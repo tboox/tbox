@@ -7,6 +7,9 @@
 # append names
 NAMES += $(NAMES-y)
 
+# append headers 
+INC_FILES += $(INC_FILES-y)
+
 # append debug cflags
 ifeq ($(DEBUG),y)
 CFLAGS := $(CFLAGS) $(CFLAGS_DEBUG)

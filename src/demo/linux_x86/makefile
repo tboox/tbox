@@ -3,8 +3,8 @@ include $(PRO_DIR)$(_)prefix.mak
 
 # module name
 NAMES 						= string
-NAMES-$(CONFIG_ENCODING) 	+= encoding
-NAMES-$(CONFIG_REGEX) 		+= regex
+NAMES-$(TB_CONFIG_ENCODING) 	+= encoding
+NAMES-$(TB_CONFIG_REGEX) 		+= regex
 
 # module type
 regex_TYPE 			= BIN
@@ -17,15 +17,15 @@ encoding_C_FILES 	= encoding
 string_C_FILES 		= string
 
 # lib files
-regex_LIBS 			= tbox eplat z m dl
+regex_LIBS 			= tbox eplat z m dl pthread
 regex_LIB_DIR 		= ../../ /usr/lib/ 
 regex_INC_DIR 		= /usr/include 
 
-encoding_LIBS 		= tbox eplat z m dl
+encoding_LIBS 		= tbox eplat z m dl pthread
 encoding_LIB_DIR 	= ../../ /usr/lib/
 encoding_INC_DIR 	= /usr/include
 
-string_LIBS 		= tbox eplat z m dl
+string_LIBS 		= tbox eplat z m dl pthread
 string_LIB_DIR 		= ../../ /usr/lib/
 string_INC_DIR 		= /usr/include
 

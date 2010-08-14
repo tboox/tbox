@@ -22,8 +22,7 @@ them both to 0; an emulation function will be used. */
 #ifndef PCRE_CONFIG_H
 #define PCRE_CONFIG_H
 
-#include "eplat/eplat.h"
-#include "../../prefix.h"
+#include "../prefix.h"
 
 /* By default, the \R escape sequence matches any Unicode line ending
    character or sequence of characters. If BSR_ANYCRLF is defined, this is

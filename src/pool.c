@@ -24,6 +24,7 @@
  * includes
  */
 #include "pool.h"
+#include "math.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -172,7 +173,7 @@ tb_byte_t* tb_pool_put(tb_pool_t* pool, tb_uint16_t item)
 	if (item >= 1 + pool->maxn)
 	{
 		// adjust max size
-		pool->maxn = TB_ALIGN(item + 1, pool->grow);
+		pool->maxn = TB_MATH_ALIGN(item + 1, pool->grow);
 		if (pool->maxn > TB_POOL_MAX_SIZE) return TB_NULL;
 
 		// tb_realloc data

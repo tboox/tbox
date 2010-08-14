@@ -14,21 +14,11 @@ ASM_SUFFIX	prefix.mak	/^ASM_SUFFIX 		= .S$/;"	m
 BIN_PREFIX	prefix.mak	/^BIN_PREFIX 		= $/;"	m
 BIN_SUFFIX	prefix.mak	/^BIN_SUFFIX 		= $/;"	m
 CC	prefix.mak	/^CC 				= $(PRE)gcc$/;"	m
-CFLAGS	prefix.mak	/^CFLAGS 			= -c -O3 -g -Wall$/;"	m
+CFLAGS	prefix.mak	/^CFLAGS 			= -c -Wall$/;"	m
 CFLAGS-I	prefix.mak	/^CFLAGS-I 		= -I$/;"	m
 CFLAGS-o	prefix.mak	/^CFLAGS-o 		= -o$/;"	m
-CONFIG_DEMO	config.mak	/^CONFIG_DEMO 				= linux_x86$/;"	m
-CONFIG_GRAPHIC_CAIRO	config.h	3;"	d
-CONFIG_GRAPHIC_DEP_LIB	config.mak	/^CONFIG_GRAPHIC_DEP_LIB 		= $/;"	m
-CONFIG_GRAPHIC_INC_DIR	config.mak	/^CONFIG_GRAPHIC_INC_DIR 		= \/usr\/include$/;"	m
-CONFIG_GRAPHIC_LIB	config.mak	/^CONFIG_GRAPHIC_LIB 			= $/;"	m
-CONFIG_GRAPHIC_LIB_DIR	config.mak	/^CONFIG_GRAPHIC_LIB_DIR 		= \/usr\/lib$/;"	m
-CONFIG_RENDER	config.mak	/^CONFIG_RENDER 				= cairo$/;"	m
-CONFIG_SHOW_DEP_LIB	config.mak	/^CONFIG_SHOW_DEP_LIB 		= z m asound dl pthread$/;"	m
-CONFIG_SHOW_DEP_LIB_DIR	config.mak	/^CONFIG_SHOW_DEP_LIB_DIR 	=$/;"	m
-CONFIG_SHOW_INC_DIR	config.mak	/^CONFIG_SHOW_INC_DIR 		= \/usr\/include$/;"	m
-CONFIG_SHOW_LIB	config.mak	/^CONFIG_SHOW_LIB 			= SDL$/;"	m
-CONFIG_SHOW_LIB_DIR	config.mak	/^CONFIG_SHOW_LIB_DIR 		= \/usr\/lib$/;"	m
+CFLAGS_DEBUG	prefix.mak	/^CFLAGS_DEBUG 	= -g -DCONFIG_DEBUG$/;"	m
+CFLAGS_RELEASE	prefix.mak	/^CFLAGS_RELEASE 	= -O2 -fomit-frame-pointer $/;"	m
 CP	prefix.mak	/^CP 				= cp$/;"	m
 CPDIR	prefix.mak	/^CPDIR 			= cp -r$/;"	m
 DLL_PREFIX	prefix.mak	/^DLL_PREFIX 		= lib$/;"	m
@@ -51,3 +41,18 @@ RM	prefix.mak	/^RM 				= rm -f$/;"	m
 RMDIR	prefix.mak	/^RMDIR 			= rm -rf$/;"	m
 SHFLAGS	prefix.mak	/^SHFLAGS 		= -shared -Wl,-soname$/;"	m
 STRIP	prefix.mak	/^STRIP 			= $(PRE)strip$/;"	m
+TB_CONFIG_ARCH	config.mak	/^TB_CONFIG_ARCH 				= x86$/;"	m
+TB_CONFIG_ARCH_x86	config.h	5;"	d
+TB_CONFIG_DEMO	config.mak	/^TB_CONFIG_DEMO 				= linux_x86$/;"	m
+TB_CONFIG_ENCODING	config.h	33;"	d
+TB_CONFIG_ENCODING	config.mak	/^TB_CONFIG_ENCODING 			= y$/;"	m
+TB_CONFIG_H	config.h	2;"	d
+TB_CONFIG_JPEG	config.h	36;"	d
+TB_CONFIG_JPEG	config.mak	/^TB_CONFIG_JPEG 				= y$/;"	m
+TB_CONFIG_MATH_HAS_ROUND	config.h	42;"	d
+TB_CONFIG_MEMORY_POOL_INDEX	config.h	27;"	d
+TB_CONFIG_MEMORY_SMALL	config.h	26;"	d
+TB_CONFIG_REGEX	config.h	30;"	d
+TB_CONFIG_REGEX	config.mak	/^TB_CONFIG_REGEX 			= y$/;"	m
+TB_CONFIG_ZLIB	config.h	39;"	d
+TB_CONFIG_ZLIB	config.mak	/^TB_CONFIG_ZLIB 				= y$/;"	m

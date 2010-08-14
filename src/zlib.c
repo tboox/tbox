@@ -25,7 +25,7 @@
  * includes
  */
 #include "zlib.h"
-#include "external/zlib/zlib.h"
+#include "external/external.h"
 
 /* /////////////////////////////////////////////////////////
  * types

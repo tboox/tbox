@@ -73,94 +73,34 @@ tb_char_t const* 	tb_bits_get_string(tb_bits_t* bits);
 tb_uint32_t 		tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n);
 tb_sint32_t 		tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n);
 
+tb_uint8_t 			tb_bits_get_u1(tb_bits_t* bits);
+
+tb_uint8_t 			tb_bits_get_u8(tb_bits_t* bits);
+tb_sint8_t 			tb_bits_get_s8(tb_bits_t* bits);
+
+tb_uint16_t 		tb_bits_get_u16(tb_bits_t* bits);
+tb_sint16_t 		tb_bits_get_s16(tb_bits_t* bits);
+
+tb_uint32_t 		tb_bits_get_u32(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s32(tb_bits_t* bits);
+
+tb_uint16_t 		tb_bits_get_u16_be(tb_bits_t* bits);
+tb_sint16_t 		tb_bits_get_s16_be(tb_bits_t* bits);
+
+tb_uint32_t 		tb_bits_get_u32_be(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s32_be(tb_bits_t* bits);
+
+tb_uint16_t 		tb_bits_get_u16_le(tb_bits_t* bits);
+tb_sint16_t 		tb_bits_get_s16_le(tb_bits_t* bits);
+
+tb_uint32_t 		tb_bits_get_u32_le(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s32_le(tb_bits_t* bits);
+
 // peek
 tb_uint32_t 		tb_bits_peek_ubits(tb_bits_t* bits, tb_size_t bits_n);
 tb_sint32_t 		tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n);
 
 
-/* the swf file format uses 8-bit, 16-bit, 32-bit, 64-bit, 
- * signed, and unsigned integer types. 
- * all integer values are stored in the swf file by using little-endian byte order
- *
- * \note
- * all integer types must be byte-aligned. 
- * that is, the first bit of an integer value must be stored
- * in the first bit of a byte in the swf file.
- */
-static __tb_inline__ tb_uint8_t tb_bits_get_u1(tb_bits_t* bits)
-{
-	tb_uint8_t val = ((*bits->p) >> (7 - bits->b)) & 1;
-	bits->b++;
-	if (bits->b >= 8) 
-	{
-		bits->p++;
-		bits->b = 0;
-	}
-	return val;
-}
-static __tb_inline__ tb_uint8_t tb_bits_get_u8(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	return *(bits->p++);
-}
-
-static __tb_inline__ tb_sint8_t tb_bits_get_s8(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	return *(bits->p++);
-}
-
-static __tb_inline__ tb_uint16_t tb_bits_get_u16(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	
-#ifdef TB_WORDS_BIGENDIAN
-	tb_uint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
-#else
-	tb_uint16_t val = *((tb_uint16_t*)bits->p);
-#endif
-	bits->p += 2;
-	return val;
-}
-
-static __tb_inline__ tb_sint16_t tb_bits_get_s16(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	
-#ifdef TB_WORDS_BIGENDIAN
-	tb_sint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
-#else
-	tb_sint16_t val = *((tb_sint16_t*)bits->p);
-#endif
-	bits->p += 2;
-	return val;
-}
-
-static __tb_inline__ tb_uint32_t tb_bits_get_u32(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	
-#ifdef TB_WORDS_BIGENDIAN
-	tb_uint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
-#else
-	tb_uint32_t val = *((tb_uint32_t*)bits->p);
-#endif
-	bits->p += 4;
-	return val;
-}
-
-static __tb_inline__ tb_sint32_t tb_bits_get_s32(tb_bits_t* bits)
-{
-	TB_ASSERT(!bits->b);
-	
-#ifdef TB_WORDS_BIGENDIAN
-	tb_sint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
-#else
-	tb_sint32_t val = *((tb_sint32_t*)bits->p);
-#endif
-	bits->p += 4;
-	return val;
-}
 
 
 static __tb_inline__ tb_uint8_t tb_pbits_get_u1(tb_byte_t const* p)

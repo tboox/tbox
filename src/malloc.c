@@ -24,13 +24,13 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
+#include "option.h"
 #include "malloc.h"
 #include "eplat/eplat.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-#ifdef TB_MEMORY_POOL_ENABLE
 void* tb_malloc(tb_size_t size)
 {
 #if 1
@@ -56,30 +56,4 @@ void tb_free(void* data)
 {
 	if (data) eplat_free(TB_MEMORY_POOL_INDEX, data);
 }
-#else
-void* tb_malloc(tb_size_t size)
-{
-#if 1
-	return malloc(size);
-#else
-	void* p = malloc(size);
-	if (p) memset(p, 0, size);
-	return p;
-#endif
-}
-void* tb_realloc(void* data, tb_size_t size)
-{
-	if (data) return realloc(data, size);
-	return TB_NULL;
-}
-void* tb_calloc(tb_size_t item, tb_size_t size)
-{
-	void* p = malloc(item * size);
-	if (p) memset(p, 0, item * size);
-	return p;
-}
-void tb_free(void* data)
-{
-	if (data) free(data);
-}
-#endif
+

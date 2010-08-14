@@ -76,7 +76,13 @@ typedef struct __tb_encoding_converter_t
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+// get the encoding converter
 tb_encoding_converter_t const* 	tb_encoding_get_converter(tb_encoding_t encoding);
+
+// convert string
+tb_size_t 						tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_char_t const* src_s, tb_size_t src_n, tb_char_t* dst_s, tb_size_t dst_n);
+
 
 // c plus plus
 #ifdef __cplusplus

@@ -1,0 +1,985 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+ASO_ZEROCHECK	fixed.h	118;"	d
+ASO_ZEROCHECK	mad.h	164;"	d
+BLOCK_MODE_NORMAL	imdct_l_arm.S	/^#define BLOCK_MODE_NORMAL   0$/;"	d
+BLOCK_MODE_START	imdct_l_arm.S	/^#define BLOCK_MODE_START    1$/;"	d
+BLOCK_MODE_STOP	imdct_l_arm.S	/^#define BLOCK_MODE_STOP     3$/;"	d
+C	layer12.c	/^  mad_fixed_t C;$/;"	m	struct:quantclass	file:
+CHAR_BIT	bit.c	29;"	d	file:
+CHAR_BIT	layer12.c	29;"	d	file:
+CHAR_BIT	layer3.c	36;"	d	file:
+CRC_POLY	bit.c	80;"	d	file:
+D	layer12.c	/^  mad_fixed_t D;$/;"	m	struct:quantclass	file:
+D	synth.c	/^mad_fixed_t const D[17][32] = {$/;"	v	file:
+FPM_64BIT	config.h	167;"	d
+FPM_ARM	config.h	155;"	d
+FPM_DEFAULT	config.h	163;"	d
+FPM_INTEL	config.h	153;"	d
+FPM_INTEL	mad.h	27;"	d
+FPM_MIPS	config.h	157;"	d
+FPM_PPC	config.h	161;"	d
+FPM_SPARC	config.h	159;"	d
+III_aliasreduce	layer3.c	/^void III_aliasreduce(mad_fixed_t xr[576], int lines)$/;"	f	file:
+III_decode	layer3.c	/^enum mad_error III_decode(struct mad_bitptr *ptr, struct mad_frame *frame,$/;"	f	file:
+III_exponents	layer3.c	/^void III_exponents(struct channel const *channel,$/;"	f	file:
+III_freqinver	layer3.c	/^void III_freqinver(mad_fixed_t sample[18][32], unsigned int sb)$/;"	f	file:
+III_huffdecode	layer3.c	/^enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],$/;"	f	file:
+III_imdct_l	imdct_l_arm.S	/^III_imdct_l:$/;"	l
+III_imdct_l	layer3.c	/^void III_imdct_l(mad_fixed_t const X[18], mad_fixed_t z[36],$/;"	f	file:
+III_imdct_s	layer3.c	/^void III_imdct_s(mad_fixed_t const X[18], mad_fixed_t z[36])$/;"	f	file:
+III_overlap	layer3.c	/^void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],$/;"	f	file:
+III_overlap_z	layer3.c	/^void III_overlap_z(mad_fixed_t overlap[18],$/;"	f	file:
+III_reorder	layer3.c	/^void III_reorder(mad_fixed_t xr[576], struct channel const *channel,$/;"	f	file:
+III_requantize	layer3.c	/^mad_fixed_t III_requantize(unsigned int value, signed int exp)$/;"	f	file:
+III_scalefactors	layer3.c	/^unsigned int III_scalefactors(struct mad_bitptr *ptr, struct channel *channel,$/;"	f	file:
+III_scalefactors_lsf	layer3.c	/^unsigned int III_scalefactors_lsf(struct mad_bitptr *ptr,$/;"	f	file:
+III_sideinfo	layer3.c	/^enum mad_error III_sideinfo(struct mad_bitptr *ptr, unsigned int nch,$/;"	f	file:
+III_stereo	layer3.c	/^enum mad_error III_stereo(mad_fixed_t xr[2][576],$/;"	f	file:
+II_samples	layer12.c	/^void II_samples(struct mad_bitptr *ptr,$/;"	f	file:
+I_STEREO	layer3.c	/^  I_STEREO  = 0x1,$/;"	e	enum:__anon5	file:
+I_sample	layer12.c	/^mad_fixed_t I_sample(struct mad_bitptr *ptr, unsigned int nb)$/;"	f	file:
+K00	imdct_l_arm.S	/^#define K00  0x0ffc19fd$/;"	d
+K01	imdct_l_arm.S	/^#define K01  0x00b2aa3e$/;"	d
+K02	imdct_l_arm.S	/^#define K02  0x0fdcf549$/;"	d
+K03	imdct_l_arm.S	/^#define K03  0x0216a2a2$/;"	d
+K04	imdct_l_arm.S	/^#define K04  0x0f9ee890$/;"	d
+K05	imdct_l_arm.S	/^#define K05  0x03768962$/;"	d
+K06	imdct_l_arm.S	/^#define K06  0x0f426cb5$/;"	d
+K07	imdct_l_arm.S	/^#define K07  0x04cfb0e2$/;"	d
+K08	imdct_l_arm.S	/^#define K08  0x0ec835e8$/;"	d
+K09	imdct_l_arm.S	/^#define K09  0x061f78aa$/;"	d
+K10	imdct_l_arm.S	/^#define K10  0x0e313245$/;"	d
+K11	imdct_l_arm.S	/^#define K11  0x07635284$/;"	d
+K12	imdct_l_arm.S	/^#define K12  0x0d7e8807$/;"	d
+K13	imdct_l_arm.S	/^#define K13  0x0898c779$/;"	d
+K14	imdct_l_arm.S	/^#define K14  0x0cb19346$/;"	d
+K15	imdct_l_arm.S	/^#define K15  0x09bd7ca0$/;"	d
+K16	imdct_l_arm.S	/^#define K16  0x0bcbe352$/;"	d
+K17	imdct_l_arm.S	/^#define K17  0x0acf37ad$/;"	d
+LIBMAD_BIT_H	bit.h	23;"	d
+LIBMAD_BIT_H	mad.h	550;"	d
+LIBMAD_CONFIG_H	config.h	5;"	d
+LIBMAD_DECODER_H	decoder.h	23;"	d
+LIBMAD_DECODER_H	mad.h	896;"	d
+LIBMAD_FIXED_H	fixed.h	23;"	d
+LIBMAD_FIXED_H	mad.h	69;"	d
+LIBMAD_FRAME_H	frame.h	23;"	d
+LIBMAD_FRAME_H	mad.h	750;"	d
+LIBMAD_GLOBAL_H	global.h	23;"	d
+LIBMAD_HUFFMAN_H	huffman.h	23;"	d
+LIBMAD_LAYER12_H	layer12.h	23;"	d
+LIBMAD_LAYER3_H	layer3.h	23;"	d
+LIBMAD_STREAM_H	mad.h	661;"	d
+LIBMAD_STREAM_H	stream.h	23;"	d
+LIBMAD_SYNTH_H	mad.h	847;"	d
+LIBMAD_SYNTH_H	synth.h	23;"	d
+LIBMAD_TIMER_H	mad.h	579;"	d
+LIBMAD_TIMER_H	timer.h	23;"	d
+LIBMAD_VERSION_H	mad.h	40;"	d
+LIBMAD_VERSION_H	version.h	23;"	d
+MAD_AUTHOR	mad.h	56;"	d
+MAD_AUTHOR	version.h	39;"	d
+MAD_BUFFER_GUARD	mad.h	664;"	d
+MAD_BUFFER_GUARD	stream.h	27;"	d
+MAD_BUFFER_MDLEN	mad.h	665;"	d
+MAD_BUFFER_MDLEN	stream.h	28;"	d
+MAD_DECODER_MODE_ASYNC	decoder.h	/^  MAD_DECODER_MODE_ASYNC$/;"	e	enum:mad_decoder_mode
+MAD_DECODER_MODE_ASYNC	mad.h	/^  MAD_DECODER_MODE_ASYNC$/;"	e	enum:mad_decoder_mode
+MAD_DECODER_MODE_SYNC	decoder.h	/^  MAD_DECODER_MODE_SYNC  = 0,$/;"	e	enum:mad_decoder_mode
+MAD_DECODER_MODE_SYNC	mad.h	/^  MAD_DECODER_MODE_SYNC  = 0,$/;"	e	enum:mad_decoder_mode
+MAD_EMAIL	mad.h	57;"	d
+MAD_EMAIL	version.h	40;"	d
+MAD_EMPHASIS_50_15_US	frame.h	/^  MAD_EMPHASIS_50_15_US	  = 1,		\/* 50\/15 microseconds emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_50_15_US	mad.h	/^  MAD_EMPHASIS_50_15_US	  = 1,		\/* 50\/15 microseconds emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_CCITT_J_17	frame.h	/^  MAD_EMPHASIS_CCITT_J_17 = 3,		\/* CCITT J.17 emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_CCITT_J_17	mad.h	/^  MAD_EMPHASIS_CCITT_J_17 = 3,		\/* CCITT J.17 emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_NONE	frame.h	/^  MAD_EMPHASIS_NONE	  = 0,		\/* no emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_NONE	mad.h	/^  MAD_EMPHASIS_NONE	  = 0,		\/* no emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_RESERVED	frame.h	/^  MAD_EMPHASIS_RESERVED   = 2		\/* unknown emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_EMPHASIS_RESERVED	mad.h	/^  MAD_EMPHASIS_RESERVED   = 2		\/* unknown emphasis *\/$/;"	e	enum:mad_emphasis
+MAD_ERROR_BADBIGVALUES	mad.h	/^  MAD_ERROR_BADBIGVALUES   = 0x0232,	\/* bad big_values count *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBIGVALUES	stream.h	/^  MAD_ERROR_BADBIGVALUES   = 0x0232,	\/* bad big_values count *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBITALLOC	mad.h	/^  MAD_ERROR_BADBITALLOC	   = 0x0211,	\/* forbidden bit allocation value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBITALLOC	stream.h	/^  MAD_ERROR_BADBITALLOC	   = 0x0211,	\/* forbidden bit allocation value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBITRATE	mad.h	/^  MAD_ERROR_BADBITRATE	   = 0x0103,	\/* forbidden bitrate value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBITRATE	stream.h	/^  MAD_ERROR_BADBITRATE	   = 0x0103,	\/* forbidden bitrate value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBLOCKTYPE	mad.h	/^  MAD_ERROR_BADBLOCKTYPE   = 0x0233,	\/* reserved block_type *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADBLOCKTYPE	stream.h	/^  MAD_ERROR_BADBLOCKTYPE   = 0x0233,	\/* reserved block_type *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADCRC	mad.h	/^  MAD_ERROR_BADCRC	   = 0x0201,	\/* CRC check failed *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADCRC	stream.h	/^  MAD_ERROR_BADCRC	   = 0x0201,	\/* CRC check failed *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADDATAPTR	mad.h	/^  MAD_ERROR_BADDATAPTR	   = 0x0235,	\/* bad main_data_begin pointer *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADDATAPTR	stream.h	/^  MAD_ERROR_BADDATAPTR	   = 0x0235,	\/* bad main_data_begin pointer *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADEMPHASIS	mad.h	/^  MAD_ERROR_BADEMPHASIS	   = 0x0105,	\/* reserved emphasis value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADEMPHASIS	stream.h	/^  MAD_ERROR_BADEMPHASIS	   = 0x0105,	\/* reserved emphasis value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADFRAMELEN	mad.h	/^  MAD_ERROR_BADFRAMELEN	   = 0x0231,	\/* bad frame length *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADFRAMELEN	stream.h	/^  MAD_ERROR_BADFRAMELEN	   = 0x0231,	\/* bad frame length *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADHUFFDATA	mad.h	/^  MAD_ERROR_BADHUFFDATA	   = 0x0238,	\/* Huffman data overrun *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADHUFFDATA	stream.h	/^  MAD_ERROR_BADHUFFDATA	   = 0x0238,	\/* Huffman data overrun *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADHUFFTABLE	mad.h	/^  MAD_ERROR_BADHUFFTABLE   = 0x0237,	\/* bad Huffman table select *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADHUFFTABLE	stream.h	/^  MAD_ERROR_BADHUFFTABLE   = 0x0237,	\/* bad Huffman table select *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADLAYER	mad.h	/^  MAD_ERROR_BADLAYER	   = 0x0102,	\/* reserved header layer value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADLAYER	stream.h	/^  MAD_ERROR_BADLAYER	   = 0x0102,	\/* reserved header layer value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADMODE	mad.h	/^  MAD_ERROR_BADMODE        = 0x0222,	\/* bad bitrate\/mode combination *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADMODE	stream.h	/^  MAD_ERROR_BADMODE        = 0x0222,	\/* bad bitrate\/mode combination *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADPART3LEN	mad.h	/^  MAD_ERROR_BADPART3LEN	   = 0x0236,	\/* bad audio data length *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADPART3LEN	stream.h	/^  MAD_ERROR_BADPART3LEN	   = 0x0236,	\/* bad audio data length *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSAMPLERATE	mad.h	/^  MAD_ERROR_BADSAMPLERATE  = 0x0104,	\/* reserved sample frequency value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSAMPLERATE	stream.h	/^  MAD_ERROR_BADSAMPLERATE  = 0x0104,	\/* reserved sample frequency value *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSCALEFACTOR	mad.h	/^  MAD_ERROR_BADSCALEFACTOR = 0x0221,	\/* bad scalefactor index *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSCALEFACTOR	stream.h	/^  MAD_ERROR_BADSCALEFACTOR = 0x0221,	\/* bad scalefactor index *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSCFSI	mad.h	/^  MAD_ERROR_BADSCFSI	   = 0x0234,	\/* bad scalefactor selection info *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSCFSI	stream.h	/^  MAD_ERROR_BADSCFSI	   = 0x0234,	\/* bad scalefactor selection info *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSTEREO	mad.h	/^  MAD_ERROR_BADSTEREO	   = 0x0239	\/* incompatible block_type for JS *\/$/;"	e	enum:mad_error
+MAD_ERROR_BADSTEREO	stream.h	/^  MAD_ERROR_BADSTEREO	   = 0x0239	\/* incompatible block_type for JS *\/$/;"	e	enum:mad_error
+MAD_ERROR_BUFLEN	mad.h	/^  MAD_ERROR_BUFLEN	   = 0x0001,	\/* input buffer too small (or EOF) *\/$/;"	e	enum:mad_error
+MAD_ERROR_BUFLEN	stream.h	/^  MAD_ERROR_BUFLEN	   = 0x0001,	\/* input buffer too small (or EOF) *\/$/;"	e	enum:mad_error
+MAD_ERROR_BUFPTR	mad.h	/^  MAD_ERROR_BUFPTR	   = 0x0002,	\/* invalid (null) buffer pointer *\/$/;"	e	enum:mad_error
+MAD_ERROR_BUFPTR	stream.h	/^  MAD_ERROR_BUFPTR	   = 0x0002,	\/* invalid (null) buffer pointer *\/$/;"	e	enum:mad_error
+MAD_ERROR_LOSTSYNC	mad.h	/^  MAD_ERROR_LOSTSYNC	   = 0x0101,	\/* lost synchronization *\/$/;"	e	enum:mad_error
+MAD_ERROR_LOSTSYNC	stream.h	/^  MAD_ERROR_LOSTSYNC	   = 0x0101,	\/* lost synchronization *\/$/;"	e	enum:mad_error
+MAD_ERROR_NOMEM	mad.h	/^  MAD_ERROR_NOMEM	   = 0x0031,	\/* not enough memory *\/$/;"	e	enum:mad_error
+MAD_ERROR_NOMEM	stream.h	/^  MAD_ERROR_NOMEM	   = 0x0031,	\/* not enough memory *\/$/;"	e	enum:mad_error
+MAD_ERROR_NONE	mad.h	/^  MAD_ERROR_NONE	   = 0x0000,	\/* no error *\/$/;"	e	enum:mad_error
+MAD_ERROR_NONE	stream.h	/^  MAD_ERROR_NONE	   = 0x0000,	\/* no error *\/$/;"	e	enum:mad_error
+MAD_F	fixed.h	112;"	d
+MAD_F	fixed.h	113;"	d
+MAD_F	fixed.h	75;"	d
+MAD_F	fixed.h	79;"	d
+MAD_F	fixed.h	85;"	d
+MAD_F	mad.h	121;"	d
+MAD_F	mad.h	125;"	d
+MAD_F	mad.h	131;"	d
+MAD_F	mad.h	158;"	d
+MAD_F	mad.h	159;"	d
+MAD_FLAG_COPYRIGHT	frame.h	/^  MAD_FLAG_COPYRIGHT	= 0x0020,	\/* frame is copyright *\/$/;"	e	enum:__anon12
+MAD_FLAG_COPYRIGHT	mad.h	/^  MAD_FLAG_COPYRIGHT	= 0x0020,	\/* frame is copyright *\/$/;"	e	enum:__anon20
+MAD_FLAG_FREEFORMAT	frame.h	/^  MAD_FLAG_FREEFORMAT	= 0x0400,	\/* uses free format bitrate *\/$/;"	e	enum:__anon12
+MAD_FLAG_FREEFORMAT	mad.h	/^  MAD_FLAG_FREEFORMAT	= 0x0400,	\/* uses free format bitrate *\/$/;"	e	enum:__anon20
+MAD_FLAG_INCOMPLETE	frame.h	/^  MAD_FLAG_INCOMPLETE	= 0x0008,	\/* header but not data is decoded *\/$/;"	e	enum:__anon12
+MAD_FLAG_INCOMPLETE	mad.h	/^  MAD_FLAG_INCOMPLETE	= 0x0008,	\/* header but not data is decoded *\/$/;"	e	enum:__anon20
+MAD_FLAG_I_STEREO	frame.h	/^  MAD_FLAG_I_STEREO	= 0x0100,	\/* uses intensity joint stereo *\/$/;"	e	enum:__anon12
+MAD_FLAG_I_STEREO	mad.h	/^  MAD_FLAG_I_STEREO	= 0x0100,	\/* uses intensity joint stereo *\/$/;"	e	enum:__anon20
+MAD_FLAG_LSF_EXT	frame.h	/^  MAD_FLAG_LSF_EXT	= 0x1000,	\/* lower sampling freq. extension *\/$/;"	e	enum:__anon12
+MAD_FLAG_LSF_EXT	mad.h	/^  MAD_FLAG_LSF_EXT	= 0x1000,	\/* lower sampling freq. extension *\/$/;"	e	enum:__anon20
+MAD_FLAG_MC_EXT	frame.h	/^  MAD_FLAG_MC_EXT	= 0x2000,	\/* multichannel audio extension *\/$/;"	e	enum:__anon12
+MAD_FLAG_MC_EXT	mad.h	/^  MAD_FLAG_MC_EXT	= 0x2000,	\/* multichannel audio extension *\/$/;"	e	enum:__anon20
+MAD_FLAG_MPEG_2_5_EXT	frame.h	/^  MAD_FLAG_MPEG_2_5_EXT	= 0x4000	\/* MPEG 2.5 (unofficial) extension *\/$/;"	e	enum:__anon12
+MAD_FLAG_MPEG_2_5_EXT	mad.h	/^  MAD_FLAG_MPEG_2_5_EXT	= 0x4000	\/* MPEG 2.5 (unofficial) extension *\/$/;"	e	enum:__anon20
+MAD_FLAG_MS_STEREO	frame.h	/^  MAD_FLAG_MS_STEREO	= 0x0200,	\/* uses middle\/side joint stereo *\/$/;"	e	enum:__anon12
+MAD_FLAG_MS_STEREO	mad.h	/^  MAD_FLAG_MS_STEREO	= 0x0200,	\/* uses middle\/side joint stereo *\/$/;"	e	enum:__anon20
+MAD_FLAG_NPRIVATE_III	frame.h	/^  MAD_FLAG_NPRIVATE_III	= 0x0007,	\/* number of Layer III private bits *\/$/;"	e	enum:__anon12
+MAD_FLAG_NPRIVATE_III	mad.h	/^  MAD_FLAG_NPRIVATE_III	= 0x0007,	\/* number of Layer III private bits *\/$/;"	e	enum:__anon20
+MAD_FLAG_ORIGINAL	frame.h	/^  MAD_FLAG_ORIGINAL	= 0x0040,	\/* frame is original (else copy) *\/$/;"	e	enum:__anon12
+MAD_FLAG_ORIGINAL	mad.h	/^  MAD_FLAG_ORIGINAL	= 0x0040,	\/* frame is original (else copy) *\/$/;"	e	enum:__anon20
+MAD_FLAG_PADDING	frame.h	/^  MAD_FLAG_PADDING	= 0x0080,	\/* frame has additional slot *\/$/;"	e	enum:__anon12
+MAD_FLAG_PADDING	mad.h	/^  MAD_FLAG_PADDING	= 0x0080,	\/* frame has additional slot *\/$/;"	e	enum:__anon20
+MAD_FLAG_PROTECTION	frame.h	/^  MAD_FLAG_PROTECTION	= 0x0010,	\/* frame has CRC protection *\/$/;"	e	enum:__anon12
+MAD_FLAG_PROTECTION	mad.h	/^  MAD_FLAG_PROTECTION	= 0x0010,	\/* frame has CRC protection *\/$/;"	e	enum:__anon20
+MAD_FLOW_BREAK	decoder.h	/^  MAD_FLOW_BREAK    = 0x0011,	\/* stop decoding and signal an error *\/$/;"	e	enum:mad_flow
+MAD_FLOW_BREAK	mad.h	/^  MAD_FLOW_BREAK    = 0x0011,	\/* stop decoding and signal an error *\/$/;"	e	enum:mad_flow
+MAD_FLOW_CONTINUE	decoder.h	/^  MAD_FLOW_CONTINUE = 0x0000,	\/* continue normally *\/$/;"	e	enum:mad_flow
+MAD_FLOW_CONTINUE	mad.h	/^  MAD_FLOW_CONTINUE = 0x0000,	\/* continue normally *\/$/;"	e	enum:mad_flow
+MAD_FLOW_IGNORE	decoder.h	/^  MAD_FLOW_IGNORE   = 0x0020	\/* ignore the current frame *\/$/;"	e	enum:mad_flow
+MAD_FLOW_IGNORE	mad.h	/^  MAD_FLOW_IGNORE   = 0x0020	\/* ignore the current frame *\/$/;"	e	enum:mad_flow
+MAD_FLOW_STOP	decoder.h	/^  MAD_FLOW_STOP     = 0x0010,	\/* stop decoding normally *\/$/;"	e	enum:mad_flow
+MAD_FLOW_STOP	mad.h	/^  MAD_FLOW_STOP     = 0x0010,	\/* stop decoding normally *\/$/;"	e	enum:mad_flow
+MAD_F_FRACBITS	fixed.h	72;"	d
+MAD_F_FRACBITS	mad.h	118;"	d
+MAD_F_MAX	fixed.h	91;"	d
+MAD_F_MAX	mad.h	137;"	d
+MAD_F_MIN	fixed.h	90;"	d
+MAD_F_MIN	mad.h	136;"	d
+MAD_F_ML0	fixed.h	321;"	d
+MAD_F_ML0	fixed.h	461;"	d
+MAD_F_ML0	fixed.h	468;"	d
+MAD_F_ML0	mad.h	367;"	d
+MAD_F_ML0	mad.h	507;"	d
+MAD_F_ML0	mad.h	514;"	d
+MAD_F_MLA	fixed.h	179;"	d
+MAD_F_MLA	fixed.h	273;"	d
+MAD_F_MLA	fixed.h	312;"	d
+MAD_F_MLA	fixed.h	325;"	d
+MAD_F_MLA	fixed.h	375;"	d
+MAD_F_MLA	fixed.h	462;"	d
+MAD_F_MLA	mad.h	225;"	d
+MAD_F_MLA	mad.h	319;"	d
+MAD_F_MLA	mad.h	358;"	d
+MAD_F_MLA	mad.h	371;"	d
+MAD_F_MLA	mad.h	421;"	d
+MAD_F_MLA	mad.h	508;"	d
+MAD_F_MLN	fixed.h	278;"	d
+MAD_F_MLN	fixed.h	463;"	d
+MAD_F_MLN	fixed.h	472;"	d
+MAD_F_MLN	mad.h	324;"	d
+MAD_F_MLN	mad.h	509;"	d
+MAD_F_MLN	mad.h	518;"	d
+MAD_F_MLX	fixed.h	169;"	d
+MAD_F_MLX	fixed.h	268;"	d
+MAD_F_MLX	fixed.h	306;"	d
+MAD_F_MLX	fixed.h	346;"	d
+MAD_F_MLX	fixed.h	360;"	d
+MAD_F_MLX	mad.h	215;"	d
+MAD_F_MLX	mad.h	314;"	d
+MAD_F_MLX	mad.h	352;"	d
+MAD_F_MLX	mad.h	392;"	d
+MAD_F_MLX	mad.h	406;"	d
+MAD_F_MLZ	fixed.h	329;"	d
+MAD_F_MLZ	fixed.h	464;"	d
+MAD_F_MLZ	fixed.h	476;"	d
+MAD_F_MLZ	mad.h	375;"	d
+MAD_F_MLZ	mad.h	510;"	d
+MAD_F_MLZ	mad.h	522;"	d
+MAD_F_ONE	fixed.h	93;"	d
+MAD_F_ONE	mad.h	139;"	d
+MAD_F_SCALEBITS	fixed.h	136;"	d
+MAD_F_SCALEBITS	fixed.h	237;"	d
+MAD_F_SCALEBITS	fixed.h	296;"	d
+MAD_F_SCALEBITS	fixed.h	335;"	d
+MAD_F_SCALEBITS	fixed.h	421;"	d
+MAD_F_SCALEBITS	fixed.h	491;"	d
+MAD_F_SCALEBITS	mad.h	182;"	d
+MAD_F_SCALEBITS	mad.h	283;"	d
+MAD_F_SCALEBITS	mad.h	342;"	d
+MAD_F_SCALEBITS	mad.h	381;"	d
+MAD_F_SCALEBITS	mad.h	467;"	d
+MAD_F_SCALEBITS	mad.h	537;"	d
+MAD_F_SCALEBITS	synth.c	534;"	d	file:
+MAD_F_SCALEBITS	synth.c	535;"	d	file:
+MAD_LAYER_I	frame.h	/^  MAD_LAYER_I   = 1,			\/* Layer I *\/$/;"	e	enum:mad_layer
+MAD_LAYER_I	mad.h	/^  MAD_LAYER_I   = 1,			\/* Layer I *\/$/;"	e	enum:mad_layer
+MAD_LAYER_II	frame.h	/^  MAD_LAYER_II  = 2,			\/* Layer II *\/$/;"	e	enum:mad_layer
+MAD_LAYER_II	mad.h	/^  MAD_LAYER_II  = 2,			\/* Layer II *\/$/;"	e	enum:mad_layer
+MAD_LAYER_III	frame.h	/^  MAD_LAYER_III = 3			\/* Layer III *\/$/;"	e	enum:mad_layer
+MAD_LAYER_III	mad.h	/^  MAD_LAYER_III = 3			\/* Layer III *\/$/;"	e	enum:mad_layer
+MAD_MODE_DUAL_CHANNEL	frame.h	/^  MAD_MODE_DUAL_CHANNEL	  = 1,		\/* dual channel *\/$/;"	e	enum:mad_mode
+MAD_MODE_DUAL_CHANNEL	mad.h	/^  MAD_MODE_DUAL_CHANNEL	  = 1,		\/* dual channel *\/$/;"	e	enum:mad_mode
+MAD_MODE_JOINT_STEREO	frame.h	/^  MAD_MODE_JOINT_STEREO	  = 2,		\/* joint (MS\/intensity) stereo *\/$/;"	e	enum:mad_mode
+MAD_MODE_JOINT_STEREO	mad.h	/^  MAD_MODE_JOINT_STEREO	  = 2,		\/* joint (MS\/intensity) stereo *\/$/;"	e	enum:mad_mode
+MAD_MODE_SINGLE_CHANNEL	frame.h	/^  MAD_MODE_SINGLE_CHANNEL = 0,		\/* single channel *\/$/;"	e	enum:mad_mode
+MAD_MODE_SINGLE_CHANNEL	mad.h	/^  MAD_MODE_SINGLE_CHANNEL = 0,		\/* single channel *\/$/;"	e	enum:mad_mode
+MAD_MODE_STEREO	frame.h	/^  MAD_MODE_STEREO	  = 3		\/* normal LR stereo *\/$/;"	e	enum:mad_mode
+MAD_MODE_STEREO	mad.h	/^  MAD_MODE_STEREO	  = 3		\/* normal LR stereo *\/$/;"	e	enum:mad_mode
+MAD_NCHANNELS	frame.h	76;"	d
+MAD_NCHANNELS	mad.h	800;"	d
+MAD_NSBSAMPLES	frame.h	77;"	d
+MAD_NSBSAMPLES	mad.h	801;"	d
+MAD_OPTION_HALFSAMPLERATE	mad.h	/^  MAD_OPTION_HALFSAMPLERATE = 0x0002	\/* generate PCM at 1\/2 sample rate *\/$/;"	e	enum:__anon19
+MAD_OPTION_HALFSAMPLERATE	stream.h	/^  MAD_OPTION_HALFSAMPLERATE = 0x0002	\/* generate PCM at 1\/2 sample rate *\/$/;"	e	enum:__anon15
+MAD_OPTION_IGNORECRC	mad.h	/^  MAD_OPTION_IGNORECRC      = 0x0001,	\/* ignore CRC errors *\/$/;"	e	enum:__anon19
+MAD_OPTION_IGNORECRC	stream.h	/^  MAD_OPTION_IGNORECRC      = 0x0001,	\/* ignore CRC errors *\/$/;"	e	enum:__anon15
+MAD_PCM_CHANNEL_DUAL_1	mad.h	/^  MAD_PCM_CHANNEL_DUAL_1 = 0,$/;"	e	enum:__anon23
+MAD_PCM_CHANNEL_DUAL_1	synth.h	/^  MAD_PCM_CHANNEL_DUAL_1 = 0,$/;"	e	enum:__anon2
+MAD_PCM_CHANNEL_DUAL_2	mad.h	/^  MAD_PCM_CHANNEL_DUAL_2 = 1$/;"	e	enum:__anon23
+MAD_PCM_CHANNEL_DUAL_2	synth.h	/^  MAD_PCM_CHANNEL_DUAL_2 = 1$/;"	e	enum:__anon2
+MAD_PCM_CHANNEL_SINGLE	mad.h	/^  MAD_PCM_CHANNEL_SINGLE = 0$/;"	e	enum:__anon22
+MAD_PCM_CHANNEL_SINGLE	synth.h	/^  MAD_PCM_CHANNEL_SINGLE = 0$/;"	e	enum:__anon1
+MAD_PCM_CHANNEL_STEREO_LEFT	mad.h	/^  MAD_PCM_CHANNEL_STEREO_LEFT  = 0,$/;"	e	enum:__anon24
+MAD_PCM_CHANNEL_STEREO_LEFT	synth.h	/^  MAD_PCM_CHANNEL_STEREO_LEFT  = 0,$/;"	e	enum:__anon3
+MAD_PCM_CHANNEL_STEREO_RIGHT	mad.h	/^  MAD_PCM_CHANNEL_STEREO_RIGHT = 1$/;"	e	enum:__anon24
+MAD_PCM_CHANNEL_STEREO_RIGHT	synth.h	/^  MAD_PCM_CHANNEL_STEREO_RIGHT = 1$/;"	e	enum:__anon3
+MAD_PRIVATE_HEADER	frame.h	/^  MAD_PRIVATE_HEADER	= 0x0100,	\/* header private bit *\/$/;"	e	enum:__anon13
+MAD_PRIVATE_HEADER	mad.h	/^  MAD_PRIVATE_HEADER	= 0x0100,	\/* header private bit *\/$/;"	e	enum:__anon21
+MAD_PRIVATE_III	frame.h	/^  MAD_PRIVATE_III	= 0x001f	\/* Layer III private bits (up to 5) *\/$/;"	e	enum:__anon13
+MAD_PRIVATE_III	mad.h	/^  MAD_PRIVATE_III	= 0x001f	\/* Layer III private bits (up to 5) *\/$/;"	e	enum:__anon21
+MAD_PUBLISHYEAR	mad.h	55;"	d
+MAD_PUBLISHYEAR	version.h	38;"	d
+MAD_RECOVERABLE	mad.h	696;"	d
+MAD_RECOVERABLE	stream.h	59;"	d
+MAD_TIMER_RESOLUTION	mad.h	588;"	d
+MAD_TIMER_RESOLUTION	timer.h	32;"	d
+MAD_UNITS_11025_HZ	mad.h	/^  MAD_UNITS_11025_HZ	 = 11025,$/;"	e	enum:mad_units
+MAD_UNITS_11025_HZ	timer.h	/^  MAD_UNITS_11025_HZ	 = 11025,$/;"	e	enum:mad_units
+MAD_UNITS_12000_HZ	mad.h	/^  MAD_UNITS_12000_HZ	 = 12000,$/;"	e	enum:mad_units
+MAD_UNITS_12000_HZ	timer.h	/^  MAD_UNITS_12000_HZ	 = 12000,$/;"	e	enum:mad_units
+MAD_UNITS_16000_HZ	mad.h	/^  MAD_UNITS_16000_HZ	 = 16000,$/;"	e	enum:mad_units
+MAD_UNITS_16000_HZ	timer.h	/^  MAD_UNITS_16000_HZ	 = 16000,$/;"	e	enum:mad_units
+MAD_UNITS_22050_HZ	mad.h	/^  MAD_UNITS_22050_HZ	 = 22050,$/;"	e	enum:mad_units
+MAD_UNITS_22050_HZ	timer.h	/^  MAD_UNITS_22050_HZ	 = 22050,$/;"	e	enum:mad_units
+MAD_UNITS_23_976_FPS	mad.h	/^  MAD_UNITS_23_976_FPS	 =   -24,$/;"	e	enum:mad_units
+MAD_UNITS_23_976_FPS	timer.h	/^  MAD_UNITS_23_976_FPS	 =   -24,$/;"	e	enum:mad_units
+MAD_UNITS_24000_HZ	mad.h	/^  MAD_UNITS_24000_HZ	 = 24000,$/;"	e	enum:mad_units
+MAD_UNITS_24000_HZ	timer.h	/^  MAD_UNITS_24000_HZ	 = 24000,$/;"	e	enum:mad_units
+MAD_UNITS_24_975_FPS	mad.h	/^  MAD_UNITS_24_975_FPS	 =   -25,$/;"	e	enum:mad_units
+MAD_UNITS_24_975_FPS	timer.h	/^  MAD_UNITS_24_975_FPS	 =   -25,$/;"	e	enum:mad_units
+MAD_UNITS_24_FPS	mad.h	/^  MAD_UNITS_24_FPS	 =    24,$/;"	e	enum:mad_units
+MAD_UNITS_24_FPS	timer.h	/^  MAD_UNITS_24_FPS	 =    24,$/;"	e	enum:mad_units
+MAD_UNITS_25_FPS	mad.h	/^  MAD_UNITS_25_FPS	 =    25,$/;"	e	enum:mad_units
+MAD_UNITS_25_FPS	timer.h	/^  MAD_UNITS_25_FPS	 =    25,$/;"	e	enum:mad_units
+MAD_UNITS_29_97_FPS	mad.h	/^  MAD_UNITS_29_97_FPS	 =   -30,$/;"	e	enum:mad_units
+MAD_UNITS_29_97_FPS	timer.h	/^  MAD_UNITS_29_97_FPS	 =   -30,$/;"	e	enum:mad_units
+MAD_UNITS_30_FPS	mad.h	/^  MAD_UNITS_30_FPS	 =    30,$/;"	e	enum:mad_units
+MAD_UNITS_30_FPS	timer.h	/^  MAD_UNITS_30_FPS	 =    30,$/;"	e	enum:mad_units
+MAD_UNITS_32000_HZ	mad.h	/^  MAD_UNITS_32000_HZ	 = 32000,$/;"	e	enum:mad_units
+MAD_UNITS_32000_HZ	timer.h	/^  MAD_UNITS_32000_HZ	 = 32000,$/;"	e	enum:mad_units
+MAD_UNITS_44100_HZ	mad.h	/^  MAD_UNITS_44100_HZ	 = 44100,$/;"	e	enum:mad_units
+MAD_UNITS_44100_HZ	timer.h	/^  MAD_UNITS_44100_HZ	 = 44100,$/;"	e	enum:mad_units
+MAD_UNITS_47_952_FPS	mad.h	/^  MAD_UNITS_47_952_FPS	 =   -48,$/;"	e	enum:mad_units
+MAD_UNITS_47_952_FPS	timer.h	/^  MAD_UNITS_47_952_FPS	 =   -48,$/;"	e	enum:mad_units
+MAD_UNITS_48000_HZ	mad.h	/^  MAD_UNITS_48000_HZ	 = 48000,$/;"	e	enum:mad_units
+MAD_UNITS_48000_HZ	timer.h	/^  MAD_UNITS_48000_HZ	 = 48000,$/;"	e	enum:mad_units
+MAD_UNITS_48_FPS	mad.h	/^  MAD_UNITS_48_FPS	 =    48,$/;"	e	enum:mad_units
+MAD_UNITS_48_FPS	timer.h	/^  MAD_UNITS_48_FPS	 =    48,$/;"	e	enum:mad_units
+MAD_UNITS_49_95_FPS	mad.h	/^  MAD_UNITS_49_95_FPS	 =   -50,$/;"	e	enum:mad_units
+MAD_UNITS_49_95_FPS	timer.h	/^  MAD_UNITS_49_95_FPS	 =   -50,$/;"	e	enum:mad_units
+MAD_UNITS_50_FPS	mad.h	/^  MAD_UNITS_50_FPS	 =    50,$/;"	e	enum:mad_units
+MAD_UNITS_50_FPS	timer.h	/^  MAD_UNITS_50_FPS	 =    50,$/;"	e	enum:mad_units
+MAD_UNITS_59_94_FPS	mad.h	/^  MAD_UNITS_59_94_FPS	 =   -60$/;"	e	enum:mad_units
+MAD_UNITS_59_94_FPS	timer.h	/^  MAD_UNITS_59_94_FPS	 =   -60$/;"	e	enum:mad_units
+MAD_UNITS_60_FPS	mad.h	/^  MAD_UNITS_60_FPS	 =    60,$/;"	e	enum:mad_units
+MAD_UNITS_60_FPS	timer.h	/^  MAD_UNITS_60_FPS	 =    60,$/;"	e	enum:mad_units
+MAD_UNITS_75_FPS	mad.h	/^  MAD_UNITS_75_FPS	 =    75,$/;"	e	enum:mad_units
+MAD_UNITS_75_FPS	timer.h	/^  MAD_UNITS_75_FPS	 =    75,$/;"	e	enum:mad_units
+MAD_UNITS_8000_HZ	mad.h	/^  MAD_UNITS_8000_HZ	 =  8000,$/;"	e	enum:mad_units
+MAD_UNITS_8000_HZ	timer.h	/^  MAD_UNITS_8000_HZ	 =  8000,$/;"	e	enum:mad_units
+MAD_UNITS_CENTISECONDS	mad.h	/^  MAD_UNITS_CENTISECONDS =   100,$/;"	e	enum:mad_units
+MAD_UNITS_CENTISECONDS	timer.h	/^  MAD_UNITS_CENTISECONDS =   100,$/;"	e	enum:mad_units
+MAD_UNITS_DECISECONDS	mad.h	/^  MAD_UNITS_DECISECONDS	 =    10,$/;"	e	enum:mad_units
+MAD_UNITS_DECISECONDS	timer.h	/^  MAD_UNITS_DECISECONDS	 =    10,$/;"	e	enum:mad_units
+MAD_UNITS_HOURS	mad.h	/^  MAD_UNITS_HOURS	 =    -2,$/;"	e	enum:mad_units
+MAD_UNITS_HOURS	timer.h	/^  MAD_UNITS_HOURS	 =    -2,$/;"	e	enum:mad_units
+MAD_UNITS_MILLISECONDS	mad.h	/^  MAD_UNITS_MILLISECONDS =  1000,$/;"	e	enum:mad_units
+MAD_UNITS_MILLISECONDS	timer.h	/^  MAD_UNITS_MILLISECONDS =  1000,$/;"	e	enum:mad_units
+MAD_UNITS_MINUTES	mad.h	/^  MAD_UNITS_MINUTES	 =    -1,$/;"	e	enum:mad_units
+MAD_UNITS_MINUTES	timer.h	/^  MAD_UNITS_MINUTES	 =    -1,$/;"	e	enum:mad_units
+MAD_UNITS_SECONDS	mad.h	/^  MAD_UNITS_SECONDS	 =     0,$/;"	e	enum:mad_units
+MAD_UNITS_SECONDS	timer.h	/^  MAD_UNITS_SECONDS	 =     0,$/;"	e	enum:mad_units
+MAD_VERSION	mad.h	50;"	d
+MAD_VERSION	version.h	33;"	d
+MAD_VERSION_EXTRA	mad.h	45;"	d
+MAD_VERSION_EXTRA	version.h	28;"	d
+MAD_VERSION_MAJOR	mad.h	42;"	d
+MAD_VERSION_MAJOR	version.h	25;"	d
+MAD_VERSION_MINOR	mad.h	43;"	d
+MAD_VERSION_MINOR	version.h	26;"	d
+MAD_VERSION_PATCH	mad.h	44;"	d
+MAD_VERSION_PATCH	version.h	27;"	d
+MAD_VERSION_STRING	mad.h	48;"	d
+MAD_VERSION_STRING	version.h	31;"	d
+MAD_VERSION_STRINGIZE	mad.h	47;"	d
+MAD_VERSION_STRINGIZE	version.h	30;"	d
+MASK	layer3.c	1271;"	d	file:
+MASK	layer3.c	921;"	d	file:
+MASK1BIT	layer3.c	1272;"	d	file:
+MASK1BIT	layer3.c	923;"	d	file:
+ML0	synth.c	521;"	d	file:
+ML0	synth.c	528;"	d	file:
+MLA	synth.c	522;"	d	file:
+MLA	synth.c	529;"	d	file:
+MLN	synth.c	523;"	d	file:
+MLN	synth.c	530;"	d	file:
+MLZ	synth.c	524;"	d	file:
+MLZ	synth.c	531;"	d	file:
+MS_STEREO	layer3.c	/^  MS_STEREO = 0x2$/;"	e	enum:__anon5	file:
+MUL	synth.c	105;"	d	file:
+MUL	synth.c	113;"	d	file:
+MUL	synth.c	512;"	d	file:
+OPT_DCTO	synth.c	104;"	d	file:
+OPT_DCTO	synth.c	112;"	d	file:
+OPT_SPEED	config.h	87;"	d
+OPT_SPEED	mad.h	30;"	d
+OPT_SSO	global.h	42;"	d
+OPT_SSO	synth.c	90;"	d	file:
+PACKAGE	config.h	97;"	d
+PACKAGE_BUGREPORT	config.h	100;"	d
+PACKAGE_NAME	config.h	103;"	d
+PACKAGE_STRING	config.h	106;"	d
+PACKAGE_TARNAME	config.h	109;"	d
+PACKAGE_VERSION	config.h	112;"	d
+PRESHIFT	synth.c	526;"	d	file:
+PRESHIFT	synth.c	536;"	d	file:
+PRESHIFT	synth.c	538;"	d	file:
+PTR	huffman.c	111;"	d	file:
+PTR	huffman.c	115;"	d	file:
+PTR	huffman.c	118;"	d	file:
+PTR	huffman.c	3068;"	d	file:
+PTR	huffman.c	37;"	d	file:
+PTR	huffman.c	40;"	d	file:
+SHIFT	synth.c	513;"	d	file:
+SHIFT	synth.c	525;"	d	file:
+SHIFT	synth.c	532;"	d	file:
+SHIFT	synth.c	96;"	d	file:
+SHIFT	synth.c	98;"	d	file:
+SIZEOF_INT	config.h	115;"	d
+SIZEOF_INT	mad.h	32;"	d
+SIZEOF_LONG	config.h	118;"	d
+SIZEOF_LONG	mad.h	33;"	d
+SIZEOF_LONG_LONG	config.h	122;"	d
+SIZEOF_LONG_LONG	config.h	124;"	d
+SIZEOF_LONG_LONG	mad.h	34;"	d
+USE_ASYNC	global.h	47;"	d
+V	huffman.c	110;"	d	file:
+V	huffman.c	116;"	d	file:
+V	huffman.c	120;"	d	file:
+V	huffman.c	122;"	d	file:
+V	huffman.c	3067;"	d	file:
+V	huffman.c	38;"	d	file:
+V	huffman.c	42;"	d	file:
+V	huffman.c	45;"	d	file:
+VERSION	config.h	131;"	d
+WL0	imdct_l_arm.S	/^#define WL0  0x00b2aa3e$/;"	d
+WL1	imdct_l_arm.S	/^#define WL1  0x0216a2a2$/;"	d
+WL10	imdct_l_arm.S	/^#define WL10 0x0cb19346$/;"	d
+WL11	imdct_l_arm.S	/^#define WL11 0x0d7e8807$/;"	d
+WL12	imdct_l_arm.S	/^#define WL12 0x0e313245$/;"	d
+WL13	imdct_l_arm.S	/^#define WL13 0x0ec835e8$/;"	d
+WL14	imdct_l_arm.S	/^#define WL14 0x0f426cb5$/;"	d
+WL15	imdct_l_arm.S	/^#define WL15 0x0f9ee890$/;"	d
+WL16	imdct_l_arm.S	/^#define WL16 0x0fdcf549$/;"	d
+WL17	imdct_l_arm.S	/^#define WL17 0x0ffc19fd$/;"	d
+WL2	imdct_l_arm.S	/^#define WL2  0x03768962$/;"	d
+WL3	imdct_l_arm.S	/^#define WL3  0x04cfb0e2$/;"	d
+WL4	imdct_l_arm.S	/^#define WL4  0x061f78aa$/;"	d
+WL5	imdct_l_arm.S	/^#define WL5  0x07635284$/;"	d
+WL6	imdct_l_arm.S	/^#define WL6  0x0898c779$/;"	d
+WL7	imdct_l_arm.S	/^#define WL7  0x09bd7ca0$/;"	d
+WL8	imdct_l_arm.S	/^#define WL8  0x0acf37ad$/;"	d
+WL9	imdct_l_arm.S	/^#define WL9  0x0bcbe352$/;"	d
+WORDS_BIGENDIAN	config.h	136;"	d
+X0	imdct_l_arm.S	/^#define X0   0x00$/;"	d
+X1	imdct_l_arm.S	/^#define X1   0x04$/;"	d
+X10	imdct_l_arm.S	/^#define X10  0x28$/;"	d
+X11	imdct_l_arm.S	/^#define X11  0x2c$/;"	d
+X12	imdct_l_arm.S	/^#define X12  0x30$/;"	d
+X13	imdct_l_arm.S	/^#define X13  0x34$/;"	d
+X14	imdct_l_arm.S	/^#define X14  0x38$/;"	d
+X15	imdct_l_arm.S	/^#define X15  0x3c$/;"	d
+X16	imdct_l_arm.S	/^#define X16  0x40$/;"	d
+X17	imdct_l_arm.S	/^#define X17  0x44$/;"	d
+X2	imdct_l_arm.S	/^#define X2   0x08$/;"	d
+X3	imdct_l_arm.S	/^#define X3   0x0C$/;"	d
+X4	imdct_l_arm.S	/^#define X4   0x10$/;"	d
+X5	imdct_l_arm.S	/^#define X5   0x14$/;"	d
+X6	imdct_l_arm.S	/^#define X6   0x18$/;"	d
+X7	imdct_l_arm.S	/^#define X7   0x1c$/;"	d
+X8	imdct_l_arm.S	/^#define X8   0x20$/;"	d
+X9	imdct_l_arm.S	/^#define X9   0x24$/;"	d
+_III_imdct_l	imdct_l_arm.S	/^_III_imdct_l:$/;"	l
+anc_bitlen	mad.h	/^  unsigned int anc_bitlen;		\/* number of ancillary bits *\/$/;"	m	struct:mad_stream
+anc_bitlen	stream.h	/^  unsigned int anc_bitlen;		\/* number of ancillary bits *\/$/;"	m	struct:mad_stream
+anc_ptr	mad.h	/^  struct mad_bitptr anc_ptr;		\/* ancillary bits pointer *\/$/;"	m	struct:mad_stream	typeref:struct:mad_stream::mad_bitptr
+anc_ptr	stream.h	/^  struct mad_bitptr anc_ptr;		\/* ancillary bits pointer *\/$/;"	m	struct:mad_stream	typeref:struct:mad_stream::mad_bitptr
+assert	global.h	52;"	d
+assert	global.h	54;"	d
+async	decoder.h	/^  } async;$/;"	m	struct:mad_decoder	typeref:struct:mad_decoder::__anon16
+async	mad.h	/^  } async;$/;"	m	struct:mad_decoder	typeref:struct:mad_decoder::__anon25
+big_values	layer3.c	/^      unsigned short big_values;$/;"	m	struct:sideinfo::granule::channel	file:
+bitalloc_table	layer12.c	/^} const bitalloc_table[8] = {$/;"	v	file:
+bitrate	frame.h	/^  unsigned long bitrate;		\/* stream bitrate (bps) *\/$/;"	m	struct:mad_header
+bitrate	mad.h	/^  unsigned long bitrate;		\/* stream bitrate (bps) *\/$/;"	m	struct:mad_header
+bitrate_table	frame.c	/^unsigned long const bitrate_table[5][15] = {$/;"	v	file:
+bits	huffman.h	/^    unsigned short bits   :  3;$/;"	m	struct:huffpair::__anon10
+bits	huffman.h	/^    unsigned short bits   :  3;$/;"	m	struct:huffquad::__anon8
+bits	layer12.c	/^  unsigned char bits;$/;"	m	struct:quantclass	file:
+block_type	layer3.c	/^      unsigned char block_type;$/;"	m	struct:sideinfo::granule::channel	file:
+bufend	mad.h	/^  unsigned char const *bufend;		\/* end of buffer *\/$/;"	m	struct:mad_stream
+bufend	stream.h	/^  unsigned char const *bufend;		\/* end of buffer *\/$/;"	m	struct:mad_stream
+buffer	mad.h	/^  unsigned char const *buffer;		\/* input bitstream buffer *\/$/;"	m	struct:mad_stream
+buffer	minimad.c	/^struct buffer {$/;"	s	file:
+buffer	stream.h	/^  unsigned char const *buffer;		\/* input bitstream buffer *\/$/;"	m	struct:mad_stream
+byte	bit.h	/^  unsigned char const *byte;$/;"	m	struct:mad_bitptr
+byte	mad.h	/^  unsigned char const *byte;$/;"	m	struct:mad_bitptr
+ca	layer3.c	/^mad_fixed_t const ca[8] = {$/;"	v	file:
+cache	bit.h	/^  unsigned short cache;$/;"	m	struct:mad_bitptr
+cache	mad.h	/^  unsigned short cache;$/;"	m	struct:mad_bitptr
+cb_data	decoder.h	/^  void *cb_data;$/;"	m	struct:mad_decoder
+cb_data	mad.h	/^  void *cb_data;$/;"	m	struct:mad_decoder
+ch	layer3.c	/^    } ch[2];$/;"	m	struct:sideinfo::granule	typeref:struct:sideinfo::granule::channel	file:
+channel	layer3.c	/^    struct channel {$/;"	s	struct:sideinfo::granule	file:
+channels	mad.h	/^  unsigned short channels;		\/* number of channels *\/$/;"	m	struct:mad_pcm
+channels	synth.h	/^  unsigned short channels;		\/* number of channels *\/$/;"	m	struct:mad_pcm
+check_message	decoder.c	/^enum mad_flow check_message(struct mad_decoder *decoder)$/;"	f	file:
+costab1	synth.c	151;"	d	file:
+costab10	synth.c	160;"	d	file:
+costab11	synth.c	161;"	d	file:
+costab12	synth.c	162;"	d	file:
+costab13	synth.c	163;"	d	file:
+costab14	synth.c	164;"	d	file:
+costab15	synth.c	165;"	d	file:
+costab16	synth.c	166;"	d	file:
+costab17	synth.c	167;"	d	file:
+costab18	synth.c	168;"	d	file:
+costab19	synth.c	169;"	d	file:
+costab2	synth.c	152;"	d	file:
+costab20	synth.c	170;"	d	file:
+costab21	synth.c	171;"	d	file:
+costab22	synth.c	172;"	d	file:
+costab23	synth.c	173;"	d	file:
+costab24	synth.c	174;"	d	file:
+costab25	synth.c	175;"	d	file:
+costab26	synth.c	176;"	d	file:
+costab27	synth.c	177;"	d	file:
+costab28	synth.c	178;"	d	file:
+costab29	synth.c	179;"	d	file:
+costab3	synth.c	153;"	d	file:
+costab30	synth.c	180;"	d	file:
+costab31	synth.c	181;"	d	file:
+costab4	synth.c	154;"	d	file:
+costab5	synth.c	155;"	d	file:
+costab6	synth.c	156;"	d	file:
+costab7	synth.c	157;"	d	file:
+costab8	synth.c	158;"	d	file:
+costab9	synth.c	159;"	d	file:
+count1table_select	layer3.c	/^  count1table_select = 0x01,$/;"	e	enum:__anon4	file:
+crc_check	frame.h	/^  unsigned short crc_check;		\/* frame CRC accumulator *\/$/;"	m	struct:mad_header
+crc_check	mad.h	/^  unsigned short crc_check;		\/* frame CRC accumulator *\/$/;"	m	struct:mad_header
+crc_table	bit.c	/^unsigned short const crc_table[256] = {$/;"	v	file:
+crc_target	frame.h	/^  unsigned short crc_target;		\/* final target CRC checksum *\/$/;"	m	struct:mad_header
+crc_target	mad.h	/^  unsigned short crc_target;		\/* final target CRC checksum *\/$/;"	m	struct:mad_header
+cs	layer3.c	/^mad_fixed_t const cs[8] = {$/;"	v	file:
+dct32	synth.c	/^void dct32(mad_fixed_t const in[32], unsigned int slot,$/;"	f	file:
+dctIV	layer3.c	/^void dctIV(mad_fixed_t const y[18], mad_fixed_t X[18])$/;"	f	file:
+decode	minimad.c	/^int decode(unsigned char const *start, unsigned long length)$/;"	f	file:
+decode_header	frame.c	/^int decode_header(struct mad_header *header, struct mad_stream *stream)$/;"	f	file:
+decoder_table	frame.c	/^int (*const decoder_table[3])(struct mad_stream *, struct mad_frame *) = {$/;"	v	file:
+duration	frame.h	/^  mad_timer_t duration;			\/* audio playing time of frame *\/$/;"	m	struct:mad_header
+duration	mad.h	/^  mad_timer_t duration;			\/* audio playing time of frame *\/$/;"	m	struct:mad_header
+emphasis	frame.h	/^  enum mad_emphasis emphasis;		\/* de-emphasis to use (see above) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_emphasis
+emphasis	mad.h	/^  enum mad_emphasis emphasis;		\/* de-emphasis to use (see above) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_emphasis
+error	mad.h	/^  enum mad_error error;			\/* error code (see above) *\/$/;"	m	struct:mad_stream	typeref:enum:mad_stream::mad_error
+error	minimad.c	/^enum mad_flow error(void *data,$/;"	f	file:
+error	stream.h	/^  enum mad_error error;			\/* error code (see above) *\/$/;"	m	struct:mad_stream	typeref:enum:mad_stream::mad_error
+error_default	decoder.c	/^enum mad_flow error_default(void *data, struct mad_stream *stream,$/;"	f	file:
+error_func	decoder.h	/^  enum mad_flow (*error_func)(void *, struct mad_stream *, struct mad_frame *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::error_func
+error_func	mad.h	/^  enum mad_flow (*error_func)(void *, struct mad_stream *, struct mad_frame *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::error_func
+exponent	layer3.c	/^  unsigned short exponent :  5;$/;"	m	struct:fixedfloat	file:
+fastsdct	layer3.c	/^void fastsdct(mad_fixed_t const x[9], mad_fixed_t y[18])$/;"	f	file:
+filter	mad.h	/^  mad_fixed_t filter[2][2][2][16][8];	\/* polyphase filterbank outputs *\/$/;"	m	struct:mad_synth
+filter	synth.h	/^  mad_fixed_t filter[2][2][2][16][8];	\/* polyphase filterbank outputs *\/$/;"	m	struct:mad_synth
+filter_func	decoder.h	/^  enum mad_flow (*filter_func)(void *,$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::filter_func
+filter_func	mad.h	/^  enum mad_flow (*filter_func)(void *,$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::filter_func
+final	huffman.h	/^    unsigned short final  :  1;$/;"	m	struct:huffpair::__anon10
+final	huffman.h	/^    unsigned short final  :  1;$/;"	m	struct:huffpair::__anon11
+final	huffman.h	/^    unsigned short final  :  1;$/;"	m	struct:huffquad::__anon8
+final	huffman.h	/^    unsigned short final  :  1;$/;"	m	struct:huffquad::__anon9
+fixedfloat	layer3.c	/^struct fixedfloat {$/;"	s	file:
+flags	frame.h	/^  int flags;				\/* flags (see below) *\/$/;"	m	struct:mad_header
+flags	layer3.c	/^      unsigned char flags;$/;"	m	struct:sideinfo::granule::channel	file:
+flags	mad.h	/^  int flags;				\/* flags (see below) *\/$/;"	m	struct:mad_header
+fraction	mad.h	/^  unsigned long fraction;	\/* 1\/MAD_TIMER_RESOLUTION seconds *\/$/;"	m	struct:__anon18
+fraction	timer.h	/^  unsigned long fraction;	\/* 1\/MAD_TIMER_RESOLUTION seconds *\/$/;"	m	struct:__anon14
+frame	decoder.h	/^    struct mad_frame frame;$/;"	m	struct:mad_decoder::__anon17	typeref:struct:mad_decoder::__anon17::mad_frame
+frame	mad.h	/^    struct mad_frame frame;$/;"	m	struct:mad_decoder::__anon26	typeref:struct:mad_decoder::__anon26::mad_frame
+free_bitrate	frame.c	/^int free_bitrate(struct mad_stream *stream, struct mad_header const *header)$/;"	f	file:
+freerate	mad.h	/^  unsigned long freerate;		\/* free bitrate (fixed) *\/$/;"	m	struct:mad_stream
+freerate	stream.h	/^  unsigned long freerate;		\/* free bitrate (fixed) *\/$/;"	m	struct:mad_stream
+gcd	timer.c	/^unsigned long gcd(unsigned long num1, unsigned long num2)$/;"	f	file:
+global_gain	layer3.c	/^      unsigned short global_gain;$/;"	m	struct:sideinfo::granule::channel	file:
+gr	layer3.c	/^  } gr[2];$/;"	m	struct:sideinfo	typeref:struct:sideinfo::granule	file:
+granule	layer3.c	/^  struct granule {$/;"	s	struct:sideinfo	file:
+group	layer12.c	/^  unsigned char group;$/;"	m	struct:quantclass	file:
+header	frame.h	/^  struct mad_header header;		\/* MPEG audio header *\/$/;"	m	struct:mad_frame	typeref:struct:mad_frame::mad_header
+header	mad.h	/^  struct mad_header header;		\/* MPEG audio header *\/$/;"	m	struct:mad_frame	typeref:struct:mad_frame::mad_header
+header_func	decoder.h	/^  enum mad_flow (*header_func)(void *, struct mad_header const *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::header_func
+header_func	mad.h	/^  enum mad_flow (*header_func)(void *, struct mad_header const *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::header_func
+hlen	huffman.h	/^    unsigned short hlen   :  3;$/;"	m	struct:huffpair::__anon11
+hlen	huffman.h	/^    unsigned short hlen   :  3;$/;"	m	struct:huffquad::__anon9
+huffpair	huffman.h	/^union huffpair {$/;"	u
+huffquad	huffman.h	/^union huffquad {$/;"	u
+hufftab0	huffman.c	/^union huffpair const hufftab0[] = {$/;"	v	file:
+hufftab1	huffman.c	/^union huffpair const hufftab1[] = {$/;"	v	file:
+hufftab10	huffman.c	/^union huffpair const hufftab10[] = {$/;"	v	file:
+hufftab11	huffman.c	/^union huffpair const hufftab11[] = {$/;"	v	file:
+hufftab12	huffman.c	/^union huffpair const hufftab12[] = {$/;"	v	file:
+hufftab13	huffman.c	/^union huffpair const hufftab13[] = {$/;"	v	file:
+hufftab15	huffman.c	/^union huffpair const hufftab15[] = {$/;"	v	file:
+hufftab16	huffman.c	/^union huffpair const hufftab16[] = {$/;"	v	file:
+hufftab2	huffman.c	/^union huffpair const hufftab2[] = {$/;"	v	file:
+hufftab24	huffman.c	/^union huffpair const hufftab24[] = {$/;"	v	file:
+hufftab3	huffman.c	/^union huffpair const hufftab3[] = {$/;"	v	file:
+hufftab5	huffman.c	/^union huffpair const hufftab5[] = {$/;"	v	file:
+hufftab6	huffman.c	/^union huffpair const hufftab6[] = {$/;"	v	file:
+hufftab7	huffman.c	/^union huffpair const hufftab7[] = {$/;"	v	file:
+hufftab8	huffman.c	/^union huffpair const hufftab8[] = {$/;"	v	file:
+hufftab9	huffman.c	/^union huffpair const hufftab9[] = {$/;"	v	file:
+hufftabA	huffman.c	/^union huffquad const hufftabA[] = {$/;"	v	file:
+hufftabB	huffman.c	/^union huffquad const hufftabB[] = {$/;"	v	file:
+hufftable	huffman.h	/^struct hufftable {$/;"	s
+imdct36	layer3.c	/^void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])$/;"	f	file:
+imdct36	layer3.c	/^void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])$/;"	f	file:
+imdct36_long_karray	imdct_l_arm.S	/^imdct36_long_karray:$/;"	l
+imdct_l_windowing	imdct_l_arm.S	/^imdct_l_windowing:$/;"	l
+imdct_s	layer3.c	/^mad_fixed_t const imdct_s[6][6] = {$/;"	v	file:
+in	decoder.h	/^    int in;$/;"	m	struct:mad_decoder::__anon16
+in	mad.h	/^    int in;$/;"	m	struct:mad_decoder::__anon25
+input	minimad.c	/^enum mad_flow input(void *data,$/;"	f	file:
+input_func	decoder.h	/^  enum mad_flow (*input_func)(void *, struct mad_stream *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::input_func
+input_func	mad.h	/^  enum mad_flow (*input_func)(void *, struct mad_stream *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::input_func
+is_lsf_table	layer3.c	/^mad_fixed_t const is_lsf_table[2][15] = {$/;"	v	file:
+is_table	layer3.c	/^mad_fixed_t const is_table[7] = {$/;"	v	file:
+l	layer3.c	/^  unsigned char const *l;$/;"	m	struct:__anon7	file:
+layer	frame.h	/^  enum mad_layer layer;			\/* audio layer (1, 2, or 3) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_layer
+layer	mad.h	/^  enum mad_layer layer;			\/* audio layer (1, 2, or 3) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_layer
+left	bit.h	/^  unsigned short left;$/;"	m	struct:mad_bitptr
+left	mad.h	/^  unsigned short left;$/;"	m	struct:mad_bitptr
+length	mad.h	/^  unsigned short length;		\/* number of samples per channel *\/$/;"	m	struct:mad_pcm
+length	minimad.c	/^  unsigned long length;$/;"	m	struct:buffer	file:
+length	synth.h	/^  unsigned short length;		\/* number of samples per channel *\/$/;"	m	struct:mad_pcm
+linbits	huffman.h	/^  unsigned short linbits;$/;"	m	struct:hufftable
+linear_table	layer12.c	/^mad_fixed_t const linear_table[14] = {$/;"	v	file:
+loop	imdct_l_arm.S	/^loop:$/;"	l
+m	layer3.c	/^  unsigned char const *m;$/;"	m	struct:__anon7	file:
+mad_author	version.c	/^char const mad_author[]    = MAD_AUTHOR " <" MAD_EMAIL ">";$/;"	v
+mad_bit_bitsleft	bit.h	38;"	d
+mad_bit_bitsleft	mad.h	565;"	d
+mad_bit_crc	bit.c	/^unsigned short mad_bit_crc(struct mad_bitptr bitptr, unsigned int len,$/;"	f
+mad_bit_finish	bit.h	33;"	d
+mad_bit_finish	mad.h	560;"	d
+mad_bit_init	bit.c	/^void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)$/;"	f
+mad_bit_length	bit.c	/^unsigned int mad_bit_length(struct mad_bitptr const *begin,$/;"	f
+mad_bit_nextbyte	bit.c	/^unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)$/;"	f
+mad_bit_read	bit.c	/^unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)$/;"	f
+mad_bit_skip	bit.c	/^void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)$/;"	f
+mad_bitptr	bit.h	/^struct mad_bitptr {$/;"	s
+mad_bitptr	mad.h	/^struct mad_bitptr {$/;"	s
+mad_build	version.c	/^char const mad_build[] = ""$/;"	v
+mad_copyright	version.c	/^char const mad_copyright[] = "Copyright (C) " MAD_PUBLISHYEAR " " MAD_AUTHOR;$/;"	v
+mad_decoder	decoder.h	/^struct mad_decoder {$/;"	s
+mad_decoder	mad.h	/^struct mad_decoder {$/;"	s
+mad_decoder_finish	decoder.c	/^int mad_decoder_finish(struct mad_decoder *decoder)$/;"	f
+mad_decoder_init	decoder.c	/^void mad_decoder_init(struct mad_decoder *decoder, void *data,$/;"	f
+mad_decoder_message	decoder.c	/^int mad_decoder_message(struct mad_decoder *decoder,$/;"	f
+mad_decoder_mode	decoder.h	/^enum mad_decoder_mode {$/;"	g
+mad_decoder_mode	mad.h	/^enum mad_decoder_mode {$/;"	g
+mad_decoder_options	decoder.h	85;"	d
+mad_decoder_options	mad.h	955;"	d
+mad_decoder_run	decoder.c	/^int mad_decoder_run(struct mad_decoder *decoder, enum mad_decoder_mode mode)$/;"	f
+mad_emphasis	frame.h	/^enum mad_emphasis {$/;"	g
+mad_emphasis	mad.h	/^enum mad_emphasis {$/;"	g
+mad_error	mad.h	/^enum mad_error {$/;"	g
+mad_error	stream.h	/^enum mad_error {$/;"	g
+mad_f_abs	fixed.c	/^mad_fixed_t mad_f_abs(mad_fixed_t x)$/;"	f
+mad_f_add	fixed.h	106;"	d
+mad_f_add	mad.h	152;"	d
+mad_f_div	fixed.c	/^mad_fixed_t mad_f_div(mad_fixed_t x, mad_fixed_t y)$/;"	f
+mad_f_fracpart	fixed.h	101;"	d
+mad_f_fracpart	mad.h	147;"	d
+mad_f_fromint	fixed.h	104;"	d
+mad_f_fromint	mad.h	150;"	d
+mad_f_intpart	fixed.h	100;"	d
+mad_f_intpart	mad.h	146;"	d
+mad_f_mul	fixed.h	115;"	d
+mad_f_mul	fixed.h	127;"	d
+mad_f_mul	fixed.h	132;"	d
+mad_f_mul	fixed.h	162;"	d
+mad_f_mul	fixed.h	253;"	d
+mad_f_mul	fixed.h	437;"	d
+mad_f_mul	fixed.h	439;"	d
+mad_f_mul	fixed.h	452;"	d
+mad_f_mul	mad.h	161;"	d
+mad_f_mul	mad.h	173;"	d
+mad_f_mul	mad.h	178;"	d
+mad_f_mul	mad.h	208;"	d
+mad_f_mul	mad.h	299;"	d
+mad_f_mul	mad.h	483;"	d
+mad_f_mul	mad.h	485;"	d
+mad_f_mul	mad.h	498;"	d
+mad_f_mul_inline	fixed.h	/^mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)$/;"	f
+mad_f_mul_inline	mad.h	/^mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)$/;"	f
+mad_f_scale64	fixed.h	116;"	d
+mad_f_scale64	fixed.h	163;"	d
+mad_f_scale64	fixed.h	195;"	d
+mad_f_scale64	fixed.h	215;"	d
+mad_f_scale64	fixed.h	227;"	d
+mad_f_scale64	fixed.h	285;"	d
+mad_f_scale64	fixed.h	333;"	d
+mad_f_scale64	fixed.h	392;"	d
+mad_f_scale64	fixed.h	409;"	d
+mad_f_scale64	fixed.h	481;"	d
+mad_f_scale64	fixed.h	486;"	d
+mad_f_scale64	mad.h	162;"	d
+mad_f_scale64	mad.h	209;"	d
+mad_f_scale64	mad.h	241;"	d
+mad_f_scale64	mad.h	261;"	d
+mad_f_scale64	mad.h	273;"	d
+mad_f_scale64	mad.h	331;"	d
+mad_f_scale64	mad.h	379;"	d
+mad_f_scale64	mad.h	438;"	d
+mad_f_scale64	mad.h	455;"	d
+mad_f_scale64	mad.h	527;"	d
+mad_f_scale64	mad.h	532;"	d
+mad_f_sub	fixed.h	107;"	d
+mad_f_sub	mad.h	153;"	d
+mad_f_todouble	fixed.h	97;"	d
+mad_f_todouble	mad.h	143;"	d
+mad_f_tofixed	fixed.h	95;"	d
+mad_f_tofixed	mad.h	141;"	d
+mad_fixed64_t	fixed.h	38;"	d
+mad_fixed64_t	fixed.h	40;"	d
+mad_fixed64_t	mad.h	84;"	d
+mad_fixed64_t	mad.h	86;"	d
+mad_fixed64hi_t	fixed.h	/^typedef   signed int mad_fixed64hi_t;$/;"	t
+mad_fixed64hi_t	fixed.h	/^typedef   signed long mad_fixed64hi_t;$/;"	t
+mad_fixed64hi_t	mad.h	/^typedef   signed int mad_fixed64hi_t;$/;"	t
+mad_fixed64hi_t	mad.h	/^typedef   signed long mad_fixed64hi_t;$/;"	t
+mad_fixed64lo_t	fixed.h	/^typedef unsigned int mad_fixed64lo_t;$/;"	t
+mad_fixed64lo_t	fixed.h	/^typedef unsigned long mad_fixed64lo_t;$/;"	t
+mad_fixed64lo_t	mad.h	/^typedef unsigned int mad_fixed64lo_t;$/;"	t
+mad_fixed64lo_t	mad.h	/^typedef unsigned long mad_fixed64lo_t;$/;"	t
+mad_fixed_t	fixed.h	/^typedef   signed int mad_fixed_t;$/;"	t
+mad_fixed_t	fixed.h	/^typedef   signed long mad_fixed_t;$/;"	t
+mad_fixed_t	mad.h	/^typedef   signed int mad_fixed_t;$/;"	t
+mad_fixed_t	mad.h	/^typedef   signed long mad_fixed_t;$/;"	t
+mad_flow	decoder.h	/^enum mad_flow {$/;"	g
+mad_flow	mad.h	/^enum mad_flow {$/;"	g
+mad_frame	frame.h	/^struct mad_frame {$/;"	s
+mad_frame	mad.h	/^struct mad_frame {$/;"	s
+mad_frame_decode	frame.c	/^int mad_frame_decode(struct mad_frame *frame, struct mad_stream *stream)$/;"	f
+mad_frame_finish	frame.c	/^void mad_frame_finish(struct mad_frame *frame)$/;"	f
+mad_frame_init	frame.c	/^void mad_frame_init(struct mad_frame *frame)$/;"	f
+mad_frame_mute	frame.c	/^void mad_frame_mute(struct mad_frame *frame)$/;"	f
+mad_header	frame.h	/^struct mad_header {$/;"	s
+mad_header	mad.h	/^struct mad_header {$/;"	s
+mad_header_decode	frame.c	/^int mad_header_decode(struct mad_header *header, struct mad_stream *stream)$/;"	f
+mad_header_finish	frame.h	107;"	d
+mad_header_finish	mad.h	831;"	d
+mad_header_init	frame.c	/^void mad_header_init(struct mad_header *header)$/;"	f
+mad_huff_pair_table	huffman.c	/^struct hufftable const mad_huff_pair_table[32] = {$/;"	v
+mad_huff_quad_table	huffman.c	/^union huffquad const *const mad_huff_quad_table[2] = { hufftabA, hufftabB };$/;"	v
+mad_layer	frame.h	/^enum mad_layer {$/;"	g
+mad_layer	mad.h	/^enum mad_layer {$/;"	g
+mad_layer_I	layer12.c	/^int mad_layer_I(struct mad_stream *stream, struct mad_frame *frame)$/;"	f
+mad_layer_II	layer12.c	/^int mad_layer_II(struct mad_stream *stream, struct mad_frame *frame)$/;"	f
+mad_layer_III	layer3.c	/^int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)$/;"	f
+mad_mode	frame.h	/^enum mad_mode {$/;"	g
+mad_mode	mad.h	/^enum mad_mode {$/;"	g
+mad_pcm	mad.h	/^struct mad_pcm {$/;"	s
+mad_pcm	synth.h	/^struct mad_pcm {$/;"	s
+mad_sample_t	fixed.h	/^typedef double mad_sample_t;$/;"	t
+mad_sample_t	fixed.h	/^typedef mad_fixed_t mad_sample_t;$/;"	t
+mad_sample_t	mad.h	/^typedef double mad_sample_t;$/;"	t
+mad_sample_t	mad.h	/^typedef mad_fixed_t mad_sample_t;$/;"	t
+mad_stream	mad.h	/^struct mad_stream {$/;"	s
+mad_stream	stream.h	/^struct mad_stream {$/;"	s
+mad_stream_buffer	stream.c	/^void mad_stream_buffer(struct mad_stream *stream,$/;"	f
+mad_stream_errorstr	stream.c	/^char const *mad_stream_errorstr(struct mad_stream const *stream)$/;"	f
+mad_stream_finish	stream.c	/^void mad_stream_finish(struct mad_stream *stream)$/;"	f
+mad_stream_init	stream.c	/^void mad_stream_init(struct mad_stream *stream)$/;"	f
+mad_stream_options	mad.h	734;"	d
+mad_stream_options	stream.h	97;"	d
+mad_stream_skip	stream.c	/^void mad_stream_skip(struct mad_stream *stream, unsigned long length)$/;"	f
+mad_stream_sync	stream.c	/^int mad_stream_sync(struct mad_stream *stream)$/;"	f
+mad_synth	mad.h	/^struct mad_synth {$/;"	s
+mad_synth	synth.h	/^struct mad_synth {$/;"	s
+mad_synth_finish	mad.h	885;"	d
+mad_synth_finish	synth.h	63;"	d
+mad_synth_frame	synth.c	/^void mad_synth_frame(struct mad_synth *synth, struct mad_frame const *frame)$/;"	f
+mad_synth_init	synth.c	/^void mad_synth_init(struct mad_synth *synth)$/;"	f
+mad_synth_mute	synth.c	/^void mad_synth_mute(struct mad_synth *synth)$/;"	f
+mad_timer_abs	timer.c	/^mad_timer_t mad_timer_abs(mad_timer_t timer)$/;"	f
+mad_timer_add	timer.c	/^void mad_timer_add(mad_timer_t *timer, mad_timer_t incr)$/;"	f
+mad_timer_compare	timer.c	/^int mad_timer_compare(mad_timer_t timer1, mad_timer_t timer2)$/;"	f
+mad_timer_count	timer.c	/^signed long mad_timer_count(mad_timer_t timer, enum mad_units units)$/;"	f
+mad_timer_fraction	timer.c	/^unsigned long mad_timer_fraction(mad_timer_t timer, unsigned long denom)$/;"	f
+mad_timer_multiply	timer.c	/^void mad_timer_multiply(mad_timer_t *timer, signed long scalar)$/;"	f
+mad_timer_negate	timer.c	/^void mad_timer_negate(mad_timer_t *timer)$/;"	f
+mad_timer_reset	mad.h	638;"	d
+mad_timer_reset	timer.h	82;"	d
+mad_timer_set	timer.c	/^void mad_timer_set(mad_timer_t *timer, unsigned long seconds,$/;"	f
+mad_timer_sign	mad.h	642;"	d
+mad_timer_sign	timer.h	86;"	d
+mad_timer_string	timer.c	/^void mad_timer_string(mad_timer_t timer,$/;"	f
+mad_timer_t	mad.h	/^} mad_timer_t;$/;"	t	typeref:struct:__anon18
+mad_timer_t	timer.h	/^} mad_timer_t;$/;"	t	typeref:struct:__anon14
+mad_timer_zero	timer.c	/^mad_timer_t const mad_timer_zero = { 0, 0 };$/;"	v
+mad_units	mad.h	/^enum mad_units {$/;"	g
+mad_units	timer.h	/^enum mad_units {$/;"	g
+mad_version	version.c	/^char const mad_version[]   = "MPEG Audio Decoder " MAD_VERSION;$/;"	v
+main	minimad.c	/^int main(int argc, char *argv[])$/;"	f
+main_data	mad.h	/^  unsigned char (*main_data)[MAD_BUFFER_MDLEN];$/;"	m	struct:mad_stream
+main_data	stream.h	/^  unsigned char (*main_data)[MAD_BUFFER_MDLEN];$/;"	m	struct:mad_stream
+main_data_begin	layer3.c	/^  unsigned int main_data_begin;$/;"	m	struct:sideinfo	file:
+mantissa	layer3.c	/^  unsigned long mantissa  : 27;$/;"	m	struct:fixedfloat	file:
+md_len	mad.h	/^  unsigned int md_len;			\/* bytes in main_data *\/$/;"	m	struct:mad_stream
+md_len	stream.h	/^  unsigned int md_len;			\/* bytes in main_data *\/$/;"	m	struct:mad_stream
+message_func	decoder.h	/^  enum mad_flow (*message_func)(void *, void *, unsigned int *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::message_func
+message_func	mad.h	/^  enum mad_flow (*message_func)(void *, void *, unsigned int *);$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::message_func
+minus_K02	imdct_l_arm.S	/^#define minus_K02 0xf0230ab7$/;"	d
+mixed_block_flag	layer3.c	/^  mixed_block_flag   = 0x08$/;"	e	enum:__anon4	file:
+mode	decoder.h	/^  enum mad_decoder_mode mode;$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::mad_decoder_mode
+mode	frame.h	/^  enum mad_mode mode;			\/* channel mode (see above) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_mode
+mode	mad.h	/^  enum mad_decoder_mode mode;$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::mad_decoder_mode
+mode	mad.h	/^  enum mad_mode mode;			\/* channel mode (see above) *\/$/;"	m	struct:mad_header	typeref:enum:mad_header::mad_mode
+mode_extension	frame.h	/^  int mode_extension;			\/* additional mode info *\/$/;"	m	struct:mad_header
+mode_extension	mad.h	/^  int mode_extension;			\/* additional mode info *\/$/;"	m	struct:mad_header
+nbal	layer12.c	/^  unsigned short nbal;$/;"	m	struct:__anon28	file:
+next_frame	mad.h	/^  unsigned char const *next_frame;	\/* start of next frame *\/$/;"	m	struct:mad_stream
+next_frame	stream.h	/^  unsigned char const *next_frame;	\/* start of next frame *\/$/;"	m	struct:mad_stream
+nlevels	layer12.c	/^  unsigned short nlevels;$/;"	m	struct:quantclass	file:
+normal_block_x0_to_x17	imdct_l_arm.S	/^normal_block_x0_to_x17:$/;"	l
+normal_block_x18_to_x35	imdct_l_arm.S	/^normal_block_x18_to_x35:$/;"	l
+nsfb_table	layer3.c	/^unsigned char const nsfb_table[6][3][4] = {$/;"	v	file:
+offset	huffman.h	/^    unsigned short offset : 12;$/;"	m	struct:huffpair::__anon10
+offset	huffman.h	/^    unsigned short offset : 12;$/;"	m	struct:huffquad::__anon8
+offset	layer12.c	/^  unsigned short offset;$/;"	m	struct:__anon28	file:
+offset_table	layer12.c	/^unsigned char const offset_table[6][15] = {$/;"	v	file:
+offsets	layer12.c	/^  unsigned char const offsets[30];$/;"	m	struct:__anon27	file:
+options	decoder.h	/^  int options;$/;"	m	struct:mad_decoder
+options	frame.h	/^  int options;				\/* decoding options (from stream) *\/$/;"	m	struct:mad_frame
+options	mad.h	/^  int options;				\/* decoding options (from stream) *\/$/;"	m	struct:mad_frame
+options	mad.h	/^  int options;				\/* decoding options (see below) *\/$/;"	m	struct:mad_stream
+options	mad.h	/^  int options;$/;"	m	struct:mad_decoder
+options	stream.h	/^  int options;				\/* decoding options (see below) *\/$/;"	m	struct:mad_stream
+out	decoder.h	/^    int out;$/;"	m	struct:mad_decoder::__anon16
+out	mad.h	/^    int out;$/;"	m	struct:mad_decoder::__anon25
+output	minimad.c	/^enum mad_flow output(void *data,$/;"	f	file:
+output_func	decoder.h	/^  enum mad_flow (*output_func)(void *,$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::output_func
+output_func	mad.h	/^  enum mad_flow (*output_func)(void *,$/;"	m	struct:mad_decoder	typeref:enum:mad_decoder::output_func
+overlap	frame.h	/^  mad_fixed_t (*overlap)[2][32][18];	\/* Layer III block overlap data *\/$/;"	m	struct:mad_frame
+overlap	mad.h	/^  mad_fixed_t (*overlap)[2][32][18];	\/* Layer III block overlap data *\/$/;"	m	struct:mad_frame
+part2_3_length	layer3.c	/^      unsigned short part2_3_length;$/;"	m	struct:sideinfo::granule::channel	file:
+pcm	mad.h	/^  struct mad_pcm pcm;			\/* PCM output *\/$/;"	m	struct:mad_synth	typeref:struct:mad_synth::mad_pcm
+pcm	synth.h	/^  struct mad_pcm pcm;			\/* PCM output *\/$/;"	m	struct:mad_synth	typeref:struct:mad_synth::mad_pcm
+phase	mad.h	/^  unsigned int phase;			\/* current processing phase *\/$/;"	m	struct:mad_synth
+phase	synth.h	/^  unsigned int phase;			\/* current processing phase *\/$/;"	m	struct:mad_synth
+pid	decoder.h	/^    long pid;$/;"	m	struct:mad_decoder::__anon16
+pid	mad.h	/^    long pid;$/;"	m	struct:mad_decoder::__anon25
+preflag	layer3.c	/^  preflag	     = 0x04,$/;"	e	enum:__anon4	file:
+pretab	layer3.c	/^unsigned char const pretab[22] = {$/;"	v	file:
+private_bits	frame.h	/^  int private_bits;			\/* private bits (see below) *\/$/;"	m	struct:mad_header
+private_bits	layer3.c	/^  unsigned int private_bits;$/;"	m	struct:sideinfo	file:
+private_bits	mad.h	/^  int private_bits;			\/* private bits (see below) *\/$/;"	m	struct:mad_header
+ptr	huffman.h	/^  } ptr;$/;"	m	union:huffpair	typeref:struct:huffpair::__anon10
+ptr	huffman.h	/^  } ptr;$/;"	m	union:huffquad	typeref:struct:huffquad::__anon8
+ptr	mad.h	/^  struct mad_bitptr ptr;		\/* current processing bit pointer *\/$/;"	m	struct:mad_stream	typeref:struct:mad_stream::mad_bitptr
+ptr	stream.h	/^  struct mad_bitptr ptr;		\/* current processing bit pointer *\/$/;"	m	struct:mad_stream	typeref:struct:mad_stream::mad_bitptr
+qc_table	layer12.c	/^} const qc_table[17] = {$/;"	v	file:
+quantclass	layer12.c	/^struct quantclass {$/;"	s	file:
+receive	decoder.c	/^enum mad_flow receive(int fd, void **message, unsigned int *size)$/;"	f	file:
+receive_io	decoder.c	/^enum mad_flow receive_io(int fd, void *buffer, size_t len)$/;"	f	file:
+receive_io_blocking	decoder.c	/^enum mad_flow receive_io_blocking(int fd, void *buffer, size_t len)$/;"	f	file:
+reduce_rational	timer.c	/^void reduce_rational(unsigned long *numer, unsigned long *denom)$/;"	f	file:
+reduce_timer	timer.c	/^void reduce_timer(mad_timer_t *timer)$/;"	f	file:
+region0_count	layer3.c	/^      unsigned char region0_count;$/;"	m	struct:sideinfo::granule::channel	file:
+region1_count	layer3.c	/^      unsigned char region1_count;$/;"	m	struct:sideinfo::granule::channel	file:
+root_table	layer3.c	/^mad_fixed_t const root_table[7] = {$/;"	v	file:
+rq_table	layer3.c	/^} const rq_table[8207] = {$/;"	v	file:
+run_async	decoder.c	/^int run_async(struct mad_decoder *decoder)$/;"	f	file:
+run_sync	decoder.c	/^int run_sync(struct mad_decoder *decoder)$/;"	f	file:
+s	layer3.c	/^  unsigned char const *s;$/;"	m	struct:__anon7	file:
+samplerate	frame.h	/^  unsigned int samplerate;		\/* sampling frequency (Hz) *\/$/;"	m	struct:mad_header
+samplerate	mad.h	/^  unsigned int samplerate;		\/* sampling frequency (Hz) *\/$/;"	m	struct:mad_header
+samplerate	mad.h	/^  unsigned int samplerate;		\/* sampling frequency (Hz) *\/$/;"	m	struct:mad_pcm
+samplerate	synth.h	/^  unsigned int samplerate;		\/* sampling frequency (Hz) *\/$/;"	m	struct:mad_pcm
+samplerate_table	frame.c	/^unsigned int const samplerate_table[3] = { 44100, 48000, 32000 };$/;"	v	file:
+samples	mad.h	/^  mad_fixed_t samples[2][1152];		\/* PCM output samples [ch][sample] *\/$/;"	m	struct:mad_pcm
+samples	synth.h	/^  mad_fixed_t samples[2][1152];		\/* PCM output samples [ch][sample] *\/$/;"	m	struct:mad_pcm
+sblimit	layer12.c	/^  unsigned int sblimit;$/;"	m	struct:__anon27	file:
+sbquant_table	layer12.c	/^} const sbquant_table[5] = {$/;"	v	file:
+sbsample	frame.h	/^  mad_fixed_t sbsample[2][36][32];	\/* synthesis subband filter samples *\/$/;"	m	struct:mad_frame
+sbsample	mad.h	/^  mad_fixed_t sbsample[2][36][32];	\/* synthesis subband filter samples *\/$/;"	m	struct:mad_frame
+scale	minimad.c	/^signed int scale(mad_fixed_t sample)$/;"	f	file:
+scale_rational	timer.c	/^unsigned long scale_rational(unsigned long numer, unsigned long denom,$/;"	f	file:
+scalefac	layer3.c	/^      unsigned char scalefac[39];	\/* scalefac_l and\/or scalefac_s *\/$/;"	m	struct:sideinfo::granule::channel	file:
+scalefac_compress	layer3.c	/^      unsigned short scalefac_compress;$/;"	m	struct:sideinfo::granule::channel	file:
+scalefac_scale	layer3.c	/^  scalefac_scale     = 0x02,$/;"	e	enum:__anon4	file:
+scfsi	layer3.c	/^  unsigned char scfsi[2];$/;"	m	struct:sideinfo	file:
+sdctII	layer3.c	/^void sdctII(mad_fixed_t const x[18], mad_fixed_t X[18])$/;"	f	file:
+seconds	mad.h	/^  signed long seconds;		\/* whole seconds *\/$/;"	m	struct:__anon18
+seconds	timer.h	/^  signed long seconds;		\/* whole seconds *\/$/;"	m	struct:__anon14
+send	decoder.c	/^enum mad_flow send(int fd, void const *message, unsigned int size)$/;"	f	file:
+send_io	decoder.c	/^enum mad_flow send_io(int fd, void const *data, size_t len)$/;"	f	file:
+sf_table	layer12.c	/^mad_fixed_t const sf_table[64] = {$/;"	v	file:
+sfb_11025_long	layer3.c	268;"	d	file:
+sfb_11025_mixed	layer3.c	287;"	d	file:
+sfb_11025_short	layer3.c	277;"	d	file:
+sfb_12000_long	layer3.c	267;"	d	file:
+sfb_12000_mixed	layer3.c	286;"	d	file:
+sfb_12000_short	layer3.c	276;"	d	file:
+sfb_16000_long	layer3.c	216;"	d	file:
+sfb_16000_mixed	layer3.c	/^unsigned char const sfb_16000_mixed[] = {$/;"	v	file:
+sfb_16000_short	layer3.c	/^unsigned char const sfb_16000_short[] = {$/;"	v	file:
+sfb_22050_long	layer3.c	/^unsigned char const sfb_22050_long[] = {$/;"	v	file:
+sfb_22050_mixed	layer3.c	/^unsigned char const sfb_22050_mixed[] = {$/;"	v	file:
+sfb_22050_short	layer3.c	/^unsigned char const sfb_22050_short[] = {$/;"	v	file:
+sfb_24000_long	layer3.c	/^unsigned char const sfb_24000_long[] = {$/;"	v	file:
+sfb_24000_mixed	layer3.c	/^unsigned char const sfb_24000_mixed[] = {$/;"	v	file:
+sfb_24000_short	layer3.c	/^unsigned char const sfb_24000_short[] = {$/;"	v	file:
+sfb_32000_long	layer3.c	/^unsigned char const sfb_32000_long[] = {$/;"	v	file:
+sfb_32000_mixed	layer3.c	/^unsigned char const sfb_32000_mixed[] = {$/;"	v	file:
+sfb_32000_short	layer3.c	/^unsigned char const sfb_32000_short[] = {$/;"	v	file:
+sfb_44100_long	layer3.c	/^unsigned char const sfb_44100_long[] = {$/;"	v	file:
+sfb_44100_mixed	layer3.c	/^unsigned char const sfb_44100_mixed[] = {$/;"	v	file:
+sfb_44100_short	layer3.c	/^unsigned char const sfb_44100_short[] = {$/;"	v	file:
+sfb_48000_long	layer3.c	/^unsigned char const sfb_48000_long[] = {$/;"	v	file:
+sfb_48000_mixed	layer3.c	/^unsigned char const sfb_48000_mixed[] = {$/;"	v	file:
+sfb_48000_short	layer3.c	/^unsigned char const sfb_48000_short[] = {$/;"	v	file:
+sfb_8000_long	layer3.c	/^unsigned char const sfb_8000_long[] = {$/;"	v	file:
+sfb_8000_mixed	layer3.c	/^unsigned char const sfb_8000_mixed[] = {$/;"	v	file:
+sfb_8000_short	layer3.c	/^unsigned char const sfb_8000_short[] = {$/;"	v	file:
+sfbwidth_table	layer3.c	/^} const sfbwidth_table[9] = {$/;"	v	file:
+sflen_table	layer3.c	/^} const sflen_table[16] = {$/;"	v	file:
+sideinfo	layer3.c	/^struct sideinfo {$/;"	s	file:
+skiplen	mad.h	/^  unsigned long skiplen;		\/* bytes to skip before next frame *\/$/;"	m	struct:mad_stream
+skiplen	stream.h	/^  unsigned long skiplen;		\/* bytes to skip before next frame *\/$/;"	m	struct:mad_stream
+slen1	layer3.c	/^  unsigned char slen1;$/;"	m	struct:__anon6	file:
+slen2	layer3.c	/^  unsigned char slen2;$/;"	m	struct:__anon6	file:
+start	minimad.c	/^  unsigned char const *start;$/;"	m	struct:buffer	file:
+start_block_x18_to_x35	imdct_l_arm.S	/^start_block_x18_to_x35:$/;"	l
+startbits	huffman.h	/^  unsigned short startbits;$/;"	m	struct:hufftable
+stop_block_x0_to_x17	imdct_l_arm.S	/^stop_block_x0_to_x17:$/;"	l
+stream	decoder.h	/^    struct mad_stream stream;$/;"	m	struct:mad_decoder::__anon17	typeref:struct:mad_decoder::__anon17::mad_stream
+stream	mad.h	/^    struct mad_stream stream;$/;"	m	struct:mad_decoder::__anon26	typeref:struct:mad_decoder::__anon26::mad_stream
+subblock_gain	layer3.c	/^      unsigned char subblock_gain[3];$/;"	m	struct:sideinfo::granule::channel	file:
+sync	decoder.h	/^  } *sync;$/;"	m	struct:mad_decoder	typeref:struct:mad_decoder::__anon17
+sync	mad.h	/^  int sync;				\/* stream sync found *\/$/;"	m	struct:mad_stream
+sync	mad.h	/^  } *sync;$/;"	m	struct:mad_decoder	typeref:struct:mad_decoder::__anon26
+sync	stream.h	/^  int sync;				\/* stream sync found *\/$/;"	m	struct:mad_stream
+synth	decoder.h	/^    struct mad_synth synth;$/;"	m	struct:mad_decoder::__anon17	typeref:struct:mad_decoder::__anon17::mad_synth
+synth	mad.h	/^    struct mad_synth synth;$/;"	m	struct:mad_decoder::__anon26	typeref:struct:mad_decoder::__anon26::mad_synth
+synth_full	synth.c	/^void synth_full(struct mad_synth *synth, struct mad_frame const *frame,$/;"	f	file:
+synth_half	synth.c	/^void synth_half(struct mad_synth *synth, struct mad_frame const *frame,$/;"	f	file:
+table	huffman.h	/^  union huffpair const *table;$/;"	m	struct:hufftable
+table_select	layer3.c	/^      unsigned char table_select[3];$/;"	m	struct:sideinfo::granule::channel	file:
+this_frame	mad.h	/^  unsigned char const *this_frame;	\/* start of current frame *\/$/;"	m	struct:mad_stream
+this_frame	stream.h	/^  unsigned char const *this_frame;	\/* start of current frame *\/$/;"	m	struct:mad_stream
+v	huffman.h	/^    unsigned short v      :  1;$/;"	m	struct:huffquad::__anon9
+value	huffman.h	/^  } value;$/;"	m	union:huffpair	typeref:struct:huffpair::__anon11
+value	huffman.h	/^  } value;$/;"	m	union:huffquad	typeref:struct:huffquad::__anon9
+w	huffman.h	/^    unsigned short w      :  1;$/;"	m	struct:huffquad::__anon9
+window_l	layer3.c	/^mad_fixed_t const window_l[36] = {$/;"	v	file:
+window_s	layer3.c	/^mad_fixed_t const window_s[12] = {$/;"	v	file:
+x	huffman.h	/^    unsigned short x      :  1;$/;"	m	struct:huffquad::__anon9
+x	huffman.h	/^    unsigned short x      :  4;$/;"	m	struct:huffpair::__anon11
+x0	imdct_l_arm.S	/^#define x0   0x00$/;"	d
+x1	imdct_l_arm.S	/^#define x1   0x04$/;"	d
+x10	imdct_l_arm.S	/^#define x10  0x28$/;"	d
+x11	imdct_l_arm.S	/^#define x11  0x2c$/;"	d
+x12	imdct_l_arm.S	/^#define x12  0x30$/;"	d
+x13	imdct_l_arm.S	/^#define x13  0x34$/;"	d
+x14	imdct_l_arm.S	/^#define x14  0x38$/;"	d
+x15	imdct_l_arm.S	/^#define x15  0x3c$/;"	d
+x16	imdct_l_arm.S	/^#define x16  0x40$/;"	d
+x17	imdct_l_arm.S	/^#define x17  0x44$/;"	d
+x18	imdct_l_arm.S	/^#define x18  0x48$/;"	d
+x19	imdct_l_arm.S	/^#define x19  0x4c$/;"	d
+x2	imdct_l_arm.S	/^#define x2   0x08$/;"	d
+x20	imdct_l_arm.S	/^#define x20  0x50$/;"	d
+x21	imdct_l_arm.S	/^#define x21  0x54$/;"	d
+x22	imdct_l_arm.S	/^#define x22  0x58$/;"	d
+x23	imdct_l_arm.S	/^#define x23  0x5c$/;"	d
+x24	imdct_l_arm.S	/^#define x24  0x60$/;"	d
+x25	imdct_l_arm.S	/^#define x25  0x64$/;"	d
+x26	imdct_l_arm.S	/^#define x26  0x68$/;"	d
+x27	imdct_l_arm.S	/^#define x27  0x6c$/;"	d
+x28	imdct_l_arm.S	/^#define x28  0x70$/;"	d
+x29	imdct_l_arm.S	/^#define x29  0x74$/;"	d
+x3	imdct_l_arm.S	/^#define x3   0x0C$/;"	d
+x30	imdct_l_arm.S	/^#define x30  0x78$/;"	d
+x31	imdct_l_arm.S	/^#define x31  0x7c$/;"	d
+x32	imdct_l_arm.S	/^#define x32  0x80$/;"	d
+x33	imdct_l_arm.S	/^#define x33  0x84$/;"	d
+x34	imdct_l_arm.S	/^#define x34  0x88$/;"	d
+x35	imdct_l_arm.S	/^#define x35  0x8c$/;"	d
+x4	imdct_l_arm.S	/^#define x4   0x10$/;"	d
+x5	imdct_l_arm.S	/^#define x5   0x14$/;"	d
+x6	imdct_l_arm.S	/^#define x6   0x18$/;"	d
+x7	imdct_l_arm.S	/^#define x7   0x1c$/;"	d
+x8	imdct_l_arm.S	/^#define x8   0x20$/;"	d
+x9	imdct_l_arm.S	/^#define x9   0x24$/;"	d
+y	huffman.h	/^    unsigned short y      :  1;$/;"	m	struct:huffquad::__anon9
+y	huffman.h	/^    unsigned short y      :  4;$/;"	m	struct:huffpair::__anon11

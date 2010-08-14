@@ -14,7 +14,7 @@
 #define ZUTIL_H
 
 // [modified]
-#include "eplat/eplat.h"
+#include "../prefix.h"
 
 #define ZLIB_INTERNAL
 #include "zlib.h"

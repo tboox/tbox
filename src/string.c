@@ -141,7 +141,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 	{
 		// compute size
 		string->size = size;
-		string->maxn = TB_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -161,7 +161,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 
 		// compute size
 		string->size = size;
-		string->maxn = TB_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -188,7 +188,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 
 		// compute size
 		string->size = size;
-		string->maxn = TB_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -205,7 +205,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 	else
 	{
 		// compute size
-		string->maxn = TB_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);

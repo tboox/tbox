@@ -38,38 +38,41 @@ extern "C" {
  */
 
 // is debug?
-#ifdef CONFIG_DEBUG
+#ifdef TB_CONFIG_DEBUG
 # 	define TB_DEBUG
 #endif
 
 // memory
-#ifdef CONFIG_MEMORY_SMALL
+#ifdef TB_CONFIG_MEMORY_SMALL
 # 	define TB_MEMORY_MODE_SMALL
 #endif
 
-#ifdef CONFIG_MEMORY_POOL_ENABLE
-# 	define TB_MEMORY_POOL_ENABLE
-# 	define TB_MEMORY_POOL_INDEX 	(EPLAT_POOL_PRIVATE_INDEX)
-#endif
+#define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
 
 // platform
-#ifdef CONFIG_PLATFORM_BIGENDIAN
+#ifdef TB_CONFIG_PLAT_BIGENDIAN
 # 	define TB_WORDS_BIGENDIAN
 # 	define TB_FLOAT_BIGENDIAN
 #endif
 
 // math
-#ifdef CONFIG_MATH_HAS_ROUND
-# 	define TB_MATH_HAS_ROUND 		(CONFIG_MATH_HAS_ROUND)
+#ifdef TB_CONFIG_MATH_HAS_ROUND
+# 	define TB_MATH_HAS_ROUND 		(TB_CONFIG_MATH_HAS_ROUND)
 #else
 # 	define TB_MATH_HAS_ROUND 		(0)
 #endif
 
-// compiler
-#ifndef CONFIG_CONPILER_NOT_SUPPORT_INLINE
-# 	define __tb_inline__ 			inline
+// keyword
+#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE
+# 	define __tb_inline__ 			TB_CONFIG_KEYWORD_INLINE
 #else
-# 	define __tb_inline__ 				
+# 	define __tb_inline__ 			
+#endif
+
+#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE_ASM
+# 	define __tb_asm__ 				TB_CONFIG_KEYWORD_INLINE_ASM
+#else
+# 	define __tb_asm__ 				
 #endif
 
 // c plus plus

@@ -89,6 +89,23 @@ static tb_uint16_t tb_encoding_gb2312_to_unicode(tb_uint16_t ch)
 		return g_encoding_gb2312_to_unicode_table_data[ch - 0xa1a1];
 	else return 0;
 }
+static tb_uint16_t tb_encoding_gb2312_get_unicode(tb_char_t const** pc)
+{
+	tb_uint16_t ch = *((tb_uint16_t*)(*pc));
+	if (ch <= 0x7f) *pc++;
+	else *pc += 2;
+	return tb_encoding_gb2312_to_unicode(ch);
+}
+static void tb_encoding_gb2312_set_unicode(tb_uint16_t ch, tb_char_t** pc)
+{
+	ch = tb_encoding_gb2312_from_unicode(ch);
+	if (ch <= 0x7f) *(*pc)++ = ch & 0xff;
+	else
+	{
+		*(*pc)++ = (ch >> 8) & 0xff;
+		*(*pc)++ = ch & 0xff;
+	}
+}
 /* /////////////////////////////////////////////////////////
  * utf8
  */
@@ -189,7 +206,7 @@ static tb_uint16_t tb_encoding_unicode_get_unicode(tb_char_t const** pc)
 {
 	tb_uint16_t ch = *((tb_uint16_t*)(*pc));
 	*pc += 2;
-	return ((tb_uint16_t)ch);
+	return ch;
 }
 static void tb_encoding_unicode_set_unicode(tb_uint16_t ch, tb_char_t** pc)
 {
@@ -212,7 +229,7 @@ static tb_uint16_t tb_encoding_unicode_to_unicode(tb_uint16_t ch)
 static tb_encoding_converter_t g_encoding_converters[] =
 {
 	{TB_ENCODING_ASCII, 	0, 		0xff, 	tb_encoding_ascii_get_unicode, 		tb_encoding_ascii_set_unicode, 		tb_encoding_ascii_from_unicode, 	tb_encoding_ascii_to_unicode}
-,	{TB_ENCODING_GB2312, 	0x3000, 0x9f44, TB_NULL, 							TB_NULL, 							tb_encoding_gb2312_from_unicode, 	tb_encoding_gb2312_to_unicode}
+,	{TB_ENCODING_GB2312, 	0x3000, 0x9f44, tb_encoding_gb2312_get_unicode, 	tb_encoding_gb2312_set_unicode, 	tb_encoding_gb2312_from_unicode, 	tb_encoding_gb2312_to_unicode}
 ,	{TB_ENCODING_GBK, 		0/*0x8040*/, 0/*0xfefe*/, TB_NULL, 					TB_NULL, 							TB_NULL, 							TB_NULL}
 ,	{TB_ENCODING_UTF8, 		0, 		0xffff,	tb_encoding_utf8_get_unicode, 		tb_encoding_utf8_set_unicode,		tb_encoding_utf8_from_unicode, 		tb_encoding_utf8_to_unicode}
 ,	{TB_ENCODING_UNICODE, 	0, 		0xffff, tb_encoding_unicode_get_unicode, 	tb_encoding_unicode_set_unicode, 	tb_encoding_unicode_from_unicode, 	tb_encoding_unicode_to_unicode}
@@ -232,3 +249,30 @@ tb_encoding_converter_t const* tb_encoding_get_converter(tb_encoding_t encoding)
 	}
 	return TB_NULL;
 }
+tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_char_t const* src_s, tb_size_t src_n, tb_char_t* dst_s, tb_size_t dst_n)
+{
+	// get the encoding converters
+	tb_encoding_converter_t const* src_c = tb_encoding_get_converter(src_e);
+	tb_encoding_converter_t const* dst_c = tb_encoding_get_converter(dst_e);
+
+	// check converters
+	TB_ASSERT(src_c && dst_c && src_c->get && dst_c->set);
+	if (!src_c || !dst_c || !src_c->get || !dst_c->set) return 0;
+
+	// check string
+	TB_ASSERT(src_s && dst_s);
+	if (!src_s || !dst_s) return 0;
+
+	// get string
+	tb_char_t* sb = src_s;
+	tb_char_t* se = sb + src_n;
+
+	tb_char_t* db = dst_s;
+	tb_char_t* de = db + dst_n;
+
+	// convert
+	while (sb < se && db < de) dst_c->set(src_c->get(&sb), &db);
+
+	return (tb_size_t)(db - dst_s);
+}
+

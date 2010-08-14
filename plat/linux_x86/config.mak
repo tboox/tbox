@@ -1,17 +1,23 @@
 # demo
-CONFIG_DEMO 				= linux_x86
+TB_CONFIG_DEMO 				= linux_x86
 
 # arch
-CONFIG_ARCH 				= x86
+TB_CONFIG_ARCH 				= x86
 
 # regex
-CONFIG_REGEX 				= y
+TB_CONFIG_REGEX 			= y
 
 # encoding
-CONFIG_ENCODING 			= y
+TB_CONFIG_ENCODING 			= y
 
 # jpeg
-CONFIG_JPEG 				= y
+TB_CONFIG_JPEG 				= y
 
 # zlib
-CONFIG_ZLIB 				= y
+TB_CONFIG_ZLIB 				= y
+
+# cairo
+TB_CONFIG_CAIRO 			= n
+
+# libmad
+TB_CONFIG_LIBMAD			= y

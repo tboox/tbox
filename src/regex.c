@@ -25,7 +25,7 @@
  * includes
  */
 #include "regex.h"
-#include "external/pcre/pcre.h"
+#include "external/external.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

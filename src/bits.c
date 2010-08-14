@@ -163,6 +163,145 @@ tb_sint32_t tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n)
 	return val;
 #endif
 }
+tb_uint8_t tb_bits_get_u1(tb_bits_t* bits)
+{
+	tb_uint8_t val = ((*bits->p) >> (7 - bits->b)) & 1;
+	bits->b++;
+	if (bits->b >= 8) 
+	{
+		bits->p++;
+		bits->b = 0;
+	}
+	return val;
+}
+tb_uint8_t tb_bits_get_u8(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	return *(bits->p++);
+}
+
+tb_sint8_t tb_bits_get_s8(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	return *(bits->p++);
+}
+
+tb_uint16_t tb_bits_get_u16(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+#ifdef TB_WORDS_BIGENDIAN
+	tb_uint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
+#else
+	tb_uint16_t val = *((tb_uint16_t*)bits->p);
+#endif
+	bits->p += 2;
+	return val;
+}
+
+tb_sint16_t tb_bits_get_s16(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+#ifdef TB_WORDS_BIGENDIAN
+	tb_sint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
+#else
+	tb_sint16_t val = *((tb_sint16_t*)bits->p);
+#endif
+	bits->p += 2;
+	return val;
+}
+
+tb_uint32_t tb_bits_get_u32(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+#ifdef TB_WORDS_BIGENDIAN
+	tb_uint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
+#else
+	tb_uint32_t val = *((tb_uint32_t*)bits->p);
+#endif
+	bits->p += 4;
+	return val;
+}
+
+tb_sint32_t tb_bits_get_s32(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+#ifdef TB_WORDS_BIGENDIAN
+	tb_sint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
+#else
+	tb_sint32_t val = *((tb_sint32_t*)bits->p);
+#endif
+	bits->p += 4;
+	return val;
+}
+tb_uint16_t tb_bits_get_u16_be(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_uint16_t val = (*(bits->p) << 8 | *(bits->p + 1));
+	bits->p += 2;
+	return val;
+}
+tb_sint16_t tb_bits_get_s16_be(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_sint16_t val = (*(bits->p) << 8 | *(bits->p + 1));
+	bits->p += 2;
+	return val;
+}
+tb_uint16_t tb_bits_get_u16_le(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_uint16_t val = (*(bits->p + 1) << 8 | *(bits->p));
+	bits->p += 2;
+	return val;
+}
+tb_sint16_t tb_bits_get_s16_le(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_sint16_t val = (*(bits->p + 1) << 8 | *(bits->p));
+	bits->p += 2;
+	return val;
+}
+tb_uint32_t tb_bits_get_u32_be(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_uint32_t val = (*(bits->p) << 24 | *(bits->p + 1) << 16 | *(bits->p + 2) << 8 | *(bits->p + 3));
+	bits->p += 4;
+	return val;
+}
+tb_sint32_t tb_bits_get_s32_be(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_sint32_t val = (*(bits->p) << 24 | *(bits->p + 1) << 16 | *(bits->p + 2) << 8 | *(bits->p + 3));
+	bits->p += 4;
+	return val;
+}
+tb_uint32_t tb_bits_get_u32_le(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_uint32_t val = (*(bits->p +3) << 24 | *(bits->p + 2) << 16 | *(bits->p + 1) << 8 | *(bits->p));
+	bits->p += 4;
+	return val;
+}
+tb_sint32_t tb_bits_get_s32_le(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	
+	tb_sint32_t val = (*(bits->p + 3) << 24 | *(bits->p + 2) << 16 | *(bits->p + 1) << 8 | *(bits->p));
+	bits->p += 4;
+	return val;
+}
+
 tb_uint32_t tb_bits_peek_ubits(tb_bits_t* bits, tb_size_t bits_n)
 {
 	if (!bits_n || !bits) return 0;

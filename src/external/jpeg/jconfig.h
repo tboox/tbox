@@ -5,8 +5,8 @@
 #ifndef JCONFIG_H
 #define JCONFIG_H
 
-#include "eplat/eplat.h"
-#include "../../prefix.h"
+#include "../prefix.h"
+
 
 #define HAVE_PROTOTYPES 1
 #define HAVE_UNSIGNED_CHAR 1
