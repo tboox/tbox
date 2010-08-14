@@ -1,0 +1,8 @@
+*.a
+*.o
+*~
+*.swp
+*.bak
+other
+doc
+bin

@@ -1,0 +1,87 @@
+/*!The Tiny Box Library
+ * 
+ * TBox is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * TBox is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with TGraphic; 
+ * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
+ * 
+ * Copyright (C) 2009 - 2010, ruki All rights reserved.
+ *
+ * \author		ruki
+ * \file		encoding.c
+ *
+ */
+#ifndef TB_ENCODING_H
+#define TB_ENCODING_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * includes
+ */
+#include "prefix.h"
+
+/* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the encoding type
+typedef enum __tb_encoding_t
+{
+	TB_ENCODING_ASCII 		= 0
+, 	TB_ENCODING_GB2312 		= 1
+, 	TB_ENCODING_GBK 		= 2
+, 	TB_ENCODING_UTF8 		= 3
+, 	TB_ENCODING_UNICODE 	= 4
+
+}tb_encoding_t;
+
+// the encoding converter type
+typedef struct __tb_encoding_converter_t
+{
+	// the encoding type
+	tb_uint8_t 		encoding;
+
+	// the character range of unicode
+	tb_uint16_t 	minchar;
+	tb_uint16_t 	maxchar;
+
+	// get unicode from the encoding string
+	tb_uint16_t 	(*get)(tb_char_t const** pc);
+
+	// set unicode to the encoding string
+	void 			(*set)(tb_uint16_t ch, tb_char_t** pc);
+
+	// from unicode to the encoding character, not support utf-x
+	tb_uint16_t 	(*from)(tb_uint16_t ch);
+
+	// from the encoding character to unicode, not support utf-x
+	tb_uint16_t 	(*to)(tb_uint16_t ch);
+
+}tb_encoding_converter_t;
+
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_encoding_converter_t const* 	tb_encoding_get_converter(tb_encoding_t encoding);
+
+// c plus plus
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
