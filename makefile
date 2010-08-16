@@ -27,6 +27,7 @@ install : .null
 	-$(MKDIR) $(BIN_DIR)$(_)inc
 	-$(MKDIR) $(BIN_DIR)$(_)lib
 	-$(MKDIR) $(BIN_DIR)$(_)obj
+	$(MAKE) -C $(SRC_DIR)
 	$(MAKE) -C $(SRC_DIR) install
 
 # make clean

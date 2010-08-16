@@ -28,21 +28,21 @@
 /* /////////////////////////////////////////////////////////
  * ascii
  */
-static tb_uint16_t tb_encoding_ascii_get_unicode(tb_char_t const** pc)
+static tb_uint32_t tb_encoding_ascii_get_unicode(tb_byte_t const** pc)
 {
-	return (tb_uint16_t)(*(*pc)++);
+	return (tb_uint32_t)(*(*pc)++);
 }
 
-static void tb_encoding_ascii_set_unicode(tb_uint16_t ch, tb_char_t** pc)
+static void tb_encoding_ascii_set_unicode(tb_uint32_t ch, tb_byte_t** pc)
 {
 	if (ch >= 0x0 && ch <= 0xff)
 		*((*pc)++) = ch;
 }
-static tb_uint16_t tb_encoding_ascii_to_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_ascii_to_unicode(tb_uint32_t ch)
 {
 	return ch;
 }
-static tb_uint16_t tb_encoding_ascii_from_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_ascii_from_unicode(tb_uint32_t ch)
 {
 	if (ch <= 0xff) return ch;
 	else return 0;
@@ -54,12 +54,12 @@ static tb_uint16_t tb_encoding_ascii_from_unicode(tb_uint16_t ch)
 
 // the converter table of gb2312 & unicode
 extern tb_uint16_t 	g_encoding_unicode_to_gb2312_table_data[][2];
-extern tb_size_t 	g_encoding_unicode_to_gb2312_table_size;
+extern tb_uint16_t 	g_encoding_unicode_to_gb2312_table_size;
 
 extern tb_uint16_t 	g_encoding_gb2312_to_unicode_table_data[];
 extern tb_size_t 	g_encoding_gb2312_to_unicode_table_size;
 
-static tb_uint16_t tb_encoding_gb2312_from_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_gb2312_from_unicode(tb_uint32_t ch)
 {
 	// is ascii?
 	if (ch <= 0x7f) return ch;
@@ -83,20 +83,28 @@ static tb_uint16_t tb_encoding_gb2312_from_unicode(tb_uint16_t ch)
 
 	return 0;
 }
-static tb_uint16_t tb_encoding_gb2312_to_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_gb2312_to_unicode(tb_uint32_t ch)
 {
+	// is ascii?
+	if (ch <= 0x7f) return ch;
+
+	// is gb2312?
 	if (ch >= 0xa1a1 && ch <= 0xf7fe)
 		return g_encoding_gb2312_to_unicode_table_data[ch - 0xa1a1];
 	else return 0;
 }
-static tb_uint16_t tb_encoding_gb2312_get_unicode(tb_char_t const** pc)
+static tb_uint32_t tb_encoding_gb2312_get_unicode(tb_byte_t const** pc)
 {
-	tb_uint16_t ch = *((tb_uint16_t*)(*pc));
-	if (ch <= 0x7f) *pc++;
-	else *pc += 2;
-	return tb_encoding_gb2312_to_unicode(ch);
+	if (**pc <= 0x7f) return *(*pc)++;
+	else
+	{
+		tb_uint16_t ch = (((tb_uint16_t)(*pc)[0]) << 8) | (*pc)[1];
+		(*pc) += 2;
+
+		return tb_encoding_gb2312_to_unicode(ch);
+	}
 }
-static void tb_encoding_gb2312_set_unicode(tb_uint16_t ch, tb_char_t** pc)
+static void tb_encoding_gb2312_set_unicode(tb_uint32_t ch, tb_byte_t** pc)
 {
 	ch = tb_encoding_gb2312_from_unicode(ch);
 	if (ch <= 0x7f) *(*pc)++ = ch & 0xff;
@@ -120,7 +128,7 @@ static void tb_encoding_gb2312_set_unicode(tb_uint16_t ch, tb_char_t** pc)
  *
  * [fixme]: for bigendian
  */
-static tb_uint16_t tb_encoding_utf8_get_unicode(tb_char_t const** pc)
+static tb_uint32_t tb_encoding_utf8_get_unicode(tb_byte_t const** pc)
 {
 	tb_byte_t const* p = *pc;
 
@@ -134,31 +142,31 @@ static tb_uint16_t tb_encoding_utf8_get_unicode(tb_char_t const** pc)
 	else if ((*p & 0xe0) == 0xc0)
 	{
 		(*pc) += 2;
-		return ((((tb_uint16_t)(p[0] & 0x1f)) << 6) | (p[1] & 0x3f));
+		return ((((tb_uint32_t)(p[0] & 0x1f)) << 6) | (p[1] & 0x3f));
 	}
 	// 0x00000800 - 0x0000ffff
 	else if ((*p & 0xf0) == 0xe0)
 	{
 		(*pc) += 3;
-		return ((((tb_uint16_t)(p[0] & 0x0f)) << 12) | (((tb_uint16_t)(p[1] & 0x3f)) << 6) | (p[2] & 0x3f));
+		return ((((tb_uint32_t)(p[0] & 0x0f)) << 12) | (((tb_uint32_t)(p[1] & 0x3f)) << 6) | (p[2] & 0x3f));
 	}
 	// 0x00010000 - 0x001fffff
 	else if ((*p & 0xf8) == 0xf0)
 	{
 		(*pc) += 4;
-		return ((((tb_uint16_t)(p[0] & 0x07)) << 18) | (((tb_uint16_t)(p[1] & 0x3f)) << 12) | (((tb_uint16_t)(p[2] & 0x3f)) << 6) | (p[3] & 0x3f));
+		return ((((tb_uint32_t)(p[0] & 0x07)) << 18) | (((tb_uint32_t)(p[1] & 0x3f)) << 12) | (((tb_uint32_t)(p[2] & 0x3f)) << 6) | (p[3] & 0x3f));
 	}
 	// 0x00200000 - 0x03ffffff
 	else if ((*p & 0xfc) == 0xf8)
 	{
 		(*pc) += 5;
-		return ((((tb_uint16_t)(p[0] & 0x03)) << 24) | (((tb_uint16_t)(p[1] & 0x3f)) << 18) | (((tb_uint16_t)(p[2] & 0x3f)) << 12) | (((tb_uint16_t)(p[3] & 0x3f)) << 6) | (p[4] & 0x3f));
+		return ((((tb_uint32_t)(p[0] & 0x03)) << 24) | (((tb_uint32_t)(p[1] & 0x3f)) << 18) | (((tb_uint32_t)(p[2] & 0x3f)) << 12) | (((tb_uint32_t)(p[3] & 0x3f)) << 6) | (p[4] & 0x3f));
 	}
 	// 0x04000000 - 0x7fffffff
 	else if ((*p & 0xfe) == 0xfc)
 	{
 		(*pc) += 6;
-		return ((((tb_uint16_t)(p[0] & 0x01)) << 30) | (((tb_uint16_t)(p[1] & 0x3f)) << 24) | (((tb_uint16_t)(p[2] & 0x3f)) << 18) | (((tb_uint16_t)(p[3] & 0x3f)) << 12) | (((tb_uint16_t)(p[4] & 0x3f)) << 6) | (p[5] & 0x3f));
+		return ((((tb_uint32_t)(p[0] & 0x01)) << 30) | (((tb_uint32_t)(p[1] & 0x3f)) << 24) | (((tb_uint32_t)(p[2] & 0x3f)) << 18) | (((tb_uint32_t)(p[3] & 0x3f)) << 12) | (((tb_uint32_t)(p[4] & 0x3f)) << 6) | (p[5] & 0x3f));
 	}
 
 	// invalid character
@@ -169,11 +177,62 @@ static tb_uint16_t tb_encoding_utf8_get_unicode(tb_char_t const** pc)
 
 	return 0;
 }
-static void tb_encoding_utf8_set_unicode(tb_uint16_t ch, tb_char_t** pc)
+static void tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** pc)
 {
-	TB_DBG("[not_impl]: unicode to utf8 string");
+	// 0x00000000 - 0x0000007f
+	if (ch <= 0x0000007f) *(*pc)++ = ch;
+	// 0x00000080 - 0x000007ff
+	else if (ch <= 0x000007ff) 
+	{
+		// 110xxxxx 10xxxxxx
+		//      xxx xxxxxxxx
+		*(*pc)++ = ((ch >> 6) & 0x1f) | 0xc0;
+		*(*pc)++ = (ch & 0x3f) | 0x80;
+	}
+	// 0x00000800 - 0x0000ffff
+	else if (ch <= 0x0000ffff) 
+	{
+		// 1110xxxx 10xxxxxx 10xxxxxx
+		//          xxxxxxxx xxxxxxxx
+		*(*pc)++ = ((ch >> 12) & 0x0f) | 0xe0;
+		*(*pc)++ = ((ch >> 6) & 0x3f) | 0x80;
+		*(*pc)++ = (ch & 0x3f) | 0x80;
+	}
+	// 0x00010000 - 0x001fffff
+	else if (ch <= 0x001fffff) 
+	{
+		// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+		//             xxxxx xxxxxxxx xxxxxxxx
+		*(*pc)++ = ((ch >> 18) & 0x07) | 0xf0;
+		*(*pc)++ = ((ch >> 12) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 6) & 0x3f) | 0x80;
+		*(*pc)++ = (ch & 0x3f) | 0x80;
+	}
+	// 0x00200000 - 0x03ffffff
+	else if (ch <= 0x03ffffff) 
+	{
+		// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+		//                xx xxxxxxxx xxxxxxxx xxxxxxxx
+		*(*pc)++ = ((ch >> 24) & 0x03) | 0xf8;
+		*(*pc)++ = ((ch >> 18) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 12) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 6) & 0x3f) | 0x80;
+		*(*pc)++ = (ch & 0x3f) | 0x80;
+	}
+	// 0x04000000 - 0x7fffffff
+	else if (ch <= 0x7fffffff) 
+	{
+		// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+		//                    xxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
+		*(*pc)++ = ((ch >> 30) & 0x01) | 0xfc;
+		*(*pc)++ = ((ch >> 24) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 18) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 12) & 0x3f) | 0x80;
+		*(*pc)++ = ((ch >> 6) & 0x3f) | 0x80;
+		*(*pc)++ = (ch & 0x3f) | 0x80;
+	}
 }
-static tb_uint16_t tb_encoding_utf8_from_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_utf8_from_unicode(tb_uint32_t ch)
 {
 	if (ch <= 0x7f) return ch;
 	else if (ch <= 0x7ff)
@@ -187,7 +246,7 @@ static tb_uint16_t tb_encoding_utf8_from_unicode(tb_uint16_t ch)
 
 	return 0;
 }
-static tb_uint16_t tb_encoding_utf8_to_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_utf8_to_unicode(tb_uint32_t ch)
 {
 	// 0x00000000 - 0x0000007f
 	if (ch <= 0x7f) return ch; 
@@ -202,22 +261,22 @@ static tb_uint16_t tb_encoding_utf8_to_unicode(tb_uint16_t ch)
 /* /////////////////////////////////////////////////////////
  * unicode
  */
-static tb_uint16_t tb_encoding_unicode_get_unicode(tb_char_t const** pc)
+static tb_uint32_t tb_encoding_unicode_get_unicode(tb_byte_t const** pc)
 {
-	tb_uint16_t ch = *((tb_uint16_t*)(*pc));
-	*pc += 2;
+	tb_uint32_t ch = *((tb_uint32_t*)(*pc));
+	*pc += 4;
 	return ch;
 }
-static void tb_encoding_unicode_set_unicode(tb_uint16_t ch, tb_char_t** pc)
+static void tb_encoding_unicode_set_unicode(tb_uint32_t ch, tb_byte_t** pc)
 {
-	*((tb_uint16_t*)(*pc)) = ch;
-	*pc += 2;
+	*((tb_uint32_t*)(*pc)) = ch;
+	*pc += 4;
 }
-static tb_uint16_t tb_encoding_unicode_from_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_unicode_from_unicode(tb_uint32_t ch)
 {
 	return ch;
 }
-static tb_uint16_t tb_encoding_unicode_to_unicode(tb_uint16_t ch)
+static tb_uint32_t tb_encoding_unicode_to_unicode(tb_uint32_t ch)
 {
 	return ch;
 }
@@ -228,11 +287,11 @@ static tb_uint16_t tb_encoding_unicode_to_unicode(tb_uint16_t ch)
 // the encoding converters
 static tb_encoding_converter_t g_encoding_converters[] =
 {
-	{TB_ENCODING_ASCII, 	0, 		0xff, 	tb_encoding_ascii_get_unicode, 		tb_encoding_ascii_set_unicode, 		tb_encoding_ascii_from_unicode, 	tb_encoding_ascii_to_unicode}
-,	{TB_ENCODING_GB2312, 	0x3000, 0x9f44, tb_encoding_gb2312_get_unicode, 	tb_encoding_gb2312_set_unicode, 	tb_encoding_gb2312_from_unicode, 	tb_encoding_gb2312_to_unicode}
-,	{TB_ENCODING_GBK, 		0/*0x8040*/, 0/*0xfefe*/, TB_NULL, 					TB_NULL, 							TB_NULL, 							TB_NULL}
-,	{TB_ENCODING_UTF8, 		0, 		0xffff,	tb_encoding_utf8_get_unicode, 		tb_encoding_utf8_set_unicode,		tb_encoding_utf8_from_unicode, 		tb_encoding_utf8_to_unicode}
-,	{TB_ENCODING_UNICODE, 	0, 		0xffff, tb_encoding_unicode_get_unicode, 	tb_encoding_unicode_set_unicode, 	tb_encoding_unicode_from_unicode, 	tb_encoding_unicode_to_unicode}
+	{TB_ENCODING_ASCII, 	0x00000000, 		0x000000ff, tb_encoding_ascii_get_unicode, 		tb_encoding_ascii_set_unicode, 		tb_encoding_ascii_from_unicode, 	tb_encoding_ascii_to_unicode}
+,	{TB_ENCODING_GB2312, 	0x00003000, 		0x00009f44, tb_encoding_gb2312_get_unicode, 	tb_encoding_gb2312_set_unicode, 	tb_encoding_gb2312_from_unicode, 	tb_encoding_gb2312_to_unicode}
+,	{TB_ENCODING_GBK, 		0x00000000/*0x8040*/, 0x00000000/*0xfefe*/, TB_NULL, 				TB_NULL, 							TB_NULL, 							TB_NULL}
+,	{TB_ENCODING_UTF8, 		0x00000000, 		0x0000ffff,	tb_encoding_utf8_get_unicode, 		tb_encoding_utf8_set_unicode,		tb_encoding_utf8_from_unicode, 		tb_encoding_utf8_to_unicode}
+,	{TB_ENCODING_UNICODE, 	0x00000000, 		0x0000ffff, tb_encoding_unicode_get_unicode, 	tb_encoding_unicode_set_unicode, 	tb_encoding_unicode_from_unicode, 	tb_encoding_unicode_to_unicode}
 };
 
 /* /////////////////////////////////////////////////////////
@@ -249,7 +308,7 @@ tb_encoding_converter_t const* tb_encoding_get_converter(tb_encoding_t encoding)
 	}
 	return TB_NULL;
 }
-tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_char_t const* src_s, tb_size_t src_n, tb_char_t* dst_s, tb_size_t dst_n)
+tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n)
 {
 	// get the encoding converters
 	tb_encoding_converter_t const* src_c = tb_encoding_get_converter(src_e);
@@ -264,11 +323,11 @@ tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, t
 	if (!src_s || !dst_s) return 0;
 
 	// get string
-	tb_char_t* sb = src_s;
-	tb_char_t* se = sb + src_n;
+	tb_byte_t* sb = src_s;
+	tb_byte_t* se = sb + src_n;
 
-	tb_char_t* db = dst_s;
-	tb_char_t* de = db + dst_n;
+	tb_byte_t* db = dst_s;
+	tb_byte_t* de = db + dst_n;
 
 	// convert
 	while (sb < se && db < de) dst_c->set(src_c->get(&sb), &db);

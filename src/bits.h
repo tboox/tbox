@@ -103,57 +103,57 @@ tb_sint32_t 		tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n);
 
 
 
-static __tb_inline__ tb_uint8_t tb_pbits_get_u1(tb_byte_t const* p)
+static __tplat_inline__ tb_uint8_t tb_pbits_get_u1(tb_byte_t const* p)
 {
 	return ((*p) >> 7) & 1;
 }
-static __tb_inline__ tb_uint8_t tb_pbits_get_u8(tb_byte_t const* p)
+static __tplat_inline__ tb_uint8_t tb_pbits_get_u8(tb_byte_t const* p)
 {
 	return *(p++);
 }
 
-static __tb_inline__ tb_sint8_t tb_pbits_get_s8(tb_byte_t const* p)
+static __tplat_inline__ tb_sint8_t tb_pbits_get_s8(tb_byte_t const* p)
 {
 	return *(p++);
 }
 
-static __tb_inline__ tb_uint16_t tb_pbits_get_u16(tb_byte_t const* p)
+static __tplat_inline__ tb_uint16_t tb_pbits_get_u16(tb_byte_t const* p)
 {
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	return (*(p) | *(p + 1) << 8);
 #else
 	return *((tb_uint16_t*)p);
 #endif
 }
 
-static __tb_inline__ tb_sint16_t tb_pbits_get_s16(tb_byte_t const* p)
+static __tplat_inline__ tb_sint16_t tb_pbits_get_s16(tb_byte_t const* p)
 {
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	return (*(p) | *(p + 1) << 8);
 #else
 	return *((tb_sint16_t*)p);
 #endif
 }
 
-static __tb_inline__ tb_uint32_t tb_pbits_get_u32(tb_byte_t const* p)
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u32(tb_byte_t const* p)
 {
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	return (*(p) | *(p + 1) << 8 | *(p + 2) << 16 | *(p + 3) << 24);
 #else
 	return *((tb_uint32_t*)p);
 #endif
 }
 
-static __tb_inline__ tb_sint32_t tb_pbits_get_s32(tb_byte_t const* p)
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s32(tb_byte_t const* p)
 {
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	return (*(p) | *(p + 1) << 8 | *(p + 2) << 16 | *(p + 3) << 24);
 #else
 	return *((tb_sint32_t*)p);
 #endif
 }
 
-static __tb_inline__ tb_char_t const* tb_pbits_get_string(tb_byte_t const* p, tb_size_t size)
+static __tplat_inline__ tb_char_t const* tb_pbits_get_string(tb_byte_t const* p, tb_size_t size)
 {
 	TB_ASSERT(p && size);
 	tb_char_t const* s = (tb_char_t const*)p;

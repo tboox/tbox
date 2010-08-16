@@ -254,7 +254,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
     ({ mad_fixed64hi_t __hi;  \
        mad_fixed64lo_t __lo;  \
        mad_fixed_t __result;  \
-       __tb_asm__ ("smull	%0, %1, %3, %4\n\t"  \
+       __tplat_asm__ ("smull	%0, %1, %3, %4\n\t"  \
 	    "movs	%0, %0, lsr %5\n\t"  \
 	    "adc	%2, %0, %1, lsl %6"  \
 	    : "=&r" (__lo), "=&r" (__hi), "=r" (__result)  \
@@ -266,17 +266,17 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 # endif
 
 #  define MAD_F_MLX(hi, lo, x, y)  \
-    __tb_asm__ ("smull	%0, %1, %2, %3"  \
+    __tplat_asm__ ("smull	%0, %1, %2, %3"  \
 	 : "=&r" (lo), "=&r" (hi)  \
 	 : "%r" (x), "r" (y))
 
 #  define MAD_F_MLA(hi, lo, x, y)  \
-    __tb_asm__ ("smlal	%0, %1, %2, %3"  \
+    __tplat_asm__ ("smlal	%0, %1, %2, %3"  \
 	 : "+r" (lo), "+r" (hi)  \
 	 : "%r" (x), "r" (y))
 
 #  define MAD_F_MLN(hi, lo)  \
-    __tb_asm__ ("rsbs	%0, %2, #0\n\t"  \
+    __tplat_asm__ ("rsbs	%0, %2, #0\n\t"  \
 	 "rsc	%1, %3, #0"  \
 	 : "=r" (lo), "=r" (hi)  \
 	 : "0" (lo), "1" (hi)  \
@@ -284,7 +284,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 
 #  define mad_f_scale64(hi, lo)  \
     ({ mad_fixed_t __result;  \
-       __tb_asm__ ("movs	%0, %1, lsr %3\n\t"  \
+       __tplat_asm__ ("movs	%0, %1, lsr %3\n\t"  \
 	    "adc	%0, %0, %2, lsl %4"  \
 	    : "=&r" (__result)  \
 	    : "r" (lo), "r" (hi),  \

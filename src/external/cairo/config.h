@@ -35,12 +35,12 @@
 #endif
 
 // endian
-#ifdef TB_FLOAT_BIGENDIAN
+#ifdef TPLAT_FLOAT_BIGENDIAN
 # 	define FLOAT_WORDS_BIGENDIAN
 #else
 # 	undef FLOAT_WORDS_BIGENDIAN
 #endif
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 # 	define WORDS_BIGENDIAN
 #else
 # 	undef WORDS_BIGENDIAN

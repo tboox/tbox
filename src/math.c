@@ -29,7 +29,7 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 
 typedef union
 {

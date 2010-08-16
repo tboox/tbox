@@ -55,20 +55,20 @@ typedef struct __tb_encoding_converter_t
 	tb_uint8_t 		encoding;
 
 	// the character range of unicode
-	tb_uint16_t 	minchar;
-	tb_uint16_t 	maxchar;
+	tb_uint32_t 	minchar;
+	tb_uint32_t 	maxchar;
 
 	// get unicode from the encoding string
-	tb_uint16_t 	(*get)(tb_char_t const** pc);
+	tb_uint32_t 	(*get)(tb_byte_t const** pc);
 
 	// set unicode to the encoding string
-	void 			(*set)(tb_uint16_t ch, tb_char_t** pc);
+	void 			(*set)(tb_uint32_t ch, tb_byte_t** pc);
 
 	// from unicode to the encoding character, not support utf-x
-	tb_uint16_t 	(*from)(tb_uint16_t ch);
+	tb_uint32_t 	(*from)(tb_uint32_t ch);
 
 	// from the encoding character to unicode, not support utf-x
-	tb_uint16_t 	(*to)(tb_uint16_t ch);
+	tb_uint32_t 	(*to)(tb_uint32_t ch);
 
 }tb_encoding_converter_t;
 
@@ -81,7 +81,7 @@ typedef struct __tb_encoding_converter_t
 tb_encoding_converter_t const* 	tb_encoding_get_converter(tb_encoding_t encoding);
 
 // convert string
-tb_size_t 						tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_char_t const* src_s, tb_size_t src_n, tb_char_t* dst_s, tb_size_t dst_n);
+tb_size_t 						tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
 
 
 // c plus plus

@@ -15,9 +15,9 @@ PSRC_DIR 		= $(PRO_DIR)$(_)src$(_)pro
 INC_DIR_DEF 	= $(PRO_DIR)$(_)inc$(_)$(PLAT)
 LIB_DIR_DEF 	= $(PRO_DIR)$(_)lib$(_)$(PLAT)
 
-# eplat 
-INC_DIR 		+= $(PRO_DIR)$(_)..$(_)eplat$(_)bin$(_)$(PLAT)$(_)inc
-LIB_DIR 		+= $(PRO_DIR)$(_)..$(_)eplat$(_)bin$(_)$(PLAT)$(_)lib
+# tplat 
+INC_DIR 		+= $(PRO_DIR)$(_)..$(_)tplat$(_)bin$(_)$(PLAT)$(_)inc
+LIB_DIR 		+= $(PRO_DIR)$(_)..$(_)tplat$(_)bin$(_)$(PLAT)$(_)lib
 
 # exports
 export 			_

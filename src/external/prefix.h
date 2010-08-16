@@ -39,9 +39,9 @@ extern "C" {
 
 // debug
 #ifdef TB_DEBUG
-#	define TB_DBG(format, arg...)					do { eplat_printf("[tb]:" format "\n" , ## arg); } while (0)
-#	define TB_ASSERT(expr)							do { if (!(expr)) {eplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __LINE__, #expr, __FILE__); } } while(0)
-#	define TB_MSG_ASSERT(expr, format, arg...)		do { if (!(expr)) {eplat_printf("[tb]: assert failed at:%d: expr: %s msg: " format " file: %s\n", __LINE__, #expr, ## arg, __FILE__); }} while(0)
+#	define TB_DBG(format, arg...)					do { tplat_printf("[tb]:" format "\n" , ## arg); } while (0)
+#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __LINE__, #expr, __FILE__); } } while(0)
+#	define TB_MSG_ASSERT(expr, format, arg...)		do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s msg: " format " file: %s\n", __LINE__, #expr, ## arg, __FILE__); }} while(0)
 #else
 #	define TB_DBG(format, arg...)
 #	define TB_ASSERT(expr)

@@ -26,7 +26,7 @@
  */
 #include "option.h"
 #include "malloc.h"
-#include "eplat/eplat.h"
+#include "tplat/tplat.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -34,26 +34,26 @@
 void* tb_malloc(tb_size_t size)
 {
 #if 1
-	return eplat_malloc(TB_MEMORY_POOL_INDEX, size);
+	return tplat_malloc(TB_MEMORY_POOL_INDEX, size);
 #else
-	void* p = eplat_malloc(TB_MEMORY_POOL_INDEX, size);
+	void* p = tplat_malloc(TB_MEMORY_POOL_INDEX, size);
 	if (p) memset(p, 0, size);
 	return p;
 #endif
 }
 void* tb_realloc(void* data, tb_size_t size)
 {
-	if (data) return eplat_realloc(TB_MEMORY_POOL_INDEX, data, size);
+	if (data) return tplat_realloc(TB_MEMORY_POOL_INDEX, data, size);
 	return TB_NULL;
 }
 void* tb_calloc(tb_size_t item, tb_size_t size)
 {
-	void* p = eplat_malloc(TB_MEMORY_POOL_INDEX, item * size);
+	void* p = tplat_malloc(TB_MEMORY_POOL_INDEX, item * size);
 	if (p) memset(p, 0, item * size);
 	return p;
 }
 void tb_free(void* data)
 {
-	if (data) eplat_free(TB_MEMORY_POOL_INDEX, data);
+	if (data) tplat_free(TB_MEMORY_POOL_INDEX, data);
 }
 

@@ -51,10 +51,10 @@ differently, and global variables are not used (see pcre.in). */
 
 #if 0
 #ifndef VPCOMPAT
-PCRE_EXP_DATA_DEFN void *(*tb_malloc)(size_t) = eplat_malloc;
-PCRE_EXP_DATA_DEFN void  (*tb_free)(void *) = eplat_free;
-PCRE_EXP_DATA_DEFN void *(*tb_stack_malloc)(size_t) = eplat_malloc;
-PCRE_EXP_DATA_DEFN void  (*tb_stack_free)(void *) = eplat_free;
+PCRE_EXP_DATA_DEFN void *(*tb_malloc)(size_t) = tplat_malloc;
+PCRE_EXP_DATA_DEFN void  (*tb_free)(void *) = tplat_free;
+PCRE_EXP_DATA_DEFN void *(*tb_stack_malloc)(size_t) = tplat_malloc;
+PCRE_EXP_DATA_DEFN void  (*tb_stack_free)(void *) = tplat_free;
 PCRE_EXP_DATA_DEFN int   (*pcre_callout)(pcre_callout_block *) = NULL;
 #endif
 #endif

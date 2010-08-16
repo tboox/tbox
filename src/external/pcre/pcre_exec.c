@@ -110,7 +110,7 @@ pchars(const uschar *p, int length, BOOL is_subject, match_data *md)
 unsigned int c;
 if (is_subject && length > md->end_subject - p) length = md->end_subject - p;
 while (length-- > 0)
-  if (isprint(c = *(p++))) tb_printf("%c", c); else eplat_printf("\\x%02x", c);
+  if (isprint(c = *(p++))) tb_printf("%c", c); else tplat_printf("\\x%02x", c);
 }
 #endif
 

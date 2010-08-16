@@ -190,7 +190,7 @@ tb_uint16_t tb_bits_get_u16(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
 	
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	tb_uint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
 #else
 	tb_uint16_t val = *((tb_uint16_t*)bits->p);
@@ -203,7 +203,7 @@ tb_sint16_t tb_bits_get_s16(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
 	
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	tb_sint16_t val = (*(bits->p) | *(bits->p + 1) << 8);
 #else
 	tb_sint16_t val = *((tb_sint16_t*)bits->p);
@@ -216,7 +216,7 @@ tb_uint32_t tb_bits_get_u32(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
 	
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	tb_uint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
 #else
 	tb_uint32_t val = *((tb_uint32_t*)bits->p);
@@ -229,7 +229,7 @@ tb_sint32_t tb_bits_get_s32(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
 	
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 	tb_sint32_t val = (*(bits->p) | *(bits->p + 1) << 8 | *(bits->p + 2) << 16 | *(bits->p + 3) << 24);
 #else
 	tb_sint32_t val = *((tb_sint32_t*)bits->p);

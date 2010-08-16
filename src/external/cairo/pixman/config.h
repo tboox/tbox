@@ -27,7 +27,7 @@
 #define SIZEOF_LONG 4
 
 // endian
-#ifdef TB_WORDS_BIGENDIAN
+#ifdef TPLAT_WORDS_BIGENDIAN
 # 	define WORDS_BIGENDIAN
 #else
 # 	undef WORDS_BIGENDIAN
