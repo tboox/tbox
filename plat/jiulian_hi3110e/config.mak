@@ -1,5 +1,5 @@
 # demo
-TB_CONFIG_DEMO 				= linux_x86
+TB_CONFIG_DEMO 				= 
 
 # arch
 TB_CONFIG_ARCH 				= arm

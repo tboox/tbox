@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = linux_x86
+PLAT = jiulian_hi3110e
 
 # root
 PRO_DIR = /home/ruki/.projects/personal/tbox
