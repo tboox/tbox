@@ -31,6 +31,8 @@
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+#if 0
 void* tb_malloc(tb_size_t size)
 {
 #if 1
@@ -56,4 +58,4 @@ void tb_free(void* data)
 {
 	if (data) tplat_free(TB_MEMORY_POOL_INDEX, data);
 }
-
+#endif

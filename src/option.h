@@ -38,7 +38,7 @@ extern "C" {
  */
 
 // is debug?
-#ifdef TB_CONFIG_DEBUG
+#if tbox_CONFIG_DEBUG
 # 	define TB_DEBUG
 #endif
 

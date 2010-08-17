@@ -1218,7 +1218,7 @@ for (;;)
       else
         {
         new_recursive.offset_save =
-          (int *)(tb_malloc)(new_recursive.saved_max * sizeof(int));
+          (int *)tb_malloc(new_recursive.saved_max * sizeof(int));
         if (new_recursive.offset_save == NULL) RRETURN(PCRE_ERROR_NOMEMORY);
         }
 
@@ -1242,14 +1242,14 @@ for (;;)
           DPRINTF(("Recursion matched\n"));
           md->recursive = new_recursive.prevrec;
           if (new_recursive.offset_save != stacksave)
-            (tb_free)(new_recursive.offset_save);
+            tb_free(new_recursive.offset_save);
           RRETURN(MATCH_MATCH);
           }
         else if (rrc != MATCH_NOMATCH && rrc != MATCH_THEN)
           {
           DPRINTF(("Recursion gave error %d\n", rrc));
           if (new_recursive.offset_save != stacksave)
-            (tb_free)(new_recursive.offset_save);
+            tb_free(new_recursive.offset_save);
           RRETURN(rrc);
           }
 
@@ -1263,7 +1263,7 @@ for (;;)
       DPRINTF(("Recursion didn't match\n"));
       md->recursive = new_recursive.prevrec;
       if (new_recursive.offset_save != stacksave)
-        (tb_free)(new_recursive.offset_save);
+        tb_free(new_recursive.offset_save);
       RRETURN(MATCH_NOMATCH);
       }
     /* Control never reaches here */
@@ -5340,7 +5340,7 @@ ocount = offsetcount - (offsetcount % 3);
 if (re->top_backref > 0 && re->top_backref >= ocount/3)
   {
   ocount = re->top_backref * 3 + 3;
-  md->offset_vector = (int *)(tb_malloc)(ocount * sizeof(int));
+  md->offset_vector = (int *)tb_malloc(ocount * sizeof(int));
   if (md->offset_vector == NULL) return PCRE_ERROR_NOMEMORY;
   using_temporary_offsets = TRUE;
   DPRINTF(("Got memory to hold back references\n"));
@@ -5705,7 +5705,7 @@ if (rc == MATCH_MATCH)
       }
     if (md->end_offset_top > offsetcount) md->offset_overflow = TRUE;
     DPRINTF(("Freeing temporary memory\n"));
-    (tb_free)(md->offset_vector);
+    tb_free(md->offset_vector);
     }
 
   /* Set the return code to the number of captured strings, or 0 if there are
@@ -5733,7 +5733,7 @@ attempt has failed at all permitted starting positions. */
 if (using_temporary_offsets)
   {
   DPRINTF(("Freeing temporary memory\n"));
-  (tb_free)(md->offset_vector);
+  tb_free(md->offset_vector);
   }
 
 if (rc != MATCH_NOMATCH && rc != PCRE_ERROR_PARTIAL)

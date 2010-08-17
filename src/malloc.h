@@ -34,15 +34,24 @@ extern "C" {
 #include "type.h"
 
 /* /////////////////////////////////////////////////////////
- * malloc
- */
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+#if 1
+
+# 	define tb_malloc(size) 					tplat_malloc(TB_MEMORY_POOL_INDEX, size)
+# 	define tb_calloc(item, size) 			tplat_calloc(TB_MEMORY_POOL_INDEX, item, size)
+# 	define tb_realloc(data, size) 			tplat_realloc(TB_MEMORY_POOL_INDEX, data, size)
+# 	define tb_free(data) 					tplat_free(TB_MEMORY_POOL_INDEX, data)
+
+#else
+
 void* 	tb_malloc(tb_size_t size);
 void* 	tb_realloc(void* data, tb_size_t size);
 void* 	tb_calloc(tb_size_t item, tb_size_t size);
 void 	tb_free(void* data);
+
+#endif
 
 // c plus plus
 #ifdef __cplusplus

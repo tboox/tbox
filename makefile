@@ -59,9 +59,31 @@ ifeq ($(DEBUG),)
 DEBUG := n
 endif
 
+ifeq ($(PRO_DIR),)
+PRO_DIR 	:= ${shell pwd}
+endif
+
+ifeq ($(PRO_NAME),)
+PRO_NAME 	:= ${shell basename ${shell pwd}}
+endif
+
+# is debug?
+ifeq ($(DEBUG),y)
+IS_DEBUG = 1
+else
+IS_DEBUG = 0
+endif
+
 config :
 	# generate config.h
 	-cp ${shell pwd}$(_)plat$(_)$(PLAT)$(_)config.h ${shell pwd}$(_)src$(_)config.h
+
+	# append config.h
+	@echo "// config" 									>> ${shell pwd}$(_)src$(_)config.h
+	@echo "#ifndef $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}$(_)src$(_)config.h
+	@echo "#define $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}$(_)src$(_)config.h
+	@echo "#define $(PRO_NAME)_CONFIG_DEBUG $(IS_DEBUG)">> ${shell pwd}$(_)src$(_)config.h
+	@echo "#endif" 										>> ${shell pwd}$(_)src$(_)config.h
 
 	# generate config.mak
 	@echo "# config"                      				> config.mak
@@ -71,8 +93,8 @@ config :
 	@echo "PLAT =" $(PLAT) 								>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# root"                						>> config.mak
-	@echo "PRO_DIR =" ${shell pwd} 						>> config.mak
-	@echo "PRO_NAME =" ${shell basename ${shell pwd}} 	>> config.mak
+	@echo "PRO_DIR =" $(PRO_DIR) 						>> config.mak
+	@echo "PRO_NAME =" $(PRO_NAME) 						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# export"									>> config.mak

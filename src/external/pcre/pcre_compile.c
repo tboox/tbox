@@ -6558,7 +6558,7 @@ because nowadays we limit the maximum value of cd->names_found and
 cd->name_entry_size. */
 
 size = length + sizeof(real_pcre) + cd->names_found * (cd->name_entry_size + 3);
-re = (real_pcre *)(tb_malloc)(size);
+re = (real_pcre *)tb_malloc(size);
 
 if (re == NULL)
   {
@@ -6697,7 +6697,7 @@ if (cd->check_lookbehind)
 
 if (errorcode != 0)
   {
-  (tb_free)(re);
+  tb_free(re);
   PCRE_EARLY_ERROR_RETURN:
   *erroroffset = ptr - (const uschar *)pattern;
   PCRE_EARLY_ERROR_RETURN2:

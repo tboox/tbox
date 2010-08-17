@@ -318,7 +318,7 @@ char *p;
 for (i = 0; i < double_count; i += 2)
   size += sizeof(char *) + ovector[i+1] - ovector[i] + 1;
 
-stringlist = (char **)(tb_malloc)(size);
+stringlist = (char **)tb_malloc(size);
 if (stringlist == NULL) return PCRE_ERROR_NOMEMORY;
 
 *listptr = (const char **)stringlist;
@@ -344,7 +344,7 @@ return 0;
 *************************************************/
 
 /* This function exists for the benefit of people calling PCRE from non-C
-programs that can call its functions, but not free() or (tb_free)() directly.
+programs that can call its functions, but not free() or tb_free() directly.
 
 Argument:   the result of a previous pcre_get_substring_list()
 Returns:    nothing
@@ -353,7 +353,7 @@ Returns:    nothing
 PCRE_EXP_DEFN void PCRE_CALL_CONVENTION
 pcre_free_substring_list(const char **pointer)
 {
-(tb_free)((void *)pointer);
+tb_free((void *)pointer);
 }
 
 
@@ -393,7 +393,7 @@ if (stringnumber < 0 || stringnumber >= stringcount)
   return PCRE_ERROR_NOSUBSTRING;
 stringnumber *= 2;
 yield = ovector[stringnumber+1] - ovector[stringnumber];
-substring = (char *)(tb_malloc)(yield + 1);
+substring = (char *)tb_malloc(yield + 1);
 if (substring == NULL) return PCRE_ERROR_NOMEMORY;
 memcpy(substring, subject + ovector[stringnumber], yield);
 substring[yield] = 0;
@@ -447,7 +447,7 @@ return pcre_get_substring(subject, ovector, stringcount, n, stringptr);
 *************************************************/
 
 /* This function exists for the benefit of people calling PCRE from non-C
-programs that can call its functions, but not free() or (tb_free)() directly.
+programs that can call its functions, but not free() or tb_free() directly.
 
 Argument:   the result of a previous pcre_get_substring()
 Returns:    nothing
@@ -456,7 +456,7 @@ Returns:    nothing
 PCRE_EXP_DEFN void PCRE_CALL_CONVENTION
 pcre_free_substring(const char *pointer)
 {
-(tb_free)((void *)pointer);
+tb_free((void *)pointer);
 }
 
 /* End of pcre_get.c */

@@ -6,7 +6,7 @@
 #define TB_CONFIG_MEMORY_POOL_INDEX 	(TPLAT_POOL_PUBLIC_INDEX)
 
 // math
-#define TB_CONFIG_MATH_HAS_ROUND 0
+#define TB_CONFIG_MATH_HAS_ROUND 1
 
 // regex
 #define TB_CONFIG_REGEX
@@ -27,4 +27,9 @@
 #define TB_CONFIG_LIBMAD
 
 
+#endif
+// config
+#ifndef tbox_AUTO_CONFIG_H
+#define tbox_AUTO_CONFIG_H
+#define tbox_CONFIG_DEBUG 1
 #endif
