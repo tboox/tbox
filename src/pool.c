@@ -52,6 +52,8 @@ static tb_int_t tb_pool_info_isset(tb_byte_t* info, tb_int_t idx)
 /* /////////////////////////////////////////////////////////
  * internal implemention
  */
+
+#if 1
 tb_pool_t* tb_pool_create(tb_uint16_t step, tb_uint16_t grow)
 {
 	tb_pool_t* pool = (tb_pool_t*)tb_malloc(sizeof(tb_pool_t));
@@ -79,6 +81,36 @@ fail:
 	if (pool) tb_pool_destroy(pool);
 	return TB_NULL;
 }
+#else
+tb_pool_t* tb_pool_create_with_trace(tb_uint16_t step, tb_uint16_t grow, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+{
+	tb_pool_t* pool = (tb_pool_t*)tplat_pool_allocate(TB_MEMORY_POOL_INDEX, sizeof(tb_pool_t), func, line, file);
+	if (!pool) return TB_NULL;
+	memset(pool, 0, sizeof(tb_pool_t));
+
+	// align by 8-byte for info
+	TB_ASSERT(!(grow & 7));
+
+	pool->step = step;
+	pool->grow = grow;
+	pool->size = 0;
+	pool->maxn = grow;
+
+	pool->data = tplat_pool_allocate(TB_MEMORY_POOL_INDEX, pool->maxn * pool->step, func, line, file);
+	if (!pool->data) goto fail;
+	memset(pool->data, 0, pool->maxn * pool->step);
+
+	pool->info = tplat_pool_allocate(TB_MEMORY_POOL_INDEX, pool->maxn >> 3, func, line, file);
+	if (!pool->info) goto fail;
+	memset(pool->info, 0, pool->maxn >> 3);
+
+	return pool;
+fail:
+	if (pool) tb_pool_destroy(pool);
+	return TB_NULL;
+}
+#endif
+
 void tb_pool_destroy(tb_pool_t* pool)
 {
 	if (pool)
