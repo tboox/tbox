@@ -1,15 +1,23 @@
 # demo
-CONFIG_DEMO 				= 
+TB_CONFIG_DEMO 				= 
 
 # arch
-CONFIG_ARCH 				= 
+TB_CONFIG_ARCH 				= sh4
 
-# render
-#CONFIG_RENDER 				= cairo
-CONFIG_RENDER 				= tgraphic
+# regex
+TB_CONFIG_REGEX 			= y
 
-# audio
-CONFIG_AUDIO 				= y
+# encoding
+TB_CONFIG_ENCODING 			= y
 
-# as
-CONFIG_AS_OBJECT 			= y
+# jpeg
+TB_CONFIG_JPEG 				= y
+
+# zlib
+TB_CONFIG_ZLIB 				= y
+
+# cairo
+TB_CONFIG_CAIRO 			= n
+
+# libmad
+TB_CONFIG_LIBMAD			= y
