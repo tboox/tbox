@@ -32,8 +32,8 @@ MAKE 			= make
 PWD 			= pwd
 
 # cflags
-CFLAGS_RELEASE 	= -O2 -fomit-frame-pointer 
-CFLAGS_DEBUG 	= -g -DTB_CONFIG_DEBUG
+CFLAGS_RELEASE 	= -O2 -fomit-frame-pointer
+CFLAGS_DEBUG 	= -g
 CFLAGS 			= -c -Wall -std=c99
 CFLAGS-I 		= -I
 CFLAGS-o 		= -o
