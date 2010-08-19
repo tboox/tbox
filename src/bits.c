@@ -71,6 +71,7 @@ tb_size_t tb_bits_left_bits(tb_bits_t* bits)
 	TB_ASSERT(bits && bits->p <= bits->e);
 	return ((bits->e - bits->p) << 3) - bits->b;
 }
+
 tb_byte_t const* tb_bits_end(tb_bits_t* bits)
 {
 	TB_ASSERT(bits && bits->e);

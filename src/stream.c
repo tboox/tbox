@@ -41,6 +41,7 @@ tb_stream_t* tb_stream_open_data(tb_byte_t const* data, tb_size_t size);
 /* /////////////////////////////////////////////////////////
  * details
  */
+
 static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 {
 	if (!st || !data) return -1;
@@ -170,10 +171,7 @@ void tb_stream_close(tb_stream_t* st)
 
 tb_size_t tb_stream_size(tb_stream_t const* st)
 {
-	if (!st) return 0;
-	if (st->flag & TB_STREAM_FLAG_IS_ZLIB)
-		return 0;
-	else if (st->ssize) return st->ssize(st);
+	if (st && st->ssize) return st->ssize(st);
 	else return 0;
 }
 tb_size_t tb_stream_offset(tb_stream_t const* st)
@@ -202,11 +200,20 @@ tb_int_t tb_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 {
 	if (!st) return TB_NULL;
-	if (!size) return st->head;
+
+	//TB_DBG("need: %d %d", size, st->size);
+
+	// hook
+	if (st->need)
+	{
+		tb_byte_t* p = st->need(st, size);
+		if (p) return p;
+	}
 
 	// check size
 	TB_ASSERT(size <= TB_STREAM_DATA_MAX);
 	if (size > TB_STREAM_DATA_MAX) return TB_NULL;
+	if (!size) return st->head;
 
 	// read data from stream data first
 	if (st->size > 0)
@@ -259,6 +266,7 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 
 			// inflate data
 			tb_int_t real_n = size - st->size;
+
 			if (TB_FALSE == tb_zlib_inflate_partial(st->hzlib, st->data + st->size, &real_n) || real_n < 0)
 				return -1;
 			st->size += real_n;
@@ -271,6 +279,10 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 
 tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
+	// hook
+	if (st->seek && TB_TRUE == st->seek(st, offset, flag))
+		return TB_TRUE;
+
 	// adjust offset
 	if (st->flag & TB_STREAM_FLAG_IS_STREAM)
 	{
@@ -293,15 +305,8 @@ tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag
 		}
 	}
 
-	// support the native seek?
-	if (st->seek 
-		&& !(st->flag & TB_STREAM_FLAG_IS_ZLIB) 
-		&& !(st->flag & TB_STREAM_FLAG_IS_STREAM))
-	{
-
-	}
 	// only for backward
-	else if (st->offset < offset)
+	if (st->offset < offset)
 	{
 		tb_int_t try_n = 100;
 		while (st->offset < offset)
@@ -321,4 +326,39 @@ tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag
 	if (st->offset == offset) return TB_TRUE;
 	else return TB_FALSE;
 }
+tb_stream_flag_t tb_stream_flag(tb_stream_t const* st)
+{
+	if (st) return st->flag;
+}
+tb_bool_t tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag)
+{
+	// the old flag
+	tb_uint32_t oflag = st->flag;
 
+	// is zlib? 0 => 1
+	if (!(oflag & TB_STREAM_FLAG_IS_ZLIB) && (flag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		// create zlib
+		st->hzlib = tb_zlib_create();
+		if (st->hzlib == TB_INVALID_HANDLE) return TB_FALSE;
+
+		if (st->size)
+		{
+			st->size = 0;
+			st->head = st->data;
+			TB_DBG("[warning]: exists non-zlib data at stream data now!");
+		}
+	}
+	// is zlib? 1 => 0
+	else if (!(flag & TB_STREAM_FLAG_IS_ZLIB) && (oflag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		// destroy zlib
+		if (st->hzlib != TB_INVALID_HANDLE)
+			tb_zlib_destroy(st->hzlib);
+		st->hzlib = TB_INVALID_HANDLE;
+	}
+
+	// update flag
+	st->flag = flag;
+	return TB_TRUE;
+}

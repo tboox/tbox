@@ -49,9 +49,40 @@ static void tb_file_stream_close(tb_stream_t* st)
 static tb_size_t tb_file_stream_size(tb_stream_t* st)
 {
 	tb_file_stream_t* fst = st;
-	if (fst && fst->hfile != TPLAT_INVALID_HANDLE)
+	if (fst && fst->hfile != TPLAT_INVALID_HANDLE && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
 		return (tb_size_t)tplat_file_seek(fst->hfile, -1, TPLAT_FILE_SEEK_SIZE);
 	else return 0;
+}
+static tb_bool_t tb_file_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
+{
+	tb_file_stream_t* fst = st;
+	if (fst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		tb_int_t ret = -1;
+
+		// adjust offset
+		if (st->size)
+		{
+			if (flag == TB_STREAM_SEEK_CUR && offset >= 0 && offset <= st->size) 
+			{
+				st->head += offset;
+				st->size -= offset;
+				return TB_TRUE;
+			}
+
+			offset -= st->size;
+			st->head = st->data;
+			st->size = 0;
+		}
+
+		// seek
+		if (flag == TB_STREAM_SEEK_BEG) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_BEG);
+		else if (flag == TB_STREAM_SEEK_CUR) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_CUR);
+		else if (flag == TB_STREAM_SEEK_END) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_END);
+
+		return (ret < 0? TB_FALSE : TB_TRUE);
+	}
+	else return TB_FALSE;
 }
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -76,6 +107,7 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 	st->base.read = tb_file_stream_read;
 	st->base.close = tb_file_stream_close;
 	st->base.ssize = tb_file_stream_size;
+	st->base.seek = tb_file_stream_seek;
 	st->hfile = hfile;
 
 	// is hzlib?

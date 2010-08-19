@@ -91,6 +91,7 @@ typedef struct __tb_stream_t
 	tb_int_t 			(*read)(struct __tb_stream_t* st, tb_byte_t* data, tb_size_t size);
 	tb_int_t 			(*write)(struct __tb_stream_t* st, tb_byte_t* data, tb_size_t size);
 	tb_bool_t 			(*seek)(struct __tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag);
+	tb_byte_t* 			(*need)(struct __tb_stream_t* st, tb_size_t size);
 	void 				(*close)(struct __tb_stream_t* st);
 	tb_size_t 			(*ssize)(struct __tb_stream_t* st);
 
@@ -109,7 +110,8 @@ typedef struct __tb_http_stream_t
 typedef struct __tb_data_stream_t
 {
 	tb_stream_t 		base;
-	tb_bits_t 			bits;
+	tb_byte_t* 			data;
+	tb_byte_t* 			head;
 	tb_size_t 			size;
 
 }tb_data_stream_t;
@@ -127,17 +129,19 @@ typedef struct __tb_file_stream_t
  */
 
 // the stream operation
-tb_stream_t* 	tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
-tb_stream_t* 	tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
-tb_stream_t* 	tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* data, tb_size_t size, tb_stream_flag_t flag);
-void 			tb_stream_close(tb_stream_t* st);
+tb_stream_t* 		tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
+tb_stream_t* 		tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
+tb_stream_t* 		tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* data, tb_size_t size, tb_stream_flag_t flag);
+void 				tb_stream_close(tb_stream_t* st);
 
-tb_int_t 		tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
-tb_int_t 		tb_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
-tb_byte_t* 		tb_stream_need(tb_stream_t* st, tb_size_t size);
-tb_bool_t 		tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t seek);
-tb_size_t 		tb_stream_size(tb_stream_t const* st);
-tb_size_t 		tb_stream_offset(tb_stream_t const* st);
+tb_int_t 			tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
+tb_int_t 			tb_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
+tb_byte_t* 			tb_stream_need(tb_stream_t* st, tb_size_t size);
+tb_bool_t 			tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag);
+tb_size_t 			tb_stream_size(tb_stream_t const* st);
+tb_size_t 			tb_stream_offset(tb_stream_t const* st);
+tb_stream_flag_t 	tb_stream_flag(tb_stream_t const* st);
+tb_bool_t 			tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag);
 
 // c plus plus
 #ifdef __cplusplus

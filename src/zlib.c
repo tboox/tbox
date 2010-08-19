@@ -45,20 +45,22 @@ typedef struct __tb_zlib_t
 
 tb_handle_t tb_zlib_create()
 {
+	// create zlib
+	tb_zlib_t* z = tb_malloc(sizeof(tb_zlib_t));
+	if (!z) return TB_INVALID_HANDLE;
+
 	// init zlib
-	tb_zlib_t z;
-	memset(&z, 0, sizeof(tb_zlib_t));
+	memset(z, 0, sizeof(tb_zlib_t));
 
 	// inflate init
-    if (inflateInit(&z.st) != Z_OK)
-        return TB_INVALID_HANDLE;
+    if (inflateInit(&z->st) != Z_OK)
+        goto fail;
 
-	// create zlib
-	tb_zlib_t* pz = tb_malloc(sizeof(tb_zlib_t));
-	if (!pz) return TB_INVALID_HANDLE;
-	*pz = z;
+	return (tb_handle_t)z;
 
-	return (tb_handle_t)pz;
+fail:
+	if (z) tb_free(z);
+	return TB_INVALID_HANDLE;
 }
 void tb_zlib_attach(tb_handle_t hz, tb_byte_t const* data, tb_size_t size)
 {

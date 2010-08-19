@@ -32,21 +32,20 @@
 
 static tb_int_t tb_data_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 {
-	tb_data_stream_t* dst = st;
+	tb_data_stream_t* dst = (tb_data_stream_t*)st;
 	TB_ASSERT(data && size);
-	if (!dst) return -1;
+	if (dst && data)
+	{
+		// adjust size
+		tb_size_t left = dst->data + dst->size - dst->head;
+		if (size > left) size = left;
 
-	// get data
-	tb_byte_t const* p = tb_bits_tell(&(dst->bits));
-
-	// skip size
-	tb_size_t left_n = (tb_size_t)(tb_bits_end(&(dst->bits)) - p);
-	if (size > left_n) size = left_n;
-	tb_bits_skip_bytes(&(dst->bits), size);
-
-	// return data
-	memcpy(data, p, size);
-	return (tb_int_t)(size);
+		// return data
+		memcpy(data, dst->head, size);
+		dst->head += size;
+		return (tb_int_t)(size);
+	}
+	else return -1;
 }
 static void tb_data_stream_close(tb_stream_t* st)
 {
@@ -54,8 +53,39 @@ static void tb_data_stream_close(tb_stream_t* st)
 static tb_size_t tb_data_stream_size(tb_stream_t* st)
 {
 	tb_data_stream_t* dst = st;
-	if (dst) return dst->size;
+	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB)) return dst->size;
 	else return 0;
+}
+static tb_byte_t* tb_data_stream_need(tb_stream_t* st, tb_size_t size)
+{
+	tb_data_stream_t* dst = st;
+	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		// is out?
+		TB_ASSERT(dst->head + size <= dst->data + dst->size);
+		if (dst->head + size > dst->data + dst->size) return TB_NULL;
+
+		return dst->head;
+	}
+	else return TB_NULL;
+}
+static tb_bool_t tb_data_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
+{
+	tb_data_stream_t* dst = st;
+	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		// seek
+		if (flag == TB_STREAM_SEEK_BEG) dst->head = dst->data + offset;
+		else if (flag == TB_STREAM_SEEK_CUR) dst->head += offset;
+		else if (flag == TB_STREAM_SEEK_END) dst->head = dst->data + dst->size - offset;
+
+		// is out?
+		if (dst->head < dst->data) dst->head = dst->data;
+		else if (dst->head > dst->data + dst->size) dst->head = dst->data + dst->size;
+
+		return TB_TRUE;
+	}
+	else return TB_FALSE;
 }
 /* /////////////////////////////////////////////////////////
  * interface implemention
@@ -76,8 +106,11 @@ tb_stream_t* tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* dat
 	st->base.read = tb_data_stream_read;
 	st->base.close = tb_data_stream_close;
 	st->base.ssize= tb_data_stream_size;
+	st->base.need = tb_data_stream_need;
+	st->base.seek = tb_data_stream_seek;
+	st->data = data;
+	st->head = data;
 	st->size = size;
-	tb_bits_attach(&(st->bits), data, size);
 
 	// is hzlib?
 	if (flag & TB_STREAM_FLAG_IS_ZLIB)

@@ -325,7 +325,7 @@ static void tb_http_stream_close(tb_stream_t* st)
 static tb_size_t tb_http_stream_size(tb_stream_t* st)
 {
 	tb_http_stream_t* hst = st;
-	if (hst) return hst->size;
+	if (hst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB)) return hst->size;
 	else return 0;
 }
 /* /////////////////////////////////////////////////////////
