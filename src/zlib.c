@@ -96,7 +96,14 @@ tb_bool_t tb_zlib_inflate_partial(tb_handle_t hz, tb_byte_t* data, tb_size_t* si
 	*size = pz->st.total_out - out_n;
 	return TB_TRUE;
 }
+tb_size_t tb_zlib_left(tb_handle_t hz)
+{
+	TB_ASSERT(hz != TB_INVALID_HANDLE);
+	tb_zlib_t* pz = (tb_zlib_t*)hz;
+	TB_ASSERT(pz);
 
+	return (tb_size_t)pz->st.avail_in;
+}
 void tb_zlib_destroy(tb_handle_t hz)
 {
 	TB_ASSERT(hz != TB_INVALID_HANDLE);

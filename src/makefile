@@ -14,7 +14,11 @@ tbox_C_FILES 	+= \
 					malloc \
 					math \
 					pool \
-					string
+					string \
+					stream \
+					stream$(_)http \
+					stream$(_)file \
+					stream$(_)data
 
 
 # header files
@@ -30,6 +34,7 @@ INC_FILES 			= \
 					math.h \
 					pool.h \
 					string.h \
+					stream.h \
 					external$(_)prefix.h \
 					external$(_)external.h 
 

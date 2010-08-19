@@ -38,6 +38,7 @@ extern "C" {
 #include "pool.h"
 #include "bits.h"
 #include "bswap.h"
+#include "stream.h"
 #include "external/external.h"
 
 #ifdef TB_CONFIG_REGEX

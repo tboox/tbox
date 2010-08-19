@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		zlib.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_ZLIB_H
-#define TB_ZLIB_H
+#ifndef TB_STREAM_PREFIX_H
+#define TB_STREAM_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,21 +31,9 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
+#include "../stream.h"
 
-/* /////////////////////////////////////////////////////////
- * types
- */
-
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-
-tb_handle_t 		tb_zlib_create();
-void 				tb_zlib_attach(tb_handle_t hz, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 			tb_zlib_inflate_partial(tb_handle_t hz, tb_byte_t* data, tb_size_t* size);
-tb_size_t 			tb_zlib_left(tb_handle_t hz);
-void 				tb_zlib_destroy(tb_handle_t hz);
 
 // c plus plus
 #ifdef __cplusplus
@@ -53,4 +41,3 @@ void 				tb_zlib_destroy(tb_handle_t hz);
 #endif
 
 #endif
-
