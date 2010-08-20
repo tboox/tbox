@@ -67,6 +67,7 @@ static tb_bool_t tb_file_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream
 			{
 				st->head += offset;
 				st->size -= offset;
+				st->offset += offset;
 				return TB_TRUE;
 			}
 
@@ -80,7 +81,13 @@ static tb_bool_t tb_file_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream
 		else if (flag == TB_STREAM_SEEK_CUR) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_CUR);
 		else if (flag == TB_STREAM_SEEK_END) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_END);
 
-		return (ret < 0? TB_FALSE : TB_TRUE);
+		// update offset
+		if (ret >= 0) 
+		{
+			st->offset = ret;
+			return TB_TRUE;
+		}
+		else return TB_FALSE;
 	}
 	else return TB_FALSE;
 }

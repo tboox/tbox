@@ -83,6 +83,9 @@ static tb_bool_t tb_data_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream
 		if (dst->head < dst->data) dst->head = dst->data;
 		else if (dst->head > dst->data + dst->size) dst->head = dst->data + dst->size;
 
+		// update offset
+		st->offset = dst->head - dst->data;
+
 		return TB_TRUE;
 	}
 	else return TB_FALSE;
