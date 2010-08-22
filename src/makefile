@@ -178,6 +178,8 @@ cairo_C_FILES 	= \
 				cairo-array \
 				cairo-atomic \
 				cairo-bentley-ottmann \
+				cairo-font-face-twin \
+				cairo-font-face-twin-data \
 				cairo \
 				cairo-cache \
 				cairo-clip \
@@ -189,8 +191,6 @@ cairo_C_FILES 	= \
 				cairo-font-options \
 				cairo-user-font \
 				cairo-analysis-surface \
-				cairo-font-face-twin \
-				cairo-font-face-twin-data \
 				cairo-gstate \
 				cairo-hash \
 				cairo-hull \
