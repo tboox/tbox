@@ -63,6 +63,11 @@ typedef struct __tb_pool_t
 	tb_uint16_t 	maxn;
 	tb_uint16_t 	step;
 
+	// predict the next free block
+#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
+	tb_uint16_t 	pred;
+#endif
+
 }tb_pool_t;
 
 /* /////////////////////////////////////////////////////////

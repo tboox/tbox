@@ -47,7 +47,9 @@ extern "C" {
 # 	define TB_MEMORY_MODE_SMALL
 #endif
 
+// pool
 #define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
+#define TB_MEMORY_POOL_PREDICTION_ENABLE
 
 // math
 #ifdef TB_CONFIG_MATH_HAS_ROUND
