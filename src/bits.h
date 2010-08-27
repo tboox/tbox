@@ -38,21 +38,59 @@ extern "C" {
  */
 typedef struct __tb_bits_t
 {
-	tb_byte_t const* 	p; 	// the pointer to the current position
+	tb_byte_t* 			p; 	// the pointer to the current position
 	tb_size_t 			b; 	// the bit offset < 8
 	tb_byte_t const* 	e; 	// the pointer to the end
 
 }tb_bits_t;
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#if 0
+#ifdef TPLAT_WORDS_BIGENDIAN
+# 	define tb_bits_get_u16 				tb_bits_get_u16_be
+# 	define tb_bits_get_s16 				tb_bits_get_s16_be
+# 	define tb_bits_get_u32 				tb_bits_get_u32_be
+# 	define tb_bits_get_s32 				tb_bits_get_s32_be
+
+# 	define tb_pbits_get_u16 			tb_pbits_get_u16_be
+# 	define tb_pbits_get_s16 			tb_pbits_get_s16_be
+# 	define tb_pbits_get_u32 			tb_pbits_get_u32_be
+# 	define tb_pbits_get_s32 			tb_pbits_get_s32_be
+#else
+# 	define tb_bits_get_u16 				tb_bits_get_u16_le
+# 	define tb_bits_get_s16 				tb_bits_get_s16_le
+# 	define tb_bits_get_u32 				tb_bits_get_u32_le
+# 	define tb_bits_get_s32 				tb_bits_get_s32_le
+
+# 	define tb_pbits_get_u16 			tb_pbits_get_u16_le
+# 	define tb_pbits_get_s16 			tb_pbits_get_s16_le
+# 	define tb_pbits_get_u32 			tb_pbits_get_u32_le
+# 	define tb_pbits_get_s32 			tb_pbits_get_s32_le
+#endif
+#else
+# 	define tb_bits_get_u16 				tb_bits_get_u16_ne
+# 	define tb_bits_get_s16 				tb_bits_get_s16_ne
+# 	define tb_bits_get_u32 				tb_bits_get_u32_ne
+# 	define tb_bits_get_s32 				tb_bits_get_s32_ne
+
+# 	define tb_pbits_get_u16 			tb_pbits_get_u16_ne
+# 	define tb_pbits_get_s16 			tb_pbits_get_s16_ne
+# 	define tb_pbits_get_u32 			tb_pbits_get_u32_ne
+# 	define tb_pbits_get_s32 			tb_pbits_get_s32_ne
+#endif
+
+/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 // init
-void 				tb_bits_attach(tb_bits_t* bits, tb_byte_t const* data, tb_size_t size);
+void 				tb_bits_attach(tb_bits_t* bits, tb_byte_t* data, tb_size_t size);
 
 // modifior
-void 				tb_bits_goto(tb_bits_t* bits, tb_byte_t const* data);
+void 				tb_bits_goto(tb_bits_t* bits, tb_byte_t* data);
 void 				tb_bits_sync(tb_bits_t* bits);
 
 // position
@@ -69,26 +107,7 @@ void 				tb_bits_skip_bits(tb_bits_t* bits, tb_size_t bits_n);
 tb_char_t const* 	tb_bits_skip_string(tb_bits_t* bits);
 
 // get
-tb_char_t const* 	tb_bits_get_string(tb_bits_t* bits);
-tb_uint32_t 		tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n);
-tb_sint32_t 		tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n);
-
 tb_uint8_t 			tb_bits_get_u1(tb_bits_t* bits);
-
-tb_uint8_t 			tb_bits_get_u8(tb_bits_t* bits);
-tb_sint8_t 			tb_bits_get_s8(tb_bits_t* bits);
-
-tb_uint16_t 		tb_bits_get_u16(tb_bits_t* bits);
-tb_sint16_t 		tb_bits_get_s16(tb_bits_t* bits);
-
-tb_uint32_t 		tb_bits_get_u32(tb_bits_t* bits);
-tb_sint32_t 		tb_bits_get_s32(tb_bits_t* bits);
-
-tb_uint16_t 		tb_bits_get_u16_be(tb_bits_t* bits);
-tb_sint16_t 		tb_bits_get_s16_be(tb_bits_t* bits);
-
-tb_uint32_t 		tb_bits_get_u32_be(tb_bits_t* bits);
-tb_sint32_t 		tb_bits_get_s32_be(tb_bits_t* bits);
 
 tb_uint16_t 		tb_bits_get_u16_le(tb_bits_t* bits);
 tb_sint16_t 		tb_bits_get_s16_le(tb_bits_t* bits);
@@ -96,10 +115,115 @@ tb_sint16_t 		tb_bits_get_s16_le(tb_bits_t* bits);
 tb_uint32_t 		tb_bits_get_u32_le(tb_bits_t* bits);
 tb_sint32_t 		tb_bits_get_s32_le(tb_bits_t* bits);
 
+tb_uint16_t 		tb_bits_get_u16_be(tb_bits_t* bits);
+tb_sint16_t 		tb_bits_get_s16_be(tb_bits_t* bits);
+
+tb_uint32_t 		tb_bits_get_u32_be(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s32_be(tb_bits_t* bits);
+
+tb_uint32_t 		tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n);
+tb_sint32_t 		tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n);
+
+tb_char_t const* 	tb_bits_get_string(tb_bits_t* bits);
+tb_size_t 			tb_bits_get_data(tb_bits_t* bits, tb_byte_t* data, tb_size_t size);
+
+// set
+void 				tb_bits_set_u16_le(tb_bits_t* bits, tb_uint16_t val);
+void 				tb_bits_set_s16_le(tb_bits_t* bits, tb_sint16_t val);
+
+void 				tb_bits_set_u32_le(tb_bits_t* bits, tb_uint32_t val);
+void 				tb_bits_set_s32_le(tb_bits_t* bits, tb_sint32_t val);
+
+void 				tb_bits_set_u16_be(tb_bits_t* bits, tb_uint16_t val);
+void 				tb_bits_set_s16_be(tb_bits_t* bits, tb_sint16_t val);
+
+void 				tb_bits_set_u32_be(tb_bits_t* bits, tb_uint32_t val);
+void 				tb_bits_set_s32_be(tb_bits_t* bits, tb_sint32_t val);
+
+void 				tb_bits_set_ubits(tb_bits_t* bits, tb_uint32_t val, tb_size_t bits_n);
+tb_size_t 			tb_bits_set_data(tb_bits_t* bits, tb_byte_t const* data, tb_size_t size);
+
 // peek
 tb_uint32_t 		tb_bits_peek_ubits(tb_bits_t* bits, tb_size_t bits_n);
 tb_sint32_t 		tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n);
 
+// pbits
+tb_char_t const* 	tb_pbits_get_string(tb_byte_t const* p, tb_size_t size);
+
+// bits inline
+static __tplat_inline__ tb_uint8_t tb_bits_get_u8(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	return *(bits->p++);
+}
+static __tplat_inline__ tb_sint8_t tb_bits_get_s8(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	return *(bits->p++);
+}
+static __tplat_inline__ tb_uint16_t tb_bits_get_u16_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	tb_uint16_t val = *((tb_uint16_t*)bits->p);
+	bits->p += 2;
+	return val;
+}
+static __tplat_inline__ tb_sint16_t tb_bits_get_s16_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	tb_sint16_t val = *((tb_sint16_t*)bits->p);
+	bits->p += 2;
+	return val;
+}
+static __tplat_inline__ tb_uint32_t tb_bits_get_u32_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	tb_uint32_t val = *((tb_uint32_t*)bits->p);
+	bits->p += 4;
+	return val;
+}
+static __tplat_inline__ tb_sint32_t tb_bits_get_s32_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	tb_sint32_t val = *((tb_sint32_t*)bits->p);
+	bits->p += 4;
+	return val;
+}
+static __tplat_inline__ void tb_bits_set_u8(tb_bits_t* bits, tb_uint8_t val)
+{
+	TB_ASSERT(!bits->b);
+	*(bits->p++) = val;
+}
+static __tplat_inline__ void tb_bits_set_s8(tb_bits_t* bits, tb_sint8_t val)
+{
+	TB_ASSERT(!bits->b);
+	*(bits->p++) = val;
+}
+static __tplat_inline__ void tb_bits_set_u16_ne(tb_bits_t* bits, tb_uint16_t val)
+{
+	TB_ASSERT(!bits->b);
+	*((tb_uint16_t*)bits->p) = val;
+	bits->p += 2;
+}
+static __tplat_inline__ void tb_bits_set_s16_ne(tb_bits_t* bits, tb_sint16_t val)
+{
+	TB_ASSERT(!bits->b);
+	*((tb_sint16_t*)bits->p) = val;
+	bits->p += 2;
+}
+static __tplat_inline__ void tb_bits_set_u32_ne(tb_bits_t* bits, tb_uint32_t val)
+{
+	TB_ASSERT(!bits->b);
+	*((tb_uint32_t*)bits->p) = val;
+	bits->p += 4;
+}
+static __tplat_inline__ void tb_bits_set_s32_ne(tb_bits_t* bits, tb_sint32_t val)
+{
+	TB_ASSERT(!bits->b);
+	*((tb_sint32_t*)bits->p) = val;
+	bits->p += 4;
+}
+// pbits inline
 static __tplat_inline__ tb_uint8_t tb_pbits_get_u1(tb_byte_t const* p)
 {
 	return ((*p) >> 7) & 1;
@@ -108,54 +232,9 @@ static __tplat_inline__ tb_uint8_t tb_pbits_get_u8(tb_byte_t const* p)
 {
 	return *(p++);
 }
-
 static __tplat_inline__ tb_sint8_t tb_pbits_get_s8(tb_byte_t const* p)
 {
 	return *(p++);
-}
-
-static __tplat_inline__ tb_uint16_t tb_pbits_get_u16(tb_byte_t const* p)
-{
-#ifdef TPLAT_WORDS_BIGENDIAN
-	return (*(p) | *(p + 1) << 8);
-#else
-	return *((tb_uint16_t*)p);
-#endif
-}
-
-static __tplat_inline__ tb_sint16_t tb_pbits_get_s16(tb_byte_t const* p)
-{
-#ifdef TPLAT_WORDS_BIGENDIAN
-	return (*(p) | *(p + 1) << 8);
-#else
-	return *((tb_sint16_t*)p);
-#endif
-}
-
-static __tplat_inline__ tb_uint32_t tb_pbits_get_u32(tb_byte_t const* p)
-{
-#ifdef TPLAT_WORDS_BIGENDIAN
-	return (*(p) | *(p + 1) << 8 | *(p + 2) << 16 | *(p + 3) << 24);
-#else
-	return *((tb_uint32_t*)p);
-#endif
-}
-
-static __tplat_inline__ tb_sint32_t tb_pbits_get_s32(tb_byte_t const* p)
-{
-#ifdef TPLAT_WORDS_BIGENDIAN
-	return (*(p) | *(p + 1) << 8 | *(p + 2) << 16 | *(p + 3) << 24);
-#else
-	return *((tb_sint32_t*)p);
-#endif
-}
-static __tplat_inline__ tb_uint16_t tb_pbits_get_u16_be(tb_byte_t const* p)
-{
-	return (*(p) << 8 | *(p + 1));
-}
-static __tplat_inline__ tb_sint16_t tb_pbits_get_s16_be(tb_byte_t const* p)
-{
-	return (*(p) << 8 | *(p + 1));
 }
 static __tplat_inline__ tb_uint16_t tb_pbits_get_u16_le(tb_byte_t const* p)
 {
@@ -165,13 +244,21 @@ static __tplat_inline__ tb_sint16_t tb_pbits_get_s16_le(tb_byte_t const* p)
 {
 	return (*(p + 1) << 8 | *(p));
 }
-static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_be(tb_byte_t const* p)
+static __tplat_inline__ tb_uint16_t tb_pbits_get_u16_be(tb_byte_t const* p)
 {
-	return (*(p) << 24 | *(p + 1) << 16 | *(p + 2) << 8 | *(p + 3));
+	return (*(p) << 8 | *(p + 1));
 }
-static __tplat_inline__ tb_sint32_t tb_pbits_get_s32_be(tb_byte_t const* p)
+static __tplat_inline__ tb_sint16_t tb_pbits_get_s16_be(tb_byte_t const* p)
 {
-	return (*(p) << 24 | *(p + 1) << 16 | *(p + 2) << 8 | *(p + 3));
+	return (*(p) << 8 | *(p + 1));
+}
+static __tplat_inline__ tb_uint16_t tb_pbits_get_u16_ne(tb_byte_t const* p)
+{
+	return *((tb_uint16_t*)p);
+}
+static __tplat_inline__ tb_sint16_t tb_pbits_get_s16_ne(tb_byte_t const* p)
+{
+	return *((tb_sint16_t*)p);
 }
 static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_le(tb_byte_t const* p)
 {
@@ -181,18 +268,21 @@ static __tplat_inline__ tb_sint32_t tb_pbits_get_s32_le(tb_byte_t const* p)
 {
 	return (*(p + 3) << 24 | *(p + 2) << 16 | *(p + 1) << 8 | *(p));
 }
-
-static __tplat_inline__ tb_char_t const* tb_pbits_get_string(tb_byte_t const* p, tb_size_t size)
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_be(tb_byte_t const* p)
 {
-	TB_ASSERT(p && size);
-	tb_char_t const* s = (tb_char_t const*)p;
-
-	// find '\0'
-	while (*p && size--) p++;
-
-	// is string with '\0' ?
-	if ((*p)) return TB_NULL;
-	return s;
+	return (*(p) << 24 | *(p + 1) << 16 | *(p + 2) << 8 | *(p + 3));
+}
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s32_be(tb_byte_t const* p)
+{
+	return (*(p) << 24 | *(p + 1) << 16 | *(p + 2) << 8 | *(p + 3));
+}
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_ne(tb_byte_t const* p)
+{
+	return *((tb_uint32_t*)p);
+}
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s32_ne(tb_byte_t const* p)
+{
+	return *((tb_sint32_t*)p);
 }
 
 
