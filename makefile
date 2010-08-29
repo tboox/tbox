@@ -21,12 +21,12 @@ all : .null
 install : .null
 	-$(RMDIR) $(BIN_DIR)
 	-$(MKDIR) $(BIN_DIR)
-	-$(RMDIR) $(BIN_DIR)$(_)inc
-	-$(RMDIR) $(BIN_DIR)$(_)lib
-	-$(RMDIR) $(BIN_DIR)$(_)obj
-	-$(MKDIR) $(BIN_DIR)$(_)inc
-	-$(MKDIR) $(BIN_DIR)$(_)lib
-	-$(MKDIR) $(BIN_DIR)$(_)obj
+	-$(RMDIR) $(BIN_DIR)/inc
+	-$(RMDIR) $(BIN_DIR)/lib
+	-$(RMDIR) $(BIN_DIR)/obj
+	-$(MKDIR) $(BIN_DIR)/inc
+	-$(MKDIR) $(BIN_DIR)/lib
+	-$(MKDIR) $(BIN_DIR)/obj
 	$(MAKE) -C $(SRC_DIR)
 	$(MAKE) -C $(SRC_DIR) install
 
@@ -76,14 +76,14 @@ endif
 
 config :
 	# generate config.h
-	-cp ${shell pwd}$(_)plat$(_)$(PLAT)$(_)config.h ${shell pwd}$(_)src$(_)config.h
+	-cp ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
 
 	# append config.h
-	@echo "// config" 									>> ${shell pwd}$(_)src$(_)config.h
-	@echo "#ifndef $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}$(_)src$(_)config.h
-	@echo "#define $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}$(_)src$(_)config.h
-	@echo "#define $(PRO_NAME)_CONFIG_DEBUG $(IS_DEBUG)">> ${shell pwd}$(_)src$(_)config.h
-	@echo "#endif" 										>> ${shell pwd}$(_)src$(_)config.h
+	@echo "// config" 									>> ${shell pwd}/src/config.h
+	@echo "#ifndef $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}/src/config.h
+	@echo "#define $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}/src/config.h
+	@echo "#define $(PRO_NAME)_CONFIG_DEBUG $(IS_DEBUG)">> ${shell pwd}/src/config.h
+	@echo "#endif" 										>> ${shell pwd}/src/config.h
 
 	# generate config.mak
 	@echo "# config"                      				> config.mak

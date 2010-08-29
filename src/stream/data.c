@@ -115,12 +115,13 @@ tb_stream_t* tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* dat
 	st->head = data;
 	st->size = size;
 
+#ifdef TB_CONFIG_ZLIB
 	// is hzlib?
 	if (flag & TB_STREAM_FLAG_IS_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) return TB_NULL;
 	}
-
+#endif
 	return ((tb_stream_t*)st);
 }

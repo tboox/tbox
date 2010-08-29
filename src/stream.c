@@ -26,6 +26,7 @@
  */
 #include "stream.h"
 #include "math.h"
+
 /* /////////////////////////////////////////////////////////
  * macros
  */
@@ -79,6 +80,7 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 	}
 	else 
 	{
+#ifdef TB_CONFIG_ZLIB
 		// check
 		TB_ASSERT(st->hzlib != TB_INVALID_HANDLE);
 		
@@ -120,6 +122,7 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 				st->size = 0;
 			}
 		}
+#endif
 	}
 
 	return read_n;
@@ -164,8 +167,10 @@ void tb_stream_close(tb_stream_t* st)
 		// close stream
 		if (st->close) st->close(st); 
 
+#ifdef TB_CONFIG_ZLIB
 		// free hzlib
 		if (st->hzlib != TB_INVALID_HANDLE) tb_zlib_destroy(st->hzlib);
+#endif
 	}
 }
 
@@ -245,6 +250,7 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 	}
 	else 
 	{
+#ifdef TB_CONFIG_ZLIB
 		// check
 		TB_ASSERT(st->hzlib != TB_INVALID_HANDLE);
 		while (st->size < size)
@@ -271,6 +277,7 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 				return -1;
 			st->size += real_n;
 		}
+#endif
 	}
 
 	if (st->size < size) return TB_NULL;
@@ -335,6 +342,7 @@ tb_bool_t tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag)
 	// the old flag
 	tb_uint32_t oflag = st->flag;
 
+#ifdef TB_CONFIG_ZLIB
 	// is zlib? 0 => 1
 	if (!(oflag & TB_STREAM_FLAG_IS_ZLIB) && (flag & TB_STREAM_FLAG_IS_ZLIB))
 	{
@@ -358,6 +366,7 @@ tb_bool_t tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag)
 		st->hzlib = TB_INVALID_HANDLE;
 	}
 
+#endif
 	// update flag
 	st->flag = flag;
 	return TB_TRUE;

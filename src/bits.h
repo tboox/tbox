@@ -55,26 +55,44 @@ typedef struct __tb_bits_t
 # 	define tb_bits_get_u32 				tb_bits_get_u32_be
 # 	define tb_bits_get_s32 				tb_bits_get_s32_be
 
+# 	define tb_bits_set_u16 				tb_bits_set_u16_be
+# 	define tb_bits_set_s16 				tb_bits_set_s16_be
+# 	define tb_bits_set_u32 				tb_bits_set_u32_be
+# 	define tb_bits_set_s32 				tb_bits_set_s32_be
+
 # 	define tb_pbits_get_u16 			tb_pbits_get_u16_be
 # 	define tb_pbits_get_s16 			tb_pbits_get_s16_be
 # 	define tb_pbits_get_u32 			tb_pbits_get_u32_be
 # 	define tb_pbits_get_s32 			tb_pbits_get_s32_be
+
 #else
 # 	define tb_bits_get_u16 				tb_bits_get_u16_le
 # 	define tb_bits_get_s16 				tb_bits_get_s16_le
 # 	define tb_bits_get_u32 				tb_bits_get_u32_le
 # 	define tb_bits_get_s32 				tb_bits_get_s32_le
 
+# 	define tb_bits_set_u16 				tb_bits_set_u16_le
+# 	define tb_bits_set_s16 				tb_bits_set_s16_le
+# 	define tb_bits_set_u32 				tb_bits_set_u32_le
+# 	define tb_bits_set_s32 				tb_bits_set_s32_le
+
 # 	define tb_pbits_get_u16 			tb_pbits_get_u16_le
 # 	define tb_pbits_get_s16 			tb_pbits_get_s16_le
 # 	define tb_pbits_get_u32 			tb_pbits_get_u32_le
 # 	define tb_pbits_get_s32 			tb_pbits_get_s32_le
+
+
 #endif
 #else
 # 	define tb_bits_get_u16 				tb_bits_get_u16_ne
 # 	define tb_bits_get_s16 				tb_bits_get_s16_ne
 # 	define tb_bits_get_u32 				tb_bits_get_u32_ne
 # 	define tb_bits_get_s32 				tb_bits_get_s32_ne
+
+# 	define tb_bits_set_u16 				tb_bits_set_u16_ne
+# 	define tb_bits_set_s16 				tb_bits_set_s16_ne
+# 	define tb_bits_set_u32 				tb_bits_set_u32_ne
+# 	define tb_bits_set_s32 				tb_bits_set_s32_ne
 
 # 	define tb_pbits_get_u16 			tb_pbits_get_u16_ne
 # 	define tb_pbits_get_s16 			tb_pbits_get_s16_ne

@@ -360,13 +360,14 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 		|| st->hsocket == TPLAT_INVALID_HANDLE) return TB_NULL;
 	TB_HTTP_DBG("connect ok!");
 
+#ifdef TB_CONFIG_ZLIB
 	// is hzlib?
 	if (flag & TB_STREAM_FLAG_IS_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;
 	}
-
+#endif
 	return ((tb_stream_t*)st);
 
 fail:

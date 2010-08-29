@@ -117,13 +117,14 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 	st->base.seek = tb_file_stream_seek;
 	st->hfile = hfile;
 
+#ifdef TB_CONFIG_ZLIB
 	// is hzlib?
 	if (flag & TB_STREAM_FLAG_IS_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;
 	}
-
+#endif
 	return ((tb_stream_t*)st);
 
 fail:

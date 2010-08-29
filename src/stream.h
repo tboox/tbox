@@ -33,7 +33,10 @@ extern "C" {
  */
 #include "prefix.h"
 #include "bits.h"
-#include "zlib.h"
+
+#ifdef TB_CONFIG_ZLIB
+# 	include "zlib.h"
+#endif
 /* /////////////////////////////////////////////////////////
  * macros
  */
@@ -75,17 +78,21 @@ typedef struct __tb_stream_t
 	// the stream flag
 	tb_uint32_t 		flag;
 
-	// for zlib
-	tb_handle_t 		hzlib;
-
 	// the stream data
 	tb_byte_t 			data[TB_STREAM_DATA_MAX];
 	tb_byte_t* 			head;
 	tb_size_t 			size;
 	tb_size_t 			offset;
 
+#ifdef TB_CONFIG_ZLIB
+
+	// for zlib
+	tb_handle_t 		hzlib;
+
 	// the stream zdata
 	tb_byte_t 			zdata[TB_STREAM_ZDATA_MAX];
+
+#endif
 
 	// the operations 
 	tb_int_t 			(*read)(struct __tb_stream_t* st, tb_byte_t* data, tb_size_t size);
