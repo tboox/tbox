@@ -8,18 +8,18 @@ NAMES 				= tbox
 tbox_TYPE 			= LIB
 
 # basic files
-tbox_C_FILES 	+= \
+tbox_C_FILES 		+= \
 					bits \
 					bswap \
 					malloc \
 					math \
 					pool \
+					memops \
 					string \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
 					stream$(_)data
-
 
 # header files
 INC_FILES 			= \
@@ -33,6 +33,7 @@ INC_FILES 			= \
 					malloc.h \
 					math.h \
 					pool.h \
+					memops.h \
 					string.h \
 					stream.h \
 					external$(_)prefix.h \

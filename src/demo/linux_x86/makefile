@@ -2,19 +2,22 @@
 include $(PRO_DIR)$(_)prefix.mak
 
 # module name
-NAMES 						= string
+NAMES 							= string
 NAMES-$(TB_CONFIG_ENCODING) 	+= encoding
 NAMES-$(TB_CONFIG_REGEX) 		+= regex
+NAMES-$(TB_CONFIG_REGEX) 		+= memops
 
 # module type
 regex_TYPE 			= BIN
 encoding_TYPE 		= BIN
 string_TYPE 		= BIN
+memops_TYPE 		= BIN
 
 # c-source files
 regex_C_FILES 		= regex
 encoding_C_FILES 	= encoding
 string_C_FILES 		= string
+memops_C_FILES 		= memops
 
 # lib files
 regex_LIBS 			= tbox tplat z m dl pthread
@@ -28,6 +31,10 @@ encoding_INC_DIR 	= /usr/include
 string_LIBS 		= tbox tplat z m dl pthread
 string_LIB_DIR 		= ../../ /usr/lib/
 string_INC_DIR 		= /usr/include
+
+memops_LIBS 		= tbox tplat z m dl pthread
+memops_LIB_DIR 		= ../../ /usr/lib/
+memops_INC_DIR 		= /usr/include
 
 include $(PRO_DIR)$(_)suffix.mak
 

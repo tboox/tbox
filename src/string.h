@@ -95,6 +95,7 @@ void 				tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch);
 
 tb_char_t const* 	tb_string_shift(tb_string_t* string, tb_string_t* s_string);
 tb_char_t const* 	tb_string_assign(tb_string_t* string, tb_string_t const* s_string);
+tb_char_t const* 	tb_string_assign_char(tb_string_t* string, tb_char_t ch);
 tb_char_t const* 	tb_string_assign_c_string(tb_string_t* string, tb_char_t const* c_string);
 tb_char_t const* 	tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
 
@@ -104,6 +105,7 @@ tb_char_t const* 	tb_string_assign_c_string_with_size_by_ref(tb_string_t* string
 
 tb_char_t const* 	tb_string_append(tb_string_t* string, tb_string_t const* s_string);
 tb_char_t const* 	tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string);
+tb_char_t const* 	tb_string_append_char(tb_string_t* string, tb_char_t ch);
 
 #endif
 

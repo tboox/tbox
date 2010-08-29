@@ -58,6 +58,16 @@ extern "C" {
 # 	define TB_MATH_HAS_ROUND 		(0)
 #endif
 
+// asm
+#ifdef TB_CONFIG_ASM_ENABLE
+# 	define TB_ASM_ENABLE 
+#endif
+
+#ifdef TB_CONFIG_ASM_INLINE_ENABLE
+# 	define TB_ASM_INLINE_ENABLE 
+#endif
+
+
 // c plus plus
 #ifdef __cplusplus
 }

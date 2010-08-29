@@ -4,6 +4,9 @@ TB_CONFIG_DEMO 				=
 # arch
 TB_CONFIG_ARCH 				= arm
 
+# asm
+TB_CONFIG_ENABLE 			= n
+
 # regex
 TB_CONFIG_REGEX 			= y
 

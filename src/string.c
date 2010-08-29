@@ -307,6 +307,19 @@ tb_char_t const* tb_string_assign_c_string(tb_string_t* string, tb_char_t const*
 		return TB_NULL;
 	}
 }
+tb_char_t const* tb_string_assign_char(tb_string_t* string, tb_char_t ch)
+{
+	if (!string) return TB_NULL;
+
+	// ensure enough size
+	if (TB_FALSE == tb_string_resize(string, 1)) return TB_NULL;
+
+	// attach string
+	string->data[0] = ch;
+	string->data[1] = '\0';
+
+	return tb_string_c_string(string);
+}
 tb_char_t const* tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
 {
 	if (!string) return TB_NULL;
@@ -446,6 +459,24 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 	{
 		tb_string_clear(string);
 		return TB_NULL;
+	}
+}
+tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
+{
+	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_char(string, ch);
+	else
+	{
+		// get old size
+		tb_uint16_t size = string->size;
+
+		// ensure enough size
+		if (TB_FALSE == tb_string_resize(string, size + 1)) return TB_NULL;
+
+		// append string
+		string->data[size] = ch;
+		string->data[string->size] = '\0';
+
+		return tb_string_c_string(string);
 	}
 }
 tb_bool_t tb_string_subat(tb_string_t const* string, tb_string_t* sub, tb_int_t start, tb_int_t size)

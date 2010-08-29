@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		memops.c
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
+#ifndef TB_MEMOPS_H
+#define TB_MEMOPS_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,27 +32,14 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "malloc.h"
-#include "string.h"
-#include "math.h"
-#include "pool.h"
-#include "bits.h"
-#include "bswap.h"
-#include "memops.h"
-#include "stream.h"
-#include "external/external.h"
 
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-#ifdef TB_CONFIG_ENCODING
-# 	include "encoding.h"
-#endif
-
-#ifdef TB_CONFIG_ZLIB
-# 	include "zlib.h"
-#endif
+void 	tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size);
+void 	tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size);
+void 	tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size);
 
 // c plus plus
 #ifdef __cplusplus
@@ -60,3 +47,4 @@ extern "C" {
 #endif
 
 #endif
+
