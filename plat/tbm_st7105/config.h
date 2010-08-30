@@ -10,7 +10,6 @@
 
 // asm
 //#define TB_CONFIG_ASM_ENABLE
-//#define TB_CONFIG_ASM_INLINE_ENABLE
 
 // regex
 #define TB_CONFIG_REGEX

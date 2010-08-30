@@ -10,7 +10,7 @@ static tb_bool_t check_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t siz
 	{
 		if (*p != src) 
 		{
-			TB_DBG("%d %x", ((tb_byte_t*)p - dst) >> 1, *p);
+			tplat_printf("%d %x", ((tb_byte_t*)p - dst) >> 1, *p);
 			return TB_FALSE;
 		}
 		p++;
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000000; i++) tb_memset_u16(data, 0xbeef, 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u16(data, 0xbeef, 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u16 x 1k: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u16 x 1k: %d ms\n", (tb_int_t)(dt / 1000));
 
 	// test: u16 x 1024 * 1024
 	memset(data, 0, size);
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000; i++) tb_memset_u16(data, 0xbeef, 1024 * 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u16(data, 0xbeef, 1024 * 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u16 x 1m: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u16 x 1m: %d ms\n", (tb_int_t)(dt / 1000));
 
 	// test: u24 x 1024
 	memset(data, 0, size);
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000000; i++) tb_memset_u24(data, 0xbeefaa, 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u24(data, 0xbeefaa, 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u24 x 1k: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u24 x 1k: %d ms\n", (tb_int_t)(dt / 1000));
 
 	// test: u24 x 1024 * 1024
 	memset(data, 0, size);
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000; i++) tb_memset_u24(data, 0xbeefaa, 1024 * 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u24(data, 0xbeefaa, 1024 * 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u24 x 1m: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u24 x 1m: %d ms\n", (tb_int_t)(dt / 1000));
 
 	// test: u32 x 1024
 	memset(data, 0, size);
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000000; i++) tb_memset_u32(data, 0xbeefbeaf, 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u32(data, 0xbeefbeaf, 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u32 x 1k: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u32 x 1k: %d ms\n", (tb_int_t)(dt / 1000));
 
 	// test: u32 x 1024 * 1024
 	memset(data, 0, size);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	for (i = 0; i < 1000; i++) tb_memset_u32(data, 0xbeefbeaf, 1024 * 1024);
 	TB_ASSERT(TB_TRUE == check_memset_u32(data, 0xbeefbeaf, 1024 * 1024));
 	dt = tplat_clock() - dt;
-	TB_DBG("u32 x 1m: %d ms", (tb_int_t)(dt / 1000));
+	tplat_printf("u32 x 1m: %d ms\n", (tb_int_t)(dt / 1000));
 
 	return 0;
 }

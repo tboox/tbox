@@ -28,81 +28,15 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#if defined(TB_ASM_INLINE_ENABLE) && \
-		!defined(TPLAT_CONFIG_COMPILER_NOT_SUPPORT_INLINE)
-# 	if defined(TPLAT_ARCH_x86)
-# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-# 		define TB_ASM_ENABLE_memset_u32
-# 	elif defined(TPLAT_ARCH_ARM)
-//# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-//# 		define TB_ASM_ENABLE_memset_u32
-# 	elif defined(TPLAT_ARCH_SH4)
-//# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-//# 		define TB_ASM_ENABLE_memset_u32
-# 	elif defined(TPLAT_ARCH_MIPS)
-//# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-//# 		define TB_ASM_ENABLE_memset_u32
-# 	elif defined(TPLAT_ARCH_SPARC)
-//# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-//# 		define TB_ASM_ENABLE_memset_u32
-# 	elif defined(TPLAT_ARCH_PPC)
-//# 		define TB_ASM_ENABLE_memset_u16
-//# 		define TB_ASM_ENABLE_memset_u24
-//# 		define TB_ASM_ENABLE_memset_u32
-# 	endif
-#endif
 
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifndef TB_ASM_ENABLE_memset_u16
-#if 0
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
-{
-	tb_uint16_t* p = (tb_uint16_t*)dst;
-	tb_uint16_t* e = p + size;
-	while (p < e) *p++ = src;
-}
-#else
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
-{
-	wmemset(dst, src, size);
-#if 0
-	tb_byte_t b1 = (src) & 0xff;
-	tb_byte_t b2 = (src >> 8) & 0xff;
-	if (b1 == b2) memset(dst, b1, size << 1);
-	else 
-	{
-		// left = size % 4
-		tb_size_t left = size & 0x3;
-		size -= left;
 
-		tb_uint16_t* p = (tb_uint16_t*)dst;
-		tb_uint16_t* e = p + size;
-		while (p < e)
-		{
-			p[0] = src;
-			p[1] = src;
-			p[2] = src;
-			p[3] = src;
-			p += 4;
-		}
-
-		while (left--) *p++ = src;
-	}
-#endif
-}
-#endif
-#elif defined(TPLAT_ARCH_x86)
 void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
-#ifdef TPLAT_COMPILER_IS_GCC
-#if 1
+#if defined(TPLAT_ARCH_x86) && defined(TPLAT_ASSEMBLER_GAS)
+# 	if 1
 	__tplat_asm__
 	(
 		"cld\n\t" 
@@ -110,7 +44,7 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 		: /* no output registers */ 
 		: "c" (size), "a" (src), "D" (dst) 
 	); 
-#else
+# 	else
 	__tplat_asm__
 	(
 		"cld\n\t" 
@@ -122,26 +56,48 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 		: "m" (size), "m" (src), "m" (dst) 
 		: "%ecx", "%eax", "%edi"
 	); 
-#endif
+# 	endif
 #else
-# 	error this compiler has not specific __tplat_asm__ code
+# 	if 0
+	tb_uint16_t* p = (tb_uint16_t*)dst;
+	tb_uint16_t* e = p + size;
+	while (p < e) *p++ = src;
+# 	else
+	tb_byte_t b1 = (src) & 0xff;
+	tb_byte_t b2 = (src >> 8) & 0xff;
+	if (b1 == b2) memset(dst, b1, size << 1);
+	else 
+	{
+		// left = size % 4
+		tb_size_t left = size & 0x3;
+		size -= left;
+
+		tb_uint16_t* p = (tb_uint16_t*)dst;
+		tb_uint16_t* e = p + size;
+
+		while (p < e)
+		{
+			p[0] = src;
+			p[1] = src;
+			p[2] = src;
+			p[3] = src;
+			p += 4;
+		}
+
+		while (left--) *p++ = src;
+	}
+# 	endif
 #endif
 }
 
-#endif 
-
-#ifndef TB_ASM_ENABLE_memset_u24
-#if 0
 void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
+#if 0
 	tb_byte_t* p = dst;
 	tb_byte_t* e = p + (size * 3);
 	src &= 0xffffff;
 	for (; p < e; p += 3) *((tb_uint32_t*)p) = src;
-}
 #else
-void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
-{
 	tb_byte_t b1 = (src) & 0xff;
 	tb_byte_t b2 = (src >> 8) & 0xff;
 	tb_byte_t b3 = (src >> 16) & 0xff;
@@ -170,21 +126,40 @@ void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 			p += 3;
 		}
 	}
-}
-#endif
-#endif
 
-#ifndef TB_ASM_ENABLE_memset_u32
-#if 0
+#endif
+}
+
 void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
+#if defined(TPLAT_ARCH_x86) && defined(TPLAT_ASSEMBLER_GAS)
+# 	if 1
+	__tplat_asm__
+	(
+		"cld\n\t" 
+		"rep stosl" 
+		: /* no output registers */ 
+		: "c" (size), "a" (src), "D" (dst) 
+	); 
+# 	else
+	__tplat_asm__
+	(
+		"cld\n\t" 
+		"mov %0, %%ecx\n\t"
+		"mov %1, %%eax\n\t"
+		"mov %2, %%edi\n\t"
+		"rep stosl"
+		: /* no output registers */ 
+		: "m" (size), "m" (src), "m" (dst) 
+		: "%ecx", "%eax", "%edi"
+	); 
+# 	endif
+#else
+# 	if 0
 	tb_uint32_t* p = (tb_uint32_t*)dst;
 	tb_uint32_t* e = p + size;
 	while (p < e) *p++ = src;
-}
-#else
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
-{
+# 	else
 	tb_byte_t b1 = (src) & 0xff;
 	tb_byte_t b2 = (src >> 8) & 0xff;
 	tb_byte_t b3 = (src >> 16) & 0xff;
@@ -209,36 +184,7 @@ void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 
 		while (left--) *p++ = src;
 	}
-}
-#endif
-#elif defined(TPLAT_ARCH_x86)
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
-{
-#ifdef TPLAT_COMPILER_IS_GCC
-#if 1
-	__tplat_asm__
-	(
-		"cld\n\t" 
-		"rep stosl" 
-		: /* no output registers */ 
-		: "c" (size), "a" (src), "D" (dst) 
-	); 
-#else
-	__tplat_asm__
-	(
-		"cld\n\t" 
-		"mov %0, %%ecx\n\t"
-		"mov %1, %%eax\n\t"
-		"mov %2, %%edi\n\t"
-		"rep stosl"
-		: /* no output registers */ 
-		: "m" (size), "m" (src), "m" (dst) 
-		: "%ecx", "%eax", "%edi"
-	); 
-#endif
-#else
-# 	error this compiler has not specific __tplat_asm__ code
+# 	endif
 #endif
 }
-#endif
 
