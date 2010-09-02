@@ -26,8 +26,14 @@
 #include "memops.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * includes
  */
+
+#if defined(TPLAT_ARCH_x86)
+# 	include "asm/memops_x86.h"
+#elif defined(TPLAT_ARCH_SH4)
+# 	include "asm/memops_sh4.h"
+#endif
 
 /* /////////////////////////////////////////////////////////
  * interfaces 
@@ -36,81 +42,8 @@
 void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
-#if defined(TPLAT_ARCH_x86) && defined(TPLAT_ASSEMBLER_GAS)
-# 	if 1
-	__tplat_asm__
-	(
-		"cld\n\t" 		/* clear the direction bit, dst++, not dst-- */
-		"rep stosw" 	/* *dst++ = ax */
-		: 				/* no output registers */ 
-		: "c" (size), "a" (src), "D" (dst) /* ecx = size, eax = src, edi = dst */
-	); 
-# 	else
-	__tplat_asm__
-	(
-		"cld\n\t" 
-		"mov %0, %%ecx\n\t"
-		"mov %1, %%eax\n\t"
-		"mov %2, %%edi\n\t"
-		"rep stosw"
-		: /* no output registers */ 
-		: "m" (size), "m" (src), "m" (dst) 
-		: "%ecx", "%eax", "%edi"
-	); 
-# 	endif
-#elif defined(TPLAT_ARCH_SH4) && defined(TPLAT_ASSEMBLER_GAS)
-# 	if 0
-	dst += size << 1;
-	__tplat_asm__
-	(
-		"1:\n\t" 
-		"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-		"mov.w %1,@-%2\n\t" /* *--dst = src */
-		"bf 1b\n\t"  		/* if T == 0 goto label 1: */
-		: 					/* no output registers */ 
-		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
-	); 
-# 	else
-
-	tb_size_t left = size & 0x3;
-	dst += (size << 1);
-	size >>= 2;
-	if (!left)
-	{
-		__tplat_asm__ volatile
-		(
-			"1:\n\t" 
-			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
-			: 					/* no output registers */ 
-			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
-		); 
-	}
-	else
-	{
-		__tplat_asm__ volatile
-		(
-			"1:\n\t" 			/* fill left data */
-			"dt %3\n\t"
-			"mov.w %1,@-%2\n\t"
-			"bf 1b\n\t"
-			"2:\n\t"  			/* fill aligned data by 4 */
-			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"mov.w %1,@-%2\n\t" /* *--dst = src */
-			"bf 2b\n\t"  		/* if T == 0 goto label 1: */
-			: 					/* no output registers */ 
-			: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */
-		); 
-	}
-
-# 	endif
+#ifdef TB_MEMOPS_ASM_MEMSET_U16
+ 	TB_MEMOPS_ASM_MEMSET_U16(dst, src, size);
 #else
 # 	if 0
 	tb_uint16_t* p = (tb_uint16_t*)dst;
@@ -188,92 +121,8 @@ void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
-#if defined(TPLAT_ARCH_x86) && defined(TPLAT_ASSEMBLER_GAS)
-# 	if 1
-	__tplat_asm__
-	(
-		"cld\n\t" 
-		"rep stosl" 
-		: /* no output registers */ 
-		: "c" (size), "a" (src), "D" (dst) 
-	); 
-# 	else
-	__tplat_asm__
-	(
-		"cld\n\t" 
-		"mov %0, %%ecx\n\t"
-		"mov %1, %%eax\n\t"
-		"mov %2, %%edi\n\t"
-		"rep stosl"
-		: /* no output registers */ 
-		: "m" (size), "m" (src), "m" (dst) 	/* constraint: memory */
-		: "%ecx", "%eax", "%edi" 			/* these registers maybe modified */
-	); 
-# 	endif
-#elif defined(TPLAT_ARCH_SH4) && defined(TPLAT_ASSEMBLER_GAS)
-# 	if 0
-	dst += size << 2;
-	__tplat_asm__
-	(
-		"1:\n\t" 
-		"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-		"mov.l %1,@-%2\n\t" /* *--dst = src */
-		"bf 1b\n\t"  		/* if T == 0 goto label 1: */
-		: 					/* no output registers */ 
-		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
-	); 
-# 	else
-	tb_size_t left = size & 0x3;
-	dst += (size << 2);
-	if (!left)
-	{
-		size >>= 2;
-		__tplat_asm__ volatile
-		(
-			"1:\n\t" 
-			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
-			: 					/* no output registers */ 
-			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
-		); 
-	}
-	else
-	{
-#if 0
-		size >>= 2;
-		__tplat_asm__ volatile
-		(
-			"1:\n\t" 			/* fill the left data */
-			"dt %3\n\t"
-			"mov.l %1,@-%2\n\t"
-			"bf 1b\n\t"
-			"2:\n\t" 			/* fill aligned data by 4 */
-			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"bf 2b\n\t"  		/* if T == 0 goto label 1: */
-			: 					/* no output registers */ 
-			: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */
-		); 
-#else
-		__tplat_asm__
-		(
-			"1:\n\t" 
-			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
-			"mov.l %1,@-%2\n\t" /* *--dst = src */
-			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
-			: 					/* no output registers */ 
-			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
-		); 
-#endif
-	}
-# 	endif
+#ifdef TB_MEMOPS_ASM_MEMSET_U32
+	TB_MEMOPS_ASM_MEMSET_U32(dst, src, size);
 #else
 # 	if 0
 	tb_uint32_t* p = (tb_uint32_t*)dst;
