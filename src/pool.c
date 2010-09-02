@@ -54,7 +54,7 @@ static __tplat_inline__ tb_int_t tb_pool_info_isset(tb_byte_t* info, tb_int_t id
  */
 
 #if 1
-tb_pool_t* tb_pool_create(tb_uint16_t step, tb_uint16_t grow)
+tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 {
 	tb_pool_t* pool = (tb_pool_t*)tb_malloc(sizeof(tb_pool_t));
 	if (!pool) return TB_NULL;
@@ -62,11 +62,12 @@ tb_pool_t* tb_pool_create(tb_uint16_t step, tb_uint16_t grow)
 
 	// align by 8-byte for info
 	TB_ASSERT(!(grow & 7));
+	TB_ASSERT(!(size & 7));
 
 	pool->step = step;
 	pool->grow = grow;
 	pool->size = 0;
-	pool->maxn = grow;
+	pool->maxn = size;
 
 	pool->data = tb_malloc(pool->maxn * pool->step);
 	if (!pool->data) goto fail;
@@ -82,7 +83,7 @@ fail:
 	return TB_NULL;
 }
 #else
-tb_pool_t* tb_pool_create_with_trace(tb_uint16_t step, tb_uint16_t grow, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pool_t* tb_pool_create_with_trace(tb_size_t step, tb_size_t size, tb_size_t grow, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 {
 	tb_pool_t* pool = (tb_pool_t*)tplat_pool_allocate(TB_MEMORY_POOL_INDEX, sizeof(tb_pool_t), func, line, file);
 	if (!pool) return TB_NULL;
@@ -90,11 +91,12 @@ tb_pool_t* tb_pool_create_with_trace(tb_uint16_t step, tb_uint16_t grow, tb_char
 
 	// align by 8-byte for info
 	TB_ASSERT(!(grow & 7));
+	TB_ASSERT(!(size & 7));
 
 	pool->step = step;
 	pool->grow = grow;
 	pool->size = 0;
-	pool->maxn = grow;
+	pool->maxn = size;
 
 	pool->data = tplat_pool_allocate(TB_MEMORY_POOL_INDEX, pool->maxn * pool->step, func, line, file);
 	if (!pool->data) goto fail;
@@ -120,11 +122,11 @@ void tb_pool_destroy(tb_pool_t* pool)
 		tb_free(pool);
 	}
 }
-tb_uint16_t tb_pool_alloc(tb_pool_t* pool)
+tb_size_t tb_pool_alloc(tb_pool_t* pool)
 {
 	TB_ASSERT(pool);
 
-	tb_uint16_t item = 0;
+	tb_size_t item = 0;
 
 	// try allocating from the predicted item
 #ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
@@ -155,15 +157,20 @@ tb_uint16_t tb_pool_alloc(tb_pool_t* pool)
 		// adjust max size
 		TB_ASSERT(pool->size == pool->maxn);
 		pool->maxn += pool->grow;
+		TB_ASSERT(pool->maxn <= TB_POOL_MAX_SIZE);
 		if (pool->maxn > TB_POOL_MAX_SIZE) return 0;
+
+		TB_DBG("%d %d %d", pool->size, pool->maxn, pool->maxn * pool->step);
 
 		// realloc data
 		pool->data = (tb_byte_t*)tb_realloc(pool->data, pool->maxn * pool->step);
+		TB_ASSERT(pool->data);
 		if (!pool->data) return 0;
 		memset(pool->data + pool->size * pool->step, 0, pool->grow * pool->step);
 
 		// realloc info
 		pool->info = (tb_byte_t*)tb_realloc(pool->info, pool->maxn >> 3);
+		TB_ASSERT(pool->info);
 		if (!pool->info) return 0;
 		memset(pool->info + (pool->size >> 3), 0, pool->grow >> 3);
 
@@ -188,7 +195,7 @@ tb_uint16_t tb_pool_alloc(tb_pool_t* pool)
 	TB_ASSERT(item && item < 1 + pool->maxn);
 	return item;
 }
-void tb_pool_free(tb_pool_t* pool, tb_uint16_t item)
+void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 {
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
 	TB_ASSERT(tb_pool_info_isset(pool->info, item - 1));
@@ -205,17 +212,17 @@ void tb_pool_free(tb_pool_t* pool, tb_uint16_t item)
 		pool->size--;
 	}
 }
-tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_uint16_t item)
+tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 {
 	//TB_DBG("%d %d %d %d", pool->step, pool->size, item, pool->maxn);
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
-	if (!tb_pool_info_isset(pool->info, item - 1)) return TB_NULL;
+	if (!item || !tb_pool_info_isset(pool->info, item - 1)) return TB_NULL;
 
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 		return (pool->data + (item - 1) * pool->step);
 	else return TB_NULL;
 }
-tb_byte_t* tb_pool_put(tb_pool_t* pool, tb_uint16_t item)
+tb_byte_t* tb_pool_put(tb_pool_t* pool, tb_size_t item)
 {
 	TB_ASSERT(pool && item > 0);
 	if (item <= 0) return TB_NULL;
@@ -260,12 +267,12 @@ void tb_pool_reset(tb_pool_t* pool)
 #endif
 	}
 }
-tb_uint16_t tb_pool_maxn(tb_pool_t* pool)
+tb_size_t tb_pool_maxn(tb_pool_t* pool)
 {
 	if (pool) return pool->maxn;
 	else return 0;
 }
-tb_bool_t tb_pool_exists(tb_pool_t* pool, tb_uint16_t item)
+tb_bool_t tb_pool_exists(tb_pool_t* pool, tb_size_t item)
 {
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 		return tb_pool_info_isset(pool->info, item - 1)? TB_TRUE : TB_FALSE;

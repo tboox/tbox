@@ -44,7 +44,7 @@ extern "C" {
 #define TB_POOL_SET_NEXT(pool, item, type, value) 	(((type*)tb_pool_get((pool), (item)))->next = (value))
 #define TB_POOL_SET_PREV(pool, item, type, value) 	(((type*)tb_pool_get((pool), (item)))->prev = (value))
 
-#define TB_POOL_MAX_SIZE 							(65535)
+#define TB_POOL_MAX_SIZE 							(1 << 30)
 
 // trace pool
 //#define tb_pool_create(step, size) tb_pool_create_with_trace(step, size, __tplat_func__, __tplat_line__, __tplat_file__)
@@ -58,14 +58,14 @@ typedef struct __tb_pool_t
 {
 	tb_byte_t* 		data;
 	tb_byte_t* 		info;
-	tb_uint16_t 	size;
-	tb_uint16_t 	grow;
-	tb_uint16_t 	maxn;
-	tb_uint16_t 	step;
+	tb_size_t 		size;
+	tb_size_t 		grow;
+	tb_size_t 		maxn;
+	tb_size_t 		step;
 
 	// predict the next free block
 #ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-	tb_uint16_t 	pred;
+	tb_size_t 		pred;
 #endif
 
 }tb_pool_t;
@@ -73,16 +73,16 @@ typedef struct __tb_pool_t
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_pool_t* 		tb_pool_create(tb_uint16_t step, tb_uint16_t grow);
+tb_pool_t* 		tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow);
 void 			tb_pool_destroy(tb_pool_t* pool);
 
-tb_uint16_t 	tb_pool_alloc(tb_pool_t* pool);
-void 			tb_pool_free(tb_pool_t* pool, tb_uint16_t item);
+tb_size_t 		tb_pool_alloc(tb_pool_t* pool);
+void 			tb_pool_free(tb_pool_t* pool, tb_size_t item);
 void 			tb_pool_reset(tb_pool_t* pool);
-tb_uint16_t 	tb_pool_maxn(tb_pool_t* pool);
-tb_bool_t 		tb_pool_exists(tb_pool_t* pool, tb_uint16_t item);
-tb_byte_t* 		tb_pool_put(tb_pool_t* pool, tb_uint16_t item);
-tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_uint16_t item);
+tb_size_t 		tb_pool_maxn(tb_pool_t* pool);
+tb_bool_t 		tb_pool_exists(tb_pool_t* pool, tb_size_t item);
+tb_byte_t* 		tb_pool_put(tb_pool_t* pool, tb_size_t item);
+tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_size_t item);
 
 // c plus plus
 #ifdef __cplusplus
