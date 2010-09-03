@@ -3,6 +3,11 @@
 *~
 *.swp
 *.bak
+*.orig
 other
 doc
 bin
+src/demo/linux_x86/encoding
+src/demo/linux_x86/memops
+src/demo/linux_x86/regex
+src/demo/linux_x86/string
