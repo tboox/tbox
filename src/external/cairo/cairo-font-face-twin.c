@@ -299,9 +299,12 @@ twin_font_face_create_properties (cairo_font_face_t *twin_face,
     props->monospace = FALSE;
     props->smallcaps = FALSE;
 
+#if 0
     status = cairo_font_face_set_user_data (twin_face,
 					    &twin_properties_key,
 					    props, tb_free);
+#endif
+
     if (unlikely (status)) {
 	tb_free (props);
 	return status;
@@ -443,10 +446,12 @@ twin_scaled_font_compute_properties (cairo_scaled_font_t *scaled_font,
     props->stretch = 1 + .1 * ((int) props->face_props->stretch - (int) TWIN_STRETCH_NORMAL);
 
 
+#if 0
     /* Save it */
     status = cairo_scaled_font_set_user_data (scaled_font,
 					      &twin_properties_key,
 					      props, tb_free);
+#endif
     if (unlikely (status))
 	goto FREE_PROPS;
 

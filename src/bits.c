@@ -177,7 +177,7 @@ tb_uint32_t tb_bits_get_u32_le(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
 	
-	tb_uint32_t val = ((*(bits->p +3) << 24) | (*(bits->p + 2) << 16) | (*(bits->p + 1) << 8) | *(bits->p));
+	tb_uint32_t val = ((*(bits->p + 3) << 24) | (*(bits->p + 2) << 16) | (*(bits->p + 1) << 8) | *(bits->p));
 	bits->p += 4;
 	return val;
 }
@@ -278,22 +278,23 @@ tb_size_t tb_bits_get_data(tb_bits_t* bits, tb_byte_t* data, tb_size_t size)
 void tb_bits_set_u16_le(tb_bits_t* bits, tb_uint16_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val >> 8) & 0xff;
 	*(bits->p++) = (val) & 0xff;
+	*(bits->p++) = (val >> 8) & 0xff;
 }
 void tb_bits_set_s16_le(tb_bits_t* bits, tb_sint16_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val >> 8) & 0xff;
 	*(bits->p++) = (val) & 0xff;
+	*(bits->p++) = (val >> 8) & 0xff;
 }
 void tb_bits_set_u32_le(tb_bits_t* bits, tb_uint32_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val >> 24) & 0xff;
-	*(bits->p++) = (val >> 16) & 0xff;
-	*(bits->p++) = (val >> 8) & 0xff;
+
 	*(bits->p++) = (val) & 0xff;
+	*(bits->p++) = (val >> 8) & 0xff;
+	*(bits->p++) = (val >> 16) & 0xff;
+	*(bits->p++) = (val >> 24) & 0xff;
 }
 void tb_bits_set_s32_le(tb_bits_t* bits, tb_sint32_t val)
 {
@@ -306,22 +307,23 @@ void tb_bits_set_s32_le(tb_bits_t* bits, tb_sint32_t val)
 void tb_bits_set_u16_be(tb_bits_t* bits, tb_uint16_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val) & 0xff;
 	*(bits->p++) = (val >> 8) & 0xff;
+	*(bits->p++) = (val) & 0xff;
 }
 void tb_bits_set_s16_be(tb_bits_t* bits, tb_sint16_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val) & 0xff;
 	*(bits->p++) = (val >> 8) & 0xff;
+	*(bits->p++) = (val) & 0xff;
 }
 void tb_bits_set_u32_be(tb_bits_t* bits, tb_uint32_t val)
 {
 	TB_ASSERT(!bits->b);
-	*(bits->p++) = (val) & 0xff;
-	*(bits->p++) = (val >> 8) & 0xff;
-	*(bits->p++) = (val >> 16) & 0xff;
+
 	*(bits->p++) = (val >> 24) & 0xff;
+	*(bits->p++) = (val >> 16) & 0xff;
+	*(bits->p++) = (val >> 8) & 0xff;
+	*(bits->p++) = (val) & 0xff;
 }
 void tb_bits_set_s32_be(tb_bits_t* bits, tb_sint32_t val)
 {

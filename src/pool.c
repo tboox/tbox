@@ -160,8 +160,6 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 		TB_ASSERT(pool->maxn <= TB_POOL_MAX_SIZE);
 		if (pool->maxn > TB_POOL_MAX_SIZE) return 0;
 
-		TB_DBG("%d %d %d", pool->size, pool->maxn, pool->maxn * pool->step);
-
 		// realloc data
 		pool->data = (tb_byte_t*)tb_realloc(pool->data, pool->maxn * pool->step);
 		TB_ASSERT(pool->data);
