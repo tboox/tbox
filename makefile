@@ -3,6 +3,7 @@
 # #####################################################
 # includes
 # #
+${shell if [ ! -f "config.mak" ]; then touch config.mak; fi }
 include config.mak
 
 # #####################################################
@@ -59,13 +60,8 @@ ifeq ($(DEBUG),)
 DEBUG := n
 endif
 
-ifeq ($(PRO_DIR),)
 PRO_DIR 	:= ${shell pwd}
-endif
-
-ifeq ($(PRO_NAME),)
 PRO_NAME 	:= ${shell basename ${shell pwd}}
-endif
 
 # is debug?
 ifeq ($(DEBUG),y)
