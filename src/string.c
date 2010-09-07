@@ -496,6 +496,7 @@ tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub
 	tb_size_t 			n = tb_string_size(string);
 	if (!s || !sub || start < 0 || start >= n) return -1;
 
+	// {
 	tb_int_t idx = -1;
 	tb_char_t const* ps = s + start;
 	tb_char_t const* p1 = ps;
@@ -523,6 +524,7 @@ tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub
 	} while (1);
 
 	return ((idx < 0 || idx >= n)? -1 : idx);
+	// }
 }
 tb_int_t tb_string_find_string(tb_string_t const* string, tb_string_t const* sub, tb_int_t start)
 {

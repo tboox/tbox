@@ -1,0 +1,57 @@
+#!/bin/bash
+
+function replace_test()
+{
+	echo "test $1"
+	grep $1 -rwh --exclude="*.[oa]" --exclude="makefile" ../*
+}
+function replace_tplayer_add_tp()
+{
+	echo "replace $1 => tp_$1"
+	sed -i "s/\b$1\b/tp_&/g" `grep $1 -rlw --exclude="*.[oa]" --exclude="makefile" ../src`
+}
+function replace_ffmpeg_add_tp()
+{
+	echo "replace $1 => tp_$1"
+	sed -i "s/\b$1\b/tp_&/g" `grep $1 -rlw --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+}
+function replace_ffmpeg_demuxer()
+{
+	echo "replace demuxer: $1"
+	sed -i "s/\b$1_demuxer\b/tp_&/g" `grep $1_demuxer -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_demuxer\.h\b/$1_demuxer.h/g" `grep "tp_$1_demuxer\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_DEMUXER\\(.*\\)\\($1\\)/REGISTER_DEMUXER\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+	sed -i "s/REGISTER_MUXDEMUX\\(.*\\)\\($1\\)/REGISTER_MUXDEMUX\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+}
+function replace_ffmpeg_decoder()
+{
+	echo "replace decoder: $1"
+	sed -i "s/\b$1_decoder\b/tp_&/g" `grep $1_decoder -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_decoder\.h\b/$1_decoder.h/g" `grep "tp_$1_decoder\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_DECODER\\(.*\\)\\($1\\)/REGISTER_DECODER\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+	sed -i "s/REGISTER_ENCDEC\\(.*\\)\\($1\\)/REGISTER_ENCDEC\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+}
+function replace_ffmpeg_parser()
+{
+	echo "replace parser: $1"
+	sed -i "s/\b$1_parser\b/tp_&/g" `grep $1_parser -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_parser\.h\b/$1_parser.h/g" `grep "tp_$1_parser\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_PARSER\\(.*\\)\\($1\\)/REGISTER_PARSER\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+}
+function replace_ffmpeg_protocol()
+{
+	echo "replace protocol: $1"
+	sed -i "s/\b$1_protocol\b/tp_&/g" `grep $1_protocol -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_PROTOCOL\\(.*\\)\\($1\\)/REGISTER_PROTOCOL\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+}
+
+
+function replace_ffmpeg()
+{
+	echo "replace $1 => $2"
+	sed -i "s/\b$1\b/$2/g" `grep "$1" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+}
+
+# replace decoder
+replace_ffmpeg_decoder mp3
+replace_ffmpeg_decoder mp2

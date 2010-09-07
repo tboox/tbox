@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function suppress()
+{
+	echo "suppress $1"
+	sed2 -i "s/\/\/ {/{&/g" `grep "// {" -rlw --exclude="*.[oa]" --exclude="makefile" $1`
+	sed2 -i "s/\/\/ \\(}\\+\\)/\\1&/g" `grep "// }\+" -rlw --exclude="*.[oa]" --exclude="makefile" $1`
+}
+
+suppress ../src

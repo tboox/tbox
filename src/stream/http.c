@@ -29,10 +29,15 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
+#ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 #if 1
 # 	define TB_HTTP_DBG(fmt, arg...) 			TB_DBG(fmt, ##arg)
 #else
 # 	define TB_HTTP_DBG(fmt, arg...)
+#endif
+
+#else
+# 	define TB_HTTP_DBG
 #endif
 
 /* /////////////////////////////////////////////////////////
@@ -48,7 +53,7 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 	TB_ASSERT(url && host);
 	if (!url || !host) return 0;
 
-	// the invalid port
+	// {the invalid port
 	tb_size_t port = 0;
 
 	// create regex
@@ -69,7 +74,7 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 	hregex4 = tb_regex_create("(.+?)(/.+)", TB_REGEX_NULL);
 	if (hregex4 == TB_INVALID_HANDLE) goto fail;
 
-	// parse url
+	// {parse url
 	tplat_handle_t hregex = TB_INVALID_HANDLE;
 	if (TPLAT_TRUE == tb_regex_exec(hregex1, url, TB_REGEX_NULL))
 		hregex = hregex1;
@@ -81,6 +86,7 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 		hregex = hregex4;
 	else goto fail;
 	
+	// {
 	tplat_int_t match_n = tb_regex_count(hregex);
 	if (match_n <= 0) goto fail;
 
@@ -92,10 +98,11 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 		// parse path
 		if (TB_NULL == tb_regex_get(hregex, 3, path, TB_NULL)) goto fail;
 
-		// parse port
+		// {parse port
 		tb_char_t port_s[256];
 		if (TB_NULL == tb_regex_get(hregex, 2, port_s, TB_NULL)) goto fail;
 		port = atoi(port_s);
+		// }
 
 	}
 	else
@@ -113,6 +120,7 @@ fail:
 	if (hregex3) tb_regex_destroy(hregex3);
 	if (hregex4) tb_regex_destroy(hregex4);
 	return port;
+	// }}}
 }
 static tb_bool_t tb_http_send(tplat_handle_t hsocket, tb_byte_t const* data, tb_size_t size)
 {
@@ -176,13 +184,15 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 {
 	TB_HTTP_DBG("http: %s", line);
 
-	// process http code
+	// { process http code
 	tb_char_t* p = line;
 	tb_char_t* tag = TB_NULL;
 	if (!line_idx)
 	{
 		while (!isspace(*p) && *p != '\0') p++;
 		while (isspace(*p)) p++;
+
+		// {
 		tb_int_t http_code = strtol(p, TB_NULL, 10);
 		TB_HTTP_DBG("http code: %d", http_code);
 
@@ -191,6 +201,7 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 
 		// cannot support to redirect now!
 		else if (http_code == 302 || http_code == 303) return TB_FALSE;
+		// }
 	}
 	else
 	{
@@ -235,6 +246,7 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 	}
 	
 	return TB_TRUE;
+	// }
 }
 static tplat_bool_t tb_http_connect(tb_http_stream_t* st, tb_char_t const* host, tb_size_t port, tb_char_t const* path)
 {
@@ -242,7 +254,7 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* st, tb_char_t const* host,
 	st->hsocket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
 	if (st->hsocket == TPLAT_INVALID_HANDLE) return TB_FALSE;
 
-	// format http request
+	// { format http request
 	tb_char_t request[4096];
 	tb_int_t request_n = snprintf(request, 4096,
              "GET %s HTTP/1.1\r\n"
@@ -258,7 +270,7 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* st, tb_char_t const* host,
 	// send http request
 	if (TB_FALSE == tb_http_send(st->hsocket, request, request_n)) goto fail;
 
-	// handle reply
+	// {handle reply
 	tb_char_t ch = 0;
 	tb_char_t line[1024];
 	tb_size_t line_idx = 0;
@@ -303,6 +315,7 @@ fail:
 	if (st->hsocket != TB_INVALID_HANDLE) tplat_socket_close(st->hsocket);
 	st->hsocket = TB_INVALID_HANDLE;
 	return TB_FALSE;
+	// }}
 }
 
 static tb_int_t tb_http_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
@@ -336,7 +349,7 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	TB_ASSERT(st && url);
 	if (!st || !url) return TB_NULL;
 
-	// split url
+	// {split url
 	tb_char_t host[1024];
 	tb_char_t path[2048];
 	tb_size_t port = tb_http_url_split(url, host, path);
@@ -374,4 +387,5 @@ fail:
 	if (st->hsocket != TPLAT_INVALID_HANDLE) tplat_socket_close(st->hsocket);
 	st->hsocket = TB_INVALID_HANDLE;
 	return TB_NULL;
+	// }
 }

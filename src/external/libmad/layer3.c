@@ -1642,7 +1642,7 @@ void fastsdct(mad_fixed_t const x[9], mad_fixed_t y[18])
   y[16] = a22 + m7;
 }
 
-static inline
+static __tplat_inline__
 void sdctII(mad_fixed_t const x[18], mad_fixed_t X[18])
 {
   mad_fixed_t tmp[9];
@@ -1687,7 +1687,7 @@ void sdctII(mad_fixed_t const x[18], mad_fixed_t X[18])
   }
 }
 
-static inline
+static __tplat_inline__
 void dctIV(mad_fixed_t const y[18], mad_fixed_t X[18])
 {
   mad_fixed_t tmp[18];
@@ -1731,7 +1731,7 @@ void dctIV(mad_fixed_t const y[18], mad_fixed_t X[18])
  * NAME:	imdct36
  * DESCRIPTION:	perform X[18]->x[36] IMDCT using Szu-Wei Lee's fast algorithm
  */
-static inline
+static __tplat_inline__
 void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
 {
   mad_fixed_t tmp[18];
@@ -1764,7 +1764,7 @@ void imdct36(mad_fixed_t const x[18], mad_fixed_t y[36])
  * NAME:	imdct36
  * DESCRIPTION:	perform X[18]->x[36] IMDCT
  */
-static inline
+static __tplat_inline__
 void imdct36(mad_fixed_t const X[18], mad_fixed_t x[36])
 {
   mad_fixed_t t0, t1, t2,  t3,  t4,  t5,  t6,  t7;
@@ -2270,7 +2270,7 @@ void III_overlap(mad_fixed_t const output[36], mad_fixed_t overlap[18],
  * NAME:	III_overlap_z()
  * DESCRIPTION:	perform "overlap-add" of zero IMDCT outputs
  */
-static inline
+static __tplat_inline__
 void III_overlap_z(mad_fixed_t overlap[18],
 		   mad_fixed_t sample[18][32], unsigned int sb)
 {

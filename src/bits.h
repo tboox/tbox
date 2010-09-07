@@ -182,30 +182,38 @@ static __tplat_inline__ tb_sint8_t tb_bits_get_s8(tb_bits_t* bits)
 static __tplat_inline__ tb_uint16_t tb_bits_get_u16_ne(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
+	// {
 	tb_uint16_t val = *((tb_uint16_t*)bits->p);
 	bits->p += 2;
 	return val;
+	// }
 }
 static __tplat_inline__ tb_sint16_t tb_bits_get_s16_ne(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
+	// {
 	tb_sint16_t val = *((tb_sint16_t*)bits->p);
 	bits->p += 2;
 	return val;
+	// }
 }
 static __tplat_inline__ tb_uint32_t tb_bits_get_u32_ne(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
+	// {
 	tb_uint32_t val = *((tb_uint32_t*)bits->p);
 	bits->p += 4;
 	return val;
+	// }
 }
 static __tplat_inline__ tb_sint32_t tb_bits_get_s32_ne(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
+	// {
 	tb_sint32_t val = *((tb_sint32_t*)bits->p);
 	bits->p += 4;
 	return val;
+	// }
 }
 static __tplat_inline__ void tb_bits_set_u8(tb_bits_t* bits, tb_uint8_t val)
 {

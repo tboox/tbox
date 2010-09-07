@@ -31,6 +31,8 @@
 
 #if defined(TPLAT_ARCH_x86)
 # 	include "asm/memops_x86.h"
+#elif defined(TPLAT_ARCH_ARM)
+# 	include "asm/memops_arm.h"
 #elif defined(TPLAT_ARCH_SH4)
 # 	include "asm/memops_sh4.h"
 #endif
@@ -38,13 +40,13 @@
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
 void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
 #ifdef TB_MEMOPS_ASM_MEMSET_U16
  	TB_MEMOPS_ASM_MEMSET_U16(dst, src, size);
 #else
+	// {
 # 	if 0
 	tb_uint16_t* p = (tb_uint16_t*)dst;
 	tb_uint16_t* e = p + size;
@@ -55,10 +57,11 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 	if (b1 == b2) memset(dst, b1, size << 1);
 	else 
 	{
-		// left = size % 4
+		// { left = size % 4
 		tb_size_t left = size & 0x3;
 		size -= left;
 
+		// {
 		tb_uint16_t* p = (tb_uint16_t*)dst;
 		tb_uint16_t* e = p + size;
 
@@ -72,14 +75,17 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 		}
 
 		while (left--) *p++ = src;
+		// }}
 	}
 # 	endif
+	// }
 #endif
 }
 
 void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
+	// {
 #if 0
 	tb_byte_t* p = dst;
 	tb_byte_t* e = p + (size * 3);
@@ -92,10 +98,11 @@ void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 	if ((b1 == b2) && (b1 == b3)) memset(dst, b1, size * 3);
 	else 
 	{
-		// left = size % 4
+		// { left = size % 4
 		tb_size_t left = size & 0x3;
 		size -= left;
 
+		// {
 		tb_byte_t* p = dst;
 		tb_byte_t* e = p + (size * 3);
 		src &= 0xffffff;
@@ -113,17 +120,19 @@ void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 			((tb_uint32_t*)p)[0] = src;
 			p += 3;
 		}
+		// }}
 	}
 
 #endif
+	// }
 }
-
 void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
 #ifdef TB_MEMOPS_ASM_MEMSET_U32
 	TB_MEMOPS_ASM_MEMSET_U32(dst, src, size);
 #else
+	// {
 # 	if 0
 	tb_uint32_t* p = (tb_uint32_t*)dst;
 	tb_uint32_t* e = p + size;
@@ -136,10 +145,11 @@ void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 	if ((b1 == b2) && (b1 == b3) && (b1 == b4)) memset(dst, b1, size << 2);
 	else 
 	{
-		// left = size % 4
+		// { left = size % 4
 		tb_size_t left = size & 0x3;
 		size -= left;
 
+		// {
 		tb_uint32_t* p = (tb_uint32_t*)dst;
 		tb_uint32_t* e = p + size;
 		while (p < e)
@@ -152,8 +162,9 @@ void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 		}
 
 		while (left--) *p++ = src;
+		// }}
 	}
 # 	endif
+	// }
 #endif
 }
-

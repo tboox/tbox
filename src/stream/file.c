@@ -99,7 +99,7 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 	TB_ASSERT(st && url);
 	if (!st || !url) return TB_NULL;
 
-	// open file
+	// { open file
 	tplat_handle_t hfile = tplat_file_open(url, TPLAT_FILE_RW);
 	if (hfile == TPLAT_INVALID_HANDLE) return TB_NULL;
 
@@ -130,4 +130,5 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 fail:
 	if (hfile != TPLAT_INVALID_HANDLE) tplat_file_close(hfile);
 	return TB_NULL;
+	// }
 }

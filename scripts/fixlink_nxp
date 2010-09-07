@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ../ffmpeg-05/bin/nxp/obj/
+mv ./libavformat/utils.o ./libavformat/utils_libavformat.o
+mv ./libavcodec/utils.o ./libavcodec/utils_libavcodec.o
+mv ./libavutil/utils.o ./libavutil/utils_libavutils.o
+
+mv ./libavformat/options.o ./libavformat/options_libavformat.o
+mv ./libavcodec/options.o ./libavcodec/options_libavcodec.o
+
+mv ./libavformat/raw.o ./libavformat/raw_libavformat.o
+mv ./libavcodec/raw.o ./libavcodec/raw_libavcodec.o

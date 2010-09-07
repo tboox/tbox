@@ -45,9 +45,9 @@ void tb_bits_attach(tb_bits_t* bits, tb_byte_t* data, tb_size_t size)
  */
 void tb_bits_goto(tb_bits_t* bits, tb_byte_t* data)
 {
-	TB_ASSERT(bits && data && data >= bits->b && data <= bits->e);
+	TB_ASSERT(bits && data && data >= bits->p && data <= bits->e);
 	bits->b = 0;
-	if (data >= bits->b && data <= bits->e) bits->p = data;
+	if (data >= bits->p && data <= bits->e) bits->p = data;
 }
 void tb_bits_sync(tb_bits_t* bits)
 {
@@ -128,71 +128,80 @@ tb_uint8_t tb_bits_get_u1(tb_bits_t* bits)
 tb_uint16_t tb_bits_get_u16_be(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_uint16_t val = ((*(bits->p) << 8) | *(bits->p + 1));
 	bits->p += 2;
 	return val;
+	// }
 }
 tb_sint16_t tb_bits_get_s16_be(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_sint16_t val = ((*(bits->p) << 8) | *(bits->p + 1));
 	bits->p += 2;
 	return val;
+	// }
 }
 tb_uint16_t tb_bits_get_u16_le(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_uint16_t val = ((*(bits->p + 1) << 8) | *(bits->p));
 	bits->p += 2;
 	return val;
+	// }
 }
 tb_sint16_t tb_bits_get_s16_le(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_sint16_t val = ((*(bits->p + 1) << 8) | *(bits->p));
 	bits->p += 2;
 	return val;
+	// }
 }
 tb_uint32_t tb_bits_get_u32_be(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_uint32_t val = ((*(bits->p) << 24) | (*(bits->p + 1) << 16) | (*(bits->p + 2) << 8) | *(bits->p + 3));
 	bits->p += 4;
 	return val;
+	// }
 }
 tb_sint32_t tb_bits_get_s32_be(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_sint32_t val = ((*(bits->p) << 24) | (*(bits->p + 1) << 16) | (*(bits->p + 2) << 8) | *(bits->p + 3));
 	bits->p += 4;
 	return val;
+	// }
 }
 tb_uint32_t tb_bits_get_u32_le(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_uint32_t val = ((*(bits->p + 3) << 24) | (*(bits->p + 2) << 16) | (*(bits->p + 1) << 8) | *(bits->p));
 	bits->p += 4;
 	return val;
+	// }
 }
 tb_sint32_t tb_bits_get_s32_le(tb_bits_t* bits)
 {
 	TB_ASSERT(!bits->b);
-	
+	// {
 	tb_sint32_t val = ((*(bits->p + 3) << 24) | (*(bits->p + 2) << 16) | (*(bits->p + 1) << 8) | *(bits->p));
 	bits->p += 4;
 	return val;
+	// }
 }
 tb_uint32_t tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n)
 {
 	if (!bits_n || !bits) return 0;
 
+	// {
 	tb_uint32_t val = 0;
 	tb_uint8_t i = bits->b; 
 	tb_uint8_t j = 24;
@@ -210,11 +219,13 @@ tb_uint32_t tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n)
 	val >>= (31 - bits_n);
 
 	return val;
+	// }
 }
 tb_sint32_t tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n)
 {
 	if (!bits_n || !bits) return 0;
 
+	// {
 #if 1
 	tb_sint32_t val = 0;
 	tb_uint8_t i = bits->b; 
@@ -237,23 +248,26 @@ tb_sint32_t tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n)
 	val = (val << (bits_n - 1)) | tb_bits_get_ubits(bits, bits_n - 1);
 	return val;
 #endif
+	// }
 }
 tb_char_t const* tb_bits_get_string(tb_bits_t* bits)
 {
 	TB_ASSERT(bits && bits->p <= bits->e);
 	tb_bits_sync(bits);
 
-	// find '\0'
+	// { find '\0'
 	tb_byte_t const* p = bits->p;
 	while (*p && p < bits->e) p++;
 
 	// is string with '\0' ?
 	if ((*p)) return TB_NULL;
 
+	// {
 	tb_char_t const* s = (tb_char_t const*)bits->p;
 	bits->p += p - bits->p + 1;
 
 	return s;
+	// }}
 }
 tb_size_t tb_bits_get_data(tb_bits_t* bits, tb_byte_t* data, tb_size_t size)
 {
@@ -375,7 +389,7 @@ tb_uint32_t tb_bits_peek_ubits(tb_bits_t* bits, tb_size_t bits_n)
 {
 	if (!bits_n || !bits) return 0;
 
-	// save status
+	// { save status
 	tb_byte_t const* p = bits->p;
 	tb_size_t b = bits->b;
 
@@ -387,12 +401,13 @@ tb_uint32_t tb_bits_peek_ubits(tb_bits_t* bits, tb_size_t bits_n)
 	bits->b = b;
 
 	return val;
+	// }
 }
 tb_sint32_t tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n)
 {
 	if (!bits_n || !bits) return 0;
 
-	// save status
+	// { save status
 	tb_byte_t const* p = bits->p;
 	tb_size_t b = bits->b;
 
@@ -404,6 +419,7 @@ tb_sint32_t tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n)
 	bits->b = b;
 
 	return val;
+	// }
 }
 /* /////////////////////////////////////////////////////////
  * pbits
@@ -411,6 +427,7 @@ tb_sint32_t tb_bits_peek_sbits(tb_bits_t* bits, tb_size_t bits_n)
 tb_char_t const* tb_pbits_get_string(tb_byte_t const* p, tb_size_t size)
 {
 	TB_ASSERT(p && size);
+	// {
 	tb_char_t const* s = (tb_char_t const*)p;
 
 	// find '\0'
@@ -419,4 +436,5 @@ tb_char_t const* tb_pbits_get_string(tb_byte_t const* p, tb_size_t size)
 	// is string with '\0' ?
 	if ((*p)) return TB_NULL;
 	return s;
+	// }
 }

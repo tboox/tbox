@@ -48,7 +48,7 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 	if (!st || !data) return -1;
 	if (!size) return 0;
 
-	// read data from stream data first
+	// {read data from stream data first
 	tb_int_t read_n = 0;
 	if (st->size > 0)
 	{
@@ -96,7 +96,7 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 			tb_zlib_attach(st->hzlib, st->zdata, zsize);
 		}
 
-		// inflate data
+		// { inflate data
 		tb_int_t need_n = size - read_n;
 		tb_int_t real_n = TB_STREAM_DATA_MAX;
 		if (TB_FALSE == tb_zlib_inflate_partial(st->hzlib, st->data, &real_n) || real_n < 0)
@@ -122,6 +122,7 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 				st->size = 0;
 			}
 		}
+		// }
 #endif
 	}
 
@@ -130,12 +131,14 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 fail:
 	if (read_n) return read_n;
 	else return -1;
+	// }
 }
 static tb_int_t tb_stream_read_block(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 {
 	if (!st || !data) return -1;
 	if (!size) return 0;
 
+	// {
 	tb_int_t try_n = 100;
 	tb_int_t read_n = 0;
 	while (read_n < size)
@@ -154,6 +157,7 @@ static tb_int_t tb_stream_read_block(tb_stream_t* st, tb_byte_t* data, tb_size_t
 fail:
 	if (read_n) return read_n;
 	else return -1;
+	// }
 }
 
 /* /////////////////////////////////////////////////////////
@@ -233,7 +237,7 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 		}
 	}
 
-	// read stream directly
+	// { read stream directly
 	tb_int_t try_n = 100;
 	if (!(st->flag & TB_STREAM_FLAG_IS_ZLIB))
 	{
@@ -270,15 +274,17 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 				tb_zlib_attach(st->hzlib, st->zdata, zsize);
 			}
 
-			// inflate data
+			// { inflate data
 			tb_int_t real_n = size - st->size;
 
 			if (TB_FALSE == tb_zlib_inflate_partial(st->hzlib, st->data + st->size, &real_n) || real_n < 0)
 				return -1;
 			st->size += real_n;
+			// }
 		}
 #endif
 	}
+	// }
 
 	if (st->size < size) return TB_NULL;
 	else return st->head;

@@ -39,6 +39,7 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * macros
  */
+#ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 
 // debug
 #ifdef TB_DEBUG
@@ -49,6 +50,20 @@ extern "C" {
 #	define TB_DBG(format, arg...)
 #	define TB_ASSERT(expr)
 #	define TB_MSG_ASSERT(expr, format, arg...)
+#endif
+
+#else
+		
+// debug
+#ifdef TB_DEBUG
+#	define TB_DBG
+#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __LINE__, #expr, __FILE__); } } while(0)
+#	define TB_MSG_ASSERT
+#else
+#	define TB_DBG
+#	define TB_ASSERT(expr)
+#	define TB_MSG_ASSERT
+#endif
 #endif
 
 // filename max size

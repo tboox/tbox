@@ -64,7 +64,7 @@ static tb_uint32_t tb_encoding_gb2312_from_unicode(tb_uint32_t ch)
 	// is ascii?
 	if (ch <= 0x7f) return ch;
 
-	// find the gb2312 character
+	// { find the gb2312 character
 	tb_int_t left = 0;
 	tb_int_t right = (g_encoding_unicode_to_gb2312_table_size / sizeof(g_encoding_unicode_to_gb2312_table_data[0])) - 1;
 	while (left <= right)
@@ -80,6 +80,7 @@ static tb_uint32_t tb_encoding_gb2312_from_unicode(tb_uint32_t ch)
 		if (ch > mid_unicode) left = mid + 1;
 		else right = mid - 1;
 	}
+	// }
 
 	return 0;
 }
@@ -322,7 +323,7 @@ tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, t
 	TB_ASSERT(src_s && dst_s);
 	if (!src_s || !dst_s) return 0;
 
-	// get string
+	// { get string
 	tb_byte_t* sb = src_s;
 	tb_byte_t* se = sb + src_n;
 
@@ -333,5 +334,6 @@ tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, t
 	while (sb < se && db < de) dst_c->set(src_c->get(&sb), &db);
 
 	return (tb_size_t)(db - dst_s);
+	// }
 }
 

@@ -34,5 +34,5 @@
 // config
 #ifndef tbox_AUTO_CONFIG_H
 #define tbox_AUTO_CONFIG_H
-#define tbox_CONFIG_DEBUG 0
+#define tbox_CONFIG_DEBUG 1
 #endif

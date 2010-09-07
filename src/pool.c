@@ -126,6 +126,7 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 {
 	TB_ASSERT(pool);
 
+	// {
 	tb_size_t item = 0;
 
 	// try allocating from the predicted item
@@ -192,6 +193,7 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	pool->size++;
 	TB_ASSERT(item && item < 1 + pool->maxn);
 	return item;
+	// }
 }
 void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 {

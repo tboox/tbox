@@ -1,0 +1,131 @@
+#!/bin/bash
+
+function replace_test()
+{
+	echo "test $1"
+	grep $1 -rwh --exclude="*.[oa]" --exclude="makefile" ../*
+}
+function replace_tplayer_add_tp()
+{
+	echo "replace $1 => tp_$1"
+	sed -i "s/\b$1\b/tp_&/g" `grep $1 -rlw --exclude="*.[oa]" --exclude="makefile" ../src/tplayer`
+}
+function replace_ffmpeg_add_tp()
+{
+	echo "replace $1 => tp_$1"
+	sed -i "s/\b$1\b/tp_&/g" `grep $1 -rlw --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+}
+function replace_ffmpeg_demuxer()
+{
+	echo "replace demuxer: $1"
+	sed -i "s/\b$1_demuxer\b/tp_&/g" `grep $1_demuxer -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_demuxer\.h\b/$1_demuxer.h/g" `grep "tp_$1_demuxer\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_DEMUXER\\(.*\\)\\($1\\)/REGISTER_DEMUXER\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+	sed -i "s/REGISTER_MUXDEMUX\\(.*\\)\\($1\\)/REGISTER_MUXDEMUX\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+}
+function replace_ffmpeg_decoder()
+{
+	echo "replace decoder: $1"
+	sed -i "s/\b$1_decoder\b/tp_&/g" `grep $1_decoder -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_decoder\.h\b/$1_decoder.h/g" `grep "tp_$1_decoder\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_DECODER\\(.*\\)\\($1\\)/REGISTER_DECODER\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+	sed -i "s/REGISTER_ENCDEC\\(.*\\)\\($1\\)/REGISTER_ENCDEC\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+}
+function replace_ffmpeg_parser()
+{
+	echo "replace parser: $1"
+	sed -i "s/\b$1_parser\b/tp_&/g" `grep $1_parser -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/\btp_$1_parser\.h\b/$1_parser.h/g" `grep "tp_$1_parser\.h" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_PARSER\\(.*\\)\\($1\\)/REGISTER_PARSER\\1tp_\\2/g"  ../ffmpeg-05/src/libavcodec/allcodecs.c
+}
+function replace_ffmpeg_protocol()
+{
+	echo "replace protocol: $1"
+	sed -i "s/\b$1_protocol\b/tp_&/g" `grep $1_protocol -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+	sed -i "s/REGISTER_PROTOCOL\\(.*\\)\\($1\\)/REGISTER_PROTOCOL\\1tp_\\2/g"  ../ffmpeg-05/src/libavformat/allformats.c
+}
+
+
+function replace_ffmpeg()
+{
+	echo "replace $1 => $2"
+	sed -i "s/\b$1\b/$2/g" `grep "$1" -rwl --exclude="*.[oa]" --exclude="makefile" ../ffmpeg-05/src`
+}
+
+
+# replace ffmpeg
+replace_ffmpeg_add_tp url_fseek
+replace_ffmpeg_add_tp url_fskip
+replace_ffmpeg_add_tp url_ftell
+replace_ffmpeg_add_tp url_fsize
+replace_ffmpeg_add_tp url_feof
+replace_ffmpeg_add_tp url_ferror
+replace_ffmpeg_add_tp url_fdopen
+replace_ffmpeg_add_tp url_setbufsize
+replace_ffmpeg_add_tp url_fopen
+replace_ffmpeg_add_tp url_fclose
+replace_ffmpeg_add_tp url_fileno
+replace_ffmpeg_add_tp url_fprintf
+replace_ffmpeg_add_tp url_fgets
+replace_ffmpeg_add_tp url_fget_max_packet_size
+replace_ffmpeg_add_tp url_open_buf
+replace_ffmpeg_add_tp url_close_buf
+replace_ffmpeg_add_tp url_open_dyn_buf
+replace_ffmpeg_add_tp url_open_dyn_packet_buf
+replace_ffmpeg_add_tp url_close_dyn_buf
+replace_ffmpeg_add_tp url_split
+
+replace_ffmpeg_add_tp av_gettime
+replace_ffmpeg_add_tp av_q2d
+replace_ffmpeg_add_tp img_convert
+replace_ffmpeg_add_tp av_free_packet
+replace_ffmpeg_add_tp av_free
+replace_ffmpeg_add_tp av_malloc
+replace_ffmpeg_add_tp av_dup_packet
+replace_ffmpeg_add_tp av_init_packet
+replace_ffmpeg_add_tp avcodec_alloc_frame
+replace_ffmpeg_add_tp avcodec_flush_buffers
+replace_ffmpeg_add_tp avcodec_decode_video
+replace_ffmpeg_add_tp avcodec_decode_audio2
+replace_ffmpeg_add_tp av_rescale_q
+replace_ffmpeg_add_tp av_seek_frame
+replace_ffmpeg_add_tp av_read_frame
+replace_ffmpeg_add_tp avcodec_find_decoder
+replace_ffmpeg_add_tp avcodec_open
+replace_ffmpeg_add_tp avpicture_get_size
+replace_ffmpeg_add_tp avpicture_fill
+replace_ffmpeg_add_tp av_register_all
+replace_ffmpeg_add_tp av_open_input_file
+replace_ffmpeg_add_tp av_find_stream_info
+replace_ffmpeg_add_tp dump_format
+replace_ffmpeg_add_tp avcodec_close
+replace_ffmpeg_add_tp av_close_input_file
+
+replace_tplayer_add_tp av_gettime
+replace_tplayer_add_tp av_q2d
+replace_tplayer_add_tp img_convert
+replace_tplayer_add_tp av_free_packet
+replace_tplayer_add_tp av_free
+replace_tplayer_add_tp av_malloc
+replace_tplayer_add_tp av_dup_packet
+replace_tplayer_add_tp av_init_packet
+replace_tplayer_add_tp avcodec_alloc_frame
+replace_tplayer_add_tp avcodec_flush_buffers
+replace_tplayer_add_tp avcodec_decode_video
+replace_tplayer_add_tp avcodec_decode_audio2
+replace_tplayer_add_tp av_rescale_q
+replace_tplayer_add_tp av_seek_frame
+replace_tplayer_add_tp av_read_frame
+replace_tplayer_add_tp avcodec_find_decoder
+replace_tplayer_add_tp avcodec_open
+replace_tplayer_add_tp avpicture_get_size
+replace_tplayer_add_tp avpicture_fill
+replace_tplayer_add_tp av_register_all
+replace_tplayer_add_tp av_open_input_file
+replace_tplayer_add_tp av_find_stream_info
+replace_tplayer_add_tp dump_format
+replace_tplayer_add_tp avcodec_close
+replace_tplayer_add_tp av_close_input_file
+
+
+
