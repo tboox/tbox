@@ -16,6 +16,7 @@ tbox_C_FILES 		+= \
 					pool \
 					memops \
 					string \
+					array \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
@@ -33,6 +34,7 @@ INC_FILES 			= \
 					malloc.h \
 					math.h \
 					pool.h \
+					array.h \
 					memops.h \
 					string.h \
 					stream.h \

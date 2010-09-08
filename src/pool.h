@@ -53,7 +53,7 @@ extern "C" {
  * types
  */
 
-// the pool type, maximum item number: 65535, valid index > 0, 0: is end for list
+// the pool type, valid index > 0, 0: is end for list
 typedef struct __tb_pool_t
 {
 	tb_byte_t* 		data;
