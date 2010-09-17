@@ -42,7 +42,7 @@ $(1)_CFLAGS := $(CFLAGS) $(addprefix $(CFLAGS-I), $(INC_DIR)) $(addprefix $(CFLA
 $(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_LDFLAGS)
 $(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS)
 $(1)_ARFLAGS := $(ARFLAGS)
-$(1)_SHFLAGS := $(SHFLAGS) $($(1)_SHFLAGS)
+$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_SHFLAGS)
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FLAGS,$(name))))
 
@@ -107,7 +107,7 @@ $(LIB_PREFIX)$(1)$(LIB_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_O
 
 $(DLL_PREFIX)$(1)$(DLL_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
 	-$(RM) $$@
-	$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_LDFLAGS) $($(1)_SHFLAGS)
+	$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_SHFLAGS)
 endef
 
 

@@ -13,6 +13,9 @@ TB_CONFIG_REGEX 			= y
 # encoding
 TB_CONFIG_ENCODING 			= y
 
+# format
+TB_CONFIG_FORMAT 			= y
+
 # jpeg
 TB_CONFIG_JPEG 				= y
 

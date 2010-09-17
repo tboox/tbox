@@ -76,7 +76,7 @@ be absolutely sure we get our version. */
 
 #undef DPRINTF
 #ifdef DEBUG
-#define DPRINTF(p) tb_printf p
+#define DPRINTF(p) tplat_printf p
 #else
 #define DPRINTF(p) /* Nothing */
 #endif

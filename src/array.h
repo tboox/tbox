@@ -40,7 +40,7 @@ extern "C" {
 #define TB_ARRAY_FIRST(array, type) 					((type*)tb_array_first((array)))
 #define TB_ARRAY_LAST(array, type) 						((type*)tb_array_last((array)))
 #define TB_ARRAY_GET(array, index, type) 				((type*)tb_array_get((array), (index)))
-#define TB_ARRAY_SET(array, index, type, value) 		do { type* __p = (type*)tb_array_get((array), (index)); TF_ASSERT(__p); if (__p) *__p = (value); } while(0)
+#define TB_ARRAY_PUT(array, index, type) 				((type*)tb_array_put((array), (index)))
 
 #define TB_ARRAY_MAX_SIZE 								(1 << 30)
 

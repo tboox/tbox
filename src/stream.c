@@ -377,3 +377,20 @@ tb_bool_t tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag)
 	st->flag = flag;
 	return TB_TRUE;
 }
+tb_stream_t* tb_stream_open(tb_generic_stream_t* st, tb_char_t const* url, tb_byte_t const* data, tb_size_t size, tb_stream_flag_t flag)
+{
+	if (url)
+	{
+		st->st = tb_stream_open_from_file(&st->u.file, url, flag);
+		if (st->st) return st->st;
+		st->st = tb_stream_open_from_http(&st->u.http, url, flag);
+		if (st->st) return st->st;
+	}
+	if (data && size)
+	{
+		st->st = tb_stream_open_from_data(&st->u.file, data, size, flag);
+		if (st->st) return st->st;
+	}
+
+	return TB_NULL;
+}

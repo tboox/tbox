@@ -17,6 +17,9 @@
 // encoding
 #define TB_CONFIG_ENCODING
 
+// format
+#define TB_CONFIG_FORMAT
+
 // jpeg
 #define TB_CONFIG_JPEG
 

@@ -45,9 +45,9 @@ void tb_bits_attach(tb_bits_t* bits, tb_byte_t* data, tb_size_t size)
  */
 void tb_bits_goto(tb_bits_t* bits, tb_byte_t* data)
 {
-	TB_ASSERT(bits && data && data >= bits->p && data <= bits->e);
+	TB_ASSERT(bits && data && data <= bits->e);
 	bits->b = 0;
-	if (data >= bits->p && data <= bits->e) bits->p = data;
+	if (data <= bits->e) bits->p = data;
 }
 void tb_bits_sync(tb_bits_t* bits)
 {

@@ -107,5 +107,8 @@ tb_char_t const* 	tb_string_append(tb_string_t* string, tb_string_t const* s_str
 tb_char_t const* 	tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string);
 tb_char_t const* 	tb_string_append_char(tb_string_t* string, tb_char_t ch);
 
+tb_bool_t 			tb_string_compare(tb_string_t* string, tb_string_t const* s_string);
+tb_bool_t 			tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string);
+
 #endif
 

@@ -6755,18 +6755,18 @@ case when building a production library. */
 
 #ifdef DEBUG
 
-tb_printf("Length = %d top_bracket = %d top_backref = %d\n",
+tplat_printf("Length = %d top_bracket = %d top_backref = %d\n",
   length, re->top_bracket, re->top_backref);
 
-tb_printf("Options=%08x\n", re->options);
+tplat_printf("Options=%08x\n", re->options);
 
 if ((re->flags & PCRE_FIRSTSET) != 0)
   {
   int ch = re->first_byte & 255;
   const char *caseless = ((re->first_byte & REQ_CASELESS) == 0)?
     "" : " (caseless)";
-  if (isprint(ch)) tb_printf("First char = %c%s\n", ch, caseless);
-    else tb_printf("First char = \\x%02x%s\n", ch, caseless);
+  if (isprint(ch)) tplat_printf("First char = %c%s\n", ch, caseless);
+    else tplat_printf("First char = \\x%02x%s\n", ch, caseless);
   }
 
 if ((re->flags & PCRE_REQCHSET) != 0)
@@ -6774,8 +6774,8 @@ if ((re->flags & PCRE_REQCHSET) != 0)
   int ch = re->req_byte & 255;
   const char *caseless = ((re->req_byte & REQ_CASELESS) == 0)?
     "" : " (caseless)";
-  if (isprint(ch)) tb_printf("Req char = %c%s\n", ch, caseless);
-    else tb_printf("Req char = \\x%02x%s\n", ch, caseless);
+  if (isprint(ch)) tplat_printf("Req char = %c%s\n", ch, caseless);
+    else tplat_printf("Req char = \\x%02x%s\n", ch, caseless);
   }
 
 pcre_printint(re, stdout, TRUE);

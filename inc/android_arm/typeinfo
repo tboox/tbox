@@ -1,0 +1,28 @@
+#ifndef _TYPEINFO_HEADER_GAURD
+#define _TYPEINFO_HEADER_GAURD
+
+
+namespace std {
+    class type_info;
+    class bad_cast;
+    class bad_typeid;
+};
+
+
+class type_info {
+public:
+    type_info();
+    virtual ~type_info();
+
+    char const * name() const;
+
+    bool operator==(type_info const & right) const;
+    bool operator!=(type_info const & right) const;
+    bool before(type_info const & right) const;
+
+private:
+    type_info(type_info const & right);
+    type_info & operator=(type_info const & right);
+};
+
+#endif

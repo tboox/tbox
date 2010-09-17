@@ -530,3 +530,16 @@ tb_int_t tb_string_find_string(tb_string_t const* string, tb_string_t const* sub
 {
 	return tb_string_find_c_string(string, tb_string_c_string(sub), start);
 }
+tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
+{
+	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
+	else if (TB_FALSE == tb_string_is_null(s_string))
+		return !strcmp(tb_string_c_string(string), tb_string_c_string(s_string))? TB_TRUE : TB_FALSE;
+	else return TB_FALSE;
+}
+tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
+{
+	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
+	else if (c_string) return !strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else return TB_FALSE;
+}

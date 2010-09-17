@@ -51,6 +51,10 @@ extern "C" {
 # 	include "encoding.h"
 #endif
 
+#ifdef TB_CONFIG_FORMAT
+# 	include "format.h"
+#endif
+
 #ifdef TB_CONFIG_ZLIB
 # 	include "zlib.h"
 #endif

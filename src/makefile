@@ -49,6 +49,21 @@ tbox_C_FILES-$(TB_CONFIG_ENCODING) 	+= \
 
 INC_FILES-$(TB_CONFIG_ENCODING) 	+= encoding.h
 
+# format files
+tbox_C_FILES-$(TB_CONFIG_FORMAT) 	+= \
+									format \
+									format$(_)flv \
+									format$(_)avi \
+									format$(_)mp3 \
+									format$(_)wav \
+									format$(_)bmp \
+									format$(_)gif \
+									format$(_)jpg \
+									format$(_)png \
+									format$(_)swf
+
+INC_FILES-$(TB_CONFIG_ENCODING) 	+= format.h
+
 # zlib files
 zlib_C_FILES 		= \
 					adler32 \

@@ -110,7 +110,7 @@ pchars(const uschar *p, int length, BOOL is_subject, match_data *md)
 unsigned int c;
 if (is_subject && length > md->end_subject - p) length = md->end_subject - p;
 while (length-- > 0)
-  if (isprint(c = *(p++))) tb_printf("%c", c); else tplat_printf("\\x%02x", c);
+  if (isprint(c = *(p++))) tplat_printf("%c", c); else tplat_printf("\\x%02x", c);
 }
 #endif
 
@@ -141,15 +141,15 @@ USPTR p = md->start_subject + md->offset_vector[offset];
 
 #ifdef DEBUG
 if (eptr >= md->end_subject)
-  tb_printf("matching subject <null>");
+  tplat_printf("matching subject <null>");
 else
   {
-  tb_printf("matching subject ");
+  tplat_printf("matching subject ");
   pchars(eptr, length, TRUE, md);
   }
-tb_printf(" against backref ");
+tplat_printf(" against backref ");
 pchars(p, length, FALSE, md);
-tb_printf("\n");
+tplat_printf("\n");
 #endif
 
 /* Always fail if not enough characters left */
@@ -255,13 +255,13 @@ actuall used in this definition. */
 #ifdef DEBUG
 #define RMATCH(ra,rb,rc,rd,re,rf,rg,rw) \
   { \
-  tb_printf("match() called in line %d\n", __LINE__); \
+  tplat_printf("match() called in line %d\n", __LINE__); \
   rrc = match(ra,rb,mstart,rc,rd,re,rf,rg,rdepth+1); \
-  tb_printf("to line %d\n", __LINE__); \
+  tplat_printf("to line %d\n", __LINE__); \
   }
 #define RRETURN(ra) \
   { \
-  tb_printf("match() returned %d from line %d ", ra, __LINE__); \
+  tplat_printf("match() returned %d from line %d ", ra, __LINE__); \
   return ra; \
   }
 #else
@@ -712,10 +712,10 @@ for (;;)
     offset = number << 1;
 
 #ifdef DEBUG
-    tb_printf("start bracket %d\n", number);
-    tb_printf("subject=");
+    tplat_printf("start bracket %d\n", number);
+    tplat_printf("subject=");
     pchars(eptr, 16, TRUE, md);
-    tb_printf("\n");
+    tplat_printf("\n");
 #endif
 
     if (offset < md->offset_max)
@@ -1021,8 +1021,8 @@ for (;;)
     offset = number << 1;
 
 #ifdef DEBUG
-      tb_printf("end bracket %d at *ACCEPT", number);
-      tb_printf("\n");
+      tplat_printf("end bracket %d at *ACCEPT", number);
+      tplat_printf("\n");
 #endif
 
     md->capture_last = number;
@@ -1426,8 +1426,8 @@ for (;;)
       offset = number << 1;
 
 #ifdef DEBUG
-      tb_printf("end bracket %d", number);
-      tb_printf("\n");
+      tplat_printf("end bracket %d", number);
+      tplat_printf("\n");
 #endif
 
       md->capture_last = number;
@@ -5588,9 +5588,9 @@ for(;;)
     }
 
 #ifdef DEBUG  /* Sigh. Some compilers never learn. */
-  tb_printf(">>>> Match against: ");
+  tplat_printf(">>>> Match against: ");
   pchars(start_match, end_subject - start_match, TRUE, md);
-  tb_printf("\n");
+  tplat_printf("\n");
 #endif
 
   /* OK, we can now run the match. If "hitend" is set afterwards, remember the

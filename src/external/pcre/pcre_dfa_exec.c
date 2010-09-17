@@ -558,14 +558,14 @@ for (;;)
   workspace[1] = active_count;
 
 #ifdef DEBUG
-  tb_printf("%.*sNext character: rest of subject = \"", rlevel*2-2, SP);
+  tplat_printf("%.*sNext character: rest of subject = \"", rlevel*2-2, SP);
   pchars((uschar *)ptr, strlen((char *)ptr), stdout);
-  tb_printf("\"\n");
+  tplat_printf("\"\n");
 
-  tb_printf("%.*sActive states: ", rlevel*2-2, SP);
+  tplat_printf("%.*sActive states: ", rlevel*2-2, SP);
   for (i = 0; i < active_count; i++)
-    tb_printf("%d/%d ", active_states[i].offset, active_states[i].count);
-  tb_printf("\n");
+    tplat_printf("%d/%d ", active_states[i].offset, active_states[i].count);
+  tplat_printf("\n");
 #endif
 
   /* Set the pointers for adding new states */
@@ -604,10 +604,10 @@ for (;;)
     int count, codevalue, rrc;
 
 #ifdef DEBUG
-    tb_printf ("%.*sProcessing state %d c=", rlevel*2-2, SP, state_offset);
-    if (clen == 0) tb_printf("EOL\n");
-      else if (c > 32 && c < 127) tb_printf("'%c'\n", c);
-        else tb_printf("0x%02x\n", c);
+    tplat_printf ("%.*sProcessing state %d c=", rlevel*2-2, SP, state_offset);
+    if (clen == 0) tplat_printf("EOL\n");
+      else if (c > 32 && c < 127) tplat_printf("'%c'\n", c);
+        else tplat_printf("0x%02x\n", c);
 #endif
 
     /* This variable is referred to implicity in the ADD_xxx macros. */

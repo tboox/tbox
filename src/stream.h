@@ -131,6 +131,23 @@ typedef struct __tb_file_stream_t
 
 }tb_file_stream_t;
 
+// the generic stream
+typedef struct __tb_generic_stream_t
+{
+	// streams
+	union
+	{
+		tb_data_stream_t 	data;
+		tb_http_stream_t 	http;
+		tb_file_stream_t 	file;
+
+	}u;
+
+	// the reference to the specific stream
+	tb_stream_t* 			st;
+
+}tb_generic_stream_t;
+
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
@@ -139,6 +156,7 @@ typedef struct __tb_file_stream_t
 tb_stream_t* 		tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
 tb_stream_t* 		tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag);
 tb_stream_t* 		tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* data, tb_size_t size, tb_stream_flag_t flag);
+tb_stream_t* 		tb_stream_open(tb_generic_stream_t* st, tb_char_t const* url, tb_byte_t const* data, tb_size_t size, tb_stream_flag_t flag);
 void 				tb_stream_close(tb_stream_t* st);
 
 tb_int_t 			tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size);

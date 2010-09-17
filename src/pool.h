@@ -78,10 +78,6 @@ void 			tb_pool_destroy(tb_pool_t* pool);
 
 tb_size_t 		tb_pool_alloc(tb_pool_t* pool);
 void 			tb_pool_free(tb_pool_t* pool, tb_size_t item);
-void 			tb_pool_reset(tb_pool_t* pool);
-tb_size_t 		tb_pool_maxn(tb_pool_t* pool);
-tb_bool_t 		tb_pool_exists(tb_pool_t* pool, tb_size_t item);
-tb_byte_t* 		tb_pool_put(tb_pool_t* pool, tb_size_t item);
 tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_size_t item);
 
 // c plus plus
