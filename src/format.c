@@ -37,22 +37,22 @@
 static tb_format_t g_formats[] = 
 {
 	// video
-	{TB_FORMAT_FLAG_VIDEO, TB_FORMAT_TYPE_FLV, "flv", tb_format_flv_detect}
-,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_BMP, "bmp", tb_format_bmp_detect}
-,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_GIF, "gif", tb_format_gif_detect}
-,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_JPG, "jpg", tb_format_jpg_detect}
-,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_PNG, "png", tb_format_png_detect}
-,	{TB_FORMAT_FLAG_FLASH, TB_FORMAT_TYPE_SWF, "swf", tb_format_swf_detect}
-,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_WAV, "wav", tb_format_wav_detect}
-,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_MP3, "mp3", tb_format_mp3_detect}
-,	{TB_FORMAT_FLAG_VIDEO, TB_FORMAT_TYPE_AVI, "avi", tb_format_avi_detect}
+	{TB_FORMAT_FLAG_VIDEO, TB_FORMAT_TYPE_FLV, "flv", tb_format_flv_probe}
+,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_BMP, "bmp", tb_format_bmp_probe}
+,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_GIF, "gif", tb_format_gif_probe}
+,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_JPG, "jpg", tb_format_jpg_probe}
+,	{TB_FORMAT_FLAG_IMAGE, TB_FORMAT_TYPE_PNG, "png", tb_format_png_probe}
+,	{TB_FORMAT_FLAG_FLASH, TB_FORMAT_TYPE_SWF, "swf", tb_format_swf_probe}
+,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_WAV, "wav", tb_format_wav_probe}
+,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_MP3, "mp3", tb_format_mp3_probe}
+,	{TB_FORMAT_FLAG_VIDEO, TB_FORMAT_TYPE_AVI, "avi", tb_format_avi_probe}
 
 };
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_format_t const* tb_format_detect(tb_stream_t* st, tb_size_t flag)
+tb_format_t const* tb_format_probe(tb_stream_t* st, tb_size_t flag)
 {
 	TB_ASSERT(st);
 	if (!st) return TB_NULL;
@@ -60,7 +60,7 @@ tb_format_t const* tb_format_detect(tb_stream_t* st, tb_size_t flag)
 	tb_size_t score_max = 0;
 	tb_format_t const* format = TB_NULL;
 
-	// detect format
+	// probe format
 	tb_int_t i = 0;
 	tb_int_t n = TB_STATIC_ARRAY_SIZE(g_formats);
 	for (i = 0; i < n; i++)
@@ -68,9 +68,9 @@ tb_format_t const* tb_format_detect(tb_stream_t* st, tb_size_t flag)
 		// filter 
 		if (flag == TB_FORMAT_FLAG_ALL || g_formats[i].flag & flag)
 		{
-			// detect score
+			// probe score
 			tb_size_t score = 0;
-			if (g_formats[i].detect) score = g_formats[i].detect(st);
+			if (g_formats[i].probe) score = g_formats[i].probe(st);
 
 			// save the best format
 			if (score > score_max)

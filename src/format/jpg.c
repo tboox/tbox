@@ -40,7 +40,7 @@
  * interfaces
  */
 
-tb_size_t tb_format_jpg_detect(tb_stream_t* st)
+tb_size_t tb_format_jpg_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 4);
 	if (p && p[0] == 0xff && p[1] == 0xd8 && p[2] == 0xff && (p[3] >= 0xe0 && p[3] <= 0xef))

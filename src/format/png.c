@@ -40,7 +40,7 @@
  * interfaces
  */
 
-tb_size_t tb_format_png_detect(tb_stream_t* st)
+tb_size_t tb_format_png_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 8);
 	if (p && p[0] == 0x89 && p[1] == 'P' && p[2] == 'N' && p[3] == 'G'

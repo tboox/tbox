@@ -40,7 +40,7 @@
  * interfaces
  */
 
-tb_size_t tb_format_wav_detect(tb_stream_t* st)
+tb_size_t tb_format_wav_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 16);
 	if (p && p[0] == 'R' && p[1] == 'I' && p[2] == 'F' && p[3] == 'F'

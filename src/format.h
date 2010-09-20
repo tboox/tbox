@@ -91,8 +91,8 @@ typedef struct __tb_format_t
 	// the format name
 	tb_char_t const* 	name;
 
-	// the detector
-	tb_size_t 			(*detect)(tb_stream_t* st);
+	// the probeor
+	tb_size_t 			(*probe)(tb_stream_t* st);
 	
 }tb_format_t;
 
@@ -100,25 +100,25 @@ typedef struct __tb_format_t
  * interfaces
  */
 
-// detect format
-tb_format_t const* 	tb_format_detect(tb_stream_t* st, tb_size_t flag);
+// probe format
+tb_format_t const* 	tb_format_probe(tb_stream_t* st, tb_size_t flag);
 
 // video
-tb_size_t 			tb_format_flv_detect(tb_stream_t* st);
-tb_size_t 			tb_format_avi_detect(tb_stream_t* st);
+tb_size_t 			tb_format_flv_probe(tb_stream_t* st);
+tb_size_t 			tb_format_avi_probe(tb_stream_t* st);
 
 // audio
-tb_size_t 			tb_format_wav_detect(tb_stream_t* st);
-tb_size_t 			tb_format_mp3_detect(tb_stream_t* st);
+tb_size_t 			tb_format_wav_probe(tb_stream_t* st);
+tb_size_t 			tb_format_mp3_probe(tb_stream_t* st);
 
 // image
-tb_size_t 			tb_format_bmp_detect(tb_stream_t* st);
-tb_size_t 			tb_format_gif_detect(tb_stream_t* st);
-tb_size_t 			tb_format_jpg_detect(tb_stream_t* st);
-tb_size_t 			tb_format_png_detect(tb_stream_t* st);
+tb_size_t 			tb_format_bmp_probe(tb_stream_t* st);
+tb_size_t 			tb_format_gif_probe(tb_stream_t* st);
+tb_size_t 			tb_format_jpg_probe(tb_stream_t* st);
+tb_size_t 			tb_format_png_probe(tb_stream_t* st);
 
 // flash
-tb_size_t 			tb_format_swf_detect(tb_stream_t* st);
+tb_size_t 			tb_format_swf_probe(tb_stream_t* st);
 
 
 // c plus plus

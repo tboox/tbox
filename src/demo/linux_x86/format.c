@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	}
 
 
-	tb_format_t const* format =	tb_format_detect(st, TB_FORMAT_FLAG_ALL);
+	tb_format_t const* format =	tb_format_probe(st, TB_FORMAT_FLAG_ALL);
 	if (!format)
 	{
 		TB_DBG("unsupported format");

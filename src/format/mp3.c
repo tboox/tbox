@@ -40,7 +40,7 @@
  * interfaces
  */
 
-tb_size_t tb_format_mp3_detect(tb_stream_t* st)
+tb_size_t tb_format_mp3_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 5);
 
