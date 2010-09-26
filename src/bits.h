@@ -48,57 +48,26 @@ typedef struct __tb_bits_t
  * macros
  */
 
-#if 0
-#ifdef TPLAT_WORDS_BIGENDIAN
-# 	define tb_bits_get_u16 				tb_bits_get_u16_be
-# 	define tb_bits_get_s16 				tb_bits_get_s16_be
-# 	define tb_bits_get_u32 				tb_bits_get_u32_be
-# 	define tb_bits_get_s32 				tb_bits_get_s32_be
+#define tb_bits_get_u16 			tb_bits_get_u16_ne
+#define tb_bits_get_s16 			tb_bits_get_s16_ne
+#define tb_bits_get_u24 			tb_bits_get_u24_ne
+#define tb_bits_get_s24 			tb_bits_get_s24_ne
+#define tb_bits_get_u32 			tb_bits_get_u32_ne
+#define tb_bits_get_s32 			tb_bits_get_s32_ne
 
-# 	define tb_bits_set_u16 				tb_bits_set_u16_be
-# 	define tb_bits_set_s16 				tb_bits_set_s16_be
-# 	define tb_bits_set_u32 				tb_bits_set_u32_be
-# 	define tb_bits_set_s32 				tb_bits_set_s32_be
+#define tb_bits_set_u16 			tb_bits_set_u16_ne
+#define tb_bits_set_s16 			tb_bits_set_s16_ne
+#define tb_bits_set_u24 			tb_bits_set_u24_ne
+#define tb_bits_set_s24 			tb_bits_set_s24_ne
+#define tb_bits_set_u32 			tb_bits_set_u32_ne
+#define tb_bits_set_s32 			tb_bits_set_s32_ne
 
-# 	define tb_pbits_get_u16 			tb_pbits_get_u16_be
-# 	define tb_pbits_get_s16 			tb_pbits_get_s16_be
-# 	define tb_pbits_get_u32 			tb_pbits_get_u32_be
-# 	define tb_pbits_get_s32 			tb_pbits_get_s32_be
-
-#else
-# 	define tb_bits_get_u16 				tb_bits_get_u16_le
-# 	define tb_bits_get_s16 				tb_bits_get_s16_le
-# 	define tb_bits_get_u32 				tb_bits_get_u32_le
-# 	define tb_bits_get_s32 				tb_bits_get_s32_le
-
-# 	define tb_bits_set_u16 				tb_bits_set_u16_le
-# 	define tb_bits_set_s16 				tb_bits_set_s16_le
-# 	define tb_bits_set_u32 				tb_bits_set_u32_le
-# 	define tb_bits_set_s32 				tb_bits_set_s32_le
-
-# 	define tb_pbits_get_u16 			tb_pbits_get_u16_le
-# 	define tb_pbits_get_s16 			tb_pbits_get_s16_le
-# 	define tb_pbits_get_u32 			tb_pbits_get_u32_le
-# 	define tb_pbits_get_s32 			tb_pbits_get_s32_le
-
-
-#endif
-#else
-# 	define tb_bits_get_u16 				tb_bits_get_u16_ne
-# 	define tb_bits_get_s16 				tb_bits_get_s16_ne
-# 	define tb_bits_get_u32 				tb_bits_get_u32_ne
-# 	define tb_bits_get_s32 				tb_bits_get_s32_ne
-
-# 	define tb_bits_set_u16 				tb_bits_set_u16_ne
-# 	define tb_bits_set_s16 				tb_bits_set_s16_ne
-# 	define tb_bits_set_u32 				tb_bits_set_u32_ne
-# 	define tb_bits_set_s32 				tb_bits_set_s32_ne
-
-# 	define tb_pbits_get_u16 			tb_pbits_get_u16_ne
-# 	define tb_pbits_get_s16 			tb_pbits_get_s16_ne
-# 	define tb_pbits_get_u32 			tb_pbits_get_u32_ne
-# 	define tb_pbits_get_s32 			tb_pbits_get_s32_ne
-#endif
+#define tb_pbits_get_u16 			tb_pbits_get_u16_ne
+#define tb_pbits_get_s16 			tb_pbits_get_s16_ne
+#define tb_pbits_get_u24 			tb_pbits_get_u24_ne
+#define tb_pbits_get_s24 			tb_pbits_get_s24_ne
+#define tb_pbits_get_u32 			tb_pbits_get_u32_ne
+#define tb_pbits_get_s32 			tb_pbits_get_s32_ne
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -130,14 +99,28 @@ tb_uint8_t 			tb_bits_get_u1(tb_bits_t* bits);
 tb_uint16_t 		tb_bits_get_u16_le(tb_bits_t* bits);
 tb_sint16_t 		tb_bits_get_s16_le(tb_bits_t* bits);
 
+tb_uint32_t 		tb_bits_get_u24_le(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s24_le(tb_bits_t* bits);
+
 tb_uint32_t 		tb_bits_get_u32_le(tb_bits_t* bits);
 tb_sint32_t 		tb_bits_get_s32_le(tb_bits_t* bits);
 
 tb_uint16_t 		tb_bits_get_u16_be(tb_bits_t* bits);
 tb_sint16_t 		tb_bits_get_s16_be(tb_bits_t* bits);
 
+tb_uint32_t 		tb_bits_get_u24_be(tb_bits_t* bits);
+tb_sint32_t 		tb_bits_get_s24_be(tb_bits_t* bits);
+
 tb_uint32_t 		tb_bits_get_u32_be(tb_bits_t* bits);
 tb_sint32_t 		tb_bits_get_s32_be(tb_bits_t* bits);
+
+tb_float_t 			tb_bits_get_float_le(tb_bits_t* bits);
+tb_float_t 			tb_bits_get_float_be(tb_bits_t* bits);
+tb_float_t 			tb_bits_get_float_ne(tb_bits_t* bits);
+
+tb_float_t 			tb_bits_get_double_le(tb_bits_t* bits);
+tb_float_t 			tb_bits_get_double_be(tb_bits_t* bits);
+tb_float_t 			tb_bits_get_double_ne(tb_bits_t* bits);
 
 tb_uint32_t 		tb_bits_get_ubits(tb_bits_t* bits, tb_size_t bits_n);
 tb_sint32_t 		tb_bits_get_sbits(tb_bits_t* bits, tb_size_t bits_n);
@@ -194,6 +177,24 @@ static __tplat_inline__ tb_sint16_t tb_bits_get_s16_ne(tb_bits_t* bits)
 	// {
 	tb_sint16_t val = *((tb_sint16_t*)bits->p);
 	bits->p += 2;
+	return val;
+	// }
+}
+static __tplat_inline__ tb_uint32_t tb_bits_get_u24_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	// {
+	tb_uint32_t val = *((tb_uint32_t*)bits->p) & 0x00ffffff;
+	bits->p += 3;
+	return val;
+	// }
+}
+static __tplat_inline__ tb_sint32_t tb_bits_get_s24_ne(tb_bits_t* bits)
+{
+	TB_ASSERT(!bits->b);
+	// {
+	tb_sint32_t val = *((tb_sint32_t*)bits->p) & 0x80ffffff;
+	bits->p += 3;
 	return val;
 	// }
 }
@@ -286,6 +287,30 @@ static __tplat_inline__ tb_sint16_t tb_pbits_get_s16_ne(tb_byte_t const* p)
 {
 	return *((tb_sint16_t*)p);
 }
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u24_le(tb_byte_t const* p)
+{
+	return (*(p + 2) << 16 | *(p + 1) << 8 | *(p));
+}
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s24_le(tb_byte_t const* p)
+{
+	return (*(p + 2) << 16 | *(p + 1) << 8 | *(p));
+}
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u24_be(tb_byte_t const* p)
+{
+	return (*(p) << 16 | *(p + 1) << 8 | *(p + 2));
+}
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s24_be(tb_byte_t const* p)
+{
+	return (*(p) << 16 | *(p + 1) << 8 | *(p + 2));
+}
+static __tplat_inline__ tb_uint32_t tb_pbits_get_u24_ne(tb_byte_t const* p)
+{
+	return *((tb_uint32_t*)p) & 0x00ffffff;
+}
+static __tplat_inline__ tb_sint32_t tb_pbits_get_s24_ne(tb_byte_t const* p)
+{
+	return *((tb_sint32_t*)p) & 0x80ffffff;
+}
 static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_le(tb_byte_t const* p)
 {
 	return (*(p + 3) << 24 | *(p + 2) << 16 | *(p + 1) << 8 | *(p));
@@ -309,6 +334,100 @@ static __tplat_inline__ tb_uint32_t tb_pbits_get_u32_ne(tb_byte_t const* p)
 static __tplat_inline__ tb_sint32_t tb_pbits_get_s32_ne(tb_byte_t const* p)
 {
 	return *((tb_sint32_t*)p);
+}
+static __tplat_inline__ tb_float_t tb_pbits_get_float_le(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i;
+		float 		f;
+
+	} conv;
+
+	conv.i = tb_pbits_get_u32_le(p);
+	return (tb_float_t)conv.f;
+}
+static __tplat_inline__ tb_float_t tb_pbits_get_float_be(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i;
+		float 		f;
+
+	} conv;
+
+	conv.i = tb_pbits_get_u32_be(p);
+	return (tb_float_t)conv.f;
+}
+static __tplat_inline__ tb_float_t tb_pbits_get_float_ne(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i;
+		float 		f;
+
+	} conv;
+
+	conv.i = tb_pbits_get_u32_ne(p);
+	return (tb_float_t)conv.f;
+}
+
+static __tplat_inline__ tb_float_t tb_pbits_get_double_le(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i[2];
+		double 		f;
+
+	} conv;
+
+#ifdef TPLAT_FLOAT_BIGENDIAN
+	conv.i[0] = tb_pbits_get_u32_le(p);
+	conv.i[1] = tb_pbits_get_u32_le(p);
+#else
+	conv.i[1] = tb_pbits_get_u32_le(p);
+	conv.i[0] = tb_pbits_get_u32_le(p);
+#endif
+
+	return (tb_float_t)conv.f;
+}
+static __tplat_inline__ tb_float_t tb_pbits_get_double_be(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i[2];
+		double 		f;
+
+	} conv;
+
+#ifdef TPLAT_FLOAT_BIGENDIAN
+	conv.i[0] = tb_pbits_get_u32_be(p);
+	conv.i[1] = tb_pbits_get_u32_be(p);
+#else
+	conv.i[1] = tb_pbits_get_u32_be(p);
+	conv.i[0] = tb_pbits_get_u32_be(p);
+#endif
+
+	return (tb_float_t)conv.f;
+}
+static __tplat_inline__ tb_float_t tb_pbits_get_double_ne(tb_byte_t const* p)
+{
+	union 
+	{
+		tb_uint32_t i[2];
+		double 		f;
+
+	} conv;
+
+#ifdef TPLAT_FLOAT_BIGENDIAN
+	conv.i[0] = tb_pbits_get_u32_ne(p);
+	conv.i[1] = tb_pbits_get_u32_ne(p);
+#else
+	conv.i[1] = tb_pbits_get_u32_ne(p);
+	conv.i[0] = tb_pbits_get_u32_ne(p);
+#endif
+
+	return (tb_float_t)conv.f;
 }
 
 

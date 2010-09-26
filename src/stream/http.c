@@ -26,12 +26,13 @@
  */
 #include "prefix.h"
 #include "../regex.h"
+
 /* /////////////////////////////////////////////////////////
  * macros
  */
 #ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 #if 1
-# 	define TB_HTTP_DBG(fmt, arg...) 			TB_DBG(fmt, ##arg)
+# 	define TB_HTTP_DBG(fmt, arg...) 			TB_DBG("http: " fmt, ##arg)
 #else
 # 	define TB_HTTP_DBG(fmt, arg...)
 #endif
@@ -40,9 +41,34 @@
 # 	define TB_HTTP_DBG
 #endif
 
+#define TB_HTTP_PATH_MAX 						(8192)
+#define TB_HTTP_LINE_MAX 						(8192)
 /* /////////////////////////////////////////////////////////
  * types
  */
+
+// the http context type
+typedef struct __tb_http_context_t
+{
+	// the http code
+	tb_int_t 			code;
+
+	// the file size
+	tb_int_t 			filesize;
+
+	// is redirect
+	tb_int_t 			is_redirect;
+
+	// is stream
+	tb_int_t 			is_stream;
+	
+	// the url
+	tb_char_t 			url[TB_HTTP_PATH_MAX];
+
+	// the process line
+	tb_char_t 			line[TB_HTTP_LINE_MAX];
+
+}tb_http_context_t;
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -180,9 +206,10 @@ static tb_char_t tb_http_recv_char(tplat_handle_t hsocket)
  * Connection: close
  * Content-Type: application/x-shockwave-flash
  */
-static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_size_t line_idx)
+static tb_bool_t tb_http_process_line(tb_http_context_t* ctx, tb_size_t line_idx)
 {
-	TB_HTTP_DBG("http: %s", line);
+	tb_char_t* line = ctx->line;
+	TB_HTTP_DBG("%s", line);
 
 	// { process http code
 	tb_char_t* p = line;
@@ -193,14 +220,11 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 		while (isspace(*p)) p++;
 
 		// {
-		tb_int_t http_code = strtol(p, TB_NULL, 10);
-		TB_HTTP_DBG("http code: %d", http_code);
+		ctx->code = strtol(p, TB_NULL, 10);
+		TB_HTTP_DBG("code: %d", ctx->code);
 
 		// check error code: 4xx & 5xx
-		if (http_code >= 400 && http_code < 600) return TB_FALSE;
-
-		// cannot support to redirect now!
-		else if (http_code == 302 || http_code == 303) return TB_FALSE;
+		if (ctx->code >= 400 && ctx->code < 600) return TB_FALSE;
 		// }
 	}
 	else
@@ -216,16 +240,25 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 		// parse location
 		if (!strcmp(tag, "Location")) 
 		{
-			TB_HTTP_DBG("redirect to: %s", p);
+			//TB_HTTP_DBG("redirect to: %s", p);
 
-			// cannot support now!
-			return TB_FALSE;
+			// redirect it
+			if (ctx->code == 302 || ctx->code == 303)
+			{
+				// next url
+				strncpy(ctx->url, p, TB_HTTP_PATH_MAX - 1);
+				ctx->url[TB_HTTP_PATH_MAX - 1] = '\0';
+				ctx->is_redirect = 1;
+				
+				return TB_TRUE;
+			}
+			else return TB_FALSE;
 		}
 		// parse content size
 		else if (!strcmp (tag, "Content-Length"))
 		{
 			tb_int_t filesize = atol(p);
-			if (filesize > 0) st->size = filesize;
+			if (filesize > 0) ctx->filesize = filesize;
 		}
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!strcmp (tag, "Content-Range"))
@@ -241,44 +274,79 @@ static tb_bool_t tb_http_process_line(tb_http_stream_t* st, tb_char_t* line, tb_
 				TB_HTTP_DBG("range: %d - %d", offset, filesize);
 			}
 			// be able to seek
-			// ...
+			ctx->is_stream = 0;
 		}
 	}
-	
+
 	return TB_TRUE;
 	// }
 }
-static tplat_bool_t tb_http_connect(tb_http_stream_t* st, tb_char_t const* host, tb_size_t port, tb_char_t const* path)
+static tb_bool_t tb_http_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
-	// connect to host
-	st->hsocket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
-	if (st->hsocket == TPLAT_INVALID_HANDLE) return TB_FALSE;
+	tb_http_stream_t* hst = st;
+	if (hst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	{
+		// get context
+		tb_http_context_t* ctx = st->pdata;
+		TB_ASSERT(ctx);
+		if (!ctx) return 0;
 
+
+
+		return TB_TRUE;
+	}
+	else return TB_FALSE;
+}
+static tplat_bool_t tb_http_try_connect(tb_http_stream_t* hst, tb_char_t const* host, tb_size_t port, tb_char_t const* path)
+{
+	// get context
+	tb_http_context_t* ctx = hst->base.pdata;
+	TB_ASSERT(ctx);
+	if (!ctx) return TB_FALSE;
+
+	// connect to host if not redirect
+	if (!ctx->is_redirect) hst->hsocket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
+
+	// check socket
+	TB_ASSERT(hst->hsocket != TB_INVALID_HANDLE);
+	if (hst->hsocket == TPLAT_INVALID_HANDLE) return TB_FALSE;
+	
 	// { format http request
 	tb_char_t request[4096];
+
+#if 0
 	tb_int_t request_n = snprintf(request, 4096,
-             "GET %s HTTP/1.1\r\n"
-             "Accept: */*\r\n"
-             "Range: bytes=%d-\r\n"
-             "Host: %s\r\n"
-             "Connection: close\r\n"
-             "\r\n", path, 0, host);
+			"GET %s HTTP/1.1\r\n"
+			"Accept: */*\r\n"
+			"Range: bytes=%d-\r\n"
+			"Host: %s\r\n"
+			"Connection: close\r\n"
+			"\r\n", path, 0, host);
+#else
+	tb_int_t request_n = snprintf(request, 4096,
+			"GET %s HTTP/1.1\r\n"
+			"Accept: */*\r\n"
+			"Host: %s\r\n"
+			"Connection: close\r\n"
+			"\r\n", path, host);
+#endif
+
 	if (request_n < 0 || request_n >= 4096) goto fail;
 	request[request_n] = 0;
 	//TB_HTTP_DBG("request: %s", request);
 
 	// send http request
-	if (TB_FALSE == tb_http_send(st->hsocket, request, request_n)) goto fail;
+	if (TB_FALSE == tb_http_send(hst->hsocket, request, request_n)) goto fail;
 
 	// {handle reply
 	tb_char_t ch = 0;
-	tb_char_t line[1024];
 	tb_size_t line_idx = 0;
+	tb_char_t* line = ctx->line;
 	tb_char_t* p = line;
 	while (1)
 	{
 		// recv char
-		ch = tb_http_recv_char(st->hsocket);
+		ch = tb_http_recv_char(hst->hsocket);
 
 		// is fail?
 		if (ch < 0) goto fail;
@@ -298,24 +366,75 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* st, tb_char_t const* host,
 			p = line;
 
 			// process line
-			if (TB_FALSE == tb_http_process_line(st, line, line_idx)) goto fail;
+			if (TB_FALSE == tb_http_process_line(ctx, line_idx)) goto fail;
 			line_idx++;
 		}
 		// append char to line
 		else 
 		{
-			if ((p - line) < sizeof(line) - 1)
+			if ((p - line) < TB_HTTP_LINE_MAX - 1)
 			*p++ = ch;
 		}
 	}
 
-	return st->hsocket;
+	return TB_TRUE;
 
 fail:
-	if (st->hsocket != TB_INVALID_HANDLE) tplat_socket_close(st->hsocket);
-	st->hsocket = TB_INVALID_HANDLE;
+	if (hst->hsocket != TB_INVALID_HANDLE) tplat_socket_close(hst->hsocket);
+	hst->hsocket = TB_INVALID_HANDLE;
 	return TB_FALSE;
 	// }}
+}
+static tplat_bool_t tb_http_connect(tb_http_stream_t* hst, tb_char_t const* url)
+{
+	// get context
+	tb_http_context_t* ctx = hst->base.pdata;
+	TB_ASSERT(ctx && url);
+	if (!ctx || !url) return TB_FALSE;
+
+	// the first url
+	strncpy(ctx->url, url, TB_HTTP_PATH_MAX - 1);
+	ctx->url[TB_HTTP_PATH_MAX - 1] = '\0';
+
+	tb_int_t try_n = 0;
+	do
+	{
+		// split url
+		tb_char_t host[1024];
+		tb_char_t path[2048];
+		tb_size_t port = tb_http_url_split(ctx->url, host, path);
+		if (!port) return TB_FALSE;
+		TB_HTTP_DBG("%s to http: %s:%d at %s.", ctx->is_redirect? "redirect" : "connect", host, port, path);
+
+		// reset status
+		ctx->filesize = 0;
+		ctx->is_redirect = 0;
+		ctx->is_stream = 1;
+	
+		// try connecting
+		if (TB_TRUE == tb_http_try_connect(hst, host, port, path) && !ctx->is_redirect) 
+		{
+			// save filesize
+			hst->size = ctx->filesize;
+
+#if 0
+			// is able to seek?
+			if (ctx->is_stream) hst->base.seek = TB_NULL;
+			else hst->base.seek = tb_http_stream_seek;
+#endif
+
+			TB_HTTP_DBG("filesize: %d", ctx->filesize);
+			TB_HTTP_DBG("is_stream: %d", ctx->is_stream);
+
+			return TB_TRUE;
+		}
+	
+		// update counter
+		try_n++;
+
+	} while(ctx->is_redirect);
+	
+	return TB_FALSE;
 }
 
 static tb_int_t tb_http_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
@@ -331,8 +450,14 @@ static void tb_http_stream_close(tb_stream_t* st)
 	tb_http_stream_t* hst = st;
 	if (hst)
 	{
+		// free context
+		if (st->pdata) tb_free(st->pdata);
+		st->pdata = TB_NULL;
+
+		// close socket
 		if (hst->hsocket != TB_INVALID_HANDLE) 
 			tplat_socket_close(hst->hsocket);
+		hst->hsocket = TB_INVALID_HANDLE;
 	}
 }
 static tb_size_t tb_http_stream_size(tb_stream_t* st)
@@ -349,27 +474,27 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	TB_ASSERT(st && url);
 	if (!st || !url) return TB_NULL;
 
-	// {split url
-	tb_char_t host[1024];
-	tb_char_t path[2048];
-	tb_size_t port = tb_http_url_split(url, host, path);
-	if (!port) return TB_NULL;
-	TB_HTTP_DBG("open http: %s:%d at %s.", host, port, path);
-
 	// init stream
 	memset(st, 0, sizeof(tb_http_stream_t));
-	st->base.flag = flag | TB_STREAM_FLAG_IS_STREAM;
+	st->base.flag = flag;
 	st->base.head = st->base.data;
 	st->base.size = 0;
 	st->base.offset = 0;
+	st->base.pdata = tb_malloc(sizeof(tb_http_context_t));
+	if (!st->base.pdata) return TB_NULL;
 
 	// init http stream
 	st->base.read = tb_http_stream_read;
 	st->base.close = tb_http_stream_close;
 	st->base.ssize = tb_http_stream_size;
 
+	// init http context
+	tb_http_context_t* ctx = st->base.pdata;
+	memset(ctx, 0, sizeof(tb_http_context_t));
+	ctx->is_stream = 1;
+
 	// connect to host
-	if (TB_FALSE == tb_http_connect(st, host, port, path)
+	if (TB_FALSE == tb_http_connect(st, url)
 		|| st->hsocket == TPLAT_INVALID_HANDLE) return TB_NULL;
 	TB_HTTP_DBG("connect ok!");
 

@@ -297,7 +297,17 @@ tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag
 		return TB_TRUE;
 
 	// adjust offset
-	if (st->flag & TB_STREAM_FLAG_IS_STREAM)
+	tb_size_t streamsize = tb_stream_size(st);
+	if (streamsize)
+	{
+		if (flag == TB_STREAM_SEEK_CUR) offset += st->offset;
+		else if (flag == TB_STREAM_SEEK_END) 
+		{
+			if (!streamsize) return TB_FALSE;
+			offset += streamsize;
+		}
+	}
+	else
 	{
 		if (flag == TB_STREAM_SEEK_BEG && st->offset > offset) return TB_FALSE;
 		else if (flag == TB_STREAM_SEEK_END && !offset) return TB_FALSE;
@@ -305,16 +315,6 @@ tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag
 		{
 			if (offset < 0) return TB_FALSE;
 			offset += st->offset;
-		}
-	}
-	else
-	{
-		if (flag == TB_STREAM_SEEK_CUR) offset += st->offset;
-		else if (flag == TB_STREAM_SEEK_END) 
-		{
-			tb_size_t size = tb_stream_size(st);
-			if (!size) return TB_FALSE;
-			offset += size;
 		}
 	}
 

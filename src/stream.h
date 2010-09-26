@@ -59,7 +59,6 @@ typedef enum __tb_stream_flag_t
 	TB_STREAM_FLAG_NULL 			= 0
 , 	TB_STREAM_FLAG_IS_ZLIB 			= 1
 , 	TB_STREAM_FLAG_IS_BLOCK 		= 2
-, 	TB_STREAM_FLAG_IS_STREAM 		= 4
 
 }tb_stream_flag_t;
 
@@ -83,6 +82,9 @@ typedef struct __tb_stream_t
 	tb_byte_t* 			head;
 	tb_size_t 			size;
 	tb_size_t 			offset;
+
+	// the private data
+	tb_byte_t* 			pdata;
 
 #ifdef TB_CONFIG_ZLIB
 
