@@ -17,30 +17,45 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		txt.c
  *
  */
-#ifndef TB_FORMAT_PREFIX_H
-#define TB_FORMAT_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../format.h"
-#include "../stream.h"
-#include "../math.h"
+#include "prefix.h"
+
+/* /////////////////////////////////////////////////////////
+ * types
+ */
 
 
+/* /////////////////////////////////////////////////////////
+ * details
+ */
 
-// c plus plus
-#ifdef __cplusplus
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_size_t tb_format_txt_probe(tb_stream_t* st)
+{
+	// compute the max need_n
+	tb_size_t need_n = TB_STREAM_DATA_MAX;
+	tb_size_t file_n = tb_stream_size(st);
+	if (file_n) need_n = TB_MATH_MIN(file_n, TB_STREAM_DATA_MAX);
+
+	// need it
+	tb_byte_t const* p = tb_stream_need(st, need_n);
+	if (!p) return 0;
+
+	// filter space
+	tb_byte_t const* e = p + need_n;
+	while (p < e && *p) p++;
+
+	// is utf-9 or ascii?
+	if (p == e) return 1;
+	else return 0;
 }
-#endif
-
-#endif

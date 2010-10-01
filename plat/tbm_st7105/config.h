@@ -11,11 +11,14 @@
 // asm
 //#define TB_CONFIG_ASM_ENABLE
 
-// regex
-#define TB_CONFIG_REGEX
-
 // encoding
 #define TB_CONFIG_ENCODING
+
+// xml
+#define TB_CONFIG_XML
+
+// regex
+#define TB_CONFIG_REGEX
 
 // jpeg
 #define TB_CONFIG_JPEG

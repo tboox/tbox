@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "bits.h"
+#include "string.h"
 
 #ifdef TB_CONFIG_ZLIB
 # 	include "zlib.h"
@@ -95,6 +96,9 @@ typedef struct __tb_stream_t
 	tb_byte_t 			zdata[TB_STREAM_ZDATA_MAX];
 
 #endif
+
+	// the url
+	tb_string_t 		url;
 
 	// the operations 
 	tb_int_t 			(*read)(struct __tb_stream_t* st, tb_byte_t* data, tb_size_t size);
@@ -169,6 +173,7 @@ tb_size_t 			tb_stream_size(tb_stream_t const* st);
 tb_size_t 			tb_stream_offset(tb_stream_t const* st);
 tb_stream_flag_t 	tb_stream_flag(tb_stream_t const* st);
 tb_bool_t 			tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag);
+tb_char_t const* 	tb_stream_url(tb_stream_t const* st);
 
 // c plus plus
 #ifdef __cplusplus

@@ -119,6 +119,9 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 	// parse host
 	if (TB_NULL == tb_regex_get(hregex, 1, host, TB_NULL)) goto fail;
 
+	// check host
+	if (host[0] == '/') goto fail;
+
 	if (hregex == hregex1 || hregex == hregex3)
 	{
 		// parse path
@@ -396,7 +399,7 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* hst, tb_char_t const* url)
 	strncpy(ctx->url, url, TB_HTTP_PATH_MAX - 1);
 	ctx->url[TB_HTTP_PATH_MAX - 1] = '\0';
 
-	tb_int_t try_n = 0;
+	tb_int_t try_n = 10;
 	do
 	{
 		// split url
@@ -417,6 +420,9 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* hst, tb_char_t const* url)
 			// save filesize
 			hst->size = ctx->filesize;
 
+			// save url
+			tb_string_assign_c_string_by_ref(&hst->base.url, ctx->url);
+
 #if 0
 			// is able to seek?
 			if (ctx->is_stream) hst->base.seek = TB_NULL;
@@ -430,7 +436,7 @@ static tplat_bool_t tb_http_connect(tb_http_stream_t* hst, tb_char_t const* url)
 		}
 	
 		// update counter
-		try_n++;
+		if (try_n-- <= 0) break;
 
 	} while(ctx->is_redirect);
 	
@@ -487,6 +493,9 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	st->base.read = tb_http_stream_read;
 	st->base.close = tb_http_stream_close;
 	st->base.ssize = tb_http_stream_size;
+
+	// init url
+	tb_string_init(&st->base.url);
 
 	// init http context
 	tb_http_context_t* ctx = st->base.pdata;

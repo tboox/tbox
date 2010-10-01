@@ -7,11 +7,14 @@ TB_CONFIG_ARCH 				= sh4
 # asm
 TB_CONFIG_ENABLE 			= n
 
-# regex
-TB_CONFIG_REGEX 			= y
-
 # encoding
 TB_CONFIG_ENCODING 			= y
+
+# xml
+TB_CONFIG_XML 				= y
+
+# regex
+TB_CONFIG_REGEX 			= y
 
 # jpeg
 TB_CONFIG_JPEG 				= y

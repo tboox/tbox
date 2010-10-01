@@ -101,7 +101,24 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 
 	// { open file
 	tplat_handle_t hfile = tplat_file_open(url, TPLAT_FILE_RW);
-	if (hfile == TPLAT_INVALID_HANDLE) return TB_NULL;
+	if (hfile == TPLAT_INVALID_HANDLE) 
+	{
+		// exists arguments: ?=...
+		tb_char_t const* p = url;
+		for (; *p != '?' && *p; p++) ;
+		if (!*p) return TB_NULL;
+
+		// try open url without arguments
+		tb_char_t s[4096];
+		tb_size_t n = p - url;
+		TB_ASSERT(n < 4096);
+		if (n >= 4096) return TB_NULL;
+		strncpy(s, url, n);
+		s[n] = '\0';
+
+		hfile = tplat_file_open(s, TPLAT_FILE_RW);
+		if (hfile == TPLAT_INVALID_HANDLE) return TB_NULL;
+	}
 
 	// init stream
 	memset(st, 0, sizeof(tb_file_stream_t));
@@ -109,6 +126,10 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 	st->base.head = st->base.data;
 	st->base.size = 0;
 	st->base.offset = 0;
+
+	// init url
+	tb_string_init(&st->base.url);
+	tb_string_assign_c_string(&st->base.url, url);
 
 	// init file stream
 	st->base.read = tb_file_stream_read;

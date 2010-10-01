@@ -60,7 +60,10 @@ tbox_C_FILES-$(TB_CONFIG_FORMAT) 	+= \
 									format$(_)gif \
 									format$(_)jpg \
 									format$(_)png \
-									format$(_)swf
+									format$(_)swf \
+									format$(_)xml \
+									format$(_)htm \
+									format$(_)txt 
 
 INC_FILES-$(TB_CONFIG_ENCODING) 	+= format.h
 

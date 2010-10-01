@@ -171,6 +171,9 @@ void tb_stream_close(tb_stream_t* st)
 		// close stream
 		if (st->close) st->close(st); 
 
+		// free url
+		tb_string_uninit(&st->url);
+
 #ifdef TB_CONFIG_ZLIB
 		// free hzlib
 		if (st->hzlib != TB_INVALID_HANDLE) tb_zlib_destroy(st->hzlib);
@@ -393,4 +396,8 @@ tb_stream_t* tb_stream_open(tb_generic_stream_t* st, tb_char_t const* url, tb_by
 	}
 
 	return TB_NULL;
+}
+tb_char_t const* tb_stream_url(tb_stream_t const* st)
+{
+	return tb_string_c_string(&st->url);
 }

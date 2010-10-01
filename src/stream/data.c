@@ -115,6 +115,9 @@ tb_stream_t* tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* dat
 	st->head = data;
 	st->size = size;
 
+	// init url
+	tb_string_init(&st->base.url);
+
 #ifdef TB_CONFIG_ZLIB
 	// is hzlib?
 	if (flag & TB_STREAM_FLAG_IS_ZLIB)

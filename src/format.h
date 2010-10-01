@@ -45,7 +45,7 @@ extern "C" {
  */
 
 // the format type
-typedef enum __tf_format_type_t
+typedef enum __tb_format_type_t
 {
 	TB_FORMAT_TYPE_NUL = 0
 
@@ -66,18 +66,24 @@ typedef enum __tf_format_type_t
 	// flash
 ,	TB_FORMAT_TYPE_SWF = 9
 
-}tf_format_type_t;
+	// text
+,	TB_FORMAT_TYPE_TXT = 10
+,	TB_FORMAT_TYPE_XML = 11
+,	TB_FORMAT_TYPE_HTM = 12
+
+}tb_format_type_t;
 
 // the format flag
-typedef enum __tf_format_flag_t
+typedef enum __tb_format_flag_t
 {
 	TB_FORMAT_FLAG_ALL = 0
-,	TB_FORMAT_FLAG_VIDEO = 1
-,	TB_FORMAT_FLAG_AUDIO = 2
-,	TB_FORMAT_FLAG_IMAGE = 4
-,	TB_FORMAT_FLAG_FLASH = 8
+,	TB_FORMAT_FLAG_TEXTT = 1
+,	TB_FORMAT_FLAG_VIDEO = 2
+,	TB_FORMAT_FLAG_AUDIO = 4
+,	TB_FORMAT_FLAG_IMAGE = 8
+,	TB_FORMAT_FLAG_FLASH = 16
 
-}tf_format_flag_t;
+}tb_format_flag_t;
 
 // the format type
 typedef struct __tb_format_t
@@ -120,6 +126,10 @@ tb_size_t 			tb_format_png_probe(tb_stream_t* st);
 // flash
 tb_size_t 			tb_format_swf_probe(tb_stream_t* st);
 
+// text
+tb_size_t 			tb_format_xml_probe(tb_stream_t* st);
+tb_size_t 			tb_format_htm_probe(tb_stream_t* st);
+tb_size_t 			tb_format_txt_probe(tb_stream_t* st);
 
 // c plus plus
 #ifdef __cplusplus

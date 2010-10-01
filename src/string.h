@@ -84,8 +84,13 @@ tb_uint16_t 		tb_string_size(tb_string_t const* string);
 tb_char_t 			tb_string_at(tb_string_t const* string, tb_int_t index);
 tb_bool_t 			tb_string_is_null(tb_string_t const* string);
 tb_bool_t 			tb_string_subat(tb_string_t const* string, tb_string_t* sub, tb_int_t start, tb_int_t size);
+
+// finders
 tb_int_t 			tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
 tb_int_t 			tb_string_find_string(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
+
+tb_int_t 			tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
+tb_int_t 			tb_string_find_string_nocase(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
 
 // modifiors
 tb_bool_t 			tb_string_resize(tb_string_t* string, tb_uint16_t size);

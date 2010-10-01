@@ -46,6 +46,9 @@ static tb_format_t g_formats[] =
 ,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_WAV, "wav", tb_format_wav_probe}
 ,	{TB_FORMAT_FLAG_AUDIO, TB_FORMAT_TYPE_MP3, "mp3", tb_format_mp3_probe}
 ,	{TB_FORMAT_FLAG_VIDEO, TB_FORMAT_TYPE_AVI, "avi", tb_format_avi_probe}
+,	{TB_FORMAT_FLAG_TEXTT, TB_FORMAT_TYPE_XML, "xml", tb_format_xml_probe}
+,	{TB_FORMAT_FLAG_TEXTT, TB_FORMAT_TYPE_HTM, "htm", tb_format_htm_probe}
+,	{TB_FORMAT_FLAG_TEXTT, TB_FORMAT_TYPE_TXT, "txt", tb_format_txt_probe}
 
 };
 
@@ -58,6 +61,7 @@ tb_format_t const* tb_format_probe(tb_stream_t* st, tb_size_t flag)
 	if (!st) return TB_NULL;
 
 	tb_size_t score_max = 0;
+	tb_size_t score_total = 0;
 	tb_format_t const* format = TB_NULL;
 
 	// probe format
@@ -72,6 +76,9 @@ tb_format_t const* tb_format_probe(tb_stream_t* st, tb_size_t flag)
 			tb_size_t score = 0;
 			if (g_formats[i].probe) score = g_formats[i].probe(st);
 
+			// compute the total score
+			score_total += score;
+
 			// save the best format
 			if (score > score_max)
 			{
@@ -84,5 +91,9 @@ tb_format_t const* tb_format_probe(tb_stream_t* st, tb_size_t flag)
 		}
 	}
 
+	// no match format
+	if (!score_total) return TB_NULL;
+
+	TB_DBG("match: %d%%", score_max * 100 / score_total);
 	return format;
 }
