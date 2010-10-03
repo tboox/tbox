@@ -17,36 +17,42 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		bswap.c
+ * \file		attribute.h
  *
  */
+#ifndef TB_XML_ATTRIBUTE_H
+#define TB_XML_ATTRIBUTE_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "bswap.h"
+#include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
-
-/* /////////////////////////////////////////////////////////
- * interfaces 
+/* the xml attribute type
+ *
+ * inherit node, 
+ * but since they are not actually child nodes of the element they describe, 
+ * the DOM does not consider them part of the document tree.
  */
-void tb_bswap_u16(tb_uint16_t* data)
+typedef struct __tb_xml_attribute_t
 {
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b = p[0];
-	p[0] = p[1];
-	p[1] = b;
+	// the node base
+	tb_xml_node_t 			base;
+
+}tb_xml_attribute_t;
+
+// c plus plus
+#ifdef __cplusplus
 }
-void tb_bswap_u32(tb_uint32_t* data)
-{
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b0 = p[0];
-	tb_byte_t b1 = p[1];
-	p[0] = p[3];
-	p[1] = p[2];
-	p[3] = b0;
-	p[2] = b1;
-}
+#endif
+
+#endif

@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with TGraphic; 
+ * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-
 
 // c plus plus
 #ifdef __cplusplus

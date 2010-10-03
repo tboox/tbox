@@ -17,36 +17,54 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		bswap.c
+ * \file		reader.h
  *
  */
+#ifndef TB_XML_READER_H
+#define TB_XML_READER_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "bswap.h"
+#include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
 
+// the xml reader - StAX
+typedef struct __tb_xml_reader_t
+{
+	// the stream
+	tb_stream_t* 			st;
+	tb_bool_t 				st_owner;
+
+
+}tb_xml_reader_t;
+
+
 /* /////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
-void tb_bswap_u16(tb_uint16_t* data)
-{
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b = p[0];
-	p[0] = p[1];
-	p[1] = b;
+
+// open & close
+tb_xml_reader_t* 		tb_xml_reader_open_from_stream(tb_stream_t* st);
+tb_xml_reader_t* 		tb_xml_reader_open_from_data(tb_byte_t const* data, tb_size_t size);
+tb_xml_reader_t* 		tb_xml_reader_open_from_file(tb_char_t const* url);
+tb_xml_reader_t* 		tb_xml_reader_open_from_http(tb_char_t const* url);
+tb_xml_reader_t* 		tb_xml_reader_open_from_url(tb_char_t const* url);
+void 					tb_xml_reader_close(tb_xml_reader_t* reader);
+
+
+// c plus plus
+#ifdef __cplusplus
 }
-void tb_bswap_u32(tb_uint32_t* data)
-{
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b0 = p[0];
-	tb_byte_t b1 = p[1];
-	p[0] = p[3];
-	p[1] = p[2];
-	p[3] = b0;
-	p[2] = b1;
-}
+#endif
+
+#endif

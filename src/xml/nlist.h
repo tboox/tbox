@@ -17,36 +17,53 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		bswap.c
+ * \file		nlist.h
  *
  */
+#ifndef TB_XML_NLIST_H
+#define TB_XML_NLIST_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "bswap.h"
+#include "prefix.h"
+#include "node.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * types
  */
+
+// the xml nlist type
+typedef struct __tb_xml_nlist_t
+{
+	tb_xml_node_t* 	head;
+	tb_xml_node_t* 	tail;
+	tb_size_t 		size;
+
+}tb_xml_nlist_t;
 
 
 /* /////////////////////////////////////////////////////////
- * interfaces 
+ * interfaces
  */
-void tb_bswap_u16(tb_uint16_t* data)
-{
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b = p[0];
-	p[0] = p[1];
-	p[1] = b;
+
+tb_xml_nlist_t* tb_nlist_create();
+void 			tb_nlist_destroy(tb_xml_nlist_t* nlist);
+
+tb_xml_node_t* 	tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index);
+tb_xml_node_t* 	tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name);
+tb_xml_node_t* 	tb_xml_nlist_del(tb_xml_nlist_t* nlist, tb_char_t const* name);
+tb_xml_node_t* 	tb_xml_nlist_set(tb_xml_nlist_t* nlist, tb_xml_node_t const* node);
+
+
+// c plus plus
+#ifdef __cplusplus
 }
-void tb_bswap_u32(tb_uint32_t* data)
-{
-	tb_byte_t* p = (tb_byte_t*)data;
-	tb_byte_t b0 = p[0];
-	tb_byte_t b1 = p[1];
-	p[0] = p[3];
-	p[1] = p[2];
-	p[3] = b0;
-	p[2] = b1;
-}
+#endif
+
+#endif
