@@ -43,16 +43,20 @@ extern "C" {
 #include "stream.h"
 #include "external/external.h"
 
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
-
 #ifdef TB_CONFIG_ENCODING
 # 	include "encoding.h"
 #endif
 
 #ifdef TB_CONFIG_FORMAT
 # 	include "format.h"
+#endif
+
+#ifdef TB_CONFIG_XML
+# 	include "xml/xml.h"
+#endif
+
+#ifdef TB_CONFIG_REGEX
+# 	include "regex.h"
 #endif
 
 #ifdef TB_CONFIG_ZLIB

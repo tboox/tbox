@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "node.h"
 #include "reader.h"
 #include "writer.h"
 
@@ -71,22 +72,15 @@ typedef struct __tb_xml_document_t
 tb_xml_document_t* 	tb_xml_document_create();
 void 				tb_xml_document_destroy(tb_xml_document_t* document);
 
-// load document
-tb_bool_t 			tb_xml_document_load_stream(tb_xml_document_t* document, tb_stream_t* st);
-tb_bool_t 			tb_xml_document_load_data(tb_xml_document_t* document,tb_byte_t const* data, tb_size_t size);
-tb_bool_t 			tb_xml_document_load_file(tb_xml_document_t* document,tb_char_t const* url);
-tb_bool_t 			tb_xml_document_load_http(tb_xml_document_t* document,tb_char_t const* url);
-tb_bool_t 			tb_xml_document_load_url(tb_xml_document_t* document,tb_char_t const* url);
-
-// store document
-tb_bool_t 			tb_xml_document_store_stream(tb_xml_document_t* document, tb_stream_t* st);
-tb_bool_t 			tb_xml_document_store_data(tb_xml_document_t* document,tb_byte_t const* data, tb_size_t size);
-tb_bool_t 			tb_xml_document_store_file(tb_xml_document_t* document,tb_char_t const* url);
-tb_bool_t 			tb_xml_document_store_http(tb_xml_document_t* document,tb_char_t const* url);
-tb_bool_t 			tb_xml_document_store_url(tb_xml_document_t* document,tb_char_t const* url);
+// load & store
+tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st);
+tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st);
 
 // modifiors
 void 				tb_xml_document_clear(tb_xml_document_t* document);
+
+// debug
+tb_bool_t 			tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st);
 
 // c plus plus
 #ifdef __cplusplus

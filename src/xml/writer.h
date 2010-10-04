@@ -43,7 +43,6 @@ typedef struct __tb_xml_writer_t
 {
 	// the stream
 	tb_stream_t* 			st;
-	tb_bool_t 				st_owner;
 
 
 }tb_xml_writer_t;
@@ -54,11 +53,7 @@ typedef struct __tb_xml_writer_t
  */
 
 // open & close
-tb_xml_writer_t* 		tb_xml_writer_open_from_stream(tb_stream_t* st);
-tb_xml_writer_t* 		tb_xml_writer_open_from_data(tb_byte_t const* data, tb_size_t size);
-tb_xml_writer_t* 		tb_xml_writer_open_from_file(tb_char_t const* url);
-tb_xml_writer_t* 		tb_xml_writer_open_from_http(tb_char_t const* url);
-tb_xml_writer_t* 		tb_xml_writer_open_from_url(tb_char_t const* url);
+tb_xml_writer_t* 		tb_xml_writer_open(tb_stream_t* st);
 void 					tb_xml_writer_close(tb_xml_writer_t* writer);
 
 

@@ -24,14 +24,14 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "writer.h"
 
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_xml_writer_t* tb_xml_writer_open_from_stream(tb_stream_t* st)
+tb_xml_writer_t* tb_xml_writer_open(tb_stream_t* st)
 {
 	TB_ASSERT(st);
 	if (!st) return TB_NULL;
@@ -43,57 +43,16 @@ tb_xml_writer_t* tb_xml_writer_open_from_stream(tb_stream_t* st)
 	// init it
 	memset(writer, 0, sizeof(tb_xml_writer_t));
 	writer->st = st;
-	writer->st_owner = TB_FALSE;
 
 	return writer;
 }
-tb_xml_writer_t* tb_xml_writer_open_from_data(tb_byte_t const* data, tb_size_t size)
-{
-	TB_ASSERT(data && size);
-	if (!data || !size) return TB_NULL;
 
-	tb_data_stream_t dst;
-	tb_xml_writer_t* writer = tb_xml_writer_open_from_stream(tb_stream_open_from_data(&dst, data, size, TB_STREAM_FLAG_IS_BLOCK));
-	if (writer) writer->st_owner = TB_TRUE;
-	return writer;
-}
-tb_xml_writer_t* tb_xml_writer_open_from_file(tb_char_t const* url)
-{
-	TB_ASSERT(url);
-	if (!url) return TB_NULL;
-
-	tb_file_stream_t fst;
-	tb_xml_writer_t* writer = tb_xml_writer_open_from_stream(tb_stream_open_from_file(&fst, url, TB_STREAM_FLAG_IS_BLOCK));
-	if (writer) writer->st_owner = TB_TRUE;
-	return writer;
-}
-tb_xml_writer_t* tb_xml_writer_open_from_http(tb_char_t const* url)
-{
-	TB_ASSERT(url);
-	if (!url) return TB_NULL;
-
-	tb_http_stream_t hst;
-	tb_xml_writer_t* writer = tb_xml_writer_open_from_stream(tb_stream_open_from_http(&hst, url, TB_STREAM_FLAG_IS_BLOCK));
-	if (writer) writer->st_owner = TB_TRUE;
-	return writer;
-}
-tb_xml_writer_t* tb_xml_writer_open_from_url(tb_char_t const* url)
-{
-	TB_ASSERT(url);
-	if (!url) return TB_NULL;
-
-	tb_generic_stream_t gst;
-	tb_xml_writer_t* writer = tb_xml_writer_open_from_stream(tb_stream_open(&gst, url, TB_NULL, 0, TB_STREAM_FLAG_IS_BLOCK));
-	if (writer) writer->st_owner = TB_TRUE;
-	return writer;
-}
 void tb_xml_writer_close(tb_xml_writer_t* writer)
 {
 	if (writer)
 	{
-		// close stream
-		if (writer->st && writer->st_owner == TB_TRUE) 
-			tb_stream_close(writer->st);
+		// detach stream
+		writer->st = TB_NULL;
 
 		// free it
 		tb_free(writer);

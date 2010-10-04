@@ -68,10 +68,10 @@ typedef struct __tb_xml_node_t
 	tb_size_t 					type;
 
 	// the node name
-	tb_char_t const* 			name;
+	tb_string_t 				name;
 
 	// the node value
-	tb_char_t* 					value;
+	tb_string_t 				value;
 
 	// the reference to the document
 	void* 						document;

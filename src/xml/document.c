@@ -24,19 +24,21 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "document.h"
 
 /* /////////////////////////////////////////////////////////
- * details
+ * macros
  */
-static tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_xml_reader_t* reader)
-{
-	return TB_FALSE;
-}
-static tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_xml_writer_t* writer)
-{
-	return TB_FALSE;
-}
+#ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
+#if 1
+# 	define TB_DOCUMENT_DBG(fmt, arg...) 			TB_DBG("[xml]: " fmt, ##arg)
+#else
+# 	define TB_DOCUMENT_DBG(fmt, arg...)
+#endif
+
+#else
+# 	define TB_DOCUMENT_DBG
+#endif
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -62,46 +64,96 @@ void tb_xml_document_destroy(tb_xml_document_t* document)
 	}
 }
 
-tb_bool_t tb_xml_document_load_stream(tb_xml_document_t* document, tb_stream_t* st)
+#ifdef TB_DEBUG
+
+tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st)
 {
-	return tb_xml_document_load(document, tb_xml_reader_open_from_stream(st));
+	TB_ASSERT(document);
+	if (!document) return TB_FALSE;
+
+	// open reader
+	tb_xml_reader_t* reader = tb_xml_reader_open(st);
+	TB_ASSERT(reader);
+	if (!reader) return TB_FALSE;
+
+	// init return
+	tb_bool_t ret = TB_TRUE;
+
+	// has event?
+	while (TB_TRUE == tb_xml_reader_has_next(reader))
+	{
+		// get event type
+		tb_size_t event = tb_xml_reader_get_event(reader);
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_DOCUMENT_BEG: 
+			{
+				tb_char_t const* version = tb_xml_reader_get_version(reader);
+				tb_char_t const* encoding = tb_xml_reader_get_encoding(reader);
+				tplat_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n", version? version : "", encoding? encoding : "");
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+			{
+				tb_char_t const* name = tb_xml_reader_get_element_name(reader);
+				tplat_printf("<%s>", name? name : "");
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				tb_char_t const* name = tb_xml_reader_get_element_name(reader);
+				tplat_printf("</%s>", name? name : "");
+			}
+			break;
+		case TB_XML_READER_EVENT_CHARACTERS: 
+			{
+				tb_char_t const* text = tb_xml_reader_get_characters_text(reader);
+				tplat_printf("%s", text? text : "");
+			}
+			break;
+		case TB_XML_READER_EVENT_COMMENT: 
+			{
+				tb_char_t const* text = tb_xml_reader_get_comment_text(reader);
+				tplat_printf("<!--%s-->", text? text : "");
+			}
+			break;
+		default: break;
+		}
+
+		// next event
+		tb_xml_reader_next(reader);
+	}
+
+	tplat_printf("\n");
+
+end:
+	// close reader
+	if (reader) tb_xml_reader_close(reader);
+
+	return ret;
 }
-tb_bool_t tb_xml_document_load_data(tb_xml_document_t* document,tb_byte_t const* data, tb_size_t size)
+#endif
+
+tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st)
 {
-	return tb_xml_document_load(document, tb_xml_reader_open_from_data(st, data, size));
-}
-tb_bool_t tb_xml_document_load_file(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_load(document, tb_xml_reader_open_from_file(st, url));
-}
-tb_bool_t tb_xml_document_load_http(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_load(document, tb_xml_reader_open_from_http(st, url));
-}
-tb_bool_t tb_xml_document_load_url(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_load(document, tb_xml_reader_open_from_url(st, url));
+	TB_ASSERT(document);
+	if (!document) return TB_FALSE;
+
+	// open reader
+	tb_xml_reader_t* reader = tb_xml_reader_open(st);
+	TB_ASSERT(reader);
+	if (!reader) return TB_FALSE;
+
+	// init return
+	tb_bool_t ret = TB_TRUE;
+
+
+	return ret;
 }
 
-tb_bool_t tb_xml_document_store_stream(tb_xml_document_t* document, tb_stream_t* st)
+tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st)
 {
-	return tb_xml_document_store(document, tb_xml_writer_open_from_stream(st));
-}
-tb_bool_t tb_xml_document_store_data(tb_xml_document_t* document,tb_byte_t const* data, tb_size_t size)
-{
-	return tb_xml_document_store(document, tb_xml_writer_open_from_data(st, data, size));
-}
-tb_bool_t tb_xml_document_store_file(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_store(document, tb_xml_writer_open_from_file(st, url));
-}
-tb_bool_t tb_xml_document_store_http(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_store(document, tb_xml_writer_open_from_http(st, url));
-}
-tb_bool_t tb_xml_document_store_url(tb_xml_document_t* document,tb_char_t const* url)
-{
-	return tb_xml_document_store(document, tb_xml_writer_open_from_url(st, url));
+	return TB_FALSE;
 }
 
 void tb_xml_document_clear(tb_xml_document_t* document)

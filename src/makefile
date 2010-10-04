@@ -67,6 +67,23 @@ tbox_C_FILES-$(TB_CONFIG_FORMAT) 	+= \
 
 INC_FILES-$(TB_CONFIG_ENCODING) 	+= format.h
 
+
+# xml files
+tbox_C_FILES-$(TB_CONFIG_XML) 		+= \
+									xml$(_)document \
+									xml$(_)reader \
+									xml$(_)writer 
+
+INC_FILES-$(TB_CONFIG_ENCODING) 	+= \
+									prefix.h \
+									document.h \
+									element.h \
+									attribute.h \
+									node.h \
+									reader.h \
+									writer.h \
+									nlist.h
+
 # zlib files
 zlib_C_FILES 		= \
 					adler32 \

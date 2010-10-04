@@ -32,6 +32,8 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
+#include "../stream.h"
+#include "../string.h"
 
 // c plus plus
 #ifdef __cplusplus
