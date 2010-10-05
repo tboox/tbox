@@ -76,18 +76,18 @@ typedef struct __tb_xml_node_t
 	// the reference to the document
 	void* 						document;
 
-	// the attributes
-	struct __tb_xml_nlist_t* 	attributes;
-
-	// the child nodes
-	struct __tb_xml_nlist_t* 	childs;
-
 	// the next & prev
 	struct __tb_xml_node_t* 	prev;
 	struct __tb_xml_node_t* 	next;
 
 	// the parent node
 	struct __tb_xml_node_t* 	parent;
+
+	// the attributes
+	struct __tb_xml_nlist_t* 	attributes;
+
+	// the child nodes
+	struct __tb_xml_nlist_t* 	childs;
 
 }tb_xml_node_t;
 

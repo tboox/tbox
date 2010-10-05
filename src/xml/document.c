@@ -96,7 +96,20 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 		case TB_XML_READER_EVENT_ELEMENT_BEG: 
 			{
 				tb_char_t const* name = tb_xml_reader_get_element_name(reader);
-				tplat_printf("<%s>", name? name : "");
+				tb_size_t n = tb_xml_reader_get_attribute_count(reader);
+				if (!n) tplat_printf("<%s>", name? name : "");
+				else
+				{
+					tplat_printf("<%s", name? name : "");
+					tb_int_t i = 0;
+					for (i = 0; i < n; i++)
+					{
+						tb_char_t const* name = tb_xml_reader_get_attribute_name(reader, i);
+						tb_char_t const* value = tb_xml_reader_get_attribute_value_by_index(reader, i);
+						if (name && value) tplat_printf(" %s = \"%s\"", name? name : "", value? value : "");
+					}
+					tplat_printf(">");
+				}
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 

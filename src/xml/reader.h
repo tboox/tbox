@@ -33,6 +33,17 @@ extern "C" {
  */
 #include "prefix.h"
 #include "nlist.h"
+#include "attribute.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#ifdef TB_MEMORY_MODE_SMALL
+# 	define TB_XML_ATTRIBUTES_MAX 		(256)
+#else
+# 	define TB_XML_ATTRIBUTES_MAX 		(512)
+#endif
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -88,8 +99,8 @@ typedef struct __tb_xml_reader_t
 	tb_string_t 			text;
 
 	// the attributes
-	tb_xml_nlist_t* 		attributes;
-
+	tb_xml_attribute_t 		attributes[TB_XML_ATTRIBUTES_MAX];
+	tb_size_t 				attributes_n;
 
 }tb_xml_reader_t;
 
@@ -115,7 +126,8 @@ tb_char_t const* 		tb_xml_reader_get_comment_text(tb_xml_reader_t* reader);
 tb_char_t const* 		tb_xml_reader_get_element_name(tb_xml_reader_t* reader);
 tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);
 tb_char_t const* 		tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);
-tb_char_t const* 		tb_xml_reader_get_attribute_value(tb_xml_reader_t* reader, tb_int_t index);
+tb_char_t const* 		tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);
+tb_char_t const* 		tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);
 
 // c plus plus
 #ifdef __cplusplus

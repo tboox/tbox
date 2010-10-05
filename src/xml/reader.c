@@ -117,29 +117,7 @@ static tb_char_t const* tb_xml_reader_parse_text(tb_xml_reader_t* reader)
 	}
 	return TB_NULL;
 }
-static tb_char_t const* tb_xml_reader_parse_keyvalue(tb_string_t const* data, tb_char_t const* key, tb_string_t* value)
-{
-	TB_ASSERT(data && key);
-	if (!data || !key || !value) return TB_NULL;
 
-	// find key
-	tb_int_t pos = tb_string_find_c_string(data, key, 0);
-	if (pos < 0) return TB_NULL;
-
-	// find the begin: "
-	tb_int_t pos_b = tb_string_find_c_string(data, "\"", pos + strlen(key));
-	if (pos_b < 0) return TB_NULL;
-
-	// find the end: "
-	tb_int_t pos_e = tb_string_find_c_string(data, "\"", ++pos_b);
-	if (pos_e < 0) return TB_NULL;
-
-	// get value
-	if (TB_FALSE == tb_string_subat(data, value, pos_b, pos_e - pos_b))
-		return TB_NULL;
-
-	return tb_string_c_string(value);
-}
 /* /////////////////////////////////////////////////////////
  * interfaces: open & close
  */
@@ -165,6 +143,16 @@ tb_xml_reader_t* tb_xml_reader_open(tb_stream_t* st)
 	tb_string_init(&reader->element);
 	tb_string_init(&reader->name);
 	tb_string_init(&reader->text);
+
+	// init attributes
+	tb_int_t i = 0;
+	reader->attributes_n = 0;
+	for (i = 0; i < TB_XML_ATTRIBUTES_MAX; i++)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
+		tb_string_init(&node->name);
+		tb_string_init(&node->value);
+	}
 
 	// reader the first event
 	tb_xml_reader_next(reader);
@@ -193,6 +181,15 @@ void tb_xml_reader_close(tb_xml_reader_t* reader)
 	
 		// free text
 		tb_string_uninit(&reader->encoding);
+
+		// free attributes
+		tb_int_t i = 0;
+		for (i = 0; i < TB_XML_ATTRIBUTES_MAX; i++)
+		{
+			tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
+			tb_string_uninit(&node->name);
+			tb_string_uninit(&node->value);
+		}
 
 		// free it
 		tb_free(reader);
@@ -234,11 +231,20 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 			&& element[2] == 'm'
 			&& element[3] == 'l')
 		{
-			// parse version & encoding
-			tb_char_t const* version = tb_xml_reader_parse_keyvalue(&reader->element, "version", &reader->version);
-			tb_char_t const* encoding = tb_xml_reader_parse_keyvalue(&reader->element, "encoding", &reader->encoding);
+			// parse attributes
+			tb_size_t n = tb_xml_reader_get_attribute_count(reader);
+			TB_ASSERT(n);
+			if (!n) goto end;
+
+			// get version & encoding
+			tb_char_t const* version = tb_xml_reader_get_attribute_value_by_name(reader, "version");
+			tb_char_t const* encoding = tb_xml_reader_get_attribute_value_by_name(reader, "encoding");
 			TB_ASSERT(version && encoding);
 			if (!version || !encoding) goto end;
+
+			// save version & encoding
+			tb_string_assign_c_string(&reader->version, version);
+			tb_string_assign_c_string(&reader->encoding, encoding);
 
 			// seek to the first element
 			tb_xml_reader_parse_text(reader);
@@ -364,13 +370,63 @@ tb_char_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 }
 tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 {
-	return 0;
+	// clear attributes
+	reader->attributes_n = 0;
+
+	// get element
+	tb_char_t const* p = tb_string_c_string(&reader->element);
+	tb_char_t const* e = p + tb_string_size(&reader->element);
+
+	// parser attributes
+	tb_int_t is_key = 1;
+	tb_string_t s;
+	tb_string_init(&s);
+	for (; p < e && *p; p++)
+	{
+		tb_char_t ch = *p;
+		if (isspace(ch)|| ch == '=' || p == e - 1)
+		{
+			tb_xml_node_t* node = (tb_xml_node_t*)&reader->attributes[reader->attributes_n];
+			if (is_key) tb_string_assign(&node->name, &s);
+			else
+			{
+				tb_string_assign(&node->value, &s);
+				reader->attributes_n++;
+				is_key = 1;
+			}
+			tb_string_clear(&s);
+			if (ch == '=') is_key = 0;
+		}
+		else if (ch != '\"' && ch != '\'') tb_string_append_char(&s, ch);
+	}
+	tb_string_uninit(&s);
+
+	return reader->attributes_n;
 }
 tb_char_t const* tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index)
 {
-	return TB_NULL;
+	TB_ASSERT(reader && index < reader->attributes_n);
+	if (!reader || index >= reader->attributes_n) return TB_NULL;
+
+	return tb_string_c_string(&reader->attributes[index].base.name);
 }
-tb_char_t const* tb_xml_reader_get_attribute_value(tb_xml_reader_t* reader, tb_int_t index)
+tb_char_t const* tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index)
 {
+	TB_ASSERT(reader && index < reader->attributes_n);
+	if (!reader || index >= reader->attributes_n) return TB_NULL;
+
+	return tb_string_c_string(&reader->attributes[index].base.value);
+}
+tb_char_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name)
+{
+	TB_ASSERT(reader && reader->attributes_n);
+	if (!reader || !reader->attributes_n) return TB_NULL;
+
+	tb_int_t i = 0;
+	for (i = 0; i < reader->attributes_n; i++)
+	{
+		if (tb_string_compare_c_string(&reader->attributes[i].base.name, name) == TB_TRUE)
+			return tb_string_c_string(&reader->attributes[i].base.value);
+	}
 	return TB_NULL;
 }
