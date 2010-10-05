@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:CommandSheet gameId="K77" playerId="Marco" turn="1" xmlns:tns="http://www.example.com/SpaceWarGame" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.com/SpaceWarGame SpaceWarGame.xsd ">
+  <commands>
+    <move subjectId="Chimera">
+      <point x="120.0" y="40.0"/>
+      <point x="128.0" y="40.0"/>
+      <point x="128.0" y="60.0"/>
+    </move>    
+    <move subjectId="Hydra-II">
+      <point x="140.0" y="70.0"/>
+      <point x="135.0" y="63.0"/>
+      <point x="130.0" y="60.0"/>
+    </move>        
+    <attack subjectId="Chimera" weapon="ion cannon" power="14" targetId="Mantis"/>
+    <attack subjectId="Hydra-II" weapon="photon torpedo" power="6" targetId="Mantis"/>    
+    <transmit subjectId="Chimera" kind="threat" to="Mantis">
+      <text>Hey Fred! Leave this sector or I'll take out your battle ship!!!</text>
+    </transmit>
+  </commands>
+</tns:CommandSheet>

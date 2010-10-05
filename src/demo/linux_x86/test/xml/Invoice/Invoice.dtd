@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT Invoice (Header,Item+)>
+<!ELEMENT Header (Date,BillTo)>
+<!ATTLIST Header
+ invoiceNumber CDATA #REQUIRED
+>
+<!ELEMENT Item (description*)>
+<!ATTLIST Item
+ price CDATA #REQUIRED
+ discount (promotion | regular) "regular"
+>
+<!ELEMENT Date ((Month,Day,Year)|(Day,Month,Year))>
+<!ELEMENT BillTo (Address)>
+<!ATTLIST BillTo
+ custNumber ID #REQUIRED
+ name CDATA #IMPLIED
+ phone CDATA #IMPLIED
+>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT Address (street1,street2?,city,(state|province),zip,country?)>
+<!ELEMENT street1 (#PCDATA)>
+<!ELEMENT street2 (#PCDATA)>
+<!ELEMENT city (#PCDATA)>
+<!ELEMENT state (#PCDATA)>
+<!ELEMENT province (#PCDATA)>
+<!ELEMENT zip (#PCDATA)>
+<!ELEMENT country (#PCDATA)>
+<!ELEMENT Month (#PCDATA)>
+<!ELEMENT Day (#PCDATA)>
+<!ELEMENT Year (#PCDATA)>

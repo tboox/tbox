@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+        targetNamespace="http://www.eclipse.org/webtools/Catalogue" xmlns:c="http://www.eclipse.org/webtools/Catalogue">
+
+	<complexType name="PublicationType">
+		<sequence>
+			<element name="title" type="string"></element>
+			<element name="author" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+			<element name="date" type="gYear"></element>
+		</sequence>
+	</complexType>
+	
+	<complexType name="BookType">
+		<complexContent>
+			<extension base="c:PublicationType">
+			    <sequence>
+                    <element name="isbn" type="string" />
+					<element name="publisher" type="string"/>
+                </sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	
+	<complexType name="MagazineType">
+		<complexContent>			
+			<restriction base="c:PublicationType">
+				<sequence>
+                    <element name="title" type="string" />
+					<element name="author" type="string" minOccurs="0" maxOccurs="0"/>
+					<element name="date" type="gYear"></element>
+				</sequence>
+			</restriction>
+		</complexContent>
+	</complexType>
+	
+	<element name="Publication" type="c:PublicationType" abstract="true"></element>
+	
+	<element name="Book" type="c:BookType" substitutionGroup="c:Publication"></element>
+
+	<element name="Magazine" type="c:MagazineType" substitutionGroup="c:Publication"></element>
+	
+	<element name="Catalogue">
+		<complexType>
+			<sequence>
+				<element ref="c:Publication" maxOccurs="unbounded"></element>
+			</sequence>
+		</complexType>
+	</element>
+	
+</schema>

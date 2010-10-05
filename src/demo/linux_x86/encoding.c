@@ -62,8 +62,8 @@ int main(int argc, char** argv)
 	{
 		tplat_printf("conv(%d): %s\n", src_n, src);
 		tplat_char_t dst[4096];
-		dst_n = tb_encoding_convert_string(TB_ENCODING_UTF8, TB_ENCODING_GB2312, src, src_n, dst, 4096);
-		//dst_n = tb_encoding_convert_string(TB_ENCODING_GB2312, TB_ENCODING_UTF8, src, src_n, dst, 4096);
+		//dst_n = tb_encoding_convert_string(TB_ENCODING_UTF8, TB_ENCODING_GB2312, src, src_n, dst, 4096);
+		dst_n = tb_encoding_convert_string(TB_ENCODING_GB2312, TB_ENCODING_UTF8, src, src_n, dst, 4096);
 		if (dst_n > 0)
 		{
 			tplat_printf("result(%d): %s\n", dst_n, dst);

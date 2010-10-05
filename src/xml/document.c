@@ -86,16 +86,16 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 		tb_size_t event = tb_xml_reader_get_event(reader);
 		switch (event)
 		{
-		case TB_XML_READER_EVENT_DOCUMENT_BEG: 
+		case TB_XML_READER_EVENT_DOCUMENT: 
 			{
-				tb_char_t const* version = tb_xml_reader_get_version(reader);
-				tb_char_t const* encoding = tb_xml_reader_get_encoding(reader);
+				tb_char_t const* version = tb_string_c_string(tb_xml_reader_get_version(reader));
+				tb_char_t const* encoding = tb_string_c_string(tb_xml_reader_get_encoding(reader));
 				tplat_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n", version? version : "", encoding? encoding : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_BEG: 
 			{
-				tb_char_t const* name = tb_xml_reader_get_element_name(reader);
+				tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
 				tb_size_t n = tb_xml_reader_get_attribute_count(reader);
 				if (!n) tplat_printf("<%s>", name? name : "");
 				else
@@ -104,8 +104,8 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 					tb_int_t i = 0;
 					for (i = 0; i < n; i++)
 					{
-						tb_char_t const* name = tb_xml_reader_get_attribute_name(reader, i);
-						tb_char_t const* value = tb_xml_reader_get_attribute_value_by_index(reader, i);
+						tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_attribute_name(reader, i));
+						tb_char_t const* value = tb_string_c_string(tb_xml_reader_get_attribute_value_by_index(reader, i));
 						if (name && value) tplat_printf(" %s = \"%s\"", name? name : "", value? value : "");
 					}
 					tplat_printf(">");
@@ -114,19 +114,25 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
-				tb_char_t const* name = tb_xml_reader_get_element_name(reader);
+				tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
 				tplat_printf("</%s>", name? name : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_CHARACTERS: 
 			{
-				tb_char_t const* text = tb_xml_reader_get_characters_text(reader);
+				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_characters_text(reader));
 				tplat_printf("%s", text? text : "");
+			}
+			break;
+		case TB_XML_READER_EVENT_CDATA: 
+			{
+				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_cdata_text(reader));
+				tplat_printf("<![CDATA[%s]]>", text? text : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_COMMENT: 
 			{
-				tb_char_t const* text = tb_xml_reader_get_comment_text(reader);
+				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_comment_text(reader));
 				tplat_printf("<!--%s-->", text? text : "");
 			}
 			break;
@@ -137,9 +143,9 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 		tb_xml_reader_next(reader);
 	}
 
+end:
 	tplat_printf("\n");
 
-end:
 	// close reader
 	if (reader) tb_xml_reader_close(reader);
 

@@ -231,26 +231,26 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 			&& element[2] == 'm'
 			&& element[3] == 'l')
 		{
+			// update event
+			reader->event = TB_XML_READER_EVENT_DOCUMENT;
+
 			// parse attributes
 			tb_size_t n = tb_xml_reader_get_attribute_count(reader);
 			TB_ASSERT(n);
 			if (!n) goto end;
 
 			// get version & encoding
-			tb_char_t const* version = tb_xml_reader_get_attribute_value_by_name(reader, "version");
-			tb_char_t const* encoding = tb_xml_reader_get_attribute_value_by_name(reader, "encoding");
+			tb_string_t const* version = tb_xml_reader_get_attribute_value_by_name(reader, "version");
+			tb_string_t const* encoding = tb_xml_reader_get_attribute_value_by_name(reader, "encoding");
 			TB_ASSERT(version && encoding);
 			if (!version || !encoding) goto end;
 
 			// save version & encoding
-			tb_string_assign_c_string(&reader->version, version);
-			tb_string_assign_c_string(&reader->encoding, encoding);
+			tb_string_assign(&reader->version, version);
+			tb_string_assign(&reader->encoding, encoding);
 
 			// seek to the first element
 			tb_xml_reader_parse_text(reader);
-
-			// update event
-			reader->event = TB_XML_READER_EVENT_DOCUMENT_BEG;
 		}
 		// is element end: </name>
 		else if (size > 1 && element[0] == '/')
@@ -259,12 +259,31 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 			reader->event = TB_XML_READER_EVENT_ELEMENT_END;
 		}
 		// is comment: <!-- text -->
-		else if (size > 5
-			&& element[0] == '!' && element[1] == '-' && element[2] == '-'
-			&& element[size - 2] == '-' && element[size - 1] == '-')
+		else if (size >= 5
+			&& element[0] == '!'
+			&& element[1] == '-' 
+			&& element[2] == '-'
+			&& element[size - 2] == '-'
+			&& element[size - 1] == '-')
 		{
 			// update event
 			reader->event = TB_XML_READER_EVENT_COMMENT;
+		}
+		// is cdata: <![CDATA[ text ]]>
+		else if (size >= 10
+			&& element[0] == '!'
+			&& element[1] == '[' 
+			&& element[2] == 'C' 
+			&& element[3] == 'D'
+			&& element[4] == 'A' 
+			&& element[5] == 'T' 
+			&& element[6] == 'A'
+			&& element[7] == '['
+			&& element[size - 2] == ']' 
+			&& element[size - 1] == ']')
+		{
+			// update event
+			reader->event = TB_XML_READER_EVENT_CDATA;
 		}
 		// is element begin: <name>
 		else
@@ -276,7 +295,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 		//TB_READER_DBG("element: %s", element);
 	}
 	// is text: <> text </>
-	else 
+	else
 	{
 		// parse text: <> ... <>
 		tb_char_t const* text = tb_xml_reader_parse_text(reader);
@@ -301,17 +320,17 @@ tb_size_t tb_xml_reader_get_event(tb_xml_reader_t* reader)
 	if (reader) return reader->event;
 	else return TB_XML_READER_EVENT_NULL;
 }
-tb_char_t const* tb_xml_reader_get_version(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_version(tb_xml_reader_t* reader)
 {
-	if (reader) return tb_string_c_string(&reader->version);
+	if (reader) return &reader->version;
 	else return TB_NULL;
 }
-tb_char_t const* tb_xml_reader_get_encoding(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_encoding(tb_xml_reader_t* reader)
 {
-	if (reader) return tb_string_c_string(&reader->encoding);
+	if (reader) return &reader->encoding;
 	else return TB_NULL;
 }
-tb_char_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return TB_NULL;
@@ -325,9 +344,27 @@ tb_char_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)
 	tb_size_t 			n = tb_string_size(&reader->element);
 	if (!p || n < 6) return TB_NULL;
 
-	return tb_string_assign_c_string_with_size(&reader->text, p + 3, n - 5);
+	tb_string_assign_c_string_with_size(&reader->text, p + 3, n - 5);
+	return &reader->text;
 }
-tb_char_t const* tb_xml_reader_get_characters_text(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader)
+{
+	TB_ASSERT(reader);
+	if (!reader) return TB_NULL;
+
+	// check event
+	TB_ASSERT(reader->event == TB_XML_READER_EVENT_CDATA);
+	if (reader->event != TB_XML_READER_EVENT_CDATA) return TB_NULL;
+
+	// parse comment
+	tb_char_t const* 	p = tb_string_c_string(&reader->element);
+	tb_size_t 			n = tb_string_size(&reader->element);
+	if (!p || n < 11) return TB_NULL;
+
+	tb_string_assign_c_string_with_size(&reader->text, p + 8, n - 10);
+	return &reader->text;
+}
+tb_string_t const* tb_xml_reader_get_characters_text(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return TB_NULL;
@@ -336,9 +373,9 @@ tb_char_t const* tb_xml_reader_get_characters_text(tb_xml_reader_t* reader)
 	TB_ASSERT(reader->event == TB_XML_READER_EVENT_CHARACTERS);
 	if (reader->event != TB_XML_READER_EVENT_CHARACTERS) return TB_NULL;
 
-	return tb_string_c_string(&reader->text);
+	return &reader->text;
 }
-tb_char_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	TB_ASSERT(TB_FALSE == tb_string_is_null(&reader->element));
@@ -356,7 +393,11 @@ tb_char_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 
 	// parse the element name
 	tb_char_t const* element = tb_string_c_string(&reader->element);
-	if (element[0] == '/') return tb_string_assign_c_string_with_size_by_ref(&reader->name, element + 1, tb_string_size(&reader->element) - 1);
+	if (element[0] == '/')
+	{
+		tb_string_assign_c_string_with_size_by_ref(&reader->name, element + 1, tb_string_size(&reader->element) - 1);
+		return &reader->name;
+	}
 	else
 	{
 		// find the end position of the element
@@ -364,12 +405,30 @@ tb_char_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 		tb_char_t const* e = p + tb_string_size(&reader->element);
 		while (p < e && *p && !isspace(*p)) p++;
 
-		if (p > element) return tb_string_assign_c_string_with_size(&reader->name, element, p - element);
+		if (p > element) 
+		{
+			tb_string_assign_c_string_with_size(&reader->name, element, p - element);
+			return &reader->name;
+		}
 	}
 	return TB_NULL;
 }
 tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 {
+	TB_ASSERT(reader);
+	TB_ASSERT(TB_FALSE == tb_string_is_null(&reader->element));
+
+	// check reader
+	if (!reader) return 0;
+
+	// check event
+	TB_ASSERT( 	reader->event == TB_XML_READER_EVENT_ELEMENT_BEG
+			|| 	reader->event == TB_XML_READER_EVENT_DOCUMENT);
+
+	if ( 	reader->event != TB_XML_READER_EVENT_ELEMENT_BEG 
+		&& 	reader->event != TB_XML_READER_EVENT_DOCUMENT)
+		return 0;
+
 	// clear attributes
 	reader->attributes_n = 0;
 
@@ -403,21 +462,21 @@ tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 
 	return reader->attributes_n;
 }
-tb_char_t const* tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index)
+tb_string_t const* tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index)
 {
 	TB_ASSERT(reader && index < reader->attributes_n);
 	if (!reader || index >= reader->attributes_n) return TB_NULL;
 
-	return tb_string_c_string(&reader->attributes[index].base.name);
+	return &reader->attributes[index].base.name;
 }
-tb_char_t const* tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index)
+tb_string_t const* tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index)
 {
 	TB_ASSERT(reader && index < reader->attributes_n);
 	if (!reader || index >= reader->attributes_n) return TB_NULL;
 
-	return tb_string_c_string(&reader->attributes[index].base.value);
+	return &reader->attributes[index].base.value;
 }
-tb_char_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name)
+tb_string_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name)
 {
 	TB_ASSERT(reader && reader->attributes_n);
 	if (!reader || !reader->attributes_n) return TB_NULL;
@@ -426,7 +485,7 @@ tb_char_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* read
 	for (i = 0; i < reader->attributes_n; i++)
 	{
 		if (tb_string_compare_c_string(&reader->attributes[i].base.name, name) == TB_TRUE)
-			return tb_string_c_string(&reader->attributes[i].base.value);
+			return &reader->attributes[i].base.value;
 	}
 	return TB_NULL;
 }

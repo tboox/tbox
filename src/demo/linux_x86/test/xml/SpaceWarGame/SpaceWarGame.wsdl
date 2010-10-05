@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="SpaceWarGame" targetNamespace="http://www.example.org/SpaceWarGame/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/SpaceWarGame/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://www.example.com/SpaceWarGame">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="http://www.example.com/SpaceWarGame" schemaLocation="SpaceWarGame.xsd"></xsd:import>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="getResultSheetResponse">
+		<wsdl:part element="xsd1:ResultSheet" name="resultSheet" />
+	</wsdl:message>
+	<wsdl:message name="getResultSheetRequest">
+		<wsdl:part element="xsd1:GameInformation" name="gameInformation" />
+	</wsdl:message>
+	<wsdl:message name="submitCommandSheetRequest">
+		<wsdl:part name="commandSheet" element="xsd1:CommandSheet"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="submitCommandSheetResponse">
+		<wsdl:part name="result" element="xsd1:SubmitCommandSheetResult"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getResultSheet_faultMsg">
+		<wsdl:part name="fault" element="xsd1:GetResultSheetFault"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="SpaceWarGame">
+		<wsdl:operation name="getResultSheet">
+			<wsdl:input message="tns:getResultSheetRequest" />
+			<wsdl:output message="tns:getResultSheetResponse" />
+			<wsdl:fault name="fault" message="tns:getResultSheet_faultMsg"></wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="submitCommandSheet">
+			<wsdl:input message="tns:submitCommandSheetRequest"></wsdl:input>
+			<wsdl:output message="tns:submitCommandSheetResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SpaceWarGameSOAP" type="tns:SpaceWarGame">				<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/><wsdl:operation name="getResultSheet">
+            <soap:operation soapAction="http://www.example.org/SpaceWarGame/getResultSheet"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+			<wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="fault"><soap:fault use="literal" name="fault"/></wsdl:fault>
+        </wsdl:operation>
+		<wsdl:operation name="submitCommandSheet">
+            <soap:operation soapAction="http://www.example.org/SpaceWarGame/submitCommandSheet"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+			<wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SpaceWarGame">
+		<wsdl:port binding="tns:SpaceWarGameSOAP" name="SpaceWarGameSOAP">
+			<soap:address location="http://www.example.org/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

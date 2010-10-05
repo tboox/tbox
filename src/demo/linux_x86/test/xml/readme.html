@@ -1,0 +1,154 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Christina Lau">
+   <meta name="GENERATOR" content="Mozilla/4.75 [en] (Windows NT 5.0; U) [Netscape]">
+   <title>readme</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<center>
+<h2>
+<font face="Arial"><font color="#6633CC">Editing and Validating XML Document
+Example Readme</font></font></h2></center>
+<font face="Arial"><font size=-1>This is a collection of examples that
+illustrate how you can use some of the guided editing features in the XML
+Editor to edit and validate XML files. </font></font><br>&nbsp;
+<center><table BORDER >
+<tr>
+<td ALIGN=CENTER WIDTH="93" BGCOLOR="#CCCCCC"><b><font face="Arial"><font color="#003399"><font size=-1>Example</font></font></font></b></td>
+
+<td ALIGN=CENTER BGCOLOR="#CCCCCC" width="552"><b><font face="Arial"><font color="#003399"><font size=-1>Description</font></font></font></b></td>
+</tr>
+
+	<TR>
+		<TD width="93" height="33"><FONT face="Arial"><FONT face="Arial"><FONT
+			face="Arial"><FONT size="-1"><A href="#Invoice">Invoice</A></FONT></FONT></FONT></FONT></TD>
+		<TD height="33" width="552"><FONT face="Arial"><FONT face="Arial"><FONT
+			face="Arial"><FONT size="-1">Shows how a DTD file (Invoice.dtd) can
+		be used to provide editing assistance when editing an XML file
+		(Invoice.xml).</FONT></FONT></FONT></FONT><BR>
+		</TD>
+	</TR>
+	<TR>
+		<TD width="93" height="33"><FONT face="Arial"><FONT face="Arial"><FONT
+			size="-1"><A href="#Invoice"></A></FONT></FONT><FONT size="-1"><A
+			href="#Invoice"></A></FONT><FONT face="Arial"><FONT size="-1"><A
+			href="anyElement/readme.html#any"></A></FONT></FONT><FONT size="-1"><A
+			href="#substitutionGroup">PublicationCatalogue</A></FONT></FONT></TD>
+		<TD height="33" width="552"><FONT face="Arial"><FONT face="Arial"><FONT
+			size="-1"></FONT></FONT><FONT size="-1"></FONT><FONT face="Arial"><FONT
+			size="-1">This example shows how to define <U>substitutionGroup</U>
+		in an XML schema file and then use the substitution in the XML
+		instance document.</FONT></FONT></FONT><BR>
+		</TD>
+	</TR>
+	<TR>
+		<TD width="93" height="33"><FONT face="Arial"><FONT face="Arial"><FONT
+			face="Arial"><FONT size="-1"><A href="#GolfCountryClub">GolfCountryClub</A></FONT></FONT></FONT></FONT></TD>
+		<TD height="33" width="552"><FONT face="Arial"><FONT face="Arial"><FONT
+			face="Arial"><FONT size="-1">This example defines an XML schema of a Golf Country Club.  It demonstrates
+			the use of enumerations, local types, choices, and extensions to extend complex types (inheritance).
+	         </FONT></FONT></FONT></FONT><BR>
+		</TD>
+	</TR>
+</table></center>
+
+<p>
+<hr WIDTH="100%">
+<p><a NAME="Invoice"></a><font face="Arial,Helvetica"><font color="#000000"><font size=+1>Editing
+Invoice.xml</font></font></font>
+<p><font face="Arial,Helvetica"><font color="#000000"><font size=-1>The
+Invoice.dtd file provides the rules for defining the content of the Invoice.xml
+file. It is associated with the Invoice.xml through the <b>DOCTYPE</b>
+declaration.</font></font></font>
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Sequence
+content model</font></font></font></b>
+<p><font size=-1><font face="Arial">The </font><b><font face="Arial,Helvetica">Invoice</font></b><font face="Arial">
+element has a content model that looks like this:</font></font>
+<br><font size=-1><font face="Arial">&nbsp;&nbsp;&nbsp; </font><font face="Courier New,Courier">&lt;ELEMENT
+Invoice (Header, Items+)></font></font>
+<br><font size=-1><font face="Arial">This means that an </font><b><font face="Arial,Helvetica">Invoice</font></b><font face="Arial">
+element can have one </font><b><font face="Arial,Helvetica">Header</font></b><font face="Arial">
+element followed by multiple </font><b><font face="Arial,Helvetica">Items</font></b><font face="Arial">.</font></font>
+<p><font size=-1><font face="Arial">In the Design View of the XML Editor,
+select the </font><b><font face="Arial,Helvetica">Invoice</font></b><font face="Arial">
+element. From the pop-up menu, select </font><b><font face="Arial,Helvetica">Add
+Child -> Item</font></b><font face="Arial"> to add an </font><b><font face="Arial,Helvetica">Item</font></b><font face="Arial">
+to the </font><b><font face="Arial,Helvetica">Invoice</font></b><font face="Arial">
+element. You can repeat this to add as many </font><b><font face="Arial,Helvetica">Items</font></b><font face="Arial">
+to the </font><b><font face="Arial,Helvetica">Invoice</font></b><font face="Arial">element
+as you like.</font></font>
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Choice
+content model</font></font></font></b>
+<p><font size=-1><font face="Arial">The </font><b><font face="Arial,Helvetica">Date</font></b><font face="Arial">
+element has a content model that looks like this:</font></font>
+<br><font size=-1><font face="Arial">&nbsp;&nbsp;&nbsp; </font><font face="Courier New,Courier">&lt;ELEMENT
+Date ((Month, Day, Year) | (Day, Month, Year))></font></font>
+<br><font size=-1><font face="Arial">This means that a </font><b><font face="Arial,Helvetica">Date</font></b><font face="Arial">
+can be of the format </font><b><font face="Arial,Helvetica">Month</font></b><font face="Arial">,
+followed by </font><b><font face="Arial,Helvetica">Day</font></b><font face="Arial">,
+followed by </font><b><font face="Arial,Helvetica">Year</font></b><font face="Arial">,
+or of the format </font><b><font face="Arial,Helvetica">Day</font></b><font face="Arial">,
+followed by </font><b><font face="Arial,Helvetica">Month</font></b><font face="Arial">,
+followed by </font><b><font face="Arial,Helvetica">Year</font></b><font face="Arial">.</font></font>
+<p><font size=-1><font face="Arial">You can toggle between these two groups
+easily in the Design View of the XML Editor: First multiple select the
+</font><b><font face="Arial,Helvetica">Month</font></b><font face="Arial">,
+</font><b><font face="Arial,Helvetica">Day</font></b><font face="Arial">,
+and
+</font><b><font face="Arial,Helvetica">Year</font></b><font face="Arial">
+elements (Hold down the Ctrl key while you select them). Then from the
+pop-up menu, choose </font><b><font face="Arial,Helvetica">Replace With
+-> (Day, Month, Year)</font></b><font face="Arial"> to replace it with
+the second group.</font></font>
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Enumerated
+attribute type</font></font></font></b>
+<p><font size=-1><font face="Arial">The <b>Item</b> element has an attribute
+</font><b><font face="Arial,Helvetica">discount</font></b><font face="Arial">
+whose value can be set to either </font><b><font face="Arial,Helvetica">promotion</font></b><font face="Arial">
+or </font><b><font face="Arial,Helvetica">regular</font></b><font face="Arial">.
+In the Design View of the XML Editor, select the </font><b><font face="Arial,Helvetica">discount</font></b><font face="Arial">
+attribute. A combo-box will appear where you can choose between the two
+values. Alternatively, in the Source View, select content assist for the
+</font><b><font face="Arial,Helvetica">discount</font></b><font face="Arial">
+attribute to choose between the two values.</font></font>
+<p>
+<hr WIDTH="100%"><br><a NAME="substitutionGroup"></a><font face="Arial,Helvetica"><font color="#000000"><font size=+1>Using
+Substitution Groups</font></font></font>
+<p>XML Schema allows named groups of elements to be substituted for other
+elements. The Catalogue.xsd file declares <b>Book</b> and <b>Magazine</b>
+to be in a substitution group with <b>Publication</b>:
+<pre>&nbsp;&nbsp;&nbsp; &lt;element name="Book" type="Catalogue:BookType" substitutionGroup="Catalogue:Publication"/>
+&nbsp;&nbsp;&nbsp; &lt;element name="Magazine" type="Catalogue:MagazineType" substitutionGroup="Catalogue:Publication"/></pre>
+The content of <b>Catalogue</b> can be any element that is in the substitution
+group. In the Design View of the XML Editor, select the Add Child menu
+on the <b>Catalogue</b> element. Notice how both <b>Book</b> and <b>Magazine</b>
+can be substituted as the content of the <b>Publication</b> element. In
+additon, we have declared the <b>Publication</b> element as <i>abstract</i>,
+to prevent the <b>Publication</b> element to be used directly in the instance
+document..
+<br>&nbsp;
+<BR>
+
+<hr WIDTH="100%"><br><a NAME="GolfCountryClub"></a><font face="Arial,Helvetica"><font color="#000000"><font size=+1>
+XML Schema - Golf Country Club Example</font></font></font>
+<p>
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Inheritance</font></font></font></b>
+<p>The GolfCountryClub.xsd defines various types that extend content from other complex types.  In particular, 
+look at the various member types and <b>EmployeeType</b>, and they all extend <b>PersonType</b>.
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Enumerations</font></font></font></b>
+<p>You can restrict the values allowed for an element in the instance document by defining enumerations in the schema.
+For example, look at the simple type <b>ClubKindType</b> in the schema.   Then, look at ClubKind element in the instance 
+document, GolfCountryClub.xml, using the XML Editor.
+<p><b><font face="Arial,Helvetica"><font color="#6633CC"><font size=-1>Choices</font></font></font></b>
+<p>Similar to the Invoice example, you can choose a different content model for a particular element.  In the golf
+country club example, a Member can be restricted, regular or exclusive.
+<br>&nbsp;
+
+<HR width="100%">
+<P></P>
+
+</body>
+</html>

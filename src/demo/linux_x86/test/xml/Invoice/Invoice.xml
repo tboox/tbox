@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Invoice PUBLIC "InvoiceId" "Invoice.dtd" >
+<Invoice>
+  <Header invoiceNumber="12345">
+    <Date>
+      <Month>July</Month>
+      <Day>15</Day>
+      <Year>2001</Year>
+    </Date>
+    <BillTo custNumber="X5739" name="Milton McGoo" phone="416-448-4414">
+      <Address>
+        <street1>IBM</street1>
+        <street2>1150 Eglinton Ave East</street2>
+        <city>Toronto</city>
+        <state>Ontario</state>
+        <zip>M3C 1H7</zip>
+        <country>Canada</country>
+      </Address>
+    </BillTo>
+  </Header>
+  <Item discount="promotion" price="57">
+    <description>high speed 3D graphics card</description>
+  </Item>
+</Invoice>

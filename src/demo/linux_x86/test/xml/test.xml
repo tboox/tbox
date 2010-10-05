@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding="iso-8859-1"?>
+<labels>
+	<!-- comment: xx
+	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	-->
+  <label id='ep' added="2003-06-10">
+    <name>Ezra Pound</name>
+    <address>
+      <street>45 Usura Place</street>
+      <city>Hailey</city>
+      <province>ID</province>
+    </address>
+  </label>
+  <label id='tse' added="2003-06-20">
+    <name>Thomas Eliot</name>
+    <address>
+      <street>3 Prufrock Lane</street>
+      <city>Stamford</city>
+      <province>CT</province>
+    </address>
+  </label>
+  <label id="lh" added="2004-11-01">
+    <name>Langston Hughes</name>
+    <address>
+      <street>10 Bridge Tunnel</street>
+      <city>Harlem</city>
+      <province>NY</province>
+    </address>
+  </label>
+  <label id="co" added="2004-11-15">
+    <name>Christopher Okigbo</name>
+    <address>
+      <street>7 Heaven's Gate</street>
+      <city>Idoto</city>
+      <province>Anambra</province>
+    </address>
+  </label>
+</labels>
+

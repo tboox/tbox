@@ -53,21 +53,12 @@ extern "C" {
 typedef enum __tb_xml_reader_event_t
 {
 	TB_XML_READER_EVENT_NULL 					= 0
-,	TB_XML_READER_EVENT_SPACE 					= 1
-, 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 2
-, 	TB_XML_READER_EVENT_DOCUMENT_END 			= 3
-, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 4
-, 	TB_XML_READER_EVENT_ELEMENT_END 			= 5
-, 	TB_XML_READER_EVENT_ATTRIBUTE 				= 6
-, 	TB_XML_READER_EVENT_COMMENT					= 7
-, 	TB_XML_READER_EVENT_CHARACTERS				= 8
-, 	TB_XML_READER_EVENT_CDATA					= 9
-, 	TB_XML_READER_EVENT_DTD						= 10
-, 	TB_XML_READER_EVENT_NAMESPACE				= 11
-, 	TB_XML_READER_EVENT_ENTITY_DECLARATION 		= 12
-, 	TB_XML_READER_EVENT_ENTITY_REFERENCE		= 13
-, 	TB_XML_READER_EVENT_NOTATION_DECLARATION	= 14
-, 	TB_XML_READER_EVENT_PROCESSING_INSTRUCTION	= 15
+, 	TB_XML_READER_EVENT_DOCUMENT 				= 1
+, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 2
+, 	TB_XML_READER_EVENT_ELEMENT_END 			= 3
+, 	TB_XML_READER_EVENT_COMMENT					= 4
+, 	TB_XML_READER_EVENT_CHARACTERS				= 5
+, 	TB_XML_READER_EVENT_CDATA					= 6
 
 }tb_xml_reader_event_t;
 
@@ -119,15 +110,16 @@ tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);
 
 // getter
 tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_version(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_encoding(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_characters_text(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_comment_text(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_element_name(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_version(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_encoding(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_characters_text(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_comment_text(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_element_name(tb_xml_reader_t* reader);
 tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);
-tb_char_t const* 		tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);
-tb_char_t const* 		tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);
-tb_char_t const* 		tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);
+tb_string_t const* 		tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);
+tb_string_t const* 		tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);
+tb_string_t const* 		tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);
 
 // c plus plus
 #ifdef __cplusplus

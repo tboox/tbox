@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:GolfCountryClub xmlns:tns="http://www.example.org/GolfCountryClub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/GolfCountryClub GolfCountryClub.xsd ">
+
+  <GolfCourse NumberOfHoles="18">
+    <Name>Bird's Nest Course</Name>
+    <Yardage>7125</Yardage>
+    <Par>72</Par>
+    <Handicap>74.6</Handicap>
+    <Slope>138</Slope>
+  </GolfCourse>
+  
+  <GolfCourse NumberOfHoles="18">
+    <Name>Eagle's Nest Course</Name>
+    <Yardage>7198</Yardage>
+    <Par>72</Par>
+    <Handicap>73.5</Handicap>
+    <Slope>136</Slope>
+  </GolfCourse>
+  
+  <Member handicap="20">
+    <RegularMember>
+      <FirstName>Keith</FirstName>
+      <LastName>Chong</LastName>
+      <MembershipExpiry>2010-10-31</MembershipExpiry>
+    </RegularMember>
+  </Member>
+
+  <Member handicap="0">
+    <ExclusiveMember>
+      <FirstName>James</FirstName>
+      <MiddleName>Lion</MiddleName>
+      <LastName>Chan</LastName>
+      <ValetParkingID>124</ValetParkingID>
+      <LockerNumber>10</LockerNumber>
+    </ExclusiveMember>
+  </Member>
+
+  <Member handicap="25">
+    <RestrictedMember>
+      <FirstName>Allan</FirstName>
+      <LastName>Chong</LastName>
+      <MembershipExpiry>2010-10-31</MembershipExpiry>
+      <LimitedPlay>Weekend Only</LimitedPlay>
+    </RestrictedMember>
+  </Member>
+  
+  <Member handicap="10">
+    <RegularMember>
+      <FirstName>Murray</FirstName>
+      <MiddleName>Izzun</MiddleName>
+      <LastName>Beaton</LastName>
+      <MembershipExpiry>2010-09-30</MembershipExpiry>
+    </RegularMember>
+  </Member>
+
+  <Employee>
+    <FirstName>Craig</FirstName>
+    <LastName>Salter</LastName>
+    <EmployeeNumber>12463</EmployeeNumber>
+  </Employee>
+  
+  <Employee>
+    <FirstName>Ernest</FirstName>
+    <LastName>Mah</LastName>
+    <EmployeeNumber>15234</EmployeeNumber>
+  </Employee>
+
+  <ProShop>
+    <GolfClub>
+      <ManufacturerName>Tailor Built</ManufacturerName>
+      <Quantity>20</Quantity>
+      <ClubKind>Driver</ClubKind>
+      <Loft>10.5 Degrees</Loft>
+      <Shaft>Stiff</Shaft>
+    </GolfClub>
+    <GolfClub>
+      <ManufacturerName>Clever Plains</ManufacturerName>
+      <Quantity>5</Quantity>
+      <ClubKind>Wedge</ClubKind>
+      <Loft>60 Degrees</Loft>
+      <Shaft>Regular</Shaft>
+    </GolfClub>
+    <BoxOfBalls>
+      <ManufacturerName>A-Subject</ManufacturerName>
+      <Quantity>20</Quantity>
+      <ProductDetails>Pos. A High Spin/12</ProductDetails>
+    </BoxOfBalls>
+  </ProShop>
+
+</tns:GolfCountryClub>

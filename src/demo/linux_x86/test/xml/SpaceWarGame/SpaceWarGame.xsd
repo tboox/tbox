@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.com/SpaceWarGame" xmlns:tns="http://www.example.com/SpaceWarGame">
+
+
+	<complexType name="Command">
+		<attribute name="subjectId" type="string" />
+	</complexType>
+
+	<complexType name="CommandList">
+		<sequence>
+			<element name="move" type="tns:MoveCommand" maxOccurs="unbounded" minOccurs="0" />
+			<element name="jump" type="tns:JumpCommand" maxOccurs="unbounded" minOccurs="0" />
+			<element name="attack" type="tns:AttackCommand" maxOccurs="unbounded" minOccurs="0" />
+			<element name="transmit" type="tns:TransmitCommand" maxOccurs="unbounded" minOccurs="0"></element>
+			<element name="special" type="tns:Command" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>	</complexType>
+
+
+	<complexType name="MoveCommand">
+		<complexContent>
+			<extension base="tns:Command">
+				<sequence>
+					<element name="point" type="tns:Point" maxOccurs="unbounded" minOccurs="1" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="JumpCommand">
+		<complexContent>
+			<extension base="tns:Command">
+				<sequence>
+					<element name="destination" type="tns:Point" maxOccurs="1" minOccurs="1" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="AttackCommand">
+		<complexContent>
+			<extension base="tns:Command">
+				<sequence>					<element name="targetLocation" type="tns:Point" maxOccurs="1" minOccurs="0" />
+				</sequence>
+				<attribute name="weapon" type="string" />
+				<attribute name="power" type="string" />
+				<attribute name="targetId" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<complexType name="Point">
+		<attribute name="x" type="float" use="required"/>
+		<attribute name="y" type="float" use="required"/>
+	</complexType>
+
+
+	<complexType name="Report">
+		<sequence>
+			<element name="planets" type="tns:PlanetList" />
+			<element name="ships" type="tns:ShipList" />
+			<element name="transmissions" type="tns:TransmissionList" />
+		</sequence>
+	</complexType>
+
+	<complexType name="PlanetList">
+		<sequence>
+			<element name="planet" type="tns:Planet" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="ShipList">
+		<sequence>
+			<element name="ship" type="tns:Ship" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="TransmissionList">
+		<sequence>
+			<element name="transmission" type="tns:Transmission" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="Planet">
+		<sequence>
+			<element name="resources" type="tns:ResourceList" />
+			<element name="infrastructure" type="tns:InfrastructureList" />
+			<element name="weapons" type="tns:WeaponList" />
+			<element name="shields" type="tns:ShieldList" />
+		</sequence>
+		<attribute name="name" type="string" />
+		<attribute name="owner" type="string" />
+		<attribute name="si" type="string" />
+	</complexType>
+
+	<complexType name="Ship">
+		<sequence>
+			<element name="weapons" type="tns:WeaponList" maxOccurs="1" minOccurs="0"/>
+			<element name="shields" type="tns:ShieldList" maxOccurs="1" minOccurs="0"/>
+		</sequence>
+		<attribute name="name" type="string" />
+		<attribute name="owner" type="string" />
+		<attribute name="kind" type="string" />
+		<attribute name="variant" type="string" />
+		<attribute name="si" type="int" />
+	</complexType>
+
+	<complexType name="Transmission">
+		<sequence>
+			<element name="text" type="string"></element>
+		</sequence>
+		<attribute name="from" type="string"></attribute>
+		<attribute name="to" type="string"></attribute>
+		<attribute name="kind" type="string"></attribute>
+	</complexType>
+
+	<complexType name="ResourceList">
+		<sequence>
+			<element name="resource" type="tns:Resource" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="Resource">
+		<attribute name="kind" type="string" />
+		<attribute name="amount" type="string" />
+	</complexType>
+
+	<complexType name="InfrastructureList">
+		<sequence>
+			<element name="mine" type="tns:Mine" maxOccurs="unbounded" minOccurs="0" />
+			<element name="factory" type="tns:Factory" maxOccurs="unbounded" minOccurs="0" />
+			<element name="research" type="tns:Research" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="WeaponList">
+		<sequence>
+			<element name="weapon" type="tns:Weapon" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="Weapon">
+		<attribute name="kind" type="string" />
+		<attribute name="ammo" type="int" />
+		<attribute name="variant" type="string" />
+	</complexType>
+
+	<complexType name="ShieldList">
+		<sequence>
+			<element name="shield" type="tns:Shield" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="Shield">
+		<attribute name="kind" type="string" />
+		<attribute name="location" type="string" />
+		<attribute name="power" type="string" />
+		<attribute name="variant" type="string" />
+	</complexType>
+
+	<complexType name="Mine">
+		<attribute name="kind" type="string" />
+		<attribute name="workers" type="string" />
+		<attribute name="output" type="string" />
+		<attribute name="capacity" type="string" />
+	</complexType>
+
+	<complexType name="Factory" />
+
+	<complexType name="Research" />
+
+	<complexType name="Infrastructure">
+		<attribute name="output" type="int" />
+		<attribute name="capacity" type="int" />
+		<attribute name="workers" type="int" />
+		<attribute name="si" type="int" />
+	</complexType>
+
+
+	<complexType name="TransmitCommand">
+		<complexContent>
+			<extension base="tns:Command">
+				<sequence>
+					<element name="text" type="string"></element>
+				</sequence>
+				<attribute name="to" type="string"></attribute>
+				<attribute name="kind" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="CommandSheet" type="tns:CommandSheet"></element>
+
+	<complexType name="CommandSheet">
+		<sequence>
+			<element name="commands" type="tns:CommandList"></element>
+		</sequence>
+		<attribute name="playerId" type="string"></attribute>
+		<attribute name="gameId" type="string"></attribute>
+		<attribute name="turn" type="int"/>		
+	</complexType>
+
+	<element name="ResultSheet" type="tns:ResultSheet"></element>
+
+	<complexType name="ResultSheet">
+		<sequence>
+			<element name="commands" type="tns:CommandList" maxOccurs="1" minOccurs="0"></element>
+			<element name="report" type="tns:Report"></element>
+		</sequence>
+		<attribute name="playerId" type="string"></attribute>
+		<attribute name="gameId" type="string"></attribute>
+		<attribute name="turn" type="int"/>
+	</complexType>
+
+	<element name="GameInformation" type="tns:GameInformation"></element>
+
+	<complexType name="GameInformation">
+		<attribute name="gameId" type="string"></attribute>
+		<attribute name="playerId" type="string"></attribute>
+		<attribute name="turn" type="int"/>		
+	</complexType>
+
+	<element name="SubmitCommandSheetResult" type="tns:SubmitCommandSheetResult"></element>
+
+	<complexType name="SubmitCommandSheetResult">
+		<sequence>
+			<element name="problem" type="tns:Problem" maxOccurs="unbounded" minOccurs="0"></element>
+		</sequence>
+		<attribute name="completed" type="boolean"></attribute>
+	</complexType>
+
+	<complexType name="Problem">
+        <sequence>
+        	<element name="message" type="string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="kind" type="string"></attribute>
+	</complexType>
+
+   <element name="GetResultSheetFault" type="tns:GetResultSheetFault"/>
+
+   <complexType name="GetResultSheetFault">
+       <sequence>
+          <element name="problem" type="tns:Problem" minOccurs="0" maxOccurs="unbounded"/>
+       </sequence>   
+   </complexType>	
+</schema>
