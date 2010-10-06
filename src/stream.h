@@ -58,8 +58,12 @@ extern "C" {
 typedef enum __tb_stream_flag_t
 {
 	TB_STREAM_FLAG_NULL 			= 0
-, 	TB_STREAM_FLAG_IS_ZLIB 			= 1
-, 	TB_STREAM_FLAG_IS_BLOCK 		= 2
+, 	TB_STREAM_FLAG_RO 				= 1
+, 	TB_STREAM_FLAG_WO 				= 2
+, 	TB_STREAM_FLAG_TRUNC 			= 4
+, 	TB_STREAM_FLAG_ZLIB 			= 8
+, 	TB_STREAM_FLAG_BLOCK 			= 16
+
 
 }tb_stream_flag_t;
 
@@ -92,8 +96,8 @@ typedef struct __tb_stream_t
 	// for zlib
 	tb_handle_t 		hzlib;
 
-	// the stream zdata
-	tb_byte_t 			zdata[TB_STREAM_ZDATA_MAX];
+	// the stream zdata, size must be TB_STREAM_DATA_MAX for tb_stream_switch
+	tb_byte_t 			zdata[TB_STREAM_DATA_MAX];
 
 #endif
 
@@ -169,6 +173,8 @@ tb_int_t 			tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
 tb_int_t 			tb_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size);
 tb_byte_t* 			tb_stream_need(tb_stream_t* st, tb_size_t size);
 tb_bool_t 			tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag);
+void 				tb_stream_flush(tb_stream_t* st);
+tb_int_t 			tb_stream_printf(tb_stream_t* st, tb_char_t const* fmt, ...);
 tb_size_t 			tb_stream_size(tb_stream_t const* st);
 tb_size_t 			tb_stream_offset(tb_stream_t const* st);
 tb_stream_flag_t 	tb_stream_flag(tb_stream_t const* st);

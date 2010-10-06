@@ -26,6 +26,7 @@
  */
 #include "stream.h"
 #include "math.h"
+#include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -73,10 +74,39 @@ static tb_int_t tb_stream_read_no_block(tb_stream_t* st, tb_byte_t* data, tb_siz
 	if (read_n == size) return read_n;
 
 	// read stream directly
-	if (!(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (!(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
-		tb_int_t ret = st->read(st, data + read_n, size - read_n);
-		if (ret > 0) read_n += ret; 
+		// for large block
+		tb_int_t need_n = size - read_n;
+		if (need_n >= TB_STREAM_DATA_MAX)
+		{
+			tb_int_t ret = st->read(st, data + read_n, need_n);
+			if (ret > 0) read_n += ret; 
+		}
+		// for small block
+		else 
+		{
+			tb_int_t ret = st->read(st, st->head, TB_STREAM_DATA_MAX);
+			if (ret > 0)
+			{
+				// if enough?
+				st->size = ret;
+				if (st->size > need_n)
+				{
+					memcpy(data + read_n, st->head, need_n);
+					read_n += need_n;
+					st->head += need_n;
+					st->size -= need_n;
+				}
+				else
+				{
+					memcpy(data + read_n, st->head, st->size);
+					read_n += st->size;
+					st->head = st->data;
+					st->size = 0;
+				}
+			}
+		}
 	}
 	else 
 	{
@@ -159,6 +189,58 @@ fail:
 	else return -1;
 	// }
 }
+static tb_int_t tb_stream_write_no_block(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
+{
+	if (!st || !data) return -1;
+	if (!size) return 0;
+
+	// write to stream data if enough
+	if (TB_STREAM_DATA_MAX >= size + st->size) 
+	{
+		memcpy(st->head + st->size, data, size);
+		st->size += size;
+		return size;
+	}
+
+	// flush stream data
+	if (st->size) tb_stream_flush(st);
+
+	// write stream directly
+	tb_int_t write_n = 0;
+	if (!(st->flag & TB_STREAM_FLAG_ZLIB))
+	{
+		tb_int_t ret = st->write(st, data, size);
+		if (ret > 0) write_n += ret; 
+	}
+
+	return write_n;
+}
+static tb_int_t tb_stream_write_block(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
+{
+	if (!st || !data) return -1;
+	if (!size) return 0;
+
+	// {
+	tb_int_t try_n = 100;
+	tb_int_t write_n = 0;
+	while (write_n < size)
+	{
+		tb_int_t ret = tb_stream_write_no_block(st, data + write_n, size - write_n);
+		if (ret < 0) goto fail;
+		else if (!ret) 
+		{
+			if (!try_n--) break;
+		}
+		write_n += ret;
+	}
+
+	return write_n;
+
+fail:
+	if (write_n) return write_n;
+	else return -1;
+	// }
+}
 
 /* /////////////////////////////////////////////////////////
  * interface
@@ -168,6 +250,10 @@ void tb_stream_close(tb_stream_t* st)
 {
 	if (st)
 	{
+		// flush data
+		if (st->flag & TB_STREAM_FLAG_WO)
+			tb_stream_flush(st);
+
 		// close stream
 		if (st->close) st->close(st); 
 
@@ -193,9 +279,13 @@ tb_size_t tb_stream_offset(tb_stream_t const* st)
 }
 tb_int_t tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 {
+	// check
+	TB_ASSERT(st && st->read && st->flag & TB_STREAM_FLAG_RO);
+	if (!st || !st->read || !(st->flag & TB_STREAM_FLAG_RO)) return -1;
+
 	// read data
 	tb_int_t ret = 0;
-	if (st->flag & TB_STREAM_FLAG_IS_BLOCK) 
+	if (st->flag & TB_STREAM_FLAG_BLOCK) 
 		ret = tb_stream_read_block(st, data, size);
 	else ret = tb_stream_read_no_block(st, data, size);
 
@@ -206,9 +296,61 @@ tb_int_t tb_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 }
 tb_int_t tb_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
 {
-	return 0;
+	// check
+	TB_ASSERT(st && st->write && st->flag & TB_STREAM_FLAG_WO);
+	if (!st || !st->write || !(st->flag & TB_STREAM_FLAG_WO)) return -1;
+
+	// write data
+	tb_int_t ret = 0;
+	if (st->flag & TB_STREAM_FLAG_BLOCK) 
+		ret = tb_stream_write_block(st, data, size);
+	else ret = tb_stream_write_no_block(st, data, size);
+
+	// update offset
+	if (ret > 0) st->offset += ret;
+	//TB_DBG("write: %d", ret);
+	return ret;
 }
- 
+void tb_stream_flush(tb_stream_t* st)
+{
+	// check
+	TB_ASSERT(st && st->write && st->flag & TB_STREAM_FLAG_WO);
+	if (!st || !st->write || !(st->flag & TB_STREAM_FLAG_WO)) return ;
+
+	if (st->size > 0)
+	{
+		tb_int_t try_n = 100;
+		tb_int_t write_n = 0;
+		tb_int_t total_n = st->size;
+		while (write_n < total_n)
+		{
+			tb_int_t ret = st->write(st, st->head + write_n, total_n - write_n);
+			if (ret < 0) break;
+			else if (!ret) 
+			{
+				if (!try_n--) break;
+			}
+			if (ret > 0) write_n += ret; 
+		}
+		st->head = st->data;
+		st->size = 0;
+	}
+}
+tb_int_t tb_stream_printf(tb_stream_t* st, tb_char_t const* fmt, ...)
+{
+	// format data
+	tb_char_t data[TB_STREAM_DATA_MAX];
+	tb_size_t size = 0;
+	va_list argp;
+    va_start(argp, fmt);
+    size = vsnprintf(data, TB_STREAM_DATA_MAX - 1, fmt, argp);
+    va_end(argp);
+	if (size) data[size] = '\0';
+
+	// write data
+	if (size) return tb_stream_write_block(st, data, size);
+	else return 0;
+}
 tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 {
 	if (!st) return TB_NULL;
@@ -242,7 +384,7 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 
 	// { read stream directly
 	tb_int_t try_n = 100;
-	if (!(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (!(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
 		while (st->size < size)
 		{
@@ -295,6 +437,13 @@ tb_byte_t* tb_stream_need(tb_stream_t* st, tb_size_t size)
 
 tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
+	TB_ASSERT(st);
+	if (!st) return TB_FALSE;
+
+	// flush data
+	if (st->flag & TB_STREAM_FLAG_WO)
+		tb_stream_flush(st);
+
 	// hook
 	if (st->seek && TB_TRUE == st->seek(st, offset, flag))
 		return TB_TRUE;
@@ -330,7 +479,7 @@ tb_bool_t tb_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag
 			tb_byte_t data[TB_STREAM_DATA_MAX];
 			tb_size_t size = TB_MATH_MIN(offset - st->offset, TB_STREAM_DATA_MAX);
 			tb_int_t ret = tb_stream_read(st, data, size);
-			if (ret != size && st->flag & TB_STREAM_FLAG_IS_BLOCK) break;
+			if (ret != size && st->flag & TB_STREAM_FLAG_BLOCK) break;
 			else if (ret < 0) break;
 			else if (!ret)
 			{
@@ -353,22 +502,29 @@ tb_bool_t tb_stream_switch(tb_stream_t* st, tb_stream_flag_t flag)
 
 #ifdef TB_CONFIG_ZLIB
 	// is zlib? 0 => 1
-	if (!(oflag & TB_STREAM_FLAG_IS_ZLIB) && (flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (!(oflag & TB_STREAM_FLAG_ZLIB) && (flag & TB_STREAM_FLAG_ZLIB))
 	{
 		// create zlib
 		st->hzlib = tb_zlib_create();
 		if (st->hzlib == TB_INVALID_HANDLE) return TB_FALSE;
 
+		// move zlib data from the stream data
 		if (st->size)
 		{
+			memcpy(st->zdata, st->head, st->size);
+			tb_zlib_attach(st->hzlib, st->zdata, st->size);
+
 			st->size = 0;
 			st->head = st->data;
-			TB_DBG("[warning]: exists non-zlib data at stream data now!");
 		}
 	}
 	// is zlib? 1 => 0
-	else if (!(flag & TB_STREAM_FLAG_IS_ZLIB) && (oflag & TB_STREAM_FLAG_IS_ZLIB))
+	else if (!(flag & TB_STREAM_FLAG_ZLIB) && (oflag & TB_STREAM_FLAG_ZLIB))
 	{
+		// resume non-zlib data from the zlib data
+		// ...
+		TB_DBG("[warning]: need resume non-zlib data from the zlib data.");
+
 		// destroy zlib
 		if (st->hzlib != TB_INVALID_HANDLE)
 			tb_zlib_destroy(st->hzlib);

@@ -489,3 +489,4 @@ tb_string_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* re
 	}
 	return TB_NULL;
 }
+

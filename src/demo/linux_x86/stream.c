@@ -8,37 +8,32 @@ int main(int argc, char** argv)
 
 	if (argc < 3) return 0;
 	
-	tb_generic_stream_t stream;
-	tb_stream_t* st = tb_stream_open(&stream, argv[1], TB_NULL, 0, TB_STREAM_FLAG_IS_BLOCK);
-	if (!st)
+	tb_generic_stream_t istream;
+	tb_stream_t* ist = tb_stream_open(&istream, argv[1], TB_NULL, 0, TB_STREAM_FLAG_BLOCK | TB_STREAM_FLAG_RO);
+	if (!ist)
 	{
 		TB_DBG("failed to open url: %s", argv[1]);
 		return 0;
 	}
 
-	tplat_handle_t hfile = tplat_file_open(argv[2], TPLAT_FILE_WO | TPLAT_FILE_TRUNC | TPLAT_FILE_BINARY);
-	if (hfile == TPLAT_INVALID_HANDLE)
+	tb_generic_stream_t ostream;
+	tb_stream_t* ost = tb_stream_open(&ostream, argv[2], TB_NULL, 0, TB_STREAM_FLAG_BLOCK | TB_STREAM_FLAG_WO | TB_STREAM_FLAG_TRUNC);
+	if (!ost)
 	{
-		TB_DBG("failed to open file: %s", argv[2]);
+		TB_DBG("failed to open url: %s", argv[2]);
 		return 0;
 	}
 
-	tb_byte_t data[4096];
+	tb_byte_t data[256];
 	do
 	{
-		tb_int_t read_n = tb_stream_read(st, data, 4096);
-		if (read_n <= 0) break;
-
-		tb_int_t write_n = 0;
-		while (write_n < read_n)
-		{
-			tb_int_t ret = tplat_file_write(hfile, data, read_n);
-			if (ret < 0) break;
-
-			write_n += ret;
-		}
+		tb_int_t read_n = tb_stream_read(ist, data, 256);
+		if (read_n <= 0 || tb_stream_write(ost, data, read_n) < 0) break;
 
 	} while(1);
+
+	tb_stream_close(ist);
+	tb_stream_close(ost);
 
 
 	return 0;

@@ -40,6 +40,13 @@ static tb_int_t tb_file_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t 
 	if (fst) return (tb_int_t)tplat_file_read(fst->hfile, (tplat_byte_t*)data, (tplat_size_t)size);
 	else return -1;
 }
+static tb_int_t tb_file_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
+{
+	tb_file_stream_t* fst = st;
+	TB_ASSERT(data && size);
+	if (fst) return (tb_int_t)tplat_file_write(fst->hfile, (tplat_byte_t*)data, (tplat_size_t)size);
+	else return -1;
+}
 static void tb_file_stream_close(tb_stream_t* st)
 {
 	tb_file_stream_t* fst = st;
@@ -49,14 +56,14 @@ static void tb_file_stream_close(tb_stream_t* st)
 static tb_size_t tb_file_stream_size(tb_stream_t* st)
 {
 	tb_file_stream_t* fst = st;
-	if (fst && fst->hfile != TPLAT_INVALID_HANDLE && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (fst && fst->hfile != TPLAT_INVALID_HANDLE && !(st->flag & TB_STREAM_FLAG_ZLIB))
 		return (tb_size_t)tplat_file_seek(fst->hfile, -1, TPLAT_FILE_SEEK_SIZE);
 	else return 0;
 }
 static tb_bool_t tb_file_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
 	tb_file_stream_t* fst = st;
-	if (fst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (fst && !(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
 		tb_int_t ret = -1;
 
@@ -99,8 +106,14 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 	TB_ASSERT(st && url);
 	if (!st || !url) return TB_NULL;
 
+	// file flags
+	tplat_size_t fflags = TPLAT_FILE_BINARY;
+	if (flag & TB_STREAM_FLAG_RO) fflags |= TPLAT_FILE_RO;
+	if (flag & TB_STREAM_FLAG_WO) fflags |= TPLAT_FILE_WO;
+	if (flag & TB_STREAM_FLAG_TRUNC) fflags |= TPLAT_FILE_TRUNC;
+
 	// { open file
-	tplat_handle_t hfile = tplat_file_open(url, TPLAT_FILE_RW);
+	tplat_handle_t hfile = tplat_file_open(url, fflags);
 	if (hfile == TPLAT_INVALID_HANDLE) 
 	{
 		// exists arguments: ?=...
@@ -116,7 +129,7 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 		strncpy(s, url, n);
 		s[n] = '\0';
 
-		hfile = tplat_file_open(s, TPLAT_FILE_RW);
+		hfile = tplat_file_open(s, fflags);
 		if (hfile == TPLAT_INVALID_HANDLE) return TB_NULL;
 	}
 
@@ -133,6 +146,7 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 
 	// init file stream
 	st->base.read = tb_file_stream_read;
+	st->base.write = tb_file_stream_write;
 	st->base.close = tb_file_stream_close;
 	st->base.ssize = tb_file_stream_size;
 	st->base.seek = tb_file_stream_seek;
@@ -140,7 +154,7 @@ tb_stream_t* tb_stream_open_from_file(tb_file_stream_t* st, tb_char_t const* url
 
 #ifdef TB_CONFIG_ZLIB
 	// is hzlib?
-	if (flag & TB_STREAM_FLAG_IS_ZLIB)
+	if (flag & TB_STREAM_FLAG_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;

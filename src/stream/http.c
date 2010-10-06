@@ -287,7 +287,7 @@ static tb_bool_t tb_http_process_line(tb_http_context_t* ctx, tb_size_t line_idx
 static tb_bool_t tb_http_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
 	tb_http_stream_t* hst = st;
-	if (hst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (hst && !(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
 		// get context
 		tb_http_context_t* ctx = st->pdata;
@@ -469,7 +469,7 @@ static void tb_http_stream_close(tb_stream_t* st)
 static tb_size_t tb_http_stream_size(tb_stream_t* st)
 {
 	tb_http_stream_t* hst = st;
-	if (hst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB)) return hst->size;
+	if (hst && !(st->flag & TB_STREAM_FLAG_ZLIB)) return hst->size;
 	else return 0;
 }
 /* /////////////////////////////////////////////////////////
@@ -509,7 +509,7 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 
 #ifdef TB_CONFIG_ZLIB
 	// is hzlib?
-	if (flag & TB_STREAM_FLAG_IS_ZLIB)
+	if (flag & TB_STREAM_FLAG_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;

@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
 	// create stream
 	tb_generic_stream_t gst;
-	tb_stream_t* st = tb_stream_open(&gst, argv[1], TB_NULL, 0, TB_STREAM_FLAG_IS_BLOCK);
+	tb_stream_t* st = tb_stream_open(&gst, argv[1], TB_NULL, 0, TB_STREAM_FLAG_BLOCK | TB_STREAM_FLAG_RO);
 	if (!st)
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);

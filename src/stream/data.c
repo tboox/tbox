@@ -40,8 +40,25 @@ static tb_int_t tb_data_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t 
 		tb_size_t left = dst->data + dst->size - dst->head;
 		if (size > left) size = left;
 
-		// return data
+		// read data
 		memcpy(data, dst->head, size);
+		dst->head += size;
+		return (tb_int_t)(size);
+	}
+	else return -1;
+}
+static tb_int_t tb_data_stream_write(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
+{
+	tb_data_stream_t* dst = (tb_data_stream_t*)st;
+	TB_ASSERT(data && size);
+	if (dst && data)
+	{
+		// adjust size
+		tb_size_t left = dst->data + dst->size - dst->head;
+		if (size > left) size = left;
+
+		// write data
+		memcpy(dst->head, data, size);
 		dst->head += size;
 		return (tb_int_t)(size);
 	}
@@ -53,13 +70,13 @@ static void tb_data_stream_close(tb_stream_t* st)
 static tb_size_t tb_data_stream_size(tb_stream_t* st)
 {
 	tb_data_stream_t* dst = st;
-	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB)) return dst->size;
+	if (dst && !(st->flag & TB_STREAM_FLAG_ZLIB)) return dst->size;
 	else return 0;
 }
 static tb_byte_t* tb_data_stream_need(tb_stream_t* st, tb_size_t size)
 {
 	tb_data_stream_t* dst = st;
-	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (dst && !(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
 		// is out?
 		TB_ASSERT(dst->head + size <= dst->data + dst->size);
@@ -72,7 +89,7 @@ static tb_byte_t* tb_data_stream_need(tb_stream_t* st, tb_size_t size)
 static tb_bool_t tb_data_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
 {
 	tb_data_stream_t* dst = st;
-	if (dst && !(st->flag & TB_STREAM_FLAG_IS_ZLIB))
+	if (dst && !(st->flag & TB_STREAM_FLAG_ZLIB))
 	{
 		// seek
 		if (flag == TB_STREAM_SEEK_BEG) dst->head = dst->data + offset;
@@ -107,6 +124,7 @@ tb_stream_t* tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* dat
 
 	// init data stream
 	st->base.read = tb_data_stream_read;
+	st->base.write = tb_data_stream_write;
 	st->base.close = tb_data_stream_close;
 	st->base.ssize= tb_data_stream_size;
 	st->base.need = tb_data_stream_need;
@@ -120,7 +138,7 @@ tb_stream_t* tb_stream_open_from_data(tb_data_stream_t* st, tb_byte_t const* dat
 
 #ifdef TB_CONFIG_ZLIB
 	// is hzlib?
-	if (flag & TB_STREAM_FLAG_IS_ZLIB)
+	if (flag & TB_STREAM_FLAG_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) return TB_NULL;
