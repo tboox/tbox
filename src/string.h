@@ -97,10 +97,12 @@ tb_bool_t 			tb_string_resize(tb_string_t* string, tb_uint16_t size);
 tb_byte_t* 			tb_string_data(tb_string_t* string);
 void 				tb_string_clear(tb_string_t* string);
 void 				tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch);
-
 tb_char_t const* 	tb_string_shift(tb_string_t* string, tb_string_t* s_string);
+
+// assign
 tb_char_t const* 	tb_string_assign(tb_string_t* string, tb_string_t const* s_string);
 tb_char_t const* 	tb_string_assign_char(tb_string_t* string, tb_char_t ch);
+tb_char_t const* 	tb_stream_assign_format(tb_string_t* stringt, tb_char_t const* fmt, ...);
 tb_char_t const* 	tb_string_assign_c_string(tb_string_t* string, tb_char_t const* c_string);
 tb_char_t const* 	tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
 
@@ -108,12 +110,16 @@ tb_char_t const* 	tb_string_assign_by_ref(tb_string_t* string, tb_string_t const
 tb_char_t const* 	tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t const* c_string);
 tb_char_t const* 	tb_string_assign_c_string_with_size_by_ref(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
 
+// append
 tb_char_t const* 	tb_string_append(tb_string_t* string, tb_string_t const* s_string);
 tb_char_t const* 	tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string);
 tb_char_t const* 	tb_string_append_char(tb_string_t* string, tb_char_t ch);
 
+// compare
 tb_bool_t 			tb_string_compare(tb_string_t* string, tb_string_t const* s_string);
 tb_bool_t 			tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string);
+tb_bool_t 			tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string);
+tb_bool_t 			tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string);
 
 #endif
 

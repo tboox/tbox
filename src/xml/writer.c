@@ -25,7 +25,7 @@
  * includes
  */
 #include "writer.h"
-
+#include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -44,6 +44,16 @@ tb_xml_writer_t* tb_xml_writer_open(tb_stream_t* st)
 	memset(writer, 0, sizeof(tb_xml_writer_t));
 	writer->st = st;
 
+	// init attributes
+	tb_int_t i = 0;
+	writer->attributes_n = 0;
+	for (i = 0; i < TB_XML_WRITER_ATTRIBUTES_MAX; i++)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)(writer->attributes + i);
+		tb_string_init(&node->name);
+		tb_string_init(&node->value);
+	}
+
 	return writer;
 }
 
@@ -51,6 +61,15 @@ void tb_xml_writer_close(tb_xml_writer_t* writer)
 {
 	if (writer)
 	{
+		// free attributes
+		tb_int_t i = 0;
+		for (i = 0; i < TB_XML_WRITER_ATTRIBUTES_MAX; i++)
+		{
+			tb_xml_node_t* node = (tb_xml_node_t*)(writer->attributes + i);
+			tb_string_uninit(&node->name);
+			tb_string_uninit(&node->value);
+		}
+
 		// detach stream
 		writer->st = TB_NULL;
 
@@ -58,5 +77,161 @@ void tb_xml_writer_close(tb_xml_writer_t* writer)
 		tb_free(writer);
 	}
 }
+void tb_xml_writer_flush(tb_xml_writer_t* writer)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
 
+	tb_stream_flush(writer->st);
+}
+void tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
 
+	tb_stream_printf(writer->st, "<?xml version = \"%s\" encoding = \"%s\" ?>", version? version : "", encoding? encoding : "");
+}
+void tb_xml_writer_document_end(tb_xml_writer_t* writer)
+{
+
+}
+
+void tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	if (writer->attributes_n) 
+	{
+		tb_stream_printf(writer->st, "<%s", name? name : "");
+		tb_int_t i = 0;
+		tb_int_t n = writer->attributes_n;
+		for (i = 0; i < n; i++)
+		{
+			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
+			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
+			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s = \"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
+		}
+		tb_stream_printf(writer->st, ">");
+	}
+	else tb_stream_printf(writer->st, "<%s>", name? name : "");
+}
+void tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	tb_stream_printf(writer->st, "</%s>", name? name : "");
+	tb_xml_writer_attributes_clear(writer);
+}
+void tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	tb_stream_printf(writer->st, "<![CDATA[%s]]>", data? data : "");
+}
+void tb_xml_writer_characters(tb_xml_writer_t* writer, tb_char_t const* text)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	tb_stream_printf(writer->st, "%s", text? text : "");
+}
+void tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	tb_stream_printf(writer->st, "<!--%s-->", comment? comment : "");
+}
+void tb_xml_writer_attributes_clear(tb_xml_writer_t* writer)
+{
+	TB_ASSERT(writer);
+	if (!writer) return ;
+
+	writer->attributes_n = 0;
+}
+void tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)
+{
+	TB_ASSERT(writer && name && value);
+	if (!writer || !name || !value) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+		tb_string_assign_c_string(&node->name, name);
+		tb_string_assign(&node->value, value);
+	}
+}
+void tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)
+{
+	TB_ASSERT(writer && name && value);
+	if (!writer || !name || !value) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+		tb_string_assign_c_string(&node->name, name);
+		tb_string_assign_c_string(&node->value, value);
+	}
+}
+void tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)
+{
+	TB_ASSERT(writer && name);
+	if (!writer || !name) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+		tb_string_assign_c_string(&node->name, name);
+		tb_string_assign_format(&node->value, "%d", value);
+	}
+}
+void tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
+{
+	TB_ASSERT(writer && name);
+	if (!writer || !name) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+		tb_string_assign_c_string(&node->name, name);
+		tb_string_assign_format(&node->value, "%g", value);
+	}
+}
+void tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)
+{
+	TB_ASSERT(writer && name);
+	if (!writer || !name) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+		tb_string_assign_c_string(&node->name, name);
+		tb_string_assign_c_string(&node->value, value == TB_TRUE? "true" : "false");
+	}
+}
+void tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)
+{
+	TB_ASSERT(writer && name && fmt);
+	if (!writer || !name || !fmt) return ;
+
+	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
+	{
+		// format text
+		tb_char_t text[4096];
+		tb_size_t size = 0;
+		va_list argp;
+		va_start(argp, fmt);
+		size = vsnprintf(text, 4096 - 1, fmt, argp);
+		va_end(argp);
+		if (size) 
+		{
+			text[size] = '\0';
+			tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
+			tb_string_assign_c_string(&node->name, name);
+			tb_string_assign_c_string(&node->value, text);
+		}
+	}
+}

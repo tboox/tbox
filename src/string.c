@@ -26,6 +26,7 @@
  */
 #include "string.h"
 #include "math.h"
+#include <stdarg.h>
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -320,6 +321,24 @@ tb_char_t const* tb_string_assign_char(tb_string_t* string, tb_char_t ch)
 
 	return tb_string_c_string(string);
 }
+tb_char_t const* tb_string_assign_format(tb_string_t* string, tb_char_t const* fmt, ...)
+{
+	if (!string || !fmt) return TB_NULL;
+
+	// format text
+	tb_char_t text[4096];
+	tb_size_t size = 0;
+	va_list argp;
+    va_start(argp, fmt);
+    size = vsnprintf(text, 4096 - 1, fmt, argp);
+    va_end(argp);
+	if (size) 
+	{
+		text[size] = '\0';
+		return tb_string_assign_c_string_with_size(string, text, size);
+	}
+	else return TB_NULL;
+}
 tb_char_t const* tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
 {
 	if (!string) return TB_NULL;
@@ -546,7 +565,7 @@ tb_int_t tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t con
 			idx = ps - s;
 			break;
 		}
-		if (tolower(*p2) == tolower(*p1))
+		if (*p2 == *p1 || tolower(*p2) == tolower(*p1))
 		{
 			++p2;
 			++p1;
@@ -573,14 +592,38 @@ tb_int_t tb_string_find_string_nocase(tb_string_t const* string, tb_string_t con
 }
 tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (TB_FALSE == tb_string_is_null(s_string))
-		return !strcmp(tb_string_c_string(string), tb_string_c_string(s_string))? TB_TRUE : TB_FALSE;
+	if (TB_FALSE == tb_string_is_null(s_string))
+		return tb_string_compare_c_string(string, tb_string_c_string(s_string));
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
 	else if (c_string) return !strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else return TB_FALSE;
+}
+tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string)
+{
+	if (TB_FALSE == tb_string_is_null(s_string))
+		return tb_string_compare_c_string_nocase(string, tb_string_c_string(s_string));
+	else return TB_FALSE;
+}
+tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string)
+{
+	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
+	else if (c_string) 
+	{
+		tb_char_t const* s1 = tb_string_c_string(string);
+		tb_char_t const* s2 = c_string;
+
+		while (*s1 && *s2 && ((*s1 == *s2) || (tolower(*s1) == tolower(*s2))))
+		{
+			s1++;
+			s2++;
+		}
+
+		if (!*s1 && !*s2) return TB_TRUE;
+		else return TB_FALSE;
+	}
 	else return TB_FALSE;
 }

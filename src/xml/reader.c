@@ -147,7 +147,7 @@ tb_xml_reader_t* tb_xml_reader_open(tb_stream_t* st)
 	// init attributes
 	tb_int_t i = 0;
 	reader->attributes_n = 0;
-	for (i = 0; i < TB_XML_ATTRIBUTES_MAX; i++)
+	for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAX; i++)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
 		tb_string_init(&node->name);
@@ -184,7 +184,7 @@ void tb_xml_reader_close(tb_xml_reader_t* reader)
 
 		// free attributes
 		tb_int_t i = 0;
-		for (i = 0; i < TB_XML_ATTRIBUTES_MAX; i++)
+		for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAX; i++)
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
 			tb_string_uninit(&node->name);
@@ -221,7 +221,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 	{
 		// parse element: <...>
 		tb_char_t const* element = tb_xml_reader_parse_element(reader);
-		if (!element) goto end;
+		if (!element) goto fail;
 
 		// is document begin: <?xml version="..." encoding=".." ?>
 		tb_size_t size = tb_string_size(&reader->element);
@@ -232,18 +232,25 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 			&& element[3] == 'l')
 		{
 			// update event
-			reader->event = TB_XML_READER_EVENT_DOCUMENT;
+			reader->event = TB_XML_READER_EVENT_DOCUMENT_BEG;
 
 			// parse attributes
 			tb_size_t n = tb_xml_reader_get_attribute_count(reader);
 			TB_ASSERT(n);
-			if (!n) goto end;
+			if (!n) goto fail;
 
 			// get version & encoding
 			tb_string_t const* version = tb_xml_reader_get_attribute_value_by_name(reader, "version");
 			tb_string_t const* encoding = tb_xml_reader_get_attribute_value_by_name(reader, "encoding");
 			TB_ASSERT(version && encoding);
-			if (!version || !encoding) goto end;
+			if (!version || !encoding) goto fail;
+
+			// only support utf-8 encoding now.
+			if (TB_FALSE == tb_string_compare_c_string_nocase(encoding, "utf-8"))
+			{
+				TB_DBG("[warning]: only support xml encoding: utf-8.");
+				goto fail;
+			}
 
 			// save version & encoding
 			tb_string_assign(&reader->version, version);
@@ -299,15 +306,14 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 	{
 		// parse text: <> ... <>
 		tb_char_t const* text = tb_xml_reader_parse_text(reader);
-		if (!text) goto end;
-
-		// update event
-		reader->event = TB_XML_READER_EVENT_CHARACTERS;
+		if (text) reader->event = TB_XML_READER_EVENT_CHARACTERS;
 
 		//TB_READER_DBG("text: %s", text);
 	}
 
-end:
+	return reader->event;
+fail:
+	reader->event = TB_XML_READER_EVENT_NULL;
 	return reader->event;
 }
 
@@ -423,10 +429,10 @@ tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 
 	// check event
 	TB_ASSERT( 	reader->event == TB_XML_READER_EVENT_ELEMENT_BEG
-			|| 	reader->event == TB_XML_READER_EVENT_DOCUMENT);
+			|| 	reader->event == TB_XML_READER_EVENT_DOCUMENT_BEG);
 
 	if ( 	reader->event != TB_XML_READER_EVENT_ELEMENT_BEG 
-		&& 	reader->event != TB_XML_READER_EVENT_DOCUMENT)
+		&& 	reader->event != TB_XML_READER_EVENT_DOCUMENT_BEG)
 		return 0;
 
 	// clear attributes

@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "nlist.h"
 #include "attribute.h"
 
 /* /////////////////////////////////////////////////////////
@@ -40,9 +39,9 @@ extern "C" {
  */
 
 #ifdef TB_MEMORY_MODE_SMALL
-# 	define TB_XML_ATTRIBUTES_MAX 		(256)
+# 	define TB_XML_READER_ATTRIBUTES_MAX 		(256)
 #else
-# 	define TB_XML_ATTRIBUTES_MAX 		(512)
+# 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)
 #endif
 
 /* /////////////////////////////////////////////////////////
@@ -53,12 +52,13 @@ extern "C" {
 typedef enum __tb_xml_reader_event_t
 {
 	TB_XML_READER_EVENT_NULL 					= 0
-, 	TB_XML_READER_EVENT_DOCUMENT 				= 1
-, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 2
-, 	TB_XML_READER_EVENT_ELEMENT_END 			= 3
-, 	TB_XML_READER_EVENT_COMMENT					= 4
-, 	TB_XML_READER_EVENT_CHARACTERS				= 5
-, 	TB_XML_READER_EVENT_CDATA					= 6
+, 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 1
+, 	TB_XML_READER_EVENT_DOCUMENT_END 			= 2
+, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 3
+, 	TB_XML_READER_EVENT_ELEMENT_END 			= 4
+, 	TB_XML_READER_EVENT_COMMENT					= 5
+, 	TB_XML_READER_EVENT_CHARACTERS				= 6
+, 	TB_XML_READER_EVENT_CDATA					= 7
 
 }tb_xml_reader_event_t;
 
@@ -90,7 +90,7 @@ typedef struct __tb_xml_reader_t
 	tb_string_t 			text;
 
 	// the attributes
-	tb_xml_attribute_t 		attributes[TB_XML_ATTRIBUTES_MAX];
+	tb_xml_attribute_t 		attributes[TB_XML_READER_ATTRIBUTES_MAX];
 	tb_size_t 				attributes_n;
 
 }tb_xml_reader_t;

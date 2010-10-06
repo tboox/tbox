@@ -86,7 +86,7 @@ tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st
 		tb_size_t event = tb_xml_reader_get_event(reader);
 		switch (event)
 		{
-		case TB_XML_READER_EVENT_DOCUMENT: 
+		case TB_XML_READER_EVENT_DOCUMENT_BEG: 
 			{
 				tb_char_t const* version = tb_string_c_string(tb_xml_reader_get_version(reader));
 				tb_char_t const* encoding = tb_string_c_string(tb_xml_reader_get_encoding(reader));
