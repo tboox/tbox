@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "attribute.h"
+#include "node.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -91,8 +91,8 @@ void 					tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t
 // cdata
 void 					tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data);
 
-// characters
-void 					tb_xml_writer_characters(tb_xml_writer_t* writer, tb_char_t const* text);
+// text
+void 					tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text);
 
 // comment
 void 					tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment);

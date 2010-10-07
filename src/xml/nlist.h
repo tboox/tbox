@@ -41,8 +41,7 @@ extern "C" {
 // the xml nlist type
 typedef struct __tb_xml_nlist_t
 {
-	tb_xml_node_t* 	head;
-	tb_xml_node_t* 	tail;
+	tb_xml_node_t 	base;
 	tb_size_t 		size;
 
 }tb_xml_nlist_t;
@@ -52,14 +51,17 @@ typedef struct __tb_xml_nlist_t
  * interfaces
  */
 
-tb_xml_nlist_t* tb_nlist_create();
-void 			tb_nlist_destroy(tb_xml_nlist_t* nlist);
+// create & destroy
+tb_xml_nlist_t* tb_xml_nlist_create();
+void 			tb_xml_nlist_destroy(tb_xml_nlist_t* nlist);
 
+// accessors
 tb_xml_node_t* 	tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index);
 tb_xml_node_t* 	tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name);
-tb_xml_node_t* 	tb_xml_nlist_del(tb_xml_nlist_t* nlist, tb_char_t const* name);
-tb_xml_node_t* 	tb_xml_nlist_set(tb_xml_nlist_t* nlist, tb_xml_node_t const* node);
 
+// modifiors
+void 			tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
+void 			tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
 
 // c plus plus
 #ifdef __cplusplus

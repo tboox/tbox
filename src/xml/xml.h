@@ -34,8 +34,6 @@ extern "C" {
 #include "prefix.h"
 #include "node.h"
 #include "document.h"
-#include "element.h"
-#include "attribute.h"
 #include "nlist.h"
 #include "reader.h"
 #include "writer.h"

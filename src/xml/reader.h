@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "attribute.h"
+#include "node.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -57,7 +57,7 @@ typedef enum __tb_xml_reader_event_t
 , 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 3
 , 	TB_XML_READER_EVENT_ELEMENT_END 			= 4
 , 	TB_XML_READER_EVENT_COMMENT					= 5
-, 	TB_XML_READER_EVENT_CHARACTERS				= 6
+, 	TB_XML_READER_EVENT_TEXT					= 6
 , 	TB_XML_READER_EVENT_CDATA					= 7
 
 }tb_xml_reader_event_t;
@@ -112,9 +112,9 @@ tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);
 tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);
 tb_string_t const* 		tb_xml_reader_get_version(tb_xml_reader_t* reader);
 tb_string_t const* 		tb_xml_reader_get_encoding(tb_xml_reader_t* reader);
-tb_string_t const* 		tb_xml_reader_get_characters_text(tb_xml_reader_t* reader);
-tb_string_t const* 		tb_xml_reader_get_comment_text(tb_xml_reader_t* reader);
-tb_string_t const* 		tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_text(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_comment(tb_xml_reader_t* reader);
+tb_string_t const* 		tb_xml_reader_get_cdata(tb_xml_reader_t* reader);
 tb_string_t const* 		tb_xml_reader_get_element_name(tb_xml_reader_t* reader);
 tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);
 tb_string_t const* 		tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);

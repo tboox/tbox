@@ -71,6 +71,8 @@ INC_FILES-$(TB_CONFIG_ENCODING) 	+= format.h
 # xml files
 tbox_C_FILES-$(TB_CONFIG_XML) 		+= \
 									xml$(_)document \
+									xml$(_)node \
+									xml$(_)nlist \
 									xml$(_)reader \
 									xml$(_)writer 
 

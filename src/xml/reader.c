@@ -306,7 +306,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 	{
 		// parse text: <> ... <>
 		tb_char_t const* text = tb_xml_reader_parse_text(reader);
-		if (text) reader->event = TB_XML_READER_EVENT_CHARACTERS;
+		if (text) reader->event = TB_XML_READER_EVENT_TEXT;
 
 		//TB_READER_DBG("text: %s", text);
 	}
@@ -336,7 +336,7 @@ tb_string_t const* tb_xml_reader_get_encoding(tb_xml_reader_t* reader)
 	if (reader) return &reader->encoding;
 	else return TB_NULL;
 }
-tb_string_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_comment(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return TB_NULL;
@@ -353,7 +353,7 @@ tb_string_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)
 	tb_string_assign_c_string_with_size(&reader->text, p + 3, n - 5);
 	return &reader->text;
 }
-tb_string_t const* tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_cdata(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return TB_NULL;
@@ -370,14 +370,14 @@ tb_string_t const* tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader)
 	tb_string_assign_c_string_with_size(&reader->text, p + 8, n - 10);
 	return &reader->text;
 }
-tb_string_t const* tb_xml_reader_get_characters_text(tb_xml_reader_t* reader)
+tb_string_t const* tb_xml_reader_get_text(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return TB_NULL;
 
 	// check event
-	TB_ASSERT(reader->event == TB_XML_READER_EVENT_CHARACTERS);
-	if (reader->event != TB_XML_READER_EVENT_CHARACTERS) return TB_NULL;
+	TB_ASSERT(reader->event == TB_XML_READER_EVENT_TEXT);
+	if (reader->event != TB_XML_READER_EVENT_TEXT) return TB_NULL;
 
 	return &reader->text;
 }

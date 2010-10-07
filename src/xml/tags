@@ -1,0 +1,215 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+TB_DOCUMENT_DBG	document.c	34;"	d	file:
+TB_DOCUMENT_DBG	document.c	36;"	d	file:
+TB_DOCUMENT_DBG	document.c	40;"	d	file:
+TB_READER_DBG	reader.c	35;"	d	file:
+TB_READER_DBG	reader.c	37;"	d	file:
+TB_READER_DBG	reader.c	41;"	d	file:
+TB_XML_ATTRIBUTE_H	attribute.h	24;"	d
+TB_XML_DOCUMENT_H	document.h	24;"	d
+TB_XML_ELEMENT_H	element.h	24;"	d
+TB_XML_H	xml.h	24;"	d
+TB_XML_NLIST_H	nlist.h	24;"	d
+TB_XML_NODE_H	node.h	24;"	d
+TB_XML_NODE_TYPE_ATTRIBUTE	node.h	/^, 	TB_XML_NODE_TYPE_ATTRIBUTE 				= 2$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_CDATA_SECTION	node.h	/^, 	TB_XML_NODE_TYPE_CDATA_SECTION 			= 4$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_COMMENT	node.h	/^, 	TB_XML_NODE_TYPE_COMMENT				= 8$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_DOCUMENT	node.h	/^, 	TB_XML_NODE_TYPE_DOCUMENT				= 9$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_DOCUMENT_FRAGMENT	node.h	/^, 	TB_XML_NODE_TYPE_DOCUMENT_FRAGMENT 		= 11$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_DOCUMENT_TYPE	node.h	/^, 	TB_XML_NODE_TYPE_DOCUMENT_TYPE			= 10$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_ELEMENT	node.h	/^,	TB_XML_NODE_TYPE_ELEMENT 				= 1$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_ENTITY	node.h	/^, 	TB_XML_NODE_TYPE_ENTITY 				= 6$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_ENTITY_REFERENCE	node.h	/^, 	TB_XML_NODE_TYPE_ENTITY_REFERENCE 		= 5$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_NOTATION	node.h	/^, 	TB_XML_NODE_TYPE_NOTATION				= 12$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_NULL	node.h	/^	TB_XML_NODE_TYPE_NULL 					= 0$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_PROCESSING_INSTRUCTION	node.h	/^, 	TB_XML_NODE_TYPE_PROCESSING_INSTRUCTION	= 7$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_NODE_TYPE_TEXT	node.h	/^, 	TB_XML_NODE_TYPE_TEXT 					= 3$/;"	e	enum:__tb_xml_node_type_t
+TB_XML_PREFIX_H	prefix.h	24;"	d
+TB_XML_READER_ATTRIBUTES_MAX	reader.h	42;"	d
+TB_XML_READER_ATTRIBUTES_MAX	reader.h	44;"	d
+TB_XML_READER_EVENT_CDATA	reader.h	/^, 	TB_XML_READER_EVENT_CDATA					= 7$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_CHARACTERS	reader.h	/^, 	TB_XML_READER_EVENT_CHARACTERS				= 6$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_COMMENT	reader.h	/^, 	TB_XML_READER_EVENT_COMMENT					= 5$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_DOCUMENT_BEG	reader.h	/^, 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 1$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_DOCUMENT_END	reader.h	/^, 	TB_XML_READER_EVENT_DOCUMENT_END 			= 2$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_ELEMENT_BEG	reader.h	/^, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 3$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_ELEMENT_END	reader.h	/^, 	TB_XML_READER_EVENT_ELEMENT_END 			= 4$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_EVENT_NULL	reader.h	/^	TB_XML_READER_EVENT_NULL 					= 0$/;"	e	enum:__tb_xml_reader_event_t
+TB_XML_READER_H	reader.h	24;"	d
+TB_XML_WRITER_ATTRIBUTES_MAX	writer.h	42;"	d
+TB_XML_WRITER_ATTRIBUTES_MAX	writer.h	44;"	d
+TB_XML_WRITER_H	writer.h	24;"	d
+__tb_xml_attribute_t	attribute.h	/^typedef struct __tb_xml_attribute_t$/;"	s
+__tb_xml_attribute_t::base	attribute.h	/^	tb_xml_node_t 			base;$/;"	m	struct:__tb_xml_attribute_t	access:public
+__tb_xml_document_t	document.h	/^typedef struct __tb_xml_document_t$/;"	s
+__tb_xml_document_t::base	document.h	/^	tb_xml_node_t 				base;$/;"	m	struct:__tb_xml_document_t	access:public
+__tb_xml_document_type_t	document.h	/^typedef struct __tb_xml_document_type_t$/;"	s
+__tb_xml_document_type_t::base	document.h	/^	tb_xml_node_t 				base;$/;"	m	struct:__tb_xml_document_type_t	access:public
+__tb_xml_document_type_t::entities	document.h	/^	struct __tb_xml_nlist_t* 	entities;$/;"	m	struct:__tb_xml_document_type_t	typeref:struct:__tb_xml_document_type_t::__tb_xml_nlist_t	access:public
+__tb_xml_document_type_t::notations	document.h	/^	struct __tb_xml_nlist_t* 	notations;$/;"	m	struct:__tb_xml_document_type_t	typeref:struct:__tb_xml_document_type_t::__tb_xml_nlist_t	access:public
+__tb_xml_element_t	element.h	/^typedef struct __tb_xml_element_t$/;"	s
+__tb_xml_element_t::base	element.h	/^	tb_xml_node_t 			base;$/;"	m	struct:__tb_xml_element_t	access:public
+__tb_xml_nlist_t	nlist.h	/^typedef struct __tb_xml_nlist_t$/;"	s
+__tb_xml_nlist_t::head	nlist.h	/^	tb_xml_node_t* 	head;$/;"	m	struct:__tb_xml_nlist_t	access:public
+__tb_xml_nlist_t::size	nlist.h	/^	tb_size_t 		size;$/;"	m	struct:__tb_xml_nlist_t	access:public
+__tb_xml_nlist_t::tail	nlist.h	/^	tb_xml_node_t* 	tail;$/;"	m	struct:__tb_xml_nlist_t	access:public
+__tb_xml_node_t	node.h	/^typedef struct __tb_xml_node_t$/;"	s
+__tb_xml_node_t::attributes	node.h	/^	struct __tb_xml_nlist_t* 	attributes;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_nlist_t	access:public
+__tb_xml_node_t::childs	node.h	/^	struct __tb_xml_nlist_t* 	childs;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_nlist_t	access:public
+__tb_xml_node_t::document	node.h	/^	void* 						document;$/;"	m	struct:__tb_xml_node_t	access:public
+__tb_xml_node_t::name	node.h	/^	tb_string_t 				name;$/;"	m	struct:__tb_xml_node_t	access:public
+__tb_xml_node_t::next	node.h	/^	struct __tb_xml_node_t* 	next;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+__tb_xml_node_t::parent	node.h	/^	struct __tb_xml_node_t* 	parent;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+__tb_xml_node_t::prev	node.h	/^	struct __tb_xml_node_t* 	prev;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+__tb_xml_node_t::type	node.h	/^	tb_size_t 					type;$/;"	m	struct:__tb_xml_node_t	access:public
+__tb_xml_node_t::value	node.h	/^	tb_string_t 				value;$/;"	m	struct:__tb_xml_node_t	access:public
+__tb_xml_node_type_t	node.h	/^typedef enum __tb_xml_node_type_t$/;"	g
+__tb_xml_reader_event_t	reader.h	/^typedef enum __tb_xml_reader_event_t$/;"	g
+__tb_xml_reader_t	reader.h	/^typedef struct __tb_xml_reader_t$/;"	s
+__tb_xml_reader_t::attributes	reader.h	/^	tb_xml_attribute_t 		attributes[TB_XML_READER_ATTRIBUTES_MAX];$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::attributes_n	reader.h	/^	tb_size_t 				attributes_n;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::cache	reader.h	/^	tb_char_t 				cache;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::element	reader.h	/^	tb_string_t 			element;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::encoding	reader.h	/^	tb_string_t 			encoding;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::event	reader.h	/^	tb_size_t 				event;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::name	reader.h	/^	tb_string_t 			name;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::st	reader.h	/^	tb_stream_t* 			st;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::text	reader.h	/^	tb_string_t 			text;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_reader_t::version	reader.h	/^	tb_string_t 			version;$/;"	m	struct:__tb_xml_reader_t	access:public
+__tb_xml_writer_t	writer.h	/^typedef struct __tb_xml_writer_t$/;"	s
+__tb_xml_writer_t::attributes	writer.h	/^	tb_xml_attribute_t 		attributes[TB_XML_WRITER_ATTRIBUTES_MAX];$/;"	m	struct:__tb_xml_writer_t	access:public
+__tb_xml_writer_t::attributes_n	writer.h	/^	tb_size_t 				attributes_n;$/;"	m	struct:__tb_xml_writer_t	access:public
+__tb_xml_writer_t::st	writer.h	/^	tb_stream_t* 			st;$/;"	m	struct:__tb_xml_writer_t	access:public
+attributes	node.h	/^	struct __tb_xml_nlist_t* 	attributes;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_nlist_t	access:public
+attributes	reader.h	/^	tb_xml_attribute_t 		attributes[TB_XML_READER_ATTRIBUTES_MAX];$/;"	m	struct:__tb_xml_reader_t	access:public
+attributes	writer.h	/^	tb_xml_attribute_t 		attributes[TB_XML_WRITER_ATTRIBUTES_MAX];$/;"	m	struct:__tb_xml_writer_t	access:public
+attributes_n	reader.h	/^	tb_size_t 				attributes_n;$/;"	m	struct:__tb_xml_reader_t	access:public
+attributes_n	writer.h	/^	tb_size_t 				attributes_n;$/;"	m	struct:__tb_xml_writer_t	access:public
+base	attribute.h	/^	tb_xml_node_t 			base;$/;"	m	struct:__tb_xml_attribute_t	access:public
+base	document.h	/^	tb_xml_node_t 				base;$/;"	m	struct:__tb_xml_document_t	access:public
+base	document.h	/^	tb_xml_node_t 				base;$/;"	m	struct:__tb_xml_document_type_t	access:public
+base	element.h	/^	tb_xml_node_t 			base;$/;"	m	struct:__tb_xml_element_t	access:public
+cache	reader.h	/^	tb_char_t 				cache;$/;"	m	struct:__tb_xml_reader_t	access:public
+childs	node.h	/^	struct __tb_xml_nlist_t* 	childs;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_nlist_t	access:public
+document	node.h	/^	void* 						document;$/;"	m	struct:__tb_xml_node_t	access:public
+element	reader.h	/^	tb_string_t 			element;$/;"	m	struct:__tb_xml_reader_t	access:public
+encoding	reader.h	/^	tb_string_t 			encoding;$/;"	m	struct:__tb_xml_reader_t	access:public
+entities	document.h	/^	struct __tb_xml_nlist_t* 	entities;$/;"	m	struct:__tb_xml_document_type_t	typeref:struct:__tb_xml_document_type_t::__tb_xml_nlist_t	access:public
+event	reader.h	/^	tb_size_t 				event;$/;"	m	struct:__tb_xml_reader_t	access:public
+head	nlist.h	/^	tb_xml_node_t* 	head;$/;"	m	struct:__tb_xml_nlist_t	access:public
+name	node.h	/^	tb_string_t 				name;$/;"	m	struct:__tb_xml_node_t	access:public
+name	reader.h	/^	tb_string_t 			name;$/;"	m	struct:__tb_xml_reader_t	access:public
+next	node.h	/^	struct __tb_xml_node_t* 	next;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+notations	document.h	/^	struct __tb_xml_nlist_t* 	notations;$/;"	m	struct:__tb_xml_document_type_t	typeref:struct:__tb_xml_document_type_t::__tb_xml_nlist_t	access:public
+parent	node.h	/^	struct __tb_xml_node_t* 	parent;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+prev	node.h	/^	struct __tb_xml_node_t* 	prev;$/;"	m	struct:__tb_xml_node_t	typeref:struct:__tb_xml_node_t::__tb_xml_node_t	access:public
+size	nlist.h	/^	tb_size_t 		size;$/;"	m	struct:__tb_xml_nlist_t	access:public
+st	reader.h	/^	tb_stream_t* 			st;$/;"	m	struct:__tb_xml_reader_t	access:public
+st	writer.h	/^	tb_stream_t* 			st;$/;"	m	struct:__tb_xml_writer_t	access:public
+tail	nlist.h	/^	tb_xml_node_t* 	tail;$/;"	m	struct:__tb_xml_nlist_t	access:public
+tb_nlist_create	nlist.h	/^tb_xml_nlist_t* tb_nlist_create();$/;"	p	signature:()
+tb_nlist_destroy	nlist.h	/^void 			tb_nlist_destroy(tb_xml_nlist_t* nlist);$/;"	p	signature:(tb_xml_nlist_t* nlist)
+tb_xml_attribute_t	attribute.h	/^}tb_xml_attribute_t;$/;"	t	typeref:struct:__tb_xml_attribute_t
+tb_xml_document_clear	document.c	/^void tb_xml_document_clear(tb_xml_document_t* document)$/;"	f	signature:(tb_xml_document_t* document)
+tb_xml_document_clear	document.h	/^void 				tb_xml_document_clear(tb_xml_document_t* document);$/;"	p	signature:(tb_xml_document_t* document)
+tb_xml_document_create	document.c	/^tb_xml_document_t* tb_xml_document_create()$/;"	f
+tb_xml_document_create	document.h	/^tb_xml_document_t* 	tb_xml_document_create();$/;"	p	signature:()
+tb_xml_document_destroy	document.c	/^void tb_xml_document_destroy(tb_xml_document_t* document)$/;"	f	signature:(tb_xml_document_t* document)
+tb_xml_document_destroy	document.h	/^void 				tb_xml_document_destroy(tb_xml_document_t* document);$/;"	p	signature:(tb_xml_document_t* document)
+tb_xml_document_load	document.c	/^tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st)$/;"	f	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_load	document.h	/^tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st);$/;"	p	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_load_dump	document.c	/^tb_bool_t tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st)$/;"	f	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_load_dump	document.h	/^tb_bool_t 			tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st);$/;"	p	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_store	document.c	/^tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st)$/;"	f	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_store	document.h	/^tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st);$/;"	p	signature:(tb_xml_document_t* document, tb_stream_t* st)
+tb_xml_document_t	document.h	/^}tb_xml_document_t;$/;"	t	typeref:struct:__tb_xml_document_t
+tb_xml_document_type_t	document.h	/^}tb_xml_document_type_t;$/;"	t	typeref:struct:__tb_xml_document_type_t
+tb_xml_element_t	element.h	/^}tb_xml_element_t;$/;"	t	typeref:struct:__tb_xml_element_t
+tb_xml_nlist_at	nlist.h	/^tb_xml_node_t* 	tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index);$/;"	p	signature:(tb_xml_nlist_t* nlist, tb_int_t index)
+tb_xml_nlist_del	nlist.h	/^tb_xml_node_t* 	tb_xml_nlist_del(tb_xml_nlist_t* nlist, tb_char_t const* name);$/;"	p	signature:(tb_xml_nlist_t* nlist, tb_char_t const* name)
+tb_xml_nlist_get	nlist.h	/^tb_xml_node_t* 	tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name);$/;"	p	signature:(tb_xml_nlist_t* nlist, tb_char_t const* name)
+tb_xml_nlist_set	nlist.h	/^tb_xml_node_t* 	tb_xml_nlist_set(tb_xml_nlist_t* nlist, tb_xml_node_t const* node);$/;"	p	signature:(tb_xml_nlist_t* nlist, tb_xml_node_t const* node)
+tb_xml_nlist_t	nlist.h	/^}tb_xml_nlist_t;$/;"	t	typeref:struct:__tb_xml_nlist_t
+tb_xml_node_t	node.h	/^}tb_xml_node_t;$/;"	t	typeref:struct:__tb_xml_node_t
+tb_xml_node_type_t	node.h	/^}tb_xml_node_type_t;$/;"	t	typeref:enum:__tb_xml_node_type_t
+tb_xml_reader_close	reader.c	/^void tb_xml_reader_close(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_close	reader.h	/^void 					tb_xml_reader_close(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_event_t	reader.h	/^}tb_xml_reader_event_t;$/;"	t	typeref:enum:__tb_xml_reader_event_t
+tb_xml_reader_get_attribute_count	reader.c	/^tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_attribute_count	reader.h	/^tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_attribute_name	reader.c	/^tb_string_t const* tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index)$/;"	f	signature:(tb_xml_reader_t* reader, tb_int_t index)
+tb_xml_reader_get_attribute_name	reader.h	/^tb_string_t const* 		tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);$/;"	p	signature:(tb_xml_reader_t* reader, tb_int_t index)
+tb_xml_reader_get_attribute_value_by_index	reader.c	/^tb_string_t const* tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index)$/;"	f	signature:(tb_xml_reader_t* reader, tb_int_t index)
+tb_xml_reader_get_attribute_value_by_index	reader.h	/^tb_string_t const* 		tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);$/;"	p	signature:(tb_xml_reader_t* reader, tb_int_t index)
+tb_xml_reader_get_attribute_value_by_name	reader.c	/^tb_string_t const* tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name)$/;"	f	signature:(tb_xml_reader_t* reader, tb_char_t const* name)
+tb_xml_reader_get_attribute_value_by_name	reader.h	/^tb_string_t const* 		tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);$/;"	p	signature:(tb_xml_reader_t* reader, tb_char_t const* name)
+tb_xml_reader_get_cdata_text	reader.c	/^tb_string_t const* tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_cdata_text	reader.h	/^tb_string_t const* 		tb_xml_reader_get_cdata_text(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_char	reader.c	/^static tb_char_t tb_xml_reader_get_char(tb_xml_reader_t* reader)$/;"	f	file:	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_characters_text	reader.c	/^tb_string_t const* tb_xml_reader_get_characters_text(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_characters_text	reader.h	/^tb_string_t const* 		tb_xml_reader_get_characters_text(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_comment_text	reader.c	/^tb_string_t const* tb_xml_reader_get_comment_text(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_comment_text	reader.h	/^tb_string_t const* 		tb_xml_reader_get_comment_text(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_element_name	reader.c	/^tb_string_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_element_name	reader.h	/^tb_string_t const* 		tb_xml_reader_get_element_name(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_encoding	reader.c	/^tb_string_t const* tb_xml_reader_get_encoding(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_encoding	reader.h	/^tb_string_t const* 		tb_xml_reader_get_encoding(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_event	reader.c	/^tb_size_t tb_xml_reader_get_event(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_event	reader.h	/^tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_version	reader.c	/^tb_string_t const* tb_xml_reader_get_version(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_get_version	reader.h	/^tb_string_t const* 		tb_xml_reader_get_version(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_has_next	reader.c	/^tb_bool_t tb_xml_reader_has_next(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_has_next	reader.h	/^tb_bool_t 				tb_xml_reader_has_next(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_next	reader.c	/^tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)$/;"	f	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_next	reader.h	/^tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);$/;"	p	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_open	reader.c	/^tb_xml_reader_t* tb_xml_reader_open(tb_stream_t* st)$/;"	f	signature:(tb_stream_t* st)
+tb_xml_reader_open	reader.h	/^tb_xml_reader_t* 		tb_xml_reader_open(tb_stream_t* st);$/;"	p	signature:(tb_stream_t* st)
+tb_xml_reader_parse_element	reader.c	/^static tb_char_t const* tb_xml_reader_parse_element(tb_xml_reader_t* reader)$/;"	f	file:	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_parse_text	reader.c	/^static tb_char_t const* tb_xml_reader_parse_text(tb_xml_reader_t* reader)$/;"	f	file:	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_peek_char	reader.c	/^static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)$/;"	f	file:	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_seek_char	reader.c	/^static void tb_xml_reader_seek_char(tb_xml_reader_t* reader)$/;"	f	file:	signature:(tb_xml_reader_t* reader)
+tb_xml_reader_t	reader.h	/^}tb_xml_reader_t;$/;"	t	typeref:struct:__tb_xml_reader_t
+tb_xml_writer_attributes_add_bool	writer.c	/^void tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)
+tb_xml_writer_attributes_add_bool	writer.h	/^void 					tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)
+tb_xml_writer_attributes_add_c_string	writer.c	/^void tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)
+tb_xml_writer_attributes_add_c_string	writer.h	/^void 					tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)
+tb_xml_writer_attributes_add_float	writer.c	/^void tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
+tb_xml_writer_attributes_add_float	writer.h	/^void 					tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
+tb_xml_writer_attributes_add_format	writer.c	/^void tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)
+tb_xml_writer_attributes_add_format	writer.h	/^void 					tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)
+tb_xml_writer_attributes_add_int	writer.c	/^void tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)
+tb_xml_writer_attributes_add_int	writer.h	/^void 					tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)
+tb_xml_writer_attributes_add_string	writer.c	/^void tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)
+tb_xml_writer_attributes_add_string	writer.h	/^void 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)
+tb_xml_writer_attributes_clear	writer.c	/^void tb_xml_writer_attributes_clear(tb_xml_writer_t* writer)$/;"	f	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_attributes_clear	writer.h	/^void 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);$/;"	p	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_cdata	writer.c	/^void tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* data)
+tb_xml_writer_cdata	writer.h	/^void 					tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* data)
+tb_xml_writer_characters	writer.c	/^void tb_xml_writer_characters(tb_xml_writer_t* writer, tb_char_t const* text)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* text)
+tb_xml_writer_characters	writer.h	/^void 					tb_xml_writer_characters(tb_xml_writer_t* writer, tb_char_t const* text);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* text)
+tb_xml_writer_close	writer.c	/^void tb_xml_writer_close(tb_xml_writer_t* writer)$/;"	f	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_close	writer.h	/^void 					tb_xml_writer_close(tb_xml_writer_t* writer);$/;"	p	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_comment	writer.c	/^void tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* comment)
+tb_xml_writer_comment	writer.h	/^void 					tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* comment)
+tb_xml_writer_document_beg	writer.c	/^void tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)
+tb_xml_writer_document_beg	writer.h	/^void 					tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)
+tb_xml_writer_document_end	writer.c	/^void tb_xml_writer_document_end(tb_xml_writer_t* writer)$/;"	f	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_document_end	writer.h	/^void 					tb_xml_writer_document_end(tb_xml_writer_t* writer);$/;"	p	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_element_beg	writer.c	/^void tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name)
+tb_xml_writer_element_beg	writer.h	/^void 					tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name)
+tb_xml_writer_element_end	writer.c	/^void tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)$/;"	f	signature:(tb_xml_writer_t* writer, tb_char_t const* name)
+tb_xml_writer_element_end	writer.h	/^void 					tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name);$/;"	p	signature:(tb_xml_writer_t* writer, tb_char_t const* name)
+tb_xml_writer_flush	writer.c	/^void tb_xml_writer_flush(tb_xml_writer_t* writer)$/;"	f	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_flush	writer.h	/^void 					tb_xml_writer_flush(tb_xml_writer_t* writer);$/;"	p	signature:(tb_xml_writer_t* writer)
+tb_xml_writer_open	writer.c	/^tb_xml_writer_t* tb_xml_writer_open(tb_stream_t* st)$/;"	f	signature:(tb_stream_t* st)
+tb_xml_writer_open	writer.h	/^tb_xml_writer_t* 		tb_xml_writer_open(tb_stream_t* st);$/;"	p	signature:(tb_stream_t* st)
+tb_xml_writer_t	writer.h	/^}tb_xml_writer_t;$/;"	t	typeref:struct:__tb_xml_writer_t
+text	reader.h	/^	tb_string_t 			text;$/;"	m	struct:__tb_xml_reader_t	access:public
+type	node.h	/^	tb_size_t 					type;$/;"	m	struct:__tb_xml_node_t	access:public
+value	node.h	/^	tb_string_t 				value;$/;"	m	struct:__tb_xml_node_t	access:public
+version	reader.h	/^	tb_string_t 			version;$/;"	m	struct:__tb_xml_reader_t	access:public

@@ -89,7 +89,7 @@ void tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* versio
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "<?xml version = \"%s\" encoding = \"%s\" ?>", version? version : "", encoding? encoding : "");
+	tb_stream_printf(writer->st, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "", encoding? encoding : "");
 }
 void tb_xml_writer_document_end(tb_xml_writer_t* writer)
 {
@@ -110,9 +110,10 @@ void tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)
 		{
 			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
 			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
-			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s = \"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
+			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
 		}
 		tb_stream_printf(writer->st, ">");
+		tb_xml_writer_attributes_clear(writer);
 	}
 	else tb_stream_printf(writer->st, "<%s>", name? name : "");
 }
@@ -122,7 +123,6 @@ void tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)
 	if (!writer || !writer->st) return ;
 
 	tb_stream_printf(writer->st, "</%s>", name? name : "");
-	tb_xml_writer_attributes_clear(writer);
 }
 void tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)
 {
@@ -131,7 +131,7 @@ void tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)
 
 	tb_stream_printf(writer->st, "<![CDATA[%s]]>", data? data : "");
 }
-void tb_xml_writer_characters(tb_xml_writer_t* writer, tb_char_t const* text)
+void tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
