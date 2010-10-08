@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 	{
 		// the first node
 		tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
-		TB_DBG("node: <%s>%s</%s>", name, "", name);
+		TB_DBG("node: <%s></%s>", name, name);
 	}
 
 	// close
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
 		TB_DBG("select: %s", argv[2]);
 
 		// the first node
-		TB_DBG("node: <%s>%s</%s>", tb_string_c_string(&node->name), tb_string_c_string(&node->value), tb_string_c_string(&node->name));
+		TB_DBG("node: <%s></%s>", tb_string_c_string(&node->name), tb_string_c_string(&node->name));
 
 #if 0
 		// the other node
@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 		{
 			if (TB_TRUE == tb_string_compare(&item->name, &node->name))
 			{
-				TB_DBG("node: <%s>%s</%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->value), tb_string_c_string(&item->name));
+				TB_DBG("node: <%s></%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->name));
 			}
 			item = item->next;
 		}
