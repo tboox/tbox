@@ -29,9 +29,50 @@
 #include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * details
  */
+static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_string_t* parent, tb_char_t const* path)
+{
+	TB_ASSERT(node);
+	if (!node || !node->childs) return TB_NULL;
+	
+	// init
+	tb_xml_node_t* ret = TB_NULL;
+	tb_stack_string_t s;
+	tb_string_init_stack_string(&s);
 
+	// find it
+	tb_xml_node_t* head = (tb_xml_node_t*)node->childs;
+	tb_xml_node_t* item = head->next;
+	while (item && item != head)
+	{
+		if (item->type == TB_XML_NODE_TYPE_ELEMENT)
+		{
+			// append path
+			tb_string_clear((tb_string_t*)&s);
+			if (parent) tb_string_append((tb_string_t*)&s, parent);
+			tb_string_append_char((tb_string_t*)&s, '/');
+			tb_string_append((tb_string_t*)&s, &item->name);
+			//TB_DBG("%s: %s", tb_string_c_string(&item->name), tb_string_c_string(&s));
+			
+			// is this?
+			if (TB_TRUE == tb_string_compare_c_string((tb_string_t*)&s, path))
+			{
+				ret = item;
+				break;
+			}
+			else
+			{
+				ret = tb_xml_node_childs_select_node(item, (tb_string_t*)&s, path);
+				if (ret) break;
+			}
+		}
+		item = item->next;
+	}
+
+	tb_string_uninit((tb_string_t*)&s);
+	return ret;
+}
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -361,3 +402,10 @@ tb_xml_node_t* tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* n
 	return attribute;
 }
 
+tb_xml_node_t* tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path)
+{
+	TB_ASSERT(node && node->childs && path);
+	if (!node || !node->childs || !path) return TB_NULL;
+
+	return tb_xml_node_childs_select_node(node, TB_NULL, path);
+}

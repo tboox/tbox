@@ -85,9 +85,6 @@ tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st)
 // modifiors
 void 				tb_xml_document_clear(tb_xml_document_t* document);
 
-// debug
-tb_bool_t 			tb_xml_document_load_dump(tb_xml_document_t* document, tb_stream_t* st);
-
 // xml header
 tb_string_t* 		tb_xml_document_version(tb_xml_document_t* document);
 tb_string_t* 		tb_xml_document_encoding(tb_xml_document_t* document);

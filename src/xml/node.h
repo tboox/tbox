@@ -156,6 +156,7 @@ void 			tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child);
 void 			tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child);
 tb_xml_node_t* 	tb_xml_node_childs_head(tb_xml_node_t* node);
 tb_xml_node_t* 	tb_xml_node_childs_tail(tb_xml_node_t* node);
+tb_xml_node_t* 	tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path);
 
 // nodes
 tb_xml_node_t* 	tb_xml_node_add_element(tb_xml_node_t* node, tb_char_t const* name);
@@ -172,6 +173,8 @@ tb_xml_node_t* 	tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t co
 tb_xml_node_t* 	tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value);
 tb_xml_node_t* 	tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value);
 tb_xml_node_t* 	tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* fmt, ...);
+
+
 
 // c plus plus
 #ifdef __cplusplus

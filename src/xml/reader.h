@@ -108,6 +108,12 @@ void 					tb_xml_reader_close(tb_xml_reader_t* reader);
 tb_bool_t 				tb_xml_reader_has_next(tb_xml_reader_t* reader);
 tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);
 
+// seek: /root/node/item
+tb_bool_t 				tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path);
+
+// debug
+void 					tb_xml_reader_dump(tb_xml_reader_t* reader);
+
 // getter
 tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);
 tb_string_t const* 		tb_xml_reader_get_version(tb_xml_reader_t* reader);

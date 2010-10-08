@@ -268,6 +268,7 @@ tb_char_t const* tb_string_shift(tb_string_t* string, tb_string_t* s_string)
 	}
 	return TB_NULL;
 }
+
 tb_char_t const* tb_string_assign(tb_string_t* string, tb_string_t const* s_string)
 {
 	if (!string) return TB_NULL;
@@ -508,6 +509,23 @@ tb_bool_t tb_string_subat(tb_string_t const* string, tb_string_t* sub, tb_int_t 
 	return tb_string_resize(sub, size);
 }
 
+tb_int_t tb_string_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t start)
+{
+	// get string
+	tb_char_t const* 	s = tb_string_c_string(string);
+	tb_size_t 			n = tb_string_size(string);
+	if (!s || start < 0 || start >= n) return -1;
+	
+	// find it
+	tb_char_t const* p = s + start;
+	tb_char_t const* e = s + n;
+	while (p < e && *p)
+	{
+		if (*p == ch) break;
+		p++;
+	}
+	return (p < e)? (p - s) : -1;
+}
 tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start)
 {
 	// get string
@@ -544,6 +562,23 @@ tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub
 
 	return ((idx < 0 || idx >= n)? -1 : idx);
 	// }
+}
+tb_int_t tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_int_t start)
+{
+	// get string
+	tb_char_t const* 	s = tb_string_c_string(string);
+	tb_size_t 			n = tb_string_size(string);
+	if (!s || start < 0 || start >= n) return -1;
+	
+	// find it
+	tb_char_t const* p = s + start;
+	tb_char_t const* e = s + n;
+	while (p < e && *p)
+	{
+		if (*p == ch || tolower(*p) == tolower(ch)) break;
+		p++;
+	}
+	return (p < e)? (p - s) : -1;
 }
 tb_int_t tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t const* sub, tb_int_t start)
 {
@@ -589,6 +624,40 @@ tb_int_t tb_string_find_string(tb_string_t const* string, tb_string_t const* sub
 tb_int_t tb_string_find_string_nocase(tb_string_t const* string, tb_string_t const* sub, tb_int_t start)
 {
 	return tb_string_find_c_string_nocase(string, tb_string_c_string(sub), start);
+}
+tb_int_t tb_string_reverse_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t start)
+{
+	// get string
+	tb_char_t const* 	s = tb_string_c_string(string);
+	tb_size_t 			n = tb_string_size(string);
+	if (!s || start < 0 || start >= n) return -1;
+	
+	// find it
+	tb_char_t const* b = s + start;
+	tb_char_t const* p = s + n - 1;
+	while (p >= b && *p)
+	{
+		if (*p == ch) break;
+		p--;
+	}
+	return (p >= b)? (p - s) : -1;
+}
+tb_int_t tb_string_reverse_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_int_t start)
+{
+	// get string
+	tb_char_t const* 	s = tb_string_c_string(string);
+	tb_size_t 			n = tb_string_size(string);
+	if (!s || start < 0 || start >= n) return -1;
+	
+	// find it
+	tb_char_t const* b = s + start;
+	tb_char_t const* p = s + n - 1;
+	while (p >= b && *p)
+	{
+		if (*p == ch || tolower(*p) == tolower(ch)) break;
+		p--;
+	}
+	return (p >= b)? (p - s) : -1;
 }
 tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 {
