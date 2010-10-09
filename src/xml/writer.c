@@ -117,6 +117,27 @@ void tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)
 	}
 	else tb_stream_printf(writer->st, "<%s>", name? name : "");
 }
+void tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name)
+{
+	TB_ASSERT(writer && writer->st);
+	if (!writer || !writer->st) return ;
+
+	if (writer->attributes_n) 
+	{
+		tb_stream_printf(writer->st, "<%s", name? name : "");
+		tb_int_t i = 0;
+		tb_int_t n = writer->attributes_n;
+		for (i = 0; i < n; i++)
+		{
+			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
+			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
+			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
+		}
+		tb_stream_printf(writer->st, "/>");
+		tb_xml_writer_attributes_clear(writer);
+	}
+	else tb_stream_printf(writer->st, "<%s/>", name? name : "");
+}
 void tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)
 {
 	TB_ASSERT(writer && writer->st);

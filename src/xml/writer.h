@@ -78,6 +78,7 @@ void 					tb_xml_writer_document_end(tb_xml_writer_t* writer);
 // element
 void 					tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name);
 void 					tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name);
+void 					tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name);
 
 // attributes
 void 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);

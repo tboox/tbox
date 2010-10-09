@@ -80,8 +80,6 @@ INC_FILES-$(TB_CONFIG_ENCODING) 	+= \
 									xml$(_)xml.h \
 									xml$(_)prefix.h \
 									xml$(_)document.h \
-									xml$(_)element.h \
-									xml$(_)attribute.h \
 									xml$(_)node.h \
 									xml$(_)reader.h \
 									xml$(_)writer.h \

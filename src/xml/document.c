@@ -28,20 +28,6 @@
 #include "nlist.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-#ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-#if 1
-# 	define TB_DOCUMENT_DBG(fmt, arg...) 			TB_DBG("[xml]: " fmt, ##arg)
-#else
-# 	define TB_DOCUMENT_DBG(fmt, arg...)
-#endif
-
-#else
-# 	define TB_DOCUMENT_DBG
-#endif
-
-/* /////////////////////////////////////////////////////////
  * details
  */
 static void tb_xml_document_free(tb_xml_node_t* node)
@@ -110,8 +96,7 @@ static void tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nlist_t
 					}
 
 					// writer element
-					tb_xml_writer_element_beg(writer, tb_string_c_string(&node->name));
-					tb_xml_writer_element_end(writer, tb_string_c_string(&node->name));
+					tb_xml_writer_element_empty(writer, tb_string_c_string(&node->name));
 				}
 				break;
 			case TB_XML_NODE_TYPE_TEXT:
@@ -153,7 +138,8 @@ tb_xml_document_t* tb_xml_document_create()
 	// init document
 	tb_string_init(&document->version);
 	tb_string_init(&document->encoding);
-
+	tb_string_assign_c_string_by_ref(&document->version, "2.0");
+	tb_string_assign_c_string_by_ref(&document->encoding, "utf-8");
 
 	return document;
 }
@@ -175,9 +161,6 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st)
 	TB_ASSERT(reader);
 	if (!reader) return TB_FALSE;
 
-	// init return
-	tb_bool_t ret = TB_FALSE;
-
 	// the parent node
 	tb_xml_node_t* parent = (tb_xml_node_t*)document;
 
@@ -191,10 +174,10 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st)
 		case TB_XML_READER_EVENT_DOCUMENT_BEG: 
 			{
 				if (TB_NULL == tb_string_assign(&document->version, tb_xml_reader_get_version(reader))) goto fail;
-				if (TB_NULL == tb_string_assign(&document->encoding, tb_xml_reader_get_encoding(reader))) goto fail;
-				ret = TB_TRUE;
+				tb_string_assign(&document->encoding, tb_xml_reader_get_encoding(reader));
 			}
 			break;
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
 		case TB_XML_READER_EVENT_ELEMENT_BEG: 
 			{
 				// get element name
@@ -222,7 +205,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st)
 				tb_xml_node_childs_append(parent, element);
 
 				// enter element
-				parent = element;
+				if (event != TB_XML_READER_EVENT_ELEMENT_EMPTY) parent = element;
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 
@@ -291,7 +274,7 @@ end:
 	// close reader
 	if (reader) tb_xml_reader_close(reader);
 
-	return ret;
+	return TB_TRUE;
 
 fail:
 
@@ -339,8 +322,8 @@ void tb_xml_document_clear(tb_xml_document_t* document)
 	if (!document) return ;
 
 	// clear version & encoding
-	tb_string_clear(&document->version);
-	tb_string_clear(&document->encoding);
+	tb_string_assign_c_string_by_ref(&document->version, "2.0");
+	tb_string_assign_c_string_by_ref(&document->encoding, "utf-8");
 
 	// clear childs
 	if (document->base.childs) tb_xml_nlist_destroy(document->base.childs);
