@@ -20,6 +20,9 @@
 // xml
 #define TB_CONFIG_XML
 
+// zix
+#define TB_CONFIG_ZIX
+
 // regex
 #define TB_CONFIG_REGEX
 

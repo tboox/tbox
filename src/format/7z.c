@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		jpg.c
+ * \file		7z.c
  *
  */
 
@@ -40,14 +40,16 @@
  * interfaces
  */
 
-tb_size_t tb_format_jpg_probe(tb_stream_t* st)
+tb_size_t tb_format_7z_probe(tb_stream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 4);
+	tb_byte_t const* p = tb_stream_need(st, 6);
 	if ( 	p 
-		&& 	p[0] == 0xff 
-		&& 	p[1] == 0xd8 
-		&& 	p[2] == 0xff 
-		&& (p[3] >= 0xe0 && p[3] <= 0xef))
-		return 40;
+		&& 	p[0] == '7' 
+		&& 	p[1] == 'z' 
+		&& 	p[2] == 0xbc
+		&& 	p[3] == 0xaf
+		&& 	p[4] == 0x27
+		&& 	p[5] == 0x1c)
+		return 60;
 	else return 0;
 }

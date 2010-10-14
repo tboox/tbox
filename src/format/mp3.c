@@ -46,6 +46,6 @@ tb_size_t tb_format_mp3_probe(tb_stream_t* st)
 
 	// only for idv2.3 now
 	if (p && p[0] == 'I' && p[1] == 'D' && p[2] == '3' && p[3] == 3 && p[4] == 0)
-		return TB_FORMAT_SCORE_MAX;
+		return 50;
 	else return 0;
 }

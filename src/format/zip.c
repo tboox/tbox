@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		jpg.c
+ * \file		zip.c
  *
  */
 
@@ -40,14 +40,10 @@
  * interfaces
  */
 
-tb_size_t tb_format_jpg_probe(tb_stream_t* st)
+tb_size_t tb_format_zip_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 4);
-	if ( 	p 
-		&& 	p[0] == 0xff 
-		&& 	p[1] == 0xd8 
-		&& 	p[2] == 0xff 
-		&& (p[3] >= 0xe0 && p[3] <= 0xef))
+	if (p && tb_pbits_get_u32_le(p) == 0x04034b50)
 		return 40;
 	else return 0;
 }

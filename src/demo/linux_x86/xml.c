@@ -1,10 +1,10 @@
 #include "tplat/tplat.h"
 #include "../../tbox.h"
 
-//#define XML_READER 
+#define XML_READER 
 //#define XML_READER_SELECT
 //#define XML_WRITER
-#define XML_DOM
+//#define XML_DOM
 //#define XML_DOM_WRITER
 //#define XML_DOM_SELECT
 

@@ -61,6 +61,11 @@ tbox_C_FILES-$(TB_CONFIG_FORMAT) 	+= \
 									format$(_)jpg \
 									format$(_)png \
 									format$(_)swf \
+									format$(_)zip \
+									format$(_)bz2 \
+									format$(_)gz \
+									format$(_)7z \
+									format$(_)pdf \
 									format$(_)xml \
 									format$(_)htm \
 									format$(_)txt 

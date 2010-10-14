@@ -1,0 +1,29 @@
+<msx version="2.0" type="PlayContent" createtime="2010-10-05">
+	<entry type="Video">
+		<item cid="302" ReportHeart="30" category="ent" CommentSum="13" PlaySum="27015" IsScroll="false" NeedPass="false" FileSum="1" MediaType="flv">
+			<Title><![CDATA[周迅黑超遮面潮味足 全身名牌大秀美腿]]></Title>
+			<Url id="1" codelevel="" coderate="" name="" length="" size=""><![CDATA[/2010/09/26/06/6t14kfsdeqo44knl1erp2jx1vuxlyh9u.flv.flv]]></Url>
+			<HostPath traceRoute="0" CDNID="1" isSplit="1">http://122.225.55.130/c6d16c4a1c0e0808fd66a8f60996abfa/boke</HostPath>
+			<HostPath traceRoute="0" CDNID="1" isSplit="1">http://122.225.55.130/c6d16c4a1c0e0808fd66a8f60996abfa/boke</HostPath>
+			<HostPath traceRoute="0" CDNID="1" isSplit="1">http://115.238.29.208/c6d16c4a1c0e0808fd66a8f60996abfa/boke</HostPath>
+			<HostPath traceRoute="0" CDNID="1" isSplit="1">http://115.238.29.208/c6d16c4a1c0e0808fd66a8f60996abfa/boke</HostPath>
+			<PageUrl><![CDATA[http://ent.joy.cn/video/1928443.htm]]></PageUrl>
+			<LocalReport></LocalReport>
+			<Report><![CDATA[5|http://pcs1.app.joy.cn/aa|20678411564caabeaac439b733981563|20101005135906|ent.joy.cn/E302|58.39.10.176|67E00D06-076F-9E8A-05AB-238C639777C6|0|2|1928443|1928443|周迅黑超遮面潮味足 全身名牌大秀美腿|49||]]></Report>
+			<Introducation id='0'/>
+			<Pass/>
+			<MsxAllowNetTest>false</MsxAllowNetTest>
+			<MsxNetTestUrl/>
+			<ShowLogo>false</ShowLogo>
+		</item>
+	</entry>
+	<entry type="AD">
+		<item type="begin">
+			<type>1</type>
+			<data><![CDATA[]]></data>
+			<entity><![CDATA[&lt;&gt;&amp;&apos;&quot;]]></entity>
+			<entity>&lt;&gt;&amp;&apos;&quot;</entity>
+			<entity><![CDATA[<>'"&]]></entity>
+		</item>
+	</entry>
+</msx>

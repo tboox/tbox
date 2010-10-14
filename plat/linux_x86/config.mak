@@ -16,6 +16,9 @@ TB_CONFIG_FORMAT 			= y
 # xml
 TB_CONFIG_XML 				= y
 
+# zix
+TB_CONFIG_ZIX 				= y
+
 # regex
 TB_CONFIG_REGEX 			= y
 

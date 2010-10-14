@@ -44,6 +44,6 @@ tb_size_t tb_format_swf_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 3);
 	if (p && (p[0] == 'C' || p[0] == 'F') && p[1] == 'W' && p[2] == 'S')
-		return TB_FORMAT_SCORE_MAX;
+		return 30;
 	else return 0;
 }

@@ -47,29 +47,37 @@ extern "C" {
 // the format type
 typedef enum __tb_format_type_t
 {
-	TB_FORMAT_TYPE_NUL = 0
+	TB_FORMAT_TYPE_NUL 	= 0
 
 	// video
-,	TB_FORMAT_TYPE_FLV = 1
-,	TB_FORMAT_TYPE_AVI = 2
+,	TB_FORMAT_TYPE_FLV 	= 1
+,	TB_FORMAT_TYPE_AVI 	= 2
 
 	// audio
-,	TB_FORMAT_TYPE_WAV = 3
-,	TB_FORMAT_TYPE_MP3 = 4
+,	TB_FORMAT_TYPE_WAV 	= 3
+,	TB_FORMAT_TYPE_MP3 	= 4
 
 	// image
-,	TB_FORMAT_TYPE_JPG = 5
-,	TB_FORMAT_TYPE_GIF = 6
-,	TB_FORMAT_TYPE_BMP = 7
-,	TB_FORMAT_TYPE_PNG = 8
+,	TB_FORMAT_TYPE_JPG 	= 5
+,	TB_FORMAT_TYPE_GIF 	= 6
+,	TB_FORMAT_TYPE_BMP 	= 7
+,	TB_FORMAT_TYPE_PNG 	= 8
 
 	// flash
-,	TB_FORMAT_TYPE_SWF = 9
+,	TB_FORMAT_TYPE_SWF 	= 9
 
 	// text
-,	TB_FORMAT_TYPE_TXT = 10
-,	TB_FORMAT_TYPE_XML = 11
-,	TB_FORMAT_TYPE_HTM = 12
+,	TB_FORMAT_TYPE_TXT 	= 10
+,	TB_FORMAT_TYPE_XML 	= 11
+,	TB_FORMAT_TYPE_HTM 	= 12
+,	TB_FORMAT_TYPE_PDF 	= 13
+
+	// zix
+,	TB_FORMAT_TYPE_ZIP 	= 14
+,	TB_FORMAT_TYPE_BZ2 	= 15
+,	TB_FORMAT_TYPE_GZ 	= 16
+,	TB_FORMAT_TYPE_7Z 	= 17
+
 
 }tb_format_type_t;
 
@@ -82,6 +90,7 @@ typedef enum __tb_format_flag_t
 ,	TB_FORMAT_FLAG_AUDIO = 4
 ,	TB_FORMAT_FLAG_IMAGE = 8
 ,	TB_FORMAT_FLAG_FLASH = 16
+,	TB_FORMAT_FLAG_STORE = 32
 
 }tb_format_flag_t;
 
@@ -129,7 +138,14 @@ tb_size_t 			tb_format_swf_probe(tb_stream_t* st);
 // text
 tb_size_t 			tb_format_xml_probe(tb_stream_t* st);
 tb_size_t 			tb_format_htm_probe(tb_stream_t* st);
+tb_size_t 			tb_format_pdf_probe(tb_stream_t* st);
 tb_size_t 			tb_format_txt_probe(tb_stream_t* st);
+
+// store
+tb_size_t 			tb_format_zip_probe(tb_stream_t* st);
+tb_size_t 			tb_format_bz2_probe(tb_stream_t* st);
+tb_size_t 			tb_format_gz_probe(tb_stream_t* st);
+tb_size_t 			tb_format_7z_probe(tb_stream_t* st);
 
 // c plus plus
 #ifdef __cplusplus

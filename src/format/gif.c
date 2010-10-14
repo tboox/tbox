@@ -43,8 +43,14 @@
 tb_size_t tb_format_gif_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 6);
-	if (p && p[0] == 'G' && p[1] == 'I' && p[2] == 'F' && p[3] == '8' 
-		&& (p[4] == '7' || p[4] == '9') && p[5] == 'a')
-		return TB_FORMAT_SCORE_MAX;
+	if ( 	p 
+		&& 	p[0] == 'G'
+		&& 	p[1] == 'I' 
+		&& 	p[2] == 'F' 
+		&& 	p[3] == '8' 
+		&& ( 	p[4] == '7'
+			|| 	p[4] == '9') 
+		&& 	p[5] == 'a')
+		return 60;
 	else return 0;
 }

@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		jpg.c
+ * \file		bz2.c
  *
  */
 
@@ -40,14 +40,13 @@
  * interfaces
  */
 
-tb_size_t tb_format_jpg_probe(tb_stream_t* st)
+tb_size_t tb_format_bz2_probe(tb_stream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 4);
+	tb_byte_t const* p = tb_stream_need(st, 3);
 	if ( 	p 
-		&& 	p[0] == 0xff 
-		&& 	p[1] == 0xd8 
-		&& 	p[2] == 0xff 
-		&& (p[3] >= 0xe0 && p[3] <= 0xef))
-		return 40;
+		&& 	p[0] == 'B'
+		&& 	p[1] == 'Z'
+		&& 	p[2] == 'h')
+		return 30;
 	else return 0;
 }
