@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 			tb_string_t string;
 			tb_string_init(&string);
 			tb_char_t const* s = tb_http_recv_string(http, &string);
-			if (s) TB_DBG("return: %s", s);
+			if (s) TB_DBG("reply: %s", s);
 			tb_string_uninit(&s);
 		}
 		else
