@@ -481,6 +481,30 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		return TB_NULL;
 	}
 }
+tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
+{
+	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_c_string_with_size(string, c_string, size);
+	else if (c_string)
+	{
+		// get old osize
+		tb_uint16_t osize = string->size;
+
+		// ensure enough size
+		if (TB_FALSE == tb_string_resize(string, osize + size)) return TB_NULL;
+
+		// append string
+		memcpy(string->data + osize, c_string, size);
+		string->data[string->size] = '\0';
+
+		return tb_string_c_string(string);
+	}
+	else 
+	{
+		tb_string_clear(string);
+		return TB_NULL;
+	}
+}
+
 tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_char(string, ch);

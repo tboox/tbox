@@ -37,6 +37,7 @@ extern "C" {
 #include "math.h"
 #include "pool.h"
 #include "bits.h"
+#include "http.h"
 #include "bswap.h"
 #include "array.h"
 #include "memops.h"

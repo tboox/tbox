@@ -17,6 +17,7 @@ tbox_C_FILES 		+= \
 					memops \
 					string \
 					array \
+					http \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
@@ -35,6 +36,7 @@ INC_FILES 			= \
 					math.h \
 					pool.h \
 					array.h \
+					http.h \
 					memops.h \
 					string.h \
 					stream.h \
