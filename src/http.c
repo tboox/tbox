@@ -26,6 +26,7 @@
  */
 #include "http.h"
 #include "regex.h"
+#include "math.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -209,10 +210,56 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			// no stream, be able to seek
 			http->stream = 0;
 		}
+		// parse content type
+		else if (!strcmp (tag, "Content-Type"))
+		{
+			//TB_DBG("type: %s", p);
+		}
+		// parse transfer encoding
+		else if (!strcmp (tag, "Transfer-Encoding"))
+		{
+			if (!strcmp(p, "chunked")) 
+			{
+				http->chunked = 1;
+				http->stream = 1;
+			}
+		}
 	}
 
 	return TB_TRUE;
 	// }
+}
+static tb_char_t const* tb_http_recv_line(tb_http_t* http)
+{
+	tb_char_t ch = 0;
+	tb_char_t* line = http->line;
+	tb_char_t* p = line;
+	while (1)
+	{
+		// recv char
+		ch = tb_http_recv_char(http);
+
+		// is fail?
+		if (ch < 0) break;
+
+		// is line?
+		if (ch == '\n') 
+		{
+			// finish line
+			if (p > line && p[-1] == '\r')
+				p--;
+			*p = '\0';
+	
+			return line;
+		}
+		// append char to line
+		else 
+		{
+			if ((p - line) < TB_HTTP_LINE_MAX - 1)
+			*p++ = ch;
+		}
+	}
+	return TB_NULL;
 }
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -308,47 +355,29 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 	strncpy(http->url, url, TB_HTTP_PATH_MAX - 1);
 	http->url[TB_HTTP_PATH_MAX - 1] = '\0';
 
-	// reset redirect
+	// reset info
+	http->size = 0;
+	http->code = 0;
+	http->stream = 1;
+	http->chunked = 0;
 	http->redirect = 0;
 	if (!http->redirect) http->redirect_n = 0;
-	
-	// handle http reply
-	tb_char_t ch = 0;
+
+	// process reply
 	tb_size_t line_idx = 0;
-	tb_char_t* line = http->line;
-	tb_char_t* p = line;
 	while (1)
 	{
-		// recv char
-		ch = tb_http_recv_char(http);
-
-		// is fail?
-		if (ch < 0) goto fail;
-
-		// is line?
-		if (ch == '\n') 
+		tb_char_t const* line = tb_http_recv_line(http);
+		if (line)
 		{
-			// finish line
-			if (p > line && p[-1] == '\r')
-				p--;
-			*p = '\0';
-	
 			// is end?
 			if (line[0] == '\0') break;
-	
-			// new line
-			p = line;
 
 			// process line
 			if (TB_FALSE == tb_http_process_line(http, line_idx)) goto fail;
 			line_idx++;
 		}
-		// append char to line
-		else 
-		{
-			if ((p - line) < TB_HTTP_LINE_MAX - 1)
-			*p++ = ch;
-		}
+		else break;
 	}
 
 	// redirect?
@@ -465,30 +494,81 @@ tb_int_t tb_http_recv_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_
 	//TB_DBG("recv: %d", recv_n);
 	return recv_n;
 }
+
 tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 {
 	TB_ASSERT(http && string && http->socket != TPLAT_INVALID_HANDLE);
 	if (!http || !string || http->socket == TPLAT_INVALID_HANDLE) return TB_NULL;
 
-	tb_int_t recv_n = 0;
-	tb_int_t try_n = 100;
-	while (recv_n < http->size)
+	if (http->chunked)
 	{
-		tb_char_t 	s[4096];
-		tb_int_t 	n = tplat_socket_recv(http->socket, s, 4095);
-		if (n < 0) break;
-		else if (!n)
+		tb_int_t recv_n = 0;
+		while (1)
 		{
-			if (try_n > 0) try_n--;
+			// recv chunk header
+			tb_char_t const* line = tb_http_recv_line(http);
+			if (line) 
+			{
+				// get chunk size
+				tb_char_t* stop;
+				tb_int_t size = strtol(line, &stop, 16);
+				//TB_DBG("%s %d", line, size);
+
+				// is end?
+				if (!size) break;
+
+				// recv chunk data
+				tb_int_t chunk_n = 0;
+				tb_int_t try_n = 100;
+				while (chunk_n < size)
+				{
+					tb_char_t 	s[4096];
+					tb_int_t 	n = tplat_socket_recv(http->socket, s, TB_MATH_MIN(size - chunk_n, 4095));
+					if (n < 0) break;
+					else if (!n)
+					{
+						if (try_n > 0) try_n--;
+						else break;
+					}
+					else 
+					{
+						s[n] = '\0';
+						tb_string_append_c_string_with_size(string, s, n);
+						chunk_n += n;
+					}
+					tplat_msleep(1);
+				}
+				recv_n += chunk_n;
+				//TB_DBG("recv: %d %s", recv_n, tb_string_c_string(string));
+			}
 			else break;
 		}
-		else 
-		{
-			s[n] = '\0';
-			tb_string_append_c_string_with_size(string, s, n);
-			recv_n += n;
-		}
-		tplat_msleep(1);
+
+		http->size = recv_n;
+		return (recv_n > 0? tb_string_c_string(string) : TB_NULL);
 	}
-	return (recv_n == http->size? tb_string_c_string(string) : TB_NULL);
+	else
+	{
+		tb_int_t recv_n = 0;
+		tb_int_t try_n = 100;
+		while (recv_n < http->size)
+		{
+			tb_char_t 	s[4096];
+			tb_int_t 	n = tplat_socket_recv(http->socket, s, TB_MATH_MIN(http->size - recv_n, 4095));
+			if (n < 0) break;
+			else if (!n)
+			{
+				if (try_n > 0) try_n--;
+				else break;
+			}
+			else 
+			{
+				s[n] = '\0';
+				tb_string_append_c_string_with_size(string, s, n);
+				recv_n += n;
+			}
+			tplat_msleep(1);
+		}
+		return (recv_n == http->size? tb_string_c_string(string) : TB_NULL);
+	}
 }

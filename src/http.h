@@ -65,6 +65,9 @@ typedef struct __tb_http_t
 	tb_int_t 			redirect;
 	tb_int_t 			redirect_n;
 
+	// is transfer: chunked
+	tb_int_t 			chunked;
+
 	// is stream
 	tb_int_t 			stream;
 	
