@@ -252,11 +252,8 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 	TB_HTTP_DBG("open: %s:%d %s:%s%s%s", host, port, method == TB_HTTP_METHOD_GET? "GET" : "POST", path, args? "?" : "", args? args : "");
 
 	// open socket
-	if (!http->redirect)
-	{
-		if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
-		http->socket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
-	}
+	if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
+	http->socket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
 
 	// check socket
 	TB_ASSERT(http->socket != TPLAT_INVALID_HANDLE);
@@ -306,7 +303,7 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 	
 	// send http request
 	if (request_n != tb_http_send_data(http, request, request_n, TB_TRUE)) goto fail;
-	
+
 	// save url
 	strncpy(http->url, url, TB_HTTP_PATH_MAX - 1);
 	http->url[TB_HTTP_PATH_MAX - 1] = '\0';
@@ -438,6 +435,7 @@ tb_int_t tb_http_send_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_
 
 	}
 	else send_n = tplat_socket_send(http->socket, data, size);
+	//TB_DBG("send: %d", send_n);
 	return send_n;
 }
 tb_int_t tb_http_recv_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_bool_t block)
@@ -464,6 +462,7 @@ tb_int_t tb_http_recv_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_
 
 	}
 	else recv_n = tplat_socket_recv(http->socket, data, size);
+	//TB_DBG("recv: %d", recv_n);
 	return recv_n;
 }
 tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)

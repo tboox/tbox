@@ -118,8 +118,6 @@ typedef struct __tb_stream_t
 typedef struct __tb_http_stream_t
 {
 	tb_stream_t 		base;
-	tplat_handle_t 		hsocket;
-	tb_size_t 			size;
 
 }tb_http_stream_t;
 
