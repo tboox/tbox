@@ -48,13 +48,22 @@
 /* ////////////////////////////////////////////////////////////////////////
  * details
  */
-static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_char_t* path)
+static tb_bool_t tb_http_split(tb_http_t* http, tb_char_t const* url)
 {
-	TB_ASSERT(url && host);
-	if (!url || !host) return 0;
+	TB_ASSERT(url && http);
+	if (!url || !http) return TB_FALSE;
 
-	// {the invalid port
-	tb_size_t port = 0;
+	// is file root?
+	if (url[0] == '/') 
+	{
+		if (http->redirect)
+		{
+			strncpy(http->path, url, TB_HTTP_PATH_MAX - 1);
+			http->path[TB_HTTP_PATH_MAX - 1] = '\0';
+			return TB_TRUE;
+		}
+		else return TB_FALSE;
+	}
 
 	// create regex
 	tplat_handle_t hregex1 = TB_INVALID_HANDLE;
@@ -91,40 +100,43 @@ static tb_size_t tb_http_url_split(tb_char_t const* url, tb_char_t* host, tb_cha
 	if (match_n <= 0) goto fail;
 
 	// parse host
-	if (TB_NULL == tb_regex_get(hregex, 1, host, TB_NULL)) goto fail;
-
-	// check host
-	if (host[0] == '/') goto fail;
+	if (TB_NULL == tb_regex_get(hregex, 1, http->host, TB_NULL)) goto fail;
 
 	if (hregex == hregex1 || hregex == hregex3)
 	{
 		// parse path
-		if (TB_NULL == tb_regex_get(hregex, 3, path, TB_NULL)) goto fail;
+		if (TB_NULL == tb_regex_get(hregex, 3, http->path, TB_NULL)) goto fail;
 
 		// {parse port
 		tb_char_t port_s[256];
 		if (TB_NULL == tb_regex_get(hregex, 2, port_s, TB_NULL)) goto fail;
-		port = atoi(port_s);
+		http->port = atoi(port_s);
 		// }
 
 	}
 	else
 	{
 		// parse path
-		if (TB_NULL == tb_regex_get(hregex, 2, path, TB_NULL)) goto fail;
+		if (TB_NULL == tb_regex_get(hregex, 2, http->path, TB_NULL)) goto fail;
 
-		// the default port
-		port = 80;
+		// default port
+		if (!http->redirect) http->port = TB_HTTP_PORT_DEFAULT;
 	}
+
+	if (hregex1) tb_regex_destroy(hregex1);
+	if (hregex2) tb_regex_destroy(hregex2);
+	if (hregex3) tb_regex_destroy(hregex3);
+	if (hregex4) tb_regex_destroy(hregex4);
+	return TB_TRUE;
 
 fail:
 	if (hregex1) tb_regex_destroy(hregex1);
 	if (hregex2) tb_regex_destroy(hregex2);
 	if (hregex3) tb_regex_destroy(hregex3);
 	if (hregex4) tb_regex_destroy(hregex4);
-	return port;
-	// }}}
+	return TB_FALSE;
 }
+
 static tb_char_t tb_http_recv_char(tb_http_t* http)
 {
 	tb_char_t ch[1];
@@ -181,10 +193,15 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			if (http->code == 302 || http->code == 303)
 			{
 				// next url
-				strncpy(http->url, p, TB_HTTP_PATH_MAX - 1);
-				http->url[TB_HTTP_PATH_MAX - 1] = '\0';
 				http->redirect = 1;
 				
+				// split url
+				if (TB_FALSE == tb_http_split(http, p)) return TB_FALSE;
+				TB_HTTP_DBG("redirect: %s:%d %s", http->host, http->port, http->path);
+
+				// the host is changed, open new socket
+				if (p[0] != '/') http->changed = 1;
+
 				return TB_TRUE;
 			}
 			else return TB_FALSE;
@@ -261,46 +278,17 @@ static tb_char_t const* tb_http_recv_line(tb_http_t* http)
 	}
 	return TB_NULL;
 }
-/* ////////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_http_t* tb_http_create()
+static tb_bool_t tb_http_open_host(tb_http_t* http, tb_char_t const* args, tb_http_method_t method)
 {
-	// alloc
-	tb_http_t* http = tb_malloc(sizeof(tb_http_t));
-	if (!http) return TB_NULL;
-
-	// init
-	memset(http, 0, sizeof(tb_http_t));
-	http->socket = TPLAT_INVALID_HANDLE;
-	http->stream = 1;
-
-	return http;
-}
-void tb_http_destroy(tb_http_t* http)
-{
-	if (http)
-	{
-		if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
-		tb_free(http);
-	}
-}
-
-tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* args, tb_http_method_t method)
-{
-	TB_ASSERT(http && url);
-	if (!http || !url) return TB_FALSE;
-
-	// split url
-	tb_char_t host[1024];
-	tb_char_t path[2048];
-	tb_size_t port = tb_http_url_split(url, host, path);
-	if (!port) return TB_FALSE;
-	TB_HTTP_DBG("open: %s:%d %s:%s%s%s", host, port, method == TB_HTTP_METHOD_GET? "GET" : "POST", path, args? "?" : "", args? args : "");
+	TB_ASSERT(http);
+	if (!http) return TB_FALSE;
 
 	// open socket
-	if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
-	http->socket = tplat_socket_client_open(host, port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
+	if (http->socket == TPLAT_INVALID_HANDLE || http->changed)
+	{
+		if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
+		http->socket = tplat_socket_client_open(http->host, http->port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
+	}
 
 	// check socket
 	TB_ASSERT(http->socket != TPLAT_INVALID_HANDLE);
@@ -317,7 +305,7 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 				"Accept: */*\r\n"
 				"Host: %s\r\n"
 				"Connection: close\r\n"
-				"\r\n", path, args? "?" : "", args? args : "", host);
+				"\r\n", http->path, args? "?" : "", args? args : "", http->host);
 	}
 	else
 	{
@@ -331,7 +319,7 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 					"Content-Length: %d\r\n"
 					"Connection: close\r\n"
 					"\r\n"
-					"%s", path, host, strlen(args), args);
+					"%s", http->path, http->host, strlen(args), args);
 		}
 		else
 		{
@@ -340,7 +328,7 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 			"Accept: */*\r\n"
 			"Host: %s\r\n"
 			"Connection: close\r\n"
-			"\r\n", path, host);
+			"\r\n", http->path, http->host);
 		}
 	}
 
@@ -350,10 +338,6 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 	
 	// send http request
 	if (request_n != tb_http_send_data(http, request, request_n, TB_TRUE)) goto fail;
-
-	// save url
-	strncpy(http->url, url, TB_HTTP_PATH_MAX - 1);
-	http->url[TB_HTTP_PATH_MAX - 1] = '\0';
 
 	// reset info
 	http->size = 0;
@@ -385,9 +369,8 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 	{
 		if (http->redirect_n < TB_HTTP_REDIRECT_MAX)
 		{
-			TB_HTTP_DBG("redirect: %s", http->url);
 			http->redirect_n++;
-			return tb_http_open(http, http->url, TB_NULL, TB_HTTP_METHOD_GET);
+			return tb_http_open_host(http, TB_NULL, TB_HTTP_METHOD_GET);
 		}
 		else return TB_FALSE;
 	}
@@ -397,6 +380,47 @@ tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* a
 fail:
 	if (http) tb_http_close(http);
 	return TB_FALSE;
+}
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_http_t* tb_http_create()
+{
+	// alloc
+	tb_http_t* http = tb_malloc(sizeof(tb_http_t));
+	if (!http) return TB_NULL;
+
+	// init
+	memset(http, 0, sizeof(tb_http_t));
+	http->socket = TPLAT_INVALID_HANDLE;
+	http->stream = 1;
+	http->port = TB_HTTP_PORT_DEFAULT;
+
+	return http;
+}
+void tb_http_destroy(tb_http_t* http)
+{
+	if (http)
+	{
+		if (http->socket != TPLAT_INVALID_HANDLE) tplat_socket_close(http->socket);
+		tb_free(http);
+	}
+}
+
+tb_bool_t tb_http_open(tb_http_t* http, tb_char_t const* url, tb_char_t const* args, tb_http_method_t method)
+{
+	TB_ASSERT(http && url);
+	if (!http || !url) return TB_FALSE;
+
+	// close old socket
+	tb_http_close(http);
+
+	// split url
+	if (TB_FALSE == tb_http_split(http, url)) return TB_FALSE;
+	TB_HTTP_DBG("open: %s:%d %s:%s%s%s", http->host, http->port, method == TB_HTTP_METHOD_GET? "GET" : "POST", http->path, args? "?" : "", args? args : "");
+
+	// open host
+	return tb_http_open_host(http, args, method);
 }
 void tb_http_close(tb_http_t* http)
 {
@@ -410,6 +434,7 @@ void tb_http_close(tb_http_t* http)
 		memset(http, 0, sizeof(tb_http_t));
 		http->socket = TPLAT_INVALID_HANDLE;
 		http->stream = 1;
+		http->port = TB_HTTP_PORT_DEFAULT;
 	}
 }
 tb_size_t tb_http_size(tb_http_t* http)
@@ -426,12 +451,26 @@ tb_size_t tb_http_code(tb_http_t* http)
 
 	return (http->code > 0? http->code : 0);
 }
-tb_char_t const* tb_http_url(tb_http_t* http)
+tb_char_t const* tb_http_host(tb_http_t* http)
 {	
 	TB_ASSERT(http && http->socket != TPLAT_INVALID_HANDLE);
 	if (!http || http->socket == TPLAT_INVALID_HANDLE) return TB_NULL;
 
-	return http->url;
+	return http->host;
+}
+tb_char_t const* tb_http_path(tb_http_t* http)
+{	
+	TB_ASSERT(http && http->socket != TPLAT_INVALID_HANDLE);
+	if (!http || http->socket == TPLAT_INVALID_HANDLE) return TB_NULL;
+
+	return http->path;
+}
+tb_size_t tb_http_port(tb_http_t* http)
+{	
+	TB_ASSERT(http && http->socket != TPLAT_INVALID_HANDLE);
+	if (!http || http->socket == TPLAT_INVALID_HANDLE) return 0;
+
+	return http->port;
 }
 tb_bool_t tb_http_stream(tb_http_t* http)
 {
@@ -448,18 +487,16 @@ tb_int_t tb_http_send_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_
 	tb_int_t send_n = 0;
 	if (block == TB_TRUE)
 	{
-		tb_int_t try_n = 100;
+		tb_int_t try = 100;
 		while (send_n < size)
 		{
 			tb_int_t ret = tplat_socket_send(http->socket, data + send_n, size - send_n);
 			if (ret < 0) break;
 			else if (!ret)
 			{
-				if (try_n > 0) try_n--;
-				else break;
+				if (try-- <= 0) break;
 			}
 			else send_n += ret;
-			tplat_msleep(1);
 		}
 
 	}
@@ -475,18 +512,16 @@ tb_int_t tb_http_recv_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_
 	tb_int_t recv_n = 0;
 	if (block == TB_TRUE)
 	{
-		tb_int_t try_n = 100;
+		tb_int_t try = 100;
 		while (recv_n < size)
 		{
 			tb_int_t ret = tplat_socket_recv(http->socket, data + recv_n, size - recv_n);
 			if (ret < 0) break;
 			else if (!ret)
 			{
-				if (try_n > 0) try_n--;
-				else break;
+				if (try-- <= 0) break;
 			}
 			else recv_n += ret;
-			tplat_msleep(1);
 		}
 
 	}
@@ -519,7 +554,7 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 
 				// recv chunk data
 				tb_int_t chunk_n = 0;
-				tb_int_t try_n = 100;
+				tb_int_t try = 100;
 				while (chunk_n < size)
 				{
 					tb_char_t 	s[4096];
@@ -527,8 +562,7 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 					if (n < 0) break;
 					else if (!n)
 					{
-						if (try_n > 0) try_n--;
-						else break;
+						if (try-- <= 0) break;
 					}
 					else 
 					{
@@ -536,7 +570,6 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 						tb_string_append_c_string_with_size(string, s, n);
 						chunk_n += n;
 					}
-					tplat_msleep(1);
 				}
 				recv_n += chunk_n;
 				//TB_DBG("recv: %d %s", recv_n, tb_string_c_string(string));
@@ -550,7 +583,7 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 	else
 	{
 		tb_int_t recv_n = 0;
-		tb_int_t try_n = 100;
+		tb_int_t try = 100;
 		while (recv_n < http->size)
 		{
 			tb_char_t 	s[4096];
@@ -558,8 +591,7 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 			if (n < 0) break;
 			else if (!n)
 			{
-				if (try_n > 0) try_n--;
-				else break;
+				if (try-- <= 0) break;
 			}
 			else 
 			{
@@ -567,8 +599,18 @@ tb_char_t const* tb_http_recv_string(tb_http_t* http, tb_string_t* string)
 				tb_string_append_c_string_with_size(string, s, n);
 				recv_n += n;
 			}
-			tplat_msleep(1);
 		}
 		return (recv_n == http->size? tb_string_c_string(string) : TB_NULL);
 	}
+}
+tb_char_t const* tb_http_url(tb_http_t* http, tb_string_t* url)
+{
+	TB_ASSERT(http && url && http->socket != TPLAT_INVALID_HANDLE);
+	if (!http || !url || http->socket == TPLAT_INVALID_HANDLE) return TB_NULL;
+
+	tb_string_assign_c_string(url, "http://");
+	tb_string_append_c_string(url, tb_http_host(http));
+	if (tb_http_port(http) != TB_HTTP_PORT_DEFAULT)
+		tb_string_append_format(url, ":%d", tb_http_port(http));
+	return tb_string_append_c_string(url, tb_http_path(http));
 }

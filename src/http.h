@@ -32,9 +32,11 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_HTTP_PATH_MAX 						(8192)
+#define TB_HTTP_HOST_MAX 						(1024)
+#define TB_HTTP_PATH_MAX 						(4096)
 #define TB_HTTP_LINE_MAX 						(8192)
 #define TB_HTTP_HEAD_MAX 						(4096)
+#define TB_HTTP_PORT_DEFAULT 					(80)
 #define TB_HTTP_REDIRECT_MAX 					(3)
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -70,9 +72,14 @@ typedef struct __tb_http_t
 
 	// is stream
 	tb_int_t 			stream;
-	
+
+	// host is changed
+	tb_int_t 			changed;
+
 	// the url
-	tb_char_t 			url[TB_HTTP_PATH_MAX];
+	tb_size_t 			port;
+	tb_char_t 			host[TB_HTTP_HOST_MAX];
+	tb_char_t 			path[TB_HTTP_PATH_MAX];
 
 	// the process line
 	tb_char_t 			line[TB_HTTP_LINE_MAX];
@@ -90,7 +97,10 @@ void 				tb_http_close(tb_http_t* http);
 
 tb_size_t 			tb_http_size(tb_http_t* http);
 tb_size_t 			tb_http_code(tb_http_t* http);
-tb_char_t const* 	tb_http_url(tb_http_t* http);
+tb_char_t const* 	tb_http_host(tb_http_t* http);
+tb_char_t const* 	tb_http_path(tb_http_t* http);
+tb_size_t 			tb_http_port(tb_http_t* http);
+tb_char_t const* 	tb_http_url(tb_http_t* http, tb_string_t* url);
 tb_bool_t 			tb_http_stream(tb_http_t* http);
 
 tb_int_t 			tb_http_send_data(tb_http_t* http, tb_byte_t* data, tb_size_t size, tb_bool_t block);

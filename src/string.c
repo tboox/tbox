@@ -504,7 +504,24 @@ tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_cha
 		return TB_NULL;
 	}
 }
+tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* fmt, ...)
+{
+	if (!string || !fmt) return TB_NULL;
 
+	// format text
+	tb_char_t text[4096];
+	tb_size_t size = 0;
+	va_list argp;
+    va_start(argp, fmt);
+    size = vsnprintf(text, 4096 - 1, fmt, argp);
+    va_end(argp);
+	if (size) 
+	{
+		text[size] = '\0';
+		return tb_string_append_c_string_with_size(string, text, size);
+	}
+	else return TB_NULL;
+}
 tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_char(string, ch);

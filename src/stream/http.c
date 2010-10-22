@@ -94,9 +94,9 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	if (TB_FALSE == tb_http_open(http, url, TB_NULL, TB_HTTP_METHOD_GET)) goto fail;
 	TB_DBG("connect ok!");
 
-	// update info
+	// save url
 	tb_string_init(&st->base.url);
-	tb_string_assign_c_string_by_ref(&st->base.url, tb_http_url(http));
+	tb_http_url(http, &st->base.url);
 
 #if 0
 	// is able to seek?

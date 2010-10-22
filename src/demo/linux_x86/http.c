@@ -9,25 +9,24 @@ int main(int argc, char** argv)
 	tb_http_t* http = tb_http_create();
 	if (http)
 	{
+		tb_string_t string;
+		tb_string_init(&string);
 		if (TB_TRUE == tb_http_open(http, argv[1], argv[2], TB_HTTP_METHOD_GET))
 		{
-			TB_DBG("url: %s", tb_http_url(http));
+			TB_DBG("url: %s", tb_http_url(http, &string));
 			TB_DBG("code: %d stream: %s size: %d"
 				, tb_http_code(http)
 				, tb_http_stream(http) == TB_TRUE? "true" : "false"
 				, tb_http_size(http));
 
-			tb_string_t string;
-			tb_string_init(&string);
-			tb_char_t const* s = tb_http_recv_string(http, &string);
-			if (s) TB_DBG("reply: %s", s);
-			tb_string_uninit(&s);
+			TB_DBG("reply: %s", tb_http_recv_string(http, &string));
 		}
 		else
 		{
 			TB_DBG("cannot request: %s%s%s", argv[1], argv[2]? "?" : "", argv[2]);
 		}
 		tb_http_destroy(http);
+		tb_string_uninit(&string);
 	}
 
 	return 0;
