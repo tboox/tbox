@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 				, tb_http_stream(http) == TB_TRUE? "true" : "false"
 				, tb_http_size(http));
 
-			TB_DBG("reply: %s", tb_http_recv_string(http, &string));
+			//TB_DBG("reply: %s", tb_http_recv_string(http, &string));
 		}
 		else
 		{

@@ -25,7 +25,6 @@
  * includes
  */
 #include "http.h"
-#include "regex.h"
 #include "math.h"
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -48,95 +47,79 @@
 /* ////////////////////////////////////////////////////////////////////////
  * details
  */
+
 static tb_bool_t tb_http_split(tb_http_t* http, tb_char_t const* url)
 {
 	TB_ASSERT(url && http);
 	if (!url || !http) return TB_FALSE;
 
+	// get url size
+	tb_int_t n = strlen(url);
+	if (n <= 0) return TB_FALSE;
+
+	// get url pointer
+	tb_char_t const* p = url;
+	tb_char_t const* e = url + n;
+
 	// is file root?
-	if (url[0] == '/') 
+	if (p[0] == '/') 
 	{
 		if (http->redirect)
 		{
-			strncpy(http->path, url, TB_HTTP_PATH_MAX - 1);
+			strncpy(http->path, p, TB_HTTP_PATH_MAX - 1);
 			http->path[TB_HTTP_PATH_MAX - 1] = '\0';
 			return TB_TRUE;
 		}
 		else return TB_FALSE;
 	}
 
-	// create regex
-	tplat_handle_t hregex1 = TB_INVALID_HANDLE;
-	tplat_handle_t hregex2 = TB_INVALID_HANDLE;
-	tplat_handle_t hregex3 = TB_INVALID_HANDLE;
-	tplat_handle_t hregex4 = TB_INVALID_HANDLE;
-
-	hregex1 = tb_regex_create("http://(.+):(\\d+)(/.+)", TB_REGEX_NULL);
-	if (hregex1 == TB_INVALID_HANDLE) goto fail;
-	
-	hregex2 = tb_regex_create("http://(.+?)(/.+)", TB_REGEX_NULL);
-	if (hregex2 == TB_INVALID_HANDLE) goto fail;
-
-	hregex3 = tb_regex_create("(.+):(\\d+)(/.+)", TB_REGEX_NULL);
-	if (hregex3 == TB_INVALID_HANDLE) goto fail;
-
-	hregex4 = tb_regex_create("(.+?)(/.+)", TB_REGEX_NULL);
-	if (hregex4 == TB_INVALID_HANDLE) goto fail;
-
-	// {parse url
-	tplat_handle_t hregex = TB_INVALID_HANDLE;
-	if (TPLAT_TRUE == tb_regex_exec(hregex1, url, TB_REGEX_NULL))
-		hregex = hregex1;
-	else if (TPLAT_TRUE == tb_regex_exec(hregex2, url, TB_REGEX_NULL))
-		hregex = hregex2;
-	else if (TPLAT_TRUE == tb_regex_exec(hregex3, url, TB_REGEX_NULL))
-		hregex = hregex3;
-	else if (TPLAT_TRUE == tb_regex_exec(hregex4, url, TB_REGEX_NULL))
-		hregex = hregex4;
-	else goto fail;
-	
-	// {
-	tplat_int_t match_n = tb_regex_count(hregex);
-	if (match_n <= 0) goto fail;
-
-	// parse host
-	if (TB_NULL == tb_regex_get(hregex, 1, http->host, TB_NULL)) goto fail;
-
-	if (hregex == hregex1 || hregex == hregex3)
+	// filter http://
+	if (n > 7 
+		&& p[0] == 'h'
+		&& p[1] == 't'
+		&& p[2] == 't'
+		&& p[3] == 'p'
+		&& p[4] == ':'
+		&& p[5] == '/'
+		&& p[6] == '/')
 	{
-		// parse path
-		if (TB_NULL == tb_regex_get(hregex, 3, http->path, TB_NULL)) goto fail;
-
-		// {parse port
-		tb_char_t port_s[256];
-		if (TB_NULL == tb_regex_get(hregex, 2, port_s, TB_NULL)) goto fail;
-		http->port = atoi(port_s);
-		// }
-
-	}
-	else
-	{
-		// parse path
-		if (TB_NULL == tb_regex_get(hregex, 2, http->path, TB_NULL)) goto fail;
-
-		// default port
-		if (!http->redirect) http->port = TB_HTTP_PORT_DEFAULT;
+		p += 7;
 	}
 
-	if (hregex1) tb_regex_destroy(hregex1);
-	if (hregex2) tb_regex_destroy(hregex2);
-	if (hregex3) tb_regex_destroy(hregex3);
-	if (hregex4) tb_regex_destroy(hregex4);
+	// get host
+	tb_char_t* pb = http->host;
+	tb_char_t* pe = http->host + TB_HTTP_HOST_MAX - 1;
+	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
+	if (p == e) return TB_FALSE;
+	*pb = '\0';
+	TB_HTTP_DBG("host: %s", http->host);
+
+	// get port
+	if (*p == ':')
+	{
+		tb_char_t port[12];
+		pb = port;
+		pe = port + 12 - 1;
+		for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
+		if (p == e) return TB_FALSE;
+		*pb = '\0';
+		http->port = atol(port);
+	}
+	else http->port = TB_HTTP_PORT_DEFAULT;
+	TB_HTTP_DBG("port: %d", http->port);
+
+	// get path
+	pb = http->path;
+	pe = http->path + TB_HTTP_PATH_MAX - 1;
+	while (p < e && pb < pe && *p) *pb++ = *p++;
+	*pb = '\0';
+	TB_HTTP_DBG("path: %s", http->path);
+
 	return TB_TRUE;
 
 fail:
-	if (hregex1) tb_regex_destroy(hregex1);
-	if (hregex2) tb_regex_destroy(hregex2);
-	if (hregex3) tb_regex_destroy(hregex3);
-	if (hregex4) tb_regex_destroy(hregex4);
 	return TB_FALSE;
 }
-
 static tb_char_t tb_http_recv_char(tb_http_t* http)
 {
 	tb_char_t ch[1];
