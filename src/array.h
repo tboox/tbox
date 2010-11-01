@@ -65,6 +65,7 @@ typedef struct __tb_array_t
  */
 tb_array_t* 	tb_array_create(tb_size_t step, tb_size_t size, tb_size_t grow);
 void 			tb_array_destroy(tb_array_t* array);
+tb_array_t* 	tb_array_duplicate(tb_array_t* array);
 
 tb_byte_t* 		tb_array_put(tb_array_t* array, tb_int_t index);
 tb_byte_t* 		tb_array_get(tb_array_t* array, tb_int_t index);

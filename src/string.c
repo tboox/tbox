@@ -258,14 +258,15 @@ tb_char_t const* tb_string_shift(tb_string_t* string, tb_string_t* s_string)
 {
 	if (string)
 	{
+		// shift
 		if (s_string)
 		{
 			*string = *s_string;
 			tb_string_init(s_string);
 			return tb_string_c_string(string);
 		}
-		else tb_string_init(string);
 	}
+
 	return TB_NULL;
 }
 

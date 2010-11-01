@@ -128,3 +128,24 @@ tb_bool_t tb_array_resize(tb_array_t* array, tb_size_t size)
 	return TB_TRUE;
 }
 
+tb_array_t* tb_array_duplicate(tb_array_t* array)
+{
+	// alloc
+	tb_array_t* dup = (tb_array_t*)tb_malloc(sizeof(tb_array_t));
+	TB_ASSERT(dup);
+	if (!dup) return TB_NULL;
+
+	// copy info
+	*dup = *array;
+
+	// copy data
+	dup->data = tb_malloc(array->maxn * array->step);
+	if (!dup->data) goto fail;
+	memcpy(dup->data, array->data, array->size * array->step);
+
+	return dup;
+fail:
+	if (dup) tb_array_destroy(dup);
+	return TB_NULL;
+}
+
