@@ -58,6 +58,7 @@ fail:
 	if (array) tb_array_destroy(array);
 	return TB_NULL;
 }
+
 void tb_array_destroy(tb_array_t* array)
 {
 	if (array)
