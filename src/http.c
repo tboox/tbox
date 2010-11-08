@@ -26,6 +26,7 @@
  */
 #include "http.h"
 #include "math.h"
+#include "conv.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -148,8 +149,8 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 	tb_char_t* tag = TB_NULL;
 	if (!line_idx)
 	{
-		while (!isspace(*p) && *p != '\0') p++;
-		while (isspace(*p)) p++;
+		while (!TB_CONV_ISSPACE(*p) && *p != '\0') p++;
+		while (TB_CONV_ISSPACE(*p)) p++;
 
 		http->code = strtol(p, TB_NULL, 10);
 		TB_HTTP_DBG("code: %d", http->code);
@@ -165,7 +166,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		*p = '\0';
 		tag = line;
 		p++;
-		while (isspace(*p)) p++;
+		while (TB_CONV_ISSPACE(*p)) p++;
 
 		// parse location
 		if (!strcmp(tag, "Location")) 

@@ -4,9 +4,6 @@ TB_CONFIG_DEMO 				= linux_x86
 # arch
 TB_CONFIG_ARCH 				= x86
 
-# asm
-TB_CONFIG_ENABLE 			= n
-
 # encoding
 TB_CONFIG_ENCODING 			= y
 

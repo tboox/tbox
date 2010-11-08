@@ -26,6 +26,7 @@
  */
 #include "string.h"
 #include "math.h"
+#include "conv.h"
 #include <stdarg.h>
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -447,14 +448,8 @@ tb_char_t const* tb_string_append(tb_string_t* string, tb_string_t const* s_stri
 		// append string
 		memcpy(string->data + size, s_string->data, s_size);
 		string->data[string->size] = '\0';
-
-		return tb_string_c_string(string);
 	}
-	else 
-	{
-		tb_string_clear(string);
-		return TB_NULL;
-	}
+	return tb_string_c_string(string);
 }
 tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
@@ -473,14 +468,8 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		// append string
 		memcpy(string->data + size, c_string, c_size);
 		string->data[string->size] = '\0';
-
-		return tb_string_c_string(string);
 	}
-	else 
-	{
-		tb_string_clear(string);
-		return TB_NULL;
-	}
+	return tb_string_c_string(string);
 }
 tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
 {
@@ -496,14 +485,8 @@ tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_cha
 		// append string
 		memcpy(string->data + osize, c_string, size);
 		string->data[string->size] = '\0';
-
-		return tb_string_c_string(string);
 	}
-	else 
-	{
-		tb_string_clear(string);
-		return TB_NULL;
-	}
+	return tb_string_c_string(string);
 }
 tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* fmt, ...)
 {
@@ -521,7 +504,7 @@ tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* f
 		text[size] = '\0';
 		return tb_string_append_c_string_with_size(string, text, size);
 	}
-	else return TB_NULL;
+	return tb_string_c_string(string);
 }
 tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 {
@@ -537,9 +520,8 @@ tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 		// append string
 		string->data[size] = ch;
 		string->data[string->size] = '\0';
-
-		return tb_string_c_string(string);
 	}
+	return tb_string_c_string(string);
 }
 tb_bool_t tb_string_subat(tb_string_t const* string, tb_string_t* sub, tb_int_t start, tb_int_t size)
 {
@@ -617,7 +599,7 @@ tb_int_t tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_
 	tb_char_t const* e = s + n;
 	while (p < e && *p)
 	{
-		if (*p == ch || tolower(*p) == tolower(ch)) break;
+		if (*p == ch || TB_CONV_TOLOWER(*p) == TB_CONV_TOLOWER(ch)) break;
 		p++;
 	}
 	return (p < e)? (p - s) : -1;
@@ -642,7 +624,7 @@ tb_int_t tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t con
 			idx = ps - s;
 			break;
 		}
-		if (*p2 == *p1 || tolower(*p2) == tolower(*p1))
+		if (*p2 == *p1 || TB_CONV_TOLOWER(*p2) == TB_CONV_TOLOWER(*p1))
 		{
 			++p2;
 			++p1;
@@ -696,7 +678,7 @@ tb_int_t tb_string_reverse_find_char_nocase(tb_string_t const* string, tb_char_t
 	tb_char_t const* p = s + n - 1;
 	while (p >= b && *p)
 	{
-		if (*p == ch || tolower(*p) == tolower(ch)) break;
+		if (*p == ch || TB_CONV_TOLOWER(*p) == TB_CONV_TOLOWER(ch)) break;
 		p--;
 	}
 	return (p >= b)? (p - s) : -1;
@@ -727,7 +709,7 @@ tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const
 		tb_char_t const* s1 = tb_string_c_string(string);
 		tb_char_t const* s2 = c_string;
 
-		while (*s1 && *s2 && ((*s1 == *s2) || (tolower(*s1) == tolower(*s2))))
+		while (*s1 && *s2 && ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))))
 		{
 			s1++;
 			s2++;

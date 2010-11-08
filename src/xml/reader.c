@@ -25,6 +25,8 @@
  * includes
  */
 #include "reader.h"
+#include "../conv.h"
+#include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -447,7 +449,7 @@ tb_string_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 		// find the end position of the element
 		tb_char_t const* p = element;
 		tb_char_t const* e = p + tb_string_size(&reader->element);
-		while (p < e && *p && !isspace(*p)) p++;
+		while (p < e && *p && !TB_CONV_ISSPACE(*p)) p++;
 
 		if (p > element) 
 		{
@@ -497,7 +499,7 @@ tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 	for (; p < e && *p; p++)
 	{
 		tb_char_t ch = *p;
-		if (isspace(ch)|| ch == '=' || p == e - 1)
+		if (TB_CONV_ISSPACE(ch)|| ch == '=' || p == e - 1)
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)&reader->attributes[reader->attributes_n];
 			if (is_key) tb_string_assign(&node->name, &s);
