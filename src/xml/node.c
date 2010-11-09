@@ -26,7 +26,7 @@
  */
 #include "node.h"
 #include "nlist.h"
-#include <stdarg.h>
+#include "../varg.h"
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -305,10 +305,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t 
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	va_list argp;
-	va_start(argp, fmt);
-	size = vsnprintf(text, 4096 - 1, fmt, argp);
-	va_end(argp);
+	TB_VARG_FORMAT(text, 4096, fmt, &size);
 	if (!size) return TB_NULL;
 
 	// create attribute

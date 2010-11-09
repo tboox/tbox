@@ -27,7 +27,7 @@
 #include "string.h"
 #include "math.h"
 #include "conv.h"
-#include <stdarg.h>
+#include "varg.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -331,15 +331,8 @@ tb_char_t const* tb_string_assign_format(tb_string_t* string, tb_char_t const* f
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	va_list argp;
-    va_start(argp, fmt);
-    size = vsnprintf(text, 4096 - 1, fmt, argp);
-    va_end(argp);
-	if (size) 
-	{
-		text[size] = '\0';
-		return tb_string_assign_c_string_with_size(string, text, size);
-	}
+	TB_VARG_FORMAT(text, 4096, fmt, &size);
+	if (size) return tb_string_assign_c_string_with_size(string, text, size);
 	else return TB_NULL;
 }
 tb_char_t const* tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
@@ -495,16 +488,9 @@ tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* f
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	va_list argp;
-    va_start(argp, fmt);
-    size = vsnprintf(text, 4096 - 1, fmt, argp);
-    va_end(argp);
-	if (size) 
-	{
-		text[size] = '\0';
-		return tb_string_append_c_string_with_size(string, text, size);
-	}
-	return tb_string_c_string(string);
+	TB_VARG_FORMAT(text, 4096, fmt, &size);
+	if (size) return tb_string_append_c_string_with_size(string, text, size);
+	else return tb_string_c_string(string);
 }
 tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 {

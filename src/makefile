@@ -19,6 +19,7 @@ tbox_C_FILES 		+= \
 					array \
 					conv \
 					http \
+					time \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
@@ -37,8 +38,10 @@ INC_FILES 			= \
 					math.h \
 					pool.h \
 					array.h \
+					varg.h \
 					conv.h \
 					http.h \
+					time.h \
 					memops.h \
 					string.h \
 					stream.h \

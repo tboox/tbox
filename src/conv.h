@@ -51,7 +51,10 @@
 // string to int
 #define TB_CONV_ATOI(x) 					(atoi((x)))
 #define TB_CONV_ATOL(x) 					(atol((x)))
-#define TB_CONV_ATOLL(x) 					(atoll((x)))
+#define TB_CONV_ATOUL(x) 					(strtoul((x), TB_NULL, 10))
+#define TB_CONV_ATOLB(x, b) 				(strtol((x), TB_NULL, (b)))
+#define TB_CONV_ATOULB(x, b) 				(strtoul((x), TB_NULL, (b)))
+#define TB_CONV_ATOLL(x) 					((tb_int64_t)atoll((x)))
 
 // float to string
 //#define TB_CONV_FTOA(x, s, n) 					

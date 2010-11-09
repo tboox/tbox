@@ -25,7 +25,7 @@
  * includes
  */
 #include "writer.h"
-#include <stdarg.h>
+#include "../varg.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -243,13 +243,9 @@ void tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t cons
 		// format text
 		tb_char_t text[4096];
 		tb_size_t size = 0;
-		va_list argp;
-		va_start(argp, fmt);
-		size = vsnprintf(text, 4096 - 1, fmt, argp);
-		va_end(argp);
+		TB_VARG_FORMAT(text, 4096, fmt, &size);
 		if (size) 
 		{
-			text[size] = '\0';
 			tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
 			tb_string_assign_c_string(&node->name, name);
 			tb_string_assign_c_string(&node->value, text);

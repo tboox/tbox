@@ -26,7 +26,7 @@
  */
 #include "stream.h"
 #include "math.h"
-#include <stdarg.h>
+#include "varg.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -341,11 +341,7 @@ tb_int_t tb_stream_printf(tb_stream_t* st, tb_char_t const* fmt, ...)
 	// format data
 	tb_char_t data[TB_STREAM_DATA_MAX];
 	tb_size_t size = 0;
-	va_list argp;
-    va_start(argp, fmt);
-    size = vsnprintf(data, TB_STREAM_DATA_MAX - 1, fmt, argp);
-    va_end(argp);
-	if (size) data[size] = '\0';
+    TB_VARG_FORMAT(data, TB_STREAM_DATA_MAX, fmt, &size);
 
 	// write data
 	if (size) return tb_stream_write_block(st, data, size);

@@ -26,7 +26,6 @@
  */
 #include "reader.h"
 #include "../conv.h"
-#include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
  * details

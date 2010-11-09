@@ -17,59 +17,42 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		varg.h
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
+#ifndef TB_VARG_H
+#define TB_VARG_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* /////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "malloc.h"
-#include "string.h"
-#include "math.h"
-#include "conv.h"
-#include "pool.h"
-#include "bits.h"
-#include "http.h"
-#include "time.h"
-#include "varg.h"
-#include "bswap.h"
-#include "array.h"
-#include "memops.h"
-#include "stream.h"
-#include "external/external.h"
+#include <stdarg.h>
 
-#ifdef TB_CONFIG_ENCODING
-# 	include "encoding.h"
-#endif
+/* ////////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
-#ifdef TB_CONFIG_FORMAT
-# 	include "format.h"
-#endif
+#define TB_VARG_FORMAT(s, n, fmt, r) \
+do \
+{ \
+	tb_int_t __tb_ret = 0; \
+	va_list __tb_varg_list; \
+    va_start(__tb_varg_list, fmt); \
+    __tb_ret = vsnprintf(s, (n) - 1, fmt, __tb_varg_list); \
+    va_end(__tb_varg_list); \
+	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
+	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
+ \
+} while (0) 
 
-#ifdef TB_CONFIG_XML
-# 	include "xml/xml.h"
-#endif
 
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
 
-#ifdef TB_CONFIG_ZLIB
-# 	include "zlib.h"
-#endif
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
+

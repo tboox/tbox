@@ -2,7 +2,7 @@
 include $(PRO_DIR)$(_)prefix.mak
 
 # module name
-NAMES 							= string memops stream http
+NAMES 							= string memops stream http time
 NAMES-$(TB_CONFIG_ENCODING) 	+= encoding
 NAMES-$(TB_CONFIG_REGEX) 		+= regex
 NAMES-$(TB_CONFIG_FORMAT) 		+= format
@@ -17,6 +17,7 @@ format_TYPE 		= BIN
 stream_TYPE 		= BIN
 xml_TYPE 			= BIN
 http_TYPE 			= BIN
+time_TYPE 			= BIN
 
 # c-source files
 regex_C_FILES 		= regex
@@ -27,6 +28,7 @@ format_C_FILES 		= format
 stream_C_FILES 		= stream
 xml_C_FILES 		= xml
 http_C_FILES 		= http
+time_C_FILES 		= time
 
 # lib files
 regex_LIBS 			= tbox tplat z m dl pthread
@@ -60,6 +62,10 @@ xml_INC_DIR 		= /usr/include
 http_LIBS 			= tbox tplat z m dl pthread
 http_LIB_DIR 		= ../../ /usr/lib/
 http_INC_DIR 		= /usr/include
+
+time_LIBS 			= tbox tplat z m dl pthread
+time_LIB_DIR 		= ../../ /usr/lib/
+time_INC_DIR 		= /usr/include
 
 include $(PRO_DIR)$(_)suffix.mak
 
