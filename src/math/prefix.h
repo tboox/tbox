@@ -17,16 +17,21 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		math.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_MATH_PREFIX_H
+#define TB_MATH_PREFIX_H
 
-/* ////////////////////////////////////////////////////////////////////////
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -43,7 +48,7 @@
 #define TB_MATH_RAND() 						rand()
 #define TB_MATH_RAND_MAX 					(RAND_MAX)
 
-// functions
+// std c functions
 #define TB_MATH_SIN(x) 						(sin((x)))
 #define TB_MATH_COS(x) 						(cos((x)))
 #define TB_MATH_TAN(x) 						(tan((x)))
@@ -83,11 +88,11 @@
 // swap
 #define TB_MATH_SWAP_INT(a, b) 				((a) ^= (b) ^= (a) ^= (b))
 
-/* ////////////////////////////////////////////////////////////////////////
- * interfaces
- */
 
 
-
+// c plus plus
+#ifdef __cplusplus
+}
 #endif
 
+#endif

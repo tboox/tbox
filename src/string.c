@@ -25,7 +25,7 @@
  * includes
  */
 #include "string.h"
-#include "math.h"
+#include "math/math.h"
 #include "conv.h"
 #include "varg.h"
 

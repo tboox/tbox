@@ -34,7 +34,7 @@ extern "C" {
 #include "../prefix.h"
 #include "../format.h"
 #include "../stream.h"
-#include "../math.h"
+#include "../math/math.h"
 
 
 

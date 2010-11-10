@@ -12,7 +12,6 @@ tbox_C_FILES 		+= \
 					bits \
 					bswap \
 					malloc \
-					math \
 					pool \
 					memops \
 					string \
@@ -20,6 +19,8 @@ tbox_C_FILES 		+= \
 					conv \
 					http \
 					time \
+					math$(_)exp \
+					math$(_)pow \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
@@ -35,7 +36,6 @@ INC_FILES 			= \
 					bits.h \
 					bswap.h \
 					malloc.h \
-					math.h \
 					pool.h \
 					array.h \
 					varg.h \
@@ -45,6 +45,10 @@ INC_FILES 			= \
 					memops.h \
 					string.h \
 					stream.h \
+					math$(_)exp.h \
+					math$(_)pow.h \
+					math$(_)prefix.h \
+					math$(_)math.h \
 					external$(_)prefix.h \
 					external$(_)external.h 
 

@@ -25,7 +25,7 @@
  * includes
  */
 #include "http.h"
-#include "math.h"
+#include "math/math.h"
 #include "conv.h"
 
 /* ////////////////////////////////////////////////////////////////////////

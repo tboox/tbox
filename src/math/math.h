@@ -17,60 +17,19 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		math.h
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
+#ifndef TB_MATH_H
+#define TB_MATH_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* /////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "malloc.h"
-#include "string.h"
-#include "math.h"
-#include "conv.h"
-#include "pool.h"
-#include "bits.h"
-#include "http.h"
-#include "time.h"
-#include "varg.h"
-#include "bswap.h"
-#include "array.h"
-#include "memops.h"
-#include "stream.h"
-#include "math/math.h"
-#include "external/external.h"
+#include "exp.h"
+#include "pow.h"
 
-#ifdef TB_CONFIG_ENCODING
-# 	include "encoding.h"
-#endif
-
-#ifdef TB_CONFIG_FORMAT
-# 	include "format.h"
-#endif
-
-#ifdef TB_CONFIG_XML
-# 	include "xml/xml.h"
-#endif
-
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
-
-#ifdef TB_CONFIG_ZLIB
-# 	include "zlib.h"
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
+
