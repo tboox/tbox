@@ -16,8 +16,8 @@
 #define MATH_TEST_IFLOOR 		(0)
 #define MATH_TEST_ICEIL 		(0)
 
-#define MATH_TEST_ABSI 			(1)
-#define MATH_TEST_ABSF 			(1)
+#define MATH_TEST_ABSI 			(0)
+#define MATH_TEST_ABSF 			(0)
 
 /* ////////////////////////////////////////////////////////////////////////
  * exp

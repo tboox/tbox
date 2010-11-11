@@ -32,9 +32,9 @@
  * macros
  */
 
-#define TB_MATH_IROUND(x) 					((x) > 0? (tb_int_t)((x) + 0.5) : (tb_int_t)((x) - 0.5))
-#define TB_MATH_IFLOOR(x) 					((x) > 0? (tb_int_t)(x) : (tb_int_t)((x) - 0.9999999999))
-#define TB_MATH_ICEIL(x) 					((x) > 0? (tb_int_t)((x) + 0.9999999999) : (tb_int_t)(x))
+#define TB_MATH_IROUND(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)((x) + 0.5) : (tb_int32_t)(tb_uint32_t)((x) - 0.5))
+#define TB_MATH_IFLOOR(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)(x) : (tb_int32_t)(tb_uint32_t)((x) - 0.9999999999))
+#define TB_MATH_ICEIL(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)((x) + 0.9999999999) : (tb_int32_t)(tb_uint32_t)(x))
 
 
 #endif

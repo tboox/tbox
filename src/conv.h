@@ -34,12 +34,12 @@
  */
 
 // is
-#define TB_CONV_ISSPACE(x) 					(isspace(x))
-#define TB_CONV_ISALPHA(x) 					(isalpha(x))
-#define TB_CONV_ISDIGIT(x) 					(isdigit(x))
-#define TB_CONV_ISUPPER(x) 					(isupper(x))
-#define TB_CONV_ISLOWER(x) 					(islower(x))
-#define TB_CONV_ISASCII(x) 					(isascii(x))
+#define TB_CONV_ISSPACE(x) 					((x) == 0x20 || ((x) > 0x8 && (x) < 0xe))
+#define TB_CONV_ISALPHA(x) 					(((x) > 0x40 && (x) < 0x5b) || ((x) > 0x60 && (x) < 0x7b))
+#define TB_CONV_ISDIGIT(x) 					((x) > 0x2f && (x) < 0x3a)
+#define TB_CONV_ISUPPER(x) 					((x) > 0x40 && (x) < 0x5b)
+#define TB_CONV_ISLOWER(x) 					((x) > 0x60 && (x) < 0x7b)
+#define TB_CONV_ISASCII(x) 					((x) >= 0x0 && (x) < 0x80)
 
 // int to string
 #define TB_CONV_ITOA(x) 					(itoa((x)))
