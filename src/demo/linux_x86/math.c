@@ -1,14 +1,23 @@
 #include "tplat/tplat.h"
 #include "../../tbox.h"
 
-#define MATH_TEST_FEXPF1 		(1)
-#define MATH_TEST_FEXPI 		(1)
-#define MATH_TEST_FEXPF 		(1)
+#define MATH_TEST_FEXPF1 		(0)
+#define MATH_TEST_FEXPI 		(0)
+#define MATH_TEST_FEXPF 		(0)
 
-#define MATH_TEST_FPOW2F1 		(1)
-#define MATH_TEST_FPOW2I 		(1)
-#define MATH_TEST_FPOW2F 		(1)
+#define MATH_TEST_FPOW2F1 		(0)
+#define MATH_TEST_FPOW2I 		(0)
+#define MATH_TEST_FPOW2F 		(0)
 
+#define MATH_TEST_ILOG2I 		(0)
+#define MATH_TEST_ILOG2F 		(0)
+
+#define MATH_TEST_IROUND 		(0)
+#define MATH_TEST_IFLOOR 		(0)
+#define MATH_TEST_ICEIL 		(0)
+
+#define MATH_TEST_ABSI 			(1)
+#define MATH_TEST_ABSF 			(1)
 
 /* ////////////////////////////////////////////////////////////////////////
  * exp
@@ -162,6 +171,187 @@ static void tb_math_test_fpow2f_libc(tb_float_t x)
 }
 
 /* ////////////////////////////////////////////////////////////////////////
+ * log
+ */
+static void tb_math_test_ilog2i(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ILOG2I(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ilog2i(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_ilog2f(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ILOG2F(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ilog2f(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_ilog2i_libc(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_float_t log2 = log(2);
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_IROUND(log(x) / log2);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ilog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_ilog2f_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_float_t log2 = log(2);
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_IROUND(log(x) / log2);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ilog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+
+/* ////////////////////////////////////////////////////////////////////////
+ * round
+ */
+static void tb_math_test_iround(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_IROUND(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iround(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_ifloor(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_IFLOOR(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ifloor(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iceil(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ICEIL(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iceil(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iround_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = round(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iround_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_ifloor_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = floor(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_ifloor_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iceil_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = ceil(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iceil_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+
+/* ////////////////////////////////////////////////////////////////////////
+ * abs
+ */
+static void tb_math_test_absi(tb_int_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ABSI(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_absi(%d) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_absi_libc(tb_int_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = abs(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_absi_libc(%d) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_absf(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_float_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ABSF(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_absf(%lf) = %lf\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_absf_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_float_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = fabs(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_absf_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
+}
+/* ////////////////////////////////////////////////////////////////////////
  * table
  */
 static void tb_math_make_fexpi_table()
@@ -299,6 +489,22 @@ static void tb_math_make_fpow2i_table()
 	tplat_printf(",\t%lf\n", pow(2, 31.));
 
 }
+static void tb_math_make_ilog2i_table()
+{
+	tb_uint32_t i = 1;
+	tb_uint32_t a = 0;
+	tb_uint32_t n = 1 << 31;
+	tb_float_t log2 = log(2);
+	for (i = 0; i < n; i++)
+	{
+		tb_uint32_t x = TB_MATH_IROUND(log((tb_float_t)i) / log2);
+		if (x == a)
+		{
+			tplat_printf(",\t%u \t// %d\n", i, x);
+			a++;
+		}
+	}
+}
 
 int main(int argc, char** argv)
 {
@@ -307,6 +513,7 @@ int main(int argc, char** argv)
 
 	//tb_math_make_fexpi_table();
 	//tb_math_make_fpow2i_table();
+	//tb_math_make_ilog2i_table();
 
 #if MATH_TEST_FEXPI
 	tplat_printf("===================================:\n");
@@ -399,7 +606,242 @@ int main(int argc, char** argv)
 	tb_math_test_fpow2f_libc(-10.1415926f);
 #endif
 
+#if MATH_TEST_ILOG2I
+	tplat_printf("===================================:\n");
+	tb_math_test_ilog2i(1);
+	tb_math_test_ilog2i(10);
+	tb_math_test_ilog2i(100);
+	tb_math_test_ilog2i(1000);
+	tb_math_test_ilog2i(1024);
+	tb_math_test_ilog2i((1 << 31) + 100);
 
+	tplat_printf("\n");
+	tb_math_test_ilog2i_libc(1);
+	tb_math_test_ilog2i_libc(10);
+	tb_math_test_ilog2i_libc(100);
+	tb_math_test_ilog2i_libc(1000);
+	tb_math_test_ilog2i_libc(1024);
+	tb_math_test_ilog2i_libc((1 << 31) + 100);
+
+#endif
+
+#if MATH_TEST_ILOG2F
+	tplat_printf("===================================:\n");
+	tb_math_test_ilog2f(1.1415926f);
+	tb_math_test_ilog2f(10.1415926f);
+	tb_math_test_ilog2f(100.1415926f);
+	tb_math_test_ilog2f(1000.1415926f);
+	tb_math_test_ilog2f(10000.1415926f);
+	tb_math_test_ilog2f(100000.1415926f);
+	tb_math_test_ilog2f(1024);
+	tb_math_test_ilog2f((1 << 31) + 100);
+
+	tplat_printf("\n");
+	tb_math_test_ilog2f_libc(1.1415926f);
+	tb_math_test_ilog2f_libc(10.1415926f);
+	tb_math_test_ilog2f_libc(100.1415926f);
+	tb_math_test_ilog2f_libc(1000.1415926f);
+	tb_math_test_ilog2f_libc(10000.1415926f);
+	tb_math_test_ilog2f_libc(100000.1415926f);
+	tb_math_test_ilog2f_libc(1024);
+	tb_math_test_ilog2f_libc((1 << 31) + 100);
+#endif
+
+#if MATH_TEST_IROUND
+	tplat_printf("===================================:\n");
+	tb_math_test_iround(0.);
+	tb_math_test_iround(3.0000000f);
+	tb_math_test_iround(3.0415926f);
+	tb_math_test_iround(3.1415926f);
+	tb_math_test_iround(3.2415926f);
+	tb_math_test_iround(3.3415926f);
+	tb_math_test_iround(3.4415926f);
+	tb_math_test_iround(3.5415926f);
+	tb_math_test_iround(3.6415926f);
+	tb_math_test_iround(3.7415926f);
+	tb_math_test_iround(3.8415926f);
+	tb_math_test_iround(3.9415926f);
+
+	tb_math_test_iround(-0.);
+	tb_math_test_iround(-3.0000000f);
+	tb_math_test_iround(-3.0415926f);
+	tb_math_test_iround(-3.1415926f);
+	tb_math_test_iround(-3.2415926f);
+	tb_math_test_iround(-3.3415926f);
+	tb_math_test_iround(-3.4415926f);
+	tb_math_test_iround(-3.5415926f);
+	tb_math_test_iround(-3.6415926f);
+	tb_math_test_iround(-3.7415926f);
+	tb_math_test_iround(-3.8415926f);
+	tb_math_test_iround(-3.9415926f);
+
+	tplat_printf("\n");
+	tb_math_test_iround_libc(0.);
+	tb_math_test_iround_libc(3.0000000f);
+	tb_math_test_iround_libc(3.0415926f);
+	tb_math_test_iround_libc(3.1415926f);
+	tb_math_test_iround_libc(3.2415926f);
+	tb_math_test_iround_libc(3.3415926f);
+	tb_math_test_iround_libc(3.4415926f);
+	tb_math_test_iround_libc(3.5415926f);
+	tb_math_test_iround_libc(3.6415926f);
+	tb_math_test_iround_libc(3.7415926f);
+	tb_math_test_iround_libc(3.8415926f);
+	tb_math_test_iround_libc(3.9415926f);
+
+	tb_math_test_iround_libc(-0.);
+	tb_math_test_iround_libc(-3.0000000f);
+	tb_math_test_iround_libc(-3.0415926f);
+	tb_math_test_iround_libc(-3.1415926f);
+	tb_math_test_iround_libc(-3.2415926f);
+	tb_math_test_iround_libc(-3.3415926f);
+	tb_math_test_iround_libc(-3.4415926f);
+	tb_math_test_iround_libc(-3.5415926f);
+	tb_math_test_iround_libc(-3.6415926f);
+	tb_math_test_iround_libc(-3.7415926f);
+	tb_math_test_iround_libc(-3.8415926f);
+	tb_math_test_iround_libc(-3.9415926f);
+#endif
+
+#if MATH_TEST_IFLOOR
+	tplat_printf("===================================:\n");
+	tb_math_test_ifloor(0.);
+	tb_math_test_ifloor(3.0000000f);
+	tb_math_test_ifloor(3.0415926f);
+	tb_math_test_ifloor(3.1415926f);
+	tb_math_test_ifloor(3.2415926f);
+	tb_math_test_ifloor(3.3415926f);
+	tb_math_test_ifloor(3.4415926f);
+	tb_math_test_ifloor(3.5415926f);
+	tb_math_test_ifloor(3.6415926f);
+	tb_math_test_ifloor(3.7415926f);
+	tb_math_test_ifloor(3.8415926f);
+	tb_math_test_ifloor(3.9415926f);
+
+	tb_math_test_ifloor(-0.);
+	tb_math_test_ifloor(-3.0000000f);
+	tb_math_test_ifloor(-3.0415926f);
+	tb_math_test_ifloor(-3.1415926f);
+	tb_math_test_ifloor(-3.2415926f);
+	tb_math_test_ifloor(-3.3415926f);
+	tb_math_test_ifloor(-3.4415926f);
+	tb_math_test_ifloor(-3.5415926f);
+	tb_math_test_ifloor(-3.6415926f);
+	tb_math_test_ifloor(-3.7415926f);
+	tb_math_test_ifloor(-3.8415926f);
+	tb_math_test_ifloor(-3.9415926f);
+	
+	tplat_printf("\n");
+	tb_math_test_ifloor_libc(0.);
+	tb_math_test_ifloor_libc(3.0000000f);
+	tb_math_test_ifloor_libc(3.0415926f);
+	tb_math_test_ifloor_libc(3.1415926f);
+	tb_math_test_ifloor_libc(3.2415926f);
+	tb_math_test_ifloor_libc(3.3415926f);
+	tb_math_test_ifloor_libc(3.4415926f);
+	tb_math_test_ifloor_libc(3.5415926f);
+	tb_math_test_ifloor_libc(3.6415926f);
+	tb_math_test_ifloor_libc(3.7415926f);
+	tb_math_test_ifloor_libc(3.8415926f);
+	tb_math_test_ifloor_libc(3.9415926f);
+
+	tb_math_test_ifloor_libc(-0.);
+	tb_math_test_ifloor_libc(-3.0000000f);
+	tb_math_test_ifloor_libc(-3.0415926f);
+	tb_math_test_ifloor_libc(-3.1415926f);
+	tb_math_test_ifloor_libc(-3.2415926f);
+	tb_math_test_ifloor_libc(-3.3415926f);
+	tb_math_test_ifloor_libc(-3.4415926f);
+	tb_math_test_ifloor_libc(-3.5415926f);
+	tb_math_test_ifloor_libc(-3.6415926f);
+	tb_math_test_ifloor_libc(-3.7415926f);
+	tb_math_test_ifloor_libc(-3.8415926f);
+	tb_math_test_ifloor_libc(-3.9415926f);
+#endif
+
+#if MATH_TEST_ICEIL
+	tplat_printf("===================================:\n");
+	tb_math_test_iceil(0.);
+	tb_math_test_iceil(3.0000000f);
+	tb_math_test_iceil(3.0415926f);
+	tb_math_test_iceil(3.1415926f);
+	tb_math_test_iceil(3.2415926f);
+	tb_math_test_iceil(3.3415926f);
+	tb_math_test_iceil(3.4415926f);
+	tb_math_test_iceil(3.5415926f);
+	tb_math_test_iceil(3.6415926f);
+	tb_math_test_iceil(3.7415926f);
+	tb_math_test_iceil(3.8415926f);
+	tb_math_test_iceil(3.9415926f);
+
+	tb_math_test_iceil(-0.);
+	tb_math_test_iceil(-3.0000000f);
+	tb_math_test_iceil(-3.0415926f);
+	tb_math_test_iceil(-3.1415926f);
+	tb_math_test_iceil(-3.2415926f);
+	tb_math_test_iceil(-3.3415926f);
+	tb_math_test_iceil(-3.4415926f);
+	tb_math_test_iceil(-3.5415926f);
+	tb_math_test_iceil(-3.6415926f);
+	tb_math_test_iceil(-3.7415926f);
+	tb_math_test_iceil(-3.8415926f);
+	tb_math_test_iceil(-3.9415926f);
+
+	tplat_printf("\n");
+	tb_math_test_iceil_libc(0.);
+	tb_math_test_iceil_libc(3.0000000f);
+	tb_math_test_iceil_libc(3.0415926f);
+	tb_math_test_iceil_libc(3.1415926f);
+	tb_math_test_iceil_libc(3.2415926f);
+	tb_math_test_iceil_libc(3.3415926f);
+	tb_math_test_iceil_libc(3.4415926f);
+	tb_math_test_iceil_libc(3.5415926f);
+	tb_math_test_iceil_libc(3.6415926f);
+	tb_math_test_iceil_libc(3.7415926f);
+	tb_math_test_iceil_libc(3.8415926f);
+	tb_math_test_iceil_libc(3.9415926f);
+
+	tb_math_test_iceil_libc(-0.);
+	tb_math_test_iceil_libc(-3.0000000f);
+	tb_math_test_iceil_libc(-3.0415926f);
+	tb_math_test_iceil_libc(-3.1415926f);
+	tb_math_test_iceil_libc(-3.2415926f);
+	tb_math_test_iceil_libc(-3.3415926f);
+	tb_math_test_iceil_libc(-3.4415926f);
+	tb_math_test_iceil_libc(-3.5415926f);
+	tb_math_test_iceil_libc(-3.6415926f);
+	tb_math_test_iceil_libc(-3.7415926f);
+	tb_math_test_iceil_libc(-3.8415926f);
+	tb_math_test_iceil_libc(-3.9415926f);
+#endif
+
+#if MATH_TEST_ABSI
+	tplat_printf("===================================:\n");
+	tb_math_test_absi(0);
+	tb_math_test_absi(-0);
+	tb_math_test_absi(3);
+	tb_math_test_absi(-3);
+
+	tplat_printf("\n");
+	tb_math_test_absi_libc(0);
+	tb_math_test_absi_libc(-0);
+	tb_math_test_absi_libc(3);
+	tb_math_test_absi_libc(-3);
+#endif
+
+#if MATH_TEST_ABSF
+	tplat_printf("===================================:\n");
+	tb_math_test_absf(0.);
+	tb_math_test_absf(-0.);
+	tb_math_test_absf(3.1415926);
+	tb_math_test_absf(-3.1415926);
+
+	tplat_printf("\n");
+	tb_math_test_absf_libc(0.);
+	tb_math_test_absf_libc(-0.);
+	tb_math_test_absf_libc(3.1415926);
+	tb_math_test_absf_libc(-3.1415926);
+#endif
 
 	return 0;
 }

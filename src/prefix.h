@@ -34,6 +34,7 @@ extern "C" {
 #include "tplat/tplat.h"
 #include "option.h"
 #include "type.h"
+#include "fixed.h"
 #include "malloc.h"
 
 /* /////////////////////////////////////////////////////////

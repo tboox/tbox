@@ -21,6 +21,7 @@ tbox_C_FILES 		+= \
 					time \
 					math$(_)exp \
 					math$(_)pow \
+					math$(_)log \
 					stream \
 					stream$(_)http \
 					stream$(_)file \
@@ -30,6 +31,7 @@ tbox_C_FILES 		+= \
 INC_FILES 			= \
 					prefix.h \
 					config.h \
+					fixed.h \
 					type.h \
 					tbox.h \
 					option.h \
@@ -47,6 +49,9 @@ INC_FILES 			= \
 					stream.h \
 					math$(_)exp.h \
 					math$(_)pow.h \
+					math$(_)log.h \
+					math$(_)abs.h \
+					math$(_)round.h \
 					math$(_)prefix.h \
 					math$(_)math.h \
 					external$(_)prefix.h \

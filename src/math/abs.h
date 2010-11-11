@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		exp.h
+ * \file		abs.h
  *
  */
-#ifndef TB_MATH_EXP_H
-#define TB_MATH_EXP_H
+#ifndef TB_MATH_ABS_H
+#define TB_MATH_ABS_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -32,32 +32,8 @@
  * macros
  */
 
-// fexpi(x), for x is int, x = [-31, 31]
-#define TB_MATH_FEXPI(x) 					(g_tb_math_fexpi_table[((x) + 15) & 0x3f])
-
-// fexpf1(x) = 1 + x + (x^2) / 2 + (x^3) / 6, for x = [-1, 1]
-#define TB_MATH_FEXPF1(x) 					(1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6)
-
-// fexpf(x) = fexpi([x]) * fexpf1(x - [x]), for x = [-inf, inf]
-//#define TB_MATH_FEXPF(x) 					(TB_MATH_FEXPI(((tb_int_t)(x))) * TB_MATH_FEXPF1(((x) - (tb_int_t)(x))))
-#define TB_MATH_FEXPF(x) 					tb_math_fexpf(x)
-
-/* ////////////////////////////////////////////////////////////////////////
- * globals
- */
-extern tb_float_t g_tb_math_fexpi_table[47];
-
-
-/* ////////////////////////////////////////////////////////////////////////
- * implements
- */
-
-static __tplat_inline__ tb_float_t tb_math_fexpf(tb_float_t x)
-{
-	tb_float_t a = x - (tb_int_t)x;
-	return (TB_MATH_FEXPI(((tb_int_t)x)) * TB_MATH_FEXPF1(a));
-}
-
+#define TB_MATH_ABSI(x) 					((x) > 0? (x) : -(x))
+#define TB_MATH_ABSF(x) 					((x) > 0.? (x) : -(x))
 
 
 #endif

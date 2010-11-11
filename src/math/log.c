@@ -17,48 +17,50 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		exp.h
+ * \file		log.c
  *
  */
-#ifndef TB_MATH_EXP_H
-#define TB_MATH_EXP_H
-
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-
-/* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// fexpi(x), for x is int, x = [-31, 31]
-#define TB_MATH_FEXPI(x) 					(g_tb_math_fexpi_table[((x) + 15) & 0x3f])
-
-// fexpf1(x) = 1 + x + (x^2) / 2 + (x^3) / 6, for x = [-1, 1]
-#define TB_MATH_FEXPF1(x) 					(1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6)
-
-// fexpf(x) = fexpi([x]) * fexpf1(x - [x]), for x = [-inf, inf]
-//#define TB_MATH_FEXPF(x) 					(TB_MATH_FEXPI(((tb_int_t)(x))) * TB_MATH_FEXPF1(((x) - (tb_int_t)(x))))
-#define TB_MATH_FEXPF(x) 					tb_math_fexpf(x)
+#include "log.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * globals
  */
-extern tb_float_t g_tb_math_fexpi_table[47];
-
-
-/* ////////////////////////////////////////////////////////////////////////
- * implements
- */
-
-static __tplat_inline__ tb_float_t tb_math_fexpf(tb_float_t x)
+tb_uint32_t g_tb_math_ilog2i_table[32] = 
 {
-	tb_float_t a = x - (tb_int_t)x;
-	return (TB_MATH_FEXPI(((tb_int_t)x)) * TB_MATH_FEXPF1(a));
-}
-
-
-
-#endif
+	0 			// 0
+,	2 			// 1
+,	3 			// 2
+,	6 			// 3
+,	12 			// 4
+,	23 			// 5
+,	46 			// 6
+,	91 			// 7
+,	182 		// 8
+,	363 		// 9
+,	725 		// 10
+,	1449 		// 11
+,	2897 		// 12
+,	5793 		// 13
+,	11586 		// 14
+,	23171 		// 15
+,	46341 		// 16
+,	92682 		// 17
+,	185364 		// 18
+,	370728 		// 19
+,	741456 		// 20
+,	1482911 	// 21
+,	2965821 	// 22
+,	5931642 	// 23
+,	11863284 	// 24
+,	23726567 	// 25
+,	47453133 	// 26
+,	94906266 	// 27
+,	189812532 	// 28
+,	379625063 	// 29
+,	759250125 	// 30
+,	1518500250 	// 31
+};
 

@@ -42,43 +42,6 @@ extern "C" {
 // null
 #define TB_NULL 					((void*)0)
 
-/* fixed-point numbers
- *
- * the swf file format supports two types of fixed-point numbers: 32-bit and 16-bit.
- * the 32-bit fixed-point numbers are 16.16. that is, the high 16 bits represent the number
- * before the decimal point, and the low 16 bits represent the number after the decimal point.
- * fixed values are stored like 32-bit integers in the swf file (using little-endian byte order)
- * and must be byte aligned.
- */
-#define TB_FIXED8_FACTOR 			(0xff)
-#define TB_FIXED16_FACTOR 			(0xffff)
-#define TB_FIXED32_FACTOR 			(0xffffffff)
-
-#define TB_FIXED32_2_FLOAT(x) 		((tg_float_t)(x) / 0xffffffff)
-#define TB_FLOAT_2_FIXED32(x) 		((tg_fixed32_t)((x) * 0xffffffff))
-	
-#define TB_FIXED16_2_FLOAT(x) 		((tg_float_t)(x) / 0xffff)
-#define TB_FLOAT_2_FIXED16(x) 		((tg_fixed16_t)((x) * 0xffff))
-
-#define TB_FIXED8_2_FLOAT(x) 		((tg_float_t)(x) / 0xff)
-#define TB_FLOAT_2_FIXED8(x) 		((tg_fixed8_t)((x) * 0xff))
-
-#define TB_FIXED32_2_INT(x) 		((x) >> 32)
-#define TB_INT_2_FIXED32(x) 		((x) << 32)
-
-#define TB_FIXED16_2_INT(x) 		((x) >> 16)
-#define TB_INT_2_FIXED16(x) 		((x) << 16)
-#define TB_FIXED16_2_RINT(x) 		((((x) >= 0)? ((x) + (TB_FIXED16_FACTOR >> 1)) : ((x) - (TB_FIXED16_FACTOR >> 1))) >> 16)
-
-#define TB_FIXED8_2_INT(x) 			((x) >> 8)
-#define TB_INT_2_FIXED8(x) 			((x) << 8)
-
-#define TB_FIXED16_2_FIXED32(x) 	((x) << 16)
-#define TB_FIXED32_2_FIXED16(x) 	((x) >> 16)
-
-#define TB_FIXED8_2_FIXED16(x) 		((x) << 8)
-#define TB_FIXED16_2_FIXED8(x) 		((x) >> 8)
-
 /* /////////////////////////////////////////////////////////
  * basic types
  */
@@ -102,8 +65,6 @@ typedef tb_uint8_t			tb_byte_t;
 typedef void* 				tb_handle_t;
 typedef char 				tb_char_t;
 typedef double 				tb_float_t;
-typedef tb_int16_t 			tb_fixed8_t;
-typedef tb_int32_t 			tb_fixed16_t;
 
 
 // c plus plus

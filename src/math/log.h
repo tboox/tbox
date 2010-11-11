@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		exp.h
+ * \file		log.h
  *
  */
-#ifndef TB_MATH_EXP_H
-#define TB_MATH_EXP_H
+#ifndef TB_MATH_LOG_H
+#define TB_MATH_LOG_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -32,32 +32,46 @@
  * macros
  */
 
-// fexpi(x), for x is int, x = [-31, 31]
-#define TB_MATH_FEXPI(x) 					(g_tb_math_fexpi_table[((x) + 15) & 0x3f])
+// ilog2i(x) 
+#define TB_MATH_ILOG2I(x) 					tb_math_ilog2i(x)
 
-// fexpf1(x) = 1 + x + (x^2) / 2 + (x^3) / 6, for x = [-1, 1]
-#define TB_MATH_FEXPF1(x) 					(1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6)
 
-// fexpf(x) = fexpi([x]) * fexpf1(x - [x]), for x = [-inf, inf]
-//#define TB_MATH_FEXPF(x) 					(TB_MATH_FEXPI(((tb_int_t)(x))) * TB_MATH_FEXPF1(((x) - (tb_int_t)(x))))
-#define TB_MATH_FEXPF(x) 					tb_math_fexpf(x)
+// ilog2f(x) 
+#define TB_MATH_ILOG2F(x) 					tb_math_ilog2i(TB_MATH_IROUND(x))
 
 /* ////////////////////////////////////////////////////////////////////////
  * globals
  */
-extern tb_float_t g_tb_math_fexpi_table[47];
-
+extern tb_uint32_t g_tb_math_ilog2i_table[32];
 
 /* ////////////////////////////////////////////////////////////////////////
  * implements
  */
-
-static __tplat_inline__ tb_float_t tb_math_fexpf(tb_float_t x)
+static __tplat_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
 {
-	tb_float_t a = x - (tb_int_t)x;
-	return (TB_MATH_FEXPI(((tb_int_t)x)) * TB_MATH_FEXPF1(a));
+#if 0
+	tb_uint32_t const* p = g_tb_math_ilog2i_table + 31;
+	tb_uint32_t const* b = g_tb_math_ilog2i_table;
+	while (p >= b)
+	{
+		if (x > *p) return (p - b);
+		p--;
+	}
+	return 0;
+#else
+	tb_int_t l = 0;
+	tb_int_t m = 15;
+	tb_int_t r = 32;
+	while ((r - l) > 1)
+	{
+		tb_uint32_t v = g_tb_math_ilog2i_table[m];
+		if (x < v) r = m;
+		else l = m;
+		m = (l + r) >> 1;
+	}
+	return m;
+#endif
 }
-
 
 
 #endif
