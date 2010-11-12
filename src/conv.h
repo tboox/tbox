@@ -50,11 +50,11 @@
 #define TB_CONV_FTOU32(x) 					((tb_uint32_t)(x))
 
 // int to string
-#define TB_CONV_ITOA(x) 					(itoa((x)))
-#define TB_CONV_LTOA(x) 					(ltoa((x)))
-#define TB_CONV_LLTOA(x) 					(lltoa((x)))
-#define TB_CONV_UTOA(x) 					(utoa((x)))
-#define TB_CONV_ULTOA(x) 					(ultoa((x)))
+//#define TB_CONV_ITOA(x) 					(itoa((x)))
+//#define TB_CONV_LTOA(x) 					(ltoa((x)))
+//#define TB_CONV_LLTOA(x) 					(lltoa((x)))
+//#define TB_CONV_UTOA(x) 					(utoa((x)))
+//#define TB_CONV_ULTOA(x) 					(ultoa((x)))
 
 // string to int
 //#define TB_CONV_ATOI(x) 					(atoi((x)))

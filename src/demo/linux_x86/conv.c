@@ -240,6 +240,10 @@ int main(int argc, char** argv)
 	tb_conv_test_stoi32("-0x1dcc666", -31415926);
 #endif
 
+	tb_float_t f = 4294967294.1234567;
+	tb_float_t d = (f - (tb_uint32_t)f);
+	TB_DBG("%lf", d);
+
 
 	return 0;
 }
