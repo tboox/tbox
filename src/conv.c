@@ -44,3 +44,612 @@
  * interfaces
  */
 
+tb_uint32_t tb_conv_s2tou32(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0b"
+	if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
+		s += 2;
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint32_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (TB_CONV_ISDIGIT2(ch))
+			val = (val << 1) + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint32_t tb_conv_s8tou32(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint32_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (TB_CONV_ISDIGIT8(ch))
+			val = (val << 3) + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+
+tb_uint32_t tb_conv_s10tou32(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint32_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (TB_CONV_ISDIGIT10(ch))
+			val = val * 10 + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint32_t tb_conv_s16tou32(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0x"
+	if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+		s += 2;
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint32_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (TB_CONV_ISDIGIT10(ch))
+			val = (val << 4) + (ch - '0');
+		else if ((ch > 'a' && ch < 'f'))
+			val = (val << 4) + (ch - 'a') + 10;
+		else if ((ch > 'A' && ch < 'F'))
+			val = (val << 4) + (ch - 'A') + 10;
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint32_t tb_conv_stou32(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	tb_char_t const* p = s;
+	while (TB_CONV_ISSPACE(*p)) p++;
+
+	// has sign?
+	if (*p == '-') p++;
+
+	// is hex?
+	if (*p++ == '0')
+	{
+		if (*p == 'x' || *p == 'X')
+			return tb_conv_s16tou32(s);
+		else if (*p == 'b' || *p == 'B')
+			return tb_conv_s2tou32(s);
+		else return tb_conv_s8tou32(s);
+	}
+	else return tb_conv_s10tou32(s);
+}
+tb_float_t tb_conv_s2tof(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0.;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0b"
+	if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
+		s += 2;
+
+	// compute float: lhs.rhs
+	tb_int_t 	dec = 0;
+	tb_uint32_t lhs = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
+	tb_int_t 	zeros = 0;
+	tb_int8_t 	decimals[256];
+	tb_int8_t* 	d = decimals;
+	tb_int8_t* 	e = decimals + 256;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+
+		// is the part of decimal?
+		if (ch == '.')
+		{
+			if (!dec) 
+			{
+				dec = 1;
+				s++;
+				continue ;
+			}
+			else break;
+		}
+
+		// parse integer & decimal
+		if (TB_CONV_ISDIGIT2(ch))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - '0';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = (lhs << 1) + (ch - '0');
+		}
+		else break;
+	
+		s++;
+	}
+
+	TB_ASSERT(d <= decimals + 256);
+
+	// compute decimal
+	while (d-- > decimals) rhs = (rhs + *d) / 2;
+
+	// merge 
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
+}
+tb_float_t tb_conv_s8tof(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0.;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute float: lhs.rhs
+	tb_int_t 	dec = 0;
+	tb_uint32_t lhs = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
+	tb_int_t 	zeros = 0;
+	tb_int8_t 	decimals[256];
+	tb_int8_t* 	d = decimals;
+	tb_int8_t* 	e = decimals + 256;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+
+		// is the part of decimal?
+		if (ch == '.')
+		{
+			if (!dec) 
+			{
+				dec = 1;
+				s++;
+				continue ;
+			}
+			else break;
+		}
+
+		// parse integer & decimal
+		if (TB_CONV_ISDIGIT8(ch))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - '0';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = (lhs << 3) + (ch - '0');
+		}
+		else break;
+	
+		s++;
+	}
+
+	TB_ASSERT(d <= decimals + 256);
+
+	// compute decimal
+	while (d-- > decimals) rhs = (rhs + *d) / 8;
+
+	// merge 
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
+}
+tb_float_t tb_conv_s10tof(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0.;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute float: lhs.rhs
+	tb_int_t 	dec = 0;
+	tb_uint32_t lhs = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
+	tb_int_t 	zeros = 0;
+	tb_int8_t 	decimals[256];
+	tb_int8_t* 	d = decimals;
+	tb_int8_t* 	e = decimals + 256;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+
+		// is the part of decimal?
+		if (ch == '.')
+		{
+			if (!dec) 
+			{
+				dec = 1;
+				s++;
+				continue ;
+			}
+			else break;
+		}
+
+		// parse integer & decimal
+		if (TB_CONV_ISDIGIT10(ch))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - '0';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = lhs * 10 + (ch - '0');
+		}
+		else break;
+	
+		s++;
+	}
+
+	TB_ASSERT(d <= decimals + 256);
+
+	// compute decimal
+	while (d-- > decimals) rhs = (rhs + *d) / 10;
+
+	// merge 
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
+}
+tb_float_t tb_conv_s16tof(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0.;
+
+	// skip space
+	while (TB_CONV_ISSPACE(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0x"
+	if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+		s += 2;
+
+	// compute float: lhs.rhs
+	tb_int_t 	dec = 0;
+	tb_uint32_t lhs = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
+	tb_int_t 	zeros = 0;
+	tb_int8_t 	decimals[256];
+	tb_int8_t* 	d = decimals;
+	tb_int8_t* 	e = decimals + 256;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+
+		// is the part of decimal?
+		if (ch == '.')
+		{
+			if (!dec) 
+			{
+				dec = 1;
+				s++;
+				continue ;
+			}
+			else break;
+		}
+
+		// parse integer & decimal
+		if (TB_CONV_ISDIGIT10(ch))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - '0';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = (lhs << 4) + (ch - '0');
+		}
+		else if ((ch > 'a' && ch < 'f'))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - 'a';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = (lhs << 4) + (ch - 'a');
+		}
+		else if ((ch > 'A' && ch < 'F'))
+		{
+			// save decimals
+			if (dec) 
+			{
+				if (d < e)
+				{
+					if (ch != '0')
+					{
+						// fill '0'
+						while (zeros--) *d++ = 0;
+						zeros = 0;
+
+						// save decimal
+						*d++ = ch - 'A';
+					}
+					else zeros++;
+				}
+			}
+			else lhs = (lhs << 4) + (ch - 'A');
+		}
+		else break;
+	
+		s++;
+	}
+
+	TB_ASSERT(d <= decimals + 256);
+
+	// compute decimal
+	while (d-- > decimals) rhs = (rhs + *d) / 16;
+
+	// merge 
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
+}
+tb_float_t tb_conv_stof(tb_char_t const* s)
+{
+	TB_ASSERT(s);
+	if (!s) return 0;
+
+	// skip space
+	tb_char_t const* p = s;
+	while (TB_CONV_ISSPACE(*p)) p++;
+
+	// has sign?
+	if (*p == '-') p++;
+
+	// is hex?
+	if (*p++ == '0')
+	{
+		if (*p == 'x' || *p == 'X')
+			return tb_conv_s16tof(s);
+		else if (*p == 'b' || *p == 'B')
+			return tb_conv_s2tof(s);
+		else return tb_conv_s8tof(s);
+	}
+	else return tb_conv_s10tof(s);
+}
+tb_uint32_t tb_conv_sbtou32(tb_char_t const* s, tb_int_t base)
+{
+	typedef tb_uint32_t (*tb_conv_t)(tb_char_t const*);
+	tb_conv_t convs[] =
+	{
+		TB_NULL
+	, 	TB_NULL
+	,	tb_conv_s2tou32
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_conv_s8tou32
+	, 	TB_NULL
+	, 	tb_conv_s10tou32
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_conv_s16tou32
+	};
+	TB_ASSERT(base < TB_STATIC_ARRAY_SIZE(convs));
+	if (convs[base]) return convs[base](s);
+	else return 0;
+}
+tb_float_t tb_conv_sbtof(tb_char_t const* s, tb_int_t base)
+{
+	typedef tb_float_t (*tb_conv_t)(tb_char_t const*);
+	tb_conv_t convs[] =
+	{
+		TB_NULL
+	, 	TB_NULL
+	,	tb_conv_s2tof
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_conv_s8tof
+	, 	TB_NULL
+	, 	tb_conv_s10tof
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_conv_s16tof
+	};
+	TB_ASSERT(base < TB_STATIC_ARRAY_SIZE(convs));
+	if (convs[base]) return convs[base](s);
+	else return 0.;
+}

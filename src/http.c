@@ -104,7 +104,7 @@ static tb_bool_t tb_http_split(tb_http_t* http, tb_char_t const* url)
 		for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
 		if (p == e) return TB_FALSE;
 		*pb = '\0';
-		http->port = atol(port);
+		http->port = TB_CONV_S10TOU32(port);
 	}
 	else http->port = TB_HTTP_PORT_DEFAULT;
 	TB_HTTP_DBG("port: %d", http->port);
@@ -193,7 +193,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		// parse content size
 		else if (!strcmp (tag, "Content-Length"))
 		{
-			http->size = atol(p);
+			http->size = TB_CONV_S10TOU32(p);
 		}
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!strcmp (tag, "Content-Range"))
@@ -203,9 +203,9 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			if (!strncmp (p, "bytes ", 6)) 
 			{
 				p += 6;
-				offset = atol(p);
+				offset = TB_CONV_S10TOU32(p);
 				if ((slash = strchr(p, '/')) && strlen(slash) > 0)
-					filesize = atol(slash + 1);
+					filesize = TB_CONV_S10TOU32(slash + 1);
 				TB_HTTP_DBG("range: %d - %d", offset, filesize);
 			}
 			// no stream, be able to seek
