@@ -3,9 +3,6 @@
 
 #define CONV_TEST_IS 			(0)
 
-#define CONV_TEST_FTOI 			(0)
-#define CONV_TEST_FTOU 			(0)
-
 #define CONV_TEST_TOLOWER 		(0)
 #define CONV_TEST_TOUPPER 		(0)
 
@@ -45,14 +42,6 @@ static void tb_conv_make_isalpha_table()
 	{
 		if (isalpha(i)) tplat_printf("0x%02x\n", i);
 	}
-}
-static void tb_conv_test_ftoi32(tb_float_t f)
-{
-	tplat_printf("ftoi32(%lf) = %d, int(%lf) = %d\n", f, TB_CONV_FTOI32(f), f, (tb_int32_t)f);
-}
-static void tb_conv_test_ftou32(tb_float_t f)
-{
-	tplat_printf("ftou32(%lf) = %u, uint(%lf) = %u\n", f, TB_CONV_FTOU32(f), f, (tb_uint32_t)f);
 }
 static void tb_conv_check_toupper()
 {
@@ -105,32 +94,6 @@ int main(int argc, char** argv)
 #if CONV_TEST_IS
 	tplat_printf("===============================\n");
 	tb_conv_check_is();
-#endif
-
-#if CONV_TEST_FTOI
-	tplat_printf("===============================\n");
-	tb_conv_test_ftoi32(0.1415926);
-	tb_conv_test_ftoi32(-0.1415926);
-
-	tb_conv_test_ftoi32(3.1415926);
-	tb_conv_test_ftoi32(-3.1415926);
-
-	tb_conv_test_ftoi32(-1);
-	tb_conv_test_ftoi32((tb_uint32_t)-1);
-	tb_conv_test_ftoi32(0xffffffff);
-#endif
-
-#if CONV_TEST_FTOU
-	tplat_printf("===============================\n");
-	tb_conv_test_ftou32(0.1415926);
-	tb_conv_test_ftou32(-0.1415926);
-
-	tb_conv_test_ftou32(3.1415926);
-	tb_conv_test_ftou32(-3.1415926);
-
-	tb_conv_test_ftou32(-1);
-	tb_conv_test_ftou32((tb_uint32_t)-1);
-	tb_conv_test_ftou32(0xffffffff);
 #endif
 
 #if CONV_TEST_TOLOWER
@@ -189,6 +152,9 @@ int main(int argc, char** argv)
 	tb_conv_test_sbtof("00003.0001415926000", 10, 00003.0001415926000);
 	tb_conv_test_sbtof("4294967295", 10, 4294967295);
 	tb_conv_test_sbtof("4294967295.", 10, 4294967295.);
+	tb_conv_test_sbtof("01234567", 8, 01234567);
+	tb_conv_test_sbtof("0xb14ac01c", 16, 0xb14ac01c);
+
 
 	tplat_printf("\n");
 	tb_conv_test_sbtof("-0", 10, -0);
@@ -240,9 +206,6 @@ int main(int argc, char** argv)
 	tb_conv_test_stoi32("-0x1dcc666", -31415926);
 #endif
 
-	tb_float_t f = 4294967294.1234567;
-	tb_float_t d = (f - (tb_uint32_t)f);
-	TB_DBG("%lf", d);
 
 
 	return 0;

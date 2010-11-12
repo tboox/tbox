@@ -45,10 +45,6 @@
 #define TB_CONV_ISDIGIT8(x) 				(((x) > 0x2f && (x) < 0x38))
 #define TB_CONV_ISDIGIT16(x) 				(((x) > 0x2f && (x) < 0x3a) || ((x) > 0x40 && (x) < 0x47) || ((x) > 0x60 && (x) < 0x67))
 
-// float to int
-#define TB_CONV_FTOI32(x) 					((tb_int32_t)(tb_uint32_t)(x))
-#define TB_CONV_FTOU32(x) 					((tb_uint32_t)(x))
-
 // int to string
 //#define TB_CONV_ITOA(x) 					(itoa((x)))
 //#define TB_CONV_LTOA(x) 					(ltoa((x)))

@@ -181,9 +181,9 @@ tb_uint32_t tb_conv_s16tou32(tb_char_t const* s)
 		tb_char_t ch = *s;
 		if (TB_CONV_ISDIGIT10(ch))
 			val = (val << 4) + (ch - '0');
-		else if ((ch > 'a' && ch < 'f'))
+		else if (ch > ('a' - 1) && ch < ('f' + 1))
 			val = (val << 4) + (ch - 'a') + 10;
-		else if ((ch > 'A' && ch < 'F'))
+		else if (ch > ('A' - 1) && ch < ('F' + 1))
 			val = (val << 4) + (ch - 'A') + 10;
 		else break;
 	
@@ -521,7 +521,7 @@ tb_float_t tb_conv_s16tof(tb_char_t const* s)
 			}
 			else lhs = (lhs << 4) + (ch - '0');
 		}
-		else if ((ch > 'a' && ch < 'f'))
+		else if (ch > ('a' - 1) && ch < ('f' + 1))
 		{
 			// save decimals
 			if (dec) 
@@ -535,14 +535,14 @@ tb_float_t tb_conv_s16tof(tb_char_t const* s)
 						zeros = 0;
 
 						// save decimal
-						*d++ = ch - 'a';
+						*d++ = (ch - 'a') + 10;
 					}
 					else zeros++;
 				}
 			}
-			else lhs = (lhs << 4) + (ch - 'a');
+			else lhs = (lhs << 4) + (ch - 'a') + 10;
 		}
-		else if ((ch > 'A' && ch < 'F'))
+		else if (ch > ('A' - 1) && ch < ('F' + 1))
 		{
 			// save decimals
 			if (dec) 
@@ -556,12 +556,12 @@ tb_float_t tb_conv_s16tof(tb_char_t const* s)
 						zeros = 0;
 
 						// save decimal
-						*d++ = ch - 'A';
+						*d++ = (ch - 'A') + 10;
 					}
 					else zeros++;
 				}
 			}
-			else lhs = (lhs << 4) + (ch - 'A');
+			else lhs = (lhs << 4) + (ch - 'A') + 10;
 		}
 		else break;
 	
