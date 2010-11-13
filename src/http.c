@@ -174,7 +174,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			//TB_HTTP_DBG("redirect to: %s", p);
 
 			// redirect it
-			if (http->code == 302 || http->code == 303)
+			if (http->code == 301 || http->code == 302 || http->code == 303)
 			{
 				// next url
 				http->redirect = 1;

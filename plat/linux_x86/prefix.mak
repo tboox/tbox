@@ -2,7 +2,7 @@
 
 # prefix & suffix
 BIN_PREFIX 		= 
-BIN_SUFFIX 		= 
+BIN_SUFFIX 		= .b
 
 OBJ_PREFIX 		= 
 OBJ_SUFFIX 		= .o
