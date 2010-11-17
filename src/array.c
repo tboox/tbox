@@ -94,7 +94,10 @@ void tb_array_pop(tb_array_t* array)
 {
 	if (array && array->size) array->size--;
 }
-
+void tb_array_clear(tb_array_t* array)
+{
+	if (array) array->size = 0;
+}
 tb_byte_t* tb_array_first(tb_array_t* array)
 {
 	return tb_array_get(array, 0);

@@ -44,6 +44,13 @@ extern "C" {
 # 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)
 #endif
 
+
+#ifdef TB_DEBUG
+# 	define TB_XML_READER_DUMP(r) 				tb_xml_reader_dump(r)
+#else 
+# 	define TB_XML_READER_DUMP(r)
+#endif
+
 /* /////////////////////////////////////////////////////////
  * types
  */

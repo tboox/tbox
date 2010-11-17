@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	}
 
 	// dump xml
-	tb_xml_reader_dump(tb_xml_reader_open(st));
+	TB_XML_READER_DUMP(tb_xml_reader_open(st));
 	tb_stream_close(st);
 
 #elif defined(XML_READER_SELECT)

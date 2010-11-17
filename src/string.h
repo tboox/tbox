@@ -67,6 +67,8 @@ typedef struct __tb_stack_string_t
  * interfaces
  */
 
+#if 1
+
 // create & destroy
 tb_string_t* 		tb_string_create();
 tb_string_t* 		tb_string_create_from_buffer(tb_byte_t* data, tb_uint16_t size);
@@ -132,6 +134,25 @@ tb_bool_t 			tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 tb_bool_t 			tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string);
 tb_bool_t 			tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string);
 tb_bool_t 			tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string);
+
+#else
+#define tb_string_create() 							tb_string_create_trace(__tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_create_from_buffer(a,b) 			tb_string_create_from_buffer_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_resize(a,b) 						tb_string_resize_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_subat(a,b,c,d) 					tb_string_subat_trace(a,b,c,d, __tplat_func__, __tplat_line__, __tplat_file__)
+
+#define tb_string_assign(a,b) 						tb_string_assign_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_assign_char(a,b) 					tb_string_assign_char_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_assign_format(a,b,...) 			tb_string_assign_format_trace(a, __tplat_func__, __tplat_line__, __tplat_file__, #b)
+#define tb_string_assign_c_string(a,b) 				tb_string_assign_c_string_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_assign_c_string_with_size(a,b,c) 	tb_string_assign_c_string_with_size_trace(a,b,c, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_append(a,b) 						tb_string_append_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_append_c_string(a,b) 				tb_string_append_c_string_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_append_c_string_with_size(a,b,c) 	tb_string_append_c_string_with_size_trace(a,b,c, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_append_char(a,b) 					tb_string_append_char_trace(a,b, __tplat_func__, __tplat_line__, __tplat_file__)
+#define tb_string_append_format(a,b,...)			tb_string_append_format_trace(a, __tplat_func__, __tplat_line__, __tplat_file__, #b)
+
+#endif
 
 #endif
 

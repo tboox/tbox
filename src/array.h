@@ -72,6 +72,7 @@ tb_byte_t* 		tb_array_get(tb_array_t* array, tb_int_t index);
 
 tb_byte_t* 		tb_array_push(tb_array_t* array);
 void 			tb_array_pop(tb_array_t* array);
+void 			tb_array_clear(tb_array_t* array);
 
 tb_byte_t* 		tb_array_first(tb_array_t* array);
 tb_byte_t* 		tb_array_last(tb_array_t* array);

@@ -47,7 +47,7 @@ extern "C" {
 #define TB_POOL_MAX_SIZE 							(1 << 30)
 
 // trace pool
-//#define tb_pool_create(step, size) tb_pool_create_with_trace(step, size, __tplat_func__, __tplat_line__, __tplat_file__)
+//#define tb_pool_create(step, size, grow) tb_pool_create_with_trace(step, size, grow, __tplat_func__, __tplat_line__, __tplat_file__)
 
 /* /////////////////////////////////////////////////////////
  * types

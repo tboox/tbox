@@ -45,21 +45,7 @@
 #define TB_CONV_ISDIGIT8(x) 				(((x) > 0x2f && (x) < 0x38))
 #define TB_CONV_ISDIGIT16(x) 				(((x) > 0x2f && (x) < 0x3a) || ((x) > 0x40 && (x) < 0x47) || ((x) > 0x60 && (x) < 0x67))
 
-// int to string
-//#define TB_CONV_ITOA(x) 					(itoa((x)))
-//#define TB_CONV_LTOA(x) 					(ltoa((x)))
-//#define TB_CONV_LLTOA(x) 					(lltoa((x)))
-//#define TB_CONV_UTOA(x) 					(utoa((x)))
-//#define TB_CONV_ULTOA(x) 					(ultoa((x)))
-
-// string to int
-//#define TB_CONV_ATOI(x) 					(atoi((x)))
-//#define TB_CONV_ATOL(x) 					(atol((x)))
-//#define TB_CONV_ATOUL(x) 					(strtoul((x), TB_NULL, 10))
-//#define TB_CONV_ATOLB(x, b) 				(strtol((x), TB_NULL, (b)))
-//#define TB_CONV_ATOULB(x, b) 				(strtoul((x), TB_NULL, (b)))
-//#define TB_CONV_ATOLL(x) 					((tb_int64_t)atoll((x)))
-
+// string => number
 #define TB_CONV_S2TOI32(s) 					((tb_int32_t)tb_conv_s2tou32(s))
 #define TB_CONV_S2TOU32(s) 					tb_conv_s2tou32(s)
 #define TB_CONV_S2TOF(s) 					tb_conv_s2tof(s)
@@ -84,9 +70,6 @@
 #define TB_CONV_SBTOU32(s, b) 				tb_conv_sbtou32(s, b)
 #define TB_CONV_SBTOF(s, b) 				tb_conv_sbtof(s, b)
 
-// string to float
-//#define TB_CONV_ATOF(x) 					(atof((x)))
-//#define TB_CONV_ATOLF(x) 					(strtod((x), TB_NULL)) // is double?
 
 // to lower & upper
 #define TB_CONV_TOLOWER(x) 					(((x) && ((x) != 0x20))? (x) + 0x20 : (x))
@@ -96,23 +79,24 @@
  * interfaces
  */
 
-tb_uint32_t 	tb_conv_s2tou32(tb_char_t const* s);
-tb_float_t 		tb_conv_s2tof(tb_char_t const* s);
+tb_uint32_t 		tb_conv_s2tou32(tb_char_t const* s);
+tb_float_t 			tb_conv_s2tof(tb_char_t const* s);
 
-tb_uint32_t 	tb_conv_s8tou32(tb_char_t const* s);
-tb_float_t 		tb_conv_s8tof(tb_char_t const* s);
+tb_uint32_t 		tb_conv_s8tou32(tb_char_t const* s);
+tb_float_t 			tb_conv_s8tof(tb_char_t const* s);
 
-tb_uint32_t 	tb_conv_s10tou32(tb_char_t const* s);
-tb_float_t 		tb_conv_s10tof(tb_char_t const* s);
+tb_uint32_t 		tb_conv_s10tou32(tb_char_t const* s);
+tb_float_t 			tb_conv_s10tof(tb_char_t const* s);
 
-tb_uint32_t 	tb_conv_s16tou32(tb_char_t const* s);
-tb_float_t 		tb_conv_s16tof(tb_char_t const* s);
+tb_uint32_t 		tb_conv_s16tou32(tb_char_t const* s);
+tb_float_t 			tb_conv_s16tof(tb_char_t const* s);
 
-tb_uint32_t 	tb_conv_stou32(tb_char_t const* s);
-tb_float_t 		tb_conv_stof(tb_char_t const* s);
+tb_uint32_t 		tb_conv_stou32(tb_char_t const* s);
+tb_float_t 			tb_conv_stof(tb_char_t const* s);
 
-tb_uint32_t 	tb_conv_sbtou32(tb_char_t const* s, tb_int_t base);
-tb_float_t 		tb_conv_sbtof(tb_char_t const* s, tb_int_t base);
+tb_uint32_t 		tb_conv_sbtou32(tb_char_t const* s, tb_int_t base);
+tb_float_t 			tb_conv_sbtof(tb_char_t const* s, tb_int_t base);
+
 
 #endif
 

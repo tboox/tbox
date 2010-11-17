@@ -254,3 +254,30 @@ $(foreach file, $(OBJ_FILES), $(eval $(call MAKE_INSTALL_OBJ_FILES,$(file))))
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_INSTALL_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
+#############################################################
+# make update 
+# #
+
+define MAKE_UPDATE_SUB_PROS
+SUB_PROS_$(1)_update:
+	$(MAKE) -C $(1) update
+endef
+
+define MAKE_UPDATE_DEP_PROS
+DEP_PROS_$(1)_update:
+	$(MAKE) -C $(1) update
+endef
+
+update: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_update) .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
+	-$(RM) *.b *.a *.so
+
+$(foreach pro, $(DEP_PROS), $(eval $(call MAKE_UPDATE_DEP_PROS,$(pro))))
+$(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))
+
+#############################################################
+# null
+# #
+.null :
+
+
+

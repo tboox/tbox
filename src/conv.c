@@ -653,3 +653,8 @@ tb_float_t tb_conv_sbtof(tb_char_t const* s, tb_int_t base)
 	if (convs[base]) return convs[base](s);
 	else return 0.;
 }
+
+tb_char_t const* tb_conv_u32tos10(tb_uint32_t val, tb_char_t* s, tb_size_t n)
+{
+
+}

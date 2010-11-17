@@ -35,6 +35,12 @@ install : .null
 clean : .null
 	$(MAKE) -C $(SRC_DIR) clean
 
+# make update
+update : .null
+	$(MAKE) -C $(SRC_DIR) update
+	$(MAKE) -C $(SRC_DIR)
+	$(MAKE) -C $(SRC_DIR) install
+
 .null :
 
 else
