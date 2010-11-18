@@ -58,6 +58,10 @@ typedef struct __tb_array_t
 	tb_size_t 		maxn;
 	tb_size_t 		step;
 
+	// free item
+	void 			(*free)(void* priv, void* data);
+	void* 			priv;
+
 }tb_array_t;
 
 /* /////////////////////////////////////////////////////////

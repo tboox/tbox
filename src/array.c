@@ -63,7 +63,13 @@ void tb_array_destroy(tb_array_t* array)
 {
 	if (array)
 	{
+		// clear data
+		tb_array_clear(array);
+
+		// free data
 		if (array->data) tb_free(array->data);
+
+		// free it
 		tb_free(array);
 	}
 }
@@ -92,11 +98,25 @@ tb_byte_t* tb_array_push(tb_array_t* array)
 }
 void tb_array_pop(tb_array_t* array)
 {
-	if (array && array->size) array->size--;
+	if (array && array->size)
+	{
+		if (array->free) array->free(array->priv, tb_array_last(array));
+		array->size--;
+	}
 }
 void tb_array_clear(tb_array_t* array)
 {
-	if (array) array->size = 0;
+	if (array) 
+	{
+		// free item
+		if (array->free)
+		{
+			tb_int_t i = 0;
+			for (i = 0; i < array->size; i++)
+				array->free(array->priv, tb_array_get(array, i));
+		}
+		array->size = 0;
+	}
 }
 tb_byte_t* tb_array_first(tb_array_t* array)
 {
@@ -115,6 +135,16 @@ tb_size_t tb_array_size(tb_array_t const* array)
 tb_bool_t tb_array_resize(tb_array_t* array, tb_size_t size)
 {
 	if (!array) return TB_FALSE;
+	
+	// free items if the array is decreased
+	if (array->free && size < array->size)
+	{
+		tb_int_t i = 0;
+		for (i = size; i < array->size; i++)
+			array->free(array->priv, tb_array_get(array, i));
+	}
+
+	// resize buffer
 	if (size > array->maxn)
 	{
 		tb_size_t omaxn = array->maxn;
@@ -128,6 +158,8 @@ tb_bool_t tb_array_resize(tb_array_t* array, tb_size_t size)
 		if (!array->data) return TB_FALSE;
 		memset(array->data + array->size * array->step, 0, (array->maxn - omaxn) * array->step);
 	}
+
+	// update size
 	array->size = size;
 	return TB_TRUE;
 }
@@ -149,7 +181,7 @@ tb_array_t* tb_array_duplicate(tb_array_t* array)
 
 	return dup;
 fail:
-	if (dup) tb_array_destroy(dup);
+	if (dup) tb_free(dup);
 	return TB_NULL;
 }
 

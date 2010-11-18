@@ -117,8 +117,25 @@ void tb_pool_destroy(tb_pool_t* pool)
 {
 	if (pool)
 	{
+		// free items
+		if (pool->free)
+		{
+			tb_int_t i = 0;
+			for (i = 0; i < pool->maxn; i++)
+			{
+				// is free?
+				if (tb_pool_info_isset(pool->info, i))
+					tb_pool_free(pool, i + 1);
+			}
+		}
+
+		// free data
 		if (pool->data) tb_free(pool->data);
+
+		// free info
 		if (pool->info) tb_free(pool->info);
+
+		// free it
 		tb_free(pool);
 	}
 }
@@ -201,6 +218,9 @@ void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 	TB_ASSERT(tb_pool_info_isset(pool->info, item - 1));
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 	{
+		// free item
+		if (pool->free) pool->free(pool->priv, tb_pool_get(pool, item));
+
 		// set info
 		tb_pool_info_reset(pool->info, item - 1);
 

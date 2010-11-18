@@ -63,6 +63,10 @@ typedef struct __tb_pool_t
 	tb_size_t 		maxn;
 	tb_size_t 		step;
 
+	// free item
+	void 			(*free)(void* priv, void* data);
+	void* 			priv;
+
 	// predict the next free block
 #ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
 	tb_size_t 		pred;
