@@ -536,6 +536,32 @@ tb_stream_t* tb_stream_open(tb_generic_stream_t* st, tb_char_t const* url, tb_by
 {
 	if (url)
 	{
+		tb_size_t n = strlen(url);
+		if (n > 7)
+		{
+			if (url[0] == 'h'
+				&& url[1] == 't'
+				&& url[2] == 't'
+				&& url[3] == 'p'
+				&& url[4] == ':'
+				&& url[5] == '/'
+				&& url[6] == '/')
+			{
+				st->st = tb_stream_open_from_http(&st->u.http, url, flag);
+				if (st->st) return st->st;
+			}
+			else if (url[0] == 'f'
+				&& url[1] == 'i'
+				&& url[2] == 'l'
+				&& url[3] == 'e'
+				&& url[4] == ':'
+				&& url[5] == '/'
+				&& url[6] == '/')
+			{
+				st->st = tb_stream_open_from_file(&st->u.file, &url[6], flag);
+				if (st->st) return st->st;
+			}
+		}
 		st->st = tb_stream_open_from_file(&st->u.file, url, flag);
 		if (st->st) return st->st;
 		st->st = tb_stream_open_from_http(&st->u.http, url, flag);
@@ -543,7 +569,7 @@ tb_stream_t* tb_stream_open(tb_generic_stream_t* st, tb_char_t const* url, tb_by
 	}
 	if (data && size)
 	{
-		st->st = tb_stream_open_from_data(&st->u.file, data, size, flag);
+		st->st = tb_stream_open_from_data(&st->u.data, data, size, flag);
 		if (st->st) return st->st;
 	}
 

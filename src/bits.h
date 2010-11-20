@@ -257,11 +257,11 @@ static __tplat_inline__ tb_uint8_t tb_pbits_get_u1(tb_byte_t const* p)
 }
 static __tplat_inline__ tb_uint8_t tb_pbits_get_u8(tb_byte_t const* p)
 {
-	return *(p++);
+	return *(p);
 }
 static __tplat_inline__ tb_sint8_t tb_pbits_get_s8(tb_byte_t const* p)
 {
-	return *(p++);
+	return *(p);
 }
 static __tplat_inline__ tb_uint16_t tb_pbits_get_u16_le(tb_byte_t const* p)
 {

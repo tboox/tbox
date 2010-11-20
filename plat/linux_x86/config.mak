@@ -13,11 +13,11 @@ TB_CONFIG_FORMAT 			= y
 # xml
 TB_CONFIG_XML 				= y
 
-# zix
-TB_CONFIG_ZIX 				= y
+# zstream
+TB_CONFIG_ZSTREAM 			= y
 
 # regex
-TB_CONFIG_REGEX 			= y
+TB_CONFIG_REGEX 			= n
 
 # jpeg
 TB_CONFIG_JPEG 				= y

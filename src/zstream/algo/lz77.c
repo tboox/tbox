@@ -17,49 +17,28 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		option.h
+ * \file		lz77.c
  *
  */
-#ifndef TB_OPTION_H
-#define TB_OPTION_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef TB_ZIX_LZ77_H
+#define TB_ZIX_LZ77_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "config.h"
+#include "prefix.h"
+
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
-// is debug?
-#if tbox_CONFIG_DEBUG
-# 	define TB_DEBUG
-#endif
-
-// memory
-#ifdef TB_CONFIG_MEMORY_SMALL
-# 	define TB_MEMORY_MODE_SMALL
-#endif
-
-// pool
-#define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
-#define TB_MEMORY_POOL_PREDICTION_ENABLE
-
-// asm
-#ifdef TB_CONFIG_ASM_ENABLE
-# 	define TB_ASM_ENABLE 
-#endif
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
+
+
 
 #endif

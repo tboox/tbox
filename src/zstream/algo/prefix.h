@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		option.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_OPTION_H
-#define TB_OPTION_H
+#ifndef TB_ZIX_ALGO_PREFIX_H
+#define TB_ZIX_ALGO_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,31 +31,8 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "config.h"
-
-/* /////////////////////////////////////////////////////////
- * macros
- */
-
-// is debug?
-#if tbox_CONFIG_DEBUG
-# 	define TB_DEBUG
-#endif
-
-// memory
-#ifdef TB_CONFIG_MEMORY_SMALL
-# 	define TB_MEMORY_MODE_SMALL
-#endif
-
-// pool
-#define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
-#define TB_MEMORY_POOL_PREDICTION_ENABLE
-
-// asm
-#ifdef TB_CONFIG_ASM_ENABLE
-# 	define TB_ASM_ENABLE 
-#endif
-
+#include "../prefix.h"
+#include "../stream.h"
 
 // c plus plus
 #ifdef __cplusplus

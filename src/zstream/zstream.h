@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		option.h
+ * \file		zstream.h
  *
  */
-#ifndef TB_OPTION_H
-#define TB_OPTION_H
+#ifndef TB_ZSTREAM_H
+#define TB_ZSTREAM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,31 +31,20 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "config.h"
+#include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
 
-// is debug?
-#if tbox_CONFIG_DEBUG
-# 	define TB_DEBUG
-#endif
 
-// memory
-#ifdef TB_CONFIG_MEMORY_SMALL
-# 	define TB_MEMORY_MODE_SMALL
-#endif
+/* /////////////////////////////////////////////////////////
+ * types
+ */
 
-// pool
-#define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
-#define TB_MEMORY_POOL_PREDICTION_ENABLE
-
-// asm
-#ifdef TB_CONFIG_ASM_ENABLE
-# 	define TB_ASM_ENABLE 
-#endif
-
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 // c plus plus
 #ifdef __cplusplus
@@ -63,3 +52,4 @@ extern "C" {
 #endif
 
 #endif
+
