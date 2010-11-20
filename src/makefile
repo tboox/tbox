@@ -23,6 +23,7 @@ tbox_C_FILES 		+= \
 					math$(_)pow \
 					math$(_)log \
 					stream \
+					bstream \
 					stream$(_)http \
 					stream$(_)file \
 					stream$(_)data
@@ -47,6 +48,7 @@ INC_FILES 			= \
 					memops.h \
 					string.h \
 					stream.h \
+					bstream.h \
 					math$(_)exp.h \
 					math$(_)pow.h \
 					math$(_)log.h \

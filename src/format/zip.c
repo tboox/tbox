@@ -43,7 +43,7 @@
 tb_size_t tb_format_zip_probe(tb_stream_t* st)
 {
 	tb_byte_t const* p = tb_stream_need(st, 4);
-	if (p && tb_pbits_get_u32_le(p) == 0x04034b50)
+	if (p && tb_bits_get_u32_le(p) == 0x04034b50)
 		return 40;
 	else return 0;
 }

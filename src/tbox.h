@@ -46,6 +46,7 @@ extern "C" {
 #include "memops.h"
 #include "stream.h"
 #include "format.h"
+#include "bstream.h"
 #include "math/math.h"
 #include "external/external.h"
 
