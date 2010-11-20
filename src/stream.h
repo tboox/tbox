@@ -33,7 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "bits.h"
-#include "string.h"
+#include "string/string.h"
 
 #ifdef TB_CONFIG_ZLIB
 # 	include "zlib.h"

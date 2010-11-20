@@ -27,7 +27,7 @@
  * includes
  */
 #include "prefix.h"
-#include "string.h"
+#include "string/string.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros

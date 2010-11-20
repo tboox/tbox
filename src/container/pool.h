@@ -20,8 +20,8 @@
  * \file		pool.h
  *
  */
-#ifndef TB_POOL_H
-#define TB_POOL_H
+#ifndef TB_CONTAINER_POOL_H
+#define TB_CONTAINER_POOL_H
 
 // c plus plus
 #ifdef __cplusplus

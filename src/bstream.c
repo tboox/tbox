@@ -558,20 +558,4 @@ tb_sint32_t tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t bits_n)
 	return val;
 	// }
 }
-/* /////////////////////////////////////////////////////////
- * pbstream
- */
-tb_char_t const* tb_pbstream_get_string(tb_byte_t const* p, tb_size_t size)
-{
-	TB_ASSERT(p && size);
-	// {
-	tb_char_t const* s = (tb_char_t const*)p;
 
-	// find '\0'
-	while (*p && size--) p++;
-
-	// is string with '\0' ?
-	if ((*p)) return TB_NULL;
-	return s;
-	// }
-}

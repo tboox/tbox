@@ -24,7 +24,7 @@
  * includes
  */
 #include "array.h"
-#include "math/math.h"
+#include "../math/math.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

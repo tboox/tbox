@@ -11,10 +11,7 @@ tbox_TYPE 			= LIB
 tbox_C_FILES 		+= \
 					bits \
 					malloc \
-					pool \
 					memops \
-					string \
-					array \
 					conv \
 					http \
 					time \
@@ -25,7 +22,10 @@ tbox_C_FILES 		+= \
 					bstream \
 					stream$(_)http \
 					stream$(_)file \
-					stream$(_)data
+					stream$(_)data \
+					string$(_)string \
+					container$(_)pool \
+					container$(_)array
 
 # header files
 INC_FILES 			= \
@@ -37,14 +37,11 @@ INC_FILES 			= \
 					option.h \
 					bits.h \
 					malloc.h \
-					pool.h \
-					array.h \
 					varg.h \
 					conv.h \
 					http.h \
 					time.h \
 					memops.h \
-					string.h \
 					stream.h \
 					bstream.h \
 					math$(_)exp.h \
@@ -54,6 +51,12 @@ INC_FILES 			= \
 					math$(_)round.h \
 					math$(_)prefix.h \
 					math$(_)math.h \
+					string$(_)prefix.h \
+					string$(_)string.h \
+					container$(_)prefix.h \
+					container$(_)container.h \
+					container$(_)pool.h \
+					container$(_)array.h \
 					external$(_)prefix.h \
 					external$(_)external.h 
 

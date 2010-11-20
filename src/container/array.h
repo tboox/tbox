@@ -20,8 +20,8 @@
  * \file		array.h
  *
  */
-#ifndef TB_ARRAY_H
-#define TB_ARRAY_H
+#ifndef TB_CONTAINER_ARRAY_H
+#define TB_CONTAINER_ARRAY_H
 
 // c plus plus
 #ifdef __cplusplus
