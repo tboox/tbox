@@ -141,3 +141,20 @@ tb_float_t tb_bits_get_double_ne(tb_byte_t const* p)
 	return (tb_float_t)conv.f;
 }
 
+void tb_bits_swap_u16(tb_uint16_t* p)
+{
+	tb_byte_t* q = (tb_byte_t*)p;
+	tb_byte_t b = q[0];
+	q[0] = q[1];
+	q[1] = b;
+}
+void tb_bits_swap_u32(tb_uint32_t* p)
+{
+	tb_byte_t* q = (tb_byte_t*)p;
+	tb_byte_t b0 = q[0];
+	tb_byte_t b1 = q[1];
+	q[0] = q[3];
+	q[1] = q[2];
+	q[3] = b0;
+	q[2] = b1;
+}

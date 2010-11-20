@@ -135,7 +135,7 @@ tb_uint16_t tb_bstream_get_u16_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint16_t val = ((*(bst->p) << 8) | *(bst->p + 1));
+	tb_uint16_t val = tb_bits_get_u16_be(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -144,7 +144,7 @@ tb_sint16_t tb_bstream_get_s16_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint16_t val = ((*(bst->p) << 8) | *(bst->p + 1));
+	tb_sint16_t val = tb_bits_get_s16_be(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -153,7 +153,7 @@ tb_uint16_t tb_bstream_get_u16_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint16_t val = ((*(bst->p + 1) << 8) | *(bst->p));
+	tb_uint16_t val = tb_bits_get_u16_le(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -162,7 +162,7 @@ tb_sint16_t tb_bstream_get_s16_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint16_t val = ((*(bst->p + 1) << 8) | *(bst->p));
+	tb_sint16_t val = tb_bits_get_s16_le(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -171,7 +171,7 @@ tb_uint32_t tb_bstream_get_u24_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = ((*(bst->p) << 16) | (*(bst->p + 1) << 8) | *(bst->p + 2));
+	tb_uint32_t val = tb_bits_get_u24_be(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -180,7 +180,7 @@ tb_sint32_t tb_bstream_get_s24_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = ((*(bst->p) << 16) | (*(bst->p + 1) << 8) | *(bst->p + 2));
+	tb_sint32_t val = tb_bits_get_s24_be(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -189,7 +189,7 @@ tb_uint32_t tb_bstream_get_u32_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = ((*(bst->p) << 24) | (*(bst->p + 1) << 16) | (*(bst->p + 2) << 8) | *(bst->p + 3));
+	tb_uint32_t val = tb_bits_get_u32_be(bst->p);;
 	bst->p += 4;
 	return val;
 	// }
@@ -198,7 +198,7 @@ tb_sint32_t tb_bstream_get_s32_be(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = ((*(bst->p) << 24) | (*(bst->p + 1) << 16) | (*(bst->p + 2) << 8) | *(bst->p + 3));
+	tb_sint32_t val = tb_bits_get_s32_be(bst->p);
 	bst->p += 4;
 	return val;
 	// }
@@ -207,7 +207,7 @@ tb_uint32_t tb_bstream_get_u24_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = ((*(bst->p + 2) << 16) | (*(bst->p + 1) << 8) | *(bst->p));
+	tb_uint32_t val = tb_bits_get_u24_le(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -216,7 +216,7 @@ tb_sint32_t tb_bstream_get_s24_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = ((*(bst->p + 2) << 16) | (*(bst->p + 1) << 8) | *(bst->p));
+	tb_sint32_t val = tb_bits_get_s24_le(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -225,7 +225,7 @@ tb_uint32_t tb_bstream_get_u32_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = ((*(bst->p + 3) << 24) | (*(bst->p + 2) << 16) | (*(bst->p + 1) << 8) | *(bst->p));
+	tb_uint32_t val = tb_bits_get_u32_le(bst->p);
 	bst->p += 4;
 	return val;
 	// }
@@ -234,7 +234,7 @@ tb_sint32_t tb_bstream_get_s32_le(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = ((*(bst->p + 3) << 24) | (*(bst->p + 2) << 16) | (*(bst->p + 1) << 8) | *(bst->p));
+	tb_sint32_t val = tb_bits_get_s32_le(bst->p);
 	bst->p += 4;
 	return val;
 	// }

@@ -10,7 +10,6 @@ tbox_TYPE 			= LIB
 # basic files
 tbox_C_FILES 		+= \
 					bits \
-					bswap \
 					malloc \
 					pool \
 					memops \
@@ -37,7 +36,6 @@ INC_FILES 			= \
 					tbox.h \
 					option.h \
 					bits.h \
-					bswap.h \
 					malloc.h \
 					pool.h \
 					array.h \

@@ -95,6 +95,9 @@ tb_float_t 			tb_bits_get_double_le(tb_byte_t const* p);
 tb_float_t 			tb_bits_get_double_be(tb_byte_t const* p);
 tb_float_t 			tb_bits_get_double_ne(tb_byte_t const* p);
 
+// swap
+void 				tb_bits_swap_u16(tb_uint16_t* p);
+void 				tb_bits_swap_u32(tb_uint32_t* p);
 
 // c plus plus
 #ifdef __cplusplus

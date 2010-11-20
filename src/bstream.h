@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "bits.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -160,7 +161,7 @@ static __tplat_inline__ tb_uint16_t tb_bstream_get_u16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint16_t val = *((tb_uint16_t*)bst->p);
+	tb_uint16_t val = tb_bits_get_u16_ne(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -169,7 +170,7 @@ static __tplat_inline__ tb_sint16_t tb_bstream_get_s16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint16_t val = *((tb_sint16_t*)bst->p);
+	tb_sint16_t val = tb_bits_get_s16_ne(bst->p);
 	bst->p += 2;
 	return val;
 	// }
@@ -178,7 +179,7 @@ static __tplat_inline__ tb_uint32_t tb_bstream_get_u24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = *((tb_uint32_t*)bst->p) & 0x00ffffff;
+	tb_uint32_t val = tb_bits_get_u24_ne(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -187,7 +188,7 @@ static __tplat_inline__ tb_sint32_t tb_bstream_get_s24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = *((tb_sint32_t*)bst->p) & 0x80ffffff;
+	tb_sint32_t val = tb_bits_get_s24_ne(bst->p);
 	bst->p += 3;
 	return val;
 	// }
@@ -196,7 +197,7 @@ static __tplat_inline__ tb_uint32_t tb_bstream_get_u32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_uint32_t val = *((tb_uint32_t*)bst->p);
+	tb_uint32_t val = tb_bits_get_u32_ne(bst->p);
 	bst->p += 4;
 	return val;
 	// }
@@ -205,7 +206,7 @@ static __tplat_inline__ tb_sint32_t tb_bstream_get_s32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
-	tb_sint32_t val = *((tb_sint32_t*)bst->p);
+	tb_sint32_t val = tb_bits_get_s32_ne(bst->p);
 	bst->p += 4;
 	return val;
 	// }

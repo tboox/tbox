@@ -41,7 +41,6 @@ extern "C" {
 #include "http.h"
 #include "time.h"
 #include "varg.h"
-#include "bswap.h"
 #include "array.h"
 #include "memops.h"
 #include "stream.h"
