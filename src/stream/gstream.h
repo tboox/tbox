@@ -140,19 +140,11 @@ typedef struct __tb_fstream_t
 }tb_fstream_t;
 
 // the union stream
-typedef struct __tb_ustream_t
+typedef union __tb_ustream_t
 {
-	// streams
-	union
-	{
-		tb_dstream_t 	data;
-		tb_hstream_t 	http;
-		tb_fstream_t 	file;
-
-	}u;
-
-	// the reference to the specific stream
-	tb_gstream_t* 			st;
+	tb_dstream_t 	data;
+	tb_hstream_t 	http;
+	tb_fstream_t 	file;
 
 }tb_ustream_t;
 
@@ -174,6 +166,7 @@ tb_bool_t 			tb_gstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_seek_
 void 				tb_gstream_flush(tb_gstream_t* st);
 tb_int_t 			tb_gstream_printf(tb_gstream_t* st, tb_char_t const* fmt, ...);
 tb_size_t 			tb_gstream_size(tb_gstream_t const* st);
+tb_size_t 			tb_gstream_left(tb_gstream_t const* st);
 tb_size_t 			tb_gstream_offset(tb_gstream_t const* st);
 tb_gstream_flag_t 	tb_gstream_flag(tb_gstream_t const* st);
 tb_bool_t 			tb_gstream_switch(tb_gstream_t* st, tb_gstream_flag_t flag);

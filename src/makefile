@@ -18,12 +18,6 @@ tbox_C_FILES 		+= \
 					math$(_)exp \
 					math$(_)pow \
 					math$(_)log \
-					stream$(_)bstream \
-					stream$(_)tstream \
-					stream$(_)gstream \
-					stream$(_)gstream$(_)http \
-					stream$(_)gstream$(_)file \
-					stream$(_)gstream$(_)data \
 					string$(_)string \
 					container$(_)pool \
 					container$(_)array
@@ -50,11 +44,6 @@ INC_FILES 			= \
 					math$(_)log.h \
 					math$(_)abs.h \
 					math$(_)round.h \
-					stream$(_)prefix.h \
-					stream$(_)stream.h \
-					stream$(_)bstream.h \
-					stream$(_)gstream.h \
-					stream$(_)tstream.h \
 					string$(_)prefix.h \
 					string$(_)string.h \
 					container$(_)prefix.h \
@@ -71,6 +60,33 @@ tbox_C_FILES-$(TB_CONFIG_ENCODING) 	+= \
 									encoding$(_)gb2312_unicode
 
 INC_FILES-$(TB_CONFIG_ENCODING) 	+= encoding.h
+
+# stream files
+tbox_C_FILES-$(TB_CONFIG_STREAM) 	+= \
+									stream$(_)bstream \
+									stream$(_)tstream \
+									stream$(_)gstream \
+									stream$(_)gstream$(_)http \
+									stream$(_)gstream$(_)file \
+									stream$(_)gstream$(_)data \
+									stream$(_)zstream$(_)zstream \
+									stream$(_)zstream$(_)lz77 
+
+INC_FILES-$(TB_CONFIG_STREAM) 		+= \
+									stream$(_)prefix.h \
+									stream$(_)stream.h \
+									stream$(_)bstream.h \
+									stream$(_)gstream.h \
+									stream$(_)tstream.h \
+									stream$(_)zstream.h \
+									stream$(_)zstream$(_)prefix.h \
+									stream$(_)zstream$(_)zstream.h \
+									stream$(_)zstream$(_)lz77.h
+
+ifeq ($(TB_CONFIG_ENCODING),y)
+tbox_C_FILES-$(TB_CONFIG_STREAM) 	+= stream$(_)estream 
+INC_FILES-$(TB_CONFIG_STREAM) 		+= stream$(_)estream.h 
+endif
 
 # format files
 tbox_C_FILES-$(TB_CONFIG_FORMAT) 	+= \

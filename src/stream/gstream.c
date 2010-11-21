@@ -277,6 +277,12 @@ tb_size_t tb_gstream_offset(tb_gstream_t const* st)
 	if (st) return st->offset;
 	else return 0;
 }
+tb_size_t tb_gstream_left(tb_gstream_t const* st)
+{
+	tb_size_t size = tb_gstream_size(st);
+	tb_size_t offset = tb_gstream_offset(st);
+	return (size > offset? (size - offset) : 0);
+}
 tb_int_t tb_gstream_read(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
 {
 	// check
@@ -534,6 +540,7 @@ tb_bool_t tb_gstream_switch(tb_gstream_t* st, tb_gstream_flag_t flag)
 }
 tb_gstream_t* tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t const* data, tb_size_t size, tb_gstream_flag_t flag)
 {
+	tb_gstream_t* gst = TB_NULL;
 	if (url)
 	{
 		tb_size_t n = strlen(url);
@@ -547,8 +554,8 @@ tb_gstream_t* tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t 
 				&& url[5] == '/'
 				&& url[6] == '/')
 			{
-				st->st = tb_gstream_open_from_http(&st->u.http, url, flag);
-				if (st->st) return st->st;
+				gst = tb_gstream_open_from_http(&st->http, url, flag);
+				if (gst) return gst;
 			}
 			else if (url[0] == 'f'
 				&& url[1] == 'i'
@@ -558,19 +565,19 @@ tb_gstream_t* tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t 
 				&& url[5] == '/'
 				&& url[6] == '/')
 			{
-				st->st = tb_gstream_open_from_file(&st->u.file, &url[6], flag);
-				if (st->st) return st->st;
+				gst = tb_gstream_open_from_file(&st->file, &url[6], flag);
+				if (gst) return gst;
 			}
 		}
-		st->st = tb_gstream_open_from_file(&st->u.file, url, flag);
-		if (st->st) return st->st;
-		st->st = tb_gstream_open_from_http(&st->u.http, url, flag);
-		if (st->st) return st->st;
+		gst = tb_gstream_open_from_file(&st->file, url, flag);
+		if (gst) return gst;
+		gst = tb_gstream_open_from_http(&st->http, url, flag);
+		if (gst) return gst;
 	}
 	if (data && size)
 	{
-		st->st = tb_gstream_open_from_data(&st->u.data, data, size, flag);
-		if (st->st) return st->st;
+		gst = tb_gstream_open_from_data(&st->data, data, size, flag);
+		if (gst) return gst;
 	}
 
 	return TB_NULL;

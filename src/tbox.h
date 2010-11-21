@@ -42,10 +42,13 @@ extern "C" {
 #include "memops.h"
 #include "format.h"
 #include "math/math.h"
-#include "stream/stream.h"
 #include "string/string.h"
 #include "container/container.h"
 #include "external/external.h"
+
+#ifdef TB_CONFIG_STREAM
+#include "stream/stream.h"
+#endif
 
 #ifdef TB_CONFIG_ENCODING
 # 	include "encoding.h"

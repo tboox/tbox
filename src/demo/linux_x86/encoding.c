@@ -62,8 +62,21 @@ int main(int argc, char** argv)
 	{
 		tplat_printf("conv(%d): %s\n", src_n, src);
 		tplat_char_t dst[4096];
+
+#if 1
 		//dst_n = tb_encoding_convert_string(TB_ENCODING_UTF8, TB_ENCODING_GB2312, src, src_n, dst, 4096);
 		dst_n = tb_encoding_convert_string(TB_ENCODING_GB2312, TB_ENCODING_UTF8, src, src_n, dst, 4096);
+#else
+		tb_estream_t 	est;
+		tb_tstream_t* 	tst = tb_estream_open(&est, TB_ENCODING_GB2312, TB_ENCODING_UTF8);
+		tb_bstream_attach(tb_tstream_src(tst), src, src_n);
+		tb_bstream_attach(tb_tstream_dst(tst), dst, 4096);
+		tb_bstream_t* 	ost = tb_tstream_transform(tst);
+		dst_n = tb_bstream_pos(ost) - tb_bstream_beg(ost);
+		tb_tstream_close(tst);
+#endif
+
+
 		if (dst_n > 0)
 		{
 			tplat_printf("result(%d): %s\n", dst_n, dst);

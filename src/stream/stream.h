@@ -35,6 +35,28 @@ extern "C" {
 #include "bstream.h"
 #include "gstream.h"
 #include "tstream.h"
+#include "zstream.h"
+
+#ifdef TB_CONFIG_ENCODING
+# 	include "estream.h"
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * architecture
+ *
+ *
+ *
+ *           [estream, zstream]
+ *                  |
+ *                  |            - hstream
+ *                  |           |
+ * gstream ------ tstream ------  fstream
+ *    |             |          |
+ * ustream          |          - dstream
+ *    |             |
+ *    -- bstream --
+ *
+ */
 
 // c plus plus
 #ifdef __cplusplus

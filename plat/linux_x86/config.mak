@@ -13,8 +13,8 @@ TB_CONFIG_FORMAT 			= y
 # xml
 TB_CONFIG_XML 				= y
 
-# zstream
-TB_CONFIG_ZSTREAM 			= y
+# stream
+TB_CONFIG_STREAM 			= y
 
 # regex
 TB_CONFIG_REGEX 			= n

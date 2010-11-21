@@ -27,19 +27,36 @@
 #include "zstream.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * interfaces
  */
 
-/* /////////////////////////////////////////////////////////
- * decls
- */
+tb_zstream_algo_t tb_zstream_algo(tb_zstream_t* zst)
+{
+	if (zst) return zst->algo;
+	else return TB_ZSTREAM_ALGO_NULL;
+}
+tb_zstream_action_t tb_zstream_action(tb_zstream_t* zst)
+{
+	if (zst) return zst->action;
+	else return TB_ZSTREAM_ACTION_NULL;
+}
+tb_char_t const* tb_zstream_name(tb_zstream_t* zst)
+{
+	TB_ASSERT(zst);
+	if (!zst) return "";
+	tb_char_t const* names[] =
+	{
+		""
+	, 	"huffman"
+	, 	"lz77"
+	, 	"lzw"
+	, 	"zlib"
+	
+	};
 
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-/* /////////////////////////////////////////////////////////
- * interface
- */
+	tb_size_t n = TB_STATIC_ARRAY_SIZE(names);
+	tb_size_t i = zst->algo;
+	if (i < n) return names[i];
+	else return "";
+}
 
