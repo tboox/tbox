@@ -47,10 +47,13 @@ tb_char_t const* tb_zstream_name(tb_zstream_t* zst)
 	tb_char_t const* names[] =
 	{
 		""
+	, 	"rle"
 	, 	"huffman"
 	, 	"lz77"
 	, 	"lzw"
 	, 	"zlib"
+	, 	"algorithm"
+	, 	"zix"
 	
 	};
 

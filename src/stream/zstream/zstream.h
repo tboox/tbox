@@ -51,10 +51,13 @@ typedef enum __tb_zstream_action_t
 typedef enum __tb_zstream_algo_t
 {
 	TB_ZSTREAM_ALGO_NULL 		= 0
-,	TB_ZSTREAM_ALGO_HUFFMAN 	= 1
-,	TB_ZSTREAM_ALGO_LZ77 		= 2
-,	TB_ZSTREAM_ALGO_LZW 		= 3
-,	TB_ZSTREAM_ALGO_ZLIB 		= 4
+,	TB_ZSTREAM_ALGO_RLE 		= 1
+,	TB_ZSTREAM_ALGO_HUFFMAN 	= 2
+,	TB_ZSTREAM_ALGO_LZ77 		= 3
+,	TB_ZSTREAM_ALGO_LZW 		= 4
+,	TB_ZSTREAM_ALGO_ZLIB 		= 5
+,	TB_ZSTREAM_ALGO_ALGORITHM 	= 6
+,	TB_ZSTREAM_ALGO_ZIX 		= 7
 
 }tb_zstream_algo_t;
 

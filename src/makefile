@@ -70,6 +70,7 @@ tbox_C_FILES-$(TB_CONFIG_STREAM) 	+= \
 									stream$(_)gstream$(_)file \
 									stream$(_)gstream$(_)data \
 									stream$(_)zstream$(_)zstream \
+									stream$(_)zstream$(_)golobm \
 									stream$(_)zstream$(_)lz77 
 
 INC_FILES-$(TB_CONFIG_STREAM) 		+= \
@@ -81,6 +82,7 @@ INC_FILES-$(TB_CONFIG_STREAM) 		+= \
 									stream$(_)zstream.h \
 									stream$(_)zstream$(_)prefix.h \
 									stream$(_)zstream$(_)zstream.h \
+									stream$(_)zstream$(_)golobm.h \
 									stream$(_)zstream$(_)lz77.h
 
 ifeq ($(TB_CONFIG_ENCODING),y)
