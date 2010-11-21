@@ -17,8 +17,8 @@
 // xml
 #define TB_CONFIG_XML
 
-// zstream
-#define TB_CONFIG_ZSTREAM
+// stream
+#define TB_CONFIG_STREAM
 
 // regex
 //#define TB_CONFIG_REGEX

@@ -2,11 +2,16 @@
 include $(PRO_DIR)$(_)prefix.mak
 
 # module name
-NAMES 							= string memops stream http time math conv
+NAMES 							= string memops http time math conv
 NAMES-$(TB_CONFIG_ENCODING) 	+= encoding
 NAMES-$(TB_CONFIG_REGEX) 		+= regex
 NAMES-$(TB_CONFIG_FORMAT) 		+= format
 NAMES-$(TB_CONFIG_XML) 			+= xml
+NAMES-$(TB_CONFIG_STREAM) 		+= gstream zstream
+
+ifeq ($(TB_CONFIG_ENCODING),y)
+NAMES-$(TB_CONFIG_STREAM) 		+= estream
+endif
 
 # module type
 regex_TYPE 			= BIN
@@ -14,12 +19,14 @@ encoding_TYPE 		= BIN
 string_TYPE 		= BIN
 memops_TYPE 		= BIN
 format_TYPE 		= BIN
-stream_TYPE 		= BIN
 xml_TYPE 			= BIN
 http_TYPE 			= BIN
 time_TYPE 			= BIN
 math_TYPE 			= BIN
 conv_TYPE 			= BIN
+gstream_TYPE 		= BIN
+zstream_TYPE 		= BIN
+estream_TYPE 		= BIN
 
 # c-source files
 regex_C_FILES 		= regex
@@ -27,12 +34,14 @@ encoding_C_FILES 	= encoding
 string_C_FILES 		= string
 memops_C_FILES 		= memops
 format_C_FILES 		= format
-stream_C_FILES 		= stream
 xml_C_FILES 		= xml
 http_C_FILES 		= http
 time_C_FILES 		= time
 math_C_FILES 		= math
 conv_C_FILES 		= conv
+gstream_C_FILES 	= gstream
+estream_C_FILES 	= estream
+zstream_C_FILES 	= zstream
 
 # lib files
 regex_LIBS 			= tbox tplat z m dl pthread
@@ -55,9 +64,17 @@ format_LIBS 		= tbox tplat z m dl pthread
 format_LIB_DIR 		= ../../ /usr/lib/
 format_INC_DIR 		= /usr/include
 
-stream_LIBS 		= tbox tplat z m dl pthread
-stream_LIB_DIR 		= ../../ /usr/lib/
-stream_INC_DIR 		= /usr/include
+gstream_LIBS 		= tbox tplat z m dl pthread
+gstream_LIB_DIR 	= ../../ /usr/lib/
+gstream_INC_DIR 	= /usr/include
+
+zstream_LIBS 		= tbox tplat z m dl pthread
+zstream_LIB_DIR 	= ../../ /usr/lib/
+zstream_INC_DIR 	= /usr/include
+
+estream_LIBS 		= tbox tplat z m dl pthread
+estream_LIB_DIR 	= ../../ /usr/lib/
+estream_INC_DIR 	= /usr/include
 
 xml_LIBS 			= tbox tplat z m dl pthread
 xml_LIB_DIR 		= ../../ /usr/lib/

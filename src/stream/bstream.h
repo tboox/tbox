@@ -20,7 +20,7 @@
  * \file		bstream.h
  *
  */
-#ifndef TB_STREAM_BSTRAEM_H
+#ifndef TB_STREAM_BSTREAM_H
 #define TB_STREAM_BSTREAM_H
 
 // c plus plus
@@ -44,6 +44,7 @@ typedef struct __tb_bstream_t
 	tb_byte_t* 			p; 	// the pointer to the current position
 	tb_size_t 			b; 	// the bit offset < 8
 	tb_byte_t const* 	e; 	// the pointer to the end
+	tb_size_t 			n; 	// the data size
 
 }tb_bstream_t;
 
@@ -70,24 +71,30 @@ typedef struct __tb_bstream_t
  * interfaces
  */
 
-// open
-tb_bstream_t* 		tb_bstream_open(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size);
-void 				tb_bstream_close(tb_bstream_t* bst);
+// attach
+tb_bstream_t* 		tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size);
+
+// load & save
+tb_size_t 			tb_bstream_load(tb_bstream_t* bst, void* gst);
+tb_size_t 			tb_bstream_save(tb_bstream_t* bst, void* gst);
 
 // modifior
 void 				tb_bstream_goto(tb_bstream_t* bst, tb_byte_t* data);
 void 				tb_bstream_sync(tb_bstream_t* bst);
 
 // position
-tb_byte_t const* 	tb_bstream_tell(tb_bstream_t* bst);
+tb_byte_t const* 	tb_bstream_beg(tb_bstream_t* bst);
+tb_byte_t const* 	tb_bstream_pos(tb_bstream_t* bst);
 tb_byte_t const* 	tb_bstream_end(tb_bstream_t* bst);
 
-// left
-tb_size_t 			tb_bstream_left_bytes(tb_bstream_t* bst);
+// size
+tb_size_t 			tb_bstream_offset(tb_bstream_t* bst);
+tb_size_t 			tb_bstream_size(tb_bstream_t* bst);
+tb_size_t 			tb_bstream_left(tb_bstream_t* bst);
 tb_size_t 			tb_bstream_left_bits(tb_bstream_t* bst);
 
 // skip
-void 				tb_bstream_skip_bytes(tb_bstream_t* bst, tb_size_t bytes_n);
+void 				tb_bstream_skip(tb_bstream_t* bst, tb_size_t size);
 void 				tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t bits_n);
 tb_char_t const* 	tb_bstream_skip_string(tb_bstream_t* bst);
 
@@ -245,7 +252,6 @@ static __tplat_inline__ void tb_bstream_set_s32_ne(tb_bstream_t* bst, tb_sint32_
 	*((tb_sint32_t*)bst->p) = val;
 	bst->p += 4;
 }
-
 
 // c plus plus
 #ifdef __cplusplus

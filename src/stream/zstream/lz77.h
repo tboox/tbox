@@ -20,8 +20,8 @@
  * \file		tstream.h
  *
  */
-#ifndef TB_STREAM_TSTREAM_H
-#define TB_STREAM_TSTREAM_H
+#ifndef TB_STREAM_ZSTREAM_LZ77_H
+#define TB_STREAM_ZSTREAM_LZ77_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,36 +32,43 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "bstream.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
-// the transform stream type
-typedef struct __tb_tstream_t
+// the lz77 inflate zstream type
+typedef struct __tb_lz77_inflate_zstream_t
 {
-	// src => dst
-	tb_bstream_t 	src;
-	tb_bstream_t 	dst;
+	// the stream base
+	tb_inflate_zstream_t 			base;
 
-	// do transform and return dst
-	tb_bstream_t* 	(*transform)(struct __tb_tstream_t* st);
+}tb_lz77_inflate_zstream_t;
 
-	// close it
-	void 			(*close)(struct __tb_tstream_t* st);
+// the lz77 deflate zstream type
+typedef struct __tb_lz77_deflate_zstream_t
+{
+	// the stream base
+	tb_deflate_zstream_t 			base;
 
-}tb_tstream_t;
+}tb_lz77_deflate_zstream_t;
+
+
+// the lz77 zstream type
+typedef union __tb_lz77_zstream_t
+{
+	tb_lz77_inflate_zstream_t 	infst;
+	tb_lz77_deflate_zstream_t 	defst;
+
+}tb_lz77_zstream_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_bstream_t* 	tb_tstream_src(tb_tstream_t* st);
-tb_bstream_t* 	tb_tstream_dst(tb_tstream_t* st);
-
-void 			tb_tstream_close(tb_tstream_t* st);
-tb_bool_t 		tb_tstream_transform(tb_tstream_t* st);
+tb_tstream_t* 	tb_zstream_open_lz77_inflate(tb_lz77_inflate_zstream_t* zst);
+tb_tstream_t* 	tb_zstream_open_lz77_deflate(tb_lz77_deflate_zstream_t* zst);
+tb_tstream_t* 	tb_zstream_open_lz77(tb_lz77_zstream_t* zst, tb_size_t action);
 
 // c plus plus
 #ifdef __cplusplus

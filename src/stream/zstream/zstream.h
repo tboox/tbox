@@ -20,8 +20,8 @@
  * \file		zstream.h
  *
  */
-#ifndef TB_ZSTREAM_H
-#define TB_ZSTREAM_H
+#ifndef TB_STREAM_ZSTREAM_ZSTREAM_H
+#define TB_STREAM_ZSTREAM_ZSTREAM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,20 +31,71 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-
-/* /////////////////////////////////////////////////////////
- * macros
- */
-
+#include "../prefix.h"
+#include "../tstream.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
+// the zstream action type
+typedef enum __tb_zstream_action_t
+{
+	TB_ZSTREAM_ACTION_NULL 		= 1
+,	TB_ZSTREAM_ACTION_INFLATE 	= 2
+,	TB_ZSTREAM_ACTION_DEFLATE 	= 3
+
+}tb_zstream_action_t;
+
+// the zstream algorithm type
+typedef enum __tb_zstream_algo_t
+{
+	TB_ZSTREAM_ALGO_NULL 		= 0
+,	TB_ZSTREAM_ALGO_HUFFMAN 	= 1
+,	TB_ZSTREAM_ALGO_LZ77 		= 2
+,	TB_ZSTREAM_ALGO_LZW 		= 3
+,	TB_ZSTREAM_ALGO_ZLIB 		= 4
+
+}tb_zstream_algo_t;
+
+// the zstream type
+typedef struct __tb_zstream_t
+{
+	// the stream base
+	tb_tstream_t 		base;
+
+	// the algorithm
+	tb_uint8_t 			algo;
+
+	// the action
+	tb_uint8_t 			action;
+
+}tb_zstream_t;
+
+// the inflate zstream type
+typedef struct __tb_inflate_zstream_t
+{
+	// the stream base
+	tb_zstream_t 		base;
+
+}tb_inflate_zstream_t;
+
+
+// the deflate zstream type
+typedef struct __tb_deflate_zstream_t
+{
+	// the stream base
+	tb_zstream_t 		base;
+
+}tb_deflate_zstream_t;
+
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+tb_zstream_algo_t 	tb_zstream_algo(tb_zstream_t* zst);
+tb_zstream_action_t tb_zstream_action(tb_zstream_t* zst);
+tb_char_t const* 	tb_zstream_name(tb_zstream_t* zst);
 
 // c plus plus
 #ifdef __cplusplus
@@ -52,4 +103,3 @@ extern "C" {
 #endif
 
 #endif
-

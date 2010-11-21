@@ -17,38 +17,56 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tstream.c
+ * \file		tstream.h
  *
  */
+#ifndef TB_STREAM_ESTREAM_H
+#define TB_STREAM_ESTREAM_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
+#include "prefix.h"
 #include "tstream.h"
+#include "../encoding.h"
+
+/* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the encoding stream type
+typedef struct __tb_estream_t
+{
+	// the stream base
+	tb_tstream_t 					base;
+
+	// the converter
+	tb_encoding_converter_t const* 	src_c;
+	tb_encoding_converter_t const* 	dst_c;
+
+}tb_estream_t;
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
 
-tb_bstream_t* tb_tstream_src(tb_tstream_t* st)
-{
-	if (st) return &st->src;
-	else return TB_NULL;
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_tstream_t* 	tb_estream_open(tb_estream_t* est, tb_encoding_t src_e, tb_encoding_t dst_e);
+
+
+// c plus plus
+#ifdef __cplusplus
 }
-tb_bstream_t* tb_tstream_dst(tb_tstream_t* st)
-{
-	if (st) return &st->dst;
-	else return TB_NULL;
-}
-tb_bool_t tb_tstream_transform(tb_tstream_t* st)
-{
-	if (st && st->transform) return st->transform(st);
-	else return TB_FALSE;
-}
-void tb_tstream_close(tb_tstream_t* st)
-{
-	if (st)
-	{
-		if (st->close) st->close(st);
-		memset(st, 0, sizeof(st));
-	}
-}
+#endif
+
+#endif
+

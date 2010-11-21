@@ -17,38 +17,33 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tstream.c
+ * \file		tstream.h
  *
  */
+#ifndef TB_STREAM_ZSTREAM_H
+#define TB_STREAM_ZSTREAM_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "tstream.h"
+#include "prefix.h"
+#include "zstream/lz77.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
-tb_bstream_t* tb_tstream_src(tb_tstream_t* st)
-{
-	if (st) return &st->src;
-	else return TB_NULL;
+
+
+// c plus plus
+#ifdef __cplusplus
 }
-tb_bstream_t* tb_tstream_dst(tb_tstream_t* st)
-{
-	if (st) return &st->dst;
-	else return TB_NULL;
-}
-tb_bool_t tb_tstream_transform(tb_tstream_t* st)
-{
-	if (st && st->transform) return st->transform(st);
-	else return TB_FALSE;
-}
-void tb_tstream_close(tb_tstream_t* st)
-{
-	if (st)
-	{
-		if (st->close) st->close(st);
-		memset(st, 0, sizeof(st));
-	}
-}
+#endif
+
+#endif
+

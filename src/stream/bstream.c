@@ -24,27 +24,119 @@
  * includes
  */
 #include "bstream.h"
+#include "gstream.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
 
 /* /////////////////////////////////////////////////////////
- * open & close
+ * attach 
  */
-tb_bstream_t* tb_bstream_open(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
+tb_bstream_t* tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
 {
 	TB_ASSERT(bst && data && size);
 
 	bst->p 	= data;
 	bst->b 	= 0;
+	bst->n 	= size;
 	bst->e 	= data + size;
 
 	return bst;
 }
-void tb_bstream_close(tb_bstream_t* bst)
+
+/* /////////////////////////////////////////////////////////
+ * load & save 
+ */
+tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 {
-	if (bst) memset(bst, 0, sizeof(tb_bstream_t));
+	TB_ASSERT(bst && gst);
+	if (!bst || !gst) return 0;
+
+	// sync it first
+	tb_bstream_sync(bst);
+
+	// load
+	tb_byte_t 		data[TB_GSTREAM_DATA_MAX];
+	tb_size_t 		load = 0;
+	tb_size_t 		base = (tb_size_t)tplat_clock();
+	tb_size_t 		time = (tb_size_t)tplat_clock();
+	tb_size_t 		left = tb_gstream_left(gst);
+
+	while(1)
+	{
+		tb_int_t ret = tb_gstream_read(gst, data, TB_GSTREAM_DATA_MAX);
+		//TB_DBG("ret: %d", ret);
+		if (ret < 0) break;
+		else if (!ret) 
+		{
+			// > 10s?
+			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			if (timeout > 10000) break;
+		}
+		else
+		{
+			load += ret;
+			if (tb_bstream_set_data(bst, data, ret) != ret) break;
+			time = (tb_size_t)tplat_clock();
+		}
+
+		// is end?
+		if (left && load >= left) break;
+
+	}
+
+	return load;
+}
+tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
+{
+	TB_ASSERT(bst && gst);
+	if (!bst || !gst) return 0;
+
+	// sync it first
+	tb_bstream_sync(bst);
+
+	// load
+	tb_byte_t 		data[TB_GSTREAM_DATA_MAX];
+	tb_size_t 		save = 0;
+	tb_size_t 		base = (tb_size_t)tplat_clock();
+	tb_size_t 		time = (tb_size_t)tplat_clock();
+	while(1)
+	{
+		// get data
+		tb_int_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_DATA_MAX);
+		//TB_DBG("ret: %d", ret);
+
+		// is end?
+		if (size)
+		{
+			// write it
+			tb_int_t write = 0;
+			while (write < size)
+			{
+				tb_int_t ret = tb_gstream_write(gst, data + write, size - write);
+				if (ret < 0) break;
+				else if (!ret)
+				{
+					// > 10s?
+					tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+					if (timeout > 10000) break;
+				}
+				else
+				{
+					write += ret;
+					time = (tb_size_t)tplat_clock();
+				}
+			}
+
+			// update size
+			save += write;
+			if (write != size) break;
+		}
+		else break;
+	}
+
+	return save;
 }
 /* /////////////////////////////////////////////////////////
  * modifiors
@@ -66,7 +158,12 @@ void tb_bstream_sync(tb_bstream_t* bst)
 /* /////////////////////////////////////////////////////////
  * position
  */
-tb_byte_t const* tb_bstream_tell(tb_bstream_t* bst)
+tb_byte_t const* tb_bstream_beg(tb_bstream_t* bst)
+{
+	TB_ASSERT(bst && bst->e);
+	return (bst->e - bst->n);
+}
+tb_byte_t const* tb_bstream_pos(tb_bstream_t* bst)
 {
 	TB_ASSERT(bst && bst->p <= bst->e);
 	tb_bstream_sync(bst);
@@ -80,9 +177,19 @@ tb_byte_t const* tb_bstream_end(tb_bstream_t* bst)
 }
 
 /* /////////////////////////////////////////////////////////
- * left
+ * size
  */
-tb_size_t tb_bstream_left_bytes(tb_bstream_t* bst)
+tb_size_t tb_bstream_size(tb_bstream_t* bst)
+{
+	TB_ASSERT(bst);
+	return bst->n;
+}
+tb_size_t tb_bstream_offset(tb_bstream_t* bst)
+{
+	TB_ASSERT(bst);
+	return (((bst->p + bst->n) > bst->e)? (bst->p + bst->n - bst->e) : 0);
+}
+tb_size_t tb_bstream_left(tb_bstream_t* bst)
 {
 	TB_ASSERT(bst && bst->p <= bst->e);
 	tb_bstream_sync(bst);
@@ -96,11 +203,11 @@ tb_size_t tb_bstream_left_bits(tb_bstream_t* bst)
 /* /////////////////////////////////////////////////////////
  * skip
  */
-void tb_bstream_skip_bytes(tb_bstream_t* bst, tb_size_t bytes_n)
+void tb_bstream_skip(tb_bstream_t* bst, tb_size_t size)
 {
 	TB_ASSERT(bst && bst->p <= bst->e);
 	tb_bstream_sync(bst);
-	bst->p += bytes_n;
+	bst->p += size;
 }
 void tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t bits_n)
 {
