@@ -20,8 +20,8 @@
  * \file		bstream.h
  *
  */
-#ifndef TB_BSTRAEM_H
-#define TB_BSTREAM_H
+#ifndef TB_STREAM_BSTRAEM_H
+#define TB_STREAM_BSTREAM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "bits.h"
+#include "../bits.h"
 
 /* /////////////////////////////////////////////////////////
  * types

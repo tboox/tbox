@@ -25,14 +25,14 @@
  * includes
  */
 #include "prefix.h"
-#include "../http.h"
+#include "../../http.h"
 
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_bool_t tb_http_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream_seek_t flag)
+static tb_bool_t tb_hstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_seek_t flag)
 {
-	if (st && !(st->flag & TB_STREAM_FLAG_ZLIB))
+	if (st && !(st->flag & TB_GSTREAM_FLAG_ZLIB))
 	{
 		// get http
 		tb_http_t* http = st->pdata;
@@ -46,13 +46,13 @@ static tb_bool_t tb_http_stream_seek(tb_stream_t* st, tb_int_t offset, tb_stream
 	else return TB_FALSE;
 }
 
-static tb_int_t tb_http_stream_read(tb_stream_t* st, tb_byte_t* data, tb_size_t size)
+static tb_int_t tb_hstream_read(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
 {
 	TB_ASSERT(data && size);
 	if (st && st->pdata) return tb_http_recv_data((tb_http_t*)st->pdata, data, size, TB_FALSE);
 	else return -1;
 }
-static void tb_http_stream_close(tb_stream_t* st)
+static void tb_hstream_close(tb_gstream_t* st)
 {
 	if (st)
 	{
@@ -60,15 +60,15 @@ static void tb_http_stream_close(tb_stream_t* st)
 		st->pdata = TB_NULL;
 	}
 }
-static tb_size_t tb_http_stream_size(tb_stream_t* st)
+static tb_size_t tb_hstream_size(tb_gstream_t* st)
 {
-	if (st && st->pdata && !(st->flag & TB_STREAM_FLAG_ZLIB)) return tb_http_size((tb_http_t*)st->pdata);
+	if (st && st->pdata && !(st->flag & TB_GSTREAM_FLAG_ZLIB)) return tb_http_size((tb_http_t*)st->pdata);
 	else return 0;
 }
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url, tb_stream_flag_t flag)
+tb_gstream_t* tb_gstream_open_from_http(tb_hstream_t* st, tb_char_t const* url, tb_gstream_flag_t flag)
 {
 	TB_ASSERT(st && url);
 	if (!st || !url) return TB_NULL;
@@ -78,7 +78,7 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	if (!http) return TB_NULL;
 
 	// init stream
-	memset(st, 0, sizeof(tb_http_stream_t));
+	memset(st, 0, sizeof(tb_hstream_t));
 	st->base.flag = flag;
 	st->base.head = st->base.data;
 	st->base.size = 0;
@@ -86,9 +86,9 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 	st->base.pdata = http;
 
 	// init http stream
-	st->base.read = tb_http_stream_read;
-	st->base.close = tb_http_stream_close;
-	st->base.ssize = tb_http_stream_size;
+	st->base.read = tb_hstream_read;
+	st->base.close = tb_hstream_close;
+	st->base.ssize = tb_hstream_size;
 
 	// connect to host
 	if (TB_FALSE == tb_http_open(http, url, TB_NULL, TB_HTTP_METHOD_GET)) goto fail;
@@ -100,19 +100,19 @@ tb_stream_t* tb_stream_open_from_http(tb_http_stream_t* st, tb_char_t const* url
 
 #if 0
 	// is able to seek?
-	if (TB_TRUE == tb_http_stream(http)) st->base.seek = TB_NULL;
-	else st->base.seek = tb_http_stream_seek;
+	if (TB_TRUE == tb_hstream(http)) st->base.seek = TB_NULL;
+	else st->base.seek = tb_hstream_seek;
 #endif
 
 #ifdef TB_CONFIG_ZLIB
 	// is hzlib?
-	if (flag & TB_STREAM_FLAG_ZLIB)
+	if (flag & TB_GSTREAM_FLAG_ZLIB)
 	{
 		st->base.hzlib = tb_zlib_create();
 		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;
 	}
 #endif
-	return ((tb_stream_t*)st);
+	return ((tb_gstream_t*)st);
 
 fail:
 	if (http) tb_http_destroy(http);

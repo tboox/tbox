@@ -60,7 +60,7 @@ static tb_format_t g_formats[] =
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_format_t const* tb_format_probe(tb_stream_t* st, tb_size_t flag)
+tb_format_t const* tb_format_probe(tb_gstream_t* st, tb_size_t flag)
 {
 	TB_ASSERT(st);
 	if (!st) return TB_NULL;

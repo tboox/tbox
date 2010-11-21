@@ -31,7 +31,7 @@
  * interfaces
  */
 
-tb_xml_writer_t* tb_xml_writer_open(tb_stream_t* st)
+tb_xml_writer_t* tb_xml_writer_open(tb_gstream_t* st)
 {
 	TB_ASSERT(st);
 	if (!st) return TB_NULL;
@@ -82,14 +82,14 @@ void tb_xml_writer_flush(tb_xml_writer_t* writer)
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_flush(writer->st);
+	tb_gstream_flush(writer->st);
 }
 void tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "", encoding? encoding : "");
+	tb_gstream_printf(writer->st, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "", encoding? encoding : "");
 }
 void tb_xml_writer_document_end(tb_xml_writer_t* writer)
 {
@@ -103,19 +103,19 @@ void tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)
 
 	if (writer->attributes_n) 
 	{
-		tb_stream_printf(writer->st, "<%s", name? name : "");
+		tb_gstream_printf(writer->st, "<%s", name? name : "");
 		tb_int_t i = 0;
 		tb_int_t n = writer->attributes_n;
 		for (i = 0; i < n; i++)
 		{
 			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
 			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
-			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
+			if (attr_name && attr_value) tb_gstream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
 		}
-		tb_stream_printf(writer->st, ">");
+		tb_gstream_printf(writer->st, ">");
 		tb_xml_writer_attributes_clear(writer);
 	}
-	else tb_stream_printf(writer->st, "<%s>", name? name : "");
+	else tb_gstream_printf(writer->st, "<%s>", name? name : "");
 }
 void tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name)
 {
@@ -124,47 +124,47 @@ void tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name)
 
 	if (writer->attributes_n) 
 	{
-		tb_stream_printf(writer->st, "<%s", name? name : "");
+		tb_gstream_printf(writer->st, "<%s", name? name : "");
 		tb_int_t i = 0;
 		tb_int_t n = writer->attributes_n;
 		for (i = 0; i < n; i++)
 		{
 			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
 			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
-			if (attr_name && attr_value) tb_stream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
+			if (attr_name && attr_value) tb_gstream_printf(writer->st, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
 		}
-		tb_stream_printf(writer->st, "/>");
+		tb_gstream_printf(writer->st, "/>");
 		tb_xml_writer_attributes_clear(writer);
 	}
-	else tb_stream_printf(writer->st, "<%s/>", name? name : "");
+	else tb_gstream_printf(writer->st, "<%s/>", name? name : "");
 }
 void tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "</%s>", name? name : "");
+	tb_gstream_printf(writer->st, "</%s>", name? name : "");
 }
 void tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "<![CDATA[%s]]>", data? data : "");
+	tb_gstream_printf(writer->st, "<![CDATA[%s]]>", data? data : "");
 }
 void tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "%s", text? text : "");
+	tb_gstream_printf(writer->st, "%s", text? text : "");
 }
 void tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment)
 {
 	TB_ASSERT(writer && writer->st);
 	if (!writer || !writer->st) return ;
 
-	tb_stream_printf(writer->st, "<!--%s-->", comment? comment : "");
+	tb_gstream_printf(writer->st, "<!--%s-->", comment? comment : "");
 }
 void tb_xml_writer_attributes_clear(tb_xml_writer_t* writer)
 {

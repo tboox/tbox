@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_CONTAINER_PREFIX_H
-#define TB_CONTAINER_PREFIX_H
+#ifndef TB_GSTREAM_GSTREAM_PREFIX_H
+#define TB_GSTREAM_GSTREAM_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,7 +32,8 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-#include "../stream/stream.h"
+#include "../gstream.h"
+
 
 // c plus plus
 #ifdef __cplusplus

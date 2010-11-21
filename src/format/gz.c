@@ -40,9 +40,9 @@
  * interfaces
  */
 
-tb_size_t tb_format_gz_probe(tb_stream_t* st)
+tb_size_t tb_format_gz_probe(tb_gstream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 2);
+	tb_byte_t const* p = tb_gstream_need(st, 2);
 	if (p && p[0] == 0x1f && p[1] == 0x8b)
 		return 20;
 	else return 0;

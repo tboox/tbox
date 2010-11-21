@@ -40,18 +40,18 @@
  * interfaces
  */
 
-tb_size_t tb_format_xml_probe(tb_stream_t* st)
+tb_size_t tb_format_xml_probe(tb_gstream_t* st)
 {
 	// compute the max need_n
-	tb_size_t need_n = TB_STREAM_DATA_MAX;
-	tb_size_t file_n = tb_stream_size(st);
-	if (file_n) need_n = TB_MATH_MIN(file_n, TB_STREAM_DATA_MAX);
+	tb_size_t need_n = TB_GSTREAM_DATA_MAX;
+	tb_size_t file_n = tb_gstream_size(st);
+	if (file_n) need_n = TB_MATH_MIN(file_n, TB_GSTREAM_DATA_MAX);
 
 	// the score
 	tb_size_t score = 0;
 
 	// need it
-	tb_byte_t const* p = tb_stream_need(st, need_n);
+	tb_byte_t const* p = tb_gstream_need(st, need_n);
 	if (!p) return score;
 
 	// attach text

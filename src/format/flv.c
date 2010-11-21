@@ -40,9 +40,9 @@
  * interfaces
  */
 
-tb_size_t tb_format_flv_probe(tb_stream_t* st)
+tb_size_t tb_format_flv_probe(tb_gstream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 6);
+	tb_byte_t const* p = tb_gstream_need(st, 6);
 	if (p && p[0] == 'F' && p[1] == 'L' && p[2] == 'V' && p[3] < 5 && p[5] == 0)
 		return 50;
 	else return 0;

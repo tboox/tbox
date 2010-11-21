@@ -79,8 +79,8 @@ tb_xml_document_t* 	tb_xml_document_create();
 void 				tb_xml_document_destroy(tb_xml_document_t* document);
 
 // load & store
-tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_stream_t* st);
-tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_stream_t* st);
+tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* st);
+tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* st);
 
 // modifiors
 void 				tb_xml_document_clear(tb_xml_document_t* document);

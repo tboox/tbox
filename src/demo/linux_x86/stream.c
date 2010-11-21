@@ -8,30 +8,30 @@ int main(int argc, char** argv)
 
 	if (argc < 3) return 0;
 	
-	tb_generic_stream_t istream;
-	tb_stream_t* ist = tb_stream_open(&istream, argv[1], TB_NULL, 0, TB_STREAM_FLAG_RO);
+	tb_ustream_t istream;
+	tb_gstream_t* ist = tb_gstream_open(&istream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_RO);
 	if (!ist)
 	{
 		TB_DBG("failed to open url: %s", argv[1]);
 		return 0;
 	}
 
-	tb_generic_stream_t ostream;
-	tb_stream_t* ost = tb_stream_open(&ostream, argv[2], TB_NULL, 0, TB_STREAM_FLAG_BLOCK | TB_STREAM_FLAG_WO | TB_STREAM_FLAG_TRUNC);
+	tb_ustream_t ostream;
+	tb_gstream_t* ost = tb_gstream_open(&ostream, argv[2], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
 	if (!ost)
 	{
 		TB_DBG("failed to open url: %s", argv[2]);
 		return 0;
 	}
 
-	tb_byte_t 		data[TB_STREAM_DATA_MAX];
+	tb_byte_t 		data[TB_GSTREAM_DATA_MAX];
 	tb_size_t 		read = 0;
 	tb_size_t 		base = (tb_size_t)tplat_clock();
 	tb_size_t 		time = (tb_size_t)tplat_clock();
-	tb_size_t 		size = tb_stream_size(ist);
+	tb_size_t 		size = tb_gstream_size(ist);
 	do
 	{
-		tb_int_t ret = tb_stream_read(ist, data, TB_STREAM_DATA_MAX);
+		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_DATA_MAX);
 		//TB_DBG("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 		else
 		{
 			read += ret;
-			if (tb_stream_write(ost, data, ret) < 0) break;
+			if (tb_gstream_write(ost, data, ret) < 0) break;
 			time = (tb_size_t)tplat_clock();
 		}
 
@@ -59,8 +59,8 @@ int main(int argc, char** argv)
 	} while(1);
 
 	tplat_printf("speed: %d kb/s, load: %d kb, time: %d s\n", (read / ((tb_size_t)tplat_clock() - base)), read / 1000, ((tb_size_t)tplat_clock() - base) / 1000);
-	tb_stream_close(ist);
-	tb_stream_close(ost);
+	tb_gstream_close(ist);
+	tb_gstream_close(ost);
 
 
 	return 0;

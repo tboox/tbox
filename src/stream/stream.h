@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		stream.h
  *
  */
-#ifndef TB_CONTAINER_PREFIX_H
-#define TB_CONTAINER_PREFIX_H
+#ifndef TB_STREAM_H
+#define TB_STREAM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,8 +31,10 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../stream/stream.h"
+#include "prefix.h"
+#include "bstream.h"
+#include "gstream.h"
+#include "tstream.h"
 
 // c plus plus
 #ifdef __cplusplus
@@ -40,3 +42,4 @@ extern "C" {
 #endif
 
 #endif
+

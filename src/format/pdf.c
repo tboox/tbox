@@ -40,9 +40,9 @@
  * interfaces
  */
 
-tb_size_t tb_format_pdf_probe(tb_stream_t* st)
+tb_size_t tb_format_pdf_probe(tb_gstream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 5);
+	tb_byte_t const* p = tb_gstream_need(st, 5);
 	if ( 	p 
 		&& 	p[0] == '%'
 		&& 	p[1] == 'P'

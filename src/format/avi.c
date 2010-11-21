@@ -40,9 +40,9 @@
  * interfaces
  */
 
-tb_size_t tb_format_avi_probe(tb_stream_t* st)
+tb_size_t tb_format_avi_probe(tb_gstream_t* st)
 {
-	tb_byte_t const* p = tb_stream_need(st, 11);
+	tb_byte_t const* p = tb_gstream_need(st, 11);
 	if ( 	p 
 		&& 	p[0] == 'R'
 		&& 	p[1] == 'I'

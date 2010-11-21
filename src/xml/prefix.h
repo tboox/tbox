@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-#include "../stream.h"
+#include "../stream/stream.h"
 #include "../string/string.h"
 
 // c plus plus

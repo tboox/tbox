@@ -74,7 +74,7 @@ typedef enum __tb_xml_reader_event_t
 typedef struct __tb_xml_reader_t
 {
 	// the reference to stream
-	tb_stream_t* 			st;
+	tb_gstream_t* 			st;
 
 	// the event
 	tb_size_t 				event;
@@ -109,7 +109,7 @@ typedef struct __tb_xml_reader_t
  */
 
 // open & close
-tb_xml_reader_t* 		tb_xml_reader_open(tb_stream_t* st);
+tb_xml_reader_t* 		tb_xml_reader_open(tb_gstream_t* st);
 void 					tb_xml_reader_close(tb_xml_reader_t* reader);
 
 // iterator

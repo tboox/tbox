@@ -20,8 +20,8 @@
  * \file		tstream.h
  *
  */
-#ifndef TB_TSTREAM_H
-#define TB_TSTREAM_H
+#ifndef TB_STREAM_TSTREAM_H
+#define TB_STREAM_TSTREAM_H
 
 // c plus plus
 #ifdef __cplusplus

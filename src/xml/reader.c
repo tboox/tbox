@@ -43,7 +43,7 @@ static tb_char_t tb_xml_reader_get_char(tb_xml_reader_t* reader)
 
 	// get character
 	tb_char_t ch[1];
-	if (1 == tb_stream_read(reader->st, ch, 1)) return ch[0];
+	if (1 == tb_gstream_read(reader->st, ch, 1)) return ch[0];
 	else return '\0';
 }
 static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)
@@ -52,7 +52,7 @@ static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)
 	if (reader->cache != '\0') return reader->cache;
 
 	// map character 
-	tb_char_t const* p = tb_stream_need(reader->st, 1);
+	tb_char_t const* p = tb_gstream_need(reader->st, 1);
 
 	// get character
 	if (p) return *p;
@@ -60,7 +60,7 @@ static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)
 }
 static void tb_xml_reader_seek_char(tb_xml_reader_t* reader)
 {
-	tb_stream_seek(reader->st, 1, TB_STREAM_SEEK_CUR);
+	tb_gstream_seek(reader->st, 1, TB_GSTREAM_SEEK_CUR);
 }
 static tb_char_t const* tb_xml_reader_parse_element(tb_xml_reader_t* reader)
 {
@@ -107,7 +107,7 @@ static tb_char_t const* tb_xml_reader_parse_text(tb_xml_reader_t* reader)
  * interfaces: open & close
  */
 
-tb_xml_reader_t* tb_xml_reader_open(tb_stream_t* st)
+tb_xml_reader_t* tb_xml_reader_open(tb_gstream_t* st)
 {
 	TB_ASSERT(st);
 	if (!st) return TB_NULL;

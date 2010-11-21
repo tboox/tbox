@@ -53,7 +53,7 @@ extern "C" {
 typedef struct __tb_xml_writer_t
 {
 	// the stream
-	tb_stream_t* 			st;
+	tb_gstream_t* 			st;
 
 	// the attributes
 	tb_xml_attribute_t 		attributes[TB_XML_WRITER_ATTRIBUTES_MAX];
@@ -67,7 +67,7 @@ typedef struct __tb_xml_writer_t
  */
 
 // open & close
-tb_xml_writer_t* 		tb_xml_writer_open(tb_stream_t* st);
+tb_xml_writer_t* 		tb_xml_writer_open(tb_gstream_t* st);
 void 					tb_xml_writer_close(tb_xml_writer_t* writer);
 void 					tb_xml_writer_flush(tb_xml_writer_t* writer);
 

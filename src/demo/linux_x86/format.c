@@ -6,8 +6,8 @@ int main(int argc, char** argv)
 	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
 	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
 	
-	tb_generic_stream_t stream;
-	tb_stream_t* st = tb_stream_open(&stream, argv[1], TB_NULL, 0, TB_STREAM_FLAG_BLOCK | TB_STREAM_FLAG_RO);
+	tb_ustream_t stream;
+	tb_gstream_t* st = tb_gstream_open(&stream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
 	if (!st)
 	{
 		TB_DBG("failed to open url: %s", argv[1]);

@@ -33,7 +33,7 @@ extern "C" {
  */
 #include "../prefix.h"
 #include "../format.h"
-#include "../stream.h"
+#include "../stream/stream.h"
 #include "../math/math.h"
 
 
