@@ -70,8 +70,11 @@ tbox_C_FILES-$(TB_CONFIG_STREAM) 	+= \
 									stream$(_)gstream$(_)file \
 									stream$(_)gstream$(_)data \
 									stream$(_)zstream$(_)zstream \
-									stream$(_)zstream$(_)golomb \
-									stream$(_)zstream$(_)lz77 
+									stream$(_)zstream$(_)vlc$(_)fixed \
+									stream$(_)zstream$(_)vlc$(_)golomb \
+									stream$(_)zstream$(_)vlc$(_)gamma \
+									stream$(_)zstream$(_)rlc \
+									stream$(_)zstream$(_)lzsw 
 
 INC_FILES-$(TB_CONFIG_STREAM) 		+= \
 									stream$(_)prefix.h \
@@ -82,8 +85,14 @@ INC_FILES-$(TB_CONFIG_STREAM) 		+= \
 									stream$(_)zstream.h \
 									stream$(_)zstream$(_)prefix.h \
 									stream$(_)zstream$(_)zstream.h \
-									stream$(_)zstream$(_)golomb.h \
-									stream$(_)zstream$(_)lz77.h
+									stream$(_)zstream$(_)vlc$(_)prefix.h \
+									stream$(_)zstream$(_)vlc$(_)type.h \
+									stream$(_)zstream$(_)vlc$(_)fixed.h \
+									stream$(_)zstream$(_)vlc$(_)golomb.h \
+									stream$(_)zstream$(_)vlc$(_)gamma.h \
+									stream$(_)zstream$(_)vlc.h \
+									stream$(_)zstream$(_)rlc.h \
+									stream$(_)zstream$(_)lzsw.h
 
 ifeq ($(TB_CONFIG_ENCODING),y)
 tbox_C_FILES-$(TB_CONFIG_STREAM) 	+= stream$(_)estream 

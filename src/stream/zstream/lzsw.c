@@ -23,14 +23,14 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "lz77.h"
+#include "lzsw.h"
 
 /* /////////////////////////////////////////////////////////
  * inflate
  */
-static tb_bstream_t* tb_zstream_inflate_lz77_transform(tb_tstream_t* st)
+static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 {
-	tb_lz77_inflate_zstream_t* zst = (tb_lz77_inflate_zstream_t*)st;
+	tb_lzsw_inflate_zstream_t* zst = (tb_lzsw_inflate_zstream_t*)st;
 	TB_ASSERT(zst);
 	if (!zst) return TB_NULL;
 
@@ -64,16 +64,16 @@ static tb_bstream_t* tb_zstream_inflate_lz77_transform(tb_tstream_t* st)
 
 	return tb_tstream_dst(st);
 }
-static void tb_zstream_inflate_lz77_close(tb_tstream_t* st)
+static void tb_zstream_inflate_lzsw_close(tb_tstream_t* st)
 {
-	if (st) memset(st, 0, sizeof(tb_lz77_inflate_zstream_t));
+	if (st) memset(st, 0, sizeof(tb_lzsw_inflate_zstream_t));
 }
 /* /////////////////////////////////////////////////////////
  * deflate
  */
-static tb_bstream_t* tb_zstream_deflate_lz77_transform(tb_tstream_t* st)
+static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 {
-	tb_lz77_deflate_zstream_t* zst = (tb_lz77_deflate_zstream_t*)st;
+	tb_lzsw_deflate_zstream_t* zst = (tb_lzsw_deflate_zstream_t*)st;
 	TB_ASSERT(zst);
 	if (!zst) return TB_NULL;
 
@@ -104,58 +104,58 @@ static tb_bstream_t* tb_zstream_deflate_lz77_transform(tb_tstream_t* st)
 
 	return tb_tstream_dst(st);
 }
-static void tb_zstream_deflate_lz77_close(tb_tstream_t* st)
+static void tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 {
-	if (st) memset(st, 0, sizeof(tb_lz77_deflate_zstream_t));
+	if (st) memset(st, 0, sizeof(tb_lzsw_deflate_zstream_t));
 }
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_tstream_t* tb_zstream_open_lz77_inflate(tb_lz77_inflate_zstream_t* zst)
+tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 {
 	TB_ASSERT(zst);
 	if (!zst) return TB_NULL;
 
 	// init 
-	memset(zst, 0, sizeof(tb_lz77_inflate_zstream_t));
+	memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
 
 	// init tstream
-	((tb_tstream_t*)zst)->transform = tb_zstream_inflate_lz77_transform;
-	((tb_tstream_t*)zst)->close 	= tb_zstream_inflate_lz77_close;
+	((tb_tstream_t*)zst)->transform = tb_zstream_inflate_lzsw_transform;
+	((tb_tstream_t*)zst)->close 	= tb_zstream_inflate_lzsw_close;
 
 	// init zstream
-	((tb_zstream_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZ77;
+	((tb_zstream_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZSW;
 	((tb_zstream_t*)zst)->action 	= TB_ZSTREAM_ACTION_INFLATE;
 
 
 	return ((tb_tstream_t*)zst);
 }
-tb_tstream_t* tb_zstream_open_lz77_deflate(tb_lz77_deflate_zstream_t* zst)
+tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 {
 	TB_ASSERT(zst);
 	if (!zst) return TB_NULL;
 
 	// init 
-	memset(zst, 0, sizeof(tb_lz77_deflate_zstream_t));
+	memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
 
 	// init tstream
-	((tb_tstream_t*)zst)->transform = tb_zstream_deflate_lz77_transform;
-	((tb_tstream_t*)zst)->close 	= tb_zstream_deflate_lz77_close;
+	((tb_tstream_t*)zst)->transform = tb_zstream_deflate_lzsw_transform;
+	((tb_tstream_t*)zst)->close 	= tb_zstream_deflate_lzsw_close;
 
 	// init zstream
-	((tb_zstream_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZ77;
+	((tb_zstream_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZSW;
 	((tb_zstream_t*)zst)->action 	= TB_ZSTREAM_ACTION_DEFLATE;
 
 	return ((tb_tstream_t*)zst);
 }
 
-tb_tstream_t* tb_zstream_open_lz77(tb_lz77_zstream_t* zst, tb_size_t action)
+tb_tstream_t* tb_zstream_open_lzsw(tb_lzsw_zstream_t* zst, tb_size_t action)
 {
 	if (action == TB_ZSTREAM_ACTION_INFLATE)
-		return tb_zstream_open_lz77_inflate((tb_lz77_inflate_zstream_t*)zst);
+		return tb_zstream_open_lzsw_inflate((tb_lzsw_inflate_zstream_t*)zst);
 	else if (action == TB_ZSTREAM_ACTION_DEFLATE)
-		return tb_zstream_open_lz77_deflate((tb_lz77_deflate_zstream_t*)zst);
+		return tb_zstream_open_lzsw_deflate((tb_lzsw_deflate_zstream_t*)zst);
 	else return TB_NULL;
 }

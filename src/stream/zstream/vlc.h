@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		zstream.h
+ * \file		vlc.h
  *
  */
-#ifndef TB_STREAM_ZSTREAM_H
-#define TB_STREAM_ZSTREAM_H
+#ifndef TB_STREAM_ZSTREAM_VLC_H
+#define TB_STREAM_ZSTREAM_VLC_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,15 +31,22 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "zstream/vlc.h"
-#include "zstream/rlc.h"
-#include "zstream/lzsw.h"
+#include "vlc/fixed.h"
+#include "vlc/golomb.h"
+#include "vlc/gamma.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
+// the vlc union type
+typedef union __tb_zstream_vlc_union_t
+{
+	tb_zstream_vlc_fixed_t 		fixed;
+	tb_zstream_vlc_golomb_t 	golomb;
+	tb_zstream_vlc_gamma_t 		gamma;
+
+}tb_zstream_vlc_union_t;
 
 
 // c plus plus

@@ -17,48 +17,27 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		zstream.c
+ * \file		prefix.h
  *
  */
+#ifndef TB_STREAM_ZSTREAM_VLC_PREFIX_H
+#define TB_STREAM_ZSTREAM_VLC_PREFIX_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "zstream.h"
+#include "../../prefix.h"
+#include "../../bstream.h"
+#include "type.h"
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-
-tb_zstream_algo_t tb_zstream_algo(tb_zstream_t* zst)
-{
-	if (zst) return zst->algo;
-	else return TB_ZSTREAM_ALGO_NULL;
+// c plus plus
+#ifdef __cplusplus
 }
-tb_zstream_action_t tb_zstream_action(tb_zstream_t* zst)
-{
-	if (zst) return zst->action;
-	else return TB_ZSTREAM_ACTION_NULL;
-}
-tb_char_t const* tb_zstream_name(tb_zstream_t* zst)
-{
-	TB_ASSERT(zst);
-	if (!zst) return "";
-	tb_char_t const* names[] =
-	{
-		""
-	, 	"rlc"
-	, 	"huffman"
-	, 	"lzsw"
-	, 	"lzpd"
-	, 	"zlib"
-	, 	"arithmetic"
-	
-	};
+#endif
 
-	tb_size_t n = TB_STATIC_ARRAY_SIZE(names);
-	tb_size_t i = zst->algo;
-	if (i < n) return names[i];
-	else return "";
-}
-
+#endif

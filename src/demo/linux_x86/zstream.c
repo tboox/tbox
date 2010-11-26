@@ -1,7 +1,8 @@
 #include "tplat/tplat.h"
 #include "../../tbox.h"
 
-#define TB_ZSTREAM_TEST_LZ77 
+#define TB_ZSTREAM_TEST_RLC
+//#define TB_ZSTREAM_TEST_LZ77 
 
 int main(int argc, char** argv)
 {
@@ -30,9 +31,12 @@ int main(int argc, char** argv)
 	tb_byte_t* 		dst = tb_malloc(dstn);
 
 	// the zstream
-#if defined(TB_ZSTREAM_TEST_LZ77)
-	tb_lz77_zstream_t 	zst;
-	tb_tstream_t* 		tst = tb_zstream_open_lz77(&zst, action);
+#if defined(TB_ZSTREAM_TEST_RLC)
+	tb_rlc_zstream_t 	zst;
+	tb_tstream_t* 		tst = tb_zstream_open_rlc(&zst, action);
+#elif defined(TB_ZSTREAM_TEST_LZ77)
+	tb_lzsw_zstream_t 	zst;
+	tb_tstream_t* 		tst = tb_zstream_open_lzsw(&zst, action);
 #endif
 
 	// attach data
