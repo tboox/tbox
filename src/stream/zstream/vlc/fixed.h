@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		zstream.h
+ * \file		fixed.h
  *
  */
-#ifndef TB_STREAM_ZSTREAM_H
-#define TB_STREAM_ZSTREAM_H
+#ifndef TB_STREAM_ZSTREAM_VLC_FIXED_H
+#define TB_STREAM_ZSTREAM_VLC_FIXED_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,15 +32,28 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "zstream/vlc.h"
-#include "zstream/rlc.h"
-#include "zstream/lzsw.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
+// the fixed length coding type
+typedef struct __tb_zstream_vlc_fixed_t
+{
+	// the base
+	tb_zstream_vlc_t 		base;
 
+	// the bits
+	tb_byte_t 				nbits;
+
+}tb_zstream_vlc_fixed_t;
+
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_zstream_vlc_t* tb_zstream_vlc_fixed_open(tb_zstream_vlc_fixed_t* fixed, tb_byte_t nbits);
 
 // c plus plus
 #ifdef __cplusplus

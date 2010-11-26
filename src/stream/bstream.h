@@ -95,7 +95,7 @@ tb_size_t 			tb_bstream_left_bits(tb_bstream_t* bst);
 
 // skip
 void 				tb_bstream_skip(tb_bstream_t* bst, tb_size_t size);
-void 				tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t bits_n);
+void 				tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t nbits);
 tb_char_t const* 	tb_bstream_skip_string(tb_bstream_t* bst);
 
 // get
@@ -127,13 +127,15 @@ tb_float_t 			tb_bstream_get_double_le(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_double_be(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_double_ne(tb_bstream_t* bst);
 
-tb_uint32_t 		tb_bstream_get_ubits(tb_bstream_t* bst, tb_size_t bits_n);
-tb_sint32_t 		tb_bstream_get_sbits(tb_bstream_t* bst, tb_size_t bits_n);
+tb_uint32_t 		tb_bstream_get_ubits(tb_bstream_t* bst, tb_size_t nbits);
+tb_sint32_t 		tb_bstream_get_sbits(tb_bstream_t* bst, tb_size_t nbits);
 
 tb_char_t const* 	tb_bstream_get_string(tb_bstream_t* bst);
 tb_size_t 			tb_bstream_get_data(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size);
 
 // set
+void 				tb_bstream_set_u1(tb_bstream_t* bst, tb_uint8_t val);
+
 void 				tb_bstream_set_u16_le(tb_bstream_t* bst, tb_uint16_t val);
 void 				tb_bstream_set_s16_le(tb_bstream_t* bst, tb_sint16_t val);
 
@@ -146,12 +148,12 @@ void 				tb_bstream_set_s16_be(tb_bstream_t* bst, tb_sint16_t val);
 void 				tb_bstream_set_u32_be(tb_bstream_t* bst, tb_uint32_t val);
 void 				tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val);
 
-void 				tb_bstream_set_ubits(tb_bstream_t* bst, tb_uint32_t val, tb_size_t bits_n);
+void 				tb_bstream_set_ubits(tb_bstream_t* bst, tb_uint32_t val, tb_size_t nbits);
 tb_size_t 			tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_t size);
 
 // peek
-tb_uint32_t 		tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t bits_n);
-tb_sint32_t 		tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t bits_n);
+tb_uint32_t 		tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits);
+tb_sint32_t 		tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t nbits);
 
 // bst inline
 static __tplat_inline__ tb_uint8_t tb_bstream_get_u8(tb_bstream_t* bst)

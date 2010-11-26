@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tstream.h
+ * \file		golomb.h
  *
  */
-#ifndef TB_STREAM_ZSTREAM_LZ77_H
-#define TB_STREAM_ZSTREAM_LZ77_H
+#ifndef TB_STREAM_ZSTREAM_VLC_GOLOMB_H
+#define TB_STREAM_ZSTREAM_VLC_GOLOMB_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -37,38 +37,27 @@ extern "C" {
  * types
  */
 
-// the lz77 inflate zstream type
-typedef struct __tb_lz77_inflate_zstream_t
+// the golomb length coding type
+typedef struct __tb_zstream_vlc_golomb_t
 {
-	// the stream base
-	tb_inflate_zstream_t 		base;
+	// the base
+	tb_zstream_vlc_t 		base;
+	
+	// the default value of m
+	tb_size_t 				defm;
 
-}tb_lz77_inflate_zstream_t;
+	// for computing the average value
+	tb_size_t 				total;
+	tb_size_t 				count;
 
-// the lz77 deflate zstream type
-typedef struct __tb_lz77_deflate_zstream_t
-{
-	// the stream base
-	tb_deflate_zstream_t 		base;
+}tb_zstream_vlc_golomb_t;
 
-}tb_lz77_deflate_zstream_t;
-
-
-// the lz77 zstream type
-typedef union __tb_lz77_zstream_t
-{
-	tb_lz77_inflate_zstream_t 	infst;
-	tb_lz77_deflate_zstream_t 	defst;
-
-}tb_lz77_zstream_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_tstream_t* 	tb_zstream_open_lz77_inflate(tb_lz77_inflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lz77_deflate(tb_lz77_deflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lz77(tb_lz77_zstream_t* zst, tb_size_t action);
+tb_zstream_vlc_t* tb_zstream_vlc_golomb_open(tb_zstream_vlc_golomb_t* golomb, tb_size_t defm);
 
 // c plus plus
 #ifdef __cplusplus

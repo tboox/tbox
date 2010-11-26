@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tstream.h
+ * \file		gamma.h
  *
  */
-#ifndef TB_STREAM_ZSTREAM_LZ77_H
-#define TB_STREAM_ZSTREAM_LZ77_H
+#ifndef TB_STREAM_ZSTREAM_VLC_GAMMA_H
+#define TB_STREAM_ZSTREAM_VLC_GAMMA_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -37,38 +37,20 @@ extern "C" {
  * types
  */
 
-// the lz77 inflate zstream type
-typedef struct __tb_lz77_inflate_zstream_t
+// the gamma length coding type
+typedef struct __tb_zstream_vlc_gamma_t
 {
-	// the stream base
-	tb_inflate_zstream_t 		base;
+	// the base
+	tb_zstream_vlc_t 		base;
 
-}tb_lz77_inflate_zstream_t;
+}tb_zstream_vlc_gamma_t;
 
-// the lz77 deflate zstream type
-typedef struct __tb_lz77_deflate_zstream_t
-{
-	// the stream base
-	tb_deflate_zstream_t 		base;
-
-}tb_lz77_deflate_zstream_t;
-
-
-// the lz77 zstream type
-typedef union __tb_lz77_zstream_t
-{
-	tb_lz77_inflate_zstream_t 	infst;
-	tb_lz77_deflate_zstream_t 	defst;
-
-}tb_lz77_zstream_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_tstream_t* 	tb_zstream_open_lz77_inflate(tb_lz77_inflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lz77_deflate(tb_lz77_deflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lz77(tb_lz77_zstream_t* zst, tb_size_t action);
+tb_zstream_vlc_t* tb_zstream_vlc_gamma_open(tb_zstream_vlc_gamma_t* gamma);
 
 // c plus plus
 #ifdef __cplusplus

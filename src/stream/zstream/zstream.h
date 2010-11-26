@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "../prefix.h"
 #include "../tstream.h"
+#include "vlc.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -50,14 +51,13 @@ typedef enum __tb_zstream_action_t
 // the zstream algorithm type
 typedef enum __tb_zstream_algo_t
 {
-	TB_ZSTREAM_ALGO_NULL 		= 0
-,	TB_ZSTREAM_ALGO_RLE 		= 1
-,	TB_ZSTREAM_ALGO_HUFFMAN 	= 2
-,	TB_ZSTREAM_ALGO_LZ77 		= 3
-,	TB_ZSTREAM_ALGO_LZW 		= 4
-,	TB_ZSTREAM_ALGO_ZLIB 		= 5
-,	TB_ZSTREAM_ALGO_ALGORITHM 	= 6
-,	TB_ZSTREAM_ALGO_ZIX 		= 7
+	TB_ZSTREAM_ALGO_NULL 		= 0 	//!< null
+,	TB_ZSTREAM_ALGO_RLC 		= 1 	//!< run length coding
+,	TB_ZSTREAM_ALGO_HUFFMAN 	= 2 	//!< adaptive huffman
+,	TB_ZSTREAM_ALGO_LZSW 		= 3 	//!< sliding window .e.g lz77 lzss ...
+,	TB_ZSTREAM_ALGO_LZPD 		= 4 	//!< phrase dictionary .e.g lzw lz78 ...
+,	TB_ZSTREAM_ALGO_ZLIB 		= 5 	//!< standard zlib
+,	TB_ZSTREAM_ALGO_ARITHMETIC 	= 6 	//!< arithmetic coding
 
 }tb_zstream_algo_t;
 
@@ -65,13 +65,16 @@ typedef enum __tb_zstream_algo_t
 typedef struct __tb_zstream_t
 {
 	// the stream base
-	tb_tstream_t 		base;
+	tb_tstream_t 				base;
 
 	// the algorithm
-	tb_uint8_t 			algo;
+	tb_uint8_t 					algo;
 
 	// the action
-	tb_uint8_t 			action;
+	tb_uint8_t 					action;
+
+	// the vlc 
+	tb_zstream_vlc_union_t 		vlc;
 
 }tb_zstream_t;
 
