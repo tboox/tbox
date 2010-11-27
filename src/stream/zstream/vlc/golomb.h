@@ -50,7 +50,7 @@ typedef struct __tb_zstream_vlc_golomb_t
 	// the base
 	tb_zstream_vlc_t 		base;
 	
-	// the default value of m
+	// the m value
 	tb_size_t 				defm;
 
 #ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
