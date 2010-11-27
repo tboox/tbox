@@ -34,11 +34,11 @@ static void tb_zstream_vlc_golomb_set(tb_zstream_vlc_t* vlc, tb_uint32_t val, tb
 {
 	TB_ASSERT(vlc && val);
 
-#if 1
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	tb_size_t avg = 0;
 	if (((tb_zstream_vlc_golomb_t*)vlc)->count)
 		avg = ((tb_zstream_vlc_golomb_t*)vlc)->total / ((tb_zstream_vlc_golomb_t*)vlc)->count;
-	//TB_DBG("%d %d", avg, ((tb_zstream_vlc_golomb_t*)vlc)->count);
+	TB_DBG("%d %d", avg, val);
 
 	((tb_zstream_vlc_golomb_t*)vlc)->defm = TB_MATH_IRLOG2I(avg);
 #endif
@@ -57,7 +57,7 @@ static void tb_zstream_vlc_golomb_set(tb_zstream_vlc_t* vlc, tb_uint32_t val, tb
 	tb_bstream_set_u1(bst, 0);
 	for (i = 0; i < m; i++, r >>= 1) tb_bstream_set_u1(bst, r & 0x1);
 
-#if 1
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	((tb_zstream_vlc_golomb_t*)vlc)->total += val;
 	((tb_zstream_vlc_golomb_t*)vlc)->count++;
 #endif
@@ -66,7 +66,7 @@ static tb_uint32_t tb_zstream_vlc_golomb_get(tb_zstream_vlc_t* vlc, tb_bstream_t
 {
 	TB_ASSERT(vlc);
 
-#if 1
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	tb_size_t avg = 0;
 	if (((tb_zstream_vlc_golomb_t*)vlc)->count)
 		avg = ((tb_zstream_vlc_golomb_t*)vlc)->total / ((tb_zstream_vlc_golomb_t*)vlc)->count;
@@ -88,7 +88,7 @@ static tb_uint32_t tb_zstream_vlc_golomb_get(tb_zstream_vlc_t* vlc, tb_bstream_t
 	tb_uint32_t r = 0;
 	for (i = 0; i < m; i++) r |= tb_bstream_get_u1(bst) << i;
 
-#if 1
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	((tb_zstream_vlc_golomb_t*)vlc)->total += (r + q * b + 1);
 	((tb_zstream_vlc_golomb_t*)vlc)->count++;
 #endif
@@ -110,8 +110,11 @@ tb_zstream_vlc_t* tb_zstream_vlc_golomb_open(tb_zstream_vlc_golomb_t* golomb, tb
 	((tb_zstream_vlc_t*)golomb)->get = tb_zstream_vlc_golomb_get;
 	((tb_zstream_vlc_t*)golomb)->close = TB_NULL;
 	golomb->defm = defm;
+
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	golomb->total = 0;
 	golomb->count = 0;
+#endif
 
 	/* golomb coding
 	 *
