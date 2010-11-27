@@ -39,8 +39,8 @@ extern "C" {
 
 // vlc 
 #define TB_RLC_VLC_TYPE_FIXED 			(0)
-#define TB_RLC_VLC_TYPE_GAMMA 			(0)
-#define TB_RLC_VLC_TYPE_GOLOMB 			(1)
+#define TB_RLC_VLC_TYPE_GAMMA 			(1)
+#define TB_RLC_VLC_TYPE_GOLOMB 			(0)
 
 /* /////////////////////////////////////////////////////////
  * types
