@@ -34,6 +34,13 @@ extern "C" {
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// adaptive golomb coding
+#define TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
+
+/* /////////////////////////////////////////////////////////
  * types
  */
 
@@ -46,9 +53,11 @@ typedef struct __tb_zstream_vlc_golomb_t
 	// the default value of m
 	tb_size_t 				defm;
 
+#ifdef TB_ZSTREAM_VLC_GOLOMB_ADAPTIVE
 	// for computing the average value
 	tb_size_t 				total;
 	tb_size_t 				count;
+#endif
 
 }tb_zstream_vlc_golomb_t;
 
