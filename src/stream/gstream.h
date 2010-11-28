@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "tstream.h"
 #include "../bits.h"
 #include "../string/string.h"
 
@@ -64,7 +65,6 @@ typedef enum __tb_gstream_flag_t
 , 	TB_GSTREAM_FLAG_ZLIB 			= 8
 , 	TB_GSTREAM_FLAG_BLOCK 			= 16
 
-
 }tb_gstream_flag_t;
 
 // the stream seek type
@@ -90,6 +90,9 @@ typedef struct __tb_gstream_t
 
 	// the private data
 	tb_byte_t* 			pdata;
+
+	// the transform stream 
+	tb_tstream_t* 		tstream;
 
 #ifdef TB_CONFIG_ZLIB
 
@@ -159,17 +162,20 @@ tb_gstream_t* 		tb_gstream_open_from_data(tb_dstream_t* st, tb_byte_t const* dat
 tb_gstream_t* 		tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t const* data, tb_size_t size, tb_gstream_flag_t flag);
 void 				tb_gstream_close(tb_gstream_t* st);
 
+tb_tstream_t* 		tb_gstream_tstream(tb_gstream_t* st, tb_tstream_t* tstream);
+tb_bool_t 			tb_gstream_switch(tb_gstream_t* st, tb_gstream_flag_t flag);
+
 tb_int_t 			tb_gstream_read(tb_gstream_t* st, tb_byte_t* data, tb_size_t size);
 tb_int_t 			tb_gstream_write(tb_gstream_t* st, tb_byte_t* data, tb_size_t size);
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* st, tb_size_t size);
 tb_bool_t 			tb_gstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_seek_t flag);
 void 				tb_gstream_flush(tb_gstream_t* st);
 tb_int_t 			tb_gstream_printf(tb_gstream_t* st, tb_char_t const* fmt, ...);
+
 tb_size_t 			tb_gstream_size(tb_gstream_t const* st);
 tb_size_t 			tb_gstream_left(tb_gstream_t const* st);
 tb_size_t 			tb_gstream_offset(tb_gstream_t const* st);
 tb_gstream_flag_t 	tb_gstream_flag(tb_gstream_t const* st);
-tb_bool_t 			tb_gstream_switch(tb_gstream_t* st, tb_gstream_flag_t flag);
 tb_char_t const* 	tb_gstream_url(tb_gstream_t const* st);
 
 // c plus plus

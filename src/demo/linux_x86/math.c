@@ -1,5 +1,7 @@
 #include "tplat/tplat.h"
 #include "../../tbox.h"
+#include <math.h>
+#include <stdlib.h>
 
 #define MATH_TEST_FEXPF1 		(0)
 #define MATH_TEST_FEXPI 		(0)
@@ -13,6 +15,8 @@
 #define MATH_TEST_ILOG2F 		(0)
 #define MATH_TEST_IRLOG2I 		(0)
 #define MATH_TEST_IRLOG2F 		(0)
+#define MATH_TEST_ICLOG2I 		(1)
+#define MATH_TEST_ICLOG2F 		(0)
 
 #define MATH_TEST_IROUND 		(0)
 #define MATH_TEST_IFLOOR 		(0)
@@ -207,7 +211,7 @@ static void tb_math_test_ilog2i_libc(tb_uint32_t x)
 	tplat_int64_t t = tplat_clock();
 	while (n--)
 	{
-		r = (log(x) / log2);
+		r = (log((tb_float_t)x + .1) / log2);
 	}
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_math_ilog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
@@ -273,7 +277,57 @@ static void tb_math_test_irlog2f_libc(tb_float_t x)
 		r = TB_MATH_IROUND(log(x) / log2);
 	}
 	t = tplat_clock() - t;
-	tplat_printf("%d ms, tb_math_irlog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+	tplat_printf("%d ms, tb_math_iclog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iclog2i(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ICLOG2I(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iclog2i(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iclog2f(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ICLOG2F(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iclog2f(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iclog2i_libc(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_float_t log2 = log(2);
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ICEIL(log(x) / log2);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iclog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_iclog2f_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_float_t log2 = log(2);
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ICEIL(log(x) / log2);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_iclog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 /* ////////////////////////////////////////////////////////////////////////
  * round
@@ -545,10 +599,24 @@ static void tb_math_make_irlog2i_table()
 	tb_uint32_t i = 1;
 	tb_uint32_t a = 0;
 	tb_uint32_t n = 1 << 31;
-	tb_float_t log2 = log(2);
 	for (i = 0; i < n; i++)
 	{
-		tb_uint32_t x = TB_MATH_IROUND(log((tb_float_t)i) / log2);
+		tb_uint32_t x = TB_MATH_IROUND(log((tb_float_t)i) / log(2.));
+		if (x == a)
+		{
+			tplat_printf(",\t%u \t// %d\n", i, x);
+			a++;
+		}
+	}
+}
+static void tb_math_make_iclog2i_table()
+{
+	tb_uint32_t i = 1;
+	tb_uint32_t a = 0;
+	tb_uint32_t n = 1 << 31;
+	for (i = 0; i < n; i++)
+	{
+		tb_uint32_t x = TB_MATH_ICEIL(log((tb_float_t)i) / log(2.));
 		if (x == a)
 		{
 			tplat_printf(",\t%u \t// %d\n", i, x);
@@ -561,10 +629,9 @@ static void tb_math_make_ilog2i_table()
 	tb_uint32_t i = 1;
 	tb_uint32_t a = 0;
 	tb_uint32_t n = 1 << 31;
-	tb_float_t log2 = log(2);
 	for (i = 0; i < n; i++)
 	{
-		tb_uint32_t x = (log((tb_float_t)i) / log2);
+		tb_uint32_t x = (tb_uint32_t)(log((tb_float_t)i + .1) / log(2.));
 		if (x == a)
 		{
 			tplat_printf(",\t%u \t// %d\n", i, x);
@@ -579,8 +646,9 @@ int main(int argc, char** argv)
 
 	//tb_math_make_fexpi_table();
 	//tb_math_make_fpow2i_table();
-	tb_math_make_ilog2i_table();
+	//tb_math_make_ilog2i_table();
 	//tb_math_make_irlog2i_table();
+	//tb_math_make_iclog2i_table();
 
 #if MATH_TEST_FEXPI
 	tplat_printf("===================================:\n");
@@ -680,6 +748,8 @@ int main(int argc, char** argv)
 	tb_math_test_ilog2i(100);
 	tb_math_test_ilog2i(1000);
 	tb_math_test_ilog2i(1024);
+	tb_math_test_ilog2i(2048);
+	tb_math_test_ilog2i(4096);
 	tb_math_test_ilog2i((1 << 31) + 100);
 
 	tplat_printf("\n");
@@ -688,6 +758,8 @@ int main(int argc, char** argv)
 	tb_math_test_ilog2i_libc(100);
 	tb_math_test_ilog2i_libc(1000);
 	tb_math_test_ilog2i_libc(1024);
+	tb_math_test_ilog2i_libc(2048);
+	tb_math_test_ilog2i_libc(4096);
 	tb_math_test_ilog2i_libc((1 << 31) + 100);
 
 #endif
@@ -721,6 +793,8 @@ int main(int argc, char** argv)
 	tb_math_test_irlog2i(100);
 	tb_math_test_irlog2i(1000);
 	tb_math_test_irlog2i(1024);
+	tb_math_test_irlog2i(2048);
+	tb_math_test_irlog2i(4096);
 	tb_math_test_irlog2i((1 << 31) + 100);
 
 	tplat_printf("\n");
@@ -729,6 +803,8 @@ int main(int argc, char** argv)
 	tb_math_test_irlog2i_libc(100);
 	tb_math_test_irlog2i_libc(1000);
 	tb_math_test_irlog2i_libc(1024);
+	tb_math_test_irlog2i_libc(2048);
+	tb_math_test_irlog2i_libc(4096);
 	tb_math_test_irlog2i_libc((1 << 31) + 100);
 
 #endif
@@ -754,6 +830,52 @@ int main(int argc, char** argv)
 	tb_math_test_irlog2f_libc(1024);
 	tb_math_test_irlog2f_libc((1 << 31) + 100);
 #endif
+
+#if MATH_TEST_ICLOG2I
+	tplat_printf("===================================:\n");
+	tb_math_test_iclog2i(1);
+	tb_math_test_iclog2i(10);
+	tb_math_test_iclog2i(100);
+	tb_math_test_iclog2i(1000);
+	tb_math_test_iclog2i(1024);
+	tb_math_test_iclog2i(2048);
+	tb_math_test_iclog2i(4096);
+	tb_math_test_iclog2i((1 << 31) + 100);
+
+	tplat_printf("\n");
+	tb_math_test_iclog2i_libc(1);
+	tb_math_test_iclog2i_libc(10);
+	tb_math_test_iclog2i_libc(100);
+	tb_math_test_iclog2i_libc(1000);
+	tb_math_test_iclog2i_libc(1024);
+	tb_math_test_iclog2i_libc(2048);
+	tb_math_test_iclog2i_libc(4096);
+	tb_math_test_iclog2i_libc((1 << 31) + 100);
+
+#endif
+
+#if MATH_TEST_ICLOG2F
+	tplat_printf("===================================:\n");
+	tb_math_test_iclog2f(1.1415926f);
+	tb_math_test_iclog2f(10.1415926f);
+	tb_math_test_iclog2f(100.1415926f);
+	tb_math_test_iclog2f(1000.1415926f);
+	tb_math_test_iclog2f(10000.1415926f);
+	tb_math_test_iclog2f(100000.1415926f);
+	tb_math_test_iclog2f(1024);
+	tb_math_test_iclog2f((1 << 31) + 100);
+
+	tplat_printf("\n");
+	tb_math_test_iclog2f_libc(1.1415926f);
+	tb_math_test_iclog2f_libc(10.1415926f);
+	tb_math_test_iclog2f_libc(100.1415926f);
+	tb_math_test_iclog2f_libc(1000.1415926f);
+	tb_math_test_iclog2f_libc(10000.1415926f);
+	tb_math_test_iclog2f_libc(100000.1415926f);
+	tb_math_test_iclog2f_libc(1024);
+	tb_math_test_iclog2f_libc((1 << 31) + 100);
+#endif
+
 
 #if MATH_TEST_IROUND
 	tplat_printf("===================================:\n");

@@ -538,6 +538,11 @@ tb_bool_t tb_gstream_switch(tb_gstream_t* st, tb_gstream_flag_t flag)
 	st->flag = flag;
 	return TB_TRUE;
 }
+
+tb_tstream_t* tb_gstream_tstream(tb_gstream_t* st, tb_tstream_t* tstream)
+{
+	return TB_NULL;
+}
 tb_gstream_t* tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t const* data, tb_size_t size, tb_gstream_flag_t flag)
 {
 	tb_gstream_t* gst = TB_NULL;
