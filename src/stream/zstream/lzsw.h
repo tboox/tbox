@@ -34,6 +34,20 @@ extern "C" {
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// vlc 
+#define TB_LZSW_VLC_TYPE_FIXED 			(0)
+#define TB_LZSW_VLC_TYPE_GAMMA 			(1)
+#define TB_LZSW_VLC_TYPE_GOLOMB 		(0)
+
+// window
+//#define TB_LZSW_WINDOW_SIZE_MAX 		(256)
+#define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
+//#define TB_LZSW_WINDOW_SIZE_MAX 		(65535)
+
+/* /////////////////////////////////////////////////////////
  * types
  */
 
@@ -43,6 +57,9 @@ typedef struct __tb_lzsw_inflate_zstream_t
 	// the stream base
 	tb_inflate_zstream_t 		base;
 
+	// the reference to vlc
+	tb_zstream_vlc_t* 			vlc;
+
 }tb_lzsw_inflate_zstream_t;
 
 // the lzsw deflate zstream type
@@ -50,6 +67,9 @@ typedef struct __tb_lzsw_deflate_zstream_t
 {
 	// the stream base
 	tb_deflate_zstream_t 		base;
+
+	// the reference to vlc
+	tb_zstream_vlc_t* 			vlc;
 
 }tb_lzsw_deflate_zstream_t;
 

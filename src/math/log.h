@@ -38,33 +38,30 @@
 // irlog2i(x) 
 #define TB_MATH_IRLOG2I(x) 					tb_math_irlog2i(x)
 
+// iclog2i(x) 
+#define TB_MATH_ICLOG2I(x) 					tb_math_iclog2i(x)
+
 // ilog2f(x) 
 #define TB_MATH_ILOG2F(x) 					tb_math_ilog2i(TB_MATH_IROUND(x))
 
-// irlog2f(x) 
+// round(ilog2f(x))
 #define TB_MATH_IRLOG2F(x) 					tb_math_irlog2i(TB_MATH_IROUND(x))
+
+// ceil(ilog2f(x))
+#define TB_MATH_ICLOG2F(x) 					tb_math_iclog2i(TB_MATH_IROUND(x))
 
 /* ////////////////////////////////////////////////////////////////////////
  * globals
  */
 extern tb_uint32_t g_tb_math_ilog2i_table[32];
 extern tb_uint32_t g_tb_math_irlog2i_table[32];
+extern tb_uint32_t g_tb_math_iclog2i_table[33];
 
 /* ////////////////////////////////////////////////////////////////////////
  * implements
  */
 static __tplat_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
 {
-#if 0
-	tb_uint32_t const* p = g_tb_math_ilog2i_table + 31;
-	tb_uint32_t const* b = g_tb_math_ilog2i_table;
-	while (p >= b)
-	{
-		if (x > *p) return (p - b);
-		p--;
-	}
-	return 0;
-#else
 	tb_int_t l = 0;
 	tb_int_t m = 15;
 	tb_int_t r = 32;
@@ -76,20 +73,9 @@ static __tplat_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
 		m = (l + r) >> 1;
 	}
 	return m;
-#endif
 }
 static __tplat_inline__ tb_uint32_t tb_math_irlog2i(tb_uint32_t x)
 {
-#if 0
-	tb_uint32_t const* p = g_tb_math_irlog2i_table + 31;
-	tb_uint32_t const* b = g_tb_math_irlog2i_table;
-	while (p >= b)
-	{
-		if (x > *p) return (p - b);
-		p--;
-	}
-	return 0;
-#else
 	tb_int_t l = 0;
 	tb_int_t m = 15;
 	tb_int_t r = 32;
@@ -101,8 +87,21 @@ static __tplat_inline__ tb_uint32_t tb_math_irlog2i(tb_uint32_t x)
 		m = (l + r) >> 1;
 	}
 	return m;
-#endif
 }
 
+static __tplat_inline__ tb_uint32_t tb_math_iclog2i(tb_uint32_t x)
+{
+	tb_int_t l = 0;
+	tb_int_t m = 16;
+	tb_int_t r = 33;
+	while ((r - l) > 1)
+	{
+		tb_uint32_t v = g_tb_math_iclog2i_table[m];
+		if (x < v) r = m;
+		else l = m;
+		m = (l + r) >> 1;
+	}
+	return m;
+}
 #endif
 

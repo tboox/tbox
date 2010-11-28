@@ -111,7 +111,7 @@ static tb_bstream_t* tb_zstream_deflate_rlc_transform(tb_tstream_t* st)
 	TB_ASSERT(vlc && vlc->set);
 
 	// vlc callback
-	tb_zstream_vlc_set_t 	vlc_set = vlc->set;
+	tb_zstream_vlc_set_t vlc_set = vlc->set;
 
 	// deflate 
 	tb_byte_t last = *sp++;
@@ -141,7 +141,7 @@ static tb_bstream_t* tb_zstream_deflate_rlc_transform(tb_tstream_t* st)
 				// set flag
 				tb_bstream_set_u1(dst, 0);
 
-				// set values
+				// set value
 				tb_bstream_set_ubits(dst, last, 8);
 			}
 

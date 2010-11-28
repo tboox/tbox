@@ -1,8 +1,8 @@
 #include "tplat/tplat.h"
 #include "../../tbox.h"
 
-#define TB_ZSTREAM_TEST_RLC
-//#define TB_ZSTREAM_TEST_LZ77 
+//#define TB_ZSTREAM_TEST_RLC
+#define TB_ZSTREAM_TEST_LZSW
 
 int main(int argc, char** argv)
 {
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 #if defined(TB_ZSTREAM_TEST_RLC)
 	tb_rlc_zstream_t 	zst;
 	tb_tstream_t* 		tst = tb_zstream_open_rlc(&zst, action);
-#elif defined(TB_ZSTREAM_TEST_LZ77)
+#elif defined(TB_ZSTREAM_TEST_LZSW)
 	tb_lzsw_zstream_t 	zst;
 	tb_tstream_t* 		tst = tb_zstream_open_lzsw(&zst, action);
 #endif
