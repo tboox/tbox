@@ -47,9 +47,67 @@ extern "C" {
 #define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(65535)
 
+#define TB_LZSW_WINDOW_FIND_HASH 		(1)
+#define TB_LZSW_WINDOW_MAX				(768) 	// (256 + 256 + 256)
+
 /* /////////////////////////////////////////////////////////
  * types
  */
+
+#if TB_LZSW_WINDOW_FIND_HASH
+// the node type
+typedef struct __tb_lzsw_node_t
+{
+	// the signature
+	tb_byte_t 					sign[3];
+
+	// the circle offset
+	tb_size_t 					coff;
+
+	// the global offset
+	//tb_size_t 					goff;
+
+	// the next & prev
+	tb_size_t 					prev;
+	tb_size_t 					next;
+
+}tb_lzsw_node_t;
+#endif
+
+// the inflate window type
+typedef struct __tb_lzsw_inflate_window_t
+{
+	// the window rage
+	tb_byte_t const* 			e;
+	tb_size_t 					n;
+
+	// the window bits
+	tb_size_t 					b;
+
+}tb_lzsw_inflate_window_t;
+
+
+// the deflate window type
+typedef struct __tb_lzsw_deflate_window_t
+{
+	// the window rage
+	tb_byte_t const* 			e;
+	tb_size_t 					n;
+
+	// the window bits
+	tb_size_t 					b;
+
+#if TB_LZSW_WINDOW_FIND_HASH
+	// the circle base
+	//tb_size_t 					base;
+
+	// the window hash
+	void* 						pool;
+	tb_size_t 					hash[TB_LZSW_WINDOW_MAX];
+#endif
+
+}tb_lzsw_deflate_window_t;
+
 
 // the lzsw inflate zstream type
 typedef struct __tb_lzsw_inflate_zstream_t
@@ -59,6 +117,9 @@ typedef struct __tb_lzsw_inflate_zstream_t
 
 	// the reference to vlc
 	tb_zstream_vlc_t* 			vlc;
+
+	// the window 
+	tb_lzsw_inflate_window_t  	window;
 
 }tb_lzsw_inflate_zstream_t;
 
@@ -70,6 +131,9 @@ typedef struct __tb_lzsw_deflate_zstream_t
 
 	// the reference to vlc
 	tb_zstream_vlc_t* 			vlc;
+
+	// the window 
+	tb_lzsw_deflate_window_t  	window;
 
 }tb_lzsw_deflate_zstream_t;
 
