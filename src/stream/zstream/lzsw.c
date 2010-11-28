@@ -24,26 +24,116 @@
  * includes
  */
 #include "lzsw.h"
+#include "../../container/container.h"
 #include "../../math/math.h"
 
 /* /////////////////////////////////////////////////////////
- * types
+ * macros
  */
-// the window type
-typedef struct __tb_zstream_lzsw_window_t
-{
-	// the window range
-	tb_byte_t const* 	e;
-	tb_size_t 			n;
-	tb_size_t 			b;
-
-}tb_zstream_lzsw_window_t;
 
 /* /////////////////////////////////////////////////////////
  * details
  */
+#if TB_LZSW_WINDOW_FIND_HASH
 
-tb_size_t tb_zstream_lzsw_window_find_max_match(tb_zstream_lzsw_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
+void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
+{
+	tb_pool_t* pool = window->pool;
+	tb_byte_t const* wp = window->e - size;
+	tb_byte_t const* we = window->e - 2;
+	for (; wp < we; wp++)
+	{
+		// alloc node
+		tb_size_t node = tb_pool_alloc(pool);
+		if (node)
+		{
+			// init node
+			tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
+			TB_ASSERT(onode);
+			onode->sign[0] = wp[0];
+			onode->sign[1] = wp[1];
+			onode->sign[2] = wp[2];
+
+			// insert node to the head of hash 
+			tb_size_t idx = wp[0] + wp[1] + wp[2];
+			tb_size_t head = window->hash[idx];
+			if (head)
+			{
+				tb_lzsw_node_t* onext = TB_POOL_GET(pool, head, tb_lzsw_node_t);
+				TB_ASSERT(onext);
+
+				tb_lzsw_node_t* oprev = TB_POOL_GET(pool, onext->prev, tb_lzsw_node_t);
+				TB_ASSERT(oprev);
+
+				onode->next = head;
+				onode->prev = onext->prev;
+				onext->prev = node;
+				oprev->next = node;
+			}
+			else
+			{
+				onode->next = node;
+				onode->prev = node;
+			}
+			window->hash[idx] = node;
+		}
+		else break;
+	}
+}
+void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
+{
+	tb_pool_t* pool = window->pool;
+	tb_byte_t const* wp = window->e - size;
+	tb_byte_t const* we = window->e - 2;
+	for (; wp < we; wp++)
+	{
+		tb_size_t idx = wp[0] + wp[1] + wp[2];
+		tb_size_t head = window->hash[idx];
+		if (head)
+		{
+			// get the head
+			tb_lzsw_node_t* ohead = TB_POOL_GET(pool, head, tb_lzsw_node_t);
+
+			// remove from the tail
+			tb_size_t node = ohead->prev;
+			while (node != head)
+			{
+				// get node
+				tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
+				TB_ASSERT(onode);
+
+				// get next & prev 
+				tb_size_t next = onode->next;
+				tb_size_t prev = onode->prev;
+			
+				// remove it
+				if (1)
+				{
+					// detach it
+					TB_POOL_SET_NEXT(pool, onode->prev, tb_lzsw_node_t, next);	
+					TB_POOL_SET_PREV(pool, onode->next, tb_lzsw_node_t, prev);	
+
+					// free it
+					tb_pool_free(pool, node);
+				}
+			
+				// prev
+				node = prev;
+			}
+
+			// remove head
+			if (1)
+			{
+				// detach it
+				window->hash[idx] = 0;
+			
+				// free it
+				tb_pool_free(pool, head);
+			}
+		}
+	}
+}
+tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
 {
 	tb_byte_t const* wb = window->e - window->n;
 	tb_byte_t const* wp = wb;
@@ -65,6 +155,31 @@ tb_size_t tb_zstream_lzsw_window_find_max_match(tb_zstream_lzsw_window_t* window
 	*p = mp - wb;
 	return (me - mp);
 }
+#else
+// find the maximum matched data
+tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
+{
+	tb_byte_t const* wb = window->e - window->n;
+	tb_byte_t const* wp = wb;
+	tb_byte_t const* we = window->e;
+	tb_byte_t const* mp = wp;
+	tb_byte_t const* me = wp;
+	for (; wp < we; wp++)
+	{
+		tb_byte_t const* wq = wp;
+		tb_byte_t const* sq = sp;
+		for (; wq < we && sq < se && *wq == *sq; wq++, sq++);
+		if ((wq - wp) > (me - mp))
+		{
+			mp = wp;
+			me = wq;
+		}
+	}
+
+	*p = mp - wb;
+	return (me - mp);
+}
+#endif
 
 /* /////////////////////////////////////////////////////////
  * inflate
@@ -93,10 +208,8 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 	tb_zstream_vlc_get_t vlc_get = vlc->get;
 
 	// init window
-	tb_zstream_lzsw_window_t window;
-	window.e = dp;
-	window.n = 0;
-	window.b = 0;
+	tb_lzsw_inflate_window_t* window = &zst->window;
+	window->e = dp;
 
 	// inflate 
 	while (tb_bstream_left_bits(src) > 8 && (dp < de))
@@ -105,21 +218,21 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 		if (tb_bstream_get_u1(src))
 		{
 			// set position
-			tb_size_t p = tb_bstream_get_ubits(src, window.b);
+			tb_size_t p = tb_bstream_get_ubits(src, window->b);
 			
 			// get size
-			tb_size_t n = vlc_get(vlc, src);
+			tb_size_t n = vlc_get(vlc, src) + 2;
 
 			//TB_DBG("%d %d", p, n);
 #if 1 
 			// fill data
 			// \note: address maybe overlap
-			memcpy(dp, window.e + p - window.n, n);
+			memcpy(dp, window->e + p - window->n, n);
 
 			// update dp
 			dp += n;
 #else
-			tb_byte_t const* wp = window.e + p - window.n;
+			tb_byte_t const* wp = window->e + p - window->n;
 			while (n--) *dp++ = *wp++;
 #endif
 
@@ -131,11 +244,11 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 		}
 
 		// update window
-		window.e = dp;
+		window->e = dp;
 		if (dp - db <= TB_LZSW_WINDOW_SIZE_MAX) 
 		{
-			window.n = dp - db;
-			window.b = TB_MATH_ICLOG2I(window.n);
+			window->n = dp - db;
+			window->b = TB_MATH_ICLOG2I(window->n);
 		}
 	}
 
@@ -182,26 +295,24 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 	tb_zstream_vlc_set_t vlc_set = vlc->set;
 
 	// init window
-	tb_zstream_lzsw_window_t window;
-	window.e = sp;
-	window.n = 0;
-	window.b = 0;
+	tb_lzsw_deflate_window_t* window = &zst->window;
+	window->e = sp;
 
 	// deflate 
 	while (sp < se)
 	{
 		tb_size_t p = 0;
-		tb_size_t n = tb_zstream_lzsw_window_find_max_match(&window, sp, se, &p);
+		tb_size_t n = tb_lzsw_window_find(window, sp, se, &p);
 		if (n > 2)
 		{
 			// set flag
 			tb_bstream_set_u1(dst, 1);
 
 			// set position
-			tb_bstream_set_ubits(dst, p, window.b);
+			tb_bstream_set_ubits(dst, p, window->b);
 			
 			// set size
-			vlc_set(vlc, n, dst);
+			vlc_set(vlc, n - 2, dst);
 
 			// update sp
 			sp += n;
@@ -219,11 +330,11 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 		}
 
 		// update window
-		window.e = sp;
+		window->e = sp;
 		if (sp - sb <= TB_LZSW_WINDOW_SIZE_MAX) 
 		{
-			window.n = sp - sb;
-			window.b = TB_MATH_ICLOG2I(window.n);
+			window->n = sp - sb;
+			window->b = TB_MATH_ICLOG2I(window->n);
 		}
 	}
 
@@ -241,6 +352,11 @@ static void tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 	{
 		// close vlc
 		if (zst->vlc && zst->vlc->close) zst->vlc->close(zst->vlc); 
+
+		// free pool
+#if TB_LZSW_WINDOW_FIND_HASH
+		if (zst->window.pool) tb_pool_destroy(zst->window.pool);
+#endif
 
 		// reset it
 		memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
@@ -301,6 +417,11 @@ tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 	zst->vlc = tb_zstream_vlc_gamma_open(&(((tb_zstream_t*)zst)->vlc));
 #else
 	zst->vlc = tb_zstream_vlc_fixed_open(&(((tb_zstream_t*)zst)->vlc), 16);
+#endif
+
+	// create pool
+#if TB_LZSW_WINDOW_FIND_HASH
+	zst->window.pool = tb_pool_create(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX - 2, 0);
 #endif
 
 	return ((tb_tstream_t*)zst);
