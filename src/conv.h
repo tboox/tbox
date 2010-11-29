@@ -72,8 +72,8 @@
 
 
 // to lower & upper
-#define TB_CONV_TOLOWER(x) 					(((x) && ((x) != 0x20))? (x) + 0x20 : (x))
-#define TB_CONV_TOUPPER(x) 					(((x) && ((x) != 0x20))? (x) - 0x20 : (x))
+#define TB_CONV_TOLOWER(x) 					(TB_CONV_ISUPPER(x)? (x) + 0x20 : (x))
+#define TB_CONV_TOUPPER(x) 					(TB_CONV_ISLOWER(x)? (x) - 0x20 : (x))
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces

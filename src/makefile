@@ -19,6 +19,7 @@ tbox_C_FILES 		+= \
 					math$(_)pow \
 					math$(_)log \
 					string$(_)string \
+					string$(_)cstring \
 					container$(_)pool \
 					container$(_)array
 
@@ -46,6 +47,7 @@ INC_FILES 			= \
 					math$(_)round.h \
 					string$(_)prefix.h \
 					string$(_)string.h \
+					string$(_)cstring.h \
 					container$(_)prefix.h \
 					container$(_)container.h \
 					container$(_)pool.h \
