@@ -76,7 +76,7 @@ static void tb_cstring_test_copy(tb_char_t const* s2)
 	tplat_int64_t t = tplat_clock();
 	while (n--)
 	{
-		r = tb_cstring_copy(s1, s2);
+		tb_cstring_ncopy(s1, s2, 4);
 	}
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_cstring_test_copy(%s) = %s\n", (tb_int_t)t, s2, s1);
@@ -89,7 +89,7 @@ static void tb_cstring_test_copy_libc(tb_char_t const* s2)
 	tplat_int64_t t = tplat_clock();
 	while (n--)
 	{
-		r = strcpy(s1, s2);
+		strcpy(s1, s2);
 	}
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_cstring_test_copy_libc(%s) = %s\n", (tb_int_t)t, s2, s1);
