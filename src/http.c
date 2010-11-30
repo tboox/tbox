@@ -55,7 +55,7 @@ static tb_bool_t tb_http_split(tb_http_t* http, tb_char_t const* url)
 	if (!url || !http) return TB_FALSE;
 
 	// get url size
-	tb_int_t n = strlen(url);
+	tb_int_t n = tb_cstring_size(url);
 	if (n <= 0) return TB_FALSE;
 
 	// get url pointer
@@ -67,7 +67,7 @@ static tb_bool_t tb_http_split(tb_http_t* http, tb_char_t const* url)
 	{
 		if (http->redirect)
 		{
-			strncpy(http->path, p, TB_HTTP_PATH_MAX - 1);
+			tb_cstring_ncopy(http->path, p, TB_HTTP_PATH_MAX - 1);
 			http->path[TB_HTTP_PATH_MAX - 1] = '\0';
 			return TB_TRUE;
 		}
@@ -169,7 +169,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		while (TB_CONV_ISSPACE(*p)) p++;
 
 		// parse location
-		if (!strcmp(tag, "Location")) 
+		if (!tb_cstring_compare(tag, "Location")) 
 		{
 			//TB_HTTP_DBG("redirect to: %s", p);
 
@@ -191,12 +191,12 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			else return TB_FALSE;
 		}
 		// parse content size
-		else if (!strcmp (tag, "Content-Length"))
+		else if (!tb_cstring_compare (tag, "Content-Length"))
 		{
 			http->size = TB_CONV_S10TOU32(p);
 		}
 		// parse content range: "bytes $from-$to/$document_size"
-		else if (!strcmp (tag, "Content-Range"))
+		else if (!tb_cstring_compare (tag, "Content-Range"))
 		{
 			tb_char_t const* slash = TB_NULL;
 			tb_int_t offset = 0, filesize = 0;
@@ -204,7 +204,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			{
 				p += 6;
 				offset = TB_CONV_S10TOU32(p);
-				if ((slash = strchr(p, '/')) && strlen(slash) > 0)
+				if ((slash = strchr(p, '/')) && tb_cstring_size(slash) > 0)
 					filesize = TB_CONV_S10TOU32(slash + 1);
 				TB_HTTP_DBG("range: %d - %d", offset, filesize);
 			}
@@ -212,14 +212,14 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			http->stream = 0;
 		}
 		// parse content type
-		else if (!strcmp (tag, "Content-Type"))
+		else if (!tb_cstring_compare (tag, "Content-Type"))
 		{
 			//TB_DBG("type: %s", p);
 		}
 		// parse transfer encoding
-		else if (!strcmp (tag, "Transfer-Encoding"))
+		else if (!tb_cstring_compare (tag, "Transfer-Encoding"))
 		{
-			if (!strcmp(p, "chunked")) 
+			if (!tb_cstring_compare(p, "chunked")) 
 			{
 				http->chunked = 1;
 				http->stream = 1;
@@ -303,7 +303,7 @@ static tb_bool_t tb_http_open_host(tb_http_t* http, tb_char_t const* args, tb_ht
 					"Content-Length: %d\r\n"
 					"Connection: close\r\n"
 					"\r\n"
-					"%s", http->path, http->host, strlen(args), args);
+					"%s", http->path, http->host, tb_cstring_size(args), args);
 		}
 		else
 		{

@@ -68,7 +68,7 @@ static __tplat_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1,
 }
 
 // length
-static __tplat_inline__ tb_size_t tb_cstring_size(tb_char_t const* s)
+static __tplat_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
 {
 #if 0
 	TB_ASSERT(s);
