@@ -298,7 +298,7 @@ tb_char_t const* tb_string_assign_c_string(tb_string_t* string, tb_char_t const*
 	if (c_string) 
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, strlen(c_string))) return TB_NULL;
+		if (TB_FALSE == tb_string_resize(string, tb_cstring_size(c_string))) return TB_NULL;
 
 		// attach string
 		memcpy(string->data, c_string, string->size);
@@ -386,7 +386,7 @@ tb_char_t const* tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t
 
 		// attach string
 		string->data = (tb_byte_t*)c_string;
-		string->size = strlen(c_string);
+		string->size = tb_cstring_size(c_string);
 
 		// readonly
 		string->maxn = 0;
@@ -454,7 +454,7 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		tb_uint16_t size = string->size;
 
 		// get c_string size
-		tb_uint16_t c_size = strlen(c_string);
+		tb_uint16_t c_size = tb_cstring_size(c_string);
 
 		// ensure enough size
 		if (TB_FALSE == tb_string_resize(string, size + c_size)) return TB_NULL;
@@ -679,7 +679,7 @@ tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) return !strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else if (c_string) return !tb_cstring_compare(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string)
@@ -691,20 +691,7 @@ tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_str
 tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) 
-	{
-		tb_char_t const* s1 = tb_string_c_string(string);
-		tb_char_t const* s2 = c_string;
-
-		while (*s1 && *s2 && ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))))
-		{
-			s1++;
-			s2++;
-		}
-
-		if (!*s1 && !*s2) return TB_TRUE;
-		else return TB_FALSE;
-	}
+	else if (c_string) return !tb_cstring_compare_nocase(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 #else
@@ -959,7 +946,7 @@ tb_char_t const* tb_string_assign_c_string_trace(tb_string_t* string, tb_char_t 
 	if (c_string) 
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize_trace(string, strlen(c_string), func, line, file)) return TB_NULL;
+		if (TB_FALSE == tb_string_resize_trace(string, tb_cstring_size(c_string), func, line, file)) return TB_NULL;
 
 		// attach string
 		memcpy(string->data, c_string, string->size);
@@ -1048,7 +1035,7 @@ tb_char_t const* tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t
 
 		// attach string
 		string->data = (tb_byte_t*)c_string;
-		string->size = strlen(c_string);
+		string->size = tb_cstring_size(c_string);
 
 		// readonly
 		string->maxn = 0;
@@ -1116,7 +1103,7 @@ tb_char_t const* tb_string_append_c_string_trace(tb_string_t* string, tb_char_t 
 		tb_uint16_t size = string->size;
 
 		// get c_string size
-		tb_uint16_t c_size = strlen(c_string);
+		tb_uint16_t c_size = tb_cstring_size(c_string);
 
 		// ensure enough size
 		if (TB_FALSE == tb_string_resize_trace(string, size + c_size, func, line, file)) return TB_NULL;
@@ -1341,7 +1328,7 @@ tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) return !strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else if (c_string) return !tb_cstring_compare(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string)
@@ -1353,20 +1340,8 @@ tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_str
 tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) 
-	{
-		tb_char_t const* s1 = tb_string_c_string(string);
-		tb_char_t const* s2 = c_string;
-
-		while (*s1 && *s2 && ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))))
-		{
-			s1++;
-			s2++;
-		}
-
-		if (!*s1 && !*s2) return TB_TRUE;
-		else return TB_FALSE;
-	}
+	else if (c_string) return !tb_cstring_compare_nocase(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
+
 #endif

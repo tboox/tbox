@@ -548,7 +548,7 @@ tb_gstream_t* tb_gstream_open(tb_ustream_t* st, tb_char_t const* url, tb_byte_t 
 	tb_gstream_t* gst = TB_NULL;
 	if (url)
 	{
-		tb_size_t n = strlen(url);
+		tb_size_t n = tb_cstring_size(url);
 		if (n > 7)
 		{
 			if (url[0] == 'h'
