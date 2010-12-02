@@ -77,8 +77,6 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_s
 				st->offset += offset;
 				return TB_TRUE;
 			}
-
-			offset -= st->size;
 			st->head = st->data;
 			st->size = 0;
 		}

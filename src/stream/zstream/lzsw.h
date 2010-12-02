@@ -44,7 +44,7 @@ extern "C" {
 
 // window
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(256)
-#define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
+#define TB_LZSW_WINDOW_SIZE_MAX 		(10)
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(65535)
 
 #define TB_LZSW_WINDOW_FIND_HASH 		(1)
@@ -99,7 +99,7 @@ typedef struct __tb_lzsw_deflate_window_t
 
 #if TB_LZSW_WINDOW_FIND_HASH
 	// the circle base
-	//tb_size_t 					base;
+	tb_size_t 					base;
 
 	// the window hash
 	void* 						pool;

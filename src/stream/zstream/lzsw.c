@@ -36,7 +36,19 @@
  */
 #if TB_LZSW_WINDOW_FIND_HASH
 
-void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
+/* circle offset => global offset
+ *
+ * global: 0, 1, 2, ...                                           TB_LZSW_WINDOW_MAX - 1
+ * circle: 3, 4, 5, ...             TB_LZSW_WINDOW_MAX - 1, 0, 1, 2
+ *                                                          |
+ *                                                    window->base
+ *
+ */
+static __tplat_inline__ tb_size_t tb_lzsw_window_goff(tb_lzsw_deflate_window_t* window, tb_size_t coff)
+{
+	return ((coff + window->base) % window->n);
+}
+static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
 	tb_byte_t const* wp = window->e - size;
@@ -80,7 +92,7 @@ void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
 		else break;
 	}
 }
-void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
+static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
 	tb_byte_t const* wp = window->e - size;
@@ -133,7 +145,7 @@ void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
 		}
 	}
 }
-tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
+static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
 {
 	tb_byte_t const* wb = window->e - window->n;
 	tb_byte_t const* wp = wb;
@@ -157,7 +169,7 @@ tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const*
 }
 #else
 // find the maximum matched data
-tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
+static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
 {
 	tb_byte_t const* wb = window->e - window->n;
 	tb_byte_t const* wp = wb;
@@ -329,6 +341,30 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			tb_bstream_set_ubits(dst, *sp++, 8);
 		}
 
+#if TB_LZSW_WINDOW_FIND_HASH
+		// the old window
+		tb_byte_t* 	owe = window->e;
+		tb_size_t 	own = window->n;
+		tb_byte_t* 	owb = owe - own;
+
+		// the new window 
+		tb_byte_t* 	we = sp;
+		tb_size_t 	wn = ((sp - sb) > TB_LZSW_WINDOW_SIZE_MAX)? own : (sp - sb);
+		tb_byte_t* 	wb = we - wn;
+
+		// remove the old nodes
+		//tb_lzsw_window_remove(window, 0);
+
+		// slide window
+		window->e = we;
+		window->n = wn;
+		window->b = ((sp - sb) > TB_LZSW_WINDOW_SIZE_MAX)? window->b : TB_MATH_ICLOG2I(wn);
+		window->base = (window->base + wn - ((wb - owb) % TB_LZSW_WINDOW_MAX)) % wn;
+		TB_DBG("lmove: %d, rmove: %d, base: %d, wb: %d", wb - owb, we - owe, window->base, wb - st->src.p);
+
+		// insert the new nodes
+		//tb_lzsw_window_insert(window, 0);
+#else
 		// update window
 		window->e = sp;
 		if (sp - sb <= TB_LZSW_WINDOW_SIZE_MAX) 
@@ -336,6 +372,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			window->n = sp - sb;
 			window->b = TB_MATH_ICLOG2I(window->n);
 		}
+#endif
 	}
 
 	// sync 
