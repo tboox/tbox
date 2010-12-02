@@ -124,7 +124,7 @@ static __tplat_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t con
 	tb_char_t* p = s1;
 	if (s1 == s2 || !n) return p;
 	while ((*s1++ = *s2++) && --n) ;
-	*s1 = '\0';
+	//*s1 = '\0';
 	return p;
 #else
 	TB_ASSERT(s1 && s2);
@@ -132,10 +132,10 @@ static __tplat_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t con
 	if (s1 == s2 || !n) return p;
 	while (1) 
 	{
-		if (!(s1[0] = s2[0]) || !--n) {s1[1] = '\0'; break;}
-		if (!(s1[1] = s2[1]) || !--n) {s1[2] = '\0'; break;}
-		if (!(s1[2] = s2[2]) || !--n) {s1[3] = '\0'; break;}
-		if (!(s1[3] = s2[3]) || !--n) {s1[4] = '\0'; break;}
+		if (!(s1[0] = s2[0]) || !--n) {/* s1[1] = '\0'; */break;}
+		if (!(s1[1] = s2[1]) || !--n) {/* s1[2] = '\0'; */break;}
+		if (!(s1[2] = s2[2]) || !--n) {/* s1[3] = '\0'; */break;}
+		if (!(s1[3] = s2[3]) || !--n) {/* s1[4] = '\0'; */break;}
 		s1 += 4;
 		s2 += 4;
 	}

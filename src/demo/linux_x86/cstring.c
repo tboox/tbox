@@ -3,7 +3,7 @@
 
 #define TB_CSTRING_TEST_COMPARE 	(0)
 #define TB_CSTRING_TEST_SIZE 		(0)
-#define TB_CSTRING_TEST_COPY 		(1)
+#define TB_CSTRING_TEST_COPY 		(0)
 
 /* ////////////////////////////////////////////////////////////////////////
  * compare
@@ -68,6 +68,18 @@ static void tb_cstring_test_size(tb_char_t const* s)
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_cstring_test_size(%s) = %d\n", (tb_int_t)t, s, r);
 }
+static void tb_cstring_test_size_libc(tb_char_t const* s)
+{
+	__tplat_volatile__ tb_int_t 	n = 100000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = strlen(s);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_cstring_test_size_libc(%s) = %d\n", (tb_int_t)t, s, r);
+}
 static void tb_cstring_test_copy(tb_char_t const* s2)
 {
 	__tplat_volatile__ tb_int_t 	n = 100000000;
@@ -76,7 +88,7 @@ static void tb_cstring_test_copy(tb_char_t const* s2)
 	tplat_int64_t t = tplat_clock();
 	while (n--)
 	{
-		tb_cstring_ncopy(s1, s2, 4);
+		tb_cstring_copy(s1, s2);
 	}
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_cstring_test_copy(%s) = %s\n", (tb_int_t)t, s2, s1);
@@ -93,6 +105,32 @@ static void tb_cstring_test_copy_libc(tb_char_t const* s2)
 	}
 	t = tplat_clock() - t;
 	tplat_printf("%d ms, tb_cstring_test_copy_libc(%s) = %s\n", (tb_int_t)t, s2, s1);
+}
+static void tb_cstring_test_ncopy(tb_char_t const* s2, tb_size_t size)
+{
+	__tplat_volatile__ tb_int_t 	n = 100000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_char_t s1[4096];
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		tb_cstring_ncopy(s1, s2, size);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_cstring_test_ncopy(%s, %d) = %s\n", (tb_int_t)t, s2, size, s1);
+}
+static void tb_cstring_test_ncopy_libc(tb_char_t const* s2, tb_size_t size)
+{
+	__tplat_volatile__ tb_int_t 	n = 100000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tb_char_t s1[4096];
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		strncpy(s1, s2, size);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_cstring_test_ncopy_libc(%s, %d) = %s\n", (tb_int_t)t, s2, size, s1);
 }
 int main(int argc, char** argv)
 {
@@ -163,12 +201,27 @@ int main(int argc, char** argv)
 	tb_cstring_test_copy("abcdefghijklmnopqrstuvwxyz1234567890");
 	
 	tplat_printf("\n");
+	tb_cstring_test_ncopy("", 5);
+	tb_cstring_test_ncopy("1", 5);
+	tb_cstring_test_ncopy("1234567890", 5);
+	tb_cstring_test_ncopy("1234567890abcbefg", 5);
+	tb_cstring_test_ncopy("abcdefghijklmnopqrstuvwxyz1234567890", 5);
+	
+	tplat_printf("\n");
 	tb_cstring_test_copy_libc("");
 	tb_cstring_test_copy_libc("1");
 	tb_cstring_test_copy_libc("1234567890");
 	tb_cstring_test_copy_libc("1234567890abcbefg");
 	tb_cstring_test_copy_libc("abcdefghijklmnopqrstuvwxyz1234567890");
 
+	tplat_printf("\n");
+	tb_cstring_test_ncopy_libc("", 5);
+	tb_cstring_test_ncopy_libc("1", 5);
+	tb_cstring_test_ncopy_libc("1234567890", 5);
+	tb_cstring_test_ncopy_libc("1234567890abcbefg", 5);
+	tb_cstring_test_ncopy_libc("abcdefghijklmnopqrstuvwxyz1234567890", 5);
+
 #endif
+
 	return 0;
 }
