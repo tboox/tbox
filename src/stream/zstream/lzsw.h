@@ -44,17 +44,17 @@ extern "C" {
 
 // window
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(256)
-#define TB_LZSW_WINDOW_SIZE_MAX 		(10)
-//#define TB_LZSW_WINDOW_SIZE_MAX 		(65535)
+#define TB_LZSW_WINDOW_SIZE_MAX 		(8)
+//#define TB_LZSW_WINDOW_SIZE_MAX 		(65536)
 
-#define TB_LZSW_WINDOW_FIND_HASH 		(1)
-#define TB_LZSW_WINDOW_MAX				(768) 	// (256 + 256 + 256)
+#define TB_LZSW_WINDOW_HASH_FIND 		(1)
+#define TB_LZSW_WINDOW_HASH_MAX			(768) 	// (256 + 256 + 256)
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
-#if TB_LZSW_WINDOW_FIND_HASH
+#if TB_LZSW_WINDOW_HASH_FIND
 // the node type
 typedef struct __tb_lzsw_node_t
 {
@@ -64,8 +64,8 @@ typedef struct __tb_lzsw_node_t
 	// the circle offset
 	tb_size_t 					coff;
 
-	// the global offset
-	//tb_size_t 					goff;
+	// the global address
+	tb_byte_t const* 			addr;
 
 	// the next & prev
 	tb_size_t 					prev;
@@ -97,13 +97,13 @@ typedef struct __tb_lzsw_deflate_window_t
 	// the window bits
 	tb_size_t 					b;
 
-#if TB_LZSW_WINDOW_FIND_HASH
+#if TB_LZSW_WINDOW_HASH_FIND
 	// the circle base
 	tb_size_t 					base;
 
 	// the window hash
 	void* 						pool;
-	tb_size_t 					hash[TB_LZSW_WINDOW_MAX];
+	tb_size_t 					hash[TB_LZSW_WINDOW_HASH_MAX];
 #endif
 
 }tb_lzsw_deflate_window_t;
