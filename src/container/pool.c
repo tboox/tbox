@@ -209,6 +209,7 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	// update size
 	pool->size++;
 	TB_ASSERT(item && item < 1 + pool->maxn);
+	if (item > pool->maxn) item = 0;
 	return item;
 	// }
 }

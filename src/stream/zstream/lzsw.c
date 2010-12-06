@@ -34,25 +34,31 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-#if TB_LZSW_WINDOW_FIND_HASH
+#if TB_LZSW_WINDOW_HASH_FIND
 
 /* circle offset => global offset
  *
- * global: 0, 1, 2, ...                                           TB_LZSW_WINDOW_MAX - 1
- * circle: 3, 4, 5, ...             TB_LZSW_WINDOW_MAX - 1, 0, 1, 2
- *                                                          |
- *                                                    window->base
+ * window: |-----------------------------------------------------------|
+ * global: 0, 1, 2, ...                                           TB_LZSW_WINDOW_SIZE_MAX - 1
+ * circle: 3, 4, 5, ...             TB_LZSW_WINDOW_SIZE_MAX - 1, 0, 1, 2
+ *                                                               |
+ *                                                         window->base
  *
  */
-static __tplat_inline__ tb_size_t tb_lzsw_window_goff(tb_lzsw_deflate_window_t* window, tb_size_t coff)
+static __tplat_inline__ tb_size_t tb_lzsw_window_goff(tb_size_t base, tb_size_t coff)
 {
-	return ((coff + window->base) % window->n);
+	return ((coff + base) % TB_LZSW_WINDOW_SIZE_MAX);
+}
+static __tplat_inline__ tb_size_t tb_lzsw_window_coff(tb_size_t base, tb_size_t goff)
+{
+	return ((goff + TB_LZSW_WINDOW_SIZE_MAX - base) % TB_LZSW_WINDOW_SIZE_MAX);
 }
 static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
+	tb_byte_t const* wb = window->e - window->n;
 	tb_byte_t const* wp = window->e - size;
-	tb_byte_t const* we = window->e - 2;
+	tb_byte_t const* we = window->e;
 	for (; wp < we; wp++)
 	{
 		// alloc node
@@ -65,6 +71,8 @@ static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t si
 			onode->sign[0] = wp[0];
 			onode->sign[1] = wp[1];
 			onode->sign[2] = wp[2];
+			onode->addr = wp;
+			onode->coff = tb_lzsw_window_coff(window->base, wp - wb);
 
 			// insert node to the head of hash 
 			tb_size_t idx = wp[0] + wp[1] + wp[2];
@@ -91,12 +99,45 @@ static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t si
 		}
 		else break;
 	}
+
+#if 0
+	{
+		TB_DBG("-----------------------");
+		TB_DBG("insert: %d", size);
+		tb_size_t idx = 0;
+		for (idx = 0; idx < TB_LZSW_WINDOW_HASH_MAX; idx++)
+		{
+			tb_size_t head = window->hash[idx];
+			if (head)
+			{
+				// get the head
+				tb_lzsw_node_t* ohead = TB_POOL_GET(pool, head, tb_lzsw_node_t);
+				TB_DBG("%d: %02x%02x%02x", idx, ohead->sign[0], ohead->sign[1], ohead->sign[2]);
+
+				// remove from the tail
+				tb_size_t node = ohead->prev;
+				while (node != head)
+				{
+					// get node
+					tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
+					TB_ASSERT(onode);
+
+					TB_DBG("%02x%02x%02x", onode->sign[0], onode->sign[1], onode->sign[2]);
+				
+					// next
+					node = onode->next;
+				}
+			}
+		}
+	}
+#endif
 }
 static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
-	tb_byte_t const* wp = window->e - size;
-	tb_byte_t const* we = window->e - 2;
+	tb_byte_t const* wb = window->e - window->n;
+	tb_byte_t const* wp = wb;
+	tb_byte_t const* we = wb + size;
 	for (; wp < we; wp++)
 	{
 		tb_size_t idx = wp[0] + wp[1] + wp[2];
@@ -119,7 +160,7 @@ static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t si
 				tb_size_t prev = onode->prev;
 			
 				// remove it
-				if (1)
+				if (onode->addr < we)
 				{
 					// detach it
 					TB_POOL_SET_NEXT(pool, onode->prev, tb_lzsw_node_t, next);	
@@ -132,9 +173,9 @@ static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t si
 				// prev
 				node = prev;
 			}
-
+				
 			// remove head
-			if (1)
+			if (ohead->addr < we)
 			{
 				// detach it
 				window->hash[idx] = 0;
@@ -144,7 +185,40 @@ static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t si
 			}
 		}
 	}
+
+#if 0
+	{
+		TB_DBG("-----------------------");
+		TB_DBG("remove: %d", size);
+		tb_size_t idx = 0;
+		for (idx = 0; idx < TB_LZSW_WINDOW_HASH_MAX; idx++)
+		{
+			tb_size_t head = window->hash[idx];
+			if (head)
+			{
+				// get the head
+				tb_lzsw_node_t* ohead = TB_POOL_GET(pool, head, tb_lzsw_node_t);
+				TB_DBG("%d: %02x%02x%02x", idx, ohead->sign[0], ohead->sign[1], ohead->sign[2]);
+
+				// remove from the tail
+				tb_size_t node = ohead->prev;
+				while (node != head)
+				{
+					// get node
+					tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
+					TB_ASSERT(onode);
+
+					TB_DBG("%02x%02x%02x", onode->sign[0], onode->sign[1], onode->sign[2]);
+				
+					// next
+					node = onode->next;
+				}
+			}
+		}
+	}
+#endif
 }
+#if 0
 static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
 {
 	tb_byte_t const* wb = window->e - window->n;
@@ -167,6 +241,78 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 	*p = mp - wb;
 	return (me - mp);
 }
+#else
+static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
+{
+	tb_byte_t const* wb = window->e - window->n;
+	tb_byte_t const* we = window->e;
+	tb_byte_t const* mp = wb;
+	tb_byte_t const* me = wb;
+
+	tb_pool_t* pool = window->pool;
+	tb_size_t idx = sp[0] + sp[1] + sp[2];
+	tb_size_t head = window->hash[idx];
+	if (head)
+	{
+		// get the head
+		tb_lzsw_node_t* ohead = TB_POOL_GET(pool, head, tb_lzsw_node_t);
+
+		// find it in the head first
+		if (ohead->sign[0] == sp[0]
+			&& ohead->sign[1] == sp[1]
+			&& ohead->sign[2] == sp[2])
+		{
+			tb_byte_t const* wp = ohead->addr;
+			//tb_byte_t const* wp = wb + tb_lzsw_window_goff(window->base, ohead->coff);
+			tb_byte_t const* wq = wp + 3;
+			tb_byte_t const* sq = sp + 3;
+			for (; wq < we && sq < se && *wq == *sq; wq++, sq++);
+			if ((wq - wp) >= (me - mp))
+			{
+				mp = wp;
+				me = wq;
+			}
+		}
+
+		// remove from the tail
+		tb_size_t node = ohead->prev;
+		while (node != head)
+		{
+			// get node
+			tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
+			TB_ASSERT(onode);
+
+			// find it
+			if (onode->sign[0] == sp[0]
+				&& onode->sign[1] == sp[1]
+				&& onode->sign[2] == sp[2])
+			{
+				tb_byte_t const* wp = onode->addr;
+				//tb_byte_t const* wp = wb + tb_lzsw_window_goff(window->base, onode->coff);
+				tb_byte_t const* wq = wp + 3;
+				tb_byte_t const* sq = sp + 3;
+				for (; wq < we && sq < se && *wq == *sq; wq++, sq++);
+				if ((wq - wp) >= (me - mp))
+				{
+					mp = wp;
+					me = wq;
+				}
+
+				//if (onode->addr != wb + tb_lzsw_window_goff(window->base, onode->coff))
+				{
+				//	TB_DBG("%x %x: %d %d", onode->addr, wb + tb_lzsw_window_goff(window->base, onode->coff), window->base, onode->coff);
+				}
+			}
+
+			// next
+			node = onode->next;
+		}
+	}
+
+	*p = mp - wb;
+	return (me - mp);
+}
+#endif
 #else
 // find the maximum matched data
 static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t const* sp, tb_byte_t const* se, tb_size_t* p)
@@ -341,7 +487,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			tb_bstream_set_ubits(dst, *sp++, 8);
 		}
 
-#if TB_LZSW_WINDOW_FIND_HASH
+#if TB_LZSW_WINDOW_HASH_FIND
 		// the old window
 		tb_byte_t* 	owe = window->e;
 		tb_size_t 	own = window->n;
@@ -349,21 +495,25 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 
 		// the new window 
 		tb_byte_t* 	we = sp;
-		tb_size_t 	wn = ((sp - sb) > TB_LZSW_WINDOW_SIZE_MAX)? own : (sp - sb);
+		tb_size_t 	wn = TB_MATH_MIN((sp - sb), TB_LZSW_WINDOW_SIZE_MAX);
 		tb_byte_t* 	wb = we - wn;
 
+		// the number of moving by left & right 
+		tb_size_t 	ln = TB_MATH_MIN((wb - owb), TB_LZSW_WINDOW_SIZE_MAX);
+		tb_size_t 	rn = TB_MATH_MIN((we - owe), TB_LZSW_WINDOW_SIZE_MAX);
+
 		// remove the old nodes
-		//tb_lzsw_window_remove(window, 0);
+		tb_lzsw_window_remove(window, ln);
 
 		// slide window
 		window->e = we;
 		window->n = wn;
 		window->b = ((sp - sb) > TB_LZSW_WINDOW_SIZE_MAX)? window->b : TB_MATH_ICLOG2I(wn);
-		window->base = (window->base + wn - ((wb - owb) % TB_LZSW_WINDOW_MAX)) % wn;
-		TB_DBG("lmove: %d, rmove: %d, base: %d, wb: %d", wb - owb, we - owe, window->base, wb - st->src.p);
+		window->base = (window->base + TB_LZSW_WINDOW_SIZE_MAX - ln) % TB_LZSW_WINDOW_SIZE_MAX;
+		//TB_DBG("[window]: at: %d, base: %d, ln: %d, rn: %d, coff0: %d", wb - sb, window->base, ln, rn, tb_lzsw_window_coff(window->base, 0));
 
 		// insert the new nodes
-		//tb_lzsw_window_insert(window, 0);
+		tb_lzsw_window_insert(window, rn);
 #else
 		// update window
 		window->e = sp;
@@ -391,7 +541,7 @@ static void tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 		if (zst->vlc && zst->vlc->close) zst->vlc->close(zst->vlc); 
 
 		// free pool
-#if TB_LZSW_WINDOW_FIND_HASH
+#if TB_LZSW_WINDOW_HASH_FIND
 		if (zst->window.pool) tb_pool_destroy(zst->window.pool);
 #endif
 
@@ -457,8 +607,8 @@ tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 #endif
 
 	// create pool
-#if TB_LZSW_WINDOW_FIND_HASH
-	zst->window.pool = tb_pool_create(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX - 2, 0);
+#if TB_LZSW_WINDOW_HASH_FIND
+	zst->window.pool = tb_pool_create(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0);
 #endif
 
 	return ((tb_tstream_t*)zst);
