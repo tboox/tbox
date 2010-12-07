@@ -233,14 +233,37 @@ void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 		pool->size--;
 	}
 }
+void tb_pool_clear(tb_pool_t* pool)
+{
+	// free private data
+	if (pool->free && pool->data) 
+	{
+		tb_int_t i = 0;
+		for (i = 0; i < pool->maxn; ++i)
+		{
+			if (tb_pool_info_isset(pool->info, i))
+				pool->free(pool->priv, pool->data + i * pool->step);
+		}
+	}
+
+	// clear info
+	pool->size = 0;
+	if (pool->info) memset(pool->info, 0, pool->maxn >> 3);
+	if (pool->data) memset(pool->data, 0, pool->maxn);
+
+#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
+	pool->pred = 0;
+#endif
+}
+#ifdef TB_DEBUG
 tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 {
 	//TB_DBG("%d %d %d %d", pool->step, pool->size, item, pool->maxn);
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
-	if (!item || !tb_pool_info_isset(pool->info, item - 1)) return TB_NULL;
+	TB_ASSERT(tb_pool_info_isset(pool->info, item - 1));
 
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 		return (pool->data + (item - 1) * pool->step);
 	else return TB_NULL;
 }
-
+#endif
