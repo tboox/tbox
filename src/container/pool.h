@@ -36,6 +36,10 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * macros
  */
+#ifndef TB_DEBUG
+#define tb_pool_get(pool, item) 					((pool)->data + ((item) - 1) * (pool)->step)
+#endif
+
 #define TB_POOL_GET(pool, item, type) 				((type*)tb_pool_get((pool), (item)))
 #define TB_POOL_GET_NEXT(pool, item, type) 			(((type*)tb_pool_get((pool), (item)))->next)
 #define TB_POOL_GET_PREV(pool, item, type) 			(((type*)tb_pool_get((pool), (item)))->prev)
@@ -82,7 +86,12 @@ void 			tb_pool_destroy(tb_pool_t* pool);
 
 tb_size_t 		tb_pool_alloc(tb_pool_t* pool);
 void 			tb_pool_free(tb_pool_t* pool, tb_size_t item);
+void 			tb_pool_clear(tb_pool_t* pool);
+
+#ifdef TB_DEBUG
 tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_size_t item);
+#endif
+
 
 // c plus plus
 #ifdef __cplusplus
