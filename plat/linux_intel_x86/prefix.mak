@@ -34,7 +34,7 @@ PWD 			= pwd
 # cflags
 CFLAGS_RELEASE 	= -O2 -fomit-frame-pointer
 CFLAGS_DEBUG 	= -g
-CFLAGS 			= -c -Wall
+CFLAGS 			= -c -Wall -fasm-blocks
 CFLAGS-I 		= -I
 CFLAGS-o 		= -o
 

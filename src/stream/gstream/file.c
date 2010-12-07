@@ -109,6 +109,7 @@ tb_gstream_t* tb_gstream_open_from_file(tb_fstream_t* st, tb_char_t const* url, 
 	if (flag & TB_GSTREAM_FLAG_RO) fflags |= TPLAT_FILE_RO;
 	if (flag & TB_GSTREAM_FLAG_WO) fflags |= TPLAT_FILE_WO;
 	if (flag & TB_GSTREAM_FLAG_TRUNC) fflags |= TPLAT_FILE_TRUNC;
+	if (flag & TB_GSTREAM_FLAG_CREATE) fflags |= TPLAT_FILE_CREAT;
 
 	// { open file
 	tplat_handle_t hfile = tplat_file_open(url, fflags);
