@@ -4,20 +4,20 @@ TB_CONFIG_DEMO 				= linux_x86
 # arch
 TB_CONFIG_ARCH 				= x86
 
-# asm
-TB_CONFIG_ENABLE 			= n
-
 # encoding
 TB_CONFIG_ENCODING 			= y
+
+# format
+TB_CONFIG_FORMAT 			= y
 
 # xml
 TB_CONFIG_XML 				= y
 
-# regex
-TB_CONFIG_REGEX 			= y
+# stream
+TB_CONFIG_STREAM 			= y
 
-# format
-TB_CONFIG_FORMAT 			= y
+# regex
+TB_CONFIG_REGEX 			= n
 
 # jpeg
 TB_CONFIG_JPEG 				= y

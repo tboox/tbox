@@ -62,8 +62,9 @@ typedef enum __tb_gstream_flag_t
 , 	TB_GSTREAM_FLAG_RO 				= 1
 , 	TB_GSTREAM_FLAG_WO 				= 2
 , 	TB_GSTREAM_FLAG_TRUNC 			= 4
-, 	TB_GSTREAM_FLAG_ZLIB 			= 8
-, 	TB_GSTREAM_FLAG_BLOCK 			= 16
+, 	TB_GSTREAM_FLAG_CREATE 			= 8
+, 	TB_GSTREAM_FLAG_ZLIB 			= 16
+, 	TB_GSTREAM_FLAG_BLOCK 			= 32
 
 }tb_gstream_flag_t;
 

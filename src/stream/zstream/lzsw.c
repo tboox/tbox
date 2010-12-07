@@ -253,7 +253,6 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 				me = wq;
 			}
 		}
-
 	}
 
 	*p = mp - wb;

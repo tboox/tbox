@@ -7,7 +7,7 @@ NAMES-$(TB_CONFIG_ENCODING) 	+= encoding
 NAMES-$(TB_CONFIG_REGEX) 		+= regex
 NAMES-$(TB_CONFIG_FORMAT) 		+= format
 NAMES-$(TB_CONFIG_XML) 			+= xml
-NAMES-$(TB_CONFIG_STREAM) 		+= gstream zstream
+NAMES-$(TB_CONFIG_STREAM) 		+= gstream deflate inflate
 
 ifeq ($(TB_CONFIG_ENCODING),y)
 NAMES-$(TB_CONFIG_STREAM) 		+= estream
@@ -26,8 +26,9 @@ time_TYPE 			= BIN
 math_TYPE 			= BIN
 conv_TYPE 			= BIN
 gstream_TYPE 		= BIN
-zstream_TYPE 		= BIN
 estream_TYPE 		= BIN
+deflate_TYPE 		= BIN
+inflate_TYPE 		= BIN
 
 # c-source files
 regex_C_FILES 		= regex
@@ -43,7 +44,8 @@ math_C_FILES 		= math
 conv_C_FILES 		= conv
 gstream_C_FILES 	= gstream
 estream_C_FILES 	= estream
-zstream_C_FILES 	= zstream
+deflate_C_FILES 	= deflate
+inflate_C_FILES 	= inflate
 
 # lib files
 regex_LIBS 			= tbox tplat z m dl pthread
@@ -74,9 +76,13 @@ gstream_LIBS 		= tbox tplat z m dl pthread
 gstream_LIB_DIR 	= ../../ /usr/lib/
 gstream_INC_DIR 	= /usr/include
 
-zstream_LIBS 		= tbox tplat z m dl pthread
-zstream_LIB_DIR 	= ../../ /usr/lib/
-zstream_INC_DIR 	= /usr/include
+deflate_LIBS 		= tbox tplat z m dl pthread
+deflate_LIB_DIR 	= ../../ /usr/lib/
+deflate_INC_DIR 	= /usr/include
+
+inflate_LIBS 		= tbox tplat z m dl pthread
+inflate_LIB_DIR 	= ../../ /usr/lib/
+inflate_INC_DIR 	= /usr/include
 
 estream_LIBS 		= tbox tplat z m dl pthread
 estream_LIB_DIR 	= ../../ /usr/lib/

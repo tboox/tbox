@@ -9,19 +9,17 @@ int main(int argc, char** argv)
 	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
 	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(50 * 1024 * 1024), 50 * 1024 * 1024, regular_block_n);
 
-	if (argc < 4) return 0;
+	if (argc < 2 || !argv[1]) return 0;
 
-	// get action
-	tb_zstream_action_t action = TB_ZSTREAM_ACTION_DEFLATE;
-	if (!strcmp(argv[1], "-i")) action = TB_ZSTREAM_ACTION_INFLATE;
-	else if (!strcmp(argv[1], "-d")) action = TB_ZSTREAM_ACTION_DEFLATE;
-	else return 0;
-	
+	// get output path
+	tb_char_t opath[4096];
+	snprintf(opath, 4095, "%s.z", argv[1]);
+
 	// input & output stream
 	tb_ustream_t 	istream;
 	tb_ustream_t 	ostream;;
-	tb_gstream_t* 	ist = tb_gstream_open(&istream, argv[2], TB_NULL, 0, TB_GSTREAM_FLAG_RO);
-	tb_gstream_t* 	ost = tb_gstream_open(&ostream, argv[3], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
+	tb_gstream_t* 	ist = tb_gstream_open(&istream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_RO);
+	tb_gstream_t* 	ost = tb_gstream_open(&ostream, opath, TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC | TB_GSTREAM_FLAG_CREATE);
 
 	// the src & dst data
 	tb_size_t 		maxn = 20 * 1024 * 1024;
@@ -33,10 +31,10 @@ int main(int argc, char** argv)
 	// the zstream
 #if defined(TB_ZSTREAM_TEST_RLC)
 	tb_rlc_zstream_t 	zst;
-	tb_tstream_t* 		tst = tb_zstream_open_rlc(&zst, action);
+	tb_tstream_t* 		tst = tb_zstream_open_rlc(&zst, TB_ZSTREAM_ACTION_DEFLATE);
 #elif defined(TB_ZSTREAM_TEST_LZSW)
 	tb_lzsw_zstream_t 	zst;
-	tb_tstream_t* 		tst = tb_zstream_open_lzsw(&zst, action);
+	tb_tstream_t* 		tst = tb_zstream_open_lzsw(&zst, TB_ZSTREAM_ACTION_DEFLATE);
 #endif
 
 	// attach data
