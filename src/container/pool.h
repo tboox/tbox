@@ -50,6 +50,14 @@ extern "C" {
 
 #define TB_POOL_MAX_SIZE 							(1 << 30)
 
+// prediction
+#define TB_MEMORY_POOL_PRED_ENABLE
+#ifdef TB_MEMORY_MODE_SMALL
+# 	define TB_MEMORY_POOL_PRED_MAX 					(128)
+#else
+# 	define TB_MEMORY_POOL_PRED_MAX 					(256)
+#endif
+
 // trace pool
 //#define tb_pool_create(step, size, grow) tb_pool_create_with_trace(step, size, grow, __tplat_func__, __tplat_line__, __tplat_file__)
 
@@ -72,8 +80,9 @@ typedef struct __tb_pool_t
 	void* 			priv;
 
 	// predict the next free block
-#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-	tb_size_t 		pred;
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+	tb_size_t 		pred[TB_MEMORY_POOL_PRED_MAX];
+	tb_size_t 		pred_n;
 #endif
 
 }tb_pool_t;

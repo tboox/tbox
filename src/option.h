@@ -49,7 +49,6 @@ extern "C" {
 
 // pool
 #define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
-#define TB_MEMORY_POOL_PREDICTION_ENABLE
 
 // asm
 #ifdef TB_CONFIG_ASM_ENABLE

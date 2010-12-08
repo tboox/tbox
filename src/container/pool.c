@@ -33,7 +33,7 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-
+#if 0
 static __tplat_inline__ void tb_pool_info_set(tb_byte_t* info, tb_int_t idx)
 {
 	TB_ASSERT(info && idx < TB_POOL_MAX_SIZE);
@@ -49,6 +49,11 @@ static __tplat_inline__ tb_int_t tb_pool_info_isset(tb_byte_t* info, tb_int_t id
 	TB_ASSERT(info && idx < TB_POOL_MAX_SIZE);
 	return (info[idx >> 3] & (0x1 << (idx & 7)));
 }
+#else
+# 	define tb_pool_info_set(info, idx) 		do {(info)[(idx) >> 3] |= (0x1 << ((idx) & 7));} while (0)
+# 	define tb_pool_info_reset(info, idx) 	do {(info)[(idx) >> 3] &= ~(0x1 << ((idx) & 7));} while (0)
+# 	define tb_pool_info_isset(info, idx) 	((info)[(idx) >> 3] & (0x1 << ((idx) & 7)))
+#endif
 /* /////////////////////////////////////////////////////////
  * internal implemention
  */
@@ -76,6 +81,12 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 	pool->info = tb_malloc(pool->maxn >> 3);
 	if (!pool->info) goto fail;
 	memset(pool->info, 0, pool->maxn >> 3);
+
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+	tb_size_t n = TB_MEMORY_POOL_PRED_MAX;
+	while (n--) pool->pred[n] = TB_MEMORY_POOL_PRED_MAX - n;
+	pool->pred_n = TB_MEMORY_POOL_PRED_MAX;
+#endif
 
 	return pool;
 fail:
@@ -147,24 +158,23 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	tb_size_t item = 0;
 
 	// try allocating from the predicted item
-#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-	if (pool->pred && !tb_pool_info_isset(pool->info, pool->pred - 1)) 
-		item = pool->pred;
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+	if (pool->pred_n) item = pool->pred[--pool->pred_n];
 #endif
 
 	// is enough?
 	if (!item && pool->size < pool->maxn)
 	{
 		 // find free op node and skip the index: 0
-		tb_int_t i = 0;
-		for (i = 0; i < pool->maxn; ++i)
+		tb_size_t i = 0;
+		tb_size_t n = pool->maxn;
+		for (i = 0; i < n; ++i)
 		{
 			// is free?
 			if (!tb_pool_info_isset(pool->info, i))
 			{
 				// get op index
 				item = 1 + i;
-
 				break;
 			}
 		}
@@ -197,13 +207,21 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	if (!item) return 0;
 
 	// set info
+	TB_ASSERT(!tb_pool_info_isset(pool->info, item - 1));
 	tb_pool_info_set(pool->info, item - 1);
 
-	// predict next
-#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-	// item + 1 - 1 < maxn
-	if (item < pool->maxn) pool->pred = item + 1;
-	else pool->pred = 0;
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+ 	// predict next, pred_n must be null, otherwise exists repeat item
+	if (!pool->pred_n) 
+	{
+		// item + 1 - 1 < maxn
+		if (item < pool->maxn && !tb_pool_info_isset(pool->info, item))
+		{
+			pool->pred[0] = item + 1;
+			pool->pred_n = 1;
+		}
+	}
+
 #endif
 
 	// update size
@@ -226,8 +244,9 @@ void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 		tb_pool_info_reset(pool->info, item - 1);
 
 		// predict next
-#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-		pool->pred = item;
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+		if (pool->pred_n < TB_MEMORY_POOL_PRED_MAX)
+			pool->pred[pool->pred_n++] = item;
 #endif
 		// update pool size
 		pool->size--;
@@ -251,8 +270,10 @@ void tb_pool_clear(tb_pool_t* pool)
 	if (pool->info) memset(pool->info, 0, pool->maxn >> 3);
 	if (pool->data) memset(pool->data, 0, pool->maxn);
 
-#ifdef TB_MEMORY_POOL_PREDICTION_ENABLE
-	pool->pred = 0;
+#ifdef TB_MEMORY_POOL_PRED_ENABLE
+	tb_size_t n = TB_MEMORY_POOL_PRED_MAX;
+	while (n--) pool->pred[n] = TB_MEMORY_POOL_PRED_MAX - n;
+	pool->pred_n = TB_MEMORY_POOL_PRED_MAX;
 #endif
 }
 #ifdef TB_DEBUG
