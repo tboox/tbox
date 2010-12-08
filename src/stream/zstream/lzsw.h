@@ -44,8 +44,8 @@ extern "C" {
 
 // window
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(256)
-#define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
-//#define TB_LZSW_WINDOW_SIZE_MAX 		(65536)
+//#define TB_LZSW_WINDOW_SIZE_MAX 		(4096)
+#define TB_LZSW_WINDOW_SIZE_MAX 		(65536)
 //#define TB_LZSW_WINDOW_SIZE_MAX 		(8)
 
 #define TB_LZSW_WINDOW_HASH_FIND 		(1)
