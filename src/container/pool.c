@@ -159,6 +159,10 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 
 	// try allocating from the predicted item
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
+# 	ifdef TB_DEBUG
+	pool->alloc_total++;
+	if (!pool->pred_n) pool->pred_failed++;
+# 	endif
 	if (pool->pred_n) item = pool->pred[--pool->pred_n];
 #endif
 
@@ -287,5 +291,13 @@ tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 		return (pool->data + (item - 1) * pool->step);
 	else return TB_NULL;
+}
+void tb_pool_dump(tb_pool_t* pool)
+{
+	TB_DBG("size: %d", pool->size);
+	TB_DBG("maxn: %d", pool->maxn);
+	TB_DBG("step: %d", pool->step);
+	TB_DBG("grow: %d", pool->grow);
+	TB_DBG("pred: %02d%%, fail: %d, total: %d", pool->alloc_total? ((pool->alloc_total - pool->pred_failed) * 100 / pool->alloc_total) : -1, pool->pred_failed, pool->alloc_total);
 }
 #endif

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		net.h
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
+#ifndef TB_NET_H
+#define TB_NET_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,43 +32,9 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "malloc.h"
-#include "math.h"
-#include "conv.h"
-#include "bits.h"
-#include "time.h"
-#include "varg.h"
-#include "memops.h"
-#include "format.h"
-#include "net/net.h"
-#include "math/math.h"
-#include "string/string.h"
-#include "container/container.h"
-#include "external/external.h"
-
-#ifdef TB_CONFIG_STREAM
-#include "stream/stream.h"
-#endif
-
-#ifdef TB_CONFIG_ENCODING
-# 	include "encoding.h"
-#endif
-
-#ifdef TB_CONFIG_FORMAT
-# 	include "format.h"
-#endif
-
-#ifdef TB_CONFIG_XML
-# 	include "xml/xml.h"
-#endif
-
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
-
-#ifdef TB_CONFIG_ZLIB
-# 	include "zlib.h"
-#endif
+#include "http.h"
+#include "dns.h"
+#include "socket.h"
 
 // c plus plus
 #ifdef __cplusplus

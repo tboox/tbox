@@ -639,6 +639,21 @@ tb_size_t tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_
 	return (set_n > 0? set_n : 0);
 	// }
 }
+
+tb_char_t* tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s)
+{
+	TB_ASSERT(bst->e >= bst->p);
+	tb_bstream_sync(bst);
+
+	tb_char_t* b = bst->p;
+	tb_char_t* p = bst->p;
+	tb_char_t* e = bst->e - 1;
+	while (*s && p < e) *p++ = *s++;
+	*p++ = '\0';
+	bst->p = p;
+
+	return b;
+}
 /* /////////////////////////////////////////////////////////
  * peek
  */

@@ -224,11 +224,24 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 				tb_byte_t const* wq = wp + 3;
 				tb_byte_t const* sq = sp + 3;
 
+#if 1
 				for (; /*wq < we && */sq < se && *wq == *sq; wq++, sq++);
+#else
+				for (; /*wq < we && */sq + 4 < se; wq += 4, sq += 4)
+				{
+					if (wq[0] != sq[0]) break;
+					if (wq[1] != sq[1]) { wq++; sq++; break; }
+					if (wq[2] != sq[2]) { wq += 2; sq += 2; break; }
+					if (wq[3] != sq[3]) { wq += 3; sq += 3; break; }
+				}
+				for (; /*wq < we && */sq < se && *wq == *sq; wq++, sq++);
+#endif
 				if ((wq - wp) > (me - mp))
 				{
 					mp = wp;
 					me = wq;
+					//if (me > we) break;
+					//if (me - mp > we - wp) break;
 				}
 			}
 
@@ -490,6 +503,8 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 
 	// sync 
 	tb_bstream_sync(dst);
+
+	//tb_pool_dump(window->pool);
 
 	// update position
 	st->src.p = sp;

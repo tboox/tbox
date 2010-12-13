@@ -150,6 +150,7 @@ void 				tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val);
 
 void 				tb_bstream_set_ubits(tb_bstream_t* bst, tb_uint32_t val, tb_size_t nbits);
 tb_size_t 			tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_t size);
+tb_char_t*			tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s);
 
 // peek
 tb_uint32_t 		tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits);

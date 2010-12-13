@@ -83,6 +83,12 @@ typedef struct __tb_pool_t
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
 	tb_size_t 		pred[TB_MEMORY_POOL_PRED_MAX];
 	tb_size_t 		pred_n;
+
+# 	ifdef TB_DEBUG
+	tb_size_t 		pred_failed;
+	tb_size_t 		alloc_total;
+# 	endif
+
 #endif
 
 }tb_pool_t;
@@ -99,6 +105,7 @@ void 			tb_pool_clear(tb_pool_t* pool);
 
 #ifdef TB_DEBUG
 tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_size_t item);
+void 			tb_pool_dump(tb_pool_t* pool);
 #endif
 
 

@@ -13,7 +13,6 @@ tbox_C_FILES 		+= \
 					malloc \
 					memops \
 					conv \
-					http \
 					time \
 					math$(_)exp \
 					math$(_)pow \
@@ -21,7 +20,10 @@ tbox_C_FILES 		+= \
 					string$(_)string \
 					string$(_)cstring \
 					container$(_)pool \
-					container$(_)array
+					container$(_)array \
+					net$(_)http \
+					net$(_)dns \
+					net$(_)socket
 
 # header files
 INC_FILES 			= \
@@ -35,7 +37,6 @@ INC_FILES 			= \
 					malloc.h \
 					varg.h \
 					conv.h \
-					http.h \
 					time.h \
 					memops.h \
 					math$(_)prefix.h \
@@ -52,6 +53,11 @@ INC_FILES 			= \
 					container$(_)container.h \
 					container$(_)pool.h \
 					container$(_)array.h \
+					net$(_)prefix.h \
+					net$(_)net.h \
+					net$(_)http.h \
+					net$(_)dns.h \
+					net$(_)socket.h \
 					external$(_)prefix.h \
 					external$(_)external.h 
 
