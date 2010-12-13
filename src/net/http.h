@@ -20,14 +20,14 @@
  * \file		http.h
  *
  */
-#ifndef TB_HTTP_H
-#define TB_HTTP_H
+#ifndef TB_NET_HTTP_H
+#define TB_NET_HTTP_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "string/string.h"
+#include "../string/string.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros

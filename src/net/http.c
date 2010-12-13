@@ -25,8 +25,8 @@
  * includes
  */
 #include "http.h"
-#include "math/math.h"
-#include "conv.h"
+#include "../math/math.h"
+#include "../conv.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
