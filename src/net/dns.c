@@ -33,7 +33,7 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
-#if 1
+#if 0
 # 	define TB_DNS_DBG 				TB_DBG
 #else
 # 	define TB_DNS_DBG
@@ -140,7 +140,7 @@ static tb_char_t const* tb_dns_parse_name_impl(tb_char_t const* sb, tb_char_t co
 {
 	tb_char_t* p = ps;
 	tb_char_t* q = *pd;
-	while (1)
+	while (p < se)
 	{
 		tb_byte_t c = *p++;
 		//TB_DNS_DBG("%x", c);
@@ -169,7 +169,7 @@ static tb_char_t const* tb_dns_parse_name_impl(tb_char_t const* sb, tb_char_t co
 static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 {
 	tb_char_t* q = name;
-	tb_char_t* p = tb_dns_parse_name_impl(tb_bstream_beg(bst), tb_bstream_pos(bst), tb_bstream_pos(bst), &q);
+	tb_char_t* p = tb_dns_parse_name_impl(tb_bstream_beg(bst), tb_bstream_end(bst), tb_bstream_pos(bst), &q);
 	if (p)
 	{
 		if (q > name && *(q - 1) == '.') *--q = '\0';
@@ -178,6 +178,54 @@ static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 	}
 	else return TB_NULL;
 }
+#if 0 
+static tb_int_t tb_dns_send(tplat_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
+{
+	tb_int_t send = 0;
+	tb_int_t time = (tb_int_t)tplat_clock();
+	while(send < size)
+	{
+		tb_int_t ret = tplat_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
+		//TB_DBG("ret: %d", ret);
+		if (ret < 0) break;
+		else if (!ret) 
+		{
+			// > 10s?
+			tb_int_t timeout = ((tb_int_t)tplat_clock()) - time;
+			if (timeout > 10000 || timeout < 0) break;
+		}
+		else
+		{
+			send += ret;
+			time = (tb_int_t)tplat_clock();
+		}
+	}
+	return send;
+}
+static tb_int_t tb_dns_recv(tplat_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
+{
+	tb_int_t recv = 0;
+	tb_int_t time = (tb_int_t)tplat_clock();
+	while(recv < size)
+	{
+		tb_int_t ret = tplat_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
+		//TB_DBG("ret: %d", ret);
+		if (ret < 0) break;
+		else if (!ret) 
+		{
+			// > 10s?
+			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			if (timeout > 10000 || timeout < 0) break;
+		}
+		else
+		{
+			recv += ret;
+			time = (tb_size_t)tplat_clock();
+		}
+	}
+	return recv;
+}
+#endif
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -293,6 +341,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 	if (size != tplat_socket_send(hserver, data, size)) goto fail;
 #else
 	if (size != tplat_socket_sendto(hserver, server, TB_DNS_SERVER_PORT, data, size)) goto fail;
+	//if (size != tb_dns_send(hserver, server, data, size)) goto fail;
 #endif
 	TB_DNS_DBG("send query ok.");
 
@@ -301,6 +350,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 	size = tplat_socket_recv(hserver, data, 8192);
 #else
 	size = tplat_socket_recvfrom(hserver, server, TB_DNS_SERVER_PORT, data, 8192);
+	//size = tb_dns_recv(hserver, server, data, 8192);
 #endif
 	if (size <= 0) goto fail;
 	TB_DNS_DBG("recv response ok.");
@@ -374,6 +424,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 			{
 				snprintf(ip, 16, "%d.%d.%d.%d", b1, b2, b3, b4);
 				found = 1;
+				TB_DNS_DBG("");
 				break;
 			}
 		}
@@ -386,6 +437,11 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 		TB_DNS_DBG("");
 	}
 
+	// is found?
+	if (found) goto ok;
+	else goto fail;
+
+#if 0
 	// parse authorities
 	for (i = 0; i < header.authority; i++)
 	{
@@ -407,9 +463,21 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 		TB_DNS_DBG("ttl: %d", answer.res.ttl);
 		TB_DNS_DBG("size: %d", answer.res.size);
 
-		// parse data
-		answer.rdata = tb_dns_parse_name(&bst, answer.name);
-		TB_DNS_DBG("server: %s", answer.rdata? answer.rdata : "");
+		// is ipv4?
+		if (answer.res.type == 1)
+		{
+			tb_byte_t b1 = tb_bstream_get_u8(&bst);
+			tb_byte_t b2 = tb_bstream_get_u8(&bst);
+			tb_byte_t b3 = tb_bstream_get_u8(&bst);
+			tb_byte_t b4 = tb_bstream_get_u8(&bst);
+			TB_DNS_DBG("ipv4: %d.%d.%d.%d", b1, b2, b3, b4);
+		}
+		else
+		{
+			// parse data
+			answer.rdata = tb_dns_parse_name(&bst, answer.name);
+			TB_DNS_DBG("server: %s", answer.rdata? answer.rdata : "");
+		}
 		TB_DNS_DBG("");
 	}
 
@@ -440,14 +508,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-
-			// save the first ip
-			if (!found) 
-			{
-				snprintf(ip, 16, "%d.%d.%d.%d", b1, b2, b3, b4);
-				found = 1;
-				break;
-			}
+			TB_DNS_DBG("ipv4: %d.%d.%d.%d", b1, b2, b3, b4);
 		}
 		else
 		{
@@ -457,10 +518,11 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 		}
 		TB_DNS_DBG("");
 	}
+#endif
 
-	// no found?
 	if (!found) goto fail;
 
+ok:
 	// close server
 	tplat_socket_close(hserver);
 	return ip;
