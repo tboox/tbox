@@ -44,6 +44,13 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
+			/* align by 4-bytes */ \
+			if (((tb_size_t)dst) & 0x3) \
+			{ \
+				*((tb_uint16_t*)dst) = src; \
+				dst += 2; \
+				size--; \
+			} \
 			dst += size << 1; \
 			__tplat_asm__ __tplat_volatile__ \
 			(
@@ -61,6 +68,13 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
+			/* align by 4-bytes */ \
+			if (((tb_size_t)dst) & 0x3) \
+			{ \
+				*((tb_uint16_t*)dst) = src; \
+				dst += 2; \
+				size--; \
+			} \
 			tb_size_t left = size & 0x3; \
 			dst += (size << 1); \
 			if (!left) \
