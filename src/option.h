@@ -50,11 +50,6 @@ extern "C" {
 // pool
 #define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
 
-// asm
-#ifdef TB_CONFIG_ASM_ENABLE
-# 	define TB_ASM_ENABLE 
-#endif
-
 
 // c plus plus
 #ifdef __cplusplus

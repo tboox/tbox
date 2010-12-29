@@ -40,12 +40,15 @@ extern "C" {
 #ifdef TPLAT_ASSEMBLER_GAS
 
 // memset_u16
-# 	if 0 // cache line: 16-bytes
+# 	if 1 // cache line: 16-bytes
 # 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			__tplat_asm__ __tplat_volatile__ \
 			( \
+			  	"tst %2, #3\n\t" 						/* align by 4-bytes, if (dst & 0x3) *((tb_uint16_t*)dst) = src, dst += 2, size-- */ \
+			  	"strneh %1, [%2], #2\n\t"\
+			  	"subnes %0, %0, #1\n\t"\
 				"orr %1, %1, %1, lsl #16\n\t" 			/* src |= src << 16, expand to 32-bits */ \
 				"mov r3, %1\n\t" 						/* for storing data by 4x32bits */ \
 				"mov r4, %1\n\t" \
@@ -71,8 +74,11 @@ extern "C" {
 		{ \
 			__tplat_asm__ __tplat_volatile__ \
 			( \
+			  	"tst %2, #3\n\t" 					/* align by 4-bytes, if (dst & 0x3) *((tb_uint16_t*)dst) = src, dst += 2, size--*/ \
+			  	"strneh %1, [%2], #2\n\t"\
+			  	"subnes %0, %0, #1\n\t" \
 				"orr %1, %1, %1, lsl #16\n\t" 			/* src |= src << 16, expand to 32-bits */ \
-				"mov r3, %1\n\t" 						/* for storing data by 4x32bits */ \
+				"mov r3, %1\n\t" 						/* for storing data by 8x32bits */ \
 				"mov r4, %1\n\t" \
 				"mov r5, %1\n\t" \
 				"1:\n\t" 								/* fill data by cache line size */ \
@@ -94,7 +100,7 @@ extern "C" {
 # 	endif
 
 // memset_u32
-# 	if 0 // cache line: 16-bytes
+# 	if 1 // cache line: 16-bytes
 # 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
 		do \
 		{ \

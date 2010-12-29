@@ -5,9 +5,6 @@
 #define TB_CONFIG_MEMORY_SMALL
 #define TB_CONFIG_MEMORY_POOL_INDEX 	(TPLAT_POOL_PUBLIC_INDEX)
 
-// asm
-//#define TB_CONFIG_ASM_ENABLE
-
 // encoding
 #define TB_CONFIG_ENCODING
 
