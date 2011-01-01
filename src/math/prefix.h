@@ -56,10 +56,6 @@ extern "C" {
 #define TB_MATH_ACOS(x) 					(acos((x)))
 #define TB_MATH_ATAN(x) 					(atan((x)))
 #define TB_MATH_ATAN2(a, b) 				(atan2((a), (b)))
-#define TB_MATH_LOG(x) 						(log((x)))
-//#define TB_MATH_EXP(x) 						(exp((x)))
-#define TB_MATH_POW(a, b) 					(pow(a, b))
-#define TB_MATH_SQRT(x) 					(sqrt((x)))
 #define TB_MATH_IS_NAN(val) 				(isnan((val)))
 #define TB_MATH_IS_INF(val) 				(isinf((val)))
 
