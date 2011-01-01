@@ -15,8 +15,11 @@
 #define MATH_TEST_ILOG2F 		(0)
 #define MATH_TEST_IRLOG2I 		(0)
 #define MATH_TEST_IRLOG2F 		(0)
-#define MATH_TEST_ICLOG2I 		(1)
+#define MATH_TEST_ICLOG2I 		(0)
 #define MATH_TEST_ICLOG2F 		(0)
+
+#define MATH_TEST_ISQRTI 		(1)
+#define MATH_TEST_ISQRTF 		(1)
 
 #define MATH_TEST_IROUND 		(0)
 #define MATH_TEST_IFLOOR 		(0)
@@ -330,6 +333,58 @@ static void tb_math_test_iclog2f_libc(tb_float_t x)
 	tplat_printf("%d ms, tb_math_iclog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 /* ////////////////////////////////////////////////////////////////////////
+ * sqrt
+ */
+static void tb_math_test_isqrti(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ISQRTI(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_isqrti(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_isqrtf(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = TB_MATH_ISQRTF(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_isqrtf(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_isqrti_libc(tb_uint32_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = sqrt(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_isqrti_libc(%u) = %d\n", (tb_int_t)t, x, r);
+}
+static void tb_math_test_isqrtf_libc(tb_float_t x)
+{
+	__tplat_volatile__ tb_int_t 	n = 10000000;
+	__tplat_volatile__ tb_int_t 	r = 0;
+	tplat_int64_t t = tplat_clock();
+	while (n--)
+	{
+		r = sqrt(x);
+	}
+	t = tplat_clock() - t;
+	tplat_printf("%d ms, tb_math_isqrtf_libc(%lf) = %d\n", (tb_int_t)t, x, r);
+}
+
+/* ////////////////////////////////////////////////////////////////////////
  * round
  */
 static void tb_math_test_iround(tb_float_t x)
@@ -639,6 +694,7 @@ static void tb_math_make_ilog2i_table()
 		}
 	}
 }
+
 int main(int argc, char** argv)
 {
 	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
@@ -876,6 +932,51 @@ int main(int argc, char** argv)
 	tb_math_test_iclog2f_libc((1 << 31) + 100);
 #endif
 
+
+#if MATH_TEST_ISQRTI
+	tplat_printf("===================================:\n");
+	tb_math_test_isqrti(1);
+	tb_math_test_isqrti(10);
+	tb_math_test_isqrti(100);
+	tb_math_test_isqrti(1000);
+	tb_math_test_isqrti(1024);
+	tb_math_test_isqrti(2048);
+	tb_math_test_isqrti(4096);
+	tb_math_test_isqrti((1 << 31) + 100);
+
+	tplat_printf("\n");
+	tb_math_test_isqrti_libc(1);
+	tb_math_test_isqrti_libc(10);
+	tb_math_test_isqrti_libc(100);
+	tb_math_test_isqrti_libc(1000);
+	tb_math_test_isqrti_libc(1024);
+	tb_math_test_isqrti_libc(2048);
+	tb_math_test_isqrti_libc(4096);
+	tb_math_test_isqrti_libc((1 << 31) + 100);
+
+#endif
+
+#if MATH_TEST_ISQRTF
+	tplat_printf("===================================:\n");
+	tb_math_test_isqrtf(1.1415926f);
+	tb_math_test_isqrtf(10.1415926f);
+	tb_math_test_isqrtf(100.1415926f);
+	tb_math_test_isqrtf(1000.1415926f);
+	tb_math_test_isqrtf(10000.1415926f);
+	tb_math_test_isqrtf(100000.1415926f);
+	tb_math_test_isqrtf(1024);
+	tb_math_test_isqrtf((1 << 31) + 100);
+
+	tplat_printf("\n");
+	tb_math_test_isqrtf_libc(1.1415926f);
+	tb_math_test_isqrtf_libc(10.1415926f);
+	tb_math_test_isqrtf_libc(100.1415926f);
+	tb_math_test_isqrtf_libc(1000.1415926f);
+	tb_math_test_isqrtf_libc(10000.1415926f);
+	tb_math_test_isqrtf_libc(100000.1415926f);
+	tb_math_test_isqrtf_libc(1024);
+	tb_math_test_isqrtf_libc((1 << 31) + 100);
+#endif
 
 #if MATH_TEST_IROUND
 	tplat_printf("===================================:\n");

@@ -50,6 +50,9 @@
 // ceil(ilog2f(x))
 #define TB_MATH_ICLOG2F(x) 					tb_math_iclog2i(TB_MATH_IROUND(x))
 
+// flog10f(x) 
+#define TB_MATH_FLOG10F(x) 					log(x)
+
 /* ////////////////////////////////////////////////////////////////////////
  * globals
  */

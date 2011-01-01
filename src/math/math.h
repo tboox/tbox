@@ -30,6 +30,7 @@
 #include "exp.h"
 #include "pow.h"
 #include "log.h"
+#include "sqrt.h"
 #include "round.h"
 #include "abs.h"
 
