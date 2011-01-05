@@ -80,6 +80,11 @@ extern "C" {
 typedef tb_int16_t 			tb_fixed8_t;
 typedef tb_int32_t 			tb_fixed16_t;
 
+#ifndef TPLAT_CONFIG_TYPE_NOT_SUPPORT_INT64
+typedef tb_int64_t 			tb_fixed32_t;
+#else
+# 	error int64 not support.
+#endif
 
 // c plus plus
 #ifdef __cplusplus

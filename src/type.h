@@ -29,42 +29,48 @@ extern "C" {
 #endif
 
 /* /////////////////////////////////////////////////////////
+ * includes
+ */
+#include "tplat/tplat.h"
+#include "option.h"
+
+/* /////////////////////////////////////////////////////////
  * macros
  */
 
 // bool values
-#define TB_TRUE						((tb_bool_t)1)
-#define	TB_FALSE					((tb_bool_t)0)
+#define TB_TRUE					TPLAT_TRUE
+#define	TB_FALSE				TPLAT_FALSE
 
 // invalidate handle
-#define TB_INVALID_HANDLE 			((tb_handle_t)-1)
+#define TB_INVALID_HANDLE 		TPLAT_INVALID_HANDLE
 
 // null
-#define TB_NULL 					((void*)0)
+#define TB_NULL 				TPLAT_NULL
 
 /* /////////////////////////////////////////////////////////
  * basic types
  */
-typedef signed int			tb_int_t;
-typedef unsigned int		tb_uint_t;
-typedef tb_int_t			tb_bool_t;
-typedef tb_uint_t			tb_size_t;
-typedef signed char			tb_int8_t;
-typedef tb_int8_t			tb_sint8_t;
-typedef unsigned char		tb_uint8_t;
-typedef signed short		tb_int16_t;
-typedef tb_int16_t			tb_sint16_t;
-typedef unsigned short		tb_uint16_t;
-typedef tb_int_t			tb_int32_t;
-typedef tb_int32_t			tb_sint32_t;
-typedef tb_uint_t			tb_uint32_t;
-typedef signed long long 	tb_int64_t;
-typedef tb_int64_t			tb_sint64_t;
-typedef unsigned long long 	tb_uint64_t;
-typedef tb_uint8_t			tb_byte_t;
-typedef void* 				tb_handle_t;
-typedef char 				tb_char_t;
-typedef double 				tb_float_t;
+typedef tplat_int_t				tb_int_t;
+typedef tplat_uint_t			tb_uint_t;
+typedef tplat_bool_t			tb_bool_t;
+typedef tplat_size_t			tb_size_t;
+typedef tplat_int8_t			tb_int8_t;
+typedef tplat_sint8_t			tb_sint8_t;
+typedef tplat_uint8_t			tb_uint8_t;
+typedef tplat_int16_t			tb_int16_t;
+typedef tplat_sint16_t			tb_sint16_t;
+typedef tplat_uint16_t			tb_uint16_t;
+typedef tplat_int32_t			tb_int32_t;
+typedef tplat_sint32_t			tb_sint32_t;
+typedef tplat_uint32_t			tb_uint32_t;
+typedef tplat_byte_t			tb_byte_t;
+typedef tplat_handle_t			tb_handle_t;
+typedef tplat_char_t 			tb_char_t;
+typedef tplat_float_t 			tb_float_t;
+typedef tplat_int64_t 			tb_int64_t;
+typedef tplat_sint64_t			tb_sint64_t;
+typedef tplat_uint64_t 			tb_uint64_t;
 
 
 // c plus plus

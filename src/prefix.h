@@ -67,9 +67,6 @@ extern "C" {
 #endif
 #endif
 
-// filename max size
-#define TB_PATH_MAX_SIZE 							(1024)
-
 // the size of the static array
 #define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
 

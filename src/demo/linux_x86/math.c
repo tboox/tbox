@@ -694,7 +694,6 @@ static void tb_math_make_ilog2i_table()
 		}
 	}
 }
-
 int main(int argc, char** argv)
 {
 	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};

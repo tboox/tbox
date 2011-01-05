@@ -61,6 +61,7 @@ tb_uint32_t tb_math_isqrti(tb_uint32_t x)
 	{ 
 		if (x >= 0x1000000)
 		{ 
+			// lookup table
 			if (x >= 0x10000000)
 			{ 
 				if (x >= 0x40000000) xn = table[x >> 24] << 8; 
@@ -72,6 +73,7 @@ tb_uint32_t tb_math_isqrti(tb_uint32_t x)
 				else xn = table[x >> 18] << 5;  
 			} 
 
+			// newton
 			xn = (xn + 1 + (x / xn)) >> 1; 
 			xn = (xn + 1 + (x / xn)) >> 1; 
 			return (((xn * xn) > x)? --xn : xn); 
