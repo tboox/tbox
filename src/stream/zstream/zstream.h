@@ -56,7 +56,7 @@ typedef enum __tb_zstream_algo_t
 ,	TB_ZSTREAM_ALGO_HUFFMAN 	= 2 	//!< adaptive huffman
 ,	TB_ZSTREAM_ALGO_LZSW 		= 3 	//!< sliding window .e.g lz77 lzss ...
 ,	TB_ZSTREAM_ALGO_LZPD 		= 4 	//!< phrase dictionary .e.g lzw lz78 ...
-,	TB_ZSTREAM_ALGO_ZLIB 		= 5 	//!< standard zlib
+,	TB_ZSTREAM_ALGO_GZIP 		= 5 	//!< gnu zip
 ,	TB_ZSTREAM_ALGO_ARITHMETIC 	= 6 	//!< arithmetic coding
 
 }tb_zstream_algo_t;

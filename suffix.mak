@@ -10,11 +10,30 @@ NAMES += $(NAMES-y)
 # append headers 
 INC_FILES += $(INC_FILES-y)
 
+# ccache hook compiler for optimizating make
+ifneq ($(CCACHE),)
+CC := $(CCACHE) $(CC)
+endif
+
+# distcc hook compiler for optimizating make
+ifneq ($(DISTCC),)
+CC := $(DISTCC) $(CC)
+AS := $(DISTCC) $(AS)
+endif
+
 # append debug cflags
 ifeq ($(DEBUG),y)
 CFLAGS := $(CFLAGS) $(CFLAGS_DEBUG)
+CPPFLAGS := $(CPPFLAGS) $(CPPFLAGS_DEBUG)
+CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_DEBUG)
+LDFLAGS := $(LDFLAGS) $(LDFLAGS_DEBUG)
+ASFLAGS := $(ASFLAGS) $(ASFLAGS_DEBUG)
 else
 CFLAGS := $(CFLAGS) $(CFLAGS_RELEASE) 
+CPPFLAGS := $(CPPFLAGS) $(CPPFLAGS_RELEASE) 
+CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_RELEASE) 
+LDFLAGS := $(LDFLAGS) $(LDFLAGS_RELEASE) 
+ASFLAGS := $(ASFLAGS) $(ASFLAGS_RELEASE) 
 endif
 
 # append source files
@@ -38,7 +57,9 @@ $(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
 
 # cflags & ldflags
 define MAKE_DEFINE_FLAGS
-$(1)_CFLAGS := $(CFLAGS) $(addprefix $(CFLAGS-I), $(INC_DIR)) $(addprefix $(CFLAGS-I), $($(1)_INC_DIR)) $($(1)_CFLAGS)
+$(1)_CFLAGS := $(CFLAGS) $($(1)_CFLAGS)
+$(1)_CXXFLAGS := $(CXXFLAGS) $($(1)_CXXFLAGS)
+$(1)_CPPFLAGS := $(CPPFLAGS) $(addprefix $(CPPFLAGS-I), $(INC_DIR)) $(addprefix $(CPPFLAGS-I), $($(1)_INC_DIR)) $($(1)_CPPFLAGS)
 $(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_LDFLAGS)
 $(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS)
 $(1)_ARFLAGS := $(ARFLAGS)
@@ -59,23 +80,27 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_OBJS_SRCS,$(name))))
 # #
 
 define MAKE_OBJ_C
-$(2)$(OBJ_SUFFIX) : $(2).c
-	$(CC) $(1) $(CFLAGS-o) $(2)$(OBJ_SUFFIX) $(2).c
+$(1)$(OBJ_SUFFIX) : $(1).c
+	@echo $(CCACHE) $(DISTCC) compile $(1).c
+	@$(CC) $(2) $(3) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).c 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_CPP
-$(2)$(OBJ_SUFFIX) : $(2).cpp
-	$(CC) $(1) $(CFLAGS-o) $(2)$(OBJ_SUFFIX) $(2).cpp
+$(1)$(OBJ_SUFFIX) : $(1).cpp
+	@echo $(CCACHE) $(DISTCC) compile $(1).cpp
+	@$(CC) $(2) $(3) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cpp 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_CC
-$(2)$(OBJ_SUFFIX) : $(2)$(ASM_SUFFIX)
-	$(CC) $(1) $(CFLAGS-o) $(2)$(OBJ_SUFFIX) $(2)$(ASM_SUFFIX)
+$(1)$(OBJ_SUFFIX) : $(1)$(ASM_SUFFIX)
+	@echo $(CCACHE) $(DISTCC) compile $(1)$(ASM_SUFFIX)
+	@$(CC) $(2) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_AS
-$(2)$(OBJ_SUFFIX) : $(2)$(ASM_SUFFIX)
-	$(AS) $(1) $(ASFLAGS-o) $(2)$(OBJ_SUFFIX) $(2)$(ASM_SUFFIX)
+$(1)$(OBJ_SUFFIX) : $(1)$(ASM_SUFFIX)
+	@echo compile $(1)$(ASM_SUFFIX)
+	@$(AS) $(2) $(ASFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_ALL
@@ -87,38 +112,43 @@ $(1)_$(2)_all: $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
 	$($(1)_SUFFIX_CMD5)
 
 $($(2)_PREFIX)$(1)$($(2)_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
-$(foreach file, $($(1)_C_FILES), $(eval $(call MAKE_OBJ_C,$($(1)_CFLAGS),$(file))))
-$(foreach file, $($(1)_CPP_FILES), $(eval $(call MAKE_OBJ_CPP,$($(1)_CFLAGS),$(file))))
+$(foreach file, $($(1)_C_FILES), $(eval $(call MAKE_OBJ_C,$(file),$($(1)_CPPFLAGS),$($(1)_CFLAGS))))
+$(foreach file, $($(1)_CPP_FILES), $(eval $(call MAKE_OBJ_CPP,$(file),$($(1)_CPPFLAGS),$($(1)_CXXFLAGS))))
 
 $(if $(AS)
-,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_AS,$($(1)_ASFLAGS),$(file))))
-,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_CC,$($(1)_CFLAGS),$(file))))
+,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_AS,$(file),$($(1)_ASFLAGS))))
+,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_CC,$(file),$($(1)_CPPFLAGS))))
 )
 
 
 $(BIN_PREFIX)$(1)$(BIN_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
-	-$(RM) $$@
-	$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_LDFLAGS)
+	@echo link $$@
+	-@$(RM) $$@
+	@$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_LDFLAGS) 2>>/tmp/$(PRO_NAME).out
 
 $(LIB_PREFIX)$(1)$(LIB_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
-	-$(RM) $$@
-	$(AR) $($(1)_ARFLAGS) $$@ $$^
-	$(if $(RANLIB),$(RANLIB) $$@,)
+	@echo link $$@
+	-@$(RM) $$@
+	@$(AR) $($(1)_ARFLAGS) $$@ $$^ 2>>/tmp/$(PRO_NAME).out
+	$(if $(RANLIB),@$(RANLIB) $$@,)
 
 $(DLL_PREFIX)$(1)$(DLL_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
-	-$(RM) $$@
-	$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_SHFLAGS)
+	@echo link $$@
+	-@$(RM) $$@
+	@$(LD) $(LDFLAGS-o) $$@ $$^ $($(1)_SHFLAGS) 2>>/tmp/$(PRO_NAME).out
 endef
 
 
 define MAKE_ALL_SUB_PROS
 SUB_PROS_$(1)_all:
-	$(MAKE) -C $(1)
+	@echo make $(1)
+	@$(MAKE) --no-print-directory -C $(1) 
 endef
 
 define MAKE_ALL_DEP_PROS
 DEP_PROS_$(1)_all:
-	$(MAKE) -C $(1)
+	@echo make $(1)
+	@$(MAKE) --no-print-directory -C $(1)
 endef
 
 all: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_all) $(foreach name, $(NAMES), $(if $($(name)_FILES), $(name)_$($(name)_TYPE)_all, )) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_all)
@@ -131,23 +161,25 @@ $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_ALL_SUB_PROS,$(pro))))
 # #
 define MAKE_CLEAN
 $(1)_$(2)_clean:
-	-$(RM) $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
-	-$(RM) $($(1)_OBJS)
+	-@$(RM) $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
+	-@$(RM) $($(1)_OBJS)
 endef
 
 define MAKE_CLEAN_FILE
 $(1)_clean:
-	-$(RM) $(1)
+	-@$(RM) $(1)
 endef
 
 define MAKE_CLEAN_SUB_PROS
 SUB_PROS_$(1)_clean:
-	$(MAKE) -C $(1) clean
+	@echo clean $(1)
+	@$(MAKE) --no-print-directory -C $(1) clean
 endef
 
 define MAKE_CLEAN_DEP_PROS
 DEP_PROS_$(1)_clean:
-	$(MAKE) -C $(1) clean
+	@echo clean $(1)
+	@$(MAKE) --no-print-directory -C $(1) clean
 endef
 
 # generate full path
@@ -232,12 +264,14 @@ endef
 
 define MAKE_INSTALL_SUB_PROS
 SUB_PROS_$(1)_install:
-	$(MAKE) -C $(1) install
+	@echo install $(1)
+	@$(MAKE) --no-print-directory -C $(1) install
 endef
 
 define MAKE_INSTALL_DEP_PROS
 DEP_PROS_$(1)_install:
-	$(MAKE) -C $(1) install
+	@echo install $(1)
+	@$(MAKE) --no-print-directory -C $(1) install
 endef
 
 install: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_install) $(foreach file, $(INSTALL_FILES), $(file)_install) $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_install)
@@ -260,16 +294,18 @@ $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_INSTALL_SUB_PROS,$(pro))))
 
 define MAKE_UPDATE_SUB_PROS
 SUB_PROS_$(1)_update:
-	$(MAKE) -C $(1) update
+	@echo update $(1)
+	@$(MAKE) --no-print-directory -C $(1) update
 endef
 
 define MAKE_UPDATE_DEP_PROS
 DEP_PROS_$(1)_update:
-	$(MAKE) -C $(1) update
+	@echo update $(1)
+	@$(MAKE) --no-print-directory -C $(1) update
 endef
 
 update: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_update) .null $(foreach pro, $(SUB_PROS), SUB_PROS_$(pro)_update)
-	-$(RM) *.b *.a *.so
+	-@$(RM) *.b *.a *.so
 
 $(foreach pro, $(DEP_PROS), $(eval $(call MAKE_UPDATE_DEP_PROS,$(pro))))
 $(foreach pro, $(SUB_PROS), $(eval $(call MAKE_UPDATE_SUB_PROS,$(pro))))

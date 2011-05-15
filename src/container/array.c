@@ -33,7 +33,6 @@
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-
 tb_array_t* tb_array_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 {
 	tb_array_t* array = (tb_array_t*)tb_malloc(sizeof(tb_array_t));
