@@ -31,20 +31,38 @@ MKDIR 			= mkdir -p
 MAKE 			= make
 PWD 			= pwd
 
-# cflags
-CFLAGS_RELEASE 	= -O2 -fomit-frame-pointer
-CFLAGS_DEBUG 	= -g
-CFLAGS 			= -c -Wall -std=c99
-CFLAGS-I 		= -I
-CFLAGS-o 		= -o
+# cppflags: c/c++ files
+CPPFLAGS_RELEASE 	= \
+	-O2 -DNDEBUG \
+	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
+	-march=native -pipe # gcc >= 4.2.3
+
+CPPFLAGS_DEBUG 	= -g
+CPPFLAGS 		= -c -Wall
+CPPFLAGS-I 		= -I
+CPPFLAGS-o 		= -o
+
+# cflags: c files
+CFLAGS_RELEASE 	= 
+CFLAGS_DEBUG 	= 
+CFLAGS 			= -std=c99
+
+# cxxflags: c++ files
+CXXFLAGS_RELEASE = -fno-rtti
+CXXFLAGS_DEBUG 	= 
+CXXFLAGS 		= 
 
 # ldflags
-LDFLAGS 		= -Bstatic
+LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
+LDFLAGS_DEBUG 	= 
+LDFLAGS 		= 
 LDFLAGS-L 		= -L
 LDFLAGS-l 		= -l
 LDFLAGS-o 		= -o
 
 # asflags
+ASFLAGS_RELEASE = Wa,-march=native
+ASFLAGS_DEBUG 	= 
 ASFLAGS 		= -c
 ASFLAGS-I 		= -I
 ASFLAGS-o 		= -o

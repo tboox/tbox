@@ -60,8 +60,9 @@ int main(int argc, char** argv)
 
 	if (src)
 	{
-		tplat_printf("conv(%d): %s\n", src_n, src);
+		tplat_printf("conv: %d\n", src_n);
 		tplat_char_t dst[4096];
+		//tplat_char_t* dst = malloc(1024 * 1024);
 
 #if 1
 		//dst_n = tb_encoding_convert_string(TB_ENCODING_UTF8, TB_ENCODING_GB2312, src, src_n, dst, 4096);
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
 
 		if (dst_n > 0)
 		{
-			tplat_printf("result(%d): %s\n", dst_n, dst);
+			tplat_printf("result: %d\n", dst_n);
 			save(argv[2], dst, dst_n);
 			tplat_printf("save: %s\n", argv[2]);
 		}

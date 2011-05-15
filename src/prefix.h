@@ -45,8 +45,8 @@ extern "C" {
 // debug
 #ifdef TB_DEBUG
 #	define TB_DBG(format, arg...)					do { tplat_printf("[tb]:" format "\n" , ## arg); } while (0)
-#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __LINE__, #expr, __FILE__); } } while(0)
-#	define TB_MSG_ASSERT(expr, format, arg...)		do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s msg: " format " file: %s\n", __LINE__, #expr, ## arg, __FILE__); }} while(0)
+#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __tplat_line__, #expr, __tplat_file__); } } while(0)
+#	define TB_MSG_ASSERT(expr, format, arg...)		do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s msg: " format " file: %s\n", __tplat_line__, #expr, ## arg, __tplat_file__); }} while(0)
 #else
 #	define TB_DBG(format, arg...)
 #	define TB_ASSERT(expr)
@@ -58,7 +58,7 @@ extern "C" {
 // debug
 #ifdef TB_DEBUG
 #	define TB_DBG
-#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __LINE__, #expr, __FILE__); } } while(0)
+#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __tplat_line__, #expr, __tplat_file__); } } while(0)
 #	define TB_MSG_ASSERT
 #else
 #	define TB_DBG
@@ -69,6 +69,23 @@ extern "C" {
 
 // the size of the static array
 #define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
+
+// check
+#define TB_IF_FAIL_RETURN(x) 						do { if (!(x)) return ; } while (0)
+#define TB_IF_FAIL_RETURN_VAL(x, v) 				do { if (!(x)) return (v); } while (0)
+#define TB_IF_FAIL_GOTO(x, b) 						do { if (!(x)) goto b; } while (0)
+
+#define TB_IF_REACHED_RETURN(x) 					do { return ; } while (0)
+#define TB_IF_REACHED_RETURN_VAL(x, v) 				do { return (v); } while (0)
+#define TB_IF_REACHED_GOTO(x, b) 					do { goto b; } while (0)
+
+#define TB_ASSERT_RETURN(x) 						do { TB_ASSERT(x); if (!(x)) return ; } while (0)
+#define TB_ASSERT_RETURN_VAL(x, v) 					do { TB_ASSERT(x); if (!(x)) return (v); } while (0)
+#define TB_ASSERT_GOTO(x, b) 						do { TB_ASSERT(x); if (!(x)) goto b; } while (0)
+
+// not implement
+#define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: %s at %d file: %s", __tplat_func__, __tplat_line__, __tplat_file__); } while (0)
+
 
 // c plus plus
 #ifdef __cplusplus
