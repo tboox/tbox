@@ -38,7 +38,7 @@ extern "C" {
  * macros
  */
 
-#ifdef TB_MEMORY_MODE_SMALL
+#ifdef TPLAT_MEMORY_MODE_SMALL
 # 	define TB_XML_READER_ATTRIBUTES_MAX 		(256)
 #else
 # 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)
@@ -74,7 +74,7 @@ typedef enum __tb_xml_reader_event_t
 typedef struct __tb_xml_reader_t
 {
 	// the reference to stream
-	tb_gstream_t* 			st;
+	tb_gstream_t* 			gst;
 
 	// the event
 	tb_size_t 				event;
@@ -109,7 +109,7 @@ typedef struct __tb_xml_reader_t
  */
 
 // open & close
-tb_xml_reader_t* 		tb_xml_reader_open(tb_gstream_t* st);
+tb_xml_reader_t* 		tb_xml_reader_open(tb_gstream_t* gst);
 void 					tb_xml_reader_close(tb_xml_reader_t* reader);
 
 // iterator

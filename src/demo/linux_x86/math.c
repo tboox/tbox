@@ -1,5 +1,4 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
 #include <math.h>
 #include <stdlib.h>
 

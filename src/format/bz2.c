@@ -27,22 +27,12 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * types
- */
-
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_size_t tb_format_bz2_probe(tb_gstream_t* st)
+tb_size_t tb_format_bz2_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(st, 3);
+	tb_byte_t const* p = tb_gstream_need(gst, 3);
 	if ( 	p 
 		&& 	p[0] == 'B'
 		&& 	p[1] == 'Z'

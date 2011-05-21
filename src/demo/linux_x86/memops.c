@@ -1,6 +1,5 @@
 #include "stdio.h"
-#include "../../tbox.h"
-#include "tplat/tplat.h"
+#include "tbox.h"
 
 static tb_bool_t check_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
@@ -47,8 +46,7 @@ int main(int argc, char** argv)
 	volatile tb_size_t i = 0;
 	volatile tplat_int64_t dt = 0;
 
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(20 * 1024 * 1024), 20 * 1024 * 1024, regular_block_n);
+	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 	
 	volatile tb_size_t 	size = 15 * 1024 * 1024;
 	volatile tb_byte_t* data = tb_malloc(size);

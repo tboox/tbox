@@ -1,46 +1,79 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
+#include "stdio.h"
 
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(50 * 1024 * 1024), 50 * 1024 * 1024, regular_block_n);
+	// init tplat
+	if (TPLAT_FALSE == tplat_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-	if (argc < 3) return 0;
+	// create stream
+	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* ost = tb_gstream_create_from_url(argv[2]);
+	//tb_gstream_t* est = tb_gstream_create_from_encoding(ist, TB_ENCODING_UTF8, TB_ENCODING_GB2312);
+	tb_gstream_t* est = tb_gstream_create_from_encoding(ist, TB_ENCODING_GB2312, TB_ENCODING_UTF8);
+	if (!ist || !ost || !est) goto end;
+
+	// init option
+	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+
+	// open stream
+	if (TB_FALSE == tb_gstream_open(ist)) goto end;
+	if (TB_FALSE == tb_gstream_open(ost)) goto end;
+	if (TB_FALSE == tb_gstream_open(est)) goto end;
 	
-	// input & output stream
-	tb_ustream_t 	istream;
-	tb_ustream_t 	ostream;;
-	tb_gstream_t* 	ist = tb_gstream_open(&istream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_RO);
-	tb_gstream_t* 	ost = tb_gstream_open(&ostream, argv[2], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
+	// read data
+	tb_byte_t 		data[4096];
+	tb_size_t 		read = 0;
+	tb_size_t 		base = (tb_size_t)tplat_clock();
+	tb_size_t 		time = (tb_size_t)tplat_clock();
+	do
+	{
+		tb_int_t ret = tb_gstream_read(est, data, 4096);
+		//TB_DBG("ret: %d", ret);
+		if (ret > 0)
+		{
+			read += ret;
+			time = (tb_size_t)tplat_clock();
 
-	// the src & dst data
-	tb_size_t 		src_n = 20 * 1024 * 1024;
-	tb_size_t 		dst_n = 20 * 1024 * 1024;
-	tb_byte_t* 		src = tb_malloc(src_n);
-	tb_byte_t* 		dst = tb_malloc(dst_n);
+#if 1
+			tb_int_t write = 0;
+			while (write < ret)
+			{
+				tb_int_t ret2 = tb_gstream_write(ost, data + write, ret - write);
+				if (ret2 > 0) write += ret2;
+				else if (ret2 < 0) break;
+			}
+#endif
 
-	// the tansform stream
-	tb_estream_t 	est;
-	tb_tstream_t* 	tst = tb_estream_open(&est, TB_ENCODING_UTF8, TB_ENCODING_GB2312);
-	tb_bstream_attach(tb_tstream_src(tst), src, src_n);
-	tb_bstream_attach(tb_tstream_dst(tst), dst, dst_n);
+		}
+		else if (!ret) 
+		{
+			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			if (timeout > 5000) break;
+		}
+		else break;
 
-	// load stream
-	tb_bstream_attach(tb_tstream_src(tst), src, tb_bstream_load(tb_tstream_src(tst), ist));
+		// update info
+		if (time > base && ((time - base) % 1000)) 
+		{
+			tplat_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
+			fflush(stdout);
+		}
 
-	// transform stream
-	tb_tstream_transform(tst);
+	} while(1);
 
-	// save stream
-	tb_bstream_attach(tb_tstream_dst(tst), dst, tb_bstream_pos(tb_tstream_dst(tst)) - dst);
-	tb_bstream_save(tb_tstream_dst(tst), ost);
+end:
 
-	// close
-	tb_tstream_close(tst);
-	tb_gstream_close(ist);
-	tb_gstream_close(ost);
+	// destroy stream
+	tb_gstream_destroy(est);
+	tb_gstream_destroy(ist);
+	tb_gstream_destroy(ost);
 
+	tplat_printf("end\n");
+	getchar();
+
+	// exit tplat
+	tplat_exit();
 	return 0;
 }
 

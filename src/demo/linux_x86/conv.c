@@ -1,5 +1,4 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
 
 #define CONV_TEST_IS 			(0)
 
@@ -85,8 +84,7 @@ static void tb_conv_test_stof(tb_char_t const* s, tb_float_t val)
 }
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
+	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
 	//tb_conv_make_isspace_table();
 	//tb_conv_make_isalpha_table();

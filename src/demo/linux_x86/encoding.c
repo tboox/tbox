@@ -1,5 +1,4 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
 
 static tplat_char_t* load(tplat_char_t const* path, tplat_size_t* size)
 {
@@ -50,8 +49,7 @@ static void save(tplat_char_t const* path, tplat_byte_t const* data, tplat_size_
 
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
+	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 	
 	tplat_size_t src_n, dst_n;
 
@@ -60,9 +58,8 @@ int main(int argc, char** argv)
 
 	if (src)
 	{
-		tplat_printf("conv: %d\n", src_n);
+		tplat_printf("conv(%d): %s\n", src_n, src);
 		tplat_char_t dst[4096];
-		//tplat_char_t* dst = malloc(1024 * 1024);
 
 #if 1
 		//dst_n = tb_encoding_convert_string(TB_ENCODING_UTF8, TB_ENCODING_GB2312, src, src_n, dst, 4096);
@@ -80,11 +77,10 @@ int main(int argc, char** argv)
 
 		if (dst_n > 0)
 		{
-			tplat_printf("result: %d\n", dst_n);
+			tplat_printf("result(%d): %s\n", dst_n, dst);
 			save(argv[2], dst, dst_n);
 			tplat_printf("save: %s\n", argv[2]);
 		}
-		tplat_free(TB_CONFIG_MEMORY_POOL_INDEX, src);
 	}
 }
 

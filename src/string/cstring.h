@@ -143,5 +143,14 @@ static __tplat_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t con
 #endif
 }
 
+tb_char_t* 	tb_cstring_duplicate(tb_char_t const* s);
+tb_char_t* 	tb_cstring_nduplicate(tb_char_t const* s, tb_size_t n);
+
+tb_int_t 	tb_cstring_find(tb_char_t const* s1, tb_char_t const* s2);
+tb_int_t 	tb_cstring_find_nocase(tb_char_t const* s1, tb_char_t const* s2);
+
+tb_int_t 	tb_cstring_find_char(tb_char_t const* s, tb_char_t c);
+tb_int_t 	tb_cstring_find_char_nocase(tb_char_t const* s, tb_char_t c);
+
 #endif
 

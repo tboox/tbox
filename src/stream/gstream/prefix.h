@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_GSTREAM_GSTREAM_PREFIX_H
-#define TB_GSTREAM_GSTREAM_PREFIX_H
+#ifndef TB_STREAM_GSTREAM_PREFIX_H
+#define TB_STREAM_GSTREAM_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus

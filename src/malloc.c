@@ -36,26 +36,26 @@
 void* tb_malloc(tb_size_t size)
 {
 #if 1
-	return tplat_malloc(TB_MEMORY_POOL_INDEX, size);
+	return tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size);
 #else
-	void* p = tplat_malloc(TB_MEMORY_POOL_INDEX, size);
+	void* p = tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size);
 	if (p) memset(p, 0, size);
 	return p;
 #endif
 }
 void* tb_realloc(void* data, tb_size_t size)
 {
-	if (data) return tplat_realloc(TB_MEMORY_POOL_INDEX, data, size);
+	if (data) return tplat_realloc(TPLAT_POOL_PUBLIC_INDEX, data, size);
 	return TB_NULL;
 }
 void* tb_calloc(tb_size_t item, tb_size_t size)
 {
-	void* p = tplat_malloc(TB_MEMORY_POOL_INDEX, item * size);
+	void* p = tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, item * size);
 	if (p) memset(p, 0, item * size);
 	return p;
 }
 void tb_free(void* data)
 {
-	if (data) tplat_free(TB_MEMORY_POOL_INDEX, data);
+	if (data) tplat_free(TPLAT_POOL_PUBLIC_INDEX, data);
 }
 #endif

@@ -33,7 +33,8 @@ extern "C" {
  */
 #include "prefix.h"
 #include "pool.h"
-#include "array.h"
+#include "slist.h"
+#include "vector.h"
 
 // c plus plus
 #ifdef __cplusplus

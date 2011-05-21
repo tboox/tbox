@@ -107,7 +107,7 @@ typedef struct __tb_format_t
 	tb_char_t const* 	name;
 
 	// the probeor
-	tb_size_t 			(*probe)(tb_gstream_t* st);
+	tb_size_t 			(*probe)(tb_gstream_t* gst);
 	
 }tb_format_t;
 
@@ -116,36 +116,36 @@ typedef struct __tb_format_t
  */
 
 // probe format
-tb_format_t const* 	tb_format_probe(tb_gstream_t* st, tb_size_t flag);
+tb_format_t const* 	tb_format_probe(tb_gstream_t* gst, tb_size_t flag);
 
 // video
-tb_size_t 			tb_format_flv_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_avi_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_flv_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_avi_probe(tb_gstream_t* gst);
 
 // audio
-tb_size_t 			tb_format_wav_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_mp3_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_wav_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_mp3_probe(tb_gstream_t* gst);
 
 // image
-tb_size_t 			tb_format_bmp_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_gif_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_jpg_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_png_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_bmp_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_gif_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_jpg_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_png_probe(tb_gstream_t* gst);
 
 // flash
-tb_size_t 			tb_format_swf_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_swf_probe(tb_gstream_t* gst);
 
 // text
-tb_size_t 			tb_format_xml_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_htm_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_pdf_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_txt_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_xml_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_htm_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_pdf_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_txt_probe(tb_gstream_t* gst);
 
 // store
-tb_size_t 			tb_format_zip_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_bz2_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_gz_probe(tb_gstream_t* st);
-tb_size_t 			tb_format_7z_probe(tb_gstream_t* st);
+tb_size_t 			tb_format_zip_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_bz2_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_gz_probe(tb_gstream_t* gst);
+tb_size_t 			tb_format_7z_probe(tb_gstream_t* gst);
 
 // c plus plus
 #ifdef __cplusplus

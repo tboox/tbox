@@ -60,10 +60,9 @@ static tb_format_t g_formats[] =
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_format_t const* tb_format_probe(tb_gstream_t* st, tb_size_t flag)
+tb_format_t const* tb_format_probe(tb_gstream_t* gst, tb_size_t flag)
 {
-	TB_ASSERT(st);
-	if (!st) return TB_NULL;
+	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
 
 	tb_size_t score_max = 0;
 	tb_size_t score_total = 0;
@@ -79,7 +78,7 @@ tb_format_t const* tb_format_probe(tb_gstream_t* st, tb_size_t flag)
 		{
 			// probe score
 			tb_size_t score = 0;
-			if (g_formats[i].probe) score = g_formats[i].probe(st);
+			if (g_formats[i].probe) score = g_formats[i].probe(gst);
 
 			// compute the total score
 			score_total += score;

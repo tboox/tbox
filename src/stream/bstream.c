@@ -48,6 +48,7 @@ tb_bstream_t* tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t si
 /* /////////////////////////////////////////////////////////
  * load & save 
  */
+#if 0
 tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 {
 	TB_ASSERT(bst && gst);
@@ -57,7 +58,7 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[TB_GSTREAM_DATA_MAX];
+	tb_byte_t 		data[4096];
 	tb_size_t 		load = 0;
 	tb_size_t 		base = (tb_size_t)tplat_clock();
 	tb_size_t 		time = (tb_size_t)tplat_clock();
@@ -65,7 +66,7 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 
 	while(1)
 	{
-		tb_int_t ret = tb_gstream_read(gst, data, TB_GSTREAM_DATA_MAX);
+		tb_int_t ret = tb_gstream_read(gst, data, 4096);
 		//TB_DBG("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
@@ -97,14 +98,14 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[TB_GSTREAM_DATA_MAX];
+	tb_byte_t 		data[4096];
 	tb_size_t 		save = 0;
 	tb_size_t 		base = (tb_size_t)tplat_clock();
 	tb_size_t 		time = (tb_size_t)tplat_clock();
 	while(1)
 	{
 		// get data
-		tb_int_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_DATA_MAX);
+		tb_int_t size = tb_bstream_get_data(bst, data, 4096);
 		//TB_DBG("ret: %d", ret);
 
 		// is end?
@@ -138,6 +139,7 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 
 	return save;
 }
+#endif
 /* /////////////////////////////////////////////////////////
  * modifiors
  */

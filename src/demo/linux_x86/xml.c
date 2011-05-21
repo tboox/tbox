@@ -1,46 +1,43 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
 
-#define XML_READER 
+//#define XML_READER 
 //#define XML_READER_SELECT
-//#define XML_WRITER
+#define XML_WRITER
 //#define XML_DOM
 //#define XML_DOM_WRITER
 //#define XML_DOM_SELECT
 
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
-	
+	// init tplat
+	if (TPLAT_FALSE == tplat_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+		
 #if defined(XML_READER)
 
 	// create stream
-	tb_ustream_t gst;
-	tb_gstream_t* st = tb_gstream_open(&gst, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
-	if (!st)
+	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 
 	// dump xml
-	TB_XML_READER_DUMP(tb_xml_reader_open(st));
-	tb_gstream_close(st);
+	TB_XML_READER_DUMP(tb_xml_reader_open(gst));
+	tb_gstream_close(gst);
 
 #elif defined(XML_READER_SELECT)
 
 	// create stream
-	tb_ustream_t gst;
-	tb_gstream_t* st = tb_gstream_open(&gst, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
-	if (!st)
+	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 
 	// open reader
-	tb_xml_reader_t* reader = tb_xml_reader_open(st);
+	tb_xml_reader_t* reader = tb_xml_reader_open(gst);
 	if (!reader)
 	{
 		TB_DBG("failed to open reader: %s", argv[1]);
@@ -58,18 +55,18 @@ int main(int argc, char** argv)
 
 	// close
 	tb_xml_reader_close(reader);
-	tb_gstream_close(st);
+	tb_gstream_close(gst);
 
 #elif defined(XML_WRITER)
-	tb_ustream_t gst;
-	tb_gstream_t* st = tb_gstream_open(&gst, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
-	if (!st)
+	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 	
-	tb_xml_writer_t* writer = tb_xml_writer_open(st);
+	tb_xml_writer_t* writer = tb_xml_writer_open(gst);
 	if (writer)
 	{
 		tb_xml_writer_document_beg(writer, "1.0", "utf-8");
@@ -112,7 +109,7 @@ int main(int argc, char** argv)
 	}
 
 	// free it
-	tb_gstream_close(st);
+	tb_gstream_close(gst);
 
 #elif defined(XML_DOM)
 	// create document
@@ -120,18 +117,17 @@ int main(int argc, char** argv)
 	if (!document) return 0;
 
 	// open input stream
-	tb_ustream_t istream;
-	tb_gstream_t* ist = tb_gstream_open(&istream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
-	if (!ist)
+	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
+	if (!ist || !tb_gstream_open(ist))
 	{
 		TB_DBG("failed to open input xml: %s", argv[1]);
 		return 0;
 	}
 
 	// open output stream
-	tb_ustream_t ostream;
-	tb_gstream_t* ost = tb_gstream_open(&ostream, argv[2], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
-	if (!ist)
+	tb_gstream_t* ost = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	if (!ost || !tb_gstream_open(ost))
 	{
 		TB_DBG("failed to open output xml: %s", argv[2]);
 		return 0;
@@ -157,13 +153,14 @@ int main(int argc, char** argv)
 	//TPLAT_POOL_DUMP(TB_CONFIG_MEMORY_POOL_INDEX);
 
 #elif defined(XML_DOM_WRITER)
-	tb_ustream_t gst;
-	tb_gstream_t* st = tb_gstream_open(&gst, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_WO | TB_GSTREAM_FLAG_TRUNC);
-	if (!st)
+	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);
 		return 0;
 	}
+
 
 	// create document
 	tb_xml_document_t* document = tb_xml_document_create();
@@ -203,23 +200,22 @@ int main(int argc, char** argv)
 	tb_xml_node_add_text(labels, "\n");
 
 	// store xml
-	if (TB_FALSE == tb_xml_document_store(document, st))
+	if (TB_FALSE == tb_xml_document_store(document, gst))
 	{
 		TB_DBG("failed to store xml: %s", argv[1]);
 		return 0;
 	}
 
 	tb_xml_document_destroy(document);
-	tb_gstream_close(st);
+	tb_gstream_close(gst);
 #elif defined(XML_DOM_SELECT)
 	// create document
 	tb_xml_document_t* 	document = tb_xml_document_create();
 	if (!document) return 0;
 
 	// open input stream
-	tb_ustream_t istream;
-	tb_gstream_t* ist = tb_gstream_open(&istream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
-	if (!ist)
+	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
+	if (!ist || !tb_gstream_open(ist))
 	{
 		TB_DBG("failed to open input xml: %s", argv[1]);
 		return 0;

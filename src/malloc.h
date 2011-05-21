@@ -39,10 +39,10 @@ extern "C" {
 
 #if 1
 
-# 	define tb_malloc(size) 					tplat_malloc(TB_MEMORY_POOL_INDEX, size)
-# 	define tb_calloc(item, size) 			tplat_calloc(TB_MEMORY_POOL_INDEX, item, size)
-# 	define tb_realloc(data, size) 			tplat_realloc(TB_MEMORY_POOL_INDEX, data, size)
-# 	define tb_free(data) 					tplat_free(TB_MEMORY_POOL_INDEX, data)
+# 	define tb_malloc(size) 					tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size)
+# 	define tb_calloc(item, size) 			tplat_calloc(TPLAT_POOL_PUBLIC_INDEX, item, size)
+# 	define tb_realloc(data, size) 			tplat_realloc(TPLAT_POOL_PUBLIC_INDEX, data, size)
+# 	define tb_free(data) 					tplat_free(TPLAT_POOL_PUBLIC_INDEX, data)
 
 #else
 
