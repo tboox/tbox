@@ -42,15 +42,6 @@ extern "C" {
 # 	define TB_DEBUG
 #endif
 
-// memory
-#ifdef TB_CONFIG_MEMORY_SMALL
-# 	define TB_MEMORY_MODE_SMALL
-#endif
-
-// pool
-#define TB_MEMORY_POOL_INDEX 		(TB_CONFIG_MEMORY_POOL_INDEX)
-
-
 // c plus plus
 #ifdef __cplusplus
 }

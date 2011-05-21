@@ -24,62 +24,38 @@
  * includes
  */
 #include "pool.h"
+#include "../memops.h"
 #include "../math/math.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
+
+#define TB_POOL_MAX_SIZE 				(1 << 30)
+
+#define TB_POOL_INFO_SET(info, idx) 	do {(info)[(idx) >> 3] |= (0x1 << ((idx) & 7));} while (0)
+#define TB_POOL_INFO_RESET(info, idx) 	do {(info)[(idx) >> 3] &= ~(0x1 << ((idx) & 7));} while (0)
+#define TB_POOL_INFO_ISSET(info, idx) 	((info)[(idx) >> 3] & (0x1 << ((idx) & 7)))
+
 /* /////////////////////////////////////////////////////////
- * details
- */
-#if 0
-static __tplat_inline__ void tb_pool_info_set(tb_byte_t* info, tb_int_t idx)
-{
-	TB_ASSERT(info && idx < TB_POOL_MAX_SIZE);
-	info[idx >> 3] |= (0x1 << (idx & 7));
-}
-static __tplat_inline__ void tb_pool_info_reset(tb_byte_t* info, tb_int_t idx)
-{
-	TB_ASSERT(info && idx < TB_POOL_MAX_SIZE);
-	info[idx >> 3] &= ~(0x1 << (idx & 7));
-}
-static __tplat_inline__ tb_int_t tb_pool_info_isset(tb_byte_t* info, tb_int_t idx)
-{
-	TB_ASSERT(info && idx < TB_POOL_MAX_SIZE);
-	return (info[idx >> 3] & (0x1 << (idx & 7)));
-}
-#else
-# 	define tb_pool_info_set(info, idx) 		do {(info)[(idx) >> 3] |= (0x1 << ((idx) & 7));} while (0)
-# 	define tb_pool_info_reset(info, idx) 	do {(info)[(idx) >> 3] &= ~(0x1 << ((idx) & 7));} while (0)
-# 	define tb_pool_info_isset(info, idx) 	((info)[(idx) >> 3] & (0x1 << ((idx) & 7)))
-#endif
-/* /////////////////////////////////////////////////////////
- * internal implemention
+ * implemention
  */
 
-#if 1
 tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 {
-	tb_pool_t* pool = (tb_pool_t*)tb_malloc(sizeof(tb_pool_t));
-	if (!pool) return TB_NULL;
-	memset(pool, 0, sizeof(tb_pool_t));
+	tb_pool_t* pool = (tb_pool_t*)tb_calloc(1, sizeof(tb_pool_t));
+	TB_ASSERT_RETURN_VAL(pool, TB_NULL);
 
-	// align by 8-byte for info
-	TB_ASSERT(!(grow & 7));
-	TB_ASSERT(!(size & 7));
-
-	pool->step = step;
-	pool->grow = grow;
+	pool->step = TB_MATH_ALIGN(step, 4);
+	pool->grow = TB_MATH_ALIGN(grow, 8); // align by 8-byte for info
 	pool->size = 0;
-	pool->maxn = size;
+	pool->maxn = TB_MATH_ALIGN(size, 8); // align by 8-byte for info
 
-	pool->data = tb_malloc(pool->maxn * pool->step);
-	if (!pool->data) goto fail;
-	memset(pool->data, 0, pool->maxn * pool->step);
+	pool->data = tb_calloc(pool->maxn, pool->step);
+	TB_ASSERT_GOTO(pool->data, fail);
 
-	pool->info = tb_malloc(pool->maxn >> 3);
-	if (!pool->info) goto fail;
-	memset(pool->info, 0, pool->maxn >> 3);
+	pool->info = tb_calloc(1, pool->maxn >> 3);
+	TB_ASSERT_GOTO(pool->info, fail);
 
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
 	tb_size_t m = TB_MATH_MIN(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
@@ -93,41 +69,12 @@ fail:
 	if (pool) tb_pool_destroy(pool);
 	return TB_NULL;
 }
-#else
-tb_pool_t* tb_pool_create_with_trace(tb_size_t step, tb_size_t size, tb_size_t grow, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-{
-	tb_pool_t* pool = (tb_pool_t*)tplat_pool_allocate(TB_MEMORY_POOL_INDEX, sizeof(tb_pool_t), func, line, file);
-	if (!pool) return TB_NULL;
-	memset(pool, 0, sizeof(tb_pool_t));
-
-	// align by 8-byte for info
-	TB_ASSERT(!(grow & 7));
-	TB_ASSERT(!(size & 7));
-
-	pool->step = step;
-	pool->grow = grow;
-	pool->size = 0;
-	pool->maxn = size;
-
-	pool->data = tplat_pool_allocate(TB_MEMORY_POOL_INDEX, pool->maxn * pool->step, func, line, file);
-	if (!pool->data) goto fail;
-	memset(pool->data, 0, pool->maxn * pool->step);
-
-	pool->info = tplat_pool_allocate(TB_MEMORY_POOL_INDEX, pool->maxn >> 3, func, line, file);
-	if (!pool->info) goto fail;
-	memset(pool->info, 0, pool->maxn >> 3);
-
-	return pool;
-fail:
-	if (pool) tb_pool_destroy(pool);
-	return TB_NULL;
-}
-#endif
 
 void tb_pool_destroy(tb_pool_t* pool)
 {
 	if (pool)
 	{
+#if 0 // discarded
 		// free items
 		if (pool->free)
 		{
@@ -135,10 +82,11 @@ void tb_pool_destroy(tb_pool_t* pool)
 			for (i = 0; i < pool->maxn; i++)
 			{
 				// is free?
-				if (tb_pool_info_isset(pool->info, i))
+				if (TB_POOL_INFO_ISSET(pool->info, i))
 					tb_pool_free(pool, i + 1);
 			}
 		}
+#endif
 
 		// free data
 		if (pool->data) tb_free(pool->data);
@@ -175,7 +123,7 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 		for (i = 0; i < n; ++i)
 		{
 			// is free?
-			if (!tb_pool_info_isset(pool->info, i))
+			if (!TB_POOL_INFO_ISSET(pool->info, i))
 			{
 				// get op index
 				item = 1 + i;
@@ -187,22 +135,19 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	if (!item)
 	{
 		// adjust max size
-		TB_ASSERT(pool->size == pool->maxn);
+		TB_ASSERTA(pool->size == pool->maxn);
 		pool->maxn += pool->grow;
-		TB_ASSERT(pool->maxn <= TB_POOL_MAX_SIZE);
-		if (pool->maxn > TB_POOL_MAX_SIZE) return 0;
+		TB_ASSERT_RETURN_VAL(pool->maxn < TB_POOL_MAX_SIZE, 0);
 
 		// realloc data
 		pool->data = (tb_byte_t*)tb_realloc(pool->data, pool->maxn * pool->step);
-		TB_ASSERT(pool->data);
-		if (!pool->data) return 0;
-		memset(pool->data + pool->size * pool->step, 0, pool->grow * pool->step);
+		TB_ASSERT_RETURN_VAL(pool->data, 0);
+		tb_memset(pool->data + pool->size * pool->step, 0, pool->grow * pool->step);
 
 		// realloc info
 		pool->info = (tb_byte_t*)tb_realloc(pool->info, pool->maxn >> 3);
-		TB_ASSERT(pool->info);
-		if (!pool->info) return 0;
-		memset(pool->info + (pool->size >> 3), 0, pool->grow >> 3);
+		TB_ASSERT_RETURN_VAL(pool->info, 0);
+		tb_memset(pool->info + (pool->size >> 3), 0, pool->grow >> 3);
 
 		// get the index of item
 		item = 1 + pool->size;
@@ -211,15 +156,15 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	if (!item) return 0;
 
 	// set info
-	TB_ASSERT(!tb_pool_info_isset(pool->info, item - 1));
-	tb_pool_info_set(pool->info, item - 1);
+	TB_ASSERTA(!TB_POOL_INFO_ISSET(pool->info, item - 1));
+	TB_POOL_INFO_SET(pool->info, item - 1);
 
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
  	// predict next, pred_n must be null, otherwise exists repeat item
 	if (!pool->pred_n) 
 	{
 		// item + 1 - 1 < maxn
-		if (item < pool->maxn && !tb_pool_info_isset(pool->info, item))
+		if (item < pool->maxn && !TB_POOL_INFO_ISSET(pool->info, item))
 		{
 			pool->pred[0] = item + 1;
 			pool->pred_n = 1;
@@ -238,14 +183,17 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 {
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
-	TB_ASSERT(tb_pool_info_isset(pool->info, item - 1));
+	TB_ASSERT(TB_POOL_INFO_ISSET(pool->info, item - 1));
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 	{
+
+#if 0 // discarded
 		// free item
 		if (pool->free) pool->free(pool->priv, tb_pool_get(pool, item));
+#endif
 
 		// set info
-		tb_pool_info_reset(pool->info, item - 1);
+		TB_POOL_INFO_RESET(pool->info, item - 1);
 
 		// predict next
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
@@ -258,21 +206,23 @@ void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 }
 void tb_pool_clear(tb_pool_t* pool)
 {
+#if 0 // discarded
 	// free private data
 	if (pool->free && pool->data) 
 	{
 		tb_int_t i = 0;
 		for (i = 0; i < pool->maxn; ++i)
 		{
-			if (tb_pool_info_isset(pool->info, i))
+			if (TB_POOL_INFO_ISSET(pool->info, i))
 				pool->free(pool->priv, pool->data + i * pool->step);
 		}
 	}
+#endif
 
 	// clear info
 	pool->size = 0;
-	if (pool->info) memset(pool->info, 0, pool->maxn >> 3);
-	if (pool->data) memset(pool->data, 0, pool->maxn);
+	if (pool->info) tb_memset(pool->info, 0, pool->maxn >> 3);
+	if (pool->data) tb_memset(pool->data, 0, pool->maxn);
 
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
 	tb_size_t m = TB_MATH_MIN(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
@@ -286,7 +236,7 @@ tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 {
 	//TB_DBG("%d %d %d %d", pool->step, pool->size, item, pool->maxn);
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
-	TB_ASSERT(tb_pool_info_isset(pool->info, item - 1));
+	TB_ASSERT(TB_POOL_INFO_ISSET(pool->info, item - 1));
 
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 		return (pool->data + (item - 1) * pool->step);

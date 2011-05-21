@@ -40,35 +40,16 @@ extern "C" {
 #include "varg.h"
 #include "memops.h"
 #include "format.h"
-#include "net/net.h"
+#include "encoding.h"
+#include "format.h"
+#include "xml/xml.h"
+#include "zip/zip.h"
 #include "math/math.h"
-#include "string/string.h"
-#include "container/container.h"
-#include "external/external.h"
-
-#ifdef TB_CONFIG_STREAM
 #include "stream/stream.h"
-#endif
-
-#ifdef TB_CONFIG_ENCODING
-# 	include "encoding.h"
-#endif
-
-#ifdef TB_CONFIG_FORMAT
-# 	include "format.h"
-#endif
-
-#ifdef TB_CONFIG_XML
-# 	include "xml/xml.h"
-#endif
-
-#ifdef TB_CONFIG_REGEX
-# 	include "regex.h"
-#endif
-
-#ifdef TB_CONFIG_ZLIB
-# 	include "zlib.h"
-#endif
+#include "string/string.h"
+#include "network/network.h"
+#include "container/container.h"
+#include "libs/libs.h"
 
 // c plus plus
 #ifdef __cplusplus

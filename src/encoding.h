@@ -48,40 +48,40 @@ typedef enum __tb_encoding_t
 
 }tb_encoding_t;
 
-// the encoding converter type
-typedef struct __tb_encoding_converter_t
+// the encoding encoder type
+typedef struct __tb_encoder_t
 {
 	// the encoding type
-	tb_uint8_t 		encoding;
+	tb_uint8_t 			encoding;
 
 	// the character range of unicode
-	tb_uint32_t 	minchar;
-	tb_uint32_t 	maxchar;
+	tb_uint32_t 		minchar;
+	tb_uint32_t 		maxchar;
 
 	// get unicode from the encoding string
-	tb_uint32_t 	(*get)(tb_byte_t const** pc);
+	tb_size_t 			(*get)(tb_uint32_t* ch, tb_byte_t const** data, tb_size_t size);
 
 	// set unicode to the encoding string
-	void 			(*set)(tb_uint32_t ch, tb_byte_t** pc);
+	tb_size_t 			(*set)(tb_uint32_t ch, tb_byte_t** data, tb_size_t size);
 
 	// from unicode to the encoding character, not support utf-x
-	tb_uint32_t 	(*from)(tb_uint32_t ch);
+	tb_uint32_t 		(*from)(tb_uint32_t ch);
 
 	// from the encoding character to unicode, not support utf-x
-	tb_uint32_t 	(*to)(tb_uint32_t ch);
+	tb_uint32_t 		(*to)(tb_uint32_t ch);
 
-}tb_encoding_converter_t;
+}tb_encoder_t;
 
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-// get the encoding converter
-tb_encoding_converter_t const* 	tb_encoding_get_converter(tb_encoding_t encoding);
+// get the encoder
+tb_encoder_t const* 	tb_encoding_get_encoder(tb_encoding_t encoding);
 
 // convert string
-tb_size_t 						tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
+tb_size_t 				tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
 
 
 // c plus plus

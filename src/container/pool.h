@@ -40,6 +40,7 @@ extern "C" {
 #define tb_pool_get(pool, item) 					((pool)->data + ((item) - 1) * (pool)->step)
 #endif
 
+#if 0 // discarded
 #define TB_POOL_GET(pool, item, type) 				((type*)tb_pool_get((pool), (item)))
 #define TB_POOL_GET_NEXT(pool, item, type) 			(((type*)tb_pool_get((pool), (item)))->next)
 #define TB_POOL_GET_PREV(pool, item, type) 			(((type*)tb_pool_get((pool), (item)))->prev)
@@ -47,19 +48,17 @@ extern "C" {
 #define TB_POOL_SET(pool, item, type, value) 		do { type* __p = (type*)tb_pool_get((pool), (item)); TF_ASSERT(__p); if (__p) *__p = (value); } while(0)
 #define TB_POOL_SET_NEXT(pool, item, type, value) 	(((type*)tb_pool_get((pool), (item)))->next = (value))
 #define TB_POOL_SET_PREV(pool, item, type, value) 	(((type*)tb_pool_get((pool), (item)))->prev = (value))
+#endif
 
-#define TB_POOL_MAX_SIZE 							(1 << 30)
 
 // prediction
 #define TB_MEMORY_POOL_PRED_ENABLE
-#ifdef TB_MEMORY_MODE_SMALL
+
+#ifdef TPLAT_MEMORY_MODE_SMALL
 # 	define TB_MEMORY_POOL_PRED_MAX 					(128)
 #else
 # 	define TB_MEMORY_POOL_PRED_MAX 					(256)
 #endif
-
-// trace pool
-//#define tb_pool_create(step, size, grow) tb_pool_create_with_trace(step, size, grow, __tplat_func__, __tplat_line__, __tplat_file__)
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -75,9 +74,11 @@ typedef struct __tb_pool_t
 	tb_size_t 		maxn;
 	tb_size_t 		step;
 
+#if 0 // discarded
 	// free item
 	void 			(*free)(void* priv, void* data);
 	void* 			priv;
+#endif
 
 	// predict the next free block
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
@@ -96,11 +97,16 @@ typedef struct __tb_pool_t
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+// create & destroy
 tb_pool_t* 		tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow);
 void 			tb_pool_destroy(tb_pool_t* pool);
 
+// alloc & free
 tb_size_t 		tb_pool_alloc(tb_pool_t* pool);
 void 			tb_pool_free(tb_pool_t* pool, tb_size_t item);
+
+// clear
 void 			tb_pool_clear(tb_pool_t* pool);
 
 #ifdef TB_DEBUG

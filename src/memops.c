@@ -40,6 +40,11 @@
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
+
+void tb_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
+{
+	tb_memset(dst, src, size);
+}
 void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
@@ -167,4 +172,24 @@ void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 # 	endif
 	// }
 #endif
+}
+
+
+void tb_memcpy(void* dst, void const* src, tb_size_t size)
+{
+	if (dst != src && size) memcpy(dst, src, size);
+}
+void tb_memmov(void* dst, void const* src, tb_size_t size)
+{
+	if (dst != src && size) memmove(dst, src, size);
+	
+#if 0
+	tb_byte_t const* p = src;
+	tb_byte_t const* e = p + size;
+	while (p < e) *dst++ = *p++;
+#endif
+}
+void tb_memset(void* dst, tb_size_t src, tb_size_t size)
+{
+	if (size) memset(dst, src, size);
 }

@@ -38,7 +38,7 @@ extern "C" {
  * macros
  */
 
-#ifdef TB_MEMORY_MODE_SMALL
+#ifdef TPLAT_MEMORY_MODE_SMALL
 # 	define TB_XML_WRITER_ATTRIBUTES_MAX 		(256)
 #else
 # 	define TB_XML_WRITER_ATTRIBUTES_MAX 		(512)
@@ -53,7 +53,7 @@ extern "C" {
 typedef struct __tb_xml_writer_t
 {
 	// the stream
-	tb_gstream_t* 			st;
+	tb_gstream_t* 			gst;
 
 	// the attributes
 	tb_xml_attribute_t 		attributes[TB_XML_WRITER_ATTRIBUTES_MAX];
@@ -67,9 +67,8 @@ typedef struct __tb_xml_writer_t
  */
 
 // open & close
-tb_xml_writer_t* 		tb_xml_writer_open(tb_gstream_t* st);
+tb_xml_writer_t* 		tb_xml_writer_open(tb_gstream_t* gst);
 void 					tb_xml_writer_close(tb_xml_writer_t* writer);
-void 					tb_xml_writer_flush(tb_xml_writer_t* writer);
 
 // document
 void 					tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding);

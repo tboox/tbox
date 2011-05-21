@@ -29,4 +29,106 @@
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_char_t* tb_cstring_duplicate(tb_char_t const* s)
+{
+	if (s)
+	{
+		tb_size_t 	n = tb_cstring_size(s);
+		tb_char_t* 	s2 = tb_malloc(n + 1);
+		if (s2) tb_cstring_ncopy(s2, s, n);
+		s2[n] = '\0';
+		return s2;
+	}
+	return TB_NULL;
+}
+tb_char_t* tb_cstring_nduplicate(tb_char_t const* s, tb_size_t n)
+{
+	if (s && n)
+	{
+		tb_char_t* 	s2 = tb_malloc(n + 1);
+		if (s2) tb_cstring_ncopy(s2, s, n);
+		s2[n] = '\0';
+		return s2;
+	}
+	return TB_NULL;
+}
+tb_int_t tb_cstring_find(tb_char_t const* s1, tb_char_t const* s2)
+{
+	if (!s1 || !s2 ) return -1;
+
+	tb_int_t idx = -1;
+	tb_char_t const* ps = s1;
+	tb_char_t const* p1 = ps;
+	tb_char_t const* p2 = s2;
+
+	do
+	{
+		if (!*p2) 
+		{
+			idx = ps - s1;
+			break;
+		}
+		if (*p2 == *p1)
+		{
+			++p2;
+			++p1;
+		} 
+		else
+		{
+			p2 = s2;
+			if (!*p1) return -1;
+			p1 = ++ps;
+		}
+
+	} while (1);
+
+	return (idx < 0? -1 : idx);
+}
+tb_int_t tb_cstring_find_nocase(tb_char_t const* s1, tb_char_t const* s2)
+{
+	if (!s1 || !s2) return -1;
+
+	tb_int_t idx = -1;
+	tb_char_t const* ps = s1;
+	tb_char_t const* p1 = ps;
+	tb_char_t const* p2 = s2;
+
+	do
+	{
+		if (!*p2) 
+		{
+			idx = ps - s1;
+			break;
+		}
+		if (*p2 == *p1 || TB_CONV_TOLOWER(*p2) == TB_CONV_TOLOWER(*p1))
+		{
+			++p2;
+			++p1;
+		} 
+		else
+		{
+			p2 = s2;
+			if (!*p1) return -1;
+			p1 = ++ps;
+		}
+
+	} while (1);
+
+	return ((idx < 0)? -1 : idx);
+}
+tb_int_t tb_cstring_find_char(tb_char_t const* s, tb_char_t c)
+{
+	TB_ASSERT_RETURN_VAL(s, -1);
+	tb_char_t const* b = s;
+	while (*s && *s == c) return s - b;
+	return -1;
+}
+tb_int_t tb_cstring_find_char_nocase(tb_char_t const* s, tb_char_t c)
+{
+	TB_ASSERT_RETURN_VAL(s, -1);
+	tb_char_t const* b = s;
+	c = TB_CONV_TOLOWER(c);
+	while (*s && TB_CONV_TOLOWER(*s) == c) return s - b;
+	return -1;
+}
 

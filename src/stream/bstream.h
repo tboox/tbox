@@ -75,8 +75,8 @@ typedef struct __tb_bstream_t
 tb_bstream_t* 		tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size);
 
 // load & save
-tb_size_t 			tb_bstream_load(tb_bstream_t* bst, void* gst);
-tb_size_t 			tb_bstream_save(tb_bstream_t* bst, void* gst);
+//tb_size_t 			tb_bstream_load(tb_bstream_t* bst, void* gst);
+//tb_size_t 			tb_bstream_save(tb_bstream_t* bst, void* gst);
 
 // modifior
 void 				tb_bstream_goto(tb_bstream_t* bst, tb_byte_t* data);

@@ -1,21 +1,20 @@
-#include "tplat/tplat.h"
-#include "../../tbox.h"
+#include "tbox.h"
 
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {10, 10, 10, 10, 10, 10, 10};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
+	// init tplat
+	if (TPLAT_FALSE == tplat_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 	
-	tb_ustream_t stream;
-	tb_gstream_t* st = tb_gstream_open(&stream, argv[1], TB_NULL, 0, TB_GSTREAM_FLAG_BLOCK | TB_GSTREAM_FLAG_RO);
-	if (!st)
+	// create stream
+	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open url: %s", argv[1]);
 		return 0;
 	}
 
 
-	tb_format_t const* format =	tb_format_probe(st, TB_FORMAT_FLAG_ALL);
+	tb_format_t const* format =	tb_format_probe(gst, TB_FORMAT_FLAG_ALL);
 	if (!format)
 	{
 		TB_DBG("unsupported format");
@@ -24,6 +23,7 @@ int main(int argc, char** argv)
 
 	TB_DBG("format: %s", format->name);
 
+	// exit tplat
+	tplat_exit();
 	return 0;
 }
-

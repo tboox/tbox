@@ -27,22 +27,12 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * types
- */
-
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_size_t tb_format_zip_probe(tb_gstream_t* st)
+tb_size_t tb_format_zip_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(st, 4);
+	tb_byte_t const* p = tb_gstream_need(gst, 4);
 	if (p && tb_bits_get_u32_le(p) == 0x04034b50)
 		return 40;
 	else return 0;

@@ -25,144 +25,172 @@
  * includes
  */
 #include "prefix.h"
+#include "../../string/string.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_FSTREAM_URL_MAX 		(4096)
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
+// the file stream type
+typedef struct __tb_fstream_t
+{
+	// the base
+	tb_gstream_t 		base;
+
+	// the file handle
+	tplat_handle_t 		file;
+
+	// the file size
+	tb_size_t 			size;
+
+	// the file offset
+	tb_size_t 			offset;
+
+	// the file flags
+	tb_size_t 			flags;
+
+	// the url
+	tb_char_t 			url[TB_FSTREAM_URL_MAX];
+
+}tb_fstream_t;
+
+
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_int_t tb_fstream_read(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
+static __tplat_inline__ tb_fstream_t* tb_fstream_cast(tb_gstream_t* gst)
 {
-	tb_fstream_t* fst = st;
-	TB_ASSERT(data && size);
-	if (fst) return (tb_int_t)tplat_file_read(fst->hfile, (tplat_byte_t*)data, (tplat_size_t)size);
-	else return -1;
+	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
+	return (tb_fstream_t*)gst;
 }
-static tb_int_t tb_fstream_write(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
+static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 {
-	tb_fstream_t* fst = st;
-	TB_ASSERT(data && size);
-	if (fst) return (tb_int_t)tplat_file_write(fst->hfile, (tplat_byte_t*)data, (tplat_size_t)size);
-	else return -1;
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst, TB_FALSE);
+	TB_ASSERT(fst->file == TPLAT_INVALID_HANDLE);
+
+	// open file
+	fst->file = tplat_file_open(fst->url, fst->flags);
+	TB_ASSERT_RETURN_VAL(fst->file != TPLAT_INVALID_HANDLE, TB_FALSE);
+
+	// init size
+	fst->size = (tb_size_t)tplat_file_seek(fst->file, -1, TPLAT_FILE_SEEK_SIZE);
+	fst->offset = 0;
+	
+	return TB_TRUE;
 }
-static void tb_fstream_close(tb_gstream_t* st)
+static void tb_fstream_close(tb_gstream_t* gst)
 {
-	tb_fstream_t* fst = st;
-	if (fst && fst->hfile != TPLAT_INVALID_HANDLE)
-		tplat_file_close(fst->hfile);
-}
-static tb_size_t tb_fstream_size(tb_gstream_t* st)
-{
-	tb_fstream_t* fst = st;
-	if (fst && fst->hfile != TPLAT_INVALID_HANDLE && !(st->flag & TB_GSTREAM_FLAG_ZLIB))
-		return (tb_size_t)tplat_file_seek(fst->hfile, -1, TPLAT_FILE_SEEK_SIZE);
-	else return 0;
-}
-static tb_bool_t tb_fstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_seek_t flag)
-{
-	tb_fstream_t* fst = st;
-	if (fst && !(st->flag & TB_GSTREAM_FLAG_ZLIB))
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	if (fst && fst->file != TPLAT_INVALID_HANDLE)
 	{
-		tb_int_t ret = -1;
+		tplat_file_close(fst->file);
+		fst->file = TPLAT_INVALID_HANDLE;
+		fst->size = 0;
+		fst->offset = 0;
+	}
+}
+static tb_int_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst && fst->file != TPLAT_INVALID_HANDLE && data, -1);
+	TB_IF_FAIL_RETURN_VAL(size, 0);
 
-		// adjust offset
-		if (st->size)
+	// read data
+	tb_int_t ret = (tb_int_t)tplat_file_read(fst->file, (tplat_byte_t*)data, (tplat_size_t)size);
+
+	// update offset
+	if (ret > 0) fst->offset += ret;
+	return ret;
+}
+static tb_int_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst && fst->file != TPLAT_INVALID_HANDLE && data, -1);
+	TB_IF_FAIL_RETURN_VAL(size, 0);
+
+	// write
+	tb_int_t ret = (tb_int_t)tplat_file_write(fst->file, (tplat_byte_t*)data, (tplat_size_t)size);
+
+	// update offset
+	if (ret > 0) fst->offset += ret;
+	return ret;
+}
+static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+{
+	TB_NOT_IMPLEMENT();
+	return TB_FALSE;
+}
+static tb_size_t tb_fstream_size(tb_gstream_t* gst)
+{	
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst && fst->file != TPLAT_INVALID_HANDLE, 0);
+	return fst->size;
+}
+static tb_size_t tb_fstream_offset(tb_gstream_t* gst)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst && fst->file != TPLAT_INVALID_HANDLE, 0);
+	return fst->offset;
+}
+static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst, TB_FALSE);
+
+	switch (cmd)
+	{
+	case TB_GSTREAM_CMD_SET_URL:
 		{
-			if (flag == TB_GSTREAM_SEEK_CUR && offset >= 0 && offset <= st->size) 
-			{
-				st->head += offset;
-				st->size -= offset;
-				st->offset += offset;
-				return TB_TRUE;
-			}
-			st->head = st->data;
-			st->size = 0;
-		}
-
-		// seek
-		if (flag == TB_GSTREAM_SEEK_BEG) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_BEG);
-		else if (flag == TB_GSTREAM_SEEK_CUR) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_CUR);
-		else if (flag == TB_GSTREAM_SEEK_END) ret = tplat_file_seek(fst->hfile, offset, TPLAT_FILE_SEEK_END);
-
-		// update offset
-		if (ret >= 0) 
-		{
-			st->offset = ret;
+			TB_ASSERT_RETURN_VAL(arg1, TB_FALSE);
+			tb_cstring_ncopy(fst->url, (tb_char_t const*)arg1, TB_FSTREAM_URL_MAX);
+			fst->url[TB_FSTREAM_URL_MAX - 1] = '\0';
 			return TB_TRUE;
 		}
-		else return TB_FALSE;
+	case TB_GSTREAM_CMD_GET_URL:
+		{
+			tb_char_t const** purl = (tb_char_t const**)arg1;
+			TB_ASSERT_RETURN_VAL(purl, TB_FALSE);
+			*purl = fst->url;
+			return TB_TRUE;
+		}
+	case TB_FSTREAM_CMD_SET_FLAGS:
+		fst->flags = (tb_size_t)arg1;
+		return TB_TRUE;
+	default:
+		break;
 	}
-	else return TB_FALSE;
+	return TB_FALSE;
 }
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_open_from_file(tb_fstream_t* st, tb_char_t const* url, tb_gstream_flag_t flag)
+
+tb_gstream_t* tb_gstream_create_file()
 {
-	TB_ASSERT(st && url);
-	if (!st || !url) return TB_NULL;
-
-	// file flags
-	tplat_size_t fflags = TPLAT_FILE_BINARY;
-	if (flag & TB_GSTREAM_FLAG_RO) fflags |= TPLAT_FILE_RO;
-	if (flag & TB_GSTREAM_FLAG_WO) fflags |= TPLAT_FILE_WO;
-	if (flag & TB_GSTREAM_FLAG_TRUNC) fflags |= TPLAT_FILE_TRUNC;
-	if (flag & TB_GSTREAM_FLAG_CREATE) fflags |= TPLAT_FILE_CREAT;
-
-	// { open file
-	tplat_handle_t hfile = tplat_file_open(url, fflags);
-	if (hfile == TPLAT_INVALID_HANDLE) 
-	{
-		// exists arguments: ?=...
-		tb_char_t const* p = url;
-		for (; *p != '?' && *p; p++) ;
-		if (!*p) return TB_NULL;
-
-		// try open url without arguments
-		tb_char_t s[4096];
-		tb_size_t n = p - url;
-		TB_ASSERT(n < 4096);
-		if (n >= 4096) return TB_NULL;
-		strncpy(s, url, n);
-		s[n] = '\0';
-
-		hfile = tplat_file_open(s, fflags);
-		if (hfile == TPLAT_INVALID_HANDLE) return TB_NULL;
-	}
+	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_fstream_t));
+	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
 
 	// init stream
-	memset(st, 0, sizeof(tb_fstream_t));
-	st->base.flag = flag;
-	st->base.head = st->base.data;
-	st->base.size = 0;
-	st->base.offset = 0;
+	tb_fstream_t* fst = (tb_fstream_t*)gst;
+	gst->type 	= TB_GSTREAM_TYPE_FILE;
+	gst->open 	= tb_fstream_open;
+	gst->close 	= tb_fstream_close;
+	gst->read 	= tb_fstream_read;
+	gst->write 	= tb_fstream_write;
+	gst->size 	= tb_fstream_size;
+	gst->offset = tb_fstream_offset;
+	gst->seek 	= tb_fstream_seek;
+	gst->ioctl1 = tb_fstream_ioctl1;
+	fst->file 	= TPLAT_INVALID_HANDLE;
+	fst->flags 	= TPLAT_FILE_RO | TPLAT_FILE_BINARY;
+	fst->url[0] = '\0';
 
-	// init url
-	tb_string_init(&st->base.url);
-	tb_string_assign_c_string(&st->base.url, url);
-
-	// init file stream
-	st->base.read = tb_fstream_read;
-	st->base.write = tb_fstream_write;
-	st->base.close = tb_fstream_close;
-	st->base.ssize = tb_fstream_size;
-	st->base.seek = tb_fstream_seek;
-	st->hfile = hfile;
-
-#ifdef TB_CONFIG_ZLIB
-	// is hzlib?
-	if (flag & TB_GSTREAM_FLAG_ZLIB)
-	{
-		st->base.hzlib = tb_zlib_create();
-		if (st->base.hzlib == TB_INVALID_HANDLE) goto fail;
-	}
-#endif
-	return ((tb_gstream_t*)st);
-
-fail:
-	if (hfile != TPLAT_INVALID_HANDLE) tplat_file_close(hfile);
-	return TB_NULL;
-	// }
+	return gst;
 }
+

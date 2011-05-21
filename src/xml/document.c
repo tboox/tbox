@@ -148,7 +148,7 @@ void tb_xml_document_destroy(tb_xml_document_t* document)
 	if (document) tb_xml_node_destroy((tb_xml_node_t*)document);
 }
 
-tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* st)
+tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 {
 	TB_ASSERT(document);
 	if (!document) return TB_FALSE;
@@ -157,7 +157,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* st)
 	tb_xml_document_clear(document);
 
 	// open reader
-	tb_xml_reader_t* reader = tb_xml_reader_open(st);
+	tb_xml_reader_t* reader = tb_xml_reader_open(gst);
 	TB_ASSERT(reader);
 	if (!reader) return TB_FALSE;
 
@@ -287,13 +287,13 @@ fail:
 	return TB_FALSE;
 
 }
-tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* st)
+tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst)
 {
 	TB_ASSERT(document);
 	if (!document) return TB_FALSE;
 
 	// open writer
-	tb_xml_writer_t* writer = tb_xml_writer_open(st);
+	tb_xml_writer_t* writer = tb_xml_writer_open(gst);
 	TB_ASSERT(writer);
 	if (!writer) return TB_FALSE;
 

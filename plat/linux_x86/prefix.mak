@@ -74,6 +74,6 @@ ARFLAGS 		= -cr
 SHFLAGS 		= -shared -Wl,-soname
 
 # include sub-config
-include 		$(PLAT_DIR)$(_)config.mak
+include 		$(PLAT_DIR)/config.mak
 
 

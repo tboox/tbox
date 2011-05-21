@@ -27,122 +27,161 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * details
+ * types
  */
 
-static tb_int_t tb_dstream_read(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
+// the data stream type
+typedef struct __tb_dstream_t
 {
-	tb_dstream_t* dst = (tb_dstream_t*)st;
-	TB_ASSERT(data && size);
-	if (dst && data)
+	// the base
+	tb_gstream_t 		base;
+
+	// the data & size
+	tb_byte_t* 			data;
+	tb_byte_t* 			head;
+	tb_size_t 			size;
+
+}tb_dstream_t;
+
+
+/* /////////////////////////////////////////////////////////
+ * details
+ */
+static __tplat_inline__ tb_dstream_t* tb_dstream_cast(tb_gstream_t* gst)
+{
+	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_DATA, TB_NULL);
+	return (tb_dstream_t*)gst;
+}
+static tb_bool_t tb_dstream_open(tb_gstream_t* gst)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->size, TB_FALSE);
+
+	dst->head = dst->data;
+	return TB_TRUE;
+}
+static void tb_dstream_close(tb_gstream_t* gst)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	if (dst) dst->head = TB_NULL;
+}
+static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->head && data, -1);
+	TB_IF_FAIL_RETURN_VAL(size, 0);
+
+	// adjust size
+	tb_size_t left = dst->data + dst->size - dst->head;
+	if (size > left) size = left;
+
+	// read data
+	memcpy(data, dst->head, size);
+	dst->head += size;
+	return (tb_int_t)(size);
+}
+static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->head && data, -1);
+	TB_IF_FAIL_RETURN_VAL(size, 0);
+
+	// adjust size
+	tb_size_t left = dst->data + dst->size - dst->head;
+	if (size > left) size = left;
+
+	// write data
+	memcpy(dst->head, data, size);
+	dst->head += size;
+	return (tb_int_t)(size);
+}
+static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst && dst->head && dst->data, TB_NULL);
+	if (dst->head + size > dst->data + dst->size) return TB_NULL;
+
+	return dst->head;
+}
+static tb_size_t tb_dstream_size(tb_gstream_t const* gst)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst, 0);
+
+	return dst->size;
+}
+
+static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst, 0);
+
+	return (dst->head - dst->data);
+}
+static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+{
+	TB_NOT_IMPLEMENT();
+	return TB_FALSE;
+}
+
+static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(dst, TB_FALSE);
+
+	switch (cmd)
 	{
-		// adjust size
-		tb_size_t left = dst->data + dst->size - dst->head;
-		if (size > left) size = left;
-
-		// read data
-		memcpy(data, dst->head, size);
-		dst->head += size;
-		return (tb_int_t)(size);
-	}
-	else return -1;
-}
-static tb_int_t tb_dstream_write(tb_gstream_t* st, tb_byte_t* data, tb_size_t size)
-{
-	tb_dstream_t* dst = (tb_dstream_t*)st;
-	TB_ASSERT(data && size);
-	if (dst && data)
-	{
-		// adjust size
-		tb_size_t left = dst->data + dst->size - dst->head;
-		if (size > left) size = left;
-
-		// write data
-		memcpy(dst->head, data, size);
-		dst->head += size;
-		return (tb_int_t)(size);
-	}
-	else return -1;
-}
-static void tb_dstream_close(tb_gstream_t* st)
-{
-}
-static tb_size_t tb_dstream_size(tb_gstream_t* st)
-{
-	tb_dstream_t* dst = st;
-	if (dst && !(st->flag & TB_GSTREAM_FLAG_ZLIB)) return dst->size;
-	else return 0;
-}
-static tb_byte_t* tb_dstream_need(tb_gstream_t* st, tb_size_t size)
-{
-	tb_dstream_t* dst = st;
-	if (dst && !(st->flag & TB_GSTREAM_FLAG_ZLIB))
-	{
-		// is out?
-		TB_ASSERT(dst->head + size <= dst->data + dst->size);
-		if (dst->head + size > dst->data + dst->size) return TB_NULL;
-
-		return dst->head;
-	}
-	else return TB_NULL;
-}
-static tb_bool_t tb_dstream_seek(tb_gstream_t* st, tb_int_t offset, tb_gstream_seek_t flag)
-{
-	tb_dstream_t* dst = st;
-	if (dst && !(st->flag & TB_GSTREAM_FLAG_ZLIB))
-	{
-		// seek
-		if (flag == TB_GSTREAM_SEEK_BEG) dst->head = dst->data + offset;
-		else if (flag == TB_GSTREAM_SEEK_CUR) dst->head += offset;
-		else if (flag == TB_GSTREAM_SEEK_END) dst->head = dst->data + dst->size - offset;
-
-		// is out?
-		if (dst->head < dst->data) dst->head = dst->data;
-		else if (dst->head > dst->data + dst->size) dst->head = dst->data + dst->size;
-
-		// update offset
-		st->offset = dst->head - dst->data;
-
+	case TB_DSTREAM_CMD_SET_DATA:
+		{
+			TB_ASSERT_RETURN_VAL(arg1 && arg2, TB_FALSE);
+			dst->data = (tb_byte_t*)arg1;
+			dst->size = (tb_size_t)arg2;
+			dst->head = TB_NULL;
+		}
 		return TB_TRUE;
+	default:
+		break;
 	}
-	else return TB_FALSE;
+	return TB_FALSE;
 }
 /* /////////////////////////////////////////////////////////
  * interface implemention
  */
-tb_gstream_t* tb_gstream_open_from_data(tb_dstream_t* st, tb_byte_t const* data, tb_size_t size, tb_gstream_flag_t flag)
+tb_gstream_t* tb_gstream_create_data()
 {
-	TB_ASSERT(st && data && size);
-	if (st && !data || !size) return TB_NULL;
+	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_dstream_t));
+	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
 
 	// init stream
-	memset(st, 0, sizeof(tb_dstream_t));
-	st->base.flag = flag;
-	st->base.head = st->base.data;
-	st->base.size = 0;
-	st->base.offset = 0;
+	gst->type 	= TB_GSTREAM_TYPE_DATA;
+	gst->open 	= tb_dstream_open;
+	gst->close 	= tb_dstream_close;
+	gst->read 	= tb_dstream_read;
+	gst->write 	= tb_dstream_write;
+	gst->bread 	= tb_dstream_read;
+	gst->bwrite = tb_dstream_write;
+	gst->need 	= tb_dstream_need;
+	gst->size 	= tb_dstream_size;
+	gst->offset	= tb_dstream_offset;
+	gst->seek 	= tb_dstream_seek;
+	gst->ioctl2 = tb_dstream_ioctl2;
 
-	// init data stream
-	st->base.read = tb_dstream_read;
-	st->base.write = tb_dstream_write;
-	st->base.close = tb_dstream_close;
-	st->base.ssize= tb_dstream_size;
-	st->base.need = tb_dstream_need;
-	st->base.seek = tb_dstream_seek;
-	st->data = data;
-	st->head = data;
-	st->size = size;
+	return gst;
+}
+tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
+{
+	TB_ASSERT_RETURN_VAL(data && size, TB_NULL);
 
-	// init url
-	tb_string_init(&st->base.url);
+	// create data stream
+	tb_gstream_t* gst = tb_gstream_create_data();
+	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
 
-#ifdef TB_CONFIG_ZLIB
-	// is hzlib?
-	if (flag & TB_GSTREAM_FLAG_ZLIB)
-	{
-		st->base.hzlib = tb_zlib_create();
-		if (st->base.hzlib == TB_INVALID_HANDLE) return TB_NULL;
-	}
-#endif
-	return ((tb_gstream_t*)st);
+	// set data & size
+	if (TB_FALSE == tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (void*)data, (void*)size)) goto fail;
+	
+	return gst;
+
+fail:
+	if (gst) tb_gstream_destroy(gst);
+	return TB_NULL;
 }

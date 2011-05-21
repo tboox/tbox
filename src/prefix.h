@@ -44,28 +44,37 @@ extern "C" {
 
 // debug
 #ifdef TB_DEBUG
-#	define TB_DBG(format, arg...)					do { tplat_printf("[tb]:" format "\n" , ## arg); } while (0)
-#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __tplat_line__, #expr, __tplat_file__); } } while(0)
-#	define TB_MSG_ASSERT(expr, format, arg...)		do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s msg: " format " file: %s\n", __tplat_line__, #expr, ## arg, __tplat_file__); }} while(0)
+#	define TB_DBG(fmt, arg...)					do { tplat_printf("[tb]:" fmt "\n" , ## arg); } while (0)
+#	define TB_ABORT()							do { tplat_printf("[tb]: abort at:%d: file: %s\n", __tplat_line__, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#	define TB_ASSERT(x)							do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); } } while(0)
+#	define TB_ASSERTA(x)						do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#	define TB_ASSERTM(x, fmt, arg...)			do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s msg: " fmt " file: %s\n", __tplat_line__, #x, ## arg, __tplat_file__); }} while(0)
 #else
-#	define TB_DBG(format, arg...)
-#	define TB_ASSERT(expr)
-#	define TB_MSG_ASSERT(expr, format, arg...)
+#	define TB_DBG(fmt, arg...)
+# 	define TB_ABORT()
+#	define TB_ASSERT(x)
+#	define TB_ASSERTA(x)
+#	define TB_ASSERTM(x, fmt, arg...)
 #endif
 
 #else
 		
 // debug
 #ifdef TB_DEBUG
-#	define TB_DBG
-#	define TB_ASSERT(expr)							do { if (!(expr)) {tplat_printf("[tb]: assert failed at:%d: expr: %s file: %s\n", __tplat_line__, #expr, __tplat_file__); } } while(0)
-#	define TB_MSG_ASSERT
+#	define TB_DBG 								
+#	define TB_ABORT()							do { tplat_printf("[tb]: abort at:%d: file: %s\n", __tplat_line__, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#	define TB_ASSERT(x)							do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); } } while(0)
+#	define TB_ASSERTA(x)						do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#	define TB_ASSERTM
 #else
 #	define TB_DBG
-#	define TB_ASSERT(expr)
-#	define TB_MSG_ASSERT
+# 	define TB_ABORT()
+#	define TB_ASSERT(x)
+#	define TB_ASSERTA(x)
+#	define TB_ASSERTM
 #endif
-#endif
+
+#endif /* TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO */
 
 // the size of the static array
 #define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
@@ -80,6 +89,7 @@ extern "C" {
 #define TB_IF_REACHED_GOTO(x, b) 					do { goto b; } while (0)
 
 #define TB_ASSERT_RETURN(x) 						do { TB_ASSERT(x); if (!(x)) return ; } while (0)
+#define TB_ASSERT_ABORT(x) 							do { TB_ASSERT(x); if (!(x)) { __tplat_volatile__ tb_int_t* a = 0; *a = 1; } ; } while (0)
 #define TB_ASSERT_RETURN_VAL(x, v) 					do { TB_ASSERT(x); if (!(x)) return (v); } while (0)
 #define TB_ASSERT_GOTO(x, b) 						do { TB_ASSERT(x); if (!(x)) goto b; } while (0)
 

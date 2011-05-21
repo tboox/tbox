@@ -34,28 +34,34 @@ extern "C" {
 #include "prefix.h"
 #include "bstream.h"
 #include "gstream.h"
-#include "tstream.h"
-#include "zstream.h"
-
-#ifdef TB_CONFIG_ENCODING
-# 	include "estream.h"
-#endif
 
 /* /////////////////////////////////////////////////////////
  * architecture
  *
  *
- *
- *           [estream, zstream]
+ *    
+ * bstream
+ *                  
+ *              - hstream
+ *             |
+ * gstream ----  fstream
+ *             |
+ *             - dstream
+ *             |
+ *             |           - estream
+ *             |          |
+ *             - tstream -|          - rlc
+ *                  |     |         |
+ *                  |     - zstream - lzsw
+ *                  |              |
+ *                  |              - gzip
  *                  |
- *                  |            - hstream
- *                  |           |
- * gstream ------ tstream ------  fstream
- *    |             |          |
- * ustream          |          - dstream
- *    |             |
- *    -- bstream --
+ *                  | 
+ *                  - gstream - ...
  *
+ *
+ *
+ * read & write <= tstream <= tstream ... <= gstream <= (data, file, http, ...)
  */
 
 // c plus plus

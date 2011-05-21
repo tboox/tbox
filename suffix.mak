@@ -183,7 +183,7 @@ DEP_PROS_$(1)_clean:
 endef
 
 # generate full path
-CLEAN_FILES := $(addprefix $(shell $(PWD))$(_), $(CLEAN_FILES))
+CLEAN_FILES := $(addprefix $(shell $(PWD))/, $(CLEAN_FILES))
 
 clean: $(foreach pro, $(DEP_PROS), DEP_PROS_$(pro)_clean) \
 	$(foreach name, $(NAMES), $(name)_$($(name)_TYPE)_clean) \
@@ -206,10 +206,10 @@ $(foreach name, $(NAMES), $(eval $(if $(findstring BIN, $($(name)_TYPE)), BIN_FI
 $(foreach name, $(NAMES), $(eval OBJ_FILES += $($(name)_OBJS)))
 
 # generate full path
-INC_FILES := $(addprefix $(shell $(PWD))$(_), $(INC_FILES))
-LIB_FILES := $(addprefix $(shell $(PWD))$(_), $(LIB_FILES))
-BIN_FILES := $(addprefix $(shell $(PWD))$(_), $(BIN_FILES))
-OBJ_FILES := $(addprefix $(shell $(PWD))$(_), $(OBJ_FILES))
+INC_FILES := $(addprefix $(shell $(PWD))/, $(INC_FILES))
+LIB_FILES := $(addprefix $(shell $(PWD))/, $(LIB_FILES))
+BIN_FILES := $(addprefix $(shell $(PWD))/, $(BIN_FILES))
+OBJ_FILES := $(addprefix $(shell $(PWD))/, $(OBJ_FILES))
 
 INC_FILES := $(sort $(INC_FILES))
 LIB_FILES := $(sort $(LIB_FILES))
@@ -220,22 +220,22 @@ INSTALL_FILES := $(INC_FILES) $(LIB_FILES) $(BIN_FILES) $(OBJ_FILES)
 
 # generate include dir
 define BIN_INC_DIR
-$(dir $(patsubst $(SRC_DIR)$(_)%,$(BIN_DIR)$(_)inc$(_)$(PRO_NAME)$(_)%,$(1)))
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/inc/$(PRO_NAME)/%,$(1)))
 endef
 
 # generate library dir
 define BIN_LIB_DIR
-$(dir $(patsubst $(SRC_DIR)$(_)%,$(BIN_DIR)$(_)lib$(_)%,$(1)))
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/lib/%,$(1)))
 endef
 
 # generate bin dir
 define BIN_BIN_DIR
-$(dir $(patsubst $(SRC_DIR)$(_)%,$(BIN_DIR)$(_)bin$(_)%,$(1)))
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/bin/%,$(1)))
 endef
 
 # generate obj dir
 define BIN_OBJ_DIR
-$(dir $(patsubst $(SRC_DIR)$(_)%,$(BIN_DIR)$(_)obj$(_)%,$(1)))
+$(dir $(patsubst $(SRC_DIR)/%,$(BIN_DIR)/obj/%,$(1)))
 endef
 
 define MAKE_INSTALL_INC_FILES

@@ -25,39 +25,34 @@
  * includes
  */
 #include "prefix.h"
+#include "../string/string.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_size_t tb_format_htm_probe(tb_gstream_t* st)
+tb_size_t tb_format_htm_probe(tb_gstream_t* gst)
 {
-	// compute the max need_n
-	tb_size_t need_n = TB_GSTREAM_DATA_MAX;
-	tb_size_t file_n = tb_gstream_size(st);
-	if (file_n) need_n = TB_MATH_MIN(file_n, TB_GSTREAM_DATA_MAX);
+	// compute the max need
+	tb_size_t need = TB_GSTREAM_CACHE_SIZE;
+	tb_size_t file = tb_gstream_size(gst);
+	if (file) need = TB_MATH_MIN(file, TB_GSTREAM_CACHE_SIZE);
 
 	// the score
 	tb_size_t score = 0;
 
 	// need it
-	tb_byte_t const* p = tb_gstream_need(st, need_n);
+	tb_byte_t const* p = tb_gstream_need(gst, need);
 	if (!p) return score;
 
 	// attach text
 	tb_string_t string;
 	tb_string_init(&string);
-	tb_string_assign_c_string_with_size_by_ref(&string, p, need_n);
+	tb_string_assign_c_string_with_size_by_ref(&string, p, need);
 
 	// find <!DOCTYPE html ... >
 	tb_int_t pos = tb_string_find_c_string_nocase(&string, "<<!DOCTYPE html", 0);
