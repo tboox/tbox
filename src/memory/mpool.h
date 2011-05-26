@@ -35,19 +35,6 @@ extern "C" {
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-
-// dump & check
-#ifdef TB_DEBUG
-# 	define TB_MPOOL_DUMP() 							tb_mpool_dump()
-# 	define TB_MPOOL_CHECK() 						tb_mpool_check()
-#else
-# 	define TB_MPOOL_DUMP() 					
-# 	define TB_MPOOL_CHECK() 						(TB_TRUE)
-#endif
-
-/* /////////////////////////////////////////////////////////
  * the interfaces
  */
 tb_bool_t 	tb_mpool_init(void* data, tb_size_t size);
