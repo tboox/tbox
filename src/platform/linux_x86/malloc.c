@@ -31,21 +31,19 @@
  * implemention
  */
 
-void* tb_malloc(tb_int_t pool_index, tb_size_t size)
+void* tb_malloc(tb_size_t size)
 {
 	return malloc(size);
 }
-void* tb_calloc(tb_int_t index, tb_size_t item, tb_size_t size)
+void* tb_calloc(tb_size_t item, tb_size_t size)
 {
-	void* p = tb_pool_allocate(index, item * size);
-	if (p) memset(p, 0, item * size);
-	return p;
+	return calloc(item, size);
 }
-void* tb_realloc(tb_int_t pool_index, void* data, tb_size_t size)
+void* tb_realloc(void* data, tb_size_t size)
 {
 	return realloc(data, size);
 }
-void tb_free(tb_int_t pool_index, void* data)
+void tb_free(void* data)
 {
 	if (data) free(data);
 }

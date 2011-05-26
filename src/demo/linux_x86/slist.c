@@ -565,7 +565,7 @@ static tb_size_t tb_slist_iterator_prev_test()
  */
 int main(int argc, char** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// create slist
 	tb_slist_t* slist = tb_slist_create(sizeof(tb_char_t), TB_SLIST_GROW_SIZE, tb_slist_char_ctor, tb_slist_char_dtor, "char");

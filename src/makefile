@@ -78,6 +78,11 @@ tbox_C_FILES 		+= \
 					platform/$(TB_CONFIG_PLAT)/audio \
 					platform/$(TB_CONFIG_PLAT)/socket \
 					platform/$(TB_CONFIG_PLAT)/thread
+
+ifeq ($(TB_CONFIG_MEMORY_POOL_ENABLE),n)
+tbox_C_FILES 		+= \
+					platform/$(TB_CONFIG_PLAT)/malloc 
+endif
 endif
 
 # header files
@@ -86,7 +91,6 @@ INC_FILES 			= \
 					config.h \
 					tbox.h \
 					memory/memory.h \
-					memory/malloc.h \
 					memory/memops.h \
 					memory/prefix.h \
 					memory/mpool.h \

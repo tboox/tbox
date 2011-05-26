@@ -34,8 +34,10 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 {
 	TB_DBG("init: %x %d", data, size);
 
+#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	// init memory pool
 	if (!tb_mpool_init(data, size)) return TB_FALSE;
+#endif
 
 	// ok
 	TB_DBG("init: ok");
@@ -45,11 +47,11 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 void tb_exit()
 {
-	// check pool
-	//TB_POOL_DUMP();
-	
+#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+	//tb_pool_dump();
 	tb_mpool_exit();
-
+#endif
+	
 	// ok
 	TB_DBG("exit: ok");
 }

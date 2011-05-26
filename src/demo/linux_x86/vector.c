@@ -565,7 +565,7 @@ static tb_size_t tb_vector_iterator_prev_test()
  */
 int main(int argc, char** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// create vector
 	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, tb_vector_char_ctor, tb_vector_char_dtor, "char");
