@@ -20,8 +20,8 @@
  * \file		memops_x86.h
  *
  */
-#ifndef TB_MEMOPS_x86_H
-#define TB_MEMOPS_x86_H
+#ifndef TB_MEMORY_ASM_MEMOPS_x86_H
+#define TB_MEMORY_ASM_MEMOPS_x86_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -37,7 +37,7 @@ extern "C" {
  * macros
  */
 
-#ifdef TPLAT_ASSEMBLER_GAS
+#ifdef TB_CONFIG_ASSEMBLER_GAS
 
 // memset_u16
 # 	if 1
@@ -51,7 +51,7 @@ extern "C" {
 				dst += 2; \
 				size--; \
 			} \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"cld\n\t" 		/* clear the direction bit, dst++, not dst-- */ \
 				"rep stosw" 	/* *dst++ = ax */ \
@@ -76,7 +76,7 @@ extern "C" {
 			if (!left) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"cld\n\t" \
 					"1:\n\t" \
@@ -93,7 +93,7 @@ extern "C" {
 			else if (size >= 4) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 				  	"cld\n\t" \
 					"1:\n\t" 		/* fill left data */ \
@@ -113,7 +113,7 @@ extern "C" {
 			} \
 			else \
 			{ \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 				  	"cld\n\t" \
 					"1:\n\t" \
@@ -138,7 +138,7 @@ extern "C" {
 				dst += 2; \
 				size--; \
 			} \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"cld\n\t" \
 				"mov %0, %%ecx\n\t" \
@@ -158,7 +158,7 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"cld\n\t" 		/* clear the direction bit, dst++, not dst-- */ \
 				"rep stosl" 	/* *dst++ = eax */ \
@@ -172,7 +172,7 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"cld\n\t" \
 				"mov %0, %%ecx\n\t" \

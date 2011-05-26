@@ -20,14 +20,22 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_ASM_PREFIX_H
-#define TB_ASM_PREFIX_H
+#ifndef TB_MEMORY_PREFIX_H
+#define TB_MEMORY_PREFIX_H
 
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
 
+// c plus plus
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -9,14 +9,16 @@ tbox_TYPE 			= LIB
 
 # basic files
 tbox_C_FILES 		+= \
+					tbox \
 					bits \
-					memops \
 					conv \
 					time \
 					math/exp \
 					math/pow \
 					math/log \
 					math/sqrt \
+					memory/mpool \
+					memory/memops \
 					string/string \
 					string/cstring \
 					container/pool \
@@ -73,16 +75,15 @@ tbox_C_FILES 		+= \
 INC_FILES 			= \
 					prefix.h \
 					config.h \
-					fixed.h \
-					type.h \
 					tbox.h \
-					option.h \
 					bits.h \
-					malloc.h \
-					varg.h \
 					conv.h \
 					time.h \
-					memops.h \
+					memory/memory.h \
+					memory/malloc.h \
+					memory/memops.h \
+					memory/prefix.h \
+					memory/mpool.h \
 					math/prefix.h \
 					math/math.h \
 					math/exp.h \

@@ -24,7 +24,7 @@
  * includes
  */
 #include "pool.h"
-#include "../memops.h"
+#include "../memory/memory.h"
 #include "../math/math.h"
 
 /* /////////////////////////////////////////////////////////

@@ -2,8 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	// init tplat
-	if (TPLAT_FALSE == tplat_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init cookies
 	tb_cookies_t* cookies = tb_cookies_create();
@@ -41,7 +40,5 @@ int main(int argc, char** argv)
 	// exit cookies
 	tb_cookies_destroy(cookies);
 
-	// exit tplat
-	tplat_exit();
 	return 0;
 }

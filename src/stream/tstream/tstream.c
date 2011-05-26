@@ -25,7 +25,7 @@
  * includes
  */
 #include "tstream.h"
-#include "../../memops.h"
+#include "../../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces

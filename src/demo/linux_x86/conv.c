@@ -84,7 +84,7 @@ static void tb_conv_test_stof(tb_char_t const* s, tb_float_t val)
 }
 int main(int argc, char** argv)
 {
-	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	//tb_conv_make_isspace_table();
 	//tb_conv_make_isalpha_table();

@@ -25,9 +25,9 @@
  * includes
  */
 #include "cookies.h"
-#include "../string/cstring.h"
 #include "../bits.h"
-#include "../memops.h"
+#include "../memory/memory.h"
+#include "../string/cstring.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

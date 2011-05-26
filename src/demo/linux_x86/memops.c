@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 	volatile tb_size_t i = 0;
 	volatile tplat_int64_t dt = 0;
 
-	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 	
 	volatile tb_size_t 	size = 15 * 1024 * 1024;
 	volatile tb_byte_t* data = tb_malloc(size);

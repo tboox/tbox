@@ -20,8 +20,8 @@
  * \file		memops_arm.h
  *
  */
-#ifndef TB_MEMOPS_ARM_H
-#define TB_MEMOPS_ARM_H
+#ifndef TB_MEMORY_ASM_MEMOPS_ARM_H
+#define TB_MEMORY_ASM_MEMOPS_ARM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -37,14 +37,14 @@ extern "C" {
  * macros
  */
 
-#ifdef TPLAT_ASSEMBLER_GAS
+#ifdef TB_CONFIG_ASSEMBLER_GAS
 
 // memset_u16
 # 	if 1 // cache line: 16-bytes
 # 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 			  	"tst %2, #3\n\t" 						/* align by 4-bytes, if (dst & 0x3) *((tb_uint16_t*)dst) = src, dst += 2, size-- */ \
 			  	"strneh %1, [%2], #2\n\t"\
@@ -72,7 +72,7 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 			  	"tst %2, #3\n\t" 					/* align by 4-bytes, if (dst & 0x3) *((tb_uint16_t*)dst) = src, dst += 2, size--*/ \
 			  	"strneh %1, [%2], #2\n\t"\
@@ -104,7 +104,7 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"mov r3, %1\n\t" 						/* for storing data by 4x32bits */ \
 				"mov r4, %1\n\t" \
@@ -126,7 +126,7 @@ extern "C" {
 # 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			( \
 				"mov r3, %1\n\t" 						/* for storing data by 4x32bits */ \
 				"mov r4, %1\n\t" \

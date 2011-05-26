@@ -20,8 +20,8 @@
  * \file		malloc.h
  *
  */
-#ifndef TB_MALLOC_H
-#define TB_MALLOC_H
+#ifndef TB_MEMORY_H
+#define TB_MEMORY_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,27 +31,10 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "type.h"
+#include "prefix.h"
+#include "memops.h"
+#include "mpool.h"
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-
-#if 1
-
-# 	define tb_malloc(size) 					tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size)
-# 	define tb_calloc(item, size) 			tplat_calloc(TPLAT_POOL_PUBLIC_INDEX, item, size)
-# 	define tb_realloc(data, size) 			tplat_realloc(TPLAT_POOL_PUBLIC_INDEX, data, size)
-# 	define tb_free(data) 					tplat_free(TPLAT_POOL_PUBLIC_INDEX, data)
-
-#else
-
-void* 	tb_malloc(tb_size_t size);
-void* 	tb_realloc(void* data, tb_size_t size);
-void* 	tb_calloc(tb_size_t item, tb_size_t size);
-void 	tb_free(void* data);
-
-#endif
 
 // c plus plus
 #ifdef __cplusplus

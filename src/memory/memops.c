@@ -29,11 +29,11 @@
  * includes
  */
 
-#if defined(TPLAT_ARCH_x86)
+#if defined(TB_CONFIG_ARCH_x86)
 # 	include "asm/memops_x86.h"
-#elif defined(TPLAT_ARCH_ARM)
+#elif defined(TB_CONFIG_ARCH_ARM)
 # 	include "asm/memops_arm.h"
-#elif defined(TPLAT_ARCH_SH4)
+#elif defined(TB_CONFIG_ARCH_SH4)
 # 	include "asm/memops_sh4.h"
 #endif
 

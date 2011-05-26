@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	tb_dns_server_add("211.95.1.123");
 	tb_dns_server_add("180.168.255.18");

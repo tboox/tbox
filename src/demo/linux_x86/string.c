@@ -2,8 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	tplat_size_t regular_block_n[TPLAT_POOL_REGULAR_CHUNCK_MAX_COUNT] = {0, 0, 0, 0, 0, 0, 0};
-	tplat_pool_create(TB_CONFIG_MEMORY_POOL_INDEX, malloc(1024 * 1024), 1024 * 1024, regular_block_n);
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	tb_string_t s1;
 	tb_string_init(&s1);

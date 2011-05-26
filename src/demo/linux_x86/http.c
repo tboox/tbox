@@ -8,8 +8,7 @@ static tb_bool_t http_head_func(tb_char_t const* line, void* priv)
 }
 int main(int argc, char** argv)
 {
-	// init tplat
-	if (TPLAT_FALSE == tplat_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create http
 	tb_handle_t http = tb_http_create(TB_NULL);

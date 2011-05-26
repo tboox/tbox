@@ -25,7 +25,7 @@
  */
 #include "slist.h"
 #include "../math/math.h"
-#include "../memops.h"
+#include "../memory/memory.h"
 #include "../bits.h"
 
 /* /////////////////////////////////////////////////////////

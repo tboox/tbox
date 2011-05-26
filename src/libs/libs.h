@@ -33,16 +33,16 @@ extern "C" {
  */
 #include "prefix.h"
 
-#ifdef TB_CONFIG_JPEG
+#ifdef TB_CONFIG_LIBS_JPEG
 # 	include "jpeg/jinclude.h"
 # 	include "jpeg/jpeglib.h"
 #endif
 
-#ifdef TB_CONFIG_ZLIB
+#ifdef TB_CONFIG_LIBS_ZLIB
 # 	include "zlib/zlib.h"
 #endif
 
-#ifdef TB_CONFIG_LIBMAD
+#ifdef TB_CONFIG_LIBS_LIBMAD
 # 	include "libmad/mad.h"
 #endif
 

@@ -17,45 +17,17 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		malloc.c
+ * \file		prefix.h
  *
  */
+#ifndef TB_MEMORY_ASM_PREFIX_H
+#define TB_MEMORY_ASM_PREFIX_H
+
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "option.h"
-#include "malloc.h"
-#include "tplat/tplat.h"
+#include "../prefix.h"
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
 
-#if 0
-void* tb_malloc(tb_size_t size)
-{
-#if 1
-	return tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size);
-#else
-	void* p = tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, size);
-	if (p) memset(p, 0, size);
-	return p;
-#endif
-}
-void* tb_realloc(void* data, tb_size_t size)
-{
-	if (data) return tplat_realloc(TPLAT_POOL_PUBLIC_INDEX, data, size);
-	return TB_NULL;
-}
-void* tb_calloc(tb_size_t item, tb_size_t size)
-{
-	void* p = tplat_malloc(TPLAT_POOL_PUBLIC_INDEX, item * size);
-	if (p) memset(p, 0, item * size);
-	return p;
-}
-void tb_free(void* data)
-{
-	if (data) tplat_free(TPLAT_POOL_PUBLIC_INDEX, data);
-}
 #endif

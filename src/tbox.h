@@ -32,24 +32,31 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "malloc.h"
 #include "math.h"
 #include "conv.h"
 #include "bits.h"
 #include "time.h"
-#include "varg.h"
-#include "memops.h"
 #include "format.h"
 #include "encoding.h"
 #include "format.h"
 #include "xml/xml.h"
 #include "zip/zip.h"
 #include "math/math.h"
+#include "memory/memory.h"
 #include "stream/stream.h"
 #include "string/string.h"
 #include "network/network.h"
 #include "container/container.h"
 #include "libs/libs.h"
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+// init & exit
+tb_bool_t 	tb_init(tb_byte_t* data, tb_size_t size);
+void 		tb_exit();
+
 
 // c plus plus
 #ifdef __cplusplus

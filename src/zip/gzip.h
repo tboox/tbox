@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_ZLIB
+#ifdef TB_CONFIG_LIBS_ZLIB
 # 	include "../libs/zlib/zlib.h"
 #endif
 
@@ -46,7 +46,7 @@ typedef struct __tb_zip_gzip_t
 	// the zip base
 	tb_zip_t 		base;
 
-#ifdef TB_CONFIG_ZLIB
+#ifdef TB_CONFIG_LIBS_ZLIB
 	z_stream 		zst;
 #endif
 
