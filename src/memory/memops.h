@@ -20,8 +20,8 @@
  * \file		memops.c
  *
  */
-#ifndef TB_MEMOPS_H
-#define TB_MEMOPS_H
+#ifndef TB_MEMORY_MEMOPS_H
+#define TB_MEMORY_MEMOPS_H
 
 // c plus plus
 #ifdef __cplusplus

@@ -9,8 +9,7 @@ static tb_bool_t http_callback_head(tb_char_t const* line, void* priv)
 
 int main(int argc, char** argv)
 {
-	// init tplat
-	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create stream
 	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
@@ -87,7 +86,5 @@ end:
 	tplat_printf("end\n");
 	getchar();
 
-	// exit tplat
-	tplat_exit();
 	return 0;
 }

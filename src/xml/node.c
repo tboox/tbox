@@ -26,7 +26,6 @@
  */
 #include "node.h"
 #include "nlist.h"
-#include "../varg.h"
 
 /* /////////////////////////////////////////////////////////
  * details

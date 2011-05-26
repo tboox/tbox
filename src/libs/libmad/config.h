@@ -4,7 +4,7 @@
 #ifndef LIBMAD_CONFIG_H
 #define LIBMAD_CONFIG_H
 
-#include "../prefix.h" 
+#include "../../prefix.h" 
 
 
 /* Define to enable diagnostic debugging support. */
@@ -128,7 +128,7 @@
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
-#ifdef TPLAT_WORDS_BIGENDIAN
+#ifdef TB_WORDS_BIGENDIAN
 # 	define WORDS_BIGENDIAN
 #endif
 

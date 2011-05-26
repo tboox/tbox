@@ -49,7 +49,7 @@ static void save(tplat_char_t const* path, tplat_byte_t const* data, tplat_size_
 
 int main(int argc, char** argv)
 {
-	if (TPLAT_FALSE == tplat_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 	
 	tplat_size_t src_n, dst_n;
 

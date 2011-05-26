@@ -45,7 +45,7 @@ CPPFLAGS-o 		= -o
 # cflags: c files
 CFLAGS_RELEASE 	= 
 CFLAGS_DEBUG 	= 
-CFLAGS 			= -std=c99
+CFLAGS 			= 
 
 # cxxflags: c++ files
 CXXFLAGS_RELEASE = -fno-rtti

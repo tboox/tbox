@@ -26,8 +26,8 @@
  */
 #include "http.h"
 #include "../conv.h"
-#include "../memops.h"
 #include "../math/math.h"
+#include "../memory/memory.h"
 #include "../string/string.h"
 
 /* ////////////////////////////////////////////////////////////////////////

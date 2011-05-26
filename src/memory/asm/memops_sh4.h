@@ -20,8 +20,8 @@
  * \file		memops_sh4.h
  *
  */
-#ifndef TB_MEMOPS_SH4_H
-#define TB_MEMOPS_SH4_H
+#ifndef TB_MEMORY_ASM_MEMOPS_SH4_H
+#define TB_MEMORY_ASM_MEMOPS_SH4_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -37,7 +37,7 @@ extern "C" {
  * macros
  */
 
-#ifdef TPLAT_ASSEMBLER_GAS
+#ifdef TB_CONFIG_ASSEMBLER_GAS
 
 // memset_u16
 # 	if 0
@@ -52,7 +52,7 @@ extern "C" {
 				size--; \
 			} \
 			dst += size << 1; \
-			__tplat_asm__ __tplat_volatile__ \
+			__tb_asm__ __tb_volatile__ \
 			(
 				"1:\n\t" \
 				"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -80,7 +80,7 @@ extern "C" {
 			if (!left) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t" \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -96,7 +96,7 @@ extern "C" {
 			else if (size >= 4) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t" 			/* fill left data */ \
 					"dt %3\n\t" \
@@ -115,7 +115,7 @@ extern "C" {
 			} \
 			else \
 			{ \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t" \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -135,7 +135,7 @@ extern "C" {
 		do \
 		{ \
 			dst += size << 2; \
-			__tplat_asm__ __tplat_volatile__\
+			__tb_asm__ __tb_volatile__\
 			( \
 				"1:\n\t" \
 				"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -156,7 +156,7 @@ extern "C" {
 			if (!left) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t"  \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -172,7 +172,7 @@ extern "C" {
 			else if (size >= 4) /* fixme */ \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t" 			/* fill the left data */ \
 					"dt %3\n\t" \
@@ -191,7 +191,7 @@ extern "C" {
 			} \
 			else \
 			{ \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t"  \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -212,7 +212,7 @@ extern "C" {
 			if (!left) \
 			{ \
 				size >>= 2; \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t"  \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
@@ -227,7 +227,7 @@ extern "C" {
 			} \
 			else \
 			{ \
-				__tplat_asm__ __tplat_volatile__ \
+				__tb_asm__ __tb_volatile__ \
 				( \
 					"1:\n\t"  \
 					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \

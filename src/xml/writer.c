@@ -25,7 +25,6 @@
  * includes
  */
 #include "writer.h"
-#include "../varg.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces

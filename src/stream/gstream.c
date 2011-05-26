@@ -26,8 +26,7 @@
  */
 #include "gstream.h"
 #include "../math/math.h"
-#include "../memops.h"
-#include "../varg.h"
+#include "../memory/memory.h"
 #include "../string/string.h"
 /* /////////////////////////////////////////////////////////
  * types
