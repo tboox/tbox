@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		socket.h
+ * \file		time.h
  *
  */
-#ifndef TB_NETWORK_SOCKET_H
-#define TB_NETWORK_SOCKET_H
+#ifndef TB_UTILS_TIME_H
+#define TB_UTILS_TIME_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -35,39 +35,44 @@ extern "C" {
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-
-/* /////////////////////////////////////////////////////////
  * types
  */
 
-// the socket protocal type
-typedef enum __tb_socket_type_t
+// the time type
+typedef struct __tb_time_t
 {
-	TB_SOCKET_TYPE_TCP 		= TPLAT_SOCKET_TYPE_TCP
-, 	TB_SOCKET_TYPE_UDP 		= TPLAT_SOCKET_TYPE_UDP
-, 	TB_SOCKET_TYPE_UNKNOWN 	= TPLAT_SOCKET_TYPE_UNKNOWN
+	tb_int_t 	year; 			// [1900, 2299]
+	tb_int_t 	month; 			// [1, 12]
+	tb_int_t 	day; 			// [1, 31]
+	tb_int_t 	hours; 			// [0, 23]
+	tb_int_t 	minutes; 		// [0, 59]
+	tb_int_t 	seconds; 		// [0, 59]
+	tb_int_t 	milliseconds; 	// [0, 999]
+	tb_int_t 	wday; 			// days since sunday: [0, 6]
+	tb_int_t 	yday; 			// days since january 1: [0, 365]
+	tb_int_t 	isdst; 			// daylight savings time flag: 
 
-}tb_socket_type_t;
+}tb_time_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-// open & close
-tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-tb_handle_t	tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-tb_handle_t	tb_socket_server_accept(tb_handle_t hserver);
-void 		tb_socket_close(tb_handle_t hsocket);
+// time => local
+tb_bool_t 			tb_time_to_local(tb_int64_t time, tb_time_t* local);
 
-// for tcp
-tb_int_t 	tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
-tb_int_t 	tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
+// time => utc/gmt
+tb_bool_t 			tb_time_to_utc(tb_int64_t time, tb_time_t* utc);
 
-// for udp
-tb_int_t 	tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
-tb_int_t 	tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
+// local => time
+tb_bool_t 			tb_time_from_local(tb_int64_t* time, tb_time_t const* local);
+
+// utc/gmt => time
+tb_bool_t 			tb_time_from_utc(tb_int64_t* time, tb_time_t const* utc);
+
+// week
+tb_char_t const* 	tb_time_week(tb_time_t const* time);
+
 	
 // c plus plus
 #ifdef __cplusplus

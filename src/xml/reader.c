@@ -25,7 +25,8 @@
  * includes
  */
 #include "reader.h"
-#include "../conv.h"
+#include "../utils/utils.h"
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -117,7 +118,7 @@ tb_xml_reader_t* tb_xml_reader_open(tb_gstream_t* gst)
 	if (!reader) return TB_NULL;
 
 	// init it
-	memset(reader, 0, sizeof(tb_xml_reader_t));
+	tb_memset(reader, 0, sizeof(tb_xml_reader_t));
 	reader->gst = gst;
 	reader->event = TB_XML_READER_EVENT_NULL;
 	reader->cache = '\0';
@@ -616,7 +617,7 @@ void tb_xml_reader_dump(tb_xml_reader_t* reader)
 			{
 				tb_char_t const* version = tb_string_c_string(tb_xml_reader_get_version(reader));
 				tb_char_t const* encoding = tb_string_c_string(tb_xml_reader_get_encoding(reader));
-				tplat_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n", version? version : "", encoding? encoding : "");
+				tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n", version? version : "", encoding? encoding : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
@@ -624,44 +625,44 @@ void tb_xml_reader_dump(tb_xml_reader_t* reader)
 			{
 				tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
 				tb_size_t n = tb_xml_reader_get_attribute_count(reader);
-				if (!n) tplat_printf("<%s%s>", name? name : "", event != TB_XML_READER_EVENT_ELEMENT_EMPTY? "" : "/");
+				if (!n) tb_printf("<%s%s>", name? name : "", event != TB_XML_READER_EVENT_ELEMENT_EMPTY? "" : "/");
 				else
 				{
-					tplat_printf("<%s", name? name : "");
+					tb_printf("<%s", name? name : "");
 					tb_int_t i = 0;
 					for (i = 0; i < n; i++)
 					{
 						tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_attribute_name(reader, i));
 						tb_char_t const* value = tb_string_c_string(tb_xml_reader_get_attribute_value_by_index(reader, i));
-						if (name && value) tplat_printf(" %s = \"%s\"", name? name : "", value? value : "");
+						if (name && value) tb_printf(" %s = \"%s\"", name? name : "", value? value : "");
 					}
-					if (event != TB_XML_READER_EVENT_ELEMENT_EMPTY) tplat_printf(">");
-					else tplat_printf("/>");
+					if (event != TB_XML_READER_EVENT_ELEMENT_EMPTY) tb_printf(">");
+					else tb_printf("/>");
 				}
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
-				tplat_printf("</%s>", name? name : "");
+				tb_printf("</%s>", name? name : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_TEXT: 
 			{
 				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_text(reader));
-				tplat_printf("%s", text? text : "");
+				tb_printf("%s", text? text : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_CDATA: 
 			{
 				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_cdata(reader));
-				tplat_printf("<![CDATA[%s]]>", text? text : "");
+				tb_printf("<![CDATA[%s]]>", text? text : "");
 			}
 			break;
 		case TB_XML_READER_EVENT_COMMENT: 
 			{
 				tb_char_t const* text = tb_string_c_string(tb_xml_reader_get_comment(reader));
-				tplat_printf("<!--%s-->", text? text : "");
+				tb_printf("<!--%s-->", text? text : "");
 			}
 			break;
 		default: break;
@@ -671,7 +672,7 @@ void tb_xml_reader_dump(tb_xml_reader_t* reader)
 		tb_xml_reader_next(reader);
 	}
 
-	tplat_printf("\n");
+	tb_printf("\n");
 }
 #endif
 

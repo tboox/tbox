@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "../prefix.h"
 #include "../stream/bstream.h"
+#include "../memory/memory.h"
 #include "vlc.h"
 
 /* /////////////////////////////////////////////////////////

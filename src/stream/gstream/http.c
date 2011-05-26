@@ -49,7 +49,7 @@ typedef struct __tb_hstream_t
 /* /////////////////////////////////////////////////////////
  * details
  */
-static __tplat_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 {
 	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_HTTP, TB_NULL);
 	return (tb_hstream_t*)gst;

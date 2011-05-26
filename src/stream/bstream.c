@@ -25,6 +25,7 @@
  */
 #include "bstream.h"
 #include "gstream.h"
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -60,8 +61,8 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 	// load
 	tb_byte_t 		data[4096];
 	tb_size_t 		load = 0;
-	tb_size_t 		base = (tb_size_t)tplat_clock();
-	tb_size_t 		time = (tb_size_t)tplat_clock();
+	tb_size_t 		base = (tb_size_t)tb_clock();
+	tb_size_t 		time = (tb_size_t)tb_clock();
 	tb_size_t 		left = tb_gstream_left(gst);
 
 	while(1)
@@ -72,14 +73,14 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 			if (timeout > 10000) break;
 		}
 		else
 		{
 			load += ret;
 			if (tb_bstream_set_data(bst, data, ret) != ret) break;
-			time = (tb_size_t)tplat_clock();
+			time = (tb_size_t)tb_clock();
 		}
 
 		// is end?
@@ -100,8 +101,8 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 	// load
 	tb_byte_t 		data[4096];
 	tb_size_t 		save = 0;
-	tb_size_t 		base = (tb_size_t)tplat_clock();
-	tb_size_t 		time = (tb_size_t)tplat_clock();
+	tb_size_t 		base = (tb_size_t)tb_clock();
+	tb_size_t 		time = (tb_size_t)tb_clock();
 	while(1)
 	{
 		// get data
@@ -120,13 +121,13 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 				else if (!ret)
 				{
 					// > 10s?
-					tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+					tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 					if (timeout > 10000) break;
 				}
 				else
 				{
 					write += ret;
-					time = (tb_size_t)tplat_clock();
+					time = (tb_size_t)tb_clock();
 				}
 			}
 
@@ -394,7 +395,7 @@ tb_float_t tb_bstream_get_double_le(tb_bstream_t* bst)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bstream_get_u32_le(bst);
 	conv.i[1] = tb_bstream_get_u32_le(bst);
 #else
@@ -413,7 +414,7 @@ tb_float_t tb_bstream_get_double_be(tb_bstream_t* bst)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bstream_get_u32_be(bst);
 	conv.i[1] = tb_bstream_get_u32_be(bst);
 #else
@@ -432,7 +433,7 @@ tb_float_t tb_bstream_get_double_ne(tb_bstream_t* bst)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bstream_get_u32_ne(bst);
 	conv.i[1] = tb_bstream_get_u32_ne(bst);
 #else
@@ -525,7 +526,7 @@ tb_size_t tb_bstream_get_data(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size
 	if (bst->e - bst->p < get_n) get_n = bst->e - bst->p;
 	if (get_n)
 	{
-		memcpy(data, bst->p, get_n);
+		tb_memcpy(data, bst->p, get_n);
 		bst->p += get_n;
 	}
 	return (get_n > 0? get_n : 0);
@@ -635,7 +636,7 @@ tb_size_t tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_
 	if (bst->e - bst->p < set_n) set_n = bst->e - bst->p;
 	if (set_n)
 	{
-		memcpy(bst->p, data, set_n);
+		tb_memcpy(bst->p, data, set_n);
 		bst->p += set_n;
 	}
 	return (set_n > 0? set_n : 0);

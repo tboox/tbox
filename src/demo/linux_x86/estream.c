@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	if (!ist || !ost || !est) goto end;
 
 	// init option
-	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	if (TB_FALSE == tb_gstream_open(ist)) goto end;
@@ -23,8 +23,8 @@ int main(int argc, char** argv)
 	// read data
 	tb_byte_t 		data[4096];
 	tb_size_t 		read = 0;
-	tb_size_t 		base = (tb_size_t)tplat_clock();
-	tb_size_t 		time = (tb_size_t)tplat_clock();
+	tb_size_t 		base = (tb_size_t)tb_clock();
+	tb_size_t 		time = (tb_size_t)tb_clock();
 	do
 	{
 		tb_int_t ret = tb_gstream_read(est, data, 4096);
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tplat_clock();
+			time = (tb_size_t)tb_clock();
 
 #if 1
 			tb_int_t write = 0;
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 		}
 		else if (!ret) 
 		{
-			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 			if (timeout > 5000) break;
 		}
 		else break;
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 		// update info
 		if (time > base && ((time - base) % 1000)) 
 		{
-			tplat_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
+			tb_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
 			fflush(stdout);
 		}
 
@@ -68,11 +68,10 @@ end:
 	tb_gstream_destroy(ist);
 	tb_gstream_destroy(ost);
 
-	tplat_printf("end\n");
+	tb_printf("end\n");
 	getchar();
 
-	// exit tplat
-	tplat_exit();
+	tb_exit();
 	return 0;
 }
 

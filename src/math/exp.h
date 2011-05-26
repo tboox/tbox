@@ -52,7 +52,7 @@ extern tb_float_t g_tb_math_fexpi_table[47];
  * implements
  */
 
-static __tplat_inline__ tb_float_t tb_math_fexpf(tb_float_t x)
+static __tb_inline__ tb_float_t tb_math_fexpf(tb_float_t x)
 {
 	tb_float_t a = x - (tb_int_t)x;
 	return (TB_MATH_FEXPI(((tb_int_t)x)) * TB_MATH_FEXPF1(a));

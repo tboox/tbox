@@ -28,7 +28,7 @@
 /* /////////////////////////////////////////////////////////
  * implements
  */
-static __tplat_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
+static __tb_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
 {
 	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_ZLIB, TB_NULL);
 	return (tb_zip_zlib_t*)zip;
@@ -43,7 +43,7 @@ static void tb_zip_zlib_close(tb_zip_t* zip)
 		else if (zip->action == TB_ZIP_ACTION_DEFLATE) deflateEnd(&(zlib->zst));
 
 		// reset it
-		memset(zlib, 0, sizeof(tb_zip_zlib_t));
+		tb_memset(zlib, 0, sizeof(tb_zip_zlib_t));
 	}
 }
 static tb_zip_status_t tb_zip_zlib_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
@@ -125,7 +125,7 @@ tb_zip_t* tb_zip_zlib_open(tb_zip_zlib_t* zlib, tb_zip_action_t action)
 	TB_ASSERT_RETURN_VAL(zip, TB_NULL);
 	
 	// init zip
-	memset(zip, 0, sizeof(tb_zip_zlib_t));
+	tb_memset(zip, 0, sizeof(tb_zip_zlib_t));
 	zip->algo 		= TB_ZIP_ALGO_ZLIB;
 	zip->action 	= action;
 	zip->close 		= tb_zip_zlib_close;

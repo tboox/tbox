@@ -109,7 +109,7 @@ static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_bstream_t const* 
 tb_zip_vlc_t* tb_zip_vlc_golomb_open(tb_zip_vlc_golomb_t* golomb, tb_size_t defm)
 {
 	// init
-	memset(golomb, 0, sizeof(tb_zip_vlc_golomb_t));
+	tb_memset(golomb, 0, sizeof(tb_zip_vlc_golomb_t));
 	((tb_zip_vlc_t*)golomb)->type = TB_ZIP_VLC_TYPE_GOLOMB;
 	((tb_zip_vlc_t*)golomb)->set = tb_zip_vlc_golomb_set;
 	((tb_zip_vlc_t*)golomb)->get = tb_zip_vlc_golomb_get;
@@ -162,12 +162,12 @@ tb_zip_vlc_t* tb_zip_vlc_golomb_open(tb_zip_vlc_golomb_t* golomb, tb_size_t defm
 		tb_bstream_set_u1(&bst, 0);
 		for (i = 0; i < m; i++, r >>= 1) tb_bstream_set_u1(&bst, r & 0x1);
 
-		tplat_printf("x = 0x%04x, q = %d, m = %d: ", x, q, m);
+		tb_printf("x = 0x%04x, q = %d, m = %d: ", x, q, m);
 		tb_bstream_attach(&bst, d, 8);
-		while (tb_bstream_get_u1(&bst)) tplat_printf("1");
-		tplat_printf("0 ");
-		for (i = 0; i < m; i++) tplat_printf("%d", tb_bstream_get_u1(&bst));
-		tplat_printf("\n");
+		while (tb_bstream_get_u1(&bst)) tb_printf("1");
+		tb_printf("0 ");
+		for (i = 0; i < m; i++) tb_printf("%d", tb_bstream_get_u1(&bst));
+		tb_printf("\n");
 	}
 
 #endif

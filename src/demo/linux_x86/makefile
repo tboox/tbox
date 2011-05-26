@@ -2,12 +2,12 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES 							= conv math dns cstring time http cookies gstream estream zstream format vector slist xml
+NAMES = conv math dns cstring time http cookies gstream estream zstream format vector slist xml
 
 define MAKE_MODULES
 $(1)_TYPE 		= BIN
 $(1)_C_FILES 	= $(1)
-$(1)_LIBS 		= tbox tplat z m asound dl pthread
+$(1)_LIBS 		= tbox z m asound dl pthread
 $(1)_LIB_DIR 	= ../../
 $(1)_INC_DIR 	= ../../
 endef

@@ -45,11 +45,11 @@
  *                                                         window->base
  *
  */
-static __tplat_inline__ tb_size_t tb_lzsw_window_goff(tb_size_t base, tb_size_t coff)
+static __tb_inline__ tb_size_t tb_lzsw_window_goff(tb_size_t base, tb_size_t coff)
 {
 	return ((coff + base) % TB_LZSW_WINDOW_SIZE_MAX);
 }
-static __tplat_inline__ tb_size_t tb_lzsw_window_coff(tb_size_t base, tb_size_t goff)
+static __tb_inline__ tb_size_t tb_lzsw_window_coff(tb_size_t base, tb_size_t goff)
 {
 	return ((goff + TB_LZSW_WINDOW_SIZE_MAX - base) % TB_LZSW_WINDOW_SIZE_MAX);
 }
@@ -107,7 +107,7 @@ static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t si
 #if 1
 	if (size == TB_LZSW_WINDOW_SIZE_MAX)
 	{
-		memset(window->hash, 0, sizeof(tb_size_t) * TB_LZSW_WINDOW_HASH_MAX);
+		tb_memset(window->hash, 0, sizeof(tb_size_t) * TB_LZSW_WINDOW_HASH_MAX);
 		tb_pool_clear(pool);
 	}
 	else
@@ -345,7 +345,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 #if 0 
 			// fill data
 			// \note: address maybe overlap
-			memcpy(dp, window->we + p - window->wn, n);
+			tb_memcpy(dp, window->we + p - window->wn, n);
 
 			// update dp
 			dp += n;
@@ -401,7 +401,7 @@ static void tb_zstream_inflate_lzsw_close(tb_tstream_t* st)
 		if (zst->vlc && zst->vlc->close) zst->vlc->close(zst->vlc); 
 
 		// reset it
-		memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
+		tb_memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
 	}
 }
 /* /////////////////////////////////////////////////////////
@@ -524,7 +524,7 @@ static void tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 #endif
 
 		// reset it
-		memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
+		tb_memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
 	}
 }
 
@@ -538,7 +538,7 @@ tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 	if (!zst) return TB_NULL;
 
 	// init 
-	memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
+	tb_memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
 
 	// init tstream
 	((tb_tstream_t*)zst)->transform = tb_zstream_inflate_lzsw_transform;
@@ -568,7 +568,7 @@ tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 	if (!zst) return TB_NULL;
 
 	// init 
-	memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
+	tb_memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
 
 	// init tstream
 	((tb_tstream_t*)zst)->transform = tb_zstream_deflate_lzsw_transform;

@@ -25,10 +25,11 @@
  * includes
  */
 #include "http.h"
-#include "../conv.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
+#include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -262,8 +263,8 @@ static tb_bool_t tb_http_socket_open(tb_http_t* http)
 	TB_ASSERT_RETURN_VAL(http, TB_FALSE);
 	if (!http->option.bhttps)
 	{
-		tplat_handle_t socket = tplat_socket_client_open(http->option.host, http->option.port, TPLAT_SOCKET_TYPE_TCP, TB_FALSE);
-		http->socket = socket != TPLAT_INVALID_HANDLE? (tb_handle_t)socket : TB_INVALID_HANDLE;
+		tb_handle_t socket = tb_socket_client_open(http->option.host, http->option.port, TB_SOCKET_TYPE_TCP, TB_FALSE);
+		http->socket = socket != TB_INVALID_HANDLE? (tb_handle_t)socket : TB_INVALID_HANDLE;
 		http->status.bhttps = 0;
 	}
 	else
@@ -282,7 +283,7 @@ static void tb_http_socket_close(tb_http_t* http)
 	TB_IF_FAIL_RETURN(http->socket != TB_INVALID_HANDLE);
 
 	if (!http->status.bhttps) 
-		tplat_socket_close((tplat_handle_t)http->socket); 
+		tb_socket_close((tb_handle_t)http->socket); 
 	else
 	{
 		if (http->option.sclose_func) 
@@ -298,7 +299,7 @@ static tb_int_t tb_http_socket_read(tb_http_t* http, tb_byte_t* data, tb_size_t 
 	TB_ASSERT_RETURN_VAL(http->socket != TB_INVALID_HANDLE, -1);
 
 	if (!http->option.bhttps) 
-		return tplat_socket_recv((tplat_handle_t)http->socket, (tplat_byte_t*)data, (tplat_size_t)size); 
+		return tb_socket_recv((tb_handle_t)http->socket, (tb_byte_t*)data, (tb_size_t)size); 
 	else 
 	{
 		TB_ASSERT_RETURN_VAL(http->option.sread_func, -1);
@@ -311,7 +312,7 @@ static tb_int_t tb_http_socket_write(tb_http_t* http, tb_byte_t const* data, tb_
 	TB_ASSERT_RETURN_VAL(http->socket != TB_INVALID_HANDLE, -1);
 
 	if (!http->option.bhttps) 
-		return tplat_socket_send((tplat_handle_t)http->socket, (tplat_byte_t const*)data, (tplat_size_t)size); 
+		return tb_socket_send((tb_handle_t)http->socket, (tb_byte_t const*)data, (tb_size_t)size); 
 	else 
 	{
 		TB_ASSERT_RETURN_VAL(http->option.swrite_func, -1);
@@ -323,19 +324,19 @@ tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket != TB_INVALID_HANDLE && data, -1);
 	
 	tb_size_t 	write = 0;
-	tb_size_t 	time = (tb_size_t)tplat_clock();
+	tb_size_t 	time = (tb_size_t)tb_clock();
 	while (write < size)
 	{
 		tb_int_t ret = tb_http_socket_write(http, data + write, size - write);
 		if (ret > 0) 
 		{
 			write += ret;
-			time = (tb_size_t)tplat_clock();
+			time = (tb_size_t)tb_clock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 			if (timeout > http->option.timeout) break;
 		}
 		else break;
@@ -349,19 +350,19 @@ tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket != TB_INVALID_HANDLE && data, -1);
 
 	tb_size_t 	read = 0;
-	tb_size_t 	time = (tb_size_t)tplat_clock();
+	tb_size_t 	time = (tb_size_t)tb_clock();
 	while (read < size)
 	{
 		tb_int_t ret = tb_http_socket_read(http, data + read, size - read);	
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tplat_clock();
+			time = (tb_size_t)tb_clock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 			if (timeout > http->option.timeout) break;
 		}
 		else break;
@@ -690,7 +691,7 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 	tb_size_t 			size = tb_string_size((tb_string_t*)&s);
 	TB_ASSERT_GOTO(head, fail);
 
-	//tplat_printf(head);
+	//tb_printf(head);
 	
 	// write http request
 	if (size != tb_http_write_block(http, (tb_byte_t*)head, size)) goto fail;

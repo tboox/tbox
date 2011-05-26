@@ -47,9 +47,9 @@ static tb_size_t tb_slist_insert_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 10000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_insert(slist, index, "F");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_insert(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -76,9 +76,9 @@ static tb_size_t tb_slist_insert_head_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_insert_head(slist, "F");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_insert_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -105,9 +105,9 @@ static tb_size_t tb_slist_insert_tail_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_insert_tail(slist, "F");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_insert_tail(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -136,9 +136,9 @@ static tb_size_t tb_slist_ninsert_test()
 	tb_size_t index = tb_slist_insert_head(slist, "F");
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_ninsert(slist, index, "F", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_ninsert(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -164,9 +164,9 @@ static tb_size_t tb_slist_ninsert_head_test()
 	TB_ASSERT_RETURN_VAL(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_ninsert_head(slist, "F", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_ninsert_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -192,9 +192,9 @@ static tb_size_t tb_slist_ninsert_tail_test()
 	TB_ASSERT_RETURN_VAL(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_ninsert_tail(slist, "F", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_ninsert_tail(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -222,9 +222,9 @@ static tb_size_t tb_slist_remove_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) index = tb_slist_remove(slist, index);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_remove(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -246,9 +246,9 @@ static tb_size_t tb_slist_remove_head_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_remove_head(slist);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_remove_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -268,9 +268,9 @@ static tb_size_t tb_slist_remove_last_test()
 	tb_size_t i = 0;
 	tb_size_t n = 10000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_remove_last(slist);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_remove_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -291,9 +291,9 @@ static tb_size_t tb_slist_nremove_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nremove(slist, tb_slist_head(slist), n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nremove(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -314,9 +314,9 @@ static tb_size_t tb_slist_nremove_head_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nremove_head(slist, n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nremove_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -337,9 +337,9 @@ static tb_size_t tb_slist_nremove_last_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nremove_last(slist, n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nremove_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -362,9 +362,9 @@ static tb_size_t tb_slist_replace_test()
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
 	tb_size_t itor = tb_slist_head(slist);
 	tb_size_t tail = tb_slist_tail(slist);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (; itor != tail; itor = tb_slist_next(slist, itor)) tb_slist_replace(slist, itor, "R");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_replace(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -388,9 +388,9 @@ static tb_size_t tb_slist_replace_head_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_replace_head(slist, "R");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_replace_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -413,9 +413,9 @@ static tb_size_t tb_slist_replace_last_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (i = 0; i < n; i++) tb_slist_replace_last(slist, "R");
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_replace_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -438,9 +438,9 @@ static tb_size_t tb_slist_nreplace_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nreplace(slist, tb_slist_head(slist), "R", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nreplace(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -463,9 +463,9 @@ static tb_size_t tb_slist_nreplace_head_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nreplace_head(slist, "R", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nreplace_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -488,9 +488,9 @@ static tb_size_t tb_slist_nreplace_last_test()
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_slist_ninsert_head(slist, "F", n);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	tb_slist_nreplace_last(slist, "R", n);
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_nreplace_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -517,12 +517,12 @@ static tb_size_t tb_slist_iterator_next_test()
 	tb_slist_ninsert_head(slist, "F", n);
 	tb_size_t itor = tb_slist_head(slist);
 	tb_size_t tail = tb_slist_tail(slist);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	for (; itor != tail; itor = tb_slist_next(slist, itor))
 	{
-		__tplat_volatile__ tb_byte_t const* item = tb_slist_const_at(slist, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_slist_const_at(slist, itor);
 	}
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_iterator_next(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
@@ -542,15 +542,15 @@ static tb_size_t tb_slist_iterator_prev_test()
 	tb_slist_ninsert_head(slist, "F", n);
 	tb_size_t itor = tb_slist_last(slist);
 	tb_size_t head = tb_slist_head(slist);
-	tb_size_t t = (tb_size_t)tplat_clock();
+	tb_size_t t = (tb_size_t)tb_clock();
 	while (1)
 	{
-		__tplat_volatile__ tb_byte_t const* item = tb_slist_const_at(slist, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_slist_const_at(slist, itor);
 
 		if (itor == head) break;
 		itor = tb_slist_prev(slist, itor);
 	}
-	t = (tb_size_t)tplat_clock() - t;
+	t = (tb_size_t)tb_clock() - t;
 
 	// time
 	TB_DBG("tb_slist_iterator_prev(%d): %d ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));

@@ -28,7 +28,9 @@
 #include "../math/math.h"
 #include "../stream/stream.h"
 #include "../string/string.h"
-#include "../conv.h"
+#include "../utils/utils.h"
+#include "../platform/platform.h"
+
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -179,48 +181,48 @@ static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 	else return TB_NULL;
 }
 #if 0 
-static tb_int_t tb_dns_send(tplat_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
+static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
 {
 	tb_int_t send = 0;
-	tb_int_t time = (tb_int_t)tplat_clock();
+	tb_int_t time = (tb_int_t)tb_clock();
 	while(send < size)
 	{
-		tb_int_t ret = tplat_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
+		tb_int_t ret = tb_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
 		//TB_DBG("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_int_t timeout = ((tb_int_t)tplat_clock()) - time;
+			tb_int_t timeout = ((tb_int_t)tb_clock()) - time;
 			if (timeout > 10000 || timeout < 0) break;
 		}
 		else
 		{
 			send += ret;
-			time = (tb_int_t)tplat_clock();
+			time = (tb_int_t)tb_clock();
 		}
 	}
 	return send;
 }
-static tb_int_t tb_dns_recv(tplat_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
+static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
 {
 	tb_int_t recv = 0;
-	tb_int_t time = (tb_int_t)tplat_clock();
+	tb_int_t time = (tb_int_t)tb_clock();
 	while(recv < size)
 	{
-		tb_int_t ret = tplat_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
+		tb_int_t ret = tb_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
 		//TB_DBG("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 			if (timeout > 10000 || timeout < 0) break;
 		}
 		else
 		{
 			recv += ret;
-			time = (tb_size_t)tplat_clock();
+			time = (tb_size_t)tb_clock();
 		}
 	}
 	return recv;
@@ -272,7 +274,7 @@ void tb_dns_server_dump()
 	tb_int_t i = 0;
 	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
 	{
-		if (g_dns_servers[i][0]) tplat_printf("dns server: %s\n", g_dns_servers[i]);
+		if (g_dns_servers[i][0]) tb_printf("dns server: %s\n", g_dns_servers[i]);
 	}
 }
 
@@ -282,11 +284,11 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 
 	// connect dns server
 #ifdef TB_DNS_SERVER_TCP
-	tplat_handle_t hserver = tplat_socket_client_open(server, TB_DNS_SERVER_PORT, TPLAT_SOCKET_TYPE_TCP, TPLAT_TRUE);
+	tb_handle_t hserver = tb_socket_client_open(server, TB_DNS_SERVER_PORT, TB_SOCKET_TYPE_TCP, TB_TRUE);
 #else
-	tplat_handle_t hserver = tplat_socket_client_open(TPLAT_NULL, 0, TPLAT_SOCKET_TYPE_UDP, TPLAT_TRUE);
+	tb_handle_t hserver = tb_socket_client_open(TB_NULL, 0, TB_SOCKET_TYPE_UDP, TB_TRUE);
 #endif
-	if (hserver == TPLAT_INVALID_HANDLE) goto fail;
+	if (hserver == TB_INVALID_HANDLE) goto fail;
 	TB_DNS_DBG("connect ok.");
 		
 	// bstream
@@ -338,18 +340,18 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 #endif
 
 #ifdef TB_DNS_SERVER_TCP
-	if (size != tplat_socket_send(hserver, data, size)) goto fail;
+	if (size != tb_socket_send(hserver, data, size)) goto fail;
 #else
-	if (size != tplat_socket_sendto(hserver, server, TB_DNS_SERVER_PORT, data, size)) goto fail;
+	if (size != tb_socket_sendto(hserver, server, TB_DNS_SERVER_PORT, data, size)) goto fail;
 	//if (size != tb_dns_send(hserver, server, data, size)) goto fail;
 #endif
 	TB_DNS_DBG("send query ok.");
 
 	// recv dns header
 #ifdef TB_DNS_SERVER_TCP
-	size = tplat_socket_recv(hserver, data, 8192);
+	size = tb_socket_recv(hserver, data, 8192);
 #else
-	size = tplat_socket_recvfrom(hserver, server, TB_DNS_SERVER_PORT, data, 8192);
+	size = tb_socket_recvfrom(hserver, server, TB_DNS_SERVER_PORT, data, 8192);
 	//size = tb_dns_recv(hserver, server, data, 8192);
 #endif
 	if (size <= 0) goto fail;
@@ -524,11 +526,11 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 
 ok:
 	// close server
-	tplat_socket_close(hserver);
+	tb_socket_close(hserver);
 	return ip;
 fail:
 	TB_DNS_DBG("lookup failed.");
-	if (hserver != TPLAT_INVALID_HANDLE) tplat_socket_close(hserver);
+	if (hserver != TB_INVALID_HANDLE) tb_socket_close(hserver);
 	return TB_NULL;
 }
 tb_char_t const* tb_dns_lookup(tb_char_t const* host, tb_char_t* ip)

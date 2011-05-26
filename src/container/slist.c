@@ -26,7 +26,7 @@
 #include "slist.h"
 #include "../math/math.h"
 #include "../memory/memory.h"
-#include "../bits.h"
+#include "../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces

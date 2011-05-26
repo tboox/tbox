@@ -31,7 +31,6 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "tplat/tplat.h"
 #include "config.h"
 #include <stdarg.h>
 
@@ -45,13 +44,13 @@ extern "C" {
 #endif
 
 // debug
-#ifndef TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
+#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 #ifdef TB_DEBUG
-#	define TB_DBG(fmt, arg...)					do { tplat_printf("[tb]:" fmt "\n" , ## arg); } while (0)
-#	define TB_ABORT()							do { tplat_printf("[tb]: abort at:%d: file: %s\n", __tplat_line__, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
-#	define TB_ASSERT(x)							do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); } } while(0)
-#	define TB_ASSERTA(x)						do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
-#	define TB_ASSERTM(x, fmt, arg...)			do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s msg: " fmt " file: %s\n", __tplat_line__, #x, ## arg, __tplat_file__); }} while(0)
+#	define TB_DBG(fmt, arg...)					do { tb_printf("[tb]:" fmt "\n" , ## arg); } while (0)
+#	define TB_ABORT()							do { tb_printf("[tb]: abort at:%d: file: %s\n", __tb_line__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#	define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); } } while(0)
+#	define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#	define TB_ASSERTM(x, fmt, arg...)			do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s msg: " fmt " file: %s\n", __tb_line__, #x, ## arg, __tb_file__); }} while(0)
 #else
 #	define TB_DBG(fmt, arg...)
 # 	define TB_ABORT()
@@ -62,9 +61,9 @@ extern "C" {
 #else
 #ifdef TB_DEBUG
 #	define TB_DBG 								
-#	define TB_ABORT()							do { tplat_printf("[tb]: abort at:%d: file: %s\n", __tplat_line__, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
-#	define TB_ASSERT(x)							do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); } } while(0)
-#	define TB_ASSERTA(x)						do { if (!(x)) {tplat_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tplat_line__, #x, __tplat_file__); __tplat_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#	define TB_ABORT()							do { tb_printf("[tb]: abort at:%d: file: %s\n", __tb_line__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#	define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); } } while(0)
+#	define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
 #	define TB_ASSERTM
 #else
 #	define TB_DBG
@@ -73,7 +72,7 @@ extern "C" {
 #	define TB_ASSERTA(x)
 #	define TB_ASSERTM
 #endif
-#endif /* TPLAT_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO */
+#endif /* TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO */
 
 // check
 #define TB_IF_FAIL_RETURN(x) 						do { if (!(x)) return ; } while (0)
@@ -85,12 +84,12 @@ extern "C" {
 #define TB_IF_REACHED_GOTO(x, b) 					do { goto b; } while (0)
 
 #define TB_ASSERT_RETURN(x) 						do { TB_ASSERT(x); if (!(x)) return ; } while (0)
-#define TB_ASSERT_ABORT(x) 							do { TB_ASSERT(x); if (!(x)) { __tplat_volatile__ tb_int_t* a = 0; *a = 1; } ; } while (0)
+#define TB_ASSERT_ABORT(x) 							do { TB_ASSERT(x); if (!(x)) { __tb_volatile__ tb_int_t* a = 0; *a = 1; } ; } while (0)
 #define TB_ASSERT_RETURN_VAL(x, v) 					do { TB_ASSERT(x); if (!(x)) return (v); } while (0)
 #define TB_ASSERT_GOTO(x, b) 						do { TB_ASSERT(x); if (!(x)) goto b; } while (0)
 
 // not implement
-#define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: %s at %d file: %s", __tplat_func__, __tplat_line__, __tplat_file__); } while (0)
+#define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: %s at %d file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
 
 // the size of the static array
 #define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
@@ -308,14 +307,18 @@ extern "C" {
 #endif
 
 // bool values
-#define TB_TRUE						TPLAT_TRUE
-#define	TB_FALSE					TPLAT_FALSE
+#define TB_TRUE						((tb_bool_t)1)
+#define	TB_FALSE					((tb_bool_t)0)
 
 // invalidate handle
-#define TB_INVALID_HANDLE 			TPLAT_INVALID_HANDLE
+#define TB_INVALID_HANDLE 			((tb_handle_t)-1)
 
 // null
-#define TB_NULL 					TPLAT_NULL
+#ifdef __cplusplus
+# 	define TB_NULL 					(0)
+#else
+# 	define TB_NULL 					((void*)0)
+#endif
 
 /* fixed-point numbers
  *
@@ -372,30 +375,30 @@ do \
 /* /////////////////////////////////////////////////////////
  * types
  */
-typedef tplat_int_t				tb_int_t;
-typedef tplat_uint_t			tb_uint_t;
-typedef tplat_bool_t			tb_bool_t;
-typedef tplat_size_t			tb_size_t;
-typedef tplat_int8_t			tb_int8_t;
-typedef tplat_sint8_t			tb_sint8_t;
-typedef tplat_uint8_t			tb_uint8_t;
-typedef tplat_int16_t			tb_int16_t;
-typedef tplat_sint16_t			tb_sint16_t;
-typedef tplat_uint16_t			tb_uint16_t;
-typedef tplat_int32_t			tb_int32_t;
-typedef tplat_sint32_t			tb_sint32_t;
-typedef tplat_uint32_t			tb_uint32_t;
-typedef tplat_byte_t			tb_byte_t;
-typedef tplat_handle_t			tb_handle_t;
-typedef tplat_char_t 			tb_char_t;
-typedef tplat_float_t 			tb_float_t;
-typedef tplat_int64_t 			tb_int64_t;
-typedef tplat_sint64_t			tb_sint64_t;
-typedef tplat_uint64_t 			tb_uint64_t;
+typedef signed int				tb_int_t;
+typedef unsigned int			tb_uint_t;
+typedef tb_int_t				tb_bool_t;
+typedef tb_uint_t				tb_size_t;
+typedef signed char				tb_int8_t;
+typedef tb_int8_t				tb_sint8_t;
+typedef unsigned char			tb_uint8_t;
+typedef signed short			tb_int16_t;
+typedef tb_int16_t				tb_sint16_t;
+typedef unsigned short			tb_uint16_t;
+typedef tb_int_t				tb_int32_t;
+typedef tb_int32_t				tb_sint32_t;
+typedef tb_uint_t				tb_uint32_t;
+typedef tb_uint8_t				tb_byte_t;
+typedef void* 					tb_handle_t;
+typedef char 					tb_char_t;
+typedef double 					tb_float_t;
 typedef tb_int16_t 				tb_fixed8_t;
 typedef tb_int32_t 				tb_fixed16_t;
 
 #ifndef TB_CONFIG_TYPE_NOT_SUPPORT_INT64
+typedef signed long long 		tb_int64_t;
+typedef tb_int64_t				tb_sint64_t;
+typedef unsigned long long 		tb_uint64_t;
 typedef tb_int64_t 				tb_fixed32_t;
 #else
 # 	error int64 not support.

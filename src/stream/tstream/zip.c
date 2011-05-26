@@ -56,7 +56,7 @@ typedef struct __tb_zstream_t
  * implements
  */
 
-static __tplat_inline__ tb_zstream_t* tb_zstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_zstream_t* tb_zstream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(tst && tst->type == TB_TSTREAM_TYPE_ZIP, TB_NULL);

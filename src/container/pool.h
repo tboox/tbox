@@ -54,7 +54,7 @@ extern "C" {
 // prediction
 #define TB_MEMORY_POOL_PRED_ENABLE
 
-#ifdef TPLAT_MEMORY_MODE_SMALL
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_MEMORY_POOL_PRED_MAX 					(128)
 #else
 # 	define TB_MEMORY_POOL_PRED_MAX 					(256)

@@ -27,7 +27,8 @@
  * includes
  */
 #include "prefix.h"
-#include "../conv.h"
+#include "../utils/utils.h"
+
 /* ////////////////////////////////////////////////////////////////////////
  * types
  */
@@ -38,28 +39,28 @@
  */
 
 // compare
-static __tplat_inline__ tb_int_t tb_cstring_compare(tb_char_t const* s1, tb_char_t const* s2)
+static __tb_inline__ tb_int_t tb_cstring_compare(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2) return 0;
 	for (; (*s1 == *s2) && *s1; s1++, s2++) ;
 	return (*s1 - *s2);
 }
-static __tplat_inline__ tb_int_t tb_cstring_ncompare(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static __tb_inline__ tb_int_t tb_cstring_ncompare(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2 || !n) return 0;
 	for (; (*s1 == *s2) && *s1 && --n; s1++, s2++) ;
 	return (*s1 - *s2);
 }
-static __tplat_inline__ tb_int_t tb_cstring_compare_nocase(tb_char_t const* s1, tb_char_t const* s2)
+static __tb_inline__ tb_int_t tb_cstring_compare_nocase(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2) return 0;
 	for (; ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))) && *s1; s1++, s2++) ;
 	return (TB_CONV_TOLOWER(*s1) - TB_CONV_TOLOWER(*s2));
 }
-static __tplat_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static __tb_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2 || !n) return 0;
@@ -68,7 +69,7 @@ static __tplat_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1,
 }
 
 // length
-static __tplat_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
+static __tb_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
 {
 #if 0
 	TB_ASSERT(s);
@@ -93,7 +94,7 @@ static __tplat_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
 }
 
 // copy
-static __tplat_inline__ tb_char_t* tb_cstring_copy(tb_char_t* s1, tb_char_t const* s2)
+static __tb_inline__ tb_char_t* tb_cstring_copy(tb_char_t* s1, tb_char_t const* s2)
 {
 #if 0
 	TB_ASSERT(s1 && s2);
@@ -117,7 +118,7 @@ static __tplat_inline__ tb_char_t* tb_cstring_copy(tb_char_t* s1, tb_char_t cons
 	return p;
 #endif
 }
-static __tplat_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+static __tb_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
 #if 0
 	TB_ASSERT(s1 && s2);

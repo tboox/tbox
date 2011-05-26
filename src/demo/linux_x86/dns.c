@@ -13,6 +13,6 @@ int main(int argc, char** argv)
 
 	tb_char_t ip[16];
 	tb_char_t const* s = tb_dns_lookup(argv[1], ip);
-	tplat_printf("host: %s, ip: %s\n", argv[1], s? s : "");
+	tb_printf("host: %s, ip: %s\n", argv[1], s? s : "");
 	return 0;
 }

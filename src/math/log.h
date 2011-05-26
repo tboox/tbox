@@ -63,7 +63,7 @@ extern tb_uint32_t g_tb_math_iclog2i_table[33];
 /* ////////////////////////////////////////////////////////////////////////
  * implements
  */
-static __tplat_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
+static __tb_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
 {
 	tb_int_t l = 0;
 	tb_int_t m = 15;
@@ -77,7 +77,7 @@ static __tplat_inline__ tb_uint32_t tb_math_ilog2i(tb_uint32_t x)
 	}
 	return m;
 }
-static __tplat_inline__ tb_uint32_t tb_math_irlog2i(tb_uint32_t x)
+static __tb_inline__ tb_uint32_t tb_math_irlog2i(tb_uint32_t x)
 {
 	tb_int_t l = 0;
 	tb_int_t m = 15;
@@ -92,7 +92,7 @@ static __tplat_inline__ tb_uint32_t tb_math_irlog2i(tb_uint32_t x)
 	return m;
 }
 
-static __tplat_inline__ tb_uint32_t tb_math_iclog2i(tb_uint32_t x)
+static __tb_inline__ tb_uint32_t tb_math_iclog2i(tb_uint32_t x)
 {
 	tb_int_t l = 0;
 	tb_int_t m = 16;

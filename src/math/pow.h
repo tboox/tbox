@@ -54,7 +54,7 @@ extern tb_float_t g_tb_math_fpow2i_table[53];
 /* ////////////////////////////////////////////////////////////////////////
  * implements
  */
-static __tplat_inline__ tb_float_t tb_math_fpow2f(tb_float_t x)
+static __tb_inline__ tb_float_t tb_math_fpow2f(tb_float_t x)
 {
 	tb_float_t a = (x - (tb_int_t)x) * TB_MATH_CONST_LN2;
 	return (TB_MATH_FPOW2I((tb_int_t)x) * TB_MATH_FEXPF1(a));

@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -47,7 +48,7 @@ typedef struct __tb_dstream_t
 /* /////////////////////////////////////////////////////////
  * details
  */
-static __tplat_inline__ tb_dstream_t* tb_dstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_dstream_t* tb_dstream_cast(tb_gstream_t* gst)
 {
 	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_DATA, TB_NULL);
 	return (tb_dstream_t*)gst;
@@ -76,7 +77,7 @@ static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t si
 	if (size > left) size = left;
 
 	// read data
-	memcpy(data, dst->head, size);
+	tb_memcpy(data, dst->head, size);
 	dst->head += size;
 	return (tb_int_t)(size);
 }
@@ -91,7 +92,7 @@ static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	if (size > left) size = left;
 
 	// write data
-	memcpy(dst->head, data, size);
+	tb_memcpy(dst->head, data, size);
 	dst->head += size;
 	return (tb_int_t)(size);
 }

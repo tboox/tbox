@@ -17,26 +17,25 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		utils.h
  *
  */
-#ifndef TB_FORMAT_PREFIX_H
-#define TB_FORMAT_PREFIX_H
+#ifndef TB_UTILS_H
+#define TB_UTILS_H
 
 // c plus plus
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "format.h"
-#include "../stream/stream.h"
-#include "../math/math.h"
-
-
+#include "prefix.h"
+#include "time.h"
+#include "conv.h"
+#include "bits.h"
 
 // c plus plus
 #ifdef __cplusplus

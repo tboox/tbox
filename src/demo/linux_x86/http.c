@@ -3,7 +3,7 @@
 
 static tb_bool_t http_head_func(tb_char_t const* line, void* priv)
 {
-	tplat_printf("head: %s\n", line);
+	tb_printf("head: %s\n", line);
 	return TB_TRUE;
 }
 int main(int argc, char** argv)
@@ -27,17 +27,17 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// open http
-		tb_size_t 		base = (tb_size_t)tplat_clock();
+		tb_size_t 		base = (tb_size_t)tb_clock();
 		if (TB_FALSE == tb_http_open(http)) goto end;
 
 		// open file
-		tplat_handle_t hfile = tplat_file_open(argv[2], TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
-		if (hfile == TPLAT_INVALID_HANDLE) goto end;
+		tb_handle_t hfile = tb_file_open(argv[2], TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+		if (hfile == TB_INVALID_HANDLE) goto end;
 		
 		// read data
 		tb_byte_t 		data[8192];
 		tb_size_t 		read = 0;
-		tb_size_t 		time = (tb_size_t)tplat_clock();
+		tb_size_t 		time = (tb_size_t)tb_clock();
 		tb_size_t 		size = tb_http_status_content_size(http);
 		do
 		{
@@ -46,13 +46,13 @@ int main(int argc, char** argv)
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tplat_clock();
+				time = (tb_size_t)tb_clock();
 
 #if 1
 				tb_int_t write = 0;
 				while (write < ret)
 				{
-					tb_int_t ret2 = tplat_file_write(hfile, data + write, ret - write);
+					tb_int_t ret2 = tb_file_write(hfile, data + write, ret - write);
 					if (ret2 > 0) write += ret2;
 					else if (ret2 < 0) break;
 				}
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 			}
 			else if (!ret) 
 			{
-				tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 				if (timeout > 10000) break;
 			}
 			else break;
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 			// update info
 			if (time > base && ((time - base) % 1000)) 
 			{
-				tplat_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
+				tb_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
 				fflush(stdout);
 			}
 
@@ -81,13 +81,13 @@ int main(int argc, char** argv)
 end:
 
 		// close file
-		tplat_file_close(hfile);
+		tb_file_close(hfile);
 
 		// close it
 		tb_http_close(http);
 
 		// time
-		tplat_printf("\ntime: %d ms\n", ((tb_size_t)tplat_clock() - base));
+		tb_printf("\ntime: %d ms\n", ((tb_size_t)tb_clock() - base));
 	}
 
 	// destroy it
@@ -101,10 +101,10 @@ end:
 	// destroy it
 	if (cookies) tb_cookies_destroy(cookies);
 
-	tplat_printf("end\n");
+	tb_printf("end\n");
 	getchar();
 
 	// exit tplat
-	tplat_exit();
+	tb_exit();
 	return 0;
 }

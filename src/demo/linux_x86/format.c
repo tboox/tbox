@@ -22,7 +22,6 @@ int main(int argc, char** argv)
 
 	TB_DBG("format: %s", format->name);
 
-	// exit tplat
-	tplat_exit();
+	tb_exit();
 	return 0;
 }

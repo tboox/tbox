@@ -25,7 +25,7 @@
  * includes
  */
 #include "cookies.h"
-#include "../bits.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/cstring.h"
 
@@ -332,7 +332,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 // set cookies entry
 static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
-	tplat_mutex_lock(cookies->hmutex);
+	tb_mutex_lock(cookies->hmutex);
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
@@ -366,21 +366,21 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 				cookie->value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
 				TB_ASSERTA(cookie->value);
 
-				tplat_mutex_unlock(cookies->hmutex);
+				tb_mutex_unlock(cookies->hmutex);
 				return TB_TRUE;
 			}
 		}
 	}
 
 	// no find
-	tplat_mutex_unlock(cookies->hmutex);
+	tb_mutex_unlock(cookies->hmutex);
 	return TB_FALSE;
 }
 
 // del cookies entry
 static void tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
-	tplat_mutex_lock(cookies->hmutex);
+	tb_mutex_lock(cookies->hmutex);
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
@@ -421,13 +421,13 @@ static void tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const*
 		}
 	}
 
-	tplat_mutex_unlock(cookies->hmutex);
+	tb_mutex_unlock(cookies->hmutex);
 }
 // add cookies entry
 static void tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
 	// lock
-	tplat_mutex_lock(cookies->hmutex);
+	tb_mutex_lock(cookies->hmutex);
 
 	// set secure
 	tb_cookie_t cookie;
@@ -447,7 +447,7 @@ static void tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const*
 	tb_vector_insert_tail(cookies->cpool, &cookie);
 
 	// unlock
-	tplat_mutex_unlock(cookies->hmutex);
+	tb_mutex_unlock(cookies->hmutex);
 }
 
 // is child domain?
@@ -519,8 +519,8 @@ tb_cookies_t* tb_cookies_create()
 	TB_ASSERT_RETURN_VAL(cookies, TB_NULL);
 
 	// create hmutex
-	cookies->hmutex = tplat_mutex_create("cookies");
-	TB_ASSERT_GOTO(cookies->hmutex != TPLAT_INVALID_HANDLE, fail);
+	cookies->hmutex = tb_mutex_create("cookies");
+	TB_ASSERT_GOTO(cookies->hmutex != TB_INVALID_HANDLE, fail);
 
 	// create spool
 	cookies->spool = tb_slist_create(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, TB_NULL, tb_cookies_spool_dtor, TB_NULL);
@@ -540,13 +540,13 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 {
 	if (cookies)
 	{
-		TB_ASSERT_RETURN(cookies->hmutex != TPLAT_INVALID_HANDLE);
+		TB_ASSERT_RETURN(cookies->hmutex != TB_INVALID_HANDLE);
 
 		// clear cookies
 		tb_cookies_clear(cookies);
 
 		// free cpool & spool
-		tplat_mutex_lock(cookies->hmutex);
+		tb_mutex_lock(cookies->hmutex);
 
 		// free cpool
 		if (cookies->cpool) tb_vector_destroy(cookies->cpool);
@@ -556,10 +556,10 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 		if (cookies->spool) tb_slist_destroy(cookies->spool);
 		cookies->spool = TB_NULL;
 
-		tplat_mutex_unlock(cookies->hmutex);
+		tb_mutex_unlock(cookies->hmutex);
 
 		// free mutex
-		tplat_mutex_destroy(cookies->hmutex);
+		tb_mutex_destroy(cookies->hmutex);
 		
 		// free it
 		tb_free(cookies);
@@ -568,18 +568,18 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 
 void tb_cookies_clear(tb_cookies_t* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TPLAT_INVALID_HANDLE);
+	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
 
-	tplat_mutex_lock(cookies->hmutex);
+	tb_mutex_lock(cookies->hmutex);
 	tb_vector_clear(cookies->cpool);
 	tb_slist_clear(cookies->spool);
 	cookies->value[0] = '\0';
-	tplat_mutex_unlock(cookies->hmutex);
+	tb_mutex_unlock(cookies->hmutex);
 }
 
 void tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {
-	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex != TPLAT_INVALID_HANDLE);
+	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
 	//TB_COOKIES_DBG("[set]::%s%s%s = %s", secure == TB_TRUE? "https://" : "http://", domain? domain : "", path? path : "", value);
 
 	// is null?
@@ -613,7 +613,7 @@ void tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t co
 }
 tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure)
 {
-	TB_ASSERT_RETURN_VAL(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex != TPLAT_INVALID_HANDLE, TB_NULL);
+	TB_ASSERT_RETURN_VAL(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE, TB_NULL);
 	
 	// no path?
 	if (!path || !path[0]) path = "/";
@@ -745,8 +745,8 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 #ifdef TB_DEBUG
 void tb_cookies_dump(tb_cookies_t const* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TPLAT_INVALID_HANDLE);
-	tplat_mutex_lock(cookies->hmutex);
+	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
+	tb_mutex_lock(cookies->hmutex);
 
 	TB_COOKIES_DBG("==================================================");
 	TB_COOKIES_DBG("cookies:");
@@ -790,7 +790,7 @@ void tb_cookies_dump(tb_cookies_t const* cookies)
 			TB_COOKIES_DBG("[string]:[%d]: %s ", s->refn, s->data? s->data : "");
 		}
 	}
-	tplat_mutex_unlock(cookies->hmutex);
+	tb_mutex_unlock(cookies->hmutex);
 }
 #endif
 

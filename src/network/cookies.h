@@ -230,7 +230,7 @@ typedef struct __tb_cookies_t
 	tb_char_t 			value[TB_COOKIES_VALUE_MAX];
 
 	// the mutex
-	tplat_handle_t 		hmutex;
+	tb_handle_t 		hmutex;
 
 }tb_cookies_t;
 

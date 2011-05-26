@@ -24,7 +24,7 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../tplat.h"
+#include "prefix.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -38,60 +38,60 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TPLAT_SOCKET_HOST_MAX 			(256)
+#define TB_SOCKET_HOST_MAX 			(256)
 
 /* /////////////////////////////////////////////////////////
  * types
  */
-typedef struct __tplat_socket_t
+typedef struct __tb_socket_t
 {
-	tplat_int_t 	fd;
-	tplat_int_t 	type;
-	tplat_bool_t 	is_block;
-	tplat_uint16_t 	port;
-	tplat_char_t 	host[TPLAT_SOCKET_HOST_MAX];
+	tb_int_t 	fd;
+	tb_int_t 	type;
+	tb_bool_t 	is_block;
+	tb_uint16_t 	port;
+	tb_char_t 	host[TB_SOCKET_HOST_MAX];
 
-}tplat_socket_t;
+}tb_socket_t;
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-tplat_bool_t tplat_socket_init()
+tb_bool_t tb_socket_init()
 {
-	return TPLAT_TRUE;
+	return TB_TRUE;
 }
-void tplat_socket_uninit()
+void tb_socket_uninit()
 {
 }
-tplat_handle_t tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t port, tplat_int_t type, tplat_bool_t is_block)
+tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
 {
-	if (type == TPLAT_SOCKET_TYPE_UNKNOWN) return TPLAT_INVALID_HANDLE;
+	if (type == TB_SOCKET_TYPE_UNKNOWN) return TB_INVALID_HANDLE;
 
-	//TPLAT_DBG("socket open: %s %d", host, port);
+	//TB_DBG("socket open: %s %d", host, port);
 
 	// create socket
-	tplat_int_t t, p;
-	if (type == TPLAT_SOCKET_TYPE_TCP)
+	tb_int_t t, p;
+	if (type == TB_SOCKET_TYPE_TCP)
 	{
 		t = SOCK_STREAM;
 		p = IPPROTO_TCP;
-		if (!host || !port) return TPLAT_INVALID_HANDLE;
+		if (!host || !port) return TB_INVALID_HANDLE;
 	}
-	else if (type == TPLAT_SOCKET_TYPE_UDP)
+	else if (type == TB_SOCKET_TYPE_UDP)
 	{
 		t = SOCK_DGRAM;
 		p = IPPROTO_UDP;
 	}
-	else return TPLAT_INVALID_HANDLE;
+	else return TB_INVALID_HANDLE;
 
-	tplat_int_t fd = socket(AF_INET, t, p);
-	if (fd < 0) return TPLAT_INVALID_HANDLE;
+	tb_int_t fd = socket(AF_INET, t, p);
+	if (fd < 0) return TB_INVALID_HANDLE;
 
 	// set block or non-block
-	if (is_block == TPLAT_TRUE) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
+	if (is_block == TB_TRUE) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
 	else fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
-	if (type == TPLAT_SOCKET_TYPE_TCP)
+	if (type == TB_SOCKET_TYPE_TCP)
 	{
 		// client
 		struct sockaddr_in dest;
@@ -101,23 +101,23 @@ tplat_handle_t tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t
 		{
 			struct hostent* h = gethostbyname(host);
 			if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-			else return TPLAT_INVALID_HANDLE;
+			else return TB_INVALID_HANDLE;
 		}
 
 		// connect host
-		tplat_int_t ret = 0;
+		tb_int_t ret = 0;
 		while (1)
 		{
 			ret = connect(fd, (struct sockaddr *)&dest, sizeof(dest));
 
 			// if non-block
-			if (ret < 0 && is_block == TPLAT_FALSE)
+			if (ret < 0 && is_block == TB_FALSE)
 			{
 				if (errno == EINTR) continue;
 				if (errno != EINPROGRESS && errno != EAGAIN)
 				{
 					if (fd >= 0) close(fd);
-					return TPLAT_INVALID_HANDLE;
+					return TB_INVALID_HANDLE;
 				}
 
 				// wait until we are connected or until abort
@@ -125,7 +125,7 @@ tplat_handle_t tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t
 				{
 					struct timeval tv;
 					fd_set wfds;
-					tplat_int_t fd_max = fd;
+					tb_int_t fd_max = fd;
 
 					FD_ZERO(&wfds);
 					FD_SET(fd, &wfds);
@@ -136,28 +136,28 @@ tplat_handle_t tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t
 				}
 
 				// test error
-				tplat_int_t optlen = sizeof(ret);
+				tb_int_t optlen = sizeof(ret);
 				getsockopt(fd, SOL_SOCKET, SO_ERROR, &ret, &optlen);
 				if (ret != 0)
 				{
 					if (fd >= 0) close(fd);
-					return TPLAT_INVALID_HANDLE;
+					return TB_INVALID_HANDLE;
 				}
 			}
 			else if (ret >= 0) break;
 			else
 			{
 				if (fd >= 0) close(fd);
-				return TPLAT_INVALID_HANDLE;
+				return TB_INVALID_HANDLE;
 			}
 		}
 	}
 
 	// create socket
-	tplat_socket_t* s = malloc(sizeof(tplat_socket_t));
-	TPLAT_ASSERT(s);
-	if (!s) return TPLAT_INVALID_HANDLE;
-	memset(s, 0, sizeof(tplat_socket_t));
+	tb_socket_t* s = malloc(sizeof(tb_socket_t));
+	TB_ASSERT(s);
+	if (!s) return TB_INVALID_HANDLE;
+	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd;
 	s->type = type;
 	s->port = port;
@@ -166,21 +166,21 @@ tplat_handle_t tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t
 	// save host
 	if (host)
 	{
-		strncpy(s->host, host, TPLAT_SOCKET_HOST_MAX - 1);
-		s->host[TPLAT_SOCKET_HOST_MAX - 1] = '\0';
+		strncpy(s->host, host, TB_SOCKET_HOST_MAX - 1);
+		s->host[TB_SOCKET_HOST_MAX - 1] = '\0';
 	}
 
-	return ((tplat_handle_t)s);
+	return ((tb_handle_t)s);
 }
-void tplat_socket_close(tplat_handle_t hsocket)
+void tb_socket_close(tb_handle_t hsocket)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE) return ;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE) return ;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
 
-	//TPLAT_DBG("socket close");
+	//TB_DBG("socket close");
 
 	if (s && s->fd >= 0) 
 	{
@@ -189,22 +189,22 @@ void tplat_socket_close(tplat_handle_t hsocket)
 	}
 }
 
-tplat_int_t tplat_socket_recv(tplat_handle_t hsocket, tplat_byte_t* data, tplat_size_t size)
+tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE) return -1;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE) return -1;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
 
-	//TPLAT_DBG("socket_recv: %d", size);
+	//TB_DBG("socket_recv: %d", size);
 
 	// non-block
-	if (s->is_block == TPLAT_FALSE)
+	if (s->is_block == TB_FALSE)
 	{
 		while (1)
 		{
-			tplat_int_t fd_max = s->fd;
+			tb_int_t fd_max = s->fd;
 			struct timeval tv;
 			fd_set rfds;
 
@@ -213,11 +213,11 @@ tplat_int_t tplat_socket_recv(tplat_handle_t hsocket, tplat_byte_t* data, tplat_
 
 			tv.tv_sec = 0;
 			tv.tv_usec = 100 * 1000;
-			tplat_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
+			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
 
 			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
 			{
-				tplat_int_t len = recv(s->fd, data, size, 0);
+				tb_int_t len = recv(s->fd, data, size, 0);
 				if (len < 0) 
 				{
 					if (errno != EINTR && errno != EAGAIN) return -1;
@@ -232,23 +232,23 @@ tplat_int_t tplat_socket_recv(tplat_handle_t hsocket, tplat_byte_t* data, tplat_
 	else return recv(s->fd, data, size, 0);
 }
 
-tplat_int_t tplat_socket_send(tplat_handle_t hsocket, tplat_byte_t* data, tplat_size_t size)
+tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE) return -1;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE) return -1;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
 
-	//TPLAT_DBG("socket_send: %d", size);
+	//TB_DBG("socket_send: %d", size);
 
 	// non-block
-	if (s->is_block == TPLAT_FALSE)
+	if (s->is_block == TB_FALSE)
 	{
-		tplat_int_t send_n = size;
+		tb_int_t send_n = size;
 		while (send_n > 0) 
 		{
-			tplat_int_t fd_max = s->fd;
+			tb_int_t fd_max = s->fd;
 			struct timeval tv;
 			fd_set wfds;
 
@@ -257,11 +257,11 @@ tplat_int_t tplat_socket_send(tplat_handle_t hsocket, tplat_byte_t* data, tplat_
 
 			tv.tv_sec = 0;
 			tv.tv_usec = 100 * 1000;
-			tplat_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
+			tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
 
 			if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
 			{
-				tplat_int_t len = send(s->fd, data, send_n, 0);
+				tb_int_t len = send(s->fd, data, send_n, 0);
 				if (len < 0) 
 				{
 					if (errno != EINTR && errno != EAGAIN) return -1;
@@ -273,22 +273,22 @@ tplat_int_t tplat_socket_send(tplat_handle_t hsocket, tplat_byte_t* data, tplat_
 			else if (ret < 0) return -1;
 			else return 0;
 		}
-		return (tplat_int_t)(size - send_n);
+		return (tb_int_t)(size - send_n);
 	}
 	else return send(s->fd, data, size, 0);
 }
-tplat_int_t tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* host, tplat_uint16_t port, tplat_byte_t* data, tplat_size_t size)
+tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE) return -1;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE) return -1;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
 
 	// get host & port
 	port = port? port : s->port;
 	host = host? host : s->host;
-	TPLAT_ASSERT(port && host && host[0]);
+	TB_ASSERT(port && host && host[0]);
 	if (!port || !host || !host[0]) return -1;
 
 	// recv data
@@ -303,12 +303,12 @@ tplat_int_t tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* ho
 	}
 
 	// non-block
-	tplat_int_t n = sizeof(dest);
-	if (s->is_block == TPLAT_FALSE)
+	tb_int_t n = sizeof(dest);
+	if (s->is_block == TB_FALSE)
 	{
 		while (1)
 		{
-			tplat_int_t fd_max = s->fd;
+			tb_int_t fd_max = s->fd;
 			struct timeval tv;
 			fd_set rfds;
 
@@ -317,11 +317,11 @@ tplat_int_t tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* ho
 
 			tv.tv_sec = 0;
 			tv.tv_usec = 100 * 1000;
-			tplat_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
+			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
 
 			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
 			{
-				tplat_int_t len = recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
+				tb_int_t len = recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
 				if (len < 0) 
 				{
 					if (errno != EINTR && errno != EAGAIN) return -1;
@@ -335,18 +335,18 @@ tplat_int_t tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* ho
 	// block
 	else return recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
 }
-tplat_int_t tplat_socket_sendto(tplat_handle_t hsocket, tplat_char_t const* host, tplat_uint16_t port, tplat_byte_t* data, tplat_size_t size)
+tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE) return -1;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE) return -1;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
 
 	// get host & port
 	port = port? port : s->port;
 	host = host? host : s->host;
-	TPLAT_ASSERT(port && host && host[0]);
+	TB_ASSERT(port && host && host[0]);
 	if (!port || !host || !host[0]) return -1;
 
 	// recv data
@@ -361,11 +361,11 @@ tplat_int_t tplat_socket_sendto(tplat_handle_t hsocket, tplat_char_t const* host
 	}
 
 	// non-block
-	if (s->is_block == TPLAT_FALSE)
+	if (s->is_block == TB_FALSE)
 	{
 		while (1)
 		{
-			tplat_int_t fd_max = s->fd;
+			tb_int_t fd_max = s->fd;
 			struct timeval tv;
 			fd_set rfds;
 
@@ -374,11 +374,11 @@ tplat_int_t tplat_socket_sendto(tplat_handle_t hsocket, tplat_char_t const* host
 
 			tv.tv_sec = 0;
 			tv.tv_usec = 100 * 1000;
-			tplat_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
+			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
 
 			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
 			{
-				tplat_int_t len = sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
+				tb_int_t len = sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
 				if (len < 0) 
 				{
 					if (errno != EINTR && errno != EAGAIN) return -1;
@@ -392,22 +392,22 @@ tplat_int_t tplat_socket_sendto(tplat_handle_t hsocket, tplat_char_t const* host
 	// block
 	else return sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
 }
-tplat_handle_t tplat_socket_server_open(tplat_uint16_t port, tplat_int_t type, tplat_bool_t is_block)
+tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
 {
-	if (!port || type == TPLAT_SOCKET_TYPE_UNKNOWN) return TPLAT_INVALID_HANDLE;
+	if (!port || type == TB_SOCKET_TYPE_UNKNOWN) return TB_INVALID_HANDLE;
 
 	// create socket
-	tplat_int_t t;
-	if (type == TPLAT_SOCKET_TYPE_TCP) t = SOCK_STREAM;
-	else if (type == TPLAT_SOCKET_TYPE_UDP) t = SOCK_DGRAM;
-	else return TPLAT_INVALID_HANDLE;
+	tb_int_t t;
+	if (type == TB_SOCKET_TYPE_TCP) t = SOCK_STREAM;
+	else if (type == TB_SOCKET_TYPE_UDP) t = SOCK_DGRAM;
+	else return TB_INVALID_HANDLE;
 
 	// udp is not implemention now
-	if (type == TPLAT_SOCKET_TYPE_UDP)
+	if (type == TB_SOCKET_TYPE_UDP)
 	{
 		// not implemention now
-		TPLAT_DBG("tplat_socket_server_open(type == UDP) is not implemention now");
-		return TPLAT_INVALID_HANDLE;
+		TB_DBG("tb_socket_server_open(type == UDP) is not implemention now");
+		return TB_INVALID_HANDLE;
 	}
 
 	// server socket
@@ -417,84 +417,84 @@ tplat_handle_t tplat_socket_server_open(tplat_uint16_t port, tplat_int_t type, t
 	saddr.sin_port = htons(port);
 	saddr.sin_addr.s_addr = INADDR_ANY;
 
-	tplat_int_t fd_s = socket(AF_INET, t, 0);
-	if (fd_s < 0) return TPLAT_INVALID_HANDLE;
+	tb_int_t fd_s = socket(AF_INET, t, 0);
+	if (fd_s < 0) return TB_INVALID_HANDLE;
 
 	// set block or non-block
-	if (is_block == TPLAT_TRUE) fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) & ~O_NONBLOCK);
+	if (is_block == TB_TRUE) fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) & ~O_NONBLOCK);
 	else fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) | O_NONBLOCK);
 
 	// bind 
     if (bind(fd_s, (struct sockaddr *)&saddr, sizeof(struct sockaddr)) == -1)
 	{
-        TPLAT_DBG("bind error!");
+        TB_DBG("bind error!");
 		close(fd_s);
-		return TPLAT_INVALID_HANDLE;
+		return TB_INVALID_HANDLE;
     }
 
 	// listen
     if (listen(fd_s, 20) == -1) 
 	{
-        TPLAT_DBG("listen error!");
+        TB_DBG("listen error!");
 		close(fd_s);
-		return TPLAT_INVALID_HANDLE;
+		return TB_INVALID_HANDLE;
     }
 
 	// return server socket
-	tplat_socket_t* s = malloc(sizeof(tplat_socket_t));
-	TPLAT_ASSERT(s);
-	if (!s) return TPLAT_INVALID_HANDLE;
-	memset(s, 0, sizeof(tplat_socket_t));
+	tb_socket_t* s = malloc(sizeof(tb_socket_t));
+	TB_ASSERT(s);
+	if (!s) return TB_INVALID_HANDLE;
+	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_s;
 	s->type = type;
 	s->is_block = is_block;
 
-	return ((tplat_handle_t)s);
+	return ((tb_handle_t)s);
 }
-tplat_handle_t tplat_socket_server_accept(tplat_handle_t hserver)
+tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
 {
-	TPLAT_ASSERT(hserver != TPLAT_INVALID_HANDLE);
-	if (hserver == TPLAT_INVALID_HANDLE) return TPLAT_INVALID_HANDLE;
+	TB_ASSERT(hserver != TB_INVALID_HANDLE);
+	if (hserver == TB_INVALID_HANDLE) return TB_INVALID_HANDLE;
 
-	tplat_socket_t* ps = (tplat_socket_t*)hserver;
-	if (!ps || ps->fd < 0) return TPLAT_INVALID_HANDLE;
+	tb_socket_t* ps = (tb_socket_t*)hserver;
+	if (!ps || ps->fd < 0) return TB_INVALID_HANDLE;
 
 	// accept client 
-	tplat_int_t caddr_n = sizeof(struct sockaddr_in);
+	tb_int_t caddr_n = sizeof(struct sockaddr_in);
 	struct sockaddr_in caddr;
-	tplat_int_t fd_c = accept(ps->fd, (struct sockaddr *)&caddr, &caddr_n);
-	if (fd_c == -1) return TPLAT_INVALID_HANDLE;
+	tb_int_t fd_c = accept(ps->fd, (struct sockaddr *)&caddr, &caddr_n);
+	if (fd_c == -1) return TB_INVALID_HANDLE;
 
-	//TPLAT_DBG("connection from %s", inet_ntoa(caddr.sin_addr));
+	//TB_DBG("connection from %s", inet_ntoa(caddr.sin_addr));
 
 	// return client socket
-	tplat_socket_t* s = malloc(sizeof(tplat_socket_t));
-	TPLAT_ASSERT(s);
-	if (!s) return TPLAT_INVALID_HANDLE;
-	memset(s, 0, sizeof(tplat_socket_t));
+	tb_socket_t* s = malloc(sizeof(tb_socket_t));
+	TB_ASSERT(s);
+	if (!s) return TB_INVALID_HANDLE;
+	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_c;
 	s->type = ps->type;
 	s->is_block = ps->is_block;
 
-	return ((tplat_handle_t)s);
+	return ((tb_handle_t)s);
 }
 
 #if 0
-tplat_bool_t tplat_socket_peername(tplat_handle_t hsocket, tplat_char_t* ip, tplat_int_t* port)
+tb_bool_t tb_socket_peername(tb_handle_t hsocket, tb_char_t* ip, tb_int_t* port)
 {
-	TPLAT_ASSERT(hsocket != TPLAT_INVALID_HANDLE);
-	if (hsocket == TPLAT_INVALID_HANDLE || !ip || !port) return TPLAT_FALSE;
+	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
+	if (hsocket == TB_INVALID_HANDLE || !ip || !port) return TB_FALSE;
 
-	tplat_socket_t* s = (tplat_socket_t*)hsocket;
-	TPLAT_ASSERT(s);
-	if (s->fd < 0) return TPLAT_FALSE;
+	tb_socket_t* s = (tb_socket_t*)hsocket;
+	TB_ASSERT(s);
+	if (s->fd < 0) return TB_FALSE;
 
 	struct sockaddr_in 	addr;
 	memset(&addr, 0, sizeof(struct sockaddr_in));
-	tplat_int_t 		addr_n = sizeof(struct sockaddr_in);
+	tb_int_t 		addr_n = sizeof(struct sockaddr_in);
 
 	if (getpeername(s->fd, (struct sockaddr *)&addr, &addr_n) == -1)
-		return TPLAT_FALSE;
+		return TB_FALSE;
 
 	// parse ip
 	memcpy(ip, inet_ntoa(addr.sin_addr), 16);
@@ -502,7 +502,7 @@ tplat_bool_t tplat_socket_peername(tplat_handle_t hsocket, tplat_char_t* ip, tpl
 
 	*port = ntohs(addr.sin_port);
 
-	return TPLAT_TRUE;
+	return TB_TRUE;
 }
 
 #endif

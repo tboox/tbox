@@ -46,7 +46,7 @@ static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_bstream_t const* b
 tb_zip_vlc_t* tb_zip_vlc_fixed_open(tb_zip_vlc_fixed_t* fixed, tb_byte_t nbits)
 {
 	// init
-	memset(fixed, 0, sizeof(tb_zip_vlc_fixed_t));
+	tb_memset(fixed, 0, sizeof(tb_zip_vlc_fixed_t));
 	((tb_zip_vlc_t*)fixed)->type = TB_ZIP_VLC_TYPE_FIXED;
 	((tb_zip_vlc_t*)fixed)->set = tb_zip_vlc_fixed_set;
 	((tb_zip_vlc_t*)fixed)->get = tb_zip_vlc_fixed_get;
