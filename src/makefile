@@ -10,9 +10,6 @@ tbox_TYPE 			= LIB
 # basic files
 tbox_C_FILES 		+= \
 					tbox \
-					bits \
-					conv \
-					time \
 					math/exp \
 					math/pow \
 					math/log \
@@ -26,9 +23,8 @@ tbox_C_FILES 		+= \
 					container/slist \
 					network/http \
 					network/dns \
-					network/socket \
 					network/cookies \
-					encoding \
+					encoding/encoding \
 					encoding/unicode_gb2312 \
 					encoding/gb2312_unicode \
 					stream/bstream \
@@ -47,7 +43,7 @@ tbox_C_FILES 		+= \
 					zip/zlib \
 					zip/gzip \
 					zip/zlibraw \
-					format \
+					format/format \
 					format/flv \
 					format/avi \
 					format/mp3 \
@@ -65,20 +61,30 @@ tbox_C_FILES 		+= \
 					format/xml \
 					format/htm \
 					format/txt \
+					utils/time \
+					utils/bits\
+					utils/conv \
 					xml/document \
 					xml/node \
 					xml/nlist \
 					xml/reader \
 					xml/writer 
 
+ifneq ($(TB_CONFIG_PLAT),)
+tbox_C_FILES 		+= \
+					platform/$(TB_CONFIG_PLAT)/file \
+					platform/$(TB_CONFIG_PLAT)/utils \
+					platform/$(TB_CONFIG_PLAT)/mutex \
+					platform/$(TB_CONFIG_PLAT)/audio \
+					platform/$(TB_CONFIG_PLAT)/socket \
+					platform/$(TB_CONFIG_PLAT)/thread
+endif
+
 # header files
 INC_FILES 			= \
 					prefix.h \
 					config.h \
 					tbox.h \
-					bits.h \
-					conv.h \
-					time.h \
 					memory/memory.h \
 					memory/malloc.h \
 					memory/memops.h \
@@ -100,18 +106,30 @@ INC_FILES 			= \
 					container/pool.h \
 					container/vector.h \
 					container/slist.h \
+					platform/platform.h \
+					platform/prefix.h \
+					platform/file.h \
+					platform/utils.h \
+					platform/mutex.h \
+					platform/audio.h \
+					platform/thread.h \
+					platform/socket.h \
 					network/prefix.h \
 					network/network.h \
 					network/http.h \
 					network/dns.h \
 					network/cookies.h \
-					network/socket.h \
-					encoding.h \
+					encoding/encoding.h \
 					stream/prefix.h \
 					stream/stream.h \
 					stream/bstream.h \
 					stream/gstream.h \
-					format.h \
+					format/format.h \
+					utils/prefix.h \
+					utils/utils.h \
+					utils/bits.h \
+					utils/conv.h \
+					utils/time.h \
 					xml/xml.h \
 					xml/prefix.h \
 					xml/document.h \
@@ -251,8 +269,8 @@ libmad_INC_FILES 				:= $(addprefix libs/libmad/,$(libmad_INC_FILES))
 INC_FILES-$(TB_CONFIG_LIBMAD) 	+= $(libmad_INC_FILES)
 
 # sub-projects
-ifneq ($(TB_CONFIG_DEMO),)
-SUB_PROS 			= demo/$(TB_CONFIG_DEMO)
+ifeq ($(TB_CONFIG_DEMO),y)
+SUB_PROS 			= demo/$(TB_CONFIG_PLAT)
 endif
 
 include $(PRO_DIR)/suffix.mak

@@ -17,66 +17,44 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		utils.c
+ * \file		thread.h
  *
  */
+#ifndef TB_PLATFORM_THREAD_H
+#define TB_PLATFORM_THREAD_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../tplat.h"
-#include <unistd.h>
-#include <stdarg.h>
-#include <time.h>
-#include <sys/time.h>
+#include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * implemention
+ * macros
+ */
+#define TB_THREAD_TIMEOUT_INFINITY 		(-1)
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
  */
 
-// msleep
-void tplat_msleep(tplat_uint32_t ms)
-{
-	usleep(ms * 1000);
+// thread
+tb_handle_t 	tb_thread_create(tb_char_t const* name, void* (*callback)(void*), void* param, tb_size_t stack_size);
+void 			tb_thread_destroy(tb_handle_t hthread);
+tb_bool_t 	tb_thread_wait(tb_handle_t hthread, tb_int_t timeout);
+tb_bool_t 	tb_thread_suspend(tb_handle_t hthread);
+tb_bool_t 	tb_thread_resume(tb_handle_t hthread);
+tb_bool_t 	tb_thread_terminate(tb_handle_t hthread);
+void 			tb_thread_exit(void* retval);
+
+// c plus plus
+#ifdef __cplusplus
 }
-
-// printf
-void tplat_printf(tplat_char_t const* fmt, ...)
-{
-	va_list argp;
-	tplat_char_t msg[4096];
-
-    va_start(argp, fmt);
-    if (vsnprintf(msg, 4096, fmt, argp) < 0) msg[4096 - 1] = '\0';
-    va_end(argp);
-
-	printf("%s", msg);
-}
-
-// clock
-tplat_int64_t tplat_clock()
-{
-	//printf("tplat_clock\n");
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return ((tplat_int64_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
-}
-
-// uclock
-tplat_int64_t tplat_uclock()
-{
-	//printf("tplat_uclock\n");
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return ((tplat_int64_t)tv.tv_sec * 1000000 + tv.tv_usec);
-}
-tplat_int64_t tplat_time()
-{
-#if 0
-	return ((tplat_int64_t)time(0) * 1000);
-#else
-	return tplat_clock();
 #endif
-}
+
+#endif

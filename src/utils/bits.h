@@ -20,8 +20,8 @@
  * \file		bits.h
  *
  */
-#ifndef TB_BITS_H
-#define TB_BITS_H
+#ifndef TB_UTILS_BITS_H
+#define TB_UTILS_BITS_H
 
 // c plus plus
 #ifdef __cplusplus

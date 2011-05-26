@@ -25,6 +25,7 @@
  * includes
  */
 #include "writer.h"
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -40,7 +41,7 @@ tb_xml_writer_t* tb_xml_writer_open(tb_gstream_t* gst)
 	if (!writer) return TB_NULL;
 
 	// init it
-	memset(writer, 0, sizeof(tb_xml_writer_t));
+	tb_memset(writer, 0, sizeof(tb_xml_writer_t));
 	writer->gst = gst;
 
 	// init attributes

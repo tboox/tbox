@@ -28,7 +28,7 @@
 /* /////////////////////////////////////////////////////////
  * implements
  */
-static __tplat_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
+static __tb_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
 {
 	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_RLC, TB_NULL);
 	return (tb_zip_rlc_t*)zip;
@@ -42,7 +42,7 @@ static void tb_zip_rlc_close(tb_zip_t* zip)
 		if (rlc->vlc && rlc->vlc->close) rlc->vlc->close(rlc->vlc); 
 
 		// reset it
-		memset(rlc, 0, sizeof(tb_zip_rlc_t));
+		tb_memset(rlc, 0, sizeof(tb_zip_rlc_t));
 	}
 }
 static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
@@ -201,7 +201,7 @@ tb_zip_t* tb_zip_rlc_open(tb_zip_rlc_t* rlc, tb_zip_action_t action)
 	TB_ASSERT_RETURN_VAL(zip, TB_NULL);
 	
 	// init zip
-	memset(zip, 0, sizeof(tb_zip_rlc_t));
+	tb_memset(zip, 0, sizeof(tb_zip_rlc_t));
 	zip->algo 		= TB_ZIP_ALGO_RLC;
 	zip->action 	= action;
 	zip->close 		= tb_zip_rlc_close;

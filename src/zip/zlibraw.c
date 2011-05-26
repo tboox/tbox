@@ -28,7 +28,7 @@
 /* /////////////////////////////////////////////////////////
  * implements
  */
-static __tplat_inline__ tb_zip_zlibraw_t* tb_zip_zlibraw_cast(tb_zip_t* zip)
+static __tb_inline__ tb_zip_zlibraw_t* tb_zip_zlibraw_cast(tb_zip_t* zip)
 {
 	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_ZLIBRAW, TB_NULL);
 	return (tb_zip_zlibraw_t*)zip;
@@ -43,7 +43,7 @@ static void tb_zip_zlibraw_close(tb_zip_t* zip)
 		else if (zip->action == TB_ZIP_ACTION_DEFLATE) deflateEnd(&(zlibraw->zst));
 
 		// reset it
-		memset(zlibraw, 0, sizeof(tb_zip_zlibraw_t));
+		tb_memset(zlibraw, 0, sizeof(tb_zip_zlibraw_t));
 	}
 }
 static tb_zip_status_t tb_zip_zlibraw_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
@@ -125,7 +125,7 @@ tb_zip_t* tb_zip_zlibraw_open(tb_zip_zlibraw_t* zlibraw, tb_zip_action_t action)
 	TB_ASSERT_RETURN_VAL(zip, TB_NULL);
 	
 	// init zip
-	memset(zip, 0, sizeof(tb_zip_zlibraw_t));
+	tb_memset(zip, 0, sizeof(tb_zip_zlibraw_t));
 	zip->algo 		= TB_ZIP_ALGO_ZLIBRAW;
 	zip->action 	= action;
 	zip->close 		= tb_zip_zlibraw_close;

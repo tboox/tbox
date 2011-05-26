@@ -92,19 +92,19 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	else if (gst->read)
 	{
 		tb_size_t 	read = 0;
-		tb_size_t 	time = (tb_size_t)tplat_clock();
+		tb_size_t 	time = (tb_size_t)tb_clock();
 		while (read < size)
 		{
 			tb_int_t ret = gst->read(gst, data + read, size - read);	
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tplat_clock();
+				time = (tb_size_t)tb_clock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 				if (timeout > 5000) break;
 			}
 			else return -1;
@@ -232,19 +232,19 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	else if (gst->write)
 	{
 		tb_size_t 	write = 0;
-		tb_size_t 	time = (tb_size_t)tplat_clock();
+		tb_size_t 	time = (tb_size_t)tb_clock();
 		while (write < size)
 		{
 			tb_int_t ret = gst->write(gst, data + write, size - write);	
 			if (ret > 0)
 			{
 				write += ret;
-				time = (tb_size_t)tplat_clock();
+				time = (tb_size_t)tb_clock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tplat_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
 				if (timeout > 5000) break;
 			}
 			else return -1;

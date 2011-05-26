@@ -33,7 +33,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "stream/stream.h"
+#include "../stream/stream.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

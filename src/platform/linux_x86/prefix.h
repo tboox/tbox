@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_FORMAT_PREFIX_H
-#define TB_FORMAT_PREFIX_H
+#ifndef TB_PLATFROM_LINUX_x86_PREFIX_H
+#define TB_PLATFROM_LINUX_x86_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,10 +32,7 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-#include "format.h"
-#include "../stream/stream.h"
-#include "../math/math.h"
-
+#include "../platform.h"
 
 
 // c plus plus

@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
 #elif defined(XML_WRITER)
 	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
-	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 
 	// open output stream
 	tb_gstream_t* ost = tb_gstream_create_from_url(argv[1]);
-	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!ost || !tb_gstream_open(ost))
 	{
 		TB_DBG("failed to open output xml: %s", argv[2]);
@@ -149,11 +149,11 @@ int main(int argc, char** argv)
 	tb_xml_document_destroy(document);
 	tb_gstream_close(ist);
 	tb_gstream_close(ost);
-	//TPLAT_POOL_DUMP(TB_CONFIG_MEMORY_POOL_INDEX);
+	//TB_POOL_DUMP(TB_CONFIG_MEMORY_POOL_INDEX);
 
 #elif defined(XML_DOM_WRITER)
 	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
-	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TPLAT_FILE_WO | TPLAT_FILE_CREAT | TPLAT_FILE_TRUNC);
+	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
 		TB_DBG("failed to open xml: %s", argv[1]);

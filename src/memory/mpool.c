@@ -294,7 +294,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 	g_pool->magic = TB_MPOOL_MAGIC;
 
 	// create mutex
-	g_pool->hmutex = tplat_mutex_create("the memory pool");
+	g_pool->hmutex = tb_mutex_create("the memory pool");
 	if (g_pool->hmutex == TB_INVALID_HANDLE) return TB_FALSE;
 
 	// attach data
@@ -371,7 +371,7 @@ void tb_mpool_exit()
 
 	// destroy mutex
 	if (g_pool->hmutex != TB_INVALID_HANDLE) 
-		tplat_mutex_destroy(g_pool->hmutex);
+		tb_mutex_destroy(g_pool->hmutex);
 	g_pool->hmutex = TB_INVALID_HANDLE;
 
 	// clear
@@ -1083,9 +1083,9 @@ void* tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, t
 	TB_ASSERT_RETURN_VAL(g_pool && g_pool->magic == TB_MPOOL_MAGIC, TB_NULL);
 
 	// lock
-	if (TB_FALSE == tplat_mutex_lock(g_pool->hmutex)) return TB_NULL;
+	if (TB_FALSE == tb_mutex_lock(g_pool->hmutex)) return TB_NULL;
 	p = TB_MPOOL_ALLOCATE_NO_LOCK(g_pool, size, func, line, file);
-	tplat_mutex_unlock(g_pool->hmutex);
+	tb_mutex_unlock(g_pool->hmutex);
 
 	TB_ASSERTM(p, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
 	return p;
@@ -1123,9 +1123,9 @@ void* tb_mpool_reallocate(void* data, tb_size_t size, tb_char_t const* func, tb_
 	TB_ASSERT_RETURN_VAL(g_pool && g_pool->magic == TB_MPOOL_MAGIC, TB_NULL);
 
 	// lock
-	if (TB_FALSE == tplat_mutex_lock(g_pool->hmutex)) return TB_NULL;
+	if (TB_FALSE == tb_mutex_lock(g_pool->hmutex)) return TB_NULL;
 	p = TB_MPOOL_REALLOCATE_NO_LOCK(g_pool, data, size, func, line, file);
-	tplat_mutex_unlock(g_pool->hmutex);
+	tb_mutex_unlock(g_pool->hmutex);
 
 	TB_ASSERTM(p, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return p;
@@ -1141,9 +1141,9 @@ void tb_mpool_deallocate(void* data, tb_char_t const* func, tb_size_t line, tb_c
 	TB_ASSERT_RETURN(g_pool && g_pool->magic == TB_MPOOL_MAGIC);
 
 	// lock
-	if (TB_FALSE == tplat_mutex_lock(g_pool->hmutex)) return ;
+	if (TB_FALSE == tb_mutex_lock(g_pool->hmutex)) return ;
 	tb_bool_t ret = TB_MPOOL_DEALLOCATE_NO_LOCK(g_pool, data, func, line, file);
-	tplat_mutex_unlock(g_pool->hmutex);
+	tb_mutex_unlock(g_pool->hmutex);
 
 	TB_ASSERTM(ret, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 }

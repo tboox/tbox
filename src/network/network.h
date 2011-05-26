@@ -33,7 +33,6 @@ extern "C" {
  */
 #include "prefix.h"
 #include "cookies.h"
-#include "socket.h"
 #include "http.h"
 #include "dns.h"
 

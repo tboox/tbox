@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 
 	tb_time_t local;
 	tb_time_t utc;
-	tb_int64_t time = tplat_time();
+	tb_int64_t time = tb_time();
 	if (TB_TRUE == tb_time_to_local(time, &local))
 	{
 		TB_DBG("LMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 			, utc.seconds
 			, utc.milliseconds);
 	}
-	TB_DBG("time: %d ms, clock: %d ms", (tb_int_t)time, (tb_int_t)tplat_clock());
+	TB_DBG("time: %d ms, clock: %d ms", (tb_int_t)time, (tb_int_t)tb_clock());
 
 	if (TB_TRUE == tb_time_from_local(&time, &local))
 	{

@@ -72,7 +72,7 @@ static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_bstream_t const* b
 tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 {
 	// init
-	memset(gamma, 0, sizeof(tb_zip_vlc_gamma_t));
+	tb_memset(gamma, 0, sizeof(tb_zip_vlc_gamma_t));
 	((tb_zip_vlc_t*)gamma)->type = TB_ZIP_VLC_TYPE_GAMMA;
 	((tb_zip_vlc_t*)gamma)->set = tb_zip_vlc_gamma_set;
 	((tb_zip_vlc_t*)gamma)->get = tb_zip_vlc_gamma_get;
@@ -115,12 +115,12 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 		tb_bstream_set_u1(&bst, 0);
 		for (i = 0; i < q; i++, r >>= 1) tb_bstream_set_u1(&bst, r & 0x1);
 
-		tplat_printf("x = 0x%04x, q = %d: ", x, q);
+		tb_printf("x = 0x%04x, q = %d: ", x, q);
 		tb_bstream_attach(&bst, d, 4);
-		for (q = 0; tb_bstream_get_u1(&bst); q++) tplat_printf("1");
-		tplat_printf("0 ");
-		for (i = 0; i < q; i++) tplat_printf("%d", tb_bstream_get_u1(&bst));
-		tplat_printf("\n");
+		for (q = 0; tb_bstream_get_u1(&bst); q++) tb_printf("1");
+		tb_printf("0 ");
+		for (i = 0; i < q; i++) tb_printf("%d", tb_bstream_get_u1(&bst));
+		tb_printf("\n");
 	}
 
 #endif

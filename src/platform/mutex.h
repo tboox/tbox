@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		thread.h
+ * \file		mutex.h
  *
  */
-#ifndef TPLAT_THREAD_H
-#define TPLAT_THREAD_H
+#ifndef TB_PLATFORM_MUTEX_H
+#define TB_PLATFORM_MUTEX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -35,29 +35,14 @@ extern "C" {
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-#define TPLAT_THREAD_TIMEOUT_INFINITY 		(-1)
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-// thread
-tplat_handle_t 	tplat_thread_create(tplat_char_t const* name, void* (*callback)(void*), void* param, tplat_size_t stack_size);
-void 			tplat_thread_destroy(tplat_handle_t hthread);
-tplat_bool_t 	tplat_thread_wait(tplat_handle_t hthread, tplat_int_t timeout);
-tplat_bool_t 	tplat_thread_suspend(tplat_handle_t hthread);
-tplat_bool_t 	tplat_thread_resume(tplat_handle_t hthread);
-tplat_bool_t 	tplat_thread_terminate(tplat_handle_t hthread);
-void 			tplat_thread_exit(void* retval);
-
-// mutex
-tplat_handle_t 	tplat_mutex_create(tplat_char_t const* name);
-void 			tplat_mutex_destroy(tplat_handle_t hmutex);
-tplat_bool_t 	tplat_mutex_lock(tplat_handle_t hmutex);
-tplat_bool_t 	tplat_mutex_trylock(tplat_handle_t hmutex);
-tplat_bool_t 	tplat_mutex_unlock(tplat_handle_t hmutex);
+tb_handle_t 	tb_mutex_create(tb_char_t const* name);
+void 			tb_mutex_destroy(tb_handle_t hmutex);
+tb_bool_t 	tb_mutex_lock(tb_handle_t hmutex);
+tb_bool_t 	tb_mutex_trylock(tb_handle_t hmutex);
+tb_bool_t 	tb_mutex_unlock(tb_handle_t hmutex);
 	
 // c plus plus
 #ifdef __cplusplus

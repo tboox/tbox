@@ -26,13 +26,14 @@
  */
 #include "string.h"
 #include "../math/math.h"
-#include "../conv.h"
+#include "../utils/utils.h"
+#include "../memory/memory.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
 // the maximum grow size of value string 
-#ifdef TPLAT_MEMORY_MODE_SMALL
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_STRING_GROW_SIZE 		(64)
 #else
 # 	define TB_STRING_GROW_SIZE 		(256)
@@ -76,7 +77,7 @@ void tb_string_destroy(tb_string_t* string)
 
 void tb_string_init(tb_string_t* string)
 {
-	if (string) memset(string, 0, sizeof(tb_string_t));
+	if (string) tb_memset(string, 0, sizeof(tb_string_t));
 }
 void tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size)
 {
@@ -172,7 +173,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->data = tb_malloc(string->maxn);
 		string->owner = 1;
 		if (!string->data) goto fail;
-		memcpy(string->data, odata, TB_MATH_MIN(osize, size));
+		tb_memcpy(string->data, odata, TB_MATH_MIN(osize, size));
 		string->data[string->size] = '\0';
 	}
 	// decrease
@@ -199,7 +200,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->data = tb_malloc(string->maxn);
 		string->owner = 1;
 		if (!string->data) goto fail;
-		memcpy(string->data, odata, TB_MATH_MIN(osize, size));
+		tb_memcpy(string->data, odata, TB_MATH_MIN(osize, size));
 		string->data[string->size] = '\0';
 	}
 	// increase
@@ -279,7 +280,7 @@ tb_char_t const* tb_string_assign(tb_string_t* string, tb_string_t const* s_stri
 		if (TB_FALSE == tb_string_resize(string, s_string->size)) return TB_NULL;
 
 		// attach string
-		memcpy(string->data, s_string->data, string->size);
+		tb_memcpy(string->data, s_string->data, string->size);
 		string->data[string->size] = '\0';
 
 		return tb_string_c_string(string);
@@ -299,7 +300,7 @@ tb_char_t const* tb_string_assign_c_string(tb_string_t* string, tb_char_t const*
 		if (TB_FALSE == tb_string_resize(string, tb_cstring_size(c_string))) return TB_NULL;
 
 		// attach string
-		memcpy(string->data, c_string, string->size);
+		tb_memcpy(string->data, c_string, string->size);
 		string->data[string->size] = '\0';
 
 		return tb_string_c_string(string);
@@ -343,7 +344,7 @@ tb_char_t const* tb_string_assign_c_string_with_size(tb_string_t* string, tb_cha
 		if (TB_FALSE == tb_string_resize(string, size)) return TB_NULL;
 
 		// attach string
-		memcpy(string->data, c_string, string->size);
+		tb_memcpy(string->data, c_string, string->size);
 		string->data[string->size] = '\0';
 
 		return tb_string_c_string(string);
@@ -438,7 +439,7 @@ tb_char_t const* tb_string_append(tb_string_t* string, tb_string_t const* s_stri
 		if (TB_FALSE == tb_string_resize(string, size + s_size)) return TB_NULL;
 
 		// append string
-		memcpy(string->data + size, s_string->data, s_size);
+		tb_memcpy(string->data + size, s_string->data, s_size);
 		string->data[string->size] = '\0';
 	}
 	return tb_string_c_string(string);
@@ -458,7 +459,7 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		if (TB_FALSE == tb_string_resize(string, size + c_size)) return TB_NULL;
 
 		// append string
-		memcpy(string->data + size, c_string, c_size);
+		tb_memcpy(string->data + size, c_string, c_size);
 		string->data[string->size] = '\0';
 	}
 	return tb_string_c_string(string);
@@ -475,7 +476,7 @@ tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_cha
 		if (TB_FALSE == tb_string_resize(string, osize + size)) return TB_NULL;
 
 		// append string
-		memcpy(string->data + osize, c_string, size);
+		tb_memcpy(string->data + osize, c_string, size);
 		string->data[string->size] = '\0';
 	}
 	return tb_string_c_string(string);

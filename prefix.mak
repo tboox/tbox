@@ -12,10 +12,6 @@ PSRC_DIR 		= $(PRO_DIR)/src/pro
 INC_DIR_DEF 	= $(PRO_DIR)/inc/$(PLAT)
 LIB_DIR_DEF 	= $(PRO_DIR)/lib/$(PLAT)
 
-# tplat 
-INC_DIR 		+= $(PRO_DIR)/../tplat/bin/$(PLAT)/inc
-LIB_DIR 		+= $(PRO_DIR)/../tplat/bin/$(PLAT)/lib
-
 # architecture makefile
 -include 		$(PLAT_DIR)/prefix.mak
 

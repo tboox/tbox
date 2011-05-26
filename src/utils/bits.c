@@ -92,7 +92,7 @@ tb_float_t tb_bits_get_double_le(tb_byte_t const* p)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bits_get_u32_le(p);
 	conv.i[1] = tb_bits_get_u32_le(p);
 #else
@@ -111,7 +111,7 @@ tb_float_t tb_bits_get_double_be(tb_byte_t const* p)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bits_get_u32_be(p);
 	conv.i[1] = tb_bits_get_u32_be(p);
 #else
@@ -130,7 +130,7 @@ tb_float_t tb_bits_get_double_ne(tb_byte_t const* p)
 
 	} conv;
 
-#ifdef TPLAT_FLOAT_BIGENDIAN
+#ifdef TB_FLOAT_BIGENDIAN
 	conv.i[0] = tb_bits_get_u32_ne(p);
 	conv.i[1] = tb_bits_get_u32_ne(p);
 #else

@@ -38,7 +38,7 @@ extern "C" {
  * macros
  */
 
-#ifdef TPLAT_MEMORY_MODE_SMALL
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_XML_READER_ATTRIBUTES_MAX 		(256)
 #else
 # 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)

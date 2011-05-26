@@ -26,6 +26,7 @@
  */
 #include "node.h"
 #include "nlist.h"
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -82,7 +83,7 @@ void tb_xml_node_init(tb_xml_node_t* node, void* document, tb_size_t type)
 	if (node)
 	{
 		// init it
-		memset(node, 0, sizeof(tb_xml_node_t));
+		tb_memset(node, 0, sizeof(tb_xml_node_t));
 		node->type = type;
 		node->document = document;
 		node->prev = node;

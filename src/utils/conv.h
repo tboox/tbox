@@ -20,8 +20,8 @@
  * \file		conv.h
  *
  */
-#ifndef TB_CONV_H
-#define TB_CONV_H
+#ifndef TB_UTILS_CONV_H
+#define TB_UTILS_CONV_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes

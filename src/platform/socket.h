@@ -20,8 +20,8 @@
  * \file		socket.h
  *
  */
-#ifndef TPLAT_SOCKET_H
-#define TPLAT_SOCKET_H
+#ifndef TB_PLATFORM_SOCKET_H
+#define TB_PLATFORM_SOCKET_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -42,33 +42,33 @@ extern "C" {
  * types
  */
 // socket proto
-typedef enum __tplat_socket_type_t
+typedef enum __tb_socket_type_t
 {
-	TPLAT_SOCKET_TYPE_TCP
-, 	TPLAT_SOCKET_TYPE_UDP
-, 	TPLAT_SOCKET_TYPE_UNKNOWN = -1
+	TB_SOCKET_TYPE_TCP
+, 	TB_SOCKET_TYPE_UDP
+, 	TB_SOCKET_TYPE_UNKNOWN = -1
 
-}tplat_socket_type_t;
+}tb_socket_type_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 // init & unint
-tplat_bool_t 	tplat_socket_init();
-void 			tplat_socket_uninit();
+tb_bool_t 	tb_socket_init();
+void 			tb_socket_uninit();
 
 // client open socket
-tplat_handle_t 	tplat_socket_client_open(tplat_char_t const* host, tplat_uint16_t port, tplat_int_t type, tplat_bool_t is_block);
+tb_handle_t 	tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
 
 // server open socket
-tplat_handle_t 	tplat_socket_server_open(tplat_uint16_t port, tplat_int_t type, tplat_bool_t is_block);
+tb_handle_t 	tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
 
 // server accept client socket
-tplat_handle_t 	tplat_socket_server_accept(tplat_handle_t hserver);
+tb_handle_t 	tb_socket_server_accept(tb_handle_t hserver);
 
 // close socket
-void 			tplat_socket_close(tplat_handle_t hsocket);
+void 			tb_socket_close(tb_handle_t hsocket);
 
 /* recv data
  *
@@ -77,7 +77,7 @@ void 			tplat_socket_close(tplat_handle_t hsocket);
  * == 0: null
  * < 0: failure
  */
-tplat_int_t 	tplat_socket_recv(tplat_handle_t hsocket, tplat_byte_t* data, tplat_size_t size);
+tb_int_t 	tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
 
 /* send data
  *
@@ -86,7 +86,7 @@ tplat_int_t 	tplat_socket_recv(tplat_handle_t hsocket, tplat_byte_t* data, tplat
  * == 0: null
  * < 0: failure
  */
-tplat_int_t 	tplat_socket_send(tplat_handle_t hsocket, tplat_byte_t* data, tplat_size_t size);
+tb_int_t 	tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
 
 /* recv data from host
  *
@@ -95,7 +95,7 @@ tplat_int_t 	tplat_socket_send(tplat_handle_t hsocket, tplat_byte_t* data, tplat
  * == 0: null
  * < 0: failure
  */
-tplat_int_t 	tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* host, tplat_uint16_t port, tplat_byte_t* data, tplat_size_t size);
+tb_int_t 	tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 
 /* send data to host
  *
@@ -104,7 +104,7 @@ tplat_int_t 	tplat_socket_recvfrom(tplat_handle_t hsocket, tplat_char_t const* h
  * == 0: null
  * < 0: failure
  */
-tplat_int_t 	tplat_socket_sendto(tplat_handle_t hsocket, tplat_char_t const* host, tplat_uint16_t port, tplat_byte_t* data, tplat_size_t size);
+tb_int_t 	tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 	
 // c plus plus
 #ifdef __cplusplus

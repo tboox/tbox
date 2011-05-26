@@ -25,7 +25,7 @@
  * includes
  */
 #include "nlist.h"
-
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -38,7 +38,7 @@ tb_xml_nlist_t* tb_xml_nlist_create()
 	if (!nlist) return TB_NULL;
 
 	// init it
-	memset(nlist, 0, sizeof(tb_xml_nlist_t));
+	tb_memset(nlist, 0, sizeof(tb_xml_nlist_t));
 	nlist->next = nlist;
 	nlist->prev = nlist;
 	((tb_xml_nlist_t*)nlist)->size = 0;

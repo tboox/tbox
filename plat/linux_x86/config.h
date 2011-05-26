@@ -10,6 +10,7 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // platform
+#define TB_CONFIG_PLAT_LINUX_x86
 //#define TB_CONFIG_PLAT_BIGENDIAN
 
 // compiler

@@ -25,7 +25,7 @@
  */
 #include "prefix.h"
 #include "tstream.h"
-#include "../../encoding.h"
+#include "../../encoding/encoding.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -47,7 +47,7 @@ typedef struct __tb_estream_t
  * implements
  */
 
-static __tplat_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(tst && tst->type == TB_TSTREAM_TYPE_ENCODING, TB_NULL);

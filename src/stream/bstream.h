@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "../bits.h"
+#include "../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -157,17 +157,17 @@ tb_uint32_t 		tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits);
 tb_sint32_t 		tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t nbits);
 
 // bst inline
-static __tplat_inline__ tb_uint8_t tb_bstream_get_u8(tb_bstream_t* bst)
+static __tb_inline__ tb_uint8_t tb_bstream_get_u8(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	return *(bst->p++);
 }
-static __tplat_inline__ tb_sint8_t tb_bstream_get_s8(tb_bstream_t* bst)
+static __tb_inline__ tb_sint8_t tb_bstream_get_s8(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	return *(bst->p++);
 }
-static __tplat_inline__ tb_uint16_t tb_bstream_get_u16_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_uint16_t tb_bstream_get_u16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -176,7 +176,7 @@ static __tplat_inline__ tb_uint16_t tb_bstream_get_u16_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ tb_sint16_t tb_bstream_get_s16_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_sint16_t tb_bstream_get_s16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -185,7 +185,7 @@ static __tplat_inline__ tb_sint16_t tb_bstream_get_s16_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ tb_uint32_t tb_bstream_get_u24_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_uint32_t tb_bstream_get_u24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -194,7 +194,7 @@ static __tplat_inline__ tb_uint32_t tb_bstream_get_u24_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ tb_sint32_t tb_bstream_get_s24_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_sint32_t tb_bstream_get_s24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -203,7 +203,7 @@ static __tplat_inline__ tb_sint32_t tb_bstream_get_s24_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ tb_uint32_t tb_bstream_get_u32_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_uint32_t tb_bstream_get_u32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -212,7 +212,7 @@ static __tplat_inline__ tb_uint32_t tb_bstream_get_u32_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ tb_sint32_t tb_bstream_get_s32_ne(tb_bstream_t* bst)
+static __tb_inline__ tb_sint32_t tb_bstream_get_s32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
 	// {
@@ -221,35 +221,35 @@ static __tplat_inline__ tb_sint32_t tb_bstream_get_s32_ne(tb_bstream_t* bst)
 	return val;
 	// }
 }
-static __tplat_inline__ void tb_bstream_set_u8(tb_bstream_t* bst, tb_uint8_t val)
+static __tb_inline__ void tb_bstream_set_u8(tb_bstream_t* bst, tb_uint8_t val)
 {
 	TB_ASSERT(!bst->b);
 	*(bst->p++) = val;
 }
-static __tplat_inline__ void tb_bstream_set_s8(tb_bstream_t* bst, tb_sint8_t val)
+static __tb_inline__ void tb_bstream_set_s8(tb_bstream_t* bst, tb_sint8_t val)
 {
 	TB_ASSERT(!bst->b);
 	*(bst->p++) = val;
 }
-static __tplat_inline__ void tb_bstream_set_u16_ne(tb_bstream_t* bst, tb_uint16_t val)
+static __tb_inline__ void tb_bstream_set_u16_ne(tb_bstream_t* bst, tb_uint16_t val)
 {
 	TB_ASSERT(!bst->b);
 	*((tb_uint16_t*)bst->p) = val;
 	bst->p += 2;
 }
-static __tplat_inline__ void tb_bstream_set_s16_ne(tb_bstream_t* bst, tb_sint16_t val)
+static __tb_inline__ void tb_bstream_set_s16_ne(tb_bstream_t* bst, tb_sint16_t val)
 {
 	TB_ASSERT(!bst->b);
 	*((tb_sint16_t*)bst->p) = val;
 	bst->p += 2;
 }
-static __tplat_inline__ void tb_bstream_set_u32_ne(tb_bstream_t* bst, tb_uint32_t val)
+static __tb_inline__ void tb_bstream_set_u32_ne(tb_bstream_t* bst, tb_uint32_t val)
 {
 	TB_ASSERT(!bst->b);
 	*((tb_uint32_t*)bst->p) = val;
 	bst->p += 4;
 }
-static __tplat_inline__ void tb_bstream_set_s32_ne(tb_bstream_t* bst, tb_sint32_t val)
+static __tb_inline__ void tb_bstream_set_s32_ne(tb_bstream_t* bst, tb_sint32_t val)
 {
 	TB_ASSERT(!bst->b);
 	*((tb_sint32_t*)bst->p) = val;
