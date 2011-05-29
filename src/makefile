@@ -124,11 +124,13 @@ INC_FILES 			= \
 					network/dns.h \
 					network/cookies.h \
 					encoding/encoding.h \
+					encoding/prefix.h \
 					stream/prefix.h \
 					stream/stream.h \
 					stream/bstream.h \
 					stream/gstream.h \
 					format/format.h \
+					format/prefix.h \
 					utils/prefix.h \
 					utils/utils.h \
 					utils/bits.h \

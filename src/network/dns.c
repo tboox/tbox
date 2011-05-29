@@ -288,7 +288,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 #else
 	tb_handle_t hserver = tb_socket_client_open(TB_NULL, 0, TB_SOCKET_TYPE_UDP, TB_TRUE);
 #endif
-	if (hserver == TB_INVALID_HANDLE) goto fail;
+	if (!hserver) goto fail;
 	TB_DNS_DBG("connect ok.");
 		
 	// bstream
@@ -530,7 +530,7 @@ ok:
 	return ip;
 fail:
 	TB_DNS_DBG("lookup failed.");
-	if (hserver != TB_INVALID_HANDLE) tb_socket_close(hserver);
+	if (hserver) tb_socket_close(hserver);
 	return TB_NULL;
 }
 tb_char_t const* tb_dns_lookup(tb_char_t const* host, tb_char_t* ip)

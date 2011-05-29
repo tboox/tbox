@@ -57,14 +57,14 @@ tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb
 	if (fd < 0) 
 	{
 		TB_DBG("cannot open audio device:%s", TB_AUDIO_DEVNAME);
-		return TB_INVALID_HANDLE;
+		return TB_NULL;
 	}
 
 #if 0
 	tb_int_t quantify_bits = 16;
-	if (ioctl(fd, SOUND_PCM_WRITE_RATE, &sample_rate) == -1) return TB_INVALID_HANDLE;
-	if (ioctl(fd, SOUND_PCM_WRITE_CHANNELS, &channels) == -1) return TB_INVALID_HANDLE;
-	if (ioctl(fd, SOUND_PCM_WRITE_BITS, &quantify_bits) == -1) return TB_INVALID_HANDLE;
+	if (ioctl(fd, SOUND_PCM_WRITE_RATE, &sample_rate) == -1) return TB_NULL;
+	if (ioctl(fd, SOUND_PCM_WRITE_CHANNELS, &channels) == -1) return TB_NULL;
+	if (ioctl(fd, SOUND_PCM_WRITE_BITS, &quantify_bits) == -1) return TB_NULL;
 #else
 
 	tb_int_t fmt = AFMT_U8;
@@ -132,7 +132,7 @@ tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb
 
 fail:
 	if (fd >= 0) close(fd);
-	return TB_INVALID_HANDLE;
+	return TB_NULL;
 }
 tb_int_t tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
 {

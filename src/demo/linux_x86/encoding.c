@@ -5,7 +5,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 	tb_handle_t hfile = tb_file_open(path, TB_FILE_RO);
 
 	tb_byte_t* p = TB_NULL;
-	if (hfile != TB_INVALID_HANDLE)
+	if (hfile)
 	{
 		tb_int_t file_size = (tb_int_t)tb_file_seek(hfile, -1, TB_FILE_SEEK_SIZE);
 		if  (file_size <= 0) return 0;
@@ -34,7 +34,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 static void save(tb_char_t const* path, tb_byte_t const* data, tb_size_t size)
 {
 	tb_handle_t hfile = tb_file_open(path, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
-	if (hfile != TB_INVALID_HANDLE)
+	if (hfile)
 	{
 		tb_int_t write_n = 0;
 		while (write_n < size) 
