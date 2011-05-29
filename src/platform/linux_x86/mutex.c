@@ -36,13 +36,12 @@
 tb_handle_t tb_mutex_create(tb_char_t const* name)
 {
 	pthread_mutex_t* pmutex = malloc(sizeof(pthread_mutex_t));
-	if (!pmutex || 0 != pthread_mutex_init(pmutex, NULL)) return TB_INVALID_HANDLE;
+	if (!pmutex || 0 != pthread_mutex_init(pmutex, NULL)) return TB_NULL;
 	else return ((tb_handle_t)pmutex);
 }
 void tb_mutex_destroy(tb_handle_t hmutex)
 {
-	TB_ASSERT(hmutex != TB_INVALID_HANDLE);
-	if (hmutex == TB_INVALID_HANDLE) return ;
+	TB_ASSERT_RETURN(hmutex);
 
 	pthread_mutex_t* pmutex = (pthread_mutex_t*)hmutex;
 	if (pmutex)
@@ -53,24 +52,21 @@ void tb_mutex_destroy(tb_handle_t hmutex)
 }
 tb_bool_t tb_mutex_lock(tb_handle_t hmutex)
 {
-	TB_ASSERT(hmutex != TB_INVALID_HANDLE);
-	if (hmutex == TB_INVALID_HANDLE) return TB_FALSE;
+	TB_ASSERT_RETURN_VAL(hmutex, TB_FALSE);
 
 	if (0 != pthread_mutex_lock((pthread_mutex_t*)hmutex)) return TB_FALSE;
 	else return TB_TRUE;
 }
 tb_bool_t tb_mutex_trylock(tb_handle_t hmutex)
 {
-	TB_ASSERT(hmutex != TB_INVALID_HANDLE);
-	if (hmutex == TB_INVALID_HANDLE) return TB_FALSE;
+	TB_ASSERT_RETURN_VAL(hmutex, TB_FALSE);
 
 	if (0 != pthread_mutex_trylock((pthread_mutex_t*)hmutex)) return TB_FALSE;
 	else return TB_TRUE;
 }
 tb_bool_t tb_mutex_unlock(tb_handle_t hmutex)
 {
-	TB_ASSERT(hmutex != TB_INVALID_HANDLE);
-	if (hmutex == TB_INVALID_HANDLE) return TB_FALSE;
+	TB_ASSERT_RETURN_VAL(hmutex, TB_FALSE);
 
 	if (0 != pthread_mutex_unlock((pthread_mutex_t*)hmutex)) return TB_FALSE;
 	else return TB_TRUE;

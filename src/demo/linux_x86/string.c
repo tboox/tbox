@@ -34,6 +34,5 @@ int main(int argc, char** argv)
 	tb_string_uninit(&s2);
 	tb_string_uninit(&s3);
 
-	TB_POOL_DUMP(TB_CONFIG_MEMORY_POOL_INDEX);
 	return 0;
 }

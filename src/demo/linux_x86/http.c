@@ -12,11 +12,11 @@ int main(int argc, char** argv)
 
 	// create http
 	tb_handle_t http = tb_http_create(TB_NULL);
-	if (http == TB_INVALID_HANDLE) goto end;
+	if (!http) goto end;
 
 	// create cookies
 	tb_cookies_t* cookies = tb_cookies_create();
-	if (cookies == TB_INVALID_HANDLE) goto end;
+	if (!cookies) goto end;
 	
 	// init option
 	if (TB_FALSE == tb_http_option_set_url(http, argv[1])) goto end;
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
 		// open file
 		tb_handle_t hfile = tb_file_open(argv[2], TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
-		if (hfile == TB_INVALID_HANDLE) goto end;
+		if (!hfile) goto end;
 		
 		// read data
 		tb_byte_t 		data[8192];
@@ -91,7 +91,7 @@ end:
 	}
 
 	// destroy it
-	if (http != TB_INVALID_HANDLE) tb_http_destroy(http);
+	if (http) tb_http_destroy(http);
 
 	// dump cookies
 #ifdef TB_DEBUG

@@ -57,7 +57,7 @@ static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE, TB_FALSE);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
 
 	// init offset
 	hst->offset = 0;
@@ -70,7 +70,7 @@ static void tb_hstream_close(tb_gstream_t* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst)
 	{
-		if (hst->http != TB_INVALID_HANDLE)
+		if (hst->http)
 			tb_http_close(hst->http);
 	}
 }
@@ -79,14 +79,14 @@ static void tb_hstream_free(tb_gstream_t* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst)
 	{
-		if (hst->http != TB_INVALID_HANDLE)
+		if (hst->http)
 			tb_http_destroy(hst->http);
 	}
 }
 static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE && data, -1);
+	TB_ASSERT_RETURN_VAL(hst && hst->http && data, -1);
 	TB_IF_FAIL_RETURN_VAL(size, 0);
 
 	// recv data
@@ -99,7 +99,7 @@ static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t si
 static tb_int_t tb_hstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE && data, -1);
+	TB_ASSERT_RETURN_VAL(hst && hst->http && data, -1);
 	TB_IF_FAIL_RETURN_VAL(size, 0);
 
 	// recv data
@@ -112,20 +112,20 @@ static tb_int_t tb_hstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 static tb_size_t tb_hstream_size(tb_gstream_t const* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE, 0);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, 0);
 
 	return tb_http_status_content_size(hst->http);
 }
 static tb_size_t tb_hstream_offset(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE, 0);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, 0);
 	return hst->offset;
 }
 static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE, TB_FALSE);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
 
 	switch (cmd)
 	{
@@ -221,7 +221,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
 static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(hst && hst->http != TB_INVALID_HANDLE, TB_FALSE);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
 
 	switch (cmd)
 	{
@@ -262,7 +262,7 @@ tb_gstream_t* tb_gstream_create_http()
 	gst->ioctl1 = tb_hstream_ioctl1;
 	gst->ioctl2 = tb_hstream_ioctl2;
 	hst->http 	= tb_http_create(TB_NULL);
-	TB_ASSERT_GOTO(hst->http != TB_INVALID_HANDLE, fail);
+	TB_ASSERT_GOTO(hst->http, fail);
 
 	return gst;
 

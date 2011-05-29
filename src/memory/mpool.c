@@ -272,7 +272,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 {
 	// check
 	TB_ASSERT_RETURN_VAL(!g_mpool && data && size, TB_FALSE);
-	TB_ASSERT_RETURN_VAL(!(sizeof(tb_mpool_nrblock_head_t) % TB_MPOOL_ALIGN_BOUNDARY), TB_FALSE);
+	TB_STATIC_ASSERT(!(sizeof(tb_mpool_nrblock_head_t) % TB_MPOOL_ALIGN_BOUNDARY));
 	
 	// init regular block 
 	tb_size_t rblockn[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT] = {0, 0, 0, 0, 0, 0, 0};
@@ -295,7 +295,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 
 	// create mutex
 	g_mpool->hmutex = tb_mutex_create("the memory pool");
-	if (g_mpool->hmutex == TB_INVALID_HANDLE) return TB_FALSE;
+	if (!g_mpool->hmutex) return TB_FALSE;
 
 	// attach data
 	g_mpool->data = &g_mpool[1];
@@ -370,9 +370,8 @@ void tb_mpool_exit()
 	TB_ASSERT_RETURN(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC);
 
 	// destroy mutex
-	if (g_mpool->hmutex != TB_INVALID_HANDLE) 
-		tb_mutex_destroy(g_mpool->hmutex);
-	g_mpool->hmutex = TB_INVALID_HANDLE;
+	if (g_mpool->hmutex) tb_mutex_destroy(g_mpool->hmutex);
+	g_mpool->hmutex = TB_NULL;
 
 	// clear
 	if (g_mpool->data) tb_memset(g_mpool->data, 0, g_mpool->size);

@@ -55,7 +55,7 @@ typedef struct __tb_file_list_t
 tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 {
 	tb_int_t flag = 0, mode = 0, fd = -1;
-	if (!filename) return TB_INVALID_HANDLE;
+	if (!filename) return TB_NULL;
 
 	//TB_DBG("tb_file_open:%s flags:%d", filename, flags);
 
@@ -78,25 +78,25 @@ tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 	snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, filename);
 	fd = open(path, flag, mode);
 
-	if (fd < 0) return TB_INVALID_HANDLE;
+	if (fd < 0) return TB_NULL;
 	else return ((tb_handle_t)fd);
 }
 void tb_file_close(tb_handle_t hfile)
 {
 	//TB_DBG("tb_file_close");
-	if (hfile != TB_INVALID_HANDLE) close((tb_int_t)hfile);
+	if (hfile) close((tb_int_t)hfile);
 }
 tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t read_n)
 {
 	//TB_DBG("tb_file_read: %d bytes", read_n);
-	if (hfile == TB_INVALID_HANDLE) return 0;
-	else return read((tb_int_t)hfile, data, read_n);
+	if (hfile) return read((tb_int_t)hfile, data, read_n);
+	else return -1;
 }
 tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_n)
 {
 	//TB_DBG("tb_file_write: %d bytes", write_n);
-	if (hfile == TB_INVALID_HANDLE) return 0;
-	else return write((tb_int_t)hfile, data, write_n);
+	if (hfile) return write((tb_int_t)hfile, data, write_n);
+	else return -1;
 }
 void tb_file_flush(tb_handle_t hfile)
 {
@@ -104,7 +104,7 @@ void tb_file_flush(tb_handle_t hfile)
 }
 tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags)
 {
-	if (hfile == TB_INVALID_HANDLE) return -1;
+	if (!hfile) return -1;
 	//TB_DBG("tb_file_seek: offset:%d flag: %d", (off_t)offset, flags);
 
 	if (flags == TB_FILE_SEEK_BEG) return lseek((tb_int_t)hfile, (off_t)offset, SEEK_SET);
@@ -125,8 +125,7 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags)
 // open file list
 tb_handle_t tb_file_list_open(tb_char_t const* dir)
 {
-	TB_ASSERT(dir);
-	if (!dir) return TB_INVALID_HANDLE;
+	TB_ASSERT_RETURN_VAL(dir, TB_NULL);
 
 	tb_file_list_t flist;
 
@@ -137,7 +136,7 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 	// open directory
 	flist.pdir = opendir(path);
 	TB_ASSERT(flist.pdir);
-	if (!flist.pdir) return TB_INVALID_HANDLE;
+	if (!flist.pdir) return TB_NULL;
 
 	// save current directory
 	strncpy(flist.dir, path, TB_FILENAME_MAX_SIZE - 1);
@@ -145,7 +144,7 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 
 	// malloc 
 	tb_file_list_t* pflist = (tb_file_list_t*)malloc(sizeof(tb_file_list_t));
-	if (!pflist) return TB_INVALID_HANDLE;
+	if (!pflist) return TB_NULL;
 	
 	// return list
 	*pflist = flist;
@@ -155,11 +154,8 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 // get file list entry, end: return NULL
 tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 {
-	TB_ASSERT(hflist != TB_INVALID_HANDLE);
-	if (hflist == TB_INVALID_HANDLE) return TB_NULL;
-
+	TB_ASSERT_RETURN_VAL(hflist, TB_NULL);
 	tb_file_list_t* pflist = (tb_file_list_t*)hflist;
-	if (!pflist) return TB_NULL;
 
 	// get file entry
 	struct dirent* pdirent = readdir(pflist->pdir);
@@ -204,17 +200,11 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 // close file list
 void tb_file_list_close(tb_handle_t hflist)
 {
-	TB_ASSERT(hflist != TB_INVALID_HANDLE);
-	if (hflist == TB_INVALID_HANDLE) return ;
-
+	TB_ASSERT_RETURN(hflist);
 	tb_file_list_t* pflist = (tb_file_list_t*)hflist;
-	if (pflist) 
-	{
-		if (pflist->pdir) 
-			closedir(pflist->pdir);
-		
-		free(pflist);
-	}
+
+	if (pflist->pdir) closedir(pflist->pdir);
+	free(pflist);
 }
 
 // delete file or empty directory

@@ -65,7 +65,7 @@ void tb_socket_uninit()
 }
 tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
 {
-	if (type == TB_SOCKET_TYPE_UNKNOWN) return TB_INVALID_HANDLE;
+	if (type == TB_SOCKET_TYPE_UNKNOWN) return TB_NULL;
 
 	//TB_DBG("socket open: %s %d", host, port);
 
@@ -75,17 +75,17 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 	{
 		t = SOCK_STREAM;
 		p = IPPROTO_TCP;
-		if (!host || !port) return TB_INVALID_HANDLE;
+		if (!host || !port) return TB_NULL;
 	}
 	else if (type == TB_SOCKET_TYPE_UDP)
 	{
 		t = SOCK_DGRAM;
 		p = IPPROTO_UDP;
 	}
-	else return TB_INVALID_HANDLE;
+	else return TB_NULL;
 
 	tb_int_t fd = socket(AF_INET, t, p);
-	if (fd < 0) return TB_INVALID_HANDLE;
+	if (fd < 0) return TB_NULL;
 
 	// set block or non-block
 	if (is_block == TB_TRUE) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
@@ -101,7 +101,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 		{
 			struct hostent* h = gethostbyname(host);
 			if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-			else return TB_INVALID_HANDLE;
+			else return TB_NULL;
 		}
 
 		// connect host
@@ -117,7 +117,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 				if (errno != EINPROGRESS && errno != EAGAIN)
 				{
 					if (fd >= 0) close(fd);
-					return TB_INVALID_HANDLE;
+					return TB_NULL;
 				}
 
 				// wait until we are connected or until abort
@@ -141,14 +141,14 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 				if (ret != 0)
 				{
 					if (fd >= 0) close(fd);
-					return TB_INVALID_HANDLE;
+					return TB_NULL;
 				}
 			}
 			else if (ret >= 0) break;
 			else
 			{
 				if (fd >= 0) close(fd);
-				return TB_INVALID_HANDLE;
+				return TB_NULL;
 			}
 		}
 	}
@@ -156,7 +156,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 	// create socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
 	TB_ASSERT(s);
-	if (!s) return TB_INVALID_HANDLE;
+	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd;
 	s->type = type;
@@ -174,11 +174,8 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 }
 void tb_socket_close(tb_handle_t hsocket)
 {
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE) return ;
-
+	TB_ASSERT_RETURN(hsocket);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
 
 	//TB_DBG("socket close");
 
@@ -191,11 +188,8 @@ void tb_socket_close(tb_handle_t hsocket)
 
 tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE) return -1;
-
+	TB_ASSERT_RETURN_VAL(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
 
 	//TB_DBG("socket_recv: %d", size);
 
@@ -234,11 +228,8 @@ tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 
 tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE) return -1;
-
+	TB_ASSERT_RETURN_VAL(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
 
 	//TB_DBG("socket_send: %d", size);
 
@@ -279,11 +270,8 @@ tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 }
 tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE) return -1;
-
+	TB_ASSERT_RETURN_VAL(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
 
 	// get host & port
 	port = port? port : s->port;
@@ -337,11 +325,8 @@ tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint1
 }
 tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE) return -1;
-
+	TB_ASSERT_RETURN_VAL(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
 
 	// get host & port
 	port = port? port : s->port;
@@ -394,20 +379,20 @@ tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_
 }
 tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
 {
-	if (!port || type == TB_SOCKET_TYPE_UNKNOWN) return TB_INVALID_HANDLE;
+	if (!port || type == TB_SOCKET_TYPE_UNKNOWN) return TB_NULL;
 
 	// create socket
 	tb_int_t t;
 	if (type == TB_SOCKET_TYPE_TCP) t = SOCK_STREAM;
 	else if (type == TB_SOCKET_TYPE_UDP) t = SOCK_DGRAM;
-	else return TB_INVALID_HANDLE;
+	else return TB_NULL;
 
 	// udp is not implemention now
 	if (type == TB_SOCKET_TYPE_UDP)
 	{
 		// not implemention now
 		TB_DBG("tb_socket_server_open(type == UDP) is not implemention now");
-		return TB_INVALID_HANDLE;
+		return TB_NULL;
 	}
 
 	// server socket
@@ -418,7 +403,7 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	saddr.sin_addr.s_addr = INADDR_ANY;
 
 	tb_int_t fd_s = socket(AF_INET, t, 0);
-	if (fd_s < 0) return TB_INVALID_HANDLE;
+	if (fd_s < 0) return TB_NULL;
 
 	// set block or non-block
 	if (is_block == TB_TRUE) fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) & ~O_NONBLOCK);
@@ -429,7 +414,7 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	{
         TB_DBG("bind error!");
 		close(fd_s);
-		return TB_INVALID_HANDLE;
+		return TB_NULL;
     }
 
 	// listen
@@ -437,13 +422,13 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	{
         TB_DBG("listen error!");
 		close(fd_s);
-		return TB_INVALID_HANDLE;
+		return TB_NULL;
     }
 
 	// return server socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
 	TB_ASSERT(s);
-	if (!s) return TB_INVALID_HANDLE;
+	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_s;
 	s->type = type;
@@ -453,24 +438,22 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 }
 tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
 {
-	TB_ASSERT(hserver != TB_INVALID_HANDLE);
-	if (hserver == TB_INVALID_HANDLE) return TB_INVALID_HANDLE;
-
+	TB_ASSERT_RETURN_VAL(hserver, TB_NULL);
 	tb_socket_t* ps = (tb_socket_t*)hserver;
-	if (!ps || ps->fd < 0) return TB_INVALID_HANDLE;
+	if (ps->fd < 0) return TB_NULL;
 
 	// accept client 
 	tb_int_t caddr_n = sizeof(struct sockaddr_in);
 	struct sockaddr_in caddr;
 	tb_int_t fd_c = accept(ps->fd, (struct sockaddr *)&caddr, &caddr_n);
-	if (fd_c == -1) return TB_INVALID_HANDLE;
+	if (fd_c == -1) return TB_NULL;
 
 	//TB_DBG("connection from %s", inet_ntoa(caddr.sin_addr));
 
 	// return client socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
 	TB_ASSERT(s);
-	if (!s) return TB_INVALID_HANDLE;
+	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_c;
 	s->type = ps->type;
@@ -479,30 +462,3 @@ tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
 	return ((tb_handle_t)s);
 }
 
-#if 0
-tb_bool_t tb_socket_peername(tb_handle_t hsocket, tb_char_t* ip, tb_int_t* port)
-{
-	TB_ASSERT(hsocket != TB_INVALID_HANDLE);
-	if (hsocket == TB_INVALID_HANDLE || !ip || !port) return TB_FALSE;
-
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-	TB_ASSERT(s);
-	if (s->fd < 0) return TB_FALSE;
-
-	struct sockaddr_in 	addr;
-	memset(&addr, 0, sizeof(struct sockaddr_in));
-	tb_int_t 		addr_n = sizeof(struct sockaddr_in);
-
-	if (getpeername(s->fd, (struct sockaddr *)&addr, &addr_n) == -1)
-		return TB_FALSE;
-
-	// parse ip
-	memcpy(ip, inet_ntoa(addr.sin_addr), 16);
-	ip[16] = 0;
-
-	*port = ntohs(addr.sin_port);
-
-	return TB_TRUE;
-}
-
-#endif

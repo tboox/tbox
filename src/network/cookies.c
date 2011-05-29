@@ -520,7 +520,7 @@ tb_cookies_t* tb_cookies_create()
 
 	// create hmutex
 	cookies->hmutex = tb_mutex_create("cookies");
-	TB_ASSERT_GOTO(cookies->hmutex != TB_INVALID_HANDLE, fail);
+	TB_ASSERT_GOTO(cookies->hmutex, fail);
 
 	// create spool
 	cookies->spool = tb_slist_create(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, TB_NULL, tb_cookies_spool_dtor, TB_NULL);
@@ -540,7 +540,7 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 {
 	if (cookies)
 	{
-		TB_ASSERT_RETURN(cookies->hmutex != TB_INVALID_HANDLE);
+		TB_ASSERT_RETURN(cookies->hmutex);
 
 		// clear cookies
 		tb_cookies_clear(cookies);
@@ -568,7 +568,7 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 
 void tb_cookies_clear(tb_cookies_t* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
+	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 
 	tb_mutex_lock(cookies->hmutex);
 	tb_vector_clear(cookies->cpool);
@@ -579,7 +579,7 @@ void tb_cookies_clear(tb_cookies_t* cookies)
 
 void tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {
-	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
+	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex);
 	//TB_COOKIES_DBG("[set]::%s%s%s = %s", secure == TB_TRUE? "https://" : "http://", domain? domain : "", path? path : "", value);
 
 	// is null?
@@ -613,7 +613,7 @@ void tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t co
 }
 tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure)
 {
-	TB_ASSERT_RETURN_VAL(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE, TB_NULL);
+	TB_ASSERT_RETURN_VAL(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex, TB_NULL);
 	
 	// no path?
 	if (!path || !path[0]) path = "/";
@@ -745,7 +745,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 #ifdef TB_DEBUG
 void tb_cookies_dump(tb_cookies_t const* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex != TB_INVALID_HANDLE);
+	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 	tb_mutex_lock(cookies->hmutex);
 
 	TB_COOKIES_DBG("==================================================");

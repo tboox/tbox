@@ -88,6 +88,8 @@ extern "C" {
 #define TB_ASSERT_RETURN_VAL(x, v) 					do { TB_ASSERT(x); if (!(x)) return (v); } while (0)
 #define TB_ASSERT_GOTO(x, b) 						do { TB_ASSERT(x); if (!(x)) goto b; } while (0)
 
+#define TB_STATIC_ASSERT(x) 						do { typedef int __static_assert__[(x)? 1 : -1]; } while(0)
+
 // not implement
 #define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: %s at %d file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
 
@@ -310,9 +312,6 @@ extern "C" {
 #define TB_TRUE						((tb_bool_t)1)
 #define	TB_FALSE					((tb_bool_t)0)
 
-// invalidate handle
-#define TB_INVALID_HANDLE 			((tb_handle_t)-1)
-
 // null
 #ifdef __cplusplus
 # 	define TB_NULL 					(0)
@@ -332,14 +331,14 @@ extern "C" {
 #define TB_FIXED16_FACTOR 			(0xffff)
 #define TB_FIXED32_FACTOR 			(0xffffffff)
 
-#define TB_FIXED32_2_FLOAT(x) 		((tg_float_t)(x) / 0xffffffff)
-#define TB_FLOAT_2_FIXED32(x) 		((tg_fixed32_t)((x) * 0xffffffff))
-	
-#define TB_FIXED16_2_FLOAT(x) 		((tg_float_t)(x) / 0xffff)
-#define TB_FLOAT_2_FIXED16(x) 		((tg_fixed16_t)((x) * 0xffff))
+#define TB_FIXED32_2_FLOAT(x) 		((tb_float_t)(x) / 0xffffffff)
+#define TB_FLOAT_2_FIXED32(x) 		((tb_fixed32_t)((x) * 0xffffffff))
 
-#define TB_FIXED8_2_FLOAT(x) 		((tg_float_t)(x) / 0xff)
-#define TB_FLOAT_2_FIXED8(x) 		((tg_fixed8_t)((x) * 0xff))
+#define TB_FIXED16_2_FLOAT(x) 		((tb_float_t)(x) / 0xffff)
+#define TB_FLOAT_2_FIXED16(x) 		((tb_fixed16_t)((x) * 0xffff))
+
+#define TB_FIXED8_2_FLOAT(x) 		((tb_float_t)(x) / 0xff)
+#define TB_FLOAT_2_FIXED8(x) 		((tb_fixed8_t)((x) * 0xff))
 
 #define TB_FIXED32_2_INT(x) 		((x) >> 32)
 #define TB_INT_2_FIXED32(x) 		((x) << 32)
