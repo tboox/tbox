@@ -82,6 +82,7 @@ static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 	// init size
 	fst->size = (tb_size_t)tb_file_seek(fst->file, -1, TB_FILE_SEEK_SIZE);
 	fst->offset = 0;
+	TB_ASSERT_RETURN_VAL(fst->size, TB_FALSE);
 	
 	return TB_TRUE;
 }
@@ -124,7 +125,33 @@ static tb_int_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 }
 static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
-	TB_NOT_IMPLEMENT();
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(fst && fst->file, TB_FALSE);
+
+	// seek
+	tb_int_t ret = -1;
+	switch (flag)
+	{
+	case TB_GSTREAM_SEEK_BEG:
+		ret = tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG);
+		break;
+	case TB_GSTREAM_SEEK_CUR:
+		ret = tb_file_seek(fst->file, offset, TB_FILE_SEEK_CUR);
+		break;
+	case TB_GSTREAM_SEEK_END:
+		ret = tb_file_seek(fst->file, offset, TB_FILE_SEEK_END);
+		break;
+	default:
+		break;
+	}
+
+	// offset
+	if (ret >= 0) 
+	{
+		fst->offset = ret;
+		return TB_TRUE;
+	}
+
 	return TB_FALSE;
 }
 static tb_size_t tb_fstream_size(tb_gstream_t* gst)
