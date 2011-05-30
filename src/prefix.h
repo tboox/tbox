@@ -45,33 +45,33 @@ extern "C" {
 
 // debug
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-#ifdef TB_DEBUG
-#	define TB_DBG(fmt, arg...)					do { tb_printf("[tb]:" fmt "\n" , ## arg); } while (0)
-#	define TB_ABORT()							do { tb_printf("[tb]: abort at:%d: file: %s\n", __tb_line__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
-#	define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); } } while(0)
-#	define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
-#	define TB_ASSERTM(x, fmt, arg...)			do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s msg: " fmt " file: %s\n", __tb_line__, #x, ## arg, __tb_file__); }} while(0)
+# 	ifdef TB_DEBUG
+#		define TB_DBG(fmt, arg...)					do { tb_printf(fmt "\n" , ## arg); } while (0)
+#		define TB_ABORT()							do { tb_printf("[abort]: line: %d, func: %s, file: %s\n", __tb_line__, __tb_func__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#		define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[assert]: line: %d, func: %s, x: %s, file: %s\n", __tb_line__, __tb_func__, #x, __tb_file__); } } while(0)
+#		define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[assert]: line: %d, func: %s, x: %s, file: %s\n", __tb_line__, __tb_func__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#		define TB_ASSERTM(x, fmt, arg...)			do { if (!(x)) {tb_printf("[assert]: line: %d, func: %s, x: %s, msg: " fmt ", file: %s\n", __tb_line__, __tb_func__, #x, ## arg, __tb_file__); }} while(0)
+# 	else
+#		define TB_DBG(fmt, arg...)
+# 		define TB_ABORT()
+#		define TB_ASSERT(x)
+#		define TB_ASSERTA(x)
+#		define TB_ASSERTM(x, fmt, arg...)
+# 	endif
 #else
-#	define TB_DBG(fmt, arg...)
-# 	define TB_ABORT()
-#	define TB_ASSERT(x)
-#	define TB_ASSERTA(x)
-#	define TB_ASSERTM(x, fmt, arg...)
-#endif
-#else
-#ifdef TB_DEBUG
-#	define TB_DBG 								
-#	define TB_ABORT()							do { tb_printf("[tb]: abort at:%d: file: %s\n", __tb_line__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
-#	define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); } } while(0)
-#	define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[tb]: assert failed at:%d: x: %s file: %s\n", __tb_line__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
-#	define TB_ASSERTM
-#else
-#	define TB_DBG
-# 	define TB_ABORT()
-#	define TB_ASSERT(x)
-#	define TB_ASSERTA(x)
-#	define TB_ASSERTM
-#endif
+# 	ifdef TB_DEBUG
+#		define TB_DBG 								
+#		define TB_ABORT()							do { tb_printf("[abort]: line :%d, func: %s, file: %s\n", __tb_line__, __tb_func__, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#		define TB_ASSERT(x)							do { if (!(x)) {tb_printf("[assert]: line :%d, func: %s, x: %s, file: %s\n", __tb_line__, __tb_func__, #x, __tb_file__); } } while(0)
+#		define TB_ASSERTA(x)						do { if (!(x)) {tb_printf("[assert]: line :%d, func: %s, x: %s, file: %s\n", __tb_line__, __tb_func__, #x, __tb_file__); __tb_volatile__ tb_int_t* a = 0; *a = 1; } } while(0)
+#		define TB_ASSERTM
+# 	else
+#		define TB_DBG
+# 		define TB_ABORT()
+#		define TB_ASSERT(x)
+#		define TB_ASSERTA(x)
+#		define TB_ASSERTM
+# 	endif
 #endif /* TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO */
 
 // check
@@ -91,7 +91,7 @@ extern "C" {
 #define TB_STATIC_ASSERT(x) 						do { typedef int __static_assert__[(x)? 1 : -1]; } while(0)
 
 // not implement
-#define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: %s at %d file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
+#define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: func: %s, line: %d, file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
 
 // the size of the static array
 #define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
@@ -407,6 +407,18 @@ typedef tb_int64_t 				tb_fixed32_t;
  * memory
  */
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+
+# 	ifdef TB_DEBUG
+void* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+void* 		tb_mpool_reallocate(void* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+void 		tb_mpool_deallocate(void* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+# 	else
+void* 		tb_mpool_allocate(tb_size_t size);
+void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
+void* 		tb_mpool_reallocate(void* data, tb_size_t size);
+void 		tb_mpool_deallocate(void* data);
+# 	endif
 
 # 	ifdef TB_DEBUG
 # 		define tb_malloc(size) 					tb_mpool_allocate(size, __tb_func__, __tb_line__, __tb_file__)

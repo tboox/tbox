@@ -122,6 +122,7 @@ static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
 	TB_NOT_IMPLEMENT();
+	TB_ABORT();
 	return TB_FALSE;
 }
 
