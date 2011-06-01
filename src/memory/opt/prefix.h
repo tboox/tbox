@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_MEMORY_ASM_PREFIX_H
-#define TB_MEMORY_ASM_PREFIX_H
+#ifndef TB_MEMORY_OPT_PREFIX_H
+#define TB_MEMORY_OPT_PREFIX_H
 
 
 /* /////////////////////////////////////////////////////////

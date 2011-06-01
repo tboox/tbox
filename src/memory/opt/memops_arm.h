@@ -20,8 +20,8 @@
  * \file		memops_arm.h
  *
  */
-#ifndef TB_MEMORY_ASM_MEMOPS_ARM_H
-#define TB_MEMORY_ASM_MEMOPS_ARM_H
+#ifndef TB_MEMORY_OPT_MEMOPS_ARM_H
+#define TB_MEMORY_OPT_MEMOPS_ARM_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ extern "C" {
 
 // memset_u16
 # 	if 1 // cache line: 16-bytes
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -69,7 +69,7 @@ extern "C" {
 		} while (0)
 
 # 	elif 0 // cache line: 32-bytes
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -101,7 +101,7 @@ extern "C" {
 
 // memset_u32
 # 	if 1 // cache line: 16-bytes
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -123,7 +123,7 @@ extern "C" {
 		} while (0)
 
 # 	elif 0 // cache line: 32-bytes
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -148,8 +148,8 @@ extern "C" {
 		} while (0)
 # 	endif
 #else
-# 	undef TB_MEMOPS_ASM_MEMSET_U16
-# 	undef TB_MEMOPS_ASM_MEMSET_U32
+# 	undef TB_MEMOPS_OPT_MEMSET_U16
+# 	undef TB_MEMOPS_OPT_MEMSET_U32
 #endif
 
 // c plus plus
