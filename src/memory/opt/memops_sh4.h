@@ -37,213 +37,213 @@ extern "C" {
  * macros
  */
 
+#undef TB_MEMOPS_OPT_MEMSET_U8
+#undef TB_MEMOPS_OPT_MEMSET_U16
+#undef TB_MEMOPS_OPT_MEMSET_U32
+
 #ifdef TB_CONFIG_ASSEMBLER_GAS
+# 	define TB_MEMOPS_OPT_MEMSET_U16
+# 	define TB_MEMOPS_OPT_MEMSET_U32
+#endif
 
-// memset_u16
-# 	if 0
-# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
-		do \
-		{ \
-			/* align by 4-bytes */ \
-			if (((tb_size_t)dst) & 0x3) \
-			{ \
-				*((tb_uint16_t*)dst) = src; \
-				dst += 2; \
-				size--; \
-			} \
-			dst += size << 1; \
-			__tb_asm__ __tb_volatile__ \
-			(
-				"1:\n\t" \
-				"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-				"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-				"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-				: 					/* no output registers */ \
-				: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-			); \
-\
-		} while (0)
+/* /////////////////////////////////////////////////////////
+ * implemention
+ */
 
-# 	else
-# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
-		do \
-		{ \
-			/* align by 4-bytes */ \
-			if (((tb_size_t)dst) & 0x3) \
-			{ \
-				*((tb_uint16_t*)dst) = src; \
-				dst += 2; \
-				size--; \
-			} \
-			tb_size_t left = size & 0x3; \
-			dst += (size << 1); \
-			if (!left) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t" \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				); \
-			} \
-			else if (size >= 4) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t" 			/* fill left data */ \
-					"dt %3\n\t" \
-					"mov.w %1,@-%2\n\t" \
-					"bf 1b\n\t" \
-					"2:\n\t"  			/* fill aligned data by 4 */ \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 2b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */ \
-				);  \
-			} \
-			else \
-			{ \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t" \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.w %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */ \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				); \
-			} \
-\
- 		} while (0)
-# 	endif
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+{
+	/* align by 4-bytes */
+	if (((tb_size_t)dst) & 0x3)
+	{
+		*((tb_uint16_t*)dst) = src;
+		dst += 2;
+		size--;
+	}
+	tb_size_t left = size & 0x3;
+	dst += (size << 1);
+	if (!left)
+	{
+		size >>= 2;
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t"
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		);
+	}
+	else if (size >= 4)
+	{
+		size >>= 2;
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 			/* fill left data */
+			"dt %3\n\t"
+			"mov.w %1,@-%2\n\t"
+			"bf 1b\n\t"
+			"2:\n\t"  			/* fill aligned data by 4 */
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"bf 2b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */
+		); 
+	}
+	else
+	{
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t"
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.w %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		);
+	}
+}
+static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+{
+	/* align by 4-bytes */
+	if (((tb_size_t)dst) & 0x3)
+	{
+		*((tb_uint16_t*)dst) = src;
+		dst += 2;
+		size--;
+	}
+	dst += size << 1;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n\t"
+		"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+		"mov.w %1,@-%2\n\t" /* *--dst = src */
+		"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+		: 					/* no output registers */
+		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+	);
+}
+void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+{
+	if (!dst) return ;
 
-// memset_u32
-# 	if 0
-# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
-		do \
-		{ \
-			dst += size << 2; \
-			__tb_asm__ __tb_volatile__\
-			( \
-				"1:\n\t" \
-				"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-				"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-				"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-				: 					/* no output registers */  \
-				: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-			); \
-\
-		} while (0)
+	if (size > 1) tb_memset_u16_opt_v1((tb_uint16_t*)dst, src, size);
+	else if (size == 1) *dst = src;
+}
+static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	tb_size_t left = size & 0x3;
+	dst += (size << 2);
+	if (!left)
+	{
+		size >>= 2;
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		); 
+	}
+	else
+	{
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		); 
+	}
+}
+static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	tb_size_t left = size & 0x3;
+	dst += (size << 2);
+	if (!left)
+	{
+		size >>= 2;
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		); 
+	}
+	else if (size >= 4) /* fixme */
+	{
+		size >>= 2;
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 			/* fill the left data */
+			"dt %3\n\t"
+			"mov.l %1,@-%2\n\t"
+			"bf 1b\n\t"
+			"2:\n\t" 			/* fill aligned data by 4 */
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"bf 2b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */
+		); 
+	}
+	else
+	{
+		__tb_asm__ __tb_volatile__
+		(
+			"1:\n\t" 
+			"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+			"mov.l %1,@-%2\n\t" /* *--dst = src */
+			"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+			: 					/* no output registers */ 
+			: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+		); 
+	}
+}
+static __tb_inline__ void tb_memset_u32_opt_v3(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	dst += size << 2;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n\t"
+		"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */
+		"mov.l %1,@-%2\n\t" /* *--dst = src */
+		"bf 1b\n\t"  		/* if T == 0 goto label 1: */
+		: 					/* no output registers */ 
+		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
+	);
+}
+void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	if (!dst) return ;
 
-# 	elif 0
-# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
-		do \
-		{ \
-			tb_size_t left = size & 0x3; \
-			dst += (size << 2); \
-			if (!left) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t"  \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				);  \
-			} \
-			else if (size >= 4) /* fixme */ \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t" 			/* fill the left data */ \
-					"dt %3\n\t" \
-					"mov.l %1,@-%2\n\t" \
-					"bf 1b\n\t" \
-					"2:\n\t" 			/* fill aligned data by 4 */ \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 2b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst), "r" (left) /* constraint: register */ \
-				);  \
-			} \
-			else \
-			{ \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t"  \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				);  \
-			} \
-\
- 		} while (0)
-# 	else
-# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
-		do \
-		{ \
-			tb_size_t left = size & 0x3; \
-			dst += (size << 2); \
-			if (!left) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t"  \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				);  \
-			} \
-			else \
-			{ \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"1:\n\t"  \
-					"dt %0\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"mov.l %1,@-%2\n\t" /* *--dst = src */ \
-					"bf 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */  \
-					: "r" (size), "r" (src), "r" (dst) /* constraint: register */ \
-				);  \
-			} \
-\
- 		} while (0)
-
-# 	endif
-#else
-# 	undef TB_MEMOPS_OPT_MEMSET_U16
-# 	undef TB_MEMOPS_OPT_MEMSET_U32
+	if (size > 1)  tb_memset_u32_opt_v1((tb_uint32_t*)dst, src, size);
+	else if (size == 1) *dst = src;
+}
 #endif
 
 // c plus plus
