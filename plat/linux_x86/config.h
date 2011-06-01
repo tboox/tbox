@@ -37,6 +37,9 @@
 #define TB_CONFIG_KEYWORD_LINE			__LINE__
 #define TB_CONFIG_KEYWORD_FILE			__FILE__
 
+// optimization
+#define TB_CONFIG_OPTI_SSE2_ENABLE
+
 // memory
 #define TB_CONFIG_MEMORY_MODE_SMALL
 #define TB_CONFIG_MEMORY_POOL_ENABLE

@@ -20,8 +20,8 @@
  * \file		memops_x86.h
  *
  */
-#ifndef TB_MEMORY_ASM_MEMOPS_x86_H
-#define TB_MEMORY_ASM_MEMOPS_x86_H
+#ifndef TB_MEMORY_OPT_MEMOPS_x86_H
+#define TB_MEMORY_OPT_MEMOPS_x86_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,6 +32,9 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+# 	include <emmintrin.h>
+#endif
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -41,7 +44,7 @@ extern "C" {
 
 // memset_u16
 # 	if 1
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			/* align by 4-bytes */ \
@@ -62,7 +65,7 @@ extern "C" {
 		} while (0)
 
 # 	elif 0
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			/* align by 4-bytes */ \
@@ -128,7 +131,7 @@ extern "C" {
  		} while (0)
 
 # 	else
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			/* align by 4-bytes */ \
@@ -155,7 +158,7 @@ extern "C" {
 
 // memset_u32
 # 	if 1
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -169,7 +172,7 @@ extern "C" {
 		} while (0)
 
 # 	else
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			__tb_asm__ __tb_volatile__ \
@@ -188,8 +191,8 @@ extern "C" {
 
 # 	endif
 #else
-# 	undef TB_MEMOPS_ASM_MEMSET_U16
-# 	undef TB_MEMOPS_ASM_MEMSET_U32
+# 	undef TB_MEMOPS_OPT_MEMSET_U16
+# 	undef TB_MEMOPS_OPT_MEMSET_U32
 #endif
 
 // c plus plus

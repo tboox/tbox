@@ -2,7 +2,7 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = conv math dns string cstring time http cookies gstream estream zstream format vector slist xml
+NAMES = conv math memops dns string cstring time http cookies gstream estream zstream format vector slist xml
 
 define MAKE_MODULES
 $(1)_TYPE 		= BIN

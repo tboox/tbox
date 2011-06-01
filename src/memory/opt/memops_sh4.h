@@ -20,8 +20,8 @@
  * \file		memops_sh4.h
  *
  */
-#ifndef TB_MEMORY_ASM_MEMOPS_SH4_H
-#define TB_MEMORY_ASM_MEMOPS_SH4_H
+#ifndef TB_MEMORY_OPT_MEMOPS_SH4_H
+#define TB_MEMORY_OPT_MEMOPS_SH4_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ extern "C" {
 
 // memset_u16
 # 	if 0
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			/* align by 4-bytes */ \
@@ -65,7 +65,7 @@ extern "C" {
 		} while (0)
 
 # 	else
-# 		define TB_MEMOPS_ASM_MEMSET_U16(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
 		do \
 		{ \
 			/* align by 4-bytes */ \
@@ -131,7 +131,7 @@ extern "C" {
 
 // memset_u32
 # 	if 0
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			dst += size << 2; \
@@ -148,7 +148,7 @@ extern "C" {
 		} while (0)
 
 # 	elif 0
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			tb_size_t left = size & 0x3; \
@@ -204,7 +204,7 @@ extern "C" {
 \
  		} while (0)
 # 	else
-# 		define TB_MEMOPS_ASM_MEMSET_U32(dst, src, size) \
+# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
 		do \
 		{ \
 			tb_size_t left = size & 0x3; \
@@ -242,8 +242,8 @@ extern "C" {
 
 # 	endif
 #else
-# 	undef TB_MEMOPS_ASM_MEMSET_U16
-# 	undef TB_MEMOPS_ASM_MEMSET_U32
+# 	undef TB_MEMOPS_OPT_MEMSET_U16
+# 	undef TB_MEMOPS_OPT_MEMSET_U32
 #endif
 
 // c plus plus
