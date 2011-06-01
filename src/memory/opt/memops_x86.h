@@ -40,160 +40,160 @@ extern "C" {
  * macros
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+#undef TB_MEMOPS_OPT_MEMSET_U8
+#undef TB_MEMOPS_OPT_MEMSET_U16
+#undef TB_MEMOPS_OPT_MEMSET_U32
 
-// memset_u16
-# 	if 1
-# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
-		do \
-		{ \
-			/* align by 4-bytes */ \
-			if (((tb_size_t)dst) & 0x3) \
-			{ \
-				*((tb_uint16_t*)dst) = src; \
-				dst += 2; \
-				size--; \
-			} \
-			__tb_asm__ __tb_volatile__ \
-			( \
-				"cld\n\t" 		/* clear the direction bit, dst++, not dst-- */ \
-				"rep stosw" 	/* *dst++ = ax */ \
-				: 				/* no output registers */ \
-				: "c" (size), "a" (src), "D" (dst) /* ecx = size, eax = src, edi = dst */ \
-			); \
-\
-		} while (0)
-
-# 	elif 0
-# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
-		do \
-		{ \
-			/* align by 4-bytes */ \
-			if (((tb_size_t)dst) & 0x3) \
-			{ \
-				*((tb_uint16_t*)dst) = src; \
-				dst += 2; \
-				size--; \
-			} \
-			tb_size_t left = size & 0x3; \
-			if (!left) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-					"cld\n\t" \
-					"1:\n\t" \
-					"dec %%ecx\n\t" /* i--, i > 0? T = 0 : 1 */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"jnz 1b\n\t"  	/* if T == 0 goto label 1: */ \
-					: 				/* no output registers */  \
-					: "c" (size), "a" (src), "D" (dst) /* constraint: register */ \
-				); \
-			} \
-			else if (size >= 4) \
-			{ \
-				size >>= 2; \
-				__tb_asm__ __tb_volatile__ \
-				( \
-				  	"cld\n\t" \
-					"1:\n\t" 		/* fill left data */ \
-					"dec %3\n\t" \
-					"stosw\n\t" \
-					"jnz 1b\n\t" \
-					"2:\n\t"  		/* fill aligned data by 4 */ \
-					"dec %%ecx\n\t" /* i--, i > 0? T = 0 : 1 */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"stosw\n\t" 	/* *--dst = src */ \
-					"jnz 2b\n\t"  	/* if T == 0 goto label 1: */ \
-					: 				/* no output registers */  \
-					: "c" (size), "a" (src), "D" (dst), "r" (left) /* constraint: register */ \
-				);  \
-			} \
-			else \
-			{ \
-				__tb_asm__ __tb_volatile__ \
-				( \
-				  	"cld\n\t" \
-					"1:\n\t" \
-					"dec %%ecx\n\t" 		/* i--, i > 0? T = 0 : 1 */ \
-					"stosw\n\t" /* *--dst = src */ \
-					"jnz 1b\n\t"  		/* if T == 0 goto label 1: */ \
-					: 					/* no output registers */ \
-					: "c" (size), "a" (src), "D" (dst) /* constraint: register */ \
-				); \
-			} \
-\
- 		} while (0)
-
-# 	else
-# 		define TB_MEMOPS_OPT_MEMSET_U16(dst, src, size) \
-		do \
-		{ \
-			/* align by 4-bytes */ \
-			if (((tb_size_t)dst) & 0x3) \
-			{ \
-				*((tb_uint16_t*)dst) = src; \
-				dst += 2; \
-				size--; \
-			} \
-			__tb_asm__ __tb_volatile__ \
-			( \
-				"cld\n\t" \
-				"mov %0, %%ecx\n\t" \
-				"mov %1, %%eax\n\t" \
-				"mov %2, %%edi\n\t" \
-				"rep stosw" \
-				: /* no output registers */ \
-				: "m" (size), "m" (src), "m" (dst) \
-				: "%ecx", "%eax", "%edi" \
-			); \
-\
- 		} while (0)
-# 	endif
-
-// memset_u32
-# 	if 1
-# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
-		do \
-		{ \
-			__tb_asm__ __tb_volatile__ \
-			( \
-				"cld\n\t" 		/* clear the direction bit, dst++, not dst-- */ \
-				"rep stosl" 	/* *dst++ = eax */ \
-				: 				/* no output registers */ \
-				: "c" (size), "a" (src), "D" (dst) /* ecx = size, eax = src, edi = dst */ \
-			); \
-\
-		} while (0)
-
-# 	else
-# 		define TB_MEMOPS_OPT_MEMSET_U32(dst, src, size) \
-		do \
-		{ \
-			__tb_asm__ __tb_volatile__ \
-			( \
-				"cld\n\t" \
-				"mov %0, %%ecx\n\t" \
-				"mov %1, %%eax\n\t" \
-				"mov %2, %%edi\n\t" \
-				"rep stosl" \
-				: /* no output registers */ \
-				: "m" (size), "m" (src), "m" (dst) \
-				: "%ecx", "%eax", "%edi" \
-			); \
-\
- 		} while (0)
-
-# 	endif
-#else
-# 	undef TB_MEMOPS_OPT_MEMSET_U16
-# 	undef TB_MEMOPS_OPT_MEMSET_U32
+#if defined(TB_CONFIG_ASSEMBLER_GAS) || \
+		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+# 	define TB_MEMOPS_OPT_MEMSET_U16
+# 	define TB_MEMOPS_OPT_MEMSET_U32
 #endif
+
+/* /////////////////////////////////////////////////////////
+ * implemention
+ */
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+{
+	// align by 4-bytes 
+	if (((tb_size_t)dst) & 0x3)
+	{
+		*dst++ = src;
+		--size;
+	}
+
+	__tb_asm__ __tb_volatile__
+	(
+		"cld\n\t" 							// clear the direction bit, dst++, not dst--
+		"rep stosw" 						// *dst++ = ax
+		: 									// no output registers
+		: "c" (size), "a" (src), "D" (dst) 	// ecx = size, eax = src, edi = dst
+	);
+}
+#endif
+
+#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+{
+    if (size >= 32) 
+	{
+		// aligned by 16-bytes
+        for (; ((tb_size_t)dst) & 0x0f; --size) *dst++ = src;
+
+		// left = size % 32
+		tb_size_t left = size & 0x1f;
+		size = (size - left) >> 5;
+
+		// fill 4 x 8 bytes
+        __m128i* 	d = (__m128i*)(dst);
+        __m128i 	v = _mm_set1_epi16(src);
+        while (size) 
+		{
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            --size;
+        }
+        dst = (tb_uint16_t*)(d);
+		size = left;
+    }
+	while (size--) *dst++ = src;
+}
+#endif
+
+#ifdef TB_MEMOPS_OPT_MEMSET_U16
+void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+{
+	if (!dst) return ;
+
+	if (size > 1)
+	{
+# 	if defined(TB_CONFIG_ASSEMBLER_GAS) && \
+		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		if (size < 2049) tb_memset_u16_opt_v2((tb_uint16_t*)dst, src, size);
+		else tb_memset_u16_opt_v1((tb_uint16_t*)dst, src, size);
+# 	elif defined(TB_CONFIG_ASSEMBLER_GAS)
+		tb_memset_u16_opt_v1((tb_uint16_t*)dst, src, size);
+# 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		tb_memset_u16_opt_v2((tb_uint16_t*)dst, src, size);
+# 	else
+# 		error
+# 	endif
+	}
+	else if (size == 1) *dst = src;
+}
+#endif
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	__tb_asm__ __tb_volatile__
+	(
+		"cld\n\t" 							// clear the direction bit, dst++, not dst--
+		"rep stosl" 						// *dst++ = eax
+		: 									// no output registers
+		: "c" (size), "a" (src), "D" (dst) 	// ecx = size, eax = src, edi = dst
+	);
+}
+#endif
+
+#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+{
+    if (size >= 16) 
+	{
+		// aligned by 16-bytes
+        for (; ((tb_size_t)dst) & 0x0f; --size) *dst++ = src;
+
+		// left = size % 16
+		tb_size_t left = size & 0x0f;
+		size = (size - left) >> 4;
+
+		// fill 4 x 16 bytes
+        __m128i* 	d = (__m128i*)(dst);
+        __m128i 	v = _mm_set1_epi32(src);
+        while (size) 
+		{
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            _mm_store_si128(d++, v);
+            --size;
+        }
+        dst = (tb_uint32_t*)(d);
+		size = left;
+    }
+    while (size--) *dst++ = src;
+}
+#endif
+
+#ifdef TB_MEMOPS_OPT_MEMSET_U32
+void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+{
+	if (!dst) return ;
+
+	if (size > 1)
+	{
+# 	if defined(TB_CONFIG_ASSEMBLER_GAS) && \
+		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		if (size < 2049) tb_memset_u32_opt_v2((tb_uint32_t*)dst, src, size);
+		else tb_memset_u32_opt_v1((tb_uint32_t*)dst, src, size);
+# 	elif defined(TB_CONFIG_ASSEMBLER_GAS)
+		tb_memset_u32_opt_v1((tb_uint32_t*)dst, src, size);
+# 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		tb_memset_u32_opt_v2((tb_uint32_t*)dst, src, size);
+# 	else
+# 		error
+# 	endif
+	}
+	else if (size == 1) *dst = src;
+}
+#endif
+
+
 
 // c plus plus
 #ifdef __cplusplus
