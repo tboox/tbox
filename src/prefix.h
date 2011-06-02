@@ -441,6 +441,12 @@ void 	tb_free(void* data);
 
 #endif
 
+#ifdef __cplusplus
+__tb_inline__ void* operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
+__tb_inline__ void 	operator delete(void* p) throw() 		{ tb_free(p); 				}
+__tb_inline__ void* operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
+__tb_inline__ void 	operator delete[](void* p) throw() 		{ tb_free(p); 				}
+#endif
 
 // c plus plus
 #ifdef __cplusplus

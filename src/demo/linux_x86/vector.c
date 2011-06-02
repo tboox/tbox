@@ -45,9 +45,9 @@ static tb_size_t tb_vector_insert_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 100000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert(vector, tb_vector_size(vector) >> 1, "F");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_insert(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -74,9 +74,9 @@ static tb_size_t tb_vector_insert_head_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 100000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert_head(vector, "F");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_insert_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -103,9 +103,9 @@ static tb_size_t tb_vector_insert_tail_test()
 
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert_tail(vector, "F");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_insert_tail(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -134,9 +134,9 @@ static tb_size_t tb_vector_ninsert_test()
 	tb_vector_insert_head(vector, "F");
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_ninsert(vector, 1, "F", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_ninsert(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -162,9 +162,9 @@ static tb_size_t tb_vector_ninsert_head_test()
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_ninsert_head(vector, "F", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_ninsert_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -190,9 +190,9 @@ static tb_size_t tb_vector_ninsert_tail_test()
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_ninsert_tail(vector, "F", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_ninsert_tail(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -221,9 +221,9 @@ static tb_size_t tb_vector_remove_test()
 	tb_size_t i = 0;
 	tb_size_t n = 100000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove(vector, tb_vector_size(vector) >> 1);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_remove(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -245,9 +245,9 @@ static tb_size_t tb_vector_remove_head_test()
 	tb_size_t i = 0;
 	tb_size_t n = 100000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove_head(vector);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_remove_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -267,9 +267,9 @@ static tb_size_t tb_vector_remove_last_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove_last(vector);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_remove_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -290,9 +290,9 @@ static tb_size_t tb_vector_nremove_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nremove(vector, tb_vector_head(vector), n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nremove(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -313,9 +313,9 @@ static tb_size_t tb_vector_nremove_head_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nremove_head(vector, n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nremove_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -336,9 +336,9 @@ static tb_size_t tb_vector_nremove_last_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nremove_last(vector, n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nremove_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -361,9 +361,9 @@ static tb_size_t tb_vector_replace_test()
 	tb_vector_ninsert_head(vector, "F", n);
 	tb_size_t itor = tb_vector_head(vector);
 	tb_size_t tail = tb_vector_tail(vector);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (; itor != tail; itor = tb_vector_next(vector, itor)) tb_vector_replace(vector, itor, "R");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_replace(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -387,9 +387,9 @@ static tb_size_t tb_vector_replace_head_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_replace_head(vector, "R");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_replace_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -412,9 +412,9 @@ static tb_size_t tb_vector_replace_last_test()
 	tb_size_t i = 0;
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_replace_last(vector, "R");
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_replace_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -437,9 +437,9 @@ static tb_size_t tb_vector_nreplace_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nreplace(vector, tb_vector_head(vector), "R", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nreplace(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -462,9 +462,9 @@ static tb_size_t tb_vector_nreplace_head_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nreplace_head(vector, "R", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nreplace_head(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -487,9 +487,9 @@ static tb_size_t tb_vector_nreplace_last_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, "F", n);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	tb_vector_nreplace_last(vector, "R", n);
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_nreplace_last(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -516,12 +516,12 @@ static tb_size_t tb_vector_iterator_next_test()
 	tb_vector_ninsert_head(vector, "F", n);
 	tb_size_t itor = tb_vector_head(vector);
 	tb_size_t tail = tb_vector_tail(vector);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	for (; itor != tail; itor = tb_vector_next(vector, itor))
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_vector_const_at(vector, itor);
 	}
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_iterator_next(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
@@ -541,7 +541,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 	tb_vector_ninsert_head(vector, "F", n);
 	tb_size_t itor = tb_vector_last(vector);
 	tb_size_t head = tb_vector_head(vector);
-	tb_size_t t = (tb_size_t)tb_clock();
+	tb_size_t t = (tb_size_t)tb_mclock();
 	while (1)
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_vector_const_at(vector, itor);
@@ -549,7 +549,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 		if (itor == head) break;
 		itor = tb_vector_prev(vector, itor);
 	}
-	t = (tb_size_t)tb_clock() - t;
+	t = (tb_size_t)tb_mclock() - t;
 
 	// time
 	TB_DBG("tb_vector_iterator_prev(%d): %d ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));

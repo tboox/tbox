@@ -34,72 +34,72 @@ static void tb_math_test_fexpf1(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FEXPF1(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpf1(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fexpf1_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = exp(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpf1_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fexpi(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FEXPI(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpi(%d) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fexpi_libc(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = exp((tb_float_t)x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpi_libc(%d) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fexpf(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FEXPF(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpf(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fexpf_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = exp(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fexpf_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 /* ////////////////////////////////////////////////////////////////////////
@@ -109,72 +109,72 @@ static void tb_math_test_fpow2f1(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FPOW2F1(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2f1(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fpow2f1_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = pow(2, x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2f1_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fpow2i(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FPOW2I(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2i(%d) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fpow2i_libc(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = pow(2, x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2i_libc(%d) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fpow2f(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_FPOW2F(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2f(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_fpow2f_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0.0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = pow(2, x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_fpow2f_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 
@@ -185,24 +185,24 @@ static void tb_math_test_ilog2i(tb_uint32_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ILOG2I(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ilog2i(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_ilog2f(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ILOG2F(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ilog2f(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_ilog2i_libc(tb_uint32_t x)
@@ -210,12 +210,12 @@ static void tb_math_test_ilog2i_libc(tb_uint32_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = (log((tb_float_t)x + .1) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ilog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_ilog2f_libc(tb_float_t x)
@@ -223,36 +223,36 @@ static void tb_math_test_ilog2f_libc(tb_float_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = (log(x) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ilog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_irlog2i(tb_uint32_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IRLOG2I(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_irlog2i(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_irlog2f(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IRLOG2F(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_irlog2f(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_irlog2i_libc(tb_uint32_t x)
@@ -260,12 +260,12 @@ static void tb_math_test_irlog2i_libc(tb_uint32_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IROUND(log(x) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_irlog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_irlog2f_libc(tb_float_t x)
@@ -273,36 +273,36 @@ static void tb_math_test_irlog2f_libc(tb_float_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IROUND(log(x) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iclog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iclog2i(tb_uint32_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ICLOG2I(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iclog2i(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iclog2f(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ICLOG2F(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iclog2f(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iclog2i_libc(tb_uint32_t x)
@@ -310,12 +310,12 @@ static void tb_math_test_iclog2i_libc(tb_uint32_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ICEIL(log(x) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iclog2i_libc(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iclog2f_libc(tb_float_t x)
@@ -323,12 +323,12 @@ static void tb_math_test_iclog2f_libc(tb_float_t x)
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
 	tb_float_t log2 = log(2);
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ICEIL(log(x) / log2);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iclog2f_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 /* ////////////////////////////////////////////////////////////////////////
@@ -338,48 +338,48 @@ static void tb_math_test_isqrti(tb_uint32_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ISQRTI(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_isqrti(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_isqrtf(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ISQRTF(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_isqrtf(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_isqrti_libc(tb_uint32_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = sqrt(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_isqrti_libc(%u) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_isqrtf_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = sqrt(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_isqrtf_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 
@@ -390,72 +390,72 @@ static void tb_math_test_iround(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IROUND(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iround(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_ifloor(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_IFLOOR(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ifloor(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iceil(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ICEIL(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iceil(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iround_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = round(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iround_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_ifloor_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = floor(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_ifloor_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_iceil_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = ceil(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_iceil_libc(%lf) = %d\n", (tb_int_t)t, x, r);
 }
 
@@ -466,48 +466,48 @@ static void tb_math_test_absi(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ABSI(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_absi(%d) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_absi_libc(tb_int_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = abs(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_absi_libc(%d) = %d\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_absf(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = TB_MATH_ABSF(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_absf(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 static void tb_math_test_absf_libc(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
-	tb_int64_t t = tb_clock();
+	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
 		r = fabs(x);
 	}
-	t = tb_clock() - t;
+	t = tb_mclock() - t;
 	tb_printf("%d ms, tb_math_absf_libc(%lf) = %lf\n", (tb_int_t)t, x, r);
 }
 /* ////////////////////////////////////////////////////////////////////////

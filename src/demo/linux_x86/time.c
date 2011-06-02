@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 			, utc.seconds
 			, utc.milliseconds);
 	}
-	TB_DBG("time: %d ms, clock: %d ms", (tb_int_t)time, (tb_int_t)tb_clock());
+	TB_DBG("time: %d ms, clock: %d ms", (tb_int_t)time, (tb_int_t)tb_mclock());
 
 	if (TB_TRUE == tb_time_from_local(&time, &local))
 	{

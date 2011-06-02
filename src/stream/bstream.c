@@ -61,8 +61,8 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 	// load
 	tb_byte_t 		data[4096];
 	tb_size_t 		load = 0;
-	tb_size_t 		base = (tb_size_t)tb_clock();
-	tb_size_t 		time = (tb_size_t)tb_clock();
+	tb_size_t 		base = (tb_size_t)tb_mclock();
+	tb_size_t 		time = (tb_size_t)tb_mclock();
 	tb_size_t 		left = tb_gstream_left(gst);
 
 	while(1)
@@ -73,14 +73,14 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 			if (timeout > 10000) break;
 		}
 		else
 		{
 			load += ret;
 			if (tb_bstream_set_data(bst, data, ret) != ret) break;
-			time = (tb_size_t)tb_clock();
+			time = (tb_size_t)tb_mclock();
 		}
 
 		// is end?
@@ -101,8 +101,8 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 	// load
 	tb_byte_t 		data[4096];
 	tb_size_t 		save = 0;
-	tb_size_t 		base = (tb_size_t)tb_clock();
-	tb_size_t 		time = (tb_size_t)tb_clock();
+	tb_size_t 		base = (tb_size_t)tb_mclock();
+	tb_size_t 		time = (tb_size_t)tb_mclock();
 	while(1)
 	{
 		// get data
@@ -121,13 +121,13 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 				else if (!ret)
 				{
 					// > 10s?
-					tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+					tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 					if (timeout > 10000) break;
 				}
 				else
 				{
 					write += ret;
-					time = (tb_size_t)tb_clock();
+					time = (tb_size_t)tb_mclock();
 				}
 			}
 

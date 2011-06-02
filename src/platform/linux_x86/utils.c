@@ -34,10 +34,22 @@
  * implemention
  */
 
-// msleep
-void tb_msleep(tb_uint32_t ms)
+// usleep
+void tb_usleep(tb_size_t us)
 {
-	usleep(ms * 1000);
+	usleep(us);
+}
+
+// msleep
+void tb_msleep(tb_size_t ms)
+{
+	tb_usleep(ms * 1000);
+}
+
+// sleep
+void tb_sleep(tb_size_t s)
+{
+	tb_msleep(s * 1000);
 }
 
 // printf
@@ -53,11 +65,9 @@ void tb_printf(tb_char_t const* fmt, ...)
 	printf("%s", msg);
 }
 
-// clock
-tb_int64_t tb_clock()
+// mclock
+tb_int64_t tb_mclock()
 {
-	//printf("tb_clock\n");
-
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return ((tb_int64_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
@@ -66,8 +76,6 @@ tb_int64_t tb_clock()
 // uclock
 tb_int64_t tb_uclock()
 {
-	//printf("tb_uclock\n");
-
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return ((tb_int64_t)tv.tv_sec * 1000000 + tv.tv_usec);
@@ -77,6 +85,6 @@ tb_int64_t tb_time()
 #if 0
 	return ((tb_int64_t)time(0) * 1000);
 #else
-	return tb_clock();
+	return tb_mclock();
 #endif
 }

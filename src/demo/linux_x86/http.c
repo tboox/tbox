@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// open http
-		tb_size_t 		base = (tb_size_t)tb_clock();
+		tb_size_t 		base = (tb_size_t)tb_mclock();
 		if (TB_FALSE == tb_http_open(http)) goto end;
 
 		// open file
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		// read data
 		tb_byte_t 		data[8192];
 		tb_size_t 		read = 0;
-		tb_size_t 		time = (tb_size_t)tb_clock();
+		tb_size_t 		time = (tb_size_t)tb_mclock();
 		tb_size_t 		size = tb_http_status_content_size(http);
 		do
 		{
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tb_clock();
+				time = (tb_size_t)tb_mclock();
 
 #if 1
 				tb_int_t write = 0;
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 			}
 			else if (!ret) 
 			{
-				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 				if (timeout > 10000) break;
 			}
 			else break;
@@ -87,7 +87,7 @@ end:
 		tb_http_close(http);
 
 		// time
-		tb_printf("\ntime: %d ms\n", ((tb_size_t)tb_clock() - base));
+		tb_printf("\ntime: %d ms\n", ((tb_size_t)tb_mclock() - base));
 	}
 
 	// destroy it

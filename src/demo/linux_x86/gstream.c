@@ -27,8 +27,8 @@ int main(int argc, char** argv)
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
-	tb_size_t 		base = (tb_size_t)tb_clock();
-	tb_size_t 		time = (tb_size_t)tb_clock();
+	tb_size_t 		base = (tb_size_t)tb_mclock();
+	tb_size_t 		time = (tb_size_t)tb_mclock();
 	tb_size_t 		size = tb_gstream_size(ist);
 	do
 	{
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tb_clock();
+			time = (tb_size_t)tb_mclock();
 
 #if 1
 			tb_int_t write = 0;
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 		}
 		else if (!ret) 
 		{
-			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 			if (timeout > 10000) break;
 		}
 		else break;
