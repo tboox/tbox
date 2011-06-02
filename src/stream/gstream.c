@@ -92,19 +92,19 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	else if (gst->read)
 	{
 		tb_size_t 	read = 0;
-		tb_size_t 	time = (tb_size_t)tb_clock();
+		tb_size_t 	time = (tb_size_t)tb_mclock();
 		while (read < size)
 		{
 			tb_int_t ret = gst->read(gst, data + read, size - read);	
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tb_clock();
+				time = (tb_size_t)tb_mclock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 				if (timeout > 5000) break;
 			}
 			else return -1;
@@ -234,19 +234,19 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	else if (gst->write)
 	{
 		tb_size_t 	write = 0;
-		tb_size_t 	time = (tb_size_t)tb_clock();
+		tb_size_t 	time = (tb_size_t)tb_mclock();
 		while (write < size)
 		{
 			tb_int_t ret = gst->write(gst, data + write, size - write);	
 			if (ret > 0)
 			{
 				write += ret;
-				time = (tb_size_t)tb_clock();
+				time = (tb_size_t)tb_mclock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 				if (timeout > 5000) break;
 			}
 			else return -1;
@@ -335,17 +335,17 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 	TB_ASSERT_RETURN_VAL(offset >= 0 && (!size || offset <= size), TB_FALSE);
 	if (curt < offset)
 	{
-		tb_size_t time = (tb_size_t)tb_clock();
+		tb_size_t time = (tb_size_t)tb_mclock();
 		while (tb_gstream_offset(gst) < offset)
 		{
 			tb_byte_t data[TB_GSTREAM_BLOCK_SIZE];
 			tb_size_t need = TB_MATH_MIN(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_SIZE);
 			tb_int_t ret = tb_gstream_read(gst, data, need);
-			if (ret > 0) time = (tb_size_t)tb_clock();
+			if (ret > 0) time = (tb_size_t)tb_mclock();
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 				if (timeout > 5000) break;
 			}
 			else break;

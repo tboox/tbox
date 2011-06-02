@@ -184,7 +184,7 @@ static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
 {
 	tb_int_t send = 0;
-	tb_int_t time = (tb_int_t)tb_clock();
+	tb_int_t time = (tb_int_t)tb_mclock();
 	while(send < size)
 	{
 		tb_int_t ret = tb_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
@@ -193,13 +193,13 @@ static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byt
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_int_t timeout = ((tb_int_t)tb_clock()) - time;
+			tb_int_t timeout = ((tb_int_t)tb_mclock()) - time;
 			if (timeout > 10000 || timeout < 0) break;
 		}
 		else
 		{
 			send += ret;
-			time = (tb_int_t)tb_clock();
+			time = (tb_int_t)tb_mclock();
 		}
 	}
 	return send;
@@ -207,7 +207,7 @@ static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byt
 static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
 {
 	tb_int_t recv = 0;
-	tb_int_t time = (tb_int_t)tb_clock();
+	tb_int_t time = (tb_int_t)tb_mclock();
 	while(recv < size)
 	{
 		tb_int_t ret = tb_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
@@ -216,13 +216,13 @@ static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byt
 		else if (!ret) 
 		{
 			// > 10s?
-			tb_size_t timeout = ((tb_size_t)tb_clock()) - time;
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
 			if (timeout > 10000 || timeout < 0) break;
 		}
 		else
 		{
 			recv += ret;
-			time = (tb_size_t)tb_clock();
+			time = (tb_size_t)tb_mclock();
 		}
 	}
 	return recv;

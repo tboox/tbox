@@ -38,14 +38,20 @@ extern "C" {
  * interfaces
  */
 
+// usleep
+void 		tb_usleep(tb_size_t us);
+
+// msleep
+void 		tb_msleep(tb_size_t ms);
+
 // sleep
-void 			tb_msleep(tb_uint32_t ms);
+void 		tb_sleep(tb_size_t s);
 
 // printf
-void 			tb_printf(tb_char_t const* fmt, ...);
+void 		tb_printf(tb_char_t const* fmt, ...);
 
 // clock, ms
-tb_int64_t 	tb_clock();
+tb_int64_t 	tb_mclock();
 
 // clock, us
 tb_int64_t 	tb_uclock();
