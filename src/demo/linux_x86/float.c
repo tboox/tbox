@@ -28,9 +28,9 @@ static void tb_float_test_mul(tb_float_t a, tb_float_t b)
 {
 	tb_printf("[float]: mul(%f, %f): %f\n", tb_float_to_float(a), tb_float_to_float(b), tb_float_to_float(tb_float_mul(a, b)));
 }
-static void tb_float_test_square(tb_float_t x)
+static void tb_float_test_sqre(tb_float_t x)
 {
-	tb_printf("[float]: square(%f): %f\n", tb_float_to_float(x), tb_float_to_float(tb_float_square(x)));
+	tb_printf("[float]: sqre(%f): %f\n", tb_float_to_float(x), tb_float_to_float(tb_float_sqre(x)));
 }
 static void tb_float_test_sqrt(tb_float_t x)
 {
@@ -56,6 +56,18 @@ static void tb_float_test_ilog2(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: ilog2(%f) = %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
+static void tb_float_test_exp(tb_float_t x)
+{
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_float_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_float_exp(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[float]: exp(%f) = %f, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
+}
 #endif
 
 int main(int argc, char** argv)
@@ -71,9 +83,10 @@ int main(int argc, char** argv)
 	tb_float_test_ceil(TB_FLOAT_PI);
 	tb_float_test_ceil(-TB_FLOAT_PI);
 	tb_float_test_mul(TB_FLOAT_PI, -TB_FLOAT_PI);
-	tb_float_test_square(TB_FLOAT_PI);
-	tb_float_test_square(-TB_FLOAT_PI);
+	tb_float_test_sqre(TB_FLOAT_PI);
+	tb_float_test_sqre(-TB_FLOAT_PI);
 	tb_float_test_sqrt(TB_FLOAT_PI);
+	tb_float_test_exp(TB_FLOAT_PI);
 	tb_float_test_ilog2(TB_FLOAT_PI);
 	tb_float_test_ilog2(1024.0);
 #endif

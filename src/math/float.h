@@ -73,12 +73,8 @@
     #define tb_float_div(x, y) 			((x) / (y))
 #endif
 
-#ifndef tb_float_muladd
-# 	define tb_float_muladd(x, y, a) 	((x) * (y) + (a))
-#endif
-
-#ifndef tb_float_square
-    #define tb_float_square(x) 			((x) * (x))
+#ifndef tb_float_sqre
+    #define tb_float_sqre(x) 			((x) * (x))
 #endif
 
 #ifndef tb_float_sqrt
@@ -113,6 +109,14 @@
     #define tb_float_exp(x) 			tb_float_exp_generic(x)
 #endif
 
+#ifndef tb_float_expi
+    #define tb_float_expi(x) 			tb_float_expi_generic(x)
+#endif
+
+#ifndef tb_float_exp1
+    #define tb_float_exp1(x) 			tb_float_exp1_inline(x)
+#endif
+
 #ifndef tb_float_ilog2
     #define tb_float_ilog2(x) 			tb_float_ilog2_generic(x)
 #endif
@@ -130,7 +134,19 @@ tb_float_t 		tb_float_asin_generic(tb_float_t x);
 tb_float_t 		tb_float_acos_generic(tb_float_t x);
 tb_float_t 		tb_float_atan_generic(tb_float_t x);
 tb_float_t 		tb_float_exp_generic(tb_float_t x);
+tb_float_t 		tb_float_expi_generic(tb_uint16_t x);
 tb_uint32_t 	tb_float_ilog2_generic(tb_float_t x);
+
+/* ////////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+// 1 + x + (x^2) / 2 + (x^3) / 6, for x = [-1, 1]
+static __tb_inline__ tb_float_t tb_float_exp1_inline(tb_float_t x)
+{
+	TB_ASSERT(x >= -1 && x <= 1);
+	return (1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6);
+}
+
 
 #endif
 
