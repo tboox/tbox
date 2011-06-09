@@ -26,9 +26,9 @@ static void tb_fixed_test_mul(tb_fixed_t a, tb_fixed_t b)
 {
 	tb_printf("[fixed]: mul(%f, %f): %f\n", tb_fixed_to_float(a), tb_fixed_to_float(b), tb_fixed_to_float(tb_fixed_mul(a, b)));
 }
-static void tb_fixed_test_square(tb_fixed_t x)
+static void tb_fixed_test_sqre(tb_fixed_t x)
 {
-	tb_printf("[fixed]: square(%f): %f\n", tb_fixed_to_float(x), tb_fixed_to_float(tb_fixed_square(x)));
+	tb_printf("[fixed]: sqre(%f): %f\n", tb_fixed_to_float(x), tb_fixed_to_float(tb_fixed_sqre(x)));
 }
 static void tb_fixed_test_sqrt(tb_fixed_t x)
 {
@@ -54,6 +54,18 @@ static void tb_fixed_test_ilog2(tb_fixed_t x)
 	t = tb_mclock() - t;
 	tb_printf("[fixed]: ilog2(%f) = %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
 }
+static void tb_fixed_test_exp(tb_fixed_t x)
+{
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_fixed_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_fixed_exp(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[fixed]: exp(%f) = %f, %d ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), (tb_int_t)t);
+}
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -66,9 +78,10 @@ int main(int argc, char** argv)
 	tb_fixed_test_ceil(TB_FIXED_PI);
 	tb_fixed_test_ceil(-TB_FIXED_PI);
 	tb_fixed_test_mul(TB_FIXED_PI, -TB_FIXED_PI);
-	tb_fixed_test_square(TB_FIXED_PI);
-	tb_fixed_test_square(-TB_FIXED_PI);
+	tb_fixed_test_sqre(TB_FIXED_PI);
+	tb_fixed_test_sqre(-TB_FIXED_PI);
 	tb_fixed_test_sqrt(TB_FIXED_PI);
+	tb_fixed_test_exp(TB_FIXED_PI);
 	tb_fixed_test_ilog2(TB_FIXED_PI);
 	tb_fixed_test_ilog2(tb_float_to_fixed(1024.));
 

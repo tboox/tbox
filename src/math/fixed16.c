@@ -26,26 +26,42 @@
 #include "fixed16.h"
 #include "int32.h"
 
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	include "float.h"
+#endif
+
 /* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
 tb_fixed16_t tb_fixed16_mul_generic(tb_fixed16_t x, tb_fixed16_t y)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_mul(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
-}
-tb_fixed16_t tb_fixed16_square_generic(tb_fixed16_t x, tb_fixed16_t y)
-{
-	TB_NOT_IMPLEMENT();
-	return 0;
-}
-tb_fixed16_t tb_fixed16_mod_generic(tb_fixed16_t x, tb_fixed16_t y)
-{
-	TB_NOT_IMPLEMENT();
-	return 0;
+#endif
 }
 
+tb_fixed16_t tb_fixed16_div_generic(tb_fixed16_t x, tb_fixed16_t y)
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_div(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
+#else
+	TB_NOT_IMPLEMENT();
+	return 0;
+#endif
+}
+tb_fixed16_t tb_fixed16_sqre_generic(tb_fixed16_t x)
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_sqre(tb_fixed16_to_float(x)));
+#else
+	TB_NOT_IMPLEMENT();
+	return 0;
+#endif
+}
 tb_fixed16_t tb_fixed16_sqrt_generic(tb_fixed16_t x)
 {
 	TB_ASSERT(x > 0);
@@ -53,38 +69,84 @@ tb_fixed16_t tb_fixed16_sqrt_generic(tb_fixed16_t x)
 }
 tb_fixed16_t tb_fixed16_sin_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_sin(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_cos_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_cos(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_tan_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_tan(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_asin_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_asin(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_acos_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_acos(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_atan_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_atan(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
 }
 tb_fixed16_t tb_fixed16_exp_generic(tb_fixed16_t x)
 {
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_exp(tb_fixed16_to_float(x)));
+#else
 	TB_NOT_IMPLEMENT();
 	return 0;
+#endif
+}
+tb_fixed16_t tb_fixed16_exp1_generic(tb_fixed16_t x)
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_exp1(tb_fixed16_to_float(x)));
+#else
+	TB_NOT_IMPLEMENT();
+	return 0;
+#endif
+}
+tb_fixed16_t tb_fixed16_expi_generic(tb_uint16_t x)
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+	return tb_float_to_fixed16(tb_float_expi(x));
+#else
+	TB_NOT_IMPLEMENT();
+	return 0;
+#endif
 }
 tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x)
 {

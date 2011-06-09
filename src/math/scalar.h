@@ -70,8 +70,7 @@
 #define tb_scalar_avg(x, y) 		tb_fixed_avg(x, y)
 #define tb_scalar_mul(x, y) 		tb_fixed_mul(x, y)
 #define tb_scalar_div(x, y) 		tb_fixed_div(x, y)
-#define tb_scalar_muladd(x, y, a) 	tb_fixed_muladd(x, y, a)
-#define tb_scalar_square(x) 		tb_fixed_square(x)
+#define tb_scalar_sqre(x) 			tb_fixed_sqre(x)
 #define tb_scalar_sqrt(x) 			tb_fixed_sqrt(x)
 #define tb_scalar_sin(x) 			tb_fixed_sin(x)
 #define tb_scalar_cos(x) 			tb_fixed_cos(x)
@@ -80,6 +79,8 @@
 #define tb_scalar_acos(x) 			tb_fixed_acos(x)
 #define tb_scalar_atan(x) 			tb_fixed_atan(x)
 #define tb_scalar_exp(x) 			tb_fixed_exp(x)
+#define tb_scalar_exp1(x) 			tb_fixed_exp1(x)
+#define tb_scalar_expi(x) 			tb_fixed_expi(x)
 #define tb_scalar_ilog2(x) 			tb_fixed_ilog2(x)
 
 #elif defined(TB_CONFIG_TYPE_FLOAT)
@@ -114,8 +115,7 @@
 #define tb_scalar_avg(x, y) 		tb_float_avg(x, y)
 #define tb_scalar_mul(x, y) 		tb_float_mul(x, y)
 #define tb_scalar_div(x, y) 		tb_float_div(x, y)
-#define tb_scalar_muladd(x, y, a) 	tb_float_muladd(x, y, a)
-#define tb_scalar_square(x) 		tb_float_square(x)
+#define tb_scalar_sqre(x) 			tb_float_sqre(x)
 #define tb_scalar_sqrt(x) 			tb_float_sqrt(x)
 #define tb_scalar_sin(x) 			tb_float_sin(x)
 #define tb_scalar_cos(x) 			tb_float_cos(x)
@@ -124,6 +124,8 @@
 #define tb_scalar_acos(x) 			tb_float_acos(x)
 #define tb_scalar_atan(x) 			tb_float_atan(x)
 #define tb_scalar_exp(x) 			tb_float_exp(x)
+#define tb_scalar_exp1(x) 			tb_float_exp1(x)
+#define tb_scalar_expi(x) 			tb_float_expi(x)
 #define tb_scalar_ilog2(x) 			tb_float_ilog2(x)
 
 #else

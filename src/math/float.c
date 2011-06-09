@@ -37,38 +37,97 @@ tb_float_t tb_float_sqrt_generic(tb_float_t x)
 }
 tb_float_t tb_float_sin_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return sin(x);
 }
 tb_float_t tb_float_cos_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return cos(x);
 }
 tb_float_t tb_float_tan_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return tan(x);
 }
 tb_float_t tb_float_asin_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return asin(x);
 }
 tb_float_t tb_float_acos_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return acos(x);
 }
 tb_float_t tb_float_atan_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+	return atan(x);
 }
 tb_float_t tb_float_exp_generic(tb_float_t x)
 {
-	TB_NOT_IMPLEMENT();
-	return 0;
+#if 1
+	tb_float_t a = x - (tb_int_t)x;
+	return (tb_float_expi(((tb_int_t)x)) * tb_float_exp1(a));
+#else
+	return exp(x);
+#endif
+}
+tb_float_t tb_float_expi_generic(tb_uint16_t x)
+{
+	// x = [-31, 31]
+	static tb_float_t table[47] = 
+	{
+		// [-15, -1]
+		0.000000
+	,	0.000001
+	,	0.000002
+	,	0.000006
+	,	0.000017
+	,	0.000045
+	,	0.000123
+	,	0.000335
+	,	0.000912
+	,	0.002479
+	,	0.006738
+	,	0.018316
+	,	0.049787
+	,	0.135335
+	,	0.367879
+
+		// 0
+	,	1.000000
+
+		// [1, 31]
+	, 	2.718282
+	,	7.389056
+	,	20.085537
+	,	54.598150
+	,	148.413159
+	,	403.428793
+	,	1096.633158
+	,	2980.957987
+	,	8103.083928
+	,	22026.465795
+	,	59874.141715
+	,	162754.791419
+	,	442413.392009
+	,	1202604.284165
+	,	3269017.372472
+	,	8886110.520508
+	,	24154952.753575
+	,	65659969.137331
+	,	178482300.963187
+	,	485165195.409790
+	,	1318815734.483215
+	,	3584912846.131592
+	,	9744803446.248903
+	,	26489122129.843472
+	,	72004899337.385880
+	,	195729609428.838776
+	,	532048240601.798645
+	,	1446257064291.475098
+	,	3931334297144.041992
+	,	10686474581524.462891
+	,	29048849665247.425781
+
+	};
+	return table[((x) + 15) & 0x3f];
 }
 tb_uint32_t tb_float_ilog2_generic(tb_float_t x)
 {

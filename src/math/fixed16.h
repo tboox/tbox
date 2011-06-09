@@ -81,8 +81,8 @@
 # 	ifndef tb_fixed16_mul
 # 		define tb_fixed16_mul(x, y) 	tb_fixed16_mul_int64(x, y)
 # 	endif
-# 	ifndef tb_fixed16_square
-# 	 	define tb_fixed16_square(x) 	tb_fixed16_square_int64(x)
+# 	ifndef tb_fixed16_sqre
+# 	 	define tb_fixed16_sqre(x) 		tb_fixed16_sqre_int64(x)
 # 	endif
 #endif
 
@@ -94,12 +94,8 @@
     #define tb_fixed16_div(x, y) 		tb_fixed16_div_generic(x, y)
 #endif
 
-#ifndef tb_fixed16_muladd
-# 	define tb_fixed16_muladd(x, y, a) 	(tb_fixed16_mul(x, y) + (a))
-#endif
-
-#ifndef tb_fixed16_square
-    #define tb_fixed16_square(x) 		tb_fixed16_square_generic(x)
+#ifndef tb_fixed16_sqre
+    #define tb_fixed16_sqre(x) 			tb_fixed16_sqre_generic(x)
 #endif
 
 #ifndef tb_fixed16_sqrt
@@ -134,6 +130,14 @@
     #define tb_fixed16_exp(x) 			tb_fixed16_exp_generic(x)
 #endif
 
+#ifndef tb_fixed16_expi
+    #define tb_fixed16_expi(x) 			tb_fixed16_expi_generic(x)
+#endif
+
+#ifndef tb_fixed16_exp1
+    #define tb_fixed16_exp1(x) 			tb_fixed16_exp1_generic(x)
+#endif
+
 #ifndef tb_fixed16_ilog2
     #define tb_fixed16_ilog2(x) 		tb_fixed16_ilog2_generic(x)
 #endif
@@ -145,8 +149,7 @@
 
 tb_fixed16_t tb_fixed16_mul_generic(tb_fixed16_t x, tb_fixed16_t y);
 tb_fixed16_t tb_fixed16_div_generic(tb_fixed16_t x, tb_fixed16_t y);
-tb_fixed16_t tb_fixed16_square_generic(tb_fixed16_t x, tb_fixed16_t y);
-tb_fixed16_t tb_fixed16_mod_generic(tb_fixed16_t x, tb_fixed16_t y);
+tb_fixed16_t tb_fixed16_sqre_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_sqrt_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_sin_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_cos_generic(tb_fixed16_t x);
@@ -155,6 +158,8 @@ tb_fixed16_t tb_fixed16_asin_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_acos_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_atan_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_exp_generic(tb_fixed16_t x);
+tb_fixed16_t tb_fixed16_exp1_generic(tb_fixed16_t x);
+tb_fixed16_t tb_fixed16_expi_generic(tb_uint16_t x);
 tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x);
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -181,7 +186,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed1
 {
 	return (tb_fixed16_t)((tb_int64_t)x * y >> 16);
 }
-static __tb_inline__ tb_fixed16_t tb_fixed16_square_int64(tb_fixed16_t x)
+static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
 {
 	return (tb_fixed16_t)((tb_int64_t)x * x >> 16);
 }
