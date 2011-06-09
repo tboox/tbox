@@ -35,11 +35,10 @@ PWD 			= pwd
 CPPFLAGS_RELEASE 	= \
 	-O2 -DNDEBUG \
 	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-	-msse2 \
 	-march=native -pipe # gcc >= 4.2.3
 
 CPPFLAGS_DEBUG 	= -g
-CPPFLAGS 		= -c -Wall
+CPPFLAGS 		= -c -Wall -msse2
 CPPFLAGS-I 		= -I
 CPPFLAGS-o 		= -o
 

@@ -25,7 +25,6 @@
  * includes
  */
 #include "http.h"
-#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
@@ -256,7 +255,7 @@ static tb_char_t const* tb_http_method_string(tb_http_method_t method)
 	, 	"CONNECT"
 
 	};
-	return ((method >= 0 && method < TB_STATIC_ARRAY_SIZE(s))? s[method] : TB_NULL);
+	return ((method >= 0 && method < tb_arrayn(s))? s[method] : TB_NULL);
 }
 static tb_bool_t tb_http_socket_open(tb_http_t* http)
 {
@@ -1158,7 +1157,7 @@ tb_int_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		if (http->status.chunked_read < http->status.chunked_size)
 		{
 			tb_int_t ret = 0;
-			tb_int_t min = TB_MATH_MIN(size, http->status.chunked_size - http->status.chunked_read);
+			tb_int_t min = tb_min(size, http->status.chunked_size - http->status.chunked_read);
 			if (!http->option.bblock) ret = tb_http_socket_read(http, data, min);
 			else ret = tb_http_read_block(http, data, min);
 

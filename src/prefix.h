@@ -93,9 +93,6 @@ extern "C" {
 // not implement
 #define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: func: %s, line: %d, file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
 
-// the size of the static array
-#define TB_STATIC_ARRAY_SIZE(a) 					(sizeof((a)) / sizeof((a)[0]))
-
 // platform
 #ifdef TB_CONFIG_PLAT_BIGENDIAN
 # 	define TB_WORDS_BIGENDIAN
@@ -319,42 +316,6 @@ extern "C" {
 # 	define TB_NULL 					((void*)0)
 #endif
 
-/* fixed-point numbers
- *
- * the swf file format supports two types of fixed-point numbers: 32-bit and 16-bit.
- * the 32-bit fixed-point numbers are 16.16. that is, the high 16 bits represent the number
- * before the decimal point, and the low 16 bits represent the number after the decimal point.
- * fixed values are stored like 32-bit integers in the swf file (using little-endian byte order)
- * and must be byte aligned.
- */
-#define TB_FIXED8_FACTOR 			(0xff)
-#define TB_FIXED16_FACTOR 			(0xffff)
-#define TB_FIXED32_FACTOR 			(0xffffffff)
-
-#define TB_FIXED32_2_FLOAT(x) 		((tb_float_t)(x) / 0xffffffff)
-#define TB_FLOAT_2_FIXED32(x) 		((tb_fixed32_t)((x) * 0xffffffff))
-
-#define TB_FIXED16_2_FLOAT(x) 		((tb_float_t)(x) / 0xffff)
-#define TB_FLOAT_2_FIXED16(x) 		((tb_fixed16_t)((x) * 0xffff))
-
-#define TB_FIXED8_2_FLOAT(x) 		((tb_float_t)(x) / 0xff)
-#define TB_FLOAT_2_FIXED8(x) 		((tb_fixed8_t)((x) * 0xff))
-
-#define TB_FIXED32_2_INT(x) 		((x) >> 32)
-#define TB_INT_2_FIXED32(x) 		((x) << 32)
-
-#define TB_FIXED16_2_INT(x) 		((x) >> 16)
-#define TB_INT_2_FIXED16(x) 		((x) << 16)
-#define TB_FIXED16_2_RINT(x) 		((((x) >= 0)? ((x) + (TB_FIXED16_FACTOR >> 1)) : ((x) - (TB_FIXED16_FACTOR >> 1))) >> 16)
-
-#define TB_FIXED8_2_INT(x) 			((x) >> 8)
-#define TB_INT_2_FIXED8(x) 			((x) << 8)
-
-#define TB_FIXED16_2_FIXED32(x) 	((x) << 16)
-#define TB_FIXED32_2_FIXED16(x) 	((x) >> 16)
-
-#define TB_FIXED8_2_FIXED16(x) 		((x) << 8)
-#define TB_FIXED16_2_FIXED8(x) 		((x) >> 8)
 
 // varg
 #define TB_VARG_FORMAT(s, n, fmt, r) \
@@ -374,6 +335,8 @@ do \
 /* /////////////////////////////////////////////////////////
  * types
  */
+
+// basic
 typedef signed int				tb_int_t;
 typedef unsigned int			tb_uint_t;
 typedef tb_int_t				tb_bool_t;
@@ -387,21 +350,80 @@ typedef unsigned short			tb_uint16_t;
 typedef tb_int_t				tb_int32_t;
 typedef tb_int32_t				tb_sint32_t;
 typedef tb_uint_t				tb_uint32_t;
-typedef tb_uint8_t				tb_byte_t;
-typedef void* 					tb_handle_t;
 typedef char 					tb_char_t;
-typedef double 					tb_float_t;
-typedef tb_int16_t 				tb_fixed8_t;
-typedef tb_int32_t 				tb_fixed16_t;
+typedef tb_int32_t 				tb_uchar_t;
+typedef tb_uint8_t				tb_byte_t;
+typedef void 					tb_void_t;
 
-#ifndef TB_CONFIG_TYPE_NOT_SUPPORT_INT64
+// int64
+#ifdef TB_CONFIG_TYPE_INT64
 typedef signed long long 		tb_int64_t;
-typedef tb_int64_t				tb_sint64_t;
 typedef unsigned long long 		tb_uint64_t;
-typedef tb_int64_t 				tb_fixed32_t;
-#else
-# 	error int64 not support.
+typedef tb_int64_t				tb_sint64_t;
 #endif
+
+// handle
+typedef tb_void_t* 				tb_handle_t;
+
+// float
+#ifdef TB_CONFIG_TYPE_FLOAT
+typedef double 					tb_float_t;
+#endif
+
+// fixed
+typedef tb_int32_t 				tb_fixed6_t;
+typedef tb_int32_t 				tb_fixed16_t;
+typedef tb_int32_t 				tb_fixed30_t;
+typedef tb_fixed16_t 			tb_fixed_t;
+
+// scalar
+#ifdef TB_CONFIG_TYPE_SCALAR_IS_FIXED
+typedef tb_fixed_t 				tb_scalar_t;
+#else
+typedef tb_float_t 				tb_scalar_t;
+#endif
+
+// limits
+#define TB_MAXS16 				(0x7fff)
+#define TB_MINS16 				(0x8001)
+#define TB_MAXU16 				(0xffff)
+#define TB_MINU16 				(0)
+#define TB_MAXS32 				(0x7fffffff)
+#define TB_MINS32 				(0x80000001)
+#define TB_MAXU32 				(0xffffffff)
+#define TB_MINU32 				(0)
+#define TB_NAN32 				(0x80000000)
+
+// abs
+#define tb_abs(x) 				((x) > 0? (x) : -(x))
+
+// min & max
+#define tb_max(x, y) 			(((x) > (y))? (x) : (y))
+#define tb_min(x, y) 			(((x) < (y))? (x) : (y))
+
+// swap
+#ifdef __cplusplus
+template <typename T> 
+static __tb_inline__ void tb_swap(T& x, T& y) 
+{
+	T c(x);
+	x = y;
+	y = c;
+}
+#else
+# 	define tb_swap(x, y) 		((x) ^= (y) ^= (x) ^= (y))
+#endif
+
+// the number of entries in the array
+#define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
+
+// align
+#define tb_align2(x) 			(((x) + 1) >> 1 << 1)
+#define tb_align4(x) 			(((x) + 3) >> 2 << 2)
+#define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
+
+// offsetof
+#define tb_offsetof(t, x) 		((tb_byte_t*)&(((t*)1)->x) - (tb_byte_t*)1)
 
 /* /////////////////////////////////////////////////////////
  * memory

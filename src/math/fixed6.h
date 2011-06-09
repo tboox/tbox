@@ -17,27 +17,26 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		fixed6.h
  *
  */
-#ifndef TB_MATH_PREFIX_H
-#define TB_MATH_PREFIX_H
+#ifndef TB_MATH_FIXED6_H
+#define TB_MATH_FIXED6_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* //////////////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
+
+/* ////////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
 
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-// c plus plus
-#ifdef __cplusplus
-}
+
 #endif
 
-#endif

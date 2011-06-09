@@ -25,7 +25,6 @@
  */
 #include "pool.h"
 #include "../memory/memory.h"
-#include "../math/math.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -46,10 +45,10 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 	tb_pool_t* pool = (tb_pool_t*)tb_calloc(1, sizeof(tb_pool_t));
 	TB_ASSERT_RETURN_VAL(pool, TB_NULL);
 
-	pool->step = TB_MATH_ALIGN(step, 4);
-	pool->grow = TB_MATH_ALIGN(grow, 8); // align by 8-byte for info
+	pool->step = tb_align(step, 4);
+	pool->grow = tb_align(grow, 8); // align by 8-byte for info
 	pool->size = 0;
-	pool->maxn = TB_MATH_ALIGN(size, 8); // align by 8-byte for info
+	pool->maxn = tb_align(size, 8); // align by 8-byte for info
 
 	pool->data = tb_calloc(pool->maxn, pool->step);
 	TB_ASSERT_GOTO(pool->data, fail);
@@ -58,7 +57,7 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 	TB_ASSERT_GOTO(pool->info, fail);
 
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
-	tb_size_t m = TB_MATH_MIN(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
+	tb_size_t m = tb_min(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
 	tb_size_t n = m;
 	while (n--) pool->pred[n] = m - n;
 	pool->pred_n = m;
@@ -225,7 +224,7 @@ void tb_pool_clear(tb_pool_t* pool)
 	if (pool->data) tb_memset(pool->data, 0, pool->maxn);
 
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
-	tb_size_t m = TB_MATH_MIN(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
+	tb_size_t m = tb_min(pool->maxn, TB_MEMORY_POOL_PRED_MAX);
 	tb_size_t n = m;
 	while (n--) pool->pred[n] = m - n;
 	pool->pred_n = m;

@@ -345,7 +345,7 @@ static tb_encoder_t g_encoders[] =
 tb_encoder_t const* tb_encoding_get_encoder(tb_encoding_t encoding)
 {
 	tb_uint8_t idx = (tb_uint8_t)encoding;
-	if (idx < TB_STATIC_ARRAY_SIZE(g_encoders))
+	if (idx < tb_arrayn(g_encoders))
 	{
 		tb_encoder_t const* encoder = &g_encoders[idx];
 		TB_ASSERT(encoder->encoding == idx);

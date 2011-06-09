@@ -10,10 +10,11 @@ tbox_TYPE 			= LIB
 # basic files
 tbox_C_FILES 		+= \
 					tbox \
-					math/exp \
-					math/pow \
-					math/log \
-					math/sqrt \
+					math/int32 \
+					math/fixed6 \
+					math/fixed16 \
+					math/fixed30 \
+					math/float \
 					memory/mpool \
 					memory/memops \
 					string/string \
@@ -94,14 +95,22 @@ INC_FILES 			= \
 					memory/memops.h \
 					memory/prefix.h \
 					memory/mpool.h \
-					math/prefix.h \
 					math/math.h \
-					math/exp.h \
-					math/pow.h \
-					math/log.h \
-					math/abs.h \
-					math/sqrt.h \
-					math/round.h \
+					math/prefix.h \
+					math/float.h \
+					math/fixed.h \
+					math/fixed6.h \
+					math/fixed16.h \
+					math/fixed30.h \
+					math/int32.h \
+					math/scalar.h \
+					math/opt/prefix.h \
+					math/opt/fixed16_x86.h \
+					math/opt/fixed16_arm.h \
+					math/opt/fixed16_sh4.h \
+					math/opt/float_x86.h \
+					math/opt/float_arm.h \
+					math/opt/float_sh4.h \
 					string/prefix.h \
 					string/string.h \
 					string/cstring.h \

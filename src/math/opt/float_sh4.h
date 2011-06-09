@@ -17,27 +17,23 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		fixed16_sh4.h
  *
  */
-#ifndef TB_MATH_PREFIX_H
-#define TB_MATH_PREFIX_H
+#ifndef TB_MATH_OPT_FLOAT_SH4_H
+#define TB_MATH_OPT_FLOAT_SH4_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* //////////////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
+
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 
 
-// c plus plus
-#ifdef __cplusplus
-}
+
 #endif
 
-#endif

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		round.h
+ * \file		fixed16_x86.h
  *
  */
-#ifndef TB_MATH_ROUND_H
-#define TB_MATH_ROUND_H
+#ifndef TB_MATH_OPT_FIXED16_x86_H
+#define TB_MATH_OPT_FIXED16_x86_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,12 +29,10 @@
 #include "prefix.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
+ * interfaces
  */
 
-#define TB_MATH_IROUND(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)((x) + 0.5) : (tb_int32_t)(tb_uint32_t)((x) - 0.5))
-#define TB_MATH_IFLOOR(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)(x) : (tb_int32_t)(tb_uint32_t)((x) - 0.9999999999))
-#define TB_MATH_ICEIL(x) 					((x) > 0? (tb_int32_t)(tb_uint32_t)((x) + 0.9999999999) : (tb_int32_t)(tb_uint32_t)(x))
+
 
 
 #endif

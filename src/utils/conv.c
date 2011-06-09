@@ -622,7 +622,7 @@ tb_uint32_t tb_conv_sbtou32(tb_char_t const* s, tb_int_t base)
 	, 	TB_NULL
 	, 	tb_conv_s16tou32
 	};
-	TB_ASSERT(base < TB_STATIC_ARRAY_SIZE(convs));
+	TB_ASSERT(base < tb_arrayn(convs));
 	if (convs[base]) return convs[base](s);
 	else return 0;
 }
@@ -649,7 +649,7 @@ tb_float_t tb_conv_sbtof(tb_char_t const* s, tb_int_t base)
 	, 	TB_NULL
 	, 	tb_conv_s16tof
 	};
-	TB_ASSERT(base < TB_STATIC_ARRAY_SIZE(convs));
+	TB_ASSERT(base < tb_arrayn(convs));
 	if (convs[base]) return convs[base](s);
 	else return 0.;
 }

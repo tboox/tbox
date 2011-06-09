@@ -70,7 +70,7 @@ tb_format_t const* tb_format_probe(tb_gstream_t* gst, tb_size_t flag)
 
 	// probe format
 	tb_int_t i = 0;
-	tb_int_t n = TB_STATIC_ARRAY_SIZE(g_formats);
+	tb_int_t n = tb_arrayn(g_formats);
 	for (i = 0; i < n; i++)
 	{
 		// filter 

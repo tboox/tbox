@@ -32,11 +32,6 @@
 
 
 /* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -45,7 +40,7 @@ tb_size_t tb_format_txt_probe(tb_gstream_t* gst)
 	// compute the max need
 	tb_size_t need = TB_GSTREAM_CACHE_SIZE;
 	tb_size_t file = tb_gstream_size(gst);
-	if (file) need = TB_MATH_MIN(file, TB_GSTREAM_CACHE_SIZE);
+	if (file) need = tb_min(file, TB_GSTREAM_CACHE_SIZE);
 
 	// need it
 	tb_byte_t const* p = tb_gstream_need(gst, need);

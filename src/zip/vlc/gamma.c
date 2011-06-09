@@ -32,6 +32,7 @@
 
 static void tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
 {
+#if 0
 	TB_ASSERT(vlc && val);
 
 	// compute q & r
@@ -46,6 +47,7 @@ static void tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_
 	for (i = 0; i < q; i++) tb_bstream_set_u1(bst, 1);
 	tb_bstream_set_u1(bst, 0);
 	for (i = 0; i < q; i++, r >>= 1) tb_bstream_set_u1(bst, r & 0x1);
+#endif
 }
 static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_bstream_t const* bst)
 {
