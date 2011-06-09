@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		abs.h
+ * \file		fixed16_arm.h
  *
  */
-#ifndef TB_MATH_ABS_H
-#define TB_MATH_ABS_H
+#ifndef TB_MATH_OPT_FLOAT_ARM_H
+#define TB_MATH_OPT_FLOAT_ARM_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,11 +29,10 @@
 #include "prefix.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
+ * interfaces
  */
 
-#define TB_MATH_ABSI(x) 					((x) > 0? (x) : -(x))
-#define TB_MATH_ABSF(x) 					((x) > 0.? (x) : -(x))
+
 
 
 #endif

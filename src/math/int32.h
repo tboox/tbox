@@ -17,48 +17,29 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		pow.h
+ * \file		int32.h
  *
  */
-#ifndef TB_MATH_POW_H
-#define TB_MATH_POW_H
+#ifndef TB_MATH_INT32_H
+#define TB_MATH_INT32_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "exp.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
 
-// fpow2i(x) == 2^x == x >= 0? (1 << x) : (1 / (1 << x))
-#define TB_MATH_FPOW2I(x) 					(g_tb_math_fpow2i_table[((x) + 21) & 0x3f])
-
-// fpow2f1(x) == exp(x * ln2), x = [-1, 1]
-#define TB_MATH_FPOW2F1(x) 					TB_MATH_FEXPF1(((x) * TB_MATH_CONST_LN2))
-
-// fpow2f(x) == 2^[x] * 2^(x - [x]) ~= 2^[x] * exp((x - [x]) * ln2)
-//#define TB_MATH_FPOW2F(x) 				(TB_MATH_FPOW2I((tb_int_t)(x)) * TB_MATH_FEXPF1(((x) - (tb_int_t)(x)) * TB_MATH_CONST_LN2))
-#define TB_MATH_FPOW2F(x) 					tb_math_fpow2f(x)
-
-// fpowf(a, x)
-#define TB_MATH_FPOWF(a, x) 				pow(a, x)
 
 /* ////////////////////////////////////////////////////////////////////////
- * globals
+ * interfaces
  */
-extern tb_float_t g_tb_math_fpow2i_table[53];
 
-/* ////////////////////////////////////////////////////////////////////////
- * implements
- */
-static __tb_inline__ tb_float_t tb_math_fpow2f(tb_float_t x)
-{
-	tb_float_t a = (x - (tb_int_t)x) * TB_MATH_CONST_LN2;
-	return (TB_MATH_FPOW2I((tb_int_t)x) * TB_MATH_FEXPF1(a));
-}
+
+tb_uint32_t tb_int32_sqrt(tb_uint32_t x);
+tb_uint32_t tb_int32_log2(tb_uint32_t x);
 
 
 #endif

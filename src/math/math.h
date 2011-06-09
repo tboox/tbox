@@ -27,13 +27,15 @@
  * includes
  */
 #include "prefix.h"
-#include "exp.h"
-#include "pow.h"
-#include "log.h"
-#include "sqrt.h"
-#include "round.h"
-#include "abs.h"
-
+#include "int32.h"
+#include "fixed6.h"
+#include "fixed16.h"
+#include "fixed30.h"
+#include "fixed.h"
+#include "scalar.h"
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	include "float.h"
+#endif
 
 #endif
 

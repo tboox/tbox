@@ -37,6 +37,11 @@
 #define TB_CONFIG_KEYWORD_LINE			__LINE__
 #define TB_CONFIG_KEYWORD_FILE			__FILE__
 
+// type
+#define TB_CONFIG_TYPE_INT64
+#define TB_CONFIG_TYPE_FLOAT
+#define TB_CONFIG_TYPE_SCALAR_IS_FIXED
+
 // optimization
 #define TB_CONFIG_OPTI_SSE2_ENABLE
 

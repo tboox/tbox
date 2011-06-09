@@ -24,7 +24,6 @@
  * includes
  */
 #include "vector.h"
-#include "../math/math.h"
 #include "../memory/memory.h"
 #include "../utils/utils.h"
 
@@ -83,7 +82,7 @@ tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, void (*ctor)(void*
 	TB_ASSERT_RETURN_VAL(vector, TB_NULL);
 
 	// init vector
-	vector->step = (step == 1)? 1 : ((step == 2)? 2 : TB_MATH_ALIGN(step, 4));
+	vector->step = (step == 1)? 1 : ((step == 2)? 2 : tb_align4(step));
 	vector->grow = grow;
 	vector->size = 0;
 	vector->maxn = grow;
@@ -207,7 +206,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	if (size > vector->maxn)
 	{
 		tb_size_t omaxn = vector->maxn;
-		vector->maxn = TB_MATH_ALIGN(size + vector->grow, 4);
+		vector->maxn = tb_align4(size + vector->grow);
 		TB_ASSERT_RETURN_VAL(vector->maxn < TB_VECTOR_MAX_SIZE, TB_FALSE);
 
 		// realloc data

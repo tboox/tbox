@@ -25,7 +25,6 @@
  * includes
  */
 #include "gstream.h"
-#include "../math/math.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
 /* /////////////////////////////////////////////////////////
@@ -131,7 +130,7 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 
 	// find stream
 	tb_int_t 		i = 0;
-	tb_int_t 		n = TB_STATIC_ARRAY_SIZE(g_gstream_table);
+	tb_int_t 		n = tb_arrayn(g_gstream_table);
 	tb_gstream_t* 	gst = TB_NULL;
 	for (; i < n; ++i)
 	{
@@ -339,7 +338,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 		while (tb_gstream_offset(gst) < offset)
 		{
 			tb_byte_t data[TB_GSTREAM_BLOCK_SIZE];
-			tb_size_t need = TB_MATH_MIN(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_SIZE);
+			tb_size_t need = tb_min(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_SIZE);
 			tb_int_t ret = tb_gstream_read(gst, data, need);
 			if (ret > 0) time = (tb_size_t)tb_mclock();
 			else if (!ret)

@@ -25,7 +25,6 @@
  * includes
  */
 #include "string.h"
-#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 
@@ -143,7 +142,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 	{
 		// compute size
 		string->size = size;
-		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -163,7 +162,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 
 		// compute size
 		string->size = size;
-		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -173,7 +172,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->data = tb_malloc(string->maxn);
 		string->owner = 1;
 		if (!string->data) goto fail;
-		tb_memcpy(string->data, odata, TB_MATH_MIN(osize, size));
+		tb_memcpy(string->data, odata, tb_min(osize, size));
 		string->data[string->size] = '\0';
 	}
 	// decrease
@@ -190,7 +189,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 
 		// compute size
 		string->size = size;
-		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
@@ -200,14 +199,14 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->data = tb_malloc(string->maxn);
 		string->owner = 1;
 		if (!string->data) goto fail;
-		tb_memcpy(string->data, odata, TB_MATH_MIN(osize, size));
+		tb_memcpy(string->data, odata, tb_min(osize, size));
 		string->data[string->size] = '\0';
 	}
 	// increase
 	else
 	{
 		// compute size
-		string->maxn = TB_MATH_ALIGN(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
+		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
 		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);

@@ -17,35 +17,27 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * \author		ruki
- * \file		sqrt.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_MATH_SQRT_H
-#define TB_MATH_SQRT_H
+#ifndef TB_MATH_OPT_PREFIX_H
+#define TB_MATH_OPT_PREFIX_H
 
-/* ////////////////////////////////////////////////////////////////////////
- * includes
- */
-#include "prefix.h"
-
-/* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// isqrti(x) 
-#define TB_MATH_ISQRTI(x) 					tb_math_isqrti(x)
-
-// isqrtf(x) 
-#define TB_MATH_ISQRTF(x) 					tb_math_isqrti(TB_MATH_IROUND(x))
-
-// fsqrtf(x) 
-#define TB_MATH_FSQRTF(x) 					sqrt(x)
-
-/* ////////////////////////////////////////////////////////////////////////
- * implements
- */
-tb_uint32_t tb_math_isqrti(tb_uint32_t x);
-
-
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+/* //////////////////////////////////////////////////////////////////
+ * includes
+ */
+#include "../prefix.h"
+
+
+
+// c plus plus
+#ifdef __cplusplus
+}
+#endif
+
+#endif

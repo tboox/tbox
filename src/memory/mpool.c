@@ -26,7 +26,6 @@
  */
 #include "mpool.h"
 #include "memops.h"
-#include "../math/math.h"
 
 /*!structure
  *
@@ -299,7 +298,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 
 	// attach data
 	g_mpool->data = &g_mpool[1];
-	g_mpool->data = (tb_byte_t*)TB_MATH_ALIGN((tb_size_t)g_mpool->data, TB_MPOOL_ALIGN_BOUNDARY);
+	g_mpool->data = (tb_byte_t*)tb_align((tb_size_t)g_mpool->data, TB_MPOOL_ALIGN_BOUNDARY);
 	g_mpool->size = (tb_size_t)(size - ((tb_int_t)g_mpool->data - (tb_int_t)data));
 	TB_ASSERT(g_mpool->size);
 
@@ -331,7 +330,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 	}
 
 	// init blocks info
-	g_mpool->blocks_info = g_mpool->data + g_mpool->size - (TB_MATH_ALIGN(g_mpool->blocks_n, 8) >> 3);
+	g_mpool->blocks_info = g_mpool->data + g_mpool->size - (tb_align(g_mpool->blocks_n, 8) >> 3);
 	g_mpool->blocks_info -= ((tb_size_t)g_mpool->blocks_info) % TB_MPOOL_ALIGN_BOUNDARY;
 	TB_ASSERT((tb_size_t)g_mpool->blocks_info > (tb_size_t)g_mpool->data);
   
@@ -687,7 +686,7 @@ static void* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, tb_cha
 
 	// align size
 	tb_byte_t* 	p = TB_NULL;
-	tb_size_t 	asize = TB_MATH_ALIGN(size, TB_MPOOL_ALIGN_BOUNDARY);
+	tb_size_t 	asize = tb_align(size, TB_MPOOL_ALIGN_BOUNDARY);
 
 	// try allocating it from predicted nrblock
 #ifdef TB_MPOOL_PRED_ENABLE
@@ -984,7 +983,7 @@ static void* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, void* data, tb_size_
 			if (pnext_head->is_free)
 			{
 				// align size
-				tb_size_t asize = TB_MATH_ALIGN(size, TB_MPOOL_ALIGN_BOUNDARY);
+				tb_size_t asize = tb_align(size, TB_MPOOL_ALIGN_BOUNDARY);
 
 				// block size : current block size + next block head + next block size
 				phead->block_size += sizeof(tb_mpool_nrblock_head_t) + pnext_head->block_size;
@@ -1180,7 +1179,7 @@ static tb_bool_t tb_mpool_allocate_try(tb_mpool_t* mpool, tb_size_t size)
 		if (phead->is_free) // allocate if the block is free
 		{
 			// align size
-			tb_size_t asize = TB_MATH_ALIGN(size, TB_MPOOL_ALIGN_BOUNDARY);
+			tb_size_t asize = tb_align(size, TB_MPOOL_ALIGN_BOUNDARY);
 			if (osize >= asize) // enough?
 			{
 				return TB_TRUE;
