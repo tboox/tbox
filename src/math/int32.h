@@ -40,6 +40,8 @@
 
 tb_uint32_t tb_int32_sqrt(tb_uint32_t x);
 tb_uint32_t tb_int32_log2(tb_uint32_t x);
+tb_uint32_t tb_int32_clog2(tb_uint32_t x);
+tb_uint32_t tb_int32_rlog2(tb_uint32_t x);
 
 
 #endif

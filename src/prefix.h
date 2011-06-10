@@ -360,6 +360,8 @@ typedef void 					tb_void_t;
 typedef signed long long 		tb_int64_t;
 typedef unsigned long long 		tb_uint64_t;
 typedef tb_int64_t				tb_sint64_t;
+#else
+# 	error int64 is not supported.
 #endif
 
 // handle

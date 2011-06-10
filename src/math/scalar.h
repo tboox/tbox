@@ -28,6 +28,7 @@
  */
 #include "prefix.h"
 #include "fixed.h"
+#include "fixed6.h"
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 # 	include "float.h"
@@ -60,6 +61,9 @@
 #define tb_fixed_to_scalar(x) 		(x)
 #define tb_scalar_to_fixed(x) 		(x)
 
+#define tb_fixed6_to_scalar(x) 		tb_fixed6_to_fixed(x)
+#define tb_scalar_to_fixed6(x) 		tb_fixed_to_fixed6(x)
+
 // round
 #define tb_scalar_round(x) 			tb_fixed_round(x)
 #define tb_scalar_ceil(x) 			tb_fixed_ceil(x)
@@ -82,6 +86,8 @@
 #define tb_scalar_exp1(x) 			tb_fixed_exp1(x)
 #define tb_scalar_expi(x) 			tb_fixed_expi(x)
 #define tb_scalar_ilog2(x) 			tb_fixed_ilog2(x)
+#define tb_scalar_iclog2(x) 		tb_fixed_iclog2(x)
+#define tb_scalar_irlog2(x) 		tb_fixed_irlog2(x)
 
 #elif defined(TB_CONFIG_TYPE_FLOAT)
 
@@ -90,6 +96,7 @@
 #define TB_SCALAR_MAX 				TB_FLOAT_MAX
 #define TB_SCALAR_MIN 				TB_FLOAT_MIN
 #define TB_SCALAR_NAN 				TB_FLOAT_NAN
+#define TB_SCALAR_INF 				TB_FLOAT_INF
 #define TB_SCALAR_PI 				TB_FLOAT_PI
 #define TB_SCALAR_SQRT2 			TB_FLOAT_SQRT2
 
@@ -104,6 +111,9 @@
 
 #define tb_fixed_to_scalar(x) 		tb_fixed_to_float(x)
 #define tb_scalar_to_fixed(x) 		tb_float_to_fixed(x)
+
+#define tb_fixed6_to_scalar(x) 		tb_fixed6_to_float(x)
+#define tb_scalar_to_fixed6(x) 		tb_float_to_fixed6(x)
 
 // round
 #define tb_scalar_round(x) 			tb_float_round(x)
@@ -127,6 +137,8 @@
 #define tb_scalar_exp1(x) 			tb_float_exp1(x)
 #define tb_scalar_expi(x) 			tb_float_expi(x)
 #define tb_scalar_ilog2(x) 			tb_float_ilog2(x)
+#define tb_scalar_iclog2(x) 		tb_float_iclog2(x)
+#define tb_scalar_irlog2(x) 		tb_float_irlog2(x)
 
 #else
 # 	error float is not supported.

@@ -32,10 +32,25 @@
  * macros
  */
 
+// constant
+#define TB_FIXED30_ONE 					(1 << 30)
+#define TB_FIXED30_HALF 				(1 << 29)
+#define TB_FIXED30_MAX 					(TB_MAXS32)
+#define TB_FIXED30_MIN 					(-TB_FIXED30_MAX)
+#define TB_FIXED30_NAN 					((tb_int_t)0x80000000)
+#define TB_FIXED30_INF 					(TB_MAXS32)
+#define TB_FIXED30_PI 					(0xc90fdaa2)
+#define TB_FIXED30_SQRT2 				(0x5a827999)
 
-/* ////////////////////////////////////////////////////////////////////////
- * interfaces
- */
+// conversion
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	ifndef tb_fixed30_to_float
+# 		define tb_fixed30_to_float(x) 	(((x) * 0.00000000093132257f))
+# 	endif
+# 	ifndef tb_float_to_fixed30
+# 		define tb_float_to_fixed30(x) 	((tb_fixed30_t)((x) * TB_FIXED30_ONE))
+# 	endif
+#endif
 
 
 #endif

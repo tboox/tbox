@@ -134,3 +134,13 @@ tb_uint32_t tb_float_ilog2_generic(tb_float_t x)
 	TB_ASSERT(x > 0);
 	return tb_int32_log2(tb_float_round(x));
 }
+tb_uint32_t tb_float_iclog2_generic(tb_float_t x)
+{
+	TB_ASSERT(x > 0);
+	return tb_int32_clog2(tb_float_round(x));
+}
+tb_uint32_t tb_float_irlog2_generic(tb_float_t x)
+{
+	TB_ASSERT(x > 0);
+	return tb_int32_rlog2(tb_float_round(x));
+}
