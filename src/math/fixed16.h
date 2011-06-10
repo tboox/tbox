@@ -87,59 +87,67 @@
 #endif
 
 #ifndef tb_fixed16_mul
-    #define tb_fixed16_mul(x, y) 		tb_fixed16_mul_generic(x, y)
+# 	define tb_fixed16_mul(x, y) 		tb_fixed16_mul_generic(x, y)
 #endif
 
 #ifndef tb_fixed16_div
-    #define tb_fixed16_div(x, y) 		tb_fixed16_div_generic(x, y)
+# 	define tb_fixed16_div(x, y) 		tb_fixed16_div_generic(x, y)
 #endif
 
 #ifndef tb_fixed16_sqre
-    #define tb_fixed16_sqre(x) 			tb_fixed16_sqre_generic(x)
+# 	define tb_fixed16_sqre(x) 			tb_fixed16_sqre_generic(x)
 #endif
 
 #ifndef tb_fixed16_sqrt
-    #define tb_fixed16_sqrt(x) 			tb_fixed16_sqrt_generic(x)
+# 	define tb_fixed16_sqrt(x) 			tb_fixed16_sqrt_generic(x)
 #endif
 
 #ifndef tb_fixed16_sin
-    #define tb_fixed16_sin(x) 			tb_fixed16_sin_generic(x)
+# 	define tb_fixed16_sin(x) 			tb_fixed16_sin_generic(x)
 #endif
 
 #ifndef tb_fixed16_cos
-    #define tb_fixed16_cos(x) 			tb_fixed16_cos_generic(x)
+# 	define tb_fixed16_cos(x) 			tb_fixed16_cos_generic(x)
 #endif
 
 #ifndef tb_fixed16_tan
-    #define tb_fixed16_tan(x) 			tb_fixed16_tan_generic(x)
+# 	define tb_fixed16_tan(x) 			tb_fixed16_tan_generic(x)
 #endif
 
 #ifndef tb_fixed16_asin
-    #define tb_fixed16_asin(x) 			tb_fixed16_asin_generic(x)
+# 	define tb_fixed16_asin(x) 			tb_fixed16_asin_generic(x)
 #endif
 
 #ifndef tb_fixed16_acos
-    #define tb_fixed16_acos(x) 			tb_fixed16_acos_generic(x)
+# 	define tb_fixed16_acos(x) 			tb_fixed16_acos_generic(x)
 #endif
 
 #ifndef tb_fixed16_atan
-    #define tb_fixed16_atan(x) 			tb_fixed16_atan_generic(x)
+# 	define tb_fixed16_atan(x) 			tb_fixed16_atan_generic(x)
 #endif
 
 #ifndef tb_fixed16_exp
-    #define tb_fixed16_exp(x) 			tb_fixed16_exp_generic(x)
+# 	define tb_fixed16_exp(x) 			tb_fixed16_exp_generic(x)
 #endif
 
 #ifndef tb_fixed16_expi
-    #define tb_fixed16_expi(x) 			tb_fixed16_expi_generic(x)
+# 	define tb_fixed16_expi(x) 			tb_fixed16_expi_generic(x)
 #endif
 
 #ifndef tb_fixed16_exp1
-    #define tb_fixed16_exp1(x) 			tb_fixed16_exp1_generic(x)
+# 	define tb_fixed16_exp1(x) 			tb_fixed16_exp1_generic(x)
 #endif
 
 #ifndef tb_fixed16_ilog2
-    #define tb_fixed16_ilog2(x) 		tb_fixed16_ilog2_generic(x)
+# 	define tb_fixed16_ilog2(x) 			tb_fixed16_ilog2_generic(x)
+#endif
+
+#ifndef tb_fixed16_iclog2
+# 	define tb_fixed16_iclog2(x) 		tb_fixed16_iclog2_generic(x)
+#endif
+
+#ifndef tb_fixed16_irlog2
+# 	define tb_fixed16_irlog2(x) 		tb_fixed16_irlog2_generic(x)
 #endif
 
 
@@ -161,6 +169,8 @@ tb_fixed16_t tb_fixed16_exp_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_exp1_generic(tb_fixed16_t x);
 tb_fixed16_t tb_fixed16_expi_generic(tb_uint16_t x);
 tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x);
+tb_uint32_t tb_fixed16_iclog2_generic(tb_fixed16_t x);
+tb_uint32_t tb_fixed16_irlog2_generic(tb_fixed16_t x);
 
 /* ////////////////////////////////////////////////////////////////////////
  * inlines

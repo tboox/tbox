@@ -216,7 +216,6 @@ typedef struct __tb_cookie_t
 
 }tb_cookie_t;
 
-
 // the cookies type
 typedef struct __tb_cookies_t
 {

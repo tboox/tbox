@@ -66,59 +66,67 @@
 #define tb_float_avg(x, y) 				(((x) + (y)) * 0.5)
 
 #ifndef tb_float_mul
-    #define tb_float_mul(x, y) 			((x) * (y))
+# 	define tb_float_mul(x, y) 			((x) * (y))
 #endif
 
 #ifndef tb_float_div
-    #define tb_float_div(x, y) 			((x) / (y))
+# 	define tb_float_div(x, y) 			((x) / (y))
 #endif
 
 #ifndef tb_float_sqre
-    #define tb_float_sqre(x) 			((x) * (x))
+# 	define tb_float_sqre(x) 			((x) * (x))
 #endif
 
 #ifndef tb_float_sqrt
-    #define tb_float_sqrt(x) 			tb_float_sqrt_generic(x)
+# 	define tb_float_sqrt(x) 			tb_float_sqrt_generic(x)
 #endif
 
 #ifndef tb_float_sin
-    #define tb_float_sin(x) 			tb_float_sin_generic(x)
+# 	define tb_float_sin(x) 				tb_float_sin_generic(x)
 #endif
 
 #ifndef tb_float_cos
-    #define tb_float_cos(x) 			tb_float_cos_generic(x)
+# 	define tb_float_cos(x) 				tb_float_cos_generic(x)
 #endif
 
 #ifndef tb_float_tan
-    #define tb_float_tan(x) 			tb_float_tan_generic(x)
+# 	define tb_float_tan(x) 				tb_float_tan_generic(x)
 #endif
 
 #ifndef tb_float_asin
-    #define tb_float_asin(x) 			tb_float_asin_generic(x)
+# 	define tb_float_asin(x) 			tb_float_asin_generic(x)
 #endif
 
 #ifndef tb_float_acos
-    #define tb_float_acos(x) 			tb_float_acos_generic(x)
+# 	define tb_float_acos(x) 			tb_float_acos_generic(x)
 #endif
 
 #ifndef tb_float_atan
-    #define tb_float_atan(x) 			tb_float_atan_generic(x)
+# 	define tb_float_atan(x) 			tb_float_atan_generic(x)
 #endif
 
 #ifndef tb_float_exp
-    #define tb_float_exp(x) 			tb_float_exp_generic(x)
+# 	define tb_float_exp(x) 				tb_float_exp_generic(x)
 #endif
 
 #ifndef tb_float_expi
-    #define tb_float_expi(x) 			tb_float_expi_generic(x)
+# 	define tb_float_expi(x) 			tb_float_expi_generic(x)
 #endif
 
 #ifndef tb_float_exp1
-    #define tb_float_exp1(x) 			tb_float_exp1_inline(x)
+# 	define tb_float_exp1(x) 			tb_float_exp1_inline(x)
 #endif
 
 #ifndef tb_float_ilog2
-    #define tb_float_ilog2(x) 			tb_float_ilog2_generic(x)
+# 	define tb_float_ilog2(x) 			tb_float_ilog2_generic(x)
+#endif
+
+#ifndef tb_float_iclog2
+# 	define tb_float_iclog2(x) 			tb_float_iclog2_generic(x)
+#endif
+
+#ifndef tb_float_irlog2
+# 	define tb_float_irlog2(x) 			tb_float_irlog2_generic(x)
 #endif
 
 
@@ -136,6 +144,8 @@ tb_float_t 		tb_float_atan_generic(tb_float_t x);
 tb_float_t 		tb_float_exp_generic(tb_float_t x);
 tb_float_t 		tb_float_expi_generic(tb_uint16_t x);
 tb_uint32_t 	tb_float_ilog2_generic(tb_float_t x);
+tb_uint32_t 	tb_float_iclog2_generic(tb_float_t x);
+tb_uint32_t 	tb_float_irlog2_generic(tb_float_t x);
 
 /* ////////////////////////////////////////////////////////////////////////
  * inlines

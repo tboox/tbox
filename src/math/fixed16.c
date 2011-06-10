@@ -154,3 +154,15 @@ tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x)
 	tb_uint32_t lg = tb_int32_log2(x);
 	return (lg > 16? (lg - 16) : 0);
 }
+tb_uint32_t tb_fixed16_iclog2_generic(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	tb_uint32_t lg = tb_int32_clog2(x);
+	return (lg > 16? (lg - 16) : 0);
+}
+tb_uint32_t tb_fixed16_irlog2_generic(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	tb_uint32_t lg = tb_int32_rlog2(x);
+	return (lg > 16? (lg - 16) : 0);
+}

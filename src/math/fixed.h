@@ -50,6 +50,9 @@
 #define tb_int_to_fixed(x) 			tb_int_to_fixed16(x)
 #define tb_fixed_to_int(x) 			tb_fixed16_to_int(x)
 
+#define tb_fixed6_to_fixed(x) 		tb_fixed6_to_fixed16(x)
+#define tb_fixed_to_fixed6(x) 		tb_fixed16_to_fixed6(x)
+
 // round
 #define tb_fixed_round(x) 			tb_fixed16_round(x)
 #define tb_fixed_ceil(x) 			tb_fixed16_ceil(x)
@@ -72,6 +75,8 @@
 #define tb_fixed_exp1(x) 			tb_fixed16_exp1(x)
 #define tb_fixed_expi(x) 			tb_fixed16_expi(x)
 #define tb_fixed_ilog2(x) 			tb_fixed16_ilog2(x)
+#define tb_fixed_iclog2(x) 			tb_fixed16_iclog2(x)
+#define tb_fixed_irlog2(x) 			tb_fixed16_irlog2(x)
 
 
 
