@@ -61,70 +61,93 @@
 #define tb_float_ceil(x) 				((x) > 0? (tb_int32_t)((x) + 0.9999999999) : (tb_int32_t)(x))
 #define tb_float_floor(x) 				((x) > 0? (tb_int32_t)(x) : (tb_int32_t)((x) - 0.9999999999))
 
-// operations
+// abs
 #define tb_float_abs(x) 				tb_abs(x)
+
+// avg
 #define tb_float_avg(x, y) 				(((x) + (y)) * 0.5)
 
+// mul
 #ifndef tb_float_mul
 # 	define tb_float_mul(x, y) 			((x) * (y))
 #endif
 
+// div
 #ifndef tb_float_div
 # 	define tb_float_div(x, y) 			((x) / (y))
 #endif
 
+// invert: 1 / x
+#ifndef tb_float_invert
+# 	define tb_float_invert(x) 			tb_float_div(TB_FLOAT_ONE, x)
+#endif
+
+// sqre: x * x
 #ifndef tb_float_sqre
 # 	define tb_float_sqre(x) 			((x) * (x))
 #endif
 
+// sqrt
 #ifndef tb_float_sqrt
 # 	define tb_float_sqrt(x) 			tb_float_sqrt_generic(x)
 #endif
 
+// sin
 #ifndef tb_float_sin
 # 	define tb_float_sin(x) 				tb_float_sin_generic(x)
 #endif
 
+// cos
 #ifndef tb_float_cos
 # 	define tb_float_cos(x) 				tb_float_cos_generic(x)
 #endif
 
+// tan
 #ifndef tb_float_tan
 # 	define tb_float_tan(x) 				tb_float_tan_generic(x)
 #endif
 
+// asin
 #ifndef tb_float_asin
 # 	define tb_float_asin(x) 			tb_float_asin_generic(x)
 #endif
 
+// acos
 #ifndef tb_float_acos
 # 	define tb_float_acos(x) 			tb_float_acos_generic(x)
 #endif
 
+// atan
 #ifndef tb_float_atan
 # 	define tb_float_atan(x) 			tb_float_atan_generic(x)
 #endif
 
+// exp
 #ifndef tb_float_exp
 # 	define tb_float_exp(x) 				tb_float_exp_generic(x)
 #endif
 
+// expi
 #ifndef tb_float_expi
 # 	define tb_float_expi(x) 			tb_float_expi_generic(x)
 #endif
 
+// exp1
 #ifndef tb_float_exp1
 # 	define tb_float_exp1(x) 			tb_float_exp1_inline(x)
 #endif
 
+// ilog2 = floor(log2)
 #ifndef tb_float_ilog2
 # 	define tb_float_ilog2(x) 			tb_float_ilog2_generic(x)
 #endif
 
+// iclog2 = ceil(log2)
 #ifndef tb_float_iclog2
 # 	define tb_float_iclog2(x) 			tb_float_iclog2_generic(x)
 #endif
 
+// irlog2 = round(log2)
 #ifndef tb_float_irlog2
 # 	define tb_float_irlog2(x) 			tb_float_irlog2_generic(x)
 #endif

@@ -12,27 +12,88 @@ static void tb_scalar_test_constant()
 }
 static void tb_scalar_test_round(tb_scalar_t x)
 {
-	tb_printf("[scalar]: round(%f): %d\n", tb_scalar_to_float(x), tb_scalar_round(x));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_int_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_round(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: round(%f): %d, %d ms\n", tb_scalar_to_float(x), r, (tb_int_t)t);
 }
 static void tb_scalar_test_floor(tb_scalar_t x)
 {
-	tb_printf("[scalar]: floor(%f): %d\n", tb_scalar_to_float(x), tb_scalar_floor(x));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_int_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_floor(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: floor(%f): %d, %d ms\n", tb_scalar_to_float(x), r, (tb_int_t)t);
 }
 static void tb_scalar_test_ceil(tb_scalar_t x)
 {
-	tb_printf("[scalar]: ceil(%f): %d\n", tb_scalar_to_float(x), tb_scalar_ceil(x));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_int_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_ceil(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: ceil(%f): %d, %d ms\n", tb_scalar_to_float(x), r, (tb_int_t)t);
 }
 static void tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
 {
-	tb_printf("[scalar]: mul(%f, %f): %f\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(tb_scalar_mul(a, b)));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_mul(a, b);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: mul(%f, %f): %f, %d ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), (tb_int_t)t);
+
 }
 static void tb_scalar_test_div(tb_scalar_t a, tb_scalar_t b)
 {
-	tb_printf("[scalar]: div(%f, %f): %f\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(tb_scalar_div(a, b)));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_div(a, b);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: div(%f, %f): %f, %d ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), (tb_int_t)t);
+}
+static void tb_scalar_test_invert(tb_scalar_t x)
+{
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_invert(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: invert(%f): %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), (tb_int_t)t);
 }
 static void tb_scalar_test_sqre(tb_scalar_t x)
 {
-	tb_printf("[scalar]: sqre(%f): %f\n", tb_scalar_to_float(x), tb_scalar_to_float(tb_scalar_sqre(x)));
+	__tb_volatile__ tb_int_t 	n = 10000000;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		r = tb_scalar_sqre(x);
+	}
+	t = tb_mclock() - t;
+	tb_printf("[scalar]: sqre(%f): %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), (tb_int_t)t);
 }
 static void tb_scalar_test_sqrt(tb_scalar_t x)
 {
@@ -106,7 +167,8 @@ int main(int argc, char** argv)
 	tb_scalar_test_ceil(TB_SCALAR_PI);
 	tb_scalar_test_ceil(-TB_SCALAR_PI);
 	tb_scalar_test_mul(TB_SCALAR_PI, -TB_SCALAR_PI);
-	tb_scalar_test_div(TB_SCALAR_PI, tb_int_to_scalar(10));
+	tb_scalar_test_div(TB_SCALAR_ONE, TB_SCALAR_PI);
+	tb_scalar_test_invert(TB_SCALAR_PI);
 	tb_scalar_test_sqre(TB_SCALAR_PI);
 	tb_scalar_test_sqre(-TB_SCALAR_PI);
 	tb_scalar_test_sqrt(TB_SCALAR_PI);

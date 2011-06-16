@@ -9,9 +9,9 @@
 //#define TB_CONFIG_ARCH_PPC
 //#define TB_CONFIG_ARCH_SH4
 
-// platform
-#define TB_CONFIG_PLAT_LINUX_x86
-//#define TB_CONFIG_PLAT_BIGENDIAN
+// cpu
+//#define TB_CONFIG_CPU_BIGENDIAN
+//#define TB_CONFIG_CPU_HAS_CONDITIONAL_INSTR
 
 // compiler
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE

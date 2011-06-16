@@ -158,3 +158,4 @@ void tb_bits_swap_u32(tb_uint32_t* p)
 	q[3] = b0;
 	q[2] = b1;
 }
+

@@ -27,7 +27,9 @@
  * includes
  */
 #include "prefix.h"
+#include "fixed6.h"
 #include "fixed16.h"
+#include "fixed30.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -53,6 +55,9 @@
 #define tb_fixed6_to_fixed(x) 		tb_fixed6_to_fixed16(x)
 #define tb_fixed_to_fixed6(x) 		tb_fixed16_to_fixed6(x)
 
+#define tb_fixed30_to_fixed(x) 		tb_fixed30_to_fixed16(x)
+#define tb_fixed_to_fixed30(x) 		tb_fixed16_to_fixed30(x)
+
 // round
 #define tb_fixed_round(x) 			tb_fixed16_round(x)
 #define tb_fixed_ceil(x) 			tb_fixed16_ceil(x)
@@ -63,6 +68,7 @@
 #define tb_fixed_avg(x, y) 			tb_fixed16_avg(x, y)
 #define tb_fixed_mul(x, y) 			tb_fixed16_mul(x, y)
 #define tb_fixed_div(x, y) 			tb_fixed16_div(x, y)
+#define tb_fixed_invert(x) 			tb_fixed16_invert(x)
 #define tb_fixed_sqre(x) 			tb_fixed16_sqre(x)
 #define tb_fixed_sqrt(x) 			tb_fixed16_sqrt(x)
 #define tb_fixed_sin(x) 			tb_fixed16_sin(x)
