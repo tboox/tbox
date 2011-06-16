@@ -27,6 +27,11 @@
  * includes
  */
 #include "prefix.h"
+#include "int32.h"
+
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	include "float.h"
+#endif
 
 #if defined(TB_CONFIG_ARCH_x86)
 # 	include "opt/fixed16_x86.h"
@@ -70,107 +75,165 @@
 
 // round
 #define tb_fixed16_round(x) 			(((x) + TB_FIXED16_HALF) >> 16)
+
+// ceil
 #define tb_fixed16_ceil(x) 				(((x) + TB_FIXED16_ONE - 1) >> 16)
+
+// floor
 #define tb_fixed16_floor(x) 			((x) >> 16)
 
-// operations
+// abs
 #define tb_fixed16_abs(x) 				tb_abs(x)
+
+// avg
 #define tb_fixed16_avg(x, y) 			(((x) + (y)) >> 1)
 
-#ifdef TB_CONFIG_TYPE_INT64
-# 	ifndef tb_fixed16_mul
-# 		define tb_fixed16_mul(x, y) 	tb_fixed16_mul_int64(x, y)
-# 	endif
-# 	ifndef tb_fixed16_sqre
-# 	 	define tb_fixed16_sqre(x) 		tb_fixed16_sqre_int64(x)
-# 	endif
-#endif
-
+// mul
 #ifndef tb_fixed16_mul
-# 	define tb_fixed16_mul(x, y) 		tb_fixed16_mul_generic(x, y)
+# 	if defined(TB_CONFIG_TYPE_INT64)
+# 		define tb_fixed16_mul(x, y) 	tb_fixed16_mul_int64(x, y)
+# 	elif defined(TB_CONFIG_TYPE_FLOAT)
+# 		define tb_fixed16_mul(x, y) 	tb_fixed16_mul_float(x, y)
+# 	else
+# 		define tb_fixed16_mul(x, y) 	tb_fixed16_mul_int32(x, y)
+# 	endif
 #endif
 
+// div
 #ifndef tb_fixed16_div
-# 	define tb_fixed16_div(x, y) 		tb_fixed16_div_generic(x, y)
+# 	if defined(TB_CONFIG_TYPE_INT64)
+# 		define tb_fixed16_div(x, y) 	tb_fixed16_div_int64(x, y)
+# 	elif defined(TB_CONFIG_TYPE_FLOAT)
+# 		define tb_fixed16_div(x, y) 	tb_fixed16_div_float(x, y)
+# 	else
+# 		define tb_fixed16_div(x, y) 	tb_int32_div(x, y, 16)
+# 	endif
 #endif
 
+// invert: 1 / x
+#ifndef tb_fixed16_invert
+# 	if defined(TB_CONFIG_TYPE_INT64)
+# 		define tb_fixed16_invert(x) 	tb_fixed16_div(TB_FIXED16_ONE, x)
+# 	elif defined(TB_CONFIG_TYPE_FLOAT)
+# 		define tb_fixed16_invert(x) 	tb_fixed16_div(TB_FIXED16_ONE, x)
+# 	else
+# 		define tb_fixed16_invert(x) 	tb_fixed16_invert_int32(x)
+# 	endif
+#endif
+
+// sqre
 #ifndef tb_fixed16_sqre
-# 	define tb_fixed16_sqre(x) 			tb_fixed16_sqre_generic(x)
+# 	if defined(TB_CONFIG_TYPE_INT64)
+# 		define tb_fixed16_sqre(x) 		tb_fixed16_sqre_int64(x)
+# 	elif defined(TB_CONFIG_TYPE_FLOAT)
+# 		define tb_fixed16_sqre(x) 		tb_fixed16_sqre_float(x)
+# 	else
+# 		define tb_fixed16_sqre(x) 		tb_fixed16_sqre_int32(x)
+# 	endif
 #endif
 
+// sqrt
 #ifndef tb_fixed16_sqrt
-# 	define tb_fixed16_sqrt(x) 			tb_fixed16_sqrt_generic(x)
+# 	define tb_fixed16_sqrt(x) 			tb_fixed16_sqrt_int32(x)
 #endif
 
+// sin
 #ifndef tb_fixed16_sin
-# 	define tb_fixed16_sin(x) 			tb_fixed16_sin_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_sin(x) 		tb_fixed16_sin_float(x)
+# 	else
+# 		define tb_fixed16_sin(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// cos
 #ifndef tb_fixed16_cos
-# 	define tb_fixed16_cos(x) 			tb_fixed16_cos_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_cos(x) 		tb_fixed16_cos_float(x)
+# 	else
+# 		define tb_fixed16_cos(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// tan
 #ifndef tb_fixed16_tan
-# 	define tb_fixed16_tan(x) 			tb_fixed16_tan_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_tan(x) 		tb_fixed16_tan_float(x)
+# 	else
+# 		define tb_fixed16_tan(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// asin
 #ifndef tb_fixed16_asin
-# 	define tb_fixed16_asin(x) 			tb_fixed16_asin_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_asin(x) 		tb_fixed16_asin_float(x)
+# 	else
+# 		define tb_fixed16_asin(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// acos
 #ifndef tb_fixed16_acos
-# 	define tb_fixed16_acos(x) 			tb_fixed16_acos_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_acos(x) 		tb_fixed16_acos_float(x)
+# 	else
+# 		define tb_fixed16_acos(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// atan
 #ifndef tb_fixed16_atan
-# 	define tb_fixed16_atan(x) 			tb_fixed16_atan_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_atan(x) 		tb_fixed16_atan_float(x)
+# 	else
+# 		define tb_fixed16_atan(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// exp
 #ifndef tb_fixed16_exp
-# 	define tb_fixed16_exp(x) 			tb_fixed16_exp_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_exp(x) 		tb_fixed16_exp_float(x)
+# 	else
+# 		define tb_fixed16_exp(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
 #ifndef tb_fixed16_expi
-# 	define tb_fixed16_expi(x) 			tb_fixed16_expi_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_expi(x) 		tb_fixed16_expi_float(x)
+# 	else
+# 		define tb_fixed16_expi(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
 #ifndef tb_fixed16_exp1
-# 	define tb_fixed16_exp1(x) 			tb_fixed16_exp1_generic(x)
+# 	ifdef TB_CONFIG_TYPE_FLOAT
+# 		define tb_fixed16_exp1(x) 		tb_fixed16_exp1_float(x)
+# 	else
+# 		define tb_fixed16_exp1(x) 		TB_ASSERT(0)
+# 	endif
 #endif
 
+// log
 #ifndef tb_fixed16_ilog2
-# 	define tb_fixed16_ilog2(x) 			tb_fixed16_ilog2_generic(x)
+# 	define tb_fixed16_ilog2(x) 			tb_fixed16_ilog2_int32(x)
 #endif
 
 #ifndef tb_fixed16_iclog2
-# 	define tb_fixed16_iclog2(x) 		tb_fixed16_iclog2_generic(x)
+# 	define tb_fixed16_iclog2(x) 		tb_fixed16_iclog2_int32(x)
 #endif
 
 #ifndef tb_fixed16_irlog2
-# 	define tb_fixed16_irlog2(x) 		tb_fixed16_irlog2_generic(x)
+# 	define tb_fixed16_irlog2(x) 		tb_fixed16_irlog2_int32(x)
 #endif
-
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_fixed16_t tb_fixed16_mul_generic(tb_fixed16_t x, tb_fixed16_t y);
-tb_fixed16_t tb_fixed16_div_generic(tb_fixed16_t x, tb_fixed16_t y);
-tb_fixed16_t tb_fixed16_sqre_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_sqrt_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_sin_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_cos_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_tan_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_asin_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_acos_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_atan_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_exp_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_exp1_generic(tb_fixed16_t x);
-tb_fixed16_t tb_fixed16_expi_generic(tb_uint16_t x);
-tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x);
-tb_uint32_t tb_fixed16_iclog2_generic(tb_fixed16_t x);
-tb_uint32_t tb_fixed16_irlog2_generic(tb_fixed16_t x);
+tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x);
 
 /* ////////////////////////////////////////////////////////////////////////
  * inlines
@@ -196,12 +259,118 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed1
 {
 	return (tb_fixed16_t)((tb_int64_t)x * y >> 16);
 }
+static __tb_inline__ tb_fixed16_t tb_fixed16_div_int64(tb_fixed16_t x, tb_fixed16_t y)
+{
+	TB_ASSERT(y);
+	return (tb_fixed16_t)((((tb_int64_t)x) << 16) / y);
+}
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
 {
 	return (tb_fixed16_t)((tb_int64_t)x * x >> 16);
 }
 #endif
 
+#ifdef TB_CONFIG_TYPE_FLOAT
+static __tb_inline__ tb_fixed16_t tb_fixed16_mul_float(tb_fixed16_t x, tb_fixed16_t y)
+{
+	return tb_float_to_fixed16(tb_float_mul(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_div_float(tb_fixed16_t x, tb_fixed16_t y)
+{
+	TB_ASSERT(y);
+	return tb_float_to_fixed16((tb_float_t)x / y);
+	//return tb_float_to_fixed16(tb_float_div(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_sqre(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_sin_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_sin(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_cos_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_cos(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_tan_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_tan(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_asin_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_asin(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_acos_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_acos(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_atan_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_atan(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_exp_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_exp(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_exp1_float(tb_fixed16_t x)
+{
+	return tb_float_to_fixed16(tb_float_exp1(tb_fixed16_to_float(x)));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_expi_float(tb_uint16_t x)
+{
+	return tb_float_to_fixed16(tb_float_expi(x));
+}
+#endif
+
+static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int32(tb_fixed16_t x, tb_fixed16_t y)
+{
+	// get sign
+	tb_int32_t s = tb_int32_get_sign(x ^ y);
+	x = tb_fixed16_abs(x);
+	y = tb_fixed16_abs(y);
+
+	tb_uint32_t xh = x >> 16;
+	tb_uint32_t xl = x & 0xffff;
+	tb_uint32_t yh = y >> 16;
+	tb_uint32_t yl = y & 0xffff;
+
+	tb_uint32_t r = xh * y + xl * yh + (xl * yl >> 16);
+	return tb_int32_set_sign(r, s);
+}
+
+static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int32(tb_fixed16_t x)
+{
+	x = tb_fixed16_abs(x);
+
+	tb_uint32_t xh = x >> 16;
+	tb_uint32_t xl = x & 0xffff;
+
+	return (xh * x + xl * xh + (xl * xl >> 16));
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_sqrt_int32(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	return (x > 0? (tb_int32_sqrt(x) << 8) : 0);
+}
+static __tb_inline__ tb_uint32_t tb_fixed16_ilog2_int32(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	tb_uint32_t lg = tb_int32_log2(x);
+	return (lg > 16? (lg - 16) : 0);
+}
+static __tb_inline__ tb_uint32_t tb_fixed16_iclog2_int32(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	tb_uint32_t lg = tb_int32_clog2(x);
+	return (lg > 16? (lg - 16) : 0);
+}
+static __tb_inline__ tb_uint32_t tb_fixed16_irlog2_int32(tb_fixed16_t x)
+{
+	TB_ASSERT(x > 0);
+	tb_uint32_t lg = tb_int32_rlog2(x);
+	return (lg > 16? (lg - 16) : 0);
+}
 
 #endif
 

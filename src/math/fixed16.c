@@ -10,9 +10,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received x copy of the GNU General Public License
  * along with TBox; 
- * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
+ * If not, see <x href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</x>
  * 
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
@@ -26,143 +26,37 @@
 #include "fixed16.h"
 #include "int32.h"
 
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-#endif
-
 /* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
-tb_fixed16_t tb_fixed16_mul_generic(tb_fixed16_t x, tb_fixed16_t y)
+tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
 {
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_mul(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
+	// is one?
+    if (x == TB_FIXED16_ONE) return TB_FIXED16_ONE;
+
+	// get sign
+	tb_int32_t s = tb_int32_get_sign(x);
+
+	// abs(x)
+	x = tb_fixed16_abs(x);
+
+	// is infinity?
+	if (x <= 2) return tb_int32_set_sign(TB_FIXED16_MAX, s);
+
+	// normalize
+	tb_int32_t clz = tb_int32_clz(x);
+	x = x << clz >> 16;
+ 
+	// compute 1 / x approximation (0.5 <= x < 1.0) 
+	// (2.90625 (~2.914) - 2 * x) >> 1
+	tb_uint32_t r = 0x17400 - x;      
+
+	// newton-raphson iteration:
+	// x = r * (2 - x * r) = ((r / 2) * (1 - x * r / 2)) * 4
+	r = ((0x10000 - ((x * r) >> 16)) * r) >> 15;
+	r = ((0x10000 - ((x * r) >> 16)) * r) >> (30 - clz);
+
+	return tb_int32_set_sign(r, s);
 }
 
-tb_fixed16_t tb_fixed16_div_generic(tb_fixed16_t x, tb_fixed16_t y)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_div(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_sqre_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_sqre(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_sqrt_generic(tb_fixed16_t x)
-{
-	TB_ASSERT(x > 0);
-	return (x > 0? (tb_int32_sqrt(x) << 8) : 0);
-}
-tb_fixed16_t tb_fixed16_sin_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_sin(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_cos_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_cos(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_tan_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_tan(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_asin_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_asin(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_acos_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_acos(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_atan_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_atan(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_exp_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_exp(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_exp1_generic(tb_fixed16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_exp1(tb_fixed16_to_float(x)));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_fixed16_t tb_fixed16_expi_generic(tb_uint16_t x)
-{
-#ifdef TB_CONFIG_TYPE_FLOAT
-	return tb_float_to_fixed16(tb_float_expi(x));
-#else
-	TB_NOT_IMPLEMENT();
-	return 0;
-#endif
-}
-tb_uint32_t tb_fixed16_ilog2_generic(tb_fixed16_t x)
-{
-	TB_ASSERT(x > 0);
-	tb_uint32_t lg = tb_int32_log2(x);
-	return (lg > 16? (lg - 16) : 0);
-}
-tb_uint32_t tb_fixed16_iclog2_generic(tb_fixed16_t x)
-{
-	TB_ASSERT(x > 0);
-	tb_uint32_t lg = tb_int32_clog2(x);
-	return (lg > 16? (lg - 16) : 0);
-}
-tb_uint32_t tb_fixed16_irlog2_generic(tb_fixed16_t x)
-{
-	TB_ASSERT(x > 0);
-	tb_uint32_t lg = tb_int32_rlog2(x);
-	return (lg > 16? (lg - 16) : 0);
-}

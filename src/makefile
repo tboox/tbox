@@ -11,10 +11,8 @@ tbox_TYPE 			= LIB
 tbox_C_FILES 		+= \
 					tbox \
 					math/int32 \
-					math/fixed6 \
-					math/fixed16 \
-					math/fixed30 \
 					math/float \
+					math/fixed16 \
 					memory/mpool \
 					memory/memops \
 					string/string \

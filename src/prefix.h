@@ -93,8 +93,8 @@ extern "C" {
 // not implement
 #define TB_NOT_IMPLEMENT() 							do { TB_DBG("[not_impl]: func: %s, line: %d, file: %s", __tb_func__, __tb_line__, __tb_file__); } while (0)
 
-// platform
-#ifdef TB_CONFIG_PLAT_BIGENDIAN
+// cpu
+#ifdef TB_CONFIG_CPU_BIGENDIAN
 # 	define TB_WORDS_BIGENDIAN
 # 	define TB_FLOAT_BIGENDIAN
 #endif

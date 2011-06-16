@@ -29,6 +29,8 @@
 #include "prefix.h"
 #include "fixed.h"
 #include "fixed6.h"
+#include "fixed16.h"
+#include "fixed30.h"
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 # 	include "float.h"
@@ -64,6 +66,9 @@
 #define tb_fixed6_to_scalar(x) 		tb_fixed6_to_fixed(x)
 #define tb_scalar_to_fixed6(x) 		tb_fixed_to_fixed6(x)
 
+#define tb_fixed30_to_scalar(x) 	tb_fixed30_to_fixed(x)
+#define tb_scalar_to_fixed30(x) 	tb_fixed_to_fixed30(x)
+
 // round
 #define tb_scalar_round(x) 			tb_fixed_round(x)
 #define tb_scalar_ceil(x) 			tb_fixed_ceil(x)
@@ -74,6 +79,7 @@
 #define tb_scalar_avg(x, y) 		tb_fixed_avg(x, y)
 #define tb_scalar_mul(x, y) 		tb_fixed_mul(x, y)
 #define tb_scalar_div(x, y) 		tb_fixed_div(x, y)
+#define tb_scalar_invert(x) 		tb_fixed_invert(x)
 #define tb_scalar_sqre(x) 			tb_fixed_sqre(x)
 #define tb_scalar_sqrt(x) 			tb_fixed_sqrt(x)
 #define tb_scalar_sin(x) 			tb_fixed_sin(x)
@@ -115,16 +121,20 @@
 #define tb_fixed6_to_scalar(x) 		tb_fixed6_to_float(x)
 #define tb_scalar_to_fixed6(x) 		tb_float_to_fixed6(x)
 
+#define tb_fixed30_to_scalar(x) 	tb_fixed30_to_float(x)
+#define tb_scalar_to_fixed30(x) 	tb_float_to_fixed30(x)
+
 // round
 #define tb_scalar_round(x) 			tb_float_round(x)
 #define tb_scalar_ceil(x) 			tb_float_ceil(x)
 #define tb_scalar_floor(x) 			tb_float_floor(x)
 
-// operations
+// functions
 #define tb_scalar_abs(x) 			tb_float_abs(x)
 #define tb_scalar_avg(x, y) 		tb_float_avg(x, y)
 #define tb_scalar_mul(x, y) 		tb_float_mul(x, y)
 #define tb_scalar_div(x, y) 		tb_float_div(x, y)
+#define tb_scalar_invert(x) 		tb_float_invert(x)
 #define tb_scalar_sqre(x) 			tb_float_sqre(x)
 #define tb_scalar_sqrt(x) 			tb_float_sqrt(x)
 #define tb_scalar_sin(x) 			tb_float_sin(x)
