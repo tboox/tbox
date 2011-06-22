@@ -139,20 +139,17 @@
 
 // sin
 #ifndef tb_fixed16_sin
-# 	ifdef TB_CONFIG_TYPE_FLOAT
-# 		define tb_fixed16_sin(x) 		tb_fixed16_sin_float(x)
-# 	else
-# 		define tb_fixed16_sin(x) 		TB_ASSERT(0)
-# 	endif
+# 	define tb_fixed16_sin(x) 			tb_fixed16_sin_int32(x)
 #endif
 
 // cos
 #ifndef tb_fixed16_cos
-# 	ifdef TB_CONFIG_TYPE_FLOAT
-# 		define tb_fixed16_cos(x) 		tb_fixed16_cos_float(x)
-# 	else
-# 		define tb_fixed16_cos(x) 		TB_ASSERT(0)
-# 	endif
+# 	define tb_fixed16_cos(x) 			tb_fixed16_cos_int32(x)
+#endif
+
+// sincos
+#ifndef tb_fixed16_sincos
+# 	define tb_fixed16_sincos(x, s, c) 	tb_fixed16_sincos_int32(x, s, c)
 #endif
 
 // tan
@@ -233,7 +230,8 @@
  * interfaces
  */
 
-tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x);
+tb_fixed16_t 	tb_fixed16_invert_int32(tb_fixed16_t x);
+void 			tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c);
 
 /* ////////////////////////////////////////////////////////////////////////
  * inlines
@@ -370,6 +368,18 @@ static __tb_inline__ tb_uint32_t tb_fixed16_irlog2_int32(tb_fixed16_t x)
 	TB_ASSERT(x > 0);
 	tb_uint32_t lg = tb_int32_rlog2(x);
 	return (lg > 16? (lg - 16) : 0);
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_sin_int32(tb_fixed16_t x)
+{
+	tb_fixed16_t s = 0;
+	tb_fixed16_sincos_int32(x, &s, TB_NULL);
+	return s;
+}
+static __tb_inline__ tb_fixed16_t tb_fixed16_cos_int32(tb_fixed16_t x)
+{
+	tb_fixed16_t c = 0;
+	tb_fixed16_sincos_int32(x, TB_NULL, &c);
+	return c;
 }
 
 #endif

@@ -73,6 +73,7 @@
 #define tb_fixed_sqrt(x) 			tb_fixed16_sqrt(x)
 #define tb_fixed_sin(x) 			tb_fixed16_sin(x)
 #define tb_fixed_cos(x) 			tb_fixed16_cos(x)
+#define tb_fixed_sincos(x, s, c) 	tb_fixed16_sincos(x, s, c)
 #define tb_fixed_tan(x) 			tb_fixed16_tan(x)
 #define tb_fixed_asin(x) 			tb_fixed16_asin(x)
 #define tb_fixed_acos(x) 			tb_fixed16_acos(x)
