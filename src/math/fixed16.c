@@ -27,6 +27,67 @@
 #include "int32.h"
 
 /* ////////////////////////////////////////////////////////////////////////
+ * globals
+ */
+static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
+{ 
+	0xc90f	// 44.999253
+,	0x76b1	// 26.564518
+,	0x3eb6	// 14.035438
+,	0x1fd5	// 7.124379
+,	0xffa	// 3.575741
+,	0x7ff	// 1.789619
+,	0x3ff	// 0.894372
+,	0x1ff	// 0.446749
+,	0xff	// 0.222937
+,	0x7f	// 0.111032
+,	0x3f	// 0.055079
+,	0x1f	// 0.027102
+,	0xf		// 0.013114
+,	0x7		// 0.006120
+,	0x3		// 0.002623
+,	0x1		// 0.000874
+};
+
+/* ////////////////////////////////////////////////////////////////////////
+ * details
+ */
+
+static void tb_fixed16_cordic(tb_fixed16_t* x0, tb_fixed16_t* y0, tb_fixed16_t* z0) 
+{
+	tb_int_t i = 0;
+	tb_fixed16_t x = *x0;
+	tb_fixed16_t y = *y0;
+	tb_fixed16_t z = *z0;
+	tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
+
+	do 
+	{
+		tb_fixed16_t xi = x >> i;
+		tb_fixed16_t yi = y >> i;
+		tb_fixed16_t atan2i = *patan2i++;
+		//tb_int32_t atan2i = tb_float_to_fixed16(atan(1. / (1 << i)));
+		//tb_printf(",\t0x%x\t// %f\n", atan2i, tb_fixed16_to_float(atan2i) * 180 / TB_FLOAT_PI);
+		if (z >= 0) 
+		{
+			x -= yi;
+			y += xi;
+			z -= atan2i;
+		} 
+		else 
+		{
+			x += yi;
+			y -= xi;
+			z += atan2i;
+		}
+
+	} while (++i < 16);
+
+	*x0 = x;
+	*y0 = y;
+	*z0 = z;
+}
+/* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
@@ -60,3 +121,15 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
 	return tb_int32_set_sign(r, s);
 }
 
+void tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c)
+{
+    tb_fixed16_t cos = 0x9b74; // k = 0.607252935
+	tb_fixed16_t sin = 0;
+	tb_fixed16_t ang = x;
+
+#error angle > 90
+    tb_fixed16_cordic(&cos, &sin, &ang);
+
+	if (s) *s = sin;
+	if (c) *c = cos;
+}

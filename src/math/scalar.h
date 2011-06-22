@@ -74,7 +74,7 @@
 #define tb_scalar_ceil(x) 			tb_fixed_ceil(x)
 #define tb_scalar_floor(x) 			tb_fixed_floor(x)
 
-// operations
+// functions
 #define tb_scalar_abs(x) 			tb_fixed_abs(x)
 #define tb_scalar_avg(x, y) 		tb_fixed_avg(x, y)
 #define tb_scalar_mul(x, y) 		tb_fixed_mul(x, y)
@@ -84,6 +84,7 @@
 #define tb_scalar_sqrt(x) 			tb_fixed_sqrt(x)
 #define tb_scalar_sin(x) 			tb_fixed_sin(x)
 #define tb_scalar_cos(x) 			tb_fixed_cos(x)
+#define tb_scalar_sincos(x, s, c) 	tb_fixed_sincos(x, s, c)
 #define tb_scalar_tan(x) 			tb_fixed_tan(x)
 #define tb_scalar_asin(x) 			tb_fixed_asin(x)
 #define tb_scalar_acos(x) 			tb_fixed_acos(x)
@@ -139,6 +140,7 @@
 #define tb_scalar_sqrt(x) 			tb_float_sqrt(x)
 #define tb_scalar_sin(x) 			tb_float_sin(x)
 #define tb_scalar_cos(x) 			tb_float_cos(x)
+#define tb_scalar_sincos(x, s, c) 	tb_float_sincos(x, s, c)
 #define tb_scalar_tan(x) 			tb_float_tan(x)
 #define tb_scalar_asin(x) 			tb_float_asin(x)
 #define tb_scalar_acos(x) 			tb_float_acos(x)

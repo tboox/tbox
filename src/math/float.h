@@ -102,6 +102,11 @@
 # 	define tb_float_cos(x) 				tb_float_cos_generic(x)
 #endif
 
+// sincos
+#ifndef tb_float_sincos
+# 	define tb_float_sincos(x, s, c) 	tb_float_sincos_generic(x, s, c)
+#endif
+
 // tan
 #ifndef tb_float_tan
 # 	define tb_float_tan(x) 				tb_float_tan_generic(x)
@@ -160,6 +165,7 @@
 tb_float_t 		tb_float_sqrt_generic(tb_float_t x);
 tb_float_t 		tb_float_sin_generic(tb_float_t x);
 tb_float_t 		tb_float_cos_generic(tb_float_t x);
+void 			tb_float_sincos_generic(tb_float_t x, tb_float_t* s, tb_float_t* c);
 tb_float_t 		tb_float_tan_generic(tb_float_t x);
 tb_float_t 		tb_float_asin_generic(tb_float_t x);
 tb_float_t 		tb_float_acos_generic(tb_float_t x);
