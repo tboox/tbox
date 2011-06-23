@@ -575,6 +575,27 @@ static void tb_float_test_cos()
 	tb_printf("[float]: cos(0 - 360), %d ms\n", (tb_int_t)t);
 }
 
+static void tb_float_test_tan()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
+	__tb_volatile__ tb_float_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 360; i++)
+			r = tb_float_tan(tb_float_test_angle[i]);
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 360; i++)
+	{
+		r = tb_float_tan(tb_float_test_angle[i]);
+		tb_printf("[float]: tan(%f) = %f, angle: %d\n", tb_float_to_float(tb_float_test_angle[i]), tb_float_to_float(r), i);
+	}
+	tb_printf("[float]: tan(0 - 360), %d ms\n", (tb_int_t)t);
+}
+
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -600,6 +621,7 @@ int main(int argc, char** argv)
 	tb_float_test_irlog2(TB_FLOAT_PI);
 	tb_float_test_sin();
 	tb_float_test_cos();
+	tb_float_test_tan();
 #endif
 
 	return 0;

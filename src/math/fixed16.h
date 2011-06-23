@@ -154,11 +154,7 @@
 
 // tan
 #ifndef tb_fixed16_tan
-# 	ifdef TB_CONFIG_TYPE_FLOAT
-# 		define tb_fixed16_tan(x) 		tb_fixed16_tan_float(x)
-# 	else
-# 		define tb_fixed16_tan(x) 		TB_ASSERT(0)
-# 	endif
+# 	define tb_fixed16_tan(x) 			tb_fixed16_tan_int32(x)
 #endif
 
 // asin
@@ -381,6 +377,12 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_cos_int32(tb_fixed16_t x)
 	tb_fixed16_sincos_int32(x, TB_NULL, &c);
 	return c;
 }
-
+static __tb_inline__ tb_fixed16_t tb_fixed16_tan_int32(tb_fixed16_t x)
+{
+	tb_fixed16_t s = 0;
+	tb_fixed16_t c = 0;
+	tb_fixed16_sincos_int32(x, &s, &c);
+	return tb_fixed16_div(s, c);
+}
 #endif
 
