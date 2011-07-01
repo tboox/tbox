@@ -366,6 +366,122 @@ static tb_float_t tb_float_test_angle[360] =
 ,	6.265732
 
 };
+
+static tb_float_t tb_float_test_arc[5][5] = 
+{
+	{TB_FLOAT_INF, 0.000000, 0.000000, 0.000000, 0.000000}
+, 	{TB_FLOAT_INF, 1.000000, 0.500000, 0.333333, 0.250000}
+, 	{TB_FLOAT_INF, 2.000000, 1.000000, 0.666667, 0.500000}
+, 	{TB_FLOAT_INF, 3.000000, 1.500000, 1.000000, 0.750000}
+, 	{TB_FLOAT_INF, 4.000000, 2.000000, 1.333333, 1.000000}
+
+};
+
+static tb_float_t tb_float_test_atan_a[] = 
+{
+	-10.000000
+,	-9.800000
+,	-9.600000
+,	-9.400000
+,	-9.200000
+,	-9.000000
+,	-8.800000
+,	-8.600000
+,	-8.400000
+,	-8.200000
+,	-8.000000
+,	-7.800000
+,	-7.600000
+,	-7.400000
+,	-7.200000
+,	-7.000000
+,	-6.800000
+,	-6.600000
+,	-6.400000
+,	-6.200000
+,	-6.000000
+,	-5.800000
+,	-5.600000
+,	-5.400000
+,	-5.200000
+,	-5.000000
+,	-4.800000
+,	-4.600000
+,	-4.400000
+,	-4.200000
+,	-4.000000
+,	-3.800000
+,	-3.600000
+,	-3.400000
+,	-3.200000
+,	-3.000000
+,	-2.800000
+,	-2.600000
+,	-2.400000
+,	-2.200000
+,	-2.000000
+,	-1.800000
+,	-1.600000
+,	-1.400000
+,	-1.200000
+,	-1.000000
+,	-0.800000
+,	-0.600000
+,	-0.400000
+,	-0.200000
+,	0.000000
+,	0.200000
+,	0.400000
+,	0.600000
+,	0.800000
+,	1.000000
+,	1.200000
+,	1.400000
+,	1.600000
+,	1.800000
+,	2.000000
+,	2.200000
+,	2.400000
+,	2.600000
+,	2.800000
+,	3.000000
+,	3.200000
+,	3.400000
+,	3.600000
+,	3.800000
+,	4.000000
+,	4.200000
+,	4.400000
+,	4.600000
+,	4.800000
+,	5.000000
+,	5.200000
+,	5.400000
+,	5.600000
+,	5.800000
+,	6.000000
+,	6.200000
+,	6.400000
+,	6.600000
+,	6.800000
+,	7.000000
+,	7.200000
+,	7.400000
+,	7.600000
+,	7.800000
+,	8.000000
+,	8.200000
+,	8.400000
+,	8.600000
+,	8.800000
+,	9.000000
+,	9.200000
+,	9.400000
+,	9.600000
+,	9.800000
+,	10.000000
+};
+
 static void tb_float_test_constant()
 {
 	tb_printf("[float]: one = %f\n", tb_float_to_float(TB_FLOAT_ONE));
@@ -522,7 +638,6 @@ static void tb_float_test_exp(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: exp(%f) = %f, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-#endif
 
 static void tb_float_test_sin()
 {
@@ -596,6 +711,146 @@ static void tb_float_test_tan()
 	tb_printf("[float]: tan(0 - 360), %d ms\n", (tb_int_t)t);
 }
 
+static void tb_float_test_atan2()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_float_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 50; i < 55; i++)
+		{
+			for (j = 50; j < 55; j++)
+			{
+				r = tb_float_atan2(i, j);
+				r = tb_float_atan2(i, -j);
+				r = tb_float_atan2(-i, -j);
+				r = tb_float_atan2(-i, j);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 50; i < 55; i++)
+	{
+		for (j = 50; j < 55; j++)
+		{
+			r = tb_float_atan2(i, j);
+			tb_printf("[float]: atan2(%d, %d) = %f\n", i, j, tb_float_to_float(r));
+			r = tb_float_atan2(i, -j);
+			tb_printf("[float]: atan2(%d, %d) = %f\n", i, -j, tb_float_to_float(r));
+			r = tb_float_atan2(-i, -j);
+			tb_printf("[float]: atan2(%d, %d) = %f\n", -i, -j, tb_float_to_float(r));
+			r = tb_float_atan2(-i, j);
+			tb_printf("[float]: atan2(%d, %d) = %f\n", -i, j, tb_float_to_float(r));
+		}
+	}
+
+	tb_printf("[float]: atan2(), %d ms\n", (tb_int_t)t);
+}
+
+static void tb_float_test_asin()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_float_t 	r = 0;
+	__tb_volatile__ tb_float_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_float_test_arc[i][j];
+				r = tb_float_asin(a);
+				r = tb_float_asin(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_float_test_arc[i][j];
+			r = tb_float_asin(a);
+			tb_printf("[float]: asin(%f) = %f\n", tb_float_to_float(a), tb_float_to_float(r));
+			r = tb_float_asin(-a);
+			tb_printf("[float]: asin(%f) = %f\n", tb_float_to_float(-a), tb_float_to_float(r));
+		}
+	}
+
+	tb_printf("[float]: asin, %d ms\n", (tb_int_t)t);
+}
+static void tb_float_test_acos()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_float_t 	r = 0;
+	__tb_volatile__ tb_float_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_float_test_arc[i][j];
+				r = tb_float_acos(a);
+				r = tb_float_acos(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_float_test_arc[i][j];
+			r = tb_float_acos(a);
+			tb_printf("[float]: acos(%f) = %f\n", tb_float_to_float(a), tb_float_to_float(r));
+			r = tb_float_acos(-a);
+			tb_printf("[float]: acos(%f) = %f\n", tb_float_to_float(-a), tb_float_to_float(r));
+		}
+	}
+
+	tb_printf("[float]: acos, %d ms\n", (tb_int_t)t);
+}
+static void tb_float_test_atan()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_float_t 	r = 0;
+	__tb_volatile__ tb_float_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = -50; i <= 50; i++)
+		{
+			a = tb_float_test_atan_a[i + 50];
+			r = tb_float_atan(a);
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = -50; i <= 50; i++)
+	{
+		a = tb_float_test_atan_a[i + 50];
+		r = tb_float_atan(a);
+		tb_printf("[float]: atan(%f) = %f\n", tb_float_to_float(a), tb_float_to_float(r));
+	}
+
+	tb_printf("[float]: atan, %d ms\n", (tb_int_t)t);
+}
+#endif
+
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -622,6 +877,10 @@ int main(int argc, char** argv)
 	tb_float_test_sin();
 	tb_float_test_cos();
 	tb_float_test_tan();
+	tb_float_test_atan2();
+	tb_float_test_asin();
+	tb_float_test_acos();
+	tb_float_test_atan();
 #endif
 
 	return 0;

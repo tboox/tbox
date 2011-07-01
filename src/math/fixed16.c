@@ -95,11 +95,11 @@ static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
  */
 
 // |angle| < 90 degrees
-static void tb_fixed16_cordic(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t* z0) 
+static void tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t z0) 
 {
 	tb_int_t i = 0;
 	tb_fixed16_t atan2i = 0;
-	tb_fixed16_t z = *z0;
+	tb_fixed16_t z = z0;
 	tb_fixed30_t x = *x0;
 	tb_fixed30_t y = *y0;
 	tb_fixed30_t xi = 0;
@@ -120,6 +120,7 @@ static void tb_fixed16_cordic(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t* 
 		//atan2i = tb_float_to_fixed16(atan(1. / (1 << i))) * 0x28be;
 		//tb_printf(",\t0x%x\t// %f\n", atan2i, atan(1. / (1 << i)) * 180 / TB_FLOAT_PI);
 #endif
+
 		if (z >= 0) 
 		{
 			x -= yi;
@@ -137,8 +138,82 @@ static void tb_fixed16_cordic(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t* 
 
 	*x0 = x;
 	*y0 = y;
-	*z0 = z;
 }
+
+// |angle| < 90 degrees
+static tb_fixed16_t tb_fixed16_cordic_vector_atan2(tb_fixed16_t y0, tb_fixed16_t x0)
+{
+	tb_int_t i = 0;
+	tb_fixed16_t atan2i = 0;
+	tb_fixed16_t z = 0;
+	tb_fixed16_t x = x0;
+	tb_fixed16_t y = y0;
+	tb_fixed16_t xi = 0;
+	tb_fixed16_t yi = 0;
+	tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
+
+	do 
+	{
+		xi = x >> i;
+		yi = y >> i;
+
+		atan2i = *patan2i++;
+
+		if (y < 0) 
+		{
+			x -= yi;
+			y += xi;
+			z -= atan2i;
+		}
+		else 
+		{
+			x += yi;
+			y -= xi;
+			z += atan2i;
+		}
+
+	} while (++i < 16);
+
+	return z / 0x28be;
+}
+
+// |angle| < 90 degrees
+static tb_fixed16_t tb_fixed16_cordic_vector_asin(tb_fixed16_t m)
+{
+	tb_int_t i = 0;
+	tb_fixed16_t atan2i = 0;
+	tb_fixed16_t z = 0;
+	tb_fixed16_t x = 0x18bde0bb; 	// k = 0.607252935
+	tb_fixed16_t y = 0;
+	tb_fixed16_t xi = 0;
+	tb_fixed16_t yi = 0;
+	tb_fixed16_t const* patan2i = tb_fixed16_cordic_atan2i_table;
+
+	do 
+	{
+		xi = x >> i;
+		yi = y >> i;
+
+		atan2i = *patan2i++;
+
+		if (y < m) 
+		{
+			x -= yi;
+			y += xi;
+			z -= atan2i;
+		}
+		else 
+		{
+			x += yi;
+			y -= xi;
+			z += atan2i;
+		}
+
+	} while (++i < 16);
+
+	return z / 0x28be;
+}
+
 /* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
@@ -193,20 +268,84 @@ void tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c)
 	 * 2: 01 ...
 	 * 3: 10 ...
 	 * 4: 11 ...
+	 *
+	 * quadrant++
+	 *
+	 * 1: 01 ...
+	 * 2: 10 ...
+	 * 3: 11 ...
+	 * 4: 00 ...
+	 *
 	 */
 	tb_int_t 		quadrant = ang >> 30;
-
-	// a = pi - a, angle => [-90, 90] if |angle| > 90 .e.g quadrant is 2 or 4
-    if (quadrant & 0x1) ang = -ang + 0x80000000;
+	quadrant++;
 	
-	// rotation
-    tb_fixed16_cordic(&cos, &sin, &ang);
+	/* quadrant == 2, 3, |angle| < 90
+	 *
+	 * 100 => -100 + 180 => 80
+	 * -200 => 200 + 180 => -20
+	 */
+    if (quadrant & 0x2) ang = -ang + 0x80000000;
 
+	// rotation
+    tb_fixed16_cordic_rotation(&cos, &sin, ang);
+	
 	// result
-	if (s) *s = tb_fixed30_to_fixed16(sin);
-	if (c) 
+	if (s) 
 	{
-		if (quadrant & 0x1) cos = -cos;
+		// return sin
+		*s = tb_fixed30_to_fixed16(sin);
+	}
+	if (c) 
+	{	
+		// quadrant == 2, 3
+		if (quadrant & 0x2) cos = -cos;
+
+		// return cos
 		*c = tb_fixed30_to_fixed16(cos);
 	}
 }
+// slope angle: [-180, 180]
+// the precision will be pool if x, y is too small
+tb_fixed16_t tb_fixed16_atan2_int32(tb_fixed16_t y, tb_fixed16_t x)
+{
+ 	if (!(x | y)) return 0;
+
+	// abs
+	tb_int32_t xs = tb_int32_get_sign(x);
+    x = tb_fixed30_abs(x);
+
+	// quadrant: 1, 4
+	tb_fixed16_t z = tb_fixed16_cordic_vector_atan2(y, x);
+
+	// for quadrant: 2, 3
+    if (xs) 
+	{
+        tb_int32_t zs = tb_int32_get_sign(z);
+        if (y == 0) zs = 0;
+
+        tb_fixed16_t pi = tb_int32_set_sign(TB_FIXED16_PI, zs);
+        z = pi - z;
+    }
+    return z;
+}
+tb_fixed16_t tb_fixed16_asin_int32(tb_fixed16_t x)
+{
+	// abs
+	tb_int32_t s = tb_int32_get_sign(x);
+    x = tb_fixed16_abs(x);
+
+	if (x >= TB_FIXED16_ONE) return tb_int32_set_sign(TB_FIXED16_PI >> 1, s);
+
+	tb_fixed16_t z = tb_fixed16_cordic_vector_asin(x * 0x28be);
+	return tb_int32_set_sign(z, ~s);
+}
+
+// |angle| < 90
+// the precision will be pool if x is too large.
+tb_fixed16_t tb_fixed16_atan_int32(tb_fixed16_t x)
+{
+ 	if (!x) return 0;
+	return tb_fixed16_cordic_vector_atan2(x, TB_FIXED16_ONE);
+}
+
