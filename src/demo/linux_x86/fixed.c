@@ -364,6 +364,122 @@ static tb_fixed_t tb_fixed_test_angle[360] =
 ,	0x64407
 };
 
+static tb_fixed_t tb_fixed_test_arc[5][5] = 
+{
+	{ 0x7fffffff, 	0x0, 		0x0, 		0x0, 		0x0}
+, 	{0x7fffffff, 	0x10000, 	0x8000, 	0x5555, 	0x4000}
+, 	{0x7fffffff, 	0x20000, 	0x10000, 	0xaaaa, 	0x8000}
+, 	{0x7fffffff, 	0x30000, 	0x18000, 	0x10000, 	0xc000}
+, 	{0x7fffffff, 	0x40000, 	0x20000, 	0x15555, 	0x10000}
+
+};
+
+static tb_fixed_t tb_fixed_test_atan_a[] = 
+{
+	0xfff60000
+,	0xfff63334
+,	0xfff66667
+,	0xfff6999a
+,	0xfff6cccd
+,	0xfff70000
+,	0xfff73334
+,	0xfff76667
+,	0xfff7999a
+,	0xfff7cccd
+,	0xfff80000
+,	0xfff83334
+,	0xfff86667
+,	0xfff8999a
+,	0xfff8cccd
+,	0xfff90000
+,	0xfff93334
+,	0xfff96667
+,	0xfff9999a
+,	0xfff9cccd
+,	0xfffa0000
+,	0xfffa3334
+,	0xfffa6667
+,	0xfffa999a
+,	0xfffacccd
+,	0xfffb0000
+,	0xfffb3334
+,	0xfffb6667
+,	0xfffb999a
+,	0xfffbcccd
+,	0xfffc0000
+,	0xfffc3334
+,	0xfffc6667
+,	0xfffc999a
+,	0xfffccccd
+,	0xfffd0000
+,	0xfffd3334
+,	0xfffd6667
+,	0xfffd999a
+,	0xfffdcccd
+,	0xfffe0000
+,	0xfffe3334
+,	0xfffe6667
+,	0xfffe999a
+,	0xfffecccd
+,	0xffff0000
+,	0xffff3334
+,	0xffff6667
+,	0xffff999a
+,	0xffffcccd
+,	0x0
+,	0x3333
+,	0x6666
+,	0x9999
+,	0xcccc
+,	0x10000
+,	0x13333
+,	0x16666
+,	0x19999
+,	0x1cccc
+,	0x20000
+,	0x23333
+,	0x26666
+,	0x29999
+,	0x2cccc
+,	0x30000
+,	0x33333
+,	0x36666
+,	0x39999
+,	0x3cccc
+,	0x40000
+,	0x43333
+,	0x46666
+,	0x49999
+,	0x4cccc
+,	0x50000
+,	0x53333
+,	0x56666
+,	0x59999
+,	0x5cccc
+,	0x60000
+,	0x63333
+,	0x66666
+,	0x69999
+,	0x6cccc
+,	0x70000
+,	0x73333
+,	0x76666
+,	0x79999
+,	0x7cccc
+,	0x80000
+,	0x83333
+,	0x86666
+,	0x89999
+,	0x8cccc
+,	0x90000
+,	0x93333
+,	0x96666
+,	0x99999
+,	0x9cccc
+,	0xa0000
+
+};
+
 static void tb_fixed_test_constant()
 {
 	tb_printf("[fixed]: one = %f\n", tb_fixed_to_float(TB_FIXED_ONE));
@@ -589,6 +705,146 @@ static void tb_fixed_test_tan()
 	}
 	tb_printf("[fixed]: tan(0 - 360), %d ms\n", (tb_int_t)t);
 }
+
+static void tb_fixed_test_atan2()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_fixed_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 50; i < 55; i++)
+		{
+			for (j = 50; j < 55; j++)
+			{
+				r = tb_fixed_atan2(i, j);
+				r = tb_fixed_atan2(i, -j);
+				r = tb_fixed_atan2(-i, -j);
+				r = tb_fixed_atan2(-i, j);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 50; i < 55; i++)
+	{
+		for (j = 50; j < 55; j++)
+		{
+			r = tb_fixed_atan2(i, j);
+			tb_printf("[fixed]: atan2(%d, %d) = %f\n", i, j, tb_fixed_to_float(r));
+			r = tb_fixed_atan2(i, -j);
+			tb_printf("[fixed]: atan2(%d, %d) = %f\n", i, -j, tb_fixed_to_float(r));
+			r = tb_fixed_atan2(-i, -j);
+			tb_printf("[fixed]: atan2(%d, %d) = %f\n", -i, -j, tb_fixed_to_float(r));
+			r = tb_fixed_atan2(-i, j);
+			tb_printf("[fixed]: atan2(%d, %d) = %f\n", -i, j, tb_fixed_to_float(r));
+		}
+	}
+
+	tb_printf("[fixed]: atan2(), %d ms\n", (tb_int_t)t);
+}
+
+static void tb_fixed_test_asin()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_fixed_t 	r = 0;
+	__tb_volatile__ tb_fixed_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_fixed_test_arc[i][j];
+				r = tb_fixed_asin(a);
+				r = tb_fixed_asin(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_fixed_test_arc[i][j];
+			r = tb_fixed_asin(a);
+			tb_printf("[fixed]: asin(%f) = %f\n", tb_fixed_to_float(a), tb_fixed_to_float(r));
+			r = tb_fixed_asin(-a);
+			tb_printf("[fixed]: asin(%f) = %f\n", tb_fixed_to_float(-a), tb_fixed_to_float(r));
+		}
+	}
+
+	tb_printf("[fixed]: asin, %d ms\n", (tb_int_t)t);
+}
+static void tb_fixed_test_acos()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_fixed_t 	r = 0;
+	__tb_volatile__ tb_fixed_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_fixed_test_arc[i][j];
+				r = tb_fixed_acos(a);
+				r = tb_fixed_acos(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_fixed_test_arc[i][j];
+			r = tb_fixed_acos(a);
+			tb_printf("[fixed]: acos(%f) = %f\n", tb_fixed_to_float(a), tb_fixed_to_float(r));
+			r = tb_fixed_acos(-a);
+			tb_printf("[fixed]: acos(%f) = %f\n", tb_fixed_to_float(-a), tb_fixed_to_float(r));
+		}
+	}
+
+	tb_printf("[fixed]: acos, %d ms\n", (tb_int_t)t);
+}
+static void tb_fixed_test_atan()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_fixed_t 	r = 0;
+	__tb_volatile__ tb_fixed_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = -50; i <= 50; i++)
+		{
+			a = tb_fixed_test_atan_a[i + 50];
+			r = tb_fixed_atan(a);
+		}
+	}
+	t = tb_mclock() - t;
+
+
+	for (i = -50; i <= 50; i++)
+	{
+		a = tb_fixed_test_atan_a[i + 50];
+		r = tb_fixed_atan(a);
+		tb_printf("[fixed]: atan(%f) = %f\n", tb_fixed_to_float(a), tb_fixed_to_float(r));
+	}
+
+	tb_printf("[fixed]: atan, %d ms\n", (tb_int_t)t);
+}
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -614,6 +870,10 @@ int main(int argc, char** argv)
 	tb_fixed_test_sin();
 	tb_fixed_test_cos();
 	tb_fixed_test_tan();
+	tb_fixed_test_atan2();
+	tb_fixed_test_asin();
+	tb_fixed_test_acos();
+	tb_fixed_test_atan();
 
 	return 0;
 }

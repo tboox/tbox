@@ -78,6 +78,7 @@
 #define tb_fixed_asin(x) 			tb_fixed16_asin(x)
 #define tb_fixed_acos(x) 			tb_fixed16_acos(x)
 #define tb_fixed_atan(x) 			tb_fixed16_atan(x)
+#define tb_fixed_atan2(y, x) 		tb_fixed16_atan2(y, x)
 #define tb_fixed_exp(x) 			tb_fixed16_exp(x)
 #define tb_fixed_exp1(x) 			tb_fixed16_exp1(x)
 #define tb_fixed_expi(x) 			tb_fixed16_expi(x)

@@ -127,6 +127,11 @@
 # 	define tb_float_atan(x) 			tb_float_atan_generic(x)
 #endif
 
+// atan2
+#ifndef tb_float_atan2
+# 	define tb_float_atan2(y, x) 		tb_float_atan2_generic(y, x)
+#endif
+
 // exp
 #ifndef tb_float_exp
 # 	define tb_float_exp(x) 				tb_float_exp_generic(x)
@@ -170,6 +175,7 @@ tb_float_t 		tb_float_tan_generic(tb_float_t x);
 tb_float_t 		tb_float_asin_generic(tb_float_t x);
 tb_float_t 		tb_float_acos_generic(tb_float_t x);
 tb_float_t 		tb_float_atan_generic(tb_float_t x);
+tb_float_t 		tb_float_atan2_generic(tb_float_t y, tb_float_t x);
 tb_float_t 		tb_float_exp_generic(tb_float_t x);
 tb_float_t 		tb_float_expi_generic(tb_uint16_t x);
 tb_uint32_t 	tb_float_ilog2_generic(tb_float_t x);

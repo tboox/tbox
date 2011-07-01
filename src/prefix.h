@@ -386,8 +386,8 @@ typedef tb_float_t 				tb_scalar_t;
 #endif
 
 // limits
-#define TB_MAXS16 				(0x7fff)
-#define TB_MINS16 				(0x8001)
+#define TB_MAXS16 				(32767)
+#define TB_MINS16 				(-32767)
 #define TB_MAXU16 				(0xffff)
 #define TB_MINU16 				(0)
 #define TB_MAXS32 				(0x7fffffff)

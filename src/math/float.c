@@ -64,6 +64,10 @@ tb_float_t tb_float_atan_generic(tb_float_t x)
 {
 	return atan(x);
 }
+tb_float_t tb_float_atan2_generic(tb_float_t y, tb_float_t x)
+{
+	return atan2(y, x);
+}
 tb_float_t tb_float_exp_generic(tb_float_t x)
 {
 #if 1
