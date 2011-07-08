@@ -116,12 +116,14 @@
  */
 
 #ifdef TB_DEBUG
+# 	ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_fixed30_t tb_float_to_fixed30_check(tb_float_t x)
 {
 	// check overflow, [-2., 2.]
 	TB_ASSERT(x >= -2. && x <= 2.);
 	return ((tb_fixed30_t)((x) * TB_FIXED30_ONE));
 }
+# 	endif
 static __tb_inline__ tb_fixed30_t tb_fixed16_to_fixed30_check(tb_fixed16_t x)
 {
 	// check overflow, [-2, 2]

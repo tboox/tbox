@@ -23,13 +23,15 @@
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "float.h"
 #include "int32.h"
-
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	include "float.h"
+#endif
 /* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_float_sqrt_generic(tb_float_t x)
 {
 	TB_ASSERT(x > 0);
@@ -153,3 +155,4 @@ tb_uint32_t tb_float_irlog2_generic(tb_float_t x)
 	TB_ASSERT(x > 0);
 	return tb_int32_rlog2(tb_float_round(x));
 }
+#endif

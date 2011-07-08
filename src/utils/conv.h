@@ -80,22 +80,22 @@
  */
 
 tb_uint32_t 		tb_conv_s2tou32(tb_char_t const* s);
-tb_float_t 			tb_conv_s2tof(tb_char_t const* s);
-
 tb_uint32_t 		tb_conv_s8tou32(tb_char_t const* s);
-tb_float_t 			tb_conv_s8tof(tb_char_t const* s);
-
 tb_uint32_t 		tb_conv_s10tou32(tb_char_t const* s);
-tb_float_t 			tb_conv_s10tof(tb_char_t const* s);
-
 tb_uint32_t 		tb_conv_s16tou32(tb_char_t const* s);
-tb_float_t 			tb_conv_s16tof(tb_char_t const* s);
-
 tb_uint32_t 		tb_conv_stou32(tb_char_t const* s);
-tb_float_t 			tb_conv_stof(tb_char_t const* s);
-
 tb_uint32_t 		tb_conv_sbtou32(tb_char_t const* s, tb_int_t base);
+
+#ifdef TB_CONFIG_TYPE_FLOAT
+
+tb_float_t 			tb_conv_s2tof(tb_char_t const* s);
+tb_float_t 			tb_conv_s8tof(tb_char_t const* s);
+tb_float_t 			tb_conv_s10tof(tb_char_t const* s);
+tb_float_t 			tb_conv_s16tof(tb_char_t const* s);
+tb_float_t 			tb_conv_stof(tb_char_t const* s);
 tb_float_t 			tb_conv_sbtof(tb_char_t const* s, tb_int_t base);
+
+#endif
 
 
 #endif

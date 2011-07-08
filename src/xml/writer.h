@@ -84,9 +84,12 @@ void 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);
 void 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value);
 void 					tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value);
 void 					tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value);
-void 					tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value);
 void 					tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value);
 void 					tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...);
+
+#ifdef TB_CONFIG_TYPE_FLOAT
+void 					tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value);
+#endif
 
 // cdata
 void 					tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data);

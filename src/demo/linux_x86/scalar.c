@@ -366,6 +366,121 @@ static tb_scalar_t tb_scalar_test_angle[360] =
 
 };
 
+static tb_scalar_t tb_scalar_test_arc[5][5] = 
+{
+	{TB_FLOAT_INF, 0.000000, 0.000000, 0.000000, 0.000000}
+, 	{TB_FLOAT_INF, 1.000000, 0.500000, 0.333333, 0.250000}
+, 	{TB_FLOAT_INF, 2.000000, 1.000000, 0.666667, 0.500000}
+, 	{TB_FLOAT_INF, 3.000000, 1.500000, 1.000000, 0.750000}
+, 	{TB_FLOAT_INF, 4.000000, 2.000000, 1.333333, 1.000000}
+
+};
+
+static tb_scalar_t tb_scalar_test_atan_a[] = 
+{
+	-10.000000
+,	-9.800000
+,	-9.600000
+,	-9.400000
+,	-9.200000
+,	-9.000000
+,	-8.800000
+,	-8.600000
+,	-8.400000
+,	-8.200000
+,	-8.000000
+,	-7.800000
+,	-7.600000
+,	-7.400000
+,	-7.200000
+,	-7.000000
+,	-6.800000
+,	-6.600000
+,	-6.400000
+,	-6.200000
+,	-6.000000
+,	-5.800000
+,	-5.600000
+,	-5.400000
+,	-5.200000
+,	-5.000000
+,	-4.800000
+,	-4.600000
+,	-4.400000
+,	-4.200000
+,	-4.000000
+,	-3.800000
+,	-3.600000
+,	-3.400000
+,	-3.200000
+,	-3.000000
+,	-2.800000
+,	-2.600000
+,	-2.400000
+,	-2.200000
+,	-2.000000
+,	-1.800000
+,	-1.600000
+,	-1.400000
+,	-1.200000
+,	-1.000000
+,	-0.800000
+,	-0.600000
+,	-0.400000
+,	-0.200000
+,	0.000000
+,	0.200000
+,	0.400000
+,	0.600000
+,	0.800000
+,	1.000000
+,	1.200000
+,	1.400000
+,	1.600000
+,	1.800000
+,	2.000000
+,	2.200000
+,	2.400000
+,	2.600000
+,	2.800000
+,	3.000000
+,	3.200000
+,	3.400000
+,	3.600000
+,	3.800000
+,	4.000000
+,	4.200000
+,	4.400000
+,	4.600000
+,	4.800000
+,	5.000000
+,	5.200000
+,	5.400000
+,	5.600000
+,	5.800000
+,	6.000000
+,	6.200000
+,	6.400000
+,	6.600000
+,	6.800000
+,	7.000000
+,	7.200000
+,	7.400000
+,	7.600000
+,	7.800000
+,	8.000000
+,	8.200000
+,	8.400000
+,	8.600000
+,	8.800000
+,	9.000000
+,	9.200000
+,	9.400000
+,	9.600000
+,	9.800000
+,	10.000000
+};
+
 #else
 static tb_scalar_t tb_scalar_test_angle[360] = 
 {
@@ -731,6 +846,122 @@ static tb_scalar_t tb_scalar_test_angle[360] =
 ,	0x64407
 };
 
+static tb_scalar_t tb_scalar_test_arc[5][5] = 
+{
+	{ 0x7fffffff, 	0x0, 		0x0, 		0x0, 		0x0}
+, 	{0x7fffffff, 	0x10000, 	0x8000, 	0x5555, 	0x4000}
+, 	{0x7fffffff, 	0x20000, 	0x10000, 	0xaaaa, 	0x8000}
+, 	{0x7fffffff, 	0x30000, 	0x18000, 	0x10000, 	0xc000}
+, 	{0x7fffffff, 	0x40000, 	0x20000, 	0x15555, 	0x10000}
+
+};
+
+static tb_scalar_t tb_scalar_test_atan_a[] = 
+{
+	0xfff60000
+,	0xfff63334
+,	0xfff66667
+,	0xfff6999a
+,	0xfff6cccd
+,	0xfff70000
+,	0xfff73334
+,	0xfff76667
+,	0xfff7999a
+,	0xfff7cccd
+,	0xfff80000
+,	0xfff83334
+,	0xfff86667
+,	0xfff8999a
+,	0xfff8cccd
+,	0xfff90000
+,	0xfff93334
+,	0xfff96667
+,	0xfff9999a
+,	0xfff9cccd
+,	0xfffa0000
+,	0xfffa3334
+,	0xfffa6667
+,	0xfffa999a
+,	0xfffacccd
+,	0xfffb0000
+,	0xfffb3334
+,	0xfffb6667
+,	0xfffb999a
+,	0xfffbcccd
+,	0xfffc0000
+,	0xfffc3334
+,	0xfffc6667
+,	0xfffc999a
+,	0xfffccccd
+,	0xfffd0000
+,	0xfffd3334
+,	0xfffd6667
+,	0xfffd999a
+,	0xfffdcccd
+,	0xfffe0000
+,	0xfffe3334
+,	0xfffe6667
+,	0xfffe999a
+,	0xfffecccd
+,	0xffff0000
+,	0xffff3334
+,	0xffff6667
+,	0xffff999a
+,	0xffffcccd
+,	0x0
+,	0x3333
+,	0x6666
+,	0x9999
+,	0xcccc
+,	0x10000
+,	0x13333
+,	0x16666
+,	0x19999
+,	0x1cccc
+,	0x20000
+,	0x23333
+,	0x26666
+,	0x29999
+,	0x2cccc
+,	0x30000
+,	0x33333
+,	0x36666
+,	0x39999
+,	0x3cccc
+,	0x40000
+,	0x43333
+,	0x46666
+,	0x49999
+,	0x4cccc
+,	0x50000
+,	0x53333
+,	0x56666
+,	0x59999
+,	0x5cccc
+,	0x60000
+,	0x63333
+,	0x66666
+,	0x69999
+,	0x6cccc
+,	0x70000
+,	0x73333
+,	0x76666
+,	0x79999
+,	0x7cccc
+,	0x80000
+,	0x83333
+,	0x86666
+,	0x89999
+,	0x8cccc
+,	0x90000
+,	0x93333
+,	0x96666
+,	0x99999
+,	0x9cccc
+,	0xa0000
+
+};
+
 #endif
 
 static void tb_scalar_test_constant()
@@ -949,6 +1180,145 @@ static void tb_scalar_test_tan()
 	}
 	tb_printf("[scalar]: tan(0 - 360), %d ms\n", (tb_int_t)t);
 }
+static void tb_scalar_test_atan2()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 50; i < 55; i++)
+		{
+			for (j = 50; j < 55; j++)
+			{
+				r = tb_scalar_atan2(i, j);
+				r = tb_scalar_atan2(i, -j);
+				r = tb_scalar_atan2(-i, -j);
+				r = tb_scalar_atan2(-i, j);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 50; i < 55; i++)
+	{
+		for (j = 50; j < 55; j++)
+		{
+			r = tb_scalar_atan2(i, j);
+			tb_printf("[scalar]: atan2(%d, %d) = %f\n", i, j, tb_scalar_to_float(r));
+			r = tb_scalar_atan2(i, -j);
+			tb_printf("[scalar]: atan2(%d, %d) = %f\n", i, -j, tb_scalar_to_float(r));
+			r = tb_scalar_atan2(-i, -j);
+			tb_printf("[scalar]: atan2(%d, %d) = %f\n", -i, -j, tb_scalar_to_float(r));
+			r = tb_scalar_atan2(-i, j);
+			tb_printf("[scalar]: atan2(%d, %d) = %f\n", -i, j, tb_scalar_to_float(r));
+		}
+	}
+
+	tb_printf("[scalar]: atan2(), %d ms\n", (tb_int_t)t);
+}
+
+static void tb_scalar_test_asin()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	__tb_volatile__ tb_scalar_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_scalar_test_arc[i][j];
+				r = tb_scalar_asin(a);
+				r = tb_scalar_asin(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_scalar_test_arc[i][j];
+			r = tb_scalar_asin(a);
+			tb_printf("[scalar]: asin(%f) = %f\n", tb_scalar_to_float(a), tb_scalar_to_float(r));
+			r = tb_scalar_asin(-a);
+			tb_printf("[scalar]: asin(%f) = %f\n", tb_scalar_to_float(-a), tb_scalar_to_float(r));
+		}
+	}
+
+	tb_printf("[scalar]: asin, %d ms\n", (tb_int_t)t);
+}
+static void tb_scalar_test_acos()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	j = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	__tb_volatile__ tb_scalar_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			for (j = 0; j < 5; j++)
+			{
+				a = tb_scalar_test_arc[i][j];
+				r = tb_scalar_acos(a);
+				r = tb_scalar_acos(-a);
+			}
+		}
+	}
+	t = tb_mclock() - t;
+
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 5; j++)
+		{
+			a = tb_scalar_test_arc[i][j];
+			r = tb_scalar_acos(a);
+			tb_printf("[scalar]: acos(%f) = %f\n", tb_scalar_to_float(a), tb_scalar_to_float(r));
+			r = tb_scalar_acos(-a);
+			tb_printf("[scalar]: acos(%f) = %f\n", tb_scalar_to_float(-a), tb_scalar_to_float(r));
+		}
+	}
+
+	tb_printf("[scalar]: acos, %d ms\n", (tb_int_t)t);
+}
+static void tb_scalar_test_atan()
+{
+	__tb_volatile__ tb_int_t 	i = 0;
+	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
+	__tb_volatile__ tb_scalar_t 	r = 0;
+	__tb_volatile__ tb_scalar_t 	a = 0;
+	tb_int64_t t = tb_mclock();
+	while (n--)
+	{
+		for (i = -50; i <= 50; i++)
+		{
+			a = tb_scalar_test_atan_a[i + 50];
+			r = tb_scalar_atan(a);
+		}
+	}
+	t = tb_mclock() - t;
+
+
+	for (i = -50; i <= 50; i++)
+	{
+		a = tb_scalar_test_atan_a[i + 50];
+		r = tb_scalar_atan(a);
+		tb_printf("[scalar]: atan(%f) = %f\n", tb_scalar_to_float(a), tb_scalar_to_float(r));
+	}
+
+	tb_printf("[scalar]: atan, %d ms\n", (tb_int_t)t);
+}
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -974,6 +1344,10 @@ int main(int argc, char** argv)
 	tb_scalar_test_sin();
 	tb_scalar_test_cos();
 	tb_scalar_test_tan();
+	tb_scalar_test_atan2();
+	tb_scalar_test_asin();
+	tb_scalar_test_acos();
+	tb_scalar_test_atan();
 
 	return 0;
 }
