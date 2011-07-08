@@ -66,10 +66,13 @@ static void tb_conv_test_sbtoi32(tb_char_t const* s, tb_int_t base, tb_int32_t v
 {
 	tb_printf("s%dtoi32(%s) = %d [?= %d]\n", base, s, TB_CONV_SBTOI32(s, base), val);
 }
+
+#ifdef TB_CONFIG_TYPE_FLOAT
 static void tb_conv_test_sbtof(tb_char_t const* s, tb_int_t base, tb_float_t val)
 {
 	tb_printf("s%dtof(%s) = %lf [?= %lf]\n", base, s, TB_CONV_SBTOF(s, base), val);
 }
+#endif
 static void tb_conv_test_stou32(tb_char_t const* s, tb_uint32_t val)
 {
 	tb_printf("stou32(%s) = %u [?= %u]\n", s, TB_CONV_STOU32(s), val);
@@ -78,10 +81,13 @@ static void tb_conv_test_stoi32(tb_char_t const* s, tb_int32_t val)
 {
 	tb_printf("stoi32(%s) = %d [?= %d]\n", s, TB_CONV_STOI32(s), val);
 }
+
+#ifdef TB_CONFIG_TYPE_FLOAT
 static void tb_conv_test_stof(tb_char_t const* s, tb_float_t val)
 {
 	tb_printf("stof(%s) = %lf [?= %lf]\n", s, TB_CONV_STOF(s), val);
 }
+#endif
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -136,7 +142,7 @@ int main(int argc, char** argv)
 	tb_conv_test_sbtoi32("-0x1dcc666", 16, -31415926);
 #endif
 
-#if TB_TEST_CONV_SBTOF
+#if TB_TEST_CONV_SBTOF && defined(TB_CONFIG_TYPE_FLOAT)
 	tb_printf("===============================\n");
 	tb_conv_test_sbtof("0", 10, 0);
 	tb_conv_test_sbtof("0.", 10, 0.);

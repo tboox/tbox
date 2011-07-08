@@ -349,6 +349,8 @@ tb_sint32_t tb_bstream_get_s32_le(tb_bstream_t* bst)
 	return val;
 	// }
 }
+
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_bstream_get_float_le(tb_bstream_t* bst)
 {
 	union 
@@ -443,6 +445,7 @@ tb_float_t tb_bstream_get_double_ne(tb_bstream_t* bst)
 
 	return (tb_float_t)conv.f;
 }
+#endif
 
 tb_uint32_t tb_bstream_get_ubits(tb_bstream_t* bst, tb_size_t nbits)
 {

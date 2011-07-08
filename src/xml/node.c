@@ -249,6 +249,8 @@ fail:
 	if (attribute) tb_xml_node_destroy(attribute);
 	return TB_NULL;
 }
+
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_xml_node_t* tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value)
 {
 	TB_ASSERT(node && name);
@@ -273,6 +275,7 @@ fail:
 	if (attribute) tb_xml_node_destroy(attribute);
 	return TB_NULL;
 }
+#endif
 tb_xml_node_t* tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value)
 {
 	TB_ASSERT(node && name);

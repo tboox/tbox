@@ -202,6 +202,8 @@ void tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* 
 		tb_string_assign_format(&node->value, "%d", value);
 	}
 }
+
+#ifdef TB_CONFIG_TYPE_FLOAT
 void tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
 {
 	TB_ASSERT(writer && name);
@@ -214,6 +216,7 @@ void tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const
 		tb_string_assign_format(&node->value, "%g", value);
 	}
 }
+#endif
 void tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)
 {
 	TB_ASSERT(writer && name);

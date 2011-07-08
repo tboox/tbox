@@ -119,6 +119,7 @@ tb_sint32_t 		tb_bstream_get_s24_be(tb_bstream_t* bst);
 tb_uint32_t 		tb_bstream_get_u32_be(tb_bstream_t* bst);
 tb_sint32_t 		tb_bstream_get_s32_be(tb_bstream_t* bst);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t 			tb_bstream_get_float_le(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_float_be(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_float_ne(tb_bstream_t* bst);
@@ -126,6 +127,7 @@ tb_float_t 			tb_bstream_get_float_ne(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_double_le(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_double_be(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_double_ne(tb_bstream_t* bst);
+#endif
 
 tb_uint32_t 		tb_bstream_get_ubits(tb_bstream_t* bst, tb_size_t nbits);
 tb_sint32_t 		tb_bstream_get_sbits(tb_bstream_t* bst, tb_size_t nbits);
