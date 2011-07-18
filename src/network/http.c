@@ -1152,7 +1152,7 @@ tb_int_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			// is end?
 			if (!http->status.chunked_size) return -1;
 		}
-
+ 
 		// read chunked data
 		if (http->status.chunked_read < http->status.chunked_size)
 		{
@@ -1161,7 +1161,7 @@ tb_int_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			if (!http->option.bblock) ret = tb_http_socket_read(http, data, min);
 			else ret = tb_http_read_block(http, data, min);
 
-			//EPLAT_DBG("read: %d", ret);
+			//TB_DBG("read: %d", ret);
 			if (ret > 0) http->status.chunked_read += ret;
 			return ret;
 		}
@@ -1175,12 +1175,54 @@ tb_int_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 }
 tb_int_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(handle, -1);
-	return tb_http_write_block((tb_http_t*)handle, data, size);
+	tb_http_t* http = (tb_http_t*)handle;
+	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
+	
+	tb_size_t 	write = 0;
+	tb_size_t 	time = (tb_size_t)tb_mclock();
+	while (write < size)
+	{
+		tb_int_t ret = tb_http_write(handle, data + write, size - write);
+		if (ret > 0) 
+		{
+			write += ret;
+			time = (tb_size_t)tb_mclock();
+		}
+		else if (!ret)
+		{
+			// timeout?
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
+			if (timeout > http->option.timeout) break;
+		}
+		else break;
+	}
+	//TB_DBG("[http]::write: %d", write);
+	return write;
 }
 tb_int_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(handle, -1);
-	return tb_http_read_block((tb_http_t*)handle, data, size);
+	tb_http_t* http = (tb_http_t*)handle;
+	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
+
+	tb_size_t 	read = 0;
+	tb_size_t 	time = (tb_size_t)tb_mclock();
+	while (read < size)
+	{
+		tb_int_t ret = tb_http_read(handle, data + read, size - read);	
+		if (ret > 0)
+		{
+			read += ret;
+			time = (tb_size_t)tb_mclock();
+		}
+		else if (!ret)
+		{
+			// timeout?
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
+			if (timeout > http->option.timeout) break;
+		}
+		else break;
+	}
+	//TB_DBG("[http]::read: %d", read);
+	return read;
 }
 

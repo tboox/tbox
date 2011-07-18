@@ -106,13 +106,14 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_HSTREAM_CMD_SET_METHOD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 6)
 ,	TB_HSTREAM_CMD_SET_HEAD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 7)
 ,	TB_HSTREAM_CMD_SET_POST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 8)
-,	TB_HSTREAM_CMD_SET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 9)
-,	TB_HSTREAM_CMD_SET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 10)
-,	TB_HSTREAM_CMD_SET_HEAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 11)
-,	TB_HSTREAM_CMD_SET_SOPEN_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 12)
-,	TB_HSTREAM_CMD_SET_SCLOSE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 13)
-,	TB_HSTREAM_CMD_SET_SREAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
-,	TB_HSTREAM_CMD_SET_SWRITE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 15)
+,	TB_HSTREAM_CMD_SET_KALIVE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 9)
+,	TB_HSTREAM_CMD_SET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 10)
+,	TB_HSTREAM_CMD_SET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 11)
+,	TB_HSTREAM_CMD_SET_HEAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 12)
+,	TB_HSTREAM_CMD_SET_SOPEN_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 13)
+,	TB_HSTREAM_CMD_SET_SCLOSE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
+,	TB_HSTREAM_CMD_SET_SREAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 15)
+,	TB_HSTREAM_CMD_SET_SWRITE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 16)
 
 	// the tstream
 ,	TB_TSTREAM_CMD_GET_GSTREAM 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_NULL, 1)
@@ -205,6 +206,50 @@ tb_int_t 			tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_int_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
 tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag);
+
+// read integer
+tb_uint8_t 			tb_gstream_read_u8(tb_gstream_t* gst);
+tb_sint8_t 			tb_gstream_read_s8(tb_gstream_t* gst);
+
+tb_uint16_t 		tb_gstream_read_u16_le(tb_gstream_t* gst);
+tb_sint16_t 		tb_gstream_read_s16_le(tb_gstream_t* gst);
+
+tb_uint32_t 		tb_gstream_read_u24_le(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_read_s24_le(tb_gstream_t* gst);
+
+tb_uint32_t 		tb_gstream_read_u32_le(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_read_s32_le(tb_gstream_t* gst);
+
+tb_uint16_t 		tb_gstream_read_u16_be(tb_gstream_t* gst);
+tb_sint16_t 		tb_gstream_read_s16_be(tb_gstream_t* gst);
+
+tb_uint32_t 		tb_gstream_read_u24_be(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_read_s24_be(tb_gstream_t* gst);
+
+tb_uint32_t 		tb_gstream_read_u32_be(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_read_s32_be(tb_gstream_t* gst);
+
+// write integer
+tb_bool_t			tb_gstream_write_u8(tb_gstream_t* gst, tb_uint8_t val);
+tb_bool_t 			tb_gstream_write_s8(tb_gstream_t* gst, tb_sint8_t val);
+
+tb_bool_t 			tb_gstream_write_u16_le(tb_gstream_t* gst, tb_uint16_t val);
+tb_bool_t 			tb_gstream_write_s16_le(tb_gstream_t* gst, tb_sint16_t val);
+
+tb_bool_t 			tb_gstream_write_u24_le(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_write_s24_le(tb_gstream_t* gst, tb_sint32_t val);
+
+tb_bool_t 			tb_gstream_write_u32_le(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_write_s32_le(tb_gstream_t* gst, tb_sint32_t val);
+
+tb_bool_t 			tb_gstream_write_u16_be(tb_gstream_t* gst, tb_uint16_t val);
+tb_bool_t 			tb_gstream_write_s16_be(tb_gstream_t* gst, tb_sint16_t val);
+
+tb_bool_t 			tb_gstream_write_u24_be(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_write_s24_be(tb_gstream_t* gst, tb_sint32_t val);
+
+tb_bool_t 			tb_gstream_write_u32_be(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
 tb_size_t 			tb_gstream_size(tb_gstream_t const* gst);

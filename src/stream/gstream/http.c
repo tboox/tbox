@@ -145,6 +145,10 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
 		{
 			return tb_http_option_set_method(hst->http, (tb_http_method_t)arg1);
 		}
+	case TB_HSTREAM_CMD_SET_KALIVE:
+		{
+			return tb_http_option_set_kalive(hst->http, (tb_http_method_t)arg1);
+		}
 	case TB_HSTREAM_CMD_SET_REDIRECT:
 		{
 			return tb_http_option_set_redirect(hst->http, (tb_uint8_t)arg1);
