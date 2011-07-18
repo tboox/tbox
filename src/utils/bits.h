@@ -102,7 +102,7 @@ extern "C" {
 
 #define tb_bits_set_u32_le(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = ((x) >> 16) & 0xff; *((p) + 3) = ((x) >> 24) & 0xff;} while (0)
 #define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le(p, x)
-#define tb_bits_set_u32_be(p, x) 	do { *(p) = ((x) >> 24) & 0xff; *((p) + 1) = ((x) >> 16) & 0xff; *((p) + 2) = ((x) >> 8) & 0xff; *((p) + 3) = (x) & 0xff } while (0)
+#define tb_bits_set_u32_be(p, x) 	do { *(p) = ((x) >> 24) & 0xff; *((p) + 1) = ((x) >> 16) & 0xff; *((p) + 2) = ((x) >> 8) & 0xff; *((p) + 3) = (x) & 0xff; } while (0)
 #define tb_bits_set_s32_be(p, x) 	tb_bits_set_u32_be(p, x)
 #define tb_bits_set_u32_ne(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x); } while (0)
 #define tb_bits_set_s32_ne(p, x) 	do { *((tb_sint32_t*)(p)) = (tb_sint32_t)(x); } while (0)

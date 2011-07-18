@@ -172,56 +172,44 @@ static __tb_inline__ tb_sint8_t tb_bstream_get_s8(tb_bstream_t* bst)
 static __tb_inline__ tb_uint16_t tb_bstream_get_u16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_uint16_t val = tb_bits_get_u16_ne(bst->p);
 	bst->p += 2;
 	return val;
-	// }
 }
 static __tb_inline__ tb_sint16_t tb_bstream_get_s16_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_sint16_t val = tb_bits_get_s16_ne(bst->p);
 	bst->p += 2;
 	return val;
-	// }
 }
 static __tb_inline__ tb_uint32_t tb_bstream_get_u24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_uint32_t val = tb_bits_get_u24_ne(bst->p);
 	bst->p += 3;
 	return val;
-	// }
 }
 static __tb_inline__ tb_sint32_t tb_bstream_get_s24_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_sint32_t val = tb_bits_get_s24_ne(bst->p);
 	bst->p += 3;
 	return val;
-	// }
 }
 static __tb_inline__ tb_uint32_t tb_bstream_get_u32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_uint32_t val = tb_bits_get_u32_ne(bst->p);
 	bst->p += 4;
 	return val;
-	// }
 }
 static __tb_inline__ tb_sint32_t tb_bstream_get_s32_ne(tb_bstream_t* bst)
 {
 	TB_ASSERT(!bst->b);
-	// {
 	tb_sint32_t val = tb_bits_get_s32_ne(bst->p);
 	bst->p += 4;
 	return val;
-	// }
 }
 static __tb_inline__ void tb_bstream_set_u8(tb_bstream_t* bst, tb_uint8_t val)
 {
