@@ -36,6 +36,7 @@ extern "C" {
 #include "time.h"
 #include "conv.h"
 #include "bits.h"
+#include "base64.h"
 
 // c plus plus
 #ifdef __cplusplus

@@ -63,6 +63,7 @@ tbox_C_FILES 		+= \
 					utils/time \
 					utils/bits\
 					utils/conv \
+					utils/base64 \
 					xml/document \
 					xml/node \
 					xml/nlist \
