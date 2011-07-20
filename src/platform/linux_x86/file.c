@@ -42,7 +42,7 @@
 typedef struct __tb_file_list_t
 {
 	DIR* 				pdir; 
-	tb_char_t 		dir[TB_FILENAME_MAX_SIZE];
+	tb_char_t 			dir[TB_FILENAME_MAX_SIZE];
 	tb_file_entry_t 	entry;
 
 }tb_file_list_t;
@@ -100,7 +100,7 @@ tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_
 }
 void tb_file_flush(tb_handle_t hfile)
 {
-	//TB_DBG("tb_file_flush");
+	TB_NOT_IMPLEMENT();
 }
 tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags)
 {
@@ -120,6 +120,25 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags)
 	else TB_DBG("unknown seek flag: %d", flags);
 
 	return -1;
+}
+tb_size_t tb_file_size(tb_char_t const* path, tb_file_type_t type)
+{
+	TB_NOT_IMPLEMENT();
+	return 0;
+}
+tb_bool_t tb_file_exists(tb_char_t const* path)
+{
+	return !access(path, F_OK)? TB_TRUE : TB_FALSE;
+}
+tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
+{
+	TB_NOT_IMPLEMENT();
+	return TB_TRUE;
+}
+tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
+{
+	TB_NOT_IMPLEMENT();
+	return TB_FALSE;
 }
 
 // open file list
@@ -205,24 +224,5 @@ void tb_file_list_close(tb_handle_t hflist)
 
 	if (pflist->pdir) closedir(pflist->pdir);
 	free(pflist);
-}
-
-// delete file or empty directory
-tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
-{
-	// no implemention
-	return TB_FALSE;
-}
-
-// get the size of file or directory 
-tb_size_t tb_file_size(tb_char_t const* path, tb_file_type_t type)
-{
-	// no implemention
-	return 0;
-}
-
-tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
-{
-	return TB_TRUE;
 }
 
