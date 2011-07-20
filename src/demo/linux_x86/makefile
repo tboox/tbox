@@ -2,7 +2,8 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = conv \
+NAMES = test \
+		conv \
 		time \
 		http \
 		fixed \
