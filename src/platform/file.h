@@ -89,51 +89,23 @@ typedef struct __tb_file_entry_t
 tb_handle_t 			tb_file_open(tb_char_t const* filename, tb_int_t flags);
 void 					tb_file_close(tb_handle_t hfile);
 
-/* read data
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
+// file io 
 tb_int_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t read_n);
-
-/* write data
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
 tb_int_t 				tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_n);
-
-// flush file buffer
+tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags);
 void 					tb_file_flush(tb_handle_t hfile);
 
-// seek
-// flags == TB_FILE_SEEK_SIZE: return file_size
-// return: -1 => fail, other => new offset
-tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags);
-
-// delete file or directory
+// file modifiors
+tb_bool_t 				tb_file_create(tb_char_t const* path, tb_file_type_t type);
 tb_bool_t 				tb_file_delete(tb_char_t const* path, tb_file_type_t type);
 
-// get the size of file or directory 
+// file attributes
+tb_bool_t 				tb_file_exists(tb_char_t const* path);
 tb_size_t 				tb_file_size(tb_char_t const* path, tb_file_type_t type);
 
-// create file or directory
-tb_bool_t 				tb_file_create(tb_char_t const* path, tb_file_type_t type);
-
-/* /////////////////////////////////////////////////////////
- * file list interfaces
- */
-// open file list
+// file list
 tb_handle_t 			tb_file_list_open(tb_char_t const* dir);
-
-// get file list entry, end: return NULL
 tb_file_entry_t const* 	tb_file_list_entry(tb_handle_t hflist);
-
-// close file list
 void 					tb_file_list_close(tb_handle_t hflist);
 
 // c plus plus

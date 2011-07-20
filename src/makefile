@@ -144,6 +144,7 @@ INC_FILES 			= \
 					utils/bits.h \
 					utils/conv.h \
 					utils/time.h \
+					utils/base64.h \
 					xml/xml.h \
 					xml/prefix.h \
 					xml/document.h \
