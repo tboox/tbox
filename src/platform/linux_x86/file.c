@@ -132,8 +132,18 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_NOT_IMPLEMENT();
-	return TB_TRUE;
+	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	switch (type)
+	{
+	case TB_FILE_TYPE_DIR:
+		return !mkdir(path, S_IRWXU)? TB_TRUE : TB_FALSE;
+	case TB_FILE_TYPE_FILE:
+		TB_NOT_IMPLEMENT();
+		break;
+	default:
+		break;
+	}
+	return TB_FALSE;
 }
 tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 {
@@ -195,8 +205,8 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 	pflist->entry.name[pflist->entry.namesize] = '\0';
 
 	// get file type
-	if (!strcmp(pflist->entry.name, ".")) pflist->entry.type = TB_FILE_TYPE_IS_DOT;
-	else if (!strcmp(pflist->entry.name, "..")) pflist->entry.type = TB_FILE_TYPE_IS_DOT2;
+	if (!strcmp(pflist->entry.name, ".")) pflist->entry.type = TB_FILE_TYPE_DOT;
+	else if (!strcmp(pflist->entry.name, "..")) pflist->entry.type = TB_FILE_TYPE_DOT2;
 	else
 	{
 		// stat
@@ -209,8 +219,8 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 		snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", &(pflist->dir[sizeof(TB_FILE_PATH_PREFIX) - 1]), pflist->entry.name);
 		pflist->entry.path[TB_FILENAME_MAX_SIZE - 1] = '\0';
 
-		if (S_ISDIR(fstat.st_mode)) pflist->entry.type = TB_FILE_TYPE_IS_DIR;
-		else pflist->entry.type = TB_FILE_TYPE_IS_FILE;
+		if (S_ISDIR(fstat.st_mode)) pflist->entry.type = TB_FILE_TYPE_DIR;
+		else pflist->entry.type = TB_FILE_TYPE_FILE;
 	}
 
 	return (&(pflist->entry));

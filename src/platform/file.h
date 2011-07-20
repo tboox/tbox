@@ -37,7 +37,7 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TB_FILENAME_MAX_SIZE 	(1024)
+#define TB_FILENAME_MAX_SIZE 	(4096)
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -65,10 +65,10 @@ typedef enum __tb_file_seek_flag_t
 
 typedef enum __tb_file_type_t
 {
-	TB_FILE_TYPE_IS_DIR 	= 1 	//!< directory
-, 	TB_FILE_TYPE_IS_FILE 	= 2 	//!< file
-, 	TB_FILE_TYPE_IS_DOT 	= 3 	//!< .
-, 	TB_FILE_TYPE_IS_DOT2 	= 4 	//!< ..
+	TB_FILE_TYPE_DIR 	= 1
+, 	TB_FILE_TYPE_FILE 	= 2 
+, 	TB_FILE_TYPE_DOT 	= 3
+, 	TB_FILE_TYPE_DOT2 	= 4
 
 }tb_file_type_t;
 
