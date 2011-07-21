@@ -24,59 +24,15 @@ int main(int argc, char** argv)
 	if (TB_FALSE == tb_gstream_open(ist)) goto end;
 	if (TB_FALSE == tb_gstream_open(ost)) goto end;
 	
-	// read data
-	tb_byte_t 		data[8192];
-	tb_size_t 		read = 0;
-	tb_size_t 		base = (tb_size_t)tb_mclock();
-	tb_size_t 		time = (tb_size_t)tb_mclock();
-	tb_size_t 		size = tb_gstream_size(ist);
-	do
-	{
-		tb_int_t ret = tb_gstream_read(ist, data, 8192);
-		//TB_DBG("ret: %d", ret);
-		if (ret > 0)
-		{
-			read += ret;
-			time = (tb_size_t)tb_mclock();
-
-#if 1
-			tb_int_t write = 0;
-			while (write < ret)
-			{
-				tb_int_t ret2 = tb_gstream_write(ost, data + write, ret - write);
-				if (ret2 > 0) write += ret2;
-				else if (ret2 < 0) break;
-			}
-#endif
-
-		}
-		else if (!ret) 
-		{
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > 10000) break;
-		}
-		else break;
-
-		// update info
-		if (time > base && ((time - base) % 1000)) 
-		{
-			tb_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
-			fflush(stdout);
-		}
-
-		// is end?
-		if (size && read >= size) break;
-
-	} while(1);
+	// save stream
+	tb_size_t size = tb_gstream_save(ist, ost);
+	TB_DBG("save: %d bytes", size);
 
 end:
 
 	// destroy stream
 	tb_gstream_destroy(ist);
 	tb_gstream_destroy(ost);
-
-	tb_printf("end\n");
-	getchar();
 
 	tb_exit();
 	return 0;

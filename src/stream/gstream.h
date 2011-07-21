@@ -47,6 +47,9 @@ extern "C" {
 // the stream data size for need
 #define TB_GSTREAM_CACHE_SIZE 		(8192)
 
+// the stream timeout
+#define TB_GSTREAM_TIMEOUT 			(5000)
+
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -206,6 +209,10 @@ tb_int_t 			tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_int_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
 tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag);
+
+// load & save
+tb_size_t 			tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
+tb_size_t 			tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
 
 // read integer
 tb_uint8_t 			tb_gstream_read_u8(tb_gstream_t* gst);

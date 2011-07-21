@@ -7,7 +7,7 @@ PLAT = linux_x86
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
-DEBUG = n
+DEBUG = y
 CCACHE = ccache
 DISTCC =
 

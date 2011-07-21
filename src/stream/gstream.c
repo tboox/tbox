@@ -104,7 +104,7 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 			{
 				// timeout?
 				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > 5000) break;
+				if (timeout > TB_GSTREAM_TIMEOUT) break;
 			}
 			else return -1;
 		}
@@ -246,7 +246,7 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			{
 				// timeout?
 				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > 5000) break;
+				if (timeout > TB_GSTREAM_TIMEOUT) break;
 			}
 			else return -1;
 		}
@@ -345,7 +345,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 			{
 				// timeout?
 				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > 5000) break;
+				if (timeout > TB_GSTREAM_TIMEOUT) break;
 			}
 			else break;
 		}
@@ -574,5 +574,50 @@ tb_bool_t tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val)
 	tb_bits_set_s32_be(b, val);
 	if (4 != tb_gstream_bwrite(gst, b, 4)) return TB_FALSE;
 	return TB_TRUE;
+}
+tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
+{
+	TB_ASSERT_RETURN_VAL(gst && ist, 0);	
+
+	// read data
+	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
+	tb_size_t 		read = 0;
+	tb_size_t 		time = (tb_size_t)tb_mclock();
+	tb_size_t 		left = tb_gstream_left(ist);
+	do
+	{
+		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
+		//TB_DBG("ret: %d", ret);
+		if (ret > 0)
+		{
+			read += ret;
+			time = (tb_size_t)tb_mclock();
+
+			tb_int_t write = 0;
+			while (write < ret)
+			{
+				tb_int_t ret2 = tb_gstream_write(gst, data + write, ret - write);
+				if (ret2 > 0) write += ret2;
+				else if (ret2 < 0) break;
+			}
+		}
+		else if (!ret) 
+		{
+			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
+			if (timeout > TB_GSTREAM_TIMEOUT) break;
+		}
+		else break;
+
+		// is end?
+		if (left && read >= left) break;
+
+	} while(1);
+
+	return read;
+}
+tb_size_t tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost)
+{
+	TB_ASSERT_RETURN_VAL(gst && ost, 0);
+	return tb_gstream_load(ost, gst);
 }
 
