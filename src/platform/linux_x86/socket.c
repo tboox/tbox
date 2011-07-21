@@ -70,7 +70,8 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 	//TB_DBG("socket open: %s %d", host, port);
 
 	// create socket
-	tb_int_t t, p;
+	tb_int_t t = 0;
+	tb_int_t p = 0;
 	if (type == TB_SOCKET_TYPE_TCP)
 	{
 		t = SOCK_STREAM;
@@ -101,7 +102,11 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 		{
 			struct hostent* h = gethostbyname(host);
 			if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-			else return TB_NULL;
+			else 
+			{
+				if (fd >= 0) close(fd);
+				return TB_NULL;
+			}
 		}
 
 		// connect host
@@ -136,7 +141,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 				}
 
 				// test error
-				tb_int_t optlen = sizeof(ret);
+				socklen_t optlen = sizeof(ret);
 				getsockopt(fd, SOL_SOCKET, SO_ERROR, &ret, &optlen);
 				if (ret != 0)
 				{

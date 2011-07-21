@@ -142,11 +142,17 @@ void 				tb_bstream_set_u1(tb_bstream_t* bst, tb_uint8_t val);
 void 				tb_bstream_set_u16_le(tb_bstream_t* bst, tb_uint16_t val);
 void 				tb_bstream_set_s16_le(tb_bstream_t* bst, tb_sint16_t val);
 
+void 				tb_bstream_set_u24_le(tb_bstream_t* bst, tb_uint32_t val);
+void 				tb_bstream_set_s24_le(tb_bstream_t* bst, tb_sint32_t val);
+
 void 				tb_bstream_set_u32_le(tb_bstream_t* bst, tb_uint32_t val);
 void 				tb_bstream_set_s32_le(tb_bstream_t* bst, tb_sint32_t val);
 
 void 				tb_bstream_set_u16_be(tb_bstream_t* bst, tb_uint16_t val);
 void 				tb_bstream_set_s16_be(tb_bstream_t* bst, tb_sint16_t val);
+
+void 				tb_bstream_set_u24_be(tb_bstream_t* bst, tb_uint32_t val);
+void 				tb_bstream_set_s24_be(tb_bstream_t* bst, tb_sint32_t val);
 
 void 				tb_bstream_set_u32_be(tb_bstream_t* bst, tb_uint32_t val);
 void 				tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val);
