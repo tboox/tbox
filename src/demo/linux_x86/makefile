@@ -19,6 +19,7 @@ NAMES = test \
 		format \
 		vector \
 		slist \
+		dlist \
 		base64 \
 		dns \
 		xml

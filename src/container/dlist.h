@@ -77,10 +77,10 @@ typedef struct __tb_dlist_t
 	tb_pool_t* 		pool;
 
 	// the head item
-	tb_size_t 		next;
+	tb_size_t 		head;
 
 	// the last item
-	tb_size_t 		prev;
+	tb_size_t 		last;
 
 	// the step size
 	tb_size_t 		step;

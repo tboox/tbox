@@ -20,6 +20,7 @@ tbox_C_FILES 		+= \
 					container/pool \
 					container/vector \
 					container/slist \
+					container/dlist \
 					network/http \
 					network/dns \
 					network/cookies \

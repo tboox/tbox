@@ -576,7 +576,8 @@ int main(int argc, char** argv)
 
 	TB_DBG("=============================================================");
 	TB_DBG("insert:");
-	tb_slist_ninsert_head(slist, "H", 10); i = tb_slist_ninsert_tail(slist, "T", 10);
+	tb_slist_ninsert_head(slist, "H", 10); 
+	i = tb_slist_ninsert_tail(slist, "T", 10);
 	j = tb_slist_insert(slist, i, "0");
 	tb_slist_insert(slist, i, "1");
 	tb_slist_insert(slist, i, "2");

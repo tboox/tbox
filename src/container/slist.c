@@ -192,11 +192,11 @@ tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t index, tb_byte_t const* i
 
 tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_byte_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool && item, index);
+	TB_ASSERT_RETURN_VAL(slist && slist->pool && item, 0);
 
 	// alloc a new node
 	tb_size_t node = tb_pool_alloc(slist->pool);
-	TB_ASSERT_RETURN_VAL(node, index);
+	TB_ASSERT_RETURN_VAL(node, 0);
 
 	// get the node data
 	tb_byte_t* pnode = tb_pool_get(slist->pool, node);
@@ -281,7 +281,7 @@ tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t index, tb_byte_t const* 
 }
 tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t index, tb_byte_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(slist && item && size, index);
+	TB_ASSERT_RETURN_VAL(slist && item && size, 0);
 
 	// insert items
 	tb_size_t node = index;
@@ -468,7 +468,8 @@ tb_size_t tb_slist_nremove_next(tb_slist_t* slist, tb_size_t index, tb_size_t si
 }
 tb_size_t tb_slist_nremove_head(tb_slist_t* slist, tb_size_t size)
 {
-	return tb_slist_nremove(slist, tb_slist_head(slist), size);
+	tb_slist_nremove(slist, tb_slist_head(slist), size);
+	return tb_slist_head(slist);
 }
 tb_size_t tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size)
 {
@@ -483,5 +484,7 @@ tb_size_t tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size)
 	for (; o-- && itor != tail; prev = itor, itor = tb_slist_next(slist, itor)) ;
 
 	// remove
-	return tb_slist_nremove_next(slist, prev, size);
+	tb_slist_nremove_next(slist, prev, size);
+
+	return tb_slist_last(slist);
 }
