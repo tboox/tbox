@@ -34,6 +34,7 @@ extern "C" {
 #include "prefix.h"
 #include "pool.h"
 #include "slist.h"
+#include "dlist.h"
 #include "vector.h"
 
 // c plus plus
