@@ -369,13 +369,13 @@ tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 }
 static tb_char_t tb_http_read_char(tb_http_t* http)
 {
-	tb_char_t ch[1];
+	tb_char_t ch[1] = {0};
 	if (1 != tb_http_read_block(http, (tb_byte_t*)ch, 1)) return '\0';
 	else return ch[0];
 }
 static tb_bool_t tb_http_skip_2bytes(tb_http_t* http)
 {
-	tb_char_t ch[2];
+	tb_char_t ch[2] = {0};
 	if (2 != tb_http_read_block(http, (tb_byte_t*)ch, 2)) return TB_FALSE;
 	else return TB_TRUE;
 }
@@ -388,9 +388,6 @@ static tb_char_t const* tb_http_read_line(tb_http_t* http)
 	{
 		// read char
 		ch = tb_http_read_char(http);
-
-		// is fail?
-		if (ch < 0) break;
 
 		// is line?
 		if (ch == '\n') 
