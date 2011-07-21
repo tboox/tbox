@@ -49,32 +49,29 @@ tb_bstream_t* tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t si
 /* /////////////////////////////////////////////////////////
  * load & save 
  */
-#if 0
-tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
+tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 {
-	TB_ASSERT(bst && gst);
-	if (!bst || !gst) return 0;
+	TB_ASSERT_RETURN_VAL(bst && ist, 0);
 
 	// sync it first
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[4096];
+	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t 		load = 0;
-	tb_size_t 		base = (tb_size_t)tb_mclock();
 	tb_size_t 		time = (tb_size_t)tb_mclock();
-	tb_size_t 		left = tb_gstream_left(gst);
+	tb_size_t 		left = tb_gstream_left(ist);
 
 	while(1)
 	{
-		tb_int_t ret = tb_gstream_read(gst, data, 4096);
+		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
 		//TB_DBG("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
-			// > 10s?
+			// timeout?
 			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > 10000) break;
+			if (timeout > TB_GSTREAM_TIMEOUT) break;
 		}
 		else
 		{
@@ -85,28 +82,25 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, void* gst)
 
 		// is end?
 		if (left && load >= left) break;
-
 	}
 
 	return load;
 }
-tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
+tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 {
-	TB_ASSERT(bst && gst);
-	if (!bst || !gst) return 0;
+	TB_ASSERT_RETURN_VAL(bst && ost, 0);
 
 	// sync it first
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[4096];
+	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t 		save = 0;
-	tb_size_t 		base = (tb_size_t)tb_mclock();
 	tb_size_t 		time = (tb_size_t)tb_mclock();
 	while(1)
 	{
 		// get data
-		tb_int_t size = tb_bstream_get_data(bst, data, 4096);
+		tb_int_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_BLOCK_SIZE);
 		//TB_DBG("ret: %d", ret);
 
 		// is end?
@@ -116,13 +110,13 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 			tb_int_t write = 0;
 			while (write < size)
 			{
-				tb_int_t ret = tb_gstream_write(gst, data + write, size - write);
+				tb_int_t ret = tb_gstream_write(ost, data + write, size - write);
 				if (ret < 0) break;
 				else if (!ret)
 				{
-					// > 10s?
+					// timeout?
 					tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-					if (timeout > 10000) break;
+					if (timeout > TB_GSTREAM_TIMEOUT) break;
 				}
 				else
 				{
@@ -140,7 +134,7 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, void* gst)
 
 	return save;
 }
-#endif
+
 /* /////////////////////////////////////////////////////////
  * modifiors
  */

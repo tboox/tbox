@@ -82,7 +82,6 @@ static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 	// init size
 	fst->size = (tb_size_t)tb_file_seek(fst->file, -1, TB_FILE_SEEK_SIZE);
 	fst->offset = 0;
-	TB_ASSERT_RETURN_VAL(fst->size, TB_FALSE);
 	
 	return TB_TRUE;
 }
