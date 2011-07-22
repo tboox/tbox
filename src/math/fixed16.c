@@ -349,3 +349,8 @@ tb_fixed16_t tb_fixed16_atan_int32(tb_fixed16_t x)
 	return tb_fixed16_cordic_vector_atan2(x, TB_FIXED16_ONE);
 }
 
+tb_fixed16_t tb_fixed16_exp_int32(tb_fixed16_t x)
+{
+	TB_NOT_IMPLEMENT();
+	return 0;
+}
