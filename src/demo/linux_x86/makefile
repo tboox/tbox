@@ -6,8 +6,6 @@ NAMES = test \
 		conv \
 		time \
 		http \
-		fixed \
-		float \
 		scalar \
 		memops \
 		string \
@@ -32,6 +30,8 @@ $(1)_LIB_DIR 	= ../../
 $(1)_INC_DIR 	= ../../
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_MODULES,$(name))))
+
+test_CPP_FILES 	= test2
 
 include $(PRO_DIR)/suffix.mak
 

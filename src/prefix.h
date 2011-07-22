@@ -403,19 +403,6 @@ typedef tb_float_t 				tb_scalar_t;
 #define tb_max(x, y) 			(((x) > (y))? (x) : (y))
 #define tb_min(x, y) 			(((x) < (y))? (x) : (y))
 
-// swap
-#ifdef __cplusplus
-template <typename T> 
-static __tb_inline__ void tb_swap(T& x, T& y) 
-{
-	T c(x);
-	x = y;
-	y = c;
-}
-#else
-# 	define tb_swap(x, y) 		((x) ^= (y) ^= (x) ^= (y))
-#endif
-
 // the number of entries in the array
 #define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
 
@@ -430,6 +417,7 @@ static __tb_inline__ void tb_swap(T& x, T& y)
 /* /////////////////////////////////////////////////////////
  * memory
  */
+
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 
 # 	ifdef TB_DEBUG
@@ -466,10 +454,23 @@ void 	tb_free(void* data);
 #endif
 
 #ifdef __cplusplus
+
+# 	ifdef TB_DEBUG
+__tb_inline__ void* operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ void 	operator delete(void* p) throw() 																		{ tb_free(p); 											}
+__tb_inline__ void* operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ void 	operator delete[](void* p) throw() 																		{ tb_free(p); 											}
+# 	else
 __tb_inline__ void* operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
 __tb_inline__ void 	operator delete(void* p) throw() 		{ tb_free(p); 				}
 __tb_inline__ void* operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
 __tb_inline__ void 	operator delete[](void* p) throw() 		{ tb_free(p); 				}
+# 	endif
+
+# 	ifdef TB_DEBUG
+# 		define new 		new(__tb_func__, __tb_line__, __tb_file__)
+# 	endif
+
 #endif
 
 // c plus plus
@@ -478,3 +479,5 @@ __tb_inline__ void 	operator delete[](void* p) throw() 		{ tb_free(p); 				}
 #endif
 
 #endif
+
+
