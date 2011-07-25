@@ -214,7 +214,7 @@
 # 	ifdef TB_CONFIG_TYPE_FLOAT
 # 		define tb_fixed16_exp(x) 			tb_fixed16_exp_float(x)
 # 	else
-# 		define tb_fixed16_exp(x) 			TB_ASSERT(0)
+# 		define tb_fixed16_exp(x) 			tb_fixed16_exp_int32(x)
 # 	endif
 #endif
 
@@ -256,6 +256,7 @@ void 			tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c
 tb_fixed16_t 	tb_fixed16_atan2_int32(tb_fixed16_t y, tb_fixed16_t x);
 tb_fixed16_t 	tb_fixed16_asin_int32(tb_fixed16_t x);
 tb_fixed16_t 	tb_fixed16_atan_int32(tb_fixed16_t x);
+tb_fixed16_t 	tb_fixed16_exp_int32(tb_fixed16_t x);
 
 /* ////////////////////////////////////////////////////////////////////////
  * inlines
