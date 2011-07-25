@@ -31,15 +31,15 @@ int main(int argc, char** argv)
 			, utc.seconds
 			, utc.milliseconds);
 	}
-	TB_DBG("time: %d ms, clock: %d ms", (tb_int_t)time, (tb_int_t)tb_mclock());
+	TB_DBG("time: %d ms, clock: %d ms", tb_int64_to_int32(time), tb_int64_to_int32(tb_mclock()));
 
 	if (TB_TRUE == tb_time_from_local(&time, &local))
 	{
-		TB_DBG("local => time: %d", (tb_int_t)time);
+		TB_DBG("local => time: %d", tb_int64_to_int32(time));
 	}
 	if (TB_TRUE == tb_time_from_utc(&time, &utc))
 	{
-		TB_DBG("utc => time: %d", (tb_int_t)time);
+		TB_DBG("utc => time: %d", tb_int64_to_int32(time));
 	}
 
 	

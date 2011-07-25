@@ -25,6 +25,7 @@
  * includes
  */
 #include "cookies.h"
+#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/cstring.h"
@@ -358,7 +359,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 				cookie->secure = entry->bsecure;
 
 				// update expires
-				cookie->expires = 0;
+				cookie->expires = tb_uint32_to_uint64(0);
 
 				// update value
 				if (svalue->refn > 1) svalue->refn--;
@@ -434,7 +435,7 @@ static void tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const*
 	cookie.secure = entry->bsecure;
 
 	// set expires
-	cookie.expires = 0;
+	cookie.expires = tb_uint32_to_uint64(0);
 
 	// set strings
 	cookie.domain = tb_cookie_set_string(cookies, entry->pdomain, entry->ndomain);
