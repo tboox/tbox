@@ -361,7 +361,19 @@ typedef signed long long 		tb_int64_t;
 typedef unsigned long long 		tb_uint64_t;
 typedef tb_int64_t				tb_sint64_t;
 #else
-# 	error int64 is not supported.
+typedef struct __tb_sint64_t
+{
+	tb_int32_t 	h;
+	tb_uint32_t l;
+
+} 								tb_sint64_t;
+typedef struct __tb_uint64_t
+{
+	tb_uint32_t h;
+	tb_uint32_t l;
+
+} 								tb_uint64_t;
+typedef tb_sint64_t 			tb_int64_t;
 #endif
 
 // handle

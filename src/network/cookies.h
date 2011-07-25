@@ -206,9 +206,8 @@ extern "C" {
 // the cookie type
 typedef struct __tb_cookie_t
 {
-	tb_uint64_t 		secure 	: 1;
-	tb_uint64_t 		expires : 63;
-
+	tb_uint64_t 		expires;
+	tb_size_t 			secure;
 	tb_size_t 			domain;
 	tb_size_t 			path;
 	tb_size_t 			name;

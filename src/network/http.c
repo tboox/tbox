@@ -25,6 +25,7 @@
  * includes
  */
 #include "http.h"
+#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
@@ -321,20 +322,20 @@ tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
 	
 	tb_size_t 	write = 0;
-	tb_size_t 	time = (tb_size_t)tb_mclock();
+	tb_int64_t 	time = tb_mclock();
 	while (write < size)
 	{
 		tb_int_t ret = tb_http_socket_write(http, data + write, size - write);
 		if (ret > 0) 
 		{
 			write += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > http->option.timeout) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -347,20 +348,20 @@ tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
 
 	tb_size_t 	read = 0;
-	tb_size_t 	time = (tb_size_t)tb_mclock();
+	tb_int64_t 	time = tb_mclock();
 	while (read < size)
 	{
 		tb_int_t ret = tb_http_socket_read(http, data + read, size - read);	
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > http->option.timeout) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -1176,20 +1177,20 @@ tb_int_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
 	
 	tb_size_t 	write = 0;
-	tb_size_t 	time = (tb_size_t)tb_mclock();
+	tb_int64_t 	time = tb_mclock();
 	while (write < size)
 	{
 		tb_int_t ret = tb_http_write(handle, data + write, size - write);
 		if (ret > 0) 
 		{
 			write += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > http->option.timeout) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -1202,20 +1203,20 @@ tb_int_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(http && http->socket && data, -1);
 
 	tb_size_t 	read = 0;
-	tb_size_t 	time = (tb_size_t)tb_mclock();
+	tb_int64_t 	time = tb_mclock();
 	while (read < size)
 	{
 		tb_int_t ret = tb_http_read(handle, data + read, size - read);	
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 		}
 		else if (!ret)
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > http->option.timeout) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
