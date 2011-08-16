@@ -45,11 +45,13 @@
 # 	define tb_uint64_mul_uint32(x, y) 	((x) * (tb_uint32_t)(y))
 # 	define tb_uint64_div_uint32(x, y) 	((x) / (tb_uint32_t)(y))
 
+# 	define tb_uint64_et(x, y) 			((x) == (y))
 # 	define tb_uint64_lt(x, y) 			((x) < (y))
 # 	define tb_uint64_bt(x, y) 			((x) > (y))
 
-# 	define tb_uint64_lt_uint32(x, y)	((x) < (tb_uint32_t)(y))
-# 	define tb_uint64_bt_uint32(x, y) 	((x) > (tb_uint32_t)(y))
+# 	define tb_uint64_et_uint32(x, y)	((tb_uint32_t)(x) == (y))
+# 	define tb_uint64_lt_uint32(x, y)	((tb_uint32_t)(x) < (y))
+# 	define tb_uint64_bt_uint32(x, y) 	((tb_uint32_t)(x) > (y))
 #else
 # 	define tb_uint32_to_uint64(x) 		tb_uint32_to_uint64_inline(x)
 # 	define tb_uint64_to_uint32(x) 		tb_uint64_to_uint32_inline(x)
@@ -64,9 +66,11 @@
 # 	define tb_uint64_mul_uint32(x, y) 	tb_uint64_mul_uint32_inline(x, y)
 # 	define tb_uint64_div_uint32(x, y) 	tb_uint64_div_uint32_inline(x, y)
 
+# 	define tb_uint64_et(x, y) 			tb_uint64_et_inline(x, y)
 # 	define tb_uint64_lt(x, y) 			tb_uint64_lt_inline(x, y)
 # 	define tb_uint64_bt(x, y) 			tb_uint64_bt_inline(x, y)
 
+# 	define tb_uint64_et_uint32(x, y)	tb_uint64_et_uint32_inline(x, y)
 # 	define tb_uint64_lt_uint32(x, y)	tb_uint64_lt_uint32_inline(x, y)
 # 	define tb_uint64_bt_uint32(x, y) 	tb_uint64_bt_uint32_inline(x, y)
 #endif
@@ -129,21 +133,29 @@ static __tb_inline__ tb_uint64_t tb_uint64_div_uint32_inline(tb_uint64_t x, tb_u
 	tb_uint64_t a;
 	return a;
 }
-static __tb_inline__ tb_bool_t tb_uint64_lt_inline(tb_uint64_t x, tb_uint64_t y)
+static __tb_inline__ tb_int_t tb_uint64_et_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	return TB_FALSE;
+ 	return (x.h == y.h && x.l == y.l);
 }
-static __tb_inline__ tb_bool_t tb_uint64_bt_inline(tb_uint64_t x, tb_uint64_t y)
+static __tb_inline__ tb_int_t tb_uint64_lt_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	return TB_FALSE;
+ 	return ((x.h < y.h) || (x.h == y.h && x.l < y.l));
 }
-static __tb_inline__ tb_bool_t tb_uint64_lt_uint32_inline(tb_uint64_t x, tb_uint32_t y)
+static __tb_inline__ tb_int_t tb_uint64_bt_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	return TB_FALSE;
+ 	return ((x.h > y.h) || (x.h == y.h && x.l > y.l));
 }
-static __tb_inline__ tb_bool_t tb_uint64_bt_uint32_inline(tb_uint64_t x, tb_uint32_t y)
+static __tb_inline__ tb_int_t tb_uint64_et_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
-	return TB_FALSE;
+ 	return (!x.h && x.l == y);
+}
+static __tb_inline__ tb_int_t tb_uint64_lt_uint32_inline(tb_uint64_t x, tb_uint32_t y)
+{
+ 	return (!x.h && x.l < y);
+}
+static __tb_inline__ tb_int_t tb_uint64_bt_uint32_inline(tb_uint64_t x, tb_uint32_t y)
+{
+ 	return (x.h || (x.l > y));
 }
 #endif
 

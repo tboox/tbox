@@ -112,11 +112,23 @@ tb_float_t tb_bits_get_double_le(tb_byte_t const* p)
 	} conv;
 
 #ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bits_get_u32_le(p);
-	conv.i[1] = tb_bits_get_u32_le(p);
+	conv.i[0] = p[7];
+	conv.i[1] = p[6];
+	conv.i[2] = p[5];
+	conv.i[3] = p[4];
+	conv.i[4] = p[3];
+	conv.i[5] = p[2];
+	conv.i[6] = p[1];
+	conv.i[7] = p[0];
 #else
-	conv.i[1] = tb_bits_get_u32_le(p);
-	conv.i[0] = tb_bits_get_u32_le(p);
+	conv.i[0] = p[0];
+	conv.i[1] = p[1];
+	conv.i[2] = p[2];
+	conv.i[3] = p[3];
+	conv.i[4] = p[4];
+	conv.i[5] = p[5];
+	conv.i[6] = p[6];
+	conv.i[7] = p[7];
 #endif
 
 	return (tb_float_t)conv.f;
@@ -125,39 +137,40 @@ tb_float_t tb_bits_get_double_be(tb_byte_t const* p)
 {
 	union 
 	{
-		tb_uint32_t i[2];
+		tb_uint8_t 	i[8];
 		double 		f;
 
 	} conv;
 
 #ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bits_get_u32_be(p);
-	conv.i[1] = tb_bits_get_u32_be(p);
+	conv.i[0] = p[0];
+	conv.i[1] = p[1];
+	conv.i[2] = p[2];
+	conv.i[3] = p[3];
+	conv.i[4] = p[4];
+	conv.i[5] = p[5];
+	conv.i[6] = p[6];
+	conv.i[7] = p[7];
 #else
-	conv.i[1] = tb_bits_get_u32_be(p);
-	conv.i[0] = tb_bits_get_u32_be(p);
+	conv.i[0] = p[7];
+	conv.i[1] = p[6];
+	conv.i[2] = p[5];
+	conv.i[3] = p[4];
+	conv.i[4] = p[3];
+	conv.i[5] = p[2];
+	conv.i[6] = p[1];
+	conv.i[7] = p[0];
 #endif
 
 	return (tb_float_t)conv.f;
 }
 tb_float_t tb_bits_get_double_ne(tb_byte_t const* p)
 {
-	union 
-	{
-		tb_uint32_t i[2];
-		double 		f;
-
-	} conv;
-
-#ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bits_get_u32_ne(p);
-	conv.i[1] = tb_bits_get_u32_ne(p);
+#ifdef TB_WORDS_BIGENDIAN
+	return tb_bits_get_double_be(p);
 #else
-	conv.i[1] = tb_bits_get_u32_ne(p);
-	conv.i[0] = tb_bits_get_u32_ne(p);
+	return tb_bits_get_double_le(p);
 #endif
-
-	return (tb_float_t)conv.f;
 }
 #endif
 
