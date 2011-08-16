@@ -363,7 +363,7 @@ typedef tb_int64_t				tb_sint64_t;
 #else
 typedef struct __tb_sint64_t
 {
-	tb_int32_t 	h;
+	tb_sint32_t h;
 	tb_uint32_t l;
 
 } 								tb_sint64_t;

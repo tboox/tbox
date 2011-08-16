@@ -45,11 +45,13 @@
 # 	define tb_sint64_mul_sint32(x, y) 	((x) * (tb_sint32_t)(y))
 # 	define tb_sint64_div_sint32(x, y) 	((x) / (tb_sint32_t)(y))
 
+# 	define tb_sint64_et(x, y) 			((x) == (y))
 # 	define tb_sint64_lt(x, y) 			((x) < (y))
 # 	define tb_sint64_bt(x, y) 			((x) > (y))
 
-# 	define tb_sint64_lt_sint32(x, y)	((x) < (tb_sint32_t)(y))
-# 	define tb_sint64_bt_sint32(x, y) 	((x) > (tb_sint32_t)(y))
+# 	define tb_sint64_et_sint32(x, y)	((tb_sint32_t)(x) == (y))
+# 	define tb_sint64_lt_sint32(x, y)	((tb_sint32_t)(x) < (y))
+# 	define tb_sint64_bt_sint32(x, y) 	((tb_sint32_t)(x) > (y))
 #else
 # 	define tb_sint32_to_sint64(x) 		tb_sint32_to_sint64_inline(x)
 # 	define tb_sint64_to_sint32(x) 		tb_sint64_to_sint32_inline(x)
@@ -64,9 +66,11 @@
 # 	define tb_sint64_mul_sint32(x, y) 	tb_sint64_mul_sint32_inline(x, y)
 # 	define tb_sint64_div_sint32(x, y) 	tb_sint64_div_sint32_inline(x, y)
 
+# 	define tb_sint64_et(x, y) 			tb_sint64_et_inline(x, y)
 # 	define tb_sint64_lt(x, y) 			tb_sint64_lt_inline(x, y)
 # 	define tb_sint64_bt(x, y) 			tb_sint64_bt_inline(x, y)
 
+# 	define tb_sint64_et_sint32(x, y)	tb_sint64_et_sint32_inline(x, y)
 # 	define tb_sint64_lt_sint32(x, y)	tb_sint64_lt_sint32_inline(x, y)
 # 	define tb_sint64_bt_sint32(x, y) 	tb_sint64_bt_sint32_inline(x, y)
 #endif
@@ -91,59 +95,72 @@ static __tb_inline__ tb_sint32_t tb_sint64_to_sint32_inline(tb_sint64_t x)
 
 static __tb_inline__ tb_sint64_t tb_sint64_add_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	tb_sint64_t a;
-	return a;
+	tb_uint32_t s = x.l + y.l;
+
+	x.h = x.h + y.h + (s < x.l);
+	x.l = s;
+
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_sub_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	tb_sint64_t a = {0};
-	return a;
+    x.h = x.h - y.h - (x.l < y.l);
+    x.l = x.l - y.l;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	tb_sint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_div_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	tb_sint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_add_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	tb_sint64_t a;
-	return a;
+	tb_sint32_t h = y >> 31;
+	tb_uint32_t s = x.l + (tb_uint32_t)y;
+
+	x.h = x.h + h + (s < x.l);
+	x.l = s;
+
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_sub_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	tb_sint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	tb_sint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_div_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	tb_sint64_t a;
-	return a;
+	return x;
 }
-static __tb_inline__ tb_bool_t tb_sint64_lt_inline(tb_sint64_t x, tb_sint64_t y)
+static __tb_inline__ tb_int_t tb_sint64_et_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	return TB_FALSE;
+ 	return (x.h == y.h && x.l == y.l);
 }
-static __tb_inline__ tb_bool_t tb_sint64_bt_inline(tb_sint64_t x, tb_sint64_t y)
+static __tb_inline__ tb_int_t tb_sint64_lt_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	return TB_FALSE;
+ 	return ((x.h < y.h) || (x.h == y.h && x.l < y.l));
 }
-static __tb_inline__ tb_bool_t tb_sint64_lt_sint32_inline(tb_sint64_t x, tb_sint32_t y)
+static __tb_inline__ tb_int_t tb_sint64_bt_inline(tb_sint64_t x, tb_sint64_t y)
 {
-	return TB_FALSE;
+ 	return ((x.h > y.h) || (x.h == y.h && x.l > y.l));
 }
-static __tb_inline__ tb_bool_t tb_sint64_bt_sint32_inline(tb_sint64_t x, tb_sint32_t y)
+static __tb_inline__ tb_int_t tb_sint64_et_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	return TB_FALSE;
+ 	return (x.h == (y >> 31) && x.l == y);
+}
+static __tb_inline__ tb_int_t tb_sint64_lt_sint32_inline(tb_sint64_t x, tb_sint32_t y)
+{
+ 	return ((x.h < (y >> 31)) || (x.h == (y >> 31) && x.l < y));
+}
+static __tb_inline__ tb_int_t tb_sint64_bt_sint32_inline(tb_sint64_t x, tb_sint32_t y)
+{
+ 	return ((x.h > (y >> 31)) || (x.h == (y >> 31) && x.l > y));
 }
 #endif
 

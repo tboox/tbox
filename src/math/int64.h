@@ -47,9 +47,11 @@
 #define tb_int64_mul_int32(x, y) 	tb_sint64_mul_sint32(x, y)
 #define tb_int64_div_int32(x, y) 	tb_sint64_div_sint32(x, y)
 
+#define tb_int64_et(x, y) 			tb_sint64_et(x, y)
 #define tb_int64_lt(x, y) 			tb_sint64_lt(x, y)
 #define tb_int64_bt(x, y) 			tb_sint64_bt(x, y)
 
+#define tb_int64_et_int32(x, y)		tb_sint64_et_sint32(x, y)
 #define tb_int64_lt_int32(x, y)		tb_sint64_lt_sint32(x, y)
 #define tb_int64_bt_int32(x, y) 	tb_sint64_bt_sint32(x, y)
 
