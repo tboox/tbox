@@ -32,7 +32,7 @@
  * interfaces
  */
 
-tb_slist_t* tb_slist_create(tb_size_t step, tb_size_t grow, void (*ctor)(void* , void* ), void (*dtor)(void* , void* ), void* priv)
+tb_slist_t* tb_slist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_slist_t* slist = (tb_slist_t*)tb_calloc(1, sizeof(tb_slist_t));
 	TB_ASSERT_RETURN_VAL(slist, TB_NULL);
@@ -55,7 +55,7 @@ fail:
 	return TB_NULL;
 }
 
-void tb_slist_destroy(tb_slist_t* slist)
+tb_void_t tb_slist_destroy(tb_slist_t* slist)
 {
 	if (slist)
 	{
@@ -69,7 +69,7 @@ void tb_slist_destroy(tb_slist_t* slist)
 		tb_free(slist);
 	}
 }
-void tb_slist_clear(tb_slist_t* slist)
+tb_void_t tb_slist_clear(tb_slist_t* slist)
 {
 	if (slist) 
 	{

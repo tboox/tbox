@@ -78,7 +78,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_str
  * interfaces
  */
 
-void tb_xml_node_init(tb_xml_node_t* node, void* document, tb_size_t type)
+tb_void_t tb_xml_node_init(tb_xml_node_t* node, tb_void_t* document, tb_size_t type)
 {
 	if (node)
 	{
@@ -92,7 +92,7 @@ void tb_xml_node_init(tb_xml_node_t* node, void* document, tb_size_t type)
 		tb_string_init(&node->value);
 	}
 }
-void tb_xml_node_uninit(tb_xml_node_t* node)
+tb_void_t tb_xml_node_uninit(tb_xml_node_t* node)
 {
 	if (node)
 	{
@@ -112,7 +112,7 @@ void tb_xml_node_uninit(tb_xml_node_t* node)
 		node->attributes = TB_NULL;
 	}
 }
-tb_xml_node_t* tb_xml_node_create(void* document, tb_size_t type)
+tb_xml_node_t* tb_xml_node_create(tb_void_t* document, tb_size_t type)
 {
 	// alloc node
 	tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_node_t));
@@ -123,7 +123,7 @@ tb_xml_node_t* tb_xml_node_create(void* document, tb_size_t type)
 
 	return node;
 }
-void tb_xml_node_destroy(tb_xml_node_t* node)
+tb_void_t tb_xml_node_destroy(tb_xml_node_t* node)
 {
 	if (node)
 	{
@@ -135,7 +135,7 @@ void tb_xml_node_destroy(tb_xml_node_t* node)
 	}
 }
 
-void tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child)
+tb_void_t tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child)
 {
 	TB_ASSERT(node && child);
 	if (!node || !child) return ;
@@ -147,7 +147,7 @@ void tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child)
 		child->parent = node;
 	}
 }
-void tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child)
+tb_void_t tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child)
 {
 	TB_ASSERT(node && child);
 	if (!node || !child) return ;
@@ -169,7 +169,7 @@ tb_xml_node_t* tb_xml_node_childs_tail(tb_xml_node_t* node)
 	return TB_NULL;
 }
 
-void tb_xml_node_attributes_clear(tb_xml_node_t* node)
+tb_void_t tb_xml_node_attributes_clear(tb_xml_node_t* node)
 {
 	if (node)
 	{

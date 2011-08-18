@@ -85,7 +85,7 @@ static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 	
 	return TB_TRUE;
 }
-static void tb_fstream_close(tb_gstream_t* gst)
+static tb_void_t tb_fstream_close(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	if (fst && fst->file)
@@ -165,7 +165,7 @@ static tb_size_t tb_fstream_offset(tb_gstream_t* gst)
 	TB_ASSERT_RETURN_VAL(fst && fst->file, 0);
 	return fst->offset;
 }
-static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
+static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(fst, TB_FALSE);

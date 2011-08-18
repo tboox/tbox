@@ -71,13 +71,13 @@ typedef struct __tb_stack_string_t
 // create & destroy
 tb_string_t* 		tb_string_create();
 tb_string_t* 		tb_string_create_from_buffer(tb_byte_t* data, tb_uint16_t size);
-void 				tb_string_destroy(tb_string_t* string);
+tb_void_t 				tb_string_destroy(tb_string_t* string);
 
 // init
-void				tb_string_init(tb_string_t* string);
-void				tb_string_init_stack_string(tb_stack_string_t* string);
-void 				tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size);
-void 				tb_string_uninit(tb_string_t* string);
+tb_void_t				tb_string_init(tb_string_t* string);
+tb_void_t				tb_string_init_stack_string(tb_stack_string_t* string);
+tb_void_t 				tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size);
+tb_void_t 				tb_string_uninit(tb_string_t* string);
 
 // accessors
 tb_char_t const* 	tb_string_c_string(tb_string_t const* string);
@@ -106,8 +106,8 @@ tb_int_t 			tb_string_reverse_find_string_nocase(tb_string_t const* string, tb_s
 // modifiors
 tb_bool_t 			tb_string_resize(tb_string_t* string, tb_uint16_t size);
 tb_byte_t* 			tb_string_data(tb_string_t* string);
-void 				tb_string_clear(tb_string_t* string);
-void 				tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch);
+tb_void_t 				tb_string_clear(tb_string_t* string);
+tb_void_t 				tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch);
 tb_char_t const* 	tb_string_shift(tb_string_t* string, tb_string_t* s_string);
 
 // assign

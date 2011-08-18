@@ -6,6 +6,7 @@ NAMES = test \
 		conv \
 		time \
 		http \
+		bits \
 		sint64 \
 		uint64 \
 		scalar \
@@ -22,6 +23,7 @@ NAMES = test \
 		dlist \
 		base32 \
 		base64 \
+		sha \
 		md5 \
 		crc \
 		dns \

@@ -59,7 +59,7 @@ static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)
 	if (p) return *p;
 	else return '\0';
 }
-static void tb_xml_reader_seek_char(tb_xml_reader_t* reader)
+static tb_void_t tb_xml_reader_seek_char(tb_xml_reader_t* reader)
 {
 	tb_gstream_seek(reader->gst, 1, TB_GSTREAM_SEEK_CUR);
 }
@@ -148,7 +148,7 @@ tb_xml_reader_t* tb_xml_reader_open(tb_gstream_t* gst)
 	return reader;
 }
 
-void tb_xml_reader_close(tb_xml_reader_t* reader)
+tb_void_t tb_xml_reader_close(tb_xml_reader_t* reader)
 {
 	if (reader)
 	{
@@ -601,7 +601,7 @@ end:
 }
 #ifdef TB_DEBUG
 
-void tb_xml_reader_dump(tb_xml_reader_t* reader)
+tb_void_t tb_xml_reader_dump(tb_xml_reader_t* reader)
 {
 	TB_ASSERT(reader);
 	if (!reader) return ;

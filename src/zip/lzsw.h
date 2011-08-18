@@ -105,7 +105,7 @@ typedef struct __tb_lzsw_deflate_window_t
 	tb_size_t 					base;
 
 	// the window hash
-	void* 						pool;
+	tb_void_t* 						pool;
 	tb_size_t 					hash[TB_LZSW_WINDOW_HASH_MAX];
 #endif
 

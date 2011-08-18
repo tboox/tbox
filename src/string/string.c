@@ -65,7 +65,7 @@ tb_string_t* tb_string_create_from_buffer(tb_byte_t* data, tb_uint16_t size)
 	tb_string_init_from_buffer(string, data, size);
 	return string;
 }
-void tb_string_destroy(tb_string_t* string)
+tb_void_t tb_string_destroy(tb_string_t* string)
 {
 	if (string) 
 	{
@@ -74,11 +74,11 @@ void tb_string_destroy(tb_string_t* string)
 	}
 }
 
-void tb_string_init(tb_string_t* string)
+tb_void_t tb_string_init(tb_string_t* string)
 {
 	if (string) tb_memset(string, 0, sizeof(tb_string_t));
 }
-void tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size)
+tb_void_t tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size)
 {
 	if (string)
 	{
@@ -93,11 +93,11 @@ void tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_
 		else tb_string_init(string);
 	}
 }
-void tb_string_init_stack_string(tb_stack_string_t* string)
+tb_void_t tb_string_init_stack_string(tb_stack_string_t* string)
 {
 	tb_string_init_from_buffer(&string->base, string->stack, TB_STRING_STACK_MAX);
 }
-void tb_string_uninit(tb_string_t* string)
+tb_void_t tb_string_uninit(tb_string_t* string)
 {
 	if (string)
 	{
@@ -124,7 +124,7 @@ tb_char_t tb_string_at(tb_string_t const* string, tb_int_t index)
 		return string->data[index];
 	else return '\0';
 }
-void tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch)
+tb_void_t tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch)
 {
 	if (TB_FALSE == tb_string_is_null(string) && index >= 0 && index < string->size)
 		string->data[index] = ch;
@@ -225,7 +225,7 @@ fail:
 	tb_string_uninit(string);
 	return TB_FALSE;
 }
-void tb_string_clear(tb_string_t* string)
+tb_void_t tb_string_clear(tb_string_t* string)
 {
 	if (string) 
 	{

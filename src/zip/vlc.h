@@ -46,9 +46,9 @@ extern "C" {
 
 // the callback type
 struct __tb_zip_vlc_t;
-typedef void 		(*tb_zip_vlc_set_t)(struct __tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst);
+typedef tb_void_t 		(*tb_zip_vlc_set_t)(struct __tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst);
 typedef tb_uint32_t (*tb_zip_vlc_get_t)(struct __tb_zip_vlc_t* vlc, tb_bstream_t const* bst);
-typedef void 		(*tb_zip_vlc_close_t)(struct __tb_zip_vlc_t* vlc);
+typedef tb_void_t 		(*tb_zip_vlc_close_t)(struct __tb_zip_vlc_t* vlc);
 
 // the vlc type
 typedef enum __tb_zip_vlc_type_t

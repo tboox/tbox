@@ -313,7 +313,7 @@ extern "C" {
 #ifdef __cplusplus
 # 	define TB_NULL 					(0)
 #else
-# 	define TB_NULL 					((void*)0)
+# 	define TB_NULL 					((tb_void_t*)0)
 #endif
 
 
@@ -433,15 +433,15 @@ typedef tb_float_t 				tb_scalar_t;
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 
 # 	ifdef TB_DEBUG
-void* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-void* 		tb_mpool_reallocate(void* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-void 		tb_mpool_deallocate(void* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_void_t 		tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 # 	else
-void* 		tb_mpool_allocate(tb_size_t size);
-void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
-void* 		tb_mpool_reallocate(void* data, tb_size_t size);
-void 		tb_mpool_deallocate(void* data);
+tb_void_t* 		tb_mpool_allocate(tb_size_t size);
+tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
+tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size);
+tb_void_t 		tb_mpool_deallocate(tb_void_t* data);
 # 	endif
 
 # 	ifdef TB_DEBUG
@@ -458,25 +458,25 @@ void 		tb_mpool_deallocate(void* data);
 
 #else
 
-void* 	tb_malloc(tb_size_t size);
-void* 	tb_realloc(void* data, tb_size_t size);
-void* 	tb_calloc(tb_size_t item, tb_size_t size);
-void 	tb_free(void* data);
+tb_void_t* 	tb_malloc(tb_size_t size);
+tb_void_t* 	tb_realloc(tb_void_t* data, tb_size_t size);
+tb_void_t* 	tb_calloc(tb_size_t item, tb_size_t size);
+tb_void_t 	tb_free(tb_void_t* data);
 
 #endif
 
 #ifdef __cplusplus
 
 # 	ifdef TB_DEBUG
-__tb_inline__ void* operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
-__tb_inline__ void 	operator delete(void* p) throw() 																		{ tb_free(p); 											}
-__tb_inline__ void* operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
-__tb_inline__ void 	operator delete[](void* p) throw() 																		{ tb_free(p); 											}
+__tb_inline__ tb_void_t* operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 																		{ tb_free(p); 											}
+__tb_inline__ tb_void_t* operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 																		{ tb_free(p); 											}
 # 	else
-__tb_inline__ void* operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
-__tb_inline__ void 	operator delete(void* p) throw() 		{ tb_free(p); 				}
-__tb_inline__ void* operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
-__tb_inline__ void 	operator delete[](void* p) throw() 		{ tb_free(p); 				}
+__tb_inline__ tb_void_t* operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
+__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 		{ tb_free(p); 				}
+__tb_inline__ tb_void_t* operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
+__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 		{ tb_free(p); 				}
 # 	endif
 
 # 	ifdef TB_DEBUG

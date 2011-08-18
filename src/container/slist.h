@@ -86,9 +86,9 @@ typedef struct __tb_slist_t
 	tb_size_t 		step;
 
 	// ctor & dtor
-	void 			(*ctor)(void* data, void* priv);
-	void 			(*dtor)(void* data, void* priv);
-	void* 			priv;
+	tb_void_t 			(*ctor)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t 			(*dtor)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t* 			priv;
 
 }tb_slist_t;
 
@@ -97,15 +97,15 @@ typedef struct __tb_slist_t
  */
 
 // create & destroy
-tb_slist_t* 		tb_slist_create(tb_size_t step, tb_size_t grow, void (*ctor)(void* , void* ), void (*dtor)(void* , void* ), void* priv);
-void 				tb_slist_destroy(tb_slist_t* slist);
+tb_slist_t* 		tb_slist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_void_t 				tb_slist_destroy(tb_slist_t* slist);
 
 // accessors
 tb_byte_t* 			tb_slist_at(tb_slist_t* slist, tb_size_t index);
 tb_byte_t const* 	tb_slist_const_at(tb_slist_t const* slist, tb_size_t index);
 
 // modifiors
-void 				tb_slist_clear(tb_slist_t* slist);
+tb_void_t 				tb_slist_clear(tb_slist_t* slist);
 
 tb_size_t 			tb_slist_insert(tb_slist_t* slist, tb_size_t index, tb_byte_t const* item);
 tb_size_t 			tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_byte_t const* item);

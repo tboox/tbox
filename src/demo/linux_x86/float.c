@@ -482,7 +482,7 @@ static tb_float_t tb_float_test_atan_a[] =
 ,	10.000000
 };
 
-static void tb_float_test_constant()
+static tb_void_t tb_float_test_constant()
 {
 	tb_printf("[float]: one = %f\n", tb_float_to_float(TB_FLOAT_ONE));
 	tb_printf("[float]: half = %f\n", tb_float_to_float(TB_FLOAT_HALF));
@@ -493,7 +493,7 @@ static void tb_float_test_constant()
 	tb_printf("[float]: pi = %f\n", tb_float_to_float(TB_FLOAT_PI));
 	tb_printf("[float]: sqrt2 = %f\n", tb_float_to_float(TB_FLOAT_SQRT2));
 }
-static void tb_float_test_round(tb_float_t x)
+static tb_void_t tb_float_test_round(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -505,7 +505,7 @@ static void tb_float_test_round(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: round(%f): %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_floor(tb_float_t x)
+static tb_void_t tb_float_test_floor(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -517,7 +517,7 @@ static void tb_float_test_floor(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: floor(%f): %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_ceil(tb_float_t x)
+static tb_void_t tb_float_test_ceil(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -529,7 +529,7 @@ static void tb_float_test_ceil(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: ceil(%f): %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_mul(tb_float_t a, tb_float_t b)
+static tb_void_t tb_float_test_mul(tb_float_t a, tb_float_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -542,7 +542,7 @@ static void tb_float_test_mul(tb_float_t a, tb_float_t b)
 	tb_printf("[float]: mul(%f, %f): %f, %d ms\n", tb_float_to_float(a), tb_float_to_float(b), tb_float_to_float(r), (tb_int_t)t);
 
 }
-static void tb_float_test_div(tb_float_t a, tb_float_t b)
+static tb_void_t tb_float_test_div(tb_float_t a, tb_float_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -554,7 +554,7 @@ static void tb_float_test_div(tb_float_t a, tb_float_t b)
 	t = tb_mclock() - t;
 	tb_printf("[float]: div(%f, %f): %f, %d ms\n", tb_float_to_float(a), tb_float_to_float(b), tb_float_to_float(r), (tb_int_t)t);
 }
-static void tb_float_test_invert(tb_float_t x)
+static tb_void_t tb_float_test_invert(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -566,7 +566,7 @@ static void tb_float_test_invert(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: invert(%f): %f, %d ms\n", tb_float_to_float(x), tb_float_to_float(r), (tb_int_t)t);
 }
-static void tb_float_test_sqre(tb_float_t x)
+static tb_void_t tb_float_test_sqre(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -578,7 +578,7 @@ static void tb_float_test_sqre(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: sqre(%f): %f, %d ms\n", tb_float_to_float(x), tb_float_to_float(r), (tb_int_t)t);
 }
-static void tb_float_test_sqrt(tb_float_t x)
+static tb_void_t tb_float_test_sqrt(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -590,7 +590,7 @@ static void tb_float_test_sqrt(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: sqrt(%f) = %f, %d ms\n", tb_float_to_float(x), tb_float_to_float(r), (tb_int_t)t);
 }
-static void tb_float_test_ilog2(tb_float_t x)
+static tb_void_t tb_float_test_ilog2(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t	r = 0;
@@ -602,7 +602,7 @@ static void tb_float_test_ilog2(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: ilog2(%f) = %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_iclog2(tb_float_t x)
+static tb_void_t tb_float_test_iclog2(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t	r = 0;
@@ -614,7 +614,7 @@ static void tb_float_test_iclog2(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: iclog2(%f) = %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_irlog2(tb_float_t x)
+static tb_void_t tb_float_test_irlog2(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t	r = 0;
@@ -626,7 +626,7 @@ static void tb_float_test_irlog2(tb_float_t x)
 	t = tb_mclock() - t;
 	tb_printf("[float]: irlog2(%f) = %d, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
-static void tb_float_test_exp(tb_float_t x)
+static tb_void_t tb_float_test_exp(tb_float_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_float_t 	r = 0;
@@ -639,7 +639,7 @@ static void tb_float_test_exp(tb_float_t x)
 	tb_printf("[float]: exp(%f) = %f, %d ms\n", tb_float_to_float(x), r, (tb_int_t)t);
 }
 
-static void tb_float_test_sin()
+static tb_void_t tb_float_test_sin()
 {
 #if 1
 	__tb_volatile__ tb_int_t 	i = 0;
@@ -669,7 +669,7 @@ static void tb_float_test_sin()
 #endif
 }
 
-static void tb_float_test_cos()
+static tb_void_t tb_float_test_cos()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
@@ -690,7 +690,7 @@ static void tb_float_test_cos()
 	tb_printf("[float]: cos(0 - 360), %d ms\n", (tb_int_t)t);
 }
 
-static void tb_float_test_tan()
+static tb_void_t tb_float_test_tan()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
@@ -711,7 +711,7 @@ static void tb_float_test_tan()
 	tb_printf("[float]: tan(0 - 360), %d ms\n", (tb_int_t)t);
 }
 
-static void tb_float_test_atan2()
+static tb_void_t tb_float_test_atan2()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -751,7 +751,7 @@ static void tb_float_test_atan2()
 	tb_printf("[float]: atan2(), %d ms\n", (tb_int_t)t);
 }
 
-static void tb_float_test_asin()
+static tb_void_t tb_float_test_asin()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -787,7 +787,7 @@ static void tb_float_test_asin()
 
 	tb_printf("[float]: asin, %d ms\n", (tb_int_t)t);
 }
-static void tb_float_test_acos()
+static tb_void_t tb_float_test_acos()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -823,7 +823,7 @@ static void tb_float_test_acos()
 
 	tb_printf("[float]: acos, %d ms\n", (tb_int_t)t);
 }
-static void tb_float_test_atan()
+static tb_void_t tb_float_test_atan()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 100;

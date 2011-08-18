@@ -91,12 +91,12 @@ typedef struct __tb_http_option_t
 	tb_uint16_t 		timeout;
 
 	// the head funcs
-	tb_bool_t 			(*head_func)(tb_char_t const* line, void* priv);
-	void* 				head_priv;
+	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_void_t* priv);
+	tb_void_t* 				head_priv;
 
 	// the ssl funcs
 	tb_handle_t 		(*sopen_func)(tb_char_t const* host, tb_size_t port);
-	void 				(*sclose_func)(tb_handle_t handle);
+	tb_void_t 				(*sclose_func)(tb_handle_t handle);
 	tb_int_t 			(*sread_func)(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 	tb_int_t 			(*swrite_func)(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 
@@ -168,14 +168,14 @@ typedef struct __tb_http_status_t
 
 // create & destroy
 tb_handle_t 			tb_http_create(tb_http_option_t const* option);
-void 					tb_http_destroy(tb_handle_t handle);
+tb_void_t 					tb_http_destroy(tb_handle_t handle);
 
 // open & close
 tb_bool_t 				tb_http_open(tb_handle_t handle);
-void 					tb_http_close(tb_handle_t handle);
+tb_void_t 					tb_http_close(tb_handle_t handle);
 
 // options
-void 					tb_http_option_dump(tb_handle_t handle);
+tb_void_t 					tb_http_option_dump(tb_handle_t handle);
 tb_size_t 				tb_http_option_get_port(tb_handle_t handle);
 tb_char_t const* 		tb_http_option_get_url(tb_handle_t handle);
 tb_char_t const* 		tb_http_option_get_host(tb_handle_t handle);
@@ -195,9 +195,9 @@ tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirec
 tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
 tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , void* ), void* head_priv);
+tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_void_t* ), tb_void_t* head_priv);
 tb_bool_t 				tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_func)(tb_char_t const*, tb_size_t ));
-tb_bool_t 				tb_http_option_set_sclose_func(tb_handle_t handle, void (*sclose_func)(tb_handle_t));
+tb_bool_t 				tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t));
 tb_bool_t 				tb_http_option_set_sread_func(tb_handle_t handle, tb_int_t (*sread_func)(tb_handle_t, tb_byte_t* , tb_size_t));
 tb_bool_t 				tb_http_option_set_swrite_func(tb_handle_t handle, tb_int_t (*swrite_func)(tb_handle_t, tb_byte_t const* , tb_size_t));
 
@@ -210,7 +210,7 @@ tb_bool_t				tb_http_status_ischunked(tb_handle_t handle);
 tb_bool_t				tb_http_status_isredirect(tb_handle_t handle);
 tb_bool_t				tb_http_status_iskalive(tb_handle_t handle);
 tb_size_t				tb_http_status_redirect(tb_handle_t handle);
-void 					tb_http_status_dump(tb_handle_t handle);
+tb_void_t 					tb_http_status_dump(tb_handle_t handle);
 
 // write & read
 tb_int_t 				tb_http_write(tb_handle_t handle, tb_byte_t* data, tb_size_t size);

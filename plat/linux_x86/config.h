@@ -38,7 +38,7 @@
 #define TB_CONFIG_KEYWORD_FILE			__FILE__
 
 // type
-//#define TB_CONFIG_TYPE_INT64
+#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
 
@@ -46,7 +46,7 @@
 #define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // binary
-#define TB_CONFIG_BINARY_SMALL
+//#define TB_CONFIG_BINARY_SMALL
 
 // memory
 #define TB_CONFIG_MEMORY_MODE_SMALL

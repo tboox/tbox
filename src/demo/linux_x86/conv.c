@@ -13,7 +13,7 @@
 #define TB_TEST_CONV_STOU32 	(1)
 
 
-static void tb_conv_check_is()
+static tb_void_t tb_conv_check_is()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -26,7 +26,7 @@ static void tb_conv_check_is()
 		if ((TB_CONV_ISASCII(i)? 1 : 0) != (isascii(i)? 1 : 0)) tb_printf("[e] isascii: 0x%02x\n", i);
 	}
 }
-static void tb_conv_make_space_table()
+static tb_void_t tb_conv_make_space_table()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -34,7 +34,7 @@ static void tb_conv_make_space_table()
 		if (isspace(i)) tb_printf("0x%02x\n", i);
 	}
 }
-static void tb_conv_make_isalpha_table()
+static tb_void_t tb_conv_make_isalpha_table()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -42,7 +42,7 @@ static void tb_conv_make_isalpha_table()
 		if (isalpha(i)) tb_printf("0x%02x\n", i);
 	}
 }
-static void tb_conv_check_toupper()
+static tb_void_t tb_conv_check_toupper()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -50,7 +50,7 @@ static void tb_conv_check_toupper()
 		if ((TB_CONV_TOUPPER(i)? 1 : 0) != (toupper(i)? 1 : 0)) tb_printf("[e] toupper: 0x%02x = 0x%02x\n", i, toupper(i));
 	}
 }
-static void tb_conv_check_tolower()
+static tb_void_t tb_conv_check_tolower()
 {
 	tb_int_t i = 0;
 	for (i = 0; i < 256; i++)
@@ -58,32 +58,32 @@ static void tb_conv_check_tolower()
 		if ((TB_CONV_TOLOWER(i)? 1 : 0) != (tolower(i)? 1 : 0)) tb_printf("[e] tolower: 0x%02x = 0x%02x\n", i, tolower(i));
 	}
 }
-static void tb_conv_test_sbtou32(tb_char_t const* s, tb_int_t base, tb_uint32_t val)
+static tb_void_t tb_conv_test_sbtou32(tb_char_t const* s, tb_int_t base, tb_uint32_t val)
 {
 	tb_printf("s%dtou32(%s) = %u [?= %u]\n", base, s, TB_CONV_SBTOU32(s, base), val);
 }
-static void tb_conv_test_sbtoi32(tb_char_t const* s, tb_int_t base, tb_int32_t val)
+static tb_void_t tb_conv_test_sbtoi32(tb_char_t const* s, tb_int_t base, tb_int32_t val)
 {
 	tb_printf("s%dtoi32(%s) = %d [?= %d]\n", base, s, TB_CONV_SBTOI32(s, base), val);
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-static void tb_conv_test_sbtof(tb_char_t const* s, tb_int_t base, tb_float_t val)
+static tb_void_t tb_conv_test_sbtof(tb_char_t const* s, tb_int_t base, tb_float_t val)
 {
 	tb_printf("s%dtof(%s) = %lf [?= %lf]\n", base, s, TB_CONV_SBTOF(s, base), val);
 }
 #endif
-static void tb_conv_test_stou32(tb_char_t const* s, tb_uint32_t val)
+static tb_void_t tb_conv_test_stou32(tb_char_t const* s, tb_uint32_t val)
 {
 	tb_printf("stou32(%s) = %u [?= %u]\n", s, TB_CONV_STOU32(s), val);
 }
-static void tb_conv_test_stoi32(tb_char_t const* s, tb_int32_t val)
+static tb_void_t tb_conv_test_stoi32(tb_char_t const* s, tb_int32_t val)
 {
 	tb_printf("stoi32(%s) = %d [?= %d]\n", s, TB_CONV_STOI32(s), val);
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-static void tb_conv_test_stof(tb_char_t const* s, tb_float_t val)
+static tb_void_t tb_conv_test_stof(tb_char_t const* s, tb_float_t val)
 {
 	tb_printf("stof(%s) = %lf [?= %lf]\n", s, TB_CONV_STOF(s), val);
 }

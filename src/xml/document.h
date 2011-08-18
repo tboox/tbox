@@ -76,14 +76,14 @@ typedef struct __tb_xml_document_t
 
 // create & destroy
 tb_xml_document_t* 	tb_xml_document_create();
-void 				tb_xml_document_destroy(tb_xml_document_t* document);
+tb_void_t 				tb_xml_document_destroy(tb_xml_document_t* document);
 
 // load & store
 tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst);
 tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst);
 
 // modifiors
-void 				tb_xml_document_clear(tb_xml_document_t* document);
+tb_void_t 				tb_xml_document_clear(tb_xml_document_t* document);
 
 // xml header
 tb_string_t* 		tb_xml_document_version(tb_xml_document_t* document);

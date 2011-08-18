@@ -379,7 +379,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 }
 
 // del cookies entry
-static void tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
+static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
 	tb_mutex_lock(cookies->hmutex);
 
@@ -425,7 +425,7 @@ static void tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const*
 	tb_mutex_unlock(cookies->hmutex);
 }
 // add cookies entry
-static void tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
+static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
 	// lock
 	tb_mutex_lock(cookies->hmutex);
@@ -496,7 +496,7 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 }
 
 // the dtor of string
-static void tb_cookies_spool_dtor(void* data, void* priv)
+static tb_void_t tb_cookies_spool_dtor(tb_void_t* data, tb_void_t* priv)
 {
 	if (data) 
 	{
@@ -537,7 +537,7 @@ fail:
 	if (cookies) tb_cookies_destroy(cookies);
 	return TB_NULL;
 }
-void tb_cookies_destroy(tb_cookies_t* cookies)
+tb_void_t tb_cookies_destroy(tb_cookies_t* cookies)
 {
 	if (cookies)
 	{
@@ -567,7 +567,7 @@ void tb_cookies_destroy(tb_cookies_t* cookies)
 	}
 }
 
-void tb_cookies_clear(tb_cookies_t* cookies)
+tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
 {
 	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 
@@ -578,7 +578,7 @@ void tb_cookies_clear(tb_cookies_t* cookies)
 	tb_mutex_unlock(cookies->hmutex);
 }
 
-void tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
+tb_void_t tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {
 	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex);
 	//TB_COOKIES_DBG("[set]::%s%s%s = %s", secure == TB_TRUE? "https://" : "http://", domain? domain : "", path? path : "", value);
@@ -675,7 +675,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 	return cookies->value;
 }
 
-void tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value)
+tb_void_t tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value)
 {
 	tb_char_t phost[1024];
 	tb_char_t ppath[4096];
@@ -744,7 +744,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 
 
 #ifdef TB_DEBUG
-void tb_cookies_dump(tb_cookies_t const* cookies)
+tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 {
 	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 	tb_mutex_lock(cookies->hmutex);

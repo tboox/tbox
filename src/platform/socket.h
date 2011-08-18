@@ -56,7 +56,7 @@ typedef enum __tb_socket_type_t
 
 // init & unint
 tb_bool_t 	tb_socket_init();
-void 			tb_socket_uninit();
+tb_void_t 			tb_socket_uninit();
 
 // client open socket
 tb_handle_t 	tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
@@ -68,7 +68,7 @@ tb_handle_t 	tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is
 tb_handle_t 	tb_socket_server_accept(tb_handle_t hserver);
 
 // close socket
-void 			tb_socket_close(tb_handle_t hsocket);
+tb_void_t 			tb_socket_close(tb_handle_t hsocket);
 
 /* recv data
  *

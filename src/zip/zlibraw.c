@@ -33,7 +33,7 @@ static __tb_inline__ tb_zip_zlibraw_t* tb_zip_zlibraw_cast(tb_zip_t* zip)
 	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_ZLIBRAW, TB_NULL);
 	return (tb_zip_zlibraw_t*)zip;
 }
-static void tb_zip_zlibraw_close(tb_zip_t* zip)
+static tb_void_t tb_zip_zlibraw_close(tb_zip_t* zip)
 {
 	tb_zip_zlibraw_t* zlibraw = tb_zip_zlibraw_cast(zip);
 	if (zlibraw) 

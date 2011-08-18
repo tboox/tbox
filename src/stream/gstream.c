@@ -156,7 +156,7 @@ fail:
 	return TB_NULL;
 }
 
-void tb_gstream_destroy(tb_gstream_t* gst)
+tb_void_t tb_gstream_destroy(tb_gstream_t* gst)
 {
 	if (gst) 
 	{
@@ -180,7 +180,7 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gst)
 	// open it
 	return gst->open(gst);
 }
-void tb_gstream_close(tb_gstream_t* gst)
+tb_void_t tb_gstream_close(tb_gstream_t* gst)
 {
 	// close it
 	if (gst && gst->close) gst->close(gst);	
@@ -376,12 +376,12 @@ tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 	TB_ASSERT_RETURN_VAL(gst && gst->ioctl0, TB_FALSE);
 	return gst->ioctl0(gst, cmd);
 }
-tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
+tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {	
 	TB_ASSERT_RETURN_VAL(gst && gst->ioctl1, TB_FALSE);
 	return gst->ioctl1(gst, cmd, arg1);
 }
-tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2)
+tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
 {
 	TB_ASSERT_RETURN_VAL(gst && gst->ioctl2, TB_FALSE);
 	return gst->ioctl2(gst, cmd, arg1, arg2);

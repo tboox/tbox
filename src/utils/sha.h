@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		md5.h
+ * \file		sha.h
  *
  */
-#ifndef TB_UTILS_MD5_H
-#define TB_UTILS_MD5_H
+#ifndef TB_UTILS_SHA_H
+#define TB_UTILS_SHA_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -32,25 +32,35 @@
  * types
  */
 
-// data structure for md5 (message data) computation 
-typedef struct __tb_md5_t
+// data structure for sha (message data) computation 
+typedef struct __tb_sha_t
 {
-	tb_uint32_t 	i[2]; 		//!< number of _bits_ handled mod 2^64 
-	tb_uint32_t 	sp[4]; 		//!< scratch buffer 
-	tb_byte_t 		ip[64]; 	//!< input buffer 
-	tb_byte_t 		data[16]; 	//!< actual data after tb_md5_exit call 
+	tb_uint8_t  	digest_len;  //!< digest length in 32-bit words
+	tb_uint64_t 	count;       //!< number of bytes in buffer
+	tb_uint8_t  	buffer[64];  //!< 512-bit buffer of input values used in hash updating
+	tb_uint32_t 	state[8];    //!< current hash value
+	tb_void_t     	(*transform)(tb_uint32_t *state, tb_uint8_t const buffer[64]);
 
-}tb_md5_t;
+}tb_sha_t;
+
+// the sha mode type
+typedef enum __tb_sha_mode_t
+{
+	TB_SHA_MODE_SHA1_160 = 160
+,	TB_SHA_MODE_SHA2_224 = 224
+,	TB_SHA_MODE_SHA2_256 = 256
+
+}tb_sha_mode_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_void_t 	tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand);
-tb_void_t 	tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size);
-tb_void_t 	tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size);
+tb_void_t 	tb_sha_init(tb_sha_t* sha, tb_size_t mode);
+tb_void_t 	tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size);
+tb_void_t 	tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size);
 
-tb_size_t 	tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
+tb_size_t 	tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t ip, tb_byte_t* ob, tb_size_t on);
 
 #endif
 

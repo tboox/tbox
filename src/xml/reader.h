@@ -110,7 +110,7 @@ typedef struct __tb_xml_reader_t
 
 // open & close
 tb_xml_reader_t* 		tb_xml_reader_open(tb_gstream_t* gst);
-void 					tb_xml_reader_close(tb_xml_reader_t* reader);
+tb_void_t 					tb_xml_reader_close(tb_xml_reader_t* reader);
 
 // iterator
 tb_bool_t 				tb_xml_reader_has_next(tb_xml_reader_t* reader);
@@ -120,7 +120,7 @@ tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);
 tb_bool_t 				tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path);
 
 // debug
-void 					tb_xml_reader_dump(tb_xml_reader_t* reader);
+tb_void_t 					tb_xml_reader_dump(tb_xml_reader_t* reader);
 
 // getter
 tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);

@@ -233,12 +233,12 @@ static tb_mpool_t* 		g_mpool = TB_NULL;
  */
 
 #ifdef TB_DEBUG
-static __tb_inline__ void tb_mpool_blocks_info_set(tb_byte_t* blocks_info, tb_int_t block_i)
+static __tb_inline__ tb_void_t tb_mpool_blocks_info_set(tb_byte_t* blocks_info, tb_int_t block_i)
 {
 	TB_ASSERT(blocks_info);
 	blocks_info[block_i >> 3] |= (0x1 << (block_i % 8));
 }
-static __tb_inline__ void tb_mpool_blocks_info_reset(tb_byte_t* blocks_info, tb_int_t block_i)
+static __tb_inline__ tb_void_t tb_mpool_blocks_info_reset(tb_byte_t* blocks_info, tb_int_t block_i)
 {
 	TB_ASSERT(blocks_info);
 	blocks_info[block_i >> 3] &= ~(0x1 << (block_i % 8));
@@ -267,7 +267,7 @@ static __tb_inline__ tb_int_t tb_block_size_to_chunk_i(tb_mpool_chunk_t* chunks,
 /* ////////////////////////////////////////////////////////////////////////
  * the interface implemention
  */
-tb_bool_t tb_mpool_init(void* data, tb_size_t size)
+tb_bool_t tb_mpool_init(tb_void_t* data, tb_size_t size)
 {
 	// check
 	TB_ASSERT_RETURN_VAL(!g_mpool && data && size, TB_FALSE);
@@ -363,7 +363,7 @@ tb_bool_t tb_mpool_init(void* data, tb_size_t size)
 #endif
 	return TB_TRUE;
 }
-void tb_mpool_exit()
+tb_void_t tb_mpool_exit()
 {
 	// check 
 	TB_ASSERT_RETURN(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC);
@@ -385,9 +385,9 @@ void tb_mpool_exit()
 
 // try allocating it from the prediction rblock
 #ifndef TB_DEBUG
-static void* tb_mpool_try_allocating_from_pred_rblock(tb_mpool_t* mpool, tb_size_t size, tb_int_t chunk_i)
+static tb_void_t* tb_mpool_try_allocating_from_pred_rblock(tb_mpool_t* mpool, tb_size_t size, tb_int_t chunk_i)
 #else
-static void* tb_mpool_try_allocating_from_pred_rblock(tb_mpool_t* mpool, tb_size_t size, tb_int_t chunk_i, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_void_t* tb_mpool_try_allocating_from_pred_rblock(tb_mpool_t* mpool, tb_size_t size, tb_int_t chunk_i, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// no predicted block
@@ -437,9 +437,9 @@ static void* tb_mpool_try_allocating_from_pred_rblock(tb_mpool_t* mpool, tb_size
 
 // try allocating it from the prediction nrblock
 #ifndef TB_DEBUG
-static void* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, tb_size_t size, tb_size_t asize)
+static tb_void_t* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, tb_size_t size, tb_size_t asize)
 #else
-static void* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, tb_size_t size, tb_size_t asize, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_void_t* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, tb_size_t size, tb_size_t asize, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 #if 0
@@ -608,9 +608,9 @@ static void* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, tb_siz
 #endif
 
 #ifndef TB_DEBUG
-static void* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size)
+static tb_void_t* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size)
 #else
-static void* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_void_t* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	TB_ASSERT(mpool && size);
@@ -805,9 +805,9 @@ static void* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, tb_cha
 	return TB_NULL;
 }
 #ifndef TB_DEBUG
-static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, void* data)
+static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data)
 #else
-static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, void* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	TB_ASSERT(mpool && data);
@@ -897,9 +897,9 @@ static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, void* data, tb_c
 	return TB_FALSE;
 }
 #ifndef TB_DEBUG
-static void* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, void* data, tb_size_t size)
+static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_size_t size)
 #else
-static void* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, void* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	TB_ASSERT(mpool && data);
@@ -1060,9 +1060,9 @@ static void* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, void* data, tb_size_
 	return TB_NULL;
 }
 #ifndef TB_DEBUG
-void* tb_mpool_allocate(tb_size_t size)
+tb_void_t* tb_mpool_allocate(tb_size_t size)
 #else
-void* tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t* tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -1083,16 +1083,16 @@ void* tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, t
 
 
 #ifndef TB_DEBUG
-void* tb_mpool_callocate(tb_size_t item, tb_size_t size)
+tb_void_t* tb_mpool_callocate(tb_size_t item, tb_size_t size)
 {
-	void* p = tb_mpool_allocate(item * size);
+	tb_void_t* p = tb_mpool_allocate(item * size);
 	if (p) tb_memset(p, 0, item * size);
 	return p;
 }
 #else
-void* tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t* tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 {
-	void* p = tb_mpool_allocate(item * size, func, line, file);
+	tb_void_t* p = tb_mpool_allocate(item * size, func, line, file);
 	if (p) tb_memset(p, 0, item * size);
 	return p;
 }
@@ -1100,9 +1100,9 @@ void* tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, 
 
 
 #ifndef TB_DEBUG
-void* tb_mpool_reallocate(void* data, tb_size_t size)
+tb_void_t* tb_mpool_reallocate(tb_void_t* data, tb_size_t size)
 #else
-void* tb_mpool_reallocate(void* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t* tb_mpool_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -1121,9 +1121,9 @@ void* tb_mpool_reallocate(void* data, tb_size_t size, tb_char_t const* func, tb_
 	return p;
 }
 #ifndef TB_DEBUG
-void tb_mpool_deallocate(void* data)
+tb_void_t tb_mpool_deallocate(tb_void_t* data)
 #else
-void tb_mpool_deallocate(void* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -1214,7 +1214,7 @@ static tb_bool_t tb_mpool_allocate_try(tb_mpool_t* mpool, tb_size_t size)
 
 	return TB_FALSE;
 }
-void tb_mpool_dump()
+tb_void_t tb_mpool_dump()
 {
 	tb_int_t i = 0, j = 0;
 	tb_byte_t* p = TB_NULL;

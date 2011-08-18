@@ -37,23 +37,23 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * the interfaces
  */
-tb_bool_t 	tb_mpool_init(void* data, tb_size_t size);
-void 		tb_mpool_exit();
+tb_bool_t 	tb_mpool_init(tb_void_t* data, tb_size_t size);
+tb_void_t 		tb_mpool_exit();
 
 #ifndef TB_DEBUG
-void* 		tb_mpool_allocate(tb_size_t size);
-void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
-void* 		tb_mpool_reallocate(void* data, tb_size_t size);
-void 		tb_mpool_deallocate(void* data);
+tb_void_t* 		tb_mpool_allocate(tb_size_t size);
+tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
+tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size);
+tb_void_t 		tb_mpool_deallocate(tb_void_t* data);
 #else
-void* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-void*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-void* 		tb_mpool_reallocate(void* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-void 		tb_mpool_deallocate(void* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_void_t 		tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // for debug
-void 		tb_mpool_dump();
+tb_void_t 		tb_mpool_dump();
 tb_bool_t 	tb_mpool_check();
 
 // c plus plus

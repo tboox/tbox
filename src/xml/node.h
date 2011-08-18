@@ -74,7 +74,7 @@ typedef struct __tb_xml_node_t
 	tb_string_t 				value;
 
 	// the reference to the document
-	void* 						document;
+	tb_void_t* 						document;
 
 	// the next & prev
 	struct __tb_xml_node_t* 	prev;
@@ -90,7 +90,7 @@ typedef struct __tb_xml_node_t
 	struct __tb_xml_nlist_t* 	attributes;
 
 	// the callback
-	void 						(*free)(struct __tb_xml_node_t* node);
+	tb_void_t 						(*free)(struct __tb_xml_node_t* node);
 
 }tb_xml_node_t;
 
@@ -144,16 +144,16 @@ typedef struct __tb_xml_attribute_t
  */
 
 // init & uninit
-void 			tb_xml_node_init(tb_xml_node_t* node, void* document, tb_size_t type);
-void 			tb_xml_node_uninit(tb_xml_node_t* node);
+tb_void_t 			tb_xml_node_init(tb_xml_node_t* node, tb_void_t* document, tb_size_t type);
+tb_void_t 			tb_xml_node_uninit(tb_xml_node_t* node);
 
 // create & destroy
-tb_xml_node_t* 	tb_xml_node_create(void* document, tb_size_t type);
-void 			tb_xml_node_destroy(tb_xml_node_t* node);
+tb_xml_node_t* 	tb_xml_node_create(tb_void_t* document, tb_size_t type);
+tb_void_t 			tb_xml_node_destroy(tb_xml_node_t* node);
 
 // childs
-void 			tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child);
-void 			tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child);
+tb_void_t 			tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child);
+tb_void_t 			tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child);
 tb_xml_node_t* 	tb_xml_node_childs_head(tb_xml_node_t* node);
 tb_xml_node_t* 	tb_xml_node_childs_tail(tb_xml_node_t* node);
 tb_xml_node_t* 	tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path);
@@ -166,7 +166,7 @@ tb_xml_node_t* 	tb_xml_node_add_comment(tb_xml_node_t* node, tb_char_t const* da
 tb_xml_node_t* 	tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* name);
 
 // attributes
-void 			tb_xml_node_attributes_clear(tb_xml_node_t* node);
+tb_void_t 			tb_xml_node_attributes_clear(tb_xml_node_t* node);
 tb_xml_node_t* 	tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value);
 tb_xml_node_t* 	tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* value);
 tb_xml_node_t* 	tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t const* name, tb_int_t value);
