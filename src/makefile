@@ -66,6 +66,8 @@ tbox_C_FILES 		+= \
 					utils/time \
 					utils/bits\
 					utils/conv \
+					utils/md5 \
+					utils/base32 \
 					utils/base64 \
 					xml/document \
 					xml/node \
@@ -149,6 +151,8 @@ INC_FILES 			= \
 					utils/bits.h \
 					utils/conv.h \
 					utils/time.h \
+					utils/md5.h \
+					utils/base32.h \
 					utils/base64.h \
 					xml/xml.h \
 					xml/prefix.h \
