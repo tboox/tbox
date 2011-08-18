@@ -52,7 +52,7 @@ extern "C" {
 
 // init & exit
 tb_bool_t 	tb_init(tb_byte_t* data, tb_size_t size);
-void 		tb_exit();
+tb_void_t 		tb_exit();
 
 
 // c plus plus

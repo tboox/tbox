@@ -84,7 +84,7 @@ typedef struct __tb_zip_t
 
 	// the operations
 	tb_zip_status_t 		(*spank)(struct __tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost);
-	void 					(*close)(struct __tb_zip_t* zip);
+	tb_void_t 					(*close)(struct __tb_zip_t* zip);
 
 	// the vlc 
 	union __tb_zip_vlc_union_t

@@ -95,7 +95,7 @@ static tb_fixed16_t const tb_fixed16_cordic_atan2i_table[16] =
  */
 
 // |angle| < 90 degrees
-static void tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t z0) 
+static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, tb_fixed16_t z0) 
 {
 	tb_int_t i = 0;
 	tb_fixed16_t atan2i = 0;
@@ -248,7 +248,7 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
 	return tb_int32_set_sign(r, s);
 }
 
-void tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c)
+tb_void_t tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c)
 {
 	// (x0, y0) = (k, 0), k = 0.607252935 => fixed30
     tb_fixed30_t 	cos = 0x26dd3b6a;

@@ -13,16 +13,16 @@
  * details
  */
 
-static void tb_dlist_char_ctor(void* data, void* priv)
+static tb_void_t tb_dlist_char_ctor(tb_void_t* data, tb_void_t* priv)
 {
 	*((tb_char_t*)data) = '_';
 	TB_DBG("[ctor]: %s, _", (tb_char_t const*)priv);
 }
-static void tb_dlist_char_dtor(void* data, void* priv)
+static tb_void_t tb_dlist_char_dtor(tb_void_t* data, tb_void_t* priv)
 {
 	TB_DBG("[dtor]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
 }
-static void tb_dlist_char_dump(tb_dlist_t const* dlist)
+static tb_void_t tb_dlist_char_dump(tb_dlist_t const* dlist)
 {
 	TB_DBG("size: %d, maxn: %d", tb_dlist_size(dlist), tb_dlist_maxn(dlist));
 	tb_size_t itor = tb_dlist_head(dlist);

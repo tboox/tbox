@@ -80,7 +80,7 @@ tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 	if (fd < 0) return TB_NULL;
 	else return ((tb_handle_t)fd);
 }
-void tb_file_close(tb_handle_t hfile)
+tb_void_t tb_file_close(tb_handle_t hfile)
 {
 	//TB_DBG("tb_file_close");
 	if (hfile) close((tb_int_t)hfile);
@@ -97,7 +97,7 @@ tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_
 	if (hfile) return write((tb_int_t)hfile, data, write_n);
 	else return -1;
 }
-void tb_file_flush(tb_handle_t hfile)
+tb_void_t tb_file_flush(tb_handle_t hfile)
 {
 	TB_NOT_IMPLEMENT();
 }
@@ -226,7 +226,7 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 }
 
 // close file list
-void tb_file_list_close(tb_handle_t hflist)
+tb_void_t tb_file_list_close(tb_handle_t hflist)
 {
 	TB_ASSERT_RETURN(hflist);
 	tb_file_list_t* pflist = (tb_file_list_t*)hflist;

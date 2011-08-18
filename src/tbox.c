@@ -45,7 +45,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	return TB_TRUE;
 }
 
-void tb_exit()
+tb_void_t tb_exit()
 {
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	//tb_pool_dump();

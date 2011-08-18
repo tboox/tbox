@@ -68,37 +68,37 @@ typedef struct __tb_xml_writer_t
 
 // open & close
 tb_xml_writer_t* 		tb_xml_writer_open(tb_gstream_t* gst);
-void 					tb_xml_writer_close(tb_xml_writer_t* writer);
+tb_void_t 					tb_xml_writer_close(tb_xml_writer_t* writer);
 
 // document
-void 					tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding);
-void 					tb_xml_writer_document_end(tb_xml_writer_t* writer);
+tb_void_t 					tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding);
+tb_void_t 					tb_xml_writer_document_end(tb_xml_writer_t* writer);
 
 // element
-void 					tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name);
-void 					tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name);
-void 					tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name);
+tb_void_t 					tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name);
+tb_void_t 					tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name);
+tb_void_t 					tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name);
 
 // attributes
-void 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);
-void 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value);
-void 					tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value);
-void 					tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value);
-void 					tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value);
-void 					tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...);
+tb_void_t 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);
+tb_void_t 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value);
+tb_void_t 					tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value);
+tb_void_t 					tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value);
+tb_void_t 					tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value);
+tb_void_t 					tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-void 					tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value);
+tb_void_t 					tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value);
 #endif
 
 // cdata
-void 					tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data);
+tb_void_t 					tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data);
 
 // text
-void 					tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text);
+tb_void_t 					tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text);
 
 // comment
-void 					tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment);
+tb_void_t 					tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment);
 
 // c plus plus
 #ifdef __cplusplus

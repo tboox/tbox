@@ -1,7 +1,7 @@
 #include "tbox.h"
 #include "stdio.h"
 
-static tb_bool_t http_head_func(tb_char_t const* line, void* priv)
+static tb_bool_t http_head_func(tb_char_t const* line, tb_void_t* priv)
 {
 	tb_printf("head: %s\n", line);
 	return TB_TRUE;

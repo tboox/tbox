@@ -238,25 +238,25 @@ typedef struct __tb_cookies_t
 
 // create & destroy
 tb_cookies_t* 		tb_cookies_create();
-void 				tb_cookies_destroy(tb_cookies_t* cookies);
+tb_void_t 				tb_cookies_destroy(tb_cookies_t* cookies);
 
 /* get & set
  *
  * domain: 	.google.com or google.com
  * path: 	/home/foo
  */
-void 				tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
+tb_void_t 				tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value);
 tb_char_t const* 	tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure);
 
 // get & set from url
-void 				tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value);
+tb_void_t 				tb_cookies_set_from_url(tb_cookies_t* cookies, tb_char_t const* url, tb_char_t const* value);
 tb_char_t const* 	tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const* url);
 
 // clear
-void 				tb_cookies_clear(tb_cookies_t* cookies);
+tb_void_t 				tb_cookies_clear(tb_cookies_t* cookies);
 
 // dump
-void 				tb_cookies_dump(tb_cookies_t const* cookies);
+tb_void_t 				tb_cookies_dump(tb_cookies_t const* cookies);
 
 // c plus plus
 #ifdef __cplusplus

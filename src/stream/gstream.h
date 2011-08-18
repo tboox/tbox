@@ -150,8 +150,8 @@ typedef struct __tb_gstream_t
 
 	// open & close
 	tb_bool_t 			(*open)(struct __tb_gstream_t* gst);
-	void 				(*close)(struct __tb_gstream_t* gst);
-	void 				(*free)(struct __tb_gstream_t* gst);
+	tb_void_t 				(*close)(struct __tb_gstream_t* gst);
+	tb_void_t 				(*free)(struct __tb_gstream_t* gst);
 
 	// stream operations
 	tb_int_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
@@ -167,8 +167,8 @@ typedef struct __tb_gstream_t
 
 	// ioctl
 	tb_bool_t 			(*ioctl0)(struct __tb_gstream_t* gst, tb_size_t cmd);
-	tb_bool_t 			(*ioctl1)(struct __tb_gstream_t* gst, tb_size_t cmd, void* arg1);
-	tb_bool_t 			(*ioctl2)(struct __tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2);
+	tb_bool_t 			(*ioctl1)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1);
+	tb_bool_t 			(*ioctl2)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2);
 
 }tb_gstream_t;
 
@@ -178,7 +178,7 @@ typedef struct __tb_gstream_t
  */
 
 // destroy stream
-void 				tb_gstream_destroy(tb_gstream_t* gst);
+tb_void_t 				tb_gstream_destroy(tb_gstream_t* gst);
 
 // the data stream
 tb_gstream_t* 		tb_gstream_create_data();
@@ -199,7 +199,7 @@ tb_gstream_t* 		tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb
 
 // open & close
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);
-void 				tb_gstream_close(tb_gstream_t* gst);
+tb_void_t 				tb_gstream_close(tb_gstream_t* gst);
 
 // access & modify
 tb_int_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
@@ -265,8 +265,8 @@ tb_size_t 			tb_gstream_offset(tb_gstream_t const* gst);
 
 // ioctl
 tb_bool_t 			tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 			tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1);
-tb_bool_t 			tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2);
+tb_bool_t 			tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1);
+tb_bool_t 			tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2);
 
 // c plus plus
 #ifdef __cplusplus

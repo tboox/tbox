@@ -232,7 +232,7 @@ static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byt
  * interfaces
  */
 
-void tb_dns_server_add(tb_char_t const* ip)
+tb_void_t tb_dns_server_add(tb_char_t const* ip)
 {
 	// ensure init
 	if (!g_dns_init)
@@ -254,7 +254,7 @@ void tb_dns_server_add(tb_char_t const* ip)
 		}
 	}
 }
-void tb_dns_server_del(tb_char_t const* ip)
+tb_void_t tb_dns_server_del(tb_char_t const* ip)
 {
 	TB_ASSERT(g_dns_init);
 	if (!g_dns_init) return ;
@@ -266,7 +266,7 @@ void tb_dns_server_del(tb_char_t const* ip)
 			g_dns_servers[i][0] = '\0';
 	}
 }
-void tb_dns_server_dump()
+tb_void_t tb_dns_server_dump()
 {
 	TB_ASSERT(g_dns_init);
 	if (!g_dns_init) return ;

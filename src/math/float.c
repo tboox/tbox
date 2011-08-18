@@ -45,7 +45,7 @@ tb_float_t tb_float_cos_generic(tb_float_t x)
 {
 	return cos(x);
 }
-void tb_float_sincos_generic(tb_float_t x, tb_float_t* s, tb_float_t* c)
+tb_void_t tb_float_sincos_generic(tb_float_t x, tb_float_t* s, tb_float_t* c)
 {
 	if (s) *s = sin(x);
 	if (c) *c = cos(x);

@@ -69,7 +69,7 @@ fail:
 	return TB_NULL;
 }
 
-void tb_pool_destroy(tb_pool_t* pool)
+tb_void_t tb_pool_destroy(tb_pool_t* pool)
 {
 	if (pool)
 	{
@@ -179,7 +179,7 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	return item;
 	// }
 }
-void tb_pool_free(tb_pool_t* pool, tb_size_t item)
+tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 {
 	TB_ASSERT(pool && pool->size && item > 0 && item < 1 + pool->maxn);
 	TB_ASSERT(TB_POOL_INFO_ISSET(pool->info, item - 1));
@@ -203,7 +203,7 @@ void tb_pool_free(tb_pool_t* pool, tb_size_t item)
 		pool->size--;
 	}
 }
-void tb_pool_clear(tb_pool_t* pool)
+tb_void_t tb_pool_clear(tb_pool_t* pool)
 {
 #if 0 // discarded
 	// free private data
@@ -241,7 +241,7 @@ tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 		return (pool->data + (item - 1) * pool->step);
 	else return TB_NULL;
 }
-void tb_pool_dump(tb_pool_t* pool)
+tb_void_t tb_pool_dump(tb_pool_t* pool)
 {
 	TB_DBG("size: %d", pool->size);
 	TB_DBG("maxn: %d", pool->maxn);

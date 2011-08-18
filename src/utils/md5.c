@@ -184,34 +184,33 @@ tb_void_t tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand)
 	md5->sp[3] = (tb_uint32_t)0x10325476 + (pseudo_rand * 97);
 }
 
-tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t *ib, tb_size_t in)
+tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
 {
 	tb_uint32_t ip[16];
-	tb_int_t mdi = 0;
-	tb_size_t i = 0, ii = 0;
+	tb_size_t 	i = 0, ii = 0;
 
 	// compute number of bytes mod 64
-	mdi = (tb_int_t)((md5->i[0] >> 3) & 0x3F);
+	tb_int_t mdi = (tb_int_t)((md5->i[0] >> 3) & 0x3F);
 
 	// update number of bits
-	if ((md5->i[0] + ((tb_uint32_t)in << 3)) < md5->i[0]) md5->i[1]++;
+	if ((md5->i[0] + ((tb_uint32_t)size << 3)) < md5->i[0]) md5->i[1]++;
 
-	md5->i[0] += ((tb_uint32_t)in << 3);
-	md5->i[1] += ((tb_uint32_t)in >> 29);
+	md5->i[0] += ((tb_uint32_t)size << 3);
+	md5->i[1] += ((tb_uint32_t)size >> 29);
 
-	while (in--)
+	while (size--)
 	{
 		// add new character to buffer, increment mdi
-		md5->ip[mdi++] = *ib++;
+		md5->ip[mdi++] = *data++;
 
 		// transform if necessary 
 		if (mdi == 0x40)
 		{
 			for (i = 0, ii = 0; i < 16; i++, ii += 4)
 			{
-				ip[i] = 	(((tb_uint32_t)md5->ip[ii+3]) << 24)
-						| 	(((tb_uint32_t)md5->ip[ii+2]) << 16)
-						| 	(((tb_uint32_t)md5->ip[ii+1]) << 8)
+				ip[i] = 	(((tb_uint32_t)md5->ip[ii + 3]) << 24)
+						| 	(((tb_uint32_t)md5->ip[ii + 2]) << 16)
+						| 	(((tb_uint32_t)md5->ip[ii + 1]) << 8)
 						| 	((tb_uint32_t)md5->ip[ii]);
 			}
 
@@ -221,7 +220,7 @@ tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t *ib, tb_size_t in)
 	}
 }
 
-tb_void_t tb_md5_exit(tb_md5_t* md5)
+tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
 {
 	tb_uint32_t ip[16];
 	tb_int_t 	mdi = 0;
@@ -243,9 +242,9 @@ tb_void_t tb_md5_exit(tb_md5_t* md5)
 	// append length ip bits and transform
 	for (i = 0, ii = 0; i < 14; i++, ii += 4)
 	{
-		ip[i] = 	(((tb_uint32_t)md5->ip[ii+3]) << 24)
-				| 	(((tb_uint32_t)md5->ip[ii+2]) << 16)
-				| 	(((tb_uint32_t)md5->ip[ii+1]) <<  8)
+		ip[i] = 	(((tb_uint32_t)md5->ip[ii + 3]) << 24)
+				| 	(((tb_uint32_t)md5->ip[ii + 2]) << 16)
+				| 	(((tb_uint32_t)md5->ip[ii + 1]) <<  8)
 				| 	((tb_uint32_t)md5->ip[ii]);
 	}
 	tb_md5_transform (md5->sp, ip);
@@ -253,11 +252,14 @@ tb_void_t tb_md5_exit(tb_md5_t* md5)
 	// store buffer ip data
 	for (i = 0, ii = 0; i < 4; i++, ii += 4)
 	{
-		md5->data[ii]   = (tb_byte_t)( md5->sp[i]        & 0xFF);
-		md5->data[ii+1] = (tb_byte_t)((md5->sp[i] >>  8) & 0xFF);
-		md5->data[ii+2] = (tb_byte_t)((md5->sp[i] >> 16) & 0xFF);
-		md5->data[ii+3] = (tb_byte_t)((md5->sp[i] >> 24) & 0xFF);
+		md5->data[ii]   = (tb_byte_t)( md5->sp[i]        & 0xff);
+		md5->data[ii+1] = (tb_byte_t)((md5->sp[i] >>  8) & 0xff);
+		md5->data[ii+2] = (tb_byte_t)((md5->sp[i] >> 16) & 0xff);
+		md5->data[ii+3] = (tb_byte_t)((md5->sp[i] >> 24) & 0xff);
 	}
+
+	// output
+	tb_memcpy(data, md5->data, 16);
 }
 
 tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
@@ -274,10 +276,7 @@ tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_siz
 	tb_md5_spank(&md5, ib, in);
 
 	// exit
-	tb_md5_exit(&md5);
-
-	// output
-	tb_memcpy(ob, md5.data, 16);
+	tb_md5_exit(&md5, ob, on);
 
 	return 16;
 }

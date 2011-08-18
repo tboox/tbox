@@ -965,7 +965,7 @@ static tb_scalar_t tb_scalar_test_atan_a[] =
 
 #endif
 
-static void tb_scalar_test_constant()
+static tb_void_t tb_scalar_test_constant()
 {
 	tb_printf("[scalar]: one = %f\n", 	tb_scalar_to_float(TB_SCALAR_ONE));
 	tb_printf("[scalar]: half = %f\n", 	tb_scalar_to_float(TB_SCALAR_HALF));
@@ -976,7 +976,7 @@ static void tb_scalar_test_constant()
 	tb_printf("[scalar]: pi = %f\n", 	tb_scalar_to_float(TB_SCALAR_PI));
 	tb_printf("[scalar]: sqrt2 = %f\n", tb_scalar_to_float(TB_SCALAR_SQRT2));
 }
-static void tb_scalar_test_round(tb_scalar_t x)
+static tb_void_t tb_scalar_test_round(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -988,7 +988,7 @@ static void tb_scalar_test_round(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: round(%f): %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_floor(tb_scalar_t x)
+static tb_void_t tb_scalar_test_floor(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -1000,7 +1000,7 @@ static void tb_scalar_test_floor(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: floor(%f): %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_ceil(tb_scalar_t x)
+static tb_void_t tb_scalar_test_ceil(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -1012,7 +1012,7 @@ static void tb_scalar_test_ceil(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: ceil(%f): %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
+static tb_void_t tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t r = 0;
@@ -1025,7 +1025,7 @@ static void tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
 	tb_printf("[scalar]: mul(%f, %f): %f, %d ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), tb_int64_to_int32(t));
 
 }
-static void tb_scalar_test_div(tb_scalar_t a, tb_scalar_t b)
+static tb_void_t tb_scalar_test_div(tb_scalar_t a, tb_scalar_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t r = 0;
@@ -1037,7 +1037,7 @@ static void tb_scalar_test_div(tb_scalar_t a, tb_scalar_t b)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: div(%f, %f): %f, %d ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), tb_int64_to_int32(t));
 }
-static void tb_scalar_test_invert(tb_scalar_t x)
+static tb_void_t tb_scalar_test_invert(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t	r = 0;
@@ -1049,7 +1049,7 @@ static void tb_scalar_test_invert(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: invert(%f): %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), tb_int64_to_int32(t));
 }
-static void tb_scalar_test_sqre(tb_scalar_t x)
+static tb_void_t tb_scalar_test_sqre(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t	r = 0;
@@ -1061,7 +1061,7 @@ static void tb_scalar_test_sqre(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: sqre(%f): %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), tb_int64_to_int32(t));
 }
-static void tb_scalar_test_sqrt(tb_scalar_t x)
+static tb_void_t tb_scalar_test_sqrt(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t r = 0;
@@ -1073,7 +1073,7 @@ static void tb_scalar_test_sqrt(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: sqrt(%f) = %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), tb_int64_to_int32(t));
 }
-static void tb_scalar_test_ilog2(tb_scalar_t x)
+static tb_void_t tb_scalar_test_ilog2(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t r = 0;
@@ -1085,7 +1085,7 @@ static void tb_scalar_test_ilog2(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: ilog2(%f) = %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_iclog2(tb_scalar_t x)
+static tb_void_t tb_scalar_test_iclog2(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t r = 0;
@@ -1097,7 +1097,7 @@ static void tb_scalar_test_iclog2(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: iclog2(%f) = %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_irlog2(tb_scalar_t x)
+static tb_void_t tb_scalar_test_irlog2(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t r = 0;
@@ -1109,7 +1109,7 @@ static void tb_scalar_test_irlog2(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: irlog2(%f) = %d, %d ms\n", tb_scalar_to_float(x), r, tb_int64_to_int32(t));
 }
-static void tb_scalar_test_exp(tb_scalar_t x)
+static tb_void_t tb_scalar_test_exp(tb_scalar_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_scalar_t r = 0;
@@ -1121,7 +1121,7 @@ static void tb_scalar_test_exp(tb_scalar_t x)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("[scalar]: exp(%f) = %f, %d ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), tb_int64_to_int32(t));
 }
-static void tb_scalar_test_sin()
+static tb_void_t tb_scalar_test_sin()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
@@ -1141,7 +1141,7 @@ static void tb_scalar_test_sin()
 	}
 	tb_printf("[scalar]: sin(0 - 360), %d ms\n", tb_int64_to_int32(t));
 }
-static void tb_scalar_test_cos()
+static tb_void_t tb_scalar_test_cos()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
@@ -1161,7 +1161,7 @@ static void tb_scalar_test_cos()
 	}
 	tb_printf("[scalar]: cos(0 - 360), %d ms\n", tb_int64_to_int32(t));
 }
-static void tb_scalar_test_tan()
+static tb_void_t tb_scalar_test_tan()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
@@ -1181,7 +1181,7 @@ static void tb_scalar_test_tan()
 	}
 	tb_printf("[scalar]: tan(0 - 360), %d ms\n", tb_int64_to_int32(t));
 }
-static void tb_scalar_test_atan2()
+static tb_void_t tb_scalar_test_atan2()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -1221,7 +1221,7 @@ static void tb_scalar_test_atan2()
 	tb_printf("[scalar]: atan2(), %d ms\n", tb_int64_to_int32(t));
 }
 
-static void tb_scalar_test_asin()
+static tb_void_t tb_scalar_test_asin()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -1257,7 +1257,7 @@ static void tb_scalar_test_asin()
 
 	tb_printf("[scalar]: asin, %d ms\n", tb_int64_to_int32(t));
 }
-static void tb_scalar_test_acos()
+static tb_void_t tb_scalar_test_acos()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	j = 0;
@@ -1293,7 +1293,7 @@ static void tb_scalar_test_acos()
 
 	tb_printf("[scalar]: acos, %d ms\n", tb_int64_to_int32(t));
 }
-static void tb_scalar_test_atan()
+static tb_void_t tb_scalar_test_atan()
 {
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 100;

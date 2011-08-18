@@ -42,14 +42,14 @@
  */
 
 #ifndef TB_MEMOPS_OPT_MEMSET_U8
-void tb_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
+tb_void_t tb_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
 {
 	if (dst && size) memset(dst, src, size);
 }
 #endif
 
 #ifndef TB_MEMOPS_OPT_MEMSET_U16
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+tb_void_t tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
 
@@ -86,7 +86,7 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 #endif
 
 #ifndef TB_MEMOPS_OPT_MEMSET_U24
-void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+tb_void_t tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
 
@@ -130,7 +130,7 @@ void tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 #endif
 
 #ifndef TB_MEMOPS_OPT_MEMSET_U32
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+tb_void_t tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst || !size) return ;
 
@@ -167,11 +167,11 @@ void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 }
 #endif
 
-void tb_memcpy(void* dst, void const* src, tb_size_t size)
+tb_void_t tb_memcpy(tb_void_t* dst, tb_void_t const* src, tb_size_t size)
 {
 	if (dst != src && size) memcpy(dst, src, size);
 }
-void tb_memmov(void* dst, void const* src, tb_size_t size)
+tb_void_t tb_memmov(tb_void_t* dst, tb_void_t const* src, tb_size_t size)
 {
 	if (dst != src && size) memmove(dst, src, size);
 	
@@ -182,7 +182,7 @@ void tb_memmov(void* dst, void const* src, tb_size_t size)
 #endif
 }
 
-void tb_memset(void* dst, tb_size_t src, tb_size_t size)
+tb_void_t tb_memset(tb_void_t* dst, tb_size_t src, tb_size_t size)
 {
 	tb_memset_u8(dst, (tb_uint8_t)src, size);
 }

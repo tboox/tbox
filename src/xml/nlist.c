@@ -45,7 +45,7 @@ tb_xml_nlist_t* tb_xml_nlist_create()
 
 	return nlist;
 }
-void tb_xml_nlist_destroy(tb_xml_nlist_t* nlist)
+tb_void_t tb_xml_nlist_destroy(tb_xml_nlist_t* nlist)
 {
 	if (nlist)
 	{
@@ -118,7 +118,7 @@ tb_xml_node_t* tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name)
 	return TB_NULL;
 }
 
-void tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
+tb_void_t tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 {
 	TB_ASSERT(nlist && node);
 	if (!nlist || !node) return ;
@@ -144,7 +144,7 @@ void tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 
 	nlist->size++;
 }
-void tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
+tb_void_t tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 {
 	TB_ASSERT(nlist && node);
 	if (!nlist || !node) return ;

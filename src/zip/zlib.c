@@ -33,7 +33,7 @@ static __tb_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
 	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_ZLIB, TB_NULL);
 	return (tb_zip_zlib_t*)zip;
 }
-static void tb_zip_zlib_close(tb_zip_t* zip)
+static tb_void_t tb_zip_zlib_close(tb_zip_t* zip)
 {
 	tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
 	if (zlib) 

@@ -78,14 +78,14 @@ tb_bool_t 	tb_audio_set_volume(tb_size_t volume);
 
 // open & close 
 tb_handle_t 	tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb_audio_channel_t channel, tb_bool_t is_block);
-void 			tb_audio_close(tb_handle_t haudio);
+tb_void_t 			tb_audio_close(tb_handle_t haudio);
 
 // buffer operations
 tb_int_t 	tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size);
 tb_size_t 	tb_audio_bsize(tb_handle_t haudio);
-void 			tb_audio_clear(tb_handle_t haudio);
-void 			tb_audio_pause(tb_handle_t haudio);
-void 			tb_audio_resume(tb_handle_t haudio);
+tb_void_t 			tb_audio_clear(tb_handle_t haudio);
+tb_void_t 			tb_audio_pause(tb_handle_t haudio);
+tb_void_t 			tb_audio_resume(tb_handle_t haudio);
 	
 // c plus plus
 #ifdef __cplusplus

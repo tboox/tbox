@@ -30,7 +30,7 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static void tb_xml_document_free(tb_xml_node_t* node)
+static tb_void_t tb_xml_document_free(tb_xml_node_t* node)
 {
 	tb_xml_document_t* document = (tb_xml_document_t*)node;
 	if (document)
@@ -43,7 +43,7 @@ static void tb_xml_document_free(tb_xml_node_t* node)
 		tb_string_uninit(&document->encoding);
 	}
 }
-static void tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nlist_t* childs, tb_bool_t* ret)
+static tb_void_t tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nlist_t* childs, tb_bool_t* ret)
 {
 	if (!writer || !childs) return ;
 
@@ -143,7 +143,7 @@ tb_xml_document_t* tb_xml_document_create()
 
 	return document;
 }
-void tb_xml_document_destroy(tb_xml_document_t* document)
+tb_void_t tb_xml_document_destroy(tb_xml_document_t* document)
 {
 	if (document) tb_xml_node_destroy((tb_xml_node_t*)document);
 }
@@ -316,7 +316,7 @@ tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst)
 	return ret;
 }
 
-void tb_xml_document_clear(tb_xml_document_t* document)
+tb_void_t tb_xml_document_clear(tb_xml_document_t* document)
 {
 	TB_ASSERT(document);
 	if (!document) return ;

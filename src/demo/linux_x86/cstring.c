@@ -7,7 +7,7 @@
 /* ////////////////////////////////////////////////////////////////////////
  * compare
  */
-static void tb_cstring_test_compare(tb_char_t const* s1, tb_char_t const* s2)
+static tb_void_t tb_cstring_test_compare(tb_char_t const* s1, tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -19,7 +19,7 @@ static void tb_cstring_test_compare(tb_char_t const* s1, tb_char_t const* s2)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_compare(%s, %s) = %d\n", tb_int64_to_int32(t), s1, s2, r);
 }
-static void tb_cstring_test_compare_libc(tb_char_t const* s1, tb_char_t const* s2)
+static tb_void_t tb_cstring_test_compare_libc(tb_char_t const* s1, tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -31,7 +31,7 @@ static void tb_cstring_test_compare_libc(tb_char_t const* s1, tb_char_t const* s
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_compare_libc(%s, %s) = %d\n", tb_int64_to_int32(t), s1, s2, r);
 }
-static void tb_cstring_test_compare_nocase(tb_char_t const* s1, tb_char_t const* s2)
+static tb_void_t tb_cstring_test_compare_nocase(tb_char_t const* s1, tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -43,7 +43,7 @@ static void tb_cstring_test_compare_nocase(tb_char_t const* s1, tb_char_t const*
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_compare_nocase(%s, %s) = %d\n", tb_int64_to_int32(t), s1, s2, r);
 }
-static void tb_cstring_test_compare_nocase_libc(tb_char_t const* s1, tb_char_t const* s2)
+static tb_void_t tb_cstring_test_compare_nocase_libc(tb_char_t const* s1, tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -55,7 +55,7 @@ static void tb_cstring_test_compare_nocase_libc(tb_char_t const* s1, tb_char_t c
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_compare_nocase_libc(%s, %s) = %d\n", tb_int64_to_int32(t), s1, s2, r);
 }
-static void tb_cstring_test_size(tb_char_t const* s)
+static tb_void_t tb_cstring_test_size(tb_char_t const* s)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -67,7 +67,7 @@ static void tb_cstring_test_size(tb_char_t const* s)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_size(%s) = %d\n", tb_int64_to_int32(t), s, r);
 }
-static void tb_cstring_test_size_libc(tb_char_t const* s)
+static tb_void_t tb_cstring_test_size_libc(tb_char_t const* s)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -79,7 +79,7 @@ static void tb_cstring_test_size_libc(tb_char_t const* s)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_size_libc(%s) = %d\n", tb_int64_to_int32(t), s, r);
 }
-static void tb_cstring_test_copy(tb_char_t const* s2)
+static tb_void_t tb_cstring_test_copy(tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -92,7 +92,7 @@ static void tb_cstring_test_copy(tb_char_t const* s2)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_copy(%s) = %s\n", tb_int64_to_int32(t), s2, s1);
 }
-static void tb_cstring_test_copy_libc(tb_char_t const* s2)
+static tb_void_t tb_cstring_test_copy_libc(tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -105,7 +105,7 @@ static void tb_cstring_test_copy_libc(tb_char_t const* s2)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_copy_libc(%s) = %s\n", tb_int64_to_int32(t), s2, s1);
 }
-static void tb_cstring_test_ncopy(tb_char_t const* s2, tb_size_t size)
+static tb_void_t tb_cstring_test_ncopy(tb_char_t const* s2, tb_size_t size)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
@@ -118,7 +118,7 @@ static void tb_cstring_test_ncopy(tb_char_t const* s2, tb_size_t size)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%d ms, tb_cstring_test_ncopy(%s, %d) = %s\n", tb_int64_to_int32(t), s2, size, s1);
 }
-static void tb_cstring_test_ncopy_libc(tb_char_t const* s2, tb_size_t size)
+static tb_void_t tb_cstring_test_ncopy_libc(tb_char_t const* s2, tb_size_t size)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;

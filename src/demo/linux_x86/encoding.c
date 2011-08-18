@@ -31,7 +31,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 	}
 	return p;
 }
-static void save(tb_char_t const* path, tb_byte_t const* data, tb_size_t size)
+static tb_void_t save(tb_char_t const* path, tb_byte_t const* data, tb_size_t size)
 {
 	tb_handle_t hfile = tb_file_open(path, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (hfile)

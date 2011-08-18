@@ -61,7 +61,7 @@ static tb_bool_t tb_dstream_open(tb_gstream_t* gst)
 	dst->head = dst->data;
 	return TB_TRUE;
 }
-static void tb_dstream_close(tb_gstream_t* gst)
+static tb_void_t tb_dstream_close(tb_gstream_t* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	if (dst) dst->head = TB_NULL;
@@ -126,7 +126,7 @@ static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 	return TB_FALSE;
 }
 
-static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2)
+static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(dst, TB_FALSE);
@@ -179,7 +179,7 @@ tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
 	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
 
 	// set data & size
-	if (TB_FALSE == tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (void*)data, (void*)size)) goto fail;
+	if (TB_FALSE == tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (tb_void_t*)data, (tb_void_t*)size)) goto fail;
 	
 	return gst;
 

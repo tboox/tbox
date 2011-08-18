@@ -47,7 +47,7 @@ tb_zip_t* tb_zip_open(tb_zip_package_t* package, tb_zip_algo_t algo, tb_zip_acti
 	}
 	return TB_NULL;
 }
-void tb_zip_close(tb_zip_t* zip)
+tb_void_t tb_zip_close(tb_zip_t* zip)
 {
 	if (zip && zip->close) zip->close(zip);
 }

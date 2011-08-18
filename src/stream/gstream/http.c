@@ -65,7 +65,7 @@ static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
 	// open it
 	return tb_http_open(hst->http);
 }
-static void tb_hstream_close(tb_gstream_t* gst)
+static tb_void_t tb_hstream_close(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst)
@@ -74,7 +74,7 @@ static void tb_hstream_close(tb_gstream_t* gst)
 			tb_http_close(hst->http);
 	}
 }
-static void tb_hstream_free(tb_gstream_t* gst)
+static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst)
@@ -122,7 +122,7 @@ static tb_size_t tb_hstream_offset(tb_gstream_t* gst)
 	TB_ASSERT_RETURN_VAL(hst && hst->http, 0);
 	return hst->offset;
 }
-static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
+static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
@@ -205,7 +205,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
 	case TB_HSTREAM_CMD_SET_SCLOSE_FUNC:
 		{
 			TB_ASSERT_RETURN_VAL(arg1, TB_FALSE);
-			return tb_http_option_set_sclose_func(hst->http, (void (*)(tb_handle_t ))arg1);
+			return tb_http_option_set_sclose_func(hst->http, (tb_void_t (*)(tb_handle_t ))arg1);
 		}
 	case TB_HSTREAM_CMD_SET_SREAD_FUNC:
 		{
@@ -222,7 +222,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1)
 	}
 	return TB_FALSE;
 }
-static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2)
+static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
@@ -232,7 +232,7 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1,
 	case TB_HSTREAM_CMD_SET_HEAD_FUNC:
 		{
 			TB_ASSERT_RETURN_VAL(arg1, TB_FALSE);
-			return tb_http_option_set_head_func(hst->http, (tb_bool_t (*)(tb_char_t const* , void* ))arg1, arg2);
+			return tb_http_option_set_head_func(hst->http, (tb_bool_t (*)(tb_char_t const* , tb_void_t* ))arg1, arg2);
 		}
 	case TB_HSTREAM_CMD_SET_POST:
 		{

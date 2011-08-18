@@ -39,7 +39,7 @@ tb_handle_t tb_mutex_create(tb_char_t const* name)
 	if (!pmutex || 0 != pthread_mutex_init(pmutex, NULL)) return TB_NULL;
 	else return ((tb_handle_t)pmutex);
 }
-void tb_mutex_destroy(tb_handle_t hmutex)
+tb_void_t tb_mutex_destroy(tb_handle_t hmutex)
 {
 	TB_ASSERT_RETURN(hmutex);
 
@@ -47,7 +47,7 @@ void tb_mutex_destroy(tb_handle_t hmutex)
 	if (pmutex)
 	{
 		pthread_mutex_destroy(pmutex);
-		free((void*)pmutex);
+		free((tb_void_t*)pmutex);
 	}
 }
 tb_bool_t tb_mutex_lock(tb_handle_t hmutex)

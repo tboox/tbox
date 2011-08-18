@@ -277,7 +277,7 @@ static tb_bool_t tb_http_socket_open(tb_http_t* http)
 	}
 	return http->socket? TB_TRUE : TB_FALSE;
 }
-static void tb_http_socket_close(tb_http_t* http)
+static tb_void_t tb_http_socket_close(tb_http_t* http)
 {
 	TB_ASSERT_RETURN(http);
 	TB_IF_FAIL_RETURN(http->socket);
@@ -755,7 +755,7 @@ tb_handle_t tb_http_create(tb_http_option_t const* option)
 
 	return (tb_handle_t)http;
 }
-void tb_http_destroy(tb_handle_t handle)
+tb_void_t tb_http_destroy(tb_handle_t handle)
 {
 	TB_IF_FAIL_RETURN(handle);
 	tb_http_t* http = (tb_http_t*)handle;
@@ -793,7 +793,7 @@ tb_bool_t tb_http_open(tb_handle_t handle)
 
 	return TB_TRUE;
 }
-void tb_http_close(tb_handle_t handle)
+tb_void_t tb_http_close(tb_handle_t handle)
 {
 	TB_IF_FAIL_RETURN(handle);
 	tb_http_t* http = (tb_http_t*)handle;
@@ -958,7 +958,7 @@ tb_bool_t tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_
 	http->option.post_size = size;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , void* ), void* head_priv)
+tb_bool_t tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_void_t* ), tb_void_t* head_priv)
 {
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
@@ -975,7 +975,7 @@ tb_bool_t tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_
 	http->option.sopen_func = sopen_func;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_sclose_func(tb_handle_t handle, void (*sclose_func)(tb_handle_t))
+tb_bool_t tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t))
 {
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
@@ -1060,7 +1060,7 @@ tb_size_t tb_http_status_code(tb_handle_t handle)
 	return http->status.code;
 }
 #ifdef TB_DEBUG
-void tb_http_option_dump(tb_handle_t handle)
+tb_void_t tb_http_option_dump(tb_handle_t handle)
 {
 	TB_ASSERT_RETURN(handle);
 	tb_http_t* http = (tb_http_t*)handle;
@@ -1091,7 +1091,7 @@ void tb_http_option_dump(tb_handle_t handle)
 		}
 	}
 }
-void tb_http_status_dump(tb_handle_t handle)
+tb_void_t tb_http_status_dump(tb_handle_t handle)
 {
 	TB_ASSERT_RETURN(handle);
 	tb_http_t* http = (tb_http_t*)handle;

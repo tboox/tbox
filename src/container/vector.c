@@ -76,7 +76,7 @@
  * interfaces
  */
 
-tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, void (*ctor)(void* , void* ), void (*dtor)(void* , void* ), void* priv)
+tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_vector_t* vector = (tb_vector_t*)tb_calloc(1, sizeof(tb_vector_t));
 	TB_ASSERT_RETURN_VAL(vector, TB_NULL);
@@ -104,7 +104,7 @@ fail:
 	return TB_NULL;
 }
 
-void tb_vector_destroy(tb_vector_t* vector)
+tb_void_t tb_vector_destroy(tb_vector_t* vector)
 {
 	if (vector)
 	{
@@ -118,7 +118,7 @@ void tb_vector_destroy(tb_vector_t* vector)
 		tb_free(vector);
 	}
 }
-void tb_vector_clear(tb_vector_t* vector)
+tb_void_t tb_vector_clear(tb_vector_t* vector)
 {
 	if (vector) 
 	{
@@ -232,7 +232,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	vector->size = size;
 	return TB_TRUE;
 }
-void tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item)
+tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && item && index <= vector->size);
 
@@ -273,17 +273,17 @@ void tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* ite
 		break;
 	}
 }
-void tb_vector_insert_head(tb_vector_t* vector, tb_byte_t const* item)
+tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && item);
 	tb_vector_insert(vector, 0, item);
 }
-void tb_vector_insert_tail(tb_vector_t* vector, tb_byte_t const* item)
+tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && item);
 	tb_vector_insert(vector, vector->size, item);
 }
-void tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && item && size && index <= vector->size);
 
@@ -322,17 +322,17 @@ void tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* it
 		break;
 	}
 }
-void tb_vector_ninsert_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && item);
 	tb_vector_ninsert(vector, 0, item, size);
 }
-void tb_vector_ninsert_tail(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && item);
 	tb_vector_ninsert(vector, vector->size, item, size);
 }
-void tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item)
+tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && vector->data && item && index <= vector->size);
 
@@ -362,17 +362,17 @@ void tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* it
 		break;
 	}
 }
-void tb_vector_replace_head(tb_vector_t* vector, tb_byte_t const* item)
+tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && vector->size && item);
 	tb_vector_replace(vector, 0, item);
 }
-void tb_vector_replace_last(tb_vector_t* vector, tb_byte_t const* item)
+tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_byte_t const* item)
 {
 	TB_ASSERT_RETURN(vector && vector->size && item);
 	tb_vector_replace(vector, vector->size - 1, item);
 }
-void tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && vector->size && index <= vector->size && item && size);
 
@@ -402,17 +402,17 @@ void tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* i
 		break;
 	}
 }
-void tb_vector_nreplace_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, 0, item, size);
 }
-void tb_vector_nreplace_last(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, size >= vector->size? 0 : vector->size - size, item, size);
 }
-void tb_vector_remove(tb_vector_t* vector, tb_size_t index)
+tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t index)
 {	
 	TB_ASSERT_RETURN(vector && index < vector->size);
 	if (vector->size)
@@ -427,11 +427,11 @@ void tb_vector_remove(tb_vector_t* vector, tb_size_t index)
 		vector->size--;
 	}
 }
-void tb_vector_remove_head(tb_vector_t* vector)
+tb_void_t tb_vector_remove_head(tb_vector_t* vector)
 {
 	tb_vector_remove(vector, 0);
 }
-void tb_vector_remove_last(tb_vector_t* vector)
+tb_void_t tb_vector_remove_last(tb_vector_t* vector)
 {
 	TB_ASSERT_RETURN(vector);
 	if (vector->size)
@@ -443,7 +443,7 @@ void tb_vector_remove_last(tb_vector_t* vector)
 		vector->size--;
 	}
 }
-void tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size)
+tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && size && index < vector->size);
 
@@ -474,7 +474,7 @@ void tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size)
 	// update size
 	vector->size -= size;
 }
-void tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
+tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
 {
 	TB_ASSERT_RETURN(vector && size);
 
@@ -488,7 +488,7 @@ void tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
 	// remove head
 	tb_vector_nremove(vector, 0, size);
 }
-void tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
+tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
 {	
 	TB_ASSERT_RETURN(vector && size);
 

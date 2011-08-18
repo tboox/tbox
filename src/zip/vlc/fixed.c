@@ -29,7 +29,7 @@
  * details
  */
 
-static void tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
+static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
 {
 	TB_ASSERT(vlc);
 	TB_ASSERT(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));

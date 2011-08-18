@@ -17,51 +17,23 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		nlist.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_XML_NLIST_H
-#define TB_XML_NLIST_H
+#ifndef TB_UTILS_OPT_PREFIX_H
+#define TB_UTILS_OPT_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* /////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "node.h"
-
-/* /////////////////////////////////////////////////////////
- * types
- */
-
-// the xml nlist type
-typedef struct __tb_xml_nlist_t
-{
-	tb_xml_node_t 	base;
-	tb_size_t 		size;
-
-}tb_xml_nlist_t;
+#include "../prefix.h"
 
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-
-// create & destroy
-tb_xml_nlist_t* tb_xml_nlist_create();
-tb_void_t 			tb_xml_nlist_destroy(tb_xml_nlist_t* nlist);
-
-// accessors
-tb_xml_node_t* 	tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index);
-tb_xml_node_t* 	tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name);
-
-// modifiors
-tb_void_t 			tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
-tb_void_t 			tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
 
 // c plus plus
 #ifdef __cplusplus

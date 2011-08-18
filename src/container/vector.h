@@ -80,9 +80,9 @@ typedef struct __tb_vector_t
 	tb_size_t 		maxn;
 
 	// ctor & dtor
-	void 			(*ctor)(void* data, void* priv);
-	void 			(*dtor)(void* data, void* priv);
-	void* 			priv;
+	tb_void_t 			(*ctor)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t 			(*dtor)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t* 			priv;
 
 }tb_vector_t;
 
@@ -91,8 +91,8 @@ typedef struct __tb_vector_t
  */
 
 // create & destroy
-tb_vector_t* 		tb_vector_create(tb_size_t step, tb_size_t grow, void (*ctor)(void* , void* ), void (*dtor)(void* , void* ), void* priv);
-void 				tb_vector_destroy(tb_vector_t* vector);
+tb_vector_t* 		tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_void_t 				tb_vector_destroy(tb_vector_t* vector);
 
 // accessors
 tb_byte_t* 			tb_vector_at(tb_vector_t* vector, tb_size_t index);
@@ -100,31 +100,31 @@ tb_byte_t const* 	tb_vector_const_at(tb_vector_t const* vector, tb_size_t index)
 
 // modifiors
 tb_bool_t 			tb_vector_resize(tb_vector_t* vector, tb_size_t size);
-void 				tb_vector_clear(tb_vector_t* vector);
+tb_void_t 				tb_vector_clear(tb_vector_t* vector);
 
-void 	 			tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item);
-void 	 			tb_vector_insert_head(tb_vector_t* vector, tb_byte_t const* item);
-void 	 			tb_vector_insert_tail(tb_vector_t* vector, tb_byte_t const* item);
+tb_void_t 	 			tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item);
+tb_void_t 	 			tb_vector_insert_head(tb_vector_t* vector, tb_byte_t const* item);
+tb_void_t 	 			tb_vector_insert_tail(tb_vector_t* vector, tb_byte_t const* item);
 
-void 	 			tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size);
-void 	 			tb_vector_ninsert_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
-void 	 			tb_vector_ninsert_tail(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_ninsert_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_ninsert_tail(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
 
-void 	 			tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item);
-void 				tb_vector_replace_head(tb_vector_t* vector, tb_byte_t const* item);
-void 	 			tb_vector_replace_last(tb_vector_t* vector, tb_byte_t const* item);
+tb_void_t 	 			tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item);
+tb_void_t 				tb_vector_replace_head(tb_vector_t* vector, tb_byte_t const* item);
+tb_void_t 	 			tb_vector_replace_last(tb_vector_t* vector, tb_byte_t const* item);
 
-void 	 			tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size);
-void 	 			tb_vector_nreplace_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
-void 	 			tb_vector_nreplace_last(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_nreplace_head(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
+tb_void_t 	 			tb_vector_nreplace_last(tb_vector_t* vector, tb_byte_t const* item, tb_size_t size);
 
-void 				tb_vector_remove(tb_vector_t* vector, tb_size_t index);
-void 	 			tb_vector_remove_head(tb_vector_t* vector);
-void 	 			tb_vector_remove_last(tb_vector_t* vector);
+tb_void_t 				tb_vector_remove(tb_vector_t* vector, tb_size_t index);
+tb_void_t 	 			tb_vector_remove_head(tb_vector_t* vector);
+tb_void_t 	 			tb_vector_remove_last(tb_vector_t* vector);
 
-void 	 			tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size);
-void 	 			tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
-void 	 			tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
+tb_void_t 	 			tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size);
+tb_void_t 	 			tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
+tb_void_t 	 			tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
 
 /* iterator
  * 

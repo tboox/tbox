@@ -140,7 +140,7 @@ tb_int_t tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t siz
 	if (fd >= 0) return write(fd, data, size);
 	else return -1;
 }
-void tb_audio_close(tb_handle_t haudio)
+tb_void_t tb_audio_close(tb_handle_t haudio)
 {
 	tb_int_t fd = (tb_int_t)haudio;
 	if (fd >= 0) close(fd);
@@ -161,12 +161,12 @@ tb_size_t tb_audio_bsize(tb_handle_t haudio)
 	}
 	return 0;
 }
-void tb_audio_clear(tb_handle_t haudio)
+tb_void_t tb_audio_clear(tb_handle_t haudio)
 {
 }
-void tb_audio_pause(tb_handle_t haudio)
+tb_void_t tb_audio_pause(tb_handle_t haudio)
 {
 }
-void tb_audio_resume(tb_handle_t haudio)
+tb_void_t tb_audio_resume(tb_handle_t haudio)
 {
 }

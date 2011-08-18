@@ -53,7 +53,7 @@ static __tb_inline__ tb_size_t tb_lzsw_window_coff(tb_size_t base, tb_size_t gof
 {
 	return ((goff + TB_LZSW_WINDOW_SIZE_MAX - base) % TB_LZSW_WINDOW_SIZE_MAX);
 }
-static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
+static tb_void_t tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
 	tb_byte_t const* wb = window->we - window->wn;
@@ -101,7 +101,7 @@ static void tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size_t si
 	}
 }
 
-static void tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
+static tb_void_t tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size_t size)
 {
 	tb_pool_t* pool = window->pool;
 #if 1
@@ -392,7 +392,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 	st->dst.p = dp;
 	return tb_tstream_dst(st);
 }
-static void tb_zstream_inflate_lzsw_close(tb_tstream_t* st)
+static tb_void_t tb_zstream_inflate_lzsw_close(tb_tstream_t* st)
 {
 	tb_lzsw_inflate_zstream_t* zst = (tb_lzsw_inflate_zstream_t*)st;
 	if (zst) 
@@ -510,7 +510,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 	st->src.p = sp;
 	return dst;
 }
-static void tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
+static tb_void_t tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 {
 	tb_lzsw_deflate_zstream_t* zst = (tb_lzsw_deflate_zstream_t*)st;
 	if (zst) 

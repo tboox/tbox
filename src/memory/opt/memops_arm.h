@@ -51,7 +51,7 @@ extern "C" {
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	// cache line: 16-bytes
 	__tb_asm__ __tb_volatile__
@@ -77,7 +77,7 @@ static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src
 		: "r3", "r4", "r5"
 	);
 }
-static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	// cache line: 32-bytes
 	__tb_asm__ __tb_volatile__
@@ -105,14 +105,14 @@ static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src
 		: "r3", "r4", "r5"
 	);
 }
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+tb_void_t tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst) return ;
 
 	if (size > 1) tb_memset_u16_opt_v1((tb_uint16_t*)dst, src, size);
 	else if (size == 1) *dst = src;
 }
-static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	// cache line: 16-bytes
 	__tb_asm__ __tb_volatile__
@@ -132,7 +132,7 @@ static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src
 		: "r3", "r4", "r5"
 	);
 }
-static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	// cache line: 32-bytes
 	__tb_asm__ __tb_volatile__
@@ -155,7 +155,7 @@ static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src
 		: "r3", "r4", "r5"
 	);
 }
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+tb_void_t tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst) return ;
 

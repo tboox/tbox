@@ -60,7 +60,7 @@ tb_bool_t tb_socket_init()
 {
 	return TB_TRUE;
 }
-void tb_socket_uninit()
+tb_void_t tb_socket_uninit()
 {
 }
 tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
@@ -177,7 +177,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 
 	return ((tb_handle_t)s);
 }
-void tb_socket_close(tb_handle_t hsocket)
+tb_void_t tb_socket_close(tb_handle_t hsocket)
 {
 	TB_ASSERT_RETURN(hsocket);
 	tb_socket_t* s = (tb_socket_t*)hsocket;

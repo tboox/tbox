@@ -84,13 +84,13 @@ typedef struct __tb_tstream_t
 tb_tstream_t* 	tb_tstream_cast(tb_gstream_t* gst);
 
 tb_bool_t 		tb_tstream_open(tb_gstream_t* gst);
-void 			tb_tstream_close(tb_gstream_t* gst);
+tb_void_t 			tb_tstream_close(tb_gstream_t* gst);
 
 tb_int_t 		tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
 tb_bool_t 		tb_tstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 		tb_tstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, void* arg1);
-tb_bool_t 		tb_tstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, void* arg1, void* arg2);
+tb_bool_t 		tb_tstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1);
+tb_bool_t 		tb_tstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2);
 
 // c plus plus
 #ifdef __cplusplus

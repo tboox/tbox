@@ -55,7 +55,7 @@ extern "C" {
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	// align by 4-bytes 
 	if (((tb_size_t)dst) & 0x3)
@@ -75,7 +75,7 @@ static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src
 #endif
 
 #ifdef TB_CONFIG_OPTI_SSE2_ENABLE
-static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
     if (size >= 32) 
 	{
@@ -105,7 +105,7 @@ static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src
 #endif
 
 #ifdef TB_MEMOPS_OPT_MEMSET_U16
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+tb_void_t tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst) return ;
 
@@ -128,7 +128,7 @@ void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 #endif
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	__tb_asm__ __tb_volatile__
 	(
@@ -141,7 +141,7 @@ static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src
 #endif
 
 #ifdef TB_CONFIG_OPTI_SSE2_ENABLE
-static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
     if (size >= 16) 
 	{
@@ -171,7 +171,7 @@ static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src
 #endif
 
 #ifdef TB_MEMOPS_OPT_MEMSET_U32
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+tb_void_t tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst) return ;
 

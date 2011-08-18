@@ -39,9 +39,9 @@ extern "C" {
  */
 
 // manage dns server
-void 				tb_dns_server_add(tb_char_t const* ip);
-void 				tb_dns_server_del(tb_char_t const* ip);
-void 				tb_dns_server_dump();
+tb_void_t 				tb_dns_server_add(tb_char_t const* ip);
+tb_void_t 				tb_dns_server_del(tb_char_t const* ip);
+tb_void_t 				tb_dns_server_dump();
 
 // lookup host ip from name
 tb_char_t const* 	tb_dns_lookup(tb_char_t const* host, tb_char_t* ip);

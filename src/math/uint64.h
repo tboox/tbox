@@ -87,7 +87,7 @@ static __tb_inline__ tb_uint64_t tb_uint32_to_uint64_inline(tb_uint32_t x)
 	i.l = x;
 	return i;
 }
-static __tb_inline__ tb_uint32_t tb_uint64_to_int32_inline(tb_uint64_t x)
+static __tb_inline__ tb_uint32_t tb_uint64_to_uint32_inline(tb_uint64_t x)
 {
 	// is uint32?
 	TB_ASSERT(!x.h);
@@ -110,7 +110,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_sub_inline(tb_uint64_t x, tb_uint64_t
 
 	return x;
 }
-//#error
+#error
 static __tb_inline__ tb_uint64_t tb_uint64_mul_inline(tb_uint64_t x, tb_uint64_t y)
 {
 	TB_ASSERT(!x.h && !y.h);

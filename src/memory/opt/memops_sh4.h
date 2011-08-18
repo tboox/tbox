@@ -51,7 +51,7 @@ extern "C" {
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	/* align by 4-bytes */
 	if (((tb_size_t)dst) & 0x3)
@@ -111,7 +111,7 @@ static __tb_inline__ void tb_memset_u16_opt_v1(tb_uint16_t* dst, tb_uint16_t src
 		);
 	}
 }
-static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	/* align by 4-bytes */
 	if (((tb_size_t)dst) & 0x3)
@@ -131,14 +131,14 @@ static __tb_inline__ void tb_memset_u16_opt_v2(tb_uint16_t* dst, tb_uint16_t src
 		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
 	);
 }
-void tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
+tb_void_t tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
 	if (!dst) return ;
 
 	if (size > 1) tb_memset_u16_opt_v1((tb_uint16_t*)dst, src, size);
 	else if (size == 1) *dst = src;
 }
-static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	tb_size_t left = size & 0x3;
 	dst += (size << 2);
@@ -171,7 +171,7 @@ static __tb_inline__ void tb_memset_u32_opt_v1(tb_uint32_t* dst, tb_uint32_t src
 		); 
 	}
 }
-static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	tb_size_t left = size & 0x3;
 	dst += (size << 2);
@@ -224,7 +224,7 @@ static __tb_inline__ void tb_memset_u32_opt_v2(tb_uint32_t* dst, tb_uint32_t src
 		); 
 	}
 }
-static __tb_inline__ void tb_memset_u32_opt_v3(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
+static __tb_inline__ tb_void_t tb_memset_u32_opt_v3(tb_uint32_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	dst += size << 2;
 	__tb_asm__ __tb_volatile__
@@ -237,7 +237,7 @@ static __tb_inline__ void tb_memset_u32_opt_v3(tb_uint32_t* dst, tb_uint32_t src
 		: "r" (size), "r" (src), "r" (dst) /* constraint: register */
 	);
 }
-void tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
+tb_void_t tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
 	if (!dst) return ;
 

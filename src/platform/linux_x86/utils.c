@@ -36,25 +36,25 @@
  */
 
 // usleep
-void tb_usleep(tb_size_t us)
+tb_void_t tb_usleep(tb_size_t us)
 {
 	usleep(us);
 }
 
 // msleep
-void tb_msleep(tb_size_t ms)
+tb_void_t tb_msleep(tb_size_t ms)
 {
 	tb_usleep(ms * 1000);
 }
 
 // sleep
-void tb_sleep(tb_size_t s)
+tb_void_t tb_sleep(tb_size_t s)
 {
 	tb_msleep(s * 1000);
 }
 
 // printf
-void tb_printf(tb_char_t const* fmt, ...)
+tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
 	va_list argp;
 	tb_char_t msg[4096];
