@@ -37,6 +37,7 @@ extern "C" {
 #include "conv.h"
 #include "bits.h"
 #include "md5.h"
+#include "crc.h"
 #include "base32.h"
 #include "base64.h"
 
