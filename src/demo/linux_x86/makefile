@@ -6,6 +6,8 @@ NAMES = test \
 		conv \
 		time \
 		http \
+		sint64 \
+		uint64 \
 		scalar \
 		memops \
 		string \
@@ -18,7 +20,9 @@ NAMES = test \
 		vector \
 		slist \
 		dlist \
+		base32 \
 		base64 \
+		md5 \
 		dns \
 		xml
 

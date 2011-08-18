@@ -34,7 +34,6 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-//#define TB_FILE_PATH_PREFIX 		"/home/enrich"
 #define TB_FILE_PATH_PREFIX 		""
 /* /////////////////////////////////////////////////////////
  * types
@@ -102,7 +101,7 @@ void tb_file_flush(tb_handle_t hfile)
 {
 	TB_NOT_IMPLEMENT();
 }
-tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_int_t flags)
+tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
 {
 	if (!hfile) return -1;
 	//TB_DBG("tb_file_seek: offset:%d flag: %d", (off_t)offset, flags);

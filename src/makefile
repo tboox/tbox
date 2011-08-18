@@ -11,6 +11,8 @@ tbox_TYPE 			= LIB
 tbox_C_FILES 		+= \
 					tbox \
 					math/int32 \
+					math/sint64 \
+					math/uint64 \
 					math/float \
 					math/fixed16 \
 					memory/mpool \
@@ -64,6 +66,8 @@ tbox_C_FILES 		+= \
 					utils/time \
 					utils/bits\
 					utils/conv \
+					utils/md5 \
+					utils/base32 \
 					utils/base64 \
 					xml/document \
 					xml/node \
@@ -103,6 +107,8 @@ INC_FILES 			= \
 					math/fixed16.h \
 					math/fixed30.h \
 					math/int32.h \
+					math/sint64.h \
+					math/uint64.h \
 					math/scalar.h \
 					math/opt/prefix.h \
 					math/opt/fixed16_x86.h \
@@ -145,6 +151,8 @@ INC_FILES 			= \
 					utils/bits.h \
 					utils/conv.h \
 					utils/time.h \
+					utils/md5.h \
+					utils/base32.h \
 					utils/base64.h \
 					xml/xml.h \
 					xml/prefix.h \

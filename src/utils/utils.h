@@ -36,6 +36,8 @@ extern "C" {
 #include "time.h"
 #include "conv.h"
 #include "bits.h"
+#include "md5.h"
+#include "base32.h"
 #include "base64.h"
 
 // c plus plus

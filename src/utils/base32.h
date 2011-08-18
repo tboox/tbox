@@ -17,26 +17,22 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		math.h
+ * \file		base32.h
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_UTILS_BASE32_H
+#define TB_UTILS_BASE32_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "int32.h"
-#include "int64.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#include "scalar.h"
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-#endif
+
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_size_t tb_base32_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+tb_size_t tb_base32_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
 #endif
 

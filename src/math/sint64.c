@@ -17,26 +17,15 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		math.h
+ * \file		sint64.c
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
-
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "int32.h"
-#include "int64.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#include "scalar.h"
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-#endif
+#include "sint64.h"
 
-#endif
+/* ////////////////////////////////////////////////////////////////////////
+ * implemention
+ */
 
