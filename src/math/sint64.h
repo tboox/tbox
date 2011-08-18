@@ -35,6 +35,9 @@
 # 	define tb_sint32_to_sint64(x) 		(tb_sint64_t)(x)
 # 	define tb_sint64_to_sint32(x) 		(tb_sint32_t)(x)
 
+# 	define tb_sint64_abs(x) 			((x) > 0? (x) : -(x))
+# 	define tb_sint64_neg(x) 			(-(x))
+
 # 	define tb_sint64_add(x, y) 			((x) + (y))
 # 	define tb_sint64_sub(x, y) 			((x) - (y))
 # 	define tb_sint64_mul(x, y) 			((x) * (y))
@@ -55,6 +58,9 @@
 #else
 # 	define tb_sint32_to_sint64(x) 		tb_sint32_to_sint64_inline(x)
 # 	define tb_sint64_to_sint32(x) 		tb_sint64_to_sint32_inline(x)
+
+# 	define tb_sint64_abs(x) 			tb_sint64_abs_inline(x)
+# 	define tb_sint64_neg(x) 			tb_sint64_neg_inline(x)
 
 # 	define tb_sint64_add(x, y) 			tb_sint64_add_inline(x, y)
 # 	define tb_sint64_sub(x, y) 			tb_sint64_sub_inline(x, y)
@@ -92,20 +98,27 @@ static __tb_inline__ tb_sint32_t tb_sint64_to_sint32_inline(tb_sint64_t x)
 	TB_ASSERT(x.h == ((tb_sint32_t)x.l >> 31));
 	return (tb_sint32_t)x.l;
 }
-
+static __tb_inline__ tb_sint64_t tb_sint64_abs_inline(tb_sint64_t x)
+{
+	return x;
+}
+static __tb_inline__ tb_sint64_t tb_sint64_neg_inline(tb_sint64_t x)
+{
+	return x;
+}
 static __tb_inline__ tb_sint64_t tb_sint64_add_inline(tb_sint64_t x, tb_sint64_t y)
 {
 	tb_uint32_t s = x.l + y.l;
 
-	x.h = x.h + y.h + (s < x.l);
+	x.h += y.h + (s < x.l);
 	x.l = s;
 
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_sub_inline(tb_sint64_t x, tb_sint64_t y)
 {
-    x.h = x.h - y.h - (x.l < y.l);
-    x.l = x.l - y.l;
+    x.h -= y.h + (x.l < y.l);
+    x.l -= y.l;
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_inline(tb_sint64_t x, tb_sint64_t y)
@@ -121,13 +134,19 @@ static __tb_inline__ tb_sint64_t tb_sint64_add_sint32_inline(tb_sint64_t x, tb_s
 	tb_sint32_t h = y >> 31;
 	tb_uint32_t s = x.l + (tb_uint32_t)y;
 
-	x.h = x.h + h + (s < x.l);
+	x.h += h + (s < x.l);
 	x.l = s;
 
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_sub_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
+	tb_sint32_t h = y >> 31;
+	tb_uint32_t s = x.l - (tb_uint32_t)y;
+
+	x.h -= h + (s < x.l);
+	x.l = s;
+
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_sint32_inline(tb_sint64_t x, tb_sint32_t y)

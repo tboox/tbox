@@ -37,6 +37,9 @@
 #define tb_int32_to_int64(x) 		tb_sint32_to_sint64(x)
 #define tb_int64_to_int32(x) 		tb_sint64_to_sint32(x)
 
+#define tb_int64_abs(x) 			tb_sint64_abs(x)
+#define tb_int64_neg(x) 			tb_sint64_neg(x)
+
 #define tb_int64_add(x, y) 			tb_sint64_add(x, y)
 #define tb_int64_sub(x, y) 			tb_sint64_sub(x, y)
 #define tb_int64_mul(x, y) 			tb_sint64_mul(x, y)

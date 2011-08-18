@@ -31,6 +31,7 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros 
  */
+
 #ifdef TB_CONFIG_TYPE_INT64
 # 	define tb_uint32_to_uint64(x) 		(tb_uint64_t)(x)
 # 	define tb_uint64_to_uint32(x) 		(tb_uint32_t)(x)
@@ -95,43 +96,67 @@ static __tb_inline__ tb_uint32_t tb_uint64_to_int32_inline(tb_uint64_t x)
 
 static __tb_inline__ tb_uint64_t tb_uint64_add_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	tb_uint64_t a;
-	return a;
+	tb_uint32_t s = x.l + y.l;
+
+	x.h += y.h + (s < x.l);
+	x.l = s;
+
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_sub_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	tb_uint64_t a;
-	return a;
+    x.h -= y.h + (x.l < y.l);
+    x.l -= y.l;
+
+	return x;
 }
+#error
 static __tb_inline__ tb_uint64_t tb_uint64_mul_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	tb_uint64_t a;
-	return a;
+	TB_ASSERT(!x.h && !y.h);
+
+	tb_uint32_t xlh = x.l >> 16;
+	tb_uint32_t xll = x.l & 0xffff;
+	tb_uint32_t ylh = y.l >> 16;
+	tb_uint32_t yll = y.l & 0xffff;
+
+	tb_uint32_t a = xlh * ylh;
+	tb_uint32_t b = xlh * yll + xll * ylh;
+	tb_uint32_t c = xll * yll;
+
+	x.l = c + (b << 16);
+	x.h = a + (b >> 16) + (x.l < c);
+
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_div_inline(tb_uint64_t x, tb_uint64_t y)
 {
-	tb_uint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_add_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
-	tb_uint64_t a;
-	return a;
+	tb_uint32_t s = x.l + y;
+
+	x.h += (s < x.l);
+	x.l = s;
+
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_sub_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
-	tb_uint64_t a;
-	return a;
+    x.h -= x.l < y;
+    x.l -= y;
+
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_mul_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
-	tb_uint64_t a;
-	return a;
+
+	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_div_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
-	tb_uint64_t a;
-	return a;
+	return x;
 }
 static __tb_inline__ tb_int_t tb_uint64_et_inline(tb_uint64_t x, tb_uint64_t y)
 {
