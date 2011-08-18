@@ -110,7 +110,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_sub_inline(tb_uint64_t x, tb_uint64_t
 
 	return x;
 }
-#error
+//#error
 static __tb_inline__ tb_uint64_t tb_uint64_mul_inline(tb_uint64_t x, tb_uint64_t y)
 {
 	TB_ASSERT(!x.h && !y.h);

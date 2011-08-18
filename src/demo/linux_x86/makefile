@@ -23,6 +23,7 @@ NAMES = test \
 		base32 \
 		base64 \
 		md5 \
+		crc \
 		dns \
 		xml
 

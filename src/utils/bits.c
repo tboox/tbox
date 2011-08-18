@@ -34,8 +34,7 @@
  */
 tb_char_t const* tb_bits_get_string(tb_byte_t const* p, tb_size_t size)
 {
-	TB_ASSERT(p && size);
-	// {
+	TB_ASSERT_RETURN_VAL(p && size, TB_NULL);
 	tb_char_t const* s = (tb_char_t const*)p;
 
 	// find '\0'
@@ -44,7 +43,6 @@ tb_char_t const* tb_bits_get_string(tb_byte_t const* p, tb_size_t size)
 	// is string with '\0' ?
 	if ((*p)) return TB_NULL;
 	return s;
-	// }
 }
 void tb_bits_swap_u16(tb_uint16_t* p)
 {
