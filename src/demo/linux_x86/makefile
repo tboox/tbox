@@ -20,7 +20,9 @@ NAMES = test \
 		vector \
 		slist \
 		dlist \
+		base32 \
 		base64 \
+		md5 \
 		dns \
 		xml
 
