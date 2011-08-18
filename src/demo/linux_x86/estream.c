@@ -23,8 +23,7 @@ int main(int argc, char** argv)
 	// read data
 	tb_byte_t 		data[4096];
 	tb_size_t 		read = 0;
-	tb_size_t 		base = (tb_size_t)tb_mclock();
-	tb_size_t 		time = (tb_size_t)tb_mclock();
+	tb_int64_t 		time = tb_mclock();
 	do
 	{
 		tb_int_t ret = tb_gstream_read(est, data, 4096);
@@ -32,7 +31,7 @@ int main(int argc, char** argv)
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 
 #if 1
 			tb_int_t write = 0;
@@ -47,17 +46,10 @@ int main(int argc, char** argv)
 		}
 		else if (!ret) 
 		{
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > 5000) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_bt_int32(timeout, 5000)) break;
 		}
 		else break;
-
-		// update info
-		if (time > base && ((time - base) % 1000)) 
-		{
-			tb_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
-			fflush(stdout);
-		}
 
 	} while(1);
 

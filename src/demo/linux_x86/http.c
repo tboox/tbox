@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// open http
-		tb_size_t 		base = (tb_size_t)tb_mclock();
+		tb_int64_t 		base = tb_mclock();
 		if (TB_FALSE == tb_http_open(http)) goto end;
 
 		// open file
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		// read data
 		tb_byte_t 		data[8192];
 		tb_size_t 		read = 0;
-		tb_size_t 		time = (tb_size_t)tb_mclock();
+		tb_int64_t 		time = tb_mclock();
 		tb_size_t 		size = tb_http_status_content_size(http);
 		do
 		{
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tb_mclock();
+				time = tb_mclock();
 
 #if 1
 				tb_int_t write = 0;
@@ -61,17 +61,10 @@ int main(int argc, char** argv)
 			}
 			else if (!ret) 
 			{
-				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > 10000) break;
+				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+				if (tb_int64_bt_int32(timeout, 10000)) break;
 			}
 			else break;
-
-			// update info
-			if (time > base && ((time - base) % 1000)) 
-			{
-				tb_printf("speed: %5d kb/s, load: %8d kb\r", (read / (time - base)), read / 1000);
-				fflush(stdout);
-			}
 
 			// is end?
 			if (size && read >= size) break;
@@ -87,7 +80,7 @@ end:
 		tb_http_close(http);
 
 		// time
-		tb_printf("\ntime: %d ms\n", ((tb_size_t)tb_mclock() - base));
+		tb_printf("\ntime: %d ms\n", tb_int64_to_int32(tb_int64_sub(tb_mclock(), base)));
 	}
 
 	// destroy it
