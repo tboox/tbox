@@ -39,7 +39,7 @@ static tb_uint64_t tb_uint64_test_mul_uint32(tb_uint64_t x, tb_uint32_t y)
 static tb_uint64_t tb_uint64_test_not(tb_uint64_t x)
 {
 	tb_uint64_t r = tb_uint64_not(x);
-	tb_printf("[uint64]: !%llu = %llu\n", x, r);
+	tb_printf("[uint64]: ~%llu = %llu\n", x, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_or(tb_uint64_t x, tb_uint64_t y)
@@ -76,6 +76,24 @@ static tb_uint64_t tb_uint64_test_xor_uint32(tb_uint64_t x, tb_uint32_t y)
 {
 	tb_uint64_t r = tb_uint64_xor_uint32(x, y);
 	tb_printf("[uint64]: %llu ^ %u = %llu\n", x, y, r);
+	return r;
+}
+static tb_uint64_t tb_uint64_test_lsh(tb_uint64_t x, tb_uint32_t b)
+{
+	tb_uint64_t r = tb_uint64_lsh(x, b);
+	tb_printf("[uint64]: %llu << %u = %llu\n", x, b, r);
+	return r;
+}
+static tb_uint64_t tb_uint64_test_rsh(tb_uint64_t x, tb_uint32_t b)
+{
+	tb_uint64_t r = tb_uint64_rsh(x, b);
+	tb_printf("[uint64]: %llu >> %u = %llu\n", x, b, r);
+	return r;
+}
+static tb_size_t tb_uint64_test_clz(tb_uint64_t x)
+{
+	tb_size_t r = tb_uint64_clz(x);
+	tb_printf("[uint64]: clz: %llu = %u\n", x, r);
 	return r;
 }
 int main(int argc, char** argv)
@@ -269,6 +287,20 @@ int main(int argc, char** argv)
 	tb_uint64_test_xor_uint32(a8, 0xffff);
 
 	tb_printf("==================================================\n");
+	tb_printf("tb_uint64_test_clz:\n");
+	tb_uint64_test_clz(TB_UINT64_ZERO);
+	tb_uint64_test_clz(TB_UINT64_ONE);
+	tb_uint64_test_clz(a0);
+	tb_uint64_test_clz(a1);
+	tb_uint64_test_clz(a2);
+	tb_uint64_test_clz(a3);
+	tb_uint64_test_clz(a4);
+	tb_uint64_test_clz(a5);
+	tb_uint64_test_clz(a6);
+	tb_uint64_test_clz(a7);
+	tb_uint64_test_clz(a8);
+
+	tb_printf("==================================================\n");
 	tb_printf("tb_uint64_test_not:\n");
 	tb_uint64_test_not(TB_UINT64_ZERO);
 	tb_uint64_test_not(TB_UINT64_ONE);
@@ -281,6 +313,40 @@ int main(int argc, char** argv)
 	tb_uint64_test_not(a6);
 	tb_uint64_test_not(a7);
 	tb_uint64_test_not(a8);
+
+	tb_printf("==================================================\n");
+	tb_printf("tb_uint64_test_lsh:\n");
+	tb_uint64_test_lsh(a1, 0);
+	tb_uint64_test_lsh(a0, 4);
+	tb_uint64_test_lsh(a3, 7);
+	tb_uint64_test_lsh(a2, 8);
+	tb_uint64_test_lsh(a5, 10);
+	tb_uint64_test_lsh(a4, 15);
+	tb_uint64_test_lsh(a7, 16);
+	tb_uint64_test_lsh(a6, 17);
+	tb_uint64_test_lsh(a8, 28);
+	tb_uint64_test_lsh(a7, 29);
+	tb_uint64_test_lsh(a8, 32);
+	tb_uint64_test_lsh(a1, 34);
+	tb_uint64_test_lsh(a8, 63);
+
+	tb_printf("==================================================\n");
+	tb_printf("tb_uint64_test_rsh:\n");
+	tb_uint64_test_rsh(a1, 0);
+	tb_uint64_test_rsh(a0, 4);
+	tb_uint64_test_rsh(a3, 7);
+	tb_uint64_test_rsh(a2, 8);
+	tb_uint64_test_rsh(a5, 10);
+	tb_uint64_test_rsh(a4, 15);
+	tb_uint64_test_rsh(a7, 16);
+	tb_uint64_test_rsh(a6, 17);
+	tb_uint64_test_rsh(a8, 28);
+	tb_uint64_test_rsh(a7, 29);
+	tb_uint64_test_rsh(a8, 32);
+	tb_uint64_test_rsh(a1, 34);
+	tb_uint64_test_rsh(a8, 63);
+
+
 
 	return 0;
 }
