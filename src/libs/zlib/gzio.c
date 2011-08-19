@@ -657,11 +657,11 @@ int ZEXPORTVA gzprintf (file, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
 #  endif
 #else
 #  ifdef HAS_snprintf_void
-    snprintf(buf, sizeof(buf), format, a1, a2, a3, a4, a5, a6, a7, a8,
+    tb_snprintf(buf, sizeof(buf), format, a1, a2, a3, a4, a5, a6, a7, a8,
              a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
     len = strlen(buf);
 #  else
-    len = snprintf(buf, sizeof(buf), format, a1, a2, a3, a4, a5, a6, a7, a8,
+    len = tb_snprintf(buf, sizeof(buf), format, a1, a2, a3, a4, a5, a6, a7, a8,
                  a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20);
 #  endif
 #endif

@@ -424,7 +424,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 			// save the first ip
 			if (!found) 
 			{
-				snprintf(ip, 16, "%d.%d.%d.%d", b1, b2, b3, b4);
+				tb_snprintf(ip, 16, "%d.%d.%d.%d", b1, b2, b3, b4);
 				found = 1;
 				TB_DNS_DBG("");
 				break;

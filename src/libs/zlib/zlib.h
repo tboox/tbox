@@ -1129,7 +1129,7 @@ ZEXTERN int ZEXPORTVA   gzprintf OF((gzFile file, const char *format, ...));
    return an error (0) with nothing written. In this case, there may also be a
    buffer overflow with unpredictable consequences, which is possible only if
    zlib was compiled with the insecure functions sprintf() or vsprintf()
-   because the secure snprintf() or vsnprintf() functions were not available.
+   because the secure tb_snprintf() or vsnprintf() functions were not available.
 */
 
 ZEXTERN int ZEXPORT gzputs OF((gzFile file, const char *s));

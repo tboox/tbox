@@ -200,8 +200,8 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		// save url
 		tb_int_t ret = 0;
 		if (http->option.port == g_http_option_default.port) 
-			ret = snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s%s", http->option.bhttps? "s" : "", http->option.host, http->option.path);
-		else ret = snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s:%d%s", http->option.bhttps? "s" : "", http->option.host, http->option.port, http->option.path);
+			ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s%s", http->option.bhttps? "s" : "", http->option.host, http->option.path);
+		else ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s:%d%s", http->option.bhttps? "s" : "", http->option.host, http->option.port, http->option.path);
 		http->option.url[ret >= 0? ret : 0] = '\0';
 		http->option.url[ret < TB_HTTP_URL_MAX? ret : TB_HTTP_URL_MAX - 1] = '\0';
 

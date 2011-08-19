@@ -25,9 +25,9 @@
  * includes
  */
 #include "prefix.h"
+#include "../../libc/libc.h"
 #include "../../math/math.h"
 #include <unistd.h>
-#include <stdarg.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -56,12 +56,10 @@ tb_void_t tb_sleep(tb_size_t s)
 // printf
 tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
-	va_list argp;
+	tb_int_t ret = 0;
 	tb_char_t msg[4096];
-
-    va_start(argp, fmt);
-    if (vsnprintf(msg, 4096, fmt, argp) < 0) msg[4096 - 1] = '\0';
-    va_end(argp);
+	TB_VA_FMT(msg, 4096, fmt, &ret);
+	if (ret >= 0) msg[ret] = '\0';
 
 	printf("%s", msg);
 }

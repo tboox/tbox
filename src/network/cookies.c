@@ -648,7 +648,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 				// enough?
 				if (n + 8 < TB_COOKIES_VALUE_MAX)
 				{
-					tb_int_t ret = snprintf(cookies->value + n, TB_COOKIES_VALUE_MAX - n, "%s=%s; ", sname->data, svalue->data);
+					tb_int_t ret = tb_snprintf(cookies->value + n, TB_COOKIES_VALUE_MAX - n, "%s=%s; ", sname->data, svalue->data);
 					if (ret > 0) 
 					{
 						n += ret;

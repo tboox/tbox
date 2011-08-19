@@ -25,6 +25,7 @@
  * includes
  */
 #include "writer.h"
+#include "../libc/libc.h"
 #include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
@@ -239,7 +240,7 @@ tb_void_t tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t
 		// format text
 		tb_char_t text[4096];
 		tb_size_t size = 0;
-		TB_VARG_FORMAT(text, 4096, fmt, &size);
+		TB_VA_FMT(text, 4096, fmt, &size);
 		if (size) 
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];

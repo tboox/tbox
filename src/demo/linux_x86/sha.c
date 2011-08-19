@@ -8,7 +8,7 @@ static tb_void_t tb_test_sha(tb_size_t mode, tb_char_t const* data)
 
 	tb_size_t i = 0;
 	tb_char_t sha[256] = {0};
-	for (i = 0; i < on; ++i) snprintf(sha + (i << 1), 3, "%02X", ob[i]);
+	for (i = 0; i < on; ++i) tb_snprintf(sha + (i << 1), 3, "%02X", ob[i]);
 	tb_printf("[sha]: %d = %s\n", mode, sha);
 }
 int main(int argc, char** argv)

@@ -25,6 +25,7 @@
  * includes
  */
 #include "gstream.h"
+#include "../libc/libc.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
 /* /////////////////////////////////////////////////////////
@@ -259,7 +260,7 @@ tb_int_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 	// format data
 	tb_char_t data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t size = 0;
-    TB_VARG_FORMAT(data, TB_GSTREAM_BLOCK_SIZE, fmt, &size);
+    TB_VA_FMT(data, TB_GSTREAM_BLOCK_SIZE, fmt, &size);
 
 	// write data
 	if (size) return tb_gstream_bwrite(gst, data, size);

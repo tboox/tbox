@@ -1,45 +1,39 @@
 #include "tbox.h"
 
-#ifdef TB_CONFIG_TYPE_INT64
-# 	define tb_uint64_to_native(x) 		((unsigned long long)(x))
-#else
-# 	define tb_uint64_to_native(x) 		(((unsigned long long)x.h << 32) | x.l)
-#endif
-
 static tb_uint64_t tb_uint64_test_add(tb_uint32_t x, tb_uint32_t y)
 {
 	tb_uint64_t r = tb_uint64_add(tb_uint32_to_uint64(x), tb_uint32_to_uint64(y));
-	tb_printf("[uint64]: %u + %u = %llu\n", x, y, tb_uint64_to_native(r));
+	tb_printf("[uint64]: %u + %u = %llu\n", x, y, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_add_uint32(tb_uint64_t x, tb_uint32_t y)
 {
 	tb_uint64_t r = tb_uint64_add_uint32(x, y);
-	tb_printf("[uint64]: %llu + %u = %llu\n", tb_uint64_to_native(x), y, tb_uint64_to_native(r));
+	tb_printf("[uint64]: %llu + %u = %llu\n", x, y, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_sub(tb_uint64_t x, tb_uint64_t y)
 {
 	tb_uint64_t r = tb_uint64_sub(x, y);
-	tb_printf("[uint64]: %llu - %llu = %llu\n", tb_uint64_to_native(x), tb_uint64_to_native(y), tb_uint64_to_native(r));
+	tb_printf("[uint64]: %llu - %llu = %llu\n", x, y, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_sub_uint32(tb_uint64_t x, tb_uint32_t y)
 {
 	tb_uint64_t r = tb_uint64_sub_uint32(x, y);
-	tb_printf("[uint64]: %llu - %u = %llu\n", tb_uint64_to_native(x), y, tb_uint64_to_native(r));
+	tb_printf("[uint64]: %llu - %u = %llu\n", x, y, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_mul(tb_uint64_t x, tb_uint64_t y)
 {
 	tb_uint64_t r = tb_uint64_mul(x, y);
-	tb_printf("[uint64]: %llu * %llu = %llu\n", tb_uint64_to_native(x), tb_uint64_to_native(y), tb_uint64_to_native(r));
+	tb_printf("[uint64]: %llu * %llu = %llu\n", x, y, r);
 	return r;
 }
 static tb_uint64_t tb_uint64_test_mul_uint32(tb_uint64_t x, tb_uint32_t y)
 {
 	tb_uint64_t r = tb_uint64_mul_uint32(x, y);
-	tb_printf("[uint64]: %llu * %u = %llu\n", tb_uint64_to_native(x), y, tb_uint64_to_native(r));
+	tb_printf("[uint64]: %llu * %u = %llu\n", x, y, r);
 	return r;
 }
 int main(int argc, char** argv)

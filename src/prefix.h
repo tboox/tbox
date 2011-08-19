@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "config.h"
-#include <stdarg.h>
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -317,21 +316,6 @@ extern "C" {
 #endif
 
 
-// varg
-#define TB_VARG_FORMAT(s, n, fmt, r) \
-do \
-{ \
-	tb_int_t __tb_ret = 0; \
-	va_list __tb_varg_list; \
-    va_start(__tb_varg_list, fmt); \
-    __tb_ret = vsnprintf(s, (n) - 1, fmt, __tb_varg_list); \
-    va_end(__tb_varg_list); \
-	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
-	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
- \
-} while (0) 
-
-
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -351,6 +335,7 @@ typedef tb_int_t				tb_int32_t;
 typedef tb_int32_t				tb_sint32_t;
 typedef tb_uint_t				tb_uint32_t;
 typedef char 					tb_char_t;
+typedef tb_int32_t 				tb_wchar_t;
 typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
@@ -434,12 +419,12 @@ typedef tb_float_t 				tb_scalar_t;
 
 # 	ifdef TB_DEBUG
 tb_void_t* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t*  	tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 tb_void_t 		tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 # 	else
 tb_void_t* 		tb_mpool_allocate(tb_size_t size);
-tb_void_t*  		tb_mpool_callocate(tb_size_t item, tb_size_t size);
+tb_void_t*  	tb_mpool_callocate(tb_size_t item, tb_size_t size);
 tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size);
 tb_void_t 		tb_mpool_deallocate(tb_void_t* data);
 # 	endif

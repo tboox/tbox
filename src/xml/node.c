@@ -308,7 +308,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t 
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	TB_VARG_FORMAT(text, 4096, fmt, &size);
+	TB_VA_FMT(text, 4096, fmt, &size);
 	if (!size) return TB_NULL;
 
 	// create attribute

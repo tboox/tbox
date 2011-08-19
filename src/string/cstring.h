@@ -69,9 +69,9 @@ static __tb_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1, tb
 }
 
 // length
-static __tb_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
+static __tb_inline__ tb_size_t tb_cstring_size(tb_char_t const* s)
 {
-#if 0
+#ifdef TB_CONFIG_BINARY_SMALL
 	TB_ASSERT(s);
 	tb_char_t const* p = s;
 	if (!p || !*p) return 0;
@@ -92,11 +92,18 @@ static __tb_inline__ tb_int_t tb_cstring_size(tb_char_t const* s)
 	return 0;
 #endif
 }
-
+static __tb_inline__ tb_size_t tb_cstring_nsize(tb_char_t const* s, tb_size_t n)
+{
+	TB_ASSERT(s);
+	tb_char_t const* p = s;
+	if (!p || !*p) return 0;
+	while (*p && ((p - s) < n)) p++;
+	return (p - s);
+}
 // copy
 static __tb_inline__ tb_char_t* tb_cstring_copy(tb_char_t* s1, tb_char_t const* s2)
 {
-#if 0
+#ifdef TB_CONFIG_BINARY_SMALL
 	TB_ASSERT(s1 && s2);
 	tb_char_t* p = s1;
 	if (s1 == s2) return p;
@@ -120,7 +127,7 @@ static __tb_inline__ tb_char_t* tb_cstring_copy(tb_char_t* s1, tb_char_t const* 
 }
 static __tb_inline__ tb_char_t* tb_cstring_ncopy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-#if 0
+#ifdef TB_CONFIG_BINARY_SMALL
 	TB_ASSERT(s1 && s2);
 	tb_char_t* p = s1;
 	if (s1 == s2 || !n) return p;
