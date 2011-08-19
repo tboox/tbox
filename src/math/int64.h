@@ -33,6 +33,8 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros 
  */
+#define TB_INT64_ZERO 				TB_SINT64_ZERO
+#define TB_INT64_ONE 				TB_SINT64_ONE
 
 #define tb_int32_to_int64(x) 		tb_sint32_to_sint64(x)
 #define tb_int64_to_int32(x) 		tb_sint64_to_sint32(x)
@@ -44,12 +46,27 @@
 #define tb_int64_sub(x, y) 			tb_sint64_sub(x, y)
 #define tb_int64_mul(x, y) 			tb_sint64_mul(x, y)
 #define tb_int64_div(x, y) 			tb_sint64_div(x, y)
+#define tb_int64_mod(x, y) 			tb_sint64_mod(x, y)
+
+#define tb_int64_not(x) 			tb_sint64_not(x)
+#define tb_int64_or(x, y) 			tb_sint64_or(x, y)
+#define tb_int64_and(x, y) 			tb_sint64_and(x, y)
+#define tb_int64_xor(x, y) 			tb_sint64_xor(x, y)
+
+#define tb_int64_lsh(x, b) 			tb_sint64_lsh(x, b)
+#define tb_int64_rsh(x, b) 			tb_sint64_rsh(x, b)
 
 #define tb_int64_add_int32(x, y) 	tb_sint64_add_sint32(x, y)
 #define tb_int64_sub_int32(x, y) 	tb_sint64_sub_sint32(x, y)
 #define tb_int64_mul_int32(x, y) 	tb_sint64_mul_sint32(x, y)
 #define tb_int64_div_int32(x, y) 	tb_sint64_div_sint32(x, y)
+#define tb_int64_mod_sint32(x, y) 	tb_sint64_mod_sint32(x, y)
 
+#define tb_int64_or_sint32(x, y) 	tb_sint64_or_sint32(x, y)
+#define tb_int64_and_sint32(x, y) 	tb_sint64_and_sint32(x, y)
+#define tb_int64_xor_sint32(x, y) 	tb_sint64_xor_sint32(x, y)
+
+#define tb_int64_tt(x) 				tb_sint64_tt(x)
 #define tb_int64_et(x, y) 			tb_sint64_et(x, y)
 #define tb_int64_lt(x, y) 			tb_sint64_lt(x, y)
 #define tb_int64_bt(x, y) 			tb_sint64_bt(x, y)

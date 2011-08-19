@@ -26,6 +26,15 @@
 #include "uint64.h"
 
 /* ////////////////////////////////////////////////////////////////////////
+ * globals 
+ */
+
+#ifndef TB_CONFIG_TYPE_INT64
+tb_uint64_t const g_uint64_zero = {0, 0};
+tb_uint64_t const g_uint64_one 	= {0, 1};
+#endif
+
+/* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
