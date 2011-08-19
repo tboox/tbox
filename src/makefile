@@ -63,6 +63,9 @@ tbox_C_FILES 		+= \
 					format/xml \
 					format/htm \
 					format/txt \
+					libc/sprintf \
+					libc/snprintf \
+					libc/vsnprintf \
 					utils/time \
 					utils/bits\
 					utils/conv \
@@ -148,6 +151,8 @@ INC_FILES 			= \
 					stream/gstream.h \
 					format/format.h \
 					format/prefix.h \
+					libc/prefix.h \
+					libc/libc.h \
 					utils/prefix.h \
 					utils/utils.h \
 					utils/bits.h \

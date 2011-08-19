@@ -25,6 +25,7 @@
  * includes
  */
 #include "string.h"
+#include "../libc/libc.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 
@@ -330,7 +331,7 @@ tb_char_t const* tb_string_assign_format(tb_string_t* string, tb_char_t const* f
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	TB_VARG_FORMAT(text, 4096, fmt, &size);
+	TB_VA_FMT(text, 4096, fmt, &size);
 	if (size) return tb_string_assign_c_string_with_size(string, text, size);
 	else return TB_NULL;
 }
@@ -487,7 +488,7 @@ tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* f
 	// format text
 	tb_char_t text[4096];
 	tb_size_t size = 0;
-	TB_VARG_FORMAT(text, 4096, fmt, &size);
+	TB_VA_FMT(text, 4096, fmt, &size);
 	if (size) return tb_string_append_c_string_with_size(string, text, size);
 	else return tb_string_c_string(string);
 }

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 
 	tb_size_t i = 0;
 	tb_char_t md5[256] = {0};
-	for (i = 0; i < 16; ++i) snprintf(md5 + (i << 1), 3, "%02X", ob[i]);
+	for (i = 0; i < 16; ++i) tb_snprintf(md5 + (i << 1), 3, "%02X", ob[i]);
 	tb_printf("%s\n", md5);
 
 

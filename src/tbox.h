@@ -42,6 +42,7 @@ extern "C" {
 #include "string/string.h"
 #include "utils/utils.h"
 #include "math/math.h"
+#include "libc/libc.h"
 #include "xml/xml.h"
 #include "zip/zip.h"
 #include "libs/libs.h"

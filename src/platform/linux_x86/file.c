@@ -74,7 +74,7 @@ tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 	}
 
 	tb_char_t path[TB_FILENAME_MAX_SIZE];
-	snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, filename);
+	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, filename);
 	fd = open(path, flag, mode);
 
 	if (fd < 0) return TB_NULL;
@@ -159,7 +159,7 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 
 	// append prefix
 	tb_char_t path[TB_FILENAME_MAX_SIZE];
-	snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, dir);
+	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, dir);
 
 	// open directory
 	flist.pdir = opendir(path);
@@ -210,12 +210,12 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 	{
 		// stat
 		struct stat fstat;
-		snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", pflist->dir, pflist->entry.name);
+		tb_snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", pflist->dir, pflist->entry.name);
 		pflist->entry.path[TB_FILENAME_MAX_SIZE - 1] = '\0';
 		stat(pflist->entry.path, &fstat);
 		
 		// save path
-		snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", &(pflist->dir[sizeof(TB_FILE_PATH_PREFIX) - 1]), pflist->entry.name);
+		tb_snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", &(pflist->dir[sizeof(TB_FILE_PATH_PREFIX) - 1]), pflist->entry.name);
 		pflist->entry.path[TB_FILENAME_MAX_SIZE - 1] = '\0';
 
 		if (S_ISDIR(fstat.st_mode)) pflist->entry.type = TB_FILE_TYPE_DIR;
