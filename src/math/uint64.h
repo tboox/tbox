@@ -45,7 +45,7 @@
 # 	define tb_uint64_div(x, y) 			((x) / (y))
 # 	define tb_uint64_mod(x, y) 			((x) % (y))
 
-# 	define tb_uint64_not(x) 			(!(x))
+# 	define tb_uint64_not(x) 			(~(x))
 # 	define tb_uint64_or(x, y) 			((x) | (y))
 # 	define tb_uint64_and(x, y) 			((x) & (y))
 # 	define tb_uint64_xor(x, y) 			((x) ^ (y))
@@ -184,18 +184,26 @@ static __tb_inline__ tb_uint64_t tb_uint64_mod_inline(tb_uint64_t x, tb_uint64_t
 }
 static __tb_inline__ tb_uint64_t tb_uint64_not_inline(tb_uint64_t x)
 {
+	x.h = ~x.h;
+	x.l = ~x.l;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_and_inline(tb_uint64_t x, tb_uint64_t y)
-{
+{	
+	x.h &= y.h;
+	x.l &= y.l;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_xor_inline(tb_uint64_t x, tb_uint64_t y)
 {
+	x.h ^= y.h;
+	x.l ^= y.l;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_or_inline(tb_uint64_t x, tb_uint64_t y)
 {
+	x.h |= y.h;
+	x.l |= y.l;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_add_uint32_inline(tb_uint64_t x, tb_uint32_t y)
@@ -229,14 +237,18 @@ static __tb_inline__ tb_uint64_t tb_uint64_mod_uint32_inline(tb_uint64_t x, tb_u
 }
 static __tb_inline__ tb_uint64_t tb_uint64_or_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
+	x.l |= y;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_and_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
+	x.h = 0;
+	x.l &= y;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_xor_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
+	x.l ^= y;
 	return x;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_lsh_inline(tb_uint64_t x, tb_int_t b)
