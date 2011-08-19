@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "int32.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros 
@@ -45,6 +46,7 @@
 # 	define tb_uint64_div(x, y) 			((x) / (y))
 # 	define tb_uint64_mod(x, y) 			((x) % (y))
 
+# 	define tb_uint64_clz(x) 			tb_uint64_clz_inline(x)
 # 	define tb_uint64_not(x) 			(~(x))
 # 	define tb_uint64_or(x, y) 			((x) | (y))
 # 	define tb_uint64_and(x, y) 			((x) & (y))
@@ -63,7 +65,8 @@
 # 	define tb_uint64_and_uint32(x, y) 	((x) & (tb_uint32_t)(y))
 # 	define tb_uint64_xor_uint32(x, y) 	((x) ^ (tb_uint32_t)(y))
 
-# 	define tb_uint64_tt(x) 				(x)
+# 	define tb_uint64_nz(x) 				(x)
+# 	define tb_uint64_ez(x) 				!(x)
 # 	define tb_uint64_et(x, y) 			((x) == (y))
 # 	define tb_uint64_lt(x, y) 			((x) < (y))
 # 	define tb_uint64_bt(x, y) 			((x) > (y))
@@ -84,6 +87,7 @@
 # 	define tb_uint64_div(x, y) 			tb_uint64_div_inline(x, y)
 # 	define tb_uint64_mod(x, y) 			tb_uint64_mod_inline(x, y)
 
+# 	define tb_uint64_clz(x) 			tb_uint64_clz_inline(x)
 # 	define tb_uint64_not(x) 			tb_uint64_not_inline(x)
 # 	define tb_uint64_or(x, y) 			tb_uint64_or_inline(x, y)
 # 	define tb_uint64_and(x, y) 			tb_uint64_and_inline(x, y)
@@ -102,7 +106,8 @@
 # 	define tb_uint64_and_uint32(x, y) 	tb_uint64_and_uint32_inline(x, y)
 # 	define tb_uint64_xor_uint32(x, y) 	tb_uint64_xor_uint32_inline(x, y)
 
-# 	define tb_uint64_tt(x) 				tb_uint64_tt_inline(x)
+# 	define tb_uint64_nz(x) 				tb_uint64_nz_inline(x)
+# 	define tb_uint64_ez(x) 				tb_uint64_ez_inline(x)
 # 	define tb_uint64_et(x, y) 			tb_uint64_et_inline(x, y)
 # 	define tb_uint64_lt(x, y) 			tb_uint64_lt_inline(x, y)
 # 	define tb_uint64_bt(x, y) 			tb_uint64_bt_inline(x, y)
@@ -182,6 +187,10 @@ static __tb_inline__ tb_uint64_t tb_uint64_mod_inline(tb_uint64_t x, tb_uint64_t
 {
 	return x;
 }
+static __tb_inline__ tb_size_t tb_uint64_clz_inline(tb_uint64_t x)
+{
+	return x.h? tb_int32_clz(x.h) : (32 + tb_int32_clz(x.l));
+}
 static __tb_inline__ tb_uint64_t tb_uint64_not_inline(tb_uint64_t x)
 {
 	x.h = ~x.h;
@@ -251,26 +260,45 @@ static __tb_inline__ tb_uint64_t tb_uint64_xor_uint32_inline(tb_uint64_t x, tb_u
 	x.l ^= y;
 	return x;
 }
-static __tb_inline__ tb_uint64_t tb_uint64_lsh_inline(tb_uint64_t x, tb_int_t b)
+static __tb_inline__ tb_uint64_t tb_uint64_lsh_inline(tb_uint64_t x, tb_size_t b)
 {
-#if 0
-	TB_ASSERT(-64 <= b && b <= 64);
-	x.h = (x.h << b) | (x.l >> (32 - b));
-	x.l <<= b;
-#endif
+	TB_ASSERT(b < 64);
+	//b &= 0x3f;
+	if (b >= 32)
+	{
+		x.h = x.l << (b - 32);
+		x.l = 0;
+	}
+	else if (b)
+	{
+		x.h = (x.h << b) | (x.l >> (32 - b));
+		x.l <<= b;
+	}
 	return x;
 }
-static __tb_inline__ tb_uint64_t tb_uint64_rsh_inline(tb_uint64_t x, tb_int_t b)
+static __tb_inline__ tb_uint64_t tb_uint64_rsh_inline(tb_uint64_t x, tb_size_t b)
 {
-#if 0
-	x.h >>= b;
-	x.l >>= b;
-#endif
+	TB_ASSERT(b < 64);
+	//b &= 0x3f;
+	if (b >= 32)
+	{
+		x.l = x.h >> (b - 32);
+		x.h = 0;
+	}
+	else if (b)
+	{
+		x.l = (x.h << (32 - b)) | (x.l >> b);
+		x.h >>= b;
+	}
 	return x;
 }
-static __tb_inline__ tb_int_t tb_uint64_tt_inline(tb_uint64_t x)
+static __tb_inline__ tb_int_t tb_uint64_nz_inline(tb_uint64_t x)
 {
  	return (x.h || x.l);
+}
+static __tb_inline__ tb_int_t tb_uint64_ez_inline(tb_uint64_t x)
+{
+ 	return !(x.h | x.l);
 }
 static __tb_inline__ tb_int_t tb_uint64_et_inline(tb_uint64_t x, tb_uint64_t y)
 {
@@ -295,6 +323,13 @@ static __tb_inline__ tb_int_t tb_uint64_lt_uint32_inline(tb_uint64_t x, tb_uint3
 static __tb_inline__ tb_int_t tb_uint64_bt_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
  	return (x.h || (x.l > y));
+}
+#else
+static __tb_inline__ tb_size_t tb_uint64_clz_inline(tb_uint64_t x)
+{
+	tb_uint32_t h = x >> 32;
+	tb_uint32_t l = x & 0xffffffff;
+	return h? tb_int32_clz(h) : (32 + tb_int32_clz(l));
 }
 #endif
 

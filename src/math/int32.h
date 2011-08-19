@@ -38,20 +38,17 @@
 
 // clz
 #ifdef TB_COMPILER_IS_GCC
-# 	define tb_int32_clz(x) 				__builtin_clz(x)
+# 	define tb_int32_clz(x) 				((x)? __builtin_clz(x) : 32)
 #else 
 # 	define tb_int32_clz(x) 				tb_int32_clz_generic(x)
 #endif
 
 // sign
-#ifdef TB_DEBUG
-# 	define tb_int32_get_sign(x) 		tb_int32_get_sign_check(x)
-# 	define tb_int32_set_sign(x, s) 		tb_int32_set_sign_check(x, s)
-#else
-# 	define tb_int32_get_sign(x) 		((tb_int32_t)(x) >> 31)
-# 	define tb_int32_set_sign(x, s) 		(((x) ^ (s)) - (s))
-#endif
+#define tb_int32_get_sign(x) 			tb_int32_get_sign_inline(x)
+#define tb_int32_set_sign(x, s) 		tb_int32_set_sign_inline(x, s)
 
+// bool: is true?
+#define tb_int32_nz(x) 					tb_int32_nz_inline(x)
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -75,18 +72,24 @@ tb_int32_t 	tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
  * inline
  */
 
-// returns -1 if x < 0, else returns 0
-static __tb_inline__ tb_int32_t tb_int32_get_sign_check(tb_int32_t x)
+// return -1 if x < 0, else return 0
+static __tb_inline__ tb_int32_t tb_int32_get_sign_inline(tb_int32_t x)
 {
 	tb_int32_t s = ((tb_int32_t)(x) >> 31);
     TB_ASSERT((x < 0 && s == -1) || (x >= 0 && !s));
     return s;
 }
-// if s == -1, returns -x, else s must be 0, and returns x.
-static __tb_inline__ tb_int32_t tb_int32_set_sign_check(tb_int32_t x, tb_int32_t s)
+// if s == -1, return -x, else s must be 0, and return x.
+static __tb_inline__ tb_int32_t tb_int32_set_sign_inline(tb_int32_t x, tb_int32_t s)
 {
     TB_ASSERT(s == 0 || s == -1);
     return (x ^ s) - s;
+}
+// return 1 if x != 0, else return 0
+static __tb_inline__ tb_int_t tb_int32_nz_inline(tb_uint32_t x)
+{
+	//return (x? 1 : 0);
+	return ((x | (0 - x)) >> 31);
 }
 
 #endif

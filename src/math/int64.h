@@ -48,6 +48,7 @@
 #define tb_int64_div(x, y) 			tb_sint64_div(x, y)
 #define tb_int64_mod(x, y) 			tb_sint64_mod(x, y)
 
+#define tb_int64_clz(x) 			tb_sint64_clz(x)
 #define tb_int64_not(x) 			tb_sint64_not(x)
 #define tb_int64_or(x, y) 			tb_sint64_or(x, y)
 #define tb_int64_and(x, y) 			tb_sint64_and(x, y)
@@ -66,7 +67,10 @@
 #define tb_int64_and_sint32(x, y) 	tb_sint64_and_sint32(x, y)
 #define tb_int64_xor_sint32(x, y) 	tb_sint64_xor_sint32(x, y)
 
-#define tb_int64_tt(x) 				tb_sint64_tt(x)
+#define tb_int64_nz(x) 				tb_sint64_nz(x)
+#define tb_int64_ez(x) 				tb_sint64_ez(x)
+#define tb_int64_bz(x) 				tb_sint64_bz(x)
+#define tb_int64_lz(x) 				tb_sint64_lz(x)
 #define tb_int64_et(x, y) 			tb_sint64_et(x, y)
 #define tb_int64_lt(x, y) 			tb_sint64_lt(x, y)
 #define tb_int64_bt(x, y) 			tb_sint64_bt(x, y)
