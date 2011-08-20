@@ -315,6 +315,11 @@ extern "C" {
 # 	define TB_NULL 					((tb_void_t*)0)
 #endif
 
+// check config
+#if !defined(TB_CONFIG_TYPE_SCALAR_IS_FIXED) \
+	&& !defined(TB_CONFIG_TYPE_FLOAT)
+# 	define TB_CONFIG_TYPE_SCALAR_IS_FIXED
+#endif
 
 /* /////////////////////////////////////////////////////////
  * types

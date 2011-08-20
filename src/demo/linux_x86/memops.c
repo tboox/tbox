@@ -52,12 +52,12 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 int main(int argc, char** argv)
 {
 	__tb_volatile__ tb_size_t i = 0;
-	__tb_volatile__ tb_int64_t dt = tb_int32_to_int64(0);
+	__tb_volatile__ tb_int64_t dt = TB_INT64_ZERO;
 
 	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
 	
 	__tb_volatile__ tb_size_t 	size = 15 * 1024 * 1024;
-	__tb_volatile__ tb_byte_t* data = tb_malloc(size);
+	__tb_volatile__ tb_byte_t* 	data = tb_malloc(size);
 
 	// test: u8 x 1024
 	memset(data, 0, size);
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000000; i++) tb_memset_u8(data, 0xbeef, 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u8 x 1k: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u8 x 1k: %lld ms\n", dt);
 	if (!check_memset_u8(data, 0xbeef, 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u8 x 1024 * 1024
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000; i++) tb_memset_u8(data, 0xbeef, 1024 * 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u8 x 1m: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u8 x 1m: %lld ms\n", dt);
 	if (!check_memset_u8(data, 0xbeef, 1024 * 1024 + 3)) tb_printf("check failed\n");
 
 
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000000; i++) tb_memset_u16(data, 0xbeef, 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u16 x 1k: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u16 x 1k: %lld ms\n", dt);
 	if (!check_memset_u16(data, 0xbeef, 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u16 x 1024 * 1024
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000; i++) tb_memset_u16(data, 0xbeef, 1024 * 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u16 x 1m: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u16 x 1m: %lld ms\n", dt);
 	if (!check_memset_u16(data, 0xbeef, 1024 * 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u24 x 1024
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000000; i++) tb_memset_u24(data, 0xbeefaa, 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u24 x 1k: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u24 x 1k: %lld ms\n", dt);
 	if (!check_memset_u24(data, 0xbeefaa, 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u24 x 1024 * 1024
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000; i++) tb_memset_u24(data, 0xbeefaa, 1024 * 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u24 x 1m: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u24 x 1m: %lld ms\n", dt);
 	if (!check_memset_u24(data, 0xbeefaa, 1024 * 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u32 x 1024
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000000; i++) tb_memset_u32(data, 0xbeefbeaf, 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u32 x 1k: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u32 x 1k: %lld ms\n", dt);
 	if (!check_memset_u32(data, 0xbeefbeaf, 1024 + 3)) tb_printf("check failed\n");
 
 	// test: u32 x 1024 * 1024
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 	dt = tb_mclock();
 	for (i = 0; i < 1000; i++) tb_memset_u32(data, 0xbeefbeaf, 1024 * 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("u32 x 1m: %d ms\n", tb_int64_to_int32(dt));
+	tb_printf("u32 x 1m: %lld ms\n", dt);
 	if (!check_memset_u32(data, 0xbeefbeaf, 1024 * 1024 + 3)) tb_printf("check failed\n");
 
 	return 0;

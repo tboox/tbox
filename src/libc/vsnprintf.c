@@ -442,6 +442,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
 	return pb;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 // only support double float-point 
 static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_float_t num)
 {
@@ -549,6 +550,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 
 	return pb;
 }
+#endif
 // get a printf format entry
 static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
 {
@@ -706,6 +708,7 @@ get_qualifier:
 		e->base = 2;
 		e->type = TB_PRINTF_TYPE_INT;
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case 'F':
 		e->extra |= TB_PRINTF_EXTRA_UPPER;
 	case 'f':
@@ -719,6 +722,7 @@ get_qualifier:
 		e->extra |= TB_PRINTF_EXTRA_SIGNED;
 		e->extra |= TB_PRINTF_EXTRA_EXP;
 		break;
+#endif
 	default:
 		e->type = TB_PRINTF_TYPE_INVALID;
 		return (p - fmt);
@@ -951,12 +955,14 @@ tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_lis
 				else pb = tb_printf_int64(pb, pe, e, TB_VA_ARG(args, tb_uint64_t));
 				break;
 			}
+#ifdef TB_CONFIG_TYPE_FLOAT
 		case TB_PRINTF_TYPE_FLOAT:
 			{
 				tb_float_t num = TB_VA_ARG(args, tb_float_t);
 				pb = tb_printf_float(pb, pe, e, num);
 				break;
 			}
+#endif
 		case TB_PRINTF_TYPE_INVALID:
 			{
 				if (pb < pe) *pb++ = '%';
