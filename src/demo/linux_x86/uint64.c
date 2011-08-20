@@ -96,6 +96,24 @@ static tb_size_t tb_uint64_test_clz(tb_uint64_t x)
 	tb_printf("[uint64]: clz: %llu = %u\n", x, r);
 	return r;
 }
+static tb_void_t tb_uint64_test_tt(tb_uint64_t x, tb_uint64_t y)
+{
+	tb_printf("[uint64]: ez: %llu : %u\n", x, tb_uint64_ez(x)? 1 : 0);
+	tb_printf("[uint64]: nz: %llu : %u\n", x, tb_uint64_nz(x)? 1 : 0);
+	tb_printf("[uint64]: et: %llu == %llu : %u\n", x, y, tb_uint64_et(x, y)? 1 : 0);
+	tb_printf("[uint64]: nt: %llu != %llu : %u\n", x, y, tb_uint64_nt(x, y)? 1 : 0);
+	tb_printf("[uint64]: lt: %llu < %llu : %u\n", x, y, tb_uint64_lt(x, y)? 1 : 0);
+	tb_printf("[uint64]: gt: %llu > %llu : %u\n", x, y, tb_uint64_gt(x, y)? 1 : 0);
+	tb_printf("\n");
+}
+static tb_void_t tb_uint64_test_tt_uint32(tb_uint64_t x, tb_uint32_t y)
+{
+	tb_printf("[uint64]: et: %llu == %lu : %u\n", x, y, tb_uint64_et_uint32(x, y)? 1 : 0);
+	tb_printf("[uint64]: nt: %llu != %lu : %u\n", x, y, tb_uint64_nt_uint32(x, y)? 1 : 0);
+	tb_printf("[uint64]: lt: %llu < %lu : %u\n", x, y, tb_uint64_lt_uint32(x, y)? 1 : 0);
+	tb_printf("[uint64]: gt: %llu > %lu : %u\n", x, y, tb_uint64_gt_uint32(x, y)? 1 : 0);
+	tb_printf("\n");
+}
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -346,7 +364,37 @@ int main(int argc, char** argv)
 	tb_uint64_test_rsh(a1, 34);
 	tb_uint64_test_rsh(a8, 63);
 
-
+	tb_printf("==================================================\n");
+	tb_printf("tb_uint64_test_tt:\n");
+	tb_uint64_test_tt(a1, a0);
+	tb_uint64_test_tt(a0, a1);
+	tb_uint64_test_tt(a3, a2);
+	tb_uint64_test_tt(a2, a3);
+	tb_uint64_test_tt(a5, a4);
+	tb_uint64_test_tt(a4, a5);
+	tb_uint64_test_tt(a7, a6);
+	tb_uint64_test_tt(a6, a7);
+	tb_uint64_test_tt(a8, a7);
+	tb_uint64_test_tt(a7, a8);
+	tb_uint64_test_tt(a8, a1);
+	tb_uint64_test_tt(a1, a8);
+	tb_uint64_test_tt(a8, a8);
+	
+	tb_printf("==================================================\n");
+	tb_printf("tb_uint64_test_tt_uint32:\n");
+	tb_uint64_test_tt_uint32(a1, 0x0);
+	tb_uint64_test_tt_uint32(a0, 0xf);
+	tb_uint64_test_tt_uint32(a3, 0xff);
+	tb_uint64_test_tt_uint32(a2, 0xfff);
+	tb_uint64_test_tt_uint32(a5, 0xffff);
+	tb_uint64_test_tt_uint32(a4, 0xfffff);
+	tb_uint64_test_tt_uint32(a7, 0xffffff);
+	tb_uint64_test_tt_uint32(a6, 0xfffffff);
+	tb_uint64_test_tt_uint32(a8, 0xffffffff);
+	tb_uint64_test_tt_uint32(a7, 0xfffffff);
+	tb_uint64_test_tt_uint32(a8, 0xffffff);
+	tb_uint64_test_tt_uint32(a1, 0xfffff);
+	tb_uint64_test_tt_uint32(a8, 0xffff);
 
 	return 0;
 }
