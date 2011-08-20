@@ -51,13 +51,13 @@ tb_void_t 		tb_sleep(tb_size_t s);
 tb_void_t 		tb_printf(tb_char_t const* fmt, ...);
 
 // clock, ms
-tb_int64_t 	tb_mclock();
+tb_int64_t 		tb_mclock();
 
 // clock, us
-tb_int64_t 	tb_uclock();
+tb_int64_t 		tb_uclock();
 
 // the milliseconds from 1970-01-01 00:00:00:000
-tb_int64_t 	tb_time();
+tb_int64_t 		tb_time();
 
 // c plus plus
 #ifdef __cplusplus

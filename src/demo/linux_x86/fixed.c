@@ -500,8 +500,8 @@ static tb_void_t tb_fixed_test_round(tb_fixed_t x)
 	{
 		r = tb_fixed_round(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: round(%f): %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: round(%f): %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_floor(tb_fixed_t x)
 {
@@ -512,8 +512,8 @@ static tb_void_t tb_fixed_test_floor(tb_fixed_t x)
 	{
 		r = tb_fixed_floor(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: floor(%f): %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: floor(%f): %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_ceil(tb_fixed_t x)
 {
@@ -524,8 +524,8 @@ static tb_void_t tb_fixed_test_ceil(tb_fixed_t x)
 	{
 		r = tb_fixed_ceil(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: ceil(%f): %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: ceil(%f): %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_mul(tb_fixed_t a, tb_fixed_t b)
 {
@@ -536,8 +536,8 @@ static tb_void_t tb_fixed_test_mul(tb_fixed_t a, tb_fixed_t b)
 	{
 		r = tb_fixed_mul(a, b);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: mul(%f, %f): %f, %d ms\n", tb_fixed_to_float(a), tb_fixed_to_float(b), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: mul(%f, %f): %f, %lld ms\n", tb_fixed_to_float(a), tb_fixed_to_float(b), tb_fixed_to_float(r), t);
 
 }
 static tb_void_t tb_fixed_test_div(tb_fixed_t a, tb_fixed_t b)
@@ -549,8 +549,8 @@ static tb_void_t tb_fixed_test_div(tb_fixed_t a, tb_fixed_t b)
 	{
 		r = tb_fixed_div(a, b);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: div(%f, %f): %f, %d ms\n", tb_fixed_to_float(a), tb_fixed_to_float(b), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: div(%f, %f): %f, %lld ms\n", tb_fixed_to_float(a), tb_fixed_to_float(b), tb_fixed_to_float(r), t);
 }
 static tb_void_t tb_fixed_test_invert(tb_fixed_t x)
 {
@@ -561,8 +561,8 @@ static tb_void_t tb_fixed_test_invert(tb_fixed_t x)
 	{
 		r = tb_fixed_invert(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: invert(%f): %f, %d ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: invert(%f): %f, %lld ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), t);
 }
 static tb_void_t tb_fixed_test_sqre(tb_fixed_t x)
 {
@@ -573,8 +573,8 @@ static tb_void_t tb_fixed_test_sqre(tb_fixed_t x)
 	{
 		r = tb_fixed_sqre(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: sqre(%f): %f, %d ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: sqre(%f): %f, %lld ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), t);
 }
 static tb_void_t tb_fixed_test_sqrt(tb_fixed_t x)
 {
@@ -585,8 +585,8 @@ static tb_void_t tb_fixed_test_sqrt(tb_fixed_t x)
 	{
 		r = tb_fixed_sqrt(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: sqrt(%f) = %f, %d ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: sqrt(%f) = %f, %lld ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), t);
 }
 static tb_void_t tb_fixed_test_ilog2(tb_fixed_t x)
 {
@@ -597,8 +597,8 @@ static tb_void_t tb_fixed_test_ilog2(tb_fixed_t x)
 	{
 		r = tb_fixed_ilog2(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: ilog2(%f) = %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: ilog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_iclog2(tb_fixed_t x)
 {
@@ -609,8 +609,8 @@ static tb_void_t tb_fixed_test_iclog2(tb_fixed_t x)
 	{
 		r = tb_fixed_iclog2(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: iclog2(%f) = %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: iclog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_irlog2(tb_fixed_t x)
 {
@@ -621,8 +621,8 @@ static tb_void_t tb_fixed_test_irlog2(tb_fixed_t x)
 	{
 		r = tb_fixed_irlog2(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: irlog2(%f) = %d, %d ms\n", tb_fixed_to_float(x), r, (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: irlog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
 static tb_void_t tb_fixed_test_exp(tb_fixed_t x)
 {
@@ -633,8 +633,8 @@ static tb_void_t tb_fixed_test_exp(tb_fixed_t x)
 	{
 		r = tb_fixed_exp(x);
 	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: exp(%f) = %f, %d ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), (tb_int_t)t);
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_printf("[fixed]: exp(%f) = %f, %lld ms\n", tb_fixed_to_float(x), tb_fixed_to_float(r), t);
 }
 static tb_void_t tb_fixed_test_sin()
 {
@@ -648,14 +648,14 @@ static tb_void_t tb_fixed_test_sin()
 		for (i = 0; i < 360; i++)
 			r = tb_fixed_sin(tb_fixed_test_angle[i]);
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 0; i < 360; i++)
 	{
 		r = tb_fixed_sin(tb_fixed_test_angle[i]);
 		tb_printf("[fixed]: sin(%f) = %f, angle: %d\n", tb_fixed_to_float(tb_fixed_test_angle[i]), tb_fixed_to_float(r), i);
 	}
-	tb_printf("[fixed]: sin(0 - 360), %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: sin(0 - 360), %lld ms\n", t);
 #else
 
 	tb_int_t i = 0;
@@ -676,14 +676,14 @@ static tb_void_t tb_fixed_test_cos()
 		for (i = 0; i < 360; i++)
 			r = tb_fixed_cos(tb_fixed_test_angle[i]);
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 0; i < 360; i++)
 	{
 		r = tb_fixed_cos(tb_fixed_test_angle[i]);
 		tb_printf("[fixed]: cos(%f) = %f, angle: %d\n", tb_fixed_to_float(tb_fixed_test_angle[i]), tb_fixed_to_float(r), i);
 	}
-	tb_printf("[fixed]: cos(0 - 360), %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: cos(0 - 360), %lld ms\n", t);
 }
 static tb_void_t tb_fixed_test_tan()
 {
@@ -696,14 +696,14 @@ static tb_void_t tb_fixed_test_tan()
 		for (i = 0; i < 360; i++)
 			r = tb_fixed_tan(tb_fixed_test_angle[i]);
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 0; i < 360; i++)
 	{
 		r = tb_fixed_tan(tb_fixed_test_angle[i]);
 		tb_printf("[fixed]: tan(%f) = %f, angle: %d\n", tb_fixed_to_float(tb_fixed_test_angle[i]), tb_fixed_to_float(r), i);
 	}
-	tb_printf("[fixed]: tan(0 - 360), %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: tan(0 - 360), %lld ms\n", t);
 }
 
 static tb_void_t tb_fixed_test_atan2()
@@ -726,7 +726,7 @@ static tb_void_t tb_fixed_test_atan2()
 			}
 		}
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 50; i < 55; i++)
 	{
@@ -743,7 +743,7 @@ static tb_void_t tb_fixed_test_atan2()
 		}
 	}
 
-	tb_printf("[fixed]: atan2(), %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: atan2(), %lld ms\n", t);
 }
 
 static tb_void_t tb_fixed_test_asin()
@@ -766,7 +766,7 @@ static tb_void_t tb_fixed_test_asin()
 			}
 		}
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 0; i < 5; i++)
 	{
@@ -780,7 +780,7 @@ static tb_void_t tb_fixed_test_asin()
 		}
 	}
 
-	tb_printf("[fixed]: asin, %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: asin, %lld ms\n", t);
 }
 static tb_void_t tb_fixed_test_acos()
 {
@@ -802,7 +802,7 @@ static tb_void_t tb_fixed_test_acos()
 			}
 		}
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 	for (i = 0; i < 5; i++)
 	{
@@ -816,7 +816,7 @@ static tb_void_t tb_fixed_test_acos()
 		}
 	}
 
-	tb_printf("[fixed]: acos, %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: acos, %lld ms\n", t);
 }
 static tb_void_t tb_fixed_test_atan()
 {
@@ -833,7 +833,7 @@ static tb_void_t tb_fixed_test_atan()
 			r = tb_fixed_atan(a);
 		}
 	}
-	t = tb_mclock() - t;
+	t = tb_int64_sub(tb_mclock(), t);
 
 
 	for (i = -50; i <= 50; i++)
@@ -843,7 +843,7 @@ static tb_void_t tb_fixed_test_atan()
 		tb_printf("[fixed]: atan(%f) = %f\n", tb_fixed_to_float(a), tb_fixed_to_float(r));
 	}
 
-	tb_printf("[fixed]: atan, %d ms\n", (tb_int_t)t);
+	tb_printf("[fixed]: atan, %lld ms\n", t);
 }
 int main(int argc, char** argv)
 {

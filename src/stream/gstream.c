@@ -26,8 +26,10 @@
  */
 #include "gstream.h"
 #include "../libc/libc.h"
+#include "../math/math.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
+#include "../platform/platform.h"
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -92,20 +94,20 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	else if (gst->read)
 	{
 		tb_size_t 	read = 0;
-		tb_size_t 	time = (tb_size_t)tb_mclock();
+		tb_int64_t 	time = tb_mclock();
 		while (read < size)
 		{
 			tb_int_t ret = gst->read(gst, data + read, size - read);	
 			if (ret > 0)
 			{
 				read += ret;
-				time = (tb_size_t)tb_mclock();
+				time = tb_mclock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > TB_GSTREAM_TIMEOUT) break;
+				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 			}
 			else return -1;
 		}
@@ -234,20 +236,20 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	else if (gst->write)
 	{
 		tb_size_t 	write = 0;
-		tb_size_t 	time = (tb_size_t)tb_mclock();
+		tb_int64_t 	time = tb_mclock();
 		while (write < size)
 		{
 			tb_int_t ret = gst->write(gst, data + write, size - write);	
 			if (ret > 0)
 			{
 				write += ret;
-				time = (tb_size_t)tb_mclock();
+				time = tb_mclock();
 			}
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > TB_GSTREAM_TIMEOUT) break;
+				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 			}
 			else return -1;
 		}
@@ -335,18 +337,18 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 	TB_ASSERT_RETURN_VAL(offset >= 0 && (!size || offset <= size), TB_FALSE);
 	if (curt < offset)
 	{
-		tb_size_t time = (tb_size_t)tb_mclock();
+		tb_int64_t time = tb_mclock();
 		while (tb_gstream_offset(gst) < offset)
 		{
 			tb_byte_t data[TB_GSTREAM_BLOCK_SIZE];
 			tb_size_t need = tb_min(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_SIZE);
 			tb_int_t ret = tb_gstream_read(gst, data, need);
-			if (ret > 0) time = (tb_size_t)tb_mclock();
+			if (ret > 0) time = tb_mclock();
 			else if (!ret)
 			{
 				// timeout?
-				tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-				if (timeout > TB_GSTREAM_TIMEOUT) break;
+				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 			}
 			else break;
 		}
@@ -583,7 +585,7 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t 		read = 0;
-	tb_size_t 		time = (tb_size_t)tb_mclock();
+	tb_int64_t 		time = tb_mclock();
 	tb_size_t 		left = tb_gstream_left(ist);
 	do
 	{
@@ -592,7 +594,7 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 		if (ret > 0)
 		{
 			read += ret;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 
 			tb_int_t write = 0;
 			while (write < ret)
@@ -604,8 +606,8 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 		}
 		else if (!ret) 
 		{
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > TB_GSTREAM_TIMEOUT) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 		}
 		else break;
 
