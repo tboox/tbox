@@ -175,7 +175,6 @@ int main(int argc, char** argv)
 	tb_uint64_test_sub_uint32(a1, 0xfffff);
 	tb_uint64_test_sub_uint32(a8, 0xffff);
 
-#if 0
 	tb_printf("==================================================\n");
 	tb_printf("tb_uint64_test_mul:\n");
 	tb_uint64_test_mul(a1, a0);
@@ -207,7 +206,6 @@ int main(int argc, char** argv)
 	tb_uint64_test_mul_uint32(a8, 0xffffff);
 	tb_uint64_test_mul_uint32(a1, 0xfffff);
 	tb_uint64_test_mul_uint32(a8, 0xffff);
-#endif
 
 	tb_printf("==================================================\n");
 	tb_printf("tb_uint64_test_or:\n");
@@ -240,6 +238,7 @@ int main(int argc, char** argv)
 	tb_uint64_test_or_uint32(a8, 0xffffff);
 	tb_uint64_test_or_uint32(a1, 0xfffff);
 	tb_uint64_test_or_uint32(a8, 0xffff);
+
 	tb_printf("==================================================\n");
 	tb_printf("tb_uint64_test_and:\n");
 	tb_uint64_test_and(a1, a0);
