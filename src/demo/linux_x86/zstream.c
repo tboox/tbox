@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 		else if (!ret) 
 		{
 			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_bt_int32(timeout, 5000)) break;
+			if (tb_int64_gt_int32(timeout, 5000)) break;
 		}
 		else break;
 

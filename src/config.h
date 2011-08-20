@@ -38,7 +38,7 @@
 #define TB_CONFIG_KEYWORD_FILE			__FILE__
 
 // type
-//#define TB_CONFIG_TYPE_INT64
+#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
 
@@ -52,15 +52,8 @@
 #define TB_CONFIG_MEMORY_MODE_SMALL
 #define TB_CONFIG_MEMORY_POOL_ENABLE
 
-// jpeg
-#define TB_CONFIG_LIBS_JPEG
-
 // zlib
 #define TB_CONFIG_LIBS_ZLIB
-
-// libmad
-#define TB_CONFIG_LIBS_LIBMAD
-
 
 
 #endif

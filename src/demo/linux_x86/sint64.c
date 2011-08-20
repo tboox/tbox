@@ -108,6 +108,26 @@ static tb_sint64_t tb_sint64_test_abs(tb_sint64_t x)
 	tb_printf("[sint64]: abs: %lld = %lld\n", x, r);
 	return r;
 }
+static tb_void_t tb_sint64_test_tt(tb_sint64_t x, tb_sint64_t y)
+{
+	tb_printf("[sint64]: ez: %lld : %d\n", x, tb_sint64_ez(x)? 1 : 0);
+	tb_printf("[sint64]: nz: %lld : %d\n", x, tb_sint64_nz(x)? 1 : 0);
+	tb_printf("[sint64]: lz: %lld : %d\n", x, tb_sint64_lz(x)? 1 : 0);
+	tb_printf("[sint64]: gz: %lld : %d\n", x, tb_sint64_gz(x)? 1 : 0);
+	tb_printf("[sint64]: et: %lld == %lld : %d\n", x, y, tb_sint64_et(x, y)? 1 : 0);
+	tb_printf("[sint64]: nt: %lld != %lld : %d\n", x, y, tb_sint64_nt(x, y)? 1 : 0);
+	tb_printf("[sint64]: lt: %lld < %lld : %d\n", x, y, tb_sint64_lt(x, y)? 1 : 0);
+	tb_printf("[sint64]: gt: %lld > %lld : %d\n", x, y, tb_sint64_gt(x, y)? 1 : 0);
+	tb_printf("\n");
+}
+static tb_void_t tb_sint64_test_tt_sint32(tb_sint64_t x, tb_sint32_t y)
+{
+	tb_printf("[sint64]: et: %lld == %lu : %d\n", x, y, tb_sint64_et_sint32(x, y)? 1 : 0);
+	tb_printf("[sint64]: nt: %lld != %lu : %d\n", x, y, tb_sint64_nt_sint32(x, y)? 1 : 0);
+	tb_printf("[sint64]: lt: %lld < %lu : %d\n", x, y, tb_sint64_lt_sint32(x, y)? 1 : 0);
+	tb_printf("[sint64]: gt: %lld > %lu : %d\n", x, y, tb_sint64_gt_sint32(x, y)? 1 : 0);
+	tb_printf("\n");
+}
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -234,6 +254,7 @@ int main(int argc, char** argv)
 	tb_sint64_test_or_sint32(a8, 0xffffff);
 	tb_sint64_test_or_sint32(a1, 0xfffff);
 	tb_sint64_test_or_sint32(a8, 0xffff);
+
 	tb_printf("==================================================\n");
 	tb_printf("tb_sint64_test_and:\n");
 	tb_sint64_test_and(a1, a0);
@@ -384,6 +405,38 @@ int main(int argc, char** argv)
 	tb_sint64_test_rsh(a8, 32);
 	tb_sint64_test_rsh(a1, 34);
 	tb_sint64_test_rsh(a8, 63);
+
+	tb_printf("==================================================\n");
+	tb_printf("tb_sint64_test_tt:\n");
+	tb_sint64_test_tt(a1, a0);
+	tb_sint64_test_tt(a0, a1);
+	tb_sint64_test_tt(a3, a2);
+	tb_sint64_test_tt(a2, a3);
+	tb_sint64_test_tt(a5, a4);
+	tb_sint64_test_tt(a4, a5);
+	tb_sint64_test_tt(a7, a6);
+	tb_sint64_test_tt(a6, a7);
+	tb_sint64_test_tt(a8, a7);
+	tb_sint64_test_tt(a7, a8);
+	tb_sint64_test_tt(a8, a1);
+	tb_sint64_test_tt(a1, a8);
+	tb_sint64_test_tt(a8, a8);
+	
+	tb_printf("==================================================\n");
+	tb_printf("tb_sint64_test_tt_sint32:\n");
+	tb_sint64_test_tt_sint32(a1, 0x0);
+	tb_sint64_test_tt_sint32(a0, 0xf);
+	tb_sint64_test_tt_sint32(a3, 0xff);
+	tb_sint64_test_tt_sint32(a2, 0xfff);
+	tb_sint64_test_tt_sint32(a5, 0xffff);
+	tb_sint64_test_tt_sint32(a4, 0xfffff);
+	tb_sint64_test_tt_sint32(a7, 0xffffff);
+	tb_sint64_test_tt_sint32(a6, 0xfffffff);
+	tb_sint64_test_tt_sint32(a8, 0xffffffff);
+	tb_sint64_test_tt_sint32(a7, 0xfffffff);
+	tb_sint64_test_tt_sint32(a8, 0xffffff);
+	tb_sint64_test_tt_sint32(a1, 0xfffff);
+	tb_sint64_test_tt_sint32(a8, 0xffff);
 
 	return 0;
 }

@@ -335,7 +335,7 @@ tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 		{
 			// timeout?
 			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
+			if (tb_int64_gt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -361,7 +361,7 @@ tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 		{
 			// timeout?
 			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
+			if (tb_int64_gt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -1190,7 +1190,7 @@ tb_int_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		{
 			// timeout?
 			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
+			if (tb_int64_gt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
@@ -1216,7 +1216,7 @@ tb_int_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		{
 			// timeout?
 			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_bt_int32(timeout, http->option.timeout)) break;
+			if (tb_int64_gt_int32(timeout, http->option.timeout)) break;
 		}
 		else break;
 	}
