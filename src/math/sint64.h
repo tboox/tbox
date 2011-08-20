@@ -48,7 +48,7 @@
 # 	define tb_sint64_mod(x, y) 			((x) % (y))
 
 # 	define tb_sint64_clz(x) 			tb_sint64_clz_inline(x)
-# 	define tb_sint64_not(x) 			(!(x))
+# 	define tb_sint64_not(x) 			(~(x))
 # 	define tb_sint64_or(x, y) 			((x) | (y))
 # 	define tb_sint64_and(x, y) 			((x) & (y))
 # 	define tb_sint64_xor(x, y) 			((x) ^ (y))
@@ -157,7 +157,7 @@ static __tb_inline__ tb_sint32_t tb_sint64_to_sint32_inline(tb_sint64_t x)
 }
 static __tb_inline__ tb_sint64_t tb_sint64_neg_inline(tb_sint64_t x)
 {
-	x.h = -x.h - tb_int32_nz(x.h);
+	x.h = -x.h - tb_int32_nz(x.l);
 	x.l = 0 - x.l;
 	return x;
 }
@@ -232,12 +232,8 @@ static __tb_inline__ tb_sint64_t tb_sint64_add_sint32_inline(tb_sint64_t x, tb_s
 }
 static __tb_inline__ tb_sint64_t tb_sint64_sub_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	tb_sint32_t h = y >> 31;
-	tb_uint32_t s = x.l - (tb_uint32_t)y;
-
-	x.h -= h + (s < x.l);
-	x.l = s;
-
+    x.h -= (y >> 31) + (x.l < y);
+    x.l -= y;
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_sint32_inline(tb_sint64_t x, tb_sint32_t y)
@@ -254,17 +250,19 @@ static __tb_inline__ tb_sint64_t tb_sint64_mod_sint32_inline(tb_sint64_t x, tb_s
 }
 static __tb_inline__ tb_sint64_t tb_sint64_or_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
+	x.h |= y >> 31;
 	x.l |= y;
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_and_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
-	x.h = 0;
+	x.h &= y >> 31;
 	x.l &= y;
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_xor_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
+	x.h ^= y >> 31;
 	x.l ^= y;
 	return x;
 }

@@ -7,8 +7,8 @@ TB_CONFIG_PLAT 					= linux_x86
 # arch
 TB_CONFIG_ARCH 					= x86
 
-# zlib
-TB_CONFIG_ZLIB 					= y
+# libs
+TB_CONFIG_LIBS_ZLIB 			= y
 
 # memory
 TB_CONFIG_MEMORY_POOL_ENABLE 	= y

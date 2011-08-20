@@ -204,11 +204,11 @@ zlib_INC_FILES 		= \
 					zlib.h \
 					zutil.h
 
-zlib_C_FILES 					:= $(addprefix libs/zlib/,$(zlib_C_FILES))
-tbox_C_FILES-$(TB_CONFIG_ZLIB) 	+= $(zlib_C_FILES)
+zlib_C_FILES 						:= $(addprefix libs/zlib/,$(zlib_C_FILES))
+tbox_C_FILES-$(TB_CONFIG_LIBS_ZLIB)	+= $(zlib_C_FILES)
 
-zlib_INC_FILES 					:= $(addprefix libs/zlib/,$(zlib_INC_FILES))
-INC_FILES-$(TB_CONFIG_ZLIB) 	+= $(zlib_INC_FILES)
+zlib_INC_FILES 						:= $(addprefix libs/zlib/,$(zlib_INC_FILES))
+INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
