@@ -189,7 +189,6 @@ int main(int argc, char** argv)
 	tb_sint64_test_sub_sint32(a1, 0xfffff);
 	tb_sint64_test_sub_sint32(a8, 0xffff);
 
-#if 0
 	tb_printf("==================================================\n");
 	tb_printf("tb_sint64_test_mul:\n");
 	tb_sint64_test_mul(a1, a0);
@@ -221,7 +220,6 @@ int main(int argc, char** argv)
 	tb_sint64_test_mul_sint32(a8, 0xffffff);
 	tb_sint64_test_mul_sint32(a1, 0xfffff);
 	tb_sint64_test_mul_sint32(a8, 0xffff);
-#endif
 
 	tb_printf("==================================================\n");
 	tb_printf("tb_sint64_test_or:\n");

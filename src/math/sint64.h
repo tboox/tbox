@@ -75,10 +75,10 @@
 # 	define tb_sint64_lt(x, y) 			((x) < (y))
 # 	define tb_sint64_gt(x, y) 			((x) > (y))
 
-# 	define tb_sint64_et_sint32(x, y)	((x) == (y))
-# 	define tb_sint64_nt_sint32(x, y)	((x) != (y))
-# 	define tb_sint64_lt_sint32(x, y)	((x) < (y))
-# 	define tb_sint64_gt_sint32(x, y) 	((x) > (y))
+# 	define tb_sint64_et_sint32(x, y)	((x) == (tb_sint32_t)(y))
+# 	define tb_sint64_nt_sint32(x, y)	((x) != (tb_sint32_t)(y))
+# 	define tb_sint64_lt_sint32(x, y)	((x) < (tb_sint32_t)(y))
+# 	define tb_sint64_gt_sint32(x, y) 	((x) > (tb_sint32_t)(y))
 #else
 # 	define TB_SINT64_ZERO 				g_sint64_zero
 # 	define TB_SINT64_ONE 				g_sint64_one
@@ -180,8 +180,38 @@ static __tb_inline__ tb_sint64_t tb_sint64_sub_inline(tb_sint64_t x, tb_sint64_t
     x.l -= y.l;
 	return x;
 }
+static __tb_inline__ tb_sint64_t tb_sint64_mul_sint32_x_sint32(tb_sint32_t x, tb_sint32_t y)
+{
+	tb_sint64_t r;
+	tb_int_t sx = x >> 31;
+	tb_int_t sy = y >> 31;
+
+	x = (x ^ sx) - sx;
+	y = (y ^ sy) - sy;
+
+	tb_uint32_t xh = x >> 16;
+	tb_uint32_t xl = x & 0xffff;
+	tb_uint32_t yh = y >> 16;
+	tb_uint32_t yl = y & 0xffff;
+
+	tb_uint32_t a = xh * yh;
+	tb_uint32_t b = xh * yl + xl * yh;
+	tb_uint32_t c = xl * yl;
+
+	r.l = c + (b << 16);
+	r.h = a + (b >> 16) + (r.l < c);
+
+	return (sx != sy)? tb_sint64_neg(r) : r;
+}
 static __tb_inline__ tb_sint64_t tb_sint64_mul_inline(tb_sint64_t x, tb_sint64_t y)
 {
+	// (x.h << 32 + x.l) * (y.h << 32 + y.l)
+	// x.h * y.h << 64 + x.l * y.h << 32 + x.h * y.l << 32 + x.l * y.l
+	// (x.l * y.h + x.h * y.l) << 32 + x.l * y.l
+	tb_sint32_t h = x.h * y.l + x.l * y.h;
+	x = tb_sint64_mul_sint32_x_sint32(x.l, y.l);
+	x.h += h;
+
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_div_inline(tb_sint64_t x, tb_sint64_t y)
@@ -238,6 +268,12 @@ static __tb_inline__ tb_sint64_t tb_sint64_sub_sint32_inline(tb_sint64_t x, tb_s
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mul_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
+	// (x.h << 32 + x.l) * y
+	// (x.h * y) << 32 + x.l * y
+	tb_sint32_t h = x.h * y;
+	x = tb_sint64_mul_sint32_x_sint32(x.l, y);
+	x.h += h;
+
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_div_sint32_inline(tb_sint64_t x, tb_sint32_t y)
@@ -246,6 +282,7 @@ static __tb_inline__ tb_sint64_t tb_sint64_div_sint32_inline(tb_sint64_t x, tb_s
 }
 static __tb_inline__ tb_sint64_t tb_sint64_mod_sint32_inline(tb_sint64_t x, tb_sint32_t y)
 {
+
 	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_or_sint32_inline(tb_sint64_t x, tb_sint32_t y)
