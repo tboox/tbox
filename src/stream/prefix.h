@@ -33,7 +33,6 @@ extern "C" {
  */
 #include "../prefix.h"
 
-
 // c plus plus
 #ifdef __cplusplus
 }

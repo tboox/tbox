@@ -80,7 +80,7 @@ end:
 		tb_http_close(http);
 
 		// time
-		tb_printf("\ntime: %d ms\n", tb_int64_to_int32(tb_int64_sub(tb_mclock(), base)));
+		tb_printf("\ntime: %lld ms\n", (tb_int64_sub(tb_mclock(), base)));
 	}
 
 	// destroy it

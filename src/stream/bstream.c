@@ -25,7 +25,11 @@
  */
 #include "bstream.h"
 #include "gstream.h"
+#include "../libc/libc.h"
+#include "../math/math.h"
 #include "../memory/memory.h"
+#include "../string/string.h"
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -59,7 +63,7 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 	// load
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t 		load = 0;
-	tb_size_t 		time = (tb_size_t)tb_mclock();
+	tb_int64_t 		time = tb_mclock();
 	tb_size_t 		left = tb_gstream_left(ist);
 
 	while(1)
@@ -70,14 +74,14 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 		else if (!ret) 
 		{
 			// timeout?
-			tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-			if (timeout > TB_GSTREAM_TIMEOUT) break;
+			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+			if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 		}
 		else
 		{
 			load += ret;
 			if (tb_bstream_set_data(bst, data, ret) != ret) break;
-			time = (tb_size_t)tb_mclock();
+			time = tb_mclock();
 		}
 
 		// is end?
@@ -96,7 +100,7 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 	// load
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t 		save = 0;
-	tb_size_t 		time = (tb_size_t)tb_mclock();
+	tb_int64_t 		time = tb_mclock();
 	while(1)
 	{
 		// get data
@@ -115,13 +119,13 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 				else if (!ret)
 				{
 					// timeout?
-					tb_size_t timeout = ((tb_size_t)tb_mclock()) - time;
-					if (timeout > TB_GSTREAM_TIMEOUT) break;
+					tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
+					if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
 				}
 				else
 				{
 					write += ret;
-					time = (tb_size_t)tb_mclock();
+					time = tb_mclock();
 				}
 			}
 
