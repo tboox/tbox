@@ -31,7 +31,7 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
+//#define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
 #define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
-#if 1 // arm v6
+#if 0 // arm v6
 	__tb_asm__("rev %0, %0" : "+r"(x));
 #else
 	tb_uint32_t t;

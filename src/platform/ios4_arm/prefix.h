@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
+#ifndef TB_PLATFROM_LINUX_x86_PREFIX_H
+#define TB_PLATFROM_LINUX_x86_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,42 +32,7 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-//#include <stdarg.h>
-
-/* /////////////////////////////////////////////////////////
- * macros
- */
-#if 0
-#define TB_VA_START 	va_start
-#define TB_VA_END 		va_end
-#define TB_VA_ARG 		va_arg
-#else
-#define TB_VA_START(v, l)	__builtin_va_start(v, l)
-#define TB_VA_END(v)		__builtin_va_end(v)
-#define TB_VA_ARG(v, l)		__builtin_va_arg(v, l)
-#endif
-
-// varg
-#define TB_VA_FMT(s, n, fmt, r) \
-do \
-{ \
-	tb_int_t __tb_ret = 0; \
-	tb_va_list_t __tb_varg_list; \
-    TB_VA_START(__tb_varg_list, fmt); \
-    __tb_ret = tb_vsnprintf(s, (n), fmt, __tb_varg_list); \
-    TB_VA_END(__tb_varg_list); \
-	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
-	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
- \
-} while (0) 
-
-
-/* /////////////////////////////////////////////////////////
- * types
- */
-
-//typedef va_list 	tb_va_list_t;
-typedef __builtin_va_list 	tb_va_list_t;
+#include "../platform.h"
 
 
 // c plus plus
