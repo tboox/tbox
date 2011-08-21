@@ -38,13 +38,13 @@ extern "C" {
  * macros
  */
 #if 0
-#define TB_VA_START 	va_start
-#define TB_VA_END 		va_end
-#define TB_VA_ARG 		va_arg
-#else
-#define TB_VA_START(v, l)	__builtin_va_start(v, l)
-#define TB_VA_END(v)		__builtin_va_end(v)
-#define TB_VA_ARG(v, l)		__builtin_va_arg(v, l)
+#define tb_va_start(v, l) 	va_start(v, l)
+#define tb_va_end(v) 		va_end(v)
+#define tb_va_arg(v, l) 	va_arg(v, l)
+#else // gcc
+#define tb_va_start(v, l)	__builtin_va_start(v, l)
+#define tb_va_end(v)		__builtin_va_end(v)
+#define tb_va_arg(v, l)		__builtin_va_arg(v, l)
 #endif
 
 // varg
@@ -53,9 +53,9 @@ do \
 { \
 	tb_int_t __tb_ret = 0; \
 	tb_va_list_t __tb_varg_list; \
-    TB_VA_START(__tb_varg_list, fmt); \
+    tb_va_start(__tb_varg_list, fmt); \
     __tb_ret = tb_vsnprintf(s, (n), fmt, __tb_varg_list); \
-    TB_VA_END(__tb_varg_list); \
+    tb_va_end(__tb_varg_list); \
 	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
 	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
  \

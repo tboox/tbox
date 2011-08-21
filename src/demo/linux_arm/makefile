@@ -32,8 +32,7 @@ NAMES = test \
 define MAKE_MODULES
 $(1)_TYPE 		= BIN
 $(1)_C_FILES 	= $(1)
-$(1)_OBJ_FILES 	= crt1
-$(1)_LIBS 		= tbox gcc gcc_eh stdc++ z m dl pthread
+$(1)_LIBS 		= tbox z m asound dl pthread
 $(1)_LIB_DIR 	= ../../
 $(1)_INC_DIR 	= ../../
 endef

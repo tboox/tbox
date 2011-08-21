@@ -9,6 +9,14 @@
 //#define TB_CONFIG_ARCH_PPC
 //#define TB_CONFIG_ARCH_SH4
 
+// arm
+#define TB_CONFIG_ARM_VERSION 	(4)
+//#define TA_CONFIG_ARM_THUMB
+//#define TA_CONFIG_ARM_JAZELLE
+//#define TA_CONFIG_ARM_VFP
+//#define TA_CONFIG_ARM_MMU 
+//#define TA_CONFIG_ARM_MPU 
+
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
 //#define TB_CONFIG_CPU_HAS_CONDITIONAL_INSTR
