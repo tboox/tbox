@@ -329,7 +329,6 @@ extern "C" {
 typedef signed int				tb_int_t;
 typedef unsigned int			tb_uint_t;
 typedef tb_int_t				tb_bool_t;
-typedef tb_uint_t				tb_size_t;
 typedef signed char				tb_int8_t;
 typedef tb_int8_t				tb_sint8_t;
 typedef unsigned char			tb_uint8_t;
@@ -344,6 +343,13 @@ typedef tb_int32_t 				tb_wchar_t;
 typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
+
+// size_t
+#ifdef TB_CONFIG_TYPE_SIZE_T
+typedef TB_CONFIG_TYPE_SIZE_T	tb_size_t;
+#else
+typedef tb_uint_t				tb_size_t;
+#endif
 
 // int64
 #ifdef TB_CONFIG_TYPE_INT64
@@ -459,9 +465,9 @@ tb_void_t 	tb_free(tb_void_t* data);
 
 # 	ifdef TB_DEBUG
 __tb_inline__ tb_void_t* 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 																		{ tb_free(p); 											}
+__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 																	{ tb_free(p); 											}
 __tb_inline__ tb_void_t* 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 																		{ tb_free(p); 											}
+__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 																{ tb_free(p); 											}
 # 	else
 __tb_inline__ tb_void_t* 	operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
 __tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 	{ tb_free(p); 				}
