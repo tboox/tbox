@@ -898,7 +898,7 @@ tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_lis
 						}
 					}
 
-					if (pb < pe) *pb++ = (tb_char_t)TB_VA_ARG(args, tb_int_t);
+					if (pb < pe) *pb++ = (tb_char_t)tb_va_arg(args, tb_int_t);
 
 					// fill space at right side, e.g. "a   "
 					while (--e.width > 0) 
@@ -910,16 +910,16 @@ tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_lis
 			}
 			// get field width for *
 		case TB_PRINTF_TYPE_WIDTH:
-			e.width = TB_VA_ARG(args, tb_int_t);
+			e.width = tb_va_arg(args, tb_int_t);
 			break;
 			// get precision for *
 		case TB_PRINTF_TYPE_PRECISION:
-			e.precision = TB_VA_ARG(args, tb_int_t);
+			e.precision = tb_va_arg(args, tb_int_t);
 			break;
 			// get string for %s
 		case TB_PRINTF_TYPE_STRING:
 			{
-				pb = tb_printf_string(pb, pe, e, TB_VA_ARG(args, tb_char_t const*));
+				pb = tb_printf_string(pb, pe, e, tb_va_arg(args, tb_char_t const*));
 				break;
 			}
 			// get an integer for %d %u %x ...
@@ -932,33 +932,33 @@ tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_lis
 					{
 						switch (e.qual)
 						{
-						case TB_PRINTF_QUAL_I: 		num = TB_VA_ARG(args, tb_int_t); break;
-						case TB_PRINTF_QUAL_I8:		num = (tb_int8_t)TB_VA_ARG(args, tb_int_t); break;
-						case TB_PRINTF_QUAL_I16:	num = (tb_int16_t)TB_VA_ARG(args, tb_int_t); break;
-						case TB_PRINTF_QUAL_I32:	num = TB_VA_ARG(args, tb_int32_t); break;
-						default: 					num = TB_VA_ARG(args, tb_int_t); break;
+						case TB_PRINTF_QUAL_I: 		num = tb_va_arg(args, tb_int_t); break;
+						case TB_PRINTF_QUAL_I8:		num = (tb_int8_t)tb_va_arg(args, tb_int_t); break;
+						case TB_PRINTF_QUAL_I16:	num = (tb_int16_t)tb_va_arg(args, tb_int_t); break;
+						case TB_PRINTF_QUAL_I32:	num = tb_va_arg(args, tb_int32_t); break;
+						default: 					num = tb_va_arg(args, tb_int_t); break;
 						}
 					}
 					else
 					{
 						switch (e.qual)
 						{
-						case TB_PRINTF_QUAL_I: 		num = TB_VA_ARG(args, tb_uint_t); break;
-						case TB_PRINTF_QUAL_I8:		num = (tb_uint8_t)TB_VA_ARG(args, tb_uint_t); break;
-						case TB_PRINTF_QUAL_I16:	num = (tb_uint16_t)TB_VA_ARG(args, tb_uint_t); break;
-						case TB_PRINTF_QUAL_I32:	num = TB_VA_ARG(args, tb_uint32_t); break;
-						default: 					num = TB_VA_ARG(args, tb_uint_t); break;
+						case TB_PRINTF_QUAL_I: 		num = tb_va_arg(args, tb_uint_t); break;
+						case TB_PRINTF_QUAL_I8:		num = (tb_uint8_t)tb_va_arg(args, tb_uint_t); break;
+						case TB_PRINTF_QUAL_I16:	num = (tb_uint16_t)tb_va_arg(args, tb_uint_t); break;
+						case TB_PRINTF_QUAL_I32:	num = tb_va_arg(args, tb_uint32_t); break;
+						default: 					num = tb_va_arg(args, tb_uint_t); break;
 						}
 					}
 					pb = tb_printf_int32(pb, pe, e, num);
 				}
-				else pb = tb_printf_int64(pb, pe, e, TB_VA_ARG(args, tb_uint64_t));
+				else pb = tb_printf_int64(pb, pe, e, tb_va_arg(args, tb_uint64_t));
 				break;
 			}
 #ifdef TB_CONFIG_TYPE_FLOAT
 		case TB_PRINTF_TYPE_FLOAT:
 			{
-				tb_float_t num = TB_VA_ARG(args, tb_float_t);
+				tb_float_t num = tb_va_arg(args, tb_float_t);
 				pb = tb_printf_float(pb, pe, e, num);
 				break;
 			}

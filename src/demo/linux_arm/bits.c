@@ -31,7 +31,7 @@ static tb_void_t tb_test_bits_swap_u64()
 	while (n--) x = tb_bits_swap_u64(x);
 
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("[bits]: swap_u32: %x => %x, %u ms\n", 0x12345678, tb_uint64_to_uint32(x), tb_int64_to_int32(dt));
+	tb_printf("[bits]: swap_u64: %x => %x, %u ms\n", 0x12345678, tb_uint64_to_uint32(x), tb_int64_to_int32(dt));
 }
 
 int main(int argc, char** argv)
