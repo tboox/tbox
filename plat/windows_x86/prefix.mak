@@ -2,16 +2,16 @@
 
 # prefix & suffix
 BIN_PREFIX 		= 
-BIN_SUFFIX 		= .exe
+BIN_SUFFIX 		= .b
 
 OBJ_PREFIX 		= 
-OBJ_SUFFIX 		= .obj
+OBJ_SUFFIX 		= .o
 
-LIB_PREFIX 		= 
-LIB_SUFFIX 		= .lib
+LIB_PREFIX 		= lib
+LIB_SUFFIX 		= .a
 
-DLL_PREFIX 		= 
-DLL_SUFFIX 		= .dll
+DLL_PREFIX 		= lib
+DLL_SUFFIX 		= .so
 
 ASM_SUFFIX 		= .S
 
@@ -55,7 +55,7 @@ CXXFLAGS 		=
 # ldflags
 LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
 LDFLAGS_DEBUG 	= 
-LDFLAGS 		= 
+LDFLAGS 		= -static
 LDFLAGS-L 		= -L
 LDFLAGS-l 		= -l
 LDFLAGS-o 		= -o

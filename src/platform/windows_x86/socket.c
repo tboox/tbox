@@ -110,7 +110,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 		struct sockaddr_in dest;
 		dest.sin_family = AF_INET;
 		dest.sin_port = htons(port);
-		if (-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
+		if (1)//-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
 		{
 			struct hostent* h = gethostbyname(host);
 			if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
@@ -275,7 +275,7 @@ tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint1
 	struct sockaddr_in dest;
 	dest.sin_family = AF_INET;
 	dest.sin_port = htons(port);
-	if (-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
+	if (1)//-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
 	{
 		struct hostent* h = gethostbyname(host);
 		if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
@@ -320,7 +320,7 @@ tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_
 	struct sockaddr_in dest;
 	dest.sin_family = AF_INET;
 	dest.sin_port = htons(port);
-	if (-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
+	if (1)//-1 == inet_pton(AF_INET, host, &(dest.sin_addr))) 
 	{
 		struct hostent* h = gethostbyname(host);
 		if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
