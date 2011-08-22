@@ -10,12 +10,17 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 	(4)
+#define TB_CONFIG_ARM_VERSION 	(6)
 //#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
 //#define TA_CONFIG_ARM_MMU 
 //#define TA_CONFIG_ARM_MPU 
+
+// os
+#define TB_CONFIG_OS_IOS
+#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(4)
+#define TB_CONFIG_OS_IOS_VERSION_MINOR 	(2)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
@@ -49,7 +54,7 @@
 //#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
-#define TB_CONFIG_TYPE_SIZE_T 			unsigned int
+#define TB_CONFIG_TYPE_SIZE_T 			unsigned long
 
 // optimization
 //#define TB_CONFIG_OPTI_SSE2_ENABLE

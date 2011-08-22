@@ -30,7 +30,6 @@ CPDIR 			= cp -r
 MKDIR 			= mkdir -p
 MAKE 			= make
 PWD 			= pwd
-SDK 			= /home/ruki/programs/toolchain4/sys
 
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
