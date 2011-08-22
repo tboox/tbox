@@ -33,10 +33,6 @@
 #include <dirent.h>
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-#define TB_FILE_PATH_PREFIX 		""
-/* /////////////////////////////////////////////////////////
  * types
  */
 typedef struct __tb_file_list_t
@@ -55,7 +51,7 @@ typedef struct __tb_file_list_t
 tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 {
 	tb_int_t flag = 0, mode = 0, fd = -1;
-	if (!path) return TB_NULL;
+	TB_ASSERT_RETURN_VAL(path, TB_NULL);
 
 	//TB_DBG("tb_file_open:%s flags:%d", path, flags);
 
@@ -74,8 +70,7 @@ tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 		mode = 0777;
 	}
 
-	tb_char_t path[TB_FILENAME_MAX_SIZE];
-	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, path);
+	// open it
 	fd = open(path, flag, mode);
 
 	if (fd < 0) return TB_NULL;
@@ -158,17 +153,13 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 
 	tb_file_list_t flist;
 
-	// append prefix
-	tb_char_t path[TB_FILENAME_MAX_SIZE];
-	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, dir);
-
 	// open directory
-	flist.pdir = opendir(path);
+	flist.pdir = opendir(dir);
 	TB_ASSERT(flist.pdir);
 	if (!flist.pdir) return TB_NULL;
 
 	// save current directory
-	strncpy(flist.dir, path, TB_FILENAME_MAX_SIZE - 1);
+	strncpy(flist.dir, dir, TB_FILENAME_MAX_SIZE - 1);
 	flist.dir[TB_FILENAME_MAX_SIZE - 1] = '\0';
 
 	// malloc 
@@ -215,10 +206,6 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 		pflist->entry.path[TB_FILENAME_MAX_SIZE - 1] = '\0';
 		stat(pflist->entry.path, &fstat);
 		
-		// save path
-		tb_snprintf(pflist->entry.path, TB_FILENAME_MAX_SIZE - 1, "%s/%s", &(pflist->dir[sizeof(TB_FILE_PATH_PREFIX) - 1]), pflist->entry.name);
-		pflist->entry.path[TB_FILENAME_MAX_SIZE - 1] = '\0';
-
 		if (S_ISDIR(fstat.st_mode)) pflist->entry.type = TB_FILE_TYPE_DIR;
 		else pflist->entry.type = TB_FILE_TYPE_FILE;
 	}
