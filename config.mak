@@ -2,10 +2,10 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios4_arm
+PLAT = android_arm
 
 # root
-PRO_DIR = /home/ruki/.projects/personal/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
 CCACHE = ccache
