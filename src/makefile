@@ -189,6 +189,9 @@ zlib_C_FILES 		= \
 					inflate \
 					inftrees \
 					uncompr \
+					deflate \
+					compress \
+					trees \
 					zutil
 
 zlib_INC_FILES 		= \
