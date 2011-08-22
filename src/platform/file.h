@@ -86,7 +86,7 @@ typedef struct __tb_file_entry_t
  */
 
 // open & close
-tb_handle_t 			tb_file_open(tb_char_t const* filename, tb_int_t flags);
+tb_handle_t 			tb_file_open(tb_char_t const* path, tb_int_t flags);
 tb_void_t 				tb_file_close(tb_handle_t hfile);
 
 // file io 

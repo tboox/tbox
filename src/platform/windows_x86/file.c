@@ -25,16 +25,76 @@
  * includes
  */
 #include "prefix.h"
+#include "../../string/string.h"
 #include <windows.h>
+
+/* /////////////////////////////////////////////////////////
+ * details
+ */
+
+/* transform the file path to the unix style
+ *
+ * C://home/file.txt
+ * C:\\\\home\\file.txt
+ *
+ * => /c/home/file.txt
+ */
+static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
+{
+	TB_NOT_IMPLEMENT();
+	return TB_NULL;
+}
+/* transform the file path to the windows style
+ *
+ * /c/home/file.txt
+ * file:///c/home/file.txt
+ *
+ * => C://home/file.txt
+ */
+static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
+{
+	TB_ASSERT_RETURN_VAL(path && data && maxn > 3, TB_NULL);
+	if (path[0] == '/' && path[2] == '/') 
+	{
+		data[0] = path[1];
+		data[1] = ':';
+		data[2] = '/';
+		tb_cstring_ncopy(data + 3, path + 2, maxn - 3);
+		//TB_DBG("[file]: path: %s => %s", path, data);
+		return data;
+	}
+	else if ( 	path[0] == 'f'
+			&& 	path[1] == 'i'
+			&& 	path[2] == 'l'
+			&& 	path[3] == 'e'
+			&& 	path[4] == ':'
+			&& 	path[5] == '/'
+			&& 	path[6] == '/'
+			) 
+	{
+		data[0] = path[8];
+		data[1] = ':';
+		data[2] = '/';
+		tb_cstring_ncopy(data + 3, path + 9, maxn - 3);
+		//TB_DBG("[file]: path: %s => %s", path, data);
+		return data;
+	}
+	return TB_NULL;
+}
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
 // file
-tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
+tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 {
-	TB_ASSERT_RETURN_VAL(filename, TB_FALSE);
+	TB_ASSERT_RETURN_VAL(path, TB_NULL);
+
+	tb_char_t data[4096];
+	path = tb_file_path_to_windows(path, data, 4096);
+	TB_ASSERT_RETURN_VAL(path, TB_NULL);
+
 	DWORD access = GENERIC_READ;
 	if (flags & TB_FILE_RO) access = GENERIC_READ;
 	else if (flags & TB_FILE_WO) access = GENERIC_WRITE;
@@ -46,11 +106,11 @@ tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 	else if (flags & TB_FILE_RW) share = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
 	DWORD cflag = 0;
-	if (flags & TB_FILE_CREAT) cflag |= CREATE_NEW;
-	if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
+	if (flags & TB_FILE_CREAT) cflag |= CREATE_ALWAYS;
+	else if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
 	if (!cflag) cflag |= OPEN_EXISTING;
 
-	HANDLE hfile = CreateFile(filename, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hfile = CreateFile(path, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
 	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : TB_NULL;
 }
 tb_void_t tb_file_close(tb_handle_t hfile)
@@ -75,7 +135,6 @@ tb_void_t tb_file_flush(tb_handle_t hfile)
 }
 tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
 {
-
 	if (hfile) 
 	{
 		if (flags == TB_FILE_SEEK_SIZE)
@@ -107,6 +166,10 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 {
 	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
 
+	tb_char_t data[4096];
+	path = tb_file_path_to_windows(path, data, 4096);
+	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+
 #if 0
 	switch (type)
 	{
@@ -134,6 +197,10 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 {
 	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	
+	tb_char_t data[4096];
+	path = tb_file_path_to_windows(path, data, 4096);
+	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
 
 	switch (type)
 	{
@@ -156,6 +223,10 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 }
 tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 {
+	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	
+	tb_char_t data[4096];
+	path = tb_file_path_to_windows(path, data, 4096);
 	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
 
 	switch (type)

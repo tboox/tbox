@@ -52,12 +52,12 @@ typedef struct __tb_file_list_t
  */
 
 // file
-tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
+tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 {
 	tb_int_t flag = 0, mode = 0, fd = -1;
-	if (!filename) return TB_NULL;
+	if (!path) return TB_NULL;
 
-	//TB_DBG("tb_file_open:%s flags:%d", filename, flags);
+	//TB_DBG("tb_file_open:%s flags:%d", path, flags);
 
 	if (flags & TB_FILE_RO) flag |= O_RDONLY;
 	else if (flags & TB_FILE_WO) flag |= O_WRONLY;
@@ -75,7 +75,7 @@ tb_handle_t tb_file_open(tb_char_t const* filename, tb_int_t flags)
 	}
 
 	tb_char_t path[TB_FILENAME_MAX_SIZE];
-	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, filename);
+	tb_snprintf(path, TB_FILENAME_MAX_SIZE, "%s%s", TB_FILE_PATH_PREFIX, path);
 	fd = open(path, flag, mode);
 
 	if (fd < 0) return TB_NULL;
