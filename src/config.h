@@ -2,20 +2,12 @@
 #define TB_CONFIG_H
 
 // arch
-//#define TB_CONFIG_ARCH_x86
-#define TB_CONFIG_ARCH_ARM
+#define TB_CONFIG_ARCH_x86
+//#define TB_CONFIG_ARCH_ARM
 //#define TB_CONFIG_ARCH_MIPS
 //#define TB_CONFIG_ARCH_SPARC
 //#define TB_CONFIG_ARCH_PPC
 //#define TB_CONFIG_ARCH_SH4
-
-// arm
-#define TB_CONFIG_ARM_VERSION 	(6)
-//#define TA_CONFIG_ARM_THUMB
-//#define TA_CONFIG_ARM_JAZELLE
-//#define TA_CONFIG_ARM_VFP
-//#define TA_CONFIG_ARM_MMU 
-//#define TA_CONFIG_ARM_MPU 
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
@@ -49,13 +41,13 @@
 //#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
-#define TB_CONFIG_TYPE_SIZE_T 			unsigned long
+#define TB_CONFIG_TYPE_SIZE_T 			unsigned int
 
 // optimization
-//#define TB_CONFIG_OPTI_SSE2_ENABLE
+#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // binary
-#define TB_CONFIG_BINARY_SMALL
+//#define TB_CONFIG_BINARY_SMALL
 
 // memory
 #define TB_CONFIG_MEMORY_MODE_SMALL

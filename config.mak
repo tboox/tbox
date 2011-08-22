@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios4_arm
+PLAT = linux_x86
 
 # root
 PRO_DIR = /home/ruki/.projects/personal/tbox
