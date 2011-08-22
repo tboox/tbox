@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include <windows.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -32,25 +33,26 @@
 
 tb_handle_t tb_mutex_create(tb_char_t const* name)
 {
-	TB_NOT_IMPLEMENT();
-	return TB_NULL;
+	HANDLE hmutex = CreateMutex(NULL, FALSE, name);
+	return ((hmutex != INVALID_HANDLE_VALUE)? hmutex : TB_NULL);
 }
 tb_void_t tb_mutex_destroy(tb_handle_t hmutex)
 {
-	TB_NOT_IMPLEMENT();
+	if (hmutex != INVALID_HANDLE_VALUE) CloseHandle(hmutex);
+	hmutex = INVALID_HANDLE_VALUE;
 }
 tb_bool_t tb_mutex_lock(tb_handle_t hmutex)
 {
-	TB_NOT_IMPLEMENT();
+	if (hmutex && WAIT_OBJECT_0 == WaitForSingleObject(hmutex, INFINITE)) return TB_TRUE;
 	return TB_FALSE;
 }
 tb_bool_t tb_mutex_trylock(tb_handle_t hmutex)
 {
-	TB_NOT_IMPLEMENT();
+	if (hmutex && WAIT_OBJECT_0 == WaitForSingleObject(hmutex, 100)) return TB_TRUE;
 	return TB_FALSE;
 }
 tb_bool_t tb_mutex_unlock(tb_handle_t hmutex)
 {
-	TB_NOT_IMPLEMENT();
+	if (hmutex) return ReleaseMutex(hmutex)? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }

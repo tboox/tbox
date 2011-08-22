@@ -54,57 +54,19 @@ typedef enum __tb_socket_type_t
  * interfaces
  */
 
-// init & unint
-tb_bool_t 	tb_socket_init();
-tb_void_t 			tb_socket_uninit();
+tb_bool_t 		tb_socket_init();
+tb_void_t 		tb_socket_exit();
 
-// client open socket
 tb_handle_t 	tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-
-// server open socket
 tb_handle_t 	tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-
-// server accept client socket
 tb_handle_t 	tb_socket_server_accept(tb_handle_t hserver);
+tb_void_t 		tb_socket_close(tb_handle_t hsocket);
 
-// close socket
-tb_void_t 			tb_socket_close(tb_handle_t hsocket);
+tb_int_t 		tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
+tb_int_t 		tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
 
-/* recv data
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
-tb_int_t 	tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
-
-/* send data
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
-tb_int_t 	tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
-
-/* recv data from host
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
-tb_int_t 	tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
-
-/* send data to host
- *
- * return: 
- * > 0: real sise
- * == 0: null
- * < 0: failure
- */
-tb_int_t 	tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
+tb_int_t 		tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
+tb_int_t 		tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 	
 // c plus plus
 #ifdef __cplusplus

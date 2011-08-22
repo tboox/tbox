@@ -39,6 +39,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	if (!tb_mpool_init(data, size)) return TB_FALSE;
 #endif
 
+	// init socket
+	if (!tb_socket_init()) return TB_FALSE;
+
 	// ok
 	TB_DBG("init: ok");
 
@@ -47,6 +50,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 tb_void_t tb_exit()
 {
+	// exit socket
+	tb_socket_exit();
+
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	//tb_pool_dump();
 	tb_mpool_exit();

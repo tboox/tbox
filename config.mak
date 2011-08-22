@@ -2,13 +2,13 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios4_arm
+PLAT = windows_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
-SDK = /home/ruki/programs/toolchain4/sys
+SDK =
 CCACHE = ccache
 DISTCC =
 

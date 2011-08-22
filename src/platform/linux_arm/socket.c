@@ -60,7 +60,7 @@ tb_bool_t tb_socket_init()
 {
 	return TB_TRUE;
 }
-tb_void_t tb_socket_uninit()
+tb_void_t tb_socket_exit()
 {
 }
 tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
@@ -199,33 +199,30 @@ tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 	//TB_DBG("socket_recv: %d", size);
 
 	// non-block
-	if (s->is_block == TB_FALSE)
+	if (!s->is_block)
 	{
-		while (1)
+		tb_int_t fd_max = s->fd;
+		struct timeval tv;
+		fd_set rfds;
+
+		FD_ZERO(&rfds);
+		FD_SET(s->fd, &rfds);
+
+		tv.tv_sec = 0;
+		tv.tv_usec = 100 * 1000;
+		tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
+
+		if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
 		{
-			tb_int_t fd_max = s->fd;
-			struct timeval tv;
-			fd_set rfds;
-
-			FD_ZERO(&rfds);
-			FD_SET(s->fd, &rfds);
-
-			tv.tv_sec = 0;
-			tv.tv_usec = 100 * 1000;
-			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-
-			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
+			tb_int_t len = recv(s->fd, data, size, 0);
+			if (len < 0) 
 			{
-				tb_int_t len = recv(s->fd, data, size, 0);
-				if (len < 0) 
-				{
-					if (errno != EINTR && errno != EAGAIN) return -1;
-				} 
-				else return len;
-			}
-			else if (ret < 0) return -1;
-			else return 0; // no data
+				if (errno != EINTR && errno != EAGAIN) return -1;
+			} 
+			else return len;
 		}
+		else if (ret < 0) return -1;
+		else return 0; // no data
 	}
 	// block
 	else return recv(s->fd, data, size, 0);
@@ -239,37 +236,30 @@ tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 	//TB_DBG("socket_send: %d", size);
 
 	// non-block
-	if (s->is_block == TB_FALSE)
+	if (!s->is_block)
 	{
-		tb_int_t send_n = size;
-		while (send_n > 0) 
+		tb_int_t fd_max = s->fd;
+		struct timeval tv;
+		fd_set wfds;
+
+		FD_ZERO(&wfds);
+		FD_SET(s->fd, &wfds);
+
+		tv.tv_sec = 0;
+		tv.tv_usec = 100 * 1000;
+		tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
+
+		if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
 		{
-			tb_int_t fd_max = s->fd;
-			struct timeval tv;
-			fd_set wfds;
-
-			FD_ZERO(&wfds);
-			FD_SET(s->fd, &wfds);
-
-			tv.tv_sec = 0;
-			tv.tv_usec = 100 * 1000;
-			tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-
-			if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
+			tb_int_t len = send(s->fd, data, size, 0);
+			if (len < 0) 
 			{
-				tb_int_t len = send(s->fd, data, send_n, 0);
-				if (len < 0) 
-				{
-					if (errno != EINTR && errno != EAGAIN) return -1;
-					continue;
-				}
-				send_n -= len;
-				data += len;
-			} 
-			else if (ret < 0) return -1;
-			else return 0;
-		}
-		return (tb_int_t)(size - send_n);
+				if (errno != EINTR && errno != EAGAIN) return -1;
+			}
+			return len;
+		} 
+		else if (ret < 0) return -1;
+		else return 0;
 	}
 	else return send(s->fd, data, size, 0);
 }
@@ -297,33 +287,30 @@ tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint1
 
 	// non-block
 	tb_int_t n = sizeof(dest);
-	if (s->is_block == TB_FALSE)
+	if (!s->is_block)
 	{
-		while (1)
+		tb_int_t fd_max = s->fd;
+		struct timeval tv;
+		fd_set rfds;
+
+		FD_ZERO(&rfds);
+		FD_SET(s->fd, &rfds);
+
+		tv.tv_sec = 0;
+		tv.tv_usec = 100 * 1000;
+		tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
+
+		if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
 		{
-			tb_int_t fd_max = s->fd;
-			struct timeval tv;
-			fd_set rfds;
-
-			FD_ZERO(&rfds);
-			FD_SET(s->fd, &rfds);
-
-			tv.tv_sec = 0;
-			tv.tv_usec = 100 * 1000;
-			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-
-			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
+			tb_int_t len = recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
+			if (len < 0) 
 			{
-				tb_int_t len = recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
-				if (len < 0) 
-				{
-					if (errno != EINTR && errno != EAGAIN) return -1;
-				} 
-				else return len;
-			}
-			else if (ret < 0) return -1;
-			else return 0; // no data
+				if (errno != EINTR && errno != EAGAIN) return -1;
+			} 
+			else return len;
 		}
+		else if (ret < 0) return -1;
+		else return 0; // no data
 	}
 	// block
 	else return recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
@@ -351,33 +338,30 @@ tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_
 	}
 
 	// non-block
-	if (s->is_block == TB_FALSE)
+	if (!s->is_block)
 	{
-		while (1)
+		tb_int_t fd_max = s->fd;
+		struct timeval tv;
+		fd_set wfds;
+
+		FD_ZERO(&wfds);
+		FD_SET(s->fd, &wfds);
+
+		tv.tv_sec = 0;
+		tv.tv_usec = 100 * 1000;
+		tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
+
+		if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
 		{
-			tb_int_t fd_max = s->fd;
-			struct timeval tv;
-			fd_set rfds;
-
-			FD_ZERO(&rfds);
-			FD_SET(s->fd, &rfds);
-
-			tv.tv_sec = 0;
-			tv.tv_usec = 100 * 1000;
-			tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-
-			if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
+			tb_int_t len = sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
+			if (len < 0) 
 			{
-				tb_int_t len = sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
-				if (len < 0) 
-				{
-					if (errno != EINTR && errno != EAGAIN) return -1;
-				} 
-				else return len;
-			}
-			else if (ret < 0) return -1;
-			else return 0; // no data
+				if (errno != EINTR && errno != EAGAIN) return -1;
+			} 
+			else return len;
 		}
+		else if (ret < 0) return -1;
+		else return 0; // no data
 	}
 	// block
 	else return sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));

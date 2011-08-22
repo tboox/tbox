@@ -1,6 +1,9 @@
 *.a
 *.b
 *.o
+*.exe
+*.dll
+*.lib
 *.out
 *~
 *.swp

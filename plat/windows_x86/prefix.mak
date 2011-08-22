@@ -2,16 +2,16 @@
 
 # prefix & suffix
 BIN_PREFIX 		= 
-BIN_SUFFIX 		= .b
+BIN_SUFFIX 		= .exe
 
 OBJ_PREFIX 		= 
-OBJ_SUFFIX 		= .o
+OBJ_SUFFIX 		= .obj
 
-LIB_PREFIX 		= lib
-LIB_SUFFIX 		= .a
+LIB_PREFIX 		= 
+LIB_SUFFIX 		= .lib
 
-DLL_PREFIX 		= lib
-DLL_SUFFIX 		= .so
+DLL_PREFIX 		= 
+DLL_SUFFIX 		= .dll
 
 ASM_SUFFIX 		= .S
 
