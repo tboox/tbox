@@ -10,12 +10,17 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 	(4)
+#define TB_CONFIG_ARM_VERSION 			(4)
 //#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
 //#define TA_CONFIG_ARM_MMU 
 //#define TA_CONFIG_ARM_MPU 
+
+// os
+#define TB_CONFIG_OS_ANDROID
+#define TB_CONFIG_OS_ANDROID_VERSION_MAJOR 	(1)
+#define TB_CONFIG_OS_ANDROID_VERSION_MINOR 	(5)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
