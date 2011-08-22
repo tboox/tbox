@@ -86,14 +86,14 @@ typedef struct __tb_file_entry_t
  */
 
 // open & close
-tb_handle_t 			tb_file_open(tb_char_t const* filename, tb_int_t flags);
-tb_void_t 					tb_file_close(tb_handle_t hfile);
+tb_handle_t 			tb_file_open(tb_char_t const* path, tb_int_t flags);
+tb_void_t 				tb_file_close(tb_handle_t hfile);
 
 // file io 
-tb_int_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t read_n);
-tb_int_t 				tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_n);
+tb_int_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size);
+tb_int_t 				tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size);
 tb_int_t 				tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags);
-tb_void_t 					tb_file_flush(tb_handle_t hfile);
+tb_void_t 				tb_file_flush(tb_handle_t hfile);
 
 // file modifiors
 tb_bool_t 				tb_file_create(tb_char_t const* path, tb_file_type_t type);
@@ -106,7 +106,7 @@ tb_size_t 				tb_file_size(tb_char_t const* path, tb_file_type_t type);
 // file list
 tb_handle_t 			tb_file_list_open(tb_char_t const* dir);
 tb_file_entry_t const* 	tb_file_list_entry(tb_handle_t hflist);
-tb_void_t 					tb_file_list_close(tb_handle_t hflist);
+tb_void_t 				tb_file_list_close(tb_handle_t hflist);
 
 // c plus plus
 #ifdef __cplusplus
