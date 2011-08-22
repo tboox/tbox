@@ -5,10 +5,11 @@ IS_CONFIG = yes
 PLAT = linux_x86
 
 # root
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/.projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
-SDK =
+SDK = /home/ruki/programs/toolchain4/sys
+BIN = /home/ruki/programs/windows/cross/bin
 CCACHE = ccache
 DISTCC =
 
@@ -18,5 +19,6 @@ export PRO_DIR
 export PRO_NAME
 export DEBUG
 export SDK
+export BIN
 export CCACHE
 export DISTCC
