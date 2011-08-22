@@ -16,13 +16,12 @@ DLL_SUFFIX 		= .so
 ASM_SUFFIX 		= .S
 
 # for mac
-PRE 			= $(BIN)/arm-apple-darwin9-
-CC 				= $(PRE)gcc
-AR 				= $(PRE)ar
-STRIP 			= $(PRE)strip
-RANLIB 			= $(PRE)ranlib
-LD 				= $(PRE)g++
-AS				= 
+CC 				= $(BIN)/gcc-4.2 -arch armv6
+AR 				= $(BIN)/ar
+STRIP 			= $(BIN)/strip
+RANLIB 			= $(BIN)/ranlib
+LD 				= $(BIN)/llvm-gcc-4.2 -arch armv6
+AS 				=
 
 # for linux
 #PRE 			= $(BIN)/arm-apple-darwin9-
