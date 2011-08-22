@@ -32,7 +32,7 @@ NAMES = test \
 define MAKE_MODULES
 $(1)_TYPE 		= BIN
 $(1)_C_FILES 	= $(1)
-$(1)_LIBS 		= tbox 
+$(1)_LIBS 		= tbox ws2_32
 $(1)_LIB_DIR 	= ../../
 $(1)_INC_DIR 	= ../../
 endef

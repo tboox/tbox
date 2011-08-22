@@ -86,16 +86,16 @@ tb_void_t tb_file_close(tb_handle_t hfile)
 	//TB_DBG("tb_file_close");
 	if (hfile) close((tb_int_t)hfile);
 }
-tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t read_n)
+tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size)
 {
-	//TB_DBG("tb_file_read: %d bytes", read_n);
-	if (hfile) return read((tb_int_t)hfile, data, read_n);
+	//TB_DBG("tb_file_read: %d bytes", size);
+	if (hfile) return read((tb_int_t)hfile, data, size);
 	else return -1;
 }
-tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t write_n)
+tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
 {
-	//TB_DBG("tb_file_write: %d bytes", write_n);
-	if (hfile) return write((tb_int_t)hfile, data, write_n);
+	//TB_DBG("tb_file_write: %d bytes", size);
+	if (hfile) return write((tb_int_t)hfile, data, size);
 	else return -1;
 }
 tb_void_t tb_file_flush(tb_handle_t hfile)

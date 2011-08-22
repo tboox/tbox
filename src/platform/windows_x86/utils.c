@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../../libc/libc.h"
 #include "../../math/math.h"
+#include <windows.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -41,13 +42,13 @@ tb_void_t tb_usleep(tb_size_t us)
 // msleep
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	TB_NOT_IMPLEMENT();
+	Sleep(ms);
 }
 
 // sleep
 tb_void_t tb_sleep(tb_size_t s)
 {
-	TB_NOT_IMPLEMENT();
+	Sleep(s * 1000);
 }
 
 // printf
@@ -64,8 +65,8 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 // mclock
 tb_int64_t tb_mclock()
 {
-	TB_NOT_IMPLEMENT();
-	return TB_INT64_ZERO;
+	DWORD ms = GetTickCount();
+	return tb_int32_to_int64(ms);
 }
 
 // uclock
