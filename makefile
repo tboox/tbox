@@ -123,6 +123,7 @@ config :
 	@echo "PRO_DIR =" $(PRO_DIR) 						>> config.mak
 	@echo "PRO_NAME =" $(PRO_NAME) 						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
+	@echo "SDK =" $(SDK) 								>> config.mak
 	@echo "CCACHE =" $(CCACHE) 							>> config.mak
 	@echo "DISTCC =" $(DISTCC) 							>> config.mak
 	@echo ""                              				>> config.mak
@@ -131,6 +132,7 @@ config :
 	@echo "export PRO_DIR" 		 						>> config.mak
 	@echo "export PRO_NAME" 		 					>> config.mak
 	@echo "export DEBUG" 			 					>> config.mak
+	@echo "export SDK" 				 					>> config.mak
 	@echo "export CCACHE" 			 					>> config.mak
 	@echo "export DISTCC" 			 					>> config.mak
 

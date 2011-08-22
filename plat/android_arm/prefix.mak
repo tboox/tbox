@@ -30,7 +30,6 @@ CPDIR 			= cp -r
 MKDIR 			= mkdir -p
 MAKE 			= make
 PWD 			= pwd
-SDK 			= /home/ruki/programs/android-ndk-r6
 
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
