@@ -16,7 +16,7 @@ DLL_SUFFIX 		= .so
 ASM_SUFFIX 		= .S
 
 # tool
-PRE 			= arm-linux-
+PRE 			= $(BIN)/arm-linux-
 CC 				= $(PRE)gcc
 AR 				= $(PRE)ar
 STRIP 			= $(PRE)strip

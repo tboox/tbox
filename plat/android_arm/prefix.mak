@@ -16,7 +16,7 @@ DLL_SUFFIX 		= .so
 ASM_SUFFIX 		= .S
 
 # tool
-PRE 			= arm-linux-androideabi-
+PRE 			= $(BIN)/arm-linux-androideabi-
 CC 				= $(PRE)gcc
 AR 				= $(PRE)ar
 STRIP 			= $(PRE)strip
