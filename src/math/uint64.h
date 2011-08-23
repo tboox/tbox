@@ -189,6 +189,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_mul_inline(tb_uint64_t x, tb_uint64_t
 	tb_uint32_t h = x.h * y.l + x.l * y.h;
 	x = tb_uint64_mul_uint32_x_uint32(x.l, y.l);
 	x.h += h;
+	TB_ASSERT(x.h >= h);
 
 	return x;
 }
@@ -246,12 +247,34 @@ static __tb_inline__ tb_uint64_t tb_uint64_sub_uint32_inline(tb_uint64_t x, tb_u
 }
 static __tb_inline__ tb_uint64_t tb_uint64_mul_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {
+#if 0
 	// (x.h << 32 + x.l) * y
 	// (x.h * y) << 32 + x.l * y
 	tb_uint32_t h = x.h * y;
 	x = tb_uint64_mul_uint32_x_uint32(x.l, y);
 	x.h += h;
+	TB_ASSERT(x.h >= h);
 	return x;
+#else
+	tb_uint64_t r;
+	tb_uint32_t xlh = x.l >> 16;
+	tb_uint32_t xll = x.l & 0xffff;	
+	tb_uint32_t xhh = x.h >> 16;
+	tb_uint32_t xhl = x.h & 0xffff;
+	tb_uint32_t ylh = y >> 16;
+	tb_uint32_t yll = y & 0xffff;
+
+	tb_uint32_t a = xll * yll;
+	tb_uint32_t b = xlh * yll + xll * ylh;
+	tb_uint32_t c = xhl * yll + xlh * ylh;
+	tb_uint32_t d = xhh * yll + xhl * ylh;
+
+	r.l = (b << 16) + a;
+	r.h = (d << 16) + c + (b >> 16) + (r.l < a);
+	TB_ASSERT(r.h >= c);
+
+	return r;
+#endif
 }
 static __tb_inline__ tb_uint64_t tb_uint64_div_uint32_inline(tb_uint64_t x, tb_uint32_t y)
 {

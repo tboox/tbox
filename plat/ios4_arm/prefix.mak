@@ -21,16 +21,18 @@ endif
 
 ifeq ($(SDK),)
 SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk 
+#SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk 
 endif
 
+ifeq ($(HOST),mac)
 # for mac
-#CC 			= $(BIN)/gcc-4.2 -arch armv6
-#AR 			= $(BIN)/ar
-#STRIP 			= $(BIN)/strip
-#RANLIB 		= $(BIN)/ranlib
-#LD 			= $(BIN)/llvm-gcc-4.2 -arch armv6
-#AS 			=
-
+CC 				= $(BIN)/gcc-4.2 -arch armv6
+AR 				= $(BIN)/ar
+STRIP 			= $(BIN)/strip
+RANLIB 			= $(BIN)/ranlib
+LD 				= $(BIN)/llvm-gcc-4.2 -arch armv6
+AS				= 
+else
 # for linux
 PRE 			= $(BIN)/arm-apple-darwin9-
 CC 				= $(PRE)gcc
@@ -39,6 +41,7 @@ STRIP 			= $(PRE)strip
 RANLIB 			= $(PRE)ranlib
 LD 				= $(PRE)g++
 AS				= 
+endif
 
 RM 				= rm -f
 RMDIR 			= rm -rf
@@ -76,6 +79,7 @@ LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
 LDFLAGS_DEBUG 	= 
 LDFLAGS 		= -arch=armv6 -nostdlib \
 				  -L$(SDK)/usr/lib \
+				  -L$(SDK)/usr/lib/system \
 				  -L$(SDK)/usr/lib/gcc/arm-apple-darwin10/4.2.1
 LDFLAGS-L 		= -L
 LDFLAGS-l 		= -l

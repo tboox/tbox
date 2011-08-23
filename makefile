@@ -70,35 +70,43 @@ endif
 # config
 # #
 
-# default args
+# platform
 ifeq ($(PLAT),)
 PLAT := linux_x86
 endif
 
+# linux, cygwin, mac
+ifeq ($(HOST),)
+HOST := linux
+endif
+
+# debug
 ifeq ($(DEBUG),)
 DEBUG := n
 endif
 
+ifeq ($(DEBUG),y)
+IS_DEBUG = 1
+else
+IS_DEBUG = 0
+endif
+
+# project
 PRO_DIR 	:= ${shell pwd}
 PRO_NAME 	:= ${shell basename ${shell pwd}}
 
+# ccache
 ifeq ($(CCACHE),n)
 CCACHE 		:= 
 else
 CCACHE 		:= ${shell if [ -f "/usr/bin/ccache" ]; then echo "ccache"; elif [ -f "/usr/local/bin/ccache" ]; then echo "ccache"; else echo ""; fi }
 endif
 
+# distcc
 ifeq ($(DISTCC),y)
 DISTCC 		:= ${shell if [ -f "/usr/bin/distcc" ]; then echo "distcc"; elif [ -f "/usr/local/bin/distcc" ]; then echo "distcc"; else echo ""; fi }
 else
 DISTCC 		:= 
-endif
-
-# is debug?
-ifeq ($(DEBUG),y)
-IS_DEBUG = 1
-else
-IS_DEBUG = 0
 endif
 
 config :
@@ -125,6 +133,7 @@ config :
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
 	@echo "SDK =" $(SDK) 								>> config.mak
 	@echo "BIN =" $(BIN) 								>> config.mak
+	@echo "HOST =" $(HOST) 								>> config.mak
 	@echo "CCACHE =" $(CCACHE) 							>> config.mak
 	@echo "DISTCC =" $(DISTCC) 							>> config.mak
 	@echo ""                              				>> config.mak
@@ -135,6 +144,7 @@ config :
 	@echo "export DEBUG" 			 					>> config.mak
 	@echo "export SDK" 				 					>> config.mak
 	@echo "export BIN" 				 					>> config.mak
+	@echo "export HOST" 			 					>> config.mak
 	@echo "export CCACHE" 			 					>> config.mak
 	@echo "export DISTCC" 			 					>> config.mak
 

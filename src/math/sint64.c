@@ -31,7 +31,7 @@
 
 #ifndef TB_CONFIG_TYPE_INT64
 tb_sint64_t const g_sint64_zero = {0, 0};
-tb_sint64_t const g_sint64_one 	= {0, 1};
+tb_sint64_t const g_sint64_one 	= {1, 0};
 #endif
 
 /* ////////////////////////////////////////////////////////////////////////

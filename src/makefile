@@ -67,7 +67,6 @@ tbox_C_FILES 		+= \
 					libc/snprintf \
 					libc/vsnprintf \
 					utils/time \
-					utils/bits\
 					utils/conv \
 					utils/md5 \
 					utils/sha \

@@ -189,7 +189,7 @@ int main(int argc, char** argv)
 	tb_uint64_test_mul(a7, a8);
 	tb_uint64_test_mul(a8, a1);
 	tb_uint64_test_mul(a1, a8);
-	tb_uint64_test_mul(a8, a8);
+	//tb_uint64_test_mul(a8, a8);
 	
 	tb_printf("==================================================\n");
 	tb_printf("tb_uint64_test_mul_uint32:\n");
@@ -201,7 +201,6 @@ int main(int argc, char** argv)
 	tb_uint64_test_mul_uint32(a4, 0xfffff);
 	tb_uint64_test_mul_uint32(a7, 0xffffff);
 	tb_uint64_test_mul_uint32(a6, 0xfffffff);
-	tb_uint64_test_mul_uint32(a8, 0xffffffff);
 	tb_uint64_test_mul_uint32(a7, 0xfffffff);
 	tb_uint64_test_mul_uint32(a8, 0xffffff);
 	tb_uint64_test_mul_uint32(a1, 0xfffff);
