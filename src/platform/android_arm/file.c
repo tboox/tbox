@@ -27,7 +27,6 @@
 #include "prefix.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <dirent.h>

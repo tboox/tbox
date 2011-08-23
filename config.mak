@@ -5,12 +5,12 @@ IS_CONFIG = yes
 PLAT = ios4_arm
 
 # root
-PRO_DIR = /Users/ruki/projects/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
-SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk
-BIN = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
-CCACHE =
+SDK = /home/ruki/programs/toolchain4/sys
+BIN = /home/ruki/programs/toolchain4/pre/bin
+CCACHE = ccache
 DISTCC =
 
 # export
