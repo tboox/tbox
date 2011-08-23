@@ -177,6 +177,9 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 		{
 			sign = '-';
 			--e.width;
+	
+			// FIXME
+			num_u = (unsigned long long)(-num_s); 
 		}
 		else if (e.flags & TB_PRINTF_FLAG_PLUS)
 		{
@@ -189,9 +192,6 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	if (num_u == 0) digits[digit_i++] = '0';
 	else 
 	{
-		// FIXME
-		if (num_s < 0) num_u = (unsigned long long)(-num_s); 
-
 #if 0
 		do 
 		{
@@ -320,6 +320,7 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 		{
 			sign = '-';
 			--e.width;
+			num = (tb_uint32_t)(-(tb_int32_t)num); 
 		}
 		else if (e.flags & TB_PRINTF_FLAG_PLUS)
 		{
@@ -332,8 +333,6 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	if (num == 0) digits[digit_i++] = '0';
 	else 
 	{
-		if ((tb_int32_t)num < 0) num = (tb_uint32_t)(-(tb_int32_t)num); 
-
 #if 0
 		do 
 		{
