@@ -46,7 +46,7 @@
 //#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
-#define TB_CONFIG_TYPE_SIZE_T 			unsigned int
+#define TB_CONFIG_TYPE_SIZE_T 			unsigned long
 
 // optimization
 #define TB_CONFIG_OPTI_SSE2_ENABLE
