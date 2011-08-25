@@ -52,8 +52,11 @@ extern "C" {
  */
 
 // init & exit
-tb_bool_t 	tb_init(tb_byte_t* data, tb_size_t size);
-tb_void_t 		tb_exit();
+tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
+tb_void_t 			tb_exit();
+
+// version
+tb_char_t const* 	tb_version();
 
 
 // c plus plus
