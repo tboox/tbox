@@ -61,3 +61,16 @@ tb_void_t tb_exit()
 	// ok
 	TB_DBG("exit: ok");
 }
+
+tb_char_t const* tb_version()
+{
+	static tb_char_t version_data[32] = {0};
+	static tb_size_t version_size = 0;
+	
+	if (!version_size)
+	{
+		version_size = tb_snprintf(version_data, 32, "tbox-v%u.%u.%u", TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER);
+		version_data[version_size] = '\0';
+	}
+	return version_data;
+}
