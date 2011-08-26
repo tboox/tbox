@@ -100,18 +100,18 @@ typedef struct __tb_pool_t
 
 // create & destroy
 tb_pool_t* 		tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow);
-tb_void_t 			tb_pool_destroy(tb_pool_t* pool);
+tb_void_t 		tb_pool_destroy(tb_pool_t* pool);
 
 // alloc & free
 tb_size_t 		tb_pool_alloc(tb_pool_t* pool);
-tb_void_t 			tb_pool_free(tb_pool_t* pool, tb_size_t item);
+tb_void_t 		tb_pool_free(tb_pool_t* pool, tb_size_t item);
 
 // clear
-tb_void_t 			tb_pool_clear(tb_pool_t* pool);
+tb_void_t 		tb_pool_clear(tb_pool_t* pool);
 
 #ifdef TB_DEBUG
 tb_byte_t* 		tb_pool_get(tb_pool_t* pool, tb_size_t item);
-tb_void_t 			tb_pool_dump(tb_pool_t* pool);
+tb_void_t 		tb_pool_dump(tb_pool_t* pool);
 #endif
 
 

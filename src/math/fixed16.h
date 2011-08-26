@@ -252,7 +252,7 @@
  */
 
 tb_fixed16_t 	tb_fixed16_invert_int32(tb_fixed16_t x);
-tb_void_t 			tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c);
+tb_void_t 		tb_fixed16_sincos_int32(tb_fixed16_t x, tb_fixed16_t* s, tb_fixed16_t* c);
 tb_fixed16_t 	tb_fixed16_atan2_int32(tb_fixed16_t y, tb_fixed16_t x);
 tb_fixed16_t 	tb_fixed16_asin_int32(tb_fixed16_t x);
 tb_fixed16_t 	tb_fixed16_atan_int32(tb_fixed16_t x);

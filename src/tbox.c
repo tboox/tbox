@@ -34,6 +34,18 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 {
 	TB_DBG("init: %x %d", data, size);
 
+	// check types
+	TB_STATIC_ASSERT(sizeof(tb_byte_t) == 1);
+	TB_STATIC_ASSERT(sizeof(tb_uint_t) == 4);
+	TB_STATIC_ASSERT(sizeof(tb_uint8_t) == 1);
+	TB_STATIC_ASSERT(sizeof(tb_uint16_t) == 2);
+	TB_STATIC_ASSERT(sizeof(tb_uint32_t) == 4);
+	TB_STATIC_ASSERT(sizeof(tb_uint64_t) == 8);
+	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_size_t) << 3));
+	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
+	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_void_t*) << 3));
+	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
+
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	// init memory pool
 	if (!tb_mpool_init(data, size)) return TB_FALSE;
