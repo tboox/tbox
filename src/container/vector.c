@@ -82,7 +82,7 @@ tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(
 	TB_ASSERT_RETURN_VAL(vector, TB_NULL);
 
 	// init vector
-	vector->step = (step == 1)? 1 : ((step == 2)? 2 : tb_align4(step));
+	vector->step = step;
 	vector->grow = grow;
 	vector->size = 0;
 	vector->maxn = grow;
@@ -94,9 +94,6 @@ tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(
 	// calloc data
 	vector->data = tb_calloc(vector->maxn, vector->step);
 	TB_ASSERT_GOTO(vector->data, fail);
-
-	// must be align by 4-bytes
-	TB_ASSERT_GOTO(!(((tb_size_t)(vector->data)) & 3), fail);
 
 	return vector;
 fail:

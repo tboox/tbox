@@ -35,6 +35,7 @@
 
 // keyword
 #define TB_CONFIG_KEYWORD_INLINE		inline
+#define TB_CONFIG_KEYWORD_REGISTER		register
 #define TB_CONFIG_KEYWORD_ASM 			__asm__
 #define TB_CONFIG_KEYWORD_FUNC			__FUNCTION__
 #define TB_CONFIG_KEYWORD_LINE			__LINE__
@@ -44,7 +45,6 @@
 //#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
-#define TB_CONFIG_TYPE_SIZE_T 			unsigned int
 
 // optimization
 #define TB_CONFIG_OPTI_SSE2_ENABLE

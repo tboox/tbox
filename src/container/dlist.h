@@ -98,14 +98,14 @@ typedef struct __tb_dlist_t
 
 // create & destroy
 tb_dlist_t* 		tb_dlist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
-tb_void_t 				tb_dlist_destroy(tb_dlist_t* dlist);
+tb_void_t 			tb_dlist_destroy(tb_dlist_t* dlist);
 
 // accessors
 tb_byte_t* 			tb_dlist_at(tb_dlist_t* dlist, tb_size_t index);
 tb_byte_t const* 	tb_dlist_const_at(tb_dlist_t const* dlist, tb_size_t index);
 
 // modifiors
-tb_void_t 				tb_dlist_clear(tb_dlist_t* dlist);
+tb_void_t 			tb_dlist_clear(tb_dlist_t* dlist);
 
 tb_size_t 			tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_byte_t const* item);
 tb_size_t 			tb_dlist_insert_head(tb_dlist_t* dlist, tb_byte_t const* item);

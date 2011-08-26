@@ -45,7 +45,7 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 	tb_pool_t* pool = (tb_pool_t*)tb_calloc(1, sizeof(tb_pool_t));
 	TB_ASSERT_RETURN_VAL(pool, TB_NULL);
 
-	pool->step = tb_align(step, 4);
+	pool->step = tb_align(step, (TB_CPU_BITSIZE >> 3));
 	pool->grow = tb_align(grow, 8); // align by 8-byte for info
 	pool->size = 0;
 	pool->maxn = tb_align(size, 8); // align by 8-byte for info

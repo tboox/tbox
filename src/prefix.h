@@ -295,6 +295,7 @@ extern "C" {
 
 // keyword
 #define __tb_inline__ 				TB_CONFIG_KEYWORD_INLINE
+#define __tb_register__ 			TB_CONFIG_KEYWORD_REGISTER
 #define __tb_asm__ 					TB_CONFIG_KEYWORD_ASM
 #define __tb_func__ 				TB_CONFIG_KEYWORD_FUNC
 #define __tb_file__ 				TB_CONFIG_KEYWORD_FILE
@@ -326,6 +327,20 @@ extern "C" {
 # 	define TB_CONFIG_TYPE_SCALAR_IS_FIXED
 #endif
 
+// check 64-bits
+#if defined (__LP64__) \
+	|| defined (__64BIT__) \
+		|| defined (_LP64) \
+		|| (__WORDSIZE == 64)
+# 	define TB_CPU_BITSIZE 		(64)
+# 	define TB_CPU_BITBYTE 		(8)
+# 	define TB_CPU_BITALIGN 		(7)
+#else
+# 	define TB_CPU_BITSIZE 		(32)
+# 	define TB_CPU_BITBYTE 		(4)
+# 	define TB_CPU_BITALIGN 		(3)
+#endif
+
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -333,6 +348,9 @@ extern "C" {
 // basic
 typedef signed int				tb_int_t;
 typedef unsigned int			tb_uint_t;
+typedef signed long				tb_long_t;
+typedef unsigned long			tb_ulong_t;
+typedef tb_ulong_t				tb_size_t;
 typedef tb_int_t				tb_bool_t;
 typedef signed char				tb_int8_t;
 typedef tb_int8_t				tb_sint8_t;
@@ -348,13 +366,6 @@ typedef tb_int32_t 				tb_wchar_t;
 typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
-
-// size_t
-#ifdef TB_CONFIG_TYPE_SIZE_T
-typedef TB_CONFIG_TYPE_SIZE_T	tb_size_t;
-#else
-typedef tb_uint_t				tb_size_t;
-#endif
 
 // int64
 #ifdef TB_CONFIG_TYPE_INT64
@@ -420,10 +431,8 @@ typedef tb_float_t 				tb_scalar_t;
 // align
 #define tb_align2(x) 			(((x) + 1) >> 1 << 1)
 #define tb_align4(x) 			(((x) + 3) >> 2 << 2)
+#define tb_align8(x) 			(((x) + 7) >> 4 << 4)
 #define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
-
-// offsetof
-#define tb_offsetof(t, x) 		((tb_byte_t*)&(((t*)1)->x) - (tb_byte_t*)1)
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -465,6 +474,7 @@ tb_void_t 	tb_free(tb_void_t* data);
 
 #endif
 
+#if 0
 // new & delete
 #ifdef __cplusplus
 
@@ -484,6 +494,7 @@ __tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() { tb_free(p); 	
 # 		define new 			new(__tb_func__, __tb_line__, __tb_file__)
 # 	endif
 
+#endif
 #endif
 
 // printf
