@@ -25,30 +25,141 @@
  * includes
  */
 #include "prefix.h"
+#include "../../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////
  * implemention 
  */
+
 #if defined(TB_CONFIG_ARCH_x86)
 # 	include "opt/x86/memset.c"
 #elif defined(TB_CONFIG_ARCH_ARM)
 # 	include "opt/arm/memset.c"
 #elif defined(TB_CONFIG_ARCH_SH4)
 # 	include "opt/sh4/memset.c"
-#else
+#endif
+
+
+#ifndef TB_LIBC_STRING_OPT_MEMSET_U8
 tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s, TB_NULL);
 
 	__tb_register__ tb_byte_t* p = s;
+	if (!n) return s;
 
-	while (n) 
+	tb_byte_t b = (tb_byte_t)c;
+#ifdef TB_CONFIG_BINARY_SMALL
+	while (n--) *p++ = b;
+#else
+	tb_size_t l = n & 0x3; n = (n - l) >> 2;
+	while (n--)
 	{
-		*p++ = (tb_byte_t)c;
-		--n;
+		p[0] = b;
+		p[1] = b;
+		p[2] = b;
+		p[3] = b;
+		p += 4;
 	}
 
+	while (l--) *p++ = b;
+#endif
 	return s;
 }
-
 #endif
+
+#ifndef TB_LIBC_STRING_OPT_MEMSET_U16
+tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+
+	// align by 2-bytes 
+	TB_ASSERT(!(((tb_size_t)s) & 0x1));
+
+	__tb_register__ tb_uint16_t* p = s;
+	if (!n) return s;
+
+	tb_uint16_t b = (tb_uint16_t)c;
+
+#ifdef TB_CONFIG_BINARY_SMALL
+	while (n--) *p++ = b;
+#else
+	tb_size_t l = n & 0x3; n = (n - l) >> 2;
+	while (n--)
+	{
+		p[0] = b;
+		p[1] = b;
+		p[2] = b;
+		p[3] = b;
+		p += 4;
+	}
+
+	while (l--) *p++ = b;
+#endif
+	return s;
+}
+#endif
+
+#ifndef TB_LIBC_STRING_OPT_MEMSET_U24
+tb_void_t* tb_memset_u24(tb_void_t* s, tb_size_t c, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+
+	__tb_register__ tb_byte_t* p = s;
+	if (!n) return s;
+
+	tb_byte_t* e = p + (n * 3);
+#ifdef TB_CONFIG_BINARY_SMALL
+	for (; p < e; p += 3) tb_bits_set_u24_ne(p, c);
+#else
+	tb_size_t l = n & 0x3; n -= l;
+	while (p < e)
+	{
+		tb_bits_set_u24_ne(p + 0, c);
+		tb_bits_set_u24_ne(p + 3, c);
+		tb_bits_set_u24_ne(p + 6, c);
+		tb_bits_set_u24_ne(p + 9, c);
+		p += 12;
+	}
+
+	while (l--)
+	{
+		tb_bits_set_u24_ne(p, c);
+		p += 3;
+	}
+#endif
+	return s;
+}
+#endif
+
+#ifndef TB_LIBC_STRING_OPT_MEMSET_U32
+tb_void_t* tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+
+	// align by 4-bytes 
+	TB_ASSERT(!(((tb_size_t)s) & 0x3));
+
+	__tb_register__ tb_uint32_t* p = s;
+	if (!n) return s;
+
+	tb_uint32_t b = (tb_uint32_t)c;
+#ifdef TB_CONFIG_BINARY_SMALL
+	while (n--) *p++ = b;
+#else
+	tb_size_t l = n & 0x3; n = (n - l) >> 2;
+	while (n--)
+	{
+		p[0] = b;
+		p[1] = b;
+		p[2] = b;
+		p[3] = b;
+		p += 4;
+	}
+
+	while (l--) *p++ = b;
+#endif
+	return s;
+}
+#endif
+
