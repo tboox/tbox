@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memcpy.c
+ * \file		memmov.c
  *
  */
 
@@ -29,45 +29,41 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/memcpy.c"
-#else
-tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
+tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
 
-#ifdef TB_CONFIG_BINARY_SMALL
-	__tb_register__ tb_byte_t* p1 = s1;
-	__tb_register__ tb_byte_t* p2 = s2;
-	if (p1 == p2 || !n) return s1;
-	while (n--) *p1++ = *p2++;
-	return s1;
+#if 0
+	tb_int_t reg, edi;
+	__tb_asm__ __tb_volatile__
+	(
+		/* Most of the time, count is divisible by 4 and nonzero */
+		/* It's better to make this case faster */
+		/*	"	jecxz	9f\n" - (optional) count == 0: goto ret */
+		" 	mov	%%ecx, %1\n"
+		" 	shr	$2, %%ecx\n"
+		" 	jz	1f\n" /* zero words: goto fill_bytes */
+		/* extend 8-bit fill to 32 bits */
+		" 	movzx	%%al, %%eax\n" /* 3 bytes */
+		/* or:	"	and	$0xff, %%eax\n" - 5 bytes */
+		" 	imul	$0x01010101, %%eax\n" /* 6 bytes */
+		/* fill full words */
+		" 	rep; stosl\n"
+		/* fill 0-3 bytes */
+		"1:	and	$3, %1\n"
+		"	jz	9f\n" /* (count & 3) == 0: goto end */
+		"2:	stosb\n"
+		"	dec	%1\n"
+		"	jnz	2b\n"
+		/* end */
+		"9:\n"
+
+		: "=&D" (edi), "=&r" (reg)
+		: "0" (s), "a" (c), "c" (n)
+ 		: "memory"
+	);
+	return s;
 #else
-	__tb_register__ tb_byte_t* p1 = s1;
-	__tb_register__ tb_byte_t* p2 = s2;
-	if (p1 == p2 || !n) return s1;
-	
-	tb_size_t l = n & 0x3;
-	n -= l;
-
-#error n-=4
-	while (n--)
-	{
-		p1[0] = p2[0];
-		p1[1] = p2[1];
-		p1[2] = p2[2];
-		p1[3] = p2[3];
-		p1 += 4;
-		p2 += 4;
-	}
-
-	while (l--) *p1++ = *p2++;
-
-	return s1;
+	return memset(s, c, n);
 #endif
 }
-#endif

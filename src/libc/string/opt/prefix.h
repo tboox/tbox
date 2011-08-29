@@ -17,38 +17,26 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memset.c
+ * \file		prefix.h
  *
  */
+#ifndef TB_LIBC_STRING_OPT_PREFIX_H
+#define TB_LIBC_STRING_OPT_PREFIX_H
+
+// c plus plus
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
-/* /////////////////////////////////////////////////////////
- * implemention 
- */
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/memset.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/memset.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/memset.c"
-#else
-tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
-{
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
 
-	__tb_register__ tb_byte_t* p = s;
-
-	while (n) 
-	{
-		*p++ = (tb_byte_t)c;
-		--n;
-	}
-
-	return s;
+// c plus plus
+#ifdef __cplusplus
 }
+#endif
 
 #endif

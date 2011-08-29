@@ -96,6 +96,9 @@ tbox_C_FILES 		+= \
 					libc/string/stristr \
 					libc/string/strchr
 
+
+#tbox_ASM_FILES 		+= libc/string/memcpy
+
 ifneq ($(TB_CONFIG_PLAT),)
 tbox_C_FILES 		+= \
 					platform/$(TB_CONFIG_PLAT)/file \

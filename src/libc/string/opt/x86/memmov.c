@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memcpy.c
+ * \file		memmov.c
  *
  */
 
@@ -29,45 +29,31 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/memcpy.c"
-#else
-tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
+tb_void_t* tb_memmov(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
-#ifdef TB_CONFIG_BINARY_SMALL
-	__tb_register__ tb_byte_t* p1 = s1;
-	__tb_register__ tb_byte_t* p2 = s2;
-	if (p1 == p2 || !n) return s1;
-	while (n--) *p1++ = *p2++;
-	return s1;
+#if 0
+	tb_int_t eax, ecx, esi, edi;
+	__tb_asm__ __tb_volatile__
+	(
+		" 	movl 	%%eax, %%edi\n"
+		" 	cmpl 	%%esi, %%eax\n"
+		" 	je		2f\n" /* (optional) s2 == s1 -> NOP */
+		" 	jb		1f\n" /* s2 > s1 -> simple copy */
+		" 	leal	-1(%%esi,%%ecx), %%esi\n"
+		" 	leal 	-1(%%eax,%%ecx), %%edi\n"
+		" 	std\n"
+		"1:	rep; 	movsb\n"
+		" 	cld\n"
+		"2:\n"
+
+		: "=&c" (ecx), "=&S" (esi), "=&a" (eax), "=&D" (edi)
+		: "0" (n), "1" (s2), "2" (s1)
+		: "memory"
+	);
+	return (tb_void_t*)eax;
 #else
-	__tb_register__ tb_byte_t* p1 = s1;
-	__tb_register__ tb_byte_t* p2 = s2;
-	if (p1 == p2 || !n) return s1;
-	
-	tb_size_t l = n & 0x3;
-	n -= l;
-
-#error n-=4
-	while (n--)
-	{
-		p1[0] = p2[0];
-		p1[1] = p2[1];
-		p1[2] = p2[2];
-		p1[3] = p2[3];
-		p1 += 4;
-		p2 += 4;
-	}
-
-	while (l--) *p1++ = *p2++;
-
-	return s1;
+	return memmove(s1, s2, n);
 #endif
 }
-#endif
