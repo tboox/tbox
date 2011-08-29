@@ -64,7 +64,6 @@ tbox_C_FILES 		+= \
 					format/htm \
 					format/txt \
 					utils/time \
-					utils/conv \
 					utils/md5 \
 					utils/sha \
 					utils/crc \
@@ -78,6 +77,7 @@ tbox_C_FILES 		+= \
 					libc/stdio/sprintf \
 					libc/stdio/snprintf \
 					libc/stdio/vsnprintf \
+					libc/stdlib/stdlib \
 					libc/string/memset \
 					libc/string/memcpy \
 					libc/string/memmov \
@@ -170,7 +170,6 @@ INC_FILES 			= \
 					utils/prefix.h \
 					utils/utils.h \
 					utils/bits.h \
-					utils/conv.h \
 					utils/time.h \
 					utils/sha.h \
 					utils/md5.h \
@@ -193,14 +192,16 @@ INC_FILES 			= \
 					zip/gzip.h \
 					libc/prefix.h \
 					libc/libc.h \
+					libc/ctype.h \
+					libc/limits.h \
+					libc/stdarg.h \
+					libc/stdlib/prefix.h \
+					libc/stdlib/stdlib.h \
 					libc/stdio/prefix.h \
 					libc/stdio/stdio.h \
 					libc/string/prefix.h \
 					libc/string/string.h \
 					libs/prefix.h \
-					libs/ctype.h \
-					libs/limits.h \
-					libs/stdarg.h \
 					libs/libs.h 
 
 # zlib files

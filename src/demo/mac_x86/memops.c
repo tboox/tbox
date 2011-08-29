@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 	memset(data, 0, size);
 
 	dt = tb_mclock();
-	for (i = 0; i < 1000000; i++) tb_memset_u8(data, 0xbeef, 1024 + 3);
+	for (i = 0; i < 1000000; i++) tb_memset(data, 0xbeef, 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
 	tb_printf("u8 x 1k: %lld ms\n", dt);
 	if (!check_memset_u8(data, 0xbeef, 1024 + 3)) tb_printf("check failed\n");
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 	memset(data, 0, size);
 
 	dt = tb_mclock();
-	for (i = 0; i < 1000; i++) tb_memset_u8(data, 0xbeef, 1024 * 1024 + 3);
+	for (i = 0; i < 1000; i++) tb_memset(data, 0xbeef, 1024 * 1024 + 3);
 	dt = tb_int64_sub(tb_mclock(), dt);
 	tb_printf("u8 x 1m: %lld ms\n", dt);
 	if (!check_memset_u8(data, 0xbeef, 1024 * 1024 + 3)) tb_printf("check failed\n");

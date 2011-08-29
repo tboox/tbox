@@ -24,8 +24,7 @@
  * includes
  */
 #include "slist.h"
-#include "../math/math.h"
-#include "../memory/memory.h"
+#include "../libc/libc.h"
 #include "../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////

@@ -25,7 +25,7 @@
  * includes
  */
 #include "base32.h"
-#include "conv.h"
+#include "../libc/libc.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -131,7 +131,7 @@ tb_size_t tb_base32_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	for ( ; i < in; ++i)
 	{
 		// loopup
-		tb_int_t lookup = TB_CONV_TOUPPER(ib[i]) - '0';
+		tb_int_t lookup = tb_toupper(ib[i]) - '0';
 		if (lookup < 0 || lookup >= 43) w = 0xff;
 		else w = table[lookup][1];
 		if (w == 0xff) continue;

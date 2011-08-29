@@ -24,7 +24,7 @@
  * includes
  */
 #include "pool.h"
-#include "../memory/memory.h"
+#include "../libc/libc.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

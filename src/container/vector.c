@@ -24,7 +24,7 @@
  * includes
  */
 #include "vector.h"
-#include "../memory/memory.h"
+#include "../libc/libc.h"
 #include "../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////

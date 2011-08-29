@@ -554,7 +554,7 @@ tb_int_t tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_
 	tb_char_t const* e = s + n;
 	while (p < e && *p)
 	{
-		if (*p == ch || TB_CONV_TOLOWER(*p) == TB_CONV_TOLOWER(ch)) break;
+		if (*p == ch || tb_tolower(*p) == tb_tolower(ch)) break;
 		p++;
 	}
 	return (p < e)? (p - s) : -1;
@@ -602,7 +602,7 @@ tb_int_t tb_string_reverse_find_char_nocase(tb_string_t const* string, tb_char_t
 	tb_char_t const* p = s + n - 1;
 	while (p >= b && *p)
 	{
-		if (*p == ch || TB_CONV_TOLOWER(*p) == TB_CONV_TOLOWER(ch)) break;
+		if (*p == ch || tb_tolower(*p) == tb_tolower(ch)) break;
 		p--;
 	}
 	return (p >= b)? (p - s) : -1;

@@ -36,6 +36,7 @@ extern "C" {
 #include "limits.h"
 #include "stdarg.h"
 #include "stdio/stdio.h"
+#include "stdlib/stdlib.h"
 #include "string/string.h"
 
 
