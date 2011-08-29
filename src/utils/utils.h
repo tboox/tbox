@@ -34,7 +34,6 @@ extern "C" {
  */
 #include "prefix.h"
 #include "time.h"
-#include "conv.h"
 #include "bits.h"
 #include "sha.h"
 #include "md5.h"

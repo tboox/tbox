@@ -37,7 +37,7 @@
 # 	define tb_float_to_fixed16(x) 	tb_float_to_fixed16_asm(x)
 #endif
 
-#define tb_fixed16_mul(x) 			tb_fixed16_mul_asm(x)
+//#define tb_fixed16_mul(x) 			tb_fixed16_mul_asm(x)
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -61,6 +61,7 @@ static __tb_inline__ tb_fixed16_t const tb_float_to_fixed16_asm(tb_float_t x)
 }
 #endif
 
+#if 0
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_t y)
 {
 	__tb_register__ tb_fixed16_t t;
@@ -73,7 +74,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_
 				);
 	return x;
 }
-
+#endif
 
 #endif
 

@@ -3,10 +3,10 @@ include $(PRO_DIR)/prefix.mak
 
 # module name
 NAMES = test \
-		conv \
 		time \
 		http \
 		bits \
+		stdlib \
 		sint64 \
 		uint64 \
 		scalar \

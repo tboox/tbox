@@ -25,6 +25,7 @@
  * includes
  */
 #include "http.h"
+#include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
@@ -223,7 +224,7 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		pe = port + 12 - 1;
 		for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
 		*pb = '\0';
-		http->option.port = TB_CONV_S10TOU32(port);
+		http->option.port = tb_s10tou32(port);
 	}
 	else http->option.port = http->option.bhttps? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
 	//TB_DBG("[http]::port: %d", http->option.port);
@@ -539,7 +540,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 	if (!line_idx)
 	{
 #if 0 // skip "HTTP/1.1"
-		while (!TB_CONV_ISSPACE(*p) && *p != '\0') p++;
+		while (!tb_isspace(*p) && *p != '\0') p++;
 #else
 		while (*p != '.' && *p != '\0') p++;
 		p++;
@@ -550,9 +551,9 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 #endif
 
 		// skip spaces
-		while (TB_CONV_ISSPACE(*p)) p++;
+		while (tb_isspace(*p)) p++;
 
-		http->status.code = TB_CONV_S10TOU32(p);
+		http->status.code = tb_s10tou32(p);
 		//TB_DBG("[http]::code: %d", http->status.code);
 
 		// check error code: 4xx & 5xx
@@ -566,7 +567,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		*p = '\0';
 		tag = line;
 		p++;
-		while (TB_CONV_ISSPACE(*p)) p++;
+		while (tb_isspace(*p)) p++;
 
 		// parse location
 		if (!tb_cstring_compare_nocase(tag, "Location")) 
@@ -597,7 +598,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		// parse content size
 		else if (!tb_cstring_compare_nocase (tag, "Content-Length"))
 		{
-			http->status.content_size = TB_CONV_S10TOU32(p);
+			http->status.content_size = tb_s10tou32(p);
 		}
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!tb_cstring_compare_nocase (tag, "Content-Range"))
@@ -606,10 +607,10 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			if (!tb_cstring_ncompare(p, "bytes ", 6)) 
 			{
 				p += 6;
-				offset = TB_CONV_S10TOU32(p);
+				offset = tb_s10tou32(p);
 				tb_int_t slash = tb_cstring_find_char(p, '/');
 				if (slash >= 0 && tb_cstring_size(p + slash) > 0)
-					filesize = TB_CONV_S10TOU32(p + slash + 1);
+					filesize = tb_s10tou32(p + slash + 1);
 				//TB_DBG("[http]::range: %d - %d", offset, filesize);
 			}
 			// no stream, be able to seek
@@ -1144,7 +1145,7 @@ tb_int_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		if (!http->status.chunked_size)
 		{
 			tb_char_t const* line = tb_http_read_line(http);
-			if (line) http->status.chunked_size = TB_CONV_S16TOU32(line);
+			if (line) http->status.chunked_size = tb_s16tou32(line);
 			//TB_DBG("[http]::chunk: %s %d", line, http->status.chunked_size);
 
 			// is end?

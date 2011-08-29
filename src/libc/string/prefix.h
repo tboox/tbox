@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-#include "../ctype.h"
 
 
 // c plus plus

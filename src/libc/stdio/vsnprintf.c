@@ -127,7 +127,7 @@ typedef struct __tb_printf_entry_t
 static tb_int_t tb_skip_atoi(tb_char_t const** s)
 {
 	tb_int_t i = 0;
-	while (TB_CONV_ISDIGIT(**s)) 
+	while (tb_isdigit(**s)) 
 		i = i * 10 + *((*s)++) - '0';
 	return i;
 }
@@ -608,7 +608,7 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
 
 	// get field width
 	e->width = -1;
-	if (TB_CONV_ISDIGIT(*p)) e->width = tb_skip_atoi(&p);
+	if (tb_isdigit(*p)) e->width = tb_skip_atoi(&p);
 	else if (*p == '*') 
 	{
 		// it's the next argument
@@ -622,7 +622,7 @@ get_precision:
 	if (*p == '.')
 	{
 		++p;
-		if (TB_CONV_ISDIGIT(*p)) 
+		if (tb_isdigit(*p)) 
 		{
 			e->precision = tb_skip_atoi(&p);
 			if (e->precision < 0) e->precision = 0;

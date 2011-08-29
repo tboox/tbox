@@ -100,7 +100,7 @@ tb_int_t tb_cstring_find_nocase(tb_char_t const* s1, tb_char_t const* s2)
 			idx = ps - s1;
 			break;
 		}
-		if (*p2 == *p1 || TB_CONV_TOLOWER(*p2) == TB_CONV_TOLOWER(*p1))
+		if (*p2 == *p1 || tb_tolower(*p2) == tb_tolower(*p1))
 		{
 			++p2;
 			++p1;
@@ -127,8 +127,8 @@ tb_int_t tb_cstring_find_char_nocase(tb_char_t const* s, tb_char_t c)
 {
 	TB_ASSERT_RETURN_VAL(s, -1);
 	tb_char_t const* b = s;
-	c = TB_CONV_TOLOWER(c);
-	while (*s && TB_CONV_TOLOWER(*s) == c) return s - b;
+	c = tb_tolower(c);
+	while (*s && tb_tolower(*s) == c) return s - b;
 	return -1;
 }
 

@@ -28,6 +28,7 @@
  */
 #include "prefix.h"
 #include "../utils/utils.h"
+#include "../libc/libc.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * types
@@ -57,15 +58,15 @@ static __tb_inline__ tb_int_t tb_cstring_compare_nocase(tb_char_t const* s1, tb_
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2) return 0;
-	for (; ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))) && *s1; s1++, s2++) ;
-	return (TB_CONV_TOLOWER(*s1) - TB_CONV_TOLOWER(*s2));
+	for (; ((*s1 == *s2) || (tb_tolower(*s1) == tb_tolower(*s2))) && *s1; s1++, s2++) ;
+	return (tb_tolower(*s1) - tb_tolower(*s2));
 }
 static __tb_inline__ tb_int_t tb_cstring_ncompare_nocase(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	TB_ASSERT(s1 && s2);
 	if (s1 == s2 || !n) return 0;
-	for (; ((*s1 == *s2) || (TB_CONV_TOLOWER(*s1) == TB_CONV_TOLOWER(*s2))) && *s1 && --n; s1++, s2++) ;
-	return (TB_CONV_TOLOWER(*s1) - TB_CONV_TOLOWER(*s2));
+	for (; ((*s1 == *s2) || (tb_tolower(*s1) == tb_tolower(*s2))) && *s1 && --n; s1++, s2++) ;
+	return (tb_tolower(*s1) - tb_tolower(*s2));
 }
 
 // length
