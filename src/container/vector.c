@@ -252,23 +252,7 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const
 	if (osize != index) tb_memmov(data + (index + 1) * step, data + index * step, (osize - index) * step);
 
 	// copy data
-	switch (step)
-	{
-	case 4:
-		data += index << 2;
-		tb_bits_set_u32_ne(data, tb_bits_get_u32_ne(item));
-		break;
-	case 2:
-		data += index << 1;
-		tb_bits_set_u16_ne(data, tb_bits_get_u16_ne(item));
-		break;
-	case 1:
-		*(data + index) = *item;
-		break;
-	default:
-		tb_memcpy(data + index * step, item, step);
-		break;
-	}
+	tb_memcpy(data + index * step, item, step);
 }
 tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_byte_t const* item)
 {
@@ -341,23 +325,7 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t cons
 	if (vector->dtor) vector->dtor(data + index * step, vector->priv);
 
 	// copy data
-	switch (step)
-	{
-	case 4:
-		data += index << 2;
-		tb_bits_set_u32_ne(data, tb_bits_get_u32_ne(item));
-		break;
-	case 2:
-		data += index << 1;
-		tb_bits_set_u16_ne(data, tb_bits_get_u16_ne(item));
-		break;
-	case 1:
-		*(data + index) = *item;
-		break;
-	default:
-		tb_memcpy(data + index * step, item, step);
-		break;
-	}
+	tb_memcpy(data + index * step, item, step);
 }
 tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_byte_t const* item)
 {

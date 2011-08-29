@@ -99,9 +99,8 @@ tb_void_t tb_pool_destroy(tb_pool_t* pool)
 }
 tb_size_t tb_pool_alloc(tb_pool_t* pool)
 {
-	TB_ASSERT(pool);
+	TB_ASSERT_RETURN_VAL(pool, 0);
 
-	// {
 	tb_size_t item = 0;
 
 	// try allocating from the predicted item
@@ -177,7 +176,6 @@ tb_size_t tb_pool_alloc(tb_pool_t* pool)
 	TB_ASSERT(item && item < 1 + pool->maxn);
 	if (item > pool->maxn) item = 0;
 	return item;
-	// }
 }
 tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 {
