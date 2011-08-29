@@ -25,10 +25,10 @@
  * includes
  */
 #include "prefix.h"
-#include "../math/math.h"
-#include "../utils/utils.h"
-#include "../string/string.h"
-#include "../memory/memory.h"
+#include "../../math/math.h"
+#include "../../utils/utils.h"
+#include "../../string/string.h"
+#include "../../memory/memory.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros

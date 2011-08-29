@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
+#ifndef TB_LIBC_STDIO_PREFIX_H
+#define TB_LIBC_STDIO_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-#include "stdarg.h"
+
 
 // c plus plus
 #ifdef __cplusplus

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		limits.h
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
+#ifndef TB_LIBC_LIMITS_H
+#define TB_LIBC_LIMITS_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,8 +31,11 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
 
 // c plus plus
 #ifdef __cplusplus

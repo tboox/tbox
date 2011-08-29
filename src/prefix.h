@@ -497,21 +497,6 @@ __tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() { tb_free(p); 	
 #endif
 #endif
 
-// printf
-tb_void_t 	tb_printf(tb_char_t const* fmt, ...);
-tb_int_t 	tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...);
-tb_int_t 	tb_snprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, ...);
-
-// memops
-tb_void_t 	tb_memcpy(tb_void_t* dst, tb_void_t const* src, tb_size_t size);
-tb_void_t 	tb_memmov(tb_void_t* dst, tb_void_t const* src, tb_size_t size);
-tb_void_t 	tb_memset(tb_void_t* dst, tb_size_t src, tb_size_t size);
-
-tb_void_t 	tb_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size);
-tb_void_t 	tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size);
-tb_void_t 	tb_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size);
-tb_void_t 	tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size);
-
 
 // c plus plus
 #ifdef __cplusplus
