@@ -100,7 +100,7 @@ static tb_uint32_t const K256[64] =
 static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_uint8_t const buffer[64])
 {
 	tb_uint32_t block[80];
-	tb_size_t 	i, a, b, c, d, e;
+	tb_uint32_t 	i, a, b, c, d, e;
 
 	a = state[0];
 	b = state[1];
@@ -186,7 +186,7 @@ static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_uint8_t const bu
 
 static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buffer[64])
 {
-	tb_size_t 	i, a, b, c, d, e, f, g, h;
+	tb_uint32_t 	i, a, b, c, d, e, f, g, h;
 	tb_uint32_t block[64];
 	tb_uint32_t T1, T2;
 
@@ -312,15 +312,15 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 
 	tb_sha_spank(sha, (tb_byte_t*)&count, 8);
 
-	tb_size_t i = 0;
-	tb_size_t n = sha->digest_len;
+	tb_uint32_t i = 0;
+	tb_uint32_t n = sha->digest_len;
 	TB_ASSERT((n << 2) <= size);
 	for (i = 0; i < n; i++)
 		tb_bits_set_u32_be(data + (i << 2), sha->state[i]);
 }
 tb_void_t tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
 {
-	tb_size_t i, j;
+	tb_uint32_t i, j;
 
 	j = tb_uint64_to_uint32(sha->count) & 63;
 	sha->count = tb_uint64_add_uint32(sha->count, size);
