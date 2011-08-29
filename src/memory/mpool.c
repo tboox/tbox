@@ -25,7 +25,7 @@
  * includes
  */
 #include "mpool.h"
-#include "memops.h"
+#include "../libc/libc.h"
 
 /*!structure
  *

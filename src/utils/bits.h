@@ -57,97 +57,220 @@ extern "C" {
 #define tb_bits_set_s8(p, x) 		tb_bits_set_u8(p, x)
 
 // 16-bits
-#define tb_bits_get_u16_le(p) 		(*((p) + 1) << 8 | *(p))
-#define tb_bits_get_s16_le(p) 		(*((p) + 1) << 8 | *(p))
-#define tb_bits_get_u16_be(p) 		(*((p)) << 8 | *((p) + 1))
-#define tb_bits_get_s16_be(p) 		(*((p)) << 8 | *((p) + 1))
-#define tb_bits_get_u16_ne(p) 		(*((tb_uint16_t*)(p)))
-#define tb_bits_get_s16_ne(p) 		(*((tb_sint16_t*)(p)))
-//#define tb_bits_get_u16(p) 			tb_bits_get_u16_ne(p)
-//#define tb_bits_get_s16(p) 			tb_bits_get_s16_ne(p)
+#define tb_bits_get_u16_le_(p) 		(*((p) + 1) << 8 | *(p))
+#define tb_bits_get_s16_le_(p) 		tb_bits_get_u16_le_(p)
+#define tb_bits_get_u16_be_(p) 		(*((p)) << 8 | *((p) + 1))
+#define tb_bits_get_s16_be_(p) 		tb_bits_get_u16_be_(p)
+#define tb_bits_get_u16_ne_(p) 		(*((tb_uint16_t*)(p)))
+#define tb_bits_get_s16_ne_(p) 		tb_bits_get_u16_ne_(p)
 
-#define tb_bits_set_u16_le(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; } while (0)
-#define tb_bits_set_s16_le(p, x) 	tb_bits_set_u16_le(p, x)
-#define tb_bits_set_u16_be(p, x) 	do { *(p) = ((x) >> 8) & 0xff; *((p) + 1) = (x) & 0xff; } while (0)
-#define tb_bits_set_s16_be(p, x) 	tb_bits_set_u16_be(p, x)
-#define tb_bits_set_u16_ne(p, x) 	do { *((tb_uint16_t*)(p)) = (tb_uint16_t)(x); } while (0)
-#define tb_bits_set_s16_ne(p, x) 	do { *((tb_sint16_t*)(p)) = (tb_sint16_t)(x); } while (0)
-//#define tb_bits_set_u16(p, x) 		tb_bits_set_u16_ne(p, x)
-//#define tb_bits_set_s16(p, x) 		tb_bits_set_s16_ne(p, x)
+#define tb_bits_set_u16_le_(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; } while (0)
+#define tb_bits_set_s16_le_(p, x) 	tb_bits_set_u16_le_(p, x)
+#define tb_bits_set_u16_be_(p, x) 	do { *(p) = ((x) >> 8) & 0xff; *((p) + 1) = (x) & 0xff; } while (0)
+#define tb_bits_set_s16_be_(p, x) 	tb_bits_set_u16_be_(p, x)
+#define tb_bits_set_u16_ne_(p, x) 	do { *((tb_uint16_t*)(p)) = (tb_uint16_t)(x); } while (0)
+#define tb_bits_set_s16_ne_(p, x) 	tb_bits_set_u16_ne_(p, x)
 
 // 24-bits
-#define tb_bits_get_u24_le(p) 		(*((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
-#define tb_bits_get_s24_le(p) 		(*((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
-#define tb_bits_get_u24_be(p) 		(*(p) << 16 | *((p) + 1) << 8 | *((p) + 2))
-#define tb_bits_get_s24_be(p) 		(*(p) << 16 | *((p) + 1) << 8 | *((p) + 2))
-#define tb_bits_get_u24_ne(p) 		(*((tb_uint32_t*)(p)) & 0x00ffffff)
-#define tb_bits_get_s24_ne(p) 		(*((tb_sint32_t*)(p)) & 0x80ffffff)
-//#define tb_bits_get_u24(p) 			tb_bits_get_u24_ne(p)
-//#define tb_bits_get_s24(p) 			tb_bits_get_s24_ne(p)
+#define tb_bits_get_u24_le_(p) 		(*((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
+#define tb_bits_get_s24_le_(p) 		tb_bits_get_u24_le_(p)
+#define tb_bits_get_u24_be_(p) 		(*(p) << 16 | *((p) + 1) << 8 | *((p) + 2))
+#define tb_bits_get_s24_be_(p) 		tb_bits_get_u24_be_(p)
+#define tb_bits_get_u24_ne_(p) 		(*((tb_uint32_t*)(p)) & 0x00ffffff)
+#define tb_bits_get_s24_ne_(p) 		(*((tb_sint32_t*)(p)) & 0x80ffffff)
 
-#define tb_bits_set_u24_le(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = ((x) >> 16) & 0xff;} while (0)
-#define tb_bits_set_s24_le(p, x) 	tb_bits_set_u24_le(p, x)
-#define tb_bits_set_u24_be(p, x) 	do { *(p) = ((x) >> 16) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = (x) & 0xff; } while (0)
-#define tb_bits_set_s24_be(p, x) 	tb_bits_set_u24_be(p, x)
-#define tb_bits_set_u24_ne(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x) & 0x00ffffff; } while (0)
-#define tb_bits_set_s24_ne(p, x) 	do { *((tb_sint32_t*)(p)) = (tb_sint32_t)(x) & 0x00ffffff; } while (0)
-//#define tb_bits_set_u24(p, x) 		tb_bits_set_u24_ne(p, x)
-//#define tb_bits_set_s24(p, x) 		tb_bits_set_s24_ne(p, x)
+#define tb_bits_set_u24_le_(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = ((x) >> 16) & 0xff;} while (0)
+#define tb_bits_set_s24_le_(p, x) 	tb_bits_set_u24_le(p, x)
+#define tb_bits_set_u24_be_(p, x) 	do { *(p) = ((x) >> 16) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = (x) & 0xff; } while (0)
+#define tb_bits_set_s24_be_(p, x) 	tb_bits_set_u24_be(p, x)
+#define tb_bits_set_u24_ne_(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x) & 0x00ffffff; } while (0)
+#define tb_bits_set_s24_ne_(p, x) 	tb_bits_set_u24_ne_(p, x)
 
 // 32-bits
-#define tb_bits_get_u32_le(p) 		(*((p) + 3) << 24 | *((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
-#define tb_bits_get_s32_le(p) 		(*((p) + 3) << 24 | *((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
-#define tb_bits_get_u32_be(p) 		(*(p) << 24 | *((p) + 1) << 16 | *((p) + 2) << 8 | *((p) + 3))
-#define tb_bits_get_s32_be(p) 		(*(p) << 24 | *((p) + 1) << 16 | *((p) + 2) << 8 | *((p) + 3))
-#define tb_bits_get_u32_ne(p) 		(*((tb_uint32_t*)(p)))
-#define tb_bits_get_s32_ne(p) 		(*((tb_sint32_t*)(p)))
-//#define tb_bits_get_u32(p) 			tb_bits_get_u32_ne(p)
-//#define tb_bits_get_s32(p) 			tb_bits_get_s32_ne(p)
+#define tb_bits_get_u32_le_(p) 		(*((p) + 3) << 24 | *((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
+#define tb_bits_get_s32_le_(p) 		tb_bits_get_u32_le_(p)
+#define tb_bits_get_u32_be_(p) 		(*(p) << 24 | *((p) + 1) << 16 | *((p) + 2) << 8 | *((p) + 3))
+#define tb_bits_get_s32_be_(p) 		tb_bits_get_u32_be_(p)
+#define tb_bits_get_u32_ne_(p) 		(*((tb_uint32_t*)(p)))
+#define tb_bits_get_s32_ne_(p) 		tb_bits_get_u32_ne_(p)
 
-#define tb_bits_set_u32_le(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = ((x) >> 16) & 0xff; *((p) + 3) = ((x) >> 24) & 0xff;} while (0)
-#define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le(p, x)
-#define tb_bits_set_u32_be(p, x) 	do { *(p) = ((x) >> 24) & 0xff; *((p) + 1) = ((x) >> 16) & 0xff; *((p) + 2) = ((x) >> 8) & 0xff; *((p) + 3) = (x) & 0xff; } while (0)
-#define tb_bits_set_s32_be(p, x) 	tb_bits_set_u32_be(p, x)
-#define tb_bits_set_u32_ne(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x); } while (0)
-#define tb_bits_set_s32_ne(p, x) 	do { *((tb_sint32_t*)(p)) = (tb_sint32_t)(x); } while (0)
-//#define tb_bits_set_u32(p, x) 		tb_bits_set_u32_ne(p, x)
-//#define tb_bits_set_s32(p, x) 		tb_bits_set_s32_ne(p, x)
+#define tb_bits_set_u32_le_(p, x) 	do { *(p) = (x) & 0xff; *((p) + 1) = ((x) >> 8) & 0xff; *((p) + 2) = ((x) >> 16) & 0xff; *((p) + 3) = ((x) >> 24) & 0xff;} while (0)
+#define tb_bits_set_s32_le_(p, x) 	tb_bits_set_u32_le_(p, x)
+#define tb_bits_set_u32_be_(p, x) 	do { *(p) = ((x) >> 24) & 0xff; *((p) + 1) = ((x) >> 16) & 0xff; *((p) + 2) = ((x) >> 8) & 0xff; *((p) + 3) = (x) & 0xff; } while (0)
+#define tb_bits_set_s32_be_(p, x) 	tb_bits_set_u32_be_(p, x)
+#define tb_bits_set_u32_ne_(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x); } while (0)
+#define tb_bits_set_s32_ne_(p, x) 	tb_bits_set_u32_ne_(p, x)
 
-// swap
-#ifndef tb_bits_swap_u16
-# 	define tb_bits_swap_u16(x) 		tb_bits_swap_u16_inline(x)
-#endif
+#ifdef TB_CONFIG_MEMORY_UNALIGNED_ACCESSE_ENABLE
 
-#ifndef tb_bits_swap_u32
-# 	define tb_bits_swap_u32(x) 		tb_bits_swap_u32_inline(x)
-#endif
+# 	ifdef TB_WORDS_BIGENDIAN
+// 16-bits
+# 	define tb_bits_get_u16_le(p) 		tb_bits_get_u16_le_(p)
+# 	define tb_bits_get_s16_le(p) 		tb_bits_get_s16_le_(p)
+# 	define tb_bits_get_u16_be(p) 		tb_bits_get_u16_ne_(p)
+# 	define tb_bits_get_s16_be(p) 		tb_bits_get_s16_ne_(p)
 
-#ifndef tb_bits_swap_u64
-# 	define tb_bits_swap_u64(x) 		tb_bits_swap_u64_inline(x)
+# 	define tb_bits_set_u16_le(p, x) 	tb_bits_set_u16_le_(p, x)
+# 	define tb_bits_set_s16_le(p, x) 	tb_bits_set_s16_le_(p, x)
+# 	define tb_bits_set_u16_be(p, x) 	tb_bits_set_u16_ne_(p, x)
+# 	define tb_bits_set_s16_be(p, x) 	tb_bits_set_s16_ne_(p, x)
+
+// 24-bits
+# 	define tb_bits_get_u24_le(p) 		tb_bits_get_u24_le_(p)
+# 	define tb_bits_get_s24_le(p) 		tb_bits_get_s24_le_(p)
+# 	define tb_bits_get_u24_be(p) 		tb_bits_get_u24_ne_(p)
+# 	define tb_bits_get_s24_be(p) 		tb_bits_get_s24_ne_(p)
+
+# 	define tb_bits_set_u24_le(p, x) 	tb_bits_set_u24_le_(p, x)
+# 	define tb_bits_set_s24_le(p, x) 	tb_bits_set_s24_le_(p, x)
+# 	define tb_bits_set_u24_be(p, x) 	tb_bits_set_u24_ne_(p, x)
+# 	define tb_bits_set_s24_be(p, x) 	tb_bits_set_s24_ne_(p, x)
+
+// 32-bits
+# 	define tb_bits_get_u32_le(p) 		tb_bits_get_u32_le_(p)
+# 	define tb_bits_get_s32_le(p) 		tb_bits_get_s32_le_(p)
+# 	define tb_bits_get_u32_be(p) 		tb_bits_get_u32_ne_(p)
+# 	define tb_bits_get_s32_be(p) 		tb_bits_get_s32_ne_(p)
+
+# 	define tb_bits_set_u32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_ne_(p, x)
+# 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_ne_(p, x)
+# 	else
+// 16-bits
+# 	define tb_bits_get_u16_le(p) 		tb_bits_get_u16_ne_(p)
+# 	define tb_bits_get_s16_le(p) 		tb_bits_get_s16_ne_(p)
+# 	define tb_bits_get_u16_be(p) 		tb_bits_get_u16_be_(p)
+# 	define tb_bits_get_s16_be(p) 		tb_bits_get_s16_be_(p)
+
+# 	define tb_bits_set_u16_le(p, x) 	tb_bits_set_u16_ne_(p, x)
+# 	define tb_bits_set_s16_le(p, x) 	tb_bits_set_s16_ne_(p, x)
+# 	define tb_bits_set_u16_be(p, x) 	tb_bits_set_u16_be_(p, x)
+# 	define tb_bits_set_s16_be(p, x) 	tb_bits_set_s16_be_(p, x)
+
+// 24-bits
+# 	define tb_bits_get_u24_le(p) 		tb_bits_get_u24_ne_(p)
+# 	define tb_bits_get_s24_le(p) 		tb_bits_get_s24_ne_(p)
+# 	define tb_bits_get_u24_be(p) 		tb_bits_get_u24_be_(p)
+# 	define tb_bits_get_s24_be(p) 		tb_bits_get_s24_be_(p)
+
+# 	define tb_bits_set_u24_le(p, x) 	tb_bits_set_u24_ne_(p, x)
+# 	define tb_bits_set_s24_le(p, x) 	tb_bits_set_s24_ne_(p, x)
+# 	define tb_bits_set_u24_be(p, x) 	tb_bits_set_u24_be_(p, x)
+# 	define tb_bits_set_s24_be(p, x) 	tb_bits_set_s24_be_(p, x)
+
+// 32-bits
+# 	define tb_bits_get_u32_le(p) 		tb_bits_get_u32_ne_(p)
+# 	define tb_bits_get_s32_le(p) 		tb_bits_get_s32_ne_(p)
+# 	define tb_bits_get_u32_be(p) 		tb_bits_get_u32_be_(p)
+# 	define tb_bits_get_s32_be(p) 		tb_bits_get_s32_be_(p)
+
+# 	define tb_bits_set_u32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_be_(p, x)
+# 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_be_(p, x)
+# 	endif
+
+#else
+// 16-bits
+# 	define tb_bits_get_u16_le(p) 		tb_bits_get_u16_le_(p)
+# 	define tb_bits_get_s16_le(p) 		tb_bits_get_s16_le_(p)
+# 	define tb_bits_get_u16_be(p) 		tb_bits_get_u16_be_(p)
+# 	define tb_bits_get_s16_be(p) 		tb_bits_get_s16_be_(p)
+
+# 	define tb_bits_set_u16_le(p, x) 	tb_bits_set_u16_le_(p, x)
+# 	define tb_bits_set_s16_le(p, x) 	tb_bits_set_s16_le_(p, x)
+# 	define tb_bits_set_u16_be(p, x) 	tb_bits_set_u16_be_(p, x)
+# 	define tb_bits_set_s16_be(p, x) 	tb_bits_set_s16_be_(p, x)
+
+// 24-bits
+# 	define tb_bits_get_u24_le(p) 		tb_bits_get_u24_le_(p)
+# 	define tb_bits_get_s24_le(p) 		tb_bits_get_s24_le_(p)
+# 	define tb_bits_get_u24_be(p) 		tb_bits_get_u24_be_(p)
+# 	define tb_bits_get_s24_be(p) 		tb_bits_get_s24_be_(p)
+
+# 	define tb_bits_set_u24_le(p, x) 	tb_bits_set_u24_le_(p, x)
+# 	define tb_bits_set_s24_le(p, x) 	tb_bits_set_s24_le_(p, x)
+# 	define tb_bits_set_u24_be(p, x) 	tb_bits_set_u24_be_(p, x)
+# 	define tb_bits_set_s24_be(p, x) 	tb_bits_set_s24_be_(p, x)
+
+// 32-bits
+# 	define tb_bits_get_u32_le(p) 		tb_bits_get_u32_le_(p)
+# 	define tb_bits_get_s32_le(p) 		tb_bits_get_s32_le_(p)
+# 	define tb_bits_get_u32_be(p) 		tb_bits_get_u32_be_(p)
+# 	define tb_bits_get_s32_be(p) 		tb_bits_get_s32_be_(p)
+
+# 	define tb_bits_set_u32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le_(p, x)
+# 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_be_(p, x)
+# 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_be_(p, x)
 #endif
 
 #ifdef TB_WORDS_BIGENDIAN
-# 	define tb_bits_be_to_ne_u16(x) 	(x)
-# 	define tb_bits_le_to_ne_u16(x) 	tb_bits_swap_u16(x)
-# 	define tb_bits_be_to_ne_u32(x) 	(x)
-# 	define tb_bits_le_to_ne_u32(x) 	tb_bits_swap_u32(x)
-# 	define tb_bits_be_to_ne_u64(x) 	(x)
-# 	define tb_bits_le_to_ne_u64(x) 	tb_bits_swap_u64(x)
+# 	define tb_bits_get_u16_ne(p) 		tb_bits_get_u16_be(p)
+# 	define tb_bits_get_s16_ne(p) 		tb_bits_get_s16_be(p)
+# 	define tb_bits_get_u24_ne(p) 		tb_bits_get_u24_be(p)
+# 	define tb_bits_get_s24_ne(p) 		tb_bits_get_s24_be(p)
+# 	define tb_bits_get_u32_ne(p) 		tb_bits_get_u32_be(p)
+# 	define tb_bits_get_s32_ne(p) 		tb_bits_get_s32_be(p)
+
+# 	define tb_bits_set_u16_ne(p, x) 	tb_bits_set_u16_be(p, x)
+# 	define tb_bits_set_s16_ne(p, x)		tb_bits_set_s16_be(p, x)
+# 	define tb_bits_set_u24_ne(p, x) 	tb_bits_set_u24_be(p, x)
+# 	define tb_bits_set_s24_ne(p, x)		tb_bits_set_s24_be(p, x)
+# 	define tb_bits_set_u32_ne(p, x)		tb_bits_set_u32_be(p, x)
+# 	define tb_bits_set_s32_ne(p, x) 	tb_bits_set_s32_be(p, x)
 #else
-# 	define tb_bits_be_to_ne_u16(x) 	tb_bits_swap_u16(x)
-# 	define tb_bits_le_to_ne_u16(x) 	(x)
-# 	define tb_bits_be_to_ne_u32(x) 	tb_bits_swap_u32(x)
-# 	define tb_bits_le_to_ne_u32(x) 	(x)
-# 	define tb_bits_be_to_ne_u64(x) 	tb_bits_swap_u64(x)
-# 	define tb_bits_le_to_ne_u64(x) 	(x)
+# 	define tb_bits_get_u16_ne(p) 		tb_bits_get_u16_le(p)
+# 	define tb_bits_get_s16_ne(p) 		tb_bits_get_s16_le(p)
+# 	define tb_bits_get_u24_ne(p) 		tb_bits_get_u24_le(p)
+# 	define tb_bits_get_s24_ne(p) 		tb_bits_get_s24_le(p)
+# 	define tb_bits_get_u32_ne(p) 		tb_bits_get_u32_le(p)
+# 	define tb_bits_get_s32_ne(p) 		tb_bits_get_s32_le(p)
+
+# 	define tb_bits_set_u16_ne(p, x) 	tb_bits_set_u16_le(p, x)
+# 	define tb_bits_set_s16_ne(p, x)		tb_bits_set_s16_le(p, x)
+# 	define tb_bits_set_u24_ne(p, x) 	tb_bits_set_u24_le(p, x)
+# 	define tb_bits_set_s24_ne(p, x)		tb_bits_set_s24_le(p, x)
+# 	define tb_bits_set_u32_ne(p, x)		tb_bits_set_u32_le(p, x)
+# 	define tb_bits_set_s32_ne(p, x) 	tb_bits_set_s32_le(p, x)
 #endif
 
-#define tb_bits_ne_to_be_u16(x) 	tb_bits_be_to_ne_u16(x)
-#define tb_bits_ne_to_le_u16(x) 	tb_bits_le_to_ne_u16(x)
-#define tb_bits_ne_to_be_u32(x) 	tb_bits_be_to_ne_u32(x)
-#define tb_bits_ne_to_le_u32(x) 	tb_bits_le_to_ne_u32(x)
-#define tb_bits_ne_to_be_u64(x) 	tb_bits_be_to_ne_u64(x)
-#define tb_bits_ne_to_le_u64(x) 	tb_bits_le_to_ne_u64(x)
+// swap
+#ifndef tb_bits_swap_u16
+# 	define tb_bits_swap_u16(x) 			tb_bits_swap_u16_inline(x)
+#endif
+
+#ifndef tb_bits_swap_u32
+# 	define tb_bits_swap_u32(x) 			tb_bits_swap_u32_inline(x)
+#endif
+
+#ifndef tb_bits_swap_u64
+# 	define tb_bits_swap_u64(x) 			tb_bits_swap_u64_inline(x)
+#endif
+
+#ifdef TB_WORDS_BIGENDIAN
+# 	define tb_bits_be_to_ne_u16(x) 		(x)
+# 	define tb_bits_le_to_ne_u16(x) 		tb_bits_swap_u16(x)
+# 	define tb_bits_be_to_ne_u32(x) 		(x)
+# 	define tb_bits_le_to_ne_u32(x) 		tb_bits_swap_u32(x)
+# 	define tb_bits_be_to_ne_u64(x) 		(x)
+# 	define tb_bits_le_to_ne_u64(x) 		tb_bits_swap_u64(x)
+#else
+# 	define tb_bits_be_to_ne_u16(x) 		tb_bits_swap_u16(x)
+# 	define tb_bits_le_to_ne_u16(x) 		(x)
+# 	define tb_bits_be_to_ne_u32(x) 		tb_bits_swap_u32(x)
+# 	define tb_bits_le_to_ne_u32(x) 		(x)
+# 	define tb_bits_be_to_ne_u64(x) 		tb_bits_swap_u64(x)
+# 	define tb_bits_le_to_ne_u64(x) 		(x)
+#endif
+
+#define tb_bits_ne_to_be_u16(x) 		tb_bits_be_to_ne_u16(x)
+#define tb_bits_ne_to_le_u16(x) 		tb_bits_le_to_ne_u16(x)
+#define tb_bits_ne_to_be_u32(x) 		tb_bits_be_to_ne_u32(x)
+#define tb_bits_ne_to_le_u32(x) 		tb_bits_le_to_ne_u32(x)
+#define tb_bits_ne_to_be_u64(x) 		tb_bits_be_to_ne_u64(x)
+#define tb_bits_ne_to_le_u64(x) 		tb_bits_le_to_ne_u64(x)
 
 /* /////////////////////////////////////////////////////////
  * inline

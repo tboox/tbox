@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "memops.h"
 #include "mpool.h"
 
 

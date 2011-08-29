@@ -51,10 +51,7 @@ tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 	__tb_register__ tb_byte_t* p2 = s2;
 	if (p1 == p2 || !n) return s1;
 	
-	tb_size_t l = n & 0x3;
-	n -= l;
-
-#error n-=4
+	tb_size_t l = n & 0x3; n = (n - l) >> 2;
 	while (n--)
 	{
 		p1[0] = p2[0];
@@ -64,9 +61,7 @@ tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 		p1 += 4;
 		p2 += 4;
 	}
-
 	while (l--) *p1++ = *p2++;
-
 	return s1;
 #endif
 }

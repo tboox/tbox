@@ -38,6 +38,10 @@ extern "C" {
  */
 
 tb_void_t* 	tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n);
+tb_void_t* 	tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n);
+tb_void_t* 	tb_memset_u24(tb_void_t* s, tb_size_t c, tb_size_t n);
+tb_void_t* 	tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n);
+
 tb_void_t* 	tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n);
 tb_void_t* 	tb_memmov(tb_void_t* s1, tb_void_t const* s2, tb_size_t n);
 
