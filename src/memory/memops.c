@@ -24,6 +24,7 @@
  * includes
  */
 #include "memops.h"
+#include "../libc/libc.h"
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -40,13 +41,6 @@
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
-#ifndef TB_MEMOPS_OPT_MEMSET_U8
-tb_void_t tb_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
-{
-	if (dst && size) memset(dst, src, size);
-}
-#endif
 
 #ifndef TB_MEMOPS_OPT_MEMSET_U16
 tb_void_t tb_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
@@ -166,24 +160,4 @@ tb_void_t tb_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 # 	endif
 }
 #endif
-
-tb_void_t tb_memcpy(tb_void_t* dst, tb_void_t const* src, tb_size_t size)
-{
-	if (dst != src && size) memcpy(dst, src, size);
-}
-tb_void_t tb_memmov(tb_void_t* dst, tb_void_t const* src, tb_size_t size)
-{
-	if (dst != src && size) memmove(dst, src, size);
-	
-#if 0
-	tb_byte_t const* p = src;
-	tb_byte_t const* e = p + size;
-	while (p < e) *dst++ = *p++;
-#endif
-}
-
-tb_void_t tb_memset(tb_void_t* dst, tb_size_t src, tb_size_t size)
-{
-	tb_memset_u8(dst, (tb_uint8_t)src, size);
-}
 

@@ -17,26 +17,31 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		strncpy.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+
+	__tb_register__ tb_char_t* s = s1;
+
+	while (n) 
+	{
+		if ((*s = *s2) != 0) s2++; // Need to fill tail with 0s.
+		++s;
+		--n;
+	}
+
+	return s;
 }
-#endif
-
-#endif

@@ -63,9 +63,6 @@ tbox_C_FILES 		+= \
 					format/xml \
 					format/htm \
 					format/txt \
-					libc/sprintf \
-					libc/snprintf \
-					libc/vsnprintf \
 					utils/time \
 					utils/conv \
 					utils/md5 \
@@ -77,7 +74,27 @@ tbox_C_FILES 		+= \
 					xml/node \
 					xml/nlist \
 					xml/reader \
-					xml/writer 
+					xml/writer \
+					libc/stdio/sprintf \
+					libc/stdio/snprintf \
+					libc/stdio/vsnprintf \
+					libc/string/memset \
+					libc/string/memcpy \
+					libc/string/memmov \
+					libc/string/strlen \
+					libc/string/strnlen \
+					libc/string/strcat \
+					libc/string/strcpy \
+					libc/string/strncpy \
+					libc/string/strdup \
+					libc/string/strndup \
+					libc/string/strcmp \
+					libc/string/strncmp \
+					libc/string/stricmp \
+					libc/string/strnicmp \
+					libc/string/strstr \
+					libc/string/stristr \
+					libc/string/strchr
 
 ifneq ($(TB_CONFIG_PLAT),)
 tbox_C_FILES 		+= \
@@ -150,8 +167,6 @@ INC_FILES 			= \
 					stream/gstream.h \
 					format/format.h \
 					format/prefix.h \
-					libc/prefix.h \
-					libc/libc.h \
 					utils/prefix.h \
 					utils/utils.h \
 					utils/bits.h \
@@ -176,7 +191,16 @@ INC_FILES 			= \
 					zip/zlib.h \
 					zip/zlibraw.h \
 					zip/gzip.h \
+					libc/prefix.h \
+					libc/libc.h \
+					libc/stdio/prefix.h \
+					libc/stdio/stdio.h \
+					libc/string/prefix.h \
+					libc/string/string.h \
 					libs/prefix.h \
+					libs/ctype.h \
+					libs/limits.h \
+					libs/stdarg.h \
 					libs/libs.h 
 
 # zlib files

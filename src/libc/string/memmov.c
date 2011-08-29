@@ -17,26 +17,43 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		memmov.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_void_t* tb_memmov(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+
+	__tb_register__ tb_byte_t* 			s = s1;
+	__tb_register__ tb_byte_t const* 	p = s2;
+
+	if (p >= s) 
+	{
+		while (n) 
+		{
+			*s++ = *p++;
+			--n;
+		}
+	} 
+	else 
+	{
+		while (n) 
+		{
+			--n;
+			s[n] = p[n];
+		}
+	}
+
+	return s1;
 }
-#endif
 
-#endif

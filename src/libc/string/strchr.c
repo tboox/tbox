@@ -17,26 +17,28 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		strchr.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+
+	do 
+	{
+		if (*s == c) return (tb_char_t* )s;
+
+	} while (*s++);
+	return TB_NULL;
 }
-#endif
 
-#endif

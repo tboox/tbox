@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "libc.h"
+#include "stdio.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * implemention

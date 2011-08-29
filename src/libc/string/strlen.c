@@ -17,26 +17,25 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		strlen.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_size_t tb_strlen(tb_char_t const* s)
+{
+	TB_ASSERT_RETURN_VAL(s, 0);
+
+	__tb_register__ tb_char_t const* p = s;
+
+	for (p = s; *p; p++);
+	return p - s;
 }
-#endif
-
-#endif

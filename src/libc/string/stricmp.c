@@ -17,26 +17,25 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		stricmp.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_int_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+
+	tb_int_t r = 0;
+	while (((s1 == s2) || !(r = ((tb_int_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
+	return r;
 }
-#endif
 
-#endif

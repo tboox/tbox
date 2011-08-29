@@ -17,26 +17,43 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		strstr.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+
+	__tb_register__ tb_char_t const* s = s1;
+	__tb_register__ tb_char_t const* p = s2;
+
+	do 
+	{
+		if (!*p) return (tb_char_t *)s1;
+		if (*p == *s) 
+		{
+			++p;
+			++s;
+		} 
+		else 
+		{
+			p = s2;
+			if (!*s) return TB_NULL;
+			s = ++s1;
+		}
+
+	} while (1);
+
+	return TB_NULL;
 }
-#endif
 
-#endif

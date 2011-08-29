@@ -17,26 +17,31 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		strdup.c
  *
  */
-#ifndef TB_LIBC_PREFIX_H
-#define TB_LIBC_PREFIX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "stdarg.h"
+#include "prefix.h"
+#include "string.h"
 
-// c plus plus
-#ifdef __cplusplus
+/* /////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_char_t* tb_strdup(tb_char_t const* s)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+
+	__tb_register__ tb_size_t 	n = tb_strlen(s);
+	__tb_register__ tb_char_t* 	p = tb_malloc(n + 1);
+	if (p)
+	{
+		tb_memcpy(p, s, n);
+		p[n] = 0;
+	}
+
+	return p;
 }
-#endif
-
-#endif
