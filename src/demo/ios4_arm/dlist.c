@@ -57,7 +57,7 @@ static tb_size_t tb_dlist_insert_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n + 1);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -86,7 +86,7 @@ static tb_size_t tb_dlist_insert_head_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -115,7 +115,7 @@ static tb_size_t tb_dlist_insert_tail_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -146,7 +146,7 @@ static tb_size_t tb_dlist_ninsert_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n + 1);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -174,7 +174,7 @@ static tb_size_t tb_dlist_ninsert_head_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -202,7 +202,7 @@ static tb_size_t tb_dlist_ninsert_tail_test()
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
 	TB_ASSERT(tb_dlist_const_at(dlist, tb_dlist_head(dlist))[0] == 'F');
-	TB_ASSERT(!tb_cstring_compare("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
+	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at(dlist, tb_dlist_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);

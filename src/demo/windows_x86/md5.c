@@ -5,7 +5,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	tb_byte_t ob[16];
-	tb_size_t on = tb_md5_encode(argv[1], tb_cstring_size(argv[1]), ob, 16);
+	tb_size_t on = tb_md5_encode(argv[1], tb_strlen(argv[1]), ob, 16);
 	if (on != 16) return 0;
 
 	tb_size_t i = 0;

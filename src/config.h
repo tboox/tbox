@@ -44,7 +44,7 @@
 #define TB_CONFIG_KEYWORD_FILE			__FILE__
 
 // type
-//#define TB_CONFIG_TYPE_INT64
+#define TB_CONFIG_TYPE_INT64
 #define TB_CONFIG_TYPE_FLOAT
 #define TB_CONFIG_TYPE_SCALAR_IS_FIXED
 
@@ -67,5 +67,5 @@
 // config
 #ifndef tbox_AUTO_CONFIG_H
 #define tbox_AUTO_CONFIG_H
-#define tbox_CONFIG_DEBUG 0
+#define tbox_CONFIG_DEBUG 1
 #endif

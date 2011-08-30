@@ -27,7 +27,6 @@
 #include "string.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
-#include "../memory/memory.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -297,7 +296,7 @@ tb_char_t const* tb_string_assign_c_string(tb_string_t* string, tb_char_t const*
 	if (c_string) 
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, tb_cstring_size(c_string))) return TB_NULL;
+		if (TB_FALSE == tb_string_resize(string, tb_strlen(c_string))) return TB_NULL;
 
 		// attach string
 		tb_memcpy(string->data, c_string, string->size);
@@ -385,7 +384,7 @@ tb_char_t const* tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t
 
 		// attach string
 		string->data = (tb_byte_t*)c_string;
-		string->size = tb_cstring_size(c_string);
+		string->size = tb_strlen(c_string);
 
 		// readonly
 		string->maxn = 0;
@@ -453,7 +452,7 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		tb_uint16_t size = string->size;
 
 		// get c_string size
-		tb_uint16_t c_size = tb_cstring_size(c_string);
+		tb_uint16_t c_size = tb_strlen(c_string);
 
 		// ensure enough size
 		if (TB_FALSE == tb_string_resize(string, size + c_size)) return TB_NULL;
@@ -526,21 +525,16 @@ tb_int_t tb_string_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t s
 	tb_size_t 			n = tb_string_size(string);
 	if (!s || start < 0 || start >= n) return -1;
 	
-	// find it
-	tb_char_t const* p = s + start;
-	tb_char_t const* e = s + n;
-	while (p < e && *p)
-	{
-		if (*p == ch) break;
-		p++;
-	}
-	return (p < e)? (p - s) : -1;
+	tb_char_t const* p = (tb_char_t const*)tb_strchr(s + start, ch);
+	return (p? p - s : -1);
 }
 tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start)
 {
 	tb_char_t const* s = tb_string_c_string(string);
 	TB_ASSERT_RETURN_VAL(s, -1);
-	return tb_cstring_find(s + start, sub);
+
+	tb_char_t const* p = (tb_char_t const*)tb_strstr(s + start, sub);
+	return (p? p - s : -1);
 }
 tb_int_t tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_int_t start)
 {
@@ -563,7 +557,9 @@ tb_int_t tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t con
 {
 	tb_char_t const* s = tb_string_c_string(string);
 	TB_ASSERT_RETURN_VAL(s, -1);
-	return tb_cstring_find_nocase(s + start, sub);
+
+	tb_char_t const* p = (tb_char_t const*)tb_stristr(s + start, sub);
+	return (p? p - s : -1);
 }
 tb_int_t tb_string_find_string(tb_string_t const* string, tb_string_t const* sub, tb_int_t start)
 {
@@ -616,7 +612,7 @@ tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) return !tb_cstring_compare(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else if (c_string) return !tb_strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string)
@@ -628,7 +624,7 @@ tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_str
 tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string)
 {
 	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
-	else if (c_string) return !tb_cstring_compare_nocase(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
+	else if (c_string) return !tb_stricmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 

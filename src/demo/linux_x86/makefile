@@ -11,8 +11,8 @@ NAMES = test \
 		uint64 \
 		scalar \
 		memops \
+		strops \
 		string \
-		cstring \
 		cookies \
 		gstream \
 		estream \

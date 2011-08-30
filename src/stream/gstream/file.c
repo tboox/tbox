@@ -175,7 +175,7 @@ static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 	case TB_GSTREAM_CMD_SET_URL:
 		{
 			TB_ASSERT_RETURN_VAL(arg1, TB_FALSE);
-			tb_cstring_ncopy(fst->url, (tb_char_t const*)arg1, TB_FSTREAM_URL_MAX);
+			tb_strncpy(fst->url, (tb_char_t const*)arg1, TB_FSTREAM_URL_MAX);
 			fst->url[TB_FSTREAM_URL_MAX - 1] = '\0';
 			return TB_TRUE;
 		}

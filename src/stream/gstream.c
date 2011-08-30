@@ -27,6 +27,7 @@
 #include "gstream.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../string/string.h"
 #include "../platform/platform.h"
@@ -137,7 +138,7 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	tb_gstream_t* 	gst = TB_NULL;
 	for (; i < n; ++i)
 	{
-		if (!tb_cstring_compare(g_gstream_table[i].name, proto))
+		if (!tb_strcmp(g_gstream_table[i].name, proto))
 		{
 			gst = g_gstream_table[i].create();
 			break;

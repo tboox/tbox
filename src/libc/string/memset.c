@@ -27,10 +27,6 @@
 #include "prefix.h"
 #include "../../utils/utils.h"
 
-/* /////////////////////////////////////////////////////////
- * implemention 
- */
-
 #if defined(TB_CONFIG_ARCH_x86)
 # 	include "opt/x86/memset.c"
 #elif defined(TB_CONFIG_ARCH_ARM)
@@ -39,7 +35,9 @@
 # 	include "opt/sh4/memset.c"
 #endif
 
-
+/* /////////////////////////////////////////////////////////
+ * implemention 
+ */
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U8
 tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 {

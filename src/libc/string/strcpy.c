@@ -26,10 +26,19 @@
  */
 #include "prefix.h"
 
+#if defined(TB_CONFIG_ARCH_x86)
+# 	include "opt/x86/strcpy.c"
+#elif defined(TB_CONFIG_ARCH_ARM)
+# 	include "opt/arm/strcpy.c"
+#elif defined(TB_CONFIG_ARCH_SH4)
+# 	include "opt/sh4/strcpy.c"
+#endif
+
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
 
+#ifndef TB_LIBC_STRING_OPT_STRCPY
 tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
@@ -40,4 +49,4 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 
 	return s;
 }
-
+#endif

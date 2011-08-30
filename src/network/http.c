@@ -28,8 +28,6 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
-#include "../memory/memory.h"
-#include "../string/string.h"
 #include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -127,8 +125,8 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 	//TB_DBG("[http]::split: %s", url);
 
 	// get url size
-	tb_int_t n = tb_cstring_size(url);
-	if (n <= 0) return TB_FALSE;
+	tb_size_t n = tb_strlen(url);
+	if (!n) return TB_FALSE;
 
 	// get url pointer
 	tb_char_t const* p = url;
@@ -171,14 +169,14 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		// save root path
 		if (p[0] == '/')
 		{
-			tb_cstring_ncopy(http->option.path, p, TB_HTTP_PATH_MAX);
+			tb_strncpy(http->option.path, p, TB_HTTP_PATH_MAX);
 			http->option.path[TB_HTTP_PATH_MAX - 1] = '\0';
 		}
 		// save current path
 		else
 		{
 			// reverse find '/'
-			tb_size_t 	n = tb_cstring_size(http->option.path);
+			tb_size_t 	n = tb_strlen(http->option.path);
 			tb_char_t* 	b = http->option.path;
 			tb_char_t* 	q = b + n - 1;
 			for (; q >= b && *q != '/'; --q) ;
@@ -188,12 +186,12 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 			{
 				q++;
 				tb_int_t maxn = TB_HTTP_PATH_MAX - (q - b);
-				tb_cstring_ncopy(q, p, maxn);
+				tb_strncpy(q, p, maxn);
 				http->option.path[maxn - 1] = '\0';
 			}
 			else
 			{
-				tb_cstring_ncopy(http->option.path + 1, p, TB_HTTP_PATH_MAX - 1);
+				tb_strncpy(http->option.path + 1, p, TB_HTTP_PATH_MAX - 1);
 				http->option.path[TB_HTTP_PATH_MAX - 2] = '\0';
 			}
 		}
@@ -237,7 +235,7 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 	//TB_DBG("[http]::path: %s", http->option.path);
 
 	// save url
-	tb_cstring_ncopy(http->option.url, url? url : "", TB_HTTP_URL_MAX);
+	tb_strncpy(http->option.url, url? url : "", TB_HTTP_URL_MAX);
 	http->option.url[TB_HTTP_URL_MAX - 1] = '\0';
 
 	return TB_TRUE;
@@ -419,18 +417,18 @@ static tb_bool_t tb_http_head_find(tb_http_t* http, tb_char_t const* name)
 	TB_IF_FAIL_RETURN_VAL(http->option.head[0], TB_FALSE);
 
 	// get name size
-	tb_size_t n = tb_cstring_size(name);
+	tb_size_t n = tb_strlen(name);
 	TB_ASSERT_RETURN_VAL(n, TB_FALSE);
 
 	// find item
 	tb_char_t const* p = http->option.head;
 	while (*p)
 	{
-		tb_int_t pos = tb_cstring_find_nocase(p, name);
-		if (pos >= 0)
+		tb_char_t const* pos = (tb_char_t const*)tb_stristr(p, name);
+		if (pos)
 		{
 			// skip to the begin position of the value
-			p += pos + n;
+			p = pos + n;
 
 			// is valid item?
 			if (*p == ':') return TB_TRUE;
@@ -570,7 +568,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		while (tb_isspace(*p)) p++;
 
 		// parse location
-		if (!tb_cstring_compare_nocase(tag, "Location")) 
+		if (!tb_stricmp(tag, "Location")) 
 		{
 			//TB_DBG("[http]::redirect to: %s", p);
 
@@ -589,51 +587,51 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			else return TB_FALSE;
 		}
 		// parse connection
-		else if (!tb_cstring_compare_nocase (tag, "Connection"))
+		else if (!tb_stricmp(tag, "Connection"))
 		{
-			if (!tb_cstring_compare_nocase(p, "close"))
+			if (!tb_stricmp(p, "close"))
 				http->status.bkalive = 0;
 			else http->status.bkalive = 1; 	// keep-alive
 		}
 		// parse content size
-		else if (!tb_cstring_compare_nocase (tag, "Content-Length"))
+		else if (!tb_stricmp(tag, "Content-Length"))
 		{
 			http->status.content_size = tb_s10tou32(p);
 		}
 		// parse content range: "bytes $from-$to/$document_size"
-		else if (!tb_cstring_compare_nocase (tag, "Content-Range"))
+		else if (!tb_stricmp(tag, "Content-Range"))
 		{
 			tb_int_t offset = 0, filesize = 0;
-			if (!tb_cstring_ncompare(p, "bytes ", 6)) 
+			if (!tb_strncmp(p, "bytes ", 6)) 
 			{
 				p += 6;
 				offset = tb_s10tou32(p);
-				tb_int_t slash = tb_cstring_find_char(p, '/');
-				if (slash >= 0 && tb_cstring_size(p + slash) > 0)
-					filesize = tb_s10tou32(p + slash + 1);
+				tb_char_t const* slash = (tb_char_t const*)tb_strchr(p, '/');
+				if (slash && tb_strlen(slash) > 0)
+					filesize = tb_s10tou32(slash + 1);
 				//TB_DBG("[http]::range: %d - %d", offset, filesize);
 			}
 			// no stream, be able to seek
 			http->status.bseeked = 1;
 		}
 		// parse content type
-		else if (!tb_cstring_compare_nocase (tag, "Content-Type"))
+		else if (!tb_stricmp (tag, "Content-Type"))
 		{
 			// save type
-			tb_cstring_ncopy(http->status.content_type, p, TB_HTTP_CONTENT_TYPE_MAX);
+			tb_strncpy(http->status.content_type, p, TB_HTTP_CONTENT_TYPE_MAX);
 			http->status.content_type[TB_HTTP_CONTENT_TYPE_MAX - 1] = '\0';
 			//TB_DBG("[http]::type: %s", p);
 		}
 		// parse cookie
-		else if (http->option.cookies && !tb_cstring_compare_nocase (tag, "Set-Cookie"))
+		else if (http->option.cookies && !tb_stricmp(tag, "Set-Cookie"))
 		{
 			// set cookie
 			tb_cookies_set_from_url(http->option.cookies, http->option.url, p);
 		}
 		// parse transfer encoding
-		else if (!tb_cstring_compare_nocase (tag, "Transfer-Encoding"))
+		else if (!tb_stricmp(tag, "Transfer-Encoding"))
 		{
-			if (!tb_cstring_compare_nocase(p, "chunked")) 
+			if (!tb_stricmp(p, "chunked")) 
 			{
 				http->status.bchunked = 1;
 			}
@@ -885,7 +883,7 @@ tb_bool_t tb_http_option_set_host(tb_handle_t handle, tb_char_t const* host)
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_cstring_ncopy(http->option.host, host? host : "", TB_HTTP_HOST_MAX);
+	tb_strncpy(http->option.host, host? host : "", TB_HTTP_HOST_MAX);
 	http->option.host[TB_HTTP_HOST_MAX - 1] = '\0';
 	return TB_TRUE;
 }
@@ -894,7 +892,7 @@ tb_bool_t tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path)
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_cstring_ncopy(http->option.path, path? path : "", TB_HTTP_PATH_MAX);
+	tb_strncpy(http->option.path, path? path : "", TB_HTTP_PATH_MAX);
 	http->option.path[TB_HTTP_PATH_MAX - 1] = '\0';
 	return TB_TRUE;
 }
@@ -936,7 +934,7 @@ tb_bool_t tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head)
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_cstring_ncopy(http->option.head, head? head : "", TB_HTTP_HEAD_MAX);
+	tb_strncpy(http->option.head, head? head : "", TB_HTTP_HEAD_MAX);
 	http->option.head[TB_HTTP_HEAD_MAX - 1] = '\0';	
 	return TB_TRUE;
 }

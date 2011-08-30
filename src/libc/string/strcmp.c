@@ -26,10 +26,18 @@
  */
 #include "prefix.h"
 
+#if defined(TB_CONFIG_ARCH_x86)
+# 	include "opt/x86/strcmp.c"
+#elif defined(TB_CONFIG_ARCH_ARM)
+# 	include "opt/arm/strcmp.c"
+#elif defined(TB_CONFIG_ARCH_SH4)
+# 	include "opt/sh4/strcmp.c"
+#endif
+
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
+#ifndef TB_LIBC_STRING_OPT_STRCMP
 tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
@@ -38,4 +46,5 @@ tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 	while (((r = ((tb_int_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
 	return r;
 }
+#endif
 
