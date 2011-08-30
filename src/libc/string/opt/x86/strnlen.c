@@ -29,8 +29,8 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
-# 	define TB_LIBC_STRING_OPT_STRNLEN
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+//# 	define TB_LIBC_STRING_OPT_STRNLEN
 #endif
 
 /* /////////////////////////////////////////////////////////
@@ -40,22 +40,27 @@
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s, 0);
+	if (!n) return 0;
 
-	tb_int_t edx;
-	tb_int_t eax;
+	__tb_register__ tb_size_t r = 0;
 	__tb_asm__ __tb_volatile__
 	(
-		"	leal	-1(%%ecx), %%eax\n"
-		"1:	incl	%%eax\n"
-		"	decl	%%edx\n"
-		"	jz		3f\n"
-		"	cmpb	$0, (%%eax)\n"
-		"	jnz		1b\n"
-		"3:	subl	%%ecx, %%eax"
+		" 	movl 	%1, %0\n"
+		" 	decl 	%0\n"
+		"1:\n"	
+		" 	incl 	%0\n"
+		" 	test 	%2, %2\n"
+		" 	je 		2f\n"
+		" 	decl 	%2\n"
+		" 	cmpb 	$0, (%0)\n"
+		" 	jne 	1b\n"
+		"2:\n"
+		" 	subl 	%1, %0"
 
-		: "=a" (eax), "=&d" (edx)
-		: "c" (s), "1" (n + 1)
+		: "=a" (r)
+		: "d" (s), "c"(n)
+		: "memory"
 	);
-	return eax;
+	return r;
 }
 #endif

@@ -132,7 +132,7 @@ static tb_int_t tb_skip_atoi(tb_char_t const** s)
 }
 static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_char_t const* s)
 {
-	tb_size_t n = tb_strnlen(s, e.precision);
+	tb_int_t n = tb_strnlen(s, e.precision);
 
 	// fill space at left side, e.g. "   abcd"
 	if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 

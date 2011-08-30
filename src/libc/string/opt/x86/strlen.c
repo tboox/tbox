@@ -41,16 +41,37 @@ tb_size_t tb_strlen(tb_char_t const* s)
 {
 	TB_ASSERT_RETURN_VAL(s, 0);
 
-	tb_int_t eax, ecx, edi;
+#if 0
+	__tb_register__ tb_size_t r = 0;
 	__tb_asm__ __tb_volatile__
 	(
-		"	repne; 	scasb\n"
-		"	notl 	%%ecx\n"
-		"	leal 	-1(%%ecx), %%eax\n"
+		"repne\n"
+		"scasb\n"
+		"notl 	%0\n"
+		"decl 	%0"
 
-		: "=&c" (ecx), "=&D" (edi), "=&a" (eax)
-		: "0" (0xffffffff), "1" (s), "2" (0)
+		: "=c" (r)
+		: "D" (s), "a" (0), "0" (0xffffffffu)
+		: "memory"
 	);
-	return eax;
+	return r;
+#else
+	__tb_register__ tb_size_t r = 0;
+	__tb_asm__ __tb_volatile__
+	(
+		" 	movl 	%1, %0\n"
+		" 	decl 	%0\n"
+		"1:\n"	
+		" 	incl 	%0\n"
+		" 	cmpb 	$0, (%0)\n"
+		" 	jne 	1b\n"
+		" 	subl 	%1, %0"
+
+		: "=a" (r)
+		: "d" (s)
+		: "memory"
+	);
+	return r;
+#endif
 }
 #endif
