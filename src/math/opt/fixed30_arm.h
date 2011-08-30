@@ -32,24 +32,34 @@
  * macros
  */
 
-#define tb_fixed30_mul(x) 			tb_fixed30_mul_asm(x)
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+
+#ifndef TB_CONFIG_TYPE_INT64
+# 	define tb_fixed30_mul(x, y) 			tb_fixed30_mul_asm(x, y)
+#endif
+
+#endif /* TB_CONFIG_ASSEMBLER_GAS */
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
+#if defined(TB_CONFIG_ASSEMBLER_GAS) \
+	&& !defined(TB_CONFIG_TYPE_INT64)
 static __tb_inline__ tb_fixed30_t tb_fixed30_mul_asm(tb_fixed30_t x, tb_fixed30_t y)
 {
 	__tb_register__ tb_fixed30_t t;
-	__tb_asm__( "smull 	%0, %2, %1, %3 			\n"
-				"mov 	%0, %0, lsr #30 		\n"
-				"orr 	%0, %0, %2, lsl #2 		\n"
-				: "=r"(x), "=&r"(y), "=r"(t)
-				: "r"(x), "1"(y)
-				:
-				);
+	__tb_asm__ __tb_volatile__
+	(
+		"smull 	%0, %2, %1, %3 			\n" 	// r64 = (l, h) = x * y
+		"mov 	%0, %0, lsr #30 		\n" 	// to fixed30: r64 >>= 30
+		"orr 	%0, %0, %2, lsl #2 		\n" 	// x = l = (h << (32 - 30)) | (l >> 30);
+
+		: "=r"(x), "=&r"(y), "=r"(t)
+		: "r"(x), "1"(y)
+	);
 	return x;
 }
+#endif
 
 
 #endif

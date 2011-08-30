@@ -33,6 +33,14 @@
 # 	include "float.h"
 #endif
 
+#if defined(TB_CONFIG_ARCH_x86)
+# 	include "opt/fixed16_x86.h"
+#elif defined(TB_CONFIG_ARCH_ARM)
+# 	include "opt/fixed16_arm.h"
+#elif defined(TB_CONFIG_ARCH_SH4)
+# 	include "opt/fixed16_sh4.h"
+#endif
+
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
