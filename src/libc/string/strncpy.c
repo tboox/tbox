@@ -44,13 +44,26 @@ tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
 	__tb_register__ tb_char_t* s = s1;
+	if (!n || s1 == s2) return s;
 
+#ifdef TB_CONFIG_BINARY_SMALL
 	while (n) 
 	{
-		if ((*s = *s2) != 0) s2++; // Need to fill tail with 0s.
+		if ((*s = *s2)) s2++; 
 		++s;
 		--n;
 	}
+#else
+	while (1) 
+	{
+		if (!(s1[0] = s2[0]) || !--n) break;
+		if (!(s1[1] = s2[1]) || !--n) break;
+		if (!(s1[2] = s2[2]) || !--n) break;
+		if (!(s1[3] = s2[3]) || !--n) break;
+		s1 += 4;
+		s2 += 4;
+	}
+#endif
 
 	return s;
 }

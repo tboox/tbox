@@ -41,6 +41,29 @@ tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
 
+	// FIXME: return is -1, 0, 1
+	tb_size_t d0, d1;
+	tb_size_t r;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n"
+		" 	lodsb\n"
+		" 	scasb\n"
+		" 	jne 2f\n"
+		" 	testb %%al, %%al\n"
+		" 	jne 1b\n"
+		" 	xorl %%eax, %%eax\n"
+		" 	jmp 3f\n"
+		"2:\n"
+		" 	sbbl %%eax, %%eax\n"
+		" 	orb $1, %%al\n"
+		"3:"
 
+		: "=a" (r), "=&S" (d0), "=&D" (d1)
+		: "1" (s1), "2" (s2)
+		: "memory"
+	);
+
+	return r;
 }
 #endif

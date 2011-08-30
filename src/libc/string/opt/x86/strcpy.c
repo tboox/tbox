@@ -41,6 +41,19 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
+	tb_size_t d0, d1, d2;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n"
+		" 	lodsb\n"
+		" 	stosb\n"
+		" 	testb %%al, %%al\n"
+		" 	jne 1b"
 
+		: "=&S" (d0), "=&D" (d1), "=&a" (d2)
+		: "0" (s2), "1" (s1) 
+		: "memory"
+	);
+	return s1;
 }
 #endif

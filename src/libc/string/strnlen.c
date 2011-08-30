@@ -27,11 +27,11 @@
 #include "prefix.h"
 
 #if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/strlen.c"
+# 	include "opt/x86/strnlen.c"
 #elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/strlen.c"
+# 	include "opt/arm/strnlen.c"
 #elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/strlen.c"
+# 	include "opt/sh4/strnlen.c"
 #endif
 
 /* /////////////////////////////////////////////////////////
@@ -42,6 +42,7 @@
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s, 0);
+	if (!n) return 0;
 
 	__tb_register__ tb_char_t const* p = s;
 

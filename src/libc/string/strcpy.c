@@ -44,8 +44,21 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
 	__tb_register__ tb_char_t* s = s1;
+	if (s1 == s2) return s;
 
-	while ( (*s++ = *s2++) != 0 );
+#ifdef TB_CONFIG_BINARY_SMALL
+	while ((*s++ = *s2++)) ;
+#else
+	while (1) 
+	{
+		if (!(s1[0] = s2[0])) break;
+		if (!(s1[1] = s2[1])) break;
+		if (!(s1[2] = s2[2])) break;
+		if (!(s1[3] = s2[3])) break;
+		s1 += 4;
+		s2 += 4;
+	}
+#endif
 
 	return s;
 }
