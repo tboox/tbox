@@ -1,7 +1,7 @@
 #include "tbox.h"
 
-#define TB_TEST_CMP 		(0)
-#define TB_TEST_LEN 		(1)
+#define TB_TEST_CMP 		(1)
+#define TB_TEST_LEN 		(0)
 #define TB_TEST_CPY 		(0)
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -139,6 +139,7 @@ static tb_void_t tb_test_strnlen(tb_char_t const* s, tb_size_t size)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%lld ms, tb_test_strnlen(%s, %u) = %d\n", t, s, size, r);
 }
+#if 0
 static tb_void_t tb_test_strnlen_libc(tb_char_t const* s, tb_size_t size)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
@@ -151,6 +152,7 @@ static tb_void_t tb_test_strnlen_libc(tb_char_t const* s, tb_size_t size)
 	t = tb_int64_sub(tb_mclock(), t);
 	tb_printf("%lld ms, tb_test_strnlen_libc(%s, %u) = %d\n", t, s, size, r);
 }
+#endif
 static tb_void_t tb_test_strcpy(tb_char_t const* s2)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
@@ -181,7 +183,7 @@ static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_char_t s1[4096];
+	tb_char_t s1[4096] = {0};
 	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
@@ -194,7 +196,7 @@ static tb_void_t tb_test_strncpy_libc(tb_char_t const* s2, tb_size_t size)
 {
 	__tb_volatile__ tb_int_t 	n = 100000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_char_t s1[4096];
+	tb_char_t s1[4096] = {0};
 	tb_int64_t t = tb_mclock();
 	while (n--)
 	{
@@ -307,6 +309,7 @@ int main(int argc, char** argv)
 	tb_test_strnlen("abcdefghijklmnopqrstuvwxyz1234567890", 20);
 	tb_test_strnlen("abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890", 60);
 	
+#if 0
 	tb_printf("\n");
 	tb_test_strnlen_libc("", 10);
 	tb_test_strnlen_libc("1", 10);
@@ -314,6 +317,7 @@ int main(int argc, char** argv)
 	tb_test_strnlen_libc("1234567890abcbefg", 20);
 	tb_test_strnlen_libc("abcdefghijklmnopqrstuvwxyz1234567890", 20);
 	tb_test_strnlen_libc("abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890", 60);
+#endif
 
 #endif
 

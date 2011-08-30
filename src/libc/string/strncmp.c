@@ -41,6 +41,7 @@
 tb_int_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	if (s1 == s2 || !n) return 0;
 
 	tb_int_t r = 0;
 	while (n-- && ((r = ((tb_int_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
