@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		strnicmp.c
+ * \file		strncpy.c
  *
  */
 
@@ -27,15 +27,20 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * interfaces 
+ * macros
  */
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+//# 	define TB_LIBC_STRING_OPT_STRNCPY
+#endif
 
-tb_int_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+/* /////////////////////////////////////////////////////////
+ * implemention
+ */
+#if 0//def TB_CONFIG_ASSEMBLER_GAS
+tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
-	if (s1 == s2 || !n) return 0;
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
-	tb_int_t r = 0;
-	while (n && ((s1 == s2) || !(r = ((tb_int_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (--n, ++s2, *s1++));
-	return r;
+	return TB_NULL;
 }
+#endif

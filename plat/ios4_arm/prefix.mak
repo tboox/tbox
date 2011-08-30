@@ -75,7 +75,7 @@ CXXFLAGS_DEBUG 	=
 CXXFLAGS 		= 
 
 # ldflags
-LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
+LDFLAGS_RELEASE =
 LDFLAGS_DEBUG 	= 
 LDFLAGS 		= -arch=armv6 -nostdlib \
 				  -L$(SDK)/usr/lib \

@@ -33,6 +33,7 @@
 tb_int_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	if (s1 == s2) return 0;
 
 	tb_int_t r = 0;
 	while (((s1 == s2) || !(r = ((tb_int_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
