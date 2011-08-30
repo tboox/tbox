@@ -27,8 +27,7 @@
 #include "cookies.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
-#include "../memory/memory.h"
-#include "../string/cstring.h"
+#include "../libc/libc.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -91,8 +90,8 @@ static tb_bool_t tb_cookies_split_url(tb_char_t const* url, tb_char_t const* pho
 	TB_ASSERT_RETURN_VAL(url && phost && ppath && psecure, TB_FALSE);
 
 	// get url size
-	tb_int_t n = tb_cstring_size(url);
-	if (n <= 0) return TB_FALSE;
+	tb_size_t n = tb_strlen(url);
+	if (!n) return TB_FALSE;
 
 	// get url pointer
 	tb_char_t const* p = url;
@@ -183,7 +182,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			//TB_COOKIES_DBG("value[%d]: %s", p - v, v? v : "");
 
 			// parse field
-			if (!tb_cstring_ncompare_nocase(b, "expires", 7))
+			if (!tb_strnicmp(b, "expires", 7))
 			{	
 				// invalid format?
 				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
@@ -191,7 +190,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 				entry->pexpires = v;
 				entry->nexpires = p - v;
 			}
-			else if (!tb_cstring_ncompare_nocase(b, "max-age", 7))
+			else if (!tb_strnicmp(b, "max-age", 7))
 			{			
 				// invalid format?
 				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
@@ -199,7 +198,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 				entry->pmaxage = v;
 				entry->nmaxage = p - v;
 			}
-			else if (!tb_cstring_ncompare_nocase(b, "domain", 6))
+			else if (!tb_strnicmp(b, "domain", 6))
 			{			
 				// invalid format?
 				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
@@ -207,7 +206,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 				entry->pdomain = v;
 				entry->ndomain = p - v;
 			}
-			else if (!tb_cstring_ncompare_nocase(b, "path", 4))
+			else if (!tb_strnicmp(b, "path", 4))
 			{				
 				// invalid format?
 				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
@@ -215,7 +214,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 				entry->ppath = v;
 				entry->npath = p - v;
 			}	
-			else if (!tb_cstring_ncompare_nocase(b, "version", 7))
+			else if (!tb_strnicmp(b, "version", 7))
 			{
 				// invalid format?
 				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
@@ -223,12 +222,12 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 				entry->pversion = v;
 				entry->nversion = p - v;
 			}	
-			else if (!tb_cstring_ncompare_nocase(b, "secure", 6))
+			else if (!tb_strnicmp(b, "secure", 6))
 			{
 				entry->bsecure = 1;
 			}
 			// ignore 
-			else if (!tb_cstring_ncompare_nocase(b, "HttpOnly", 8)) ;
+			else if (!tb_strnicmp(b, "HttpOnly", 8)) ;
 			else if (v)
 			{
 				// invalid format?
@@ -269,7 +268,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 		if (domain)
 		{
 			entry->pdomain = domain;
-			entry->ndomain = tb_cstring_size(domain);
+			entry->ndomain = tb_strlen(domain);
 		}
 		else return TB_FALSE;
 	}
@@ -287,7 +286,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 		if (path)
 		{
 			entry->ppath = path;
-			entry->npath = tb_cstring_size(path);
+			entry->npath = tb_strlen(path);
 		}
 		else 
 		{
@@ -314,7 +313,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 	for (; itor != tail; itor = tb_slist_next(spool, itor))
 	{
 		tb_cookie_string_t* string = (tb_cookie_string_t*)tb_slist_at(spool, itor);
-		if (string && string->data && !tb_cstring_ncompare(string->data, s, n))
+		if (string && string->data && !tb_strncmp(string->data, s, n))
 		{
 			string->refn++;
 			return itor;
@@ -324,7 +323,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 	// add it if not exists
 	tb_cookie_string_t string;
 	string.refn = 1;
-	string.data = tb_cstring_nduplicate(s, n);
+	string.data = tb_strndup(s, n);
 	TB_ASSERT(string.data);
 	if (string.data) return tb_slist_insert_tail(spool, &string);
 	else return 0;
@@ -350,9 +349,9 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 			tb_cookie_string_t* svalue = (tb_cookie_string_t*)tb_slist_at(spool, cookie->value);
 
 			// is this?
-			if ( 	sdomain && sdomain->data && !tb_cstring_ncompare_nocase(sdomain->data, entry->pdomain, entry->ndomain)
-				&& 	spath && spath->data && !tb_cstring_ncompare(spath->data, entry->ppath, entry->npath)
-				&& 	sname && sname->data && !tb_cstring_ncompare(sname->data, entry->pname, entry->nname)
+			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
+				&& 	spath && spath->data && !tb_strncmp(spath->data, entry->ppath, entry->npath)
+				&& 	sname && sname->data && !tb_strncmp(sname->data, entry->pname, entry->nname)
 				)
 			{
 				// update secure
@@ -397,9 +396,9 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_slist_at(spool, cookie->name);
 
 			// is this?
-			if ( 	sdomain && sdomain->data && !tb_cstring_ncompare_nocase(sdomain->data, entry->pdomain, entry->ndomain)
-				&& 	spath && spath->data && !tb_cstring_ncompare(spath->data, entry->ppath, entry->npath)
-				&& 	sname && sname->data && !tb_cstring_ncompare(sname->data, entry->pname, entry->nname)
+			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
+				&& 	spath && spath->data && !tb_strncmp(spath->data, entry->ppath, entry->npath)
+				&& 	sname && sname->data && !tb_strncmp(sname->data, entry->pname, entry->nname)
 				)
 			{
 				// remove domain
@@ -458,8 +457,8 @@ static tb_bool_t tb_cookies_domain_ischild(tb_char_t const* parent, tb_char_t co
 
 	tb_char_t const* 	pb = parent;
 	tb_char_t const* 	cb = child;
-	tb_size_t 			pn = tb_cstring_size(pb);
-	tb_size_t 			cn = tb_cstring_size(cb);
+	tb_size_t 			pn = tb_strlen(pb);
+	tb_size_t 			cn = tb_strlen(cb);
 	TB_ASSERT_RETURN_VAL(pn > 3 && cn > 3, TB_FALSE);
 
 	tb_size_t 			n = 0;
@@ -486,7 +485,7 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 	// is child?
 	tb_char_t const* 	p = parent;
 	tb_char_t const* 	c = child;
-	tb_size_t 			n = tb_cstring_size(parent);
+	tb_size_t 			n = tb_strlen(parent);
 	while (n-- && *p && *c && *p++ == *c++) ; 
 
 	// ok?

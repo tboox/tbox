@@ -248,7 +248,7 @@ tb_void_t tb_dns_server_add(tb_char_t const* ip)
 	{
 		if (!g_dns_servers[i][0]) 
 		{
-			tb_char_t* s = tb_cstring_ncopy(g_dns_servers[i], ip, 16);
+			tb_char_t* s = tb_strncpy(g_dns_servers[i], ip, 16);
 			if (s) s[15] = '\0';
 			break;
 		}
@@ -262,7 +262,7 @@ tb_void_t tb_dns_server_del(tb_char_t const* ip)
 	tb_int_t i = 0;
 	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
 	{
-		if (g_dns_servers[i][0] && !tb_cstring_compare(g_dns_servers[i], ip)) 
+		if (g_dns_servers[i][0] && !tb_strcmp(g_dns_servers[i], ip)) 
 			g_dns_servers[i][0] = '\0';
 	}
 }

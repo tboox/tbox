@@ -17,7 +17,6 @@ tbox_C_FILES 		+= \
 					math/fixed16 \
 					memory/mpool \
 					string/string \
-					string/cstring \
 					container/pool \
 					container/vector \
 					container/slist \
@@ -141,7 +140,6 @@ INC_FILES 			= \
 					math/opt/float_sh4.h \
 					string/prefix.h \
 					string/string.h \
-					string/cstring.h \
 					container/prefix.h \
 					container/container.h \
 					container/pool.h \

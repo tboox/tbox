@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memmov.c
+ * \file		strnlen.c
  *
  */
 
@@ -29,44 +29,33 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#if 1//def TB_CONFIG_ASSEMBLER_GAS
-# 	define TB_LIBC_STRING_OPT_MEMMOV
+#if 0//def TB_CONFIG_ASSEMBLER_GAS
+# 	define TB_LIBC_STRING_OPT_STRNLEN
 #endif
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
-#if 1
-tb_void_t* tb_memmov(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
+#if 0//def TB_CONFIG_ASSEMBLER_GAS
+tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	TB_ASSERT_RETURN_VAL(s, 0);
 
-	return memmove(s1, s2, n);
-}
-#elif defined(TB_CONFIG_ASSEMBLER_GAS)
-tb_void_t* tb_memmov(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
-{
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
-
-	tb_int_t eax, ecx, esi, edi;
+	tb_int_t edx;
+	tb_int_t eax;
 	__tb_asm__ __tb_volatile__
 	(
-		" 	movl 	%%eax, %%edi\n"
-		" 	cmpl 	%%esi, %%eax\n"
-		" 	je		2f\n" /* (optional) s2 == s1 -> NOP */
-		" 	jb		1f\n" /* s2 > s1 -> simple copy */
-		" 	leal	-1(%%esi,%%ecx), %%esi\n"
-		" 	leal 	-1(%%eax,%%ecx), %%edi\n"
-		" 	std\n"
-		"1:	rep; 	movsb\n"
-		" 	cld\n"
-		"2:\n"
+		"	leal	-1(%%ecx), %%eax\n"
+		"1:	incl	%%eax\n"
+		"	decl	%%edx\n"
+		"	jz		3f\n"
+		"	cmpb	$0, (%%eax)\n"
+		"	jnz		1b\n"
+		"3:	subl	%%ecx, %%eax"
 
-		: "=&c" (ecx), "=&S" (esi), "=&a" (eax), "=&D" (edi)
-		: "0" (n), "1" (s2), "2" (s1)
-		: "memory"
+		: "=a" (eax), "=&d" (edx)
+		: "c" (s), "1" (n + 1)
 	);
-	return (tb_void_t*)eax;
+	return eax;
 }
 #endif

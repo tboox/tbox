@@ -12,7 +12,7 @@ NAMES = test \
 		scalar \
 		memops \
 		string \
-		cstring \
+		strops \
 		cookies \
 		gstream \
 		estream \

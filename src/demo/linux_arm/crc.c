@@ -4,7 +4,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	tb_byte_t* 	p = argv[1];
-	tb_size_t 	n = tb_cstring_size(p);
+	tb_size_t 	n = tb_strlen(p);
 
 #ifndef TB_CONFIG_BINARY_SMALL
 	tb_printf("[crc]: TB_CRC_MODE_8_ATM = %x\n", tb_crc_encode(TB_CRC_MODE_8_ATM, 0, p, n));
