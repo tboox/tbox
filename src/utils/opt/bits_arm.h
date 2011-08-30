@@ -31,21 +31,29 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+
 #if TB_CONFIG_ARM_VERSION >= 6
 # 	define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
 #endif
 
 #define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
 
+#endif /* TB_CONFIG_ASSEMBLER_GAS */
+
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+
 
 // swap
 #if TB_CONFIG_ARM_VERSION >= 6 
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-	__tb_asm__("rev16 %0, %0" : "+r"(x));
+	__tb_asm__ __tb_volatile__("rev16 %0, %0" : "+r"(x));
 	return x;
 }
 #endif
@@ -55,15 +63,20 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 #if TB_CONFIG_ARM_VERSION >= 6 
 	__tb_asm__("rev %0, %0" : "+r"(x));
 #else
-	tb_uint32_t t;
-	__tb_asm__( "eor %1, %0, %0, ror #16 \n\t"
-				"bic %1, %1, #0xff0000   \n\t"
-				"mov %0, %0, ror #8      \n\t"
-				"eor %0, %0, %1, lsr #8  \n\t"
-				: "+r"(x), "=&r"(t));
+	__tb_register__ tb_uint32_t t;
+	__tb_asm__ __tb_volatile__
+	( 
+	 	"eor %1, %0, %0, ror #16 \n"
+		"bic %1, %1, #0xff0000   \n"
+		"mov %0, %0, ror #8      \n"
+		"eor %0, %0, %1, lsr #8  \n"
+		: "+r"(x), "=&r"(t)
+	);
 #endif
 	return x;
 }
+
+#endif /* TB_CONFIG_ASSEMBLER_GAS */
 
 
 #endif

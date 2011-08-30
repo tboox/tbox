@@ -17,51 +17,23 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		fixed16_arm.h
+ * \file		fixed30_sh4.h
  *
  */
-#ifndef TB_MATH_OPT_FIXED16_ARM_H
-#define TB_MATH_OPT_FIXED16_ARM_H
+#ifndef TB_MATH_OPT_FIXED30_SH4_H
+#define TB_MATH_OPT_FIXED30_SH4_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 
-
-/* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-#ifdef TB_CONFIG_ASSEMBLER_GAS
-
-#ifndef TB_CONFIG_TYPE_INT64
-# 	define tb_fixed16_mul(x, y) 			tb_fixed16_mul_asm(x, y)
-#endif
-
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
-
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS) \
-	&& !defined(TB_CONFIG_TYPE_INT64)
-static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_t y)
-{
-	__tb_register__ tb_fixed16_t t;
-	__tb_asm__ __tb_volatile__
-	( 
-		"smull 	%0, %2, %1, %3 			\n" 	// r64 = (l, h) = x * y
-		"mov 	%0, %0, lsr #16 		\n" 	// to fixed16: r64 >>= 16
-		"orr 	%0, %0, %2, lsl #16 	\n" 	// x = l = (h << (32 - 16)) | (l >> 16);
 
-		: "=r"(x), "=&r"(y), "=r"(t)
-		: "r"(x), "1"(y)
-	);
-	return x;
-}
-#endif
+
 
 #endif
 

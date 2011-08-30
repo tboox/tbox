@@ -30,18 +30,34 @@
  * macros
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-//# 	define TB_LIBC_STRING_OPT_STRCMP
+# 	define TB_LIBC_STRING_OPT_STRCMP
 #endif
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-#if 0//def TB_CONFIG_ASSEMBLER_GAS
+#ifdef TB_CONFIG_ASSEMBLER_GAS
 tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	if (s1 == s2) return 0;
 
+	__tb_register__ tb_int_t r = 0;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n"
+		"ldrb 	r2, [%1], #1\n"
+		"ldrb 	r3, [%2], #1\n"
+		"cmp	r2, #1\n"
+		"cmpcs	r2, r3\n" 		// r2 == r3? if r2 >= 1
+		"beq	1b\n"
+		"sub	%0, r2, r3" 	// r = r2 - r3 if r2 != r3
 
-	return 0;
+		: "=r"(r)
+		: "r"(s1), "r"(s2)
+		: "memory"
+	);
+
+	return r;
 }
 #endif
