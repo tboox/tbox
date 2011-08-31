@@ -79,29 +79,14 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 	for (b = 0; b < 8; ++b)
 	{
 		tb_printf("[bitops]: sbits32 b: %d x: %d\n", b, x);
-		for (n = 0; n <= 32; ++n)
+		for (n = 2; n <= 32; ++n)
 		{
 			__tb_volatile__ tb_byte_t 	p[256] = {0};
 			__tb_volatile__ tb_size_t 	n1 = 1000000;
 			__tb_volatile__ tb_size_t 	n2 = 1000000;
 			__tb_volatile__ tb_sint32_t y = 0;
 			__tb_volatile__ tb_int64_t 	t1, t2;
-			__tb_volatile__ tb_sint32_t xx = 0;
-			switch (n)
-			{
-			case 8:
-				xx = (tb_sint8_t)x;
-				break;
-			case 16:
-				xx = (tb_sint16_t)x;
-				break;
-			case 32:
-				xx = x;
-				break;
-			default:
-				xx = x >= 0? (x & ((1 << n) - 1)) : ~(~(x - 1) & ((1 << n) - 1)) + 1;
-				break;
-			}
+			__tb_volatile__ tb_sint32_t xx = ((x >> 31) << (n - 1)) | (x & ((1 << (n - 1)) - 1));
 
 			t1 = tb_mclock();
 			while (n1--) tb_bits_set_sbits32(p, b, x, n);
@@ -130,11 +115,11 @@ int main(int argc, char** argv)
 	tb_test_bits_swap_u32();
 	tb_test_bits_swap_u64();
 
-//	tb_test_bits_ubits32(0x87654321);
-//	tb_test_bits_ubits32(0x12345678);
+	tb_test_bits_ubits32(0x87654321);
+	tb_test_bits_ubits32(0x12345678);
 	
-//	tb_test_bits_sbits32(0x87654321);
-//	tb_test_bits_sbits32(0x12345678);
+	tb_test_bits_sbits32(0x87654321);
+	tb_test_bits_sbits32(0x12345678);
 
 	tb_test_bits_sbits32(-300);
 	tb_test_bits_sbits32(300);
