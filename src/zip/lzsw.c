@@ -336,7 +336,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 		if (tb_bstream_get_u1(src))
 		{
 			// set position
-			tb_size_t p = tb_bstream_get_ubits(src, window->wb);
+			tb_size_t p = tb_bstream_get_ubits32(src, window->wb);
 			
 			// get size
 			tb_size_t n = vlc_get(vlc, src) + 2;
@@ -378,8 +378,8 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 		}
 		else 
 		{
-			*dp++ = tb_bstream_get_ubits(src, 8);
-			*dp++ = tb_bstream_get_ubits(src, 8);
+			*dp++ = tb_bstream_get_ubits32(src, 8);
+			*dp++ = tb_bstream_get_ubits32(src, 8);
 		}
 
 		// update window
@@ -445,7 +445,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			tb_bstream_set_u1(dst, 1);
 
 			// set position
-			tb_bstream_set_ubits(dst, p, window->wb);
+			tb_bstream_set_ubits32(dst, p, window->wb);
 			
 			// set size
 			vlc_set(vlc, n - 2, dst);
@@ -461,8 +461,8 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			tb_bstream_set_u1(dst, 0);
 
 			// set value
-			tb_bstream_set_ubits(dst, *sp++, 8);
-			tb_bstream_set_ubits(dst, *sp++, 8);
+			tb_bstream_set_ubits32(dst, *sp++, 8);
+			tb_bstream_set_ubits32(dst, *sp++, 8);
 		}
 
 #if TB_LZSW_WINDOW_HASH_FIND

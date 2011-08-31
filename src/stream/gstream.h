@@ -50,6 +50,39 @@ extern "C" {
 // the stream timeout
 #define TB_GSTREAM_TIMEOUT 			(5000)
 
+// the stream bitops
+#ifdef TB_WORDS_BIGENDIAN
+# 	define tb_gstream_read_u16_ne(gst) 			tb_gstream_read_u16_be(gst)
+# 	define tb_gstream_read_s16_ne(gst) 			tb_gstream_read_s16_be(gst)
+# 	define tb_gstream_read_u24_ne(gst) 			tb_gstream_read_u24_be(gst)
+# 	define tb_gstream_read_s24_ne(gst) 			tb_gstream_read_s24_be(gst)
+# 	define tb_gstream_read_u32_ne(gst) 			tb_gstream_read_u32_be(gst)
+# 	define tb_gstream_read_s32_ne(gst) 			tb_gstream_read_s32_be(gst)
+
+# 	define tb_gstream_write_u16_ne(gst, val) 	tb_gstream_write_u16_be(gst, val)
+# 	define tb_gstream_write_s16_ne(gst, val)	tb_gstream_write_s16_be(gst, val)
+# 	define tb_gstream_write_u24_ne(gst, val) 	tb_gstream_write_u24_be(gst, val)
+# 	define tb_gstream_write_s24_ne(gst, val)	tb_gstream_write_s24_be(gst, val)
+# 	define tb_gstream_write_u32_ne(gst, val)	tb_gstream_write_u32_be(gst, val)
+# 	define tb_gstream_write_s32_ne(gst, val) 	tb_gstream_write_s32_be(gst, val)
+
+#else
+# 	define tb_gstream_read_u16_ne(gst) 			tb_gstream_read_u16_le(gst)
+# 	define tb_gstream_read_s16_ne(gst) 			tb_gstream_read_s16_le(gst)
+# 	define tb_gstream_read_u24_ne(gst) 			tb_gstream_read_u24_le(gst)
+# 	define tb_gstream_read_s24_ne(gst) 			tb_gstream_read_s24_le(gst)
+# 	define tb_gstream_read_u32_ne(gst) 			tb_gstream_read_u32_le(gst)
+# 	define tb_gstream_read_s32_ne(gst) 			tb_gstream_read_s32_le(gst)
+
+# 	define tb_gstream_write_u16_ne(gst, val) 	tb_gstream_write_u16_le(gst, val)
+# 	define tb_gstream_write_s16_ne(gst, val)	tb_gstream_write_s16_le(gst, val)
+# 	define tb_gstream_write_u24_ne(gst, val) 	tb_gstream_write_u24_le(gst, val)
+# 	define tb_gstream_write_s24_ne(gst, val)	tb_gstream_write_s24_le(gst, val)
+# 	define tb_gstream_write_u32_ne(gst, val)	tb_gstream_write_u32_le(gst, val)
+# 	define tb_gstream_write_s32_ne(gst, val) 	tb_gstream_write_s32_le(gst, val)
+
+#endif
+
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -178,7 +211,7 @@ typedef struct __tb_gstream_t
  */
 
 // destroy stream
-tb_void_t 				tb_gstream_destroy(tb_gstream_t* gst);
+tb_void_t 			tb_gstream_destroy(tb_gstream_t* gst);
 
 // the data stream
 tb_gstream_t* 		tb_gstream_create_data();
@@ -199,7 +232,7 @@ tb_gstream_t* 		tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb
 
 // open & close
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);
-tb_void_t 				tb_gstream_close(tb_gstream_t* gst);
+tb_void_t 			tb_gstream_close(tb_gstream_t* gst);
 
 // access & modify
 tb_int_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);

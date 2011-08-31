@@ -299,7 +299,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 	tb_bstream_attach(&bst, data, 8192);
 	tb_bstream_set_u16_be(&bst, TB_DNS_HEADER_ID); 	// identification number
 	tb_bstream_set_u1(&bst, 0); 			// this is a query
-	tb_bstream_set_ubits(&bst, 0, 4); 		// this is a standard query
+	tb_bstream_set_ubits32(&bst, 0, 4); 	// this is a standard query
 	tb_bstream_set_u1(&bst, 0); 			// not authoritive answer
 	tb_bstream_set_u1(&bst, 0); 			// not truncated
 	tb_bstream_set_u1(&bst, 1); 			// recursion desired
@@ -308,7 +308,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 	tb_bstream_set_u1(&bst, 0);
 	tb_bstream_set_u1(&bst, 0);
 	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_ubits(&bst, 0, 4);
+	tb_bstream_set_ubits32(&bst, 0, 4);
 
 	tb_bstream_set_u16_be(&bst, 1); 		// we have only one question
 	tb_bstream_set_u16_be(&bst, 0);

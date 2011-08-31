@@ -61,6 +61,7 @@ tbox_C_FILES 		+= \
 					format/xml \
 					format/htm \
 					format/txt \
+					utils/bits \
 					utils/time \
 					utils/md5 \
 					utils/sha \

@@ -27,6 +27,44 @@
 #include "tbox.h"
 
 /* ////////////////////////////////////////////////////////////////////////
+ * helper
+ */
+static tb_bool_t tb_check_word_order()
+{
+	tb_uint16_t x = 0x1234;
+	tb_byte_t const* p = (tb_byte_t const*)&x;
+
+#ifdef TB_WORDS_BIGENDIAN
+	// is big endian?
+	return (p[0] == 0x12 && p[1] == 0x34)? TB_TRUE : TB_FALSE;
+#else
+	// is little endian?
+	return (p[0] == 0x34 && p[1] == 0x12)? TB_TRUE : TB_FALSE;
+#endif
+}
+static tb_bool_t tb_check_float_order()
+{
+#ifdef TB_CONFIG_TYPE_FLOAT
+	union 
+	{
+		tb_uint32_t i[2];
+		tb_float_t 	f;
+
+	} conv;
+	conv.f = 1.0f;
+
+# 	ifdef TB_FLOAT_BIGENDIAN
+	// is big endian?
+	return (!conv.i[1] && conv.i[0])? TB_TRUE : TB_FALSE;
+# 	else
+	// is little endian?
+	return (!conv.i[0] && conv.i[1])? TB_TRUE : TB_FALSE;
+# 	endif
+#else
+	return TB_TRUE;
+#endif
+}
+/* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
@@ -45,6 +83,10 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
 	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_void_t*) << 3));
 	TB_STATIC_ASSERT(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
+
+	// check byteorder
+	TB_ASSERT(tb_check_word_order());
+	TB_ASSERT(tb_check_float_order());
 
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	// init memory pool

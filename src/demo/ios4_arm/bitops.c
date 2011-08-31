@@ -9,7 +9,7 @@ static tb_void_t tb_test_bits_swap_u16()
 	while (n--) x = tb_bits_swap_u16(x);
 
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("[bits]: swap_u16: %x => %x, %u ms\n", 0x1234, x, tb_int64_to_int32(dt));
+	tb_printf("[bitops]: swap_u16: %x => %x, %u ms\n", 0x1234, x, tb_int64_to_int32(dt));
 }
 static tb_void_t tb_test_bits_swap_u32()
 {
@@ -20,7 +20,7 @@ static tb_void_t tb_test_bits_swap_u32()
 	while (n--) x = tb_bits_swap_u32(x);
 
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("[bits]: swap_u32: %x => %x, %u ms\n", 0x12345678, x, tb_int64_to_int32(dt));
+	tb_printf("[bitops]: swap_u32: %x => %x, %u ms\n", 0x12345678, x, tb_int64_to_int32(dt));
 }
 static tb_void_t tb_test_bits_swap_u64()
 {
@@ -31,7 +31,7 @@ static tb_void_t tb_test_bits_swap_u64()
 	while (n--) x = tb_bits_swap_u64(x);
 
 	dt = tb_int64_sub(tb_mclock(), dt);
-	tb_printf("[bits]: swap_u64: %x => %llx, %llu ms\n", 0x12345678, x, dt);
+	tb_printf("[bitops]: swap_u64: %x => %llx, %llu ms\n", 0x12345678, x, dt);
 }
 
 int main(int argc, char** argv)

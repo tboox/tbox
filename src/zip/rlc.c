@@ -99,7 +99,7 @@ static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist
 					vlc_set(vlc, repeat, ost);
 					
 					// set value
-					tb_bstream_set_ubits(ost, last, 8);
+					tb_bstream_set_ubits32(ost, last, 8);
 
 					//TB_DBG("repeat(0x%02x): %d", last, repeat);
 				}
@@ -111,7 +111,7 @@ static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist
 					tb_bstream_set_u1(ost, 0);
 
 					// set value
-					tb_bstream_set_ubits(ost, last, 8);
+					tb_bstream_set_ubits32(ost, last, 8);
 				}
 			}
 
@@ -172,7 +172,7 @@ static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist
 			repeat = vlc_get(vlc, ist);
 
 			// get value
-			last = tb_bstream_get_ubits(ist, 8);
+			last = tb_bstream_get_ubits32(ist, 8);
 
 			//TB_DBG("repeat(0x%02x): %d", last, repeat);
 
@@ -180,7 +180,7 @@ static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist
 			while (repeat-- > 0 && op < oe) *op++ = last;
 	
 		}
-		else if (op < oe) *op++ = tb_bstream_get_ubits(ist, 8);
+		else if (op < oe) *op++ = tb_bstream_get_ubits32(ist, 8);
 	}
 
 	// update 
