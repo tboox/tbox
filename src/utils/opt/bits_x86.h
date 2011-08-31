@@ -35,7 +35,7 @@
 #define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
 
 #ifdef TB_CONFIG_TYPE_INT64
-//# 	define tb_bits_swap_u64(x) 	tb_bits_swap_u64_asm(x)
+# 	define tb_bits_swap_u64(x) 	tb_bits_swap_u64_asm(x)
 #endif
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -44,20 +44,20 @@
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-	__tb_asm__ __tb_volatile__("rorw $8, %w0" : "+r"(x));
+	__tb_asm__ __tb_volatile__("rorw 	$8, %w0" : "+r"(x));
 	return x;
 }
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
 #if 1
-	__tb_asm__ __tb_volatile__("bswap   %0" : "+r" (x));
+	__tb_asm__ __tb_volatile__("bswap 	%0" : "+r" (x));
 #else
 	__tb_asm__ __tb_volatile__
 	(
-		"rorw    $8,  %w0 \n" 	//!< swap low 16 bits
-		"rorl    $16, %0  \n" 	//!< swap x by word
-		"rorw    $8,  %w0" 		//!< swap low 16 bits
+		"rorw 	$8,  %w0 \n" 	//!< swap low 16 bits
+		"rorl 	$16, %0  \n" 	//!< swap x by word
+		"rorw 	$8,  %w0" 		//!< swap low 16 bits
 
 		: "+r"(x)
 	);
@@ -68,8 +68,22 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 #ifdef TB_CONFIG_TYPE_INT64
 static __tb_inline__ tb_uint64_t const tb_bits_swap_u64_asm(tb_uint64_t x)
 {
-	// FIXME: swap u32?
-	__tb_asm__("bswap  %0": "=r" (x) : "0" (x));
+	__tb_register__ tb_size_t esi, edi;
+	__tb_asm__ __tb_volatile__
+	(
+		"lodsl\n"
+		"bswap 	%%eax\n"
+		"movl 	%%eax, %%ebx\n"
+		"lodsl\n"
+		"bswap 	%%eax\n"
+		"stosl\n"
+		"movl 	%%ebx, %%eax\n"
+		"stosl\n"
+
+		: "=&S" (esi), "=&D" (edi)
+		: "0"(&x), "1"(&x)
+		: "memory", "eax", "ebx"
+	);
 	return x;
 }
 #endif
