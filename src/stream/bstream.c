@@ -213,12 +213,8 @@ tb_void_t tb_bstream_skip(tb_bstream_t* bst, tb_size_t size)
 tb_void_t tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t nbits)
 {
 	TB_ASSERT(bst && bst->p <= bst->e);
-	bst->b += nbits;
-	while (bst->b > 7) 
-	{
-		bst->p++;
-		bst->b -= 8;
-	}
+	bst->p += nbits >> 3;
+	bst->b = (bst->b + nbits) & 0x07;
 }
 tb_char_t const* tb_bstream_skip_string(tb_bstream_t* bst)
 {
@@ -238,6 +234,16 @@ tb_uint8_t tb_bstream_get_u1(tb_bstream_t* bst)
 		bst->b = 0;
 	}
 	return val;
+}
+tb_uint8_t tb_bstream_get_u8(tb_bstream_t* bst)
+{
+	TB_ASSERT(!bst->b);
+	return *(bst->p++);
+}
+tb_sint8_t tb_bstream_get_s8(tb_bstream_t* bst)
+{
+	TB_ASSERT(!bst->b);
+	return *(bst->p++);
 }
 tb_uint16_t tb_bstream_get_u16_be(tb_bstream_t* bst)
 {
@@ -351,148 +357,59 @@ tb_sint32_t tb_bstream_get_s32_le(tb_bstream_t* bst)
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_bstream_get_float_le(tb_bstream_t* bst)
 {
-	union 
-	{
-		tb_uint32_t i;
-		float 		f;
-
-	} conv;
-
-	conv.i = tb_bstream_get_u32_le(bst);
-	return (tb_float_t)conv.f;
+	TB_ASSERT(!bst->b);
+	
+	tb_float_t val = tb_bits_get_float_le(bst->p);
+	bst->p += 4;
+	return val;
 }
 tb_float_t tb_bstream_get_float_be(tb_bstream_t* bst)
 {
-	union 
-	{
-		tb_uint32_t i;
-		float 		f;
-
-	} conv;
-
-	conv.i = tb_bstream_get_u32_be(bst);
-	return (tb_float_t)conv.f;
-}
-tb_float_t tb_bstream_get_float_ne(tb_bstream_t* bst)
-{
-	union 
-	{
-		tb_uint32_t i;
-		float 		f;
-
-	} conv;
-
-	conv.i = tb_bstream_get_u32_ne(bst);
-	return (tb_float_t)conv.f;
+	TB_ASSERT(!bst->b);
+	
+	tb_float_t val = tb_bits_get_float_be(bst->p);
+	bst->p += 4;
+	return val;
 }
 
 tb_float_t tb_bstream_get_double_le(tb_bstream_t* bst)
 {
-	union 
-	{
-		tb_uint32_t i[2];
-		double 		f;
-
-	} conv;
-
-#ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bstream_get_u32_le(bst);
-	conv.i[1] = tb_bstream_get_u32_le(bst);
-#else
-	conv.i[1] = tb_bstream_get_u32_le(bst);
-	conv.i[0] = tb_bstream_get_u32_le(bst);
-#endif
-
-	return (tb_float_t)conv.f;
+	TB_ASSERT(!bst->b);
+	
+	tb_float_t val = tb_bits_get_double_le(bst->p);
+	bst->p += 8;
+	return val;
 }
 tb_float_t tb_bstream_get_double_be(tb_bstream_t* bst)
 {
-	union 
-	{
-		tb_uint32_t i[2];
-		double 		f;
-
-	} conv;
-
-#ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bstream_get_u32_be(bst);
-	conv.i[1] = tb_bstream_get_u32_be(bst);
-#else
-	conv.i[1] = tb_bstream_get_u32_be(bst);
-	conv.i[0] = tb_bstream_get_u32_be(bst);
-#endif
-
-	return (tb_float_t)conv.f;
+	TB_ASSERT(!bst->b);
+	
+	tb_float_t val = tb_bits_get_double_be(bst->p);
+	bst->p += 8;
+	return val;
 }
-tb_float_t tb_bstream_get_double_ne(tb_bstream_t* bst)
-{
-	union 
-	{
-		tb_uint32_t i[2];
-		double 		f;
 
-	} conv;
-
-#ifdef TB_FLOAT_BIGENDIAN
-	conv.i[0] = tb_bstream_get_u32_ne(bst);
-	conv.i[1] = tb_bstream_get_u32_ne(bst);
-#else
-	conv.i[1] = tb_bstream_get_u32_ne(bst);
-	conv.i[0] = tb_bstream_get_u32_ne(bst);
 #endif
 
-	return (tb_float_t)conv.f;
-}
-#endif
-
-tb_uint32_t tb_bstream_get_ubits(tb_bstream_t* bst, tb_size_t nbits)
+tb_uint32_t tb_bstream_get_ubits32(tb_bstream_t* bst, tb_size_t nbits)
 {
 	if (!nbits || !bst) return 0;
 
-	tb_uint32_t val = 0;
-	tb_uint8_t i = bst->b; 
-	tb_uint8_t j = 24;
-
-	bst->b += nbits;
-	while (bst->b > 7) 
-	{
-		val |= *(bst->p++) << (i + j);
-		j -= 8;
-		bst->b -= 8;
-	}
-	if (bst->b > 0) val |= *(bst->p) << (i + j);
-	val >>= 1;
-	if (val & 0x80000000) val &= 0x7fffffff;
-	val >>= (31 - nbits);
+	tb_uint32_t val = tb_bits_get_ubits32(bst->p, bst->b, nbits);
+	bst->p += nbits >> 3;
+	bst->b = (bst->b + nbits) & 0x07;
 
 	return val;
 }
-tb_sint32_t tb_bstream_get_sbits(tb_bstream_t* bst, tb_size_t nbits)
+tb_sint32_t tb_bstream_get_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 {
 	if (!nbits || !bst) return 0;
 
-#if 1
-	tb_sint32_t val = 0;
-	tb_uint8_t i = bst->b; 
-	tb_uint8_t j = 24;
+	tb_sint32_t val = tb_bits_get_sbits32(bst->p, bst->b, nbits);
+	bst->p += nbits >> 3;
+	bst->b = (bst->b + nbits) & 0x07;
 
-	bst->b += nbits;
-	while (bst->b > 7) 
-	{
-		val |= *(bst->p++) << (i + j);
-		j -= 8;
-		bst->b -= 8;
-	}
-
-	if (bst->b > 0) val |= *(bst->p) << (i + j);
-	val >>= (32 - nbits);
 	return val;
-#else
-	tb_sint32_t val = 0;
-	val = -tb_bstream_get_u1(bst);
-	val = (val << (nbits - 1)) | tb_bstream_get_ubits(bst, nbits - 1);
-	return val;
-#endif
 }
 tb_char_t const* tb_bstream_get_string(tb_bstream_t* bst)
 {
@@ -542,83 +459,113 @@ tb_void_t tb_bstream_set_u1(tb_bstream_t* bst, tb_uint8_t val)
 		bst->b = 0;
 	}
 }
+tb_void_t tb_bstream_set_u8(tb_bstream_t* bst, tb_uint8_t val)
+{
+	TB_ASSERT(!bst->b);
+	*(bst->p++) = val;
+}
+tb_void_t tb_bstream_set_s8(tb_bstream_t* bst, tb_sint8_t val)
+{
+	TB_ASSERT(!bst->b);
+	*(bst->p++) = val;
+}
 tb_void_t tb_bstream_set_u16_le(tb_bstream_t* bst, tb_uint16_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
+	tb_bits_set_u16_le(bst->p, val);
+	bst->p += 2;
 }
 tb_void_t tb_bstream_set_s16_le(tb_bstream_t* bst, tb_sint16_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
+	tb_bits_set_s16_le(bst->p, val);
+	bst->p += 2;
 }
 tb_void_t tb_bstream_set_u32_le(tb_bstream_t* bst, tb_uint32_t val)
 {
 	TB_ASSERT(!bst->b);
-
-	*(bst->p++) = (val) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val >> 16) & 0xff;
-	*(bst->p++) = (val >> 24) & 0xff;
+	tb_bits_set_u32_le(bst->p, val);
+	bst->p += 4;
 }
 tb_void_t tb_bstream_set_s32_le(tb_bstream_t* bst, tb_sint32_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val >> 16) & 0xff;
-	*(bst->p++) = (val >> 24) & 0xff;
+	tb_bits_set_s32_le(bst->p, val);
+	bst->p += 4;
 }
 tb_void_t tb_bstream_set_u16_be(tb_bstream_t* bst, tb_uint16_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val) & 0xff;
+	tb_bits_set_u16_be(bst->p, val);
+	bst->p += 2;
 }
 tb_void_t tb_bstream_set_s16_be(tb_bstream_t* bst, tb_sint16_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val) & 0xff;
+	tb_bits_set_s16_be(bst->p, val);
+	bst->p += 2;
 }
 tb_void_t tb_bstream_set_u32_be(tb_bstream_t* bst, tb_uint32_t val)
 {
 	TB_ASSERT(!bst->b);
-
-	*(bst->p++) = (val >> 24) & 0xff;
-	*(bst->p++) = (val >> 16) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val) & 0xff;
+	tb_bits_set_u32_be(bst->p, val);
+	bst->p += 4;
 }
 tb_void_t tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val)
 {
 	TB_ASSERT(!bst->b);
-	*(bst->p++) = (val >> 24) & 0xff;
-	*(bst->p++) = (val >> 16) & 0xff;
-	*(bst->p++) = (val >> 8) & 0xff;
-	*(bst->p++) = (val) & 0xff;
+	tb_bits_set_s32_be(bst->p, val);
+	bst->p += 4;
 }
-tb_void_t tb_bstream_set_ubits(tb_bstream_t* bst, tb_uint32_t val, tb_size_t nbits)
+
+#ifdef TB_CONFIG_TYPE_FLOAT
+tb_void_t tb_bstream_set_float_le(tb_bstream_t* bst, tb_float_t val)
+{
+	TB_ASSERT(!bst->b);
+	
+	tb_bits_set_float_le(bst->p, val);
+	bst->p += 4;
+}
+tb_void_t tb_bstream_set_float_be(tb_bstream_t* bst, tb_float_t val)
+{
+	TB_ASSERT(!bst->b);
+	
+	tb_bits_set_float_be(bst->p, val);
+	bst->p += 4;
+}
+tb_void_t tb_bstream_set_double_le(tb_bstream_t* bst, tb_float_t val)
+{
+	TB_ASSERT(!bst->b);
+	
+	tb_bits_set_double_le(bst->p, val);
+	bst->p += 8;
+}
+tb_void_t tb_bstream_set_double_be(tb_bstream_t* bst, tb_float_t val)
+{
+	TB_ASSERT(!bst->b);
+	
+	tb_bits_set_double_be(bst->p, val);
+	bst->p += 8;
+}
+#endif
+
+tb_void_t tb_bstream_set_ubits32(tb_bstream_t* bst, tb_uint32_t val, tb_size_t nbits)
 {
 	if (!nbits || !bst) return ;
 
-	val <<= (32 - nbits);
-	while (nbits--) 
-	{
-		*(bst->p) &= ~(0x1 << (7 - bst->b));
-		*(bst->p) |= (((val & 0x80000000) >> 31) << (7 - bst->b));
-
-		val <<= 1;
-		if (++bst->b > 7) 
-		{
-			bst->b = 0;
-			bst->p++;
-		}
-	}
+	tb_bits_set_ubits32(bst->p, bst->b, val, nbits);
+	bst->p += nbits >> 3;
+	bst->b = (bst->b + nbits) & 0x07;
 }
 
+tb_void_t tb_bstream_set_sbits32(tb_bstream_t* bst, tb_sint32_t val, tb_size_t nbits)
+{
+	if (!nbits || !bst) return ;
+
+	tb_bits_set_sbits32(bst->p, bst->b, val, nbits);
+	bst->p += nbits >> 3;
+	bst->b = (bst->b + nbits) & 0x07;
+}
 tb_size_t tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_t size)
 {
 	TB_ASSERT(bst->e >= bst->p);
@@ -651,7 +598,7 @@ tb_char_t* tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s)
 /* /////////////////////////////////////////////////////////
  * peek
  */
-tb_uint32_t tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits)
+tb_uint32_t tb_bstream_peek_ubits32(tb_bstream_t* bst, tb_size_t nbits)
 {
 	if (!nbits || !bst) return 0;
 
@@ -660,7 +607,7 @@ tb_uint32_t tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits)
 	tb_size_t b = bst->b;
 
 	// peek value
-	tb_uint32_t val = tb_bstream_get_ubits(bst, nbits);
+	tb_uint32_t val = tb_bstream_get_ubits32(bst, nbits);
 
 	// restore status
 	bst->p = p;
@@ -668,7 +615,7 @@ tb_uint32_t tb_bstream_peek_ubits(tb_bstream_t* bst, tb_size_t nbits)
 
 	return val;
 }
-tb_sint32_t tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t nbits)
+tb_sint32_t tb_bstream_peek_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 {
 	if (!nbits || !bst) return 0;
 
@@ -677,7 +624,7 @@ tb_sint32_t tb_bstream_peek_sbits(tb_bstream_t* bst, tb_size_t nbits)
 	tb_size_t b = bst->b;
 
 	// peek value
-	tb_sint32_t val = tb_bstream_get_sbits(bst, nbits);
+	tb_sint32_t val = tb_bstream_get_sbits32(bst, nbits);
 
 	// restore status
 	bst->p = p;

@@ -44,19 +44,23 @@
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
 {
-	__tb_asm__("rorw $8, %w0" : "+r"(x));
+	__tb_asm__ __tb_volatile__("rorw $8, %w0" : "+r"(x));
 	return x;
 }
 
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 {
 #if 1
-	__asm__("bswap   %0" : "+r" (x));
+	__tb_asm__ __tb_volatile__("bswap   %0" : "+r" (x));
 #else
-	__tb_asm__( "rorw    $8,  %w0 \n\t"
-				"rorl    $16, %0  \n\t"
-				"rorw    $8,  %w0"
-				: "+r"(x));
+	__tb_asm__ __tb_volatile__
+	(
+		"rorw    $8,  %w0 \n" 	//!< swap low 16 bits
+		"rorl    $16, %0  \n" 	//!< swap x by word
+		"rorw    $8,  %w0" 		//!< swap low 16 bits
+
+		: "+r"(x)
+	);
 #endif
 	return x;
 }

@@ -5,7 +5,7 @@ include $(PRO_DIR)/prefix.mak
 NAMES = test \
 		time \
 		http \
-		bits \
+		bitops \
 		stdlib \
 		sint64 \
 		uint64 \
