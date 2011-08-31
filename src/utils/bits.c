@@ -31,73 +31,116 @@
  */
 tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(p && n <= 32, 0);
+	TB_ASSERT_RETURN_VAL(p && b < 8 && n <= 32, 0);
 	if (!n) return 0;
 
-	tb_uint32_t x = 0;
-	tb_uint8_t i = (tb_uint8_t)b; 
-	tb_uint8_t j = 24;
-
-	b += n;
-	while (b > 7) 
+	if (!b && n == 1) return tb_bits_get_u1(p);
+	else if (!b && n == 8) return tb_bits_get_u8(p);
+	else if (!b && n == 16) return tb_bits_get_u16_be(p);
+	else if (!b && n == 24) return tb_bits_get_u24_be(p);
+	else if (!b && n == 32) return tb_bits_get_u32_be(p);
+	else
 	{
-		x |= *(p++) << (i + j);
-		j -= 8;
-		b -= 8;
+		tb_uint32_t x = 0;
+		tb_size_t 	i = b; 
+		tb_int_t 	j = 24;
+
+		b += n;
+		while (b > 7) 
+		{
+			x |= *p++ << (i + j);
+			j -= 8;
+			b -= 8;
+		}
+		if (b > 0) x |= j < 0? (*p >> (8 - i)) : *p << (i + j);
+
+		return (n < 32)? (x >> (32 - n)) : x;
 	}
-	if (b > 0) x |= *(p) << (i + j);
-
-	x >>= 1;
-	if (x & 0x80000000) x &= 0x7fffffff;
-	x >>= (31 - n);
-
-	return x;
 }
 tb_sint32_t tb_bits_get_sbits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(p && n <= 32, 0);
+	TB_ASSERT_RETURN_VAL(p && b < 8 && n <= 32, 0);
 	if (!n) return 0;
 
-	tb_sint32_t x = 0;
-	tb_uint8_t i = (tb_uint8_t)b; 
-	tb_uint8_t j = 24;
-
-	b += n;
-	while (b > 7) 
+#if 0
+	if (n > 1 && n < 32)
 	{
-		x |= *(p++) << (i + j);
-		j -= 8;
-		b -= 8;
-	}
-	if (b > 0) x |= *(p) << (i + j);
+		tb_sint32_t x = 0;
+		tb_size_t 	i = b; 
+		tb_int_t 	j = 24;
 
-	x >>= (32 - n);
-	return x;
+		b += n;
+		while (b > 7) 
+		{
+			x |= *p++ << (i + j);
+			j -= 8;
+			b -= 8;
+		}
+		if (b > 0) x |= j < 0? (*p >> (8 - i)) : *p << (i + j);
+
+		return (x >> (32 - n));
+	}
+	else return (tb_sint32_t)tb_bits_get_ubits32(p, b, n);
+#else
+	if (n > 1 && n < 32)
+	{
+		if (!tb_bits_get_ubits32(p, b, 1)) 
+			return (tb_sint32_t)tb_bits_get_ubits32(p, b, n);
+		else
+		{
+#if 0
+			tb_uint32_t x = tb_bits_get_ubits32(p, b + 1, n - 1);
+			return (tb_sint32_t)(x | 0x80000000);
+#else
+			tb_sint32_t x = -1;
+			return ((x << (n - 1)) | tb_bits_get_ubits32(p, b + 1, n - 1));
+#endif
+		}
+	}
+	else return (tb_sint32_t)tb_bits_get_ubits32(p, b, n);
+#endif
 }
 tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_t n)
 {
-	TB_ASSERT_RETURN(p && n <= 32);
+	TB_ASSERT_RETURN(p && b < 8 && n <= 32);
 	if (!n) return ;
 
-	x <<= (32 - n);
-	while (n--) 
+	if (!b && n == 1) tb_bits_set_u1(p, x);
+	else if (!b && n == 8) tb_bits_set_u8(p, x);
+	else if (!b && n == 16) tb_bits_set_u16_be(p, x);
+	else if (!b && n == 24) tb_bits_set_u24_be(p, x);
+	else if (!b && n == 32) tb_bits_set_u32_be(p, x);
+	else
 	{
-		*(p) &= ~(0x1 << (7 - b));
-		*(p) |= (((x & 0x80000000) >> 31) << (7 - b));
-
-		x <<= 1;
-		if (++b > 7) 
+		if (n < 32) x <<= (32 - n);
+		while (n--) 
 		{
-			b = 0;
-			p++;
+			*p &= ~(0x1 << (7 - b));
+			*p |= ((x >> 31) << (7 - b));
+
+			x <<= 1;
+			if (++b > 7) 
+			{
+				b = 0;
+				p++;
+			}
 		}
 	}
 }
 tb_void_t tb_bits_set_sbits32(tb_byte_t* p, tb_size_t b, tb_sint32_t x, tb_size_t n)
 {
-	TB_ASSERT_RETURN(p && n <= 32);
+	TB_ASSERT_RETURN(p && b < 8 && n <= 32);
 	if (!n) return ;
 
-
-	TB_NOT_IMPLEMENT();
+	if (x >= 0) tb_bits_set_ubits32(p, b, (tb_uint32_t)x, n);
+	else if (n > 1)
+	{
+		tb_bits_set_ubits32(p, b, (((tb_uint32_t)x) >> 31) & 0x01, 1);
+		tb_bits_set_ubits32(p, b + 1, (((tb_uint32_t)x) & 0x7fffffff), n - 1);
+	}
+	else 
+	{
+		// need 2-bits at least
+		TB_ASSERT(0);
+	}
 }
