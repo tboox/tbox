@@ -131,7 +131,6 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 			}
 		}
 #else
-#error
 		tb_uint32_t m = 0xffffffff;
 		tb_size_t 	i = b; b += n;
 
@@ -142,7 +141,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 		}
 		if (b > 32)
 		{
-			p[0] &= (m >> (24 + i));
+			p[0] &= ~(m >> (24 + i));
 			p[0] |= (x >> (24 + i));
 			p[1] = (x >> (16 + i));
 			p[2] = (x >> (8 + i));	
@@ -153,7 +152,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 		{
 			if (i)
 			{
-				p[0] &= (m >> (24 + i));
+				p[0] &= ~(m >> (24 + i));
 				p[0] |= (x >> (24 + i));
 				p[1] = (x >> (16 + i));
 				p[2] = (x >> (8 + i));	
@@ -171,7 +170,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 		{
 			if (i)
 			{
-				p[0] &= (m >> (24 + i));
+				p[0] &= ~(m >> (24 + i));
 				p[0] |= (x >> (24 + i));
 				p[1] = (x >> (16 + i));
 				p[2] = (x >> (8 + i));
@@ -187,7 +186,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 		{
 			if (i)
 			{
-				p[0] &= (m >> (24 + i));
+				p[0] &= ~(m >> (24 + i));
 				p[0] |= (x >> (24 + i));
 				p[1] = (x >> (16 + i));
 			}
@@ -201,7 +200,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 		{
 			if (i)
 			{
-				p[0] &= (m >> (24 + i));
+				p[0] &= ~(m >> (24 + i));
 				p[0] |= (x >> (24 + i));	
 			}
 			else p[0] = x >> 24;

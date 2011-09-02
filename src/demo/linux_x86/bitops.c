@@ -115,11 +115,11 @@ int main(int argc, char** argv)
 	tb_test_bits_swap_u32();
 	tb_test_bits_swap_u64();
 
-//	tb_test_bits_ubits32(0x87654321);
-//	tb_test_bits_ubits32(0x12345678);
+	tb_test_bits_ubits32(0x87654321);
+	tb_test_bits_ubits32(0x12345678);
 	
-//	tb_test_bits_sbits32(0x87654321);
-//	tb_test_bits_sbits32(0x12345678);
+	tb_test_bits_sbits32(0x87654321);
+	tb_test_bits_sbits32(0x12345678);
 
 	tb_test_bits_sbits32(-300);
 	tb_test_bits_sbits32(300);
