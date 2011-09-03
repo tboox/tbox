@@ -42,7 +42,9 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 	else if (!b && n == 32) return tb_bits_get_u32_be(p);
 	else
 	{
-#ifdef TB_CONFIG_BINARY_SMALL
+#if defined(tb_bits_get_ubits32_impl)
+		return tb_bits_get_ubits32_impl(p, b, n);
+#elif defined(TB_CONFIG_BINARY_SMALL)
 		tb_uint32_t x = 0;
 		tb_size_t 	i = b; 
 		tb_int_t 	j = 24;
@@ -70,10 +72,15 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 		}
 		else if (b > 24)
 		{
+#if 1
 			x |= p[0] << (i + 24);
 			x |= p[1] << (i + 16);
 			x |= p[2] << (i + 8);
 			x |= p[3] << (i + 0);
+#else
+			x = tb_bits_get_u32_be(p);
+			x <<= i;
+#endif
 		}
 		else if (b > 16)
 		{
