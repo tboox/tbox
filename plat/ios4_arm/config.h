@@ -60,7 +60,7 @@
 //#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // binary
-#define TB_CONFIG_BINARY_SMALL
+//#define TB_CONFIG_BINARY_SMALL
 
 // memory
 #define TB_CONFIG_MEMORY_MODE_SMALL

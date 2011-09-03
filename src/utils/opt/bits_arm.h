@@ -35,10 +35,12 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 
 #if TB_CONFIG_ARM_VERSION >= 6
-# 	define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
+# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
 #endif
 
-#define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
+#define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+
+#define tb_bits_get_ubits32_impl(p, b, n) 	tb_bits_get_ubits32_impl_asm(p, b, n)
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 
@@ -74,6 +76,113 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 	);
 #endif
 	return x;
+}
+
+static __tb_inline__ tb_uint32_t tb_bits_get_ubits32_impl_asm(tb_byte_t const* p, tb_size_t b, tb_size_t n)
+{
+#ifdef TB_CONFIG_BINARY_SMALL
+	__tb_register__ tb_uint32_t x;
+	__tb_asm__ __tb_volatile__
+	(
+	 	"ldrb r6, [%1], #1\n"
+	 	"ldrb r7, [%1], #1\n"
+	 	"ldrb r8, [%1], #1\n"
+	 	"ldrb r9, [%1], #1\n"
+	 	"ldrb %1, [%1]\n"
+	 	"orr %0, r6, lsl %2\n"
+		"sub %2, %2, #8\n"
+		"cmp %3, #8\n"
+	 	"orrhi %0, r7, lsl %2\n"
+		"sub %2, %2, #8\n"
+		"cmp %3, #16\n"
+	 	"orrhi %0, r8, lsl %2\n"
+		"sub %2, %2, #8\n"
+		"cmp %3, #24\n"
+	 	"orrhi %0, r9, lsl %2\n"
+		"rsb %2, %2, #8\n"
+		"cmp %3, #32\n"
+	 	"orrhi %0, %1, lsr %2\n"
+		"rsb %4, %4, #32\n"
+		"mov %0, %0, lsr %4\n"
+
+
+		: "=&r"(x)
+		: "r"(p), "r"(b + 24), "r"(b + n), "r"(n), "0"(0)
+		: "r6", "r7", "r8", "r9"
+	);
+
+	return x;
+#else
+	__tb_register__ tb_uint32_t x;
+	__tb_asm__ __tb_volatile__
+	(
+		" 	cmp %3, #32\n"
+		" 	bhi 1f\n"
+		" 	cmp %3, #24\n"
+		" 	bhi 2f\n"
+		" 	cmp %3, #16\n"
+		" 	bhi 3f\n"
+		" 	cmp %3, #8\n"
+		" 	bhi 4f\n"
+	 	" 	ldrb %1, [%1]\n"
+	 	" 	orr %0, %1, lsl %2\n"
+		" 	b 	5f\n"
+		"1:\n"
+	 	" 	ldrb r6, [%1], #1\n"
+	 	" 	ldrb r7, [%1], #1\n"
+	 	" 	ldrb r8, [%1], #1\n"
+	 	" 	ldrb r9, [%1], #1\n"
+	 	" 	ldrb %1, [%1]\n"
+	 	" 	orr %0, r6, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r7, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r8, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r9, lsl %2\n"
+		" 	rsb %2, %2, #8\n"
+	 	" 	orr %0, %1, lsr %2\n"
+		" 	b 	5f\n"
+		"2:\n"
+	 	" 	ldrb r6, [%1], #1\n"
+	 	" 	ldrb r7, [%1], #1\n"
+	 	" 	ldrb r8, [%1], #1\n"
+	 	" 	ldrb r9, [%1], #1\n"
+	 	" 	orr %0, r6, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r7, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r8, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r9, lsl %2\n"
+		" 	b 	5f\n"
+		"3:\n"
+	 	" 	ldrb r6, [%1], #1\n"
+	 	" 	ldrb r7, [%1], #1\n"
+	 	" 	ldrb r8, [%1], #1\n"
+	 	" 	orr %0, r6, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r7, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r8, lsl %2\n"
+		" 	b 	5f\n"
+		"4:\n"
+	 	" 	ldrb r6, [%1], #1\n"
+	 	" 	ldrb r7, [%1], #1\n"
+	 	" 	orr %0, r6, lsl %2\n"
+		" 	sub %2, %2, #8\n"
+	 	" 	orr %0, r7, lsl %2\n"
+		"5:\n"
+		" 	rsb %4, %4, #32\n"
+		" 	mov %0, %0, lsr %4\n"
+
+		: "=&r"(x)
+		: "r"(p), "r"(b + 24), "r"(b + n), "r"(n), "0"(0)
+		: "r6", "r7", "r8", "r9"
+	);
+
+	return x;
+#endif
 }
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
