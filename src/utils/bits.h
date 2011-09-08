@@ -485,7 +485,7 @@ static __tb_inline__ tb_float_t tb_bits_get_double_be_impl_inline(tb_byte_t cons
 {
 	union 
 	{
-		tb_uint8_t 	i[8];
+		tb_uint32_t i[2];
 		double 		f;
 
 	} conv;
@@ -504,8 +504,8 @@ static __tb_inline__ tb_float_t tb_bits_get_double_ne_impl_inline(tb_byte_t cons
 {
 	union 
 	{
-		tb_uint8_t 	i[8];
-		double 		f;
+		tb_uint32_t 	i[0];
+		double 			f;
 
 	} conv;
 
@@ -523,8 +523,8 @@ static __tb_inline__ tb_void_t tb_bits_set_double_le_impl_inline(tb_byte_t* p, t
 {
 	union 
 	{
-		tb_uint32_t i[2];
-		double 		f;
+		tb_uint32_t 	i[2];
+		double 			f;
 
 	} conv;
 
@@ -542,8 +542,8 @@ static __tb_inline__ tb_void_t tb_bits_set_double_be_impl_inline(tb_byte_t* p, t
 {
 	union 
 	{
-		tb_uint32_t i[2];
-		double 		f;
+		tb_uint32_t 	i[2];
+		double 			f;
 
 	} conv;
 
@@ -561,8 +561,8 @@ static __tb_inline__ tb_void_t tb_bits_set_double_ne_impl_inline(tb_byte_t* p, t
 {
 	union 
 	{
-		tb_uint32_t i[2];
-		double 		f;
+		tb_uint32_t 	i[2];
+		double 			f;
 
 	} conv;
 
