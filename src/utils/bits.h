@@ -103,21 +103,54 @@ extern "C" {
 
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	define tb_bits_get_float_le_impl(p) 	tb_bits_get_float_le_impl_inline(p)
-# 	define tb_bits_get_float_be_impl(p) 	tb_bits_get_float_be_impl_inline(p)
-# 	define tb_bits_get_float_ne_impl(p) 	tb_bits_get_float_ne_impl_inline(p)
 
-# 	define tb_bits_set_float_le_impl(p, x) 	tb_bits_set_float_le_impl_inline(p, x)
-# 	define tb_bits_set_float_be_impl(p, x) 	tb_bits_set_float_be_impl_inline(p, x)
-# 	define tb_bits_set_float_ne_impl(p, x) 	tb_bits_set_float_ne_impl_inline(p, x)
+# 	ifndef tb_bits_get_float_le_impl
+# 		define tb_bits_get_float_le_impl(p) 	tb_bits_get_float_le_impl_inline(p)
+# 	endif
 
-# 	define tb_bits_get_double_le_impl(p) 	tb_bits_get_double_le_impl_inline(p)
-# 	define tb_bits_get_double_be_impl(p) 	tb_bits_get_double_be_impl_inline(p)
-# 	define tb_bits_get_double_ne_impl(p) 	tb_bits_get_double_ne_impl_inline(p)
+# 	ifndef tb_bits_get_float_be_impl
+# 		define tb_bits_get_float_be_impl(p) 	tb_bits_get_float_be_impl_inline(p)
+# 	endif
 
-# 	define tb_bits_set_double_le_impl(p, x) tb_bits_set_double_le_impl_inline(p, x)
-# 	define tb_bits_set_double_be_impl(p, x) tb_bits_set_double_be_impl_inline(p, x)
-# 	define tb_bits_set_double_ne_impl(p, x) tb_bits_set_double_ne_impl_inline(p, x)
+# 	ifndef tb_bits_get_float_ne_impl
+# 		define tb_bits_get_float_ne_impl(p) 	tb_bits_get_float_ne_impl_inline(p)
+# 	endif
+
+# 	ifndef tb_bits_set_float_le_impl
+# 		define tb_bits_set_float_le_impl(p, x) 	tb_bits_set_float_le_impl_inline(p, x)
+# 	endif
+
+# 	ifndef tb_bits_set_float_be_impl
+# 		define tb_bits_set_float_be_impl(p, x) 	tb_bits_set_float_be_impl_inline(p, x)
+# 	endif
+
+# 	ifndef tb_bits_set_float_ne_impl
+# 		define tb_bits_set_float_ne_impl(p, x) 	tb_bits_set_float_ne_impl_inline(p, x)
+# 	endif
+
+# 	ifndef tb_bits_get_double_le_impl
+# 		define tb_bits_get_double_le_impl(p) 	tb_bits_get_double_le_impl_inline(p)
+# 	endif
+
+# 	ifndef tb_bits_get_double_be_impl
+# 		define tb_bits_get_double_be_impl(p) 	tb_bits_get_double_be_impl_inline(p)
+# 	endif
+
+# 	ifndef tb_bits_get_double_ne_impl
+# 		define tb_bits_get_double_ne_impl(p) 	tb_bits_get_double_ne_impl_inline(p)
+# 	endif
+
+# 	ifndef tb_bits_set_double_le_impl
+# 		define tb_bits_set_double_le_impl(p, x) tb_bits_set_double_le_impl_inline(p, x)
+# 	endif
+
+# 	ifndef tb_bits_set_double_be_impl
+# 		define tb_bits_set_double_be_impl(p, x) tb_bits_set_double_be_impl_inline(p, x)
+# 	endif
+
+# 	ifndef tb_bits_set_double_ne_impl
+# 		define tb_bits_set_double_ne_impl(p, x) tb_bits_set_double_ne_impl_inline(p, x)
+# 	endif
 
 #endif
 

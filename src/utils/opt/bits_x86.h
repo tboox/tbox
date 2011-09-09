@@ -31,15 +31,22 @@
 /* ////////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
-#define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+
+#define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+#define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
 
 #ifdef TB_CONFIG_TYPE_INT64
-# 	define tb_bits_swap_u64(x) 	tb_bits_swap_u64_asm(x)
+# 	define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
 #endif
+
+#endif /* TB_CONFIG_ASSEMBLER_GAS */
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+#ifdef TB_CONFIG_ASSEMBLER_GAS
 
 // swap
 static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_asm(tb_uint16_t x)
@@ -87,6 +94,8 @@ static __tb_inline__ tb_uint64_t const tb_bits_swap_u64_asm(tb_uint64_t x)
 	return x;
 }
 #endif
+
+#endif /* TB_CONFIG_ASSEMBLER_GAS */
 
 #endif
 
