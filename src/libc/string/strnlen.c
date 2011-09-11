@@ -26,19 +26,28 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/strnlen.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/strnlen.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/strnlen.c"
+#ifndef TB_CONFIG_LIBC_HAVE_STRNLEN
+# 	if defined(TB_CONFIG_ARCH_x86)
+# 		include "opt/x86/strnlen.c"
+# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 		include "opt/arm/strnlen.c"
+# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 		include "opt/sh4/strnlen.c"
+# 	endif
+#else
+# 	include <string.h>
 #endif
 
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
-#ifndef TB_LIBC_STRING_OPT_STRNLEN
+#if defined(TB_CONFIG_LIBC_HAVE_STRNLEN)
+tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s, 0);
+	return strnlen(s, n);
+}
+#elif !defined(TB_LIBC_STRING_OPT_STRNLEN)
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s, 0);

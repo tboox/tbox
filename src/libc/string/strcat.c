@@ -25,11 +25,20 @@
  * includes
  */
 #include "prefix.h"
-
+#ifdef TB_CONFIG_LIBC_HAVE_STRCAT
+# 	include <string.h>
+#endif
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
 
+#ifdef TB_CONFIG_LIBC_HAVE_STRCAT
+tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	return strcat(s1, s2);
+}
+#else
 tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
@@ -39,4 +48,4 @@ tb_char_t* tb_strcat(tb_char_t* s1, tb_char_t const* s2)
 	while (!(*s++ = *s2++));
 	return s1;
 }
-
+#endif

@@ -27,18 +27,28 @@
 #include "prefix.h"
 #include "../../utils/utils.h"
 
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/memset.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/memset.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/memset.c"
+#ifndef TB_CONFIG_LIBC_HAVE_MEMSET
+# 	if defined(TB_CONFIG_ARCH_x86)
+# 		include "opt/x86/memset.c"
+# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 		include "opt/arm/memset.c"
+# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 		include "opt/sh4/memset.c"
+# 	endif
+#else
+# 	include <string.h>
 #endif
 
 /* /////////////////////////////////////////////////////////
  * implemention 
  */
-#ifndef TB_LIBC_STRING_OPT_MEMSET_U8
+#if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
+tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	return memset(s, c, n);
+}
+#elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
 tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s, TB_NULL);
