@@ -26,19 +26,29 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/memcpy.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/memcpy.c"
+#ifndef TB_CONFIG_LIBC_HAVE_MEMCPY
+# 	if defined(TB_CONFIG_ARCH_x86)
+# 		include "opt/x86/memcpy.c"
+# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 		include "opt/arm/memcpy.c"
+# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 		include "opt/sh4/memcpy.c"
+# 	endif
+#else
+# 	include <string.h>
 #endif
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-#ifndef TB_LIBC_STRING_OPT_MEMCPY
+#if defined(TB_CONFIG_LIBC_HAVE_MEMCPY)
+tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	return memcpy(s1, s2, n);
+}
+#elif !defined(TB_LIBC_STRING_OPT_MEMCPY)
 tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
@@ -66,6 +76,7 @@ tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 	}
 	while (l--) *p1++ = *p2++;
 	return s1;
-#endif
+#endif /* TB_CONFIG_BINARY_SMALL */
 }
 #endif
+

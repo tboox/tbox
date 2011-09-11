@@ -26,18 +26,28 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_ARCH_x86)
-# 	include "opt/x86/strncmp.c"
-#elif defined(TB_CONFIG_ARCH_ARM)
-# 	include "opt/arm/strncmp.c"
-#elif defined(TB_CONFIG_ARCH_SH4)
-# 	include "opt/sh4/strncmp.c"
+#ifndef TB_CONFIG_LIBC_HAVE_STRNCMP
+# 	if defined(TB_CONFIG_ARCH_x86)
+# 		include "opt/x86/strncmp.c"
+# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 		include "opt/arm/strncmp.c"
+# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 		include "opt/sh4/strncmp.c"
+# 	endif
+#else
+# 	include <string.h>
 #endif
 
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifndef TB_LIBC_STRING_OPT_STRNCMP
+#if defined(TB_CONFIG_LIBC_HAVE_STRNCMP)
+tb_int_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	return strncmp(s1, s2, n);
+}
+#elif !defined(TB_LIBC_STRING_OPT_STRNCMP)
 tb_int_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);

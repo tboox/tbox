@@ -26,10 +26,21 @@
  */
 #include "prefix.h"
 
+#ifdef TB_CONFIG_LIBC_HAVE_STRSTR
+# 	include <string.h>
+#endif
+
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
 
+#ifdef TB_CONFIG_LIBC_HAVE_STRSTR
+tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	return strstr(s1, s2);
+}
+#else
 tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
@@ -56,4 +67,4 @@ tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 
 	return TB_NULL;
 }
-
+#endif

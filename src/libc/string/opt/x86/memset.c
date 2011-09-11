@@ -32,10 +32,10 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TB_LIBC_STRING_OPT_MEMSET_U8
 
 #if defined(TB_CONFIG_ASSEMBLER_GAS) || \
 		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+# 	define TB_LIBC_STRING_OPT_MEMSET_U8
 # 	define TB_LIBC_STRING_OPT_MEMSET_U16
 # 	define TB_LIBC_STRING_OPT_MEMSET_U32
 #endif
@@ -113,9 +113,7 @@ tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 	TB_ASSERT_RETURN_VAL(s, TB_NULL);
 	if (!n) return s;
 
-# 	if 1
-	memset(s, c, n);
-# 	elif defined(TB_CONFIG_ASSEMBLER_GAS)
+# 	if defined(TB_CONFIG_ASSEMBLER_GAS)
 	tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
 # 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
 	tb_memset_u8_opt_v2(s, (tb_byte_t)c, n);

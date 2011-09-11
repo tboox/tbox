@@ -26,10 +26,20 @@
  */
 #include "prefix.h"
 
+#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
+# 	include <string.h>
+#endif
+
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
+#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
+tb_int_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+{
+	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	return strcasecmp(s1, s2);
+}
+#else
 tb_int_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
@@ -39,4 +49,4 @@ tb_int_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 	while (((s1 == s2) || !(r = ((tb_int_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
 	return r;
 }
-
+#endif
