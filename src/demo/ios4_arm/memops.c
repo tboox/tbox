@@ -80,6 +80,7 @@ int main(int argc, char** argv)
 	tb_printf("memset[1m]: %lld ms\n", dt);
 	if (!check_memset_u8(data, 0xbe, 1024 * 1024 + 3)) tb_printf("check failed\n");
 
+#if 0
 	// test: u8 x 1024
 	memset(data2, 0, size2);
 
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
 	dt = tb_int64_sub(tb_mclock(), dt);
 	tb_printf("memmov[1m]: %lld ms\n", dt);
 	if (!check_memset_u8(data + 1024 * 1024 + 3, 0xbe, 1024 * 1024 + 3)) tb_printf("check failed\n");
-
+#endif
 	// test: u16 x 1024
 	memset(data, 0, size);
 

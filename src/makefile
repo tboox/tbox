@@ -129,16 +129,20 @@ INC_FILES 			= \
 					math/fixed16.h \
 					math/fixed30.h \
 					math/int32.h \
+					math/int64.h \
 					math/sint64.h \
 					math/uint64.h \
 					math/scalar.h \
 					math/opt/prefix.h \
-					math/opt/fixed16_x86.h \
-					math/opt/fixed16_arm.h \
-					math/opt/fixed16_sh4.h \
 					math/opt/float_x86.h \
 					math/opt/float_arm.h \
 					math/opt/float_sh4.h \
+					math/opt/fixed16_x86.h \
+					math/opt/fixed16_arm.h \
+					math/opt/fixed16_sh4.h \
+					math/opt/fixed30_x86.h \
+					math/opt/fixed30_arm.h \
+					math/opt/fixed30_sh4.h \
 					string/prefix.h \
 					string/string.h \
 					container/prefix.h \
@@ -146,6 +150,7 @@ INC_FILES 			= \
 					container/pool.h \
 					container/vector.h \
 					container/slist.h \
+					container/dlist.h \
 					platform/platform.h \
 					platform/prefix.h \
 					platform/file.h \
@@ -175,6 +180,11 @@ INC_FILES 			= \
 					utils/md5.h \
 					utils/crc.h \
 					utils/base32.h \
+					utils/base64.h \
+					utils/opt/bits_x86.h \
+					utils/opt/bits_arm.h \
+					utils/opt/bits_sh4.h \
+					utils/opt/prefix.h \
 					utils/base64.h \
 					xml/xml.h \
 					xml/prefix.h \

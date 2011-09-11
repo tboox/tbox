@@ -29,9 +29,8 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TB_LIBC_STRING_OPT_MEMSET_U8
-
 #if defined(TB_CONFIG_ASSEMBLER_GAS)
+# 	define TB_LIBC_STRING_OPT_MEMSET_U8
 # 	define TB_LIBC_STRING_OPT_MEMSET_U16
 # 	define TB_LIBC_STRING_OPT_MEMSET_U32
 #endif
@@ -42,7 +41,38 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
+	// cache line: 16-bytes
+	__tb_asm__ __tb_volatile__
+	(
+		" 	tst 	%2, #3\n" 					//!<  align by 4-bytes, if (s & 0x3) *s = c, s++, n-- 
+		" 	strneb 	%1, [%2], #1\n"
+		" 	subne 	%0, %0, #1\n"
+		" 	tst 	%2, #3\n" 					//!<  align by 4-bytes, if (s & 0x3) *s = c, s++, n-- 
+		" 	strneb 	%1, [%2], #1\n"
+		" 	subne 	%0, %0, #1\n"
+		" 	tst 	%2, #3\n" 					//!<  align by 4-bytes, if (s & 0x3) *s = c, s++, n-- 
+		" 	strneb 	%1, [%2], #1\n"
+		" 	subne 	%0, %0, #1\n"
+		" 	orr 	%1, %1, %1, lsl #8\n" 		//!<  c |= c << 8, expand to 16-bits 
+		" 	orr 	%1, %1, %1, lsl #16\n" 		//!<  c |= c << 16, expand to 32-bits 
+		" 	mov 	r3, %1\n" 					//!<  for storing data by 4x32bits 
+		" 	mov 	r4, %1\n"
+		" 	mov 	r5, %1\n"
+		"1:\n" 									//!<  fill data by cache line n 
+		" 	subs 	%0, %0, #16\n" 				//!<  n -= 16[x8bits] and update cpsr, assume 16-bytes cache lines 
+		" 	stmhsia %2!, {%1, r3, r4, r5}\n" 	//!<  storing data by 4x32bits = 16[x8bits], cond: hs (if >= 0), ia: s++ 
+		" 	bhs 	1b\n" 						//!<  goto 1b if hs (>= 0) 
+		" 	add 	%0, %0, #16\n" 				//!<  fill the left data, n = left n (< 16[x8bits]) 
+		" 	movs 	%0, %0, lsl #29\n" 			//!<  1, 11100000000000000000000000000000 
+		" 	stmcsia %2!, {r4, r5}\n" 			//!<  store 2x32bits, cond: cs (if carry bit == 1, >= 8[x8bits]) 
+		" 	strmi 	r3, [%2], #4\n" 			//!<  store 32bits, cond: mi (if negative bit == 1, >=4[x8bits]) 
+		" 	movs 	%0, %0, lsl #2\n" 			//!<  1, 10000000000000000000000000000000 
+		" 	strcsh 	%1, [%2], #2\n" 			//!<  store 16bits, cond: cs (if carry bit == 1, >= 2[x8bits]) 
+		" 	strmib 	r3, [%2]\n" 				//!<  store 8bits, cond: cs (if negative bit == 1, >= 1[x8bits]) 
 
+		: : "r" (n), "r" (c), "r" (s)
+		: "r3", "r4", "r5"
+	);
 }
 #endif
 
@@ -52,10 +82,15 @@ tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 	TB_ASSERT_RETURN_VAL(s, TB_NULL);
 	if (!n) return s;
 
-# 	if 1
-	memset(s, c, n);
-# 	elif defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
+# 	if defined(TB_CONFIG_ASSEMBLER_GAS)
+	// align: 3 + cache: 16
+	if (n > 19) tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
+	else
+	{
+		__tb_register__ tb_byte_t* 	p = s;
+		__tb_register__	tb_byte_t 	b = (tb_byte_t)c;
+		while (n--) *p++ = b;
+	}
 # 	else
 # 		error
 # 	endif
@@ -73,7 +108,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t 
 	(
 		" 	tst 	%2, #3\n" 					//!<  align by 4-bytes, if (s & 0x3) *((tb_uint16_t*)s) = c, s += 2, n-- 
 		" 	strneh 	%1, [%2], #2\n"
-		" 	subnes 	%0, %0, #1\n"
+		" 	subne 	%0, %0, #1\n"
 		" 	orr 	%1, %1, %1, lsl #16\n" 		//!<  c |= c << 16, expand to 32-bits 
 		" 	mov 	r3, %1\n" 					//!<  for storing data by 4x32bits 
 		" 	mov 	r4, %1\n"
@@ -87,7 +122,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t 
 		" 	stmcsia %2!, {r4, r5}\n" 			//!<  store 2x32bits, cond: cs (if carry bit == 1, >= 4[x16bits]) 
 		" 	strmi 	r3, [%2], #4\n" 			//!<  store 32bits, cond: mi (if negative bit == 1, >=2[x16bits]) 
 		" 	movs 	%0, %0, lsl #2\n" 			//!<  1, 00000000000000000000000000000000 
-		" 	strcsh 	%1, [%2], #2\n" 			//!<  store 16bits, cond: cs (if carry bit == 1, >= [x16bits]) 
+		" 	strcsh 	%1, [%2]\n" 				//!<  store 16bits, cond: cs (if carry bit == 1, >= [x16bits]) 
 
 		: : "r" (n), "r" (c), "r" (s)
 		: "r3", "r4", "r5"
@@ -100,7 +135,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 	(
 		" 	tst 	%2, #3\n" 					//!<  align by 4-bytes, if (s & 0x3) *((tb_uint16_t*)s) = c, s += 2, n--
 		" 	strneh 	%1, [%2], #2\n"
-		" 	subnes 	%0, %0, #1\n"
+		" 	subne 	%0, %0, #1\n"
 		" 	orr 	%1, %1, %1, lsl #16\n" 		//!<  c |= c << 16, expand to 32-bits 
 		" 	mov 	r3, %1\n" 					//!<  for storing data by 8x32bits 
 		" 	mov 	r4, %1\n"
@@ -116,7 +151,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 		" 	stmmiia %2!, {r4, r5}\n" 			//!<  store 2x32bits, cond: mi (if negative bit == 1, >=4[x16bits]) 
 		" 	movs 	%0, %0, lsl #2\n" 			//!<  1, 10000000000000000000000000000000 
 		" 	strcs 	%1, [%2], #4\n" 			//!<  store 32bits, cond: cs (if carry bit == 1, >= 2[x16bits]) 
-		" 	strmih 	r3, [%2], #2\n" 			//!<  store 16bits, cond: cs (if negative bit == 1, >= [x16bits]) 
+		" 	strmih 	r3, [%2]\n" 				//!<  store 16bits, cond: cs (if negative bit == 1, >= [x16bits]) 
 
 		: : "r" (n), "r" (c), "r" (s)
 		: "r3", "r4", "r5"
@@ -134,7 +169,13 @@ tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	if (n > 8) tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	else
+	{
+		__tb_register__ tb_uint16_t* 	p = s;
+		__tb_register__	tb_uint16_t 	b = (tb_uint16_t)c;
+		while (n--) *p++ = b;
+	}
 # 	else
 # 		error
 # 	endif
@@ -159,7 +200,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t 
 		" 	add %0, %0, #4\n" 					//!<  fill the left data, n = left n (< 4[x32bits]) 
 		" 	movs %0, %0, lsl #31\n" 			//!<  1, 1000000000000000000000000000000 
 		" 	stmcsia %2!, {r4, r5}\n" 			//!<  store 2x32bits, cond: cs (if carry bit == 1, >= 2[x32bits]) 
-		" 	strmi r3, [%2], #4\n" 				//!<  store 32bits, cond: mi (if negative bit == 1, >= [x32bits]) 
+		" 	strmi r3, [%2]\n" 					//!<  store 32bits, cond: mi (if negative bit == 1, >= [x32bits]) 
 
 		: : "r" (n), "r" (c), "r" (s)
 		: "r3", "r4", "r5"
@@ -183,7 +224,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t 
 		" 	stmcsia %2!, {%1, r3, r4, r5}\n" 	//!<  store 4x32bits, cond: cs (if carry bit == 1, >= 4[x32bits]) 
 		" 	stmmiia %2!, {r4, r5}\n" 			//!<  store 2x32bits, cond: mi (if negative bit == 1, >=2[x32bits]) 
 		" 	movs %0, %0, lsl #2\n" 				//!<  1, 00000000000000000000000000000000 
-		" 	strcs %1, [%2], #4\n" 				//!<  store 32bits, cond: cs (if carry bit == 1, >= [x32bits]) 
+		" 	strcs %1, [%2]\n" 					//!<  store 32bits, cond: cs (if carry bit == 1, >= [x32bits]) 
 
 		: : "r" (n), "r" (c), "r" (s)
 		: "r3", "r4", "r5"
@@ -201,7 +242,13 @@ tb_void_t* tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	if (n > 4) tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	else
+	{
+		__tb_register__ tb_uint32_t* 	p = s;
+		__tb_register__	tb_uint32_t 	b = (tb_uint32_t)c;
+		while (n--) *p++ = b;
+	}
 # 	else
 # 		error
 # 	endif

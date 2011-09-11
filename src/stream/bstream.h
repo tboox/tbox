@@ -54,14 +54,6 @@ extern "C" {
 # 	define tb_bstream_set_u32_ne(bst, val)		tb_bstream_set_u32_be(bst, val)
 # 	define tb_bstream_set_s32_ne(bst, val) 		tb_bstream_set_s32_be(bst, val)
 
-# 	ifdef TB_CONFIG_TYPE_FLOAT
-# 	define tb_bstream_get_float_ne(bst) 		tb_bstream_get_float_be(bst)
-# 	define tb_bstream_set_float_ne(bst, val) 	tb_bstream_set_float_be(bst, val)
-
-# 	define tb_bstream_get_double_ne(bst) 		tb_bstream_get_double_be(bst)
-# 	define tb_bstream_set_double_ne(bst, val) 	tb_bstream_set_double_be(bst, val)
-# 	endif
-
 #else
 # 	define tb_bstream_get_u16_ne(bst) 			tb_bstream_get_u16_le(bst)
 # 	define tb_bstream_get_s16_ne(bst) 			tb_bstream_get_s16_le(bst)
@@ -76,14 +68,6 @@ extern "C" {
 # 	define tb_bstream_set_s24_ne(bst, val)		tb_bstream_set_s24_le(bst, val)
 # 	define tb_bstream_set_u32_ne(bst, val)		tb_bstream_set_u32_le(bst, val)
 # 	define tb_bstream_set_s32_ne(bst, val) 		tb_bstream_set_s32_le(bst, val)
-
-# 	ifdef TB_CONFIG_TYPE_FLOAT
-# 	define tb_bstream_get_float_ne(bst) 		tb_bstream_get_float_le(bst)
-# 	define tb_bstream_set_float_ne(bst, val) 	tb_bstream_set_float_le(bst, val)
-
-# 	define tb_bstream_get_double_ne(bst) 		tb_bstream_get_double_le(bst)
-# 	define tb_bstream_set_double_ne(bst, val) 	tb_bstream_set_double_le(bst, val)
-# 	endif
 
 #endif
 
@@ -161,8 +145,17 @@ tb_sint32_t 		tb_bstream_get_s32_be(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_float_le(tb_bstream_t* bst);
 tb_float_t 			tb_bstream_get_float_be(tb_bstream_t* bst);
 
-tb_float_t 			tb_bstream_get_double_le(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_be(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_ble(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_bbe(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_bne(tb_bstream_t* bst);
+
+tb_float_t 			tb_bstream_get_double_lle(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_lbe(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_lne(tb_bstream_t* bst);
+
+tb_float_t 			tb_bstream_get_double_nle(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_nbe(tb_bstream_t* bst);
+tb_float_t 			tb_bstream_get_double_nne(tb_bstream_t* bst);
 #endif
 
 tb_uint32_t 		tb_bstream_get_ubits32(tb_bstream_t* bst, tb_size_t nbits);
@@ -205,8 +198,17 @@ tb_char_t*			tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s);
 tb_void_t 			tb_bstream_set_float_le(tb_bstream_t* bst, tb_float_t val);
 tb_void_t 			tb_bstream_set_float_be(tb_bstream_t* bst, tb_float_t val);
 
-tb_void_t 			tb_bstream_set_double_le(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_be(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_ble(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_bbe(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_bne(tb_bstream_t* bst, tb_float_t val);
+
+tb_void_t 			tb_bstream_set_double_lle(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_lbe(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_lne(tb_bstream_t* bst, tb_float_t val);
+
+tb_void_t 			tb_bstream_set_double_nle(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_nbe(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_nne(tb_bstream_t* bst, tb_float_t val);
 #endif
 
 // peek
