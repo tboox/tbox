@@ -48,7 +48,7 @@ static tb_bool_t tb_check_float_order()
 	union 
 	{
 		tb_uint32_t i[2];
-		tb_float_t 	f;
+		double 		f;
 
 	} conv;
 	conv.f = 1.0f;

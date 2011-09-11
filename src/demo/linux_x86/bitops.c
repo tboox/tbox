@@ -195,7 +195,7 @@ static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 
 	tb_printf("[bitops]: u24_le set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_u16_be(tb_uint32_t x)
+static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_uint16_t y = 0;
@@ -217,7 +217,7 @@ static tb_void_t tb_test_bits_u16_be(tb_uint32_t x)
 
 	tb_printf("[bitops]: u16_be set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_u16_le(tb_uint32_t x)
+static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_uint16_t y = 0;
@@ -328,7 +328,7 @@ static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 
 	tb_printf("[bitops]: s24_le set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_s16_be(tb_sint32_t x)
+static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_sint16_t y = 0;
@@ -350,7 +350,7 @@ static tb_void_t tb_test_bits_s16_be(tb_sint32_t x)
 
 	tb_printf("[bitops]: s16_be set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_s16_le(tb_sint32_t x)
+static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_sint16_t y = 0;
@@ -372,7 +372,7 @@ static tb_void_t tb_test_bits_s16_le(tb_sint32_t x)
 
 	tb_printf("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_double_be(tb_float_t x)
+static tb_void_t tb_test_bits_double_bbe(tb_float_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_float_t 	y = 0;
@@ -383,18 +383,18 @@ static tb_void_t tb_test_bits_double_be(tb_float_t x)
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
-	while (n1--) tb_bits_set_double_be(p, x);
+	while (n1--) tb_bits_set_double_bbe(p, x);
 	t1 = tb_int64_sub(tb_mclock(), t1);
 	ts = tb_int64_add(ts, t1);
 
 	t2 = tb_mclock();
-	while (n2--) y = tb_bits_get_double_be(p);
+	while (n2--) y = tb_bits_get_double_bbe(p);
 	t2 = tb_int64_sub(tb_mclock(), t2);
 	tg = tb_int64_add(tg, t2);
 
-	tb_printf("[bitops]: double_be set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
+	tb_printf("[bitops]: double_bbe set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_double_le(tb_float_t x)
+static tb_void_t tb_test_bits_double_ble(tb_float_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
 	__tb_volatile__ tb_float_t 	y = 0;
@@ -405,16 +405,60 @@ static tb_void_t tb_test_bits_double_le(tb_float_t x)
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
-	while (n1--) tb_bits_set_double_le(p, x);
+	while (n1--) tb_bits_set_double_ble(p, x);
 	t1 = tb_int64_sub(tb_mclock(), t1);
 	ts = tb_int64_add(ts, t1);
 
 	t2 = tb_mclock();
-	while (n2--) y = tb_bits_get_double_le(p);
+	while (n2--) y = tb_bits_get_double_ble(p);
 	t2 = tb_int64_sub(tb_mclock(), t2);
 	tg = tb_int64_add(tg, t2);
 
-	tb_printf("[bitops]: double_le set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
+	tb_printf("[bitops]: double_ble set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
+}
+static tb_void_t tb_test_bits_double_lbe(tb_float_t x)
+{
+	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	__tb_volatile__ tb_float_t 	y = 0;
+	__tb_volatile__ tb_size_t 	n1 = 100000000;
+	__tb_volatile__ tb_size_t 	n2 = 100000000;
+	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	t1, t2;
+
+	t1 = tb_mclock();
+	while (n1--) tb_bits_set_double_lbe(p, x);
+	t1 = tb_int64_sub(tb_mclock(), t1);
+	ts = tb_int64_add(ts, t1);
+
+	t2 = tb_mclock();
+	while (n2--) y = tb_bits_get_double_lbe(p);
+	t2 = tb_int64_sub(tb_mclock(), t2);
+	tg = tb_int64_add(tg, t2);
+
+	tb_printf("[bitops]: double_lbe set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
+}
+static tb_void_t tb_test_bits_double_lle(tb_float_t x)
+{
+	__tb_volatile__ tb_byte_t 	p[8] = {0};
+	__tb_volatile__ tb_float_t 	y = 0;
+	__tb_volatile__ tb_size_t 	n1 = 100000000;
+	__tb_volatile__ tb_size_t 	n2 = 100000000;
+	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	t1, t2;
+
+	t1 = tb_mclock();
+	while (n1--) tb_bits_set_double_lle(p, x);
+	t1 = tb_int64_sub(tb_mclock(), t1);
+	ts = tb_int64_add(ts, t1);
+
+	t2 = tb_mclock();
+	while (n2--) y = tb_bits_get_double_lle(p);
+	t2 = tb_int64_sub(tb_mclock(), t2);
+	tg = tb_int64_add(tg, t2);
+
+	tb_printf("[bitops]: double_lle set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_float_be(tb_float_t x)
 {
@@ -468,7 +512,6 @@ int main(int argc, char** argv)
 	tb_test_bits_swap_u32();
 	tb_test_bits_swap_u64();
 
-#if 0
 	tb_printf("\n");
 	tb_test_bits_ubits32(0x87654321);
 	tb_test_bits_ubits32(0x12345678);
@@ -480,7 +523,6 @@ int main(int argc, char** argv)
 	tb_printf("\n");
 	tb_test_bits_sbits32(-300);
 	tb_test_bits_sbits32(300);
-#endif
 
 	tb_printf("\n");
 	tb_test_bits_u32_be(0x87654321);
@@ -490,18 +532,18 @@ int main(int argc, char** argv)
 	tb_test_bits_u32_le(0x12345678);
 
 	tb_printf("\n");
-	tb_test_bits_u24_be(0x87654321);
-	tb_test_bits_u24_be(0x12345678);
+	tb_test_bits_u24_be(0x654321);
+	tb_test_bits_u24_be(0x345678);
 
-	tb_test_bits_u24_le(0x87654321);
-	tb_test_bits_u24_le(0x12345678);
+	tb_test_bits_u24_le(0x654321);
+	tb_test_bits_u24_le(0x345678);
 
 	tb_printf("\n");
-	tb_test_bits_u16_be(0x87654321);
-	tb_test_bits_u16_be(0x12345678);
+	tb_test_bits_u16_be(0x4321);
+	tb_test_bits_u16_be(0x5678);
 
-	tb_test_bits_u16_le(0x87654321);
-	tb_test_bits_u16_le(0x12345678);
+	tb_test_bits_u16_le(0x4321);
+	tb_test_bits_u16_le(0x5678);
 
 	tb_printf("\n");
 	tb_test_bits_s32_be(0x8765F321);
@@ -511,32 +553,32 @@ int main(int argc, char** argv)
 	tb_test_bits_s32_le(0x1234F678);
 
 	tb_printf("\n");
-	tb_test_bits_s24_be(0x87F5F321);
-	tb_test_bits_s24_be(0x12F4F678);
+	tb_test_bits_s24_be(123456);
+	tb_test_bits_s24_be(-123456);
 
-	tb_test_bits_s24_le(0x87F5F321);
-	tb_test_bits_s24_le(0x12F4f678);
-
-	tb_printf("\n");
-	tb_test_bits_s16_be(0x8765F321);
-	tb_test_bits_s16_be(0x1234F678);
-
-	tb_test_bits_s16_le(0x8765F321);
-	tb_test_bits_s16_le(0x1234F678);
+	tb_test_bits_s24_le(123456);
+	tb_test_bits_s24_le(-123456);
 
 	tb_printf("\n");
-	tb_test_bits_double_be(3.1415926);
-	tb_test_bits_double_le(3.1415926);
+	tb_test_bits_s16_be(4321);
+	tb_test_bits_s16_be(-4321);
 
-	tb_test_bits_double_be(-3.1415926);
-	tb_test_bits_double_le(-3.1415926);
+	tb_test_bits_s16_le(4321);
+	tb_test_bits_s16_le(-4321);
+
+	tb_printf("\n");
+	tb_test_bits_double_bbe(3.1415926);
+	tb_test_bits_double_ble(3.1415926);
+
+	tb_test_bits_double_lbe(3.1415926);
+	tb_test_bits_double_lle(3.1415926);
 
 	tb_printf("\n");
 	tb_test_bits_float_be(3.1415926);
 	tb_test_bits_float_le(3.1415926);
 
-	tb_test_bits_float_be(-3.1415926);
-	tb_test_bits_float_le(-3.1415926);
+	tb_test_bits_float_be(3.1415926);
+	tb_test_bits_float_le(3.1415926);
 
 	tb_exit();
 	return 0;
