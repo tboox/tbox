@@ -46,35 +46,28 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
-	tb_int_t reg, edi;
+	tb_size_t edi;
 	__tb_asm__ __tb_volatile__
 	(
-		/* most of the time, count is divisible by 4 and nonzero */
-		/* it's better to make this case faster */
-		/*	"	jecxz	9f\n" - (optional) count == 0: goto ret */
-		" 	mov	%%ecx, %1\n"
-		" 	shr	$2, %%ecx\n"
-		" 	jz	1f\n" /* zero words: goto fill_bytes */
-		/* extend 8-bit fill to 32 bits */
-		" 	movzx	%%al, %%eax\n" /* 3 bytes */
-		/* or:	"	and	$0xff, %%eax\n" - 5 bytes */
-		" 	imul	$0x01010101, %%eax\n" /* 6 bytes */
-		/* fill full words */
-		" 	rep; stosl\n"
-		/* fill 0-3 bytes */
-		"1:	and	$3, %1\n"
-		"	jz	9f\n" /* (count & 3) == 0: goto end */
-		"2:	stosb\n"
-		"	dec	%1\n"
-		"	jnz	2b\n"
-		/* end */
+	 	// note: the address not align by 4-bytes, but it is also fast.
+		" 	cld\n"
+		" 	mov		%2, 	%%ecx\n"
+		" 	shr		$2, 	%%ecx\n" 		//!< n >>= 2
+		" 	jz 		1f\n" 					//!< goto fill the left bytes if n < 4
+		" 	movzx 	%%al, 	%%eax\n" 		//!< 3 bytes, or: and $0xff, %%eax - 5 bytes
+		" 	imul 	$0x01010101, %%eax\n" 	//!< 6 bytes
+		" 	rep; 	stosl\n" 				//!< fill 4-bytes
+		"1:	and		$3, 	%2\n" 			//!< left = n & 0x3
+		"	jz 		9f\n" 					//!< goto end if left == 0
+		"2:\n"
+		" 	mov		%2, 	%%ecx\n"
+		" 	rep 	stosb\n" 				//!< fill the left bytes (3-bytes)
 		"9:\n"
 
-		: "=&D" (edi), "=&r" (reg)
-		: "0" (s), "a" (c), "c" (n)
- 		: "memory"
+		: "=&D" (edi)
+		: "a" (c), "r" (n), "0" (s)
+ 		: "memory", "ecx"
 	);
-	return s;
 }
 #endif
 
