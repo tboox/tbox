@@ -1,7 +1,7 @@
 #include "tbox.h"
 
-#define TB_TEST_CMP 		(1)
-#define TB_TEST_LEN 		(1)
+#define TB_TEST_CMP 		(0)
+#define TB_TEST_LEN 		(0)
 #define TB_TEST_CPY 		(1)
 
 /* ////////////////////////////////////////////////////////////////////////
