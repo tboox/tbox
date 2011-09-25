@@ -41,18 +41,38 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
 	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
 
-	tb_size_t d0, d1, d2;
+	tb_size_t edi, esi, eax;
 	__tb_asm__ __tb_volatile__
 	(
 		"1:\n"
-		" 	lodsb\n"
+		" 	movl (%%esi), %%eax\n" // lodsl is too slower, why?
+		" 	add $4, %%esi\n"
+		" 	movl %%eax, %%edx\n"
+		" 	testb %%dl, %%dl\n"
+		" 	je 2f\n"
+		" 	shr $8, %%edx\n"
+		" 	testb %%dl, %%dl\n"
+		" 	je 2f\n"
+		" 	shr $8, %%edx\n"
+		" 	testb %%dl, %%dl\n"
+		" 	je 2f\n"
+		" 	shr $8, %%edx\n"
+		" 	testb %%dl, %%dl\n"
+		" 	je 2f\n"
+		" 	stosl\n"
+		" 	jmp 1b\n"
+		"2:\n"
 		" 	stosb\n"
 		" 	testb %%al, %%al\n"
-		" 	jne 1b"
+		" 	je 3f\n"
+		" 	shr $8, %%eax\n"
+		" 	jmp 2b\n"
+		"3:\n"
 
-		: "=&S" (d0), "=&D" (d1), "=&a" (d2)
+
+		: "=&S" (esi), "=&D" (edi)
 		: "0" (s2), "1" (s1) 
-		: "memory"
+		: "memory", "eax", "edx"
 	);
 	return s1;
 }
