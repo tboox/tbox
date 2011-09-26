@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-
+#include "string.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_STRNCPY
 # 	if defined(TB_CONFIG_ARCH_x86)
@@ -57,7 +57,9 @@ tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 	__tb_register__ tb_char_t* s = s1;
 	if (!n || s1 == s2) return s;
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#if 1
+	tb_memcpy(s1, s2, tb_strnlen(s2, n) + 1);
+#elif defined(TB_CONFIG_BINARY_SMALL)
 	while (n) 
 	{
 		if ((*s = *s2)) s2++; 

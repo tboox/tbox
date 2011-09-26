@@ -11,7 +11,7 @@ DEBUG = n
 SDK = /home/ruki/programs/toolchain4/sys
 BIN = /home/ruki/programs/toolchain4/pre/bin
 HOST = linux
-CCACHE =
+CCACHE = ccache
 DISTCC =
 
 # export
