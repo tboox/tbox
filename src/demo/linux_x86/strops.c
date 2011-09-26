@@ -174,6 +174,7 @@ int main(int argc, char** argv)
 	tb_test_strcpy("1234567890");
 	tb_test_strcpy("1234567890abcbefg");
 	tb_test_strcpy("abcdefghijklmnopqrstuvwxyz1234567890");
+	tb_test_strcpy("abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890");
 	
 	tb_printf("\n");
 	tb_test_strncpy("", 5);
@@ -181,6 +182,7 @@ int main(int argc, char** argv)
 	tb_test_strncpy("1234567890", 5);
 	tb_test_strncpy("1234567890abcbefg", 5);
 	tb_test_strncpy("abcdefghijklmnopqrstuvwxyz1234567890", 5);
+	tb_test_strncpy("abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890", 50);
 
 #endif
 

@@ -44,6 +44,7 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 	tb_size_t edi, esi, eax;
 	__tb_asm__ __tb_volatile__
 	(
+	 	// align?
 		"1:\n"
 		" 	movl (%%esi), %%eax\n" // lodsl is too slower, why?
 		" 	add $4, %%esi\n"
