@@ -42,6 +42,9 @@ $(1)_C_FILES += $($(1)_C_FILES-y)
 $(1)_CPP_FILES += $($(1)_CPP_FILES-y)
 $(1)_ASM_FILES += $($(1)_ASM_FILES-y)
 $(1)_OBJ_FILES += $($(1)_OBJ_FILES-y)
+$(1)_INC_DIR += $($(1)_INC_DIR-y)
+$(1)_LIB_DIR += $($(1)_LIB_DIR-y)
+$(1)_LIBS += $($(1)_LIBS-y)
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FILES,$(name))))
 
@@ -51,19 +54,22 @@ $(1)_C_FILES := $(sort $($(1)_C_FILES))
 $(1)_CPP_FILES := $(sort $($(1)_CPP_FILES))
 $(1)_ASM_FILES := $(sort $($(1)_ASM_FILES))
 $(1)_OBJ_FILES := $(sort $($(1)_OBJ_FILES))
+$(1)_INC_DIR := $(sort $($(1)_INC_DIR))
+$(1)_LIB_DIR := $(sort $($(1)_LIB_DIR))
+$(1)_LIBS := $(sort $($(1)_LIBS))
 endef
 $(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
 
 
 # cflags & ldflags
 define MAKE_DEFINE_FLAGS
-$(1)_CFLAGS := $(CFLAGS) $($(1)_CFLAGS)
-$(1)_CXXFLAGS := $(CXXFLAGS) $($(1)_CXXFLAGS)
-$(1)_CPPFLAGS := $(CPPFLAGS) $(addprefix $(CPPFLAGS-I), $(INC_DIR)) $(addprefix $(CPPFLAGS-I), $($(1)_INC_DIR)) $($(1)_CPPFLAGS)
-$(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_LDFLAGS)
-$(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS)
-$(1)_ARFLAGS := $(ARFLAGS)
-$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_SHFLAGS)
+$(1)_CFLAGS := $(CFLAGS) $($(1)_CFLAGS) $($(1)_CFLAGS-y)
+$(1)_CXXFLAGS := $(CXXFLAGS) $($(1)_CXXFLAGS) $($(1)_CXXFLAGS-y)
+$(1)_CPPFLAGS := $(CPPFLAGS) $(addprefix $(CPPFLAGS-I), $(INC_DIR)) $(addprefix $(CPPFLAGS-I), $($(1)_INC_DIR)) $($(1)_CPPFLAGS) $($(1)_CPPFLAGS-y)
+$(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y)
+$(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS) $($(1)_ASFLAGS-y)
+$(1)_ARFLAGS := $(ARFLAGS) $($(1)_ARFLAGS-y)
+$(1)_SHFLAGS := $(SHFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_SHFLAGS) $($(1)_SHFLAGS-y)
 endef
 $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FLAGS,$(name))))
 
