@@ -56,7 +56,6 @@ $(1)_ASM_FILES := $(sort $($(1)_ASM_FILES))
 $(1)_OBJ_FILES := $(sort $($(1)_OBJ_FILES))
 $(1)_INC_DIR := $(sort $($(1)_INC_DIR))
 $(1)_LIB_DIR := $(sort $($(1)_LIB_DIR))
-$(1)_LIBS := $(sort $($(1)_LIBS))
 endef
 $(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
 
