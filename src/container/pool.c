@@ -40,7 +40,7 @@
  * implemention
  */
 
-tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
+tb_pool_t* tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_pool_t* pool = (tb_pool_t*)tb_calloc(1, sizeof(tb_pool_t));
 	TB_ASSERT_RETURN_VAL(pool, TB_NULL);
@@ -49,6 +49,8 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 	pool->grow = tb_align(grow, 8); // align by 8-byte for info
 	pool->size = 0;
 	pool->maxn = tb_align(size, 8); // align by 8-byte for info
+	pool->free = free;
+	pool->priv = priv;
 
 	pool->data = tb_calloc(pool->maxn, pool->step);
 	TB_ASSERT_GOTO(pool->data, fail);
@@ -65,27 +67,15 @@ tb_pool_t* tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow)
 
 	return pool;
 fail:
-	if (pool) tb_pool_destroy(pool);
+	if (pool) tb_pool_exit(pool);
 	return TB_NULL;
 }
 
-tb_void_t tb_pool_destroy(tb_pool_t* pool)
+tb_void_t tb_pool_exit(tb_pool_t* pool)
 {
 	if (pool)
 	{
-#if 0 // discarded
-		// free items
-		if (pool->free)
-		{
-			tb_int_t i = 0;
-			for (i = 0; i < pool->maxn; i++)
-			{
-				// is free?
-				if (TB_POOL_INFO_ISSET(pool->info, i))
-					tb_pool_free(pool, i + 1);
-			}
-		}
-#endif
+		tb_pool_clear(pool);
 
 		// free data
 		if (pool->data) tb_free(pool->data);
@@ -183,11 +173,8 @@ tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 	TB_ASSERT(TB_POOL_INFO_ISSET(pool->info, item - 1));
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 	{
-
-#if 0 // discarded
 		// free item
-		if (pool->free) pool->free(pool->priv, tb_pool_get(pool, item));
-#endif
+		if (pool->free) pool->free(tb_pool_get(pool, item), pool->priv);
 
 		// set info
 		TB_POOL_INFO_RESET(pool->info, item - 1);
@@ -203,18 +190,16 @@ tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 }
 tb_void_t tb_pool_clear(tb_pool_t* pool)
 {
-#if 0 // discarded
-	// free private data
+	// free items
 	if (pool->free && pool->data) 
 	{
 		tb_int_t i = 0;
 		for (i = 0; i < pool->maxn; ++i)
 		{
 			if (TB_POOL_INFO_ISSET(pool->info, i))
-				pool->free(pool->priv, pool->data + i * pool->step);
+				pool->free(pool->data + i * pool->step, pool->priv);
 		}
 	}
-#endif
 
 	// clear info
 	pool->size = 0;
@@ -228,6 +213,7 @@ tb_void_t tb_pool_clear(tb_pool_t* pool)
 	pool->pred_n = m;
 #endif
 }
+
 #ifdef TB_DEBUG
 tb_byte_t* tb_pool_get(tb_pool_t* pool, tb_size_t item)
 {

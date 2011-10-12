@@ -80,7 +80,7 @@ static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 	if (hst)
 	{
 		if (hst->http)
-			tb_http_destroy(hst->http);
+			tb_http_exit(hst->http);
 	}
 }
 static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
@@ -265,7 +265,7 @@ tb_gstream_t* tb_gstream_create_http()
 	gst->offset = tb_hstream_offset;
 	gst->ioctl1 = tb_hstream_ioctl1;
 	gst->ioctl2 = tb_hstream_ioctl2;
-	hst->http 	= tb_http_create(TB_NULL);
+	hst->http 	= tb_http_init(TB_NULL);
 	TB_ASSERT_GOTO(hst->http, fail);
 
 	return gst;

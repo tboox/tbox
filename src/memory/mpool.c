@@ -286,7 +286,7 @@ tb_bool_t tb_mpool_init(tb_void_t* data, tb_size_t size)
 	g_mpool->magic = TB_MPOOL_MAGIC;
 
 	// create mutex
-	g_mpool->hmutex = tb_mutex_create("the memory pool");
+	g_mpool->hmutex = tb_mutex_init("the memory pool");
 	if (!g_mpool->hmutex) return TB_FALSE;
 
 	// attach data
@@ -364,7 +364,7 @@ tb_void_t tb_mpool_exit()
 	TB_ASSERT_RETURN(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC);
 
 	// destroy mutex
-	if (g_mpool->hmutex) tb_mutex_destroy(g_mpool->hmutex);
+	if (g_mpool->hmutex) tb_mutex_exit(g_mpool->hmutex);
 	g_mpool->hmutex = TB_NULL;
 
 	// clear

@@ -34,38 +34,19 @@
 // max size
 #define TB_VECTOR_MAX_SIZE 		(1 << 30)
 
-// do ctor
-#define TB_VECTOR_DO_CTOR(b, n) \
+// do free
+#define TB_VECTOR_DO_FREE(b, n) \
 { \
 	do \
 	{ \
-		if (vector->ctor && (n)) \
+		if (vector->free && (n)) \
 		{ \
 			tb_size_t 	_i = 0; \
 			tb_size_t 	_m = (n); \
 			tb_size_t 	_s = vector->step; \
 			tb_byte_t* 	_b = vector->data + (b) * _s; \
 			for (_i = 0; _i < _m; _i++) \
-				vector->ctor(_b + _i * _s, vector->priv); \
-		} \
-	 \
-	} while (0); \
-} 
-
-
-// do dtor
-#define TB_VECTOR_DO_DTOR(b, n) \
-{ \
-	do \
-	{ \
-		if (vector->dtor && (n)) \
-		{ \
-			tb_size_t 	_i = 0; \
-			tb_size_t 	_m = (n); \
-			tb_size_t 	_s = vector->step; \
-			tb_byte_t* 	_b = vector->data + (b) * _s; \
-			for (_i = 0; _i < _m; _i++) \
-				vector->dtor(_b + _i * _s, vector->priv); \
+				vector->free(_b + _i * _s, vector->priv); \
 		} \
 	 \
 	} while (0); \
@@ -76,7 +57,7 @@
  * interfaces
  */
 
-tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_vector_t* tb_vector_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_vector_t* vector = (tb_vector_t*)tb_calloc(1, sizeof(tb_vector_t));
 	TB_ASSERT_RETURN_VAL(vector, TB_NULL);
@@ -86,8 +67,7 @@ tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(
 	vector->grow = grow;
 	vector->size = 0;
 	vector->maxn = grow;
-	vector->ctor = ctor;
-	vector->dtor = dtor;
+	vector->free = free;
 	vector->priv = priv;
 	TB_ASSERT_GOTO(vector->maxn < TB_VECTOR_MAX_SIZE, fail);
 
@@ -97,11 +77,11 @@ tb_vector_t* tb_vector_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(
 
 	return vector;
 fail:
-	if (vector) tb_vector_destroy(vector);
+	if (vector) tb_vector_exit(vector);
 	return TB_NULL;
 }
 
-tb_void_t tb_vector_destroy(tb_vector_t* vector)
+tb_void_t tb_vector_exit(tb_vector_t* vector)
 {
 	if (vector)
 	{
@@ -119,39 +99,36 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 {
 	if (vector) 
 	{
-		// do dtor
-		TB_VECTOR_DO_DTOR(0, vector->size);
+		// do free
+		TB_VECTOR_DO_FREE(0, vector->size);
 		vector->size = 0;
 	}
-}
-tb_vector_t* tb_vector_duplicate(tb_vector_t const* vector)
-{
-	// alloc
-	tb_vector_t* dup = (tb_vector_t*)tb_calloc(1, sizeof(tb_vector_t));
-	TB_ASSERT_RETURN_VAL(dup, TB_NULL);
-
-	// copy info
-	tb_memcpy(dup, vector, sizeof(tb_vector_t));
-
-	// copy data
-	dup->data = tb_calloc(vector->maxn, vector->step);
-	TB_ASSERT_GOTO(dup->data, fail);
-	tb_memcpy(dup->data, vector->data, vector->size * vector->step);
-
-	return dup;
-fail:
-	if (dup) tb_free(dup);
-	return TB_NULL;
 }
 tb_byte_t* tb_vector_at(tb_vector_t* vector, tb_size_t index)
 {
 	TB_ASSERTA(vector && vector->size && index < vector->maxn);
 	return (vector->data + index * vector->step);
 }
+tb_byte_t* tb_vector_at_head(tb_vector_t* vector)
+{
+	return tb_vector_at(vector, tb_vector_head(vector));
+}
+tb_byte_t* tb_vector_at_last(tb_vector_t* vector)
+{
+	return tb_vector_at(vector, tb_vector_last(vector));
+}
 tb_byte_t const* tb_vector_const_at(tb_vector_t const* vector, tb_size_t index)
 {
 	TB_ASSERTA(vector && vector->size && index < vector->maxn);
 	return (vector->data + index * vector->step);
+}
+tb_byte_t const* tb_vector_const_at_head(tb_vector_t const* vector)
+{
+	return tb_vector_const_at(vector, tb_vector_head(vector));
+}
+tb_byte_t const* tb_vector_const_at_last(tb_vector_t const* vector)
+{
+	return tb_vector_const_at(vector, tb_vector_last(vector));
 }
 tb_size_t tb_vector_head(tb_vector_t const* vector)
 {
@@ -192,11 +169,11 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 {
 	TB_ASSERT_RETURN_VAL(vector, TB_FALSE);
 	
-	// destruct items if the vector is decreased
+	// free items if the vector is decreased
 	if (size < vector->size)
 	{
-		// do dtor
-		TB_VECTOR_DO_DTOR(size, vector->size);
+		// do free
+		TB_VECTOR_DO_FREE(size, vector->size);
 	}
 
 	// resize buffer
@@ -218,13 +195,6 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 
 	}
 
-	// construct the growed items
-	if (size > vector->size)
-	{
-		// do ctor for the grow data
-		TB_VECTOR_DO_CTOR(vector->size, size - vector->size);
-	}
-
 	// update size
 	vector->size = size;
 	return TB_TRUE;
@@ -242,11 +212,9 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_byte_t const
 		TB_ABORT();
 	}
 
-	// desctruct the tail item
 	tb_byte_t* 	data = vector->data;
 	tb_size_t 	step = vector->step;
 	TB_ASSERT_RETURN(data && step);
-	if (vector->dtor) vector->dtor(data + osize * step, vector->priv);
 
 	// move items if not at tail
 	if (osize != index) tb_memmov(data + (index + 1) * step, data + index * step, (osize - index) * step);
@@ -276,9 +244,6 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_byte_t cons
 	{
 		TB_ABORT();
 	}
-
-	// do dtors
-	TB_VECTOR_DO_DTOR(osize, size);
 
 	// move items if not at tail
 	tb_byte_t* 	data = vector->data;
@@ -321,8 +286,8 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_byte_t cons
 	tb_size_t 	step = vector->step;
 	TB_ASSERT_RETURN(data && step);
 
-	// do dtor
-	if (vector->dtor) vector->dtor(data + index * step, vector->priv);
+	// do free
+	if (vector->free) vector->free(data + index * step, vector->priv);
 
 	// copy data
 	tb_memcpy(data + index * step, item, step);
@@ -344,8 +309,8 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_byte_t con
 	// strip size
 	if (index + size > vector->size) size = vector->size - index;
 
-	// do dtors
-	TB_VECTOR_DO_DTOR(index, size);
+	// do free
+	TB_VECTOR_DO_FREE(index, size);
 
 	// copy data
 	tb_byte_t* 	data = vector->data;
@@ -382,8 +347,8 @@ tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t index)
 	TB_ASSERT_RETURN(vector && index < vector->size);
 	if (vector->size)
 	{
-		// do dtor
-		if (vector->dtor) vector->dtor(vector->data + index * vector->step, vector->priv);
+		// do free
+		if (vector->free) vector->free(vector->data + index * vector->step, vector->priv);
 
 		// move data if index is not last
 		if (index < vector->size - 1) tb_memmov(vector->data + index * vector->step, vector->data + (index + 1) * vector->step, (vector->size - index - 1) * vector->step);
@@ -401,8 +366,8 @@ tb_void_t tb_vector_remove_last(tb_vector_t* vector)
 	TB_ASSERT_RETURN(vector);
 	if (vector->size)
 	{
-		// do dtor
-		if (vector->dtor) vector->dtor(vector->data + (vector->size - 1) * vector->step, vector->priv);
+		// do free
+		if (vector->free) vector->free(vector->data + (vector->size - 1) * vector->step, vector->priv);
 
 		// resize
 		vector->size--;
@@ -425,8 +390,8 @@ tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size
 	// compute the left size
 	tb_size_t left = vector->size - index - size;
 
-	// do dtor
-	TB_VECTOR_DO_DTOR(index, size);
+	// do free
+	TB_VECTOR_DO_FREE(index, size);
 
 	// move the left data
 	if (left)

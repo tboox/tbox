@@ -28,33 +28,45 @@
 #include "../utils/utils.h"
 
 /* /////////////////////////////////////////////////////////
+ * details
+ */
+
+static tb_void_t tb_slist_free(tb_void_t* item, tb_void_t* priv)
+{
+	tb_slist_t* slist = priv;
+	if (slist && slist->free)
+	{
+		slist->free((tb_byte_t*)item + sizeof(tb_size_t), slist->priv);
+	}
+}
+
+/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_slist_t* tb_slist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_slist_t* slist = (tb_slist_t*)tb_calloc(1, sizeof(tb_slist_t));
 	TB_ASSERT_RETURN_VAL(slist, TB_NULL);
 
 	// init slist
-	slist->ctor = ctor;
-	slist->dtor = dtor;
-	slist->priv = priv;
 	slist->step = step;
 	slist->head = 0;
 	slist->last = 0;
+	slist->free = free;
+	slist->priv = priv;
 
-	// create pool, capacity = grow, size = 0, step = next + data
-	slist->pool = tb_pool_create(sizeof(tb_size_t) + step, grow, grow);
+	// init pool, capacity = grow, size = 0, step = next + data
+	slist->pool = tb_pool_init(sizeof(tb_size_t) + step, grow, grow, tb_slist_free, slist);
 	TB_ASSERT_GOTO(slist->pool, fail);
 
 	return slist;
 fail:
-	if (slist) tb_slist_destroy(slist);
+	if (slist) tb_slist_exit(slist);
 	return TB_NULL;
 }
 
-tb_void_t tb_slist_destroy(tb_slist_t* slist)
+tb_void_t tb_slist_exit(tb_slist_t* slist)
 {
 	if (slist)
 	{
@@ -62,7 +74,7 @@ tb_void_t tb_slist_destroy(tb_slist_t* slist)
 		tb_slist_clear(slist);
 
 		// free pool
-		if (slist->pool) tb_pool_destroy(slist->pool);
+		if (slist->pool) tb_pool_exit(slist->pool);
 
 		// free it
 		tb_free(slist);
@@ -72,23 +84,8 @@ tb_void_t tb_slist_clear(tb_slist_t* slist)
 {
 	if (slist) 
 	{
-		if (slist->pool)
-		{
-			// do dtor
-			if (slist->dtor)
-			{
-				tb_size_t itor = tb_slist_head(slist);
-				tb_size_t tail = tb_slist_tail(slist);
-				for (; itor != tail; itor = tb_slist_next(slist, itor))
-				{
-					tb_byte_t* item = tb_slist_at(slist, itor);
-					if (item) slist->dtor(item, slist->priv);
-				}
-			}
-			
-			// clear pool
-			tb_pool_clear(slist->pool);
-		}
+		// clear pool
+		if (slist->pool) tb_pool_clear(slist->pool);
 
 		// reset it
 		slist->head = 0;
@@ -102,12 +99,28 @@ tb_byte_t* tb_slist_at(tb_slist_t* slist, tb_size_t index)
 	TB_ASSERTA(data);
 	return (data + sizeof(tb_size_t));
 }
+tb_byte_t* tb_slist_at_head(tb_slist_t* slist)
+{
+	return tb_slist_at(slist, tb_slist_head(slist));
+}
+tb_byte_t* tb_slist_at_last(tb_slist_t* slist)
+{
+	return tb_slist_at(slist, tb_slist_last(slist));
+}
 tb_byte_t const* tb_slist_const_at(tb_slist_t const* slist, tb_size_t index)
 {
 	TB_ASSERTA(slist && slist->pool);
 	tb_byte_t const* data = tb_pool_get(slist->pool, index);
 	TB_ASSERTA(data);
 	return (data + sizeof(tb_size_t));
+}
+tb_byte_t const* tb_slist_const_at_head(tb_slist_t const* slist)
+{
+	return tb_slist_const_at(slist, tb_slist_head(slist));
+}
+tb_byte_t const* tb_slist_const_at_last(tb_slist_t const* slist)
+{
+	return tb_slist_const_at(slist, tb_slist_last(slist));
 }
 tb_size_t tb_slist_head(tb_slist_t const* slist)
 {
@@ -300,10 +313,10 @@ tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_byte_t const* item, tb_siz
 tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t index, tb_byte_t const* item)
 {
 	tb_byte_t* data = tb_slist_at(slist, index);
-	TB_ASSERT_RETURN_VAL(data && item, index);
+	TB_ASSERT_RETURN_VAL(data && item && slist->pool, index);
 	
-	// do dtor
-	if (slist->dtor) slist->dtor(data, slist->priv);
+	// do free
+	if (slist->free) slist->free(data, slist->priv);
 
 	// copy data
 	tb_memcpy(data, item, slist->step);
@@ -426,15 +439,6 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 
 		// check
 		TB_ASSERTA(midd);
-
-		// do dtor
-		if (slist->dtor)
-		{
-			tb_byte_t* data = tb_slist_at(slist, midd);
-			TB_ASSERTA(data);
-
-			slist->dtor(data, slist->priv);
-		}
 
 		// free node
 		tb_pool_free(slist->pool, midd);

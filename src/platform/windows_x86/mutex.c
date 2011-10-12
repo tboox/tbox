@@ -31,12 +31,12 @@
  * implemention
  */
 
-tb_handle_t tb_mutex_create(tb_char_t const* name)
+tb_handle_t tb_mutex_init(tb_char_t const* name)
 {
 	HANDLE hmutex = CreateMutex(NULL, FALSE, name);
 	return ((hmutex != INVALID_HANDLE_VALUE)? hmutex : TB_NULL);
 }
-tb_void_t tb_mutex_destroy(tb_handle_t hmutex)
+tb_void_t tb_mutex_exit(tb_handle_t hmutex)
 {
 	if (hmutex != INVALID_HANDLE_VALUE) CloseHandle(hmutex);
 	hmutex = INVALID_HANDLE_VALUE;
