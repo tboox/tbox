@@ -495,7 +495,7 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 }
 
 // the dtor of string
-static tb_void_t tb_cookies_spool_dtor(tb_void_t* data, tb_void_t* priv)
+static tb_void_t tb_cookies_spool_free(tb_void_t* data, tb_void_t* priv)
 {
 	if (data) 
 	{
@@ -512,31 +512,31 @@ static tb_void_t tb_cookies_spool_dtor(tb_void_t* data, tb_void_t* priv)
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_cookies_t* tb_cookies_create()
+tb_cookies_t* tb_cookies_init()
 {
 	// calloc
 	tb_cookies_t* cookies = (tb_cookies_t*)tb_calloc(1, sizeof(tb_cookies_t));
 	TB_ASSERT_RETURN_VAL(cookies, TB_NULL);
 
-	// create hmutex
-	cookies->hmutex = tb_mutex_create("cookies");
+	// init hmutex
+	cookies->hmutex = tb_mutex_init("cookies");
 	TB_ASSERT_GOTO(cookies->hmutex, fail);
 
-	// create spool
-	cookies->spool = tb_slist_create(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, TB_NULL, tb_cookies_spool_dtor, TB_NULL);
+	// init spool
+	cookies->spool = tb_slist_init(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, tb_cookies_spool_free, TB_NULL);
 	TB_ASSERT_GOTO(cookies->spool, fail);
 
-	// create cpool
-	cookies->cpool = tb_vector_create(sizeof(tb_cookie_t), TB_COOKIES_CPOOL_GROW, TB_NULL, TB_NULL, TB_NULL);
+	// init cpool
+	cookies->cpool = tb_vector_init(sizeof(tb_cookie_t), TB_COOKIES_CPOOL_GROW, TB_NULL, TB_NULL);
 	TB_ASSERT_GOTO(cookies->cpool, fail);
 
 	return cookies;
 
 fail:
-	if (cookies) tb_cookies_destroy(cookies);
+	if (cookies) tb_cookies_exit(cookies);
 	return TB_NULL;
 }
-tb_void_t tb_cookies_destroy(tb_cookies_t* cookies)
+tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 {
 	if (cookies)
 	{
@@ -549,17 +549,17 @@ tb_void_t tb_cookies_destroy(tb_cookies_t* cookies)
 		tb_mutex_lock(cookies->hmutex);
 
 		// free cpool
-		if (cookies->cpool) tb_vector_destroy(cookies->cpool);
+		if (cookies->cpool) tb_vector_exit(cookies->cpool);
 		cookies->cpool = TB_NULL;
 
 		// free spool
-		if (cookies->spool) tb_slist_destroy(cookies->spool);
+		if (cookies->spool) tb_slist_exit(cookies->spool);
 		cookies->spool = TB_NULL;
 
 		tb_mutex_unlock(cookies->hmutex);
 
 		// free mutex
-		tb_mutex_destroy(cookies->hmutex);
+		tb_mutex_exit(cookies->hmutex);
 		
 		// free it
 		tb_free(cookies);

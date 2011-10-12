@@ -5,7 +5,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init cookies
-	tb_cookies_t* cookies = tb_cookies_create();
+	tb_cookies_t* cookies = tb_cookies_init();
 	TB_ASSERT_RETURN_VAL(cookies, 0);
 
 	// set cookies
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	getchar();
 
 	// exit cookies
-	tb_cookies_destroy(cookies);
+	tb_cookies_exit(cookies);
 
 	return 0;
 }

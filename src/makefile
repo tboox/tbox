@@ -18,6 +18,8 @@ tbox_C_FILES 		+= \
 					memory/mpool \
 					string/string \
 					container/pool \
+					container/queue \
+					container/stack \
 					container/vector \
 					container/slist \
 					container/dlist \

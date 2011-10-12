@@ -520,7 +520,7 @@ static tb_void_t tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 
 		// free pool
 #if TB_LZSW_WINDOW_HASH_FIND
-		if (zst->window.pool) tb_pool_destroy(zst->window.pool);
+		if (zst->window.pool) tb_pool_exit(zst->window.pool);
 #endif
 
 		// reset it
@@ -590,7 +590,7 @@ tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 	// init window
 	zst->window.mb = TB_MATH_ICLOG2I(TB_LZSW_WINDOW_SIZE_MAX);
 #if TB_LZSW_WINDOW_HASH_FIND
-	zst->window.pool = tb_pool_create(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0);
+	zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, TB_NULL, TB_NULL);
 #endif
 
 	return ((tb_tstream_t*)zst);

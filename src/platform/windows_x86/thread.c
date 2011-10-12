@@ -31,12 +31,12 @@
  * implemention
  */
 
-tb_handle_t tb_thread_create(tb_char_t const* name, tb_void_t* (*callback)(tb_void_t*), tb_void_t* param, tb_size_t stack_size)
+tb_handle_t tb_thread_open(tb_char_t const* name, tb_void_t* (*callback)(tb_void_t*), tb_void_t* param, tb_size_t stack_size)
 {
 	HANDLE hthread = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)callback, (LPVOID)param, 0, NULL);
 	return ((hthread != INVALID_HANDLE_VALUE)? hthread : TB_NULL);
 }
-tb_void_t tb_thread_destroy(tb_handle_t hthread)
+tb_void_t tb_thread_close(tb_handle_t hthread)
 {
 	if (hthread) CloseHandle(hthread);
 	hthread = TB_NULL;

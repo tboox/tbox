@@ -74,12 +74,6 @@ typedef struct __tb_pool_t
 	tb_size_t 		maxn;
 	tb_size_t 		step;
 
-#if 0 // discarded
-	// free item
-	tb_void_t 			(*free)(tb_void_t* priv, tb_void_t* data);
-	tb_void_t* 			priv;
-#endif
-
 	// predict the next free block
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
 	tb_size_t 		pred[TB_MEMORY_POOL_PRED_MAX];
@@ -92,15 +86,19 @@ typedef struct __tb_pool_t
 
 #endif
 
+	// free
+	tb_void_t 		(*free)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t* 		priv;
+
 }tb_pool_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-// create & destroy
-tb_pool_t* 		tb_pool_create(tb_size_t step, tb_size_t size, tb_size_t grow);
-tb_void_t 		tb_pool_destroy(tb_pool_t* pool);
+// init & exit
+tb_pool_t* 		tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_void_t 		tb_pool_exit(tb_pool_t* pool);
 
 // alloc & free
 tb_size_t 		tb_pool_alloc(tb_pool_t* pool);

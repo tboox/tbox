@@ -742,7 +742,7 @@ fail:
  * interfaces
  */
 
-tb_handle_t tb_http_create(tb_http_option_t const* option)
+tb_handle_t tb_http_init(tb_http_option_t const* option)
 {
 	// alloc
 	tb_http_t* http = tb_calloc(1, sizeof(tb_http_t));
@@ -754,7 +754,7 @@ tb_handle_t tb_http_create(tb_http_option_t const* option)
 
 	return (tb_handle_t)http;
 }
-tb_void_t tb_http_destroy(tb_handle_t handle)
+tb_void_t tb_http_exit(tb_handle_t handle)
 {
 	TB_IF_FAIL_RETURN(handle);
 	tb_http_t* http = (tb_http_t*)handle;

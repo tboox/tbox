@@ -28,33 +28,45 @@
 #include "../math/math.h"
 
 /* /////////////////////////////////////////////////////////
+ * details
+ */
+
+static tb_void_t tb_dlist_free(tb_void_t* item, tb_void_t* priv)
+{
+	tb_dlist_t* dlist = priv;
+	if (dlist && dlist->free)
+	{
+		dlist->free((tb_byte_t*)item + 8, dlist->priv);
+	}
+}
+
+/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_dlist_t* tb_dlist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_dlist_t* tb_dlist_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)tb_calloc(1, sizeof(tb_dlist_t));
 	TB_ASSERT_RETURN_VAL(dlist, TB_NULL);
 
 	// init dlist
-	dlist->ctor = ctor;
-	dlist->dtor = dtor;
-	dlist->priv = priv;
-	dlist->step = step;
 	dlist->head = 0;
 	dlist->last = 0;
+	dlist->step = step;
+	dlist->free = free;
+	dlist->priv = priv;
 
-	// create pool, capacity = grow, size = 0, step = next + prev + data
-	dlist->pool = tb_pool_create(8 + step, grow, grow);
+	// init pool, capacity = grow, size = 0, step = next + prev + data
+	dlist->pool = tb_pool_init(8 + step, grow, grow, tb_dlist_free, dlist);
 	TB_ASSERT_GOTO(dlist->pool, fail);
 
 	return dlist;
 fail:
-	if (dlist) tb_dlist_destroy(dlist);
+	if (dlist) tb_dlist_exit(dlist);
 	return TB_NULL;
 }
 
-tb_void_t tb_dlist_destroy(tb_dlist_t* dlist)
+tb_void_t tb_dlist_exit(tb_dlist_t* dlist)
 {
 	if (dlist)
 	{
@@ -62,7 +74,7 @@ tb_void_t tb_dlist_destroy(tb_dlist_t* dlist)
 		tb_dlist_clear(dlist);
 
 		// free pool
-		if (dlist->pool) tb_pool_destroy(dlist->pool);
+		if (dlist->pool) tb_pool_exit(dlist->pool);
 
 		// free it
 		tb_free(dlist);
@@ -72,23 +84,8 @@ tb_void_t tb_dlist_clear(tb_dlist_t* dlist)
 {
 	if (dlist) 
 	{
-		if (dlist->pool)
-		{
-			// do dtor
-			if (dlist->dtor)
-			{
-				tb_size_t itor = tb_dlist_head(dlist);
-				tb_size_t tail = tb_dlist_tail(dlist);
-				for (; itor != tail; itor = tb_dlist_next(dlist, itor))
-				{
-					tb_byte_t* item = tb_dlist_at(dlist, itor);
-					if (item) dlist->dtor(item, dlist->priv);
-				}
-			}
-			
-			// clear pool
-			tb_pool_clear(dlist->pool);
-		}
+		// clear pool
+		if (dlist->pool) tb_pool_clear(dlist->pool);
 
 		// reset it
 		dlist->head = 0;
@@ -102,12 +99,28 @@ tb_byte_t* tb_dlist_at(tb_dlist_t* dlist, tb_size_t index)
 	TB_ASSERTA(data);
 	return (data + 8);
 }
+tb_byte_t* tb_dlist_at_head(tb_dlist_t* dlist)
+{
+	return tb_dlist_at(dlist, tb_dlist_head(dlist));
+}
+tb_byte_t* tb_dlist_at_last(tb_dlist_t* dlist)
+{
+	return tb_dlist_at(dlist, tb_dlist_last(dlist));
+}
 tb_byte_t const* tb_dlist_const_at(tb_dlist_t const* dlist, tb_size_t index)
 {
 	TB_ASSERTA(dlist && dlist->pool);
 	tb_byte_t const* data = tb_pool_get(dlist->pool, index);
 	TB_ASSERTA(data);
 	return (data + 8);
+}
+tb_byte_t const* tb_dlist_const_at_head(tb_dlist_t const* dlist)
+{
+	return tb_dlist_const_at(dlist, tb_dlist_head(dlist));
+}
+tb_byte_t const* tb_dlist_const_at_last(tb_dlist_t const* dlist)
+{
+	return tb_dlist_const_at(dlist, tb_dlist_last(dlist));
 }
 tb_size_t tb_dlist_head(tb_dlist_t const* dlist)
 {
@@ -289,8 +302,8 @@ tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t index, tb_byte_t const* 
 	tb_byte_t* data = tb_dlist_at(dlist, index);
 	TB_ASSERT_RETURN_VAL(data && item, index);
 	
-	// do dtor
-	if (dlist->dtor) dlist->dtor(data, dlist->priv);
+	// do free
+	if (dlist->free) dlist->free(data, dlist->priv);
 
 	// copy data
 	tb_memcpy(data, item, dlist->step);
@@ -416,15 +429,6 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 				// update node
 				node = next;
 			}
-		}
-
-		// do dtor
-		if (dlist->dtor)
-		{
-			tb_byte_t* data = tb_dlist_at(dlist, index);
-			TB_ASSERTA(data);
-
-			dlist->dtor(data, dlist->priv);
 		}
 
 		// free node

@@ -21,6 +21,8 @@ NAMES = test \
 		vector \
 		slist \
 		dlist \
+		queue \
+		stack \
 		base32 \
 		base64 \
 		sha \

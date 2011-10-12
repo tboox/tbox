@@ -85,10 +85,9 @@ typedef struct __tb_dlist_t
 	// the step size
 	tb_size_t 		step;
 
-	// ctor & dtor
-	tb_void_t 			(*ctor)(tb_void_t* data, tb_void_t* priv);
-	tb_void_t 			(*dtor)(tb_void_t* data, tb_void_t* priv);
-	tb_void_t* 			priv;
+	// free
+	tb_void_t 		(*free)(tb_void_t* data, tb_void_t* priv);
+	tb_void_t* 		priv;
 
 }tb_dlist_t;
 
@@ -96,13 +95,18 @@ typedef struct __tb_dlist_t
  * interfaces
  */
 
-// create & destroy
-tb_dlist_t* 		tb_dlist_create(tb_size_t step, tb_size_t grow, tb_void_t (*ctor)(tb_void_t* , tb_void_t* ), tb_void_t (*dtor)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
-tb_void_t 			tb_dlist_destroy(tb_dlist_t* dlist);
+// init & exit
+tb_dlist_t* 		tb_dlist_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_void_t 			tb_dlist_exit(tb_dlist_t* dlist);
 
 // accessors
 tb_byte_t* 			tb_dlist_at(tb_dlist_t* dlist, tb_size_t index);
+tb_byte_t* 			tb_dlist_at_head(tb_dlist_t* dlist);
+tb_byte_t* 			tb_dlist_at_last(tb_dlist_t* dlist);
+
 tb_byte_t const* 	tb_dlist_const_at(tb_dlist_t const* dlist, tb_size_t index);
+tb_byte_t const* 	tb_dlist_const_at_head(tb_dlist_t const* dlist);
+tb_byte_t const* 	tb_dlist_const_at_last(tb_dlist_t const* dlist);
 
 // modifiors
 tb_void_t 			tb_dlist_clear(tb_dlist_t* dlist);

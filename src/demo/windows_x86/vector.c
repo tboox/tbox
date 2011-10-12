@@ -13,14 +13,9 @@
  * details
  */
 
-static tb_void_t tb_vector_char_ctor(tb_void_t* data, tb_void_t* priv)
+static tb_void_t tb_vector_char_free(tb_void_t* data, tb_void_t* priv)
 {
-	*((tb_char_t*)data) = '_';
-	TB_DBG("[ctor]: %s, _", (tb_char_t const*)priv);
-}
-static tb_void_t tb_vector_char_dtor(tb_void_t* data, tb_void_t* priv)
-{
-	TB_DBG("[dtor]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
+	TB_DBG("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
 }
 static tb_void_t tb_vector_char_dump(tb_vector_t const* vector)
 {
@@ -39,8 +34,8 @@ static tb_void_t tb_vector_char_dump(tb_vector_t const* vector)
 
 static tb_size_t tb_vector_insert_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -54,22 +49,22 @@ static tb_size_t tb_vector_insert_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_insert_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -83,22 +78,22 @@ static tb_size_t tb_vector_insert_head_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 	
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_insert_tail_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -112,22 +107,22 @@ static tb_size_t tb_vector_insert_tail_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_ninsert_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	// insert one first
@@ -143,22 +138,22 @@ static tb_size_t tb_vector_ninsert_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n + 1);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_ninsert_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -171,22 +166,22 @@ static tb_size_t tb_vector_ninsert_head_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_ninsert_tail_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -199,23 +194,23 @@ static tb_size_t tb_vector_ninsert_tail_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'F');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'F');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'F');
 
 	// clear it
 	tb_vector_clear(vector);
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 
 static tb_size_t tb_vector_remove_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -231,15 +226,15 @@ static tb_size_t tb_vector_remove_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_remove_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -255,13 +250,13 @@ static tb_size_t tb_vector_remove_head_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 }
 static tb_size_t tb_vector_remove_last_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -277,15 +272,15 @@ static tb_size_t tb_vector_remove_last_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nremove_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -300,15 +295,15 @@ static tb_size_t tb_vector_nremove_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nremove_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -323,15 +318,15 @@ static tb_size_t tb_vector_nremove_head_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nremove_last_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -346,15 +341,15 @@ static tb_size_t tb_vector_nremove_last_test()
 	// check
 	TB_ASSERT(!tb_vector_size(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_replace_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -370,18 +365,18 @@ static tb_size_t tb_vector_replace_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'R');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'R');
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_replace_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -396,17 +391,17 @@ static tb_size_t tb_vector_replace_head_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'R');
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_replace_last_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t i = 0;
@@ -421,18 +416,18 @@ static tb_size_t tb_vector_replace_last_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'R');
 
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nreplace_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -446,18 +441,18 @@ static tb_size_t tb_vector_nreplace_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'R');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'R');
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nreplace_head_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -471,18 +466,18 @@ static tb_size_t tb_vector_nreplace_head_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'R');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'R');
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_nreplace_last_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -496,20 +491,20 @@ static tb_size_t tb_vector_nreplace_last_test()
 
 	// check
 	TB_ASSERT(tb_vector_size(vector) == n);
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_head(vector))[0] == 'R');
-	TB_ASSERT(tb_vector_const_at(vector, tb_vector_last(vector))[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_head(vector)[0] == 'R');
+	TB_ASSERT(tb_vector_const_at_last(vector)[0] == 'R');
 
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 
 static tb_size_t tb_vector_iterator_next_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -526,15 +521,15 @@ static tb_size_t tb_vector_iterator_next_test()
 	// time
 	TB_DBG("tb_vector_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
 static tb_size_t tb_vector_iterator_prev_test()
 {
-	// create
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL, TB_NULL);
+	// init
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, TB_NULL, TB_NULL);
 	TB_ASSERT_RETURN(vector);
 
 	tb_size_t n = 1000000;
@@ -554,8 +549,8 @@ static tb_size_t tb_vector_iterator_prev_test()
 	// time
 	TB_DBG("tb_vector_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
-	// destroy
-	tb_vector_destroy(vector);
+	// exit
+	tb_vector_exit(vector);
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
@@ -567,8 +562,8 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
-	// create vector
-	tb_vector_t* vector = tb_vector_create(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, tb_vector_char_ctor, tb_vector_char_dtor, "char");
+	// init vector
+	tb_vector_t* vector = tb_vector_init(sizeof(tb_char_t), TB_VECTOR_GROW_SIZE, tb_vector_char_free, "char");
 	TB_ASSERT_GOTO(vector, end);
 
 	TB_DBG("=============================================================");
@@ -655,8 +650,8 @@ int main(int argc, char** argv)
 	getchar();
 end:
 
-	// destroy vector
-	tb_vector_destroy(vector);
+	// exit vector
+	tb_vector_exit(vector);
 
 	return 0;
 }

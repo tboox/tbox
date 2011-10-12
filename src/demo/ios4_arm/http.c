@@ -11,11 +11,11 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create http
-	tb_handle_t http = tb_http_create(TB_NULL);
+	tb_handle_t http = tb_http_init(TB_NULL);
 	if (!http) goto end;
 
 	// create cookies
-	tb_cookies_t* cookies = tb_cookies_create();
+	tb_cookies_t* cookies = tb_cookies_init();
 	if (!cookies) goto end;
 	
 	// init option
@@ -84,7 +84,7 @@ end:
 	}
 
 	// destroy it
-	if (http) tb_http_destroy(http);
+	if (http) tb_http_exit(http);
 
 	// dump cookies
 #ifdef TB_DEBUG
@@ -92,7 +92,7 @@ end:
 #endif
 
 	// destroy it
-	if (cookies) tb_cookies_destroy(cookies);
+	if (cookies) tb_cookies_exit(cookies);
 
 	tb_printf("end\n");
 	getchar();

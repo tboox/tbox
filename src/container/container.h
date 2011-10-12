@@ -35,6 +35,8 @@ extern "C" {
 #include "pool.h"
 #include "slist.h"
 #include "dlist.h"
+#include "queue.h"
+#include "stack.h"
 #include "vector.h"
 
 // c plus plus
