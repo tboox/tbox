@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "pool.h"
+#include "hash.h"
 #include "slist.h"
 #include "dlist.h"
 #include "queue.h"
