@@ -452,11 +452,14 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 	tb_string_append_format(head, "%s %s HTTP/1.1\r\n", method, http->option.path[0]? http->option.path : "/");
 
 	// append host
-	TB_ASSERT_RETURN_VAL(http->option.host, TB_NULL);
-	tb_string_append_format(head, "Host: %s\r\n", http->option.host);
+	if (!tb_http_head_find(http, "Host")) 
+	{
+		TB_ASSERT_RETURN_VAL(http->option.host, TB_NULL);
+		tb_string_append_format(head, "Host: %s\r\n", http->option.host);
+	}
 
 	// append accept
-	if (TB_FALSE == tb_http_head_find(http, "Accept")) 
+	if (!tb_http_head_find(http, "Accept")) 
 		tb_string_append_c_string(head, "Accept: */*\r\n");
 
 	// append content size if post data
