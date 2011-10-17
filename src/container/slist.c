@@ -56,7 +56,7 @@ tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_v
 	slist->free = free;
 	slist->priv = priv;
 
-	// init pool, capacity = grow, size = 0, step = next + data
+	// init pool, step = next + data
 	slist->pool = tb_pool_init(sizeof(tb_size_t) + step, grow, grow, tb_slist_free, slist);
 	TB_ASSERT_GOTO(slist->pool, fail);
 
