@@ -366,6 +366,7 @@ typedef tb_int32_t 				tb_wchar_t;
 typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
+typedef tb_void_t* 				tb_handle_t;
 
 // int64
 #ifdef TB_CONFIG_TYPE_INT64
@@ -385,9 +386,6 @@ typedef struct __tb_uint64_t
 } 								tb_uint64_t;
 typedef tb_sint64_t 			tb_int64_t;
 #endif
-
-// handle
-typedef tb_void_t* 				tb_handle_t;
 
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT

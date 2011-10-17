@@ -27,89 +27,106 @@
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 
-
 /* /////////////////////////////////////////////////////////
- * interfaces
+ * implemention
  */
 
-tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name_func, tb_hash_item_func_t const* item_func)
 {
-	return tb_vector_init(step, grow, free, priv);
+	return TB_NULL;
 }
-
 tb_void_t tb_hash_exit(tb_hash_t* hash)
 {
-	tb_vector_exit(hash);
 }
 tb_void_t tb_hash_clear(tb_hash_t* hash)
 {
-	tb_vector_clear(hash);
 }
-tb_void_t tb_hash_put(tb_hash_t* hash, tb_byte_t const* item)
+tb_byte_t* tb_hash_at(tb_hash_t* hash, tb_void_t const* name)
 {
-	tb_vector_insert_tail(hash, item);
+	return TB_NULL;
 }
-tb_void_t tb_hash_pop(tb_hash_t* hash, tb_byte_t* item)
+tb_byte_t const* tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
 {
-	TB_ASSERT_RETURN(hash);
-	if (item) 
-	{
-		tb_byte_t const* last = tb_vector_const_at_last(hash);
-		if (last) tb_memcpy(item, last, hash->step);
-	}
-	tb_vector_remove_last(hash);
+	return TB_NULL;
 }
-tb_byte_t* tb_hash_at(tb_hash_t* hash, tb_size_t index)
+tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
 {
-	return tb_vector_at(hash, index);
 }
-tb_byte_t* tb_hash_at_head(tb_hash_t* hash)
+tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_byte_t const* item)
 {
-	return tb_vector_at_head(hash);
 }
-tb_byte_t* tb_hash_at_last(tb_hash_t* hash)
+tb_void_t tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_byte_t* item)
 {
-	return tb_vector_at_last(hash);
-}
-tb_byte_t const* tb_hash_const_at(tb_hash_t const* hash, tb_size_t index)
-{
-	return tb_vector_const_at(hash, index);
-}
-tb_byte_t const* tb_hash_const_at_head(tb_hash_t const* hash)
-{
-	return tb_vector_const_at_head(hash);
-}
-tb_byte_t const* tb_hash_const_at_last(tb_hash_t const* hash)
-{
-	return tb_vector_const_at_last(hash);
-}
-tb_size_t tb_hash_head(tb_hash_t const* hash)
-{
-	return tb_vector_head(hash);
-}
-tb_size_t tb_hash_last(tb_hash_t const* hash)
-{
-	return tb_vector_last(hash);
-}
-tb_size_t tb_hash_tail(tb_hash_t const* hash)
-{
-	return tb_vector_tail(hash);
-}
-tb_size_t tb_hash_next(tb_hash_t const* hash, tb_size_t index)
-{
-	return tb_vector_next(hash, index);
-}
-tb_size_t tb_hash_prev(tb_hash_t const* hash, tb_size_t index)
-{
-	return tb_vector_prev(hash, index);
 }
 tb_size_t tb_hash_size(tb_hash_t const* hash)
 {
-	return tb_vector_size(hash);
+	return 0;
 }
 tb_size_t tb_hash_maxn(tb_hash_t const* hash)
 {
-	return tb_vector_maxn(hash);
-
+	return 0;
+}
+tb_hash_name_func_t tb_hash_name_func_str(tb_void_t* priv)
+{
+	tb_hash_name_func_t func;
+	func.hash = TB_NULL;
+	func.comp = TB_NULL;
+	func.dupl = TB_NULL;
+	func.free = TB_NULL;
+	func.priv = priv;
+	return func;
+}
+tb_hash_name_func_t tb_hash_name_func_int(tb_void_t* priv)
+{
+	tb_hash_name_func_t func;
+	func.hash = TB_NULL;
+	func.comp = TB_NULL;
+	func.dupl = TB_NULL;
+	func.free = TB_NULL;
+	func.priv = priv;
+	return func;
+}
+tb_hash_name_func_t tb_hash_name_func_ptr(tb_void_t* priv)
+{
+	tb_hash_name_func_t func;
+	func.hash = TB_NULL;
+	func.comp = TB_NULL;
+	func.dupl = TB_NULL;
+	func.free = TB_NULL;
+	func.priv = priv;
+	return func;
+}
+tb_hash_name_func_t tb_hash_name_func_mem(tb_void_t* priv)
+{
+	tb_hash_name_func_t func;
+	func.hash = TB_NULL;
+	func.comp = TB_NULL;
+	func.dupl = TB_NULL;
+	func.free = TB_NULL;
+	func.priv = priv;
+	return func;
+}
+tb_hash_pair_t tb_hash_itor_at(tb_hash_t* hash, tb_hash_itor_t itor)
+{
+	tb_hash_pair_t pair;
+	pair.name = TB_NULL;
+	pair.item = TB_NULL;
+	return pair;
+}
+tb_hash_itor_t tb_hash_itor_head(tb_hash_t const* hash)
+{
+	return 0;
+}
+tb_hash_itor_t tb_hash_itor_tail(tb_hash_t const* hash)
+{
+	return 0;
+}
+tb_hash_itor_t tb_hash_itor_next(tb_hash_t const* hash, tb_hash_itor_t itor)
+{
+	return 0;
+}
+tb_hash_itor_t tb_hash_itor_prev(tb_hash_t const* hash, tb_hash_itor_t itor)
+{
+	return 0;
 }
 
