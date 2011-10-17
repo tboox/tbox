@@ -82,7 +82,7 @@ typedef struct __tb_hash_bucket_t
 typedef tb_void_t 	(*tb_hash_name_free_func_t)(tb_void_t* name, tb_void_t* priv);
 typedef tb_void_t* 	(*tb_hash_name_dupl_func_t)(tb_void_t const* name, tb_void_t* priv);
 typedef tb_size_t 	(*tb_hash_name_hash_func_t)(tb_void_t const* name, tb_size_t size, tb_void_t* priv);
-typedef tb_int_t 	(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
+typedef tb_bool_t 	(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
 
 // the item func
 typedef tb_void_t 	(*tb_hash_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
@@ -123,16 +123,16 @@ typedef struct __tb_hash_pair_t
 // the hash type
 typedef struct __tb_hash_t
 {
-	// the pool
+	// the item pool
 	tb_pool_t* 					pool;
-
-	// the bucket list & size
-	tb_hash_bucket_t* 			list;
-	tb_size_t 					size;
 
 	// the item step
 	tb_size_t 					step;
 	
+	// the bucket list & size
+	tb_hash_bucket_t* 			list;
+	tb_size_t 					size;
+
 	// the hash func
 	tb_hash_name_func_t 		name_func;
 	tb_hash_item_func_t 		item_func;
