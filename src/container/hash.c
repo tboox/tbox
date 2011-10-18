@@ -31,7 +31,7 @@
  * details
  */
 
-static tb_void_t tb_hash_free(tb_void_t* item, tb_void_t* priv)
+static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 {
 	tb_hash_t* hash = priv;
 	if (hash && hash->item_func.free)
@@ -39,7 +39,7 @@ static tb_void_t tb_hash_free(tb_void_t* item, tb_void_t* priv)
 		hash->item_func.free((tb_byte_t*)item + 8, hash->item_func.priv);
 	}
 }
-static tb_hash_itor_t tb_hash_find(tb_hash_t* hash, tb_void_t const* name)
+static tb_size_t tb_hash_find(tb_hash_t* hash, tb_void_t const* name)
 {
 	return 0;
 }
@@ -146,19 +146,21 @@ tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name
 	tb_hash_t* hash = (tb_hash_t*)tb_calloc(1, sizeof(tb_hash_t));
 	TB_ASSERT_RETURN_VAL(hash && !(size % 2), TB_NULL);
 
-	// init hash
-	hash->step = step;
-	hash->size = size;
+	// init hash func
 	hash->name_func = name_func;
 	if (item_func) hash->item_func = *item_func;
 
-	// init pool, step = next + prev + data
-	hash->pool = tb_pool_init(8 + step, (hash->size << 2), hash->size, tb_hash_free, hash);
-	TB_ASSERT_GOTO(hash->pool, fail);
+	// init item list
+	tb_slist_item_func_t func;
+	func.free = tb_hash_item_free;
+	func.priv = hash;
+	hash->item_list = tb_slist_init(step, size, &func);
+	TB_ASSERT_GOTO(hash->item_list, fail);
 
-	// init list
-	hash->list = tb_calloc(size, sizeof(tb_hash_bucket_t));
-	TB_ASSERT_GOTO(hash->list, fail);
+	// init hash list
+	hash->hash_size = size;
+	hash->hash_list = tb_calloc(hash->hash_size, sizeof(tb_hash_bucket_t));
+	TB_ASSERT_GOTO(hash->hash_list, fail);
 
 	return hash;
 fail:
@@ -172,11 +174,11 @@ tb_void_t tb_hash_exit(tb_hash_t* hash)
 		// clear it
 		tb_hash_clear(hash);
 
-		// free pool
-		if (hash->pool) tb_pool_exit(hash->pool);
+		// free hash list
+		if (hash->hash_list) tb_free(hash->hash_list);
 
-		// free list
-		if (hash->list) tb_free(hash->list);
+		// free item list
+		if (hash->item_list) tb_slist_exit(hash->item_list);
 
 		// free it
 		tb_free(hash);
@@ -184,27 +186,17 @@ tb_void_t tb_hash_exit(tb_hash_t* hash)
 }
 tb_void_t tb_hash_clear(tb_hash_t* hash)
 {
-	TB_ASSERT_RETURN(hash && hash->pool && hash->list);
+	TB_ASSERT_RETURN(hash && hash->hash_list && hash->item_list);
 
-	// free names
-	tb_hash_itor_t itor = tb_hash_itor_head(hash);
-	tb_hash_itor_t tail = tb_hash_itor_tail(hash);
-	for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
-	{
-		tb_hash_pair_t pair = tb_hash_itor_at(hash, itor);
-		if (pair.name && hash->name_func.free)
-			hash->name_func.free(pair.name, hash->name_func.priv);
-	}
+	// clear hash list
+	tb_memset(hash->hash_list, 0, hash->hash_size * sizeof(tb_hash_bucket_t));
 
-	// clear list
-	tb_memset(hash->list, 0, hash->size * sizeof(tb_hash_bucket_t));
-
-	// clear pool
-	tb_pool_clear(hash->pool);
+	// clear item list
+	tb_slist_clear(hash->item_list);
 }
 tb_void_t* tb_hash_at(tb_hash_t* hash, tb_void_t const* name)
 {
-	//tb_hash_itor_t itor = tb_hash_find(hash, name);
+	//tb_size_t itor = tb_hash_find(hash, name);
 	return TB_NULL;
 }
 tb_void_t const* tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
@@ -226,13 +218,13 @@ tb_void_t tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_void_t* item)
 }
 tb_size_t tb_hash_size(tb_hash_t const* hash)
 {
-	TB_ASSERT_RETURN_VAL(hash && hash->pool, 0);
-	return hash->pool->size;
+	TB_ASSERT_RETURN_VAL(hash && hash->item_list, 0);
+	return tb_slist_size(hash->item_list);
 }
 tb_size_t tb_hash_maxn(tb_hash_t const* hash)
 {
-	TB_ASSERT_RETURN_VAL(hash && hash->pool, 0);
-	return hash->pool->maxn;
+	TB_ASSERT_RETURN_VAL(hash && hash->item_list, 0);
+	return tb_slist_maxn(hash->item_list);
 }
 tb_hash_name_func_t tb_hash_name_func_str()
 {
@@ -274,29 +266,29 @@ tb_hash_name_func_t tb_hash_name_func_mem(tb_size_t size)
 	func.priv = (tb_size_t)size;
 	return func;
 }
-tb_hash_pair_t tb_hash_itor_at(tb_hash_t* hash, tb_hash_itor_t itor)
+tb_hash_pair_t tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor)
 {
 	tb_hash_pair_t pair;
 	pair.name = TB_NULL;
 	pair.item = TB_NULL;
 	return pair;
 }
-tb_hash_itor_t tb_hash_itor_head(tb_hash_t const* hash)
+tb_size_t tb_hash_itor_head(tb_hash_t const* hash)
 {
 	TB_NOT_IMPLEMENT();
 	return 0;
 }
-tb_hash_itor_t tb_hash_itor_tail(tb_hash_t const* hash)
+tb_size_t tb_hash_itor_tail(tb_hash_t const* hash)
 {
 	TB_NOT_IMPLEMENT();
 	return 0;
 }
-tb_hash_itor_t tb_hash_itor_next(tb_hash_t const* hash, tb_hash_itor_t itor)
+tb_size_t tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor)
 {
 	TB_NOT_IMPLEMENT();
 	return 0;
 }
-tb_hash_itor_t tb_hash_itor_prev(tb_hash_t const* hash, tb_hash_itor_t itor)
+tb_size_t tb_hash_itor_prev(tb_hash_t const* hash, tb_size_t itor)
 {
 	TB_NOT_IMPLEMENT();
 	return 0;
