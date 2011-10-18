@@ -51,9 +51,6 @@ extern "C" {
  * types
  */
 
-// the hash iterator type
-typedef tb_size_t 		tb_hash_itor_t;
-
 // the hash item type
 typedef struct __tb_hash_item_t
 {
@@ -123,15 +120,12 @@ typedef struct __tb_hash_pair_t
 // the hash type
 typedef struct __tb_hash_t
 {
-	// the item pool
-	tb_pool_t* 					pool;
+	// the item list
+	tb_slist_t* 				item_list;
 
-	// the item step
-	tb_size_t 					step;
-	
-	// the bucket list & size
-	tb_hash_bucket_t* 			list;
-	tb_size_t 					size;
+	// the hash list
+	tb_hash_bucket_t* 			hash_list;
+	tb_size_t 					hash_size;
 
 	// the hash func
 	tb_hash_name_func_t 		name_func;
@@ -172,8 +166,8 @@ tb_void_t 			tb_hash_dump(tb_hash_t const* hash);
 
 /* iterator
  * 
- * tb_hash_itor_t itor = tb_hash_itor_head(hash);
- * tb_hash_itor_t tail = tb_hash_itor_tail(hash);
+ * tb_size_t itor = tb_hash_itor_head(hash);
+ * tb_size_t tail = tb_hash_itor_tail(hash);
  * for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
  * {
  * 		tb_hash_pair_t pair = tb_hash_itor_at(hash, itor);
@@ -188,11 +182,11 @@ tb_void_t 			tb_hash_dump(tb_hash_t const* hash);
  *
  * \note the index of the same item is mutable, only for iterator
  */
-tb_hash_pair_t 		tb_hash_itor_at(tb_hash_t* hash, tb_hash_itor_t itor);
-tb_hash_itor_t 		tb_hash_itor_head(tb_hash_t const* hash);
-tb_hash_itor_t 		tb_hash_itor_tail(tb_hash_t const* hash);
-tb_hash_itor_t 		tb_hash_itor_next(tb_hash_t const* hash, tb_hash_itor_t itor);
-tb_hash_itor_t 		tb_hash_itor_prev(tb_hash_t const* hash, tb_hash_itor_t itor);
+tb_hash_pair_t 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
+tb_size_t 			tb_hash_itor_head(tb_hash_t const* hash);
+tb_size_t 			tb_hash_itor_tail(tb_hash_t const* hash);
+tb_size_t 			tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
+tb_size_t 			tb_hash_itor_prev(tb_hash_t const* hash, tb_size_t itor);
 
 // c plus plus
 #ifdef __cplusplus

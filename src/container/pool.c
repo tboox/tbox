@@ -40,7 +40,7 @@
  * implemention
  */
 
-tb_pool_t* tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_pool_t* tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_pool_item_func_t const* func)
 {
 	tb_pool_t* pool = (tb_pool_t*)tb_calloc(1, sizeof(tb_pool_t));
 	TB_ASSERT_RETURN_VAL(pool, TB_NULL);
@@ -49,8 +49,7 @@ tb_pool_t* tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_void_
 	pool->grow = tb_align(grow, 8); // align by 8-byte for info
 	pool->size = 0;
 	pool->maxn = tb_align(size, 8); // align by 8-byte for info
-	pool->free = free;
-	pool->priv = priv;
+	if (func) pool->func = *func;
 
 	pool->data = tb_calloc(pool->maxn, pool->step);
 	TB_ASSERT_GOTO(pool->data, fail);
@@ -174,7 +173,7 @@ tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 	if (pool && pool->size && item > 0 && item < 1 + pool->maxn)
 	{
 		// free item
-		if (pool->free) pool->free(tb_pool_get(pool, item), pool->priv);
+		if (pool->func.free) pool->func.free(tb_pool_get(pool, item), pool->func.priv);
 
 		// set info
 		TB_POOL_INFO_RESET(pool->info, item - 1);
@@ -191,13 +190,13 @@ tb_void_t tb_pool_free(tb_pool_t* pool, tb_size_t item)
 tb_void_t tb_pool_clear(tb_pool_t* pool)
 {
 	// free items
-	if (pool->free && pool->data) 
+	if (pool->func.free && pool->data) 
 	{
 		tb_int_t i = 0;
 		for (i = 0; i < pool->maxn; ++i)
 		{
 			if (TB_POOL_INFO_ISSET(pool->info, i))
-				pool->free(pool->data + i * pool->step, pool->priv);
+				pool->func.free(pool->data + i * pool->step, pool->func.priv);
 		}
 	}
 

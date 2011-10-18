@@ -64,31 +64,44 @@ extern "C" {
  * types
  */
 
+// the item func
+typedef tb_void_t 	(*tb_pool_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
+
+// the pool item func type
+typedef struct __tb_pool_item_func_t
+{
+	// the item func
+	tb_pool_item_free_func_t 	free;
+
+	// the priv data
+	tb_void_t* 					priv;
+
+}tb_pool_item_func_t;
+
 // the pool type, valid index > 0, 0: is end for list
 typedef struct __tb_pool_t
 {
-	tb_byte_t* 		data;
-	tb_byte_t* 		info;
-	tb_size_t 		size;
-	tb_size_t 		grow;
-	tb_size_t 		maxn;
-	tb_size_t 		step;
+	tb_byte_t* 				data;
+	tb_byte_t* 				info;
+	tb_size_t 				size;
+	tb_size_t 				grow;
+	tb_size_t 				maxn;
+	tb_size_t 				step;
 
 	// predict the next free block
 #ifdef TB_MEMORY_POOL_PRED_ENABLE
-	tb_size_t 		pred[TB_MEMORY_POOL_PRED_MAX];
-	tb_size_t 		pred_n;
+	tb_size_t 				pred[TB_MEMORY_POOL_PRED_MAX];
+	tb_size_t 				pred_n;
 
 # 	ifdef TB_DEBUG
-	tb_size_t 		pred_failed;
-	tb_size_t 		alloc_total;
+	tb_size_t 				pred_failed;
+	tb_size_t 				alloc_total;
 # 	endif
 
 #endif
 
-	// free
-	tb_void_t 		(*free)(tb_void_t* data, tb_void_t* priv);
-	tb_void_t* 		priv;
+	// func
+	tb_pool_item_func_t 	func;
 
 }tb_pool_t;
 
@@ -97,7 +110,7 @@ typedef struct __tb_pool_t
  */
 
 // init & exit
-tb_pool_t* 		tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_pool_t* 		tb_pool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_pool_item_func_t const* func);
 tb_void_t 		tb_pool_exit(tb_pool_t* pool);
 
 // alloc & free

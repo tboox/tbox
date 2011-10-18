@@ -13,18 +13,18 @@
  * details
  */
 
-static tb_void_t tb_dlist_char_free(tb_void_t* data, tb_void_t* priv)
+static tb_void_t tb_dlist_char_free(tb_void_t* item, tb_void_t* priv)
 {
-	TB_DBG("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
+	TB_DBG("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)item));
 }
 static tb_void_t tb_dlist_char_dump(tb_dlist_t const* dlist)
 {
 	TB_DBG("size: %d, maxn: %d", tb_dlist_size(dlist), tb_dlist_maxn(dlist));
-	tb_size_t itor = tb_dlist_head(dlist);
-	tb_size_t tail = tb_dlist_tail(dlist);
-	for (; itor != tail; itor = tb_dlist_next(dlist, itor))
+	tb_size_t itor = tb_dlist_itor_head(dlist);
+	tb_size_t tail = tb_dlist_itor_tail(dlist);
+	for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
 	{
-		tb_byte_t const* item = tb_dlist_const_at(dlist, itor);
+		tb_byte_t const* item = tb_dlist_itor_const_at(dlist, itor);
 		if (item)
 		{
 			TB_DBG("at[%d]: %c", itor, *((tb_char_t const*)item));
@@ -34,7 +34,7 @@ static tb_void_t tb_dlist_char_dump(tb_dlist_t const* dlist)
 static tb_size_t tb_dlist_insert_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	// insert one first
@@ -51,8 +51,8 @@ static tb_size_t tb_dlist_insert_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n + 1);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -66,7 +66,7 @@ static tb_size_t tb_dlist_insert_test()
 static tb_size_t tb_dlist_insert_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -80,8 +80,8 @@ static tb_size_t tb_dlist_insert_head_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -95,7 +95,7 @@ static tb_size_t tb_dlist_insert_head_test()
 static tb_size_t tb_dlist_insert_tail_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -109,8 +109,8 @@ static tb_size_t tb_dlist_insert_tail_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -124,7 +124,7 @@ static tb_size_t tb_dlist_insert_tail_test()
 static tb_size_t tb_dlist_ninsert_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	// insert one first
@@ -140,8 +140,8 @@ static tb_size_t tb_dlist_ninsert_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n + 1);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -155,7 +155,7 @@ static tb_size_t tb_dlist_ninsert_test()
 static tb_size_t tb_dlist_ninsert_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -168,8 +168,8 @@ static tb_size_t tb_dlist_ninsert_head_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -183,7 +183,7 @@ static tb_size_t tb_dlist_ninsert_head_test()
 static tb_size_t tb_dlist_ninsert_tail_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -196,8 +196,8 @@ static tb_size_t tb_dlist_ninsert_tail_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'F');
-	TB_ASSERT(!tb_strcmp("F", tb_dlist_const_at_last(dlist)));
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'F');
+	TB_ASSERT(!tb_strcmp("F", ((tb_char_t const*)tb_dlist_const_at_last(dlist))));
 
 	// clear it
 	tb_dlist_clear(dlist);
@@ -211,7 +211,7 @@ static tb_size_t tb_dlist_ninsert_tail_test()
 static tb_size_t tb_dlist_remove_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -235,7 +235,7 @@ static tb_size_t tb_dlist_remove_test()
 static tb_size_t tb_dlist_remove_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -257,7 +257,7 @@ static tb_size_t tb_dlist_remove_head_test()
 static tb_size_t tb_dlist_remove_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -281,13 +281,13 @@ static tb_size_t tb_dlist_remove_last_test()
 static tb_size_t tb_dlist_nremove_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_dlist_ninsert_head(dlist, "F", n);
 	tb_int64_t t = tb_mclock();
-	tb_dlist_nremove(dlist, tb_dlist_head(dlist), n);
+	tb_dlist_nremove(dlist, tb_dlist_itor_head(dlist), n);
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
@@ -304,7 +304,7 @@ static tb_size_t tb_dlist_nremove_test()
 static tb_size_t tb_dlist_nremove_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -327,7 +327,7 @@ static tb_size_t tb_dlist_nremove_head_test()
 static tb_size_t tb_dlist_nremove_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -350,15 +350,15 @@ static tb_size_t tb_dlist_nremove_last_test()
 static tb_size_t tb_dlist_replace_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_dlist_ninsert_head(dlist, "F", n);
-	tb_size_t itor = tb_dlist_head(dlist);
-	tb_size_t tail = tb_dlist_tail(dlist);
+	tb_size_t itor = tb_dlist_itor_head(dlist);
+	tb_size_t tail = tb_dlist_itor_tail(dlist);
 	tb_int64_t t = tb_mclock();
-	for (; itor != tail; itor = tb_dlist_next(dlist, itor)) tb_dlist_replace(dlist, itor, "R");
+	for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor)) tb_dlist_replace(dlist, itor, "R");
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
@@ -366,8 +366,8 @@ static tb_size_t tb_dlist_replace_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'R');
-	TB_ASSERT(tb_dlist_const_at_last(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_last(dlist))[0] == 'R');
 
 	// exit
 	tb_dlist_exit(dlist);
@@ -377,7 +377,7 @@ static tb_size_t tb_dlist_replace_test()
 static tb_size_t tb_dlist_replace_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -392,7 +392,7 @@ static tb_size_t tb_dlist_replace_head_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'R');
 
 	// exit
 	tb_dlist_exit(dlist);
@@ -402,7 +402,7 @@ static tb_size_t tb_dlist_replace_head_test()
 static tb_size_t tb_dlist_replace_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t i = 0;
@@ -417,7 +417,7 @@ static tb_size_t tb_dlist_replace_last_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_last(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_last(dlist))[0] == 'R');
 
 
 	// exit
@@ -428,13 +428,13 @@ static tb_size_t tb_dlist_replace_last_test()
 static tb_size_t tb_dlist_nreplace_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
 	tb_size_t index = tb_dlist_ninsert_head(dlist, "F", n);
 	tb_int64_t t = tb_mclock();
-	tb_dlist_nreplace(dlist, tb_dlist_head(dlist), "R", n);
+	tb_dlist_nreplace(dlist, tb_dlist_itor_head(dlist), "R", n);
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
@@ -442,8 +442,8 @@ static tb_size_t tb_dlist_nreplace_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'R');
-	TB_ASSERT(tb_dlist_const_at_last(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_last(dlist))[0] == 'R');
 
 	// exit
 	tb_dlist_exit(dlist);
@@ -453,7 +453,7 @@ static tb_size_t tb_dlist_nreplace_test()
 static tb_size_t tb_dlist_nreplace_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -467,8 +467,8 @@ static tb_size_t tb_dlist_nreplace_head_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'R');
-	TB_ASSERT(tb_dlist_const_at_last(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_head(dlist))[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_last(dlist))[0] == 'R');
 
 	// exit
 	tb_dlist_exit(dlist);
@@ -478,7 +478,7 @@ static tb_size_t tb_dlist_nreplace_head_test()
 static tb_size_t tb_dlist_nreplace_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -492,8 +492,8 @@ static tb_size_t tb_dlist_nreplace_last_test()
 
 	// check
 	TB_ASSERT(tb_dlist_size(dlist) == n);
-	TB_ASSERT(tb_dlist_const_at_head(dlist)[0] == 'R');
-	TB_ASSERT(tb_dlist_const_at_last(dlist)[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)((tb_char_t const*)tb_dlist_const_at_head(dlist)))[0] == 'R');
+	TB_ASSERT(((tb_char_t const*)tb_dlist_const_at_last(dlist))[0] == 'R');
 
 
 	// exit
@@ -505,17 +505,17 @@ static tb_size_t tb_dlist_nreplace_last_test()
 static tb_size_t tb_dlist_iterator_next_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 1000000;
 	tb_dlist_ninsert_head(dlist, "F", n);
-	tb_size_t itor = tb_dlist_head(dlist);
-	tb_size_t tail = tb_dlist_tail(dlist);
+	tb_size_t itor = tb_dlist_itor_head(dlist);
+	tb_size_t tail = tb_dlist_itor_tail(dlist);
 	tb_int64_t t = tb_mclock();
-	for (; itor != tail; itor = tb_dlist_next(dlist, itor))
+	for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_dlist_const_at(dlist, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_dlist_itor_const_at(dlist, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -530,20 +530,20 @@ static tb_size_t tb_dlist_iterator_next_test()
 static tb_size_t tb_dlist_iterator_prev_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL, TB_NULL);
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, TB_NULL);
 	TB_ASSERT_RETURN_VAL(dlist, 0);
 
 	tb_size_t n = 10000;
 	tb_dlist_ninsert_head(dlist, "F", n);
-	tb_size_t itor = tb_dlist_last(dlist);
-	tb_size_t head = tb_dlist_head(dlist);
+	tb_size_t itor = tb_dlist_itor_last(dlist);
+	tb_size_t head = tb_dlist_itor_head(dlist);
 	tb_int64_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_dlist_const_at(dlist, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_dlist_itor_const_at(dlist, itor);
 
 		if (itor == head) break;
-		itor = tb_dlist_prev(dlist, itor);
+		itor = tb_dlist_itor_prev(dlist, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -563,7 +563,8 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// init dlist
-	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, tb_dlist_char_free, "char");
+	tb_dlist_item_func_t func = {tb_dlist_char_free, "char"};
+	tb_dlist_t* dlist = tb_dlist_init(sizeof(tb_char_t), TB_DLIST_GROW_SIZE, &func);
 	TB_ASSERT_GOTO(dlist, end);
 
 	tb_size_t 			i = 0;

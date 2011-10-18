@@ -308,11 +308,11 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
  
 	// reuse it if exists
 	tb_slist_t* 	spool = cookies->spool;
-	tb_size_t 		itor = tb_slist_head(spool);
-	tb_size_t 		tail = tb_slist_tail(spool);
-	for (; itor != tail; itor = tb_slist_next(spool, itor))
+	tb_size_t 		itor = tb_slist_itor_head(spool);
+	tb_size_t 		tail = tb_slist_itor_tail(spool);
+	for (; itor != tail; itor = tb_slist_itor_next(spool, itor))
 	{
-		tb_cookie_string_t* string = (tb_cookie_string_t*)tb_slist_at(spool, itor);
+		tb_cookie_string_t* string = (tb_cookie_string_t*)tb_slist_itor_at(spool, itor);
 		if (string && string->data && !tb_strncmp(string->data, s, n))
 		{
 			string->refn++;
@@ -343,10 +343,10 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_at(cpool, i);
 		if (cookie)
 		{
-			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_at(spool, cookie->domain);
-			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_slist_at(spool, cookie->path);
-			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_slist_at(spool, cookie->name);
-			tb_cookie_string_t* svalue = (tb_cookie_string_t*)tb_slist_at(spool, cookie->value);
+			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->domain);
+			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->path);
+			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->name);
+			tb_cookie_string_t* svalue = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->value);
 
 			// is this?
 			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
@@ -391,9 +391,9 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_at(cpool, i);
 		if (cookie)
 		{
-			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_at(spool, cookie->domain);
-			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_slist_at(spool, cookie->path);
-			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_slist_at(spool, cookie->name);
+			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->domain);
+			tb_cookie_string_t* spath = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->path);
+			tb_cookie_string_t* sname = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->name);
 
 			// is this?
 			if ( 	sdomain && sdomain->data && !tb_strnicmp(sdomain->data, entry->pdomain, entry->ndomain)
@@ -523,7 +523,8 @@ tb_cookies_t* tb_cookies_init()
 	TB_ASSERT_GOTO(cookies->hmutex, fail);
 
 	// init spool
-	cookies->spool = tb_slist_init(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, tb_cookies_spool_free, TB_NULL);
+	tb_slist_item_func_t func = {tb_cookies_spool_free, TB_NULL};
+	cookies->spool = tb_slist_init(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, &func);
 	TB_ASSERT_GOTO(cookies->spool, fail);
 
 	// init cpool
@@ -632,15 +633,15 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_const_at(cpool, i);
 		if (cookie)
 		{
-			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->domain) : TB_NULL;
-			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->path) : TB_NULL;
+			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->domain) : TB_NULL;
+			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->path) : TB_NULL;
 			
 			// this cookies is at domain/path?
 			if ( 	tb_cookies_domain_ischild(sdomain->data, domain)
 				&& 	tb_cookies_path_ischild(spath->data, path))
 			{
-				tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->name) : TB_NULL;
-				tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->value) : TB_NULL;
+				tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->name) : TB_NULL;
+				tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->value) : TB_NULL;
 				TB_ASSERT_RETURN_VAL(sname && sname->data, TB_NULL);
 				TB_ASSERT_RETURN_VAL(svalue && svalue->data, TB_NULL);
 			
@@ -763,10 +764,10 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_const_at(cpool, i);
 		if (cookie)
 		{
-			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->domain) : TB_NULL;
-			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->path) : TB_NULL;
-			tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->name) : TB_NULL;
-			tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_slist_const_at(spool, cookie->value) : TB_NULL;
+			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->domain) : TB_NULL;
+			tb_cookie_string_t const* spath = cookie->path? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->path) : TB_NULL;
+			tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->name) : TB_NULL;
+			tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->value) : TB_NULL;
 
 			TB_COOKIES_DBG("[cookie]: url = %s%s%s, %s = %s"
 				, cookie->secure? "https://" : "http://"
@@ -779,12 +780,12 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	}
 
 	// dump strings
-	tb_size_t itor = tb_slist_head(spool);
-	tb_size_t tail = tb_slist_tail(spool);
+	tb_size_t itor = tb_slist_itor_head(spool);
+	tb_size_t tail = tb_slist_itor_tail(spool);
 	TB_COOKIES_DBG("[spool]:size: %d, maxn: %d", n, tb_slist_maxn(spool));
-	for (; itor != tail; itor = tb_slist_next(spool, itor))
+	for (; itor != tail; itor = tb_slist_itor_next(spool, itor))
 	{
-		tb_cookie_string_t const* s = (tb_cookie_string_t const*)tb_slist_const_at(spool, itor);
+		tb_cookie_string_t const* s = (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, itor);
 		if (s)
 		{
 			TB_COOKIES_DBG("[string]:[%d]: %s ", s->refn, s->data? s->data : "");
