@@ -32,19 +32,19 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "pool.h"
+#include "slist.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TB_HASH_SIZE_MICRO 				(64)
-#define TB_HASH_SIZE_SMALL 				(256)
-#define TB_HASH_SIZE_LARGE 				(65535)
+#define TB_HASH_SIZE_MICRO 					(64)
+#define TB_HASH_SIZE_SMALL 					(256)
+#define TB_HASH_SIZE_LARGE 					(65536)
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_HASH_SIZE_DEFAULT 		TB_HASH_SIZE_SMALL
+# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_SMALL
 #else
-# 	define TB_HASH_SIZE_DEFAULT 		TB_HASH_SIZE_LARGE
+# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_LARGE
 #endif
 
 /* /////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ typedef struct __tb_hash_bucket_t
 typedef tb_void_t 	(*tb_hash_name_free_func_t)(tb_void_t* name, tb_void_t* priv);
 typedef tb_void_t* 	(*tb_hash_name_dupl_func_t)(tb_void_t const* name, tb_void_t* priv);
 typedef tb_size_t 	(*tb_hash_name_hash_func_t)(tb_void_t const* name, tb_size_t size, tb_void_t* priv);
-typedef tb_bool_t 	(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
+typedef tb_int_t 	(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
 
 // the item func
 typedef tb_void_t 	(*tb_hash_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
@@ -162,10 +162,13 @@ tb_size_t 			tb_hash_size(tb_hash_t const* hash);
 tb_size_t 			tb_hash_maxn(tb_hash_t const* hash);
 
 // hash name func
-tb_hash_name_func_t tb_hash_name_func_str(tb_void_t* priv); 	//!< cstring
-tb_hash_name_func_t tb_hash_name_func_int(tb_void_t* priv); 	//!< integer
-tb_hash_name_func_t tb_hash_name_func_ptr(tb_void_t* priv); 	//!< pointer
-tb_hash_name_func_t tb_hash_name_func_mem(tb_void_t* priv); 	//!< memory
+tb_hash_name_func_t tb_hash_name_func_str(); 				//!< cstring
+tb_hash_name_func_t tb_hash_name_func_int(); 				//!< integer
+tb_hash_name_func_t tb_hash_name_func_ptr(); 				//!< pointer
+tb_hash_name_func_t tb_hash_name_func_mem(tb_size_t size); 	//!< memory
+
+// debug
+tb_void_t 			tb_hash_dump(tb_hash_t const* hash);
 
 /* iterator
  * 

@@ -65,7 +65,7 @@ extern "C" {
  * next: fast
  * prev: fast
  *
- * \note the index of the same item is fixed
+ * \note the index of the same item is mutable
  *
  */
 typedef struct __tb_vector_t
