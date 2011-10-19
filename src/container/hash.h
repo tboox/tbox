@@ -57,9 +57,8 @@ typedef struct __tb_hash_item_t
 	// the item name
 	tb_void_t* 			name;
 
-	// the prev & next item
-	tb_size_t 			prev;
-	tb_size_t 			next;
+	// the item data
+	tb_byte_t 			data[1];
 
 }tb_hash_item_t;
 
@@ -69,17 +68,20 @@ typedef struct __tb_hash_bucket_t
 	// the bucket size
 	tb_size_t 			size;
 
-	// the prev & next item
-	tb_size_t 			prev;
-	tb_size_t 			next;
+	// the bucket head
+	tb_size_t 			head;
+
+	// the bucket tail
+	tb_size_t 			tail;
 
 }tb_hash_bucket_t;
 
 // the callback type
-typedef tb_void_t 	(*tb_hash_name_free_func_t)(tb_void_t* name, tb_void_t* priv);
-typedef tb_void_t* 	(*tb_hash_name_dupl_func_t)(tb_void_t const* name, tb_void_t* priv);
-typedef tb_size_t 	(*tb_hash_name_hash_func_t)(tb_void_t const* name, tb_size_t size, tb_void_t* priv);
-typedef tb_int_t 	(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
+typedef tb_void_t 			(*tb_hash_name_free_func_t)(tb_void_t* name, tb_void_t* priv);
+typedef tb_void_t* 			(*tb_hash_name_dupl_func_t)(tb_void_t const* name, tb_void_t* priv);
+typedef tb_char_t const* 	(*tb_hash_name_cstr_func_t)(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv);
+typedef tb_size_t 			(*tb_hash_name_hash_func_t)(tb_void_t const* name, tb_size_t size, tb_void_t* priv);
+typedef tb_int_t 			(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
 
 // the item func
 typedef tb_void_t 	(*tb_hash_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
@@ -91,6 +93,7 @@ typedef struct __tb_hash_name_func_t
 	tb_hash_name_hash_func_t 	hash;
 	tb_hash_name_comp_func_t 	comp;
 	tb_hash_name_dupl_func_t 	dupl;
+	tb_hash_name_cstr_func_t 	cstr;
 	tb_hash_name_free_func_t 	free;
 
 	// the priv data
@@ -117,7 +120,17 @@ typedef struct __tb_hash_pair_t
 
 }tb_hash_pair_t;
 
-// the hash type
+/* the hash type
+ *
+ *                    bucket0                     bucket1                       bucketn
+ * hash_list: |----------------------|--|-----------------------|-| .....  |-----------------|
+ *            head                 tail head                   tail      head               tail
+ *
+ * item_list: |----| => |----| => |----| => .... =>  ... =>  |----| => |----| => ... => ... => 0
+ *
+ *
+ *
+ */
 typedef struct __tb_hash_t
 {
 	// the item list
@@ -149,7 +162,7 @@ tb_void_t const* 	tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
 
 tb_void_t 	 		tb_hash_del(tb_hash_t* hash, tb_void_t const* name);
 tb_void_t 	 		tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* item);
-tb_void_t 	 		tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_void_t* item);
+tb_void_t const* 	tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_void_t* item);
 
 // attributes
 tb_size_t 			tb_hash_size(tb_hash_t const* hash);
@@ -170,8 +183,8 @@ tb_void_t 			tb_hash_dump(tb_hash_t const* hash);
  * tb_size_t tail = tb_hash_itor_tail(hash);
  * for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
  * {
- * 		tb_hash_pair_t pair = tb_hash_itor_at(hash, itor);
- * 		if (pair.name && pair.item)
+ * 		tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
+ * 		if (item)
  * 		{
  * 			// ...
  * 		}
@@ -182,11 +195,11 @@ tb_void_t 			tb_hash_dump(tb_hash_t const* hash);
  *
  * \note the index of the same item is mutable, only for iterator
  */
-tb_hash_pair_t 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
-tb_size_t 			tb_hash_itor_head(tb_hash_t const* hash);
-tb_size_t 			tb_hash_itor_tail(tb_hash_t const* hash);
-tb_size_t 			tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
-tb_size_t 			tb_hash_itor_prev(tb_hash_t const* hash, tb_size_t itor);
+tb_hash_item_t* 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
+tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t* hash, tb_size_t itor);
+tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
+tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
+tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
 // c plus plus
 #ifdef __cplusplus
