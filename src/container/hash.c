@@ -39,9 +39,38 @@ static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 	if (hash->name_func.free) hash->name_func.free(((tb_hash_item_t*)item)->name, hash->name_func.priv);
 	if (hash->item_func.free) hash->item_func.free(((tb_hash_item_t*)item)->data, hash->item_func.priv);
 }
-static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* prev, tb_hash_bucket_t** bucket)
+static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* pprev, tb_hash_bucket_t** pbucket)
 {
-	return 0;
+	TB_ASSERT_RETURN_VAL(hash && hash->name_func.hash && hash->name_func.comp, 0);
+
+	// comupte hash from name
+	tb_size_t i = hash->name_func.hash(name, hash->hash_size, hash->name_func.priv);
+	TB_ASSERT_RETURN_VAL(i < hash->hash_size, 0);
+
+	// get bucket
+	tb_hash_bucket_t* bucket = &hash->hash_list[i];
+
+	// find item
+	tb_int_t 	ret = 1;
+	tb_size_t 	prev = 0;
+	tb_size_t 	itor = bucket->head;
+	tb_size_t 	tail = bucket->tail;
+	for (; itor != tail; prev = itor, itor = tb_slist_itor_next(hash->item_list, itor))
+	{
+		// get item
+		tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
+		if (!item) break;
+		
+		// compare it
+		ret = hash->name_func.comp(name, item->name, hash->name_func.priv);
+		if (ret <= 0) break;
+	}
+
+	// return info
+	if (pprev) 		*pprev = prev;
+	if (pbucket) 	*pbucket = bucket;
+
+	return (!ret? itor : 0);
 }
 /* /////////////////////////////////////////////////////////
  * func
@@ -281,7 +310,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 			}
 
 			// update bucket
-			// ...
+			bucket->size++;
 		}
 	}
 }
