@@ -26,6 +26,7 @@
 #include "dlist.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * details

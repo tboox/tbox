@@ -25,6 +25,7 @@
  */
 #include "pool.h"
 #include "../libc/libc.h"
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
