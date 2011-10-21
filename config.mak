@@ -5,7 +5,7 @@ IS_CONFIG = yes
 PLAT = linux_x86
 
 # root
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/personal_/tbox
 PRO_NAME = tbox
 DEBUG = y
 SDK = /home/ruki/programs/toolchain4/sys

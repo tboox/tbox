@@ -26,7 +26,7 @@
 #include "stack.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
-
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * interfaces

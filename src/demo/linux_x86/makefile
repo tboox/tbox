@@ -18,11 +18,12 @@ NAMES = test \
 		estream \
 		zstream \
 		format \
-		vector \
+		hash \
 		slist \
 		dlist \
 		queue \
 		stack \
+		vector \
 		base32 \
 		base64 \
 		sha \
