@@ -85,9 +85,6 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
 	{
 		// update size
 		if (psize) *psize = e - b + 1;
-
-		// return prev
-		return 0;
 	}
 	else
 	{
@@ -98,7 +95,14 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
 		if (psize) *psize = e - p;
 
 		// return prev
-		return (p < b? 0 : *p);
+		if (p >= b)
+		{
+			tb_size_t itor = p[0];
+			tb_size_t tail = p[1];
+			tb_size_t last = itor;
+			for (; itor != tail; last = itor, itor = tb_slist_itor_next(hash->item_list, itor)) ;
+			return last;
+		}
 	}
 
 	return 0;
@@ -116,9 +120,10 @@ static tb_void_t* tb_hash_name_str_dupl_func(tb_void_t const* name, tb_void_t* p
 {
 	return tb_strdup(name);
 }
+#if 1
 static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
 {
-	TB_ASSERT_RETURN_VAL(size, 0);
+	TB_ASSERT_RETURN_VAL(name && size, 0);
 
 	tb_size_t h = 2166136261;
 	tb_byte_t const* p = name;
@@ -126,6 +131,13 @@ static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t siz
 
 	return (h & (size - 1));
 }
+#else
+static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
+{
+	TB_ASSERT_RETURN_VAL(name && size, 0);
+	return (tb_strlen(name) & (size - 1));
+}
+#endif
 static tb_int_t tb_hash_name_str_comp_func(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv)
 {
 	return tb_strcmp(lname, rname);
@@ -155,6 +167,7 @@ static tb_int_t tb_hash_name_int_comp_func(tb_void_t const* lname, tb_void_t con
 }
 static tb_char_t const* tb_hash_name_int_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
 {
+	TB_ASSERT_RETURN_VAL(data, TB_NULL);
 	tb_int_t n = tb_snprintf(data, maxn, "%d", name);
 	if (n > 0) data[n] = '\0';
 	return (tb_char_t const*)data;
@@ -179,6 +192,7 @@ static tb_int_t tb_hash_name_ptr_comp_func(tb_void_t const* lname, tb_void_t con
 }
 static tb_char_t const* tb_hash_name_ptr_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
 {
+	TB_ASSERT_RETURN_VAL(data, TB_NULL);
 	tb_int_t n = tb_snprintf(data, maxn, "%x", name);
 	if (n > 0) data[n] = '\0';
 	return (tb_char_t const*)data;
@@ -200,7 +214,7 @@ static tb_void_t* tb_hash_name_mem_dupl_func(tb_void_t const* name, tb_void_t* p
 }
 static tb_size_t tb_hash_name_mem_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
 {
-	TB_ASSERT_RETURN_VAL(size, 0);
+	TB_ASSERT_RETURN_VAL(name && size, 0);
 
 	tb_size_t h = 2166136261;
 	tb_byte_t const* p = name;
@@ -215,6 +229,7 @@ static tb_int_t tb_hash_name_mem_comp_func(tb_void_t const* lname, tb_void_t con
 }
 static tb_char_t const* tb_hash_name_mem_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
 {
+	TB_ASSERT_RETURN_VAL(name && data, TB_NULL);
 	tb_byte_t const* p = name;
 	tb_int_t n = tb_snprintf(data, maxn, "%x", tb_bits_get_u32_be(p));
 	if (n > 0) data[n] = '\0';
@@ -285,7 +300,7 @@ tb_void_t const* tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
 {
 	TB_ASSERT_RETURN_VAL(hash, TB_NULL);
 
-	tb_size_t itor = tb_hash_item_find(hash, name, 0, TB_NULL);
+	tb_size_t itor = tb_hash_item_find(hash, name, TB_NULL, TB_NULL);
 	if (itor)
 	{
 		tb_hash_item_t* it = tb_hash_itor_at(hash, itor);
@@ -314,11 +329,7 @@ tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
 		// update hash list
 		if (size > 32 && sizeof(tb_size_t) == 4) 
 			tb_memset_u32(hash->hash_list + bukt + 1 - size, next, size);
-		else if (size)
-		{
-			for (; bukt < size; bukt++)
-				hash->hash_list[bukt + 1 - size] = next;
-		}
+		else if (size) while (size--) hash->hash_list[bukt - size] = next;
 	}
 }
 tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* item)
@@ -344,8 +355,8 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 
 		// insert it and set data if not exists
 		itor = tb_slist_insert_next(hash->item_list, prev, item - sizeof(tb_void_t*)); //!< hack, no name
+		//TB_DBG("%d %d %d %d", prev, bukt, size, itor);
 
-		TB_DBG("%d %d %d %d", prev, bukt, size, itor);
 		// ok?
 		if (itor) 
 		{
@@ -360,11 +371,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 			// update hash list
 			if (size > 32 && sizeof(tb_size_t) == 4) 
 				tb_memset_u32(hash->hash_list + bukt + 1 - size, itor, size);
-			else if (size)
-			{
-				for (; bukt < size; bukt++)
-					hash->hash_list[bukt + 1 - size] = itor;
-			}
+			else if (size) while (size--) hash->hash_list[bukt - size] = itor;
 		}
 	}
 }
@@ -473,25 +480,35 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 		tb_size_t tail = hash->hash_list[i + 1];
 		if (itor != tail)
 		{
+			tb_size_t num = 0;
 			for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor))
 			{
 				tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 
 				if (hash->name_func.cstr && hash->item_func.cstr) 
-					tb_printf("bucket[%d]:\t%s\t\t=> %s\n", i
+					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %s\n", i
+						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, itor
 						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
 						, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
 				else if (hash->name_func.cstr) 
-					tb_printf("bucket[%d]:\t%s\t\t=> %x\n", i
+					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %x\n", i
+						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, itor
 						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
 						, item->data);
 				else if (hash->item_func.cstr) 
-					tb_printf("bucket[%d]:\t%x\t\t=> %x\n", i
+					tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
+						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, itor
 						, item->name
 						, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
-				else tb_printf("bucket[%d]:\t%x\t\t=> %x\n", i
+				else tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
+						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, itor
 						, item->name
 						, item->data);
+
 			}
 		}
 	}

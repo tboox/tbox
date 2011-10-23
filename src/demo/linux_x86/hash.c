@@ -2,12 +2,19 @@
  * includes
  */
 #include "tbox.h"
+#include <stdlib.h>
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
+
+#ifdef TB_DEBUG
+# 	define tb_hash_test_dump(h) 				tb_hash_dump(h)
+#endif
+
 #define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, (tb_void_t const*)s, (tb_void_t const*)&n); } while (0);
 #define tb_hash_test_get_s2i(h, s) 		do {tb_size_t const* p = (tb_size_t const*)tb_hash_const_at(h, (tb_void_t const*)s); TB_ASSERT(p && tb_strlen(s) == p[0]); } while (0);
+#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, (tb_void_t const*)s); tb_size_t const* p = (tb_size_t const*)tb_hash_const_at(h, (tb_void_t const*)s); TB_ASSERT(!p); } while (0);
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -54,6 +61,7 @@ static tb_void_t tb_hash_test_s2i()
 	tb_hash_t* hash = tb_hash_init(sizeof(tb_size_t), 8, tb_hash_name_func_str(), &int_func);
 	TB_ASSERT_RETURN(hash);
 
+	// set
 	tb_hash_test_set_s2i(hash, "");
 	tb_hash_test_set_s2i(hash, "0");
 	tb_hash_test_set_s2i(hash, "01");
@@ -77,7 +85,7 @@ static tb_void_t tb_hash_test_s2i()
 	tb_hash_test_set_s2i(hash, "0");
 	tb_hash_test_set_s2i(hash, "");
 
-#if 0
+	// get
 	tb_hash_test_get_s2i(hash, "");
 	tb_hash_test_get_s2i(hash, "01");
 	tb_hash_test_get_s2i(hash, "012");
@@ -88,12 +96,70 @@ static tb_void_t tb_hash_test_s2i()
 	tb_hash_test_get_s2i(hash, "01234567");
 	tb_hash_test_get_s2i(hash, "012345678");
 	tb_hash_test_get_s2i(hash, "0123456789");
-#endif
+	tb_hash_test_get_s2i(hash, "9876543210");
+	tb_hash_test_get_s2i(hash, "876543210");
+	tb_hash_test_get_s2i(hash, "76543210");
+	tb_hash_test_get_s2i(hash, "6543210");
+	tb_hash_test_get_s2i(hash, "543210");
+	tb_hash_test_get_s2i(hash, "43210");
+	tb_hash_test_get_s2i(hash, "3210");
+	tb_hash_test_get_s2i(hash, "210");
+	tb_hash_test_get_s2i(hash, "10");
+	tb_hash_test_get_s2i(hash, "0");
+	tb_hash_test_get_s2i(hash, "");
+	tb_hash_test_dump(hash);
 
-#ifdef TB_DEBUG
-	tb_hash_dump(hash);
-#endif
+	// del
+	tb_hash_test_del_s2i(hash, "");
+	tb_hash_test_del_s2i(hash, "01");
+	tb_hash_test_del_s2i(hash, "012");
+	tb_hash_test_del_s2i(hash, "0123");
+	tb_hash_test_del_s2i(hash, "01234");
+	tb_hash_test_del_s2i(hash, "012345");
+	tb_hash_test_del_s2i(hash, "0123456");
+	tb_hash_test_del_s2i(hash, "01234567");
+	tb_hash_test_del_s2i(hash, "012345678");
+	tb_hash_test_del_s2i(hash, "0123456789");
+	tb_hash_test_del_s2i(hash, "0123456789");
+	tb_hash_test_dump(hash);
 
+	// clear
+	tb_hash_clear(hash);
+	tb_hash_test_dump(hash);
+
+#if 0
+	// performance
+	__tb_volatile__ tb_char_t s[256] = {0};
+	__tb_volatile__ tb_size_t n = 80000;
+	tb_int64_t t = tb_mclock();
+	while (n--) 
+	{
+		tb_int_t r = snprintf(s, 256, "%x", rand()); 
+		s[r] == '\0'; 
+		tb_hash_test_set_s2i(hash, s); 
+		tb_hash_test_get_s2i(hash, s);
+	}
+	t = tb_int64_sub(tb_mclock(), t);
+	tb_hash_test_dump(hash);
+	tb_printf("time: %lld\n", t);
+#else
+	__tb_volatile__ m = 10;
+	while (m--)
+	{
+		// performance
+		__tb_volatile__ tb_char_t s[256] = {0};
+		__tb_volatile__ tb_size_t n = 32;
+		while (n--) 
+		{
+			tb_int_t r = snprintf(s, 256, "%x", rand()); 
+			s[r] == '\0'; 
+			tb_hash_test_set_s2i(hash, s); 
+			tb_hash_test_get_s2i(hash, s);
+		}
+	}
+	tb_hash_test_dump(hash);
+#endif
+	// exit
 	tb_hash_exit(hash);
 }
 static tb_void_t tb_hash_test_i2s()
