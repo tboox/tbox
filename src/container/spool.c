@@ -30,6 +30,33 @@
 #include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the spool item type
+typedef struct __tb_spool_item_t
+{
+	// the string refn
+	tb_size_t 			refn;
+
+	// the string data
+	tb_char_t const* 	data;
+
+	// the string size
+	tb_size_t 			size;
+
+}tb_spool_item_t;
+
+// the chunk type of the string pool
+typedef struct __tb_spool_chunk_t
+{
+	tb_handle_t 	pool;
+	tb_byte_t* 		data;
+	tb_size_t 		size;
+
+}tb_spool_chunk_t;
+
+/* /////////////////////////////////////////////////////////
  * interfaces
  */
 

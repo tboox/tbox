@@ -36,9 +36,6 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#ifndef TB_DEBUG
-#define tb_gpool_get(gpool, item) 					((gpool)->data + ((item) - 1) * (gpool)->step)
-#endif
 
 // prediction
 #define TB_GPOOL_PRED_ENABLE
@@ -99,20 +96,43 @@ typedef struct __tb_gpool_t
  */
 
 // init & exit
-tb_gpool_t* 	tb_gpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_gpool_item_func_t const* func);
-tb_void_t 		tb_gpool_exit(tb_gpool_t* gpool);
+tb_gpool_t* 		tb_gpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_gpool_item_func_t const* func);
+tb_void_t 			tb_gpool_exit(tb_gpool_t* gpool);
 
-// alloc & free
-tb_size_t 		tb_gpool_alloc(tb_gpool_t* gpool);
-tb_void_t 		tb_gpool_free(tb_gpool_t* gpool, tb_size_t item);
+// modifiors
+tb_void_t 			tb_gpool_clear(tb_gpool_t* gpool);
 
-// clear
-tb_void_t 		tb_gpool_clear(tb_gpool_t* gpool);
+tb_size_t 			tb_gpool_put(tb_gpool_t* gpool, tb_void_t const* item);
+tb_void_t 			tb_gpool_set(tb_gpool_t* gpool, tb_size_t itor, tb_void_t const* item);
+tb_void_t 			tb_gpool_del(tb_gpool_t* gpool, tb_size_t itor);
 
-#ifdef TB_DEBUG
-tb_byte_t* 		tb_gpool_get(tb_gpool_t* gpool, tb_size_t item);
-tb_void_t 		tb_gpool_dump(tb_gpool_t* gpool);
-#endif
+/* iterator
+ * 
+ * tb_size_t itor = tb_gpool_itor_head(gpool);
+ * tb_size_t tail = tb_gpool_itor_tail(gpool);
+ * for (; itor != tail; itor = tb_gpool_itor_next(gpool, itor))
+ * {
+ * 		tb_void_t const* item = tb_gpool_itor_const_at(gpool, itor);
+ * 		if (item)
+ * 		{
+ * 			// ...
+ * 		}
+ * }
+ *
+ */
+tb_void_t* 			tb_gpool_itor_at(tb_gpool_t* gpool, tb_size_t itor);
+tb_void_t const* 	tb_gpool_itor_const_at(tb_gpool_t const* gpool, tb_size_t itor);
+
+tb_size_t 			tb_gpool_itor_head(tb_gpool_t const* gpool);
+tb_size_t 			tb_gpool_itor_tail(tb_gpool_t const* gpool);
+tb_size_t 			tb_gpool_itor_next(tb_gpool_t const* gpool, tb_size_t itor);
+
+// attributes
+tb_size_t 			tb_gpool_size(tb_gpool_t const* gpool);
+tb_size_t 			tb_gpool_maxn(tb_gpool_t const* gpool);
+
+// debug
+tb_void_t 			tb_gpool_dump(tb_gpool_t* gpool);
 
 
 // c plus plus
