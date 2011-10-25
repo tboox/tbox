@@ -33,7 +33,7 @@
  * interfaces
  */
 
-tb_queue_t* tb_queue_init(tb_size_t step, tb_size_t maxn, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_queue_t* tb_queue_init(tb_size_t step, tb_size_t maxn, tb_queue_item_func_t const* func)
 {
 	TB_ASSERT_RETURN_VAL(step && maxn, TB_NULL);
 
@@ -44,8 +44,7 @@ tb_queue_t* tb_queue_init(tb_size_t step, tb_size_t maxn, tb_void_t (*free)(tb_v
 	// init queue
 	queue->step = step;
 	queue->maxn = maxn + 1; // + tail
-	queue->free = free;
-	queue->priv = priv;
+	if (func) queue->func = *func;
 
 	// calloc data
 	queue->data = tb_calloc(queue->maxn, queue->step);
@@ -81,69 +80,69 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
 		queue->tail = 0;
 	}
 }
-tb_void_t tb_queue_put(tb_queue_t* queue, tb_byte_t const* item)
+tb_void_t tb_queue_put(tb_queue_t* queue, tb_void_t const* item)
 {
 	TB_ASSERT_RETURN(queue && item && !tb_queue_full(queue));
 	tb_memcpy(queue->data + queue->tail, item, queue->step);
 	queue->tail = ((queue->tail + 1) % queue->maxn);
 }
-tb_void_t tb_queue_pop(tb_queue_t* queue, tb_byte_t* item)
+tb_void_t tb_queue_pop(tb_queue_t* queue, tb_void_t* item)
 {
 	TB_ASSERT_RETURN(queue && !tb_queue_null(queue));
 	if (item) tb_memcpy(item, queue->data + queue->head, queue->step);
-	else if (queue->free) queue->free(queue->data + queue->head, queue->priv);
+	else if (queue->func.free) queue->func.free(queue->data + queue->head, queue->func.priv);
 	queue->head = ((queue->head + 1) % queue->maxn);
 }
-tb_byte_t* tb_queue_at(tb_queue_t* queue, tb_size_t index)
+tb_void_t* tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor)
 {
-	TB_ASSERTA(queue && !tb_queue_null(queue) && index < queue->maxn);
-	return (queue->data + index * queue->step);
+	TB_ASSERTA(queue && !tb_queue_null(queue) && itor < queue->maxn);
+	return (queue->data + itor * queue->step);
 }
-tb_byte_t* tb_queue_at_head(tb_queue_t* queue)
+tb_void_t* tb_queue_at_head(tb_queue_t* queue)
 {
-	return tb_queue_at(queue, tb_queue_head(queue));
+	return tb_queue_itor_at(queue, tb_queue_itor_head(queue));
 }
-tb_byte_t* tb_queue_at_last(tb_queue_t* queue)
+tb_void_t* tb_queue_at_last(tb_queue_t* queue)
 {
-	return tb_queue_at(queue, tb_queue_last(queue));
+	return tb_queue_itor_at(queue, tb_queue_itor_last(queue));
 }
-tb_byte_t const* tb_queue_const_at(tb_queue_t const* queue, tb_size_t index)
+tb_void_t const* tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor)
 {
-	TB_ASSERTA(queue && !tb_queue_null(queue) && index < queue->maxn);
-	return (queue->data + index * queue->step);
+	TB_ASSERTA(queue && !tb_queue_null(queue) && itor < queue->maxn);
+	return (queue->data + itor * queue->step);
 }
-tb_byte_t const* tb_queue_const_at_head(tb_queue_t const* queue)
+tb_void_t const* tb_queue_const_at_head(tb_queue_t const* queue)
 {
-	return tb_queue_const_at(queue, tb_queue_head(queue));
+	return tb_queue_itor_const_at(queue, tb_queue_itor_head(queue));
 }
-tb_byte_t const* tb_queue_const_at_last(tb_queue_t const* queue)
+tb_void_t const* tb_queue_const_at_last(tb_queue_t const* queue)
 {
-	return tb_queue_const_at(queue, tb_queue_last(queue));
+	return tb_queue_itor_const_at(queue, tb_queue_itor_last(queue));
 }
-tb_size_t tb_queue_head(tb_queue_t const* queue)
+tb_size_t tb_queue_itor_head(tb_queue_t const* queue)
 {
 	TB_ASSERTA(queue);
 	return queue->head;
 }
-tb_size_t tb_queue_last(tb_queue_t const* queue)
+tb_size_t tb_queue_itor_last(tb_queue_t const* queue)
 {
 	TB_ASSERTA(queue && !tb_queue_null(queue));
 	return ((queue->tail + queue->maxn - 1) % queue->maxn);
 }
-tb_size_t tb_queue_tail(tb_queue_t const* queue)
+tb_size_t tb_queue_itor_tail(tb_queue_t const* queue)
 {
 	TB_ASSERTA(queue);
 	return queue->tail;
 }
-tb_size_t tb_queue_next(tb_queue_t const* queue, tb_size_t index)
+tb_size_t tb_queue_itor_next(tb_queue_t const* queue, tb_size_t itor)
 {
 	TB_ASSERTA(queue);
-	return ((index + 1) % queue->maxn);
+	return ((itor + 1) % queue->maxn);
 }
-tb_size_t tb_queue_prev(tb_queue_t const* queue, tb_size_t index)
+tb_size_t tb_queue_itor_prev(tb_queue_t const* queue, tb_size_t itor)
 {
 	TB_ASSERTA(queue);
-	return ((index + queue->maxn - 1) % queue->maxn);
+	return ((itor + queue->maxn - 1) % queue->maxn);
 }
 tb_size_t tb_queue_size(tb_queue_t const* queue)
 {

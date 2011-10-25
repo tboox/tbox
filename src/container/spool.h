@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		container.h
+ * \file		spool.h
  *
  */
-#ifndef TB_CONTAINER_H
-#define TB_CONTAINER_H
+#ifndef TB_CONTAINER_SPOOL_H
+#define TB_CONTAINER_SPOOL_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,13 +32,24 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "hash.h"
-#include "gpool.h"
-#include "slist.h"
-#include "dlist.h"
-#include "queue.h"
-#include "stack.h"
-#include "vector.h"
+
+/* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the string pool
+typedef struct __tb_spool_t
+{
+	tb_handle_t 	pool;
+	tb_byte_t* 		data;
+	tb_size_t 		size;
+
+}tb_spool_t;
+
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 // c plus plus
 #ifdef __cplusplus
@@ -46,3 +57,4 @@ extern "C" {
 #endif
 
 #endif
+

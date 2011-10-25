@@ -340,7 +340,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
-		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_at(cpool, i);
+		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_itor_at(cpool, i);
 		if (cookie)
 		{
 			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->domain);
@@ -388,7 +388,7 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
-		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_at(cpool, i);
+		tb_cookie_t* cookie = (tb_cookie_t*)tb_vector_itor_at(cpool, i);
 		if (cookie)
 		{
 			tb_cookie_string_t* sdomain = (tb_cookie_string_t*)tb_slist_itor_at(spool, cookie->domain);
@@ -528,7 +528,7 @@ tb_cookies_t* tb_cookies_init()
 	TB_ASSERT_GOTO(cookies->spool, fail);
 
 	// init cpool
-	cookies->cpool = tb_vector_init(sizeof(tb_cookie_t), TB_COOKIES_CPOOL_GROW, TB_NULL, TB_NULL);
+	cookies->cpool = tb_vector_init(sizeof(tb_cookie_t), TB_COOKIES_CPOOL_GROW, TB_NULL);
 	TB_ASSERT_GOTO(cookies->cpool, fail);
 
 	return cookies;
@@ -630,7 +630,7 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 	tb_size_t 		size = tb_vector_size(cpool);
 	for (i = 0; i < size; i++)
 	{
-		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_const_at(cpool, i);
+		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_itor_const_at(cpool, i);
 		if (cookie)
 		{
 			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->domain) : TB_NULL;
@@ -761,7 +761,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	TB_COOKIES_DBG("[cpool]:size: %d, maxn: %d", n, tb_vector_maxn(cpool));
 	for (i = 0; i < n; i++)
 	{
-		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_const_at(cpool, i);
+		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_vector_itor_const_at(cpool, i);
 		if (cookie)
 		{
 			tb_cookie_string_t const* sdomain = cookie->domain? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->domain) : TB_NULL;

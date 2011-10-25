@@ -32,7 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "pool.h"
+#include "gpool.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -96,7 +96,7 @@ typedef struct __tb_slist_item_func_t
 typedef struct __tb_slist_t
 {
 	// the pool
-	tb_pool_t* 				pool;
+	tb_gpool_t* 			pool;
 
 	// the head item 
 	tb_size_t 				head;

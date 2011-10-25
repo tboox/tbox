@@ -108,7 +108,7 @@ tb_void_t tb_exit()
 	tb_socket_exit();
 
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
-	//tb_pool_dump();
+	//tb_memory_dump();
 	tb_memory_exit();
 #endif
 	

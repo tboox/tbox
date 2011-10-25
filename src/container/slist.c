@@ -57,10 +57,10 @@ tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_slist_item_func_t c
 	if (func) slist->func = *func;
 
 	// init pool, step = next + data
-	tb_pool_item_func_t pool_func;
+	tb_gpool_item_func_t pool_func;
 	pool_func.free = tb_slist_item_free;
 	pool_func.priv = slist;
-	slist->pool = tb_pool_init(sizeof(tb_size_t) + step, grow, grow, &pool_func);
+	slist->pool = tb_gpool_init(sizeof(tb_size_t) + step, grow, grow, &pool_func);
 	TB_ASSERT_GOTO(slist->pool, fail);
 
 	return slist;
@@ -77,7 +77,7 @@ tb_void_t tb_slist_exit(tb_slist_t* slist)
 		tb_slist_clear(slist);
 
 		// free pool
-		if (slist->pool) tb_pool_exit(slist->pool);
+		if (slist->pool) tb_gpool_exit(slist->pool);
 
 		// free it
 		tb_free(slist);
@@ -88,7 +88,7 @@ tb_void_t tb_slist_clear(tb_slist_t* slist)
 	if (slist) 
 	{
 		// clear pool
-		if (slist->pool) tb_pool_clear(slist->pool);
+		if (slist->pool) tb_gpool_clear(slist->pool);
 
 		// reset it
 		slist->head = 0;
@@ -98,7 +98,7 @@ tb_void_t tb_slist_clear(tb_slist_t* slist)
 tb_void_t* tb_slist_itor_at(tb_slist_t* slist, tb_size_t itor)
 {
 	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t* data = tb_pool_get(slist->pool, itor);
+	tb_byte_t* data = tb_gpool_get(slist->pool, itor);
 	TB_ASSERTA(data);
 	return (data + sizeof(tb_size_t));
 }
@@ -113,7 +113,7 @@ tb_void_t* tb_slist_at_last(tb_slist_t* slist)
 tb_void_t const* tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t index)
 {
 	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t const* data = tb_pool_get(slist->pool, index);
+	tb_byte_t const* data = tb_gpool_get(slist->pool, index);
 	TB_ASSERTA(data);
 	return (data + sizeof(tb_size_t));
 }
@@ -143,7 +143,7 @@ tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
 	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t* data = tb_pool_get(slist->pool, itor);
+	tb_byte_t* data = tb_gpool_get(slist->pool, itor);
 	TB_ASSERTA(data);
 	return tb_bits_get_u32_ne(data);
 }
@@ -210,11 +210,11 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 	TB_ASSERT_RETURN_VAL(slist && slist->pool && item, 0);
 
 	// alloc a new node
-	tb_size_t node = tb_pool_alloc(slist->pool);
+	tb_size_t node = tb_gpool_alloc(slist->pool);
 	TB_ASSERT_RETURN_VAL(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_pool_get(slist->pool, node);
+	tb_byte_t* pnode = tb_gpool_get(slist->pool, node);
 	TB_ASSERTA(pnode);
 
 	// init node, inode => 0
@@ -242,7 +242,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else if (prev == slist->last)
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_pool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// last => node => null
@@ -255,7 +255,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_pool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// node => next
@@ -427,7 +427,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 			midd = tb_slist_itor_next(slist, prev);
 
 			// get the prev data
-			tb_byte_t* pprev = tb_pool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// the next node
@@ -444,7 +444,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 		TB_ASSERTA(midd);
 
 		// free node
-		tb_pool_free(slist->pool, midd);
+		tb_gpool_free(slist->pool, midd);
 
 		// return next node
 		return next;

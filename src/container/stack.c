@@ -32,9 +32,9 @@
  * interfaces
  */
 
-tb_stack_t* tb_stack_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv)
+tb_stack_t* tb_stack_init(tb_size_t step, tb_size_t grow, tb_stack_item_func_t const* func)
 {
-	return tb_vector_init(step, grow, free, priv);
+	return tb_vector_init(step, grow, func);
 }
 
 tb_void_t tb_stack_exit(tb_stack_t* stack)
@@ -45,63 +45,63 @@ tb_void_t tb_stack_clear(tb_stack_t* stack)
 {
 	tb_vector_clear(stack);
 }
-tb_void_t tb_stack_put(tb_stack_t* stack, tb_byte_t const* item)
+tb_void_t tb_stack_put(tb_stack_t* stack, tb_void_t const* item)
 {
 	tb_vector_insert_tail(stack, item);
 }
-tb_void_t tb_stack_pop(tb_stack_t* stack, tb_byte_t* item)
+tb_void_t tb_stack_pop(tb_stack_t* stack, tb_void_t* item)
 {
 	TB_ASSERT_RETURN(stack);
 	if (item) 
 	{
-		tb_byte_t const* last = tb_vector_const_at_last(stack);
+		tb_void_t const* last = tb_vector_const_at_last(stack);
 		if (last) tb_memcpy(item, last, stack->step);
 	}
 	tb_vector_remove_last(stack);
 }
-tb_byte_t* tb_stack_at(tb_stack_t* stack, tb_size_t index)
+tb_void_t* tb_stack_itor_at(tb_stack_t* stack, tb_size_t itor)
 {
-	return tb_vector_at(stack, index);
+	return tb_vector_itor_at(stack, itor);
 }
-tb_byte_t* tb_stack_at_head(tb_stack_t* stack)
+tb_void_t* tb_stack_at_head(tb_stack_t* stack)
 {
 	return tb_vector_at_head(stack);
 }
-tb_byte_t* tb_stack_at_last(tb_stack_t* stack)
+tb_void_t* tb_stack_at_last(tb_stack_t* stack)
 {
 	return tb_vector_at_last(stack);
 }
-tb_byte_t const* tb_stack_const_at(tb_stack_t const* stack, tb_size_t index)
+tb_void_t const* tb_stack_itor_const_at(tb_stack_t const* stack, tb_size_t itor)
 {
-	return tb_vector_const_at(stack, index);
+	return tb_vector_itor_const_at(stack, itor);
 }
-tb_byte_t const* tb_stack_const_at_head(tb_stack_t const* stack)
+tb_void_t const* tb_stack_const_at_head(tb_stack_t const* stack)
 {
 	return tb_vector_const_at_head(stack);
 }
-tb_byte_t const* tb_stack_const_at_last(tb_stack_t const* stack)
+tb_void_t const* tb_stack_const_at_last(tb_stack_t const* stack)
 {
 	return tb_vector_const_at_last(stack);
 }
-tb_size_t tb_stack_head(tb_stack_t const* stack)
+tb_size_t tb_stack_itor_head(tb_stack_t const* stack)
 {
-	return tb_vector_head(stack);
+	return tb_vector_itor_head(stack);
 }
-tb_size_t tb_stack_last(tb_stack_t const* stack)
+tb_size_t tb_stack_itor_last(tb_stack_t const* stack)
 {
-	return tb_vector_last(stack);
+	return tb_vector_itor_last(stack);
 }
-tb_size_t tb_stack_tail(tb_stack_t const* stack)
+tb_size_t tb_stack_itor_tail(tb_stack_t const* stack)
 {
-	return tb_vector_tail(stack);
+	return tb_vector_itor_tail(stack);
 }
-tb_size_t tb_stack_next(tb_stack_t const* stack, tb_size_t index)
+tb_size_t tb_stack_itor_next(tb_stack_t const* stack, tb_size_t itor)
 {
-	return tb_vector_next(stack, index);
+	return tb_vector_itor_next(stack, itor);
 }
-tb_size_t tb_stack_prev(tb_stack_t const* stack, tb_size_t index)
+tb_size_t tb_stack_itor_prev(tb_stack_t const* stack, tb_size_t itor)
 {
-	return tb_vector_prev(stack, index);
+	return tb_vector_itor_prev(stack, itor);
 }
 tb_size_t tb_stack_size(tb_stack_t const* stack)
 {
