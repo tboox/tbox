@@ -82,8 +82,9 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
 }
 tb_void_t tb_queue_put(tb_queue_t* queue, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(queue && item && !tb_queue_full(queue));
-	tb_memcpy(queue->data + queue->tail, item, queue->step);
+	TB_ASSERT_RETURN(queue && !tb_queue_full(queue));
+	if (item) tb_memcpy(queue->data + queue->tail, item, queue->step);
+	else tb_memset(queue->data + queue->tail, 0, queue->step);
 	queue->tail = ((queue->tail + 1) % queue->maxn);
 }
 tb_void_t tb_queue_pop(tb_queue_t* queue, tb_void_t* item)

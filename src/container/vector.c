@@ -201,7 +201,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 }
 tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && item && index <= vector->size);
+	TB_ASSERT_RETURN(vector && index <= vector->size);
 
 	// save size
 	tb_size_t osize = vector->size;
@@ -220,21 +220,22 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const
 	if (osize != index) tb_memmov(data + (index + 1) * step, data + index * step, (osize - index) * step);
 
 	// copy data
-	tb_memcpy(data + index * step, item, step);
+	if (item) tb_memcpy(data + index * step, item, step);
+	else tb_memset(data + index * step, 0, step);
 }
 tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && item);
+	TB_ASSERT_RETURN(vector);
 	tb_vector_insert(vector, 0, item);
 }
 tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && item);
+	TB_ASSERT_RETURN(vector);
 	tb_vector_insert(vector, vector->size, item);
 }
 tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && item && size && index <= vector->size);
+	TB_ASSERT_RETURN(vector && size && index <= vector->size);
 
 	// save size
 	tb_size_t osize = vector->size;
@@ -251,31 +252,35 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 	TB_ASSERT_RETURN(data && step);
 	if (osize != index) tb_memmov(data + (index + size) * step, data + index * step, (osize - index) * step);
 
-	// copy data	
-	switch (step)
-	{
-	case 4:
-		tb_memset_u32(data + (index << 2), tb_bits_get_u32_ne((tb_byte_t const*)item), size);
-		break;
-	case 2:
-		tb_memset_u16(data + (index << 1), tb_bits_get_u16_ne((tb_byte_t const*)item), size);
-		break;
-	case 1:
-		tb_memset(data + index, tb_bits_get_u8((tb_byte_t const*)item), size);
-		break;
-	default:
-		while (size--) tb_memcpy(data + (index++) * step, item, step);
-		break;
+	// copy data
+	if (item) 
+	{	
+		switch (step)
+		{
+		case 4:
+			tb_memset_u32(data + (index << 2), tb_bits_get_u32_ne((tb_byte_t const*)item), size);
+			break;
+		case 2:
+			tb_memset_u16(data + (index << 1), tb_bits_get_u16_ne((tb_byte_t const*)item), size);
+			break;
+		case 1:
+			tb_memset(data + index, tb_bits_get_u8((tb_byte_t const*)item), size);
+			break;
+		default:
+			while (size--) tb_memcpy(data + (index++) * step, item, step);
+			break;
+		}
 	}
+	else tb_memset(data + index * step, 0, size * step);
 }
 tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && item);
+	TB_ASSERT_RETURN(vector);
 	tb_vector_ninsert(vector, 0, item, size);
 }
 tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && item);
+	TB_ASSERT_RETURN(vector);
 	tb_vector_ninsert(vector, vector->size, item, size);
 }
 tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)

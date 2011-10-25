@@ -37,19 +37,31 @@ extern "C" {
  * types
  */
 
-// the string pool
+// the string pool type
 typedef struct __tb_spool_t
 {
-	tb_handle_t 	pool;
-	tb_byte_t* 		data;
-	tb_size_t 		size;
+	// the chunk list
+	tb_slist_t* 				list;
+
+	// the chunk pred
+	tb_size_t 					pred;
 
 }tb_spool_t;
-
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
+
+// init & exit
+tb_spool_t* 		tb_spool_init(tb_size_t size);
+tb_void_t 			tb_spool_exit(tb_spool_t* spool);
+
+// modifiors
+tb_void_t 			tb_spool_clear(tb_spool_t* spool);
+
+tb_char_t const* 	tb_spool_dup(tb_spool_t* spool, tb_char_t const* s);
+tb_void_t 			tb_spool_del(tb_spool_t* spool, tb_char_t const* s);
+
 
 // c plus plus
 #ifdef __cplusplus

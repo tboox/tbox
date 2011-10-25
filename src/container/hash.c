@@ -333,7 +333,7 @@ tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
 }
 tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(hash && item && hash->item_list);
+	TB_ASSERT_RETURN(hash && hash->item_list);
 
 	// find it
 	tb_size_t prev = 0;
@@ -344,7 +344,11 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 	{
 		// update data if exists
 		tb_hash_item_t* it = tb_hash_itor_at(hash, itor);
-		if (it) tb_memcpy(it->data, item, hash->item_list->step - sizeof(tb_void_t*));
+		if (it) 
+		{
+			if (item) tb_memcpy(it->data, item, hash->item_list->step - sizeof(tb_void_t*));
+			else tb_memset(it->data, 0, hash->item_list->step - sizeof(tb_void_t*));
+		}
 	}
 	else 
 	{
@@ -353,18 +357,23 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 		TB_ASSERT(bukt + 1 >= size);
 
 		// insert it and set data if not exists
-		itor = tb_slist_insert_next(hash->item_list, prev, item - sizeof(tb_void_t*)); //!< hack, no name
+		itor = tb_slist_insert_next(hash->item_list, prev, TB_NULL);
 		//TB_DBG("%d %d %d %d", prev, bukt, size, itor);
 
 		// ok?
 		if (itor) 
 		{
-			// set name
+			// set item
 			tb_hash_item_t* it = tb_slist_itor_at(hash->item_list, itor);
 			if (it) 
 			{
+				// set name
 				if (hash->name_func.dupl) it->name = hash->name_func.dupl(name, hash->name_func.priv);
 				else it->name = TB_NULL;
+
+				// set data
+				if (item) tb_memcpy(it->data, item, hash->item_list->step - sizeof(tb_void_t*));
+				else tb_memset(it->data, 0, hash->item_list->step - sizeof(tb_void_t*));
 			}
 
 			// update hash list

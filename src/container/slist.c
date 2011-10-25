@@ -97,10 +97,7 @@ tb_void_t tb_slist_clear(tb_slist_t* slist)
 }
 tb_void_t* tb_slist_itor_at(tb_slist_t* slist, tb_size_t itor)
 {
-	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t* data = tb_gpool_get(slist->pool, itor);
-	TB_ASSERTA(data);
-	return (data + sizeof(tb_size_t));
+	return (tb_void_t*)tb_slist_itor_const_at(slist, itor);
 }
 tb_void_t* tb_slist_at_head(tb_slist_t* slist)
 {
@@ -110,10 +107,10 @@ tb_void_t* tb_slist_at_last(tb_slist_t* slist)
 {
 	return tb_slist_itor_at(slist, tb_slist_itor_last(slist));
 }
-tb_void_t const* tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t index)
+tb_void_t const* tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t itor)
 {
 	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t const* data = tb_gpool_get(slist->pool, index);
+	tb_byte_t const* data = tb_gpool_itor_const_at(slist->pool, itor);
 	TB_ASSERTA(data);
 	return (data + sizeof(tb_size_t));
 }
@@ -143,7 +140,7 @@ tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
 	TB_ASSERTA(slist && slist->pool);
-	tb_byte_t* data = tb_gpool_get(slist->pool, itor);
+	tb_byte_t const* data = tb_gpool_itor_const_at(slist->pool, itor);
 	TB_ASSERTA(data);
 	return tb_bits_get_u32_ne(data);
 }
@@ -207,21 +204,22 @@ tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t index, tb_void_t const* i
 
 tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool && item, 0);
+	TB_ASSERT_RETURN_VAL(slist && slist->pool, 0);
 
 	// alloc a new node
-	tb_size_t node = tb_gpool_alloc(slist->pool);
+	tb_size_t node = tb_gpool_put(slist->pool, TB_NULL);
 	TB_ASSERT_RETURN_VAL(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_gpool_get(slist->pool, node);
+	tb_byte_t* pnode = tb_gpool_itor_at(slist->pool, node);
 	TB_ASSERTA(pnode);
 
 	// init node, inode => 0
 	tb_bits_set_u32_ne(pnode, 0);
 
 	// copy the item data
-	tb_memcpy(pnode + sizeof(tb_size_t), item, slist->step);
+	if (item) tb_memcpy(pnode + sizeof(tb_size_t), item, slist->step);
+	else tb_memset(pnode + sizeof(tb_size_t), 0, slist->step);
 
 	// the prev node
 	tb_size_t prev = index;
@@ -242,7 +240,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else if (prev == slist->last)
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// last => node => null
@@ -255,7 +253,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// node => next
@@ -296,7 +294,7 @@ tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t index, tb_void_t const* 
 }
 tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(slist && item && size, 0);
+	TB_ASSERT_RETURN_VAL(slist && size, 0);
 
 	// insert items
 	tb_size_t node = index;
@@ -427,7 +425,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 			midd = tb_slist_itor_next(slist, prev);
 
 			// get the prev data
-			tb_byte_t* pprev = tb_gpool_get(slist->pool, prev);
+			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
 			TB_ASSERTA(pprev);
 
 			// the next node
@@ -444,7 +442,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 		TB_ASSERTA(midd);
 
 		// free node
-		tb_gpool_free(slist->pool, midd);
+		tb_gpool_del(slist->pool, midd);
 
 		// return next node
 		return next;

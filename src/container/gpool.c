@@ -87,25 +87,25 @@ tb_void_t tb_gpool_exit(tb_gpool_t* gpool)
 		tb_free(gpool);
 	}
 }
-tb_size_t tb_gpool_alloc(tb_gpool_t* gpool)
+tb_size_t tb_gpool_put(tb_gpool_t* gpool, tb_void_t const* item)
 {
 	TB_ASSERT_RETURN_VAL(gpool, 0);
 
-	tb_size_t item = 0;
+	tb_size_t itor = 0;
 
-	// try allocating from the predicted item
+	// try allocating from the predicted itor
 #ifdef TB_GPOOL_PRED_ENABLE
 # 	ifdef TB_DEBUG
 	gpool->alloc_total++;
 	if (!gpool->pred_n) gpool->pred_failed++;
 # 	endif
-	if (gpool->pred_n) item = gpool->pred[--gpool->pred_n];
+	if (gpool->pred_n) itor = gpool->pred[--gpool->pred_n];
 #endif
 
 	// is enough?
-	if (!item && gpool->size < gpool->maxn)
+	if (!itor && gpool->size < gpool->maxn)
 	{
-		 // find free op node and skip the index: 0
+		// find free op node and skip the index: 0
 		tb_size_t i = 0;
 		tb_size_t n = gpool->maxn;
 		for (i = 0; i < n; ++i)
@@ -114,13 +114,13 @@ tb_size_t tb_gpool_alloc(tb_gpool_t* gpool)
 			if (!TB_POOL_INFO_ISSET(gpool->info, i))
 			{
 				// get op index
-				item = 1 + i;
+				itor = 1 + i;
 				break;
 			}
 		}
 	}
 	// the gpool is full?
-	if (!item)
+	if (!itor)
 	{
 		// adjust max size
 		TB_ASSERTA(gpool->size == gpool->maxn);
@@ -137,24 +137,24 @@ tb_size_t tb_gpool_alloc(tb_gpool_t* gpool)
 		TB_ASSERT_RETURN_VAL(gpool->info, 0);
 		tb_memset(gpool->info + (gpool->size >> 3), 0, gpool->grow >> 3);
 
-		// get the index of item
-		item = 1 + gpool->size;
+		// get the index of itor
+		itor = 1 + gpool->size;
 	}
 
-	if (!item) return 0;
+	if (!itor) return 0;
 
 	// set info
-	TB_ASSERTA(!TB_POOL_INFO_ISSET(gpool->info, item - 1));
-	TB_POOL_INFO_SET(gpool->info, item - 1);
+	TB_ASSERTA(!TB_POOL_INFO_ISSET(gpool->info, itor - 1));
+	TB_POOL_INFO_SET(gpool->info, itor - 1);
 
 #ifdef TB_GPOOL_PRED_ENABLE
- 	// predict next, pred_n must be null, otherwise exists repeat item
+ 	// predict next, pred_n must be null, otherwise exists repeat itor
 	if (!gpool->pred_n) 
 	{
-		// item + 1 - 1 < maxn
-		if (item < gpool->maxn && !TB_POOL_INFO_ISSET(gpool->info, item))
+		// itor + 1 - 1 < maxn
+		if (itor < gpool->maxn && !TB_POOL_INFO_ISSET(gpool->info, itor))
 		{
-			gpool->pred[0] = item + 1;
+			gpool->pred[0] = itor + 1;
 			gpool->pred_n = 1;
 		}
 	}
@@ -163,26 +163,44 @@ tb_size_t tb_gpool_alloc(tb_gpool_t* gpool)
 
 	// update size
 	gpool->size++;
-	TB_ASSERT(item && item < 1 + gpool->maxn);
-	if (item > gpool->maxn) item = 0;
-	return item;
-}
-tb_void_t tb_gpool_free(tb_gpool_t* gpool, tb_size_t item)
-{
-	TB_ASSERT(gpool && gpool->size && item > 0 && item < 1 + gpool->maxn);
-	TB_ASSERT(TB_POOL_INFO_ISSET(gpool->info, item - 1));
-	if (gpool && gpool->size && item > 0 && item < 1 + gpool->maxn)
+	TB_ASSERT(itor && itor < 1 + gpool->maxn);
+	if (itor > gpool->maxn) itor = 0;
+
+	// update data
+	if (itor) 
 	{
-		// free item
-		if (gpool->func.free) gpool->func.free(tb_gpool_get(gpool, item), gpool->func.priv);
+		if (item) tb_memcpy(gpool->data + (itor - 1) * gpool->step, item, gpool->step);
+		else tb_memset(gpool->data + (itor - 1) * gpool->step, 0, gpool->step);
+	}
+	return itor;
+}
+
+tb_void_t tb_gpool_set(tb_gpool_t* gpool, tb_size_t itor, tb_void_t const* item)
+{
+	TB_ASSERT_RETURN(gpool && itor);
+	tb_byte_t* data = tb_gpool_itor_at(gpool, itor);
+	if (data)
+	{
+		if (item) tb_memcpy(data, item, gpool->step);
+		else tb_memset(data, 0, gpool->step);
+	}
+}
+tb_void_t tb_gpool_del(tb_gpool_t* gpool, tb_size_t itor)
+{
+	TB_ASSERT(gpool && gpool->size && itor > 0 && itor < 1 + gpool->maxn);
+	TB_ASSERT(TB_POOL_INFO_ISSET(gpool->info, itor - 1));
+	if (gpool && gpool->size && itor > 0 && itor < 1 + gpool->maxn)
+	{
+		// free itor
+		if (gpool->func.free) gpool->func.free(gpool->data + (itor - 1) * gpool->step, gpool->func.priv);
 
 		// set info
-		TB_POOL_INFO_RESET(gpool->info, item - 1);
+		TB_POOL_INFO_RESET(gpool->info, itor - 1);
 
 		// predict next
 #ifdef TB_GPOOL_PRED_ENABLE
 		if (gpool->pred_n < TB_GPOOL_PRED_MAX)
-			gpool->pred[gpool->pred_n++] = item;
+			gpool->pred[gpool->pred_n++] = itor;
 #endif
 		// update gpool size
 		gpool->size--;
@@ -213,18 +231,72 @@ tb_void_t tb_gpool_clear(tb_gpool_t* gpool)
 	gpool->pred_n = m;
 #endif
 }
-
-#ifdef TB_DEBUG
-tb_byte_t* tb_gpool_get(tb_gpool_t* gpool, tb_size_t item)
+tb_void_t* tb_gpool_itor_at(tb_gpool_t* gpool, tb_size_t itor)
 {
-	//TB_DBG("%d %d %d %d", gpool->step, gpool->size, item, gpool->maxn);
-	TB_ASSERT(gpool && gpool->size && item > 0 && item < 1 + gpool->maxn);
-	TB_ASSERT(TB_POOL_INFO_ISSET(gpool->info, item - 1));
+	return (tb_void_t*)tb_gpool_itor_const_at(gpool, itor);
+}
+tb_void_t const* tb_gpool_itor_const_at(tb_gpool_t const* gpool, tb_size_t itor)
+{
+	//TB_DBG("%d %d %d %d", gpool->step, gpool->size, itor, gpool->maxn);
+	TB_ASSERT(gpool && gpool->size && itor > 0 && itor < 1 + gpool->maxn);
+	TB_ASSERT(TB_POOL_INFO_ISSET(gpool->info, itor - 1));
 
-	if (gpool && gpool->size && item > 0 && item < 1 + gpool->maxn)
-		return (gpool->data + (item - 1) * gpool->step);
+	if (gpool && gpool->size && itor > 0 && itor < 1 + gpool->maxn)
+		return (gpool->data + (itor - 1) * gpool->step);
 	else return TB_NULL;
 }
+tb_size_t tb_gpool_itor_head(tb_gpool_t const* gpool)
+{
+	TB_ASSERTA(gpool);
+	if (gpool->size)
+	{
+		// find the first item
+		tb_size_t i = 0;
+		tb_size_t n = gpool->maxn;
+		for ( ; i < n; ++i)
+		{
+			// is non-free?
+			if (TB_POOL_INFO_ISSET(gpool->info, i))
+				return (1 + i);
+		}
+	}
+	return gpool->maxn;
+}
+tb_size_t tb_gpool_itor_tail(tb_gpool_t const* gpool)
+{
+	TB_ASSERTA(gpool);
+	return (gpool->maxn);
+}
+tb_size_t tb_gpool_itor_next(tb_gpool_t const* gpool, tb_size_t itor)
+{
+	TB_ASSERTA(gpool && itor);
+	if (gpool->size)
+	{
+		// find the next item
+		tb_size_t i = itor;
+		tb_size_t n = gpool->maxn;
+		for ( ; i < n; ++i)
+		{
+			// is non-free?
+			if (TB_POOL_INFO_ISSET(gpool->info, i))
+				return (1 + i);
+		}
+	}
+	return gpool->maxn;
+}
+
+tb_size_t tb_gpool_size(tb_gpool_t const* gpool)
+{
+	TB_ASSERT_RETURN_VAL(gpool, 0);
+	return gpool->size;
+}
+tb_size_t tb_gpool_maxn(tb_gpool_t const* gpool)
+{
+	TB_ASSERT_RETURN_VAL(gpool, 0);
+	return gpool->maxn;
+}
+
+#ifdef TB_DEBUG
 tb_void_t tb_gpool_dump(tb_gpool_t* gpool)
 {
 	TB_DBG("size: %d", gpool->size);
