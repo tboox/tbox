@@ -90,7 +90,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	// init memory pool
-	if (!tb_mpool_init(data, size)) return TB_FALSE;
+	if (!tb_memory_init(data, size)) return TB_FALSE;
 #endif
 
 	// init socket
@@ -109,7 +109,7 @@ tb_void_t tb_exit()
 
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	//tb_pool_dump();
-	tb_mpool_exit();
+	tb_memory_exit();
 #endif
 	
 	// ok

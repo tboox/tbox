@@ -8,7 +8,7 @@ int test(int argc, char** argv)
 	
 	delete[] a;
 
-	//tb_mpool_dump();
+	//tb_memory_dump();
 	return 0;
 }
 
