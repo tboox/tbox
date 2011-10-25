@@ -127,7 +127,7 @@ static tb_void_t tb_hash_test_s2i()
 	tb_hash_clear(hash);
 	tb_hash_test_dump(hash);
 
-#if 0
+#if 1
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 80000;
@@ -160,6 +160,7 @@ static tb_void_t tb_hash_test_s2i()
 	tb_hash_test_dump(hash);
 #endif
 	// exit
+	getchar();
 	tb_hash_exit(hash);
 }
 static tb_void_t tb_hash_test_i2s()

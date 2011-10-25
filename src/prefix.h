@@ -440,27 +440,27 @@ typedef tb_float_t 				tb_scalar_t;
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 
 # 	ifdef TB_DEBUG
-tb_void_t* 		tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t*  	tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-tb_void_t 		tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t*  	tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_void_t* 		tb_memory_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_void_t 		tb_memory_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 # 	else
-tb_void_t* 		tb_mpool_allocate(tb_size_t size);
-tb_void_t*  	tb_mpool_callocate(tb_size_t item, tb_size_t size);
-tb_void_t* 		tb_mpool_reallocate(tb_void_t* data, tb_size_t size);
-tb_void_t 		tb_mpool_deallocate(tb_void_t* data);
+tb_void_t* 		tb_memory_allocate(tb_size_t size);
+tb_void_t*  	tb_memory_callocate(tb_size_t item, tb_size_t size);
+tb_void_t* 		tb_memory_reallocate(tb_void_t* data, tb_size_t size);
+tb_void_t 		tb_memory_deallocate(tb_void_t* data);
 # 	endif
 
 # 	ifdef TB_DEBUG
-# 		define tb_malloc(size) 					tb_mpool_allocate(size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_calloc(item, size) 			tb_mpool_callocate(item, size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_realloc(data, size) 			tb_mpool_reallocate(data, size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_free(data) 					tb_mpool_deallocate(data, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_malloc(size) 					tb_memory_allocate(size, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_calloc(item, size) 			tb_memory_callocate(item, size, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_realloc(data, size) 			tb_memory_reallocate(data, size, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_free(data) 					tb_memory_deallocate(data, __tb_func__, __tb_line__, __tb_file__)
 # 	else
-# 		define tb_malloc(size) 					tb_mpool_allocate(size)
-# 		define tb_calloc(item, size) 			tb_mpool_callocate(item, size)
-# 		define tb_realloc(data, size) 			tb_mpool_reallocate(data, size)
-# 		define tb_free(data) 					tb_mpool_deallocate(data)
+# 		define tb_malloc(size) 					tb_memory_allocate(size)
+# 		define tb_calloc(item, size) 			tb_memory_callocate(item, size)
+# 		define tb_realloc(data, size) 			tb_memory_reallocate(data, size)
+# 		define tb_free(data) 					tb_memory_deallocate(data)
 # 	endif
 
 #else
@@ -477,9 +477,9 @@ tb_void_t 	tb_free(tb_void_t* data);
 #ifdef __cplusplus
 
 # 	ifdef TB_DEBUG
-__tb_inline__ tb_void_t* 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t* 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
 __tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 																	{ tb_free(p); 											}
-__tb_inline__ tb_void_t* 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_mpool_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t* 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
 __tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 																{ tb_free(p); 											}
 # 	else
 __tb_inline__ tb_void_t* 	operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}

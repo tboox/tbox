@@ -80,17 +80,11 @@
 
 // alloc & free without lock
 #ifndef TB_DEBUG
-# 	define TB_MPOOL_ALLOCATE_NO_LOCK(mpool, size, func, line, file) 							tb_mpool_allocate_no_lock(mpool, size)
-# 	define TB_MPOOL_REALLOCATE_NO_LOCK(mpool, data, size, func, line, file) 					tb_mpool_reallocate_no_lock(mpool, data, size)
-# 	define TB_MPOOL_CALLOCATE_NO_LOCK(mpool, item, size, func, line, file) 						tb_mpool_callocate_no_lock(mpool, item, size)
-# 	define TB_MPOOL_DEALLOCATE_NO_LOCK(mpool, data, func, line, file) 							tb_mpool_deallocate_no_lock(mpool, data)
+# 	define TB_MPOOL_ALLOCATE(mpool, size, func, line, file) 									tb_mpool_allocate(mpool, size)
 # 	define TB_MPOOL_TRY_ALLOCATING_FROM_PRED_RBLOCK(mpool, size, chunk_i, func, line, file) 	tb_mpool_try_allocating_from_pred_rblock(mpool, size, chunk_i)
 # 	define TB_MPOOL_TRY_ALLOCATING_FROM_PRED_NRBLOCK(mpool, size, asize, func, line, file) 		tb_mpool_try_allocating_from_pred_nrblock(mpool, size, asize)
 #else
-# 	define TB_MPOOL_ALLOCATE_NO_LOCK(mpool, size, func, line, file) 							tb_mpool_allocate_no_lock(mpool, size, func, line, file)
-# 	define TB_MPOOL_REALLOCATE_NO_LOCK(mpool, data, size, func, line, file) 					tb_mpool_reallocate_no_lock(mpool, data, size, func, line, file)
-# 	define TB_MPOOL_CALLOCATE_NO_LOCK(mpool, item, size, func, line, file) 						tb_mpool_callocate_no_lock(mpool, item, size, func, line, file)
-# 	define TB_MPOOL_DEALLOCATE_NO_LOCK(mpool, data, func, line, file) 							tb_mpool_deallocate_no_lock(mpool, data, func, line, file)
+# 	define TB_MPOOL_ALLOCATE(mpool, size, func, line, file) 									tb_mpool_allocate(mpool, size, func, line, file)
 # 	define TB_MPOOL_TRY_ALLOCATING_FROM_PRED_RBLOCK(mpool, size, chunk_i, func, line, file) 	tb_mpool_try_allocating_from_pred_rblock(mpool, size, chunk_i, func, line, file)
 # 	define TB_MPOOL_TRY_ALLOCATING_FROM_PRED_NRBLOCK(mpool, size, asize, func, line, file) 		tb_mpool_try_allocating_from_pred_nrblock(mpool, size, asize, func, line, file)
 #endif
@@ -200,9 +194,6 @@ typedef struct __tb_mpool_t
 	tb_mpool_status_t 	status;
 #endif
 
-	// the mutex
-	tb_handle_t 		hmutex; 
-
 	// the mpool chunks
 	// some regular chunks + one non-regular chunk
 	tb_mpool_chunk_t 	chunks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT + 1];
@@ -217,12 +208,7 @@ typedef struct __tb_mpool_t
 }tb_mpool_t;
 
 /* ////////////////////////////////////////////////////////////////////////
- * globals
- */
-static tb_mpool_t* 		g_mpool = TB_NULL;
-
-/* ////////////////////////////////////////////////////////////////////////
- * the inner implemention
+ * the details
  */
 
 #ifdef TB_DEBUG
@@ -256,123 +242,6 @@ static __tb_inline__ tb_size_t tb_block_size_to_chunk_i(tb_mpool_chunk_t* chunks
 
 	// regular chunks is full 
 	return i;
-}
-/* ////////////////////////////////////////////////////////////////////////
- * the interface implemention
- */
-tb_bool_t tb_mpool_init(tb_void_t* data, tb_size_t size)
-{
-	// check
-	TB_ASSERT_RETURN_VAL(!g_mpool && data && size, TB_FALSE);
-	TB_STATIC_ASSERT(!(sizeof(tb_mpool_nrblock_head_t) % TB_MPOOL_ALIGN_BOUNDARY));
-	
-	// init regular block 
-	tb_size_t rblockn[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT] = {0, 0, 0, 0, 0, 0, 0};
-#ifndef TB_DEBUG
-	rblockn[0] = size >> 14;
-	rblockn[1] = rblockn[0] >> 1;
-	rblockn[2] = rblockn[1] >> 1;
-	rblockn[3] = rblockn[2] >> 1;
-	rblockn[4] = rblockn[3] >> 1;
-	rblockn[5] = rblockn[4] >> 1;
-	rblockn[6] = rblockn[5] >> 1;
-#endif
-
-	// init data
-	tb_memset(data, 0, size);
-
-	// init mpool
-	g_mpool = data;
-	g_mpool->magic = TB_MPOOL_MAGIC;
-
-	// create mutex
-	g_mpool->hmutex = tb_mutex_init("the memory pool");
-	if (!g_mpool->hmutex) return TB_FALSE;
-
-	// attach data
-	g_mpool->data = &g_mpool[1];
-	g_mpool->data = (tb_byte_t*)tb_align((tb_size_t)g_mpool->data, TB_MPOOL_ALIGN_BOUNDARY);
-
-	TB_ASSERT((tb_size_t)data + size > (tb_size_t)g_mpool->data);
-	g_mpool->size = (tb_size_t)((tb_size_t)data + size - (tb_size_t)g_mpool->data);
-
-	// init regular chunks
-	tb_size_t i = 0;
-	g_mpool->blocks_n = 0;
-	for (i = 0; i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT; ++i)
-	{
-		// init regular chunk
-		if (i == 0) g_mpool->chunks[i].data = g_mpool->data;
-		else g_mpool->chunks[i].data = g_mpool->chunks[i - 1].data + g_mpool->chunks[i - 1].size;
-
-		g_mpool->chunks[i].block_n = rblockn[i];
-		g_mpool->chunks[i].free_block_n = g_mpool->chunks[i].block_n;
-		g_mpool->chunks[i].block_size = TB_MPOOL_PRATICLE_SIZE << i;
-		g_mpool->chunks[i].size = g_mpool->chunks[i].block_size * g_mpool->chunks[i].block_n;
-
-		// stats total blocks count
-		g_mpool->chunks[i].start_block = g_mpool->blocks_n;
-		g_mpool->blocks_n += g_mpool->chunks[i].block_n;
-
-		// init predicted info
-#ifdef TB_MPOOL_PRED_ENABLE
-		tb_size_t m = rblockn[i] < TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX? rblockn[i] : TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX;
-		tb_size_t n = m;
-		while (n--) g_mpool->pred_rblocks[i][n] = g_mpool->chunks[i].start_block + m - n - 1;
-		g_mpool->pred_rblocks_n[i] = m;
-#endif
-	}
-
-	// init blocks info
-	g_mpool->blocks_info = g_mpool->data + g_mpool->size - (tb_align(g_mpool->blocks_n, 8) >> 3);
-	g_mpool->blocks_info -= ((tb_size_t)g_mpool->blocks_info) % TB_MPOOL_ALIGN_BOUNDARY;
-	TB_ASSERT((tb_size_t)g_mpool->blocks_info > (tb_size_t)g_mpool->data);
-  
-	// init non-regular chunk
-	TB_ASSERT(i >= 1 && i == TB_MPOOL_NON_REGULAR_CHUNCK_INDEX);
-	g_mpool->chunks[i].data = g_mpool->chunks[i - 1].data + g_mpool->chunks[i - 1].size;
-	g_mpool->chunks[i].start_block = 0;
-	g_mpool->chunks[i].block_n = 0;
-	g_mpool->chunks[i].size = (tb_size_t)(g_mpool->blocks_info - g_mpool->chunks[i].data);
-	TB_ASSERT(!(g_mpool->chunks[i].size % TB_MPOOL_ALIGN_BOUNDARY));
-	TB_ASSERT(g_mpool->chunks[i].size >= TB_MPOOL_NON_REGULAR_CHUNCK_MIN_SIZE);
-
-	// check non-regular chunk size & data address
-	TB_ASSERT(!(g_mpool->chunks[i].size % TB_MPOOL_ALIGN_BOUNDARY));
-	TB_ASSERTM((tb_size_t)g_mpool->blocks_info == (tb_size_t)g_mpool->chunks[i].data + g_mpool->chunks[i].size, "the size of non-regular chunk is too small");
-
-	((tb_mpool_nrblock_head_t*)g_mpool->chunks[i].data)->block_size = g_mpool->chunks[i].size - sizeof(tb_mpool_nrblock_head_t); // block size == the whole chunk size - the head size
-	((tb_mpool_nrblock_head_t*)g_mpool->chunks[i].data)->is_free = 1; // is free? = 1
-
-#ifdef TB_DEBUG
-	// init mpool status info
-	TB_ASSERT(g_mpool->data + g_mpool->size >= g_mpool->blocks_info);
-	g_mpool->status.total_size = g_mpool->size;
-	g_mpool->status.used_size = (tb_size_t)(g_mpool->data + g_mpool->size - g_mpool->blocks_info);
-	g_mpool->status.peak_size = g_mpool->status.used_size;
-	g_mpool->status.need_used_size = 0;
-	g_mpool->status.real_used_size = g_mpool->status.used_size;
-	g_mpool->status.alloc_failed = 0;
-	g_mpool->status.nrblock_max_size = 0;
-	tb_memset(g_mpool->status.rblock_max_n, 0, TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT);
-#endif
-	return TB_TRUE;
-}
-tb_void_t tb_mpool_exit()
-{
-	// check 
-	TB_ASSERT_RETURN(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC);
-
-	// destroy mutex
-	if (g_mpool->hmutex) tb_mutex_exit(g_mpool->hmutex);
-	g_mpool->hmutex = TB_NULL;
-
-	// clear
-	if (g_mpool->data) tb_memset(g_mpool->data, 0, g_mpool->size);
-	tb_memset(g_mpool, 0, sizeof(tb_mpool_t));
-
-	// free
-	g_mpool = TB_NULL;
 }
 
 // prediction
@@ -601,17 +470,204 @@ static tb_void_t* tb_mpool_try_allocating_from_pred_nrblock(tb_mpool_t* mpool, t
 
 	return TB_NULL;
 }
-
 #endif
+
+#ifdef TB_DEBUG
+static tb_bool_t tb_mpool_allocate_try(tb_mpool_t* mpool, tb_size_t size)
+{
+	TB_ASSERT_RETURN_VAL(mpool && size, TB_FALSE);
+
+	// allocate it from regular-chunks if block is small
+	if (size <= TB_MPOOL_REGULAR_BLOCK_MAX_SIZE)
+	{
+		// find the chunk index of the first free regular-block
+		tb_size_t chunk_i = tb_block_size_to_chunk_i(mpool->chunks, size);
+
+		// if exists free block
+		if (chunk_i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT)
+		{
+			// allocate a free block
+			tb_size_t i = 0;
+			for (i = 0; i < mpool->chunks[chunk_i].block_n; ++i)
+			{
+				tb_size_t block_i = mpool->chunks[chunk_i].start_block + i;
+				if (!tb_mpool_blocks_info_isset(mpool->blocks_info, block_i)) // is free?
+				{
+					return TB_TRUE;
+				}
+			}
+		}
+	}
+
+	// allocate it from non-regular chunk
+	tb_byte_t* 	p = mpool->chunks[TB_MPOOL_NON_REGULAR_CHUNCK_INDEX].data;
+	tb_byte_t* 	pe = p + mpool->chunks[TB_MPOOL_NON_REGULAR_CHUNCK_INDEX].size;
+
+	// find free block
+	while (p + sizeof(tb_mpool_nrblock_head_t) < pe)
+	{
+		// get the head of current block
+		tb_mpool_nrblock_head_t* 	phead = ((tb_mpool_nrblock_head_t*)p);
+		tb_size_t 					osize = ((tb_mpool_nrblock_head_t*)p)->block_size;
+
+		if (phead->is_free) // allocate if the block is free
+		{
+			// align size
+			tb_size_t asize = tb_align(size, TB_MPOOL_ALIGN_BOUNDARY);
+			if (osize >= asize) // enough?
+			{
+				return TB_TRUE;
+			}
+			else // attempt to merge next free block if current free block is too small
+			{
+				tb_mpool_nrblock_head_t* pnext_head = (tb_mpool_nrblock_head_t*)(p + sizeof(tb_mpool_nrblock_head_t) + osize);
+			
+				// break if doesn't exist next block
+				if ((tb_size_t)pnext_head + sizeof(tb_mpool_nrblock_head_t) >= (tb_size_t)mpool->blocks_info) break;
+
+				if (pnext_head->is_free) // next block is free?
+				{
+					// merge next block
+					phead->block_size += pnext_head->block_size + sizeof(tb_mpool_nrblock_head_t);
+
+					// reset the next predicted block
+				#ifdef TB_MPOOL_PRED_ENABLE
+					if (mpool->pred_nrblock == (tb_byte_t*)pnext_head)
+						mpool->pred_nrblock = TB_NULL;
+				#endif
+
+					// continue handle this block
+					continue ;
+				}
+			}
+		}
+
+		// skip it if the block is non-free or block_size is too small
+		p += sizeof(tb_mpool_nrblock_head_t) + osize;
+	}	
+
+	return TB_FALSE;
+}
+#endif
+
+/* ////////////////////////////////////////////////////////////////////////
+ * the implemention
+ */
+tb_handle_t tb_mpool_init(tb_void_t* data, tb_size_t size)
+{
+	// check
+	TB_ASSERT_RETURN_VAL(data && size, TB_NULL);
+	TB_STATIC_ASSERT(!(sizeof(tb_mpool_nrblock_head_t) % TB_MPOOL_ALIGN_BOUNDARY));
+	
+	// init regular block 
+	tb_size_t rblockn[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT] = {0, 0, 0, 0, 0, 0, 0};
+#ifndef TB_DEBUG
+	rblockn[0] = size >> 14;
+	rblockn[1] = rblockn[0] >> 1;
+	rblockn[2] = rblockn[1] >> 1;
+	rblockn[3] = rblockn[2] >> 1;
+	rblockn[4] = rblockn[3] >> 1;
+	rblockn[5] = rblockn[4] >> 1;
+	rblockn[6] = rblockn[5] >> 1;
+#endif
+
+	// init data
+	tb_memset(data, 0, size);
+
+	// init mpool
+	tb_mpool_t* mpool = data;
+	mpool->magic = TB_MPOOL_MAGIC;
+
+	// attach data
+	mpool->data = &mpool[1];
+	mpool->data = (tb_byte_t*)tb_align((tb_size_t)mpool->data, TB_MPOOL_ALIGN_BOUNDARY);
+
+	TB_ASSERT((tb_size_t)data + size > (tb_size_t)mpool->data);
+	mpool->size = (tb_size_t)((tb_size_t)data + size - (tb_size_t)mpool->data);
+
+	// init regular chunks
+	tb_size_t i = 0;
+	mpool->blocks_n = 0;
+	for (i = 0; i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT; ++i)
+	{
+		// init regular chunk
+		if (i == 0) mpool->chunks[i].data = mpool->data;
+		else mpool->chunks[i].data = mpool->chunks[i - 1].data + mpool->chunks[i - 1].size;
+
+		mpool->chunks[i].block_n = rblockn[i];
+		mpool->chunks[i].free_block_n = mpool->chunks[i].block_n;
+		mpool->chunks[i].block_size = TB_MPOOL_PRATICLE_SIZE << i;
+		mpool->chunks[i].size = mpool->chunks[i].block_size * mpool->chunks[i].block_n;
+
+		// stats total blocks count
+		mpool->chunks[i].start_block = mpool->blocks_n;
+		mpool->blocks_n += mpool->chunks[i].block_n;
+
+		// init predicted info
+#ifdef TB_MPOOL_PRED_ENABLE
+		tb_size_t m = rblockn[i] < TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX? rblockn[i] : TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX;
+		tb_size_t n = m;
+		while (n--) mpool->pred_rblocks[i][n] = mpool->chunks[i].start_block + m - n - 1;
+		mpool->pred_rblocks_n[i] = m;
+#endif
+	}
+
+	// init blocks info
+	mpool->blocks_info = mpool->data + mpool->size - (tb_align(mpool->blocks_n, 8) >> 3);
+	mpool->blocks_info -= ((tb_size_t)mpool->blocks_info) % TB_MPOOL_ALIGN_BOUNDARY;
+	TB_ASSERT((tb_size_t)mpool->blocks_info > (tb_size_t)mpool->data);
+  
+	// init non-regular chunk
+	TB_ASSERT(i >= 1 && i == TB_MPOOL_NON_REGULAR_CHUNCK_INDEX);
+	mpool->chunks[i].data = mpool->chunks[i - 1].data + mpool->chunks[i - 1].size;
+	mpool->chunks[i].start_block = 0;
+	mpool->chunks[i].block_n = 0;
+	mpool->chunks[i].size = (tb_size_t)(mpool->blocks_info - mpool->chunks[i].data);
+	TB_ASSERT(!(mpool->chunks[i].size % TB_MPOOL_ALIGN_BOUNDARY));
+	TB_ASSERT(mpool->chunks[i].size >= TB_MPOOL_NON_REGULAR_CHUNCK_MIN_SIZE);
+
+	// check non-regular chunk size & data address
+	TB_ASSERT(!(mpool->chunks[i].size % TB_MPOOL_ALIGN_BOUNDARY));
+	TB_ASSERTM((tb_size_t)mpool->blocks_info == (tb_size_t)mpool->chunks[i].data + mpool->chunks[i].size, "the size of non-regular chunk is too small");
+
+	((tb_mpool_nrblock_head_t*)mpool->chunks[i].data)->block_size = mpool->chunks[i].size - sizeof(tb_mpool_nrblock_head_t); // block size == the whole chunk size - the head size
+	((tb_mpool_nrblock_head_t*)mpool->chunks[i].data)->is_free = 1; // is free? = 1
+
+#ifdef TB_DEBUG
+	// init mpool status info
+	TB_ASSERT(mpool->data + mpool->size >= mpool->blocks_info);
+	mpool->status.total_size = mpool->size;
+	mpool->status.used_size = (tb_size_t)(mpool->data + mpool->size - mpool->blocks_info);
+	mpool->status.peak_size = mpool->status.used_size;
+	mpool->status.need_used_size = 0;
+	mpool->status.real_used_size = mpool->status.used_size;
+	mpool->status.alloc_failed = 0;
+	mpool->status.nrblock_max_size = 0;
+	tb_memset(mpool->status.rblock_max_n, 0, TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT);
+#endif
+	return ((tb_handle_t)mpool);
+}
+tb_void_t tb_mpool_exit(tb_handle_t hpool)
+{
+	// check 
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN(mpool && mpool->magic == TB_MPOOL_MAGIC);
+
+	// clear
+	if (mpool->data) tb_memset(mpool->data, 0, mpool->size);
+	tb_memset(mpool, 0, sizeof(tb_mpool_t));
+}
 
 #ifndef TB_DEBUG
-static tb_void_t* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size)
+tb_void_t* tb_mpool_allocate(tb_handle_t hpool, tb_size_t size)
 #else
-static tb_void_t* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t* tb_mpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
-	TB_ASSERT(mpool && size);
-	if (!mpool || !size) return TB_NULL;
+	// check
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN_VAL(mpool && mpool->magic == TB_MPOOL_MAGIC, TB_NULL);
+	TB_IF_FAIL_RETURN_VAL(size, TB_NULL);
 
 #ifdef TB_DEBUG
 	mpool->status.alloc_total++;
@@ -799,16 +855,19 @@ static tb_void_t* tb_mpool_allocate_no_lock(tb_mpool_t* mpool, tb_size_t size, t
 	mpool->status.alloc_failed++;
 #endif
 	
+	TB_ASSERTM(0, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
 	return TB_NULL;
 }
 #ifndef TB_DEBUG
-static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data)
+tb_bool_t tb_mpool_deallocate(tb_handle_t hpool, tb_void_t* data)
 #else
-static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_mpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
-	TB_ASSERT(mpool && data);
-	if (!mpool || !data) return TB_FALSE;
+	// check
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN_VAL(mpool && mpool->magic == TB_MPOOL_MAGIC, TB_FALSE);
+	TB_IF_FAIL_RETURN_VAL(data, TB_TRUE);
 
 	// get data address
 	// |--------------------------------------------|-----------------|
@@ -890,18 +949,35 @@ static tb_bool_t tb_mpool_deallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data,
 
 		return TB_TRUE;
 	}
-	//TB_ASSERTM(0, "invalid data address:%x at free()", addr);
 
+	TB_ASSERTM(0, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return TB_FALSE;
 }
+
 #ifndef TB_DEBUG
-static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_size_t size)
+tb_void_t* tb_mpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size)
 #else
-static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t* tb_mpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
-	TB_ASSERT(mpool && data);
-	if (!mpool || !data) return TB_MPOOL_ALLOCATE_NO_LOCK(mpool, size, func, line, file);
+	TB_IF_FAIL_RETURN_VAL(item && size, TB_NULL);
+	tb_void_t* p = TB_MPOOL_ALLOCATE(hpool, item * size, func, line, file);
+	if (p) tb_memset(p, 0, item * size);
+	return p;
+}
+
+#ifndef TB_DEBUG
+tb_void_t* tb_mpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size)
+#else
+tb_void_t* tb_mpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+#endif
+{
+	// check
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN_VAL(mpool && mpool->magic == TB_MPOOL_MAGIC, TB_NULL);
+
+	// alloc it if is null?
+	if (!data) return TB_MPOOL_ALLOCATE(hpool, size, func, line, file);
 
 	/* get data address
 	 * |--------------------------------------------|-----------------|
@@ -937,7 +1013,7 @@ static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data
 			TB_ASSERT(!(offset % mpool->chunks[chunk_i].block_size));
 
 			// allocate new buffer
-			tb_byte_t* p = TB_MPOOL_ALLOCATE_NO_LOCK(mpool, size, func, line, file);
+			tb_byte_t* p = TB_MPOOL_ALLOCATE(mpool, size, func, line, file);
 			tb_memcpy(p, data, mpool->chunks[chunk_i].block_size);
 
 			// reset used flag: the block is free
@@ -1034,7 +1110,7 @@ static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data
 			}
 
 			// allocate new buffer
-			p = TB_MPOOL_ALLOCATE_NO_LOCK(mpool, size, func, line, file);
+			p = TB_MPOOL_ALLOCATE(mpool, size, func, line, file);
 			if (p) tb_memcpy(p, data, osize);
 			else return TB_NULL;
 
@@ -1054,189 +1130,38 @@ static tb_void_t* tb_mpool_reallocate_no_lock(tb_mpool_t* mpool, tb_void_t* data
 			return p;
 		}
 	}
-	//TB_ASSERTM(0, "invalid data address:%x at realloc()", addr);
+	TB_ASSERTM(0, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return TB_NULL;
 }
-#ifndef TB_DEBUG
-tb_void_t* tb_mpool_allocate(tb_size_t size)
-#else
-tb_void_t* tb_mpool_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
-{
-	// check 
-	TB_IF_FAIL_RETURN_VAL(size, TB_NULL);
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC, TB_NULL);
 
-	// lock
-	if (TB_FALSE == tb_mutex_lock(g_mpool->hmutex)) return TB_NULL;
-	tb_byte_t* p = TB_MPOOL_ALLOCATE_NO_LOCK(g_mpool, size, func, line, file);
-	tb_mutex_unlock(g_mpool->hmutex);
-
-	// align by 4 bytes
-	TB_ASSERT(!(((tb_size_t)p) & TB_CPU_BITALIGN));
-
-	TB_ASSERTM(p, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
-	return p;
-}
-
-
-#ifndef TB_DEBUG
-tb_void_t* tb_mpool_callocate(tb_size_t item, tb_size_t size)
-{
-	tb_void_t* p = tb_mpool_allocate(item * size);
-	if (p) tb_memset(p, 0, item * size);
-	return p;
-}
-#else
-tb_void_t* tb_mpool_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-{
-	tb_void_t* p = tb_mpool_allocate(item * size, func, line, file);
-	if (p) tb_memset(p, 0, item * size);
-	return p;
-}
-#endif
-
-
-#ifndef TB_DEBUG
-tb_void_t* tb_mpool_reallocate(tb_void_t* data, tb_size_t size)
-#else
-tb_void_t* tb_mpool_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
-{
-	// check 
-	TB_IF_FAIL_RETURN_VAL(size, TB_NULL);
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC, TB_NULL);
-
-	// lock
-	if (TB_FALSE == tb_mutex_lock(g_mpool->hmutex)) return TB_NULL;
-	tb_byte_t* p = TB_MPOOL_REALLOCATE_NO_LOCK(g_mpool, data, size, func, line, file);
-	tb_mutex_unlock(g_mpool->hmutex);
-
-	// align by 4 bytes
-	TB_ASSERT(!(((tb_size_t)p) & TB_CPU_BITALIGN));
-
-	TB_ASSERTM(p, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
-	return p;
-}
-#ifndef TB_DEBUG
-tb_void_t tb_mpool_deallocate(tb_void_t* data)
-#else
-tb_void_t tb_mpool_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
-{
-	// check 
-	TB_ASSERT_RETURN(g_mpool && g_mpool->magic == TB_MPOOL_MAGIC);
-
-	// lock
-	if (TB_FALSE == tb_mutex_lock(g_mpool->hmutex)) return ;
-	tb_bool_t ret = TB_MPOOL_DEALLOCATE_NO_LOCK(g_mpool, data, func, line, file);
-	tb_mutex_unlock(g_mpool->hmutex);
-
-	TB_ASSERTM(ret, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
-}
 
 #ifdef TB_DEBUG
-
-static tb_bool_t tb_mpool_allocate_try(tb_mpool_t* mpool, tb_size_t size)
-{
-	TB_ASSERT_RETURN_VAL(mpool && size, TB_FALSE);
-
-	// allocate it from regular-chunks if block is small
-	if (size <= TB_MPOOL_REGULAR_BLOCK_MAX_SIZE)
-	{
-		// find the chunk index of the first free regular-block
-		tb_size_t chunk_i = tb_block_size_to_chunk_i(mpool->chunks, size);
-
-		// if exists free block
-		if (chunk_i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT)
-		{
-			// allocate a free block
-			tb_size_t i = 0;
-			for (i = 0; i < mpool->chunks[chunk_i].block_n; ++i)
-			{
-				tb_size_t block_i = mpool->chunks[chunk_i].start_block + i;
-				if (!tb_mpool_blocks_info_isset(mpool->blocks_info, block_i)) // is free?
-				{
-					return TB_TRUE;
-				}
-			}
-		}
-	}
-
-	// allocate it from non-regular chunk
-	tb_byte_t* 	p = mpool->chunks[TB_MPOOL_NON_REGULAR_CHUNCK_INDEX].data;
-	tb_byte_t* 	pe = p + mpool->chunks[TB_MPOOL_NON_REGULAR_CHUNCK_INDEX].size;
-
-	// find free block
-	while (p + sizeof(tb_mpool_nrblock_head_t) < pe)
-	{
-		// get the head of current block
-		tb_mpool_nrblock_head_t* 	phead = ((tb_mpool_nrblock_head_t*)p);
-		tb_size_t 					osize = ((tb_mpool_nrblock_head_t*)p)->block_size;
-
-		if (phead->is_free) // allocate if the block is free
-		{
-			// align size
-			tb_size_t asize = tb_align(size, TB_MPOOL_ALIGN_BOUNDARY);
-			if (osize >= asize) // enough?
-			{
-				return TB_TRUE;
-			}
-			else // attempt to merge next free block if current free block is too small
-			{
-				tb_mpool_nrblock_head_t* pnext_head = (tb_mpool_nrblock_head_t*)(p + sizeof(tb_mpool_nrblock_head_t) + osize);
-			
-				// break if doesn't exist next block
-				if ((tb_size_t)pnext_head + sizeof(tb_mpool_nrblock_head_t) >= (tb_size_t)mpool->blocks_info) break;
-
-				if (pnext_head->is_free) // next block is free?
-				{
-					// merge next block
-					phead->block_size += pnext_head->block_size + sizeof(tb_mpool_nrblock_head_t);
-
-					// reset the next predicted block
-				#ifdef TB_MPOOL_PRED_ENABLE
-					if (mpool->pred_nrblock == (tb_byte_t*)pnext_head)
-						mpool->pred_nrblock = TB_NULL;
-				#endif
-
-					// continue handle this block
-					continue ;
-				}
-			}
-		}
-
-		// skip it if the block is non-free or block_size is too small
-		p += sizeof(tb_mpool_nrblock_head_t) + osize;
-	}	
-
-	return TB_FALSE;
-}
-tb_void_t tb_mpool_dump()
+tb_void_t tb_mpool_dump(tb_handle_t hpool)
 {
 	tb_size_t i = 0, j = 0;
 	tb_byte_t* p = TB_NULL;
 	tb_byte_t* pe = TB_NULL;
 
-	TB_ASSERT_RETURN(g_mpool);
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN(mpool);
 
 	TB_DBG("=============================================");
 	TB_DBG("memory mpool info:");
-	TB_DBG("mpool data addr:%x", (tb_size_t)g_mpool->data);
-	TB_DBG("mpool data size:%u", g_mpool->size);
-	TB_DBG("mpool blocks_n:%u\n", g_mpool->blocks_n);
+	TB_DBG("mpool data addr:%x", (tb_size_t)mpool->data);
+	TB_DBG("mpool data size:%u", mpool->size);
+	TB_DBG("mpool blocks_n:%u\n", mpool->blocks_n);
 	TB_DBG("regular chunks info:");
 	for (i = 0; i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT; ++i)
 	{
-		TB_DBG("chunk(%d):", g_mpool->chunks[i].block_size);
-		TB_DBG("\tdata:%x size:%u", (tb_size_t)g_mpool->chunks[i].data, g_mpool->chunks[i].size);
-		TB_DBG("\tstart block:%d block_n:%u free_block_n:%u", g_mpool->chunks[i].start_block, g_mpool->chunks[i].block_n, g_mpool->chunks[i].free_block_n);
+		TB_DBG("chunk(%d):", mpool->chunks[i].block_size);
+		TB_DBG("\tdata:%x size:%u", (tb_size_t)mpool->chunks[i].data, mpool->chunks[i].size);
+		TB_DBG("\tstart block:%d block_n:%u free_block_n:%u", mpool->chunks[i].start_block, mpool->chunks[i].block_n, mpool->chunks[i].free_block_n);
 
 		// dump allocated blocks info
 		{
 			tb_char_t str[4 * 8 + 4];
 			p = (tb_byte_t*)str;
-			for (j = 0; j < g_mpool->chunks[i].block_n; ++j)
+			for (j = 0; j < mpool->chunks[i].block_n; ++j)
 			{
 				if (!(j % 32)) 
 				{
@@ -1245,7 +1170,7 @@ tb_void_t tb_mpool_dump()
 					p = (tb_byte_t*)str;
 				}
 				if ((j % 32) && !(j % 8)) *p++ = ' ';
-				if (tb_mpool_blocks_info_isset(g_mpool->blocks_info, g_mpool->chunks[i].start_block + j)) *p = '1';
+				if (tb_mpool_blocks_info_isset(mpool->blocks_info, mpool->chunks[i].start_block + j)) *p = '1';
 				else *p = '0';
 				++p;
 			}
@@ -1254,9 +1179,9 @@ tb_void_t tb_mpool_dump()
 		}
 	}
 	TB_DBG("non-regular chunks info:");
-	TB_DBG("\tdata:%x size:%u", (tb_size_t)g_mpool->chunks[i].data, g_mpool->chunks[i].size);
-	p = g_mpool->chunks[i].data;
-	pe = p + g_mpool->chunks[i].size;
+	TB_DBG("\tdata:%x size:%u", (tb_size_t)mpool->chunks[i].data, mpool->chunks[i].size);
+	p = mpool->chunks[i].data;
+	pe = p + mpool->chunks[i].size;
 	i = 0;
 	while (p + sizeof(tb_mpool_nrblock_head_t) < pe)
 	{
@@ -1291,36 +1216,39 @@ tb_void_t tb_mpool_dump()
 	}
 
 	TB_DBG("blocks info:");
-	TB_DBG("\tdata:%x size:%u", (tb_size_t)g_mpool->blocks_info, (tb_size_t)(g_mpool->data + g_mpool->size - g_mpool->blocks_info));
+	TB_DBG("\tdata:%x size:%u", (tb_size_t)mpool->blocks_info, (tb_size_t)(mpool->data + mpool->size - mpool->blocks_info));
 
 	TB_DBG("=============================================");
 	TB_DBG("mpool status info:");
 	TB_DBG("=============================================");
-	TB_DBG("total:%u", g_mpool->status.total_size);
-	TB_DBG("used:%u", g_mpool->status.used_size);
-	TB_DBG("peak:%u", g_mpool->status.peak_size);
-	TB_DBG("wast:%u%%", g_mpool->status.real_used_size? (g_mpool->status.real_used_size - g_mpool->status.need_used_size) * 100 / g_mpool->status.real_used_size : 0);
-	TB_DBG("fail:%u", g_mpool->status.alloc_failed);
-	TB_DBG("pred:%02d%%, fail: %d, total: %d", g_mpool->status.alloc_total? ((g_mpool->status.alloc_total - g_mpool->status.pred_failed) * 100 / g_mpool->status.alloc_total) : -1, g_mpool->status.pred_failed, g_mpool->status.alloc_total);
+	TB_DBG("total:%u", mpool->status.total_size);
+	TB_DBG("used:%u", mpool->status.used_size);
+	TB_DBG("peak:%u", mpool->status.peak_size);
+	TB_DBG("wast:%u%%", mpool->status.real_used_size? (mpool->status.real_used_size - mpool->status.need_used_size) * 100 / mpool->status.real_used_size : 0);
+	TB_DBG("fail:%u", mpool->status.alloc_failed);
+	TB_DBG("pred:%02d%%, fail: %d, total: %d", mpool->status.alloc_total? ((mpool->status.alloc_total - mpool->status.pred_failed) * 100 / mpool->status.alloc_total) : -1, mpool->status.pred_failed, mpool->status.alloc_total);
 
 	for (i = 0; i < TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT; ++i)
-		TB_DBG("regular chunk:%d total_block_n:%u block_max_n:%u used rate:%u%% recommend_block_n:%u", g_mpool->chunks[i].block_size, g_mpool->chunks[i].block_n, g_mpool->status.rblock_max_n[i], g_mpool->chunks[i].block_n? g_mpool->status.rblock_max_n[i] * 100 / g_mpool->chunks[i].block_n : 0, 2 + g_mpool->status.rblock_max_n[i] * 100 / 80);
-	TB_DBG("nrblock_max_size:%u", g_mpool->status.nrblock_max_size);
+		TB_DBG("regular chunk:%d total_block_n:%u block_max_n:%u used rate:%u%% recommend_block_n:%u", mpool->chunks[i].block_size, mpool->chunks[i].block_n, mpool->status.rblock_max_n[i], mpool->chunks[i].block_n? mpool->status.rblock_max_n[i] * 100 / mpool->chunks[i].block_n : 0, 2 + mpool->status.rblock_max_n[i] * 100 / 80);
+	TB_DBG("nrblock_max_size:%u", mpool->status.nrblock_max_size);
 
-	if (!tb_mpool_check())
+	if (!tb_mpool_check(hpool))
 		TB_DBG("the mpool maybe exists error!");
 }
-tb_bool_t tb_mpool_check()
-{
+tb_bool_t tb_mpool_check(tb_handle_t hpool)
+{	
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN_VAL(mpool, TB_FALSE);
+
 	// check magic
-	if (!g_mpool || g_mpool->magic != TB_MPOOL_MAGIC) return TB_FALSE;
+	if (mpool->magic != TB_MPOOL_MAGIC) return TB_FALSE;
 
 	// check chunk
-	if (!g_mpool->chunks) return TB_FALSE;
+	if (!mpool->chunks) return TB_FALSE;
 
 	//check non-regular chunks
-	tb_byte_t const* p = g_mpool->chunks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT].data;
-	tb_byte_t const* pe = p + g_mpool->chunks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT].size;
+	tb_byte_t const* p = mpool->chunks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT].data;
+	tb_byte_t const* pe = p + mpool->chunks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT].size;
 	if (!p || !pe || p >= pe) return TB_FALSE;
 	while (p + sizeof(tb_mpool_nrblock_head_t) < pe)
 	{
@@ -1339,7 +1267,7 @@ tb_bool_t tb_mpool_check()
 	}
 
 	// is enough?
-	if (TB_FALSE == tb_mpool_allocate_try(g_mpool, 10)) return TB_FALSE;
+	if (TB_FALSE == tb_mpool_allocate_try(mpool, 10)) return TB_FALSE;
 
 	return TB_TRUE;
 }

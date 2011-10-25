@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		malloc.h
+ * \file		memory.h
  *
  */
 #ifndef TB_MEMORY_H
@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "mpool.h"
+#include "malloc.h"
 
 
 // c plus plus
