@@ -18,13 +18,14 @@ tbox_C_FILES 		+= \
 					memory/mpool \
 					memory/malloc \
 					string/string \
-					container/pool \
 					container/hash \
 					container/queue \
 					container/stack \
-					container/vector \
+					container/gpool \
+					container/spool \
 					container/slist \
 					container/dlist \
+					container/vector \
 					network/http \
 					network/dns \
 					network/cookies \
@@ -153,7 +154,7 @@ INC_FILES 			= \
 					string/string.h \
 					container/prefix.h \
 					container/container.h \
-					container/pool.h \
+					container/gpool.h \
 					container/vector.h \
 					container/slist.h \
 					container/dlist.h \

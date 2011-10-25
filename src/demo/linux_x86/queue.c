@@ -14,11 +14,11 @@ static tb_void_t tb_queue_char_free(tb_void_t* data, tb_void_t* priv)
 static tb_void_t tb_queue_char_dump(tb_queue_t const* queue)
 {
 	TB_DBG("size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_queue_head(queue);
-	tb_size_t tail = tb_queue_tail(queue);
-	for (; itor != tail; itor = tb_queue_next(queue, itor))
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
 	{
-		tb_byte_t const* item = tb_queue_const_at(queue, itor);
+		tb_byte_t const* item = tb_queue_itor_const_at(queue, itor);
 		if (item)
 		{
 			TB_DBG("at[%d]: %c", itor, *((tb_char_t const*)item));
@@ -28,7 +28,7 @@ static tb_void_t tb_queue_char_dump(tb_queue_t const* queue)
 static tb_size_t tb_queue_put_and_pop_test()
 {
 	// init
-	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), 10, TB_NULL, TB_NULL);
+	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), 10, TB_NULL);
 	TB_ASSERT_RETURN_VAL(queue, 0);
 
 	tb_queue_put(queue, "0");
@@ -57,8 +57,8 @@ static tb_size_t tb_queue_put_and_pop_test()
 
 	// check
 	TB_ASSERT(tb_queue_size(queue) == 10);
-	TB_ASSERT(tb_queue_const_at_head(queue)[0] == 'F');
-	TB_ASSERT(tb_queue_const_at_last(queue)[0] == 'F');
+	TB_ASSERT(((tb_char_t const*)tb_queue_const_at_head(queue))[0] == 'F');
+	TB_ASSERT(((tb_char_t const*)tb_queue_const_at_last(queue))[0] == 'F');
 
 	// clear it
 	tb_queue_clear(queue);
@@ -74,16 +74,16 @@ static tb_size_t tb_queue_iterator_next_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), n, TB_NULL, TB_NULL);
+	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), n, TB_NULL);
 	TB_ASSERT_RETURN_VAL(queue, 0);
 
 	while (n--) tb_queue_put(queue, "F");
-	tb_size_t itor = tb_queue_head(queue);
-	tb_size_t tail = tb_queue_tail(queue);
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
 	tb_int64_t t = tb_mclock();
-	for (; itor != tail; itor = tb_queue_next(queue, itor))
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_queue_const_at(queue, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_queue_itor_const_at(queue, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -99,19 +99,19 @@ static tb_size_t tb_queue_iterator_prev_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), n, TB_NULL, TB_NULL);
+	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), n, TB_NULL);
 	TB_ASSERT_RETURN_VAL(queue, 0);
 
 	while (n--) tb_queue_put(queue, "F");
-	tb_size_t itor = tb_queue_last(queue);
-	tb_size_t head = tb_queue_head(queue);
+	tb_size_t itor = tb_queue_itor_last(queue);
+	tb_size_t head = tb_queue_itor_head(queue);
 	tb_int64_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_queue_const_at(queue, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_queue_itor_const_at(queue, itor);
 
 		if (itor == head) break;
-		itor = tb_queue_prev(queue, itor);
+		itor = tb_queue_itor_prev(queue, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -132,7 +132,8 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// init queue
-	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), 10, tb_queue_char_free, "char");
+	tb_queue_item_func_t func = {tb_queue_char_free, "char"};
+	tb_queue_t* queue = tb_queue_init(sizeof(tb_char_t), 10, &func);
 	TB_ASSERT_GOTO(queue, end);
 
 

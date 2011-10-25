@@ -14,11 +14,11 @@ static tb_void_t tb_stack_char_free(tb_void_t* data, tb_void_t* priv)
 static tb_void_t tb_stack_char_dump(tb_stack_t const* stack)
 {
 	TB_DBG("size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
-	tb_size_t itor = tb_stack_head(stack);
-	tb_size_t tail = tb_stack_tail(stack);
-	for (; itor != tail; itor = tb_stack_next(stack, itor))
+	tb_size_t itor = tb_stack_itor_head(stack);
+	tb_size_t tail = tb_stack_itor_tail(stack);
+	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
 	{
-		tb_byte_t const* item = tb_stack_const_at(stack, itor);
+		tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
 		if (item)
 		{
 			TB_DBG("at[%d]: %c", itor, *((tb_char_t const*)item));
@@ -28,7 +28,7 @@ static tb_void_t tb_stack_char_dump(tb_stack_t const* stack)
 static tb_size_t tb_stack_put_and_pop_test()
 {
 	// init
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, TB_NULL, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, TB_NULL);
 	TB_ASSERT_RETURN_VAL(stack, 0);
 
 	tb_stack_put(stack, "0");
@@ -57,8 +57,8 @@ static tb_size_t tb_stack_put_and_pop_test()
 
 	// check
 	TB_ASSERT(tb_stack_size(stack) == 10);
-	TB_ASSERT(tb_stack_const_at_head(stack)[0] == '0');
-	TB_ASSERT(tb_stack_const_at_last(stack)[0] == 'F');
+	TB_ASSERT(((tb_char_t const*)tb_stack_const_at_head(stack))[0] == '0');
+	TB_ASSERT(((tb_char_t const*)tb_stack_const_at_last(stack))[0] == 'F');
 
 	// clear it
 	tb_stack_clear(stack);
@@ -74,16 +74,16 @@ static tb_size_t tb_stack_iterator_next_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL);
 	TB_ASSERT_RETURN_VAL(stack, 0);
 
 	while (n--) tb_stack_put(stack, "F");
-	tb_size_t itor = tb_stack_head(stack);
-	tb_size_t tail = tb_stack_tail(stack);
+	tb_size_t itor = tb_stack_itor_head(stack);
+	tb_size_t tail = tb_stack_itor_tail(stack);
 	tb_int64_t t = tb_mclock();
-	for (; itor != tail; itor = tb_stack_next(stack, itor))
+	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_stack_const_at(stack, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -99,19 +99,19 @@ static tb_size_t tb_stack_iterator_prev_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL);
 	TB_ASSERT_RETURN_VAL(stack, 0);
 
 	while (n--) tb_stack_put(stack, "F");
-	tb_size_t itor = tb_stack_last(stack);
-	tb_size_t head = tb_stack_head(stack);
+	tb_size_t itor = tb_stack_itor_last(stack);
+	tb_size_t head = tb_stack_itor_head(stack);
 	tb_int64_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_stack_const_at(stack, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
 
 		if (itor == head) break;
-		itor = tb_stack_prev(stack, itor);
+		itor = tb_stack_itor_prev(stack, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -132,7 +132,8 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// init stack
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, tb_stack_char_free, "char");
+	tb_stack_item_func_t func = {tb_stack_char_free, "char"};
+	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, &func);
 	TB_ASSERT_GOTO(stack, end);
 
 

@@ -40,6 +40,16 @@ extern "C" {
 
 /* the stack type
  *
+ * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                                           last    tail
+ *
+ * stack: |||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                   last    tail
+ *
+ * head: => the first item
+ * last: => the last item
+ * tail: => behind the last item, no item
+
  * performance: 
  *
  * push: 	fast
@@ -52,69 +62,54 @@ extern "C" {
  * \note the index of the same item is fixed
  *
  */
-typedef tb_vector_t tb_stack_t;
+typedef tb_vector_t 			tb_stack_t;
+typedef tb_vector_item_func_t 	tb_stack_item_func_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 // init & exit
-tb_stack_t* 		tb_stack_init(tb_size_t step, tb_size_t grow, tb_void_t (*free)(tb_void_t* , tb_void_t* ), tb_void_t* priv);
+tb_stack_t* 		tb_stack_init(tb_size_t step, tb_size_t grow, tb_stack_item_func_t const* func);
 tb_void_t 			tb_stack_exit(tb_stack_t* stack);
 
 // accessors
-tb_byte_t* 			tb_stack_at(tb_stack_t* stack, tb_size_t index);
-tb_byte_t* 			tb_stack_at_head(tb_stack_t* stack);
-tb_byte_t* 			tb_stack_at_last(tb_stack_t* stack);
+tb_void_t* 			tb_stack_at_head(tb_stack_t* stack);
+tb_void_t* 			tb_stack_at_last(tb_stack_t* stack);
 
-tb_byte_t const* 	tb_stack_const_at(tb_stack_t const* stack, tb_size_t index);
-tb_byte_t const* 	tb_stack_const_at_head(tb_stack_t const* stack);
-tb_byte_t const* 	tb_stack_const_at_last(tb_stack_t const* stack);
+tb_void_t const* 	tb_stack_const_at_head(tb_stack_t const* stack);
+tb_void_t const* 	tb_stack_const_at_last(tb_stack_t const* stack);
 
 // modifiors
 tb_void_t 			tb_stack_clear(tb_stack_t* stack);
 
-tb_void_t 	 		tb_stack_put(tb_stack_t* stack, tb_byte_t const* item);
-tb_void_t 	 		tb_stack_pop(tb_stack_t* stack, tb_byte_t* item);
+tb_void_t 	 		tb_stack_put(tb_stack_t* stack, tb_void_t const* item);
+tb_void_t 	 		tb_stack_pop(tb_stack_t* stack, tb_void_t* item);
 
 /* iterator
  * 
- * tb_size_t itor = tb_stack_head(stack);
- * tb_size_t tail = tb_stack_tail(stack);
- * for (; itor != tail; itor = tb_stack_next(stack, itor))
+ * tb_size_t itor = tb_stack_itor_head(stack);
+ * tb_size_t tail = tb_stack_itor_tail(stack);
+ * for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
  * {
- * 		tb_byte_t const* item = tb_stack_const_at(stack, itor);
+ * 		tb_void_t const* item = tb_stack_itor_const_at(stack, itor);
  * 		if (item)
  * 		{
  * 			// ...
  * 		}
  * }
- *
- * tb_size_t itor = 0;
- * tb_size_t size = tb_stack_size(stack);
- * for (itor = 0; itor < size; itor++)
- * {
- * 		// ...
- * }
- *
- * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
- *       head                                                           last    tail
- *
- * stack: |||||||||||||||||||||||||||||||||||||||||------|
- *       head                                   last    tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
  */
-tb_size_t 			tb_stack_head(tb_stack_t const* stack);
-tb_size_t 			tb_stack_tail(tb_stack_t const* stack);
-tb_size_t 			tb_stack_last(tb_stack_t const* stack);
-tb_size_t 			tb_stack_size(tb_stack_t const* stack);
-tb_size_t 			tb_stack_next(tb_stack_t const* stack, tb_size_t index);
-tb_size_t 			tb_stack_prev(tb_stack_t const* stack, tb_size_t index);
+tb_void_t* 			tb_stack_itor_at(tb_stack_t* stack, tb_size_t itor);
+tb_void_t const* 	tb_stack_itor_const_at(tb_stack_t const* stack, tb_size_t itor);
+
+tb_size_t 			tb_stack_itor_head(tb_stack_t const* stack);
+tb_size_t 			tb_stack_itor_tail(tb_stack_t const* stack);
+tb_size_t 			tb_stack_itor_last(tb_stack_t const* stack);
+tb_size_t 			tb_stack_itor_next(tb_stack_t const* stack, tb_size_t itor);
+tb_size_t 			tb_stack_itor_prev(tb_stack_t const* stack, tb_size_t itor);
 
 // attributes
+tb_size_t 			tb_stack_size(tb_stack_t const* stack);
 tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
 
 

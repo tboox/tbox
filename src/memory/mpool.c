@@ -92,9 +92,9 @@
 // prediction
 #define TB_MPOOL_PRED_ENABLE
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX 		(128)
+# 	define TB_MPOOL_PRED_RBLOCKS_MAX 		(128)
 #else
-# 	define TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX 		(256)
+# 	define TB_MPOOL_PRED_RBLOCKS_MAX 		(256)
 #endif
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ typedef struct __tb_mpool_t
 
 	// the predicted block
 #ifdef TB_MPOOL_PRED_ENABLE
-	tb_size_t 			pred_rblocks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT][TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX];
+	tb_size_t 			pred_rblocks[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT][TB_MPOOL_PRED_RBLOCKS_MAX];
 	tb_size_t 			pred_rblocks_n[TB_MPOOL_REGULAR_CHUNCK_MAX_COUNT];
 	tb_byte_t* 			pred_nrblock;
 #endif
@@ -605,7 +605,7 @@ tb_handle_t tb_mpool_init(tb_void_t* data, tb_size_t size)
 
 		// init predicted info
 #ifdef TB_MPOOL_PRED_ENABLE
-		tb_size_t m = rblockn[i] < TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX? rblockn[i] : TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX;
+		tb_size_t m = rblockn[i] < TB_MPOOL_PRED_RBLOCKS_MAX? rblockn[i] : TB_MPOOL_PRED_RBLOCKS_MAX;
 		tb_size_t n = m;
 		while (n--) mpool->pred_rblocks[i][n] = mpool->chunks[i].start_block + m - n - 1;
 		mpool->pred_rblocks_n[i] = m;
@@ -656,6 +656,16 @@ tb_void_t tb_mpool_exit(tb_handle_t hpool)
 	// clear
 	if (mpool->data) tb_memset(mpool->data, 0, mpool->size);
 	tb_memset(mpool, 0, sizeof(tb_mpool_t));
+}
+
+tb_bool_t tb_mpool_move(tb_handle_t hpool, tb_void_t* data, tb_size_t size)
+{
+	// check 
+	tb_mpool_t* mpool = (tb_mpool_t*)hpool;
+	TB_ASSERT_RETURN_VAL(mpool && mpool->magic == TB_MPOOL_MAGIC, TB_FALSE);
+	TB_ASSERT_RETURN_VAL(data && size, TB_FALSE);
+
+	return TB_TRUE;
 }
 
 #ifndef TB_DEBUG
@@ -855,7 +865,6 @@ tb_void_t* tb_mpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const*
 	mpool->status.alloc_failed++;
 #endif
 	
-	TB_ASSERTM(0, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
 	return TB_NULL;
 }
 #ifndef TB_DEBUG
@@ -903,7 +912,7 @@ tb_bool_t tb_mpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t cons
 
 		// predict the next free block
 	#ifdef TB_MPOOL_PRED_ENABLE
-		if (mpool->pred_rblocks_n[chunk_i] < TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX)
+		if (mpool->pred_rblocks_n[chunk_i] < TB_MPOOL_PRED_RBLOCKS_MAX)
 			mpool->pred_rblocks[chunk_i][mpool->pred_rblocks_n[chunk_i]++] = block_i;
 	#endif
 
@@ -950,7 +959,6 @@ tb_bool_t tb_mpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t cons
 		return TB_TRUE;
 	}
 
-	TB_ASSERTM(0, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return TB_FALSE;
 }
 
@@ -1023,7 +1031,7 @@ tb_void_t* tb_mpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t siz
 
 			// predict the next free block
 		#ifdef TB_MPOOL_PRED_ENABLE
-			if (mpool->pred_rblocks_n[chunk_i] < TB_MEMORY_MPOOL_PRED_RBLOCKS_MAX)
+			if (mpool->pred_rblocks_n[chunk_i] < TB_MPOOL_PRED_RBLOCKS_MAX)
 				mpool->pred_rblocks[chunk_i][mpool->pred_rblocks_n[chunk_i]++] = block_i;
 		#endif
 
@@ -1130,7 +1138,6 @@ tb_void_t* tb_mpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t siz
 			return p;
 		}
 	}
-	TB_ASSERTM(0, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return TB_NULL;
 }
 

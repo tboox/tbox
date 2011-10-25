@@ -31,7 +31,6 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-
 static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 {
 	tb_hash_t* hash = priv;
