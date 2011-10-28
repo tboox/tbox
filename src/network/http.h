@@ -88,7 +88,11 @@ typedef struct __tb_http_option_t
 	tb_uint16_t 		bkalive : 1;
 
 	// timeout, ms
-	tb_uint16_t 		timeout;
+	tb_size_t 			timeout;
+
+	// range
+	tb_size_t 			range_b;
+	tb_size_t 			range_e;
 
 	// the head funcs
 	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_void_t* priv);
@@ -150,6 +154,9 @@ typedef struct __tb_http_status_t
 	// the content size
 	tb_size_t 			content_size;
 
+	// the document size
+	tb_size_t 			document_size;
+
 	// the chunked size
 	tb_size_t 			chunked_read;
 	tb_size_t 			chunked_size;
@@ -190,7 +197,8 @@ tb_bool_t 				tb_http_option_set_host(tb_handle_t handle, tb_char_t const* host)
 tb_bool_t 				tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path);
 tb_bool_t 				tb_http_option_set_block(tb_handle_t handle, tb_bool_t bblock);
 tb_bool_t 				tb_http_option_set_kalive(tb_handle_t handle, tb_bool_t bkalive);
-tb_bool_t 				tb_http_option_set_timeout(tb_handle_t handle, tb_uint16_t timeout);
+tb_bool_t 				tb_http_option_set_timeout(tb_handle_t handle, tb_size_t timeout);
+tb_bool_t 				tb_http_option_set_range(tb_handle_t handle, tb_size_t range_b, tb_size_t range_e);
 tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirect);
 tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
@@ -205,10 +213,12 @@ tb_bool_t 				tb_http_option_set_swrite_func(tb_handle_t handle, tb_int_t (*swri
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
 tb_size_t				tb_http_status_content_size(tb_handle_t handle);
 tb_char_t const*		tb_http_status_content_type(tb_handle_t handle);
+tb_size_t				tb_http_status_document_size(tb_handle_t handle);
 tb_size_t				tb_http_status_code(tb_handle_t handle);
 tb_bool_t				tb_http_status_ischunked(tb_handle_t handle);
 tb_bool_t				tb_http_status_isredirect(tb_handle_t handle);
 tb_bool_t				tb_http_status_iskalive(tb_handle_t handle);
+tb_bool_t				tb_http_status_isseeked(tb_handle_t handle);
 tb_size_t				tb_http_status_redirect(tb_handle_t handle);
 tb_void_t 				tb_http_status_dump(tb_handle_t handle);
 

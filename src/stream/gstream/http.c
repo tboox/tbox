@@ -77,11 +77,7 @@ static tb_void_t tb_hstream_close(tb_gstream_t* gst)
 static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	if (hst)
-	{
-		if (hst->http)
-			tb_http_exit(hst->http);
-	}
+	if (hst && hst->http) tb_http_destroy(hst->http);
 }
 static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
@@ -114,13 +110,58 @@ static tb_size_t tb_hstream_size(tb_gstream_t const* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(hst && hst->http, 0);
 
-	return tb_http_status_content_size(hst->http);
+	return tb_http_status_document_size(hst->http);
 }
 static tb_size_t tb_hstream_offset(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	TB_ASSERT_RETURN_VAL(hst && hst->http, 0);
 	return hst->offset;
+}
+static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+{
+	tb_hstream_t* hst = tb_hstream_cast(gst);
+	TB_ASSERT_RETURN_VAL(hst && hst->http, TB_FALSE);
+
+	// is seekable?
+	if (!tb_http_status_isseeked(hst->http)) return TB_FALSE;
+
+	// get size
+	tb_size_t size = tb_http_status_content_size(hst->http);
+	TB_ASSERT_RETURN_VAL(size, TB_FALSE);
+
+	// compute range
+	tb_size_t range = offset;
+	switch (flag)
+	{
+	case TB_GSTREAM_SEEK_BEG:
+		break;
+	case TB_GSTREAM_SEEK_CUR:
+		range = hst->offset + offset;
+		break;
+	case TB_GSTREAM_SEEK_END:
+		range = size + offset;
+		break;
+	default:
+		break;
+	}
+	TB_ASSERT_RETURN_VAL(range <= size, TB_FALSE);
+
+	if (range != hst->offset)
+	{
+		// close it
+		tb_http_close(hst->http);
+
+		// set range
+		tb_http_option_set_range(hst->http, offset, 0);
+
+		// reopen it
+		if (!tb_http_open(hst->http)) return TB_FALSE;
+
+		// update offset
+		hst->offset = range;
+	}
+	return TB_TRUE;
 }
 static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {
@@ -239,6 +280,11 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 			TB_ASSERT_RETURN_VAL(arg1 && arg2, TB_FALSE);
 			return tb_http_option_set_post(hst->http, (tb_byte_t const*)arg1, (tb_size_t)arg2);
 		}
+	case TB_HSTREAM_CMD_SET_RANGE:
+		{
+			TB_ASSERT_RETURN_VAL(arg1 && arg2, TB_FALSE);
+			return tb_http_option_set_range(hst->http, (tb_size_t)arg1, (tb_size_t)arg2);
+		}
 	default:
 		break;
 	}
@@ -261,6 +307,7 @@ tb_gstream_t* tb_gstream_create_http()
 	gst->free 	= tb_hstream_free;
 	gst->read 	= tb_hstream_read;
 	gst->bread 	= tb_hstream_bread;
+	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
 	gst->offset = tb_hstream_offset;
 	gst->ioctl1 = tb_hstream_ioctl1;

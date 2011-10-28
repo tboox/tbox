@@ -89,6 +89,10 @@ static tb_http_option_t g_http_option_default =
 	// timeout
 ,	TB_HTTP_TIMEOUT_DEFAULT
 
+	// range
+, 	0
+, 	0
+
 	// head func
 , 	TB_NULL
 , 	TB_NULL
@@ -462,6 +466,17 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 	if (!tb_http_head_find(http, "Accept")) 
 		tb_string_append_c_string(head, "Accept: */*\r\n");
 
+	// append range
+	if (!tb_http_head_find(http, "Range")) 
+	{
+		if (http->option.range_b && http->option.range_e > http->option.range_b)
+			tb_string_append_format(head, "Range: bytes=%u-%u\r\n", http->option.range_b, http->option.range_e);
+		else if (http->option.range_b && !http->option.range_e)
+			tb_string_append_format(head, "Range: bytes=%u-\r\n", http->option.range_b);
+		else if (!http->option.range_b && http->option.range_e)
+			tb_string_append_format(head, "Range: bytes=0-%u\r\n", http->option.range_e);
+	}
+
 	// append content size if post data
 	if (http->option.method == TB_HTTP_METHOD_POST 
 		&& http->option.post_data && http->option.post_size)
@@ -490,9 +505,11 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 		else tb_string_append_c_string(head, "Connection: close\r\n");
 	}
 
+#if 0
 	// append connection
 	if (http->option.bkalive && TB_FALSE == tb_http_head_find(http, "Keep-Alive"))
 		tb_string_append_c_string(head, "Keep-Alive: 115\r\n");
+#endif
 
 #if 0
 	// append language
@@ -604,16 +621,33 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!tb_stricmp(tag, "Content-Range"))
 		{
-			tb_int_t offset = 0, filesize = 0;
+			tb_size_t from = 0;
+			tb_size_t to = 0;
+			tb_size_t document_size = 0;
 			if (!tb_strncmp(p, "bytes ", 6)) 
 			{
 				p += 6;
-				offset = tb_s10tou32(p);
-				tb_char_t const* slash = (tb_char_t const*)tb_strchr(p, '/');
-				if (slash && tb_strlen(slash) > 0)
-					filesize = tb_s10tou32(slash + 1);
-				//TB_DBG("[http]::range: %d - %d", offset, filesize);
+				from = TB_CONV_S10TOU32(p);
+				while (*p && *p != '-') p++;
+				if (*p && *p++ == '-') to = tb_s10tou32(p);
+				while (*p && *p != '/') p++;
+				if (*p && *p++ == '/') document_size = TB_CONV_S10TOU32(p);
+				//TB_DBG("[http]::range: %u - %u / %u\n", from, to, document_size);
 			}
+			// no stream, be able to seek
+			http->status.bseeked = 1;
+			http->status.document_size = document_size;
+			if (!http->status.content_size) 
+			{
+				if (from && to > from) http->status.content_size = to - from;
+				else if (!from && to) http->status.content_size = to;
+				else if (from && !to && document_size > from) http->status.content_size = document_size - from;
+				else http->status.content_size = document_size;
+			}
+		}
+		// parse accept-ranges: "bytes "
+		else if (!tb_stricmp (tag, "Accept-Ranges"))
+		{
 			// no stream, be able to seek
 			http->status.bseeked = 1;
 		}
@@ -705,6 +739,7 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 	http->status.bredirect = 0;
 	http->status.bkalive = 0;
 	http->status.content_size = 0;
+	http->status.document_size = 0;
 	http->status.chunked_read = 0;
 	http->status.chunked_size = 0;
 	http->status.code = 0;
@@ -915,12 +950,21 @@ tb_bool_t tb_http_option_set_kalive(tb_handle_t handle, tb_bool_t bkalive)
 	http->option.bkalive = bkalive == TB_TRUE? 1 : 0;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_timeout(tb_handle_t handle, tb_uint16_t timeout)
+tb_bool_t tb_http_option_set_timeout(tb_handle_t handle, tb_size_t timeout)
 {
 	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
 
 	http->option.timeout = timeout;
+	return TB_TRUE;
+}
+tb_bool_t tb_http_option_set_range(tb_handle_t handle, tb_size_t range_b, tb_size_t range_e)
+{
+	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
+	tb_http_t* http = (tb_http_t*)handle;
+
+	http->option.range_b = range_b;
+	http->option.range_e = range_e;
 	return TB_TRUE;
 }
 tb_bool_t tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirect)
@@ -1018,6 +1062,13 @@ tb_size_t tb_http_status_content_size(tb_handle_t handle)
 	return http->status.content_size;
 }
 
+tb_size_t tb_http_status_document_size(tb_handle_t handle)
+{	
+	TB_ASSERT_RETURN_VAL(handle, 0);
+	tb_http_t* http = (tb_http_t*)handle;
+
+	return http->status.document_size;
+}
 tb_char_t const* tb_http_status_content_type(tb_handle_t handle)
 {
 	TB_ASSERT_RETURN_VAL(handle, TB_NULL);
@@ -1046,6 +1097,13 @@ tb_bool_t tb_http_status_iskalive(tb_handle_t handle)
 	tb_http_t* http = (tb_http_t*)handle;
 
 	return http->status.bkalive? TB_TRUE : TB_FALSE;
+}
+tb_bool_t tb_http_status_isseeked(tb_handle_t handle)
+{
+	TB_ASSERT_RETURN_VAL(handle, TB_FALSE);
+	tb_http_t* http = (tb_http_t*)handle;
+
+	return http->status.bseeked? TB_TRUE : TB_FALSE;
 }
 tb_size_t tb_http_status_redirect(tb_handle_t handle)
 {
@@ -1077,6 +1135,7 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	TB_DBG("[http]::option:redirect: %d", http->option.redirect);
 	TB_DBG("[http]::option:block: %s", http->option.bblock? "true" : "false");
 	TB_DBG("[http]::option:https: %s", http->option.bhttps? "true" : "false");
+	TB_DBG("[http]::option:range: %u-%u", http->option.range_b, http->option.range_e);
 	TB_DBG("[http]::option:keepalive: %s", http->option.bkalive? "true" : "false");
 
 	if (http->option.cookies)
@@ -1104,6 +1163,7 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	TB_DBG("[http]::status:version: %s", http->status.version == TB_HTTP_VERSION_11? "HTTP/1.1" : "HTTP/1.0");
 	TB_DBG("[http]::status:content:type: %s", http->status.content_type);
 	TB_DBG("[http]::status:content:size: %d", http->status.content_size);
+	TB_DBG("[http]::status:document:size: %d", http->status.document_size);
 	TB_DBG("[http]::status:chunked:read: %d", http->status.chunked_read);
 	TB_DBG("[http]::status:chunked:size: %d", http->status.chunked_size);
 	TB_DBG("[http]::status:redirect: %d", http->status.redirect);
