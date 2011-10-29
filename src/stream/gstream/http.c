@@ -77,7 +77,7 @@ static tb_void_t tb_hstream_close(tb_gstream_t* gst)
 static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	if (hst && hst->http) tb_http_destroy(hst->http);
+	if (hst && hst->http) tb_http_exit(hst->http);
 }
 static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {

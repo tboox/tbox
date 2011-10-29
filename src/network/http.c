@@ -627,11 +627,11 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			if (!tb_strncmp(p, "bytes ", 6)) 
 			{
 				p += 6;
-				from = TB_CONV_S10TOU32(p);
+				from = tb_s10tou32(p);
 				while (*p && *p != '-') p++;
 				if (*p && *p++ == '-') to = tb_s10tou32(p);
 				while (*p && *p != '/') p++;
-				if (*p && *p++ == '/') document_size = TB_CONV_S10TOU32(p);
+				if (*p && *p++ == '/') document_size = tb_s10tou32(p);
 				//TB_DBG("[http]::range: %u - %u / %u\n", from, to, document_size);
 			}
 			// no stream, be able to seek

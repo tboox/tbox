@@ -240,8 +240,11 @@ static tb_char_t const* tb_hash_name_mem_cstr_func(tb_void_t const* name, tb_cha
 
 tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name_func, tb_hash_item_func_t const* item_func)
 {
+	TB_ASSERT_RETURN_VAL(!(size % 2), TB_NULL);
+
+	// alloc hash
 	tb_hash_t* hash = (tb_hash_t*)tb_calloc(1, sizeof(tb_hash_t));
-	TB_ASSERT_RETURN_VAL(hash && !(size % 2), TB_NULL);
+	TB_ASSERT_RETURN_VAL(hash, TB_NULL);
 
 	// init hash func
 	hash->name_func = name_func;
