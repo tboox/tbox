@@ -48,12 +48,18 @@ extern "C" {
 # 	define tb_mpool_free(hpool, data) 					tb_mpool_deallocate(hpool, data)
 #endif
 
+#define TB_MPOOL_SIZE_MIN 								g_mpool_size_min
+
+/* /////////////////////////////////////////////////////////
+ * the globals
+ */
+extern tb_size_t const g_mpool_size_min;
+
 /* /////////////////////////////////////////////////////////
  * the interfaces
  */
 tb_handle_t 	tb_mpool_init(tb_void_t* data, tb_size_t size);
 tb_void_t 		tb_mpool_exit(tb_handle_t hpool);
-tb_bool_t 		tb_mpool_move(tb_handle_t hpool, tb_void_t* data, tb_size_t size);
 
 #ifndef TB_DEBUG
 tb_void_t* 		tb_mpool_allocate(tb_handle_t hpool, tb_size_t size);

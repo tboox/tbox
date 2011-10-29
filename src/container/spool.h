@@ -32,19 +32,44 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "slist.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_SPOOL_SIZE_MICRO 				(8096)
+#define TB_SPOOL_SIZE_SMALL 				(65536)
+#define TB_SPOOL_SIZE_LARGE 				(256 * 1024)
+
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_SPOOL_SIZE_DEFAULT 			TB_SPOOL_SIZE_SMALL
+#else
+# 	define TB_SPOOL_SIZE_DEFAULT 			TB_SPOOL_SIZE_LARGE
+#endif
+
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 
-// the string pool type
+/* the string or small pool type for reducing memory fragmentation
+ * 
+ * small data:   |-------|---|-----|    |--|------|----|-|
+ * chunk list:   |-----------------| => |----------------| => 0
+ * local spool:  |-----------------------------------------|                      |---------------------|
+ * global mpool: |----------------------------------------------------------------------------------------------|
+ *                                 tb_malloc ...
+ */
 typedef struct __tb_spool_t
 {
 	// the chunk list
-	tb_slist_t* 				list;
+	tb_slist_t* 		list;
 
 	// the chunk pred
-	tb_size_t 					pred;
+	tb_size_t 			pred;
+
+	// the chunk size
+	tb_size_t 			size;
 
 }tb_spool_t;
 
@@ -59,8 +84,16 @@ tb_void_t 			tb_spool_exit(tb_spool_t* spool);
 // modifiors
 tb_void_t 			tb_spool_clear(tb_spool_t* spool);
 
-tb_char_t const* 	tb_spool_dup(tb_spool_t* spool, tb_char_t const* s);
-tb_void_t 			tb_spool_del(tb_spool_t* spool, tb_char_t const* s);
+// malloc
+tb_void_t* 			tb_spool_malloc(tb_spool_t* spool, tb_size_t size);
+tb_void_t* 			tb_spool_calloc(tb_spool_t* spool, tb_size_t item, tb_size_t size);
+tb_void_t* 			tb_spool_realloc(tb_spool_t* spool, tb_void_t* data, tb_size_t size);
+tb_void_t 			tb_spool_free(tb_spool_t* spool, tb_void_t* data);
+
+// string
+tb_char_t* 			tb_spool_strdup(tb_spool_t* spool, tb_char_t const* s);
+tb_char_t* 			tb_spool_strndup(tb_spool_t* spool, tb_char_t const* s, tb_size_t n);
+
 
 
 // c plus plus

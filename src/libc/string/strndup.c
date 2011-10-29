@@ -42,7 +42,7 @@ tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 	if (p)
 	{
 		tb_memcpy(p, s, n);
-		p[n] = 0;
+		p[n] = '\0';
 	}
 
 	return p;

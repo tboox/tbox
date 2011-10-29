@@ -83,6 +83,7 @@ extern "C" {
 #define TB_IF_REACHED_GOTO(x, b) 					do { goto b; } while (0)
 
 #define TB_ASSERT_RETURN(x) 						do { TB_ASSERT(x); if (!(x)) return ; } while (0)
+#define TB_ASSERT_BREAK(x) 							{ TB_ASSERT(x); if (!(x)) break ; }
 #define TB_ASSERT_ABORT(x) 							do { TB_ASSERT(x); if (!(x)) { __tb_volatile__ tb_int_t* a = 0; *a = 1; } ; } while (0)
 #define TB_ASSERT_RETURN_VAL(x, v) 					do { TB_ASSERT(x); if (!(x)) return (v); } while (0)
 #define TB_ASSERT_GOTO(x, b) 						do { TB_ASSERT(x); if (!(x)) goto b; } while (0)

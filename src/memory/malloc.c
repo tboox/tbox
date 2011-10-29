@@ -26,6 +26,21 @@
 #include "malloc.h"
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef TB_DEBUG
+#	define TB_MPOOL_ALLOCATE(hpool, size, func, line, file) 			tb_mpool_allocate(hpool, size, func, line, file)
+# 	define TB_MPOOL_CALLOCATE(hpool, item, size, func, line, file) 		tb_mpool_callocate(hpool, item, size, func, line, file)
+# 	define TB_MPOOL_REALLOCATE(hpool, data, size, func, line, file) 	tb_mpool_reallocate(hpool, data, size, func, line, file)
+# 	define TB_MPOOL_DEALLOCATE(hpool, data, func, line, file) 			tb_mpool_deallocate(hpool, data, func, line, file)
+#else
+# 	define TB_MPOOL_ALLOCATE(hpool, size, func, line, file) 			tb_mpool_allocate(hpool, size)
+# 	define TB_MPOOL_CALLOCATE(hpool, item, size, func, line, file) 		tb_mpool_callocate(hpool, item, size)
+# 	define TB_MPOOL_REALLOCATE(hpool, data, size, func, line, file) 	tb_mpool_reallocate(hpool, data, size)
+# 	define TB_MPOOL_DEALLOCATE(hpool, data, func, line, file) 			tb_mpool_deallocate(hpool, data)
+#endif
+
+/* /////////////////////////////////////////////////////////
  * globals
  */
 static tb_handle_t g_mpool = TB_NULL;
@@ -77,7 +92,7 @@ tb_void_t* tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t l
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
-	tb_byte_t* p = tb_mpool_allocate(g_mpool, size, func, line, file);
+	tb_byte_t* p = TB_MPOOL_ALLOCATE(g_mpool, size, func, line, file);
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
@@ -97,7 +112,7 @@ tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* 
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
-	tb_byte_t* p = tb_mpool_callocate(g_mpool, item, size, func, line, file);
+	tb_byte_t* p = TB_MPOOL_CALLOCATE(g_mpool, item, size, func, line, file);
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
@@ -118,7 +133,7 @@ tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
-	tb_byte_t* p = tb_mpool_reallocate(g_mpool, data, size, func, line, file);
+	tb_byte_t* p = TB_MPOOL_REALLOCATE(g_mpool, data, size, func, line, file);
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
@@ -138,12 +153,13 @@ tb_void_t tb_memory_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return ;
-	tb_bool_t ret = tb_mpool_deallocate(g_mpool, data, func, line, file);
+	tb_bool_t ret = TB_MPOOL_DEALLOCATE(g_mpool, data, func, line, file);
 	tb_mutex_unlock(g_mutex);
 
 	TB_ASSERTM(ret, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 }
 
+#ifdef TB_DEBUG
 tb_void_t tb_memory_dump()
 {
 	// check 
@@ -165,3 +181,4 @@ tb_bool_t tb_memory_check()
 	tb_mutex_unlock(g_mutex);
 	return ret;
 }
+#endif

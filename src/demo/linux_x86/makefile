@@ -23,6 +23,9 @@ NAMES = test \
 		dlist \
 		queue \
 		stack \
+		spool \
+		gpool \
+		mpool \
 		vector \
 		base32 \
 		base64 \

@@ -9,7 +9,9 @@
  */
 
 #ifdef TB_DEBUG
-# 	define tb_hash_test_dump(h) 				tb_hash_dump(h)
+# 	define tb_hash_test_dump(h) 		tb_hash_dump(h)
+#else
+# 	define tb_hash_test_dump(h)
 #endif
 
 #define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, (tb_void_t const*)s, (tb_void_t const*)&n); } while (0);
