@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "slist.h"
+#include "spool.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -175,10 +176,10 @@ tb_size_t 				tb_hash_size(tb_hash_t const* hash);
 tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
 
 // hash name func
-tb_hash_name_func_t 	tb_hash_name_func_str(); 				//!< cstring
-tb_hash_name_func_t 	tb_hash_name_func_int(); 				//!< integer
-tb_hash_name_func_t 	tb_hash_name_func_ptr(); 				//!< pointer
-tb_hash_name_func_t 	tb_hash_name_func_mem(tb_size_t size); 	//!< memory
+tb_hash_name_func_t 	tb_hash_name_func_str(tb_spool_t* spool); 	//!< cstring
+tb_hash_name_func_t 	tb_hash_name_func_int(); 					//!< integer
+tb_hash_name_func_t 	tb_hash_name_func_ptr(); 					//!< pointer
+tb_hash_name_func_t 	tb_hash_name_func_mem(tb_size_t size); 		//!< memory
 
 // debug
 tb_void_t 				tb_hash_dump(tb_hash_t const* hash);

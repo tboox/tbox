@@ -113,11 +113,15 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
 // cstring
 static tb_void_t tb_hash_name_str_free_func(tb_void_t* name, tb_void_t* priv)
 {
-	if (name) tb_free(name);
+	if (name) 
+	{
+		if (priv) tb_spool_free((tb_spool_t*)priv, name);
+		else tb_free(name);
+	}
 }
 static tb_void_t* tb_hash_name_str_dupl_func(tb_void_t const* name, tb_void_t* priv)
 {
-	return tb_strdup(name);
+	return priv? tb_spool_strdup((tb_spool_t*)priv, name) : tb_strdup(name);
 }
 #if 1
 static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
@@ -403,7 +407,7 @@ tb_size_t tb_hash_maxn(tb_hash_t const* hash)
 	TB_ASSERT_RETURN_VAL(hash && hash->item_list, 0);
 	return tb_slist_maxn(hash->item_list);
 }
-tb_hash_name_func_t tb_hash_name_func_str()
+tb_hash_name_func_t tb_hash_name_func_str(tb_spool_t* spool)
 {
 	tb_hash_name_func_t func;
 	func.hash = tb_hash_name_str_hash_func;
@@ -411,7 +415,7 @@ tb_hash_name_func_t tb_hash_name_func_str()
 	func.dupl = tb_hash_name_str_dupl_func;
 	func.cstr = tb_hash_name_str_cstr_func;
 	func.free = tb_hash_name_str_free_func;
-	func.priv = TB_NULL;
+	func.priv = spool;
 	return func;
 }
 tb_hash_name_func_t tb_hash_name_func_int()
