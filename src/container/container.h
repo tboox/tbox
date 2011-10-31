@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "item.h"
 #include "hash.h"
 #include "gpool.h"
 #include "spool.h"

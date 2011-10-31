@@ -37,7 +37,7 @@ static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 	TB_ASSERT_RETURN(hash);
 
 	if (hash->name_func.free) hash->name_func.free(((tb_hash_item_t*)item)->name, hash->name_func.priv);
-	if (hash->item_func.free) hash->item_func.free(((tb_hash_item_t*)item)->data, hash->item_func.priv);
+	if (hash->data_func.free) hash->data_func.free(((tb_hash_item_t*)item)->data, hash->data_func.priv);
 }
 static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* pprev, tb_size_t* pbuck)
 {
@@ -106,143 +106,12 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
 
 	return 0;
 }
-/* /////////////////////////////////////////////////////////
- * func
- */
 
-// cstring
-static tb_void_t tb_hash_name_str_free_func(tb_void_t* name, tb_void_t* priv)
-{
-	if (name) 
-	{
-		if (priv) tb_spool_free((tb_spool_t*)priv, name);
-		else tb_free(name);
-	}
-}
-static tb_void_t* tb_hash_name_str_dupl_func(tb_void_t const* name, tb_void_t* priv)
-{
-	return priv? tb_spool_strdup((tb_spool_t*)priv, name) : tb_strdup(name);
-}
-#if 1
-static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(name && size, 0);
-
-	tb_size_t h = 2166136261;
-	tb_byte_t const* p = name;
-	while (*p) h = 16777619 * h ^ (tb_size_t)(*p++);
-
-	return (h & (size - 1));
-}
-#else
-static tb_size_t tb_hash_name_str_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(name && size, 0);
-	return (tb_strlen(name) & (size - 1));
-}
-#endif
-static tb_int_t tb_hash_name_str_comp_func(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv)
-{
-	return tb_strcmp(lname, rname);
-}
-
-static tb_char_t const* tb_hash_name_str_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	return (tb_char_t const*)name;
-}
-
-// integer
-static tb_void_t tb_hash_name_int_free_func(tb_void_t* name, tb_void_t* priv)
-{
-}
-static tb_void_t* tb_hash_name_int_dupl_func(tb_void_t const* name, tb_void_t* priv)
-{
-	return name;
-}
-static tb_size_t tb_hash_name_int_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(size, 0);
-	return (((tb_size_t)name) ^ 0xdeadbeef) & (size - 1);
-}
-static tb_int_t tb_hash_name_int_comp_func(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv)
-{
-	return (lname - rname);
-}
-static tb_char_t const* tb_hash_name_int_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(data, TB_NULL);
-	tb_int_t n = tb_snprintf(data, maxn, "%d", name);
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
-
-// pointer
-static tb_void_t tb_hash_name_ptr_free_func(tb_void_t* name, tb_void_t* priv)
-{
-}
-static tb_void_t* tb_hash_name_ptr_dupl_func(tb_void_t const* name, tb_void_t* priv)
-{
-	return name;
-}
-static tb_size_t tb_hash_name_ptr_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(size, 0);
-	return (((tb_size_t)name) ^ 0xdeadbeef) & (size - 1);
-}
-static tb_int_t tb_hash_name_ptr_comp_func(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv)
-{
-	return (lname - rname);
-}
-static tb_char_t const* tb_hash_name_ptr_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(data, TB_NULL);
-	tb_int_t n = tb_snprintf(data, maxn, "%x", name);
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
-
-// memory
-static tb_void_t tb_hash_name_mem_free_func(tb_void_t* name, tb_void_t* priv)
-{
-	if (name) tb_free(name);
-}
-static tb_void_t* tb_hash_name_mem_dupl_func(tb_void_t const* name, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(priv, TB_NULL);
-	
-	tb_void_t* p = tb_malloc((tb_size_t)priv);
-	TB_ASSERT_RETURN_VAL(p, TB_NULL);
-
-	return tb_memcpy(p, name, (tb_size_t)priv);
-}
-static tb_size_t tb_hash_name_mem_hash_func(tb_void_t const* name, tb_size_t size, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(name && size, 0);
-
-	tb_size_t h = 2166136261;
-	tb_byte_t const* p = name;
-	tb_byte_t const* e = p + (tb_size_t)priv;
-	while (p < e && *p) h = 16777619 * h ^ (tb_size_t)(*p++);
-
-	return (h & (size - 1));
-}
-static tb_int_t tb_hash_name_mem_comp_func(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv)
-{
-	return tb_memcmp(lname, rname, (tb_size_t)priv);
-}
-static tb_char_t const* tb_hash_name_mem_cstr_func(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	TB_ASSERT_RETURN_VAL(name && data, TB_NULL);
-	tb_byte_t const* p = name;
-	tb_int_t n = tb_snprintf(data, maxn, "%x", tb_bits_get_u32_be(p));
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name_func, tb_hash_item_func_t const* item_func)
+tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
 	TB_ASSERT_RETURN_VAL(!(size % 2), TB_NULL);
 
@@ -252,13 +121,13 @@ tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name
 
 	// init hash func
 	hash->name_func = name_func;
-	if (item_func) hash->item_func = *item_func;
+	hash->data_func = data_func;
 
 	// init item list
 	tb_slist_item_func_t func;
 	func.free = tb_hash_item_free;
 	func.priv = hash;
-	hash->item_list = tb_slist_init(sizeof(tb_void_t*) + step, size, &func); //!< hack, add name
+	hash->item_list = tb_slist_init(sizeof(tb_void_t*) << 1, size, &func); //!< name + data
 	TB_ASSERT_GOTO(hash->item_list, fail);
 
 	// init hash list
@@ -338,7 +207,7 @@ tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
 		else if (size) while (size--) hash->hash_list[bukt - size] = next;
 	}
 }
-tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* item)
+tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* data)
 {
 	TB_ASSERT_RETURN(hash && hash->item_list);
 
@@ -353,8 +222,9 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 		tb_hash_item_t* it = tb_hash_itor_at(hash, itor);
 		if (it) 
 		{
-			if (item) tb_memcpy(it->data, item, hash->item_list->step - sizeof(tb_void_t*));
-			else tb_memset(it->data, 0, hash->item_list->step - sizeof(tb_void_t*));
+			// set data 
+			if (hash->data_func.dupl) it->data = hash->data_func.dupl(data, hash->data_func.priv);
+			else it->data = TB_NULL;
 		}
 	}
 	else 
@@ -379,8 +249,8 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 				else it->name = TB_NULL;
 
 				// set data
-				if (item) tb_memcpy(it->data, item, hash->item_list->step - sizeof(tb_void_t*));
-				else tb_memset(it->data, 0, hash->item_list->step - sizeof(tb_void_t*));
+				if (hash->data_func.dupl) it->data = hash->data_func.dupl(data, hash->data_func.priv);
+				else it->data = TB_NULL;
 			}
 
 			// update hash list
@@ -389,13 +259,6 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* i
 			else if (size) while (size--) hash->hash_list[bukt - size] = itor;
 		}
 	}
-}
-tb_void_t const* tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_void_t* item)
-{
-	TB_ASSERT_RETURN_VAL(hash && hash->item_list && item, TB_NULL);
-	tb_void_t* data = tb_hash_const_at(hash, name);
-	if (data) return tb_memcpy(item, data, hash->item_list->step - sizeof(tb_void_t*));
-	else return TB_NULL;
 }
 tb_size_t tb_hash_size(tb_hash_t const* hash)
 {
@@ -406,50 +269,6 @@ tb_size_t tb_hash_maxn(tb_hash_t const* hash)
 {
 	TB_ASSERT_RETURN_VAL(hash && hash->item_list, 0);
 	return tb_slist_maxn(hash->item_list);
-}
-tb_hash_name_func_t tb_hash_name_func_str(tb_spool_t* spool)
-{
-	tb_hash_name_func_t func;
-	func.hash = tb_hash_name_str_hash_func;
-	func.comp = tb_hash_name_str_comp_func;
-	func.dupl = tb_hash_name_str_dupl_func;
-	func.cstr = tb_hash_name_str_cstr_func;
-	func.free = tb_hash_name_str_free_func;
-	func.priv = spool;
-	return func;
-}
-tb_hash_name_func_t tb_hash_name_func_int()
-{
-	tb_hash_name_func_t func;
-	func.hash = tb_hash_name_int_hash_func;
-	func.comp = tb_hash_name_int_comp_func;
-	func.dupl = tb_hash_name_int_dupl_func;
-	func.cstr = tb_hash_name_int_cstr_func;
-	func.free = tb_hash_name_int_free_func;
-	func.priv = TB_NULL;
-	return func;
-}
-tb_hash_name_func_t tb_hash_name_func_ptr()
-{
-	tb_hash_name_func_t func;
-	func.hash = tb_hash_name_ptr_hash_func;
-	func.comp = tb_hash_name_ptr_comp_func;
-	func.dupl = tb_hash_name_ptr_dupl_func;
-	func.cstr = tb_hash_name_ptr_cstr_func;
-	func.free = tb_hash_name_ptr_free_func;
-	func.priv = TB_NULL;
-	return func;
-}
-tb_hash_name_func_t tb_hash_name_func_mem(tb_size_t size)
-{
-	tb_hash_name_func_t func;
-	func.hash = tb_hash_name_mem_hash_func;
-	func.comp = tb_hash_name_mem_comp_func;
-	func.dupl = tb_hash_name_mem_dupl_func;
-	func.cstr = tb_hash_name_mem_cstr_func;
-	func.free = tb_hash_name_mem_free_func;
-	func.priv = (tb_size_t)size;
-	return func;
 }
 tb_hash_item_t* tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor)
 {
@@ -500,24 +319,24 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 			{
 				tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 
-				if (hash->name_func.cstr && hash->item_func.cstr) 
+				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %s\n", i
 						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
 						, itor
 						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
-						, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
+						, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
 				else if (hash->name_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %x\n", i
 						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
 						, itor
 						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
 						, item->data);
-				else if (hash->item_func.cstr) 
+				else if (hash->data_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
 						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
 						, itor
 						, item->name
-						, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
+						, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
 				else tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
 						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
 						, itor
@@ -540,18 +359,18 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 	{
 		tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 
-		if (hash->name_func.cstr && hash->item_func.cstr) 
+		if (hash->name_func.cstr && hash->data_func.cstr) 
 			tb_printf("item[%d]:\t%s\t\t=> %s\n", itor
 				, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
-				, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
+				, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
 		else if (hash->name_func.cstr) 
 			tb_printf("item[%d]:\t%s\t\t=> %x\n", itor
 				, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
 				, item->data);
-		else if (hash->item_func.cstr) 
+		else if (hash->data_func.cstr) 
 			tb_printf("item[%d]:\t%x\t\t=> %x\n", itor
 				, item->name
-				, hash->item_func.cstr(item->data, data, 4096, hash->item_func.priv));
+				, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
 		else tb_printf("item[%d]:\t%x\t\t=> %x\n", itor
 				, item->name
 				, item->data);
