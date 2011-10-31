@@ -18,6 +18,7 @@ tbox_C_FILES 		+= \
 					memory/mpool \
 					memory/malloc \
 					string/string \
+					container/item \
 					container/hash \
 					container/queue \
 					container/stack \
@@ -154,10 +155,15 @@ INC_FILES 			= \
 					string/string.h \
 					container/prefix.h \
 					container/container.h \
-					container/gpool.h \
-					container/vector.h \
+					container/item.h \
+					container/hash.h \
 					container/slist.h \
 					container/dlist.h \
+					container/gpool.h \
+					container/spool.h \
+					container/queue.h \
+					container/stack.h \
+					container/vector.h \
 					platform/platform.h \
 					platform/prefix.h \
 					platform/file.h \

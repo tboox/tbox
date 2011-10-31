@@ -33,7 +33,7 @@ extern "C" {
  */
 #include "prefix.h"
 #include "slist.h"
-#include "spool.h"
+#include "item.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -59,55 +59,9 @@ typedef struct __tb_hash_item_t
 	tb_void_t* 			name;
 
 	// the item data
-	tb_byte_t 			data[1];
+	tb_void_t* 			data;
 
 }tb_hash_item_t;
-
-// the callback type
-typedef tb_void_t 			(*tb_hash_name_free_func_t)(tb_void_t* name, tb_void_t* priv);
-typedef tb_void_t* 			(*tb_hash_name_dupl_func_t)(tb_void_t const* name, tb_void_t* priv);
-typedef tb_char_t const* 	(*tb_hash_name_cstr_func_t)(tb_void_t const* name, tb_char_t* data, tb_size_t maxn, tb_void_t* priv);
-typedef tb_size_t 			(*tb_hash_name_hash_func_t)(tb_void_t const* name, tb_size_t size, tb_void_t* priv);
-typedef tb_int_t 			(*tb_hash_name_comp_func_t)(tb_void_t const* lname, tb_void_t const* rname, tb_void_t* priv);
-
-// the item func
-typedef tb_void_t 			(*tb_hash_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
-typedef tb_char_t const* 	(*tb_hash_item_cstr_func_t)(tb_void_t const* item, tb_char_t* data, tb_size_t maxn, tb_void_t* priv);
-
-// the hash name func type
-typedef struct __tb_hash_name_func_t
-{
-	// the name func
-	tb_hash_name_hash_func_t 	hash;
-	tb_hash_name_comp_func_t 	comp;
-	tb_hash_name_dupl_func_t 	dupl;
-	tb_hash_name_cstr_func_t 	cstr;
-	tb_hash_name_free_func_t 	free;
-
-	// the priv data
-	tb_void_t* 					priv;
-
-}tb_hash_name_func_t;
-
-// the hash item func type
-typedef struct __tb_hash_item_func_t
-{
-	// the item func
-	tb_hash_item_free_func_t 	free;
-	tb_hash_item_cstr_func_t 	cstr;
-
-	// the priv data
-	tb_void_t* 					priv;
-
-}tb_hash_item_func_t;
-
-// the hash pair type
-typedef struct __tb_hash_pair_t
-{
-	tb_void_t const* 			name;
-	tb_void_t* 					item;
-
-}tb_hash_pair_t;
 
 /* the hash type
  *
@@ -141,15 +95,15 @@ typedef struct __tb_hash_pair_t
 typedef struct __tb_hash_t
 {
 	// the item list
-	tb_slist_t* 				item_list;
+	tb_slist_t* 		item_list;
 
 	// the hash list
-	tb_size_t* 					hash_list;
-	tb_size_t 					hash_size;
+	tb_size_t* 			hash_list;
+	tb_size_t 			hash_size;
 
 	// the hash func
-	tb_hash_name_func_t 		name_func;
-	tb_hash_item_func_t 		item_func;
+	tb_item_func_t 		name_func;
+	tb_item_func_t 		data_func;
 
 }tb_hash_t;
 
@@ -158,7 +112,7 @@ typedef struct __tb_hash_t
  */
 
 // init & exit
-tb_hash_t* 				tb_hash_init(tb_size_t step, tb_size_t size, tb_hash_name_func_t name_func, tb_hash_item_func_t const* item_func);
+tb_hash_t* 				tb_hash_init(tb_size_t step, tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
 tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 
 // accessors & modifiors
@@ -168,18 +122,11 @@ tb_void_t* 				tb_hash_at(tb_hash_t* hash, tb_void_t const* name);
 tb_void_t const* 		tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name);
 
 tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_void_t const* name);
-tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* item);
-tb_void_t const* 		tb_hash_get(tb_hash_t* hash, tb_void_t const* name, tb_void_t* item);
+tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* data);
 
 // attributes
 tb_size_t 				tb_hash_size(tb_hash_t const* hash);
 tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
-
-// hash name func
-tb_hash_name_func_t 	tb_hash_name_func_str(tb_spool_t* spool); 	//!< cstring
-tb_hash_name_func_t 	tb_hash_name_func_int(); 					//!< integer
-tb_hash_name_func_t 	tb_hash_name_func_ptr(); 					//!< pointer
-tb_hash_name_func_t 	tb_hash_name_func_mem(tb_size_t size); 		//!< memory
 
 // debug
 tb_void_t 				tb_hash_dump(tb_hash_t const* hash);

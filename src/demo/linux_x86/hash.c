@@ -14,59 +14,21 @@
 # 	define tb_hash_test_dump(h)
 #endif
 
-#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, (tb_void_t const*)s, (tb_void_t const*)&n); } while (0);
-#define tb_hash_test_get_s2i(h, s) 		do {tb_size_t const* p = (tb_size_t const*)tb_hash_const_at(h, (tb_void_t const*)s); TB_ASSERT(p && tb_strlen(s) == *p); } while (0);
-#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, (tb_void_t const*)s); tb_size_t const* p = (tb_size_t const*)tb_hash_const_at(h, (tb_void_t const*)s); TB_ASSERT(!p); } while (0);
+#define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, s, n); } while (0);
+#define tb_hash_test_get_s2i(h, s) 		do {TB_ASSERT(tb_strlen(s) == (tb_size_t)tb_hash_const_at(h, s)); } while (0);
+#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); TB_ASSERT(!tb_hash_const_at(h, s)); } while (0);
 
-#define tb_hash_test_set_i2s(h, i) 		do {tb_char_t d[256] = {0}; tb_snprintf(d, 256, "%u", (i)); tb_char_t* s = tb_strdup(d); tb_hash_set(h, (tb_void_t const*)(i), (tb_void_t const*)&s); } while (0);
-#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t d[256] = {0}; tb_snprintf(d, 256, "%u", (i)); tb_char_t const** p = (tb_char_t const**)tb_hash_const_at(h, (tb_void_t const*)(i)); TB_ASSERT(p && !tb_strcmp(d, *p)); } while (0);
-#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, (tb_void_t const*)(i)); tb_char_t const** p = (tb_char_t const**)tb_hash_const_at(h, (tb_void_t const*)(i)); TB_ASSERT(!p); } while (0);
+#define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, i, s); } while (0);
+#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); TB_ASSERT(!tb_strcmp(s, tb_hash_const_at(h, i))); } while (0);
+#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); TB_ASSERT(!tb_hash_const_at(h, i)); } while (0);
 
 /* /////////////////////////////////////////////////////////
  * details
  */
-
-static tb_void_t tb_hash_test_item_int_free(tb_void_t* item, tb_void_t* priv)
-{
-	tb_printf("[free]: %u\n", *((tb_size_t*)item));
-}
-static tb_char_t const* tb_hash_test_item_int_cstr(tb_void_t const* item, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	tb_int_t n = tb_snprintf(data, maxn, "%u", *((tb_size_t const*)item));
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
-static tb_void_t tb_hash_test_item_str_free(tb_void_t* item, tb_void_t* priv)
-{
-	if (item && *((tb_char_t const**)item)) 
-	{
-		tb_printf("[free]: %s\n", *((tb_char_t const**)item));
-		tb_free(*((tb_char_t const**)item));
-	}
-}
-static tb_char_t const* tb_hash_test_item_str_cstr(tb_void_t const* item, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	tb_int_t n = tb_snprintf(data, maxn, "%s", *((tb_char_t const**)item));
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
-static tb_void_t tb_hash_test_item_mem_free(tb_void_t* item, tb_void_t* priv)
-{
-	tb_char_t const* p = item;
-	tb_printf("[free]: %c%c%c%c\n", p[0], p[1], p[2], p[3]);
-}
-static tb_char_t const* tb_hash_test_item_mem_cstr(tb_void_t const* item, tb_char_t* data, tb_size_t maxn, tb_void_t* priv)
-{
-	tb_byte_t const* p = item;
-	tb_int_t n = tb_snprintf(data, maxn, "%c%c%c%c", p[0], p[1], p[2], p[3]);
-	if (n > 0) data[n] = '\0';
-	return (tb_char_t const*)data;
-}
-static tb_void_t tb_hash_test_s2i_function()
+static tb_void_t tb_hash_test_s2i_func()
 {
 	// init hash: str => int
-	tb_hash_item_func_t int_func = {tb_hash_test_item_int_free, tb_hash_test_item_int_cstr, TB_NULL};
-	tb_hash_t* hash = tb_hash_init(sizeof(tb_size_t), 8, tb_hash_name_func_str(TB_NULL), &int_func);
+	tb_hash_t* hash = tb_hash_init(sizeof(tb_size_t), 8, tb_item_func_str(TB_NULL), tb_item_func_int());
 	TB_ASSERT_RETURN(hash);
 
 	// set
@@ -137,10 +99,10 @@ static tb_void_t tb_hash_test_s2i_function()
 
 	tb_hash_exit(hash);
 }
-static tb_void_t tb_hash_test_s2i_performance()
+static tb_void_t tb_hash_test_s2i_perf()
 {
 	// init hash: str => int
-	tb_hash_t* hash = tb_hash_init(sizeof(tb_size_t), TB_HASH_SIZE_DEFAULT, tb_hash_name_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)), TB_NULL);
+	tb_hash_t* hash = tb_hash_init(sizeof(tb_size_t), TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)), tb_item_func_int());
 	TB_ASSERT_RETURN(hash);
 
 	// performance
@@ -159,11 +121,10 @@ static tb_void_t tb_hash_test_s2i_performance()
 
 	tb_hash_exit(hash);
 }
-static tb_void_t tb_hash_test_i2s()
+static tb_void_t tb_hash_test_i2s_func()
 {
 	// init hash: int => str
-	tb_hash_item_func_t str_func = {tb_hash_test_item_str_free, tb_hash_test_item_str_cstr, TB_NULL};
-	tb_hash_t* hash = tb_hash_init(sizeof(tb_char_t const*), 8, tb_hash_name_func_int(), &str_func);
+	tb_hash_t* hash = tb_hash_init(sizeof(tb_char_t const*), 8, tb_item_func_int(), tb_item_func_str(TB_NULL));
 	TB_ASSERT_RETURN(hash);
 
 	// set
@@ -232,8 +193,7 @@ static tb_void_t tb_hash_test_i2s()
 static tb_void_t tb_hash_test_m2m()
 {
 	// init hash: mem => mem
-	tb_hash_item_func_t mem_func = {tb_hash_test_item_mem_free, tb_hash_test_item_mem_cstr, TB_NULL};
-	tb_hash_t* hash = tb_hash_init(4, TB_HASH_SIZE_SMALL, tb_hash_name_func_mem(4), &mem_func);
+	tb_hash_t* hash = tb_hash_init(4, TB_HASH_SIZE_SMALL, tb_item_func_mem(4), tb_item_func_mem(4));
 	TB_ASSERT_RETURN(hash);
 
 	tb_hash_exit(hash);
@@ -245,10 +205,10 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
 
-//	tb_hash_test_s2i_function();
-//	tb_hash_test_s2i_performance();
+	tb_hash_test_s2i_func();
+	tb_hash_test_s2i_perf();
 
-	tb_hash_test_i2s();
+	tb_hash_test_i2s_func();
 //	tb_hash_test_m2m();
 
 	getchar();
