@@ -111,7 +111,7 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
  * implemention
  */
 
-tb_hash_t* tb_hash_init(tb_size_t step, tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
+tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
 	TB_ASSERT_RETURN_VAL(!(size % 2), TB_NULL);
 
