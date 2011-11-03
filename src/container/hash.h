@@ -112,7 +112,7 @@ typedef struct __tb_hash_t
  */
 
 // init & exit
-tb_hash_t* 				tb_hash_init(tb_size_t step, tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
+tb_hash_t* 				tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
 tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 
 // accessors & modifiors

@@ -79,7 +79,7 @@ static tb_void_t tb_item_func_int_free(tb_void_t* item, tb_void_t* priv)
 }
 static tb_void_t* tb_item_func_int_dupl(tb_void_t const* item, tb_void_t* priv)
 {
-	return item;
+	return (tb_void_t*)item;
 }
 static tb_size_t tb_item_func_int_hash(tb_void_t const* item, tb_size_t size, tb_void_t* priv)
 {
