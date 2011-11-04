@@ -36,15 +36,15 @@ static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 	tb_hash_t* hash = priv;
 	TB_ASSERT_RETURN(hash);
 
-	if (hash->name_func.free) hash->name_func.free(((tb_hash_item_t*)item)->name, hash->name_func.priv);
-	if (hash->data_func.free) hash->data_func.free(((tb_hash_item_t*)item)->data, hash->data_func.priv);
+	if (hash->name_func.free) hash->name_func.free(&hash->name_func, ((tb_hash_item_t*)item)->name);
+	if (hash->data_func.free) hash->data_func.free(&hash->data_func, ((tb_hash_item_t*)item)->data);
 }
 static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* pprev, tb_size_t* pbuck)
 {
 	TB_ASSERT_RETURN_VAL(hash && hash->item_list && hash->name_func.hash && hash->name_func.comp, 0);
 
 	// comupte hash from name
-	tb_size_t i = hash->name_func.hash(name, hash->hash_size, hash->name_func.priv);
+	tb_size_t i = hash->name_func.hash(&hash->name_func, name, hash->hash_size);
 	TB_ASSERT_RETURN_VAL(i < hash->hash_size, 0);
 
 	// find item
@@ -59,7 +59,7 @@ static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_si
 		if (!item) break;
 		
 		// compare it
-		retn = hash->name_func.comp(name, item->name, hash->name_func.priv);
+		retn = hash->name_func.comp(&hash->name_func, name, item->name);
 		if (retn <= 0) break;
 	}
 
@@ -223,7 +223,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 		if (it) 
 		{
 			// set data 
-			if (hash->data_func.dupl) it->data = hash->data_func.dupl(data, hash->data_func.priv);
+			if (hash->data_func.dupl) it->data = hash->data_func.dupl(&hash->data_func, data);
 			else it->data = TB_NULL;
 		}
 	}
@@ -245,11 +245,11 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 			if (it) 
 			{
 				// set name
-				if (hash->name_func.dupl) it->name = hash->name_func.dupl(name, hash->name_func.priv);
+				if (hash->name_func.dupl) it->name = hash->name_func.dupl(&hash->name_func, name);
 				else it->name = TB_NULL;
 
 				// set data
-				if (hash->data_func.dupl) it->data = hash->data_func.dupl(data, hash->data_func.priv);
+				if (hash->data_func.dupl) it->data = hash->data_func.dupl(&hash->data_func, data);
 				else it->data = TB_NULL;
 			}
 
@@ -321,24 +321,24 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %s\n", i
-						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 						, itor
-						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
-						, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
+						, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
+						, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 				else if (hash->name_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%s\t\t=> %x\n", i
-						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 						, itor
-						, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
+						, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 						, item->data);
 				else if (hash->data_func.cstr) 
 					tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
-						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 						, itor
 						, item->name
-						, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
+						, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 				else tb_printf("bucket[%d:%d] => [%d]:\t%x\t\t=> %x\n", i
-						, hash->name_func.hash(item->name, hash->hash_size, hash->name_func.priv)
+						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 						, itor
 						, item->name
 						, item->data);
@@ -361,16 +361,16 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 
 		if (hash->name_func.cstr && hash->data_func.cstr) 
 			tb_printf("item[%d]:\t%s\t\t=> %s\n", itor
-				, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
-				, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
+				, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
+				, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 		else if (hash->name_func.cstr) 
 			tb_printf("item[%d]:\t%s\t\t=> %x\n", itor
-				, hash->name_func.cstr(item->name, name, 4096, hash->name_func.priv)
+				, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 				, item->data);
 		else if (hash->data_func.cstr) 
 			tb_printf("item[%d]:\t%x\t\t=> %x\n", itor
 				, item->name
-				, hash->data_func.cstr(item->data, data, 4096, hash->data_func.priv));
+				, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 		else tb_printf("item[%d]:\t%x\t\t=> %x\n", itor
 				, item->name
 				, item->data);
