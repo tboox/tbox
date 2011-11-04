@@ -39,11 +39,12 @@ extern "C" {
  */
 
 // the callback type
-typedef tb_void_t 			(*tb_item_func_free_t)(tb_void_t* item, tb_void_t* priv);
-typedef tb_void_t* 			(*tb_item_func_dupl_t)(tb_void_t const* item, tb_void_t* priv);
-typedef tb_char_t const* 	(*tb_item_func_cstr_t)(tb_void_t const* item, tb_char_t* data, tb_size_t maxn, tb_void_t* priv);
-typedef tb_size_t 			(*tb_item_func_hash_t)(tb_void_t const* item, tb_size_t size, tb_void_t* priv);
-typedef tb_int_t 			(*tb_item_func_comp_t)(tb_void_t const* litem, tb_void_t const* ritem, tb_void_t* priv);
+struct __tb_item_func_t;
+typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_void_t* item);
+typedef tb_void_t* 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_void_t const* item);
+typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn);
+typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_void_t const* item, tb_size_t size);
+typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem);
 
 // the item func type
 typedef struct __tb_item_func_t
@@ -54,6 +55,9 @@ typedef struct __tb_item_func_t
 	tb_item_func_dupl_t 	dupl;
 	tb_item_func_cstr_t 	cstr;
 	tb_item_func_free_t 	free;
+
+	// the item pool
+	tb_void_t* 				pool;
 
 	// the priv data
 	tb_void_t* 				priv;
@@ -68,7 +72,7 @@ typedef struct __tb_item_func_t
 tb_item_func_t 		tb_item_func_str(tb_spool_t* spool); 
 tb_item_func_t 		tb_item_func_int();
 tb_item_func_t 		tb_item_func_ptr();
-tb_item_func_t 		tb_item_func_mem(tb_size_t size);
+tb_item_func_t 		tb_item_func_mem(tb_size_t size, tb_gpool_t* gpool);
 
 // c plus plus
 #ifdef __cplusplus

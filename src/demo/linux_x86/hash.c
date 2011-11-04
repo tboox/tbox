@@ -22,6 +22,10 @@
 #define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); TB_ASSERT(!tb_strcmp(s, tb_hash_const_at(h, i))); } while (0);
 #define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); TB_ASSERT(!tb_hash_const_at(h, i)); } while (0);
 
+#define tb_hash_test_set_m2m(h, i) 		do {tb_memset(item, i, step); tb_hash_set(h, item, item); } while (0);
+#define tb_hash_test_get_m2m(h, i) 		do {tb_memset(item, i, step); TB_ASSERT(!tb_memcmp(item, tb_hash_const_at(h, item), step)); } while (0);
+#define tb_hash_test_del_m2m(h, i) 		do {tb_memset(item, i, step); tb_hash_del(h, item); TB_ASSERT(!tb_hash_const_at(h, item)); } while (0);
+
 /* /////////////////////////////////////////////////////////
  * details
  */
@@ -54,6 +58,7 @@ static tb_void_t tb_hash_test_s2i_func()
 	tb_hash_test_set_s2i(hash, "10");
 	tb_hash_test_set_s2i(hash, "0");
 	tb_hash_test_set_s2i(hash, "");
+	tb_hash_test_dump(hash);
 
 	// get
 	tb_hash_test_get_s2i(hash, "");
@@ -77,7 +82,6 @@ static tb_void_t tb_hash_test_s2i_func()
 	tb_hash_test_get_s2i(hash, "10");
 	tb_hash_test_get_s2i(hash, "0");
 	tb_hash_test_get_s2i(hash, "");
-	tb_hash_test_dump(hash);
 
 	// del
 	tb_hash_test_del_s2i(hash, "");
@@ -149,6 +153,7 @@ static tb_void_t tb_hash_test_i2s_func()
 	tb_hash_test_set_i2s(hash, 210);
 	tb_hash_test_set_i2s(hash, 10);
 	tb_hash_test_set_i2s(hash, 0);
+	tb_hash_test_dump(hash);
 
 	// get
 	tb_hash_test_get_i2s(hash, 0);
@@ -170,7 +175,6 @@ static tb_void_t tb_hash_test_i2s_func()
 	tb_hash_test_get_i2s(hash, 210);
 	tb_hash_test_get_i2s(hash, 10);
 	tb_hash_test_get_i2s(hash, 0);
-	tb_hash_test_dump(hash);
 
 	// del
 	tb_hash_test_del_i2s(hash, 0);
@@ -215,12 +219,110 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_hash_exit(hash);
 	tb_spool_exit(pool);
 }
-static tb_void_t tb_hash_test_m2m()
+static tb_void_t tb_hash_test_m2m_func()
 {
+	tb_size_t const	step = 256;
+	tb_byte_t 		item[step];
 	// init hash: mem => mem
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_mem(4), tb_item_func_mem(4));
+	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_mem(step, TB_NULL), tb_item_func_mem(step, TB_NULL));
 	TB_ASSERT_RETURN(hash);
 
+	// set
+	tb_hash_test_set_m2m(hash, 0);
+	tb_hash_test_set_m2m(hash, 1);
+	tb_hash_test_set_m2m(hash, 2);
+	tb_hash_test_set_m2m(hash, 3);
+	tb_hash_test_set_m2m(hash, 4);
+	tb_hash_test_set_m2m(hash, 5);
+	tb_hash_test_set_m2m(hash, 6);
+	tb_hash_test_set_m2m(hash, 7);
+	tb_hash_test_set_m2m(hash, 8);
+	tb_hash_test_set_m2m(hash, 9);
+	tb_hash_test_set_m2m(hash, 10);
+	tb_hash_test_set_m2m(hash, 11);
+	tb_hash_test_set_m2m(hash, 12);
+	tb_hash_test_set_m2m(hash, 13);
+	tb_hash_test_set_m2m(hash, 14);
+	tb_hash_test_set_m2m(hash, 15);
+	tb_hash_test_set_m2m(hash, 16);
+	tb_hash_test_set_m2m(hash, 17);
+	tb_hash_test_set_m2m(hash, 18);
+	tb_hash_test_set_m2m(hash, 19);
+	tb_hash_test_set_m2m(hash, 20);
+	tb_hash_test_set_m2m(hash, 21);
+	tb_hash_test_set_m2m(hash, 22);
+	tb_hash_test_set_m2m(hash, 23);
+	tb_hash_test_set_m2m(hash, 24);
+	tb_hash_test_set_m2m(hash, 25);
+	tb_hash_test_set_m2m(hash, 26);
+	tb_hash_test_set_m2m(hash, 27);
+	tb_hash_test_set_m2m(hash, 28);
+	tb_hash_test_set_m2m(hash, 29);
+	tb_hash_test_set_m2m(hash, 30);
+	tb_hash_test_set_m2m(hash, 31);
+	tb_hash_test_set_m2m(hash, 32);
+	tb_hash_test_dump(hash);
+
+	// get
+	tb_hash_test_get_m2m(hash, 0);
+	tb_hash_test_get_m2m(hash, 1);
+	tb_hash_test_get_m2m(hash, 2);
+	tb_hash_test_get_m2m(hash, 3);
+	tb_hash_test_get_m2m(hash, 4);
+	tb_hash_test_get_m2m(hash, 5);
+	tb_hash_test_get_m2m(hash, 6);
+	tb_hash_test_get_m2m(hash, 7);
+	tb_hash_test_get_m2m(hash, 8);
+	tb_hash_test_get_m2m(hash, 9);
+	tb_hash_test_get_m2m(hash, 10);
+	tb_hash_test_get_m2m(hash, 11);
+	tb_hash_test_get_m2m(hash, 12);
+	tb_hash_test_get_m2m(hash, 13);
+	tb_hash_test_get_m2m(hash, 14);
+	tb_hash_test_get_m2m(hash, 15);
+	tb_hash_test_get_m2m(hash, 16);
+	tb_hash_test_get_m2m(hash, 17);
+	tb_hash_test_get_m2m(hash, 18);
+	tb_hash_test_get_m2m(hash, 19);
+	tb_hash_test_get_m2m(hash, 20);
+	tb_hash_test_get_m2m(hash, 21);
+	tb_hash_test_get_m2m(hash, 22);
+	tb_hash_test_get_m2m(hash, 23);
+	tb_hash_test_get_m2m(hash, 24);
+	tb_hash_test_get_m2m(hash, 25);
+	tb_hash_test_get_m2m(hash, 26);
+	tb_hash_test_get_m2m(hash, 27);
+	tb_hash_test_get_m2m(hash, 28);
+	tb_hash_test_get_m2m(hash, 29);
+	tb_hash_test_get_m2m(hash, 30);
+	tb_hash_test_get_m2m(hash, 31);
+	tb_hash_test_get_m2m(hash, 32);
+
+	// del
+	tb_hash_test_del_m2m(hash, 10);
+	tb_hash_test_del_m2m(hash, 11);
+	tb_hash_test_del_m2m(hash, 12);
+	tb_hash_test_del_m2m(hash, 13);
+	tb_hash_test_del_m2m(hash, 14);
+	tb_hash_test_del_m2m(hash, 15);
+	tb_hash_test_del_m2m(hash, 16);
+	tb_hash_test_del_m2m(hash, 17);
+	tb_hash_test_del_m2m(hash, 18);
+	tb_hash_test_del_m2m(hash, 19);
+	tb_hash_test_del_m2m(hash, 20);
+	tb_hash_test_del_m2m(hash, 21);
+	tb_hash_test_del_m2m(hash, 22);
+	tb_hash_test_del_m2m(hash, 23);
+	tb_hash_test_del_m2m(hash, 24);
+	tb_hash_test_del_m2m(hash, 25);
+	tb_hash_test_del_m2m(hash, 26);
+	tb_hash_test_del_m2m(hash, 27);
+	tb_hash_test_del_m2m(hash, 28);
+	tb_hash_test_del_m2m(hash, 29);
+	tb_hash_test_del_m2m(hash, 30);
+	tb_hash_test_del_m2m(hash, 31);
+	tb_hash_test_del_m2m(hash, 32);
+	tb_hash_test_dump(hash);
 
 	// clear
 	tb_hash_clear(hash);
@@ -241,7 +343,8 @@ int main(int argc, char** argv)
 //	tb_hash_test_i2s_func();
 //	tb_hash_test_i2s_perf();
 
-//	tb_hash_test_m2m();
+	// FIXME: hash key
+	tb_hash_test_m2m_func();
 
 	getchar();
 	return 0;
