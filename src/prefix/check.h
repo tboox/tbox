@@ -40,6 +40,14 @@ extern "C" {
  */
 
 // check
+#define tb_if_fail_return(x) 							do { if (!(x)) return ; } while (0)
+#define tb_if_fail_return_val(x, v) 					do { if (!(x)) return (v); } while (0)
+#define tb_if_fail_goto(x, b) 							do { if (!(x)) goto b; } while (0)
+#define tb_if_fail_break(x) 							{ if (!(x)) break ; }
+#define tb_if_fail_abort(x) 							do { if (!(x)) {tb_abort();} } while (0)
+#define tb_if_fail_continue(x) 							{ if (!(x)) continue ; }
+
+// check: discard
 #define TB_IF_FAIL_RETURN(x) 							do { if (!(x)) return ; } while (0)
 #define TB_IF_FAIL_RETURN_VAL(x, v) 					do { if (!(x)) return (v); } while (0)
 #define TB_IF_FAIL_GOTO(x, b) 							do { if (!(x)) goto b; } while (0)
