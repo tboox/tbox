@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		keyword.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_KEYWORD_H
+#define TB_PREFIX_KEYWORD_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,28 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#define __tb_inline__ 				TB_CONFIG_KEYWORD_INLINE
+#define __tb_register__ 			TB_CONFIG_KEYWORD_REGISTER
+#define __tb_asm__ 					TB_CONFIG_KEYWORD_ASM
+#define __tb_func__ 				TB_CONFIG_KEYWORD_FUNC
+#define __tb_file__ 				TB_CONFIG_KEYWORD_FILE
+#define __tb_line__ 				TB_CONFIG_KEYWORD_LINE
+#define __tb_volatile__ 			volatile
+
+#if defined(TB_COMPILER_IS_GCC) && __GNUC__ > 2
+# 	define __tb_likely__(x) 		__builtin_expect((x), 1)
+# 	define __tb_unlikely__(x) 		__builtin_expect((x), 0)
+#else
+# 	define __tb_likely__(x) 		(x)
+# 	define __tb_unlikely__(x) 		(x)
+#endif
+
 
 // c plus plus
 #ifdef __cplusplus

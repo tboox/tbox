@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		version.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_VERSION_H
+#define TB_PREFIX_VERSION_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,16 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// version: v1.4.3
+#define TB_VERSION_MAJOR 			(1)
+#define TB_VERSION_MINOR 			(4)
+#define TB_VERSION_ALTER 			(3)
 
 // c plus plus
 #ifdef __cplusplus

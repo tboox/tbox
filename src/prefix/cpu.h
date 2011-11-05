@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		cpu.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_CPU_H
+#define TB_PREFIX_CPU_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,26 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// check 64-bits
+#if defined (__LP64__) \
+	|| defined (__64BIT__) \
+		|| defined (_LP64) \
+		|| (__WORDSIZE == 64)
+# 	define TB_CPU_BITSIZE 		(64)
+# 	define TB_CPU_BITBYTE 		(8)
+# 	define TB_CPU_BITALIGN 		(7)
+#else
+# 	define TB_CPU_BITSIZE 		(32)
+# 	define TB_CPU_BITBYTE 		(4)
+# 	define TB_CPU_BITALIGN 		(3)
+#endif
+
 
 // c plus plus
 #ifdef __cplusplus

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		abort.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_ABORT_H
+#define TB_PREFIX_ABORT_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,16 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+#include "trace.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// abort
+#define TB_ABORT_TAG(tag)								do { TB_TRACE_LINE_TAG(tag, "[abort]: "); __tb_volatile__ tb_int_t* a = 0; *a = 1; } while(0)
+#define TB_ABORT()										TB_ABORT_TAG(TB_TAG)
 
 // c plus plus
 #ifdef __cplusplus

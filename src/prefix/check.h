@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		check.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_CHECK_H
+#define TB_PREFIX_CHECK_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,21 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+#include "trace.h"
+#include "abort.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// check
+#define TB_IF_FAIL_RETURN(x) 							do { if (!(x)) return ; } while (0)
+#define TB_IF_FAIL_RETURN_VAL(x, v) 					do { if (!(x)) return (v); } while (0)
+#define TB_IF_FAIL_GOTO(x, b) 							do { if (!(x)) goto b; } while (0)
+#define TB_IF_FAIL_BREAK(x) 							{ if (!(x)) break ; }
+#define TB_IF_FAIL_ABORT(x) 							do { if (!(x)) {TB_ABORT();} } while (0)
+#define TB_IF_FAIL_CONTINUE(x) 							{ if (!(x)) continue ; }
 
 // c plus plus
 #ifdef __cplusplus
