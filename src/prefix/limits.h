@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		limits.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_LIMITS_H
+#define TB_PREFIX_LIMITS_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,22 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#define TB_MAXS16 				(32767)
+#define TB_MINS16 				(-32767)
+#define TB_MAXU16 				(0xffff)
+#define TB_MINU16 				(0)
+#define TB_MAXS32 				(0x7fffffff)
+#define TB_MINS32 				(0x80000001)
+#define TB_MAXU32 				(0xffffffff)
+#define TB_MINU32 				(0)
+#define TB_NAN32 				(0x80000000)
+
 
 // c plus plus
 #ifdef __cplusplus

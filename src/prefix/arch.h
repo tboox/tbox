@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		arch.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_ARCH_H
+#define TB_PREFIX_ARCH_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,27 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#if defined(TB_CONFIG_ARCH_x86)
+# 	define TB_ARCH_x86
+#elif defined(TB_CONFIG_ARCH_ARM)
+# 	define TB_ARCH_ARM
+#elif defined(TB_CONFIG_ARCH_SH4)
+# 	define TB_ARCH_SH4
+#elif defined(TB_CONFIG_ARCH_MIPS)
+# 	define TB_ARCH_MIPS
+#elif defined(TB_CONFIG_ARCH_SPARC)
+# 	define TB_ARCH_SPARC
+#elif defined(TB_CONFIG_ARCH_PPC)
+# 	define TB_ARCH_PPC
+#else
+# 	error unknown arch
+#endif
 
 // c plus plus
 #ifdef __cplusplus

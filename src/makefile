@@ -122,15 +122,31 @@ endif
 
 # header files
 INC_FILES 			= \
-					prefix.h \
-					config.h \
 					tbox.h \
-					memory/memory.h \
+					config.h \
+					prefix.h \
+					prefix/prefix.h \
+					prefix/type.h \
+					prefix/malloc.h \
+					prefix/utils.h \
+					prefix/limits.h \
+					prefix/cpu.h \
+					prefix/arch.h \
+					prefix/keyword.h \
+					prefix/compiler.h \
+					prefix/version.h \
+					prefix/endian.h \
+					prefix/assert.h \
+					prefix/check.h \
+					prefix/abort.h \
+					prefix/trace.h \
+					prefix/config.h \
 					memory/prefix.h \
+					memory/memory.h \
 					memory/malloc.h \
 					memory/mpool.h \
-					math/math.h \
 					math/prefix.h \
+					math/math.h \
 					math/float.h \
 					math/fixed.h \
 					math/fixed6.h \

@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		endian.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_ENDIAN_H
+#define TB_PREFIX_ENDIAN_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,17 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+#ifdef TB_CONFIG_CPU_BIGENDIAN
+# 	define TB_WORDS_BIGENDIAN
+# 	define TB_FLOAT_BIGENDIAN
+#endif
+
 
 // c plus plus
 #ifdef __cplusplus

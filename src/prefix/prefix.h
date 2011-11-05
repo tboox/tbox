@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_PREFIX_H
+#define TB_PREFIX_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,22 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+#include "cpu.h"
+#include "arch.h"
+#include "type.h"
+#include "limits.h"
+#include "endian.h"
+#include "version.h"
+#include "compiler.h"
+#include "keyword.h"
+#include "trace.h"
+#include "abort.h"
+#include "check.h"
+#include "assert.h"
+#include "malloc.h"
+#include "utils.h"
+
 
 // c plus plus
 #ifdef __cplusplus
