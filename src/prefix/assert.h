@@ -138,8 +138,7 @@ extern "C" {
 #define tb_assert_and_check_break(x)						tb_assert_and_check_break_tag(TB_TAG, x)
 #define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_TAG, x)
 
-
-#define tb_assert_static(x) 							do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
+#define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
 
 // c plus plus
 #ifdef __cplusplus
