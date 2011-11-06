@@ -39,6 +39,7 @@
 
 # 	define tb_uint32_to_uint64(x) 		(tb_uint64_t)(x)
 # 	define tb_uint64_to_uint32(x) 		(tb_uint32_t)(x)
+# 	define tb_uint64_make(h, l) 		(tb_uint64_t)(((tb_uint64_t)(h) << 32) + (tb_uint64_t)(l))
 
 # 	define tb_uint64_add(x, y) 			((x) + (y))
 # 	define tb_uint64_sub(x, y) 			((x) - (y))
@@ -82,6 +83,7 @@
 
 # 	define tb_uint32_to_uint64(x) 		tb_uint32_to_uint64_inline(x)
 # 	define tb_uint64_to_uint32(x) 		tb_uint64_to_uint32_inline(x)
+# 	define tb_uint64_make(h, l) 		tb_uint64_make_inline(h, l)
 
 # 	define tb_uint64_add(x, y) 			tb_uint64_add_inline(x, y)
 # 	define tb_uint64_sub(x, y) 			tb_uint64_sub_inline(x, y)
@@ -147,7 +149,13 @@ static __tb_inline__ tb_uint32_t tb_uint64_to_uint32_inline(tb_uint64_t x)
 	TB_ASSERT(!x.h);
 	return x.l;
 }
-
+static __tb_inline__ tb_uint64_t tb_uint64_make_inline(tb_uint32_t h, tb_uint32_t l)
+{
+	tb_uint64_t x;
+	x.h = h;
+	x.l = l;
+	return x;
+}
 static __tb_inline__ tb_uint64_t tb_uint64_add_inline(tb_uint64_t x, tb_uint64_t y)
 {
 	tb_uint32_t s = x.l + y.l;
