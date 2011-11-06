@@ -75,37 +75,69 @@ extern "C" {
 #define TB_ASSERTA(x)									TB_ASSERT_ABORT(x) 						//!< discarded
 
 
-#define TB_ASSERT_STATIC(x) 							do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
-#define TB_STATIC_ASSERT(x) 							TB_ASSERT_STATIC(x)		//!< discarded
+#define TB_ASSERT_STATIC(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
+#define TB_STATIC_ASSERT(x) 								TB_ASSERT_STATIC(x)		//!< discarded
 #endif
 
 // assert
-#if defined(TB_DEBUG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
-# 	define tb_assert_message(x, fmt, arg...)			tb_assert_message_tag(TB_TAG, x, fmt, ## arg)
+#if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
+#	define tb_assert_message_tag(tag, x, fmt, arg...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_assert_message_tag(...)
-# 	define tb_assert_message(...)
 #else
 #	define tb_assert_message_tag
+#endif
+
+#ifdef TB_ASSERT_ENABLE
+# 	define tb_assert_tag(tag, x)							do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); } } while(0)
+# 	define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); __tb_volatile__ tb_int_t* p = 0; *p = 0; } } while(0)
+# 	define tb_assert_return_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return ; } } while(0)
+# 	define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
+# 	define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
+# 	define tb_assert_break_tag(tag, x)						{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); break ; } }
+# 	define tb_assert_continue_tag(tag, x, b)				{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); continue ; } }
+# 	define tb_assert_and_check_abort_tag(tag, x)			tb_assert_abort_tag(tag, x)
+# 	define tb_assert_and_check_return_tag(tag, x)			tb_assert_return_tag(tag, x)
+# 	define tb_assert_and_check_return_val_tag(tag, x, v)	tb_assert_return_val_tag(tag, x, v)
+# 	define tb_assert_and_check_goto_tag(tag, x, b)			tb_assert_goto_tag(tag, x, b)
+# 	define tb_assert_and_check_break_tag(tag, x)			tb_assert_break_tag(tag, x)
+# 	define tb_assert_and_check_continue_tag(tag, x)			tb_assert_continue_tag(tag, x)
+#else
+# 	define tb_assert_tag(tag, x)
+# 	define tb_assert_abort_tag(tag, x)
+# 	define tb_assert_return_tag(tag, x)
+# 	define tb_assert_return_val_tag(tag, x, v)
+# 	define tb_assert_goto_tag(tag, x, b)
+# 	define tb_assert_break_tag(tag, x)
+# 	define tb_assert_continue_tag(tag, x, b)
+# 	define tb_assert_and_check_abort_tag(tag, x)			tb_check_abort(x)
+# 	define tb_assert_and_check_return_tag(tag, x)			tb_check_return(x)
+# 	define tb_assert_and_check_return_val_tag(tag, x, v)	tb_check_return_val(x, v)
+# 	define tb_assert_and_check_goto_tag(tag, x, b)			tb_check_goto(x, b)
+# 	define tb_assert_and_check_break_tag(tag, x)			tb_check_break(x)
+# 	define tb_assert_and_check_continue_tag(tag, x)			tb_check_continue(x)
+#endif
+
+#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
+# 	define tb_assert_message(x, fmt, arg...)				tb_assert_message_tag(TB_TAG, x, fmt, ## arg)
+#else
 # 	define tb_assert_message
 #endif
 
-#define tb_assert_tag(tag, x)							do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); } } while(0)
-#define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_abort_tag(tag); } } while(0)
-#define tb_assert_return_tag(tag, x)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return ; } } while(0)
-#define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
-#define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
-#define tb_assert_break_tag(tag, x)						{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); break ; } }
-#define tb_assert_continue_tag(tag, x, b)				{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); continue ; } }
+#define tb_assert(x)										tb_assert_tag(TB_TAG, x)
+#define tb_assert_abort(x)									tb_assert_abort_tag(TB_TAG, x)
+#define tb_assert_return(x)									tb_assert_return_tag(TB_TAG, x)
+#define tb_assert_return_val(x, v)							tb_assert_return_val_tag(TB_TAG, x, v)
+#define tb_assert_goto(x, b)								tb_assert_goto_tag(TB_TAG, x, b)
+#define tb_assert_break(x)									tb_assert_break_tag(TB_TAG, x)
+#define tb_assert_continue(x)								tb_assert_continue_tag(TB_TAG, x)
+#define tb_assert_and_check_abort(x)						tb_assert_and_check_abort_tag(TB_TAG, x)
+#define tb_assert_and_check_return(x)						tb_assert_and_check_return_tag(TB_TAG, x)
+#define tb_assert_and_check_return_val(x, v)				tb_assert_and_check_return_val_tag(TB_TAG, x, v)
+#define tb_assert_and_check_goto(x, b)						tb_assert_and_check_goto_tag(TB_TAG, x, b)
+#define tb_assert_and_check_break(x)						tb_assert_and_check_break_tag(TB_TAG, x)
+#define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_TAG, x)
 
-#define tb_assert(x)									tb_assert_tag(TB_TAG, x)
-#define tb_assert_abort(x)								tb_assert_abort_tag(TB_TAG, x)
-#define tb_assert_return(x)								tb_assert_return_tag(TB_TAG, x)
-#define tb_assert_return_val(x, v)						tb_assert_return_val_tag(TB_TAG, x, v)
-#define tb_assert_goto(x, b)							tb_assert_goto_tag(TB_TAG, x, b)
-#define tb_assert_break(x)								tb_assert_break_tag(TB_TAG, x)
-#define tb_assert_continue(x)							tb_assert_continue_tag(TB_TAG, x)
 
 #define tb_assert_static(x) 							do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
 

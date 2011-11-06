@@ -40,12 +40,12 @@ extern "C" {
  */
 
 // check
-#define tb_if_fail_return(x) 							do { if (!(x)) return ; } while (0)
-#define tb_if_fail_return_val(x, v) 					do { if (!(x)) return (v); } while (0)
-#define tb_if_fail_goto(x, b) 							do { if (!(x)) goto b; } while (0)
-#define tb_if_fail_break(x) 							{ if (!(x)) break ; }
-#define tb_if_fail_abort(x) 							do { if (!(x)) {tb_abort();} } while (0)
-#define tb_if_fail_continue(x) 							{ if (!(x)) continue ; }
+#define tb_check_return(x) 								do { if (!(x)) return ; } while (0)
+#define tb_check_return_val(x, v) 						do { if (!(x)) return (v); } while (0)
+#define tb_check_goto(x, b) 							do { if (!(x)) goto b; } while (0)
+#define tb_check_break(x) 								{ if (!(x)) break ; }
+#define tb_check_abort(x) 								do { if (!(x)) {__tb_volatile__ tb_int_t* p = 0; *p = 0;} } while (0)
+#define tb_check_continue(x) 							{ if (!(x)) continue ; }
 
 #if 1
 // check: discard
