@@ -118,7 +118,7 @@ tbox_C_FILES 			+= \
 endif
 endif
 
-tbox_CFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
+tbox_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_TAG=\"tbox\" -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
 
 # header files
 INC_FILES 				= \
