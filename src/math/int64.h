@@ -38,6 +38,7 @@
 
 #define tb_int32_to_int64(x) 		tb_sint32_to_sint64(x)
 #define tb_int64_to_int32(x) 		tb_sint64_to_sint32(x)
+#define tb_int64_make(h, l) 		tb_sint64_make(h, l)
 
 #define tb_int64_abs(x) 			tb_sint64_abs(x)
 #define tb_int64_neg(x) 			tb_sint64_neg(x)

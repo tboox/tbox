@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo $1 '=>' $2 'at' $3 with $4
+sed -i "s/$1/$2/g" `grep $1 $3 $4 -l`
