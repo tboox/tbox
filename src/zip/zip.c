@@ -31,7 +31,7 @@
 
 tb_zip_t* tb_zip_open(tb_zip_package_t* package, tb_zip_algo_t algo, tb_zip_action_t action)
 {
-	TB_ASSERT_RETURN_VAL(package, TB_NULL);
+	tb_assert_and_check_return_val(package, TB_NULL);
 	switch (algo)
 	{
 	case TB_ZIP_ALGO_RLC:
@@ -53,7 +53,7 @@ tb_void_t tb_zip_close(tb_zip_t* zip)
 }
 tb_zip_status_t tb_zip_spank(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
-	TB_ASSERT_RETURN_VAL(zip && zip->spank && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(zip && zip->spank && ist && ost, TB_ZIP_STATUS_FAIL);
 	return zip->spank(zip, ist, ost);
 }
 

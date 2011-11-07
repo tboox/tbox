@@ -40,7 +40,7 @@
 
 tb_size_t tb_strlen(tb_char_t const* s)
 {
-	TB_ASSERT_RETURN_VAL(s, 0);
+	tb_assert_and_check_return_val(s, 0);
 
 	__tb_register__ tb_size_t n;
 	__tb_asm__ __tb_volatile__

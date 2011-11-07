@@ -15,16 +15,16 @@
 #endif
 
 #define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, s, n); } while (0);
-#define tb_hash_test_get_s2i(h, s) 		do {TB_ASSERT(tb_strlen(s) == (tb_size_t)tb_hash_const_at(h, s)); } while (0);
-#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); TB_ASSERT(!tb_hash_const_at(h, s)); } while (0);
+#define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen(s) == (tb_size_t)tb_hash_const_at(h, s)); } while (0);
+#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); tb_assert(!tb_hash_const_at(h, s)); } while (0);
 
 #define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, i, s); } while (0);
-#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); TB_ASSERT(!tb_strcmp(s, tb_hash_const_at(h, i))); } while (0);
-#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); TB_ASSERT(!tb_hash_const_at(h, i)); } while (0);
+#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_const_at(h, i))); } while (0);
+#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_const_at(h, i)); } while (0);
 
 #define tb_hash_test_set_m2m(h, i) 		do {tb_memset(item, i, step); tb_hash_set(h, item, item); } while (0);
-#define tb_hash_test_get_m2m(h, i) 		do {tb_memset(item, i, step); TB_ASSERT(!tb_memcmp(item, tb_hash_const_at(h, item), step)); } while (0);
-#define tb_hash_test_del_m2m(h, i) 		do {tb_memset(item, i, step); tb_hash_del(h, item); TB_ASSERT(!tb_hash_const_at(h, item)); } while (0);
+#define tb_hash_test_get_m2m(h, i) 		do {tb_memset(item, i, step); tb_assert(!tb_memcmp(item, tb_hash_const_at(h, item), step)); } while (0);
+#define tb_hash_test_del_m2m(h, i) 		do {tb_memset(item, i, step); tb_hash_del(h, item); tb_assert(!tb_hash_const_at(h, item)); } while (0);
 
 /* /////////////////////////////////////////////////////////
  * details
@@ -33,7 +33,7 @@ static tb_void_t tb_hash_test_s2i_func()
 {
 	// init hash: str => int
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(TB_NULL), tb_item_func_int());
-	TB_ASSERT_RETURN(hash);
+	tb_assert_and_check_return(hash);
 
 	// set
 	tb_hash_test_set_s2i(hash, "");
@@ -108,7 +108,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	// init hash: str => int
 	tb_spool_t* pool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(pool), tb_item_func_int());
-	TB_ASSERT_RETURN(hash);
+	tb_assert_and_check_return(hash);
 
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
@@ -122,7 +122,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 		tb_hash_test_get_s2i(hash, s);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
-	tb_printf("time: %lld\n", t);
+	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
 	tb_spool_exit(pool);
@@ -131,7 +131,7 @@ static tb_void_t tb_hash_test_i2s_func()
 {
 	// init hash: int => str
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_int(), tb_item_func_str(TB_NULL));
-	TB_ASSERT_RETURN(hash);
+	tb_assert_and_check_return(hash);
 
 	// set
 	tb_hash_test_set_i2s(hash, 0);
@@ -201,7 +201,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 	// init hash: int => str
 	tb_spool_t* pool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_str(pool));
-	TB_ASSERT_RETURN(hash);
+	tb_assert_and_check_return(hash);
 
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
@@ -214,7 +214,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 		tb_hash_test_get_i2s(hash, i);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
-	tb_printf("time: %lld\n", t);
+	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
 	tb_spool_exit(pool);
@@ -225,7 +225,7 @@ static tb_void_t tb_hash_test_m2m_func()
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
 	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_mem(step, TB_NULL), tb_item_func_mem(step, TB_NULL));
-	TB_ASSERT_RETURN(hash);
+	tb_assert_and_check_return(hash);
 
 	// set
 	tb_hash_test_set_m2m(hash, 0);

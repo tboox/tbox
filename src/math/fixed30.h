@@ -128,14 +128,14 @@
 static __tb_inline__ tb_fixed30_t tb_float_to_fixed30_check(tb_float_t x)
 {
 	// check overflow, [-2., 2.]
-	TB_ASSERT(x >= -2. && x <= 2.);
+	tb_assert(x >= -2. && x <= 2.);
 	return ((tb_fixed30_t)((x) * TB_FIXED30_ONE));
 }
 # 	endif
 static __tb_inline__ tb_fixed30_t tb_fixed16_to_fixed30_check(tb_fixed16_t x)
 {
 	// check overflow, [-2, 2]
-	TB_ASSERT(x >= (-2 << 16) && x <= (2 << 16) - 1);
+	tb_assert(x >= (-2 << 16) && x <= (2 << 16) - 1);
 	return (x << 14);
 }
 #endif
@@ -147,7 +147,7 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_mul_int64(tb_fixed30_t x, tb_fixed3
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_div_int64(tb_fixed30_t x, tb_fixed30_t y)
 {
-	TB_ASSERT(y);
+	tb_assert(y);
 	return (tb_fixed30_t)((((tb_int64_t)x) << 30) / y);
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_int64(tb_fixed30_t x)
@@ -163,7 +163,7 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_mul_float(tb_fixed30_t x, tb_fixed3
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_div_float(tb_fixed30_t x, tb_fixed30_t y)
 {
-	TB_ASSERT(y);
+	tb_assert(y);
 	return tb_float_to_fixed30((tb_float_t)x / y);
 	//return tb_float_to_fixed30(tb_float_div(tb_fixed30_to_float(x), tb_fixed30_to_float(y)));
 }
@@ -193,7 +193,7 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_mul_int32(tb_fixed30_t x, tb_fixed3
     tb_uint32_t hi = xyh + (xyhl >> 16) + (lo < xyl);
 
 	// check overflow
-    TB_ASSERT(!(hi >> 29));
+    tb_assert(!(hi >> 29));
 
     tb_uint32_t r = (hi << 2) + (lo >> 30);
 	return tb_int32_set_sign(r, s);
@@ -214,13 +214,13 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_int32(tb_fixed30_t x)
     tb_uint32_t hi = xxh + (xxhl >> 16) + (lo < xxl);
 
 	// check overflow
-    TB_ASSERT(!(hi >> 29));
+    tb_assert(!(hi >> 29));
 
     return ((hi << 2) + (lo >> 30));
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_sqrt_int32(tb_fixed30_t x)
 {
-	TB_ASSERT(x > 0);
+	tb_assert(x > 0);
 	return (x > 0? (tb_int32_sqrt(x) << 15) : 0);
 }
 

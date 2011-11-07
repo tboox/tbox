@@ -31,13 +31,13 @@
  */
 static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
 {
-	TB_ASSERT(vlc && val);
+	tb_assert(vlc && val);
 
 #ifdef TB_ZIP_VLC_GOLOMB_ADAPTIVE
 	tb_size_t avg = 0;
 	if (((tb_zip_vlc_golomb_t*)vlc)->count)
 		avg = ((tb_zip_vlc_golomb_t*)vlc)->total / ((tb_zip_vlc_golomb_t*)vlc)->count;
-	//TB_DBG("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
+	//tb_trace("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
 
 	tb_int_t m = TB_MATH_IRLOG2I(avg);
 #else
@@ -49,7 +49,7 @@ static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bs
 	tb_int_t q = (tb_int_t)((val - 1) / b);
 	tb_int_t r = val - 1 - q * b;
 
-	//TB_DBG("x: %d, q: %d, m: %d, r: %d", val, q, m, r);
+	//tb_trace("x: %d, q: %d, m: %d, r: %d", val, q, m, r);
 
 	// store
 	tb_int_t i = 0;
@@ -65,13 +65,13 @@ static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bs
 }
 static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_bstream_t const* bst)
 {
-	TB_ASSERT(vlc);
+	tb_assert(vlc);
 
 #ifdef TB_ZIP_VLC_GOLOMB_ADAPTIVE
 	tb_size_t avg = 0;
 	if (((tb_zip_vlc_golomb_t*)vlc)->count)
 		avg = ((tb_zip_vlc_golomb_t*)vlc)->total / ((tb_zip_vlc_golomb_t*)vlc)->count;
-	//TB_DBG("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
+	//tb_trace("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
 
 	tb_int_t m = TB_MATH_IRLOG2I(avg);
 #else
@@ -98,7 +98,7 @@ static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_bstream_t const* 
 	((tb_zip_vlc_golomb_t*)vlc)->count++;
 #endif
 
-	//TB_DBG("x: %d, q: %d, m: %d, r: %d", (r + q * b + 1), q, m, r);
+	//tb_trace("x: %d, q: %d, m: %d, r: %d", (r + q * b + 1), q, m, r);
 
 	return val;
 }

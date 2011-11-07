@@ -35,7 +35,7 @@
 // cstring
 static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_void_t* item)
 {
-	TB_ASSERT_RETURN(func);
+	tb_assert_and_check_return(func);
 	if (item) 
 	{
 		if (func->pool) tb_spool_free((tb_spool_t*)func->pool, item);
@@ -44,13 +44,13 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_void_t* item)
 }
 static tb_void_t* tb_item_func_str_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(func, TB_NULL);
+	tb_assert_and_check_return_val(func, TB_NULL);
 	return func->pool? tb_spool_strdup((tb_spool_t*)func->pool, item) : tb_strdup(item);
 }
 #if 1
 static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(func && item && size, 0);
+	tb_assert_and_check_return_val(func && item && size, 0);
 
 	tb_size_t h = 2166136261;
 	tb_byte_t const* p = item;
@@ -61,45 +61,45 @@ static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_void_t const* it
 #else
 static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(func && item && size, 0);
+	tb_assert_and_check_return_val(func && item && size, 0);
 	return (tb_strlen(item) & (size - 1));
 }
 #endif
 static tb_int_t tb_item_func_str_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	TB_ASSERT_RETURN_VAL(func, 0);
+	tb_assert_and_check_return_val(func, 0);
 	return tb_strcmp(litem, ritem);
 }
 
 static tb_char_t const* tb_item_func_str_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
 {
-	TB_ASSERT_RETURN_VAL(func, "");
+	tb_assert_and_check_return_val(func, "");
 	return (tb_char_t const*)item;
 }
 
 // integer
 static tb_void_t tb_item_func_int_free(tb_item_func_t* func, tb_void_t* item)
 {
-	TB_ASSERT_RETURN(func);
+	tb_assert_and_check_return(func);
 }
 static tb_void_t* tb_item_func_int_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(func, TB_NULL);
+	tb_assert_and_check_return_val(func, TB_NULL);
 	return (tb_void_t*)item;
 }
 static tb_size_t tb_item_func_int_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(func && size, 0);
+	tb_assert_and_check_return_val(func && size, 0);
 	return (((tb_size_t)item) ^ 0xdeadbeef) & (size - 1);
 }
 static tb_int_t tb_item_func_int_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	TB_ASSERT_RETURN_VAL(func, 0);
+	tb_assert_and_check_return_val(func, 0);
 	return (litem - ritem);
 }
 static tb_char_t const* tb_item_func_int_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
 {
-	TB_ASSERT_RETURN_VAL(func && data, "");
+	tb_assert_and_check_return_val(func && data, "");
 	tb_int_t n = tb_snprintf(data, maxn, "%d", item);
 	if (n > 0) data[n] = '\0';
 	return (tb_char_t const*)data;
@@ -108,26 +108,26 @@ static tb_char_t const* tb_item_func_int_cstr(tb_item_func_t* func, tb_void_t co
 // pointer
 static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_void_t* item)
 {
-	TB_ASSERT_RETURN(func);
+	tb_assert_and_check_return(func);
 }
 static tb_void_t* tb_item_func_ptr_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(func, TB_NULL);
+	tb_assert_and_check_return_val(func, TB_NULL);
 	return item;
 }
 static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(func && size, 0);
+	tb_assert_and_check_return_val(func && size, 0);
 	return (((tb_size_t)item) ^ 0xdeadbeef) & (size - 1);
 }
 static tb_int_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	TB_ASSERT_RETURN_VAL(func, 0);
+	tb_assert_and_check_return_val(func, 0);
 	return (litem - ritem);
 }
 static tb_char_t const* tb_item_func_ptr_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
 {
-	TB_ASSERT_RETURN_VAL(func && data, "");
+	tb_assert_and_check_return_val(func && data, "");
 	tb_int_t n = tb_snprintf(data, maxn, "%x", item);
 	if (n > 0) data[n] = '\0';
 	return (tb_char_t const*)data;
@@ -136,7 +136,7 @@ static tb_char_t const* tb_item_func_ptr_cstr(tb_item_func_t* func, tb_void_t co
 // memory
 static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_void_t* item)
 {
-	TB_ASSERT_RETURN(func);
+	tb_assert_and_check_return(func);
 	if (func->pool)
 	{
 	}
@@ -147,7 +147,7 @@ static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_void_t* item)
 }
 static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(func && func->priv, TB_NULL);
+	tb_assert_and_check_return_val(func && func->priv, TB_NULL);
 		
 	if (func->pool)
 	{
@@ -156,7 +156,7 @@ static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* i
 	{
 		tb_size_t 	step = (tb_size_t)func->priv;
 		tb_void_t* 	data = tb_malloc(step);
-		TB_ASSERT_RETURN_VAL(data, TB_NULL);
+		tb_assert_and_check_return_val(data, TB_NULL);
 
 		return tb_memcpy(data, item, step);
 	}
@@ -164,7 +164,7 @@ static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* i
 }
 static tb_size_t tb_item_func_mem_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(func && func->priv && item && size, 0);
+	tb_assert_and_check_return_val(func && func->priv && item && size, 0);
 
 	if (func->pool)
 	{
@@ -183,7 +183,7 @@ static tb_size_t tb_item_func_mem_hash(tb_item_func_t* func, tb_void_t const* it
 }
 static tb_int_t tb_item_func_mem_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	TB_ASSERT_RETURN_VAL(func, 0);
+	tb_assert_and_check_return_val(func, 0);
 	if (func->pool)
 	{
 	}
@@ -196,7 +196,7 @@ static tb_int_t tb_item_func_mem_comp(tb_item_func_t* func, tb_void_t const* lit
 }
 static tb_char_t const* tb_item_func_mem_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
 {
-	TB_ASSERT_RETURN_VAL(func && item && data, "");
+	tb_assert_and_check_return_val(func && item && data, "");
 
 	if (func->pool)
 	{

@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 
 	// init cookies
 	tb_cookies_t* cookies = tb_cookies_init();
-	TB_ASSERT_RETURN_VAL(cookies, 0);
+	tb_assert_and_check_return_val(cookies, 0);
 
 	// set cookies
 	tb_cookies_set(cookies, TB_NULL, TB_NULL, TB_FALSE, "BAIDUID=0; max-age=946080000; expires=Sat, 06-Apr-41 03:21:53 GMT; domain=.baidu.com; path=/");
@@ -22,13 +22,13 @@ int main(int argc, char** argv)
 	tb_cookies_set_from_url(cookies, "http://mail.evmtv.com:2000/WorldClient.dll?View=Main", "Theme=Standard; Expires=Tue, 19-Apr-2012 07:10:56 GMT; path=/");
 	
 	// get cookies
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://www.space.baidu.com/style/foo/login.css"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style/foo/login.css"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "https://www.baidu.com/"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://pingfore.qq.com/pingd?dm=qzone.qq.com&url=login/qzone_n&tt=-&rdm=-&rurl=-&pvid=7466815060&scr=-&scl=-&lang=-&java=1&cc=-&pf=-&tz=-8&ct=-&vs=3.3&emu=0.20486706611700356"));
-	TB_DBG("%s", tb_cookies_get_from_url(cookies, "http://mail.evmtv.com:2000/?Session=LZBMQVW&View=Menu"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://www.space.baidu.com/style/foo/login.css"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style/foo/login.css"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com/style"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://www.baidu.com"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "https://www.baidu.com/"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://pingfore.qq.com/pingd?dm=qzone.qq.com&url=login/qzone_n&tt=-&rdm=-&rurl=-&pvid=7466815060&scr=-&scl=-&lang=-&java=1&cc=-&pf=-&tz=-8&ct=-&vs=3.3&emu=0.20486706611700356"));
+	tb_trace("%s", tb_cookies_get_from_url(cookies, "http://mail.evmtv.com:2000/?Session=LZBMQVW&View=Menu"));
 
 #ifdef TB_DEBUG
 	// dump

@@ -146,7 +146,7 @@ static __tb_inline__ tb_uint64_t tb_uint32_to_uint64_inline(tb_uint32_t x)
 static __tb_inline__ tb_uint32_t tb_uint64_to_uint32_inline(tb_uint64_t x)
 {
 	// is uint32?
-	TB_ASSERT(!x.h);
+	tb_assert(!x.h);
 	return x.l;
 }
 static __tb_inline__ tb_uint64_t tb_uint64_make_inline(tb_uint32_t h, tb_uint32_t l)
@@ -197,7 +197,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_mul_inline(tb_uint64_t x, tb_uint64_t
 	tb_uint32_t h = x.h * y.l + x.l * y.h;
 	x = tb_uint64_mul_uint32_x_uint32(x.l, y.l);
 	x.h += h;
-	TB_ASSERT(x.h >= h);
+	tb_assert(x.h >= h);
 
 	return x;
 }
@@ -261,7 +261,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_mul_uint32_inline(tb_uint64_t x, tb_u
 	tb_uint32_t h = x.h * y;
 	x = tb_uint64_mul_uint32_x_uint32(x.l, y);
 	x.h += h;
-	TB_ASSERT(x.h >= h);
+	tb_assert(x.h >= h);
 	return x;
 #else
 	tb_uint64_t r;
@@ -279,7 +279,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_mul_uint32_inline(tb_uint64_t x, tb_u
 
 	r.l = (b << 16) + a;
 	r.h = (d << 16) + c + (b >> 16) + (r.l < a);
-	TB_ASSERT(r.h >= c);
+	tb_assert(r.h >= c);
 
 	return r;
 #endif
@@ -310,7 +310,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_xor_uint32_inline(tb_uint64_t x, tb_u
 }
 static __tb_inline__ tb_uint64_t tb_uint64_lsh_inline(tb_uint64_t x, tb_size_t b)
 {
-	TB_ASSERT(b < 64);
+	tb_assert(b < 64);
 	//b &= 0x3f;
 	if (b >= 32)
 	{
@@ -326,7 +326,7 @@ static __tb_inline__ tb_uint64_t tb_uint64_lsh_inline(tb_uint64_t x, tb_size_t b
 }
 static __tb_inline__ tb_uint64_t tb_uint64_rsh_inline(tb_uint64_t x, tb_size_t b)
 {
-	TB_ASSERT(b < 64);
+	tb_assert(b < 64);
 	//b &= 0x3f;
 	if (b >= 32)
 	{

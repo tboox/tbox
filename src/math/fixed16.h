@@ -222,7 +222,7 @@
 # 	ifdef TB_CONFIG_TYPE_FLOAT
 # 		define tb_fixed16_expi(x) 			tb_fixed16_expi_float(x)
 # 	else
-# 		define tb_fixed16_expi(x) 			TB_ASSERT(0)
+# 		define tb_fixed16_expi(x) 			tb_assert(0)
 # 	endif
 #endif
 
@@ -230,7 +230,7 @@
 # 	ifdef TB_CONFIG_TYPE_FLOAT
 # 		define tb_fixed16_exp1(x) 			tb_fixed16_exp1_float(x)
 # 	else
-# 		define tb_fixed16_exp1(x) 			TB_ASSERT(0)
+# 		define tb_fixed16_exp1(x) 			tb_assert(0)
 # 	endif
 #endif
 
@@ -266,13 +266,13 @@ tb_fixed16_t 	tb_fixed16_exp_int32(tb_fixed16_t x);
 static __tb_inline__ tb_fixed16_t tb_int_to_fixed16_check(tb_int_t x)
 {
 	// check overflow
-	TB_ASSERT(x >= TB_MINS16 && x <= TB_MAXS16);
+	tb_assert(x >= TB_MINS16 && x <= TB_MAXS16);
 	return (x << 16);
 }
 static __tb_inline__ tb_int_t tb_fixed16_to_int_check(tb_fixed16_t x)
 {
 	// check overflow
-	TB_ASSERT(x != TB_FIXED16_NAN);
+	tb_assert(x != TB_FIXED16_NAN);
 	return (x >> 16);
 }
 #endif
@@ -284,7 +284,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed1
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_div_int64(tb_fixed16_t x, tb_fixed16_t y)
 {
-	TB_ASSERT(y);
+	tb_assert(y);
 	return (tb_fixed16_t)((((tb_int64_t)x) << 16) / y);
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
@@ -300,7 +300,7 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_mul_float(tb_fixed16_t x, tb_fixed1
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_div_float(tb_fixed16_t x, tb_fixed16_t y)
 {
-	TB_ASSERT(y);
+	tb_assert(y);
 	return tb_float_to_fixed16((tb_float_t)x / y);
 	//return tb_float_to_fixed16(tb_float_div(tb_fixed16_to_float(x), tb_fixed16_to_float(y)));
 }
@@ -377,24 +377,24 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int32(tb_fixed16_t x)
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqrt_int32(tb_fixed16_t x)
 {
-	TB_ASSERT(x > 0);
+	tb_assert(x > 0);
 	return (x > 0? (tb_int32_sqrt(x) << 8) : 0);
 }
 static __tb_inline__ tb_uint32_t tb_fixed16_ilog2_int32(tb_fixed16_t x)
 {
-	TB_ASSERT(x > 0);
+	tb_assert(x > 0);
 	tb_uint32_t lg = tb_int32_log2(x);
 	return (lg > 16? (lg - 16) : 0);
 }
 static __tb_inline__ tb_uint32_t tb_fixed16_iclog2_int32(tb_fixed16_t x)
 {
-	TB_ASSERT(x > 0);
+	tb_assert(x > 0);
 	tb_uint32_t lg = tb_int32_clog2(x);
 	return (lg > 16? (lg - 16) : 0);
 }
 static __tb_inline__ tb_uint32_t tb_fixed16_irlog2_int32(tb_fixed16_t x)
 {
-	TB_ASSERT(x > 0);
+	tb_assert(x > 0);
 	tb_uint32_t lg = tb_int32_rlog2(x);
 	return (lg > 16? (lg - 16) : 0);
 }

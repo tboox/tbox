@@ -30,7 +30,7 @@
  */
 static __tb_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
 {
-	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_RLC, TB_NULL);
+	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_RLC, TB_NULL);
 	return (tb_zip_rlc_t*)zip;
 }
 static tb_void_t tb_zip_rlc_close(tb_zip_t* zip)
@@ -48,21 +48,21 @@ static tb_void_t tb_zip_rlc_close(tb_zip_t* zip)
 static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	TB_ASSERT_RETURN_VAL(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	TB_ASSERT_RETURN_VAL(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	TB_ASSERT_RETURN_VAL(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
 
 	// get vlc
 	tb_zip_vlc_t* vlc = rlc->vlc;
-	TB_ASSERT_RETURN_VAL(vlc && vlc->set, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(vlc && vlc->set, TB_ZIP_STATUS_FAIL);
 
 	// vlc callback
 	tb_zip_vlc_set_t vlc_set = vlc->set;
@@ -101,11 +101,11 @@ static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist
 					// set value
 					tb_bstream_set_ubits32(ost, last, 8);
 
-					//TB_DBG("repeat(0x%02x): %d", last, repeat);
+					//tb_trace("repeat(0x%02x): %d", last, repeat);
 				}
 				else
 				{
-					TB_ASSERT(repeat == 1);
+					tb_assert(repeat == 1);
 
 					// set flag
 					tb_bstream_set_u1(ost, 0);
@@ -138,21 +138,21 @@ static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist
 static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	TB_ASSERT_RETURN_VAL(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	TB_ASSERT_RETURN_VAL(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	TB_ASSERT_RETURN_VAL(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
 
 	// get vlc
 	tb_zip_vlc_t* vlc = rlc->vlc;
-	TB_ASSERT_RETURN_VAL(vlc && vlc->get, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(vlc && vlc->get, TB_ZIP_STATUS_FAIL);
 
 	// vlc callback
 	tb_zip_vlc_get_t vlc_get = vlc->get;
@@ -174,7 +174,7 @@ static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist
 			// get value
 			last = tb_bstream_get_ubits32(ist, 8);
 
-			//TB_DBG("repeat(0x%02x): %d", last, repeat);
+			//tb_trace("repeat(0x%02x): %d", last, repeat);
 
 			// fill bytes
 			while (repeat-- > 0 && op < oe) *op++ = last;
@@ -198,7 +198,7 @@ static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist
 tb_zip_t* tb_zip_rlc_open(tb_zip_rlc_t* rlc, tb_zip_action_t action)
 {
 	tb_zip_t* zip = (tb_zip_t*)rlc;
-	TB_ASSERT_RETURN_VAL(zip, TB_NULL);
+	tb_assert_and_check_return_val(zip, TB_NULL);
 	
 	// init zip
 	tb_memset(zip, 0, sizeof(tb_zip_rlc_t));
@@ -217,7 +217,7 @@ tb_zip_t* tb_zip_rlc_open(tb_zip_rlc_t* rlc, tb_zip_action_t action)
 #endif
 
 	// check vlc
-	TB_ASSERT_RETURN_VAL(rlc->vlc, TB_NULL);
+	tb_assert_and_check_return_val(rlc->vlc, TB_NULL);
 
 	return zip;
 }

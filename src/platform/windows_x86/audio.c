@@ -35,42 +35,42 @@
  */
 tb_size_t tb_audio_get_volume()
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return 0;
 }
 tb_bool_t tb_audio_set_volume(tb_size_t volume)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_FALSE;
 }
 tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb_audio_channel_t channel, tb_bool_t is_block)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_NULL;
 }
 tb_int_t tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return -1;
 }
 tb_void_t tb_audio_close(tb_handle_t haudio)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 tb_size_t tb_audio_bsize(tb_handle_t haudio)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return 0;
 }
 tb_void_t tb_audio_clear(tb_handle_t haudio)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 tb_void_t tb_audio_pause(tb_handle_t haudio)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 tb_void_t tb_audio_resume(tb_handle_t haudio)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }

@@ -33,7 +33,7 @@
  */
 static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_string_t* parent, tb_char_t const* path)
 {
-	TB_ASSERT(node);
+	tb_assert(node);
 	if (!node || !node->childs) return TB_NULL;
 	
 	// init
@@ -53,7 +53,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_str
 			if (parent) tb_string_append((tb_string_t*)&s, parent);
 			tb_string_append_char((tb_string_t*)&s, '/');
 			tb_string_append((tb_string_t*)&s, &item->name);
-			//TB_DBG("%s: %s", tb_string_c_string(&item->name), tb_string_c_string(&s));
+			//tb_trace("%s: %s", tb_string_c_string(&item->name), tb_string_c_string(&s));
 			
 			// is this?
 			if (TB_TRUE == tb_string_compare_c_string((tb_string_t*)&s, path))
@@ -137,7 +137,7 @@ tb_void_t tb_xml_node_destroy(tb_xml_node_t* node)
 
 tb_void_t tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child)
 {
-	TB_ASSERT(node && child);
+	tb_assert(node && child);
 	if (!node || !child) return ;
 
 	if (!node->childs) node->childs = tb_xml_nlist_create();
@@ -149,7 +149,7 @@ tb_void_t tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child)
 }
 tb_void_t tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child)
 {
-	TB_ASSERT(node && child);
+	tb_assert(node && child);
 	if (!node || !child) return ;
 
 	if (node->childs) 
@@ -179,7 +179,7 @@ tb_void_t tb_xml_node_attributes_clear(tb_xml_node_t* node)
 }
 tb_xml_node_t* tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value)
 {
-	TB_ASSERT(node && name && value);
+	tb_assert(node && name && value);
 	if (!node || !name || !value) return TB_NULL;
 
 	// create attribute
@@ -203,7 +203,7 @@ fail:
 }
 tb_xml_node_t* tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* value)
 {
-	TB_ASSERT(node && name && value);
+	tb_assert(node && name && value);
 	if (!node || !name || !value) return TB_NULL;
 
 	// create attribute
@@ -227,7 +227,7 @@ fail:
 }
 tb_xml_node_t* tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t const* name, tb_int_t value)
 {
-	TB_ASSERT(node && name);
+	tb_assert(node && name);
 	if (!node || !name) return TB_NULL;
 
 	// create attribute
@@ -253,7 +253,7 @@ fail:
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_xml_node_t* tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value)
 {
-	TB_ASSERT(node && name);
+	tb_assert(node && name);
 	if (!node || !name) return TB_NULL;
 
 	// create attribute
@@ -278,7 +278,7 @@ fail:
 #endif
 tb_xml_node_t* tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value)
 {
-	TB_ASSERT(node && name);
+	tb_assert(node && name);
 	if (!node || !name) return TB_NULL;
 
 	// create attribute
@@ -302,7 +302,7 @@ fail:
 }
 tb_xml_node_t* tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* fmt, ...)
 {
-	TB_ASSERT(node && name && fmt);
+	tb_assert(node && name && fmt);
 	if (!node || !name || !fmt) return TB_NULL;
 
 	// format text
@@ -333,7 +333,7 @@ fail:
 
 tb_xml_node_t* tb_xml_node_add_element(tb_xml_node_t* node, tb_char_t const* name)
 {
-	TB_ASSERT(node && name);
+	tb_assert(node && name);
 	if (!node || !name) return TB_NULL;
 
 	// create element
@@ -347,7 +347,7 @@ tb_xml_node_t* tb_xml_node_add_element(tb_xml_node_t* node, tb_char_t const* nam
 }
 tb_xml_node_t* tb_xml_node_add_text(tb_xml_node_t* node, tb_char_t const* data)
 {
-	TB_ASSERT(node && data);
+	tb_assert(node && data);
 	if (!node || !data) return TB_NULL;
 
 	// create text
@@ -361,7 +361,7 @@ tb_xml_node_t* tb_xml_node_add_text(tb_xml_node_t* node, tb_char_t const* data)
 }
 tb_xml_node_t* tb_xml_node_add_cdata(tb_xml_node_t* node, tb_char_t const* data)
 {
-	TB_ASSERT(node && data);
+	tb_assert(node && data);
 	if (!node || !data) return TB_NULL;
 
 	// create cdata
@@ -375,7 +375,7 @@ tb_xml_node_t* tb_xml_node_add_cdata(tb_xml_node_t* node, tb_char_t const* data)
 }
 tb_xml_node_t* tb_xml_node_add_comment(tb_xml_node_t* node, tb_char_t const* data)
 {
-	TB_ASSERT(node && data);
+	tb_assert(node && data);
 	if (!node || !data) return TB_NULL;
 
 	// create comment
@@ -389,7 +389,7 @@ tb_xml_node_t* tb_xml_node_add_comment(tb_xml_node_t* node, tb_char_t const* dat
 }
 tb_xml_node_t* tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* name)
 {
-	TB_ASSERT(node && name);
+	tb_assert(node && name);
 	if (!node || !name) return TB_NULL;
 
 	// create attribute
@@ -404,7 +404,7 @@ tb_xml_node_t* tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* n
 
 tb_xml_node_t* tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path)
 {
-	TB_ASSERT(node && node->childs && path);
+	tb_assert(node && node->childs && path);
 	if (!node || !node->childs || !path) return TB_NULL;
 
 	return tb_xml_node_childs_select_node(node, TB_NULL, path);

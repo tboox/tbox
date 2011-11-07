@@ -296,7 +296,7 @@ tb_void_t tb_sha_init(tb_sha_t* sha, tb_size_t mode)
 		sha->transform = tb_sha_transform_sha2;
 		break;
 	default:
-		TB_ASSERT(0);
+		tb_assert(0);
 		break;
 	}
 	sha->count = TB_UINT64_ZERO;
@@ -314,7 +314,7 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 
 	tb_uint32_t i = 0;
 	tb_uint32_t n = sha->digest_len;
-	TB_ASSERT((n << 2) <= size);
+	tb_assert((n << 2) <= size);
 	for (i = 0; i < n; i++)
 		tb_bits_set_u32_be(data + (i << 2), sha->state[i]);
 }
@@ -354,7 +354,7 @@ tb_size_t tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t in, tb_by
 	tb_sha_t sha;
 
 	// check
-	TB_ASSERT_RETURN_VAL(ib && in && ob && on >= 16, 0);
+	tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);
 
 	// init 
 	tb_sha_init(&sha, mode);

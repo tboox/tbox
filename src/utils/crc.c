@@ -235,7 +235,7 @@ static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] =
 
 tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in)
 {
-	TB_ASSERT_RETURN_VAL(mode < TB_CRC_MODE_MAX, 0);
+	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX, 0);
 	tb_byte_t const* 	ie = ib + in;
 	tb_uint32_t const* 	pt = &g_crc_table[mode];
 	while (ib < ie)

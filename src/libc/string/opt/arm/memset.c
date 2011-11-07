@@ -79,7 +79,7 @@ static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
 tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	tb_assert_and_check_return_val(s, TB_NULL);
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
@@ -162,10 +162,10 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
 tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	tb_assert_and_check_return_val(s, TB_NULL);
 
 	// align by 2-bytes 
-	TB_ASSERT(!(((tb_size_t)s) & 0x1));
+	tb_assert(!(((tb_size_t)s) & 0x1));
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
@@ -235,10 +235,10 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
 tb_void_t* tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	tb_assert_and_check_return_val(s, TB_NULL);
 
 	// align by 4-bytes 
-	TB_ASSERT(!(((tb_size_t)s) & 0x3));
+	tb_assert(!(((tb_size_t)s) & 0x3));
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)

@@ -44,7 +44,7 @@ tb_void_t tb_thread_close(tb_handle_t hthread)
 }
 tb_bool_t tb_thread_wait(tb_handle_t hthread, tb_int_t timeout)
 {
-	TB_ASSERT_RETURN_VAL(hthread, TB_FALSE);
+	tb_assert_and_check_return_val(hthread, TB_FALSE);
 
 	if (0 != pthread_join(((pthread_t)hthread), NULL)) return TB_FALSE;
 	else return TB_TRUE;

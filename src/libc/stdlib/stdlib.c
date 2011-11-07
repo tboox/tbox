@@ -32,7 +32,7 @@
 
 tb_uint32_t tb_s2tou32(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -70,7 +70,7 @@ tb_uint32_t tb_s2tou32(tb_char_t const* s)
 }
 tb_uint32_t tb_s8tou32(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -105,7 +105,7 @@ tb_uint32_t tb_s8tou32(tb_char_t const* s)
 
 tb_uint32_t tb_s10tou32(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -139,7 +139,7 @@ tb_uint32_t tb_s10tou32(tb_char_t const* s)
 }
 tb_uint32_t tb_s16tou32(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -181,7 +181,7 @@ tb_uint32_t tb_s16tou32(tb_char_t const* s)
 }
 tb_uint32_t tb_stou32(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -225,14 +225,14 @@ tb_uint32_t tb_sbtou32(tb_char_t const* s, tb_int_t base)
 	, 	TB_NULL
 	, 	tb_s16tou32
 	};
-	TB_ASSERT(base < tb_arrayn(convs));
+	tb_assert(base < tb_arrayn(convs));
 	if (convs[base]) return convs[base](s);
 	else return 0;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_s2tof(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0.;
 
 	// skip space
@@ -302,7 +302,7 @@ tb_float_t tb_s2tof(tb_char_t const* s)
 		s++;
 	}
 
-	TB_ASSERT(d <= decimals + 256);
+	tb_assert(d <= decimals + 256);
 
 	// compute decimal
 	while (d-- > decimals) rhs = (rhs + *d) / 2;
@@ -312,7 +312,7 @@ tb_float_t tb_s2tof(tb_char_t const* s)
 }
 tb_float_t tb_s8tof(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0.;
 
 	// skip space
@@ -381,7 +381,7 @@ tb_float_t tb_s8tof(tb_char_t const* s)
 		s++;
 	}
 
-	TB_ASSERT(d <= decimals + 256);
+	tb_assert(d <= decimals + 256);
 
 	// compute decimal
 	while (d-- > decimals) rhs = (rhs + *d) / 8;
@@ -391,7 +391,7 @@ tb_float_t tb_s8tof(tb_char_t const* s)
 }
 tb_float_t tb_s10tof(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0.;
 
 	// skip space
@@ -460,7 +460,7 @@ tb_float_t tb_s10tof(tb_char_t const* s)
 		s++;
 	}
 
-	TB_ASSERT(d <= decimals + 256);
+	tb_assert(d <= decimals + 256);
 
 	// compute decimal
 	while (d-- > decimals) rhs = (rhs + *d) / 10;
@@ -470,7 +470,7 @@ tb_float_t tb_s10tof(tb_char_t const* s)
 }
 tb_float_t tb_s16tof(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0.;
 
 	// skip space
@@ -582,7 +582,7 @@ tb_float_t tb_s16tof(tb_char_t const* s)
 		s++;
 	}
 
-	TB_ASSERT(d <= decimals + 256);
+	tb_assert(d <= decimals + 256);
 
 	// compute decimal
 	while (d-- > decimals) rhs = (rhs + *d) / 16;
@@ -592,7 +592,7 @@ tb_float_t tb_s16tof(tb_char_t const* s)
 }
 tb_float_t tb_stof(tb_char_t const* s)
 {
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return 0;
 
 	// skip space
@@ -636,7 +636,7 @@ tb_float_t tb_sbtof(tb_char_t const* s, tb_int_t base)
 	, 	TB_NULL
 	, 	tb_s16tof
 	};
-	TB_ASSERT(base < tb_arrayn(convs));
+	tb_assert(base < tb_arrayn(convs));
 	if (convs[base]) return convs[base](s);
 	else return 0.;
 }

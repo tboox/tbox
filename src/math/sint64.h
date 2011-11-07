@@ -154,7 +154,7 @@ static __tb_inline__ tb_sint64_t tb_sint32_to_sint64_inline(tb_sint32_t x)
 static __tb_inline__ tb_sint32_t tb_sint64_to_sint32_inline(tb_sint64_t x)
 {
 	// is sint32?
-	TB_ASSERT(x.h == ((tb_sint32_t)x.l >> 31));
+	tb_assert(x.h == ((tb_sint32_t)x.l >> 31));
 	return (tb_sint32_t)x.l;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_make_inline(tb_sint32_t h, tb_uint32_t l)
@@ -314,7 +314,7 @@ static __tb_inline__ tb_sint64_t tb_sint64_xor_sint32_inline(tb_sint64_t x, tb_s
 }
 static __tb_inline__ tb_sint64_t tb_sint64_lsh_inline(tb_sint64_t x, tb_size_t b)
 {
-	TB_ASSERT(b < 64);
+	tb_assert(b < 64);
 	//b &= 0x3f;
 	if (b >= 32)
 	{
@@ -330,7 +330,7 @@ static __tb_inline__ tb_sint64_t tb_sint64_lsh_inline(tb_sint64_t x, tb_size_t b
 }
 static __tb_inline__ tb_sint64_t tb_sint64_rsh_inline(tb_sint64_t x, tb_size_t b)
 {
-	TB_ASSERT(b < 64);
+	tb_assert(b < 64);
 	//b &= 0x3f;
 	if (b >= 32)
 	{

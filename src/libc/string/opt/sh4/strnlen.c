@@ -39,7 +39,7 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, 0);
+	tb_assert_and_check_return_val(s, 0);
 	if (!n) return 0;
 
 	return 0;

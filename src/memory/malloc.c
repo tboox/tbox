@@ -51,10 +51,10 @@ static tb_handle_t g_mutex = TB_NULL;
  */
 tb_bool_t tb_memory_init(tb_void_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(data && size, TB_FALSE);
+	tb_assert_and_check_return_val(data && size, TB_FALSE);
 
 	if (!g_mutex) g_mutex = tb_mutex_init("the memory pool");
-	TB_ASSERT_RETURN_VAL(g_mutex, TB_FALSE);
+	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
 
 	if (!tb_mutex_lock(g_mutex)) return TB_FALSE;
 	if (!g_mpool) g_mpool = tb_mpool_init(data, size);
@@ -88,7 +88,7 @@ tb_void_t* tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t l
 #endif
 {
 	// check 
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_mpool && g_mutex, TB_NULL);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
@@ -96,9 +96,9 @@ tb_void_t* tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t l
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
-	TB_ASSERT(!(((tb_size_t)p) & TB_CPU_BITALIGN));
+	tb_assert(!(((tb_size_t)p) & TB_CPU_BITALIGN));
 
-	TB_ASSERTM(p, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
+	tb_assert_message(p, "cannot alloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
 	return p;
 }
 #ifndef TB_DEBUG
@@ -108,7 +108,7 @@ tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* 
 #endif
 {
 	// check 
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_mpool && g_mutex, TB_NULL);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
@@ -116,9 +116,9 @@ tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* 
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
-	TB_ASSERT(!(((tb_size_t)p) & TB_CPU_BITALIGN));
+	tb_assert(!(((tb_size_t)p) & TB_CPU_BITALIGN));
 
-	TB_ASSERTM(p, "cannot calloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
+	tb_assert_message(p, "cannot calloc at %s(): %d, file: %s", func? func : "null", line, file? file : "null");
 	return p;
 }
 
@@ -129,7 +129,7 @@ tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const
 #endif
 {
 	// check 
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_mpool && g_mutex, TB_NULL);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_NULL;
@@ -137,9 +137,9 @@ tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const
 	tb_mutex_unlock(g_mutex);
 
 	// align by 4 bytes
-	TB_ASSERT(!(((tb_size_t)p) & TB_CPU_BITALIGN));
+	tb_assert(!(((tb_size_t)p) & TB_CPU_BITALIGN));
 
-	TB_ASSERTM(p, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
+	tb_assert_message(p, "invalid realloc data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 	return p;
 }
 #ifndef TB_DEBUG
@@ -149,21 +149,21 @@ tb_void_t tb_memory_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t
 #endif
 {
 	// check 
-	TB_ASSERT_RETURN(g_mpool && g_mutex);
+	tb_assert_and_check_return(g_mpool && g_mutex);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return ;
 	tb_bool_t ret = TB_MPOOL_DEALLOCATE(g_mpool, data, func, line, file);
 	tb_mutex_unlock(g_mutex);
 
-	TB_ASSERTM(ret, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
+	tb_assert_message(ret, "invalid free data address:%x at %s(): %d, file: %s", data, func? func : "null", line, file? file : "null");
 }
 
 #ifdef TB_DEBUG
 tb_void_t tb_memory_dump()
 {
 	// check 
-	TB_ASSERT_RETURN(g_mpool && g_mutex);
+	tb_assert_and_check_return(g_mpool && g_mutex);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return ;
@@ -173,7 +173,7 @@ tb_void_t tb_memory_dump()
 tb_bool_t tb_memory_check()
 {
 	// check 
-	TB_ASSERT_RETURN_VAL(g_mpool && g_mutex, TB_FALSE);
+	tb_assert_and_check_return_val(g_mpool && g_mutex, TB_FALSE);
 
 	// lock
 	if (!tb_mutex_lock(g_mutex)) return TB_FALSE;

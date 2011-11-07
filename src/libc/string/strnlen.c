@@ -44,13 +44,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRNLEN)
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, 0);
+	tb_assert_and_check_return_val(s, 0);
 	return strnlen(s, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRNLEN)
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s, 0);
+	tb_assert_and_check_return_val(s, 0);
 	if (!n) return 0;
 
 	__tb_register__ tb_char_t const* p = s;

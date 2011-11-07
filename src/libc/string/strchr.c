@@ -35,13 +35,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRCHR
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 	return strchr(s1, c);
 }
 #else
 tb_char_t* tb_strchr(tb_char_t const* s, tb_char_t c)
 {
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	tb_assert_and_check_return_val(s, TB_NULL);
 
 	do 
 	{

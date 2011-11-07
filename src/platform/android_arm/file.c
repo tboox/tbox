@@ -50,9 +50,9 @@ typedef struct __tb_file_list_t
 tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 {
 	tb_int_t flag = 0, mode = 0, fd = -1;
-	TB_ASSERT_RETURN_VAL(path, TB_NULL);
+	tb_assert_and_check_return_val(path, TB_NULL);
 
-	//TB_DBG("tb_file_open:%s flags:%d", path, flags);
+	//tb_trace("tb_file_open:%s flags:%d", path, flags);
 
 	if (flags & TB_FILE_RO) flag |= O_RDONLY;
 	else if (flags & TB_FILE_WO) flag |= O_WRONLY;
@@ -77,29 +77,29 @@ tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 }
 tb_void_t tb_file_close(tb_handle_t hfile)
 {
-	//TB_DBG("tb_file_close");
+	//tb_trace("tb_file_close");
 	if (hfile) close((tb_int_t)hfile);
 }
 tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size)
 {
-	//TB_DBG("tb_file_read: %d bytes", size);
+	//tb_trace("tb_file_read: %d bytes", size);
 	if (hfile) return read((tb_int_t)hfile, data, size);
 	else return -1;
 }
 tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
 {
-	//TB_DBG("tb_file_write: %d bytes", size);
+	//tb_trace("tb_file_write: %d bytes", size);
 	if (hfile) return write((tb_int_t)hfile, data, size);
 	else return -1;
 }
 tb_void_t tb_file_flush(tb_handle_t hfile)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
 {
 	if (!hfile) return -1;
-	//TB_DBG("tb_file_seek: offset:%d flag: %d", (off_t)offset, flags);
+	//tb_trace("tb_file_seek: offset:%d flag: %d", (off_t)offset, flags);
 
 	if (flags == TB_FILE_SEEK_BEG) return lseek((tb_int_t)hfile, (off_t)offset, SEEK_SET);
 	else if (flags == TB_FILE_SEEK_CUR) return lseek((tb_int_t)hfile, (off_t)offset, SEEK_CUR);
@@ -111,13 +111,13 @@ tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
 		if (-1 == lseek((tb_int_t)hfile, cur, SEEK_SET)) return -1;
 		else return ret;
 	}
-	else TB_DBG("unknown seek flag: %d", flags);
+	else tb_trace("unknown seek flag: %d", flags);
 
 	return -1;
 }
 tb_size_t tb_file_size(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return 0;
 }
 tb_bool_t tb_file_exists(tb_char_t const* path)
@@ -126,13 +126,13 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
 		return !mkdir(path, S_IRWXU)? TB_TRUE : TB_FALSE;
 	case TB_FILE_TYPE_FILE:
-		TB_NOT_IMPLEMENT();
+		tb_trace_noimpl();
 		break;
 	default:
 		break;
@@ -141,20 +141,20 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 }
 tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_FALSE;
 }
 
 // open file list
 tb_handle_t tb_file_list_open(tb_char_t const* dir)
 {
-	TB_ASSERT_RETURN_VAL(dir, TB_NULL);
+	tb_assert_and_check_return_val(dir, TB_NULL);
 
 	tb_file_list_t flist;
 
 	// open directory
 	flist.pdir = opendir(dir);
-	TB_ASSERT(flist.pdir);
+	tb_assert(flist.pdir);
 	if (!flist.pdir) return TB_NULL;
 
 	// save current directory
@@ -173,7 +173,7 @@ tb_handle_t tb_file_list_open(tb_char_t const* dir)
 // get file list entry, end: return NULL
 tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 {
-	TB_ASSERT_RETURN_VAL(hflist, TB_NULL);
+	tb_assert_and_check_return_val(hflist, TB_NULL);
 	tb_file_list_t* pflist = (tb_file_list_t*)hflist;
 
 	// get file entry
@@ -215,7 +215,7 @@ tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 // close file list
 tb_void_t tb_file_list_close(tb_handle_t hflist)
 {
-	TB_ASSERT_RETURN(hflist);
+	tb_assert_and_check_return(hflist);
 	tb_file_list_t* pflist = (tb_file_list_t*)hflist;
 
 	if (pflist->pdir) closedir(pflist->pdir);

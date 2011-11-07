@@ -40,7 +40,7 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	static tb_char_t const table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 	// check 
-	TB_ASSERT_RETURN_VAL(!(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
+	tb_assert_and_check_return_val(!(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
 
 	// encode
 	tb_char_t* 		op = ob;

@@ -40,45 +40,6 @@ extern "C" {
  * macros
  */
 
-#if 1
-// assert
-#if defined(TB_DEBUG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define TB_ASSERT_MESSAGE_TAG(tag, x, fmt, arg...)	do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
-# 	define TB_ASSERT_MESSAGE(x, fmt, arg...)			TB_ASSERT_MESSAGE_TAG(TB_TRACE_TAG, x, fmt, ## arg)
-# 	define TB_ASSERTM(x, fmt, arg...)					TB_ASSERT_MESSAGE(x, fmt, ## arg) 		//!< discarded
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define TB_ASSERT_MESSAGE_TAG(...)
-# 	define TB_ASSERT_MESSAGE(...)
-# 	define TB_ASSERTM(...)
-#else
-#	define TB_ASSERT_MESSAGE_TAG
-# 	define TB_ASSERT_MESSAGE
-# 	define TB_ASSERTM
-#endif
-
-#define TB_ASSERT_TAG(tag, x)							do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); } } while(0)
-#define TB_ASSERT_ABORT_TAG(tag, x)						do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); TB_ABORT_TAG(tag); } } while(0)
-#define TB_ASSERT_RETURN_TAG(tag, x)					do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); return ; } } while(0)
-#define TB_ASSERT_RETURN_VAL_TAG(tag, x, v)				do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
-#define TB_ASSERT_GOTO_TAG(tag, x, b)					do { if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
-#define TB_ASSERT_BREAK_TAG(tag, x)						{ if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); break ; } }
-#define TB_ASSERT_CONTINUE_TAG(tag, x, b)				{ if (!(x)) {TB_TRACE_LINE_TAG(tag, "[assert]: expr: %s", #x); continue ; } }
-
-#define TB_ASSERT(x)									TB_ASSERT_TAG(TB_TRACE_TAG, x)
-#define TB_ASSERT_ABORT(x)								TB_ASSERT_ABORT_TAG(TB_TRACE_TAG, x)
-#define TB_ASSERT_RETURN(x)								TB_ASSERT_RETURN_TAG(TB_TRACE_TAG, x)
-#define TB_ASSERT_RETURN_VAL(x, v)						TB_ASSERT_RETURN_VAL_TAG(TB_TRACE_TAG, x, v)
-#define TB_ASSERT_GOTO(x, b)							TB_ASSERT_GOTO_TAG(TB_TRACE_TAG, x, b)
-#define TB_ASSERT_BREAK(x)								TB_ASSERT_BREAK_TAG(TB_TRACE_TAG, x)
-#define TB_ASSERT_CONTINUE(x)							TB_ASSERT_CONTINUE_TAG(TB_TRACE_TAG, x)
-
-#define TB_ASSERTA(x)									TB_ASSERT_ABORT(x) 						//!< discarded
-
-
-#define TB_ASSERT_STATIC(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
-#define TB_STATIC_ASSERT(x) 								TB_ASSERT_STATIC(x)		//!< discarded
-#endif
-
 // assert
 #if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_assert_message_tag(tag, x, fmt, arg...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)

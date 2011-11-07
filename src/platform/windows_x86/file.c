@@ -41,7 +41,7 @@
  */
 static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_NULL;
 }
 /* transform the file path to the windows style
@@ -53,14 +53,14 @@ static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path, tb_char_t* d
  */
 static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
-	TB_ASSERT_RETURN_VAL(path && data && maxn > 3, TB_NULL);
+	tb_assert_and_check_return_val(path && data && maxn > 3, TB_NULL);
 	if (path[0] == '/' && path[2] == '/') 
 	{
 		data[0] = path[1];
 		data[1] = ':';
 		data[2] = '/';
 		tb_cstring_ncopy(data + 3, path + 2, maxn - 3);
-		//TB_DBG("[file]: path: %s => %s", path, data);
+		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
 	else if ( 	path[0] == 'f'
@@ -76,7 +76,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		data[1] = ':';
 		data[2] = '/';
 		tb_cstring_ncopy(data + 3, path + 9, maxn - 3);
-		//TB_DBG("[file]: path: %s => %s", path, data);
+		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
 	return TB_NULL;
@@ -89,11 +89,11 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 // file
 tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
 {
-	TB_ASSERT_RETURN_VAL(path, TB_NULL);
+	tb_assert_and_check_return_val(path, TB_NULL);
 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	TB_ASSERT_RETURN_VAL(path, TB_NULL);
+	tb_assert_and_check_return_val(path, TB_NULL);
 
 	DWORD access = GENERIC_READ;
 	if (flags & TB_FILE_RO) access = GENERIC_READ;
@@ -159,16 +159,16 @@ tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
 }
 tb_size_t tb_file_size(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return 0;
 }
 tb_bool_t tb_file_exists(tb_char_t const* path)
 {
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 
 #if 0
 	switch (type)
@@ -184,7 +184,7 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 			return ((attr & FILE_ATTRIBUTE_DIRECTORY) || attr == 0xffffffff)? TB_FALSE : TB_TRUE;
 		}
 	default:
-		TB_ASSERT(0);
+		tb_assert(0);
 		break;
 	}
 	return TB_FALSE;
@@ -196,11 +196,11 @@ tb_bool_t tb_file_exists(tb_char_t const* path)
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 	
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 
 	switch (type)
 	{
@@ -216,18 +216,18 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 			}
 		}
 	default:
-		TB_ASSERT(0);
+		tb_assert(0);
 		break;
 	}
 	return TB_FALSE;
 }
 tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 {
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 	
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	TB_ASSERT_RETURN_VAL(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, TB_FALSE);
 
 	switch (type)
 	{
@@ -236,7 +236,7 @@ tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 	case TB_FILE_TYPE_FILE:
 		return DeleteFile(path)? TB_TRUE : TB_FALSE;
 	default:
-		TB_ASSERT(0);
+		tb_assert(0);
 		break;
 	}
 	return TB_FALSE;
@@ -245,20 +245,20 @@ tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
 // open file list
 tb_handle_t tb_file_list_open(tb_char_t const* dir)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_NULL;
 }
 
 // get file list entry, end: return NULL
 tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_NULL;
 }
 
 // close file list
 tb_void_t tb_file_list_close(tb_handle_t hflist)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 

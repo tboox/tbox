@@ -39,7 +39,7 @@
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, 0);
+	tb_assert_and_check_return_val(s1 && s2, 0);
 	if (s1 == s2) return 0;
 
 	__tb_register__ tb_int_t r = 0;

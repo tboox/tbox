@@ -76,13 +76,13 @@ tb_int32_t 	tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
 static __tb_inline__ tb_int32_t tb_int32_get_sign_inline(tb_int32_t x)
 {
 	tb_int32_t s = ((tb_int32_t)(x) >> 31);
-    TB_ASSERT((x < 0 && s == -1) || (x >= 0 && !s));
+    tb_assert((x < 0 && s == -1) || (x >= 0 && !s));
     return s;
 }
 // if s == -1, return -x, else s must be 0, and return x.
 static __tb_inline__ tb_int32_t tb_int32_set_sign_inline(tb_int32_t x, tb_int32_t s)
 {
-    TB_ASSERT(s == 0 || s == -1);
+    tb_assert(s == 0 || s == -1);
     return (x ^ s) - s;
 }
 // return 1 if x != 0, else return 0

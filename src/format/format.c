@@ -62,7 +62,7 @@ static tb_format_t g_formats[] =
  */
 tb_format_t const* tb_format_probe(tb_gstream_t* gst, tb_size_t flag)
 {
-	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	tb_size_t score_max = 0;
 	tb_size_t score_total = 0;
@@ -98,6 +98,6 @@ tb_format_t const* tb_format_probe(tb_gstream_t* gst, tb_size_t flag)
 	// no match format
 	if (!score_total) return TB_NULL;
 
-	TB_DBG("match: %d%%", score_max * 100 / score_total);
+	tb_trace("match: %d%%", score_max * 100 / score_total);
 	return format;
 }

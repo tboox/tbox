@@ -56,7 +56,7 @@ tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb
 	tb_int_t fd = open(TB_AUDIO_DEVNAME, O_WRONLY);
 	if (fd < 0) 
 	{
-		TB_DBG("cannot open audio device:%s", TB_AUDIO_DEVNAME);
+		tb_trace("cannot open audio device:%s", TB_AUDIO_DEVNAME);
 		return TB_NULL;
 	}
 
@@ -156,7 +156,7 @@ tb_size_t tb_audio_bsize(tb_handle_t haudio)
 		if (ioctl(fd, SOUND_PCM_READ_RATE, &sample_rate) == -1) return 0;
 		if (ioctl(fd, SOUND_PCM_READ_CHANNELS, &channels) == -1) return 0;
 		if (ioctl(fd, SOUND_PCM_READ_BITS, &quantify_bits) == -1) return 0;
-		TB_DBG("bsize: %d x %d x %d / 8 = %d kb", sample_rate, channels, quantify_bits, ((sample_rate * channels * quantify_bits) >> 3) / 1024);
+		tb_trace("bsize: %d x %d x %d / 8 = %d kb", sample_rate, channels, quantify_bits, ((sample_rate * channels * quantify_bits) >> 3) / 1024);
 		return ((sample_rate * channels * quantify_bits) >> 3);
 	}
 	return 0;

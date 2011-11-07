@@ -39,7 +39,7 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
 	return TB_NULL;
 }

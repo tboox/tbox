@@ -36,7 +36,7 @@
 // usleep
 tb_void_t tb_usleep(tb_size_t us)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 }
 
 // msleep
@@ -72,12 +72,12 @@ tb_int64_t tb_mclock()
 // uclock
 tb_int64_t tb_uclock()
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_INT64_ZERO;
 }
 tb_int64_t tb_time()
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return TB_INT64_ZERO;
 }
 
