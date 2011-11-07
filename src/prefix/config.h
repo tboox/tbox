@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		config.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_CONFIG_H
+#define TB_PREFIX_CONFIG_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,17 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "../config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// is debug?
+#if tbox_CONFIG_DEBUG
+# 	define TB_DEBUG
+#endif
+
 
 // c plus plus
 #ifdef __cplusplus

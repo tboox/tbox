@@ -37,6 +37,7 @@
 
 # 	define tb_sint32_to_sint64(x) 		(tb_sint64_t)(x)
 # 	define tb_sint64_to_sint32(x) 		(tb_sint32_t)(x)
+# 	define tb_sint64_make(h, l) 		(tb_sint64_t)(((tb_sint64_t)(h) << 32) + (tb_uint64_t)(l))
 
 # 	define tb_sint64_abs(x) 			((x) > 0? (x) : -(x))
 # 	define tb_sint64_neg(x) 			(-(x))
@@ -85,6 +86,7 @@
 
 # 	define tb_sint32_to_sint64(x) 		tb_sint32_to_sint64_inline(x)
 # 	define tb_sint64_to_sint32(x) 		tb_sint64_to_sint32_inline(x)
+# 	define tb_sint64_make(h, l) 		tb_sint64_make_inline(h, l)
 
 # 	define tb_sint64_abs(x) 			tb_sint64_abs_inline(x)
 # 	define tb_sint64_neg(x) 			tb_sint64_neg_inline(x)
@@ -154,6 +156,13 @@ static __tb_inline__ tb_sint32_t tb_sint64_to_sint32_inline(tb_sint64_t x)
 	// is sint32?
 	TB_ASSERT(x.h == ((tb_sint32_t)x.l >> 31));
 	return (tb_sint32_t)x.l;
+}
+static __tb_inline__ tb_sint64_t tb_sint64_make_inline(tb_sint32_t h, tb_uint32_t l)
+{
+	tb_sint64_t x;
+	x.h = h;
+	x.l = l;
+	return x;
 }
 static __tb_inline__ tb_sint64_t tb_sint64_neg_inline(tb_sint64_t x)
 {

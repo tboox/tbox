@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		utils.h
  *
  */
-#ifndef TB_PREFIX_H
-#define TB_PREFIX_H
+#ifndef TB_PREFIX_UTILS_H
+#define TB_PREFIX_UTILS_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -31,7 +31,28 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix/prefix.h"
+#include "config.h"
+
+/* /////////////////////////////////////////////////////////
+ * macros
+ */
+
+// abs
+#define tb_abs(x) 				((x) > 0? (x) : -(x))
+
+// min & max
+#define tb_max(x, y) 			(((x) > (y))? (x) : (y))
+#define tb_min(x, y) 			(((x) < (y))? (x) : (y))
+
+// the number of entries in the array
+#define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
+
+// align
+#define tb_align2(x) 			(((x) + 1) >> 1 << 1)
+#define tb_align4(x) 			(((x) + 3) >> 2 << 2)
+#define tb_align8(x) 			(((x) + 7) >> 4 << 4)
+#define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
+
 
 // c plus plus
 #ifdef __cplusplus
