@@ -351,6 +351,6 @@ tb_fixed16_t tb_fixed16_atan_int32(tb_fixed16_t x)
 
 tb_fixed16_t tb_fixed16_exp_int32(tb_fixed16_t x)
 {
-	TB_NOT_IMPLEMENT();
+	tb_trace_noimpl();
 	return 0;
 }

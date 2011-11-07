@@ -66,18 +66,18 @@ typedef struct __tb_fstream_t
  */
 static __tb_inline__ tb_fstream_t* tb_fstream_cast(tb_gstream_t* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
 	return (tb_fstream_t*)gst;
 }
 static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst, TB_FALSE);
-	TB_ASSERT(!fst->file);
+	tb_assert_and_check_return_val(fst, TB_FALSE);
+	tb_assert(!fst->file);
 
 	// open file
 	fst->file = tb_file_open(fst->url, fst->flags);
-	TB_ASSERT_RETURN_VAL(fst->file, TB_FALSE);
+	tb_assert_and_check_return_val(fst->file, TB_FALSE);
 
 	// init size
 	fst->size = (tb_size_t)tb_file_seek(fst->file, -1, TB_FILE_SEEK_SIZE);
@@ -99,8 +99,8 @@ static tb_void_t tb_fstream_close(tb_gstream_t* gst)
 static tb_int_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst && fst->file && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(fst && fst->file && data, -1);
+	tb_check_return_val(size, 0);
 
 	// read data
 	tb_int_t ret = (tb_int_t)tb_file_read(fst->file, (tb_byte_t*)data, (tb_size_t)size);
@@ -112,8 +112,8 @@ static tb_int_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t si
 static tb_int_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst && fst->file && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(fst && fst->file && data, -1);
+	tb_check_return_val(size, 0);
 
 	// write
 	tb_int_t ret = (tb_int_t)tb_file_write(fst->file, (tb_byte_t*)data, (tb_size_t)size);
@@ -125,7 +125,7 @@ static tb_int_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst && fst->file, TB_FALSE);
+	tb_assert_and_check_return_val(fst && fst->file, TB_FALSE);
 
 	// seek
 	tb_int_t ret = -1;
@@ -156,25 +156,25 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 static tb_size_t tb_fstream_size(tb_gstream_t* gst)
 {	
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst && fst->file, 0);
+	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->size;
 }
 static tb_size_t tb_fstream_offset(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst && fst->file, 0);
+	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->offset;
 }
 static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(fst, TB_FALSE);
+	tb_assert_and_check_return_val(fst, TB_FALSE);
 
 	switch (cmd)
 	{
 	case TB_GSTREAM_CMD_SET_URL:
 		{
-			TB_ASSERT_RETURN_VAL(arg1, TB_FALSE);
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
 			tb_strncpy(fst->url, (tb_char_t const*)arg1, TB_FSTREAM_URL_MAX);
 			fst->url[TB_FSTREAM_URL_MAX - 1] = '\0';
 			return TB_TRUE;
@@ -182,7 +182,7 @@ static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 	case TB_GSTREAM_CMD_GET_URL:
 		{
 			tb_char_t const** purl = (tb_char_t const**)arg1;
-			TB_ASSERT_RETURN_VAL(purl, TB_FALSE);
+			tb_assert_and_check_return_val(purl, TB_FALSE);
 			*purl = fst->url;
 			return TB_TRUE;
 		}
@@ -201,7 +201,7 @@ static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 tb_gstream_t* tb_gstream_create_file()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_fstream_t));
-	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// init stream
 	tb_fstream_t* fst = (tb_fstream_t*)gst;

@@ -122,7 +122,7 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
  */
 tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 {
-	TB_ASSERT_RETURN_VAL(url, TB_NULL);
+	tb_assert_and_check_return_val(url, TB_NULL);
 
 	// get proto name
 	tb_char_t 			proto[32];
@@ -150,7 +150,7 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	else if (!gst && url[0] == '/') gst = tb_gstream_create_file(); // is /home/file?
 
 	// set url
-	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, TB_NULL);
 	if (TB_FALSE == tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
 	return gst;
@@ -179,7 +179,7 @@ tb_void_t tb_gstream_destroy(tb_gstream_t* gst)
 
 tb_bool_t tb_gstream_open(tb_gstream_t* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->open, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->open, TB_FALSE);
 
 	// open it
 	return gst->open(gst);
@@ -195,8 +195,8 @@ tb_void_t tb_gstream_close(tb_gstream_t* gst)
 }
 tb_int_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(gst && data && gst->read, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(gst && data && gst->read, -1);
+	tb_check_return_val(size, 0);
 
 	// read from cache if exists
 	tb_size_t cache = tb_gstream_read_cache(gst, data, size);
@@ -208,20 +208,20 @@ tb_int_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 
 tb_int_t tb_gstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(gst && data && gst->write, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(gst && data && gst->write, -1);
+	tb_check_return_val(size, 0);
 
 	return gst->write(gst, data, size);
 }
 tb_int_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(gst && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(gst && data, -1);
+	tb_check_return_val(size, 0);
 
 	// read from cache first
 	tb_size_t cache = tb_gstream_read_cache(gst, data, size);
 	if (cache == size) return cache;
-	TB_ASSERT_RETURN_VAL(cache < size, -1);
+	tb_assert_and_check_return_val(cache < size, -1);
 
 	// read from stream
 	tb_int_t read = tb_gstream_read_block(gst, data + cache, size - cache);
@@ -230,8 +230,8 @@ tb_int_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 
 tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(gst && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(gst && data, -1);
+	tb_check_return_val(size, 0);
 
 	if (gst->bwrite) return gst->bwrite(gst, data, size);
 	else if (gst->write)
@@ -271,13 +271,13 @@ tb_int_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 }
 tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(gst && size, TB_NULL);
+	tb_assert_and_check_return_val(gst && size, TB_NULL);
 
 	// hook, .e.g the data stream
 	if (gst->need) return gst->need(gst, size);
 
 	// check 
-	TB_ASSERT_RETURN_VAL(size <= TB_GSTREAM_CACHE_SIZE, TB_NULL);
+	tb_assert_and_check_return_val(size <= TB_GSTREAM_CACHE_SIZE, TB_NULL);
 	if (!size) return gst->cache_head;
 
 	// ensure data
@@ -287,7 +287,7 @@ tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 		gst->cache_head = gst->cache_data;
 		gst->cache_size = 0;
 	}
-	TB_ASSERT_RETURN_VAL(gst->cache_data, TB_NULL);
+	tb_assert_and_check_return_val(gst->cache_data, TB_NULL);
 
 	// read it if exists
 	if (gst->cache_size > 0)
@@ -308,17 +308,17 @@ tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 
 	// update size
 	gst->cache_size += ret;
-	TB_ASSERT_RETURN_VAL(gst->cache_size == size, TB_NULL);
+	tb_assert_and_check_return_val(gst->cache_size == size, TB_NULL);
 
 	return gst->cache_head;
 }
 
 tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
-	TB_ASSERT_RETURN_VAL(gst, TB_FALSE);
+	tb_assert_and_check_return_val(gst, TB_FALSE);
 
 	// not support for cache now
-	TB_ASSERT_RETURN_VAL(!gst->cache_size, TB_FALSE);
+	tb_assert_and_check_return_val(!gst->cache_size, TB_FALSE);
 
 	// hook
 	if (gst->seek && TB_TRUE == gst->seek(gst, offset, flag))
@@ -330,12 +330,12 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 	if (flag == TB_GSTREAM_SEEK_CUR) offset += curt;
 	else if (flag == TB_GSTREAM_SEEK_END)
 	{
-		TB_ASSERT_RETURN_VAL(size && offset <= 0, TB_FALSE);
+		tb_assert_and_check_return_val(size && offset <= 0, TB_FALSE);
 		offset += size;
 	}
 
 	// forward only
-	TB_ASSERT_RETURN_VAL(offset >= 0 && (!size || offset <= size), TB_FALSE);
+	tb_assert_and_check_return_val(offset >= 0 && (!size || offset <= size), TB_FALSE);
 	if (curt < offset)
 	{
 		tb_int64_t time = tb_mclock();
@@ -360,12 +360,12 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 }
 tb_size_t tb_gstream_size(tb_gstream_t const* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst, 0);
+	tb_assert_and_check_return_val(gst, 0);
 	return gst->size? gst->size(gst) : 0;
 }
 tb_size_t tb_gstream_offset(tb_gstream_t const* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->offset, 0);
+	tb_assert_and_check_return_val(gst && gst->offset, 0);
 	return gst->offset(gst);
 }
 tb_size_t tb_gstream_left(tb_gstream_t const* gst)
@@ -377,17 +377,17 @@ tb_size_t tb_gstream_left(tb_gstream_t const* gst)
 
 tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->ioctl0, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->ioctl0, TB_FALSE);
 	return gst->ioctl0(gst, cmd);
 }
 tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {	
-	TB_ASSERT_RETURN_VAL(gst && gst->ioctl1, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->ioctl1, TB_FALSE);
 	return gst->ioctl1(gst, cmd, arg1);
 }
 tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->ioctl2, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->ioctl2, TB_FALSE);
 	return gst->ioctl2(gst, cmd, arg1, arg2);
 }
 tb_uint8_t tb_gstream_read_u8(tb_gstream_t* gst)
@@ -581,7 +581,7 @@ tb_bool_t tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val)
 }
 tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 {
-	TB_ASSERT_RETURN_VAL(gst && ist, 0);	
+	tb_assert_and_check_return_val(gst && ist, 0);	
 
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
@@ -591,7 +591,7 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	do
 	{
 		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
-		//TB_DBG("ret: %d", ret);
+		//tb_trace("ret: %d", ret);
 		if (ret > 0)
 		{
 			read += ret;
@@ -621,7 +621,7 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 }
 tb_size_t tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost)
 {
-	TB_ASSERT_RETURN_VAL(gst && ost, 0);
+	tb_assert_and_check_return_val(gst && ost, 0);
 	return tb_gstream_load(ost, gst);
 }
 

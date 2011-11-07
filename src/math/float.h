@@ -188,7 +188,7 @@ tb_uint32_t 	tb_float_irlog2_generic(tb_float_t x);
 // 1 + x + (x^2) / 2 + (x^3) / 6, for x = [-1, 1]
 static __tb_inline__ tb_float_t tb_float_exp1_inline(tb_float_t x)
 {
-	TB_ASSERT(x >= -1 && x <= 1);
+	tb_assert(x >= -1 && x <= 1);
 	return (1 + (x) + ((x) * (x)) / 2 + ((x) * (x) * (x)) / 6);
 }
 

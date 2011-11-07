@@ -134,7 +134,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 	if (!string) return TB_FALSE;
 	
 	// check size
-	TB_ASSERT(size < TB_STRING_MAX_SIZE);
+	tb_assert(size < TB_STRING_MAX_SIZE);
 	if (size >= TB_STRING_MAX_SIZE) return TB_FALSE;
 
 	// is null?
@@ -145,7 +145,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
-		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
+		tb_assert(string->maxn < TB_STRING_MAX_SIZE);
 		if (string->maxn >= TB_STRING_MAX_SIZE) goto fail;
 
 		// alloc
@@ -165,7 +165,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
-		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
+		tb_assert(string->maxn < TB_STRING_MAX_SIZE);
 		if (string->maxn >= TB_STRING_MAX_SIZE) goto fail;
 
 		// alloc
@@ -192,7 +192,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
-		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
+		tb_assert(string->maxn < TB_STRING_MAX_SIZE);
 		if (string->maxn >= TB_STRING_MAX_SIZE) goto fail;
 
 		// alloc
@@ -209,7 +209,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 		string->maxn = tb_align(size + TB_STRING_GROW_SIZE, TB_STRING_GROW_SIZE);
 
 		// check maxn
-		TB_ASSERT(string->maxn < TB_STRING_MAX_SIZE);
+		tb_assert(string->maxn < TB_STRING_MAX_SIZE);
 		if (string->maxn >= TB_STRING_MAX_SIZE) goto fail;
 
 		// realloc
@@ -221,7 +221,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 
 	return TB_TRUE;
 fail:
-	TB_DBG("resize string fail!");
+	tb_trace("resize string fail!");
 	tb_string_uninit(string);
 	return TB_FALSE;
 }
@@ -531,7 +531,7 @@ tb_int_t tb_string_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t s
 tb_int_t tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start)
 {
 	tb_char_t const* s = tb_string_c_string(string);
-	TB_ASSERT_RETURN_VAL(s, -1);
+	tb_assert_and_check_return_val(s, -1);
 
 	tb_char_t const* p = (tb_char_t const*)tb_strstr(s + start, sub);
 	return (p? p - s : -1);
@@ -556,7 +556,7 @@ tb_int_t tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_
 tb_int_t tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t const* sub, tb_int_t start)
 {
 	tb_char_t const* s = tb_string_c_string(string);
-	TB_ASSERT_RETURN_VAL(s, -1);
+	tb_assert_and_check_return_val(s, -1);
 
 	tb_char_t const* p = (tb_char_t const*)tb_stristr(s + start, sub);
 	return (p? p - s : -1);

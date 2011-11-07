@@ -30,7 +30,7 @@
  */
 static __tb_inline__ tb_zip_zlibraw_t* tb_zip_zlibraw_cast(tb_zip_t* zip)
 {
-	TB_ASSERT_RETURN_VAL(zip && zip->algo == TB_ZIP_ALGO_ZLIBRAW, TB_NULL);
+	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIBRAW, TB_NULL);
 	return (tb_zip_zlibraw_t*)zip;
 }
 static tb_void_t tb_zip_zlibraw_close(tb_zip_t* zip)
@@ -49,17 +49,17 @@ static tb_void_t tb_zip_zlibraw_close(tb_zip_t* zip)
 static tb_zip_status_t tb_zip_zlibraw_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_zlibraw_t* zlibraw = tb_zip_zlibraw_cast(zip);
-	TB_ASSERT_RETURN_VAL(zlibraw && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(zlibraw && ist && ost, TB_ZIP_STATUS_FAIL);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	TB_ASSERT_RETURN_VAL(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	TB_ASSERT_RETURN_VAL(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
 
 	// attach zst
 	zlibraw->zst.next_in = (Bytef*)ip;
@@ -70,8 +70,8 @@ static tb_zip_status_t tb_zip_zlibraw_spank_deflate(tb_zip_t* zip, tb_bstream_t*
 
 	// deflate 
 	tb_int_t ret = deflate(&zlibraw->zst, Z_NO_FLUSH);
-	TB_ASSERT_RETURN_VAL(ret == Z_OK || ret == Z_STREAM_END, TB_ZIP_STATUS_FAIL);
-	//TB_DBG("deflate: %d", zlibraw->zst.total_out);
+	tb_assert_and_check_return_val(ret == Z_OK || ret == Z_STREAM_END, TB_ZIP_STATUS_FAIL);
+	//tb_trace("deflate: %d", zlibraw->zst.total_out);
 
 	// update 
 	ist->p = (tb_byte_t*)zlibraw->zst.next_in;
@@ -83,17 +83,17 @@ static tb_zip_status_t tb_zip_zlibraw_spank_deflate(tb_zip_t* zip, tb_bstream_t*
 static tb_zip_status_t tb_zip_zlibraw_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_zlibraw_t* zlibraw = tb_zip_zlibraw_cast(zip);
-	TB_ASSERT_RETURN_VAL(zlibraw && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(zlibraw && ist && ost, TB_ZIP_STATUS_FAIL);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	TB_ASSERT_RETURN_VAL(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	TB_ASSERT_RETURN_VAL(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
 
 	// attach zst
 	zlibraw->zst.next_in = (Bytef*)ip;
@@ -104,8 +104,8 @@ static tb_zip_status_t tb_zip_zlibraw_spank_inflate(tb_zip_t* zip, tb_bstream_t*
 
 	// inflate 
 	tb_int_t ret = inflate(&zlibraw->zst, Z_NO_FLUSH);
-	TB_ASSERT_RETURN_VAL(ret == Z_OK || ret == Z_STREAM_END, TB_ZIP_STATUS_FAIL);
-	//TB_DBG("inflate: %d", zlibraw->zst.total_out);
+	tb_assert_and_check_return_val(ret == Z_OK || ret == Z_STREAM_END, TB_ZIP_STATUS_FAIL);
+	//tb_trace("inflate: %d", zlibraw->zst.total_out);
 
 	// update 
 	ist->p = (tb_byte_t*)zlibraw->zst.next_in;
@@ -122,7 +122,7 @@ static tb_zip_status_t tb_zip_zlibraw_spank_inflate(tb_zip_t* zip, tb_bstream_t*
 tb_zip_t* tb_zip_zlibraw_open(tb_zip_zlibraw_t* zlibraw, tb_zip_action_t action)
 {
 	tb_zip_t* zip = (tb_zip_t*)zlibraw;
-	TB_ASSERT_RETURN_VAL(zip, TB_NULL);
+	tb_assert_and_check_return_val(zip, TB_NULL);
 	
 	// init zip
 	tb_memset(zip, 0, sizeof(tb_zip_zlibraw_t));

@@ -50,13 +50,13 @@ typedef struct __tb_dstream_t
  */
 static __tb_inline__ tb_dstream_t* tb_dstream_cast(tb_gstream_t* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_DATA, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_DATA, TB_NULL);
 	return (tb_dstream_t*)gst;
 }
 static tb_bool_t tb_dstream_open(tb_gstream_t* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->size, TB_FALSE);
+	tb_assert_and_check_return_val(dst && dst->data && dst->size, TB_FALSE);
 
 	dst->head = dst->data;
 	return TB_TRUE;
@@ -69,8 +69,8 @@ static tb_void_t tb_dstream_close(tb_gstream_t* gst)
 static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->head && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
+	tb_check_return_val(size, 0);
 
 	// adjust size
 	tb_size_t left = dst->data + dst->size - dst->head;
@@ -84,8 +84,8 @@ static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t si
 static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst && dst->data && dst->head && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
+	tb_check_return_val(size, 0);
 
 	// adjust size
 	tb_size_t left = dst->data + dst->size - dst->head;
@@ -99,7 +99,7 @@ static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst && dst->head && dst->data, TB_NULL);
+	tb_assert_and_check_return_val(dst && dst->head && dst->data, TB_NULL);
 	if (dst->head + size > dst->data + dst->size) return TB_NULL;
 
 	return dst->head;
@@ -107,7 +107,7 @@ static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
 static tb_size_t tb_dstream_size(tb_gstream_t const* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst, 0);
+	tb_assert_and_check_return_val(dst, 0);
 
 	return dst->size;
 }
@@ -115,27 +115,27 @@ static tb_size_t tb_dstream_size(tb_gstream_t const* gst)
 static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst, 0);
+	tb_assert_and_check_return_val(dst, 0);
 
 	return (dst->head - dst->data);
 }
 static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
-	TB_NOT_IMPLEMENT();
-	TB_ABORT();
+	tb_trace_noimpl();
+	tb_abort();
 	return TB_FALSE;
 }
 
 static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(dst, TB_FALSE);
+	tb_assert_and_check_return_val(dst, TB_FALSE);
 
 	switch (cmd)
 	{
 	case TB_DSTREAM_CMD_SET_DATA:
 		{
-			TB_ASSERT_RETURN_VAL(arg1 && arg2, TB_FALSE);
+			tb_assert_and_check_return_val(arg1 && arg2, TB_FALSE);
 			dst->data = (tb_byte_t*)arg1;
 			dst->size = (tb_size_t)arg2;
 			dst->head = TB_NULL;
@@ -152,7 +152,7 @@ static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 tb_gstream_t* tb_gstream_create_data()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_dstream_t));
-	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// init stream
 	gst->type 	= TB_GSTREAM_TYPE_DATA;
@@ -172,11 +172,11 @@ tb_gstream_t* tb_gstream_create_data()
 }
 tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(data && size, TB_NULL);
+	tb_assert_and_check_return_val(data && size, TB_NULL);
 
 	// create data stream
 	tb_gstream_t* gst = tb_gstream_create_data();
-	TB_ASSERT_RETURN_VAL(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set data & size
 	if (TB_FALSE == tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (tb_void_t*)data, (tb_void_t*)size)) goto fail;

@@ -61,7 +61,7 @@
 tb_vector_t* tb_vector_init(tb_size_t step, tb_size_t grow, tb_vector_item_func_t const* func)
 {
 	tb_vector_t* vector = (tb_vector_t*)tb_calloc(1, sizeof(tb_vector_t));
-	TB_ASSERT_RETURN_VAL(vector, TB_NULL);
+	tb_assert_and_check_return_val(vector, TB_NULL);
 
 	// init vector
 	vector->step = step;
@@ -69,11 +69,11 @@ tb_vector_t* tb_vector_init(tb_size_t step, tb_size_t grow, tb_vector_item_func_
 	vector->size = 0;
 	vector->maxn = grow;
 	if (func) vector->func = *func;
-	TB_ASSERT_GOTO(vector->maxn < TB_VECTOR_MAX_SIZE, fail);
+	tb_assert_and_check_goto(vector->maxn < TB_VECTOR_MAX_SIZE, fail);
 
 	// calloc data
 	vector->data = tb_calloc(vector->maxn, vector->step);
-	TB_ASSERT_GOTO(vector->data, fail);
+	tb_assert_and_check_goto(vector->data, fail);
 
 	return vector;
 fail:
@@ -106,7 +106,7 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 }
 tb_void_t* tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor)
 {
-	TB_ASSERTA(vector && vector->size && itor < vector->maxn);
+	tb_assert_abort(vector && vector->size && itor < vector->maxn);
 	return (vector->data + itor * vector->step);
 }
 tb_void_t* tb_vector_at_head(tb_vector_t* vector)
@@ -119,7 +119,7 @@ tb_void_t* tb_vector_at_last(tb_vector_t* vector)
 }
 tb_void_t const* tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor)
 {
-	TB_ASSERTA(vector && vector->size && itor < vector->maxn);
+	tb_assert_abort(vector && vector->size && itor < vector->maxn);
 	return (vector->data + itor * vector->step);
 }
 tb_void_t const* tb_vector_const_at_head(tb_vector_t const* vector)
@@ -132,42 +132,42 @@ tb_void_t const* tb_vector_const_at_last(tb_vector_t const* vector)
 }
 tb_size_t tb_vector_itor_head(tb_vector_t const* vector)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return 0;
 }
 tb_size_t tb_vector_itor_last(tb_vector_t const* vector)
 {
-	TB_ASSERTA(vector && vector->size);
+	tb_assert_abort(vector && vector->size);
 	return (vector->size - 1);
 }
 tb_size_t tb_vector_itor_tail(tb_vector_t const* vector)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return vector->size;
 }
 tb_size_t tb_vector_itor_next(tb_vector_t const* vector, tb_size_t itor)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return (itor < vector->size)? (itor + 1) : vector->size;
 }
 tb_size_t tb_vector_itor_prev(tb_vector_t const* vector, tb_size_t itor)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return (itor)? (itor - 1) : 0;
 }
 tb_size_t tb_vector_size(tb_vector_t const* vector)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return vector->size;
 }
 tb_size_t tb_vector_maxn(tb_vector_t const* vector)
 {
-	TB_ASSERTA(vector);
+	tb_assert_abort(vector);
 	return vector->maxn;
 }
 tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(vector, TB_FALSE);
+	tb_assert_and_check_return_val(vector, TB_FALSE);
 	
 	// free items if the vector is decreased
 	if (size < vector->size)
@@ -181,14 +181,14 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	{
 		tb_size_t omaxn = vector->maxn;
 		vector->maxn = tb_align4(size + vector->grow);
-		TB_ASSERT_RETURN_VAL(vector->maxn < TB_VECTOR_MAX_SIZE, TB_FALSE);
+		tb_assert_and_check_return_val(vector->maxn < TB_VECTOR_MAX_SIZE, TB_FALSE);
 
 		// realloc data
 		vector->data = (tb_byte_t*)tb_realloc(vector->data, vector->maxn * vector->step);
-		TB_ASSERT_RETURN_VAL(vector->data, TB_FALSE);
+		tb_assert_and_check_return_val(vector->data, TB_FALSE);
 
 		// must be align by 4-bytes
-		TB_ASSERT_RETURN_VAL(!(((tb_size_t)(vector->data)) & 3), TB_FALSE);
+		tb_assert_and_check_return_val(!(((tb_size_t)(vector->data)) & 3), TB_FALSE);
 
 		// clear the grow data
 		tb_memset(vector->data + vector->size * vector->step, 0, (vector->maxn - omaxn) * vector->step);
@@ -201,7 +201,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 }
 tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && index <= vector->size);
+	tb_assert_and_check_return(vector && index <= vector->size);
 
 	// save size
 	tb_size_t osize = vector->size;
@@ -209,12 +209,12 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const
 	// grow a item
 	if (!tb_vector_resize(vector, osize + 1)) 
 	{
-		TB_ABORT();
+		tb_abort();
 	}
 
 	tb_byte_t* 	data = vector->data;
 	tb_size_t 	step = vector->step;
-	TB_ASSERT_RETURN(data && step);
+	tb_assert_and_check_return(data && step);
 
 	// move items if not at tail
 	if (osize != index) tb_memmov(data + (index + 1) * step, data + index * step, (osize - index) * step);
@@ -225,17 +225,17 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const
 }
 tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector);
+	tb_assert_and_check_return(vector);
 	tb_vector_insert(vector, 0, item);
 }
 tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector);
+	tb_assert_and_check_return(vector);
 	tb_vector_insert(vector, vector->size, item);
 }
 tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && size && index <= vector->size);
+	tb_assert_and_check_return(vector && size && index <= vector->size);
 
 	// save size
 	tb_size_t osize = vector->size;
@@ -243,13 +243,13 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 	// grow size
 	if (!tb_vector_resize(vector, osize + size)) 
 	{
-		TB_ABORT();
+		tb_abort();
 	}
 
 	// move items if not at tail
 	tb_byte_t* 	data = vector->data;
 	tb_size_t 	step = vector->step;
-	TB_ASSERT_RETURN(data && step);
+	tb_assert_and_check_return(data && step);
 	if (osize != index) tb_memmov(data + (index + size) * step, data + index * step, (osize - index) * step);
 
 	// copy data
@@ -275,21 +275,21 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 }
 tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector);
+	tb_assert_and_check_return(vector);
 	tb_vector_ninsert(vector, 0, item, size);
 }
 tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector);
+	tb_assert_and_check_return(vector);
 	tb_vector_ninsert(vector, vector->size, item, size);
 }
 tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && vector->data && item && index <= vector->size);
+	tb_assert_and_check_return(vector && vector->data && item && index <= vector->size);
 
 	tb_byte_t* 	data = vector->data;
 	tb_size_t 	step = vector->step;
-	TB_ASSERT_RETURN(data && step);
+	tb_assert_and_check_return(data && step);
 
 	// do free
 	if (vector->func.free) vector->func.free(data + index * step, vector->func.priv);
@@ -299,17 +299,17 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 }
 tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && vector->size && item);
+	tb_assert_and_check_return(vector && vector->size && item);
 	tb_vector_replace(vector, 0, item);
 }
 tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN(vector && vector->size && item);
+	tb_assert_and_check_return(vector && vector->size && item);
 	tb_vector_replace(vector, vector->size - 1, item);
 }
 tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && vector->size && index <= vector->size && item && size);
+	tb_assert_and_check_return(vector && vector->size && index <= vector->size && item && size);
 
 	// strip size
 	if (index + size > vector->size) size = vector->size - index;
@@ -320,7 +320,7 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t con
 	// copy data
 	tb_byte_t* 	data = vector->data;
 	tb_size_t 	step = vector->step;
-	TB_ASSERT_RETURN(data && step);
+	tb_assert_and_check_return(data && step);
 	switch (step)
 	{
 	case 4:
@@ -339,17 +339,17 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t con
 }
 tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && vector->size && item && size);
+	tb_assert_and_check_return(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, 0, item, size);
 }
 tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && vector->size && item && size);
+	tb_assert_and_check_return(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, size >= vector->size? 0 : vector->size - size, item, size);
 }
 tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t index)
 {	
-	TB_ASSERT_RETURN(vector && index < vector->size);
+	tb_assert_and_check_return(vector && index < vector->size);
 	if (vector->size)
 	{
 		// do free
@@ -368,7 +368,7 @@ tb_void_t tb_vector_remove_head(tb_vector_t* vector)
 }
 tb_void_t tb_vector_remove_last(tb_vector_t* vector)
 {
-	TB_ASSERT_RETURN(vector);
+	tb_assert_and_check_return(vector);
 	if (vector->size)
 	{
 		// do free
@@ -380,7 +380,7 @@ tb_void_t tb_vector_remove_last(tb_vector_t* vector)
 }
 tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && size && index < vector->size);
+	tb_assert_and_check_return(vector && size && index < vector->size);
 
 	// clear it
 	if (!index && size >= vector->size) 
@@ -411,7 +411,7 @@ tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t index, tb_size_t size
 }
 tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
 {
-	TB_ASSERT_RETURN(vector && size);
+	tb_assert_and_check_return(vector && size);
 
 	// clear it
 	if (size >= vector->size)
@@ -425,7 +425,7 @@ tb_void_t tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size)
 }
 tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
 {	
-	TB_ASSERT_RETURN(vector && size);
+	tb_assert_and_check_return(vector && size);
 
 	// clear it
 	if (size >= vector->size)

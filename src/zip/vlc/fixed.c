@@ -31,13 +31,13 @@
 
 static tb_void_t tb_zip_vlc_fixed_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
 {
-	TB_ASSERT(vlc);
-	TB_ASSERT(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));
+	tb_assert(vlc);
+	tb_assert(val && val <= (0x1 << ((tb_zip_vlc_fixed_t*)vlc)->nbits));
 	tb_bstream_set_ubits(bst, val - 1, ((tb_zip_vlc_fixed_t*)vlc)->nbits);
 }
 static tb_uint32_t tb_zip_vlc_fixed_get(tb_zip_vlc_t* vlc, tb_bstream_t const* bst)
 {
-	TB_ASSERT(vlc);
+	tb_assert(vlc);
 	return (tb_bstream_get_ubits(bst, ((tb_zip_vlc_fixed_t*)vlc)->nbits) + 1);
 }
 /* /////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ tb_zip_vlc_t* tb_zip_vlc_fixed_open(tb_zip_vlc_fixed_t* fixed, tb_byte_t nbits)
 	fixed->nbits = nbits;
 
 	// check
-	TB_ASSERT_RETURN_VAL(nbits <= 32, TB_NULL);
+	tb_assert_and_check_return_val(nbits <= 32, TB_NULL);
 
 	return (tb_zip_vlc_t*)fixed;
 }

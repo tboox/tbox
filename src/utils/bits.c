@@ -31,7 +31,7 @@
  */
 tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(p && n <= 32, 0);
+	tb_assert_and_check_return_val(p && n <= 32, 0);
 	if (!n) return 0;
 
 	p += b >> 3; b &= 0x07;
@@ -100,7 +100,7 @@ tb_uint32_t tb_bits_get_ubits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 }
 tb_sint32_t tb_bits_get_sbits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(p && n > 1 && n <= 32, 0);
+	tb_assert_and_check_return_val(p && n > 1 && n <= 32, 0);
 
 	p += b >> 3; b &= 0x07;
 	if (n < 32)
@@ -112,7 +112,7 @@ tb_sint32_t tb_bits_get_sbits32(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 }
 tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_t n)
 {
-	TB_ASSERT_RETURN(p && n <= 32);
+	tb_assert_and_check_return(p && n <= 32);
 	if (!n) return ;
 
 	p += b >> 3; b &= 0x07;
@@ -217,7 +217,7 @@ tb_void_t tb_bits_set_ubits32(tb_byte_t* p, tb_size_t b, tb_uint32_t x, tb_size_
 }
 tb_void_t tb_bits_set_sbits32(tb_byte_t* p, tb_size_t b, tb_sint32_t x, tb_size_t n)
 {
-	TB_ASSERT_RETURN(p && n > 1 && n <= 32);
+	tb_assert_and_check_return(p && n > 1 && n <= 32);
 
 	p += b >> 3; b &= 0x07;
 	if (n < 32)

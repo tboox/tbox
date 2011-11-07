@@ -36,7 +36,7 @@
  * macros
  */
 #if 0
-# 	define TB_DNS_DBG 				TB_DBG
+# 	define TB_DNS_DBG 				tb_trace
 #else
 # 	define TB_DNS_DBG
 #endif
@@ -116,7 +116,7 @@ static tb_char_t 	g_dns_servers[TB_DNS_SERVER_MAX][16] = {0};
 // size + data, e.g. .www.google.com => 3www6google3com
 static tb_char_t const* tb_dns_encode_name(tb_char_t* name)
 {
-	TB_ASSERT(name && name[0] == '.');
+	tb_assert(name && name[0] == '.');
 	if (!name || name[0] != '.') return TB_NULL;
 	
 	tb_size_t 	n = 0;
@@ -188,7 +188,7 @@ static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byt
 	while(send < size)
 	{
 		tb_int_t ret = tb_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
-		//TB_DBG("ret: %d", ret);
+		//tb_trace("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
@@ -211,7 +211,7 @@ static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byt
 	while(recv < size)
 	{
 		tb_int_t ret = tb_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
-		//TB_DBG("ret: %d", ret);
+		//tb_trace("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
@@ -256,7 +256,7 @@ tb_void_t tb_dns_server_add(tb_char_t const* ip)
 }
 tb_void_t tb_dns_server_del(tb_char_t const* ip)
 {
-	TB_ASSERT(g_dns_init);
+	tb_assert(g_dns_init);
 	if (!g_dns_init) return ;
 
 	tb_int_t i = 0;
@@ -268,7 +268,7 @@ tb_void_t tb_dns_server_del(tb_char_t const* ip)
 }
 tb_void_t tb_dns_server_dump()
 {
-	TB_ASSERT(g_dns_init);
+	tb_assert(g_dns_init);
 	if (!g_dns_init) return ;
 
 	tb_int_t i = 0;
@@ -334,7 +334,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 		tb_int_t i = 0;
 		for (i = 0; i < size; i++)
 		{
-			TB_DBG("%02x", data[i]);
+			tb_trace("%02x", data[i]);
 		}
 	}
 #endif
@@ -377,7 +377,7 @@ tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* 
 
 	// skip questions, only one question now.
 	// name + question1 + question2 + ...
-	TB_ASSERT(header.question == 1);
+	tb_assert(header.question == 1);
 #if 1
 	tb_bstream_skip_string(&bst);
 	tb_bstream_skip(&bst, 4);
@@ -535,11 +535,11 @@ fail:
 }
 tb_char_t const* tb_dns_lookup(tb_char_t const* host, tb_char_t* ip)
 {
-	TB_ASSERT(g_dns_init);
+	tb_assert(g_dns_init);
 	if (!g_dns_init) goto fail;
 
 	// check
-	TB_ASSERT(host && ip);
+	tb_assert(host && ip);
 	if (!host || !ip || !*host) goto fail;
 
 	// lookup servers

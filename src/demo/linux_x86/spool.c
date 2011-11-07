@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	tb_spool_t* spool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
-	TB_ASSERT_GOTO(spool, end);
+	tb_assert_and_check_goto(spool, end);
 
 	tb_char_t* s0 = tb_spool_strdup(spool, "0");
 	tb_char_t* s1 = tb_spool_strdup(spool, "01");
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	while (n--) 
 	{
 		tb_int_t r = snprintf(s, 256, "%x", rand()); s[r] == '\0'; 
-		TB_ASSERT_BREAK(!tb_strcmp(tb_spool_strdup(spool, s), s));
+		tb_assert_and_check_break(!tb_strcmp(tb_spool_strdup(spool, s), s));
 	}
 
 end:

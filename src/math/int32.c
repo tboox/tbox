@@ -315,7 +315,7 @@ tb_uint32_t tb_int32_rlog2(tb_uint32_t x)
 
 tb_size_t tb_int32_clz_generic(tb_uint32_t x)
 {
-    TB_IF_FAIL_RETURN_VAL(x, 32);
+    tb_check_return_val(x, 32);
 
 	tb_size_t n = 31;
 	if (x & 0xffff0000) { n -= 16; 	x >>= 16; 	}
@@ -329,8 +329,8 @@ tb_size_t tb_int32_clz_generic(tb_uint32_t x)
 
 tb_int32_t tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits)
 {
-	TB_ASSERT(y);
-	TB_IF_FAIL_RETURN_VAL(x, 0);
+	tb_assert(y);
+	tb_check_return_val(x, 0);
 
 	// get sign
 	tb_int32_t s = tb_int32_get_sign(x ^ y);

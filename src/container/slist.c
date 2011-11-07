@@ -48,7 +48,7 @@ static tb_void_t tb_slist_item_free(tb_void_t* item, tb_void_t* priv)
 tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_slist_item_func_t const* func)
 {
 	tb_slist_t* slist = (tb_slist_t*)tb_calloc(1, sizeof(tb_slist_t));
-	TB_ASSERT_RETURN_VAL(slist, TB_NULL);
+	tb_assert_and_check_return_val(slist, TB_NULL);
 
 	// init slist
 	slist->step = step;
@@ -61,7 +61,7 @@ tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_slist_item_func_t c
 	pool_func.free = tb_slist_item_free;
 	pool_func.priv = slist;
 	slist->pool = tb_gpool_init(sizeof(tb_size_t) + step, grow, grow, &pool_func);
-	TB_ASSERT_GOTO(slist->pool, fail);
+	tb_assert_and_check_goto(slist->pool, fail);
 
 	return slist;
 fail:
@@ -109,9 +109,9 @@ tb_void_t* tb_slist_at_last(tb_slist_t* slist)
 }
 tb_void_t const* tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t itor)
 {
-	TB_ASSERTA(slist && slist->pool);
+	tb_assert_abort(slist && slist->pool);
 	tb_byte_t const* data = tb_gpool_itor_const_at(slist->pool, itor);
-	TB_ASSERTA(data);
+	tb_assert_abort(data);
 	return (data + sizeof(tb_size_t));
 }
 tb_void_t const* tb_slist_const_at_head(tb_slist_t const* slist)
@@ -124,29 +124,29 @@ tb_void_t const* tb_slist_const_at_last(tb_slist_t const* slist)
 }
 tb_size_t tb_slist_itor_head(tb_slist_t const* slist)
 {
-	TB_ASSERTA(slist);
+	tb_assert_abort(slist);
 	return slist->head;
 }
 tb_size_t tb_slist_itor_last(tb_slist_t const* slist)
 {
-	TB_ASSERTA(slist);
+	tb_assert_abort(slist);
 	return slist->last;
 }
 tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 {
-	TB_ASSERTA(slist);
+	tb_assert_abort(slist);
 	return 0;
 }
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
-	TB_ASSERTA(slist && slist->pool);
+	tb_assert_abort(slist && slist->pool);
 	tb_byte_t const* data = tb_gpool_itor_const_at(slist->pool, itor);
-	TB_ASSERTA(data);
+	tb_assert_abort(data);
 	return tb_bits_get_u32_ne(data);
 }
 tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 {
-	TB_ASSERTA(slist);
+	tb_assert_abort(slist);
 
 	// is tail?
 	tb_size_t prev = 0;
@@ -165,12 +165,12 @@ tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 }
 tb_size_t tb_slist_size(tb_slist_t const* slist)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool, 0);
+	tb_assert_and_check_return_val(slist && slist->pool, 0);
 	return slist->pool->size;
 }
 tb_size_t tb_slist_maxn(tb_slist_t const* slist)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool, 0);
+	tb_assert_and_check_return_val(slist && slist->pool, 0);
 	return slist->pool->maxn;
 }
 /* insert node:
@@ -204,15 +204,15 @@ tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t index, tb_void_t const* i
 
 tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t const* item)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool, 0);
+	tb_assert_and_check_return_val(slist && slist->pool, 0);
 
 	// alloc a new node
 	tb_size_t node = tb_gpool_put(slist->pool, TB_NULL);
-	TB_ASSERT_RETURN_VAL(node, 0);
+	tb_assert_and_check_return_val(node, 0);
 
 	// get the node data
 	tb_byte_t* pnode = tb_gpool_itor_at(slist->pool, node);
-	TB_ASSERTA(pnode);
+	tb_assert_abort(pnode);
 
 	// init node, inode => 0
 	tb_bits_set_u32_ne(pnode, 0);
@@ -241,7 +241,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		{
 			// the prev data
 			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
-			TB_ASSERTA(pprev);
+			tb_assert_abort(pprev);
 
 			// last => node => null
 			tb_bits_set_u32_ne(pprev, node);
@@ -254,7 +254,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		{
 			// the prev data
 			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
-			TB_ASSERTA(pprev);
+			tb_assert_abort(pprev);
 
 			// node => next
 			tb_bits_set_u32_ne(pnode, tb_bits_get_u32_ne(pprev));
@@ -267,7 +267,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 	else
 	{
 		// must be zero
-		TB_ASSERT(!prev);
+		tb_assert(!prev);
 
 		// update head
 		slist->head = node;
@@ -294,7 +294,7 @@ tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t index, tb_void_t const* 
 }
 tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(slist && size, 0);
+	tb_assert_and_check_return_val(slist && size, 0);
 
 	// insert items
 	tb_size_t node = index;
@@ -314,7 +314,7 @@ tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_void_t const* item, tb_siz
 tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t index, tb_void_t const* item)
 {
 	tb_void_t* data = tb_slist_itor_at(slist, index);
-	TB_ASSERT_RETURN_VAL(data && item && slist->pool, index);
+	tb_assert_and_check_return_val(data && item && slist->pool, index);
 	
 	// do free
 	if (slist->func.free) slist->func.free(data, slist->func.priv);
@@ -333,7 +333,7 @@ tb_size_t tb_slist_replace_last(tb_slist_t* slist, tb_void_t const* item)
 }
 tb_size_t tb_slist_nreplace(tb_slist_t* slist, tb_size_t index, tb_void_t const* item, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(slist && item && size, index);
+	tb_assert_and_check_return_val(slist && item && size, index);
 
 	tb_size_t itor = index;
 	tb_size_t tail = tb_slist_itor_tail(slist);
@@ -389,7 +389,7 @@ tb_size_t tb_slist_remove(tb_slist_t* slist, tb_size_t index)
 }
 tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 {
-	TB_ASSERT_RETURN_VAL(slist && slist->pool, index);
+	tb_assert_and_check_return_val(slist && slist->pool, index);
 
 	// the prev node
 	tb_size_t prev = index;
@@ -426,7 +426,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 
 			// get the prev data
 			tb_byte_t* pprev = tb_gpool_itor_at(slist->pool, prev);
-			TB_ASSERTA(pprev);
+			tb_assert_abort(pprev);
 
 			// the next node
 			next = tb_slist_itor_next(slist, midd);
@@ -439,7 +439,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 		}
 
 		// check
-		TB_ASSERTA(midd);
+		tb_assert_abort(midd);
 
 		// free node
 		tb_gpool_del(slist->pool, midd);
@@ -464,7 +464,7 @@ tb_size_t tb_slist_nremove(tb_slist_t* slist, tb_size_t index, tb_size_t size)
 }
 tb_size_t tb_slist_nremove_next(tb_slist_t* slist, tb_size_t index, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(slist && size, index);
+	tb_assert_and_check_return_val(slist && size, index);
 
 	tb_size_t next = index;
 	while (size--) next = tb_slist_remove_next(slist, index);

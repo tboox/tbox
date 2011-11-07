@@ -40,14 +40,14 @@
 #if 1
 tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
 	return memcpy(s1, s2, n);
 }
 #elif defined(TB_CONFIG_ASSEMBLER_GAS)
 tb_void_t* tb_memcpy(tb_void_t* s1, tb_void_t const* s2, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
 	
 	return TB_NULL;

@@ -51,7 +51,7 @@ tb_void_t tb_stack_put(tb_stack_t* stack, tb_void_t const* item)
 }
 tb_void_t tb_stack_pop(tb_stack_t* stack, tb_void_t* item)
 {
-	TB_ASSERT_RETURN(stack);
+	tb_assert_and_check_return(stack);
 	if (item) 
 	{
 		tb_void_t const* last = tb_vector_const_at_last(stack);

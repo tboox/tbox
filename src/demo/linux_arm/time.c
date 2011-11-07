@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	tb_int64_t time = tb_time();
 	if (TB_TRUE == tb_time_to_local(time, &local))
 	{
-		TB_DBG("LMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
+		tb_trace("LMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
 			, tb_time_week(&local)
 			, local.year
 			, local.month
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 	}
 	if (TB_TRUE == tb_time_to_utc(time, &utc))
 	{
-		TB_DBG("GMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
+		tb_trace("GMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
 			, tb_time_week(&utc)
 			, utc.year
 			, utc.month
@@ -31,15 +31,15 @@ int main(int argc, char** argv)
 			, utc.seconds
 			, utc.milliseconds);
 	}
-	TB_DBG("time: %lld ms, clock: %lld ms", time, tb_mclock());
+	tb_trace("time: %lld ms, clock: %lld ms", time, tb_mclock());
 
 	if (TB_TRUE == tb_time_from_local(&time, &local))
 	{
-		TB_DBG("local => time: %lld", time);
+		tb_trace("local => time: %lld", time);
 	}
 	if (TB_TRUE == tb_time_from_utc(&time, &utc))
 	{
-		TB_DBG("utc => time: %lld", time);
+		tb_trace("utc => time: %lld", time);
 	}
 
 	

@@ -40,7 +40,7 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_void_t* tb_memcmp(tb_void_t const* s1, tb_void_t const* s2, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
 
 }

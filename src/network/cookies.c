@@ -33,7 +33,7 @@
  * macros
  */
 #if 1
-#	define TB_COOKIES_DBG(fmt, arg...) do { TB_DBG("[cookies]:" fmt , ## arg); } while (0)
+#	define TB_COOKIES_DBG(fmt, arg...) do { tb_trace("[cookies]:" fmt , ## arg); } while (0)
 #else
 # 	define TB_COOKIES_DBG(fmt, arg...)
 #endif
@@ -87,7 +87,7 @@ typedef struct __tb_cookie_string_t
  */
 static tb_bool_t tb_cookies_split_url(tb_char_t const* url, tb_char_t const* phost, tb_size_t* nhost, tb_char_t* ppath, tb_size_t* npath, tb_bool_t* psecure)
 {
-	TB_ASSERT_RETURN_VAL(url && phost && ppath && psecure, TB_FALSE);
+	tb_assert_and_check_return_val(url && phost && ppath && psecure, TB_FALSE);
 
 	// get url size
 	tb_size_t n = tb_strlen(url);
@@ -185,7 +185,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			if (!tb_strnicmp(b, "expires", 7))
 			{	
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
+				tb_assert_and_check_return_val(v, TB_FALSE);
 
 				entry->pexpires = v;
 				entry->nexpires = p - v;
@@ -193,7 +193,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			else if (!tb_strnicmp(b, "max-age", 7))
 			{			
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
+				tb_assert_and_check_return_val(v, TB_FALSE);
 
 				entry->pmaxage = v;
 				entry->nmaxage = p - v;
@@ -201,7 +201,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			else if (!tb_strnicmp(b, "domain", 6))
 			{			
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
+				tb_assert_and_check_return_val(v, TB_FALSE);
 
 				entry->pdomain = v;
 				entry->ndomain = p - v;
@@ -209,7 +209,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			else if (!tb_strnicmp(b, "path", 4))
 			{				
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
+				tb_assert_and_check_return_val(v, TB_FALSE);
 
 				entry->ppath = v;
 				entry->npath = p - v;
@@ -217,7 +217,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			else if (!tb_strnicmp(b, "version", 7))
 			{
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v, TB_FALSE);
+				tb_assert_and_check_return_val(v, TB_FALSE);
 
 				entry->pversion = v;
 				entry->nversion = p - v;
@@ -231,7 +231,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 			else if (v)
 			{
 				// invalid format?
-				TB_ASSERT_RETURN_VAL(v > b, TB_FALSE);
+				tb_assert_and_check_return_val(v > b, TB_FALSE);
 
 				entry->pname = b;
 				entry->nname = v - b - 1;
@@ -260,7 +260,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 	}
 
 	// check name
-	TB_ASSERT_RETURN_VAL(entry->pname && entry->nname, TB_FALSE);
+	tb_assert_and_check_return_val(entry->pname && entry->nname, TB_FALSE);
 
 	// domain not exists?
 	if (!entry->pdomain)
@@ -304,7 +304,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 // set cookies string
 static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s, tb_size_t n)
 {
-	TB_ASSERT_RETURN_VAL(s && n, 0);
+	tb_assert_and_check_return_val(s && n, 0);
  
 	// reuse it if exists
 	tb_slist_t* 	spool = cookies->spool;
@@ -324,7 +324,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 	tb_cookie_string_t string;
 	string.refn = 1;
 	string.data = tb_strndup(s, n);
-	TB_ASSERT(string.data);
+	tb_assert(string.data);
 	if (string.data) return tb_slist_insert_tail(spool, &string);
 	else return 0;
 }
@@ -364,7 +364,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 				if (svalue->refn > 1) svalue->refn--;
 				else tb_slist_remove(spool, cookie->value);
 				cookie->value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
-				TB_ASSERTA(cookie->value);
+				tb_assert_abort(cookie->value);
 
 				tb_mutex_unlock(cookies->hmutex);
 				return TB_TRUE;
@@ -441,7 +441,7 @@ static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 	cookie.path = tb_cookie_set_string(cookies, entry->ppath, entry->npath);
 	cookie.name = tb_cookie_set_string(cookies, entry->pname, entry->nname);
 	cookie.value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
-	TB_ASSERTA(cookie.domain && cookie.path && cookie.name && cookie.value);
+	tb_assert_abort(cookie.domain && cookie.path && cookie.name && cookie.value);
 
 	// add cookie
 	tb_vector_insert_tail(cookies->cpool, &cookie);
@@ -453,13 +453,13 @@ static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 // is child domain?
 static tb_bool_t tb_cookies_domain_ischild(tb_char_t const* parent, tb_char_t const* child)
 {
-	TB_ASSERT_RETURN_VAL(parent && child, TB_FALSE);
+	tb_assert_and_check_return_val(parent && child, TB_FALSE);
 
 	tb_char_t const* 	pb = parent;
 	tb_char_t const* 	cb = child;
 	tb_size_t 			pn = tb_strlen(pb);
 	tb_size_t 			cn = tb_strlen(cb);
-	TB_ASSERT_RETURN_VAL(pn > 3 && cn > 3, TB_FALSE);
+	tb_assert_and_check_return_val(pn > 3 && cn > 3, TB_FALSE);
 
 	tb_size_t 			n = 0;
 	tb_char_t const* 	pe = pb + pn - 1;
@@ -477,7 +477,7 @@ static tb_bool_t tb_cookies_domain_ischild(tb_char_t const* parent, tb_char_t co
 // is child path?
 static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t const* child)
 {
-	TB_ASSERT_RETURN_VAL(parent && child, TB_FALSE);
+	tb_assert_and_check_return_val(parent && child, TB_FALSE);
 
 	// parent is root?
 	if (parent[0] == '/' && !parent[1]) return TB_TRUE;
@@ -516,20 +516,20 @@ tb_cookies_t* tb_cookies_init()
 {
 	// calloc
 	tb_cookies_t* cookies = (tb_cookies_t*)tb_calloc(1, sizeof(tb_cookies_t));
-	TB_ASSERT_RETURN_VAL(cookies, TB_NULL);
+	tb_assert_and_check_return_val(cookies, TB_NULL);
 
 	// init hmutex
 	cookies->hmutex = tb_mutex_init("cookies");
-	TB_ASSERT_GOTO(cookies->hmutex, fail);
+	tb_assert_and_check_goto(cookies->hmutex, fail);
 
 	// init spool
 	tb_slist_item_func_t func = {tb_cookies_spool_free, TB_NULL};
 	cookies->spool = tb_slist_init(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, &func);
-	TB_ASSERT_GOTO(cookies->spool, fail);
+	tb_assert_and_check_goto(cookies->spool, fail);
 
 	// init cpool
 	cookies->cpool = tb_vector_init(sizeof(tb_cookie_t), TB_COOKIES_CPOOL_GROW, TB_NULL);
-	TB_ASSERT_GOTO(cookies->cpool, fail);
+	tb_assert_and_check_goto(cookies->cpool, fail);
 
 	return cookies;
 
@@ -541,7 +541,7 @@ tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 {
 	if (cookies)
 	{
-		TB_ASSERT_RETURN(cookies->hmutex);
+		tb_assert_and_check_return(cookies->hmutex);
 
 		// clear cookies
 		tb_cookies_clear(cookies);
@@ -569,7 +569,7 @@ tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 
 tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
+	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 
 	tb_mutex_lock(cookies->hmutex);
 	tb_vector_clear(cookies->cpool);
@@ -580,11 +580,11 @@ tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
 
 tb_void_t tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
 {
-	TB_ASSERT_RETURN(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex);
+	tb_assert_and_check_return(cookies && value && cookies->cpool && cookies->spool && cookies->hmutex);
 	//TB_COOKIES_DBG("[set]::%s%s%s = %s", secure == TB_TRUE? "https://" : "http://", domain? domain : "", path? path : "", value);
 
 	// is null?
-	TB_IF_FAIL_RETURN(value[0]);
+	tb_check_return(value[0]);
 
 	// parse cookies entry
 	tb_cookie_entry_t entry;
@@ -614,7 +614,7 @@ tb_void_t tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char
 }
 tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure)
 {
-	TB_ASSERT_RETURN_VAL(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex, TB_NULL);
+	tb_assert_and_check_return_val(cookies && domain && *domain && cookies->cpool && cookies->spool && cookies->hmutex, TB_NULL);
 	
 	// no path?
 	if (!path || !path[0]) path = "/";
@@ -642,8 +642,8 @@ tb_char_t const* tb_cookies_get(tb_cookies_t* cookies, tb_char_t const* domain, 
 			{
 				tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->name) : TB_NULL;
 				tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_slist_itor_const_at(spool, cookie->value) : TB_NULL;
-				TB_ASSERT_RETURN_VAL(sname && sname->data, TB_NULL);
-				TB_ASSERT_RETURN_VAL(svalue && svalue->data, TB_NULL);
+				tb_assert_and_check_return_val(sname && sname->data, TB_NULL);
+				tb_assert_and_check_return_val(svalue && svalue->data, TB_NULL);
 			
 				// enough?
 				if (n + 8 < TB_COOKIES_VALUE_MAX)
@@ -746,7 +746,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 #ifdef TB_DEBUG
 tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 {
-	TB_ASSERT_RETURN(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
+	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 	tb_mutex_lock(cookies->hmutex);
 
 	TB_COOKIES_DBG("==================================================");

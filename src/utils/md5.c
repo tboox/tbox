@@ -267,7 +267,7 @@ tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_siz
 	tb_md5_t md5;
 
 	// check
-	TB_ASSERT_RETURN_VAL(ib && in && ob && on >= 16, 0);
+	tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);
 
 	// init 
 	tb_md5_init(&md5, 0);

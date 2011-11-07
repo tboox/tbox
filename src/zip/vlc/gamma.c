@@ -33,14 +33,14 @@
 static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
 {
 #if 0
-	TB_ASSERT(vlc && val);
+	tb_assert(vlc && val);
 
 	// compute q & r
 	tb_uint32_t q = TB_MATH_ILOG2I(val);
 	tb_uint32_t r = val - (1 << q);
-	TB_ASSERT(q < 32);
+	tb_assert(q < 32);
 
-	//TB_DBG("x: %d, q: %d, r: %d", val, q, r);
+	//tb_trace("x: %d, q: %d, r: %d", val, q, r);
 
 	// store
 	tb_int_t i = 0;
@@ -51,19 +51,19 @@ static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bst
 }
 static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_bstream_t const* bst)
 {
-	TB_ASSERT(vlc);
+	tb_assert(vlc);
 
 	// get q
 	tb_uint32_t q = 0;
 	while (tb_bstream_get_u1(bst)) q++;
-	TB_ASSERT(q < 32);
+	tb_assert(q < 32);
 
 	// get r
 	tb_uint32_t i = 0;
 	tb_uint32_t r = 0;
 	for (i = 0; i < q; i++) r |= tb_bstream_get_u1(bst) << i;
 
-	//TB_DBG("x: %d, q: %d, r: %d", r + (1 << q), q, r);
+	//tb_trace("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 
 	return (r + (1 << q));
 }

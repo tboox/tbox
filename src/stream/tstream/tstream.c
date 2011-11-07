@@ -32,7 +32,7 @@
  */
 tb_tstream_t* tb_tstream_cast(tb_gstream_t* gst)
 {
-	TB_ASSERT_RETURN_VAL(gst && gst->type == TB_GSTREAM_TYPE_TRAN, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_TRAN, TB_NULL);
 	return (tb_tstream_t*)gst;
 }
 tb_bool_t tb_tstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
@@ -42,14 +42,14 @@ tb_bool_t tb_tstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 tb_bool_t tb_tstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(tst, TB_FALSE);
+	tb_assert_and_check_return_val(tst, TB_FALSE);
 
 	switch (cmd)
 	{
 	case TB_TSTREAM_CMD_GET_GSTREAM:
 		{
 			tb_gstream_t** pgst = (tb_gstream_t*)arg1;
-			TB_ASSERT_RETURN_VAL(pgst, TB_FALSE);
+			tb_assert_and_check_return_val(pgst, TB_FALSE);
 			*pgst = tst->gst;
 			return TB_TRUE;
 		}
@@ -70,7 +70,7 @@ tb_bool_t tb_tstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, t
 tb_bool_t tb_tstream_open(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	TB_ASSERT_RETURN_VAL(tst && tst->gst, TB_FALSE);
+	tb_assert_and_check_return_val(tst && tst->gst, TB_FALSE);
 
 	// init input
 	tst->ip = tst->ib;
@@ -91,19 +91,19 @@ tb_void_t tb_tstream_close(tb_gstream_t* gst)
 tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	//TB_DBG("=====================================");
-	//TB_DBG("need: %d", size);
+	//tb_trace("=====================================");
+	//tb_trace("need: %d", size);
 
 	// check
-	TB_ASSERT_RETURN_VAL(tst && data, -1);
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_assert_and_check_return_val(tst && data, -1);
+	tb_check_return_val(size, 0);
 
 	// read data from the output data first
 	tb_int_t read = 0;
 	if (tst->on > 0)
 	{
 		// if enough?
-		TB_ASSERT_RETURN_VAL(tst->op, -1);
+		tb_assert_and_check_return_val(tst->op, -1);
 		if (tst->on > size)
 		{
 			read = size;
@@ -120,7 +120,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		}
 	}
 
-	//TB_DBG("have: %d", read);
+	//tb_trace("have: %d", read);
 	// is enough?
 	if (read == size) return read;
 
@@ -130,7 +130,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	if (tst->in < ln)
 	{
 		// read data
-		TB_ASSERT_RETURN_VAL(tst->gst, -1);
+		tb_assert_and_check_return_val(tst->gst, -1);
 		ret = tb_gstream_read(tst->gst, tst->ip + tst->in, ln - tst->in);
 		if (ret > 0) tst->in += ret;
 		// handle the left data
@@ -152,21 +152,21 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		else return -1;
 	}
 
-	//TB_DBG("spank[i]: %d", tst->in);
+	//tb_trace("spank[i]: %d", tst->in);
 	// spank it for transform
-	TB_ASSERT_RETURN_VAL(tst->spank && !tst->on && tst->op == tst->ob, -1);
+	tb_assert_and_check_return_val(tst->spank && !tst->on && tst->op == tst->ob, -1);
 	if (TB_FALSE == tst->spank(gst)) 
 	{
 		tst->status = TB_TSTREAM_STATUS_FAIL;
 		return read? read : -1;
 	}
 
-	//TB_DBG("spank[o]: %d, left: %d", tst->on, tst->in);
+	//tb_trace("spank[o]: %d, left: %d", tst->on, tst->in);
 	// read data from the output data
 	if (tst->on > 0)
 	{
 		// if enough?
-		TB_ASSERT_RETURN_VAL(read < size, -1);
+		tb_assert_and_check_return_val(read < size, -1);
 		tb_size_t need = size - read;
 		if (tst->on > need)
 		{
@@ -186,7 +186,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// have not enough input data for transform?
 	else ;
 
-	//TB_DBG("move: %d", tst->in);
+	//tb_trace("move: %d", tst->in);
 	// move the left input data to the begin for getting more data
 	if (tst->ib != tst->ip)
 	{
@@ -207,7 +207,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		}
 	}
 
-	//TB_DBG("read: %d", read);
+	//tb_trace("read: %d", read);
 	return read;
 }
 

@@ -67,7 +67,7 @@ static tb_void_t tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size
 		{
 			// init node
 			tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
-			TB_ASSERT(onode);
+			tb_assert(onode);
 			onode->sign[0] = wp[0];
 			onode->sign[1] = wp[1];
 			onode->sign[2] = wp[2];
@@ -80,10 +80,10 @@ static tb_void_t tb_lzsw_window_insert(tb_lzsw_deflate_window_t* window, tb_size
 			if (head)
 			{
 				tb_lzsw_node_t* onext = TB_POOL_GET(pool, head, tb_lzsw_node_t);
-				TB_ASSERT(onext);
+				tb_assert(onext);
 
 				tb_lzsw_node_t* oprev = TB_POOL_GET(pool, onext->prev, tb_lzsw_node_t);
-				TB_ASSERT(oprev);
+				tb_assert(oprev);
 
 				onode->next = head;
 				onode->prev = onext->prev;
@@ -131,7 +131,7 @@ static tb_void_t tb_lzsw_window_remove(tb_lzsw_deflate_window_t* window, tb_size
 				{
 					// get node
 					tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
-					TB_ASSERT(onode);
+					tb_assert(onode);
 
 					// get next & prev 
 					tb_size_t next = onode->next;
@@ -212,7 +212,7 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 		{
 			// get node
 			tb_lzsw_node_t* onode = TB_POOL_GET(pool, node, tb_lzsw_node_t);
-			TB_ASSERT(onode);
+			tb_assert(onode);
 
 			// find it
 			if (onode->sign[0] == sp[0]
@@ -305,14 +305,14 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 {
 	tb_lzsw_inflate_zstream_t* zst = (tb_lzsw_inflate_zstream_t*)st;
-	TB_ASSERT(zst);
+	tb_assert(zst);
 	if (!zst) return TB_NULL;
 
 	// get dst
 	tb_byte_t* dp = st->dst.p;
 	tb_byte_t* de = st->dst.e;
 	tb_byte_t* db = dp;
-	TB_ASSERT(dp && de);
+	tb_assert(dp && de);
 	if (!dp || !de) return TB_NULL;
 
 	// get src
@@ -320,7 +320,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 
 	// get vlc
 	tb_zstream_vlc_t* vlc = zst->vlc;
-	TB_ASSERT(vlc && vlc->get);
+	tb_assert(vlc && vlc->get);
 
 	// vlc callback
 	tb_zstream_vlc_get_t vlc_get = vlc->get;
@@ -341,7 +341,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 			// get size
 			tb_size_t n = vlc_get(vlc, src) + 2;
 
-			//TB_DBG("%d %d", p, n);
+			//tb_trace("%d %d", p, n);
 #if 0 
 			// fill data
 			// \note: address maybe overlap
@@ -410,14 +410,14 @@ static tb_void_t tb_zstream_inflate_lzsw_close(tb_tstream_t* st)
 static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 {
 	tb_lzsw_deflate_zstream_t* zst = (tb_lzsw_deflate_zstream_t*)st;
-	TB_ASSERT(zst);
+	tb_assert(zst);
 	if (!zst) return TB_NULL;
 
 	// get src
 	tb_byte_t* sp = st->src.p;
 	tb_byte_t* se = st->src.e;
 	tb_byte_t* sb = sp;
-	TB_ASSERT(sp && se);
+	tb_assert(sp && se);
 	if (!sp || !se) return TB_NULL;
 
 	// get dst
@@ -425,7 +425,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 
 	// get vlc
 	tb_zstream_vlc_t* vlc = zst->vlc;
-	TB_ASSERT(vlc && vlc->set);
+	tb_assert(vlc && vlc->set);
 
 	// vlc callback
 	tb_zstream_vlc_set_t vlc_set = vlc->set;
@@ -453,7 +453,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 			// update sp
 			sp += n;
 
-			//TB_DBG("%d %d", p, n);
+			//tb_trace("%d %d", p, n);
 		}
 		else
 		{
@@ -488,7 +488,7 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 		window->wn = wn;
 		window->wb = (wn == TB_LZSW_WINDOW_SIZE_MAX)? window->mb : TB_MATH_ICLOG2I(wn);
 		window->base = (window->base + TB_LZSW_WINDOW_SIZE_MAX - ln) % TB_LZSW_WINDOW_SIZE_MAX;
-		//TB_DBG("[window]: at: %d, base: %d, ln: %d, rn: %d, coff0: %d", wb - sb, window->base, ln, rn, tb_lzsw_window_coff(window->base, 0));
+		//tb_trace("[window]: at: %d, base: %d, ln: %d, rn: %d, coff0: %d", wb - sb, window->base, ln, rn, tb_lzsw_window_coff(window->base, 0));
 
 
 		// insert the new nodes
@@ -534,7 +534,7 @@ static tb_void_t tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 
 tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 {
-	TB_ASSERT(zst);
+	tb_assert(zst);
 	if (!zst) return TB_NULL;
 
 	// init 
@@ -564,7 +564,7 @@ tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 }
 tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 {
-	TB_ASSERT(zst);
+	tb_assert(zst);
 	if (!zst) return TB_NULL;
 
 	// init 

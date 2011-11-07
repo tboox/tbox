@@ -85,13 +85,13 @@
 static __tb_inline__ tb_fixed6_t tb_int_to_fixed6_check(tb_int_t x)
 {
 	// check overflow
-	TB_ASSERT(x >= -1024 && x <= 1024);
+	tb_assert(x >= -1024 && x <= 1024);
 	return (x << 6);
 }
 static __tb_inline__ tb_int_t tb_fixed6_to_int_check(tb_fixed6_t x)
 {
 	// no overflow, < int16 ?
-	TB_ASSERT(x == (tb_int16_t)x);
+	tb_assert(x == (tb_int16_t)x);
 	return (x >> 6);
 }
 #endif
@@ -99,7 +99,7 @@ static __tb_inline__ tb_int_t tb_fixed6_to_int_check(tb_fixed6_t x)
 // \note the return value is the fixed16 type
 static __tb_inline__ tb_fixed16_t tb_fixed6_div_inline(tb_fixed6_t x, tb_fixed6_t y)
 {
-	TB_ASSERT(y != 0);
+	tb_assert(y != 0);
 	// no overflow, < int16 ?
 	if (x == (tb_int16_t)x) return (x << 16) / y;
 	else return tb_fixed16_div(x, y);

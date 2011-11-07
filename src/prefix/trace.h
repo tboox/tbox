@@ -37,43 +37,6 @@ extern "C" {
  * macros
  */
 
-#if 1
-// print
-#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-#	define TB_PRINT_TAG(tag, fmt, arg...)				do { tb_printf("["tag"]: " fmt "\n" , ## arg); } while (0)
-# 	define TB_PRINT(fmt, arg...)						TB_PRINT_TAG(TB_TRACE_TAG, fmt, ## arg)
-#else
-#	define TB_PRINT_TAG
-#	define TB_PRINT
-#endif
-
-// trace
-#if defined(TB_DEBUG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-//#	define TB_TRACE_TAG(tag, fmt, arg...)				TB_PRINT_TAG(tag, fmt, ## arg)
-# 	define TB_TRACE(fmt, arg...)						TB_PRINT(fmt, ## arg)
-# 	define TB_TRACE_LINE_TAG(tag, fmt, arg...) 			TB_PRINT_TAG(tag, fmt "at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
-# 	define TB_TRACE_LINE(fmt, arg...) 					TB_TRACE_LINE_TAG(TB_TRACE_TAG, fmt, ## arg)
-# 	define TB_DBG(fmt, arg...)							TB_TRACE(fmt, ## arg) 				//!< discarded
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-//#	define TB_TRACE_TAG(...)
-# 	define TB_TRACE(...)
-# 	define TB_TRACE_LINE_TAG(...)
-# 	define TB_TRACE_LINE(...)
-# 	define TB_DBG(...)							
-#else
-//#	define TB_TRACE_TAG
-# 	define TB_TRACE
-# 	define TB_TRACE_LINE_TAG
-# 	define TB_TRACE_LINE
-# 	define TB_DBG					
-#endif
-
-#define TB_TRACE_NOIMPL_TAG(tag) 						TB_TRACE_LINE_TAG(tag, "[no_impl]: ")
-#define TB_TRACE_NOIMPL() 								TB_TRACE_NOIMPL_TAG(TB_TRACE_TAG)
-#define TB_NOT_IMPLEMENT() 								TB_TRACE_NOIMPL() 				//!< discarded
-#endif
-
-
 // print
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 #	define tb_print_tag(tag, fmt, arg...)				do { tb_printf("["tag"]: " fmt "\n" , ## arg); } while (0)

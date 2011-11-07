@@ -33,7 +33,7 @@
 
 tb_char_t* tb_strdup(tb_char_t const* s)
 {
-	TB_ASSERT_RETURN_VAL(s, TB_NULL);
+	tb_assert_and_check_return_val(s, TB_NULL);
 
 	__tb_register__ tb_size_t 	n = tb_strlen(s);
 	__tb_register__ tb_char_t* 	p = tb_malloc(n + 1);

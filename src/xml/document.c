@@ -150,7 +150,7 @@ tb_void_t tb_xml_document_destroy(tb_xml_document_t* document)
 
 tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 {
-	TB_ASSERT(document);
+	tb_assert(document);
 	if (!document) return TB_FALSE;
 
 	// clear document
@@ -158,7 +158,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 
 	// open reader
 	tb_xml_reader_t* reader = tb_xml_reader_open(gst);
-	TB_ASSERT(reader);
+	tb_assert(reader);
 	if (!reader) return TB_FALSE;
 
 	// the parent node
@@ -218,7 +218,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 				parent = parent->parent;
 
 				// check parent
-				TB_ASSERT(parent);
+				tb_assert(parent);
 				if (!parent) goto fail;
 			}
 			break;
@@ -289,12 +289,12 @@ fail:
 }
 tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst)
 {
-	TB_ASSERT(document);
+	tb_assert(document);
 	if (!document) return TB_FALSE;
 
 	// open writer
 	tb_xml_writer_t* writer = tb_xml_writer_open(gst);
-	TB_ASSERT(writer);
+	tb_assert(writer);
 	if (!writer) return TB_FALSE;
 
 	// check xml header
@@ -318,7 +318,7 @@ tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst)
 
 tb_void_t tb_xml_document_clear(tb_xml_document_t* document)
 {
-	TB_ASSERT(document);
+	tb_assert(document);
 	if (!document) return ;
 
 	// clear version & encoding
@@ -345,7 +345,7 @@ tb_string_t* tb_xml_document_encoding(tb_xml_document_t* document)
 }
 tb_xml_node_t* tb_xml_document_create_element(tb_xml_document_t* document, tb_char_t const* name)
 {
-	TB_ASSERT(document && name);
+	tb_assert(document && name);
 	if (!document || !name) return TB_NULL;
 
 	// alloc element
@@ -361,7 +361,7 @@ tb_xml_node_t* tb_xml_document_create_element(tb_xml_document_t* document, tb_ch
 }
 tb_xml_node_t* tb_xml_document_create_text(tb_xml_document_t* document, tb_char_t const* data)
 {
-	TB_ASSERT(document && data);
+	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc text
@@ -377,7 +377,7 @@ tb_xml_node_t* tb_xml_document_create_text(tb_xml_document_t* document, tb_char_
 }
 tb_xml_node_t* tb_xml_document_create_cdata(tb_xml_document_t* document, tb_char_t const* data)
 {
-	TB_ASSERT(document && data);
+	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc cdata
@@ -393,7 +393,7 @@ tb_xml_node_t* tb_xml_document_create_cdata(tb_xml_document_t* document, tb_char
 }
 tb_xml_node_t* tb_xml_document_create_comment(tb_xml_document_t* document, tb_char_t const* data)
 {
-	TB_ASSERT(document && data);
+	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc comment
@@ -409,7 +409,7 @@ tb_xml_node_t* tb_xml_document_create_comment(tb_xml_document_t* document, tb_ch
 }
 tb_xml_node_t* tb_xml_document_create_attribute(tb_xml_document_t* document, tb_char_t const* name)
 {
-	TB_ASSERT(document && name);
+	tb_assert(document && name);
 	if (!document || !name) return TB_NULL;
 
 	// alloc attribute

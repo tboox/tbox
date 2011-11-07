@@ -30,14 +30,14 @@
  */
 static tb_size_t tb_encoding_ascii_get_unicode(tb_uint32_t* ch, tb_byte_t const** data, tb_size_t size)
 {
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_check_return_val(size, 0);
 	*ch = *(*data)++;
 	return 1;
 }
 
 static tb_size_t tb_encoding_ascii_set_unicode(tb_uint32_t ch, tb_byte_t** data, tb_size_t size)
 {
-	TB_IF_FAIL_RETURN_VAL(size, 0);
+	tb_check_return_val(size, 0);
 	if (ch >= 0x0 && ch <= 0xff)
 		*((*data)++) = ch;
 
@@ -103,13 +103,13 @@ static tb_size_t tb_encoding_gb2312_get_unicode(tb_uint32_t* ch, tb_byte_t const
 {
 	if (**data <= 0x7f) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size, 0);
+		tb_check_return_val(size, 0);
 		*ch = *(*data)++;
 		return 1;
 	}
 	else
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 1, 0);
+		tb_check_return_val(size > 1, 0);
 		*ch = tb_encoding_gb2312_to_unicode((tb_uint16_t)((((tb_uint16_t)(*data)[0]) << 8) | (*data)[1]));
 		(*data) += 2;
 		return 2;
@@ -120,13 +120,13 @@ static tb_size_t tb_encoding_gb2312_set_unicode(tb_uint32_t ch, tb_byte_t** data
 	ch = tb_encoding_gb2312_from_unicode(ch);
 	if (ch <= 0x7f) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size, 0);
+		tb_check_return_val(size, 0);
 		*(*data)++ = ch & 0xff;
 		return 1;
 	}
 	else
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 1, 0);
+		tb_check_return_val(size > 1, 0);
 		*(*data)++ = (ch >> 8) & 0xff;
 		*(*data)++ = ch & 0xff;
 		return 2;
@@ -154,48 +154,48 @@ static tb_size_t tb_encoding_utf8_get_unicode(tb_uint32_t* ch, tb_byte_t const**
 	// 0x00000000 - 0x0000007f
 	if (!(*p & 0x80))
 	{
-		TB_IF_FAIL_RETURN_VAL(size, 0);
+		tb_check_return_val(size, 0);
 		*ch = *p++;
 	}
 	// 0x00000080 - 0x000007ff
 	else if ((*p & 0xe0) == 0xc0)
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 1, 0);
+		tb_check_return_val(size > 1, 0);
 		*ch = ((((tb_uint32_t)(p[0] & 0x1f)) << 6) | (p[1] & 0x3f));
 		p += 2;
 	}
 	// 0x00000800 - 0x0000ffff
 	else if ((*p & 0xf0) == 0xe0)
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 2, 0);
+		tb_check_return_val(size > 2, 0);
 		*ch = ((((tb_uint32_t)(p[0] & 0x0f)) << 12) | (((tb_uint32_t)(p[1] & 0x3f)) << 6) | (p[2] & 0x3f));
 		p += 3;
 	}
 	// 0x00010000 - 0x001fffff
 	else if ((*p & 0xf8) == 0xf0)
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 3, 0);
+		tb_check_return_val(size > 3, 0);
 		*ch = ((((tb_uint32_t)(p[0] & 0x07)) << 18) | (((tb_uint32_t)(p[1] & 0x3f)) << 12) | (((tb_uint32_t)(p[2] & 0x3f)) << 6) | (p[3] & 0x3f));
 		p += 4;
 	}
 	// 0x00200000 - 0x03ffffff
 	else if ((*p & 0xfc) == 0xf8)
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 4, 0);
+		tb_check_return_val(size > 4, 0);
 		*ch = ((((tb_uint32_t)(p[0] & 0x03)) << 24) | (((tb_uint32_t)(p[1] & 0x3f)) << 18) | (((tb_uint32_t)(p[2] & 0x3f)) << 12) | (((tb_uint32_t)(p[3] & 0x3f)) << 6) | (p[4] & 0x3f));
 		p += 5;
 	}
 	// 0x04000000 - 0x7fffffff
 	else if ((*p & 0xfe) == 0xfc)
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 5, 0);
+		tb_check_return_val(size > 5, 0);
 		*ch = ((((tb_uint32_t)(p[0] & 0x01)) << 30) | (((tb_uint32_t)(p[1] & 0x3f)) << 24) | (((tb_uint32_t)(p[2] & 0x3f)) << 18) | (((tb_uint32_t)(p[3] & 0x3f)) << 12) | (((tb_uint32_t)(p[4] & 0x3f)) << 6) | (p[5] & 0x3f));
 		p += 6;
 	}
 	else
 	{
 		// invalid character
-		TB_DBG("invalid utf8 character: %x", *p);
+		tb_trace("invalid utf8 character: %x", *p);
 
 		// skip it
 		p++;
@@ -212,13 +212,13 @@ static tb_byte_t* tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** data,
 	// 0x00000000 - 0x0000007f
 	if (ch <= 0x0000007f) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size, 0);
+		tb_check_return_val(size, 0);
 		*p++ = ch;
 	}
 	// 0x00000080 - 0x000007ff
 	else if (ch <= 0x000007ff) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 1, 0);
+		tb_check_return_val(size > 1, 0);
 		// 110xxxxx 10xxxxxx
 		//      xxx xxxxxxxx
 		*p++ = ((ch >> 6) & 0x1f) | 0xc0;
@@ -227,7 +227,7 @@ static tb_byte_t* tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** data,
 	// 0x00000800 - 0x0000ffff
 	else if (ch <= 0x0000ffff) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 2, 0);
+		tb_check_return_val(size > 2, 0);
 		// 1110xxxx 10xxxxxx 10xxxxxx
 		//          xxxxxxxx xxxxxxxx
 		*p++ = ((ch >> 12) & 0x0f) | 0xe0;
@@ -237,7 +237,7 @@ static tb_byte_t* tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** data,
 	// 0x00010000 - 0x001fffff
 	else if (ch <= 0x001fffff) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 3, 0);
+		tb_check_return_val(size > 3, 0);
 		// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 		//             xxxxx xxxxxxxx xxxxxxxx
 		*p++ = ((ch >> 18) & 0x07) | 0xf0;
@@ -248,7 +248,7 @@ static tb_byte_t* tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** data,
 	// 0x00200000 - 0x03ffffff
 	else if (ch <= 0x03ffffff) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 4, 0);
+		tb_check_return_val(size > 4, 0);
 		// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 		//                xx xxxxxxxx xxxxxxxx xxxxxxxx
 		*p++ = ((ch >> 24) & 0x03) | 0xf8;
@@ -260,7 +260,7 @@ static tb_byte_t* tb_encoding_utf8_set_unicode(tb_uint32_t ch, tb_byte_t** data,
 	// 0x04000000 - 0x7fffffff
 	else if (ch <= 0x7fffffff) 
 	{
-		TB_IF_FAIL_RETURN_VAL(size > 5, 0);
+		tb_check_return_val(size > 5, 0);
 		// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 		//                    xxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
 		*p++ = ((ch >> 30) & 0x01) | 0xfc;
@@ -279,12 +279,12 @@ static tb_uint32_t tb_encoding_utf8_from_unicode(tb_uint32_t ch)
 	if (ch <= 0x7f) return ch;
 	else if (ch <= 0x7ff)
 	{
-		TB_DBG("[not_impl]: unicode to utf8 character");
+		tb_trace("[not_impl]: unicode to utf8 character");
 		return 0;
 	}
 
 	// this unicode character is too large
-	TB_DBG("only support 2-bytes utf8 character, the character(%x) is too large", ch);
+	tb_trace("only support 2-bytes utf8 character, the character(%x) is too large", ch);
 
 	return 0;
 }
@@ -295,7 +295,7 @@ static tb_uint32_t tb_encoding_utf8_to_unicode(tb_uint32_t ch)
 	// 0x00000080 - 0x000007ff
 	else
 	{
-		TB_DBG("[not_impl]: utf8 to unicode character");
+		tb_trace("[not_impl]: utf8 to unicode character");
 		return 0;
 	}
 }
@@ -305,14 +305,14 @@ static tb_uint32_t tb_encoding_utf8_to_unicode(tb_uint32_t ch)
  */
 static tb_size_t tb_encoding_unicode_get_unicode(tb_uint32_t* ch, tb_byte_t const** data, tb_size_t size)
 {
-	TB_IF_FAIL_RETURN_VAL(size > 3, 0);
+	tb_check_return_val(size > 3, 0);
 	*ch = *((tb_uint32_t*)(*data));
 	*data += 4;
 	return 4;
 }
 static tb_byte_t* tb_encoding_unicode_set_unicode(tb_uint32_t ch, tb_byte_t** data, tb_size_t size)
 {
-	TB_IF_FAIL_RETURN_VAL(size > 3, 0);
+	tb_check_return_val(size > 3, 0);
 	*((tb_uint32_t*)(*data)) = ch;
 	*data += 4;
 	return 4;
@@ -348,7 +348,7 @@ tb_encoder_t const* tb_encoding_get_encoder(tb_encoding_t encoding)
 	if (idx < tb_arrayn(g_encoders))
 	{
 		tb_encoder_t const* encoder = &g_encoders[idx];
-		TB_ASSERT(encoder->encoding == idx);
+		tb_assert(encoder->encoding == idx);
 		return encoder;
 	}
 	return TB_NULL;
@@ -360,11 +360,11 @@ tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, t
 	tb_encoder_t const* dst_c = tb_encoding_get_encoder(dst_e);
 
 	// check encoders
-	TB_ASSERT(src_c && dst_c && src_c->get && dst_c->set);
+	tb_assert(src_c && dst_c && src_c->get && dst_c->set);
 	if (!src_c || !dst_c || !src_c->get || !dst_c->set) return 0;
 
 	// check string
-	TB_ASSERT(src_s && dst_s);
+	tb_assert(src_s && dst_s);
 	if (!src_s || !dst_s) return 0;
 
 	// { get string

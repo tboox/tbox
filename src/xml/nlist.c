@@ -68,7 +68,7 @@ tb_void_t tb_xml_nlist_destroy(tb_xml_nlist_t* nlist)
 
 tb_xml_node_t* tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index)
 {
-	TB_ASSERT(nlist && index >= 0 && index < nlist->size);
+	tb_assert(nlist && index >= 0 && index < nlist->size);
 	if (!nlist || index < 0 || index >= nlist->size) return TB_NULL;
 	
 	// get head
@@ -101,7 +101,7 @@ tb_xml_node_t* tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index)
 }
 tb_xml_node_t* tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name)
 {
-	TB_ASSERT(nlist && name);
+	tb_assert(nlist && name);
 	if (!nlist || !name) return TB_NULL;
 	
 	// get head
@@ -120,7 +120,7 @@ tb_xml_node_t* tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name)
 
 tb_void_t tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 {
-	TB_ASSERT(nlist && node);
+	tb_assert(nlist && node);
 	if (!nlist || !node) return ;
 	
 	// get head
@@ -146,7 +146,7 @@ tb_void_t tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 }
 tb_void_t tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node)
 {
-	TB_ASSERT(nlist && node);
+	tb_assert(nlist && node);
 	if (!nlist || !node) return ;
 	
 	// get head

@@ -67,7 +67,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 {
 	if (type == TB_SOCKET_TYPE_UNKNOWN) return TB_NULL;
 
-	//TB_DBG("socket open: %s %d", host, port);
+	//tb_trace("socket open: %s %d", host, port);
 
 	// create socket
 	tb_int_t t = 0;
@@ -160,7 +160,7 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 
 	// create socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd;
@@ -179,10 +179,10 @@ tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_in
 }
 tb_void_t tb_socket_close(tb_handle_t hsocket)
 {
-	TB_ASSERT_RETURN(hsocket);
+	tb_assert_and_check_return(hsocket);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
 
-	//TB_DBG("socket close");
+	//tb_trace("socket close");
 
 	if (s && s->fd >= 0) 
 	{
@@ -193,10 +193,10 @@ tb_void_t tb_socket_close(tb_handle_t hsocket)
 
 tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(hsocket, -1);
+	tb_assert_and_check_return_val(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
 
-	//TB_DBG("socket_recv: %d", size);
+	//tb_trace("socket_recv: %d", size);
 
 	// non-block
 	if (!s->is_block)
@@ -230,10 +230,10 @@ tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 
 tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(hsocket, -1);
+	tb_assert_and_check_return_val(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
 
-	//TB_DBG("socket_send: %d", size);
+	//tb_trace("socket_send: %d", size);
 
 	// non-block
 	if (!s->is_block)
@@ -265,13 +265,13 @@ tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 }
 tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(hsocket, -1);
+	tb_assert_and_check_return_val(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
 
 	// get host & port
 	port = port? port : s->port;
 	host = host? host : s->host;
-	TB_ASSERT(port && host && host[0]);
+	tb_assert(port && host && host[0]);
 	if (!port || !host || !host[0]) return -1;
 
 	// recv data
@@ -317,13 +317,13 @@ tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint1
 }
 tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
 {
-	TB_ASSERT_RETURN_VAL(hsocket, -1);
+	tb_assert_and_check_return_val(hsocket, -1);
 	tb_socket_t* s = (tb_socket_t*)hsocket;
 
 	// get host & port
 	port = port? port : s->port;
 	host = host? host : s->host;
-	TB_ASSERT(port && host && host[0]);
+	tb_assert(port && host && host[0]);
 	if (!port || !host || !host[0]) return -1;
 
 	// recv data
@@ -380,7 +380,7 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	if (type == TB_SOCKET_TYPE_UDP)
 	{
 		// not implemention now
-		TB_DBG("tb_socket_server_open(type == UDP) is not implemention now");
+		tb_trace("tb_socket_server_open(type == UDP) is not implemention now");
 		return TB_NULL;
 	}
 
@@ -401,7 +401,7 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	// bind 
     if (bind(fd_s, (struct sockaddr *)&saddr, sizeof(struct sockaddr)) == -1)
 	{
-        TB_DBG("bind error!");
+        tb_trace("bind error!");
 		close(fd_s);
 		return TB_NULL;
     }
@@ -409,14 +409,14 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 	// listen
     if (listen(fd_s, 20) == -1) 
 	{
-        TB_DBG("listen error!");
+        tb_trace("listen error!");
 		close(fd_s);
 		return TB_NULL;
     }
 
 	// return server socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_s;
@@ -427,7 +427,7 @@ tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_
 }
 tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
 {
-	TB_ASSERT_RETURN_VAL(hserver, TB_NULL);
+	tb_assert_and_check_return_val(hserver, TB_NULL);
 	tb_socket_t* ps = (tb_socket_t*)hserver;
 	if (ps->fd < 0) return TB_NULL;
 
@@ -437,11 +437,11 @@ tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
 	tb_int_t fd_c = accept(ps->fd, (struct sockaddr *)&caddr, &caddr_n);
 	if (fd_c == -1) return TB_NULL;
 
-	//TB_DBG("connection from %s", inet_ntoa(caddr.sin_addr));
+	//tb_trace("connection from %s", inet_ntoa(caddr.sin_addr));
 
 	// return client socket
 	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	TB_ASSERT(s);
+	tb_assert(s);
 	if (!s) return TB_NULL;
 	memset(s, 0, sizeof(tb_socket_t));
 	s->fd = fd_c;

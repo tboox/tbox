@@ -34,7 +34,7 @@
 
 tb_xml_writer_t* tb_xml_writer_open(tb_gstream_t* gst)
 {
-	TB_ASSERT(gst);
+	tb_assert(gst);
 	if (!gst) return TB_NULL;
 
 	// alloc writer
@@ -80,7 +80,7 @@ tb_void_t tb_xml_writer_close(tb_xml_writer_t* writer)
 }
 tb_void_t tb_xml_writer_document_beg(tb_xml_writer_t* writer, tb_char_t const* version, tb_char_t const* encoding)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	tb_gstream_printf(writer->gst, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "", encoding? encoding : "");
@@ -92,7 +92,7 @@ tb_void_t tb_xml_writer_document_end(tb_xml_writer_t* writer)
 
 tb_void_t tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* name)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	if (writer->attributes_n) 
@@ -113,7 +113,7 @@ tb_void_t tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* na
 }
 tb_void_t tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* name)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	if (writer->attributes_n) 
@@ -134,42 +134,42 @@ tb_void_t tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* 
 }
 tb_void_t tb_xml_writer_element_end(tb_xml_writer_t* writer, tb_char_t const* name)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	tb_gstream_printf(writer->gst, "</%s>", name? name : "");
 }
 tb_void_t tb_xml_writer_cdata(tb_xml_writer_t* writer, tb_char_t const* data)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	tb_gstream_printf(writer->gst, "<![CDATA[%s]]>", data? data : "");
 }
 tb_void_t tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	tb_gstream_printf(writer->gst, "%s", text? text : "");
 }
 tb_void_t tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment)
 {
-	TB_ASSERT(writer && writer->gst);
+	tb_assert(writer && writer->gst);
 	if (!writer || !writer->gst) return ;
 
 	tb_gstream_printf(writer->gst, "<!--%s-->", comment? comment : "");
 }
 tb_void_t tb_xml_writer_attributes_clear(tb_xml_writer_t* writer)
 {
-	TB_ASSERT(writer);
+	tb_assert(writer);
 	if (!writer) return ;
 
 	writer->attributes_n = 0;
 }
 tb_void_t tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)
 {
-	TB_ASSERT(writer && name && value);
+	tb_assert(writer && name && value);
 	if (!writer || !name || !value) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
@@ -181,7 +181,7 @@ tb_void_t tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t
 }
 tb_void_t tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)
 {
-	TB_ASSERT(writer && name && value);
+	tb_assert(writer && name && value);
 	if (!writer || !name || !value) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
@@ -193,7 +193,7 @@ tb_void_t tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char
 }
 tb_void_t tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)
 {
-	TB_ASSERT(writer && name);
+	tb_assert(writer && name);
 	if (!writer || !name) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
@@ -207,7 +207,7 @@ tb_void_t tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t co
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
 {
-	TB_ASSERT(writer && name);
+	tb_assert(writer && name);
 	if (!writer || !name) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
@@ -220,7 +220,7 @@ tb_void_t tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t 
 #endif
 tb_void_t tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value)
 {
-	TB_ASSERT(writer && name);
+	tb_assert(writer && name);
 	if (!writer || !name) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
@@ -232,7 +232,7 @@ tb_void_t tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t c
 }
 tb_void_t tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)
 {
-	TB_ASSERT(writer && name && fmt);
+	tb_assert(writer && name && fmt);
 	if (!writer || !name || !fmt) return ;
 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
