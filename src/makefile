@@ -22,7 +22,7 @@ tbox_C_FILES 			+= \
 						container/hash \
 						container/queue \
 						container/stack \
-						container/gpool \
+						container/fpool \
 						container/spool \
 						container/slist \
 						container/dlist \
@@ -176,7 +176,7 @@ INC_FILES 				= \
 						container/hash.h \
 						container/slist.h \
 						container/dlist.h \
-						container/gpool.h \
+						container/fpool.h \
 						container/spool.h \
 						container/queue.h \
 						container/stack.h \

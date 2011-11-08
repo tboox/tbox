@@ -335,7 +335,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_size_t const	step = 256;
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
-	tb_gpool_t* 	pool = tb_gpool_init(step, 256, 256, TB_NULL);
+	tb_fpool_t* 	pool = tb_fpool_init(step, 256, 256, TB_NULL);
 	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_mem(step, pool), tb_item_func_mem(step, pool));
 	tb_assert_and_check_return(hash);
 
@@ -352,7 +352,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
-	tb_gpool_exit(pool);
+	tb_fpool_exit(pool);
 }
 /* /////////////////////////////////////////////////////////
  * main
@@ -361,7 +361,7 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_hash_test_s2i_func();
 	tb_hash_test_i2s_func();
 	tb_hash_test_m2m_func();

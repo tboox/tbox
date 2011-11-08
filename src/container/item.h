@@ -74,7 +74,7 @@ typedef struct __tb_item_func_t
 tb_item_func_t 		tb_item_func_str(tb_spool_t* spool); 
 tb_item_func_t 		tb_item_func_int();
 tb_item_func_t 		tb_item_func_ptr();
-tb_item_func_t 		tb_item_func_mem(tb_size_t size, tb_gpool_t* gpool);
+tb_item_func_t 		tb_item_func_mem(tb_size_t size, tb_fpool_t* fpool);
 
 // c plus plus
 #ifdef __cplusplus

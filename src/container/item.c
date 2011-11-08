@@ -140,7 +140,7 @@ static tb_char_t const* tb_item_func_ptr_cstr(tb_item_func_t* func, tb_void_t co
 static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_void_t* item)
 {
 	tb_assert_and_check_return(func);
-	if (func->pool) tb_gpool_del(func->pool, item);
+	if (func->pool) tb_fpool_del(func->pool, item);
 	else if (item) tb_free(item);
 }
 static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* item)
@@ -151,10 +151,10 @@ static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* i
 	if (func->pool) 
 	{
 		// check step
-		tb_assert_and_check_return_val(step == tb_gpool_step(func->pool), 0);
+		tb_assert_and_check_return_val(step == tb_fpool_step(func->pool), 0);
 
 		// data => itor
-		return tb_gpool_put(func->pool, item);
+		return tb_fpool_put(func->pool, item);
 	}
 	else
 	{
@@ -169,7 +169,7 @@ static tb_void_t* tb_item_func_mem_data(tb_item_func_t* func, tb_void_t const* i
 {
 	tb_assert_and_check_return_val(func, 0);
 
-	if (func->pool) item = tb_gpool_itor_at(func->pool, (tb_size_t)item);
+	if (func->pool) item = tb_fpool_itor_at(func->pool, (tb_size_t)item);
 	return item;
 }
 static tb_size_t tb_item_func_mem_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
@@ -233,7 +233,7 @@ tb_item_func_t tb_item_func_ptr()
 	func.priv = TB_NULL;
 	return func;
 }
-tb_item_func_t tb_item_func_mem(tb_size_t size, tb_gpool_t* gpool)
+tb_item_func_t tb_item_func_mem(tb_size_t size, tb_fpool_t* fpool)
 {
 	tb_item_func_t func = {0};
 	func.hash = tb_item_func_mem_hash;
@@ -242,7 +242,7 @@ tb_item_func_t tb_item_func_mem(tb_size_t size, tb_gpool_t* gpool)
 	func.data = tb_item_func_mem_data;
 	func.cstr = tb_item_func_mem_cstr;
 	func.free = tb_item_func_mem_free;
-	func.pool = gpool;
+	func.pool = fpool;
 	func.priv = (tb_size_t)size;
 	return func;
 }

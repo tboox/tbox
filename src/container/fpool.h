@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		gpool.h
+ * \file		fpool.h
  *
  */
 #ifndef TB_CONTAINER_GPOOL_H
@@ -51,21 +51,21 @@ extern "C" {
  */
 
 // the item func
-typedef tb_void_t 	(*tb_gpool_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
+typedef tb_void_t 	(*tb_fpool_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
 
-// the gpool item func type
-typedef struct __tb_gpool_item_func_t
+// the fpool item func type
+typedef struct __tb_fpool_item_func_t
 {
 	// the item func
-	tb_gpool_item_free_func_t 	free;
+	tb_fpool_item_free_func_t 	free;
 
 	// the priv data
 	tb_void_t* 					priv;
 
-}tb_gpool_item_func_t;
+}tb_fpool_item_func_t;
 
-// the generic pool type, valid index > 0, 0: is end for list
-typedef struct __tb_gpool_t
+// the fixed pool type, valid index > 0, 0: is end for list
+typedef struct __tb_fpool_t
 {
 	tb_byte_t* 				data;
 	tb_byte_t* 				info;
@@ -87,32 +87,32 @@ typedef struct __tb_gpool_t
 #endif
 
 	// func
-	tb_gpool_item_func_t 	func;
+	tb_fpool_item_func_t 	func;
 
-}tb_gpool_t;
+}tb_fpool_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 // init & exit
-tb_gpool_t* 		tb_gpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_gpool_item_func_t const* func);
-tb_void_t 			tb_gpool_exit(tb_gpool_t* gpool);
+tb_fpool_t* 		tb_fpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_fpool_item_func_t const* func);
+tb_void_t 			tb_fpool_exit(tb_fpool_t* fpool);
 
 // modifiors
-tb_void_t 			tb_gpool_clear(tb_gpool_t* gpool);
+tb_void_t 			tb_fpool_clear(tb_fpool_t* fpool);
 
-tb_size_t 			tb_gpool_put(tb_gpool_t* gpool, tb_void_t const* item);
-tb_void_t 			tb_gpool_set(tb_gpool_t* gpool, tb_size_t itor, tb_void_t const* item);
-tb_void_t 			tb_gpool_del(tb_gpool_t* gpool, tb_size_t itor);
+tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item);
+tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* item);
+tb_void_t 			tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor);
 
 /* iterator
  * 
- * tb_size_t itor = tb_gpool_itor_head(gpool);
- * tb_size_t tail = tb_gpool_itor_tail(gpool);
- * for (; itor != tail; itor = tb_gpool_itor_next(gpool, itor))
+ * tb_size_t itor = tb_fpool_itor_head(fpool);
+ * tb_size_t tail = tb_fpool_itor_tail(fpool);
+ * for (; itor != tail; itor = tb_fpool_itor_next(fpool, itor))
  * {
- * 		tb_void_t const* item = tb_gpool_itor_const_at(gpool, itor);
+ * 		tb_void_t const* item = tb_fpool_itor_const_at(fpool, itor);
  * 		if (item)
  * 		{
  * 			// ...
@@ -120,20 +120,20 @@ tb_void_t 			tb_gpool_del(tb_gpool_t* gpool, tb_size_t itor);
  * }
  *
  */
-tb_void_t* 			tb_gpool_itor_at(tb_gpool_t* gpool, tb_size_t itor);
-tb_void_t const* 	tb_gpool_itor_const_at(tb_gpool_t const* gpool, tb_size_t itor);
+tb_void_t* 			tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor);
+tb_void_t const* 	tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor);
 
-tb_size_t 			tb_gpool_itor_head(tb_gpool_t const* gpool);
-tb_size_t 			tb_gpool_itor_tail(tb_gpool_t const* gpool);
-tb_size_t 			tb_gpool_itor_next(tb_gpool_t const* gpool, tb_size_t itor);
+tb_size_t 			tb_fpool_itor_head(tb_fpool_t const* fpool);
+tb_size_t 			tb_fpool_itor_tail(tb_fpool_t const* fpool);
+tb_size_t 			tb_fpool_itor_next(tb_fpool_t const* fpool, tb_size_t itor);
 
 // attributes
-tb_size_t 			tb_gpool_size(tb_gpool_t const* gpool);
-tb_size_t 			tb_gpool_maxn(tb_gpool_t const* gpool);
-tb_size_t 			tb_gpool_step(tb_gpool_t const* gpool);
+tb_size_t 			tb_fpool_size(tb_fpool_t const* fpool);
+tb_size_t 			tb_fpool_maxn(tb_fpool_t const* fpool);
+tb_size_t 			tb_fpool_step(tb_fpool_t const* fpool);
 
 // debug
-tb_void_t 			tb_gpool_dump(tb_gpool_t* gpool);
+tb_void_t 			tb_fpool_dump(tb_fpool_t* fpool);
 
 
 // c plus plus
