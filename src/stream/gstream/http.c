@@ -153,7 +153,7 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 		tb_http_close(hst->http);
 
 		// set range
-		tb_http_option_set_range(hst->http, offset, 0);
+		tb_http_option_set_range(hst->http, range, 0);
 
 		// reopen it
 		if (!tb_http_open(hst->http)) return TB_FALSE;
