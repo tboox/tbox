@@ -34,7 +34,7 @@ extern "C" {
 #include "prefix.h"
 #include "item.h"
 #include "hash.h"
-#include "gpool.h"
+#include "fpool.h"
 #include "spool.h"
 #include "slist.h"
 #include "dlist.h"

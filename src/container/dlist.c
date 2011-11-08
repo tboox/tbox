@@ -57,10 +57,10 @@ tb_dlist_t* tb_dlist_init(tb_size_t step, tb_size_t grow, tb_dlist_item_func_t c
 	if (func) dlist->func = *func;
 
 	// init pool, step = next + prev + data
-	tb_gpool_item_func_t pool_func;
+	tb_fpool_item_func_t pool_func;
 	pool_func.free = tb_dlist_item_free;
 	pool_func.priv = dlist;
-	dlist->pool = tb_gpool_init(8 + step, grow, grow, &pool_func);
+	dlist->pool = tb_fpool_init(8 + step, grow, grow, &pool_func);
 	tb_assert_and_check_goto(dlist->pool, fail);
 
 	return dlist;
@@ -77,7 +77,7 @@ tb_void_t tb_dlist_exit(tb_dlist_t* dlist)
 		tb_dlist_clear(dlist);
 
 		// free pool
-		if (dlist->pool) tb_gpool_exit(dlist->pool);
+		if (dlist->pool) tb_fpool_exit(dlist->pool);
 
 		// free it
 		tb_free(dlist);
@@ -88,7 +88,7 @@ tb_void_t tb_dlist_clear(tb_dlist_t* dlist)
 	if (dlist) 
 	{
 		// clear pool
-		if (dlist->pool) tb_gpool_clear(dlist->pool);
+		if (dlist->pool) tb_fpool_clear(dlist->pool);
 
 		// reset it
 		dlist->head = 0;
@@ -110,7 +110,7 @@ tb_void_t* tb_dlist_at_last(tb_dlist_t* dlist)
 tb_void_t const* tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor)
 {
 	tb_assert_abort(dlist && dlist->pool);
-	tb_byte_t const* data = tb_gpool_itor_const_at(dlist->pool, itor);
+	tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
 	tb_assert_abort(data);
 	return (data + 8);
 }
@@ -144,7 +144,7 @@ tb_size_t tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor)
 	if (!itor) return dlist->head;
 	else
 	{
-		tb_byte_t const* data = tb_gpool_itor_const_at(dlist->pool, itor);
+		tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
 		tb_assert_abort(data);
 		return tb_bits_get_u32_ne(data);
 	}
@@ -156,7 +156,7 @@ tb_size_t tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor)
 	if (!itor) return dlist->last;
 	else
 	{
-		tb_byte_t const* data = tb_gpool_itor_const_at(dlist->pool, itor);
+		tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
 		tb_assert_abort(data);
 		data += 4;
 		return tb_bits_get_u32_ne(data);
@@ -177,11 +177,11 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
 	// alloc a new node
-	tb_size_t node = tb_gpool_put(dlist->pool, TB_NULL);
+	tb_size_t node = tb_fpool_put(dlist->pool, TB_NULL);
 	tb_assert_and_check_return_val(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_gpool_itor_at(dlist->pool, node);
+	tb_byte_t* pnode = tb_fpool_itor_at(dlist->pool, node);
 	tb_assert_abort(pnode);
 
 	// init node, node <=> 0
@@ -213,7 +213,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 			tb_size_t last = dlist->last;
 		
 			// the last data
-			tb_byte_t* plast = tb_gpool_itor_at(dlist->pool, last);
+			tb_byte_t* plast = tb_fpool_itor_at(dlist->pool, last);
 			tb_assert_abort(plast);
 
 			// last <=> node <=> 0
@@ -230,7 +230,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 			tb_size_t head = dlist->head;
 		
 			// the head data
-			tb_byte_t* phead = tb_gpool_itor_at(dlist->pool, head);
+			tb_byte_t* phead = tb_fpool_itor_at(dlist->pool, head);
 			tb_assert_abort(phead);
 
 			// 0 <=> node <=> head
@@ -247,14 +247,14 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 			tb_size_t body = index;
 		
 			// the body data
-			tb_byte_t* pbody = tb_gpool_itor_at(dlist->pool, body);
+			tb_byte_t* pbody = tb_fpool_itor_at(dlist->pool, body);
 			tb_assert_abort(pbody);
 
 			// the prev node 
 			tb_size_t prev = tb_bits_get_u32_ne(pbody + 4);
 
 			// the prev data
-			tb_byte_t* pprev = tb_gpool_itor_at(dlist->pool, prev);
+			tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
 			tb_assert_abort(pprev);
 
 			/* 0 <=> ... <=> prev <=> body <=> ... <=> 0
@@ -366,7 +366,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 				tb_size_t next = tb_dlist_itor_next(dlist, index);
 
 				// the next data
-				tb_byte_t* pnext = tb_gpool_itor_at(dlist->pool, next);
+				tb_byte_t* pnext = tb_fpool_itor_at(dlist->pool, next);
 				tb_assert_abort(pnext);
 
 				/* 0 <=> node <=> next <=> ... <=> 0
@@ -385,7 +385,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 				tb_size_t prev = tb_dlist_itor_prev(dlist, index);
 
 				// the prev data
-				tb_byte_t* pprev = tb_gpool_itor_at(dlist->pool, prev);
+				tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
 				tb_assert_abort(pprev);
 
 				/* 0 <=> ... <=> prev <=> node <=> 0
@@ -404,21 +404,21 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 				tb_size_t body = index;
 	
 				// the body data
-				tb_byte_t* pbody = tb_gpool_itor_at(dlist->pool, body);
+				tb_byte_t* pbody = tb_fpool_itor_at(dlist->pool, body);
 				tb_assert_abort(pbody);
 
 				// the next node
 				tb_size_t next = tb_bits_get_u32_ne(pbody);
 
 				// the next data
-				tb_byte_t* pnext = tb_gpool_itor_at(dlist->pool, next);
+				tb_byte_t* pnext = tb_fpool_itor_at(dlist->pool, next);
 				tb_assert_abort(pnext);
 
 				// the prev node
 				tb_size_t prev = tb_bits_get_u32_ne(pbody + 4);
 
 				// the prev data
-				tb_byte_t* pprev = tb_gpool_itor_at(dlist->pool, prev);
+				tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
 				tb_assert_abort(pprev);
 
 				/* 0 <=> ... <=> prev <=> body <=> next <=> ... <=> 0
@@ -433,7 +433,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 		}
 
 		// free node
-		tb_gpool_del(dlist->pool, index);
+		tb_fpool_del(dlist->pool, index);
 	}
 
 	return node;
