@@ -25,7 +25,7 @@ NAMES = test \
 		stack \
 		spool \
 		fpool \
-		mpool \
+		gpool \
 		vector \
 		base32 \
 		base64 \
