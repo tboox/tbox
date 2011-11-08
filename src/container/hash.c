@@ -41,8 +41,8 @@ static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 }
 static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* pprev, tb_size_t* pbuck)
 {
-	tb_assert_and_check_return_val(hash && hash->item_list && hash->name_func.hash && hash->name_func.comp, 0);
-
+	tb_assert_and_check_return_val(hash && hash->item_list, 0);
+	
 	// comupte hash from name
 	tb_size_t i = hash->name_func.hash(&hash->name_func, name, hash->hash_size);
 	tb_assert_and_check_return_val(i < hash->hash_size, 0);
@@ -59,7 +59,7 @@ static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_si
 		if (!item) break;
 		
 		// compare it
-		retn = hash->name_func.comp(&hash->name_func, name, item->name);
+		retn = hash->name_func.comp(&hash->name_func, name, hash->name_func.data(&hash->name_func, item->name));
 		if (retn <= 0) break;
 	}
 
@@ -122,6 +122,8 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	// init hash func
 	hash->name_func = name_func;
 	hash->data_func = data_func;
+	tb_assert_and_check_goto(name_func.hash && name_func.comp && name_func.dupl && name_func.data, fail);
+	tb_assert_and_check_goto(data_func.dupl && data_func.data, fail);
 
 	// init item list
 	tb_slist_item_func_t func;
@@ -223,8 +225,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 		if (it) 
 		{
 			// set data 
-			if (hash->data_func.dupl) it->data = hash->data_func.dupl(&hash->data_func, data);
-			else it->data = TB_NULL;
+			it->data = hash->data_func.dupl(&hash->data_func, data);
 		}
 	}
 	else 
@@ -245,12 +246,10 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 			if (it) 
 			{
 				// set name
-				if (hash->name_func.dupl) it->name = hash->name_func.dupl(&hash->name_func, name);
-				else it->name = TB_NULL;
+				it->name = hash->name_func.dupl(&hash->name_func, name);
 
 				// set data
-				if (hash->data_func.dupl) it->data = hash->data_func.dupl(&hash->data_func, data);
-				else it->data = TB_NULL;
+				it->data = hash->data_func.dupl(&hash->data_func, data);
 			}
 
 			// update hash list
@@ -272,15 +271,20 @@ tb_size_t tb_hash_maxn(tb_hash_t const* hash)
 }
 tb_hash_item_t* tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(hash && hash->item_list && itor, TB_NULL);
-	return tb_slist_itor_at(hash->item_list, itor);
+	return (tb_hash_item_t*)tb_hash_itor_const_at(hash, itor);
 }
-tb_hash_item_t const* tb_hash_itor_const_at(tb_hash_t* hash, tb_size_t itor)
+tb_hash_item_t const* tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t itor)
 {	
 	tb_assert_and_check_return_val(hash && hash->item_list && itor, TB_NULL);
-	return tb_slist_itor_const_at(hash->item_list, itor);
+	tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
+	if (item) 
+	{
+		((tb_hash_t*)hash)->hash_item.name = hash->name_func.data(&hash->name_func, item->name);
+		((tb_hash_t*)hash)->hash_item.data = hash->data_func.data(&hash->data_func, item->data);
+		return &(hash->hash_item);
+	}
+	return TB_NULL;
 }
-
 tb_size_t tb_hash_itor_head(tb_hash_t const* hash)
 {
 	tb_assert_and_check_return_val(hash && hash->item_list, 0);
@@ -321,27 +325,27 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i
-						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
 						, itor
-						, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
-						, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+						, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
+						, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
 				else if (hash->name_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
 						, itor
-						, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
-						, item->data);
+						, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
+						, hash->data_func.data(&hash->data_func, item->data));
 				else if (hash->data_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
 						, itor
-						, item->name
-						, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+						, hash->name_func.data(&hash->name_func, item->name)
+						, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
 				else tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
 						, itor
-						, item->name
-						, item->data);
+						, hash->name_func.data(&hash->name_func, item->name)
+						, hash->data_func.data(&hash->data_func, item->data));
 
 			}
 		}
@@ -361,19 +365,19 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 
 		if (hash->name_func.cstr && hash->data_func.cstr) 
 			tb_print("item[%d]:\t%s\t\t=> %s", itor
-				, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
-				, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+				, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
+				, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
 		else if (hash->name_func.cstr) 
 			tb_print("item[%d]:\t%s\t\t=> %x", itor
-				, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
-				, item->data);
+				, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
+				, hash->data_func.data(&hash->data_func, item->data));
 		else if (hash->data_func.cstr) 
 			tb_print("item[%d]:\t%x\t\t=> %x", itor
-				, item->name
-				, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+				, hash->name_func.data(&hash->name_func, item->name)
+				, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
 		else tb_print("item[%d]:\t%x\t\t=> %x", itor
-				, item->name
-				, item->data);
+				, hash->name_func.data(&hash->name_func, item->name)
+				, hash->data_func.data(&hash->data_func, item->data));
 	}
 	tb_print("");
 }
