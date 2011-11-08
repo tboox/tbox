@@ -40,7 +40,7 @@ extern "C" {
 // print
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 #	define tb_print_tag(tag, fmt, arg...)				do { tb_printf("["tag"]: " fmt "\n" , ## arg); } while (0)
-# 	define tb_print(fmt, arg...)						tb_print_tag(TB_TRACE_TAG, fmt, ## arg)
+# 	define tb_print(fmt, arg...)						tb_print_tag(TB_PRINT_TAG, fmt, ## arg)
 #else
 #	define tb_print_tag
 #	define tb_print
@@ -49,7 +49,7 @@ extern "C" {
 // trace
 #if defined(TB_TRACE_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_trace_tag(tag, fmt, arg...)				tb_print_tag(tag, fmt, ## arg)
-# 	define tb_trace_line_tag(tag, fmt, arg...) 			tb_print_tag(tag, fmt "at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+# 	define tb_trace_line_tag(tag, fmt, arg...) 			tb_print_tag(tag, fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_trace_tag(...)
 # 	define tb_trace_line_tag(...)
@@ -59,15 +59,15 @@ extern "C" {
 #endif
 
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	define tb_trace(fmt, arg...)						tb_trace_tag(TB_TRACE_TAG, fmt, ## arg)
-# 	define tb_trace_line(fmt, arg...) 					tb_trace_line_tag(TB_TRACE_TAG, fmt, ## arg)
+# 	define tb_trace(fmt, arg...)						tb_trace_tag(TB_PRINT_TAG, fmt, ## arg)
+# 	define tb_trace_line(fmt, arg...) 					tb_trace_line_tag(TB_PRINT_TAG, fmt, ## arg)
 #else
 # 	define tb_trace
 # 	define tb_trace_line
 #endif
 
-#define tb_trace_noimpl_tag(tag) 						tb_trace_line_tag(tag, "[no_impl]: ")
-#define tb_trace_noimpl() 								tb_trace_line("[no_impl]: ")
+#define tb_trace_noimpl_tag(tag) 						tb_trace_line_tag(tag, "[no_impl]:")
+#define tb_trace_noimpl() 								tb_trace_line("[no_impl]:")
 
 // c plus plus
 #ifdef __cplusplus

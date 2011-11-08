@@ -295,7 +295,11 @@ tb_size_t tb_gpool_maxn(tb_gpool_t const* gpool)
 	tb_assert_and_check_return_val(gpool, 0);
 	return gpool->maxn;
 }
-
+tb_size_t tb_gpool_step(tb_gpool_t const* gpool)
+{
+	tb_assert_and_check_return_val(gpool, 0);
+	return gpool->step;
+}
 #ifdef TB_DEBUG
 tb_void_t tb_gpool_dump(tb_gpool_t* gpool)
 {

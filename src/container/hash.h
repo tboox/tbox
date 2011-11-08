@@ -101,6 +101,9 @@ typedef struct __tb_hash_t
 	tb_size_t* 			hash_list;
 	tb_size_t 			hash_size;
 
+	// the hash item
+	tb_hash_item_t 		hash_item;
+
 	// the hash func
 	tb_item_func_t 		name_func;
 	tb_item_func_t 		data_func;
@@ -140,7 +143,7 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * 		tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
  * 		if (item)
  * 		{
- * 			// ...
+ *
  * 		}
  * }
  *
@@ -150,7 +153,7 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * \note the index of the same item is mutable, only for iterator
  */
 tb_hash_item_t* 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
-tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t* hash, tb_size_t itor);
+tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t itor);
 tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);

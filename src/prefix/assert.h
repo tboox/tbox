@@ -80,24 +80,24 @@ extern "C" {
 #endif
 
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	define tb_assert_message(x, fmt, arg...)				tb_assert_message_tag(TB_TRACE_TAG, x, fmt, ## arg)
+# 	define tb_assert_message(x, fmt, arg...)				tb_assert_message_tag(TB_PRINT_TAG, x, fmt, ## arg)
 #else
 # 	define tb_assert_message
 #endif
 
-#define tb_assert(x)										tb_assert_tag(TB_TRACE_TAG, x)
-#define tb_assert_abort(x)									tb_assert_abort_tag(TB_TRACE_TAG, x)
-#define tb_assert_return(x)									tb_assert_return_tag(TB_TRACE_TAG, x)
-#define tb_assert_return_val(x, v)							tb_assert_return_val_tag(TB_TRACE_TAG, x, v)
-#define tb_assert_goto(x, b)								tb_assert_goto_tag(TB_TRACE_TAG, x, b)
-#define tb_assert_break(x)									tb_assert_break_tag(TB_TRACE_TAG, x)
-#define tb_assert_continue(x)								tb_assert_continue_tag(TB_TRACE_TAG, x)
-#define tb_assert_and_check_abort(x)						tb_assert_and_check_abort_tag(TB_TRACE_TAG, x)
-#define tb_assert_and_check_return(x)						tb_assert_and_check_return_tag(TB_TRACE_TAG, x)
-#define tb_assert_and_check_return_val(x, v)				tb_assert_and_check_return_val_tag(TB_TRACE_TAG, x, v)
-#define tb_assert_and_check_goto(x, b)						tb_assert_and_check_goto_tag(TB_TRACE_TAG, x, b)
-#define tb_assert_and_check_break(x)						tb_assert_and_check_break_tag(TB_TRACE_TAG, x)
-#define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_TRACE_TAG, x)
+#define tb_assert(x)										tb_assert_tag(TB_PRINT_TAG, x)
+#define tb_assert_abort(x)									tb_assert_abort_tag(TB_PRINT_TAG, x)
+#define tb_assert_return(x)									tb_assert_return_tag(TB_PRINT_TAG, x)
+#define tb_assert_return_val(x, v)							tb_assert_return_val_tag(TB_PRINT_TAG, x, v)
+#define tb_assert_goto(x, b)								tb_assert_goto_tag(TB_PRINT_TAG, x, b)
+#define tb_assert_break(x)									tb_assert_break_tag(TB_PRINT_TAG, x)
+#define tb_assert_continue(x)								tb_assert_continue_tag(TB_PRINT_TAG, x)
+#define tb_assert_and_check_abort(x)						tb_assert_and_check_abort_tag(TB_PRINT_TAG, x)
+#define tb_assert_and_check_return(x)						tb_assert_and_check_return_tag(TB_PRINT_TAG, x)
+#define tb_assert_and_check_return_val(x, v)				tb_assert_and_check_return_val_tag(TB_PRINT_TAG, x, v)
+#define tb_assert_and_check_goto(x, b)						tb_assert_and_check_goto_tag(TB_PRINT_TAG, x, b)
+#define tb_assert_and_check_break(x)						tb_assert_and_check_break_tag(TB_PRINT_TAG, x)
+#define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_PRINT_TAG, x)
 
 #define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
 

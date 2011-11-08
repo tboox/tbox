@@ -130,6 +130,7 @@ tb_size_t 			tb_gpool_itor_next(tb_gpool_t const* gpool, tb_size_t itor);
 // attributes
 tb_size_t 			tb_gpool_size(tb_gpool_t const* gpool);
 tb_size_t 			tb_gpool_maxn(tb_gpool_t const* gpool);
+tb_size_t 			tb_gpool_step(tb_gpool_t const* gpool);
 
 // debug
 tb_void_t 			tb_gpool_dump(tb_gpool_t* gpool);

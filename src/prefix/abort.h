@@ -40,7 +40,7 @@ extern "C" {
 
 // abort
 #define tb_abort_tag(tag)								do { tb_trace_line_tag(tag, "[abort]: "); __tb_volatile__ tb_int_t* p = 0; *p = 0; } while(0)
-#define tb_abort()										tb_abort_tag(TB_TRACE_TAG)
+#define tb_abort()										tb_abort_tag(TB_PRINT_TAG)
 
 // c plus plus
 #ifdef __cplusplus
