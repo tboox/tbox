@@ -75,11 +75,9 @@ static tb_char_t const* tb_item_func_str_cstr(tb_item_func_t* func, tb_void_t co
 // integer
 static tb_void_t tb_item_func_int_free(tb_item_func_t* func, tb_void_t* item)
 {
-	tb_assert_and_check_return(func);
 }
 static tb_void_t* tb_item_func_int_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	tb_assert_and_check_return_val(func, TB_NULL);
 	return (tb_void_t*)item;
 }
 static tb_void_t* tb_item_func_int_data(tb_item_func_t* func, tb_void_t const* item)
@@ -93,7 +91,6 @@ static tb_size_t tb_item_func_int_hash(tb_item_func_t* func, tb_void_t const* it
 }
 static tb_int_t tb_item_func_int_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	tb_assert_and_check_return_val(func, 0);
 	return (litem - ritem);
 }
 static tb_char_t const* tb_item_func_int_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
@@ -107,11 +104,9 @@ static tb_char_t const* tb_item_func_int_cstr(tb_item_func_t* func, tb_void_t co
 // pointer
 static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_void_t* item)
 {
-	tb_assert_and_check_return(func);
 }
 static tb_void_t* tb_item_func_ptr_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	tb_assert_and_check_return_val(func, TB_NULL);
 	return item;
 }
 static tb_void_t* tb_item_func_ptr_data(tb_item_func_t* func, tb_void_t const* item)
@@ -125,7 +120,6 @@ static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_void_t const* it
 }
 static tb_int_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem)
 {
-	tb_assert_and_check_return_val(func, 0);
 	return (litem - ritem);
 }
 static tb_char_t const* tb_item_func_ptr_cstr(tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn)
