@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 	__tb_volatile__ tb_size_t n = 80000;
 	while (n--) 
 	{
-		tb_int_t r = snprintf(s, 256, "%x", rand()); s[r] == '\0'; 
+		tb_int_t r = snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); s[r] == '\0'; 
 		tb_assert_and_check_break(!tb_strcmp(tb_spool_strdup(spool, s), s));
 	}
 

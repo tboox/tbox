@@ -47,10 +47,6 @@ static tb_void_t* tb_item_func_str_dupl(tb_item_func_t* func, tb_void_t const* i
 	tb_assert_and_check_return_val(func, TB_NULL);
 	return func->pool? tb_spool_strdup((tb_spool_t*)func->pool, item) : tb_strdup(item);
 }
-static tb_void_t* tb_item_func_str_data(tb_item_func_t* func, tb_void_t const* item)
-{
-	return item;
-}
 static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && item && size, 0);
@@ -80,10 +76,6 @@ static tb_void_t* tb_item_func_int_dupl(tb_item_func_t* func, tb_void_t const* i
 {
 	return (tb_void_t*)item;
 }
-static tb_void_t* tb_item_func_int_data(tb_item_func_t* func, tb_void_t const* item)
-{
-	return item;
-}
 static tb_size_t tb_item_func_int_hash(tb_item_func_t* func, tb_void_t const* item, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && size, 0);
@@ -106,10 +98,6 @@ static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_void_t* item)
 {
 }
 static tb_void_t* tb_item_func_ptr_dupl(tb_item_func_t* func, tb_void_t const* item)
-{
-	return item;
-}
-static tb_void_t* tb_item_func_ptr_data(tb_item_func_t* func, tb_void_t const* item)
 {
 	return item;
 }
@@ -194,9 +182,9 @@ tb_item_func_t tb_item_func_str(tb_spool_t* spool)
 	func.hash = tb_item_func_str_hash;
 	func.comp = tb_item_func_str_comp;
 	func.dupl = tb_item_func_str_dupl;
-	func.data = tb_item_func_str_data;
 	func.cstr = tb_item_func_str_cstr;
 	func.free = tb_item_func_str_free;
+	func.data = TB_NULL;
 	func.pool = spool;
 	func.priv = TB_NULL;
 	return func;
@@ -207,9 +195,9 @@ tb_item_func_t tb_item_func_int()
 	func.hash = tb_item_func_int_hash;
 	func.comp = tb_item_func_int_comp;
 	func.dupl = tb_item_func_int_dupl;
-	func.data = tb_item_func_int_data;
 	func.cstr = tb_item_func_int_cstr;
 	func.free = tb_item_func_int_free;
+	func.data = TB_NULL;
 	func.pool = TB_NULL;
 	func.priv = TB_NULL;
 	return func;
@@ -220,9 +208,9 @@ tb_item_func_t tb_item_func_ptr()
 	func.hash = tb_item_func_ptr_hash;
 	func.comp = tb_item_func_ptr_comp;
 	func.dupl = tb_item_func_ptr_dupl;
-	func.data = tb_item_func_ptr_data;
 	func.cstr = tb_item_func_ptr_cstr;
 	func.free = tb_item_func_ptr_free;
+	func.data = TB_NULL;
 	func.pool = TB_NULL;
 	func.priv = TB_NULL;
 	return func;
@@ -233,9 +221,9 @@ tb_item_func_t tb_item_func_mem(tb_size_t size, tb_fpool_t* fpool)
 	func.hash = tb_item_func_mem_hash;
 	func.comp = tb_item_func_mem_comp;
 	func.dupl = tb_item_func_mem_dupl;
-	func.data = tb_item_func_mem_data;
 	func.cstr = tb_item_func_mem_cstr;
 	func.free = tb_item_func_mem_free;
+	func.data = tb_item_func_mem_data;
 	func.pool = fpool;
 	func.priv = (tb_size_t)size;
 	return func;
