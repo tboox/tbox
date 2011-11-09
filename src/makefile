@@ -13,6 +13,7 @@ tbox_C_FILES 			+= \
 						math/int32 \
 						math/sint64 \
 						math/uint64 \
+						math/rand \
 						math/float \
 						math/fixed16 \
 						memory/gpool \
@@ -148,6 +149,7 @@ INC_FILES 				= \
 						memory/gpool.h \
 						math/prefix.h \
 						math/math.h \
+						math/rand.h \
 						math/float.h \
 						math/fixed.h \
 						math/fixed6.h \
@@ -279,7 +281,7 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
-SUB_PROS 			= demo/$(TB_CONFIG_PLAT)
+SUB_PROS 			= demo
 endif
 
 include $(PRO_DIR)/suffix.mak

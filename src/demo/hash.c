@@ -120,7 +120,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_int64_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_int_t r = snprintf(s, 256, "%x", rand()); 
+		tb_int_t r = snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
 		tb_hash_test_set_s2i(hash, s); 
 		tb_hash_test_get_s2i(hash, s);
@@ -213,7 +213,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_int64_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = rand();
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
 		tb_hash_test_set_i2s(hash, i); 
 		tb_hash_test_get_i2s(hash, i);
 	}
@@ -348,7 +348,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_int64_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = rand();
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
 		tb_hash_test_set_m2m(hash, i); 
 		tb_hash_test_get_m2m(hash, i);
 	}
@@ -438,7 +438,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 	tb_int64_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_size_t i = rand();
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
 		tb_hash_test_set_i2i(hash, i); 
 		tb_hash_test_get_i2i(hash, i);
 	}

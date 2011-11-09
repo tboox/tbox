@@ -57,9 +57,12 @@ static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_si
 		// get item
 		tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 		if (!item) break;
+
+		// get item name
+		tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
 		
 		// compare it
-		retn = hash->name_func.comp(&hash->name_func, name, hash->name_func.data(&hash->name_func, item->name));
+		retn = hash->name_func.comp(&hash->name_func, name, item_name);
 		if (retn <= 0) break;
 	}
 
@@ -122,8 +125,8 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	// init hash func
 	hash->name_func = name_func;
 	hash->data_func = data_func;
-	tb_assert_and_check_goto(name_func.hash && name_func.comp && name_func.dupl && name_func.data, fail);
-	tb_assert_and_check_goto(data_func.dupl && data_func.data, fail);
+	tb_assert_and_check_goto(name_func.hash && name_func.comp && name_func.dupl, fail);
+	tb_assert_and_check_goto(data_func.dupl, fail);
 
 	// init item list
 	tb_slist_item_func_t func;
@@ -279,8 +282,8 @@ tb_hash_item_t const* tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t ito
 	tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 	if (item) 
 	{
-		((tb_hash_t*)hash)->hash_item.name = hash->name_func.data(&hash->name_func, item->name);
-		((tb_hash_t*)hash)->hash_item.data = hash->data_func.data(&hash->data_func, item->data);
+		((tb_hash_t*)hash)->hash_item.name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+		((tb_hash_t*)hash)->hash_item.data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
 		return &(hash->hash_item);
 	}
 	return TB_NULL;
@@ -322,30 +325,32 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 			for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor))
 			{
 				tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
+				tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+				tb_void_t* item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i
-						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, name, hash->hash_size)
 						, itor
-						, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
-						, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
+						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
+						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 				else if (hash->name_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, itor
-						, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
-						, hash->data_func.data(&hash->data_func, item->data));
+						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
+						, item_data);
 				else if (hash->data_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, itor
-						, hash->name_func.data(&hash->name_func, item->name)
-						, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
+						, item_name
+						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 				else tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i
-						, hash->name_func.hash(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), hash->hash_size)
+						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, itor
-						, hash->name_func.data(&hash->name_func, item->name)
-						, hash->data_func.data(&hash->data_func, item->data));
+						, item_name
+						, item_data);
 
 			}
 		}
@@ -362,22 +367,24 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 	for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor))
 	{
 		tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
+		tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+		tb_void_t* item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
 
 		if (hash->name_func.cstr && hash->data_func.cstr) 
 			tb_print("item[%d]:\t%s\t\t=> %s", itor
-				, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
-				, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
+				, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
+				, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 		else if (hash->name_func.cstr) 
 			tb_print("item[%d]:\t%s\t\t=> %x", itor
-				, hash->name_func.cstr(&hash->name_func, hash->name_func.data(&hash->name_func, item->name), name, 4096)
-				, hash->data_func.data(&hash->data_func, item->data));
+				, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
+				, item_data);
 		else if (hash->data_func.cstr) 
 			tb_print("item[%d]:\t%x\t\t=> %x", itor
-				, hash->name_func.data(&hash->name_func, item->name)
-				, hash->data_func.cstr(&hash->data_func, hash->data_func.data(&hash->data_func, item->data), data, 4096));
+				, item_name
+				, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 		else tb_print("item[%d]:\t%x\t\t=> %x", itor
-				, hash->name_func.data(&hash->name_func, item->name)
-				, hash->data_func.data(&hash->data_func, item->data));
+				, item_name
+				, item_data);
 	}
 	tb_print("");
 }
