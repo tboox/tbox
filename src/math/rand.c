@@ -38,6 +38,15 @@ static tb_rand_t* 		g_rand = TB_NULL;
 static tb_handle_t 		g_mutex = TB_NULL;
 
 /* ////////////////////////////////////////////////////////////////////////
+ * details
+ */
+static __tb_inline__ tb_uint32_t tb_rand_linear_next_uint32(tb_rand_linear_t* rand)
+{
+	rand->data = (rand->data * 10807 + 1) & 0xffffffff;
+	return rand->data;
+}
+
+/* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
@@ -109,45 +118,6 @@ tb_sint32_t tb_rand_sint32(tb_sint32_t b, tb_sint32_t e)
 	return rand;
 }
 
-#ifdef TB_CONFIG_TYPE_INT64
-tb_uint64_t tb_rand_uint64(tb_uint64_t b, tb_uint64_t e)
-{
-	// check 
-	tb_uint64_t rand = b;
-	tb_assert_and_check_return_val(g_rand && g_mutex, rand);
-
-	// lock
-	if (tb_mutex_lock(g_mutex))
-	{
-		// rand
-		rand = tb_rand_linear_uint64(g_rand, b, e);
-
-		// unlock
-		tb_mutex_unlock(g_mutex);
-	}
-
-	return rand;
-}
-tb_sint64_t tb_rand_sint64(tb_sint64_t b, tb_sint64_t e)
-{
-	// check 
-	tb_sint64_t rand = b;
-	tb_assert_and_check_return_val(g_rand && g_mutex, rand);
-
-	// lock
-	if (tb_mutex_lock(g_mutex))
-	{
-		// rand
-		rand = tb_rand_linear_sint64(g_rand, b, e);
-
-		// unlock
-		tb_mutex_unlock(g_mutex);
-	}
-
-	return rand;
-}
-#endif
-
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_rand_float(tb_float_t b, tb_float_t e)
 {
@@ -172,42 +142,36 @@ tb_float_t tb_rand_float(tb_float_t b, tb_float_t e)
 // the linear rand
 tb_rand_linear_t* tb_rand_linear_init(tb_size_t seed)
 {
-	tb_trace_noimpl();
-	return TB_NULL;
+	// alloc rand
+	tb_rand_linear_t* rand = tb_calloc(1, sizeof(tb_rand_linear_t));
+	tb_assert_and_check_return_val(rand, TB_NULL);
+
+	// init rand
+	rand->seed = seed;
+	rand->data = seed;
+
+	return rand;
 }
 tb_void_t tb_rand_linear_exit(tb_rand_linear_t* rand)
 {
-	tb_trace_noimpl();
+	if (rand) tb_free(rand);
 }
 tb_uint32_t tb_rand_linear_uint32(tb_rand_linear_t* rand, tb_uint32_t b, tb_uint32_t e)
 {
-	tb_trace_noimpl();
-	return 0;
+	tb_assert_and_check_return_val(e > b, 0);
+	return (b + (tb_rand_linear_next_uint32(rand) % (e - b)));
 }
 tb_sint32_t tb_rand_linear_sint32(tb_rand_linear_t* rand, tb_sint32_t b, tb_sint32_t e)
 {
-	tb_trace_noimpl();
-	return 0;
+	tb_assert_and_check_return_val(e > b, 0);
+	return (b + (tb_sint32_t)(tb_rand_linear_next_uint32(rand) % (e - b)));
 }
-
-#ifdef TB_CONFIG_TYPE_INT64
-tb_uint64_t tb_rand_linear_uint64(tb_rand_linear_t* rand, tb_uint64_t b, tb_uint64_t e)
-{
-	tb_trace_noimpl();
-	return TB_UINT64_ZERO;
-}
-tb_sint64_t tb_rand_linear_sint64(tb_rand_linear_t* rand, tb_sint64_t b, tb_sint64_t e)
-{
-	tb_trace_noimpl();
-	return TB_SINT64_ZERO;
-}
-#endif
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_rand_linear_float(tb_rand_linear_t* rand, tb_float_t b, tb_float_t e)
 {
-	tb_trace_noimpl();
-	return 0.;
+	tb_assert_and_check_return_val(e > b, 0);
+	return (b + (((tb_float_t)tb_rand_linear_next_uint32(rand) * (e - b)) / TB_MAXU32));
 }
 #endif
 

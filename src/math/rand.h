@@ -51,13 +51,13 @@ typedef struct __tb_rand_t
 typedef struct __tb_rand_linear_t
 {
 	// the rand base
-	tb_rand_t 	base;
+	tb_rand_t 		base;
 
 	// the rand seed
-	tb_size_t 	seed;
+	tb_size_t 		seed;
 
 	// the rand data
-	tb_size_t 	data;
+	tb_uint32_t 	data;
 
 }tb_rand_linear_t;
 
@@ -72,11 +72,6 @@ tb_void_t 			tb_rand_exit();
 tb_uint32_t 		tb_rand_uint32(tb_uint32_t b, tb_uint32_t e);
 tb_sint32_t 		tb_rand_sint32(tb_sint32_t b, tb_sint32_t e);
 
-#ifdef TB_CONFIG_TYPE_INT64
-tb_uint64_t 		tb_rand_uint64(tb_uint64_t b, tb_uint64_t e);
-tb_sint64_t 		tb_rand_sint64(tb_sint64_t b, tb_sint64_t e);
-#endif
-
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t 			tb_rand_float(tb_float_t b, tb_float_t e);
 #endif
@@ -87,11 +82,6 @@ tb_void_t 			tb_rand_linear_exit(tb_rand_linear_t* rand);
 
 tb_uint32_t 		tb_rand_linear_uint32(tb_rand_linear_t* rand, tb_uint32_t b, tb_uint32_t e);
 tb_sint32_t 		tb_rand_linear_sint32(tb_rand_linear_t* rand, tb_sint32_t b, tb_sint32_t e);
-
-#ifdef TB_CONFIG_TYPE_INT64
-tb_uint64_t 		tb_rand_linear_uint64(tb_rand_linear_t* rand, tb_uint64_t b, tb_uint64_t e);
-tb_sint64_t 		tb_rand_linear_sint64(tb_rand_linear_t* rand, tb_sint64_t b, tb_sint64_t e);
-#endif
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t 			tb_rand_linear_float(tb_rand_linear_t* rand, tb_float_t b, tb_float_t e);

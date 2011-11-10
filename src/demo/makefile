@@ -18,6 +18,7 @@ NAMES = test \
 		estream \
 		zstream \
 		format \
+		rand \
 		hash \
 		slist \
 		dlist \
