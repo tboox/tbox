@@ -213,7 +213,7 @@ tb_void_t tb_bstream_skip(tb_bstream_t* bst, tb_size_t size)
 tb_void_t tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t nbits)
 {
 	tb_assert(bst && bst->p <= bst->e);
-	bst->p += nbits >> 3;
+	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 }
 tb_char_t const* tb_bstream_skip_string(tb_bstream_t* bst)
@@ -454,7 +454,7 @@ tb_uint32_t tb_bstream_get_ubits32(tb_bstream_t* bst, tb_size_t nbits)
 	if (!nbits || !bst) return 0;
 
 	tb_uint32_t val = tb_bits_get_ubits32(bst->p, bst->b, nbits);
-	bst->p += nbits >> 3;
+	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 
 	return val;
@@ -464,7 +464,7 @@ tb_sint32_t tb_bstream_get_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 	if (!nbits || !bst) return 0;
 
 	tb_sint32_t val = tb_bits_get_sbits32(bst->p, bst->b, nbits);
-	bst->p += nbits >> 3;
+	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 
 	return val;
@@ -661,7 +661,7 @@ tb_void_t tb_bstream_set_ubits32(tb_bstream_t* bst, tb_uint32_t val, tb_size_t n
 	if (!nbits || !bst) return ;
 
 	tb_bits_set_ubits32(bst->p, bst->b, val, nbits);
-	bst->p += nbits >> 3;
+	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 }
 
@@ -670,7 +670,7 @@ tb_void_t tb_bstream_set_sbits32(tb_bstream_t* bst, tb_sint32_t val, tb_size_t n
 	if (!nbits || !bst) return ;
 
 	tb_bits_set_sbits32(bst->p, bst->b, val, nbits);
-	bst->p += nbits >> 3;
+	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 }
 tb_size_t tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_t size)
