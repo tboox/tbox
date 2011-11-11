@@ -127,20 +127,15 @@ static tb_void_t tb_item_func_mem_free(tb_item_func_t* func, tb_void_t* item)
 }
 static tb_void_t* tb_item_func_mem_dupl(tb_item_func_t* func, tb_void_t const* item)
 {
-	tb_assert_and_check_return_val(func && func->priv && item, TB_NULL);
+	tb_assert_and_check_return_val(func && item, TB_NULL);
 
-	tb_size_t step = (tb_size_t)func->priv;
-	if (func->pool) 
-	{
-		// check step
-		tb_assert_and_check_return_val(step == tb_fpool_step(func->pool), 0);
-
-		// data => itor
-		return tb_fpool_put(func->pool, item);
-	}
+	if (func->pool) return tb_fpool_put(func->pool, item);
 	else
 	{
-		tb_void_t* data = tb_malloc(step);
+		tb_size_t 	step = (tb_size_t)func->priv;
+		tb_assert_and_check_return_val(step, TB_NULL);
+
+		tb_void_t* 	data = tb_malloc(step);
 		tb_assert_and_check_return_val(data, TB_NULL);
 
 		return tb_memcpy(data, item, step);

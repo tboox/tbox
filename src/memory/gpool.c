@@ -499,6 +499,7 @@ tb_handle_t tb_gpool_init(tb_void_t* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(data && size, TB_NULL);
+	tb_assert_static(tb_ispow2(TB_GPOOL_ALIGN_BOUNDARY));
 	tb_assert_static(!(sizeof(tb_gpool_nrblock_head_t) & (TB_GPOOL_ALIGN_BOUNDARY - 1)));
 	
 	// init regular block 

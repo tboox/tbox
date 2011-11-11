@@ -32,24 +32,11 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "item.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
-
-// the item func
-typedef tb_void_t 	(*tb_queue_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
-
-// the queue item func type
-typedef struct __tb_queue_item_func_t
-{
-	// the item func
-	tb_queue_item_free_func_t 	free;
-
-	// the priv data
-	tb_void_t* 					priv;
-
-}tb_queue_item_func_t;
 
 /* the queue type
  *
@@ -78,16 +65,13 @@ typedef struct __tb_queue_item_func_t
 typedef struct __tb_queue_t
 {
 	// the data
-	tb_byte_t* 				data;
-
-	// the info
-	tb_size_t 				step;
+	tb_void_t** 			data;
 	tb_size_t 				head;
 	tb_size_t 				tail;
 	tb_size_t 				maxn;
 
 	// the func
-	tb_queue_item_func_t 	func;
+	tb_item_func_t 			func;
 
 }tb_queue_t;
 
@@ -96,21 +80,21 @@ typedef struct __tb_queue_t
  */
 
 // init & exit
-tb_queue_t* 		tb_queue_init(tb_size_t step, tb_size_t maxn, tb_queue_item_func_t const* func);
+tb_queue_t* 		tb_queue_init(tb_size_t maxn, tb_item_func_t func);
 tb_void_t 			tb_queue_exit(tb_queue_t* queue);
 
-// accessors
+// accessors & modifiors
 tb_void_t* 			tb_queue_at_head(tb_queue_t* queue);
 tb_void_t* 			tb_queue_at_last(tb_queue_t* queue);
 
 tb_void_t const* 	tb_queue_const_at_head(tb_queue_t const* queue);
 tb_void_t const* 	tb_queue_const_at_last(tb_queue_t const* queue);
 
-// modifiors
-tb_void_t 			tb_queue_clear(tb_queue_t* queue);
-
 tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_void_t const* item);
-tb_void_t 	 		tb_queue_pop(tb_queue_t* queue, tb_void_t* item);
+tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
+tb_void_t* 	 		tb_queue_get(tb_queue_t* queue);
+
+tb_void_t 			tb_queue_clear(tb_queue_t* queue);
 
 /* iterator
  * 
