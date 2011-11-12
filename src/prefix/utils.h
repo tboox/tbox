@@ -47,15 +47,15 @@ extern "C" {
 // the number of entries in the array
 #define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
 
-// ispow2
-#define tb_ispow2(x) 			(!((x) & ((x) - 1)) && ((x) > 1))
+// ispow2: 1, 2, 4, 8, 16, 32, ...
+#define tb_ispow2(x) 			(!((x) & ((x) - 1)) && (x))
 
 // align
 #define tb_align2(x) 			(((x) + 1) >> 1 << 1)
 #define tb_align4(x) 			(((x) + 3) >> 2 << 2)
 #define tb_align8(x) 			(((x) + 7) >> 4 << 4)
 #define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
-#define tb_align_pow2(x) 		((x)? (tb_ispow2(x)? (x) : (1 << (32 - tb_int32_clz((tb_uint32_t)(x))))) : 2)
+#define tb_align_pow2(x) 		(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_int32_clz((tb_uint32_t)(x))))) : 2)
 
 
 // c plus plus
