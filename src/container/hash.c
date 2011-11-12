@@ -25,6 +25,7 @@
  */
 #include "hash.h"
 #include "../libc/libc.h"
+#include "../math/math.h"
 #include "../utils/utils.h"
 #include "../platform/platform.h"
 
@@ -116,8 +117,6 @@ static tb_size_t tb_hash_prev_find(tb_hash_t* hash, tb_size_t bukt, tb_size_t* p
 
 tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
-	tb_assert_and_check_return_val(!(size % 2), TB_NULL);
-
 	// alloc hash
 	tb_hash_t* hash = (tb_hash_t*)tb_calloc(1, sizeof(tb_hash_t));
 	tb_assert_and_check_return_val(hash, TB_NULL);
@@ -136,7 +135,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	tb_assert_and_check_goto(hash->item_list, fail);
 
 	// init hash list
-	hash->hash_size = size;
+	hash->hash_size = tb_align_pow2(size);
 	hash->hash_list = tb_calloc(hash->hash_size + 1, sizeof(tb_size_t)); //!< + end
 	tb_assert_and_check_goto(hash->hash_list, fail);
 
