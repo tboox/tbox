@@ -33,9 +33,9 @@
 
 #define TB_POOL_MAX_SIZE 				(1 << 30)
 
-#define TB_POOL_INFO_SET(info, idx) 	do {(info)[(idx) >> 3] |= (0x1 << ((idx) & 7));} while (0)
-#define TB_POOL_INFO_RESET(info, idx) 	do {(info)[(idx) >> 3] &= ~(0x1 << ((idx) & 7));} while (0)
-#define TB_POOL_INFO_ISSET(info, idx) 	((info)[(idx) >> 3] & (0x1 << ((idx) & 7)))
+#define tb_pool_info_set(info, idx) 	do {(info)[(idx) >> 3] |= (0x1 << ((idx) & 7));} while (0)
+#define tb_pool_info_reset(info, idx) 	do {(info)[(idx) >> 3] &= ~(0x1 << ((idx) & 7));} while (0)
+#define tb_pool_info_isset(info, idx) 	((info)[(idx) >> 3] & (0x1 << ((idx) & 7)))
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -87,7 +87,7 @@ tb_void_t tb_fpool_exit(tb_fpool_t* fpool)
 		tb_free(fpool);
 	}
 }
-tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item)
+tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* data)
 {
 	tb_assert_and_check_return_val(fpool, 0);
 
@@ -111,7 +111,7 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item)
 		for (i = 0; i < n; ++i)
 		{
 			// is free?
-			if (!TB_POOL_INFO_ISSET(fpool->info, i))
+			if (!tb_pool_info_isset(fpool->info, i))
 			{
 				// get op index
 				itor = 1 + i;
@@ -144,15 +144,15 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item)
 	if (!itor) return 0;
 
 	// set info
-	tb_assert_abort(!TB_POOL_INFO_ISSET(fpool->info, itor - 1));
-	TB_POOL_INFO_SET(fpool->info, itor - 1);
+	tb_assert_abort(!tb_pool_info_isset(fpool->info, itor - 1));
+	tb_pool_info_set(fpool->info, itor - 1);
 
 #ifdef TB_GPOOL_PRED_ENABLE
  	// predict next, pred_n must be null, otherwise exists repeat itor
 	if (!fpool->pred_n) 
 	{
 		// itor + 1 - 1 < maxn
-		if (itor < fpool->maxn && !TB_POOL_INFO_ISSET(fpool->info, itor))
+		if (itor < fpool->maxn && !tb_pool_info_isset(fpool->info, itor))
 		{
 			fpool->pred[0] = itor + 1;
 			fpool->pred_n = 1;
@@ -169,33 +169,46 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item)
 	// update data
 	if (itor) 
 	{
-		if (item) tb_memcpy(fpool->data + (itor - 1) * fpool->step, item, fpool->step);
+		if (data) tb_memcpy(fpool->data + (itor - 1) * fpool->step, data, fpool->step);
 		else tb_memset(fpool->data + (itor - 1) * fpool->step, 0, fpool->step);
 	}
 	return itor;
 }
+tb_void_t* tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor)
+{
+	//tb_trace("%d %d %d %d", fpool->step, fpool->size, itor, fpool->maxn);
+	tb_assert_and_check_return_val(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn, TB_NULL);
+	tb_assert_and_check_return_val(tb_pool_info_isset(fpool->info, itor - 1), TB_NULL);
 
-tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* item)
+	return (fpool->data + (itor - 1) * fpool->step);
+}
+tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* data)
 {
 	tb_assert_and_check_return(fpool && itor);
-	tb_byte_t* data = tb_fpool_itor_at(fpool, itor);
-	if (data)
+
+	// get item
+	tb_void_t* item = tb_fpool_get(fpool, itor);
+	if (item)
 	{
-		if (item) tb_memcpy(data, item, fpool->step);
-		else tb_memset(data, 0, fpool->step);
+		// free item
+		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
+
+		// copy data
+		if (data) tb_memcpy(item, data, fpool->step);
+		else tb_memset(item, 0, fpool->step);
 	}
 }
 tb_void_t tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor)
 {
-	tb_assert(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn);
-	tb_assert(TB_POOL_INFO_ISSET(fpool->info, itor - 1));
-	if (fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn)
+	// get item
+	tb_void_t* item = tb_fpool_get(fpool, itor);
+	if (item)
 	{
-		// free itor
-		if (fpool->func.free) fpool->func.free(fpool->data + (itor - 1) * fpool->step, fpool->func.priv);
+		// free item
+		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
 
-		// set info
-		TB_POOL_INFO_RESET(fpool->info, itor - 1);
+		// reset info
+		tb_pool_info_reset(fpool->info, itor - 1);
 
 		// predict next
 #ifdef TB_GPOOL_PRED_ENABLE
@@ -214,7 +227,7 @@ tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 		tb_int_t i = 0;
 		for (i = 0; i < fpool->maxn; ++i)
 		{
-			if (TB_POOL_INFO_ISSET(fpool->info, i))
+			if (tb_pool_info_isset(fpool->info, i))
 				fpool->func.free(fpool->data + i * fpool->step, fpool->func.priv);
 		}
 	}
@@ -233,17 +246,11 @@ tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 }
 tb_void_t* tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor)
 {
-	return (tb_void_t*)tb_fpool_itor_const_at(fpool, itor);
+	return tb_fpool_get(fpool, itor);
 }
 tb_void_t const* tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor)
 {
-	//tb_trace("%d %d %d %d", fpool->step, fpool->size, itor, fpool->maxn);
-	tb_assert(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn);
-	tb_assert(TB_POOL_INFO_ISSET(fpool->info, itor - 1));
-
-	if (fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn)
-		return (fpool->data + (itor - 1) * fpool->step);
-	else return TB_NULL;
+	return tb_fpool_get((tb_fpool_t*)fpool, itor);
 }
 tb_size_t tb_fpool_itor_head(tb_fpool_t const* fpool)
 {
@@ -256,7 +263,7 @@ tb_size_t tb_fpool_itor_head(tb_fpool_t const* fpool)
 		for ( ; i < n; ++i)
 		{
 			// is non-free?
-			if (TB_POOL_INFO_ISSET(fpool->info, i))
+			if (tb_pool_info_isset(fpool->info, i))
 				return (1 + i);
 		}
 	}
@@ -278,7 +285,7 @@ tb_size_t tb_fpool_itor_next(tb_fpool_t const* fpool, tb_size_t itor)
 		for ( ; i < n; ++i)
 		{
 			// is non-free?
-			if (TB_POOL_INFO_ISSET(fpool->info, i))
+			if (tb_pool_info_isset(fpool->info, i))
 				return (1 + i);
 		}
 	}

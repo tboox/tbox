@@ -110,7 +110,7 @@ tb_void_t* tb_slist_at_last(tb_slist_t* slist)
 tb_void_t const* tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t itor)
 {
 	tb_assert_abort(slist && slist->pool);
-	tb_byte_t const* data = tb_fpool_itor_const_at(slist->pool, itor);
+	tb_byte_t const* data = tb_fpool_get(slist->pool, itor);
 	tb_assert_abort(data);
 	return (data + sizeof(tb_size_t));
 }
@@ -140,7 +140,7 @@ tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
 	tb_assert_abort(slist && slist->pool);
-	tb_byte_t const* data = tb_fpool_itor_const_at(slist->pool, itor);
+	tb_byte_t const* data = tb_fpool_get(slist->pool, itor);
 	tb_assert_abort(data);
 	return tb_bits_get_u32_ne(data);
 }
@@ -211,7 +211,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 	tb_assert_and_check_return_val(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_fpool_itor_at(slist->pool, node);
+	tb_byte_t* pnode = tb_fpool_get(slist->pool, node);
 	tb_assert_abort(pnode);
 
 	// init node, inode => 0
@@ -240,7 +240,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else if (prev == slist->last)
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_fpool_itor_at(slist->pool, prev);
+			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
 			tb_assert_abort(pprev);
 
 			// last => node => null
@@ -253,7 +253,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_void_t con
 		else
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_fpool_itor_at(slist->pool, prev);
+			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
 			tb_assert_abort(pprev);
 
 			// node => next
@@ -425,7 +425,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 			midd = tb_slist_itor_next(slist, prev);
 
 			// get the prev data
-			tb_byte_t* pprev = tb_fpool_itor_at(slist->pool, prev);
+			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
 			tb_assert_abort(pprev);
 
 			// the next node

@@ -103,7 +103,7 @@ tb_void_t* 			tb_queue_at_last(tb_queue_t* queue);
 tb_void_t const* 	tb_queue_const_at_head(tb_queue_t const* queue);
 tb_void_t const* 	tb_queue_const_at_last(tb_queue_t const* queue);
 
-tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_void_t const* item);
+tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_void_t const* data);
 tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
 tb_void_t* 	 		tb_queue_get(tb_queue_t* queue);
 

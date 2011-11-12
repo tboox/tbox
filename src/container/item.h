@@ -41,11 +41,12 @@ extern "C" {
 // the callback type
 struct __tb_item_func_t;
 typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_void_t* item);
-typedef tb_void_t* 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_void_t const* item);
 typedef tb_void_t* 			(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_void_t const* item);
-typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_void_t const* item, tb_char_t* data, tb_size_t maxn);
-typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_void_t const* item, tb_size_t size);
-typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_void_t const* litem, tb_void_t const* ritem);
+typedef tb_void_t* 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_void_t const* data);
+typedef tb_void_t* 			(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_void_t* item, tb_void_t const* data);
+typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_void_t const* data, tb_char_t* cstr, tb_size_t maxn);
+typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_void_t const* data, tb_size_t size);
+typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_void_t const* rdata, tb_void_t const* ldata);
 
 // the item func type
 typedef struct __tb_item_func_t
@@ -53,10 +54,11 @@ typedef struct __tb_item_func_t
 	// the item func
 	tb_item_func_hash_t 	hash;
 	tb_item_func_comp_t 	comp;
-	tb_item_func_dupl_t 	dupl;
-	tb_item_func_data_t 	data;
-	tb_item_func_cstr_t 	cstr;
 	tb_item_func_free_t 	free;
+	tb_item_func_data_t 	data;
+	tb_item_func_dupl_t 	dupl;
+	tb_item_func_copy_t 	copy;
+	tb_item_func_cstr_t 	cstr;
 
 	// the item pool
 	tb_void_t* 				pool;

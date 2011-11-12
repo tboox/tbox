@@ -35,7 +35,7 @@
 
 tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
-	tb_assert_and_check_return_val(maxn && func.dupl, TB_NULL);
+	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// alloc queue
 	tb_queue_t* queue = (tb_queue_t*)tb_calloc(1, sizeof(tb_queue_t));
@@ -79,10 +79,10 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
 		queue->tail = 0;
 	}
 }
-tb_void_t tb_queue_put(tb_queue_t* queue, tb_void_t const* item)
+tb_void_t tb_queue_put(tb_queue_t* queue, tb_void_t const* data)
 {
 	tb_assert_and_check_return(queue && !tb_queue_full(queue));
-	queue->data[queue->tail] = queue->func.dupl(&queue->func, item);
+	queue->data[queue->tail] = queue->func.dupl? queue->func.dupl(&queue->func, data) : data;
 	queue->tail = ((queue->tail + 1) & (queue->maxn - 1));
 }
 tb_void_t tb_queue_pop(tb_queue_t* queue)

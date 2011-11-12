@@ -124,14 +124,13 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	// init hash func
 	hash->name_func = name_func;
 	hash->data_func = data_func;
-	tb_assert_and_check_goto(name_func.hash && name_func.comp && name_func.dupl, fail);
-	tb_assert_and_check_goto(data_func.dupl, fail);
+	tb_assert_and_check_goto(name_func.hash && name_func.comp, fail);
 
 	// init item list
 	tb_slist_item_func_t func;
 	func.free = tb_hash_item_free;
 	func.priv = hash;
-	hash->item_list = tb_slist_init(sizeof(tb_void_t*) << 1, size, &func); //!< name + data
+	hash->item_list = tb_slist_init(sizeof(tb_hash_item_t), size, &func);
 	tb_assert_and_check_goto(hash->item_list, fail);
 
 	// init hash list
@@ -227,7 +226,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 		if (it) 
 		{
 			// set data 
-			it->data = hash->data_func.dupl(&hash->data_func, data);
+			it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
 		}
 	}
 	else 
@@ -248,10 +247,10 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* d
 			if (it) 
 			{
 				// set name
-				it->name = hash->name_func.dupl(&hash->name_func, name);
+				it->name = hash->name_func.dupl? hash->name_func.dupl(&hash->name_func, name) : name;
 
 				// set data
-				it->data = hash->data_func.dupl(&hash->data_func, data);
+				it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
 			}
 
 			// update hash list
@@ -320,8 +319,8 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 		tb_size_t tail = hash->hash_list[i + 1];
 		if (itor != tail)
 		{
-			tb_size_t num = 0;
-			for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor))
+			tb_size_t n = 0;
+			for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor), n++)
 			{
 				tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
 				tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
@@ -352,6 +351,7 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 						, item_data);
 
 			}
+			tb_print("bucket[%u]: size: %u", i, n);
 		}
 	}
 	tb_print("");
