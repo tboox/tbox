@@ -29,23 +29,39 @@
 #include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the dlist item type
+typedef struct __tb_dlist_item_t
+{
+	// the item next
+	tb_size_t 			next;
+
+	// the item prev
+	tb_size_t 			prev;
+
+	// the item data
+	tb_void_t* 			data;
+
+}tb_dlist_item_t;
+
+/* /////////////////////////////////////////////////////////
  * details
  */
 
 static tb_void_t tb_dlist_item_free(tb_void_t* item, tb_void_t* priv)
 {
 	tb_dlist_t* dlist = priv;
-	if (dlist && dlist->func.free)
-	{
-		dlist->func.free((tb_byte_t*)item + 8, dlist->func.priv);
-	}
+	if (dlist && dlist->func.free && item)
+		dlist->func.free(&dlist->func, ((tb_dlist_item_t*)item)->data);
 }
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_dlist_t* tb_dlist_init(tb_size_t step, tb_size_t grow, tb_dlist_item_func_t const* func)
+tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)tb_calloc(1, sizeof(tb_dlist_t));
 	tb_assert_and_check_return_val(dlist, TB_NULL);
@@ -53,14 +69,13 @@ tb_dlist_t* tb_dlist_init(tb_size_t step, tb_size_t grow, tb_dlist_item_func_t c
 	// init dlist
 	dlist->head = 0;
 	dlist->last = 0;
-	dlist->step = step;
-	if (func) dlist->func = *func;
+	dlist->func = func;
 
 	// init pool, step = next + prev + data
 	tb_fpool_item_func_t pool_func;
 	pool_func.free = tb_dlist_item_free;
 	pool_func.priv = dlist;
-	dlist->pool = tb_fpool_init(8 + step, grow, grow, &pool_func);
+	dlist->pool = tb_fpool_init(sizeof(tb_dlist_item_t), grow, grow, &pool_func);
 	tb_assert_and_check_goto(dlist->pool, fail);
 
 	return dlist;
@@ -109,10 +124,15 @@ tb_void_t* tb_dlist_at_last(tb_dlist_t* dlist)
 }
 tb_void_t const* tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor)
 {
-	tb_assert_abort(dlist && dlist->pool);
-	tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
-	tb_assert_abort(data);
-	return (data + 8);
+	// check 
+	tb_assert_and_check_return_val(dlist && dlist->pool, TB_NULL);
+
+	// get item
+	tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
+	tb_assert_and_check_return_val(item, TB_NULL);
+
+	// get data
+	return dlist->func.data? dlist->func.data(&dlist->func, item->data) : item->data;
 }
 tb_void_t const* tb_dlist_const_at_head(tb_dlist_t const* dlist)
 {
@@ -124,55 +144,59 @@ tb_void_t const* tb_dlist_const_at_last(tb_dlist_t const* dlist)
 }
 tb_size_t tb_dlist_itor_head(tb_dlist_t const* dlist)
 {
-	tb_assert_abort(dlist);
+	tb_assert_and_check_return_val(dlist, 0);
 	return dlist->head;
 }
 tb_size_t tb_dlist_itor_last(tb_dlist_t const* dlist)
 {
-	tb_assert_abort(dlist);
+	tb_assert_and_check_return_val(dlist, 0);
 	return dlist->last;
 }
 tb_size_t tb_dlist_itor_tail(tb_dlist_t const* dlist)
 {
-	tb_assert_abort(dlist);
 	return 0;
 }
 tb_size_t tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor)
 {
-	tb_assert_abort(dlist && dlist->pool);
+	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
 	if (!itor) return dlist->head;
 	else
 	{
-		tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
-		tb_assert_abort(data);
-		return tb_bits_get_u32_ne(data);
+		// get item
+		tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
+		tb_assert_and_check_return_val(item, 0);
+
+		// get next
+		return item->next;
 	}
 }
 tb_size_t tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor)
 {
-	tb_assert_abort(dlist && dlist->pool);
+	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
 	if (!itor) return dlist->last;
 	else
 	{
-		tb_byte_t const* data = tb_fpool_itor_const_at(dlist->pool, itor);
-		tb_assert_abort(data);
-		data += 4;
-		return tb_bits_get_u32_ne(data);
+		// get item
+		tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
+		tb_assert_and_check_return_val(item, 0);
+
+		// get prev
+		return item->prev;
 	}
 }
 tb_size_t tb_dlist_size(tb_dlist_t const* dlist)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
-	return dlist->pool->size;
+	return tb_fpool_size(dlist->pool);
 }
 tb_size_t tb_dlist_maxn(tb_dlist_t const* dlist)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
-	return dlist->pool->maxn;
+	return tb_fpool_maxn(dlist->pool);
 }
-tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* item)
+tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_void_t const* data)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
@@ -181,16 +205,13 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 	tb_assert_and_check_return_val(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_fpool_itor_at(dlist->pool, node);
-	tb_assert_abort(pnode);
+	tb_dlist_item_t* pnode = tb_fpool_get(dlist->pool, node);
+	tb_assert_and_check_return_val(pnode, 0);
 
-	// init node, node <=> 0
-	tb_bits_set_u32_ne(pnode, 0);
-	tb_bits_set_u32_ne(pnode + 4, 0);
-
-	// copy the item data
-	if (item) tb_memcpy(pnode + 8, item, dlist->step);
-	else tb_memset(pnode + 8, 0, dlist->step);
+	// init node
+	pnode->prev = 0;
+	pnode->next = 0;
+	pnode->data = dlist->func.dupl? dlist->func.dupl(&dlist->func, data) : data;
 
 	// is null?
 	if (!dlist->head && !dlist->last)
@@ -204,38 +225,38 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 	}
 	else
 	{
-		tb_assert_abort(dlist->head && dlist->last);
+		tb_assert_and_check_return_val(dlist->head && dlist->last, 0);
 
 		// insert to tail
-		if (!index)
+		if (!itor)
 		{
 			// the last node
 			tb_size_t last = dlist->last;
 		
 			// the last data
-			tb_byte_t* plast = tb_fpool_itor_at(dlist->pool, last);
-			tb_assert_abort(plast);
+			tb_dlist_item_t* plast = tb_fpool_get(dlist->pool, last);
+			tb_assert_and_check_return_val(plast, 0);
 
 			// last <=> node <=> 0
-			tb_bits_set_u32_ne(plast, node);
-			tb_bits_set_u32_ne(pnode + 4, last);
+			plast->next = node;
+			pnode->prev = last;
 
 			// update the last node
 			dlist->last = node;
 		}
 		// insert to head
-		else if (index == dlist->head)
+		else if (itor == dlist->head)
 		{
 			// the head node
 			tb_size_t head = dlist->head;
 		
 			// the head data
-			tb_byte_t* phead = tb_fpool_itor_at(dlist->pool, head);
-			tb_assert_abort(phead);
+			tb_dlist_item_t* phead = tb_fpool_get(dlist->pool, head);
+			tb_assert_and_check_return_val(phead, 0);
 
 			// 0 <=> node <=> head
-			tb_bits_set_u32_ne(phead + 4, node);
-			tb_bits_set_u32_ne(pnode, head);
+			phead->prev = node;
+			pnode->next = head;
 
 			// update the head node
 			dlist->head = node;
@@ -244,26 +265,26 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 		else
 		{
 			// the body node
-			tb_size_t body = index;
+			tb_size_t body = itor;
 		
 			// the body data
-			tb_byte_t* pbody = tb_fpool_itor_at(dlist->pool, body);
-			tb_assert_abort(pbody);
+			tb_dlist_item_t* pbody = tb_fpool_get(dlist->pool, body);
+			tb_assert_and_check_return_val(pbody, 0);
 
 			// the prev node 
-			tb_size_t prev = tb_bits_get_u32_ne(pbody + 4);
+			tb_size_t prev = pbody->prev;
 
 			// the prev data
-			tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
-			tb_assert_abort(pprev);
+			tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+			tb_assert_and_check_return_val(pprev, 0);
 
 			/* 0 <=> ... <=> prev <=> body <=> ... <=> 0
 			 * 0 <=> ... <=> prev <=> node <=> body <=> ... <=> 0
 			 */
-			tb_bits_set_u32_ne(pnode, body);
-			tb_bits_set_u32_ne(pnode + 4, prev);
-			tb_bits_set_u32_ne(pprev, node);
-			tb_bits_set_u32_ne(pbody + 4, node);
+			pnode->next = body;
+			pnode->prev = prev;
+			pprev->next = node;
+			pbody->prev = node;
 		}
 	}
 
@@ -271,127 +292,128 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* i
 	return node;
 }
 
-tb_size_t tb_dlist_insert_head(tb_dlist_t* dlist, tb_void_t const* item)
+tb_size_t tb_dlist_insert_head(tb_dlist_t* dlist, tb_void_t const* data)
 {
-	return tb_dlist_insert(dlist, tb_dlist_itor_head(dlist), item);
+	return tb_dlist_insert(dlist, tb_dlist_itor_head(dlist), data);
 }
-tb_size_t tb_dlist_insert_tail(tb_dlist_t* dlist, tb_void_t const* item)
+tb_size_t tb_dlist_insert_tail(tb_dlist_t* dlist, tb_void_t const* data)
 {
-	return tb_dlist_insert(dlist, tb_dlist_itor_tail(dlist), item);
+	return tb_dlist_insert(dlist, tb_dlist_itor_tail(dlist), data);
 }
-tb_size_t tb_dlist_ninsert(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* item, tb_size_t size)
+tb_size_t tb_dlist_ninsert(tb_dlist_t* dlist, tb_size_t itor, tb_void_t const* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(dlist && size, 0);
 
 	// insert items
-	tb_size_t node = index;
-	while (size--) node = tb_dlist_insert(dlist, node, item);
+	tb_size_t node = itor;
+	while (size--) node = tb_dlist_insert(dlist, node, data);
 
-	// return the first index
+	// return the first itor
 	return node;
 }
-tb_size_t tb_dlist_ninsert_head(tb_dlist_t* dlist, tb_void_t const* item, tb_size_t size)
+tb_size_t tb_dlist_ninsert_head(tb_dlist_t* dlist, tb_void_t const* data, tb_size_t size)
 {
-	return tb_dlist_ninsert(dlist, tb_dlist_itor_head(dlist), item, size);
+	return tb_dlist_ninsert(dlist, tb_dlist_itor_head(dlist), data, size);
 }
-tb_size_t tb_dlist_ninsert_tail(tb_dlist_t* dlist, tb_void_t const* item, tb_size_t size)
+tb_size_t tb_dlist_ninsert_tail(tb_dlist_t* dlist, tb_void_t const* data, tb_size_t size)
 {
-	return tb_dlist_ninsert(dlist, tb_dlist_itor_tail(dlist), item, size);
+	return tb_dlist_ninsert(dlist, tb_dlist_itor_tail(dlist), data, size);
 }
-tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* item)
+tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t itor, tb_void_t const* data)
 {
-	tb_byte_t* data = tb_dlist_itor_at(dlist, index);
-	tb_assert_and_check_return_val(data && item, index);
-	
-	// do free
-	if (dlist->func.free) dlist->func.free(data, dlist->func.priv);
+	tb_assert_and_check_return_val(dlist && dlist->pool, itor);
 
-	// copy data
-	tb_memcpy(data, item, dlist->step);
-	return index;
-}
-tb_size_t tb_dlist_replace_head(tb_dlist_t* dlist, tb_void_t const* item)
-{
-	return tb_dlist_replace(dlist, tb_dlist_itor_head(dlist), item);
-}
-tb_size_t tb_dlist_replace_last(tb_dlist_t* dlist, tb_void_t const* item)
-{
-	return tb_dlist_replace(dlist, tb_dlist_itor_last(dlist), item);
-}
-tb_size_t tb_dlist_nreplace(tb_dlist_t* dlist, tb_size_t index, tb_void_t const* item, tb_size_t size)
-{
-	tb_assert_and_check_return_val(dlist && item && size, index);
+	// get item
+	tb_dlist_item_t* item = tb_fpool_get(dlist->pool, itor);
+	tb_assert_and_check_return_val(item, itor);
 
-	tb_size_t itor = index;
+	// copy data to item
+	item->data = dlist->func.copy? dlist->func.copy(&dlist->func, item->data, data) : data;
+
+	return itor;
+}
+tb_size_t tb_dlist_replace_head(tb_dlist_t* dlist, tb_void_t const* data)
+{
+	return tb_dlist_replace(dlist, tb_dlist_itor_head(dlist), data);
+}
+tb_size_t tb_dlist_replace_last(tb_dlist_t* dlist, tb_void_t const* data)
+{
+	return tb_dlist_replace(dlist, tb_dlist_itor_last(dlist), data);
+}
+tb_size_t tb_dlist_nreplace(tb_dlist_t* dlist, tb_size_t itor, tb_void_t const* data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(dlist && data && size, itor);
+
+	tb_size_t head = itor;
 	tb_size_t tail = tb_dlist_itor_tail(dlist);
 	for (; size-- && itor != tail; itor = tb_dlist_itor_next(dlist, itor)) 
-		tb_dlist_replace(dlist, itor, item);
-	return index;
+		tb_dlist_replace(dlist, itor, data);
+	return head;
 }
-tb_size_t tb_dlist_nreplace_head(tb_dlist_t* dlist, tb_void_t const* item, tb_size_t size)
+tb_size_t tb_dlist_nreplace_head(tb_dlist_t* dlist, tb_void_t const* data, tb_size_t size)
 {
-	return tb_dlist_nreplace(dlist, tb_dlist_itor_head(dlist), item, size);
+	return tb_dlist_nreplace(dlist, tb_dlist_itor_head(dlist), data, size);
 }
-tb_size_t tb_dlist_nreplace_last(tb_dlist_t* dlist, tb_void_t const* item, tb_size_t size)
+tb_size_t tb_dlist_nreplace_last(tb_dlist_t* dlist, tb_void_t const* data, tb_size_t size)
 {
 	tb_size_t node = 0;
 	tb_size_t itor = tb_dlist_itor_last(dlist);
 	tb_size_t tail = tb_dlist_itor_tail(dlist);
 	for (; size-- && itor != tail; itor = tb_dlist_itor_prev(dlist, itor)) 
-		node = tb_dlist_replace(dlist, itor, item);
+		node = tb_dlist_replace(dlist, itor, data);
 
 	return node;
 }
-tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
+tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(dlist && dlist->pool && index, index);
+	tb_assert_and_check_return_val(dlist && dlist->pool && itor, 0);
 
 	// not null?
-	tb_size_t node = index;
+	tb_size_t node = itor;
 	if (dlist->head && dlist->last)
 	{
 		// only one?
 		if (dlist->head == dlist->last)
 		{
-			tb_assert_abort(dlist->head == index);
+			tb_assert_and_check_return_val(dlist->head == itor, 0);
 			dlist->head = 0;
 			dlist->last = 0;
 		}
 		else
 		{
 			// remove head?
-			if (index == dlist->head)
+			if (itor == dlist->head)
 			{
 				// the next node
-				tb_size_t next = tb_dlist_itor_next(dlist, index);
+				tb_size_t next = tb_dlist_itor_next(dlist, itor);
 
 				// the next data
-				tb_byte_t* pnext = tb_fpool_itor_at(dlist->pool, next);
-				tb_assert_abort(pnext);
+				tb_dlist_item_t* pnext = tb_fpool_get(dlist->pool, next);
+				tb_assert_and_check_return_val(pnext, 0);
 
 				/* 0 <=> node <=> next <=> ... <=> 0
 				 * 0 <=> next <=> ... <=> 0
 				 */
 				dlist->head = next;
-				tb_bits_set_u32_ne(pnext + 4, 0);
+				pnext->prev = 0;
 
 				// update node 
 				node = next;
 			}
 			// remove last?
-			else if (index == dlist->last)
+			else if (itor == dlist->last)
 			{
 				// the prev node
-				tb_size_t prev = tb_dlist_itor_prev(dlist, index);
+				tb_size_t prev = tb_dlist_itor_prev(dlist, itor);
 
 				// the prev data
-				tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
-				tb_assert_abort(pprev);
+				tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+				tb_assert_and_check_return_val(pprev, 0);
 
 				/* 0 <=> ... <=> prev <=> node <=> 0
 				 * 0 <=> ... <=> prev <=> 0
 				 */
-				tb_bits_set_u32_ne(pprev, 0);
+				pprev->next = 0;
 				dlist->last = prev;
 
 				// update node
@@ -401,31 +423,31 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 			else
 			{
 				// the body node
-				tb_size_t body = index;
+				tb_size_t body = itor;
 	
 				// the body data
-				tb_byte_t* pbody = tb_fpool_itor_at(dlist->pool, body);
-				tb_assert_abort(pbody);
+				tb_dlist_item_t* pbody = tb_fpool_get(dlist->pool, body);
+				tb_assert_and_check_return_val(pbody, 0);
 
 				// the next node
-				tb_size_t next = tb_bits_get_u32_ne(pbody);
+				tb_size_t next = pbody->next;
 
 				// the next data
-				tb_byte_t* pnext = tb_fpool_itor_at(dlist->pool, next);
-				tb_assert_abort(pnext);
+				tb_dlist_item_t* pnext = tb_fpool_get(dlist->pool, next);
+				tb_assert_and_check_return_val(pnext, 0);
 
 				// the prev node
-				tb_size_t prev = tb_bits_get_u32_ne(pbody + 4);
+				tb_size_t prev = pbody->prev;
 
 				// the prev data
-				tb_byte_t* pprev = tb_fpool_itor_at(dlist->pool, prev);
-				tb_assert_abort(pprev);
+				tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+				tb_assert_and_check_return_val(pprev, 0);
 
 				/* 0 <=> ... <=> prev <=> body <=> next <=> ... <=> 0
 				 * 0 <=> ... <=> prev <=> next <=> ... <=> 0
 				 */
-				tb_bits_set_u32_ne(pprev, next);
-				tb_bits_set_u32_ne(pnext + 4, prev);
+				pprev->next = next;
+				pnext->prev = prev;
 
 				// update node
 				node = next;
@@ -433,7 +455,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t index)
 		}
 
 		// free node
-		tb_fpool_del(dlist->pool, index);
+		tb_fpool_del(dlist->pool, itor);
 	}
 
 	return node;
@@ -446,11 +468,11 @@ tb_size_t tb_dlist_remove_last(tb_dlist_t* dlist)
 {
 	return tb_dlist_remove(dlist, tb_dlist_itor_last(dlist));
 }
-tb_size_t tb_dlist_nremove(tb_dlist_t* dlist, tb_size_t index, tb_size_t size)
+tb_size_t tb_dlist_nremove(tb_dlist_t* dlist, tb_size_t itor, tb_size_t size)
 {
-	tb_assert_and_check_return_val(dlist && size, index);
+	tb_assert_and_check_return_val(dlist && size, itor);
 
-	tb_size_t next = index;
+	tb_size_t next = itor;
 	while (size--) next = tb_dlist_remove(dlist, next);
 	return next;
 }

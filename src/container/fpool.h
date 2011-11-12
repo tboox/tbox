@@ -102,9 +102,10 @@ tb_void_t 			tb_fpool_exit(tb_fpool_t* fpool);
 // modifiors
 tb_void_t 			tb_fpool_clear(tb_fpool_t* fpool);
 
-tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* item);
-tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* item);
+tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* data);
+tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* data);
 tb_void_t 			tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor);
+tb_void_t* 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
 
 /* iterator
  * 
