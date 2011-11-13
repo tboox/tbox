@@ -495,11 +495,11 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 }
 
 // the dtor of string
-static tb_void_t tb_cookies_spool_free(tb_pointer_t data, tb_pointer_t priv)
+static tb_void_t tb_cookies_spool_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	if (data) 
 	{
-		tb_cookie_string_t* s = (tb_cookie_string_t*)data;
+		tb_cookie_string_t* s = (tb_cookie_string_t*)item;
 		//TB_COOKIES_DBG("[string]::dtor: %s", s->data? s->data : "");
 		if (s->data) 
 		{
@@ -523,8 +523,7 @@ tb_cookies_t* tb_cookies_init()
 	tb_assert_and_check_goto(cookies->hmutex, fail);
 
 	// init spool
-	tb_slist_item_func_t func = {tb_cookies_spool_free, TB_NULL};
-	cookies->spool = tb_slist_init(sizeof(tb_cookie_string_t), TB_COOKIES_SPOOL_GROW, &func);
+	cookies->spool = tb_slist_init(TB_COOKIES_SPOOL_GROW, tb_item_func_ifm(sizeof(tb_cookie_string_t), tb_cookies_spool_free, TB_NULL));
 	tb_assert_and_check_goto(cookies->spool, fail);
 
 	// init cpool

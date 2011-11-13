@@ -29,38 +29,52 @@
 #include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the slist item type
+typedef struct __tb_slist_item_t
+{
+	// the item next
+	tb_size_t 			next;
+
+}tb_slist_item_t;
+
+/* /////////////////////////////////////////////////////////
  * details
  */
 
 static tb_void_t tb_slist_item_free(tb_pointer_t item, tb_pointer_t priv)
 {
 	tb_slist_t* slist = priv;
-	if (slist && slist->func.free)
-	{
-		slist->func.free((tb_byte_t*)item + sizeof(tb_size_t), slist->func.priv);
-	}
+	if (slist && slist->func.free && item)
+		slist->func.free(&slist->func, &((tb_slist_item_t*)item)[1]);
 }
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_slist_t* tb_slist_init(tb_size_t step, tb_size_t grow, tb_slist_item_func_t const* func)
+tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 {
+	// check
+	tb_assert_and_check_return_val(grow, TB_NULL);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
+
+	// alloc slist
 	tb_slist_t* slist = (tb_slist_t*)tb_calloc(1, sizeof(tb_slist_t));
 	tb_assert_and_check_return_val(slist, TB_NULL);
 
 	// init slist
-	slist->step = step;
 	slist->head = 0;
 	slist->last = 0;
-	if (func) slist->func = *func;
+	slist->func = func;
 
 	// init pool, step = next + data
 	tb_fpool_item_func_t pool_func;
 	pool_func.free = tb_slist_item_free;
 	pool_func.priv = slist;
-	slist->pool = tb_fpool_init(sizeof(tb_size_t) + step, grow, grow, &pool_func);
+	slist->pool = tb_fpool_init(sizeof(tb_slist_item_t) + func.size, grow, grow, &pool_func);
 	tb_assert_and_check_goto(slist->pool, fail);
 
 	return slist;
