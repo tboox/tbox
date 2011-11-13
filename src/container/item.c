@@ -227,7 +227,7 @@ static tb_void_t tb_item_func_ifm_copy(tb_item_func_t* func, tb_pointer_t item, 
 	tb_assert_and_check_return(func && func->size && item);
 
 	// free item
-	if (func->free) func->free(&func, item);
+	if (func->free) func->free(func, item);
 
 	// copy item
 	if (data) tb_memcpy(item, data, func->size);

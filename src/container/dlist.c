@@ -41,9 +41,6 @@ typedef struct __tb_dlist_item_t
 	// the item prev
 	tb_size_t 			prev;
 
-	// the item data
-	tb_pointer_t 			data;
-
 }tb_dlist_item_t;
 
 /* /////////////////////////////////////////////////////////
@@ -54,7 +51,7 @@ static tb_void_t tb_dlist_item_free(tb_pointer_t item, tb_pointer_t priv)
 {
 	tb_dlist_t* dlist = priv;
 	if (dlist && dlist->func.free && item)
-		dlist->func.free(&dlist->func, ((tb_dlist_item_t*)item)->data);
+		dlist->func.free(&dlist->func, &((tb_dlist_item_t*)item)[1]);
 }
 
 /* /////////////////////////////////////////////////////////
@@ -63,6 +60,10 @@ static tb_void_t tb_dlist_item_free(tb_pointer_t item, tb_pointer_t priv)
 
 tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 {
+	// check
+	tb_assert_and_check_return_val(grow, TB_NULL);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
+
 	tb_dlist_t* dlist = (tb_dlist_t*)tb_calloc(1, sizeof(tb_dlist_t));
 	tb_assert_and_check_return_val(dlist, TB_NULL);
 
@@ -75,7 +76,7 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 	tb_fpool_item_func_t pool_func;
 	pool_func.free = tb_dlist_item_free;
 	pool_func.priv = dlist;
-	dlist->pool = tb_fpool_init(sizeof(tb_dlist_item_t), grow, grow, &pool_func);
+	dlist->pool = tb_fpool_init(sizeof(tb_dlist_item_t) + func.size, grow, grow, &pool_func);
 	tb_assert_and_check_goto(dlist->pool, fail);
 
 	return dlist;
@@ -132,7 +133,7 @@ tb_cpointer_t tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor)
 	tb_assert_and_check_return_val(item, TB_NULL);
 
 	// get data
-	return dlist->func.data? dlist->func.data(&dlist->func, item->data) : item->data;
+	return dlist->func.data(&dlist->func, &item[1]);
 }
 tb_cpointer_t tb_dlist_const_at_head(tb_dlist_t const* dlist)
 {
@@ -211,7 +212,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 	// init node
 	pnode->prev = 0;
 	pnode->next = 0;
-//	pnode->data = dlist->func.dupl? dlist->func.dupl(&dlist->func, data) : data;
+	dlist->func.dupl(&dlist->func, &pnode[1], data);
 
 	// is null?
 	if (!dlist->head && !dlist->last)
@@ -328,7 +329,7 @@ tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data
 	tb_assert_and_check_return_val(item, itor);
 
 	// copy data to item
-//	item->data = dlist->func.copy? dlist->func.copy(&dlist->func, item->data, data) : data;
+	dlist->func.copy(&dlist->func, &item[1], data);
 
 	return itor;
 }
