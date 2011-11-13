@@ -6,14 +6,6 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
-{
-	tb_trace("size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_queue_itor_head(queue);
-	tb_size_t tail = tb_queue_itor_tail(queue);
-	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
-		tb_trace("at[%d]: %s", itor, tb_queue_itor_const_at(queue, itor));
-}
 static tb_size_t tb_queue_put_and_pop_test()
 {
 	// init
@@ -112,17 +104,120 @@ static tb_size_t tb_queue_iterator_prev_test()
 
 	return n / (tb_int64_to_int32(t) + 1);
 }
-
-/* /////////////////////////////////////////////////////////
- * main
- */
-int main(int argc, char** argv)
+static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 {
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
+	tb_trace("int size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
+		tb_trace("int at[%d]: %u", itor, tb_queue_itor_const_at(queue, itor));
+}
+static tb_void_t tb_queue_int_test()
+{
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_int());
+	tb_assert_and_check_return(queue);
 
-	// init queue
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, 0);
+	tb_queue_put(queue, 1);
+	tb_queue_put(queue, 2);
+	tb_queue_put(queue, 3);
+	tb_queue_put(queue, 4);
+	tb_queue_put(queue, 5);
+	tb_queue_put(queue, 6);
+	tb_queue_put(queue, 7);
+	tb_queue_put(queue, 8);
+	tb_queue_put(queue, 9);
+	tb_queue_int_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("pop:");
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_int_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, 0);
+	tb_queue_put(queue, 1);
+	tb_queue_put(queue, 2);
+	tb_queue_put(queue, 3);
+	tb_queue_put(queue, 4);
+	tb_queue_int_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("clear:");
+	tb_queue_clear(queue);
+	tb_queue_int_dump(queue);
+	tb_queue_exit(queue);
+}
+static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
+{
+	tb_trace("str size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
+		tb_trace("str at[%d]: %s", itor, tb_queue_itor_const_at(queue, itor));
+}
+static tb_void_t tb_queue_str_test()
+{
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_assert_and_check_return(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, "0000000000");
+	tb_queue_put(queue, "1111111111");
+	tb_queue_put(queue, "2222222222");
+	tb_queue_put(queue, "3333333333");
+	tb_queue_put(queue, "4444444444");
+	tb_queue_put(queue, "5555555555");
+	tb_queue_put(queue, "6666666666");
+	tb_queue_put(queue, "7777777777");
+	tb_queue_put(queue, "8888888888");
+	tb_queue_put(queue, "9999999999");
+	tb_queue_str_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("pop:");
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_str_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, "0000000000");
+	tb_queue_put(queue, "1111111111");
+	tb_queue_put(queue, "2222222222");
+	tb_queue_put(queue, "3333333333");
+	tb_queue_put(queue, "4444444444");
+	tb_queue_str_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("clear:");
+	tb_queue_clear(queue);
+	tb_queue_str_dump(queue);
+	tb_queue_exit(queue);
+}
+static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
+{
+	tb_trace("efm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
+		tb_trace("efm at[%d]: %s", itor, tb_queue_itor_const_at(queue, itor));
+}
+static tb_void_t tb_queue_efm_test()
+{
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
-	tb_assert_and_check_goto(queue, end);
+	tb_assert_and_check_return(queue);
 
 	tb_trace("=============================================================");
 	tb_trace("put:");
@@ -160,6 +255,75 @@ int main(int argc, char** argv)
 	tb_trace("clear:");
 	tb_queue_clear(queue);
 	tb_queue_efm_dump(queue);
+	tb_queue_exit(queue);
+}
+
+static tb_void_t tb_queue_ifm_free(tb_item_func_t* func, tb_pointer_t item)
+{
+	tb_print("ifm free: %s, priv: %s", item, func->priv);
+}
+static tb_void_t tb_queue_ifm_dump(tb_queue_t const* queue)
+{
+	tb_trace("ifm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_size_t itor = tb_queue_itor_head(queue);
+	tb_size_t tail = tb_queue_itor_tail(queue);
+	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
+		tb_trace("ifm at[%d]: %s", itor, tb_queue_itor_const_at(queue, itor));
+}
+static tb_void_t tb_queue_ifm_test()
+{
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_ifm(11, tb_queue_ifm_free, "ifm"));
+	tb_assert_and_check_return(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, "0000000000");
+	tb_queue_put(queue, "1111111111");
+	tb_queue_put(queue, "2222222222");
+	tb_queue_put(queue, "3333333333");
+	tb_queue_put(queue, "4444444444");
+	tb_queue_put(queue, "5555555555");
+	tb_queue_put(queue, "6666666666");
+	tb_queue_put(queue, "7777777777");
+	tb_queue_put(queue, "8888888888");
+	tb_queue_put(queue, "9999999999");
+	tb_queue_ifm_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("pop:");
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_pop(queue);
+	tb_queue_ifm_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("put:");
+	tb_queue_put(queue, "0000000000");
+	tb_queue_put(queue, "1111111111");
+	tb_queue_put(queue, "2222222222");
+	tb_queue_put(queue, "3333333333");
+	tb_queue_put(queue, "4444444444");
+	tb_queue_ifm_dump(queue);
+
+	tb_trace("=============================================================");
+	tb_trace("clear:");
+	tb_queue_clear(queue);
+	tb_queue_ifm_dump(queue);
+	tb_queue_exit(queue);
+}
+/* /////////////////////////////////////////////////////////
+ * main
+ */
+int main(int argc, char** argv)
+{
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
+
+	tb_queue_int_test();
+	tb_queue_str_test();
+	tb_queue_efm_test();
+	tb_queue_ifm_test();
 
 	tb_size_t score = 0;
 	tb_trace("=============================================================");
@@ -173,12 +337,6 @@ int main(int argc, char** argv)
 
 	tb_trace("=============================================================");
 	tb_trace("score: %d", score / 100);
-
-	getchar();
-end:
-
-	// exit queue
-	tb_queue_exit(queue);
 
 	return 0;
 }

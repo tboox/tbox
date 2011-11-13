@@ -105,7 +105,8 @@ tb_void_t 			tb_fpool_clear(tb_fpool_t* fpool);
 tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data);
 tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_cpointer_t data);
 tb_void_t 			tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor);
-tb_pointer_t 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
+tb_void_t 			tb_fpool_clr(tb_fpool_t* fpool, tb_size_t itor);
+tb_pointer_t 		tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
 
 /* iterator
  * 
@@ -121,8 +122,8 @@ tb_pointer_t 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
  * }
  *
  */
-tb_pointer_t 			tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor);
-tb_cpointer_t 	tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor);
+tb_pointer_t 		tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor);
+tb_cpointer_t 		tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor);
 
 tb_size_t 			tb_fpool_itor_head(tb_fpool_t const* fpool);
 tb_size_t 			tb_fpool_itor_tail(tb_fpool_t const* fpool);

@@ -42,8 +42,8 @@ extern "C" {
 struct __tb_item_func_t;
 typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_pointer_t item);
 typedef tb_pointer_t 		(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t item);
-typedef tb_pointer_t 		(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_cpointer_t data);
-typedef tb_pointer_t 		(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
+typedef tb_void_t 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
+typedef tb_void_t 			(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
 typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn);
 typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t size);
 typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t rdata, tb_cpointer_t ldata);

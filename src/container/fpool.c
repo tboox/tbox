@@ -198,6 +198,21 @@ tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_cpointer_t data)
 		else tb_memset(item, 0, fpool->step);
 	}
 }
+tb_void_t tb_fpool_clr(tb_fpool_t* fpool, tb_size_t itor)
+{
+	tb_assert_and_check_return(fpool && itor);
+
+	// get item
+	tb_pointer_t item = tb_fpool_get(fpool, itor);
+	if (item)
+	{
+		// free item
+		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
+
+		// clear data
+		tb_memset(item, 0, fpool->step);
+	}
+}
 tb_void_t tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor)
 {
 	// get item

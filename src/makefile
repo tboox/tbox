@@ -88,6 +88,7 @@ tbox_C_FILES 			+= \
 						libc/string/memcpy \
 						libc/string/memcmp \
 						libc/string/memmov \
+						libc/string/memdup \
 						libc/string/strlen \
 						libc/string/strnlen \
 						libc/string/strcat \
