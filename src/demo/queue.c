@@ -313,18 +313,9 @@ static tb_void_t tb_queue_ifm_test()
 	tb_queue_ifm_dump(queue);
 	tb_queue_exit(queue);
 }
-/* /////////////////////////////////////////////////////////
- * main
- */
-int main(int argc, char** argv)
+
+static tb_void_t tb_queue_perf_test()
 {
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
-	tb_queue_int_test();
-	tb_queue_str_test();
-	tb_queue_efm_test();
-	tb_queue_ifm_test();
-
 	tb_size_t score = 0;
 	tb_print("=============================================================");
 	tb_print("put & pop performance:");
@@ -338,5 +329,19 @@ int main(int argc, char** argv)
 	tb_print("=============================================================");
 	tb_print("score: %d", score / 100);
 
+}
+/* /////////////////////////////////////////////////////////
+ * main
+ */
+int main(int argc, char** argv)
+{
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
+
+	tb_queue_int_test();
+	tb_queue_str_test();
+	tb_queue_efm_test();
+	tb_queue_ifm_test();
+
+	tb_queue_perf_test();
 	return 0;
 }

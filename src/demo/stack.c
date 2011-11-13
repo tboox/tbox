@@ -7,58 +7,40 @@
  * details
  */
 
-static tb_void_t tb_stack_char_free(tb_pointer_t data, tb_pointer_t priv)
-{
-	tb_trace("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
-}
-static tb_void_t tb_stack_char_dump(tb_stack_t const* stack)
-{
-	tb_trace("size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
-	tb_size_t itor = tb_stack_itor_head(stack);
-	tb_size_t tail = tb_stack_itor_tail(stack);
-	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
-	{
-		tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
-		if (item)
-		{
-			tb_trace("at[%d]: %c", itor, *((tb_char_t const*)item));
-		}
-	}
-}
 static tb_size_t tb_stack_put_and_pop_test()
 {
 	// init
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(10, tb_item_func_int());
 	tb_assert_and_check_return_val(stack, 0);
 
-	tb_stack_put(stack, "0");
-	tb_stack_put(stack, "1");
-	tb_stack_put(stack, "2");
-	tb_stack_put(stack, "3");
-	tb_stack_put(stack, "4");
-	tb_stack_put(stack, "5");
-	tb_stack_put(stack, "6");
-	tb_stack_put(stack, "7");
-	tb_stack_put(stack, "8");
-	tb_stack_put(stack, "9");
+	tb_stack_put(stack, 0);
+	tb_stack_put(stack, 1);
+	tb_stack_put(stack, 2);
+	tb_stack_put(stack, 3);
+	tb_stack_put(stack, 4);
+	tb_stack_put(stack, 5);
+	tb_stack_put(stack, 6);
+	tb_stack_put(stack, 7);
+	tb_stack_put(stack, 8);
+	tb_stack_put(stack, 9);
 
-	tb_size_t i = 0;
-	tb_size_t n = 10000;
+	__tb_volatile__ tb_size_t i = 0;
+	__tb_volatile__ tb_size_t n = 10000;
 	tb_int64_t t = tb_mclock();
 	for (i = 0; i < n; i++) 
 	{
-		tb_stack_pop(stack, TB_NULL);
-		tb_stack_put(stack, "F");
+		tb_stack_pop(stack);
+		tb_stack_put(stack, 0xf);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
-	tb_trace("tb_stack_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_print("tb_stack_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// check
 	tb_assert(tb_stack_size(stack) == 10);
-	tb_assert(((tb_char_t const*)tb_stack_const_at_head(stack))[0] == '0');
-	tb_assert(((tb_char_t const*)tb_stack_const_at_last(stack))[0] == 'F');
+	tb_assert(tb_stack_const_at_head(stack) == 0x0);
+	tb_assert(tb_stack_const_at_last(stack) == 0xf);
 
 	// clear it
 	tb_stack_clear(stack);
@@ -74,12 +56,12 @@ static tb_size_t tb_stack_iterator_next_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(n, tb_item_func_int());
 	tb_assert_and_check_return_val(stack, 0);
 
-	while (n--) tb_stack_put(stack, "F");
-	tb_size_t itor = tb_stack_itor_head(stack);
-	tb_size_t tail = tb_stack_itor_tail(stack);
+	while (n--) tb_stack_put(stack, 0xf);
+	__tb_volatile__ tb_size_t itor = tb_stack_itor_head(stack);
+	__tb_volatile__ tb_size_t tail = tb_stack_itor_tail(stack);
 	tb_int64_t t = tb_mclock();
 	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
 	{
@@ -88,7 +70,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
-	tb_trace("tb_stack_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_print("tb_stack_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// exit
 	tb_stack_exit(stack);
@@ -99,12 +81,12 @@ static tb_size_t tb_stack_iterator_prev_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), n, TB_NULL);
+	tb_stack_t* stack = tb_stack_init(n, tb_item_func_int());
 	tb_assert_and_check_return_val(stack, 0);
 
-	while (n--) tb_stack_put(stack, "F");
-	tb_size_t itor = tb_stack_itor_last(stack);
-	tb_size_t head = tb_stack_itor_head(stack);
+	while (n--) tb_stack_put(stack, 0xf);
+	__tb_volatile__ tb_size_t itor = tb_stack_itor_last(stack);
+	__tb_volatile__ tb_size_t head = tb_stack_itor_head(stack);
 	tb_int64_t t = tb_mclock();
 	while (1)
 	{
@@ -116,7 +98,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 	t = tb_int64_sub(tb_mclock(), t);
 
 	// time
-	tb_trace("tb_stack_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_print("tb_stack_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// exit
 	tb_stack_exit(stack);
@@ -124,6 +106,75 @@ static tb_size_t tb_stack_iterator_prev_test()
 	return n / (tb_int64_to_int32(t) + 1);
 }
 
+static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)
+{
+	tb_print("efm size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_size_t itor = tb_stack_itor_head(stack);
+	tb_size_t tail = tb_stack_itor_tail(stack);
+	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
+		tb_print("efm at[%d]: %s", itor, tb_stack_itor_const_at(stack, itor));
+}
+static tb_void_t tb_stack_efm_test()
+{	
+	tb_stack_t* stack = tb_stack_init(10, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
+	tb_assert_and_check_return(stack);
+
+	tb_print("=============================================================");
+	tb_print("put:");
+	tb_stack_put(stack, "0000000000");
+	tb_stack_put(stack, "1111111111");
+	tb_stack_put(stack, "2222222222");
+	tb_stack_put(stack, "3333333333");
+	tb_stack_put(stack, "4444444444");
+	tb_stack_put(stack, "5555555555");
+	tb_stack_put(stack, "6666666666");
+	tb_stack_put(stack, "7777777777");
+	tb_stack_put(stack, "8888888888");
+	tb_stack_put(stack, "9999999999");
+	tb_stack_efm_dump(stack);
+
+	tb_print("=============================================================");
+	tb_print("pop:");
+	tb_stack_pop(stack);
+	tb_stack_pop(stack);
+	tb_stack_pop(stack);
+	tb_stack_pop(stack);
+	tb_stack_pop(stack);
+	tb_stack_efm_dump(stack);
+
+	tb_print("=============================================================");
+	tb_print("put:");
+	tb_stack_put(stack, "0000000000");
+	tb_stack_put(stack, "1111111111");
+	tb_stack_put(stack, "2222222222");
+	tb_stack_put(stack, "3333333333");
+	tb_stack_put(stack, "4444444444");
+	tb_stack_efm_dump(stack);
+
+	tb_print("=============================================================");
+	tb_print("clear:");
+	tb_stack_clear(stack);
+	tb_stack_efm_dump(stack);
+
+	tb_stack_exit(stack);
+}
+
+static tb_void_t tb_stack_perf_test()
+{
+	tb_size_t score = 0;
+	tb_print("=============================================================");
+	tb_print("put & pop performance:");
+	score += tb_stack_put_and_pop_test();
+
+	tb_print("=============================================================");
+	tb_print("iterator performance:");
+	score += tb_stack_iterator_next_test();
+	score += tb_stack_iterator_prev_test();
+
+	tb_print("=============================================================");
+	tb_print("score: %d", score / 100);
+
+}
 /* /////////////////////////////////////////////////////////
  * main
  */
@@ -131,67 +182,8 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
-	// init stack
-	tb_stack_item_func_t func = {tb_stack_char_free, "char"};
-	tb_stack_t* stack = tb_stack_init(sizeof(tb_char_t), 10, &func);
-	tb_assert_and_check_goto(stack, end);
-
-
-	tb_trace("=============================================================");
-	tb_trace("put:");
-	tb_stack_put(stack, "0");
-	tb_stack_put(stack, "1");
-	tb_stack_put(stack, "2");
-	tb_stack_put(stack, "3");
-	tb_stack_put(stack, "4");
-	tb_stack_put(stack, "5");
-	tb_stack_put(stack, "6");
-	tb_stack_put(stack, "7");
-	tb_stack_put(stack, "8");
-	tb_stack_put(stack, "9");
-	tb_stack_char_dump(stack);
-
-	tb_trace("=============================================================");
-	tb_trace("pop:");
-	tb_stack_pop(stack, TB_NULL);
-	tb_stack_pop(stack, TB_NULL);
-	tb_stack_pop(stack, TB_NULL);
-	tb_stack_pop(stack, TB_NULL);
-	tb_stack_pop(stack, TB_NULL);
-	tb_stack_char_dump(stack);
-
-	tb_trace("=============================================================");
-	tb_trace("put:");
-	tb_stack_put(stack, "0");
-	tb_stack_put(stack, "1");
-	tb_stack_put(stack, "2");
-	tb_stack_put(stack, "3");
-	tb_stack_put(stack, "4");
-	tb_stack_char_dump(stack);
-
-	tb_trace("=============================================================");
-	tb_trace("clear:");
-	tb_stack_clear(stack);
-	tb_stack_char_dump(stack);
-
-	tb_size_t score = 0;
-	tb_trace("=============================================================");
-	tb_trace("put & pop performance:");
-	score += tb_stack_put_and_pop_test();
-
-	tb_trace("=============================================================");
-	tb_trace("iterator performance:");
-	score += tb_stack_iterator_next_test();
-	score += tb_stack_iterator_prev_test();
-
-	tb_trace("=============================================================");
-	tb_trace("score: %d", score / 100);
-
-	getchar();
-end:
-
-	// exit stack
-	tb_stack_exit(stack);
+	tb_stack_efm_test();
+	tb_stack_perf_test();
 
 	return 0;
 }

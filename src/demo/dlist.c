@@ -845,18 +845,8 @@ static tb_void_t tb_dlist_ifm_test()
 
 	tb_dlist_exit(dlist);
 }
-/* /////////////////////////////////////////////////////////
- * main
- */
-int main(int argc, char** argv)
+static tb_void_t tb_dlist_perf_test()
 {
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
-	tb_dlist_int_test();
-	tb_dlist_str_test();
-	tb_dlist_efm_test();
-	tb_dlist_ifm_test();
-
 	tb_size_t score = 0;
 	tb_print("=============================================================");
 	tb_print("insert performance:");
@@ -892,6 +882,21 @@ int main(int argc, char** argv)
 
 	tb_print("=============================================================");
 	tb_print("score: %d", score / 100);
+
+}
+/* /////////////////////////////////////////////////////////
+ * main
+ */
+int main(int argc, char** argv)
+{
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
+
+	tb_dlist_int_test();
+	tb_dlist_str_test();
+	tb_dlist_efm_test();
+	tb_dlist_ifm_test();
+
+	tb_dlist_perf_test();
 
 	return 0;
 }
