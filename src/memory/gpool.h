@@ -58,19 +58,19 @@ extern tb_size_t const g_gpool_size_min;
 /* /////////////////////////////////////////////////////////
  * the interfaces
  */
-tb_handle_t 	tb_gpool_init(tb_void_t* data, tb_size_t size);
+tb_handle_t 	tb_gpool_init(tb_pointer_t data, tb_size_t size);
 tb_void_t 		tb_gpool_exit(tb_handle_t hpool);
 
 #ifndef TB_DEBUG
-tb_void_t* 		tb_gpool_allocate(tb_handle_t hpool, tb_size_t size);
-tb_void_t*  	tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size);
-tb_void_t* 		tb_gpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size);
-tb_bool_t 		tb_gpool_deallocate(tb_handle_t hpool, tb_void_t* data);
+tb_pointer_t 		tb_gpool_allocate(tb_handle_t hpool, tb_size_t size);
+tb_pointer_t  	tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size);
+tb_pointer_t 		tb_gpool_reallocate(tb_handle_t hpool, tb_pointer_t data, tb_size_t size);
+tb_bool_t 		tb_gpool_deallocate(tb_handle_t hpool, tb_pointer_t data);
 #else
-tb_void_t* 		tb_gpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t*  	tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t* 		tb_gpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-tb_bool_t 		tb_gpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 		tb_gpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 		tb_gpool_reallocate(tb_handle_t hpool, tb_pointer_t data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_bool_t 		tb_gpool_deallocate(tb_handle_t hpool, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 tb_void_t 		tb_gpool_dump(tb_handle_t hpool);

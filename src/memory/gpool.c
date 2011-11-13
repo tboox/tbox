@@ -257,9 +257,9 @@ static __tb_inline__ tb_size_t tb_block_size_to_chunk_i(tb_gpool_chunk_t* chunks
 
 // try allocating it from the prediction rblock
 #ifndef TB_DEBUG
-static tb_void_t* tb_gpool_try_allocating_from_pred_rblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t chunk_i)
+static tb_pointer_t tb_gpool_try_allocating_from_pred_rblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t chunk_i)
 #else
-static tb_void_t* tb_gpool_try_allocating_from_pred_rblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t chunk_i, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_pointer_t tb_gpool_try_allocating_from_pred_rblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t chunk_i, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// no predicted block
@@ -311,9 +311,9 @@ static tb_void_t* tb_gpool_try_allocating_from_pred_rblock(tb_gpool_t* gpool, tb
 
 // try allocating it from the prediction nrblock
 #ifndef TB_DEBUG
-static tb_void_t* tb_gpool_try_allocating_from_pred_nrblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t asize)
+static tb_pointer_t tb_gpool_try_allocating_from_pred_nrblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t asize)
 #else
-static tb_void_t* tb_gpool_try_allocating_from_pred_nrblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t asize, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+static tb_pointer_t tb_gpool_try_allocating_from_pred_nrblock(tb_gpool_t* gpool, tb_size_t size, tb_size_t asize, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	tb_byte_t* 	pb = gpool->chunks[TB_GPOOL_NON_REGULAR_CHUNCK_INDEX].data;
@@ -495,7 +495,7 @@ static tb_bool_t tb_gpool_allocate_try(tb_gpool_t* gpool, tb_size_t size)
 /* ////////////////////////////////////////////////////////////////////////
  * the implemention
  */
-tb_handle_t tb_gpool_init(tb_void_t* data, tb_size_t size)
+tb_handle_t tb_gpool_init(tb_pointer_t data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(data && size, TB_NULL);
@@ -603,9 +603,9 @@ tb_void_t tb_gpool_exit(tb_handle_t hpool)
 
 
 #ifndef TB_DEBUG
-tb_void_t* tb_gpool_allocate(tb_handle_t hpool, tb_size_t size)
+tb_pointer_t tb_gpool_allocate(tb_handle_t hpool, tb_size_t size)
 #else
-tb_void_t* tb_gpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_gpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check
@@ -802,9 +802,9 @@ tb_void_t* tb_gpool_allocate(tb_handle_t hpool, tb_size_t size, tb_char_t const*
 	return TB_NULL;
 }
 #ifndef TB_DEBUG
-tb_bool_t tb_gpool_deallocate(tb_handle_t hpool, tb_void_t* data)
+tb_bool_t tb_gpool_deallocate(tb_handle_t hpool, tb_pointer_t data)
 #else
-tb_bool_t tb_gpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_gpool_deallocate(tb_handle_t hpool, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check
@@ -897,21 +897,21 @@ tb_bool_t tb_gpool_deallocate(tb_handle_t hpool, tb_void_t* data, tb_char_t cons
 }
 
 #ifndef TB_DEBUG
-tb_void_t* tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size)
 #else
-tb_void_t* tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_gpool_callocate(tb_handle_t hpool, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	tb_check_return_val(item && size, TB_NULL);
-	tb_void_t* p = TB_GPOOL_ALLOCATE(hpool, item * size, func, line, file);
+	tb_pointer_t p = TB_GPOOL_ALLOCATE(hpool, item * size, func, line, file);
 	if (p) tb_memset(p, 0, item * size);
 	return p;
 }
 
 #ifndef TB_DEBUG
-tb_void_t* tb_gpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size)
+tb_pointer_t tb_gpool_reallocate(tb_handle_t hpool, tb_pointer_t data, tb_size_t size)
 #else
-tb_void_t* tb_gpool_reallocate(tb_handle_t hpool, tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_gpool_reallocate(tb_handle_t hpool, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check

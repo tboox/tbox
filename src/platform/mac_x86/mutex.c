@@ -47,7 +47,7 @@ tb_void_t tb_mutex_exit(tb_handle_t hmutex)
 	if (pmutex)
 	{
 		pthread_mutex_destroy(pmutex);
-		free((tb_void_t*)pmutex);
+		free((tb_pointer_t)pmutex);
 	}
 }
 tb_bool_t tb_mutex_lock(tb_handle_t hmutex)

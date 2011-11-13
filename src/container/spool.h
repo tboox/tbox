@@ -85,10 +85,10 @@ tb_void_t 			tb_spool_exit(tb_spool_t* spool);
 tb_void_t 			tb_spool_clear(tb_spool_t* spool);
 
 // malloc
-tb_void_t* 			tb_spool_malloc(tb_spool_t* spool, tb_size_t size);
-tb_void_t* 			tb_spool_calloc(tb_spool_t* spool, tb_size_t item, tb_size_t size);
-tb_void_t* 			tb_spool_realloc(tb_spool_t* spool, tb_void_t* data, tb_size_t size);
-tb_void_t 			tb_spool_free(tb_spool_t* spool, tb_void_t* data);
+tb_pointer_t 			tb_spool_malloc(tb_spool_t* spool, tb_size_t size);
+tb_pointer_t 			tb_spool_calloc(tb_spool_t* spool, tb_size_t item, tb_size_t size);
+tb_pointer_t 			tb_spool_realloc(tb_spool_t* spool, tb_pointer_t data, tb_size_t size);
+tb_void_t 			tb_spool_free(tb_spool_t* spool, tb_pointer_t data);
 
 // string
 tb_char_t* 			tb_spool_strdup(tb_spool_t* spool, tb_char_t const* s);

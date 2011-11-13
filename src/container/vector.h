@@ -38,7 +38,7 @@ extern "C" {
  */
 
 // the item func
-typedef tb_void_t 	(*tb_vector_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
+typedef tb_void_t 	(*tb_vector_item_free_func_t)(tb_pointer_t item, tb_pointer_t priv);	
 
 // the vector item func type
 typedef struct __tb_vector_item_func_t
@@ -47,7 +47,7 @@ typedef struct __tb_vector_item_func_t
 	tb_vector_item_free_func_t 	free;
 
 	// the priv data
-	tb_void_t* 					priv;
+	tb_pointer_t 					priv;
 
 }tb_vector_item_func_t;
 
@@ -114,31 +114,31 @@ tb_vector_t* 		tb_vector_init(tb_size_t step, tb_size_t grow, tb_vector_item_fun
 tb_void_t 			tb_vector_exit(tb_vector_t* vector);
 
 // accessors
-tb_void_t* 			tb_vector_at_head(tb_vector_t* vector);
-tb_void_t* 			tb_vector_at_last(tb_vector_t* vector);
+tb_pointer_t 			tb_vector_at_head(tb_vector_t* vector);
+tb_pointer_t 			tb_vector_at_last(tb_vector_t* vector);
 
-tb_void_t const* 	tb_vector_const_at_head(tb_vector_t const* vector);
-tb_void_t const* 	tb_vector_const_at_last(tb_vector_t const* vector);
+tb_cpointer_t 	tb_vector_const_at_head(tb_vector_t const* vector);
+tb_cpointer_t 	tb_vector_const_at_last(tb_vector_t const* vector);
 
 // modifiors
 tb_bool_t 			tb_vector_resize(tb_vector_t* vector, tb_size_t size);
 tb_void_t 			tb_vector_clear(tb_vector_t* vector);
 
-tb_void_t 	 		tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item);
-tb_void_t 	 		tb_vector_insert_head(tb_vector_t* vector, tb_void_t const* item);
-tb_void_t 	 		tb_vector_insert_tail(tb_vector_t* vector, tb_void_t const* item);
+tb_void_t 	 		tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item);
+tb_void_t 	 		tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t item);
+tb_void_t 	 		tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t item);
 
-tb_void_t 	 		tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size);
-tb_void_t 	 		tb_vector_ninsert_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size);
-tb_void_t 	 		tb_vector_ninsert_tail(tb_vector_t* vector, tb_void_t const* item, tb_size_t size);
+tb_void_t 	 		tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item, tb_size_t size);
+tb_void_t 	 		tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size);
+tb_void_t 	 		tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size);
 
-tb_void_t 	 		tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item);
-tb_void_t 			tb_vector_replace_head(tb_vector_t* vector, tb_void_t const* item);
-tb_void_t 	 		tb_vector_replace_last(tb_vector_t* vector, tb_void_t const* item);
+tb_void_t 	 		tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item);
+tb_void_t 			tb_vector_replace_head(tb_vector_t* vector, tb_cpointer_t item);
+tb_void_t 	 		tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t item);
 
-tb_void_t 	 		tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size);
-tb_void_t 	 		tb_vector_nreplace_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size);
-tb_void_t 	 		tb_vector_nreplace_last(tb_vector_t* vector, tb_void_t const* item, tb_size_t size);
+tb_void_t 	 		tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item, tb_size_t size);
+tb_void_t 	 		tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size);
+tb_void_t 	 		tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size);
 
 tb_void_t 			tb_vector_remove(tb_vector_t* vector, tb_size_t index);
 tb_void_t 	 		tb_vector_remove_head(tb_vector_t* vector);
@@ -154,15 +154,15 @@ tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
  * tb_size_t tail = tb_vector_itor_tail(vector);
  * for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
  * {
- * 		tb_void_t const* item = tb_vector_itor_const_at(vector, itor);
+ * 		tb_cpointer_t item = tb_vector_itor_const_at(vector, itor);
  * 		if (item)
  * 		{
  * 			// ...
  * 		}
  * }
  */
-tb_void_t* 			tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor);
-tb_void_t const* 	tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor);
+tb_pointer_t 			tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor);
+tb_cpointer_t 	tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor);
 
 tb_size_t 			tb_vector_itor_head(tb_vector_t const* vector);
 tb_size_t 			tb_vector_itor_tail(tb_vector_t const* vector);

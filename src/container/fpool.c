@@ -87,7 +87,7 @@ tb_void_t tb_fpool_exit(tb_fpool_t* fpool)
 		tb_free(fpool);
 	}
 }
-tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* data)
+tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 {
 	tb_assert_and_check_return_val(fpool, 0);
 
@@ -174,7 +174,7 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* data)
 	}
 	return itor;
 }
-tb_void_t* tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor)
+tb_pointer_t tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor)
 {
 	//tb_trace("%d %d %d %d", fpool->step, fpool->size, itor, fpool->maxn);
 	tb_assert_and_check_return_val(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn, TB_NULL);
@@ -182,12 +182,12 @@ tb_void_t* tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor)
 
 	return (fpool->data + (itor - 1) * fpool->step);
 }
-tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* data)
+tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(fpool && itor);
 
 	// get item
-	tb_void_t* item = tb_fpool_get(fpool, itor);
+	tb_pointer_t item = tb_fpool_get(fpool, itor);
 	if (item)
 	{
 		// free item
@@ -201,7 +201,7 @@ tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* data)
 tb_void_t tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor)
 {
 	// get item
-	tb_void_t* item = tb_fpool_get(fpool, itor);
+	tb_pointer_t item = tb_fpool_get(fpool, itor);
 	if (item)
 	{
 		// free item
@@ -244,11 +244,11 @@ tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 	fpool->pred_n = m;
 #endif
 }
-tb_void_t* tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor)
+tb_pointer_t tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor)
 {
 	return tb_fpool_get(fpool, itor);
 }
-tb_void_t const* tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor)
+tb_cpointer_t tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor)
 {
 	return tb_fpool_get((tb_fpool_t*)fpool, itor);
 }

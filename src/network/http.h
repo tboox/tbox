@@ -95,8 +95,8 @@ typedef struct __tb_http_option_t
 	tb_size_t 			range_e;
 
 	// the head funcs
-	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_void_t* priv);
-	tb_void_t* 			head_priv;
+	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_pointer_t priv);
+	tb_pointer_t 			head_priv;
 
 	// the ssl funcs
 	tb_handle_t 		(*sopen_func)(tb_char_t const* host, tb_size_t port);
@@ -203,7 +203,7 @@ tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirec
 tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
 tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_void_t* ), tb_void_t* head_priv);
+tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
 tb_bool_t 				tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_func)(tb_char_t const*, tb_size_t ));
 tb_bool_t 				tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t));
 tb_bool_t 				tb_http_option_set_sread_func(tb_handle_t handle, tb_int_t (*sread_func)(tb_handle_t, tb_byte_t* , tb_size_t));

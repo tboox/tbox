@@ -78,7 +78,7 @@ extern "C" {
 typedef struct __tb_queue_t
 {
 	// the data
-	tb_void_t** 			data;
+	tb_pointer_t* 			data;
 	tb_size_t 				head;
 	tb_size_t 				tail;
 	tb_size_t 				maxn;
@@ -97,15 +97,15 @@ tb_queue_t* 		tb_queue_init(tb_size_t maxn, tb_item_func_t func);
 tb_void_t 			tb_queue_exit(tb_queue_t* queue);
 
 // accessors & modifiors
-tb_void_t* 			tb_queue_at_head(tb_queue_t* queue);
-tb_void_t* 			tb_queue_at_last(tb_queue_t* queue);
+tb_pointer_t 			tb_queue_at_head(tb_queue_t* queue);
+tb_pointer_t 			tb_queue_at_last(tb_queue_t* queue);
 
-tb_void_t const* 	tb_queue_const_at_head(tb_queue_t const* queue);
-tb_void_t const* 	tb_queue_const_at_last(tb_queue_t const* queue);
+tb_cpointer_t 	tb_queue_const_at_head(tb_queue_t const* queue);
+tb_cpointer_t 	tb_queue_const_at_last(tb_queue_t const* queue);
 
-tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_void_t const* data);
+tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_cpointer_t data);
 tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
-tb_void_t* 	 		tb_queue_get(tb_queue_t* queue);
+tb_pointer_t 	 		tb_queue_get(tb_queue_t* queue);
 
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
 
@@ -115,7 +115,7 @@ tb_void_t 			tb_queue_clear(tb_queue_t* queue);
  * tb_size_t tail = tb_queue_itor_tail(queue);
  * for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
  * {
- * 		tb_void_t const* item = tb_queue_itor_const_at(queue, itor);
+ * 		tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
  * 		if (item)
  * 		{
  * 			// ...
@@ -123,8 +123,8 @@ tb_void_t 			tb_queue_clear(tb_queue_t* queue);
  * }
  *
  */
-tb_void_t* 			tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor);
-tb_void_t const* 	tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor);
+tb_pointer_t 			tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor);
+tb_cpointer_t 	tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor);
 
 tb_size_t 			tb_queue_itor_head(tb_queue_t const* queue);
 tb_size_t 			tb_queue_itor_tail(tb_queue_t const* queue);

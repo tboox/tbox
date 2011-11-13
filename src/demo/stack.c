@@ -7,7 +7,7 @@
  * details
  */
 
-static tb_void_t tb_stack_char_free(tb_void_t* data, tb_void_t* priv)
+static tb_void_t tb_stack_char_free(tb_pointer_t data, tb_pointer_t priv)
 {
 	tb_trace("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)data));
 }

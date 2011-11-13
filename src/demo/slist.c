@@ -13,7 +13,7 @@
  * details
  */
 
-static tb_void_t tb_slist_char_free(tb_void_t* item, tb_void_t* priv)
+static tb_void_t tb_slist_char_free(tb_pointer_t item, tb_pointer_t priv)
 {
 	tb_trace("[free]: %s, %c", (tb_char_t const*)priv, *((tb_char_t*)item));
 }

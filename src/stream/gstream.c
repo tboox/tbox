@@ -380,12 +380,12 @@ tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 	tb_assert_and_check_return_val(gst && gst->ioctl0, TB_FALSE);
 	return gst->ioctl0(gst, cmd);
 }
-tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
+tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {	
 	tb_assert_and_check_return_val(gst && gst->ioctl1, TB_FALSE);
 	return gst->ioctl1(gst, cmd, arg1);
 }
-tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
+tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
 	tb_assert_and_check_return_val(gst && gst->ioctl2, TB_FALSE);
 	return gst->ioctl2(gst, cmd, arg1, arg2);

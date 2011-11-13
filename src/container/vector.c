@@ -104,29 +104,29 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 		vector->size = 0;
 	}
 }
-tb_void_t* tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor)
+tb_pointer_t tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor)
 {
 	tb_assert_abort(vector && vector->size && itor < vector->maxn);
 	return (vector->data + itor * vector->step);
 }
-tb_void_t* tb_vector_at_head(tb_vector_t* vector)
+tb_pointer_t tb_vector_at_head(tb_vector_t* vector)
 {
 	return tb_vector_itor_at(vector, tb_vector_itor_head(vector));
 }
-tb_void_t* tb_vector_at_last(tb_vector_t* vector)
+tb_pointer_t tb_vector_at_last(tb_vector_t* vector)
 {
 	return tb_vector_itor_at(vector, tb_vector_itor_last(vector));
 }
-tb_void_t const* tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor)
+tb_cpointer_t tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor)
 {
 	tb_assert_abort(vector && vector->size && itor < vector->maxn);
 	return (vector->data + itor * vector->step);
 }
-tb_void_t const* tb_vector_const_at_head(tb_vector_t const* vector)
+tb_cpointer_t tb_vector_const_at_head(tb_vector_t const* vector)
 {
 	return tb_vector_itor_const_at(vector, tb_vector_itor_head(vector));
 }
-tb_void_t const* tb_vector_const_at_last(tb_vector_t const* vector)
+tb_cpointer_t tb_vector_const_at_last(tb_vector_t const* vector)
 {
 	return tb_vector_itor_const_at(vector, tb_vector_itor_last(vector));
 }
@@ -199,7 +199,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	vector->size = size;
 	return TB_TRUE;
 }
-tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)
+tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector && index <= vector->size);
 
@@ -223,17 +223,17 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t index, tb_void_t const
 	if (item) tb_memcpy(data + index * step, item, step);
 	else tb_memset(data + index * step, 0, step);
 }
-tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_void_t const* item)
+tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector);
 	tb_vector_insert(vector, 0, item);
 }
-tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_void_t const* item)
+tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector);
 	tb_vector_insert(vector, vector->size, item);
 }
-tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector && size && index <= vector->size);
 
@@ -273,17 +273,17 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 	}
 	else tb_memset(data + index * step, 0, size * step);
 }
-tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector);
 	tb_vector_ninsert(vector, 0, item, size);
 }
-tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector);
 	tb_vector_ninsert(vector, vector->size, item, size);
 }
-tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item)
+tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector && vector->data && item && index <= vector->size);
 
@@ -297,17 +297,17 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t index, tb_void_t cons
 	// copy data
 	tb_memcpy(data + index * step, item, step);
 }
-tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_void_t const* item)
+tb_void_t tb_vector_replace_head(tb_vector_t* vector, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector && vector->size && item);
 	tb_vector_replace(vector, 0, item);
 }
-tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_void_t const* item)
+tb_void_t tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t item)
 {
 	tb_assert_and_check_return(vector && vector->size && item);
 	tb_vector_replace(vector, vector->size - 1, item);
 }
-tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector && vector->size && index <= vector->size && item && size);
 
@@ -337,12 +337,12 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t index, tb_void_t con
 		break;
 	}
 }
-tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, 0, item, size);
 }
-tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_void_t const* item, tb_size_t size)
+tb_void_t tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t item, tb_size_t size)
 {
 	tb_assert_and_check_return(vector && vector->size && item && size);
 	tb_vector_nreplace(vector, size >= vector->size? 0 : vector->size - size, item, size);

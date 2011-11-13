@@ -33,7 +33,7 @@
  * implemention
  */
 
-tb_handle_t tb_thread_open(tb_char_t const* name, tb_void_t* (*callback)(tb_void_t*), tb_void_t* param, tb_size_t stack_size)
+tb_handle_t tb_thread_open(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t param, tb_size_t stack_size)
 {
 	pthread_t hthread;
 	if (0 != pthread_create(&hthread, NULL, callback, param)) return TB_NULL;
@@ -53,7 +53,7 @@ tb_bool_t tb_thread_terminate(tb_handle_t hthread)
 {
 	return TB_TRUE;
 }
-tb_void_t tb_thread_exit(tb_void_t* retval)
+tb_void_t tb_thread_exit(tb_pointer_t retval)
 {
 	pthread_exit(retval);
 }

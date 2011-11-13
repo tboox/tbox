@@ -51,7 +51,7 @@ extern "C" {
  */
 
 // the item func
-typedef tb_void_t 	(*tb_fpool_item_free_func_t)(tb_void_t* item, tb_void_t* priv);	
+typedef tb_void_t 	(*tb_fpool_item_free_func_t)(tb_pointer_t item, tb_pointer_t priv);	
 
 // the fpool item func type
 typedef struct __tb_fpool_item_func_t
@@ -60,7 +60,7 @@ typedef struct __tb_fpool_item_func_t
 	tb_fpool_item_free_func_t 	free;
 
 	// the priv data
-	tb_void_t* 					priv;
+	tb_pointer_t 					priv;
 
 }tb_fpool_item_func_t;
 
@@ -102,10 +102,10 @@ tb_void_t 			tb_fpool_exit(tb_fpool_t* fpool);
 // modifiors
 tb_void_t 			tb_fpool_clear(tb_fpool_t* fpool);
 
-tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_void_t const* data);
-tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_void_t const* data);
+tb_size_t 			tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data);
+tb_void_t 			tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_cpointer_t data);
 tb_void_t 			tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor);
-tb_void_t* 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
+tb_pointer_t 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
 
 /* iterator
  * 
@@ -113,7 +113,7 @@ tb_void_t* 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
  * tb_size_t tail = tb_fpool_itor_tail(fpool);
  * for (; itor != tail; itor = tb_fpool_itor_next(fpool, itor))
  * {
- * 		tb_void_t const* item = tb_fpool_itor_const_at(fpool, itor);
+ * 		tb_cpointer_t item = tb_fpool_itor_const_at(fpool, itor);
  * 		if (item)
  * 		{
  * 			// ...
@@ -121,8 +121,8 @@ tb_void_t* 			tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor);
  * }
  *
  */
-tb_void_t* 			tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor);
-tb_void_t const* 	tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor);
+tb_pointer_t 			tb_fpool_itor_at(tb_fpool_t* fpool, tb_size_t itor);
+tb_cpointer_t 	tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor);
 
 tb_size_t 			tb_fpool_itor_head(tb_fpool_t const* fpool);
 tb_size_t 			tb_fpool_itor_tail(tb_fpool_t const* fpool);

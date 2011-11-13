@@ -78,7 +78,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_str
  * interfaces
  */
 
-tb_void_t tb_xml_node_init(tb_xml_node_t* node, tb_void_t* document, tb_size_t type)
+tb_void_t tb_xml_node_init(tb_xml_node_t* node, tb_pointer_t document, tb_size_t type)
 {
 	if (node)
 	{
@@ -112,7 +112,7 @@ tb_void_t tb_xml_node_uninit(tb_xml_node_t* node)
 		node->attributes = TB_NULL;
 	}
 }
-tb_xml_node_t* tb_xml_node_create(tb_void_t* document, tb_size_t type)
+tb_xml_node_t* tb_xml_node_create(tb_pointer_t document, tb_size_t type)
 {
 	// alloc node
 	tb_xml_node_t* node = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_node_t));

@@ -495,7 +495,7 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 }
 
 // the dtor of string
-static tb_void_t tb_cookies_spool_free(tb_void_t* data, tb_void_t* priv)
+static tb_void_t tb_cookies_spool_free(tb_pointer_t data, tb_pointer_t priv)
 {
 	if (data) 
 	{

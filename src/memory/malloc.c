@@ -49,7 +49,7 @@ static tb_handle_t g_mutex = TB_NULL;
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_bool_t tb_memory_init(tb_void_t* data, tb_size_t size)
+tb_bool_t tb_memory_init(tb_pointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(data && size, TB_FALSE);
 
@@ -82,9 +82,9 @@ tb_void_t tb_memory_exit()
 }
 
 #ifndef TB_DEBUG
-tb_void_t* tb_memory_allocate(tb_size_t size)
+tb_pointer_t tb_memory_allocate(tb_size_t size)
 #else
-tb_void_t* tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -102,9 +102,9 @@ tb_void_t* tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t l
 	return p;
 }
 #ifndef TB_DEBUG
-tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_memory_callocate(tb_size_t item, tb_size_t size)
 #else
-tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -123,9 +123,9 @@ tb_void_t* tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* 
 }
 
 #ifndef TB_DEBUG
-tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size)
+tb_pointer_t tb_memory_reallocate(tb_pointer_t data, tb_size_t size)
 #else
-tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_reallocate(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -143,9 +143,9 @@ tb_void_t* tb_memory_reallocate(tb_void_t* data, tb_size_t size, tb_char_t const
 	return p;
 }
 #ifndef TB_DEBUG
-tb_void_t tb_memory_deallocate(tb_void_t* data)
+tb_void_t tb_memory_deallocate(tb_pointer_t data)
 #else
-tb_void_t tb_memory_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t tb_memory_deallocate(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 

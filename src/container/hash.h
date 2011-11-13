@@ -56,10 +56,10 @@ extern "C" {
 typedef struct __tb_hash_item_t
 {
 	// the item name
-	tb_void_t* 			name;
+	tb_pointer_t 			name;
 
 	// the item data
-	tb_void_t* 			data;
+	tb_pointer_t 			data;
 
 }tb_hash_item_t;
 
@@ -121,11 +121,11 @@ tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 // accessors & modifiors
 tb_void_t 				tb_hash_clear(tb_hash_t* hash);
 
-tb_void_t* 				tb_hash_at(tb_hash_t* hash, tb_void_t const* name);
-tb_void_t const* 		tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name);
+tb_pointer_t 				tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
+tb_cpointer_t 		tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
 
-tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_void_t const* name);
-tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* data);
+tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
+tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
 
 // attributes
 tb_size_t 				tb_hash_size(tb_hash_t const* hash);
