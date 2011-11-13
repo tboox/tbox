@@ -115,8 +115,8 @@ tb_void_t 			tb_queue_clear(tb_queue_t* queue);
  * tb_size_t tail = tb_queue_itor_tail(queue);
  * for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
  * {
- * 		tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
- * 		if (item)
+ * 		tb_cpointer_t data = tb_queue_itor_const_at(queue, itor);
+ * 		if (data)
  * 		{
  * 			// ...
  * 		}

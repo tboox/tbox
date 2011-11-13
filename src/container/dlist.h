@@ -107,11 +107,11 @@ tb_dlist_t* 		tb_dlist_init(tb_size_t grow, tb_item_func_t func);
 tb_void_t 			tb_dlist_exit(tb_dlist_t* dlist);
 
 // accessors
-tb_pointer_t 			tb_dlist_at_head(tb_dlist_t* dlist);
-tb_pointer_t 			tb_dlist_at_last(tb_dlist_t* dlist);
+tb_pointer_t 		tb_dlist_at_head(tb_dlist_t* dlist);
+tb_pointer_t 		tb_dlist_at_last(tb_dlist_t* dlist);
 
-tb_cpointer_t 	tb_dlist_const_at_head(tb_dlist_t const* dlist);
-tb_cpointer_t 	tb_dlist_const_at_last(tb_dlist_t const* dlist);
+tb_cpointer_t 		tb_dlist_const_at_head(tb_dlist_t const* dlist);
+tb_cpointer_t 		tb_dlist_const_at_last(tb_dlist_t const* dlist);
 
 // modifiors
 tb_void_t 			tb_dlist_clear(tb_dlist_t* dlist);
@@ -146,16 +146,16 @@ tb_size_t 			tb_dlist_nremove_last(tb_dlist_t* dlist, tb_size_t size);
  * tb_size_t tail = tb_dlist_itor_tail(dlist);
  * for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
  * {
- * 		tb_byte_t const* item = tb_dlist_itor_const_at(dlist, itor);
- * 		if (item)
+ * 		tb_byte_t const* data = tb_dlist_itor_const_at(dlist, itor);
+ * 		if (data)
  * 		{
  * 			// ...
  * 		}
  * }
  *
  */
-tb_pointer_t 			tb_dlist_itor_at(tb_dlist_t* dlist, tb_size_t itor);
-tb_cpointer_t 	tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor);
+tb_pointer_t 		tb_dlist_itor_at(tb_dlist_t* dlist, tb_size_t itor);
+tb_cpointer_t 		tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor);
 
 tb_size_t 			tb_dlist_itor_head(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_itor_tail(tb_dlist_t const* dlist);
