@@ -184,8 +184,8 @@ typedef struct __tb_gstream_t
 
 	// open & close
 	tb_bool_t 			(*open)(struct __tb_gstream_t* gst);
-	tb_void_t 				(*close)(struct __tb_gstream_t* gst);
-	tb_void_t 				(*free)(struct __tb_gstream_t* gst);
+	tb_void_t 			(*close)(struct __tb_gstream_t* gst);
+	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
 	// stream operations
 	tb_int_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
