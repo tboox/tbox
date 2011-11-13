@@ -163,7 +163,7 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 	}
 	return TB_TRUE;
 }
-static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
+static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -263,7 +263,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 	}
 	return TB_FALSE;
 }
-static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2)
+static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -273,7 +273,7 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* 
 	case TB_HSTREAM_CMD_SET_HEAD_FUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_head_func(hst->http, (tb_bool_t (*)(tb_char_t const* , tb_void_t* ))arg1, arg2);
+			return tb_http_option_set_head_func(hst->http, (tb_bool_t (*)(tb_char_t const* , tb_pointer_t ))arg1, arg2);
 		}
 	case TB_HSTREAM_CMD_SET_POST:
 		{

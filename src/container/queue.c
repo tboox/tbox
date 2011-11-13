@@ -47,7 +47,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	tb_assert_and_check_goto(tb_ispow2(queue->maxn), fail);
 
 	// calloc data
-	queue->data = tb_calloc(queue->maxn, sizeof(tb_void_t*));
+	queue->data = tb_calloc(queue->maxn, sizeof(tb_pointer_t));
 	tb_assert_and_check_goto(queue->data, fail);
 
 	return queue;
@@ -79,7 +79,7 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
 		queue->tail = 0;
 	}
 }
-tb_void_t tb_queue_put(tb_queue_t* queue, tb_void_t const* data)
+tb_void_t tb_queue_put(tb_queue_t* queue, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(queue && !tb_queue_full(queue));
 	queue->data[queue->tail] = queue->func.dupl? queue->func.dupl(&queue->func, data) : data;
@@ -91,32 +91,32 @@ tb_void_t tb_queue_pop(tb_queue_t* queue)
 	if (queue->func.free) queue->func.free(&queue->func, queue->data[queue->head]);
 	queue->head = ((queue->head + 1) & (queue->maxn - 1));
 }
-tb_void_t* tb_queue_get(tb_queue_t* queue)
+tb_pointer_t tb_queue_get(tb_queue_t* queue)
 {
 	return tb_queue_at_head(queue);
 }
-tb_void_t* tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor)
+tb_pointer_t tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor)
 {
-	return (tb_void_t*)tb_queue_itor_const_at(queue, itor);
+	return (tb_pointer_t)tb_queue_itor_const_at(queue, itor);
 }
-tb_void_t* tb_queue_at_head(tb_queue_t* queue)
+tb_pointer_t tb_queue_at_head(tb_queue_t* queue)
 {
 	return tb_queue_itor_at(queue, tb_queue_itor_head(queue));
 }
-tb_void_t* tb_queue_at_last(tb_queue_t* queue)
+tb_pointer_t tb_queue_at_last(tb_queue_t* queue)
 {
 	return tb_queue_itor_at(queue, tb_queue_itor_last(queue));
 }
-tb_void_t const* tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor)
+tb_cpointer_t tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor)
 {
 	tb_assert_abort(queue && !tb_queue_null(queue) && itor < queue->maxn);
 	return queue->func.data? queue->func.data((tb_item_func_t*)&queue->func, queue->data[itor]) : queue->data[itor];
 }
-tb_void_t const* tb_queue_const_at_head(tb_queue_t const* queue)
+tb_cpointer_t tb_queue_const_at_head(tb_queue_t const* queue)
 {
 	return tb_queue_itor_const_at(queue, tb_queue_itor_head(queue));
 }
-tb_void_t const* tb_queue_const_at_last(tb_queue_t const* queue)
+tb_cpointer_t tb_queue_const_at_last(tb_queue_t const* queue)
 {
 	return tb_queue_itor_const_at(queue, tb_queue_itor_last(queue));
 }

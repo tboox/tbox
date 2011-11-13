@@ -165,7 +165,7 @@ static tb_size_t tb_fstream_offset(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->offset;
 }
-static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
+static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst, TB_FALSE);

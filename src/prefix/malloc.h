@@ -41,15 +41,15 @@ extern "C" {
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 
 # 	ifdef TB_DEBUG
-tb_void_t* 		tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t*  	tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_void_t* 		tb_memory_reallocate(tb_void_t* data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-tb_void_t 		tb_memory_deallocate(tb_void_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 		tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 		tb_memory_reallocate(tb_pointer_t data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_void_t 		tb_memory_deallocate(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 # 	else
-tb_void_t* 		tb_memory_allocate(tb_size_t size);
-tb_void_t*  	tb_memory_callocate(tb_size_t item, tb_size_t size);
-tb_void_t* 		tb_memory_reallocate(tb_void_t* data, tb_size_t size);
-tb_void_t 		tb_memory_deallocate(tb_void_t* data);
+tb_pointer_t 		tb_memory_allocate(tb_size_t size);
+tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size);
+tb_pointer_t 		tb_memory_reallocate(tb_pointer_t data, tb_size_t size);
+tb_void_t 		tb_memory_deallocate(tb_pointer_t data);
 # 	endif
 
 # 	ifdef TB_DEBUG
@@ -66,10 +66,10 @@ tb_void_t 		tb_memory_deallocate(tb_void_t* data);
 
 #else
 
-tb_void_t* 	tb_malloc(tb_size_t size);
-tb_void_t* 	tb_realloc(tb_void_t* data, tb_size_t size);
-tb_void_t* 	tb_calloc(tb_size_t item, tb_size_t size);
-tb_void_t 	tb_free(tb_void_t* data);
+tb_pointer_t 	tb_malloc(tb_size_t size);
+tb_pointer_t 	tb_realloc(tb_pointer_t data, tb_size_t size);
+tb_pointer_t 	tb_calloc(tb_size_t item, tb_size_t size);
+tb_void_t 	tb_free(tb_pointer_t data);
 
 #endif
 
@@ -78,15 +78,15 @@ tb_void_t 	tb_free(tb_void_t* data);
 #ifdef __cplusplus
 
 # 	ifdef TB_DEBUG
-__tb_inline__ tb_void_t* 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 																	{ tb_free(p); 											}
-__tb_inline__ tb_void_t* 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() 																{ tb_free(p); 											}
+__tb_inline__ tb_pointer_t 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t 	operator delete(tb_pointer_t p) throw() 																	{ tb_free(p); 											}
+__tb_inline__ tb_pointer_t 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
+__tb_inline__ tb_void_t 	operator delete[](tb_pointer_t p) throw() 																{ tb_free(p); 											}
 # 	else
-__tb_inline__ tb_void_t* 	operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
-__tb_inline__ tb_void_t 	operator delete(tb_void_t* p) throw() 	{ tb_free(p); 				}
-__tb_inline__ tb_void_t* 	operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
-__tb_inline__ tb_void_t 	operator delete[](tb_void_t* p) throw() { tb_free(p); 				}
+__tb_inline__ tb_pointer_t 	operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
+__tb_inline__ tb_void_t 	operator delete(tb_pointer_t p) throw() 	{ tb_free(p); 				}
+__tb_inline__ tb_pointer_t 	operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
+__tb_inline__ tb_void_t 	operator delete[](tb_pointer_t p) throw() { tb_free(p); 				}
 # 	endif
 
 # 	ifdef TB_DEBUG

@@ -32,7 +32,7 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
+static tb_void_t tb_hash_item_free(tb_pointer_t item, tb_pointer_t priv)
 {
 	tb_hash_t* hash = priv;
 	tb_assert_and_check_return(hash);
@@ -40,7 +40,7 @@ static tb_void_t tb_hash_item_free(tb_void_t* item, tb_void_t* priv)
 	if (hash->name_func.free) hash->name_func.free(&hash->name_func, ((tb_hash_item_t*)item)->name);
 	if (hash->data_func.free) hash->data_func.free(&hash->data_func, ((tb_hash_item_t*)item)->data);
 }
-static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_size_t* pprev, tb_size_t* pbuck)
+static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_cpointer_t name, tb_size_t* pprev, tb_size_t* pbuck)
 {
 	tb_assert_and_check_return_val(hash && hash->item_list, 0);
 	
@@ -60,7 +60,7 @@ static tb_size_t tb_hash_item_find(tb_hash_t* hash, tb_void_t const* name, tb_si
 		if (!item) break;
 
 		// get item name
-		tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+		tb_pointer_t item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
 		
 		// compare it
 		retn = hash->name_func.comp(&hash->name_func, name, item_name);
@@ -170,11 +170,11 @@ tb_void_t tb_hash_clear(tb_hash_t* hash)
 	// clear item list
 	tb_slist_clear(hash->item_list);
 }
-tb_void_t* tb_hash_at(tb_hash_t* hash, tb_void_t const* name)
+tb_pointer_t tb_hash_at(tb_hash_t* hash, tb_cpointer_t name)
 {
-	return (tb_void_t*)tb_hash_const_at(hash, name);
+	return (tb_pointer_t)tb_hash_const_at(hash, name);
 }
-tb_void_t const* tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
+tb_cpointer_t tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name)
 {
 	tb_assert_and_check_return_val(hash, TB_NULL);
 
@@ -186,7 +186,7 @@ tb_void_t const* tb_hash_const_at(tb_hash_t const* hash, tb_void_t const* name)
 	}
 	return TB_NULL;
 }
-tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
+tb_void_t tb_hash_del(tb_hash_t* hash, tb_cpointer_t name)
 {
 	tb_assert_and_check_return(hash && hash->item_list);
 
@@ -210,7 +210,7 @@ tb_void_t tb_hash_del(tb_hash_t* hash, tb_void_t const* name)
 		else if (size) while (size--) hash->hash_list[bukt - size] = next;
 	}
 }
-tb_void_t tb_hash_set(tb_hash_t* hash, tb_void_t const* name, tb_void_t const* data)
+tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(hash && hash->item_list);
 
@@ -323,8 +323,8 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 			for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor), n++)
 			{
 				tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
-				tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
-				tb_void_t* item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
+				tb_pointer_t item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+				tb_pointer_t item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
 					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i
@@ -366,8 +366,8 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 	for (; itor != tail; itor = tb_slist_itor_next(hash->item_list, itor))
 	{
 		tb_hash_item_t const* item = tb_slist_itor_const_at(hash->item_list, itor);
-		tb_void_t* item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
-		tb_void_t* item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
+		tb_pointer_t item_name = hash->name_func.data? hash->name_func.data(&hash->name_func, item->name) : item->name;
+		tb_pointer_t item_data = hash->data_func.data? hash->data_func.data(&hash->data_func, item->data) : item->data;
 
 		if (hash->name_func.cstr && hash->data_func.cstr) 
 			tb_print("item[%d]:\t%s\t\t=> %s", itor

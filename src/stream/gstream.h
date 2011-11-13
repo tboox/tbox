@@ -201,8 +201,8 @@ typedef struct __tb_gstream_t
 
 	// ioctl
 	tb_bool_t 			(*ioctl0)(struct __tb_gstream_t* gst, tb_size_t cmd);
-	tb_bool_t 			(*ioctl1)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1);
-	tb_bool_t 			(*ioctl2)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2);
+	tb_bool_t 			(*ioctl1)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
+	tb_bool_t 			(*ioctl2)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
 
 }tb_gstream_t;
 
@@ -299,8 +299,8 @@ tb_size_t 			tb_gstream_offset(tb_gstream_t const* gst);
 
 // ioctl
 tb_bool_t 			tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 			tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1);
-tb_bool_t 			tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1, tb_void_t* arg2);
+tb_bool_t 			tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
+tb_bool_t 			tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
 
 // c plus plus
 #ifdef __cplusplus

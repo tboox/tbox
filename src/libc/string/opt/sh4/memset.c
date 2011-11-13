@@ -47,7 +47,7 @@ static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 	if (!n) return s;
@@ -149,7 +149,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 
@@ -270,7 +270,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v3(tb_uint32_t* s, tb_uint32_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-tb_void_t* tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 

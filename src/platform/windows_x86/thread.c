@@ -31,7 +31,7 @@
  * implemention
  */
 
-tb_handle_t tb_thread_open(tb_char_t const* name, tb_void_t* (*callback)(tb_void_t*), tb_void_t* param, tb_size_t stack_size)
+tb_handle_t tb_thread_open(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t param, tb_size_t stack_size)
 {
 	HANDLE hthread = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)callback, (LPVOID)param, 0, NULL);
 	return ((hthread != INVALID_HANDLE_VALUE)? hthread : TB_NULL);
@@ -51,7 +51,7 @@ tb_bool_t tb_thread_terminate(tb_handle_t hthread)
 	if (hthread) return TerminateThread(hthread, 0)? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
-tb_void_t tb_thread_exit(tb_void_t* retval)
+tb_void_t tb_thread_exit(tb_pointer_t retval)
 {
 	ExitThread(0);
 }

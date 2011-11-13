@@ -74,7 +74,7 @@ typedef struct __tb_xml_node_t
 	tb_string_t 				value;
 
 	// the reference to the document
-	tb_void_t* 						document;
+	tb_pointer_t 						document;
 
 	// the next & prev
 	struct __tb_xml_node_t* 	prev;
@@ -144,11 +144,11 @@ typedef struct __tb_xml_attribute_t
  */
 
 // init & uninit
-tb_void_t 			tb_xml_node_init(tb_xml_node_t* node, tb_void_t* document, tb_size_t type);
+tb_void_t 			tb_xml_node_init(tb_xml_node_t* node, tb_pointer_t document, tb_size_t type);
 tb_void_t 			tb_xml_node_uninit(tb_xml_node_t* node);
 
 // create & destroy
-tb_xml_node_t* 	tb_xml_node_create(tb_void_t* document, tb_size_t type);
+tb_xml_node_t* 	tb_xml_node_create(tb_pointer_t document, tb_size_t type);
 tb_void_t 			tb_xml_node_destroy(tb_xml_node_t* node);
 
 // childs

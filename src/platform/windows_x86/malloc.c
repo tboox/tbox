@@ -31,19 +31,19 @@
  * implemention
  */
 
-tb_void_t* tb_malloc(tb_size_t size)
+tb_pointer_t tb_malloc(tb_size_t size)
 {
 	return malloc(size);
 }
-tb_void_t* tb_calloc(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_calloc(tb_size_t item, tb_size_t size)
 {
 	return calloc(item, size);
 }
-tb_void_t* tb_realloc(tb_void_t* data, tb_size_t size)
+tb_pointer_t tb_realloc(tb_pointer_t data, tb_size_t size)
 {
 	return realloc(data, size);
 }
-tb_void_t tb_free(tb_void_t* data)
+tb_void_t tb_free(tb_pointer_t data)
 {
 	if (data) free(data);
 }

@@ -43,13 +43,13 @@
  * implemention 
  */
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
-tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 	return memset(s, c, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
-tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 
@@ -77,7 +77,7 @@ tb_void_t* tb_memset(tb_void_t* s, tb_size_t c, tb_size_t n)
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U16
-tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 
@@ -109,7 +109,7 @@ tb_void_t* tb_memset_u16(tb_void_t* s, tb_size_t c, tb_size_t n)
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U24
-tb_void_t* tb_memset_u24(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 
@@ -141,7 +141,7 @@ tb_void_t* tb_memset_u24(tb_void_t* s, tb_size_t c, tb_size_t n)
 #endif
 
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U32
-tb_void_t* tb_memset_u32(tb_void_t* s, tb_size_t c, tb_size_t n)
+tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
 

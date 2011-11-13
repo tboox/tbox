@@ -72,7 +72,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	tb_int64_t t = tb_mclock();
 	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
 	{
-		__tb_volatile__ tb_void_t const* item = tb_queue_itor_const_at(queue, itor);
+		__tb_volatile__ tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
 	}
 	t = tb_int64_sub(tb_mclock(), t);
 
@@ -97,7 +97,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	tb_int64_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_void_t const* item = tb_queue_itor_const_at(queue, itor);
+		__tb_volatile__ tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
 
 		if (itor == head) break;
 		itor = tb_queue_itor_prev(queue, itor);

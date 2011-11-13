@@ -40,17 +40,33 @@ extern "C" {
 
 // the callback type
 struct __tb_item_func_t;
-typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_void_t* item);
-typedef tb_void_t* 			(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_void_t const* item);
-typedef tb_void_t* 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_void_t const* data);
-typedef tb_void_t* 			(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_void_t* item, tb_void_t const* data);
-typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_void_t const* data, tb_char_t* cstr, tb_size_t maxn);
-typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_void_t const* data, tb_size_t size);
-typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_void_t const* rdata, tb_void_t const* ldata);
+typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_pointer_t item);
+typedef tb_pointer_t 		(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t item);
+typedef tb_pointer_t 		(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_cpointer_t data);
+typedef tb_pointer_t 		(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
+typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn);
+typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t size);
+typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t rdata, tb_cpointer_t ldata);
+
+// the item type
+typedef enum __tb_item_type_t
+{
+	TB_ITEM_TYPE_NUL 	= 0 	//!< null
+,	TB_ITEM_TYPE_STR 	= 1 	//!< c-string
+,	TB_ITEM_TYPE_INT 	= 2 	//!< integer
+,	TB_ITEM_TYPE_PTR 	= 3 	//!< pointer
+,	TB_ITEM_TYPE_EFM 	= 4 	//!< external fixed memory
+,	TB_ITEM_TYPE_IFM 	= 5 	//!< internal fixed memory
+,	TB_ITEM_TYPE_OTR 	= 6 	//!< other
+
+}tb_item_type_t;
 
 // the item func type
 typedef struct __tb_item_func_t
 {
+	// the item type
+	tb_size_t 				type;
+
 	// the item func
 	tb_item_func_hash_t 	hash;
 	tb_item_func_comp_t 	comp;
@@ -61,13 +77,13 @@ typedef struct __tb_item_func_t
 	tb_item_func_cstr_t 	cstr;
 
 	// the item pool
-	tb_void_t* 				pool;
+	tb_pointer_t 			pool;
 
 	// the item size
 	tb_size_t 				size;
 
 	// the priv data
-	tb_void_t* 				priv;
+	tb_pointer_t 			priv;
 
 }tb_item_func_t;
 
@@ -101,10 +117,10 @@ tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_fpool_t* fpool);
 
 /* the internal fixed memory item function
  *
- * storing it in the internal item of the container directly
+ * storing it in the internal item of the container directly for saving memory
  *
  */
-tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_void_t* priv);
+tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_pointer_t priv);
 
 // c plus plus
 #ifdef __cplusplus

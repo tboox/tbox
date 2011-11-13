@@ -45,7 +45,7 @@ extern "C" {
 #ifdef __cplusplus
 # 	define TB_NULL 					(0)
 #else
-# 	define TB_NULL 					((tb_void_t*)0)
+# 	define TB_NULL 					((tb_pointer_t)0)
 #endif
 
 // check config
@@ -79,9 +79,9 @@ typedef tb_int32_t 				tb_wchar_t;
 typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
-typedef tb_void_t* 				tb_handle_t;
 typedef tb_void_t* 				tb_pointer_t;
 typedef tb_void_t const* 		tb_cpointer_t;
+typedef tb_pointer_t 			tb_handle_t;
 
 // int64
 #ifdef TB_CONFIG_TYPE_INT64

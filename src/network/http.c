@@ -1004,7 +1004,7 @@ tb_bool_t tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_
 	http->option.post_size = size;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_void_t* ), tb_void_t* head_priv)
+tb_bool_t tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv)
 {
 	tb_assert_and_check_return_val(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;

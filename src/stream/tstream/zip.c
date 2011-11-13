@@ -85,7 +85,7 @@ static tb_void_t tb_zstream_close(tb_gstream_t* gst)
 	// close tstream
 	tb_tstream_close(gst);
 }
-static tb_bool_t tb_zstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_void_t* arg1)
+static tb_bool_t tb_zstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst, TB_FALSE);
@@ -207,13 +207,13 @@ tb_gstream_t* tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 	tb_assert_and_check_return_val(zst, TB_NULL);
 
 	// set gstream
-	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_TSTREAM_CMD_SET_GSTREAM, (tb_void_t*)gst)) goto fail;
+	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_TSTREAM_CMD_SET_GSTREAM, (tb_pointer_t)gst)) goto fail;
 		
 	// set zip algorithm
-	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_ZSTREAM_CMD_SET_ALGO, (tb_void_t*)algo)) goto fail;
+	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_ZSTREAM_CMD_SET_ALGO, (tb_pointer_t)algo)) goto fail;
 		
 	// set zip action
-	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_ZSTREAM_CMD_SET_ACTION, (tb_void_t*)action)) goto fail;
+	if (TB_FALSE == tb_gstream_ioctl1(zst, TB_ZSTREAM_CMD_SET_ACTION, (tb_pointer_t)action)) goto fail;
 	
 	return zst;
 
