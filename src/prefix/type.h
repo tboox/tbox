@@ -80,6 +80,8 @@ typedef tb_int32_t 				tb_uchar_t;
 typedef tb_uint8_t				tb_byte_t;
 typedef void 					tb_void_t;
 typedef tb_void_t* 				tb_handle_t;
+typedef tb_void_t* 				tb_pointer_t;
+typedef tb_void_t const* 		tb_cpointer_t;
 
 // int64
 #ifdef TB_CONFIG_TYPE_INT64

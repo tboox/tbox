@@ -13,15 +13,15 @@
  * details
  */
 
-static tb_void_t tb_dlist_int_dump(tb_dlist_t const* dlist)
+static tb_void_t tb_dlist_efm_dump(tb_dlist_t const* dlist)
 {
 	tb_trace("size: %d, maxn: %d", tb_dlist_size(dlist), tb_dlist_maxn(dlist));
 	tb_size_t itor = tb_dlist_itor_head(dlist);
 	tb_size_t tail = tb_dlist_itor_tail(dlist);
 	for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
 	{
-		tb_size_t item = (tb_size_t)tb_dlist_itor_const_at(dlist, itor);
-		tb_trace("at[%d]: %x", itor, item);
+		tb_char_t const* item = tb_dlist_itor_const_at(dlist, itor);
+		tb_trace("at[%d]: %s", itor, item);
 	}
 }
 static tb_size_t tb_dlist_insert_test()
@@ -556,7 +556,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// init dlist
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
 	tb_assert_and_check_goto(dlist, end);
 
 	tb_size_t 			i = 0;
@@ -564,29 +564,29 @@ int main(int argc, char** argv)
 
 	tb_trace("=============================================================");
 	tb_trace("insert:");
-	tb_dlist_ninsert_head(dlist, 0xa, 10);
-	i = tb_dlist_ninsert_tail(dlist, 0xf, 10);
-	j = tb_dlist_insert(dlist, i, 0);
-	tb_dlist_insert(dlist, i, 1);
-	tb_dlist_insert(dlist, i, 2);
-	tb_dlist_insert(dlist, i, 3);
-	tb_dlist_insert(dlist, i, 4);
-	tb_dlist_insert(dlist, i, 5);
-	tb_dlist_insert(dlist, i, 6);
-	tb_dlist_insert(dlist, i, 7);
-	tb_dlist_insert(dlist, i, 8);
-	tb_dlist_insert(dlist, i, 9);
-	tb_dlist_insert_head(dlist, 4);
-	tb_dlist_insert_head(dlist, 3);
-	tb_dlist_insert_head(dlist, 2);
-	tb_dlist_insert_head(dlist, 1);
-	tb_dlist_insert_head(dlist, 0);
-	tb_dlist_insert_tail(dlist, 5);
-	tb_dlist_insert_tail(dlist, 6);
-	tb_dlist_insert_tail(dlist, 7);
-	tb_dlist_insert_tail(dlist, 8);
-	tb_dlist_insert_tail(dlist, 9);
-	tb_dlist_int_dump(dlist);
+	tb_dlist_ninsert_head(dlist, "HHHHHHHHHH", 10);
+	i = tb_dlist_ninsert_tail(dlist, "TTTTTTTTTT", 10);
+	j = tb_dlist_insert(dlist, i, "0000000000");
+	tb_dlist_insert(dlist, i, "1111111111");
+	tb_dlist_insert(dlist, i, "2222222222");
+	tb_dlist_insert(dlist, i, "3333333333");
+	tb_dlist_insert(dlist, i, "4444444444");
+	tb_dlist_insert(dlist, i, "5555555555");
+	tb_dlist_insert(dlist, i, "6666666666");
+	tb_dlist_insert(dlist, i, "7777777777");
+	tb_dlist_insert(dlist, i, "8888888888");
+	tb_dlist_insert(dlist, i, "9999999999");
+	tb_dlist_insert_head(dlist, "4444444444");
+	tb_dlist_insert_head(dlist, "3333333333");
+	tb_dlist_insert_head(dlist, "2222222222");
+	tb_dlist_insert_head(dlist, "1111111111");
+	tb_dlist_insert_head(dlist, "0000000000");
+	tb_dlist_insert_tail(dlist, "5555555555");
+	tb_dlist_insert_tail(dlist, "6666666666");
+	tb_dlist_insert_tail(dlist, "7777777777");
+	tb_dlist_insert_tail(dlist, "8888888888");
+	tb_dlist_insert_tail(dlist, "9999999999");
+	tb_dlist_efm_dump(dlist);
 
 	tb_trace("=============================================================");
 	tb_trace("remove:");
@@ -602,20 +602,20 @@ int main(int argc, char** argv)
 	j = tb_dlist_remove(dlist, j);
 	j = tb_dlist_remove(dlist, j);
 	j = tb_dlist_remove(dlist, j);	
-	tb_dlist_int_dump(dlist);
+	tb_dlist_efm_dump(dlist);
 
 	tb_trace("=============================================================");
 	tb_trace("replace:");
-	tb_dlist_nreplace_head(dlist, 0xf, 10);
-	tb_dlist_nreplace_last(dlist, 0xa, 10);
-	tb_dlist_replace_head(dlist, 0);
-	tb_dlist_replace_last(dlist, 0);
-	tb_dlist_int_dump(dlist);
+	tb_dlist_nreplace_head(dlist, "TTTTTTTTTT", 10);
+	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
+	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
+	tb_dlist_replace_last(dlist, "OOOOOOOOOO");
+	tb_dlist_efm_dump(dlist);
 
 	tb_trace("=============================================================");
 	tb_trace("clear:");
 	tb_dlist_clear(dlist);
-	tb_dlist_int_dump(dlist);
+	tb_dlist_efm_dump(dlist);
 
 	tb_size_t score = 0;
 	tb_trace("=============================================================");
