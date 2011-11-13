@@ -211,7 +211,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 	// init node
 	pnode->prev = 0;
 	pnode->next = 0;
-	pnode->data = dlist->func.dupl? dlist->func.dupl(&dlist->func, data) : data;
+//	pnode->data = dlist->func.dupl? dlist->func.dupl(&dlist->func, data) : data;
 
 	// is null?
 	if (!dlist->head && !dlist->last)
@@ -328,7 +328,7 @@ tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data
 	tb_assert_and_check_return_val(item, itor);
 
 	// copy data to item
-	item->data = dlist->func.copy? dlist->func.copy(&dlist->func, item->data, data) : data;
+//	item->data = dlist->func.copy? dlist->func.copy(&dlist->func, item->data, data) : data;
 
 	return itor;
 }

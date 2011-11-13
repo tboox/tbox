@@ -226,7 +226,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 		if (it) 
 		{
 			// set data 
-			it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
+			//it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
 		}
 	}
 	else 
@@ -247,10 +247,10 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 			if (it) 
 			{
 				// set name
-				it->name = hash->name_func.dupl? hash->name_func.dupl(&hash->name_func, name) : name;
+				//it->name = hash->name_func.dupl? hash->name_func.dupl(&hash->name_func, name) : name;
 
 				// set data
-				it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
+				//it->data = hash->data_func.dupl? hash->data_func.dupl(&hash->data_func, data) : data;
 			}
 
 			// update hash list
