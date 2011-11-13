@@ -228,7 +228,7 @@ static tb_void_t tb_hash_test_m2m_func()
 	tb_size_t const	step = 256;
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
-	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_mem(step, TB_NULL), tb_item_func_mem(step, TB_NULL));
+	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_efm(step, TB_NULL), tb_item_func_efm(step, TB_NULL));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -340,7 +340,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
 	tb_fpool_t* 	pool = tb_fpool_init(step, 256, 256, TB_NULL);
-	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_mem(step, pool), tb_item_func_mem(step, pool));
+	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
 	tb_assert_and_check_return(hash);
 
 	// performance

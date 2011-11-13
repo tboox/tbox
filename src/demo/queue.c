@@ -6,7 +6,7 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_queue_mem_dump(tb_queue_t const* queue)
+static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
 {
 	tb_trace("size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_queue_itor_head(queue);
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 	// init queue
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_mem(11, tb_fpool_init(11, 256, 256, TB_NULL)));
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
 	tb_assert_and_check_goto(queue, end);
 
 	tb_trace("=============================================================");
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 	tb_queue_put(queue, "7777777777");
 	tb_queue_put(queue, "8888888888");
 	tb_queue_put(queue, "9999999999");
-	tb_queue_mem_dump(queue);
+	tb_queue_efm_dump(queue);
 
 	tb_trace("=============================================================");
 	tb_trace("pop:");
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
-	tb_queue_mem_dump(queue);
+	tb_queue_efm_dump(queue);
 
 	tb_trace("=============================================================");
 	tb_trace("put:");
@@ -154,12 +154,12 @@ int main(int argc, char** argv)
 	tb_queue_put(queue, "2222222222");
 	tb_queue_put(queue, "3333333333");
 	tb_queue_put(queue, "4444444444");
-	tb_queue_mem_dump(queue);
+	tb_queue_efm_dump(queue);
 
 	tb_trace("=============================================================");
 	tb_trace("clear:");
 	tb_queue_clear(queue);
-	tb_queue_mem_dump(queue);
+	tb_queue_efm_dump(queue);
 
 	tb_size_t score = 0;
 	tb_trace("=============================================================");
