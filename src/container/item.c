@@ -24,6 +24,8 @@
  * includes
  */
 #include "item.h"
+#include "spool.h"
+#include "fpool.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 #include "../platform/platform.h"

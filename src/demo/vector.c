@@ -665,7 +665,7 @@ static tb_void_t tb_vector_efm_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_efm_test()
 {
-	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
+	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(256, 256, tb_item_func_ifm(11, TB_NULL, TB_NULL))));
 	tb_assert_and_check_return(vector);
 
 	tb_print("=============================================================");

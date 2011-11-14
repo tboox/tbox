@@ -20,8 +20,8 @@
  * \file		fpool.h
  *
  */
-#ifndef TB_CONTAINER_GPOOL_H
-#define TB_CONTAINER_GPOOL_H
+#ifndef TB_CONTAINER_FPOOL_H
+#define TB_CONTAINER_FPOOL_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -32,37 +32,24 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "item.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
 
 // prediction
-#define TB_GPOOL_PRED_ENABLE
+#define TB_FPOOL_PRED_ENABLE
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_GPOOL_PRED_MAX 					(128)
+# 	define TB_FPOOL_PRED_MAX 					(128)
 #else
-# 	define TB_GPOOL_PRED_MAX 					(256)
+# 	define TB_FPOOL_PRED_MAX 					(256)
 #endif
 
 /* /////////////////////////////////////////////////////////
  * types
  */
-
-// the item func
-typedef tb_void_t 	(*tb_fpool_item_free_func_t)(tb_pointer_t item, tb_pointer_t priv);	
-
-// the fpool item func type
-typedef struct __tb_fpool_item_func_t
-{
-	// the item func
-	tb_fpool_item_free_func_t 	free;
-
-	// the priv data
-	tb_pointer_t 					priv;
-
-}tb_fpool_item_func_t;
 
 // the fixed pool type, valid index > 0, 0: is end for list
 typedef struct __tb_fpool_t
@@ -72,11 +59,10 @@ typedef struct __tb_fpool_t
 	tb_size_t 				size;
 	tb_size_t 				grow;
 	tb_size_t 				maxn;
-	tb_size_t 				step;
 
 	// predict the next free block
-#ifdef TB_GPOOL_PRED_ENABLE
-	tb_size_t 				pred[TB_GPOOL_PRED_MAX];
+#ifdef TB_FPOOL_PRED_ENABLE
+	tb_size_t 				pred[TB_FPOOL_PRED_MAX];
 	tb_size_t 				pred_n;
 
 # 	ifdef TB_DEBUG
@@ -87,7 +73,7 @@ typedef struct __tb_fpool_t
 #endif
 
 	// func
-	tb_fpool_item_func_t 	func;
+	tb_item_func_t 			func;
 
 }tb_fpool_t;
 
@@ -96,7 +82,7 @@ typedef struct __tb_fpool_t
  */
 
 // init & exit
-tb_fpool_t* 		tb_fpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_fpool_item_func_t const* func);
+tb_fpool_t* 		tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func);
 tb_void_t 			tb_fpool_exit(tb_fpool_t* fpool);
 
 // modifiors

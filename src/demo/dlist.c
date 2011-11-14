@@ -702,7 +702,7 @@ static tb_void_t tb_dlist_efm_dump(tb_dlist_t const* dlist)
 }
 static tb_void_t tb_dlist_efm_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(11, 256, 256, TB_NULL)));
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(256, 256, tb_item_func_ifm(11, TB_NULL, TB_NULL))));
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
