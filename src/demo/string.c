@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 	tb_string_append_char(&s1, ' ');
 	tb_string_append_c_string(&s1, "world");
 	tb_string_append_format(&s1, "%s", "...");
-	tb_trace("%s", tb_string_c_string(&s1));
+	tb_print("%s", tb_string_c_string(&s1));
 
 	tb_string_t s2;
 	tb_string_init(&s2);
@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	tb_string_append_c_string(&s2, "world");
 	tb_string_assign_c_string_by_ref(&s2, "hello");
 	tb_string_append_format(&s2, "%s", "...");
-	tb_trace("%s", tb_string_c_string(&s2));
+	tb_print("%s", tb_string_c_string(&s2));
 
 	tb_stack_string_t s3;
 	tb_string_init_stack_string(&s3);
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	tb_string_append_c_string(&s3, "world");
 	tb_string_assign_c_string_by_ref(&s3, "hello");
 	tb_string_append_format(&s3, "%s", "...");
-	tb_trace("%s", tb_string_c_string(&s3));
+	tb_print("%s", tb_string_c_string(&s3));
 
 	tb_string_uninit(&s1);
 	tb_string_uninit(&s2);

@@ -497,7 +497,7 @@ static tb_bool_t tb_cookies_path_ischild(tb_char_t const* parent, tb_char_t cons
 // the dtor of string
 static tb_void_t tb_cookies_spool_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	if (data) 
+	if (item) 
 	{
 		tb_cookie_string_t* s = (tb_cookie_string_t*)item;
 		//TB_COOKIES_DBG("[string]::dtor: %s", s->data? s->data : "");

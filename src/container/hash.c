@@ -32,11 +32,11 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_hash_item_free(tb_pointer_t item, tb_pointer_t priv)
+static tb_void_t tb_hash_item_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_hash_t* hash = priv;
-	tb_assert_and_check_return(hash);
+	tb_assert_and_check_return(func && func->priv);
 
+	tb_hash_t* hash = func->priv;
 	if (hash->name_func.free) hash->name_func.free(&hash->name_func, item);
 	if (hash->data_func.free) hash->data_func.free(&hash->data_func, (tb_byte_t*)item + hash->name_func.size);
 }
@@ -128,10 +128,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	hash->data_func = data_func;
 
 	// init item list
-	tb_slist_item_func_t func;
-	func.free = tb_hash_item_free;
-	func.priv = hash;
-	hash->item_list = tb_slist_init(name_func.size + data_func.size, size, &func);
+	hash->item_list = tb_slist_init(size, tb_item_func_ifm(name_func.size + data_func.size, tb_hash_item_free, hash));
 	tb_assert_and_check_goto(hash->item_list, fail);
 
 	// init hash list
