@@ -123,10 +123,9 @@ tb_pointer_t tb_slist_at_last(tb_slist_t* slist)
 }
 tb_cpointer_t tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t itor)
 {
-	tb_assert_abort(slist && slist->pool);
-	tb_byte_t const* data = tb_fpool_get(slist->pool, itor);
-	tb_assert_abort(data);
-	return (data + sizeof(tb_size_t));
+	tb_assert_and_check_return_val(slist && slist->pool, TB_NULL);
+	tb_slist_item_t const* item = tb_fpool_get(slist->pool, itor);
+	return item? slist->func.data(&slist->func, &item[1]) : TB_NULL;
 }
 tb_cpointer_t tb_slist_const_at_head(tb_slist_t const* slist)
 {
@@ -138,29 +137,27 @@ tb_cpointer_t tb_slist_const_at_last(tb_slist_t const* slist)
 }
 tb_size_t tb_slist_itor_head(tb_slist_t const* slist)
 {
-	tb_assert_abort(slist);
+	tb_assert_and_check_return_val(slist, 0);
 	return slist->head;
 }
 tb_size_t tb_slist_itor_last(tb_slist_t const* slist)
 {
-	tb_assert_abort(slist);
+	tb_assert_and_check_return_val(slist, 0);
 	return slist->last;
 }
 tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 {
-	tb_assert_abort(slist);
 	return 0;
 }
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
-	tb_assert_abort(slist && slist->pool);
-	tb_byte_t const* data = tb_fpool_get(slist->pool, itor);
-	tb_assert_abort(data);
-	return tb_bits_get_u32_ne(data);
+	tb_assert_and_check_return_val(slist && slist->pool, 0);
+	tb_slist_item_t const* item = tb_fpool_get(slist->pool, itor);
+	return item? item->next : 0;
 }
 tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 {
-	tb_assert_abort(slist);
+	tb_assert_and_check_return_val(slist, 0);
 
 	// is tail?
 	tb_size_t prev = 0;
@@ -180,30 +177,30 @@ tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 tb_size_t tb_slist_size(tb_slist_t const* slist)
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	return slist->pool->size;
+	return tb_fpool_size(slist->pool);
 }
 tb_size_t tb_slist_maxn(tb_slist_t const* slist)
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	return slist->pool->maxn;
+	return tb_fpool_maxn(slist->pool);
 }
 /* insert node:
  *
- * index == a: 
+ * itor == a: 
  * before: [a] => ... => [b] => [0]
  *         head         last   tail
  *
  * after:  [node] => [a] => ... => [b] => [0]
  *          head                  last    tail
  *
- * index == b: 
+ * itor == b: 
  * before: [a] => ... => [b] => [c] => [0]
  *         head                last   tail
  *
  * after:  [a] => ... => [node] => [b] => [c] => [0]
  *         head                          last   tail
  *
- * index == 0: 
+ * itor == 0: 
  * before: [a] => ... => [b] => [0]
  *         head         last   tail
  *
@@ -211,12 +208,12 @@ tb_size_t tb_slist_maxn(tb_slist_t const* slist)
  *         head                  last    tail
  *
  */
-tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item)
+tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
-	return tb_slist_insert_next(slist, tb_slist_itor_prev(slist, index), item);
+	return tb_slist_insert_next(slist, tb_slist_itor_prev(slist, itor), data);
 }
 
-tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item)
+tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
 
@@ -225,18 +222,15 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t
 	tb_assert_and_check_return_val(node, 0);
 
 	// get the node data
-	tb_byte_t* pnode = tb_fpool_get(slist->pool, node);
-	tb_assert_abort(pnode);
+	tb_slist_item_t* pnode = tb_fpool_get(slist->pool, node);
+	tb_assert_and_check_return_val(pnode, 0);
 
 	// init node, inode => 0
-	tb_bits_set_u32_ne(pnode, 0);
-
-	// copy the item data
-	if (item) tb_memcpy(pnode + sizeof(tb_size_t), item, slist->step);
-	else tb_memset(pnode + sizeof(tb_size_t), 0, slist->step);
+	pnode->next = 0;
+	slist->func.dupl(&slist->func, &pnode[1], data);
 
 	// the prev node
-	tb_size_t prev = index;
+	tb_size_t prev = itor;
 
 	// non-empty?
 	if (slist->head)
@@ -245,7 +239,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t
 		if (!prev)
 		{
 			// node => head
-			tb_bits_set_u32_ne(pnode, slist->head);
+			pnode->next = slist->head;
 
 			// update head
 			slist->head = node;
@@ -254,11 +248,11 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t
 		else if (prev == slist->last)
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
-			tb_assert_abort(pprev);
+			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_assert_and_check_return_val(pprev, 0);
 
 			// last => node => null
-			tb_bits_set_u32_ne(pprev, node);
+			pprev->next = node;
 
 			// update last
 			slist->last = node;
@@ -267,21 +261,21 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t
 		else
 		{
 			// the prev data
-			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
-			tb_assert_abort(pprev);
+			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_assert_and_check_return_val(pprev, 0);
 
 			// node => next
-			tb_bits_set_u32_ne(pnode, tb_bits_get_u32_ne(pprev));
+			pnode->next = pprev->next;
 
 			// prev => node
-			tb_bits_set_u32_ne(pprev, node);
+			pprev->next = node;
 		}
 	}
 	// empty?
 	else
 	{
 		// must be zero
-		tb_assert(!prev);
+		tb_assert_and_check_return_val(!prev, 0);
 
 		// update head
 		slist->head = node;
@@ -294,72 +288,73 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t
 	return node;
 }
 
-tb_size_t tb_slist_insert_head(tb_slist_t* slist, tb_cpointer_t item)
+tb_size_t tb_slist_insert_head(tb_slist_t* slist, tb_cpointer_t data)
 {
-	return tb_slist_insert(slist, tb_slist_itor_head(slist), item);
+	return tb_slist_insert(slist, tb_slist_itor_head(slist), data);
 }
-tb_size_t tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t item)
+tb_size_t tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t data)
 {
-	return tb_slist_insert(slist, tb_slist_itor_tail(slist), item);
+	return tb_slist_insert(slist, tb_slist_itor_tail(slist), data);
 }
-tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_ninsert_next(slist, tb_slist_itor_prev(slist, index), item, size);
+	return tb_slist_ninsert_next(slist, tb_slist_itor_prev(slist, itor), data, size);
 }
-tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(slist && size, 0);
 
 	// insert items
-	tb_size_t node = index;
-	while (size--) node = tb_slist_insert_next(slist, index, item);
+	tb_size_t node = itor;
+	while (size--) node = tb_slist_insert_next(slist, itor, data);
 
-	// return the first index
+	// return the first itor
 	return node;
 }
-tb_size_t tb_slist_ninsert_head(tb_slist_t* slist, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_ninsert_head(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_ninsert(slist, tb_slist_itor_head(slist), item, size);
+	return tb_slist_ninsert(slist, tb_slist_itor_head(slist), data, size);
 }
-tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_ninsert(slist, tb_slist_itor_tail(slist), item, size);
+	return tb_slist_ninsert(slist, tb_slist_itor_tail(slist), data, size);
 }
-tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item)
+tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
-	tb_pointer_t data = tb_slist_itor_at(slist, index);
-	tb_assert_and_check_return_val(data && item && slist->pool, index);
-	
-	// do free
-	if (slist->func.free) slist->func.free(data, slist->func.priv);
+	tb_assert_and_check_return_val(slist && slist->pool, itor);
 
-	// copy data
-	tb_memcpy(data, item, slist->step);
-	return index;
-}
-tb_size_t tb_slist_replace_head(tb_slist_t* slist, tb_cpointer_t item)
-{
-	return tb_slist_replace(slist, tb_slist_itor_head(slist), item);
-}
-tb_size_t tb_slist_replace_last(tb_slist_t* slist, tb_cpointer_t item)
-{
-	return tb_slist_replace(slist, tb_slist_itor_last(slist), item);
-}
-tb_size_t tb_slist_nreplace(tb_slist_t* slist, tb_size_t index, tb_cpointer_t item, tb_size_t size)
-{
-	tb_assert_and_check_return_val(slist && item && size, index);
+	// get item
+	tb_slist_item_t* item = tb_fpool_get(slist->pool, itor);
+	tb_assert_and_check_return_val(item, itor);
 
-	tb_size_t itor = index;
+	// copy data to item
+	slist->func.copy(&slist->func, &item[1], data);
+
+	return itor;
+}
+tb_size_t tb_slist_replace_head(tb_slist_t* slist, tb_cpointer_t data)
+{
+	return tb_slist_replace(slist, tb_slist_itor_head(slist), data);
+}
+tb_size_t tb_slist_replace_last(tb_slist_t* slist, tb_cpointer_t data)
+{
+	return tb_slist_replace(slist, tb_slist_itor_last(slist), data);
+}
+tb_size_t tb_slist_nreplace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(slist && size, itor);
+
+	tb_size_t head = itor;
 	tb_size_t tail = tb_slist_itor_tail(slist);
 	for (; size-- && itor != tail; itor = tb_slist_itor_next(slist, itor)) 
-		tb_slist_replace(slist, itor, item);
-	return index;
+		tb_slist_replace(slist, itor, data);
+	return head;
 }
-tb_size_t tb_slist_nreplace_head(tb_slist_t* slist, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_nreplace_head(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_nreplace(slist, tb_slist_itor_head(slist), item, size);
+	return tb_slist_nreplace(slist, tb_slist_itor_head(slist), data, size);
 }
-tb_size_t tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t item, tb_size_t size)
+tb_size_t tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
 	// compute offset
 	tb_size_t n = tb_slist_size(slist);
@@ -371,11 +366,11 @@ tb_size_t tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t item, tb_size_
 	for (; o-- && itor != tail; itor = tb_slist_itor_next(slist, itor)) ;
 
 	// replace
-	return tb_slist_nreplace(slist, itor, item, size);
+	return tb_slist_nreplace(slist, itor, data, size);
 }
 /* remove node:
  *
- * index == node: 
+ * itor == node: 
  * before: [node] => [a] => ... => [b] => [0]
  *          head                  last    tail
 
@@ -383,13 +378,13 @@ tb_size_t tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t item, tb_size_
  *         head         last   tail
  *
  *
- * index == node: 
+ * itor == node: 
  * before: [a] => ... => [node] => [b] => [c] => [0]
  *         head                          last   tail
  * after:  [a] => ... => [b] => [c] => [0]
  *         head                last   tail
  *
- * index == node: 
+ * itor == node: 
  * before: [a] => ... => [b] => [node] => [0]
  *         head                  last    tail
  * after:  [a] => ... => [b] => [0]
@@ -397,16 +392,16 @@ tb_size_t tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t item, tb_size_
  *
  *
  */
-tb_size_t tb_slist_remove(tb_slist_t* slist, tb_size_t index)
+tb_size_t tb_slist_remove(tb_slist_t* slist, tb_size_t itor)
 {	
-	return tb_slist_remove_next(slist, tb_slist_itor_prev(slist, index));
+	return tb_slist_remove_next(slist, tb_slist_itor_prev(slist, itor));
 }
-tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
+tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(slist && slist->pool, index);
+	tb_assert_and_check_return_val(slist && slist->pool, itor);
 
 	// the prev node
-	tb_size_t prev = index;
+	tb_size_t prev = itor;
 
 	// non-empty?
 	if (slist->head)
@@ -439,21 +434,21 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 			midd = tb_slist_itor_next(slist, prev);
 
 			// get the prev data
-			tb_byte_t* pprev = tb_fpool_get(slist->pool, prev);
-			tb_assert_abort(pprev);
+			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_assert_and_check_return_val(pprev, 0);
 
 			// the next node
 			next = tb_slist_itor_next(slist, midd);
 
 			// prev => next
-			tb_bits_set_u32_ne(pprev, next);
+			pprev->next = next;
 
 			// update last if midd is last
 			if (midd == slist->last) slist->last = next = prev;
 		}
 
 		// check
-		tb_assert_abort(midd);
+		tb_assert_and_check_return_val(midd, 0);
 
 		// free node
 		tb_fpool_del(slist->pool, midd);
@@ -462,7 +457,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t index)
 		return next;
 	}
 
-	return index;
+	return itor;
 }
 tb_size_t tb_slist_remove_head(tb_slist_t* slist)
 {
@@ -472,16 +467,16 @@ tb_size_t tb_slist_remove_last(tb_slist_t* slist)
 {
 	return tb_slist_remove(slist, tb_slist_itor_last(slist));
 }
-tb_size_t tb_slist_nremove(tb_slist_t* slist, tb_size_t index, tb_size_t size)
+tb_size_t tb_slist_nremove(tb_slist_t* slist, tb_size_t itor, tb_size_t size)
 {
-	return tb_slist_nremove_next(slist, tb_slist_itor_prev(slist, index), size);
+	return tb_slist_nremove_next(slist, tb_slist_itor_prev(slist, itor), size);
 }
-tb_size_t tb_slist_nremove_next(tb_slist_t* slist, tb_size_t index, tb_size_t size)
+tb_size_t tb_slist_nremove_next(tb_slist_t* slist, tb_size_t itor, tb_size_t size)
 {
-	tb_assert_and_check_return_val(slist && size, index);
+	tb_assert_and_check_return_val(slist && size, itor);
 
-	tb_size_t next = index;
-	while (size--) next = tb_slist_remove_next(slist, index);
+	tb_size_t next = itor;
+	while (size--) next = tb_slist_remove_next(slist, itor);
 	return next;
 }
 tb_size_t tb_slist_nremove_head(tb_slist_t* slist, tb_size_t size)

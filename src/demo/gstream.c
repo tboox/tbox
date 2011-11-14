@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	
 	// save stream
 	tb_size_t size = tb_gstream_save(ist, ost);
-	tb_trace("save: %d bytes", size);
+	tb_print("save: %d bytes", size);
 
 end:
 

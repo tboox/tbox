@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
 	if (!gst || !tb_gstream_open(gst))
 	{
-		tb_trace("failed to open xml: %s", argv[1]);
+		tb_print("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
 	if (!gst || !tb_gstream_open(gst))
 	{
-		tb_trace("failed to open xml: %s", argv[1]);
+		tb_print("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -39,17 +39,17 @@ int main(int argc, char** argv)
 	tb_xml_reader_t* reader = tb_xml_reader_open(gst);
 	if (!reader)
 	{
-		tb_trace("failed to open reader: %s", argv[1]);
+		tb_print("failed to open reader: %s", argv[1]);
 		return 0;
 	}
 
 	// seek 
-	tb_trace("seek: %s", argv[2]);
+	tb_print("seek: %s", argv[2]);
 	if (TB_TRUE == tb_xml_reader_seek(reader, argv[2]))
 	{
 		// the first node
 		tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
-		tb_trace("node: <%s></%s>", name, name);
+		tb_print("node: <%s></%s>", name, name);
 	}
 
 	// close
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
-		tb_trace("failed to open xml: %s", argv[1]);
+		tb_print("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 	
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
 	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
 	if (!ist || !tb_gstream_open(ist))
 	{
-		tb_trace("failed to open input xml: %s", argv[1]);
+		tb_print("failed to open input xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -128,21 +128,21 @@ int main(int argc, char** argv)
 	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!ost || !tb_gstream_open(ost))
 	{
-		tb_trace("failed to open output xml: %s", argv[2]);
+		tb_print("failed to open output xml: %s", argv[2]);
 		return 0;
 	}
 
 	// load xml
 	if (TB_FALSE == tb_xml_document_load(document, ist))
 	{
-		tb_trace("failed to load xml: %s", argv[1]);
+		tb_print("failed to load xml: %s", argv[1]);
 		return 0;
 	}
 
 	// store xml
 	if (TB_FALSE == tb_xml_document_store(document, ost))
 	{
-		tb_trace("failed to store xml: %s", argv[2]);
+		tb_print("failed to store xml: %s", argv[2]);
 		return 0;
 	}
 
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
 	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
-		tb_trace("failed to open xml: %s", argv[1]);
+		tb_print("failed to open xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -201,7 +201,7 @@ int main(int argc, char** argv)
 	// store xml
 	if (TB_FALSE == tb_xml_document_store(document, gst))
 	{
-		tb_trace("failed to store xml: %s", argv[1]);
+		tb_print("failed to store xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -216,14 +216,14 @@ int main(int argc, char** argv)
 	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
 	if (!ist || !tb_gstream_open(ist))
 	{
-		tb_trace("failed to open input xml: %s", argv[1]);
+		tb_print("failed to open input xml: %s", argv[1]);
 		return 0;
 	}
 
 	// load xml
 	if (TB_FALSE == tb_xml_document_load(document, ist))
 	{
-		tb_trace("failed to load xml: %s", argv[1]);
+		tb_print("failed to load xml: %s", argv[1]);
 		return 0;
 	}
 
@@ -231,10 +231,10 @@ int main(int argc, char** argv)
 	tb_xml_node_t* node = tb_xml_node_childs_select(document, argv[2]);
 	if (node)
 	{
-		tb_trace("select: %s", argv[2]);
+		tb_print("select: %s", argv[2]);
 
 		// the first node
-		tb_trace("node: <%s></%s>", tb_string_c_string(&node->name), tb_string_c_string(&node->name));
+		tb_print("node: <%s></%s>", tb_string_c_string(&node->name), tb_string_c_string(&node->name));
 
 #if 0
 		// the other node
@@ -243,7 +243,7 @@ int main(int argc, char** argv)
 		{
 			if (TB_TRUE == tb_string_compare(&item->name, &node->name))
 			{
-				tb_trace("node: <%s></%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->name));
+				tb_print("node: <%s></%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->name));
 			}
 			item = item->next;
 		}

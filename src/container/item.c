@@ -255,7 +255,7 @@ static tb_char_t const* tb_item_func_ifm_cstr(tb_item_func_t* func, tb_cpointer_
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_item_func_t tb_item_func_str(tb_spool_t* spool)
+tb_item_func_t tb_item_func_str(tb_pointer_t spool)
 {
 	tb_item_func_t func;
 	tb_memset(&func, 0, sizeof(tb_item_func_t));
@@ -299,7 +299,7 @@ tb_item_func_t tb_item_func_ptr()
 	func.size = sizeof(tb_pointer_t);
 	return func;
 }
-tb_item_func_t tb_item_func_efm(tb_size_t size, tb_fpool_t* fpool)
+tb_item_func_t tb_item_func_efm(tb_size_t size, tb_pointer_t fpool)
 {
 	tb_item_func_t func;
 	tb_memset(&func, 0, sizeof(tb_item_func_t));

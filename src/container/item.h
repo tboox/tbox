@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "spool.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -97,7 +96,7 @@ typedef struct __tb_item_func_t
  * using tb_spool_strdup if the spool exists
  *
  */
-tb_item_func_t 		tb_item_func_str(tb_spool_t* spool); 
+tb_item_func_t 		tb_item_func_str(tb_pointer_t spool); 
 
 // the integer item function
 tb_item_func_t 		tb_item_func_int();
@@ -113,7 +112,7 @@ tb_item_func_t 		tb_item_func_ptr();
  * using tb_fpool_put if the fpool exists
  *
  */
-tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_fpool_t* fpool);
+tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_pointer_t fpool);
 
 /* the internal fixed memory item function
  *

@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	do
 	{
 		tb_int_t ret = tb_gstream_read(est, data, 4096);
-		//tb_trace("ret: %d", ret);
+		//tb_print("ret: %d", ret);
 		if (ret > 0)
 		{
 			read += ret;

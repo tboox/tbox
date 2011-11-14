@@ -24,6 +24,8 @@
  * includes
  */
 #include "spool.h"
+#include "item.h"
+#include "slist.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
@@ -48,7 +50,7 @@ typedef struct __tb_spool_chunk_t
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_void_t tb_spool_item_free(tb_pointer_t item, tb_pointer_t priv)
+static tb_void_t tb_spool_item_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	tb_spool_chunk_t* chunk = item;
 	if (chunk)
@@ -71,8 +73,7 @@ tb_spool_t* tb_spool_init(tb_size_t size)
 	tb_assert_and_check_return_val(spool, TB_NULL);
 
 	// init chunk list
-	tb_slist_item_func_t func = {tb_spool_item_free, TB_NULL};
-	spool->list = tb_slist_init(sizeof(tb_spool_chunk_t), 8, &func);
+	spool->list = tb_slist_init(8, tb_item_func_ifm(sizeof(tb_spool_chunk_t), tb_spool_item_free, TB_NULL));
 	tb_assert_and_check_goto(spool->list, fail);
 
 	// init chunk size
