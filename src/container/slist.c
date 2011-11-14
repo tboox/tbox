@@ -44,10 +44,11 @@ typedef struct __tb_slist_item_t
  * details
  */
 
-static tb_void_t tb_slist_item_free(tb_pointer_t item, tb_pointer_t priv)
+static tb_void_t tb_slist_item_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_slist_t* slist = priv;
-	if (slist && slist->func.free && item)
+	tb_assert_and_check_return(func && func->priv);
+	tb_slist_t* slist = func->priv;
+	if (slist->func.free && item)
 		slist->func.free(&slist->func, &((tb_slist_item_t*)item)[1]);
 }
 
@@ -71,10 +72,7 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 	slist->func = func;
 
 	// init pool, step = next + data
-	tb_fpool_item_func_t pool_func;
-	pool_func.free = tb_slist_item_free;
-	pool_func.priv = slist;
-	slist->pool = tb_fpool_init(sizeof(tb_slist_item_t) + func.size, grow, grow, &pool_func);
+	slist->pool = tb_fpool_init(grow, grow, tb_item_func_ifm(sizeof(tb_slist_item_t) + func.size, tb_slist_item_free, slist));
 	tb_assert_and_check_goto(slist->pool, fail);
 
 	return slist;

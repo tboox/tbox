@@ -41,25 +41,34 @@
  * implemention
  */
 
-tb_fpool_t* tb_fpool_init(tb_size_t step, tb_size_t size, tb_size_t grow, tb_fpool_item_func_t const* func)
+tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 {
+	// check
+	tb_assert_and_check_return_val(size && grow, TB_NULL);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
+
+	// alloc fpool
 	tb_fpool_t* fpool = (tb_fpool_t*)tb_calloc(1, sizeof(tb_fpool_t));
 	tb_assert_and_check_return_val(fpool, TB_NULL);
 
-	fpool->step = tb_align(step, (TB_CPU_BITSIZE >> 3));
-	fpool->grow = tb_align(grow, 8); // align by 8-byte for info
+	// init fpool
+	fpool->grow = tb_align(grow, TB_CPU_BITBYTE);
 	fpool->size = 0;
-	fpool->maxn = tb_align(size, 8); // align by 8-byte for info
-	if (func) fpool->func = *func;
+	fpool->maxn = tb_align(size, TB_CPU_BITBYTE);
+	fpool->func = func;
+	fpool->func.size = tb_align(func.size, TB_CPU_BITBYTE);
 
-	fpool->data = tb_calloc(fpool->maxn, fpool->step);
+	// alloc data
+	fpool->data = tb_calloc(fpool->maxn, fpool->func.size);
 	tb_assert_and_check_goto(fpool->data, fail);
 
+	// alloc info
 	fpool->info = tb_calloc(1, fpool->maxn >> 3);
 	tb_assert_and_check_goto(fpool->info, fail);
 
-#ifdef TB_GPOOL_PRED_ENABLE
-	tb_size_t m = tb_min(fpool->maxn, TB_GPOOL_PRED_MAX);
+	// init predicted info
+#ifdef TB_FPOOL_PRED_ENABLE
+	tb_size_t m = tb_min(fpool->maxn, TB_FPOOL_PRED_MAX);
 	tb_size_t n = m;
 	while (n--) fpool->pred[n] = m - n;
 	fpool->pred_n = m;
@@ -94,7 +103,7 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 	tb_size_t itor = 0;
 
 	// try allocating from the predicted itor
-#ifdef TB_GPOOL_PRED_ENABLE
+#ifdef TB_FPOOL_PRED_ENABLE
 # 	ifdef TB_DEBUG
 	fpool->alloc_total++;
 	if (!fpool->pred_n) fpool->pred_failed++;
@@ -128,9 +137,9 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 		tb_assert_and_check_return_val(fpool->maxn < TB_POOL_MAX_SIZE, 0);
 
 		// realloc data
-		fpool->data = (tb_byte_t*)tb_realloc(fpool->data, fpool->maxn * fpool->step);
+		fpool->data = (tb_byte_t*)tb_realloc(fpool->data, fpool->maxn * fpool->func.size);
 		tb_assert_and_check_return_val(fpool->data, 0);
-		tb_memset(fpool->data + fpool->size * fpool->step, 0, fpool->grow * fpool->step);
+		tb_memset(fpool->data + fpool->size * fpool->func.size, 0, fpool->grow * fpool->func.size);
 
 		// realloc info
 		fpool->info = (tb_byte_t*)tb_realloc(fpool->info, fpool->maxn >> 3);
@@ -147,7 +156,7 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 	tb_assert_abort(!tb_pool_info_isset(fpool->info, itor - 1));
 	tb_pool_info_set(fpool->info, itor - 1);
 
-#ifdef TB_GPOOL_PRED_ENABLE
+#ifdef TB_FPOOL_PRED_ENABLE
  	// predict next, pred_n must be null, otherwise exists repeat itor
 	if (!fpool->pred_n) 
 	{
@@ -166,73 +175,61 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 	tb_assert(itor && itor < 1 + fpool->maxn);
 	if (itor > fpool->maxn) itor = 0;
 
-	// update data
-	if (itor) 
-	{
-		if (data) tb_memcpy(fpool->data + (itor - 1) * fpool->step, data, fpool->step);
-		else tb_memset(fpool->data + (itor - 1) * fpool->step, 0, fpool->step);
-	}
+	// duplicate data
+	if (itor) fpool->func.dupl(&fpool->func, fpool->data + (itor - 1) * fpool->func.size, data);
 	return itor;
 }
 tb_pointer_t tb_fpool_get(tb_fpool_t* fpool, tb_size_t itor)
 {
-	//tb_trace("%d %d %d %d", fpool->step, fpool->size, itor, fpool->maxn);
+	//tb_trace("%d %d %d %d", fpool->func.size, fpool->size, itor, fpool->maxn);
 	tb_assert_and_check_return_val(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn, TB_NULL);
 	tb_assert_and_check_return_val(tb_pool_info_isset(fpool->info, itor - 1), TB_NULL);
 
-	return (fpool->data + (itor - 1) * fpool->step);
+	return fpool->func.data(&fpool->func, fpool->data + (itor - 1) * fpool->func.size);
 }
 tb_void_t tb_fpool_set(tb_fpool_t* fpool, tb_size_t itor, tb_cpointer_t data)
 {
-	tb_assert_and_check_return(fpool && itor);
+	tb_assert_and_check_return(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn);
+	tb_assert_and_check_return(tb_pool_info_isset(fpool->info, itor - 1));
 
-	// get item
-	tb_pointer_t item = tb_fpool_get(fpool, itor);
-	if (item)
-	{
-		// free item
-		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
-
-		// copy data
-		if (data) tb_memcpy(item, data, fpool->step);
-		else tb_memset(item, 0, fpool->step);
-	}
+	// copy data
+	fpool->func.copy(&fpool->func, fpool->data + (itor - 1) * fpool->func.size, data);
 }
 tb_void_t tb_fpool_clr(tb_fpool_t* fpool, tb_size_t itor)
 {
-	tb_assert_and_check_return(fpool && itor);
+	tb_assert_and_check_return(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn);
+	tb_assert_and_check_return(tb_pool_info_isset(fpool->info, itor - 1));
 
 	// get item
-	tb_pointer_t item = tb_fpool_get(fpool, itor);
-	if (item)
-	{
-		// free item
-		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
+	tb_pointer_t item = fpool->data + (itor - 1) * fpool->func.size;
 
-		// clear data
-		tb_memset(item, 0, fpool->step);
-	}
+	// free item
+	if (fpool->func.free) fpool->func.free(&fpool->func, item);
+
+	// clear data
+	tb_memset(item, 0, fpool->func.size);
 }
 tb_void_t tb_fpool_del(tb_fpool_t* fpool, tb_size_t itor)
 {
+	tb_assert_and_check_return(fpool && fpool->size && itor > 0 && itor < 1 + fpool->maxn);
+	tb_assert_and_check_return(tb_pool_info_isset(fpool->info, itor - 1));
+
 	// get item
-	tb_pointer_t item = tb_fpool_get(fpool, itor);
-	if (item)
-	{
-		// free item
-		if (fpool->func.free) fpool->func.free(item, fpool->func.priv);
+	tb_pointer_t item = fpool->data + (itor - 1) * fpool->func.size;
 
-		// reset info
-		tb_pool_info_reset(fpool->info, itor - 1);
+	// free item
+	if (fpool->func.free) fpool->func.free(&fpool->func, item);
 
-		// predict next
-#ifdef TB_GPOOL_PRED_ENABLE
-		if (fpool->pred_n < TB_GPOOL_PRED_MAX)
-			fpool->pred[fpool->pred_n++] = itor;
+	// reset info
+	tb_pool_info_reset(fpool->info, itor - 1);
+
+	// predict next
+#ifdef TB_FPOOL_PRED_ENABLE
+	if (fpool->pred_n < TB_FPOOL_PRED_MAX)
+		fpool->pred[fpool->pred_n++] = itor;
 #endif
-		// update fpool size
-		fpool->size--;
-	}
+	// update fpool size
+	fpool->size--;
 }
 tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 {
@@ -243,17 +240,17 @@ tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 		for (i = 0; i < fpool->maxn; ++i)
 		{
 			if (tb_pool_info_isset(fpool->info, i))
-				fpool->func.free(fpool->data + i * fpool->step, fpool->func.priv);
+				fpool->func.free(&fpool->func, fpool->data + i * fpool->func.size);
 		}
 	}
 
 	// clear info
 	fpool->size = 0;
 	if (fpool->info) tb_memset(fpool->info, 0, fpool->maxn >> 3);
-	if (fpool->data) tb_memset(fpool->data, 0, fpool->maxn);
+	if (fpool->data) tb_memset(fpool->data, 0, fpool->maxn * fpool->func.size);
 
-#ifdef TB_GPOOL_PRED_ENABLE
-	tb_size_t m = tb_min(fpool->maxn, TB_GPOOL_PRED_MAX);
+#ifdef TB_FPOOL_PRED_ENABLE
+	tb_size_t m = tb_min(fpool->maxn, TB_FPOOL_PRED_MAX);
 	tb_size_t n = m;
 	while (n--) fpool->pred[n] = m - n;
 	fpool->pred_n = m;
@@ -320,14 +317,14 @@ tb_size_t tb_fpool_maxn(tb_fpool_t const* fpool)
 tb_size_t tb_fpool_step(tb_fpool_t const* fpool)
 {
 	tb_assert_and_check_return_val(fpool, 0);
-	return fpool->step;
+	return fpool->func.size;
 }
 #ifdef TB_DEBUG
 tb_void_t tb_fpool_dump(tb_fpool_t* fpool)
 {
 	tb_trace("size: %d", fpool->size);
 	tb_trace("maxn: %d", fpool->maxn);
-	tb_trace("step: %d", fpool->step);
+	tb_trace("step: %d", fpool->func.size);
 	tb_trace("grow: %d", fpool->grow);
 	tb_trace("pred: %02d%%, fail: %d, total: %d", fpool->alloc_total? ((fpool->alloc_total - fpool->pred_failed) * 100 / fpool->alloc_total) : -1, fpool->pred_failed, fpool->alloc_total);
 }

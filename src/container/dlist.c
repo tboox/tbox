@@ -47,10 +47,11 @@ typedef struct __tb_dlist_item_t
  * details
  */
 
-static tb_void_t tb_dlist_item_free(tb_pointer_t item, tb_pointer_t priv)
+static tb_void_t tb_dlist_item_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_dlist_t* dlist = priv;
-	if (dlist && dlist->func.free && item)
+	tb_assert_and_check_return(func && func->priv);
+	tb_dlist_t* dlist = func->priv;
+	if (dlist->func.free && item)
 		dlist->func.free(&dlist->func, &((tb_dlist_item_t*)item)[1]);
 }
 
@@ -74,10 +75,7 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 	dlist->func = func;
 
 	// init pool, step = next + prev + data
-	tb_fpool_item_func_t pool_func;
-	pool_func.free = tb_dlist_item_free;
-	pool_func.priv = dlist;
-	dlist->pool = tb_fpool_init(sizeof(tb_dlist_item_t) + func.size, grow, grow, &pool_func);
+	dlist->pool = tb_fpool_init(grow, grow, tb_item_func_ifm(sizeof(tb_dlist_item_t) + func.size, tb_dlist_item_free, dlist));
 	tb_assert_and_check_goto(dlist->pool, fail);
 
 	return dlist;
