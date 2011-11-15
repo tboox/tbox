@@ -43,7 +43,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(grow, TB_NULL);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, TB_NULL);
 
 	// alloc vector
 	tb_vector_t* vector = (tb_vector_t*)tb_calloc(1, sizeof(tb_vector_t));
@@ -85,12 +85,8 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 	if (vector) 
 	{
 		// free data
-		if (vector->func.free)
-		{
-			tb_size_t i = 0;
-			for (i = 0; i < vector->size; i++)
-				vector->func.free(&vector->func, vector->data + i * vector->func.size);
-		}
+		if (vector->func.nfree)
+			vector->func.nfree(&vector->func, vector->data, vector->size);
 
 		// reset size 
 		vector->size = 0;
@@ -164,12 +160,8 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	if (size < vector->size)
 	{
 		// free data
-		if (vector->func.free)
-		{
-			tb_size_t i = 0;
-			for (i = 0; i < vector->size; i++)
-				vector->func.free(&vector->func, vector->data + (size + i) * vector->func.size);
-		}
+		if (vector->func.nfree) 
+			vector->func.nfree(&vector->func, vector->data + size * vector->func.size, vector->size - size);
 	}
 
 	// resize buffer
@@ -243,7 +235,7 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t d
 	if (osize != itor) tb_memmov(vector->data + (itor + size) * vector->func.size, vector->data + itor * vector->func.size, (osize - itor) * vector->func.size);
 
 	// duplicate data
-	while (size--) vector->func.dupl(&vector->func, vector->data + (itor++) * vector->func.size, data);
+	vector->func.ndupl(&vector->func, vector->data + itor * vector->func.size, data, size);
 }
 tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
@@ -280,7 +272,7 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t 
 	if (itor + size > vector->size) size = vector->size - itor;
 
 	// copy data
-	while (size--) vector->func.copy(&vector->func, vector->data + (itor++) * vector->func.size, data);
+	vector->func.ncopy(&vector->func, vector->data + itor * vector->func.size, data, size);
 }
 tb_void_t tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
@@ -341,12 +333,8 @@ tb_void_t tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size)
 	tb_size_t left = vector->size - itor - size;
 
 	// free data
-	if (vector->func.free)
-	{
-		tb_size_t i = 0;
-		for (i = 0; i < size; i++)
-			vector->func.free(&vector->func, vector->data + (itor + i) * vector->func.size);
-	}
+	if (vector->func.nfree)
+		vector->func.nfree(&vector->func, vector->data + itor * vector->func.size, size);
 
 	// move the left data
 	if (left)
