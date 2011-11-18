@@ -121,9 +121,34 @@ static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 }
 static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
 {
-	tb_trace_noimpl();
-	tb_abort();
-	return TB_FALSE;
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_assert_and_check_return_val(dst, TB_FALSE);
+
+	// get size
+	tb_size_t size = tb_dstream_size(gst);
+	tb_assert_and_check_return_val(size, TB_FALSE);
+
+	// compute range
+	tb_size_t range = offset;
+	switch (flag)
+	{
+	case TB_GSTREAM_SEEK_BEG:
+		break;
+	case TB_GSTREAM_SEEK_CUR:
+		range = tb_dstream_offset(gst) + offset;
+		break;
+	case TB_GSTREAM_SEEK_END:
+		range = size + offset;
+		break;
+	default:
+		break;
+	}
+	tb_assert_and_check_return_val(range <= size, TB_FALSE);
+
+	// seek 
+	dst->head = dst->data + range;
+
+	return TB_TRUE;
 }
 
 static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)

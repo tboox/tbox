@@ -106,11 +106,12 @@ tb_byte_t const* 	tb_bstream_beg(tb_bstream_t* bst);
 tb_byte_t const* 	tb_bstream_pos(tb_bstream_t* bst);
 tb_byte_t const* 	tb_bstream_end(tb_bstream_t* bst);
 
-// size
+// attributes
 tb_size_t 			tb_bstream_offset(tb_bstream_t* bst);
 tb_size_t 			tb_bstream_size(tb_bstream_t* bst);
 tb_size_t 			tb_bstream_left(tb_bstream_t* bst);
 tb_size_t 			tb_bstream_left_bits(tb_bstream_t* bst);
+tb_bool_t 			tb_bstream_valid(tb_bstream_t* bst);
 
 // skip
 tb_void_t 			tb_bstream_skip(tb_bstream_t* bst, tb_size_t size);

@@ -178,7 +178,7 @@ tb_byte_t const* tb_bstream_end(tb_bstream_t* bst)
 }
 
 /* /////////////////////////////////////////////////////////
- * size
+ * attributes
  */
 tb_size_t tb_bstream_size(tb_bstream_t* bst)
 {
@@ -200,6 +200,11 @@ tb_size_t tb_bstream_left_bits(tb_bstream_t* bst)
 {
 	tb_assert(bst);
 	return ((bst->p < bst->e)? (((bst->e - bst->p) << 3) - bst->b) : 0);
+}
+tb_bool_t tb_bstream_valid(tb_bstream_t* bst)
+{
+	if (!bst || !bst->p || !bst->e || !bst->n || bst->p > bst->e) return TB_FALSE;
+	return TB_TRUE;
 }
 /* /////////////////////////////////////////////////////////
  * skip
