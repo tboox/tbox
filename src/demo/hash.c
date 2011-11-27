@@ -457,14 +457,14 @@ int main(int argc, char** argv)
 //	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
 	if (!tb_init(0, 0)) return 0;
 
-#if 0
+#if 1
 	tb_hash_test_s2i_func();
 	tb_hash_test_i2s_func();
 	tb_hash_test_m2m_func();
 	tb_hash_test_i2i_func();
 #endif
 
-#if 0
+#if 1
 	tb_hash_test_s2i_perf();
 	tb_hash_test_i2s_perf();
 	tb_hash_test_m2m_perf();

@@ -45,7 +45,7 @@
  * details
  */
 
-#if 0
+#if 1
 static tb_bool_t tb_hash_item_find(tb_hash_t* hash, tb_cpointer_t name, tb_size_t* pbuck, tb_size_t* pitem)
 {
 	tb_assert_and_check_return_val(hash && hash->hash_list && hash->hash_size, TB_FALSE);
@@ -117,10 +117,11 @@ static tb_bool_t tb_hash_item_find(tb_hash_t* hash, tb_cpointer_t name, tb_size_
 
 		// compare it
 		t = hash->name_func.comp(&hash->name_func, name, hash->name_func.data(&hash->name_func, item));
+
 		if (t < 0) r = m;
 		else if (t > 0) l = m + 1;
 		else break;
-	
+
 		// next
 		m = (l + r) >> 1;
 	}
