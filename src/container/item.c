@@ -45,7 +45,7 @@ static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_cpointer_t data,
 
 	return (h & (size - 1));
 }
-static tb_int_t tb_item_func_str_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_item_func_str_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	tb_assert_and_check_return_val(func, 0);
 	return tb_strcmp(ldata, rdata);
@@ -94,7 +94,7 @@ static tb_size_t tb_item_func_int_hash(tb_item_func_t* func, tb_cpointer_t data,
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
 	return (((tb_size_t)data) ^ 0xdeadbeef) & (size - 1);
 }
-static tb_int_t tb_item_func_int_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_item_func_int_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	return (ldata - rdata);
 }
@@ -107,7 +107,7 @@ static tb_pointer_t tb_item_func_int_data(tb_item_func_t* func, tb_cpointer_t it
 static tb_char_t const* tb_item_func_int_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(func && cstr, "");
-	tb_int_t n = tb_snprintf(cstr, maxn, "%d", data);
+	tb_long_t n = tb_snprintf(cstr, maxn, "%d", data);
 	if (n > 0) cstr[n] = '\0';
 	return (tb_char_t const*)cstr;
 }
@@ -140,8 +140,9 @@ static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_cpointer_t data,
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
 	return (((tb_size_t)data) ^ 0xdeadbeef) & (size - 1);
 }
-static tb_int_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
+	tb_assert((tb_size_t)ldata <= TB_MAXS32 && (tb_size_t)rdata <= TB_MAXS32);
 	return (ldata - rdata);
 }
 static tb_pointer_t tb_item_func_ptr_data(tb_item_func_t* func, tb_cpointer_t item)
@@ -222,7 +223,7 @@ static tb_size_t tb_item_func_efm_hash(tb_item_func_t* func, tb_cpointer_t data,
 	tb_assert_and_check_return_val(func && func->priv && data && tb_ispow2(size), 0);
 	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, data, func->priv) & (size - 1));
 }
-static tb_int_t tb_item_func_efm_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_item_func_efm_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	tb_assert_and_check_return_val(func && func->priv && ldata && rdata, 0);
 	return tb_memcmp(ldata, rdata, func->priv);
@@ -260,7 +261,7 @@ static tb_size_t tb_item_func_ifm_hash(tb_item_func_t* func, tb_cpointer_t data,
 	tb_assert_and_check_return_val(func && func->size && data && tb_ispow2(size), 0);
 	return (tb_crc_encode(TB_CRC_MODE_32_IEEE_LE, 0, data, func->size) & (size - 1));
 }
-static tb_int_t tb_item_func_ifm_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
+static tb_long_t tb_item_func_ifm_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	tb_assert_and_check_return_val(func && func->size && ldata && rdata, 0);
 	return tb_memcmp(ldata, rdata, func->size);

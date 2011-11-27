@@ -40,7 +40,7 @@ extern "C" {
 // the callback type
 struct __tb_item_func_t;
 typedef tb_size_t 			(*tb_item_func_hash_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_size_t size);
-typedef tb_int_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t rdata, tb_cpointer_t ldata);
+typedef tb_long_t 			(*tb_item_func_comp_t)(struct __tb_item_func_t* func, tb_cpointer_t rdata, tb_cpointer_t ldata);
 
 typedef tb_pointer_t 		(*tb_item_func_data_t)(struct __tb_item_func_t* func, tb_cpointer_t item);
 typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn);
