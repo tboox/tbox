@@ -155,7 +155,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	//tb_trace("spank[i]: %d", tst->in);
 	// spank it for transform
 	tb_assert_and_check_return_val(tst->spank && !tst->on && tst->op == tst->ob, -1);
-	if (TB_FALSE == tst->spank(gst)) 
+	if (!tst->spank(gst)) 
 	{
 		tst->status = TB_TSTREAM_STATUS_FAIL;
 		return read? read : -1;

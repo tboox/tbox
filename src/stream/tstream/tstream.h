@@ -84,7 +84,7 @@ typedef struct __tb_tstream_t
 tb_tstream_t* 	tb_tstream_cast(tb_gstream_t* gst);
 
 tb_bool_t 		tb_tstream_open(tb_gstream_t* gst);
-tb_void_t 			tb_tstream_close(tb_gstream_t* gst);
+tb_void_t 		tb_tstream_close(tb_gstream_t* gst);
 
 tb_int_t 		tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
