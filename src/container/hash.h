@@ -63,50 +63,58 @@ typedef struct __tb_hash_item_t
 
 }tb_hash_item_t;
 
+// the hash item list type
+typedef struct __tb_hash_item_list_t
+{
+	tb_byte_t* 				data;
+	tb_size_t 				size;
+	tb_size_t 				maxn;
+
+}tb_hash_item_list_t;
+
 /* the hash type
  *
  *
  *                 0        1        3       ...     ...                n       n + 1
  * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
- *                 |_____________________________________________________|
- *                       |
- *                     -----    
- * item_list:         | end | ->                                                 0
- *                     -----  
+ *                         |
+ *                       -----    
+ * item_list:           |     |       key:0                                      
+ *                       -----   
+ *                      |     |       key:1                                              
+ *                       -----               <= insert by binary search algorithm
+ *                      |     |       key:2                                               
+ *                       -----  
+ *                      |     |       key:3                                               
+ *                       -----   
+ *                      |     |       key:4                                               
+ *                       -----  
+ *                      |     |                                              
+ *                       -----  
+ *                      |     |                                              
+ *                       -----  
+ *                      |     |                                              
+ *                       -----  
  *
- *
- *                 0        1        3       ...     ...                n       n + 1
- * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
- *                 |_________|        |_______|        |_________________|
- *                      |                 |                   |
- *                    -----             -----               -----
- * item_list:        |     |    ==>    |     | ==> ... ... | end | ->            0
- *                    -----             -----               -----
- *
- *
- *                 0        1        3       ...     ...                n       n + 1
- * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
- *                 |          |                                           |
- *                 |          |                                           |
- *               -----      -----       -----                           -----
- * item_list:   |     | => |     | ==> |     |          ... ...        | end | -> 0
- *               -----      -----       -----                           ----- 
  */
 typedef struct __tb_hash_t
 {
-	// the item list
-	tb_slist_t* 		item_list;
-
 	// the hash list
-	tb_size_t* 			hash_list;
-	tb_size_t 			hash_size;
+	tb_hash_item_list_t** 	hash_list;
+	tb_size_t 				hash_size;
+
+	// the item size
+	tb_size_t 				item_size;
+
+	// the item maxn
+	tb_size_t 				item_maxn;
 
 	// the hash item
-	tb_hash_item_t 		hash_item;
+	tb_hash_item_t 			hash_item;
 
 	// the hash func
-	tb_item_func_t 		name_func;
-	tb_item_func_t 		data_func;
+	tb_item_func_t 			name_func;
+	tb_item_func_t 			data_func;
 
 }tb_hash_t;
 
@@ -121,8 +129,8 @@ tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 // accessors & modifiors
 tb_void_t 				tb_hash_clear(tb_hash_t* hash);
 
-tb_pointer_t 				tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
-tb_cpointer_t 		tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
+tb_pointer_t 			tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
+tb_cpointer_t 			tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
 
 tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
 tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
