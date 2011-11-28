@@ -53,10 +53,10 @@ typedef enum __tb_audio_fmt_t
 typedef enum __tb_audio_rate_t
 {
 	TB_AUDIO_RATE_5512 		= 1
-,	TB_AUDIO_RATE_11025 		= 2
-,	TB_AUDIO_RATE_22050 		= 3
-,	TB_AUDIO_RATE_44100 		= 4
-,	TB_AUDIO_RATE_88200 		= 5
+,	TB_AUDIO_RATE_11025 	= 2
+,	TB_AUDIO_RATE_22050 	= 3
+,	TB_AUDIO_RATE_44100 	= 4
+,	TB_AUDIO_RATE_88200 	= 5
 
 }tb_audio_rate_t;
 
@@ -64,7 +64,7 @@ typedef enum __tb_audio_rate_t
 typedef enum __tb_audio_channel_t
 {
 	TB_AUDIO_CHANNEL_MONO 	= 1
-,	TB_AUDIO_CHANNEL_STEREO 	= 2
+,	TB_AUDIO_CHANNEL_STEREO = 2
 
 }tb_audio_channel_t;
 
@@ -77,15 +77,15 @@ tb_size_t 	tb_audio_get_volume();
 tb_bool_t 	tb_audio_set_volume(tb_size_t volume);
 
 // open & close 
-tb_handle_t 	tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb_audio_channel_t channel, tb_bool_t is_block);
-tb_void_t 			tb_audio_close(tb_handle_t haudio);
+tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb_audio_channel_t channel, tb_bool_t is_block);
+tb_void_t 	tb_audio_close(tb_handle_t haudio);
 
 // buffer operations
 tb_int_t 	tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size);
 tb_size_t 	tb_audio_bsize(tb_handle_t haudio);
-tb_void_t 			tb_audio_clear(tb_handle_t haudio);
-tb_void_t 			tb_audio_pause(tb_handle_t haudio);
-tb_void_t 			tb_audio_resume(tb_handle_t haudio);
+tb_void_t 	tb_audio_clear(tb_handle_t haudio);
+tb_void_t 	tb_audio_pause(tb_handle_t haudio);
+tb_void_t 	tb_audio_resume(tb_handle_t haudio);
 	
 // c plus plus
 #ifdef __cplusplus

@@ -84,23 +84,9 @@ typedef tb_void_t const* 		tb_cpointer_t;
 typedef tb_pointer_t 			tb_handle_t;
 
 // int64
-#ifdef TB_CONFIG_TYPE_INT64
 typedef signed long long 		tb_int64_t;
 typedef unsigned long long 		tb_uint64_t;
 typedef tb_int64_t				tb_sint64_t;
-#else
-typedef struct __tb_sint64_t
-{
-	tb_uint32_t l;
-	tb_sint32_t h;
-} 								tb_sint64_t;
-typedef struct __tb_uint64_t
-{
-	tb_uint32_t l;
-	tb_uint32_t h;
-} 								tb_uint64_t;
-typedef tb_sint64_t 			tb_int64_t;
-#endif
 
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT

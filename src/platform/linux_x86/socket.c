@@ -218,6 +218,7 @@ tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
 			if (len < 0) 
 			{
 				if (errno != EINTR && errno != EAGAIN) return -1;
+				else return 0;
 			} 
 			else return len;
 		}
