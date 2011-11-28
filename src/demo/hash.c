@@ -340,8 +340,8 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
 	tb_fpool_t* 	pool = tb_fpool_init(256, 256, tb_item_func_ifm(step, TB_NULL, TB_NULL));
-	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
-	//tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, TB_NULL, TB_NULL), tb_item_func_ifm(step, TB_NULL, TB_NULL));
+	//tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
+	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, TB_NULL, TB_NULL), tb_item_func_ifm(step, TB_NULL, TB_NULL));
 	tb_assert_and_check_return(hash);
 
 	// performance
@@ -454,8 +454,7 @@ static tb_void_t tb_hash_test_i2i_perf()
  */
 int main(int argc, char** argv)
 {
-//	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
-	if (!tb_init(0, 0)) return 0;
+	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
 
 #if 1
 	tb_hash_test_s2i_func();
