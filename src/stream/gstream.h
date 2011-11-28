@@ -38,17 +38,17 @@ extern "C" {
  */
 
 // the stream command
-#define TB_GSTREAM_CMD(type, cmd) 	(((type) << 16) | (cmd))
-#define TB_TSTREAM_CMD(type, cmd) 	TB_GSTREAM_CMD(TB_GSTREAM_TYPE_TRAN, (((type) << 8) | (cmd)))
+#define TB_GSTREAM_CMD(type, cmd) 				(((type) << 16) | (cmd))
+#define TB_TSTREAM_CMD(type, cmd) 				TB_GSTREAM_CMD(TB_GSTREAM_TYPE_TRAN, (((type) << 8) | (cmd)))
 
 // the stream block size for read & write
-#define TB_GSTREAM_BLOCK_SIZE 		(8192)
+#define TB_GSTREAM_BLOCK_SIZE 					(8192)
 
 // the stream data size for need
-#define TB_GSTREAM_CACHE_SIZE 		(8192)
+#define TB_GSTREAM_CACHE_SIZE 					(8192)
 
 // the stream timeout
-#define TB_GSTREAM_TIMEOUT 			(5000)
+#define TB_GSTREAM_TIMEOUT 						(5000)
 
 // the stream bitops
 #ifdef TB_WORDS_BIGENDIAN
@@ -188,16 +188,16 @@ typedef struct __tb_gstream_t
 	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
 	// stream operations
-	tb_int_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_int_t 			(*write)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_int_t 			(*bread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_int_t 			(*bwrite)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	tb_long_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	tb_long_t 			(*write)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	tb_long_t 			(*bread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	tb_long_t 			(*bwrite)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 	tb_byte_t* 			(*need)(struct __tb_gstream_t* gst, tb_size_t size);
-	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag);
+	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag);
 
 	// stream size
-	tb_size_t 			(*size)(struct __tb_gstream_t* gst);
-	tb_size_t 			(*offset)(struct __tb_gstream_t* gst);
+	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
+	tb_uint64_t 		(*offset)(struct __tb_gstream_t* gst);
 
 	// ioctl
 	tb_bool_t 			(*ioctl0)(struct __tb_gstream_t* gst, tb_size_t cmd);
@@ -236,17 +236,17 @@ tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);
 tb_void_t 			tb_gstream_close(tb_gstream_t* gst);
 
 // access & modify
-tb_int_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_int_t 			tb_gstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_int_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_int_t 			tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_int_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
+tb_long_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
-tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag);
+tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag);
 
 // load & save
-tb_size_t 			tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
-tb_size_t 			tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
+tb_uint64_t 		tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
+tb_uint64_t 		tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
 
 // read integer
 tb_uint8_t 			tb_gstream_read_u8(tb_gstream_t* gst);
@@ -293,9 +293,9 @@ tb_bool_t 			tb_gstream_write_u32_be(tb_gstream_t* gst, tb_uint32_t val);
 tb_bool_t 			tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
-tb_size_t 			tb_gstream_size(tb_gstream_t const* gst);
-tb_size_t 			tb_gstream_left(tb_gstream_t const* gst);
-tb_size_t 			tb_gstream_offset(tb_gstream_t const* gst);
+tb_uint64_t 		tb_gstream_size(tb_gstream_t const* gst);
+tb_uint64_t 		tb_gstream_left(tb_gstream_t const* gst);
+tb_uint64_t 		tb_gstream_offset(tb_gstream_t const* gst);
 
 // ioctl
 tb_bool_t 			tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);

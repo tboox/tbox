@@ -47,10 +47,10 @@ typedef struct __tb_fstream_t
 	tb_handle_t 		file;
 
 	// the file size
-	tb_size_t 			size;
+	tb_uint64_t 		size;
 
 	// the file offset
-	tb_size_t 			offset;
+	tb_uint64_t 		offset;
 
 	// the file flags
 	tb_size_t 			flags;
@@ -80,7 +80,7 @@ static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst->file, TB_FALSE);
 
 	// init size
-	fst->size = (tb_size_t)tb_file_seek(fst->file, -1, TB_FILE_SEEK_SIZE);
+	fst->size = tb_file_size(fst->file);
 	fst->offset = 0;
 	
 	return TB_TRUE;
@@ -96,39 +96,39 @@ static tb_void_t tb_fstream_close(tb_gstream_t* gst)
 		fst->offset = 0;
 	}
 }
-static tb_int_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file && data, -1);
 	tb_check_return_val(size, 0);
 
 	// read data
-	tb_int_t ret = (tb_int_t)tb_file_read(fst->file, (tb_byte_t*)data, (tb_size_t)size);
+	tb_long_t ret = tb_file_read(fst->file, data, size);
 
 	// update offset
-	if (ret > 0) fst->offset += ret;
+	if (ret > 0) fst->offset = tb_uint64_add_uint32(fst->offset, (tb_uint32_t)ret);
 	return ret;
 }
-static tb_int_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file && data, -1);
 	tb_check_return_val(size, 0);
 
 	// write
-	tb_int_t ret = (tb_int_t)tb_file_write(fst->file, (tb_byte_t*)data, (tb_size_t)size);
+	tb_long_t ret = tb_file_write(fst->file, (tb_byte_t*)data, (tb_size_t)size);
 
 	// update offset
 	if (ret > 0) fst->offset += ret;
 	return ret;
 }
-static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, TB_FALSE);
 
 	// seek
-	tb_int_t ret = -1;
+	tb_int64_t ret = -1;
 	switch (flag)
 	{
 	case TB_GSTREAM_SEEK_BEG:
@@ -153,13 +153,13 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 
 	return TB_FALSE;
 }
-static tb_size_t tb_fstream_size(tb_gstream_t* gst)
+static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 {	
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->size;
 }
-static tb_size_t tb_fstream_offset(tb_gstream_t* gst)
+static tb_uint64_t tb_fstream_offset(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, 0);

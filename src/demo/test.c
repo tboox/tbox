@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 #endif
 
 #if 0
-	tb_bool_t ret = tb_file_create(argv[1], TB_FILE_TYPE_DIR);
+	tb_bool_t ret = tb_file_delete(argv[1], TB_FILE_TYPE_FILE);
 	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
 #endif
 

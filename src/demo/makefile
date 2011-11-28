@@ -7,8 +7,6 @@ NAMES = test \
 		http \
 		bitops \
 		stdlib \
-		sint64 \
-		uint64 \
 		scalar \
 		memops \
 		strops \

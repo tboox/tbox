@@ -42,7 +42,7 @@ typedef struct __tb_hstream_t
 	tb_handle_t 		http;
 
 	// the http offset
-	tb_size_t 			offset;
+	tb_uint64_t 		offset;
 
 }tb_hstream_t;
 
@@ -79,46 +79,46 @@ static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst && hst->http) tb_http_exit(hst->http);
 }
-static tb_int_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http && data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv data
-	tb_int_t ret = tb_http_read(hst->http, data, size);
+	tb_long_t ret = tb_http_read(hst->http, data, size);
 
 	// update offset
 	if (ret > 0) hst->offset += ret;
 	return ret;
 }
-static tb_int_t tb_hstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_hstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http && data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv data
-	tb_int_t ret = tb_http_bread(hst->http, data, size);
+	tb_long_t ret = tb_http_bread(hst->http, data, size);
 
 	// update offset
 	if (ret > 0) hst->offset += ret;
 	return ret;
 }
-static tb_size_t tb_hstream_size(tb_gstream_t const* gst)
+static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, 0);
 
 	return tb_http_status_document_size(hst->http);
 }
-static tb_size_t tb_hstream_offset(tb_gstream_t* gst)
+static tb_uint64_t tb_hstream_offset(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, 0);
 	return hst->offset;
 }
-static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -127,11 +127,11 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_
 	if (!tb_http_status_isseeked(hst->http)) return TB_FALSE;
 
 	// get size
-	tb_size_t size = tb_http_status_content_size(hst->http);
+	tb_uint64_t size = tb_http_status_content_size(hst->http);
 	tb_assert_and_check_return_val(size, TB_FALSE);
 
 	// compute range
-	tb_size_t range = offset;
+	tb_uint64_t range = offset;
 	switch (flag)
 	{
 	case TB_GSTREAM_SEEK_BEG:
@@ -251,12 +251,12 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 	case TB_HSTREAM_CMD_SET_SREAD_FUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_sread_func(hst->http, (tb_int_t (*)(tb_handle_t, tb_byte_t* , tb_size_t ))arg1);
+			return tb_http_option_set_sread_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t* , tb_size_t ))arg1);
 		}	
 	case TB_HSTREAM_CMD_SET_SWRITE_FUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_swrite_func(hst->http, (tb_int_t (*)(tb_handle_t, tb_byte_t const* , tb_size_t ))arg1);
+			return tb_http_option_set_swrite_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t const* , tb_size_t ))arg1);
 		}
 	default:
 		break;
@@ -283,7 +283,7 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 	case TB_HSTREAM_CMD_SET_RANGE:
 		{
 			tb_assert_and_check_return_val(arg1 && arg2, TB_FALSE);
-			return tb_http_option_set_range(hst->http, (tb_size_t)arg1, (tb_size_t)arg2);
+			return tb_http_option_set_range(hst->http, (tb_uint64_t)arg1, (tb_uint64_t)arg2);
 		}
 	default:
 		break;

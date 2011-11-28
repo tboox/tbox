@@ -66,7 +66,7 @@ static tb_void_t tb_dstream_close(tb_gstream_t* gst)
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	if (dst) dst->head = TB_NULL;
 }
-static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
@@ -79,9 +79,9 @@ static tb_int_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t si
 	// read data
 	tb_memcpy(data, dst->head, size);
 	dst->head += size;
-	return (tb_int_t)(size);
+	return (tb_long_t)(size);
 }
-static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
@@ -94,7 +94,7 @@ static tb_int_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	// write data
 	tb_memcpy(dst->head, data, size);
 	dst->head += size;
-	return (tb_int_t)(size);
+	return (tb_long_t)(size);
 }
 static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
 {
@@ -104,7 +104,7 @@ static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
 
 	return dst->head;
 }
-static tb_size_t tb_dstream_size(tb_gstream_t const* gst)
+static tb_uint64_t tb_dstream_size(tb_gstream_t const* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, 0);
@@ -119,17 +119,17 @@ static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 
 	return (dst->head - dst->data);
 }
-static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, TB_FALSE);
 
 	// get size
-	tb_size_t size = tb_dstream_size(gst);
+	tb_uint64_t size = tb_dstream_size(gst);
 	tb_assert_and_check_return_val(size, TB_FALSE);
 
 	// compute range
-	tb_size_t range = offset;
+	tb_uint64_t range = offset;
 	switch (flag)
 	{
 	case TB_GSTREAM_SEEK_BEG:

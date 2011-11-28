@@ -37,10 +37,10 @@ extern "C" {
  * macros
  */
 
-// version: v1.4.3
+// version: v1.4.4
 #define TB_VERSION_MAJOR 			(1)
 #define TB_VERSION_MINOR 			(4)
-#define TB_VERSION_ALTER 			(3)
+#define TB_VERSION_ALTER 			(4)
 
 // c plus plus
 #ifdef __cplusplus

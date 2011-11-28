@@ -31,6 +31,7 @@
 #include "../memory/memory.h"
 #include "../string/string.h"
 #include "../platform/platform.h"
+
 /* /////////////////////////////////////////////////////////
  * types
  */
@@ -89,7 +90,7 @@ static tb_size_t tb_gstream_read_cache(tb_gstream_t* gst, tb_byte_t* data, tb_si
 
 	return read;
 }
-static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	if (gst->bread) return gst->bread(gst, data, size);
 	else if (gst->read)
@@ -98,7 +99,7 @@ static tb_int_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 		tb_int64_t 	time = tb_mclock();
 		while (read < size)
 		{
-			tb_int_t ret = gst->read(gst, data + read, size - read);	
+			tb_long_t ret = gst->read(gst, data + read, size - read);	
 			if (ret > 0)
 			{
 				read += ret;
@@ -133,8 +134,8 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	*p = '\0';
 
 	// find stream
-	tb_int_t 		i = 0;
-	tb_int_t 		n = tb_arrayn(g_gstream_table);
+	tb_size_t 		i = 0;
+	tb_size_t 		n = tb_arrayn(g_gstream_table);
 	tb_gstream_t* 	gst = TB_NULL;
 	for (; i < n; ++i)
 	{
@@ -193,7 +194,7 @@ tb_void_t tb_gstream_close(tb_gstream_t* gst)
 	gst->cache_size = 0;
 	gst->cache_head = gst->cache_data;
 }
-tb_int_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(gst && data && gst->read, -1);
 	tb_check_return_val(size, 0);
@@ -206,14 +207,14 @@ tb_int_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	return gst->read(gst, data, size);
 }
 
-tb_int_t tb_gstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(gst && data && gst->write, -1);
 	tb_check_return_val(size, 0);
 
 	return gst->write(gst, data, size);
 }
-tb_int_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(gst && data, -1);
 	tb_check_return_val(size, 0);
@@ -224,11 +225,11 @@ tb_int_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(cache < size, -1);
 
 	// read from stream
-	tb_int_t read = tb_gstream_read_block(gst, data + cache, size - cache);
+	tb_long_t read = tb_gstream_read_block(gst, data + cache, size - cache);
 	return (read < 0? -1 : (cache + read));
 }
 
-tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(gst && data, -1);
 	tb_check_return_val(size, 0);
@@ -240,7 +241,7 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		tb_int64_t 	time = tb_mclock();
 		while (write < size)
 		{
-			tb_int_t ret = gst->write(gst, data + write, size - write);	
+			tb_long_t ret = gst->write(gst, data + write, size - write);	
 			if (ret > 0)
 			{
 				write += ret;
@@ -258,7 +259,7 @@ tb_int_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	}
 	return -1;
 }
-tb_int_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
+tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 {
 	// format data
 	tb_char_t data[TB_GSTREAM_BLOCK_SIZE];
@@ -303,7 +304,7 @@ tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 	}
 
 	// fill the left data
-	tb_int_t ret = tb_gstream_read_block(gst, gst->cache_data + gst->cache_size, size - gst->cache_size);
+	tb_long_t ret = tb_gstream_read_block(gst, gst->cache_data + gst->cache_size, size - gst->cache_size);
 	if (ret < 0) return TB_NULL;
 
 	// update size
@@ -313,7 +314,7 @@ tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 	return gst->cache_head;
 }
 
-tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t flag)
+tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
 {
 	tb_assert_and_check_return_val(gst, TB_FALSE);
 
@@ -325,8 +326,8 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 		return TB_TRUE;
 
 	// compute the real offset
-	tb_size_t size = tb_gstream_size(gst);
-	tb_size_t curt = tb_gstream_offset(gst);
+	tb_uint64_t size = tb_gstream_size(gst);
+	tb_uint64_t curt = tb_gstream_offset(gst);
 	if (flag == TB_GSTREAM_SEEK_CUR) offset += curt;
 	else if (flag == TB_GSTREAM_SEEK_END)
 	{
@@ -343,7 +344,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int_t offset, tb_gstream_seek_t 
 		{
 			tb_byte_t data[TB_GSTREAM_BLOCK_SIZE];
 			tb_size_t need = tb_min(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_SIZE);
-			tb_int_t ret = tb_gstream_read(gst, data, need);
+			tb_long_t ret = tb_gstream_read(gst, data, need);
 			if (ret > 0) time = tb_mclock();
 			else if (!ret)
 			{
@@ -579,36 +580,35 @@ tb_bool_t tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val)
 	if (4 != tb_gstream_bwrite(gst, b, 4)) return TB_FALSE;
 	return TB_TRUE;
 }
-tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
+tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 {
 	tb_assert_and_check_return_val(gst && ist, 0);	
 
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
-	tb_size_t 		read = 0;
+	tb_uint64_t 	read = 0;
+	tb_uint64_t 	left = tb_gstream_left(ist);
 	tb_int64_t 		time = tb_mclock();
-	tb_size_t 		left = tb_gstream_left(ist);
 	do
 	{
-		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
+		tb_long_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
 		//tb_trace("ret: %d", ret);
 		if (ret > 0)
 		{
 			read += ret;
 			time = tb_mclock();
 
-			tb_int_t write = 0;
+			tb_long_t write = 0;
 			while (write < ret)
 			{
-				tb_int_t ret2 = tb_gstream_write(gst, data + write, ret - write);
+				tb_long_t ret2 = tb_gstream_write(gst, data + write, ret - write);
 				if (ret2 > 0) write += ret2;
 				else if (ret2 < 0) break;
 			}
 		}
 		else if (!ret) 
 		{
-			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+			if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
 		}
 		else break;
 
@@ -619,7 +619,7 @@ tb_size_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 
 	return read;
 }
-tb_size_t tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost)
+tb_uint64_t tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost)
 {
 	tb_assert_and_check_return_val(gst && ost, 0);
 	return tb_gstream_load(ost, gst);
