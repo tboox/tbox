@@ -32,7 +32,6 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "slist.h"
 #include "item.h"
 
 /* /////////////////////////////////////////////////////////
