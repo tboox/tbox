@@ -96,7 +96,8 @@ static tb_size_t tb_item_func_int_hash(tb_item_func_t* func, tb_cpointer_t data,
 }
 static tb_long_t tb_item_func_int_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	return (ldata - rdata);
+	return (ldata > rdata? 1 : (ldata < rdata? -1 : 0));
+	//return (ldata - rdata); //!< maybe overflow for int32
 }
 static tb_pointer_t tb_item_func_int_data(tb_item_func_t* func, tb_cpointer_t item)
 {
