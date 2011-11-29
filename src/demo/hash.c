@@ -124,7 +124,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 		tb_hash_test_set_s2i(hash, s); 
 		tb_hash_test_get_s2i(hash, s);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
@@ -216,7 +216,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 		tb_hash_test_set_i2s(hash, i); 
 		tb_hash_test_get_i2s(hash, i);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
@@ -353,7 +353,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 		tb_hash_test_set_m2m(hash, i); 
 		tb_hash_test_get_m2m(hash, i);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);
@@ -443,7 +443,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 		tb_hash_test_set_i2i(hash, i); 
 		tb_hash_test_get_i2i(hash, i);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
 
 	tb_hash_exit(hash);

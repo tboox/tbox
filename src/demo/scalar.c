@@ -985,7 +985,7 @@ static tb_void_t tb_scalar_test_round(tb_scalar_t x)
 	{
 		r = tb_scalar_round(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: round(%f): %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_floor(tb_scalar_t x)
@@ -997,7 +997,7 @@ static tb_void_t tb_scalar_test_floor(tb_scalar_t x)
 	{
 		r = tb_scalar_floor(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: floor(%f): %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_ceil(tb_scalar_t x)
@@ -1009,7 +1009,7 @@ static tb_void_t tb_scalar_test_ceil(tb_scalar_t x)
 	{
 		r = tb_scalar_ceil(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: ceil(%f): %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
@@ -1021,7 +1021,7 @@ static tb_void_t tb_scalar_test_mul(tb_scalar_t a, tb_scalar_t b)
 	{
 		r = tb_scalar_mul(a, b);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: mul(%f, %f): %f, %lld ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), t);
 
 }
@@ -1034,7 +1034,7 @@ static tb_void_t tb_scalar_test_div(tb_scalar_t a, tb_scalar_t b)
 	{
 		r = tb_scalar_div(a, b);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: div(%f, %f): %f, %lld ms\n", tb_scalar_to_float(a), tb_scalar_to_float(b), tb_scalar_to_float(r), t);
 }
 static tb_void_t tb_scalar_test_invert(tb_scalar_t x)
@@ -1046,7 +1046,7 @@ static tb_void_t tb_scalar_test_invert(tb_scalar_t x)
 	{
 		r = tb_scalar_invert(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: invert(%f): %f, %lld ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), t);
 }
 static tb_void_t tb_scalar_test_sqre(tb_scalar_t x)
@@ -1058,7 +1058,7 @@ static tb_void_t tb_scalar_test_sqre(tb_scalar_t x)
 	{
 		r = tb_scalar_sqre(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: sqre(%f): %f, %lld ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), t);
 }
 static tb_void_t tb_scalar_test_sqrt(tb_scalar_t x)
@@ -1070,7 +1070,7 @@ static tb_void_t tb_scalar_test_sqrt(tb_scalar_t x)
 	{
 		r = tb_scalar_sqrt(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: sqrt(%f) = %f, %lld ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), t);
 }
 static tb_void_t tb_scalar_test_ilog2(tb_scalar_t x)
@@ -1082,7 +1082,7 @@ static tb_void_t tb_scalar_test_ilog2(tb_scalar_t x)
 	{
 		r = tb_scalar_ilog2(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: ilog2(%f) = %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_iclog2(tb_scalar_t x)
@@ -1094,7 +1094,7 @@ static tb_void_t tb_scalar_test_iclog2(tb_scalar_t x)
 	{
 		r = tb_scalar_iclog2(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: iclog2(%f) = %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_irlog2(tb_scalar_t x)
@@ -1106,7 +1106,7 @@ static tb_void_t tb_scalar_test_irlog2(tb_scalar_t x)
 	{
 		r = tb_scalar_irlog2(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: irlog2(%f) = %d, %lld ms\n", tb_scalar_to_float(x), r, t);
 }
 static tb_void_t tb_scalar_test_exp(tb_scalar_t x)
@@ -1118,7 +1118,7 @@ static tb_void_t tb_scalar_test_exp(tb_scalar_t x)
 	{
 		r = tb_scalar_exp(x);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("[scalar]: exp(%f) = %f, %lld ms\n", tb_scalar_to_float(x), tb_scalar_to_float(r), t);
 }
 static tb_void_t tb_scalar_test_sin()
@@ -1132,7 +1132,7 @@ static tb_void_t tb_scalar_test_sin()
 		for (i = 0; i < 360; i++)
 			r = tb_scalar_sin(tb_scalar_test_angle[i]);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 0; i < 360; i++)
 	{
@@ -1152,7 +1152,7 @@ static tb_void_t tb_scalar_test_cos()
 		for (i = 0; i < 360; i++)
 			r = tb_scalar_cos(tb_scalar_test_angle[i]);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 0; i < 360; i++)
 	{
@@ -1172,7 +1172,7 @@ static tb_void_t tb_scalar_test_tan()
 		for (i = 0; i < 360; i++)
 			r = tb_scalar_tan(tb_scalar_test_angle[i]);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 0; i < 360; i++)
 	{
@@ -1201,7 +1201,7 @@ static tb_void_t tb_scalar_test_atan2()
 			}
 		}
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 50; i < 55; i++)
 	{
@@ -1241,7 +1241,7 @@ static tb_void_t tb_scalar_test_asin()
 			}
 		}
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 0; i < 5; i++)
 	{
@@ -1277,7 +1277,7 @@ static tb_void_t tb_scalar_test_acos()
 			}
 		}
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	for (i = 0; i < 5; i++)
 	{
@@ -1308,7 +1308,7 @@ static tb_void_t tb_scalar_test_atan()
 			r = tb_scalar_atan(a);
 		}
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 
 	for (i = -50; i <= 50; i++)

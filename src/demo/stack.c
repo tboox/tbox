@@ -32,7 +32,7 @@ static tb_size_t tb_stack_put_and_pop_test()
 		tb_stack_pop(stack);
 		tb_stack_put(stack, 0xf);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_stack_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_stack_size(stack), tb_stack_maxn(stack));
@@ -49,7 +49,7 @@ static tb_size_t tb_stack_put_and_pop_test()
 	// exit
 	tb_stack_exit(stack);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 
 static tb_size_t tb_stack_iterator_next_test()
@@ -67,7 +67,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_stack_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
@@ -75,7 +75,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	// exit
 	tb_stack_exit(stack);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_stack_iterator_prev_test()
 {
@@ -95,7 +95,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 		if (itor == head) break;
 		itor = tb_stack_itor_prev(stack, itor);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_stack_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
@@ -103,7 +103,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 	// exit
 	tb_stack_exit(stack);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 
 static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)

@@ -16,7 +16,7 @@ static tb_void_t tb_test_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 	{
 		r = tb_strcmp(s1, s2);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strcmp(%s, %s) = %d\n", t, s1, s2, r);
 }
 static tb_void_t tb_test_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t size)
@@ -28,7 +28,7 @@ static tb_void_t tb_test_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_si
 	{
 		r = tb_strncmp(s1, s2, size);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strncmp(%s, %s, %u) = %d\n", t, s1, s2, size, r);
 }
 static tb_void_t tb_test_stricmp(tb_char_t const* s1, tb_char_t const* s2)
@@ -40,7 +40,7 @@ static tb_void_t tb_test_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 	{
 		r = tb_stricmp(s1, s2);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_stricmp(%s, %s) = %d\n", t, s1, s2, r);
 }
 static tb_void_t tb_test_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t size)
@@ -52,7 +52,7 @@ static tb_void_t tb_test_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_s
 	{
 		r = tb_strnicmp(s1, s2, size);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strnicmp(%s, %s, %u) = %d\n", t, s1, s2, size, r);
 }
 static tb_void_t tb_test_strlen(tb_char_t const* s)
@@ -64,7 +64,7 @@ static tb_void_t tb_test_strlen(tb_char_t const* s)
 	{
 		r = tb_strlen(s);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strlen(%s) = %d\n", t, s, r);
 }
 static tb_void_t tb_test_strnlen(tb_char_t const* s, tb_size_t size)
@@ -76,7 +76,7 @@ static tb_void_t tb_test_strnlen(tb_char_t const* s, tb_size_t size)
 	{
 		r = tb_strnlen(s, size);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strnlen(%s, %u) = %d\n", t, s, size, r);
 }
 static tb_void_t tb_test_strcpy(tb_char_t const* s2)
@@ -89,7 +89,7 @@ static tb_void_t tb_test_strcpy(tb_char_t const* s2)
 	{
 		tb_strcpy(s1, s2);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strcpy(%s) = %s\n", t, s2, s1);
 }
 static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
@@ -102,7 +102,7 @@ static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 	{
 		tb_strncpy(s1, s2, size);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strncpy(%s, %d) = %s\n", t, s2, size, s1);
 }
 int main(int argc, char** argv)

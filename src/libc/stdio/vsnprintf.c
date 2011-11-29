@@ -30,16 +30,6 @@
 #include "../string/string.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-
-#ifdef TB_CONFIG_TYPE_INT64
-# 	define tb_uint64_to_native(x) 		((unsigned long long)(x))
-#else
-# 	define tb_uint64_to_native(x) 		(((unsigned long long)x.h << 32) | x.l)
-#endif
-
-/* ////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -164,21 +154,16 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	// lowercase mask, e.g. 'F' | 0x20 => 'f'
 	tb_int_t lomask = (e.extra & TB_PRINTF_EXTRA_UPPER)? 0x0 : 0x20;
 
-	// FIXME
-	unsigned long long 	num_u = tb_uint64_to_native(num);
-	signed long long 	num_s = (signed long long)num_u;
-
 	// sign: + -
 	tb_char_t sign = 0;
 	if (e.extra & TB_PRINTF_EXTRA_SIGNED)
 	{
-		if (num_s < 0) 
+		if ((tb_int64_t)num < 0) 
 		{
 			sign = '-';
 			--e.width;
 	
-			// FIXME
-			num_u = (unsigned long long)(-num_s); 
+			num = (tb_uint64_t)(-(tb_int64_t)num); 
 		}
 		else if (e.flags & TB_PRINTF_FLAG_PLUS)
 		{
@@ -188,16 +173,16 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	}
 
 	// convert num => digits string in reverse order
-	if (num_u == 0) digits[digit_i++] = '0';
+	if (num == 0) digits[digit_i++] = '0';
 	else 
 	{
 #if 0
 		do 
 		{
-			digits[digit_i++] = digits_table[num_u % e.base] | lomask;
-			num_u /= e.base;
+			digits[digit_i++] = digits_table[num % e.base] | lomask;
+			num /= e.base;
 		}
-		while (num_u);
+		while (num);
 #else
 		if (e.base != 10)
 		{
@@ -206,19 +191,19 @@ static tb_char_t* tb_printf_int64(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 			else if (e.base == 2) shift_bits -= 3;
 			do 
 			{
-				digits[digit_i++] = digits_table[(tb_uint8_t)num_u & (e.base - 1)] | lomask;
-				num_u >>= shift_bits;
+				digits[digit_i++] = digits_table[(tb_uint8_t)num & (e.base - 1)] | lomask;
+				num >>= shift_bits;
 			}
-			while (num_u);
+			while (num);
 		}
 		else
 		{
 			do 
 			{
-				digits[digit_i++] = digits_table[num_u % e.base] | lomask;
-				num_u /= e.base;
+				digits[digit_i++] = digits_table[num % e.base] | lomask;
+				num /= e.base;
 			}
-			while (num_u);
+			while (num);
 		}
 #endif
 	}

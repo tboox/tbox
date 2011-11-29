@@ -45,11 +45,11 @@
  */
 typedef struct __tb_socket_t
 {
-	tb_int_t 	fd;
-	tb_int_t 	type;
-	tb_bool_t 	is_block;
+	tb_int_t 		fd;
+	tb_int_t 		type;
+	tb_bool_t 		is_block;
 	tb_uint16_t 	port;
-	tb_char_t 	host[TB_SOCKET_HOST_MAX];
+	tb_char_t 		host[TB_SOCKET_HOST_MAX];
 
 }tb_socket_t;
 /* /////////////////////////////////////////////////////////

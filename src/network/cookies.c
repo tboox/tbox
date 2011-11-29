@@ -358,7 +358,7 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 				cookie->secure = entry->bsecure;
 
 				// update expires
-				cookie->expires = tb_uint32_to_uint64(0);
+				cookie->expires = 0;
 
 				// update value
 				if (svalue->refn > 1) svalue->refn--;
@@ -434,7 +434,7 @@ static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 	cookie.secure = entry->bsecure;
 
 	// set expires
-	cookie.expires = tb_uint32_to_uint64(0);
+	cookie.expires = 0;
 
 	// set strings
 	cookie.domain = tb_cookie_set_string(cookies, entry->pdomain, entry->ndomain);

@@ -68,14 +68,13 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 
 	while(1)
 	{
-		tb_int_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
+		tb_long_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
 		//tb_trace("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
 		{
 			// timeout?
-			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+			if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
 		}
 		else
 		{
@@ -104,23 +103,22 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 	while(1)
 	{
 		// get data
-		tb_int_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_BLOCK_SIZE);
+		tb_long_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_BLOCK_SIZE);
 		//tb_trace("ret: %d", ret);
 
 		// is end?
 		if (size)
 		{
 			// write it
-			tb_int_t write = 0;
+			tb_long_t write = 0;
 			while (write < size)
 			{
-				tb_int_t ret = tb_gstream_write(ost, data + write, size - write);
+				tb_long_t ret = tb_gstream_write(ost, data + write, size - write);
 				if (ret < 0) break;
 				else if (!ret)
 				{
 					// timeout?
-					tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-					if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+					if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;	
 				}
 				else
 				{
@@ -496,7 +494,7 @@ tb_size_t tb_bstream_get_data(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size
 	tb_assert(bst->e >= bst->p);
 	tb_bstream_sync(bst);
 	
-	tb_int_t get_n = size;
+	tb_size_t get_n = size;
 	if (bst->e - bst->p < get_n) get_n = bst->e - bst->p;
 	if (get_n)
 	{
@@ -683,7 +681,7 @@ tb_size_t tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_size_
 	tb_assert(bst->e >= bst->p);
 	tb_bstream_sync(bst);
 
-	tb_int_t set_n = size;
+	tb_size_t set_n = size;
 	if (bst->e - bst->p < set_n) set_n = bst->e - bst->p;
 	if (set_n)
 	{

@@ -8,7 +8,7 @@ static tb_void_t tb_test_bits_swap_u16()
 
 	while (n--) x = tb_bits_swap_u16(x);
 
-	dt = tb_int64_sub(tb_mclock(), dt);
+	dt = tb_mclock() - dt;
 	tb_printf("[bitops]: swap_u16: %x => %x, %llu ms\n", 0x1234, x, dt);
 }
 static tb_void_t tb_test_bits_swap_u32()
@@ -19,26 +19,26 @@ static tb_void_t tb_test_bits_swap_u32()
 
 	while (n--) x = tb_bits_swap_u32(x);
 
-	dt = tb_int64_sub(tb_mclock(), dt);
+	dt = tb_mclock() - dt;
 	tb_printf("[bitops]: swap_u32: %x => %x, %llu ms\n", 0x12345678, x, dt);
 }
 static tb_void_t tb_test_bits_swap_u64()
 {
-	__tb_volatile__ tb_uint64_t x = tb_uint32_to_uint64(0x12345678);
+	__tb_volatile__ tb_uint64_t x = 0x12345678;
 	__tb_volatile__ tb_size_t 	n = 100000001;
 	__tb_volatile__ tb_int64_t 	dt = tb_mclock();
 
 	while (n--) x = tb_bits_swap_u64(x);
 
-	dt = tb_int64_sub(tb_mclock(), dt);
+	dt = tb_mclock() - dt;
 	tb_printf("[bitops]: swap_u64: %x => %llx, %llu ms\n", 0x12345678, x, dt);
 }
 static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 {
 	__tb_volatile__ tb_size_t 	b = 0;
 	__tb_volatile__ tb_size_t 	n = 0;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	for (b = 0; b < 8; ++b)
 	{
 		tb_printf("[bitops]: ubits32 b: %d x: %x\n", b, x);
@@ -53,13 +53,13 @@ static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 
 			t1 = tb_mclock();
 			while (n1--) tb_bits_set_ubits32(p, b, x, n);
-			t1 = tb_int64_sub(tb_mclock(), t1);
-			ts = tb_int64_add(ts, t1);
+			t1 = tb_mclock() - t1;
+			ts += t1;
 
 			t2 = tb_mclock();
 			while (n2--) y = tb_bits_get_ubits32(p, b, n);
-			t2 = tb_int64_sub(tb_mclock(), t2);
-			tg = tb_int64_add(tg, t2);
+			t2 = tb_mclock() - t2;
+			tg += t1;
 
 			if (xx != y)
 			{
@@ -74,8 +74,8 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 {
 	__tb_volatile__ tb_size_t 	b = 0;
 	__tb_volatile__ tb_size_t 	n = 0;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	for (b = 0; b < 8; ++b)
 	{
 		tb_printf("[bitops]: sbits32 b: %d x: %d\n", b, x);
@@ -90,13 +90,13 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 
 			t1 = tb_mclock();
 			while (n1--) tb_bits_set_sbits32(p, b, x, n);
-			t1 = tb_int64_sub(tb_mclock(), t1);
-			ts = tb_int64_add(ts, t1);
+			t1 = tb_mclock() - t1;
+			ts += t1;
 
 			t2 = tb_mclock();
 			while (n2--) y = tb_bits_get_sbits32(p, b, n);
-			t2 = tb_int64_sub(tb_mclock(), t2);
-			tg = tb_int64_add(tg, t2);
+			t2 = tb_mclock() - t2;
+			tg += t1;
 
 			if (xx != y)
 			{
@@ -113,19 +113,19 @@ static tb_void_t tb_test_bits_u32_be(tb_uint32_t x)
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u32_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u32_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u32_be set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -135,19 +135,19 @@ static tb_void_t tb_test_bits_u32_le(tb_uint32_t x)
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u32_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u32_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u32_le set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -157,19 +157,19 @@ static tb_void_t tb_test_bits_u24_be(tb_uint32_t x)
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u24_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u24_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u24_be set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -179,19 +179,19 @@ static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 	__tb_volatile__ tb_uint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u24_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u24_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u24_le set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -201,19 +201,19 @@ static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 	__tb_volatile__ tb_uint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u16_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u16_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u16_be set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -223,19 +223,19 @@ static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 	__tb_volatile__ tb_uint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_u16_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_u16_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: u16_le set: x: %x, %llu ms, get: y: %x, %llu ms\n", x, ts, y, tg);
 }
@@ -246,19 +246,19 @@ static tb_void_t tb_test_bits_s32_be(tb_sint32_t x)
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s32_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s32_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s32_be set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -268,19 +268,19 @@ static tb_void_t tb_test_bits_s32_le(tb_sint32_t x)
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s32_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s32_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s32_le set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -290,19 +290,19 @@ static tb_void_t tb_test_bits_s24_be(tb_sint32_t x)
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s24_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s24_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s24_be set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -312,19 +312,19 @@ static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 	__tb_volatile__ tb_sint32_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s24_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s24_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s24_le set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -334,19 +334,19 @@ static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 	__tb_volatile__ tb_sint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s16_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s16_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s16_be set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -356,19 +356,19 @@ static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 	__tb_volatile__ tb_sint16_t y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_s16_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_s16_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms\n", x, ts, y, tg);
 }
@@ -378,19 +378,19 @@ static tb_void_t tb_test_bits_double_bbe(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_double_bbe(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_double_bbe(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: double_bbe set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
@@ -400,19 +400,19 @@ static tb_void_t tb_test_bits_double_ble(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_double_ble(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_double_ble(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: double_ble set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
@@ -422,19 +422,19 @@ static tb_void_t tb_test_bits_double_lbe(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_double_lbe(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_double_lbe(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: double_lbe set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
@@ -444,19 +444,19 @@ static tb_void_t tb_test_bits_double_lle(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_double_lle(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_double_lle(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: double_lle set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
@@ -466,19 +466,19 @@ static tb_void_t tb_test_bits_float_be(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_float_be(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_float_be(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: float_be set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }
@@ -488,19 +488,19 @@ static tb_void_t tb_test_bits_float_le(tb_float_t x)
 	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
-	__tb_volatile__ tb_int64_t 	ts = TB_INT64_ZERO;
-	__tb_volatile__ tb_int64_t 	tg = TB_INT64_ZERO;
+	__tb_volatile__ tb_int64_t 	ts = 0;
+	__tb_volatile__ tb_int64_t 	tg = 0;
 	__tb_volatile__ tb_int64_t 	t1, t2;
 
 	t1 = tb_mclock();
 	while (n1--) tb_bits_set_float_le(p, x);
-	t1 = tb_int64_sub(tb_mclock(), t1);
-	ts = tb_int64_add(ts, t1);
+	t1 = tb_mclock() - t1;
+	ts += t1;
 
 	t2 = tb_mclock();
 	while (n2--) y = tb_bits_get_float_le(p);
-	t2 = tb_int64_sub(tb_mclock(), t2);
-	tg = tb_int64_add(tg, t2);
+	t2 = tb_mclock() - t2;
+	tg += t1;
 
 	tb_printf("[bitops]: float_le set: x: %lf, %llu ms, get: y: %lf, %llu ms\n", x, ts, y, tg);
 }

@@ -26,7 +26,6 @@
  */
 #include "sha.h"
 #include "bits.h"
-#include "../math/math.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -299,15 +298,15 @@ tb_void_t tb_sha_init(tb_sha_t* sha, tb_size_t mode)
 		tb_assert(0);
 		break;
 	}
-	sha->count = TB_UINT64_ZERO;
+	sha->count = 0;
 }
 tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 {
-	tb_uint64_t count = tb_bits_be_to_ne_u64(tb_uint64_lsh(sha->count, 3));
+	tb_uint64_t count = tb_bits_be_to_ne_u64(sha->count << 3);
 
 	tb_sha_spank(sha, "\200", 1);
 
-	while ((tb_uint64_to_uint32(sha->count) & 63) != 56)
+	while ((sha->count & 63) != 56)
 		tb_sha_spank(sha, "", 1);
 
 	tb_sha_spank(sha, (tb_byte_t*)&count, 8);
@@ -322,8 +321,8 @@ tb_void_t tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
 {
 	tb_uint32_t i, j;
 
-	j = tb_uint64_to_uint32(sha->count) & 63;
-	sha->count = tb_uint64_add_uint32(sha->count, size);
+	j = (tb_uint32_t)sha->count & 63;
+	sha->count += size;
 
 #ifdef TB_CONFIG_BINARY_SMALL
 	for (i = 0; i < size; i++) 

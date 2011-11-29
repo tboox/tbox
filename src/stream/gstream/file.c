@@ -106,7 +106,7 @@ static tb_long_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	tb_long_t ret = tb_file_read(fst->file, data, size);
 
 	// update offset
-	if (ret > 0) fst->offset = tb_uint64_add_uint32(fst->offset, (tb_uint32_t)ret);
+	if (ret > 0) fst->offset += ret;
 	return ret;
 }
 static tb_long_t tb_fstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)

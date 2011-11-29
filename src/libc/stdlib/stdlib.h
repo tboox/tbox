@@ -45,6 +45,22 @@ extern "C" {
 #define tb_stoi32(s) 				((tb_int32_t)tb_stou32(s))
 #define tb_sbtoi32(s, b) 			((tb_int32_t)tb_sbtou32(s, b))
 
+// FIXME
+#define tb_s2toi64(s) 				((tb_int64_t)tb_s2toi32(s))
+#define tb_s8toi64(s) 				((tb_int64_t)tb_s8toi32(s))
+#define tb_s10toi64(s) 				((tb_int64_t)tb_s10toi32(s))
+#define tb_s16toi64(s) 				((tb_int64_t)tb_s16toi32(s))
+#define tb_stoi64(s) 				((tb_int64_t)tb_stoi32(s))
+#define tb_sbtoi64(s, b) 			((tb_int64_t)tb_sbtoi32(s, b))
+
+// FIXME
+#define tb_s2tou64(s) 				((tb_uint64_t)tb_s2tou32(s))
+#define tb_s8tou64(s) 				((tb_uint64_t)tb_s8tou32(s))
+#define tb_s10tou64(s) 				((tb_uint64_t)tb_s10tou32(s))
+#define tb_s16tou64(s) 				((tb_uint64_t)tb_s16tou32(s))
+#define tb_stou64(s) 				((tb_uint64_t)tb_stou32(s))
+#define tb_sbtou64(s, b) 			((tb_uint64_t)tb_sbtou32(s, b))
+
 // c porting
 #define tb_atoi(s) 					((tb_int32_t)tb_stou32(s))
 #define tb_atof(s) 					tb_stof(s)
