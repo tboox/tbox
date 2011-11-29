@@ -83,9 +83,6 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_pointer_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
-#ifndef TB_CONFIG_TYPE_INT64
-	tb_assert_static(TB_CPU_BITSIZE < 64);
-#endif
 
 	// check byteorder
 	tb_assert(tb_check_word_order());

@@ -37,9 +37,7 @@
 #define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
 #define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
 
-#ifdef TB_CONFIG_TYPE_INT64
-# 	define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
-#endif
+#define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 /* ////////////////////////////////////////////////////////////////////////
@@ -72,7 +70,6 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 	return x;
 }
 
-#ifdef TB_CONFIG_TYPE_INT64
 static __tb_inline__ tb_uint64_t const tb_bits_swap_u64_asm(tb_uint64_t x)
 {
 	__tb_register__ tb_size_t esi, edi;
@@ -93,7 +90,6 @@ static __tb_inline__ tb_uint64_t const tb_bits_swap_u64_asm(tb_uint64_t x)
 	);
 	return x;
 }
-#endif
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 
