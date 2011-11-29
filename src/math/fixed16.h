@@ -90,7 +90,7 @@
 	
 // mul
 #ifndef tb_fixed16_mul
-# 	if defined(TB_CONFIG_TYPE_INT64)
+# 	if 1
 # 		define tb_fixed16_mul(x, y) 		tb_fixed16_mul_int64(x, y)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
 # 		define tb_fixed16_mul(x, y) 		tb_fixed16_mul_float(x, y)
@@ -101,7 +101,7 @@
 
 // div
 #ifndef tb_fixed16_div
-# 	if defined(TB_CONFIG_TYPE_INT64)
+# 	if 1
 # 		define tb_fixed16_div(x, y) 		tb_fixed16_div_int64(x, y)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
 # 		define tb_fixed16_div(x, y) 		tb_fixed16_div_float(x, y)
@@ -112,7 +112,7 @@
 
 // invert: 1 / x
 #ifndef tb_fixed16_invert
-# 	if defined(TB_CONFIG_TYPE_INT64)
+# 	if 1
 # 		define tb_fixed16_invert(x) 		tb_fixed16_div(TB_FIXED16_ONE, x)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
 # 		define tb_fixed16_invert(x) 		tb_fixed16_div(TB_FIXED16_ONE, x)
@@ -123,7 +123,7 @@
 
 // sqre
 #ifndef tb_fixed16_sqre
-# 	if defined(TB_CONFIG_TYPE_INT64)
+# 	if 1
 # 		define tb_fixed16_sqre(x) 			tb_fixed16_sqre_int64(x)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
 # 		define tb_fixed16_sqre(x) 			tb_fixed16_sqre_float(x)
@@ -277,7 +277,6 @@ static __tb_inline__ tb_int_t tb_fixed16_to_int_check(tb_fixed16_t x)
 }
 #endif
 
-#ifdef TB_CONFIG_TYPE_INT64
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed16_t y)
 {
 	return (tb_fixed16_t)((tb_int64_t)x * y >> 16);
@@ -291,7 +290,6 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
 {
 	return (tb_fixed16_t)((tb_int64_t)x * x >> 16);
 }
-#endif
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_float(tb_fixed16_t x, tb_fixed16_t y)
