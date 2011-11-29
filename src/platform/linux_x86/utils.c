@@ -26,7 +26,6 @@
  */
 #include "prefix.h"
 #include "../../libc/libc.h"
-#include "../../math/math.h"
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
@@ -69,8 +68,7 @@ tb_int64_t tb_mclock()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-	tb_int64_t ms = tb_int64_mul_int32(tb_int32_to_int64(tv.tv_sec), 1000);
-	return tb_int64_add_int32(ms, tv.tv_usec / 1000);
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
 // uclock
@@ -78,8 +76,7 @@ tb_int64_t tb_uclock()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-	tb_int64_t us = tb_int64_mul_int32(tb_int32_to_int64(tv.tv_sec), 1000000);
-	return tb_int64_add_int32(us, tv.tv_usec);
+	return (tv.tv_sec * 1000000 + tv.tv_usec);
 }
 tb_int64_t tb_time()
 {

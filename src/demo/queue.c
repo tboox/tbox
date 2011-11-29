@@ -31,7 +31,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 		tb_queue_pop(queue);
 		tb_queue_put(queue, 0xf);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_queue_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_queue_size(queue), tb_queue_maxn(queue));
@@ -48,7 +48,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 	// exit
 	tb_queue_exit(queue);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 
 static tb_size_t tb_queue_iterator_next_test()
@@ -66,7 +66,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	{
 		__tb_volatile__ tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_queue_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
@@ -74,7 +74,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	// exit
 	tb_queue_exit(queue);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_queue_iterator_prev_test()
 {
@@ -94,7 +94,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 		if (itor == head) break;
 		itor = tb_queue_itor_prev(queue, itor);
 	}
-	t = tb_int64_sub(tb_mclock(), t);
+	t = tb_mclock() - t;
 
 	// time
 	tb_print("tb_queue_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
@@ -102,7 +102,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	// exit
 	tb_queue_exit(queue);
 
-	return n / (tb_int64_to_int32(t) + 1);
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 {

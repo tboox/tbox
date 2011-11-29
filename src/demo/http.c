@@ -19,16 +19,16 @@ int main(int argc, char** argv)
 	if (!cookies) goto end;
 	
 	// init option
-	if (TB_FALSE == tb_http_option_set_url(http, argv[1])) goto end;
-	if (TB_FALSE == tb_http_option_set_head_func(http, http_head_func, http)) goto end;
-	if (TB_FALSE == tb_http_option_set_cookies(http, cookies)) goto end;
-	if (TB_FALSE == tb_http_option_set_kalive(http, TB_TRUE)) goto end;
+	if (!tb_http_option_set_url(http, argv[1])) goto end;
+	if (!tb_http_option_set_head_func(http, http_head_func, http)) goto end;
+	if (!tb_http_option_set_cookies(http, cookies)) goto end;
+	if (!tb_http_option_set_kalive(http, TB_TRUE)) goto end;
 
 	while (1)
 	{
 		// open http
 		tb_int64_t 		base = tb_mclock();
-		if (TB_FALSE == tb_http_open(http)) goto end;
+		if (!tb_http_open(http)) goto end;
 
 		// open file
 		tb_handle_t hfile = tb_file_open(argv[2], TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 		tb_size_t 		size = tb_http_status_content_size(http);
 		do
 		{
-			tb_int_t ret = tb_http_read(http, data, 8192);
+			tb_long_t ret = tb_http_read(http, data, 8192);
 			//tb_print("ret: %d", ret);
 			if (ret > 0)
 			{
@@ -49,10 +49,10 @@ int main(int argc, char** argv)
 				time = tb_mclock();
 
 #if 1
-				tb_int_t write = 0;
+				tb_long_t write = 0;
 				while (write < ret)
 				{
-					tb_int_t ret2 = tb_file_write(hfile, data + write, ret - write);
+					tb_long_t ret2 = tb_file_write(hfile, data + write, ret - write);
 					if (ret2 > 0) write += ret2;
 					else if (ret2 < 0) break;
 				}
@@ -61,8 +61,7 @@ int main(int argc, char** argv)
 			}
 			else if (!ret) 
 			{
-				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-				if (tb_int64_gt_int32(timeout, 10000)) break;
+				if (tb_mclock() - time > 10000) break;
 			}
 			else break;
 
@@ -80,7 +79,7 @@ end:
 		tb_http_close(http);
 
 		// time
-		tb_printf("\ntime: %lld ms\n", (tb_int64_sub(tb_mclock(), base)));
+		tb_printf("\ntime: %lld ms\n", tb_mclock() - base);
 	}
 
 	// destroy it

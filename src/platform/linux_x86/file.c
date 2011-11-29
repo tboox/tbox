@@ -66,25 +66,25 @@ tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
 	tb_long_t fd = open(path, flag, mode);
 
 	// ok?
-	return (fd < 0)? TB_NULL : ((tb_handle_t)fd);
+	return (fd < 0)? TB_NULL : ((tb_handle_t)(fd + 1));
 }
 tb_void_t tb_file_close(tb_handle_t hfile)
 {
-	if (hfile) close(hfile);
+	if (hfile) close((tb_long_t)hfile - 1);
 }
 tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(hfile, -1);
-	return read(hfile, data, size);
+	return read((tb_long_t)hfile - 1, data, size);
 }
 tb_long_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(hfile, -1);
-	return write(hfile, data, size);
+	return write((tb_long_t)hfile - 1, data, size);
 }
 tb_void_t tb_file_flush(tb_handle_t hfile)
 {
-	if (hfile) flush(hfile);
+	if (hfile) fdatasync((tb_long_t)hfile - 1);
 }
 tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 {
@@ -93,11 +93,11 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 	switch (flags)
 	{
 	case TB_FILE_SEEK_BEG:
-		offset = lseek(hfile, offset, SEEK_SET);
+		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_SET);
 	case TB_FILE_SEEK_CUR:
-		offset = lseek(hfile, offset, SEEK_CUR);
+		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_CUR);
 	case TB_FILE_SEEK_END:
-		offset = lseek(hfile, offset, SEEK_END);
+		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_END);
 	default:
 		tb_trace("unknown file seek flag: %d", flags);
 		break;
@@ -111,7 +111,7 @@ tb_uint64_t tb_file_size(tb_handle_t hfile)
 	tb_assert_and_check_return_val(hfile, 0);
 
 	struct stat st = {0};
-	return !fstat(hfile, &st) && st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
+	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 {

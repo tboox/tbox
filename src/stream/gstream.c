@@ -108,8 +108,7 @@ static tb_long_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_si
 			else if (!ret)
 			{
 				// timeout?
-				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
 			}
 			else return -1;
 		}
@@ -152,7 +151,7 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 
 	// set url
 	tb_assert_and_check_return_val(gst, TB_NULL);
-	if (TB_FALSE == tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
+	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
 	return gst;
 
@@ -250,8 +249,7 @@ tb_long_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			else if (!ret)
 			{
 				// timeout?
-				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
 			}
 			else return -1;
 		}
@@ -265,10 +263,10 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 	tb_char_t data[TB_GSTREAM_BLOCK_SIZE];
 	tb_size_t size = 0;
     TB_VA_FMT(data, TB_GSTREAM_BLOCK_SIZE, fmt, &size);
+	tb_check_return_val(size, 0);
 
 	// write data
-	if (size) return tb_gstream_bwrite(gst, data, size);
-	else return 0;
+	return tb_gstream_bwrite(gst, data, size);
 }
 tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 {
@@ -322,7 +320,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_
 	tb_assert_and_check_return_val(!gst->cache_size, TB_FALSE);
 
 	// hook
-	if (gst->seek && TB_TRUE == gst->seek(gst, offset, flag))
+	if (gst->seek && gst->seek(gst, offset, flag))
 		return TB_TRUE;
 
 	// compute the real offset
@@ -349,8 +347,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_
 			else if (!ret)
 			{
 				// timeout?
-				tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-				if (tb_int64_gt_int32(timeout, TB_GSTREAM_TIMEOUT)) break;
+				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
 			}
 			else break;
 		}
@@ -359,20 +356,20 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_
 	// ok?
 	return (tb_gstream_offset(gst) == offset)? TB_TRUE : TB_FALSE;
 }
-tb_size_t tb_gstream_size(tb_gstream_t const* gst)
+tb_uint64_t tb_gstream_size(tb_gstream_t const* gst)
 {
 	tb_assert_and_check_return_val(gst, 0);
 	return gst->size? gst->size(gst) : 0;
 }
-tb_size_t tb_gstream_offset(tb_gstream_t const* gst)
+tb_uint64_t tb_gstream_offset(tb_gstream_t const* gst)
 {
 	tb_assert_and_check_return_val(gst && gst->offset, 0);
 	return gst->offset(gst);
 }
-tb_size_t tb_gstream_left(tb_gstream_t const* gst)
+tb_uint64_t tb_gstream_left(tb_gstream_t const* gst)
 {
-	tb_size_t size = tb_gstream_size(gst);
-	tb_size_t offset = tb_gstream_offset(gst);
+	tb_uint64_t size = tb_gstream_size(gst);
+	tb_uint64_t offset = tb_gstream_offset(gst);
 	return (size > offset? (size - offset) : 0);
 }
 

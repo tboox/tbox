@@ -131,35 +131,36 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstrea
 	tb_assert_and_check_return_val(size, TB_FALSE);
 
 	// compute range
-	tb_uint64_t range = offset;
+	tb_http_range_t range = {0};
+	range.bof = offset;
 	switch (flag)
 	{
 	case TB_GSTREAM_SEEK_BEG:
 		break;
 	case TB_GSTREAM_SEEK_CUR:
-		range = hst->offset + offset;
+		range.bof = hst->offset + offset;
 		break;
 	case TB_GSTREAM_SEEK_END:
-		range = size + offset;
+		range.bof = size + offset;
 		break;
 	default:
 		break;
 	}
-	tb_assert_and_check_return_val(range <= size, TB_FALSE);
+	tb_assert_and_check_return_val(range.bof <= size, TB_FALSE);
 
-	if (range != hst->offset)
+	if (range.bof != hst->offset)
 	{
 		// close it
 		tb_http_close(hst->http);
 
 		// set range
-		tb_http_option_set_range(hst->http, range, 0);
+		tb_http_option_set_range(hst->http, &range);
 
 		// reopen it
 		if (!tb_http_open(hst->http)) return TB_FALSE;
 
 		// update offset
-		hst->offset = range;
+		hst->offset = range.bof;
 	}
 	return TB_TRUE;
 }
@@ -238,6 +239,10 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 		{
 			return tb_http_option_set_cookies(hst->http, (tb_cookies_t*)arg1);
 		}
+	case TB_HSTREAM_CMD_SET_RANGE:
+		{
+			return tb_http_option_set_range(hst->http, (tb_http_range_t const*)arg1);
+		}
 	case TB_HSTREAM_CMD_SET_SOPEN_FUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
@@ -279,11 +284,6 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 		{
 			tb_assert_and_check_return_val(arg1 && arg2, TB_FALSE);
 			return tb_http_option_set_post(hst->http, (tb_byte_t const*)arg1, (tb_size_t)arg2);
-		}
-	case TB_HSTREAM_CMD_SET_RANGE:
-		{
-			tb_assert_and_check_return_val(arg1 && arg2, TB_FALSE);
-			return tb_http_option_set_range(hst->http, (tb_uint64_t)arg1, (tb_uint64_t)arg2);
 		}
 	default:
 		break;

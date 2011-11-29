@@ -71,7 +71,7 @@ tb_bool_t tb_time_to_local(tb_int64_t time, tb_time_t* local)
 	return TB_FALSE;
 #else
 	// for beigin: gmt+8
-	time = tb_int64_add_int32(time, 8 * 3600 * 1000);
+	time += 8 * 3600 * 1000;
 	return tb_time_to_utc(time, local);
 #endif
 }
@@ -79,7 +79,7 @@ tb_bool_t tb_time_to_local(tb_int64_t time, tb_time_t* local)
 // time => utc
 tb_bool_t tb_time_to_utc(tb_int64_t time, tb_time_t* utc)
 {
-	time_t t = (time_t)(tb_int64_to_int32(tb_int64_div_int32(time, 1000))); 
+	time_t t = (time_t)(time / 1000); 
 	struct tm* date = gmtime(&t);
 	if (date)
 	{
@@ -113,10 +113,10 @@ tb_bool_t tb_time_to_utc(tb_int64_t time, tb_time_t* utc)
 // local => time
 tb_bool_t tb_time_from_local(tb_int64_t* time, tb_time_t const* local)
 {
-	if (time && TB_TRUE == tb_time_from_utc(time, local))
+	if (time && tb_time_from_utc(time, local))
 	{
 		// for beigin: gmt+8
-		*time = tb_int64_add_int32(*time, 8 * 3600 * 1000);
+		*time += 8 * 3600 * 1000;
 		return TB_TRUE;
 	}
 	return TB_FALSE;
@@ -148,12 +148,12 @@ tb_bool_t tb_time_from_utc(tb_int64_t* time, tb_time_t const* utc)
 			y--;
 		}
 
-		tb_int64_t t = tb_int32_to_int64(86400 * (d + (153 * m - 457) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 719469));
-		t = tb_int64_add_int32(t, 3600 * utc->hours);
-		t = tb_int64_add_int32(t, 60 * utc->minutes);
-		t = tb_int64_add_int32(t, utc->seconds);
-		t = tb_int64_mul_int32(t, 1000);
-		t = tb_int64_add_int32(t, utc->milliseconds);
+		tb_int64_t t = 86400 * (d + (153 * m - 457) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 719469);
+		t += 3600 * utc->hours;
+		t += 60 * utc->minutes;
+		t += utc->seconds;
+		t *= 1000;
+		t += utc->milliseconds;
 		*time = t;
 
 		return TB_TRUE;

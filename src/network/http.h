@@ -99,7 +99,6 @@ typedef struct __tb_http_option_t
 	// timeout, ms
 	tb_size_t 			timeout;
 
-#error
 	// range
 	tb_http_range_t 	range;
 
@@ -161,10 +160,10 @@ typedef struct __tb_http_status_t
 	tb_uint8_t 			redirect;
 
 	// the content size
-	tb_size_t 			content_size;
+	tb_uint64_t 		content_size;
 
 	// the document size
-	tb_size_t 			document_size;
+	tb_uint64_t 		document_size;
 
 	// the chunked size
 	tb_size_t 			chunked_read;

@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	tb_int64_t 		time = tb_mclock();
 	do
 	{
-		tb_int_t ret = tb_gstream_read(zst, data, 4096);
+		tb_long_t ret = tb_gstream_read(zst, data, 4096);
 		//tb_print("ret: %d", ret);
 		if (ret > 0)
 		{
@@ -49,10 +49,10 @@ int main(int argc, char** argv)
 			time = tb_mclock();
 
 #if 1
-			tb_int_t write = 0;
+			tb_long_t write = 0;
 			while (write < ret)
 			{
-				tb_int_t ret2 = tb_gstream_write(ost, data + write, ret - write);
+				tb_long_t ret2 = tb_gstream_write(ost, data + write, ret - write);
 				if (ret2 > 0) write += ret2;
 				else if (ret2 < 0) break;
 			}
@@ -61,8 +61,7 @@ int main(int argc, char** argv)
 		}
 		else if (!ret) 
 		{
-			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_gt_int32(timeout, 5000)) break;
+			if (tb_mclock() - time > 5000) break;	
 		}
 		else break;
 
