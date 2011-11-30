@@ -228,9 +228,6 @@ tb_long_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_size_t cache = tb_gstream_read_cache(gst, data, size);
 	if (cache == size) return cache;
 
-#error
-	tb_assert_and_check_return_val(cache < size, -1);
-
 	// read from stream
 	tb_long_t read = tb_gstream_read_block(gst, data + cache, size - cache);
 	return (read < 0? -1 : (cache + read));
