@@ -31,9 +31,9 @@ int main(int argc, char** argv)
 	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
-	if (TB_FALSE == tb_gstream_open(ist)) goto end;
-	if (TB_FALSE == tb_gstream_open(ost)) goto end;
-	if (TB_FALSE == tb_gstream_open(zst)) goto end;
+	if (!tb_gstream_open(ist)) goto end;
+	if (!tb_gstream_open(ost)) goto end;
+	if (!tb_gstream_open(zst)) goto end;
 	
 	// read data
 	tb_byte_t 		data[4096];

@@ -39,7 +39,7 @@
 #define TB_HTTPS_PORT_DEFAULT 					(443)
 
 // the default timeout
-#define TB_HTTP_TIMEOUT_DEFAULT 				(5000)
+#define TB_HTTP_TIMEOUT_DEFAULT 				(10000)
 
 // the max redirect
 #define TB_HTTP_REDIRECT_MAX 					(10)
@@ -125,7 +125,7 @@ static tb_http_option_t g_http_option_default =
 static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 {
 	tb_assert_and_check_return_val(url && http, TB_FALSE);
-	//tb_trace("[http]::split: %s", url);
+	//tb_trace("[http]: split: %s", url);
 
 	// get url size
 	tb_size_t n = tb_strlen(url);
@@ -215,7 +215,7 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 	tb_char_t* pe = http->option.host + TB_HTTP_HOST_MAX - 1;
 	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
 	*pb = '\0';
-	//tb_trace("[http]::host: %s", http->option.host);
+	//tb_trace("[http]: host: %s", http->option.host);
 
 	// get port
 	if (*p && *p == ':')
@@ -228,14 +228,14 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		http->option.port = tb_stou32(port);
 	}
 	else http->option.port = http->option.bhttps? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
-	//tb_trace("[http]::port: %d", http->option.port);
+	//tb_trace("[http]: port: %d", http->option.port);
 
 	// get path
 	pb = http->option.path;
 	pe = http->option.path + TB_HTTP_PATH_MAX - 1;
 	while (p < e && pb < pe && *p) *pb++ = *p++;
 	*pb = '\0';
-	//tb_trace("[http]::path: %s", http->option.path);
+	//tb_trace("[http]: path: %s", http->option.path);
 
 	// save url
 	tb_strncpy(http->option.url, url? url : "", TB_HTTP_URL_MAX);
@@ -340,7 +340,7 @@ tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]::write: %d", write);
+	//tb_trace("[http]: write: %d", write);
 	return write;
 }
 
@@ -365,7 +365,7 @@ tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]::read: %d", read);
+	//tb_trace("[http]: read: %d", read);
 	return read;
 }
 static tb_char_t tb_http_read_char(tb_http_t* http)
@@ -495,7 +495,7 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 	tb_string_append_c_string(head, http->option.head);
 
 	// append connection
-	if (TB_FALSE == tb_http_head_find(http, "Connection")) 
+	if (!tb_http_head_find(http, "Connection")) 
 	{
 		if (http->option.bkalive)
 			tb_string_append_c_string(head, "Connection: keep-alive\r\n");
@@ -504,7 +504,7 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 
 #if 0
 	// append connection
-	if (http->option.bkalive && TB_FALSE == tb_http_head_find(http, "Keep-Alive"))
+	if (http->option.bkalive && !tb_http_head_find(http, "Keep-Alive"))
 		tb_string_append_c_string(head, "Keep-Alive: 115\r\n");
 #endif
 
@@ -539,11 +539,11 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 {
 	tb_char_t* line = http->status.line;
-	//tb_trace("[http]::line: %s", line);
+	//tb_trace("[http]: line: %s", line);
 
 	if (http->option.head_func) 
 	{
-		if (TB_FALSE == http->option.head_func(line, http->option.head_priv)) return TB_FALSE;
+		if (!http->option.head_func(line, http->option.head_priv)) return TB_FALSE;
 	}
 
 	// is end?
@@ -569,7 +569,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		while (tb_isspace(*p)) p++;
 
 		http->status.code = tb_stou32(p);
-		//tb_trace("[http]::code: %d", http->status.code);
+		//tb_trace("[http]: code: %d", http->status.code);
 
 		// check error code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return TB_FALSE;
@@ -587,7 +587,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		// parse location
 		if (!tb_stricmp(tag, "Location")) 
 		{
-			//tb_trace("[http]::redirect to: %s", p);
+			//tb_trace("[http]: redirect to: %s", p);
 
 			// redirect it
 			if (http->status.code == 301 || http->status.code == 302 || http->status.code == 303)
@@ -596,8 +596,8 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 				http->status.bredirect = 1;
 
 				// split url
-				if (TB_FALSE == tb_http_split_url(http, p)) return TB_FALSE;
-				//tb_trace("[http]::redirect: %s:%d %s", http->option.host, http->option.port, http->option.path);
+				if (!tb_http_split_url(http, p)) return TB_FALSE;
+				//tb_trace("[http]: redirect: %s:%d %s", http->option.host, http->option.port, http->option.path);
 
 				return TB_TRUE;
 			}
@@ -629,7 +629,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 				if (*p && *p++ == '-') to = tb_stou64(p);
 				while (*p && *p != '/') p++;
 				if (*p && *p++ == '/') document_size = tb_stou64(p);
-				//tb_trace("[http]::range: %u - %u / %u\n", from, to, document_size);
+				//tb_trace("[http]: range: %u - %u / %u\n", from, to, document_size);
 			}
 			// no stream, be able to seek
 			http->status.bseeked = 1;
@@ -654,7 +654,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 			// save type
 			tb_strncpy(http->status.content_type, p, TB_HTTP_CONTENT_TYPE_MAX);
 			http->status.content_type[TB_HTTP_CONTENT_TYPE_MAX - 1] = '\0';
-			//tb_trace("[http]::type: %s", p);
+			//tb_trace("[http]: type: %s", p);
 		}
 		// parse cookie
 		else if (http->option.cookies && !tb_stricmp(tag, "Set-Cookie"))
@@ -677,7 +677,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 
 static tb_bool_t tb_http_handle_response(tb_http_t* http)
 {
-	tb_trace("[http]::=============================================");
+	tb_trace("[http]: =============================================");
 	tb_size_t line_idx = 0;
 	while (1)
 	{
@@ -685,7 +685,7 @@ static tb_bool_t tb_http_handle_response(tb_http_t* http)
 		if (line)
 		{
 			// process line
-			if (TB_FALSE == tb_http_process_line(http, line_idx)) return TB_FALSE;
+			if (!tb_http_process_line(http, line_idx)) return TB_FALSE;
 			line_idx++;
 
 			// is end?
@@ -706,7 +706,7 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 	if (!http->socket || !http->status.bkalive)
 	{
 		tb_http_socket_close(http);
-		if (TB_FALSE == tb_http_socket_open(http)) return TB_FALSE;
+		if (!tb_http_socket_open(http)) return TB_FALSE;
 	}
 
 	// check socket
@@ -747,7 +747,7 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 	http->status.line[0] = '\0';
 
 	// handle response
-	if (TB_FALSE == tb_http_handle_response(http)) goto fail;
+	if (!tb_http_handle_response(http)) goto fail;
 
 	// free it
 	tb_string_uninit((tb_string_t*)&s);
@@ -817,7 +817,7 @@ tb_bool_t tb_http_open(tb_handle_t handle)
 	tb_http_close(handle);
 
 	// open host
-	if (TB_FALSE == tb_http_open_host(http))
+	if (!tb_http_open_host(http))
 	{
 		// clear status
 		tb_memset(&http->status, 0, sizeof(tb_http_status_t));
@@ -1122,18 +1122,18 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	tb_assert_and_check_return(handle);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_trace("[http]::=============================================");
-	tb_trace("[http]::option:");
-	tb_trace("[http]::option:url: %s", http->option.url);
-	tb_trace("[http]::option:host: %s", http->option.host);
-	tb_trace("[http]::option:path: %s", http->option.path);
-	tb_trace("[http]::option:port: %d", http->option.port);
-	tb_trace("[http]::option:method: %s", tb_http_method_string(http->option.method));
-	tb_trace("[http]::option:redirect: %d", http->option.redirect);
-	tb_trace("[http]::option:block: %s", http->option.bblock? "true" : "false");
-	tb_trace("[http]::option:https: %s", http->option.bhttps? "true" : "false");
-	tb_trace("[http]::option:range: %llu-%llu", http->option.range.bof, http->option.range.eof);
-	tb_trace("[http]::option:keepalive: %s", http->option.bkalive? "true" : "false");
+	tb_trace("[http]: =============================================");
+	tb_trace("[http]: option: ");
+	tb_trace("[http]: option: url: %s", http->option.url);
+	tb_trace("[http]: option: host: %s", http->option.host);
+	tb_trace("[http]: option: path: %s", http->option.path);
+	tb_trace("[http]: option: port: %d", http->option.port);
+	tb_trace("[http]: option: method: %s", tb_http_method_string(http->option.method));
+	tb_trace("[http]: option: redirect: %d", http->option.redirect);
+	tb_trace("[http]: option: block: %s", http->option.bblock? "true" : "false");
+	tb_trace("[http]: option: https: %s", http->option.bhttps? "true" : "false");
+	tb_trace("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
+	tb_trace("[http]: option: keepalive: %s", http->option.bkalive? "true" : "false");
 
 	if (http->option.cookies)
 	{
@@ -1145,7 +1145,7 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 		// format it
 		if (value) 
 		{
-			tb_trace("[http]::option:cookie: %s", value);
+			tb_trace("[http]: option: cookie: %s", value);
 		}
 	}
 }
@@ -1154,20 +1154,20 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	tb_assert_and_check_return(handle);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_trace("[http]::=============================================");
-	tb_trace("[http]::status:");
-	tb_trace("[http]::status:code: %d", http->status.code);
-	tb_trace("[http]::status:version: %s", http->status.version == TB_HTTP_VERSION_11? "HTTP/1.1" : "HTTP/1.0");
-	tb_trace("[http]::status:content:type: %s", http->status.content_type);
-	tb_trace("[http]::status:content:size: %llu", http->status.content_size);
-	tb_trace("[http]::status:document:size: %llu", http->status.document_size);
-	tb_trace("[http]::status:chunked:read: %d", http->status.chunked_read);
-	tb_trace("[http]::status:chunked:size: %d", http->status.chunked_size);
-	tb_trace("[http]::status:redirect: %d", http->status.redirect);
-	tb_trace("[http]::status:bredirect: %s", http->status.bredirect? "true" : "false");
-	tb_trace("[http]::status:bchunked: %s", http->status.bchunked? "true" : "false");
-	tb_trace("[http]::status:bseeked: %s", http->status.bseeked? "true" : "false");
-	tb_trace("[http]::status:bkalive: %s", http->status.bkalive? "true" : "false");
+	tb_trace("[http]: =============================================");
+	tb_trace("[http]: status: ");
+	tb_trace("[http]: status: code: %d", http->status.code);
+	tb_trace("[http]: status: version: %s", http->status.version == TB_HTTP_VERSION_11? "HTTP/1.1" : "HTTP/1.0");
+	tb_trace("[http]: status: content:type: %s", http->status.content_type);
+	tb_trace("[http]: status: content:size: %llu", http->status.content_size);
+	tb_trace("[http]: status: document:size: %llu", http->status.document_size);
+	tb_trace("[http]: status: chunked:read: %d", http->status.chunked_read);
+	tb_trace("[http]: status: chunked:size: %d", http->status.chunked_size);
+	tb_trace("[http]: status: redirect: %d", http->status.redirect);
+	tb_trace("[http]: status: bredirect: %s", http->status.bredirect? "true" : "false");
+	tb_trace("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
+	tb_trace("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
+	tb_trace("[http]: status: bkalive: %s", http->status.bkalive? "true" : "false");
 }
 #endif
 
@@ -1196,7 +1196,7 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			http->status.chunked_read = 0;
 
 			// skip "\r\n"
-			if (TB_FALSE == tb_http_skip_2bytes(http)) return -1;
+			if (!tb_http_skip_2bytes(http)) return -1;
 		}
 
 		// parse chunked size
@@ -1204,7 +1204,7 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		{
 			tb_char_t const* line = tb_http_read_line(http);
 			if (line) http->status.chunked_size = tb_s16tou32(line);
-			//tb_trace("[http]::chunk: %s %d", line, http->status.chunked_size);
+			//tb_trace("[http]: chunk: %s %d", line, http->status.chunked_size);
 
 			// is end?
 			if (!http->status.chunked_size) return -1;
@@ -1252,7 +1252,7 @@ tb_long_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]::write: %d", write);
+	//tb_trace("[http]: write: %d", write);
 	return write;
 }
 tb_long_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
@@ -1277,7 +1277,7 @@ tb_long_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]::read: %d", read);
+	//tb_trace("[http]: read: %d", read);
 	return read;
 }
 

@@ -204,7 +204,7 @@ tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set data & size
-	if (TB_FALSE == tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (tb_pointer_t)data, (tb_pointer_t)size)) goto fail;
+	if (!tb_gstream_ioctl2(gst, TB_DSTREAM_CMD_SET_DATA, (tb_pointer_t)data, (tb_pointer_t)size)) goto fail;
 	
 	return gst;
 

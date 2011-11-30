@@ -165,7 +165,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 	tb_xml_node_t* parent = (tb_xml_node_t*)document;
 
 	// has event?
-	while (TB_TRUE == tb_xml_reader_has_next(reader))
+	while (tb_xml_reader_has_next(reader))
 	{
 		// get event type
 		tb_size_t event = tb_xml_reader_get_event(reader);
@@ -211,7 +211,7 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				// check
-				if (TB_FALSE == tb_string_compare(&parent->name, tb_xml_reader_get_element_name(reader)))
+				if (!tb_string_compare(&parent->name, tb_xml_reader_get_element_name(reader)))
 					goto fail;
 
 				// leave element
@@ -298,8 +298,8 @@ tb_bool_t tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst)
 	if (!writer) return TB_FALSE;
 
 	// check xml header
-	if (TB_TRUE == tb_string_is_null(&document->version)) return TB_FALSE;
-	if (TB_TRUE == tb_string_is_null(&document->encoding)) return TB_FALSE;
+	if (tb_string_is_null(&document->version)) return TB_FALSE;
+	if (tb_string_is_null(&document->encoding)) return TB_FALSE;
 
 	// begin document
 	tb_xml_writer_document_beg(writer, tb_string_c_string(tb_xml_document_version(document)), tb_string_c_string(tb_xml_document_encoding(document)));

@@ -88,7 +88,7 @@ tb_bool_t tb_tstream_open(tb_gstream_t* gst)
 tb_void_t tb_tstream_close(tb_gstream_t* gst)
 {
 }
-tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	//tb_trace("=====================================");
@@ -99,7 +99,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// read data from the output data first
-	tb_int_t read = 0;
+	tb_long_t read = 0;
 	if (tst->on > 0)
 	{
 		// if enough?
@@ -125,8 +125,8 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	if (read == size) return read;
 
 	// read data from gstream if the input data is not full
-	tb_int_t ln = tst->ib + TB_GSTREAM_BLOCK_SIZE - tst->ip;
-	tb_int_t ret = -1;
+	tb_long_t ln = tst->ib + TB_GSTREAM_BLOCK_SIZE - tst->ip;
+	tb_long_t ret = -1;
 	if (tst->in < ln)
 	{
 		// read data
@@ -140,7 +140,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		else if (!ret && tst->status != TB_TSTREAM_STATUS_FAIL) 
 		{
 			// has size?
-			tb_size_t gsize = tb_gstream_size(tst->gst);
+			tb_uint64_t gsize = tb_gstream_size(tst->gst);
 
 			// is end?
 			if (gsize && tb_gstream_offset(tst->gst) >= gsize) return -1;
@@ -201,7 +201,7 @@ tb_int_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		// is end?
 		else
 		{
-			tb_size_t gsize = tb_gstream_size(tst->gst);
+			tb_uint64_t gsize = tb_gstream_size(tst->gst);
 			if (gsize && tb_gstream_offset(tst->gst) >= gsize) return -1;
 			else if (tst->status == TB_TSTREAM_STATUS_END) return -1;
 		}

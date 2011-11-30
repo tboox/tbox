@@ -108,7 +108,7 @@ static tb_long_t tb_gstream_read_block(tb_gstream_t* gst, tb_byte_t* data, tb_si
 			else if (!ret)
 			{
 				// timeout?
-				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
+				if (tb_mclock() - time > gst->timeout) break;
 			}
 			else return -1;
 		}
@@ -149,10 +149,16 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	if (gst && gst->type == TB_GSTREAM_TYPE_FILE) url = url + 7; 	// file:///home/file => /home/file
 	else if (!gst && url[0] == '/') gst = tb_gstream_create_file(); // is /home/file?
 
-	// set url
+	// check
 	tb_assert_and_check_return_val(gst, TB_NULL);
+
+	// set url
 	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
+	// set timeout
+	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_TIMEOUT, TB_GSTREAM_TIMEOUT_DEFAULT)) goto fail;
+
+	// ok
 	return gst;
 
 fail:
@@ -221,6 +227,8 @@ tb_long_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// read from cache first
 	tb_size_t cache = tb_gstream_read_cache(gst, data, size);
 	if (cache == size) return cache;
+
+#error
 	tb_assert_and_check_return_val(cache < size, -1);
 
 	// read from stream
@@ -249,7 +257,7 @@ tb_long_t tb_gstream_bwrite(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			else if (!ret)
 			{
 				// timeout?
-				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
+				if (tb_mclock() - time > gst->timeout) break;
 			}
 			else return -1;
 		}
@@ -347,7 +355,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_
 			else if (!ret)
 			{
 				// timeout?
-				if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
+				if (tb_mclock() - time > gst->timeout) break;
 			}
 			else break;
 		}
@@ -372,7 +380,11 @@ tb_uint64_t tb_gstream_left(tb_gstream_t const* gst)
 	tb_uint64_t offset = tb_gstream_offset(gst);
 	return (size > offset? (size - offset) : 0);
 }
-
+tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
+{	
+	tb_assert_and_check_return_val(gst, 0);
+	return gst->timeout;
+}
 tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 {
 	tb_assert_and_check_return_val(gst && gst->ioctl0, TB_FALSE);
@@ -381,7 +393,18 @@ tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
 tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {	
 	tb_assert_and_check_return_val(gst && gst->ioctl1, TB_FALSE);
-	return gst->ioctl1(gst, cmd, arg1);
+
+	tb_bool_t ret = TB_FALSE;
+	switch (cmd)
+	{
+	case TB_GSTREAM_CMD_SET_TIMEOUT:
+		gst->timeout = (tb_size_t)arg1;
+		ret = TB_TRUE;
+		break;
+	default:
+		break;
+	}
+	return (gst->ioctl1(gst, cmd, arg1) || ret)? TB_TRUE : TB_FALSE;
 }
 tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
@@ -605,7 +628,7 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 		}
 		else if (!ret) 
 		{
-			if (tb_mclock() - time > TB_GSTREAM_TIMEOUT) break;
+			if (tb_mclock() - time > gst->timeout) break;
 		}
 		else break;
 

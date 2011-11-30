@@ -56,7 +56,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_str
 			//tb_trace("%s: %s", tb_string_c_string(&item->name), tb_string_c_string(&s));
 			
 			// is this?
-			if (TB_TRUE == tb_string_compare_c_string((tb_string_t*)&s, path))
+			if (tb_string_compare_c_string((tb_string_t*)&s, path))
 			{
 				ret = item;
 				break;

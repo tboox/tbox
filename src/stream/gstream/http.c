@@ -183,6 +183,10 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 			*purl = tb_http_option_get_url(hst->http);
 			return TB_TRUE;
 		}
+	case TB_GSTREAM_CMD_SET_TIMEOUT:
+		{
+			return tb_http_option_set_timeout(hst->http, (tb_size_t)arg1);
+		}
 	case TB_HSTREAM_CMD_SET_METHOD:
 		{
 			return tb_http_option_set_method(hst->http, (tb_http_method_t)arg1);

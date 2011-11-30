@@ -234,7 +234,7 @@ tb_size_t tb_xml_reader_next(tb_xml_reader_t* reader)
 			if (!version) goto fail;
 
 			// only support utf-8 encoding now.
-			if (TB_FALSE == tb_string_compare_c_string_nocase(encoding, "utf-8"))
+			if (!tb_string_compare_c_string_nocase(encoding, "utf-8"))
 			{
 				tb_trace("[warning]: only support xml encoding: utf-8.");
 				goto fail;
@@ -422,7 +422,7 @@ tb_string_t const* tb_xml_reader_get_text(tb_xml_reader_t* reader)
 tb_string_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 {
 	tb_assert(reader);
-	tb_assert(TB_FALSE == tb_string_is_null(&reader->element));
+	tb_assert(!tb_string_is_null(&reader->element));
 
 	// check reader
 	if (!reader) return TB_NULL;
@@ -470,7 +470,7 @@ tb_string_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 {
 	tb_assert(reader);
-	tb_assert(TB_FALSE == tb_string_is_null(&reader->element));
+	tb_assert(!tb_string_is_null(&reader->element));
 
 	// check reader
 	if (!reader) return 0;
@@ -557,7 +557,7 @@ tb_bool_t tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path)
 	tb_string_init_stack_string(&s);
 
 	// has event?
-	while (TB_TRUE == tb_xml_reader_has_next(reader))
+	while (tb_xml_reader_has_next(reader))
 	{
 		// get event type
 		tb_size_t event = tb_xml_reader_get_event(reader);
@@ -571,7 +571,7 @@ tb_bool_t tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path)
 				//tb_trace("enter: %s", tb_string_c_string((tb_string_t*)&s));
 
 				// is this?
-				if (TB_TRUE == tb_string_compare_c_string((tb_string_t*)&s, path))
+				if (tb_string_compare_c_string((tb_string_t*)&s, path))
 				{
 					ret = TB_TRUE;
 					goto end;
@@ -607,7 +607,7 @@ tb_void_t tb_xml_reader_dump(tb_xml_reader_t* reader)
 	if (!reader) return ;
 
 	// has event?
-	while (TB_TRUE == tb_xml_reader_has_next(reader))
+	while (tb_xml_reader_has_next(reader))
 	{
 		// get event type
 		tb_size_t event = tb_xml_reader_get_event(reader);
