@@ -120,13 +120,13 @@ tb_uint16_t tb_string_size(tb_string_t const* string)
 }
 tb_char_t tb_string_at(tb_string_t const* string, tb_int_t index)
 {
-	if (TB_FALSE == tb_string_is_null(string) && index >= 0 && index < string->size)
+	if (!tb_string_is_null(string) && index >= 0 && index < string->size)
 		return string->data[index];
 	else return '\0';
 }
 tb_void_t tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch)
 {
-	if (TB_FALSE == tb_string_is_null(string) && index >= 0 && index < string->size)
+	if (!tb_string_is_null(string) && index >= 0 && index < string->size)
 		string->data[index] = ch;
 }
 tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
@@ -229,7 +229,7 @@ tb_void_t tb_string_clear(tb_string_t* string)
 {
 	if (string) 
 	{
-		if (TB_FALSE == tb_string_is_null(string))
+		if (!tb_string_is_null(string))
 		{
 			string->size = 0;
 
@@ -273,10 +273,10 @@ tb_char_t const* tb_string_shift(tb_string_t* string, tb_string_t* s_string)
 tb_char_t const* tb_string_assign(tb_string_t* string, tb_string_t const* s_string)
 {
 	if (!string) return TB_NULL;
-	if (TB_FALSE == tb_string_is_null(s_string))
+	if (!tb_string_is_null(s_string))
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, s_string->size)) return TB_NULL;
+		if (!tb_string_resize(string, s_string->size)) return TB_NULL;
 
 		// attach string
 		tb_memcpy(string->data, s_string->data, string->size);
@@ -296,7 +296,7 @@ tb_char_t const* tb_string_assign_c_string(tb_string_t* string, tb_char_t const*
 	if (c_string) 
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, tb_strlen(c_string))) return TB_NULL;
+		if (!tb_string_resize(string, tb_strlen(c_string))) return TB_NULL;
 
 		// attach string
 		tb_memcpy(string->data, c_string, string->size);
@@ -315,7 +315,7 @@ tb_char_t const* tb_string_assign_char(tb_string_t* string, tb_char_t ch)
 	if (!string) return TB_NULL;
 
 	// ensure enough size
-	if (TB_FALSE == tb_string_resize(string, 1)) return TB_NULL;
+	if (!tb_string_resize(string, 1)) return TB_NULL;
 
 	// attach string
 	string->data[0] = ch;
@@ -340,7 +340,7 @@ tb_char_t const* tb_string_assign_c_string_with_size(tb_string_t* string, tb_cha
 	if (c_string && size) 
 	{
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, size)) return TB_NULL;
+		if (!tb_string_resize(string, size)) return TB_NULL;
 
 		// attach string
 		tb_memcpy(string->data, c_string, string->size);
@@ -360,7 +360,7 @@ tb_char_t const* tb_string_assign_by_ref(tb_string_t* string, tb_string_t const*
 	if (!string) return TB_NULL;
 
 	// ensure is null
-	if (TB_FALSE == tb_string_is_null(string))
+	if (!tb_string_is_null(string))
 		tb_string_uninit(string);
 
 	// attach string
@@ -379,7 +379,7 @@ tb_char_t const* tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t
 	if (c_string)
 	{
 		// ensure is null
-		if (TB_FALSE == tb_string_is_null(string))
+		if (!tb_string_is_null(string))
 			tb_string_uninit(string);
 
 		// attach string
@@ -404,7 +404,7 @@ tb_char_t const* tb_string_assign_c_string_with_size_by_ref(tb_string_t* string,
 	if (c_string && size)
 	{
 		// ensure is null
-		if (TB_FALSE == tb_string_is_null(string))
+		if (!tb_string_is_null(string))
 			tb_string_uninit(string);
 
 		// attach string
@@ -425,8 +425,8 @@ tb_char_t const* tb_string_assign_c_string_with_size_by_ref(tb_string_t* string,
 }
 tb_char_t const* tb_string_append(tb_string_t* string, tb_string_t const* s_string)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign(string, s_string);
-	else if (TB_FALSE == tb_string_is_null(s_string))
+	if (tb_string_is_null(string)) return tb_string_assign(string, s_string);
+	else if (!tb_string_is_null(s_string))
 	{
 		// get old size
 		tb_uint16_t size = string->size;
@@ -435,7 +435,7 @@ tb_char_t const* tb_string_append(tb_string_t* string, tb_string_t const* s_stri
 		tb_uint16_t s_size = s_string->size;
 
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, size + s_size)) return TB_NULL;
+		if (!tb_string_resize(string, size + s_size)) return TB_NULL;
 
 		// append string
 		tb_memcpy(string->data + size, s_string->data, s_size);
@@ -445,7 +445,7 @@ tb_char_t const* tb_string_append(tb_string_t* string, tb_string_t const* s_stri
 }
 tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_c_string(string, c_string);
+	if (tb_string_is_null(string)) return tb_string_assign_c_string(string, c_string);
 	else if (c_string)
 	{
 		// get old size
@@ -455,7 +455,7 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 		tb_uint16_t c_size = tb_strlen(c_string);
 
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, size + c_size)) return TB_NULL;
+		if (!tb_string_resize(string, size + c_size)) return TB_NULL;
 
 		// append string
 		tb_memcpy(string->data + size, c_string, c_size);
@@ -465,14 +465,14 @@ tb_char_t const* tb_string_append_c_string(tb_string_t* string, tb_char_t const*
 }
 tb_char_t const* tb_string_append_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_c_string_with_size(string, c_string, size);
+	if (tb_string_is_null(string)) return tb_string_assign_c_string_with_size(string, c_string, size);
 	else if (c_string)
 	{
 		// get old osize
 		tb_uint16_t osize = string->size;
 
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, osize + size)) return TB_NULL;
+		if (!tb_string_resize(string, osize + size)) return TB_NULL;
 
 		// append string
 		tb_memcpy(string->data + osize, c_string, size);
@@ -493,14 +493,14 @@ tb_char_t const* tb_string_append_format(tb_string_t* string, tb_char_t const* f
 }
 tb_char_t const* tb_string_append_char(tb_string_t* string, tb_char_t ch)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return tb_string_assign_char(string, ch);
+	if (tb_string_is_null(string)) return tb_string_assign_char(string, ch);
 	else
 	{
 		// get old size
 		tb_uint16_t size = string->size;
 
 		// ensure enough size
-		if (TB_FALSE == tb_string_resize(string, size + 1)) return TB_NULL;
+		if (!tb_string_resize(string, size + 1)) return TB_NULL;
 
 		// append string
 		string->data[size] = ch;
@@ -605,25 +605,25 @@ tb_int_t tb_string_reverse_find_char_nocase(tb_string_t const* string, tb_char_t
 }
 tb_bool_t tb_string_compare(tb_string_t* string, tb_string_t const* s_string)
 {
-	if (TB_FALSE == tb_string_is_null(s_string))
+	if (!tb_string_is_null(s_string))
 		return tb_string_compare_c_string(string, tb_string_c_string(s_string));
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
+	if (tb_string_is_null(string)) return TB_FALSE;
 	else if (c_string) return !tb_strcmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string)
 {
-	if (TB_FALSE == tb_string_is_null(s_string))
+	if (!tb_string_is_null(s_string))
 		return tb_string_compare_c_string_nocase(string, tb_string_c_string(s_string));
 	else return TB_FALSE;
 }
 tb_bool_t tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string)
 {
-	if (TB_TRUE == tb_string_is_null(string)) return TB_FALSE;
+	if (tb_string_is_null(string)) return TB_FALSE;
 	else if (c_string) return !tb_stricmp(tb_string_c_string(string), c_string)? TB_TRUE : TB_FALSE;
 	else return TB_FALSE;
 }

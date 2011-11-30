@@ -1208,7 +1208,7 @@ tb_bool_t tb_gpool_check(tb_handle_t hpool)
 	}
 
 	// is enough?
-	if (TB_FALSE == tb_gpool_allocate_try(gpool, 10)) return TB_FALSE;
+	if (!tb_gpool_allocate_try(gpool, 10)) return TB_FALSE;
 
 	return TB_TRUE;
 }

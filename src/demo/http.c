@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 		tb_byte_t 		data[8192];
 		tb_size_t 		read = 0;
 		tb_int64_t 		time = tb_mclock();
-		tb_size_t 		size = tb_http_status_content_size(http);
+		tb_uint64_t 	size = tb_http_status_content_size(http);
 		do
 		{
 			tb_long_t ret = tb_http_read(http, data, 8192);

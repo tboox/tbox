@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
 	// seek 
 	tb_print("seek: %s", argv[2]);
-	if (TB_TRUE == tb_xml_reader_seek(reader, argv[2]))
+	if (tb_xml_reader_seek(reader, argv[2]))
 	{
 		// the first node
 		tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
@@ -133,14 +133,14 @@ int main(int argc, char** argv)
 	}
 
 	// load xml
-	if (TB_FALSE == tb_xml_document_load(document, ist))
+	if (!tb_xml_document_load(document, ist))
 	{
 		tb_print("failed to load xml: %s", argv[1]);
 		return 0;
 	}
 
 	// store xml
-	if (TB_FALSE == tb_xml_document_store(document, ost))
+	if (!tb_xml_document_store(document, ost))
 	{
 		tb_print("failed to store xml: %s", argv[2]);
 		return 0;
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
 	tb_xml_node_add_text(labels, "\n");
 
 	// store xml
-	if (TB_FALSE == tb_xml_document_store(document, gst))
+	if (!tb_xml_document_store(document, gst))
 	{
 		tb_print("failed to store xml: %s", argv[1]);
 		return 0;
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 	}
 
 	// load xml
-	if (TB_FALSE == tb_xml_document_load(document, ist))
+	if (!tb_xml_document_load(document, ist))
 	{
 		tb_print("failed to load xml: %s", argv[1]);
 		return 0;
@@ -241,7 +241,7 @@ int main(int argc, char** argv)
 		tb_xml_node_t* item = node->next;
 		while (item && item != node)
 		{
-			if (TB_TRUE == tb_string_compare(&item->name, &node->name))
+			if (tb_string_compare(&item->name, &node->name))
 			{
 				tb_print("node: <%s></%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->name));
 			}

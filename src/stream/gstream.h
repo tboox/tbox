@@ -48,7 +48,7 @@ extern "C" {
 #define TB_GSTREAM_CACHE_SIZE 					(8192)
 
 // the stream timeout
-#define TB_GSTREAM_TIMEOUT 						(5000)
+#define TB_GSTREAM_TIMEOUT_DEFAULT 				(10000)
 
 // the stream bitops
 #ifdef TB_WORDS_BIGENDIAN
@@ -124,6 +124,7 @@ typedef enum __tb_gstream_cmd_t
 	// the gstream
 ,	TB_GSTREAM_CMD_GET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 1)
 ,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 2)
+,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
 
 	// the dstream
 ,	TB_DSTREAM_CMD_SET_DATA 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_DATA, 1)
@@ -175,7 +176,10 @@ typedef enum __tb_gstream_cmd_t
 typedef struct __tb_gstream_t
 {	
 	// the stream type
-	tb_uint16_t 		type;
+	tb_size_t 			type;
+
+	// the timeout: ms
+	tb_size_t 			timeout;
 
 	// the cache data
 	tb_byte_t* 			cache_data;
@@ -296,6 +300,7 @@ tb_bool_t 			tb_gstream_write_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 tb_uint64_t 		tb_gstream_size(tb_gstream_t const* gst);
 tb_uint64_t 		tb_gstream_left(tb_gstream_t const* gst);
 tb_uint64_t 		tb_gstream_offset(tb_gstream_t const* gst);
+tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
 // ioctl
 tb_bool_t 			tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);

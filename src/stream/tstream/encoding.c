@@ -175,13 +175,13 @@ tb_gstream_t* tb_gstream_create_from_encoding(tb_gstream_t* gst, tb_size_t ie, t
 	tb_assert_and_check_return_val(est, TB_NULL);
 
 	// set gstream
-	if (TB_FALSE == tb_gstream_ioctl1(est, TB_TSTREAM_CMD_SET_GSTREAM, (tb_pointer_t)gst)) goto fail;
+	if (!tb_gstream_ioctl1(est, TB_TSTREAM_CMD_SET_GSTREAM, (tb_pointer_t)gst)) goto fail;
 		
 	// set input encoding
-	if (TB_FALSE == tb_gstream_ioctl1(est, TB_ESTREAM_CMD_SET_IE, (tb_pointer_t)ie)) goto fail;
+	if (!tb_gstream_ioctl1(est, TB_ESTREAM_CMD_SET_IE, (tb_pointer_t)ie)) goto fail;
 		
 	// set output encoding
-	if (TB_FALSE == tb_gstream_ioctl1(est, TB_ESTREAM_CMD_SET_OE, (tb_pointer_t)oe)) goto fail;
+	if (!tb_gstream_ioctl1(est, TB_ESTREAM_CMD_SET_OE, (tb_pointer_t)oe)) goto fail;
 	
 	return est;
 
