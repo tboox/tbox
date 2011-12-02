@@ -41,6 +41,9 @@ extern "C" {
 #define TB_GSTREAM_CMD(type, cmd) 				(((type) << 16) | (cmd))
 #define TB_TSTREAM_CMD(type, cmd) 				TB_GSTREAM_CMD(TB_GSTREAM_TYPE_TRAN, (((type) << 8) | (cmd)))
 
+// the stream block maxn
+#define TB_GSTREAM_BLOCK_MAXN 					(8192)
+
 // the stream cache maxn
 #define TB_GSTREAM_CACHE_MAXN 					(8192)
 
@@ -48,7 +51,7 @@ extern "C" {
 #define TB_GSTREAM_URL_MAXN 					(8192)
 
 // the stream timeout
-#define TB_GSTREAM_TIMEOUT_DEFAULT 				(10000)
+#define TB_GSTREAM_TIMEOUT 						(10000)
 
 // the stream bitops
 #ifdef TB_WORDS_BIGENDIAN
@@ -123,8 +126,11 @@ typedef enum __tb_gstream_cmd_t
 
 	// the gstream
 ,	TB_GSTREAM_CMD_GET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 1)
-,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 2)
-,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
+,	TB_GSTREAM_CMD_GET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 2)
+
+,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
+,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 4)
+,	TB_GSTREAM_CMD_SET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 5)
 
 	// the dstream
 ,	TB_DSTREAM_CMD_SET_DATA 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_DATA, 1)
@@ -191,6 +197,7 @@ typedef struct __tb_gstream_t
 	tb_byte_t* 			cache_data;
 	tb_byte_t* 			cache_head;
 	tb_size_t 			cache_size;
+	tb_size_t 			cache_maxn;
 
 	// open & close
 	tb_bool_t 			(*open)(struct __tb_gstream_t* gst);

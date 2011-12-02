@@ -131,7 +131,7 @@ static tb_long_t tb_gstream_cache_read(tb_gstream_t* gst, tb_byte_t* data, tb_si
 
 	// fill cache
 	tb_assert(gst->read);
-	tb_long_t n = gst->read(gst, gst->cache_data, TB_GSTREAM_CACHE_MAXN);
+	tb_long_t n = gst->read(gst, gst->cache_data, gst->cache_maxn);
 	if (n > 0) 
 	{
 //		tb_trace("fill cache: %d", n);
@@ -161,7 +161,7 @@ static tb_long_t tb_gstream_cache_writ(tb_gstream_t* gst, tb_byte_t* data, tb_si
 	tb_long_t writ = 0;
 
 	// writ data to cache first
-	tb_size_t cache_left = TB_GSTREAM_CACHE_MAXN - gst->cache_size;
+	tb_size_t cache_left = gst->cache_maxn - gst->cache_size;
 	if (cache_left)
 	{
 		// update writ
@@ -178,16 +178,16 @@ static tb_long_t tb_gstream_cache_writ(tb_gstream_t* gst, tb_byte_t* data, tb_si
 	if (writ == size) return writ;
 
 	// cache is full now.
-	tb_assert_and_check_return_val(gst->cache_size == TB_GSTREAM_CACHE_MAXN, -1);
+	tb_assert_and_check_return_val(gst->cache_size == gst->cache_maxn, -1);
 
 	// writ cache
 	tb_assert(gst->writ);
-	tb_long_t n = gst->writ(gst, gst->cache_data, TB_GSTREAM_CACHE_MAXN);
+	tb_long_t n = gst->writ(gst, gst->cache_data, gst->cache_maxn);
 	if (n > 0)
 	{
 		// update cache
-		if (n < TB_GSTREAM_CACHE_MAXN) 
-			tb_memmov(gst->cache_data, gst->cache_data + n, TB_GSTREAM_CACHE_MAXN - n);
+		if (n < gst->cache_maxn) 
+			tb_memmov(gst->cache_data, gst->cache_data + n, gst->cache_maxn - n);
 		gst->cache_size -= n;
 
 //		tb_trace("writ cache: %d", n);
@@ -324,10 +324,11 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gst)
 	gst->bopened = 1;
 
 	// init timeout
-	if (!gst->timeout) gst->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
+	if (!gst->timeout) gst->timeout = TB_GSTREAM_TIMEOUT;
 	
 	// init cache
-	if (!gst->cache_data) gst->cache_data = tb_malloc(TB_GSTREAM_CACHE_MAXN);
+	if (!gst->cache_maxn) gst->cache_maxn = TB_GSTREAM_CACHE_MAXN;
+	if (!gst->cache_data) gst->cache_data = tb_malloc(gst->cache_maxn);
 	tb_assert_and_check_return_val(gst->cache_data, TB_FALSE);
 	gst->cache_head = gst->cache_data;
 	gst->cache_size = 0;
@@ -498,11 +499,11 @@ tb_long_t tb_gstream_writ_line(tb_gstream_t* gst, tb_byte_t* data, tb_size_t siz
 tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 {
 	// init data
-	tb_char_t data[TB_GSTREAM_CACHE_MAXN] = {0};
+	tb_char_t data[TB_GSTREAM_BLOCK_MAXN] = {0};
 	tb_size_t size = 0;
 
 	// format data
-    TB_VA_FMT(data, TB_GSTREAM_CACHE_MAXN, fmt, &size);
+    TB_VA_FMT(data, TB_GSTREAM_BLOCK_MAXN, fmt, &size);
 	tb_check_return_val(size, 0);
 
 	// writ data
@@ -538,8 +539,8 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_
 		tb_int64_t time = tb_mclock();
 		while (tb_gstream_offset(gst) < offset)
 		{
-			tb_byte_t data[TB_GSTREAM_CACHE_MAXN];
-			tb_size_t need = tb_min(offset - tb_gstream_offset(gst), TB_GSTREAM_CACHE_MAXN);
+			tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
+			tb_size_t need = tb_min(offset - tb_gstream_offset(gst), TB_GSTREAM_BLOCK_MAXN);
 			tb_long_t ret = tb_gstream_read(gst, data, need);
 			if (ret > 0) time = tb_mclock();
 			else if (!ret)
@@ -616,6 +617,21 @@ tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 			if (arg1)
 			{
 				*((tb_char_t const**)arg1) = gst->url;
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_CACHE:
+		{
+			gst->cache_maxn = (tb_size_t)arg1;
+			ret = TB_TRUE;
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_CACHE:
+		{
+			if (arg1)
+			{
+				*((tb_size_t*)arg1) = gst->cache_maxn;
 				ret = TB_TRUE;
 			}
 		}
@@ -830,7 +846,7 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	tb_assert_and_check_return_val(gst && ist, 0);	
 
 	// read data
-	tb_byte_t 		data[TB_GSTREAM_CACHE_MAXN];
+	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_uint64_t 	read = 0;
 	tb_uint64_t 	left = tb_gstream_left(ist);
 	tb_int64_t 		time = tb_mclock();
@@ -838,7 +854,7 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	do
 	{
 		// read data
-		tb_long_t n = tb_gstream_read(ist, data, TB_GSTREAM_CACHE_MAXN);
+		tb_long_t n = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_MAXN);
 		if (n > 0)
 		{
 			// update clock

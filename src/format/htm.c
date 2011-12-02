@@ -37,10 +37,13 @@
 
 tb_size_t tb_format_htm_probe(tb_gstream_t* gst)
 {
-	// compute the max need
-	tb_size_t 		need = TB_GSTREAM_CACHE_MAXN;
-	tb_uint64_t 	file = tb_gstream_size(gst);
-	if (file) need = tb_min(file, TB_GSTREAM_CACHE_MAXN);
+	// get need size
+	tb_size_t 	need = 0;
+	tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_GET_CACHE, &need);
+	tb_assert_and_check_return_val(need, 0);
+
+	tb_uint64_t size = tb_gstream_size(gst);
+	if (size && size < need) need = (tb_size_t)size;
 
 	// the score
 	tb_size_t score = 0;
