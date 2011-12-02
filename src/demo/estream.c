@@ -34,11 +34,11 @@ int main(int argc, char** argv)
 			time = tb_mclock();
 
 #if 1
-			tb_long_t write = 0;
-			while (write < ret)
+			tb_long_t writ = 0;
+			while (writ < ret)
 			{
-				tb_long_t ret2 = tb_gstream_write(ost, data + write, ret - write);
-				if (ret2 > 0) write += ret2;
+				tb_long_t ret2 = tb_gstream_writ(ost, data + writ, ret - writ);
+				if (ret2 > 0) writ += ret2;
 				else if (ret2 < 0) break;
 			}
 #endif

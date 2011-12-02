@@ -115,7 +115,7 @@ extern "C" {
  * Additional Notes
  * Multiple Set-Cookie headers can be issued in a single server response. 
  *
- * Instances of the same path and name will overwrite each other, with the latest instance taking precedence.
+ * Instances of the same path and name will overwrit each other, with the latest instance taking precedence.
  * Instances of the same path but different names will add additional mappings. 
  *
  * Setting the path to a higher-level value does not override other more specific path mappings.

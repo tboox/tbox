@@ -57,10 +57,16 @@ static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
+	tb_assert_and_check_return_val(hst && hst->http && gst->url, TB_FALSE);
 
 	// init offset
 	hst->offset = 0;
+
+	// init timeout
+	if (gst->timeout) tb_http_option_set_timeout(hst->http, gst->timeout);
+
+	// init url
+	tb_http_option_set_url(hst->http, gst->url);
 
 	// open it
 	return tb_http_open(hst->http);
@@ -87,19 +93,6 @@ static tb_long_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 
 	// recv data
 	tb_long_t ret = tb_http_read(hst->http, data, size);
-
-	// update offset
-	if (ret > 0) hst->offset += ret;
-	return ret;
-}
-static tb_long_t tb_hstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
-{
-	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http && data, -1);
-	tb_check_return_val(size, 0);
-
-	// recv data
-	tb_long_t ret = tb_http_bread(hst->http, data, size);
 
 	// update offset
 	if (ret > 0) hst->offset += ret;
@@ -171,22 +164,6 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 
 	switch (cmd)
 	{
-	case TB_GSTREAM_CMD_SET_URL:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_url(hst->http, (tb_char_t const*)arg1);
-		}
-	case TB_GSTREAM_CMD_GET_URL:
-		{
-			tb_char_t const** purl = (tb_char_t const**)arg1;
-			tb_assert_and_check_return_val(purl, TB_FALSE);
-			*purl = tb_http_option_get_url(hst->http);
-			return TB_TRUE;
-		}
-	case TB_GSTREAM_CMD_SET_TIMEOUT:
-		{
-			return tb_http_option_set_timeout(hst->http, (tb_size_t)arg1);
-		}
 	case TB_HSTREAM_CMD_SET_METHOD:
 		{
 			return tb_http_option_set_method(hst->http, (tb_http_method_t)arg1);
@@ -265,7 +242,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 	case TB_HSTREAM_CMD_SET_SWRITE_FUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_swrite_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t const* , tb_size_t ))arg1);
+			return tb_http_option_set_swrit_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t const* , tb_size_t ))arg1);
 		}
 	default:
 		break;
@@ -310,7 +287,6 @@ tb_gstream_t* tb_gstream_create_http()
 	gst->close 	= tb_hstream_close;
 	gst->free 	= tb_hstream_free;
 	gst->read 	= tb_hstream_read;
-	gst->bread 	= tb_hstream_bread;
 	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
 	gst->offset = tb_hstream_offset;

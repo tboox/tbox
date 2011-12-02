@@ -125,7 +125,7 @@ tb_long_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	if (read == size) return read;
 
 	// read data from gstream if the input data is not full
-	tb_long_t ln = tst->ib + TB_GSTREAM_BLOCK_SIZE - tst->ip;
+	tb_long_t ln = tst->ib + TB_GSTREAM_CACHE_MAXN - tst->ip;
 	tb_long_t ret = -1;
 	if (tst->in < ln)
 	{

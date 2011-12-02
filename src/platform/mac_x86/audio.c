@@ -48,7 +48,7 @@ tb_handle_t tb_audio_open(tb_audio_fmt_t format, tb_audio_rate_t sample_rate, tb
 	tb_trace_noimpl();
 	return TB_NULL;
 }
-tb_int_t tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
+tb_int_t tb_audio_writ(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
 {
 	tb_trace_noimpl();
 	return -1;

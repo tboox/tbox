@@ -110,7 +110,7 @@ typedef struct __tb_http_option_t
 	tb_handle_t 		(*sopen_func)(tb_char_t const* host, tb_size_t port);
 	tb_void_t 			(*sclose_func)(tb_handle_t handle);
 	tb_long_t 			(*sread_func)(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-	tb_long_t 			(*swrite_func)(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
+	tb_long_t 			(*swrit_func)(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 
 	// the post data
 	tb_byte_t const* 	post_data;
@@ -215,7 +215,7 @@ tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_
 tb_bool_t 				tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_func)(tb_char_t const*, tb_size_t ));
 tb_bool_t 				tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t));
 tb_bool_t 				tb_http_option_set_sread_func(tb_handle_t handle, tb_long_t (*sread_func)(tb_handle_t, tb_byte_t* , tb_size_t));
-tb_bool_t 				tb_http_option_set_swrite_func(tb_handle_t handle, tb_long_t (*swrite_func)(tb_handle_t, tb_byte_t const* , tb_size_t));
+tb_bool_t 				tb_http_option_set_swrit_func(tb_handle_t handle, tb_long_t (*swrit_func)(tb_handle_t, tb_byte_t const* , tb_size_t));
 
 // status
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
@@ -230,11 +230,11 @@ tb_bool_t				tb_http_status_isseeked(tb_handle_t handle);
 tb_size_t				tb_http_status_redirect(tb_handle_t handle);
 tb_void_t 				tb_http_status_dump(tb_handle_t handle);
 
-// write & read
-tb_long_t 				tb_http_write(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+// writ & read
+tb_long_t 				tb_http_writ(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
-tb_long_t 				tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
 

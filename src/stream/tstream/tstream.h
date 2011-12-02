@@ -63,12 +63,12 @@ typedef struct __tb_tstream_t
 	tb_gstream_t* 		gst;
 	
 	// the input data
-	tb_byte_t 			ib[TB_GSTREAM_BLOCK_SIZE];
+	tb_byte_t 			ib[TB_GSTREAM_CACHE_MAXN];
 	tb_byte_t const* 	ip;
 	tb_size_t 			in;
 
 	// the output data
-	tb_byte_t 			ob[TB_GSTREAM_BLOCK_SIZE];
+	tb_byte_t 			ob[TB_GSTREAM_CACHE_MAXN];
 	tb_byte_t* 			op;
 	tb_size_t 			on;
 
