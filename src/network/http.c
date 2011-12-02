@@ -614,6 +614,7 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 		else if (!tb_stricmp(tag, "Content-Length"))
 		{
 			http->status.content_size = tb_stou64(p);
+			if (!http->status.document_size) http->status.document_size = http->status.content_size;
 		}
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!tb_stricmp(tag, "Content-Range"))
