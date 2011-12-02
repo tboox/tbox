@@ -31,7 +31,9 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#define TB_FSTREAM_URL_MAX 		(4096)
+
+// need larger cache for performance
+#define TB_FSTREAM_CACHE_MAXN 					(TB_GSTREAM_CACHE_MAXN << 2)
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -201,6 +203,9 @@ tb_gstream_t* tb_gstream_create_file()
 	gst->ioctl1 = tb_fstream_ioctl1;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
+
+	// need larger cache for performance
+	gst->cache_maxn = TB_FSTREAM_CACHE_MAXN;
 
 	return gst;
 }
