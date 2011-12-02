@@ -61,7 +61,7 @@ extern "C" {
  *
  *
  *
- * read & write <= tstream <= tstream ... <= gstream <= (data, file, http, ...)
+ * read & writ <= tstream <= tstream ... <= gstream <= (data, file, http, ...)
  */
 
 // c plus plus

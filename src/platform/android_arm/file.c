@@ -86,10 +86,10 @@ tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size)
 	if (hfile) return read((tb_int_t)hfile, data, size);
 	else return -1;
 }
-tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
+tb_int_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
 {
-	//tb_trace("tb_file_write: %d bytes", size);
-	if (hfile) return write((tb_int_t)hfile, data, size);
+	//tb_trace("tb_file_writ: %d bytes", size);
+	if (hfile) return writ((tb_int_t)hfile, data, size);
 	else return -1;
 }
 tb_void_t tb_file_flush(tb_handle_t hfile)

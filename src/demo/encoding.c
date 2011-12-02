@@ -36,12 +36,12 @@ static tb_void_t save(tb_char_t const* path, tb_byte_t const* data, tb_size_t si
 	tb_handle_t hfile = tb_file_open(path, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (hfile)
 	{
-		tb_int_t write_n = 0;
-		while (write_n < size) 
+		tb_int_t writ_n = 0;
+		while (writ_n < size) 
 		{
-			tb_int_t ret = tb_file_write(hfile, data + write_n, (tb_int_t)(size - write_n));
+			tb_int_t ret = tb_file_writ(hfile, data + writ_n, (tb_int_t)(size - writ_n));
 			if (ret < 0) break ;
-			else write_n += ret;
+			else writ_n += ret;
 		}
 		tb_file_close(hfile);
 	}

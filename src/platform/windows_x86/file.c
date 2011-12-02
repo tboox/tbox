@@ -123,7 +123,7 @@ tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size)
 	if (hfile && ReadFile(hfile, data, size, &real_size, NULL)) return (tb_int_t)real_size;
 	return -1;
 }
-tb_int_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
+tb_int_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
 {
 	DWORD real_size = 0;
 	if (hfile && WriteFile(hfile, data, size, &real_size, NULL)) return (tb_int_t)real_size;

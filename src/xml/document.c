@@ -57,7 +57,7 @@ static tb_void_t tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nl
 		// is childs?
 		if (node->childs) 
 		{
-			// write attributes
+			// writ attributes
 			if (node->attributes)
 			{
 				tb_xml_node_t* ahead = (tb_xml_node_t*)node->attributes;
@@ -69,7 +69,7 @@ static tb_void_t tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nl
 				}
 			}
 
-			// write element
+			// writ element
 			tb_xml_writer_element_beg(writer, tb_string_c_string(&node->name));
 			tb_xml_document_store_childs(writer, node->childs, ret);
 			tb_xml_writer_element_end(writer, tb_string_c_string(&node->name));
@@ -83,7 +83,7 @@ static tb_void_t tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nl
 			{
 			case TB_XML_NODE_TYPE_ELEMENT:
 				{
-					// write attributes
+					// writ attributes
 					if (node->attributes)
 					{
 						tb_xml_node_t* ahead = (tb_xml_node_t*)node->attributes;

@@ -273,7 +273,7 @@ static tb_bool_t tb_http_socket_open(tb_http_t* http)
 	{
 		tb_assert_and_check_return_val(http->option.sopen_func, TB_FALSE);
 		tb_assert_and_check_return_val(http->option.sread_func, TB_FALSE);
-		tb_assert_and_check_return_val(http->option.swrite_func, TB_FALSE);
+		tb_assert_and_check_return_val(http->option.swrit_func, TB_FALSE);
 		http->socket = http->option.sopen_func(http->option.host, http->option.port);
 		http->status.bhttps = 1;
 	}
@@ -307,7 +307,7 @@ static tb_long_t tb_http_socket_read(tb_http_t* http, tb_byte_t* data, tb_size_t
 		return http->option.sread_func(http->socket, data, size);
 	}
 }
-static tb_long_t tb_http_socket_write(tb_http_t* http, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_http_socket_writ(tb_http_t* http, tb_byte_t const* data, tb_size_t size)
 {	
 	tb_assert_and_check_return_val(http && http->socket, -1);
 
@@ -315,22 +315,22 @@ static tb_long_t tb_http_socket_write(tb_http_t* http, tb_byte_t const* data, tb
 		return tb_socket_send((tb_handle_t)http->socket, (tb_byte_t const*)data, (tb_size_t)size); 
 	else 
 	{
-		tb_assert_and_check_return_val(http->option.swrite_func, -1);
-		return http->option.swrite_func(http->socket, data, size);
+		tb_assert_and_check_return_val(http->option.swrit_func, -1);
+		return http->option.swrit_func(http->socket, data, size);
 	}
 }
-tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
+tb_size_t tb_http_writ_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(http && http->socket && data, -1);
 	
-	tb_size_t 	write = 0;
+	tb_size_t 	writ = 0;
 	tb_int64_t 	time = tb_mclock();
-	while (write < size)
+	while (writ < size)
 	{
-		tb_long_t ret = tb_http_socket_write(http, data + write, size - write);
+		tb_long_t ret = tb_http_socket_writ(http, data + writ, size - writ);
 		if (ret > 0) 
 		{
-			write += ret;
+			writ += ret;
 			time = tb_mclock();
 		}
 		else if (!ret)
@@ -340,8 +340,8 @@ tb_size_t tb_http_write_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]: write: %d", write);
-	return write;
+	//tb_trace("[http]: writ: %d", writ);
+	return writ;
 }
 
 tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
@@ -721,14 +721,14 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 
 	//tb_printf(head);
 	
-	// write http request
-	if (size != tb_http_write_block(http, (tb_byte_t*)head, size)) goto fail;
+	// writ http request
+	if (size != tb_http_writ_block(http, (tb_byte_t*)head, size)) goto fail;
 
-	// write post data
+	// writ post data
 	if (http->option.method == TB_HTTP_METHOD_POST 
 		&& http->option.post_data && http->option.post_size)
 	{
-		if (http->option.post_size != tb_http_write_block(http, http->option.post_data, http->option.post_size))
+		if (http->option.post_size != tb_http_writ_block(http, http->option.post_data, http->option.post_size))
 			goto fail;
 	}
 
@@ -1034,12 +1034,12 @@ tb_bool_t tb_http_option_set_sread_func(tb_handle_t handle, tb_long_t (*sread_fu
 	http->option.sread_func = sread_func;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_swrite_func(tb_handle_t handle, tb_long_t (*swrite_func)(tb_handle_t, tb_byte_t const* , tb_size_t))
+tb_bool_t tb_http_option_set_swrit_func(tb_handle_t handle, tb_long_t (*swrit_func)(tb_handle_t, tb_byte_t const* , tb_size_t))
 {
 	tb_assert_and_check_return_val(handle, TB_FALSE);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	http->option.swrite_func = swrite_func;
+	http->option.swrit_func = swrit_func;
 	return TB_TRUE;
 }
 
@@ -1171,14 +1171,14 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 }
 #endif
 
-tb_long_t tb_http_write(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_writ(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(handle, -1);
 	tb_http_t* http = (tb_http_t*)handle;
 
 	tb_assert_and_check_return_val(http->socket, -1);
-	if (!http->option.bblock) return tb_http_socket_write(http, data, size);
-	else return tb_http_write_block(http, data, size);
+	if (!http->option.bblock) return tb_http_socket_writ(http, data, size);
+	else return tb_http_writ_block(http, data, size);
 }
 tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -1230,19 +1230,19 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		else return tb_http_read_block(http, data, size);
 	}
 }
-tb_long_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->socket && data, -1);
 	
-	tb_size_t 	write = 0;
+	tb_size_t 	writ = 0;
 	tb_int64_t 	time = tb_mclock();
-	while (write < size)
+	while (writ < size)
 	{
-		tb_long_t ret = tb_http_write(handle, data + write, size - write);
+		tb_long_t ret = tb_http_writ(handle, data + writ, size - writ);
 		if (ret > 0) 
 		{
-			write += ret;
+			writ += ret;
 			time = tb_mclock();
 		}
 		else if (!ret)
@@ -1252,8 +1252,8 @@ tb_long_t tb_http_bwrite(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		}
 		else break;
 	}
-	//tb_trace("[http]: write: %d", write);
-	return write;
+	//tb_trace("[http]: writ: %d", writ);
+	return writ;
 }
 tb_long_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

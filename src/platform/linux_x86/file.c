@@ -77,7 +77,7 @@ tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(hfile, -1);
 	return read((tb_long_t)hfile - 1, data, size);
 }
-tb_long_t tb_file_write(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(hfile, -1);
 	return write((tb_long_t)hfile - 1, data, size);

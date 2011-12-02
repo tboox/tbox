@@ -49,11 +49,11 @@ int main(int argc, char** argv)
 				time = tb_mclock();
 
 #if 1
-				tb_long_t write = 0;
-				while (write < ret)
+				tb_long_t writ = 0;
+				while (writ < ret)
 				{
-					tb_long_t ret2 = tb_file_write(hfile, data + write, ret - write);
-					if (ret2 > 0) write += ret2;
+					tb_long_t ret2 = tb_file_writ(hfile, data + writ, ret - writ);
+					if (ret2 > 0) writ += ret2;
 					else if (ret2 < 0) break;
 				}
 #endif

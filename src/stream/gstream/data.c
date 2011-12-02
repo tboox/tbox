@@ -81,7 +81,7 @@ static tb_long_t tb_dstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	dst->head += size;
 	return (tb_long_t)(size);
 }
-static tb_long_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_dstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
@@ -91,18 +91,10 @@ static tb_long_t tb_dstream_write(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_size_t left = dst->data + dst->size - dst->head;
 	if (size > left) size = left;
 
-	// write data
+	// writ data
 	tb_memcpy(dst->head, data, size);
 	dst->head += size;
 	return (tb_long_t)(size);
-}
-static tb_byte_t* tb_dstream_need(tb_gstream_t* gst, tb_size_t size)
-{
-	tb_dstream_t* dst = tb_dstream_cast(gst);
-	tb_assert_and_check_return_val(dst && dst->head && dst->data, TB_NULL);
-	if (dst->head + size > dst->data + dst->size) return TB_NULL;
-
-	return dst->head;
 }
 static tb_uint64_t tb_dstream_size(tb_gstream_t const* gst)
 {
@@ -184,10 +176,7 @@ tb_gstream_t* tb_gstream_create_data()
 	gst->open 	= tb_dstream_open;
 	gst->close 	= tb_dstream_close;
 	gst->read 	= tb_dstream_read;
-	gst->write 	= tb_dstream_write;
-	gst->bread 	= tb_dstream_read;
-	gst->bwrite = tb_dstream_write;
-	gst->need 	= tb_dstream_need;
+	gst->writ 	= tb_dstream_writ;
 	gst->size 	= tb_dstream_size;
 	gst->offset	= tb_dstream_offset;
 	gst->seek 	= tb_dstream_seek;

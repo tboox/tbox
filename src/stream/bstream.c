@@ -61,14 +61,14 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
+	tb_byte_t 		data[TB_GSTREAM_CACHE_MAXN];
 	tb_size_t 		load = 0;
 	tb_int64_t 		time = tb_mclock();
 	tb_uint64_t 	left = tb_gstream_left(ist);
 
 	while(1)
 	{
-		tb_long_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_SIZE);
+		tb_long_t ret = tb_gstream_read(ist, data, TB_GSTREAM_CACHE_MAXN);
 		//tb_trace("ret: %d", ret);
 		if (ret < 0) break;
 		else if (!ret) 
@@ -97,23 +97,23 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 	tb_bstream_sync(bst);
 
 	// load
-	tb_byte_t 		data[TB_GSTREAM_BLOCK_SIZE];
+	tb_byte_t 		data[TB_GSTREAM_CACHE_MAXN];
 	tb_size_t 		save = 0;
 	tb_int64_t 		time = tb_mclock();
 	while(1)
 	{
 		// get data
-		tb_long_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_BLOCK_SIZE);
+		tb_long_t size = tb_bstream_get_data(bst, data, TB_GSTREAM_CACHE_MAXN);
 		//tb_trace("ret: %d", ret);
 
 		// is end?
 		if (size)
 		{
-			// write it
-			tb_long_t write = 0;
-			while (write < size)
+			// writ it
+			tb_long_t writ = 0;
+			while (writ < size)
 			{
-				tb_long_t ret = tb_gstream_write(ost, data + write, size - write);
+				tb_long_t ret = tb_gstream_writ(ost, data + writ, size - writ);
 				if (ret < 0) break;
 				else if (!ret)
 				{
@@ -122,14 +122,14 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 				}
 				else
 				{
-					write += ret;
+					writ += ret;
 					time = tb_mclock();
 				}
 			}
 
 			// update size
-			save += write;
-			if (write != size) break;
+			save += writ;
+			if (writ != size) break;
 		}
 		else break;
 	}

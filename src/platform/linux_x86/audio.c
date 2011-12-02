@@ -134,10 +134,10 @@ fail:
 	if (fd >= 0) close(fd);
 	return TB_NULL;
 }
-tb_int_t tb_audio_write(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
+tb_int_t tb_audio_writ(tb_handle_t haudio, tb_byte_t const* data, tb_size_t size)
 {
 	tb_int_t fd = (tb_int_t)haudio;
-	if (fd >= 0) return write(fd, data, size);
+	if (fd >= 0) return writ(fd, data, size);
 	else return -1;
 }
 tb_void_t tb_audio_close(tb_handle_t haudio)
