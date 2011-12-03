@@ -51,8 +51,8 @@
 // the http type
 typedef struct __tb_http_t
 {
-	// the socket
-	tb_handle_t 		socket;
+	// the socket stream
+	tb_gstream_t* 		stream;
 
 	// the option
 	tb_http_option_t 	option;
@@ -77,10 +77,7 @@ static tb_http_option_t g_http_option_default =
 	// port
 , 	TB_HTTP_PORT_DEFAULT
 
-	// is block 
-, 	0
-
-	// is https 
+	// is ssl?
 , 	0
 
 	// is keep alive?
@@ -96,12 +93,6 @@ static tb_http_option_t g_http_option_default =
 , 	TB_NULL
 , 	TB_NULL
 
-	// ssl funcs
-, 	TB_NULL
-, 	TB_NULL
-, 	TB_NULL
-, 	TB_NULL
-
 	// post data
 ,	TB_NULL
 , 	0
@@ -110,12 +101,12 @@ static tb_http_option_t g_http_option_default =
 , 	TB_NULL
 
 	// head
-, 	""
+, 	{0}
 
 	// url
-, 	""
-, 	""
-, 	""
+, 	{0}
+, 	{0}
+, 	{0}
 
 };
  
@@ -145,8 +136,11 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		&& p[5] == '/'
 		&& p[6] == '/')
 	{
+		// skip prefix
 		p += 7;
-		http->option.bhttps = 0;
+
+		// no ssl
+		http->option.bssl = 0;
 	}
 	else if (n > 8 
 		&& p[0] == 'h'
@@ -158,13 +152,14 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		&& p[6] == '/'
 		&& p[7] == '/')
 	{
+		// skip prefix
 		p += 8;
 
 		// url changed, close connection
-		if (http->status.bredirect && !http->option.bhttps) http->status.bkalive = 0;
+		if (http->status.bredirect && !http->option.bssl) http->status.bkalive = 0;
 		
-		// is https url
-		http->option.bhttps = 1;
+		// is ssl
+		http->option.bssl = 1;
 	}
 	// redirect to host/url
 	else if (http->status.bredirect)
@@ -202,8 +197,8 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		// save url
 		tb_long_t ret = 0;
 		if (http->option.port == g_http_option_default.port) 
-			ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s%s", http->option.bhttps? "s" : "", http->option.host, http->option.path);
-		else ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s:%d%s", http->option.bhttps? "s" : "", http->option.host, http->option.port, http->option.path);
+			ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s%s", http->option.bssl? "s" : "", http->option.host, http->option.path);
+		else ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s:%d%s", http->option.bssl? "s" : "", http->option.host, http->option.port, http->option.path);
 		http->option.url[ret >= 0? ret : 0] = '\0';
 		http->option.url[ret < TB_HTTP_URL_MAX? ret : TB_HTTP_URL_MAX - 1] = '\0';
 
@@ -227,7 +222,7 @@ static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
 		*pb = '\0';
 		http->option.port = tb_stou32(port);
 	}
-	else http->option.port = http->option.bhttps? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
+	else http->option.port = http->option.bssl? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
 	//tb_trace("[http]: port: %d", http->option.port);
 
 	// get path
@@ -259,158 +254,6 @@ static tb_char_t const* tb_http_method_string(tb_http_method_t method)
 
 	};
 	return ((method >= 0 && method < tb_arrayn(s))? s[method] : TB_NULL);
-}
-static tb_bool_t tb_http_socket_open(tb_http_t* http)
-{
-	tb_assert_and_check_return_val(http, TB_FALSE);
-	if (!http->option.bhttps)
-	{
-		tb_handle_t socket = tb_socket_client_open(http->option.host, http->option.port, TB_SOCKET_TYPE_TCP, TB_FALSE);
-		http->socket = socket? socket : TB_NULL;
-		http->status.bhttps = 0;
-	}
-	else
-	{
-		tb_assert_and_check_return_val(http->option.sopen_func, TB_FALSE);
-		tb_assert_and_check_return_val(http->option.sread_func, TB_FALSE);
-		tb_assert_and_check_return_val(http->option.swrit_func, TB_FALSE);
-		http->socket = http->option.sopen_func(http->option.host, http->option.port);
-		http->status.bhttps = 1;
-	}
-	return http->socket? TB_TRUE : TB_FALSE;
-}
-static tb_void_t tb_http_socket_close(tb_http_t* http)
-{
-	tb_assert_and_check_return(http);
-	tb_check_return(http->socket);
-
-	if (!http->status.bhttps) 
-		tb_socket_close((tb_handle_t)http->socket); 
-	else
-	{
-		if (http->option.sclose_func) 
-			http->option.sclose_func(http->socket);
-	}
-
-	http->socket = TB_NULL;
-	http->status.bhttps = 0;
-}
-static tb_long_t tb_http_socket_read(tb_http_t* http, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(http && http->socket, -1);
-
-	if (!http->option.bhttps) 
-		return tb_socket_recv((tb_handle_t)http->socket, (tb_byte_t*)data, (tb_size_t)size); 
-	else 
-	{
-		tb_assert_and_check_return_val(http->option.sread_func, -1);
-		return http->option.sread_func(http->socket, data, size);
-	}
-}
-static tb_long_t tb_http_socket_writ(tb_http_t* http, tb_byte_t const* data, tb_size_t size)
-{	
-	tb_assert_and_check_return_val(http && http->socket, -1);
-
-	if (!http->option.bhttps) 
-		return tb_socket_send((tb_handle_t)http->socket, (tb_byte_t const*)data, (tb_size_t)size); 
-	else 
-	{
-		tb_assert_and_check_return_val(http->option.swrit_func, -1);
-		return http->option.swrit_func(http->socket, data, size);
-	}
-}
-tb_size_t tb_http_writ_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(http && http->socket && data, -1);
-	
-	tb_size_t 	writ = 0;
-	tb_int64_t 	time = tb_mclock();
-	while (writ < size)
-	{
-		tb_long_t ret = tb_http_socket_writ(http, data + writ, size - writ);
-		if (ret > 0) 
-		{
-			writ += ret;
-			time = tb_mclock();
-		}
-		else if (!ret)
-		{
-			// timeout?
-			if (tb_mclock() - time > http->option.timeout) break;
-		}
-		else break;
-	}
-	//tb_trace("[http]: writ: %d", writ);
-	return writ;
-}
-
-tb_size_t tb_http_read_block(tb_http_t* http, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(http && http->socket && data, -1);
-
-	tb_size_t 	read = 0;
-	tb_int64_t 	time = tb_mclock();
-	while (read < size)
-	{
-		tb_long_t ret = tb_http_socket_read(http, data + read, size - read);	
-		if (ret > 0)
-		{
-			read += ret;
-			time = tb_mclock();
-		}
-		else if (!ret)
-		{
-			// timeout?
-			if (tb_mclock() - time > http->option.timeout) break;
-		}
-		else break;
-	}
-	//tb_trace("[http]: read: %d", read);
-	return read;
-}
-static tb_char_t tb_http_read_char(tb_http_t* http)
-{
-	tb_char_t ch[1] = {0};
-	if (1 != tb_http_read_block(http, (tb_byte_t*)ch, 1)) return '\0';
-	else return ch[0];
-}
-static tb_bool_t tb_http_skip_2bytes(tb_http_t* http)
-{
-	tb_char_t ch[2] = {0};
-	if (2 != tb_http_read_block(http, (tb_byte_t*)ch, 2)) return TB_FALSE;
-	else return TB_TRUE;
-}
-static tb_char_t const* tb_http_read_line(tb_http_t* http)
-{
-	tb_char_t ch = 0;
-	tb_char_t* line = http->status.line;
-	tb_char_t* p = line;
-	while (1)
-	{
-		// read char
-		ch = tb_http_read_char(http);
-
-		// is line?
-		if (ch == '\n') 
-		{
-			// finish line
-			if (p > line && p[-1] == '\r')
-				p--;
-			*p = '\0';
-	
-			return line;
-		}
-		// append char to line
-		else 
-		{
-			if ((p - line) < TB_HTTP_LINE_MAX - 1)
-			*p++ = ch;
-
-			// no data?
-			if (!ch) break;
-		}
-	}
-	return TB_NULL;
 }
 static tb_bool_t tb_http_head_find(tb_http_t* http, tb_char_t const* name)
 {
@@ -485,7 +328,7 @@ static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
 	if (http->option.cookies)
 	{
 		// get cookie
-		tb_char_t const* value = tb_cookies_get(http->option.cookies, http->option.host, http->option.path, http->status.bhttps? TB_TRUE : TB_FALSE);
+		tb_char_t const* value = tb_cookies_get(http->option.cookies, http->option.host, http->option.path, http->status.bssl? TB_TRUE : TB_FALSE);
 
 		// format it
 		if (value) tb_string_append_format(head, "Cookie: %s\r\n", value);
@@ -679,40 +522,46 @@ static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
 static tb_bool_t tb_http_handle_response(tb_http_t* http)
 {
 	tb_trace("[http]: =============================================");
-	tb_size_t line_idx = 0;
-	while (1)
-	{
-		tb_char_t const* line = tb_http_read_line(http);
-		if (line)
-		{
-			// process line
-			if (!tb_http_process_line(http, line_idx)) return TB_FALSE;
-			line_idx++;
 
-			// is end?
-			if (!line[0]) break;
-		}
-		else break;
+	// read line
+	tb_size_t line = 0;
+	while (tb_gstream_read_line(http->stream, http->status.line, TB_HTTP_LINE_MAX))
+	{
+		// process line
+		if (!tb_http_process_line(http, line)) return TB_FALSE;
+
+		// update line
+		line++;
 	}
 
 	return TB_TRUE;
 }
 static tb_bool_t tb_http_open_host(tb_http_t* http)
 {
+	// check stream
+	tb_assert_and_check_return_val(http->stream, TB_FALSE);
+	
 #ifdef TB_DEBUG
 	tb_http_option_dump(http);
 #endif
 
-	// open socket
-	if (!http->socket || !http->status.bkalive)
+	// FIXME
+	// open stream
+	if (!http->status.bkalive)
 	{
-		tb_http_socket_close(http);
-		if (!tb_http_socket_open(http)) return TB_FALSE;
+		// close
+		tb_gstream_close(http->stream);
+
+		// is ssl?
+		http->status.bssl = http->option.bssl;
+
+		// ioctl
+		tb_gstream_ioctl1(http->stream, TB_SSTREAM_CMD_SET_SSL, http->option.bssl? TB_TRUE : TB_FALSE);
+
+		// open stream
+		if (!tb_gstream_open(http->stream)) return TB_FALSE;
 	}
 
-	// check socket
-	tb_assert_and_check_return_val(http->socket, TB_FALSE);
-	
 	// format http header
 	tb_stack_string_t s;
 	tb_string_init_stack_string(&s);
@@ -723,13 +572,13 @@ static tb_bool_t tb_http_open_host(tb_http_t* http)
 	//tb_printf(head);
 	
 	// writ http request
-	if (size != tb_http_writ_block(http, (tb_byte_t*)head, size)) goto fail;
+	if (size != tb_gstream_bwrit(http->stream, (tb_byte_t*)head, size)) goto fail;
 
 	// writ post data
 	if (http->option.method == TB_HTTP_METHOD_POST 
 		&& http->option.post_data && http->option.post_size)
 	{
-		if (http->option.post_size != tb_http_writ_block(http, http->option.post_data, http->option.post_size))
+		if (http->option.post_size != tb_gstream_bwrit(http->stream, http->option.post_data, http->option.post_size))
 			goto fail;
 	}
 
@@ -782,31 +631,37 @@ tb_handle_t tb_http_init(tb_http_option_t const* option)
 {
 	// alloc
 	tb_http_t* http = tb_calloc(1, sizeof(tb_http_t));
-	if (!http) return TB_NULL;
+	tb_assert_and_check_return_val(http, TB_NULL);
 
 	// init
-	http->socket = TB_NULL;
 	http->option = option? *option : g_http_option_default;
 
+	// init stream
+	http->stream = tb_gstream_init_sock();
+	tb_assert_and_check_goto(http->stream, fail);
+
+	// ok
 	return (tb_handle_t)http;
+
+fail:
+	if (http) tb_http_exit((tb_handle_t)http);
+	return TB_NULL;
 }
 tb_void_t tb_http_exit(tb_handle_t handle)
 {
-	tb_check_return(handle);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	// close it
-	tb_http_close(handle);
-
-	// free socket
-	if (http->socket) 
+	if (handle)
 	{
-		tb_assert(http->status.bkalive);
-		tb_http_socket_close(http);
-	}
+		tb_http_t* http = (tb_http_t*)handle;
 
-	// free it
-	tb_free(http);
+		// close it
+		tb_http_close(handle);
+
+		// exit stream
+		if (http->stream) tb_gstream_exit(http->stream);
+
+		// free it
+		tb_free(http);
+	}
 }
 
 tb_bool_t tb_http_open(tb_handle_t handle)
@@ -834,10 +689,10 @@ tb_void_t tb_http_close(tb_handle_t handle)
 	tb_http_t* http = (tb_http_t*)handle;
 
 	// close it
-	if (http->socket) 
+	if (http->stream) 
 	{
-		// close socket
-		if (!http->status.bkalive) tb_http_socket_close(http);
+		// close stream
+		if (!http->status.bkalive) tb_gstream_close(http->stream);
 
 		// clear status
 		tb_memset(&http->status, 0, sizeof(tb_http_status_t));
@@ -932,14 +787,6 @@ tb_bool_t tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path)
 	http->option.path[TB_HTTP_PATH_MAX - 1] = '\0';
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_block(tb_handle_t handle, tb_bool_t bblock)
-{
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	http->option.bblock = bblock == TB_TRUE? 1 : 0;
-	return TB_TRUE;
-}
 tb_bool_t tb_http_option_set_kalive(tb_handle_t handle, tb_bool_t bkalive)
 {
 	tb_assert_and_check_return_val(handle, TB_FALSE);
@@ -1009,38 +856,6 @@ tb_bool_t tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func
 
 	http->option.head_func = head_func;
 	http->option.head_priv = head_priv;
-	return TB_TRUE;
-}
-tb_bool_t tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_func)(tb_char_t const*, tb_size_t))
-{	
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	http->option.sopen_func = sopen_func;
-	return TB_TRUE;
-}
-tb_bool_t tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t))
-{
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	http->option.sclose_func = sclose_func;
-	return TB_TRUE;
-}
-tb_bool_t tb_http_option_set_sread_func(tb_handle_t handle, tb_long_t (*sread_func)(tb_handle_t, tb_byte_t* , tb_size_t))
-{
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	http->option.sread_func = sread_func;
-	return TB_TRUE;
-}
-tb_bool_t tb_http_option_set_swrit_func(tb_handle_t handle, tb_long_t (*swrit_func)(tb_handle_t, tb_byte_t const* , tb_size_t))
-{
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	tb_http_t* http = (tb_http_t*)handle;
-
-	http->option.swrit_func = swrit_func;
 	return TB_TRUE;
 }
 
@@ -1131,8 +946,7 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	tb_trace("[http]: option: port: %d", http->option.port);
 	tb_trace("[http]: option: method: %s", tb_http_method_string(http->option.method));
 	tb_trace("[http]: option: redirect: %d", http->option.redirect);
-	tb_trace("[http]: option: block: %s", http->option.bblock? "true" : "false");
-	tb_trace("[http]: option: https: %s", http->option.bhttps? "true" : "false");
+	tb_trace("[http]: option: https: %s", http->option.bssl? "true" : "false");
 	tb_trace("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
 	tb_trace("[http]: option: keepalive: %s", http->option.bkalive? "true" : "false");
 
@@ -1174,19 +988,15 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 
 tb_long_t tb_http_writ(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
-	tb_assert_and_check_return_val(handle, -1);
 	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream, -1);
 
-	tb_assert_and_check_return_val(http->socket, -1);
-	if (!http->option.bblock) return tb_http_socket_writ(http, data, size);
-	else return tb_http_writ_block(http, data, size);
+	return tb_gstream_writ(http->stream, data, size);
 }
 tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
-	tb_assert_and_check_return_val(handle, -1);
 	tb_http_t* http = (tb_http_t*)handle;
-
-	tb_assert_and_check_return_val(http->socket, -1);
+	tb_assert_and_check_return_val(http && http->stream, -1);
 
 	if (http->status.bchunked)
 	{
@@ -1197,14 +1007,14 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			http->status.chunked_read = 0;
 
 			// skip "\r\n"
-			if (!tb_http_skip_2bytes(http)) return -1;
+			if (!tb_gstream_skip(http->stream, 2)) return -1;
 		}
 
 		// parse chunked size
 		if (!http->status.chunked_size)
 		{
-			tb_char_t const* line = tb_http_read_line(http);
-			if (line) http->status.chunked_size = tb_s16tou32(line);
+			if (tb_gstream_read_line(http->stream, http->status.line, TB_HTTP_LINE_MAX)) 
+				http->status.chunked_size = tb_s16tou32(http->status.line);
 			//tb_trace("[http]: chunk: %s %d", line, http->status.chunked_size);
 
 			// is end?
@@ -1214,10 +1024,8 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		// read chunked data
 		if (http->status.chunked_read < http->status.chunked_size)
 		{
-			tb_long_t ret = 0;
 			tb_long_t min = tb_min(size, http->status.chunked_size - http->status.chunked_read);
-			if (!http->option.bblock) ret = tb_http_socket_read(http, data, min);
-			else ret = tb_http_read_block(http, data, min);
+			tb_long_t ret = tb_gstream_read(http->stream, data, min);
 
 			//tb_trace("read: %d", ret);
 			if (ret > 0) http->status.chunked_read += ret;
@@ -1225,60 +1033,6 @@ tb_long_t tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		}
 		else return -1;
 	}
-	else
-	{
-		if (!http->option.bblock) return tb_http_socket_read(http, data, size);
-		else return tb_http_read_block(http, data, size);
-	}
-}
-tb_long_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
-{
-	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->socket && data, -1);
-	
-	tb_size_t 	writ = 0;
-	tb_int64_t 	time = tb_mclock();
-	while (writ < size)
-	{
-		tb_long_t ret = tb_http_writ(handle, data + writ, size - writ);
-		if (ret > 0) 
-		{
-			writ += ret;
-			time = tb_mclock();
-		}
-		else if (!ret)
-		{
-			// timeout?
-			if (tb_mclock() - time > http->option.timeout) break;
-		}
-		else break;
-	}
-	//tb_trace("[http]: writ: %d", writ);
-	return writ;
-}
-tb_long_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
-{
-	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->socket && data, -1);
-
-	tb_size_t 	read = 0;
-	tb_int64_t 	time = tb_mclock();
-	while (read < size)
-	{
-		tb_long_t ret = tb_http_read(handle, data + read, size - read);	
-		if (ret > 0)
-		{
-			read += ret;
-			time = tb_mclock();
-		}
-		else if (!ret)
-		{
-			// timeout?
-			if (tb_mclock() - time > http->option.timeout) break;
-		}
-		else break;
-	}
-	//tb_trace("[http]: read: %d", read);
-	return read;
+	else return tb_gstream_read(http->stream, data, size);
 }
 

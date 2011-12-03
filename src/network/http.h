@@ -29,6 +29,7 @@
 #include "prefix.h"
 #include "cookies.h"
 #include "../string/string.h"
+#include "../stream/stream.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -87,11 +88,8 @@ typedef struct __tb_http_option_t
 	// the port
 	tb_uint16_t 		port;
 
-	// is block?
-	tb_uint16_t 		bblock : 1;
-
-	// is https?
-	tb_uint16_t 		bhttps : 1;
+	// is ssl?
+	tb_uint16_t 		bssl 	: 1;
 
 	// is keep alive?
 	tb_uint16_t 		bkalive : 1;
@@ -105,12 +103,6 @@ typedef struct __tb_http_option_t
 	// the head funcs
 	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_pointer_t priv);
 	tb_pointer_t 		head_priv;
-
-	// the ssl funcs
-	tb_handle_t 		(*sopen_func)(tb_char_t const* host, tb_size_t port);
-	tb_void_t 			(*sclose_func)(tb_handle_t handle);
-	tb_long_t 			(*sread_func)(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-	tb_long_t 			(*swrit_func)(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 
 	// the post data
 	tb_byte_t const* 	post_data;
@@ -151,7 +143,7 @@ typedef struct __tb_http_status_t
 	tb_uint8_t 			bredirect 	: 1;
 
 	// is https?
-	tb_uint8_t 			bhttps 		: 1;
+	tb_uint8_t 			bssl 		: 1;
 
 	// is keep alive?
 	tb_uint8_t 			bkalive		: 1;
@@ -212,10 +204,6 @@ tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head)
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
 tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
-tb_bool_t 				tb_http_option_set_sopen_func(tb_handle_t handle, tb_handle_t (*sopen_func)(tb_char_t const*, tb_size_t ));
-tb_bool_t 				tb_http_option_set_sclose_func(tb_handle_t handle, tb_void_t (*sclose_func)(tb_handle_t));
-tb_bool_t 				tb_http_option_set_sread_func(tb_handle_t handle, tb_long_t (*sread_func)(tb_handle_t, tb_byte_t* , tb_size_t));
-tb_bool_t 				tb_http_option_set_swrit_func(tb_handle_t handle, tb_long_t (*swrit_func)(tb_handle_t, tb_byte_t const* , tb_size_t));
 
 // status
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
@@ -233,9 +221,6 @@ tb_void_t 				tb_http_status_dump(tb_handle_t handle);
 // writ & read
 tb_long_t 				tb_http_writ(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-
-tb_long_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-tb_long_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
 
 #endif

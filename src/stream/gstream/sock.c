@@ -158,6 +158,11 @@ static tb_bool_t tb_sstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 			sst->port = (tb_size_t)arg1;
 			return TB_TRUE;
 		}
+	case TB_SSTREAM_CMD_SET_SSL:
+		{
+			tb_trace_noimpl();
+			return TB_FALSE;
+		}
 	default:
 		break;
 	}
