@@ -275,7 +275,7 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
  * interfaces
  */
 
-tb_gstream_t* tb_gstream_create_http()
+tb_gstream_t* tb_gstream_init_http()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_hstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);

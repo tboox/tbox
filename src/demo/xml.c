@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 #if defined(XML_READER)
 
 	// create stream
-	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	if (!gst || !tb_gstream_open(gst))
 	{
 		tb_print("failed to open xml: %s", argv[1]);
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 #elif defined(XML_READER_SELECT)
 
 	// create stream
-	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	if (!gst || !tb_gstream_open(gst))
 	{
 		tb_print("failed to open xml: %s", argv[1]);
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	tb_gstream_close(gst);
 
 #elif defined(XML_WRITER)
-	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 	if (!document) return 0;
 
 	// open input stream
-	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	if (!ist || !tb_gstream_open(ist))
 	{
 		tb_print("failed to open input xml: %s", argv[1]);
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 	}
 
 	// open output stream
-	tb_gstream_t* ost = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* ost = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!ost || !tb_gstream_open(ost))
 	{
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 	//TB_POOL_DUMP(TB_CONFIG_MEMORY_POOL_INDEX);
 
 #elif defined(XML_DOM_WRITER)
-	tb_gstream_t* gst = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_ioctl1(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (!gst || !tb_gstream_open(gst))
 	{
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
 	if (!document) return 0;
 
 	// open input stream
-	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
+	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	if (!ist || !tb_gstream_open(ist))
 	{
 		tb_print("failed to open input xml: %s", argv[1]);

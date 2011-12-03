@@ -178,7 +178,7 @@ static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_create_zip()
+tb_gstream_t* tb_gstream_init_zip()
 {
 	// create stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_zstream_t));
@@ -198,12 +198,12 @@ tb_gstream_t* tb_gstream_create_zip()
 
 	return gst;
 }
-tb_gstream_t* tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
+tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
 {
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// create encoding stream
-	tb_gstream_t* zst = tb_gstream_create_zip();
+	tb_gstream_t* zst = tb_gstream_init_zip();
 	tb_assert_and_check_return_val(zst, TB_NULL);
 
 	// set gstream
@@ -218,7 +218,7 @@ tb_gstream_t* tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 	return zst;
 
 fail:
-	if (zst) tb_gstream_destroy(zst);
+	if (zst) tb_gstream_exit(zst);
 	return TB_NULL;
 }
 
