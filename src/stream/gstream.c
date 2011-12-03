@@ -683,6 +683,11 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 	// ok?
 	return (gst->offset == offset)? TB_TRUE : TB_FALSE;
 }
+tb_size_t tb_gstream_type(tb_gstream_t const* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_GSTREAM_TYPE_NULL);
+	return gst->type;
+}
 tb_uint64_t tb_gstream_size(tb_gstream_t const* gst)
 {
 	tb_assert_and_check_return_val(gst, 0);

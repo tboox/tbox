@@ -69,34 +69,7 @@ static __tb_inline__ tb_sstream_t* tb_sstream_cast(tb_gstream_t* gst)
 static tb_bool_t tb_sstream_open(tb_gstream_t* gst)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst && !sst->sock && gst->url, TB_FALSE);
-
-	// skip prefix
-	tb_size_t 			n = tb_strlen(gst->url);
-	tb_char_t const* 	p = gst->url;
-	tb_char_t const* 	e = p + n;
-	tb_assert_and_check_return_val(n > 7 && !tb_strncmp(p, "sock://", 7), TB_FALSE);
-	p += 7;
-
-	// get host
-	tb_char_t* pb = sst->host;
-	tb_char_t* pe = sst->host + TB_SSTREAM_HOST_MAX - 1;
-	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
-	*pb = '\0';
-	tb_trace("[sst]: host: %s", sst->host);
-
-	// get port
-	if (*p && *p == ':')
-	{
-		tb_char_t port[12];
-		pb = port;
-		pe = port + 12 - 1;
-		for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
-		*pb = '\0';
-		sst->port = tb_stou32(port);
-	}
-	tb_assert_and_check_return_val(sst->port, TB_FALSE);
-	tb_trace("[sst]: port: %u", sst->port);
+	tb_assert_and_check_return_val(sst && !sst->sock && sst->port, TB_FALSE);
 
 	// open socket
 	sst->sock = tb_socket_client_open(sst->host, sst->port, sst->type, TB_FALSE);
@@ -139,6 +112,52 @@ static tb_bool_t tb_sstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 
 	switch (cmd)
 	{
+	case TB_GSTREAM_CMD_SET_URL:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+
+			// skip prefix
+			tb_char_t const* 	p = (tb_char_t const*)arg1;
+			tb_size_t 			n = tb_strlen(p);
+			tb_char_t const* 	e = p + n;
+			tb_assert_and_check_return_val(n > 7 && !tb_strncmp(p, "sock://", 7), TB_FALSE);
+			p += 7;
+
+			// get host
+			tb_char_t* pb = sst->host;
+			tb_char_t* pe = sst->host + TB_SSTREAM_HOST_MAX - 1;
+			while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
+			*pb = '\0';
+			//tb_trace("[sst]: host: %s", sst->host);
+
+			// get port
+			if (*p && *p == ':')
+			{
+				tb_char_t port[12];
+				pb = port;
+				pe = port + 12 - 1;
+				for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
+				*pb = '\0';
+				sst->port = tb_stou32(port);
+			}
+			tb_assert_and_check_return_val(sst->port, TB_FALSE);
+			//tb_trace("[sst]: port: %u", sst->port);
+
+			return TB_TRUE;
+		}
+	case TB_SSTREAM_CMD_SET_HOST:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			tb_strncpy(sst->host, (tb_char_t const*)arg1, TB_SSTREAM_HOST_MAX);
+			sst->host[TB_SSTREAM_HOST_MAX - 1] = '\0';
+			return TB_TRUE;
+		}
+	case TB_SSTREAM_CMD_SET_PORT:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			sst->port = (tb_size_t)arg1;
+			return TB_TRUE;
+		}
 	default:
 		break;
 	}
