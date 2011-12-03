@@ -61,6 +61,7 @@ static tb_gstream_item_t g_gstream_table[] =
 ,	{TB_GSTREAM_TYPE_HTTP, "https", tb_gstream_init_http}
 ,	{TB_GSTREAM_TYPE_FILE, "file", 	tb_gstream_init_file}
 ,	{TB_GSTREAM_TYPE_DATA, "data", 	tb_gstream_init_data}
+,	{TB_GSTREAM_TYPE_SOCK, "sock", 	tb_gstream_init_sock}
 };
 
 
