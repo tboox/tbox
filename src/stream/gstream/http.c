@@ -54,13 +54,10 @@ static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http && gst->url, TB_FALSE);
+	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
 
 	// init timeout
 	if (gst->timeout) tb_http_option_set_timeout(hst->http, gst->timeout);
-
-	// init url
-	tb_http_option_set_url(hst->http, gst->url);
 
 	// open it
 	return tb_http_open(hst->http);
@@ -125,6 +122,26 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 
 	switch (cmd)
 	{
+	case TB_GSTREAM_CMD_SET_URL:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			return tb_http_option_set_url(hst->http, (tb_char_t const*)arg1);
+		}
+	case TB_HSTREAM_CMD_SET_HOST:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			return tb_http_option_set_host(hst->http, (tb_char_t const*)arg1);
+		}
+	case TB_HSTREAM_CMD_SET_PORT:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			return tb_http_option_set_port(hst->http, (tb_size_t)arg1);
+		}
+	case TB_HSTREAM_CMD_SET_PATH:
+		{
+			tb_assert_and_check_return_val(arg1, TB_FALSE);
+			return tb_http_option_set_path(hst->http, (tb_char_t const*)arg1);
+		}
 	case TB_HSTREAM_CMD_SET_METHOD:
 		{
 			return tb_http_option_set_method(hst->http, (tb_http_method_t)arg1);
