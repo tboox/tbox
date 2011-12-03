@@ -48,15 +48,6 @@ typedef struct __tb_sstream_t
 	// the sock handle
 	tb_handle_t 		sock;
 
-	// the sock size
-	tb_uint64_t 		size;
-
-	// the sock offset
-	tb_uint64_t 		offset;
-
-	// the sock flags
-	tb_size_t 			flags;
-
 }tb_sstream_t;
 
 
@@ -65,117 +56,46 @@ typedef struct __tb_sstream_t
  */
 static __tb_inline__ tb_sstream_t* tb_sstream_cast(tb_gstream_t* gst)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_SOCK, TB_NULL);
 	return (tb_sstream_t*)gst;
 }
 static tb_bool_t tb_sstream_open(tb_gstream_t* gst)
 {
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && !fst->sock && gst->url, TB_FALSE);
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst && !sst->sock && gst->url, TB_FALSE);
 
-	// open sock
-	fst->sock = tb_sock_open(gst->url, fst->flags);
-	tb_assert_and_check_return_val(fst->sock, TB_FALSE);
-
-	// init size
-	fst->size = tb_sock_size(fst->sock);
-	fst->offset = 0;
-	
 	return TB_TRUE;
 }
 static tb_void_t tb_sstream_close(tb_gstream_t* gst)
 {
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	if (fst && fst->sock)
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	if (sst && sst->sock)
 	{
-		tb_sock_close(fst->sock);
-		fst->sock = TB_NULL;
-		fst->size = 0;
-		fst->offset = 0;
 	}
 }
 static tb_long_t tb_sstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->sock && data, -1);
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst && sst->sock && data, -1);
 	tb_check_return_val(size, 0);
 
-	// read data
-	tb_long_t ret = tb_sock_read(fst->sock, data, size);
-
-	// update offset
-	if (ret > 0) fst->offset += ret;
-	return ret;
+	return 0;
 }
 static tb_long_t tb_sstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->sock && data, -1);
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst && sst->sock && data, -1);
 	tb_check_return_val(size, 0);
 
-	// writ
-	tb_long_t ret = tb_sock_writ(fst->sock, (tb_byte_t*)data, (tb_size_t)size);
-	
-	// flush data
-	tb_sock_flush(fst->sock);
-
-	// update offset
-	if (ret > 0) fst->offset += ret;
-	return ret;
-}
-static tb_bool_t tb_sstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
-{
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->sock, TB_FALSE);
-
-	// seek
-	tb_int64_t ret = -1;
-	switch (flag)
-	{
-	case TB_GSTREAM_SEEK_BEG:
-		ret = tb_sock_seek(fst->sock, offset, TB_FILE_SEEK_BEG);
-		break;
-	case TB_GSTREAM_SEEK_CUR:
-		ret = tb_sock_seek(fst->sock, offset, TB_FILE_SEEK_CUR);
-		break;
-	case TB_GSTREAM_SEEK_END:
-		ret = tb_sock_seek(fst->sock, offset, TB_FILE_SEEK_END);
-		break;
-	default:
-		break;
-	}
-
-	// offset
-	if (ret >= 0) 
-	{
-		fst->offset = ret;
-		return TB_TRUE;
-	}
-
-	return TB_FALSE;
-}
-static tb_uint64_t tb_sstream_size(tb_gstream_t* gst)
-{	
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->sock, 0);
-	return fst->size;
-}
-static tb_uint64_t tb_sstream_offset(tb_gstream_t* gst)
-{
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->sock, 0);
-	return fst->offset;
+	return 0;
 }
 static tb_bool_t tb_sstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
-	tb_sstream_t* fst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(fst, TB_FALSE);
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst, TB_FALSE);
 
 	switch (cmd)
 	{
-	case TB_SSTREAM_CMD_SET_FLAGS:
-		fst->flags = (tb_size_t)arg1;
-		return TB_TRUE;
 	default:
 		break;
 	}
@@ -191,21 +111,14 @@ tb_gstream_t* tb_gstream_init_sock()
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// init stream
-	tb_sstream_t* fst = (tb_sstream_t*)gst;
+	tb_sstream_t* sst = (tb_sstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_FILE;
 	gst->open 	= tb_sstream_open;
 	gst->close 	= tb_sstream_close;
 	gst->read 	= tb_sstream_read;
 	gst->writ 	= tb_sstream_writ;
-	gst->size 	= tb_sstream_size;
-	gst->offset = tb_sstream_offset;
-	gst->seek 	= tb_sstream_seek;
 	gst->ioctl1 = tb_sstream_ioctl1;
-	fst->sock 	= TB_NULL;
-	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
-
-	// need larger cache for performance
-	gst->cache_maxn = TB_SSTREAM_CACHE_MAXN;
+	sst->sock 	= TB_NULL;
 
 	return gst;
 }

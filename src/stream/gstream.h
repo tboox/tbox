@@ -188,11 +188,11 @@ typedef struct __tb_gstream_t
 	// is opened?
 	tb_size_t 			bopened 	: 1;
 
-	// the timeout: ms
-	tb_size_t 			timeout 	: 23;
+	// is readed?
+	tb_size_t 			breaded 	: 1;
 
-	// the url
-	tb_char_t* 			url;
+	// the timeout: ms
+	tb_size_t 			timeout 	: 22;
 
 	// the cache data
 	tb_byte_t* 			cache_data;
@@ -200,19 +200,28 @@ typedef struct __tb_gstream_t
 	tb_size_t 			cache_size;
 	tb_size_t 			cache_maxn;
 
+	// the offset
+	tb_uint64_t 		offset;
+
+	// the url
+	tb_char_t* 			url;
+
 	// open & close
 	tb_bool_t 			(*open)(struct __tb_gstream_t* gst);
 	tb_void_t 			(*close)(struct __tb_gstream_t* gst);
-	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
-	// stream operations
+	// read & writ
 	tb_long_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 	tb_long_t 			(*writ)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);
 
-	// stream size
+	// seek
+	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset);
+
+	// size
 	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
-	tb_uint64_t 		(*offset)(struct __tb_gstream_t* gst);
+
+	// free
+	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
 	// ioctl
 	tb_bool_t 			(*ioctl0)(struct __tb_gstream_t* gst, tb_size_t cmd);

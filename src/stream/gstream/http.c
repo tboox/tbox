@@ -41,9 +41,6 @@ typedef struct __tb_hstream_t
 	// the http handle
 	tb_handle_t 		http;
 
-	// the http offset
-	tb_uint64_t 		offset;
-
 }tb_hstream_t;
 
 /* /////////////////////////////////////////////////////////
@@ -58,9 +55,6 @@ static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http && gst->url, TB_FALSE);
-
-	// init offset
-	hst->offset = 0;
 
 	// init timeout
 	if (gst->timeout) tb_http_option_set_timeout(hst->http, gst->timeout);
@@ -92,11 +86,7 @@ static tb_long_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	tb_check_return_val(size, 0);
 
 	// recv data
-	tb_long_t ret = tb_http_read(hst->http, data, size);
-
-	// update offset
-	if (ret > 0) hst->offset += ret;
-	return ret;
+	return tb_http_read(hst->http, data, size);
 }
 static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 {
@@ -105,13 +95,7 @@ static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 
 	return tb_http_status_document_size(hst->http);
 }
-static tb_uint64_t tb_hstream_offset(tb_gstream_t* gst)
-{
-	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http, 0);
-	return hst->offset;
-}
-static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
+static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -119,42 +103,19 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t
 	// is seekable?
 	if (!tb_http_status_isseeked(hst->http)) return TB_FALSE;
 
-	// get size
-	tb_uint64_t size = tb_http_status_content_size(hst->http);
-	tb_assert_and_check_return_val(size, TB_FALSE);
+	// close it
+	tb_http_close(hst->http);
 
-	// compute range
-	tb_http_range_t range = {0};
+	// set range
+	tb_http_range_t range;
 	range.bof = offset;
-	switch (flag)
-	{
-	case TB_GSTREAM_SEEK_BEG:
-		break;
-	case TB_GSTREAM_SEEK_CUR:
-		range.bof = hst->offset + offset;
-		break;
-	case TB_GSTREAM_SEEK_END:
-		range.bof = size + offset;
-		break;
-	default:
-		break;
-	}
-	tb_assert_and_check_return_val(range.bof <= size, TB_FALSE);
+	range.eof = 0;
+	tb_http_option_set_range(hst->http, &range);
 
-	if (range.bof != hst->offset)
-	{
-		// close it
-		tb_http_close(hst->http);
+	// reopen it
+	if (!tb_http_open(hst->http)) return TB_FALSE;
 
-		// set range
-		tb_http_option_set_range(hst->http, &range);
-
-		// reopen it
-		if (!tb_http_open(hst->http)) return TB_FALSE;
-
-		// update offset
-		hst->offset = range.bof;
-	}
+	// ok
 	return TB_TRUE;
 }
 static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
@@ -289,7 +250,6 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->read 	= tb_hstream_read;
 	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
-	gst->offset = tb_hstream_offset;
 	gst->ioctl1 = tb_hstream_ioctl1;
 	gst->ioctl2 = tb_hstream_ioctl2;
 	hst->http 	= tb_http_init(TB_NULL);
