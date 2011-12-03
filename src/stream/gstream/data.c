@@ -111,35 +111,15 @@ static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 
 	return (dst->head - dst->data);
 }
-static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
+static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, TB_FALSE);
 
-	// get size
-	tb_uint64_t size = tb_dstream_size(gst);
-	tb_assert_and_check_return_val(size, TB_FALSE);
-
-	// compute range
-	tb_uint64_t range = offset;
-	switch (flag)
-	{
-	case TB_GSTREAM_SEEK_BEG:
-		break;
-	case TB_GSTREAM_SEEK_CUR:
-		range = tb_dstream_offset(gst) + offset;
-		break;
-	case TB_GSTREAM_SEEK_END:
-		range = size + offset;
-		break;
-	default:
-		break;
-	}
-	tb_assert_and_check_return_val(range <= size, TB_FALSE);
-
 	// seek 
-	dst->head = dst->data + range;
+	dst->head = dst->data + offset;
 
+	// ok
 	return TB_TRUE;
 }
 

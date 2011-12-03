@@ -37,6 +37,7 @@ tbox_C_FILES 			+= \
 						stream/gstream/http \
 						stream/gstream/file \
 						stream/gstream/data \
+						stream/gstream/sock \
 						stream/tstream/tstream \
 						stream/tstream/encoding \
 						stream/tstream/zip \
