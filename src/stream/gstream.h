@@ -217,6 +217,9 @@ typedef struct __tb_gstream_t
 	// seek
 	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset);
 
+	// sync
+	tb_void_t 			(*sync)(struct __tb_gstream_t* gst);
+
 	// size
 	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
 
@@ -259,6 +262,9 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 // open & close
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);
 tb_void_t 			tb_gstream_close(tb_gstream_t* gst);
+
+// sync data - blocked
+tb_void_t 			tb_gstream_sync(tb_gstream_t* gst);
 
 // read & writ data
 tb_long_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);

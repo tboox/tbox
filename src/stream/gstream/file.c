@@ -105,12 +105,7 @@ static tb_long_t tb_fstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	tb_check_return_val(size, 0);
 
 	// writ
-	tb_long_t ret = tb_file_writ(fst->file, (tb_byte_t*)data, (tb_size_t)size);
-	
-	// flush data
-	tb_file_flush(fst->file);
-
-	return ret;
+	return tb_file_writ(fst->file, (tb_byte_t*)data, (tb_size_t)size);
 }
 static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
@@ -119,6 +114,14 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 
 	// seek
 	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? TB_TRUE : TB_FALSE);
+}
+static tb_void_t tb_fstream_sync(tb_gstream_t* gst)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	tb_assert_and_check_return(fst && fst->file);
+
+	// sync data
+	tb_file_sync(fst->file);
 }
 static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 {	
@@ -159,6 +162,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->writ 	= tb_fstream_writ;
 	gst->size 	= tb_fstream_size;
 	gst->seek 	= tb_fstream_seek;
+	gst->sync 	= tb_fstream_sync;
 	gst->ioctl1 = tb_fstream_ioctl1;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
