@@ -32,8 +32,6 @@
  * macros
  */
 
-// need larger cache for performance
-#define TB_SSTREAM_CACHE_MAXN 					(TB_GSTREAM_CACHE_MAXN << 2)
 
 /* /////////////////////////////////////////////////////////
  * types

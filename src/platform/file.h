@@ -99,7 +99,7 @@ tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size);
 tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags);
 tb_uint64_t 			tb_file_size(tb_handle_t hfile);
-tb_void_t 				tb_file_flush(tb_handle_t hfile);
+tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
 // file modifiors
 tb_bool_t 				tb_file_create(tb_char_t const* path, tb_file_type_t type);

@@ -229,7 +229,7 @@ end:
 //	tb_trace("writ: %d", writ);
 	return writ;
 }
-static tb_void_t tb_gstream_cache_flush(tb_gstream_t* gst)
+static tb_void_t tb_gstream_cache_sync(tb_gstream_t* gst)
 {
 	tb_size_t 	writ = 0;
 	tb_size_t 	size = gst->cache_size;
@@ -263,6 +263,9 @@ static tb_void_t tb_gstream_cache_flush(tb_gstream_t* gst)
 	// clear cache
 	gst->cache_size = 0;
 	gst->cache_head = gst->cache_data;
+
+	// sync stream
+	if (gst->sync) gst->sync(gst);
 }
 static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
@@ -399,8 +402,8 @@ tb_void_t tb_gstream_close(tb_gstream_t* gst)
 	// set close state first, avoid occupy
 	gst->bopened = 0;
 
-	// flush cache
-	tb_gstream_cache_flush(gst);
+	// sync cache
+	tb_gstream_cache_sync(gst);
 
 	// close it
 	if (gst->close) gst->close(gst);	
@@ -411,6 +414,12 @@ tb_void_t tb_gstream_close(tb_gstream_t* gst)
 	// exit cache
 	gst->cache_head = gst->cache_data;
 	gst->cache_size = 0;
+}
+
+tb_void_t tb_gstream_sync(tb_gstream_t* gst)
+{
+	// sync cache
+	tb_gstream_cache_sync(gst);
 }
 tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 {

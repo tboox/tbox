@@ -82,7 +82,7 @@ tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(hfile, -1);
 	return write((tb_long_t)hfile - 1, data, size);
 }
-tb_void_t tb_file_flush(tb_handle_t hfile)
+tb_void_t tb_file_sync(tb_handle_t hfile)
 {
 	if (hfile) fdatasync((tb_long_t)hfile - 1);
 }
