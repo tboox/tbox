@@ -202,26 +202,6 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 		{
 			return tb_http_option_set_range(hst->http, (tb_http_range_t const*)arg1);
 		}
-	case TB_HSTREAM_CMD_SET_SOPEN_FUNC:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_sopen_func(hst->http, (tb_handle_t (*)(tb_char_t const*))arg1);
-		}
-	case TB_HSTREAM_CMD_SET_SCLOSE_FUNC:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_sclose_func(hst->http, (tb_void_t (*)(tb_handle_t ))arg1);
-		}
-	case TB_HSTREAM_CMD_SET_SREAD_FUNC:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_sread_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t* , tb_size_t ))arg1);
-		}	
-	case TB_HSTREAM_CMD_SET_SWRITE_FUNC:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_swrit_func(hst->http, (tb_long_t (*)(tb_handle_t, tb_byte_t const* , tb_size_t ))arg1);
-		}
 	default:
 		break;
 	}

@@ -142,6 +142,7 @@ typedef enum __tb_gstream_cmd_t
 	// the sstream
 ,	TB_SSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 1)
 ,	TB_SSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 2)
+,	TB_SSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 3)
 
 	// the hstream
 ,	TB_HSTREAM_CMD_ISCHUNKED 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 1)
@@ -162,10 +163,6 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_HSTREAM_CMD_SET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
 ,	TB_HSTREAM_CMD_SET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 15)
 ,	TB_HSTREAM_CMD_SET_HEAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 16)
-,	TB_HSTREAM_CMD_SET_SOPEN_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 17)
-,	TB_HSTREAM_CMD_SET_SCLOSE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 18)
-,	TB_HSTREAM_CMD_SET_SREAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 19)
-,	TB_HSTREAM_CMD_SET_SWRITE_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 20)
 
 	// the tstream
 ,	TB_TSTREAM_CMD_GET_GSTREAM 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_NULL, 1)
@@ -290,6 +287,9 @@ tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
 
 // seek
 tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);
+
+// skip
+tb_bool_t 			tb_gstream_skip(tb_gstream_t* gst, tb_size_t size);
 
 // format writ data - blocked
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
