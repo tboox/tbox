@@ -207,7 +207,7 @@ typedef struct __tb_gstream_t
 	// stream operations
 	tb_long_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 	tb_long_t 			(*writ)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag);
+	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);
 
 	// stream size
 	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
@@ -258,14 +258,14 @@ tb_long_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_long_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
 // read & writ line - blocked
-tb_long_t 			tb_gstream_read_line(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_long_t 			tb_gstream_writ_line(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_read_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_writ_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
 
 // need data - blocked
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
 
 // seek
-tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag);
+tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);
 
 // format writ data - blocked
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);

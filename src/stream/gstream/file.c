@@ -123,7 +123,7 @@ static tb_long_t tb_fstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	if (ret > 0) fst->offset += ret;
 	return ret;
 }
-static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, TB_FALSE);
