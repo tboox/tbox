@@ -45,8 +45,8 @@ typedef struct __tb_gstream_item_t
 	// the stream name
 	tb_char_t const* 	name;
 	
-	// the stream creator
-	tb_gstream_t* 		(*create)();
+	// the stream initor
+	tb_gstream_t* 		(*init)();
 
 }tb_gstream_item_t;
 
@@ -57,10 +57,10 @@ typedef struct __tb_gstream_item_t
 // the stream table
 static tb_gstream_item_t g_gstream_table[] = 
 {
-	{TB_GSTREAM_TYPE_HTTP, "http", tb_gstream_create_http}
-,	{TB_GSTREAM_TYPE_HTTP, "https", tb_gstream_create_http}
-,	{TB_GSTREAM_TYPE_FILE, "file", tb_gstream_create_file}
-,	{TB_GSTREAM_TYPE_DATA, "data", tb_gstream_create_data}
+	{TB_GSTREAM_TYPE_HTTP, "http", 	tb_gstream_init_http}
+,	{TB_GSTREAM_TYPE_HTTP, "https", tb_gstream_init_http}
+,	{TB_GSTREAM_TYPE_FILE, "file", 	tb_gstream_init_file}
+,	{TB_GSTREAM_TYPE_DATA, "data", 	tb_gstream_init_data}
 };
 
 
@@ -285,7 +285,7 @@ static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset, tb_
 /* /////////////////////////////////////////////////////////
  * interface
  */
-tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
+tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 {
 	tb_assert_and_check_return_val(url, TB_NULL);
 
@@ -305,14 +305,14 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	{
 		if (!tb_strcmp(g_gstream_table[i].name, proto))
 		{
-			gst = g_gstream_table[i].create();
+			gst = g_gstream_table[i].init();
 			break;
 		}
 	}
 
 	// \note: prehandle for file
-	if (gst && gst->type == TB_GSTREAM_TYPE_FILE) url = url + 7; 	// file:///home/file => /home/file
-	else if (!gst && url[0] == '/') gst = tb_gstream_create_file(); // is /home/file?
+	if (gst && gst->type == TB_GSTREAM_TYPE_FILE) url = url + 7; 	//!< file:///root/file => /root/file
+	else if (!gst && url[0] == '/') gst = tb_gstream_init_file(); 	//!< is /root/file?
 
 	// check
 	tb_assert_and_check_return_val(gst, TB_NULL);
@@ -324,11 +324,11 @@ tb_gstream_t* tb_gstream_create_from_url(tb_char_t const* url)
 	return gst;
 
 fail:
-	if (gst) tb_gstream_destroy(gst);
+	if (gst) tb_gstream_exit(gst);
 	return TB_NULL;
 }
 
-tb_void_t tb_gstream_destroy(tb_gstream_t* gst)
+tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 {
 	if (gst) 
 	{

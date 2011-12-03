@@ -6,10 +6,10 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create stream
-	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
-	tb_gstream_t* ost = tb_gstream_create_from_url(argv[2]);
-	//tb_gstream_t* est = tb_gstream_create_from_encoding(ist, TB_ENCODING_UTF8, TB_ENCODING_GB2312);
-	tb_gstream_t* est = tb_gstream_create_from_encoding(ist, TB_ENCODING_GB2312, TB_ENCODING_UTF8);
+	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
+	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
+	//tb_gstream_t* est = tb_gstream_init_from_encoding(ist, TB_ENCODING_UTF8, TB_ENCODING_GB2312);
+	tb_gstream_t* est = tb_gstream_init_from_encoding(ist, TB_ENCODING_GB2312, TB_ENCODING_UTF8);
 	if (!ist || !ost || !est) goto end;
 
 	// init option
@@ -55,9 +55,9 @@ int main(int argc, char** argv)
 end:
 
 	// destroy stream
-	tb_gstream_destroy(est);
-	tb_gstream_destroy(ist);
-	tb_gstream_destroy(ost);
+	tb_gstream_exit(est);
+	tb_gstream_exit(ist);
+	tb_gstream_exit(ost);
 
 	tb_printf("end\n");
 	getchar();

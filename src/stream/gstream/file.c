@@ -185,7 +185,7 @@ static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
  * interfaces
  */
 
-tb_gstream_t* tb_gstream_create_file()
+tb_gstream_t* tb_gstream_init_file()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_fstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);

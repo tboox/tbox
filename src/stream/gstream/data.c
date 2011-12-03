@@ -166,7 +166,7 @@ static tb_bool_t tb_dstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 /* /////////////////////////////////////////////////////////
  * interface implemention
  */
-tb_gstream_t* tb_gstream_create_data()
+tb_gstream_t* tb_gstream_init_data()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_dstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
@@ -184,12 +184,12 @@ tb_gstream_t* tb_gstream_create_data()
 
 	return gst;
 }
-tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
+tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(data && size, TB_NULL);
 
 	// create data stream
-	tb_gstream_t* gst = tb_gstream_create_data();
+	tb_gstream_t* gst = tb_gstream_init_data();
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set data & size
@@ -198,6 +198,6 @@ tb_gstream_t* tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size)
 	return gst;
 
 fail:
-	if (gst) tb_gstream_destroy(gst);
+	if (gst) tb_gstream_exit(gst);
 	return TB_NULL;
 }

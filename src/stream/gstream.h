@@ -103,10 +103,11 @@ typedef enum __tb_gstream_seek_t
 typedef enum __tb_gstream_type_t
 {
  	TB_GSTREAM_TYPE_NULL 			= 0
-, 	TB_GSTREAM_TYPE_HTTP 			= 1
+, 	TB_GSTREAM_TYPE_DATA 			= 1
 , 	TB_GSTREAM_TYPE_FILE 			= 2
-, 	TB_GSTREAM_TYPE_DATA 			= 3
-, 	TB_GSTREAM_TYPE_TRAN 			= 4
+, 	TB_GSTREAM_TYPE_SOCK 			= 3
+, 	TB_GSTREAM_TYPE_HTTP 			= 4
+, 	TB_GSTREAM_TYPE_TRAN 			= 5
 
 }tb_gstream_type_t;
 
@@ -226,24 +227,25 @@ typedef struct __tb_gstream_t
  */
 
 // destroy stream
-tb_void_t 			tb_gstream_destroy(tb_gstream_t* gst);
+tb_void_t 			tb_gstream_exit(tb_gstream_t* gst);
 
 // the data stream
-tb_gstream_t* 		tb_gstream_create_data();
-tb_gstream_t* 		tb_gstream_create_from_data(tb_byte_t const* data, tb_size_t size);
+tb_gstream_t* 		tb_gstream_init_data();
+tb_gstream_t* 		tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size);
 
 // the protocol stream
-tb_gstream_t* 		tb_gstream_create_file();
-tb_gstream_t* 		tb_gstream_create_http();
-tb_gstream_t* 		tb_gstream_create_from_url(tb_char_t const* url);
+tb_gstream_t* 		tb_gstream_init_file(); //!< file://path or unix path: e.g. /root/xxxx/file
+tb_gstream_t* 		tb_gstream_init_sock(); //!< sock://host:port
+tb_gstream_t* 		tb_gstream_init_http(); //!< http://host:port/path?arg0=&arg1=...
+tb_gstream_t* 		tb_gstream_init_from_url(tb_char_t const* url);
 
 // the transform stream for encoding
-tb_gstream_t* 		tb_gstream_create_encoding();
-tb_gstream_t* 		tb_gstream_create_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
+tb_gstream_t* 		tb_gstream_init_encoding();
+tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
 // the transform stream for zip
-tb_gstream_t* 		tb_gstream_create_zip();
-tb_gstream_t* 		tb_gstream_create_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
+tb_gstream_t* 		tb_gstream_init_zip();
+tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
 
 // open & close
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);

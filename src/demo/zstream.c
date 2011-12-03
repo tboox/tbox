@@ -12,16 +12,16 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create stream
-	tb_gstream_t* ist = tb_gstream_create_from_url(argv[1]);
-	tb_gstream_t* ost = tb_gstream_create_from_url(argv[2]);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_DEFLATE);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_DEFLATE);
-	tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);	
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_create_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_DEFLATE);
+	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
+	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_DEFLATE);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_DEFLATE);
+	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_INFLATE);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);	
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_INFLATE);
+	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_DEFLATE);
 
 	if (!ist || !ost || !zst) goto end;
 
@@ -70,9 +70,9 @@ int main(int argc, char** argv)
 end:
 
 	// destroy stream
-	tb_gstream_destroy(zst);
-	tb_gstream_destroy(ist);
-	tb_gstream_destroy(ost);
+	tb_gstream_exit(zst);
+	tb_gstream_exit(ist);
+	tb_gstream_exit(ost);
 
 	tb_printf("end\n");
 	getchar();
