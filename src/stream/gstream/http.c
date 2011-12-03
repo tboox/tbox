@@ -111,7 +111,7 @@ static tb_uint64_t tb_hstream_offset(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(hst && hst->http, 0);
 	return hst->offset;
 }
-static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);

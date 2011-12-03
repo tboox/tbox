@@ -111,7 +111,7 @@ static tb_size_t tb_dstream_offset(tb_gstream_t const* gst)
 
 	return (dst->head - dst->data);
 }
-static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_gstream_seek_t flag)
+static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, TB_FALSE);
