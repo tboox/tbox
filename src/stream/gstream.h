@@ -55,34 +55,34 @@ extern "C" {
 
 // the stream bitops
 #ifdef TB_WORDS_BIGENDIAN
-# 	define tb_gstream_read_u16_ne(gst) 			tb_gstream_read_u16_be(gst)
-# 	define tb_gstream_read_s16_ne(gst) 			tb_gstream_read_s16_be(gst)
-# 	define tb_gstream_read_u24_ne(gst) 			tb_gstream_read_u24_be(gst)
-# 	define tb_gstream_read_s24_ne(gst) 			tb_gstream_read_s24_be(gst)
-# 	define tb_gstream_read_u32_ne(gst) 			tb_gstream_read_u32_be(gst)
-# 	define tb_gstream_read_s32_ne(gst) 			tb_gstream_read_s32_be(gst)
+# 	define tb_gstream_bread_u16_ne(gst) 		tb_gstream_bread_u16_be(gst)
+# 	define tb_gstream_bread_s16_ne(gst) 		tb_gstream_bread_s16_be(gst)
+# 	define tb_gstream_bread_u24_ne(gst) 		tb_gstream_bread_u24_be(gst)
+# 	define tb_gstream_bread_s24_ne(gst) 		tb_gstream_bread_s24_be(gst)
+# 	define tb_gstream_bread_u32_ne(gst) 		tb_gstream_bread_u32_be(gst)
+# 	define tb_gstream_bread_s32_ne(gst) 		tb_gstream_bread_s32_be(gst)
 
-# 	define tb_gstream_writ_u16_ne(gst, val) 	tb_gstream_writ_u16_be(gst, val)
-# 	define tb_gstream_writ_s16_ne(gst, val)		tb_gstream_writ_s16_be(gst, val)
-# 	define tb_gstream_writ_u24_ne(gst, val) 	tb_gstream_writ_u24_be(gst, val)
-# 	define tb_gstream_writ_s24_ne(gst, val)		tb_gstream_writ_s24_be(gst, val)
-# 	define tb_gstream_writ_u32_ne(gst, val)		tb_gstream_writ_u32_be(gst, val)
-# 	define tb_gstream_writ_s32_ne(gst, val) 	tb_gstream_writ_s32_be(gst, val)
+# 	define tb_gstream_bwrit_u16_ne(gst, val) 	tb_gstream_bwrit_u16_be(gst, val)
+# 	define tb_gstream_bwrit_s16_ne(gst, val)	tb_gstream_bwrit_s16_be(gst, val)
+# 	define tb_gstream_bwrit_u24_ne(gst, val) 	tb_gstream_bwrit_u24_be(gst, val)
+# 	define tb_gstream_bwrit_s24_ne(gst, val)	tb_gstream_bwrit_s24_be(gst, val)
+# 	define tb_gstream_bwrit_u32_ne(gst, val)	tb_gstream_bwrit_u32_be(gst, val)
+# 	define tb_gstream_bwrit_s32_ne(gst, val) 	tb_gstream_bwrit_s32_be(gst, val)
 
 #else
-# 	define tb_gstream_read_u16_ne(gst) 			tb_gstream_read_u16_le(gst)
-# 	define tb_gstream_read_s16_ne(gst) 			tb_gstream_read_s16_le(gst)
-# 	define tb_gstream_read_u24_ne(gst) 			tb_gstream_read_u24_le(gst)
-# 	define tb_gstream_read_s24_ne(gst) 			tb_gstream_read_s24_le(gst)
-# 	define tb_gstream_read_u32_ne(gst) 			tb_gstream_read_u32_le(gst)
-# 	define tb_gstream_read_s32_ne(gst) 			tb_gstream_read_s32_le(gst)
+# 	define tb_gstream_bread_u16_ne(gst) 		tb_gstream_bread_u16_le(gst)
+# 	define tb_gstream_bread_s16_ne(gst) 		tb_gstream_bread_s16_le(gst)
+# 	define tb_gstream_bread_u24_ne(gst) 		tb_gstream_bread_u24_le(gst)
+# 	define tb_gstream_bread_s24_ne(gst) 		tb_gstream_bread_s24_le(gst)
+# 	define tb_gstream_bread_u32_ne(gst) 		tb_gstream_bread_u32_le(gst)
+# 	define tb_gstream_bread_s32_ne(gst) 		tb_gstream_bread_s32_le(gst)
 
-# 	define tb_gstream_writ_u16_ne(gst, val) 	tb_gstream_writ_u16_le(gst, val)
-# 	define tb_gstream_writ_s16_ne(gst, val)		tb_gstream_writ_s16_le(gst, val)
-# 	define tb_gstream_writ_u24_ne(gst, val) 	tb_gstream_writ_u24_le(gst, val)
-# 	define tb_gstream_writ_s24_ne(gst, val)		tb_gstream_writ_s24_le(gst, val)
-# 	define tb_gstream_writ_u32_ne(gst, val)		tb_gstream_writ_u32_le(gst, val)
-# 	define tb_gstream_writ_s32_ne(gst, val) 	tb_gstream_writ_s32_le(gst, val)
+# 	define tb_gstream_bwrit_u16_ne(gst, val) 	tb_gstream_bwrit_u16_le(gst, val)
+# 	define tb_gstream_bwrit_s16_ne(gst, val)	tb_gstream_bwrit_s16_le(gst, val)
+# 	define tb_gstream_bwrit_u24_ne(gst, val) 	tb_gstream_bwrit_u24_le(gst, val)
+# 	define tb_gstream_bwrit_s24_ne(gst, val)	tb_gstream_bwrit_s24_le(gst, val)
+# 	define tb_gstream_bwrit_u32_ne(gst, val)	tb_gstream_bwrit_u32_le(gst, val)
+# 	define tb_gstream_bwrit_s32_ne(gst, val) 	tb_gstream_bwrit_s32_le(gst, val)
 
 #endif
 
@@ -142,7 +142,8 @@ typedef enum __tb_gstream_cmd_t
 	// the sstream
 ,	TB_SSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 1)
 ,	TB_SSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 2)
-,	TB_SSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 3)
+,	TB_SSTREAM_CMD_SET_TYPE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 3)
+,	TB_SSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 4)
 
 	// the hstream
 ,	TB_HSTREAM_CMD_ISCHUNKED 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 1)
@@ -157,12 +158,13 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_HSTREAM_CMD_SET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 8)
 ,	TB_HSTREAM_CMD_SET_HEAD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 9)
 ,	TB_HSTREAM_CMD_SET_POST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 10)
-,	TB_HSTREAM_CMD_SET_RANGE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 11)
-,	TB_HSTREAM_CMD_SET_METHOD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 12)
-,	TB_HSTREAM_CMD_SET_KALIVE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 13)
-,	TB_HSTREAM_CMD_SET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
-,	TB_HSTREAM_CMD_SET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 15)
-,	TB_HSTREAM_CMD_SET_HEAD_FUNC 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 16)
+,	TB_HSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 11)
+,	TB_HSTREAM_CMD_SET_RANGE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 12)
+,	TB_HSTREAM_CMD_SET_METHOD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 13)
+,	TB_HSTREAM_CMD_SET_KALIVE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
+,	TB_HSTREAM_CMD_SET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 15)
+,	TB_HSTREAM_CMD_SET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 16)
+,	TB_HSTREAM_CMD_SET_HFUNC 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 17)
 
 	// the tstream
 ,	TB_TSTREAM_CMD_GET_GSTREAM 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_NULL, 1)
@@ -192,8 +194,8 @@ typedef struct __tb_gstream_t
 	// is opened?
 	tb_size_t 			bopened 	: 1;
 
-	// is readed?
-	tb_size_t 			breaded 	: 1;
+	// is writed?
+	tb_size_t 			bwrited 	: 1;
 
 	// the timeout: ms
 	tb_size_t 			timeout 	: 22;
@@ -210,19 +212,26 @@ typedef struct __tb_gstream_t
 	// the url
 	tb_char_t* 			url;
 
-	// open & close
-	tb_bool_t 			(*open)(struct __tb_gstream_t* gst);
-	tb_void_t 			(*close)(struct __tb_gstream_t* gst);
+	// async open
+	tb_long_t 			(*aopen)(struct __tb_gstream_t* gst);
 
-	// read & writ
-	tb_long_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-	tb_long_t 			(*writ)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	// async close
+	tb_long_t 			(*aclose)(struct __tb_gstream_t* gst);
+
+	// async read
+	tb_long_t 			(*aread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+
+	// async writ
+	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+
+	// async fread
+	tb_long_t 			(*afread)(struct __tb_gstream_t* gst);
+
+	// async fwrit
+	tb_long_t 			(*afwrit)(struct __tb_gstream_t* gst);
 
 	// seek
 	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset);
-
-	// sync
-	tb_void_t 			(*sync)(struct __tb_gstream_t* gst);
 
 	// size
 	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
@@ -242,47 +251,77 @@ typedef struct __tb_gstream_t
  * interfaces
  */
 
-// destroy stream
+// exit stream
 tb_void_t 			tb_gstream_exit(tb_gstream_t* gst);
 
-// the data stream
+// init stream
 tb_gstream_t* 		tb_gstream_init_data();
-tb_gstream_t* 		tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size);
+tb_gstream_t* 		tb_gstream_init_file();
+tb_gstream_t* 		tb_gstream_init_sock();
+tb_gstream_t* 		tb_gstream_init_http();
+tb_gstream_t* 		tb_gstream_init_zip();
+tb_gstream_t* 		tb_gstream_init_encoding();
 
-// the protocol stream
-tb_gstream_t* 		tb_gstream_init_file(); //!< file://path or unix path: e.g. /root/xxxx/file
-tb_gstream_t* 		tb_gstream_init_sock(); //!< sock://host:port
-tb_gstream_t* 		tb_gstream_init_http(); //!< http://host:port/path?arg0=&arg1=...
+/* init stream from url
+ *
+ * file://path or unix path: e.g. /root/xxxx/file
+ * sock://host:port?tcp=&ssl=
+ * http://host:port/path?arg0=&arg1=...
+ * https://host:port/path?arg0=&arg1=...
+ */
 tb_gstream_t* 		tb_gstream_init_from_url(tb_char_t const* url);
 
-// the transform stream for encoding
-tb_gstream_t* 		tb_gstream_init_encoding();
-tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
+// init stream from data
+tb_gstream_t* 		tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size);
 
-// the transform stream for zip
-tb_gstream_t* 		tb_gstream_init_zip();
+// init stream from file
+tb_gstream_t* 		tb_gstream_init_from_file(tb_char_t const* path);
+
+// init stream from sock
+tb_gstream_t* 		tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
+
+// init stream from http or https
+tb_gstream_t* 		tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+
+// init stream from zip
 tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
 
-// open & close
-tb_bool_t 			tb_gstream_open(tb_gstream_t* gst);
-tb_void_t 			tb_gstream_close(tb_gstream_t* gst);
+// init stream from encoding
+tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
-// sync data - blocked
-tb_void_t 			tb_gstream_sync(tb_gstream_t* gst);
+// async open, allow multiple called before closing 
+tb_long_t 			tb_gstream_aopen(tb_gstream_t* gst);
 
-// read & writ data
-tb_long_t 			tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_long_t 			tb_gstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+// block open, allow multiple called before closing 
+tb_bool_t 			tb_gstream_bopen(tb_gstream_t* gst);
 
-// read & writ data - blocked
-tb_long_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_long_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+// async close, allow multiple called
+tb_long_t 			tb_gstream_aclose(tb_gstream_t* gst);
 
-// read & writ line - blocked
-tb_long_t 			tb_gstream_read_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
-tb_long_t 			tb_gstream_writ_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
+// block close, allow multiple called
+tb_bool_t 			tb_gstream_bclose(tb_gstream_t* gst);
 
-// need data - blocked
+// async flush read & writ data
+tb_long_t 			tb_gstream_afread(tb_gstream_t* gst);
+tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst);
+
+// block flush read & writ data
+tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst);
+tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst);
+
+// async read & writ data
+tb_long_t 			tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+
+// block read & writ data
+tb_bool_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+
+// block read & writ line
+tb_long_t 			tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
+
+// need
 tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
 
 // seek
@@ -298,49 +337,49 @@ tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 tb_uint64_t 		tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
 tb_uint64_t 		tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
 
-// read integer - blocked
-tb_uint8_t 			tb_gstream_read_u8(tb_gstream_t* gst);
-tb_sint8_t 			tb_gstream_read_s8(tb_gstream_t* gst);
+// block read integer
+tb_uint8_t 			tb_gstream_bread_u8(tb_gstream_t* gst);
+tb_sint8_t 			tb_gstream_bread_s8(tb_gstream_t* gst);
 
-tb_uint16_t 		tb_gstream_read_u16_le(tb_gstream_t* gst);
-tb_sint16_t 		tb_gstream_read_s16_le(tb_gstream_t* gst);
+tb_uint16_t 		tb_gstream_bread_u16_le(tb_gstream_t* gst);
+tb_sint16_t 		tb_gstream_bread_s16_le(tb_gstream_t* gst);
 
-tb_uint32_t 		tb_gstream_read_u24_le(tb_gstream_t* gst);
-tb_sint32_t 		tb_gstream_read_s24_le(tb_gstream_t* gst);
+tb_uint32_t 		tb_gstream_bread_u24_le(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_bread_s24_le(tb_gstream_t* gst);
 
-tb_uint32_t 		tb_gstream_read_u32_le(tb_gstream_t* gst);
-tb_sint32_t 		tb_gstream_read_s32_le(tb_gstream_t* gst);
+tb_uint32_t 		tb_gstream_bread_u32_le(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_bread_s32_le(tb_gstream_t* gst);
 
-tb_uint16_t 		tb_gstream_read_u16_be(tb_gstream_t* gst);
-tb_sint16_t 		tb_gstream_read_s16_be(tb_gstream_t* gst);
+tb_uint16_t 		tb_gstream_bread_u16_be(tb_gstream_t* gst);
+tb_sint16_t 		tb_gstream_bread_s16_be(tb_gstream_t* gst);
 
-tb_uint32_t 		tb_gstream_read_u24_be(tb_gstream_t* gst);
-tb_sint32_t 		tb_gstream_read_s24_be(tb_gstream_t* gst);
+tb_uint32_t 		tb_gstream_bread_u24_be(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_bread_s24_be(tb_gstream_t* gst);
 
-tb_uint32_t 		tb_gstream_read_u32_be(tb_gstream_t* gst);
-tb_sint32_t 		tb_gstream_read_s32_be(tb_gstream_t* gst);
+tb_uint32_t 		tb_gstream_bread_u32_be(tb_gstream_t* gst);
+tb_sint32_t 		tb_gstream_bread_s32_be(tb_gstream_t* gst);
 
-// writ integer - blocked
-tb_bool_t			tb_gstream_writ_u8(tb_gstream_t* gst, tb_uint8_t val);
-tb_bool_t 			tb_gstream_writ_s8(tb_gstream_t* gst, tb_sint8_t val);
+// block writ integer
+tb_bool_t			tb_gstream_bwrit_u8(tb_gstream_t* gst, tb_uint8_t val);
+tb_bool_t 			tb_gstream_bwrit_s8(tb_gstream_t* gst, tb_sint8_t val);
 
-tb_bool_t 			tb_gstream_writ_u16_le(tb_gstream_t* gst, tb_uint16_t val);
-tb_bool_t 			tb_gstream_writ_s16_le(tb_gstream_t* gst, tb_sint16_t val);
+tb_bool_t 			tb_gstream_bwrit_u16_le(tb_gstream_t* gst, tb_uint16_t val);
+tb_bool_t 			tb_gstream_bwrit_s16_le(tb_gstream_t* gst, tb_sint16_t val);
 
-tb_bool_t 			tb_gstream_writ_u24_le(tb_gstream_t* gst, tb_uint32_t val);
-tb_bool_t 			tb_gstream_writ_s24_le(tb_gstream_t* gst, tb_sint32_t val);
+tb_bool_t 			tb_gstream_bwrit_u24_le(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_bwrit_s24_le(tb_gstream_t* gst, tb_sint32_t val);
 
-tb_bool_t 			tb_gstream_writ_u32_le(tb_gstream_t* gst, tb_uint32_t val);
-tb_bool_t 			tb_gstream_writ_s32_le(tb_gstream_t* gst, tb_sint32_t val);
+tb_bool_t 			tb_gstream_bwrit_u32_le(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_bwrit_s32_le(tb_gstream_t* gst, tb_sint32_t val);
 
-tb_bool_t 			tb_gstream_writ_u16_be(tb_gstream_t* gst, tb_uint16_t val);
-tb_bool_t 			tb_gstream_writ_s16_be(tb_gstream_t* gst, tb_sint16_t val);
+tb_bool_t 			tb_gstream_bwrit_u16_be(tb_gstream_t* gst, tb_uint16_t val);
+tb_bool_t 			tb_gstream_bwrit_s16_be(tb_gstream_t* gst, tb_sint16_t val);
 
-tb_bool_t 			tb_gstream_writ_u24_be(tb_gstream_t* gst, tb_uint32_t val);
-tb_bool_t 			tb_gstream_writ_s24_be(tb_gstream_t* gst, tb_sint32_t val);
+tb_bool_t 			tb_gstream_bwrit_u24_be(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_bwrit_s24_be(tb_gstream_t* gst, tb_sint32_t val);
 
-tb_bool_t 			tb_gstream_writ_u32_be(tb_gstream_t* gst, tb_uint32_t val);
-tb_bool_t 			tb_gstream_writ_s32_be(tb_gstream_t* gst, tb_sint32_t val);
+tb_bool_t 			tb_gstream_bwrit_u32_be(tb_gstream_t* gst, tb_uint32_t val);
+tb_bool_t 			tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gst);

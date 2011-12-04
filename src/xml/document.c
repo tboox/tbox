@@ -124,14 +124,13 @@ fail:
  * interfaces
  */
 
-tb_xml_document_t* tb_xml_document_create()
+tb_xml_document_t* tb_xml_document_init()
 {
 	// alloc document
-	tb_xml_document_t* document = (tb_xml_document_t*)tb_malloc(sizeof(tb_xml_document_t));
-	if (!document) return TB_NULL;
+	tb_xml_document_t* document = tb_xml_node_init(TB_NULL, TB_XML_NODE_TYPE_DOCUMENT);
+	tb_assert_and_check_return_val(document, TB_NULL);
 
 	// init node
-	tb_xml_node_init(&document->base, document, TB_XML_NODE_TYPE_DOCUMENT);
 	document->base.free = tb_xml_document_free;
 	tb_string_assign_c_string_by_ref(&document->base.name, "#document");
 
@@ -143,9 +142,9 @@ tb_xml_document_t* tb_xml_document_create()
 
 	return document;
 }
-tb_void_t tb_xml_document_destroy(tb_xml_document_t* document)
+tb_void_t tb_xml_document_exit(tb_xml_document_t* document)
 {
-	if (document) tb_xml_node_destroy((tb_xml_node_t*)document);
+	if (document) tb_xml_node_exit((tb_xml_node_t*)document);
 }
 
 tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
@@ -184,8 +183,8 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 				tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
 				if (!name) goto fail;
 
-				// create element
-				tb_xml_node_t* element = tb_xml_document_create_element(document, name);
+				// init element
+				tb_xml_node_t* element = tb_xml_document_init_element(document, name);
 				if (!element) goto fail;
 
 				// add attributes
@@ -227,8 +226,8 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 				// get text data
 				tb_char_t const* data = tb_string_c_string(tb_xml_reader_get_text(reader));
 
-				// create text
-				tb_xml_node_t* text = tb_xml_document_create_text(document, data? data : "");
+				// init text
+				tb_xml_node_t* text = tb_xml_document_init_text(document, data? data : "");
 				if (!text) goto fail;
 
 				// append text
@@ -240,8 +239,8 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 				// get cdata data
 				tb_char_t const* data = tb_string_c_string(tb_xml_reader_get_cdata(reader));
 
-				// create cdata
-				tb_xml_node_t* cdata = tb_xml_document_create_cdata(document, data? data : "");
+				// init cdata
+				tb_xml_node_t* cdata = tb_xml_document_init_cdata(document, data? data : "");
 				if (!cdata) goto fail;
 
 				// append cdata
@@ -254,8 +253,8 @@ tb_bool_t tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst)
 				// get comment data
 				tb_char_t const* data = tb_string_c_string(tb_xml_reader_get_comment(reader));
 
-				// create comment
-				tb_xml_node_t* comment = tb_xml_document_create_comment(document, data? data : "");
+				// init comment
+				tb_xml_node_t* comment = tb_xml_document_init_comment(document, data? data : "");
 				if (!comment) goto fail;
 
 				// append comment
@@ -326,11 +325,11 @@ tb_void_t tb_xml_document_clear(tb_xml_document_t* document)
 	tb_string_assign_c_string_by_ref(&document->encoding, "utf-8");
 
 	// clear childs
-	if (document->base.childs) tb_xml_nlist_destroy(document->base.childs);
+	if (document->base.childs) tb_xml_nlist_exit(document->base.childs);
 	document->base.childs = TB_NULL;
 
 	// clear attributes
-	if (document->base.attributes) tb_xml_nlist_destroy(document->base.attributes);
+	if (document->base.attributes) tb_xml_nlist_exit(document->base.attributes);
 	document->base.attributes = TB_NULL;
 }
 tb_string_t* tb_xml_document_version(tb_xml_document_t* document)
@@ -343,81 +342,76 @@ tb_string_t* tb_xml_document_encoding(tb_xml_document_t* document)
 	if (document) return &document->encoding;
 	else return TB_NULL;
 }
-tb_xml_node_t* tb_xml_document_create_element(tb_xml_document_t* document, tb_char_t const* name)
+tb_xml_node_t* tb_xml_document_init_element(tb_xml_document_t* document, tb_char_t const* name)
 {
 	tb_assert(document && name);
 	if (!document || !name) return TB_NULL;
 
 	// alloc element
-	tb_xml_node_t* element = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_element_t));
-	if (!element) return TB_NULL;
+	tb_xml_node_t* element = tb_xml_node_init(document, TB_XML_NODE_TYPE_ELEMENT);
+	tb_assert_and_check_return_val(element, TB_NULL);
 
 	// init it
-	tb_xml_node_init(element, document, TB_XML_NODE_TYPE_ELEMENT);
 	tb_string_assign_c_string(&element->name, name);
 	tb_xml_node_attributes_clear(element);
 
 	return element;
 }
-tb_xml_node_t* tb_xml_document_create_text(tb_xml_document_t* document, tb_char_t const* data)
+tb_xml_node_t* tb_xml_document_init_text(tb_xml_document_t* document, tb_char_t const* data)
 {
 	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc text
-	tb_xml_node_t* text = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_text_t));
-	if (!text) return TB_NULL;
+	tb_xml_node_t* text = tb_xml_node_init(document, TB_XML_NODE_TYPE_TEXT);
+	tb_assert_and_check_return_val(text, TB_NULL);
 
 	// init it
-	tb_xml_node_init(text, document, TB_XML_NODE_TYPE_TEXT);
 	tb_string_assign_c_string_by_ref(&text->name, "#text");
 	tb_string_assign_c_string(&text->value, data);
 
 	return text;
 }
-tb_xml_node_t* tb_xml_document_create_cdata(tb_xml_document_t* document, tb_char_t const* data)
+tb_xml_node_t* tb_xml_document_init_cdata(tb_xml_document_t* document, tb_char_t const* data)
 {
 	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc cdata
-	tb_xml_node_t* cdata = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_cdata_t));
-	if (!cdata) return TB_NULL;
+	tb_xml_node_t* cdata = tb_xml_node_init(document, TB_XML_NODE_TYPE_CDATA);
+	tb_assert_and_check_return_val(cdata, TB_NULL);
 
 	// init it
-	tb_xml_node_init(cdata, document, TB_XML_NODE_TYPE_CDATA);
 	tb_string_assign_c_string_by_ref(&cdata->name, "#cdata");
 	tb_string_assign_c_string(&cdata->value, data);
 
 	return cdata;
 }
-tb_xml_node_t* tb_xml_document_create_comment(tb_xml_document_t* document, tb_char_t const* data)
+tb_xml_node_t* tb_xml_document_init_comment(tb_xml_document_t* document, tb_char_t const* data)
 {
 	tb_assert(document && data);
 	if (!document || !data) return TB_NULL;
 
 	// alloc comment
-	tb_xml_node_t* comment = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_comment_t));
-	if (!comment) return TB_NULL;
+	tb_xml_node_t* comment = tb_xml_node_init(document, TB_XML_NODE_TYPE_COMMENT);
+	tb_assert_and_check_return_val(comment, TB_NULL);
 
 	// init it
-	tb_xml_node_init(comment, document, TB_XML_NODE_TYPE_COMMENT);
 	tb_string_assign_c_string_by_ref(&comment->name, "#comment");
 	tb_string_assign_c_string(&comment->value, data);
 
 	return comment;
 }
-tb_xml_node_t* tb_xml_document_create_attribute(tb_xml_document_t* document, tb_char_t const* name)
+tb_xml_node_t* tb_xml_document_init_attribute(tb_xml_document_t* document, tb_char_t const* name)
 {
 	tb_assert(document && name);
 	if (!document || !name) return TB_NULL;
 
 	// alloc attribute
-	tb_xml_node_t* attribute = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_attribute_t));
-	if (!attribute) return TB_NULL;
+	tb_xml_node_t* attribute = tb_xml_node_init(document, TB_XML_NODE_TYPE_ATTRIBUTE);
+	tb_assert_and_check_return_val(attribute, TB_NULL);
 
 	// init it
-	tb_xml_node_init(attribute, document, TB_XML_NODE_TYPE_ATTRIBUTE);
 	tb_string_assign_c_string(&attribute->name, name);
 
 	return attribute;

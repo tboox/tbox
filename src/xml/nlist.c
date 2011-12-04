@@ -31,7 +31,7 @@
  * interfaces
  */
 
-tb_xml_nlist_t* tb_xml_nlist_create()
+tb_xml_nlist_t* tb_xml_nlist_init()
 {
 	// alloc nlist
 	tb_xml_node_t* nlist = (tb_xml_node_t*)tb_malloc(sizeof(tb_xml_nlist_t));
@@ -45,7 +45,7 @@ tb_xml_nlist_t* tb_xml_nlist_create()
 
 	return nlist;
 }
-tb_void_t tb_xml_nlist_destroy(tb_xml_nlist_t* nlist)
+tb_void_t tb_xml_nlist_exit(tb_xml_nlist_t* nlist)
 {
 	if (nlist)
 	{
@@ -57,7 +57,7 @@ tb_void_t tb_xml_nlist_destroy(tb_xml_nlist_t* nlist)
 		while (node && node != head)
 		{
 			tb_xml_node_t* next = node->next;
-			tb_xml_node_destroy(node);
+			tb_xml_node_exit(node);
 			node = next;
 		}
 

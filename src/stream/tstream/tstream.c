@@ -67,10 +67,10 @@ tb_bool_t tb_tstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1,
 {
 	return TB_FALSE;
 }
-tb_bool_t tb_tstream_open(tb_gstream_t* gst)
+tb_long_t tb_tstream_aopen(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->gst, TB_FALSE);
+	tb_assert_and_check_return_val(tst && tst->gst, -1);
 
 	// init input
 	tst->ip = tst->ib;
@@ -83,12 +83,15 @@ tb_bool_t tb_tstream_open(tb_gstream_t* gst)
 	// init status
 	tst->status = TB_TSTREAM_STATUS_OK;
 
-	return TB_TRUE;
+	// ok
+	return 1;
 }
-tb_void_t tb_tstream_close(tb_gstream_t* gst)
+tb_long_t tb_tstream_aclose(tb_gstream_t* gst)
 {
+	// ok
+	return 1;
 }
-tb_long_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	//tb_trace("=====================================");
@@ -131,7 +134,7 @@ tb_long_t tb_tstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	{
 		// read data
 		tb_assert_and_check_return_val(tst->gst, -1);
-		ret = tb_gstream_read(tst->gst, tst->ip + tst->in, ln - tst->in);
+		ret = tb_gstream_aread(tst->gst, tst->ip + tst->in, ln - tst->in);
 		if (ret > 0) tst->in += ret;
 		// handle the left data
 		else if (tst->in) ;

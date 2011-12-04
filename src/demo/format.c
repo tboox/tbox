@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 	
 	// create stream
 	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
-	if (!gst || !tb_gstream_open(gst))
+	if (!gst || !tb_gstream_bopen(gst))
 	{
 		tb_print("failed to open url: %s", argv[1]);
 		return 0;

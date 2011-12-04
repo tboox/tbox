@@ -101,7 +101,7 @@ typedef struct __tb_http_option_t
 	tb_http_range_t 	range;
 
 	// the head funcs
-	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_pointer_t priv);
+	tb_bool_t 			(*hfunc)(tb_char_t const* line, tb_pointer_t priv);
 	tb_pointer_t 		head_priv;
 
 	// the post data
@@ -173,13 +173,29 @@ typedef struct __tb_http_status_t
  * interfaces
  */
 
-// create & destroy
+// init & exit
 tb_handle_t 			tb_http_init(tb_http_option_t const* option);
 tb_void_t 				tb_http_exit(tb_handle_t handle);
 
-// open & close
-tb_bool_t 				tb_http_open(tb_handle_t handle);
-tb_void_t 				tb_http_close(tb_handle_t handle);
+// async open, allow multiple called before closing 
+tb_long_t 				tb_http_aopen(tb_handle_t handle);
+
+// block open, allow multiple called before closing 
+tb_bool_t 				tb_http_bopen(tb_handle_t handle);
+
+// async close, allow multiple called
+tb_long_t 				tb_http_aclose(tb_handle_t handle);
+
+// block close, allow multiple called
+tb_bool_t 				tb_http_bclose(tb_handle_t handle);
+
+// async writ & read
+tb_long_t 				tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t 				tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+// block writ & read
+tb_bool_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_bool_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
 // options
 tb_void_t 				tb_http_option_dump(tb_handle_t handle);
@@ -191,8 +207,9 @@ tb_cookies_t* 			tb_http_option_get_cookies(tb_handle_t handle);
 
 tb_bool_t 				tb_http_option_set_default(tb_handle_t handle);
 tb_bool_t 				tb_http_option_set_method(tb_handle_t handle, tb_http_method_t request);
-tb_bool_t 				tb_http_option_set_port(tb_handle_t handle, tb_uint16_t port);
+tb_bool_t 				tb_http_option_set_ssl(tb_handle_t handle, tb_bool_t bssl);
 tb_bool_t 				tb_http_option_set_url(tb_handle_t handle, tb_char_t const* url);
+tb_bool_t 				tb_http_option_set_port(tb_handle_t handle, tb_uint16_t port);
 tb_bool_t 				tb_http_option_set_host(tb_handle_t handle, tb_char_t const* host);
 tb_bool_t 				tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path);
 tb_bool_t 				tb_http_option_set_block(tb_handle_t handle, tb_bool_t bblock);
@@ -203,7 +220,7 @@ tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirec
 tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
 tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 				tb_http_option_set_head_func(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
+tb_bool_t 				tb_http_option_set_hfunc(tb_handle_t handle, tb_bool_t (*hfunc)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
 
 // status
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
@@ -217,10 +234,6 @@ tb_bool_t				tb_http_status_iskalive(tb_handle_t handle);
 tb_bool_t				tb_http_status_isseeked(tb_handle_t handle);
 tb_size_t				tb_http_status_redirect(tb_handle_t handle);
 tb_void_t 				tb_http_status_dump(tb_handle_t handle);
-
-// writ & read
-tb_long_t 				tb_http_writ(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-tb_long_t 				tb_http_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
 
 #endif

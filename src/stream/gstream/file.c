@@ -65,31 +65,41 @@ static __tb_inline__ tb_fstream_t* tb_fstream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
 	return (tb_fstream_t*)gst;
 }
-static tb_bool_t tb_fstream_open(tb_gstream_t* gst)
+static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && !fst->file && gst->url, TB_FALSE);
+	tb_assert_and_check_return_val(fst && !fst->file && gst->url, -1);
 
 	// open file
 	fst->file = tb_file_open(gst->url, fst->flags);
-	tb_assert_and_check_return_val(fst->file, TB_FALSE);
+	tb_assert_and_check_return_val(fst->file, -1);
 
 	// init size
 	fst->size = tb_file_size(fst->file);
 	
-	return TB_TRUE;
+	// ok
+	return 1;
 }
-static tb_void_t tb_fstream_close(tb_gstream_t* gst)
+static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	if (fst && fst->file)
+	tb_assert_and_check_return_val(fst, -1);
+
+	if (fst->file)
 	{
+		// close file
 		tb_file_close(fst->file);
+
+		// clear 
 		fst->file = TB_NULL;
 		fst->size = 0;
+
 	}
+
+	// ok
+	return 1;
 }
-static tb_long_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file && data, -1);
@@ -98,7 +108,7 @@ static tb_long_t tb_fstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	// read data
 	return tb_file_read(fst->file, data, size);
 }
-static tb_long_t tb_fstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file && data, -1);
@@ -115,13 +125,18 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	// seek
 	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? TB_TRUE : TB_FALSE);
 }
-static tb_void_t tb_fstream_sync(tb_gstream_t* gst)
+static tb_long_t tb_fstream_afwrit(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return(fst && fst->file);
+	tb_assert_and_check_return_val(fst && fst->file, -1);
 
 	// sync data
 	tb_file_sync(fst->file);
+
+	// FIXME: check return value
+	
+	// ok
+	return 1;
 }
 static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 {	
@@ -156,13 +171,13 @@ tb_gstream_t* tb_gstream_init_file()
 	// init stream
 	tb_fstream_t* fst = (tb_fstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_FILE;
-	gst->open 	= tb_fstream_open;
-	gst->close 	= tb_fstream_close;
-	gst->read 	= tb_fstream_read;
-	gst->writ 	= tb_fstream_writ;
+	gst->aopen 	= tb_fstream_aopen;
+	gst->aclose = tb_fstream_aclose;
+	gst->aread 	= tb_fstream_aread;
+	gst->awrit 	= tb_fstream_awrit;
+	gst->afwrit	= tb_fstream_afwrit;
 	gst->size 	= tb_fstream_size;
 	gst->seek 	= tb_fstream_seek;
-	gst->sync 	= tb_fstream_sync;
 	gst->ioctl1 = tb_fstream_ioctl1;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
@@ -173,3 +188,20 @@ tb_gstream_t* tb_gstream_init_file()
 	return gst;
 }
 
+tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
+{
+	tb_assert_and_check_return_val(path, TB_NULL);
+
+	// init file stream
+	tb_gstream_t* gst = tb_gstream_init_file();
+	tb_assert_and_check_return_val(gst, TB_NULL);
+
+	// set path
+	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
+	
+	return gst;
+
+fail:
+	if (gst) tb_gstream_exit(gst);
+	return TB_NULL;
+}
