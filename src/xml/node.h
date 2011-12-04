@@ -74,7 +74,7 @@ typedef struct __tb_xml_node_t
 	tb_string_t 				value;
 
 	// the reference to the document
-	tb_pointer_t 						document;
+	tb_pointer_t 				document;
 
 	// the next & prev
 	struct __tb_xml_node_t* 	prev;
@@ -90,7 +90,7 @@ typedef struct __tb_xml_node_t
 	struct __tb_xml_nlist_t* 	attributes;
 
 	// the callback
-	tb_void_t 						(*free)(struct __tb_xml_node_t* node);
+	tb_void_t 					(*free)(struct __tb_xml_node_t* node);
 
 }tb_xml_node_t;
 
@@ -143,38 +143,34 @@ typedef struct __tb_xml_attribute_t
  * interfaces
  */
 
-// init & uninit
-tb_void_t 			tb_xml_node_init(tb_xml_node_t* node, tb_pointer_t document, tb_size_t type);
-tb_void_t 			tb_xml_node_uninit(tb_xml_node_t* node);
-
-// create & destroy
-tb_xml_node_t* 	tb_xml_node_create(tb_pointer_t document, tb_size_t type);
-tb_void_t 			tb_xml_node_destroy(tb_xml_node_t* node);
+// init & exit
+tb_xml_node_t* 		tb_xml_node_init(tb_pointer_t document, tb_size_t type);
+tb_void_t 			tb_xml_node_exit(tb_xml_node_t* node);
 
 // childs
 tb_void_t 			tb_xml_node_childs_append(tb_xml_node_t* node, tb_xml_node_t* child);
 tb_void_t 			tb_xml_node_childs_remove(tb_xml_node_t* node, tb_xml_node_t* child);
-tb_xml_node_t* 	tb_xml_node_childs_head(tb_xml_node_t* node);
-tb_xml_node_t* 	tb_xml_node_childs_tail(tb_xml_node_t* node);
-tb_xml_node_t* 	tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path);
+tb_xml_node_t* 		tb_xml_node_childs_head(tb_xml_node_t* node);
+tb_xml_node_t* 		tb_xml_node_childs_tail(tb_xml_node_t* node);
+tb_xml_node_t* 		tb_xml_node_childs_select(tb_xml_node_t* node, tb_char_t const* path);
 
 // nodes
-tb_xml_node_t* 	tb_xml_node_add_element(tb_xml_node_t* node, tb_char_t const* name);
-tb_xml_node_t* 	tb_xml_node_add_text(tb_xml_node_t* node, tb_char_t const* data);
-tb_xml_node_t* 	tb_xml_node_add_cdata(tb_xml_node_t* node, tb_char_t const* data);
-tb_xml_node_t* 	tb_xml_node_add_comment(tb_xml_node_t* node, tb_char_t const* data);
-tb_xml_node_t* 	tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* name);
+tb_xml_node_t* 		tb_xml_node_add_element(tb_xml_node_t* node, tb_char_t const* name);
+tb_xml_node_t* 		tb_xml_node_add_text(tb_xml_node_t* node, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_node_add_cdata(tb_xml_node_t* node, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_node_add_comment(tb_xml_node_t* node, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const* name);
 
 // attributes
 tb_void_t 			tb_xml_node_attributes_clear(tb_xml_node_t* node);
-tb_xml_node_t* 	tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value);
-tb_xml_node_t* 	tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* value);
-tb_xml_node_t* 	tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t const* name, tb_int_t value);
-tb_xml_node_t* 	tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value);
-tb_xml_node_t* 	tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* fmt, ...);
+tb_xml_node_t* 		tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t const* name, tb_int_t value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* fmt, ...);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_xml_node_t* 	tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value);
 #endif
 
 

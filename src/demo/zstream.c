@@ -27,13 +27,13 @@ int main(int argc, char** argv)
 
 	// init option
 	tb_gstream_ioctl1(ist, TB_HSTREAM_CMD_SET_HEAD, "Accept-Encoding: gzip,deflate\r\n");
-	tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HEAD_FUNC, http_callback_head, TB_NULL);
+	tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
 	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
-	if (!tb_gstream_open(ist)) goto end;
-	if (!tb_gstream_open(ost)) goto end;
-	if (!tb_gstream_open(zst)) goto end;
+	if (!tb_gstream_bopen(ist)) goto end;
+	if (!tb_gstream_bopen(ost)) goto end;
+	if (!tb_gstream_bopen(zst)) goto end;
 	
 	// read data
 	tb_byte_t 		data[4096];
@@ -41,27 +41,26 @@ int main(int argc, char** argv)
 	tb_int64_t 		time = tb_mclock();
 	do
 	{
-		tb_long_t ret = tb_gstream_read(zst, data, 4096);
-		//tb_print("ret: %d", ret);
-		if (ret > 0)
+		// read data
+		tb_long_t n = tb_gstream_aread(zst, data, 4096);
+		if (n > 0)
 		{
-			read += ret;
+			// update read
+			read += n;
+
+			// update clock
 			time = tb_mclock();
 
-#if 1
-			tb_long_t writ = 0;
-			while (writ < ret)
-			{
-				tb_long_t ret2 = tb_gstream_writ(ost, data + writ, ret - writ);
-				if (ret2 > 0) writ += ret2;
-				else if (ret2 < 0) break;
-			}
-#endif
-
+			// writ data
+			if (!tb_gstream_bwrit(ost, data, n)) break;
 		}
-		else if (!ret) 
+		else if (!n) 
 		{
-			if (tb_mclock() - time > 5000) break;	
+			// timeout?
+			if (tb_mclock() - time > 5000) break;
+
+			// sleep some time
+			tb_usleep(100);
 		}
 		else break;
 

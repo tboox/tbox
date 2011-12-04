@@ -51,39 +51,35 @@ static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_HTTP, TB_NULL);
 	return (tb_hstream_t*)gst;
 }
-static tb_bool_t tb_hstream_open(tb_gstream_t* gst)
+static tb_long_t tb_hstream_aopen(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
-
-	// init timeout
-	if (gst->timeout) tb_http_option_set_timeout(hst->http, gst->timeout);
+	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// open it
-	return tb_http_open(hst->http);
+	return tb_http_aopen(hst->http);
 }
-static tb_void_t tb_hstream_close(tb_gstream_t* gst)
+static tb_long_t tb_hstream_aclose(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	if (hst)
-	{
-		if (hst->http)
-			tb_http_close(hst->http);
-	}
+	tb_assert_and_check_return_val(hst && hst->http, -1);
+
+	// close it
+	return tb_http_aclose(hst->http);
 }
 static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst && hst->http) tb_http_exit(hst->http);
 }
-static tb_long_t tb_hstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http && data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv data
-	return tb_http_read(hst->http, data, size);
+	return tb_http_aread(hst->http, data, size);
 }
 static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 {
@@ -101,7 +97,7 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	if (!tb_http_status_isseeked(hst->http)) return TB_FALSE;
 
 	// close it
-	tb_http_close(hst->http);
+	tb_http_bclose(hst->http);
 
 	// set range
 	tb_http_range_t range;
@@ -110,7 +106,7 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	tb_http_option_set_range(hst->http, &range);
 
 	// reopen it
-	if (!tb_http_open(hst->http)) return TB_FALSE;
+	if (!tb_http_bopen(hst->http)) return TB_FALSE;
 
 	// ok
 	return TB_TRUE;
@@ -126,6 +122,10 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
 			return tb_http_option_set_url(hst->http, (tb_char_t const*)arg1);
+		}
+	case TB_GSTREAM_CMD_SET_TIMEOUT:
+		{
+			return tb_http_option_set_timeout(hst->http, (tb_size_t)arg1);
 		}
 	case TB_HSTREAM_CMD_SET_HOST:
 		{
@@ -158,6 +158,10 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
 			return tb_http_option_set_head(hst->http, (tb_char_t const*)arg1);
+		}
+	case TB_HSTREAM_CMD_SET_SSL:
+		{
+			return tb_http_option_set_ssl(hst->http, (tb_bool_t)arg1);
 		}
 	case TB_HSTREAM_CMD_GET_CODE:
 		{
@@ -214,10 +218,10 @@ static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 
 	switch (cmd)
 	{
-	case TB_HSTREAM_CMD_SET_HEAD_FUNC:
+	case TB_HSTREAM_CMD_SET_HFUNC:
 		{
 			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			return tb_http_option_set_head_func(hst->http, (tb_bool_t (*)(tb_char_t const* , tb_pointer_t ))arg1, arg2);
+			return tb_http_option_set_hfunc(hst->http, (tb_bool_t (*)(tb_char_t const* , tb_pointer_t ))arg1, arg2);
 		}
 	case TB_HSTREAM_CMD_SET_POST:
 		{
@@ -241,14 +245,14 @@ tb_gstream_t* tb_gstream_init_http()
 	// init stream
 	tb_hstream_t* hst = (tb_hstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_HTTP;
-	gst->open 	= tb_hstream_open;
-	gst->close 	= tb_hstream_close;
-	gst->free 	= tb_hstream_free;
-	gst->read 	= tb_hstream_read;
+	gst->aopen 	= tb_hstream_aopen;
+	gst->aclose = tb_hstream_aclose;
+	gst->aread 	= tb_hstream_aread;
 	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
 	gst->ioctl1 = tb_hstream_ioctl1;
 	gst->ioctl2 = tb_hstream_ioctl2;
+	gst->free 	= tb_hstream_free;
 	hst->http 	= tb_http_init(TB_NULL);
 	tb_assert_and_check_goto(hst->http, fail);
 
@@ -259,3 +263,24 @@ fail:
 	return TB_NULL;
 }
 
+tb_gstream_t* tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
+{
+	tb_assert_and_check_return_val(host && port && path, TB_NULL);
+
+	// init http stream
+	tb_gstream_t* gst = tb_gstream_init_http();
+	tb_assert_and_check_return_val(gst, TB_NULL);
+
+	// ioctl
+	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_PATH, path)) goto fail;
+	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_SSL, bssl)) goto fail;
+	
+	// ok
+	return gst;
+
+fail:
+	if (gst) tb_gstream_exit(gst);
+	return TB_NULL;
+}

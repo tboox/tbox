@@ -74,9 +74,9 @@ typedef struct __tb_xml_document_t
  * interfaces
  */
 
-// create & destroy
-tb_xml_document_t* 	tb_xml_document_create();
-tb_void_t 				tb_xml_document_destroy(tb_xml_document_t* document);
+// init & exit
+tb_xml_document_t* 	tb_xml_document_init();
+tb_void_t 				tb_xml_document_exit(tb_xml_document_t* document);
 
 // load & store
 tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst);
@@ -90,11 +90,11 @@ tb_string_t* 		tb_xml_document_version(tb_xml_document_t* document);
 tb_string_t* 		tb_xml_document_encoding(tb_xml_document_t* document);
 
 // nodes
-tb_xml_node_t* 		tb_xml_document_create_element(tb_xml_document_t* document, tb_char_t const* name);
-tb_xml_node_t* 		tb_xml_document_create_text(tb_xml_document_t* document, tb_char_t const* data);
-tb_xml_node_t* 		tb_xml_document_create_cdata(tb_xml_document_t* document, tb_char_t const* data);
-tb_xml_node_t* 		tb_xml_document_create_comment(tb_xml_document_t* document, tb_char_t const* data);
-tb_xml_node_t* 		tb_xml_document_create_attribute(tb_xml_document_t* document, tb_char_t const* name);
+tb_xml_node_t* 		tb_xml_document_init_element(tb_xml_document_t* document, tb_char_t const* name);
+tb_xml_node_t* 		tb_xml_document_init_text(tb_xml_document_t* document, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_document_init_cdata(tb_xml_document_t* document, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_document_init_comment(tb_xml_document_t* document, tb_char_t const* data);
+tb_xml_node_t* 		tb_xml_document_init_attribute(tb_xml_document_t* document, tb_char_t const* name);
 
 // c plus plus
 #ifdef __cplusplus

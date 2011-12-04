@@ -53,12 +53,12 @@ static __tb_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ENCODING, TB_NULL);
 	return (tb_estream_t*)tst;
 }
-static tb_bool_t tb_estream_open(tb_gstream_t* gst)
+static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_assert_and_check_return_val(est && est->ic && est->oc, TB_FALSE);
 
-	return tb_tstream_open(gst);
+	return tb_tstream_aopen(gst);
 }
 static tb_bool_t tb_estream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
@@ -154,9 +154,9 @@ tb_gstream_t* tb_gstream_init_encoding()
 
 	// init gstream
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->open 	= tb_estream_open;
-	gst->close 	= tb_tstream_close;
-	gst->read 	= tb_tstream_read;
+	gst->aopen 	= tb_estream_aopen;
+	gst->aread 	= tb_tstream_aread;
+	gst->aclose	= tb_tstream_aclose;
 	gst->ioctl1 = tb_estream_ioctl1;
 
 	// init tstream

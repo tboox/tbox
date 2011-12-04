@@ -51,9 +51,9 @@ typedef struct __tb_xml_nlist_t
  * interfaces
  */
 
-// create & destroy
-tb_xml_nlist_t* tb_xml_nlist_create();
-tb_void_t 			tb_xml_nlist_destroy(tb_xml_nlist_t* nlist);
+// init & exit
+tb_xml_nlist_t* tb_xml_nlist_init();
+tb_void_t 			tb_xml_nlist_exit(tb_xml_nlist_t* nlist);
 
 // accessors
 tb_xml_node_t* 	tb_xml_nlist_at(tb_xml_nlist_t* nlist, tb_int_t index);

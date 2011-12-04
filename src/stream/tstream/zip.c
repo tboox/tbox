@@ -62,28 +62,28 @@ static __tb_inline__ tb_zstream_t* tb_zstream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ZIP, TB_NULL);
 	return (tb_zstream_t*)tst;
 }
-static tb_bool_t tb_zstream_open(tb_gstream_t* gst)
+static tb_long_t tb_zstream_aopen(tb_gstream_t* gst)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
-	tb_assert_and_check_return_val(zst, TB_FALSE);
+	tb_assert_and_check_return_val(zst, -1);
 
 	// open zip
 	zst->zip = tb_zip_open(&zst->package, zst->algo, zst->action);
-	tb_assert_and_check_return_val(zst->zip, TB_FALSE);
+	tb_assert_and_check_return_val(zst->zip, -1);
 
 	// open tstream
-	return tb_tstream_open(gst);
+	return tb_tstream_aopen(gst);
 }
-static tb_void_t tb_zstream_close(tb_gstream_t* gst)
+static tb_long_t tb_zstream_aclose(tb_gstream_t* gst)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
-	tb_assert_and_check_return(zst);
+	tb_assert_and_check_return_val(zst, -1);
 
 	// close zip
 	if (zst->zip) tb_zip_close(zst->zip);
 
 	// close tstream
-	tb_tstream_close(gst);
+	return tb_tstream_aclose(gst);
 }
 static tb_bool_t tb_zstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
@@ -187,9 +187,9 @@ tb_gstream_t* tb_gstream_init_zip()
 
 	// init gstream
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->open 	= tb_zstream_open;
-	gst->close 	= tb_zstream_close;
-	gst->read 	= tb_tstream_read;
+	gst->aopen 	= tb_zstream_aopen;
+	gst->aread 	= tb_tstream_aread;
+	gst->aclose	= tb_zstream_aclose;
 	gst->ioctl1 = tb_zstream_ioctl1;
 
 	// init tstream

@@ -70,11 +70,17 @@ static tb_gstream_item_t g_gstream_table[] =
  */
 static tb_byte_t* tb_gstream_cache_need(tb_gstream_t* gst, tb_size_t size)
 {
+	tb_size_t need = 0;
+
 	// enough?
-	if (size <= gst->cache_size) return gst->cache_head;
+	if (size <= gst->cache_size) 
+	{
+		need = size;
+		goto end;
+	}
 
 	// move cache
-	tb_size_t need = gst->cache_size;
+	need = gst->cache_size;
 	if (gst->cache_head != gst->cache_data)
 	{
 		tb_memmov(gst->cache_data, gst->cache_head, need);
@@ -82,12 +88,12 @@ static tb_byte_t* tb_gstream_cache_need(tb_gstream_t* gst, tb_size_t size)
 	}
 
 	// fill cache
-	tb_assert(gst->read);
+	tb_assert(gst->aread);
 	tb_assert(size <= gst->cache_maxn);
 	tb_int64_t time = tb_mclock();
 	while (need < size)
 	{
-		tb_long_t n = gst->read(gst, gst->cache_data + need, gst->cache_maxn - need);
+		tb_long_t n = gst->aread(gst, gst->cache_data + need, gst->cache_maxn - need);
 		if (n > 0)
 		{
 			// update need
@@ -109,6 +115,11 @@ static tb_byte_t* tb_gstream_cache_need(tb_gstream_t* gst, tb_size_t size)
 		}
 		else break;
 	}
+
+end:
+
+	// update status
+	gst->bwrited = 0;
 
 //	tb_trace("need: %u size: %u", need, size);
 	return ((need >= size)? gst->cache_head : TB_NULL);
@@ -142,8 +153,8 @@ static tb_long_t tb_gstream_cache_read(tb_gstream_t* gst, tb_byte_t* data, tb_si
 	tb_assert_and_check_return_val(!gst->cache_size, -1);
 
 	// fill cache
-	tb_assert(gst->read);
-	tb_long_t n = gst->read(gst, gst->cache_data, gst->cache_maxn);
+	tb_assert(gst->aread);
+	tb_long_t n = gst->aread(gst, gst->cache_data, gst->cache_maxn);
 	if (n > 0) 
 	{
 //		tb_trace("fill cache: %d", n);
@@ -169,6 +180,9 @@ static tb_long_t tb_gstream_cache_read(tb_gstream_t* gst, tb_byte_t* data, tb_si
 end:
 	// update offset
 	gst->offset += read;
+
+	// update status
+	gst->bwrited = 0;
 
 //	tb_trace("read: %d", read);
 	return read;
@@ -198,8 +212,8 @@ static tb_long_t tb_gstream_cache_writ(tb_gstream_t* gst, tb_byte_t* data, tb_si
 	tb_assert_and_check_return_val(gst->cache_size == gst->cache_maxn, -1);
 
 	// writ cache
-	tb_assert(gst->writ);
-	tb_long_t n = gst->writ(gst, gst->cache_data, gst->cache_maxn);
+	tb_assert(gst->awrit);
+	tb_long_t n = gst->awrit(gst, gst->cache_data, gst->cache_maxn);
 	if (n > 0)
 	{
 		// update cache
@@ -227,46 +241,76 @@ end:
 	// update offset
 	gst->offset += writ;
 
+	// update status
+	gst->bwrited = 1;
+
 //	tb_trace("writ: %d", writ);
 	return writ;
 }
-static tb_void_t tb_gstream_cache_sync(tb_gstream_t* gst)
+static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gst)
 {
-	tb_size_t 	writ = 0;
-	tb_size_t 	size = gst->cache_size;
-	tb_int64_t 	time = tb_mclock();
-	while (writ < size)
-	{
-		// writ data
-		tb_long_t n = gst->writ(gst, gst->cache_data + writ, size - writ);
-		if (n > 0)
-		{
-			// update writ
-			writ += n;
+	// last operaton is read
+	tb_assert_and_check_return_val(!gst->bwrited, -1);
 
-			// update clock
-			time = tb_mclock();
-		}
-		else if (!n)
-		{
-			// timeout?
-			if (tb_mclock() - time > gst->timeout) break;
-
-			// sleep some time
-			tb_usleep(100);
-		}
-		else break;
-	}
-
-	// check
-	tb_assert(writ == size);
+	// init
+	tb_long_t r = 1;
 
 	// clear cache
-	gst->cache_size = 0;
 	gst->cache_head = gst->cache_data;
+	gst->cache_size = 0;
 
-	// sync stream
-	if (gst->sync) gst->sync(gst);
+	// flush read data
+	if (gst->afread) r = gst->afread(gst);
+
+	return r;
+}
+static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst)
+{
+	// last operaton is writ
+	tb_assert_and_check_return_val(gst->bwrited, -1);
+
+	// init 
+	tb_long_t r = 1;
+
+	// only flush writ data if no cache
+	if (!gst->cache_size) 
+	{
+		if (gst->afwrit) r = gst->afwrit(gst);
+		goto end;
+	}
+
+	// writ data to stream
+	tb_long_t writ = gst->awrit(gst, gst->cache_data, gst->cache_size);
+	tb_assert_and_check_return_val(writ >= 0 && writ <= gst->cache_size, -1);
+
+	// ok?
+	if (writ == gst->cache_size)
+	{
+		// clear cache
+		gst->cache_size = 0;
+		gst->cache_head = gst->cache_data;
+
+		// flush writ data
+		if (gst->afwrit) r = gst->afwrit(gst);
+	}
+	else 
+	{
+		// update cache
+		if (writ)
+		{
+			tb_memmov(gst->cache_data, gst->cache_data + writ, gst->cache_size - writ);
+			gst->cache_size -= writ;
+		}
+
+		// continue 
+		r = 0;
+	}
+
+end:
+	// update status if ok
+	if (r > 0) gst->bwrited = 0;
+
+	return r;
 }
 static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
@@ -346,7 +390,7 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 	if (gst) 
 	{
 		// close it
-		tb_gstream_close(gst);
+		tb_gstream_bclose(gst);
 
 		// free cache
 		if (gst->cache_data) tb_free(gst->cache_data);
@@ -362,16 +406,13 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 	}
 }
 
-tb_bool_t tb_gstream_open(tb_gstream_t* gst)
+tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->open, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->aopen, -1);
 
 	// already been opened?
-	tb_assert_and_check_return_val(!gst->bopened, TB_TRUE);
-
-	// set open state first, avoid occupy
-	gst->bopened = 1;
+	tb_assert_and_check_return_val(!gst->bopened, 1);
 
 	// init timeout
 	if (!gst->timeout) gst->timeout = TB_GSTREAM_TIMEOUT;
@@ -379,7 +420,7 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gst)
 	// init cache
 	if (!gst->cache_maxn) gst->cache_maxn = TB_GSTREAM_CACHE_MAXN;
 	if (!gst->cache_data) gst->cache_data = tb_malloc(gst->cache_maxn);
-	tb_assert_and_check_return_val(gst->cache_data, TB_FALSE);
+	tb_assert_and_check_return_val(gst->cache_data, -1);
 	gst->cache_head = gst->cache_data;
 	gst->cache_size = 0;
 
@@ -387,98 +428,233 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gst)
 	gst->offset = 0;
 
 	// open it
-	if (!gst->open(gst)) gst->bopened = 0;
+	tb_long_t r = gst->aopen(gst);
+	
+	// ok?
+	if (r > 0) gst->bopened = 1;
+	return r;
+}
+tb_bool_t tb_gstream_bopen(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_aopen(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
 
 	// ok?
-	return gst->bopened? TB_TRUE : TB_FALSE;
+	return r > 0? TB_TRUE : TB_FALSE;
 }
-tb_void_t tb_gstream_close(tb_gstream_t* gst)
+tb_long_t tb_gstream_aclose(tb_gstream_t* gst)
 {
 	// check stream
-	tb_assert_and_check_return(gst);
+	tb_assert_and_check_return_val(gst, -1);
 
 	// already been closed?
-	tb_assert_and_check_return(gst->bopened);
+	tb_assert_and_check_return_val(gst->bopened, 1);
 
-	// set close state first, avoid occupy
-	gst->bopened = 0;
+	// init 
+	tb_long_t r1 = 1;
+	tb_long_t r2 = 1;
 
-	// sync cache
-	tb_gstream_cache_sync(gst);
+	// flush writed data first
+	if (gst->bwrited) 
+	{
+		// flush it
+		r1 = tb_gstream_cache_afwrit(gst);
 
-	// close it
-	if (gst->close) gst->close(gst);	
+		// continue?
+		tb_check_return_val(r1, r1);
+
+		// bwrited will be clear
+		tb_assert_and_check_return_val(!gst->bwrited, -1);
+	}
+
+	// has close?
+	if (gst->aclose) 
+	{
+		// close it
+		r2 = gst->aclose(gst);	
+
+		// continue?
+		tb_check_return_val(r2, r2);
+	}
 
 	// reset offset
-	gst->offset;
+	gst->offset = 0;
 
 	// exit cache
 	gst->cache_head = gst->cache_data;
 	gst->cache_size = 0;
-}
 
-tb_void_t tb_gstream_sync(tb_gstream_t* gst)
+	// update status
+	gst->bopened = 0;
+
+	// ok?
+	return (r1 > 0 && r2 > 0)? 1 : -1;
+}
+tb_bool_t tb_gstream_bclose(tb_gstream_t* gst)
 {
-	// sync cache
-	tb_gstream_cache_sync(gst);
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_aclose(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
+}
+tb_long_t tb_gstream_afread(tb_gstream_t* gst)
+{
+	// check stream
+	tb_assert_and_check_return_val(gst, -1);
+
+	// flush readed cache data if the last operaton is read
+	tb_check_return_val(!gst->bwrited, 1);
+
+	// flush it
+	return tb_gstream_cache_afread(gst);
+}
+tb_long_t tb_gstream_afwrit(tb_gstream_t* gst)
+{
+	// check stream
+	tb_assert_and_check_return_val(gst, -1);
+
+	// flush writed cache data if the last operaton is writ
+	tb_check_return_val(gst->bwrited, 1);
+
+	// flush it
+	return tb_gstream_cache_afwrit(gst);
+}
+tb_bool_t tb_gstream_bfread(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// flush readed cache data if the last operaton is read
+	tb_check_return_val(!gst->bwrited, 1);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_cache_afread(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
+}
+tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// flush writed cache data if the last operaton is writ
+	tb_check_return_val(gst->bwrited, 1);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_cache_afwrit(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
 }
 tb_byte_t* tb_gstream_need(tb_gstream_t* gst, tb_size_t size)
 {
+	// check stream
+	tb_assert_and_check_return_val(gst && gst->aread, TB_NULL);
+
 	// check size
 	tb_check_return_val(size && size <= gst->cache_maxn, TB_NULL);
 
-	// check stream
-	tb_assert_and_check_return_val(gst && gst->read, TB_NULL);
-
 	// check cache
 	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_NULL);
+
+	// sync writed cache
+	if (gst->bwrited) tb_gstream_cache_wsync(gst);
 
 	// need data from cache
 	return tb_gstream_cache_need(gst, size);
 }
 
-tb_long_t tb_gstream_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
 	tb_assert_and_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->read, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, -1);
+
+	// sync writed cache
+	if (gst->bwrited) tb_gstream_cache_wsync(gst);
 
 	// read data from cache
 	return tb_gstream_cache_read(gst, data, size);
 }
 
-tb_long_t tb_gstream_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
 	tb_assert_and_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->writ, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->awrit, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, -1);
+
+	// sync readed cache
+	if (!gst->bwrited) tb_gstream_cache_rsync(gst);
 
 	// writ data to cache
 	return tb_gstream_cache_writ(gst, data, size);
 }
-tb_long_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data, -1);
-	tb_check_return_val(size, 0);
+	tb_assert_and_check_return_val(data, TB_FALSE);
+	tb_check_return_val(size, TB_TRUE);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->read, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, TB_FALSE);
 
 	// check cache
-	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, -1);
+	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_FALSE);
+
+	// sync writed cache
+	if (gst->bwrited) tb_gstream_cache_wsync(gst);
 
 	// read data from cache
 	tb_long_t 	read = 0;
@@ -503,22 +679,27 @@ tb_long_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			// sleep some time
 			tb_usleep(100);
 		}
-		else return -1;
+		else break;
 	}
-	return read;
+
+	// ok?
+	return (read == size? TB_TRUE : TB_FALSE);
 }
 
-tb_long_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data, -1);
-	tb_check_return_val(size, 0);
+	tb_assert_and_check_return_val(data, TB_FALSE);
+	tb_check_return_val(size, TB_TRUE);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->writ, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->awrit, TB_FALSE);
 
 	// check cache
-	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, -1);
+	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_FALSE);
+
+	// sync readed cache
+	if (!gst->bwrited) tb_gstream_cache_rsync(gst);
 
 	// writ data to cache
 	tb_long_t 	writ = 0;
@@ -543,18 +724,20 @@ tb_long_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			// sleep some time
 			tb_usleep(100);
 		}
-		else return -1;
+		else break;
 	}
-	return writ;
+
+	// ok?
+	return (writ == size? TB_TRUE : TB_FALSE);
 }
-tb_long_t tb_gstream_read_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
+tb_long_t tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
 {
 	tb_char_t 	ch = 0;
 	tb_char_t* 	p = data;
 	while (1)
 	{
 		// read char
-		ch = tb_gstream_read_s8(gst);
+		ch = tb_gstream_bread_s8(gst);
 
 		// is line?
 		if (ch == '\n') 
@@ -579,21 +762,20 @@ tb_long_t tb_gstream_read_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t siz
 	}
 	return 0;
 }
-tb_long_t tb_gstream_writ_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
+tb_long_t tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
 {
 	// writ data
 	tb_long_t writ = 0;
 	if (size) 
 	{
-		writ = tb_gstream_bwrit(gst, data, size);
-		tb_assert_and_check_return_val(writ == size, -1);
+		if (!tb_gstream_bwrit(gst, data, size)) return -1;
 	}
 	else
 	{
 		tb_char_t* p = data;
 		while (*p)
 		{
-			if (1 != tb_gstream_bwrit(gst, p, 1)) return -1;
+			if (!tb_gstream_bwrit(gst, p, 1)) return -1;
 			p++;
 		}
 	
@@ -608,7 +790,7 @@ tb_long_t tb_gstream_writ_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t siz
 	tb_char_t le[] = "\n";
 	tb_size_t ln = 1;
 #endif
-	if (ln != tb_gstream_bwrit(gst, le, ln)) return -1;
+	if (!tb_gstream_bwrit(gst, le, ln)) return -1;
 	writ += ln;
 
 	// ok
@@ -626,7 +808,7 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 	tb_check_return_val(size, 0);
 
 	// writ data
-	return tb_gstream_bwrit(gst, data, size);
+	return tb_gstream_bwrit(gst, data, size)? size : -1;
 }
 
 tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
@@ -662,7 +844,7 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 		{
 			tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
 			tb_size_t need = tb_min(offset - gst->offset, TB_GSTREAM_BLOCK_MAXN);
-			tb_long_t n = tb_gstream_read(gst, data, need);
+			tb_long_t n = tb_gstream_aread(gst, data, need);
 			if (n > 0) 
 			{
 				// update clock
@@ -778,194 +960,180 @@ tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1,
 	tb_assert_and_check_return_val(gst && gst->ioctl2, TB_FALSE);
 	return gst->ioctl2(gst, cmd, arg1, arg2);
 }
-tb_uint8_t tb_gstream_read_u8(tb_gstream_t* gst)
+tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gst)
 {
 	tb_byte_t b[1];
-	if (1 != tb_gstream_bread(gst, b, 1)) return 0;
+	if (!tb_gstream_bread(gst, b, 1)) return 0;
 	return b[0];
 }
-tb_sint8_t tb_gstream_read_s8(tb_gstream_t* gst)
+tb_sint8_t tb_gstream_bread_s8(tb_gstream_t* gst)
 {
 	tb_byte_t b[1];
-	if (1 != tb_gstream_bread(gst, b, 1)) return 0;
+	if (!tb_gstream_bread(gst, b, 1)) return 0;
 	return b[0];
 }
 
-tb_uint16_t tb_gstream_read_u16_le(tb_gstream_t* gst)
+tb_uint16_t tb_gstream_bread_u16_le(tb_gstream_t* gst)
 {	
 	tb_byte_t b[2];
-	if (2 != tb_gstream_bread(gst, b, 2)) return 0;
+	if (!tb_gstream_bread(gst, b, 2)) return 0;
 	return tb_bits_get_u16_le(b);
 }
-tb_sint16_t tb_gstream_read_s16_le(tb_gstream_t* gst)
+tb_sint16_t tb_gstream_bread_s16_le(tb_gstream_t* gst)
 {	
 	tb_byte_t b[2];
-	if (2 != tb_gstream_bread(gst, b, 2)) return 0;
+	if (!tb_gstream_bread(gst, b, 2)) return 0;
 	return tb_bits_get_s16_le(b);
 }
-tb_uint32_t tb_gstream_read_u24_le(tb_gstream_t* gst)
+tb_uint32_t tb_gstream_bread_u24_le(tb_gstream_t* gst)
 {	
 	tb_byte_t b[3];
-	if (3 != tb_gstream_bread(gst, b, 3)) return 0;
+	if (!tb_gstream_bread(gst, b, 3)) return 0;
 	return tb_bits_get_u24_le(b);
 }
-tb_sint32_t tb_gstream_read_s24_le(tb_gstream_t* gst)
+tb_sint32_t tb_gstream_bread_s24_le(tb_gstream_t* gst)
 {
 	tb_byte_t b[3];
-	if (3 != tb_gstream_bread(gst, b, 3)) return 0;
+	if (!tb_gstream_bread(gst, b, 3)) return 0;
 	return tb_bits_get_s24_le(b);
 }
-tb_uint32_t tb_gstream_read_u32_le(tb_gstream_t* gst)
+tb_uint32_t tb_gstream_bread_u32_le(tb_gstream_t* gst)
 {
 	tb_byte_t b[4];
-	if (4 != tb_gstream_bread(gst, b, 4)) return 0;
+	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_u32_le(b);
 }
-tb_sint32_t tb_gstream_read_s32_le(tb_gstream_t* gst)
+tb_sint32_t tb_gstream_bread_s32_le(tb_gstream_t* gst)
 {	
 	tb_byte_t b[4];
-	if (4 != tb_gstream_bread(gst, b, 4)) return 0;
+	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_s32_le(b);
 }
-tb_uint16_t tb_gstream_read_u16_be(tb_gstream_t* gst)
+tb_uint16_t tb_gstream_bread_u16_be(tb_gstream_t* gst)
 {	
 	tb_byte_t b[2];
-	if (2 != tb_gstream_bread(gst, b, 2)) return 0;
+	if (!tb_gstream_bread(gst, b, 2)) return 0;
 	return tb_bits_get_u16_be(b);
 }
-tb_sint16_t tb_gstream_read_s16_be(tb_gstream_t* gst)
+tb_sint16_t tb_gstream_bread_s16_be(tb_gstream_t* gst)
 {	
 	tb_byte_t b[2];
-	if (2 != tb_gstream_bread(gst, b, 2)) return 0;
+	if (!tb_gstream_bread(gst, b, 2)) return 0;
 	return tb_bits_get_s16_be(b);
 }
-tb_uint32_t tb_gstream_read_u24_be(tb_gstream_t* gst)
+tb_uint32_t tb_gstream_bread_u24_be(tb_gstream_t* gst)
 {	
 	tb_byte_t b[3];
-	if (3 != tb_gstream_bread(gst, b, 3)) return 0;
+	if (!tb_gstream_bread(gst, b, 3)) return 0;
 	return tb_bits_get_u24_be(b);
 }
-tb_sint32_t tb_gstream_read_s24_be(tb_gstream_t* gst)
+tb_sint32_t tb_gstream_bread_s24_be(tb_gstream_t* gst)
 {
 	tb_byte_t b[3];
-	if (3 != tb_gstream_bread(gst, b, 3)) return 0;
+	if (!tb_gstream_bread(gst, b, 3)) return 0;
 	return tb_bits_get_s24_be(b);
 }
-tb_uint32_t tb_gstream_read_u32_be(tb_gstream_t* gst)
+tb_uint32_t tb_gstream_bread_u32_be(tb_gstream_t* gst)
 {
 	tb_byte_t b[4];
-	if (4 != tb_gstream_bread(gst, b, 4)) return 0;
+	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_u32_be(b);
 }
-tb_sint32_t tb_gstream_read_s32_be(tb_gstream_t* gst)
+tb_sint32_t tb_gstream_bread_s32_be(tb_gstream_t* gst)
 {	
 	tb_byte_t b[4];
-	if (4 != tb_gstream_bread(gst, b, 4)) return 0;
+	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_s32_be(b);
 }
-tb_bool_t tb_gstream_writ_u8(tb_gstream_t* gst, tb_uint8_t val)
+tb_bool_t tb_gstream_bwrit_u8(tb_gstream_t* gst, tb_uint8_t val)
 {
 	tb_byte_t b[1];
 	tb_bits_set_u8(b, val);
-	if (1 != tb_gstream_bwrit(gst, b, 1)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 1);
 }
-tb_bool_t tb_gstream_writ_s8(tb_gstream_t* gst, tb_sint8_t val)
+tb_bool_t tb_gstream_bwrit_s8(tb_gstream_t* gst, tb_sint8_t val)
 {
 	tb_byte_t b[1];
 	tb_bits_set_s8(b, val);
-	if (1 != tb_gstream_bwrit(gst, b, 1)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 1);
 }
 
-tb_bool_t tb_gstream_writ_u16_le(tb_gstream_t* gst, tb_uint16_t val)
+tb_bool_t tb_gstream_bwrit_u16_le(tb_gstream_t* gst, tb_uint16_t val)
 {
 	tb_byte_t b[2];
 	tb_bits_set_u16_le(b, val);
-	if (2 != tb_gstream_bwrit(gst, b, 2)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 2);
 }
-tb_bool_t tb_gstream_writ_s16_le(tb_gstream_t* gst, tb_sint16_t val)
+tb_bool_t tb_gstream_bwrit_s16_le(tb_gstream_t* gst, tb_sint16_t val)
 {
 	tb_byte_t b[2];
 	tb_bits_set_s16_le(b, val);
-	if (2 != tb_gstream_bwrit(gst, b, 2)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 2);
 }
 
-tb_bool_t tb_gstream_writ_u24_le(tb_gstream_t* gst, tb_uint32_t val)
+tb_bool_t tb_gstream_bwrit_u24_le(tb_gstream_t* gst, tb_uint32_t val)
 {	
 	tb_byte_t b[3];
 	tb_bits_set_u24_le(b, val);
-	if (3 != tb_gstream_bwrit(gst, b, 3)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 3);
 }
-tb_bool_t tb_gstream_writ_s24_le(tb_gstream_t* gst, tb_sint32_t val)
+tb_bool_t tb_gstream_bwrit_s24_le(tb_gstream_t* gst, tb_sint32_t val)
 {
 	tb_byte_t b[3];
 	tb_bits_set_s24_le(b, val);
-	if (3 != tb_gstream_bwrit(gst, b, 3)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 3);
 }
 
-tb_bool_t tb_gstream_writ_u32_le(tb_gstream_t* gst, tb_uint32_t val)
+tb_bool_t tb_gstream_bwrit_u32_le(tb_gstream_t* gst, tb_uint32_t val)
 {	
 	tb_byte_t b[4];
 	tb_bits_set_u32_le(b, val);
-	if (4 != tb_gstream_bwrit(gst, b, 4)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 4);
 }
-tb_bool_t tb_gstream_writ_s32_le(tb_gstream_t* gst, tb_sint32_t val)
+tb_bool_t tb_gstream_bwrit_s32_le(tb_gstream_t* gst, tb_sint32_t val)
 {
 	tb_byte_t b[4];
 	tb_bits_set_s32_le(b, val);
-	if (4 != tb_gstream_bwrit(gst, b, 4)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 4);
 }
 
-tb_bool_t tb_gstream_writ_u16_be(tb_gstream_t* gst, tb_uint16_t val)
+tb_bool_t tb_gstream_bwrit_u16_be(tb_gstream_t* gst, tb_uint16_t val)
 {
 	tb_byte_t b[2];
 	tb_bits_set_u16_be(b, val);
-	if (2 != tb_gstream_bwrit(gst, b, 2)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 2);
 }
-tb_bool_t tb_gstream_writ_s16_be(tb_gstream_t* gst, tb_sint16_t val)
+tb_bool_t tb_gstream_bwrit_s16_be(tb_gstream_t* gst, tb_sint16_t val)
 {
 	tb_byte_t b[2];
 	tb_bits_set_s16_be(b, val);
-	if (2 != tb_gstream_bwrit(gst, b, 2)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 2);
 }
 
-tb_bool_t tb_gstream_writ_u24_be(tb_gstream_t* gst, tb_uint32_t val)
+tb_bool_t tb_gstream_bwrit_u24_be(tb_gstream_t* gst, tb_uint32_t val)
 {	
 	tb_byte_t b[3];
 	tb_bits_set_u24_be(b, val);
-	if (3 != tb_gstream_bwrit(gst, b, 3)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 3);
 }
-tb_bool_t tb_gstream_writ_s24_be(tb_gstream_t* gst, tb_sint32_t val)
+tb_bool_t tb_gstream_bwrit_s24_be(tb_gstream_t* gst, tb_sint32_t val)
 {
 	tb_byte_t b[3];
 	tb_bits_set_s24_be(b, val);
-	if (3 != tb_gstream_bwrit(gst, b, 3)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 3);
 }
 
-tb_bool_t tb_gstream_writ_u32_be(tb_gstream_t* gst, tb_uint32_t val)
+tb_bool_t tb_gstream_bwrit_u32_be(tb_gstream_t* gst, tb_uint32_t val)
 {	
 	tb_byte_t b[4];
 	tb_bits_set_u32_be(b, val);
-	if (4 != tb_gstream_bwrit(gst, b, 4)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 4);
 }
-tb_bool_t tb_gstream_writ_s32_be(tb_gstream_t* gst, tb_sint32_t val)
+tb_bool_t tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val)
 {
 	tb_byte_t b[4];
 	tb_bits_set_s32_be(b, val);
-	if (4 != tb_gstream_bwrit(gst, b, 4)) return TB_FALSE;
-	return TB_TRUE;
+	return tb_gstream_bwrit(gst, b, 4);
 }
 tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 {
@@ -980,14 +1148,14 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	do
 	{
 		// read data
-		tb_long_t n = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_MAXN);
+		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
 		if (n > 0)
 		{
 			// update clock
 			time = tb_mclock();
 
 			// writ data
-			if (n != tb_gstream_bwrit(gst, data, n)) break;
+			if (!tb_gstream_bwrit(gst, data, n)) break;
 
 			// update read
 			read += n;

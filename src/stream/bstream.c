@@ -66,22 +66,29 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 	tb_int64_t 		time = tb_mclock();
 	tb_uint64_t 	left = tb_gstream_left(ist);
 
-	while(1)
+	while (1)
 	{
-		tb_long_t ret = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_MAXN);
-		//tb_trace("ret: %d", ret);
-		if (ret < 0) break;
-		else if (!ret) 
+		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
+		if (n > 0)
+		{
+			// update load
+			load += n;
+
+			// set data
+			if (tb_bstream_set_data(bst, data, n) != n) break;
+
+			// update clock
+			time = tb_mclock();
+		}
+		else if (!n) 
 		{
 			// timeout?
 			if (tb_mclock() - time > tb_gstream_timeout(ist)) break;
+			
+			// sleep some time
+			tb_usleep(ist);
 		}
-		else
-		{
-			load += ret;
-			if (tb_bstream_set_data(bst, data, ret) != ret) break;
-			time = tb_mclock();
-		}
+		else break;
 
 		// is end?
 		if (left && load >= left) break;
@@ -110,26 +117,10 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 		if (size)
 		{
 			// writ it
-			tb_long_t writ = 0;
-			while (writ < size)
-			{
-				tb_long_t ret = tb_gstream_writ(ost, data + writ, size - writ);
-				if (ret < 0) break;
-				else if (!ret)
-				{
-					// timeout?
-					if (tb_mclock() - time > tb_gstream_timeout(ost)) break;	
-				}
-				else
-				{
-					writ += ret;
-					time = tb_mclock();
-				}
-			}
+			if (!tb_gstream_bwrit(ost, data, size)) break;
 
 			// update size
-			save += writ;
-			if (writ != size) break;
+			save += size;
 		}
 		else break;
 	}

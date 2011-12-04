@@ -29,17 +29,17 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!ist || !ost) goto end;
 	
 	// ioctl
-	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HEAD_FUNC, http_callback_head, TB_NULL);
+	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
 	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	tb_int64_t itime = tb_mclock();
-	if (!tb_gstream_open(ist)) goto end;
+	if (!tb_gstream_bopen(ist)) goto end;
 	itime = tb_mclock() - itime;
 	tb_print("[gst]: open ist: %llu ms", itime);
 
 	tb_int64_t otime = tb_mclock();
-	if (!tb_gstream_open(ost)) goto end;
+	if (!tb_gstream_bopen(ost)) goto end;
 	otime = tb_mclock() - otime;
 	tb_print("[gst]: open ost: %llu ms", otime);
 
@@ -58,7 +58,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	do
 	{
 		// read data
-		tb_long_t n = tb_gstream_read(ist, data, TB_GSTREAM_BLOCK_MAXN);
+		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
 //		tb_trace("read: %d, offset: %llu, left: %llu, size: %llu", n, tb_gstream_offset(ist), tb_gstream_left(ist), tb_gstream_size(ist));
 		if (n > 0)
 		{
@@ -66,7 +66,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			time = tb_mclock();
 
 			// writ data
-			if (n != tb_gstream_bwrit(ost, data, n)) break;
+			if (!tb_gstream_bwrit(ost, data, n)) break;
 
 			// update read
 			read += n;
