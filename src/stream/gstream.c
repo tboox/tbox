@@ -540,13 +540,10 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst, TB_FALSE);
 
-	// flush readed cache data if the last operaton is read
-	tb_check_return_val(!gst->bwrited, 1);
-
 	// try opening it
 	tb_long_t 	r = 0;
 	tb_int64_t 	t = tb_mclock();
-	while (!(r = tb_gstream_cache_afread(gst)))
+	while (!(r = tb_gstream_afread(gst)))
 	{
 		// timeout?
 		if (tb_mclock() - t > gst->timeout) break;
@@ -562,13 +559,10 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst, TB_FALSE);
 
-	// flush writed cache data if the last operaton is writ
-	tb_check_return_val(gst->bwrited, 1);
-
 	// try opening it
 	tb_long_t 	r = 0;
 	tb_int64_t 	t = tb_mclock();
-	while (!(r = tb_gstream_cache_afwrit(gst)))
+	while (!(r = tb_gstream_afwrit(gst)))
 	{
 		// timeout?
 		if (tb_mclock() - t > gst->timeout) break;
@@ -610,18 +604,12 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 tb_bool_t tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data && size, TB_FALSE);
-
-	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, TB_FALSE);
-
-	// check cache
-	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_FALSE);
+	tb_assert_and_check_return_val(gst && data, TB_FALSE);
 
 	// need data from cache
 	tb_long_t 	need = 0;
 	tb_int64_t 	time = tb_mclock();
-	while ((need = tb_gstream_cache_aneed(gst, data, size)) < size)
+	while ((need = tb_gstream_aneed(gst, data, size)) < size)
 	{
 		// check
 		tb_check_break(need >= 0);
@@ -693,14 +681,8 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data, TB_FALSE);
+	tb_assert_and_check_return_val(gst && data, TB_FALSE);
 	tb_check_return_val(size, TB_TRUE);
-
-	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, TB_FALSE);
-
-	// check cache
-	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_FALSE);
 
 	// read data from cache
 	tb_long_t 	read = 0;
@@ -708,7 +690,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	while (read < size)
 	{
 		// read data
-		tb_long_t n = tb_gstream_cache_aread(gst, data + read, size - read);	
+		tb_long_t n = tb_gstream_aread(gst, data + read, size - read);	
 		if (n > 0)
 		{
 			// update read
@@ -735,14 +717,8 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data, TB_FALSE);
+	tb_assert_and_check_return_val(gst && data, TB_FALSE);
 	tb_check_return_val(size, TB_TRUE);
-
-	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->awrit, TB_FALSE);
-
-	// check cache
-	tb_assert_and_check_return_val(gst->cache_data && gst->cache_head, TB_FALSE);
 
 	// writ data to cache
 	tb_long_t 	writ = 0;
@@ -750,7 +726,7 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	while (writ < size)
 	{
 		// writ data
-		tb_long_t n = tb_gstream_cache_awrit(gst, data + writ, size - writ);	
+		tb_long_t n = tb_gstream_awrit(gst, data + writ, size - writ);	
 		if (n > 0)
 		{
 			// update writ

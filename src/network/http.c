@@ -113,429 +113,7 @@ static tb_http_option_t g_http_option_default =
 /* ////////////////////////////////////////////////////////////////////////
  * details
  */
-static tb_bool_t tb_http_split_url(tb_http_t* http, tb_char_t const* url)
-{
-	tb_assert_and_check_return_val(url && http, TB_FALSE);
-	//tb_trace("[http]: split: %s", url);
 
-	// get url size
-	tb_size_t n = tb_strlen(url);
-	if (!n) return TB_FALSE;
-
-	// get url pointer
-	tb_char_t const* p = url;
-	tb_char_t const* e = url + n;
-
-	// is "http://" ?
-	if (n > 7 
-		&& p[0] == 'h'
-		&& p[1] == 't'
-		&& p[2] == 't'
-		&& p[3] == 'p'
-		&& p[4] == ':'
-		&& p[5] == '/'
-		&& p[6] == '/')
-	{
-		// skip prefix
-		p += 7;
-
-		// no ssl
-		http->option.bssl = 0;
-	}
-	else if (n > 8 
-		&& p[0] == 'h'
-		&& p[1] == 't'
-		&& p[2] == 't'
-		&& p[3] == 'p'
-		&& p[4] == 's'
-		&& p[5] == ':'
-		&& p[6] == '/'
-		&& p[7] == '/')
-	{
-		// skip prefix
-		p += 8;
-
-		// url changed, close connection
-		if (http->status.bredirect && !http->option.bssl) http->status.bkalive = 0;
-		
-		// is ssl
-		http->option.bssl = 1;
-	}
-	// redirect to host/url
-	else if (http->status.bredirect)
-	{
-		// save root path
-		if (p[0] == '/')
-		{
-			tb_strncpy(http->option.path, p, TB_HTTP_PATH_MAX);
-			http->option.path[TB_HTTP_PATH_MAX - 1] = '\0';
-		}
-		// save current path
-		else
-		{
-			// reverse find '/'
-			tb_size_t 	n = tb_strlen(http->option.path);
-			tb_char_t* 	b = http->option.path;
-			tb_char_t* 	q = b + n - 1;
-			for (; q >= b && *q != '/'; --q) ;
-
-			// find it?
-			if (q >= b)
-			{
-				q++;
-				tb_long_t maxn = TB_HTTP_PATH_MAX - (q - b);
-				tb_strncpy(q, p, maxn);
-				http->option.path[maxn - 1] = '\0';
-			}
-			else
-			{
-				tb_strncpy(http->option.path + 1, p, TB_HTTP_PATH_MAX - 1);
-				http->option.path[TB_HTTP_PATH_MAX - 2] = '\0';
-			}
-		}
-
-		// save url
-		tb_long_t ret = 0;
-		if (http->option.port == g_http_option_default.port) 
-			ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s%s", http->option.bssl? "s" : "", http->option.host, http->option.path);
-		else ret = tb_snprintf(http->option.url, TB_HTTP_URL_MAX, "http%s://%s:%d%s", http->option.bssl? "s" : "", http->option.host, http->option.port, http->option.path);
-		http->option.url[ret >= 0? ret : 0] = '\0';
-		http->option.url[ret < TB_HTTP_URL_MAX? ret : TB_HTTP_URL_MAX - 1] = '\0';
-
-		return TB_TRUE;
-	}
-
-	// get host
-	tb_char_t* pb = http->option.host;
-	tb_char_t* pe = http->option.host + TB_HTTP_HOST_MAX - 1;
-	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
-	*pb = '\0';
-	//tb_trace("[http]: host: %s", http->option.host);
-
-	// get port
-	if (*p && *p == ':')
-	{
-		tb_char_t port[12];
-		pb = port;
-		pe = port + 12 - 1;
-		for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
-		*pb = '\0';
-		http->option.port = tb_stou32(port);
-	}
-	else http->option.port = http->option.bssl? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
-	//tb_trace("[http]: port: %d", http->option.port);
-
-	// get path
-	pb = http->option.path;
-	pe = http->option.path + TB_HTTP_PATH_MAX - 1;
-	while (p < e && pb < pe && *p) *pb++ = *p++;
-	*pb = '\0';
-	//tb_trace("[http]: path: %s", http->option.path);
-
-	// save url
-	tb_strncpy(http->option.url, url? url : "", TB_HTTP_URL_MAX);
-	http->option.url[TB_HTTP_URL_MAX - 1] = '\0';
-
-	return TB_TRUE;
-}
-
-static tb_char_t const* tb_http_method_string(tb_http_method_t method)
-{
-	static tb_char_t const* s[] = 
-	{
-		"GET"
-	, 	"POST"
-	, 	"HEAD"
-	, 	"PUT"
-	, 	"OPTIONS"
-	, 	"DELETE"
-	, 	"TRACE"
-	, 	"CONNECT"
-
-	};
-	return ((method >= 0 && method < tb_arrayn(s))? s[method] : TB_NULL);
-}
-static tb_bool_t tb_http_head_find(tb_http_t* http, tb_char_t const* name)
-{
-	tb_assert_and_check_return_val(http && name, TB_FALSE);
-	tb_check_return_VAL(http->option.head[0], TB_FALSE);
-
-	// get name size
-	tb_size_t n = tb_strlen(name);
-	tb_assert_and_check_return_val(n, TB_FALSE);
-
-	// find item
-	tb_char_t const* p = http->option.head;
-	while (*p)
-	{
-		tb_char_t const* pos = (tb_char_t const*)tb_stristr(p, name);
-		if (pos)
-		{
-			// skip to the begin position of the value
-			p = pos + n;
-
-			// is valid item?
-			if (*p == ':') return TB_TRUE;
-			else 
-			{
-				// skip value
-				while (*p && *p != '\r') p++;
-			}
-		}
-		else break;
-	}
-
-	return TB_FALSE;
-}
-static tb_char_t const* tb_http_head_format(tb_http_t* http, tb_string_t* head)
-{
-	// append method
-	// e.g. GET /index.html HTTP/1.1
-	tb_char_t const* method = tb_http_method_string(http->option.method);
-	tb_assert_and_check_return_val(method, TB_NULL);
-	tb_string_append_format(head, "%s %s HTTP/1.1\r\n", method, http->option.path[0]? http->option.path : "/");
-
-	// append host
-	if (!tb_http_head_find(http, "Host")) 
-	{
-		tb_assert_and_check_return_val(http->option.host, TB_NULL);
-		tb_string_append_format(head, "Host: %s\r\n", http->option.host);
-	}
-
-	// append accept
-	if (!tb_http_head_find(http, "Accept")) 
-		tb_string_append_c_string(head, "Accept: */*\r\n");
-
-	// append range
-	if (!tb_http_head_find(http, "Range")) 
-	{
-		if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
-			tb_string_append_format(head, "Range: bytes=%llu-%llu\r\n", http->option.range.bof, http->option.range.eof);
-		else if (http->option.range.bof && !http->option.range.eof)
-			tb_string_append_format(head, "Range: bytes=%llu-\r\n", http->option.range.bof);
-		else if (!http->option.range.bof && http->option.range.eof)
-			tb_string_append_format(head, "Range: bytes=0-%llu\r\n", http->option.range.eof);
-	}
-
-	// append content size if post data
-	if (http->option.method == TB_HTTP_METHOD_POST 
-		&& http->option.post_data && http->option.post_size)
-	{
-		tb_string_append_format(head, "Content-Length: %d\r\n", http->option.post_size);
-	}
-
-	// append cookie
-	if (http->option.cookies)
-	{
-		// get cookie
-		tb_char_t const* value = tb_cookies_get(http->option.cookies, http->option.host, http->option.path, http->status.bssl? TB_TRUE : TB_FALSE);
-
-		// format it
-		if (value) tb_string_append_format(head, "Cookie: %s\r\n", value);
-	}
-
-	// append custom 
-	tb_string_append_c_string(head, http->option.head);
-
-	// append connection
-	if (!tb_http_head_find(http, "Connection")) 
-	{
-		if (http->option.bkalive)
-			tb_string_append_c_string(head, "Connection: keep-alive\r\n");
-		else tb_string_append_c_string(head, "Connection: close\r\n");
-	}
-
-#if 0
-	// append connection
-	if (http->option.bkalive && !tb_http_head_find(http, "Keep-Alive"))
-		tb_string_append_c_string(head, "Keep-Alive: 115\r\n");
-#endif
-
-#if 0
-	// append language
-	tb_string_append_c_string(head, "Accept-Language: zh-cn,zh;q=0.5\r\n");
-
-	// append encoding
-	tb_string_append_c_string(head, "Accept-Encoding: gzip,deflate\r\n");
-	
-	// append charset
-	tb_string_append_c_string(head, "Accept-Charset: GB2312,utf-8;q=0.7,*;q=0.7\r\n");
-#endif
-
-	// append end
-	tb_string_append_c_string(head, "\r\n");
-
-	return tb_string_c_string(head);
-}
-/*
- * HTTP/1.1 206 Partial Content
- * Date: Fri, 23 Apr 2010 05:25:45 GMT
- * Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4.5 with Suhosin-Patch
- * Last-Modified: Mon, 08 Mar 2010 09:58:09 GMT
- * ETag: "6cc014-8f47f-481471a322e40"
- * Accept-Ranges: bytes
- * Content-Length: 586879
- * Content-Range: bytes 0-586878/586879
- * Connection: close
- * Content-Type: application/x-shockwave-flash
- */
-static tb_bool_t tb_http_process_line(tb_http_t* http, tb_size_t line_idx)
-{
-	tb_char_t* line = http->status.line;
-	//tb_trace("[http]: line: %s", line);
-
-	if (http->option.hfunc) 
-	{
-		if (!http->option.hfunc(line, http->option.head_priv)) return TB_FALSE;
-	}
-
-	// is end?
-	if (!line[0]) return TB_TRUE;
-
-	// process http code
-	tb_char_t* p = line;
-	tb_char_t* tag = TB_NULL;
-	if (!line_idx)
-	{
-#if 0 // skip "HTTP/1.1"
-		while (!tb_isspace(*p) && *p != '\0') p++;
-#else
-		while (*p != '.' && *p != '\0') p++;
-		p++;
-		if (*p == '1') http->status.version = TB_HTTP_VERSION_11;
-		else if (*p == '0') http->status.version = TB_HTTP_VERSION_10;
-		else return TB_FALSE;
-		p++;
-#endif
-
-		// skip spaces
-		while (tb_isspace(*p)) p++;
-
-		http->status.code = tb_stou32(p);
-		//tb_trace("[http]: code: %d", http->status.code);
-
-		// check error code: 4xx & 5xx
-		if (http->status.code >= 400 && http->status.code < 600) return TB_FALSE;
-	}
-	else
-	{
-		// parse tag
-		while (*p != '\0' && *p != ':') p++;
-		if (*p != ':') return TB_TRUE;
-		*p = '\0';
-		tag = line;
-		p++;
-		while (tb_isspace(*p)) p++;
-
-		// parse location
-		if (!tb_stricmp(tag, "Location")) 
-		{
-			//tb_trace("[http]: redirect to: %s", p);
-
-			// redirect it
-			if (http->status.code == 301 || http->status.code == 302 || http->status.code == 303)
-			{
-				// next url
-				http->status.bredirect = 1;
-
-				// split url
-				if (!tb_http_split_url(http, p)) return TB_FALSE;
-				//tb_trace("[http]: redirect: %s:%d %s", http->option.host, http->option.port, http->option.path);
-
-				return TB_TRUE;
-			}
-			else return TB_FALSE;
-		}
-		// parse connection
-		else if (!tb_stricmp(tag, "Connection"))
-		{
-			if (!tb_stricmp(p, "close"))
-				http->status.bkalive = 0;
-			else http->status.bkalive = 1; 	// keep-alive
-		}
-		// parse content size
-		else if (!tb_stricmp(tag, "Content-Length"))
-		{
-			http->status.content_size = tb_stou64(p);
-			if (!http->status.document_size) http->status.document_size = http->status.content_size;
-		}
-		// parse content range: "bytes $from-$to/$document_size"
-		else if (!tb_stricmp(tag, "Content-Range"))
-		{
-			tb_uint64_t from = 0;
-			tb_uint64_t to = 0;
-			tb_uint64_t document_size = 0;
-			if (!tb_strncmp(p, "bytes ", 6)) 
-			{
-				p += 6;
-				from = tb_stou64(p);
-				while (*p && *p != '-') p++;
-				if (*p && *p++ == '-') to = tb_stou64(p);
-				while (*p && *p != '/') p++;
-				if (*p && *p++ == '/') document_size = tb_stou64(p);
-				//tb_trace("[http]: range: %u - %u / %u\n", from, to, document_size);
-			}
-			// no stream, be able to seek
-			http->status.bseeked = 1;
-			http->status.document_size = document_size;
-			if (!http->status.content_size) 
-			{
-				if (from && to > from) http->status.content_size = to - from;
-				else if (!from && to) http->status.content_size = to;
-				else if (from && !to && document_size > from) http->status.content_size = document_size - from;
-				else http->status.content_size = document_size;
-			}
-		}
-		// parse accept-ranges: "bytes "
-		else if (!tb_stricmp (tag, "Accept-Ranges"))
-		{
-			// no stream, be able to seek
-			http->status.bseeked = 1;
-		}
-		// parse content type
-		else if (!tb_stricmp (tag, "Content-Type"))
-		{
-			// save type
-			tb_strncpy(http->status.content_type, p, TB_HTTP_CONTENT_TYPE_MAX);
-			http->status.content_type[TB_HTTP_CONTENT_TYPE_MAX - 1] = '\0';
-			//tb_trace("[http]: type: %s", p);
-		}
-		// parse cookie
-		else if (http->option.cookies && !tb_stricmp(tag, "Set-Cookie"))
-		{
-			// set cookie
-			tb_cookies_set_from_url(http->option.cookies, http->option.url, p);
-		}
-		// parse transfer encoding
-		else if (!tb_stricmp(tag, "Transfer-Encoding"))
-		{
-			if (!tb_stricmp(p, "chunked")) 
-			{
-				http->status.bchunked = 1;
-			}
-		}
-	}
-
-	return TB_TRUE;
-}
-
-static tb_bool_t tb_http_handle_response(tb_http_t* http)
-{
-	tb_trace("[http]: =============================================");
-
-	// read line
-	tb_size_t line = 0;
-	while (tb_gstream_bread_line(http->stream, http->status.line, TB_HTTP_LINE_MAX))
-	{
-		// process line
-		if (!tb_http_process_line(http, line)) return TB_FALSE;
-
-		// update line
-		line++;
-	}
-
-	return TB_TRUE;
-}
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -577,7 +155,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 		tb_free(http);
 	}
 }
-
+#if 0
 tb_long_t tb_http_aopen(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
@@ -597,7 +175,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	tb_gstream_ioctl1(http->stream, TB_SSTREAM_CMD_SET_PORT, http->option.port);
 
 	// open stream
-	if (!tb_gstream_aopen(http->stream)) return -1;
+	if (!tb_gstream_aopen(http->stream)) return 0;
 
 	// format http header
 	tb_stack_string_t s;
@@ -664,6 +242,24 @@ fail:
 	if (http) tb_http_bclose((tb_handle_t)http);
 	return -1;
 }
+#else
+tb_long_t tb_http_aopen(tb_handle_t handle)
+{
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(handle, -1);
+
+	// check stream
+	tb_assert_and_check_return_val(http->stream, -1);
+	
+	// dump option
+#ifdef TB_DEBUG
+	tb_http_option_dump(http);
+#endif
+
+	// ok
+	return 1;
+}
+#endif
 tb_bool_t tb_http_bopen(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
@@ -878,7 +474,7 @@ tb_bool_t tb_http_option_set_default(tb_handle_t handle)
 	http->option = g_http_option_default;
 	return TB_TRUE;
 }
-tb_bool_t tb_http_option_set_method(tb_handle_t handle, tb_http_method_t method)
+tb_bool_t tb_http_option_set_method(tb_handle_t handle, tb_size_t method)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http, TB_FALSE);
