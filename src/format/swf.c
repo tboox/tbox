@@ -32,18 +32,16 @@
 
 
 /* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 tb_size_t tb_format_swf_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 3);
-	if (p && (p[0] == 'C' || p[0] == 'F') && p[1] == 'W' && p[2] == 'S')
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 3)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if ((p[0] == 'C' || p[0] == 'F') && p[1] == 'W' && p[2] == 'S')
 		return 30;
 	else return 0;
 }

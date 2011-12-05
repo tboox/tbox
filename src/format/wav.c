@@ -36,10 +36,13 @@
 
 tb_size_t tb_format_wav_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 16);
-	if (p && p[0] == 'R' && p[1] == 'I' && p[2] == 'F' && p[3] == 'F'
-		&& p[8] == 'W' && p[9] == 'A' && p[10] == 'V' && p[11] == 'E'
-		&& p[12] == 'f' && p[13] == 'm' && p[14] == 't')
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 16)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if ( 	p[0] == 'R' && p[1] == 'I' && p[2] == 'F' && p[3] == 'F'
+		&& 	p[8] == 'W' && p[9] == 'A' && p[10] == 'V' && p[11] == 'E'
+		&& 	p[12] == 'f' && p[13] == 'm' && p[14] == 't')
 		return TB_FORMAT_SCORE_MAX;
 	else return 0;
 }

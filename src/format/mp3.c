@@ -40,12 +40,14 @@
  * interfaces
  */
 
-tb_size_t tb_format_mp3_probe(tb_gstream_t* st)
+tb_size_t tb_format_mp3_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(st, 5);
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 5)) return 0;
+	tb_assert_and_check_return_val(p, 0);
 
 	// only for idv2.3 now
-	if (p && p[0] == 'I' && p[1] == 'D' && p[2] == '3' && p[3] == 3 && p[4] == 0)
+	if (p[0] == 'I' && p[1] == 'D' && p[2] == '3' && p[3] == 3 && p[4] == 0)
 		return 50;
 	else return 0;
 }

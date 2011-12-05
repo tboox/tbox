@@ -45,12 +45,13 @@ tb_size_t tb_format_htm_probe(tb_gstream_t* gst)
 	tb_uint64_t size = tb_gstream_size(gst);
 	if (size && size < need) need = (tb_size_t)size;
 
+	// need it
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, need)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
 	// the score
 	tb_size_t score = 0;
-
-	// need it
-	tb_byte_t const* p = tb_gstream_need(gst, need);
-	if (!p) return score;
 
 	// attach text
 	tb_string_t string;

@@ -32,8 +32,9 @@
 
 tb_size_t tb_format_gz_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 2);
-	if (p && p[0] == 0x1f && p[1] == 0x8b)
-		return 20;
-	else return 0;
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 2)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	return (p[0] == 0x1f && p[1] == 0x8b)? 20 : 0;
 }
