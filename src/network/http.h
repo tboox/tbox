@@ -111,21 +111,41 @@ typedef struct __tb_http_option_t
 	// the reference to cookies
 	tb_cookies_t* 		cookies;
 
+#error
 	// the request head
 	tb_char_t 			head[TB_HTTP_HEAD_MAX];
 
 	// the url
 	tb_char_t 			url[TB_HTTP_URL_MAX];
+
+	// the host 
 	tb_char_t 			host[TB_HTTP_HOST_MAX];
+
+	// the path
 	tb_char_t 			path[TB_HTTP_PATH_MAX];
 
 }tb_http_option_t;
+
+// the http state type
+typedef struct __tb_http_state_t
+{
+	TB_HTTP_STATE_NULL 			= 0
+,	TB_HTTP_STATE_OPEN 			= 1
+,	TB_HTTP_STATE_REQUEST 		= 2
+,	TB_HTTP_STATE_RESPONSE 		= 3
+,	TB_HTTP_STATE_REDIRECT 		= 4
+,	TB_HTTP_STATE_OK 			= 5
+
+}tb_http_state_t;
 
 // the http status type
 typedef struct __tb_http_status_t
 {
 	// the http code
-	tb_uint16_t 		code;
+	tb_uint16_t 		code 		: 10;
+
+	// the http state
+	tb_uint16_t 		state 		: 6;
 
 	// the http version
 	tb_uint8_t 			version 	: 1;
@@ -160,9 +180,6 @@ typedef struct __tb_http_status_t
 	// the chunked size
 	tb_size_t 			chunked_read;
 	tb_size_t 			chunked_size;
-
-	// the process line
-	tb_char_t 			line[TB_HTTP_LINE_MAX];
 
 	// the content type
 	tb_char_t 			content_type[TB_HTTP_CONTENT_TYPE_MAX];
@@ -206,13 +223,12 @@ tb_char_t const* 		tb_http_option_get_path(tb_handle_t handle);
 tb_cookies_t* 			tb_http_option_get_cookies(tb_handle_t handle);
 
 tb_bool_t 				tb_http_option_set_default(tb_handle_t handle);
-tb_bool_t 				tb_http_option_set_method(tb_handle_t handle, tb_http_method_t request);
+tb_bool_t 				tb_http_option_set_method(tb_handle_t handle, tb_size_t method);
 tb_bool_t 				tb_http_option_set_ssl(tb_handle_t handle, tb_bool_t bssl);
 tb_bool_t 				tb_http_option_set_url(tb_handle_t handle, tb_char_t const* url);
 tb_bool_t 				tb_http_option_set_port(tb_handle_t handle, tb_uint16_t port);
 tb_bool_t 				tb_http_option_set_host(tb_handle_t handle, tb_char_t const* host);
 tb_bool_t 				tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path);
-tb_bool_t 				tb_http_option_set_block(tb_handle_t handle, tb_bool_t bblock);
 tb_bool_t 				tb_http_option_set_kalive(tb_handle_t handle, tb_bool_t bkalive);
 tb_bool_t 				tb_http_option_set_timeout(tb_handle_t handle, tb_size_t timeout);
 tb_bool_t 				tb_http_option_set_range(tb_handle_t handle, tb_http_range_t const* range);
