@@ -76,7 +76,7 @@ tb_void_t 			tb_string_destroy(tb_string_t* string);
 tb_void_t			tb_string_init(tb_string_t* string);
 tb_void_t			tb_string_init_stack_string(tb_stack_string_t* string);
 tb_void_t 			tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size);
-tb_void_t 			tb_string_uninit(tb_string_t* string);
+tb_void_t 			tb_string_exit(tb_string_t* string);
 
 // accessors
 tb_char_t const* 	tb_string_c_string(tb_string_t const* string);

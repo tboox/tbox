@@ -67,8 +67,8 @@ tb_void_t tb_xml_writer_close(tb_xml_writer_t* writer)
 		for (i = 0; i < TB_XML_WRITER_ATTRIBUTES_MAX; i++)
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)(writer->attributes + i);
-			tb_string_uninit(&node->name);
-			tb_string_uninit(&node->value);
+			tb_string_exit(&node->name);
+			tb_string_exit(&node->value);
 		}
 
 		// detach stream
