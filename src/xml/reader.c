@@ -156,27 +156,27 @@ tb_void_t tb_xml_reader_close(tb_xml_reader_t* reader)
 		reader->gst = TB_NULL;
 
 		// free element
-		tb_string_uninit(&reader->name);
+		tb_string_exit(&reader->name);
 	
 		// free element
-		tb_string_uninit(&reader->element);
+		tb_string_exit(&reader->element);
 	
 		// free text
-		tb_string_uninit(&reader->text);
+		tb_string_exit(&reader->text);
 
 		// free element
-		tb_string_uninit(&reader->version);
+		tb_string_exit(&reader->version);
 	
 		// free text
-		tb_string_uninit(&reader->encoding);
+		tb_string_exit(&reader->encoding);
 
 		// free attributes
 		tb_int_t i = 0;
 		for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAX; i++)
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
-			tb_string_uninit(&node->name);
-			tb_string_uninit(&node->value);
+			tb_string_exit(&node->name);
+			tb_string_exit(&node->value);
 		}
 
 		// free it
@@ -514,7 +514,7 @@ tb_size_t tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader)
 		}
 		else if (ch != '\"' && ch != '\'') tb_string_append_char(&s, ch);
 	}
-	tb_string_uninit(&s);
+	tb_string_exit(&s);
 
 	return reader->attributes_n;
 }
@@ -596,7 +596,7 @@ tb_bool_t tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path)
 	}
 
 end:
-	tb_string_uninit((tb_string_t*)&s);
+	tb_string_exit((tb_string_t*)&s);
 	return ret;
 }
 #ifdef TB_DEBUG

@@ -637,7 +637,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	if (!tb_http_handle_response(http)) goto fail;
 
 	// free it
-	tb_string_uninit((tb_string_t*)&s);
+	tb_string_exit((tb_string_t*)&s);
 
 #ifdef TB_DEBUG
 	tb_http_status_dump(http);
@@ -660,7 +660,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	return 1;
 
 fail:
-	tb_string_uninit((tb_string_t*)&s);
+	tb_string_exit((tb_string_t*)&s);
 	if (http) tb_http_bclose((tb_handle_t)http);
 	return -1;
 }

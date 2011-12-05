@@ -71,7 +71,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_str
 		item = item->next;
 	}
 
-	tb_string_uninit((tb_string_t*)&s);
+	tb_string_exit((tb_string_t*)&s);
 	return ret;
 }
 
@@ -124,8 +124,8 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		if (node->free) node->free(node);
 
 		// free name & value
-		tb_string_uninit(&node->name);
-		tb_string_uninit(&node->value);
+		tb_string_exit(&node->name);
+		tb_string_exit(&node->value);
 
 		// free childs
 		if (node->childs) tb_xml_nlist_exit(node->childs);

@@ -30,9 +30,9 @@ int main(int argc, char** argv)
 	tb_string_append_format(&s3, "%s", "...");
 	tb_print("%s", tb_string_c_string(&s3));
 
-	tb_string_uninit(&s1);
-	tb_string_uninit(&s2);
-	tb_string_uninit(&s3);
+	tb_string_exit(&s1);
+	tb_string_exit(&s2);
+	tb_string_exit(&s3);
 
 	return 0;
 }

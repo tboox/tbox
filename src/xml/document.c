@@ -39,8 +39,8 @@ static tb_void_t tb_xml_document_free(tb_xml_node_t* node)
 		tb_xml_document_clear(document);
 
 		// free it
-		tb_string_uninit(&document->version);
-		tb_string_uninit(&document->encoding);
+		tb_string_exit(&document->version);
+		tb_string_exit(&document->encoding);
 	}
 }
 static tb_void_t tb_xml_document_store_childs(tb_xml_writer_t* writer, tb_xml_nlist_t* childs, tb_bool_t* ret)

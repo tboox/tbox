@@ -69,7 +69,7 @@ tb_void_t tb_string_destroy(tb_string_t* string)
 {
 	if (string) 
 	{
-		tb_string_uninit(string);
+		tb_string_exit(string);
 		tb_free(string);
 	}
 }
@@ -97,7 +97,7 @@ tb_void_t tb_string_init_stack_string(tb_stack_string_t* string)
 {
 	tb_string_init_from_buffer(&string->base, string->stack, TB_STRING_STACK_MAX);
 }
-tb_void_t tb_string_uninit(tb_string_t* string)
+tb_void_t tb_string_exit(tb_string_t* string)
 {
 	if (string)
 	{
@@ -222,7 +222,7 @@ tb_bool_t tb_string_resize(tb_string_t* string, tb_uint16_t size)
 	return TB_TRUE;
 fail:
 	tb_trace("resize string fail!");
-	tb_string_uninit(string);
+	tb_string_exit(string);
 	return TB_FALSE;
 }
 tb_void_t tb_string_clear(tb_string_t* string)
@@ -361,7 +361,7 @@ tb_char_t const* tb_string_assign_by_ref(tb_string_t* string, tb_string_t const*
 
 	// ensure is null
 	if (!tb_string_is_null(string))
-		tb_string_uninit(string);
+		tb_string_exit(string);
 
 	// attach string
 	string->data = (tb_byte_t*)s_string->data;
@@ -380,7 +380,7 @@ tb_char_t const* tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t
 	{
 		// ensure is null
 		if (!tb_string_is_null(string))
-			tb_string_uninit(string);
+			tb_string_exit(string);
 
 		// attach string
 		string->data = (tb_byte_t*)c_string;
@@ -405,7 +405,7 @@ tb_char_t const* tb_string_assign_c_string_with_size_by_ref(tb_string_t* string,
 	{
 		// ensure is null
 		if (!tb_string_is_null(string))
-			tb_string_uninit(string);
+			tb_string_exit(string);
 
 		// attach string
 		string->data = (tb_byte_t*)c_string;

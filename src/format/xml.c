@@ -59,7 +59,7 @@ tb_size_t tb_format_xml_probe(tb_gstream_t* gst)
 	if (pos >= 0) score += 50;
 
 	// detach it
-	tb_string_uninit(&string);
+	tb_string_exit(&string);
 
 	return score;
 }
