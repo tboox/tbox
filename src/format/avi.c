@@ -27,24 +27,16 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * types
- */
-
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 tb_size_t tb_format_avi_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 11);
-	if ( 	p 
-		&& 	p[0] == 'R'
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 11)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if ( 	p[0] == 'R'
 		&& 	p[1] == 'I'
 		&& 	p[2] == 'F'
 		&& 	p[3] == 'F'

@@ -32,9 +32,11 @@
 
 tb_size_t tb_format_bz2_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 3);
-	if ( 	p 
-		&& 	p[0] == 'B'
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 3)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if ( 	p[0] == 'B'
 		&& 	p[1] == 'Z'
 		&& 	p[2] == 'h')
 		return 30;

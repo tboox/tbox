@@ -32,9 +32,11 @@
 
 tb_size_t tb_format_pdf_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 5);
-	if ( 	p 
-		&& 	p[0] == '%'
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 5)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if ( 	p[0] == '%'
 		&& 	p[1] == 'P'
 		&& 	p[2] == 'D'
 		&& 	p[3] == 'F'

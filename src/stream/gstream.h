@@ -321,8 +321,11 @@ tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_long_t 			tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
 tb_long_t 			tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
 
-// need
-tb_byte_t* 			tb_gstream_need(tb_gstream_t* gst, tb_size_t size);
+// async need data
+tb_long_t 			tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
+
+// block need data
+tb_bool_t 			tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
 
 // seek
 tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);

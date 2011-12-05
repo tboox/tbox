@@ -27,23 +27,16 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * types
- */
-
-
-/* /////////////////////////////////////////////////////////
- * details
- */
-
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 tb_size_t tb_format_png_probe(tb_gstream_t* gst)
 {
-	tb_byte_t const* p = tb_gstream_need(gst, 8);
-	if (p && p[0] == 0x89 && p[1] == 'P' && p[2] == 'N' && p[3] == 'G'
+	tb_byte_t* p = TB_NULL;
+	if (!tb_gstream_bneed(gst, &p, 8)) return 0;
+	tb_assert_and_check_return_val(p, 0);
+
+	if (p[0] == 0x89 && p[1] == 'P' && p[2] == 'N' && p[3] == 'G'
 		&& p[4] == 0x0d && p[5] == 0x0a && p[6] == 0x1a && p[7] == 0x0a)
 		return 80;
 	else return 0;
