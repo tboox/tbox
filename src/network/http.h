@@ -30,6 +30,7 @@
 #include "cookies.h"
 #include "../string/string.h"
 #include "../stream/stream.h"
+#include "../container/container.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -100,34 +101,38 @@ typedef struct __tb_http_option_t
 	// range
 	tb_http_range_t 	range;
 
-	// the head funcs
-	tb_bool_t 			(*hfunc)(tb_char_t const* line, tb_pointer_t priv);
-	tb_pointer_t 		head_priv;
-
-	// the post data
-	tb_byte_t const* 	post_data;
-	tb_size_t 			post_size;
-
 	// the reference to cookies
 	tb_cookies_t* 		cookies;
 
-#error
-	// the request head
-	tb_char_t 			head[TB_HTTP_HEAD_MAX];
+	// the head funcs
+	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_pointer_t priv);
+	tb_pointer_t 		head_priv;
 
-	// the url
-	tb_char_t 			url[TB_HTTP_URL_MAX];
+	// the head hash
+	tb_hash_t* 			head_hash;
 
-	// the host 
-	tb_char_t 			host[TB_HTTP_HOST_MAX];
+	// the head data
+	tb_string_t 		head_data;
 
-	// the path
-	tb_char_t 			path[TB_HTTP_PATH_MAX];
+	// the post data
+	tb_string_t 		post;
+
+	// the response data
+	tb_string_t 		resp;
+
+	// the url data
+	tb_string_t 		url;
+
+	// the host data
+	tb_string_t 		host;
+
+	// the path data
+	tb_string_t 		path;
 
 }tb_http_option_t;
 
 // the http state type
-typedef struct __tb_http_state_t
+typedef enum __tb_http_state_t
 {
 	TB_HTTP_STATE_NULL 			= 0
 ,	TB_HTTP_STATE_OPEN 			= 1
@@ -236,7 +241,7 @@ tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirec
 tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
 tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
 tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 				tb_http_option_set_hfunc(tb_handle_t handle, tb_bool_t (*hfunc)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
+tb_bool_t 				tb_http_option_set_hfunc(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
 
 // status
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
