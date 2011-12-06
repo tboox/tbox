@@ -401,7 +401,7 @@ tb_hash_item_t const* tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t ito
 {	
 	tb_assert_and_check_return_val(hash && itor, TB_NULL);
 
-	// get index
+	// get buck & item
 	tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
 	tb_size_t item = TB_HASH_INDEX_ITEM(itor);
 	tb_assert_and_check_return_val(buck && item, TB_NULL);
@@ -414,19 +414,48 @@ tb_hash_item_t const* tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t ito
 tb_size_t tb_hash_itor_head(tb_hash_t const* hash)
 {
 	tb_assert_and_check_return_val(hash, 0);
-	tb_trace_noimpl();
+
+	// find the head
+	tb_size_t i = 0;
+	tb_size_t n = hash->hash_size;
+	for (i = 0; i < n; i++)
+	{
+		tb_hash_item_list_t* list = hash->hash_list[i];
+		if (list && list->size) return TB_HASH_INDEX_MAKE(i + 1, 1);
+	}
 	return 0;
 }
 tb_size_t tb_hash_itor_tail(tb_hash_t const* hash)
 {
 	tb_assert_and_check_return_val(hash, 0);
-	tb_trace_noimpl();
 	return 0;
 }
 tb_size_t tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(hash, 0);
-	tb_trace_noimpl();
+	tb_assert_and_check_return_val(hash && hash->hash_list && hash->hash_size, 0);
+
+	// get buck & item
+	tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
+	tb_size_t item = TB_HASH_INDEX_ITEM(itor);
+	tb_assert_and_check_return_val(buck && item, 0);
+
+	// get the current bucket & item
+	buck--;
+	item--;
+	tb_assert_and_check_return_val(buck < hash->hash_size, 0);
+
+	// find the next from the current bucket first
+	if (hash->hash_list[buck] && item + 1 < hash->hash_list[buck]->size) return TB_HASH_INDEX_MAKE(buck + 1, item + 2);
+
+	// find the next from the next buckets
+	tb_size_t i;
+	tb_size_t j;
+	tb_size_t n = hash->hash_size;
+	for (i = buck + 1; i < n; i++)
+	{
+		tb_hash_item_list_t* list = hash->hash_list[i];
+		if (list && list->size) return TB_HASH_INDEX_MAKE(i + 1, 1);
+	}
 	return 0;
 }
 #ifdef TB_DEBUG
@@ -478,6 +507,36 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 			}
 
 			tb_print("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
+		}
+	}
+
+	tb_print("");
+	tb_size_t itor = tb_hash_itor_head(hash);
+	tb_size_t tail = tb_hash_itor_tail(hash);
+	for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
+	{
+		tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
+		if (item)
+		{
+			if (hash->name_func.cstr && hash->data_func.cstr) 
+				tb_print("item[%d] => [%d]:\t%s\t\t=> %s", itor
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
+					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+			else if (hash->name_func.cstr) 
+				tb_print("item[%d] => [%d]:\t%s\t\t=> %x", itor
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
+					, item->data);
+			else if (hash->data_func.cstr) 
+				tb_print("item[%d] => [%d]:\t%x\t\t=> %x", itor
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, item->name
+					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
+			else tb_print("item[%d] => [%d]:\t%x\t\t=> %x", itor
+					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
+					, item->name
+					, item->data);
 		}
 	}
 }
