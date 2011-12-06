@@ -42,7 +42,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
-	tb_int_t d0, d1, d2;
+	tb_long_t d0, d1, d2;
 	__tb_asm__ __tb_volatile__
 	(
 		" 	rep; 	movsl\n"

@@ -179,9 +179,9 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 
 	// format http header
 	tb_stack_string_t s;
-	tb_string_init_stack_string(&s);
-	tb_char_t const* 	head = tb_http_head_format(http, (tb_string_t*)&s);
-	tb_size_t 			size = tb_string_size((tb_string_t*)&s);
+	tb_pstring_init_stack_string(&s);
+	tb_char_t const* 	head = tb_http_head_format(http, (tb_pstring_t*)&s);
+	tb_size_t 			size = tb_pstring_size((tb_pstring_t*)&s);
 	tb_assert_and_check_goto(head, fail);
 
 	//tb_printf(head);
@@ -208,14 +208,14 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	http->status.bseeked = 0;
 	http->status.bchunked = 0;
 	http->status.version = TB_HTTP_VERSION_10;
-	http->status.content_type[0] = '\0';
+//	http->status.content_type[0] = '\0';
 	http->status.line[0] = '\0';
 
 	// handle response
 	if (!tb_http_handle_response(http)) goto fail;
 
 	// free it
-	tb_string_exit((tb_string_t*)&s);
+	tb_pstring_exit((tb_pstring_t*)&s);
 
 #ifdef TB_DEBUG
 	tb_http_status_dump(http);
@@ -238,7 +238,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	return 1;
 
 fail:
-	tb_string_exit((tb_string_t*)&s);
+	tb_pstring_exit((tb_pstring_t*)&s);
 	if (http) tb_http_bclose((tb_handle_t)http);
 	return -1;
 }
@@ -625,7 +625,9 @@ tb_char_t const* tb_http_status_content_type(tb_handle_t handle)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http, TB_NULL);
 
-	return http->status.content_type;
+	tb_trace_noimpl();
+	return TB_NULL;
+//	return http->status.content_type;
 }
 
 tb_bool_t tb_http_status_ischunked(tb_handle_t handle)
@@ -715,7 +717,7 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	tb_trace("[http]: status: ");
 	tb_trace("[http]: status: code: %d", http->status.code);
 	tb_trace("[http]: status: version: %s", http->status.version == TB_HTTP_VERSION_11? "HTTP/1.1" : "HTTP/1.0");
-	tb_trace("[http]: status: content:type: %s", http->status.content_type);
+//	tb_trace("[http]: status: content:type: %s", http->status.content_type);
 	tb_trace("[http]: status: content:size: %llu", http->status.content_size);
 	tb_trace("[http]: status: document:size: %llu", http->status.document_size);
 	tb_trace("[http]: status: chunked:read: %d", http->status.chunked_read);

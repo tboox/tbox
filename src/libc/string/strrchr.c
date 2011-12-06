@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		stristr.c
+ * \file		strrchr.c
  *
  */
 
@@ -26,46 +26,11 @@
  */
 #include "prefix.h"
 
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
-# 	include <string.h>
-#endif
-
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
-
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
-tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
+tb_char_t* tb_strrchr(tb_char_t const* s, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
-	return strcasestr(s1, s2);
+	tb_assert_and_check_return_val(s, TB_NULL);
+	return tb_strnrchr(s, tb_strlen(s), c);
 }
-#else
-tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
-{
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
-
-	__tb_register__ tb_char_t const* s = s1;
-	__tb_register__ tb_char_t const* p = s2;
-
-	do 
-	{
-		if (!*p) return (tb_char_t* )s1;
-		if ((*p == *s) 	|| (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))) 
-		{
-			++p;
-			++s;
-		} 
-		else 
-		{
-			p = s2;
-			if (!*s) return TB_NULL;
-			s = ++s1;
-		}
-
-	} while (1);
-
-	return TB_NULL;
-}
-#endif
-

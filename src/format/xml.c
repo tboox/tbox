@@ -49,17 +49,16 @@ tb_size_t tb_format_xml_probe(tb_gstream_t* gst)
 	// the score
 	tb_size_t score = 0;
 
-	// attach text
-	tb_string_t string;
-	tb_string_init(&string);
-	tb_string_assign_c_string_with_size_by_ref(&string, p, need);
+	// init string
+	tb_sstring_t string;
+	if (!tb_sstring_init(&string, p, need)) return 0;
 
 	// find <?xml ...>
-	tb_int_t pos = tb_string_find_c_string(&string, "<?xml", 0);
+	tb_long_t pos = tb_sstring_cstristr(&string, 0, "<?xml");
 	if (pos >= 0) score += 50;
 
-	// detach it
-	tb_string_exit(&string);
+	// exit string
+	tb_sstring_exit(&string);
 
 	return score;
 }

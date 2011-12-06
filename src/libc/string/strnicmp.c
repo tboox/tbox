@@ -34,19 +34,19 @@
  * interfaces 
  */
 #ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
-tb_int_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	return strncasecmp(s1, s2, n);
 }
 #else
-tb_int_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	if (s1 == s2 || !n) return 0;
 
-	tb_int_t r = 0;
-	while (n && ((s1 == s2) || !(r = ((tb_int_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (--n, ++s2, *s1++));
+	tb_long_t r = 0;
+	while (n && ((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t*)s1)))) - tb_tolower(*((tb_byte_t*)s2)))) && (--n, ++s2, *s1++));
 	return r;
 }
 #endif

@@ -16,7 +16,9 @@ tbox_C_FILES 			+= \
 						math/fixed16 \
 						memory/gpool \
 						memory/malloc \
-						string/string \
+						string/pstring \
+						string/sstring \
+						string/rstring \
 						container/item \
 						container/hash \
 						container/queue \
@@ -91,6 +93,7 @@ tbox_C_FILES 			+= \
 						libc/string/strlen \
 						libc/string/strnlen \
 						libc/string/strcat \
+						libc/string/strncat \
 						libc/string/strcpy \
 						libc/string/strncpy \
 						libc/string/strdup \
@@ -101,7 +104,16 @@ tbox_C_FILES 			+= \
 						libc/string/strnicmp \
 						libc/string/strstr \
 						libc/string/stristr \
-						libc/string/strchr
+						libc/string/strrstr \
+						libc/string/strirstr \
+						libc/string/strnrstr \
+						libc/string/strnirstr \
+						libc/string/strchr \
+						libc/string/strichr \
+						libc/string/strrchr \
+						libc/string/strirchr \
+						libc/string/strnrchr \
+						libc/string/strnirchr
 
 
 ifneq ($(TB_CONFIG_PLAT),)
@@ -168,7 +180,9 @@ INC_FILES 				= \
 						math/opt/fixed30_arm.h \
 						math/opt/fixed30_sh4.h \
 						string/prefix.h \
-						string/string.h \
+						string/pstring.h \
+						string/sstring.h \
+						string/rstring.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

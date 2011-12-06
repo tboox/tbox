@@ -42,19 +42,19 @@
  * interfaces 
  */
 #if defined(TB_CONFIG_LIBC_HAVE_STRCMP)
-tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_long_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	return strcmp(s1, s2);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRCMP)
-tb_int_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_long_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	if (s1 == s2) return 0;
 
-	tb_int_t r = 0;
-	while (((r = ((tb_int_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
+	tb_long_t r = 0;
+	while (((r = ((tb_long_t)(*((tb_byte_t *)s1))) - *((tb_byte_t *)s2++)) == 0) && *s1++);
 	return r;
 }
 #endif

@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 // varg
-#define TB_VA_FMT(s, n, fmt, r) \
+#define tb_va_format(s, n, fmt, r) \
 do \
 { \
 	tb_int_t __tb_ret = 0; \

@@ -53,29 +53,28 @@ tb_size_t tb_format_htm_probe(tb_gstream_t* gst)
 	// the score
 	tb_size_t score = 0;
 
-	// attach text
-	tb_string_t string;
-	tb_string_init(&string);
-	tb_string_assign_c_string_with_size_by_ref(&string, p, need);
+	// init string
+	tb_sstring_t string;
+	if (!tb_sstring_init(&string, p, need)) return 0;
 
 	// find <!DOCTYPE html ... >
-	tb_int_t pos = tb_string_find_c_string_nocase(&string, "<<!DOCTYPE html", 0);
+	tb_long_t pos = tb_sstring_cstristr(&string, 0, "<<!DOCTYPE html");
 	if (pos >= 0) score += 20;
 
 	// find <html>
-	pos = tb_string_find_c_string_nocase(&string, "<html>", 0);
+	pos = tb_sstring_cstristr(&string, 0, "<html>");
 	if (pos >= 0) score += 20;
 
 	// find <head>
-	pos = tb_string_find_c_string_nocase(&string, "<head>", 0);
+	pos = tb_sstring_cstristr(&string, 0, "<head>");
 	if (pos >= 0) score += 20;
 
 	// find <body>
-	pos = tb_string_find_c_string_nocase(&string, "<body>", 0);
+	pos = tb_sstring_cstristr(&string, 0, "<body>");
 	if (pos >= 0) score += 20;
 
-	// detach it
-	tb_string_exit(&string);
+	// exit string
+	tb_sstring_exit(&string);
 
 	return score;
 }
