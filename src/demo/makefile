@@ -10,7 +10,9 @@ NAMES = test \
 		scalar \
 		memops \
 		strops \
-		string \
+		pstring \
+		sstring \
+		rstring \
 		cookies \
 		gstream \
 		estream \

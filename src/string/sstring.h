@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		string.h
+ * \file		sstring.h
  *
  */
-#ifndef TB_STRING_H
-#define TB_STRING_H
+#ifndef TB_STRING_SSTRING_H
+#define TB_STRING_SSTRING_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
@@ -29,104 +29,82 @@
 #include "prefix.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-// the string stack max
-#define TB_STRING_STACK_MAX 			(1024)
-
-/* ////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the string type
-typedef struct __tb_string_t
+// the static string type
+typedef struct __tb_sstring_t
 {
 	// the string data
-	tb_byte_t* 		data;
-	tb_uint16_t 	size;
+	tb_char_t* 		data;
 
-	// the maximum size
-	// readonly: maxn ==0 && owner == 0
-	tb_uint16_t 	maxn : 15;
-	tb_uint16_t 	owner : 1;
+	// the string size
+	tb_size_t 		size;
 
-}tb_string_t;
+	// the string maxn
+	tb_size_t 		maxn;
 
-// the stack string type
-typedef struct __tb_stack_string_t
-{
-	// the string base
-	tb_string_t 	base;
-
-	// the stack
-	tb_byte_t 		stack[TB_STRING_STACK_MAX];
-
-}tb_stack_string_t;
+}tb_sstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init
-tb_void_t			tb_string_init(tb_string_t* string);
-tb_void_t			tb_string_init_stack_string(tb_stack_string_t* string);
-tb_void_t 			tb_string_init_from_buffer(tb_string_t* string, tb_byte_t* data, tb_uint16_t size);
-tb_void_t 			tb_string_exit(tb_string_t* string);
+// init & exit
+tb_bool_t			tb_sstring_init(tb_sstring_t* string, tb_char_t* data, tb_size_t maxn);
+tb_void_t 			tb_sstring_exit(tb_sstring_t* string);
 
 // accessors
-tb_char_t const* 	tb_string_c_string(tb_string_t const* string);
-tb_uint16_t 		tb_string_size(tb_string_t const* string);
-tb_char_t 			tb_string_at(tb_string_t const* string, tb_int_t index);
-tb_bool_t 			tb_string_is_null(tb_string_t const* string);
-tb_bool_t 			tb_string_subat(tb_string_t const* string, tb_string_t* sub, tb_int_t start, tb_int_t size);
-
-// finders
-tb_int_t 			tb_string_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t start);
-tb_int_t 			tb_string_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
-tb_int_t 			tb_string_find_string(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
-
-tb_int_t 			tb_string_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_int_t start);
-tb_int_t 			tb_string_find_c_string_nocase(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
-tb_int_t 			tb_string_find_string_nocase(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
-
-tb_int_t 			tb_string_reverse_find_char(tb_string_t const* string, tb_char_t ch, tb_int_t start);
-tb_int_t 			tb_string_reverse_find_c_string(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
-tb_int_t 			tb_string_reverse_find_string(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
-
-tb_int_t 			tb_string_reverse_find_char_nocase(tb_string_t const* string, tb_char_t ch, tb_int_t start);
-tb_int_t 			tb_string_reverse_find_c_string_nocase(tb_string_t const* string, tb_char_t const* sub, tb_int_t start);
-tb_int_t 			tb_string_reverse_find_string_nocase(tb_string_t const* string, tb_string_t const* sub, tb_int_t start);
+tb_char_t const* 	tb_sstring_cstr(tb_sstring_t const* string);
+tb_size_t 			tb_sstring_size(tb_sstring_t const* string);
 
 // modifiors
-tb_bool_t 			tb_string_resize(tb_string_t* string, tb_uint16_t size);
-tb_byte_t* 			tb_string_data(tb_string_t* string);
-tb_void_t 			tb_string_clear(tb_string_t* string);
-tb_void_t 			tb_string_set(tb_string_t const* string, tb_int_t index, tb_char_t ch);
-tb_char_t const* 	tb_string_shift(tb_string_t* string, tb_string_t* s_string);
+tb_void_t 			tb_sstring_clear(tb_sstring_t* string);
+tb_bool_t 			tb_sstring_resize(tb_sstring_t* string, tb_size_t size);
 
-// assign
-tb_char_t const* 	tb_string_assign(tb_string_t* string, tb_string_t const* s_string);
-tb_char_t const* 	tb_string_assign_char(tb_string_t* string, tb_char_t ch);
-tb_char_t const* 	tb_string_assign_format(tb_string_t* string, tb_char_t const* fmt, ...);
-tb_char_t const* 	tb_string_assign_c_string(tb_string_t* string, tb_char_t const* c_string);
-tb_char_t const* 	tb_string_assign_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
+// strchr
+tb_long_t 			tb_sstring_strchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strichr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
 
-tb_char_t const* 	tb_string_assign_by_ref(tb_string_t* string, tb_string_t const* s_string);
-tb_char_t const* 	tb_string_assign_c_string_by_ref(tb_string_t* string, tb_char_t const* c_string);
-tb_char_t const* 	tb_string_assign_c_string_with_size_by_ref(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
+// strrchr
+tb_long_t 			tb_sstring_strrchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strirchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
 
-// append
-tb_char_t const* 	tb_string_append(tb_string_t* string, tb_string_t const* s_string);
-tb_char_t const* 	tb_string_append_c_string(tb_string_t* string, tb_char_t const* c_string);
-tb_char_t const* 	tb_string_append_c_string_with_size(tb_string_t* string, tb_char_t const* c_string, tb_size_t size);
-tb_char_t const* 	tb_string_append_char(tb_string_t* string, tb_char_t ch);
-tb_char_t const* 	tb_string_append_format(tb_string_t* string, tb_char_t const* fmt, ...);
+// strstr
+tb_long_t 			tb_sstring_strstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_stristr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
 
-// compare
-tb_bool_t 			tb_string_compare(tb_string_t* string, tb_string_t const* s_string);
-tb_bool_t 			tb_string_compare_c_string(tb_string_t* string, tb_char_t const* c_string);
-tb_bool_t 			tb_string_compare_nocase(tb_string_t* string, tb_string_t const* s_string);
-tb_bool_t 			tb_string_compare_c_string_nocase(tb_string_t* string, tb_char_t const* c_string);
+tb_long_t 			tb_sstring_cstrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstristr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+
+// strrstr
+tb_long_t 			tb_sstring_strrstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_strirstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
+
+tb_long_t 			tb_sstring_cstrrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstrirstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+
+// strcpy
+tb_char_t const* 	tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s);
+tb_char_t const* 	tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s);
+tb_char_t const* 	tb_sstring_cstrncpy(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_char_t const* 	tb_sstring_cstrfcpy(tb_sstring_t* string, tb_char_t const* fmt, ...);
+
+// strcat
+tb_char_t const* 	tb_sstring_strcat(tb_sstring_t* string, tb_sstring_t const* s);
+tb_char_t const* 	tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s);
+tb_char_t const* 	tb_sstring_cstrncat(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_char_t const* 	tb_sstring_cstrfcat(tb_sstring_t* string, tb_char_t const* fmt, ...);
+
+// strcmp
+tb_long_t 			tb_sstring_strcmp(tb_sstring_t* string, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_strimp(tb_sstring_t* string, tb_sstring_t const* s);
+
+tb_long_t 			tb_sstring_cstrcmp(tb_sstring_t* string, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstricmp(tb_sstring_t* string, tb_char_t const* s);
+
+tb_long_t 			tb_sstring_cstrncmp(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_long_t 			tb_sstring_cstrnicmp(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
 
 #endif
 

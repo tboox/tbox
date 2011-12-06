@@ -56,7 +56,7 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
 	tb_int_t ret = 0;
 	tb_char_t msg[4096];
-	TB_VA_FMT(msg, 4096, fmt, &ret);
+	tb_va_format(msg, 4096, fmt, &ret);
 	if (ret >= 0) msg[ret] = '\0';
 
 	printf("%s", msg);

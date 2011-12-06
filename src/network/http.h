@@ -33,16 +33,6 @@
 #include "../container/container.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_HTTP_LINE_MAX 						(8192)
-#define TB_HTTP_HOST_MAX 						(1024)
-#define TB_HTTP_PATH_MAX 						(4096)
-#define TB_HTTP_URL_MAX 						((TB_HTTP_HOST_MAX) + (TB_HTTP_PATH_MAX) + 12)
-#define TB_HTTP_CONTENT_TYPE_MAX 				(64)
-#define TB_HTTP_HEAD_MAX 						(8192)
-#define TB_HTTP_RESPONSE_MAX 					(4096)
-/* ////////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -112,22 +102,22 @@ typedef struct __tb_http_option_t
 	tb_hash_t* 			head_hash;
 
 	// the head data
-	tb_string_t 		head_data;
+	tb_pstring_t 		head_data;
 
 	// the post data
-	tb_string_t 		post;
+	tb_pstring_t 		post;
 
 	// the response data
-	tb_string_t 		resp;
+	tb_pstring_t 		resp;
 
 	// the url data
-	tb_string_t 		url;
+	tb_pstring_t 		url;
 
 	// the host data
-	tb_string_t 		host;
+	tb_pstring_t 		host;
 
 	// the path data
-	tb_string_t 		path;
+	tb_pstring_t 		path;
 
 }tb_http_option_t;
 
@@ -187,7 +177,7 @@ typedef struct __tb_http_status_t
 	tb_size_t 			chunked_size;
 
 	// the content type
-	tb_char_t 			content_type[TB_HTTP_CONTENT_TYPE_MAX];
+	tb_pstring_t 		content_type;
 
 }tb_http_status_t;
 

@@ -41,7 +41,7 @@ tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
-	tb_int_t eax, ecx, esi, edi;
+	tb_long_t eax, ecx, esi, edi;
 	__tb_asm__ __tb_volatile__
 	(
 		" 	movl 	%%eax, %%edi\n"

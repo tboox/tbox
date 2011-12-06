@@ -37,35 +37,68 @@ extern "C" {
  * interfaces
  */
 
+// memset
 tb_pointer_t 	tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n);
 tb_pointer_t 	tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n);
 tb_pointer_t 	tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n);
 tb_pointer_t 	tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n);
 
+// memdup
 tb_pointer_t 	tb_memdup(tb_cpointer_t s, tb_size_t n);
-tb_pointer_t 	tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
-tb_pointer_t 	tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
-tb_int_t 		tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n);
 
+// memcpy
+tb_pointer_t 	tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
+
+// memmov
+tb_pointer_t 	tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n);
+
+// memcmp
+tb_long_t 		tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n);
+
+// strlen
 tb_size_t 		tb_strlen(tb_char_t const* s);
 tb_size_t 		tb_strnlen(tb_char_t const* s, tb_size_t n);
 
+// strdup
 tb_char_t* 		tb_strdup(tb_char_t const* s);
 tb_char_t* 		tb_strndup(tb_char_t const* s, tb_size_t n);
 
+// strcat
 tb_char_t* 		tb_strcat(tb_char_t* s1, tb_char_t const* s2);
+tb_char_t* 		tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
+
+// strcpy
 tb_char_t* 		tb_strcpy(tb_char_t* s1, tb_char_t const* s2);
 tb_char_t* 		tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
 
-tb_int_t 		tb_strcmp(tb_char_t* s1, tb_char_t const* s2);
-tb_int_t 		tb_strncmp(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
+// strcmp
+tb_long_t 		tb_strcmp(tb_char_t* s1, tb_char_t const* s2);
+tb_long_t 		tb_strncmp(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
 
-tb_int_t 		tb_stricmp(tb_char_t const* s1, tb_char_t const* s2);
-tb_int_t 		tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n);
+tb_long_t 		tb_stricmp(tb_char_t const* s1, tb_char_t const* s2);
+tb_long_t 		tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n);
 
+// strchr
 tb_char_t* 		tb_strchr(tb_char_t const* s, tb_char_t c);
+tb_char_t* 		tb_strichr(tb_char_t const* s, tb_char_t c);
+
+// strrchr
+tb_char_t* 		tb_strrchr(tb_char_t const* s, tb_char_t c);
+tb_char_t* 		tb_strirchr(tb_char_t const* s, tb_char_t c);
+
+tb_char_t* 		tb_strnrchr(tb_char_t const* s, tb_size_t n, tb_char_t c);
+tb_char_t* 		tb_strnirchr(tb_char_t const* s, tb_size_t n, tb_char_t c);
+
+// strstr
 tb_char_t* 		tb_strstr(tb_char_t const* s1, tb_char_t const* s2);
 tb_char_t* 		tb_stristr(tb_char_t const* s1, tb_char_t const* s2);
+
+// strrstr
+tb_char_t* 		tb_strrstr(tb_char_t const* s1, tb_char_t const* s2);
+tb_char_t* 		tb_strirstr(tb_char_t const* s1, tb_char_t const* s2);
+
+tb_char_t* 		tb_strnrstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
+tb_char_t* 		tb_strnirstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
 
 
 // c plus plus

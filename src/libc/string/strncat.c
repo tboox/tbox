@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		stristr.c
+ * \file		strncat.c
  *
  */
 
@@ -25,47 +25,27 @@
  * includes
  */
 #include "prefix.h"
-
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
+#ifdef TB_CONFIG_LIBC_HAVE_STRNCAT
 # 	include <string.h>
 #endif
-
 /* /////////////////////////////////////////////////////////
  * interfaces 
  */
 
-#ifdef TB_CONFIG_LIBC_HAVE_STRISTR
-tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
+#ifdef TB_CONFIG_LIBC_HAVE_STRNCAT
+tb_char_t* tb_strcnat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
-	return strcasestr(s1, s2);
+	return strncat(s1, s2);
 }
 #else
-tb_char_t* tb_stristr(tb_char_t const* s1, tb_char_t const* s2)
+tb_char_t* tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
 
-	__tb_register__ tb_char_t const* s = s1;
-	__tb_register__ tb_char_t const* p = s2;
-
-	do 
-	{
-		if (!*p) return (tb_char_t* )s1;
-		if ((*p == *s) 	|| (tb_tolower(*((tb_byte_t*)p)) == tb_tolower(*((tb_byte_t*)s)))) 
-		{
-			++p;
-			++s;
-		} 
-		else 
-		{
-			p = s2;
-			if (!*s) return TB_NULL;
-			s = ++s1;
-		}
-
-	} while (1);
-
-	return TB_NULL;
+	__tb_register__ tb_char_t* s = s1;
+	while (*s++); --s;
+	while (n-- && !(*s++ = *s2++));
+	return s1;
 }
 #endif
-
