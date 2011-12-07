@@ -41,17 +41,17 @@ tb_void_t tb_mutex_exit(tb_handle_t hmutex)
 	if (hmutex != INVALID_HANDLE_VALUE) CloseHandle(hmutex);
 	hmutex = INVALID_HANDLE_VALUE;
 }
-tb_bool_t tb_mutex_lock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_enter(tb_handle_t hmutex)
 {
 	if (hmutex && WAIT_OBJECT_0 == WaitForSingleObject(hmutex, INFINITE)) return TB_TRUE;
 	return TB_FALSE;
 }
-tb_bool_t tb_mutex_trylock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_tryenter(tb_handle_t hmutex)
 {
 	if (hmutex && WAIT_OBJECT_0 == WaitForSingleObject(hmutex, 100)) return TB_TRUE;
 	return TB_FALSE;
 }
-tb_bool_t tb_mutex_unlock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_leave(tb_handle_t hmutex)
 {
 	if (hmutex) return ReleaseMutex(hmutex)? TB_TRUE : TB_FALSE;
 	return TB_FALSE;

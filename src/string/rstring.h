@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "pstring.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * types
@@ -35,14 +36,11 @@
 // the shared string type
 typedef struct __tb_rstring_t
 {
-	// the string data
-	tb_char_t* 		data;
+	// the string data + refn
+	tb_pstring_t** 	data;
 
-	// the string size
-	tb_size_t 		size;
-
-	// the string maxn
-	tb_size_t 		maxn;
+	// the string mutex
+	tb_handle_t 	mutx;
 
 }tb_rstring_t;
 
@@ -55,34 +53,40 @@ tb_bool_t			tb_rstring_init(tb_rstring_t* string);
 tb_void_t 			tb_rstring_exit(tb_rstring_t* string);
 
 // accessors
-tb_char_t const* 	tb_rstring_cstr(tb_rstring_t const* string);
+tb_char_t const* 	tb_rstring_cstr(tb_rstring_t const* string); //!< no safe, need enter the mutex scope
 tb_size_t 			tb_rstring_size(tb_rstring_t const* string);
+tb_size_t 			tb_rstring_refn(tb_rstring_t const* string);
 
 // modifiors
 tb_void_t 			tb_rstring_clear(tb_rstring_t* string);
-tb_bool_t 			tb_rstring_resize(tb_rstring_t* string, tb_size_t size);
+tb_size_t 			tb_rstring_incr(tb_rstring_t* string);
+tb_size_t 			tb_rstring_decr(tb_rstring_t* string);
+
+// enter & leave
+tb_bool_t 			tb_rstring_enter(tb_rstring_t const* string);
+tb_bool_t 			tb_rstring_leave(tb_rstring_t const* string);
 
 // strchr
-tb_long_t 			tb_rstring_strchr(tb_rstring_t const* string, tb_long_t p, tb_char_t c);
-tb_long_t 			tb_rstring_strichr(tb_rstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_rstring_strchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 			tb_rstring_strichr(tb_rstring_t const* string, tb_size_t p, tb_char_t c);
 
 // strrchr
-tb_long_t 			tb_rstring_strrchr(tb_rstring_t const* string, tb_long_t p, tb_char_t c);
-tb_long_t 			tb_rstring_strirchr(tb_rstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_rstring_strrchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 			tb_rstring_strirchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c);
 
 // strstr
-tb_long_t 			tb_rstring_strstr(tb_rstring_t const* string, tb_long_t p, tb_rstring_t const* s);
-tb_long_t 			tb_rstring_stristr(tb_rstring_t const* string, tb_long_t p, tb_rstring_t const* s);
+tb_long_t 			tb_rstring_strstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_t const* s);
+tb_long_t 			tb_rstring_stristr(tb_rstring_t const* string, tb_size_t p, tb_rstring_t const* s);
 
-tb_long_t 			tb_rstring_cstrstr(tb_rstring_t const* string, tb_long_t p, tb_char_t const* s);
-tb_long_t 			tb_rstring_cstristr(tb_rstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_rstring_cstrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 			tb_rstring_cstristr(tb_rstring_t const* string, tb_size_t p, tb_char_t const* s);
 
 // strrstr
-tb_long_t 			tb_rstring_strrstr(tb_rstring_t const* string, tb_long_t p, tb_rstring_t const* s);
-tb_long_t 			tb_rstring_strirstr(tb_rstring_t const* string, tb_long_t p, tb_rstring_t const* s);
+tb_long_t 			tb_rstring_strrstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_t const* s);
+tb_long_t 			tb_rstring_strirstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_t const* s);
 
-tb_long_t 			tb_rstring_cstrrstr(tb_rstring_t const* string, tb_long_t p, tb_char_t const* s);
-tb_long_t 			tb_rstring_cstrirstr(tb_rstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_rstring_cstrrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 			tb_rstring_cstrirstr(tb_rstring_t const* string, tb_size_t p, tb_char_t const* s);
 
 // strcpy
 tb_char_t const* 	tb_rstring_strcpy(tb_rstring_t* string, tb_rstring_t const* s);

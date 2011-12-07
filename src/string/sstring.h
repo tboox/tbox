@@ -60,29 +60,29 @@ tb_size_t 			tb_sstring_size(tb_sstring_t const* string);
 
 // modifiors
 tb_void_t 			tb_sstring_clear(tb_sstring_t* string);
-tb_bool_t 			tb_sstring_resize(tb_sstring_t* string, tb_size_t size);
+tb_char_t const* 	tb_sstring_strip(tb_sstring_t* string, tb_size_t n);
 
 // strchr
-tb_long_t 			tb_sstring_strchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
-tb_long_t 			tb_sstring_strichr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strichr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
 
 // strrchr
-tb_long_t 			tb_sstring_strrchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
-tb_long_t 			tb_sstring_strirchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strrchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 			tb_sstring_strirchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
 
 // strstr
-tb_long_t 			tb_sstring_strstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
-tb_long_t 			tb_sstring_stristr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_strstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_stristr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
 
-tb_long_t 			tb_sstring_cstrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
-tb_long_t 			tb_sstring_cstristr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstristr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
 
 // strrstr
-tb_long_t 			tb_sstring_strrstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
-tb_long_t 			tb_sstring_strirstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_strrstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 			tb_sstring_strirstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
 
-tb_long_t 			tb_sstring_cstrrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
-tb_long_t 			tb_sstring_cstrirstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstrrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 			tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
 
 // strcpy
 tb_char_t const* 	tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s);

@@ -40,9 +40,11 @@ extern "C" {
 
 tb_handle_t 	tb_mutex_init(tb_char_t const* name);
 tb_void_t 		tb_mutex_exit(tb_handle_t hmutex);
-tb_bool_t 		tb_mutex_lock(tb_handle_t hmutex);
-tb_bool_t 		tb_mutex_trylock(tb_handle_t hmutex);
-tb_bool_t 		tb_mutex_unlock(tb_handle_t hmutex);
+
+tb_bool_t 		tb_mutex_enter(tb_handle_t hmutex);
+tb_bool_t 		tb_mutex_leave(tb_handle_t hmutex);
+
+tb_bool_t 		tb_mutex_tryenter(tb_handle_t hmutex);
 	
 // c plus plus
 #ifdef __cplusplus

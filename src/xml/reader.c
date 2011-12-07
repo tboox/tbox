@@ -462,7 +462,7 @@ tb_pstring_t const* tb_xml_reader_get_element_name(tb_xml_reader_t* reader)
 			if (reader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY)
 			{
 				if (name && size > 0 && name[size - 1] == '/')
-					tb_pstring_resize(&reader->name, size - 1);
+					tb_pstring_strip(&reader->name, size - 1);
 			}
 			return &reader->name;
 		}
@@ -576,9 +576,7 @@ tb_bool_t tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path)
 			{
 				// remove
 				tb_long_t pos = tb_pstring_strrchr(&s, 0, '/');
-				if (pos > 0) tb_pstring_resize(&s, pos);
-				else if (!pos) tb_pstring_clear(&s);
-
+				if (pos >= 0) tb_pstring_strip(&s, pos);
 			}
 			break;
 		default: break;
