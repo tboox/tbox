@@ -61,10 +61,10 @@ typedef struct __tb_xml_document_t
 	tb_xml_node_t 				base;
 
 	// the version
-	tb_string_t 				version;
+	tb_pstring_t 				version;
 
 	// the encoding 
-	tb_string_t 				encoding;
+	tb_pstring_t 				encoding;
 
 
 }tb_xml_document_t;
@@ -76,18 +76,18 @@ typedef struct __tb_xml_document_t
 
 // init & exit
 tb_xml_document_t* 	tb_xml_document_init();
-tb_void_t 				tb_xml_document_exit(tb_xml_document_t* document);
+tb_void_t 			tb_xml_document_exit(tb_xml_document_t* document);
 
 // load & store
 tb_bool_t 			tb_xml_document_load(tb_xml_document_t* document, tb_gstream_t* gst);
 tb_bool_t 			tb_xml_document_store(tb_xml_document_t* document, tb_gstream_t* gst);
 
 // modifiors
-tb_void_t 				tb_xml_document_clear(tb_xml_document_t* document);
+tb_void_t 			tb_xml_document_clear(tb_xml_document_t* document);
 
 // xml header
-tb_string_t* 		tb_xml_document_version(tb_xml_document_t* document);
-tb_string_t* 		tb_xml_document_encoding(tb_xml_document_t* document);
+tb_pstring_t* 		tb_xml_document_version(tb_xml_document_t* document);
+tb_pstring_t* 		tb_xml_document_encoding(tb_xml_document_t* document);
 
 // nodes
 tb_xml_node_t* 		tb_xml_document_init_element(tb_xml_document_t* document, tb_char_t const* name);

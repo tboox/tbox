@@ -51,8 +51,8 @@ tb_xml_writer_t* tb_xml_writer_open(tb_gstream_t* gst)
 	for (i = 0; i < TB_XML_WRITER_ATTRIBUTES_MAX; i++)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)(writer->attributes + i);
-		tb_string_init(&node->name);
-		tb_string_init(&node->value);
+		tb_pstring_init(&node->name);
+		tb_pstring_init(&node->value);
 	}
 
 	return writer;
@@ -67,8 +67,8 @@ tb_void_t tb_xml_writer_close(tb_xml_writer_t* writer)
 		for (i = 0; i < TB_XML_WRITER_ATTRIBUTES_MAX; i++)
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)(writer->attributes + i);
-			tb_string_exit(&node->name);
-			tb_string_exit(&node->value);
+			tb_pstring_exit(&node->name);
+			tb_pstring_exit(&node->value);
 		}
 
 		// detach stream
@@ -102,8 +102,8 @@ tb_void_t tb_xml_writer_element_beg(tb_xml_writer_t* writer, tb_char_t const* na
 		tb_int_t n = writer->attributes_n;
 		for (i = 0; i < n; i++)
 		{
-			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
-			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
+			tb_char_t const* attr_name = tb_pstring_cstr(&writer->attributes[i].base.name);
+			tb_char_t const* attr_value = tb_pstring_cstr(&writer->attributes[i].base.value);
 			if (attr_name && attr_value) tb_gstream_printf(writer->gst, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
 		}
 		tb_gstream_printf(writer->gst, ">");
@@ -123,8 +123,8 @@ tb_void_t tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t const* 
 		tb_int_t n = writer->attributes_n;
 		for (i = 0; i < n; i++)
 		{
-			tb_char_t const* attr_name = tb_string_c_string(&writer->attributes[i].base.name);
-			tb_char_t const* attr_value = tb_string_c_string(&writer->attributes[i].base.value);
+			tb_char_t const* attr_name = tb_pstring_cstr(&writer->attributes[i].base.name);
+			tb_char_t const* attr_value = tb_pstring_cstr(&writer->attributes[i].base.value);
 			if (attr_name && attr_value) tb_gstream_printf(writer->gst, " %s=\"%s\"", attr_name? attr_name : "", attr_value? attr_value : "");
 		}
 		tb_gstream_printf(writer->gst, "/>");
@@ -167,7 +167,7 @@ tb_void_t tb_xml_writer_attributes_clear(tb_xml_writer_t* writer)
 
 	writer->attributes_n = 0;
 }
-tb_void_t tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value)
+tb_void_t tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_pstring_t const* value)
 {
 	tb_assert(writer && name && value);
 	if (!writer || !name || !value) return ;
@@ -175,8 +175,8 @@ tb_void_t tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-		tb_string_assign_c_string(&node->name, name);
-		tb_string_assign(&node->value, value);
+		tb_pstring_cstrcpy(&node->name, name);
+		tb_pstring_strcpy(&node->value, value);
 	}
 }
 tb_void_t tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value)
@@ -187,8 +187,8 @@ tb_void_t tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-		tb_string_assign_c_string(&node->name, name);
-		tb_string_assign_c_string(&node->value, value);
+		tb_pstring_cstrcpy(&node->name, name);
+		tb_pstring_cstrcpy(&node->value, value);
 	}
 }
 tb_void_t tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value)
@@ -199,8 +199,8 @@ tb_void_t tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t co
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-		tb_string_assign_c_string(&node->name, name);
-		tb_string_assign_format(&node->value, "%d", value);
+		tb_pstring_cstrcpy(&node->name, name);
+		tb_pstring_cstrfcpy(&node->value, "%d", value);
 	}
 }
 
@@ -213,8 +213,8 @@ tb_void_t tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t 
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-		tb_string_assign_c_string(&node->name, name);
-		tb_string_assign_format(&node->value, "%g", value);
+		tb_pstring_cstrcpy(&node->name, name);
+		tb_pstring_cstrfcpy(&node->value, "%g", value);
 	}
 }
 #endif
@@ -226,8 +226,8 @@ tb_void_t tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t c
 	if (writer->attributes_n < TB_XML_WRITER_ATTRIBUTES_MAX)
 	{
 		tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-		tb_string_assign_c_string(&node->name, name);
-		tb_string_assign_c_string(&node->value, value == TB_TRUE? "true" : "false");
+		tb_pstring_cstrcpy(&node->name, name);
+		tb_pstring_cstrcpy(&node->value, value == TB_TRUE? "true" : "false");
 	}
 }
 tb_void_t tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* fmt, ...)
@@ -244,8 +244,8 @@ tb_void_t tb_xml_writer_attributes_add_format(tb_xml_writer_t* writer, tb_char_t
 		if (size) 
 		{
 			tb_xml_node_t* node = (tb_xml_node_t*)&writer->attributes[writer->attributes_n++];
-			tb_string_assign_c_string(&node->name, name);
-			tb_string_assign_c_string(&node->value, text);
+			tb_pstring_cstrcpy(&node->name, name);
+			tb_pstring_cstrcpy(&node->value, text);
 		}
 	}
 }

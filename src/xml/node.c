@@ -32,47 +32,52 @@
 /* /////////////////////////////////////////////////////////
  * details
  */
-static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_string_t* parent, tb_char_t const* path)
+static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_sstring_t* parent, tb_char_t const* path)
 {
-	tb_assert(node);
-	if (!node || !node->childs) return TB_NULL;
+	tb_assert_and_check_return_val(node && node->childs, TB_NULL);
 	
 	// init
-	tb_xml_node_t* ret = TB_NULL;
-	tb_stack_string_t s;
-	tb_string_init_stack_string(&s);
+	tb_xml_node_t* 	r = TB_NULL;
+
+	// init string
+	tb_sstring_t 	s;
+	tb_char_t 		d[4096];
+	if (!tb_sstring_init(&s, d, 4096)) return TB_NULL;
 
 	// find it
 	tb_xml_node_t* head = (tb_xml_node_t*)node->childs;
 	tb_xml_node_t* item = head->next;
 	while (item && item != head)
 	{
-		if (item->type == TB_XML_NODE_TYPE_ELEMENT)
+		// element?
+		if (item->type == TB_XML_NODE_TYPE_ELEMENT 
+			&& tb_pstring_size(&item->name))
 		{
 			// append path
-			tb_string_clear((tb_string_t*)&s);
-			if (parent) tb_string_append((tb_string_t*)&s, parent);
-			tb_string_append_char((tb_string_t*)&s, '/');
-			tb_string_append((tb_string_t*)&s, &item->name);
-			//tb_trace("%s: %s", tb_string_c_string(&item->name), tb_string_c_string(&s));
-			
+			tb_sstring_clear(&s);
+			if (parent) tb_sstring_strcat(&s, parent);
+			tb_sstring_strfcat(&s, "/%s", tb_pstring_cstr(&item->name));
+
 			// is this?
-			if (tb_string_compare_c_string((tb_string_t*)&s, path))
+			if (!tb_sstring_cstrcmp(&s, path))
 			{
-				ret = item;
+				r = item;
 				break;
 			}
+			// select from next childs
 			else
 			{
-				ret = tb_xml_node_childs_select_node(item, (tb_string_t*)&s, path);
-				if (ret) break;
+				r = tb_xml_node_childs_select_node(item, &s, path);
+				if (r) break;
 			}
 		}
 		item = item->next;
 	}
 
-	tb_string_exit((tb_string_t*)&s);
-	return ret;
+	// exit string
+	tb_sstring_exit(&s);
+
+	return r;
 }
 
 /* /////////////////////////////////////////////////////////
@@ -110,8 +115,8 @@ tb_xml_node_t* tb_xml_node_init(tb_pointer_t document, tb_size_t type)
 	node->document = document? document : node;
 	node->prev = node;
 	node->next = node;
-	tb_string_init(&node->name);
-	tb_string_init(&node->value);
+	tb_pstring_init(&node->name);
+	tb_pstring_init(&node->value);
 
 	// ok
 	return node;
@@ -124,8 +129,8 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		if (node->free) node->free(node);
 
 		// free name & value
-		tb_string_exit(&node->name);
-		tb_string_exit(&node->value);
+		tb_pstring_exit(&node->name);
+		tb_pstring_exit(&node->value);
 
 		// free childs
 		if (node->childs) tb_xml_nlist_exit(node->childs);
@@ -182,7 +187,7 @@ tb_void_t tb_xml_node_attributes_clear(tb_xml_node_t* node)
 		node->attributes = TB_NULL;
 	}
 }
-tb_xml_node_t* tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value)
+tb_xml_node_t* tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_pstring_t const* value)
 {
 	tb_assert(node && name && value);
 	if (!node || !name || !value) return TB_NULL;
@@ -192,7 +197,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t 
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign(&attribute->value, value);
+	tb_pstring_strcpy(&attribute->value, value);
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();
@@ -216,7 +221,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign_c_string(&attribute->value, value);
+	tb_pstring_cstrcpy(&attribute->value, value);
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();
@@ -240,7 +245,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t con
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign_format(&attribute->value, "%d", value);
+	tb_pstring_cstrfcpy(&attribute->value, "%d", value);
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();
@@ -266,7 +271,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t c
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign_format(&attribute->value, "%g", value);
+	tb_pstring_cstrfcpy(&attribute->value, "%g", value);
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();
@@ -291,7 +296,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t co
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign_c_string(&attribute->value, value == TB_TRUE? "true" : "false");
+	tb_pstring_cstrfcpy(&attribute->value, value == TB_TRUE? "true" : "false");
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();
@@ -321,7 +326,7 @@ tb_xml_node_t* tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_t 
 	if (!attribute) return TB_NULL;
 
 	// init attribute
-	tb_string_assign_c_string(&attribute->value, text);
+	tb_pstring_cstrfcpy(&attribute->value, text);
 
 	// init attributes
 	if (!node->attributes) node->attributes = tb_xml_nlist_init();

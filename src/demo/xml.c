@@ -1,8 +1,8 @@
 #include "tbox.h"
 
 //#define XML_READER 
-//#define XML_READER_SELECT
-#define XML_WRITER
+#define XML_READER_SELECT
+//#define XML_WRITER
 //#define XML_DOM
 //#define XML_DOM_WRITER
 //#define XML_DOM_SELECT
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 	if (tb_xml_reader_seek(reader, argv[2]))
 	{
 		// the first node
-		tb_char_t const* name = tb_string_c_string(tb_xml_reader_get_element_name(reader));
+		tb_char_t const* name = tb_pstring_cstr(tb_xml_reader_get_element_name(reader));
 		tb_print("node: <%s></%s>", name, name);
 	}
 
@@ -166,8 +166,8 @@ int main(int argc, char** argv)
 	if (!document) return 0;
 
 	// xml header
-	tb_string_assign_c_string_by_ref(tb_xml_document_version(document), "1.0");
-	tb_string_assign_c_string_by_ref(tb_xml_document_encoding(document), "utf-8");
+	tb_pstring_cstrcpy(tb_xml_document_version(document), "1.0");
+	tb_pstring_cstrcpy(tb_xml_document_encoding(document), "utf-8");
 
 	// comment
 	tb_xml_node_add_comment(document, "\n\tcomments ...\n\tcomments ...\n\tcomments ...\n");
@@ -234,16 +234,16 @@ int main(int argc, char** argv)
 		tb_print("select: %s", argv[2]);
 
 		// the first node
-		tb_print("node: <%s></%s>", tb_string_c_string(&node->name), tb_string_c_string(&node->name));
+		tb_print("node: <%s></%s>", tb_pstring_cstr(&node->name), tb_pstring_cstr(&node->name));
 
 #if 0
 		// the other node
 		tb_xml_node_t* item = node->next;
 		while (item && item != node)
 		{
-			if (tb_string_compare(&item->name, &node->name))
+			if (!tb_pstring_strcmp(&item->name, &node->name))
 			{
-				tb_print("node: <%s></%s>", tb_string_c_string(&item->name), tb_string_c_string(&item->name));
+				tb_print("node: <%s></%s>", tb_pstring_cstr(&item->name), tb_pstring_cstr(&item->name));
 			}
 			item = item->next;
 		}
