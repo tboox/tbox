@@ -111,7 +111,7 @@ tb_xml_node_t* tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name)
 	tb_xml_node_t* node = head->next;
 	while (node && node != head)
 	{
-		if (tb_string_compare_c_string(&node->name, name))
+		if (!tb_pstring_cstrcmp(&node->name, name))
 			return node;
 		node = node->next;
 	}

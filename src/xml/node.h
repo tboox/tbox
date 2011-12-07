@@ -68,10 +68,10 @@ typedef struct __tb_xml_node_t
 	tb_size_t 					type;
 
 	// the node name
-	tb_string_t 				name;
+	tb_pstring_t 				name;
 
 	// the node value
-	tb_string_t 				value;
+	tb_pstring_t 				value;
 
 	// the reference to the document
 	tb_pointer_t 				document;
@@ -163,7 +163,7 @@ tb_xml_node_t* 		tb_xml_node_add_attribute(tb_xml_node_t* node, tb_char_t const*
 
 // attributes
 tb_void_t 			tb_xml_node_attributes_clear(tb_xml_node_t* node);
-tb_xml_node_t* 		tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_string_t const* value);
+tb_xml_node_t* 		tb_xml_node_attributes_add_string(tb_xml_node_t* node, tb_char_t const* name, tb_pstring_t const* value);
 tb_xml_node_t* 		tb_xml_node_attributes_add_c_string(tb_xml_node_t* node, tb_char_t const* name, tb_char_t const* value);
 tb_xml_node_t* 		tb_xml_node_attributes_add_int(tb_xml_node_t* node, tb_char_t const* name, tb_int_t value);
 tb_xml_node_t* 		tb_xml_node_attributes_add_bool(tb_xml_node_t* node, tb_char_t const* name, tb_bool_t value);

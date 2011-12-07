@@ -285,7 +285,29 @@ tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt,
 	
 	return tb_pstring_cstrncpy(string, p, n);
 }
+/* ////////////////////////////////////////////////////////////////////////
+ * chrcat
+ */
+tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
+{
+	tb_assert_and_check_return_val(string, TB_NULL);
 
+	// get old size
+	tb_size_t n = string->size;
+
+	// resize
+	if (!tb_pstring_resize(string, n + 1)) return TB_NULL;
+
+	// check
+	tb_assert(string->data && string->size == n + 1);
+
+	// append char
+	string->data[n] = c;
+	string->data[n + 1] = '\0';
+
+	// ok
+	return string->data;
+}
 /* ////////////////////////////////////////////////////////////////////////
  * strcat
  */

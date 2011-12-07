@@ -67,7 +67,7 @@ typedef struct __tb_xml_writer_t
  */
 
 // open & close
-tb_xml_writer_t* 		tb_xml_writer_open(tb_gstream_t* gst);
+tb_xml_writer_t* 			tb_xml_writer_open(tb_gstream_t* gst);
 tb_void_t 					tb_xml_writer_close(tb_xml_writer_t* writer);
 
 // document
@@ -81,7 +81,7 @@ tb_void_t 					tb_xml_writer_element_empty(tb_xml_writer_t* writer, tb_char_t co
 
 // attributes
 tb_void_t 					tb_xml_writer_attributes_clear(tb_xml_writer_t* writer);
-tb_void_t 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_string_t const* value);
+tb_void_t 					tb_xml_writer_attributes_add_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_pstring_t const* value);
 tb_void_t 					tb_xml_writer_attributes_add_c_string(tb_xml_writer_t* writer, tb_char_t const* name, tb_char_t const* value);
 tb_void_t 					tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t const* name, tb_int_t value);
 tb_void_t 					tb_xml_writer_attributes_add_bool(tb_xml_writer_t* writer, tb_char_t const* name, tb_bool_t value);
