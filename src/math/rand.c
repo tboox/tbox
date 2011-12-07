@@ -55,22 +55,22 @@ tb_bool_t tb_rand_init()
 	if (!g_mutex) g_mutex = tb_mutex_init("the global rand");
 	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
 
-	if (!tb_mutex_lock(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;
 	if (!g_rand) g_rand = tb_rand_linear_init(TB_RAND_LINEAR_SEED);
-	if (!tb_mutex_unlock(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_leave(g_mutex)) return TB_FALSE;
 
 	return g_rand? TB_TRUE : TB_FALSE;
 }
 tb_void_t tb_rand_exit()
 {
-	if (tb_mutex_lock(g_mutex))
+	if (tb_mutex_enter(g_mutex))
 	{
 		if (g_rand)
 		{
 			tb_rand_linear_exit(g_rand);
 			g_rand = TB_NULL;
 		}
-		tb_mutex_unlock(g_mutex);
+		tb_mutex_leave(g_mutex);
 	}
 
 	if (g_mutex)	
@@ -87,13 +87,13 @@ tb_uint32_t tb_rand_uint32(tb_uint32_t b, tb_uint32_t e)
 	tb_assert_and_check_return_val(g_rand && g_mutex, rand);
 
 	// lock
-	if (tb_mutex_lock(g_mutex))
+	if (tb_mutex_enter(g_mutex))
 	{
 		// rand
 		rand = tb_rand_linear_uint32(g_rand, b, e);
 
 		// unlock
-		tb_mutex_unlock(g_mutex);
+		tb_mutex_leave(g_mutex);
 	}
 
 	return rand;
@@ -105,13 +105,13 @@ tb_sint32_t tb_rand_sint32(tb_sint32_t b, tb_sint32_t e)
 	tb_assert_and_check_return_val(g_rand && g_mutex, rand);
 
 	// lock
-	if (tb_mutex_lock(g_mutex))
+	if (tb_mutex_enter(g_mutex))
 	{
 		// rand
 		rand = tb_rand_linear_sint32(g_rand, b, e);
 
 		// unlock
-		tb_mutex_unlock(g_mutex);
+		tb_mutex_leave(g_mutex);
 	}
 
 	return rand;
@@ -125,13 +125,13 @@ tb_float_t tb_rand_float(tb_float_t b, tb_float_t e)
 	tb_assert_and_check_return_val(g_rand && g_mutex, rand);
 
 	// lock
-	if (tb_mutex_lock(g_mutex))
+	if (tb_mutex_enter(g_mutex))
 	{
 		// rand
 		rand = tb_rand_linear_float(g_rand, b, e);
 
 		// unlock
-		tb_mutex_unlock(g_mutex);
+		tb_mutex_leave(g_mutex);
 	}
 
 	return rand;

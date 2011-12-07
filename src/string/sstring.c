@@ -77,22 +77,21 @@ tb_void_t tb_sstring_clear(tb_sstring_t* string)
 	string->size = 0;
 	if (string->data) string->data[0] = '\0';
 }
-tb_bool_t tb_sstring_resize(tb_sstring_t* string, tb_size_t size)
+tb_char_t const* tb_sstring_strip(tb_sstring_t* string, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && string->data && size < string->maxn, TB_FALSE);
+	tb_assert_and_check_return_val(string, TB_NULL);
 
-	// resize
-	string->size = size;
-	string->data[size] = '\0';
+	// out?
+	tb_check_return_val(n < string->maxn, string->data);
 
-	// ok
-	return TB_TRUE;
+	// strip
+	string->size = n;
+	if (string->data) string->data[n] = '\0';
 }
-
 /* ////////////////////////////////////////////////////////////////////////
  * strchr
  */
-tb_long_t tb_sstring_strchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c)
+tb_long_t tb_sstring_strchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -101,7 +100,7 @@ tb_long_t tb_sstring_strchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c
 	tb_char_t* q = tb_strchr(s + p, c);
 	return (q? q - s : -1);
 }
-tb_long_t tb_sstring_strichr(tb_sstring_t const* string, tb_long_t p, tb_char_t c)
+tb_long_t tb_sstring_strichr(tb_sstring_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -114,7 +113,7 @@ tb_long_t tb_sstring_strichr(tb_sstring_t const* string, tb_long_t p, tb_char_t 
 /* ////////////////////////////////////////////////////////////////////////
  * strrchr
  */
-tb_long_t tb_sstring_strrchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c)
+tb_long_t tb_sstring_strrchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -123,7 +122,7 @@ tb_long_t tb_sstring_strrchr(tb_sstring_t const* string, tb_long_t p, tb_char_t 
 	tb_char_t* q = tb_strnrchr(s + p, n, c);
 	return (q? q - s : -1);
 }
-tb_long_t tb_sstring_strirchr(tb_sstring_t const* string, tb_long_t p, tb_char_t c)
+tb_long_t tb_sstring_strirchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -136,15 +135,15 @@ tb_long_t tb_sstring_strirchr(tb_sstring_t const* string, tb_long_t p, tb_char_t
 /* ////////////////////////////////////////////////////////////////////////
  * strstr
  */
-tb_long_t tb_sstring_strstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s)
+tb_long_t tb_sstring_strstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s)
 {
 	return tb_sstring_cstrstr(string, tb_sstring_cstr(s), p);
 }
-tb_long_t tb_sstring_stristr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s)
+tb_long_t tb_sstring_stristr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s)
 {
 	return tb_sstring_cstristr(string, tb_sstring_cstr(s), p);
 }
-tb_long_t tb_sstring_cstrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s2)
+tb_long_t tb_sstring_cstrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s2)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -153,7 +152,7 @@ tb_long_t tb_sstring_cstrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t 
 	tb_char_t* q = tb_strstr(s + p, s2);
 	return (q? q - s : -1);
 }
-tb_long_t tb_sstring_cstristr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s2)
+tb_long_t tb_sstring_cstristr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s2)
 {	
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -166,16 +165,16 @@ tb_long_t tb_sstring_cstristr(tb_sstring_t const* string, tb_long_t p, tb_char_t
 /* ////////////////////////////////////////////////////////////////////////
  * strrstr
  */
-tb_long_t tb_sstring_strrstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s)
+tb_long_t tb_sstring_strrstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s)
 {
 	return tb_sstring_cstrrstr(string, tb_sstring_cstr(s), p);
 }
-tb_long_t tb_sstring_strirstr(tb_sstring_t const* string, tb_long_t p, tb_sstring_t const* s)
+tb_long_t tb_sstring_strirstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s)
 {
 	return tb_sstring_cstrirstr(string, tb_sstring_cstr(s), p);
 }
 
-tb_long_t tb_sstring_cstrrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s2)
+tb_long_t tb_sstring_cstrrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s2)
 {	
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -184,7 +183,7 @@ tb_long_t tb_sstring_cstrrstr(tb_sstring_t const* string, tb_long_t p, tb_char_t
 	tb_char_t* q = tb_strnrstr(s + p, n, s2);
 	return (q? q - s : -1);
 }
-tb_long_t tb_sstring_cstrirstr(tb_sstring_t const* string, tb_long_t p, tb_char_t const* s2)
+tb_long_t tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s2)
 {
 	tb_char_t const* 	s = tb_sstring_cstr(string);
 	tb_size_t 			n = tb_sstring_size(string);
@@ -209,17 +208,13 @@ tb_char_t const* tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s)
 }
 tb_char_t const* tb_sstring_cstrncpy(tb_sstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && s && n, TB_NULL);
-
-	// resize
-	if (!tb_sstring_resize(string, n)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == n);
+	tb_assert_and_check_return_val(string && string->data && string->maxn, TB_NULL);
+	tb_assert_and_check_return_val(s && n && n < string->maxn, TB_NULL);
 
 	// copy data
 	tb_memcpy(string->data, s, n);
 	string->data[n] = '\0';
+	string->size = n;
 
 	// ok
 	return string->data;
@@ -241,20 +236,14 @@ tb_char_t const* tb_sstring_cstrfcpy(tb_sstring_t* string, tb_char_t const* fmt,
  */
 tb_char_t const* tb_sstring_chrcat(tb_sstring_t* string, tb_char_t c)
 {
-	tb_assert_and_check_return_val(string, TB_NULL);
-
-	// get old size
-	tb_size_t n = string->size;
-
-	// resize
-	if (!tb_sstring_resize(string, n + 1)) return TB_NULL;
-
 	// check
-	tb_assert(string->data && string->size == n + 1);
+	tb_assert_and_check_return_val(string && string->data && string->maxn, TB_NULL);
+	tb_assert_and_check_return_val(string->size + 1 < string->maxn, TB_NULL);
 
 	// append char
-	string->data[n] = c;
-	string->data[n + 1] = '\0';
+	string->data[string->size] = c;
+	string->data[string->size + 1] = '\0';
+	string->size++;
 
 	// ok
 	return string->data;
@@ -274,23 +263,16 @@ tb_char_t const* tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s)
 }
 tb_char_t const* tb_sstring_cstrncat(tb_sstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && s && n, TB_NULL);
+	tb_assert_and_check_return_val(string && string->data && string->maxn, TB_NULL);
+	tb_assert_and_check_return_val(s && n && string->size + n < string->maxn, TB_NULL);
 
 	// copy it if null
 	if (!string->size) return tb_sstring_cstrncpy(string, s, n);
 
-	// get old size
-	tb_size_t on = string->size;
-
-	// resize
-	if (!tb_sstring_resize(string, on + n)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == on + n);
-
 	// copy data
-	tb_memcpy(string->data + on, s, n);
-	string->data[on + n] = '\0';
+	tb_memcpy(string->data + string->size, s, n);
+	string->data[string->size + n] = '\0';
+	string->size += n;
 
 	// ok
 	return string->data;

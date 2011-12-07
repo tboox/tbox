@@ -332,7 +332,7 @@ static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s,
 // set cookies entry
 static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
-	tb_mutex_lock(cookies->hmutex);
+	tb_mutex_enter(cookies->hmutex);
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
@@ -366,21 +366,21 @@ static tb_bool_t tb_cookies_set_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 				cookie->value = tb_cookie_set_string(cookies, entry->pvalue, entry->nvalue);
 				tb_assert_abort(cookie->value);
 
-				tb_mutex_unlock(cookies->hmutex);
+				tb_mutex_leave(cookies->hmutex);
 				return TB_TRUE;
 			}
 		}
 	}
 
 	// no find
-	tb_mutex_unlock(cookies->hmutex);
+	tb_mutex_leave(cookies->hmutex);
 	return TB_FALSE;
 }
 
 // del cookies entry
 static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
-	tb_mutex_lock(cookies->hmutex);
+	tb_mutex_enter(cookies->hmutex);
 
 	tb_size_t 		i = 0;	
 	tb_vector_t* 	cpool = cookies->cpool;
@@ -421,13 +421,13 @@ static tb_void_t tb_cookies_del_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 		}
 	}
 
-	tb_mutex_unlock(cookies->hmutex);
+	tb_mutex_leave(cookies->hmutex);
 }
 // add cookies entry
 static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t const* entry)
 {
 	// lock
-	tb_mutex_lock(cookies->hmutex);
+	tb_mutex_enter(cookies->hmutex);
 
 	// set secure
 	tb_cookie_t cookie;
@@ -447,7 +447,7 @@ static tb_void_t tb_cookies_add_entry(tb_cookies_t* cookies, tb_cookie_entry_t c
 	tb_vector_insert_tail(cookies->cpool, &cookie);
 
 	// unlock
-	tb_mutex_unlock(cookies->hmutex);
+	tb_mutex_leave(cookies->hmutex);
 }
 
 // is child domain?
@@ -546,7 +546,7 @@ tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 		tb_cookies_clear(cookies);
 
 		// free cpool & spool
-		tb_mutex_lock(cookies->hmutex);
+		tb_mutex_enter(cookies->hmutex);
 
 		// free cpool
 		if (cookies->cpool) tb_vector_exit(cookies->cpool);
@@ -556,7 +556,7 @@ tb_void_t tb_cookies_exit(tb_cookies_t* cookies)
 		if (cookies->spool) tb_slist_exit(cookies->spool);
 		cookies->spool = TB_NULL;
 
-		tb_mutex_unlock(cookies->hmutex);
+		tb_mutex_leave(cookies->hmutex);
 
 		// free mutex
 		tb_mutex_exit(cookies->hmutex);
@@ -570,11 +570,11 @@ tb_void_t tb_cookies_clear(tb_cookies_t* cookies)
 {
 	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 
-	tb_mutex_lock(cookies->hmutex);
+	tb_mutex_enter(cookies->hmutex);
 	tb_vector_clear(cookies->cpool);
 	tb_slist_clear(cookies->spool);
 	cookies->value[0] = '\0';
-	tb_mutex_unlock(cookies->hmutex);
+	tb_mutex_leave(cookies->hmutex);
 }
 
 tb_void_t tb_cookies_set(tb_cookies_t* cookies, tb_char_t const* domain, tb_char_t const* path, tb_bool_t secure, tb_char_t const* value)
@@ -746,7 +746,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 {
 	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
-	tb_mutex_lock(cookies->hmutex);
+	tb_mutex_enter(cookies->hmutex);
 
 	TB_COOKIES_DBG("==================================================");
 	TB_COOKIES_DBG("cookies:");
@@ -790,7 +790,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 			TB_COOKIES_DBG("[string]:[%d]: %s ", s->refn, s->data? s->data : "");
 		}
 	}
-	tb_mutex_unlock(cookies->hmutex);
+	tb_mutex_leave(cookies->hmutex);
 }
 #endif
 

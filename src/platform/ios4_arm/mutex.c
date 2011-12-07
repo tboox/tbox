@@ -50,21 +50,21 @@ tb_void_t tb_mutex_exit(tb_handle_t hmutex)
 		free((tb_pointer_t)pmutex);
 	}
 }
-tb_bool_t tb_mutex_lock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_enter(tb_handle_t hmutex)
 {
 	tb_assert_and_check_return_val(hmutex, TB_FALSE);
 
 	if (0 != pthread_mutex_lock((pthread_mutex_t*)hmutex)) return TB_FALSE;
 	else return TB_TRUE;
 }
-tb_bool_t tb_mutex_trylock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_tryenter(tb_handle_t hmutex)
 {
 	tb_assert_and_check_return_val(hmutex, TB_FALSE);
 
 	if (0 != pthread_mutex_trylock((pthread_mutex_t*)hmutex)) return TB_FALSE;
 	else return TB_TRUE;
 }
-tb_bool_t tb_mutex_unlock(tb_handle_t hmutex)
+tb_bool_t tb_mutex_leave(tb_handle_t hmutex)
 {
 	tb_assert_and_check_return_val(hmutex, TB_FALSE);
 

@@ -14,6 +14,15 @@ ifeq ($(IS_CONFIG), yes)
 # include prefix
 include prefix.mak
 
+# shortcut
+a : all
+i : install
+c : clean
+u : update
+o : output
+e : error
+w : warning
+
 # make all
 all : .null
 	@echo "" > /tmp/$(PRO_NAME).out
@@ -50,9 +59,19 @@ update : .null
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
 
 # make output
-output: .null
+output : .null
 	@echo output $(PRO_NAME)
 	@cat /tmp/$(PRO_NAME).out
+
+# make error
+error : .null
+	@echo error $(PRO_NAME)
+	@cat /tmp/$(PRO_NAME).out | grep -P "error|undefined"
+
+# make warning
+warning : .null
+	@echo warning $(PRO_NAME)
+	@cat /tmp/$(PRO_NAME).out | grep warning
 
 .null :
 
