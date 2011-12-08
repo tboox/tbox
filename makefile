@@ -7,21 +7,24 @@ ${shell if [ ! -f "config.mak" ]; then touch config.mak; fi }
 include config.mak
 
 # #####################################################
-# make projects
+# make shortcut
 # #
-ifeq ($(IS_CONFIG), yes)
-
-# include prefix
-include prefix.mak
-
-# shortcut
 a : all
+f : config
 i : install
 c : clean
 u : update
 o : output
 e : error
 w : warning
+
+# #####################################################
+# make projects
+# #
+ifeq ($(IS_CONFIG), yes)
+
+# include prefix
+include prefix.mak
 
 # make all
 all : .null

@@ -92,6 +92,7 @@ tb_char_t const* 	tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt
 
 // chrcat
 tb_char_t const* 	tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c);
+tb_char_t const* 	tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n);
 
 // strcat
 tb_char_t const* 	tb_pstring_strcat(tb_pstring_t* string, tb_pstring_t const* s);
