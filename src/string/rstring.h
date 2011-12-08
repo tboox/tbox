@@ -33,14 +33,30 @@
  * types
  */
 
-// the shared string type
+// the shared string data type
+typedef struct __tb_rstring_data_t
+{
+	// the string mutex
+	tb_handle_t 			mutx;
+
+	// the string refn
+	tb_size_t 				refn;
+
+	// the string data
+	tb_pstring_t* 			pstr;
+
+}tb_rstring_data_t;
+
+/* the shared string type
+ *
+ *                (atomic)       (mutex)
+ * rstring => shared pointer => shared data
+ *
+ */
 typedef struct __tb_rstring_t
 {
-	// the string data + refn
-	tb_pstring_t** 	data;
-
-	// the string mutex
-	tb_handle_t 	mutx;
+	// the shared data
+	tb_rstring_data_t** 	data;
 
 }tb_rstring_t;
 
@@ -96,6 +112,7 @@ tb_char_t const* 	tb_rstring_cstrfcpy(tb_rstring_t* string, tb_char_t const* fmt
 
 // chrcat
 tb_char_t const* 	tb_rstring_chrcat(tb_rstring_t* string, tb_char_t c);
+tb_char_t const* 	tb_rstring_chrncat(tb_rstring_t* string, tb_char_t c, tb_size_t n);
 
 // strcat
 tb_char_t const* 	tb_rstring_strcat(tb_rstring_t* string, tb_rstring_t const* s);

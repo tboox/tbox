@@ -322,6 +322,26 @@ tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 	// ok
 	return string->data;
 }
+tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n)
+{
+	tb_assert_and_check_return_val(string, TB_NULL);
+
+	// get old size
+	tb_size_t on = string->size;
+
+	// resize
+	if (!tb_pstring_resize(string, on + n)) return TB_NULL;
+
+	// check
+	tb_assert(string->data && string->size == on + n);
+
+	// append chars
+	tb_memset(string->data + n, c, n);
+	string->data[on + n] = '\0';
+
+	// ok
+	return string->data;
+}
 /* ////////////////////////////////////////////////////////////////////////
  * strcat
  */

@@ -242,8 +242,23 @@ tb_char_t const* tb_sstring_chrcat(tb_sstring_t* string, tb_char_t c)
 
 	// append char
 	string->data[string->size] = c;
-	string->data[string->size + 1] = '\0';
 	string->size++;
+	string->data[string->size] = '\0';
+
+	// ok
+	return string->data;
+}
+
+tb_char_t const* tb_sstring_chrncat(tb_sstring_t* string, tb_char_t c, tb_size_t n)
+{
+	// check
+	tb_assert_and_check_return_val(string && string->data && string->maxn, TB_NULL);
+	tb_assert_and_check_return_val(string->size + n < string->maxn, TB_NULL);
+
+	// append chars
+	tb_memset(string->data + string->size, c, n);
+	string->size += n;
+	string->data[string->size] = '\0';
 
 	// ok
 	return string->data;

@@ -33,10 +33,10 @@
  */
 
 #ifdef TB_CONFIG_LIBC_HAVE_STRNCAT
-tb_char_t* tb_strcnat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+tb_char_t* tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
-	return strncat(s1, s2);
+	return strncat(s1, s2, n);
 }
 #else
 tb_char_t* tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
