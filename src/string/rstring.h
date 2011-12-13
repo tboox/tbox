@@ -36,14 +36,11 @@
 // the shared string data type
 typedef struct __tb_rstring_data_t
 {
-	// the string mutex
-	tb_handle_t 			mutx;
-
 	// the string refn
 	tb_size_t 				refn;
 
 	// the string data
-	tb_pstring_t* 			pstr;
+	tb_pstring_t 			pstr;
 
 }tb_rstring_data_t;
 
@@ -57,6 +54,9 @@ typedef struct __tb_rstring_t
 {
 	// the shared data
 	tb_rstring_data_t** 	data;
+
+	// the shared mutex
+	tb_handle_t* 			mutx;
 
 }tb_rstring_t;
 
