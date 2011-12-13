@@ -40,62 +40,23 @@
 /* ////////////////////////////////////////////////////////////////////////
  * atomic
  */
-static __tb_inline__ tb_rstring_data_t* tb_rstring_atomic_data_get(tb_rstring_t const* string)
+static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_get(tb_rstring_t const* string)
 {
-	tb_check_return_val(string && string->data, TB_NULL);
+	tb_check_return_val(string && string->mutx, TB_NULL);
 
 	// FIXME: atomic
-	return *(string->data);
+	return *(string->mutx);
 }
-static __tb_inline__ tb_void_t tb_rstring_atomic_data_set(tb_rstring_t* string, tb_rstring_data_t* data)
+static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_del(tb_rstring_t* string)
 {
-	tb_check_return(string && string->data);
+	tb_check_return(string && string->mutx);
 
 	// FIXME: atomic
-	string->data = data;
+	tb_handle_t mutx = *(string->mutx);
+	*(string->mutx) = TB_NULL;
+	return mutx;
 }
-static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_get(tb_rstring_data_t const* data)
-{
-	tb_check_return_val(data, TB_NULL);
 
-	// FIXME: atomic
-	return data->mutx;
-}
-static __tb_inline__ tb_void_t tb_rstring_atomic_mutx_set(tb_rstring_data_t* data, tb_handle_t mutx)
-{
-	tb_check_return(data);
-
-	// FIXME: atomic
-	data->mutx = mutx;
-}
-static __tb_inline__ tb_size_t tb_rstring_atomic_refn_get(tb_rstring_data_t const* data)
-{
-	tb_check_return_val(data, TB_NULL);
-
-	// FIXME: atomic
-	return data->refn;
-}
-static __tb_inline__ tb_void_t tb_rstring_atomic_refn_set(tb_rstring_data_t* data, tb_size_t refn)
-{
-	tb_check_return(data);
-
-	// FIXME: atomic
-	data->refn = refn;
-}
-static __tb_inline__ tb_size_t tb_rstring_atomic_refn_inc(tb_rstring_data_t* data)
-{
-	tb_check_return_val(data, TB_NULL);
-
-	// FIXME: atomic
-	return ++data->refn;
-}
-static __tb_inline__ tb_size_t tb_rstring_atomic_refn_dec(tb_rstring_data_t* data)
-{
-	tb_check_return_val(data, TB_NULL);
-
-	// FIXME: atomic
-	return --data->refn;
-}
 /* ////////////////////////////////////////////////////////////////////////
  * init & exit
  */
@@ -124,19 +85,26 @@ tb_char_t const* tb_rstring_cstr(tb_rstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_NULL);
+	// init
+	tb_char_t const* s = TB_NULL;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, TB_NULL);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
-	// cstr
-	tb_char_t const* s = data->pstr? tb_pstring_cstr(data->pstr) : TB_NULL;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstr
+		s = tb_pstring_cstr(&data->pstr);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
@@ -147,19 +115,26 @@ tb_size_t tb_rstring_size(tb_rstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_size_t n = 0;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, 0);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), 0);
 
-	// cstr
-	tb_size_t n = data->pstr? tb_pstring_size(data->pstr) : 0;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// size
+		n = tb_pstring_size(&data->pstr);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), 0);
@@ -170,12 +145,31 @@ tb_size_t tb_rstring_refn(tb_rstring_t const* string)
 {	
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_size_t r = 0;
 
-	// get refn
-	return tb_rstring_atomic_refn_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
+	tb_check_return_val(mutx, 0);
+
+	// enter
+	tb_check_return_val(tb_mutex_enter(mutx), 0);
+
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// refn
+		r = data->refn;
+	}
+
+	// leave
+	tb_check_return_val(tb_mutex_leave(mutx), 0);
+
+	return r;
 }
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -185,19 +179,23 @@ tb_void_t tb_rstring_clear(tb_rstring_t* string)
 {
 	tb_assert_and_check_return(string);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return(data);
-
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return(mutx);
 
 	// enter
 	tb_check_return(tb_mutex_enter(mutx));
 
-	// clear
-	if (data->pstr) tb_pstring_clear(data->pstr);
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// clear
+		tb_pstring_clear(&data->pstr);
+	}
 
 	// leave
 	tb_check_return(tb_mutex_leave(mutx));
@@ -206,19 +204,26 @@ tb_char_t const* tb_rstring_strip(tb_rstring_t* string, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_NULL);
+	// init
+	tb_char_t const* s = TB_NULL;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, TB_NULL);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
-	// strip
-	tb_char_t const* s = data->pstr? tb_pstring_strip(data->pstr, n) : TB_NULL;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstr
+		s = tb_pstring_strip(&data->pstr, n);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
@@ -229,62 +234,141 @@ tb_size_t tb_rstring_incr(tb_rstring_t* string)
 {	
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_size_t r = 0;
 
-	// refn++
-	return tb_rstring_atomic_refn_inc(data);
+	// data
+	tb_rstring_data_t* data = TB_NULL;
+
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
+	if (!mutx)
+	{
+		// init mutx
+		mutx = tb_mutex_init("rsting");
+		tb_assert_and_check_goto(mutx, fail);
+
+		// alloc the shared mutx 
+		string->mutx = tb_calloc(1, sizeof(tb_handle_t));
+		tb_assert_and_check_goto(string->mutx, fail);
+	
+		// init the shared mutx
+		*(string->mutx) = mutx;
+	
+		// alloc the shared data pointer
+		string->data = tb_calloc(1, sizeof(tb_rstring_data_t*));
+		tb_assert_and_check_goto(string->data, fail);
+
+		// alloc the shared data
+		data = tb_calloc(1, sizeof(tb_rstring_data_t));
+		tb_assert_and_check_goto(data, fail);
+	
+		// init the shared pointer
+		*(string->data) = data;
+
+		// init refn
+		r = data->refn = 1;
+
+		// init pstring
+		if (!tb_pstring_init(&data->pstr)) goto fail;
+	}
+	else
+	{
+		// enter
+		tb_check_return_val(tb_mutex_enter(mutx), 0);
+
+		// data
+		data = string->data? *(string->data) : TB_NULL;
+		if (data)
+		{
+			// check 
+			tb_assert(data->refn);
+
+			// refn++
+			r = ++data->refn;
+		}
+
+		// leave
+		tb_check_return_val(tb_mutex_leave(mutx), 0);
+	}
+
+	return r;
+
+fail:
+	// free data
+	if (data) tb_free(data);
+
+	// free data pointer
+	if (string->data) tb_free(string->data);
+
+	// free mutx
+	if (string->mutx) tb_free(string->mutx);
+
+	// exit mutx
+	if (mutx) tb_mutex_exit(mutx);
+
+	// clear
+	tb_memset(string, 0, sizeof(tb_rstring_t));
+
+	return 0;
 }
 tb_size_t tb_rstring_decr(tb_rstring_t* string)
 {	
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_size_t r = 0;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, 0);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), 0);
 
-	// not freed?
-	tb_bool_t frmx = TB_FALSE;
-	tb_size_t refn = data->refn;
-	if (refn >= 1) 
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
 	{
-		// refn--, avoid double free
-		data->refn = --refn;
+		// check 
+		tb_assert(data->refn);
 
-		// free it
-		if (!refn)
+		// refn--
+		r = --data->refn;
+
+		// free it?
+		if (!r)
 		{
-			// free pstring
-			tb_pstring_exit(data->pstr);
+			// exit pstring
+			tb_pstring_exit(&data->pstr);
 
-			// free shared data
+			// free data
 			tb_free(data);
 
-			// free mutex
-			frmx = TB_TRUE;
+			// reset pointer
+			*string->data = TB_NULL;
 		}
 	}
-	// \note: mutex maybe already been freed
-	// else ;
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), 0);
 
-	// exit mutex
-	if (frmx) tb_mutex_exit(mutx);
+	// free mutx
+	if (!r)
+	{
+		// atomic remove mutx
+		mutx = tb_rstring_atomic_mutx_del(string);
+		if (mutx) //!< only one get it
+		{
+			// exit mutex
+			tb_mutex_exit(mutx);
 
-	// clear string
-	if (!refn) string->data = TB_NULL;
+			// free it
+			tb_free(string->mutx);
+		}
+	}
 
-	return refn;
+	return r;
 }
 /* ////////////////////////////////////////////////////////////////////////
  * enter & leave
@@ -293,12 +377,8 @@ tb_bool_t tb_rstring_enter(tb_rstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, TB_FALSE);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_FALSE);
-
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, TB_FALSE);
 
 	// enter
@@ -308,12 +388,8 @@ tb_bool_t tb_rstring_leave(tb_rstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, TB_FALSE);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_FALSE);
-
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, TB_FALSE);
 
 	// leave
@@ -327,19 +403,26 @@ tb_long_t tb_rstring_strchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strchr
-	tb_long_t r = data->pstr? tb_pstring_strchr(data->pstr, p, c) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strchr(&data->pstr, p, c);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -350,19 +433,26 @@ tb_long_t tb_rstring_strichr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strichr
-	tb_long_t r = data->pstr? tb_pstring_strichr(data->pstr, p, c) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strichr(&data->pstr, p, c);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -377,19 +467,26 @@ tb_long_t tb_rstring_strrchr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strrchr
-	tb_long_t r = data->pstr? tb_pstring_strrchr(data->pstr, p, c) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strrchr(&data->pstr, p, c);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -400,19 +497,26 @@ tb_long_t tb_rstring_strirchr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strirchr
-	tb_long_t r = data->pstr? tb_pstring_strirchr(data->pstr, p, c) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strirchr(&data->pstr, p, c);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -427,19 +531,26 @@ tb_long_t tb_rstring_strstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strstr
-	tb_long_t r = data->pstr? tb_pstring_strstr(data->pstr, p, s) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strstr(&data->pstr, p, s);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -450,19 +561,26 @@ tb_long_t tb_rstring_stristr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// stristr
-	tb_long_t r = data->pstr? tb_pstring_stristr(data->pstr, p, s) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_stristr(&data->pstr, p, s);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -473,19 +591,26 @@ tb_long_t tb_rstring_cstrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// cstrstr
-	tb_long_t r = data->pstr? tb_pstring_cstrstr(data->pstr, p, s2) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_cstrstr(&data->pstr, p, s2);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -496,19 +621,26 @@ tb_long_t tb_rstring_cstristr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 {	
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// cstristr
-	tb_long_t r = data->pstr? tb_pstring_cstristr(data->pstr, p, s2) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_cstristr(&data->pstr, p, s2);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -523,19 +655,26 @@ tb_long_t tb_rstring_strrstr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strrstr
-	tb_long_t r = data->pstr? tb_pstring_strrstr(data->pstr, p, s) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strrstr(&data->pstr, p, s);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -546,19 +685,26 @@ tb_long_t tb_rstring_strirstr(tb_rstring_t const* string, tb_size_t p, tb_rstrin
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// strirstr
-	tb_long_t r = data->pstr? tb_pstring_strirstr(data->pstr, p, s) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_strirstr(&data->pstr, p, s);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -570,19 +716,26 @@ tb_long_t tb_rstring_cstrrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 {	
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// cstrrstr
-	tb_long_t r = data->pstr? tb_pstring_cstrrstr(data->pstr, p, s2) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_cstrrstr(&data->pstr, p, s2);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -593,19 +746,26 @@ tb_long_t tb_rstring_cstrirstr(tb_rstring_t const* string, tb_size_t p, tb_char_
 {
 	tb_assert_and_check_return_val(string, -1);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, -1);
+	// init
+	tb_long_t r = -1;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, -1);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), -1);
 
-	// cstrirstr
-	tb_long_t r = data->pstr? tb_pstring_cstrirstr(data->pstr, p, s2) : -1;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// strchr
+		r = tb_pstring_cstrirstr(&data->pstr, p, s2);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), -1);
@@ -641,8 +801,39 @@ tb_char_t const* tb_rstring_cstrncpy(tb_rstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	tb_trace_noimpl();
-	return TB_NULL;
+	// init
+	tb_char_t const* r = TB_NULL;
+
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
+	if (!mutx)
+	{
+		// refn++
+		tb_rstring_incr(string);
+
+		// mutx
+		mutx = tb_rstring_atomic_mutx_get(string);
+		tb_assert_and_check_return_val(mutx, TB_NULL);
+	}
+
+	// enter
+	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
+
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstrcat
+		r = tb_pstring_cstrncpy(&data->pstr, s, n);
+	}
+
+	// leave
+	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
+
+	return r;
 }
 tb_char_t const* tb_rstring_cstrfcpy(tb_rstring_t* string, tb_char_t const* fmt, ...)
 {
@@ -663,19 +854,34 @@ tb_char_t const* tb_rstring_chrcat(tb_rstring_t* string, tb_char_t c)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_NULL);
+	// init
+	tb_char_t const* r = TB_NULL;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
-	tb_check_return_val(mutx, TB_NULL);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
+	if (!mutx)
+	{
+		// refn++
+		tb_rstring_incr(string);
+
+		// mutx
+		mutx = tb_rstring_atomic_mutx_get(string);
+		tb_assert_and_check_return_val(mutx, TB_NULL);
+	}
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
-	// cstrcat
-	tb_char_t const* r = data->pstr? tb_pstring_chrcat(data->pstr, c) : TB_NULL;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstrcat
+		r = tb_pstring_chrcat(&data->pstr, c);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
@@ -686,19 +892,34 @@ tb_char_t const* tb_rstring_chrncat(tb_rstring_t* string, tb_char_t c, tb_size_t
 {
 	tb_assert_and_check_return_val(string && n, TB_NULL);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_NULL);
+	// init
+	tb_char_t const* r = TB_NULL;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
-	tb_check_return_val(mutx, TB_NULL);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
+	if (!mutx)
+	{
+		// refn++
+		tb_rstring_incr(string);
+
+		// mutx
+		mutx = tb_rstring_atomic_mutx_get(string);
+		tb_assert_and_check_return_val(mutx, TB_NULL);
+	}
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
-	// cstrcat
-	tb_char_t const* r = data->pstr? tb_pstring_chrncat(data->pstr, c, n) : TB_NULL;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstrcat
+		r = tb_pstring_chrncat(&data->pstr, c, n);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
@@ -711,7 +932,12 @@ tb_char_t const* tb_rstring_chrncat(tb_rstring_t* string, tb_char_t c, tb_size_t
 tb_char_t const* tb_rstring_strcat(tb_rstring_t* string, tb_rstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_rstring_cstrncat(string, s, tb_rstring_size(s));
+
+	// copy it?
+	if (!tb_rstring_size(string)) return tb_rstring_strcpy(string, s);
+
+	// append it
+	return tb_rstring_cstrncat(string, tb_rstring_cstr(s), tb_rstring_size(s));
 }
 tb_char_t const* tb_rstring_cstrcat(tb_rstring_t* string, tb_char_t const* s)
 {
@@ -722,22 +948,29 @@ tb_char_t const* tb_rstring_cstrncat(tb_rstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	// copy it if null
+	// copy it?
 	if (!tb_rstring_size(string)) return tb_rstring_cstrncpy(string, s, n);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, TB_NULL);
+	// init
+	tb_char_t const* r = TB_NULL;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, TB_NULL);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
-	// cstrcat
-	tb_char_t const* r = data->pstr? tb_pstring_cstrncat(data->pstr, s, n) : TB_NULL;
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
+
+		// cstrcat
+		r = tb_pstring_cstrncat(&data->pstr, s, n);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
@@ -784,19 +1017,26 @@ tb_long_t tb_rstring_cstrncmp(tb_rstring_t* string, tb_char_t const* s, tb_size_
 {
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_long_t r = 0;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, 0);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), 0);
+	
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
 
-	// cstrncmp
-	tb_long_t r = data->pstr? tb_pstring_cstrncmp(data->pstr, s, n) : 0;
+		// cstrncmp
+		r = tb_pstring_cstrncmp(&data->pstr, s, n);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), 0);
@@ -807,19 +1047,26 @@ tb_long_t tb_rstring_cstrnicmp(tb_rstring_t* string, tb_char_t const* s, tb_size
 {
 	tb_assert_and_check_return_val(string, 0);
 
-	// get data
-	tb_rstring_data_t* data = tb_rstring_atomic_data_get(string);
-	tb_check_return_val(data, 0);
+	// init
+	tb_long_t r = 0;
 
-	// get mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(data);
+	// mutx
+	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
 	tb_check_return_val(mutx, 0);
 
 	// enter
 	tb_check_return_val(tb_mutex_enter(mutx), 0);
+	
+	// data
+	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	if (data)
+	{
+		// check 
+		tb_assert(data->refn);
 
-	// cstrnicmp
-	tb_long_t r = data->pstr? tb_pstring_cstrnicmp(data->pstr, s, n) : 0;
+		// cstrncmp
+		r = tb_pstring_cstrnicmp(&data->pstr, s, n);
+	}
 
 	// leave
 	tb_check_return_val(tb_mutex_leave(mutx), 0);

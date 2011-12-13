@@ -122,23 +122,33 @@ static tb_int_t tb_skip_atoi(tb_char_t const** s)
 }
 static tb_char_t* tb_printf_string(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_char_t const* s)
 {
-	tb_int_t n = tb_strnlen(s, e.precision);
-
-	// fill space at left side, e.g. "   abcd"
-	if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
+	if (s)
 	{
+		tb_int_t n = tb_strnlen(s, e.precision);
+
+		// fill space at left side, e.g. "   abcd"
+		if (!(e.flags & TB_PRINTF_FLAG_LEFT)) 
+		{
+			while (n < e.width--) 
+				if (pb < pe) *pb++ = ' ';
+		}
+
+		// copy string
+		tb_size_t i = 0;
+		for (i = 0; i < n; ++i)
+			if (pb < pe) *pb++ = *s++;
+
+		// fill space at right side, e.g. "abcd    "
 		while (n < e.width--) 
 			if (pb < pe) *pb++ = ' ';
 	}
-
-	// copy string
-	tb_size_t i = 0;
-	for (i = 0; i < n; ++i)
-		if (pb < pe) *pb++ = *s++;
-
-	// fill space at right side, e.g. "abcd    "
-	while (n < e.width--) 
-		if (pb < pe) *pb++ = ' ';
+	else 
+	{
+		if (pb < pe) *pb++ = 'n';
+		if (pb < pe) *pb++ = 'u';
+		if (pb < pe) *pb++ = 'l';
+		if (pb < pe) *pb++ = 'l';
+	}
 
 	return pb;
 }
