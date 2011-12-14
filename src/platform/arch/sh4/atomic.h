@@ -20,8 +20,8 @@
  * \file		atomic.h
  *
  */
-#ifndef TB_PLATFORM_ATOMIC_H
-#define TB_PLATFORM_ATOMIC_H
+#ifndef TB_PLATFORM_ARCH_SH4_ATOMIC_H
+#define TB_PLATFORM_ARCH_SH4_ATOMIC_H
 
 // c plus plus
 #ifdef __cplusplus
@@ -33,16 +33,6 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-
-#if defined(TB_COMPILER_IS_GCC) && \
-		(__GNUC__ >= 4 && __GNUC_MINOR__ >= 1)
-# 	include "compiler/gcc/atomic.h"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-# 	include "compiler/windows/atomic.h"
-#endif
-
-#include "arch/atomic.h"
-#include "stub/atomic.h"
 
 
 // c plus plus

@@ -10,6 +10,7 @@ NAMES = test \
 		scalar \
 		memops \
 		strops \
+		atomic \
 		pstring \
 		sstring \
 		rstring \
