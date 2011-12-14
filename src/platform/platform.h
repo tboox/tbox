@@ -38,6 +38,7 @@ extern "C" {
 #include "mutex.h"
 #include "socket.h"
 #include "thread.h"
+#include "atomic.h"
 
 
 // c plus plus

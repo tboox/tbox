@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		malloc.c
+ * \file		utils.c
  *
  */
 
@@ -25,26 +25,60 @@
  * includes
  */
 #include "prefix.h"
-#include <stdlib.h>
+#include "../../../libc/libc.h"
+#include "../../../math/math.h"
+#include <windows.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-tb_pointer_t tb_malloc(tb_size_t size)
+// usleep
+tb_void_t tb_usleep(tb_size_t us)
 {
-	return malloc(size);
+	tb_trace_noimpl();
 }
-tb_pointer_t tb_calloc(tb_size_t item, tb_size_t size)
+
+// msleep
+tb_void_t tb_msleep(tb_size_t ms)
 {
-	return calloc(item, size);
+	Sleep(ms);
 }
-tb_pointer_t tb_realloc(tb_pointer_t data, tb_size_t size)
+
+// sleep
+tb_void_t tb_sleep(tb_size_t s)
 {
-	return realloc(data, size);
+	Sleep(s * 1000);
 }
-tb_void_t tb_free(tb_pointer_t data)
+
+// printf
+tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
-	if (data) free(data);
+	tb_int_t ret = 0;
+	tb_char_t msg[4096];
+	tb_va_format(msg, 4096, fmt, &ret);
+	if (ret >= 0) msg[ret] = '\0';
+
+	printf("%s", msg);
 }
+
+// mclock
+tb_int64_t tb_mclock()
+{
+	DWORD ms = GetTickCount();
+	return tb_int32_to_int64(ms);
+}
+
+// uclock
+tb_int64_t tb_uclock()
+{
+	tb_trace_noimpl();
+	return TB_INT64_ZERO;
+}
+tb_int64_t tb_time()
+{
+	tb_trace_noimpl();
+	return TB_INT64_ZERO;
+}
+
 

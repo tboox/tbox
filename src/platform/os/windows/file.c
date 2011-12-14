@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../../string/string.h"
+#include "../../../string/string.h"
 #include <windows.h>
 
 /* /////////////////////////////////////////////////////////

@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "config.h"
+#include "keyword.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -59,52 +60,55 @@ extern "C" {
  */
 
 // basic
-typedef signed int				tb_int_t;
-typedef unsigned int			tb_uint_t;
-typedef signed long				tb_long_t;
-typedef unsigned long			tb_ulong_t;
-typedef tb_ulong_t				tb_size_t;
-typedef tb_int_t				tb_bool_t;
-typedef signed char				tb_int8_t;
-typedef tb_int8_t				tb_sint8_t;
-typedef unsigned char			tb_uint8_t;
-typedef signed short			tb_int16_t;
-typedef tb_int16_t				tb_sint16_t;
-typedef unsigned short			tb_uint16_t;
-typedef tb_int_t				tb_int32_t;
-typedef tb_int32_t				tb_sint32_t;
-typedef tb_uint_t				tb_uint32_t;
-typedef char 					tb_char_t;
-typedef tb_int32_t 				tb_wchar_t;
-typedef tb_int32_t 				tb_uchar_t;
-typedef tb_uint8_t				tb_byte_t;
-typedef void 					tb_void_t;
-typedef tb_void_t* 				tb_pointer_t;
-typedef tb_void_t const* 		tb_cpointer_t;
-typedef tb_pointer_t 			tb_handle_t;
+typedef signed int					tb_int_t;
+typedef unsigned int				tb_uint_t;
+typedef signed long					tb_long_t;
+typedef unsigned long				tb_ulong_t;
+typedef tb_ulong_t					tb_size_t;
+typedef tb_int_t					tb_bool_t;
+typedef signed char					tb_int8_t;
+typedef tb_int8_t					tb_sint8_t;
+typedef unsigned char				tb_uint8_t;
+typedef signed short				tb_int16_t;
+typedef tb_int16_t					tb_sint16_t;
+typedef unsigned short				tb_uint16_t;
+typedef tb_int_t					tb_int32_t;
+typedef tb_int32_t					tb_sint32_t;
+typedef tb_uint_t					tb_uint32_t;
+typedef char 						tb_char_t;
+typedef tb_int32_t 					tb_wchar_t;
+typedef tb_int32_t 					tb_uchar_t;
+typedef tb_uint8_t					tb_byte_t;
+typedef void 						tb_void_t;
+typedef tb_void_t* 					tb_pointer_t;
+typedef tb_void_t const* 			tb_cpointer_t;
+typedef tb_pointer_t 				tb_handle_t;
 
 // int64
-typedef signed long long 		tb_int64_t;
-typedef unsigned long long 		tb_uint64_t;
-typedef tb_int64_t				tb_sint64_t;
+typedef signed long long 			tb_int64_t;
+typedef unsigned long long 			tb_uint64_t;
+typedef tb_int64_t					tb_sint64_t;
 
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT
-typedef double 					tb_float_t;
+typedef double 						tb_float_t;
 #endif
 
 // fixed
-typedef tb_int32_t 				tb_fixed6_t;
-typedef tb_int32_t 				tb_fixed16_t;
-typedef tb_int32_t 				tb_fixed30_t;
-typedef tb_fixed16_t 			tb_fixed_t;
+typedef tb_int32_t 					tb_fixed6_t;
+typedef tb_int32_t 					tb_fixed16_t;
+typedef tb_int32_t 					tb_fixed30_t;
+typedef tb_fixed16_t 				tb_fixed_t;
 
 // scalar
 #ifdef TB_CONFIG_TYPE_SCALAR_IS_FIXED
-typedef tb_fixed_t 				tb_scalar_t;
+typedef tb_fixed_t 					tb_scalar_t;
 #else
-typedef tb_float_t 				tb_scalar_t;
+typedef tb_float_t 					tb_scalar_t;
 #endif
+
+// atomic
+typedef __tb_volatile__ tb_size_t 	tb_atomic_t;
 
 // c plus plus
 #ifdef __cplusplus

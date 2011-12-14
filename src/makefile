@@ -115,21 +115,78 @@ tbox_C_FILES 			+= \
 						libc/string/strnrchr \
 						libc/string/strnirchr
 
-
-ifneq ($(TB_CONFIG_PLAT),)
-tbox_C_FILES 			+= \
-						platform/$(TB_CONFIG_PLAT)/file \
-						platform/$(TB_CONFIG_PLAT)/utils \
-						platform/$(TB_CONFIG_PLAT)/mutex \
-						platform/$(TB_CONFIG_PLAT)/audio \
-						platform/$(TB_CONFIG_PLAT)/socket \
-						platform/$(TB_CONFIG_PLAT)/thread
-
+# pool
 ifeq ($(TB_CONFIG_MEMORY_POOL_ENABLE),n)
 tbox_C_FILES 			+= \
-						platform/$(TB_CONFIG_PLAT)/malloc 
+						platform/libc/malloc 
 endif
+
+# linux_x86
+ifeq ($(TB_CONFIG_PLAT),linux_x86)
+tbox_C_FILES 			+= \
+						platform/os/unix/audio \
+						platform/os/unix/file \
+						platform/os/unix/utils \
+						platform/os/unix/mutex \
+						platform/os/unix/socket \
+						platform/os/unix/thread
 endif
+
+# ios4_x86
+ifeq ($(TB_CONFIG_PLAT),ios4_x86)
+tbox_C_FILES 			+= \
+						platform/null/audio \
+						platform/os/unix/file \
+						platform/os/unix/utils \
+						platform/os/unix/mutex \
+						platform/os/unix/socket \
+						platform/os/unix/thread
+endif
+
+# mac_x86
+ifeq ($(TB_CONFIG_PLAT),mac_x86)
+tbox_C_FILES 			+= \
+						platform/null/audio \
+						platform/os/unix/file \
+						platform/os/unix/utils \
+						platform/os/unix/mutex \
+						platform/os/unix/socket \
+						platform/os/unix/thread
+endif
+
+# windows_x86
+ifeq ($(TB_CONFIG_PLAT),windows_x86)
+tbox_C_FILES 			+= \
+						platform/null/audio \
+						platform/os/windows/file \
+						platform/os/windows/utils \
+						platform/os/windows/mutex \
+						platform/os/windows/socket \
+						platform/os/windows/thread
+endif
+
+# linux_arm
+ifeq ($(TB_CONFIG_PLAT),linux_arm)
+tbox_C_FILES 			+= \
+						platform/null/audio \
+						platform/os/unix/file \
+						platform/os/unix/utils \
+						platform/os/unix/mutex \
+						platform/os/unix/socket \
+						platform/os/unix/thread
+endif
+
+# android_arm
+ifeq ($(TB_CONFIG_PLAT),android_arm)
+tbox_C_FILES 			+= \
+						platform/null/audio \
+						platform/os/unix/file \
+						platform/os/unix/utils \
+						platform/os/unix/mutex \
+						platform/os/unix/socket \
+						platform/os/unix/thread
+endif
+
 
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
 tbox_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
@@ -202,6 +259,12 @@ INC_FILES 				= \
 						platform/audio.h \
 						platform/thread.h \
 						platform/socket.h \
+						platform/atomic.h \
+						platform/compiler/prefix.h \
+						platform/compiler/gcc/prefix.h \
+						platform/compiler/gcc/atomic.h \
+						platform/stub/prefix.h \
+						platform/stub/atomic.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \
