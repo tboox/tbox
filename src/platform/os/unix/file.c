@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../../math/math.h"
+#include "../../../math/math.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>

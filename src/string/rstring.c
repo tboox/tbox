@@ -27,6 +27,7 @@
 #include "rstring.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -43,18 +44,12 @@
 static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_get(tb_rstring_t const* string)
 {
 	tb_check_return_val(string && string->mutx, TB_NULL);
-
-	// FIXME: atomic
-	return *(string->mutx);
+	return tb_atomic_get(string->mutx);
 }
 static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_del(tb_rstring_t* string)
 {
-	tb_check_return(string && string->mutx);
-
-	// FIXME: atomic
-	tb_handle_t mutx = *(string->mutx);
-	*(string->mutx) = TB_NULL;
-	return mutx;
+	tb_check_return_val(string && string->mutx, TB_NULL);
+	return tb_atomic_fetch_and_set0(string->mutx);
 }
 
 /* ////////////////////////////////////////////////////////////////////////
