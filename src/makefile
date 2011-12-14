@@ -263,6 +263,14 @@ INC_FILES 				= \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \
+						platform/arch/prefix.h \
+						platform/arch/atomic.h \
+						platform/arch/x86/prefix.h \
+						platform/arch/x86/atomic.h \
+						platform/arch/arm/prefix.h \
+						platform/arch/arm/atomic.h \
+						platform/arch/sh4/prefix.h \
+						platform/arch/sh4/atomic.h \
 						platform/stub/prefix.h \
 						platform/stub/atomic.h \
 						network/prefix.h \

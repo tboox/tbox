@@ -69,7 +69,7 @@ output : .null
 # make error
 error : .null
 	@echo error $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep -P "error|undefined"
+	@cat /tmp/$(PRO_NAME).out | grep -P "error|Error|undefined"
 
 # make warning
 warning : .null
