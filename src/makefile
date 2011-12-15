@@ -16,6 +16,7 @@ tbox_C_FILES 			+= \
 						math/fixed16 \
 						memory/gpool \
 						memory/malloc \
+						memory/pbuffer \
 						string/pstring \
 						string/sstring \
 						string/rstring \
@@ -213,10 +214,11 @@ INC_FILES 				= \
 						prefix/abort.h \
 						prefix/trace.h \
 						prefix/config.h \
+						memory/gpool.h \
 						memory/prefix.h \
 						memory/memory.h \
 						memory/malloc.h \
-						memory/gpool.h \
+						memory/pbuffer.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

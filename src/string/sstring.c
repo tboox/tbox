@@ -199,7 +199,7 @@ tb_long_t tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_char_
 tb_char_t const* tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_sstring_cstrncpy(string, s, tb_sstring_size(s));
+	return tb_sstring_cstrncpy(string, tb_sstring_cstr(s), tb_sstring_size(s));
 }
 tb_char_t const* tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s)
 {
@@ -269,7 +269,7 @@ tb_char_t const* tb_sstring_chrncat(tb_sstring_t* string, tb_char_t c, tb_size_t
 tb_char_t const* tb_sstring_strcat(tb_sstring_t* string, tb_sstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_sstring_cstrncat(string, s, tb_sstring_size(s));
+	return tb_sstring_cstrncat(string, tb_sstring_cstr(s), tb_sstring_size(s));
 }
 tb_char_t const* tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s)
 {

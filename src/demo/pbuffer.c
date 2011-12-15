@@ -10,17 +10,14 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-	tb_pstring_t s;
-	tb_pstring_init(&s);
+	tb_pbuffer_t b;
+	tb_pbuffer_init(&b);
 
-	tb_pstring_cstrcpy(&s, "hello");
-	tb_pstring_chrcat(&s, 'y');
-//	tb_pstring_cstrfcat(&s, "%s", "world");
-//	tb_pstring_chrcat(&s, ' ');
-//	tb_pstring_chrncat(&s, 'x', 5);
-	tb_print("%d: %s", tb_pstring_size(&s), tb_pstring_cstr(&s));
+	tb_pbuffer_pmemcpy(&b, "hello ", 6);
+	tb_pbuffer_pmemcat(&b, "world", 6);
+	tb_print("%s", tb_pbuffer_data(&b));
 
-	tb_pstring_exit(&s);
+	tb_pbuffer_exit(&b);
 
 	return 0;
 }

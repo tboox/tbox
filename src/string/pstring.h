@@ -27,24 +27,14 @@
  * includes
  */
 #include "prefix.h"
+#include "../memory/memory.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * types
  */
 
 // the scoped string type
-typedef struct __tb_pstring_t
-{
-	// the string data
-	tb_char_t* 		data;
-
-	// the string size
-	tb_size_t 		size;
-
-	// the string maxn
-	tb_size_t 		maxn;
-
-}tb_pstring_t;
+typedef tb_pbuffer_t 	tb_pstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
