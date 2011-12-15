@@ -14,6 +14,7 @@ NAMES = test \
 		pstring \
 		sstring \
 		rstring \
+		mstring \
 		cookies \
 		gstream \
 		estream \
