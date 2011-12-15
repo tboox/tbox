@@ -11,7 +11,6 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	tb_atomic_t a;
-#if 0
 	tb_atomic_set0(&a);
 	tb_print("%d", tb_atomic_get(&a));
 	tb_print("%d", tb_atomic_fetch_and_set(&a, 1));
@@ -25,12 +24,6 @@ int main(int argc, char** argv)
 	tb_print("%d", tb_atomic_dec_and_fetch(&a));
 	tb_print("%d", tb_atomic_add_and_fetch(&a, 10));
 	tb_print("%d", tb_atomic_sub_and_fetch(&a, 10));
-#endif
 
-	tb_atomic_set(&a, 2000);
-	tb_print("%d", tb_atomic_get(&a));
-	tb_print("%d", tb_atomic_fetch_and_pset(&a, 2000, 2));
-	tb_print("%d", tb_atomic_fetch_and_set(&a, 2));
-	tb_print("%d", tb_atomic_get(&a));
 	return 0;
 }
