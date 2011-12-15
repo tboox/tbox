@@ -33,71 +33,10 @@
  */
 // the maximum grow size of value string 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_PSTRING_GROW_SIZE 		(64)
 # 	define TB_PSTRING_FMTD_SIZE 		(4096)
 #else
-# 	define TB_PSTRING_GROW_SIZE 		(256)
 # 	define TB_PSTRING_FMTD_SIZE 		(8192)
 #endif
-
-/* ////////////////////////////////////////////////////////////////////////
- * resize
- */
-static tb_bool_t tb_pstring_resize(tb_pstring_t* string, tb_size_t size)
-{
-	tb_assert_and_check_return_val(string, TB_FALSE);
-
-	// save it
-	tb_pstring_t s = *string;
-	
-	// null?
-	if (!string->data) 
-	{
-		// check size
-		tb_assert(!string->size && size);
-
-		// compute size
-		string->size = size;
-		string->maxn = tb_align8(size + TB_PSTRING_GROW_SIZE);
-		tb_assert_and_check_goto(size < string->maxn, fail);
-
-		// alloc data
-		string->data = tb_malloc(string->maxn);
-		tb_assert_and_check_goto(string->data, fail);
-		string->data[size] = '\0';
-	}
-	// decrease
-	else if (size < string->maxn)
-	{
-		string->size = size;
-		string->data[size] = '\0';
-	}
-	// increase
-	else
-	{
-		// compute size
-		string->maxn = tb_align8(size + TB_PSTRING_GROW_SIZE);
-		tb_assert_and_check_goto(size < string->maxn, fail);
-
-		// realloc
-		string->size = size;
-		string->data = tb_realloc(string->data, string->maxn);
-		tb_assert_and_check_goto(string->data, fail);
-		string->data[size] = '\0';
-	}
-
-	// ok
-	return TB_TRUE;
-
-fail:
-
-	// restore it
-	*string = s;
-
-	// failed
-	tb_trace("failed to resize string: %s", s.data? s.data : "");
-	return TB_FALSE;
-}
 
 /* ////////////////////////////////////////////////////////////////////////
  * init & exit
@@ -105,16 +44,11 @@ fail:
 tb_bool_t tb_pstring_init(tb_pstring_t* string)
 {
 	tb_assert_and_check_return_val(string, TB_FALSE);
-	tb_memset(string, 0, sizeof(tb_pstring_t));
-	return TB_TRUE;
+	return tb_pbuffer_init(string);
 }
 tb_void_t tb_pstring_exit(tb_pstring_t* string)
 {
-	if (string)
-	{
-		if (string->data) tb_free(string->data);
-		tb_memset(string, 0, sizeof(tb_pstring_t));
-	}
+	if (string) tb_pbuffer_exit(string);
 }
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -123,12 +57,13 @@ tb_void_t tb_pstring_exit(tb_pstring_t* string)
 tb_char_t const* tb_pstring_cstr(tb_pstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
-	return (tb_char_t const*)string->data;
+	return (tb_char_t const*)tb_pbuffer_data(string);
 }
 tb_size_t tb_pstring_size(tb_pstring_t const* string)
 {
 	tb_assert_and_check_return_val(string, 0);
-	return string->size;
+	tb_size_t n = tb_pbuffer_size(string);
+	return n > 0? n - 1 : 0;
 }
 
 
@@ -138,19 +73,19 @@ tb_size_t tb_pstring_size(tb_pstring_t const* string)
 tb_void_t tb_pstring_clear(tb_pstring_t* string)
 {
 	tb_assert_and_check_return(string);
-	string->size = 0;
-	if (string->data) string->data[0] = '\0';
+	tb_pbuffer_clear(string);
 }
 tb_char_t const* tb_pstring_strip(tb_pstring_t* string, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
 	// out?
-	tb_check_return_val(n < string->maxn, string->data);
+	tb_check_return_val(n < tb_pbuffer_size(string), tb_pbuffer_data(string));
 
 	// strip
-	string->size = n;
-	if (string->data) string->data[n] = '\0';
+	tb_char_t* p = tb_pbuffer_resize(string, n + 1);
+	if (p) p[n] = '\0';
+	return p;
 }
 /* ////////////////////////////////////////////////////////////////////////
  * strchr
@@ -263,7 +198,7 @@ tb_long_t tb_pstring_cstrirstr(tb_pstring_t const* string, tb_size_t p, tb_char_
 tb_char_t const* tb_pstring_strcpy(tb_pstring_t* string, tb_pstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_pstring_cstrncpy(string, s, tb_pstring_size(s));
+	return tb_pstring_cstrncpy(string, tb_pstring_cstr(s), tb_pstring_size(s));
 }
 tb_char_t const* tb_pstring_cstrcpy(tb_pstring_t* string, tb_char_t const* s)
 {
@@ -274,18 +209,7 @@ tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	// resize
-	if (!tb_pstring_resize(string, n)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == n);
-
-	// copy data
-	tb_memcpy(string->data, s, n);
-	string->data[n] = '\0';
-
-	// ok
-	return string->data;
+	return tb_pbuffer_pmemcpy(string, s, n + 1);
 }
 tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
@@ -305,42 +229,33 @@ tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt,
 tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
-
-	// get old size
-	tb_size_t n = string->size;
-
-	// resize
-	if (!tb_pstring_resize(string, n + 1)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == n + 1);
-
-	// append char
-	string->data[n] = c;
-	string->data[n + 1] = '\0';
-
-	// ok
-	return string->data;
+	
+#error
+	tb_size_t size = tb_pstring_size(string);
+	tb_char_t* p = tb_pbuffer_resize(string, (size? (size + 1) : 2));
+	if (p)
+	{
+		size = tb_pstring_size(string);
+		tb_assert_and_check_return_val(size > 0, TB_NULL);
+		p[size - 1] = c;
+		p[size] = '\0';
+	}
+	return p;
 }
 tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
-	// get old size
-	tb_size_t on = string->size;
-
-	// resize
-	if (!tb_pstring_resize(string, on + n)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == on + n);
-
-	// append chars
-	tb_memset(string->data + n, c, n);
-	string->data[on + n] = '\0';
-
-	// ok
-	return string->data;
+	tb_size_t size = tb_pbuffer_size(string);
+	tb_char_t* p = tb_pbuffer_resize(string, (size? (size + n) : (n + 1)));
+	if (p)
+	{
+		size = tb_pbuffer_size(string);
+		tb_assert_and_check_return_val(size > n, TB_NULL);
+		tb_memset(p + size - n - 1, c, n);
+		p[size] = '\0';
+	}
+	return p;
 }
 /* ////////////////////////////////////////////////////////////////////////
  * strcat
@@ -348,7 +263,7 @@ tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t
 tb_char_t const* tb_pstring_strcat(tb_pstring_t* string, tb_pstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_pstring_cstrncat(string, s, tb_pstring_size(s));
+	return tb_pstring_cstrncat(string, tb_pstring_cstr(s), tb_pstring_size(s));
 }
 tb_char_t const* tb_pstring_cstrcat(tb_pstring_t* string, tb_char_t const* s)
 {
@@ -359,24 +274,7 @@ tb_char_t const* tb_pstring_cstrncat(tb_pstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	// copy it if null
-	if (!string->size) return tb_pstring_cstrncpy(string, s, n);
-
-	// get old size
-	tb_size_t on = string->size;
-
-	// resize
-	if (!tb_pstring_resize(string, on + n)) return TB_NULL;
-
-	// check
-	tb_assert(string->data && string->size == on + n);
-
-	// copy data
-	tb_memcpy(string->data + on, s, n);
-	string->data[on + n] = '\0';
-
-	// ok
-	return string->data;
+	return tb_pbuffer_pmemcat(string, s, n + 1);
 }
 tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
@@ -416,12 +314,12 @@ tb_long_t tb_pstring_cstricmp(tb_pstring_t* string, tb_char_t const* s)
 }
 tb_long_t tb_pstring_cstrncmp(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && string->data && s, 0);
-	return tb_strncmp(string->data, s, n);
+	tb_assert_and_check_return_val(string && s, 0);
+	return tb_strncmp(tb_pstring_cstr(string), s, n);
 }
 tb_long_t tb_pstring_cstrnicmp(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && string->data && s, 0);
-	return tb_strnicmp(string->data, s, n);
+	tb_assert_and_check_return_val(string && s, 0);
+	return tb_strnicmp(tb_pstring_cstr(string), s, n);
 }
 
