@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 #ifndef tb_atomic_set0
-# 	define tb_atomic_set0(a) 					tb_atomic_set0_x86(a)
+# 	define tb_atomic_set0(a) 					tb_atomic_set_x86(a, 0)
 #endif
 
 #ifndef tb_atomic_pset
@@ -67,21 +67,38 @@ extern "C" {
 # 	define tb_atomic_fetch_and_pset(a, p, v) 	tb_atomic_fetch_and_pset_x86(a, p, v)
 #endif
 
-#endif // TB_CONFIG_ASSEMBLER_GAS
+#ifndef tb_atomic_fetch_and_inc
+# 	define tb_atomic_fetch_and_inc(a) 			tb_atomic_fetch_and_add_x86(a, 1)
+#endif
+
+#ifndef tb_atomic_fetch_and_dec
+# 	define tb_atomic_fetch_and_dec(a) 			tb_atomic_fetch_and_add_x86(a, -1)
+#endif
+
+#ifndef tb_atomic_fetch_and_add
+# 	define tb_atomic_fetch_and_add(a, v) 		tb_atomic_fetch_and_add_x86(a, v)
+#endif
+
+#ifndef tb_atomic_fetch_and_sub
+# 	define tb_atomic_fetch_and_sub(a, v) 		tb_atomic_fetch_and_add_x86(a, -(v))
+#endif
+
 
 /* /////////////////////////////////////////////////////////
  * get & set
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
 static __tb_inline__ tb_void_t tb_atomic_set_x86(tb_atomic_t* a, tb_size_t v)
 {
 	tb_assert(a);
 
 	__tb_asm__ __tb_volatile__ 
 	(
+#if TB_CPU_BITSIZE == 64
+		"lock xchgq %1, %0\n" 	//!< xchgq v, [a]
+#else
 		"lock xchgl %1, %0\n" 	//!< xchgl v, [a]
-
+#endif
 		:
 		: "m" (*a), "r"(v) 
 		: "memory"
@@ -93,10 +110,14 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_x86(tb_atomic_t* a, tb_si
 
 	__tb_asm__ __tb_volatile__ 
 	(
-		"lock xchgl %2, %1\n" 	//!< xchgl v, [a]
+#if TB_CPU_BITSIZE == 64
+		"lock xchgq %0, %1\n" 	//!< xchgq v, [a]
+#else
+		"lock xchgl %0, %1\n" 	//!< xchgl v, [a]
+#endif
 
-		: "=r" (v) 
-		: "m" (*a), "0"(v) 
+		: "+r" (v) 
+		: "m" (*a)
 		: "memory"
 	);
 
@@ -123,8 +144,11 @@ static __tb_inline__ tb_void_t tb_atomic_pset_x86(tb_atomic_t* a, tb_size_t p, t
 	 */
 	__tb_asm__ __tb_volatile__ 
 	(
+#if TB_CPU_BITSIZE == 64
+		"lock cmpxchgq 	%2, %0 	\n" 	//!< cmpxchgq v, [a]
+#else
 		"lock cmpxchgl 	%2, %0 	\n" 	//!< cmpxchgl v, [a]
-
+#endif
 		:
 		: "m" (*a), "a" (p), "r" (v) 
 		: "cc", "memory" 				//!< "cc" means that flags were changed.
@@ -152,7 +176,11 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_s
 	tb_size_t o;
 	__tb_asm__ __tb_volatile__ 
 	(
+#if TB_CPU_BITSIZE == 64
 		"lock cmpxchgl 	%3, %1 	\n" 	//!< cmpxchgl v, [a]
+#else
+		"lock cmpxchgq 	%3, %1 	\n" 	//!< cmpxchgq v, [a]
+#endif
 
 		: "=a" (o) 
 		: "m" (*a), "a" (p), "r" (v) 
@@ -161,7 +189,40 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_x86(tb_atomic_t* a, tb_s
 
     return o;
 }
+
+/* /////////////////////////////////////////////////////////
+ * fetch and ...
+ */
+
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_x86(tb_atomic_t* a, tb_long_t v)
+{
+	/*
+	 * xaddl v, [a]:
+	 *
+	 * o = [a]
+	 * [a] += v;
+	 * v = o;
+	 *
+	 * cf, ef, of, sf, zf, pf... maybe changed
+	 */
+	__tb_asm__ __tb_volatile__ 
+	(
+#if TB_CPU_BITSIZE == 64
+		"lock xaddq %0, %1 \n" 			//!< xaddq v, [a]
+#else
+		"lock xaddl %0, %1 \n" 			//!< xaddl v, [a]
 #endif
+
+		: "+r" (v) 
+		: "m" (*a) 
+		: "cc", "memory"
+	);
+
+    return v;
+}
+
+
+#endif // TB_CONFIG_ASSEMBLER_GAS
 
 
 // c plus plus
