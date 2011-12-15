@@ -33,7 +33,7 @@
  * types
  */
 
-// the shared string data type
+// the reference string data type
 typedef struct __tb_rstring_data_t
 {
 	// the string refn
@@ -46,17 +46,13 @@ typedef struct __tb_rstring_data_t
 
 /* the shared string type
  *
- *                (atomic)       (mutex)
  * rstring => shared pointer => shared data
- *
+ *      (no safed)
  */
 typedef struct __tb_rstring_t
 {
 	// the shared data
 	tb_rstring_data_t** 	data;
-
-	// the shared mutex
-	tb_handle_t* 			mutx;
 
 }tb_rstring_t;
 
@@ -69,7 +65,7 @@ tb_bool_t			tb_rstring_init(tb_rstring_t* string);
 tb_void_t 			tb_rstring_exit(tb_rstring_t* string);
 
 // accessors
-tb_char_t const* 	tb_rstring_cstr(tb_rstring_t const* string); //!< no safe, need enter the mutex scope
+tb_char_t const* 	tb_rstring_cstr(tb_rstring_t const* string);
 tb_size_t 			tb_rstring_size(tb_rstring_t const* string);
 tb_size_t 			tb_rstring_refn(tb_rstring_t const* string);
 
@@ -77,10 +73,6 @@ tb_size_t 			tb_rstring_refn(tb_rstring_t const* string);
 tb_void_t 			tb_rstring_clear(tb_rstring_t* string);
 tb_size_t 			tb_rstring_incr(tb_rstring_t* string);
 tb_size_t 			tb_rstring_decr(tb_rstring_t* string);
-
-// enter & leave
-tb_bool_t 			tb_rstring_enter(tb_rstring_t const* string);
-tb_bool_t 			tb_rstring_leave(tb_rstring_t const* string);
 
 // strchr
 tb_long_t 			tb_rstring_strchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c);

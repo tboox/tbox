@@ -27,7 +27,6 @@
 #include "rstring.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
-#include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros
@@ -37,20 +36,6 @@
 #else
 # 	define TB_RSTRING_FMTD_SIZE 		(8192)
 #endif
-
-/* ////////////////////////////////////////////////////////////////////////
- * atomic
- */
-static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_get(tb_rstring_t const* string)
-{
-	tb_check_return_val(string && string->mutx, TB_NULL);
-	return tb_atomic_get(string->mutx);
-}
-static __tb_inline__ tb_handle_t tb_rstring_atomic_mutx_del(tb_rstring_t* string)
-{
-	tb_check_return_val(string && string->mutx, TB_NULL);
-	return tb_atomic_fetch_and_set0(string->mutx);
-}
 
 /* ////////////////////////////////////////////////////////////////////////
  * init & exit
@@ -83,13 +68,6 @@ tb_char_t const* tb_rstring_cstr(tb_rstring_t const* string)
 	// init
 	tb_char_t const* s = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, TB_NULL);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -101,9 +79,6 @@ tb_char_t const* tb_rstring_cstr(tb_rstring_t const* string)
 		s = tb_pstring_cstr(&data->pstr);
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
-
 	return s;
 }
 tb_size_t tb_rstring_size(tb_rstring_t const* string)
@@ -112,13 +87,6 @@ tb_size_t tb_rstring_size(tb_rstring_t const* string)
 
 	// init
 	tb_size_t n = 0;
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, 0);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), 0);
 
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
@@ -131,9 +99,6 @@ tb_size_t tb_rstring_size(tb_rstring_t const* string)
 		n = tb_pstring_size(&data->pstr);
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), 0);
-
 	return n;
 }
 tb_size_t tb_rstring_refn(tb_rstring_t const* string)
@@ -142,13 +107,6 @@ tb_size_t tb_rstring_refn(tb_rstring_t const* string)
 
 	// init
 	tb_size_t r = 0;
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, 0);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), 0);
 
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
@@ -161,9 +119,6 @@ tb_size_t tb_rstring_refn(tb_rstring_t const* string)
 		r = data->refn;
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), 0);
-
 	return r;
 }
 
@@ -173,13 +128,6 @@ tb_size_t tb_rstring_refn(tb_rstring_t const* string)
 tb_void_t tb_rstring_clear(tb_rstring_t* string)
 {
 	tb_assert_and_check_return(string);
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return(mutx);
-
-	// enter
-	tb_check_return(tb_mutex_enter(mutx));
 
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
@@ -191,9 +139,6 @@ tb_void_t tb_rstring_clear(tb_rstring_t* string)
 		// clear
 		tb_pstring_clear(&data->pstr);
 	}
-
-	// leave
-	tb_check_return(tb_mutex_leave(mutx));
 }
 tb_char_t const* tb_rstring_strip(tb_rstring_t* string, tb_size_t n)
 {
@@ -201,13 +146,6 @@ tb_char_t const* tb_rstring_strip(tb_rstring_t* string, tb_size_t n)
 
 	// init
 	tb_char_t const* s = TB_NULL;
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, TB_NULL);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
 
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
@@ -219,9 +157,6 @@ tb_char_t const* tb_rstring_strip(tb_rstring_t* string, tb_size_t n)
 		// cstr
 		s = tb_pstring_strip(&data->pstr, n);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
 
 	return s;
 }
@@ -235,21 +170,9 @@ tb_size_t tb_rstring_incr(tb_rstring_t* string)
 	// data
 	tb_rstring_data_t* data = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	if (!mutx)
+	// init
+	if (!string->data)
 	{
-		// init mutx
-		mutx = tb_mutex_init("rsting");
-		tb_assert_and_check_goto(mutx, fail);
-
-		// alloc the shared mutx 
-		string->mutx = tb_calloc(1, sizeof(tb_handle_t));
-		tb_assert_and_check_goto(string->mutx, fail);
-	
-		// init the shared mutx
-		*(string->mutx) = mutx;
-	
 		// alloc the shared data pointer
 		string->data = tb_calloc(1, sizeof(tb_rstring_data_t*));
 		tb_assert_and_check_goto(string->data, fail);
@@ -269,11 +192,8 @@ tb_size_t tb_rstring_incr(tb_rstring_t* string)
 	}
 	else
 	{
-		// enter
-		tb_check_return_val(tb_mutex_enter(mutx), 0);
-
 		// data
-		data = string->data? *(string->data) : TB_NULL;
+		data = *(string->data);
 		if (data)
 		{
 			// check 
@@ -282,9 +202,6 @@ tb_size_t tb_rstring_incr(tb_rstring_t* string)
 			// refn++
 			r = ++data->refn;
 		}
-
-		// leave
-		tb_check_return_val(tb_mutex_leave(mutx), 0);
 	}
 
 	return r;
@@ -295,12 +212,6 @@ fail:
 
 	// free data pointer
 	if (string->data) tb_free(string->data);
-
-	// free mutx
-	if (string->mutx) tb_free(string->mutx);
-
-	// exit mutx
-	if (mutx) tb_mutex_exit(mutx);
 
 	// clear
 	tb_memset(string, 0, sizeof(tb_rstring_t));
@@ -313,13 +224,6 @@ tb_size_t tb_rstring_decr(tb_rstring_t* string)
 
 	// init
 	tb_size_t r = 0;
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, 0);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), 0);
 
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
@@ -345,50 +249,7 @@ tb_size_t tb_rstring_decr(tb_rstring_t* string)
 		}
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), 0);
-
-	// free mutx
-	if (!r)
-	{
-		// atomic remove mutx
-		mutx = tb_rstring_atomic_mutx_del(string);
-		if (mutx) //!< only one get it
-		{
-			// exit mutex
-			tb_mutex_exit(mutx);
-
-			// free it
-			tb_free(string->mutx);
-		}
-	}
-
 	return r;
-}
-/* ////////////////////////////////////////////////////////////////////////
- * enter & leave
- */
-tb_bool_t tb_rstring_enter(tb_rstring_t const* string)
-{
-	tb_assert_and_check_return_val(string, TB_FALSE);
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, TB_FALSE);
-
-	// enter
-	return tb_mutex_enter(mutx);
-}
-tb_bool_t tb_rstring_leave(tb_rstring_t const* string)
-{
-	tb_assert_and_check_return_val(string, TB_FALSE);
-
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, TB_FALSE);
-
-	// leave
-	return tb_mutex_leave(mutx);
 }
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -401,13 +262,6 @@ tb_long_t tb_rstring_strchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -419,9 +273,6 @@ tb_long_t tb_rstring_strchr(tb_rstring_t const* string, tb_size_t p, tb_char_t c
 		r = tb_pstring_strchr(&data->pstr, p, c);
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
-
 	return r;
 }
 tb_long_t tb_rstring_strichr(tb_rstring_t const* string, tb_size_t p, tb_char_t c)
@@ -431,13 +282,6 @@ tb_long_t tb_rstring_strichr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -445,12 +289,9 @@ tb_long_t tb_rstring_strichr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strichr
 		r = tb_pstring_strichr(&data->pstr, p, c);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -465,13 +306,6 @@ tb_long_t tb_rstring_strrchr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -479,12 +313,9 @@ tb_long_t tb_rstring_strrchr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strrchr
 		r = tb_pstring_strrchr(&data->pstr, p, c);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -495,13 +326,6 @@ tb_long_t tb_rstring_strirchr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -509,12 +333,9 @@ tb_long_t tb_rstring_strirchr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strirchr
 		r = tb_pstring_strirchr(&data->pstr, p, c);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -529,13 +350,6 @@ tb_long_t tb_rstring_strstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -543,12 +357,9 @@ tb_long_t tb_rstring_strstr(tb_rstring_t const* string, tb_size_t p, tb_rstring_
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strstr
 		r = tb_pstring_strstr(&data->pstr, p, s);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -559,13 +370,6 @@ tb_long_t tb_rstring_stristr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -573,12 +377,9 @@ tb_long_t tb_rstring_stristr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// stristr
 		r = tb_pstring_stristr(&data->pstr, p, s);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -589,13 +390,6 @@ tb_long_t tb_rstring_cstrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -603,12 +397,9 @@ tb_long_t tb_rstring_cstrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t 
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// cstrstr
 		r = tb_pstring_cstrstr(&data->pstr, p, s2);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -619,13 +410,6 @@ tb_long_t tb_rstring_cstristr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -633,12 +417,9 @@ tb_long_t tb_rstring_cstristr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// cstristr
 		r = tb_pstring_cstristr(&data->pstr, p, s2);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -653,13 +434,6 @@ tb_long_t tb_rstring_strrstr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -667,12 +441,9 @@ tb_long_t tb_rstring_strrstr(tb_rstring_t const* string, tb_size_t p, tb_rstring
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strrstr
 		r = tb_pstring_strrstr(&data->pstr, p, s);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -683,13 +454,6 @@ tb_long_t tb_rstring_strirstr(tb_rstring_t const* string, tb_size_t p, tb_rstrin
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -697,12 +461,9 @@ tb_long_t tb_rstring_strirstr(tb_rstring_t const* string, tb_size_t p, tb_rstrin
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// strirstr
 		r = tb_pstring_strirstr(&data->pstr, p, s);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -714,13 +475,6 @@ tb_long_t tb_rstring_cstrrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -728,12 +482,9 @@ tb_long_t tb_rstring_cstrrstr(tb_rstring_t const* string, tb_size_t p, tb_char_t
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// cstrrstr
 		r = tb_pstring_cstrrstr(&data->pstr, p, s2);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -744,13 +495,6 @@ tb_long_t tb_rstring_cstrirstr(tb_rstring_t const* string, tb_size_t p, tb_char_
 	// init
 	tb_long_t r = -1;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, -1);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), -1);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -758,12 +502,9 @@ tb_long_t tb_rstring_cstrirstr(tb_rstring_t const* string, tb_size_t p, tb_char_
 		// check 
 		tb_assert(data->refn);
 
-		// strchr
+		// cstrirstr
 		r = tb_pstring_cstrirstr(&data->pstr, p, s2);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), -1);
 
 	return r;
 }
@@ -799,34 +540,20 @@ tb_char_t const* tb_rstring_cstrncpy(tb_rstring_t* string, tb_char_t const* s, t
 	// init
 	tb_char_t const* r = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	if (!mutx)
-	{
-		// refn++
-		tb_rstring_incr(string);
-
-		// mutx
-		mutx = tb_rstring_atomic_mutx_get(string);
-		tb_assert_and_check_return_val(mutx, TB_NULL);
-	}
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
+	// no data? refn++
+	if (!string->data) tb_rstring_incr(string);
+	tb_assert_and_check_return_val(string->data, TB_NULL);
 
 	// data
-	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	tb_rstring_data_t* data = *(string->data);
 	if (data)
 	{
 		// check 
 		tb_assert(data->refn);
 
-		// cstrcat
+		// cstrncpy
 		r = tb_pstring_cstrncpy(&data->pstr, s, n);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
 
 	return r;
 }
@@ -852,34 +579,20 @@ tb_char_t const* tb_rstring_chrcat(tb_rstring_t* string, tb_char_t c)
 	// init
 	tb_char_t const* r = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	if (!mutx)
-	{
-		// refn++
-		tb_rstring_incr(string);
-
-		// mutx
-		mutx = tb_rstring_atomic_mutx_get(string);
-		tb_assert_and_check_return_val(mutx, TB_NULL);
-	}
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
+	// no data? refn++
+	if (!string->data) tb_rstring_incr(string);
+	tb_assert_and_check_return_val(string->data, TB_NULL);
 
 	// data
-	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	tb_rstring_data_t* data = *(string->data);
 	if (data)
 	{
 		// check 
 		tb_assert(data->refn);
 
-		// cstrcat
+		// chrcat
 		r = tb_pstring_chrcat(&data->pstr, c);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
 
 	return r;
 }
@@ -890,34 +603,20 @@ tb_char_t const* tb_rstring_chrncat(tb_rstring_t* string, tb_char_t c, tb_size_t
 	// init
 	tb_char_t const* r = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	if (!mutx)
-	{
-		// refn++
-		tb_rstring_incr(string);
-
-		// mutx
-		mutx = tb_rstring_atomic_mutx_get(string);
-		tb_assert_and_check_return_val(mutx, TB_NULL);
-	}
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
+	// no data? refn++
+	if (!string->data) tb_rstring_incr(string);
+	tb_assert_and_check_return_val(string->data, TB_NULL);
 
 	// data
-	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
+	tb_rstring_data_t* data = *(string->data);
 	if (data)
 	{
 		// check 
 		tb_assert(data->refn);
 
-		// cstrcat
+		// chrncat
 		r = tb_pstring_chrncat(&data->pstr, c, n);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
 
 	return r;
 }
@@ -949,13 +648,6 @@ tb_char_t const* tb_rstring_cstrncat(tb_rstring_t* string, tb_char_t const* s, t
 	// init
 	tb_char_t const* r = TB_NULL;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, TB_NULL);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), TB_NULL);
-
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -963,12 +655,9 @@ tb_char_t const* tb_rstring_cstrncat(tb_rstring_t* string, tb_char_t const* s, t
 		// check 
 		tb_assert(data->refn);
 
-		// cstrcat
+		// cstrncat
 		r = tb_pstring_cstrncat(&data->pstr, s, n);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), TB_NULL);
 
 	return r;
 }
@@ -1015,13 +704,6 @@ tb_long_t tb_rstring_cstrncmp(tb_rstring_t* string, tb_char_t const* s, tb_size_
 	// init
 	tb_long_t r = 0;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, 0);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), 0);
-	
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -1033,9 +715,6 @@ tb_long_t tb_rstring_cstrncmp(tb_rstring_t* string, tb_char_t const* s, tb_size_
 		r = tb_pstring_cstrncmp(&data->pstr, s, n);
 	}
 
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), 0);
-
 	return r;
 }
 tb_long_t tb_rstring_cstrnicmp(tb_rstring_t* string, tb_char_t const* s, tb_size_t n)
@@ -1045,13 +724,6 @@ tb_long_t tb_rstring_cstrnicmp(tb_rstring_t* string, tb_char_t const* s, tb_size
 	// init
 	tb_long_t r = 0;
 
-	// mutx
-	tb_handle_t mutx = tb_rstring_atomic_mutx_get(string);
-	tb_check_return_val(mutx, 0);
-
-	// enter
-	tb_check_return_val(tb_mutex_enter(mutx), 0);
-	
 	// data
 	tb_rstring_data_t* data = string->data? *(string->data) : TB_NULL;
 	if (data)
@@ -1059,12 +731,9 @@ tb_long_t tb_rstring_cstrnicmp(tb_rstring_t* string, tb_char_t const* s, tb_size
 		// check 
 		tb_assert(data->refn);
 
-		// cstrncmp
+		// cstrnicmp
 		r = tb_pstring_cstrnicmp(&data->pstr, s, n);
 	}
-
-	// leave
-	tb_check_return_val(tb_mutex_leave(mutx), 0);
 
 	return r;
 }

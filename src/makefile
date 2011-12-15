@@ -19,6 +19,7 @@ tbox_C_FILES 			+= \
 						string/pstring \
 						string/sstring \
 						string/rstring \
+						string/mstring \
 						container/item \
 						container/hash \
 						container/queue \
@@ -240,6 +241,7 @@ INC_FILES 				= \
 						string/pstring.h \
 						string/sstring.h \
 						string/rstring.h \
+						string/mstring.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
