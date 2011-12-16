@@ -12,6 +12,7 @@ NAMES = test \
 		strops \
 		atomic \
 		pbuffer \
+		sbuffer \
 		pstring \
 		sstring \
 		rstring \
