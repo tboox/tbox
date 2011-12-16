@@ -61,27 +61,39 @@ tb_size_t 			tb_pbuffer_maxn(tb_pbuffer_t const* buffer);
 
 // modifiors
 tb_void_t 			tb_pbuffer_clear(tb_pbuffer_t* buffer);
-tb_void_t 			tb_pbuffer_clear0(tb_pbuffer_t* buffer);
 tb_byte_t* 			tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n);
 
-#error
-// memset
-tb_byte_t* 			tb_pbuffer_memset(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n);
-tb_byte_t* 			tb_pbuffer_memset(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n);
+// memset: b => 0 ... e
+tb_byte_t* 			tb_pbuffer_memset(tb_pbuffer_t* buffer, tb_byte_t b);
+// memset: b => p ... e
+tb_byte_t* 			tb_pbuffer_memsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b);
+// memset: b => 0 ... n
+tb_byte_t* 			tb_pbuffer_memnset(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n);
+// memset: b => p ... n
+tb_byte_t* 			tb_pbuffer_memnsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n);
 
-// memcpy
+// memcpy: b => 0 ... 
 tb_byte_t* 			tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_pbuffer_t const* b);
-tb_byte_t* 			tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_size_t p, tb_pbuffer_t const* b);
+// memcpy: b => p ... 
+tb_byte_t* 			tb_pbuffer_memcpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_pbuffer_t const* b);
+// memcpy: b ... n => 0 ... 
+tb_byte_t* 			tb_pbuffer_memncpy(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n);
+// memcpy: b ... n => p ... 
+tb_byte_t* 			tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n);
 
-tb_byte_t* 			tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n);
-tb_byte_t* 			tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n);
+// memmov: b ... e => 0 ... 
+tb_byte_t* 			tb_pbuffer_memmov(tb_pbuffer_t* buffer, tb_size_t b);
+// memmov: b ... e => p ... 
+tb_byte_t* 			tb_pbuffer_memmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b);
+// memmov: b ... n => 0 ... 
+tb_byte_t* 			tb_pbuffer_memnmov(tb_pbuffer_t* buffer, tb_size_t b, tb_size_t n);
+// memmov: b ... n => p ... 
+tb_byte_t* 			tb_pbuffer_memnmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n);
 
-// memcat
+// memcat: b +=> e ... 
 tb_byte_t* 			tb_pbuffer_memcat(tb_pbuffer_t* buffer, tb_pbuffer_t const* b);
-tb_byte_t* 			tb_pbuffer_memcat(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n);
-tb_byte_t* 			tb_pbuffer_memcat(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n);
-
-// memmov
+// memcat: b ... n +=> e ... 
+tb_byte_t* 			tb_pbuffer_memncat(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n);
 
 
 #endif

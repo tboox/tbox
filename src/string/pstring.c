@@ -80,7 +80,7 @@ tb_char_t const* tb_pstring_strip(tb_pstring_t* string, tb_size_t n)
 	tb_assert_and_check_return_val(string, TB_NULL);
 
 	// out?
-	tb_check_return_val(n < tb_pbuffer_size(string), tb_pbuffer_data(string));
+	tb_check_return_val(n < tb_pstring_size(string), tb_pstring_cstr(string));
 
 	// strip
 	tb_char_t* p = tb_pbuffer_resize(string, n + 1);
@@ -209,7 +209,7 @@ tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	return tb_pbuffer_pmemcpy(string, s, n + 1);
+	return tb_pbuffer_memncpy(string, s, n + 1);
 }
 tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
@@ -230,31 +230,16 @@ tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 	
-#error
-	tb_size_t size = tb_pstring_size(string);
-	tb_char_t* p = tb_pbuffer_resize(string, (size? (size + 1) : 2));
-	if (p)
-	{
-		size = tb_pstring_size(string);
-		tb_assert_and_check_return_val(size > 0, TB_NULL);
-		p[size - 1] = c;
-		p[size] = '\0';
-	}
+	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, 2);
+	if (p) p[tb_pstring_size(string)] = '\0';
 	return p;
 }
 tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string, TB_NULL);
 
-	tb_size_t size = tb_pbuffer_size(string);
-	tb_char_t* p = tb_pbuffer_resize(string, (size? (size + n) : (n + 1)));
-	if (p)
-	{
-		size = tb_pbuffer_size(string);
-		tb_assert_and_check_return_val(size > n, TB_NULL);
-		tb_memset(p + size - n - 1, c, n);
-		p[size] = '\0';
-	}
+	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, n + 1);
+	if (p) p[tb_pstring_size(string)] = '\0';
 	return p;
 }
 /* ////////////////////////////////////////////////////////////////////////
@@ -273,8 +258,7 @@ tb_char_t const* tb_pstring_cstrcat(tb_pstring_t* string, tb_char_t const* s)
 tb_char_t const* tb_pstring_cstrncat(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
-
-	return tb_pbuffer_pmemcat(string, s, n + 1);
+	return tb_pbuffer_memncpyp(string, tb_pstring_size(string), s, n + 1);
 }
 tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
