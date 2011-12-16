@@ -27,34 +27,14 @@
  * includes
  */
 #include "prefix.h"
-#include "pstring.h"
+#include "../memory/memory.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the reference string data type
-typedef struct __tb_rstring_data_t
-{
-	// the string refn
-	tb_size_t 				refn;
-
-	// the string data
-	tb_pstring_t 			pstr;
-
-}tb_rstring_data_t;
-
-/* the shared string type
- *
- * rstring => shared pointer => shared data
- *      (no safed)
- */
-typedef struct __tb_rstring_t
-{
-	// the shared data
-	tb_rstring_data_t** 	data;
-
-}tb_rstring_t;
+// the scoped string type
+typedef tb_rbuffer_t tb_rstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -71,6 +51,7 @@ tb_size_t 			tb_rstring_refn(tb_rstring_t const* string);
 
 // modifiors
 tb_void_t 			tb_rstring_clear(tb_rstring_t* string);
+tb_char_t const* 	tb_rstring_strip(tb_rstring_t* string, tb_size_t n);
 tb_size_t 			tb_rstring_incr(tb_rstring_t* string);
 tb_size_t 			tb_rstring_decr(tb_rstring_t* string);
 
