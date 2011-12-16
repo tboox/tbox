@@ -13,6 +13,7 @@ NAMES = test \
 		atomic \
 		pbuffer \
 		sbuffer \
+		rbuffer \
 		pstring \
 		sstring \
 		rstring \

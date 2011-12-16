@@ -34,10 +34,8 @@
 // the maximum grow size of value buffer 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_PBUFFER_GROW_SIZE 		(64)
-# 	define TB_PBUFFER_FMTD_SIZE 		(4096)
 #else
 # 	define TB_PBUFFER_GROW_SIZE 		(256)
-# 	define TB_PBUFFER_FMTD_SIZE 		(8192)
 #endif
 
 
@@ -86,7 +84,7 @@ tb_void_t tb_pbuffer_clear(tb_pbuffer_t* buffer)
 	tb_assert_and_check_return(buffer);
 	buffer->size = 0;
 }
-tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t size)
+tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n)
 {
 	tb_assert_and_check_return_val(buffer, TB_NULL);
 
@@ -97,31 +95,31 @@ tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t size)
 	if (!buffer->data) 
 	{
 		// check size
-		tb_assert(!buffer->size && size);
+		tb_assert(!buffer->size && n);
 
 		// compute size
-		buffer->size = size;
-		buffer->maxn = tb_align8(size + TB_PBUFFER_GROW_SIZE);
-		tb_assert_and_check_goto(size < buffer->maxn, fail);
+		buffer->size = n;
+		buffer->maxn = tb_align8(n + TB_PBUFFER_GROW_SIZE);
+		tb_assert_and_check_goto(n < buffer->maxn, fail);
 
 		// alloc data
 		buffer->data = tb_malloc(buffer->maxn);
 		tb_assert_and_check_goto(buffer->data, fail);
 	}
 	// decrease
-	else if (size < buffer->maxn)
+	else if (n < buffer->maxn)
 	{
-		buffer->size = size;
+		buffer->size = n;
 	}
 	// increase
 	else
 	{
 		// compute size
-		buffer->maxn = tb_align8(size + TB_PBUFFER_GROW_SIZE);
-		tb_assert_and_check_goto(size < buffer->maxn, fail);
+		buffer->maxn = tb_align8(n + TB_PBUFFER_GROW_SIZE);
+		tb_assert_and_check_goto(n < buffer->maxn, fail);
 
 		// realloc
-		buffer->size = size;
+		buffer->size = n;
 		buffer->data = tb_realloc(buffer->data, buffer->maxn);
 		tb_assert_and_check_goto(buffer->data, fail);
 	}

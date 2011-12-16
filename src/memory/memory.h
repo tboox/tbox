@@ -36,6 +36,7 @@ extern "C" {
 #include "malloc.h"
 #include "pbuffer.h"
 #include "sbuffer.h"
+#include "rbuffer.h"
 
 
 // c plus plus
