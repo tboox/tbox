@@ -34,10 +34,8 @@
 // the maximum grow size of value buffer 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_SBUFFER_GROW_SIZE 		(64)
-# 	define TB_SBUFFER_FMTD_SIZE 		(4096)
 #else
 # 	define TB_SBUFFER_GROW_SIZE 		(256)
-# 	define TB_SBUFFER_FMTD_SIZE 		(8192)
 #endif
 
 
@@ -84,12 +82,12 @@ tb_void_t tb_sbuffer_clear(tb_sbuffer_t* buffer)
 	tb_assert_and_check_return(buffer);
 	buffer->size = 0;
 }
-tb_byte_t* tb_sbuffer_resize(tb_sbuffer_t* buffer, tb_size_t size)
+tb_byte_t* tb_sbuffer_resize(tb_sbuffer_t* buffer, tb_size_t n)
 {
-	tb_assert_and_check_return_val(buffer && buffer->data && size <= buffer->maxn, TB_NULL);
+	tb_assert_and_check_return_val(buffer && buffer->data && n <= buffer->maxn, TB_NULL);
 
 	// resize
-	buffer->size = size;
+	buffer->size = n;
 
 	// ok
 	return buffer->data;
