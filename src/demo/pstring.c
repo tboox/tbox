@@ -14,10 +14,10 @@ int main(int argc, char** argv)
 	tb_pstring_init(&s);
 
 	tb_pstring_cstrcpy(&s, "hello");
-	tb_pstring_chrcat(&s, 'y');
-//	tb_pstring_cstrfcat(&s, "%s", "world");
-//	tb_pstring_chrcat(&s, ' ');
-//	tb_pstring_chrncat(&s, 'x', 5);
+	tb_pstring_chrcat(&s, ' ');
+	tb_pstring_cstrfcat(&s, "%s", "world");
+	tb_pstring_chrcat(&s, ' ');
+	tb_pstring_chrncat(&s, 'x', 5);
 	tb_print("%d: %s", tb_pstring_size(&s), tb_pstring_cstr(&s));
 
 	tb_pstring_exit(&s);

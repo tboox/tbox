@@ -86,12 +86,6 @@ tb_void_t tb_pbuffer_clear(tb_pbuffer_t* buffer)
 	tb_assert_and_check_return(buffer);
 	buffer->size = 0;
 }
-tb_void_t tb_pbuffer_clear0(tb_pbuffer_t* buffer)
-{
-	tb_assert_and_check_return(buffer);
-	buffer->size = 0;
-	if (buffer->maxn && buffer->data) tb_memset(buffer->data, 0, buffer->maxn);
-}
 tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t size)
 {
 	tb_assert_and_check_return_val(buffer, TB_NULL);
@@ -140,53 +134,103 @@ fail:
 	// restore it
 	*buffer = b;
 
-	// failed
-	tb_trace("failed to resize buffer: %x", b.data? b.data : "");
 	return TB_NULL;
 }
 
 /* ////////////////////////////////////////////////////////////////////////
  * memset
  */
-tb_byte_t* tb_pbuffer_bmemset(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n)
+tb_byte_t* tb_pbuffer_memset(tb_pbuffer_t* buffer, tb_byte_t b)
 {
-	tb_assert_and_check_return_val(buffer && n, TB_NULL);
+	return tb_pbuffer_memnsetp(buffer, 0, b, tb_pbuffer_size(buffer));
+}
+tb_byte_t* tb_pbuffer_memsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b)
+{
+	return tb_pbuffer_memnsetp(buffer, p, b, tb_pbuffer_size(buffer));
+}
+tb_byte_t* tb_pbuffer_memnset(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n)
+{
+	return tb_pbuffer_memnsetp(buffer, 0, b, n);
+}
+tb_byte_t* tb_pbuffer_memnsetp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t b, tb_size_t n)
+{
+	tb_assert_and_check_return_val(buffer, TB_NULL);
+	
+	// check
+	tb_check_return_val(n, tb_pbuffer_data(buffer));
 
 	// resize
-	if (!tb_pbuffer_resize(buffer, n)) return TB_NULL;
+	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_assert_and_check_return_val(d, TB_NULL);
 
-	// check
-	tb_assert(buffer->data && buffer->size == n);
+	// memset
+	tb_memset(d + p, b, n);
 
-	// set data
-	tb_memset(buffer->data, b, n);
-
-	// ok
-	return buffer->data;
+	return d;
 }
 /* ////////////////////////////////////////////////////////////////////////
  * memcpy
  */
 tb_byte_t* tb_pbuffer_memcpy(tb_pbuffer_t* buffer, tb_pbuffer_t const* b)
 {
-	tb_assert_and_check_return_val(b, TB_NULL);
-	return tb_pbuffer_pmemcpy(buffer, tb_pbuffer_data(b), tb_pbuffer_size(b));
+	return tb_pbuffer_memncpyp(buffer, 0, tb_pbuffer_data(b), tb_pbuffer_size(b));
 }
-tb_byte_t* tb_pbuffer_pmemcpy(tb_pbuffer_t* buffer, tb_byte_t const* p, tb_size_t n)
+tb_byte_t* tb_pbuffer_memcpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_pbuffer_t const* b)
 {
-	tb_assert_and_check_return_val(buffer && p && n, TB_NULL);
+	return tb_pbuffer_memncpyp(buffer, p, tb_pbuffer_data(b), tb_pbuffer_size(b));
+}
+tb_byte_t* tb_pbuffer_memncpy(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+{
+	return tb_pbuffer_memncpyp(buffer, 0, b, n);
+}
+tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
+{
+	tb_assert_and_check_return_val(buffer && b, TB_NULL);
+	
+	// check
+	tb_check_return_val(n, tb_pbuffer_data(buffer));
 
 	// resize
-	if (!tb_pbuffer_resize(buffer, n)) return TB_NULL;
+	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_assert_and_check_return_val(d, TB_NULL);
+
+	// memcpy
+	tb_memcpy(d + p, b, n);
+
+	return d;
+}
+/* ////////////////////////////////////////////////////////////////////////
+ * memmov
+ */
+tb_byte_t* tb_pbuffer_memmov(tb_pbuffer_t* buffer, tb_size_t b)
+{
+	tb_assert_and_check_return_val(b < tb_pbuffer_size(buffer), TB_NULL);
+	return tb_pbuffer_memnmovp(buffer, 0, b, tb_pbuffer_size(buffer) - b);
+}
+tb_byte_t* tb_pbuffer_memmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b)
+{
+	tb_assert_and_check_return_val(b < tb_pbuffer_size(buffer), TB_NULL);
+	return tb_pbuffer_memnmovp(buffer, p, b, tb_pbuffer_size(buffer) - b);
+}
+tb_byte_t* tb_pbuffer_memnmov(tb_pbuffer_t* buffer, tb_size_t b, tb_size_t n)
+{
+	return tb_pbuffer_memnmovp(buffer, 0, b, n);
+}
+tb_byte_t* tb_pbuffer_memnmovp(tb_pbuffer_t* buffer, tb_size_t p, tb_size_t b, tb_size_t n)
+{
+	tb_assert_and_check_return_val(buffer && (b + n) <= tb_pbuffer_size(buffer), TB_NULL);
 
 	// check
-	tb_assert(buffer->data && buffer->size == n);
+	tb_check_return_val(p != b && n, tb_pbuffer_data(buffer));
 
-	// copy data
-	tb_memcpy(buffer->data, p, n);
+	// resize
+	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_assert_and_check_return_val(d, TB_NULL);
 
-	// ok
-	return buffer->data;
+	// memmov
+	tb_memmov(d + p, d + b, n);
+
+	return d;
 }
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -194,50 +238,26 @@ tb_byte_t* tb_pbuffer_pmemcpy(tb_pbuffer_t* buffer, tb_byte_t const* p, tb_size_
  */
 tb_byte_t* tb_pbuffer_memcat(tb_pbuffer_t* buffer, tb_pbuffer_t const* b)
 {
-	tb_assert_and_check_return_val(b, TB_NULL);
-	return tb_pbuffer_pmemcat(buffer, tb_pbuffer_data(b), tb_pbuffer_size(b));
+	return tb_pbuffer_memncat(buffer, tb_pbuffer_data(b), tb_pbuffer_size(b));
 }
-tb_byte_t* tb_pbuffer_pmemcat(tb_pbuffer_t* buffer, tb_byte_t const* p, tb_size_t n)
-{
-	tb_assert_and_check_return_val(buffer && p && n, TB_NULL);
+tb_byte_t* tb_pbuffer_memncat(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_t n)
+{	
+	tb_assert_and_check_return_val(buffer && b, TB_NULL);
+	
+	// check
+	tb_check_return_val(n, tb_pbuffer_data(buffer));
 
-	// copy it if null
-	if (!buffer->size) return tb_pbuffer_pmemcpy(buffer, p, n);
-
-	// get old size
-	tb_size_t on = buffer->size;
+	// is null?
+	tb_size_t p = tb_pbuffer_size(buffer);
+	if (!p) return tb_pbuffer_memncpy(buffer, b, n);
 
 	// resize
-	if (!tb_pbuffer_resize(buffer, on + n)) return TB_NULL;
+	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
+	tb_assert_and_check_return_val(d, TB_NULL);
 
-	// check
-	tb_assert(buffer->data && buffer->size == on + n);
+	// memcat
+	tb_memcpy(d + p, b, n);
 
-	// copy data
-	tb_memcpy(buffer->data + on, p, n);
-
-	// ok
-	return buffer->data;
+	return d;
 }
-tb_byte_t* tb_pbuffer_bmemcat(tb_pbuffer_t* buffer, tb_byte_t b, tb_size_t n)
-{
-	tb_assert_and_check_return_val(buffer && n, TB_NULL);
 
-	// copy it if null
-	if (!buffer->size) return tb_pbuffer_bmemset(buffer, b, n);
-
-	// get old size
-	tb_size_t on = buffer->size;
-
-	// resize
-	if (!tb_pbuffer_resize(buffer, on + n)) return TB_NULL;
-
-	// check
-	tb_assert(buffer->data && buffer->size == on + n);
-
-	// set data
-	tb_memset(buffer->data + on, b, n);
-
-	// ok
-	return buffer->data;
-}
