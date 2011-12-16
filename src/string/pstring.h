@@ -34,7 +34,7 @@
  */
 
 // the scoped string type
-typedef tb_pbuffer_t 	tb_pstring_t;
+typedef tb_pbuffer_t tb_pstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces

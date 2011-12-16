@@ -73,7 +73,13 @@ tb_size_t tb_pstring_size(tb_pstring_t const* string)
 tb_void_t tb_pstring_clear(tb_pstring_t* string)
 {
 	tb_assert_and_check_return(string);
+
+	// clear buffer
 	tb_pbuffer_clear(string);
+
+	// clear string
+	tb_char_t* p = tb_pbuffer_data(string);
+	if (p) p[0] = '\0';
 }
 tb_char_t const* tb_pstring_strip(tb_pstring_t* string, tb_size_t n)
 {

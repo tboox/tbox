@@ -17,6 +17,7 @@ tbox_C_FILES 			+= \
 						memory/gpool \
 						memory/malloc \
 						memory/pbuffer \
+						memory/sbuffer \
 						string/pstring \
 						string/sstring \
 						string/rstring \
@@ -219,6 +220,7 @@ INC_FILES 				= \
 						memory/memory.h \
 						memory/malloc.h \
 						memory/pbuffer.h \
+						memory/sbuffer.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

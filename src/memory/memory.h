@@ -35,6 +35,7 @@ extern "C" {
 #include "gpool.h"
 #include "malloc.h"
 #include "pbuffer.h"
+#include "sbuffer.h"
 
 
 // c plus plus
