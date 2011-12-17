@@ -29,17 +29,6 @@
 #include "../utils/utils.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * macros
- */
-// the maximum grow size of value buffer 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_RBUFFER_GROW_SIZE 		(64)
-#else
-# 	define TB_RBUFFER_GROW_SIZE 		(256)
-#endif
-
-
-/* ////////////////////////////////////////////////////////////////////////
  * init & exit
  */
 tb_bool_t tb_rbuffer_init(tb_rbuffer_t* buffer)
