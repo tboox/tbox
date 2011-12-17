@@ -30,7 +30,6 @@
 #include "pstring.h"
 #include "sstring.h"
 #include "rstring.h"
-#include "mstring.h"
 
 #endif
 

@@ -33,7 +33,7 @@
  * types
  */
 
-// the scoped string type
+// the reference string type
 typedef tb_rbuffer_t tb_rstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
