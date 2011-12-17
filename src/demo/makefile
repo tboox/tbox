@@ -14,11 +14,9 @@ NAMES = test \
 		pbuffer \
 		sbuffer \
 		rbuffer \
-		mbuffer \
 		pstring \
 		sstring \
 		rstring \
-		mstring \
 		cookies \
 		gstream \
 		estream \

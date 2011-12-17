@@ -19,11 +19,9 @@ tbox_C_FILES 			+= \
 						memory/pbuffer \
 						memory/sbuffer \
 						memory/rbuffer \
-						memory/mbuffer \
 						string/pstring \
 						string/sstring \
 						string/rstring \
-						string/mstring \
 						container/item \
 						container/hash \
 						container/queue \
@@ -224,7 +222,6 @@ INC_FILES 				= \
 						memory/pbuffer.h \
 						memory/sbuffer.h \
 						memory/rbuffer.h \
-						memory/mbuffer.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -249,7 +246,6 @@ INC_FILES 				= \
 						string/pstring.h \
 						string/sstring.h \
 						string/rstring.h \
-						string/mstring.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

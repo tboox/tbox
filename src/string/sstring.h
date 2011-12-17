@@ -33,7 +33,7 @@
  * types
  */
 
-// the scoped string type
+// the static string type
 typedef tb_sbuffer_t tb_sstring_t;
 
 /* ////////////////////////////////////////////////////////////////////////
