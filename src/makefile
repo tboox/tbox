@@ -19,6 +19,7 @@ tbox_C_FILES 			+= \
 						memory/pbuffer \
 						memory/sbuffer \
 						memory/rbuffer \
+						memory/qbuffer \
 						string/pstring \
 						string/sstring \
 						string/rstring \
@@ -222,6 +223,7 @@ INC_FILES 				= \
 						memory/pbuffer.h \
 						memory/sbuffer.h \
 						memory/rbuffer.h \
+						memory/qbuffer.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

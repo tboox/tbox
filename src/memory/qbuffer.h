@@ -17,50 +17,61 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		fixed16_arm.h
+ * \file		qbuffer.h
  *
  */
-#ifndef TB_MATH_OPT_FIXED16_ARM_H
-#define TB_MATH_OPT_FIXED16_ARM_H
+#ifndef TB_MEMORY_QBUFFER_H
+#define TB_MEMORY_QBUFFER_H
 
 /* ////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 
-
 /* ////////////////////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
-#ifdef TB_CONFIG_ASSEMBLER_GAS
+// the queue buffer type
+typedef struct __tb_qbuffer_t
+{
+	// the buffer data
+	tb_char_t* 		data;
 
-#if 0
-# 	define tb_fixed16_mul(x, y) 			tb_fixed16_mul_asm(x, y)
-#endif
+	// the buffer head
+	tb_char_t* 		head;
 
-#endif /* TB_CONFIG_ASSEMBLER_GAS */
+	// the buffer size
+	tb_size_t 		size;
+
+	// the buffer maxn
+	tb_size_t 		maxn;
+
+}tb_qbuffer_t;
 
 /* ////////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-#if defined(TB_CONFIG_ASSEMBLER_GAS)
-static __tb_inline__ tb_fixed16_t tb_fixed16_mul_asm(tb_fixed16_t x, tb_fixed16_t y)
-{
-	__tb_register__ tb_fixed16_t t;
-	__tb_asm__ __tb_volatile__
-	( 
-		"smull 	%0, %2, %1, %3 			\n" 	// r64 = (l, h) = x * y
-		"mov 	%0, %0, lsr #16 		\n" 	// to fixed16: r64 >>= 16
-		"orr 	%0, %0, %2, lsl #16 	\n" 	// x = l = (h << (32 - 16)) | (l >> 16);
+// init & exit
+tb_bool_t			tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn);
+tb_void_t 			tb_qbuffer_exit(tb_qbuffer_t* buffer);
 
-		: "=r"(x), "=&r"(y), "=r"(t)
-		: "r"(x), "1"(y)
-	);
-	return x;
-}
-#endif
+// accessors
+tb_byte_t* 			tb_qbuffer_data(tb_qbuffer_t const* buffer);
+tb_size_t 			tb_qbuffer_maxn(tb_qbuffer_t const* buffer);
+tb_size_t 			tb_qbuffer_size(tb_qbuffer_t const* buffer);
+tb_size_t 			tb_qbuffer_left(tb_qbuffer_t const* buffer);
+tb_bool_t 			tb_qbuffer_full(tb_qbuffer_t const* buffer);
+tb_bool_t 			tb_qbuffer_null(tb_qbuffer_t const* buffer);
+
+// modifiors
+tb_void_t 			tb_qbuffer_clear(tb_qbuffer_t* buffer);
+
+// read & writ
+tb_size_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+tb_size_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+
 
 #endif
 
