@@ -183,9 +183,14 @@ tb_gstream_t* tb_gstream_init_file()
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 
 	// need larger cache for performance
-	gst->cache_maxn = TB_FSTREAM_CACHE_MAXN;
+	if (!tb_qbuffer_init(&gst->cache, TB_FSTREAM_CACHE_MAXN)) goto fail;
 
+	// ok
 	return gst;
+
+fail:
+	if (gst) tb_free(gst);
+	return TB_NULL;
 }
 
 tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
