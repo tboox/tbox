@@ -32,6 +32,7 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
+#include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -200,11 +201,8 @@ typedef struct __tb_gstream_t
 	// the timeout: ms
 	tb_size_t 			timeout 	: 22;
 
-	// the cache data
-	tb_byte_t* 			cache_data;
-	tb_byte_t* 			cache_head;
-	tb_size_t 			cache_size;
-	tb_size_t 			cache_maxn;
+	// the cache
+	tb_qbuffer_t 		cache;
 
 	// the offset
 	tb_uint64_t 		offset;

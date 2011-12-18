@@ -59,6 +59,8 @@ tb_void_t 			tb_qbuffer_exit(tb_qbuffer_t* buffer);
 
 // accessors
 tb_byte_t* 			tb_qbuffer_data(tb_qbuffer_t const* buffer);
+tb_byte_t* 			tb_qbuffer_head(tb_qbuffer_t const* buffer);
+tb_byte_t* 			tb_qbuffer_tail(tb_qbuffer_t const* buffer);
 tb_size_t 			tb_qbuffer_maxn(tb_qbuffer_t const* buffer);
 tb_size_t 			tb_qbuffer_size(tb_qbuffer_t const* buffer);
 tb_size_t 			tb_qbuffer_left(tb_qbuffer_t const* buffer);
@@ -67,10 +69,19 @@ tb_bool_t 			tb_qbuffer_null(tb_qbuffer_t const* buffer);
 
 // modifiors
 tb_void_t 			tb_qbuffer_clear(tb_qbuffer_t* buffer);
+tb_byte_t* 			tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn);
 
 // read & writ
-tb_size_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
-tb_size_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+
+// pull
+tb_byte_t* 			tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size);
+tb_void_t 			tb_qbuffer_pull_done(tb_qbuffer_t* buffer, tb_size_t size);
+
+// push
+tb_byte_t* 			tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size);
+tb_void_t 			tb_qbuffer_push_done(tb_qbuffer_t* buffer, tb_size_t size);
 
 
 #endif
