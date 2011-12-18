@@ -14,6 +14,7 @@ NAMES = test \
 		pbuffer \
 		sbuffer \
 		rbuffer \
+		qbuffer \
 		pstring \
 		sstring \
 		rstring \
