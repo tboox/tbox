@@ -170,9 +170,9 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 #endif
 
 	// ioctl
-	tb_gstream_ioctl1(http->stream, TB_SSTREAM_CMD_SET_SSL, http->option.bssl? TB_TRUE : TB_FALSE);
-	tb_gstream_ioctl1(http->stream, TB_SSTREAM_CMD_SET_HOST, http->option.host);
-	tb_gstream_ioctl1(http->stream, TB_SSTREAM_CMD_SET_PORT, http->option.port);
+	tb_gstream_ctrl1(http->stream, TB_SSTREAM_CMD_SET_SSL, http->option.bssl? TB_TRUE : TB_FALSE);
+	tb_gstream_ctrl1(http->stream, TB_SSTREAM_CMD_SET_HOST, http->option.host);
+	tb_gstream_ctrl1(http->stream, TB_SSTREAM_CMD_SET_PORT, http->option.port);
 
 	// open stream
 	if (!tb_gstream_aopen(http->stream)) return 0;

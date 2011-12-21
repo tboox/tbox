@@ -111,7 +111,7 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_hstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -211,7 +211,7 @@ static tb_bool_t tb_hstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_
 	}
 	return TB_FALSE;
 }
-static tb_bool_t tb_hstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
+static tb_bool_t tb_hstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
@@ -250,8 +250,8 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->aread 	= tb_hstream_aread;
 	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
-	gst->ioctl1 = tb_hstream_ioctl1;
-	gst->ioctl2 = tb_hstream_ioctl2;
+	gst->ctrl1 = tb_hstream_ctrl1;
+	gst->ctrl2 = tb_hstream_ctrl2;
 	gst->free 	= tb_hstream_free;
 	hst->http 	= tb_http_init(TB_NULL);
 	tb_assert_and_check_goto(hst->http, fail);
@@ -272,10 +272,10 @@ tb_gstream_t* tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// ioctl
-	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_PATH, path)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_HSTREAM_CMD_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_PATH, path)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return gst;

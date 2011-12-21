@@ -29,8 +29,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!ist || !ost) goto end;
 	
 	// ioctl
-	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
-	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) tb_gstream_ctrl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
+	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	tb_int64_t itime = tb_mclock();

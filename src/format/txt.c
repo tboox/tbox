@@ -39,7 +39,7 @@ tb_size_t tb_format_txt_probe(tb_gstream_t* gst)
 {
 	// get need size
 	tb_size_t 	need = 0;
-	tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_GET_CACHE, &need);
+	tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_GET_CACHE, &need);
 	tb_assert_and_check_return_val(need, 0);
 
 	tb_uint64_t size = tb_gstream_size(gst);

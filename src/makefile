@@ -267,6 +267,10 @@ INC_FILES 				= \
 						platform/audio.h \
 						platform/thread.h \
 						platform/socket.h \
+						platform/event.h \
+						platform/event/prefix.h \
+						platform/event/epool.h \
+						platform/event/eobject.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \

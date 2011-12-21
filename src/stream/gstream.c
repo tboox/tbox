@@ -335,7 +335,7 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set url
-	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
 	// ok
 	return gst;
@@ -875,14 +875,14 @@ tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
 	tb_assert_and_check_return_val(gst, 0);
 	return gst->timeout;
 }
-tb_bool_t tb_gstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd)
+tb_bool_t tb_gstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd)
 {
-	tb_assert_and_check_return_val(gst && gst->ioctl0, TB_FALSE);
-	return gst->ioctl0(gst, cmd);
+	tb_assert_and_check_return_val(gst && gst->ctrl0, TB_FALSE);
+	return gst->ctrl0(gst, cmd);
 }
-tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {	
-	tb_assert_and_check_return_val(gst && gst->ioctl1, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->ctrl1, TB_FALSE);
 
 	tb_bool_t ret = TB_FALSE;
 	switch (cmd)
@@ -938,12 +938,12 @@ tb_bool_t tb_gstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 	default:
 		break;
 	}
-	return (gst->ioctl1(gst, cmd, arg1) || ret)? TB_TRUE : TB_FALSE;
+	return (gst->ctrl1(gst, cmd, arg1) || ret)? TB_TRUE : TB_FALSE;
 }
-tb_bool_t tb_gstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
+tb_bool_t tb_gstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
-	tb_assert_and_check_return_val(gst && gst->ioctl2, TB_FALSE);
-	return gst->ioctl2(gst, cmd, arg1, arg2);
+	tb_assert_and_check_return_val(gst && gst->ctrl2, TB_FALSE);
+	return gst->ctrl2(gst, cmd, arg1, arg2);
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gst)
 {
