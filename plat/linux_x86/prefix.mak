@@ -18,6 +18,7 @@ ASM_SUFFIX 		= .S
 # tool
 PRE 			= 
 CC 				= $(PRE)gcc
+#CC 				= $(PRE)icc
 AR 				= $(PRE)ar
 STRIP 			= $(PRE)strip
 RANLIB 			= $(PRE)ranlib
