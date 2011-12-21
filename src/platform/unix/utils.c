@@ -25,9 +25,10 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../libc/libc.h"
-#include "../../../math/math.h"
-#include <windows.h>
+#include "../../libc/libc.h"
+#include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -36,19 +37,19 @@
 // usleep
 tb_void_t tb_usleep(tb_size_t us)
 {
-	tb_trace_noimpl();
+	usleep(us);
 }
 
 // msleep
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	Sleep(ms);
+	tb_usleep(ms * 1000);
 }
 
 // sleep
 tb_void_t tb_sleep(tb_size_t s)
 {
-	Sleep(s * 1000);
+	tb_msleep(s * 1000);
 }
 
 // printf
@@ -65,20 +66,25 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 // mclock
 tb_int64_t tb_mclock()
 {
-	DWORD ms = GetTickCount();
-	return tb_int32_to_int64(ms);
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
 // uclock
 tb_int64_t tb_uclock()
 {
-	tb_trace_noimpl();
-	return TB_INT64_ZERO;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000000 + tv.tv_usec);
 }
 tb_int64_t tb_time()
 {
-	tb_trace_noimpl();
-	return TB_INT64_ZERO;
+#if 0
+	return ((tb_int64_t)time(0) * 1000);
+#else
+	return tb_mclock();
+#endif
 }
 
 

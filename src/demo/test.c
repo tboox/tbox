@@ -19,5 +19,9 @@ int main(int argc, char** argv)
 	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
 #endif
 
+	tb_int64_t t = tb_uclock();
+	tb_msleep(1);
+	t = tb_uclock() - t;
+	tb_print("%lld", t);
 	return 0;
 }

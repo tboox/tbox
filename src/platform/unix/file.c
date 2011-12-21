@@ -25,14 +25,15 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../math/math.h"
+#include "../file.h"
+#include "../../math/math.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/unistd.h>
-#include <sys/unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <stdio.h>
+#ifndef TB_CONFIG_OS_ANDROID
+# 	include <sys/unistd.h>
+#endif
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -84,7 +85,11 @@ tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 }
 tb_void_t tb_file_sync(tb_handle_t hfile)
 {
+#ifdef TB_CONFIG_OS_LINUX
 	if (hfile) fdatasync((tb_long_t)hfile - 1);
+#else
+	if (hfile) fsync((tb_long_t)hfile - 1);
+#endif
 }
 tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 {
@@ -113,7 +118,7 @@ tb_uint64_t tb_file_size(tb_handle_t hfile)
 	struct stat st = {0};
 	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
 }
-tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
+tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
 	tb_assert_and_check_return_val(path, TB_FALSE);
 	switch (type)
@@ -135,7 +140,7 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 	}
 	return TB_FALSE;
 }
-tb_void_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
+tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 {
 	tb_assert_and_check_return(path);
 	remove(path);
@@ -158,7 +163,15 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 		struct stat st = {0};
 		if (!stat(path, &st))
 		{
+			// file type
+			if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIR;
+			else info->type = TB_FILE_TYPE_FILE;
+
+			// file size
 			info->size = st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
+
+			// ok
+			return TB_TRUE;
 		}
 	}
 	return TB_FALSE;
