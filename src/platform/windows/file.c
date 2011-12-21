@@ -25,7 +25,8 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../string/string.h"
+#include "../file.h"
+#include "../../libc/libc.h"
 #include <windows.h>
 
 /* /////////////////////////////////////////////////////////
@@ -59,7 +60,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		data[0] = path[1];
 		data[1] = ':';
 		data[2] = '/';
-		tb_cstring_ncopy(data + 3, path + 2, maxn - 3);
+		tb_strncpy(data + 3, path + 2, maxn - 3);
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
@@ -75,7 +76,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		data[0] = path[8];
 		data[1] = ':';
 		data[2] = '/';
-		tb_cstring_ncopy(data + 3, path + 9, maxn - 3);
+		tb_strncpy(data + 3, path + 9, maxn - 3);
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
@@ -87,10 +88,11 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
  */
 
 // file
-tb_handle_t tb_file_open(tb_char_t const* path, tb_int_t flags)
+tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(path, TB_NULL);
 
+	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
 	tb_assert_and_check_return_val(path, TB_NULL);
@@ -117,87 +119,48 @@ tb_void_t tb_file_close(tb_handle_t hfile)
 {
 	if (hfile) CloseHandle(hfile);
 }
-tb_int_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_int_t size)
+tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
+	tb_assert_and_check_return_val(hfile, -1);
 	DWORD real_size = 0;
-	if (hfile && ReadFile(hfile, data, size, &real_size, NULL)) return (tb_int_t)real_size;
-	return -1;
+	return ReadFile(hfile, data, size, &real_size, NULL)? (tb_long_t)real_size : -1;
 }
-tb_int_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_int_t size)
+tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 {
+	tb_assert_and_check_return_val(hfile, -1);
 	DWORD real_size = 0;
-	if (hfile && WriteFile(hfile, data, size, &real_size, NULL)) return (tb_int_t)real_size;
-	return -1;
+	return WriteFile(hfile, data, size, &real_size, NULL)? (tb_long_t)real_size : -1;
 }
-tb_void_t tb_file_flush(tb_handle_t hfile)
+tb_void_t tb_file_sync(tb_handle_t hfile)
 {
 	if (hfile) FlushFileBuffers(hfile);
 }
-tb_int_t tb_file_seek(tb_handle_t hfile, tb_int_t offset, tb_int_t flags)
+tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 {
-	if (hfile) 
-	{
-		if (flags == TB_FILE_SEEK_SIZE)
-		{
-			// FIXME:
-			// GetFileSizeEx for 64-bits
-			return (tb_int_t)GetFileSize(hfile, NULL);
-		}
-		else
-		{
-			DWORD method = 0;
-			if (flags & TB_FILE_SEEK_BEG) method = FILE_BEGIN;
-			if (flags & TB_FILE_SEEK_CUR) method = FILE_CURRENT;
-			if (flags & TB_FILE_SEEK_END) method = FILE_END;
+	tb_assert_and_check_return_val(hfile, -1);
 
-			// FIXME: SetFilePointerEx for 64-bits
-			DWORD pos = SetFilePointer(hfile, (LONG)offset, NULL, method);
-			return (pos != INVALID_SET_FILE_POINTER? pos : -1);
-		}
-	}
-	return -1;
+	DWORD method = 0;
+	if (flags & TB_FILE_SEEK_BEG) method = FILE_BEGIN;
+	if (flags & TB_FILE_SEEK_CUR) method = FILE_CURRENT;
+	if (flags & TB_FILE_SEEK_END) method = FILE_END;
+
+	LARGE_INTEGER o = {0};
+	LARGE_INTEGER p = {0};
+	o.QuadPart = (LONGLONG)offset;
+	return SetFilePointerEx(hfile, o, &p, method)? (tb_int64_t)p.QuadPart : -1;
 }
-tb_size_t tb_file_size(tb_char_t const* path, tb_file_type_t type)
+tb_uint64_t tb_file_size(tb_handle_t hfile)
 {
-	tb_trace_noimpl();
-	return 0;
-}
-tb_bool_t tb_file_exists(tb_char_t const* path)
-{
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(hfile, 0);
 
-	tb_char_t data[4096];
-	path = tb_file_path_to_windows(path, data, 4096);
-	tb_assert_and_check_return_val(path, TB_FALSE);
-
-#if 0
-	switch (type)
-	{
-	case TB_FILE_TYPE_DIR:
-		{
-			DWORD attr = GetFileAttributes(path);
-			return ((attr & FILE_ATTRIBUTE_DIRECTORY) && attr != 0xffffffff)? TB_TRUE : TB_FALSE;
-		}
-	case TB_FILE_TYPE_FILE:
-		{
-			DWORD attr = GetFileAttributes(path);
-			return ((attr & FILE_ATTRIBUTE_DIRECTORY) || attr == 0xffffffff)? TB_FALSE : TB_TRUE;
-		}
-	default:
-		tb_assert(0);
-		break;
-	}
-	return TB_FALSE;
-#else
-	// FIXME:
-	DWORD attr = GetFileAttributes(path);
-	return (attr != 0xffffffff)? TB_TRUE : TB_FALSE;
-#endif
+	LARGE_INTEGER p = {0};
+	return GetFileSizeEx(hfile, &p)? (tb_int64_t)p.QuadPart : 0;
 }
-tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
+tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
 	tb_assert_and_check_return_val(path, TB_FALSE);
 	
+	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
 	tb_assert_and_check_return_val(path, TB_FALSE);
@@ -221,44 +184,58 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_file_type_t type)
 	}
 	return TB_FALSE;
 }
-tb_bool_t tb_file_delete(tb_char_t const* path, tb_file_type_t type)
+tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 {
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return(path);
 	
+	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return(path);
 
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
-		return RemoveDirectory(path)? TB_TRUE : TB_FALSE;
+		RemoveDirectory(path);
+		break;
 	case TB_FILE_TYPE_FILE:
-		return DeleteFile(path)? TB_TRUE : TB_FALSE;
+		DeleteFile(path);
+		break;
 	default:
 		tb_assert(0);
 		break;
 	}
+}
+tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
+{
+	tb_assert_and_check_return_val(path, TB_FALSE);
+
+	// unix path => windows 
+	tb_char_t data[4096];
+	path = tb_file_path_to_windows(path, data, 4096);
+	tb_assert_and_check_return_val(path, TB_FALSE);
+
+	// get attributes
+	WIN32_FILE_ATTRIBUTE_DATA st = {0};
+	if (!GetFileAttributesEx(path, GetFileExInfoStandard, &st)) return TB_FALSE;
+
+	// get info
+	if (info)
+	{
+		// init info
+		tb_memset(info, 0, sizeof(tb_file_info_t));
+
+		// file type
+		if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) info->type = TB_FILE_TYPE_DIR;
+		else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
+
+		// file size
+		info->size = ((tb_int64_t)st.nFileSizeHigh << 32) | st.nFileSizeLow;
+
+		// ok
+		return TB_TRUE;
+	}
+
 	return TB_FALSE;
-}
-
-// open file list
-tb_handle_t tb_file_list_open(tb_char_t const* dir)
-{
-	tb_trace_noimpl();
-	return TB_NULL;
-}
-
-// get file list entry, end: return NULL
-tb_file_entry_t const* tb_file_list_entry(tb_handle_t hflist)
-{
-	tb_trace_noimpl();
-	return TB_NULL;
-}
-
-// close file list
-tb_void_t tb_file_list_close(tb_handle_t hflist)
-{
-	tb_trace_noimpl();
 }
 

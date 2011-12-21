@@ -25,10 +25,9 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../libc/libc.h"
-#include <unistd.h>
-#include <time.h>
-#include <sys/time.h>
+#include "../../libc/libc.h"
+#include "../../math/math.h"
+#include <windows.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -37,19 +36,19 @@
 // usleep
 tb_void_t tb_usleep(tb_size_t us)
 {
-	usleep(us);
+	tb_trace_noimpl();
 }
 
 // msleep
 tb_void_t tb_msleep(tb_size_t ms)
 {
-	tb_usleep(ms * 1000);
+	Sleep(ms);
 }
 
 // sleep
 tb_void_t tb_sleep(tb_size_t s)
 {
-	tb_msleep(s * 1000);
+	Sleep(s * 1000);
 }
 
 // printf
@@ -66,25 +65,26 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 // mclock
 tb_int64_t tb_mclock()
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+	return (tb_int64_t)GetTickCount();
 }
 
 // uclock
 tb_int64_t tb_uclock()
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000000 + tv.tv_usec);
+	LARGE_INTEGER f = {0};
+    if (!QueryPerformanceFrequency(&f)) return 0;
+	tb_assert_and_check_return_val(f.QuadPart, 0);
+
+	LARGE_INTEGER t = {0};
+	if (!QueryPerformanceCounter(&t)) return 0;
+	tb_assert_and_check_return_val(t.QuadPart, 0);
+	
+	return (t.QuadPart * 1000000) / f.QuadPart;
 }
 tb_int64_t tb_time()
 {
-#if 0
-	return ((tb_int64_t)time(0) * 1000);
-#else
-	return tb_mclock();
-#endif
+	tb_trace_noimpl();
+	return 0;
 }
 
 

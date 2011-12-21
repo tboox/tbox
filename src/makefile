@@ -125,71 +125,12 @@ tbox_C_FILES 			+= \
 						platform/libc/malloc 
 endif
 
-# linux_x86
-ifeq ($(TB_CONFIG_PLAT),linux_x86)
 tbox_C_FILES 			+= \
-						platform/os/unix/audio \
-						platform/os/unix/file \
-						platform/os/unix/utils \
-						platform/os/unix/mutex \
-						platform/os/unix/socket \
-						platform/os/unix/thread
-endif
-
-# ios4_x86
-ifeq ($(TB_CONFIG_PLAT),ios4_x86)
-tbox_C_FILES 			+= \
-						platform/null/audio \
-						platform/os/unix/file \
-						platform/os/unix/utils \
-						platform/os/unix/mutex \
-						platform/os/unix/socket \
-						platform/os/unix/thread
-endif
-
-# mac_x86
-ifeq ($(TB_CONFIG_PLAT),mac_x86)
-tbox_C_FILES 			+= \
-						platform/null/audio \
-						platform/os/unix/file \
-						platform/os/unix/utils \
-						platform/os/unix/mutex \
-						platform/os/unix/socket \
-						platform/os/unix/thread
-endif
-
-# windows_x86
-ifeq ($(TB_CONFIG_PLAT),windows_x86)
-tbox_C_FILES 			+= \
-						platform/null/audio \
-						platform/os/windows/file \
-						platform/os/windows/utils \
-						platform/os/windows/mutex \
-						platform/os/windows/socket \
-						platform/os/windows/thread
-endif
-
-# linux_arm
-ifeq ($(TB_CONFIG_PLAT),linux_arm)
-tbox_C_FILES 			+= \
-						platform/null/audio \
-						platform/os/unix/file \
-						platform/os/unix/utils \
-						platform/os/unix/mutex \
-						platform/os/unix/socket \
-						platform/os/unix/thread
-endif
-
-# android_arm
-ifeq ($(TB_CONFIG_PLAT),android_arm)
-tbox_C_FILES 			+= \
-						platform/null/audio \
-						platform/os/unix/file \
-						platform/os/unix/utils \
-						platform/os/unix/mutex \
-						platform/os/unix/socket \
-						platform/os/unix/thread
-endif
+						platform/$(TB_CONFIG_API_FILE)/file \
+						platform/$(TB_CONFIG_API_UTIL)/utils \
+						platform/$(TB_CONFIG_API_MUTX)/mutex \
+						platform/$(TB_CONFIG_API_SOCK)/socket \
+						platform/$(TB_CONFIG_API_THRD)/thread
 
 
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
@@ -264,7 +205,6 @@ INC_FILES 				= \
 						platform/file.h \
 						platform/utils.h \
 						platform/mutex.h \
-						platform/audio.h \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \

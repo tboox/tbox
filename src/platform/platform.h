@@ -34,7 +34,6 @@ extern "C" {
 #include "prefix.h"
 #include "file.h"
 #include "utils.h"
-#include "audio.h"
 #include "mutex.h"
 #include "event.h"
 #include "socket.h"

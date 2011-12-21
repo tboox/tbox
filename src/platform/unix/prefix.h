@@ -20,8 +20,8 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_OS_UNIX_PREFIX_H
-#define TB_PLATFROM_OS_UNIX_PREFIX_H
+#ifndef TB_PLATFROM_UNIX_PREFIX_H
+#define TB_PLATFROM_UNIX_PREFIX_H
 
 // c plus plus
 #ifdef __cplusplus

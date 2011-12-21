@@ -68,7 +68,8 @@ typedef enum __tb_file_seek_flag_t
 // the file type
 typedef enum __tb_file_type_t
 {
-	TB_FILE_TYPE_DIR 	= 1
+	TB_FILE_TYPE_NULL 	= 0
+,	TB_FILE_TYPE_DIR 	= 1
 , 	TB_FILE_TYPE_FILE 	= 2 
 , 	TB_FILE_TYPE_DOT 	= 3
 , 	TB_FILE_TYPE_DOT2 	= 4
@@ -102,8 +103,8 @@ tb_uint64_t 			tb_file_size(tb_handle_t hfile);
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
 // file modifiors
-tb_bool_t 				tb_file_create(tb_char_t const* path, tb_file_type_t type);
-tb_void_t 				tb_file_delete(tb_char_t const* path, tb_file_type_t type);
+tb_bool_t 				tb_file_create(tb_char_t const* path, tb_size_t type);
+tb_void_t 				tb_file_delete(tb_char_t const* path, tb_size_t type);
 
 // file attributes
 tb_bool_t 				tb_file_info(tb_char_t const* path, tb_file_info_t* info);
