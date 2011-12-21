@@ -44,8 +44,8 @@ typedef enum __tb_etype_t
  	TB_ETYPE_NULL 	= 0
 , 	TB_ETYPE_OPEN 	= 1
 ,	TB_ETYPE_READ 	= 2
-,	TB_ETYPE_WRIT 	= 3
-,	TB_ETYPE_CLOS 	= 4
+,	TB_ETYPE_WRIT 	= 4
+,	TB_ETYPE_CLOS 	= 8
 
 }tb_etype_t;
 
@@ -67,13 +67,15 @@ typedef enum __tb_eotype_t
 typedef struct __tb_eobject_t
 {
 	// the object type
-	tb_size_t 		otype;
+	tb_size_t 		otype 	: 8;
 
 	// the event type
-	tb_size_t 		etype;
+	tb_size_t 		etype 	: 24;
 
 	// the object handle
 	tb_handle_t 	handle;
+
+	// the callback
 
 }tb_eobject_t;
 
@@ -88,6 +90,7 @@ typedef struct __tb_eobject_t
  *
  * @param 	object 	the event object
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ *
  * @return 	the event type, return 0 if timeout
  */
 tb_size_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);

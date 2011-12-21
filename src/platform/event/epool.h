@@ -42,7 +42,10 @@ extern "C" {
 // the event ctrl type
 typedef enum __tb_ectrl_t
 {
- 	TB_ECTRL_NULL 	= 0
+ 	TB_ECTRL_NULL 			= 0
+, 	TB_ECTRL_OBJECT_ADD 	= 1
+, 	TB_ECTRL_OBJECT_MOD 	= 2
+, 	TB_ECTRL_OBJECT_DEL 	= 3
 
 }tb_ectrl_t;
 
@@ -53,7 +56,7 @@ typedef struct __tb_epool_t
 	tb_vector_t* 	handles;
 
 	// the object hash: handle => object
-	tb_hash_t* 		hash;
+	tb_hash_t* 		objects;
 
 }tb_epool_t;
 
@@ -77,6 +80,7 @@ tb_bool_t 		tb_epool_ctrl(tb_epool_t* pool, tb_size_t ectrl, tb_pointer_t arg0, 
  * @param 	objs 	the returned event objects array
  * @param 	maxn 	the maximum event objects number
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ *
  * @return 	the event number, return 0 if timeout
  */
 tb_size_t 		tb_epool_wait(tb_epool_t* pool, tb_eobject_t* objs, tb_size_t maxn, tb_long_t timeout);
