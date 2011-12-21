@@ -111,7 +111,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// writ data
 	return tb_socket_send(sst->sock, data, size);
 }
-static tb_bool_t tb_sstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, TB_FALSE);
@@ -195,7 +195,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->aclose = tb_sstream_aclose;
 	gst->aread 	= tb_sstream_aread;
 	gst->awrit 	= tb_sstream_awrit;
-	gst->ioctl1 = tb_sstream_ioctl1;
+	gst->ctrl1 = tb_sstream_ctrl1;
 	sst->sock 	= TB_NULL;
 	sst->type 	= TB_SOCKET_TYPE_TCP;
 
@@ -211,10 +211,10 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// ioctl
-	if (!tb_gstream_ioctl1(gst, TB_SSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_SSTREAM_CMD_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
-	if (!tb_gstream_ioctl1(gst, TB_SSTREAM_CMD_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return gst;

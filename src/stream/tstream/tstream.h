@@ -88,9 +88,9 @@ tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
 
 tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
-tb_bool_t 		tb_tstream_ioctl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 		tb_tstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
-tb_bool_t 		tb_tstream_ioctl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
+tb_bool_t 		tb_tstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd);
+tb_bool_t 		tb_tstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
+tb_bool_t 		tb_tstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
 
 // c plus plus
 #ifdef __cplusplus

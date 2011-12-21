@@ -26,9 +26,9 @@ int main(int argc, char** argv)
 	if (!ist || !ost || !zst) goto end;
 
 	// init option
-	tb_gstream_ioctl1(ist, TB_HSTREAM_CMD_SET_HEAD, "Accept-Encoding: gzip,deflate\r\n");
-	tb_gstream_ioctl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
-	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	tb_gstream_ctrl1(ist, TB_HSTREAM_CMD_SET_HEAD, "Accept-Encoding: gzip,deflate\r\n");
+	tb_gstream_ctrl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
+	tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	if (!tb_gstream_bopen(ist)) goto end;

@@ -144,7 +144,7 @@ static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->size;
 }
-static tb_bool_t tb_fstream_ioctl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_fstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst, TB_FALSE);
@@ -178,7 +178,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->afwrit	= tb_fstream_afwrit;
 	gst->size 	= tb_fstream_size;
 	gst->seek 	= tb_fstream_seek;
-	gst->ioctl1 = tb_fstream_ioctl1;
+	gst->ctrl1 = tb_fstream_ctrl1;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 
@@ -202,7 +202,7 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set path
-	if (!tb_gstream_ioctl1(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
 	
 	return gst;
 

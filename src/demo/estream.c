@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	if (!ist || !ost || !est) goto end;
 
 	// init option
-	tb_gstream_ioctl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	if (!tb_gstream_bopen(ist)) goto end;
