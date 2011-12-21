@@ -2,14 +2,14 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = mingw_x86
+PLAT = windows_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
-SDK = /home/ruki/programs/cross
-BIN = /home/ruki/programs/cross/bin
+SDK = /home/ruki/programs/INTEL11_0_061
+BIN = /home/ruki/programs/INTEL11_0_061/bin
 HOST = linux
 CCACHE = ccache
 DISTCC =

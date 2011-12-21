@@ -33,6 +33,7 @@ extern "C" {
  */
 #include "config.h"
 #include "keyword.h"
+#include "compiler.h"
 
 /* /////////////////////////////////////////////////////////
  * macros
@@ -85,8 +86,13 @@ typedef tb_void_t const* 			tb_cpointer_t;
 typedef tb_pointer_t 				tb_handle_t;
 
 // int64
+#ifdef TB_COMPILER_IS_MSVC
+typedef __int64						tb_int64_t;
+typedef unsigned __int64 			tb_uint64_t;
+#else
 typedef signed long long 			tb_int64_t;
 typedef unsigned long long 			tb_uint64_t;
+#endif
 typedef tb_int64_t					tb_sint64_t;
 
 // float

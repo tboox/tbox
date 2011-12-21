@@ -32,19 +32,21 @@ extern "C" {
  * includes
  */
 #include "../prefix.h"
-//#include <stdarg.h>
+#ifndef TB_COMPILER_IS_GCC
+# 	include <stdarg.h>
+#endif
 
 /* /////////////////////////////////////////////////////////
  * macros
  */
-#if 0
-#define tb_va_start(v, l) 	va_start(v, l)
-#define tb_va_end(v) 		va_end(v)
-#define tb_va_arg(v, l) 	va_arg(v, l)
-#else // gcc
-#define tb_va_start(v, l)	__builtin_va_start(v, l)
-#define tb_va_end(v)		__builtin_va_end(v)
-#define tb_va_arg(v, l)		__builtin_va_arg(v, l)
+#ifdef TB_COMPILER_IS_GCC
+# 	define tb_va_start(v, l)	__builtin_va_start(v, l)
+# 	define tb_va_end(v)			__builtin_va_end(v)
+# 	define tb_va_arg(v, l)		__builtin_va_arg(v, l)
+#else
+# 	define tb_va_start(v, l) 	va_start(v, l)
+# 	define tb_va_end(v) 		va_end(v)
+# 	define tb_va_arg(v, l) 		va_arg(v, l)
 #endif
 
 // varg
@@ -66,9 +68,11 @@ do \
  * types
  */
 
-//typedef va_list 	tb_va_list_t;
+#ifdef TB_COMPILER_IS_GCC
 typedef __builtin_va_list 	tb_va_list_t;
-
+#else
+typedef va_list 			tb_va_list_t;
+#endif
 
 // c plus plus
 #ifdef __cplusplus

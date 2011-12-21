@@ -16,12 +16,14 @@ DLL_SUFFIX 		= .so
 ASM_SUFFIX 		= .S
 
 # tool
-PRE 			= $(BIN)/i686-w64-mingw32-
-CC 				= $(PRE)gcc
-AR 				= $(PRE)ar
-STRIP 			= $(PRE)strip
-RANLIB 			= $(PRE)ranlib
-LD 				= $(PRE)g++
+PRE 			= wine $(BIN)/
+CC 				= $(PRE)cl.exe 
+#CC 				= $(PRE)icl.exe 
+AR 				= 
+STRIP 			= 
+RANLIB 			= 
+LD 				= $(PRE)link.exe
+#LD 				= $(PRE)xilink.exe
 AS				= 
 RM 				= rm -f
 RMDIR 			= rm -rf
@@ -33,12 +35,11 @@ PWD 			= pwd
 
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
-	-O2 -DNDEBUG \
-	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-	-march=native -pipe # gcc >= 4.2.3
+	-O2 -DNDEBUG
 
 CPPFLAGS_DEBUG 	= -g
-CPPFLAGS 		= -c -Wall -msse2
+CPPFLAGS 		= -c -X -nologo -W3 -EHsc -DWIN32 -D_CONSOLE \
+				  -I$(SDK)/include
 CPPFLAGS-I 		= -I
 CPPFLAGS-o 		= -o
 
@@ -48,30 +49,34 @@ CFLAGS_DEBUG 	=
 CFLAGS 			= 
 
 # cxxflags: c++ files
-CXXFLAGS_RELEASE = -fno-rtti
+CXXFLAGS_RELEASE = 
 CXXFLAGS_DEBUG 	= 
 CXXFLAGS 		= 
 
 # ldflags
-LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
+LDFLAGS_RELEASE = 
 LDFLAGS_DEBUG 	= 
-LDFLAGS 		= -static
-LDFLAGS-L 		= -L
+LDFLAGS 		= \
+				  -libpath:$(SDK)/lib \
+				  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib \
+				  shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib \
+				  -nologo -subsystem:console -incremental:no -machine:I386
+LDFLAGS-L 		= -libpath:
 LDFLAGS-l 		= -l
 LDFLAGS-o 		= -o
 
 # asflags
-ASFLAGS_RELEASE = Wa,-march=native
+ASFLAGS_RELEASE = 
 ASFLAGS_DEBUG 	= 
 ASFLAGS 		= -c
 ASFLAGS-I 		= -I
 ASFLAGS-o 		= -o
 
 # arflags
-ARFLAGS 		= -cr
+ARFLAGS 		= 
 
 # share ldflags
-SHFLAGS 		= -shared -Wl,-soname
+SHFLAGS 		= 
 
 # include sub-config
 include 		$(PLAT_DIR)/config.mak
