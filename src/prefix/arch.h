@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_ARCH_H
 #define TB_PREFIX_ARCH_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -51,11 +46,6 @@ extern "C" {
 # 	define TB_ARCH_PPC
 #else
 # 	error unknown arch
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
 #endif
 
 #endif

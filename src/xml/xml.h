@@ -23,11 +23,6 @@
 #ifndef TB_XML_H
 #define TB_XML_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -37,10 +32,5 @@ extern "C" {
 #include "nlist.h"
 #include "reader.h"
 #include "writer.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

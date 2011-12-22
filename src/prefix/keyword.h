@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_KEYWORD_H
 #define TB_PREFIX_KEYWORD_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -53,11 +48,6 @@ extern "C" {
 # 	define __tb_unlikely__(x) 		(x)
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

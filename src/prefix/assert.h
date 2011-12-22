@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_ASSERT_H
 #define TB_PREFIX_ASSERT_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -42,7 +37,11 @@ extern "C" {
 
 // assert
 #if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_assert_message_tag(tag, x, fmt, arg...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
+# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#		define tb_assert_message_tag(tag, x, fmt, ...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, __VA_ARGS__); } } while(0)
+# 	else
+#		define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
+# 	endif
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_assert_message_tag(...)
 #else
@@ -80,7 +79,11 @@ extern "C" {
 #endif
 
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	define tb_assert_message(x, fmt, arg...)				tb_assert_message_tag(TB_PRINT_TAG, x, fmt, ## arg)
+# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+# 		define tb_assert_message(x, fmt, ...)				tb_assert_message_tag(TB_PRINT_TAG, x, fmt, __VA_ARGS__)
+# 	else
+# 		define tb_assert_message(x, fmt, arg...)			tb_assert_message_tag(TB_PRINT_TAG, x, fmt, ## arg)
+# 	endif
 #else
 # 	define tb_assert_message
 #endif
@@ -100,11 +103,6 @@ extern "C" {
 #define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_PRINT_TAG, x)
 
 #define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

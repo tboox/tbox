@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_QUEUE_H
 #define TB_CONTAINER_QUEUE_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -139,11 +134,6 @@ tb_bool_t 			tb_queue_full(tb_queue_t const* queue);
 tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

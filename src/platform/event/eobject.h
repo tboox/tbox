@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_EVENT_OBJECT_H
 #define TB_PLATFORM_EVENT_OBJECT_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -94,10 +89,5 @@ typedef struct __tb_eobject_t
  * @return 	the event type, return 0 if timeout
  */
 tb_size_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

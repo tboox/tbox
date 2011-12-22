@@ -23,11 +23,6 @@
 #ifndef TB_STREAM_TSTREAM_H
 #define TB_STREAM_TSTREAM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -91,10 +86,5 @@ tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_bool_t 		tb_tstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd);
 tb_bool_t 		tb_tstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
 tb_bool_t 		tb_tstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

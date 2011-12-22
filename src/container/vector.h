@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_VECTOR_H
 #define TB_CONTAINER_VECTOR_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -159,11 +154,6 @@ tb_size_t 			tb_vector_size(tb_vector_t const* vector);
 tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

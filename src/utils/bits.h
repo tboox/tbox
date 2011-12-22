@@ -23,11 +23,6 @@
 #ifndef TB_UTILS_BITS_H
 #define TB_UTILS_BITS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -865,11 +860,6 @@ static __tb_inline__ tb_void_t tb_bits_set_double_nne_inline(tb_byte_t* p, tb_fl
 }
 
 #endif /* TB_CONFIG_TYPE_FLOAT */
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

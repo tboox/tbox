@@ -23,11 +23,6 @@
 #ifndef TB_STREAM_GSTREAM_H
 #define TB_STREAM_GSTREAM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -393,11 +388,6 @@ tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 tb_bool_t 			tb_gstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd);
 tb_bool_t 			tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
 tb_bool_t 			tb_gstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_EVENT_POOL_H
 #define TB_PLATFORM_EVENT_POOL_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -84,10 +79,5 @@ tb_bool_t 		tb_epool_ctrl(tb_epool_t* pool, tb_size_t ectrl, tb_pointer_t arg0, 
  * @return 	the event number, return 0 if timeout
  */
 tb_size_t 		tb_epool_wait(tb_epool_t* pool, tb_eobject_t* objs, tb_size_t maxn, tb_long_t timeout);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -23,11 +23,6 @@
 #ifndef TB_ZIP_H
 #define TB_ZIP_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -61,10 +56,5 @@ tb_void_t 				tb_zip_close(tb_zip_t* zip);
 
 // spank
 tb_zip_status_t 	tb_zip_spank(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

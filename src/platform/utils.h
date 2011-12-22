@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_UTILS_H
 #define TB_PLATFORM_UTILS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -58,10 +53,5 @@ tb_int64_t 		tb_uclock();
 
 // the milliseconds from 1970-01-01 00:00:00:000
 tb_int64_t 		tb_time();
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

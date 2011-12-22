@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_DLIST_H
 #define TB_CONTAINER_DLIST_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -167,11 +162,6 @@ tb_size_t 			tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor);
 tb_size_t 			tb_dlist_size(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

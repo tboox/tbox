@@ -23,11 +23,6 @@
 #ifndef TB_XML_WRITER_H
 #define TB_XML_WRITER_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -99,10 +94,5 @@ tb_void_t 					tb_xml_writer_text(tb_xml_writer_t* writer, tb_char_t const* text
 
 // comment
 tb_void_t 					tb_xml_writer_comment(tb_xml_writer_t* writer, tb_char_t const* comment);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

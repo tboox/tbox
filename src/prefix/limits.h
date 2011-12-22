@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_LIMITS_H
 #define TB_PREFIX_LIMITS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -47,11 +42,6 @@ extern "C" {
 #define TB_MINU32 				(0)
 #define TB_NAN32 				(0x80000000)
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_CONFIG_H
 #define TB_PREFIX_CONFIG_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -42,11 +37,6 @@ extern "C" {
 # 	define TB_DEBUG
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

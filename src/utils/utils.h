@@ -23,11 +23,6 @@
 #ifndef TB_UTILS_H
 #define TB_UTILS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -40,10 +35,5 @@ extern "C" {
 #include "crc.h"
 #include "base32.h"
 #include "base64.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

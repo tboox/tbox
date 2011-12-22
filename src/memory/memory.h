@@ -23,11 +23,6 @@
 #ifndef TB_MEMORY_H
 #define TB_MEMORY_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -39,11 +34,6 @@ extern "C" {
 #include "rbuffer.h"
 #include "qbuffer.h"
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

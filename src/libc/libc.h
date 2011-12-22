@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_H
 #define TB_LIBC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -39,10 +34,5 @@ extern "C" {
 #include "stdlib/stdlib.h"
 #include "string/string.h"
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

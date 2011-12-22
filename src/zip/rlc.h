@@ -23,11 +23,6 @@
 #ifndef TB_ZIP_RLC_H
 #define TB_ZIP_RLC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -68,11 +63,6 @@ typedef struct __tb_zip_rlc_t
  */
 
 tb_zip_t* 	tb_zip_rlc_open(tb_zip_rlc_t* rlc, tb_zip_action_t action);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

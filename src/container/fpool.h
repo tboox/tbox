@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_FPOOL_H
 #define TB_CONTAINER_FPOOL_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -123,11 +118,6 @@ tb_size_t 			tb_fpool_step(tb_fpool_t const* fpool);
 // debug
 tb_void_t 			tb_fpool_dump(tb_fpool_t* fpool);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

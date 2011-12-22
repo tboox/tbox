@@ -23,11 +23,6 @@
 #ifndef TB_XML_NLIST_H
 #define TB_XML_NLIST_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -62,10 +57,5 @@ tb_xml_node_t* 	tb_xml_nlist_get(tb_xml_nlist_t* nlist, tb_char_t const* name);
 // modifiors
 tb_void_t 			tb_xml_nlist_add(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
 tb_void_t 			tb_xml_nlist_det(tb_xml_nlist_t* nlist, tb_xml_node_t* node);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

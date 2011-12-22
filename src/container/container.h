@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_H
 #define TB_CONTAINER_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -41,10 +36,5 @@ extern "C" {
 #include "queue.h"
 #include "stack.h"
 #include "vector.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

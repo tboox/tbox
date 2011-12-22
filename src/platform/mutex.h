@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_MUTEX_H
 #define TB_PLATFORM_MUTEX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -46,9 +41,4 @@ tb_bool_t 		tb_mutex_leave(tb_handle_t hmutex);
 
 tb_bool_t 		tb_mutex_tryenter(tb_handle_t hmutex);
 	
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
-
 #endif

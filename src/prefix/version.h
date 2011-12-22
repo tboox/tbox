@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_VERSION_H
 #define TB_PREFIX_VERSION_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -41,11 +36,6 @@ extern "C" {
 #define TB_VERSION_MAJOR 			(1)
 #define TB_VERSION_MINOR 			(4)
 #define TB_VERSION_ALTER 			(4)
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

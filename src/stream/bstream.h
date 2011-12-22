@@ -23,11 +23,6 @@
 #ifndef TB_STREAM_BSTREAM_H
 #define TB_STREAM_BSTREAM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -216,11 +211,6 @@ tb_void_t 			tb_bstream_set_double_nne(tb_bstream_t* bst, tb_float_t val);
 tb_uint32_t 		tb_bstream_peek_ubits32(tb_bstream_t* bst, tb_size_t nbits);
 tb_sint32_t 		tb_bstream_peek_sbits32(tb_bstream_t* bst, tb_size_t nbits);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

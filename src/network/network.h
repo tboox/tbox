@@ -23,11 +23,6 @@
 #ifndef TB_NETWORK_H
 #define TB_NETWORK_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -35,10 +30,5 @@ extern "C" {
 #include "cookies.h"
 #include "http.h"
 #include "dns.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

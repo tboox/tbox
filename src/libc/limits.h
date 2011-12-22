@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_LIMITS_H
 #define TB_LIBC_LIMITS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -36,10 +31,5 @@ extern "C" {
 /* /////////////////////////////////////////////////////////
  * macros
  */
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

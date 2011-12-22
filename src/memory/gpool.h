@@ -23,11 +23,6 @@
 #ifndef TB_MEMORY_GPOOL_H
 #define TB_MEMORY_GPOOL_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -75,10 +70,5 @@ tb_bool_t 		tb_gpool_deallocate(tb_handle_t hpool, tb_pointer_t data, tb_char_t 
 
 tb_void_t 		tb_gpool_dump(tb_handle_t hpool);
 tb_bool_t 		tb_gpool_check(tb_handle_t hpool);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

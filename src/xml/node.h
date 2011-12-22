@@ -23,11 +23,6 @@
 #ifndef TB_XML_NODE_H
 #define TB_XML_NODE_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -173,10 +168,5 @@ tb_xml_node_t* 		tb_xml_node_attributes_add_format(tb_xml_node_t* node, tb_char_
 tb_xml_node_t* 		tb_xml_node_attributes_add_float(tb_xml_node_t* node, tb_char_t const* name, tb_float_t value);
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

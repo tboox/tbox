@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_STDLIB_H
 #define TB_LIBC_STDLIB_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -93,10 +88,5 @@ tb_float_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
 
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

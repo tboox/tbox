@@ -23,11 +23,6 @@
 #ifndef TB_XML_READER_H
 #define TB_XML_READER_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -134,10 +129,5 @@ tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);
 tb_pstring_t const* 	tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);
 tb_pstring_t const* 	tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);
 tb_pstring_t const* 	tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

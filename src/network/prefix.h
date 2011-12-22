@@ -23,19 +23,9 @@
 #ifndef TB_NETWORK_PREFIX_H
 #define TB_NETWORK_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

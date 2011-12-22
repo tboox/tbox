@@ -23,21 +23,11 @@
 #ifndef TB_STREAM_GSTREAM_PREFIX_H
 #define TB_STREAM_GSTREAM_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
 #include "../gstream.h"
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

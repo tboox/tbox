@@ -23,11 +23,6 @@
 #ifndef TB_ENCODING_H
 #define TB_ENCODING_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -83,11 +78,6 @@ tb_encoder_t const* 	tb_encoding_get_encoder(tb_encoding_t encoding);
 // convert string
 tb_size_t 				tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

@@ -23,11 +23,6 @@
 #ifndef TB_XML_DOCUMENT_H
 #define TB_XML_DOCUMENT_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -95,10 +90,5 @@ tb_xml_node_t* 		tb_xml_document_init_text(tb_xml_document_t* document, tb_char_
 tb_xml_node_t* 		tb_xml_document_init_cdata(tb_xml_document_t* document, tb_char_t const* data);
 tb_xml_node_t* 		tb_xml_document_init_comment(tb_xml_document_t* document, tb_char_t const* data);
 tb_xml_node_t* 		tb_xml_document_init_attribute(tb_xml_document_t* document, tb_char_t const* name);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

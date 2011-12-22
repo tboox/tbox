@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_ARCH_ATOMIC_H
 #define TB_PLATFORM_ARCH_ATOMIC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -40,11 +35,6 @@ extern "C" {
 # 	include "arm/atomic.h"
 #elif defined(TB_CONFIG_ARCH_SH4)
 # 	include "sh4/atomic.h"
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
 #endif
 
 #endif

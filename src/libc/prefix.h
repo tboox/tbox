@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_PREFIX_H
 #define TB_LIBC_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -35,10 +30,5 @@ extern "C" {
 #include "ctype.h"
 #include "limits.h"
 #include "stdarg.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
