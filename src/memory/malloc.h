@@ -23,11 +23,6 @@
 #ifndef TB_MEMORY_MALLOC_H
 #define TB_MEMORY_MALLOC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -54,11 +49,6 @@ tb_void_t 		tb_memory_deallocate(tb_pointer_t data, tb_char_t const* func, tb_si
 tb_void_t 		tb_memory_dump();
 tb_bool_t 		tb_memory_check();
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

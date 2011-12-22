@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_THREAD_H
 #define TB_PLATFORM_THREAD_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -51,10 +46,5 @@ tb_bool_t 		tb_thread_suspend(tb_handle_t hthread);
 tb_bool_t 		tb_thread_resume(tb_handle_t hthread);
 tb_bool_t 		tb_thread_terminate(tb_handle_t hthread);
 tb_void_t 		tb_thread_exit(tb_pointer_t retval);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

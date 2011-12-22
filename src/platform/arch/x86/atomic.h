@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_ARCH_x86_ATOMIC_H
 #define TB_PLATFORM_ARCH_x86_ATOMIC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -224,10 +219,5 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_x86(tb_atomic_t* a, tb_lo
 
 #endif // TB_CONFIG_ASSEMBLER_GAS
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

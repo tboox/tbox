@@ -23,11 +23,6 @@
 #ifndef TB_ZIP_ZLIB_H
 #define TB_ZIP_ZLIB_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -57,11 +52,6 @@ typedef struct __tb_zip_zlib_t
  */
 
 tb_zip_t* 	tb_zip_zlib_open(tb_zip_zlib_t* zlib, tb_zip_action_t action);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

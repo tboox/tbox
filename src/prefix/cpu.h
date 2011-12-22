@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_CPU_H
 #define TB_PREFIX_CPU_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -51,11 +46,6 @@ extern "C" {
 # 	define TB_CPU_BITALIGN 		(3)
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

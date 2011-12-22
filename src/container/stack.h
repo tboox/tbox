@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_STACK_H
 #define TB_CONTAINER_STACK_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -114,11 +109,6 @@ tb_size_t 			tb_stack_size(tb_stack_t const* stack);
 tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

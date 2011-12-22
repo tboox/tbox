@@ -23,11 +23,6 @@
 #ifndef TB_NETWORK_COOKIES_H
 #define TB_NETWORK_COOKIES_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * INTRODUCTION 
  * Cookies are a general mechanism which server side connections (such as CGI scripts) 
@@ -257,10 +252,5 @@ tb_void_t 			tb_cookies_clear(tb_cookies_t* cookies);
 
 // dump
 tb_void_t 			tb_cookies_dump(tb_cookies_t const* cookies);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

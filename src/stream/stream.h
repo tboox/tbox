@@ -23,11 +23,6 @@
 #ifndef TB_STREAM_H
 #define TB_STREAM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -63,11 +58,6 @@ extern "C" {
  *
  * read & writ <= tstream <= tstream ... <= gstream <= (data, file, http, ...)
  */
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

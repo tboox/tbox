@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_COMPILER_H
 #define TB_PREFIX_COMPILER_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -207,11 +202,6 @@ extern "C" {
 #	define TB_COMPILER_IS_UNKNOWN
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

@@ -186,6 +186,7 @@ INC_FILES 				= \
 						math/opt/fixed30_arm.h \
 						math/opt/fixed30_sh4.h \
 						string/prefix.h \
+						string/string.h \
 						string/pstring.h \
 						string/sstring.h \
 						string/rstring.h \

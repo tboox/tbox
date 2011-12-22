@@ -23,11 +23,6 @@
 #ifndef TB_UTILS_TIME_H
 #define TB_UTILS_TIME_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -74,9 +69,4 @@ tb_bool_t 			tb_time_from_utc(tb_int64_t* time, tb_time_t const* utc);
 tb_char_t const* 	tb_time_week(tb_time_t const* time);
 
 	
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
-
 #endif

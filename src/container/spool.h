@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_SPOOL_H
 #define TB_CONTAINER_SPOOL_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -95,11 +90,6 @@ tb_char_t* 			tb_spool_strdup(tb_spool_t* spool, tb_char_t const* s);
 tb_char_t* 			tb_spool_strndup(tb_spool_t* spool, tb_char_t const* s, tb_size_t n);
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

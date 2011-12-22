@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_SOCKET_H
 #define TB_PLATFORM_SOCKET_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -68,9 +63,4 @@ tb_int_t 		tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
 tb_int_t 		tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 tb_int_t 		tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
 	
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
-
 #endif

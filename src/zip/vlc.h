@@ -23,11 +23,6 @@
 #ifndef TB_ZIP_VLC_H
 #define TB_ZIP_VLC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -120,10 +115,5 @@ typedef struct __tb_zip_vlc_golomb_t
 tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma);
 tb_zip_vlc_t* tb_zip_vlc_golomb_open(tb_zip_vlc_golomb_t* golomb, tb_size_t defm);
 tb_zip_vlc_t* tb_zip_vlc_fixed_open(tb_zip_vlc_fixed_t* fixed, tb_byte_t nbits);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

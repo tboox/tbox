@@ -23,11 +23,6 @@
 #ifndef TB_NETWORK_DNS_H
 #define TB_NETWORK_DNS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -46,10 +41,5 @@ tb_void_t 				tb_dns_server_dump();
 // lookup host ip from name
 tb_char_t const* 	tb_dns_lookup(tb_char_t const* host, tb_char_t* ip);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

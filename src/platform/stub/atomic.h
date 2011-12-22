@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_STUB_ATOMIC_H
 #define TB_PLATFORM_STUB_ATOMIC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -326,10 +321,5 @@ static __tb_inline__ tb_size_t tb_atomic_nand_and_fetch_stub(tb_atomic_t* a, tb_
 	*((tb_long_t*)a) = ~*((tb_long_t*)a) & v;
 	return *((tb_long_t*)a);
 }
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_ITEM_H
 #define TB_CONTAINER_ITEM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -130,11 +125,6 @@ tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_pointer_t fpool);
  *
  */
 tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_pointer_t priv);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

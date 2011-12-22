@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_FILE_H
 #define TB_PLATFORM_FILE_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -108,10 +103,5 @@ tb_void_t 				tb_file_delete(tb_char_t const* path, tb_size_t type);
 
 // file attributes
 tb_bool_t 				tb_file_info(tb_char_t const* path, tb_file_info_t* info);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

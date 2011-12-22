@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_EVENT_PREFIX_H
 #define TB_PLATFORM_EVENT_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -35,10 +30,5 @@ extern "C" {
 #include "prefix.h"
 #include "../../container/container.h"
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

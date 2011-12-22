@@ -23,11 +23,6 @@
 #ifndef TB_PLATFROM_H
 #define TB_PLATFORM_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -40,10 +35,5 @@ extern "C" {
 #include "thread.h"
 #include "atomic.h"
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

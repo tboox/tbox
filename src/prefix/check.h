@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_CHECK_H
 #define TB_PREFIX_CHECK_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -55,11 +50,6 @@ extern "C" {
 #define TB_IF_FAIL_BREAK(x) 							{ if (!(x)) break ; }
 #define TB_IF_FAIL_ABORT(x) 							do { if (!(x)) {tb_abort();} } while (0)
 #define TB_IF_FAIL_CONTINUE(x) 							{ if (!(x)) continue ; }
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
 #endif
 
 #endif

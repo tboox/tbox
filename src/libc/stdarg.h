@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_STDARG_H
 #define TB_LIBC_STDARG_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -72,11 +67,6 @@ do \
 typedef __builtin_va_list 	tb_va_list_t;
 #else
 typedef va_list 			tb_va_list_t;
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
 #endif
 
 #endif

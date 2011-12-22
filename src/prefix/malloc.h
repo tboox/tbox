@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_MALLOC_H
 #define TB_PREFIX_MALLOC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -96,11 +91,6 @@ __tb_inline__ tb_void_t 	operator delete[](tb_pointer_t p) throw() { tb_free(p);
 #endif
 #endif
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

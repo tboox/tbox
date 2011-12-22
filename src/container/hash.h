@@ -23,11 +23,6 @@
 #ifndef TB_CONTAINER_HASH_H
 #define TB_CONTAINER_HASH_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -163,11 +158,6 @@ tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t it
 tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

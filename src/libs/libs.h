@@ -23,11 +23,6 @@
 #ifndef TB_LIBS_H
 #define TB_LIBS_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -35,11 +30,6 @@ extern "C" {
 
 #ifdef TB_CONFIG_LIBS_ZLIB
 # 	include "zlib/zlib.h"
-#endif
-
-// c plus plus
-#ifdef __cplusplus
-}
 #endif
 
 #endif

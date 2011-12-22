@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_CTYPE_H
 #define TB_LIBC_CTYPE_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -54,10 +49,5 @@ extern "C" {
 #define tb_toupper(x) 				(tb_islower(x)? (x) - 0x20 : (x))
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

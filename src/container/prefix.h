@@ -23,20 +23,10 @@
 #ifndef TB_CONTAINER_PREFIX_H
 #define TB_CONTAINER_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
 #include "../stream/stream.h"
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

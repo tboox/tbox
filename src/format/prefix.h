@@ -23,11 +23,6 @@
 #ifndef TB_FORMAT_PREFIX_H
 #define TB_FORMAT_PREFIX_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -37,10 +32,5 @@ extern "C" {
 #include "../math/math.h"
 
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

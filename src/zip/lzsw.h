@@ -23,11 +23,6 @@
 #ifndef TB_STREAM_ZSTREAM_LZSW_H
 #define TB_STREAM_ZSTREAM_LZSW_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -156,11 +151,6 @@ typedef union __tb_lzsw_zstream_t
 tb_tstream_t* 	tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst);
 tb_tstream_t* 	tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst);
 tb_tstream_t* 	tb_zstream_open_lzsw(tb_lzsw_zstream_t* zst, tb_size_t action);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

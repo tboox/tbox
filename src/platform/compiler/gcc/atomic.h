@@ -23,11 +23,6 @@
 #ifndef TB_PLATFORM_COMPILER_GCC_ATOMIC_H
 #define TB_PLATFORM_COMPILER_GCC_ATOMIC_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -190,10 +185,5 @@ static __tb_inline__ tb_size_t tb_atomic_nand_and_fetch_sync(tb_atomic_t* a, tb_
 	tb_assert(a);
 	return __sync_nand_and_fetch(a, v);
 }
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

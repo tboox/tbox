@@ -23,11 +23,6 @@
 #ifndef TB_PREFIX_TYPE_H
 #define TB_PREFIX_TYPE_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -115,11 +110,6 @@ typedef tb_float_t 					tb_scalar_t;
 
 // atomic
 typedef __tb_volatile__ tb_size_t 	tb_atomic_t;
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

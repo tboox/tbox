@@ -24,11 +24,6 @@
 #ifndef TB_FORMAT_H
 #define TB_FORMAT_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -146,11 +141,6 @@ tb_size_t 			tb_format_zip_probe(tb_gstream_t* gst);
 tb_size_t 			tb_format_bz2_probe(tb_gstream_t* gst);
 tb_size_t 			tb_format_gz_probe(tb_gstream_t* gst);
 tb_size_t 			tb_format_7z_probe(tb_gstream_t* gst);
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

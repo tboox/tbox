@@ -23,11 +23,6 @@
 #ifndef TB_LIBC_STRING_H
 #define TB_LIBC_STRING_H
 
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
@@ -100,10 +95,5 @@ tb_char_t* 		tb_strirstr(tb_char_t const* s1, tb_char_t const* s2);
 tb_char_t* 		tb_strnrstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
 tb_char_t* 		tb_strnirstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
 
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif
