@@ -2,7 +2,7 @@
 
 static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 {
-	tb_handle_t hfile = tb_file_open(path, TB_FILE_RO);
+	tb_handle_t hfile = tb_file_init(path, TB_FILE_RO);
 
 	tb_byte_t* p = TB_NULL;
 	if (hfile)
@@ -20,7 +20,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 			if (ret < 0) break ;
 			else read_n += ret;
 		}
-		tb_file_close(hfile);
+		tb_file_exit(hfile);
 		if (read_n < file_size) 
 		{
 			tb_free(1, p);
@@ -33,7 +33,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 }
 static tb_void_t save(tb_char_t const* path, tb_byte_t const* data, tb_size_t size)
 {
-	tb_handle_t hfile = tb_file_open(path, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	tb_handle_t hfile = tb_file_init(path, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (hfile)
 	{
 		tb_int_t writ_n = 0;
@@ -43,7 +43,7 @@ static tb_void_t save(tb_char_t const* path, tb_byte_t const* data, tb_size_t si
 			if (ret < 0) break ;
 			else writ_n += ret;
 		}
-		tb_file_close(hfile);
+		tb_file_exit(hfile);
 	}
 }
 

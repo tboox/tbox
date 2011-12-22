@@ -31,6 +31,12 @@
 /* /////////////////////////////////////////////////////////
  * macros
  */
+
+// tag
+#if defined(TB_TRACE_ENABLE) && !defined(TB_PRINT_TAG)
+# 	define TB_PRINT_TAG 									"tbox"
+#endif
+
 // print
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
