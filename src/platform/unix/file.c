@@ -40,7 +40,7 @@
  */
 
 // file
-tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
+tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(path, TB_NULL);
 
@@ -69,7 +69,7 @@ tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
 	// ok?
 	return (fd < 0)? TB_NULL : ((tb_handle_t)(fd + 1));
 }
-tb_void_t tb_file_close(tb_handle_t hfile)
+tb_void_t tb_file_exit(tb_handle_t hfile)
 {
 	if (hfile) close((tb_long_t)hfile - 1);
 }

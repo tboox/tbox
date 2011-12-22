@@ -88,7 +88,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
  */
 
 // file
-tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
+tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(path, TB_NULL);
 
@@ -115,7 +115,7 @@ tb_handle_t tb_file_open(tb_char_t const* path, tb_size_t flags)
 	HANDLE hfile = CreateFile(path, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
 	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : TB_NULL;
 }
-tb_void_t tb_file_close(tb_handle_t hfile)
+tb_void_t tb_file_exit(tb_handle_t hfile)
 {
 	if (hfile) CloseHandle(hfile);
 }

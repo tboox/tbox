@@ -4,6 +4,7 @@ include $(PRO_DIR)/prefix.mak
 # module name
 NAMES = test \
 		time \
+		file \
 		http \
 		bitops \
 		stdlib \

@@ -71,7 +71,7 @@ static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst && !fst->file && gst->url, -1);
 
 	// open file
-	fst->file = tb_file_open(gst->url, fst->flags);
+	fst->file = tb_file_init(gst->url, fst->flags);
 	tb_assert_and_check_return_val(fst->file, -1);
 
 	// init size
@@ -88,7 +88,7 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 	if (fst->file)
 	{
 		// close file
-		tb_file_close(fst->file);
+		tb_file_exit(fst->file);
 
 		// clear 
 		fst->file = TB_NULL;
