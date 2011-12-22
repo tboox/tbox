@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = mingw_x86
+PLAT = windows_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox

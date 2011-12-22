@@ -28,10 +28,11 @@
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_DYNAMIC_ARRAY_DEFINATION
 
 // assembler
-//#define TB_CONFIG_ASSEMBLER_GAS
-//#define TB_CONFIG_ASSEMBLER_MASM
-//#define TB_CONFIG_ASSEMBLER_NASM
-//#define TB_CONFIG_ASSEMBLER_YASM
+#if defined(_MSC_VER)
+# 	define TB_CONFIG_ASSEMBLER_MASM
+#elif defined(__GNUC__)
+# 	define TB_CONFIG_ASSEMBLER_GAS
+#endif
 
 // keyword
 #define TB_CONFIG_KEYWORD_INLINE		__inline
