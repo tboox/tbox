@@ -58,7 +58,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read file
 	tb_byte_t 	data[4096];
 	tb_uint64_t read = 0;
-	while (read < isize)
+	while (1)//read < isize)
 	{
 		// try to read data
 		tb_long_t n = tb_file_read(ifile, data, 4096);
@@ -73,13 +73,25 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		else if (!n)
 		{
 			// waiting read...
+			tb_print("waiting...");
 			tb_size_t etype = tb_eobject_wait(&io, 10000);
 
 			// timeout?
-			tb_check_break(etype);
+			if (!etype)
+			{
+				tb_print("timeout");
+				break;
+			}
+
+			// closed?
+			if (etype == TB_ETYPE_EXIT)
+			{
+				tb_print("closed");
+				break;
+			}
 
 			// check
-			tb_assert_and_check_break(etype == TB_ETYPE_READ);
+			tb_assert_and_check_break(etype & TB_ETYPE_READ);
 		}
 		else break;
 	}
