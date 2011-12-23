@@ -11,8 +11,8 @@ TB_CONFIG_ARCH 					= arm
 TB_CONFIG_API_FILE 				= posix
 TB_CONFIG_API_SOCK 				= posix
 TB_CONFIG_API_UTIL 				= posix
-TB_CONFIG_API_MUTX 				= pthread
-TB_CONFIG_API_THRD 				= pthread
+TB_CONFIG_API_MUTX 				= posix
+TB_CONFIG_API_THRD 				= posix
 
 # libs
 TB_CONFIG_LIBS_ZLIB 			= y
