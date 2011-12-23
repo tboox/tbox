@@ -4,6 +4,36 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////
+ * writ
+ */
+static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_byte_t* data, tb_size_t size, tb_eobject_t* oo)
+{
+	tb_size_t writ = 0;
+	while (writ < size)
+	{
+		// try to writ data
+		tb_long_t n = tb_file_writ(ofile, data + writ, size - writ);
+		if (n > 0)
+		{
+			// update writ
+			writ += n;
+		}
+		else if (!n)
+		{
+			// waiting read...
+			tb_size_t etype = tb_eobject_wait(&oo, 10000);
+
+			// timeout?
+			tb_check_break(etype);
+
+			// check
+			tb_assert_and_check_break(etype == TB_ETYPE_WRIT);
+		}
+		else break;
+	}
+	return writ == size? TB_TRUE : TB_FALSE;
+}
+/* ///////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
@@ -20,22 +50,22 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(isize, end);
 
 	// init eobject
-	tb_eobject_t o;
-	o.otype = TB_EOTYPE_FILE;
-	o.etype = TB_ETYPE_READ;
-	o.handle = ifile;
+	tb_eobject_t io;
+	tb_eobject_t oo;
+	if (!tb_eobject_init(&io, TB_EOTYPE_FILE, TB_ETYPE_READ, ifile)) goto end;
+	if (!tb_eobject_init(&oo, TB_EOTYPE_FILE, TB_ETYPE_WRIT, ofile)) goto end;
 
 	// read file
 	tb_byte_t 	data[4096];
 	tb_uint64_t read = 0;
-	while (read < size)
+	while (read < isize)
 	{
 		// try to read data
 		tb_long_t n = tb_file_read(ifile, data, 4096);
 		if (n > 0)
 		{
 			// writ data
-
+			if (!tb_test_file_writ(ofile, data, n, &oo)) break;;
 
 			// update read
 			read += n;
@@ -43,7 +73,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		else if (!n)
 		{
 			// waiting read...
-			if (!tb_eobject_wait(&o, -1)) break;
+			tb_size_t etype = tb_eobject_wait(&io, 10000);
+
+			// timeout?
+			tb_check_break(etype);
+
+			// check
+			tb_assert_and_check_break(etype == TB_ETYPE_READ);
 		}
 		else break;
 	}
@@ -51,7 +87,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// trace
-	tb_print("size: %llu, read: %llu, writ: %llu", size, read, writ);
+	tb_print("size: %llu, read: %llu", isize, read);
+
+	// exit eobject
+	if (ifile) tb_eobject_exit(&io);
+	if (ofile) tb_eobject_exit(&oo);
 
 	// exit file
 	if (ifile) tb_file_exit(ifile);

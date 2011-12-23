@@ -1,17 +1,17 @@
-/*!The Treasure Platform Library
+/*!The Treasure Box Library
  * 
- * TPlat is free software; you can redistribute it and/or modify
+ * TBox is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  * 
- * TPlat is distributed in the hope that it will be useful,
+ * TBox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with TPlat; 
+ * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
@@ -49,12 +49,12 @@ typedef enum __tb_etype_t
 typedef enum __tb_eotype_t
 {
  	TB_EOTYPE_NULL 	= 0
-, 	TB_EOTYPE_FILE 	= 1
-,	TB_EOTYPE_SOCK 	= 2
-,	TB_EOTYPE_HTTP 	= 3
-,	TB_EOTYPE_GSTM 	= 4
-,	TB_EOTYPE_EVET 	= 5
-,	TB_EOTYPE_OTHR 	= 6
+, 	TB_EOTYPE_DATA 	= 1 	//!< for qbuffer
+, 	TB_EOTYPE_FILE 	= 2 	//!< for file
+,	TB_EOTYPE_SOCK 	= 3 	//!< for socket
+,	TB_EOTYPE_HTTP 	= 4 	//!< for http
+,	TB_EOTYPE_GSTM 	= 5 	//!< for gstream
+,	TB_EOTYPE_EVET 	= 6 	//!< for event
 
 }tb_eotype_t;
 
@@ -77,7 +77,38 @@ typedef struct __tb_eobject_t
  */
 
 /// init the event object
-tb_bool_t tb_eobject_init(tb_eobject_t* object);
+tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_size_t otype, tb_size_t etype, tb_handle_t handle);
+
+/// exit the event object
+tb_void_t tb_eobject_exit(tb_eobject_t* object);
+
+/// get the object type
+tb_size_t tb_eobject_type(tb_eobject_t* object);
+
+/// get the event type
+tb_size_t tb_eobject_gete(tb_eobject_t* object);
+
+/*!add the event type
+ *
+ * add the event type by 'or' before waiting it
+ *
+ * @param 	object 	the event object
+ * @param 	type 	the event type
+ *
+ * @return 	the new event type
+ */
+tb_size_t tb_eobject_adde(tb_eobject_t* object, tb_size_t etype);
+
+/*!delete the event type
+ *
+ * delete the event type by 'and' before waiting it
+ *
+ * @param 	object 	the event object
+ * @param 	type 	the event type
+ *
+ * @return 	the new event type
+ */
+tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype);
 
 /*!wait the event object
  *
@@ -87,9 +118,9 @@ tb_bool_t tb_eobject_init(tb_eobject_t* object);
  * @param 	object 	the event object
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
- * @return 	the event type, return 0 if timeout
+ * @return 	the event type, return 0 if timeout, return -1 if error
  */
-tb_size_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
+tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
 
 /*!kill the event object
  *
@@ -97,10 +128,8 @@ tb_size_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
  * and tb_eobject_wait() return 0
  *
  * @param 	object 	the event object
- *
- * @return 	return TB_TRUE if cancel successfully
  */
-tb_bool_t tb_eobject_kill(tb_eobject_t* object);
+tb_void_t tb_eobject_kill(tb_eobject_t* object);
 
 /*!spank the event object
  *

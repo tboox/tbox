@@ -1,17 +1,17 @@
-/*!The Treasure Platform Library
+/*!The Treasure Box Library
  * 
- * TPlat is free software; you can redistribute it and/or modify
+ * TBox is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  * 
- * TPlat is distributed in the hope that it will be useful,
+ * TBox is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with TPlat; 
+ * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
@@ -26,9 +26,11 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../event.h"
 #include "../../math/math.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/poll.h>
 #include <fcntl.h>
 #include <stdio.h>
 #ifndef TB_CONFIG_OS_ANDROID
@@ -110,7 +112,32 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 
 	return offset;
 }
+tb_long_t tb_file_wait(tb_handle_t hfile, tb_size_t etype, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(hfile, 0);
 
+	// init
+	struct pollfd pfd = {0};
+	pfd.fd = (tb_long_t)hfile - 1;
+	if (etype & TB_ETYPE_READ) pfd.events |= POLLIN;
+	if (etype & TB_ETYPE_WRIT) pfd.events |= POLLOUT;
+	etype = 0;
+
+	// poll
+	tb_long_t r = poll(&pfd, 1, timeout);
+	tb_assert_and_check_return_val(r >= 0, -1);
+
+	// timeout?
+	tb_check_return_val(r, 0);
+
+	// ok
+	if (pfd.revents & POLLIN) etype |= TB_ETYPE_READ;
+	if (pfd.revents & POLLOUT) etype |= TB_ETYPE_WRIT;
+	return etype;
+}
+tb_void_t tb_file_kill(tb_handle_t hfile)
+{
+}
 tb_uint64_t tb_file_size(tb_handle_t hfile)
 {
 	tb_assert_and_check_return_val(hfile, 0);
@@ -118,34 +145,6 @@ tb_uint64_t tb_file_size(tb_handle_t hfile)
 	struct stat st = {0};
 	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
 }
-tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
-{
-	tb_assert_and_check_return_val(path, TB_FALSE);
-	switch (type)
-	{
-	case TB_FILE_TYPE_DIR:
-		return !mkdir(path, S_IRWXU)? TB_TRUE : TB_FALSE;
-	case TB_FILE_TYPE_FILE:
-		{
-			tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
-			if (fd >= 0) 
-			{
-				close(fd); 
-				return TB_TRUE;
-			}
-		}
-		break;
-	default:
-		break;
-	}
-	return TB_FALSE;
-}
-tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
-{
-	tb_assert_and_check_return(path);
-	remove(path);
-}
-
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
 	tb_assert_and_check_return_val(path, TB_FALSE);
@@ -175,4 +174,31 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 		}
 	}
 	return TB_FALSE;
+}
+tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
+{
+	tb_assert_and_check_return_val(path, TB_FALSE);
+	switch (type)
+	{
+	case TB_FILE_TYPE_DIR:
+		return !mkdir(path, S_IRWXU)? TB_TRUE : TB_FALSE;
+	case TB_FILE_TYPE_FILE:
+		{
+			tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
+			if (fd >= 0) 
+			{
+				close(fd); 
+				return TB_TRUE;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	return TB_FALSE;
+}
+tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
+{
+	tb_assert_and_check_return(path);
+	remove(path);
 }
