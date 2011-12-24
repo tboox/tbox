@@ -39,9 +39,9 @@
 // socket proto
 typedef enum __tb_socket_type_t
 {
-	TB_SOCKET_TYPE_TCP
+ 	TB_SOCKET_TYPE_NUL 	= 0
+,	TB_SOCKET_TYPE_TCP
 , 	TB_SOCKET_TYPE_UDP
-, 	TB_SOCKET_TYPE_UNKNOWN = -1
 
 }tb_socket_type_t;
 
@@ -49,18 +49,34 @@ typedef enum __tb_socket_type_t
  * interfaces
  */
 
+// init & exit
 tb_bool_t 		tb_socket_init();
 tb_void_t 		tb_socket_exit();
 
-tb_handle_t 	tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-tb_handle_t 	tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block);
-tb_handle_t 	tb_socket_server_accept(tb_handle_t hserver);
-tb_void_t 		tb_socket_close(tb_handle_t hsocket);
+// open
+tb_handle_t 	tb_socket_open(tb_size_t type);
 
-tb_int_t 		tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
-tb_int_t 		tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size);
+// connect
+tb_long_t 		tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
 
-tb_int_t 		tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
-tb_int_t 		tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size);
+// bind 
+tb_bool_t 		tb_socket_bind(tb_handle_t handle, tb_size_t port);
+
+// accept
+tb_handle_t 	tb_socket_accept(tb_handle_t handle);
+
+// close
+tb_void_t 		tb_socket_close(tb_handle_t handle);
+
+// fd
+tb_long_t 		tb_socket_fd(tb_handle_t handle);
+
+// recv & send
+tb_long_t 		tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t 		tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+// recv & send for udp
+tb_long_t 		tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
+tb_long_t 		tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
 	
 #endif

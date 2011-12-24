@@ -33,7 +33,6 @@ tbox_C_FILES 			+= \
 						container/dlist \
 						container/vector \
 						network/http \
-						network/dns \
 						network/cookies \
 						encoding/encoding \
 						encoding/unicode_gb2312 \

@@ -46,7 +46,7 @@ tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_lo
 	struct pollfd pfd = {0};
 	pfd.fd = fd;
 	if (etype & TB_ETYPE_READ) pfd.events |= POLLIN;
-	if (etype & TB_ETYPE_WRIT) pfd.events |= POLLOUT;
+	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd.events |= POLLOUT;
 
 	// poll
 	tb_long_t r = poll(&pfd, 1, timeout);
@@ -55,12 +55,18 @@ tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_lo
 	// timeout?
 	tb_check_return_val(r, 0);
 
+	// closed?
+	tb_check_return_val(!(pfd.revents & POLLHUP), -1);
+
 	// ok
-	etype = 0;
-	if (pfd.revents & POLLIN) etype |= TB_ETYPE_READ;
-	if (pfd.revents & POLLOUT) etype |= TB_ETYPE_WRIT;
-	if (pfd.revents & POLLHUP) etype = TB_ETYPE_EXIT;
-	return etype;
+	tb_long_t e = 0;
+	if (pfd.revents & POLLIN) e |= TB_ETYPE_READ;
+	if (pfd.revents & POLLOUT) 
+	{
+		e |= TB_ETYPE_WRIT;
+		if (etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+	}
+	return e;
 }
 
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
@@ -82,7 +88,7 @@ tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_lo
 	fd_set 	wfds;
 	fd_set 	efds;
 	fd_set* prfds = etype & TB_ETYPE_READ? &rfds : TB_NULL;
-	fd_set* pwfds = etype & TB_ETYPE_WRIT? &wfds : TB_NULL;
+	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &wfds : TB_NULL;
 
 	if (prfds)
 	{
@@ -110,12 +116,18 @@ tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_lo
 	// timeout?
 	tb_check_return_val(r, 0);
 
+	// closed?
+	tb_check_return_val(!FD_ISSET(fd, &efds), -1);
+
 	// ok
-	etype = 0;
-	if (prfds && FD_ISSET(fd, &rfds)) etype |= TB_ETYPE_READ;
-	if (pwfds && FD_ISSET(fd, &wfds)) etype |= TB_ETYPE_WRIT;
-	if (FD_ISSET(fd, &efds)) etype = TB_ETYPE_EXIT;
-	return etype;
+	tb_long_t e = 0;
+	if (prfds && FD_ISSET(fd, &rfds)) e |= TB_ETYPE_READ;
+	if (pwfds && FD_ISSET(fd, &wfds)) 
+	{
+		e |= TB_ETYPE_WRIT;
+		if (etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+	}
+	return e;
 }
 #else
 # 	error have not available event mode

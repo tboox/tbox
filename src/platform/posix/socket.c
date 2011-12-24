@@ -31,32 +31,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/select.h>
 #include <netdb.h>
 #include <errno.h>
-#include <string.h>
 
-/* /////////////////////////////////////////////////////////
- * macros
- */
-#define TB_SOCKET_HOST_MAX 			(256)
-
-/* /////////////////////////////////////////////////////////
- * types
- */
-typedef struct __tb_socket_t
-{
-	tb_int_t 		fd;
-	tb_int_t 		type;
-	tb_bool_t 		is_block;
-	tb_uint16_t 	port;
-	tb_char_t 		host[TB_SOCKET_HOST_MAX];
-
-}tb_socket_t;
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
 tb_bool_t tb_socket_init()
 {
 	return TB_TRUE;
@@ -64,392 +44,185 @@ tb_bool_t tb_socket_init()
 tb_void_t tb_socket_exit()
 {
 }
-tb_handle_t tb_socket_client_open(tb_char_t const* host, tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
+tb_handle_t tb_socket_open(tb_size_t type)
 {
-	if (type == TB_SOCKET_TYPE_UNKNOWN) return TB_NULL;
-
-	//tb_trace("socket open: %s %d", host, port);
-
-	// create socket
-	tb_int_t t = 0;
-	tb_int_t p = 0;
-	if (type == TB_SOCKET_TYPE_TCP)
+	tb_assert_and_check_return_val(type, TB_NULL);
+	
+	// init type & protocol
+	tb_size_t t = 0;
+	tb_size_t p = 0;
+	switch (type)
 	{
-		t = SOCK_STREAM;
-		p = IPPROTO_TCP;
-		if (!host || !port) return TB_NULL;
-	}
-	else if (type == TB_SOCKET_TYPE_UDP)
-	{
-		t = SOCK_DGRAM;
-		p = IPPROTO_UDP;
-	}
-	else return TB_NULL;
-
-	tb_int_t fd = socket(AF_INET, t, p);
-	if (fd < 0) return TB_NULL;
-
-	// set block or non-block
-	if (is_block == TB_TRUE) fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
-	else fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
-
-	if (type == TB_SOCKET_TYPE_TCP)
-	{
-		// client
-		struct sockaddr_in dest;
-		dest.sin_family = AF_INET;
-		dest.sin_port = htons(port);
-		if (!inet_aton(host, &(dest.sin_addr))) 
+	case TB_SOCKET_TYPE_TCP:
 		{
-			struct hostent* h = gethostbyname(host);
-			if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-			else 
-			{
-				if (fd >= 0) close(fd);
-				return TB_NULL;
-			}
+			t = SOCK_STREAM;
+			p = IPPROTO_TCP;
 		}
-
-		// connect host
-		tb_int_t ret = 0;
-		while (1)
+		break;
+	case TB_SOCKET_TYPE_UDP:
 		{
-			ret = connect(fd, (struct sockaddr *)&dest, sizeof(dest));
-
-			// if non-block
-			if (ret < 0 && is_block == TB_FALSE)
-			{
-				if (errno == EINTR) continue;
-				if (errno != EINPROGRESS && errno != EAGAIN)
-				{
-					if (fd >= 0) close(fd);
-					return TB_NULL;
-				}
-
-				// wait until we are connected or until abort
-				while (1) 
-				{
-					struct timeval tv;
-					fd_set wfds;
-					tb_int_t fd_max = fd;
-
-					FD_ZERO(&wfds);
-					FD_SET(fd, &wfds);
-					tv.tv_sec = 0;
-					tv.tv_usec = 100 * 1000;
-					ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-					if (ret > 0 && FD_ISSET(fd, &wfds)) break;
-				}
-
-				// test error
-				socklen_t optlen = sizeof(ret);
-				getsockopt(fd, SOL_SOCKET, SO_ERROR, &ret, &optlen);
-				if (ret != 0)
-				{
-					if (fd >= 0) close(fd);
-					return TB_NULL;
-				}
-			}
-			else if (ret >= 0) break;
-			else
-			{
-				if (fd >= 0) close(fd);
-				return TB_NULL;
-			}
+			t = SOCK_DGRAM;
+			p = IPPROTO_UDP;
 		}
-	}
-
-	// create socket
-	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	tb_assert(s);
-	if (!s) return TB_NULL;
-	memset(s, 0, sizeof(tb_socket_t));
-	s->fd = fd;
-	s->type = type;
-	s->port = port;
-	s->is_block = is_block;
-
-	// save host
-	if (host)
-	{
-		strncpy(s->host, host, TB_SOCKET_HOST_MAX - 1);
-		s->host[TB_SOCKET_HOST_MAX - 1] = '\0';
-	}
-
-	return ((tb_handle_t)s);
-}
-tb_void_t tb_socket_close(tb_handle_t hsocket)
-{
-	tb_assert_and_check_return(hsocket);
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-
-	//tb_trace("socket close");
-
-	if (s && s->fd >= 0) 
-	{
-		close(s->fd);
-		free(s);
-	}
-}
-
-tb_int_t tb_socket_recv(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(hsocket, -1);
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-
-	//tb_trace("socket_recv: %d", size);
-
-	// non-block
-	if (!s->is_block)
-	{
-		tb_int_t fd_max = s->fd;
-		struct timeval tv;
-		fd_set rfds;
-
-		FD_ZERO(&rfds);
-		FD_SET(s->fd, &rfds);
-
-		tv.tv_sec = 0;
-		tv.tv_usec = 100 * 1000;
-		tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-
-		if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
-		{
-			tb_int_t len = recv(s->fd, data, size, 0);
-			if (len < 0) 
-			{
-				if (errno != EINTR && errno != EAGAIN) return -1;
-				else return 0;
-			} 
-			else return len;
-		}
-		else if (ret < 0) return -1;
-		else return 0; // no data
-	}
-	// block
-	else return recv(s->fd, data, size, 0);
-}
-
-tb_int_t tb_socket_send(tb_handle_t hsocket, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(hsocket, -1);
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-
-	//tb_trace("socket_send: %d", size);
-
-	// non-block
-	if (!s->is_block)
-	{
-		tb_int_t fd_max = s->fd;
-		struct timeval tv;
-		fd_set wfds;
-
-		FD_ZERO(&wfds);
-		FD_SET(s->fd, &wfds);
-
-		tv.tv_sec = 0;
-		tv.tv_usec = 100 * 1000;
-		tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-
-		if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
-		{
-			tb_int_t len = send(s->fd, data, size, 0);
-			if (len < 0) 
-			{
-				if (errno != EINTR && errno != EAGAIN) return -1;
-			}
-			return len;
-		} 
-		else if (ret < 0) return -1;
-		else return 0;
-	}
-	else return send(s->fd, data, size, 0);
-}
-tb_int_t tb_socket_recvfrom(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(hsocket, -1);
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-
-	// get host & port
-	port = port? port : s->port;
-	host = host? host : s->host;
-	tb_assert(port && host && host[0]);
-	if (!port || !host || !host[0]) return -1;
-
-	// recv data
-	struct sockaddr_in dest;
-	dest.sin_family = AF_INET;
-	dest.sin_port = htons(port);
-	if (!inet_aton(host, &(dest.sin_addr))) 
-	{
-		struct hostent* h = gethostbyname(host);
-		if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-		else return -1;
-	}
-
-	// non-block
-	tb_int_t n = sizeof(dest);
-	if (!s->is_block)
-	{
-		tb_int_t fd_max = s->fd;
-		struct timeval tv;
-		fd_set rfds;
-
-		FD_ZERO(&rfds);
-		FD_SET(s->fd, &rfds);
-
-		tv.tv_sec = 0;
-		tv.tv_usec = 100 * 1000;
-		tb_int_t ret = select(fd_max + 1, &rfds, NULL, NULL, &tv);
-
-		if (ret > 0 && FD_ISSET(s->fd, &rfds)) 
-		{
-			tb_int_t len = recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
-			if (len < 0) 
-			{
-				if (errno != EINTR && errno != EAGAIN) return -1;
-			} 
-			else return len;
-		}
-		else if (ret < 0) return -1;
-		else return 0; // no data
-	}
-	// block
-	else return recvfrom(s->fd, data, size, 0, (struct sockaddr*)&dest, &n);
-}
-tb_int_t tb_socket_sendto(tb_handle_t hsocket, tb_char_t const* host, tb_uint16_t port, tb_byte_t* data, tb_size_t size)
-{
-	tb_assert_and_check_return_val(hsocket, -1);
-	tb_socket_t* s = (tb_socket_t*)hsocket;
-
-	// get host & port
-	port = port? port : s->port;
-	host = host? host : s->host;
-	tb_assert(port && host && host[0]);
-	if (!port || !host || !host[0]) return -1;
-
-	// recv data
-	struct sockaddr_in dest;
-	dest.sin_family = AF_INET;
-	dest.sin_port = htons(port);
-	if (!inet_aton(host, &(dest.sin_addr))) 
-	{
-		struct hostent* h = gethostbyname(host);
-		if (h) memcpy(&dest.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
-		else return -1;
-	}
-
-	// non-block
-	if (!s->is_block)
-	{
-		tb_int_t fd_max = s->fd;
-		struct timeval tv;
-		fd_set wfds;
-
-		FD_ZERO(&wfds);
-		FD_SET(s->fd, &wfds);
-
-		tv.tv_sec = 0;
-		tv.tv_usec = 100 * 1000;
-		tb_int_t ret = select(fd_max + 1, NULL, &wfds, NULL, &tv);
-
-		if (ret > 0 && FD_ISSET(s->fd, &wfds)) 
-		{
-			tb_int_t len = sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
-			if (len < 0) 
-			{
-				if (errno != EINTR && errno != EAGAIN) return -1;
-			} 
-			else return len;
-		}
-		else if (ret < 0) return -1;
-		else return 0; // no data
-	}
-	// block
-	else return sendto(s->fd, data, size, 0, (struct sockaddr*)&dest, sizeof(dest));
-}
-tb_handle_t tb_socket_server_open(tb_uint16_t port, tb_int_t type, tb_bool_t is_block)
-{
-	if (!port || type == TB_SOCKET_TYPE_UNKNOWN) return TB_NULL;
-
-	// create socket
-	tb_int_t t;
-	if (type == TB_SOCKET_TYPE_TCP) t = SOCK_STREAM;
-	else if (type == TB_SOCKET_TYPE_UDP) t = SOCK_DGRAM;
-	else return TB_NULL;
-
-	// udp is not implemention now
-	if (type == TB_SOCKET_TYPE_UDP)
-	{
-		// not implemention now
-		tb_trace("tb_socket_server_open(type == UDP) is not implemention now");
+		break;
+	default:
 		return TB_NULL;
 	}
 
-	// server socket
-	struct sockaddr_in saddr;
-	memset(&saddr, 0, sizeof(struct sockaddr_in));
-	saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(port);
-	saddr.sin_addr.s_addr = INADDR_ANY;
+	// socket
+	tb_long_t fd = socket(AF_INET, t, p);
+	tb_assert_and_check_return_val(fd >= 0, TB_NULL);
 
-	tb_int_t fd_s = socket(AF_INET, t, 0);
-	if (fd_s < 0) return TB_NULL;
+	// non-block
+	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
-	// set block or non-block
-	if (is_block == TB_TRUE) fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) & ~O_NONBLOCK);
-	else fcntl(fd_s, F_SETFL, fcntl(fd_s, F_GETFL) | O_NONBLOCK);
+	// ok
+	return (fd + 1);
+}
+
+tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+{
+	tb_assert_and_check_return_val(handle && ip && port, -1);
+
+	// init
+	struct sockaddr_in d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+
+	// connect
+	tb_long_t r = connect((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d));
+
+	// ok?
+	if (!r) return 1;
+
+	// continue?
+	if (errno == EINTR || errno == EINPROGRESS || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+
+tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
+{
+	tb_assert_and_check_return_val(handle && port, TB_FALSE);
+
+	// init
+	struct sockaddr_in d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	d.sin_addr.s_addr = INADDR_ANY;
 
 	// bind 
-    if (bind(fd_s, (struct sockaddr *)&saddr, sizeof(struct sockaddr)) == -1)
-	{
-        tb_trace("bind error!");
-		close(fd_s);
-		return TB_NULL;
-    }
+    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return TB_FALSE;
 
 	// listen
-    if (listen(fd_s, 20) == -1) 
-	{
-        tb_trace("listen error!");
-		close(fd_s);
-		return TB_NULL;
-    }
-
-	// return server socket
-	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	tb_assert(s);
-	if (!s) return TB_NULL;
-	memset(s, 0, sizeof(tb_socket_t));
-	s->fd = fd_s;
-	s->type = type;
-	s->is_block = is_block;
-
-	return ((tb_handle_t)s);
+    return (listen((tb_long_t)handle - 1, 20) < 0)? TB_FALSE : TB_TRUE;
 }
-tb_handle_t tb_socket_server_accept(tb_handle_t hserver)
+tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(hserver, TB_NULL);
-	tb_socket_t* ps = (tb_socket_t*)hserver;
-	if (ps->fd < 0) return TB_NULL;
+	tb_assert_and_check_return_val(handle, TB_NULL);
 
-	// accept client 
-	tb_int_t caddr_n = sizeof(struct sockaddr_in);
-	struct sockaddr_in caddr;
-	tb_int_t fd_c = accept(ps->fd, (struct sockaddr *)&caddr, &caddr_n);
-	if (fd_c == -1) return TB_NULL;
+	// accept  
+	struct sockaddr_in d;
+	tb_int_t 	n = sizeof(struct sockaddr_in);
+	tb_long_t 	r = accept((tb_long_t)handle - 1, (struct sockaddr *)&d, &n);
+	tb_assert_and_check_return_val(!r, TB_NULL);
 
-	//tb_trace("connection from %s", inet_ntoa(caddr.sin_addr));
-
-	// return client socket
-	tb_socket_t* s = malloc(sizeof(tb_socket_t));
-	tb_assert(s);
-	if (!s) return TB_NULL;
-	memset(s, 0, sizeof(tb_socket_t));
-	s->fd = fd_c;
-	s->type = ps->type;
-	s->is_block = ps->is_block;
-
-	return ((tb_handle_t)s);
+	// ok
+	return r + 1;
 }
 
+tb_void_t tb_socket_close(tb_handle_t handle)
+{
+	if (handle) close((tb_long_t)handle - 1);
+}
+tb_long_t tb_socket_fd(tb_handle_t handle)
+{
+	tb_assert_and_check_return_val(handle, -1);
+	return ((tb_long_t)handle - 1);
+}
+tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(handle && data, -1);
+	tb_check_return_val(size, 0);
+
+	// recv
+	tb_long_t r = recv((tb_long_t)handle - 1, data, size, 0);
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(handle && data, -1);
+	tb_check_return_val(size, 0);
+
+	// recv
+	tb_long_t r = send((tb_long_t)handle - 1, data, size, 0);
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+
+// recv & send for udp
+tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_check_return_val(size, 0);
+
+	// init
+	struct sockaddr_in d;
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+
+	// recv
+	tb_int_t 	n = sizeof(d);
+	tb_long_t 	r = recvfrom((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, &n);
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
+{
+	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_check_return_val(size, 0);
+
+	// init
+	struct sockaddr_in d;
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+
+	// send
+	tb_long_t 	r = sendto((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, sizeof(d));
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+	
