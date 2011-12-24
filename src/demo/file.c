@@ -89,7 +89,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// end?
 			if (wait)
 			{
-				tb_print("end");
+				tb_print("eof");
 				break;
 			}
 
@@ -108,13 +108,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			if (!etype)
 			{
 				tb_print("timeout");
-				break;
-			}
-
-			// closed?
-			if (etype == TB_ETYPE_EXIT)
-			{
-				tb_print("closed");
 				break;
 			}
 

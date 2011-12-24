@@ -6,6 +6,8 @@ NAMES = test \
 		time \
 		file \
 		http \
+		sockc \
+		socks \
 		bitops \
 		stdlib \
 		scalar \
@@ -39,7 +41,6 @@ NAMES = test \
 		sha \
 		md5 \
 		crc \
-		dns \
 		xml
 
 ifeq ($(TB_CONFIG_PLAT),linux_x86)

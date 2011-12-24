@@ -109,7 +109,7 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	, 	tb_file_fd
 
 		// for socket
-	, 	TB_NULL
+	, 	tb_socket_fd
 
 		// for http
 	, 	TB_NULL

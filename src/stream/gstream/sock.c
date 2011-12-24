@@ -72,7 +72,7 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(sst && !sst->sock && sst->port, -1);
 
 	// open socket
-	sst->sock = tb_socket_client_open(sst->host, sst->port, sst->type, TB_FALSE);
+//	sst->sock = tb_socket_client_open(sst->host, sst->port, sst->type, TB_FALSE);
 	tb_assert_and_check_return_val(sst->sock, -1);
 
 	// ok
@@ -86,7 +86,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	if (sst->sock)
 	{
 		// close socket
-		tb_socket_close(sst->sock);
+//		tb_socket_close(sst->sock);
 		sst->sock = TB_NULL;
 	}
 
@@ -100,7 +100,8 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// read data
-	return tb_socket_recv(sst->sock, data, size);
+//	return tb_socket_recv(sst->sock, data, size);
+	return -1;
 }
 static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
@@ -109,7 +110,8 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// writ data
-	return tb_socket_send(sst->sock, data, size);
+//	return tb_socket_send(sst->sock, data, size);
+	return -1;
 }
 static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
