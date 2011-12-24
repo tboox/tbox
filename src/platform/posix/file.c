@@ -116,87 +116,10 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 
 	return offset;
 }
-#if 1
-tb_long_t tb_file_wait(tb_handle_t hfile, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_file_fd(tb_handle_t hfile)
 {
-	tb_assert_and_check_return_val(hfile, 0);
-
-	// init
-	struct pollfd pfd = {0};
-	pfd.fd = (tb_long_t)hfile - 1;
-	if (etype & TB_ETYPE_READ) pfd.events |= POLLIN;
-	if (etype & TB_ETYPE_WRIT) pfd.events |= POLLOUT;
-
-	// poll
-	tb_long_t r = poll(&pfd, 1, timeout);
-	tb_assert_and_check_return_val(r >= 0, -1);
-
-	// timeout?
-	tb_check_return_val(r, 0);
-
-	// ok
-	etype = 0;
-	if (pfd.revents & POLLIN) etype |= TB_ETYPE_READ;
-	if (pfd.revents & POLLOUT) etype |= TB_ETYPE_WRIT;
-	if (pfd.revents & POLLHUP) etype = TB_ETYPE_EXIT;
-	return etype;
-}
-#else
-tb_long_t tb_file_wait(tb_handle_t hfile, tb_size_t etype, tb_long_t timeout)
-{
-	tb_assert_and_check_return_val(hfile, 0);
-
-	// init time
-	struct timeval t = {0};
-	if (timeout > 0)
-	{
-		t.tv_sec = timeout / 1000;
-		t.tv_usec = (timeout % 1000) * 1000;
-	}
-
-	// init fds
-	fd_set 	rfds;
-	fd_set 	wfds;
-	fd_set 	efds;
-	fd_set* prfds = etype & TB_ETYPE_READ? &rfds : TB_NULL;
-	fd_set* pwfds = etype & TB_ETYPE_WRIT? &wfds : TB_NULL;
-
-	if (prfds)
-	{
-		FD_ZERO(prfds);
-		FD_SET((tb_long_t)hfile - 1, prfds);
-	}
-
-	if (pwfds)
-	{
-		FD_ZERO(pwfds);
-		FD_SET((tb_long_t)hfile - 1, pwfds);
-	}
-	
-	FD_ZERO(&efds);
-	FD_SET((tb_long_t)hfile - 1, &efds);
-
-	// select
-	tb_long_t r = select((tb_long_t)hfile
-						, prfds
-						, pwfds
-						, &efds
-						, timeout >= 0? &t : TB_NULL);
-	tb_assert_and_check_return_val(r >= 0, -1);
-
-	// timeout?
-	tb_check_return_val(r, 0);
-
-	// ok
-	etype = 0;
-	if (prfds && FD_ISSET((tb_long_t)hfile - 1, &rfds)) etype |= TB_ETYPE_READ;
-	if (pwfds && FD_ISSET((tb_long_t)hfile - 1, &wfds)) etype |= TB_ETYPE_WRIT;
-	if (FD_ISSET((tb_long_t)hfile - 1, &efds)) etype = TB_ETYPE_EXIT;
-	return etype;
-}
-#endif
-tb_void_t tb_file_kill(tb_handle_t hfile)
-{
+	tb_assert_and_check_return_val(hfile, -1);
+	return hfile - 1;
 }
 tb_uint64_t tb_file_size(tb_handle_t hfile)
 {

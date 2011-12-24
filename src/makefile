@@ -85,7 +85,7 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						platform/event/eobject \
+						event/eobject \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -126,14 +126,16 @@ tbox_C_FILES 			+= \
 						platform/libc/malloc 
 endif
 
+# platform
 tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
-						platform/$(TB_CONFIG_API_THRD)/thread
+						platform/$(TB_CONFIG_API_THRD)/thread \
+						platform/$(TB_CONFIG_API_EVET)/event
 
-
+# flags
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
 tbox_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
 
@@ -202,6 +204,10 @@ INC_FILES 				= \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \
+						event/prefix.h \
+						event/eobject.h \
+						event/epool.h \
+						event/event.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/file.h \
@@ -210,9 +216,6 @@ INC_FILES 				= \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
-						platform/event/prefix.h \
-						platform/event/epool.h \
-						platform/event/eobject.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \

@@ -20,8 +20,8 @@
  * \file		epool.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_POOL_H
-#define TB_PLATFORM_EVENT_POOL_H
+#ifndef TB_EVENT_POOL_H
+#define TB_EVENT_POOL_H
 
 
 /* /////////////////////////////////////////////////////////

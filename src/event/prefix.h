@@ -17,22 +17,18 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		event.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_H
-#define TB_PLATFORM_EVENT_H
+#ifndef TB_EVENT_PREFIX_H
+#define TB_EVENT_PREFIX_H
 
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t etype, tb_long_t timeout);
+#include "../container/container.h"
 
 
 #endif

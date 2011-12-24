@@ -25,12 +25,11 @@
  * includes
  */
 #include "eobject.h"
-#include "../file.h"
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
 tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_size_t otype, tb_size_t etype, tb_handle_t handle)
 {
 	tb_assert_and_check_return_val(object, TB_FALSE);
@@ -42,9 +41,6 @@ tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_size_t otype, tb_size_t etype
 tb_void_t tb_eobject_exit(tb_eobject_t* object)
 {
 	tb_assert_and_check_return(object);
-
-	// kill it first
-	tb_eobject_kill(object);
 
 	// clear it
 	tb_memset(object, 0, sizeof(tb_eobject_t));
@@ -78,46 +74,59 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	tb_assert_and_check_return_val(object && object->handle, 0);
 
 	// the wait funcs
-	static tb_long_t (*wait[])(tb_handle_t, tb_size_t, tb_long_t) =
+	static tb_long_t (*wait[])(tb_handle_t, tb_size_t, tb_size_t, tb_long_t) =
 	{
 		TB_NULL
-	, 	TB_NULL				//!< for qbuffer
-	, 	tb_file_wait		//!< for file
-	, 	TB_NULL				//!< for socket
-	, 	TB_NULL				//!< for http
-	, 	TB_NULL				//!< for gstream
-	, 	TB_NULL				//!< for event
+
+		// for qbuffer
+	, 	TB_NULL
+	
+		// for file
+	, 	tb_event_wait_fd
+
+		// for socket
+	, 	tb_event_wait_fd
+
+		// for http
+	, 	TB_NULL
+
+		// for gstream
+	, 	TB_NULL
+
+		// for event
+	, 	TB_NULL
+	};
+
+	// the fd funcs
+	static tb_long_t (*fd[])(tb_handle_t) =
+	{
+		TB_NULL
+
+		// for qbuffer
+	, 	TB_NULL
+	
+		// for file
+	, 	tb_file_fd
+
+		// for socket
+	, 	TB_NULL
+
+		// for http
+	, 	TB_NULL
+
+		// for gstream
+	, 	TB_NULL
+
+		// for event
+	, 	TB_NULL
 	};
 
 	// check
-	tb_assert_and_check_return_val(object->otype < tb_arrayn(wait), 0);
-	tb_assert_and_check_return_val(wait[object->otype], 0);
+	tb_assert_and_check_return_val(object->otype < tb_arrayn(wait) && object->otype < tb_arrayn(fd), 0);
+	tb_assert_and_check_return_val(wait[object->otype] && fd[object->otype], 0);
  
 	// wait object
-	return wait[object->otype](object->handle, object->etype, timeout);
-}
-tb_void_t tb_eobject_kill(tb_eobject_t* object)
-{
-	tb_assert_and_check_return(object && object->handle);
-
-	// the kill funcs
-	static tb_size_t (*kill[])(tb_handle_t) =
-	{
-		TB_NULL
-	, 	TB_NULL		//!< for qbuffer
-	, 	TB_NULL		//!< for file
-	, 	TB_NULL		//!< for socket
-	, 	TB_NULL		//!< for http
-	, 	TB_NULL		//!< for gstream
-	, 	TB_NULL		//!< for event
-	};
-
-	// check
-	tb_assert_and_check_return(object->otype < tb_arrayn(kill));
-	tb_assert_and_check_return(kill[object->otype]);
- 
-	// kill object
-	return kill[object->otype](object->handle);
+	return wait[object->otype](fd[object->otype](object->handle), object->otype, object->etype, timeout);
 }
 tb_bool_t tb_eobject_spak(tb_eobject_t* object)
 {

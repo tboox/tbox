@@ -17,18 +17,18 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		event.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_PREFIX_H
-#define TB_PLATFORM_EVENT_PREFIX_H
+#ifndef TB_EVENT_H
+#define TB_EVENT_H
 
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../../container/container.h"
-
+#include "eobject.h"
+#include "epool.h"
 
 #endif
