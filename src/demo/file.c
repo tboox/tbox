@@ -9,6 +9,7 @@
 static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_byte_t* data, tb_size_t size, tb_eobject_t* oo)
 {
 	tb_size_t writ = 0;
+	tb_bool_t wait = TB_FALSE;
 	while (writ < size)
 	{
 		// try to writ data
@@ -17,17 +18,26 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_byte_t* data, tb_size_t
 		{
 			// update writ
 			writ += n;
+
+			// no waiting
+			wait = TB_FALSE;
 		}
-		else if (!n)
+		else if (!n && !wait)
 		{
-			// waiting read...
-			tb_size_t etype = tb_eobject_wait(&oo, 10000);
+			// waiting...
+			tb_long_t etype = tb_eobject_wait(&oo, 10000);
+
+			// error?
+			tb_check_break(etype >= 0);
 
 			// timeout?
 			tb_check_break(etype);
 
-			// check
-			tb_assert_and_check_break(etype == TB_ETYPE_WRIT);
+			// has writ?
+			tb_assert_and_check_break(etype & TB_ETYPE_WRIT);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 	}
@@ -58,6 +68,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read file
 	tb_byte_t 	data[4096];
 	tb_uint64_t read = 0;
+	tb_bool_t 	wait = TB_FALSE;
 	while (1)//read < isize)
 	{
 		// try to read data
@@ -69,12 +80,29 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 			// update read
 			read += n;
+
+			// no waiting
+			wait = TB_FALSE;
 		}
 		else if (!n)
 		{
-			// waiting read...
+			// end?
+			if (wait)
+			{
+				tb_print("end");
+				break;
+			}
+
+			// waiting...
 			tb_print("waiting...");
-			tb_size_t etype = tb_eobject_wait(&io, 10000);
+			tb_long_t etype = tb_eobject_wait(&io, 10000);
+
+			// error?
+			if (etype < 0)
+			{
+				tb_print("error");
+				break;
+			}
 
 			// timeout?
 			if (!etype)
@@ -90,8 +118,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				break;
 			}
 
-			// check
+			// has read?
 			tb_assert_and_check_break(etype & TB_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 	}

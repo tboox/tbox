@@ -20,8 +20,8 @@
  * \file		eobject.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_OBJECT_H
-#define TB_PLATFORM_EVENT_OBJECT_H
+#ifndef TB_EVENT_OBJECT_H
+#define TB_EVENT_OBJECT_H
 
 
 /* /////////////////////////////////////////////////////////
@@ -122,15 +122,6 @@ tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype);
  * @return 	the event type, return 0 if timeout, return -1 if error
  */
 tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
-
-/*!kill the event object
- *
- * force to cancel waiting operation of the object
- * and tb_eobject_wait() return 0
- *
- * @param 	object 	the event object
- */
-tb_void_t tb_eobject_kill(tb_eobject_t* object);
 
 /*!spank the event object
  *

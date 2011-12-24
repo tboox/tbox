@@ -94,10 +94,6 @@ tb_void_t 				tb_file_exit(tb_handle_t hfile);
 tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size);
 
-// wait & kill
-tb_long_t 				tb_file_wait(tb_handle_t hfile, tb_size_t etype, tb_long_t timeout);
-tb_void_t 				tb_file_kill(tb_handle_t hfile);
-
 // seek
 tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags);
 
@@ -105,6 +101,7 @@ tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flag
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
 // accessors
+tb_long_t 				tb_file_fd(tb_handle_t hfile);
 tb_uint64_t 			tb_file_size(tb_handle_t hfile);
 
 // info

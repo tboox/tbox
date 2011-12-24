@@ -40,6 +40,7 @@ extern "C" {
 #include "memory/memory.h"
 #include "stream/stream.h"
 #include "string/string.h"
+#include "event/event.h"
 #include "utils/utils.h"
 #include "math/math.h"
 #include "libc/libc.h"

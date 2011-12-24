@@ -13,6 +13,7 @@ TB_CONFIG_API_SOCK 				= windows
 TB_CONFIG_API_UTIL 				= windows
 TB_CONFIG_API_MUTX 				= windows
 TB_CONFIG_API_THRD 				= windows
+TB_CONFIG_API_EVET 				= windows
 
 # libs
 TB_CONFIG_LIBS_ZLIB 			= y
