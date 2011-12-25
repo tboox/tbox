@@ -55,6 +55,13 @@ tb_size_t tb_eobject_gete(tb_eobject_t* object)
 	tb_assert_and_check_return_val(object, TB_ETYPE_NULL);
 	return object->etype;
 }
+tb_size_t tb_eobject_sete(tb_eobject_t* object, tb_size_t etype)
+{
+	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);
+
+	object->etype = etype;
+	return object->etype;
+}
 tb_size_t tb_eobject_adde(tb_eobject_t* object, tb_size_t etype)
 {
 	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);

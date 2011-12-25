@@ -84,6 +84,7 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
+						event/epool \
 						event/eobject \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \

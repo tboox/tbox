@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////
  * writ
  */
-static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_byte_t* data, tb_size_t size, tb_eobject_t* oo)
+static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_eobject_t* oo, tb_byte_t* data, tb_size_t size)
 {
 	tb_size_t writ = 0;
 	tb_bool_t wait = TB_FALSE;
@@ -25,7 +25,7 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_byte_t* data, tb_size_t
 		else if (!n && !wait)
 		{
 			// waiting...
-			tb_long_t etype = tb_eobject_wait(&oo, 10000);
+			tb_long_t etype = tb_eobject_wait(oo, 10000);
 
 			// error?
 			tb_check_break(etype >= 0);
@@ -76,7 +76,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		if (n > 0)
 		{
 			// writ data
-			if (!tb_test_file_writ(ofile, data, n, &oo)) break;;
+			if (!tb_test_file_writ(ofile, &oo, data, n)) break;;
 
 			// update read
 			read += n;

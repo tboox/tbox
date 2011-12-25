@@ -31,27 +31,25 @@
 #include "eobject.h"
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define tb_epool_object_max 			()
+#else
+#endif
+
+/* /////////////////////////////////////////////////////////
  * types
  */
-
-// the event ctrl type
-typedef enum __tb_ectrl_t
-{
- 	TB_ECTRL_NULL 			= 0
-, 	TB_ECTRL_OBJECT_ADD 	= 1
-, 	TB_ECTRL_OBJECT_MOD 	= 2
-, 	TB_ECTRL_OBJECT_DEL 	= 3
-
-}tb_ectrl_t;
 
 // the event pool type
 typedef struct __tb_epool_t
 {
-	// the object handles
-	tb_vector_t* 	handles;
+	// the maximum number of concurrent connections
+	tb_size_t 		maxc;
 
 	// the object hash: handle => object
-	tb_hash_t* 		objects;
+	tb_hash_t* 		objs;
 
 }tb_epool_t;
 
@@ -59,12 +57,71 @@ typedef struct __tb_epool_t
  * interfaces
  */
 
-// init & exit
-tb_epool_t* 	tb_epool_init();
+
+/*!init the event pool
+ *
+ * @param 	maxn 	the maximum number of concurrent connections
+ *
+ * @return 	the event pool
+ */
+tb_epool_t* 	tb_epool_init(tb_size_t maxc);
+
+/// exit the event pool
 tb_void_t 		tb_epool_exit(tb_epool_t* pool);
 
-// ctrl
-tb_bool_t 		tb_epool_ctrl(tb_epool_t* pool, tb_size_t ectrl, tb_pointer_t arg0, ...);
+/*!add the event object
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ * @param 	otype 	the type of the event object
+ * @param 	etype 	the event type
+ *
+ * @return 	the number of the objects
+ */
+tb_size_t 		tb_epool_addo(tb_epool_t* pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
+
+/*!del the event object
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ *
+ * @return 	the number of the objects
+ */
+tb_size_t 		tb_epool_delo(tb_epool_t* pool, tb_handle_t handle);
+
+/*!set the event type
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ * @param 	etype 	the event type
+ *
+ * @return 	the new event type
+ */
+tb_size_t 		tb_epool_sete(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
+
+/*!add the event type
+ *
+ * add the event type by 'or' before waiting it
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ * @param 	etype 	the event type
+ *
+ * @return 	the new event type
+ */
+tb_size_t 		tb_epool_adde(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
+
+/*!del the event type
+ *
+ * delete the event type by 'and' before waiting it
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ * @param 	etype 	the event type
+ *
+ * @return 	the new event type
+ */
+tb_size_t 		tb_epool_dele(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
 
 /*!wait the event objects in the epool
  *
