@@ -88,6 +88,9 @@ tb_size_t tb_eobject_type(tb_eobject_t* object);
 /// get the event type
 tb_size_t tb_eobject_gete(tb_eobject_t* object);
 
+/// set the event type
+tb_size_t tb_eobject_sete(tb_eobject_t* object, tb_size_t etype);
+
 /*!add the event type
  *
  * add the event type by 'or' before waiting it

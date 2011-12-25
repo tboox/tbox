@@ -16,50 +16,48 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init eobject
 	tb_eobject_t o;
-	if (!tb_eobject_init(&o, TB_EOTYPE_SOCK, TB_ETYPE_CONN, s)) goto end;
+	if (!tb_eobject_init(&o, TB_EOTYPE_SOCK, TB_ETYPE_ACPT, s)) goto end;
 
-	// connect...
+	// bind 
+	tb_print("bind port: %u", tb_stou32(argv[1]));
+	if (!tb_socket_bind(s, tb_stou32(argv[1]))) goto end;
+
+	// accept
 	while (1)
 	{
-		// connecting
-		tb_print("connecting %s:%u", argv[1], tb_stou32(argv[2]));
-		tb_long_t r = tb_socket_connect(s, argv[1], tb_stou32(argv[2]));
+		// try accepting
+		tb_print("accepting...");
+		tb_handle_t c = tb_socket_accept(s);
 
-		// ok
-		if (r > 0) break;
-		// continue ?
-		else if (!r)
+		// ok?
+		if (c)
+		{
+			tb_print("accept ok.");
+		}
+		else
 		{
 			// waiting...
 			tb_print("waiting...");
 			tb_long_t etype = tb_eobject_wait(&o, 10000);
 
 			// error?
-			if (etype < 0)
+			if (etype < 0) 
 			{
-				tb_print("connect error");
-				goto end;
+				tb_print("accept failed");
+				continue ;
 			}
 
 			// timeout?
-			if (!etype)
+			if (!etype) 
 			{
-				tb_print("connect timeout");
-				goto end;
+				tb_print("accept timeout");
+				continue ;
 			}
 
-			// has connect?
-			tb_assert_and_check_break(etype & TB_ETYPE_CONN);
-		}
-		// error
-		else 
-		{
-			tb_print("connect error.");
-			goto end;
+			// has accept?
+			tb_assert_and_check_break(etype & TB_ETYPE_ACPT);
 		}
 	}
-	tb_print("connect ok.");
-
 
 end:
 

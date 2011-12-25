@@ -127,7 +127,12 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	struct sockaddr_in d;
 	tb_int_t 	n = sizeof(struct sockaddr_in);
 	tb_long_t 	r = accept((tb_long_t)handle - 1, (struct sockaddr *)&d, &n);
-	tb_assert_and_check_return_val(!r, TB_NULL);
+
+	// no client?
+	tb_check_return_val(r > 0, TB_NULL);
+
+	// non-block
+	fcntl(r, F_SETFL, fcntl(r, F_GETFL) | O_NONBLOCK);
 
 	// ok
 	return r + 1;
