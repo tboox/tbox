@@ -54,7 +54,7 @@ tb_epool_t* tb_epool_init(tb_size_t maxn)
 	pool->maxn = maxn;
 
 	// init the objects hash
-	pool->objs = tb_hash_init(tb_align8(tb_int32_sqrt(maxn)), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
+	pool->objs = tb_hash_init(tb_align8(tb_int32_sqrt(maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(pool->objs, fail);
 
 	// ok
