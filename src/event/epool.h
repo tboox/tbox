@@ -29,14 +29,7 @@
  */
 #include "prefix.h"
 #include "eobject.h"
-
-/* /////////////////////////////////////////////////////////
- * macros
- */
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define tb_epool_object_max 			()
-#else
-#endif
+#include "../container/container.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -46,11 +39,11 @@
 typedef struct __tb_epool_t
 {
 	// the maximum number of concurrent connections
-	tb_size_t 		maxc;
+	tb_size_t 		maxn;
 
 	// the object hash: handle => object
 	tb_hash_t* 		objs;
-
+	
 }tb_epool_t;
 
 /* /////////////////////////////////////////////////////////
@@ -60,11 +53,11 @@ typedef struct __tb_epool_t
 
 /*!init the event pool
  *
- * @param 	maxn 	the maximum number of concurrent connections
+ * @param 	maxn 	the maximum number of concurrent objects
  *
  * @return 	the event pool
  */
-tb_epool_t* 	tb_epool_init(tb_size_t maxc);
+tb_epool_t* 	tb_epool_init(tb_size_t maxn);
 
 /// exit the event pool
 tb_void_t 		tb_epool_exit(tb_epool_t* pool);

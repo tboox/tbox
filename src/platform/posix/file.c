@@ -26,7 +26,6 @@
  */
 #include "prefix.h"
 #include "../file.h"
-#include "../event.h"
 #include "../../math/math.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -115,11 +114,6 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 	}
 
 	return offset;
-}
-tb_long_t tb_file_fd(tb_handle_t hfile)
-{
-	tb_assert_and_check_return_val(hfile, -1);
-	return hfile - 1;
 }
 tb_uint64_t tb_file_size(tb_handle_t hfile)
 {

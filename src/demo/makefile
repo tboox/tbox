@@ -7,7 +7,7 @@ NAMES = test \
 		file \
 		http \
 		sockc \
-		socks \
+		sockd \
 		bitops \
 		stdlib \
 		scalar \

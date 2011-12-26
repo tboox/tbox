@@ -101,7 +101,6 @@ tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flag
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
 // accessors
-tb_long_t 				tb_file_fd(tb_handle_t hfile);
 tb_uint64_t 			tb_file_size(tb_handle_t hfile);
 
 // info
