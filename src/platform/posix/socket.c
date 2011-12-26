@@ -142,11 +142,6 @@ tb_void_t tb_socket_close(tb_handle_t handle)
 {
 	if (handle) close((tb_long_t)handle - 1);
 }
-tb_long_t tb_socket_fd(tb_handle_t handle)
-{
-	tb_assert_and_check_return_val(handle, -1);
-	return ((tb_long_t)handle - 1);
-}
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(handle && data, -1);

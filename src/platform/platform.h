@@ -30,7 +30,6 @@
 #include "file.h"
 #include "utils.h"
 #include "mutex.h"
-#include "event.h"
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"

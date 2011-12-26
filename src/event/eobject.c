@@ -25,7 +25,11 @@
  * includes
  */
 #include "eobject.h"
-#include "../platform/platform.h"
+
+/* /////////////////////////////////////////////////////////
+ * decls
+ */
+tb_long_t tb_eobject_wait_impl(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_long_t timeout);
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -81,7 +85,7 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	tb_assert_and_check_return_val(object && object->handle, 0);
 
 	// the wait funcs
-	static tb_long_t (*wait[])(tb_handle_t, tb_size_t, tb_size_t, tb_long_t) =
+	static tb_long_t (*wait[])(tb_eobject_t*, tb_long_t) =
 	{
 		TB_NULL
 
@@ -89,34 +93,10 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	, 	TB_NULL
 	
 		// for file
-	, 	tb_event_wait_fd
+	, 	tb_eobject_wait_impl
 
 		// for socket
-	, 	tb_event_wait_fd
-
-		// for http
-	, 	TB_NULL
-
-		// for gstream
-	, 	TB_NULL
-
-		// for event
-	, 	TB_NULL
-	};
-
-	// the fd funcs
-	static tb_long_t (*fd[])(tb_handle_t) =
-	{
-		TB_NULL
-
-		// for qbuffer
-	, 	TB_NULL
-	
-		// for file
-	, 	tb_file_fd
-
-		// for socket
-	, 	tb_socket_fd
+	, 	tb_eobject_wait_impl
 
 		// for http
 	, 	TB_NULL
@@ -129,11 +109,11 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	};
 
 	// check
-	tb_assert_and_check_return_val(object->otype < tb_arrayn(wait) && object->otype < tb_arrayn(fd), 0);
-	tb_assert_and_check_return_val(wait[object->otype] && fd[object->otype], 0);
+	tb_assert_and_check_return_val(object->otype < tb_arrayn(wait), 0);
+	tb_assert_and_check_return_val(wait[object->otype], 0);
  
 	// wait object
-	return wait[object->otype](fd[object->otype](object->handle), object->otype, object->etype, timeout);
+	return wait[object->otype](object, timeout);
 }
 tb_bool_t tb_eobject_spak(tb_eobject_t* object)
 {

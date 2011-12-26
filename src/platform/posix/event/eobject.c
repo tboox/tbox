@@ -17,14 +17,14 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		event.c
+ * \file		eobject.c
  *
  */
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../../event/eobject.h"
+#include "../../../event/eobject.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #if defined(TB_CONFIG_EVENT_HAVE_POLL)
@@ -38,11 +38,19 @@
  */
 
 #if defined(TB_CONFIG_EVENT_HAVE_POLL)
-tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(fd >= 0, -1);
+	tb_assert_and_check_return_val(object, -1);
+
+	// type
+	tb_size_t otype = object->otype;
+	tb_size_t etype = object->etype;
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
 
+	// fd
+	tb_long_t fd = ((tb_long_t)object->handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, -1);
+	
 	// init
 	struct pollfd pfd = {0};
 	pfd.fd = fd;
@@ -84,11 +92,19 @@ tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_lo
 }
 
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(fd >= 0, -1);
+	tb_assert_and_check_return_val(object, -1);
+
+	// type
+	tb_size_t otype = object->otype;
+	tb_size_t etype = object->etype;
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
 
+	// fd
+	tb_long_t fd = ((tb_long_t)object->handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, -1);
+	
 	// init time
 	struct timeval t = {0};
 	if (timeout > 0)

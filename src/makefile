@@ -133,7 +133,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
-						platform/$(TB_CONFIG_API_EVET)/event
+						platform/$(TB_CONFIG_API_EVET)/event/epool \
+						platform/$(TB_CONFIG_API_EVET)/event/eobject
 
 # flags
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
