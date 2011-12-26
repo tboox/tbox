@@ -71,33 +71,62 @@ tb_epool_t* tb_epool_init_impl(tb_size_t maxn)
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// alloc pool
-	tb_epool_t* pool = tb_calloc(1, sizeof(tb_epool_epoll_t));
-	tb_assert_and_check_return_val(pool, TB_NULL);
+	tb_epool_epoll_t* ep = tb_calloc(1, sizeof(tb_epool_epoll_t));
+	tb_assert_and_check_return_val(ep, TB_NULL);
 
 	// init epoll
-	pool->epfd = epoll_create(maxn);
-	tb_assert_and_check_goto(pool->efd >= 0, fail);
+	ep->epfd = epoll_create(maxn);
+	tb_assert_and_check_goto(ep->epfd >= 0, fail);
 	
 	// init events
-	if (!tb_pbuffer_init(&pool->evts)) goto fail;
+	if (!tb_pbuffer_init(&ep->evts)) goto fail;
 
 	// ok
-	return pool;
+	return (tb_epool_t*)ep;
 
 fail:
-	if (pool) tb_epool_exit_impl(pool);
+	if (ep) tb_epool_exit_impl(ep);
 	return TB_NULL;
 }
 tb_void_t tb_epool_exit_impl(tb_epool_t* pool)
 {
+	tb_epool_epoll_t* ep = (tb_epool_epoll_t*)pool;
 	if (pool)
 	{
 		// free events
-		tb_pbuffer_exit(&pool->evts);
+		tb_pbuffer_exit(&ep->evts);
+		
+		// close fd
+		if (ep->epfd) close(ep->epfd);
 
 		// free pool
 		tb_free(pool);
 	}
+}
+tb_size_t tb_epool_addo_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+{
+	tb_assert_and_check_return_val(pool && handle, 0);
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
+
+	struct epoll_event e = {0};
+	if (!epoll_ctl(pool->epfd, EPOLL_CTL_ADD, (tb_long_t)handle - 1, &e)) return 0;
+	return 0;
+}
+tb_size_t tb_epool_delo_impl(tb_epool_t* pool, tb_handle_t handle)
+{
+	return 0;
+}
+tb_size_t tb_epool_sete_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
+{
+	return 0;
+}
+tb_size_t tb_epool_adde_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
+{
+	return 0;
+}
+tb_size_t tb_epool_dele_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
+{
+	return 0;
 }
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
