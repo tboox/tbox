@@ -46,8 +46,30 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_print("listen timeout");
 			continue ;
 		}
-			
-		tb_print("listen ok: %u events", objn);
+
+		// ok?
+		tb_assert_and_check_break(objs);
+		tb_size_t i = 0;
+		for (i = 0; i < objn; i++)
+		{
+			if (objs[i].etype & TB_ETYPE_ACPT)
+			{
+				tb_handle_t c = tb_socket_accept(s);
+				if (c)
+				{
+					tb_print("accept ok");
+					if (!tb_epool_addo(ep, c, TB_EOTYPE_SOCK, TB_ETYPE_READ)) goto end;
+				}
+				else
+				{
+					tb_print("accept failed");
+				}
+			}
+			else if (objs[i].etype & TB_ETYPE_READ)
+			{
+				tb_assert_and_check_break(objs[i].handle);
+			}
+		}
 	}
 
 end:
