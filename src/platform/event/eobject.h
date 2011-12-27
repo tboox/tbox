@@ -39,8 +39,8 @@ typedef enum __tb_etype_t
  	TB_ETYPE_NULL 	= 0
 ,	TB_ETYPE_READ 	= 1		//!< for all i/o object
 ,	TB_ETYPE_WRIT 	= 2		//!< for all i/o object
-, 	TB_ETYPE_CONN 	= 4 	//!< only for TB_EOTYPE_SOCK
-, 	TB_ETYPE_ACPT 	= 8 	//!< only for TB_EOTYPE_SOCK
+, 	TB_ETYPE_ACPT 	= 4 	//!< only for TB_EOTYPE_SOCK
+, 	TB_ETYPE_CONN 	= 8 	//!< only for TB_EOTYPE_SOCK
 ,	TB_ETYPE_SPAK 	= 16 	//!< only for TB_EOTYPE_EVET
 
 }tb_etype_t;
