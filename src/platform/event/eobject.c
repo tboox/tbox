@@ -34,7 +34,7 @@ tb_long_t tb_eobject_wait_impl(tb_long_t fd, tb_size_t otype, tb_size_t etype, t
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_size_t otype, tb_size_t etype, tb_handle_t handle)
+tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_assert_and_check_return_val(object, TB_FALSE);
 	object->otype = otype;

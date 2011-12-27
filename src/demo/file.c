@@ -62,8 +62,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init eobject
 	tb_eobject_t io;
 	tb_eobject_t oo;
-	if (!tb_eobject_init(&io, TB_EOTYPE_FILE, TB_ETYPE_READ, ifile)) goto end;
-	if (!tb_eobject_init(&oo, TB_EOTYPE_FILE, TB_ETYPE_WRIT, ofile)) goto end;
+	if (!tb_eobject_init(&io, ifile, TB_EOTYPE_FILE, TB_ETYPE_READ)) goto end;
+	if (!tb_eobject_init(&oo, ofile, TB_EOTYPE_FILE, TB_ETYPE_WRIT)) goto end;
 
 	// read file
 	tb_byte_t 	data[4096];

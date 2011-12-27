@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../event/eobject.h"
+#include "../../event.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #if defined(TB_CONFIG_EVENT_HAVE_POLL)

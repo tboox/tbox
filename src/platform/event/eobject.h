@@ -20,8 +20,8 @@
  * \file		eobject.h
  *
  */
-#ifndef TB_EVENT_OBJECT_H
-#define TB_EVENT_OBJECT_H
+#ifndef TB_PLATFORM_EVENT_OBJECT_H
+#define TB_PLATFORM_EVENT_OBJECT_H
 
 
 /* /////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ typedef struct __tb_eobject_t
  */
 
 /// init the event object
-tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_size_t otype, tb_size_t etype, tb_handle_t handle);
+tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
 
 /// exit the event object
 tb_void_t tb_eobject_exit(tb_eobject_t* object);

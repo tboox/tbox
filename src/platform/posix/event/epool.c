@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../event/epool.h"
+#include "../../event.h"
 #include "../../../memory/memory.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -42,18 +42,26 @@
 #if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
 
 // the event pool type
-typedef struct __tb_epool_epoll_t
+typedef struct __tb_epool_t
 {
-	// the base
-	tb_epool_t 				base;
+	// the object maxn
+	tb_size_t 				maxn;
 
-	// the fd
+	// the object size
+	tb_size_t 				size;
+
+	// the epoll fd
 	tb_long_t 				epfd;
 
 	// the events
-	tb_pbuffer_t 			evts;
+	struct epoll_event* 	evts;
+	tb_size_t 				evtn;
 	
-}tb_epool_epoll_t;
+	// the objects
+	tb_eobject_t* 			objs;
+	tb_size_t 				objn;
+
+}tb_epool_t;
 
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
@@ -65,69 +73,179 @@ typedef struct __tb_epool_epoll_t
  */
 
 #if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-tb_epool_t* tb_epool_init_impl(tb_size_t maxn)
+tb_handle_t tb_epool_init(tb_size_t maxn)
 {
 	// check
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
-	// alloc pool
-	tb_epool_epoll_t* ep = tb_calloc(1, sizeof(tb_epool_epoll_t));
+	// init pool
+	tb_epool_t* ep = tb_calloc(1, sizeof(tb_epool_t));
 	tb_assert_and_check_return_val(ep, TB_NULL);
+
+	// init maxn
+	ep->maxn = maxn;
 
 	// init epoll
 	ep->epfd = epoll_create(maxn);
 	tb_assert_and_check_goto(ep->epfd >= 0, fail);
-	
+
 	// init events
 	if (!tb_pbuffer_init(&ep->evts)) goto fail;
 
 	// ok
-	return (tb_epool_t*)ep;
+	return (tb_handle_t)ep;
 
 fail:
-	if (ep) tb_epool_exit_impl(ep);
+	if (ep) tb_epool_exit(ep);
 	return TB_NULL;
 }
-tb_void_t tb_epool_exit_impl(tb_epool_t* pool)
+
+tb_void_t tb_epool_exit(tb_handle_t pool)
 {
-	tb_epool_epoll_t* ep = (tb_epool_epoll_t*)pool;
-	if (pool)
+	tb_epool_t* ep = (tb_epool_t*)pool;
+	if (ep)
 	{
 		// free events
 		tb_pbuffer_exit(&ep->evts);
-		
+
 		// close fd
 		if (ep->epfd) close(ep->epfd);
 
 		// free pool
-		tb_free(pool);
+		tb_free(ep);
 	}
 }
-tb_size_t tb_epool_addo_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(pool && handle, 0);
+	tb_epool_t* ep = (tb_epool_t*)pool;
+	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size < ep->maxn && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
+	// init 
 	struct epoll_event e = {0};
-	if (!epoll_ctl(pool->epfd, EPOLL_CTL_ADD, (tb_long_t)handle - 1, &e)) return 0;
-	return 0;
+	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
+	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
+	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
+
+	// ctrl
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_ADD, (tb_long_t)handle - 1, &e) < 0) return 0;
+
+	// ok
+	return ++ep->size;
 }
-tb_size_t tb_epool_delo_impl(tb_epool_t* pool, tb_handle_t handle)
+tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
-	return 0;
+	tb_epool_t* ep = (tb_epool_t*)pool;
+	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
+
+	// init 
+	struct epoll_event e = {0};
+	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
+	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
+	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
+
+	// ctrl
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_MOD, (tb_long_t)handle - 1, &e) < 0) return 0;
+
+	// ok
+	return ep->size;
 }
-tb_size_t tb_epool_sete_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
+tb_size_t tb_epool_delo(tb_handle_t pool, tb_handle_t handle)
 {
-	return 0;
+	tb_epool_t* ep = (tb_epool_t*)pool;
+	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
+
+	// ctrl
+	struct epoll_event e = {0};
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_DEL, (tb_long_t)handle - 1, &e) < 0) return 0;
+
+	// ok
+	return --ep->size;
 }
-tb_size_t tb_epool_adde_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
-{
-	return 0;
+tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout)
+{	
+	tb_epool_t* ep = (tb_epool_t*)pool;
+	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && objs, -1);
+
+	// init grow
+	tb_size_t grow = tb_align8((ep->maxn >> 3) + 1);
+
+	// init events
+	if (!ep->evts)
+	{
+		ep->evtn = grow;
+		ep->evts = tb_calloc(ep->evtn, sizeof(struct epoll_event));
+		tb_assert_and_check_return_val(ep->evts, -1);
+	}
+	
+	// wait events
+	tb_long_t evtn = epoll_wait(ep->epfd, ep->evts, ep->evtn, timeout);
+	tb_assert_and_check_return_val(evtn >= 0 && evtn <= ep->evtn, -1);
+	
+	// timeout?
+	tb_check_return_val(evtn, 0);
+
+	// grow it if events is full
+	if (evtn == ep->evtn)
+	{
+		// grow size
+		ep->evtn += grow;
+		if (ep->evtn > ep->maxn) ep->evtn = ep->maxn;
+
+		// grow data
+		ep->evts = tb_realloc(ep->evts, ep->evtn * sizeof(struct epoll_event));
+		tb_assert_and_check_return_val(ep->evts, -1);
+	}
+
+	// init objs
+	if (!ep->objs)
+	{
+		ep->objn = evtn + grow;
+		ep->objs = tb_calloc(ep->objn, sizeof(tb_eobject_t));
+		tb_assert_and_check_return_val(ep->objs, -1);
+	}
+	// grow objs if not enough
+	else if (evtn > ep->objn)
+	{
+		// grow size
+		ep->objn = evtn + grow;
+		if (ep->objn > ep->maxn) ep->objn = ep->maxn;
+
+		// grow data
+		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(struct epoll_event));
+		tb_assert_and_check_return_val(ep->objs, -1);
+	}
+	tb_assert(evtn <= ep->evtn && evtn <= ep->objn);
+
+	// update objects 
+	tb_size_t i = 0;
+	for (i = 0; i < evtn; i++)
+	{
+		struct epoll_event* e = ep->evts + i;
+		tb_eobject_t* 		o = ep->objs + i;
+		tb_size_t 			etype = (tb_size_t)((e->data.u64 >> 32) & 0x00ffffff);
+
+		o->handle = (tb_handle_t)(tb_uint32_t)e->data.u64;
+		o->otype = (tb_size_t)(e->data.u64 >> 56);
+		o->etype = 0;
+		if (e->events & EPOLLIN) 
+		{
+			o->etype |= TB_ETYPE_READ;
+			if (etype & TB_ETYPE_ACPT) o->etype |= TB_ETYPE_ACPT;
+		}
+		if (e->events & EPOLLOUT) 
+		{
+			o->etype |= TB_ETYPE_WRIT;
+			if (etype & TB_ETYPE_CONN) o->etype |= TB_ETYPE_CONN;
+		}
+	}
+	*objs = ep->objs;
+	
+	// ok
+	return evtn;
 }
-tb_size_t tb_epool_dele_impl(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
-{
-	return 0;
-}
+
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
 #else

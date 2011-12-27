@@ -84,8 +84,7 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						event/epool \
-						event/eobject \
+						platform/event/eobject \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -205,10 +204,6 @@ INC_FILES 				= \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \
-						event/prefix.h \
-						event/eobject.h \
-						event/epool.h \
-						event/event.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/file.h \
@@ -217,6 +212,9 @@ INC_FILES 				= \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
+						platform/event/prefix.h \
+						platform/event/eobject.h \
+						platform/event/epool.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \

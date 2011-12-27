@@ -20,36 +20,18 @@
  * \file		epool.h
  *
  */
-#ifndef TB_EVENT_POOL_H
-#define TB_EVENT_POOL_H
+#ifndef TB_PLATFORM_EVENT_POOL_H
+#define TB_PLATFORM_EVENT_POOL_H
 
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "eobject.h"
-#include "../container/container.h"
-
-/* /////////////////////////////////////////////////////////
- * types
- */
-
-// the event pool type
-typedef struct __tb_epool_t
-{
-	// the maximum number of concurrent connections
-	tb_size_t 		maxn;
-
-	// the object hash: handle => object
-	tb_hash_t* 		objs;
-	
-}tb_epool_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
-
 
 /*!init the event pool
  *
@@ -57,10 +39,10 @@ typedef struct __tb_epool_t
  *
  * @return 	the event pool
  */
-tb_epool_t* 	tb_epool_init(tb_size_t maxn);
+tb_handle_t 	tb_epool_init(tb_size_t maxn);
 
 /// exit the event pool
-tb_void_t 		tb_epool_exit(tb_epool_t* pool);
+tb_void_t 		tb_epool_exit(tb_handle_t pool);
 
 /*!add the event object
  *
@@ -69,52 +51,29 @@ tb_void_t 		tb_epool_exit(tb_epool_t* pool);
  * @param 	otype 	the type of the event object
  * @param 	etype 	the event type
  *
- * @return 	the number of the objects
+ * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_epool_addo(tb_epool_t* pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
+tb_size_t 		tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
+
+/*!set the event object
+ *
+ * @param 	pool 	the event pool
+ * @param 	handle 	the handle of the event object
+ * @param 	otype 	the type of the event object
+ * @param 	etype 	the event type
+ *
+ * @return 	the number of the objects, return 0 if failed
+ */
+tb_size_t 		tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
 
 /*!del the event object
  *
  * @param 	pool 	the event pool
  * @param 	handle 	the handle of the event object
  *
- * @return 	the number of the objects
+ * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_epool_delo(tb_epool_t* pool, tb_handle_t handle);
-
-/*!set the event type
- *
- * @param 	pool 	the event pool
- * @param 	handle 	the handle of the event object
- * @param 	etype 	the event type
- *
- * @return 	the new event type
- */
-tb_size_t 		tb_epool_sete(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
-
-/*!add the event type
- *
- * add the event type by 'or' before waiting it
- *
- * @param 	pool 	the event pool
- * @param 	handle 	the handle of the event object
- * @param 	etype 	the event type
- *
- * @return 	the new event type
- */
-tb_size_t 		tb_epool_adde(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
-
-/*!del the event type
- *
- * delete the event type by 'and' before waiting it
- *
- * @param 	pool 	the event pool
- * @param 	handle 	the handle of the event object
- * @param 	etype 	the event type
- *
- * @return 	the new event type
- */
-tb_size_t 		tb_epool_dele(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype);
+tb_size_t 		tb_epool_delo(tb_handle_t pool, tb_handle_t handle);
 
 /*!wait the event objects in the epool
  *
@@ -122,12 +81,11 @@ tb_size_t 		tb_epool_dele(tb_epool_t* pool, tb_handle_t handle, tb_size_t etype)
  * return the event number if ok, otherwise return 0 for timeout
  *
  * @param 	pool 	the event pool
- * @param 	objs 	the returned event objects array
- * @param 	maxn 	the maximum event objects number
+ * @param 	objs 	the returned event objects
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
- * @return 	the event number, return 0 if timeout
+ * @return 	the event number, return 0 if timeout, return -1 if error
  */
-tb_size_t 		tb_epool_wait(tb_epool_t* pool, tb_eobject_t* objs, tb_size_t maxn, tb_long_t timeout);
+tb_long_t 		tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout);
 
 #endif
