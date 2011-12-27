@@ -4,6 +4,42 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////
+ * send
+ */
+static tb_size_t tb_test_sock_send(tb_handle_t s, tb_byte_t* data, tb_size_t size)
+{
+	// send
+	tb_size_t send = 0;
+	while (send < size)
+	{
+		// try to send data
+		tb_long_t n = tb_socket_send(s, data + send, size - send);
+		if (n > 0) send += n;
+		else break;
+	}
+	
+	// ok?
+	return send;
+}
+/* ///////////////////////////////////////////////////////////////////
+ * recv
+ */
+static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_byte_t* data, tb_size_t size)
+{
+	// recv
+	tb_size_t recv = 0;
+	while (recv < size)
+	{
+		// try to recv data
+		tb_long_t n = tb_socket_recv(s, data + recv, size - recv);
+		if (n > 0) recv += n;
+		else break;
+	}
+	
+	// ok?
+	return recv;
+}
+/* ///////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
@@ -62,12 +98,34 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				}
 				else
 				{
-					tb_print("accept failed");
+					tb_print("connection closed");
+					tb_epool_delo(ep, objs[i].handle);
 				}
 			}
 			else if (objs[i].etype & TB_ETYPE_READ)
 			{
 				tb_assert_and_check_break(objs[i].handle);
+
+				tb_eobject_t o;
+				if (!tb_eobject_init(&o, objs[i].handle, TB_EOTYPE_SOCK, TB_ETYPE_NULL)) goto end;
+
+				tb_char_t data[4096] = {0};
+				tb_size_t size = tb_test_sock_recv(objs[i].handle, data, 4096);
+
+				if (size)
+				{
+					tb_print("recv[%u]: %s", size, data);
+					tb_test_sock_send(objs[i].handle, "ok", 3);
+				}
+				else
+				{
+					tb_print("connection closed");
+					tb_epool_delo(ep, objs[i].handle);
+				}
+			}
+			else 
+			{
+				tb_print("unknown event: %u", objs[i].etype);
 			}
 		}
 	}

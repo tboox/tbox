@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		epost.h
+ * \file		eiocp.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_POST_H
-#define TB_PLATFORM_EVENT_POST_H
+#ifndef TB_PLATFORM_EVENT_IOCP_H
+#define TB_PLATFORM_EVENT_IOCP_H
 
 /* /////////////////////////////////////////////////////////
  * includes
