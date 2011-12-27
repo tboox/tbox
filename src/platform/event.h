@@ -20,15 +20,15 @@
  * \file		event.h
  *
  */
-#ifndef TB_EVENT_H
-#define TB_EVENT_H
-
+#ifndef TB_PLATFROM_EVENT_H
+#define TB_PLATFROM_EVENT_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "eobject.h"
-#include "epool.h"
+#include "event/eobject.h"
+#include "event/epool.h"
+
 
 #endif
