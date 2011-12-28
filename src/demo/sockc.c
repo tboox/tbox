@@ -190,7 +190,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init eobject
 	tb_eobject_t o;
-	if (!tb_eobject_init(&o, s, TB_EOTYPE_SOCK, TB_ETYPE_NULL)) goto end;
+	tb_eobject_seto(&o, s, TB_EOTYPE_SOCK, TB_ETYPE_NULL);
 
 	// connect
 	if (!tb_test_sock_connect(s, &o, argv[1], tb_stou32(argv[2]))) goto end;
@@ -205,9 +205,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_print("recv[%u]: %s", size, data);
 
 end:
-
-	// exit eobject
-	if (s) tb_eobject_exit(&o);
 
 	// close socket
 	if (s) tb_socket_close(s);

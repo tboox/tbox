@@ -62,8 +62,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init eobject
 	tb_eobject_t io;
 	tb_eobject_t oo;
-	if (!tb_eobject_init(&io, ifile, TB_EOTYPE_FILE, TB_ETYPE_READ)) goto end;
-	if (!tb_eobject_init(&oo, ofile, TB_EOTYPE_FILE, TB_ETYPE_WRIT)) goto end;
+	tb_eobject_seto(&io, ifile, TB_EOTYPE_FILE, TB_ETYPE_READ);
+	tb_eobject_seto(&oo, ofile, TB_EOTYPE_FILE, TB_ETYPE_WRIT);
 
 	// read file
 	tb_byte_t 	data[4096];
@@ -124,10 +124,6 @@ end:
 
 	// trace
 	tb_print("size: %llu, read: %llu", isize, read);
-
-	// exit eobject
-	if (ifile) tb_eobject_exit(&io);
-	if (ofile) tb_eobject_exit(&oo);
 
 	// exit file
 	if (ifile) tb_file_exit(ifile);

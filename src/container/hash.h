@@ -125,6 +125,7 @@ tb_void_t 				tb_hash_clear(tb_hash_t* hash);
 tb_pointer_t 			tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
 tb_cpointer_t 			tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
 
+tb_pointer_t 			tb_hash_get(tb_hash_t* hash, tb_cpointer_t name);
 tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
 tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
 
