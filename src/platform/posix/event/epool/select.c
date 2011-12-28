@@ -17,13 +17,13 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		poll.c
+ * \file		select.c
  *
  */
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include <sys/poll.h>
+#include <sys/select.h>
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -37,8 +37,17 @@ typedef struct __tb_epool_t
 	// the objects hash
 	tb_hash_t* 				hash;
 
-	// the poll fds
-	tb_vector_t* 			pfds;
+	// the fd max
+	tb_size_t 				sfdm;
+
+	// the select fds
+	fd_set 					rfdi;
+	fd_set 					wfdi;
+	fd_set 					efdi;
+
+	fd_set 					rfdo;
+	fd_set 					wfdo;
+	fd_set 					efdo;
 	
 	// the objects
 	tb_eobject_t* 			objs;
@@ -65,9 +74,10 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	ep->hash = tb_hash_init(tb_align8(tb_int32_sqrt(maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(ep->hash, fail);
 
-	// init pfds
-	ep->pfds = tb_vector_init(tb_align8((maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
-	tb_assert_and_check_goto(ep->pfds, fail);
+	// init fds
+	FD_ZERO(&ep->rfdi);
+	FD_ZERO(&ep->wfdi);
+	FD_ZERO(&ep->efdi);
 
 	// ok
 	return (tb_handle_t)ep;
@@ -82,11 +92,13 @@ tb_void_t tb_epool_exit(tb_handle_t pool)
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	if (ep)
 	{
+		// free pfds
+		FD_ZERO(&ep->rfdi);
+		FD_ZERO(&ep->wfdi);
+		FD_ZERO(&ep->efdi);
+
 		// free objs 
 		if (ep->objs) tb_free(ep->objs);
-
-		// exit pfds
-		if (ep->pfds) tb_vector_exit(ep->pfds);
 
 		// exit hash
 		if (ep->hash) tb_hash_exit(ep->hash);
@@ -98,25 +110,26 @@ tb_void_t tb_epool_exit(tb_handle_t pool)
 tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, 0);
+	tb_assert_and_check_return_val(fd >= 0 && fd < FD_SETSIZE, 0);
+
+	// update fd max
+	if (fd > ep->sfdm) ep->sfdm = fd;
 	
-	// init pfd
-	struct pollfd pfd = {0};
-	pfd.fd = fd;
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd.events |= POLLIN;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd.events |= POLLOUT;
+	// init fds
+	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &ep->rfdi : TB_NULL;
+	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &ep->wfdi : TB_NULL;
+	if (prfds) FD_SET(fd, prfds);
+	if (pwfds) FD_SET(fd, pwfds);
+	FD_SET(fd, &ep->efdi);
 
 	// init obj
 	tb_eobject_t o;
 	tb_eobject_seto(&o, handle, otype, etype);
-
-	// add pfd
-	tb_vector_insert_tail(ep->pfds, &pfd);
 
 	// add obj
 	tb_hash_set(ep->hash, fd, &o);
@@ -127,7 +140,7 @@ tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
 	// fd
@@ -138,21 +151,12 @@ tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 	tb_eobject_t* o = tb_hash_get(ep->hash, fd);
 	tb_assert_and_check_return_val(o, -1);
 
-	// set pfd
-	tb_size_t itor = tb_vector_itor_head(ep->pfds);
-	tb_size_t tail = tb_vector_itor_tail(ep->pfds);
-	for (; itor != tail; itor = tb_vector_itor_next(ep->pfds, itor))
-	{
-		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(ep->pfds, itor);
-		if (pfd && pfd->fd == fd)
-		{
-			pfd->events = 0;
-			if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd->events |= POLLIN;
-			if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd->events |= POLLOUT;
-			break;
-		}
-	}
-	tb_assert_and_check_return_val(itor != tail, 0);
+	// set fds
+	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &ep->rfdi : TB_NULL;
+	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &ep->wfdi : TB_NULL;
+	if (prfds) FD_SET(fd, prfds); else FD_CLR(fd, prfds);
+	if (pwfds) FD_SET(fd, pwfds); else FD_CLR(fd, pwfds);
+	if (prfds || pwfds) FD_SET(fd, &ep->efdi); else FD_CLR(fd, &ep->efdi);
 
 	// set obj
 	tb_eobject_seto(o, handle, otype, etype);
@@ -163,24 +167,16 @@ tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 tb_size_t tb_epool_delo(tb_handle_t pool, tb_handle_t handle)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, 0);
 
-	// find pfd
-	tb_size_t itor = tb_vector_itor_head(ep->pfds);
-	tb_size_t tail = tb_vector_itor_tail(ep->pfds);
-	for (; itor != tail; itor = tb_vector_itor_next(ep->pfds, itor))
-	{
-		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(ep->pfds, itor);
-		if (pfd && pfd->fd == fd) break;
-	}
-	tb_assert_and_check_return_val(itor != tail, 0);
-	
-	// del pfd
-	tb_vector_remove(ep->pfds, itor);
+	// del fds
+	FD_CLR(fd, &ep->rfdi);
+	FD_CLR(fd, &ep->wfdi);
+	FD_CLR(fd, &ep->efdi);
 
 	// del obj
 	tb_hash_del(ep->hash, fd);
@@ -191,19 +187,27 @@ tb_size_t tb_epool_delo(tb_handle_t pool, tb_handle_t handle)
 tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout)
 {	
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && objs, -1);
+	tb_assert_and_check_return_val(ep && ep->hash && objs, -1);
 
-	// pfds
-	struct pollfd* 	pfds = (struct pollfd*)tb_vector_at_head(ep->pfds);
-	tb_size_t 		pfdm = tb_vector_size(ep->pfds);
-	tb_assert_and_check_return_val(pfds && pfdm, -1);
+	// init time
+	struct timeval t = {0};
+	if (timeout > 0)
+	{
+		t.tv_sec = timeout / 1000;
+		t.tv_usec = (timeout % 1000) * 1000;
+	}
+
+	// init fdo
+	memcpy(&ep->rfdo, &ep->rfdi, sizeof(fd_set));
+	memcpy(&ep->wfdo, &ep->wfdi, sizeof(fd_set));
+	memcpy(&ep->efdo, &ep->efdi, sizeof(fd_set));
 
 	// wait
-	tb_long_t pfdn = poll(pfds, pfdm, timeout);
-	tb_assert_and_check_return_val(pfdn >= 0, -1);
+	tb_long_t sfdn = select(ep->sfdm + 1, &ep->rfdo, &ep->wfdo, &ep->efdo, timeout >= 0? &t : TB_NULL);
+	tb_assert_and_check_return_val(sfdn >= 0, -1);
 
 	// timeout?
-	tb_check_return_val(pfdn, 0);
+	tb_check_return_val(sfdn, 0);
 
 	// init grow
 	tb_size_t grow = tb_align8((ep->maxn >> 3) + 1);
@@ -211,53 +215,58 @@ tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout
 	// init objs
 	if (!ep->objs)
 	{
-		ep->objn = pfdn + grow;
+		ep->objn = sfdn + grow;
 		ep->objs = tb_calloc(ep->objn, sizeof(tb_eobject_t));
 		tb_assert_and_check_return_val(ep->objs, -1);
 	}
 	// grow objs if not enough
-	else if (pfdn > ep->objn)
+	else if (sfdn > ep->objn)
 	{
 		// grow size
-		ep->objn = pfdn + grow;
+		ep->objn = sfdn + grow;
 		if (ep->objn > ep->maxn) ep->objn = ep->maxn;
 
 		// grow data
 		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(tb_eobject_t));
 		tb_assert_and_check_return_val(ep->objs, -1);
 	}
-	tb_assert(pfdn <= ep->objn);
+	tb_assert(sfdn <= ep->objn);
 
 	// update objects 
 	tb_size_t i = 0;
-	tb_size_t j = 0;
-	for (i = 0; i < pfdm; i++)
+	tb_size_t itor = tb_hash_itor_head(ep->hash);
+	tb_size_t tail = tb_hash_itor_tail(ep->hash);
+	for (; itor != tail; itor = tb_hash_itor_next(ep->hash, itor))
 	{
-		struct pollfd* 	p = pfds + i;
-		tb_eobject_t* 	o = tb_hash_get(ep->hash, p->fd);
-		tb_assert_and_check_return_val(o, -1);
-		
-		// add event
-		tb_long_t e = 0;
-		if (p->revents & POLLIN)
+		tb_hash_item_t* item = tb_hash_itor_at(ep->hash, itor);
+		if (item)
 		{
-			e |= TB_ETYPE_READ;
-			if (o->etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+			tb_long_t 		fd = (tb_long_t)item->name;
+			tb_eobject_t* 	o = (tb_eobject_t*)item->data;
+			if (fd >= 0 && o)
+			{
+				tb_long_t e = 0;
+				if (FD_ISSET(fd, &ep->rfdo)) 
+				{
+					e |= TB_ETYPE_READ;
+					if (o->etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+				}
+				if (FD_ISSET(fd, &ep->wfdo)) 
+				{
+					e |= TB_ETYPE_WRIT;
+					if (o->etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+				}
+				if (FD_ISSET(fd, &ep->efdo) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
+					e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+					
+				// add object
+				if (e && i < ep->objn) ep->objs[i++] = *o;
+			}
 		}
-		if (p->revents & POLLOUT) 
-		{
-			e |= TB_ETYPE_WRIT;
-			if (o->etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
-		}
-		if ((p->revents & POLLHUP) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
-			e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
-
-		// add object
-		if (e && j < ep->objn) ep->objs[j++] = *o;
 	}
 	*objs = ep->objs;
 	
 	// ok
-	return pfdn;
+	return sfdn;
 }
 
