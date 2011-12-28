@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../../event.h"
+#include "../../../math/math.h"
 #include "../../../memory/memory.h"
 #include "../../../container/container.h"
 #include <sys/types.h>

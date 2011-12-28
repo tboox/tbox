@@ -206,7 +206,7 @@ tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout
 		if (ep->objn > ep->maxn) ep->objn = ep->maxn;
 
 		// grow data
-		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(struct epoll_event));
+		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(tb_eobject_t));
 		tb_assert_and_check_return_val(ep->objs, -1);
 	}
 	tb_assert(evtn <= ep->evtn && evtn <= ep->objn);
