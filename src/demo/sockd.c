@@ -106,9 +106,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			{
 				tb_assert_and_check_break(objs[i].handle);
 
-				tb_eobject_t o;
-				if (!tb_eobject_init(&o, objs[i].handle, TB_EOTYPE_SOCK, TB_ETYPE_NULL)) goto end;
-
 				tb_char_t data[4096] = {0};
 				tb_size_t size = tb_test_sock_recv(objs[i].handle, data, 4096);
 

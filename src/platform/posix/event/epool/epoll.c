@@ -69,9 +69,6 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	ep->epfd = epoll_create(maxn);
 	tb_assert_and_check_goto(ep->epfd >= 0, fail);
 
-	// init events
-	if (!tb_pbuffer_init(&ep->evts)) goto fail;
-
 	// ok
 	return (tb_handle_t)ep;
 
@@ -85,8 +82,11 @@ tb_void_t tb_epool_exit(tb_handle_t pool)
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	if (ep)
 	{
+		// free objects 
+		if (ep->objs) tb_free(ep->objs);
+
 		// free events
-		tb_pbuffer_exit(&ep->evts);
+		if (ep->evts) tb_free(ep->evts);
 
 		// close fd
 		if (ep->epfd) close(ep->epfd);
@@ -101,6 +101,10 @@ tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size < ep->maxn && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
+
 	// init 
 	struct epoll_event e = {0};
 	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN;
@@ -109,7 +113,7 @@ tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
 
 	// ctrl
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_ADD, (tb_long_t)handle - 1, &e) < 0) return 0;
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_ADD, fd, &e) < 0) return 0;
 
 	// ok
 	return ++ep->size;
@@ -120,6 +124,10 @@ tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
+
 	// init 
 	struct epoll_event e = {0};
 	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
@@ -127,7 +135,7 @@ tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
 
 	// ctrl
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_MOD, (tb_long_t)handle - 1, &e) < 0) return 0;
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_MOD, fd, &e) < 0) return 0;
 
 	// ok
 	return ep->size;
@@ -137,9 +145,13 @@ tb_size_t tb_epool_delo(tb_handle_t pool, tb_handle_t handle)
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
 
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
+
 	// ctrl
 	struct epoll_event e = {0};
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_DEL, (tb_long_t)handle - 1, &e) < 0) return 0;
+	if (epoll_ctl(ep->epfd, EPOLL_CTL_DEL, fd, &e) < 0) return 0;
 
 	// ok
 	return --ep->size;

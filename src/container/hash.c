@@ -251,6 +251,10 @@ tb_cpointer_t tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name)
 	}
 	return TB_NULL;
 }
+tb_pointer_t tb_hash_get(tb_hash_t* hash, tb_cpointer_t name)
+{
+	return (tb_pointer_t)tb_hash_const_at(hash, name);
+}
 tb_void_t tb_hash_del(tb_hash_t* hash, tb_cpointer_t name)
 {
 	tb_assert_and_check_return(hash);

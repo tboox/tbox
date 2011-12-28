@@ -76,11 +76,8 @@ typedef struct __tb_eobject_t
  * interfaces
  */
 
-/// init the event object
-tb_bool_t tb_eobject_init(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
-
-/// exit the event object
-tb_void_t tb_eobject_exit(tb_eobject_t* object);
+/// set the event object
+tb_void_t tb_eobject_seto(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
 
 /// get the object type
 tb_size_t tb_eobject_type(tb_eobject_t* object);

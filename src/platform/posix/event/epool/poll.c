@@ -34,12 +34,11 @@ typedef struct __tb_epool_t
 	// the object maxn
 	tb_size_t 				maxn;
 
-	// the object size
-	tb_size_t 				size;
+	// the objects hash
+	tb_hash_t* 				hash;
 
 	// the poll fds
-	struct pollfd* 			pfds;
-	tb_size_t 				pfdn;
+	tb_vector_t* 			pfds;
 	
 	// the objects
 	tb_eobject_t* 			objs;
@@ -62,12 +61,13 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	// init maxn
 	ep->maxn = maxn;
 
-	// init epoll
-	ep->epfd = epoll_create(maxn);
-	tb_assert_and_check_goto(ep->epfd >= 0, fail);
+	// init hash
+	ep->hash = tb_hash_init(tb_align8((maxn >> 3) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
+	tb_assert_and_check_goto(ep->hash, fail);
 
-	// init events
-	if (!tb_pbuffer_init(&ep->evts)) goto fail;
+	// init pfds
+	ep->pfds = tb_vector_init(tb_align8((maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
+	tb_assert_and_check_goto(ep->pfds, fail);
 
 	// ok
 	return (tb_handle_t)ep;
@@ -82,11 +82,14 @@ tb_void_t tb_epool_exit(tb_handle_t pool)
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	if (ep)
 	{
-		// free events
-		tb_pbuffer_exit(&ep->evts);
+		// free objs 
+		if (ep->objs) tb_free(ep->objs);
 
-		// close fd
-		if (ep->epfd) close(ep->epfd);
+		// exit pfds
+		if (ep->pfds) tb_vector_exit(ep->pfds);
+
+		// exit hash
+		if (ep->hash) tb_hash_exit(ep->hash);
 
 		// free pool
 		tb_free(ep);
@@ -95,134 +98,163 @@ tb_void_t tb_epool_exit(tb_handle_t pool)
 tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size < ep->maxn && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
-	// init 
-	struct epoll_event e = {0};
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT;
-	e.events |= EPOLLET;
-	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
+	
+	// init pfd
+	struct pollfd pfd = {0};
+	pfd.fd = fd;
+	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd.events |= POLLIN;
+	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd.events |= POLLOUT;
 
-	// ctrl
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_ADD, (tb_long_t)handle - 1, &e) < 0) return 0;
+	// init obj
+	tb_eobject_t o;
+	tb_eobject_seto(&o, handle, otype, etype);
 
+	// add pfd
+	tb_vector_insert_tail(ep->pfds, &pfd);
+
+	// add obj
+	tb_hash_set(ep->hash, fd, &o);
+	
 	// ok
-	return ++ep->size;
+	return tb_hash_size(ep->hash);
 }
 tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
 
-	// init 
-	struct epoll_event e = {0};
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
-	e.data.u64 = (((tb_uint64_t)otype << 56) | ((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
 
-	// ctrl
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_MOD, (tb_long_t)handle - 1, &e) < 0) return 0;
+	// set pfd
+	tb_size_t itor = tb_vector_itor_head(ep->pfds);
+	tb_size_t tail = tb_vector_itor_tail(ep->pfds);
+	for (; itor != tail; itor = tb_vector_itor_next(ep->pfds, itor))
+	{
+		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(ep->pfds, itor);
+		if (pfd && pfd->fd == fd)
+		{
+			pfd->events = 0;
+			if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd->events |= POLLIN;
+			if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd->events |= POLLOUT;
+			break;
+		}
+	}
+	tb_assert_and_check_return_val(itor != tail, 0);
 
+	// set obj
+	tb_eobject_t* o = tb_hash_get(ep->hash, fd);
+	if (o) tb_eobject_seto(o, handle, otype, etype);
+	
 	// ok
-	return ep->size;
+	return tb_hash_size(ep->hash);
 }
 tb_size_t tb_epool_delo(tb_handle_t pool, tb_handle_t handle)
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && ep->size && handle, 0);
+	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && handle, 0);
 
-	// ctrl
-	struct epoll_event e = {0};
-	if (epoll_ctl(ep->epfd, EPOLL_CTL_DEL, (tb_long_t)handle - 1, &e) < 0) return 0;
+	// fd
+	tb_long_t fd = ((tb_long_t)handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, 0);
 
+	// find pfd
+	tb_size_t itor = tb_vector_itor_head(ep->pfds);
+	tb_size_t tail = tb_vector_itor_tail(ep->pfds);
+	for (; itor != tail; itor = tb_vector_itor_next(ep->pfds, itor))
+	{
+		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(ep->pfds, itor);
+		if (pfd && pfd->fd == fd) break;
+	}
+	tb_assert_and_check_return_val(itor != tail, 0);
+	
+	// del pfd
+	tb_vector_remove(ep->pfds, itor);
+
+	// del obj
+	tb_hash_del(ep->hash, fd);
+	
 	// ok
-	return --ep->size;
+	return tb_hash_size(ep->hash);
 }
 tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout)
 {	
 	tb_epool_t* ep = (tb_epool_t*)pool;
-	tb_assert_and_check_return_val(ep && ep->epfd >= 0 && objs, -1);
+	tb_assert_and_check_return_val(ep && ep->hash && ep->pfds && objs, -1);
+
+	// pfds
+	struct pollfd* 	pfds = (struct pollfd*)tb_vector_at_head(ep->pfds);
+	tb_size_t 		pfdm = tb_vector_size(ep->pfds);
+	tb_assert_and_check_return_val(pfds && pfdm, -1);
+
+	// wait
+	tb_long_t pfdn = poll(pfds, pfdm, timeout);
+	tb_assert_and_check_return_val(pfdn >= 0, -1);
+
+	// timeout?
+	tb_check_return_val(pfdn, 0);
 
 	// init grow
 	tb_size_t grow = tb_align8((ep->maxn >> 3) + 1);
 
-	// init events
-	if (!ep->evts)
-	{
-		ep->evtn = grow;
-		ep->evts = tb_calloc(ep->evtn, sizeof(struct epoll_event));
-		tb_assert_and_check_return_val(ep->evts, -1);
-	}
-	
-	// wait events
-	tb_long_t evtn = epoll_wait(ep->epfd, ep->evts, ep->evtn, timeout);
-	tb_assert_and_check_return_val(evtn >= 0 && evtn <= ep->evtn, -1);
-	
-	// timeout?
-	tb_check_return_val(evtn, 0);
-
-	// grow it if events is full
-	if (evtn == ep->evtn)
-	{
-		// grow size
-		ep->evtn += grow;
-		if (ep->evtn > ep->maxn) ep->evtn = ep->maxn;
-
-		// grow data
-		ep->evts = tb_realloc(ep->evts, ep->evtn * sizeof(struct epoll_event));
-		tb_assert_and_check_return_val(ep->evts, -1);
-	}
-
 	// init objs
 	if (!ep->objs)
 	{
-		ep->objn = evtn + grow;
+		ep->objn = pfdn + grow;
 		ep->objs = tb_calloc(ep->objn, sizeof(tb_eobject_t));
 		tb_assert_and_check_return_val(ep->objs, -1);
 	}
 	// grow objs if not enough
-	else if (evtn > ep->objn)
+	else if (pfdn > ep->objn)
 	{
 		// grow size
-		ep->objn = evtn + grow;
+		ep->objn = pfdn + grow;
 		if (ep->objn > ep->maxn) ep->objn = ep->maxn;
 
 		// grow data
-		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(struct epoll_event));
+		ep->objs = tb_realloc(ep->objs, ep->objn * sizeof(struct pollfd));
 		tb_assert_and_check_return_val(ep->objs, -1);
 	}
-	tb_assert(evtn <= ep->evtn && evtn <= ep->objn);
+	tb_assert(pfdn <= ep->objn);
 
 	// update objects 
 	tb_size_t i = 0;
-	for (i = 0; i < evtn; i++)
+	tb_size_t j = 0;
+	for (i = 0; i < pfdm; i++)
 	{
-		struct epoll_event* e = ep->evts + i;
-		tb_eobject_t* 		o = ep->objs + i;
-		tb_size_t 			etype = (tb_size_t)((e->data.u64 >> 32) & 0x00ffffff);
+		struct pollfd* 	p = pfds + i;
+		tb_eobject_t* 	o = tb_hash_get(ep->hash, p->fd);
+		tb_assert_and_check_return_val(o, -1);
+		
+		// add event
+		tb_long_t e = 0;
+		if (p->revents & POLLIN)
+		{
+			e |= TB_ETYPE_READ;
+			if (o->etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+		}
+		if (p->revents & POLLOUT) 
+		{
+			e |= TB_ETYPE_WRIT;
+			if (o->etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+		}
+		if ((p->revents & POLLHUP) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
+			e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
 
-		o->handle = (tb_handle_t)(tb_uint32_t)e->data.u64;
-		o->otype = (tb_size_t)(e->data.u64 >> 56);
-		o->etype = 0;
-		if (e->events & EPOLLIN) 
-		{
-			o->etype |= TB_ETYPE_READ;
-			if (etype & TB_ETYPE_ACPT) o->etype |= TB_ETYPE_ACPT;
-		}
-		if (e->events & EPOLLOUT) 
-		{
-			o->etype |= TB_ETYPE_WRIT;
-			if (etype & TB_ETYPE_CONN) o->etype |= TB_ETYPE_CONN;
-		}
-		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->etype & TB_ETYPE_READ | TB_ETYPE_WRIT)) 
-			o->etype |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+		// add object
+		if (e && j < ep->objn) ep->objs[j++] = *o;
 	}
 	*objs = ep->objs;
 	
 	// ok
-	return evtn;
+	return pfdn;
 }
 
