@@ -39,8 +39,12 @@
 # 	include "epool/epoll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
 # 	include "epool/poll.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_PORT)
+# 	include "epool/port.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
 # 	include "epool/select.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
+# 	include "epool/kqueue.c"
 #else
 # 	error have not available event mode
 #endif
