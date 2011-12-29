@@ -637,6 +637,12 @@ get_qualifier:
 		// short & long => int
 	case 'h':
 	case 'l':
+		// %lxx
+#if TB_CPU_BITSIZE == 64
+		if (*p == 'l') 
+			e->qual = TB_PRINTF_QUAL_I64;
+#endif
+		// %llxx
 		++p;
 		if (*p == 'l') 
 		{
@@ -690,6 +696,16 @@ get_qualifier:
 	case 'x':
 		e->base = 16;
 		e->type = TB_PRINTF_TYPE_INT;
+		break;
+	case 'P':
+		e->extra |= TB_PRINTF_EXTRA_UPPER;
+	case 'p':
+		e->base = 16;
+		e->type = TB_PRINTF_TYPE_INT;
+		e->flags |= TB_PRINTF_FLAG_PFIX;
+#if TB_CPU_BITSIZE == 64
+		e->qual = TB_PRINTF_QUAL_I64;
+#endif
 		break;
 	case 'o':
 		e->base = 8;
