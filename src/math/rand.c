@@ -24,6 +24,7 @@
  * includes
  */
 #include "rand.h"
+#include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
  * macros

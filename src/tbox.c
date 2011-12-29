@@ -70,7 +70,7 @@ static tb_bool_t tb_check_float_order()
 
 tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 {
-	tb_trace("init: %p %d", data, size);
+	tb_trace("init: %p %lu", data, size);
 
 	// check types
 	tb_assert_static(sizeof(tb_byte_t) == 1);
