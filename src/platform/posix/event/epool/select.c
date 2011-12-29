@@ -198,9 +198,9 @@ tb_long_t tb_epool_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout
 	}
 
 	// init fdo
-	memcpy(&ep->rfdo, &ep->rfdi, sizeof(fd_set));
-	memcpy(&ep->wfdo, &ep->wfdi, sizeof(fd_set));
-	memcpy(&ep->efdo, &ep->efdi, sizeof(fd_set));
+	tb_memcpy(&ep->rfdo, &ep->rfdi, sizeof(fd_set));
+	tb_memcpy(&ep->wfdo, &ep->wfdi, sizeof(fd_set));
+	tb_memcpy(&ep->efdo, &ep->efdi, sizeof(fd_set));
 
 	// wait
 	tb_long_t sfdn = select(ep->sfdm + 1, &ep->rfdo, &ep->wfdo, &ep->efdo, timeout >= 0? &t : TB_NULL);
