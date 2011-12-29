@@ -28,6 +28,7 @@
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../libc/libc.h"
+#include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
  * macros

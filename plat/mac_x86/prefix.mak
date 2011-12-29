@@ -34,8 +34,7 @@ PWD 			= pwd
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
 	-O2 -DNDEBUG \
-	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-	-march=native -pipe # gcc >= 4.2.3
+	-fomit-frame-pointer -freg-struct-return -fno-bounds-check 
 
 CPPFLAGS_DEBUG 	= -g
 CPPFLAGS 		= -c -Wall -msse2
@@ -53,7 +52,7 @@ CXXFLAGS_DEBUG 	=
 CXXFLAGS 		= 
 
 # ldflags
-LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed
+LDFLAGS_RELEASE = 
 LDFLAGS_DEBUG 	= 
 LDFLAGS 		= 
 LDFLAGS-L 		= -L
