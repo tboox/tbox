@@ -17,24 +17,29 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		event.c
+ * \file		select.c
  *
  */
-/* /////////////////////////////////////////////////////////
- * includes
- */
-#include "prefix.h"
-#include "../../event/eobject.h"
-#include "winsock2.h"
-#include "windows.h"
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-#if defined(TB_CONFIG_EVENT_HAVE_SELECT)
-tb_long_t tb_event_wait_sock_fd(tb_long_t fd, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
 {
+	tb_assert_and_check_return_val(object, -1);
+
+	// type
+	tb_size_t otype = object->otype;
+	tb_size_t etype = object->etype;
+
+	// \note select is not support file for windows
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, -1);
+
+	// fd
+	tb_long_t fd = ((tb_long_t)object->handle) - 1;
+	tb_assert_and_check_return_val(fd >= 0, -1);
+	
 	// init time
 	struct timeval t = {0};
 	if (timeout > 0)
@@ -47,8 +52,8 @@ tb_long_t tb_event_wait_sock_fd(tb_long_t fd, tb_size_t etype, tb_long_t timeout
 	fd_set 	rfds;
 	fd_set 	wfds;
 	fd_set 	efds;
-	fd_set* prfds = etype & TB_ETYPE_READ? &rfds : TB_NULL;
-	fd_set* pwfds = etype & TB_ETYPE_WRIT? &wfds : TB_NULL;
+	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &rfds : TB_NULL;
+	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &wfds : TB_NULL;
 
 	if (prfds)
 	{
@@ -76,23 +81,28 @@ tb_long_t tb_event_wait_sock_fd(tb_long_t fd, tb_size_t etype, tb_long_t timeout
 	// timeout?
 	tb_check_return_val(r, 0);
 
+	// error?
+	if (otype == TB_EOTYPE_SOCK)
+	{
+		tb_int_t o = 0;
+		tb_int_t n = sizeof(tb_int_t);
+		getsockopt(fd, SOL_SOCKET, SO_ERROR, &o, &n);
+		if (o) return -1;
+	}
+
 	// ok
-	etype = 0;
-	if (prfds && FD_ISSET(fd, &rfds)) etype |= TB_ETYPE_READ;
-	if (pwfds && FD_ISSET(fd, &wfds)) etype |= TB_ETYPE_WRIT;
-	if (FD_ISSET(fd, &efds)) etype = TB_ETYPE_EXIT;
-	return etype;
-}
-#else
-# 	error have not available event mode
-#endif
-
-tb_long_t tb_event_wait_fd(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_long_t timeout)
-{
-	tb_assert_and_check_return_val(fd >= 0, -1);
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
-
-	return 	( 	otype == TB_EOTYPE_SOCK?
-				tb_event_wait_sock_fd(fd, etype, timeout)
-			: 	tb_event_wait_file_fd(fd, etype, timeout));
+	tb_long_t e = 0;
+	if (prfds && FD_ISSET(fd, &rfds)) 
+	{
+		e |= TB_ETYPE_READ;
+		if (etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+	}
+	if (pwfds && FD_ISSET(fd, &wfds)) 
+	{
+		e |= TB_ETYPE_WRIT;
+		if (etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+	}
+	if (FD_ISSET(fd, &efds) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
+		e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+	return e;
 }
