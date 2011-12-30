@@ -20,10 +20,6 @@
  * \file		select.c
  *
  */
-/* /////////////////////////////////////////////////////////
- * includes
- */
-#include <sys/select.h>
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -111,7 +107,7 @@ tb_size_t tb_epool_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, 0);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -142,7 +138,7 @@ tb_size_t tb_epool_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, t
 {
 	tb_epool_t* ep = (tb_epool_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, 0);
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, 0);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
