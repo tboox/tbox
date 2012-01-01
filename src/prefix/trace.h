@@ -84,6 +84,9 @@
 #define tb_trace_noimpl_tag(tag) 							tb_trace_line_tag(tag, "[no_impl]:")
 #define tb_trace_noimpl() 									tb_trace_line("[no_impl]:")
 
+#define tb_trace_nosafe_tag(tag) 							tb_trace_line_tag(tag, "[no_safe]:")
+#define tb_trace_nosafe() 									tb_trace_line("[no_safe]:")
+
 #endif
 
 
