@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		overlap.c
+ * \file		waito.c
  *
  */
 
@@ -25,19 +25,28 @@
  * implemention
  */
 
-tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eobject_waito(tb_eobject_t* object, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(object, -1);
+	tb_assert_and_check_return_val(object && object->handle, -1);
 
 	// type
 	tb_size_t otype = object->otype;
 	tb_size_t etype = object->etype;
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
-
-	// fd
-	tb_long_t fd = ((tb_long_t)object->handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, -1);
 	
+	// check
+	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_EVET, -1);
+	tb_assert_and_check_return_val(!((otype == TB_EOTYPE_FILE) && (etype & TB_ETYPE_READ) && (etype & TB_ETYPE_WRIT)), -1);
 
-	return 0;
+	// select
+	DWORD r = WaitForSingleObject(object->handle, timeout >= 0? timeout : INFINITE);
+	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+
+	// timeout?
+	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+
+	// error?
+	tb_check_return_val(r == WAIT_OBJECT_0, -1);
+
+	// ok
+	return etype;
 }

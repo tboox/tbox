@@ -32,10 +32,36 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-#if defined(TB_CONFIG_EVENT_HAVE_OVERLAP)
-# 	include "eobject/overlap.c"
-#elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "eobject/select.c"
-#else
-# 	error have not available event mode
+#ifdef TB_CONFIG_EVENT_HAVE_WAITO
+# 	include "eobject/waito.c"
 #endif
+
+#ifdef TB_CONFIG_EVENT_HAVE_SELECT
+# 	include "eobject/select.c"
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * selector
+ */
+tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(object, -1);
+
+	switch (object->otype)
+	{
+#ifdef TB_CONFIG_EVENT_HAVE_WAITO
+	case TB_EOTYPE_FILE:
+	case TB_EOTYPE_EVET:
+		return tb_eobject_waito(object, timeout);
+#endif
+
+#ifdef TB_CONFIG_EVENT_HAVE_SELECT
+	case TB_EOTYPE_SOCK:
+		return tb_eobject_select(object, timeout);
+#endif
+	default:
+		break;
+	}
+	tb_trace_noimpl();
+	return 0;
+}

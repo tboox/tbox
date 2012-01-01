@@ -25,7 +25,7 @@
  * implemention
  */
 
-tb_long_t tb_eobject_wait_impl(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eobject_select(tb_eobject_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object, -1);
 

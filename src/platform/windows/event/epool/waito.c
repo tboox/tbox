@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		slect.c
+ * \file		waito.c
  *
  */
 
@@ -25,7 +25,7 @@
  * types
  */
 // the event pool type
-typedef struct __tb_epool_slect_t
+typedef struct __tb_epool_waito_t
 {
 	// the object maxn
 	tb_size_t 				maxn;
@@ -36,7 +36,7 @@ typedef struct __tb_epool_slect_t
 	// the fd max
 	tb_size_t 				sfdm;
 
-	// the slect fds
+	// the waito fds
 	fd_set 					rfdi;
 	fd_set 					wfdi;
 	fd_set 					efdi;
@@ -49,18 +49,18 @@ typedef struct __tb_epool_slect_t
 	tb_eobject_t* 			objs;
 	tb_size_t 				objn;
 
-}tb_epool_slect_t;
+}tb_epool_waito_t;
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_handle_t tb_epool_slect_init(tb_size_t maxn)
+tb_handle_t tb_epool_waito_init(tb_size_t maxn)
 {
 	// check
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// init pool
-	tb_epool_slect_t* ep = tb_calloc(1, sizeof(tb_epool_slect_t));
+	tb_epool_waito_t* ep = tb_calloc(1, sizeof(tb_epool_waito_t));
 	tb_assert_and_check_return_val(ep, TB_NULL);
 
 	// init maxn
@@ -79,13 +79,13 @@ tb_handle_t tb_epool_slect_init(tb_size_t maxn)
 	return (tb_handle_t)ep;
 
 fail:
-	if (ep) tb_epool_slect_exit(ep);
+	if (ep) tb_epool_waito_exit(ep);
 	return TB_NULL;
 }
 
-tb_void_t tb_epool_slect_exit(tb_handle_t pool)
+tb_void_t tb_epool_waito_exit(tb_handle_t pool)
 {
-	tb_epool_slect_t* ep = (tb_epool_slect_t*)pool;
+	tb_epool_waito_t* ep = (tb_epool_waito_t*)pool;
 	if (ep)
 	{
 		// free pfds
@@ -103,9 +103,9 @@ tb_void_t tb_epool_slect_exit(tb_handle_t pool)
 		tb_free(ep);
 	}
 }
-tb_size_t tb_epool_slect_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+tb_size_t tb_epool_waito_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
-	tb_epool_slect_t* ep = (tb_epool_slect_t*)pool;
+	tb_epool_waito_t* ep = (tb_epool_waito_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, 0);
 
@@ -134,9 +134,9 @@ tb_size_t tb_epool_slect_addo(tb_handle_t pool, tb_handle_t handle, tb_size_t ot
 	// ok
 	return tb_hash_size(ep->hash);
 }
-tb_size_t tb_epool_slect_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+tb_size_t tb_epool_waito_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
-	tb_epool_slect_t* ep = (tb_epool_slect_t*)pool;
+	tb_epool_waito_t* ep = (tb_epool_waito_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, 0);
 
@@ -161,9 +161,9 @@ tb_size_t tb_epool_slect_seto(tb_handle_t pool, tb_handle_t handle, tb_size_t ot
 	// ok
 	return tb_hash_size(ep->hash);
 }
-tb_size_t tb_epool_slect_delo(tb_handle_t pool, tb_handle_t handle)
+tb_size_t tb_epool_waito_delo(tb_handle_t pool, tb_handle_t handle)
 {
-	tb_epool_slect_t* ep = (tb_epool_slect_t*)pool;
+	tb_epool_waito_t* ep = (tb_epool_waito_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && handle, 0);
 
 	// fd
@@ -181,9 +181,9 @@ tb_size_t tb_epool_slect_delo(tb_handle_t pool, tb_handle_t handle)
 	// ok
 	return tb_hash_size(ep->hash);
 }
-tb_long_t tb_epool_slect_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout)
+tb_long_t tb_epool_waito_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t timeout)
 {	
-	tb_epool_slect_t* ep = (tb_epool_slect_t*)pool;
+	tb_epool_waito_t* ep = (tb_epool_waito_t*)pool;
 	tb_assert_and_check_return_val(ep && ep->hash && objs, -1);
 
 	// init time
@@ -200,7 +200,7 @@ tb_long_t tb_epool_slect_wait(tb_handle_t pool, tb_eobject_t** objs, tb_long_t t
 	tb_memcpy(&ep->efdo, &ep->efdi, sizeof(fd_set));
 
 	// wait
-	tb_long_t sfdn = select(ep->sfdm + 1, &ep->rfdo, &ep->wfdo, &ep->efdo, timeout >= 0? &t : TB_NULL);
+	tb_long_t sfdn = waito(ep->sfdm + 1, &ep->rfdo, &ep->wfdo, &ep->efdo, timeout >= 0? &t : TB_NULL);
 	tb_assert_and_check_return_val(sfdn >= 0, -1);
 
 	// timeout?
