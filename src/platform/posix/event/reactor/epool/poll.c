@@ -49,7 +49,7 @@ typedef struct __tb_epool_reactor_poll_t
 static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
 	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->epool, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -63,7 +63,7 @@ static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_hand
 
 	// init obj
 	tb_eobject_t o;
-	tb_eobject_seto(&o, handle, TB_EOTYPE_NULL, etype);
+	tb_eobject_seto(&o, handle, reactor->epool->type, etype);
 
 	// add pfd
 	tb_vector_insert_tail(rtor->pfds, &pfd);
@@ -77,7 +77,7 @@ static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_hand
 static tb_bool_t tb_epool_reactor_poll_seto(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
 	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->epool, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -104,7 +104,7 @@ static tb_bool_t tb_epool_reactor_poll_seto(tb_epool_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(itor != tail, TB_FALSE);
 
 	// set obj
-	tb_eobject_seto(o, handle, TB_EOTYPE_NULL, etype);
+	tb_eobject_seto(o, handle, reactor->epool->type, etype);
 
 	// ok
 	return TB_TRUE;
@@ -210,6 +210,7 @@ static tb_void_t tb_epool_reactor_poll_exit(tb_epool_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
@@ -255,3 +256,4 @@ tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
 {
 	return tb_epool_reactor_poll_init(epool);
 }
+

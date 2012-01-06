@@ -17,18 +17,19 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		event.h
+ * \file		eiocp.h
  *
  */
-#ifndef TB_PLATFROM_EVENT_H
-#define TB_PLATFROM_EVENT_H
+#ifndef TB_EVENT_IOCP_H
+#define TB_EVENT_IOCP_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "event/eobject.h"
-#include "event/epool.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
 #endif
