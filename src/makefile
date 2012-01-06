@@ -84,6 +84,7 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
+						platform/event/epool \
 						platform/event/eobject \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
@@ -132,7 +133,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
-						platform/$(TB_CONFIG_API_EVET)/event/epool \
+						platform/$(TB_CONFIG_API_EVET)/event/reactor \
 						platform/$(TB_CONFIG_API_EVET)/event/eobject
 
 # flags
