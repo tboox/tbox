@@ -20,8 +20,8 @@
  * \file		eobject.h
  *
  */
-#ifndef TB_PLATFORM_EVENT_OBJECT_H
-#define TB_PLATFORM_EVENT_OBJECT_H
+#ifndef TB_EVENT_OBJECT_H
+#define TB_EVENT_OBJECT_H
 
 
 /* /////////////////////////////////////////////////////////

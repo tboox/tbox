@@ -17,25 +17,18 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		eobject.c
+ * \file		event.h
  *
  */
+#ifndef TB_EVENT_H
+#define TB_EVENT_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../../event.h"
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "eobject.h"
+#include "epool.h"
 
-/* /////////////////////////////////////////////////////////
- * implemention
- */
-#if defined(TB_CONFIG_EVENT_HAVE_POLL)
-# 	include "eobject/poll.c"
-#elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "eobject/select.c"
-#else
-# 	error have not available event mode
+
 #endif

@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../../event.h"
+#include "../../../event/event.h"
 #include "../../../math/math.h"
 #include "../../../memory/memory.h"
 #include "../../../container/container.h"
@@ -35,16 +35,33 @@
 /* /////////////////////////////////////////////////////////
  * reactor
  */
-#if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-# 	include "reactor/epoll.c"
-#elif defined(TB_CONFIG_EVENT_HAVE_POLL)
-# 	include "reactor/poll.c"
+
+// eobject
+#if defined(TB_CONFIG_EVENT_HAVE_POLL)
+# 	include "reactor/eobject/poll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_PORT)
-# 	include "reactor/port.c"
+# 	include "reactor/eobject/port.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "reactor/select.c"
+# 	include "reactor/eobject/select.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_EPOLL)
+# 	include "reactor/epool/epoll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
-# 	include "reactor/kqueue.c"
+# 	include "reactor/eobject/kqueue.c"
+#else
+# 	error have not available event mode
+#endif
+
+// epool
+#if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
+# 	include "reactor/epool/epoll.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_POLL)
+# 	include "reactor/epool/poll.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_PORT)
+# 	include "reactor/epool/port.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
+# 	include "reactor/epool/select.c"
+#elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
+# 	include "reactor/epool/kqueue.c"
 #else
 # 	error have not available event mode
 #endif

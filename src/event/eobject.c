@@ -27,9 +27,10 @@
 #include "eobject.h"
 
 /* /////////////////////////////////////////////////////////
- * decls
+ * declaration
  */
-tb_long_t tb_eobject_wait_impl(tb_long_t fd, tb_size_t otype, tb_size_t etype, tb_long_t timeout);
+tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout);
+tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout);
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -76,7 +77,7 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object && object->handle, 0);
 
-	// the wait funcs
+	// the reactor 
 	static tb_long_t (*wait[])(tb_eobject_t*, tb_long_t) =
 	{
 		TB_NULL
@@ -85,10 +86,10 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	, 	TB_NULL
 	
 		// for file
-	, 	tb_eobject_wait_impl
+	, 	tb_eobject_reactor_file_wait
 
 		// for socket
-	, 	tb_eobject_wait_impl
+	, 	tb_eobject_reactor_sock_wait
 
 		// for http
 	, 	TB_NULL
