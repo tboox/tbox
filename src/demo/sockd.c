@@ -51,7 +51,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(s, end);
 
 	// init epool
-	tb_handle_t ep = tb_epool_init(16);
+	tb_handle_t ep = tb_epool_init(TB_EOTYPE_SOCK, 16);
 	tb_assert_and_check_goto(ep, end);
 
 	// bind 
@@ -59,15 +59,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_bind(s, tb_stou32(argv[1]))) goto end;
 
 	// add event
-	if (!tb_epool_addo(ep, s, TB_EOTYPE_SOCK, TB_ETYPE_ACPT)) goto end;
+	if (!tb_epool_addo(ep, s, TB_ETYPE_ACPT)) goto end;
 
 	// accept
 	while (1)
 	{
 		// waiting...
 		tb_print("listening...");
-		tb_eobject_t* objs = TB_NULL;
-		tb_long_t objn = tb_epool_wait(ep, &objs, 10000);
+		tb_long_t 		objn = tb_epool_wait(ep, 10000);
+		tb_eobject_t* 	objs = tb_epool_objs(ep);
 
 		// error?
 		if (objn < 0) 
@@ -94,7 +94,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (c)
 				{
 					tb_print("accept ok");
-					if (!tb_epool_addo(ep, c, TB_EOTYPE_SOCK, TB_ETYPE_READ)) goto end;
+					if (!tb_epool_addo(ep, c, TB_ETYPE_READ)) goto end;
 				}
 				else
 				{

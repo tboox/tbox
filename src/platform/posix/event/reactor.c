@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		epool.c
+ * \file		reactor.c
  *
  */
 
@@ -33,18 +33,18 @@
 #include <sys/socket.h>
 
 /* /////////////////////////////////////////////////////////
- * includes implemention
+ * reactor
  */
 #if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-# 	include "epool/epoll.c"
+# 	include "reactor/epoll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
-# 	include "epool/poll.c"
+# 	include "reactor/poll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_PORT)
-# 	include "epool/port.c"
+# 	include "reactor/port.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "epool/select.c"
+# 	include "reactor/select.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
-# 	include "epool/kqueue.c"
+# 	include "reactor/kqueue.c"
 #else
 # 	error have not available event mode
 #endif
