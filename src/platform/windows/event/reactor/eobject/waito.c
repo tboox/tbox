@@ -24,8 +24,7 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
-tb_long_t tb_eobject_waito(tb_eobject_t* object, tb_long_t timeout)
+static tb_long_t tb_eobject_reactor_waito_wait(tb_eobject_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object && object->handle, -1);
 
@@ -49,4 +48,16 @@ tb_long_t tb_eobject_waito(tb_eobject_t* object, tb_long_t timeout)
 
 	// ok
 	return etype;
+}
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_waito_wait(object, timeout);
+}
+tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_waito_wait(object, timeout);
 }
