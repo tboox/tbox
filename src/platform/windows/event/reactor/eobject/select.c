@@ -24,16 +24,13 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
-tb_long_t tb_eobject_select(tb_eobject_t* object, tb_long_t timeout)
+static tb_long_t tb_eobject_reactor_select_wait(tb_eobject_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object, -1);
 
 	// type
 	tb_size_t otype = object->otype;
 	tb_size_t etype = object->etype;
-
-	// \note select is not support file for windows
 	tb_assert_and_check_return_val(otype == TB_EOTYPE_SOCK, -1);
 
 	// fd
@@ -105,4 +102,12 @@ tb_long_t tb_eobject_select(tb_eobject_t* object, tb_long_t timeout)
 	if (FD_ISSET(fd, &efds) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
 		e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
 	return e;
+}
+
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_select_wait(object, timeout);
 }

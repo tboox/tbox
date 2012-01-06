@@ -32,6 +32,7 @@
  */
 tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t*);
 tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t*);
+tb_epool_reactor_t* tb_epool_reactor_evet_init(tb_epool_t*);
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -58,7 +59,7 @@ tb_epool_t* tb_epool_init(tb_size_t type, tb_size_t maxn)
 	,	tb_epool_reactor_sock_init
 	,	TB_NULL 	//!< for http
 	,	TB_NULL 	//!< for gstream
-	,	TB_NULL 	//!< for event
+	,	tb_epool_reactor_evet_init
 	
 	};
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);

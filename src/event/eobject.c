@@ -31,6 +31,7 @@
  */
 tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout);
 tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout);
+tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout);
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -98,7 +99,7 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	, 	TB_NULL
 
 		// for event
-	, 	TB_NULL
+	, 	tb_eobject_reactor_evet_wait
 	};
 
 	// check
