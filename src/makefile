@@ -321,7 +321,17 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
-SUB_PROS 			= demo
+SUB_PROS 				= \
+					  	demo/math \
+					  	demo/other \
+					  	demo/utils \
+					  	demo/memory \
+					  	demo/string \
+					  	demo/gstream \
+					  	demo/network \
+					  	demo/platform
+
+
 endif
 
 include $(PRO_DIR)/suffix.mak
