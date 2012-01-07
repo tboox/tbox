@@ -109,10 +109,4 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	// wait object
 	return wait[object->otype](object, timeout);
 }
-tb_bool_t tb_eobject_spak(tb_eobject_t* object)
-{
-	tb_trace_noimpl();
-	return TB_FALSE;
-}
-
 

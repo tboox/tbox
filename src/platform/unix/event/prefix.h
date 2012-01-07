@@ -17,36 +17,16 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		mutex.c
+ * \file		prefix.h
  *
  */
+#ifndef TB_PLATFROM_UNIX_EVENT_PREFIX_H
+#define TB_PLATFROM_UNIX_EVENT_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include <windows.h>
+#include "../prefix.h"
 
-/* /////////////////////////////////////////////////////////
- * implemention
- */
 
-tb_handle_t tb_mutex_init(tb_char_t const* name)
-{
-	HANDLE handle = CreateMutex(NULL, FALSE, name);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
-}
-tb_void_t tb_mutex_exit(tb_handle_t handle)
-{
-	if (handle) CloseHandle(handle);
-}
-tb_bool_t tb_mutex_enter(tb_handle_t handle)
-{
-	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return TB_TRUE;
-	return TB_FALSE;
-}
-tb_bool_t tb_mutex_leave(tb_handle_t handle)
-{
-	if (handle) return ReleaseMutex(handle)? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
-}
+#endif

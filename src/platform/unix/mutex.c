@@ -39,35 +39,28 @@ tb_handle_t tb_mutex_init(tb_char_t const* name)
 	if (!pmutex || 0 != pthread_mutex_init(pmutex, NULL)) return TB_NULL;
 	else return ((tb_handle_t)pmutex);
 }
-tb_void_t tb_mutex_exit(tb_handle_t hmutex)
+tb_void_t tb_mutex_exit(tb_handle_t handle)
 {
-	tb_assert_and_check_return(hmutex);
+	tb_assert_and_check_return(handle);
 
-	pthread_mutex_t* pmutex = (pthread_mutex_t*)hmutex;
+	pthread_mutex_t* pmutex = (pthread_mutex_t*)handle;
 	if (pmutex)
 	{
 		pthread_mutex_destroy(pmutex);
 		free((tb_pointer_t)pmutex);
 	}
 }
-tb_bool_t tb_mutex_enter(tb_handle_t hmutex)
+tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(hmutex, TB_FALSE);
+	tb_assert_and_check_return_val(handle, TB_FALSE);
 
-	if (0 != pthread_mutex_lock((pthread_mutex_t*)hmutex)) return TB_FALSE;
+	if (0 != pthread_mutex_lock((pthread_mutex_t*)handle)) return TB_FALSE;
 	else return TB_TRUE;
 }
-tb_bool_t tb_mutex_tryenter(tb_handle_t hmutex)
+tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(hmutex, TB_FALSE);
+	tb_assert_and_check_return_val(handle, TB_FALSE);
 
-	if (0 != pthread_mutex_trylock((pthread_mutex_t*)hmutex)) return TB_FALSE;
-	else return TB_TRUE;
-}
-tb_bool_t tb_mutex_leave(tb_handle_t hmutex)
-{
-	tb_assert_and_check_return_val(hmutex, TB_FALSE);
-
-	if (0 != pthread_mutex_unlock((pthread_mutex_t*)hmutex)) return TB_FALSE;
+	if (0 != pthread_mutex_unlock((pthread_mutex_t*)handle)) return TB_FALSE;
 	else return TB_TRUE;
 }

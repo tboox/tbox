@@ -80,14 +80,3 @@ static tb_long_t tb_eobject_reactor_poll_wait(tb_eobject_t* object, tb_long_t ti
 	return e;
 }
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	return tb_eobject_reactor_poll_wait(object, timeout);
-}
-tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	return tb_eobject_reactor_poll_wait(object, timeout);
-}

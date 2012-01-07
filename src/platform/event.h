@@ -17,16 +17,27 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		event.h
  *
  */
-#ifndef TB_PLATFROM_POSIX_EVENT_PREFIX_H
-#define TB_PLATFROM_POSIX_EVENT_PREFIX_H
+#ifndef TB_PLATFORM_EVENT_H
+#define TB_PLATFORM_EVENT_H
+
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
+tb_handle_t 	tb_event_init(tb_char_t const* name, tb_bool_t bsignal);
+tb_void_t 		tb_event_exit(tb_handle_t handle);
+
+tb_void_t 		tb_event_post(tb_handle_t handle);
+tb_long_t 		tb_event_wait(tb_handle_t handle, tb_long_t timeout);
+
+	
 #endif

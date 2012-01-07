@@ -133,6 +133,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
+						platform/$(TB_CONFIG_API_EVET)/event/event \
 						platform/$(TB_CONFIG_API_EVET)/event/reactor
 
 # flags
@@ -215,6 +216,7 @@ INC_FILES 				= \
 						platform/mutex.h \
 						platform/thread.h \
 						platform/socket.h \
+						platform/event.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
