@@ -143,7 +143,7 @@ static tb_long_t tb_epool_reactor_poll_wait(tb_epool_reactor_t* reactor, tb_long
 	tb_assert_and_check_return_val(rtor && rtor->hash && rtor->pfds, -1);
 
 	// pfds
-	struct pollfd* 	pfds = (struct pollfd*)tb_vector_at_head(rtor->pfds);
+	struct pollfd* 	pfds = (struct pollfd*)tb_vector_data(rtor->pfds);
 	tb_size_t 		pfdm = tb_vector_size(rtor->pfds);
 	tb_assert_and_check_return_val(pfds && pfdm, -1);
 

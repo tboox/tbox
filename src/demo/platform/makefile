@@ -5,7 +5,7 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		atomic \
 		event \
-		events \
+		epool \
 		file
 
 include $(SRC_DIR)/demo/makefile

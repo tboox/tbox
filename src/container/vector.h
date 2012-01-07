@@ -93,6 +93,7 @@ tb_vector_t* 		tb_vector_init(tb_size_t grow, tb_item_func_t func);
 tb_void_t 			tb_vector_exit(tb_vector_t* vector);
 
 // accessors
+tb_pointer_t 		tb_vector_data(tb_vector_t* vector);
 tb_pointer_t 		tb_vector_at_head(tb_vector_t* vector);
 tb_pointer_t 		tb_vector_at_last(tb_vector_t* vector);
 

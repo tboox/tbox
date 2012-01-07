@@ -47,12 +47,15 @@ static tb_bool_t tb_epool_reactor_waito_addo(tb_epool_reactor_t* reactor, tb_han
 	tb_epool_reactor_waito_t* rtor = (tb_epool_reactor_waito_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hdls && rtor->hash && reactor->epool, TB_FALSE);
 
+	// check
+	tb_assert_and_check_return_val(tb_hash_size(rtor->hash) < MAXIMUM_WAIT_OBJECTS, TB_FALSE);
+
 	// init obj
 	tb_eobject_t o;
 	tb_eobject_seto(&o, handle, reactor->epool->type, etype);
 
 	// add hdl
-	tb_vector_insert_tail(rtor->hdls, &handle);
+	tb_vector_insert_tail(rtor->hdls, handle);
 
 	// add obj
 	tb_hash_set(rtor->hash, handle, &o);
@@ -148,7 +151,7 @@ static tb_long_t tb_epool_reactor_waito_wait(tb_epool_reactor_t* reactor, tb_lon
 	tb_assert_and_check_return_val(rtor && rtor->hash && rtor->hdls, -1);
 
 	// hdls
-	tb_handle_t*	hdls = (tb_handle_t*)tb_vector_at_head(rtor->hdls);
+	tb_handle_t*	hdls = (tb_handle_t*)tb_vector_data(rtor->hdls);
 	tb_size_t 		hdlm = tb_vector_size(rtor->hdls);
 	tb_assert_and_check_return_val(hdls && hdlm, -1);
 
@@ -164,17 +167,18 @@ static tb_long_t tb_epool_reactor_waito_wait(tb_epool_reactor_t* reactor, tb_lon
 
 	// has more event?
 	tb_size_t hdln = 0;
-	while (1)
+	while (hdli < WAIT_OBJECT_0 + hdlm)
 	{
-		// seek to next base
-		hdli -= WAIT_OBJECT_0;
-		hdls += hdli;
-		hdlm -= hdli;
-
 		// return evented handle to objects
-		if (!tb_epool_reactor_waito_reto(reactor, hdln++, hdls[hdli])) break;
+		hdli -= WAIT_OBJECT_0;
+		if (!tb_epool_reactor_waito_reto(reactor, hdln++, hdls[hdli++])) break;
+
+		// end?
+		tb_check_break(hdli < hdlm);
 
 		// wait next
+		hdls += hdli;
+		hdlm -= hdli;
 		hdli = WaitForMultipleObjects((DWORD)hdlm, (HANDLE const*)hdls, FALSE, 0);
 		tb_assert_and_check_return_val(hdli != WAIT_FAILED, -1);
 
@@ -229,7 +233,7 @@ static tb_epool_reactor_t* tb_epool_reactor_waito_init(tb_epool_t* epool)
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init hdls
-	rtor->hdls = tb_vector_init(tb_align8((epool->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_handle_t), TB_NULL, TB_NULL));
+	rtor->hdls = tb_vector_init(tb_align8((epool->maxn >> 3) + 1), tb_item_func_ptr());
 	tb_assert_and_check_goto(rtor->hdls, fail);
 
 	// ok

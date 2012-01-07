@@ -43,7 +43,7 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 }
 tb_void_t tb_event_post(tb_handle_t handle)
 {
-	if (handle) PulseEvent(handle);
+	if (handle) SetEvent(handle);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
