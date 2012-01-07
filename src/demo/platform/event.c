@@ -4,6 +4,11 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_TEST_ITEM_MAX 	(10)
+
+/* ///////////////////////////////////////////////////////////////////
  * types
  */
 typedef struct __tb_test_item_t
@@ -14,11 +19,6 @@ typedef struct __tb_test_item_t
 	tb_size_t 		q 	: 8;
 
 }tb_test_item_t;
-
-/* ///////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_TEST_ITEM_MAX 	(10)
 
 /* ///////////////////////////////////////////////////////////////////
  * thread
@@ -33,15 +33,15 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 	while (1)
 	{
 		// wait
-		tb_print("[thread: %u]: wait", it->i);
+		tb_print("[event: %u]: wait", it->i);
 		tb_long_t r = tb_event_wait(it->e, -1);
 		tb_assert_and_check_goto(r >= 0, end);
 
 		// quit?
 		tb_check_goto(!it->q, end);
 
-		// post
-		tb_print("[thread: %u]: post", it->i);
+		// handled
+		tb_print("[event: %u]: signal", it->i);
 	}
 
 end:
@@ -69,27 +69,34 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		it[i].t = tb_thread_init(TB_NULL, tb_test_thread, it + i, 0);
 		tb_assert_and_check_goto(it[i].t, end);
 	}
+	tb_msleep(100);
 
 	// post
+	tb_char_t s[256];
 	while (1)
 	{
-		tb_char_t ch = getchar();
-		getchar();
-		switch (ch)
+		tb_char_t const* p = gets(s);
+		if (p)
 		{
-		case 'q':
-			goto end;
-		default:
+			while (*p)
 			{
-				if (ch >= '0' && ch <= '9')
+				tb_char_t ch = *p++;
+				switch (ch)
 				{
-					// post event
-					tb_size_t i = ch - '0';
-					tb_print("[event: %u]: post", i);
-					if (it[i].e) tb_event_post(it[i].e);
+				case 'q':
+					goto end;
+				default:
+					{
+						if (ch >= '0' && ch <= '9')
+						{
+							// post event
+							tb_size_t i = ch - '0';
+							if (it[i].e) tb_event_post(it[i].e);
+						}
+					}
+					break;
 				}
 			}
-			break;
 		}
 	}
 

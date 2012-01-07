@@ -97,6 +97,11 @@ tb_pointer_t tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor)
 	tb_assert_and_check_return_val(vector && vector->size && itor < vector->maxn, 0);
 	return vector->func.data(&vector->func, vector->data + itor * vector->func.size);
 }
+tb_pointer_t tb_vector_data(tb_vector_t* vector)
+{
+	tb_assert_and_check_return_val(vector, TB_NULL);
+	return vector->data;
+}
 tb_pointer_t tb_vector_at_head(tb_vector_t* vector)
 {
 	return tb_vector_itor_at(vector, tb_vector_itor_head(vector));
