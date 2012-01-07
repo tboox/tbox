@@ -31,38 +31,47 @@
  * implemention
  */
 
-tb_handle_t tb_thread_open(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t param, tb_size_t stack_size)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size)
 {
-	HANDLE hthread = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)callback, (LPVOID)param, 0, NULL);
-	return ((hthread != INVALID_HANDLE_VALUE)? hthread : TB_NULL);
+	HANDLE handle = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)callback, (LPVOID)cb_data, 0, NULL);
+	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
 }
-tb_void_t tb_thread_close(tb_handle_t hthread)
+tb_void_t tb_thread_exit(tb_handle_t handle)
 {
-	if (hthread) CloseHandle(hthread);
-	hthread = TB_NULL;
+	if (handle) CloseHandle(handle);
 }
-tb_bool_t tb_thread_wait(tb_handle_t hthread, tb_int_t timeout)
+tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	if (hthread && WAIT_OBJECT_0 == WaitForSingleObject(hthread, timeout)) return TB_TRUE;
+	// wait
+	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+
+	// timeout?
+	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+
+	// error?
+	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+
+	// ok
+	return 1;
+}
+tb_bool_t tb_thread_kill(tb_handle_t handle)
+{
+	if (handle) return TerminateThread(handle, 0)? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
-tb_bool_t tb_thread_terminate(tb_handle_t hthread)
-{
-	if (hthread) return TerminateThread(hthread, 0)? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
-}
-tb_void_t tb_thread_exit(tb_pointer_t retval)
+tb_void_t tb_thread_return(tb_handle_t handle, tb_pointer_t value)
 {
 	ExitThread(0);
 }
-tb_bool_t tb_thread_suspend(tb_handle_t hthread)
+tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
-	if (hthread) return ((DWORD)-1 != SuspendThread(hthread))? TB_TRUE : TB_FALSE;
+	if (handle) return ((DWORD)-1 != SuspendThread(handle))? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
-tb_bool_t tb_thread_resume(tb_handle_t hthread)
+tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
-	if (hthread) return ((DWORD)-1 != ResumeThread(hthread))? TB_TRUE : TB_FALSE;
+	if (handle) return ((DWORD)-1 != ResumeThread(handle))? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
 

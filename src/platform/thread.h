@@ -30,21 +30,22 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
- * macros
- */
-#define TB_THREAD_TIMEOUT_INFINITY 		(-1)
-
-/* /////////////////////////////////////////////////////////
  * interfaces
  */
 
-// thread
-tb_handle_t 	tb_thread_open(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t param, tb_size_t stack_size);
-tb_void_t 		tb_thread_close(tb_handle_t hthread);
-tb_bool_t 		tb_thread_wait(tb_handle_t hthread, tb_int_t timeout);
-tb_bool_t 		tb_thread_suspend(tb_handle_t hthread);
-tb_bool_t 		tb_thread_resume(tb_handle_t hthread);
-tb_bool_t 		tb_thread_terminate(tb_handle_t hthread);
-tb_void_t 		tb_thread_exit(tb_pointer_t retval);
+// init & exit
+tb_handle_t 	tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size);
+tb_void_t 		tb_thread_exit(tb_handle_t handle);
+
+// wait
+tb_long_t 		tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
+
+// suspend & resume
+tb_bool_t 		tb_thread_suspend(tb_handle_t handle);
+tb_bool_t 		tb_thread_resume(tb_handle_t handle);
+
+// kill & return
+tb_bool_t 		tb_thread_kill(tb_handle_t handle);
+tb_void_t 		tb_thread_return(tb_handle_t handle, tb_pointer_t value);
 
 #endif
