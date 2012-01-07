@@ -210,11 +210,7 @@ static tb_void_t tb_epool_reactor_poll_exit(tb_epool_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-tb_epool_reactor_t* tb_epool_reactor_poll_init(tb_epool_t* epool)
+static tb_epool_reactor_t* tb_epool_reactor_poll_init(tb_epool_t* epool)
 {
 	// check
 	tb_assert_and_check_return_val(epool && epool->maxn, TB_NULL);
@@ -247,13 +243,5 @@ tb_epool_reactor_t* tb_epool_reactor_poll_init(tb_epool_t* epool)
 fail:
 	if (rtor) tb_epool_reactor_poll_exit(rtor);
 	return TB_NULL;
-}
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
-{
-	return tb_epool_reactor_poll_init(epool);
-}
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
-{
-	return tb_epool_reactor_poll_init(epool);
 }
 

@@ -29,6 +29,7 @@
 #include "prefix.h"
 #include "eobject.h"
 #include "epool.h"
+#include "../platform/event.h"
 
 
 #endif

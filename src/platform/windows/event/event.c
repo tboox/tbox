@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		mutex.c
+ * \file		event.c
  *
  */
 
@@ -25,28 +25,42 @@
  * includes
  */
 #include "prefix.h"
-#include <windows.h>
+#include "../../../event/event.h"
+#include "windows.h"
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
 
-tb_handle_t tb_mutex_init(tb_char_t const* name)
+tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
 {
-	HANDLE handle = CreateMutex(NULL, FALSE, name);
+	HANDLE handle = CreateEvent(NULL, FALSE, bsignal? TRUE : FALSE, name);
 	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
 }
-tb_void_t tb_mutex_exit(tb_handle_t handle)
+tb_void_t tb_event_exit(tb_handle_t handle)
 {
 	if (handle) CloseHandle(handle);
 }
-tb_bool_t tb_mutex_enter(tb_handle_t handle)
+tb_void_t tb_event_post(tb_handle_t handle)
 {
-	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return TB_TRUE;
-	return TB_FALSE;
+	if (handle) PulseEvent(handle);
 }
-tb_bool_t tb_mutex_leave(tb_handle_t handle)
+tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	if (handle) return ReleaseMutex(handle)? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
+	tb_assert_and_check_return_val(handle, -1);
+
+	// wait
+	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+
+	// timeout?
+	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+
+	// error?
+	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+
+	// ok
+	return TB_ETYPE_SIGL;
 }
+
+

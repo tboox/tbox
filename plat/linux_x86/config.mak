@@ -8,12 +8,12 @@ TB_CONFIG_PLAT 					= linux_x86
 TB_CONFIG_ARCH 					= x86
 
 # api
-TB_CONFIG_API_FILE 				= posix
-TB_CONFIG_API_SOCK 				= posix
-TB_CONFIG_API_UTIL 				= posix
-TB_CONFIG_API_MUTX 				= posix
-TB_CONFIG_API_THRD 				= posix
-TB_CONFIG_API_EVET 				= posix
+TB_CONFIG_API_FILE 				= unix
+TB_CONFIG_API_SOCK 				= unix
+TB_CONFIG_API_UTIL 				= unix
+TB_CONFIG_API_MUTX 				= unix
+TB_CONFIG_API_THRD 				= unix
+TB_CONFIG_API_EVET 				= unix
 
 # libs
 TB_CONFIG_LIBS_ZLIB 			= y

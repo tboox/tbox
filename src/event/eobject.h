@@ -41,7 +41,7 @@ typedef enum __tb_etype_t
 ,	TB_ETYPE_WRIT 	= 2		//!< for all i/o object
 , 	TB_ETYPE_ACPT 	= 4 	//!< only for TB_EOTYPE_SOCK
 , 	TB_ETYPE_CONN 	= 8 	//!< only for TB_EOTYPE_SOCK
-,	TB_ETYPE_SPAK 	= 16 	//!< only for TB_EOTYPE_EVET
+,	TB_ETYPE_SIGL 	= 16 	//!< only for TB_EOTYPE_EVET
 
 }tb_etype_t;
 
@@ -121,18 +121,6 @@ tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype);
  * @return 	the event type, return 0 if timeout, return -1 if error
  */
 tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
-
-/*!spank the event object
- *
- * if the etype is TB_ETYPE_SPAK, force to cancel waiting operation of the object
- * and tb_eobject_wait() return TB_ETYPE_SPAK
- *
- * @param 	object 	the event object
- *
- * @return 	return TB_TRUE if cancel successfully
- */
-tb_bool_t tb_eobject_spak(tb_eobject_t* object);
-
 
 
 #endif

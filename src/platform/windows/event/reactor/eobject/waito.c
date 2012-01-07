@@ -50,14 +50,3 @@ static tb_long_t tb_eobject_reactor_waito_wait(tb_eobject_t* object, tb_long_t t
 	return etype;
 }
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	return tb_eobject_reactor_waito_wait(object, timeout);
-}
-tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	return tb_eobject_reactor_waito_wait(object, timeout);
-}

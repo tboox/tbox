@@ -32,10 +32,6 @@
 #include "winsock2.h"
 #include "windows.h"
 
-/* /////////////////////////////////////////////////////////
- * reactor
- */
-
 // eobject
 #ifdef TB_CONFIG_EVENT_HAVE_WAITO
 # 	include "reactor/eobject/waito.c"
@@ -52,5 +48,50 @@
 
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
 # 	include "reactor/epool/select.c"
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * eobject
+ */
+#ifdef TB_CONFIG_EVENT_HAVE_WAITO
+
+tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_waito_wait(object, timeout);
+}
+tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_waito_wait(object, timeout);
+}
+#endif
+
+
+#ifdef TB_CONFIG_EVENT_HAVE_SELECT
+tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
+{
+	return tb_eobject_reactor_select_wait(object, timeout);
+}
+
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * epool
+ */
+#ifdef TB_CONFIG_EVENT_HAVE_SELECT
+tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
+{
+	return tb_epool_reactor_waito_init(epool);
+}
+tb_epool_reactor_t* tb_epool_reactor_evet_init(tb_epool_t* epool)
+{
+	return tb_epool_reactor_waito_init(epool);
+}
+#endif
+
+#ifdef TB_CONFIG_EVENT_HAVE_SELECT
+tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
+{
+	return tb_epool_reactor_select_init(epool);
+}
 #endif
 
