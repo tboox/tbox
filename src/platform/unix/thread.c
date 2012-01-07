@@ -33,35 +33,38 @@
  * implemention
  */
 
-tb_handle_t tb_thread_open(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t param, tb_size_t stack_size)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size)
 {
-	pthread_t hthread;
-	if (0 != pthread_create(&hthread, NULL, callback, param)) return TB_NULL;
-	else return ((tb_handle_t)hthread);
+	pthread_t handle;
+	if (0 != pthread_create(&handle, NULL, callback, cb_data)) return TB_NULL;
+	else return ((tb_handle_t)handle);
 }
-tb_void_t tb_thread_close(tb_handle_t hthread)
+tb_void_t tb_thread_exit(tb_handle_t handle)
 {
 }
-tb_bool_t tb_thread_wait(tb_handle_t hthread, tb_int_t timeout)
+tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(hthread, TB_FALSE);
+	tb_assert_and_check_return_val(handle, -1);
 
-	if (0 != pthread_join(((pthread_t)hthread), NULL)) return TB_FALSE;
-	else return TB_TRUE;
+	// wait
+	if (0 != pthread_join(((pthread_t)handle), NULL)) return -1;
+	
+	// ok
+	return 1;
 }
-tb_bool_t tb_thread_terminate(tb_handle_t hthread)
+tb_bool_t tb_thread_kill(tb_handle_t handle)
 {
 	return TB_TRUE;
 }
-tb_void_t tb_thread_exit(tb_pointer_t retval)
+tb_void_t tb_thread_return(tb_handle_t handle, tb_pointer_t value)
 {
-	pthread_exit(retval);
+	pthread_exit(value);
 }
-tb_bool_t tb_thread_suspend(tb_handle_t hthread)
+tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
 	return TB_TRUE;
 }
-tb_bool_t tb_thread_resume(tb_handle_t hthread)
+tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
 	return TB_TRUE;
 }
