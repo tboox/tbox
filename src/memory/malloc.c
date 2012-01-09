@@ -54,7 +54,7 @@ tb_bool_t tb_memory_init(tb_pointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(data && size, TB_FALSE);
 
-	if (!g_mutex) g_mutex = tb_mutex_init("the memory pool");
+	if (!g_mutex) g_mutex = tb_mutex_init(TB_NULL);
 	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
 
 	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;

@@ -40,7 +40,10 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// quit?
 		tb_check_goto(!it->q, end);
 
-		// handled
+		// timeout?
+		tb_check_continue(r);
+
+		// signal
 		tb_print("[event: %u]: signal", it->i);
 	}
 
