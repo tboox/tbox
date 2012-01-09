@@ -50,6 +50,9 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// quit?
 		tb_check_goto(!it->q, end);
 
+		// timeout?
+		tb_check_continue(r);
+
 		// check
 		tb_assert_and_check_goto(o->etype & TB_ETYPE_SIGL && o->otype == TB_EOTYPE_EVET, end);
 

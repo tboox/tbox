@@ -323,7 +323,6 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
 					  	demo/math \
-					  	demo/other \
 					  	demo/utils \
 					  	demo/memory \
 					  	demo/string \
