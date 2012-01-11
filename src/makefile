@@ -84,8 +84,8 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						event/epool \
-						event/eobject \
+						event/eiop \
+						event/eio \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -171,8 +171,8 @@ INC_FILES 				= \
 						memory/qbuffer.h \
 						event/event.h \
 						event/prefix.h \
-						event/eobject.h \
-						event/epool.h \
+						event/eio.h \
+						event/eiop.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

@@ -32,66 +32,58 @@
 #include "winsock2.h"
 #include "windows.h"
 
-// eobject
+// eio
 #ifdef TB_CONFIG_EVENT_HAVE_WAITO
-# 	include "reactor/eobject/waito.c"
+# 	include "reactor/eio/waito.c"
 #endif
 
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
-# 	include "reactor/eobject/select.c"
+# 	include "reactor/eio/select.c"
 #endif
 
-// epool
+// eiop
 #ifdef TB_CONFIG_EVENT_HAVE_WAITO
-# 	include "reactor/epool/waito.c"
+# 	include "reactor/eiop/waito.c"
 #endif
 
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
-# 	include "reactor/epool/select.c"
+# 	include "reactor/eiop/select.c"
 #endif
 
 /* /////////////////////////////////////////////////////////
- * eobject
+ * eio
  */
 #ifdef TB_CONFIG_EVENT_HAVE_WAITO
 
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_file_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_waito_wait(object, timeout);
-}
-tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	return tb_eobject_reactor_waito_wait(object, timeout);
+	return tb_eio_reactor_waito_wait(object, timeout);
 }
 #endif
 
 
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
-tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_sock_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_select_wait(object, timeout);
+	return tb_eio_reactor_select_wait(object, timeout);
 }
 
 #endif
 
 /* /////////////////////////////////////////////////////////
- * epool
+ * eiop
  */
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_file_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_waito_init(epool);
-}
-tb_epool_reactor_t* tb_epool_reactor_evet_init(tb_epool_t* epool)
-{
-	return tb_epool_reactor_waito_init(epool);
+	return tb_eiop_reactor_waito_init(eiop);
 }
 #endif
 
 #ifdef TB_CONFIG_EVENT_HAVE_SELECT
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_sock_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_select_init(epool);
+	return tb_eiop_reactor_select_init(eiop);
 }
 #endif
 

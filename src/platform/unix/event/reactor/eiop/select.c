@@ -30,10 +30,10 @@
  */
 
 // the select reactor type
-typedef struct __tb_epool_reactor_select_t
+typedef struct __tb_eiop_reactor_select_t
 {
 	// the reactor base
-	tb_epool_reactor_t 		base;
+	tb_eiop_reactor_t 		base;
 
 	// the objects hash
 	tb_hash_t* 				hash;
@@ -50,15 +50,15 @@ typedef struct __tb_epool_reactor_select_t
 	fd_set 					wfdo;
 	fd_set 					efdo;
 	
-}tb_epool_reactor_select_t;
+}tb_eiop_reactor_select_t;
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_epool_reactor_select_addo(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_select_addo(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->epool, TB_FALSE);
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->eiop, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -69,15 +69,15 @@ static tb_bool_t tb_epool_reactor_select_addo(tb_epool_reactor_t* reactor, tb_ha
 	if (fd > rtor->sfdm) rtor->sfdm = fd;
 	
 	// init fds
-	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &rtor->rfdi : TB_NULL;
-	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &rtor->wfdi : TB_NULL;
+	fd_set* prfds = (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT)? &rtor->rfdi : TB_NULL;
+	fd_set* pwfds = (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN)? &rtor->wfdi : TB_NULL;
 	if (prfds) FD_SET(fd, prfds);
 	if (pwfds) FD_SET(fd, pwfds);
 	FD_SET(fd, &rtor->efdi);
 
 	// init obj
-	tb_eobject_t o;
-	tb_eobject_seto(&o, handle, reactor->epool->type, etype);
+	tb_eio_t o;
+	tb_eio_seto(&o, handle, reactor->eiop->type, etype);
 
 	// add obj
 	tb_hash_set(rtor->hash, fd, &o);
@@ -85,35 +85,35 @@ static tb_bool_t tb_epool_reactor_select_addo(tb_epool_reactor_t* reactor, tb_ha
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_select_seto(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_select_seto(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->epool, TB_FALSE);
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->eiop, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// get obj
-	tb_eobject_t* o = tb_hash_get(rtor->hash, fd);
+	tb_eio_t* o = tb_hash_get(rtor->hash, fd);
 	tb_assert_and_check_return_val(o, TB_FALSE);
 
 	// set fds
-	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &rtor->rfdi : TB_NULL;
-	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &rtor->wfdi : TB_NULL;
+	fd_set* prfds = (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT)? &rtor->rfdi : TB_NULL;
+	fd_set* pwfds = (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN)? &rtor->wfdi : TB_NULL;
 	if (prfds) FD_SET(fd, prfds); else FD_CLR(fd, prfds);
 	if (pwfds) FD_SET(fd, pwfds); else FD_CLR(fd, pwfds);
 	if (prfds || pwfds) FD_SET(fd, &rtor->efdi); else FD_CLR(fd, &rtor->efdi);
 
 	// set obj
-	tb_eobject_seto(o, handle, reactor->epool->type, etype);
+	tb_eio_seto(o, handle, reactor->eiop->type, etype);
 
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_select_delo(tb_epool_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_eiop_reactor_select_delo(tb_eiop_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash, TB_FALSE);
 
 	// fd
@@ -131,9 +131,9 @@ static tb_bool_t tb_epool_reactor_select_delo(tb_epool_reactor_t* reactor, tb_ha
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_epool_reactor_select_wait(tb_epool_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_eiop_reactor_select_wait(tb_eiop_reactor_t* reactor, tb_long_t timeout)
 {	
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash, -1);
 
 	// init time
@@ -159,10 +159,10 @@ static tb_long_t tb_epool_reactor_select_wait(tb_epool_reactor_t* reactor, tb_lo
 	// ok
 	return sfdn;
 }
-static tb_void_t tb_epool_reactor_select_sync(tb_epool_reactor_t* reactor, tb_size_t evtn)
+static tb_void_t tb_eiop_reactor_select_sync(tb_eiop_reactor_t* reactor, tb_size_t evtn)
 {	
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->hash && reactor->epool && reactor->epool->objs);
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->hash && reactor->eiop && reactor->eiop->objs);
 
 	// sync
 	tb_size_t i = 0;
@@ -174,32 +174,32 @@ static tb_void_t tb_epool_reactor_select_sync(tb_epool_reactor_t* reactor, tb_si
 		if (item)
 		{
 			tb_long_t 		fd = (tb_long_t)item->name;
-			tb_eobject_t* 	o = (tb_eobject_t*)item->data;
+			tb_eio_t* 	o = (tb_eio_t*)item->data;
 			if (fd >= 0 && o)
 			{
 				tb_long_t e = 0;
 				if (FD_ISSET(fd, &rtor->rfdo)) 
 				{
-					e |= TB_ETYPE_READ;
-					if (o->etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+					e |= TB_EIO_ETYPE_READ;
+					if (o->etype & TB_EIO_ETYPE_ACPT) e |= TB_EIO_ETYPE_ACPT;
 				}
 				if (FD_ISSET(fd, &rtor->wfdo)) 
 				{
-					e |= TB_ETYPE_WRIT;
-					if (o->etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+					e |= TB_EIO_ETYPE_WRIT;
+					if (o->etype & TB_EIO_ETYPE_CONN) e |= TB_EIO_ETYPE_CONN;
 				}
-				if (FD_ISSET(fd, &rtor->efdo) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
-					e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+				if (FD_ISSET(fd, &rtor->efdo) && !(e & (TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT))) 
+					e |= TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT;
 					
 				// add object
-				if (e && i < reactor->epool->objn) reactor->epool->objs[i++] = *o;
+				if (e && i < reactor->eiop->objn) reactor->eiop->objs[i++] = *o;
 			}
 		}
 	}
 }
-static tb_void_t tb_epool_reactor_select_exit(tb_epool_reactor_t* reactor)
+static tb_void_t tb_eiop_reactor_select_exit(tb_eiop_reactor_t* reactor)
 {
-	tb_epool_reactor_select_t* rtor = (tb_epool_reactor_select_t*)reactor;
+	tb_eiop_reactor_select_t* rtor = (tb_eiop_reactor_select_t*)reactor;
 	if (rtor)
 	{
 		// free fds
@@ -217,27 +217,27 @@ static tb_void_t tb_epool_reactor_select_exit(tb_epool_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-static tb_epool_reactor_t* tb_epool_reactor_select_init(tb_epool_t* epool)
+static tb_eiop_reactor_t* tb_eiop_reactor_select_init(tb_eiop_t* eiop)
 {
 	// check
-	tb_assert_and_check_return_val(epool && epool->maxn, TB_NULL);
-	tb_assert_and_check_return_val(epool->type == TB_EOTYPE_FILE || epool->type == TB_EOTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(eiop && eiop->maxn, TB_NULL);
+	tb_assert_and_check_return_val(eiop->type == TB_EIO_OTYPE_FILE || eiop->type == TB_EIO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_epool_reactor_select_t* rtor = tb_calloc(1, sizeof(tb_epool_reactor_select_t));
+	tb_eiop_reactor_select_t* rtor = tb_calloc(1, sizeof(tb_eiop_reactor_select_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.epool = epool;
-	rtor->base.exit = tb_epool_reactor_select_exit;
-	rtor->base.addo = tb_epool_reactor_select_addo;
-	rtor->base.seto = tb_epool_reactor_select_seto;
-	rtor->base.delo = tb_epool_reactor_select_delo;
-	rtor->base.wait = tb_epool_reactor_select_wait;
-	rtor->base.sync = tb_epool_reactor_select_sync;
+	rtor->base.eiop = eiop;
+	rtor->base.exit = tb_eiop_reactor_select_exit;
+	rtor->base.addo = tb_eiop_reactor_select_addo;
+	rtor->base.seto = tb_eiop_reactor_select_seto;
+	rtor->base.delo = tb_eiop_reactor_select_delo;
+	rtor->base.wait = tb_eiop_reactor_select_wait;
+	rtor->base.sync = tb_eiop_reactor_select_sync;
 
 	// init hash
-	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(epool->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
+	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(eiop->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eio_t), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init fds
@@ -249,10 +249,10 @@ static tb_epool_reactor_t* tb_epool_reactor_select_init(tb_epool_t* epool)
 	FD_ZERO(&rtor->efdo);
 
 	// ok
-	return (tb_epool_reactor_t*)rtor;
+	return (tb_eiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_epool_reactor_select_exit(rtor);
+	if (rtor) tb_eiop_reactor_select_exit(rtor);
 	return TB_NULL;
 }
 

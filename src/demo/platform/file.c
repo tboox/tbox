@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////
  * writ
  */
-static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_eobject_t* oo, tb_byte_t* data, tb_size_t size)
+static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_eio_t* oo, tb_byte_t* data, tb_size_t size)
 {
 	tb_size_t writ = 0;
 	tb_bool_t wait = TB_FALSE;
@@ -25,7 +25,7 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_eobject_t* oo, tb_byte_
 		else if (!n && !wait)
 		{
 			// waiting...
-			tb_long_t etype = tb_eobject_wait(oo, 10000);
+			tb_long_t etype = tb_eio_wait(oo, 10000);
 
 			// error?
 			tb_check_break(etype >= 0);
@@ -34,7 +34,7 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_eobject_t* oo, tb_byte_
 			tb_check_break(etype);
 
 			// has writ?
-			tb_assert_and_check_break(etype & TB_ETYPE_WRIT);
+			tb_assert_and_check_break(etype & TB_EIO_ETYPE_WRIT);
 
 			// be waiting
 			wait = TB_TRUE;
@@ -59,11 +59,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_uint64_t isize = tb_file_size(ifile);
 	tb_assert_and_check_goto(isize, end);
 
-	// init eobject
-	tb_eobject_t io;
-	tb_eobject_t oo;
-	tb_eobject_seto(&io, ifile, TB_EOTYPE_FILE, TB_ETYPE_READ);
-	tb_eobject_seto(&oo, ofile, TB_EOTYPE_FILE, TB_ETYPE_WRIT);
+	// init eio
+	tb_eio_t io;
+	tb_eio_t oo;
+	tb_eio_seto(&io, ifile, TB_EIO_OTYPE_FILE, TB_EIO_ETYPE_READ);
+	tb_eio_seto(&oo, ofile, TB_EIO_OTYPE_FILE, TB_EIO_ETYPE_WRIT);
 
 	// read file
 	tb_byte_t 	data[4096];
@@ -95,7 +95,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 			// waiting...
 			tb_print("waiting...");
-			tb_long_t etype = tb_eobject_wait(&io, 10000);
+			tb_long_t etype = tb_eio_wait(&io, 10000);
 
 			// error?
 			if (etype < 0)
@@ -112,7 +112,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			}
 
 			// has read?
-			tb_assert_and_check_break(etype & TB_ETYPE_READ);
+			tb_assert_and_check_break(etype & TB_EIO_ETYPE_READ);
 
 			// be waiting
 			wait = TB_TRUE;

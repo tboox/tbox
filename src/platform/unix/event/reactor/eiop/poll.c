@@ -30,10 +30,10 @@
  */
 
 // the poll reactor type
-typedef struct __tb_epool_reactor_poll_t
+typedef struct __tb_eiop_reactor_poll_t
 {
 	// the reactor base
-	tb_epool_reactor_t 		base;
+	tb_eiop_reactor_t 		base;
 
 	// the objects hash
 	tb_hash_t* 				hash;
@@ -41,15 +41,15 @@ typedef struct __tb_epool_reactor_poll_t
 	// the poll fds
 	tb_vector_t* 			pfds;
 
-}tb_epool_reactor_poll_t;
+}tb_eiop_reactor_poll_t;
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_poll_addo(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->epool, TB_FALSE);
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->eiop, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -58,12 +58,12 @@ static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_hand
 	// init pfd
 	struct pollfd pfd = {0};
 	pfd.fd = fd;
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd.events |= POLLIN;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd.events |= POLLOUT;
+	if (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT) pfd.events |= POLLIN;
+	if (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN) pfd.events |= POLLOUT;
 
 	// init obj
-	tb_eobject_t o;
-	tb_eobject_seto(&o, handle, reactor->epool->type, etype);
+	tb_eio_t o;
+	tb_eio_seto(&o, handle, reactor->eiop->type, etype);
 
 	// add pfd
 	tb_vector_insert_tail(rtor->pfds, &pfd);
@@ -74,17 +74,17 @@ static tb_bool_t tb_epool_reactor_poll_addo(tb_epool_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_poll_seto(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_poll_seto(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->epool, TB_FALSE);
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash && reactor->eiop, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// get obj
-	tb_eobject_t* o = tb_hash_get(rtor->hash, fd);
+	tb_eio_t* o = tb_hash_get(rtor->hash, fd);
 	tb_assert_and_check_return_val(o, TB_FALSE);
 
 	// set pfd
@@ -96,22 +96,22 @@ static tb_bool_t tb_epool_reactor_poll_seto(tb_epool_reactor_t* reactor, tb_hand
 		if (pfd && pfd->fd == fd)
 		{
 			pfd->events = 0;
-			if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd->events |= POLLIN;
-			if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd->events |= POLLOUT;
+			if (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT) pfd->events |= POLLIN;
+			if (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN) pfd->events |= POLLOUT;
 			break;
 		}
 	}
 	tb_assert_and_check_return_val(itor != tail, TB_FALSE);
 
 	// set obj
-	tb_eobject_seto(o, handle, reactor->epool->type, etype);
+	tb_eio_seto(o, handle, reactor->eiop->type, etype);
 
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_poll_delo(tb_epool_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_eiop_reactor_poll_delo(tb_eiop_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->hash, TB_FALSE);
 
 	// fd
@@ -137,9 +137,9 @@ static tb_bool_t tb_epool_reactor_poll_delo(tb_epool_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_epool_reactor_poll_wait(tb_epool_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_eiop_reactor_poll_wait(tb_eiop_reactor_t* reactor, tb_long_t timeout)
 {	
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash && rtor->pfds, -1);
 
 	// pfds
@@ -157,10 +157,10 @@ static tb_long_t tb_epool_reactor_poll_wait(tb_epool_reactor_t* reactor, tb_long
 	// ok
 	return pfdn;
 }
-static tb_void_t tb_epool_reactor_poll_sync(tb_epool_reactor_t* reactor, tb_size_t evtn)
+static tb_void_t tb_eiop_reactor_poll_sync(tb_eiop_reactor_t* reactor, tb_size_t evtn)
 {	
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->hash && rtor->pfds && reactor->epool && reactor->epool->objs);
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->hash && rtor->pfds && reactor->eiop && reactor->eiop->objs);
 
 	// pfds
 	struct pollfd* 	pfds = (struct pollfd*)tb_vector_at_head(rtor->pfds);
@@ -173,31 +173,31 @@ static tb_void_t tb_epool_reactor_poll_sync(tb_epool_reactor_t* reactor, tb_size
 	for (i = 0; i < pfdm; i++)
 	{
 		struct pollfd* 	p = pfds + i;
-		tb_eobject_t* 	o = tb_hash_get(rtor->hash, p->fd);
+		tb_eio_t* 	o = tb_hash_get(rtor->hash, p->fd);
 		tb_assert_and_check_return_val(o, -1);
 		
 		// add event
 		tb_long_t e = 0;
 		if (p->revents & POLLIN)
 		{
-			e |= TB_ETYPE_READ;
-			if (o->etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+			e |= TB_EIO_ETYPE_READ;
+			if (o->etype & TB_EIO_ETYPE_ACPT) e |= TB_EIO_ETYPE_ACPT;
 		}
 		if (p->revents & POLLOUT) 
 		{
-			e |= TB_ETYPE_WRIT;
-			if (o->etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+			e |= TB_EIO_ETYPE_WRIT;
+			if (o->etype & TB_EIO_ETYPE_CONN) e |= TB_EIO_ETYPE_CONN;
 		}
-		if ((p->revents & POLLHUP) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
-			e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+		if ((p->revents & POLLHUP) && !(e & (TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT))) 
+			e |= TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT;
 
 		// add object
-		if (e && j < reactor->epool->objn) reactor->epool->objs[j++] = *o;
+		if (e && j < reactor->eiop->objn) reactor->eiop->objs[j++] = *o;
 	}
 }
-static tb_void_t tb_epool_reactor_poll_exit(tb_epool_reactor_t* reactor)
+static tb_void_t tb_eiop_reactor_poll_exit(tb_eiop_reactor_t* reactor)
 {
-	tb_epool_reactor_poll_t* rtor = (tb_epool_reactor_poll_t*)reactor;
+	tb_eiop_reactor_poll_t* rtor = (tb_eiop_reactor_poll_t*)reactor;
 	if (rtor)
 	{
 		// exit pfds
@@ -210,38 +210,38 @@ static tb_void_t tb_epool_reactor_poll_exit(tb_epool_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-static tb_epool_reactor_t* tb_epool_reactor_poll_init(tb_epool_t* epool)
+static tb_eiop_reactor_t* tb_eiop_reactor_poll_init(tb_eiop_t* eiop)
 {
 	// check
-	tb_assert_and_check_return_val(epool && epool->maxn, TB_NULL);
-	tb_assert_and_check_return_val(epool->type == TB_EOTYPE_FILE || epool->type == TB_EOTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(eiop && eiop->maxn, TB_NULL);
+	tb_assert_and_check_return_val(eiop->type == TB_EIO_OTYPE_FILE || eiop->type == TB_EIO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_epool_reactor_poll_t* rtor = tb_calloc(1, sizeof(tb_epool_reactor_poll_t));
+	tb_eiop_reactor_poll_t* rtor = tb_calloc(1, sizeof(tb_eiop_reactor_poll_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.epool = epool;
-	rtor->base.exit = tb_epool_reactor_poll_exit;
-	rtor->base.addo = tb_epool_reactor_poll_addo;
-	rtor->base.seto = tb_epool_reactor_poll_seto;
-	rtor->base.delo = tb_epool_reactor_poll_delo;
-	rtor->base.wait = tb_epool_reactor_poll_wait;
-	rtor->base.sync = tb_epool_reactor_poll_sync;
+	rtor->base.eiop = eiop;
+	rtor->base.exit = tb_eiop_reactor_poll_exit;
+	rtor->base.addo = tb_eiop_reactor_poll_addo;
+	rtor->base.seto = tb_eiop_reactor_poll_seto;
+	rtor->base.delo = tb_eiop_reactor_poll_delo;
+	rtor->base.wait = tb_eiop_reactor_poll_wait;
+	rtor->base.sync = tb_eiop_reactor_poll_sync;
 
 	// init hash
-	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(epool->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
+	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(eiop->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_eio_t), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init pfds
-	rtor->pfds = tb_vector_init(tb_align8((epool->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
+	rtor->pfds = tb_vector_init(tb_align8((eiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(rtor->pfds, fail);
 
 	// ok
-	return (tb_epool_reactor_t*)rtor;
+	return (tb_eiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_epool_reactor_poll_exit(rtor);
+	if (rtor) tb_eiop_reactor_poll_exit(rtor);
 	return TB_NULL;
 }
 

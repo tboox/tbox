@@ -24,7 +24,7 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_long_t tb_eobject_reactor_waito_wait(tb_eobject_t* object, tb_long_t timeout)
+static tb_long_t tb_eio_reactor_waito_wait(tb_eio_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object && object->handle, -1);
 
@@ -33,8 +33,8 @@ static tb_long_t tb_eobject_reactor_waito_wait(tb_eobject_t* object, tb_long_t t
 	tb_size_t etype = object->etype;
 	
 	// check
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_EVET, -1);
-	tb_assert_and_check_return_val(!((otype == TB_EOTYPE_FILE) && (etype & TB_ETYPE_READ) && (etype & TB_ETYPE_WRIT)), -1);
+	tb_assert_and_check_return_val(otype == TB_EIO_OTYPE_FILE || otype == TB_EIO_OTYPE_EVET, -1);
+	tb_assert_and_check_return_val(!((otype == TB_EIO_OTYPE_FILE) && (etype & TB_EIO_ETYPE_READ) && (etype & TB_EIO_ETYPE_WRIT)), -1);
 
 	// select
 	DWORD r = WaitForSingleObject(object->handle, timeout >= 0? timeout : INFINITE);

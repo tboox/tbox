@@ -31,6 +31,7 @@
 #include <sys/sem.h>
 #include <sys/stat.h>
 #include <sys/ipc.h>
+#include <sys/msg.h>
 #include <sys/select.h>
 #include <errno.h>
 #include <unistd.h>
@@ -38,7 +39,6 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-
 tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
 {
 	// make key
@@ -105,7 +105,6 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 		t.tv_usec = (timeout % 1000) * 1000;
 	}
 
-#if 1
 	// init
 	struct sembuf sb;
 	sb.sem_num = 0;
@@ -123,28 +122,5 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// error
 	return -1;
-#else
-
-	// init
-	fd_set 	fds;
-	FD_ZERO(&fds);
-	FD_SET(h, &fds);
-
-	// select
-	tb_long_t r = select(h + 1
-						, &fds
-						, TB_NULL
-						, TB_NULL
-						, timeout >= 0? &t : TB_NULL);
-	tb_assert_and_check_return_val(r >= 0, -1);
-
-	// timeout?
-	tb_check_return_val(r, 0);
-
-	// ok
-	return 1;
-
-#endif
 }
-
 

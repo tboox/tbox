@@ -24,27 +24,27 @@ typedef struct __tb_test_item_t
  */
 static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 {
-	tb_epool_t* 	ep = TB_NULL;
+	tb_eiop_t* 	ep = TB_NULL;
 	tb_test_item_t* it = (tb_test_item_t*)cb_data;
 	tb_assert_and_check_goto(it, end);
 	tb_print("[thread]: init");
 
-	// init epool
-	ep = tb_epool_init(TB_EOTYPE_EVET, TB_TEST_ITEM_MAX);
+	// init eiop
+	ep = tb_eiop_init(TB_EIO_OTYPE_EVET, TB_TEST_ITEM_MAX);
 	tb_assert_and_check_goto(ep, end);
 
 	// add event
 	tb_size_t i = 0;
 	for (i = 0; i < TB_TEST_ITEM_MAX; i++) 
-		if (it->e[i]) tb_epool_addo(ep, it->e[i], TB_ETYPE_SIGL);
+		if (it->e[i]) tb_eiop_addo(ep, it->e[i], TB_EIO_ETYPE_SIGL);
 
 	// loop
 	while (1)
 	{
 		// wait
 		tb_print("[event]: wait");
-		tb_long_t 		r = tb_epool_wait(ep, -1);
-		tb_eobject_t* 	o = tb_epool_objs(ep);
+		tb_long_t 		r = tb_eiop_wait(ep, -1);
+		tb_eio_t* 	o = tb_eiop_objs(ep);
 		tb_assert_and_check_goto(r >= 0 && o, end);
 
 		// quit?
@@ -54,7 +54,7 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		tb_check_continue(r);
 
 		// check
-		tb_assert_and_check_goto(o->etype & TB_ETYPE_SIGL && o->otype == TB_EOTYPE_EVET, end);
+		tb_assert_and_check_goto(o->etype & TB_EIO_ETYPE_SIGL && o->otype == TB_EIO_OTYPE_EVET, end);
 
 		// signal
 		for (i = 0; i < r; i++) 
@@ -63,8 +63,8 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 
 end:
 
-	// exit epool
-	if (ep) tb_epool_exit(ep);
+	// exit eiop
+	if (ep) tb_eiop_exit(ep);
 
 	// exit thread
 	tb_print("[thread]: exit");
