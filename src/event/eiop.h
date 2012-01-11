@@ -17,50 +17,50 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		epool.h
+ * \file		eiop.h
  *
  */
-#ifndef TB_EVENT_POOL_H
-#define TB_EVENT_POOL_H
+#ifndef TB_EVENT_IO_POOL_H
+#define TB_EVENT_IO_POOL_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "eobject.h"
+#include "eio.h"
 
 /* /////////////////////////////////////////////////////////
  * types
  */
 // the event pool reactor type
-typedef struct __tb_epool_t;
-typedef struct __tb_epool_reactor_t
+typedef struct __tb_eiop_t;
+typedef struct __tb_eiop_reactor_t
 {
 	// the reference to the event pool
-	struct __tb_epool_t* 	epool;
+	struct __tb_eiop_t* 	eiop;
 
 	// exit
-	tb_void_t 				(*exit)(struct __tb_epool_reactor_t* reactor);
+	tb_void_t 				(*exit)(struct __tb_eiop_reactor_t* reactor);
 
 	// addo
-	tb_bool_t 				(*addo)(struct __tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
+	tb_bool_t 				(*addo)(struct __tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
 
 	// seto
-	tb_bool_t 				(*seto)(struct __tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
+	tb_bool_t 				(*seto)(struct __tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
 
 	// delo
-	tb_bool_t 				(*delo)(struct __tb_epool_reactor_t* reactor, tb_handle_t handle);
+	tb_bool_t 				(*delo)(struct __tb_eiop_reactor_t* reactor, tb_handle_t handle);
 
 	// wait
-	tb_long_t 				(*wait)(struct __tb_epool_reactor_t* reactor, tb_long_t timeout);
+	tb_long_t 				(*wait)(struct __tb_eiop_reactor_t* reactor, tb_long_t timeout);
 
 	// sync
-	tb_void_t 				(*sync)(struct __tb_epool_reactor_t* reactor, tb_size_t evtn);
+	tb_void_t 				(*sync)(struct __tb_eiop_reactor_t* reactor, tb_size_t evtn);
 
-}tb_epool_reactor_t;
+}tb_eiop_reactor_t;
 
 // the event pool type
-typedef struct __tb_epool_t
+typedef struct __tb_eiop_t
 {
 	// the object type
 	tb_size_t 				type;
@@ -72,13 +72,13 @@ typedef struct __tb_epool_t
 	tb_size_t 				size;
 
 	// the objects
-	tb_eobject_t* 			objs;
+	tb_eio_t* 			objs;
 	tb_size_t 				objn;
 
 	// the event pool reactor
-	tb_epool_reactor_t* 	reactor;
+	tb_eiop_reactor_t* 	reactor;
 
-}tb_epool_t;
+}tb_eiop_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -91,59 +91,59 @@ typedef struct __tb_epool_t
  *
  * @return 	the event pool
  */
-tb_epool_t* 	tb_epool_init(tb_size_t type, tb_size_t maxn);
+tb_eiop_t* 	tb_eiop_init(tb_size_t type, tb_size_t maxn);
 
 /// exit the event pool
-tb_void_t 		tb_epool_exit(tb_epool_t* epool);
+tb_void_t 		tb_eiop_exit(tb_eiop_t* eiop);
 
 /// the object maximum number of the event pool
-tb_size_t 		tb_epool_maxn(tb_epool_t* epool);
+tb_size_t 		tb_eiop_maxn(tb_eiop_t* eiop);
 
 /// the object number of the event pool
-tb_size_t 		tb_epool_size(tb_epool_t* epool);
+tb_size_t 		tb_eiop_size(tb_eiop_t* eiop);
 
 /*!add the event object
  *
- * @param 	epool 	the event pool
+ * @param 	eiop 	the event pool
  * @param 	handle 	the handle of the event object
  * @param 	etype 	the event type
  *
  * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_epool_addo(tb_epool_t* epool, tb_handle_t handle, tb_size_t etype);
+tb_size_t 		tb_eiop_addo(tb_eiop_t* eiop, tb_handle_t handle, tb_size_t etype);
 
 /*!set the event object
  *
- * @param 	epool 	the event pool
+ * @param 	eiop 	the event pool
  * @param 	handle 	the handle of the event object
  * @param 	etype 	the event type
  *
  * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_epool_seto(tb_epool_t* epool, tb_handle_t handle, tb_size_t etype);
+tb_size_t 		tb_eiop_seto(tb_eiop_t* eiop, tb_handle_t handle, tb_size_t etype);
 
 /*!del the event object
  *
- * @param 	epool 	the event pool
+ * @param 	eiop 	the event pool
  * @param 	handle 	the handle of the event object
  *
  * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_epool_delo(tb_epool_t* epool, tb_handle_t handle);
+tb_size_t 		tb_eiop_delo(tb_eiop_t* eiop, tb_handle_t handle);
 
 /*!wait the event objects in the pool
  *
  * blocking wait the multiple event objects
  * return the event number if ok, otherwise return 0 for timeout
  *
- * @param 	epool 	the event pool
+ * @param 	eiop 	the event pool
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
  * @return 	the event number, return 0 if timeout, return -1 if error
  */
-tb_long_t 		tb_epool_wait(tb_epool_t* epool, tb_long_t timeout);
+tb_long_t 		tb_eiop_wait(tb_eiop_t* eiop, tb_long_t timeout);
 
 /// the event objects
-tb_eobject_t* 	tb_epool_objs(tb_epool_t* epool);
+tb_eio_t* 	tb_eiop_objs(tb_eiop_t* eiop);
 
 #endif

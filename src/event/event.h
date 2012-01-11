@@ -27,8 +27,8 @@
  * includes
  */
 #include "prefix.h"
-#include "eobject.h"
-#include "epool.h"
+#include "eio.h"
+#include "eiop.h"
 #include "../platform/event.h"
 
 

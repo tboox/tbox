@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		eobject.h
+ * \file		eio.h
  *
  */
-#ifndef TB_EVENT_OBJECT_H
-#define TB_EVENT_OBJECT_H
+#ifndef TB_EVENT_IO_OBJECT_H
+#define TB_EVENT_IO_OBJECT_H
 
 
 /* /////////////////////////////////////////////////////////
@@ -34,32 +34,30 @@
  */
 
 // the event type
-typedef enum __tb_etype_t
+typedef enum __tb_eio_etype_t
 {
- 	TB_ETYPE_NULL 	= 0
-,	TB_ETYPE_READ 	= 1		//!< for all i/o object
-,	TB_ETYPE_WRIT 	= 2		//!< for all i/o object
-, 	TB_ETYPE_ACPT 	= 4 	//!< only for TB_EOTYPE_SOCK
-, 	TB_ETYPE_CONN 	= 8 	//!< only for TB_EOTYPE_SOCK
-,	TB_ETYPE_SIGL 	= 16 	//!< only for TB_EOTYPE_EVET
+ 	TB_EIO_ETYPE_NULL 	= 0
+,	TB_EIO_ETYPE_READ 	= 1		//!< for all i/o object
+,	TB_EIO_ETYPE_WRIT 	= 2		//!< for all i/o object
+, 	TB_EIO_ETYPE_ACPT 	= 4 	//!< only for TB_EIO_OTYPE_SOCK
+, 	TB_EIO_ETYPE_CONN 	= 8 	//!< only for TB_EIO_OTYPE_SOCK
 
-}tb_etype_t;
+}tb_eio_etype_t;
 
-// the event object type
-typedef enum __tb_eotype_t
+// the object type
+typedef enum __tb_eio_otype_t
 {
- 	TB_EOTYPE_NULL 	= 0
-, 	TB_EOTYPE_DATA 	= 1 	//!< for qbuffer
-, 	TB_EOTYPE_FILE 	= 2 	//!< for file
-,	TB_EOTYPE_SOCK 	= 3 	//!< for socket
-,	TB_EOTYPE_HTTP 	= 4 	//!< for http
-,	TB_EOTYPE_GSTM 	= 5 	//!< for gstream
-,	TB_EOTYPE_EVET 	= 6 	//!< for event
+ 	TB_EIO_OTYPE_NULL 	= 0
+, 	TB_EIO_OTYPE_DATA 	= 1 	//!< for qbuffer
+, 	TB_EIO_OTYPE_FILE 	= 2 	//!< for file
+,	TB_EIO_OTYPE_SOCK 	= 3 	//!< for socket
+,	TB_EIO_OTYPE_HTTP 	= 4 	//!< for http
+,	TB_EIO_OTYPE_GSTM 	= 5 	//!< for gstream
 
-}tb_eotype_t;
+}tb_eio_otype_t;
 
-// the event object type
-typedef struct __tb_eobject_t
+// the event io object type
+typedef struct __tb_eio_t
 {
 	// the object type
 	tb_size_t 		otype 	: 8;
@@ -70,23 +68,23 @@ typedef struct __tb_eobject_t
 	// the object handle
 	tb_handle_t 	handle;
 
-}tb_eobject_t;
+}tb_eio_t;
 
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
 
 /// set the event object
-tb_void_t tb_eobject_seto(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
+tb_void_t tb_eio_seto(tb_eio_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
 
 /// get the object type
-tb_size_t tb_eobject_type(tb_eobject_t* object);
+tb_size_t tb_eio_type(tb_eio_t* object);
 
 /// get the event type
-tb_size_t tb_eobject_gete(tb_eobject_t* object);
+tb_size_t tb_eio_gete(tb_eio_t* object);
 
 /// set the event type
-tb_size_t tb_eobject_sete(tb_eobject_t* object, tb_size_t etype);
+tb_size_t tb_eio_sete(tb_eio_t* object, tb_size_t etype);
 
 /*!add the event type
  *
@@ -97,7 +95,7 @@ tb_size_t tb_eobject_sete(tb_eobject_t* object, tb_size_t etype);
  *
  * @return 	the new event type
  */
-tb_size_t tb_eobject_adde(tb_eobject_t* object, tb_size_t etype);
+tb_size_t tb_eio_adde(tb_eio_t* object, tb_size_t etype);
 
 /*!delete the event type
  *
@@ -108,11 +106,11 @@ tb_size_t tb_eobject_adde(tb_eobject_t* object, tb_size_t etype);
  *
  * @return 	the new event type
  */
-tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype);
+tb_size_t tb_eio_dele(tb_eio_t* object, tb_size_t etype);
 
 /*!wait the event object
  *
- * blocking wait the single event object, so need not epool 
+ * blocking wait the single event object, so need not eiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	object 	the event object
@@ -120,7 +118,7 @@ tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype);
  *
  * @return 	the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout);
+tb_long_t tb_eio_wait(tb_eio_t* object, tb_long_t timeout);
 
 
 #endif

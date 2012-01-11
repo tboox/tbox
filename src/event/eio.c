@@ -17,69 +17,68 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		eobject.c
+ * \file		eio.c
  *
  */
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "eobject.h"
+#include "eio.h"
 
 /* /////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout);
-tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout);
-tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout);
+tb_long_t tb_eio_reactor_file_wait(tb_eio_t* object, tb_long_t timeout);
+tb_long_t tb_eio_reactor_sock_wait(tb_eio_t* object, tb_long_t timeout);
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_void_t tb_eobject_seto(tb_eobject_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+tb_void_t tb_eio_seto(tb_eio_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
 {
 	tb_assert_and_check_return(object);
 	object->otype = otype;
 	object->etype = etype;
 	object->handle = handle;
 }
-tb_size_t tb_eobject_type(tb_eobject_t* object)
+tb_size_t tb_eio_type(tb_eio_t* object)
 {
-	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);
+	tb_assert_and_check_return_val(object, TB_EIO_OTYPE_NULL);
 	return object->otype;
 }
-tb_size_t tb_eobject_gete(tb_eobject_t* object)
+tb_size_t tb_eio_gete(tb_eio_t* object)
 {
-	tb_assert_and_check_return_val(object, TB_ETYPE_NULL);
+	tb_assert_and_check_return_val(object, TB_EIO_ETYPE_NULL);
 	return object->etype;
 }
-tb_size_t tb_eobject_sete(tb_eobject_t* object, tb_size_t etype)
+tb_size_t tb_eio_sete(tb_eio_t* object, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);
+	tb_assert_and_check_return_val(object, TB_EIO_OTYPE_NULL);
 
 	object->etype = etype;
 	return object->etype;
 }
-tb_size_t tb_eobject_adde(tb_eobject_t* object, tb_size_t etype)
+tb_size_t tb_eio_adde(tb_eio_t* object, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);
+	tb_assert_and_check_return_val(object, TB_EIO_OTYPE_NULL);
 
 	object->etype |= etype;
 	return object->etype;
 }
-tb_size_t tb_eobject_dele(tb_eobject_t* object, tb_size_t etype)
+tb_size_t tb_eio_dele(tb_eio_t* object, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(object, TB_EOTYPE_NULL);
+	tb_assert_and_check_return_val(object, TB_EIO_OTYPE_NULL);
 
 	object->etype &= ~etype;
 	return object->etype;
 }
-tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_wait(tb_eio_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object && object->handle, 0);
 
 	// the reactor 
-	static tb_long_t (*wait[])(tb_eobject_t*, tb_long_t) =
+	static tb_long_t (*wait[])(tb_eio_t*, tb_long_t) =
 	{
 		TB_NULL
 
@@ -87,10 +86,10 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 	, 	TB_NULL
 	
 		// for file
-	, 	tb_eobject_reactor_file_wait
+	, 	tb_eio_reactor_file_wait
 
 		// for socket
-	, 	tb_eobject_reactor_sock_wait
+	, 	tb_eio_reactor_sock_wait
 
 		// for http
 	, 	TB_NULL
@@ -98,8 +97,6 @@ tb_long_t tb_eobject_wait(tb_eobject_t* object, tb_long_t timeout)
 		// for gstream
 	, 	TB_NULL
 
-		// for event
-	, 	tb_eobject_reactor_evet_wait
 	};
 
 	// check

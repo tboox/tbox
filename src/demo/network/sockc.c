@@ -6,10 +6,10 @@
 /* ///////////////////////////////////////////////////////////////////
  * connect
  */
-static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eobject_t* o, tb_char_t const* ip, tb_size_t port)
+static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eio_t* o, tb_char_t const* ip, tb_size_t port)
 {
 	// add event
-	if (!tb_eobject_adde(o, TB_ETYPE_CONN)) return TB_FALSE;
+	if (!tb_eio_adde(o, TB_EIO_ETYPE_CONN)) return TB_FALSE;
 
 	// connect...
 	while (1)
@@ -25,7 +25,7 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eobject_t* o, tb_char_t 
 		{
 			// waiting...
 			tb_print("connect waiting...");
-			tb_long_t etype = tb_eobject_wait(o, 10000);
+			tb_long_t etype = tb_eio_wait(o, 10000);
 
 			// error?
 			if (etype < 0)
@@ -42,7 +42,7 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eobject_t* o, tb_char_t 
 			}
 
 			// has connect?
-			tb_assert_and_check_break(etype & TB_ETYPE_CONN);
+			tb_assert_and_check_break(etype & TB_EIO_ETYPE_CONN);
 		}
 		// error
 		else 
@@ -53,7 +53,7 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eobject_t* o, tb_char_t 
 	}
 
 	// del event
-	tb_eobject_dele(o, TB_ETYPE_CONN);
+	tb_eio_dele(o, TB_EIO_ETYPE_CONN);
 
 	// ok
 	tb_print("connect ok.");
@@ -63,10 +63,10 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_eobject_t* o, tb_char_t 
 /* ///////////////////////////////////////////////////////////////////
  * send
  */
-static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eobject_t* o, tb_byte_t* data, tb_size_t size)
+static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eio_t* o, tb_byte_t* data, tb_size_t size)
 {
 	// add event
-	if (!tb_eobject_adde(o, TB_ETYPE_WRIT)) return TB_FALSE;
+	if (!tb_eio_adde(o, TB_EIO_ETYPE_WRIT)) return TB_FALSE;
 
 	// send
 	tb_size_t send = 0;
@@ -87,7 +87,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 		{
 			// waiting...
 			tb_print("send waiting...");
-			tb_long_t etype = tb_eobject_wait(o, 10000);
+			tb_long_t etype = tb_eio_wait(o, 10000);
 
 			// error?
 			if (etype < 0)
@@ -104,7 +104,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 			}
 
 			// has send?
-			tb_assert_and_check_break(etype & TB_ETYPE_WRIT);
+			tb_assert_and_check_break(etype & TB_EIO_ETYPE_WRIT);
 
 			// be waiting
 			wait = TB_TRUE;
@@ -113,7 +113,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 	}
 	
 	// del event
-	tb_eobject_dele(o, TB_ETYPE_WRIT);
+	tb_eio_dele(o, TB_EIO_ETYPE_WRIT);
 
 	// ok?
 	return send == size? TB_TRUE : TB_FALSE;
@@ -122,10 +122,10 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 /* ///////////////////////////////////////////////////////////////////
  * recv
  */
-static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_eobject_t* o, tb_byte_t* data, tb_size_t size)
+static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_eio_t* o, tb_byte_t* data, tb_size_t size)
 {
 	// add event
-	if (!tb_eobject_adde(o, TB_ETYPE_READ)) return 0;
+	if (!tb_eio_adde(o, TB_EIO_ETYPE_READ)) return 0;
 
 	// recv
 	tb_size_t recv = 0;
@@ -146,7 +146,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 		{
 			// waiting...
 			tb_print("recv waiting...");
-			tb_long_t etype = tb_eobject_wait(o, 1000);
+			tb_long_t etype = tb_eio_wait(o, 1000);
 
 			// error?
 			if (etype < 0)
@@ -163,7 +163,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 			}
 
 			// has recv?
-			tb_assert_and_check_break(etype & TB_ETYPE_READ);
+			tb_assert_and_check_break(etype & TB_EIO_ETYPE_READ);
 
 			// be waiting
 			wait = TB_TRUE;
@@ -172,7 +172,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_eobject_t* o, tb_byte_t* da
 	}
 	
 	// del event
-	tb_eobject_dele(o, TB_ETYPE_READ);
+	tb_eio_dele(o, TB_EIO_ETYPE_READ);
 
 	// ok?
 	return recv;
@@ -188,9 +188,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t s = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(s, end);
 
-	// init eobject
-	tb_eobject_t o;
-	tb_eobject_seto(&o, s, TB_EOTYPE_SOCK, TB_ETYPE_NULL);
+	// init eio
+	tb_eio_t o;
+	tb_eio_seto(&o, s, TB_EIO_OTYPE_SOCK, TB_EIO_ETYPE_NULL);
 
 	// connect
 	if (!tb_test_sock_connect(s, &o, argv[1], tb_stou32(argv[2]))) goto end;

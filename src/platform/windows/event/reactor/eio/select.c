@@ -17,45 +17,69 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		poll.c
+ * \file		select.c
  *
  */
-/* /////////////////////////////////////////////////////////
- * includes
- */
-#include <sys/poll.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_long_t tb_eobject_reactor_poll_wait(tb_eobject_t* object, tb_long_t timeout)
+static tb_long_t tb_eio_reactor_select_wait(tb_eio_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object, -1);
 
 	// type
 	tb_size_t otype = object->otype;
 	tb_size_t etype = object->etype;
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
+	tb_assert_and_check_return_val(otype == TB_EIO_OTYPE_SOCK, -1);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)object->handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, -1);
 	
-	// init
-	struct pollfd pfd = {0};
-	pfd.fd = fd;
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) pfd.events |= POLLIN;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) pfd.events |= POLLOUT;
+	// init time
+	struct timeval t = {0};
+	if (timeout > 0)
+	{
+		t.tv_sec = timeout / 1000;
+		t.tv_usec = (timeout % 1000) * 1000;
+	}
 
-	// poll
-	tb_long_t r = poll(&pfd, 1, timeout);
+	// init fds
+	fd_set 	rfds;
+	fd_set 	wfds;
+	fd_set 	efds;
+	fd_set* prfds = (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT)? &rfds : TB_NULL;
+	fd_set* pwfds = (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN)? &wfds : TB_NULL;
+
+	if (prfds)
+	{
+		FD_ZERO(prfds);
+		FD_SET(fd, prfds);
+	}
+
+	if (pwfds)
+	{
+		FD_ZERO(pwfds);
+		FD_SET(fd, pwfds);
+	}
+	
+	FD_ZERO(&efds);
+	FD_SET(fd, &efds);
+
+	// select
+	tb_long_t r = select(fd + 1
+						, prfds
+						, pwfds
+						, &efds
+						, timeout >= 0? &t : TB_NULL);
 	tb_assert_and_check_return_val(r >= 0, -1);
 
 	// timeout?
 	tb_check_return_val(r, 0);
 
 	// error?
-	if (otype == TB_EOTYPE_SOCK)
+	if (otype == TB_EIO_OTYPE_SOCK)
 	{
 		tb_int_t o = 0;
 		tb_int_t n = sizeof(tb_int_t);
@@ -65,18 +89,18 @@ static tb_long_t tb_eobject_reactor_poll_wait(tb_eobject_t* object, tb_long_t ti
 
 	// ok
 	tb_long_t e = 0;
-	if (pfd.revents & POLLIN) 
+	if (prfds && FD_ISSET(fd, &rfds)) 
 	{
-		e |= TB_ETYPE_READ;
-		if (etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+		e |= TB_EIO_ETYPE_READ;
+		if (etype & TB_EIO_ETYPE_ACPT) e |= TB_EIO_ETYPE_ACPT;
 	}
-	if (pfd.revents & POLLOUT) 
+	if (pwfds && FD_ISSET(fd, &wfds)) 
 	{
-		e |= TB_ETYPE_WRIT;
-		if (etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+		e |= TB_EIO_ETYPE_WRIT;
+		if (etype & TB_EIO_ETYPE_CONN) e |= TB_EIO_ETYPE_CONN;
 	}
-	if ((pfd.revents & POLLHUP) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
-		e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+	if (FD_ISSET(fd, &efds) && !(e & (TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT))) 
+		e |= TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT;
 	return e;
 }
 

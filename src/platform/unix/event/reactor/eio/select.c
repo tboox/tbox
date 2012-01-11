@@ -28,14 +28,14 @@
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_long_t tb_eobject_reactor_select_wait(tb_eobject_t* object, tb_long_t timeout)
+static tb_long_t tb_eio_reactor_select_wait(tb_eio_t* object, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(object, -1);
 
 	// type
 	tb_size_t otype = object->otype;
 	tb_size_t etype = object->etype;
-	tb_assert_and_check_return_val(otype == TB_EOTYPE_FILE || otype == TB_EOTYPE_SOCK, -1);
+	tb_assert_and_check_return_val(otype == TB_EIO_OTYPE_FILE || otype == TB_EIO_OTYPE_SOCK, -1);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)object->handle) - 1;
@@ -53,8 +53,8 @@ static tb_long_t tb_eobject_reactor_select_wait(tb_eobject_t* object, tb_long_t 
 	fd_set 	rfds;
 	fd_set 	wfds;
 	fd_set 	efds;
-	fd_set* prfds = (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT)? &rfds : TB_NULL;
-	fd_set* pwfds = (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN)? &wfds : TB_NULL;
+	fd_set* prfds = (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT)? &rfds : TB_NULL;
+	fd_set* pwfds = (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN)? &wfds : TB_NULL;
 
 	if (prfds)
 	{
@@ -83,7 +83,7 @@ static tb_long_t tb_eobject_reactor_select_wait(tb_eobject_t* object, tb_long_t 
 	tb_check_return_val(r, 0);
 
 	// error?
-	if (otype == TB_EOTYPE_SOCK)
+	if (otype == TB_EIO_OTYPE_SOCK)
 	{
 		tb_int_t o = 0;
 		tb_int_t n = sizeof(tb_int_t);
@@ -95,16 +95,16 @@ static tb_long_t tb_eobject_reactor_select_wait(tb_eobject_t* object, tb_long_t 
 	tb_long_t e = 0;
 	if (prfds && FD_ISSET(fd, &rfds)) 
 	{
-		e |= TB_ETYPE_READ;
-		if (etype & TB_ETYPE_ACPT) e |= TB_ETYPE_ACPT;
+		e |= TB_EIO_ETYPE_READ;
+		if (etype & TB_EIO_ETYPE_ACPT) e |= TB_EIO_ETYPE_ACPT;
 	}
 	if (pwfds && FD_ISSET(fd, &wfds)) 
 	{
-		e |= TB_ETYPE_WRIT;
-		if (etype & TB_ETYPE_CONN) e |= TB_ETYPE_CONN;
+		e |= TB_EIO_ETYPE_WRIT;
+		if (etype & TB_EIO_ETYPE_CONN) e |= TB_EIO_ETYPE_CONN;
 	}
-	if (FD_ISSET(fd, &efds) && !(e & (TB_ETYPE_READ | TB_ETYPE_WRIT))) 
-		e |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+	if (FD_ISSET(fd, &efds) && !(e & (TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT))) 
+		e |= TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT;
 	return e;
 }
 

@@ -60,7 +60,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
 	// ok
-	return TB_ETYPE_SIGL;
+	return 1;
 }
 
 

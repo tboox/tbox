@@ -32,100 +32,89 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-// eobject
+// eio
 #if defined(TB_CONFIG_EVENT_HAVE_POLL)
-# 	include "reactor/eobject/poll.c"
+# 	include "reactor/eio/poll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_PORT)
-# 	include "reactor/eobject/port.c"
+# 	include "reactor/eio/port.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "reactor/eobject/select.c"
+# 	include "reactor/eio/select.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-# 	include "reactor/epool/epoll.c"
+# 	include "reactor/eiop/epoll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
-# 	include "reactor/eobject/kqueue.c"
+# 	include "reactor/eio/kqueue.c"
 #else
 # 	error have not available event mode
 #endif
 
-// epool
+// eiop
 #if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-# 	include "reactor/epool/epoll.c"
+# 	include "reactor/eiop/epoll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
-# 	include "reactor/epool/poll.c"
+# 	include "reactor/eiop/poll.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_PORT)
-# 	include "reactor/epool/port.c"
+# 	include "reactor/eiop/port.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-# 	include "reactor/epool/select.c"
+# 	include "reactor/eiop/select.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_KQUEUE)
-# 	include "reactor/epool/kqueue.c"
+# 	include "reactor/eiop/kqueue.c"
 #else
 # 	error have not available event mode
 #endif
 
 /* /////////////////////////////////////////////////////////
- * eobject
+ * eio
  */
 
 #if defined(TB_CONFIG_EVENT_HAVE_POLL)
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_file_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_poll_wait(object, timeout);
+	return tb_eio_reactor_poll_wait(object, timeout);
 }
-tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_sock_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_poll_wait(object, timeout);
+	return tb_eio_reactor_poll_wait(object, timeout);
 }
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-tb_long_t tb_eobject_reactor_file_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_file_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_select_wait(object, timeout);
+	return tb_eio_reactor_select_wait(object, timeout);
 }
-tb_long_t tb_eobject_reactor_sock_wait(tb_eobject_t* object, tb_long_t timeout)
+tb_long_t tb_eio_reactor_sock_wait(tb_eio_t* object, tb_long_t timeout)
 {
-	return tb_eobject_reactor_select_wait(object, timeout);
+	return tb_eio_reactor_select_wait(object, timeout);
 }
 #endif
-
-tb_long_t tb_eobject_reactor_evet_wait(tb_eobject_t* object, tb_long_t timeout)
-{
-	tb_assert_and_check_return_val(object && object->handle && object->otype == TB_EOTYPE_EVET, -1);
-	return tb_event_wait(object->handle, timeout);
-}
 
 /* /////////////////////////////////////////////////////////
- * epool
+ * eiop
  */
 #if defined(TB_CONFIG_EVENT_HAVE_EPOLL)
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_file_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_epoll_init(epool);
+	return tb_eiop_reactor_epoll_init(eiop);
 }
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_sock_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_epoll_init(epool);
+	return tb_eiop_reactor_epoll_init(eiop);
 }
 #elif defined(TB_CONFIG_EVENT_HAVE_POLL)
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_file_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_poll_init(epool);
+	return tb_eiop_reactor_poll_init(eiop);
 }
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_sock_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_poll_init(epool);
+	return tb_eiop_reactor_poll_init(eiop);
 }
 #elif defined(TB_CONFIG_EVENT_HAVE_SELECT)
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_file_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_select_init(epool);
+	return tb_eiop_reactor_select_init(eiop);
 }
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
+tb_eiop_reactor_t* tb_eiop_reactor_sock_init(tb_eiop_t* eiop)
 {
-	return tb_epool_reactor_select_init(epool);
+	return tb_eiop_reactor_select_init(eiop);
 }
 #endif
 
-tb_epool_reactor_t* tb_epool_reactor_evet_init(tb_epool_t* epool)
-{
-	tb_trace_noimpl();
-	return TB_NULL;
-}

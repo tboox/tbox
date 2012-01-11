@@ -30,10 +30,10 @@
  */
 
 // the epoll reactor type
-typedef struct __tb_epool_reactor_epoll_t
+typedef struct __tb_eiop_reactor_epoll_t
 {
 	// the reactor base
-	tb_epool_reactor_t 		base;
+	tb_eiop_reactor_t 		base;
 
 	// the epoll fd
 	tb_long_t 				epfd;
@@ -42,14 +42,14 @@ typedef struct __tb_epool_reactor_epoll_t
 	struct epoll_event* 	evts;
 	tb_size_t 				evtn;
 	
-}tb_epool_reactor_epoll_t;
+}tb_eiop_reactor_epoll_t;
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_epool_reactor_epoll_addo(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_epoll_addo(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, TB_FALSE);
 
 	// fd
@@ -58,8 +58,8 @@ static tb_bool_t tb_epool_reactor_epoll_addo(tb_epool_reactor_t* reactor, tb_han
 
 	// init 
 	struct epoll_event e = {0};
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT;
+	if (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT) e.events |= EPOLLIN;
+	if (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN) e.events |= EPOLLOUT;
 	e.events |= EPOLLET;
 	e.data.u64 = (((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
 
@@ -69,9 +69,9 @@ static tb_bool_t tb_epool_reactor_epoll_addo(tb_epool_reactor_t* reactor, tb_han
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_epoll_seto(tb_epool_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_eiop_reactor_epoll_seto(tb_eiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, TB_FALSE);
 
 	// fd
@@ -80,8 +80,8 @@ static tb_bool_t tb_epool_reactor_epoll_seto(tb_epool_reactor_t* reactor, tb_han
 
 	// init 
 	struct epoll_event e = {0};
-	if (etype & TB_ETYPE_READ || etype & TB_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
-	if (etype & TB_ETYPE_WRIT || etype & TB_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
+	if (etype & TB_EIO_ETYPE_READ || etype & TB_EIO_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
+	if (etype & TB_EIO_ETYPE_WRIT || etype & TB_EIO_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
 	e.data.u64 = (((tb_uint64_t)etype << 32) | (tb_uint64_t)(tb_uint32_t)handle);
 
 	// ctrl
@@ -90,9 +90,9 @@ static tb_bool_t tb_epool_reactor_epoll_seto(tb_epool_reactor_t* reactor, tb_han
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_epool_reactor_epoll_delo(tb_epool_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_eiop_reactor_epoll_delo(tb_eiop_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, TB_FALSE);
 
 	// fd
@@ -106,13 +106,13 @@ static tb_bool_t tb_epool_reactor_epoll_delo(tb_epool_reactor_t* reactor, tb_han
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_epool_reactor_epoll_wait(tb_epool_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_eiop_reactor_epoll_wait(tb_eiop_reactor_t* reactor, tb_long_t timeout)
 {	
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0 && reactor->epool, -1);
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0 && reactor->eiop, -1);
 
 	// init grow
-	tb_size_t maxn = reactor->epool->maxn;
+	tb_size_t maxn = reactor->eiop->maxn;
 	tb_size_t grow = tb_align8((maxn >> 3) + 1);
 
 	// init events
@@ -146,39 +146,39 @@ static tb_long_t tb_epool_reactor_epoll_wait(tb_epool_reactor_t* reactor, tb_lon
 	// ok
 	return evtn;
 }
-static tb_void_t tb_epool_reactor_epoll_sync(tb_epool_reactor_t* reactor, tb_size_t evtn)
+static tb_void_t tb_eiop_reactor_epoll_sync(tb_eiop_reactor_t* reactor, tb_size_t evtn)
 {	
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->epfd >= 0 && reactor->epool && reactor->epool->objs);
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->epfd >= 0 && reactor->eiop && reactor->eiop->objs);
 
 	// sync
 	tb_size_t i = 0;
 	for (i = 0; i < evtn; i++)
 	{
 		struct epoll_event* e = rtor->evts + i;
-		tb_eobject_t* 		o = reactor->epool->objs + i;
+		tb_eio_t* 		o = reactor->eiop->objs + i;
 		tb_size_t 			etype = (tb_size_t)((e->data.u64 >> 32) & 0x00ffffff);
 
 		o->handle = (tb_handle_t)(tb_uint32_t)e->data.u64;
-		o->otype = reactor->epool->type;
+		o->otype = reactor->eiop->type;
 		o->etype = 0;
 		if (e->events & EPOLLIN) 
 		{
-			o->etype |= TB_ETYPE_READ;
-			if (etype & TB_ETYPE_ACPT) o->etype |= TB_ETYPE_ACPT;
+			o->etype |= TB_EIO_ETYPE_READ;
+			if (etype & TB_EIO_ETYPE_ACPT) o->etype |= TB_EIO_ETYPE_ACPT;
 		}
 		if (e->events & EPOLLOUT) 
 		{
-			o->etype |= TB_ETYPE_WRIT;
-			if (etype & TB_ETYPE_CONN) o->etype |= TB_ETYPE_CONN;
+			o->etype |= TB_EIO_ETYPE_WRIT;
+			if (etype & TB_EIO_ETYPE_CONN) o->etype |= TB_EIO_ETYPE_CONN;
 		}
-		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->etype & TB_ETYPE_READ | TB_ETYPE_WRIT)) 
-			o->etype |= TB_ETYPE_READ | TB_ETYPE_WRIT;
+		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->etype & TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT)) 
+			o->etype |= TB_EIO_ETYPE_READ | TB_EIO_ETYPE_WRIT;
 	}
 }
-static tb_void_t tb_epool_reactor_epoll_exit(tb_epool_reactor_t* reactor)
+static tb_void_t tb_eiop_reactor_epoll_exit(tb_eiop_reactor_t* reactor)
 {
-	tb_epool_reactor_epoll_t* rtor = (tb_epool_reactor_epoll_t*)reactor;
+	tb_eiop_reactor_epoll_t* rtor = (tb_eiop_reactor_epoll_t*)reactor;
 	if (rtor)
 	{
 		// free events
@@ -191,44 +191,34 @@ static tb_void_t tb_epool_reactor_epoll_exit(tb_epool_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-tb_epool_reactor_t* tb_epool_reactor_epoll_init(tb_epool_t* epool)
+static tb_eiop_reactor_t* tb_eiop_reactor_epoll_init(tb_eiop_t* eiop)
 {
 	// check
-	tb_assert_and_check_return_val(epool && epool->maxn, TB_NULL);
-	tb_assert_and_check_return_val(epool->type == TB_EOTYPE_FILE || epool->type == TB_EOTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(eiop && eiop->maxn, TB_NULL);
+	tb_assert_and_check_return_val(eiop->type == TB_EIO_OTYPE_FILE || eiop->type == TB_EIO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_epool_reactor_epoll_t* rtor = tb_calloc(1, sizeof(tb_epool_reactor_epoll_t));
+	tb_eiop_reactor_epoll_t* rtor = tb_calloc(1, sizeof(tb_eiop_reactor_epoll_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.epool = epool;
-	rtor->base.exit = tb_epool_reactor_epoll_exit;
-	rtor->base.addo = tb_epool_reactor_epoll_addo;
-	rtor->base.seto = tb_epool_reactor_epoll_seto;
-	rtor->base.delo = tb_epool_reactor_epoll_delo;
-	rtor->base.wait = tb_epool_reactor_epoll_wait;
-	rtor->base.sync = tb_epool_reactor_epoll_sync;
+	rtor->base.eiop = eiop;
+	rtor->base.exit = tb_eiop_reactor_epoll_exit;
+	rtor->base.addo = tb_eiop_reactor_epoll_addo;
+	rtor->base.seto = tb_eiop_reactor_epoll_seto;
+	rtor->base.delo = tb_eiop_reactor_epoll_delo;
+	rtor->base.wait = tb_eiop_reactor_epoll_wait;
+	rtor->base.sync = tb_eiop_reactor_epoll_sync;
 
 	// init epoll
-	rtor->epfd = epoll_create(epool->maxn);
+	rtor->epfd = epoll_create(eiop->maxn);
 	tb_assert_and_check_goto(rtor->epfd >= 0, fail);
 
 	// ok
-	return (tb_epool_reactor_t*)rtor;
+	return (tb_eiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_epool_reactor_epoll_exit(rtor);
+	if (rtor) tb_eiop_reactor_epoll_exit(rtor);
 	return TB_NULL;
 }
-tb_epool_reactor_t* tb_epool_reactor_file_init(tb_epool_t* epool)
-{
-	return tb_epool_reactor_epoll_init(epool);
-}
-tb_epool_reactor_t* tb_epool_reactor_sock_init(tb_epool_t* epool)
-{
-	return tb_epool_reactor_epoll_init(epool);
-}
+
