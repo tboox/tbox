@@ -17,52 +17,50 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		event.c
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "platform/platform.h"
-#include "container/container.h"
-#include "encoding/encoding.h"
-#include "network/network.h"
-#include "format/format.h"
-#include "memory/memory.h"
-#include "stream/stream.h"
-#include "string/string.h"
-#include "utils/utils.h"
-#include "math/math.h"
-#include "libc/libc.h"
-#include "aio/aio.h"
-#include "xml/xml.h"
-#include "zip/zip.h"
-#include "libs/libs.h"
+#include "../event.h"
+#include "windows.h"
 
 /* /////////////////////////////////////////////////////////
- * interfaces
+ * implemention
  */
 
-// init & exit
-tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
-tb_void_t 			tb_exit();
-
-// version
-tb_char_t const* 	tb_version();
-
-
-// c plus plus
-#ifdef __cplusplus
+tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
+{
+	HANDLE handle = CreateEvent(NULL, FALSE, bsignal? TRUE : FALSE, name);
+	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
 }
-#endif
+tb_void_t tb_event_exit(tb_handle_t handle)
+{
+	if (handle) CloseHandle(handle);
+}
+tb_void_t tb_event_post(tb_handle_t handle)
+{
+	if (handle) SetEvent(handle);
+}
+tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(handle, -1);
 
-#endif
+	// wait
+	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
+	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+
+	// timeout?
+	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+
+	// error?
+	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+
+	// ok
+	return 1;
+}
+
+

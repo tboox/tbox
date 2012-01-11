@@ -17,52 +17,35 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		waito.c
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* /////////////////////////////////////////////////////////
- * includes
+ * implemention
  */
-#include "prefix.h"
-#include "platform/platform.h"
-#include "container/container.h"
-#include "encoding/encoding.h"
-#include "network/network.h"
-#include "format/format.h"
-#include "memory/memory.h"
-#include "stream/stream.h"
-#include "string/string.h"
-#include "utils/utils.h"
-#include "math/math.h"
-#include "libc/libc.h"
-#include "aio/aio.h"
-#include "xml/xml.h"
-#include "zip/zip.h"
-#include "libs/libs.h"
+static tb_long_t tb_aioo_reactor_waito_wait(tb_aioo_t* object, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(object && object->handle, -1);
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
+	// type
+	tb_size_t otype = object->otype;
+	tb_size_t etype = object->etype;
+	
+	// check
+	tb_assert_and_check_return_val(otype == TB_AIOO_OTYPE_FILE, -1);
 
-// init & exit
-tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
-tb_void_t 			tb_exit();
+	// select
+	DWORD r = WaitForSingleObject(object->handle, timeout >= 0? timeout : INFINITE);
+	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
 
-// version
-tb_char_t const* 	tb_version();
+	// timeout?
+	tb_check_return_val(r != WAIT_TIMEOUT, 0);
 
+	// error?
+	tb_check_return_val(r == WAIT_OBJECT_0, -1);
 
-// c plus plus
-#ifdef __cplusplus
+	// ok
+	return etype;
 }
-#endif
 
-#endif
