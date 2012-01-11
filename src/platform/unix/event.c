@@ -29,10 +29,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/sem.h>
-#include <sys/stat.h>
 #include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/select.h>
 #include <errno.h>
 #include <unistd.h>
 
@@ -51,18 +48,7 @@ tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
 
 	// init semaphore
 	tb_long_t h = semget((key_t)k, 1, IPC_CREAT | IPC_EXCL | 0666);
-
-	// we got it first
-	if (h >= 0) ;
-	// have been existed?
-	else if (errno == EEXIST)
-	{
-		// get semaphore
-		h = semget((key_t)k, 1, 0);
-		tb_assert_and_check_return_val(h >= 0, TB_NULL);
-	}
-	// error
-	else return TB_NULL;
+	tb_assert_and_check_return_val(h >= 0, TB_NULL);
 
 ok:
 	// ok

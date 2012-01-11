@@ -134,6 +134,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
 						platform/$(TB_CONFIG_API_EVET)/event \
+						platform/$(TB_CONFIG_API_EVET)/epool \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor
 
 # flags
@@ -171,7 +172,7 @@ INC_FILES 				= \
 						memory/qbuffer.h \
 						aio/aio.h \
 						aio/prefix.h \
-						aio/aio.h \
+						aio/aioo.h \
 						aio/aiop.h \
 						math/prefix.h \
 						math/math.h \
@@ -216,7 +217,8 @@ INC_FILES 				= \
 						platform/mutex.h \
 						platform/thread.h \
 						platform/socket.h \
-						platform/aio.h \
+						platform/event.h \
+						platform/epool.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
