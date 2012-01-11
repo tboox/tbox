@@ -17,52 +17,16 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		tbox.h
+ * \file		prefix.h
  *
  */
-#ifndef TB_TBOX_H
-#define TB_TBOX_H
-
-// c plus plus
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef TB_PLATFROM_UNIX_AIO_PREFIX_H
+#define TB_PLATFROM_UNIX_AIO_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "platform/platform.h"
-#include "container/container.h"
-#include "encoding/encoding.h"
-#include "network/network.h"
-#include "format/format.h"
-#include "memory/memory.h"
-#include "stream/stream.h"
-#include "string/string.h"
-#include "utils/utils.h"
-#include "math/math.h"
-#include "libc/libc.h"
-#include "aio/aio.h"
-#include "xml/xml.h"
-#include "zip/zip.h"
-#include "libs/libs.h"
+#include "../prefix.h"
 
-/* /////////////////////////////////////////////////////////
- * interfaces
- */
-
-// init & exit
-tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
-tb_void_t 			tb_exit();
-
-// version
-tb_char_t const* 	tb_version();
-
-
-// c plus plus
-#ifdef __cplusplus
-}
-#endif
 
 #endif

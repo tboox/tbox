@@ -14,6 +14,7 @@ TB_CONFIG_API_UTIL 				= unix
 TB_CONFIG_API_MUTX 				= unix
 TB_CONFIG_API_THRD 				= unix
 TB_CONFIG_API_EVET 				= unix
+TB_CONFIG_API_ASIO 				= unix
 
 # libs
 TB_CONFIG_LIBS_ZLIB 			= y

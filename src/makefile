@@ -84,8 +84,8 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						event/eiop \
-						event/eio \
+						aio/aiop \
+						aio/aioo \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -133,8 +133,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
-						platform/$(TB_CONFIG_API_EVET)/event/event \
-						platform/$(TB_CONFIG_API_EVET)/event/reactor
+						platform/$(TB_CONFIG_API_EVET)/event \
+						platform/$(TB_CONFIG_API_ASIO)/aio/reactor
 
 # flags
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
@@ -169,10 +169,10 @@ INC_FILES 				= \
 						memory/sbuffer.h \
 						memory/rbuffer.h \
 						memory/qbuffer.h \
-						event/event.h \
-						event/prefix.h \
-						event/eio.h \
-						event/eiop.h \
+						aio/aio.h \
+						aio/prefix.h \
+						aio/aio.h \
+						aio/aiop.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -216,7 +216,7 @@ INC_FILES 				= \
 						platform/mutex.h \
 						platform/thread.h \
 						platform/socket.h \
-						platform/event.h \
+						platform/aio.h \
 						platform/atomic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
