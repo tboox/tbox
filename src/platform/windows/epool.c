@@ -17,16 +17,58 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		epool.c
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_EVENT_PREFIX_H
-#define TB_PLATFROM_WINDOWS_EVENT_PREFIX_H
-
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
+#include "../epool.h"
+#include "windows.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-#endif
+tb_handle_t tb_epool_init(tb_size_t maxn)
+{
+	return TB_NULL;
+}
+tb_void_t tb_epool_exit(tb_handle_t epool)
+{
+}
+
+tb_size_t tb_epool_maxn(tb_handle_t epool)
+{
+	return 0;
+}
+
+tb_size_t tb_epool_size(tb_handle_t epool)
+{
+	return 0;
+}
+
+tb_handle_t tb_epool_adde(tb_handle_t epool, tb_handle_t event, tb_pointer_t edata, tb_bool_t bsignal)
+{
+	return TB_NULL;
+}
+
+tb_void_t tb_epool_dele(tb_handle_t epool, tb_handle_t event)
+{
+}
+
+tb_void_t tb_epool_post(tb_handle_t epool, tb_handle_t event)
+{
+}
+
+tb_long_t tb_epool_wait(tb_handle_t epool, tb_long_t timeout)
+{
+	return 0;
+}
+
+tb_handle_t* tb_epool_objs(tb_handle_t epool)
+{
+	return TB_NULL;
+}
+

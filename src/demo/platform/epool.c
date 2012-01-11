@@ -13,7 +13,7 @@
  */
 typedef struct __tb_test_item_t
 {
-	tb_handle_t 	e[TB_TEST_ITEM_MAX];
+	tb_handle_t 	e;
 	tb_handle_t 	t;
 	tb_size_t 		q;
 
@@ -24,27 +24,18 @@ typedef struct __tb_test_item_t
  */
 static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 {
-	tb_aiop_t* 	ep = TB_NULL;
 	tb_test_item_t* it = (tb_test_item_t*)cb_data;
 	tb_assert_and_check_goto(it, end);
 	tb_print("[thread]: init");
-
-	// init aiop
-	ep = tb_aiop_init(TB_AIOO_OTYPE_EVET, TB_TEST_ITEM_MAX);
-	tb_assert_and_check_goto(ep, end);
-
-	// add event
-	tb_size_t i = 0;
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) 
-		if (it->e[i]) tb_aiop_addo(ep, it->e[i], TB_AIOO_ETYPE_SIGL);
 
 	// loop
 	while (1)
 	{
 		// wait
 		tb_print("[event]: wait");
-		tb_long_t 		r = tb_aiop_wait(ep, -1);
-		tb_aioo_t* 	o = tb_aiop_objs(ep);
+		tb_long_t 		r = tb_epool_wait(it->e, -1);
+		tb_handle_t* 	o = tb_epool_objs(it->e);
+		tb_pointer_t* 	d = tb_epool_data(it->e);
 		tb_assert_and_check_goto(r >= 0 && o, end);
 
 		// quit?
@@ -53,18 +44,13 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// timeout?
 		tb_check_continue(r);
 
-		// check
-		tb_assert_and_check_goto(o->etype & TB_AIOO_ETYPE_SIGL && o->otype == TB_AIOO_OTYPE_EVET, end);
-
 		// signal
+		tb_size_t i = 0;
 		for (i = 0; i < r; i++) 
-			tb_print("[event: %x]: signal", o[i].handle);
+			tb_print("[event: %x %u]: signal", o[i], d? d[i] : 0);
 	}
 
 end:
-
-	// exit aiop
-	if (ep) tb_aiop_exit(ep);
 
 	// exit thread
 	tb_print("[thread]: exit");
@@ -82,9 +68,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init item
 	tb_test_item_t it = {0};
 
+	// init epool
+	it.e = tb_epool_init(TB_TEST_ITEM_MAX);
+	tb_assert_and_check_return_val(it.e, 0);
+
 	// init event
-	tb_size_t i = 0;
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) it.e[i] = tb_event_init(TB_NULL, TB_FALSE);
+	tb_size_t 	i = 0;
+	tb_handle_t e[TB_TEST_ITEM_MAX] = {TB_NULL};
+	for (i = 0; i < TB_TEST_ITEM_MAX; i++) e[i] = tb_epool_adde(it.e, i, TB_FALSE);
 
 	// init thread
 	it.t = tb_thread_init(TB_NULL, tb_test_thread, &it, 0);
@@ -111,7 +102,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 						{
 							// post event
 							tb_size_t i = ch - '0';
-							if (it.e[i]) tb_event_post(it.e[i]);
+							tb_epool_post(it.e, e[i]);
 						}
 					}
 					break;
@@ -124,8 +115,8 @@ end:
 	// quit thread
 	it.q = 1;
 
-	// post event
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) if (it.e[i]) tb_event_post(it.e[i]);
+	// kill events
+	tb_epool_kill(it.e);
 
 	// kill thread
 	if (it.t) 
@@ -136,7 +127,7 @@ end:
 	}
 
 	// exit event
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) if (it.e[i]) tb_event_exit(it.e[i]);
+	tb_epool_exit(it.e);
 
 	tb_print("quit");
 	tb_exit();
