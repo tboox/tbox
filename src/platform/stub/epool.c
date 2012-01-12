@@ -26,6 +26,7 @@
 #include "prefix.h"
 #include "../epool.h"
 #include "../event.h"
+#include "../mutex.h"
 #include "../../container/container.h"
 
 /* /////////////////////////////////////////////////////////
@@ -225,7 +226,7 @@ tb_void_t tb_epool_post(tb_handle_t epool, tb_handle_t event)
 
 		// get event
 		tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, event);
-		tb_assert_and_check_return(e);
+		tb_assert_and_check_goto(e, end);
 
 		// post event 
 		e->post = 1;
