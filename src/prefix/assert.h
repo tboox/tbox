@@ -55,7 +55,7 @@
 # 	define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
 # 	define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
 # 	define tb_assert_break_tag(tag, x)						{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); break ; } }
-# 	define tb_assert_continue_tag(tag, x, b)				{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); continue ; } }
+# 	define tb_assert_continue_tag(tag, x)					{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); continue ; } }
 # 	define tb_assert_and_check_abort_tag(tag, x)			tb_assert_abort_tag(tag, x)
 # 	define tb_assert_and_check_return_tag(tag, x)			tb_assert_return_tag(tag, x)
 # 	define tb_assert_and_check_return_val_tag(tag, x, v)	tb_assert_return_val_tag(tag, x, v)
@@ -69,7 +69,7 @@
 # 	define tb_assert_return_val_tag(tag, x, v)
 # 	define tb_assert_goto_tag(tag, x, b)
 # 	define tb_assert_break_tag(tag, x)
-# 	define tb_assert_continue_tag(tag, x, b)
+# 	define tb_assert_continue_tag(tag, x)
 # 	define tb_assert_and_check_abort_tag(tag, x)			tb_check_abort(x)
 # 	define tb_assert_and_check_return_tag(tag, x)			tb_check_return(x)
 # 	define tb_assert_and_check_return_val_tag(tag, x, v)	tb_check_return_val(x, v)

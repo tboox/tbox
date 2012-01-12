@@ -29,8 +29,24 @@
 #include "prefix.h"
 
 /* /////////////////////////////////////////////////////////
+ * types
+ */
+
+// the epool object type
+typedef struct __tb_eobject_t
+{
+	// the event
+	tb_handle_t 	evet;
+
+	// the data
+	tb_pointer_t 	data;
+
+}tb_eobject_t;
+
+/* /////////////////////////////////////////////////////////
  * interfaces
  */
+
 /// init the event pool
 tb_handle_t 	tb_epool_init(tb_size_t maxn);
 
@@ -47,11 +63,10 @@ tb_size_t 		tb_epool_size(tb_handle_t epool);
  *
  * @param 	epool 	the event pool
  * @param 	edata 	the event data
- * @param 	bsignal	the event signal for initialization
  *
  * @return 	the number of the objects, return 0 if failed
  */
-tb_handle_t 	tb_epool_adde(tb_handle_t epool, tb_pointer_t edata, tb_bool_t bsignal);
+tb_handle_t 	tb_epool_adde(tb_handle_t epool, tb_pointer_t edata);
 
 /*!del the event object
  *
@@ -90,9 +105,6 @@ tb_void_t 		tb_epool_kill(tb_handle_t epool);
 tb_long_t 		tb_epool_wait(tb_handle_t epool, tb_long_t timeout);
 
 /// the event objs
-tb_handle_t* 	tb_epool_objs(tb_handle_t epool);
-
-/// the event data
-tb_pointer_t* 	tb_epool_data(tb_handle_t epool);
+tb_eobject_t* 	tb_epool_objs(tb_handle_t epool);
 
 #endif

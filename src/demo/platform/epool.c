@@ -34,8 +34,7 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// wait
 		tb_print("[event]: wait");
 		tb_long_t 		r = tb_epool_wait(it->e, -1);
-		tb_handle_t* 	o = tb_epool_objs(it->e);
-		tb_pointer_t* 	d = tb_epool_data(it->e);
+		tb_eobject_t* 	o = tb_epool_objs(it->e);
 		tb_assert_and_check_goto(r >= 0 && o, end);
 
 		// quit?
@@ -47,7 +46,7 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// signal
 		tb_size_t i = 0;
 		for (i = 0; i < r; i++) 
-			tb_print("[event: %x %u]: signal", o[i], d? d[i] : 0);
+			tb_print("[event: %u]: signal", o[i].data);
 	}
 
 end:
@@ -69,13 +68,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_test_item_t it = {0};
 
 	// init epool
-	it.e = tb_epool_init(TB_TEST_ITEM_MAX);
+	it.e = tb_epool_init(TB_TEST_ITEM_MAX + 10);
 	tb_assert_and_check_return_val(it.e, 0);
 
 	// init event
 	tb_size_t 	i = 0;
 	tb_handle_t e[TB_TEST_ITEM_MAX] = {TB_NULL};
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) e[i] = tb_epool_adde(it.e, i, TB_FALSE);
+	for (i = 0; i < TB_TEST_ITEM_MAX; i++) e[i] = tb_epool_adde(it.e, i);
 
 	// init thread
 	it.t = tb_thread_init(TB_NULL, tb_test_thread, &it, 0);

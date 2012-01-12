@@ -33,7 +33,7 @@
  * interfaces
  */
 
-tb_handle_t 	tb_event_init(tb_char_t const* name, tb_bool_t bsignal);
+tb_handle_t 	tb_event_init(tb_char_t const* name);
 tb_void_t 		tb_event_exit(tb_handle_t handle);
 
 tb_void_t 		tb_event_post(tb_handle_t handle);
