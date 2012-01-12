@@ -36,7 +36,7 @@
 tb_handle_t tb_mutex_init(tb_char_t const* name)
 {
 	pthread_mutex_t* pmutex = malloc(sizeof(pthread_mutex_t));
-	if (!pmutex || 0 != pthread_mutex_init(pmutex, NULL)) return TB_NULL;
+	if (!pmutex || 0 != pthread_mutex_init(pmutex, TB_NULL)) return TB_NULL;
 	else return ((tb_handle_t)pmutex);
 }
 tb_void_t tb_mutex_exit(tb_handle_t handle)
