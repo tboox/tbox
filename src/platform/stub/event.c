@@ -27,32 +27,13 @@
 #include "../atomic.h"
 
 /* /////////////////////////////////////////////////////////
- * types
- */
-
-// the event type
-typedef struct __tb_event_t
-{
-	// mutx
-	tb_handle_t 	mutx;
-
-	// post
-	tb_size_t 		post; 
-
-}tb_event_t;
-
-/* /////////////////////////////////////////////////////////
  * implemention
  */
 tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
-	tb_event_t* e = tb_calloc(1, sizeof(tb_event_t));
+	tb_size_t* e = tb_calloc(1, sizeof(tb_size_t));
 	tb_assert_and_check_return_val(e, TB_NULL);
-
-	// init mutx
-	e->mutx = tb_mutex_init(name);
-	tb_assert_and_check_goto(e->mutx, fail);
 
 	// warning
 	tb_warning("the event impl maybe not fast");
@@ -67,7 +48,7 @@ fail:
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
 	tb_assert_and_check_return(handle);
-	tb_event_t* e = (tb_event_t*)handle;
+	tb_size_t* e = (tb_size_t*)handle;
 
 	// post first
 	tb_event_post(handle);
@@ -75,35 +56,31 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 	// wait some time
 	tb_msleep(200);
 
-	// free cond
-	if (e->mutx) tb_mutex_exit(e->mutx);
-
 	// free it
 	tb_free(e);
 }
 tb_void_t tb_event_post(tb_handle_t handle)
 {
 	tb_assert_and_check_return(handle);
-	tb_event_t* e = (tb_event_t*)handle;
+	tb_size_t* e = (tb_size_t*)handle;
 
 	// post signal
-	tb_atomic_set(&e->post, 1);
+	tb_atomic_set(e, 1);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(handle, -1);
-	tb_event_t* e = (tb_event_t*)handle;
+	tb_size_t* e = (tb_size_t*)handle;
 
 	// init
 	tb_long_t 	r = 0;
 	tb_int64_t 	base = tb_mclock();
 
 	// wait 
-	tb_mutex_enter(e->mutx);
 	while (1)
 	{
 		// get post
-		tb_size_t post = tb_atomic_fetch_and_set0(&e->post);
+		tb_size_t post = tb_atomic_fetch_and_set0(e);
 
 		// has signal?
 		if (post == 1) 
@@ -125,7 +102,6 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 			else tb_msleep(200);
 		}
 	}
-	tb_mutex_leave(e->mutx);
 
 	return r;
 }

@@ -32,6 +32,17 @@
  * types
  */
 
+// the event type
+typedef struct __tb_event_t
+{
+	// post
+	tb_size_t 		post; 
+
+	// data
+	tb_pointer_t 	data;
+
+}tb_event_t;
+
 // the epool type
 typedef struct __tb_epool_t
 {
@@ -44,25 +55,10 @@ typedef struct __tb_epool_t
 	// the event list
 	tb_dlist_t* 	list;
 
-	// the objects
-	tb_vector_t* 	objs;
+	// the mutex
+	tb_handle_t 	mutx;
 
 }tb_epool_t;
-
-/* /////////////////////////////////////////////////////////
- * free
- */
-static tb_void_t tb_epool_event_free(tb_item_func_t* func, tb_pointer_t item)
-{
-	tb_assert_and_check_return(func && item);
-	tb_eobject_t* o = (tb_eobject_t*)item;
-
-	// exit event
-	if (o->evet) tb_event_exit(o->evet);
-
-	// clean
-	tb_memset(o, 0, sizeof(tb_eobject_t));
-}
 
 /* /////////////////////////////////////////////////////////
  * interfaces
@@ -79,18 +75,18 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	// init
 	ep->maxn = maxn;
 
+	// init mutx
+	ep->mutx = tb_mutex_init(TB_NULL);
+	tb_assert_and_check_goto(ep->mutx, fail);
+
 	// init spank
 	ep->spak = tb_event_init(TB_NULL);
 	tb_assert_and_check_goto(ep->spak, fail);
 
 	// init events
-	ep->list = tb_dlist_init(tb_align8((ep->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_eobject_t), tb_epool_event_free, TB_NULL));
+	ep->list = tb_dlist_init(tb_align8((ep->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_event_t), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(ep->list, fail);
 	
-	// init objs
-	ep->objs = tb_vector_init(tb_align8((ep->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_eobject_t), TB_NULL, TB_NULL));
-	tb_assert_and_check_goto(ep->objs, fail);
-
 	// ok
 	return (tb_handle_t)ep;
 
@@ -106,14 +102,21 @@ tb_void_t tb_epool_exit(tb_handle_t epool)
 		// kill 
 		tb_epool_kill(ep);
 
-		// exit spank
-		if (ep->spak) tb_event_exit(ep->spak);
+		// enter
+		if (!ep->mutx || tb_mutex_enter(ep->mutx))
+		{
+			// exit spank
+			if (ep->spak) tb_event_exit(ep->spak);
 
-		// exit list
-		if (ep->list) tb_dlist_exit(ep->list);
+			// exit list
+			if (ep->list) tb_dlist_exit(ep->list);
 
-		// free objs
-		if (ep->objs) tb_vector_exit(ep->objs);
+			// leave
+			if (ep->mutx) tb_mutex_leave(ep->mutx);
+		}
+
+		// exit mutx
+		if (ep->mutx) tb_mutex_exit(ep->mutx);
 
 		// free it
 		tb_free(ep);
@@ -122,132 +125,215 @@ tb_void_t tb_epool_exit(tb_handle_t epool)
 tb_size_t tb_epool_maxn(tb_handle_t epool)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep, 0);
+	tb_assert_and_check_return_val(ep && ep->mutx, 0);
 
-	return ep->maxn;
+	// enter
+	tb_size_t maxn = 0;
+	if (tb_mutex_enter(ep->mutx))
+	{
+		// maxn
+		maxn = ep->maxn;
+
+		// leave
+		tb_mutex_leave(ep->mutx);
+	}
+
+	return maxn;
 }
 tb_size_t tb_epool_size(tb_handle_t epool)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep && ep->list, 0);
+	tb_assert_and_check_return_val(ep && ep->mutx, 0);
 
-	return tb_dlist_size(ep->list);
+	// enter
+	tb_size_t size = 0;
+	if (tb_mutex_enter(ep->mutx))
+	{
+		// check
+		tb_assert_and_check_goto(ep->list, end);
+
+		// size
+		size = tb_dlist_size(ep->list);
+	}
+
+end:
+
+	// leave
+	tb_mutex_leave(ep->mutx);
+
+	return size;
 }
 tb_handle_t tb_epool_adde(tb_handle_t epool, tb_pointer_t edata)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep && ep->list && tb_dlist_size(ep->list) < ep->maxn, TB_NULL);
+	tb_assert_and_check_return_val(ep && ep->mutx, TB_NULL);
 
-	// init event
-	tb_handle_t e = tb_event_init(TB_NULL);
-	tb_assert_and_check_return_val(e, TB_NULL);
+	// enter
+	tb_size_t itor = 0;
+	if (tb_mutex_enter(ep->mutx))
+	{
+		// check
+		tb_assert_and_check_goto(ep->list && tb_dlist_size(ep->list) < ep->maxn, end);
 
-	// init object
-	tb_eobject_t o;
-	o.evet = e;
-	o.data = edata;
+		// init event
+		tb_event_t e;
+		e.post = 0;
+		e.data = edata;
 
-	// add event
-	tb_size_t itor = tb_dlist_insert_tail(ep->list, &o);
-	tb_assert_and_check_goto(itor, fail);
+		// add event
+		itor = tb_dlist_insert_tail(ep->list, &e);
+	}
 
-	// ok
+end:
+
+	// leave
+	tb_mutex_leave(ep->mutx);
+
 	return (tb_handle_t)itor;
-
-fail:
-	if (e) tb_event_exit(e);
-	return TB_NULL;
 }
 tb_void_t tb_epool_dele(tb_handle_t epool, tb_handle_t event)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return(ep && ep->list && tb_dlist_size(ep->list) && event);
+	tb_assert_and_check_return(ep && ep->mutx && event);
 
 	// post first
 	tb_epool_post(epool, event);
 
-	// remove it
-	tb_dlist_remove(ep->list, (tb_size_t)event);
+	// enter
+	if (tb_mutex_enter(ep->mutx))
+	{	
+		// check
+		tb_assert_and_check_goto(ep->list && tb_dlist_size(ep->list), end);
+
+		// remove it
+		tb_dlist_remove(ep->list, (tb_size_t)event);
+	}
+end:
+	// leave
+	tb_mutex_leave(ep->mutx);
 }
 tb_void_t tb_epool_post(tb_handle_t epool, tb_handle_t event)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return(ep && ep->spak && ep->list && tb_dlist_size(ep->list) && event);
+	tb_assert_and_check_return(ep && ep->mutx && event);
 
-	// get object
-	tb_eobject_t const* o = (tb_eobject_t const*)tb_dlist_itor_const_at(ep->list, event);
-	tb_assert_and_check_return(o && o->evet);
+	// enter
+	if (tb_mutex_enter(ep->mutx))
+	{	
+		// check
+		tb_assert_and_check_goto(ep->spak && ep->list && tb_dlist_size(ep->list), end);
 
-	// post event 
-	tb_event_post(o->evet);
+		// get event
+		tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, event);
+		tb_assert_and_check_return(e);
 
-	// post spank
-	tb_event_post(ep->spak);
+		// post event 
+		e->post = 1;
+
+		// post spank
+		tb_event_post(ep->spak);
+
+	}
+end:
+	// leave
+	tb_mutex_leave(ep->mutx);
 }
 tb_void_t tb_epool_kill(tb_handle_t epool)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return(ep && ep->spak && ep->list);
+	tb_assert_and_check_return(ep && ep->mutx);
 
-	// post events
-	tb_size_t itor = tb_dlist_itor_head(ep->list);
-	tb_size_t tail = tb_dlist_itor_tail(ep->list);
-	for (; itor != tail; itor = tb_dlist_itor_next(ep->list, itor))
+	// enter
+	if (tb_mutex_enter(ep->mutx))
 	{
-		// get event
-		tb_eobject_t const* o = (tb_eobject_t const*)tb_dlist_itor_const_at(ep->list, itor);
-		tb_assert_and_check_continue(o && o->evet);
+		// check
+		tb_assert_and_check_goto(ep->spak && ep->list, end);
 
-		// post event
-		tb_event_post(o->evet);
+		// post events
+		tb_size_t itor = tb_dlist_itor_head(ep->list);
+		tb_size_t tail = tb_dlist_itor_tail(ep->list);
+		for (; itor != tail; itor = tb_dlist_itor_next(ep->list, itor))
+		{
+			// get event
+			tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, itor);
+			tb_assert_and_check_continue(e);
+
+			// post event
+			e->post = 1;
+		}
+
+		// post spank
+		tb_event_post(ep->spak);
 	}
-
-	// post spank
-	tb_event_post(ep->spak);
+end:
+	// leave
+	tb_mutex_leave(ep->mutx);
 }
-tb_long_t tb_epool_wait(tb_handle_t epool, tb_long_t timeout)
+tb_long_t tb_epool_wait(tb_handle_t epool, tb_eobject_t* objs, tb_size_t maxn, tb_long_t timeout)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep && ep->spak && ep->list && ep->objs, -1);
+	tb_assert_and_check_return_val(ep && ep->mutx && objs && maxn, -1);
 
-	// wait spank
-	tb_long_t r = tb_event_wait(ep->spak, timeout);
-    tb_check_return_val(r >= 0, -1);
+	// get spak
+	tb_long_t 	r = -1;
+	tb_handle_t spak = TB_NULL;
+	if (tb_mutex_enter(ep->mutx))
+	{
+		// check
+		tb_assert_and_check_goto(ep->spak && ep->list, end);
+
+		// spak
+		spak = ep->spak;
+
+		// leave
+		tb_mutex_leave(ep->mutx);
+	}
+
+	// wait 
+	r = tb_event_wait(spak, timeout);
+
+	// error?
+	tb_assert_and_check_return_val(r >= 0, -1);
 
 	// timeout?
-    tb_check_return_val(r, 0);
+	tb_check_return_val(r, 0);
 
-	// clear objs
-	tb_vector_clear(ep->objs);
+	// enter
+	r = -1;
+	if (!tb_mutex_enter(ep->mutx)) return -1;
 
 	// wait events
+	tb_size_t n = 0;
 	tb_size_t itor = tb_dlist_itor_head(ep->list);
 	tb_size_t tail = tb_dlist_itor_tail(ep->list);
-	for (; itor != tail; itor = tb_dlist_itor_next(ep->list, itor))
+	for (; itor != tail && n < maxn; itor = tb_dlist_itor_next(ep->list, itor))
 	{
 		// get event
-		tb_eobject_t const* o = (tb_eobject_t const*)tb_dlist_itor_const_at(ep->list, itor);
-		tb_assert_and_check_continue(o && o->evet);
+		tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, itor);
+		tb_assert_and_check_continue(e);
 
-		// wait event
-		r = tb_event_wait(o->evet, 0);
-    	tb_check_return_val(r >= 0, -1);
+		// wait post
+		tb_size_t post = e->post;
+		tb_assert_and_check_goto(!post || post == 1, end);
 
 		// timeout? next 
-		tb_check_continue(r);
+		tb_check_continue(post);
+
+		// reset post
+		e->post = 0;
 		
 		// has signal? add it to the returned objects
-		tb_vector_insert_tail(ep->objs, o);
+		objs[n].evet = (tb_handle_t)itor;
+		objs[n].data = e->data;
+		n++;
 	}
 
 	// ok
-	return tb_vector_size(ep->objs);
-}
-tb_eobject_t* tb_epool_objs(tb_handle_t epool)
-{
-	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep && ep->objs, TB_NULL);
+	r = n;
 
-	return (tb_eobject_t*)tb_vector_data(ep->objs);
+end:
+	// leave
+	if (!tb_mutex_leave(ep->mutx)) return -1;
+	return r;
 }
 
