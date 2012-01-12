@@ -39,7 +39,7 @@
 #elif defined(TB_CONFIG_EVENT_HAVE_PTHREAD)
 # 	include "event/pthread.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SYSTEMV)
-# 	include "event/system.c"
+# 	include "event/systemv.c"
 #else
 # 	include "../stub/event.c"
 #endif
