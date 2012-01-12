@@ -32,11 +32,14 @@
 #include <sys/ipc.h>
 #include <errno.h>
 #include <unistd.h>
+#include <time.h>
+#include <semaphore.h>
 
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
+#if 0
+tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// make key
 	tb_size_t k = IPC_PRIVATE;
@@ -48,7 +51,14 @@ tb_handle_t tb_event_init(tb_char_t const* name, tb_bool_t bsignal)
 
 	// init semaphore
 	tb_long_t h = semget((key_t)k, 1, IPC_CREAT | IPC_EXCL | 0666);
-	tb_assert_and_check_return_val(h >= 0, TB_NULL);
+	tb_assert_and_check_return_val(h >= 0 || errno == EEXIST, TB_NULL);
+
+	// exists?
+	if (errno == EEXIST)
+	{
+		h = semget((key_t)k, 1, 0);
+		tb_assert_and_check_return_val(h >= 0, TB_NULL);
+	}
 
 ok:
 	// ok
@@ -109,4 +119,62 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 	// error
 	return -1;
 }
+#else
+tb_handle_t tb_event_init(tb_char_t const* name)
+{
+	// alloc
+	sem_t* h = tb_calloc(1, sizeof(sem_t));
+	tb_assert_and_check_return_val(h, TB_NULL);
 
+	// init
+	if (sem_init(h, 0, 0) < 0) goto fail;
+
+	// ok
+	return (tb_handle_t)h;
+
+fail:
+	return TB_NULL;
+}
+tb_void_t tb_event_exit(tb_handle_t handle)
+{
+	tb_assert_and_check_return(handle);
+	sem_t* h = (sem_t*)handle;
+
+	sem_destroy(h);
+}
+tb_void_t tb_event_post(tb_handle_t handle)
+{
+	tb_assert_and_check_return(handle);
+	sem_t* h = (sem_t*)handle;
+
+	tb_long_t r = sem_post(h);
+    tb_assert(r != -1);
+}
+tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(handle, -1);
+	sem_t* h = (sem_t*)handle;
+
+	// init time
+	struct timespec t = {0};
+	t.tv_sec = time(TB_NULL);
+	if (timeout > 0)
+	{
+		t.tv_sec += timeout / 1000;
+		t.tv_nsec += (timeout % 1000) * 1000000;
+	}
+	else if (timeout < 0) t.tv_sec += 12 * 30 * 24 * 3600; // infinity: one year
+
+	// wait semaphore
+	tb_long_t r = sem_timedwait(h, &t);
+
+	// ok?
+    tb_check_return_val(r != 0, 1);
+
+	// timeout?
+    tb_check_return_val(errno != EAGAIN && errno != ETIMEDOUT, 0);
+
+	// error
+	return -1;
+}
+#endif
