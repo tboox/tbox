@@ -56,36 +56,49 @@
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 #		define tb_trace_tag(tag, fmt, ...)					tb_print_tag(tag, fmt, __VA_ARGS__)
 # 		define tb_trace_line_tag(tag, fmt, ...) 			tb_print_tag(tag, "func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
+# 		define tb_trace_waring_tag(tag, fmt, ...) 			tb_print_tag(tag, "warning: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
 # 	else
 #		define tb_trace_tag(tag, fmt, arg ...)				tb_print_tag(tag, fmt, ## arg)
 # 		define tb_trace_line_tag(tag, fmt, arg ...) 		tb_print_tag(tag, fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_trace_waring_tag(tag, fmt, arg ...) 		tb_print_tag(tag, "warning: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
 # 	endif
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_trace_tag(...)
 # 	define tb_trace_line_tag(...)
+# 	define tb_trace_warning_tag(...)
 #else
 #	define tb_trace_tag
 # 	define tb_trace_line_tag
+# 	define tb_trace_warning_tag
 #endif
 
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 # 		define tb_trace(fmt, ...)							tb_trace_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 # 		define tb_trace_line(fmt, ...) 						tb_trace_line_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
+# 		define tb_trace_warning(fmt, ...) 					tb_trace_waring_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 # 	else
 # 		define tb_trace(fmt, arg ...)						tb_trace_tag(TB_PRINT_TAG, fmt, ## arg)
 # 		define tb_trace_line(fmt, arg ...) 					tb_trace_line_tag(TB_PRINT_TAG, fmt, ## arg)
+# 		define tb_trace_warning(fmt, arg ...) 				tb_trace_waring_tag(TB_PRINT_TAG, fmt, ## arg)
 # 	endif
 #else
 # 	define tb_trace
 # 	define tb_trace_line
+# 	define tb_trace_warning
 #endif
 
+// noimpl
 #define tb_trace_noimpl_tag(tag) 							tb_trace_line_tag(tag, "[no_impl]:")
 #define tb_trace_noimpl() 									tb_trace_line("[no_impl]:")
 
-#define tb_trace_nosafe_tag(tag) 							tb_trace_line_tag(tag, "[no_safe]:")
-#define tb_trace_nosafe() 									tb_trace_line("[no_safe]:")
+// warning
+#define tb_warning_tag 										tb_trace_warning_tag
+#define tb_warning 											tb_trace_warning
+
+// nosafe
+#define tb_trace_nosafe_tag(tag) 							tb_trace_warning_tag(tag, "no_safe")
+#define tb_trace_nosafe() 									tb_trace_warning("no_safe")
 
 #endif
 
