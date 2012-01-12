@@ -98,13 +98,14 @@ tb_void_t 		tb_epool_kill(tb_handle_t epool);
  * return the event number if ok, otherwise return 0 for timeout
  *
  * @param 	epool 	the event pool
+ * @param 	objs 	the returned event objects
+ * @param 	maxn 	the maximum number of the returned event objects
+ * @param 	epool 	the event pool
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
  * @return 	the event number, return 0 if timeout, return -1 if error
  */
-tb_long_t 		tb_epool_wait(tb_handle_t epool, tb_long_t timeout);
+tb_long_t 		tb_epool_wait(tb_handle_t epool, tb_eobject_t* objs, tb_size_t maxn, tb_long_t timeout);
 
-/// the event objs
-tb_eobject_t* 	tb_epool_objs(tb_handle_t epool);
 
 #endif

@@ -30,13 +30,13 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 	tb_print("[thread]: init");
 
 	// loop
+	tb_eobject_t o[TB_TEST_ITEM_MAX];
 	while (1)
 	{
 		// wait
 		tb_print("[event]: wait");
-		tb_long_t 		r = tb_epool_wait(it->e, -1);
-		tb_eobject_t* 	o = tb_epool_objs(it->e);
-		tb_assert_and_check_goto(r >= 0 && o, end);
+		tb_long_t 		r = tb_epool_wait(it->e, o, TB_TEST_ITEM_MAX, -1);
+		tb_assert_and_check_goto(r >= 0, end);
 
 		// quit?
 		tb_check_goto(!it->q, end);
