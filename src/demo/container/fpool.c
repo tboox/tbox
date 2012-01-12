@@ -2,6 +2,7 @@
  * includes
  */
 #include "tbox.h"
+#include <stdio.h>
 
 /* /////////////////////////////////////////////////////////
  * main
