@@ -127,7 +127,7 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash, -1);
@@ -152,19 +152,11 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_long
 	// timeout?
 	tb_check_return_val(sfdn, 0);
 
-	// ok
-	return sfdn;
-}
-static tb_void_t tb_aiop_reactor_select_sync(tb_aiop_reactor_t* reactor, tb_size_t evtn)
-{	
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->hash && reactor->aiop && reactor->aiop->objs);
-
 	// sync
-	tb_size_t i = 0;
+	tb_size_t n = 0;
 	tb_size_t itor = tb_hash_itor_head(rtor->hash);
 	tb_size_t tail = tb_hash_itor_tail(rtor->hash);
-	for (; itor != tail; itor = tb_hash_itor_next(rtor->hash, itor))
+	for (; itor != tail && n < objm; itor = tb_hash_itor_next(rtor->hash, itor))
 	{
 		tb_hash_item_t* item = tb_hash_itor_at(rtor->hash, itor);
 		if (item)
@@ -188,10 +180,13 @@ static tb_void_t tb_aiop_reactor_select_sync(tb_aiop_reactor_t* reactor, tb_size
 					e |= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT;
 					
 				// add object
-				if (e && i < reactor->aiop->objn) reactor->aiop->objs[i++] = *o;
+				if (e) objs[n++] = *o;
 			}
 		}
 	}
+
+	// ok
+	return n;
 }
 static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
 {
@@ -230,7 +225,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	rtor->base.seto = tb_aiop_reactor_select_seto;
 	rtor->base.delo = tb_aiop_reactor_select_delo;
 	rtor->base.wait = tb_aiop_reactor_select_wait;
-	rtor->base.sync = tb_aiop_reactor_select_sync;
 
 	// init hash
 	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(aiop->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_aioo_t), TB_NULL, TB_NULL));

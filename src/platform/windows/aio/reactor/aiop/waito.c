@@ -102,7 +102,7 @@ static tb_bool_t tb_aiop_reactor_waito_delo(tb_aiop_reactor_t* reactor, tb_handl
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_waito_reto(tb_aiop_reactor_t* reactor, tb_size_t hdli, tb_handle_t handle)
+static tb_bool_t tb_aiop_reactor_waito_reto(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t hdli, tb_handle_t handle)
 {	
 	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash, TB_FALSE);
@@ -110,42 +110,14 @@ static tb_bool_t tb_aiop_reactor_waito_reto(tb_aiop_reactor_t* reactor, tb_size_
 	// get obj
 	tb_aioo_t* o = tb_hash_get(rtor->hash, handle);
 	tb_assert_and_check_return_val(o, TB_FALSE);
-
-	// aiop
-	tb_aiop_t* aiop = reactor->aiop;
-	tb_assert_and_check_return_val(aiop, TB_FALSE);
-
-	// init grow
-	tb_size_t grow = tb_align8((aiop->maxn >> 3) + 1);
-
-	// init objs
-	tb_size_t hdln = hdli + 1;
-	if (!aiop->objs)
-	{
-		aiop->objn = hdln + grow;
-		aiop->objs = tb_calloc(aiop->objn, sizeof(tb_aioo_t));
-		tb_assert_and_check_return_val(aiop->objs, TB_FALSE);
-	}
-	// grow objs if not enough
-	else if (hdln > aiop->objn)
-	{
-		// grow size
-		aiop->objn = hdln + grow;
-		if (aiop->objn > aiop->maxn) aiop->objn = aiop->maxn;
-
-		// grow data
-		aiop->objs = tb_realloc(aiop->objs, aiop->objn * sizeof(tb_aioo_t));
-		tb_assert_and_check_return_val(aiop->objs, TB_FALSE);
-	}
-	tb_assert(hdln <= aiop->objn);
 	
 	// add object
-	aiop->objs[hdli] = *o;
+	objs[hdli] = *o;
 
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hash && rtor->hdls, -1);
@@ -167,11 +139,19 @@ static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_long_
 
 	// has more event?
 	tb_size_t hdln = 0;
-	while (hdli < WAIT_OBJECT_0 + hdlm)
+	while (hdli < WAIT_OBJECT_0 + hdlm && hdln < objm)
 	{
-		// return evented handle to objects
+		// get object
 		hdli -= WAIT_OBJECT_0;
-		if (!tb_aiop_reactor_waito_reto(reactor, hdln++, hdls[hdli++])) break;
+		tb_aioo_t* o = tb_hash_get(rtor->hash, hdls[hdli]);
+		tb_assert_and_check_return_val(o, -1);
+
+		// add object
+		objs[hdli] = *o;
+
+		// next
+		hdli++;
+		hdln++;
 
 		// end?
 		tb_check_break(hdli < hdlm);
@@ -188,9 +168,6 @@ static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_long_
 
 	// ok
 	return hdln;
-}
-static tb_void_t tb_aiop_reactor_waito_sync(tb_aiop_reactor_t* reactor, tb_size_t evtn)
-{	
 }
 static tb_void_t tb_aiop_reactor_waito_exit(tb_aiop_reactor_t* reactor)
 {
@@ -226,7 +203,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_waito_init(tb_aiop_t* aiop)
 	rtor->base.seto = tb_aiop_reactor_waito_seto;
 	rtor->base.delo = tb_aiop_reactor_waito_delo;
 	rtor->base.wait = tb_aiop_reactor_waito_wait;
-	rtor->base.sync = tb_aiop_reactor_waito_sync;
 
 	// init hash
 	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(aiop->maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_aioo_t), TB_NULL, TB_NULL));
