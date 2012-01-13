@@ -62,12 +62,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_aiop_addo(ep, s, TB_AIOO_ETYPE_ACPT)) goto end;
 
 	// accept
+	tb_aioo_t objs[256];
 	while (1)
 	{
 		// waiting...
 		tb_print("listening...");
-		tb_long_t 		objn = tb_aiop_wait(ep, 10000);
-		tb_aioo_t* 	objs = tb_aiop_objs(ep);
+		tb_long_t objn = tb_aiop_wait(ep, objs, 256, 10000);
 
 		// error?
 		if (objn < 0) 

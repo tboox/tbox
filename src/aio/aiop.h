@@ -52,10 +52,7 @@ typedef struct __tb_aiop_reactor_t
 	tb_bool_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle);
 
 	// wait
-	tb_long_t 				(*wait)(struct __tb_aiop_reactor_t* reactor, tb_long_t timeout);
-
-	// sync
-	tb_void_t 				(*sync)(struct __tb_aiop_reactor_t* reactor, tb_size_t evtn);
+	tb_long_t 				(*wait)(struct __tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout);
 
 }tb_aiop_reactor_t;
 
@@ -71,12 +68,8 @@ typedef struct __tb_aiop_t
 	// the object size
 	tb_size_t 				size;
 
-	// the objects
-	tb_aioo_t* 				objs;
-	tb_size_t 				objn;
-
-	// the aio pool reactor
-	tb_aiop_reactor_t* 		reactor;
+	// the reactor
+	tb_aiop_reactor_t* 		rtor;
 
 }tb_aiop_t;
 
@@ -91,7 +84,7 @@ typedef struct __tb_aiop_t
  *
  * @return 	the aio pool
  */
-tb_aiop_t* 	tb_aiop_init(tb_size_t type, tb_size_t maxn);
+tb_aiop_t* 		tb_aiop_init(tb_size_t type, tb_size_t maxn);
 
 /// exit the aio pool
 tb_void_t 		tb_aiop_exit(tb_aiop_t* aiop);
@@ -137,13 +130,12 @@ tb_size_t 		tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle);
  * return the event number if ok, otherwise return 0 for timeout
  *
  * @param 	aiop 	the aio pool
+ * @param 	objs 	the aio objects
+ * @param 	objm 	the maximum size of the aio objects
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
  * @return 	the event number, return 0 if timeout, return -1 if error
  */
-tb_long_t 		tb_aiop_wait(tb_aiop_t* aiop, tb_long_t timeout);
-
-/// the aio objects
-tb_aioo_t* 		tb_aiop_objs(tb_aiop_t* aiop);
+tb_long_t 		tb_aiop_wait(tb_aiop_t* aiop, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout);
 
 #endif

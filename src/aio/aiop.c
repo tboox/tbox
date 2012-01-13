@@ -63,8 +63,8 @@ tb_aiop_t* tb_aiop_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);
 
 	// init reactor
-	if (s_init[type]) aiop->reactor = s_init[type](aiop);
-	tb_assert_and_check_goto(aiop->reactor, fail);
+	if (s_init[type]) aiop->rtor = s_init[type](aiop);
+	tb_assert_and_check_goto(aiop->rtor, fail);
 
 	// ok
 	return aiop;
@@ -79,11 +79,8 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 	if (aiop)
 	{
 		// exit reactor
-		tb_assert(aiop->reactor && aiop->reactor->exit);
-		aiop->reactor->exit(aiop->reactor);
-
-		// free objects 
-		if (aiop->objs) tb_free(aiop->objs);
+		tb_assert(aiop->rtor && aiop->rtor->exit);
+		aiop->rtor->exit(aiop->rtor);
 
 		// free aiop
 		tb_free(aiop);
@@ -102,11 +99,11 @@ tb_size_t tb_aiop_size(tb_aiop_t* aiop)
 tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->reactor && aiop->reactor->addo && aiop->size < aiop->maxn, 0);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && aiop->size < aiop->maxn, 0);
 	tb_assert_and_check_return_val(handle && etype, 0);
 
 	// addo
-	if (!aiop->reactor->addo(aiop->reactor, handle, etype)) return 0;
+	if (!aiop->rtor->addo(aiop->rtor, handle, etype)) return 0;
 
 	// ok
 	return ++aiop->size;
@@ -114,11 +111,11 @@ tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 tb_size_t tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->reactor && aiop->reactor->seto, 0);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->seto, 0);
 	tb_assert_and_check_return_val(handle && etype, 0);
 
 	// seto
-	if (!aiop->reactor->seto(aiop->reactor, handle, etype)) return 0;
+	if (!aiop->rtor->seto(aiop->rtor, handle, etype)) return 0;
 
 	// ok
 	return aiop->size;
@@ -126,59 +123,21 @@ tb_size_t tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 tb_size_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->reactor && aiop->reactor->delo && aiop->size, 0);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->delo && aiop->size, 0);
 	tb_assert_and_check_return_val(handle, 0);
 
 	// delo
-	if (!aiop->reactor->delo(aiop->reactor, handle)) return 0;
+	if (!aiop->rtor->delo(aiop->rtor, handle)) return 0;
 
 	// ok
 	return --aiop->size;
 }
-tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_long_t timeout)
+tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->reactor && aiop->reactor->wait && aiop->reactor->sync, -1);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->wait, -1);
 
 	// wait 
-	tb_long_t evtn = aiop->reactor->wait(aiop->reactor, timeout);
-	tb_assert_and_check_return_val(evtn >= 0, -1);
-	
-	// timeout?
-	tb_check_return_val(evtn, 0);
-
-	// init grow
-	tb_size_t grow = tb_align8((aiop->maxn >> 3) + 1);
-
-	// init objs
-	if (!aiop->objs)
-	{
-		aiop->objn = evtn + grow;
-		aiop->objs = tb_calloc(aiop->objn, sizeof(tb_aioo_t));
-		tb_assert_and_check_return_val(aiop->objs, -1);
-	}
-	// grow objs if not enough
-	else if (evtn > aiop->objn)
-	{
-		// grow size
-		aiop->objn = evtn + grow;
-		if (aiop->objn > aiop->maxn) aiop->objn = aiop->maxn;
-
-		// grow data
-		aiop->objs = tb_realloc(aiop->objs, aiop->objn * sizeof(tb_aioo_t));
-		tb_assert_and_check_return_val(aiop->objs, -1);
-	}
-	tb_assert(evtn <= aiop->objn);
-
-	// sync events to objects 
-	aiop->reactor->sync(aiop->reactor, evtn);
-	
-	// ok
-	return evtn;
+	return aiop->rtor->wait(aiop->rtor, objs, objm, timeout);
 }
 
-tb_aioo_t* tb_aiop_objs(tb_aiop_t* aiop)
-{
-	tb_assert_and_check_return_val(aiop, TB_NULL);
-	return aiop->objs;
-}
