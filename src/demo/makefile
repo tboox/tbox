@@ -6,6 +6,11 @@ demo_LIBS 				= z m dl pthread
 demo_OBJ_FILES 			=
 endif
 
+ifeq ($(TB_CONFIG_PLAT),freebsd_x86)
+demo_LIBS 				= z m pthread
+demo_OBJ_FILES 			=
+endif
+
 ifeq ($(TB_CONFIG_PLAT),mac_x86)
 demo_LIBS 				= z m dl pthread
 demo_OBJ_FILES 			=
