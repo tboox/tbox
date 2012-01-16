@@ -28,6 +28,7 @@
  */
 #include "prefix.h"
 #include "aioo.h"
+#include "../container/container.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -46,7 +47,7 @@ typedef struct __tb_aiop_reactor_t
 	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
 
 	// seto
-	tb_bool_t 				(*seto)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
+	tb_bool_t 				(*seto)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj);
 
 	// delo
 	tb_bool_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle);
@@ -65,8 +66,8 @@ typedef struct __tb_aiop_t
 	// the object maxn
 	tb_size_t 				maxn;
 
-	// the object size
-	tb_size_t 				size;
+	// the objects hash
+	tb_hash_t* 				hash;
 
 	// the reactor
 	tb_aiop_reactor_t* 		rtor;
