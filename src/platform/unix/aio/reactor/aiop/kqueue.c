@@ -52,9 +52,6 @@ typedef struct __tb_aiop_reactor_kqueue_t
 	// the kqueue fd
 	tb_long_t 				kqfd;
 
-	// the kqueue fds
-	tb_vector_t* 			kevs;
-
 	// the events
 	struct kevent64_s* 		evts;
 	tb_size_t 				evtn;
@@ -64,6 +61,18 @@ typedef struct __tb_aiop_reactor_kqueue_t
 /* /////////////////////////////////////////////////////////
  * implemention
  */
+static tb_bool_t tb_aiop_reactor_kqueue_sync(tb_aiop_reactor_t* reactor, struct kevent64_s* evts, tb_size_t evtn)
+{
+	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0, TB_FALSE);
+
+	// change events
+	struct timespec t = {0};
+	if (kevent64(rtor->kqfd, evts, evtn, TB_NULL, 0, 0, &t) < 0) return TB_FALSE;
+
+	// ok
+	return TB_TRUE;
+}
 static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
@@ -74,20 +83,21 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// add event
-	struct kevent64_s e;
+	struct kevent64_s 	e[2];
+	tb_size_t 			n = 0;
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) 
 	{
-		EV_SET64(&e, fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
-		tb_vector_insert_tail(rtor->kevs, &e);
+		EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		n++;
 	}
 	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)
 	{
-		EV_SET64(&e, fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
-		tb_vector_insert_tail(rtor->kevs, &e);
+		EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		n++;
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_aiop_reactor_kqueue_sync(reactor, e, n);
 }
 static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
@@ -99,20 +109,21 @@ static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// add event
-	struct kevent64_s e;
+	struct kevent64_s 	e[2];
+	tb_size_t 			n = 0;
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) 
 	{
-		EV_SET64(&e, fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
-		tb_vector_insert_tail(rtor->kevs, &e);
+		EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		n++;
 	}
 	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)
 	{
-		EV_SET64(&e, fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
-		tb_vector_insert_tail(rtor->kevs, &e);
+		EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		n++;
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_aiop_reactor_kqueue_sync(reactor, e, n);
 }
 static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
@@ -124,35 +135,25 @@ static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// del event
-	struct kevent64_s e;
-	EV_SET64(&e, fd, EVFILT_READ, EV_DELETE, 0, 0, 0, 0, 0);
-	tb_vector_insert_tail(rtor->kevs, &e);
-
-	EV_SET64(&e, fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0, 0, 0);
-	tb_vector_insert_tail(rtor->kevs, &e);
+	struct kevent64_s e[2];
+	EV_SET64(&e[0], fd, EVFILT_READ, EV_DELETE, 0, 0, 0, 0, 0);
+	EV_SET64(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0, 0, 0);
 
 	// ok
-	return TB_TRUE;
+	return tb_aiop_reactor_kqueue_sync(reactor, e, 2);
 }
 static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && rtor->kevs && reactor->aiop, -1);
+	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && reactor->aiop, -1);
 
 	// init time
 	struct timespec t = {0};
-	t.tv_sec = time(TB_NULL);
 	if (timeout > 0)
 	{
-		t.tv_sec += timeout / 1000;
-		t.tv_nsec += (timeout % 1000) * 1000000;
+		t.tv_sec = timeout / 1000;
+		t.tv_nsec+= (timeout % 1000) * 1000000;
 	}
-
-	// init kevs
-	struct kevent64_s* 	kevs = (struct kevent64_s*)tb_vector_data(rtor->kevs);
-	tb_size_t 			kevn = tb_vector_size(rtor->kevs);
-	tb_assert_and_check_return_val(kevs, -1);
-	tb_check_return_val(kevn, 0);
 
 	// init grow
 	tb_size_t maxn = reactor->aiop->maxn;
@@ -165,16 +166,13 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 		rtor->evts = tb_calloc(rtor->evtn, sizeof(struct kevent64_s));
 		tb_assert_and_check_return_val(rtor->evts, -1);
 	}
-	
+
 	// wait events
-	tb_long_t evtn = kevent64(rtor->kqfd, kevs, kevn, rtor->evts, rtor->evtn, 0, timeout >= 0? &t : TB_NULL);
+	tb_long_t evtn = kevent64(rtor->kqfd, TB_NULL, 0, rtor->evts, rtor->evtn, 0, timeout >= 0? &t : TB_NULL);
 	tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
 	
 	// timeout?
 	tb_check_return_val(evtn, 0);
-
-	// clear kevs
-	tb_vector_clear(rtor->kevs);
 
 	// grow it if events is full
 	if (evtn == rtor->evtn)
@@ -228,11 +226,8 @@ static tb_void_t tb_aiop_reactor_kqueue_exit(tb_aiop_reactor_t* reactor)
 		// free events
 		if (rtor->evts) tb_free(rtor->evts);
 
-		// exit kevs
-		if (rtor->kevs) tb_vector_exit(rtor->kevs);
-
-		// close kqfd?
-		// ...
+		// close kqfd
+		if (rtor->kqfd >= 0) close(rtor->kqfd);
 
 		// free it
 		tb_free(rtor);
@@ -259,10 +254,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_kqueue_init(tb_aiop_t* aiop)
 	// init kqueue
 	rtor->kqfd = kqueue();
 	tb_assert_and_check_goto(rtor->kqfd >= 0, fail);
-
-	// init kevs
-	rtor->kevs = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct kevent64_s), TB_NULL, TB_NULL));
-	tb_assert_and_check_goto(rtor->kevs, fail);
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;
