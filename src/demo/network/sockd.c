@@ -59,7 +59,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_bind(s, tb_stou32(argv[1]))) goto end;
 
 	// add event
-	if (!tb_aiop_addo(ep, s, TB_AIOO_ETYPE_ACPT)) goto end;
+	if (!tb_aiop_addo(ep, s, TB_AIOO_ETYPE_ACPT, TB_NULL)) goto end;
 
 	// accept
 	tb_aioo_t objs[16];
@@ -94,7 +94,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (c)
 				{
 					tb_print("accept ok");
-					if (!tb_aiop_addo(ep, c, TB_AIOO_ETYPE_READ)) goto end;
+					if (!tb_aiop_addo(ep, c, TB_AIOO_ETYPE_READ, TB_NULL)) goto end;
 				}
 				else
 				{

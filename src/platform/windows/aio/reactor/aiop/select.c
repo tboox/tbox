@@ -31,9 +31,6 @@ typedef struct __tb_aiop_reactor_select_t
 	// the reactor base
 	tb_aiop_reactor_t 		base;
 
-	// the objects hash
-	tb_hash_t* 				hash;
-
 	// the fd max
 	tb_size_t 				sfdm;
 
@@ -54,12 +51,12 @@ typedef struct __tb_aiop_reactor_select_t
 static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->aiop, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
-	tb_assert_and_check_return_val(tb_hash_size(rtor->hash) < FD_SETSIZE, TB_FALSE);
+	tb_assert_and_check_return_val(tb_hash_size(reactor->aiop->hash) < FD_SETSIZE, TB_FALSE);
 
 	// update fd max
 	if (fd > rtor->sfdm) rtor->sfdm = fd;
@@ -71,28 +68,17 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	if (pwfds) FD_SET(fd, pwfds);
 	FD_SET(fd, &rtor->efdi);
 
-	// init obj
-	tb_aioo_t o;
-	tb_aioo_seto(&o, handle, reactor->aiop->type, etype);
-
-	// add obj
-	tb_hash_set(rtor->hash, fd, &o);
-	
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash && reactor->aiop, TB_FALSE);
+	tb_assert_and_check_return_val(rtor, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
-
-	// get obj
-	tb_aioo_t* o = tb_hash_get(rtor->hash, fd);
-	tb_assert_and_check_return_val(o, TB_FALSE);
 
 	// set fds
 	fd_set* prfds = (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT)? &rtor->rfdi : TB_NULL;
@@ -101,16 +87,13 @@ static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_hand
 	if (pwfds) FD_SET(fd, pwfds); else FD_CLR(fd, pwfds);
 	if (prfds || pwfds) FD_SET(fd, &rtor->efdi); else FD_CLR(fd, &rtor->efdi);
 
-	// set obj
-	tb_aioo_seto(o, handle, reactor->aiop->type, etype);
-
 	// ok
 	return TB_TRUE;
 }
 static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash, TB_FALSE);
+	tb_assert_and_check_return_val(rtor, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
@@ -121,16 +104,13 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_hand
 	FD_CLR(fd, &rtor->wfdi);
 	FD_CLR(fd, &rtor->efdi);
 
-	// del obj
-	tb_hash_del(rtor->hash, fd);
-	
 	// ok
 	return TB_TRUE;
 }
 static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hash, -1);
+	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, -1);
 
 	// init time
 	struct timeval t = {0};
@@ -151,18 +131,18 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 
 	// timeout?
 	tb_check_return_val(sfdn, 0);
-
+	
 	// sync
 	tb_size_t n = 0;
-	tb_size_t itor = tb_hash_itor_head(rtor->hash);
-	tb_size_t tail = tb_hash_itor_tail(rtor->hash);
-	for (; itor != tail && n < objm; itor = tb_hash_itor_next(rtor->hash, itor))
+	tb_size_t itor = tb_hash_itor_head(reactor->aiop->hash);
+	tb_size_t tail = tb_hash_itor_tail(reactor->aiop->hash);
+	for (; itor != tail && n < objm; itor = tb_hash_itor_next(reactor->aiop->hash, itor))
 	{
-		tb_hash_item_t* item = tb_hash_itor_at(rtor->hash, itor);
+		tb_hash_item_t* item = tb_hash_itor_at(reactor->aiop->hash, itor);
 		if (item)
 		{
-			tb_long_t 		fd = (tb_long_t)item->name;
-			tb_aioo_t* 	o = (tb_aioo_t*)item->data;
+			tb_long_t 		fd = (tb_long_t)item->name - 1;
+			tb_aioo_t* 		o = (tb_aioo_t*)item->data;
 			if (fd >= 0 && o)
 			{
 				tb_long_t e = 0;
@@ -188,6 +168,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	// ok
 	return n;
 }
+
 static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
 {
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
@@ -201,9 +182,6 @@ static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
 		FD_ZERO(&rtor->wfdo);
 		FD_ZERO(&rtor->efdo);
 
-		// exit hash
-		if (rtor->hash) tb_hash_exit(rtor->hash);
-
 		// free it
 		tb_free(rtor);
 	}
@@ -212,7 +190,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aiop->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(aiop->type == TB_AIOO_OTYPE_FILE || aiop->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
 	tb_aiop_reactor_select_t* rtor = tb_calloc(1, sizeof(tb_aiop_reactor_select_t));
@@ -225,10 +203,6 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	rtor->base.seto = tb_aiop_reactor_select_seto;
 	rtor->base.delo = tb_aiop_reactor_select_delo;
 	rtor->base.wait = tb_aiop_reactor_select_wait;
-
-	// init hash
-	rtor->hash = tb_hash_init(tb_align8(tb_int32_sqrt(aiop->maxn) + 1), tb_item_func_int(), tb_item_func_ifm(sizeof(tb_aioo_t), TB_NULL, TB_NULL));
-	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init fds
 	FD_ZERO(&rtor->rfdi);

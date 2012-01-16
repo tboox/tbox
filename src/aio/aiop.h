@@ -101,20 +101,11 @@ tb_size_t 		tb_aiop_size(tb_aiop_t* aiop);
  * @param 	aiop 	the aio pool
  * @param 	handle 	the handle of the aio object
  * @param 	etype 	the event type
+ * @param 	odata 	the object data
  *
  * @return 	the number of the objects, return 0 if failed
  */
-tb_size_t 		tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
-
-/*!set the aio object
- *
- * @param 	aiop 	the aio pool
- * @param 	handle 	the handle of the aio object
- * @param 	etype 	the event type
- *
- * @return 	the number of the objects, return 0 if failed
- */
-tb_size_t 		tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
+tb_size_t 		tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
 
 /*!del the aio object
  *
@@ -124,6 +115,50 @@ tb_size_t 		tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
  * @return 	the number of the objects, return 0 if failed
  */
 tb_size_t 		tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle);
+
+/*!set the aio event
+ *
+ * @param 	aiop 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ * @param 	etype 	the event type
+ *
+ */
+tb_size_t 		tb_aiop_gete(tb_aiop_t* aiop, tb_handle_t handle);
+
+/*!set the aio event
+ *
+ * @param 	aiop 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ * @param 	etype 	the event type
+ *
+ */
+tb_void_t 		tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
+
+/*!add the aio event
+ *
+ * @param 	aiop 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ * @param 	etype 	the event type
+ *
+ */
+tb_void_t 		tb_aiop_adde(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
+
+/*!del the aio event
+ *
+ * @param 	aiop 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ *
+ */
+tb_void_t 		tb_aiop_dele(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype);
+
+/*!set the aio odata
+ *
+ * @param 	aiop 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ * @param 	odata 	the object data
+ *
+ */
+tb_void_t 		tb_aiop_setp(tb_aiop_t* aiop, tb_handle_t handle, tb_pointer_t odata);
 
 /*!wait the aio objects in the pool
  *

@@ -65,6 +65,9 @@ typedef struct __tb_aioo_t
 	// the event type
 	tb_size_t 		etype 	: 24;
 
+	// the object data
+	tb_pointer_t 	odata;
+
 	// the object handle
 	tb_handle_t 	handle;
 
@@ -75,7 +78,7 @@ typedef struct __tb_aioo_t
  */
 
 /// set the aio object
-tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype);
+tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata);
 
 /// get the object type
 tb_size_t tb_aioo_type(tb_aioo_t* object);
