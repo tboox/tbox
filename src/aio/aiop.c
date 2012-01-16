@@ -62,6 +62,10 @@ tb_aiop_t* tb_aiop_init(tb_size_t type, tb_size_t maxn)
 	};
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);
 
+	// init hash
+	aiop->hash = tb_hash_init(tb_align8(tb_int32_sqrt(maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_aioo_t), TB_NULL, TB_NULL));
+	tb_assert_and_check_goto(aiop->hash, fail);
+
 	// init reactor
 	if (s_init[type]) aiop->rtor = s_init[type](aiop);
 	tb_assert_and_check_goto(aiop->rtor, fail);
@@ -82,6 +86,9 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 		tb_assert(aiop->rtor && aiop->rtor->exit);
 		aiop->rtor->exit(aiop->rtor);
 
+		// exit hash
+		if (aiop->hash) tb_hash_exit(aiop->hash);
+
 		// free aiop
 		tb_free(aiop);
 	}
@@ -93,44 +100,66 @@ tb_size_t tb_aiop_maxn(tb_aiop_t* aiop)
 }
 tb_size_t tb_aiop_size(tb_aiop_t* aiop)
 {
-	tb_assert_and_check_return_val(aiop, 0);
-	return aiop->size;
+	tb_assert_and_check_return_val(aiop && aiop->hash, 0);
+	return tb_hash_size(aiop->hash);
 }
 tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && aiop->size < aiop->maxn, 0);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo, 0);
+	tb_assert_and_check_return_val(aiop->hash && tb_hash_size(aiop->hash) < aiop->maxn, 0);
 	tb_assert_and_check_return_val(handle && etype, 0);
 
-	// addo
+	// add object to native
 	if (!aiop->rtor->addo(aiop->rtor, handle, etype)) return 0;
 
+	// add object to hash
+	tb_aioo_t o;
+	tb_aioo_seto(&o, handle, aiop->type, etype);
+	tb_hash_set(aiop->hash, handle, &o);
+	
 	// ok
-	return ++aiop->size;
+	return tb_hash_size(aiop->hash);
 }
 tb_size_t tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->seto, 0);
+	tb_assert_and_check_return_val(aiop->hash && tb_hash_size(aiop->hash), 0);
 	tb_assert_and_check_return_val(handle && etype, 0);
 
-	// seto
-	if (!aiop->rtor->seto(aiop->rtor, handle, etype)) return 0;
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return_val(o, 0);
 
+	// no change?
+	tb_check_goto(etype != o->etype, ok);
+
+	// set object at native
+	if (!aiop->rtor->seto(aiop->rtor, handle, etype, o)) return 0;
+
+	// set object at hash
+	tb_aioo_seto(o, handle, aiop->type, etype);
+
+ok:
 	// ok
-	return aiop->size;
+	return tb_hash_size(aiop->hash);
 }
 tb_size_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->delo && aiop->size, 0);
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->delo, 0);
+	tb_assert_and_check_return_val(aiop->hash && tb_hash_size(aiop->hash), 0);
 	tb_assert_and_check_return_val(handle, 0);
 
-	// delo
+	// del object from native
 	if (!aiop->rtor->delo(aiop->rtor, handle)) return 0;
 
+	// del object from hash
+	tb_hash_del(aiop->hash, handle);
+	
 	// ok
-	return --aiop->size;
+	return tb_hash_size(aiop->hash);
 }
 tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	

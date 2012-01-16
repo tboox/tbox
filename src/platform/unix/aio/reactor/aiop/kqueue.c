@@ -53,7 +53,7 @@ typedef struct __tb_aiop_reactor_kqueue_t
 	tb_long_t 				kqfd;
 
 	// the events
-	struct kevent64_s* 		evts;
+	struct kevent* 			evts;
 	tb_size_t 				evtn;
 	
 }tb_aiop_reactor_kqueue_t;
@@ -61,14 +61,15 @@ typedef struct __tb_aiop_reactor_kqueue_t
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_aiop_reactor_kqueue_sync(tb_aiop_reactor_t* reactor, struct kevent64_s* evts, tb_size_t evtn)
+static tb_bool_t tb_aiop_reactor_kqueue_sync(tb_aiop_reactor_t* reactor, struct kevent* evts, tb_size_t evtn)
 {
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0, TB_FALSE);
+	tb_assert_and_check_return_val(evts && evtn, TB_FALSE);
 
 	// change events
 	struct timespec t = {0};
-	if (kevent64(rtor->kqfd, evts, evtn, TB_NULL, 0, 0, &t) < 0) return TB_FALSE;
+	if (kevent(rtor->kqfd, evts, evtn, TB_NULL, 0, &t) < 0) return TB_FALSE;
 
 	// ok
 	return TB_TRUE;
@@ -83,42 +84,56 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// add event
-	struct kevent64_s 	e[2];
+	struct kevent 	e[2];
 	tb_size_t 			n = 0;
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) 
 	{
-		EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)
 	{
-		EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 
 	// ok
 	return tb_aiop_reactor_kqueue_sync(reactor, e, n);
 }
-static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && obj, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
+	// change
+	tb_size_t adde = etype & ~obj->etype;
+	tb_size_t dele = ~etype & obj->etype;
+
 	// add event
-	struct kevent64_s 	e[2];
-	tb_size_t 			n = 0;
-	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) 
+	struct kevent 	e[2];
+	tb_size_t 		n = 0;
+	if (adde & TB_AIOO_ETYPE_READ || adde & TB_AIOO_ETYPE_ACPT) 
 	{
-		EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
-	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)
+	else if (dele & TB_AIOO_ETYPE_READ || dele & TB_AIOO_ETYPE_ACPT) 
 	{
-		EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, (tb_uint64_t)handle, etype, 0);
+		EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, handle);
+		n++;
+	}
+	if (adde & TB_AIOO_ETYPE_WRIT || adde & TB_AIOO_ETYPE_CONN)
+	{
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
+		n++;
+	}
+	else if (dele & TB_AIOO_ETYPE_WRIT || dele & TB_AIOO_ETYPE_CONN)
+	{
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, handle);
 		n++;
 	}
 
@@ -135,9 +150,9 @@ static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// del event
-	struct kevent64_s e[2];
-	EV_SET64(&e[0], fd, EVFILT_READ, EV_DELETE, 0, 0, 0, 0, 0);
-	EV_SET64(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0, 0, 0);
+	struct kevent e[2];
+	EV_SET(&e[0], fd, EVFILT_READ, EV_DELETE, 0, 0, 0);
+	EV_SET(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0);
 
 	// ok
 	return tb_aiop_reactor_kqueue_sync(reactor, e, 2);
@@ -145,7 +160,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_hand
 static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && reactor->aiop, -1);
+	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0 && reactor->aiop && reactor->aiop->hash, -1);
 
 	// init time
 	struct timespec t = {0};
@@ -163,12 +178,12 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	if (!rtor->evts)
 	{
 		rtor->evtn = grow;
-		rtor->evts = tb_calloc(rtor->evtn, sizeof(struct kevent64_s));
+		rtor->evts = tb_calloc(rtor->evtn, sizeof(struct kevent));
 		tb_assert_and_check_return_val(rtor->evts, -1);
 	}
 
 	// wait events
-	tb_long_t evtn = kevent64(rtor->kqfd, TB_NULL, 0, rtor->evts, rtor->evtn, 0, timeout >= 0? &t : TB_NULL);
+	tb_long_t evtn = kevent(rtor->kqfd, TB_NULL, 0, rtor->evts, rtor->evtn, timeout >= 0? &t : TB_NULL);
 	tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
 	
 	// timeout?
@@ -182,7 +197,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 		if (rtor->evtn > maxn) rtor->evtn = maxn;
 
 		// grow data
-		rtor->evts = tb_realloc(rtor->evts, rtor->evtn * sizeof(struct kevent64_s));
+		rtor->evts = tb_realloc(rtor->evts, rtor->evtn * sizeof(struct kevent));
 		tb_assert_and_check_return_val(rtor->evts, -1);
 	}
 	tb_assert(evtn <= rtor->evtn);
@@ -194,9 +209,10 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	tb_size_t i = 0;
 	for (i = 0; i < evtn; i++)
 	{
-		struct kevent64_s* 	e = rtor->evts + i;
-		tb_aioo_t* 			o = objs + i;
-		tb_size_t 			etype = (tb_size_t)e->ext[0];
+		struct kevent* 	e = rtor->evts + i;
+		tb_aioo_t* 		o = objs + i;
+		tb_aioo_t* 		p = tb_hash_get(reactor->aiop->hash, e->udata);
+		tb_assert_and_check_return_val(p, -1);
 
 		o->handle = (tb_handle_t)e->udata;
 		o->otype = reactor->aiop->type;
@@ -204,12 +220,12 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 		if (e->filter == EVFILT_READ) 
 		{
 			o->etype |= TB_AIOO_ETYPE_READ;
-			if (etype & TB_AIOO_ETYPE_ACPT) o->etype |= TB_AIOO_ETYPE_ACPT;
+			if (p->etype & TB_AIOO_ETYPE_ACPT) o->etype |= TB_AIOO_ETYPE_ACPT;
 		}
 		if (e->filter == EVFILT_WRITE) 
 		{
 			o->etype |= TB_AIOO_ETYPE_WRIT;
-			if (etype & TB_AIOO_ETYPE_CONN) o->etype |= TB_AIOO_ETYPE_CONN;
+			if (p->etype & TB_AIOO_ETYPE_CONN) o->etype |= TB_AIOO_ETYPE_CONN;
 		}
 		if (e->flags & EV_ERROR && !(o->etype & TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT)) 
 			o->etype |= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT;
