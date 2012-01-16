@@ -35,11 +35,12 @@ tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
 /* /////////////////////////////////////////////////////////
  * implemention
  */
-tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype)
+tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata)
 {
 	tb_assert_and_check_return(object);
 	object->otype = otype;
 	object->etype = etype;
+	object->odata = odata;
 	object->handle = handle;
 }
 tb_size_t tb_aioo_type(tb_aioo_t* object)

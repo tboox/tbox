@@ -62,8 +62,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init aio
 	tb_aioo_t io;
 	tb_aioo_t oo;
-	tb_aioo_seto(&io, ifile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_READ);
-	tb_aioo_seto(&oo, ofile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT);
+	tb_aioo_seto(&io, ifile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_READ, TB_NULL);
+	tb_aioo_seto(&oo, ofile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT, TB_NULL);
 
 	// read file
 	tb_byte_t 	data[4096];

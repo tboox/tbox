@@ -190,7 +190,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init aio
 	tb_aioo_t o;
-	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NULL);
+	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NULL, TB_NULL);
 
 	// connect
 	if (!tb_test_sock_connect(s, &o, argv[1], tb_stou32(argv[2]))) goto end;

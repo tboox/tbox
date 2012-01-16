@@ -103,7 +103,7 @@ tb_size_t tb_aiop_size(tb_aiop_t* aiop)
 	tb_assert_and_check_return_val(aiop && aiop->hash, 0);
 	return tb_hash_size(aiop->hash);
 }
-tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
+tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo, 0);
@@ -115,33 +115,9 @@ tb_size_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
 
 	// add object to hash
 	tb_aioo_t o;
-	tb_aioo_seto(&o, handle, aiop->type, etype);
+	tb_aioo_seto(&o, handle, aiop->type, etype, odata);
 	tb_hash_set(aiop->hash, handle, &o);
 	
-	// ok
-	return tb_hash_size(aiop->hash);
-}
-tb_size_t tb_aiop_seto(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
-{
-	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->seto, 0);
-	tb_assert_and_check_return_val(aiop->hash && tb_hash_size(aiop->hash), 0);
-	tb_assert_and_check_return_val(handle && etype, 0);
-
-	// get object from hash
-	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
-	tb_assert_and_check_return_val(o, 0);
-
-	// no change?
-	tb_check_goto(etype != o->etype, ok);
-
-	// set object at native
-	if (!aiop->rtor->seto(aiop->rtor, handle, etype, o)) return 0;
-
-	// set object at hash
-	tb_aioo_seto(o, handle, aiop->type, etype);
-
-ok:
 	// ok
 	return tb_hash_size(aiop->hash);
 }
@@ -160,6 +136,100 @@ tb_size_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
 	
 	// ok
 	return tb_hash_size(aiop->hash);
+}
+tb_size_t tb_aiop_gete(tb_aiop_t* aiop, tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->seto, 0);
+	tb_assert_and_check_return_val(aiop->hash && tb_hash_size(aiop->hash), 0);
+	tb_assert_and_check_return_val(handle, 0);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return_val(o, 0);
+
+	// get the event type
+	return o->etype;
+}
+tb_void_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
+{
+	// check
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->seto);
+	tb_assert_and_check_return(aiop->hash && tb_hash_size(aiop->hash));
+	tb_assert_and_check_return(handle && etype);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return(o);
+
+	// no change?
+	tb_check_return(etype != o->etype);
+
+	// set object at native
+	if (!aiop->rtor->seto(aiop->rtor, handle, etype, o)) return ;
+
+	// update the event type
+	o->etype = etype;
+}
+tb_void_t tb_aiop_adde(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
+{
+	// check
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->seto);
+	tb_assert_and_check_return(aiop->hash && tb_hash_size(aiop->hash));
+	tb_assert_and_check_return(handle && etype);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return(o);
+
+	// no change?
+	etype |= o->etype;
+
+	// no change?
+	tb_check_return(etype != o->etype);
+
+	// set object at native
+	if (!aiop->rtor->seto(aiop->rtor, handle, etype, o)) return ;
+
+	// update the event type
+	o->etype = etype;
+}
+tb_void_t tb_aiop_dele(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t etype)
+{
+	// check
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->seto);
+	tb_assert_and_check_return(aiop->hash && tb_hash_size(aiop->hash));
+	tb_assert_and_check_return(handle && etype);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return(o);
+
+	// no change?
+	etype = o->etype & ~etype;
+
+	// no change?
+	tb_check_return(etype != o->etype);
+
+	// set object at native
+	if (!aiop->rtor->seto(aiop->rtor, handle, etype, o)) return ;
+
+	// update the event type
+	o->etype = etype;
+}
+tb_void_t tb_aiop_setp(tb_aiop_t* aiop, tb_handle_t handle, tb_pointer_t odata)
+{
+	// check
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->seto);
+	tb_assert_and_check_return(aiop->hash && tb_hash_size(aiop->hash));
+	tb_assert_and_check_return(handle);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aiop->hash, handle);
+	tb_assert_and_check_return(o);
+
+	// update the object data
+	o->odata = odata;
 }
 tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
