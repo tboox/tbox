@@ -35,8 +35,6 @@
 // aio
 #if defined(TB_CONFIG_AIO_HAVE_POLL)
 # 	include "reactor/aioo/poll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_PORT)
-# 	include "reactor/aioo/port.c"
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
 # 	include "reactor/aioo/select.c"
 #elif defined(TB_CONFIG_AIO_HAVE_EPOLL)
@@ -52,10 +50,10 @@
 # 	include "reactor/aiop/epoll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
 # 	include "reactor/aiop/kqueue.c"
-#elif defined(TB_CONFIG_AIO_HAVE_POLL)
-# 	include "reactor/aiop/poll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_PORT)
 # 	include "reactor/aiop/port.c"
+#elif defined(TB_CONFIG_AIO_HAVE_POLL)
+# 	include "reactor/aiop/poll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
 # 	include "reactor/aiop/select.c"
 #else
