@@ -48,7 +48,6 @@
 #define tb_atomic_fetch_and_or(a, v) 		tb_atomic_fetch_and_or_sync(a, v)
 #define tb_atomic_fetch_and_xor(a, v) 		tb_atomic_fetch_and_xor_sync(a, v)
 #define tb_atomic_fetch_and_and(a, v) 		tb_atomic_fetch_and_and_sync(a, v)
-#define tb_atomic_fetch_and_nand(a, v) 		tb_atomic_fetch_and_nand_sync(a, v)
 
 #define tb_atomic_inc_and_fetch(a) 			tb_atomic_inc_and_fetch_sync(a)
 #define tb_atomic_dec_and_fetch(a) 			tb_atomic_dec_and_fetch_sync(a)
@@ -57,7 +56,6 @@
 #define tb_atomic_or_and_fetch(a, v) 		tb_atomic_or_and_fetch_sync(a, v)
 #define tb_atomic_xor_and_fetch(a, v) 		tb_atomic_xor_and_fetch_sync(a, v)
 #define tb_atomic_and_and_fetch(a, v) 		tb_atomic_and_and_fetch_sync(a, v)
-#define tb_atomic_nand_and_fetch(a, v) 		tb_atomic_nand_and_fetch_sync(a, v)
 
 /* /////////////////////////////////////////////////////////
  * get & set
@@ -136,11 +134,6 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_sync(tb_atomic_t* a, tb_si
 	tb_assert(a);
 	return __sync_fetch_and_or(a, v);
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_nand_sync(tb_atomic_t* a, tb_size_t v)
-{
-	tb_assert(a);
-	return __sync_fetch_and_nand(a, v);
-}
 
 /* /////////////////////////////////////////////////////////
  * ... and fetch
@@ -173,17 +166,12 @@ static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_sync(tb_atomic_t* a, tb_s
 static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_sync(tb_atomic_t* a, tb_size_t v)
 {
 	tb_assert(a);
-	return __sync_xor_and_fetch(a, v);
+	return __sync_and_and_fetch(a, v);
 }
 static __tb_inline__ tb_size_t tb_atomic_or_and_fetch_sync(tb_atomic_t* a, tb_size_t v)
 {
 	tb_assert(a);
 	return __sync_or_and_fetch(a, v);
-}
-static __tb_inline__ tb_size_t tb_atomic_nand_and_fetch_sync(tb_atomic_t* a, tb_size_t v)
-{
-	tb_assert(a);
-	return __sync_nand_and_fetch(a, v);
 }
 
 #endif
