@@ -41,7 +41,7 @@ tb_size_t tb_base32_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	static tb_char_t const table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
 	// check
-	tb_assert_and_check_return_val(!(in >= TB_MAXU32 / 4 || on < TB_BASE32_OUTPUT_MIN(in)), 0);
+	tb_assert_and_check_return_val(ob && !(in >= TB_MAXU32 / 4 || on < TB_BASE32_OUTPUT_MIN(in)), 0);
 
 	// encode
 	tb_size_t i = 0;
@@ -121,7 +121,10 @@ tb_size_t tb_base32_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	};
 
 	// check
-	tb_assert_and_check_return_val(on > (in * 5) / 8, 0);
+	tb_assert_and_check_return_val(ib && ob && on > (in * 5) / 8, 0);
+
+	// init 
+	tb_memset(ob, 0, on);
 
 	// decode
 	tb_size_t i = 0;

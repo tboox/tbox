@@ -326,6 +326,7 @@ ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
 					  	demo/math \
 					  	demo/utils \
+					  	demo/other \
 					  	demo/memory \
 					  	demo/string \
 					  	demo/gstream \
