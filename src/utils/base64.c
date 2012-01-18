@@ -40,7 +40,7 @@ tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	static tb_char_t const table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 	// check 
-	tb_assert_and_check_return_val(!(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
+	tb_assert_and_check_return_val(ib && ob && !(in >= TB_MAXU32 / 4 || on < TB_BASE64_OUTPUT_MIN(in)), 0);
 
 	// encode
 	tb_char_t* 		op = ob;
@@ -81,6 +81,8 @@ tb_size_t tb_base64_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_
 	,	0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b
 	,	0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33
 	};
+
+	tb_assert_and_check_return_val(ib && ob, 0);
 
 	tb_int_t 	i = 0;
 	tb_int_t 	v = 0;
