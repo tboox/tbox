@@ -88,10 +88,6 @@
 # 	define tb_atomic_fetch_and_and(a, v) 		tb_atomic_fetch_and_and_stub(a, v)
 #endif
 
-#ifndef tb_atomic_fetch_and_nand
-# 	define tb_atomic_fetch_and_nand(a, v) 		tb_atomic_fetch_and_nand_stub(a, v)
-#endif
-
 #ifndef tb_atomic_inc_and_fetch
 # 	define tb_atomic_inc_and_fetch(a) 			tb_atomic_inc_and_fetch_stub(a)
 #endif
@@ -118,10 +114,6 @@
 
 #ifndef tb_atomic_and_and_fetch
 # 	define tb_atomic_and_and_fetch(a, v) 		tb_atomic_and_and_fetch_stub(a, v)
-#endif
-
-#ifndef tb_atomic_nand_and_fetch
-# 	define tb_atomic_nand_and_fetch(a, v) 		tb_atomic_nand_and_fetch_stub(a, v)
 #endif
 
 
@@ -244,15 +236,6 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_stub(tb_atomic_t* a, tb_si
 	*a |= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_nand_stub(tb_atomic_t* a, tb_size_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_size_t o = *a;
-	*a = ~o & v;
-	return o;
-}
 
 /* /////////////////////////////////////////////////////////
  * ... and fetch
@@ -313,13 +296,6 @@ static __tb_inline__ tb_size_t tb_atomic_or_and_fetch_stub(tb_atomic_t* a, tb_si
 	*((tb_long_t*)a) |= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_nand_and_fetch_stub(tb_atomic_t* a, tb_size_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
 
-	*((tb_long_t*)a) = ~*((tb_long_t*)a) & v;
-	return *((tb_long_t*)a);
-}
 
 #endif

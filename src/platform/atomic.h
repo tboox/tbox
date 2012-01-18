@@ -33,7 +33,7 @@
 		(__GNUC__ >= 4 && __GNUC_MINOR__ >= 1)
 # 	include "compiler/gcc/atomic.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)
-//# 	include "windows/atomic.h"
+# 	include "windows/atomic.h"
 #endif
 
 #include "arch/atomic.h"
