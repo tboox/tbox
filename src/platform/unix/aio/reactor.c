@@ -50,8 +50,6 @@
 # 	include "reactor/aiop/epoll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
 # 	include "reactor/aiop/kqueue.c"
-#elif defined(TB_CONFIG_AIO_HAVE_PORT)
-# 	include "reactor/aiop/port.c"
 #elif defined(TB_CONFIG_AIO_HAVE_POLL)
 # 	include "reactor/aiop/poll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
