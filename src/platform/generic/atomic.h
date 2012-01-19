@@ -20,8 +20,8 @@
  * \file		atomic.h
  *
  */
-#ifndef TB_PLATFORM_STUB_ATOMIC_H
-#define TB_PLATFORM_STUB_ATOMIC_H
+#ifndef TB_PLATFORM_GENERIC_ATOMIC_H
+#define TB_PLATFORM_GENERIC_ATOMIC_H
 
 /* /////////////////////////////////////////////////////////
  * includes
@@ -33,118 +33,118 @@
  */
 
 #ifndef tb_atomic_get
-# 	define tb_atomic_get(a) 					tb_atomic_get_stub(a)
+# 	define tb_atomic_get(a) 					tb_atomic_get_generic(a)
 #endif
 
 #ifndef tb_atomic_set
-# 	define tb_atomic_set(a, v) 					tb_atomic_set_stub(a, v)
+# 	define tb_atomic_set(a, v) 					tb_atomic_set_generic(a, v)
 #endif
 
 #ifndef tb_atomic_set0
-# 	define tb_atomic_set0(a) 					tb_atomic_set0_stub(a)
+# 	define tb_atomic_set0(a) 					tb_atomic_set0_generic(a)
 #endif
 
 #ifndef tb_atomic_pset
-# 	define tb_atomic_pset(a, p, v) 				tb_atomic_pset_stub(a, p, v)
+# 	define tb_atomic_pset(a, p, v) 				tb_atomic_pset_generic(a, p, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_set0
-# 	define tb_atomic_fetch_and_set0(a) 			tb_atomic_fetch_and_set0_stub(a)
+# 	define tb_atomic_fetch_and_set0(a) 			tb_atomic_fetch_and_set0_generic(a)
 #endif
 
 #ifndef tb_atomic_fetch_and_set
-# 	define tb_atomic_fetch_and_set(a, v) 		tb_atomic_fetch_and_set_stub(a, v)
+# 	define tb_atomic_fetch_and_set(a, v) 		tb_atomic_fetch_and_set_generic(a, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_pset
-# 	define tb_atomic_fetch_and_pset(a, p, v) 	tb_atomic_fetch_and_pset_stub(a, p, v)
+# 	define tb_atomic_fetch_and_pset(a, p, v) 	tb_atomic_fetch_and_pset_generic(a, p, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_inc
-# 	define tb_atomic_fetch_and_inc(a) 			tb_atomic_fetch_and_inc_stub(a)
+# 	define tb_atomic_fetch_and_inc(a) 			tb_atomic_fetch_and_inc_generic(a)
 #endif
 
 #ifndef tb_atomic_fetch_and_dec
-# 	define tb_atomic_fetch_and_dec(a) 			tb_atomic_fetch_and_dec_stub(a)
+# 	define tb_atomic_fetch_and_dec(a) 			tb_atomic_fetch_and_dec_generic(a)
 #endif
 
 #ifndef tb_atomic_fetch_and_add
-# 	define tb_atomic_fetch_and_add(a, v) 		tb_atomic_fetch_and_add_stub(a, v)
+# 	define tb_atomic_fetch_and_add(a, v) 		tb_atomic_fetch_and_add_generic(a, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_sub
-# 	define tb_atomic_fetch_and_sub(a, v) 		tb_atomic_fetch_and_sub_stub(a, v)
+# 	define tb_atomic_fetch_and_sub(a, v) 		tb_atomic_fetch_and_sub_generic(a, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_or
-# 	define tb_atomic_fetch_and_or(a, v) 		tb_atomic_fetch_and_or_stub(a, v)
+# 	define tb_atomic_fetch_and_or(a, v) 		tb_atomic_fetch_and_or_generic(a, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_xor
-# 	define tb_atomic_fetch_and_xor(a, v) 		tb_atomic_fetch_and_xor_stub(a, v)
+# 	define tb_atomic_fetch_and_xor(a, v) 		tb_atomic_fetch_and_xor_generic(a, v)
 #endif
 
 #ifndef tb_atomic_fetch_and_and
-# 	define tb_atomic_fetch_and_and(a, v) 		tb_atomic_fetch_and_and_stub(a, v)
+# 	define tb_atomic_fetch_and_and(a, v) 		tb_atomic_fetch_and_and_generic(a, v)
 #endif
 
 #ifndef tb_atomic_inc_and_fetch
-# 	define tb_atomic_inc_and_fetch(a) 			tb_atomic_inc_and_fetch_stub(a)
+# 	define tb_atomic_inc_and_fetch(a) 			tb_atomic_inc_and_fetch_generic(a)
 #endif
 
 #ifndef tb_atomic_dec_and_fetch
-# 	define tb_atomic_dec_and_fetch(a) 			tb_atomic_dec_and_fetch_stub(a)
+# 	define tb_atomic_dec_and_fetch(a) 			tb_atomic_dec_and_fetch_generic(a)
 #endif
 
 #ifndef tb_atomic_add_and_fetch
-# 	define tb_atomic_add_and_fetch(a, v) 		tb_atomic_add_and_fetch_stub(a, v)
+# 	define tb_atomic_add_and_fetch(a, v) 		tb_atomic_add_and_fetch_generic(a, v)
 #endif
 
 #ifndef tb_atomic_sub_and_fetch
-# 	define tb_atomic_sub_and_fetch(a, v) 		tb_atomic_sub_and_fetch_stub(a, v)
+# 	define tb_atomic_sub_and_fetch(a, v) 		tb_atomic_sub_and_fetch_generic(a, v)
 #endif
 
 #ifndef tb_atomic_or_and_fetch
-# 	define tb_atomic_or_and_fetch(a, v) 		tb_atomic_or_and_fetch_stub(a, v)
+# 	define tb_atomic_or_and_fetch(a, v) 		tb_atomic_or_and_fetch_generic(a, v)
 #endif
 
 #ifndef tb_atomic_xor_and_fetch
-# 	define tb_atomic_xor_and_fetch(a, v) 		tb_atomic_xor_and_fetch_stub(a, v)
+# 	define tb_atomic_xor_and_fetch(a, v) 		tb_atomic_xor_and_fetch_generic(a, v)
 #endif
 
 #ifndef tb_atomic_and_and_fetch
-# 	define tb_atomic_and_and_fetch(a, v) 		tb_atomic_and_and_fetch_stub(a, v)
+# 	define tb_atomic_and_and_fetch(a, v) 		tb_atomic_and_and_fetch_generic(a, v)
 #endif
 
 
 /* /////////////////////////////////////////////////////////
  * get & set
  */
-static __tb_inline__ tb_size_t tb_atomic_get_stub(tb_atomic_t* a)
+static __tb_inline__ tb_size_t tb_atomic_get_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	return *a;
 }
-static __tb_inline__ tb_void_t tb_atomic_set_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_set_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	*a = v;
 }
-static __tb_inline__ tb_void_t tb_atomic_set0_stub(tb_atomic_t* a)
+static __tb_inline__ tb_void_t tb_atomic_set0_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	*a = 0;
 }
-static __tb_inline__ tb_void_t tb_atomic_pset_stub(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_pset_generic(tb_atomic_t* a, tb_size_t p, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	if (*a == p) *a = v;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_set0_stub(tb_atomic_t* a)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_set0_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -153,7 +153,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_set0_stub(tb_atomic_t* a)
 	*a = 0;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -162,7 +162,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_stub(tb_atomic_t* a, tb_s
 	*a = v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_stub(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_generic(tb_atomic_t* a, tb_size_t p, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -175,7 +175,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_stub(tb_atomic_t* a, tb_
 /* /////////////////////////////////////////////////////////
  * fetch and ...
  */
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_inc_stub(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_inc_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -183,7 +183,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_inc_stub(tb_atomic_t* a)
 	tb_long_t __tb_volatile__* pa = (tb_long_t __tb_volatile__*)a;
 	return *pa++;
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_dec_stub(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_dec_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -191,7 +191,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_dec_stub(tb_atomic_t* a)
 	tb_long_t __tb_volatile__* pa = (tb_long_t __tb_volatile__*)a;
 	return *pa--;
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_stub(tb_atomic_t* a, tb_long_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -200,7 +200,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_add_stub(tb_atomic_t* a, tb_l
 	*((tb_long_t*)a) += v;
 	return o;
 }
-static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_stub(tb_atomic_t* a, tb_long_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -209,7 +209,7 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_stub(tb_atomic_t* a, tb_l
 	*((tb_long_t*)a) -= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_xor_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_xor_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -218,7 +218,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_xor_stub(tb_atomic_t* a, tb_s
 	*a ^= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_and_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_and_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -227,7 +227,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_and_stub(tb_atomic_t* a, tb_s
 	*a &= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -240,7 +240,7 @@ static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_stub(tb_atomic_t* a, tb_si
 /* /////////////////////////////////////////////////////////
  * ... and fetch
  */
-static __tb_inline__ tb_long_t tb_atomic_inc_and_fetch_stub(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_inc_and_fetch_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -248,7 +248,7 @@ static __tb_inline__ tb_long_t tb_atomic_inc_and_fetch_stub(tb_atomic_t* a)
 	tb_long_t __tb_volatile__* pa = (tb_long_t __tb_volatile__*)a;
 	return ++*pa;
 }
-static __tb_inline__ tb_long_t tb_atomic_dec_and_fetch_stub(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_dec_and_fetch_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -256,7 +256,7 @@ static __tb_inline__ tb_long_t tb_atomic_dec_and_fetch_stub(tb_atomic_t* a)
 	tb_long_t __tb_volatile__* pa = (tb_long_t __tb_volatile__*)a;
 	return --*pa;
 }
-static __tb_inline__ tb_long_t tb_atomic_add_and_fetch_stub(tb_atomic_t* a, tb_long_t v)
+static __tb_inline__ tb_long_t tb_atomic_add_and_fetch_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -264,7 +264,7 @@ static __tb_inline__ tb_long_t tb_atomic_add_and_fetch_stub(tb_atomic_t* a, tb_l
 	*((tb_long_t*)a) += v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_long_t tb_atomic_sub_and_fetch_stub(tb_atomic_t* a, tb_long_t v)
+static __tb_inline__ tb_long_t tb_atomic_sub_and_fetch_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -272,7 +272,7 @@ static __tb_inline__ tb_long_t tb_atomic_sub_and_fetch_stub(tb_atomic_t* a, tb_l
 	*((tb_long_t*)a) -= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -280,7 +280,7 @@ static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_stub(tb_atomic_t* a, tb_s
 	*((tb_long_t*)a) ^= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -288,7 +288,7 @@ static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_stub(tb_atomic_t* a, tb_s
 	*((tb_long_t*)a) &= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_or_and_fetch_stub(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_size_t tb_atomic_or_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);

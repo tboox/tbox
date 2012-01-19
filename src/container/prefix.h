@@ -27,6 +27,5 @@
  * includes
  */
 #include "../prefix.h"
-#include "../stream/stream.h"
 
 #endif

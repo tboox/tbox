@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		reactor.c
+ * \file		aioo.c
  *
  */
 
@@ -25,65 +25,36 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../aio/aio.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../container/container.h"
-#include "winsock2.h"
-#include "windows.h"
 
-// aio
-#ifdef TB_CONFIG_AIO_HAVE_WAITO
-# 	include "reactor/aioo/waito.c"
-#endif
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-# 	include "reactor/aioo/select.c"
-#endif
-
-// aiop
-#ifdef TB_CONFIG_AIO_HAVE_WAITO
-# 	include "reactor/aiop/waito.c"
-#endif
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-# 	include "reactor/aiop/select.c"
+#if defined(TB_CONFIG_AIO_HAVE_POLL)
+# 	include "aioo/poll.c"
+#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
+# 	include "aioo/select.c"
+#else
+# 	error have not available event mode
 #endif
 
 /* /////////////////////////////////////////////////////////
- * aio
+ * implemention
  */
-#ifdef TB_CONFIG_AIO_HAVE_WAITO
 
+#if defined(TB_CONFIG_AIO_HAVE_POLL)
 tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
 {
-	return tb_aioo_reactor_waito_wait(object, timeout);
+	return tb_aioo_reactor_poll_wait(object, timeout);
 }
-#endif
-
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
 tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
+{
+	return tb_aioo_reactor_poll_wait(object, timeout);
+}
+#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
 {
 	return tb_aioo_reactor_select_wait(object, timeout);
 }
-
-#endif
-
-/* /////////////////////////////////////////////////////////
- * aiop
- */
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
 {
-	return tb_aiop_reactor_waito_init(aiop);
-}
-#endif
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
-{
-	return tb_aiop_reactor_select_init(aiop);
+	return tb_aioo_reactor_select_wait(object, timeout);
 }
 #endif
 

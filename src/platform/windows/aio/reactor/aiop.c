@@ -17,17 +17,37 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aiop.c
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_PREFIX_H
-#define TB_PLATFROM_WINDOWS_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "windows.h"
+#include "prefix.h"
 
-
+#ifdef TB_CONFIG_AIO_HAVE_WAITO
+# 	include "aiop/waito.c"
 #endif
+
+#ifdef TB_CONFIG_AIO_HAVE_SELECT
+# 	include "aiop/select.c"
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * implemention
+ */
+#ifdef TB_CONFIG_AIO_HAVE_SELECT
+tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+{
+	return tb_aiop_reactor_waito_init(aiop);
+}
+#endif
+
+#ifdef TB_CONFIG_AIO_HAVE_SELECT
+tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+{
+	return tb_aiop_reactor_select_init(aiop);
+}
+#endif
+

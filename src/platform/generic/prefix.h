@@ -20,14 +20,13 @@
  * \file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_PREFIX_H
-#define TB_PLATFROM_WINDOWS_PREFIX_H
+#ifndef TB_PLATFROM_GENERIC_PREFIX_H
+#define TB_PLATFROM_GENERIC_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-#include "windows.h"
 
 
 #endif

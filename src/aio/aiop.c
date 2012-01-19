@@ -26,12 +26,7 @@
  */
 #include "aiop.h"
 #include "aioo.h"
-
-/* /////////////////////////////////////////////////////////
- * declaration
- */
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t*);
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t*);
+#include "reactor/aiop.h"
 
 /* /////////////////////////////////////////////////////////
  * implemention
@@ -53,11 +48,10 @@ tb_aiop_t* tb_aiop_init(tb_size_t type, tb_size_t maxn)
 	static tb_aiop_reactor_t* (*s_init[])(tb_aiop_t*) = 
 	{
 		TB_NULL
-	, 	TB_NULL 	//!< for qbuffer
 	, 	tb_aiop_reactor_file_init
 	,	tb_aiop_reactor_sock_init
-	,	TB_NULL 	//!< for http
-	,	TB_NULL 	//!< for gstream
+	,	tb_aiop_reactor_http_init
+	,	tb_aiop_reactor_gstm_init
 	
 	};
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);

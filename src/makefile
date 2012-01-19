@@ -86,6 +86,8 @@ tbox_C_FILES 			+= \
 						xml/writer \
 						aio/aiop \
 						aio/aioo \
+						aio/reactor/aiop \
+						aio/reactor/aioo \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -135,7 +137,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_THRD)/thread \
 						platform/$(TB_CONFIG_API_EVET)/event \
 						platform/$(TB_CONFIG_API_EVET)/epool \
-						platform/$(TB_CONFIG_API_ASIO)/aio/reactor
+						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
+						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aiop
 
 # flags
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 

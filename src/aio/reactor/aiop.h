@@ -17,16 +17,25 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aiop.h
  *
  */
-#ifndef TB_PLATFROM_STUB_PREFIX_H
-#define TB_PLATFROM_STUB_PREFIX_H
+#ifndef TB_AIO_REACTOR_AIOP_H
+#define TB_AIO_REACTOR_AIOP_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
+#include "prefix.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop);
+tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop);
+tb_aiop_reactor_t* tb_aiop_reactor_http_init(tb_aiop_t* aiop);
+tb_aiop_reactor_t* tb_aiop_reactor_gstm_init(tb_aiop_t* aiop);
 
 #endif
