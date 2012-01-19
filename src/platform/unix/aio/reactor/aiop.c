@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		reactor.c
+ * \file		aiop.c
  *
  */
 
@@ -25,65 +25,21 @@
  * includes
  */
 #include "prefix.h"
-#include "../../../aio/aio.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../container/container.h"
-#include <sys/types.h>
-#include <sys/socket.h>
 
-// aio
-#if defined(TB_CONFIG_AIO_HAVE_POLL)
-# 	include "reactor/aioo/poll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-# 	include "reactor/aioo/select.c"
-#elif defined(TB_CONFIG_AIO_HAVE_EPOLL)
-# 	include "reactor/aiop/epoll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
-# 	include "reactor/aioo/kqueue.c"
-#else
-# 	error have not available event mode
-#endif
-
-// aiop
 #if defined(TB_CONFIG_AIO_HAVE_EPOLL)
-# 	include "reactor/aiop/epoll.c"
+# 	include "aiop/epoll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
-# 	include "reactor/aiop/kqueue.c"
+# 	include "aiop/kqueue.c"
 #elif defined(TB_CONFIG_AIO_HAVE_POLL)
-# 	include "reactor/aiop/poll.c"
+# 	include "aiop/poll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-# 	include "reactor/aiop/select.c"
+# 	include "aiop/select.c"
 #else
 # 	error have not available event mode
 #endif
 
 /* /////////////////////////////////////////////////////////
- * aio
- */
-
-#if defined(TB_CONFIG_AIO_HAVE_POLL)
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_poll_wait(object, timeout);
-}
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_poll_wait(object, timeout);
-}
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_select_wait(object, timeout);
-}
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_select_wait(object, timeout);
-}
-#endif
-
-/* /////////////////////////////////////////////////////////
- * aiop
+ * implemention
  */
 #if defined(TB_CONFIG_AIO_HAVE_EPOLL)
 tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)

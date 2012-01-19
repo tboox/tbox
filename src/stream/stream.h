@@ -29,6 +29,7 @@
 #include "prefix.h"
 #include "bstream.h"
 #include "gstream.h"
+#include "tstream/tstream.h"
 
 /* /////////////////////////////////////////////////////////
  * architecture

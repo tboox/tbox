@@ -17,17 +17,27 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aiop.c
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_PREFIX_H
-#define TB_PLATFROM_WINDOWS_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "windows.h"
+#include "aiop.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-#endif
+tb_aiop_reactor_t* tb_aiop_reactor_http_init(tb_aiop_t* aiop)
+{
+	tb_trace_noimpl();
+	return TB_NULL;
+}
+tb_aiop_reactor_t* tb_aiop_reactor_gstm_init(tb_aiop_t* aiop)
+{
+	tb_trace_noimpl();
+	return TB_NULL;
+}
+

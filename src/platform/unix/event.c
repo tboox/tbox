@@ -41,6 +41,6 @@
 #elif defined(TB_CONFIG_EVENT_HAVE_SYSTEMV)
 # 	include "event/systemv.c"
 #else
-# 	include "../stub/event.c"
+# 	include "../generic/event.c"
 #endif
 

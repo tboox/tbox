@@ -39,8 +39,8 @@ typedef enum __tb_aioo_etype_t
  	TB_AIOO_ETYPE_NULL 	= 0
 ,	TB_AIOO_ETYPE_READ 	= 1		//!< for all i/o object
 ,	TB_AIOO_ETYPE_WRIT 	= 2		//!< for all i/o object
-, 	TB_AIOO_ETYPE_ACPT 	= 4 	//!< only for TB_AIOO_OTYPE_SOCK
-, 	TB_AIOO_ETYPE_CONN 	= 8 	//!< only for TB_AIOO_OTYPE_SOCK
+, 	TB_AIOO_ETYPE_ACPT 	= 4 	//!< for socket, http, gstream(sock, http)
+, 	TB_AIOO_ETYPE_CONN 	= 8 	//!< for socket, http, gstream(sock, http)
 
 }tb_aioo_etype_t;
 
@@ -48,11 +48,10 @@ typedef enum __tb_aioo_etype_t
 typedef enum __tb_aioo_otype_t
 {
  	TB_AIOO_OTYPE_NULL 	= 0
-, 	TB_AIOO_OTYPE_DATA 	= 1 	//!< for qbuffer
-, 	TB_AIOO_OTYPE_FILE 	= 2 	//!< for file
-,	TB_AIOO_OTYPE_SOCK 	= 3 	//!< for socket
-,	TB_AIOO_OTYPE_HTTP 	= 4 	//!< for http
-,	TB_AIOO_OTYPE_GSTM 	= 5 	//!< for gstream
+, 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
+,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
+,	TB_AIOO_OTYPE_HTTP 	= 3 	//!< for http
+,	TB_AIOO_OTYPE_GSTM 	= 4 	//!< for gstream
 
 }tb_aioo_otype_t;
 

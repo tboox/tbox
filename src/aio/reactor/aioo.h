@@ -17,17 +17,24 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aioo.h
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_PREFIX_H
-#define TB_PLATFROM_WINDOWS_PREFIX_H
+#ifndef TB_AIO_REACTOR_AIOO_H
+#define TB_AIO_REACTOR_AIOO_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "windows.h"
+#include "prefix.h"
 
+/* /////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_http_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_gstm_wait(tb_aioo_t* object, tb_long_t timeout);
 
 #endif

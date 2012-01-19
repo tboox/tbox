@@ -37,7 +37,7 @@
 #endif
 
 #include "arch/atomic.h"
-#include "stub/atomic.h"
+#include "generic/atomic.h"
 
 
 #endif

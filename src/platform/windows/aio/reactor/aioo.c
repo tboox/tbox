@@ -17,17 +17,40 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aioo.c
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_PREFIX_H
-#define TB_PLATFROM_WINDOWS_PREFIX_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "windows.h"
+#include "prefix.h"
 
+#ifdef TB_CONFIG_AIO_HAVE_WAITO
+# 	include "aioo/waito.c"
+#endif
+
+#ifdef TB_CONFIG_AIO_HAVE_SELECT
+# 	include "aioo/select.c"
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * implemention
+ */
+#ifdef TB_CONFIG_AIO_HAVE_WAITO
+
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
+{
+	return tb_aioo_reactor_waito_wait(object, timeout);
+}
+#endif
+
+
+#ifdef TB_CONFIG_AIO_HAVE_SELECT
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
+{
+	return tb_aioo_reactor_select_wait(object, timeout);
+}
 
 #endif
+
