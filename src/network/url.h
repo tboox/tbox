@@ -61,12 +61,51 @@ typedef struct __tb_url_t
 	// the path
 	tb_pstring_t 	path;
 
+	// the path
+	tb_pstring_t 	data;
+
 }tb_url_t;
 
 
 /* /////////////////////////////////////////////////////////
  * the interfaces
  */
+
+// init & exit
+tb_bool_t 			tb_url_init(tb_url_t* url);
+tb_void_t 			tb_url_exit(tb_url_t* url);
+
+// accessors
+tb_char_t const* 	tb_url_cstr(tb_url_t const* url);
+tb_size_t 			tb_url_size(tb_url_t const* url);
+
+// modifiors
+tb_void_t 			tb_url_clear(tb_url_t* url);
+
+// url
+tb_char_t const* 	tb_url_get(tb_url_t const* url);
+tb_bool_t 			tb_url_set(tb_url_t* url, tb_char_t const* u);
+
+// ssl
+tb_bool_t 			tb_url_ssl_get(tb_url_t const* url);
+tb_void_t 			tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl);
+
+// poto
+tb_size_t 			tb_url_poto_get(tb_url_t const* url);
+tb_void_t 			tb_url_poto_set(tb_url_t* url, tb_size_t poto);
+
+// port
+tb_size_t 			tb_url_port_get(tb_url_t const* url);
+tb_void_t 			tb_url_port_set(tb_url_t* url, tb_size_t port);
+
+// host
+tb_char_t const* 	tb_url_host_get(tb_url_t const* url);
+tb_void_t 			tb_url_host_set(tb_url_t* url, tb_char_t const* host);
+
+// path
+tb_char_t const* 	tb_url_path_get(tb_url_t const* url);
+tb_void_t 			tb_url_path_set(tb_url_t* url, tb_char_t const* path);
+
 
 
 #endif

@@ -32,6 +32,7 @@ tbox_C_FILES 			+= \
 						container/slist \
 						container/dlist \
 						container/vector \
+						network/url \
 						network/http \
 						network/cookies \
 						encoding/encoding \
@@ -239,6 +240,7 @@ INC_FILES 				= \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \
+						network/url.h \
 						network/dns.h \
 						network/cookies.h \
 						encoding/encoding.h \
