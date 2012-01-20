@@ -332,7 +332,7 @@ SUB_PROS 				= \
 					  	demo/other \
 					  	demo/memory \
 					  	demo/string \
-					  	demo/gstream \
+					  	demo/stream \
 					  	demo/network \
 					  	demo/platform
 

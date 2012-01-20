@@ -205,6 +205,12 @@ typedef struct __tb_gstream_t
 	// the url
 	tb_char_t* 			url;
 
+	// the bare handle for aio
+	tb_handle_t 		(*bare)(struct __tb_gstream_t* gst);
+
+	// wait the aio event
+	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+
 	// async open
 	tb_long_t 			(*aopen)(struct __tb_gstream_t* gst);
 
@@ -282,6 +288,12 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 // init stream from encoding
 tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
+// the bare handle for aio
+tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
+
+// wait the aio event
+tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+
 // async open, allow multiple called before closing 
 tb_long_t 			tb_gstream_aopen(tb_gstream_t* gst);
 
@@ -294,14 +306,6 @@ tb_long_t 			tb_gstream_aclose(tb_gstream_t* gst);
 // block close, allow multiple called
 tb_bool_t 			tb_gstream_bclose(tb_gstream_t* gst);
 
-// async flush read & writ data
-tb_long_t 			tb_gstream_afread(tb_gstream_t* gst);
-tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst);
-
-// block flush read & writ data
-tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst);
-tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst);
-
 // async read & writ data
 tb_long_t 			tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 tb_long_t 			tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
@@ -309,10 +313,6 @@ tb_long_t 			tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 // block read & writ data
 tb_bool_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-
-// block read & writ line
-tb_long_t 			tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
-tb_long_t 			tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
 
 // async need data
 tb_long_t 			tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
@@ -332,6 +332,10 @@ tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 // load & save data
 tb_uint64_t 		tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
 tb_uint64_t 		tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
+
+// block read & writ line
+tb_long_t 			tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
 
 // block read integer
 tb_uint8_t 			tb_gstream_bread_u8(tb_gstream_t* gst);

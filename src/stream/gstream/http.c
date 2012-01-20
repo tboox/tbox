@@ -111,6 +111,19 @@ static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	// ok
 	return TB_TRUE;
 }
+static tb_handle_t tb_hstream_bare(tb_gstream_t* gst)
+{	
+	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_assert_and_check_return_val(hst && hst->http, TB_NULL);
+	return tb_http_bare(hst->http);
+}
+static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_assert_and_check_return_val(hst && hst->http, -1);
+
+	return tb_http_wait(hst->http, etype, timeout);
+}
 static tb_bool_t tb_hstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
@@ -250,8 +263,10 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->aread 	= tb_hstream_aread;
 	gst->seek 	= tb_hstream_seek;
 	gst->size 	= tb_hstream_size;
-	gst->ctrl1 = tb_hstream_ctrl1;
-	gst->ctrl2 = tb_hstream_ctrl2;
+	gst->bare 	= tb_hstream_bare;
+	gst->wait 	= tb_hstream_wait;
+	gst->ctrl1 	= tb_hstream_ctrl1;
+	gst->ctrl2 	= tb_hstream_ctrl2;
 	gst->free 	= tb_hstream_free;
 	hst->http 	= tb_http_init(TB_NULL);
 	tb_assert_and_check_goto(hst->http, fail);

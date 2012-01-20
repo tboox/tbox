@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../aio/aio.h"
 #include "../../string/string.h"
 #include "../../platform/platform.h"
 
@@ -69,14 +70,14 @@ static __tb_inline__ tb_sstream_t* tb_sstream_cast(tb_gstream_t* gst)
 static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst && !sst->sock && sst->port, -1);
+	tb_assert_and_check_return_val(sst && sst->port, -1);
 
-	// open socket
-//	sst->sock = tb_socket_client_open(sst->host, sst->port, sst->type, TB_FALSE);
+	// open
+	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
 	tb_assert_and_check_return_val(sst->sock, -1);
 
-	// ok
-	return 1;
+	// connect
+	return tb_socket_connect(sst->sock, sst->host, sst->port);
 }
 static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 {
@@ -86,7 +87,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	if (sst->sock)
 	{
 		// close socket
-//		tb_socket_close(sst->sock);
+		tb_socket_close(sst->sock);
 		sst->sock = TB_NULL;
 	}
 
@@ -100,8 +101,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// read data
-//	return tb_socket_recv(sst->sock, data, size);
-	return -1;
+	return tb_socket_recv(sst->sock, data, size);
 }
 static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
@@ -110,8 +110,23 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// writ data
-//	return tb_socket_send(sst->sock, data, size);
-	return -1;
+	return tb_socket_send(sst->sock, data, size);
+}
+static tb_handle_t tb_sstream_bare(tb_gstream_t* gst)
+{	
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst && sst->sock, TB_NULL);
+	return tb_socket_bare(sst->sock);
+}
+static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_sstream_t* sst = tb_sstream_cast(gst);
+	tb_assert_and_check_return_val(sst && sst->sock, -1);
+
+	tb_aioo_t o;
+	tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, TB_NULL);
+
+	return tb_aioo_wait(&o, timeout);
 }
 static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
@@ -197,7 +212,9 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->aclose = tb_sstream_aclose;
 	gst->aread 	= tb_sstream_aread;
 	gst->awrit 	= tb_sstream_awrit;
-	gst->ctrl1 = tb_sstream_ctrl1;
+	gst->ctrl1 	= tb_sstream_ctrl1;
+	gst->bare 	= tb_sstream_bare;
+	gst->wait 	= tb_sstream_wait;
 	sst->sock 	= TB_NULL;
 	sst->type 	= TB_SOCKET_TYPE_TCP;
 

@@ -25,6 +25,7 @@
  */
 #include "bstream.h"
 #include "gstream.h"
+#include "../aio/aio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../memory/memory.h"
@@ -63,7 +64,7 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 	// load
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_size_t 		load = 0;
-	tb_int64_t 		time = tb_mclock();
+	tb_bool_t 		wait = TB_FALSE;
 	tb_uint64_t 	left = tb_gstream_left(ist);
 
 	while (1)
@@ -77,16 +78,26 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 			// set data
 			if (tb_bstream_set_data(bst, data, n) != n) break;
 
-			// update clock
-			time = tb_mclock();
+			// no waiting
+			wait = TB_FALSE;
 		}
 		else if (!n) 
 		{
+			// no end?
+			tb_check_break(!wait);
+
+			// wait
+			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, tb_gstream_timeout(ist));
+			tb_assert_and_check_break(e >= 0);
+
 			// timeout?
-			if (tb_mclock() - time > tb_gstream_timeout(ist)) break;
-			
-			// sleep some time
-			tb_usleep(ist);
+			tb_check_break(e);
+
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 
@@ -106,7 +117,6 @@ tb_size_t tb_bstream_save(tb_bstream_t* bst, tb_gstream_t* ost)
 	// load
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_size_t 		save = 0;
-	tb_int64_t 		time = tb_mclock();
 	while(1)
 	{
 		// get data

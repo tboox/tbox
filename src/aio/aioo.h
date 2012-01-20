@@ -41,6 +41,7 @@ typedef enum __tb_aioo_etype_t
 ,	TB_AIOO_ETYPE_WRIT 	= 2		//!< for all i/o object
 , 	TB_AIOO_ETYPE_ACPT 	= 4 	//!< for socket, http, gstream(sock, http)
 , 	TB_AIOO_ETYPE_CONN 	= 8 	//!< for socket, http, gstream(sock, http)
+, 	TB_AIOO_ETYPE_EALL 	= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT | TB_AIOO_ETYPE_ACPT | TB_AIOO_ETYPE_CONN
 
 }tb_aioo_etype_t;
 

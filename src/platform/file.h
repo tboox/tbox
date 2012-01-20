@@ -100,6 +100,9 @@ tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flag
 // sync
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
+// the bare handle for aio
+tb_handle_t 			tb_file_bare(tb_handle_t hfile);
+
 // accessors
 tb_uint64_t 			tb_file_size(tb_handle_t hfile);
 
