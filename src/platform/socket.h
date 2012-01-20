@@ -66,7 +66,7 @@ tb_bool_t 		tb_socket_bind(tb_handle_t handle, tb_size_t port);
 tb_handle_t 	tb_socket_accept(tb_handle_t handle);
 
 // close
-tb_void_t 		tb_socket_close(tb_handle_t handle);
+tb_bool_t 		tb_socket_close(tb_handle_t handle);
 
 // the bare handle for aio
 tb_handle_t 	tb_socket_bare(tb_handle_t handle);

@@ -17,29 +17,56 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		dns.h
+ * \file		url.h
  *
  */
-#ifndef TB_NETWORK_DNS_H
-#define TB_NETWORK_DNS_H
-
+#ifndef TB_NETWORK_URL_H
+#define TB_NETWORK_URL_H
 
 /* /////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+#include "../string/string.h"
+
+/* /////////////////////////////////////////////////////////
+ * the types
+ */
+
+// the url protocol type
+typedef enum __tb_url_proto_t
+{
+	TB_URL_PROTO_NULL 	= 0
+,	TB_URL_PROTO_FILE 	= 1 	//!< file://... or files://...
+,	TB_URL_PROTO_SOCK 	= 2 	//!< sock://... or socks://...
+,	TB_URL_PROTO_HTTP 	= 3 	//!< http://... or https://...
+
+}tb_url_proto_t;
+
+// the url type
+typedef struct __tb_url_t
+{
+	// the protocol 
+	tb_uint16_t 	poto: 	15;
+
+	// is ssl?
+	tb_uint16_t 	bssl: 	1;
+
+	// the port
+	tb_uint16_t 	port;
+
+	// the host
+	tb_pstring_t 	host;
+
+	// the path
+	tb_pstring_t 	path;
+
+}tb_url_t;
+
 
 /* /////////////////////////////////////////////////////////
  * the interfaces
  */
-
-// manage dns server
-tb_void_t 			tb_dns_server_add(tb_char_t const* ip);
-tb_void_t 			tb_dns_server_del(tb_char_t const* ip);
-tb_void_t 			tb_dns_server_dump();
-
-// lookup host ip from name
-tb_char_t const* 	tb_dns_lookup(tb_char_t const* host, tb_char_t* ip);
 
 
 #endif

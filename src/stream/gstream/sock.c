@@ -87,7 +87,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	if (sst->sock)
 	{
 		// close socket
-		tb_socket_close(sst->sock);
+		if (!tb_socket_close(sst->sock)) return 0;
 		sst->sock = TB_NULL;
 	}
 

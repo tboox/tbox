@@ -138,9 +138,10 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	return r + 1;
 }
 
-tb_void_t tb_socket_close(tb_handle_t handle)
+tb_bool_t tb_socket_close(tb_handle_t handle)
 {
-	if (handle) close((tb_long_t)handle - 1);
+	tb_assert_and_check_return_val(handle, TB_FALSE);
+	return !close((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
 }
 tb_handle_t tb_socket_bare(tb_handle_t handle)
 {

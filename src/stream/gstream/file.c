@@ -89,7 +89,7 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 	if (fst->file)
 	{
 		// close file
-		tb_file_exit(fst->file);
+		if (!tb_file_exit(fst->file)) return 0;
 
 		// clear 
 		fst->file = TB_NULL;
