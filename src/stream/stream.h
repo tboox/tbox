@@ -36,28 +36,33 @@
  *
  *
  *    
- * bstream
- *                  
- *              - hstream
- *             |
- * gstream ----  fstream
- *             |
- *             - dstream
- *             |
- *             |           - estream
- *             |          |
- *             - tstream -|          - rlc
- *                  |     |         |
- *                  |     - zstream - lzsw
- *                  |              |
- *                  |              - gzip
- *                  |
- *                  | 
- *                  - gstream - ...
+ *     bstream
+ *        |         
+ *        |                                               - dstream(data)
+ *    (url, ...)   (aio)                     (aio)       |
+ *     gstream ------------- gstream ---------------------  fstream(file)
+ *                   |              \                    |
+ *                   |               -- hstream(http) ----- sstream(sock)
+ *                   |
+ *                   |
+ *                   |           - estream(utf8, gb2312, gbk)
+ *                   |          |
+ *                   - tstream -| lstream(ssl)      
+ *                              |        
+ *                              - zstream(rlc, lzsw, gzip)
+ *                        
+ *                         
+ * url: 
+ *     unix: /home/path/file...
+ * or
+ *     file://...
+ *     sock://...
+ *     http://...
+ *     files://...
+ *     socks://...
+ *     https://...
  *
  *
- *
- * read & writ <= tstream <= tstream ... <= gstream <= (data, file, http, ...)
  */
 
 #endif

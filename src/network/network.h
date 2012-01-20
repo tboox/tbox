@@ -27,8 +27,9 @@
  * includes
  */
 #include "prefix.h"
-#include "cookies.h"
-#include "http.h"
 #include "dns.h"
+#include "url.h"
+#include "http.h"
+#include "cookies.h"
 
 #endif

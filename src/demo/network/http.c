@@ -40,12 +40,11 @@ int main(int argc, char** argv)
 	tb_assert_and_check_goto(option->cookies, end);
 	
 	// init url
-//	tb_pstring_cstrcpy(&option->host, "119.75.217.56");
-//	tb_pstring_cstrcpy(&option->path, "/index.html");
+	if (!tb_url_set(&option->url, "http://119.75.217.56/index.html")) goto end;
 
 	// init head func
 	option->hfunc = tb_http_test_hfunc;
-	option->udata = http;
+	option->udata = (tb_pointer_t)http;
 
 	// open http
 	if (!tb_http_bopen(http)) goto end;
