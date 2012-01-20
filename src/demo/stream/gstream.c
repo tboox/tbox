@@ -43,6 +43,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	otime = tb_mclock() - otime;
 	tb_print("[gst]: open ost: %llu ms", otime);
 
+#if 1
+	tb_gstream_bwrit(ist, "<policy-file-request/>", tb_strlen("<policy-file-request/>") + 1);
+#endif
+
 #if 0
 	// save stream
 	tb_uint64_t size = tb_gstream_save(ist, ost);
@@ -51,8 +55,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_uint64_t 	read = 0;
+	tb_bool_t 		wait = TB_FALSE;
 	tb_uint64_t 	left = tb_gstream_left(ist);
-	tb_int64_t 		time = tb_mclock();
 	tb_int64_t 		base = tb_mclock();
 	tb_int64_t 		basc = tb_mclock();
 	do
@@ -62,8 +66,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 //		tb_trace("read: %d, offset: %llu, left: %llu, size: %llu", n, tb_gstream_offset(ist), tb_gstream_left(ist), tb_gstream_size(ist));
 		if (n > 0)
 		{
-			// update clock
-			time = tb_mclock();
+			// no waiting
+			wait = TB_FALSE;
 
 			// writ data
 			if (!tb_gstream_bwrit(ost, data, n)) break;
@@ -73,11 +77,21 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		}
 		else if (!n) 
 		{
-			// timeout?
-			if (tb_mclock() - time > ist->timeout) break;
+			// no end?
+			tb_check_break(!wait);
 
-			// sleep some time
-			tb_usleep(100);
+			// wait
+			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, tb_gstream_timeout(ist));
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 

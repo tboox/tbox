@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../aio/aio.h"
 #include "../../string/string.h"
 #include "../../platform/platform.h"
 
@@ -105,7 +106,7 @@ static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_assert_and_check_return_val(fst && fst->file && data, -1);
 	tb_check_return_val(size, 0);
 
-	// read data
+	// read 
 	return tb_file_read(fst->file, data, size);
 }
 static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
@@ -144,6 +145,22 @@ static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->size;
 }
+static tb_handle_t tb_fstream_bare(tb_gstream_t* gst)
+{	
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	tb_assert_and_check_return_val(fst && fst->file, TB_NULL);
+	return tb_file_bare(fst->file);
+}
+static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_fstream_t* fst = tb_fstream_cast(gst);
+	tb_assert_and_check_return_val(fst && fst->file, -1);
+
+	tb_aioo_t o;
+	tb_aioo_seto(&o, fst->file, TB_AIOO_OTYPE_FILE, etype, TB_NULL);
+
+	return tb_aioo_wait(&o, timeout);
+}
 static tb_bool_t tb_fstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
@@ -178,7 +195,9 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->afwrit	= tb_fstream_afwrit;
 	gst->size 	= tb_fstream_size;
 	gst->seek 	= tb_fstream_seek;
-	gst->ctrl1 = tb_fstream_ctrl1;
+	gst->bare 	= tb_fstream_bare;
+	gst->wait 	= tb_fstream_wait;
+	gst->ctrl1 	= tb_fstream_ctrl1;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 

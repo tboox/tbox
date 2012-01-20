@@ -149,9 +149,8 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 	o.QuadPart = (LONGLONG)offset;
 	return SetFilePointerEx(hfile, o, &p, method)? (tb_int64_t)p.QuadPart : -1;
 }
-tb_long_t tb_file_fd(tb_handle_t hfile)
+tb_handle_t tb_file_bare(tb_handle_t hfile)
 {
-	tb_assert_and_check_return_val(hfile, -1);
 	return hfile;
 }
 tb_uint64_t tb_file_size(tb_handle_t hfile)

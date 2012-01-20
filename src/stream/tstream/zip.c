@@ -190,7 +190,9 @@ tb_gstream_t* tb_gstream_init_zip()
 	gst->aopen 	= tb_zstream_aopen;
 	gst->aread 	= tb_tstream_aread;
 	gst->aclose	= tb_zstream_aclose;
-	gst->ctrl1 = tb_zstream_ctrl1;
+	gst->bare	= tb_tstream_bare;
+	gst->wait	= tb_tstream_wait;
+	gst->ctrl1 	= tb_zstream_ctrl1;
 
 	// init tstream
 	tst->type 	= TB_TSTREAM_TYPE_ZIP;

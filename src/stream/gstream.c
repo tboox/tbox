@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		stream.c
+ * \file		gstream.c
  *
  */
 
@@ -25,6 +25,7 @@
  * includes
  */
 #include "gstream.h"
+#include "../aio/aio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -364,7 +365,16 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 		tb_free(gst);
 	}
 }
-
+tb_handle_t tb_gstream_bare(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst && gst->bare, TB_NULL);
+	return gst->bare(gst);
+}
+tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_assert_and_check_return_val(gst && gst->wait, -1);
+	return gst->wait(gst, etype, timeout);
+}
 tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {
 	// check stream
@@ -400,11 +410,12 @@ tb_bool_t tb_gstream_bopen(tb_gstream_t* gst)
 	tb_int64_t 	t = tb_mclock();
 	while (!(r = tb_gstream_aopen(gst)))
 	{
-		// timeout?
-		if (tb_mclock() - t > gst->timeout) break;
+		// wait
+		r = tb_gstream_wait(gst, TB_AIOO_ETYPE_EALL, gst->timeout);
+		tb_assert_and_check_return_val(r >= 0, TB_FALSE);
 
-		// sleep some time
-		tb_usleep(100);
+		// timeout?
+		tb_check_return_val(r, TB_FALSE);
 	}
 
 	// ok?
@@ -476,66 +487,6 @@ tb_bool_t tb_gstream_bclose(tb_gstream_t* gst)
 	// ok?
 	return r > 0? TB_TRUE : TB_FALSE;
 }
-tb_long_t tb_gstream_afread(tb_gstream_t* gst)
-{
-	// check stream
-	tb_assert_and_check_return_val(gst, -1);
-
-	// flush readed cache data if the last operaton is read
-	tb_check_return_val(!gst->bwrited, 1);
-
-	// flush it
-	return tb_gstream_cache_afread(gst);
-}
-tb_long_t tb_gstream_afwrit(tb_gstream_t* gst)
-{
-	// check stream
-	tb_assert_and_check_return_val(gst, -1);
-
-	// flush writed cache data if the last operaton is writ
-	tb_check_return_val(gst->bwrited, 1);
-
-	// flush it
-	return tb_gstream_cache_afwrit(gst);
-}
-tb_bool_t tb_gstream_bfread(tb_gstream_t* gst)
-{
-	tb_assert_and_check_return_val(gst, TB_FALSE);
-
-	// try opening it
-	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
-	while (!(r = tb_gstream_afread(gst)))
-	{
-		// timeout?
-		if (tb_mclock() - t > gst->timeout) break;
-
-		// sleep some time
-		tb_usleep(100);
-	}
-
-	// ok?
-	return r > 0? TB_TRUE : TB_FALSE;
-}
-tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst)
-{
-	tb_assert_and_check_return_val(gst, TB_FALSE);
-
-	// try opening it
-	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
-	while (!(r = tb_gstream_afwrit(gst)))
-	{
-		// timeout?
-		if (tb_mclock() - t > gst->timeout) break;
-
-		// sleep some time
-		tb_usleep(100);
-	}
-
-	// ok?
-	return r > 0? TB_TRUE : TB_FALSE;
-}
 tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 {
 	// check data
@@ -569,18 +520,13 @@ tb_bool_t tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	tb_assert_and_check_return_val(gst && data, TB_FALSE);
 
 	// need data from cache
-	tb_long_t 	need = 0;
-	tb_int64_t 	time = tb_mclock();
+	tb_long_t need = 0;
+	tb_bool_t wait = TB_FALSE;
 	while ((need = tb_gstream_aneed(gst, data, size)) < size)
 	{
 		// check
 		tb_check_break(need >= 0);
 
-		// timeout?
-		if (tb_mclock() - time > gst->timeout) break;
-
-		// sleep some time
-		tb_usleep(100);
 	}
 
 	// ok?
@@ -647,8 +593,8 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, TB_TRUE);
 
 	// read data from cache
-	tb_long_t 	read = 0;
-	tb_int64_t 	time = tb_mclock();
+	tb_long_t read = 0;
+	tb_bool_t wait = TB_FALSE;
 	while (read < size)
 	{
 		// read data
@@ -658,16 +604,26 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			// update read
 			read += n;
 
-			// update clock
-			time = tb_mclock();
+			// no waiting
+			wait = TB_FALSE;
 		}
 		else if (!n)
-		{
-			// timeout?
-			if (tb_mclock() - time > gst->timeout) break;
+		{	
+			// no end?
+			tb_check_break(!wait);
 
-			// sleep some time
-			tb_usleep(100);
+			// wait
+			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 	}
@@ -683,8 +639,8 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, TB_TRUE);
 
 	// writ data to cache
-	tb_long_t 	writ = 0;
-	tb_int64_t 	time = tb_mclock();
+	tb_long_t writ = 0;
+	tb_bool_t wait = TB_FALSE;
 	while (writ < size)
 	{
 		// writ data
@@ -694,16 +650,26 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			// update writ
 			writ += n;
 
-			// update clock
-			time = tb_mclock();
+			// no waiting
+			wait = TB_FALSE;
 		}
 		else if (!n)
 		{
-			// timeout?
-			if (tb_mclock() - time > gst->timeout) break;
+			// no end?
+			tb_check_break(!wait);
 
-			// sleep some time
-			tb_usleep(100);
+			// wait
+			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has writ?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 	}
@@ -1127,17 +1093,16 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_uint64_t 	read = 0;
+	tb_bool_t 		wait = TB_FALSE;
 	tb_uint64_t 	left = tb_gstream_left(ist);
-	tb_int64_t 		time = tb_mclock();
-	tb_int64_t 		base = tb_mclock();
 	do
 	{
 		// read data
 		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
 		if (n > 0)
 		{
-			// update clock
-			time = tb_mclock();
+			// no waiting
+			wait = TB_FALSE;
 
 			// writ data
 			if (!tb_gstream_bwrit(gst, data, n)) break;
@@ -1147,11 +1112,21 @@ tb_uint64_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 		}
 		else if (!n) 
 		{
-			// timeout?
-			if (tb_mclock() - time > ist->timeout) break;
+			// no end?
+			tb_check_break(!wait);
 
-			// sleep some time
-			tb_usleep(100);
+			// wait
+			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, ist->timeout);
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
 		}
 		else break;
 

@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../aio/aio.h"
 #include "../../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
@@ -123,7 +124,16 @@ static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 	// ok
 	return TB_TRUE;
 }
+static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_assert_and_check_return_val(dst && dst->head <= dst->data + dst->size, -1);
 
+	tb_long_t 	e = 0;
+	if (etype & TB_AIOO_ETYPE_READ) e |= TB_AIOO_ETYPE_READ;
+	if (etype & TB_AIOO_ETYPE_WRIT) e |= TB_AIOO_ETYPE_WRIT;
+	return e;
+}
 static tb_bool_t tb_dstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
@@ -160,6 +170,7 @@ tb_gstream_t* tb_gstream_init_data()
 	gst->awrit 	= tb_dstream_awrit;
 	gst->size 	= tb_dstream_size;
 	gst->seek 	= tb_dstream_seek;
+	gst->wait 	= tb_dstream_wait;
 	gst->ctrl2 = tb_dstream_ctrl2;
 
 	return gst;

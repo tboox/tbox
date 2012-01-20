@@ -77,8 +77,8 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	}
 
 	// socket
-//	tb_long_t fd = socket(AF_INET, t, p);
-	SOCKET fd = WSASocket(AF_INET, t, p, TB_NULL, 0, WSA_FLAG_OVERLAPPED);
+	tb_long_t fd = socket(AF_INET, t, p);
+//	SOCKET fd = WSASocket(AF_INET, t, p, TB_NULL, 0, WSA_FLAG_OVERLAPPED);
 	tb_assert_and_check_return_val(fd >= 0, TB_NULL);
 
 	// non-block
@@ -165,6 +165,10 @@ fail:
 tb_void_t tb_socket_close(tb_handle_t handle)
 {
 	if (handle) close((tb_long_t)handle - 1);
+}
+tb_handle_t tb_socket_bare(tb_handle_t handle)
+{
+	return handle;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

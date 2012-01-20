@@ -96,6 +96,10 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 	if (hfile) fsync((tb_long_t)hfile - 1);
 #endif
 }
+tb_handle_t tb_file_bare(tb_handle_t hfile)
+{
+	return hfile? (tb_handle_t)((tb_long_t)hfile - 1) : TB_NULL;
+}
 tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(hfile, -1);

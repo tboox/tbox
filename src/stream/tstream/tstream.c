@@ -214,3 +214,13 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	return read;
 }
 
+tb_handle_t tb_tstream_bare(tb_gstream_t* gst)
+{
+	tb_trace_noimpl();
+	return TB_NULL;
+}
+tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_trace_noimpl();
+	return -1;
+}
