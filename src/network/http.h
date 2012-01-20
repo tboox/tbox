@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "url.h"
 #include "cookies.h"
 #include "../string/string.h"
 #include "../stream/stream.h"
@@ -71,53 +72,40 @@ typedef struct __tb_http_range_t
 typedef struct __tb_http_option_t
 {
 	// the method
-	tb_uint8_t 			method;
+	tb_uint16_t 		method 	: 4;
 
 	// the max redirect
-	tb_uint8_t 			redirect;
-
-	// the port
-	tb_uint16_t 		port;
+	tb_uint16_t 		mrdt 	: 10;
 
 	// is ssl?
 	tb_uint16_t 		bssl 	: 1;
 
-	// is keep alive?
-	tb_uint16_t 		bkalive : 1;
+	// is alive?
+	tb_uint16_t 		balive : 1;
 
-	// timeout, ms
+	// the url
+	tb_url_t 			url;
+
+	// the post data
+	tb_pstring_t 		post;
+
+	// the head hash
+	tb_hash_t* 			head;
+
+	// timeout: ms
 	tb_size_t 			timeout;
 
 	// range
 	tb_http_range_t 	range;
 
+	// the user data
+	tb_pointer_t 		udata;
+
 	// the reference to cookies
 	tb_cookies_t* 		cookies;
 
-	// the head funcs
-	tb_bool_t 			(*head_func)(tb_char_t const* line, tb_pointer_t priv);
-	tb_pointer_t 		head_priv;
-
-	// the head hash
-	tb_hash_t* 			head_hash;
-
-	// the head data
-	tb_pstring_t 		head_data;
-
-	// the post data
-	tb_pstring_t 		post;
-
-	// the response data
-	tb_pstring_t 		resp;
-
-	// the url data
-	tb_pstring_t 		url;
-
-	// the host data
-	tb_pstring_t 		host;
-
-	// the path data
-	tb_pstring_t 		path;
+	// the head func
+	tb_bool_t 			(*hfunc)(struct __tb_http_option_t* option, tb_char_t const* line);
 
 }tb_http_option_t;
 
@@ -161,7 +149,7 @@ typedef struct __tb_http_status_t
 	tb_uint8_t 			bssl 		: 1;
 
 	// is keep alive?
-	tb_uint8_t 			bkalive		: 1;
+	tb_uint8_t 			balive		: 1;
 
 	// the redirect count
 	tb_uint8_t 			redirect;
@@ -186,7 +174,7 @@ typedef struct __tb_http_status_t
  */
 
 // init & exit
-tb_handle_t 			tb_http_init(tb_http_option_t const* option);
+tb_handle_t 			tb_http_init();
 tb_void_t 				tb_http_exit(tb_handle_t handle);
 
 // the bare handle for aio
@@ -215,43 +203,13 @@ tb_long_t 				tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 tb_bool_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 tb_bool_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
-// options
+// option
+tb_http_option_t* 		tb_http_option(tb_handle_t handle);
 tb_void_t 				tb_http_option_dump(tb_handle_t handle);
-tb_size_t 				tb_http_option_get_port(tb_handle_t handle);
-tb_char_t const* 		tb_http_option_get_url(tb_handle_t handle);
-tb_char_t const* 		tb_http_option_get_host(tb_handle_t handle);
-tb_char_t const* 		tb_http_option_get_path(tb_handle_t handle);
-tb_cookies_t* 			tb_http_option_get_cookies(tb_handle_t handle);
-
-tb_bool_t 				tb_http_option_set_default(tb_handle_t handle);
-tb_bool_t 				tb_http_option_set_method(tb_handle_t handle, tb_size_t method);
-tb_bool_t 				tb_http_option_set_ssl(tb_handle_t handle, tb_bool_t bssl);
-tb_bool_t 				tb_http_option_set_url(tb_handle_t handle, tb_char_t const* url);
-tb_bool_t 				tb_http_option_set_port(tb_handle_t handle, tb_uint16_t port);
-tb_bool_t 				tb_http_option_set_host(tb_handle_t handle, tb_char_t const* host);
-tb_bool_t 				tb_http_option_set_path(tb_handle_t handle, tb_char_t const* path);
-tb_bool_t 				tb_http_option_set_kalive(tb_handle_t handle, tb_bool_t bkalive);
-tb_bool_t 				tb_http_option_set_timeout(tb_handle_t handle, tb_size_t timeout);
-tb_bool_t 				tb_http_option_set_range(tb_handle_t handle, tb_http_range_t const* range);
-tb_bool_t 				tb_http_option_set_redirect(tb_handle_t handle, tb_uint8_t redirect);
-tb_bool_t 				tb_http_option_set_head(tb_handle_t handle, tb_char_t const* head);
-tb_bool_t 				tb_http_option_set_cookies(tb_handle_t handle, tb_cookies_t* cookies);
-tb_bool_t 				tb_http_option_set_post(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-tb_bool_t 				tb_http_option_set_hfunc(tb_handle_t handle, tb_bool_t (*head_func)(tb_char_t const* , tb_pointer_t ), tb_pointer_t head_priv);
 
 // status
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
-tb_uint64_t				tb_http_status_content_size(tb_handle_t handle);
-tb_char_t const*		tb_http_status_content_type(tb_handle_t handle);
-tb_uint64_t				tb_http_status_document_size(tb_handle_t handle);
-tb_size_t				tb_http_status_code(tb_handle_t handle);
-tb_bool_t				tb_http_status_ischunked(tb_handle_t handle);
-tb_bool_t				tb_http_status_isredirect(tb_handle_t handle);
-tb_bool_t				tb_http_status_iskalive(tb_handle_t handle);
-tb_bool_t				tb_http_status_isseeked(tb_handle_t handle);
-tb_size_t				tb_http_status_redirect(tb_handle_t handle);
 tb_void_t 				tb_http_status_dump(tb_handle_t handle);
-
 
 #endif
 

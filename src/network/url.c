@@ -17,29 +17,28 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		dns.h
+ * \file		url.c
  *
  */
-#ifndef TB_NETWORK_DNS_H
-#define TB_NETWORK_DNS_H
 
-
-/* /////////////////////////////////////////////////////////
+/* ////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "url.h"
+#include "../libc/libc.h"
+#include "../math/math.h"
+#include "../utils/utils.h"
+#include "../platform/platform.h"
 
-/* /////////////////////////////////////////////////////////
- * the interfaces
+/* ////////////////////////////////////////////////////////////////////////
+ * macros
  */
 
-// manage dns server
-tb_void_t 			tb_dns_server_add(tb_char_t const* ip);
-tb_void_t 			tb_dns_server_del(tb_char_t const* ip);
-tb_void_t 			tb_dns_server_dump();
+/* /////////////////////////////////////////////////////////
+ * types
+ */
 
-// lookup host ip from name
-tb_char_t const* 	tb_dns_lookup(tb_char_t const* host, tb_char_t* ip);
+/* ////////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 
-
-#endif

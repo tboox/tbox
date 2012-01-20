@@ -25,8 +25,8 @@
  * includes
  */
 #include "prefix.h"
-#include "../../network/network.h"
 #include "../../string/string.h"
+#include "../../network/network.h"
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -46,6 +46,7 @@ typedef struct __tb_hstream_t
 /* /////////////////////////////////////////////////////////
  * details
  */
+#if 0
 static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_HTTP, TB_NULL);
@@ -246,6 +247,7 @@ static tb_bool_t tb_hstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	}
 	return TB_FALSE;
 }
+#endif
 /* /////////////////////////////////////////////////////////
  * interfaces
  */
@@ -255,6 +257,7 @@ tb_gstream_t* tb_gstream_init_http()
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_hstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
+#if 0
 	// init stream
 	tb_hstream_t* hst = (tb_hstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_HTTP;
@@ -270,7 +273,7 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->free 	= tb_hstream_free;
 	hst->http 	= tb_http_init(TB_NULL);
 	tb_assert_and_check_goto(hst->http, fail);
-
+#endif
 	return gst;
 
 fail:

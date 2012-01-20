@@ -10,7 +10,7 @@
 /* ///////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_bool_t tb_http_test_hfunc(tb_char_t const* line, tb_pointer_t priv)
+static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
 {
 	tb_printf("head: %s\n", line);
 	return TB_TRUE;
@@ -24,76 +24,89 @@ int main(int argc, char** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init http
-	tb_handle_t http = tb_http_init(TB_NULL);
-	if (!http) goto end;
+	tb_handle_t http = tb_http_init();
+	tb_assert_and_check_goto(http, end);
+
+	// option
+	tb_http_option_t* option = tb_http_option(http);
+	tb_assert_and_check_goto(option, end);
+
+	// status
+	tb_http_status_t const* status = tb_http_status(http);
+	tb_assert_and_check_goto(status, end);
 
 	// init cookies
-	tb_cookies_t* cookies = tb_cookies_init();
-	if (!cookies) goto end;
+	option->cookies = tb_cookies_init();
+	tb_assert_and_check_goto(option->cookies, end);
 	
-	// init option
-	if (!tb_http_option_set_url(http, argv[1])) goto end;
-	if (!tb_http_option_set_hfunc(http, tb_http_test_hfunc, http)) goto end;
-	if (!tb_http_option_set_cookies(http, cookies)) goto end;
-	if (!tb_http_option_set_kalive(http, TB_TRUE)) goto end;
+	// init url
+//	tb_pstring_cstrcpy(&option->host, "119.75.217.56");
+//	tb_pstring_cstrcpy(&option->path, "/index.html");
 
-	while (1)
+	// init head func
+	option->hfunc = tb_http_test_hfunc;
+	option->udata = http;
+
+	// open http
+	if (!tb_http_bopen(http)) goto end;
+
+	// read data
+	tb_byte_t 		data[8192];
+	tb_size_t 		read = 0;
+	tb_bool_t 		wait = TB_FALSE;
+	tb_uint64_t 	size = status->content_size;
+	do
 	{
-		// open http
-		tb_int64_t base = tb_mclock();
-		if (!tb_http_bopen(http)) goto end;
-
 		// read data
-		tb_byte_t 		data[8192];
-		tb_size_t 		read = 0;
-		tb_int64_t 		time = tb_mclock();
-		tb_uint64_t 	size = tb_http_status_content_size(http);
-		do
+		tb_long_t n = tb_http_aread(http, data, 8192);
+		if (n > 0)
 		{
-			// read data
-			tb_long_t n = tb_http_aread(http, data, 8192);
-			if (n > 0)
-			{
-				// update read
-				read += n;
+			// update read
+			read += n;
 
-				// update clock
-				time = tb_mclock();
-			}
-			else if (!n) 
-			{
-				// timeout?
-				if (tb_mclock() - time > 10000) break;
+			// no waiting
+			wait = TB_FALSE;
+		}
+		else if (!n) 
+		{
+			// no end?
+			tb_check_break(!wait);
 
-				// sleep some time
-				tb_usleep(100);
-			}
-			else break;
+			// wait
+			tb_long_t e = tb_http_wait(http, TB_AIOO_ETYPE_READ, option->timeout);
+			tb_assert_and_check_break(e >= 0);
 
-			// is end?
-			if (size && read >= size) break;
+			// timeout?
+			tb_check_break(e);
 
-		} while(1);
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
+		}
+		else break;
+
+		// is end?
+		if (size && read >= size) break;
+
+	} while(1);
 
 end:
 
-		// close it
-		tb_http_bclose(http);
+	// exit cookies
+	if (option && option->cookies) 
+	{
+		// dump cookies
+#ifdef TB_DEBUG
+		tb_cookies_dump(option->cookies);
+#endif
 
-		// time
-		tb_printf("\ntime: %lld ms\n", tb_mclock() - base);
+		tb_cookies_exit(option->cookies);
 	}
 
 	// exit http
 	if (http) tb_http_exit(http);
-
-	// dump cookies
-#ifdef TB_DEBUG
-	tb_cookies_dump(cookies);
-#endif
-
-	// exit cookies
-	if (cookies) tb_cookies_exit(cookies);
 
 	// exit tbox
 	tb_exit();

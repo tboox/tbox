@@ -88,7 +88,7 @@ typedef struct __tb_file_info_t
 
 // open & close
 tb_handle_t 			tb_file_init(tb_char_t const* path, tb_size_t flags);
-tb_void_t 				tb_file_exit(tb_handle_t hfile);
+tb_bool_t 				tb_file_exit(tb_handle_t hfile);
 
 // read & writ
 tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);

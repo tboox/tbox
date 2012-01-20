@@ -115,9 +115,10 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 	HANDLE hfile = CreateFile(path, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
 	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : TB_NULL;
 }
-tb_void_t tb_file_exit(tb_handle_t hfile)
+tb_bool_t tb_file_exit(tb_handle_t hfile)
 {
-	if (hfile) CloseHandle(hfile);
+	tb_assert_and_check_return_val(hfile, TB_FALSE);
+	return CloseHandle(hfile)? TB_TRUE : TB_FALSE;
 }
 tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
