@@ -35,10 +35,6 @@
  * macros
  */
 
-// the default port
-#define TB_HTTP_PORT_DEFAULT 					(80)
-#define TB_HTTPS_PORT_DEFAULT 					(443)
-
 // the default timeout
 #define TB_HTTP_TIMEOUT_DEFAULT 				(10000)
 
