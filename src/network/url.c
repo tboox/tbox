@@ -25,6 +25,7 @@
  * includes
  */
 #include "url.h"
+#include "http.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -109,7 +110,9 @@ tb_char_t const* tb_url_get(tb_url_t const* url, tb_pstring_t* u)
 			tb_pstring_cstrncat(u, tb_sstring_cstr(&url->host), tb_sstring_size(&url->host));
 
 			// add port
-			if (url->poto != TB_URL_PROTO_HTTP || url->port != 80) 
+			if ( 	(url->poto != TB_URL_PROTO_HTTP)
+				|| 	(url->bssl && url->port != TB_HTTPS_PORT_DEFAULT) 
+				|| 	(!url->bssl && url->port != TB_HTTP_PORT_DEFAULT)) 
 				tb_pstring_cstrfcat(u, ":%u", url->port);
 
 			// add path
@@ -197,7 +200,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 			url->port = tb_s10tou32(port);
 			tb_assert_and_check_goto(url->port, fail);
 		}
-		else if (url->poto == TB_URL_PROTO_HTTP) url->port = url->bssl? 445 : 80;
+		else if (url->poto == TB_URL_PROTO_HTTP) url->port = url->bssl? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
 		else goto fail;
 
 		// skip '/'

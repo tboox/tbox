@@ -49,6 +49,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("sock://localhost:8080");
 	tb_url_test_set("sock://localhost:8080/ruki/file.txt");
 	tb_url_test_set("http://localhost");
+	tb_url_test_set("http://localhost:80");
 	tb_url_test_set("http://localhost:8080");
 	tb_url_test_set("http://localhost/ruki/file.txt");
 	tb_url_test_set("http://localhost:8080/ruki/file.txt");
@@ -57,8 +58,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("socks://localhost:8080");
 	tb_url_test_set("socks://localhost:8080/ruki/file.txt");
 	tb_url_test_set("https://localhost");
+	tb_url_test_set("https://localhost:80");
 	tb_url_test_set("https://localhost:8080");
 	tb_url_test_set("https://localhost/ruki/file.txt");
+	tb_url_test_set("https://localhost:443/ruki/file.txt");
 	tb_url_test_set("https://localhost:8080/ruki/file.txt");
 
 	tb_url_test_set("file:///home/ruki/file.txt?");
