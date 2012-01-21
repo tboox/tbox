@@ -3,10 +3,11 @@ include $(PRO_DIR)/prefix.mak
 
 # module name
 NAMES = \
-		cookies \
+		url \
 		http \
 		sockd \
-		sockc
+		sockc \
+		cookies
 
 include $(SRC_DIR)/demo/makefile
 

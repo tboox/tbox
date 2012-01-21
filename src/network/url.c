@@ -31,59 +31,6 @@
 #include "../platform/platform.h"
 
 /* ////////////////////////////////////////////////////////////////////////
- * helper
- */
-static tb_void_t tb_url_sync(tb_url_t* url)
-{
-	switch (url->poto)
-	{
-	case TB_URL_PROTO_FILE:
-		{
-			// check
-			tb_check_return(tb_pstring_size(&url->path));
-
-			// add protocol
-			if (url->bssl) tb_pstring_cstrncpy(&url->data, "files://", 8);
-			else tb_pstring_cstrncpy(&url->data, "file://", 7);
-
-			// add path
-			tb_pstring_strcat(&url->data, &url->path);
-		}
-		break;
-	case TB_URL_PROTO_SOCK:
-	case TB_URL_PROTO_HTTP:
-		{
-			// check
-			tb_check_return(url->port && tb_pstring_size(&url->host));
-
-			// add protocol
-			if (url->poto == TB_URL_PROTO_HTTP) tb_pstring_cstrcpy(&url->data, "http");
-			else tb_pstring_cstrcpy(&url->data, "sock");
-
-			// add ssl
-			if (url->bssl) tb_pstring_chrcat(&url->data, 's');
-
-			// add ://
-			tb_pstring_cstrncat(&url->data, "://", 3);
-
-			// add host
-			tb_pstring_strcat(&url->data, &url->host);
-
-			// add port
-			if (url->poto != TB_URL_PROTO_HTTP || url->port != 80) 
-				tb_pstring_cstrfcat(&url->data, ":%u", url->port);
-
-			// add path
-			if (tb_pstring_size(&url->path)) 
-				tb_pstring_strcat(&url->data, &url->path);
-		}
-		break;
-	default:
-		break;
-	}
-}
-
-/* ////////////////////////////////////////////////////////////////////////
  * implemention
  */
 
@@ -94,29 +41,19 @@ tb_bool_t tb_url_init(tb_url_t* url)
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
-	if (!tb_pstring_init(&url->data)) return TB_FALSE;
-	if (!tb_pstring_init(&url->host)) return TB_FALSE;
-	if (!tb_pstring_init(&url->path)) return TB_FALSE;
+	if (!tb_sstring_init(&url->host, url->data, TB_URL_HOST_MAX)) return TB_FALSE;
+	if (!tb_sstring_init(&url->path, url->data + TB_URL_HOST_MAX, TB_URL_PATH_MAX)) return TB_FALSE;
+	if (!tb_pstring_init(&url->args)) return TB_FALSE;
 	return TB_TRUE;
 }
 tb_void_t tb_url_exit(tb_url_t* url)
 {
 	if (url)
 	{
-		tb_pstring_exit(&url->data);
-		tb_pstring_exit(&url->host);
-		tb_pstring_exit(&url->path);
+		tb_sstring_exit(&url->host);
+		tb_sstring_exit(&url->path);
+		tb_pstring_exit(&url->args);
 	}
-}
-tb_char_t const* tb_url_cstr(tb_url_t const* url)
-{
-	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_pstring_cstr(&url->data);
-}
-tb_size_t tb_url_size(tb_url_t const* url)
-{
-	tb_assert_and_check_return_val(url, 0);
-	return tb_pstring_size(&url->data);
 }
 tb_void_t tb_url_clear(tb_url_t* url)
 {
@@ -125,18 +62,161 @@ tb_void_t tb_url_clear(tb_url_t* url)
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
-	tb_pstring_clear(&url->data);
-	tb_pstring_clear(&url->host);
-	tb_pstring_clear(&url->path);
+	tb_sstring_clear(&url->host);
+	tb_sstring_clear(&url->path);
+	tb_pstring_clear(&url->args);
 }
-tb_char_t const* tb_url_get(tb_url_t const* url)
+tb_char_t const* tb_url_get(tb_url_t const* url, tb_pstring_t* u)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_pstring_cstr(&url->data);
+	tb_assert_and_check_return_val(url && u, TB_NULL);
+
+	// init 
+	tb_pstring_clear(u);
+
+	// make
+	switch (url->poto)
+	{
+	case TB_URL_PROTO_FILE:
+		{
+			// check
+			tb_check_return(tb_sstring_size(&url->path));
+
+			// add protocol
+			if (url->bssl) tb_pstring_cstrncpy(u, "files://", 8);
+			else tb_pstring_cstrncpy(u, "file://", 7);
+
+			// add path
+			tb_pstring_cstrncat(u, tb_sstring_cstr(&url->path), tb_sstring_size(&url->path));
+		}
+		break;
+	case TB_URL_PROTO_SOCK:
+	case TB_URL_PROTO_HTTP:
+		{
+			// check
+			tb_check_return(url->port && tb_sstring_size(&url->host));
+
+			// add protocol
+			if (url->poto == TB_URL_PROTO_HTTP) tb_pstring_cstrcpy(u, "http");
+			else tb_pstring_cstrcpy(u, "sock");
+
+			// add ssl
+			if (url->bssl) tb_pstring_chrcat(u, 's');
+
+			// add ://
+			tb_pstring_cstrncat(u, "://", 3);
+
+			// add host
+			tb_pstring_cstrncat(u, tb_sstring_cstr(&url->host), tb_sstring_size(&url->host));
+
+			// add port
+			if (url->poto != TB_URL_PROTO_HTTP || url->port != 80) 
+				tb_pstring_cstrfcat(u, ":%u", url->port);
+
+			// add path
+			if (tb_sstring_size(&url->path)) 
+				tb_pstring_cstrncat(u, tb_sstring_cstr(&url->path), tb_sstring_size(&url->path));
+
+			// add args
+			if (tb_pstring_size(&url->args)) 
+			{
+				tb_pstring_chrcat(u, '?');
+				tb_pstring_strcat(u, &url->args);
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	// ok?
+	return tb_pstring_size(u)? tb_pstring_cstr(u) : TB_NULL;
 }
 tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 {
-	tb_trace_noimpl();
+	tb_assert_and_check_return_val(url && u, TB_FALSE);
+	
+	// init
+	tb_url_clear(url);
+
+	// parse proto
+	tb_char_t const* p = TB_NULL;
+	if (p = tb_stristr(u, "http://")) 
+	{
+		url->poto = TB_URL_PROTO_HTTP;
+		url->bssl = 0;
+		p += 7;
+	}
+	else if ((*u == '/') || (p = tb_stristr(u, "file://"))) 
+	{
+		url->poto = TB_URL_PROTO_FILE;
+		url->bssl = 0;
+		if (*p != '/') p += 7;
+	}
+	else if (p = tb_stristr(u, "sock://")) 
+	{
+		url->poto = TB_URL_PROTO_SOCK;
+		url->bssl = 0;
+		p += 7;
+	}
+	else if (p = tb_stristr(u, "https://")) 
+	{
+		url->poto = TB_URL_PROTO_HTTP;
+		url->bssl = 1;
+		p += 8;
+	}
+	else if (p = tb_stristr(u, "files://")) 
+	{
+		url->poto = TB_URL_PROTO_FILE;
+		url->bssl = 1;
+		p += 8;
+	}
+	else if (p = tb_stristr(u, "socks://")) 
+	{
+		url->poto = TB_URL_PROTO_SOCK;
+		url->bssl = 1;
+		p += 8;
+	}
+	else goto fail;
+
+	// end?
+	tb_assert_and_check_goto(p && *p, fail);
+
+	// parse host and port for http or sock
+	if (url->poto == TB_URL_PROTO_HTTP || url->poto == TB_URL_PROTO_SOCK)
+	{
+		// parse host
+		while (*p && *p != '/' && *p != ':') tb_sstring_chrcat(&url->host, *p++);
+	
+		// parse port
+		if (*p == ':')
+		{
+			tb_char_t 	port[12] = {0};
+			tb_char_t* 	pb = port;
+			tb_char_t* 	pe = port + 12;
+			for (p++; pb < pe && *p && *p != '/' && *p != '?' && *p != '&' && *p != '='; ) *pb++ = *p++;
+			url->port = tb_s10tou32(port);
+			tb_assert_and_check_goto(url->port, fail);
+		}
+		else if (url->poto == TB_URL_PROTO_HTTP) url->port = url->bssl? 445 : 80;
+		else goto fail;
+
+		// skip '/'
+		if (*p == '/') p++;
+	}
+
+	// parse path
+	if (*p != '/') tb_sstring_chrcat(&url->path, '/');
+	while (*p && *p != '?' && *p != '&' && *p != '=') tb_sstring_chrcat(&url->path, *p++);
+
+	// parse args
+	while (*p && (*p == '?' || *p == '=')) p++;
+	if (*p) tb_pstring_cstrcpy(&url->args, p);
+
+	// ok
+	return TB_TRUE;
+
+fail:
+	tb_url_clear(url);
 	return TB_FALSE;
 }
 tb_bool_t tb_url_ssl_get(tb_url_t const* url)
@@ -147,13 +227,7 @@ tb_bool_t tb_url_ssl_get(tb_url_t const* url)
 tb_void_t tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl)
 {
 	tb_assert_and_check_return(url);
-
-	tb_size_t b = bssl? 1 : 0;
-	if (url->bssl != b)
-	{
-		url->bssl = b;
-		tb_url_sync(url);
-	}
+	url->bssl = bssl? 1 : 0;
 }
 tb_size_t tb_url_poto_get(tb_url_t const* url)
 {
@@ -163,11 +237,7 @@ tb_size_t tb_url_poto_get(tb_url_t const* url)
 tb_void_t tb_url_poto_set(tb_url_t* url, tb_size_t poto)
 {
 	tb_assert_and_check_return(url);
-	if (url->poto != poto)
-	{
-		url->poto = poto;
-		tb_url_sync(url);
-	}
+	url->poto = poto;
 }
 tb_size_t tb_url_port_get(tb_url_t const* url)
 {
@@ -177,37 +247,48 @@ tb_size_t tb_url_port_get(tb_url_t const* url)
 tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
 {
 	tb_assert_and_check_return(url);
-	if (url->port != port)
-	{
-		url->port = port;
-		tb_url_sync(url);
-	}
+	url->port = port;
 }
 tb_char_t const* tb_url_host_get(tb_url_t const* url)
 {
 	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_pstring_cstr(&url->host);
+	return tb_sstring_size(&url->host)? tb_sstring_cstr(&url->host) : TB_NULL;
 }
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
 	tb_assert_and_check_return(url);
-	if (host) tb_pstring_cstrcpy(&url->host, host);
-	else tb_pstring_clear(&url->host);
-	tb_url_sync(url);
+	if (host) tb_sstring_cstrcpy(&url->host, host);
+	else tb_sstring_clear(&url->host);
 }
 tb_char_t const* tb_url_path_get(tb_url_t const* url)
 {
 	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_pstring_cstr(&url->path);
+	return tb_sstring_size(&url->path)? tb_sstring_cstr(&url->path) : TB_NULL;
 }
 tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 {
 	tb_assert_and_check_return(url);
+	tb_sstring_clear(&url->path);
 	if (path) 
 	{
-		if (path[0] != '/') tb_pstring_chrcat(&url->path, '/');
-		tb_pstring_cstrcat(&url->path, path);
+		if (path[0] != '/') tb_sstring_chrcat(&url->path, '/');
+		tb_sstring_cstrcat(&url->path, path);
 	}
-	else tb_pstring_clear(&url->path);
-	tb_url_sync(url);
 }
+tb_char_t const* tb_url_args_get(tb_url_t const* url)
+{
+	tb_assert_and_check_return_val(url, TB_NULL);
+	return tb_pstring_size(&url->args)? tb_pstring_cstr(&url->args) : TB_NULL;
+}
+tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
+{
+	tb_assert_and_check_return(url);
+	tb_pstring_clear(&url->args);
+	if (args) 
+	{
+		tb_char_t const* p = args;
+		while (*p && (*p == '?' || *p == '=')) p++;
+		if (*p) tb_pstring_cstrcpy(&url->args, p);
+	}
+}
+

@@ -30,7 +30,18 @@
 #include "../string/string.h"
 
 /* /////////////////////////////////////////////////////////
- * the types
+ * macros
+ */
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_URL_HOST_MAX 		(32)
+# 	define TB_URL_PATH_MAX 		(1024)
+#else
+# 	define TB_URL_HOST_MAX 		(128)
+# 	define TB_URL_PATH_MAX 		(4096)
+#endif
+
+/* /////////////////////////////////////////////////////////
+ * types
  */
 
 // the url protocol type
@@ -56,13 +67,16 @@ typedef struct __tb_url_t
 	tb_uint16_t 	port;
 
 	// the host
-	tb_pstring_t 	host;
+	tb_sstring_t 	host;
 
 	// the path
-	tb_pstring_t 	path;
+	tb_sstring_t 	path;
 
-	// the path
-	tb_pstring_t 	data;
+	// the args
+	tb_pstring_t 	args;
+
+	// the data
+	tb_char_t 		data[TB_URL_HOST_MAX + TB_URL_PATH_MAX];
 
 }tb_url_t;
 
@@ -75,15 +89,11 @@ typedef struct __tb_url_t
 tb_bool_t 			tb_url_init(tb_url_t* url);
 tb_void_t 			tb_url_exit(tb_url_t* url);
 
-// accessors
-tb_char_t const* 	tb_url_cstr(tb_url_t const* url);
-tb_size_t 			tb_url_size(tb_url_t const* url);
-
 // modifiors
 tb_void_t 			tb_url_clear(tb_url_t* url);
 
 // url
-tb_char_t const* 	tb_url_get(tb_url_t const* url);
+tb_char_t const* 	tb_url_get(tb_url_t const* url, tb_pstring_t* u);
 tb_bool_t 			tb_url_set(tb_url_t* url, tb_char_t const* u);
 
 // ssl
@@ -105,6 +115,11 @@ tb_void_t 			tb_url_host_set(tb_url_t* url, tb_char_t const* host);
 // path
 tb_char_t const* 	tb_url_path_get(tb_url_t const* url);
 tb_void_t 			tb_url_path_set(tb_url_t* url, tb_char_t const* path);
+
+// args
+tb_char_t const* 	tb_url_args_get(tb_url_t const* url);
+tb_void_t 			tb_url_args_set(tb_url_t* url, tb_char_t const* args);
+
 
 
 
