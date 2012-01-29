@@ -257,6 +257,9 @@ tb_gstream_t* tb_gstream_init_http()
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_hstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
+
 #if 0
 	// init stream
 	tb_hstream_t* hst = (tb_hstream_t*)gst;
@@ -274,6 +277,8 @@ tb_gstream_t* tb_gstream_init_http()
 	hst->http 	= tb_http_init(TB_NULL);
 	tb_assert_and_check_goto(hst->http, fail);
 #endif
+
+	// ok
 	return gst;
 
 fail:
@@ -290,10 +295,10 @@ tb_gstream_t* tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// ioctl
-	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_PATH, path)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_HSTREAM_CMD_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_PATH, path)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return gst;

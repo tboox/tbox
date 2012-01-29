@@ -34,6 +34,16 @@
 #include "../platform/platform.h"
 
 /* /////////////////////////////////////////////////////////
+ * macros
+ */
+ 
+// the default stream cache maxn
+#define TB_GSTREAM_MCACHE_DEFAULT 					(8192)
+
+// the default stream timeout
+#define TB_GSTREAM_TIMEOUT_DEFAULT 					(10000)
+
+/* /////////////////////////////////////////////////////////
  * types
  */
  
@@ -43,9 +53,6 @@ typedef struct __tb_gstream_item_t
 	// the stream type
 	tb_size_t 			type;
 
-	// the stream name
-	tb_char_t const* 	name;
-	
 	// the stream initor
 	tb_gstream_t* 		(*init)();
 
@@ -58,11 +65,10 @@ typedef struct __tb_gstream_item_t
 // the stream table
 static tb_gstream_item_t g_gstream_table[] = 
 {
-	{TB_GSTREAM_TYPE_HTTP, "http", 	tb_gstream_init_http}
-,	{TB_GSTREAM_TYPE_HTTP, "https", tb_gstream_init_http}
-,	{TB_GSTREAM_TYPE_FILE, "file", 	tb_gstream_init_file}
-,	{TB_GSTREAM_TYPE_DATA, "data", 	tb_gstream_init_data}
-,	{TB_GSTREAM_TYPE_SOCK, "sock", 	tb_gstream_init_sock}
+	{TB_GSTREAM_TYPE_FILE, tb_gstream_init_file}
+,	{TB_GSTREAM_TYPE_SOCK, tb_gstream_init_sock}
+,	{TB_GSTREAM_TYPE_HTTP, tb_gstream_init_http}
+,	{TB_GSTREAM_TYPE_DATA, tb_gstream_init_data}
 };
 
 
@@ -306,8 +312,8 @@ tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t ti
 	
 	// wait cache?
 	tb_long_t 	e = 0;
-	if (etype & TB_AIOO_ETYPE_READ && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
-	if (etype & TB_AIOO_ETYPE_WRIT && !tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+	if ((etype & TB_AIOO_ETYPE_READ) && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
+	if ((etype & TB_AIOO_ETYPE_WRIT) && !tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
 	return e;
 }
 /* /////////////////////////////////////////////////////////
@@ -317,45 +323,63 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 {
 	tb_assert_and_check_return_val(url, TB_NULL);
 
-	// get proto name
-	tb_char_t 			proto[32];
-	tb_char_t* 			p = proto;
-	tb_char_t const* 	e = p + 32;
-	tb_char_t const* 	u = url;
-	for (; p < e && *u && *u != ':'; p++, u++) *p = *u;
-	*p = '\0';
-
-	// find stream
-	tb_size_t 		i = 0;
-	tb_size_t 		n = tb_arrayn(g_gstream_table);
+	// init
 	tb_gstream_t* 	gst = TB_NULL;
-	for (; i < n; ++i)
-	{
-		if (!tb_strcmp(g_gstream_table[i].name, proto))
-		{
-			gst = g_gstream_table[i].init();
-			break;
-		}
-	}
-
-	// \note: prehandle for file
-	if (gst && gst->type == TB_GSTREAM_TYPE_FILE) url = url + 7; 	//!< file:///root/file => /root/file
-	else if (!gst && url[0] == '/') gst = tb_gstream_init_file(); 	//!< is /root/file?
-
-	// check
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_url_t 		u;
+	if (!tb_url_set(&u, url)) goto fail;
 
 	// set url
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
+	if (!tb_url_init(&u)) return TB_NULL;
+
+	// get type
+	tb_size_t type = tb_url_poto_get(&u);
+	tb_assert_and_check_goto(type && type < tb_arrayn(g_gstream_table), fail);
+
+	// init stream
+	gst = g_gstream_table[type].init();
+	tb_assert_and_check_goto(gst, fail);
+
+	// copy url
+	tb_url_exit(&gst->url);
+	tb_memcpy(&gst->url, &u, sizeof(tb_url_t));
 
 	// ok
 	return gst;
 
 fail:
+	
+	// exit stream
 	if (gst) tb_gstream_exit(gst);
+
+	// exit url
+	tb_url_exit(&u);
+
 	return TB_NULL;
 }
 
+tb_bool_t tb_gstream_init(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// clear
+	tb_memset(gst, 0, sizeof(tb_gstream_t));
+
+	// init timeout
+	gst->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
+
+	// init url
+	if (!tb_url_init(&gst->url)) return TB_FALSE;
+
+	// init cache
+	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
+
+	// ok
+	return TB_TRUE;
+
+fail:
+	tb_qbuffer_exit(&gst->cache);
+	return TB_FALSE;
+}
 tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 {
 	if (gst) 
@@ -363,15 +387,16 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 		// close it
 		tb_gstream_bclose(gst);
 
-		// free cache
+		// exit cache
 		tb_qbuffer_exit(&gst->cache);
 
-		// free url
-		if (gst->url) tb_free(gst->url);
-		gst->url = TB_NULL;
+		// exit url
+		tb_url_exit(&gst->url);
+
+		// free native
+		if (gst->free) gst->free(gst);
 
 		// free it
-		if (gst->free) gst->free(gst);
 		tb_free(gst);
 	}
 }
@@ -399,12 +424,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 	// already been opened?
 	tb_assert_and_check_return_val(!gst->bopened, 1);
 
-	// init timeout
-	if (!gst->timeout) gst->timeout = TB_GSTREAM_TIMEOUT;
-	
-	// init cache
-	if (!tb_qbuffer_data(&gst->cache) && !tb_qbuffer_maxn(&gst->cache))
-		if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_CACHE_MAXN)) return -1;
+	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
 	// init offset
@@ -875,13 +895,7 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		{
 			if (arg1)
 			{
-				if (!gst->url) gst->url = tb_calloc(1, TB_GSTREAM_URL_MAXN);
-				if (gst->url)
-				{
-					tb_strncpy(gst->url, (tb_char_t const*)arg1, TB_GSTREAM_URL_MAXN);
-					gst->url[TB_GSTREAM_URL_MAXN - 1] = '\0';
-					ret = TB_TRUE;
-				}
+				if (tb_url_set(&gst->url, (tb_char_t const*)arg1)) ret = TB_TRUE;
 			}
 		}
 		break;
@@ -889,7 +903,91 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		{
 			if (arg1)
 			{
-				*((tb_char_t const**)arg1) = gst->url;
+				tb_char_t const* url = tb_url_get(&gst->url);
+				if (url)
+				{
+					*((tb_char_t const**)arg1) = url;
+					ret = TB_TRUE;
+				}
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_HOST:
+		{
+			if (arg1)
+			{
+				tb_url_host_set(&gst->url, (tb_char_t const*)arg1);
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_HOST:
+		{
+			if (arg1)
+			{
+				tb_char_t const* host = tb_url_host_get(&gst->url);
+				if (host)
+				{
+					*((tb_char_t const**)arg1) = host;
+					ret = TB_TRUE;
+				}
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_PORT:
+		{
+			if (arg1)
+			{
+				tb_url_port_set(&gst->url, (tb_size_t)arg1);
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_PORT:
+		{
+			if (arg1)
+			{
+				*((tb_size_t*)arg1) = tb_url_port_get(&gst->url);
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_PATH:
+		{
+			if (arg1)
+			{
+				tb_url_path_set(&gst->url, (tb_char_t const*)arg1);
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_PATH:
+		{
+			if (arg1)
+			{
+				tb_char_t const* path = tb_url_path_get(&gst->url);
+				if (path)
+				{
+					*((tb_char_t const**)arg1) = path;
+					ret = TB_TRUE;
+				}
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_SSL:
+		{
+			if (arg1)
+			{
+				tb_url_ssl_set(&gst->url, (tb_bool_t)arg1);
+				ret = TB_TRUE;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_SSL:
+		{
+			if (arg1)
+			{
+				*((tb_bool_t*)arg1) = tb_url_ssl_get(&gst->url);
 				ret = TB_TRUE;
 			}
 		}
@@ -898,9 +996,7 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		{
 			if (arg1)
 			{
-				if (!tb_qbuffer_data(&gst->cache))
-					ret = tb_qbuffer_init(&gst->cache, (tb_size_t)arg1);
-				else ret = tb_qbuffer_resize(&gst->cache, (tb_size_t)arg1)? TB_TRUE : TB_FALSE;
+				if (tb_qbuffer_resize(&gst->cache, (tb_size_t)arg1)) ret = TB_TRUE;
 			}
 		}
 		break;
@@ -917,6 +1013,15 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		{
 			gst->timeout = (tb_size_t)arg1;
 			ret = TB_TRUE;
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_TIMEOUT:
+		{
+			if (arg1)
+			{
+				*((tb_size_t*)arg1) = gst->timeout;
+				ret = TB_TRUE;
+			}
 		}
 		break;
 	default:

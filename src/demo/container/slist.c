@@ -626,7 +626,7 @@ static tb_void_t tb_slist_str_dump(tb_slist_t const* slist)
 }
 static tb_void_t tb_slist_str_test()
 {
-	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_SIZE_SMALL)));
 	tb_assert_and_check_return(slist);
 
 	tb_size_t 			i = 0;

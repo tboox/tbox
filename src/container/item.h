@@ -101,7 +101,7 @@ typedef struct __tb_item_func_t
  * using tb_spool_strdup if the spool exists
  *
  */
-tb_item_func_t 		tb_item_func_str(tb_pointer_t spool); 
+tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_pointer_t spool); 
 
 // the integer item function
 tb_item_func_t 		tb_item_func_int();

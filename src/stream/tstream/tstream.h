@@ -56,14 +56,17 @@ typedef struct __tb_tstream_t
 
 	// the reference to gstream
 	tb_gstream_t* 		gst;
-	
+
+	// FIXME
 	// the input data
-	tb_byte_t 			ib[TB_GSTREAM_CACHE_MAXN];
+	tb_byte_t 			ib[1];
+//	tb_byte_t 			ib[TB_GSTREAM_CACHE_MAXN];
 	tb_byte_t const* 	ip;
 	tb_size_t 			in;
 
 	// the output data
-	tb_byte_t 			ob[TB_GSTREAM_CACHE_MAXN];
+	tb_byte_t 			ob[1];
+//	tb_byte_t 			ob[TB_GSTREAM_CACHE_MAXN];
 	tb_byte_t* 			op;
 	tb_size_t 			on;
 

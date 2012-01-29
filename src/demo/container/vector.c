@@ -605,7 +605,7 @@ static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_str_test()
 {
-	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_SIZE_SMALL)));
 	tb_assert_and_check_return(vector);
 
 	tb_print("=============================================================");

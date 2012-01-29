@@ -8,11 +8,8 @@
  */
 static tb_void_t tb_url_test_set(tb_char_t const* url)
 {
-	tb_url_t 		u;
-	tb_pstring_t 	s;
-
+	tb_url_t u;
 	tb_url_init(&u);
-	tb_pstring_init(&s);
 
 	if (tb_url_set(&u, url))
 	{
@@ -26,7 +23,7 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 
 		tb_print("=================================================");
 		tb_print("irl: %s", url);
-		tb_print("orl: %s", tb_url_get(&u, &s));
+		tb_print("orl: %s", tb_url_get(&u));
 		tb_print("poto: %s", poto[tb_url_poto_get(&u)]);
 		tb_print("port: %u", tb_url_port_get(&u));
 		tb_print("host: %s", tb_url_host_get(&u));
@@ -36,7 +33,6 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 	else tb_print("invalid url: %s", url);
 
 	tb_url_exit(&u);
-	tb_pstring_exit(&s);
 }
 /* ////////////////////////////////////////////////////////////////////
  * main

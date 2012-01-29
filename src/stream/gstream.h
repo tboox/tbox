@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../network/url.h"
 #include "../memory/memory.h"
 
 /* /////////////////////////////////////////////////////////
@@ -39,15 +40,6 @@
 
 // the stream block maxn
 #define TB_GSTREAM_BLOCK_MAXN 					(8192)
-
-// the stream cache maxn
-#define TB_GSTREAM_CACHE_MAXN 					(8192)
-
-// the stream url maxn
-#define TB_GSTREAM_URL_MAXN 					(8192)
-
-// the stream timeout
-#define TB_GSTREAM_TIMEOUT 						(10000)
 
 // the stream bitops
 #ifdef TB_WORDS_BIGENDIAN
@@ -99,10 +91,10 @@ typedef enum __tb_gstream_seek_t
 typedef enum __tb_gstream_type_t
 {
  	TB_GSTREAM_TYPE_NULL 			= 0
-, 	TB_GSTREAM_TYPE_DATA 			= 1
-, 	TB_GSTREAM_TYPE_FILE 			= 2
-, 	TB_GSTREAM_TYPE_SOCK 			= 3
-, 	TB_GSTREAM_TYPE_HTTP 			= 4
+, 	TB_GSTREAM_TYPE_FILE 			= 1 //!< TB_URL_PROTO_FILE
+, 	TB_GSTREAM_TYPE_SOCK 			= 2 //!< TB_URL_PROTO_SOCK
+, 	TB_GSTREAM_TYPE_HTTP 			= 3 //!< TB_URL_PROTO_HTTP
+, 	TB_GSTREAM_TYPE_DATA 			= 4
 , 	TB_GSTREAM_TYPE_TRAN 			= 5
 
 }tb_gstream_type_t;
@@ -123,11 +115,20 @@ typedef enum __tb_gstream_cmd_t
 
 	// the gstream
 ,	TB_GSTREAM_CMD_GET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 1)
-,	TB_GSTREAM_CMD_GET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 2)
+,	TB_GSTREAM_CMD_GET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 2)
+,	TB_GSTREAM_CMD_GET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
+,	TB_GSTREAM_CMD_GET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 4)
+,	TB_GSTREAM_CMD_GET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 5)
+,	TB_GSTREAM_CMD_GET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 6)
+,	TB_GSTREAM_CMD_GET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 7)
 
-,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
-,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 4)
-,	TB_GSTREAM_CMD_SET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 5)
+,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 11)
+,	TB_GSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 12)
+,	TB_GSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 13)
+,	TB_GSTREAM_CMD_SET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 14)
+,	TB_GSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 15)
+,	TB_GSTREAM_CMD_SET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 16)
+,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 17)
 
 	// the dstream
 ,	TB_DSTREAM_CMD_SET_DATA 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_DATA, 1)
@@ -136,10 +137,7 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_FSTREAM_CMD_SET_FLAGS 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_FILE, 1)
 
 	// the sstream
-,	TB_SSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 1)
-,	TB_SSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 2)
 ,	TB_SSTREAM_CMD_SET_TYPE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 3)
-,	TB_SSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_SOCK, 4)
 
 	// the hstream
 ,	TB_HSTREAM_CMD_ISCHUNKED 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 1)
@@ -149,12 +147,8 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_HSTREAM_CMD_GET_REDIRECT 		= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 4)
 ,	TB_HSTREAM_CMD_GET_COOKIES 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 5)
 
-,	TB_HSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 6)
-,	TB_HSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 7)
-,	TB_HSTREAM_CMD_SET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 8)
 ,	TB_HSTREAM_CMD_SET_HEAD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 9)
 ,	TB_HSTREAM_CMD_SET_POST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 10)
-,	TB_HSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 11)
 ,	TB_HSTREAM_CMD_SET_RANGE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 12)
 ,	TB_HSTREAM_CMD_SET_METHOD 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 13)
 ,	TB_HSTREAM_CMD_SET_KALIVE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_HTTP, 14)
@@ -196,14 +190,14 @@ typedef struct __tb_gstream_t
 	// the timeout: ms
 	tb_size_t 			timeout 	: 22;
 
+	// the url
+	tb_url_t 			url;
+
 	// the cache
 	tb_qbuffer_t 		cache;
 
 	// the offset
 	tb_uint64_t 		offset;
-
-	// the url
-	tb_char_t* 			url;
 
 	// the bare handle for aio
 	tb_handle_t 		(*bare)(struct __tb_gstream_t* gst);
@@ -260,6 +254,7 @@ tb_gstream_t* 		tb_gstream_init_sock();
 tb_gstream_t* 		tb_gstream_init_http();
 tb_gstream_t* 		tb_gstream_init_zip();
 tb_gstream_t* 		tb_gstream_init_encoding();
+tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
 
 /* init stream from url
  *

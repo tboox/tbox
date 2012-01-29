@@ -165,7 +165,7 @@ static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_str_test()
 {
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_SIZE_SMALL)));
 	tb_assert_and_check_return(queue);
 
 	tb_print("=============================================================");
