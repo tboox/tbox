@@ -127,8 +127,10 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// is enough?
 	if (read == size) return read;
 
+	// FIXME
 	// read data from gstream if the input data is not full
-	tb_long_t ln = tst->ib + TB_GSTREAM_CACHE_MAXN - tst->ip;
+//	tb_long_t ln = tst->ib + TB_GSTREAM_CACHE_MAXN - tst->ip;
+	tb_long_t ln = tst->ib + 1 - tst->ip;
 	tb_long_t ret = -1;
 	if (tst->in < ln)
 	{

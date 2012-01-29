@@ -35,7 +35,7 @@
 static tb_void_t tb_hash_test_s2i_func()
 {
 	// init hash: str => int
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(TB_NULL), tb_item_func_int());
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(TB_TRUE, TB_NULL), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -110,7 +110,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 {
 	// init hash: str => int
 	tb_spool_t* pool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(pool), tb_item_func_int());
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(TB_TRUE, pool), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
 	// performance
@@ -133,7 +133,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 static tb_void_t tb_hash_test_i2s_func()
 {
 	// init hash: int => str
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_int(), tb_item_func_str(TB_NULL));
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_int(), tb_item_func_str(TB_TRUE, TB_NULL));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -203,7 +203,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 {
 	// init hash: int => str
 	tb_spool_t* pool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_str(pool));
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_str(TB_TRUE, pool));
 	tb_assert_and_check_return(hash);
 
 	// performance

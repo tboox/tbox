@@ -142,7 +142,9 @@ static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
 	// get output
 	tb_assert_and_check_return_val(tst->op, TB_FALSE);
 	tb_byte_t* op = tst->op;
-	tb_byte_t* oe = tst->ob + TB_GSTREAM_CACHE_MAXN;
+	// FIXME
+//	tb_byte_t* oe = tst->ob + TB_GSTREAM_CACHE_MAXN;
+	tb_byte_t* oe = tst->ob + 1;
 
 	// attach bstream
 	tb_bstream_t ist, ost;

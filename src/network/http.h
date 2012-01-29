@@ -30,7 +30,6 @@
 #include "url.h"
 #include "cookies.h"
 #include "../string/string.h"
-#include "../stream/stream.h"
 #include "../container/container.h"
 
 /* ////////////////////////////////////////////////////////////////////////
@@ -62,8 +61,8 @@ typedef enum __tb_http_method_t
 // the http version constant
 typedef enum __tb_http_version_t
 {
- 	TB_HTTP_VERSION_10
-, 	TB_HTTP_VERSION_11
+ 	TB_HTTP_VERSION_10 		= 0
+, 	TB_HTTP_VERSION_11 		= 1
 
 }tb_http_version_t;
 
@@ -83,13 +82,13 @@ typedef struct __tb_http_option_t
 	tb_uint16_t 		method 	: 4;
 
 	// the max redirect
-	tb_uint16_t 		mrdt 	: 10;
-
-	// is ssl?
-	tb_uint16_t 		bssl 	: 1;
+	tb_uint16_t 		mrdt 	: 11;
 
 	// is alive?
-	tb_uint16_t 		balive : 1;
+	tb_uint16_t 		balive 	: 1;
+
+	// the http version
+	tb_uint16_t 		version : 1;
 
 	// the url
 	tb_url_t 			url;
@@ -117,60 +116,29 @@ typedef struct __tb_http_option_t
 
 }tb_http_option_t;
 
-// the http state type
-typedef enum __tb_http_state_t
-{
-	TB_HTTP_STATE_NULL 			= 0
-,	TB_HTTP_STATE_OPEN 			= 1
-,	TB_HTTP_STATE_REQUEST 		= 2
-,	TB_HTTP_STATE_RESPONSE 		= 3
-,	TB_HTTP_STATE_REDIRECT 		= 4
-,	TB_HTTP_STATE_OK 			= 5
-
-}tb_http_state_t;
-
 // the http status type
 typedef struct __tb_http_status_t
 {
 	// the http code
 	tb_uint16_t 		code 		: 10;
 
-	// the http state
-	tb_uint16_t 		state 		: 6;
-
 	// the http version
-	tb_uint8_t 			version 	: 1;
-
-	// the connection is closed?
-	tb_uint8_t 			bclosed 	: 1;
+	tb_uint16_t 		version 	: 1;
 
 	// be able to seek?
-	tb_uint8_t 			bseeked		: 1;
+	tb_uint16_t 		bseeked		: 1;
 
 	// is chunk data
-	tb_uint8_t 			bchunked	: 1;
-
-	// is redirect?
-	tb_uint8_t 			bredirect 	: 1;
-
-	// is https?
-	tb_uint8_t 			bssl 		: 1;
+	tb_uint16_t 		bchunked	: 1;
 
 	// is keep alive?
-	tb_uint8_t 			balive		: 1;
-
-	// the redirect count
-	tb_uint8_t 			redirect;
-
-	// the content size
-	tb_uint64_t 		content_size;
+	tb_uint16_t 		balive		: 1;
 
 	// the document size
 	tb_uint64_t 		document_size;
 
-	// the chunked size
-	tb_size_t 			chunked_read;
-	tb_size_t 			chunked_size;
+	// the current content size, maybe in range
+	tb_uint64_t 		content_size;
 
 	// the content type
 	tb_pstring_t 		content_type;

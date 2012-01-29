@@ -50,12 +50,6 @@ typedef struct __tb_sstream_t
 	// the sock type
 	tb_size_t 			type;
 
-	// the port
-	tb_size_t 			port;
-
-	// the host
-	tb_char_t 			host[TB_SSTREAM_HOST_MAX];
-
 }tb_sstream_t;
 
 
@@ -70,14 +64,22 @@ static __tb_inline__ tb_sstream_t* tb_sstream_cast(tb_gstream_t* gst)
 static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst && sst->port, -1);
+	tb_assert_and_check_return_val(sst, -1);
 
 	// open
 	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
 	tb_assert_and_check_return_val(sst->sock, -1);
 
+	// host
+	tb_char_t const* host = tb_url_host_get(&gst->url);
+	tb_assert_and_check_return_val(host, -1);
+
+	// port
+	tb_size_t port = tb_url_port_get(&gst->url);
+	tb_assert_and_check_return_val(port, -1);
+
 	// connect
-	return tb_socket_connect(sst->sock, sst->host, sst->port);
+	return tb_socket_connect(sst->sock, host, port);
 }
 static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 {
@@ -135,61 +137,10 @@ static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 
 	switch (cmd)
 	{
-	case TB_GSTREAM_CMD_SET_URL:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-
-			// skip prefix
-			tb_char_t const* 	p = (tb_char_t const*)arg1;
-			tb_size_t 			n = tb_strlen(p);
-			tb_char_t const* 	e = p + n;
-			tb_assert_and_check_return_val(n > 7 && !tb_strncmp(p, "sock://", 7), TB_FALSE);
-			p += 7;
-
-			// get host
-			tb_char_t* pb = sst->host;
-			tb_char_t* pe = sst->host + TB_SSTREAM_HOST_MAX - 1;
-			while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
-			*pb = '\0';
-			//tb_trace("[sst]: host: %s", sst->host);
-
-			// get port
-			if (*p && *p == ':')
-			{
-				tb_char_t port[12];
-				pb = port;
-				pe = port + 12 - 1;
-				for (p++; p < e && pb < pe && *p && *p != '/'; ) *pb++ = *p++;
-				*pb = '\0';
-				sst->port = tb_stou32(port);
-			}
-			tb_assert_and_check_return_val(sst->port, TB_FALSE);
-			//tb_trace("[sst]: port: %u", sst->port);
-
-			return TB_TRUE;
-		}
-	case TB_SSTREAM_CMD_SET_HOST:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			tb_strncpy(sst->host, (tb_char_t const*)arg1, TB_SSTREAM_HOST_MAX);
-			sst->host[TB_SSTREAM_HOST_MAX - 1] = '\0';
-			return TB_TRUE;
-		}
-	case TB_SSTREAM_CMD_SET_PORT:
-		{
-			tb_assert_and_check_return_val(arg1, TB_FALSE);
-			sst->port = (tb_size_t)arg1;
-			return TB_TRUE;
-		}
 	case TB_SSTREAM_CMD_SET_TYPE:
 		{
 			sst->type = (tb_size_t)arg1;
 			return TB_TRUE;
-		}
-	case TB_SSTREAM_CMD_SET_SSL:
-		{
-			tb_trace_noimpl();
-			return TB_FALSE;
 		}
 	default:
 		break;
@@ -205,6 +156,9 @@ tb_gstream_t* tb_gstream_init_sock()
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_sstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
+
 	// init stream
 	tb_sstream_t* sst = (tb_sstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_SOCK;
@@ -218,7 +172,12 @@ tb_gstream_t* tb_gstream_init_sock()
 	sst->sock 	= TB_NULL;
 	sst->type 	= TB_SOCKET_TYPE_TCP;
 
+	// ok
 	return gst;
+
+fail:
+	if (gst) tb_free(gst);
+	return TB_NULL;
 }
 
 tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
@@ -230,10 +189,10 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// ioctl
-	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_SSL, bssl)) goto fail;
 	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return gst;

@@ -72,6 +72,9 @@ typedef struct __tb_url_t
 	// the path
 	tb_sstring_t 	path;
 
+	// the urls
+	tb_pstring_t 	urls;
+
 	// the args
 	tb_pstring_t 	args;
 
@@ -93,7 +96,7 @@ tb_void_t 			tb_url_exit(tb_url_t* url);
 tb_void_t 			tb_url_clear(tb_url_t* url);
 
 // url
-tb_char_t const* 	tb_url_get(tb_url_t const* url, tb_pstring_t* u);
+tb_char_t const* 	tb_url_get(tb_url_t* url);
 tb_bool_t 			tb_url_set(tb_url_t* url, tb_char_t const* u);
 
 // ssl

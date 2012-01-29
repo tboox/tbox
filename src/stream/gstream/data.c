@@ -162,6 +162,9 @@ tb_gstream_t* tb_gstream_init_data()
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_dstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
+
 	// init stream
 	gst->type 	= TB_GSTREAM_TYPE_DATA;
 	gst->aopen 	= tb_dstream_aopen;
@@ -173,7 +176,12 @@ tb_gstream_t* tb_gstream_init_data()
 	gst->wait 	= tb_dstream_wait;
 	gst->ctrl2 = tb_dstream_ctrl2;
 
+	// ok
 	return gst;
+
+fail:
+	if (gst) tb_free(gst);
+	return TB_NULL;
 }
 tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 {

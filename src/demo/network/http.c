@@ -49,6 +49,9 @@ int main(int argc, char** argv)
 	// open http
 	if (!tb_http_bopen(http)) goto end;
 
+	tb_print("open ok");
+	getchar();
+
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;

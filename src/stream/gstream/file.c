@@ -34,7 +34,7 @@
  */
 
 // need larger cache for performance
-#define TB_FSTREAM_CACHE_MAXN 					(TB_GSTREAM_CACHE_MAXN << 2)
+#define TB_FSTREAM_MCACHE_DEFAULT 		(8192 << 2)
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -69,10 +69,14 @@ static __tb_inline__ tb_fstream_t* tb_fstream_cast(tb_gstream_t* gst)
 static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && !fst->file && gst->url, -1);
+	tb_assert_and_check_return_val(fst && !fst->file, -1);
+
+	// url
+	tb_char_t const* url = tb_url_get(&gst->url);
+	tb_assert_and_check_return_val(url, -1);
 
 	// open file
-	fst->file = tb_file_init(gst->url, fst->flags);
+	fst->file = tb_file_init(url, fst->flags);
 	tb_assert_and_check_return_val(fst->file, -1);
 
 	// init size
@@ -185,6 +189,9 @@ tb_gstream_t* tb_gstream_init_file()
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_fstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
+
 	// init stream
 	tb_fstream_t* fst = (tb_fstream_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_FILE;
@@ -201,8 +208,8 @@ tb_gstream_t* tb_gstream_init_file()
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 
-	// need larger cache for performance
-	if (!tb_qbuffer_init(&gst->cache, TB_FSTREAM_CACHE_MAXN)) goto fail;
+	// resize file cache
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
 
 	// ok
 	return gst;
