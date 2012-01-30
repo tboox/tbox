@@ -320,8 +320,8 @@ tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t ti
 	// have readed event for cache?
 	if (etype & TB_AIOO_ETYPE_READ)
 	{
-		// the cache is writed-cache now, so set read event for flushing it
-		if (gst->bwrited && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
+		// the cache is writed-cache now, need call afwrit or bfwrit first.
+		tb_assert_and_check_return_val(!gst->bwrited, -1);
 
 		// can read data
 		if (!tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
@@ -330,8 +330,8 @@ tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t ti
 	// have writed event for cache?
 	if (etype & TB_AIOO_ETYPE_WRIT)
 	{
-		// the cache is readed-cache now, so set writ event for flushing it
-		if (!gst->bwrited && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+		// the cache is readed-cache now, need call afread or bfread first.
+		tb_assert_and_check_return_val(gst->bwrited, -1);
 
 		// can writ data
 		if (!tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
@@ -553,18 +553,8 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
-	// flush writed data
-	if (gst->bwrited) 
-	{
-		// flush it
-		tb_long_t r = tb_gstream_cache_afwrit(gst);
-
-		// check?
-		tb_check_return_val(r > 0, r);
-
-		// bwrited will be clear
-		tb_assert_and_check_return_val(!gst->bwrited, -1);
-	}
+	// the cache is writed-cache now, need call afwrit or bfwrit first.
+	tb_assert_and_check_return_val(!gst->bwrited, -1); 
 
 	// need data from cache
 	return tb_gstream_cache_aneed(gst, data, size);
@@ -601,18 +591,8 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
-	// flush writed data
-	if (gst->bwrited) 
-	{
-		// flush it
-		tb_long_t r = tb_gstream_cache_afwrit(gst);
-
-		// check?
-		tb_check_return_val(r > 0, r);
-
-		// bwrited will be clear
-		tb_assert_and_check_return_val(!gst->bwrited, -1);
-	}
+	// the cache is writed-cache now, need call afwrit or bfwrit first.
+	tb_assert_and_check_return_val(!gst->bwrited, -1); 
 
 	// read data from cache
 	return tb_gstream_cache_aread(gst, data, size);
@@ -630,15 +610,8 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
-	// flush readed data
-	if (!gst->bwrited) 
-	{
-		// flush it
-		tb_long_t r = tb_gstream_cache_afread(gst);
-
-		// check?
-		tb_check_return_val(r > 0, r);
-	}
+	// the cache is readed-cache now, need call afread or bfread first.
+	tb_assert_and_check_return_val(gst->bwrited, -1); 
 
 	// writ data to cache
 	return tb_gstream_cache_awrit(gst, data, size);
@@ -734,6 +707,68 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// ok?
 	return (writ == size? TB_TRUE : TB_FALSE);
 }
+
+tb_long_t tb_gstream_afread(tb_gstream_t* gst)
+{
+	// check stream
+	tb_assert_and_check_return_val(gst, -1);
+
+	// flush readed cache data if the last operaton is read
+	tb_check_return_val(!gst->bwrited, 1);
+
+	// flush it
+	return tb_gstream_cache_afread(gst);
+}
+tb_long_t tb_gstream_afwrit(tb_gstream_t* gst)
+{
+	// check stream
+	tb_assert_and_check_return_val(gst, -1);
+
+	// flush writed cache data if the last operaton is writ
+	tb_check_return_val(gst->bwrited, 1);
+
+	// flush it
+	return tb_gstream_cache_afwrit(gst);
+}
+tb_bool_t tb_gstream_bfread(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_afread(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
+}
+tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst)
+{
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	tb_int64_t 	t = tb_mclock();
+	while (!(r = tb_gstream_afwrit(gst)))
+	{
+		// timeout?
+		if (tb_mclock() - t > gst->timeout) break;
+
+		// sleep some time
+		tb_usleep(100);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
+}
+
 tb_long_t tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
 {
 	tb_char_t 	ch = 0;
