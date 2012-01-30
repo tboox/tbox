@@ -145,38 +145,38 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	tb_url_clear(url);
 
 	// parse proto
-	tb_char_t const* p = TB_NULL;
-	if (p = tb_stristr(u, "http://")) 
+	tb_char_t const* p = u;
+	if (!tb_strnicmp(p, "http://", 7)) 
 	{
 		url->poto = TB_URL_PROTO_HTTP;
 		url->bssl = 0;
 		p += 7;
 	}
-	else if ((*u == '/') || (p = tb_stristr(u, "file://"))) 
+	else if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
 	{
 		url->poto = TB_URL_PROTO_FILE;
 		url->bssl = 0;
 		if (*p != '/') p += 7;
 	}
-	else if (p = tb_stristr(u, "sock://")) 
+	else if (!tb_strnicmp(p, "sock://", 7))
 	{
 		url->poto = TB_URL_PROTO_SOCK;
 		url->bssl = 0;
 		p += 7;
 	}
-	else if (p = tb_stristr(u, "https://")) 
+	else if (!tb_strnicmp(p, "https://", 8))
 	{
 		url->poto = TB_URL_PROTO_HTTP;
 		url->bssl = 1;
 		p += 8;
 	}
-	else if (p = tb_stristr(u, "files://")) 
+	else if (!tb_strnicmp(p, "files://", 8))
 	{
 		url->poto = TB_URL_PROTO_FILE;
 		url->bssl = 1;
 		p += 8;
 	}
-	else if (p = tb_stristr(u, "socks://")) 
+	else if (!tb_strnicmp(p, "socks://", 8))
 	{
 		url->poto = TB_URL_PROTO_SOCK;
 		url->bssl = 1;
@@ -185,7 +185,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	else goto fail;
 
 	// end?
-	tb_assert_and_check_goto(p && *p, fail);
+	tb_assert_and_check_goto(*p, fail);
 
 	// parse host and port for http or sock
 	if (url->poto == TB_URL_PROTO_HTTP || url->poto == TB_URL_PROTO_SOCK)
@@ -224,6 +224,17 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 fail:
 	tb_url_clear(url);
 	return TB_FALSE;
+}
+tb_void_t tb_url_cpy(tb_url_t* url, tb_url_t const* u)
+{
+	tb_assert_and_check_return(url && u);
+	url->poto = u->poto;
+	url->port = u->port;
+	url->bssl = u->bssl;
+	tb_sstring_strcpy(&url->host, &u->host);
+	tb_sstring_strcpy(&url->path, &u->path);
+	tb_pstring_strcpy(&url->args, &u->args);
+	tb_pstring_strcpy(&url->urls, &u->urls);
 }
 tb_bool_t tb_url_ssl_get(tb_url_t const* url)
 {

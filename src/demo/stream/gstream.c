@@ -43,10 +43,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	otime = tb_mclock() - otime;
 	tb_print("[gst]: open ost: %llu ms", otime);
 
-#if 1
-	tb_gstream_bwrit(ist, "<policy-file-request/>", tb_strlen("<policy-file-request/>") + 1);
-#endif
-
 #if 0
 	// save stream
 	tb_uint64_t size = tb_gstream_save(ist, ost);

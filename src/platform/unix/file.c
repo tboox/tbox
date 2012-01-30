@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../../math/math.h"
+#include "../../libc/libc.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/poll.h>
@@ -38,6 +39,23 @@
 #endif
 
 /* /////////////////////////////////////////////////////////
+ * path
+ */
+
+/* transform the file path to the unix style
+ *
+ * /home/ruki/file.txt
+ * file:///home/ruki/file.txt
+ *
+ * => /home/ruki/file.txt
+ */
+static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path)
+{
+	tb_assert_and_check_return_val(path, TB_NULL);
+
+	return (!tb_strnicmp(path, "file://", 7))? (path + 7) : path;
+}
+/* /////////////////////////////////////////////////////////
  * implemention
  */
 
@@ -45,6 +63,9 @@
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(path, TB_NULL);
+
+	// path => unix
+	path = tb_file_path_to_unix(path);
 
 	// flag
 	tb_size_t flag = 0;
@@ -131,6 +152,9 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
 	tb_assert_and_check_return_val(path, TB_FALSE);
 
+	// path => unix
+	path = tb_file_path_to_unix(path);
+
 	// exists?
 	tb_check_return_val(!access(path, F_OK), TB_FALSE);
 
@@ -160,6 +184,11 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
 	tb_assert_and_check_return_val(path, TB_FALSE);
+
+	// path => unix
+	path = tb_file_path_to_unix(path);
+
+	// create file
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
@@ -182,5 +211,10 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 {
 	tb_assert_and_check_return(path);
+
+	// path => unix
+	path = tb_file_path_to_unix(path);
+
+	// remove it
 	remove(path);
 }

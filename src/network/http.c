@@ -479,9 +479,6 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	tb_char_t 			ch[1];
 	tb_long_t 			cn = 0;
 
-	// check the initialize value for line number
-	tb_assert_and_check_return_val(!http->size, -1);
-
 	// read response
 	while (1)
 	{
@@ -527,6 +524,13 @@ static tb_long_t tb_http_response(tb_http_t* http)
 			http->size++;
 		}
 	}
+
+	// flush readed data
+	r = tb_gstream_afread(http->stream);
+	tb_assert_and_check_return_val(r >= 0, -1);
+
+	// continue?
+	tb_check_return_val(r > 0, 0);
 
 	// finish it
 	http->state |= TB_HTTP_STATE_RESPONSED;

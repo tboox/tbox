@@ -204,7 +204,14 @@ tb_long_t tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_char_
 tb_char_t const* tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s)
 {
 	tb_assert_and_check_return_val(s, TB_NULL);
-	return tb_sstring_cstrncpy(string, tb_sstring_cstr(s), tb_sstring_size(s));
+
+	tb_size_t n = tb_sstring_size(s);
+	if (n) return tb_sstring_cstrncpy(string, tb_sstring_cstr(s), n);
+	else 
+	{
+		tb_sstring_clear(string);
+		return TB_NULL;
+	}
 }
 tb_char_t const* tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s)
 {

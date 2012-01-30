@@ -65,7 +65,8 @@ typedef struct __tb_gstream_item_t
 // the stream table
 static tb_gstream_item_t g_gstream_table[] = 
 {
-	{TB_GSTREAM_TYPE_FILE, tb_gstream_init_file}
+	{TB_GSTREAM_TYPE_NULL, TB_NULL}
+,	{TB_GSTREAM_TYPE_FILE, tb_gstream_init_file}
 ,	{TB_GSTREAM_TYPE_SOCK, tb_gstream_init_sock}
 ,	{TB_GSTREAM_TYPE_HTTP, tb_gstream_init_http}
 ,	{TB_GSTREAM_TYPE_DATA, tb_gstream_init_data}
@@ -317,25 +318,9 @@ tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t ti
 	// no event?
 	tb_check_return_val(!e, e);
 
-	// have readed event for cache?
-	if (etype & TB_AIOO_ETYPE_READ)
-	{
-		// the cache is writed-cache now, need call afwrit or bfwrit first.
-		tb_assert_and_check_return_val(!gst->bwrited, -1);
-
-		// can read data
-		if (!tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
-	}
-
-	// have writed event for cache?
-	if (etype & TB_AIOO_ETYPE_WRIT)
-	{
-		// the cache is readed-cache now, need call afread or bfread first.
-		tb_assert_and_check_return_val(gst->bwrited, -1);
-
-		// can writ data
-		if (!tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
-	}
+	// wait for cache
+	if ((etype & TB_AIOO_ETYPE_READ) && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
+	if ((etype & TB_AIOO_ETYPE_WRIT) && !tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
 
 	return e;
 }
@@ -349,10 +334,10 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	// init
 	tb_gstream_t* 	gst = TB_NULL;
 	tb_url_t 		u;
-	if (!tb_url_set(&u, url)) goto fail;
+	if (!tb_url_init(&u)) return TB_NULL;
 
 	// set url
-	if (!tb_url_init(&u)) return TB_NULL;
+	if (!tb_url_set(&u, url)) goto fail;
 
 	// get type
 	tb_size_t type = tb_url_poto_get(&u);
@@ -363,8 +348,10 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_goto(gst, fail);
 
 	// copy url
-	tb_url_exit(&gst->url);
-	tb_memcpy(&gst->url, &u, sizeof(tb_url_t));
+	tb_url_cpy(&gst->url, &u);
+
+	// exit url
+	tb_url_exit(&u);
 
 	// ok
 	return gst;
@@ -432,6 +419,20 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst && gst->wait, -1);
 	
+	// have readed event for cache?
+	if (etype & TB_AIOO_ETYPE_READ)
+	{
+		// the cache is writed-cache now, need call afwrit or bfwrit first.
+		tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1);
+	}
+
+	// have writed event for cache?
+	if (etype & TB_AIOO_ETYPE_WRIT)
+	{
+		// the cache is readed-cache now, need call afread or bfread first.
+		tb_assert_and_check_return_val(gst->bwrited || tb_qbuffer_null(&gst->cache), -1);
+	}
+
 	// wait
 	return tb_gstream_cache_wait(gst, etype, timeout);
 }
@@ -554,7 +555,7 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
 	// the cache is writed-cache now, need call afwrit or bfwrit first.
-	tb_assert_and_check_return_val(!gst->bwrited, -1); 
+	tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
 
 	// need data from cache
 	return tb_gstream_cache_aneed(gst, data, size);
@@ -565,15 +566,41 @@ tb_bool_t tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	tb_assert_and_check_return_val(gst && data, TB_FALSE);
 
 	// need data from cache
+	tb_long_t prev = 0;
 	tb_long_t need = 0;
 	tb_bool_t wait = TB_FALSE;
 	while ((need = tb_gstream_aneed(gst, data, size)) < size)
 	{
-		// check
-		tb_check_break(need >= 0);
+		// error?
+		tb_check_break(need >= 0 && need >= prev);
+		
+		// no data?
+		if (!(need - prev))
+		{
+			// no end?
+			tb_check_break(!wait);
 
-		// FIXME
-		tb_trace_noimpl();
+			// wait
+			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has read?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+			// be waiting
+			wait = TB_TRUE;
+		}
+		else 
+		{
+			// no waiting
+			wait = TB_FALSE;
+
+			// update prev
+			prev = need;
+		}
 	}
 
 	// ok?
@@ -592,7 +619,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
 	// the cache is writed-cache now, need call afwrit or bfwrit first.
-	tb_assert_and_check_return_val(!gst->bwrited, -1); 
+	tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
 
 	// read data from cache
 	return tb_gstream_cache_aread(gst, data, size);
@@ -611,7 +638,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
 	// the cache is readed-cache now, need call afread or bfread first.
-	tb_assert_and_check_return_val(gst->bwrited, -1); 
+	tb_assert_and_check_return_val(gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
 
 	// writ data to cache
 	return tb_gstream_cache_awrit(gst, data, size);
@@ -736,14 +763,24 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gst)
 
 	// try opening it
 	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
+	tb_bool_t 	w = TB_FALSE;
 	while (!(r = tb_gstream_afread(gst)))
 	{
-		// timeout?
-		if (tb_mclock() - t > gst->timeout) break;
+		// no end?
+		tb_check_break(!w);
 
-		// sleep some time
-		tb_usleep(100);
+		// wait
+		tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+		tb_assert_and_check_break(e >= 0);
+
+		// timeout?
+		tb_check_break(e);
+
+		// has read?
+		tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+
+		// be waiting
+		w = TB_TRUE;
 	}
 
 	// ok?
@@ -755,14 +792,21 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst)
 
 	// try opening it
 	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
+	tb_bool_t 	w = TB_FALSE;
 	while (!(r = tb_gstream_afwrit(gst)))
 	{
-		// timeout?
-		if (tb_mclock() - t > gst->timeout) break;
+		// wait
+		tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
+		tb_assert_and_check_break(e >= 0);
 
-		// sleep some time
-		tb_usleep(100);
+		// timeout?
+		tb_check_break(e);
+
+		// has writ?
+		tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+
+		// be waiting
+		w = TB_TRUE;
 	}
 
 	// ok?
@@ -1050,7 +1094,8 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		{
 			if (arg1)
 			{
-				if (tb_qbuffer_resize(&gst->cache, (tb_size_t)arg1)) ret = TB_TRUE;
+				tb_qbuffer_resize(&gst->cache, (tb_size_t)arg1);
+				if (tb_qbuffer_maxn(&gst->cache)) ret = TB_TRUE;
 			}
 		}
 		break;
