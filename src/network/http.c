@@ -320,6 +320,13 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		http->size += n;
 	}
 
+	// flush writed data
+	tb_long_t r = tb_gstream_afwrit(http->stream);
+	tb_assert_and_check_return_val(r >= 0, -1);
+
+	// continue?
+	tb_check_return_val(r > 0, 0);
+
 	// finish it
 	http->state |= TB_HTTP_STATE_REQUESTED;
 

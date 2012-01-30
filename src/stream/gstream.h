@@ -309,6 +309,14 @@ tb_long_t 			tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_bool_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
+// async fread & fwrit data
+tb_long_t 			tb_gstream_afread(tb_gstream_t* gst);
+tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst);
+
+// block fread & fwrit data
+tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst);
+tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst);
+
 // async need data
 tb_long_t 			tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
 
