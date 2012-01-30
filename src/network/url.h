@@ -98,6 +98,7 @@ tb_void_t 			tb_url_clear(tb_url_t* url);
 // url
 tb_char_t const* 	tb_url_get(tb_url_t* url);
 tb_bool_t 			tb_url_set(tb_url_t* url, tb_char_t const* u);
+tb_void_t 			tb_url_cpy(tb_url_t* url, tb_url_t const* u);
 
 // ssl
 tb_bool_t 			tb_url_ssl_get(tb_url_t const* url);

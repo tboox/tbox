@@ -217,10 +217,10 @@ typedef struct __tb_gstream_t
 	// async writ
 	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
-	// async fread
+	// async flush readed data, need wait it if return 0
 	tb_long_t 			(*afread)(struct __tb_gstream_t* gst);
 
-	// async fwrit
+	// async flush writed data, need wait it if return 0
 	tb_long_t 			(*afwrit)(struct __tb_gstream_t* gst);
 
 	// seek

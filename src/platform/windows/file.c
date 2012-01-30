@@ -30,21 +30,9 @@
 #include <windows.h>
 
 /* /////////////////////////////////////////////////////////
- * details
+ * path
  */
 
-/* transform the file path to the unix style
- *
- * C://home/file.txt
- * C:\\\\home\\file.txt
- *
- * => /c/home/file.txt
- */
-static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
-{
-	tb_trace_noimpl();
-	return TB_NULL;
-}
 /* transform the file path to the windows style
  *
  * /c/home/file.txt
@@ -64,14 +52,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
-	else if ( 	path[0] == 'f'
-			&& 	path[1] == 'i'
-			&& 	path[2] == 'l'
-			&& 	path[3] == 'e'
-			&& 	path[4] == ':'
-			&& 	path[5] == '/'
-			&& 	path[6] == '/'
-			) 
+	else if (!tb_strnicmp(path, "file://", 7)) 
 	{
 		data[0] = path[8];
 		data[1] = ':';
