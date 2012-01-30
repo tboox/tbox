@@ -309,11 +309,34 @@ static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset)
 tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst, -1);
+
+	// wait the native event first
+	tb_long_t e = gst->wait(gst, etype, timeout);
+	tb_assert_and_check_return_val(e >= 0, -1);
 	
-	// wait cache?
-	tb_long_t 	e = 0;
-	if ((etype & TB_AIOO_ETYPE_READ) && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
-	if ((etype & TB_AIOO_ETYPE_WRIT) && !tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+	// no event?
+	tb_check_return_val(!e, e);
+
+	// have readed event for cache?
+	if (etype & TB_AIOO_ETYPE_READ)
+	{
+		// the cache is writed-cache now, so set read event for flushing it
+		if (gst->bwrited && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
+
+		// can read data
+		if (!tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
+	}
+
+	// have writed event for cache?
+	if (etype & TB_AIOO_ETYPE_WRIT)
+	{
+		// the cache is readed-cache now, so set writ event for flushing it
+		if (!gst->bwrited && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+
+		// can writ data
+		if (!tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+	}
+
 	return e;
 }
 /* /////////////////////////////////////////////////////////
@@ -409,12 +432,8 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst && gst->wait, -1);
 	
-	// wait cache?
-	tb_long_t e = tb_gstream_cache_wait(gst, etype, timeout);
-	tb_check_return_val(!e, e);
-
-	// wait ...
-	return gst->wait(gst, etype, timeout);
+	// wait
+	return tb_gstream_cache_wait(gst, etype, timeout);
 }
 tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {
@@ -422,7 +441,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst && gst->aopen, -1);
 
 	// already been opened?
-	tb_assert_and_check_return_val(!gst->bopened, 1);
+	tb_check_return_val(!gst->bopened, 1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);

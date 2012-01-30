@@ -42,6 +42,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init url
 	if (!tb_url_set(&option->url, "http://119.75.217.56/index.html2")) goto end;
 
+	// keep-alive
+	option->balive = 1;
+
+	// redirect
+//	option->rdtm = 0;
+
 	// init head func
 	option->hfunc = tb_http_test_hfunc;
 	option->udata = (tb_pointer_t)http;

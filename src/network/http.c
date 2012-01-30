@@ -53,7 +53,6 @@ typedef enum __tb_http_state_t
 ,	TB_HTTP_STATE_CONNECTED 	= 1
 ,	TB_HTTP_STATE_REQUESTED 	= 2
 ,	TB_HTTP_STATE_RESPONSED 	= 4
-,	TB_HTTP_STATE_REDIRECTED 	= 8
 
 }tb_http_state_t;
 
@@ -74,6 +73,9 @@ typedef struct __tb_http_t
 
 	// the state
 	tb_size_t 			state;
+
+	// the redirect count
+	tb_size_t 			rdtn;
 	
 	// the data && size for request and response
 	tb_pstring_t 		data;
@@ -103,7 +105,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 {
 	// init default
 	http->option.method 	= TB_HTTP_METHOD_GET;
-	http->option.mrdt 		= TB_HTTP_MRDT_DEFAULT;
+	http->option.rdtm 		= TB_HTTP_MRDT_DEFAULT;
 	http->option.timeout 	= TB_HTTP_TIMEOUT_DEFAULT;
 	http->option.version 	= TB_HTTP_VERSION_11;
 
@@ -135,11 +137,14 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 static tb_bool_t tb_http_status_init(tb_http_t* http)
 {
 	http->status.version = TB_HTTP_VERSION_11;
-	return tb_pstring_init(&http->status.content_type);
+	if (!tb_pstring_init(&http->status.content_type)) return TB_FALSE;
+	if (!tb_pstring_init(&http->status.location)) return TB_FALSE;
+	return TB_TRUE;
 }
 static tb_void_t tb_http_status_exit(tb_http_t* http)
 {
 	tb_pstring_exit(&http->status.content_type);
+	tb_pstring_exit(&http->status.location);
 }
 static tb_void_t tb_http_status_clear(tb_http_t* http)
 {
@@ -151,10 +156,15 @@ static tb_void_t tb_http_status_clear(tb_http_t* http)
 	http->status.document_size = 0;
 	http->status.content_size = 0;
 	tb_pstring_clear(&http->status.content_type);
+	tb_pstring_clear(&http->status.location);
 }
 static tb_long_t tb_http_connect(tb_http_t* http)
 {
+	// have been connected?
 	tb_check_return_val(!(http->state & TB_HTTP_STATE_CONNECTED), 1);
+
+	// clear status
+	if (!http->state) tb_http_status_clear(http);
 
 	// ioctl
 	tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_SSL, tb_url_ssl_get(&http->option.url));
@@ -437,8 +447,11 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 			// redirect? check code: 301 - 303
 			tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, TB_FALSE);
 
-			// ...
-			tb_trace_noimpl();
+			// init redirect
+			http->rdtn = 0;
+
+			// save location
+			tb_pstring_cstrcpy(&http->status.location, p);
 		}
 		// parse connection
 		else if (!tb_strnicmp(line, "Connection", 10))
@@ -458,8 +471,6 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	tb_long_t 			r = -1;
 	tb_char_t 			ch[1];
 	tb_long_t 			cn = 0;
-	tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
-	tb_assert_and_check_return_val(pb, -1);
 
 	// check the initialize value for line number
 	tb_assert_and_check_return_val(!http->size, -1);
@@ -483,8 +494,11 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		else
 		{
 			// strip '\r' if exists
-			tb_size_t pn = tb_pstring_size(&http->data);
-			if (pn && pb[pn - 1] == '\r')
+			tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
+			tb_size_t 			pn = tb_pstring_size(&http->data);
+			tb_assert_and_check_return_val(pb, -1);
+
+			if (pb[pn - 1] == '\r')
 				tb_pstring_strip(&http->data, pn - 1);
 
 			// trace
@@ -516,6 +530,61 @@ static tb_long_t tb_http_response(tb_http_t* http)
 
 	// ok
 	tb_trace("[http]: response: ok");
+	return 1;
+}
+
+static tb_long_t tb_http_redirect(tb_http_t* http)
+{
+	tb_check_return_val(tb_pstring_size(&http->status.location), 1);
+
+	// redirect
+	if (http->rdtn < http->option.rdtm)
+	{
+		// not keep-alive?
+		if (!http->status.balive) 
+		{
+			// close stream
+			tb_long_t r = tb_gstream_aclose(http->stream);
+			tb_assert_and_check_return_val(r >= 0, -1);
+
+			// continue ?
+			tb_check_return_val(r, 0);
+		}
+#if 0
+		else
+		{
+			// clear read data
+			tb_byte_t d[8192];
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+			tb_gstream_aread(http->stream, d, 8192);
+		}
+#endif
+
+		// set url
+		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) return -1;
+
+		// set keep-alive
+		http->option.balive = http->status.balive;
+
+		// set version
+		http->option.version = http->status.version;
+
+		// redirect++
+		http->rdtn++;
+		
+		// clear state
+		http->state = TB_HTTP_STATE_NULL;
+
+		// continue 
+		return 0;
+	}
+
+	// ok
 	return 1;
 }
 /* ////////////////////////////////////////////////////////////////////////
@@ -600,20 +669,15 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t etype, tb_long_t timeout)
 tb_long_t tb_http_aopen(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(handle, -1);
+	tb_assert_and_check_return_val(http && http->stream, -1);
 
 	// check stream
 	tb_long_t r = -1;
-	tb_assert_and_check_return_val(http->stream, r);
 
-	// not keep-alive?
-	if (!http->stream || !http->status.balive) 
-	{
-		// connect
-		r = tb_http_connect(http);
-		tb_check_goto(r >= 0, fail);
-		tb_check_return_val(r > 0, r);
-	}
+	// connect
+	r = tb_http_connect(http);
+	tb_check_goto(r >= 0, fail);
+	tb_check_return_val(r > 0, r);
 	
 	// request
 	r = tb_http_request(http);
@@ -624,7 +688,12 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	r = tb_http_response(http);
 	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
-	
+
+	// redirect
+	r = tb_http_redirect(http);
+	tb_check_goto(r >= 0, fail);
+	tb_check_return_val(r > 0, r);
+
 	// ok
 	return r;
 
@@ -648,6 +717,9 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	tb_size_t w = 0;
 	while (!(r = tb_http_aopen(handle)))
 	{
+		// is redirect?
+		tb_check_continue(!tb_pstring_size(&http->status.location));
+
 		// has aio event?
 		tb_size_t e = TB_AIOO_ETYPE_NULL;
 		if (!(http->state & TB_HTTP_STATE_CONNECTED)) e = TB_AIOO_ETYPE_CONN;
@@ -714,6 +786,9 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 
 		// clear state
 		http->state = TB_HTTP_STATE_NULL;
+
+		// clear redirect
+		http->rdtn = 0;
 	}
 
 	// ok
@@ -873,7 +948,7 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	tb_trace("[http]: option: url: %s", tb_url_get(&http->option.url));
 	tb_trace("[http]: option: version: HTTP/1.%1u", http->option.version);
 	tb_trace("[http]: option: method: %s", http->option.method < tb_arrayn(tb_http_methods)? tb_http_methods[http->option.method] : "none");
-	tb_trace("[http]: option: mrdt: %d", http->option.mrdt);
+	tb_trace("[http]: option: rdtm: %d", http->option.rdtm);
 	tb_trace("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
 	tb_trace("[http]: option: balive: %s", http->option.balive? "true" : "false");
 	tb_trace("[http]: option: bchunked: %s", http->option.bchunked? "true" : "false");
@@ -904,6 +979,7 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	tb_trace("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
 	tb_trace("[http]: status: content:size: %llu", http->status.content_size);
 	tb_trace("[http]: status: document:size: %llu", http->status.document_size);
+	tb_trace("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
 	tb_trace("[http]: status: balive: %s", http->status.balive? "true" : "false");
 	tb_trace("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
 	tb_trace("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");

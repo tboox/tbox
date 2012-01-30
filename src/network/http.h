@@ -82,7 +82,7 @@ typedef struct __tb_http_option_t
 	tb_uint16_t 		method 		: 4;
 
 	// the max redirect
-	tb_uint16_t 		mrdt 		: 9;
+	tb_uint16_t 		rdtm 		: 9;
 
 	// the http version
 	tb_uint16_t 		version 	: 1;
@@ -145,6 +145,9 @@ typedef struct __tb_http_status_t
 
 	// the content type
 	tb_pstring_t 		content_type;
+
+	// the location
+	tb_pstring_t 		location;
 
 }tb_http_status_t;
 
