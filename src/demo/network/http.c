@@ -12,14 +12,14 @@
  */
 static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
 {
-	tb_printf("head: %s\n", line);
+	tb_print("[demo]: response: %s", line);
 	return TB_TRUE;
 }
 
 /* ///////////////////////////////////////////////////////////////////
  * main
  */
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 	tb_assert_and_check_goto(option->cookies, end);
 	
 	// init url
-	if (!tb_url_set(&option->url, "http://119.75.217.56/index.html")) goto end;
+	if (!tb_url_set(&option->url, "http://119.75.217.56/index.html2")) goto end;
 
 	// init head func
 	option->hfunc = tb_http_test_hfunc;
@@ -48,9 +48,6 @@ int main(int argc, char** argv)
 
 	// open http
 	if (!tb_http_bopen(http)) goto end;
-
-	tb_print("open ok");
-	getchar();
 
 	// read data
 	tb_byte_t 		data[8192];
@@ -61,6 +58,7 @@ int main(int argc, char** argv)
 	{
 		// read data
 		tb_long_t n = tb_http_aread(http, data, 8192);
+		tb_print("[demo]: read: %d", n);
 		if (n > 0)
 		{
 			// update read
@@ -71,7 +69,7 @@ int main(int argc, char** argv)
 		}
 		else if (!n) 
 		{
-			// no end?
+			// abort?
 			tb_check_break(!wait);
 
 			// wait

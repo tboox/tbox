@@ -463,7 +463,7 @@ tb_long_t tb_gstream_aclose(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst, -1);
 
 	// already been closed?
-	tb_assert_and_check_return_val(gst->bopened, 1);
+	tb_check_return_val(gst->bopened, 1);
 
 	// init 
 	tb_long_t r1 = 1;
