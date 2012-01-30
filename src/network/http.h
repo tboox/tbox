@@ -79,16 +79,19 @@ typedef struct __tb_http_range_t
 typedef struct __tb_http_option_t
 {
 	// the method
-	tb_uint16_t 		method 	: 4;
+	tb_uint16_t 		method 		: 4;
 
 	// the max redirect
-	tb_uint16_t 		mrdt 	: 11;
-
-	// is alive?
-	tb_uint16_t 		balive 	: 1;
+	tb_uint16_t 		mrdt 		: 9;
 
 	// the http version
-	tb_uint16_t 		version : 1;
+	tb_uint16_t 		version 	: 1;
+
+	// is alive?
+	tb_uint16_t 		balive 		: 1;
+
+	// is chunked?
+	tb_uint16_t 		bchunked 	: 1;
 
 	// the url
 	tb_url_t 			url;
@@ -125,14 +128,14 @@ typedef struct __tb_http_status_t
 	// the http version
 	tb_uint16_t 		version 	: 1;
 
+	// is keep alive?
+	tb_uint16_t 		balive		: 1;
+
 	// be able to seek?
 	tb_uint16_t 		bseeked		: 1;
 
-	// is chunk data
+	// is chunked?
 	tb_uint16_t 		bchunked	: 1;
-
-	// is keep alive?
-	tb_uint16_t 		balive		: 1;
 
 	// the document size
 	tb_uint64_t 		document_size;
