@@ -525,13 +525,6 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		}
 	}
 
-	// flush readed data
-	r = tb_gstream_afread(http->stream);
-	tb_assert_and_check_return_val(r >= 0, -1);
-
-	// continue?
-	tb_check_return_val(r > 0, 0);
-
 	// finish it
 	http->state |= TB_HTTP_STATE_RESPONSED;
 
@@ -561,20 +554,15 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 			// continue ?
 			tb_check_return_val(r, 0);
 		}
-#if 0
 		else
 		{
-			// clear read data
-			tb_byte_t d[8192];
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
-			tb_gstream_aread(http->stream, d, 8192);
+			// flush readed data
+			tb_long_t r = tb_gstream_afread(http->stream);
+			tb_assert_and_check_return_val(r >= 0, -1);
+
+			// continue?
+			tb_check_return_val(r > 0, 0);
 		}
-#endif
 
 		// set url
 		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) return -1;
@@ -728,19 +716,19 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	tb_size_t w = 0;
 	while (!(r = tb_http_aopen(handle)))
 	{
-		// is redirect?
-		tb_check_continue(!tb_pstring_size(&http->status.location));
-
 		// has aio event?
 		tb_size_t e = TB_AIOO_ETYPE_NULL;
-		if (!(http->state & TB_HTTP_STATE_CONNECTED)) e = TB_AIOO_ETYPE_CONN;
-		else if (!(http->state & TB_HTTP_STATE_REQUESTED)) e = TB_AIOO_ETYPE_WRIT;
-		else if (!(http->state & TB_HTTP_STATE_RESPONSED)) e = TB_AIOO_ETYPE_READ;
+		if (!tb_pstring_size(&http->status.location))
+		{
+			if (!(http->state & TB_HTTP_STATE_CONNECTED)) e = TB_AIOO_ETYPE_CONN;
+			else if (!(http->state & TB_HTTP_STATE_REQUESTED)) e = TB_AIOO_ETYPE_WRIT;
+			else if (!(http->state & TB_HTTP_STATE_RESPONSED)) e = TB_AIOO_ETYPE_READ;
+		}
 
 		// need wait?
 		if (e)
 		{
-			// abort?
+			// repeat event? abort? 
 			tb_check_break(w != e);
 
 			// wait
@@ -748,10 +736,10 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 
 			// fail or timeout?
 			tb_check_break(r > 0);
-
-			// be waiting
-			w = e;
 		}
+
+		// save the event
+		w = e;
 	}
 
 	// dump status
@@ -768,16 +756,16 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 tb_long_t tb_http_aclose(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(handle, -1);
+	tb_assert_and_check_return_val(http && http->stream, -1);
 
 	// have state? clear it
 	if (http->state)
 	{
-		// not keep-alive?
-		if (http->stream && !http->status.balive) 
+		// connected?
+		if (http->state & TB_HTTP_STATE_CONNECTED) 
 		{
-			// connected?
-			if (http->state & TB_HTTP_STATE_CONNECTED)
+			// not keep-alive?
+			if (!http->status.balive)
 			{
 				// close stream
 				tb_long_t r = tb_gstream_aclose(http->stream);
@@ -786,6 +774,8 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 				// continue ?
 				tb_check_return_val(r, 0);
 			}
+			// clear stream
+			else tb_gstream_clear(http->stream);
 		}
 
 		// clear status

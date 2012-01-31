@@ -138,8 +138,6 @@ static tb_long_t tb_fstream_afwrit(tb_gstream_t* gst)
 	// sync data
 	tb_file_sync(fst->file);
 
-	// FIXME: check return value
-	
 	// ok
 	return 1;
 }
@@ -215,7 +213,7 @@ tb_gstream_t* tb_gstream_init_file()
 	return gst;
 
 fail:
-	if (gst) tb_free(gst);
+	if (gst) tb_gstream_exit(gst);
 	return TB_NULL;
 }
 

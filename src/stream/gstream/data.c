@@ -180,7 +180,7 @@ tb_gstream_t* tb_gstream_init_data()
 	return gst;
 
 fail:
-	if (gst) tb_free(gst);
+	if (gst) tb_gstream_exit(gst);
 	return TB_NULL;
 }
 tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)

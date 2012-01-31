@@ -105,19 +105,6 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// read data
 	return tb_socket_recv(sst->sock, data, size);
 }
-static tb_long_t tb_sstream_afread(tb_gstream_t* gst)
-{
-	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst && sst->sock, -1);
-
-	// read the left data
-	tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
-	tb_long_t r = tb_socket_recv(sst->sock, data, TB_GSTREAM_BLOCK_MAXN);
-	tb_assert_and_check_return_val(r >= 0, -1);
-
-	// ok?
-	return r > 0? 0 : 1;
-}
 static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
@@ -179,7 +166,6 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->aclose = tb_sstream_aclose;
 	gst->aread 	= tb_sstream_aread;
 	gst->awrit 	= tb_sstream_awrit;
-	gst->afread = tb_sstream_afread;
 	gst->ctrl1 	= tb_sstream_ctrl1;
 	gst->bare 	= tb_sstream_bare;
 	gst->wait 	= tb_sstream_wait;
@@ -190,7 +176,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	return gst;
 
 fail:
-	if (gst) tb_free(gst);
+	if (gst) tb_gstream_exit(gst);
 	return TB_NULL;
 }
 

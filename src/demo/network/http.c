@@ -40,10 +40,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(option->cookies, end);
 	
 	// init url
-	if (!tb_url_set(&option->url, "http://119.75.217.56/index.html2")) goto end;
+	if (!tb_url_set(&option->url, "http://www.baidu.com/index.html")) goto end;
+//	if (!tb_url_set(&option->url, "http://www.baidu.com/index.html2")) goto end;
+//	if (!tb_url_set(&option->url, "http://www.baidu.com/search/error.html")) goto end;
 
 	// keep-alive
-	option->balive = 1;
+	option->balive = 0;
 
 	// redirect
 //	option->rdtm = 0;
@@ -53,7 +55,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	option->udata = (tb_pointer_t)http;
 
 	// open http
+	tb_int64_t t = tb_mclock();
 	if (!tb_http_bopen(http)) goto end;
+	t = tb_mclock() - t;
+	tb_print("[demo]: open: %llu ms", t);
 
 	// read data
 	tb_byte_t 		data[8192];
@@ -79,6 +84,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_check_break(!wait);
 
 			// wait
+			tb_print("[demo]: wait");
 			tb_long_t e = tb_http_wait(http, TB_AIOO_ETYPE_READ, option->timeout);
 			tb_assert_and_check_break(e >= 0);
 

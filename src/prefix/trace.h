@@ -56,11 +56,11 @@
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 #		define tb_trace_tag(tag, fmt, ...)					tb_print_tag(tag, fmt, __VA_ARGS__)
 # 		define tb_trace_line_tag(tag, fmt, ...) 			tb_print_tag(tag, "func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
-# 		define tb_trace_waring_tag(tag, fmt, ...) 			tb_print_tag(tag, "warning: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
+# 		define tb_trace_warning_tag(tag, fmt, ...) 			tb_print_tag(tag, "warning: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
 # 	else
 #		define tb_trace_tag(tag, fmt, arg ...)				tb_print_tag(tag, fmt, ## arg)
 # 		define tb_trace_line_tag(tag, fmt, arg ...) 		tb_print_tag(tag, fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_trace_waring_tag(tag, fmt, arg ...) 		tb_print_tag(tag, "warning: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_trace_warning_tag(tag, fmt, arg ...) 		tb_print_tag(tag, "warning: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
 # 	endif
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_trace_tag(...)
@@ -76,11 +76,11 @@
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 # 		define tb_trace(fmt, ...)							tb_trace_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 # 		define tb_trace_line(fmt, ...) 						tb_trace_line_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 		define tb_trace_warning(fmt, ...) 					tb_trace_waring_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
+# 		define tb_trace_warning(fmt, ...) 					tb_trace_warning_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 # 	else
 # 		define tb_trace(fmt, arg ...)						tb_trace_tag(TB_PRINT_TAG, fmt, ## arg)
 # 		define tb_trace_line(fmt, arg ...) 					tb_trace_line_tag(TB_PRINT_TAG, fmt, ## arg)
-# 		define tb_trace_warning(fmt, arg ...) 				tb_trace_waring_tag(TB_PRINT_TAG, fmt, ## arg)
+# 		define tb_trace_warning(fmt, arg ...) 				tb_trace_warning_tag(TB_PRINT_TAG, fmt, ## arg)
 # 	endif
 #else
 # 	define tb_trace

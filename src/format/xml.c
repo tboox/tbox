@@ -40,6 +40,7 @@ tb_size_t tb_format_xml_probe(tb_gstream_t* gst)
 
 	tb_uint64_t size = tb_gstream_size(gst);
 	if (size && size < need) need = (tb_size_t)size;
+	if (need > 4096) need = 4096;
 
 	// need it
 	tb_byte_t* p = TB_NULL;
@@ -50,8 +51,12 @@ tb_size_t tb_format_xml_probe(tb_gstream_t* gst)
 	tb_size_t score = 0;
 
 	// init string
-	tb_sstring_t string;
-	if (!tb_sstring_init(&string, p, need)) return 0;
+	tb_sstring_t 	string;
+	tb_char_t 		data[4096];
+	if (!tb_sstring_init(&string, data, need)) return 0;
+
+	// copy string
+	tb_sstring_cstrncpy(&string, p, need - 1);
 
 	// find <?xml ...>
 	tb_long_t pos = tb_sstring_cstristr(&string, 0, "<?xml");
