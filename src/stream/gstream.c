@@ -347,8 +347,8 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	gst = g_gstream_table[type].init();
 	tb_assert_and_check_goto(gst, fail);
 
-	// copy url
-	tb_url_cpy(&gst->url, &u);
+	// set url
+	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
 	// exit url
 	tb_url_exit(&u);
@@ -435,6 +435,23 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 
 	// wait
 	return tb_gstream_cache_wait(gst, etype, timeout);
+}
+tb_void_t tb_gstream_clear(tb_gstream_t* gst)
+{
+	// check stream
+	tb_assert_and_check_return(gst);
+
+	// check cache
+	tb_assert_and_check_return(tb_qbuffer_maxn(&gst->cache));
+
+	// reset offset
+	gst->offset = 0;
+
+	// reset to readed-mode
+	gst->bwrited = 0;
+
+	// clear cache
+	tb_qbuffer_clear(&gst->cache);
 }
 tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {
@@ -577,7 +594,7 @@ tb_bool_t tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 		// no data?
 		if (!(need - prev))
 		{
-			// no end?
+			// abort?
 			tb_check_break(!wait);
 
 			// wait

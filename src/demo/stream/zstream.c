@@ -1,12 +1,19 @@
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */
 #include "tbox.h"
-#include <stdio.h>
 
-static tb_bool_t http_callback_head(tb_char_t const* line, tb_pointer_t priv)
+/* ///////////////////////////////////////////////////////////////////////
+ * callback
+ */
+static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
 {
-	tb_printf("head: %s\n", line);
+	tb_print("[demo]: response: %s", line);
 	return TB_TRUE;
 }
-
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */
 int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
@@ -26,9 +33,17 @@ int main(int argc, char** argv)
 	if (!ist || !ost || !zst) goto end;
 
 	// init option
-	tb_gstream_ctrl1(ist, TB_HSTREAM_CMD_SET_HEAD, "Accept-Encoding: gzip,deflate\r\n");
-	tb_gstream_ctrl2(ist, TB_HSTREAM_CMD_SET_HFUNC, http_callback_head, TB_NULL);
-	tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
+	{
+		tb_http_option_t* option = TB_NULL;
+		tb_gstream_ctrl1(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
+		if (option) 
+		{
+			option->hfunc = tb_http_test_hfunc;
+			tb_hash_set(option->head, "Accept-Encoding", "gzip,deflate");
+		}
+	}
+	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	if (!tb_gstream_bopen(ist)) goto end;
