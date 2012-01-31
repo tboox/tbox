@@ -40,9 +40,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(option->cookies, end);
 	
 	// init url
-	if (!tb_url_set(&option->url, "http://www.baidu.com/index.html")) goto end;
-//	if (!tb_url_set(&option->url, "http://www.baidu.com/index.html2")) goto end;
-//	if (!tb_url_set(&option->url, "http://www.baidu.com/search/error.html")) goto end;
+	if (!tb_url_set(&option->url, argv[1])) goto end;
 
 	// keep-alive
 	option->balive = 0;
