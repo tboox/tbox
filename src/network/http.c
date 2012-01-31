@@ -81,6 +81,10 @@ typedef struct __tb_http_t
 	tb_pstring_t 		data;
 	tb_size_t 			size;
 
+	// the chunk size
+	tb_size_t 			chunked_read;
+	tb_size_t 			chunked_size;
+
 }tb_http_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -157,6 +161,92 @@ static tb_void_t tb_http_status_clear(tb_http_t* http)
 	http->status.content_size = 0;
 	tb_pstring_clear(&http->status.content_type);
 	tb_pstring_clear(&http->status.location);
+}
+/* chunked_data
+ *
+ *   head     data   tail
+ * ea5\r\n ..........\r\n e65\r\n..............\r\n 0\r\n\r\n
+ * ---------------------- ------------------------- ---------
+ *        chunk0                  chunk1               end
+ */
+static tb_long_t tb_http_chunked_aread(tb_http_t* http, tb_byte_t* data, tb_size_t size)
+{
+	// parse chunked head and chunked tail
+	if (!http->chunked_size || http->chunked_read >= http->chunked_size)
+	{
+		// read chunked line
+		tb_char_t 			ch[1];
+		tb_long_t 			cn = 0;
+		while (1)
+		{
+			// read char
+			cn = tb_gstream_aread(http->stream, ch, 1);
+			tb_assert_and_check_return_val(cn >= 0, -1);
+
+			// no data? 
+			tb_check_return_val(cn, 0);
+
+			// there should be no '\0'
+			tb_assert_and_check_return_val(*ch, -1);
+
+			// append char to line
+			if (*ch != '\n') tb_pstring_chrcat(&http->data, *ch);
+			// is line end?
+			else
+			{
+				// strip '\r' if exists
+				tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
+				tb_size_t 			pn = tb_pstring_size(&http->data);
+				tb_assert_and_check_return_val(pb, -1);
+
+				if (pb[pn - 1] == '\r')
+					tb_pstring_strip(&http->data, pn - 1);
+
+				// is chunked tail? only "\r\n"
+				if (!tb_pstring_size(&http->data)) 
+				{
+					// reset chunked size
+					http->chunked_read = 0;
+					http->chunked_size = 0;
+
+					// continue
+					return 0;
+				}
+				// is chunked head? parse size
+				else
+				{
+					// parse size
+					http->chunked_size = tb_s16tou32(pb);
+
+					// is file end? "0\r\n\r\n"
+					tb_check_return_val(http->chunked_size, -1);
+
+					// clear data
+					tb_pstring_clear(&http->data);
+
+					// ok
+					break;
+				}
+			}
+		}
+	}
+
+	// check
+	tb_assert_and_check_return_val(http->chunked_read < http->chunked_size, -1);
+
+	// read chunked data
+	tb_long_t r = tb_gstream_aread(http->stream, data, tb_min(size, http->chunked_size - http->chunked_read));
+
+	// update read
+	if (r > 0) http->chunked_read += r;
+
+	// ok
+	return r;
+}
+static tb_long_t tb_http_chunked_awrit(tb_http_t* http, tb_byte_t* data, tb_size_t size)
+{
+	tb_trace_noimpl();
+	return -1;
 }
 static tb_long_t tb_http_connect(tb_http_t* http)
 {
@@ -532,6 +622,10 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	http->size = 0;
 	tb_pstring_clear(&http->data);
 
+	// reset chunked size
+	http->chunked_read = 0;
+	http->chunked_size = 0;
+
 	// ok
 	tb_trace("[http]: response: ok");
 	return 1;
@@ -578,6 +672,10 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		
 		// clear state
 		http->state = TB_HTTP_STATE_NULL;
+
+		// reset chunk size
+		http->chunked_read = 0;
+		http->chunked_size = 0;
 
 		// continue 
 		return 0;
@@ -790,6 +888,10 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 
 		// clear redirect
 		http->rdtn = 0;
+
+		// reset chunk size
+		http->chunked_read = 0;
+		http->chunked_size = 0;
 	}
 
 	// ok
@@ -820,24 +922,14 @@ tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
-	if (http->option.bchunked)
-	{
-		tb_trace_noimpl();
-		return -1;
-	}
-	else return tb_gstream_awrit(http->stream, data, size);
+	return http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
 }
 tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
-	if (http->status.bchunked)
-	{
-		tb_trace_noimpl();
-		return -1;
-	}
-	else return tb_gstream_aread(http->stream, data, size);
+	return http->status.bchunked? tb_http_chunked_aread(http, data, size) : tb_gstream_aread(http->stream, data, size);
 }
 tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
