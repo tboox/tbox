@@ -12,7 +12,22 @@
  */
 static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
 {
+	tb_cookies_t* cookies = option->udata;
 	tb_print("[demo]: response: %s", line);
+
+	if (cookies && !tb_strnicmp(line, "Set-Cookie", 10))
+	{
+		// seek to value
+		tb_char_t const* p = line;
+		while (*p && *p != ':') p++;
+		tb_assert_and_check_return_val(*p, TB_FALSE);
+		p++; while (tb_isspace(*p)) p++;
+		tb_assert_and_check_return_val(*p, TB_FALSE);
+
+		tb_char_t const* url = tb_url_get(&option->url);
+		if (url) tb_cookies_set_from_url(cookies, url, p);
+	}
+
 	return TB_TRUE;
 }
 
@@ -36,8 +51,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(status, end);
 
 	// init cookies
-	option->cookies = tb_cookies_init();
-	tb_assert_and_check_goto(option->cookies, end);
+	option->udata = tb_cookies_init();
+	tb_assert_and_check_goto(option->udata, end);
 	
 	// init url
 	if (!tb_url_set(&option->url, argv[1])) goto end;
@@ -50,7 +65,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init head func
 	option->hfunc = tb_http_test_hfunc;
-	option->udata = (tb_pointer_t)http;
 
 	// open http
 	tb_int64_t t = tb_mclock();
@@ -105,14 +119,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// exit cookies
-	if (option && option->cookies) 
+	if (option && option->udata) 
 	{
 		// dump cookies
 #ifdef TB_DEBUG
-		tb_cookies_dump(option->cookies);
+		tb_cookies_dump(option->udata);
 #endif
 
-		tb_cookies_exit(option->cookies);
+		tb_cookies_exit(option->udata);
 	}
 
 	// exit http
