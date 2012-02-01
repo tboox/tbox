@@ -111,9 +111,6 @@ typedef struct __tb_http_option_t
 	// the user data
 	tb_pointer_t 		udata;
 
-	// the reference to cookies
-	tb_cookies_t* 		cookies;
-
 	// the head func
 	tb_bool_t 			(*hfunc)(struct __tb_http_option_t* option, tb_char_t const* line);
 

@@ -333,13 +333,6 @@ static tb_long_t tb_http_request(tb_http_t* http)
 			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&s));
 		}
 
-		// init cookie
-		if (http->option.cookies)
-		{
-			tb_char_t const* cookie = tb_cookies_get(http->option.cookies, host, path, tb_url_ssl_get(&http->option.url));
-			if (cookie) tb_hash_set(http->option.head, "Cookie", cookie);
-		}
-
 		// check head
 		tb_assert_and_check_return_val(tb_hash_size(http->option.head), -1);
 
@@ -525,13 +518,6 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		{
 			tb_pstring_cstrcpy(&http->status.content_type, p);
 			tb_assert_and_check_return_val(tb_pstring_size(&http->status.content_type), TB_FALSE);
-		}
-		// parse cookie
-		else if (http->option.cookies && !tb_strnicmp(line, "Set-Cookie", 10))
-		{
-			// set cookie, need optimization
-			tb_char_t const* url = tb_url_get(&http->option.url);
-			if (url) tb_cookies_set_from_url(http->option.cookies, url, p);
 		}
 		// parse transfer encoding
 		else if (!tb_strnicmp(line, "Transfer-Encoding", 17))
@@ -773,31 +759,22 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 
 	// connect
 	r = tb_http_connect(http);
-	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
 	
 	// request
 	r = tb_http_request(http);
-	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
 		
 	// response
 	r = tb_http_response(http);
-	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
 
 	// redirect
 	r = tb_http_redirect(http);
-	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
 
 	// ok
 	return r;
-
-fail:
-
-	// close it
-	return tb_http_aclose(handle);
 }
 tb_bool_t tb_http_bopen(tb_handle_t handle)
 {
@@ -1045,20 +1022,6 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	tb_trace("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
 	tb_trace("[http]: option: balive: %s", http->option.balive? "true" : "false");
 	tb_trace("[http]: option: bchunked: %s", http->option.bchunked? "true" : "false");
-
-	if (http->option.cookies)
-	{
-		tb_cookies_dump(http->option.cookies);
-
-		// get cookie
-		tb_char_t const* value = tb_cookies_get_from_url(http->option.cookies, tb_url_get(&http->option.url));
-
-		// format it
-		if (value) 
-		{
-			tb_trace("[http]: option: cookie: %s", value);
-		}
-	}
 }
 tb_void_t tb_http_status_dump(tb_handle_t handle)
 {

@@ -332,26 +332,30 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_return_val(url, TB_NULL);
 
 	// init
-	tb_gstream_t* 	gst = TB_NULL;
-	tb_url_t 		u;
-	if (!tb_url_init(&u)) return TB_NULL;
-
-	// set url
-	if (!tb_url_set(&u, url)) goto fail;
-
-	// get type
-	tb_size_t type = tb_url_poto_get(&u);
-	tb_assert_and_check_goto(type && type < tb_arrayn(g_gstream_table), fail);
+	tb_gstream_t* 		gst = TB_NULL;
+	tb_size_t 			t = TB_GSTREAM_TYPE_NULL;
+	tb_char_t const* 	p = url;
+	if (!tb_strnicmp(p, "http://", 7)) 
+		t = TB_GSTREAM_TYPE_HTTP;
+	else if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
+		t = TB_GSTREAM_TYPE_FILE;
+	else if (!tb_strnicmp(p, "sock://", 7))
+		t = TB_GSTREAM_TYPE_SOCK;
+	else if (!tb_strnicmp(p, "https://", 8))
+		t = TB_GSTREAM_TYPE_HTTP;
+	else if (!tb_strnicmp(p, "files://", 8))
+		t = TB_GSTREAM_TYPE_FILE;
+	else if (!tb_strnicmp(p, "socks://", 8))
+		t = TB_GSTREAM_TYPE_SOCK;
+	else return TB_NULL;
+	tb_assert_and_check_goto(t && t < tb_arrayn(g_gstream_table), fail);
 
 	// init stream
-	gst = g_gstream_table[type].init();
+	gst = g_gstream_table[t].init();
 	tb_assert_and_check_goto(gst, fail);
 
 	// set url
 	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
-
-	// exit url
-	tb_url_exit(&u);
 
 	// ok
 	return gst;
@@ -360,9 +364,6 @@ fail:
 	
 	// exit stream
 	if (gst) tb_gstream_exit(gst);
-
-	// exit url
-	tb_url_exit(&u);
 
 	return TB_NULL;
 }
