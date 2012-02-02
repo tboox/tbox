@@ -25,7 +25,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// done
 	tb_char_t 			data[16];
-	tb_char_t const* 	addr = tb_dns_name_done(argv[1], data, 16);
+	tb_char_t const* 	addr = tb_dns_look_done(argv[1], data, 16);
 	tb_print("[demo]: %s => %s", argv[1], addr);
 
 	// exit
