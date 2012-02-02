@@ -58,8 +58,8 @@
  * types
  */
 
-// the dns item type
-typedef struct __tb_dns_item_t
+// the dns host type
+typedef struct __tb_dns_host_t
 {
 	// the host
 	tb_ipv4_t 		host;
@@ -67,7 +67,18 @@ typedef struct __tb_dns_item_t
 	// the rate
 	tb_size_t 		rate;
 
-}tb_dns_item_t;
+}tb_dns_host_t;
+
+// the dns addr type
+typedef struct __tb_dns_addr_t
+{
+	// the addr
+	tb_ipv4_t 		addr;
+
+	// the date
+	tb_size_t 		date;
+
+}tb_dns_addr_t;
 
 // the dns list type
 typedef struct __tb_dns_list_t
@@ -77,6 +88,12 @@ typedef struct __tb_dns_list_t
 
 	// the mutx
 	tb_handle_t 	mutx;
+
+	// the spool
+	tb_spool_t* 	spool;
+
+	// the cache
+	tb_hash_t* 		cache;
 
 }tb_dns_list_t;
 
@@ -89,8 +106,8 @@ typedef enum __tb_dns_step_t
 
 }tb_dns_step_t;
 
-// the dns name type
-typedef struct __tb_dns_name_t
+// the dns look type
+typedef struct __tb_dns_look_t
 {
 	// the host
 	tb_sstring_t 	host;
@@ -116,7 +133,7 @@ typedef struct __tb_dns_name_t
 	// the data
 	tb_byte_t 		data[TB_DNS_HOST_MAXN + TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
 
-}tb_dns_name_t;
+}tb_dns_look_t;
 
 #if 0
 // the dns header type
@@ -310,8 +327,16 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->mutx, fail);
 			
 		// init list
-		g_dns_list->list = tb_vector_init(8, tb_item_func_ifm(sizeof(tb_dns_item_t), TB_NULL, TB_NULL));
+		g_dns_list->list = tb_vector_init(8, tb_item_func_ifm(sizeof(tb_dns_host_t), TB_NULL, TB_NULL));
 		tb_assert_and_check_goto(g_dns_list->list, fail);
+
+		// init spool
+		g_dns_list->spool = tb_spool_init(TB_SPOOL_SIZE_DEFAULT);
+		tb_assert_and_check_goto(g_dns_list->spool, fail);
+	
+		// init cache
+		g_dns_list->cache = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(TB_FALSE, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), TB_NULL, TB_NULL));
+		tb_assert_and_check_goto(g_dns_list->cache, fail);
 	}
 
 	// init local
@@ -333,7 +358,7 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 	tb_assert_and_check_return(g_dns_list && host);
 
 	// init item
-	tb_dns_item_t item;
+	tb_dns_host_t item;
 	if (tb_ipv4_set(&item.host, host))
 	{
 		item.rate = 0;
@@ -373,7 +398,7 @@ tb_void_t tb_dns_list_dels(tb_char_t const* host)
 	tb_size_t tail = tb_vector_itor_tail(list);
 	for (; itor != tail; itor = tb_vector_itor_next(list, itor))
 	{
-		tb_dns_item_t const* item = tb_vector_itor_const_at(list, itor);
+		tb_dns_host_t const* item = tb_vector_itor_const_at(list, itor);
 		if (item && item->host.u32 == ipv4) break;
 	}
 
@@ -402,6 +427,14 @@ tb_void_t tb_dns_list_exit()
 			// save mutx
 			mutx = g_dns_list->mutx;
 			g_dns_list->mutx = TB_NULL;
+
+			// exit cache
+			if (g_dns_list->cache) tb_hash_exit(g_dns_list->cache);
+			g_dns_list->cache = TB_NULL;
+
+			// exit spool
+			if (g_dns_list->spool) tb_spool_exit(g_dns_list->spool);
+			g_dns_list->spool = TB_NULL;
 
 			// free list
 			if (g_dns_list->list) tb_vector_exit(g_dns_list->list);
@@ -442,7 +475,7 @@ tb_void_t tb_dns_list_dump()
 	tb_size_t tail = tb_vector_itor_tail(list);
 	for (; itor != tail; itor = tb_vector_itor_next(list, itor))
 	{
-		tb_dns_item_t const* item = tb_vector_itor_const_at(list, itor);
+		tb_dns_host_t const* item = tb_vector_itor_const_at(list, itor);
 		if (item) 
 		{
 			tb_print("[dns]: host: %u.%u.%u.%u, rate: %u"
@@ -462,78 +495,78 @@ tb_void_t tb_dns_list_dump()
 /* ///////////////////////////////////////////////////////////////////////
  * name
  */
-tb_handle_t tb_dns_name_init(tb_char_t const* name)
+tb_handle_t tb_dns_look_init(tb_char_t const* name)
 {
 	tb_assert_and_check_return_val(name, TB_NULL);
 
 	// alloc
-	tb_dns_name_t* h = tb_calloc(1, sizeof(tb_dns_name_t));
-	tb_assert_and_check_return_val(h, TB_NULL);
+	tb_dns_look_t* look = tb_calloc(1, sizeof(tb_dns_look_t));
+	tb_assert_and_check_return_val(look, TB_NULL);
 
 	// init host
-	if (!tb_sstring_init(&h->host, h->data, TB_DNS_HOST_MAXN)) goto fail;
+	if (!tb_sstring_init(&look->host, look->data, TB_DNS_HOST_MAXN)) goto fail;
 
 	// init name
-	if (!tb_sstring_init(&h->name, h->data + TB_DNS_HOST_MAXN, TB_DNS_NAME_MAXN)) goto fail;
-	tb_sstring_cstrcpy(&h->name, name);
+	if (!tb_sstring_init(&look->name, look->data + TB_DNS_HOST_MAXN, TB_DNS_NAME_MAXN)) goto fail;
+	tb_sstring_cstrcpy(&look->name, name);
 
 	// init rpkt
-	if (!tb_sstring_init(&h->host, h->data + TB_DNS_HOST_MAXN + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
+	if (!tb_sstring_init(&look->host, look->data + TB_DNS_HOST_MAXN + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
 
 	// init sock
-	h->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
-	tb_assert_and_check_goto(h->sock, fail);
+	look->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+	tb_assert_and_check_goto(look->sock, fail);
 
 	// ok
-	return (tb_handle_t)h;
+	return (tb_handle_t)look;
 
 fail:
-	if (h) tb_dns_name_exit(h);
+	if (look) tb_dns_look_exit(look);
 	return TB_NULL;
 }
-tb_long_t tb_dns_name_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn)
+tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn)
 {
 	tb_trace_noimpl();
 	return 0;
 }
-tb_long_t tb_dns_name_wait(tb_handle_t handle, tb_size_t timeout)
+tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_size_t timeout)
 {
 	tb_trace_noimpl();
 	return 0;
 }
-tb_void_t tb_dns_name_exit(tb_handle_t handle)
+tb_void_t tb_dns_look_exit(tb_handle_t handle)
 {
-	tb_dns_name_t* h = (tb_dns_name_t*)handle;
-	if (h)
+	tb_dns_look_t* look = (tb_dns_look_t*)handle;
+	if (look)
 	{
 		// close sock
-		if (h->sock) tb_socket_close(h->sock);
+		if (look->sock) tb_socket_close(look->sock);
 
 		// free it
-		tb_free(h);
+		tb_free(look);
 	}
 }
-tb_char_t const* tb_dns_name_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_dns_look_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(name && data && maxn > 15, TB_NULL);
 
 	// init
-	tb_handle_t handle = tb_dns_name_init(name);
+	tb_handle_t handle = tb_dns_look_init(name);
 	tb_assert_and_check_return_val(handle, TB_NULL);
 
 	// spak
 	tb_long_t r = -1;
-	while (!(r = tb_dns_name_spak(handle, data, maxn)))
+	while (!(r = tb_dns_look_spak(handle, data, maxn)))
 	{
 		// wait
-		r = tb_dns_name_wait(handle, 1000);
+		r = tb_dns_look_wait(handle, 1000);
 		tb_assert_and_check_goto(r >= 0, end);
 	}
 
 end:
 
 	// exit
-	tb_dns_name_exit(handle);
+	tb_dns_look_exit(handle);
 
 	// ok
 	return r > 0? data : TB_NULL;
