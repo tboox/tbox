@@ -17,20 +17,22 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		network.h
+ * \file		dns.c
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "url.h"
-#include "ipv4.h"
-#include "http.h"
-#include "cookies.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_void_t tb_dns_local_init()
+{
+}
+tb_void_t tb_dns_local_exit()
+{
+}
+

@@ -8,6 +8,7 @@ TB_CONFIG_PLAT 					= linux_x86
 TB_CONFIG_ARCH 					= x86
 
 # api
+TB_CONFIG_API_DNS 				= unix
 TB_CONFIG_API_FILE 				= unix
 TB_CONFIG_API_SOCK 				= unix
 TB_CONFIG_API_UTIL 				= unix
