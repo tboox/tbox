@@ -32,7 +32,9 @@ tbox_C_FILES 			+= \
 						container/slist \
 						container/dlist \
 						container/vector \
+						network/dns \
 						network/url \
+						network/ipv4 \
 						network/http \
 						network/cookies \
 						encoding/encoding \
@@ -131,6 +133,7 @@ endif
 
 # platform
 tbox_C_FILES 			+= \
+						platform/$(TB_CONFIG_API_DNS)/dns \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
@@ -240,6 +243,7 @@ INC_FILES 				= \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \
+						network/ipv4.h \
 						network/url.h \
 						network/dns.h \
 						network/cookies.h \

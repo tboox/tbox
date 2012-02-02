@@ -17,20 +17,33 @@
  * Copyright (C) 2009 - 2011, ruki All rights reserved.
  *
  * \author		ruki
- * \file		network.h
+ * \file		ipv4.h
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
+#ifndef TB_NETWORK_IPV4_H
+#define TB_NETWORK_IPV4_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "url.h"
-#include "ipv4.h"
-#include "http.h"
-#include "cookies.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+typedef union __tb_ipv4_t
+{
+	tb_uint32_t u32;
+	tb_uint8_t 	u8[4];
+
+}tb_ipv4_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+tb_uint32_t 		tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip);
+tb_char_t const* 	tb_ipv4_get(tb_ipv4_t* ipv4, tb_char_t* data, tb_size_t maxn);
 
 #endif

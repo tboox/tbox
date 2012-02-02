@@ -25,540 +25,264 @@
  * includes
  */
 #include "dns.h"
+#include "ipv4.h"
+#include "../libc/libc.h"
 #include "../math/math.h"
-#include "../stream/stream.h"
-#include "../string/string.h"
 #include "../utils/utils.h"
+#include "../string/string.h"
 #include "../platform/platform.h"
-
+#include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#if 0
-# 	define TB_DNS_DBG 				tb_trace
-#else
-# 	define TB_DNS_DBG
-#endif
-
-//#define TB_DNS_SERVER_TCP
-#define TB_DNS_SERVER_PORT 			(53)
-#define TB_DNS_SERVER_MAX 			(16)
-#define TB_DNS_HEADER_SIZE 			(12)
-#define TB_DNS_HEADER_ID 			(0xbeef) 	// or other...
-#define TB_DNS_NAME_MAX 			(1024)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the dns header type
-typedef struct __tb_dns_header_t
+// the dns item type
+typedef struct __tb_dns_item_t
 {
-	tb_uint16_t id; 			// identification number
+	// the host
+	tb_ipv4_t 		host;
 
-	tb_uint16_t qr     :1;		// query/response flag
-	tb_uint16_t opcode :4;	    // purpose of message
-	tb_uint16_t aa     :1;		// authoritive answer
-	tb_uint16_t tc     :1;		// truncated message
-	tb_uint16_t rd     :1;		// recursion desired
+	// the rate
+	tb_size_t 		rate;
 
-	tb_uint16_t ra     :1;		// recursion available
-	tb_uint16_t z      :1;		// its z! reserved
-	tb_uint16_t ad     :1;	    // authenticated data
-	tb_uint16_t cd     :1;	    // checking disabled
-	tb_uint16_t rcode  :4;	    // response code
+}tb_dns_item_t;
 
-	tb_uint16_t question;	    // number of question entries
-	tb_uint16_t answer;			// number of answer entries
-	tb_uint16_t authority;		// number of authority entries
-	tb_uint16_t resource;		// number of resource entries
-
-}tb_dns_header_t;
-
-// the dns question type
-typedef struct __tb_dns_question_t
+// the dns list type
+typedef struct __tb_dns_list_t
 {
-	tb_uint16_t 		type;
-	tb_uint16_t 		class;
+	// the list
+	tb_vector_t* 	list;
 
-}tb_dns_question_t;
+	// the fast
+	tb_ipv4_t 		fast;
 
-// the dns resource type
-typedef struct __tb_dns_resource_t
-{
-	tb_uint16_t 	type;
-	tb_uint16_t 	class;
-	tb_uint32_t 	ttl;
-	tb_uint16_t 	size;
+	// the mutx
+	tb_handle_t 	mutx;
 
-}tb_dns_resource_t;
-
-// the dns answer type
-typedef struct __tb_dns_answer_t
-{
-	tb_char_t 			name[TB_DNS_NAME_MAX];
-	tb_dns_resource_t 	res;
-	tb_byte_t const* 	rdata;
-
-}tb_dns_answer_t;
-/* ///////////////////////////////////////////////////////////////////////
- * globals 
- */
-
-static tb_int_t 	g_dns_init = 0;
-static tb_char_t 	g_dns_servers[TB_DNS_SERVER_MAX][16] = {0};
+}tb_dns_list_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * globals
  */
 
-// size + data, e.g. .www.google.com => 3www6google3com
-static tb_char_t const* tb_dns_encode_name(tb_char_t* name)
-{
-	tb_assert(name && name[0] == '.');
-	if (!name || name[0] != '.') return TB_NULL;
-	
-	tb_size_t 	n = 0;
-	tb_char_t* 	b = name;
-	tb_char_t* 	p = name + 1;
-	while (*p)
-	{
-		if (*p == '.')
-		{
-			//*b = '0' + n;
-			*b = n;
-			n = 0;
-			b = p;
-		}
-		else n++;
-		p++;
-	}
-	//*b = '0' + n;
-	*b = n;
-	return name;
-}
-static tb_char_t const* tb_dns_parse_name_impl(tb_char_t const* sb, tb_char_t const* se, tb_char_t const* ps, tb_char_t** pd)
-{
-	tb_char_t* p = ps;
-	tb_char_t* q = *pd;
-	while (p < se)
-	{
-		tb_byte_t c = *p++;
-		//TB_DNS_DBG("%x", c);
-		if (!c) break;
-		// is pointer? 11xxxxxx xxxxxxxx
-		else if (c >= 0xc0)
-		{
-			tb_uint16_t pos = c;
-			pos &= ~0xc0;
-			pos <<= 8;
-			pos |= *p++;
-			//TB_DNS_DBG("skip to: %d", pos);
-			tb_dns_parse_name_impl(sb, se, sb + pos, &q);
-			break; 
-		}
-		// is ascii? 00xxxxxx
-		else
-		{
-			while (c--) *q++ = *p++;
-			*q++ = '.';
-		}
-	}
-	*pd = q;
-	return p;
-}
-static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
-{
-	tb_char_t* q = name;
-	tb_char_t* p = tb_dns_parse_name_impl(tb_bstream_beg(bst), tb_bstream_end(bst), tb_bstream_pos(bst), &q);
-	if (p)
-	{
-		if (q > name && *(q - 1) == '.') *--q = '\0';
-		tb_bstream_goto(bst, p);
-		return name;
-	}
-	else return TB_NULL;
-}
-#if 0 
-static tb_int_t tb_dns_send(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
-{
-	tb_int_t 	send = 0;
-	tb_int64_t 	time = tb_mclock();
-	while(send < size)
-	{
-		tb_int_t ret = tb_socket_sendto(hsocket, server, TB_DNS_SERVER_PORT, data + send, size - send);
-		//tb_trace("ret: %d", ret);
-		if (ret < 0) break;
-		else if (!ret) 
-		{
-			// > 10s?
-			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_gt_int32(timeout, 10000)) break;
-		}
-		else
-		{
-			send += ret;
-			time = tb_mclock();
-		}
-	}
-	return send;
-}
-static tb_int_t tb_dns_recv(tb_handle_t hsocket, tb_char_t const* server, tb_byte_t* data, tb_size_t size)
-{
-	tb_int_t 	recv = 0;
-	tb_int64_t 	time = tb_mclock();
-	while(recv < size)
-	{
-		tb_int_t ret = tb_socket_recvfrom(hsocket, server, TB_DNS_SERVER_PORT, data + recv, size - recv);
-		//tb_trace("ret: %d", ret);
-		if (ret < 0) break;
-		else if (!ret) 
-		{
-			// > 10s?
-			tb_int64_t timeout = tb_int64_sub(tb_mclock(), time);
-			if (tb_int64_gt_int32(timeout, 10000)) break;
-		}
-		else
-		{
-			recv += ret;
-			time = tb_mclock();
-		}
-	}
-	return recv;
-}
-#endif
+// the dns list
+static tb_dns_list_t* 	g_dns_list = TB_NULL;
+
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * list
  */
-
-tb_void_t tb_dns_server_add(tb_char_t const* ip)
+tb_bool_t tb_dns_list_init()
 {
-	// ensure init
-	if (!g_dns_init)
+	// no list?
+	if (!g_dns_list)
 	{
-		tb_int_t i = 0;
-		for (i = 0; i < TB_DNS_SERVER_MAX; i++) g_dns_servers[i][0] = '\0';
-		g_dns_init = 1;
+		// alloc list
+		g_dns_list = tb_calloc(1, sizeof(tb_dns_list_t));
+		tb_assert_and_check_return_val(g_dns_list, TB_FALSE);
+
+		// init mutx
+		g_dns_list->mutx = tb_mutex_init(TB_NULL);
+		tb_assert_and_check_goto(g_dns_list->mutx, fail);
+			
+		// init list
+		g_dns_list->list = tb_vector_init(8, tb_item_func_ifm(sizeof(tb_dns_item_t), TB_NULL, TB_NULL));
+		tb_assert_and_check_goto(g_dns_list->list, fail);
 	}
 
-	// add it
-	tb_int_t i = 0;
-	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
-	{
-		if (!g_dns_servers[i][0]) 
-		{
-			tb_char_t* s = tb_strncpy(g_dns_servers[i], ip, 16);
-			if (s) s[15] = '\0';
-			break;
-		}
-	}
-}
-tb_void_t tb_dns_server_del(tb_char_t const* ip)
-{
-	tb_assert(g_dns_init);
-	if (!g_dns_init) return ;
+	// init local
+	tb_dns_local_init();
 
-	tb_int_t i = 0;
-	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
-	{
-		if (g_dns_servers[i][0] && !tb_strcmp(g_dns_servers[i], ip)) 
-			g_dns_servers[i][0] = '\0';
-	}
-}
-tb_void_t tb_dns_server_dump()
-{
-	tb_assert(g_dns_init);
-	if (!g_dns_init) return ;
-
-	tb_int_t i = 0;
-	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
-	{
-		if (g_dns_servers[i][0]) tb_printf("dns server: %s\n", g_dns_servers[i]);
-	}
-}
-
-tb_char_t const* tb_dns_lookup_server(tb_char_t const* server, tb_char_t const* host, tb_char_t* ip)
-{
-	TB_DNS_DBG("lookup host: %s from %s", host, server);
-
-	// connect dns server
-#ifdef TB_DNS_SERVER_TCP
-	tb_handle_t hserver = tb_socket_client_open(server, TB_DNS_SERVER_PORT, TB_SOCKET_TYPE_TCP, TB_TRUE);
-#else
-	tb_handle_t hserver = tb_socket_client_open(TB_NULL, 0, TB_SOCKET_TYPE_UDP, TB_TRUE);
-#endif
-	if (!hserver) goto fail;
-	TB_DNS_DBG("connect ok.");
-		
-	// bstream
-	tb_byte_t data[8192];
-	tb_bstream_t bst;
-
-	// set dns header, see as tb_dns_header_t
-	tb_bstream_attach(&bst, data, 8192);
-	tb_bstream_set_u16_be(&bst, TB_DNS_HEADER_ID); 	// identification number
-	tb_bstream_set_u1(&bst, 0); 			// this is a query
-	tb_bstream_set_ubits32(&bst, 0, 4); 	// this is a standard query
-	tb_bstream_set_u1(&bst, 0); 			// not authoritive answer
-	tb_bstream_set_u1(&bst, 0); 			// not truncated
-	tb_bstream_set_u1(&bst, 1); 			// recursion desired
-
-	tb_bstream_set_u1(&bst, 0); 			// recursion not available! hey we dont have it (lol)
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_ubits32(&bst, 0, 4);
-
-	tb_bstream_set_u16_be(&bst, 1); 		// we have only one question
-	tb_bstream_set_u16_be(&bst, 0);
-	tb_bstream_set_u16_be(&bst, 0);
-	tb_bstream_set_u16_be(&bst, 0);
-
-	// set questions, see as tb_dns_question_t
-	// name + question1 + question2 + ...
-	tb_bstream_set_u8(&bst, '.');
-	tb_char_t* name = tb_bstream_set_string(&bst, host);
-
-	// only one question now.
-	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
-	tb_bstream_set_u16_be(&bst, 1); 		// it's internet (lol)
-
-	// encode dns name
-	if (!name || !tb_dns_encode_name(name - 1)) goto fail;
-
-	// send query
-	tb_int_t size = tb_bstream_offset(&bst);
-#if 0
-	{
-		tb_int_t i = 0;
-		for (i = 0; i < size; i++)
-		{
-			tb_trace("%02x", data[i]);
-		}
-	}
-#endif
-
-#ifdef TB_DNS_SERVER_TCP
-	if (size != tb_socket_send(hserver, data, size)) goto fail;
-#else
-	if (size != tb_socket_sendto(hserver, server, TB_DNS_SERVER_PORT, data, size)) goto fail;
-	//if (size != tb_dns_send(hserver, server, data, size)) goto fail;
-#endif
-	TB_DNS_DBG("send query ok.");
-
-	// recv dns header
-#ifdef TB_DNS_SERVER_TCP
-	size = tb_socket_recv(hserver, data, 8192);
-#else
-	size = tb_socket_recvfrom(hserver, server, TB_DNS_SERVER_PORT, data, 8192);
-	//size = tb_dns_recv(hserver, server, data, 8192);
-#endif
-	if (size <= 0) goto fail;
-	TB_DNS_DBG("recv response ok.");
-
-	// parse dns header
-	tb_dns_header_t header;
-	tb_bstream_attach(&bst, data, size);
-	header.id = tb_bstream_get_u16_be(&bst);
-	tb_bstream_skip(&bst, 2);
-	header.question 	= tb_bstream_get_u16_be(&bst);
-	header.answer 		= tb_bstream_get_u16_be(&bst);
-	header.authority 	= tb_bstream_get_u16_be(&bst);
-	header.resource 	= tb_bstream_get_u16_be(&bst);
-	TB_DNS_DBG("response: %d", size);
-	TB_DNS_DBG("id: 0x%04x", 	header.id);
-	TB_DNS_DBG("question: %d", 	header.question);
-	TB_DNS_DBG("answer: %d", 	header.answer);
-	TB_DNS_DBG("authority: %d", header.authority);
-	TB_DNS_DBG("resource: %d", 	header.resource);
-	TB_DNS_DBG("");
-	if (header.id != TB_DNS_HEADER_ID) goto fail;
-
-	// skip questions, only one question now.
-	// name + question1 + question2 + ...
-	tb_assert(header.question == 1);
-#if 1
-	tb_bstream_skip_string(&bst);
-	tb_bstream_skip(&bst, 4);
-#else
-	name = tb_bstream_get_string(&bst);
-	name = tb_dns_decode_name(name);
-	if (!name) goto fail;
-	tb_bstream_skip(&bst, 4);
-	TB_DNS_DBG("recv dns name: %s", name);
-#endif
-
-	// parse answers
-	tb_int_t i = 0;
-	tb_int_t found = 0;
-	for (i = 0; i < header.answer; i++)
-	{
-		// parse answer
-		tb_dns_answer_t answer;
-		TB_DNS_DBG("answer: %d", i);
-
-		// parse dns name
-		name = tb_dns_parse_name(&bst, answer.name);
-		TB_DNS_DBG("name: %s", name? name : "");
-
-		// parse resource
-		answer.res.type = tb_bstream_get_u16_be(&bst);
-		answer.res.class = tb_bstream_get_u16_be(&bst);
-		answer.res.ttl = tb_bstream_get_u32_be(&bst);
-		answer.res.size = tb_bstream_get_u16_be(&bst);
-		TB_DNS_DBG("type: %d", answer.res.type);
-		TB_DNS_DBG("class: %d", answer.res.class);
-		TB_DNS_DBG("ttl: %d", answer.res.ttl);
-		TB_DNS_DBG("size: %d", answer.res.size);
-
-		// is ipv4?
-		if (answer.res.type == 1)
-		{
-			tb_byte_t b1 = tb_bstream_get_u8(&bst);
-			tb_byte_t b2 = tb_bstream_get_u8(&bst);
-			tb_byte_t b3 = tb_bstream_get_u8(&bst);
-			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			TB_DNS_DBG("ipv4: %d.%d.%d.%d", b1, b2, b3, b4);
-
-			// save the first ip
-			if (!found) 
-			{
-				tb_snprintf(ip, 16, "%d.%d.%d.%d", b1, b2, b3, b4);
-				found = 1;
-				TB_DNS_DBG("");
-				break;
-			}
-		}
-		else
-		{
-			// parse rdata
-			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			TB_DNS_DBG("alias: %s", answer.rdata? answer.rdata : "");
-		}
-		TB_DNS_DBG("");
-	}
-
-	// is found?
-	if (found) goto ok;
-	else goto fail;
-
-#if 0
-	// parse authorities
-	for (i = 0; i < header.authority; i++)
-	{
-		// parse answer
-		tb_dns_answer_t answer;
-		TB_DNS_DBG("authority: %d", i);
-
-		// parse dns name
-		name = tb_dns_parse_name(&bst, answer.name);
-		TB_DNS_DBG("name: %s", name? name : "");
-
-		// parse resource
-		answer.res.type = tb_bstream_get_u16_be(&bst);
-		answer.res.class = tb_bstream_get_u16_be(&bst);
-		answer.res.ttl = tb_bstream_get_u32_be(&bst);
-		answer.res.size = tb_bstream_get_u16_be(&bst);
-		TB_DNS_DBG("type: %d", answer.res.type);
-		TB_DNS_DBG("class: %d", answer.res.class);
-		TB_DNS_DBG("ttl: %d", answer.res.ttl);
-		TB_DNS_DBG("size: %d", answer.res.size);
-
-		// is ipv4?
-		if (answer.res.type == 1)
-		{
-			tb_byte_t b1 = tb_bstream_get_u8(&bst);
-			tb_byte_t b2 = tb_bstream_get_u8(&bst);
-			tb_byte_t b3 = tb_bstream_get_u8(&bst);
-			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			TB_DNS_DBG("ipv4: %d.%d.%d.%d", b1, b2, b3, b4);
-		}
-		else
-		{
-			// parse data
-			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			TB_DNS_DBG("server: %s", answer.rdata? answer.rdata : "");
-		}
-		TB_DNS_DBG("");
-	}
-
-	for (i = 0; i < header.resource; i++)
-	{
-		// parse answer
-		tb_dns_answer_t answer;
-		TB_DNS_DBG("resource: %d", i);
-
-		// parse dns name
-		name = tb_dns_parse_name(&bst, answer.name);
-		TB_DNS_DBG("name: %s", name? name : "");
-
-		// parse resource
-		answer.res.type = tb_bstream_get_u16_be(&bst);
-		answer.res.class = tb_bstream_get_u16_be(&bst);
-		answer.res.ttl = tb_bstream_get_u32_be(&bst);
-		answer.res.size = tb_bstream_get_u16_be(&bst);
-		TB_DNS_DBG("type: %d", answer.res.type);
-		TB_DNS_DBG("class: %d", answer.res.class);
-		TB_DNS_DBG("ttl: %d", answer.res.ttl);
-		TB_DNS_DBG("size: %d", answer.res.size);
-
-		// is ipv4?
-		if (answer.res.type == 1)
-		{
-			tb_byte_t b1 = tb_bstream_get_u8(&bst);
-			tb_byte_t b2 = tb_bstream_get_u8(&bst);
-			tb_byte_t b3 = tb_bstream_get_u8(&bst);
-			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			TB_DNS_DBG("ipv4: %d.%d.%d.%d", b1, b2, b3, b4);
-		}
-		else
-		{
-			// parse data
-			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			TB_DNS_DBG("alias: %s", answer.rdata? answer.rdata : "");
-		}
-		TB_DNS_DBG("");
-	}
-#endif
-
-	if (!found) goto fail;
-
-ok:
-	// close server
-	tb_socket_close(hserver);
-	return ip;
-fail:
-	TB_DNS_DBG("lookup failed.");
-	if (hserver) tb_socket_close(hserver);
-	return TB_NULL;
-}
-tb_char_t const* tb_dns_lookup(tb_char_t const* host, tb_char_t* ip)
-{
-	tb_assert(g_dns_init);
-	if (!g_dns_init) goto fail;
-
-	// check
-	tb_assert(host && ip);
-	if (!host || !ip || !*host) goto fail;
-
-	// lookup servers
-	tb_int_t i = 0;
-	for (i = 0; i < TB_DNS_SERVER_MAX; i++)
-	{
-		if (g_dns_servers[i][0]) 
-		{
-			if (tb_dns_lookup_server(g_dns_servers[i], host, ip)) break;
-		}
-	}
-
-	// no found?
-	if (i == TB_DNS_SERVER_MAX) goto fail;
+	// add the hosts
+	tb_dns_list_adds("8.8.8.8");
+	tb_dns_list_adds("8.8.4.4");
 
 	// ok
-	ip[15] = '\0';
-	return ip;
+	return TB_TRUE;
 
 fail:
+	tb_dns_list_exit();
+	return TB_FALSE;
+}
+tb_void_t tb_dns_list_adds(tb_char_t const* host)
+{
+	tb_assert_and_check_return(g_dns_list && host);
+
+	// init item
+	tb_dns_item_t item;
+	if (tb_ipv4_set(&item.host, host))
+	{
+		item.rate = 0;
+
+		// enter
+		if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
+
+		// add
+		tb_vector_insert_tail(g_dns_list->list, &item);
+
+		// leave
+		if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+
+		// ok
+		return ;
+	}
+
+	// trace
+	tb_trace("[dns]: host: add %s failed", host);
+}
+tb_void_t tb_dns_list_dels(tb_char_t const* host)
+{
+	tb_assert_and_check_return(g_dns_list && host);
+
+	// enter
+	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
+
+	// list
+	tb_vector_t* list = g_dns_list->list;
+	tb_assert_and_check_goto(list, end);
+
+	// ipv4
+	tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
+
+	// find it
+	tb_size_t itor = tb_vector_itor_head(list);
+	tb_size_t tail = tb_vector_itor_tail(list);
+	for (; itor != tail; itor = tb_vector_itor_next(list, itor))
+	{
+		tb_dns_item_t const* item = tb_vector_itor_const_at(list, itor);
+		if (item && item->host.u32 == ipv4) break;
+	}
+
+	// remove it
+	if (itor != tail) tb_vector_remove(list, itor);
+
+end:
+	// leave
+	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+}
+tb_ipv4_t tb_dns_list_fast()
+{
+	// init
+	tb_ipv4_t fast = {0};
+	tb_assert_and_check_return_val(g_dns_list, fast);
+
+	// enter
+	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
+
+	// fast
+	fast = g_dns_list->fast;
+
+	// leave
+	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+
+	// ok
+	return fast;
+}
+tb_void_t tb_dns_list_exit()
+{
+	// exit local
+	tb_dns_local_exit();
+
+	// exit list
+	tb_handle_t mutx = TB_NULL;
+	if (g_dns_list)
+	{
+		// enter
+		if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
+
+		// exists?
+		if (g_dns_list)
+		{
+			// save mutx
+			mutx = g_dns_list->mutx;
+			g_dns_list->mutx = TB_NULL;
+
+			// free list
+			if (g_dns_list->list) tb_vector_exit(g_dns_list->list);
+			g_dns_list->list = TB_NULL;
+
+			// free it
+			tb_free(g_dns_list);
+			g_dns_list = TB_NULL;
+
+			// free mutx
+			if (mutx) 
+			{
+				// leave
+				tb_mutex_leave(mutx);
+
+				// exit mutx
+				tb_mutex_exit(mutx);
+			}
+		}
+	}
+}
+#ifdef TB_DEBUG
+tb_void_t tb_dns_list_dump()
+{	
+	tb_assert_and_check_return(g_dns_list);
+
+	// enter
+	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
+
+	// list
+	tb_vector_t* list = g_dns_list->list;
+	tb_assert_and_check_return(list);
+
+	// find it
+	tb_print("============================================================");
+	tb_print("[dns]: list: %u items", tb_vector_size(list));
+	tb_print("[dns]: fast: %u.%u.%u.%u", g_dns_list->fast.u8[0], g_dns_list->fast.u8[1], g_dns_list->fast.u8[2], g_dns_list->fast.u8[3]);
+	tb_size_t itor = tb_vector_itor_head(list);
+	tb_size_t tail = tb_vector_itor_tail(list);
+	for (; itor != tail; itor = tb_vector_itor_next(list, itor))
+	{
+		tb_dns_item_t const* item = tb_vector_itor_const_at(list, itor);
+		if (item) 
+		{
+			tb_print("[dns]: host: %u.%u.%u.%u, rate: %u"
+				, item->host.u8[0]
+				, item->host.u8[1]
+				, item->host.u8[2]
+				, item->host.u8[3]
+				, item->rate);
+		}
+	}
+
+	// leave
+	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+}
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * host
+ */
+tb_handle_t tb_dns_host_init(tb_char_t const* host)
+{
+	tb_trace_noimpl();
 	return TB_NULL;
 }
+tb_long_t tb_dns_host_spak(tb_handle_t hdns, tb_char_t* data, tb_size_t maxn)
+{
+	tb_trace_noimpl();
+	return 0;
+}
+tb_long_t tb_dns_host_wait(tb_handle_t hdns, tb_size_t timeout)
+{
+	tb_trace_noimpl();
+	return 0;
+}
+tb_void_t tb_dns_host_exit(tb_handle_t hdns)
+{
+	tb_trace_noimpl();
+}
+tb_char_t const* tb_dns_host_done(tb_char_t const* host, tb_char_t* data, tb_size_t maxn)
+{
+	tb_trace_noimpl();
+	return TB_NULL;
+}
+

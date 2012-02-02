@@ -99,6 +99,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	// init rand
 	if (!tb_rand_init()) return TB_FALSE;
 
+	// init dns
+	if (!tb_dns_list_init()) return TB_FALSE;
+
 	// ok
 	tb_trace("init: ok");
 
@@ -107,6 +110,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 tb_void_t tb_exit()
 {
+	// exit dns
+	tb_dns_list_exit();
+	
 	// exit rand
 	tb_rand_exit();
 
