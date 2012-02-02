@@ -30,12 +30,29 @@
 #include "../math/math.h"
 #include "../utils/utils.h"
 #include "../string/string.h"
+#include "../stream/stream.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
+
+// the protocol header
+#define TB_DNS_HEADER_SIZE 			(12)
+#define TB_DNS_HEADER_MAGIC 		(0xbeef)
+
+// the protocol port
+#define TB_DNS_HOST_PORT 			(53)
+
+// the host maximum size 
+#define TB_DNS_HOST_MAXN 			(16)
+
+// the name maximum size 
+#define TB_DNS_NAME_MAXN 			(256)
+
+// the rpkt maximum size 
+#define TB_DNS_RPKT_MAXN 			(TB_DNS_HEADER_SIZE + TB_DNS_NAME_MAXN + 256)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -58,13 +75,101 @@ typedef struct __tb_dns_list_t
 	// the list
 	tb_vector_t* 	list;
 
-	// the fast
-	tb_ipv4_t 		fast;
-
 	// the mutx
 	tb_handle_t 	mutx;
 
 }tb_dns_list_t;
+
+// the dns step type
+typedef enum __tb_dns_step_t
+{
+	TB_DNS_STEP_NONE 	= 0
+,	TB_DNS_STEP_REQT 	= 1
+,	TB_DNS_STEP_RESP 	= 2
+
+}tb_dns_step_t;
+
+// the dns name type
+typedef struct __tb_dns_name_t
+{
+	// the host
+	tb_sstring_t 	host;
+
+	// the name
+	tb_sstring_t 	name;
+
+	// the request & response packet
+	tb_sstring_t 	rpkt;
+	
+	// the size for recv & send packet
+	tb_size_t 		size;
+
+	// the iterator
+	tb_size_t 		itor;
+
+	// the step
+	tb_size_t 		step;
+
+	// the socket
+	tb_handle_t 	sock;
+
+	// the data
+	tb_byte_t 		data[TB_DNS_HOST_MAXN + TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
+
+}tb_dns_name_t;
+
+#if 0
+// the dns header type
+typedef struct __tb_dns_header_t
+{
+	tb_uint16_t 	id; 			// identification number
+
+	tb_uint16_t 	qr     :1;		// query/response flag
+	tb_uint16_t 	opcode :4;	    // purpose of message
+	tb_uint16_t 	aa     :1;		// authoritive answer
+	tb_uint16_t 	tc     :1;		// truncated message
+	tb_uint16_t 	rd     :1;		// recursion desired
+
+	tb_uint16_t 	ra     :1;		// recursion available
+	tb_uint16_t 	z      :1;		// its z! reserved
+	tb_uint16_t 	ad     :1;	    // authenticated data
+	tb_uint16_t 	cd     :1;	    // checking disabled
+	tb_uint16_t 	rcode  :4;	    // response code
+
+	tb_uint16_t 	question;	    // number of question entries
+	tb_uint16_t 	answer;			// number of answer entries
+	tb_uint16_t 	authority;		// number of authority entries
+	tb_uint16_t 	resource;		// number of resource entries
+
+}tb_dns_header_t;
+
+// the dns question type
+typedef struct __tb_dns_question_t
+{
+	tb_uint16_t 	type;
+	tb_uint16_t 	class;
+
+}tb_dns_question_t;
+
+// the dns resource type
+typedef struct __tb_dns_resource_t
+{
+	tb_uint16_t 	type;
+	tb_uint16_t 	class;
+	tb_uint32_t 	ttl;
+	tb_uint16_t 	size;
+
+}tb_dns_resource_t;
+
+// the dns answer type
+typedef struct __tb_dns_answer_t
+{
+	tb_char_t 			name[TB_DNS_NAME_MAXN];
+	tb_dns_resource_t 	res;
+	tb_byte_t const* 	rdata;
+
+}tb_dns_answer_t;
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
@@ -72,6 +177,121 @@ typedef struct __tb_dns_list_t
 
 // the dns list
 static tb_dns_list_t* 	g_dns_list = TB_NULL;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+
+// size + data, e.g. .www.google.com => 3www6google3com
+static tb_char_t const* tb_dns_encode_name(tb_char_t* name)
+{
+	tb_assert_and_check_return_val(name && name[0] == '.', TB_NULL);
+	
+	// encode
+	tb_size_t 	n = 0;
+	tb_char_t* 	b = name;
+	tb_char_t* 	p = name + 1;
+	while (*p)
+	{
+		if (*p == '.')
+		{
+			//*b = '0' + n;
+			*b = n;
+			n = 0;
+			b = p;
+		}
+		else n++;
+		p++;
+	}
+	//*b = '0' + n;
+	*b = n;
+
+	// ok
+	return name;
+}
+static tb_handle_t tb_dns_host_post(tb_char_t const* host, tb_char_t const* name)
+{
+	tb_assert_and_check_return_val(name, TB_NULL);
+
+	// open socket
+	tb_handle_t handle = tb_socket_open(TB_SOCKET_TYPE_UDP);
+	tb_assert_and_check_return_val(handle, TB_NULL);
+
+	// format query
+	tb_bstream_t 	bst;
+	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
+	tb_size_t 		size = 0;
+	tb_char_t* 		p = TB_NULL;
+	tb_bstream_attach(&bst, rpkt, TB_DNS_RPKT_MAXN);
+
+	// identification number
+	tb_bstream_set_u16_be(&bst, TB_DNS_HEADER_MAGIC);
+
+	/* 0x2104: 0 0100 001 0000 0100
+	 *
+	 * tb_uint16_t qr     :1;		// query/response flag
+	 * tb_uint16_t opcode :4;	    // purpose of message
+	 * tb_uint16_t aa     :1;		// authoritive answer
+	 * tb_uint16_t tc     :1;		// truncated message
+	 * tb_uint16_t rd     :1;		// recursion desired
+
+	 * tb_uint16_t ra     :1;		// recursion available
+	 * tb_uint16_t z      :1;		// its z! reserved
+	 * tb_uint16_t ad     :1;	    // authenticated data
+	 * tb_uint16_t cd     :1;	    // checking disabled
+	 * tb_uint16_t rcode  :4;	    // response code
+	 *
+	 * this is a query 
+	 * this is a standard query 
+	 * not authoritive answer 
+	 * not truncated 
+	 * recursion desired
+	 *
+	 * recursion not available! hey we dont have it (lol)
+	 *
+	 */
+	tb_bstream_set_u16_be(&bst, 0x2104);
+
+	/* we have only one question
+	 *
+	 * tb_uint16_t question;	    // number of question entries
+	 * tb_uint16_t answer;			// number of answer entries
+	 * tb_uint16_t authority;		// number of authority entries
+	 * tb_uint16_t resource;		// number of resource entries
+	 *
+	 */
+	tb_bstream_set_u16_be(&bst, 1); 
+	tb_bstream_set_u16_be(&bst, 0);
+	tb_bstream_set_u16_be(&bst, 0);
+	tb_bstream_set_u16_be(&bst, 0);
+
+	// set questions, see as tb_dns_question_t
+	// name + question1 + question2 + ...
+	tb_bstream_set_u8(&bst, '.');
+	p = tb_bstream_set_string(&bst, name);
+
+	// only one question now.
+	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
+	tb_bstream_set_u16_be(&bst, 1); 		// it's internet (lol)
+
+	// encode dns name
+	if (!p || !tb_dns_encode_name(p - 1)) goto fail;
+
+	// size
+	size = tb_bstream_offset(&bst);
+	tb_assert_and_check_goto(size, fail);
+
+	// send query
+	tb_long_t r = tb_socket_usend(handle, host, TB_DNS_HOST_PORT, rpkt, size);
+	tb_print("%d => %d", size, r);
+
+	// ok
+	return handle;
+
+fail:
+	if (handle) tb_socket_exit(handle);
+	return TB_NULL;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * list
@@ -164,24 +384,6 @@ end:
 	// leave
 	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
 }
-tb_ipv4_t tb_dns_list_fast()
-{
-	// init
-	tb_ipv4_t fast = {0};
-	tb_assert_and_check_return_val(g_dns_list, fast);
-
-	// enter
-	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
-
-	// fast
-	fast = g_dns_list->fast;
-
-	// leave
-	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
-
-	// ok
-	return fast;
-}
 tb_void_t tb_dns_list_exit()
 {
 	// exit local
@@ -232,11 +434,10 @@ tb_void_t tb_dns_list_dump()
 	// list
 	tb_vector_t* list = g_dns_list->list;
 	tb_assert_and_check_return(list);
-
+	
 	// find it
 	tb_print("============================================================");
 	tb_print("[dns]: list: %u items", tb_vector_size(list));
-	tb_print("[dns]: fast: %u.%u.%u.%u", g_dns_list->fast.u8[0], g_dns_list->fast.u8[1], g_dns_list->fast.u8[2], g_dns_list->fast.u8[3]);
 	tb_size_t itor = tb_vector_itor_head(list);
 	tb_size_t tail = tb_vector_itor_tail(list);
 	for (; itor != tail; itor = tb_vector_itor_next(list, itor))
@@ -259,30 +460,82 @@ tb_void_t tb_dns_list_dump()
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * host
+ * name
  */
-tb_handle_t tb_dns_host_init(tb_char_t const* host)
+tb_handle_t tb_dns_name_init(tb_char_t const* name)
 {
-	tb_trace_noimpl();
+	tb_assert_and_check_return_val(name, TB_NULL);
+
+	// alloc
+	tb_dns_name_t* h = tb_calloc(1, sizeof(tb_dns_name_t));
+	tb_assert_and_check_return_val(h, TB_NULL);
+
+	// init host
+	if (!tb_sstring_init(&h->host, h->data, TB_DNS_HOST_MAXN)) goto fail;
+
+	// init name
+	if (!tb_sstring_init(&h->name, h->data + TB_DNS_HOST_MAXN, TB_DNS_NAME_MAXN)) goto fail;
+	tb_sstring_cstrcpy(&h->name, name);
+
+	// init rpkt
+	if (!tb_sstring_init(&h->host, h->data + TB_DNS_HOST_MAXN + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
+
+	// init sock
+	h->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
+	tb_assert_and_check_goto(h->sock, fail);
+
+	// ok
+	return (tb_handle_t)h;
+
+fail:
+	if (h) tb_dns_name_exit(h);
 	return TB_NULL;
 }
-tb_long_t tb_dns_host_spak(tb_handle_t hdns, tb_char_t* data, tb_size_t maxn)
+tb_long_t tb_dns_name_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn)
 {
 	tb_trace_noimpl();
 	return 0;
 }
-tb_long_t tb_dns_host_wait(tb_handle_t hdns, tb_size_t timeout)
+tb_long_t tb_dns_name_wait(tb_handle_t handle, tb_size_t timeout)
 {
 	tb_trace_noimpl();
 	return 0;
 }
-tb_void_t tb_dns_host_exit(tb_handle_t hdns)
+tb_void_t tb_dns_name_exit(tb_handle_t handle)
 {
-	tb_trace_noimpl();
+	tb_dns_name_t* h = (tb_dns_name_t*)handle;
+	if (h)
+	{
+		// close sock
+		if (h->sock) tb_socket_close(h->sock);
+
+		// free it
+		tb_free(h);
+	}
 }
-tb_char_t const* tb_dns_host_done(tb_char_t const* host, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_dns_name_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn)
 {
-	tb_trace_noimpl();
-	return TB_NULL;
+	tb_assert_and_check_return_val(name && data && maxn > 15, TB_NULL);
+
+	// init
+	tb_handle_t handle = tb_dns_name_init(name);
+	tb_assert_and_check_return_val(handle, TB_NULL);
+
+	// spak
+	tb_long_t r = -1;
+	while (!(r = tb_dns_name_spak(handle, data, maxn)))
+	{
+		// wait
+		r = tb_dns_name_wait(handle, 1000);
+		tb_assert_and_check_goto(r >= 0, end);
+	}
+
+end:
+
+	// exit
+	tb_dns_name_exit(handle);
+
+	// ok
+	return r > 0? data : TB_NULL;
 }
 

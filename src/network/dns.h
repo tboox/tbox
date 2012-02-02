@@ -38,14 +38,13 @@ tb_bool_t 			tb_dns_list_init();
 tb_void_t 			tb_dns_list_adds(tb_char_t const* host);
 tb_void_t 			tb_dns_list_dels(tb_char_t const* host);
 tb_void_t 			tb_dns_list_exit();
-tb_ipv4_t 			tb_dns_list_fast();
 tb_void_t 			tb_dns_list_dump();
 
-// host
-tb_handle_t 		tb_dns_host_init(tb_char_t const* host);
-tb_long_t 			tb_dns_host_spak(tb_handle_t hdns, tb_char_t* data, tb_size_t maxn);
-tb_long_t 			tb_dns_host_wait(tb_handle_t hdns, tb_size_t timeout);
-tb_void_t 			tb_dns_host_exit(tb_handle_t hdns);
-tb_char_t const* 	tb_dns_host_done(tb_char_t const* host, tb_char_t* data, tb_size_t maxn);
+// name
+tb_handle_t 		tb_dns_name_init(tb_char_t const* name);
+tb_long_t 			tb_dns_name_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn);
+tb_long_t 			tb_dns_name_wait(tb_handle_t handle, tb_size_t timeout);
+tb_void_t 			tb_dns_name_exit(tb_handle_t handle);
+tb_char_t const* 	tb_dns_name_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn);
 
 #endif
