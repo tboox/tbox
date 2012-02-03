@@ -301,7 +301,7 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
 {
 	tb_assert_and_check_return_val(url, TB_NULL);
-	return &url->ipv4;
+	return &(url->ipv4);
 }
 tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
 {
