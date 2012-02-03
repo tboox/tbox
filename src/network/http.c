@@ -377,7 +377,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// check request
 		tb_assert_and_check_return_val(tb_pstring_size(&http->data) && tb_pstring_cstr(&http->data), -1);
 
-		// dump
+		// trace
 		tb_trace("[http]: request:\n%s", tb_pstring_cstr(&http->data));
 	}
 
