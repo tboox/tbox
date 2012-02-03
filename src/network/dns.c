@@ -133,9 +133,6 @@ typedef struct __tb_dns_look_t
 	// the step
 	tb_size_t 		step;
 
-	// the wait
-	tb_size_t 		wait;
-
 	// try the next host?
 	tb_bool_t 		next;
 
@@ -367,7 +364,6 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 	// send request
 	tb_long_t writ = 0;
-	tb_bool_t wait = TB_FALSE;
 	while (writ < size)
 	{
 		// writ data
@@ -379,7 +375,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 		if (!r)
 		{
 			// abort?
-			tb_check_goto(!wait, end);
+			tb_check_goto(!writ, end);
 
 			// wait
 			tb_aioo_t o;
@@ -388,22 +384,9 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// fail or timeout?
 			tb_check_goto(r > 0, end);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
-		else
-		{
-			// no waiting
-			wait = TB_FALSE;
-
-			// update size
-			writ += r;
-		}
+		else writ += r;
 	}
-
-	// reset wait
-	wait = TB_FALSE;
 
 	// only recv id, 2 bytes 
 	tb_long_t read = 0;
@@ -418,7 +401,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 		if (!r)
 		{
 			// end?
-			tb_check_break(!wait);
+			tb_check_break(!read);
 
 			// wait
 			tb_aioo_t o;
@@ -427,18 +410,8 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// fail or timeout?
 			tb_check_break(r > 0);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
-		else
-		{
-			// no waiting
-			wait = TB_FALSE;
-
-			// update size
-			read += r;
-		}
+		else read += r;
 	}
 
 	// check
@@ -601,7 +574,14 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 		tb_assert_and_check_return_val(writ >= 0, -1);
 
 		// no data? 
-		tb_check_return_val(writ, 0);
+		if (!writ)
+		{
+			// abort?
+			tb_check_return_val(!look->size, -1);
+
+			// continue
+			return 0;
+		}
 
 		// update size
 		look->size += writ;
@@ -847,19 +827,18 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	{
 		// read data
 		tb_long_t read = tb_socket_urecv(look->sock, host, TB_DNS_HOST_PORT, rpkt, 4096);
-		tb_trace("[dns]: read %d", read);
+		//tb_trace("[dns]: read %d", read);
 		tb_assert_and_check_return_val(read >= 0, -1);
 
 		// no data? 
 		if (!read)
 		{
-			// no wait? wait it
-			if (look->wait != TB_AIOO_ETYPE_READ) return 0;
 			// end?
-			else break;
+			tb_check_break(!tb_sbuffer_size(&look->rpkt));
+			
+			// continue 
+			return 0;
 		}
-		// clear wait
-		else look->wait = 0;
 
 		// copy data
 		tb_sbuffer_memncat(&look->rpkt, rpkt, read);
@@ -1193,9 +1172,6 @@ fail:
 		look->size = 0;
 		tb_sbuffer_clear(&look->rpkt);
 
-		// reset wait
-		look->wait = 0;
-
 		// continue 
 		return 0;
 	}
@@ -1215,9 +1191,6 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 		if (!(look->step & TB_DNS_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
 		else if (!(look->step & TB_DNS_STEP_RESP)) e = TB_AIOO_ETYPE_READ;
 	}
-
-	// save the event
-	look->wait = e;
 
 	// need wait?
 	tb_long_t r = 0;

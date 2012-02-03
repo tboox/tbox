@@ -54,6 +54,9 @@ typedef struct __tb_sstream_t
 	// the sock type
 	tb_size_t 			type;
 
+	// the wait event
+	tb_long_t 			wait;
+
 }tb_sstream_t;
 
 
@@ -78,14 +81,12 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_size_t 			port = tb_url_port_get(&gst->url);
 	tb_assert_and_check_return_val(port, -1);
 
-	// host
-	tb_char_t const* 	host = tb_url_host_get(&gst->url);
-	tb_assert_and_check_return_val(host, -1);
-
 	// ipv4
 	tb_char_t 			data[16];
+	tb_char_t const* 	host = TB_NULL;
 	tb_ipv4_t const* 	ipv4 = tb_url_ipv4_get(&gst->url);
-	if (!ipv4 || !ipv4->u32)
+	tb_assert_and_check_return_val(ipv4, -1);
+	if (!ipv4->u32)
 	{
 		// lookup ipv4
 		tb_ipv4_t addr;
@@ -100,6 +101,10 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		}
 		else
 		{
+			// host
+			host = tb_url_host_get(&gst->url);
+			tb_assert_and_check_return_val(host, -1);
+
 			// try get ipv4
 			if (!tb_dns_look_try4(host, &addr))
 			{
@@ -130,10 +135,24 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		// set ipv4
 		tb_url_ipv4_set(&gst->url, &addr);
 	}
+	else 
+	{
+		// ipv4 => host
+		host = tb_ipv4_get(ipv4, data, 16);
+		tb_assert_and_check_goto(host, fail);
+	}
 
 	// connect
-	tb_trace("[sock]: connect %s:%u", host, port);
-	return tb_socket_connect(sst->sock, host, port);
+	tb_trace("[sock]: connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
+	tb_long_t r = tb_socket_connect(sst->sock, host, port);
+	tb_check_return_val(r > 0, r);
+
+	// clear
+	sst->wait = 0;
+
+	// ok
+	tb_trace("[sock]: connect: ok");
+	return r;
 
 fail:
 
@@ -158,6 +177,9 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 		sst->sock = TB_NULL;
 	}
 
+	// clear 
+	sst->wait = 0;
+
 	// ok
 	return 1;
 }
@@ -168,7 +190,17 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// read data
-	return tb_socket_recv(sst->sock, data, size);
+	tb_long_t r = tb_socket_recv(sst->sock, data, size);
+	tb_check_return_val(r >= 0, -1);
+
+	// abort?
+	if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
+
+	// clear wait
+	if (r > 0) sst->wait = 0;
+
+	// ok?
+	return r;
 }
 static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
@@ -177,7 +209,17 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// writ data
-	return tb_socket_send(sst->sock, data, size);
+	tb_long_t r = tb_socket_send(sst->sock, data, size);
+	tb_check_return_val(r >= 0, -1);
+
+	// abort?
+	if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+
+	// clear wait
+	if (r > 0) sst->wait = 0;
+
+	// ok?
+	return r;
 }
 static tb_handle_t tb_sstream_bare(tb_gstream_t* gst)
 {	
@@ -195,13 +237,15 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 		// wait the gst
 		tb_aioo_t o;
 		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, TB_NULL);
-		return tb_aioo_wait(&o, timeout);
+		sst->wait = tb_aioo_wait(&o, timeout);
 	}
 	else
 	{
 		// wait the dns
-		return tb_dns_look_wait(sst->hdns, timeout);
+		sst->wait = tb_dns_look_wait(sst->hdns, timeout);
 	}
+
+	return sst->wait;
 }
 static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {

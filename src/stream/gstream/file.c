@@ -52,6 +52,9 @@ typedef struct __tb_fstream_t
 	// the file size
 	tb_uint64_t 		size;
 
+	// the wait event
+	tb_long_t 			wait;
+
 	// the file flags
 	tb_size_t 			flags;
 
@@ -81,6 +84,7 @@ static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 
 	// init size
 	fst->size = tb_file_size(fst->file);
+	fst->wait = 0;
 	
 	// ok
 	return 1;
@@ -98,7 +102,7 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 		// clear 
 		fst->file = TB_NULL;
 		fst->size = 0;
-
+		fst->wait = 0;
 	}
 
 	// ok
@@ -111,7 +115,17 @@ static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// read 
-	return tb_file_read(fst->file, data, size);
+	tb_long_t r = tb_file_read(fst->file, data, size);
+	tb_check_return_val(r >= 0, -1);
+
+	// abort?
+	if (!r && fst->wait > 0 && (fst->wait & TB_AIOO_ETYPE_READ)) return -1;
+
+	// clear wait
+	if (r > 0) fst->wait = 0;
+
+	// ok?
+	return r;
 }
 static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
@@ -120,7 +134,17 @@ static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(size, 0);
 
 	// writ
-	return tb_file_writ(fst->file, (tb_byte_t*)data, (tb_size_t)size);
+	tb_long_t r = tb_file_writ(fst->file, data, size);
+	tb_check_return_val(r >= 0, -1);
+
+	// abort?
+	if (!r && fst->wait > 0 && (fst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+
+	// clear wait
+	if (r > 0) fst->wait = 0;
+
+	// ok?
+	return r;
 }
 static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
@@ -158,10 +182,15 @@ static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, -1);
 
+	// aioo
 	tb_aioo_t o;
 	tb_aioo_seto(&o, fst->file, TB_AIOO_OTYPE_FILE, etype, TB_NULL);
 
-	return tb_aioo_wait(&o, timeout);
+	// wait
+	fst->wait = tb_aioo_wait(&o, timeout);
+
+	// ok?
+	return fst->wait;
 }
 static tb_bool_t tb_fstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {

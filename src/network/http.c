@@ -46,13 +46,13 @@
  * types
  */
 
-// the http state type
+// the http step type
 typedef enum __tb_http_state_t
 {
-	TB_HTTP_STATE_NULL 			= 0
-,	TB_HTTP_STATE_CONNECTED 	= 1
-,	TB_HTTP_STATE_REQUESTED 	= 2
-,	TB_HTTP_STATE_RESPONSED 	= 4
+	TB_HTTP_STEP_NONE 			= 0
+,	TB_HTTP_STEP_CONN 	= 1
+,	TB_HTTP_STEP_REQT 	= 2
+,	TB_HTTP_STEP_RESP 	= 4
 
 }tb_http_state_t;
 
@@ -71,8 +71,11 @@ typedef struct __tb_http_t
 	// the spool
 	tb_spool_t* 		spool;
 
-	// the state
-	tb_size_t 			state;
+	// the step
+	tb_size_t 			step;
+
+	// the try count
+	tb_size_t 			tryn;
 
 	// the redirect count
 	tb_size_t 			rdtn;
@@ -251,16 +254,23 @@ static tb_long_t tb_http_chunked_awrit(tb_http_t* http, tb_byte_t* data, tb_size
 static tb_long_t tb_http_connect(tb_http_t* http)
 {
 	// have been connected?
-	tb_check_return_val(!(http->state & TB_HTTP_STATE_CONNECTED), 1);
-
-	// clear status
-	if (!http->state) tb_http_status_clear(http);
+	tb_check_return_val(!(http->step & TB_HTTP_STEP_CONN), 1);
 
 	// ioctl
-	tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_SSL, tb_url_ssl_get(&http->option.url));
-	tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_HOST, tb_url_host_get(&http->option.url));
-	tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_PORT, tb_url_port_get(&http->option.url));
-	tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_PATH, tb_url_path_get(&http->option.url));
+	if (!http->tryn)
+	{
+		// clear status
+		tb_http_status_clear(http);
+
+		// set url
+		tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_SSL, tb_url_ssl_get(&http->option.url));
+		tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_HOST, tb_url_host_get(&http->option.url));
+		tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_PORT, tb_url_port_get(&http->option.url));
+		tb_gstream_ctrl1(http->stream, TB_GSTREAM_CMD_SET_PATH, tb_url_path_get(&http->option.url));
+	}
+
+	// tryn++
+	http->tryn++;
 
 	// open stream
 	tb_trace("[http]: connect: try");
@@ -268,13 +278,17 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	tb_check_return_val(r > 0, r);
 
 	// ok
-	http->state |= TB_HTTP_STATE_CONNECTED;
+	http->step |= TB_HTTP_STEP_CONN;
+	http->tryn = 0;
 	tb_trace("[http]: connect: ok");
 	return r;
 }
 static tb_long_t tb_http_request(tb_http_t* http)
 {
-	tb_check_return_val(!(http->state & TB_HTTP_STATE_REQUESTED), 1);
+	tb_check_return_val(!(http->step & TB_HTTP_STEP_REQT), 1);
+
+	// tryn++
+	http->tryn++;
 
 	// format it first if the request is null
 	if (!tb_pstring_size(&http->data))
@@ -412,7 +426,8 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	tb_check_return_val(r > 0, 0);
 
 	// finish it
-	http->state |= TB_HTTP_STATE_REQUESTED;
+	http->step |= TB_HTTP_STEP_REQT;
+	http->tryn = 0;
 
 	// reset data
 	http->size = 0;
@@ -549,12 +564,15 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 }
 static tb_long_t tb_http_response(tb_http_t* http)
 {
-	tb_check_return_val(!(http->state & TB_HTTP_STATE_RESPONSED), 1);
+	tb_check_return_val(!(http->step & TB_HTTP_STEP_RESP), 1);
 
 	// init
 	tb_long_t 			r = -1;
 	tb_char_t 			ch[1];
 	tb_long_t 			cn = 0;
+
+	// tryn++
+	http->tryn++;
 
 	// read response
 	while (1)
@@ -603,7 +621,8 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	}
 
 	// finish it
-	http->state |= TB_HTTP_STATE_RESPONSED;
+	http->step |= TB_HTTP_STEP_RESP;
+	http->tryn = 0;
 
 	// reset data
 	http->size = 0;
@@ -657,8 +676,9 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		// redirect++
 		http->rdtn++;
 		
-		// clear state
-		http->state = TB_HTTP_STATE_NULL;
+		// clear step
+		http->step = TB_HTTP_STEP_NONE;
+		http->tryn = 0;
 
 		// reset chunk size
 		http->chunked_read = 0;
@@ -795,9 +815,9 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 		tb_size_t e = TB_AIOO_ETYPE_NULL;
 		if (!tb_pstring_size(&http->status.location))
 		{
-			if (!(http->state & TB_HTTP_STATE_CONNECTED)) e = TB_AIOO_ETYPE_CONN;
-			else if (!(http->state & TB_HTTP_STATE_REQUESTED)) e = TB_AIOO_ETYPE_WRIT;
-			else if (!(http->state & TB_HTTP_STATE_RESPONSED)) e = TB_AIOO_ETYPE_READ;
+			if (!(http->step & TB_HTTP_STEP_CONN)) e = TB_AIOO_ETYPE_CONN;
+			else if (!(http->step & TB_HTTP_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
+			else if (!(http->step & TB_HTTP_STEP_RESP)) e = TB_AIOO_ETYPE_READ;
 		}
 
 		// need wait?
@@ -827,11 +847,11 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
-	// have state? clear it
-	if (http->state)
+	// have step? clear it
+	if (http->step)
 	{
 		// connected?
-		if (http->state & TB_HTTP_STATE_CONNECTED) 
+		if (http->step & TB_HTTP_STEP_CONN) 
 		{
 			// not keep-alive?
 			if (!http->status.balive)
@@ -854,8 +874,9 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 		http->size = 0;
 		tb_pstring_clear(&http->data);
 
-		// clear state
-		http->state = TB_HTTP_STATE_NULL;
+		// clear step
+		http->step = TB_HTTP_STEP_NONE;
+		http->tryn = 0;
 
 		// clear redirect
 		http->rdtn = 0;
