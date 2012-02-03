@@ -402,6 +402,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// update size
 		http->size += n;
 	}
+	tb_assert_and_check_return_val(http->size == size, -1);
 
 	// flush writed data
 	tb_long_t r = tb_gstream_afwrit(http->stream);
@@ -788,7 +789,6 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 
 	// try opening it
 	tb_long_t r = 0;
-	tb_size_t w = 0;
 	while (!(r = tb_http_aopen(handle)))
 	{
 		// has aio event?
@@ -803,18 +803,12 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 		// need wait?
 		if (e)
 		{
-			// repeat event? abort? 
-			tb_check_break(w != e);
-
 			// wait
 			r = tb_http_wait(handle, e, http->option.timeout);
 
 			// fail or timeout?
 			tb_check_break(r > 0);
 		}
-
-		// save the event
-		w = e;
 	}
 
 	// dump status
@@ -899,6 +893,7 @@ tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
+	// writ
 	return http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
 }
 tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
@@ -906,6 +901,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
+	// read
 	return http->status.bchunked? tb_http_chunked_aread(http, data, size) : tb_gstream_aread(http->stream, data, size);
 }
 tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
@@ -913,25 +909,18 @@ tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, TB_FALSE);
 
-	tb_long_t 	writ = 0;
-	tb_bool_t 	wait = TB_FALSE;
+	// writ
+	tb_long_t writ = 0;
 	while (writ < size)
 	{
 		// writ data
-		tb_long_t n = tb_http_awrit(handle, data + writ, size - writ);	
-		if (n > 0)
-		{
-			// update writ
-			writ += n;
+		tb_long_t n = tb_http_awrit(handle, data + writ, size - writ);
 
-			// no waiting
-			wait = TB_FALSE;
-		}
+		// update size
+		if (n > 0) writ += n;
+		// no data?
 		else if (!n)
 		{
-			// abort?
-			tb_check_break(!wait);
-
 			// wait
 			tb_long_t e = tb_http_wait(handle, TB_AIOO_ETYPE_WRIT, http->option.timeout);
 			tb_assert_and_check_break(e >= 0);
@@ -941,9 +930,6 @@ tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 			// has read?
 			tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
 		else break;
 	}
@@ -956,25 +942,18 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, TB_FALSE);
 
-	tb_long_t 	read = 0;
-	tb_bool_t 	wait = TB_FALSE;
+	// read
+	tb_long_t read = 0;
 	while (read < size)
 	{
 		// read data
-		tb_long_t n = tb_http_aread(handle, data + read, size - read);	
-		if (n > 0)
-		{
-			// update read
-			read += n;
+		tb_long_t n = tb_http_aread(handle, data + read, size - read);
 
-			// no waiting
-			wait = TB_FALSE;
-		}
+		// update size
+		if (n > 0) read += n;
+		// no data?
 		else if (!n)
 		{
-			// abort?
-			tb_check_break(!wait);
-
 			// wait
 			tb_long_t e = tb_http_wait(handle, TB_AIOO_ETYPE_READ, http->option.timeout);
 			tb_assert_and_check_break(e >= 0);
@@ -984,9 +963,6 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 			// has read?
 			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
 		else break;
 	}

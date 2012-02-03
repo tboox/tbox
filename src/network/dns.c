@@ -70,7 +70,7 @@ typedef struct __tb_dns_host_t
 	tb_ipv4_t 		host;
 
 	// the rate
-	tb_size_t 		rate;
+	tb_long_t 		rate;
 
 }tb_dns_host_t;
 
@@ -277,17 +277,16 @@ static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 	}
 	else return TB_NULL;
 }
-static tb_size_t tb_dns_host_rate(tb_char_t const* host)
+static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 {
 	tb_assert_and_check_return_val(host, 0);
-	tb_trace("[dns]: test host: %s", host);
 
 	// open socket
 	tb_handle_t handle = tb_socket_open(TB_SOCKET_TYPE_UDP);
 	tb_assert_and_check_return_val(handle, 0);
 
 	// init 
-	tb_size_t rate = 0;
+	tb_long_t rate = -1;
 
 	// format query
 	tb_bstream_t 	bst;
@@ -443,17 +442,17 @@ static tb_size_t tb_dns_host_rate(tb_char_t const* host)
 	}
 
 	// check
-	tb_assert_and_check_goto(read >= 2, end);
+	tb_check_goto(read >= 2, end);
 
 	// check dns header
 	tb_size_t id = tb_bits_get_u16_be(rpkt);
-	tb_assert_and_check_goto(id == TB_DNS_HEADER_MAGIC, end);
+	tb_check_goto(id == TB_DNS_HEADER_MAGIC, end);
 
 	// rate
 	rate = (tb_long_t)(tb_mclock() - time);
 
 	// ok
-	tb_trace("[dns]: test host: %s ok, rate: %u", host, rate);
+	tb_trace("[dns]: host: %s ok, rate: %u", host, rate);
 
 end:
 	// exit sock
@@ -619,7 +618,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 	tb_trace("[dns]: request: ok");
 	return 1;
 }
-static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_char_t* data, tb_size_t maxn)
+static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 {
 	// rpkt && size
 	tb_byte_t const* 	rpkt = tb_sbuffer_data(&look->rpkt);
@@ -699,8 +698,13 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_char_t* data, tb_
 			if (!found) 
 			{
 				// save it
-				tb_size_t n = tb_snprintf(data, maxn, "%u.%u.%u.%u", b1, b2, b3, b4);
-				if (n) data[n] = '\0';
+				if (ipv4)
+				{
+					ipv4->u8[0] = b1;
+					ipv4->u8[1] = b2;
+					ipv4->u8[2] = b3;
+					ipv4->u8[3] = b4;
+				}
 
 				// found it
 				found = 1;
@@ -802,7 +806,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_char_t* data, tb_
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_char_t* data, tb_size_t maxn)
+static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 {
 	tb_check_return_val(!(look->step & TB_DNS_STEP_RESP), 1);
 	
@@ -815,11 +819,11 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_char_t* data, tb_size_
 			tb_mutex_enter(g_dns_list->mutx);
 
 			// host
-			tb_char_t 				ipv4[16];
+			tb_char_t 				addr[16];
 			tb_dns_host_t const* 	item = (tb_dns_host_t const*)tb_slist_itor_const_at(g_dns_list->list, look->itor);
 			if (item)
 			{
-				tb_char_t const* host = tb_ipv4_get(&item->host, ipv4, 16);
+				tb_char_t const* host = tb_ipv4_get(&item->host, addr, 16);
 				if (host) tb_sstring_cstrcpy(&look->host, host);
 			}
 
@@ -843,7 +847,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_char_t* data, tb_size_
 	{
 		// read data
 		tb_long_t read = tb_socket_urecv(look->sock, host, TB_DNS_HOST_PORT, rpkt, 4096);
-		//tb_trace("[dns]: read %d", read);
+		tb_trace("[dns]: read %d", read);
 		tb_assert_and_check_return_val(read >= 0, -1);
 
 		// no data? 
@@ -854,13 +858,15 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_char_t* data, tb_size_
 			// end?
 			else break;
 		}
+		// clear wait
+		else look->wait = 0;
 
 		// copy data
 		tb_sbuffer_memncat(&look->rpkt, rpkt, read);
 	}
 
 	// done
-	if (!tb_dns_look_resp_done(look, data, maxn)) return -1;
+	if (!tb_dns_look_resp_done(look, ipv4)) return -1;
 
 	// finish it
 	look->step |= TB_DNS_STEP_RESP;
@@ -926,7 +932,7 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 	{
 		// the rate
 		item.rate = tb_dns_host_rate(host);
-		tb_assert_and_check_goto(item.rate, fail);
+		tb_check_goto(item.rate >= 0, fail);
 
 		// has list?
 		if (g_dns_list && g_dns_list->mutx) 
@@ -964,7 +970,7 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 
 fail:
 	// trace
-	tb_trace("[dns]: host: add %s failed", host);
+	tb_trace("[dns]: host: %s invalid", host);
 }
 tb_void_t tb_dns_list_dels(tb_char_t const* host)
 {
@@ -1082,9 +1088,22 @@ tb_void_t tb_dns_list_dump()
 /* ///////////////////////////////////////////////////////////////////////
  * name
  */
+tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
+{
+	tb_assert_and_check_return_val(name && ipv4, TB_FALSE);
+
+	// is ipv4?
+	tb_check_return_val(!tb_ipv4_set(ipv4, name), TB_TRUE);
+
+	// fail
+	return TB_FALSE;
+}
 tb_handle_t tb_dns_look_init(tb_char_t const* name)
 {
 	tb_assert_and_check_return_val(name, TB_NULL);
+
+	// must be not ipv4
+	tb_assert_return_val(!tb_ipv4_set(TB_NULL, name), TB_NULL);
 
 	// alloc
 	tb_dns_look_t* look = tb_calloc(1, sizeof(tb_dns_look_t));
@@ -1125,10 +1144,10 @@ fail:
 	if (look) tb_dns_look_exit(look);
 	return TB_NULL;
 }
-tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn)
+tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_ipv4_t* ipv4)
 {
 	tb_dns_look_t* look = (tb_dns_look_t*)handle;
-	tb_assert_and_check_return_val(look && data && maxn, -1);
+	tb_assert_and_check_return_val(look && ipv4, -1);
 
 	// init 
 	tb_long_t r = -1;
@@ -1139,7 +1158,7 @@ tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn)
 	tb_check_return_val(r > 0, r);
 		
 	// response
-	r = tb_dns_look_resp(look, data, maxn);
+	r = tb_dns_look_resp(look, ipv4);
 	tb_check_goto(r >= 0, fail);
 	tb_check_return_val(r > 0, r);
 
@@ -1227,17 +1246,17 @@ tb_void_t tb_dns_look_exit(tb_handle_t handle)
 		tb_free(look);
 	}
 }
-tb_char_t const* tb_dns_look_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn)
+tb_bool_t tb_dns_look_done(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
-	tb_assert_and_check_return_val(name && data && maxn > 15, TB_NULL);
+	tb_assert_and_check_return_val(name && ipv4, TB_FALSE);
 
 	// init
 	tb_handle_t handle = tb_dns_look_init(name);
-	tb_assert_and_check_return_val(handle, TB_NULL);
+	tb_assert_and_check_return_val(handle, TB_FALSE);
 
 	// spak
 	tb_long_t r = -1;
-	while (!(r = tb_dns_look_spak(handle, data, maxn)))
+	while (!(r = tb_dns_look_spak(handle, ipv4)))
 	{
 		// wait
 		r = tb_dns_look_wait(handle, TB_DNS_TIMEOUT);
@@ -1250,6 +1269,6 @@ end:
 	tb_dns_look_exit(handle);
 
 	// ok
-	return r > 0? data : TB_NULL;
+	return r > 0? TB_TRUE : TB_FALSE;
 }
 

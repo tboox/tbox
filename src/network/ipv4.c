@@ -35,44 +35,48 @@
  * interfaces
  */
 
+tb_void_t tb_ipv4_clr(tb_ipv4_t* ipv4)
+{
+	if (ipv4) ipv4->u32 = 0;
+}
 tb_uint32_t tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip)
 {
 	// init
 	tb_size_t b0, b1, b2, b3;
 	tb_char_t const* p = ip;
-	tb_assert_and_check_goto(p, fail);
+	tb_check_goto(p, fail);
 
 	// b0
-	tb_assert_and_check_goto(*p && tb_isdigit(*p), fail);
+	tb_check_goto(*p && tb_isdigit(*p), fail);
 	b0 = tb_stou32(p);
-	tb_assert_and_check_goto(b0 < 256, fail);
+	tb_check_goto(b0 < 256, fail);
 
 	while (*p && *p != '.') *p++;
-	tb_assert_and_check_goto(*p, fail);
+	tb_check_goto(*p, fail);
 	p++;
 
 	// b1
-	tb_assert_and_check_goto(*p && tb_isdigit(*p), fail);
+	tb_check_goto(*p && tb_isdigit(*p), fail);
 	b1 = tb_stou32(p);
-	tb_assert_and_check_goto(b1 < 256, fail);
+	tb_check_goto(b1 < 256, fail);
 
 	while (*p && *p != '.') *p++;
-	tb_assert_and_check_goto(*p, fail);
+	tb_check_goto(*p, fail);
 	p++;
 
 	// b2
-	tb_assert_and_check_goto(*p && tb_isdigit(*p), fail);
+	tb_check_goto(*p && tb_isdigit(*p), fail);
 	b2 = tb_stou32(p);
-	tb_assert_and_check_goto(b2 < 256, fail);
+	tb_check_goto(b2 < 256, fail);
 
 	while (*p && *p != '.') *p++;
-	tb_assert_and_check_goto(*p, fail);
+	tb_check_goto(*p, fail);
 	p++;
 
 	// b3
-	tb_assert_and_check_goto(*p && tb_isdigit(*p), fail);
+	tb_check_goto(*p && tb_isdigit(*p), fail);
 	b3 = tb_stou32(p);
-	tb_assert_and_check_goto(b3 < 256, fail);
+	tb_check_goto(b3 < 256, fail);
 
 	// ok
 	if (ipv4) 

@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "ipv4.h"
 #include "../string/string.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -58,13 +59,16 @@ typedef enum __tb_url_proto_t
 typedef struct __tb_url_t
 {
 	// the protocol 
-	tb_uint16_t 	poto: 	15;
+	tb_uint16_t 	poto: 	14;
 
 	// is ssl?
 	tb_uint16_t 	bssl: 	1;
 
 	// the port
 	tb_uint16_t 	port;
+
+	// the ipv4
+	tb_ipv4_t 		ipv4;
 
 	// the host
 	tb_sstring_t 	host;
@@ -111,6 +115,10 @@ tb_void_t 			tb_url_poto_set(tb_url_t* url, tb_size_t poto);
 // port
 tb_size_t 			tb_url_port_get(tb_url_t const* url);
 tb_void_t 			tb_url_port_set(tb_url_t* url, tb_size_t port);
+
+// ipv4
+tb_ipv4_t const* 	tb_url_ipv4_get(tb_url_t const* url);
+tb_void_t 			tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4);
 
 // host
 tb_char_t const* 	tb_url_host_get(tb_url_t const* url);

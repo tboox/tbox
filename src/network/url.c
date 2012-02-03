@@ -25,6 +25,7 @@
  * includes
  */
 #include "url.h"
+#include "ipv4.h"
 #include "http.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
@@ -42,6 +43,7 @@ tb_bool_t tb_url_init(tb_url_t* url)
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
+	tb_ipv4_clr(&url->ipv4);
 	if (!tb_sstring_init(&url->host, url->data, TB_URL_HOST_MAX)) return TB_FALSE;
 	if (!tb_sstring_init(&url->path, url->data + TB_URL_HOST_MAX, TB_URL_PATH_MAX)) return TB_FALSE;
 	if (!tb_pstring_init(&url->args)) return TB_FALSE;
@@ -65,6 +67,7 @@ tb_void_t tb_url_clear(tb_url_t* url)
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
+	tb_ipv4_clr(&url->ipv4);
 	tb_sstring_clear(&url->host);
 	tb_sstring_clear(&url->path);
 	tb_pstring_clear(&url->args);
@@ -192,6 +195,9 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	{
 		// parse host
 		while (*p && *p != '/' && *p != ':') tb_sstring_chrcat(&url->host, *p++);
+
+		// try set ipv4
+		if (tb_sstring_size(&url->host)) tb_ipv4_set(&url->ipv4, tb_sstring_cstr(&url->host));
 	
 		// parse port
 		if (*p == ':')
@@ -274,8 +280,48 @@ tb_char_t const* tb_url_host_get(tb_url_t const* url)
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
 	tb_assert_and_check_return(url);
-	if (host) tb_sstring_cstrcpy(&url->host, host);
-	else tb_sstring_clear(&url->host);
+
+	if (host) 
+	{
+		// set host
+		tb_sstring_cstrcpy(&url->host, host);
+
+		// try set ipv4
+		tb_ipv4_set(&url->ipv4, host);
+	}
+	else 
+	{
+		// clear host
+		tb_sstring_clear(&url->host);
+
+		// clear ipv4
+		tb_ipv4_clr(&url->ipv4);
+	}
+}
+tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
+{
+	tb_assert_and_check_return_val(url, TB_NULL);
+	return &url->ipv4;
+}
+tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
+{
+	tb_assert_and_check_return(url && ipv4);
+
+	// changed?
+	if (url->ipv4.u32 != ipv4->u32)
+	{
+		// set ipv4
+		url->ipv4 = *ipv4;
+
+		// set it if the host not exists
+		if (!tb_sstring_size(&url->host)) 
+		{
+			// ipv4 => host
+			tb_char_t 			data[16];
+			tb_char_t const* 	host = tb_ipv4_get(ipv4, data, 16);
+			if (host) tb_sstring_cstrcpy(&url->host, host);
+		}
+	}
 }
 tb_char_t const* tb_url_path_get(tb_url_t const* url)
 {
