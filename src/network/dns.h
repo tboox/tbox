@@ -41,10 +41,13 @@ tb_void_t 			tb_dns_list_exit();
 tb_void_t 			tb_dns_list_dump();
 
 // look
+tb_bool_t 			tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4);
+
+tb_bool_t 			tb_dns_look_done(tb_char_t const* name, tb_ipv4_t* ipv4);
+
 tb_handle_t 		tb_dns_look_init(tb_char_t const* name);
-tb_long_t 			tb_dns_look_spak(tb_handle_t handle, tb_char_t* data, tb_size_t maxn);
+tb_long_t 			tb_dns_look_spak(tb_handle_t handle, tb_ipv4_t* ipv4);
 tb_long_t 			tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout);
 tb_void_t 			tb_dns_look_exit(tb_handle_t handle);
-tb_char_t const* 	tb_dns_look_done(tb_char_t const* name, tb_char_t* data, tb_size_t maxn);
 
 #endif

@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../../aio/aio.h"
 #include "../../string/string.h"
+#include "../../network/network.h"
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -46,6 +47,9 @@ typedef struct __tb_sstream_t
 
 	// the sock handle
 	tb_handle_t 		sock;
+
+	// the dns handle
+	tb_handle_t 		hdns;
 
 	// the sock type
 	tb_size_t 			type;
@@ -70,16 +74,77 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
 	tb_assert_and_check_return_val(sst->sock, -1);
 
-	// host
-	tb_char_t const* host = tb_url_host_get(&gst->url);
-	tb_assert_and_check_return_val(host, -1);
-
 	// port
-	tb_size_t port = tb_url_port_get(&gst->url);
+	tb_size_t 			port = tb_url_port_get(&gst->url);
 	tb_assert_and_check_return_val(port, -1);
 
+	// host
+	tb_char_t const* 	host = tb_url_host_get(&gst->url);
+	tb_assert_and_check_return_val(host, -1);
+
+	// ipv4
+	tb_char_t 			data[16];
+	tb_ipv4_t const* 	ipv4 = tb_url_ipv4_get(&gst->url);
+	if (!ipv4 || !ipv4->u32)
+	{
+		// lookup ipv4
+		tb_ipv4_t addr;
+		if (sst->hdns)
+		{
+			// spank
+			tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
+			tb_assert_and_check_goto(r >= 0, fail);
+
+			// continue?
+			tb_check_return_val(r, 0);
+		}
+		else
+		{
+			// try get ipv4
+			if (!tb_dns_look_try4(host, &addr))
+			{
+				// init dns
+				sst->hdns = tb_dns_look_init(host);
+				tb_assert_and_check_return_val(sst->hdns, -1);
+				
+				// spank
+				tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
+				tb_assert_and_check_goto(r >= 0, fail);
+
+				// continue?
+				tb_check_return_val(r, 0);
+			}
+		}
+
+		// exit dns if ok
+		if (sst->hdns) 
+		{
+			tb_dns_look_exit(sst->hdns);
+			sst->hdns = TB_NULL;
+		}
+
+		// ipv4 => host
+		host = tb_ipv4_get(&addr, data, 16);
+		tb_assert_and_check_goto(host, fail);
+
+		// set ipv4
+		tb_url_ipv4_set(&gst->url, &addr);
+	}
+
 	// connect
+	tb_trace("[sock]: connect %s:%u", host, port);
 	return tb_socket_connect(sst->sock, host, port);
+
+fail:
+
+	// exit dns
+	if (sst && sst->hdns)
+	{
+		tb_dns_look_exit(sst->hdns);
+		sst->hdns = TB_NULL;
+	}
+
+	return -1;
 }
 static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 {
@@ -125,10 +190,18 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
 
-	tb_aioo_t o;
-	tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, TB_NULL);
-
-	return tb_aioo_wait(&o, timeout);
+	if (!sst->hdns)
+	{
+		// wait the gst
+		tb_aioo_t o;
+		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, TB_NULL);
+		return tb_aioo_wait(&o, timeout);
+	}
+	else
+	{
+		// wait the dns
+		return tb_dns_look_wait(sst->hdns, timeout);
+	}
 }
 static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 {

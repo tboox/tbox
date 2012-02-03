@@ -88,7 +88,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	struct sockaddr_in d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-#if 0
+#if 1
 	if (!inet_aton(ip, &(d.sin_addr))) return -1;
 #else
 	if (!inet_aton(ip, &(d.sin_addr))) 
