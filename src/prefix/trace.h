@@ -51,7 +51,7 @@
 #	define tb_print
 #endif
 
-// trace
+// trace_tag, the private macro
 #if defined(TB_TRACE_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 #		define tb_trace_tag(tag, fmt, ...)					tb_print_tag(tag, fmt, __VA_ARGS__)
@@ -72,6 +72,7 @@
 # 	define tb_trace_warning_tag
 #endif
 
+// trace, the debug print
 #ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
 # 		define tb_trace(fmt, ...)							tb_trace_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
@@ -88,16 +89,71 @@
 # 	define tb_trace_warning
 #endif
 
+/* trace_impl
+ *
+ * only for the .c file, debug the module implemention
+ * disable it if the module implemention is ok
+ *
+ * .e.g.1
+ *
+ * at file xxxx.c:
+ *
+ * // macros
+ * #define TB_TRACE_IMPL_TAG "module"
+ *
+ * // includes
+ * #include "tbox.h"
+ *
+ * // codes
+ * tb_trace_impl("hello world");
+ *
+ * // output
+ * "[tag]: [module]: hello world"
+ *
+ *
+ * .e.g.2
+ *
+ * at file xxxx.c:
+ *
+ * // macros
+ * // #define TB_TRACE_IMPL_TAG "module"
+ *
+ * // includes
+ * #include "tbox.h"
+ *
+ * // codes
+ * tb_trace_impl("hello world");
+ *
+ * // no output
+ *
+ */
+#if defined(TB_TRACE_IMPL_TAG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
+# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+# 		define tb_trace_impl(fmt, ...)						tb_trace("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
+# 		define tb_trace_line_impl(fmt, ...) 				tb_trace_line("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
+# 		define tb_trace_warning_impl(fmt, ...) 				tb_trace_warning("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
+# 	else
+# 		define tb_trace_impl(fmt, arg ...)					tb_trace("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_trace_line_impl(fmt, arg ...) 			tb_trace_line("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_trace_warning_impl(fmt, arg ...) 			tb_trace_warning("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 	endif
+#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
+#	define tb_trace_impl(...)
+# 	define tb_trace_line_impl(...)
+# 	define tb_trace_warning_impl(...)
+#else
+# 	define tb_trace_impl
+# 	define tb_trace_line_impl
+# 	define tb_trace_warning_impl
+#endif
+
 // noimpl
-#define tb_trace_noimpl_tag(tag) 							tb_trace_line_tag(tag, "[no_impl]:")
 #define tb_trace_noimpl() 									tb_trace_line("[no_impl]:")
 
 // warning
-#define tb_warning_tag 										tb_trace_warning_tag
 #define tb_warning 											tb_trace_warning
 
 // nosafe
-#define tb_trace_nosafe_tag(tag) 							tb_trace_warning_tag(tag, "no_safe")
 #define tb_trace_nosafe() 									tb_trace_warning("no_safe")
 
 #endif

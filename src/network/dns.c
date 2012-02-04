@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 			"dns"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "dns.h"
@@ -53,6 +58,13 @@
 // the name maximum size 
 #define TB_DNS_NAME_MAXN 			(256)
 
+// the cache maximum size
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_DNS_CACHE_MAXN 		(64)
+#else
+# 	define TB_DNS_CACHE_MAXN 		(256)
+#endif
+
 // the rpkt maximum size 
 #define TB_DNS_RPKT_MAXN 			(TB_DNS_HEADER_SIZE + TB_DNS_NAME_MAXN + 256)
 
@@ -77,11 +89,11 @@ typedef struct __tb_dns_host_t
 // the dns addr type
 typedef struct __tb_dns_addr_t
 {
-	// the addr
-	tb_ipv4_t 		addr;
+	// the ipv4
+	tb_ipv4_t 		ipv4;
 
-	// the date
-	tb_size_t 		date;
+	// the time
+	tb_size_t 		time;
 
 }tb_dns_addr_t;
 
@@ -368,7 +380,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	{
 		// writ data
 		tb_long_t r = tb_socket_usend(handle, host, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
-		//tb_trace("[dns]: writ %d", r);
+		//tb_trace_impl("writ %d", r);
 		tb_assert_and_check_goto(r >= 0, end);
 		
 		// no data?
@@ -394,7 +406,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	{
 		// read data
 		tb_long_t r = tb_socket_urecv(handle, host, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
-		//tb_trace("[dns]: read %d", r);
+		//tb_trace_impl("read %d", r);
 		tb_check_break(r >= 0);
 		
 		// no data?
@@ -565,7 +577,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 	look->step &= ~TB_DNS_STEP_NEVT;
 
 	// send request
-	tb_trace("[dns]: request: try %s", host);
+	tb_trace_impl("request: try %s", host);
 	while (look->size < size)
 	{
 		// writ data
@@ -595,7 +607,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 	tb_sbuffer_clear(&look->rpkt);
 
 	// ok
-	tb_trace("[dns]: request: ok");
+	tb_trace_impl("request: ok");
 	return 1;
 }
 static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
@@ -617,13 +629,13 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	header.answer 		= tb_bstream_get_u16_be(&bst);
 	header.authority 	= tb_bstream_get_u16_be(&bst);
 	header.resource 	= tb_bstream_get_u16_be(&bst);
-	tb_trace("[dns]: response: size: %u", 		size);
-	tb_trace("[dns]: response: id: 0x%04x", 	header.id);
-	tb_trace("[dns]: response: question: %d", 	header.question);
-	tb_trace("[dns]: response: answer: %d", 	header.answer);
-	tb_trace("[dns]: response: authority: %d", 	header.authority);
-	tb_trace("[dns]: response: resource: %d", 	header.resource);
-	tb_trace("[dns]: ");
+	tb_trace_impl("response: size: %u", 		size);
+	tb_trace_impl("response: id: 0x%04x", 		header.id);
+	tb_trace_impl("response: question: %d", 	header.question);
+	tb_trace_impl("response: answer: %d", 		header.answer);
+	tb_trace_impl("response: authority: %d", 	header.authority);
+	tb_trace_impl("response: resource: %d", 	header.resource);
+	tb_trace_impl("");
 
 	// check header
 	tb_assert_and_check_return_val(header.id == TB_DNS_HEADER_MAGIC, TB_FALSE);
@@ -639,7 +651,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	//name = tb_dns_decode_name(name);
 	tb_assert_and_check_return_val(name, TB_FALSE);
 	tb_bstream_skip(&bst, 4);
-	tb_trace("[dns]: response: name: %s", name);
+	tb_trace_impl("response: name: %s", name);
 #endif
 
 	// parse answers
@@ -649,21 +661,21 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	{
 		// parse answer
 		tb_dns_answer_t answer;
-		tb_trace("[dns]: response: answer: %d", i);
+		tb_trace_impl("response: answer: %d", i);
 
 		// parse dns name
 		tb_char_t const* name = tb_dns_parse_name(&bst, answer.name);
-		tb_trace("[dns]: response: name: %s", name? name : "");
+		tb_trace_impl("response: name: %s", name? name : "");
 
 		// parse resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);
 		answer.res.class 	= tb_bstream_get_u16_be(&bst);
 		answer.res.ttl 		= tb_bstream_get_u32_be(&bst);
 		answer.res.size 	= tb_bstream_get_u16_be(&bst);
-		tb_trace("[dns]: response: type: %d", 	answer.res.type);
-		tb_trace("[dns]: response: class: %d", 	answer.res.class);
-		tb_trace("[dns]: response: ttl: %d", 	answer.res.ttl);
-		tb_trace("[dns]: response: size: %d", 	answer.res.size);
+		tb_trace_impl("response: type: %d", 	answer.res.type);
+		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_impl("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -672,7 +684,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace("[dns]: response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 
 			// save the first ip
 			if (!found) 
@@ -688,7 +700,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 
 				// found it
 				found = 1;
-				tb_trace("[dns]: response: ");
+				tb_trace_impl("response: ");
 				break;
 			}
 		}
@@ -696,9 +708,9 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 		{
 			// parse rdata
 			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			tb_trace("[dns]: response: alias: %s", answer.rdata? answer.rdata : "");
+			tb_trace_impl("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace("[dns]: response: ");
+		tb_trace_impl("response: ");
 	}
 
 	// found it?
@@ -710,21 +722,21 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	{
 		// parse answer
 		tb_dns_answer_t answer;
-		tb_trace("[dns]: response: authority: %d", i);
+		tb_trace_impl("response: authority: %d", i);
 
 		// parse dns name
 		tb_char_t* name = tb_dns_parse_name(&bst, answer.name);
-		tb_trace("[dns]: response: name: %s", name? name : "");
+		tb_trace_impl("response: name: %s", name? name : "");
 
 		// parse resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
 		answer.res.class = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
-		tb_trace("[dns]: response: type: %d", 	answer.res.type);
-		tb_trace("[dns]: response: class: %d", 	answer.res.class);
-		tb_trace("[dns]: response: ttl: %d", 	answer.res.ttl);
-		tb_trace("[dns]: response: size: %d", 	answer.res.size);
+		tb_trace_impl("response: type: %d", 	answer.res.type);
+		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_impl("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -733,36 +745,36 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace("[dns]: response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else
 		{
 			// parse data
 			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			tb_trace("[dns]: response: server: %s", answer.rdata? answer.rdata : "");
+			tb_trace_impl("response: server: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace("[dns]: response: ");
+		tb_trace_impl("response: ");
 	}
 
 	for (i = 0; i < header.resource; i++)
 	{
 		// parse answer
 		tb_dns_answer_t answer;
-		tb_trace("[dns]: response: resource: %d", i);
+		tb_trace_impl("response: resource: %d", i);
 
 		// parse dns name
 		tb_char_t* name = tb_dns_parse_name(&bst, answer.name);
-		tb_trace("[dns]: response: name: %s", name? name : "");
+		tb_trace_impl("response: name: %s", name? name : "");
 
 		// parse resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
 		answer.res.class = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
-		tb_trace("[dns]: response: type: %d", 	answer.res.type);
-		tb_trace("[dns]: response: class: %d", 	answer.res.class);
-		tb_trace("[dns]: response: ttl: %d", 	answer.res.ttl);
-		tb_trace("[dns]: response: size: %d", 	answer.res.size);
+		tb_trace_impl("response: type: %d", 	answer.res.type);
+		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_impl("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -771,15 +783,15 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace("[dns]: response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else
 		{
 			// parse data
 			answer.rdata = tb_dns_parse_name(&bst, answer.name);
-			tb_trace("[dns]: response: alias: %s", answer.rdata? answer.rdata : "");
+			tb_trace_impl("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace("[dns]: response: ");
+		tb_trace_impl("response: ");
 	}
 #endif
 
@@ -827,7 +839,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	{
 		// read data
 		tb_long_t read = tb_socket_urecv(look->sock, host, TB_DNS_HOST_PORT, rpkt, 4096);
-		//tb_trace("[dns]: read %d", read);
+		//tb_trace_impl("read %d", read);
 		tb_assert_and_check_return_val(read >= 0, -1);
 
 		// no data? 
@@ -847,6 +859,12 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	// done
 	if (!tb_dns_look_resp_done(look, ipv4)) return -1;
 
+	// check
+	tb_assert_and_check_return_val(tb_sstring_size(&look->name) && ipv4->u32, -1);
+
+	// add ipv4 to cache
+	tb_dns_look_add4(tb_sstring_cstr(&look->name), ipv4);
+
 	// finish it
 	look->step |= TB_DNS_STEP_RESP;
 
@@ -855,8 +873,40 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	tb_sbuffer_clear(&look->rpkt);
 
 	// ok
-	tb_trace("[dns]: response: ok");
+	tb_trace_impl("response: ok");
 	return 1;
+}
+static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata)
+{
+	tb_assert_and_check_return_val(cache && berase && udata, TB_FALSE);
+
+	// the expired time
+	tb_size_t expired = (tb_size_t)udata;
+	if (item)
+	{
+		// address
+		tb_dns_addr_t const* addr = item->data;
+		tb_assert_and_check_return_val(addr, TB_FALSE);
+
+		// is expired?
+		if (addr->time < expired)
+		{
+			// remove it
+			*berase = TB_TRUE;
+
+			// trace
+			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u"
+				, (tb_char_t const*)item->name
+				, addr->ipv4.u8[0]
+				, addr->ipv4.u8[1]
+				, addr->ipv4.u8[2]
+				, addr->ipv4.u8[3]
+				, addr->time);
+		}
+	}
+
+	// ok
+	return TB_TRUE;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * list
@@ -883,7 +933,7 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->spool, fail);
 	
 		// init cache
-		g_dns_list->cache = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(TB_FALSE, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), TB_NULL, TB_NULL));
+		g_dns_list->cache = tb_hash_init(tb_align8(tb_int32_sqrt(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(TB_FALSE, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), TB_NULL, TB_NULL));
 		tb_assert_and_check_goto(g_dns_list->cache, fail);
 	}
 
@@ -920,23 +970,25 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 			tb_mutex_enter(g_dns_list->mutx);
 
 			// has list?
-			if (g_dns_list && g_dns_list->list)
+			if (g_dns_list)
 			{
 				// list
 				tb_slist_t* list = g_dns_list->list;
-
-				// find item
-				tb_size_t prev = 0;
-				tb_size_t itor = tb_slist_itor_head(list);
-				tb_size_t tail = tb_slist_itor_tail(list);
-				for (; itor != tail; prev = itor, itor = tb_slist_itor_next(list, itor))
+				if (list)
 				{
-					tb_dns_host_t const* it = tb_slist_itor_const_at(list, itor);
-					if (it && item.rate < it->rate) break;
-				}
+					// find item
+					tb_size_t prev = 0;
+					tb_size_t itor = tb_slist_itor_head(list);
+					tb_size_t tail = tb_slist_itor_tail(list);
+					for (; itor != tail; prev = itor, itor = tb_slist_itor_next(list, itor))
+					{
+						tb_dns_host_t const* it = tb_slist_itor_const_at(list, itor);
+						if (it && item.rate < it->rate) break;
+					}
 
-				// insert item by sort
-				tb_slist_insert_next(g_dns_list->list, prev, &item);
+					// insert item by sort
+					tb_slist_insert_next(g_dns_list->list, prev, &item);
+				}
 
 				// leave
 				if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
@@ -953,33 +1005,41 @@ fail:
 }
 tb_void_t tb_dns_list_dels(tb_char_t const* host)
 {
-	tb_assert_and_check_return(g_dns_list && host);
+	tb_assert_and_check_return(host);
 
-	// enter
-	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
-
-	// list
-	tb_slist_t* list = g_dns_list->list;
-	tb_assert_and_check_goto(list, end);
-
-	// ipv4
-	tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
-
-	// find it
-	tb_size_t itor = tb_slist_itor_head(list);
-	tb_size_t tail = tb_slist_itor_tail(list);
-	for (; itor != tail; itor = tb_slist_itor_next(list, itor))
+	// has list?
+	if (g_dns_list && g_dns_list->mutx) 
 	{
-		tb_dns_host_t const* item = tb_slist_itor_const_at(list, itor);
-		if (item && item->host.u32 == ipv4) break;
+		// enter
+		tb_mutex_enter(g_dns_list->mutx);
+
+		// has list?
+		if (g_dns_list)
+		{
+			// list
+			tb_slist_t* list = g_dns_list->list;
+			if (list)
+			{
+				// ipv4
+				tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
+
+				// find it
+				tb_size_t itor = tb_slist_itor_head(list);
+				tb_size_t tail = tb_slist_itor_tail(list);
+				for (; itor != tail; itor = tb_slist_itor_next(list, itor))
+				{
+					tb_dns_host_t const* item = tb_slist_itor_const_at(list, itor);
+					if (item && item->host.u32 == ipv4) break;
+				}
+
+				// remove it
+				if (itor != tail) tb_slist_remove(list, itor);
+			}
+
+			// leave
+			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+		}
 	}
-
-	// remove it
-	if (itor != tail) tb_slist_remove(list, itor);
-
-end:
-	// leave
-	if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
 }
 tb_void_t tb_dns_list_exit()
 {
@@ -1071,11 +1131,165 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
 	tb_assert_and_check_return_val(name && ipv4, TB_FALSE);
 
+	// trace
+	tb_trace_impl("try4: %s", name);
+
 	// is ipv4?
 	tb_check_return_val(!tb_ipv4_set(ipv4, name), TB_TRUE);
 
-	// fail
-	return TB_FALSE;
+	// clear ipv4
+	tb_ipv4_clr(ipv4);
+
+	// has list?
+	if (g_dns_list && g_dns_list->mutx) 
+	{
+		// enter
+		tb_mutex_enter(g_dns_list->mutx);
+
+		// has list?
+		if (g_dns_list)
+		{
+			// cache
+			tb_hash_t* cache = g_dns_list->cache;
+			if (cache)
+			{
+				// exists?
+				tb_dns_addr_t* addr = tb_hash_get(cache, name);
+				if (addr)
+				{
+					// trace
+					tb_trace_impl("cache: get %s => %u.%u.%u.%u, time: %u => %u"
+						, name
+						, addr->ipv4.u8[0]
+						, addr->ipv4.u8[1]
+						, addr->ipv4.u8[2]
+						, addr->ipv4.u8[3]
+						, addr->time
+						, (tb_size_t)(tb_mclock() / 1000));
+
+					// update time
+					addr->time = (tb_size_t)(tb_mclock() / 1000);
+
+					// ok
+					*ipv4 = addr->ipv4;
+				}
+			}
+
+			// leave
+			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+		}
+	}
+
+	// trace
+	tb_trace_impl("try4: %s", ipv4->u32? "ok" : "failed");
+
+	// ok?
+	return ipv4->u32? TB_TRUE : TB_FALSE;
+}
+tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
+{
+	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
+
+	// trace
+	tb_trace_impl("add4: %s => %u.%u.%u.%u", name, ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+
+	// init
+	tb_dns_addr_t addr;
+	addr.ipv4 = *ipv4;
+	addr.time = (tb_size_t)(tb_mclock() / 1000);
+
+	// has list?
+	if (g_dns_list && g_dns_list->mutx) 
+	{
+		// enter
+		tb_mutex_enter(g_dns_list->mutx);
+
+		// has list?
+		if (g_dns_list)
+		{
+			// cache
+			tb_hash_t* cache = g_dns_list->cache;
+			if (cache)
+			{
+				// remove the expired items if full
+				if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
+				{
+					// the min & max time
+					tb_size_t tmin = 0;
+					tb_size_t tmax = 0;
+					tb_size_t itor = tb_hash_itor_head(cache);
+					tb_size_t tail = tb_hash_itor_tail(cache);
+					for (; itor != tail; itor = tb_hash_itor_next(cache, itor))
+					{
+						tb_hash_item_t const* item = tb_hash_itor_const_at(cache, itor);
+						if (item && item->data)
+						{
+							tb_size_t time = ((tb_dns_addr_t const*)item->data)->time;
+							if (!tmin || time < tmin) tmin = time;
+							if (!tmax || time > tmax) tmax = time;
+						}
+					}
+
+					// the expired time
+					tb_size_t expired = ((tmin + tmax) >> 1);
+					tb_assert(expired);
+					tb_trace_impl("cache: expired [%u, %u] => %u", tmin, tmax, expired);
+
+					// remove the expired times
+					tb_hash_foreach(cache, tb_dns_look_clr4, (tb_pointer_t)expired);
+				}
+
+				// check
+				tb_assert(tb_hash_size(cache) < TB_DNS_CACHE_MAXN);
+
+				// add it
+				if (tb_hash_size(cache) < TB_DNS_CACHE_MAXN) 
+				{
+					// set
+					tb_hash_set(cache, name, &addr);
+
+					// trace
+					tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u"
+						, name
+						, addr.ipv4.u8[0]
+						, addr.ipv4.u8[1]
+						, addr.ipv4.u8[2]
+						, addr.ipv4.u8[3]
+						, addr.time);
+				}
+			}
+
+			// leave
+			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+		}
+	}
+}
+tb_void_t tb_dns_look_del4(tb_char_t const* name)
+{
+	tb_assert_and_check_return(name);
+	
+	// has list?
+	if (g_dns_list && g_dns_list->mutx) 
+	{
+		// enter
+		tb_mutex_enter(g_dns_list->mutx);
+
+		// has list?
+		if (g_dns_list)
+		{
+			// remove it
+			if (g_dns_list->cache) 
+			{
+				tb_hash_del(g_dns_list->cache, name);
+
+				// trace
+				tb_trace_impl("cache: del %s", name);
+			}
+
+			// leave
+			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+		}
+	}
 }
 tb_handle_t tb_dns_look_init(tb_char_t const* name)
 {

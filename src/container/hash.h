@@ -160,5 +160,28 @@ tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
+/* foreach
+ *
+ * tb_bool_t tb_hash_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata)
+ * {
+ *  	tb_assert_and_check_return_val(hash && berase, TB_FALSE);
+ *
+ * 		// is tail?
+ * 		if (!item) ;
+ *
+ * 		// erase it
+ * 		// *berase = TB_TRUE;
+ *
+ * 		// ok
+ *  	return TB_TRUE;
+ *
+ *  fail:
+ *  	// break
+ *   	return TB_FALSE;
+ * }
+ *
+ */
+tb_void_t 				tb_hash_foreach(tb_hash_t* hash, tb_bool_t (*item)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata), tb_pointer_t udata);
+
 #endif
 
