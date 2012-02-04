@@ -75,7 +75,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
-	tb_bool_t 		wait = TB_FALSE;
 	tb_uint64_t 	size = status->content_size;
 	do
 	{
@@ -86,15 +85,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		{
 			// update read
 			read += n;
-
-			// no waiting
-			wait = TB_FALSE;
 		}
 		else if (!n) 
 		{
-			// abort?
-			tb_check_break(!wait);
-
 			// wait
 			tb_print("[demo]: wait");
 			tb_long_t e = tb_http_wait(http, TB_AIOO_ETYPE_READ, option->timeout);
@@ -105,9 +98,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 			// has read?
 			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
 		else break;
 
