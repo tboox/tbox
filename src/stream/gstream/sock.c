@@ -57,6 +57,13 @@ typedef struct __tb_sstream_t
 	// the wait event
 	tb_long_t 			wait;
 
+	// the ipv4 string
+	tb_char_t 			ipv4[16];
+
+	// the read & writ
+	tb_size_t 			read;
+	tb_size_t 			writ;
+
 }tb_sstream_t;
 
 
@@ -78,40 +85,21 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(sst->sock, -1);
 
 	// port
-	tb_size_t 			port = tb_url_port_get(&gst->url);
+	tb_size_t port = tb_url_port_get(&gst->url);
 	tb_assert_and_check_return_val(port, -1);
 
 	// ipv4
-	tb_char_t 			data[16];
-	tb_char_t const* 	host = TB_NULL;
-	tb_ipv4_t const* 	ipv4 = tb_url_ipv4_get(&gst->url);
-	tb_assert_and_check_return_val(ipv4, -1);
-	if (!ipv4->u32)
+	tb_char_t const* host = TB_NULL;
+	if (!sst->ipv4[0])
 	{
-		// lookup ipv4
-		tb_ipv4_t addr;
-		if (sst->hdns)
+		tb_ipv4_t const* ipv4 = tb_url_ipv4_get(&gst->url);
+		tb_assert_and_check_return_val(ipv4, -1);
+		if (!ipv4->u32)
 		{
-			// spank
-			tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
-			tb_assert_and_check_goto(r >= 0, fail);
-
-			// continue?
-			tb_check_return_val(r, 0);
-		}
-		else
-		{
-			// host
-			host = tb_url_host_get(&gst->url);
-			tb_assert_and_check_return_val(host, -1);
-
-			// try get ipv4
-			if (!tb_dns_look_try4(host, &addr))
+			// lookup ipv4
+			tb_ipv4_t addr;
+			if (sst->hdns)
 			{
-				// init dns
-				sst->hdns = tb_dns_look_init(host);
-				tb_assert_and_check_return_val(sst->hdns, -1);
-				
 				// spank
 				tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
 				tb_assert_and_check_goto(r >= 0, fail);
@@ -119,39 +107,84 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 				// continue?
 				tb_check_return_val(r, 0);
 			}
-		}
+			else
+			{
+				// host
+				host = tb_url_host_get(&gst->url);
+				tb_assert_and_check_return_val(host, -1);
 
-		// exit dns if ok
-		if (sst->hdns) 
+				// try get ipv4
+				if (!tb_dns_look_try4(host, &addr))
+				{
+					// init dns
+					sst->hdns = tb_dns_look_init(host);
+					tb_assert_and_check_return_val(sst->hdns, -1);
+					
+					// spank
+					tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
+					tb_assert_and_check_goto(r >= 0, fail);
+
+					// continue?
+					tb_check_return_val(r, 0);
+				}
+			}
+
+			// exit dns if ok
+			if (sst->hdns) 
+			{
+				tb_dns_look_exit(sst->hdns);
+				sst->hdns = TB_NULL;
+			}
+
+			// ipv4 => host
+			host = tb_ipv4_get(&addr, sst->ipv4, 16);
+			tb_assert_and_check_goto(host, fail);
+
+			// set ipv4
+			tb_url_ipv4_set(&gst->url, &addr);
+		}
+		else 
 		{
-			tb_dns_look_exit(sst->hdns);
-			sst->hdns = TB_NULL;
+			// ipv4 => host
+			host = tb_ipv4_get(ipv4, sst->ipv4, 16);
+			tb_assert_and_check_goto(host, fail);
 		}
 
-		// ipv4 => host
-		host = tb_ipv4_get(&addr, data, 16);
-		tb_assert_and_check_goto(host, fail);
-
-		// set ipv4
-		tb_url_ipv4_set(&gst->url, &addr);
+		// tcp or udp? for url: sock://ip:port/?udp=
+		tb_char_t const* args = tb_url_args_get(&gst->url);
+		if (args && !tb_strnicmp(args, "udp=", 4)) sst->type = TB_SOCKET_TYPE_UDP;
+		else if (args && !tb_strnicmp(args, "tcp=", 4)) sst->type = TB_SOCKET_TYPE_TCP;
 	}
-	else 
+	else host = sst->ipv4;
+
+	// tcp
+	tb_long_t r = -1;
+	switch (sst->type)
 	{
-		// ipv4 => host
-		host = tb_ipv4_get(ipv4, data, 16);
-		tb_assert_and_check_goto(host, fail);
-	}
+	case TB_SOCKET_TYPE_TCP:
+		{
+			// connect
+			tb_trace("[sock]: connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
+			r = tb_socket_connect(sst->sock, host, port);
+			tb_check_return_val(r > 0, r);
 
-	// connect
-	tb_trace("[sock]: connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
-	tb_long_t r = tb_socket_connect(sst->sock, host, port);
-	tb_check_return_val(r > 0, r);
+			// ok
+			tb_trace("[sock]: connect: ok");
+		}
+		break;
+	case TB_SOCKET_TYPE_UDP:
+		r = 1;
+		break;
+	default:
+		break;
+	}
 
 	// clear
 	sst->wait = 0;
+	sst->read = 0;
+	sst->writ = 0;
 
-	// ok
-	tb_trace("[sock]: connect: ok");
+	// ok?
 	return r;
 
 fail:
@@ -170,15 +203,18 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
 
+	// close socket
 	if (sst->sock)
 	{
-		// close socket
 		if (!tb_socket_close(sst->sock)) return 0;
 		sst->sock = TB_NULL;
 	}
 
 	// clear 
 	sst->wait = 0;
+	sst->read = 0;
+	sst->writ = 0;
+	sst->ipv4[0] = '\0';
 
 	// ok
 	return 1;
@@ -189,15 +225,49 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_assert_and_check_return_val(sst && sst->sock && data, -1);
 	tb_check_return_val(size, 0);
 
-	// read data
-	tb_long_t r = tb_socket_recv(sst->sock, data, size);
-	tb_check_return_val(r >= 0, -1);
+	// clear writ
+	sst->writ = 0;
 
-	// abort?
-	if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
+	// read
+	tb_long_t r = -1;
+	switch (sst->type)
+	{
+	case TB_SOCKET_TYPE_TCP:
+		{
+			// read data
+			r = tb_socket_recv(sst->sock, data, size);
+			tb_check_return_val(r >= 0, -1);
 
-	// clear wait
-	if (r > 0) sst->wait = 0;
+			// abort?
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
+
+			// clear wait
+			if (r > 0) sst->wait = 0;
+		}
+		break;
+	case TB_SOCKET_TYPE_UDP:
+		{
+			// port
+			tb_size_t port = tb_url_port_get(&gst->url);
+			tb_assert_and_check_return_val(port, -1);
+
+			// ipv4
+			tb_assert_and_check_return_val(sst->ipv4[0], -1);
+
+			// read data
+			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
+			tb_check_return_val(r >= 0, -1);
+
+			// abort?
+			if (!r && sst->read) return -1;
+		}
+		break;
+	default:
+		break;
+	}
+
+	// update read
+	sst->read += r;
 
 	// ok?
 	return r;
@@ -208,15 +278,49 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_assert_and_check_return_val(sst && sst->sock && data, -1);
 	tb_check_return_val(size, 0);
 
-	// writ data
-	tb_long_t r = tb_socket_send(sst->sock, data, size);
-	tb_check_return_val(r >= 0, -1);
+	// clear read
+	sst->read = 0;
 
-	// abort?
-	if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+	// writ 
+	tb_long_t r = -1;
+	switch (sst->type)
+	{
+	case TB_SOCKET_TYPE_TCP:
+		{
+			// writ data
+			r = tb_socket_send(sst->sock, data, size);
+			tb_check_return_val(r >= 0, -1);
 
-	// clear wait
-	if (r > 0) sst->wait = 0;
+			// abort?
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+
+			// clear wait
+			if (r > 0) sst->wait = 0;
+		}
+		break;
+	case TB_SOCKET_TYPE_UDP:
+		{
+			// port
+			tb_size_t port = tb_url_port_get(&gst->url);
+			tb_assert_and_check_return_val(port, -1);
+
+			// ipv4
+			tb_assert_and_check_return_val(sst->ipv4[0], -1);
+
+			// writ data
+			r = tb_socket_usend(sst->sock, sst->ipv4, port, data, size);
+			tb_check_return_val(r >= 0, -1);
+
+			// abort?
+			if (!r && sst->writ) return -1;
+		}
+		break;
+	default:
+		break;
+	}
+
+	// update writ
+	sst->writ += r;
 
 	// ok?
 	return r;
@@ -256,6 +360,7 @@ static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	{
 	case TB_SSTREAM_CMD_SET_TYPE:
 		{
+			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
 			sst->type = (tb_size_t)arg1;
 			return TB_TRUE;
 		}

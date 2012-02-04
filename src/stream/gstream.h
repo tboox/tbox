@@ -91,9 +91,9 @@ typedef enum __tb_gstream_seek_t
 typedef enum __tb_gstream_type_t
 {
  	TB_GSTREAM_TYPE_NULL 			= 0
-, 	TB_GSTREAM_TYPE_FILE 			= 1 //!< TB_URL_PROTO_FILE
-, 	TB_GSTREAM_TYPE_SOCK 			= 2 //!< TB_URL_PROTO_SOCK
-, 	TB_GSTREAM_TYPE_HTTP 			= 3 //!< TB_URL_PROTO_HTTP
+, 	TB_GSTREAM_TYPE_FILE 			= 1
+, 	TB_GSTREAM_TYPE_SOCK 			= 2
+, 	TB_GSTREAM_TYPE_HTTP 			= 3
 , 	TB_GSTREAM_TYPE_DATA 			= 4
 , 	TB_GSTREAM_TYPE_TRAN 			= 5
 
@@ -246,7 +246,9 @@ tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
 /* init stream from url
  *
  * file://path or unix path: e.g. /root/xxxx/file
- * sock://host:port?tcp=&ssl=
+ * files://home/file
+ * sock://host:port?tcp=
+ * socks://host:port?udp=
  * http://host:port/path?arg0=&arg1=...
  * https://host:port/path?arg0=&arg1=...
  */

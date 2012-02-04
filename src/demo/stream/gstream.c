@@ -62,9 +62,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 //		tb_trace("read: %d, offset: %llu, left: %llu, size: %llu", n, tb_gstream_offset(ist), tb_gstream_left(ist), tb_gstream_size(ist));
 		if (n > 0)
 		{
-			// no waiting
-			wait = TB_FALSE;
-
 			// writ data
 			if (!tb_gstream_bwrit(ost, data, n)) break;
 
@@ -73,9 +70,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		}
 		else if (!n) 
 		{
-			// no end?
-			tb_check_break(!wait);
-
 			// wait
 			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, tb_gstream_timeout(ist));
 			tb_assert_and_check_break(e >= 0);
@@ -85,9 +79,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 			// has read?
 			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
-
-			// be waiting
-			wait = TB_TRUE;
 		}
 		else break;
 
