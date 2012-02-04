@@ -462,6 +462,10 @@ tb_size_t tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor)
 	}
 	return 0;
 }
+tb_void_t tb_hash_foreach(tb_hash_t* hash, tb_bool_t (*item)(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata), tb_pointer_t udata)
+{
+	tb_trace_noimpl();
+}
 #ifdef TB_DEBUG
 tb_void_t tb_hash_dump(tb_hash_t const* hash)
 {

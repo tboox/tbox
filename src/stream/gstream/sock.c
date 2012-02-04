@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 			"sock"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
@@ -164,12 +169,12 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// connect
-			tb_trace("[sock]: connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
+			tb_trace_impl("connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
 			r = tb_socket_connect(sst->sock, host, port);
 			tb_check_return_val(r > 0, r);
 
 			// ok
-			tb_trace("[sock]: connect: ok");
+			tb_trace_impl("connect: ok");
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:

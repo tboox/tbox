@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 			"http"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "http.h"
@@ -273,14 +278,14 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	http->tryn++;
 
 	// open stream
-	tb_trace("[http]: connect: try");
+	tb_trace_impl("connect: try");
 	tb_long_t r = tb_gstream_aopen(http->stream);
 	tb_check_return_val(r > 0, r);
 
 	// ok
 	http->step |= TB_HTTP_STEP_CONN;
 	http->tryn = 0;
-	tb_trace("[http]: connect: ok");
+	tb_trace_impl("connect: ok");
 	return r;
 }
 static tb_long_t tb_http_request(tb_http_t* http)
@@ -392,7 +397,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		tb_assert_and_check_return_val(tb_pstring_size(&http->data) && tb_pstring_cstr(&http->data), -1);
 
 		// trace
-		tb_trace("[http]: request:\n%s", tb_pstring_cstr(&http->data));
+		tb_trace_impl("request:\n%s", tb_pstring_cstr(&http->data));
 	}
 
 	// data && size
@@ -403,7 +408,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	tb_assert_and_check_return_val(data && size && http->size < size, -1);
 
 	// send request
-	tb_trace("[http]: request: try");
+	tb_trace_impl("request: try");
 	while (http->size < size)
 	{
 		// writ data
@@ -434,7 +439,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	tb_pstring_clear(&http->data);
 
 	// ok
-	tb_trace("[http]: request: ok");
+	tb_trace_impl("request: ok");
 	return 1;
 }
 /*
@@ -601,7 +606,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 				tb_pstring_strip(&http->data, pn - 1);
 
 			// trace
-			tb_trace("[http]: response: %s", pb);
+			tb_trace_impl("response: %s", pb);
 
 			// do callback
 			if (http->option.hfunc) if (!http->option.hfunc(&http->option, pb)) return -1;
@@ -633,7 +638,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	http->chunked_size = 0;
 
 	// ok
-	tb_trace("[http]: response: ok");
+	tb_trace_impl("response: ok");
 	return 1;
 }
 
@@ -803,7 +808,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, TB_FALSE);
 
 	// dump option
-#ifdef TB_DEBUG
+#if defined(TB_DEBUG) && defined(TB_TRACE_IMPL_TAG)
 	tb_http_option_dump(handle);
 #endif
 
@@ -832,7 +837,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	}
 
 	// dump status
-#ifdef TB_DEBUG
+#if defined(TB_DEBUG) && defined(TB_TRACE_IMPL_TAG)
 	tb_http_status_dump(handle);
 #endif
 

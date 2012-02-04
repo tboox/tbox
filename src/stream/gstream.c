@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 			"gst"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "gstream.h"
@@ -120,7 +125,7 @@ end:
 	// ok
 	if (need > 0) *data = tb_qbuffer_head(&gst->cache);
 
-//	tb_trace("need: %u size: %u", need, size);
+//	tb_trace_impl("need: %u size: %u", need, size);
 	return need;
 }
 static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
@@ -166,7 +171,7 @@ end:
 	// update status
 	gst->bwrited = 0;
 
-//	tb_trace("read: %d", read);
+//	tb_trace_impl("read: %d", read);
 	return read;
 }
 static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
@@ -212,7 +217,7 @@ end:
 	// update status
 	gst->bwrited = 1;
 
-//	tb_trace("writ: %d", writ);
+//	tb_trace_impl("writ: %d", writ);
 	return writ;
 }
 static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gst)

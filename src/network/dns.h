@@ -33,21 +33,25 @@
  * interfaces
  */
 
-// list
+// the host list
 tb_bool_t 			tb_dns_list_init();
 tb_void_t 			tb_dns_list_adds(tb_char_t const* host);
 tb_void_t 			tb_dns_list_dels(tb_char_t const* host);
 tb_void_t 			tb_dns_list_exit();
 tb_void_t 			tb_dns_list_dump();
 
-// look
-tb_bool_t 			tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4);
-
-tb_bool_t 			tb_dns_look_done(tb_char_t const* name, tb_ipv4_t* ipv4);
-
+// look ipv4 for async
 tb_handle_t 		tb_dns_look_init(tb_char_t const* name);
 tb_long_t 			tb_dns_look_spak(tb_handle_t handle, tb_ipv4_t* ipv4);
 tb_long_t 			tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout);
 tb_void_t 			tb_dns_look_exit(tb_handle_t handle);
+
+// look ipv4 for block
+tb_bool_t 			tb_dns_look_done(tb_char_t const* name, tb_ipv4_t* ipv4);
+
+// look ipv4 for cache
+tb_bool_t 			tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4);
+tb_void_t 			tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4);
+tb_void_t 			tb_dns_look_del4(tb_char_t const* name);
 
 #endif
