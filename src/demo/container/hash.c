@@ -487,7 +487,7 @@ static tb_void_t tb_hash_test_itor_perf()
 		__tb_volatile__ tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
 		if (item) 
 		{
-			if (!((tb_size_t)item->name & 7)) 
+			if (!(((tb_size_t)item->data >> 25) & 0x1))
 			{
 				// remove, hack: the itor of the same item is mutable
 				tb_hash_remove(hash, itor);
@@ -518,7 +518,10 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 	tb_uint64_t* test = data;
 	if (item)
 	{
-		if (!((tb_size_t)item->name & 7)) 
+		if (!(((tb_size_t)item->data >> 25) & 0x1))
+//		if (!(((tb_size_t)item->data) & 0x7))
+//		if (1)
+//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
 			*bdel = TB_TRUE;
 		else
 		{
