@@ -54,7 +54,7 @@ typedef struct __tb_rand_linear_t
 	tb_rand_t 		base;
 
 	// the rand seed
-	tb_size_t 		seed;
+	tb_uint32_t 	seed;
 
 	// the rand data
 	tb_uint32_t 	data;
@@ -69,6 +69,8 @@ typedef struct __tb_rand_linear_t
 tb_bool_t 			tb_rand_init();
 tb_void_t 			tb_rand_exit();
 
+tb_void_t 			tb_rand_clear();
+
 tb_uint32_t 		tb_rand_uint32(tb_uint32_t b, tb_uint32_t e);
 tb_sint32_t 		tb_rand_sint32(tb_sint32_t b, tb_sint32_t e);
 
@@ -77,8 +79,10 @@ tb_float_t 			tb_rand_float(tb_float_t b, tb_float_t e);
 #endif
 
 // the linear rand
-tb_rand_linear_t* 	tb_rand_linear_init(tb_size_t seed);
+tb_rand_linear_t* 	tb_rand_linear_init(tb_uint32_t seed);
 tb_void_t 			tb_rand_linear_exit(tb_rand_linear_t* rand);
+
+tb_void_t 			tb_rand_linear_clear(tb_rand_linear_t* rand);
 
 tb_uint32_t 		tb_rand_linear_uint32(tb_rand_linear_t* rand, tb_uint32_t b, tb_uint32_t e);
 tb_sint32_t 		tb_rand_linear_sint32(tb_rand_linear_t* rand, tb_sint32_t b, tb_sint32_t e);
