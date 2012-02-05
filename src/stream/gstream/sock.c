@@ -57,17 +57,20 @@ typedef struct __tb_sstream_t
 	tb_handle_t 		hdns;
 
 	// the sock type
-	tb_size_t 			type;
+	tb_size_t 			type : 24;
+
+	// the try number
+	tb_size_t 			tryn : 8;
 
 	// the wait event
 	tb_long_t 			wait;
 
-	// the ipv4 string
-	tb_char_t 			ipv4[16];
-
 	// the read & writ
 	tb_size_t 			read;
 	tb_size_t 			writ;
+
+	// the ipv4 string
+	tb_char_t 			ipv4[16];
 
 }tb_sstream_t;
 
@@ -186,6 +189,7 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 
 	// clear
 	sst->wait = 0;
+	sst->tryn = 0;
 	sst->read = 0;
 	sst->writ = 0;
 
@@ -217,6 +221,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 
 	// clear 
 	sst->wait = 0;
+	sst->tryn = 0;
 	sst->read = 0;
 	sst->writ = 0;
 	sst->ipv4[0] = '\0';
@@ -263,8 +268,19 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
 			tb_check_return_val(r >= 0, -1);
 
-			// abort?
-			if (!r && sst->read) return -1;
+			// no data?
+			if (!r)
+			{
+				// end? read x, read 0
+				tb_check_return_val(!sst->read, -1);
+
+				// abort? read 0, read 0
+				tb_check_return_val(!sst->tryn, -1);
+
+				// tryn++
+				sst->tryn++;
+			}
+			else sst->tryn = 0;
 		}
 		break;
 	default:
@@ -316,8 +332,16 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			r = tb_socket_usend(sst->sock, sst->ipv4, port, data, size);
 			tb_check_return_val(r >= 0, -1);
 
-			// abort?
-			if (!r && sst->writ) return -1;
+			// no data?
+			if (!r)
+			{
+				// abort? writ x, writ 0, or writ 0, writ 0
+				tb_check_return_val(!sst->writ && !sst->tryn, -1);
+
+				// tryn++
+				sst->tryn++;
+			}
+			else sst->tryn = 0;
 		}
 		break;
 	default:
@@ -352,6 +376,9 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	{
 		// wait the dns
 		sst->wait = tb_dns_look_wait(sst->hdns, timeout);
+
+		// clear tryn
+		if (sst->wait) sst->tryn = 0;
 	}
 
 	return sst->wait;
