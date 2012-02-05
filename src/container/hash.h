@@ -164,7 +164,7 @@ tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
 /* walk
  *
- * be faster than the iterator mode
+ * be faster than the iterator mode, optimizate to remove items for walking
  *
  * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {

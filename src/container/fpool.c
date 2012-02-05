@@ -63,7 +63,7 @@ tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_goto(fpool->data, fail);
 
 	// alloc info
-	fpool->info = tb_calloc(1, fpool->maxn >> 3);
+	fpool->info = tb_calloc(1, (tb_align8(fpool->maxn) >> 3));
 	tb_assert_and_check_goto(fpool->info, fail);
 
 	// init predicted info
@@ -142,9 +142,9 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 		tb_memset(fpool->data + fpool->size * fpool->func.size, 0, fpool->grow * fpool->func.size);
 
 		// realloc info
-		fpool->info = (tb_byte_t*)tb_realloc(fpool->info, fpool->maxn >> 3);
+		fpool->info = (tb_byte_t*)tb_realloc(fpool->info, tb_align8(fpool->maxn) >> 3);
 		tb_assert_and_check_return_val(fpool->info, 0);
-		tb_memset(fpool->info + (fpool->size >> 3), 0, fpool->grow >> 3);
+		tb_memset(fpool->info + (tb_align8(fpool->size) >> 3), 0, tb_align8(fpool->grow) >> 3);
 
 		// get the index of itor
 		itor = 1 + fpool->size;
@@ -246,7 +246,7 @@ tb_void_t tb_fpool_clear(tb_fpool_t* fpool)
 
 	// clear info
 	fpool->size = 0;
-	if (fpool->info) tb_memset(fpool->info, 0, fpool->maxn >> 3);
+	if (fpool->info) tb_memset(fpool->info, 0, tb_align8(fpool->maxn) >> 3);
 	if (fpool->data) tb_memset(fpool->data, 0, fpool->maxn * fpool->func.size);
 
 #ifdef TB_FPOOL_PRED_ENABLE

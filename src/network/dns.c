@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"dns"
+//#define TB_TRACE_IMPL_TAG 		"dns"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -48,6 +48,9 @@
 // the protocol header
 #define TB_DNS_HEADER_SIZE 			(12)
 #define TB_DNS_HEADER_MAGIC 		(0xbeef)
+
+// the list maximum size 
+#define TB_DNS_LIST_MAXN 			(2)
 
 // the protocol port
 #define TB_DNS_HOST_PORT 			(53)
@@ -150,6 +153,9 @@ typedef struct __tb_dns_look_t
 
 	// the step
 	tb_size_t 		step;
+
+	// the tryn
+	tb_size_t 		tryn;
 
 	// try the next host?
 	tb_bool_t 		next;
@@ -367,7 +373,21 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 	// set questions, see as tb_dns_question_t
 	// name + question1 + question2 + ...
-	tb_bstream_set_u8(&bst, 0);
+	tb_bstream_set_u8(&bst, 3);
+	tb_bstream_set_u8(&bst, 'w');
+	tb_bstream_set_u8(&bst, 'w');
+	tb_bstream_set_u8(&bst, 'w');
+	tb_bstream_set_u8(&bst, 5);
+	tb_bstream_set_u8(&bst, 't');
+	tb_bstream_set_u8(&bst, 'b');
+	tb_bstream_set_u8(&bst, 'o');
+	tb_bstream_set_u8(&bst, 'o');
+	tb_bstream_set_u8(&bst, 'x');
+	tb_bstream_set_u8(&bst, 3);
+	tb_bstream_set_u8(&bst, 'c');
+	tb_bstream_set_u8(&bst, 'o');
+	tb_bstream_set_u8(&bst, 'm');
+	tb_bstream_set_u8(&bst, '\0');
 
 	// only one question now.
 	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
@@ -406,9 +426,9 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 		else writ += r;
 	}
 
-	// only recv id, 2 bytes 
+	// only recv id & answer, 8 bytes 
 	tb_long_t read = 0;
-	while (read < 2)
+	while (read < 8)
 	{
 		// read data
 		tb_long_t r = tb_socket_urecv(handle, host, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
@@ -433,11 +453,15 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	}
 
 	// check
-	tb_check_goto(read >= 2, end);
+	tb_check_goto(read >= 8, end);
 
-	// check dns header
+	// check protocol
 	tb_size_t id = tb_bits_get_u16_be(rpkt);
 	tb_check_goto(id == TB_DNS_HEADER_MAGIC, end);
+
+	// check answer
+	tb_size_t answer = tb_bits_get_u16_be(rpkt + 6);
+	tb_check_goto(answer > 0, end);
 
 	// rate
 	rate = (tb_long_t)(tb_mclock() - time);
@@ -471,13 +495,14 @@ static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 			*bdel = TB_TRUE;
 
 			// trace
-			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u"
+			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u, size: %u"
 				, (tb_char_t const*)item->name
 				, addr->ipv4.u8[0]
 				, addr->ipv4.u8[1]
 				, addr->ipv4.u8[2]
 				, addr->ipv4.u8[3]
-				, addr->time);
+				, addr->time
+				, tb_hash_size(cache));
 
 			// update times
 			tb_assert(list->times >= addr->time);
@@ -517,7 +542,7 @@ static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 				if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
 				{
 					// the expired time
-					g_dns_list->expired = (tb_size_t)(g_dns_list->times / tb_hash_size(cache));
+					g_dns_list->expired = ((tb_size_t)(g_dns_list->times / tb_hash_size(cache)) + 1);
 					tb_assert(g_dns_list->expired);
 					tb_trace_impl("cache: expired: %u", g_dns_list->expired);
 
@@ -538,13 +563,14 @@ static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 					g_dns_list->times += addr.time;
 
 					// trace
-					tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u"
+					tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u, size: %u"
 						, name
 						, addr.ipv4.u8[0]
 						, addr.ipv4.u8[1]
 						, addr.ipv4.u8[2]
 						, addr.ipv4.u8[3]
-						, addr.time);
+						, addr.time
+						, tb_hash_size(cache));
 				}
 			}
 
@@ -696,11 +722,15 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 		if (!writ)
 		{
 			// abort?
-			tb_check_return_val(!look->size, -1);
+			tb_check_return_val(!look->size && !look->tryn, -1);
+
+			// tryn++
+			look->tryn++;
 
 			// continue
 			return 0;
 		}
+		else look->tryn = 0;
 
 		// update size
 		look->size += writ;
@@ -708,6 +738,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 
 	// finish it
 	look->step |= TB_DNS_STEP_REQT;
+	look->tryn = 0;
 
 	// reset rpkt
 	look->size = 0;
@@ -952,12 +983,19 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 		// no data? 
 		if (!read)
 		{
-			// end?
+			// end? read x, read 0
 			tb_check_break(!tb_sbuffer_size(&look->rpkt));
+	
+			// abort? read 0, read 0
+			tb_check_return_val(!look->tryn, -1);
 			
+			// tryn++
+			look->tryn++;
+
 			// continue 
 			return 0;
 		}
+		else look->tryn = 0;
 
 		// copy data
 		tb_sbuffer_memncat(&look->rpkt, rpkt, read);
@@ -974,6 +1012,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 
 	// finish it
 	look->step |= TB_DNS_STEP_RESP;
+	look->tryn = 0;
 
 	// reset rpkt
 	look->size = 0;
@@ -1001,7 +1040,7 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->mutx, fail);
 			
 		// init list
-		g_dns_list->list = tb_slist_init(8, tb_item_func_ifm(sizeof(tb_dns_host_t), TB_NULL, TB_NULL));
+		g_dns_list->list = tb_slist_init(TB_DNS_LIST_MAXN, tb_item_func_ifm(sizeof(tb_dns_host_t), TB_NULL, TB_NULL));
 		tb_assert_and_check_goto(g_dns_list->list, fail);
 
 		// init spool
@@ -1063,7 +1102,10 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 					}
 
 					// insert item by sort
-					tb_slist_insert_next(g_dns_list->list, prev, &item);
+					tb_slist_insert_next(list, prev, &item);
+
+					// remove the last, if full
+					if (tb_slist_size(list) > TB_DNS_LIST_MAXN) tb_slist_remove_last(list);
 				}
 
 				// leave
@@ -1234,14 +1276,15 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 				if (addr)
 				{
 					// trace
-					tb_trace_impl("cache: get %s => %u.%u.%u.%u, time: %u => %u"
+					tb_trace_impl("cache: get %s => %u.%u.%u.%u, time: %u => %u, size: %u"
 						, name
 						, addr->ipv4.u8[0]
 						, addr->ipv4.u8[1]
 						, addr->ipv4.u8[2]
 						, addr->ipv4.u8[3]
 						, addr->time
-						, (tb_size_t)(tb_mclock() / 1000));
+						, (tb_size_t)(tb_mclock() / 1000)
+						, tb_hash_size(cache));
 
 					// update time
 					tb_assert(g_dns_list->times >= addr->time);
