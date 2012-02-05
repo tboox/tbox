@@ -537,7 +537,8 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_ha
 		if (list)
 		{
 			tb_size_t j = 0;
-			for (j = 0; list && j < list->size; )
+			tb_size_t b = -1;
+			for (j = 0; list && j < list->size; j++)
 			{
 				// init item
 				tb_byte_t* it = ((tb_byte_t*)&list[1]) + j * step;
@@ -550,38 +551,63 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_ha
 				// callback: item
 				if (!func(hash, &item, &bdel, data)) goto end;
 
-				// remove it?
+				// free it?
 				if (bdel)
 				{
+					// save
+					if (b == -1) b = j;
+
 					// free item
 					if (hash->name_func.free) hash->name_func.free(&hash->name_func, it);
 					if (hash->data_func.free) hash->data_func.free(&hash->data_func, it + hash->name_func.size);
-
-					// remove item from the list
-					if (list->size > 1)
-					{
-						// move items
-						if (j < list->size - 1) tb_memmov(((tb_byte_t*)&list[1]) + j * step, ((tb_byte_t*)&list[1]) + (j + 1) * step, (list->size - j - 1) * step);
-						
-						// update size
-						list->size--;
-					}
-					// remove list
-					else 
-					{
-						// free it
-						tb_free(list);
-
-						// reset
-						list = TB_NULL;
-						hash->hash_list[i] = TB_NULL;
-					}
-
-					// update the hash item size
-					hash->item_size--;
 				}
-				// next
-				else j++;
+
+				// remove items?
+				if (!bdel || j + 1 == list->size)
+				{
+					// has deleted items?
+					if (b != -1)
+					{
+						// the removed items end
+						tb_size_t e = !bdel? j : j + 1;
+						if (e > b)
+						{
+							// the items number
+							tb_size_t m = e - b;
+							tb_assert(list->size >= m);
+//							tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
+
+							// remove items
+							if (e < list->size) 
+								tb_memmov(((tb_byte_t*)&list[1]) + b * step, ((tb_byte_t*)&list[1]) + e * step, (list->size - e) * step);
+
+							// remove all?
+							if (list->size > m) 
+							{
+								// update the list size
+								list->size -= m;
+
+								// update j
+								j = b;
+							}
+							else
+							{
+								// free it
+								tb_free(list);
+
+								// reset
+								list = TB_NULL;
+								hash->hash_list[i] = TB_NULL;
+							}
+
+							// update the hash item size
+							hash->item_size -= m;
+						}
+					}
+
+					// reset
+					b = -1;
+				}
 			}
 		}
 	}
