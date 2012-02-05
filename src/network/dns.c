@@ -112,6 +112,12 @@ typedef struct __tb_dns_list_t
 	// the cache
 	tb_hash_t* 		cache;
 
+	// the times
+	tb_uint64_t 	times;
+
+	// the expired
+	tb_size_t 		expired;
+
 }tb_dns_list_t;
 
 // the dns step type
@@ -445,6 +451,107 @@ end:
 
 	// ok
 	return rate;
+}
+static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	tb_assert_and_check_return_val(cache && bdel && data, TB_FALSE);
+
+	// the expired time
+	tb_dns_list_t* list = (tb_dns_list_t*)data;
+	if (item)
+	{
+		// address
+		tb_dns_addr_t const* addr = item->data;
+		tb_assert_and_check_return_val(addr, TB_FALSE);
+
+		// is expired?
+		if (addr->time < list->expired)
+		{
+			// remove it
+			*bdel = TB_TRUE;
+
+			// trace
+			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u"
+				, (tb_char_t const*)item->name
+				, addr->ipv4.u8[0]
+				, addr->ipv4.u8[1]
+				, addr->ipv4.u8[2]
+				, addr->ipv4.u8[3]
+				, addr->time);
+
+			// update times
+			tb_assert(list->times >= addr->time);
+			list->times -= addr->time;
+		}
+	}
+
+	// ok
+	return TB_TRUE;
+}
+static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
+{
+	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
+
+	// trace
+	tb_trace_impl("add4: %s => %u.%u.%u.%u", name, ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+
+	// init
+	tb_dns_addr_t addr;
+	addr.ipv4 = *ipv4;
+	addr.time = (tb_size_t)(tb_mclock() / 1000);
+
+	// has list?
+	if (g_dns_list && g_dns_list->mutx) 
+	{
+		// enter
+		tb_mutex_enter(g_dns_list->mutx);
+
+		// has list?
+		if (g_dns_list)
+		{
+			// cache
+			tb_hash_t* cache = g_dns_list->cache;
+			if (cache)
+			{
+				// remove the expired items if full
+				if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
+				{
+					// the expired time
+					g_dns_list->expired = (tb_size_t)(g_dns_list->times / tb_hash_size(cache));
+					tb_assert(g_dns_list->expired);
+					tb_trace_impl("cache: expired: %u", g_dns_list->expired);
+
+					// remove the expired times
+					tb_hash_walk(cache, tb_dns_look_clr4, g_dns_list);
+				}
+
+				// check
+				tb_assert(tb_hash_size(cache) < TB_DNS_CACHE_MAXN);
+
+				// add it
+				if (tb_hash_size(cache) < TB_DNS_CACHE_MAXN) 
+				{
+					// set
+					tb_hash_set(cache, name, &addr);
+
+					// update times
+					g_dns_list->times += addr.time;
+
+					// trace
+					tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u"
+						, name
+						, addr.ipv4.u8[0]
+						, addr.ipv4.u8[1]
+						, addr.ipv4.u8[2]
+						, addr.ipv4.u8[3]
+						, addr.time);
+				}
+			}
+
+			// leave
+			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
+		}
+	}
 }
 static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 {
@@ -876,38 +983,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	tb_trace_impl("response: ok");
 	return 1;
 }
-static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata)
-{
-	tb_assert_and_check_return_val(cache && berase && udata, TB_FALSE);
 
-	// the expired time
-	tb_size_t expired = (tb_size_t)udata;
-	if (item)
-	{
-		// address
-		tb_dns_addr_t const* addr = item->data;
-		tb_assert_and_check_return_val(addr, TB_FALSE);
-
-		// is expired?
-		if (addr->time < expired)
-		{
-			// remove it
-			*berase = TB_TRUE;
-
-			// trace
-			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u"
-				, (tb_char_t const*)item->name
-				, addr->ipv4.u8[0]
-				, addr->ipv4.u8[1]
-				, addr->ipv4.u8[2]
-				, addr->ipv4.u8[3]
-				, addr->time);
-		}
-	}
-
-	// ok
-	return TB_TRUE;
-}
 /* ///////////////////////////////////////////////////////////////////////
  * list
  */
@@ -1168,7 +1244,10 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 						, (tb_size_t)(tb_mclock() / 1000));
 
 					// update time
+					tb_assert(g_dns_list->times >= addr->time);
+					g_dns_list->times -= addr->time;
 					addr->time = (tb_size_t)(tb_mclock() / 1000);
+					g_dns_list->times += addr->time;
 
 					// ok
 					*ipv4 = addr->ipv4;
@@ -1185,111 +1264,6 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 
 	// ok?
 	return ipv4->u32? TB_TRUE : TB_FALSE;
-}
-tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
-{
-	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
-
-	// trace
-	tb_trace_impl("add4: %s => %u.%u.%u.%u", name, ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
-
-	// init
-	tb_dns_addr_t addr;
-	addr.ipv4 = *ipv4;
-	addr.time = (tb_size_t)(tb_mclock() / 1000);
-
-	// has list?
-	if (g_dns_list && g_dns_list->mutx) 
-	{
-		// enter
-		tb_mutex_enter(g_dns_list->mutx);
-
-		// has list?
-		if (g_dns_list)
-		{
-			// cache
-			tb_hash_t* cache = g_dns_list->cache;
-			if (cache)
-			{
-				// remove the expired items if full
-				if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
-				{
-					// the min & max time
-					tb_size_t tmin = 0;
-					tb_size_t tmax = 0;
-					tb_size_t itor = tb_hash_itor_head(cache);
-					tb_size_t tail = tb_hash_itor_tail(cache);
-					for (; itor != tail; itor = tb_hash_itor_next(cache, itor))
-					{
-						tb_hash_item_t const* item = tb_hash_itor_const_at(cache, itor);
-						if (item && item->data)
-						{
-							tb_size_t time = ((tb_dns_addr_t const*)item->data)->time;
-							if (!tmin || time < tmin) tmin = time;
-							if (!tmax || time > tmax) tmax = time;
-						}
-					}
-
-					// the expired time
-					tb_size_t expired = ((tmin + tmax) >> 1);
-					tb_assert(expired);
-					tb_trace_impl("cache: expired [%u, %u] => %u", tmin, tmax, expired);
-
-					// remove the expired times
-					tb_hash_foreach(cache, tb_dns_look_clr4, (tb_pointer_t)expired);
-				}
-
-				// check
-				tb_assert(tb_hash_size(cache) < TB_DNS_CACHE_MAXN);
-
-				// add it
-				if (tb_hash_size(cache) < TB_DNS_CACHE_MAXN) 
-				{
-					// set
-					tb_hash_set(cache, name, &addr);
-
-					// trace
-					tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u"
-						, name
-						, addr.ipv4.u8[0]
-						, addr.ipv4.u8[1]
-						, addr.ipv4.u8[2]
-						, addr.ipv4.u8[3]
-						, addr.time);
-				}
-			}
-
-			// leave
-			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
-		}
-	}
-}
-tb_void_t tb_dns_look_del4(tb_char_t const* name)
-{
-	tb_assert_and_check_return(name);
-	
-	// has list?
-	if (g_dns_list && g_dns_list->mutx) 
-	{
-		// enter
-		tb_mutex_enter(g_dns_list->mutx);
-
-		// has list?
-		if (g_dns_list)
-		{
-			// remove it
-			if (g_dns_list->cache) 
-			{
-				tb_hash_del(g_dns_list->cache, name);
-
-				// trace
-				tb_trace_impl("cache: del %s", name);
-			}
-
-			// leave
-			if (g_dns_list->mutx) tb_mutex_leave(g_dns_list->mutx);
-		}
-	}
 }
 tb_handle_t tb_dns_look_init(tb_char_t const* name)
 {

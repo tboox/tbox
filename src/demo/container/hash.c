@@ -113,6 +113,9 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(TB_TRUE, pool), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
+	// clear rand
+	tb_rand_clear();
+
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 100000;
@@ -205,6 +208,9 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_spool_t* pool = tb_spool_init(TB_SPOOL_SIZE_SMALL);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_str(TB_TRUE, pool));
 	tb_assert_and_check_return(hash);
+
+	// clear rand
+	tb_rand_clear();
 
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
@@ -344,6 +350,9 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, TB_NULL, TB_NULL), tb_item_func_ifm(step, TB_NULL, TB_NULL));
 	tb_assert_and_check_return(hash);
 
+	// clear rand
+	tb_rand_clear();
+
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_int64_t t = tb_mclock();
@@ -434,6 +443,9 @@ static tb_void_t tb_hash_test_i2i_perf()
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
+	// clear rand
+	tb_rand_clear();
+
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_int64_t t = tb_mclock();
@@ -448,11 +460,109 @@ static tb_void_t tb_hash_test_i2i_perf()
 
 	tb_hash_exit(hash);
 }
+static tb_void_t tb_hash_test_itor_perf()
+{
+	// init hash: int => str
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
+	tb_assert_and_check_return(hash);
 
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) 
+	{
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_hash_test_set_i2i(hash, i); 
+		tb_hash_test_get_i2i(hash, i);
+	}
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[3] = {0};
+	__tb_volatile__ tb_size_t 	itor = tb_hash_itor_head(hash);
+	for (; itor != tb_hash_itor_tail(hash); )
+	{
+		__tb_volatile__ tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
+		if (item) 
+		{
+			if (!((tb_size_t)item->name & 7)) 
+			{
+				// remove, hack: the itor of the same item is mutable
+				tb_hash_remove(hash, itor);
+
+				// continue 
+				continue ;
+			}
+			else
+			{
+				test[0] += (tb_size_t)item->name;
+				test[1] += (tb_size_t)item->data;
+
+				test[2]++;
+			}
+		}
+
+		itor = tb_hash_itor_next(hash, itor);
+	}
+	t = tb_mclock() - t;
+	tb_print("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
+
+	tb_hash_exit(hash);
+}
+static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	tb_assert_and_check_return_val(hash && bdel && data, TB_FALSE);
+
+	tb_uint64_t* test = data;
+	if (item)
+	{
+		if (!((tb_size_t)item->name & 7)) 
+			*bdel = TB_TRUE;
+		else
+		{
+			test[0] += (tb_size_t)item->name;
+			test[1] += (tb_size_t)item->data;
+
+			test[2]++;
+		}
+	}
+
+	// ok
+	return TB_TRUE;
+}
+static tb_void_t tb_hash_test_walk_perf()
+{
+	// init hash: int => str
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
+	tb_assert_and_check_return(hash);
+
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) 
+	{
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_hash_test_set_i2i(hash, i); 
+		tb_hash_test_get_i2i(hash, i);
+	}
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[3] = {0};
+	tb_hash_walk(hash, tb_hash_test_walk_item, test);
+	t = tb_mclock() - t;
+	tb_print("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
+
+	tb_hash_exit(hash);
+}
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
 
@@ -468,6 +578,11 @@ int main(int argc, char** argv)
 	tb_hash_test_i2s_perf();
 	tb_hash_test_m2m_perf();
 	tb_hash_test_i2i_perf();
+#endif
+
+#if 1
+	tb_hash_test_itor_perf();
+	tb_hash_test_walk_perf();
 #endif
 
 	return 0;

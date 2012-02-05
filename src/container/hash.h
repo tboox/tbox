@@ -89,6 +89,7 @@ typedef struct __tb_hash_item_list_t
  *                      |     |                                              
  *                       -----  
  *
+ * \note the itor of the same item is mutable
  */
 typedef struct __tb_hash_t
 {
@@ -121,6 +122,7 @@ tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 
 // accessors & modifiors
 tb_void_t 				tb_hash_clear(tb_hash_t* hash);
+tb_void_t 				tb_hash_remove(tb_hash_t* hash, tb_size_t itor);
 
 tb_pointer_t 			tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
 tb_cpointer_t 			tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
@@ -160,17 +162,19 @@ tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
-/* foreach
+/* walk
  *
- * tb_bool_t tb_hash_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata)
+ * be faster than the iterator mode
+ *
+ * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(hash && berase, TB_FALSE);
+ *  	tb_assert_and_check_return_val(hash && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
  *
- * 		// erase it
- * 		// *berase = TB_TRUE;
+ * 		// delete it?
+ * 		// *bdel = TB_TRUE;
  *
  * 		// ok
  *  	return TB_TRUE;
@@ -181,7 +185,7 @@ tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
  * }
  *
  */
-tb_void_t 				tb_hash_foreach(tb_hash_t* hash, tb_bool_t (*item)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* berase, tb_pointer_t udata), tb_pointer_t udata);
+tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
 
 #endif
 

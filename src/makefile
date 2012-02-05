@@ -340,7 +340,8 @@ SUB_PROS 				= \
 					  	demo/string \
 					  	demo/stream \
 					  	demo/network \
-					  	demo/platform
+					  	demo/platform \
+					  	demo/container
 
 
 endif
