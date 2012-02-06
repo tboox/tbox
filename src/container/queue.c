@@ -167,4 +167,7 @@ tb_bool_t tb_queue_null(tb_queue_t const* queue)
 	tb_assert_and_check_return_val(queue, TB_TRUE);
 	return ((queue->head == queue->tail)? TB_TRUE : TB_FALSE);
 }
-
+tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+{
+	tb_trace_noimpl();
+}

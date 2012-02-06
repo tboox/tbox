@@ -133,6 +133,32 @@ tb_size_t 			tb_queue_maxn(tb_queue_t const* queue);
 tb_bool_t 			tb_queue_full(tb_queue_t const* queue);
 tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
 
+/* walk
+ *
+ * be faster than the iterator mode, optimizate to remove items for walking
+ *
+ * tb_bool_t tb_queue_item_func(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * {
+ *  	tb_assert_and_check_return_val(queue && bdel, TB_FALSE);
+ *
+ * 		// is tail?
+ * 		if (!item) ;
+ *
+ * 		// delete it?
+ * 		// *bdel = TB_TRUE;
+ *
+ * 		// ok
+ *  	return TB_TRUE;
+ *
+ *  fail:
+ *  	// break
+ *   	return TB_FALSE;
+ * }
+ *
+ */
+tb_void_t 			tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+
+
 
 
 #endif

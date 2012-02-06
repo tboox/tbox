@@ -462,7 +462,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 }
 static tb_void_t tb_hash_test_itor_perf()
 {
-	// init hash: int => str
+	// init hash
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
@@ -537,7 +537,7 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 }
 static tb_void_t tb_hash_test_walk_perf()
 {
-	// init hash: int => str
+	// init hash
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 

@@ -154,6 +154,31 @@ tb_size_t 			tb_vector_itor_prev(tb_vector_t const* vector, tb_size_t itor);
 tb_size_t 			tb_vector_size(tb_vector_t const* vector);
 tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
 
+/* walk
+ *
+ * be faster than the iterator mode, optimizate to remove items for walking
+ *
+ * tb_bool_t tb_vector_item_func(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * {
+ *  	tb_assert_and_check_return_val(vector && bdel, TB_FALSE);
+ *
+ * 		// is tail?
+ * 		if (!item) ;
+ *
+ * 		// delete it?
+ * 		// *bdel = TB_TRUE;
+ *
+ * 		// ok
+ *  	return TB_TRUE;
+ *
+ *  fail:
+ *  	// break
+ *   	return TB_FALSE;
+ * }
+ *
+ */
+tb_void_t 			tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+
 
 
 #endif

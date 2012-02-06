@@ -135,6 +135,11 @@ tb_size_t 			tb_dlist_nremove(tb_dlist_t* dlist, tb_size_t itor, tb_size_t size)
 tb_size_t 			tb_dlist_nremove_head(tb_dlist_t* dlist, tb_size_t size);
 tb_size_t 			tb_dlist_nremove_last(tb_dlist_t* dlist, tb_size_t size);
 
+// attributes
+tb_size_t 			tb_dlist_size(tb_dlist_t const* dlist);
+tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
+
+
 /* iterator
  * 
  * tb_size_t itor = tb_dlist_itor_head(dlist);
@@ -158,10 +163,30 @@ tb_size_t 			tb_dlist_itor_last(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor);
 tb_size_t 			tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor);
 
-// attributes
-tb_size_t 			tb_dlist_size(tb_dlist_t const* dlist);
-tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
-
+/* walk
+ *
+ * be faster than the iterator mode, optimizate to remove items for walking
+ *
+ * tb_bool_t tb_dlist_item_func(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * {
+ *  	tb_assert_and_check_return_val(dlist && bdel, TB_FALSE);
+ *
+ * 		// is tail?
+ * 		if (!item) ;
+ *
+ * 		// delete it?
+ * 		// *bdel = TB_TRUE;
+ *
+ * 		// ok
+ *  	return TB_TRUE;
+ *
+ *  fail:
+ *  	// break
+ *   	return TB_FALSE;
+ * }
+ *
+ */
+tb_void_t 			tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
 
 #endif
 
