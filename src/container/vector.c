@@ -380,3 +380,86 @@ tb_void_t tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size)
 	// remove last
 	tb_vector_nremove(vector, vector->size - size, size);
 }
+tb_void_t tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+{
+	tb_assert_and_check_return(vector && vector->data && func);
+
+	// step
+	tb_size_t step = vector->func.size;
+	tb_assert_and_check_return(step);
+
+	// walk
+	tb_size_t 	i = 0;
+	tb_size_t 	b = -1;
+	tb_size_t 	n = vector->size;
+	tb_byte_t* 	d = vector->data;
+	tb_bool_t 	bdel = TB_FALSE;
+	for (i = 0; i < n; i++)
+	{
+		// item
+		tb_pointer_t item = vector->func.data(&vector->func, d + i * step);
+
+		// bdel
+		bdel = TB_FALSE;
+
+		// callback: item
+		if (!func(vector, &item, &bdel, data)) goto end;
+
+		// free it?
+		if (bdel)
+		{
+			// save
+			if (b == -1) b = i;
+
+			// free item
+			if (vector->func.free) vector->func.free(&vector->func, d + i * step);
+		}
+
+		// remove items?
+		if (!bdel || i + 1 == n)
+		{
+			// has deleted items?
+			if (b != -1)
+			{
+				// the removed items end
+				tb_size_t e = !bdel? i : i + 1;
+				if (e > b)
+				{
+					// the items number
+					tb_size_t m = e - b;
+					tb_assert(n >= m);
+//					tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
+
+					// remove items
+					if (e < n) tb_memmov(d + b * step, d + e * step, (n - e) * step);
+
+					// remove all?
+					if (n > m) 
+					{
+						// update the list size
+						n -= m;
+						vector->size = n;
+
+						// update i
+						i = b;
+					}
+					else
+					{
+						// update the list size
+						n = 0;
+						vector->size = 0;
+					}
+				}
+			}
+
+			// reset
+			b = -1;
+		}
+	}
+
+	// callback: tail
+	if (!func(vector, TB_NULL, &bdel, data)) goto end;
+
+end:
+	return ;
+}

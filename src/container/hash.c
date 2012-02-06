@@ -538,7 +538,8 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_ha
 		{
 			tb_size_t j = 0;
 			tb_size_t b = -1;
-			for (j = 0; list && j < list->size; j++)
+			tb_size_t l = list->size;
+			for (j = 0; j < l; j++)
 			{
 				// init item
 				tb_byte_t* it = ((tb_byte_t*)&list[1]) + j * step;
@@ -563,7 +564,7 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_ha
 				}
 
 				// remove items?
-				if (!bdel || j + 1 == list->size)
+				if (!bdel || j + 1 == l)
 				{
 					// has deleted items?
 					if (b != -1)
@@ -574,24 +575,27 @@ tb_void_t tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_ha
 						{
 							// the items number
 							tb_size_t m = e - b;
-							tb_assert(list->size >= m);
+							tb_assert(l >= m);
 //							tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
 
 							// remove items
-							if (e < list->size) 
-								tb_memmov(((tb_byte_t*)&list[1]) + b * step, ((tb_byte_t*)&list[1]) + e * step, (list->size - e) * step);
+							if (e < l) tb_memmov(((tb_byte_t*)&list[1]) + b * step, ((tb_byte_t*)&list[1]) + e * step, (l - e) * step);
 
 							// remove all?
-							if (list->size > m) 
+							if (l > m) 
 							{
 								// update the list size
-								list->size -= m;
+								l -= m;
+								list->size = l;
 
 								// update j
 								j = b;
 							}
 							else
 							{
+								// update the list size
+								l = 0;
+
 								// free it
 								tb_free(list);
 

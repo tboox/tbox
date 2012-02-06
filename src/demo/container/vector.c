@@ -818,6 +818,92 @@ static tb_void_t tb_vector_perf_test()
 	tb_print("score: %d", score / 100);
 
 }
+static tb_void_t tb_vector_test_itor_perf()
+{
+	// init vector
+	tb_vector_t* 	vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_int());
+	tb_assert_and_check_return(vector);
+
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) tb_vector_insert_tail(vector, tb_rand_uint32(0, TB_MAXU32)); 
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[2] = {0};
+	__tb_volatile__ tb_size_t 	itor = tb_vector_itor_head(vector);
+	for (; itor != tb_vector_itor_tail(vector); )
+	{
+		__tb_volatile__ tb_size_t item = tb_vector_itor_const_at(vector, itor);
+		if (!(((tb_size_t)item >> 25) & 0x1))
+		{
+			// remove, hack: the itor of the same item is mutable
+			tb_vector_remove(vector, itor);
+
+			// continue 
+			continue ;
+		}
+		else
+		{
+			test[0] += (tb_size_t)item;
+			test[1]++;
+		}
+
+		itor = tb_vector_itor_next(vector, itor);
+	}
+	t = tb_mclock() - t;
+	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
+
+	tb_vector_exit(vector);
+}
+static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	tb_assert_and_check_return_val(vector && bdel && data, TB_FALSE);
+
+	tb_uint64_t* test = data;
+	if (item)
+	{
+		tb_size_t i = (tb_size_t)*item;
+		if (!((i >> 25) & 0x1))
+//		if (!(i & 0x7))
+//		if (1)
+//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
+			*bdel = TB_TRUE;
+		else
+		{
+			test[0] += i;
+			test[1]++;
+		}
+	}
+
+	// ok
+	return TB_TRUE;
+}
+static tb_void_t tb_vector_test_walk_perf()
+{
+	// init vector
+	tb_vector_t* 	vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_int());
+	tb_assert_and_check_return(vector);
+
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) tb_vector_insert_tail(vector, tb_rand_uint32(0, TB_MAXU32)); 
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_vector_walk(vector, tb_vector_test_walk_item, test);
+	t = tb_mclock() - t;
+	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
+
+	tb_vector_exit(vector);
+}
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
@@ -825,12 +911,21 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
+#if 0
 	tb_vector_int_test();
 	tb_vector_str_test();
 	tb_vector_efm_test();
 	tb_vector_ifm_test();
+#endif
 
+#if 0
 	tb_vector_perf_test();
+#endif
+
+#if 1
+	tb_vector_test_itor_perf();
+	tb_vector_test_walk_perf();
+#endif
 
 	return 0;
 }

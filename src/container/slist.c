@@ -499,3 +499,7 @@ tb_size_t tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size)
 
 	return tb_slist_itor_last(slist);
 }
+tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+{
+	tb_trace_noimpl();
+}
