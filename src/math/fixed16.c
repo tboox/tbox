@@ -14,7 +14,7 @@
  * along with TBox; 
  * If not, see <x href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</x>
  * 
- * Copyright (C) 2009 - 2011, ruki All rights reserved.
+ * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
  * \file		fixed16.c
