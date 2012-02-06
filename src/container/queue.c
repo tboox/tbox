@@ -167,7 +167,45 @@ tb_bool_t tb_queue_null(tb_queue_t const* queue)
 	tb_assert_and_check_return_val(queue, TB_TRUE);
 	return ((queue->head == queue->tail)? TB_TRUE : TB_FALSE);
 }
-tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_queue_remove(tb_queue_t* queue, tb_size_t itor)
 {
 	tb_trace_noimpl();
+}
+tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+{
+	tb_assert_and_check_return(queue && queue->data && queue->maxn && func);
+
+	// step
+	tb_size_t step = queue->func.size;
+	tb_assert_and_check_return(step);
+
+	// walk
+	tb_bool_t 	bdel = TB_FALSE;
+	tb_byte_t* 	base = queue->data;
+	tb_size_t 	itor = queue->head;
+	tb_size_t 	tail = queue->tail;
+	tb_size_t 	maxn = queue->maxn;
+	for (; itor != tail; itor = (itor + 1) & (maxn - 1))
+	{
+		// item
+		tb_pointer_t item = queue->func.data(&queue->func, base + itor * step);
+
+		// bdel
+		bdel = TB_FALSE;
+
+		// callback: item
+		if (!func(queue, &item, &bdel, data)) goto end;
+
+		// free it?
+		if (bdel)
+		{
+			tb_trace_noimpl();
+		}
+	}
+
+	// callback: tail
+	if (!func(queue, TB_NULL, &bdel, data)) goto end;
+
+end:
+	return ;
 }
