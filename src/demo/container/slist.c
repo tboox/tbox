@@ -975,6 +975,7 @@ static tb_void_t tb_slist_test_walk_perf()
 	tb_int64_t t = tb_mclock();
 	__tb_volatile__ tb_uint64_t test[2] = {0};
 	tb_slist_walk(slist, tb_slist_test_walk_item, test);
+//	tb_slist_walk(slist, tb_slist_test_walk_item, test);
 	t = tb_mclock() - t;
 	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
 
