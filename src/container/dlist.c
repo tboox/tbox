@@ -488,5 +488,101 @@ tb_size_t tb_dlist_nremove_last(tb_dlist_t* dlist, tb_size_t size)
 }
 tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {
-	tb_trace_noimpl();
+	tb_assert_and_check_return(dlist && dlist->pool && func);
+
+	// pool
+	tb_fpool_t* pool = dlist->pool;
+
+	// step
+	tb_size_t 	step = dlist->func.size;
+	tb_assert_and_check_return(step);
+
+	// walk
+	tb_size_t 	base = -1;
+	tb_size_t 	prev = 0;
+	tb_bool_t 	bdel = TB_FALSE;
+	tb_size_t 	itor = dlist->head;
+	while (itor)
+	{
+		// node
+		tb_dlist_item_t* node = tb_fpool_get(dlist->pool, itor);
+		tb_assert_and_check_break(node);
+
+		// item
+		tb_pointer_t item = dlist->func.data(&dlist->func, &node[1]);
+
+		// next
+		tb_size_t next = node->next;
+	
+		// bdel
+		bdel = TB_FALSE;
+
+		// callback: item
+		if (!func(dlist, &item, &bdel, data)) goto end;
+
+		// free it?
+		if (bdel)
+		{
+			// save
+			if (base == -1) base = prev;
+
+			// free item
+			tb_fpool_del(pool, itor);
+		}
+		
+		// remove items?
+		if (!bdel || !next)
+		{
+			// has deleted items?
+			if (base != -1)
+			{
+				// remove part
+				if (base)
+				{
+					// get the base data
+					tb_dlist_item_t* pbase = tb_fpool_get(pool, base);
+					tb_assert_and_check_goto(pbase, end);
+
+					// base => next
+					pbase->next = next;
+
+					// has next
+					if (next) 
+					{
+						// get the next data
+						tb_dlist_item_t* pnext = tb_fpool_get(pool, next);
+						tb_assert_and_check_goto(pnext, end);
+
+						// next => base
+						pnext->prev = base;
+					}
+					// tail
+					else 
+					{
+						// update last
+						dlist->last = base;
+					}
+				}
+				// remove all
+				else
+				{
+					dlist->head = 0;
+					dlist->last = 0;
+				}
+			}
+
+			// reset
+			base = -1;
+		}
+
+		// next
+		prev = itor;
+		itor = next;
+	}
+
+	// callback: tail
+	if (!func(dlist, TB_NULL, &bdel, data)) goto end;
+
+end:
+	return ;
 }
