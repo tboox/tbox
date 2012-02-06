@@ -14,7 +14,7 @@
  * along with TBox; 
  * If not, see <a href="http://www.gnu.org/licenses/"> http://www.gnu.org/licenses/</a>
  * 
- * Copyright (C) 2009 - 2011, ruki All rights reserved.
+ * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
  * \file		strnrstr.c
