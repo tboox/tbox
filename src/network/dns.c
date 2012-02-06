@@ -104,7 +104,8 @@ typedef struct __tb_dns_addr_t
 typedef struct __tb_dns_list_t
 {
 	// the list
-	tb_slist_t* 	list;
+	tb_dns_host_t 	list[TB_DNS_LIST_MAXN];
+	tb_size_t 		size;
 
 	// the mutx
 	tb_handle_t 	mutx;
@@ -513,6 +514,22 @@ static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 	// ok
 	return TB_TRUE;
 }
+static tb_bool_t tb_dns_look_stat(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	tb_assert_and_check_return_val(cache && bdel && data, TB_FALSE);
+
+	tb_size_t* stat = (tb_size_t*)data;
+	if (item && item->data)
+	{
+		// min & max
+		tb_size_t time = ((tb_dns_addr_t const*)item->data)->time;
+		if (!stat[0] || time < stat[0]) stat[0] = time;
+		if (!stat[1] || time > stat[1]) stat[1] = time;
+	}
+
+	// ok
+	return TB_TRUE;
+}
 static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 {
 	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
@@ -541,8 +558,21 @@ static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 				// remove the expired items if full
 				if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
 				{
+					// which is better? lol
+					// ...
+#if 1
 					// the expired time
 					g_dns_list->expired = ((tb_size_t)(g_dns_list->times / tb_hash_size(cache)) + 1);
+#else
+
+					// stat
+					tb_size_t stat[2] = {0};
+					tb_hash_walk(cache, tb_dns_look_stat, stat);
+
+					// the expired time
+					g_dns_list->expired = tb_max(stat[0] + 1, ((stat[0] + stat[1]) >> 2));
+#endif
+
 					tb_assert(g_dns_list->expired);
 					tb_trace_impl("cache: expired: %u", g_dns_list->expired);
 
@@ -687,11 +717,11 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 			tb_mutex_enter(g_dns_list->mutx);
 
 			// host
-			tb_char_t 				ipv4[16];
-			tb_dns_host_t const* 	item = (tb_dns_host_t const*)tb_slist_itor_const_at(g_dns_list->list, look->itor);
-			if (item)
+			if (look->itor)
 			{
-				tb_char_t const* host = tb_ipv4_get(&item->host, ipv4, 16);
+				tb_char_t 				ipv4[16];
+				tb_dns_host_t const* 	item = &g_dns_list->list[look->itor - 1];
+				tb_char_t const* 		host = tb_ipv4_get(&item->host, ipv4, 16);
 				if (host) tb_sstring_cstrcpy(&look->host, host);
 			}
 
@@ -949,11 +979,11 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 			tb_mutex_enter(g_dns_list->mutx);
 
 			// host
-			tb_char_t 				addr[16];
-			tb_dns_host_t const* 	item = (tb_dns_host_t const*)tb_slist_itor_const_at(g_dns_list->list, look->itor);
-			if (item)
+			if (look->itor)
 			{
-				tb_char_t const* host = tb_ipv4_get(&item->host, addr, 16);
+				tb_char_t 				addr[16];
+				tb_dns_host_t const* 	item = (tb_dns_host_t const*)&g_dns_list->list[look->itor - 1];
+				tb_char_t const* 		host = tb_ipv4_get(&item->host, addr, 16);
 				if (host) tb_sstring_cstrcpy(&look->host, host);
 			}
 
@@ -1039,10 +1069,6 @@ tb_bool_t tb_dns_list_init()
 		g_dns_list->mutx = tb_mutex_init(TB_NULL);
 		tb_assert_and_check_goto(g_dns_list->mutx, fail);
 			
-		// init list
-		g_dns_list->list = tb_slist_init(TB_DNS_LIST_MAXN, tb_item_func_ifm(sizeof(tb_dns_host_t), TB_NULL, TB_NULL));
-		tb_assert_and_check_goto(g_dns_list->list, fail);
-
 		// init spool
 		g_dns_list->spool = tb_spool_init(TB_SPOOL_SIZE_DEFAULT);
 		tb_assert_and_check_goto(g_dns_list->spool, fail);
@@ -1088,24 +1114,26 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 			if (g_dns_list)
 			{
 				// list
-				tb_slist_t* list = g_dns_list->list;
-				if (list)
+				tb_dns_host_t* list = g_dns_list->list;
+
+				// find item
+				tb_size_t p = 0;
+				tb_size_t i = 0;
+				tb_size_t n = g_dns_list->size;
+				for (; i < n; p = i + 1, i++) if (item.rate < list[i].rate) break;
+
+				// insert item by sort
+				if (p < TB_DNS_LIST_MAXN) 
 				{
-					// find item
-					tb_size_t prev = 0;
-					tb_size_t itor = tb_slist_itor_head(list);
-					tb_size_t tail = tb_slist_itor_tail(list);
-					for (; itor != tail; prev = itor, itor = tb_slist_itor_next(list, itor))
-					{
-						tb_dns_host_t const* it = tb_slist_itor_const_at(list, itor);
-						if (it && item.rate < it->rate) break;
-					}
+					// move items
+					tb_size_t m = tb_min(n, TB_DNS_LIST_MAXN - 1) - p;
+					if (m) tb_memmov(list + p + 1, list + p, m * sizeof(tb_dns_host_t));
 
-					// insert item by sort
-					tb_slist_insert_next(list, prev, &item);
+					// insert it
+					list[p] = item;
 
-					// remove the last, if full
-					if (tb_slist_size(list) > TB_DNS_LIST_MAXN) tb_slist_remove_last(list);
+					// update size
+					if (n < TB_DNS_LIST_MAXN) g_dns_list->size++;
 				}
 
 				// leave
@@ -1135,23 +1163,25 @@ tb_void_t tb_dns_list_dels(tb_char_t const* host)
 		if (g_dns_list)
 		{
 			// list
-			tb_slist_t* list = g_dns_list->list;
-			if (list)
+			tb_dns_host_t* list = g_dns_list->list;
+
+			// ipv4
+			tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
+
+			// find it
+			tb_size_t i = 0;
+			tb_size_t n = g_dns_list->size;
+			for (; i < n; i++) if (ipv4 == list[i].host.u32) break;
+
+			// remove it
+			if (i < n) 
 			{
-				// ipv4
-				tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
+				// move items
+				if (i + 1 < n) tb_memmov(list + i, list + i + 1, (n - i - 1) * sizeof(tb_dns_host_t));
 
-				// find it
-				tb_size_t itor = tb_slist_itor_head(list);
-				tb_size_t tail = tb_slist_itor_tail(list);
-				for (; itor != tail; itor = tb_slist_itor_next(list, itor))
-				{
-					tb_dns_host_t const* item = tb_slist_itor_const_at(list, itor);
-					if (item && item->host.u32 == ipv4) break;
-				}
-
-				// remove it
-				if (itor != tail) tb_slist_remove(list, itor);
+				// update size
+				tb_assert(g_dns_list->size);
+				g_dns_list->size--;
 			}
 
 			// leave
@@ -1186,10 +1216,6 @@ tb_void_t tb_dns_list_exit()
 			if (g_dns_list->spool) tb_spool_exit(g_dns_list->spool);
 			g_dns_list->spool = TB_NULL;
 
-			// free list
-			if (g_dns_list->list) tb_slist_exit(g_dns_list->list);
-			g_dns_list->list = TB_NULL;
-
 			// free it
 			tb_free(g_dns_list);
 			g_dns_list = TB_NULL;
@@ -1215,26 +1241,22 @@ tb_void_t tb_dns_list_dump()
 	if (g_dns_list->mutx) tb_mutex_enter(g_dns_list->mutx);
 
 	// list
-	tb_slist_t* list = g_dns_list->list;
-	tb_assert_and_check_return(list);
+	tb_dns_host_t* list = g_dns_list->list;
 	
 	// find it
 	tb_print("============================================================");
-	tb_print("[dns]: list: %u items", tb_slist_size(list));
-	tb_size_t itor = tb_slist_itor_head(list);
-	tb_size_t tail = tb_slist_itor_tail(list);
-	for (; itor != tail; itor = tb_slist_itor_next(list, itor))
+	tb_print("[dns]: list: %u items", g_dns_list->size);
+	tb_size_t i = 0;
+	tb_size_t n = g_dns_list->size;
+	for (; i < n; i++)
 	{
-		tb_dns_host_t const* item = tb_slist_itor_const_at(list, itor);
-		if (item) 
-		{
-			tb_print("[dns]: host: %u.%u.%u.%u, rate: %u"
-				, item->host.u8[0]
-				, item->host.u8[1]
-				, item->host.u8[2]
-				, item->host.u8[3]
-				, item->rate);
-		}
+		tb_dns_host_t const* item = &list[i];
+		tb_print("[dns]: host: %u.%u.%u.%u, rate: %u"
+			, item->host.u8[0]
+			, item->host.u8[1]
+			, item->host.u8[2]
+			, item->host.u8[3]
+			, item->rate);
 	}
 
 	// leave
@@ -1340,7 +1362,7 @@ tb_handle_t tb_dns_look_init(tb_char_t const* name)
 		tb_mutex_enter(g_dns_list->mutx);
 
 		// itor
-		if (g_dns_list && g_dns_list->list) look->itor = tb_slist_itor_head(g_dns_list->list);
+		if (g_dns_list->size) look->itor = 1;
 
 		// leave
 		tb_mutex_leave(g_dns_list->mutx);
@@ -1384,7 +1406,8 @@ fail:
 		tb_mutex_enter(g_dns_list->mutx);
 
 		// next
-		if (g_dns_list && g_dns_list->list) look->itor = tb_slist_itor_next(g_dns_list->list, look->itor);
+		if (look->itor + 1 <= g_dns_list->size) look->itor++;
+		else look->itor = 0;
 
 		// leave
 		tb_mutex_leave(g_dns_list->mutx);
