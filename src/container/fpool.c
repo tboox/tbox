@@ -266,7 +266,7 @@ tb_cpointer_t tb_fpool_itor_const_at(tb_fpool_t const* fpool, tb_size_t itor)
 }
 tb_size_t tb_fpool_itor_head(tb_fpool_t const* fpool)
 {
-	tb_assert_abort(fpool);
+	tb_assert_and_check_return_val(fpool && fpool->info, 0);
 	if (fpool->size)
 	{
 		// find the first item
@@ -283,29 +283,79 @@ tb_size_t tb_fpool_itor_head(tb_fpool_t const* fpool)
 }
 tb_size_t tb_fpool_itor_tail(tb_fpool_t const* fpool)
 {
-	tb_assert_abort(fpool);
+	tb_assert_and_check_return_val(fpool, 0);
 	return (fpool->maxn);
 }
 tb_size_t tb_fpool_itor_next(tb_fpool_t const* fpool, tb_size_t itor)
 {
-	tb_assert_abort(fpool && itor);
-	if (fpool->size)
+	tb_assert_and_check_return_val(fpool && fpool->info && itor, 0);
+	tb_check_return_val(fpool->size, fpool->maxn);
+
+	// find the next item
+	tb_size_t i = itor;
+	tb_size_t n = fpool->maxn;
+	for ( ; i < n; ++i)
 	{
-		// find the next item
-		tb_size_t i = itor;
-		tb_size_t n = fpool->maxn;
-		for ( ; i < n; ++i)
-		{
-			// is non-free?
-			if (tb_pool_info_isset(fpool->info, i))
-				return (1 + i);
-		}
+		// is non-free?
+		if (tb_pool_info_isset(fpool->info, i))
+			return (1 + i);
 	}
+
 	return fpool->maxn;
 }
 tb_void_t tb_fpool_walk(tb_fpool_t* fpool, tb_bool_t (*func)(tb_fpool_t* fpool, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {
-	tb_trace_noimpl();
+	tb_assert_and_check_return(fpool && fpool->info && func);
+	tb_check_return(fpool->size);
+
+	// step
+	tb_size_t step = fpool->func.size;
+	tb_assert_and_check_return(step);
+
+	// walk
+	tb_size_t 	i = 0;
+	tb_size_t 	n = fpool->maxn;
+	tb_byte_t* 	d = fpool->data;
+	tb_bool_t 	bdel = TB_FALSE;
+	for (i = 0; i < n; ++i)
+	{
+		// is non-free?
+		if (tb_pool_info_isset(fpool->info, i))
+		{
+			// item
+			tb_pointer_t item = fpool->func.data(&fpool->func, d + i * step);
+		
+			// bdel
+			bdel = TB_FALSE;
+
+			// callback: item
+			if (!func(fpool, &item, &bdel, data)) goto end;
+
+			// delete it?
+			if (bdel)
+			{
+				// free item
+				if (fpool->func.free) fpool->func.free(&fpool->func, d + i * step);
+
+				// reset info
+				tb_pool_info_reset(fpool->info, i);
+
+				// predict next
+#ifdef TB_FPOOL_PRED_ENABLE
+				if (fpool->pred_n < TB_FPOOL_PRED_MAX)
+					fpool->pred[fpool->pred_n++] = i + 1;
+#endif
+				// update fpool size
+				fpool->size--;
+			}
+		}
+	}
+
+	// callback: tail
+	if (!func(fpool, TB_NULL, &bdel, data)) goto end;
+
+end:
+	return ;
 }
 tb_size_t tb_fpool_size(tb_fpool_t const* fpool)
 {
