@@ -884,6 +884,102 @@ static tb_void_t tb_slist_perf_test()
 	tb_print("score: %d", score / 100);
 
 }
+static tb_void_t tb_slist_test_itor_perf()
+{
+	// init slist
+	tb_slist_t* 	slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_int());
+	tb_assert_and_check_return(slist);
+
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) tb_slist_insert_tail(slist, tb_rand_uint32(0, TB_MAXU32)); 
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[2] = {0};
+	__tb_volatile__ tb_size_t 	prev = 0;
+	__tb_volatile__ tb_size_t 	itor = tb_slist_itor_head(slist);
+	for (; itor != tb_slist_itor_tail(slist); )
+	{
+		__tb_volatile__ tb_size_t item = tb_slist_itor_const_at(slist, itor);
+#if 1
+		if (!(((tb_size_t)item >> 25) & 0x1))
+		{
+			// save 
+			tb_size_t next = tb_slist_itor_next(slist, itor);
+
+			// remove
+			tb_slist_remove_next(slist, prev);
+
+			// next
+			itor = next;
+
+			// continue 
+			continue ;
+		}
+		else
+#endif
+		{
+			test[0] += (tb_size_t)item;
+			test[1]++;
+		}
+
+		prev = itor;
+		itor = tb_slist_itor_next(slist, itor);
+	}
+	t = tb_mclock() - t;
+	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
+
+	tb_slist_exit(slist);
+}
+static tb_bool_t tb_slist_test_walk_item(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	tb_assert_and_check_return_val(slist && bdel && data, TB_FALSE);
+
+	tb_uint64_t* test = data;
+	if (item)
+	{
+		tb_size_t i = (tb_size_t)*item;
+		if (!((i >> 25) & 0x1))
+//		if (!(i & 0x7))
+//		if (1)
+//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
+			*bdel = TB_TRUE;
+		else
+		{
+			test[0] += i;
+			test[1]++;
+		}
+	}
+
+	// ok
+	return TB_TRUE;
+}
+static tb_void_t tb_slist_test_walk_perf()
+{
+	// init slist
+	tb_slist_t* 	slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_int());
+	tb_assert_and_check_return(slist);
+
+	// clear rand
+	tb_rand_clear();
+
+	// add items
+	__tb_volatile__ tb_size_t n = 100000;
+	while (n--) tb_slist_insert_tail(slist, tb_rand_uint32(0, TB_MAXU32)); 
+
+	// performance
+	tb_int64_t t = tb_mclock();
+	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_slist_walk(slist, tb_slist_test_walk_item, test);
+	t = tb_mclock() - t;
+	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
+
+	tb_slist_exit(slist);
+}
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
@@ -891,12 +987,21 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
+#if 0
 	tb_slist_int_test();
 	tb_slist_str_test();
 	tb_slist_efm_test();
 	tb_slist_ifm_test();
+#endif
 
+#if 0
 	tb_slist_perf_test();
+#endif
+
+#if 1
+	tb_slist_test_itor_perf();
+	tb_slist_test_walk_perf();
+#endif
 
 	return 0;
 }

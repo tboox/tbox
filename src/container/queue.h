@@ -103,6 +103,7 @@ tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
 tb_pointer_t 	 	tb_queue_get(tb_queue_t* queue);
 
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
+tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
 
 /* iterator
  * 
@@ -157,7 +158,6 @@ tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
  *
  */
 tb_void_t 			tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
-
 
 
 

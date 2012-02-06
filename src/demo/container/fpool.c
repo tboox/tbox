@@ -31,7 +31,7 @@ static tb_void_t tb_fpool_test_itor_perf()
 			// save 
 			tb_size_t next = tb_fpool_itor_next(fpool, itor);
 
-			// remove, hack: the itor of the same item is mutable
+			// remove
 			tb_fpool_del(fpool, itor);
 
 			// next
