@@ -27,6 +27,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../libc/libc.h"
 #include "../network/url.h"
 #include "../memory/memory.h"
 
@@ -220,9 +221,7 @@ typedef struct __tb_gstream_t
 	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
 	// ctrl
-	tb_bool_t 			(*ctrl0)(struct __tb_gstream_t* gst, tb_size_t cmd);
-	tb_bool_t 			(*ctrl1)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
-	tb_bool_t 			(*ctrl2)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
+	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
 
 }tb_gstream_t;
 
@@ -384,9 +383,7 @@ tb_uint64_t 		tb_gstream_offset(tb_gstream_t const* gst);
 tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
 // ctrl
-tb_bool_t 			tb_gstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 			tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
-tb_bool_t 			tb_gstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
+tb_bool_t 			tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...);
 
 #endif
 

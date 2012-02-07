@@ -360,7 +360,7 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_goto(gst, fail);
 
 	// set url
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_URL, url)) goto fail;
 
 	// ok
 	return gst;
@@ -945,34 +945,33 @@ tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
 	tb_assert_and_check_return_val(gst, 0);
 	return gst->timeout;
 }
-tb_bool_t tb_gstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd)
-{
-	tb_assert_and_check_return_val(gst && gst->ctrl0, TB_FALSE);
-	return gst->ctrl0(gst, cmd);
-}
-tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 {	
-	tb_assert_and_check_return_val(gst && gst->ctrl1, TB_FALSE);
+	tb_assert_and_check_return_val(gst && gst->ctrl, TB_FALSE);
 
+	// init args
+	tb_va_list_t args;
+    tb_va_start(args, cmd);
+
+	// ctrl for gstream
 	tb_bool_t ret = TB_FALSE;
 	switch (cmd)
 	{
 	case TB_GSTREAM_CMD_SET_URL:
 		{
-			if (arg1)
-			{
-				if (tb_url_set(&gst->url, (tb_char_t const*)arg1)) ret = TB_TRUE;
-			}
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (url && tb_url_set(&gst->url, url)) ret = TB_TRUE;
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_URL:
 		{
-			if (arg1)
+			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (purl)
 			{
 				tb_char_t const* url = tb_url_get(&gst->url);
 				if (url)
 				{
-					*((tb_char_t const**)arg1) = url;
+					*purl = url;
 					ret = TB_TRUE;
 				}
 			}
@@ -980,21 +979,23 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		break;
 	case TB_GSTREAM_CMD_SET_HOST:
 		{
-			if (arg1)
+			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (host)
 			{
-				tb_url_host_set(&gst->url, (tb_char_t const*)arg1);
+				tb_url_host_set(&gst->url, host);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_HOST:
 		{
-			if (arg1)
+			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (phost)
 			{
 				tb_char_t const* host = tb_url_host_get(&gst->url);
 				if (host)
 				{
-					*((tb_char_t const**)arg1) = host;
+					*phost = host;
 					ret = TB_TRUE;
 				}
 			}
@@ -1002,39 +1003,43 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		break;
 	case TB_GSTREAM_CMD_SET_PORT:
 		{
-			if (arg1)
+			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
+			if (port)
 			{
-				tb_url_port_set(&gst->url, (tb_size_t)arg1);
+				tb_url_port_set(&gst->url, port);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_PORT:
 		{
-			if (arg1)
+			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			if (pport)
 			{
-				*((tb_size_t*)arg1) = tb_url_port_get(&gst->url);
+				*pport = tb_url_port_get(&gst->url);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_SET_PATH:
 		{
-			if (arg1)
+			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (path)
 			{
-				tb_url_path_set(&gst->url, (tb_char_t const*)arg1);
+				tb_url_path_set(&gst->url, path);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_PATH:
 		{
-			if (arg1)
+			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (ppath)
 			{
 				tb_char_t const* path = tb_url_path_get(&gst->url);
 				if (path)
 				{
-					*((tb_char_t const**)arg1) = path;
+					*ppath = path;
 					ret = TB_TRUE;
 				}
 			}
@@ -1042,51 +1047,53 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 		break;
 	case TB_GSTREAM_CMD_SET_SSL:
 		{
-			if (arg1)
-			{
-				tb_url_ssl_set(&gst->url, (tb_bool_t)arg1);
-				ret = TB_TRUE;
-			}
+			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+			tb_url_ssl_set(&gst->url, bssl);
+			ret = TB_TRUE;
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_SSL:
 		{
-			if (arg1)
+			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			if (pssl)
 			{
-				*((tb_bool_t*)arg1) = tb_url_ssl_get(&gst->url);
+				*pssl = tb_url_ssl_get(&gst->url);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_SET_CACHE:
 		{
-			if (arg1)
+			tb_size_t cache = (tb_size_t)tb_va_arg(args, tb_size_t);
+			if (cache)
 			{
-				tb_qbuffer_resize(&gst->cache, (tb_size_t)arg1);
+				tb_qbuffer_resize(&gst->cache, cache);
 				if (tb_qbuffer_maxn(&gst->cache)) ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_CACHE:
 		{
-			if (arg1)
+			tb_size_t* pcache = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			if (pcache)
 			{
-				*((tb_size_t*)arg1) = tb_qbuffer_maxn(&gst->cache);
+				*pcache = tb_qbuffer_maxn(&gst->cache);
 				ret = TB_TRUE;
 			}
 		}
 		break;
 	case TB_GSTREAM_CMD_SET_TIMEOUT:
 		{
-			gst->timeout = (tb_size_t)arg1;
+			gst->timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
 			ret = TB_TRUE;
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_TIMEOUT:
 		{
-			if (arg1)
+			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			if (ptimeout)
 			{
-				*((tb_size_t*)arg1) = gst->timeout;
+				*ptimeout = gst->timeout;
 				ret = TB_TRUE;
 			}
 		}
@@ -1094,12 +1101,19 @@ tb_bool_t tb_gstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 	default:
 		break;
 	}
-	return (gst->ctrl1(gst, cmd, arg1) || ret)? TB_TRUE : TB_FALSE;
-}
-tb_bool_t tb_gstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
-{
-	tb_assert_and_check_return_val(gst && gst->ctrl2, TB_FALSE);
-	return gst->ctrl2(gst, cmd, arg1, arg2);
+
+	// reset args
+	tb_va_end(args);
+    tb_va_start(args, cmd);
+
+	// ctrl for native stream
+	ret = (gst->ctrl(gst, cmd, args) || ret)? TB_TRUE : TB_FALSE;
+
+	// exit args
+	tb_va_end(args);
+
+	// ok?
+	return ret;
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gst)
 {

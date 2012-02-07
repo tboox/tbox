@@ -85,7 +85,7 @@ static tb_long_t tb_zstream_aclose(tb_gstream_t* gst)
 	// close tstream
 	return tb_tstream_aclose(gst);
 }
-static tb_bool_t tb_zstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst, TB_FALSE);
@@ -95,26 +95,26 @@ static tb_bool_t tb_zstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	{
 	case TB_ZSTREAM_CMD_GET_ALGO:
 		{
-			tb_zip_algo_t* pa = (tb_zip_algo_t*)arg1;
+			tb_size_t* pa = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pa, TB_FALSE);
 			*pa = zst->algo;
 			return TB_TRUE;
 		}
 	case TB_ZSTREAM_CMD_GET_ACTION:
 		{
-			tb_zip_action_t* pa = (tb_zip_action_t*)arg1;
+			tb_size_t* pa = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pa, TB_FALSE);
 			*pa = zst->action;
 			return TB_TRUE;
 		}
 	case TB_ZSTREAM_CMD_SET_ALGO:
 		{
-			zst->algo = (tb_size_t)arg1;
+			zst->algo = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_TRUE;
 		}
 	case TB_ZSTREAM_CMD_SET_ACTION:
 		{
-			zst->action = (tb_size_t)arg1;
+			zst->action = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_TRUE;
 		}
 	default:
@@ -122,7 +122,7 @@ static tb_bool_t tb_zstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	}
 
 	// routine to tstream 
-	return tb_tstream_ctrl1(gst, cmd, arg1);
+	return tb_tstream_ctrl(gst, cmd, args);
 }
 static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
 {
@@ -194,7 +194,7 @@ tb_gstream_t* tb_gstream_init_zip()
 	gst->aclose	= tb_zstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
-	gst->ctrl1 	= tb_zstream_ctrl1;
+	gst->ctrl 	= tb_zstream_ctrl;
 
 	// init tstream
 	tst->type 	= TB_TSTREAM_TYPE_ZIP;
@@ -211,13 +211,13 @@ tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_siz
 	tb_assert_and_check_return_val(zst, TB_NULL);
 
 	// set gstream
-	if (!tb_gstream_ctrl1(zst, TB_TSTREAM_CMD_SET_GSTREAM, (tb_pointer_t)gst)) goto fail;
+	if (!tb_gstream_ctrl(zst, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
 		
 	// set zip algorithm
-	if (!tb_gstream_ctrl1(zst, TB_ZSTREAM_CMD_SET_ALGO, (tb_pointer_t)algo)) goto fail;
+	if (!tb_gstream_ctrl(zst, TB_ZSTREAM_CMD_SET_ALGO, algo)) goto fail;
 		
 	// set zip action
-	if (!tb_gstream_ctrl1(zst, TB_ZSTREAM_CMD_SET_ACTION, (tb_pointer_t)action)) goto fail;
+	if (!tb_gstream_ctrl(zst, TB_ZSTREAM_CMD_SET_ACTION, action)) goto fail;
 	
 	return zst;
 

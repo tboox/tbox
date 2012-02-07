@@ -192,7 +192,7 @@ static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	// ok?
 	return fst->wait;
 }
-static tb_bool_t tb_fstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst, TB_FALSE);
@@ -200,7 +200,7 @@ static tb_bool_t tb_fstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	switch (cmd)
 	{
 	case TB_FSTREAM_CMD_SET_FLAGS:
-		fst->flags = (tb_size_t)arg1;
+		fst->flags = (tb_size_t)tb_va_arg(args, tb_size_t);
 		return TB_TRUE;
 	default:
 		break;
@@ -231,12 +231,12 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->seek 	= tb_fstream_seek;
 	gst->bare 	= tb_fstream_bare;
 	gst->wait 	= tb_fstream_wait;
-	gst->ctrl1 	= tb_fstream_ctrl1;
+	gst->ctrl 	= tb_fstream_ctrl;
 	fst->file 	= TB_NULL;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 
 	// resize file cache
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
 
 	// ok
 	return gst;
@@ -255,7 +255,7 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set path
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
 	
 	return gst;
 

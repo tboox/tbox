@@ -36,14 +36,14 @@ int main(int argc, char** argv)
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
 		tb_http_option_t* option = TB_NULL;
-		tb_gstream_ctrl1(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
+		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
 		if (option) 
 		{
 			option->hfunc = tb_http_test_hfunc;
 			tb_hash_set(option->head, "Accept-Encoding", "gzip,deflate");
 		}
 	}
-	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl1(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
 	if (!tb_gstream_bopen(ist)) goto end;

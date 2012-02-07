@@ -383,7 +383,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 
 	return sst->wait;
 }
-static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, TB_FALSE);
@@ -393,7 +393,8 @@ static tb_bool_t tb_sstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	case TB_SSTREAM_CMD_SET_TYPE:
 		{
 			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
-			sst->type = (tb_size_t)arg1;
+			sst->type = (tb_size_t)tb_va_arg(args, tb_size_t);
+			tb_assert_and_check_return_val(sst->type == TB_SOCKET_TYPE_TCP || sst->type == TB_SOCKET_TYPE_UDP, TB_FALSE);
 			return TB_TRUE;
 		}
 	default:
@@ -420,7 +421,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->aclose = tb_sstream_aclose;
 	gst->aread 	= tb_sstream_aread;
 	gst->awrit 	= tb_sstream_awrit;
-	gst->ctrl1 	= tb_sstream_ctrl1;
+	gst->ctrl 	= tb_sstream_ctrl;
 	gst->bare 	= tb_sstream_bare;
 	gst->wait 	= tb_sstream_wait;
 	sst->sock 	= TB_NULL;
@@ -443,10 +444,10 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// ioctl
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_GSTREAM_CMD_SET_SSL, bssl)) goto fail;
-	if (!tb_gstream_ctrl1(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
 	
 	// ok
 	return gst;

@@ -342,7 +342,7 @@ static tb_encoder_t g_encoders[] =
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-tb_encoder_t const* tb_encoding_get_encoder(tb_encoding_t encoding)
+tb_encoder_t const* tb_encoding_get_encoder(tb_size_t encoding)
 {
 	tb_uint8_t idx = (tb_uint8_t)encoding;
 	if (idx < tb_arrayn(g_encoders))
@@ -353,7 +353,7 @@ tb_encoder_t const* tb_encoding_get_encoder(tb_encoding_t encoding)
 	}
 	return TB_NULL;
 }
-tb_size_t tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n)
+tb_size_t tb_encoding_convert_string(tb_size_t src_e, tb_size_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n)
 {
 	// get the encoding encoders
 	tb_encoder_t const* src_c = tb_encoding_get_encoder(src_e);

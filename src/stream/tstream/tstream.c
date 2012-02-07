@@ -39,7 +39,7 @@ tb_bool_t tb_tstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd)
 {
 	return TB_FALSE;
 }
-tb_bool_t tb_tstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+tb_bool_t tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	tb_assert_and_check_return_val(tst, TB_FALSE);
@@ -48,23 +48,20 @@ tb_bool_t tb_tstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
 	{
 	case TB_TSTREAM_CMD_GET_GSTREAM:
 		{
-			tb_gstream_t** pgst = (tb_gstream_t*)arg1;
+			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(args, tb_gstream_t**);
 			tb_assert_and_check_return_val(pgst, TB_FALSE);
 			*pgst = tst->gst;
 			return TB_TRUE;
 		}
 	case TB_TSTREAM_CMD_SET_GSTREAM:
 		{
-			tst->gst = (tb_gstream_t*)arg1;
+			tst->gst = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
+			tb_assert_and_check_return_val(tst->gst, TB_FALSE);
 			return TB_TRUE;
 		}
 	default:
 		break;
 	}
-	return TB_FALSE;
-}
-tb_bool_t tb_tstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
-{
 	return TB_FALSE;
 }
 tb_long_t tb_tstream_aopen(tb_gstream_t* gst)
