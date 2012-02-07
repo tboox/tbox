@@ -10,11 +10,21 @@
 /* ///////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
+static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
 {
-	tb_cookies_t* cookies = option->udata;
+	// check
+	tb_assert_and_check_return_val(http && line, TB_FALSE);
+
+	// option 
+	tb_http_option_t* 	option = tb_http_option(http);
+
+	// cookies
+	tb_cookies_t* 		cookies = option->udata;
+
+	// trace
 	tb_print("[demo]: response: %s", line);
 
+	// cookie
 	if (cookies && !tb_strnicmp(line, "Set-Cookie", 10))
 	{
 		// seek to value
@@ -59,6 +69,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// keep-alive
 	option->balive = 0;
+
+	// timeout 
+//	option->timeout = 10000;
 
 	// redirect
 //	option->rdtm = 0;

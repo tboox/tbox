@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"http"
+#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -54,10 +54,11 @@
 // the http step type
 typedef enum __tb_http_state_t
 {
-	TB_HTTP_STEP_NONE 			= 0
+	TB_HTTP_STEP_NONE 	= 0
 ,	TB_HTTP_STEP_CONN 	= 1
 ,	TB_HTTP_STEP_REQT 	= 2
 ,	TB_HTTP_STEP_RESP 	= 4
+,	TB_HTTP_STEP_NEVT 	= 8
 
 }tb_http_state_t;
 
@@ -277,6 +278,9 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	// tryn++
 	http->tryn++;
 
+	// need wait connection
+	http->step &= ~TB_HTTP_STEP_NEVT;
+
 	// open stream
 	tb_trace_impl("connect: try");
 	tb_long_t r = tb_gstream_aopen(http->stream);
@@ -407,6 +411,9 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	// check
 	tb_assert_and_check_return_val(data && size && http->size < size, -1);
 
+	// need wait if no data
+	http->step &= ~TB_HTTP_STEP_NEVT;
+
 	// send request
 	tb_trace_impl("request: try");
 	while (http->size < size)
@@ -422,6 +429,9 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		http->size += n;
 	}
 	tb_assert_and_check_return_val(http->size == size, -1);
+
+	// need wait if no data
+	http->step &= ~TB_HTTP_STEP_NEVT;
 
 	// flush writed data
 	tb_long_t r = tb_gstream_afwrit(http->stream);
@@ -579,12 +589,17 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	// tryn++
 	http->tryn++;
 
+	// need wait if no data
+	http->step &= ~TB_HTTP_STEP_NEVT;
+
 	// read response
 	while (1)
 	{
 		// read char
 		cn = tb_gstream_aread(http->stream, ch, 1);
-		tb_assert_and_check_return_val(cn >= 0, -1);
+
+		// abort?
+		tb_check_return_val(cn >= 0, -1);
 
 		// no data? 
 		tb_check_return_val(cn, 0);
@@ -609,7 +624,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 			tb_trace_impl("response: %s", pb);
 
 			// do callback
-			if (http->option.hfunc) if (!http->option.hfunc(&http->option, pb)) return -1;
+			if (http->option.hfunc) if (!http->option.hfunc((tb_handle_t)http, pb)) return -1;
 			
 			// end?
 			if (!tb_pstring_size(&http->data)) break;
@@ -681,8 +696,8 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		// redirect++
 		http->rdtn++;
 		
-		// clear step
-		http->step = TB_HTTP_STEP_NONE;
+		// reset step, no event now, need not wait
+		http->step = TB_HTTP_STEP_NONE | TB_HTTP_STEP_NEVT;
 		http->tryn = 0;
 
 		// reset chunk size
@@ -772,8 +787,19 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t etype, tb_long_t timeout)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
-
-	return tb_gstream_wait(http->stream, etype, timeout);
+	
+	// wait event
+	tb_size_t e = TB_AIOO_ETYPE_NULL;
+	if (!(http->step & TB_HTTP_STEP_NEVT))
+	{
+		if (!(http->step & TB_HTTP_STEP_CONN)) e = TB_AIOO_ETYPE_CONN;
+		else if (!(http->step & TB_HTTP_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
+		else if (!(http->step & TB_HTTP_STEP_RESP)) e = TB_AIOO_ETYPE_READ;
+		else e = etype;
+	}
+		
+	// wait
+	return e? tb_gstream_wait(http->stream, e, timeout) : etype;
 }
 tb_long_t tb_http_aopen(tb_handle_t handle)
 {
@@ -816,24 +842,11 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	tb_long_t r = 0;
 	while (!(r = tb_http_aopen(handle)))
 	{
-		// has aio event?
-		tb_size_t e = TB_AIOO_ETYPE_NULL;
-		if (!tb_pstring_size(&http->status.location))
-		{
-			if (!(http->step & TB_HTTP_STEP_CONN)) e = TB_AIOO_ETYPE_CONN;
-			else if (!(http->step & TB_HTTP_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
-			else if (!(http->step & TB_HTTP_STEP_RESP)) e = TB_AIOO_ETYPE_READ;
-		}
+		// wait
+		r = tb_http_wait(handle, TB_AIOO_ETYPE_EALL, http->option.timeout);
 
-		// need wait?
-		if (e)
-		{
-			// wait
-			r = tb_http_wait(handle, e, http->option.timeout);
-
-			// fail or timeout?
-			tb_check_break(r > 0);
-		}
+		// fail or timeout?
+		tb_check_break(r > 0);
 	}
 
 	// dump status

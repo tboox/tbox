@@ -486,15 +486,13 @@ tb_bool_t tb_gstream_bopen(tb_gstream_t* gst)
 
 	// try opening it
 	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
 	while (!(r = tb_gstream_aopen(gst)))
 	{
 		// wait
 		r = tb_gstream_wait(gst, TB_AIOO_ETYPE_EALL, gst->timeout);
-		tb_assert_and_check_return_val(r >= 0, TB_FALSE);
 
-		// timeout?
-		tb_check_return_val(r, TB_FALSE);
+		// fail or timeout?
+		tb_check_break(r > 0);
 	}
 
 	// ok?
