@@ -73,10 +73,10 @@ typedef struct __tb_encoder_t
  */
 
 // get the encoder
-tb_encoder_t const* 	tb_encoding_get_encoder(tb_encoding_t encoding);
+tb_encoder_t const* 	tb_encoding_get_encoder(tb_size_t encoding);
 
 // convert string
-tb_size_t 				tb_encoding_convert_string(tb_encoding_t src_e, tb_encoding_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
+tb_size_t 				tb_encoding_convert_string(tb_size_t src_e, tb_size_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n);
 
 
 #endif

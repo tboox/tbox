@@ -134,7 +134,7 @@ static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	if (etype & TB_AIOO_ETYPE_WRIT) e |= TB_AIOO_ETYPE_WRIT;
 	return e;
 }
-static tb_bool_t tb_dstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2)
+static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, TB_FALSE);
@@ -143,10 +143,10 @@ static tb_bool_t tb_dstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	{
 	case TB_DSTREAM_CMD_SET_DATA:
 		{
-			tb_assert_and_check_return_val(arg1 && arg2, TB_FALSE);
-			dst->data = (tb_byte_t*)arg1;
-			dst->size = (tb_size_t)arg2;
+			dst->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
+			dst->size = (tb_size_t)tb_va_arg(args, tb_size_t);
 			dst->head = TB_NULL;
+			tb_assert_and_check_return_val(dst->data && dst->size, TB_FALSE);
 		}
 		return TB_TRUE;
 	default:
@@ -174,7 +174,7 @@ tb_gstream_t* tb_gstream_init_data()
 	gst->size 	= tb_dstream_size;
 	gst->seek 	= tb_dstream_seek;
 	gst->wait 	= tb_dstream_wait;
-	gst->ctrl2 = tb_dstream_ctrl2;
+	gst->ctrl 	= tb_dstream_ctrl;
 
 	// ok
 	return gst;
@@ -192,7 +192,7 @@ tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// set data & size
-	if (!tb_gstream_ctrl2(gst, TB_DSTREAM_CMD_SET_DATA, (tb_pointer_t)data, (tb_pointer_t)size)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_DSTREAM_CMD_SET_DATA, data, size)) goto fail;
 	
 	return gst;
 

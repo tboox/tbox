@@ -60,7 +60,7 @@ static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
 
 	return tb_tstream_aopen(gst);
 }
-static tb_bool_t tb_estream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1)
+static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_assert_and_check_return_val(est, TB_FALSE);
@@ -70,26 +70,26 @@ static tb_bool_t tb_estream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	{
 	case TB_ESTREAM_CMD_GET_IE:
 		{
-			tb_encoding_t* pe = (tb_encoding_t*)arg1;
+			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe && est->ic, TB_FALSE);
 			*pe = est->ic->encoding;
 			return TB_TRUE;
 		}
 	case TB_ESTREAM_CMD_GET_OE:
 		{
-			tb_encoding_t* pe = (tb_encoding_t*)arg1;
+			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe && est->oc, TB_FALSE);
 			*pe = est->oc->encoding;
 			return TB_TRUE;
 		}
 	case TB_ESTREAM_CMD_SET_IE:
 		{
-			est->ic = (tb_encoder_t const*)tb_encoding_get_encoder((tb_encoding_t)arg1);
+			est->ic = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
 			return est->ic? TB_TRUE : TB_FALSE;
 		}
 	case TB_ESTREAM_CMD_SET_OE:
 		{
-			est->oc = (tb_encoder_t const*)tb_encoding_get_encoder((tb_encoding_t)arg1);
+			est->oc = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
 			return est->oc? TB_TRUE : TB_FALSE;
 		}
 	default:
@@ -97,7 +97,7 @@ static tb_bool_t tb_estream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t
 	}
 
 	// routine to tstream 
-	return tb_tstream_ctrl1(gst, cmd, arg1);
+	return tb_tstream_ctrl(gst, cmd, args);
 }
 static tb_bool_t tb_estream_spank(tb_gstream_t* gst)
 {
@@ -161,7 +161,7 @@ tb_gstream_t* tb_gstream_init_encoding()
 	gst->aclose	= tb_tstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
-	gst->ctrl1 	= tb_estream_ctrl1;
+	gst->ctrl 	= tb_estream_ctrl;
 
 	// init tstream
 	tst->type 	= TB_TSTREAM_TYPE_ENCODING;
@@ -179,13 +179,13 @@ tb_gstream_t* tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_
 	tb_assert_and_check_return_val(est, TB_NULL);
 
 	// set gstream
-	if (!tb_gstream_ctrl1(est, TB_TSTREAM_CMD_SET_GSTREAM, (tb_pointer_t)gst)) goto fail;
+	if (!tb_gstream_ctrl(est, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
 		
 	// set input encoding
-	if (!tb_gstream_ctrl1(est, TB_ESTREAM_CMD_SET_IE, (tb_pointer_t)ie)) goto fail;
+	if (!tb_gstream_ctrl(est, TB_ESTREAM_CMD_SET_IE, ie)) goto fail;
 		
 	// set output encoding
-	if (!tb_gstream_ctrl1(est, TB_ESTREAM_CMD_SET_OE, (tb_pointer_t)oe)) goto fail;
+	if (!tb_gstream_ctrl(est, TB_ESTREAM_CMD_SET_OE, oe)) goto fail;
 	
 	return est;
 
