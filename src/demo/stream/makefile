@@ -5,7 +5,8 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		gstream \
 		nstream \
-		estream
+		estream \
+		zstream 
 
 include $(SRC_DIR)/demo/makefile
 

@@ -33,36 +33,24 @@ static __tb_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
 	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_RLC, TB_NULL);
 	return (tb_zip_rlc_t*)zip;
 }
-static tb_void_t tb_zip_rlc_close(tb_zip_t* zip)
+static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	if (rlc) 
-	{
-		// close vlc
-		if (rlc->vlc && rlc->vlc->close) rlc->vlc->close(rlc->vlc); 
-
-		// reset it
-		tb_memset(rlc, 0, sizeof(tb_zip_rlc_t));
-	}
-}
-static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
-{
-	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	tb_assert_and_check_return_val(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(rlc && ist && ost, -1);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, -1);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, -1);
 
 	// get vlc
 	tb_zip_vlc_t* vlc = rlc->vlc;
-	tb_assert_and_check_return_val(vlc && vlc->set, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(vlc && vlc->set, -1);
 
 	// vlc callback
 	tb_zip_vlc_set_t vlc_set = vlc->set;
@@ -133,26 +121,28 @@ static tb_zip_status_t tb_zip_rlc_spank_deflate(tb_zip_t* zip, tb_bstream_t* ist
 	rlc->last = last;
 	rlc->repeat = repeat;
 
-	return TB_ZIP_STATUS_OK;
+	// ok
+	return (ost->p - op);
 }
-static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
+static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
-	tb_assert_and_check_return_val(rlc && ist && ost, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(rlc && ist && ost, -1);
 
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	tb_assert_and_check_return_val(ip && ie, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(ip && ie, -1);
 
 	// the output stream
+	tb_byte_t* ob = ost->p;
 	tb_byte_t* op = ost->p;
 	tb_byte_t* oe = ost->e;
-	tb_assert_and_check_return_val(op && oe, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(op && oe, -1);
 
 	// get vlc
 	tb_zip_vlc_t* vlc = rlc->vlc;
-	tb_assert_and_check_return_val(vlc && vlc->get, TB_ZIP_STATUS_FAIL);
+	tb_assert_and_check_return_val(vlc && vlc->get, -1);
 
 	// vlc callback
 	tb_zip_vlc_get_t vlc_get = vlc->get;
@@ -188,36 +178,54 @@ static tb_zip_status_t tb_zip_rlc_spank_inflate(tb_zip_t* zip, tb_bstream_t* ist
 	rlc->last = last;
 	rlc->repeat = repeat;
 
-	return TB_ZIP_STATUS_OK;
+	// ok
+	return (op - ob);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_zip_t* tb_zip_rlc_open(tb_zip_rlc_t* rlc, tb_zip_action_t action)
+tb_zip_t* tb_zip_rlc_init(tb_size_t action)
 {
-	tb_zip_t* zip = (tb_zip_t*)rlc;
+	// alloc
+	tb_zip_t* zip = (tb_zip_t*)tb_calloc(1, sizeof(tb_zip_rlc_t));
 	tb_assert_and_check_return_val(zip, TB_NULL);
 	
 	// init zip
-	tb_memset(zip, 0, sizeof(tb_zip_rlc_t));
 	zip->algo 		= TB_ZIP_ALGO_RLC;
 	zip->action 	= action;
-	zip->close 		= tb_zip_rlc_close;
-	zip->spank 		= (action == TB_ZIP_ACTION_INFLATE)? tb_zip_rlc_spank_inflate : tb_zip_rlc_spank_deflate;
+	zip->spak 		= (action == TB_ZIP_ACTION_INFLATE)? tb_zip_rlc_spak_inflate : tb_zip_rlc_spak_deflate;
 
 	// open vlc
 #if TB_ZIP_RLC_VLC_TYPE_GOLOMB
-	rlc->vlc = tb_zip_vlc_golomb_open(&(zip->vlc), 4);
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_golomb_open(&(zip->vlc), 4);
 #elif TB_ZIP_RLC_VLC_TYPE_GAMMA
-	rlc->vlc = tb_zip_vlc_gamma_open(&(zip->vlc));
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_gamma_open(&(zip->vlc));
 #else
-	rlc->vlc = tb_zip_vlc_fixed_open(&(zip->vlc), 16);
+	((tb_zip_rlc_t*)zip)->vlc = tb_zip_vlc_fixed_open(&(zip->vlc), 16);
 #endif
 
 	// check vlc
-	tb_assert_and_check_return_val(rlc->vlc, TB_NULL);
+	tb_assert_and_check_goto(((tb_zip_rlc_t*)zip)->vlc, fail);
 
+	// ok
 	return zip;
+
+fail:
+	if (zip) tb_free(zip);
+	return TB_NULL;
 }
+tb_void_t tb_zip_rlc_exit(tb_zip_t* zip)
+{
+	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
+	if (rlc) 
+	{
+		// close vlc
+		if (rlc->vlc && rlc->vlc->close) rlc->vlc->close(rlc->vlc); 
+
+		// free it
+		tb_free(rlc);
+	}
+}
+

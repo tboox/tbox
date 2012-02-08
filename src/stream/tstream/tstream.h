@@ -70,8 +70,8 @@ typedef struct __tb_tstream_t
 	tb_byte_t* 			op;
 	tb_size_t 			on;
 
-	// spank
-	tb_long_t 			(*spank)(tb_gstream_t* gst);
+	// spak
+	tb_long_t 			(*spak)(tb_gstream_t* gst);
 
 }tb_tstream_t;
 

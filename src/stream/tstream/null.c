@@ -48,7 +48,7 @@ static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NULL, TB_NULL);
 	return (tb_nstream_t*)tst;
 }
-static tb_long_t tb_nstream_spank(tb_gstream_t* gst)
+static tb_long_t tb_nstream_spak(tb_gstream_t* gst)
 {
 	tb_nstream_t* nst = tb_nstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
@@ -68,7 +68,7 @@ static tb_long_t tb_nstream_spank(tb_gstream_t* gst)
 	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
 	tb_check_return_val(op < oe, 0);
 
-	// spank it
+	// spak it
 	tb_size_t n = tb_min(ie - ip, oe - op);
 	tb_memcpy(op, ip, n);
 	ip += n;
@@ -111,7 +111,7 @@ tb_gstream_t* tb_gstream_init_null()
 
 	// init tstream
 	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_NULL;
-	((tb_tstream_t*)gst)->spank = tb_nstream_spank;
+	((tb_tstream_t*)gst)->spak = tb_nstream_spak;
 
 	// ok
 	return gst;
