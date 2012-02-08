@@ -33,14 +33,16 @@
  * types
  */
 
-// the tstream status
-typedef enum __tb_tstream_status_t
-{
- 	TB_TSTREAM_STATUS_OK 	= 0
-, 	TB_TSTREAM_STATUS_END 	= 1
-,	TB_TSTREAM_STATUS_FAIL 	= 2
+// the tstream cache maxn
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_TSTREAM_CACHE_MAXN 					(4096)
+#else
+# 	define TB_TSTREAM_CACHE_MAXN 					(8192)
+#endif
 
-}tb_tstream_status_t;
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
 
 // the transform stream type
 typedef struct __tb_tstream_t
@@ -51,27 +53,25 @@ typedef struct __tb_tstream_t
 	// the type
 	tb_size_t 			type;
 
-	// the status
-	tb_size_t 			status;
+	// the last read & writ
+	tb_long_t 			read;
+	tb_long_t 			writ;
 
 	// the reference to gstream
 	tb_gstream_t* 		gst;
 
-	// FIXME
 	// the input data
-	tb_byte_t 			ib[1];
-//	tb_byte_t 			ib[TB_GSTREAM_CACHE_MAXN];
+	tb_byte_t 			ib[TB_TSTREAM_CACHE_MAXN];
 	tb_byte_t const* 	ip;
 	tb_size_t 			in;
 
 	// the output data
-	tb_byte_t 			ob[1];
-//	tb_byte_t 			ob[TB_GSTREAM_CACHE_MAXN];
+	tb_byte_t 			ob[TB_TSTREAM_CACHE_MAXN];
 	tb_byte_t* 			op;
 	tb_size_t 			on;
 
 	// spank
-	tb_bool_t 			(*spank)(tb_gstream_t* gst);
+	tb_long_t 			(*spank)(tb_gstream_t* gst);
 
 }tb_tstream_t;
 
@@ -79,19 +79,24 @@ typedef struct __tb_tstream_t
  * interfaces
  */
 
+// cast
 tb_tstream_t* 	tb_tstream_cast(tb_gstream_t* gst);
 
+// bare
 tb_handle_t 	tb_tstream_bare(tb_gstream_t* gst);
 
-tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
-
+// open & close 
 tb_long_t 		tb_tstream_aopen(tb_gstream_t* gst);
 tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
 
+// read & writ
 tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 		tb_tstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
-tb_bool_t 		tb_tstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd);
-tb_bool_t 		tb_tstream_ctrl1(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1);
-tb_bool_t 		tb_tstream_ctrl2(tb_gstream_t* gst, tb_size_t cmd, tb_pointer_t arg1, tb_pointer_t arg2);
+// wait
+tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+
+// ctrl
+tb_bool_t 		tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
 
 #endif

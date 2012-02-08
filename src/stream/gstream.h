@@ -238,6 +238,7 @@ tb_gstream_t* 		tb_gstream_init_data();
 tb_gstream_t* 		tb_gstream_init_file();
 tb_gstream_t* 		tb_gstream_init_sock();
 tb_gstream_t* 		tb_gstream_init_http();
+tb_gstream_t* 		tb_gstream_init_null();
 tb_gstream_t* 		tb_gstream_init_zip();
 tb_gstream_t* 		tb_gstream_init_encoding();
 tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
@@ -264,6 +265,9 @@ tb_gstream_t* 		tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port,
 
 // init stream from http or https
 tb_gstream_t* 		tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+
+// init stream from null
+tb_gstream_t* 		tb_gstream_init_from_null(tb_gstream_t* gst);
 
 // init stream from zip
 tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);

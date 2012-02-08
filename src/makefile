@@ -47,8 +47,8 @@ tbox_C_FILES 			+= \
 						stream/gstream/data \
 						stream/gstream/sock \
 						stream/tstream/tstream \
+						stream/tstream/null \
 						stream/tstream/encoding \
-						stream/tstream/zip \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \

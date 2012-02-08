@@ -52,7 +52,7 @@ typedef union __tb_zip_package_t
 
 // open & close
 tb_zip_t* 			tb_zip_open(tb_zip_package_t* package, tb_zip_algo_t algo, tb_zip_action_t action);
-tb_void_t 				tb_zip_close(tb_zip_t* zip);
+tb_void_t 			tb_zip_close(tb_zip_t* zip);
 
 // spank
 tb_zip_status_t 	tb_zip_spank(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost);

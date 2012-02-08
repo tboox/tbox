@@ -142,9 +142,7 @@ static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
 	// get output
 	tb_assert_and_check_return_val(tst->op, TB_FALSE);
 	tb_byte_t* op = tst->op;
-	// FIXME
-//	tb_byte_t* oe = tst->ob + TB_GSTREAM_CACHE_MAXN;
-	tb_byte_t* oe = tst->ob + 1;
+	tb_byte_t* oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
 
 	// attach bstream
 	tb_bstream_t ist, ost;
@@ -172,8 +170,8 @@ static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
 	// update output
 	tst->on += op - tst->op;
 
-	// update status
-	if (ret == TB_ZIP_STATUS_END) tst->status = TB_TSTREAM_STATUS_END;
+	// update state
+	if (ret == TB_ZIP_STATUS_END) tst->state = TB_TSTREAM_STATE_END;
 
 	return TB_TRUE;
 }
