@@ -321,7 +321,6 @@ zlib_INC_FILES 			= \
 						inftrees.h \
 						trees.h \
 						zconf.h \
-						zconf.in.h \
 						zlib.h \
 						zutil.h
 
