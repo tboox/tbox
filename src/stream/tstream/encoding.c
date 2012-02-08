@@ -56,7 +56,7 @@ static __tb_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
 static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
-	tb_assert_and_check_return_val(est && est->ic && est->oc, TB_FALSE);
+	tb_assert_and_check_return_val(est && est->ic && est->oc, -1);
 
 	return tb_tstream_aopen(gst);
 }
@@ -65,7 +65,6 @@ static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_assert_and_check_return_val(est, TB_FALSE);
 
-	// handle it
 	switch (cmd)
 	{
 	case TB_ESTREAM_CMD_GET_IE:
@@ -103,24 +102,26 @@ static tb_bool_t tb_estream_spank(tb_gstream_t* gst)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(est && tst, TB_FALSE);
+	tb_assert_and_check_return_val(est && tst, -1);
 
-	// get convecter
-	tb_assert_and_check_return_val(est->ic && est->oc, TB_FALSE);
+	// the convecter
+	tb_assert_and_check_return_val(est->ic && est->oc, -1);
 	tb_encoder_t const* ic = est->ic;
 	tb_encoder_t const* oc = est->oc;
 
-	// get input
-	tb_assert_and_check_return_val(tst->ip && tst->in, TB_FALSE);
-	tb_byte_t const* ip = tst->ip;
-	tb_byte_t const* ie = ip + tst->in;
+	// the input
+	tb_assert_and_check_return_val(tst->ip, -1);
+	tb_byte_t const* 	ib = tst->ip;
+	tb_byte_t const* 	ip = tst->ip;
+	tb_byte_t const* 	ie = ip + tst->in;
+	tb_check_return_val(ip < ie, 0);
 
-	// get output
-	tb_assert_and_check_return_val(tst->op, TB_FALSE);
-	tb_byte_t* op = tst->op;
-	// FIXME
-//	tb_byte_t* oe = tst->ob + TB_GSTREAM_CACHE_MAXN;
-	tb_byte_t* oe = tst->ob + 1;
+	// the output
+	tb_assert_and_check_return_val(tst->op, -1);
+	tb_byte_t* 			ob = tst->op;
+	tb_byte_t* 			op = tst->op;
+	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	tb_check_return_val(op < oe, 0);
 
 	// spank it
 	tb_uint32_t ch;
@@ -129,45 +130,52 @@ static tb_bool_t tb_estream_spank(tb_gstream_t* gst)
 		if (!ic->get(&ch, &ip, ie - ip)) break;
 		if (!oc->set(ch, &op, oe - op)) break;
 	}
-	//while (ip < ie && op < oe) *op++ = *ip++;
 
 	// check
-	tb_assert_and_check_return_val(ip >= tst->ip && ip <= ie, TB_FALSE);
-	tb_assert_and_check_return_val(op >= tst->op && op <= oe, TB_FALSE);
+	tb_assert_and_check_return_val(ip >= ib && ip <= ie, -1);
+	tb_assert_and_check_return_val(op >= ob && op <= oe, -1);
 
 	// update input
-	tst->in -= ip - tst->ip;
+	tst->in -= ip - ib;
 	tst->ip = ip;
 
 	// update output
-	tst->on += op - tst->op;
+	tst->on += op - ob;
 
-	return TB_TRUE;
+	// ok
+	return (op - ob);
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_gstream_t* tb_gstream_init_encoding()
 {
-	// create stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_estream_t));
-	tb_tstream_t* tst = (tb_tstream_t*)gst;
 	tb_assert_and_check_return_val(gst, TB_NULL);
+
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
 
 	// init gstream
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
 	gst->aopen 	= tb_estream_aopen;
 	gst->aread 	= tb_tstream_aread;
+	gst->awrit 	= tb_tstream_awrit;
 	gst->aclose	= tb_tstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
 	gst->ctrl 	= tb_estream_ctrl;
 
 	// init tstream
-	tst->type 	= TB_TSTREAM_TYPE_ENCODING;
-	tst->spank 	= tb_estream_spank;
+	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_ENCODING;
+	((tb_tstream_t*)gst)->spank = tb_estream_spank;
 
+	// ok
 	return gst;
+
+fail:
+	if (gst) tb_gstream_exit(gst);
+	return TB_NULL;
 }
 
 tb_gstream_t* tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe)

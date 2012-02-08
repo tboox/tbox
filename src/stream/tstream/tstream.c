@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 			"tst"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "tstream.h"
@@ -34,10 +39,6 @@ tb_tstream_t* tb_tstream_cast(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_TRAN, TB_NULL);
 	return (tb_tstream_t*)gst;
-}
-tb_bool_t tb_tstream_ctrl0(tb_gstream_t* gst, tb_size_t cmd)
-{
-	return TB_FALSE;
 }
 tb_bool_t tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
@@ -77,28 +78,40 @@ tb_long_t tb_tstream_aopen(tb_gstream_t* gst)
 	tst->op = tst->ob;
 	tst->on = 0;
 
-	// init status
-	tst->status = TB_TSTREAM_STATUS_OK;
+	// init read & writ
+	tst->read = 0;
+	tst->writ = 0;
 
 	// ok
 	return 1;
 }
 tb_long_t tb_tstream_aclose(tb_gstream_t* gst)
 {
+	tb_tstream_t* tst = tb_tstream_cast(gst);
+	tb_assert_and_check_return_val(tst && tst->gst, -1);
+
+	// init input
+	tst->ip = tst->ib;
+	tst->in = 0;
+
+	// init output
+	tst->op = tst->ob;
+	tst->on = 0;
+
+	// init read & writ
+	tst->read = 0;
+	tst->writ = 0;
+
 	// ok
 	return 1;
 }
 tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	//tb_trace("=====================================");
-	//tb_trace("need: %d", size);
-
-	// check
-	tb_assert_and_check_return_val(tst && data, -1);
+	tb_assert_and_check_return_val(tst && tst->gst && tst->spank && data, -1);
 	tb_check_return_val(size, 0);
 
-	// read data from the output data first
+	// read the output data first
 	tb_long_t read = 0;
 	if (tst->on > 0)
 	{
@@ -120,55 +133,46 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		}
 	}
 
-	//tb_trace("have: %d", read);
-	// is enough?
-	if (read == size) return read;
+	// enough?
+	tb_check_return_val(read < size, read);
 
-	// FIXME
-	// read data from gstream if the input data is not full
-//	tb_long_t ln = tst->ib + TB_GSTREAM_CACHE_MAXN - tst->ip;
-	tb_long_t ln = tst->ib + 1 - tst->ip;
-	tb_long_t ret = -1;
-	if (tst->in < ln)
+	// move the input data for the more space
+	if (tst->ip != tst->ib) 
+	{
+		if (tst->in) tb_memmov(tst->ib, tst->ip, tst->in);
+		tst->ip = tst->ib;
+	}
+
+	// fill the input data now
+	tb_long_t ln = tst->ib + TB_TSTREAM_CACHE_MAXN - tst->ip;
+	if (tst->in < ln && tst->read >= 0)
 	{
 		// read data
-		tb_assert_and_check_return_val(tst->gst, -1);
-		ret = tb_gstream_aread(tst->gst, tst->ip + tst->in, ln - tst->in);
-		if (ret > 0) tst->in += ret;
-		// handle the left data
-		else if (tst->in) ;
-		// return the left data
-		else if (read) return read;
-		else if (!ret && tst->status != TB_TSTREAM_STATUS_FAIL) 
+		tst->read = tb_gstream_aread(tst->gst, tst->ip + tst->in, ln - tst->in);
+
+		// update the input size
+		if (tst->read > 0) tst->in += tst->read;
+		// no data?
+		else if (!tst->read) 
 		{
 			// has size?
-			tb_uint64_t gsize = tb_gstream_size(tst->gst);
+			tb_uint64_t n = tb_gstream_size(tst->gst);
+			tb_uint64_t o = tb_gstream_offset(tst->gst);
 
 			// is end?
-			if (gsize && tb_gstream_offset(tst->gst) >= gsize) return -1;
-			else if (tst->status == TB_TSTREAM_STATUS_END) return -1;
-			// no data, wait for timeout?
-			else return 0;
+			if (n && o >= n) tst->read = -1;
 		}
-		// error? end?
-		else return -1;
 	}
 
-	//tb_trace("spank[i]: %d", tst->in);
-	// spank it for transform
-	tb_assert_and_check_return_val(tst->spank && !tst->on && tst->op == tst->ob, -1);
-	if (!tst->spank(gst)) 
-	{
-		tst->status = TB_TSTREAM_STATUS_FAIL;
-		return read? read : -1;
-	}
+	// spank it
+	tb_long_t r = 0;
+	tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
+	while ((r = tst->spank(gst)) > 0) ;
 
-	//tb_trace("spank[o]: %d, left: %d", tst->on, tst->in);
-	// read data from the output data
+	// continue to read the output data
 	if (tst->on > 0)
 	{
-		// if enough?
-		tb_assert_and_check_return_val(read < size, -1);
+		// enough?
 		tb_size_t need = size - read;
 		if (tst->on > need)
 		{
@@ -185,41 +189,31 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			tst->on = 0;
 		}
 	}
-	// have not enough input data for transform?
-	else ;
+	// no output? end?
+	else if (tst->read < 0) return -1;
 
-	//tb_trace("move: %d", tst->in);
-	// move the left input data to the begin for getting more data
-	if (tst->ib != tst->ip)
-	{
-		if (tst->in) tb_memmov(tst->ib, tst->ip, tst->in);
-		tst->ip = tst->ib;
-	}
-	// break it if no enough input? tst->in > 0
-	else if (!tst->on && !read)
-	{
-		// error?
-		if (ret < 0) return -1;
-		// is end?
-		else
-		{
-			tb_uint64_t gsize = tb_gstream_size(tst->gst);
-			if (gsize && tb_gstream_offset(tst->gst) >= gsize) return -1;
-			else if (tst->status == TB_TSTREAM_STATUS_END) return -1;
-		}
-	}
-
-	//tb_trace("read: %d", read);
+	// ok?
 	return read;
 }
 
-tb_handle_t tb_tstream_bare(tb_gstream_t* gst)
-{
-	tb_trace_noimpl();
-	return TB_NULL;
-}
-tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_tstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_trace_noimpl();
 	return -1;
+}
+tb_handle_t tb_tstream_bare(tb_gstream_t* gst)
+{
+	tb_tstream_t* tst = tb_tstream_cast(gst);
+	tb_assert_and_check_return_val(tst, TB_NULL);
+
+	return tb_gstream_bare(tst->gst);
+}
+tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+{
+	tb_tstream_t* tst = tb_tstream_cast(gst);
+	tb_assert_and_check_return_val(tst, TB_NULL);
+
+	if (tst->read > 0) return etype;
+	else if (!tst->read) return tb_gstream_wait(tst->gst, etype, timeout);
+	else return -1;
 }

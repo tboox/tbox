@@ -4,8 +4,8 @@ include $(PRO_DIR)/prefix.mak
 # module name
 NAMES = \
 		gstream \
-		estream \
-		zstream 
+		nstream \
+		estream
 
 include $(SRC_DIR)/demo/makefile
 
