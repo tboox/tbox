@@ -59,15 +59,6 @@ typedef enum __tb_zip_algo_t
 
 }tb_zip_algo_t;
 
-// the zip status
-typedef enum __tb_zip_status_t
-{
- 	TB_ZIP_STATUS_OK 		= 0
-, 	TB_ZIP_STATUS_END 		= 1
-,	TB_ZIP_STATUS_FAIL 		= 2
-
-}tb_zip_status_t;
-
 // the zip type
 typedef struct __tb_zip_t
 {
@@ -77,9 +68,8 @@ typedef struct __tb_zip_t
 	// the action
 	tb_uint16_t 			action;
 
-	// the operations, return the zip 
-	tb_zip_status_t 		(*spank)(struct __tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost);
-	tb_void_t 				(*close)(struct __tb_zip_t* zip);
+	// spak
+	tb_long_t 				(*spak)(struct __tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost);
 
 	// the vlc 
 	union __tb_zip_vlc_union_t

@@ -51,7 +51,8 @@ typedef struct __tb_zip_gzip_t
  * interfaces
  */
 
-tb_zip_t* 	tb_zip_gzip_open(tb_zip_gzip_t* gzip, tb_zip_action_t action);
+tb_zip_t* 	tb_zip_gzip_init(tb_size_t action);
+tb_void_t 	tb_zip_gzip_exit(tb_zip_t* zip);
 
 #endif
 

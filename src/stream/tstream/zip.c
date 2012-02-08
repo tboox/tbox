@@ -38,9 +38,6 @@ typedef struct __tb_zstream_t
 	// the stream base
 	tb_tstream_t 			base;
 
-	// the zip package
-	tb_zip_package_t 		package;
-
 	// the zip algorithm
 	tb_size_t 				algo;
 
@@ -65,10 +62,10 @@ static __tb_inline__ tb_zstream_t* tb_zstream_cast(tb_gstream_t* gst)
 static tb_long_t tb_zstream_aopen(tb_gstream_t* gst)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
-	tb_assert_and_check_return_val(zst, -1);
+	tb_assert_and_check_return_val(zst && !zst->zip, -1);
 
 	// open zip
-	zst->zip = tb_zip_open(&zst->package, zst->algo, zst->action);
+	zst->zip = tb_zip_init(zst->algo, zst->action);
 	tb_assert_and_check_return_val(zst->zip, -1);
 
 	// open tstream
@@ -80,7 +77,11 @@ static tb_long_t tb_zstream_aclose(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(zst, -1);
 
 	// close zip
-	if (zst->zip) tb_zip_close(zst->zip);
+	if (zst->zip) 
+	{
+		tb_zip_exit(zst->zip);
+		zst->zip = TB_NULL;
+	}
 
 	// close tstream
 	return tb_tstream_aclose(gst);
@@ -90,7 +91,6 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst, TB_FALSE);
 
-	// handle it
 	switch (cmd)
 	{
 	case TB_ZSTREAM_CMD_GET_ALGO:
@@ -124,81 +124,84 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_bool_t tb_zstream_spank(tb_gstream_t* gst)
+static tb_long_t tb_zstream_spak(tb_gstream_t* gst)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(zst && tst, TB_FALSE);
+	tb_assert_and_check_return_val(zst && zst->zip && tst, -1);
 
-	// get zip
-	tb_zip_t* zip = zst->zip;
-	tb_assert_and_check_return_val(zip && zip->spank, TB_FALSE);
+	// the input
+	tb_assert_and_check_return_val(tst->ip, -1);
+	tb_byte_t const* 	ib = tst->ip;
+	tb_byte_t const* 	ip = tst->ip;
+	tb_byte_t const* 	ie = ip + tst->in;
+	tb_check_return_val(ip < ie, 0);
 
-	// get input
-	tb_assert_and_check_return_val(tst->ip && tst->in, TB_FALSE);
-	tb_byte_t const* ip = tst->ip;
-	tb_byte_t const* ie = ip + tst->in;
-
-	// get output
-	tb_assert_and_check_return_val(tst->op, TB_FALSE);
-	tb_byte_t* op = tst->op;
-	tb_byte_t* oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	// the output
+	tb_assert_and_check_return_val(tst->op, -1);
+	tb_byte_t* 			ob = tst->op;
+	tb_byte_t* 			op = tst->op;
+	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	tb_check_return_val(op < oe, 0);
 
 	// attach bstream
 	tb_bstream_t ist, ost;
 	tb_bstream_attach(&ist, ip, ie - ip);
 	tb_bstream_attach(&ost, op, oe - op);
 
-	// spank it
-	tb_zip_status_t ret = tb_zip_spank(zip, &ist, &ost);
-	if (ret == TB_ZIP_STATUS_FAIL) return TB_FALSE;
-	tb_assert_and_check_return_val(ret == TB_ZIP_STATUS_OK || ret == TB_ZIP_STATUS_END, TB_FALSE);
-	//while (ip < ie && op < oe) *op++ = *ip++;
+	// spak it
+	tb_long_t r = tb_zip_spak(zst->zip, &ist, &ost);
+	tb_check_return_val(r >= 0, -1);
 
 	// update pointer
 	ip = ist.p;
 	op = ost.p;
 
 	// check
-	tb_assert_and_check_return_val(ip >= tst->ip && ip <= ie, TB_FALSE);
-	tb_assert_and_check_return_val(op >= tst->op && op <= oe, TB_FALSE);
+	tb_assert_and_check_return_val(ip >= ib && ip <= ie, -1);
+	tb_assert_and_check_return_val(op >= ob && op <= oe, -1);
 
 	// update input
-	tst->in -= ip - tst->ip;
+	tst->in -= ip - ib;
 	tst->ip = ip;
 
 	// update output
-	tst->on += op - tst->op;
+	tst->on += op - ob;
 
-	// update state
-	if (ret == TB_ZIP_STATUS_END) tst->state = TB_TSTREAM_STATE_END;
-
-	return TB_TRUE;
+	// ok
+	return (op - ob);
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_gstream_t* tb_gstream_init_zip()
 {
-	// create stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_zstream_t));
-	tb_tstream_t* tst = (tb_tstream_t*)gst;
 	tb_assert_and_check_return_val(gst, TB_NULL);
+
+	// init base
+	if (!tb_gstream_init(gst)) goto fail;
 
 	// init gstream
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
 	gst->aopen 	= tb_zstream_aopen;
 	gst->aread 	= tb_tstream_aread;
+	gst->awrit 	= tb_tstream_awrit;
 	gst->aclose	= tb_zstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
 	gst->ctrl 	= tb_zstream_ctrl;
 
 	// init tstream
-	tst->type 	= TB_TSTREAM_TYPE_ZIP;
-	tst->spank 	= tb_zstream_spank;
+	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_ZIP;
+	((tb_tstream_t*)gst)->spak = tb_zstream_spak;
 
+	// ok
 	return gst;
+
+fail:
+	if (gst) tb_gstream_exit(gst);
+	return TB_NULL;
 }
 tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
 {
@@ -217,6 +220,7 @@ tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_siz
 	// set zip action
 	if (!tb_gstream_ctrl(zst, TB_ZSTREAM_CMD_SET_ACTION, action)) goto fail;
 	
+	// ok
 	return zst;
 
 fail:

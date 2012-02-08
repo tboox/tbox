@@ -29,31 +29,52 @@
  * interfaces
  */
 
-tb_zip_t* tb_zip_open(tb_zip_package_t* package, tb_zip_algo_t algo, tb_zip_action_t action)
+tb_zip_t* tb_zip_init(tb_size_t algo, tb_size_t action)
 {
-	tb_assert_and_check_return_val(package, TB_NULL);
-	switch (algo)
+	// table
+	static tb_zip_t* (*s_init[])(tb_size_t action) =
 	{
-	case TB_ZIP_ALGO_RLC:
-		return tb_zip_rlc_open(&package->rlc, action);
-	case TB_ZIP_ALGO_ZLIBRAW:
-		return tb_zip_zlibraw_open(&package->zlibraw, action);
-	case TB_ZIP_ALGO_ZLIB:
-		return tb_zip_zlib_open(&package->zlib, action);
-	case TB_ZIP_ALGO_GZIP:
-		return tb_zip_gzip_open(&package->gzip, action);
-	default:
-		break;
-	}
-	return TB_NULL;
+		TB_NULL
+	, 	tb_zip_rlc_init
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_zip_zlibraw_init
+	, 	tb_zip_zlib_init
+	, 	tb_zip_gzip_init
+	, 	TB_NULL
+	};
+	tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], TB_NULL);
+
+	// init
+	return s_init[algo](action);
 }
-tb_void_t tb_zip_close(tb_zip_t* zip)
+tb_void_t tb_zip_exit(tb_zip_t* zip)
 {
-	if (zip && zip->close) zip->close(zip);
+	// check
+	tb_assert_and_check_return(zip);
+
+	// table
+	static tb_void_t (*s_exit[])(tb_zip_t* zip) =
+	{
+		TB_NULL
+	, 	tb_zip_rlc_exit
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	TB_NULL
+	, 	tb_zip_zlibraw_exit
+	, 	tb_zip_zlib_exit
+	, 	tb_zip_gzip_exit
+	, 	TB_NULL
+	};
+	tb_assert_and_check_return_val(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo], TB_NULL);
+
+	// exit
+	s_exit[zip->algo](zip);
 }
-tb_zip_status_t tb_zip_spank(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
+tb_long_t tb_zip_spak(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
 {
-	tb_assert_and_check_return_val(zip && zip->spank && ist && ost, TB_ZIP_STATUS_FAIL);
-	return zip->spank(zip, ist, ost);
+	tb_assert_and_check_return_val(zip && zip->spak && ist && ost, -1);
+	return zip->spak(zip, ist, ost);
 }
 

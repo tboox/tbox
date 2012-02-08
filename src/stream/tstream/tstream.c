@@ -108,14 +108,14 @@ tb_long_t tb_tstream_aclose(tb_gstream_t* gst)
 tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->gst && tst->spank && data, -1);
+	tb_assert_and_check_return_val(tst && tst->gst && tst->spak && data, -1);
 	tb_check_return_val(size, 0);
 
 	// read the output data first
 	tb_long_t read = 0;
 	if (tst->on > 0)
 	{
-		// if enough?
+		// enough?
 		tb_assert_and_check_return_val(tst->op, -1);
 		if (tst->on > size)
 		{
@@ -134,7 +134,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	}
 
 	// enough?
-	tb_check_return_val(read < size, read);
+	tb_check_goto(read < size, end);
 
 	// move the input data for the more space
 	if (tst->ip != tst->ib) 
@@ -149,6 +149,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	{
 		// read data
 		tst->read = tb_gstream_aread(tst->gst, tst->ip + tst->in, ln - tst->in);
+		tb_trace_impl("fill: %u", tst->read);
 
 		// update the input size
 		if (tst->read > 0) tst->in += tst->read;
@@ -164,10 +165,11 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		}
 	}
 
-	// spank it
+	// spak it
 	tb_long_t r = 0;
 	tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
-	while ((r = tst->spank(gst)) > 0) ;
+	while ((r = tst->spak(gst)) > 0) ;
+	tb_trace_impl("spak: %u", tst->on);
 
 	// continue to read the output data
 	if (tst->on > 0)
@@ -192,7 +194,9 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	// no output? end?
 	else if (tst->read < 0) return -1;
 
+end:
 	// ok?
+	tb_trace_impl("read: %u", read);
 	return read;
 }
 
@@ -214,6 +218,10 @@ tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 	tb_assert_and_check_return_val(tst, TB_NULL);
 
 	if (tst->read > 0) return etype;
-	else if (!tst->read) return tb_gstream_wait(tst->gst, etype, timeout);
+	else if (!tst->read) 
+	{
+		tb_trace_impl("wait: %u, timeout: %d", etype, timeout);
+		return tb_gstream_wait(tst->gst, etype, timeout);
+	}
 	else return -1;
 }

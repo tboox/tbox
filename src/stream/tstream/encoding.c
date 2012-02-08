@@ -98,7 +98,7 @@ static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_bool_t tb_estream_spank(tb_gstream_t* gst)
+static tb_bool_t tb_estream_spak(tb_gstream_t* gst)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
@@ -123,7 +123,7 @@ static tb_bool_t tb_estream_spank(tb_gstream_t* gst)
 	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
 	tb_check_return_val(op < oe, 0);
 
-	// spank it
+	// spak it
 	tb_uint32_t ch;
 	while (ip < ie && op < oe)
 	{
@@ -168,7 +168,7 @@ tb_gstream_t* tb_gstream_init_encoding()
 
 	// init tstream
 	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_ENCODING;
-	((tb_tstream_t*)gst)->spank = tb_estream_spank;
+	((tb_tstream_t*)gst)->spak = tb_estream_spak;
 
 	// ok
 	return gst;
