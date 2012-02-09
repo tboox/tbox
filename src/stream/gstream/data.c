@@ -76,10 +76,13 @@ static tb_long_t tb_dstream_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_dstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_dstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
+	tb_assert_and_check_return_val(dst && dst->data && dst->head, -1);
+
+	// check
+	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// adjust size
@@ -91,10 +94,13 @@ static tb_long_t tb_dstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	dst->head += size;
 	return (tb_long_t)(size);
 }
-static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	tb_assert_and_check_return_val(dst && dst->data && dst->head && data, -1);
+	tb_assert_and_check_return_val(dst && dst->data && dst->head, -1);
+
+	// check
+	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// adjust size

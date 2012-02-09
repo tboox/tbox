@@ -71,7 +71,7 @@ typedef struct __tb_tstream_t
 	tb_size_t 			on;
 
 	// spak
-	tb_long_t 			(*spak)(tb_gstream_t* gst);
+	tb_long_t 			(*spak)(tb_gstream_t* gst, tb_bool_t sync);
 
 }tb_tstream_t;
 
@@ -89,9 +89,8 @@ tb_handle_t 	tb_tstream_bare(tb_gstream_t* gst);
 tb_long_t 		tb_tstream_aopen(tb_gstream_t* gst);
 tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
 
-// read & writ
-tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-tb_long_t 		tb_tstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+// read
+tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 // wait
 tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);

@@ -108,10 +108,13 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->file && data, -1);
+	tb_assert_and_check_return_val(fst && fst->file, -1);
+
+	// check
+	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// read 
@@ -127,24 +130,37 @@ static tb_long_t tb_fstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// ok?
 	return r;
 }
-static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->file && data, -1);
-	tb_check_return_val(size, 0);
+	tb_assert_and_check_return_val(fst && fst->file, -1);
 
-	// writ
-	tb_long_t r = tb_file_writ(fst->file, data, size);
-	tb_check_return_val(r >= 0, -1);
+	// has data
+	if (data)
+	{
+		// check
+		tb_check_return_val(size, 0);
 
-	// abort?
-	if (!r && fst->wait > 0 && (fst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+		// writ
+		tb_long_t r = tb_file_writ(fst->file, data, size);
+		tb_check_goto(r >= 0, end);
 
-	// clear wait
-	if (r > 0) fst->wait = 0;
+		// abort?
+		if (!r && fst->wait > 0 && (fst->wait & TB_AIOO_ETYPE_WRIT)) goto end;
 
-	// ok?
-	return r;
+		// clear wait
+		if (r > 0) fst->wait = 0;
+
+		// ok?
+		return r;
+	}
+	
+end:
+	// sync data
+	if (sync) tb_file_sync(fst->file);
+
+	// end?
+	return -1;
 }
 static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
@@ -153,17 +169,6 @@ static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
 
 	// seek
 	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? TB_TRUE : TB_FALSE);
-}
-static tb_long_t tb_fstream_afwrit(tb_gstream_t* gst)
-{
-	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->file, -1);
-
-	// sync data
-	tb_file_sync(fst->file);
-
-	// ok
-	return 1;
 }
 static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 {	
@@ -226,7 +231,6 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->aclose = tb_fstream_aclose;
 	gst->aread 	= tb_fstream_aread;
 	gst->awrit 	= tb_fstream_awrit;
-	gst->afwrit	= tb_fstream_afwrit;
 	gst->size 	= tb_fstream_size;
 	gst->seek 	= tb_fstream_seek;
 	gst->bare 	= tb_fstream_bare;

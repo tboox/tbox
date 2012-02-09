@@ -434,11 +434,10 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	http->step &= ~TB_HTTP_STEP_NEVT;
 
 	// flush writed data
-	tb_long_t r = tb_gstream_afwrit(http->stream);
-	tb_assert_and_check_return_val(r >= 0, -1);
+	tb_long_t r = tb_gstream_afwrit(http->stream, TB_NULL, 0);
 
-	// continue?
-	tb_check_return_val(r > 0, 0);
+	// continue it if has data
+	tb_check_return_val(r < 0, 0);
 
 	// finish it
 	http->step |= TB_HTTP_STEP_REQT;
@@ -677,11 +676,10 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		else
 		{
 			// flush readed data
-			tb_long_t r = tb_gstream_afread(http->stream);
-			tb_assert_and_check_return_val(r >= 0, -1);
+			tb_long_t r = tb_gstream_afread(http->stream, TB_NULL, 0);
 
-			// continue?
-			tb_check_return_val(r > 0, 0);
+			// continue it if has data
+			tb_check_return_val(r < 0, 0);
 		}
 
 		// set url

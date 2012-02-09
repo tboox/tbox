@@ -124,7 +124,7 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_long_t tb_zstream_spak(tb_gstream_t* gst)
+static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
@@ -135,7 +135,7 @@ static tb_long_t tb_zstream_spak(tb_gstream_t* gst)
 	tb_byte_t const* 	ib = tst->ip;
 	tb_byte_t const* 	ip = tst->ip;
 	tb_byte_t const* 	ie = ip + tst->in;
-	tb_check_return_val(ip < ie, 0);
+	tb_check_return_val(ip < ie || sync, 0);
 
 	// the output
 	tb_assert_and_check_return_val(tst->op, -1);
@@ -150,7 +150,7 @@ static tb_long_t tb_zstream_spak(tb_gstream_t* gst)
 	tb_bstream_attach(&ost, op, oe - op);
 
 	// spak it
-	tb_long_t r = tb_zip_spak(zst->zip, &ist, &ost);
+	tb_long_t r = tb_zip_spak(zst->zip, &ist, &ost, sync);
 	tb_check_return_val(r >= 0, -1);
 
 	// update pointer
@@ -186,7 +186,6 @@ tb_gstream_t* tb_gstream_init_zip()
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
 	gst->aopen 	= tb_zstream_aopen;
 	gst->aread 	= tb_tstream_aread;
-	gst->awrit 	= tb_tstream_awrit;
 	gst->aclose	= tb_zstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;

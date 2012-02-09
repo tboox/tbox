@@ -73,10 +73,13 @@ static tb_void_t tb_hstream_free(tb_gstream_t* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	if (hst && hst->http) tb_http_exit(hst->http);
 }
-static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http && data, -1);
+	tb_assert_and_check_return_val(hst && hst->http, -1);
+
+	// check
+	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv data

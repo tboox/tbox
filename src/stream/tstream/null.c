@@ -48,7 +48,7 @@ static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NULL, TB_NULL);
 	return (tb_nstream_t*)tst;
 }
-static tb_long_t tb_nstream_spak(tb_gstream_t* gst)
+static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
 	tb_nstream_t* nst = tb_nstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
@@ -103,7 +103,6 @@ tb_gstream_t* tb_gstream_init_null()
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
 	gst->aopen 	= tb_tstream_aopen;
 	gst->aread 	= tb_tstream_aread;
-	gst->awrit 	= tb_tstream_awrit;
 	gst->aclose	= tb_tstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;

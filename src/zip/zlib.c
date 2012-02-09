@@ -22,6 +22,11 @@
  *
  */
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 	"zlib"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "zlib.h"
@@ -34,7 +39,7 @@ static __tb_inline__ tb_zip_zlib_t* tb_zip_zlib_cast(tb_zip_t* zip)
 	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIB, TB_NULL);
 	return (tb_zip_zlib_t*)zip;
 }
-static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
+static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_bool_t sync)
 {
 	tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
 	tb_assert_and_check_return_val(zlib && ist && ost, -1);
@@ -42,7 +47,7 @@ static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	tb_assert_and_check_return_val(ip && ie, -1);
+	tb_check_return_val(ip && ip < ie, 0);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
@@ -57,9 +62,9 @@ static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	zlib->zst.avail_out = (uInt)(oe - op);
 
 	// deflate 
-	tb_int_t r = deflate(&zlib->zst, Z_NO_FLUSH);
+	tb_int_t r = deflate(&zlib->zst, Z_SYNC_FLUSH);
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	//tb_trace("deflate: %d", zlib->zst.total_out);
+	tb_trace_impl("deflate: %u => %u, sync: %u", ie - ip, (tb_byte_t*)zlib->zst.next_out - op, sync);
 
 	// update 
 	ist->p = (tb_byte_t*)zlib->zst.next_in;
@@ -71,7 +76,7 @@ static tb_long_t tb_zip_zlib_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	// ok?
 	return (ost->p - op);
 }
-static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost)
+static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_bool_t sync)
 {
 	tb_zip_zlib_t* zlib = tb_zip_zlib_cast(zip);
 	tb_assert_and_check_return_val(zlib && ist && ost, -1);
@@ -79,7 +84,7 @@ static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	// the input stream
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	tb_assert_and_check_return_val(ip && ie, -1);
+	tb_check_return_val(ip && ip < ie, 0);
 
 	// the output stream
 	tb_byte_t* op = ost->p;
@@ -94,9 +99,9 @@ static tb_long_t tb_zip_zlib_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	zlib->zst.avail_out = (uInt)(oe - op);
 
 	// inflate 
-	tb_int_t r = inflate(&zlib->zst, Z_NO_FLUSH);
+	tb_int_t r = inflate(&zlib->zst, Z_SYNC_FLUSH);
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	//tb_trace("inflate: %d", zlib->zst.total_out);
+	tb_trace_impl("inflate: %u => %u, sync: %u", ie - ip, (tb_byte_t*)zlib->zst.next_out - op, sync);
 
 	// update 
 	ist->p = (tb_byte_t*)zlib->zst.next_in;
