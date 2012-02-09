@@ -200,16 +200,10 @@ typedef struct __tb_gstream_t
 	tb_long_t 			(*aclose)(struct __tb_gstream_t* gst);
 
 	// async read
-	tb_long_t 			(*aread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+	tb_long_t 			(*aread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	// async writ
-	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
-
-	// async flush readed data, need wait it if return 0
-	tb_long_t 			(*afread)(struct __tb_gstream_t* gst);
-
-	// async flush writed data, need wait it if return 0
-	tb_long_t 			(*afwrit)(struct __tb_gstream_t* gst);
+	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	// seek
 	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset);
@@ -305,12 +299,12 @@ tb_bool_t 			tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size
 tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
 // async fread & fwrit data
-tb_long_t 			tb_gstream_afread(tb_gstream_t* gst);
-tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst);
+tb_long_t 			tb_gstream_afread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
 // block fread & fwrit data
-tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst);
-tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst);
+tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
 // async need data
 tb_long_t 			tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);

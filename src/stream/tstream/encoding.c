@@ -98,7 +98,7 @@ static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_bool_t tb_estream_spak(tb_gstream_t* gst)
+static tb_long_t tb_estream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
@@ -160,7 +160,6 @@ tb_gstream_t* tb_gstream_init_encoding()
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
 	gst->aopen 	= tb_estream_aopen;
 	gst->aread 	= tb_tstream_aread;
-	gst->awrit 	= tb_tstream_awrit;
 	gst->aclose	= tb_tstream_aclose;
 	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;

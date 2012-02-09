@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"tst"
+//#define TB_TRACE_IMPL_TAG 			"tst"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -32,6 +32,29 @@
 #include "tstream.h"
 #include "../../memory/memory.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+static tb_long_t tb_tstream_afill(tb_tstream_t* tst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+{
+	// fill data
+	tb_long_t fill = 0;
+	if (!sync) 
+	{
+		// read data
+		fill = tb_gstream_aread(tst->gst, data, size);
+		tb_check_goto(fill < 0, end);
+
+		// end? sync data
+		fill = tb_gstream_afread(tst->gst, data, size);
+	}
+	// sync data
+	else fill = tb_gstream_afread(tst->gst, data, size);
+
+end:
+	// ok?
+	return fill;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -105,10 +128,38 @@ tb_long_t tb_tstream_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->gst && tst->spak && data, -1);
+	tb_assert_and_check_return_val(tst && tst->gst && tst->spak, -1);
+
+	// no data?
+	if (!data)
+	{
+		// flush data?
+		if (sync)
+		{
+			tb_long_t r = tb_gstream_afread(tst->gst, TB_NULL, 0);
+			tb_check_return_val(r < 0, r);
+		}
+
+		// init input
+		tst->ip = tst->ib;
+		tst->in = 0;
+
+		// init output
+		tst->op = tst->ob;
+		tst->on = 0;
+
+		// init read & writ
+		tst->read = 0;
+		tst->writ = 0;
+
+		// end
+		return -1;
+	}
+
+	// check
 	tb_check_return_val(size, 0);
 
 	// read the output data first
@@ -148,8 +199,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	if (tst->in < ln && tst->read >= 0)
 	{
 		// read data
-		tst->read = tb_gstream_aread(tst->gst, tst->ip + tst->in, ln - tst->in);
-		tb_trace_impl("fill: %u", tst->read);
+		tst->read = tb_tstream_afill(tst, tst->ip + tst->in, ln - tst->in, sync); 
 
 		// update the input size
 		if (tst->read > 0) tst->in += tst->read;
@@ -163,12 +213,13 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			// is end?
 			if (n && o >= n) tst->read = -1;
 		}
+		tb_trace_impl("fill: %d", tst->read);
 	}
 
 	// spak it
 	tb_long_t r = 0;
 	tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
-	while ((r = tst->spak(gst)) > 0) ;
+	while ((r = tst->spak(gst, tst->read < 0? TB_TRUE : sync)) > 0) ;
 	tb_trace_impl("spak: %u", tst->on);
 
 	// continue to read the output data
@@ -198,12 +249,6 @@ end:
 	// ok?
 	tb_trace_impl("read: %u", read);
 	return read;
-}
-
-tb_long_t tb_tstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
-{
-	tb_trace_noimpl();
-	return -1;
 }
 tb_handle_t tb_tstream_bare(tb_gstream_t* gst)
 {

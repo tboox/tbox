@@ -41,7 +41,7 @@
  */
 tb_bstream_t* tb_bstream_attach(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
 {
-	tb_assert(bst && data && size);
+	tb_assert(bst && data);
 
 	bst->p 	= data;
 	bst->b 	= 0;
