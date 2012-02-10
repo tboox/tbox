@@ -162,13 +162,13 @@ end:
 	// end?
 	return -1;
 }
-static tb_bool_t tb_fstream_seek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_fstream_aseek(tb_gstream_t* gst, tb_int64_t offset)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->file, TB_FALSE);
+	tb_assert_and_check_return_val(fst && fst->file, -1);
 
 	// seek
-	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? TB_TRUE : TB_FALSE);
+	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? 1 : -1);
 }
 static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
 {	
@@ -231,8 +231,8 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->aclose = tb_fstream_aclose;
 	gst->aread 	= tb_fstream_aread;
 	gst->awrit 	= tb_fstream_awrit;
+	gst->aseek 	= tb_fstream_aseek;
 	gst->size 	= tb_fstream_size;
-	gst->seek 	= tb_fstream_seek;
 	gst->bare 	= tb_fstream_bare;
 	gst->wait 	= tb_fstream_wait;
 	gst->ctrl 	= tb_fstream_ctrl;

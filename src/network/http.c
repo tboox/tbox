@@ -925,6 +925,16 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 	// ok?
 	return r > 0? TB_TRUE : TB_FALSE;
 }
+tb_long_t tb_http_aseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags)
+{
+	tb_trace_noimpl();
+	return -1;
+}
+tb_bool_t tb_http_bseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags)
+{
+	tb_trace_noimpl();
+	return TB_FALSE;
+}
 tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;

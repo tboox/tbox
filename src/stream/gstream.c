@@ -293,6 +293,7 @@ end:
 	// ok?
 	return r;
 }
+#if 0
 static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset)
 {
 	// seek to cache
@@ -324,6 +325,7 @@ static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_int64_t offset)
 
 	return TB_FALSE;
 }
+#endif
 tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst, -1);
@@ -931,6 +933,7 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 	return tb_gstream_bwrit(gst, data, size)? size : -1;
 }
 
+#if 0
 tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
 	// check stream
@@ -985,9 +988,25 @@ tb_bool_t tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 	// ok?
 	return (gst->offset == offset)? TB_TRUE : TB_FALSE;
 }
-tb_bool_t tb_gstream_skip(tb_gstream_t* gst, tb_size_t size)
+#else
+tb_long_t tb_gstream_aseek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
-	return tb_gstream_seek(gst, size, TB_GSTREAM_SEEK_CUR);
+	tb_trace_noimpl();
+	return -1;
+}
+tb_bool_t tb_gstream_bseek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
+{
+	tb_trace_noimpl();
+	return TB_FALSE;
+}
+#endif
+tb_long_t tb_gstream_askip(tb_gstream_t* gst, tb_size_t size)
+{
+	return tb_gstream_aseek(gst, size, TB_GSTREAM_SEEK_CUR);
+}
+tb_bool_t tb_gstream_bskip(tb_gstream_t* gst, tb_size_t size)
+{
+	return tb_gstream_bseek(gst, size, TB_GSTREAM_SEEK_CUR);
 }
 tb_size_t tb_gstream_type(tb_gstream_t const* gst)
 {
