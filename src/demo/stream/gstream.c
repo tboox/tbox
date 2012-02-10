@@ -99,6 +99,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 end:
 
+
 	// destroy stream
 	tb_gstream_exit(ist);
 	tb_gstream_exit(ost);

@@ -36,7 +36,7 @@
 // usleep
 tb_void_t tb_usleep(tb_size_t us)
 {
-	tb_trace_noimpl();
+	Sleep(1);
 }
 
 // msleep
