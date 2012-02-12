@@ -254,6 +254,7 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
+						stream/tstream/tstream.h \
 						format/format.h \
 						format/prefix.h \
 						utils/prefix.h \
