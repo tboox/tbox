@@ -103,7 +103,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	tb_long_t r = connect((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d));
 
 	// ok?
-	if (!r) return 1;
+	if (!r || errno == EISCONN) return 1;
 
 	// continue?
 	if (errno == EINTR || errno == EINPROGRESS || errno == EAGAIN) return 0;

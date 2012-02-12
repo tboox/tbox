@@ -36,6 +36,7 @@
 #include "../utils/utils.h"
 #include "../stream/stream.h"
 #include "../platform/platform.h"
+#include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
