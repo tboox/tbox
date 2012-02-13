@@ -85,6 +85,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	t = tb_mclock() - t;
 	tb_print("[demo]: open: %llu ms", t);
 
+	//tb_http_bseek(http, 10, 0);
+
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
