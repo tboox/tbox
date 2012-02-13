@@ -996,8 +996,21 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 }
 tb_bool_t tb_gstream_bseek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag)
 {
-	tb_trace_noimpl();
-	return TB_FALSE;
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// try opening it
+	tb_long_t 	r = 0;
+	while (!(r = tb_gstream_aseek(gst, offset, flag)))
+	{
+		// wait
+		r = tb_gstream_wait(gst, TB_AIOO_ETYPE_EALL, gst->timeout);
+
+		// fail or timeout?
+		tb_check_break(r > 0);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
 }
 #endif
 tb_long_t tb_gstream_askip(tb_gstream_t* gst, tb_size_t size)

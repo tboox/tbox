@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"http"
+#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -59,7 +59,8 @@ typedef enum __tb_http_state_t
 ,	TB_HTTP_STEP_CONN 	= 1
 ,	TB_HTTP_STEP_REQT 	= 2
 ,	TB_HTTP_STEP_RESP 	= 4
-,	TB_HTTP_STEP_NEVT 	= 8
+,	TB_HTTP_STEP_SEEK 	= 8
+,	TB_HTTP_STEP_NEVT 	= 16
 
 }tb_http_state_t;
 
@@ -86,7 +87,7 @@ typedef struct __tb_http_t
 
 	// the redirect count
 	tb_size_t 			rdtn;
-	
+
 	// the data && size for request and response
 	tb_pstring_t 		data;
 	tb_size_t 			size;
@@ -696,7 +697,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		http->rdtn++;
 		
 		// reset step, no event now, need not wait
-		http->step = TB_HTTP_STEP_NONE | TB_HTTP_STEP_NEVT;
+		http->step = ((http->step & TB_HTTP_STEP_SEEK)? TB_HTTP_STEP_SEEK : TB_HTTP_STEP_NONE) | TB_HTTP_STEP_NEVT;
 		http->tryn = 0;
 
 		// reset chunk size
@@ -710,6 +711,46 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 	// ok
 	return 1;
 }
+static tb_long_t tb_http_seek(tb_http_t* http, tb_uint64_t bof, tb_uint64_t eof)
+{
+	tb_check_return_val(!(http->step & TB_HTTP_STEP_SEEK), 1);
+	
+	// not keep-alive?
+	if (!http->status.balive) 
+	{
+		// close stream
+		tb_long_t r = tb_gstream_aclose(http->stream);
+		tb_assert_and_check_return_val(r >= 0, -1);
+
+		// continue ?
+		tb_check_return_val(r, 0);
+	}
+
+	// set keep-alive
+	http->option.balive = http->status.balive;
+
+	// set version
+	http->option.version = http->status.version;
+
+	// reset redirect
+	http->rdtn = 0;
+	
+	// reset step, no event now, need not wait
+	http->step = TB_HTTP_STEP_SEEK | TB_HTTP_STEP_NEVT;
+	http->tryn = 0;
+
+	// reset chunk size
+	http->chunked_read = 0;
+	http->chunked_size = 0;
+
+	// set range
+	http->option.range.bof = bof;
+	http->option.range.eof = eof;
+
+	// ok
+	return 1;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -926,15 +967,43 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 	// ok?
 	return r > 0? TB_TRUE : TB_FALSE;
 }
-tb_long_t tb_http_aseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags)
+tb_long_t tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
 {
-	tb_trace_noimpl();
-	return -1;
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream, -1);
+	
+	// check stream
+	tb_long_t r = -1;
+
+	// seek
+	r = tb_http_seek(http, bof, eof);
+	tb_check_return_val(r > 0, r);
+
+	// open
+	r = tb_http_aopen(http);
+	tb_check_return_val(r > 0, r);
+
+	// ok
+	return r;
 }
-tb_bool_t tb_http_bseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags)
+tb_bool_t tb_http_bseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
 {
-	tb_trace_noimpl();
-	return TB_FALSE;
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(handle, TB_FALSE);
+
+	// try seeking it
+	tb_long_t r = 0;
+	while (!(r = tb_http_aseek(handle, bof, eof)))
+	{
+		// wait
+		r = tb_http_wait(handle, TB_AIOO_ETYPE_EALL, http->option.timeout);
+
+		// fail or timeout?
+		tb_check_break(r > 0);
+	}
+
+	// ok?
+	return r > 0? TB_TRUE : TB_FALSE;
 }
 tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

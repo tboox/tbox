@@ -104,7 +104,7 @@ static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_int64_t offset)
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// seek
-	return tb_http_aseek(hst->http, offset, TB_FILE_SEEK_BEG);
+	return tb_http_aseek(hst->http, (tb_uint64_t)offset, 0);
 }
 static tb_handle_t tb_hstream_bare(tb_gstream_t* gst)
 {	

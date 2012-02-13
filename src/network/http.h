@@ -66,6 +66,15 @@ typedef enum __tb_http_version_t
 
 }tb_http_version_t;
 
+// the http seek type
+typedef enum __tb_http_seek_t
+{
+ 	TB_HTTP_SEEK_BEG 		= 0
+, 	TB_HTTP_SEEK_CUR 		= 1
+, 	TB_HTTP_SEEK_END 		= 2
+
+}tb_http_seek_t;
+
 // the http range type
 typedef struct __tb_http_range_t
 {
@@ -185,8 +194,8 @@ tb_long_t 				tb_http_aclose(tb_handle_t handle);
 tb_bool_t 				tb_http_bclose(tb_handle_t handle);
 
 // seek
-tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags);
-tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_int64_t offset, tb_size_t flags);
+tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof);
+tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof);
 
 // async writ & read
 tb_long_t 				tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
