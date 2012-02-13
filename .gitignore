@@ -8,6 +8,7 @@
 *.out
 *~
 *.swp
+*.swo
 *.bak
 *.orig
 .DS_Store
