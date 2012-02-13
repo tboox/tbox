@@ -220,6 +220,7 @@ INC_FILES 				= \
 						container/vector.h \
 						platform/platform.h \
 						platform/prefix.h \
+						platform/dns.h \
 						platform/file.h \
 						platform/utils.h \
 						platform/mutex.h \
