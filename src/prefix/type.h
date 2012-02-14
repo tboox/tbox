@@ -90,6 +90,9 @@ typedef unsigned long long 			tb_uint64_t;
 #endif
 typedef tb_int64_t					tb_sint64_t;
 
+typedef tb_sint64_t					tb_hong_t;
+typedef tb_uint64_t					tb_hize_t;
+
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT
 typedef double 						tb_float_t;

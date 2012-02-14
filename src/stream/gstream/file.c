@@ -50,7 +50,7 @@ typedef struct __tb_fstream_t
 	tb_handle_t 		file;
 
 	// the file size
-	tb_uint64_t 		size;
+	tb_hize_t 		size;
 
 	// the wait event
 	tb_long_t 			wait;
@@ -162,15 +162,15 @@ end:
 	// end?
 	return -1;
 }
-static tb_long_t tb_fstream_aseek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_fstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, -1);
 
 	// seek
-	return ((offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? 1 : -1);
+	return (offset == tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG))? 1 : -1;
 }
-static tb_uint64_t tb_fstream_size(tb_gstream_t* gst)
+static tb_hize_t tb_fstream_size(tb_gstream_t* gst)
 {	
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, 0);

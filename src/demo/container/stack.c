@@ -26,7 +26,7 @@ static tb_size_t tb_stack_put_and_pop_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) 
 	{
 		tb_stack_pop(stack);
@@ -62,7 +62,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	while (n--) tb_stack_put(stack, 0xf);
 	__tb_volatile__ tb_size_t itor = tb_stack_itor_head(stack);
 	__tb_volatile__ tb_size_t tail = tb_stack_itor_tail(stack);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
@@ -87,7 +87,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 	while (n--) tb_stack_put(stack, 0xf);
 	__tb_volatile__ tb_size_t itor = tb_stack_itor_last(stack);
 	__tb_volatile__ tb_size_t head = tb_stack_itor_head(stack);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (1)
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);

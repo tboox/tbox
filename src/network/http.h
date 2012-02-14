@@ -79,8 +79,8 @@ typedef enum __tb_http_seek_t
 typedef struct __tb_http_range_t
 {
 	// range
-	tb_uint64_t 		bof;
-	tb_uint64_t 		eof;
+	tb_hize_t 		bof;
+	tb_hize_t 		eof;
 
 }tb_http_range_t;
 
@@ -144,10 +144,10 @@ typedef struct __tb_http_status_t
 	tb_uint16_t 		bchunked	: 1;
 
 	// the document size
-	tb_uint64_t 		document_size;
+	tb_hize_t 			document_size;
 
 	// the current content size, maybe in range
-	tb_uint64_t 		content_size;
+	tb_hize_t 			content_size;
 
 	// the content type
 	tb_pstring_t 		content_type;
@@ -194,8 +194,8 @@ tb_long_t 				tb_http_aclose(tb_handle_t handle);
 tb_bool_t 				tb_http_bclose(tb_handle_t handle);
 
 // seek
-tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof);
-tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof);
+tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_hize_t offset);
+tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_hize_t offset);
 
 // async writ & read
 tb_long_t 				tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);

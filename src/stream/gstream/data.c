@@ -112,14 +112,14 @@ static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	dst->head += size;
 	return (tb_long_t)(size);
 }
-static tb_uint64_t tb_dstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_dstream_size(tb_gstream_t const* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, 0);
 
 	return dst->size;
 }
-static tb_long_t tb_dstream_aseek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_dstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, -1);

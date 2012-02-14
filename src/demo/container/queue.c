@@ -25,7 +25,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) 
 	{
 		tb_queue_pop(queue);
@@ -61,7 +61,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	while (n--) tb_queue_put(queue, 0xf);
 	__tb_volatile__ tb_size_t itor = tb_queue_itor_head(queue);
 	__tb_volatile__ tb_size_t tail = tb_queue_itor_tail(queue);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
 	{
 		__tb_volatile__ tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
@@ -86,7 +86,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	while (n--) tb_queue_put(queue, 0xf);
 	__tb_volatile__ tb_size_t itor = tb_queue_itor_last(queue);
 	__tb_volatile__ tb_size_t head = tb_queue_itor_head(queue);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (1)
 	{
 		__tb_volatile__ tb_cpointer_t item = tb_queue_itor_const_at(queue, itor);
@@ -344,8 +344,8 @@ static tb_void_t tb_queue_test_itor_perf()
 	while (n--) tb_queue_put(queue, tb_rand_uint32(0, TB_MAXU32)); 
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[2] = {0};
 	__tb_volatile__ tb_size_t 	itor = tb_queue_itor_head(queue);
 	for (; itor != tb_queue_itor_tail(queue); )
 	{
@@ -377,7 +377,7 @@ static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, 
 {
 	tb_assert_and_check_return_val(queue && bdel && data, TB_FALSE);
 
-	tb_uint64_t* test = data;
+	tb_hize_t* test = data;
 	if (item)
 	{
 		tb_size_t i = (tb_size_t)*item;
@@ -412,8 +412,8 @@ static tb_void_t tb_queue_test_walk_perf()
 	while (n--) tb_queue_put(queue, tb_rand_uint32(0, TB_MAXU32)); 
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[2] = {0};
 	tb_queue_walk(queue, tb_queue_test_walk_item, test);
 	t = tb_mclock() - t;
 	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_queue_size(queue), t);

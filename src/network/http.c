@@ -516,9 +516,9 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		// parse content range: "bytes $from-$to/$document_size"
 		else if (!tb_strnicmp(line, "Content-Range", 13))
 		{
-			tb_uint64_t from = 0;
-			tb_uint64_t to = 0;
-			tb_uint64_t document_size = 0;
+			tb_hize_t from = 0;
+			tb_hize_t to = 0;
+			tb_hize_t document_size = 0;
 			if (!tb_strncmp(p, "bytes ", 6)) 
 			{
 				p += 6;
@@ -711,7 +711,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 	// ok
 	return 1;
 }
-static tb_long_t tb_http_seek(tb_http_t* http, tb_uint64_t bof, tb_uint64_t eof)
+static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 {
 	tb_check_return_val(!(http->step & TB_HTTP_STEP_SEEK), 1);
 	
@@ -744,8 +744,8 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_uint64_t bof, tb_uint64_t eof)
 	http->chunked_size = 0;
 
 	// set range
-	http->option.range.bof = bof;
-	http->option.range.eof = eof;
+	http->option.range.bof = offset;
+	http->option.range.eof = 0;
 
 	// ok
 	return 1;
@@ -954,7 +954,7 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 
 	// try opening it
 	tb_long_t 	r = 0;
-	tb_int64_t 	t = tb_mclock();
+	tb_hong_t 	t = tb_mclock();
 	while (!(r = tb_http_aclose(handle)))
 	{
 		// timeout?
@@ -967,7 +967,7 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 	// ok?
 	return r > 0? TB_TRUE : TB_FALSE;
 }
-tb_long_t tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
+tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
@@ -976,7 +976,7 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
 	tb_long_t r = -1;
 
 	// seek
-	r = tb_http_seek(http, bof, eof);
+	r = tb_http_seek(http, offset);
 	tb_check_return_val(r > 0, r);
 
 	// open
@@ -986,14 +986,14 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
 	// ok
 	return r;
 }
-tb_bool_t tb_http_bseek(tb_handle_t handle, tb_uint64_t bof, tb_uint64_t eof)
+tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, TB_FALSE);
 
 	// try seeking it
 	tb_long_t r = 0;
-	while (!(r = tb_http_aseek(handle, bof, eof)))
+	while (!(r = tb_http_aseek(handle, offset)))
 	{
 		// wait
 		r = tb_http_wait(handle, TB_AIOO_ETYPE_EALL, http->option.timeout);

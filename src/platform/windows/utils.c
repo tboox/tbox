@@ -63,13 +63,13 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 }
 
 // mclock
-tb_int64_t tb_mclock()
+tb_hong_t tb_mclock()
 {
-	return (tb_int64_t)GetTickCount();
+	return (tb_hong_t)GetTickCount();
 }
 
 // uclock
-tb_int64_t tb_uclock()
+tb_hong_t tb_uclock()
 {
 	LARGE_INTEGER f = {0};
     if (!QueryPerformanceFrequency(&f)) return 0;
@@ -81,7 +81,7 @@ tb_int64_t tb_uclock()
 	
 	return (t.QuadPart * 1000000) / f.QuadPart;
 }
-tb_int64_t tb_time()
+tb_hong_t tb_time()
 {
 	tb_trace_noimpl();
 	return 0;

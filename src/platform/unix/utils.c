@@ -64,7 +64,7 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 }
 
 // mclock
-tb_int64_t tb_mclock()
+tb_hong_t tb_mclock()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -72,16 +72,16 @@ tb_int64_t tb_mclock()
 }
 
 // uclock
-tb_int64_t tb_uclock()
+tb_hong_t tb_uclock()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
 	return (tv.tv_sec * 1000000 + tv.tv_usec);
 }
-tb_int64_t tb_time()
+tb_hong_t tb_time()
 {
 #if 0
-	return ((tb_int64_t)time(0) * 1000);
+	return ((tb_hong_t)time(0) * 1000);
 #else
 	return tb_mclock();
 #endif
