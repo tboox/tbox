@@ -86,7 +86,7 @@ static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// recv data
 	return tb_http_aread(hst->http, data, size);
 }
-static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, 0);
@@ -98,13 +98,13 @@ static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 	// document_size
 	return status->document_size;
 }
-static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// seek
-	return tb_http_aseek(hst->http, (tb_uint64_t)offset, 0);
+	return tb_http_aseek(hst->http, offset);
 }
 static tb_handle_t tb_hstream_bare(tb_gstream_t* gst)
 {	

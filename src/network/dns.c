@@ -117,7 +117,7 @@ typedef struct __tb_dns_list_t
 	tb_hash_t* 		cache;
 
 	// the times
-	tb_uint64_t 	times;
+	tb_hize_t 	times;
 
 	// the expired
 	tb_size_t 		expired;
@@ -399,7 +399,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	tb_assert_and_check_goto(size, end);
 
 	// init time
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 
 	// se/nd request
 	tb_long_t writ = 0;

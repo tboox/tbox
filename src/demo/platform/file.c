@@ -56,7 +56,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(ifile && ofile, end);
 
 	// file size
-	tb_uint64_t isize = tb_file_size(ifile);
+	tb_hize_t isize = tb_file_size(ifile);
 	tb_assert_and_check_goto(isize, end);
 
 	// init aio
@@ -67,7 +67,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// read file
 	tb_byte_t 	data[4096];
-	tb_uint64_t read = 0;
+	tb_hize_t read = 0;
 	tb_bool_t 	wait = TB_FALSE;
 	while (1)//read < isize)
 	{

@@ -54,16 +54,16 @@ typedef struct __tb_time_t
  */
 
 // time => local
-tb_bool_t 			tb_time_to_local(tb_int64_t time, tb_time_t* local);
+tb_bool_t 			tb_time_to_local(tb_hong_t time, tb_time_t* local);
 
 // time => utc/gmt
-tb_bool_t 			tb_time_to_utc(tb_int64_t time, tb_time_t* utc);
+tb_bool_t 			tb_time_to_utc(tb_hong_t time, tb_time_t* utc);
 
 // local => time
-tb_bool_t 			tb_time_from_local(tb_int64_t* time, tb_time_t const* local);
+tb_bool_t 			tb_time_from_local(tb_hong_t* time, tb_time_t const* local);
 
 // utc/gmt => time
-tb_bool_t 			tb_time_from_utc(tb_int64_t* time, tb_time_t const* utc);
+tb_bool_t 			tb_time_from_utc(tb_hong_t* time, tb_time_t const* utc);
 
 // week
 tb_char_t const* 	tb_time_week(tb_time_t const* time);

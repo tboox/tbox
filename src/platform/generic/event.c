@@ -74,7 +74,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// init
 	tb_long_t 	r = 0;
-	tb_int64_t 	base = tb_mclock();
+	tb_hong_t 	base = tb_mclock();
 
 	// wait 
 	while (1)

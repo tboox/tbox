@@ -7,13 +7,13 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 	tb_byte_t* p = TB_NULL;
 	if (hfile)
 	{
-		tb_int64_t file_size = tb_file_size(hfile);
+		tb_hong_t file_size = tb_file_size(hfile);
 		if  (file_size <= 0) return 0;
 		
 		p = (tb_byte_t*)tb_malloc(file_size + 1);
 		if (!p) return TB_NULL;
 
-		tb_int64_t read_n = 0;
+		tb_hong_t read_n = 0;
 		while (read_n < file_size) 
 		{
 			tb_long_t ret = tb_file_read(hfile, p + read_n, (tb_long_t)(file_size - read_n));

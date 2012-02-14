@@ -201,7 +201,7 @@
 // the cookie type
 typedef struct __tb_cookie_t
 {
-	tb_uint64_t 		expires;
+	tb_hize_t 		expires;
 	tb_size_t 			secure;
 	tb_size_t 			domain;
 	tb_size_t 			path;

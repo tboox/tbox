@@ -33,28 +33,28 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 
 	// open stream
-	tb_int64_t itime = tb_mclock();
+	tb_hong_t itime = tb_mclock();
 	if (!tb_gstream_bopen(ist)) goto end;
 	itime = tb_mclock() - itime;
 	tb_print("[gst]: open ist: %llu ms", itime);
 
-	tb_int64_t otime = tb_mclock();
+	tb_hong_t otime = tb_mclock();
 	if (!tb_gstream_bopen(ost)) goto end;
 	otime = tb_mclock() - otime;
 	tb_print("[gst]: open ost: %llu ms", otime);
 
 #if 0
 	// save stream
-	tb_uint64_t size = tb_gstream_save(ist, ost);
+	tb_hize_t size = tb_gstream_save(ist, ost);
 	tb_print("save: %llu bytes", size);
 #else
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
-	tb_uint64_t 	read = 0;
+	tb_hize_t 	read = 0;
 	tb_bool_t 		wait = TB_FALSE;
-	tb_uint64_t 	left = tb_gstream_left(ist);
-	tb_int64_t 		base = tb_mclock();
-	tb_int64_t 		basc = tb_mclock();
+	tb_hize_t 	left = tb_gstream_left(ist);
+	tb_hong_t 		base = tb_mclock();
+	tb_hong_t 		basc = tb_mclock();
 	do
 	{
 		// read data

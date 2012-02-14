@@ -80,17 +80,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	option->hfunc = tb_http_test_hfunc;
 
 	// open http
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	if (!tb_http_bopen(http)) goto end;
 	t = tb_mclock() - t;
 	tb_print("[demo]: open: %llu ms", t);
 
-	//tb_http_bseek(http, 10, 0);
-
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
-	tb_uint64_t 	size = status->content_size;
+	tb_hize_t 	size = status->content_size;
 	do
 	{
 		// read data
