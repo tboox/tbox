@@ -495,7 +495,7 @@ static tb_void_t tb_fixed_test_round(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_round(x);
@@ -507,7 +507,7 @@ static tb_void_t tb_fixed_test_floor(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_floor(x);
@@ -519,7 +519,7 @@ static tb_void_t tb_fixed_test_ceil(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_int_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_ceil(x);
@@ -531,7 +531,7 @@ static tb_void_t tb_fixed_test_mul(tb_fixed_t a, tb_fixed_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_mul(a, b);
@@ -544,7 +544,7 @@ static tb_void_t tb_fixed_test_div(tb_fixed_t a, tb_fixed_t b)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_div(a, b);
@@ -556,7 +556,7 @@ static tb_void_t tb_fixed_test_invert(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_invert(x);
@@ -568,7 +568,7 @@ static tb_void_t tb_fixed_test_sqre(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_sqre(x);
@@ -580,7 +580,7 @@ static tb_void_t tb_fixed_test_sqrt(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_sqrt(x);
@@ -592,7 +592,7 @@ static tb_void_t tb_fixed_test_ilog2(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_ilog2(x);
@@ -604,7 +604,7 @@ static tb_void_t tb_fixed_test_iclog2(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_iclog2(x);
@@ -616,7 +616,7 @@ static tb_void_t tb_fixed_test_irlog2(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_uint32_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_irlog2(x);
@@ -628,7 +628,7 @@ static tb_void_t tb_fixed_test_exp(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		r = tb_fixed_exp(x);
@@ -642,7 +642,7 @@ static tb_void_t tb_fixed_test_sin()
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 0; i < 360; i++)
@@ -670,7 +670,7 @@ static tb_void_t tb_fixed_test_cos()
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 0; i < 360; i++)
@@ -690,7 +690,7 @@ static tb_void_t tb_fixed_test_tan()
 	__tb_volatile__ tb_int_t 	i = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 360;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 0; i < 360; i++)
@@ -712,7 +712,7 @@ static tb_void_t tb_fixed_test_atan2()
 	__tb_volatile__ tb_int_t 	j = 0;
 	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
 	__tb_volatile__ tb_fixed_t 	r = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 50; i < 55; i++)
@@ -753,7 +753,7 @@ static tb_void_t tb_fixed_test_asin()
 	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
 	__tb_volatile__ tb_fixed_t 	r = 0;
 	__tb_volatile__ tb_fixed_t 	a = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 0; i < 5; i++)
@@ -789,7 +789,7 @@ static tb_void_t tb_fixed_test_acos()
 	__tb_volatile__ tb_int_t 	n = 10000000 / 50;
 	__tb_volatile__ tb_fixed_t 	r = 0;
 	__tb_volatile__ tb_fixed_t 	a = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = 0; i < 5; i++)
@@ -824,7 +824,7 @@ static tb_void_t tb_fixed_test_atan()
 	__tb_volatile__ tb_int_t 	n = 10000000 / 100;
 	__tb_volatile__ tb_fixed_t 	r = 0;
 	__tb_volatile__ tb_fixed_t 	a = 0;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
 		for (i = -50; i <= 50; i++)

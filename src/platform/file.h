@@ -78,7 +78,7 @@ typedef struct __tb_file_info_t
 	tb_size_t 			type;
 
 	// the file size
-	tb_uint64_t 		size;
+	tb_hize_t 		size;
 
 }tb_file_info_t;
 
@@ -95,7 +95,7 @@ tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size);
 
 // seek
-tb_int64_t 				tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags);
+tb_hong_t 				tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags);
 
 // sync
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
@@ -104,7 +104,7 @@ tb_void_t 				tb_file_sync(tb_handle_t hfile);
 tb_handle_t 			tb_file_bare(tb_handle_t hfile);
 
 // accessors
-tb_uint64_t 			tb_file_size(tb_handle_t hfile);
+tb_hize_t 				tb_file_size(tb_handle_t hfile);
 
 // info
 tb_bool_t 				tb_file_info(tb_char_t const* path, tb_file_info_t* info);

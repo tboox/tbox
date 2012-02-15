@@ -142,16 +142,16 @@ static __tb_inline__ tb_fixed30_t tb_fixed16_to_fixed30_check(tb_fixed16_t x)
 
 static __tb_inline__ tb_fixed30_t tb_fixed30_mul_int64(tb_fixed30_t x, tb_fixed30_t y)
 {
-	return (tb_fixed30_t)((tb_int64_t)x * y >> 30);
+	return (tb_fixed30_t)((tb_hong_t)x * y >> 30);
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_div_int64(tb_fixed30_t x, tb_fixed30_t y)
 {
 	tb_assert(y);
-	return (tb_fixed30_t)((((tb_int64_t)x) << 30) / y);
+	return (tb_fixed30_t)((((tb_hong_t)x) << 30) / y);
 }
 static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_int64(tb_fixed30_t x)
 {
-	return (tb_fixed30_t)((tb_int64_t)x * x >> 30);
+	return (tb_fixed30_t)((tb_hong_t)x * x >> 30);
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT

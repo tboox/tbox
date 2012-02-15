@@ -112,23 +112,23 @@ static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	dst->head += size;
 	return (tb_long_t)(size);
 }
-static tb_uint64_t tb_dstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_dstream_size(tb_gstream_t const* gst)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, 0);
 
 	return dst->size;
 }
-static tb_bool_t tb_dstream_seek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_dstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
-	tb_assert_and_check_return_val(dst, TB_FALSE);
+	tb_assert_and_check_return_val(dst, -1);
 
 	// seek 
 	dst->head = dst->data + offset;
 
 	// ok
-	return TB_TRUE;
+	return 1;
 }
 static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
@@ -177,8 +177,8 @@ tb_gstream_t* tb_gstream_init_data()
 	gst->aclose = tb_dstream_aclose;
 	gst->aread 	= tb_dstream_aread;
 	gst->awrit 	= tb_dstream_awrit;
+	gst->aseek 	= tb_dstream_aseek;
 	gst->size 	= tb_dstream_size;
-	gst->seek 	= tb_dstream_seek;
 	gst->wait 	= tb_dstream_wait;
 	gst->ctrl 	= tb_dstream_ctrl;
 

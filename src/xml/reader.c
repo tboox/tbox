@@ -61,10 +61,6 @@ static tb_char_t tb_xml_reader_peek_char(tb_xml_reader_t* reader)
 	// get character
 	return *p;
 }
-static tb_void_t tb_xml_reader_seek_char(tb_xml_reader_t* reader)
-{
-	tb_gstream_seek(reader->gst, 1, TB_GSTREAM_SEEK_CUR);
-}
 static tb_char_t const* tb_xml_reader_parse_element(tb_xml_reader_t* reader)
 {
 	// clear element

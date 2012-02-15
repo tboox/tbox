@@ -122,7 +122,7 @@ tb_handle_t tb_file_bare(tb_handle_t hfile)
 {
 	return hfile? (tb_handle_t)((tb_long_t)hfile - 1) : TB_NULL;
 }
-tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
+tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(hfile, -1);
 
@@ -130,10 +130,13 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 	{
 	case TB_FILE_SEEK_BEG:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_SET);
+		break;
 	case TB_FILE_SEEK_CUR:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_CUR);
+		break;
 	case TB_FILE_SEEK_END:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_END);
+		break;
 	default:
 		tb_trace("unknown file seek flag: %d", flags);
 		break;
@@ -141,12 +144,12 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 
 	return offset;
 }
-tb_uint64_t tb_file_size(tb_handle_t hfile)
+tb_hize_t tb_file_size(tb_handle_t hfile)
 {
 	tb_assert_and_check_return_val(hfile, 0);
 
 	struct stat st = {0};
-	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
+	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
@@ -173,7 +176,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 			else info->type = TB_FILE_TYPE_FILE;
 
 			// file size
-			info->size = st.st_size >= 0? (tb_uint64_t)st.st_size : 0;
+			info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 
 			// ok
 			return TB_TRUE;

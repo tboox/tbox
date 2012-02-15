@@ -165,7 +165,7 @@ fail:
 tb_bool_t tb_socket_close(tb_handle_t handle)
 {
 	tb_assert_and_check_return_val(handle, TB_FALSE);
-	return !close((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
+	return !closesocket((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
 }
 tb_handle_t tb_socket_bare(tb_handle_t handle)
 {
@@ -246,10 +246,10 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	SOCKADDR_IN d;
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.s_addr = ip;
+	d.sin_addr.S_un.S_addr = inet_addr(ip);
 
 	// send
-	tb_long_t 	r = sendto((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, sizeof(d));
+	tb_long_t r = sendto((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, sizeof(d));
 
 	// ok?
 	if (r >= 0) return r;

@@ -42,7 +42,7 @@ tb_size_t tb_format_htm_probe(tb_gstream_t* gst)
 	tb_gstream_ctrl(gst, TB_GSTREAM_CMD_GET_CACHE, &need);
 	tb_assert_and_check_return_val(need, 0);
 
-	tb_uint64_t size = tb_gstream_size(gst);
+	tb_hize_t size = tb_gstream_size(gst);
 	if (size && size < need) need = (tb_size_t)size;
 	if (need > 4096) need = 4096;
 

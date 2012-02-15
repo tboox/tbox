@@ -117,7 +117,7 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 {
 	if (hfile) FlushFileBuffers(hfile);
 }
-tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
+tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
 {
 	tb_assert_and_check_return_val(hfile, -1);
 
@@ -129,18 +129,18 @@ tb_int64_t tb_file_seek(tb_handle_t hfile, tb_int64_t offset, tb_size_t flags)
 	LARGE_INTEGER o = {0};
 	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)offset;
-	return SetFilePointerEx(hfile, o, &p, method)? (tb_int64_t)p.QuadPart : -1;
+	return SetFilePointerEx(hfile, o, &p, method)? (tb_hong_t)p.QuadPart : -1;
 }
 tb_handle_t tb_file_bare(tb_handle_t hfile)
 {
 	return hfile;
 }
-tb_uint64_t tb_file_size(tb_handle_t hfile)
+tb_hize_t tb_file_size(tb_handle_t hfile)
 {
 	tb_assert_and_check_return_val(hfile, 0);
 
 	LARGE_INTEGER p = {0};
-	return GetFileSizeEx(hfile, &p)? (tb_int64_t)p.QuadPart : 0;
+	return GetFileSizeEx(hfile, &p)? (tb_hong_t)p.QuadPart : 0;
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
@@ -216,7 +216,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 		else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
 
 		// file size
-		info->size = ((tb_int64_t)st.nFileSizeHigh << 32) | st.nFileSizeLow;
+		info->size = ((tb_hong_t)st.nFileSizeHigh << 32) | st.nFileSizeLow;
 
 		// ok
 		return TB_TRUE;

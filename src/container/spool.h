@@ -32,9 +32,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_SPOOL_SIZE_MICRO 				(8096)
-#define TB_SPOOL_SIZE_SMALL 				(65536)
-#define TB_SPOOL_SIZE_LARGE 				(256 * 1024)
+#define TB_SPOOL_SIZE_MICRO 				(TB_GPOOL_SIZE_MIN + 8096)
+#define TB_SPOOL_SIZE_SMALL 				(TB_GPOOL_SIZE_MIN + 65536)
+#define TB_SPOOL_SIZE_LARGE 				(TB_GPOOL_SIZE_MIN + 256 * 1024)
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_SPOOL_SIZE_DEFAULT 			TB_SPOOL_SIZE_SMALL

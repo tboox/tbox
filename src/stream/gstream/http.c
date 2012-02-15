@@ -28,6 +28,7 @@
 #include "../../aio/aio.h"
 #include "../../string/string.h"
 #include "../../network/network.h"
+#include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -85,7 +86,7 @@ static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// recv data
 	return tb_http_aread(hst->http, data, size);
 }
-static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, 0);
@@ -97,31 +98,14 @@ static tb_uint64_t tb_hstream_size(tb_gstream_t const* gst)
 	// document_size
 	return status->document_size;
 }
-#if 0
-static tb_bool_t tb_hstream_seek(tb_gstream_t* gst, tb_int64_t offset)
+static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http, TB_FALSE);
+	tb_assert_and_check_return_val(hst && hst->http, -1);
 
-	// is seekable?
-	if (!tb_http_status_isseeked(hst->http)) return TB_FALSE;
-
-	// close it
-	tb_http_bclose(hst->http);
-
-	// set range
-	tb_http_range_t range;
-	range.bof = offset;
-	range.eof = 0;
-	tb_http_option_set_range(hst->http, &range);
-
-	// reopen it
-	if (!tb_http_bopen(hst->http)) return TB_FALSE;
-
-	// ok
-	return TB_TRUE;
+	// seek
+	return tb_http_aseek(hst->http, offset);
 }
-#endif
 static tb_handle_t tb_hstream_bare(tb_gstream_t* gst)
 {	
 	tb_hstream_t* hst = tb_hstream_cast(gst);
@@ -366,7 +350,7 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->aopen 	= tb_hstream_aopen;
 	gst->aclose = tb_hstream_aclose;
 	gst->aread 	= tb_hstream_aread;
-//	gst->seek 	= tb_hstream_seek;
+	gst->aseek 	= tb_hstream_aseek;
 	gst->size 	= tb_hstream_size;
 	gst->bare 	= tb_hstream_bare;
 	gst->wait 	= tb_hstream_wait;

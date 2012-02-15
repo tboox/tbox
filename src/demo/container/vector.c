@@ -21,7 +21,7 @@ static tb_size_t tb_vector_insert_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert(vector, tb_vector_size(vector) >> 1, 0xf);
 	t = tb_mclock() - t;
 
@@ -50,7 +50,7 @@ static tb_size_t tb_vector_insert_head_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert_head(vector, 0xf);
 	t = tb_mclock() - t;
 
@@ -79,7 +79,7 @@ static tb_size_t tb_vector_insert_tail_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_insert_tail(vector, 0xf);
 	t = tb_mclock() - t;
 
@@ -110,7 +110,7 @@ static tb_size_t tb_vector_ninsert_test()
 	tb_vector_insert_head(vector, 0xf);
 
 	tb_size_t n = 1000000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_ninsert(vector, 1, 0xf, n);
 	t = tb_mclock() - t;
 
@@ -138,7 +138,7 @@ static tb_size_t tb_vector_ninsert_head_test()
 	tb_assert_and_check_return(vector);
 
 	tb_size_t n = 1000000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_ninsert_head(vector, 0xf, n);
 	t = tb_mclock() - t;
 
@@ -166,7 +166,7 @@ static tb_size_t tb_vector_ninsert_tail_test()
 	tb_assert_and_check_return(vector);
 
 	tb_size_t n = 1000000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_ninsert_tail(vector, 0xf, n);
 	t = tb_mclock() - t;
 
@@ -197,7 +197,7 @@ static tb_size_t tb_vector_remove_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove(vector, tb_vector_size(vector) >> 1);
 	t = tb_mclock() - t;
 
@@ -221,7 +221,7 @@ static tb_size_t tb_vector_remove_head_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove_head(vector);
 	t = tb_mclock() - t;
 
@@ -243,7 +243,7 @@ static tb_size_t tb_vector_remove_last_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_remove_last(vector);
 	t = tb_mclock() - t;
 
@@ -266,7 +266,7 @@ static tb_size_t tb_vector_nremove_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nremove(vector, tb_vector_itor_head(vector), n);
 	t = tb_mclock() - t;
 
@@ -289,7 +289,7 @@ static tb_size_t tb_vector_nremove_head_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nremove_head(vector, n);
 	t = tb_mclock() - t;
 
@@ -312,7 +312,7 @@ static tb_size_t tb_vector_nremove_last_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nremove_last(vector, n);
 	t = tb_mclock() - t;
 
@@ -337,7 +337,7 @@ static tb_size_t tb_vector_replace_test()
 	tb_vector_ninsert_head(vector, 0xf, n);
 	__tb_volatile__ tb_size_t itor = tb_vector_itor_head(vector);
 	__tb_volatile__ tb_size_t tail = tb_vector_itor_tail(vector);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (; itor != tail; itor = tb_vector_itor_next(vector, itor)) tb_vector_replace(vector, itor, 0xd);
 	t = tb_mclock() - t;
 
@@ -363,7 +363,7 @@ static tb_size_t tb_vector_replace_head_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_replace_head(vector, 0xd);
 	t = tb_mclock() - t;
 
@@ -388,7 +388,7 @@ static tb_size_t tb_vector_replace_last_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_vector_replace_last(vector, 0xd);
 	t = tb_mclock() - t;
 
@@ -413,7 +413,7 @@ static tb_size_t tb_vector_nreplace_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nreplace(vector, tb_vector_itor_head(vector), 0xd, n);
 	t = tb_mclock() - t;
 
@@ -438,7 +438,7 @@ static tb_size_t tb_vector_nreplace_head_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nreplace_head(vector, 0xd, n);
 	t = tb_mclock() - t;
 
@@ -463,7 +463,7 @@ static tb_size_t tb_vector_nreplace_last_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	tb_vector_nreplace_last(vector, 0xd, n);
 	t = tb_mclock() - t;
 
@@ -492,7 +492,7 @@ static tb_size_t tb_vector_iterator_next_test()
 	tb_vector_ninsert_head(vector, 0xf, n);
 	__tb_volatile__ tb_size_t itor = tb_vector_itor_head(vector);
 	__tb_volatile__ tb_size_t tail = tb_vector_itor_tail(vector);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_vector_itor_const_at(vector, itor);
@@ -517,7 +517,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 	tb_vector_ninsert_head(vector, 0xf, n);
 	__tb_volatile__ tb_size_t itor = tb_vector_itor_last(vector);
 	__tb_volatile__ tb_size_t head = tb_vector_itor_head(vector);
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (1)
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_vector_itor_const_at(vector, itor);
@@ -832,8 +832,8 @@ static tb_void_t tb_vector_test_itor_perf()
 	while (n--) tb_vector_insert_tail(vector, tb_rand_uint32(0, TB_MAXU32)); 
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[2] = {0};
 	__tb_volatile__ tb_size_t 	itor = tb_vector_itor_head(vector);
 	for (; itor != tb_vector_itor_tail(vector); )
 	{
@@ -863,7 +863,7 @@ static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t* ite
 {
 	tb_assert_and_check_return_val(vector && bdel && data, TB_FALSE);
 
-	tb_uint64_t* test = data;
+	tb_hize_t* test = data;
 	if (item)
 	{
 		tb_size_t i = (tb_size_t)*item;
@@ -896,8 +896,8 @@ static tb_void_t tb_vector_test_walk_perf()
 	while (n--) tb_vector_insert_tail(vector, tb_rand_uint32(0, TB_MAXU32)); 
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[2] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[2] = {0};
 	tb_vector_walk(vector, tb_vector_test_walk_item, test);
 	t = tb_mclock() - t;
 	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);

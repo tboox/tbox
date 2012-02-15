@@ -119,7 +119,10 @@ tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype);
  * @param 	object 	the aio object
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
- * @return 	the event type, return 0 if timeout, return -1 if error
+ * @return 	the event type
+ *          return 0 if timeout
+ *          return -1 if error
+ *          return the need event type if object->etype == TB_AIOO_ETYPE_NULL
  */
 tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout);
 

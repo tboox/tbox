@@ -119,7 +119,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
 		tb_int_t r = snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
@@ -215,7 +215,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 	// performance
 	__tb_volatile__ tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
 		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
@@ -355,7 +355,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
 		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
@@ -448,7 +448,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 
 	// performance
 	__tb_volatile__ tb_size_t n = 100000;
-	tb_int64_t t = tb_mclock();
+	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
 		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
@@ -479,8 +479,8 @@ static tb_void_t tb_hash_test_itor_perf()
 	}
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[3] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[3] = {0};
 	__tb_volatile__ tb_size_t 	itor = tb_hash_itor_head(hash);
 	for (; itor != tb_hash_itor_tail(hash); )
 	{
@@ -515,7 +515,7 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 {
 	tb_assert_and_check_return_val(hash && bdel && data, TB_FALSE);
 
-	tb_uint64_t* test = data;
+	tb_hize_t* test = data;
 	if (item)
 	{
 		if (!(((tb_size_t)item->data >> 25) & 0x1))
@@ -554,8 +554,8 @@ static tb_void_t tb_hash_test_walk_perf()
 	}
 
 	// performance
-	tb_int64_t t = tb_mclock();
-	__tb_volatile__ tb_uint64_t test[3] = {0};
+	tb_hong_t t = tb_mclock();
+	__tb_volatile__ tb_hize_t test[3] = {0};
 	tb_hash_walk(hash, tb_hash_test_walk_item, test);
 	t = tb_mclock() - t;
 	tb_print("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);

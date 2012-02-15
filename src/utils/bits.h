@@ -336,11 +336,11 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_inline(tb_uint32_t x)
     x = (x >> 16) | (x << 16);
     return x;
 }
-static __tb_inline__ tb_uint64_t const tb_bits_swap_u64_inline(tb_uint64_t x)
+static __tb_inline__ tb_hize_t const tb_bits_swap_u64_inline(tb_hize_t x)
 {
 	union 
 	{
-		tb_uint64_t u64;
+		tb_hize_t u64;
 		tb_uint32_t u32[2];
 
 	} w, r;

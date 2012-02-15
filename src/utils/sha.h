@@ -36,7 +36,7 @@
 typedef struct __tb_sha_t
 {
 	tb_uint8_t  	digest_len;  //!< digest length in 32-bit words
-	tb_uint64_t 	count;       //!< number of bytes in buffer
+	tb_hize_t 	count;       //!< number of bytes in buffer
 	tb_uint8_t  	buffer[64];  //!< 512-bit buffer of input values used in hash updating
 	tb_uint32_t 	state[8];    //!< current hash value
 	tb_void_t     	(*transform)(tb_uint32_t *state, tb_uint8_t const buffer[64]);
