@@ -61,7 +61,7 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) e.events |= EPOLLIN;
 	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN) e.events |= EPOLLOUT;
 	e.events |= EPOLLET;
-	e.data.u64 = (tb_uint64_t)handle;
+	e.data.u64 = (tb_hize_t)handle;
 
 	// ctrl
 	if (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, fd, &e) < 0) return TB_FALSE;
@@ -82,7 +82,7 @@ static tb_bool_t tb_aiop_reactor_epoll_seto(tb_aiop_reactor_t* reactor, tb_handl
 	struct epoll_event e = {0};
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
 	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
-	e.data.u64 = (tb_uint64_t)handle;
+	e.data.u64 = (tb_hize_t)handle;
 
 	// ctrl
 	if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, fd, &e) < 0) return TB_FALSE;

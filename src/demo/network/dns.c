@@ -16,7 +16,7 @@
 static tb_void_t tb_dns_test_done(tb_char_t const* name)
 {
 	// time
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 
 	// done
 	tb_ipv4_t ipv4;
@@ -32,7 +32,7 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 static tb_void_t tb_dns_test_done(tb_char_t const* name)
 {
 	// time
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 
 	// done
 	tb_ipv4_t ipv4;
@@ -49,7 +49,7 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 static tb_void_t tb_dns_test_done(tb_char_t const* name)
 {
 	// time
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 
 	// done
 	struct hostent* h = gethostbyname(name);
@@ -111,7 +111,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #if 0
 	tb_dns_test_done(argv[1]);
 #else
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 	tb_dns_test_done("www.tboox.org");
 	tb_dns_test_done("www.tboox.net");
 	tb_dns_test_done("www.baidu.com");

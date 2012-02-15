@@ -185,7 +185,7 @@ typedef struct __tb_gstream_t
 	tb_qbuffer_t 		cache;
 
 	// the offset
-	tb_uint64_t 		offset;
+	tb_hize_t 			offset;
 
 	// the bare handle for aio
 	tb_handle_t 		(*bare)(struct __tb_gstream_t* gst);
@@ -206,10 +206,10 @@ typedef struct __tb_gstream_t
 	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	// seek
-	tb_bool_t 			(*seek)(struct __tb_gstream_t* gst, tb_int64_t offset);
+	tb_long_t 			(*aseek)(struct __tb_gstream_t* gst, tb_hize_t offset);
 
 	// size
-	tb_uint64_t 		(*size)(struct __tb_gstream_t* gst);
+	tb_hize_t 			(*size)(struct __tb_gstream_t* gst);
 
 	// free
 	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
@@ -272,7 +272,17 @@ tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, t
 // the bare handle for aio
 tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
 
-// wait the aio event
+/*!wait the gstream 
+ *
+ * blocking wait the single event object, so need not aiop 
+ * return the event type if ok, otherwise return 0 for timeout
+ *
+ * @param 	gst 	the gstream 
+ * @param 	etype 	the waited event type, return the needed event type if TB_AIOO_ETYPE_NULL
+ * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ *
+ * @return 	the event type, return 0 if timeout, return -1 if error
+ */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
 // clear stream
@@ -306,24 +316,24 @@ tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t siz
 tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size);
 
-// async need data
+// need
 tb_long_t 			tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
-
-// block need data
 tb_bool_t 			tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size);
 
 // seek
-tb_bool_t 			tb_gstream_seek(tb_gstream_t* gst, tb_int64_t offset, tb_size_t flag);
+tb_long_t 			tb_gstream_aseek(tb_gstream_t* gst, tb_hize_t offset);
+tb_bool_t 			tb_gstream_bseek(tb_gstream_t* gst, tb_hize_t offset);
 
 // skip
-tb_bool_t 			tb_gstream_skip(tb_gstream_t* gst, tb_size_t size);
+tb_long_t 			tb_gstream_askip(tb_gstream_t* gst, tb_hize_t size);
+tb_bool_t 			tb_gstream_bskip(tb_gstream_t* gst, tb_hize_t size);
 
-// format writ data - blocked
+// block writ format data
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 
-// load & save data
-tb_uint64_t 		tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
-tb_uint64_t 		tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
+// block load & save data
+tb_hize_t 			tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
+tb_hize_t 			tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost);
 
 // block read & writ line
 tb_long_t 			tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size);
@@ -375,9 +385,9 @@ tb_bool_t 			tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gst);
-tb_uint64_t 		tb_gstream_size(tb_gstream_t const* gst);
-tb_uint64_t 		tb_gstream_left(tb_gstream_t const* gst);
-tb_uint64_t 		tb_gstream_offset(tb_gstream_t const* gst);
+tb_hize_t 		tb_gstream_size(tb_gstream_t const* gst);
+tb_hize_t 		tb_gstream_left(tb_gstream_t const* gst);
+tb_hize_t 		tb_gstream_offset(tb_gstream_t const* gst);
 tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
 // ctrl

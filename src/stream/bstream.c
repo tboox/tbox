@@ -64,7 +64,7 @@ tb_size_t tb_bstream_load(tb_bstream_t* bst, tb_gstream_t* ist)
 	// load
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_size_t 		load = 0;
-	tb_uint64_t 	left = tb_gstream_left(ist);
+	tb_hize_t 	left = tb_gstream_left(ist);
 
 	while (1)
 	{

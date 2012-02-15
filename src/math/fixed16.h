@@ -279,16 +279,16 @@ static __tb_inline__ tb_int_t tb_fixed16_to_int_check(tb_fixed16_t x)
 
 static __tb_inline__ tb_fixed16_t tb_fixed16_mul_int64(tb_fixed16_t x, tb_fixed16_t y)
 {
-	return (tb_fixed16_t)((tb_int64_t)x * y >> 16);
+	return (tb_fixed16_t)((tb_hong_t)x * y >> 16);
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_div_int64(tb_fixed16_t x, tb_fixed16_t y)
 {
 	tb_assert(y);
-	return (tb_fixed16_t)((((tb_int64_t)x) << 16) / y);
+	return (tb_fixed16_t)((((tb_hong_t)x) << 16) / y);
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int64(tb_fixed16_t x)
 {
-	return (tb_fixed16_t)((tb_int64_t)x * x >> 16);
+	return (tb_fixed16_t)((tb_hong_t)x * x >> 16);
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT

@@ -207,8 +207,8 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 		else if (!tst->read) 
 		{
 			// has size?
-			tb_uint64_t n = tb_gstream_size(tst->gst);
-			tb_uint64_t o = tb_gstream_offset(tst->gst);
+			tb_hize_t n = tb_gstream_size(tst->gst);
+			tb_hize_t o = tb_gstream_offset(tst->gst);
 
 			// is end?
 			if (n && o >= n) tst->read = -1;

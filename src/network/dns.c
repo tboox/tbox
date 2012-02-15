@@ -117,7 +117,7 @@ typedef struct __tb_dns_list_t
 	tb_hash_t* 		cache;
 
 	// the times
-	tb_uint64_t 	times;
+	tb_hize_t 	times;
 
 	// the expired
 	tb_size_t 		expired;
@@ -399,9 +399,9 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	tb_assert_and_check_goto(size, end);
 
 	// init time
-	tb_int64_t time = tb_mclock();
+	tb_hong_t time = tb_mclock();
 
-	// send request
+	// se/nd request
 	tb_long_t writ = 0;
 	while (writ < size)
 	{
@@ -446,6 +446,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 			tb_aioo_t o;
 			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, TB_NULL);
 			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
+			//tb_trace_impl("wait %d", r);
 
 			// fail or timeout?
 			tb_check_break(r > 0);
@@ -472,7 +473,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 end:
 	// exit sock
-	tb_socket_exit(handle);
+	tb_socket_close(handle);
 
 	// ok
 	return rate;

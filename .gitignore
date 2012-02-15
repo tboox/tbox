@@ -8,8 +8,10 @@
 *.out
 *~
 *.swp
+*.swo
 *.bak
 *.orig
+.DS_Store
 other
 doc
 tags

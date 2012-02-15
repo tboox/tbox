@@ -302,7 +302,7 @@ tb_void_t tb_sha_init(tb_sha_t* sha, tb_size_t mode)
 }
 tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 {
-	tb_uint64_t count = tb_bits_be_to_ne_u64(sha->count << 3);
+	tb_hize_t count = tb_bits_be_to_ne_u64(sha->count << 3);
 
 	tb_sha_spank(sha, "\200", 1);
 

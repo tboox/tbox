@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 
 	tb_time_t local;
 	tb_time_t utc;
-	tb_int64_t time = tb_time();
+	tb_hong_t time = tb_time();
 	if (tb_time_to_local(time, &local))
 	{
 		tb_print("LMT(%s): %04d-%02d-%02d %02d:%02d:%02d:%03d"
