@@ -220,6 +220,7 @@ INC_FILES 				= \
 						container/vector.h \
 						platform/platform.h \
 						platform/prefix.h \
+						platform/dns.h \
 						platform/file.h \
 						platform/utils.h \
 						platform/mutex.h \
@@ -254,6 +255,7 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
+						stream/tstream/tstream.h \
 						format/format.h \
 						format/prefix.h \
 						utils/prefix.h \
