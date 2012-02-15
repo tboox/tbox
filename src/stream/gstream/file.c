@@ -50,7 +50,7 @@ typedef struct __tb_fstream_t
 	tb_handle_t 		file;
 
 	// the file size
-	tb_hize_t 		size;
+	tb_hize_t 			size;
 
 	// the wait event
 	tb_long_t 			wait;
