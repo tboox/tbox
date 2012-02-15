@@ -130,10 +130,13 @@ tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
 	{
 	case TB_FILE_SEEK_BEG:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_SET);
+		break;
 	case TB_FILE_SEEK_CUR:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_CUR);
+		break;
 	case TB_FILE_SEEK_END:
 		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_END);
+		break;
 	default:
 		tb_trace("unknown file seek flag: %d", flags);
 		break;

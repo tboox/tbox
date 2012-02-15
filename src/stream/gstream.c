@@ -293,45 +293,47 @@ end:
 	// ok?
 	return r;
 }
-#if 0
-static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hong_t offset)
-{
-	// seek to cache
-	if (offset >= gst->offset && offset <= gst->offset + tb_qbuffer_size(&gst->cache))
-	{
-#if 0
-		// update cache
-		gst->cache_head += offset - gst->offset;
-		gst->cache_size -= offset - gst->offset;
-		if (!gst->cache_size) gst->cache_head = gst->cache_data;
-#else
-		// FIXME
-		tb_trace_noimpl();
-		return TB_FALSE;
-#endif
-		// ok
-		return TB_TRUE;
-	}
-
-	// seek to stream
-	if (gst->seek && gst->seek(gst, offset))
-	{
-		// clear cache
-		tb_qbuffer_clear(&gst->cache);
-
-		// ok
-		return TB_TRUE;
-	}
-
-	return TB_FALSE;
-}
-#else
 static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 {
-	tb_trace_noimpl();
-	return -1;
+	tb_long_t r = -1;
+
+	// flush writed data first
+	if (gst->bwrited) 
+	{
+		// flush it
+		r = tb_gstream_cache_afwrit(gst, TB_NULL, 0);
+
+		// continue it if has data
+		tb_check_return_val(r < 0, 0);
+
+		// bwrited will be clear
+		tb_assert_and_check_return_val(!gst->bwrited, -1);
+	}
+	else
+	{
+		tb_size_t 	size = 0;
+		tb_hize_t 	curt = tb_gstream_offset(&gst->cache);
+		tb_byte_t* 	data = tb_qbuffer_pull_init(&gst->cache, &size);
+		if (data && size && offset >= curt && offset <= curt + size)
+		{
+			// seek it at the cache
+			tb_qbuffer_pull_done(&gst->cache, offset - curt);
+
+			// ok
+			goto ok;
+		}
+		else tb_qbuffer_clear(&gst->cache);
+	}
+
+	// seek it
+	tb_check_return_val(gst->aseek, -1);
+	r = gst->aseek(gst, offset);
+	tb_check_return_val(r > 0, r);
+
+ok:
+	gst->offset = offset;
+	return 1;
 }
-#endif
 tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst, -1);
