@@ -442,7 +442,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	// digits
 	tb_char_t 	ints[64] = {0};
 	tb_char_t 	decs[64] = {0};
-	tb_int_t 	ints_i = 0, decs_i = 0;
+	tb_long_t 	ints_i = 0, decs_i = 0;
 
 	// sign: + -
 	tb_char_t sign = 0;
@@ -463,9 +463,18 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	// adjust sign
 	if (num < 0) num = -num;
 
-	// FIXME: get integer & decimal
-	//tb_int64_t integer = (tb_int64_t)num;
-	long long integer = (long long)num;
+	// default precision: 6
+	if (e.precision <= 0) e.precision = 6;
+
+	// round? i.dddddddd5 => i.ddddddde
+	tb_uint64_t p = 1;
+	tb_size_t 	n = e.precision;
+	while (n--) p *= 10;
+	if (((tb_uint64_t)(num * p * 10) % 10) > 4) 
+		num += 1. / (tb_float_t)p;
+
+	// get integer & decimal
+	tb_int64_t integer = (tb_int64_t)num;
 	tb_float_t decimal = num - integer;
 
 	// convert integer => digits string in reverse order
@@ -481,19 +490,16 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 		while (integer);
 	}
 
-	// default precision: 6
-	if (e.precision <= 0) e.precision = 6;
-
 	// convert decimal => digits string in positive order
 	if (decimal == 0) decs[decs_i++] = '0';
 	else 
 	{
-		tb_int_t d = (tb_int_t)(decimal * 10);
+		tb_long_t d = (tb_long_t)(decimal * 10);
 		do 
 		{
 			decs[decs_i++] = d + '0';
 			decimal = decimal * 10 - d;
-			d = (tb_int_t)(decimal * 10);
+			d = (tb_long_t)(decimal * 10);
 		}
 		while (decs_i < e.precision);
 	}
