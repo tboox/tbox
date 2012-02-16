@@ -335,6 +335,7 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
+					  	demo/flv \
 					  	demo/math \
 					  	demo/utils \
 					  	demo/other \
