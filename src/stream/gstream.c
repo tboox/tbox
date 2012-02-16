@@ -312,12 +312,12 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 	else
 	{
 		tb_size_t 	size = 0;
-		tb_hize_t 	curt = tb_gstream_offset(&gst->cache);
+		tb_hize_t 	curt = tb_gstream_offset(gst);
 		tb_byte_t* 	data = tb_qbuffer_pull_init(&gst->cache, &size);
 		if (data && size && offset >= curt && offset <= curt + size)
 		{
 			// seek it at the cache
-			tb_qbuffer_pull_done(&gst->cache, offset - curt);
+			tb_qbuffer_pull_done(&gst->cache, (tb_size_t)(offset - curt));
 
 			// ok
 			goto ok;

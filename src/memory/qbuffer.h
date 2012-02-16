@@ -36,10 +36,10 @@
 typedef struct __tb_qbuffer_t
 {
 	// the buffer data
-	tb_char_t* 		data;
+	tb_byte_t* 		data;
 
 	// the buffer head
-	tb_char_t* 		head;
+	tb_byte_t* 		head;
 
 	// the buffer size
 	tb_size_t 		size;

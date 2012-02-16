@@ -19,9 +19,26 @@ int main(int argc, char** argv)
 	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
 #endif
 
-	tb_hong_t t = tb_uclock();
-	tb_msleep(1);
-	t = tb_uclock() - t;
-	tb_print("%lld", t);
+	tb_print("%f", 3.1415926);
+	tb_print("%.1f", 3.1415926);
+	tb_print("%.2f", 3.1415926);
+	tb_print("%.3f", 3.1415926);
+	tb_print("%.4f", 3.1415926);
+	tb_print("%.5f", 3.1415926);
+	tb_print("%.6f", 3.1415926);
+	tb_print("%.7f", 3.1415926);
+	tb_print("%.8f", 3.1415926);
+
+
+	printf("%f\n", 3.1415926);
+	printf("%.1f\n", 3.1415926);
+	printf("%.2f\n", 3.1415926);
+	printf("%.3f\n", 3.1415926);
+	printf("%.4f\n", 3.1415926);
+	printf("%.5f\n", 3.1415926);
+	printf("%.6f\n", 3.1415926);
+	printf("%.7f\n", 3.1415926);
+	printf("%.8f\n", 3.1415926);
+
 	return 0;
 }
