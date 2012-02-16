@@ -55,6 +55,7 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 
 	// free it
 	sem_destroy(h);
+	tb_free(h);
 }
 tb_void_t tb_event_post(tb_handle_t handle)
 {
