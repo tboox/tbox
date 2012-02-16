@@ -29,16 +29,5 @@ int main(int argc, char** argv)
 	tb_print("%.7f", 3.1415926);
 	tb_print("%.8f", 3.1415926);
 
-
-	printf("%f\n", 3.1415926);
-	printf("%.1f\n", 3.1415926);
-	printf("%.2f\n", 3.1415926);
-	printf("%.3f\n", 3.1415926);
-	printf("%.4f\n", 3.1415926);
-	printf("%.5f\n", 3.1415926);
-	printf("%.6f\n", 3.1415926);
-	printf("%.7f\n", 3.1415926);
-	printf("%.8f\n", 3.1415926);
-
 	return 0;
 }
