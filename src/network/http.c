@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"http"
+//#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -164,14 +164,18 @@ static tb_void_t tb_http_status_exit(tb_http_t* http)
 static tb_void_t tb_http_status_clear(tb_http_t* http)
 {
 	http->status.code = 0;
-	http->status.version = TB_HTTP_VERSION_11;
-	http->status.balive = 0;
-	http->status.bseeked = 0;
 	http->status.bchunked = 0;
-	http->status.document_size = 0;
 	http->status.content_size = 0;
 	tb_pstring_clear(&http->status.content_type);
 	tb_pstring_clear(&http->status.location);
+
+	// persistent state
+#if 0
+	http->status.version = TB_HTTP_VERSION_11;
+	http->status.balive = 0;
+	http->status.bseeked = 0;
+	http->status.document_size = 0;
+#endif
 }
 /* chunked_data
  *
@@ -685,6 +689,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		}
 
 		// set url
+		tb_trace_impl("redirect: %s", tb_pstring_cstr(&http->status.location));
 		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) return -1;
 
 		// set keep-alive
@@ -748,6 +753,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 	http->option.range.eof = 0;
 
 	// ok
+	tb_trace_impl("seek: %llu", offset);
 	return 1;
 }
 
@@ -984,12 +990,16 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 	tb_check_return_val(r > 0, r);
 
 	// ok
+	http->step &= ~TB_HTTP_STEP_SEEK;
 	return r;
 }
 tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, TB_FALSE);
+
+	// init step
+	http->step &= ~TB_HTTP_STEP_SEEK;
 
 	// try seeking it
 	tb_long_t r = 0;
@@ -1001,6 +1011,9 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 		// fail or timeout?
 		tb_check_break(r > 0);
 	}
+
+	// clear step
+	http->step &= ~TB_HTTP_STEP_SEEK;
 
 	// ok?
 	return r > 0? TB_TRUE : TB_FALSE;
