@@ -103,6 +103,13 @@ static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
+	// status
+	tb_http_status_t const* status = tb_http_status(hst->http);
+	tb_assert_and_check_return_val(status, -1);
+
+	// be able to seek?
+	tb_check_return_val(status->bseeked, -1);
+
 	// seek
 	return tb_http_aseek(hst->http, offset);
 }

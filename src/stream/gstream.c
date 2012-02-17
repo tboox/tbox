@@ -322,12 +322,16 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 			// ok
 			goto ok;
 		}
-		else tb_qbuffer_clear(&gst->cache);
 	}
 
 	// seek it
 	tb_check_return_val(gst->aseek, -1);
 	r = gst->aseek(gst, offset);
+
+	// support the native seek? clear cache
+	if (r >= 0) tb_qbuffer_clear(&gst->cache);
+
+	// ok?
 	tb_check_return_val(r > 0, r);
 
 ok:
@@ -974,6 +978,9 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 
 		// no data? continue it
 		tb_check_return_val(r, 0);
+
+		// no finished? continue it
+		if (r > 0 && tb_gstream_offset(gst) < offset) return 0;
 	}
 
 end:
