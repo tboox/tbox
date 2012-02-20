@@ -1,8 +1,8 @@
 # demo
-TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO 					= n
 
 # plat
-TB_CONFIG_PLAT 					= ios4_arm
+TB_CONFIG_PLAT 					= ios_arm
 
 # arch
 TB_CONFIG_ARCH 					= arm

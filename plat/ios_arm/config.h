@@ -10,7 +10,7 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 	(6)
+#define TB_CONFIG_ARM_VERSION 	(7)
 //#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
@@ -19,8 +19,8 @@
 
 // os
 #define TB_CONFIG_OS_IOS
-#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(4)
-#define TB_CONFIG_OS_IOS_VERSION_MINOR 	(2)
+#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(5)
+#define TB_CONFIG_OS_IOS_VERSION_MINOR 	(0)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
