@@ -20,29 +20,15 @@ BIN 			= /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
 endif
 
 ifeq ($(SDK),)
-SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk 
-#SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk 
+SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
 endif
 
-ifeq ($(HOST),mac)
-# for mac
-CC 				= $(BIN)/gcc-4.2 -arch armv6
+CC 				= $(BIN)/llvm-gcc-4.2 -arch armv7 
 AR 				= $(BIN)/ar
 STRIP 			= $(BIN)/strip
 RANLIB 			= $(BIN)/ranlib
-LD 				= $(BIN)/llvm-gcc-4.2 -arch armv6
+LD 				= $(BIN)/llvm-gcc-4.2 -arch armv7 
 AS				= 
-else
-# for linux
-PRE 			= $(BIN)/arm-apple-darwin9-
-CC 				= $(PRE)gcc
-AR 				= $(PRE)ar
-STRIP 			= $(PRE)strip
-RANLIB 			= $(PRE)ranlib
-LD 				= $(PRE)g++
-AS				= 
-endif
-
 RM 				= rm -f
 RMDIR 			= rm -rf
 CP 				= cp
@@ -53,11 +39,14 @@ PWD 			= pwd
 
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
-	-O2 -DNDEBUG \
-	-fomit-frame-pointer -freg-struct-return -fno-bounds-check 
+	-Os -DNDEBUG \
+	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
+	-fvisibility=hidden
 
-CPPFLAGS_DEBUG 	= -g
-CPPFLAGS 		= -c -Wall \
+CPPFLAGS_DEBUG 	= -DDEBUG=1 -gdwarf-2 
+CPPFLAGS 		= -c -Wall -mthumb -miphoneos-version-min=5.0 \
+				  -fmessage-length=0  -Wreturn-type -Wunused-variable -Wuninitialized \
+				  -pipe -Wno-trigraphs -fpascal-strings \
 				  -I$(SDK)/usr/include \
 				  -I$(SDK)/usr/include/c++/4.2.1 \
 				  -I$(SDK)/usr/lib/gcc/arm-apple-darwin10/4.2.1/include
@@ -67,7 +56,7 @@ CPPFLAGS-o 		= -o
 # cflags: c files
 CFLAGS_RELEASE 	= 
 CFLAGS_DEBUG 	= 
-CFLAGS 			=
+CFLAGS 			= -std=gnu99
 
 # cxxflags: c++ files
 CXXFLAGS_RELEASE = -fno-rtti
@@ -77,7 +66,7 @@ CXXFLAGS 		=
 # ldflags
 LDFLAGS_RELEASE =
 LDFLAGS_DEBUG 	= 
-LDFLAGS 		= -arch=armv6 -nostdlib \
+LDFLAGS 		= -arch=armv7 -nostdlib \
 				  -L$(SDK)/usr/lib \
 				  -L$(SDK)/usr/lib/system \
 				  -L$(SDK)/usr/lib/gcc/arm-apple-darwin10/4.2.1

@@ -30,11 +30,6 @@ demo_LIBS 				= supc++ log gcc c m dl
 demo_OBJ_FILES 			= ../objs/crtbegin_dynamic ../objs/crtend_android
 endif
 
-ifeq ($(TB_CONFIG_PLAT),ios4_arm)
-demo_LIBS 				= gcc gcc_eh stdc++ z m dl pthread
-demo_OBJ_FILES 			= ../objs/crt1
-endif
-
 define MAKE_MODULES
 $(1)_TYPE 				= BIN
 $(1)_C_FILES 			+= $(1)
