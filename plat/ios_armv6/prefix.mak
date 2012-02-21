@@ -45,7 +45,7 @@ CPPFLAGS_RELEASE 	= \
 
 CPPFLAGS_DEBUG 	= -DDEBUG=1 -gdwarf-2 
 CPPFLAGS 		= -arch armv6 -c -Wall -mthumb -miphoneos-version-min=5.0 \
-				  -fmessage-length=0  -Wreturn-type -Wunused-variable -Wuninitialized \
+				  -fmessage-length=0  -Wreturn-type -Wunused-variable \
 				  -pipe -Wno-trigraphs -fpascal-strings \
 				  --sysroot=$(SDK)
 CPPFLAGS-I 		= -I
@@ -54,7 +54,7 @@ CPPFLAGS-o 		= -o
 # cflags: c files
 CFLAGS_RELEASE 	= 
 CFLAGS_DEBUG 	= 
-CFLAGS 			= -std=c99
+CFLAGS 			= -std=gnu99
 
 # cxxflags: c++ files
 CXXFLAGS_RELEASE = -fno-rtti

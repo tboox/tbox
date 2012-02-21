@@ -25,6 +25,10 @@ ifeq ($(TB_CONFIG_PLAT),linux_arm)
 demo_LIBS 				= z m dl pthread
 endif
 
+ifeq ($(TB_CONFIG_PLAT),ios_arm)
+demo_LIBS 				= stdc++ z m dl pthread
+endif
+
 ifeq ($(TB_CONFIG_PLAT),android_arm)
 demo_LIBS 				= supc++ log gcc c m dl
 demo_OBJ_FILES 			= ../objs/crtbegin_dynamic ../objs/crtend_android
