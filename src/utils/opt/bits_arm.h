@@ -40,7 +40,7 @@
 
 #define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
 
-// FIXME: for thumb
+// FIXME: for ios
 //#define tb_bits_get_ubits32_impl(p, b, n) 	tb_bits_get_ubits32_impl_asm(p, b, n)
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
