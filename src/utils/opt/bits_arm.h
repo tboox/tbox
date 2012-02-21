@@ -40,7 +40,8 @@
 
 #define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
 
-#define tb_bits_get_ubits32_impl(p, b, n) 	tb_bits_get_ubits32_impl_asm(p, b, n)
+// FIXME: for thumb
+//#define tb_bits_get_ubits32_impl(p, b, n) 	tb_bits_get_ubits32_impl_asm(p, b, n)
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 
@@ -78,6 +79,7 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 	return x;
 }
 
+#if 0
 static __tb_inline__ tb_uint32_t tb_bits_get_ubits32_impl_asm(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
 #ifdef TB_CONFIG_BINARY_SMALL
@@ -184,6 +186,7 @@ static __tb_inline__ tb_uint32_t tb_bits_get_ubits32_impl_asm(tb_byte_t const* p
 	return x;
 #endif
 }
+#endif
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 

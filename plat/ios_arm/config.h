@@ -11,7 +11,7 @@
 
 // arm
 #define TB_CONFIG_ARM_VERSION 	(7)
-//#define TA_CONFIG_ARM_THUMB
+#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
 //#define TA_CONFIG_ARM_MMU 
