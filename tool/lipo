@@ -1,0 +1,9 @@
+#!/bin/bash
+
+make config PLAT=ios_armv6 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$1.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
+make clean;make;make install
+
+make config PLAT=ios_armv7 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$1.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
+make clean;make;make install
+
+lipo -create -arch armv6 bin/ios_armv6/lib/libtbox.a -arch armv7 bin/ios_armv7/lib/libtbox.a -output bin/libtbox.a
