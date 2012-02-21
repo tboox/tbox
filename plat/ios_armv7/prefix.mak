@@ -23,11 +23,11 @@ ifeq ($(SDK),)
 SDK 			= /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
 endif
 
-CC 				= $(BIN)/llvm-gcc-4.2 -arch armv7 
+CC 				= $(BIN)/gcc 
 AR 				= $(BIN)/ar
 STRIP 			= $(BIN)/strip
 RANLIB 			= $(BIN)/ranlib
-LD 				= $(BIN)/llvm-gcc-4.2 -arch armv7 
+LD 				= $(BIN)/gcc
 AS				= 
 RM 				= rm -f
 RMDIR 			= rm -rf
@@ -44,19 +44,17 @@ CPPFLAGS_RELEASE 	= \
 	-fvisibility=hidden
 
 CPPFLAGS_DEBUG 	= -DDEBUG=1 -gdwarf-2 
-CPPFLAGS 		= -c -Wall -mthumb -miphoneos-version-min=5.0 \
+CPPFLAGS 		= -arch armv7 -c -Wall -mthumb -miphoneos-version-min=5.0 \
 				  -fmessage-length=0  -Wreturn-type -Wunused-variable -Wuninitialized \
 				  -pipe -Wno-trigraphs -fpascal-strings \
-				  -I$(SDK)/usr/include \
-				  -I$(SDK)/usr/include/c++/4.2.1 \
-				  -I$(SDK)/usr/lib/gcc/arm-apple-darwin10/4.2.1/include
+				  --sysroot=$(SDK)
 CPPFLAGS-I 		= -I
 CPPFLAGS-o 		= -o
 
 # cflags: c files
 CFLAGS_RELEASE 	= 
 CFLAGS_DEBUG 	= 
-CFLAGS 			= -std=gnu99
+CFLAGS 			= -std=c99
 
 # cxxflags: c++ files
 CXXFLAGS_RELEASE = -fno-rtti
@@ -66,16 +64,13 @@ CXXFLAGS 		=
 # ldflags
 LDFLAGS_RELEASE =
 LDFLAGS_DEBUG 	= 
-LDFLAGS 		= -arch=armv7 -nostdlib \
-				  -L$(SDK)/usr/lib \
-				  -L$(SDK)/usr/lib/system \
-				  -L$(SDK)/usr/lib/gcc/arm-apple-darwin10/4.2.1
+LDFLAGS 		= -arch armv7 -isysroot $(SDK) --sysroot=$(SDK)
 LDFLAGS-L 		= -L
 LDFLAGS-l 		= -l
 LDFLAGS-o 		= -o
 
 # asflags
-ASFLAGS_RELEASE = Wa,-march=native
+ASFLAGS_RELEASE = 
 ASFLAGS_DEBUG 	= 
 ASFLAGS 		= -c
 ASFLAGS-I 		= -I
@@ -85,7 +80,7 @@ ASFLAGS-o 		= -o
 ARFLAGS 		= -cr
 
 # share ldflags
-SHFLAGS 		= -shared -Wl,-soname
+SHFLAGS 		= -dynamiclib -Wl,-single_module
 
 # include sub-config
 include 		$(PLAT_DIR)/config.mak
