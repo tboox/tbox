@@ -25,7 +25,7 @@
  */
 #include "prefix.h"
 #include "tstream.h"
-#include "../../encoding/encoding.h"
+#include "../../../encoding/encoding.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types

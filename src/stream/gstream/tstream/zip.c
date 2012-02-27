@@ -25,8 +25,8 @@
  */
 #include "prefix.h"
 #include "tstream.h"
-#include "../bstream.h"
-#include "../../zip/zip.h"
+#include "../../bstream.h"
+#include "../../../zip/zip.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types

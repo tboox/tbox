@@ -51,8 +51,6 @@ typedef enum __tb_aioo_otype_t
  	TB_AIOO_OTYPE_NULL 	= 0
 , 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
 ,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
-,	TB_AIOO_OTYPE_HTTP 	= 3 	//!< for http
-,	TB_AIOO_OTYPE_GSTM 	= 4 	//!< for gstream
 
 }tb_aioo_otype_t;
 

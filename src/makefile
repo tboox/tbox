@@ -46,10 +46,10 @@ tbox_C_FILES 			+= \
 						stream/gstream/file \
 						stream/gstream/data \
 						stream/gstream/sock \
-						stream/tstream/tstream \
-						stream/tstream/null \
-						stream/tstream/zip \
-						stream/tstream/encoding \
+						stream/gstream/tstream/tstream \
+						stream/gstream/tstream/null \
+						stream/gstream/tstream/zip \
+						stream/gstream/tstream/encoding \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -90,8 +90,6 @@ tbox_C_FILES 			+= \
 						xml/writer \
 						aio/aiop \
 						aio/aioo \
-						aio/reactor/aiop \
-						aio/reactor/aioo \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -255,8 +253,6 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
-						stream/tstream/prefix.h \
-						stream/tstream/tstream.h \
 						format/format.h \
 						format/prefix.h \
 						utils/prefix.h \

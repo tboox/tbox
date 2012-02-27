@@ -27,7 +27,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../gstream.h"
+#include "../../gstream.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
