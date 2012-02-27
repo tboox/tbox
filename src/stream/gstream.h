@@ -385,9 +385,9 @@ tb_bool_t 			tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_size(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_left(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_offset(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_size(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_left(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_offset(tb_gstream_t const* gst);
 tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
 // ctrl

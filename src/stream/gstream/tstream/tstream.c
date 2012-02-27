@@ -30,7 +30,7 @@
  * includes
  */
 #include "tstream.h"
-#include "../../memory/memory.h"
+#include "../../../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
