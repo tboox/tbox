@@ -34,29 +34,126 @@
  * types
  */
 
+// the callback type
+struct __tb_aico_t;
+struct __tb_aice_t;
+struct __tb_aicp_t;
+typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aico_t const* aico, struct __tb_aice_t const* aice);
+
 // the aio call object type
 typedef struct __tb_aico_t
 {
+	// the aioo
+	tb_aioo_t 				aioo;
 
+	// the aicb
+	tb_aicb_t 				aicb;
 
 }tb_aico_t;
+
+// the aio event code type
+typedef enum __tb_aice_code_t
+{
+ 	TB_AICE_CODE_NULL 		= 0
+, 	TB_AICE_CODE_CONN 		= 1 	//!< for socket
+, 	TB_AICE_CODE_ACPT 		= 2 	//!< for socket
+,	TB_AICE_CODE_READ 		= 4		//!< for all i/o object
+,	TB_AICE_CODE_WRIT 		= 8		//!< for all i/o object
+,	TB_AICE_CODE_SYNC 		= 16	//!< for all i/o object
+,	TB_AICE_CODE_SEEK 		= 32	//!< for all i/o object
+,	TB_AICE_CODE_SKIP 		= 64	//!< for all i/o object
+
+}tb_aice_code_t;
+
+// the aio read event type
+typedef struct __tb_aice_read_t
+{
+	// the read data
+	tb_byte_t* 				data;
+
+	// the data size
+	tb_size_t 				size;
+
+	// the real size
+	tb_long_t 				real;
+
+}tb_aice_read_t;
+
+// the aio writ event type
+typedef struct __tb_aice_writ_t
+{
+	// the writ data
+	tb_byte_t* 				data;
+
+	// the data size
+	tb_size_t 				size;
+
+	// the real size
+	tb_long_t 				real;
+
+}tb_aice_writ_t;
+
+// the aio sync event type
+typedef struct __tb_aice_sync_t
+{
+	// the ok
+	tb_size_t 				ok;
+
+}tb_aice_sync_t;
+
+// the aio seek event type
+typedef struct __tb_aice_seek_t
+{
+	// the offset
+	tb_hize_t 				offset 	: 63;
+
+	// the ok
+	tb_hize_t 				ok 		: 1;
+
+}tb_aice_seek_t;
+
+// the aio skip event type
+typedef struct __tb_aice_skip_t
+{
+	// the size
+	tb_hize_t 				size 	: 63;
+
+	// the ok
+	tb_hize_t 				ok 		: 1;
+
+}tb_aice_skip_t;
 
 // the aio call event type
 typedef struct __tb_aice_t
 {
+	// the code
+	tb_size_t 				code;
 
+	// the uion
+	union
+	{
+		tb_aice_read_t 		read;
+		tb_aice_writ_t 		writ;
+		tb_aice_sync_t 		sync;
+		tb_aice_seek_t 		seek;
+		tb_aice_skip_t 		skip;
+	} u;
 
 }tb_aice_t;
 
 // the aio call pool type
 typedef struct __tb_aicp_t
 {
+	// the object type
+	tb_size_t 				type;
 
+	// the object maxn
+	tb_size_t 				maxn;
+
+	// the reactor
+	tb_pointer_t 			rtor;
 
 }tb_aicp_t;
-
-// the callback type
-typedef tb_bool_t (*tb_aicb_t)(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
