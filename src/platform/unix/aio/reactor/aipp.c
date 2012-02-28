@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		aiop.c
+ * \file		aipp.c
  *
  */
 
@@ -27,13 +27,13 @@
 #include "prefix.h"
 
 #if defined(TB_CONFIG_AIO_HAVE_EPOLL)
-# 	include "aiop/epoll.c"
+# 	include "aipp/epoll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
-# 	include "aiop/kqueue.c"
+# 	include "aipp/kqueue.c"
 #elif defined(TB_CONFIG_AIO_HAVE_POLL)
-# 	include "aiop/poll.c"
+# 	include "aipp/poll.c"
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-# 	include "aiop/select.c"
+# 	include "aipp/select.c"
 #else
 # 	error have not available event mode
 #endif
@@ -42,40 +42,40 @@
  * implemention
  */
 #if defined(TB_CONFIG_AIO_HAVE_EPOLL)
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_epoll_init(aiop);
+	return tb_aipp_reactor_epoll_init(aipp);
 }
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_epoll_init(aiop);
+	return tb_aipp_reactor_epoll_init(aipp);
 }
 #elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_kqueue_init(aiop);
+	return tb_aipp_reactor_kqueue_init(aipp);
 }
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_kqueue_init(aiop);
+	return tb_aipp_reactor_kqueue_init(aipp);
 }
 #elif defined(TB_CONFIG_AIO_HAVE_POLL)
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_poll_init(aiop);
+	return tb_aipp_reactor_poll_init(aipp);
 }
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_poll_init(aiop);
+	return tb_aipp_reactor_poll_init(aipp);
 }
 #elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_select_init(aiop);
+	return tb_aipp_reactor_select_init(aipp);
 }
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_select_init(aiop);
+	return tb_aipp_reactor_select_init(aipp);
 }
 #endif
 
