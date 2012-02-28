@@ -250,13 +250,6 @@ end:
 	tb_trace_impl("read: %u", read);
 	return read;
 }
-tb_handle_t tb_tstream_bare(tb_gstream_t* gst)
-{
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst, TB_NULL);
-
-	return tb_gstream_bare(tst->gst);
-}
 tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);

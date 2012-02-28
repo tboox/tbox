@@ -187,9 +187,6 @@ typedef struct __tb_gstream_t
 	// the offset
 	tb_hize_t 			offset;
 
-	// the bare handle for aio
-	tb_handle_t 		(*bare)(struct __tb_gstream_t* gst);
-
 	// wait the aio event
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
@@ -269,9 +266,6 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 // init stream from encoding
 tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
-// the bare handle for aio
-tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
-
 /*!wait the gstream 
  *
  * blocking wait the single event object, so need not aiop 
@@ -285,7 +279,7 @@ tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
  */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
-// clear stream
+// clear stream cache and reset status, but not close it
 tb_void_t 			tb_gstream_clear(tb_gstream_t* gst);
 
 // async open, allow multiple called before closing 

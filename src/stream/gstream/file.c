@@ -176,12 +176,6 @@ static tb_hize_t tb_fstream_size(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(fst && fst->file, 0);
 	return fst->size;
 }
-static tb_handle_t tb_fstream_bare(tb_gstream_t* gst)
-{	
-	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst && fst->file, TB_NULL);
-	return tb_file_bare(fst->file);
-}
 static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
@@ -233,7 +227,6 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->awrit 	= tb_fstream_awrit;
 	gst->aseek 	= tb_fstream_aseek;
 	gst->size 	= tb_fstream_size;
-	gst->bare 	= tb_fstream_bare;
 	gst->wait 	= tb_fstream_wait;
 	gst->ctrl 	= tb_fstream_ctrl;
 	fst->file 	= TB_NULL;

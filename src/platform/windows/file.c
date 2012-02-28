@@ -131,10 +131,6 @@ tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
 	o.QuadPart = (LONGLONG)offset;
 	return SetFilePointerEx(hfile, o, &p, method)? (tb_hong_t)p.QuadPart : -1;
 }
-tb_handle_t tb_file_bare(tb_handle_t hfile)
-{
-	return hfile;
-}
 tb_hize_t tb_file_size(tb_handle_t hfile)
 {
 	tb_assert_and_check_return_val(hfile, 0);

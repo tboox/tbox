@@ -442,11 +442,6 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 		tb_free(gst);
 	}
 }
-tb_handle_t tb_gstream_bare(tb_gstream_t* gst)
-{
-	tb_assert_and_check_return_val(gst && gst->bare, TB_NULL);
-	return gst->bare(gst);
-}
 tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst && gst->wait, -1);

@@ -100,9 +100,6 @@ tb_hong_t 				tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
 // sync
 tb_void_t 				tb_file_sync(tb_handle_t hfile);
 
-// the bare handle for aio
-tb_handle_t 			tb_file_bare(tb_handle_t hfile);
-
 // accessors
 tb_hize_t 				tb_file_size(tb_handle_t hfile);
 

@@ -82,9 +82,6 @@ typedef struct __tb_tstream_t
 // cast
 tb_tstream_t* 	tb_tstream_cast(tb_gstream_t* gst);
 
-// bare
-tb_handle_t 	tb_tstream_bare(tb_gstream_t* gst);
-
 // open & close 
 tb_long_t 		tb_tstream_aopen(tb_gstream_t* gst);
 tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
