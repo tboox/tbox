@@ -360,12 +360,6 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// ok?
 	return r;
 }
-static tb_handle_t tb_sstream_bare(tb_gstream_t* gst)
-{	
-	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst && sst->sock, TB_NULL);
-	return tb_socket_bare(sst->sock);
-}
 static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
@@ -428,7 +422,6 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->aread 	= tb_sstream_aread;
 	gst->awrit 	= tb_sstream_awrit;
 	gst->ctrl 	= tb_sstream_ctrl;
-	gst->bare 	= tb_sstream_bare;
 	gst->wait 	= tb_sstream_wait;
 	sst->sock 	= TB_NULL;
 	sst->type 	= TB_SOCKET_TYPE_TCP;

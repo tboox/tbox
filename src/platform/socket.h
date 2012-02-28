@@ -68,9 +68,6 @@ tb_handle_t 	tb_socket_accept(tb_handle_t handle);
 // close
 tb_bool_t 		tb_socket_close(tb_handle_t handle);
 
-// the bare handle for aio
-tb_handle_t 	tb_socket_bare(tb_handle_t handle);
-
 // recv & send
 tb_long_t 		tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 tb_long_t 		tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);

@@ -17,16 +17,17 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		aicp.c
  *
  */
-#ifndef TB_STREAM_PREFIX_H
-#define TB_STREAM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "aicp.h"
+#include "aioo.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
 
-#endif

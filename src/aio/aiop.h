@@ -20,8 +20,8 @@
  * \file		aiop.h
  *
  */
-#ifndef TB_AIO_POOL_H
-#define TB_AIO_POOL_H
+#ifndef TB_AIO_POLL_POOL_H
+#define TB_AIO_POLL_POOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes

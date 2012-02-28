@@ -161,7 +161,6 @@ tb_gstream_t* tb_gstream_init_encoding()
 	gst->aopen 	= tb_estream_aopen;
 	gst->aread 	= tb_tstream_aread;
 	gst->aclose	= tb_tstream_aclose;
-	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
 	gst->ctrl 	= tb_estream_ctrl;
 
