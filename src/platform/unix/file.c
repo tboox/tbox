@@ -118,27 +118,15 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 	if (hfile) fsync((tb_long_t)hfile - 1);
 #endif
 }
-tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
+tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
 {
-	tb_assert_and_check_return_val(hfile, -1);
+	tb_assert_and_check_return_val(hfile, TB_FALSE);
 
-	switch (flags)
-	{
-	case TB_FILE_SEEK_BEG:
-		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_SET);
-		break;
-	case TB_FILE_SEEK_CUR:
-		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_CUR);
-		break;
-	case TB_FILE_SEEK_END:
-		offset = lseek((tb_long_t)hfile - 1, offset, SEEK_END);
-		break;
-	default:
-		tb_trace("unknown file seek flag: %d", flags);
-		break;
-	}
-
-	return offset;
+	return (offset == lseek((tb_long_t)hfile - 1, offset, SEEK_SET))? TB_TRUE : TB_FALSE;
+}
+tb_bool_t tb_file_skip(tb_handle_t hfile, tb_hize_t size)
+{
+	return (lseek((tb_long_t)hfile - 1, size, SEEK_CUR) >= 0)? TB_TRUE : TB_FALSE;
 }
 tb_hize_t tb_file_size(tb_handle_t hfile)
 {

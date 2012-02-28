@@ -111,7 +111,7 @@ tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype);
 
 /*!wait the aio object
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	object 	the aio object

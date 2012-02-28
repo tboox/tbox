@@ -79,15 +79,6 @@
  * types
  */
 
-// the stream seek type
-typedef enum __tb_gstream_seek_t
-{
- 	TB_GSTREAM_SEEK_BEG 			= 0
-, 	TB_GSTREAM_SEEK_CUR 			= 1
-, 	TB_GSTREAM_SEEK_END 			= 2
-
-}tb_gstream_seek_t;
-
 // the gstream type
 typedef enum __tb_gstream_type_t
 {
@@ -268,7 +259,7 @@ tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, t
 
 /*!wait the gstream 
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	gst 	the gstream 

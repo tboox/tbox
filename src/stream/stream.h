@@ -55,9 +55,9 @@
  *        |         
  *        |                                               - dstream(data) - no wait
  *    (url, ...)                                         |
- *     mstream ------------- mstream ---------------------  fstream(file) - wait for aiop
+ *     mstream ------------- mstream ---------------------  fstream(file) - wait for aicp
  *                   |              \                    |
- *                   |               -- hstream(http) ----- sstream(sock) - wait for aiop or aicp
+ *                   |               -- hstream(http) ----- sstream(sock) - wait for aicp
  *                   |
  *                   |
  *                   |           - estream(utf8, gb2312, gbk)

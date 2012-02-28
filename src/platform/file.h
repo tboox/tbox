@@ -95,7 +95,10 @@ tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);
 tb_long_t 				tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size);
 
 // seek
-tb_hong_t 				tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags);
+tb_bool_t 				tb_file_seek(tb_handle_t hfile, tb_hize_t offset);
+
+// skip
+tb_bool_t 				tb_file_skip(tb_handle_t hfile, tb_hize_t size);
 
 // sync
 tb_void_t 				tb_file_sync(tb_handle_t hfile);

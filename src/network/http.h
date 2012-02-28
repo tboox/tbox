@@ -167,7 +167,7 @@ tb_void_t 				tb_http_exit(tb_handle_t handle);
 
 /*!wait the http 
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	handle 	the http handle 

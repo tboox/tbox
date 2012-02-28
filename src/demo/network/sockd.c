@@ -50,8 +50,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t s = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(s, end);
 
-	// init aiop
-	tb_handle_t ep = tb_aiop_init(TB_AIOO_OTYPE_SOCK, 16);
+	// init aipp
+	tb_handle_t ep = tb_aipp_init(TB_AIOO_OTYPE_SOCK, 16);
 	tb_assert_and_check_goto(ep, end);
 
 	// bind 
@@ -59,7 +59,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_bind(s, tb_stou32(argv[1]))) goto end;
 
 	// add event
-	if (!tb_aiop_addo(ep, s, TB_AIOO_ETYPE_ACPT, TB_NULL)) goto end;
+	if (!tb_aipp_addo(ep, s, TB_AIOO_ETYPE_ACPT, TB_NULL)) goto end;
 
 	// accept
 	tb_aioo_t objs[16];
@@ -67,7 +67,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// waiting...
 		tb_print("listening...");
-		tb_long_t objn = tb_aiop_wait(ep, objs, 16, 10000);
+		tb_long_t objn = tb_aipp_wait(ep, objs, 16, 10000);
 
 		// error?
 		if (objn < 0) 
@@ -94,12 +94,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (c)
 				{
 					tb_print("accept ok");
-					if (!tb_aiop_addo(ep, c, TB_AIOO_ETYPE_READ, TB_NULL)) goto end;
+					if (!tb_aipp_addo(ep, c, TB_AIOO_ETYPE_READ, TB_NULL)) goto end;
 				}
 				else
 				{
 					tb_print("connection closed");
-					tb_aiop_delo(ep, objs[i].handle);
+					tb_aipp_delo(ep, objs[i].handle);
 				}
 			}
 			else if (objs[i].etype & TB_AIOO_ETYPE_READ)
@@ -117,7 +117,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				else
 				{
 					tb_print("connection closed");
-					tb_aiop_delo(ep, objs[i].handle);
+					tb_aipp_delo(ep, objs[i].handle);
 				}
 			}
 			else 
@@ -132,8 +132,8 @@ end:
 	// close socket
 	if (s) tb_socket_close(s);
 
-	// exit aiop
-	if (ep) tb_aiop_exit(ep);
+	// exit aipp
+	if (ep) tb_aipp_exit(ep);
 
 	// exit
 	tb_exit();
