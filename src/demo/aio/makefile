@@ -3,11 +3,11 @@ include $(PRO_DIR)/prefix.mak
 
 # module name
 NAMES = \
-		dns \
-		url \
-		ipv4 \
-		http \
-		cookies
+		file/aioo \
+		sock/aioo \
+		sock/aipp \
+		sock/aicpc \
+		sock/aicpd
 
 include $(SRC_DIR)/demo/makefile
 
