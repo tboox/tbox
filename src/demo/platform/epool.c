@@ -54,7 +54,7 @@ end:
 
 	// exit thread
 	tb_print("[thread]: exit");
-	tb_thread_return(it? it->t : TB_NULL, TB_NULL);
+	tb_thread_return(TB_NULL);
 	return TB_NULL;
 }
 

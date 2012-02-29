@@ -60,7 +60,7 @@ tb_bool_t tb_thread_kill(tb_handle_t handle)
 	if (handle) return TerminateThread(handle, 0)? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
-tb_void_t tb_thread_return(tb_handle_t handle, tb_pointer_t value)
+tb_void_t tb_thread_return(tb_pointer_t value)
 {
 	ExitThread(0);
 }

@@ -188,7 +188,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t s = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(s, end);
 
-	// init aio
+	// init aioo
 	tb_aioo_t o;
 	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NULL, TB_NULL);
 

@@ -88,8 +88,9 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						aio/aipp \
 						aio/aioo \
+						aio/aipp \
+						aio/aicp \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -180,6 +181,7 @@ INC_FILES 				= \
 						aio/prefix.h \
 						aio/aioo.h \
 						aio/aipp.h \
+						aio/aicp.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -332,6 +334,7 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
+					  	demo/aio \
 					  	demo/flv \
 					  	demo/math \
 					  	demo/utils \

@@ -28,6 +28,7 @@
  */
 #include "prefix.h"
 #include "aioo.h"
+#include "../network/ipv4.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -55,15 +56,38 @@ typedef struct __tb_aico_t
 typedef enum __tb_aice_code_t
 {
  	TB_AICE_CODE_NULL 		= 0
-, 	TB_AICE_CODE_CONN 		= 1 	//!< for socket
-, 	TB_AICE_CODE_ACPT 		= 2 	//!< for socket
+, 	TB_AICE_CODE_RESV 		= 1 	//!< for socket
+, 	TB_AICE_CODE_CONN 		= 2 	//!< for socket
+, 	TB_AICE_CODE_ACPT 		= 3 	//!< for socket
 ,	TB_AICE_CODE_READ 		= 4		//!< for all i/o object
-,	TB_AICE_CODE_WRIT 		= 8		//!< for all i/o object
-,	TB_AICE_CODE_SYNC 		= 16	//!< for all i/o object
-,	TB_AICE_CODE_SEEK 		= 32	//!< for all i/o object
-,	TB_AICE_CODE_SKIP 		= 64	//!< for all i/o object
+,	TB_AICE_CODE_WRIT 		= 5		//!< for all i/o object
+,	TB_AICE_CODE_SYNC 		= 6		//!< for all i/o object
+,	TB_AICE_CODE_SEEK 		= 7		//!< for all i/o object
+,	TB_AICE_CODE_SKIP 		= 8		//!< for all i/o object
 
 }tb_aice_code_t;
+
+// the aio resv event type
+typedef struct __tb_aice_resv_t
+{
+	// the name
+	tb_char_t const* 		name;
+
+	// the host
+	tb_ipv4_t 				host;
+
+}tb_aice_resv_t;
+
+// the aio conn event type
+typedef struct __tb_aice_conn_t
+{
+	// the host
+	tb_ipv4_t 				host;
+
+	// the port
+	tb_size_t 				port;
+
+}tb_aice_conn_t;
 
 // the aio read event type
 typedef struct __tb_aice_read_t
@@ -73,9 +97,6 @@ typedef struct __tb_aice_read_t
 
 	// the data size
 	tb_size_t 				size;
-
-	// the real size
-	tb_long_t 				real;
 
 }tb_aice_read_t;
 
@@ -88,27 +109,13 @@ typedef struct __tb_aice_writ_t
 	// the data size
 	tb_size_t 				size;
 
-	// the real size
-	tb_long_t 				real;
-
 }tb_aice_writ_t;
-
-// the aio sync event type
-typedef struct __tb_aice_sync_t
-{
-	// the ok
-	tb_size_t 				ok;
-
-}tb_aice_sync_t;
 
 // the aio seek event type
 typedef struct __tb_aice_seek_t
 {
 	// the offset
-	tb_hize_t 				offset 	: 63;
-
-	// the ok
-	tb_hize_t 				ok 		: 1;
+	tb_hize_t 				offset;
 
 }tb_aice_seek_t;
 
@@ -116,10 +123,7 @@ typedef struct __tb_aice_seek_t
 typedef struct __tb_aice_skip_t
 {
 	// the size
-	tb_hize_t 				size 	: 63;
-
-	// the ok
-	tb_hize_t 				ok 		: 1;
+	tb_hize_t 				size;
 
 }tb_aice_skip_t;
 
@@ -129,17 +133,44 @@ typedef struct __tb_aice_t
 	// the code
 	tb_size_t 				code;
 
+	// the ok
+	tb_long_t 				ok;
+
 	// the uion
 	union
 	{
+		tb_aice_conn_t 		conn;
 		tb_aice_read_t 		read;
 		tb_aice_writ_t 		writ;
-		tb_aice_sync_t 		sync;
 		tb_aice_seek_t 		seek;
 		tb_aice_skip_t 		skip;
 	} u;
 
 }tb_aice_t;
+
+// the aio poll pool reactor type
+typedef struct __tb_aicp_t;
+typedef struct __tb_aicp_reactor_t
+{
+	// the reference to the aio pool
+	struct __tb_aicp_t* 	aicp;
+
+	// exit
+	tb_void_t 				(*exit)(struct __tb_aicp_reactor_t* reactor);
+
+	// addo
+	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
+
+	// seto
+	tb_bool_t 				(*seto)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj);
+
+	// delo
+	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle);
+
+	// wait
+	tb_long_t 				(*wait)(struct __tb_aicp_reactor_t* reactor, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
+
+}tb_aicp_reactor_t;
 
 // the aio call pool type
 typedef struct __tb_aicp_t
@@ -151,7 +182,7 @@ typedef struct __tb_aicp_t
 	tb_size_t 				maxn;
 
 	// the reactor
-	tb_pointer_t 			rtor;
+	tb_aicp_reactor_t 		rtor;
 
 }tb_aicp_t;
 
@@ -247,5 +278,8 @@ tb_bool_t 		tb_aicp_skip(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t size);
  * @return 	return 1 if ok, return 0 if timeout, return -1 if error
  */
 tb_long_t 		tb_aicp_wait(tb_aicp_t* aicp, tb_long_t timeout);
+
+// spak aice
+tb_long_t 		tb_aicp_spak(tb_aicp_t* aicp);
 
 #endif
