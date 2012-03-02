@@ -28,7 +28,7 @@ AR 				= $(BIN)/ar
 STRIP 			= $(BIN)/strip
 RANLIB 			= $(BIN)/ranlib
 LD 				= $(BIN)/gcc
-AS				= 
+AS				= gas-preprocessor.pl $(BIN)/gcc
 RM 				= rm -f
 RMDIR 			= rm -rf
 CP 				= cp
@@ -43,8 +43,9 @@ CPPFLAGS_RELEASE 	= \
 	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
 	-fvisibility=hidden
 
-CPPFLAGS_DEBUG 	= -DDEBUG=1 -gdwarf-2 
-CPPFLAGS 		= -arch armv7 -c -Wall -mthumb -miphoneos-version-min=5.0 \
+CPPFLAGS_DEBUG 	= -g 
+CPPFLAGS 		= -arch armv7 -c -Wall  \
+				  -mthumb -mcpu=cortex-a8 -miphoneos-version-min=5.0 \
 				  -fmessage-length=0  -Wreturn-type -Wunused-variable \
 				  -pipe -Wno-trigraphs -fpascal-strings \
 				  --sysroot=$(SDK)
@@ -72,7 +73,7 @@ LDFLAGS-o 		= -o
 # asflags
 ASFLAGS_RELEASE = 
 ASFLAGS_DEBUG 	= 
-ASFLAGS 		= -c
+ASFLAGS 		= -arch armv7 -c -fPIC
 ASFLAGS-I 		= -I
 ASFLAGS-o 		= -o
 
