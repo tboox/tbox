@@ -50,7 +50,7 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 
 end:
 	tb_print("[thread: %u]: exit", it? it->i : 0);
-	tb_thread_return(it? it->t : TB_NULL, TB_NULL);
+	tb_thread_return(TB_NULL);
 	return TB_NULL;
 }
 

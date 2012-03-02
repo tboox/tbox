@@ -821,14 +821,6 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 		tb_free(http);
 	}
 }
-tb_handle_t tb_http_bare(tb_handle_t handle)
-{
-	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream, TB_NULL);
-
-	return tb_gstream_bare(http->stream);
-}
-
 tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t etype, tb_long_t timeout)
 {
 	tb_http_t* http = (tb_http_t*)handle;

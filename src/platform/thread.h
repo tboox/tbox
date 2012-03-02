@@ -46,6 +46,6 @@ tb_bool_t 		tb_thread_resume(tb_handle_t handle);
 
 // kill & return
 tb_bool_t 		tb_thread_kill(tb_handle_t handle);
-tb_void_t 		tb_thread_return(tb_handle_t handle, tb_pointer_t value);
+tb_void_t 		tb_thread_return(tb_pointer_t value);
 
 #endif

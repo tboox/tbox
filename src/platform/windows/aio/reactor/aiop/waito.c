@@ -26,26 +26,26 @@
  */
 
 // the waito reactor type
-typedef struct __tb_aiop_reactor_waito_t
+typedef struct __tb_aipp_reactor_waito_t
 {
 	// the reactor base
-	tb_aiop_reactor_t 		base;
+	tb_aipp_reactor_t 		base;
 
 	// the waito handles
 	tb_vector_t* 			hdls;
 
-}tb_aiop_reactor_waito_t;
+}tb_aipp_reactor_waito_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_aiop_reactor_waito_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aipp_reactor_waito_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aiop && reactor->aiop->hash, TB_FALSE);
+	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aipp && reactor->aipp->hash, TB_FALSE);
 
 	// check
-	tb_assert_and_check_return_val(tb_hash_size(reactor->aiop->hash) < MAXIMUM_WAIT_OBJECTS, TB_FALSE);
+	tb_assert_and_check_return_val(tb_hash_size(reactor->aipp->hash) < MAXIMUM_WAIT_OBJECTS, TB_FALSE);
 
 	// add hdl
 	tb_vector_insert_tail(rtor->hdls, handle);
@@ -53,14 +53,14 @@ static tb_bool_t tb_aiop_reactor_waito_addo(tb_aiop_reactor_t* reactor, tb_handl
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_waito_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
+static tb_bool_t tb_aipp_reactor_waito_seto(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_waito_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aipp_reactor_waito_delo(tb_aipp_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
+	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->hdls, TB_FALSE);
 
 	// find hdl
@@ -79,10 +79,10 @@ static tb_bool_t tb_aiop_reactor_waito_delo(tb_aiop_reactor_t* reactor, tb_handl
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
+static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
-	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aiop && reactor->aiop->hash, -1);
+	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aipp && reactor->aipp->hash, -1);
 
 	// hdls
 	tb_handle_t*	hdls = (tb_handle_t*)tb_vector_data(rtor->hdls);
@@ -105,7 +105,7 @@ static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_aioo_
 	{
 		// get object
 		hdli -= WAIT_OBJECT_0;
-		tb_aioo_t* o = tb_hash_get(reactor->aiop->hash, hdls[hdli]);
+		tb_aioo_t* o = tb_hash_get(reactor->aipp->hash, hdls[hdli]);
 		tb_assert_and_check_return_val(o, -1);
 
 		// add object
@@ -131,9 +131,9 @@ static tb_long_t tb_aiop_reactor_waito_wait(tb_aiop_reactor_t* reactor, tb_aioo_
 	// ok
 	return hdln;
 }
-static tb_void_t tb_aiop_reactor_waito_exit(tb_aiop_reactor_t* reactor)
+static tb_void_t tb_aipp_reactor_waito_exit(tb_aipp_reactor_t* reactor)
 {
-	tb_aiop_reactor_waito_t* rtor = (tb_aiop_reactor_waito_t*)reactor;
+	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
 	if (rtor)
 	{
 		// exit hdls
@@ -144,34 +144,34 @@ static tb_void_t tb_aiop_reactor_waito_exit(tb_aiop_reactor_t* reactor)
 	}
 }
 
-static tb_aiop_reactor_t* tb_aiop_reactor_waito_init(tb_aiop_t* aiop)
+static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aiop->type == TB_AIOO_OTYPE_FILE, TB_NULL);
+	tb_assert_and_check_return_val(aipp && aipp->maxn, TB_NULL);
+	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE, TB_NULL);
 	tb_assert_static(sizeof(tb_handle_t) == sizeof(HANDLE));
 
 	// alloc reactor
-	tb_aiop_reactor_waito_t* rtor = tb_calloc(1, sizeof(tb_aiop_reactor_waito_t));
+	tb_aipp_reactor_waito_t* rtor = tb_calloc(1, sizeof(tb_aipp_reactor_waito_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.aiop = aiop;
-	rtor->base.exit = tb_aiop_reactor_waito_exit;
-	rtor->base.addo = tb_aiop_reactor_waito_addo;
-	rtor->base.seto = tb_aiop_reactor_waito_seto;
-	rtor->base.delo = tb_aiop_reactor_waito_delo;
-	rtor->base.wait = tb_aiop_reactor_waito_wait;
+	rtor->base.aipp = aipp;
+	rtor->base.exit = tb_aipp_reactor_waito_exit;
+	rtor->base.addo = tb_aipp_reactor_waito_addo;
+	rtor->base.seto = tb_aipp_reactor_waito_seto;
+	rtor->base.delo = tb_aipp_reactor_waito_delo;
+	rtor->base.wait = tb_aipp_reactor_waito_wait;
 
 	// init hdls
-	rtor->hdls = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ptr());
+	rtor->hdls = tb_vector_init(tb_align8((aipp->maxn >> 3) + 1), tb_item_func_ptr());
 	tb_assert_and_check_goto(rtor->hdls, fail);
 
 	// ok
-	return (tb_aiop_reactor_t*)rtor;
+	return (tb_aipp_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_waito_exit(rtor);
+	if (rtor) tb_aipp_reactor_waito_exit(rtor);
 	return TB_NULL;
 }
 

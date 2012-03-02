@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		aiop.c
+ * \file		aipp.c
  *
  */
 
@@ -27,27 +27,27 @@
 #include "prefix.h"
 
 #ifdef TB_CONFIG_AIO_HAVE_WAITO
-# 	include "aiop/waito.c"
+# 	include "aipp/waito.c"
 #endif
 
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
-# 	include "aiop/select.c"
+# 	include "aipp/select.c"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aiop_reactor_t* tb_aiop_reactor_file_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_waito_init(aiop);
+	return tb_aipp_reactor_waito_init(aipp);
 }
 #endif
 
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aiop_reactor_t* tb_aiop_reactor_sock_init(tb_aiop_t* aiop)
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
-	return tb_aiop_reactor_select_init(aiop);
+	return tb_aipp_reactor_select_init(aipp);
 }
 #endif
 

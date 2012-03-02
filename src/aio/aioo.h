@@ -37,10 +37,10 @@
 typedef enum __tb_aioo_etype_t
 {
  	TB_AIOO_ETYPE_NULL 	= 0
-,	TB_AIOO_ETYPE_READ 	= 1		//!< for all i/o object
-,	TB_AIOO_ETYPE_WRIT 	= 2		//!< for all i/o object
-, 	TB_AIOO_ETYPE_ACPT 	= 4 	//!< for socket, http, gstream(sock, http)
-, 	TB_AIOO_ETYPE_CONN 	= 8 	//!< for socket, http, gstream(sock, http)
+, 	TB_AIOO_ETYPE_CONN 	= 1 	//!< for socket
+, 	TB_AIOO_ETYPE_ACPT 	= 2 	//!< for socket
+,	TB_AIOO_ETYPE_READ 	= 4		//!< for all i/o object
+,	TB_AIOO_ETYPE_WRIT 	= 8		//!< for all i/o object
 , 	TB_AIOO_ETYPE_EALL 	= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT | TB_AIOO_ETYPE_ACPT | TB_AIOO_ETYPE_CONN
 
 }tb_aioo_etype_t;
@@ -51,8 +51,6 @@ typedef enum __tb_aioo_otype_t
  	TB_AIOO_OTYPE_NULL 	= 0
 , 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
 ,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
-,	TB_AIOO_OTYPE_HTTP 	= 3 	//!< for http
-,	TB_AIOO_OTYPE_GSTM 	= 4 	//!< for gstream
 
 }tb_aioo_otype_t;
 
@@ -113,7 +111,7 @@ tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype);
 
 /*!wait the aio object
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	object 	the aio object

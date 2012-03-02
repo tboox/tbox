@@ -25,8 +25,8 @@
  */
 #include "prefix.h"
 #include "tstream.h"
-#include "../bstream.h"
-#include "../../zip/zip.h"
+#include "../../bstream.h"
+#include "../../../zip/zip.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -187,7 +187,6 @@ tb_gstream_t* tb_gstream_init_zip()
 	gst->aopen 	= tb_zstream_aopen;
 	gst->aread 	= tb_tstream_aread;
 	gst->aclose	= tb_zstream_aclose;
-	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
 	gst->ctrl 	= tb_zstream_ctrl;
 

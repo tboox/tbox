@@ -17,19 +17,36 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		prefix.h
+ * \file		mstream.c
  *
  */
-#ifndef TB_AIO_REACTOR_PREFIX_H
-#define TB_AIO_REACTOR_PREFIX_H
 
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 			"mst"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../aioo.h"
-#include "../aiop.h"
+#include "mstream.h"
+#include "../aio/aio.h"
+#include "../libc/libc.h"
+#include "../math/math.h"
+#include "../utils/utils.h"
+#include "../memory/memory.h"
+#include "../string/string.h"
+#include "../platform/platform.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+

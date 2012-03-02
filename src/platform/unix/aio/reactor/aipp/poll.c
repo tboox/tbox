@@ -30,22 +30,22 @@
  */
 
 // the poll reactor type
-typedef struct __tb_aiop_reactor_poll_t
+typedef struct __tb_aipp_reactor_poll_t
 {
 	// the reactor base
-	tb_aiop_reactor_t 		base;
+	tb_aipp_reactor_t 		base;
 
 	// the poll fds
 	tb_vector_t* 			pfds;
 
-}tb_aiop_reactor_poll_t;
+}tb_aipp_reactor_poll_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aipp_reactor_poll_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds, TB_FALSE);
 
 	// fd
@@ -64,9 +64,9 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_poll_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
+static tb_bool_t tb_aipp_reactor_poll_seto(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds, TB_FALSE);
 
 	// fd
@@ -92,9 +92,9 @@ static tb_bool_t tb_aiop_reactor_poll_seto(tb_aiop_reactor_t* reactor, tb_handle
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aipp_reactor_poll_delo(tb_aipp_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds, TB_FALSE);
 
 	// fd
@@ -117,10 +117,10 @@ static tb_bool_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
+static tb_long_t tb_aipp_reactor_poll_wait(tb_aipp_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && reactor->aiop && reactor->aiop->hash, -1);
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->pfds && reactor->aipp && reactor->aipp->hash, -1);
 
 	// pfds
 	struct pollfd* 	pfds = (struct pollfd*)tb_vector_data(rtor->pfds);
@@ -140,7 +140,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t
 	for (i = 0; i < pfdm && n < objm; i++)
 	{
 		struct pollfd* 	p = pfds + i;
-		tb_aioo_t* 	o = tb_hash_get(reactor->aiop->hash, (p->fd + 1));
+		tb_aioo_t* 	o = tb_hash_get(reactor->aipp->hash, (p->fd + 1));
 		tb_assert_and_check_return_val(o, -1);
 		
 		// add event
@@ -165,9 +165,9 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t
 	// ok
 	return n;
 }
-static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
+static tb_void_t tb_aipp_reactor_poll_exit(tb_aipp_reactor_t* reactor)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
 	if (rtor)
 	{
 		// exit pfds
@@ -177,33 +177,33 @@ static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
+static tb_aipp_reactor_t* tb_aipp_reactor_poll_init(tb_aipp_t* aipp)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aiop->type == TB_AIOO_OTYPE_FILE || aiop->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(aipp && aipp->maxn, TB_NULL);
+	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE || aipp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_aiop_reactor_poll_t* rtor = tb_calloc(1, sizeof(tb_aiop_reactor_poll_t));
+	tb_aipp_reactor_poll_t* rtor = tb_calloc(1, sizeof(tb_aipp_reactor_poll_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.aiop = aiop;
-	rtor->base.exit = tb_aiop_reactor_poll_exit;
-	rtor->base.addo = tb_aiop_reactor_poll_addo;
-	rtor->base.seto = tb_aiop_reactor_poll_seto;
-	rtor->base.delo = tb_aiop_reactor_poll_delo;
-	rtor->base.wait = tb_aiop_reactor_poll_wait;
+	rtor->base.aipp = aipp;
+	rtor->base.exit = tb_aipp_reactor_poll_exit;
+	rtor->base.addo = tb_aipp_reactor_poll_addo;
+	rtor->base.seto = tb_aipp_reactor_poll_seto;
+	rtor->base.delo = tb_aipp_reactor_poll_delo;
+	rtor->base.wait = tb_aipp_reactor_poll_wait;
 
 	// init pfds
-	rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
+	rtor->pfds = tb_vector_init(tb_align8((aipp->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), TB_NULL, TB_NULL));
 	tb_assert_and_check_goto(rtor->pfds, fail);
 
 	// ok
-	return (tb_aiop_reactor_t*)rtor;
+	return (tb_aipp_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_poll_exit(rtor);
+	if (rtor) tb_aipp_reactor_poll_exit(rtor);
 	return TB_NULL;
 }
 
