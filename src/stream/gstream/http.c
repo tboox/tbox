@@ -113,12 +113,6 @@ static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	// seek
 	return tb_http_aseek(hst->http, offset);
 }
-static tb_handle_t tb_hstream_bare(tb_gstream_t* gst)
-{	
-	tb_hstream_t* hst = tb_hstream_cast(gst);
-	tb_assert_and_check_return_val(hst && hst->http, TB_NULL);
-	return tb_http_bare(hst->http);
-}
 static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
@@ -359,7 +353,6 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->aread 	= tb_hstream_aread;
 	gst->aseek 	= tb_hstream_aseek;
 	gst->size 	= tb_hstream_size;
-	gst->bare 	= tb_hstream_bare;
 	gst->wait 	= tb_hstream_wait;
 	gst->ctrl 	= tb_hstream_ctrl;
 	gst->free 	= tb_hstream_free;

@@ -79,15 +79,6 @@
  * types
  */
 
-// the stream seek type
-typedef enum __tb_gstream_seek_t
-{
- 	TB_GSTREAM_SEEK_BEG 			= 0
-, 	TB_GSTREAM_SEEK_CUR 			= 1
-, 	TB_GSTREAM_SEEK_END 			= 2
-
-}tb_gstream_seek_t;
-
 // the gstream type
 typedef enum __tb_gstream_type_t
 {
@@ -187,9 +178,6 @@ typedef struct __tb_gstream_t
 	// the offset
 	tb_hize_t 			offset;
 
-	// the bare handle for aio
-	tb_handle_t 		(*bare)(struct __tb_gstream_t* gst);
-
 	// wait the aio event
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
@@ -269,12 +257,9 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
 // init stream from encoding
 tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
-// the bare handle for aio
-tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
-
 /*!wait the gstream 
  *
- * blocking wait the single event object, so need not aiop 
+ * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param 	gst 	the gstream 
@@ -285,7 +270,7 @@ tb_handle_t 		tb_gstream_bare(tb_gstream_t* gst);
  */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
-// clear stream
+// clear stream cache and reset status, but not close it
 tb_void_t 			tb_gstream_clear(tb_gstream_t* gst);
 
 // async open, allow multiple called before closing 
@@ -385,9 +370,9 @@ tb_bool_t 			tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val);
 
 // status
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_size(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_left(tb_gstream_t const* gst);
-tb_hize_t 		tb_gstream_offset(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_size(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_left(tb_gstream_t const* gst);
+tb_hize_t 			tb_gstream_offset(tb_gstream_t const* gst);
 tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
 // ctrl

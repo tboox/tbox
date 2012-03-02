@@ -25,7 +25,12 @@
  * includes
  */
 #include "aioo.h"
-#include "reactor/aioo.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
@@ -83,12 +88,6 @@ tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout)
 
 		// for socket
 	, 	tb_aioo_reactor_sock_wait
-
-		// for http
-	, 	tb_aioo_reactor_http_wait
-
-		// for gstream
-	, 	tb_aioo_reactor_gstm_wait
 
 	};
 

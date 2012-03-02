@@ -46,10 +46,10 @@ tbox_C_FILES 			+= \
 						stream/gstream/file \
 						stream/gstream/data \
 						stream/gstream/sock \
-						stream/tstream/tstream \
-						stream/tstream/null \
-						stream/tstream/zip \
-						stream/tstream/encoding \
+						stream/gstream/tstream/tstream \
+						stream/gstream/tstream/null \
+						stream/gstream/tstream/zip \
+						stream/gstream/tstream/encoding \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -88,10 +88,9 @@ tbox_C_FILES 			+= \
 						xml/nlist \
 						xml/reader \
 						xml/writer \
-						aio/aiop \
 						aio/aioo \
-						aio/reactor/aiop \
-						aio/reactor/aioo \
+						aio/aipp \
+						aio/aicp \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -143,7 +142,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_EVET)/event \
 						platform/$(TB_CONFIG_API_EVET)/epool \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
-						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aiop
+						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aipp
 
 # flags
 tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
@@ -181,7 +180,8 @@ INC_FILES 				= \
 						aio/aio.h \
 						aio/prefix.h \
 						aio/aioo.h \
-						aio/aiop.h \
+						aio/aipp.h \
+						aio/aicp.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -255,8 +255,6 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
-						stream/tstream/prefix.h \
-						stream/tstream/tstream.h \
 						format/format.h \
 						format/prefix.h \
 						utils/prefix.h \
@@ -336,6 +334,7 @@ INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
+					  	demo/aio \
 					  	demo/flv \
 					  	demo/math \
 					  	demo/utils \

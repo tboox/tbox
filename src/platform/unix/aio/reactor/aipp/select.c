@@ -30,10 +30,10 @@
  */
 
 // the select reactor type
-typedef struct __tb_aiop_reactor_select_t
+typedef struct __tb_aipp_reactor_select_t
 {
 	// the reactor base
-	tb_aiop_reactor_t 		base;
+	tb_aipp_reactor_t 		base;
 
 	// the fd max
 	tb_size_t 				sfdm;
@@ -47,20 +47,20 @@ typedef struct __tb_aiop_reactor_select_t
 	fd_set 					wfdo;
 	fd_set 					efdo;
 	
-}tb_aiop_reactor_select_t;
+}tb_aipp_reactor_select_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aipp_reactor_select_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, TB_FALSE);
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
+	tb_assert_and_check_return_val(rtor && reactor->aipp && reactor->aipp->hash, TB_FALSE);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
-	tb_assert_and_check_return_val(tb_hash_size(reactor->aiop->hash) < FD_SETSIZE, TB_FALSE);
+	tb_assert_and_check_return_val(tb_hash_size(reactor->aipp->hash) < FD_SETSIZE, TB_FALSE);
 
 	// update fd max
 	if (fd > rtor->sfdm) rtor->sfdm = fd;
@@ -75,9 +75,9 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
+static tb_bool_t tb_aipp_reactor_select_seto(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor, TB_FALSE);
 
 	// fd
@@ -94,9 +94,9 @@ static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aipp_reactor_select_delo(tb_aipp_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor, TB_FALSE);
 
 	// fd
@@ -111,10 +111,10 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return TB_TRUE;
 }
-static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
+static tb_long_t tb_aipp_reactor_select_wait(tb_aipp_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
-	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, -1);
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
+	tb_assert_and_check_return_val(rtor && reactor->aipp && reactor->aipp->hash, -1);
 
 	// init time
 	struct timeval t = {0};
@@ -138,11 +138,11 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	
 	// sync
 	tb_size_t n = 0;
-	tb_size_t itor = tb_hash_itor_head(reactor->aiop->hash);
-	tb_size_t tail = tb_hash_itor_tail(reactor->aiop->hash);
-	for (; itor != tail && n < objm; itor = tb_hash_itor_next(reactor->aiop->hash, itor))
+	tb_size_t itor = tb_hash_itor_head(reactor->aipp->hash);
+	tb_size_t tail = tb_hash_itor_tail(reactor->aipp->hash);
+	for (; itor != tail && n < objm; itor = tb_hash_itor_next(reactor->aipp->hash, itor))
 	{
-		tb_hash_item_t* item = tb_hash_itor_at(reactor->aiop->hash, itor);
+		tb_hash_item_t* item = tb_hash_itor_at(reactor->aipp->hash, itor);
 		if (item)
 		{
 			tb_long_t 		fd = (tb_long_t)item->name - 1;
@@ -173,9 +173,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	return n;
 }
 
-static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
+static tb_void_t tb_aipp_reactor_select_exit(tb_aipp_reactor_t* reactor)
 {
-	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
 	if (rtor)
 	{
 		// free fds
@@ -190,23 +190,23 @@ static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
+static tb_aipp_reactor_t* tb_aipp_reactor_select_init(tb_aipp_t* aipp)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aiop->type == TB_AIOO_OTYPE_FILE || aiop->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(aipp && aipp->maxn, TB_NULL);
+	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE || aipp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_aiop_reactor_select_t* rtor = tb_calloc(1, sizeof(tb_aiop_reactor_select_t));
+	tb_aipp_reactor_select_t* rtor = tb_calloc(1, sizeof(tb_aipp_reactor_select_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base
-	rtor->base.aiop = aiop;
-	rtor->base.exit = tb_aiop_reactor_select_exit;
-	rtor->base.addo = tb_aiop_reactor_select_addo;
-	rtor->base.seto = tb_aiop_reactor_select_seto;
-	rtor->base.delo = tb_aiop_reactor_select_delo;
-	rtor->base.wait = tb_aiop_reactor_select_wait;
+	rtor->base.aipp = aipp;
+	rtor->base.exit = tb_aipp_reactor_select_exit;
+	rtor->base.addo = tb_aipp_reactor_select_addo;
+	rtor->base.seto = tb_aipp_reactor_select_seto;
+	rtor->base.delo = tb_aipp_reactor_select_delo;
+	rtor->base.wait = tb_aipp_reactor_select_wait;
 
 	// init fds
 	FD_ZERO(&rtor->rfdi);
@@ -217,10 +217,10 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	FD_ZERO(&rtor->efdo);
 
 	// ok
-	return (tb_aiop_reactor_t*)rtor;
+	return (tb_aipp_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aiop_reactor_select_exit(rtor);
+	if (rtor) tb_aipp_reactor_select_exit(rtor);
 	return TB_NULL;
 }
 

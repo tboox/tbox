@@ -1,9 +1,9 @@
 #!/bin/bash
 
-make config PLAT=ios_armv6 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$1.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
+make config PLAT=ios_armv6 DEBUG=$1 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$2.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
 make clean;make;make install
 
-make config PLAT=ios_armv7 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$1.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
+make config PLAT=ios_armv7 DEBUG=$1 SDK="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$2.sdk" BIN='/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin'
 make clean;make;make install
 
 rm -rf ./bin/ios_arm

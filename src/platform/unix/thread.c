@@ -56,7 +56,7 @@ tb_bool_t tb_thread_kill(tb_handle_t handle)
 {
 	return TB_TRUE;
 }
-tb_void_t tb_thread_return(tb_handle_t handle, tb_pointer_t value)
+tb_void_t tb_thread_return(tb_pointer_t value)
 {
 	pthread_exit(value);
 }

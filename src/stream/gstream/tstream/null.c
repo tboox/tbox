@@ -104,7 +104,6 @@ tb_gstream_t* tb_gstream_init_null()
 	gst->aopen 	= tb_tstream_aopen;
 	gst->aread 	= tb_tstream_aread;
 	gst->aclose	= tb_tstream_aclose;
-	gst->bare	= tb_tstream_bare;
 	gst->wait	= tb_tstream_wait;
 	gst->ctrl	= tb_tstream_ctrl;
 

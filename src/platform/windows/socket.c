@@ -167,10 +167,6 @@ tb_bool_t tb_socket_close(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, TB_FALSE);
 	return !closesocket((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
 }
-tb_handle_t tb_socket_bare(tb_handle_t handle)
-{
-	return (tb_handle_t)((tb_long_t)handle - 1);
-}
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(handle && data, -1);

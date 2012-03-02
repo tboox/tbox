@@ -117,23 +117,23 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 {
 	if (hfile) FlushFileBuffers(hfile);
 }
-tb_hong_t tb_file_seek(tb_handle_t hfile, tb_hong_t offset, tb_size_t flags)
+tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
 {
-	tb_assert_and_check_return_val(hfile, -1);
-
-	DWORD method = 0;
-	if (flags & TB_FILE_SEEK_BEG) method = FILE_BEGIN;
-	if (flags & TB_FILE_SEEK_CUR) method = FILE_CURRENT;
-	if (flags & TB_FILE_SEEK_END) method = FILE_END;
+	tb_assert_and_check_return_val(hfile, TB_FALSE);
 
 	LARGE_INTEGER o = {0};
 	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)offset;
-	return SetFilePointerEx(hfile, o, &p, method)? (tb_hong_t)p.QuadPart : -1;
+	return SetFilePointerEx(hfile, o, &p, FILE_BEGIN)? TB_TRUE : TB_FALSE;
 }
-tb_handle_t tb_file_bare(tb_handle_t hfile)
+tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t size, tb_size_t flags)
 {
-	return hfile;
+	tb_assert_and_check_return_val(hfile, TB_FALSE);
+
+	LARGE_INTEGER o = {0};
+	LARGE_INTEGER p = {0};
+	o.QuadPart = (LONGLONG)size;
+	return SetFilePointerEx(hfile, o, &p, FILE_CURRENT)? TB_TRUE : TB_FALSE;
 }
 tb_hize_t tb_file_size(tb_handle_t hfile)
 {

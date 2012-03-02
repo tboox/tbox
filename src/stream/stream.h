@@ -29,7 +29,6 @@
 #include "prefix.h"
 #include "bstream.h"
 #include "gstream.h"
-#include "tstream/tstream.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * architecture
@@ -38,11 +37,11 @@
  *    
  *     bstream
  *        |         
- *        |                                               - dstream(data)
- *    (url, ...)   (aio)                     (aio)       |
- *     gstream ------------- gstream ---------------------  fstream(file)
+ *        |                                               - dstream(data) - no wait
+ *    (url, ...)                                         |
+ *     gstream ------------- gstream ---------------------  fstream(file) - wait for aioo
  *                   |              \                    |
- *                   |               -- hstream(http) ----- sstream(sock)
+ *                   |               -- hstream(http) ----- sstream(sock) - wait for aioo
  *                   |
  *                   |
  *                   |           - estream(utf8, gb2312, gbk)
@@ -51,6 +50,23 @@
  *                              |        
  *                              - zstream(rlc, lzsw, gzip)
  *                        
+ *
+ *     bstream
+ *        |         
+ *        |                                               - dstream(data) - no wait
+ *    (url, ...)                                         |
+ *     mstream ------------- mstream ---------------------  fstream(file) - wait for aicp
+ *                   |              \                    |
+ *                   |               -- hstream(http) ----- sstream(sock) - wait for aicp
+ *                   |
+ *                   |
+ *                   |           - estream(utf8, gb2312, gbk)
+ *                   |          |
+ *                   - tstream -| lstream(ssl)      
+ *                              |        
+ *                              - zstream(rlc, lzsw, gzip)
+ *
+ *                               
  *                         
  * url: 
  *     unix: /home/path/file...
