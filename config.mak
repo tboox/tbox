@@ -2,13 +2,13 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = linux_x86
+PLAT = ios_armv7
 
 # root
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
-DEBUG = n
-SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOSy.sdk
+DEBUG = y
+SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
 BIN = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
 HOST = mac
 CCACHE = ccache
