@@ -147,6 +147,19 @@
 # 	define tb_trace_warning_impl
 #endif
 
+// print_impl
+#if defined(TB_PRINT_IMPL_TAG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
+# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+# 		define tb_print_impl(fmt, ...)						tb_print("["TB_PRINT_IMPL_TAG"]: " fmt, __VA_ARGS__)
+# 	else
+# 		define tb_print_impl(fmt, arg ...)					tb_print("["TB_PRINT_IMPL_TAG"]: " fmt, ## arg)
+# 	endif
+#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
+#	define tb_print_impl(...)
+#else
+# 	define tb_print_impl
+#endif
+
 // noimpl
 #define tb_trace_noimpl() 									tb_trace_line("[no_impl]:")
 
