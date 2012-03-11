@@ -10,6 +10,7 @@ use strict;
 # implements the subset of the gas preprocessor used by x264 and ffmpeg
 # that isn't supported by Apple's gas.
 
+my $debug = 0;
 my @gcc_cmd = @ARGV;
 my @preprocess_c_cmd;
 
@@ -377,7 +378,18 @@ foreach my $line (@pass1_lines) {
             $literal_labels{$3} = $label;
         }
         $line = "$1 ldr$2, $label\n";
-    } elsif ($line =~ /\.ltorg/) {
+    }
+#	elsif ($line =~ /(.*)\s+\bbl\b\s+(.*)/) {
+#        my $label = $literal_labels{$2};
+#        if (!$label) {
+#            $label = ".Literal_$literal_num";
+#            $literal_num++;
+#            $literal_labels{$2} = $label;
+#        }
+#        $line = "$1 bl $label\n";
+#    }
+	elsif ($line =~ /\.ltorg/) {
+		$line .= ".align 2 \n";
         foreach my $literal (keys %literal_labels) {
             $line .= "$literal_labels{$literal}:\n .word $literal\n";
         }
@@ -403,6 +415,7 @@ foreach my $line (@pass1_lines) {
         if ($line =~ /\.unreq\s+(.*)/) {
             $line = ".unreq " . lc($1) . "\n";
             print ASMFILE ".unreq " . uc($1) . "\n";
+            if ($debug) {print ".unreq " . uc($1) . "\n"};
         }
     }
 
@@ -444,10 +457,12 @@ foreach my $line (@pass1_lines) {
                 $line =~ s/\\$irp_param/$i/g;
                 $line =~ s/\\\(\)//g;     # remove \()
                 print ASMFILE $line;
+                if ($debug) {print $line;}
             }
         } else {
             for (1 .. $num_repts) {
                 print ASMFILE $rept_lines;
+                if ($debug) {print $rept_lines;}
             }
         }
         $rept_lines = '';
@@ -457,12 +472,15 @@ foreach my $line (@pass1_lines) {
         $rept_lines .= $line;
     } else {
         print ASMFILE $line;
+        if ($debug) {print $line;}
     }
 }
 
 print ASMFILE ".text\n";
+if ($debug) {print  ".text\n"};
 foreach my $literal (keys %literal_labels) {
-    print ASMFILE "$literal_labels{$literal}:\n .word $literal\n";
+    print ASMFILE ".align 2 \n$literal_labels{$literal}:\n .word $literal\n";
+    if ($debug) {print ".align 2 \n$literal_labels{$literal}:\n .word $literal\n";}
 }
 
 close(ASMFILE) or exit 1;

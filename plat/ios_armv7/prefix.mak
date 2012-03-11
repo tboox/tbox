@@ -28,7 +28,7 @@ AR 				= $(BIN)/ar
 STRIP 			= $(BIN)/strip
 RANLIB 			= $(BIN)/ranlib
 LD 				= $(BIN)/gcc
-AS				= gas-preprocessor.pl $(BIN)/gcc
+AS				= $(PLAT_DIR)/gas-preprocessor.pl $(BIN)/gcc
 RM 				= rm -f
 RMDIR 			= rm -rf
 CP 				= cp
@@ -39,7 +39,7 @@ PWD 			= pwd
 
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= \
-	-Os -DNDEBUG \
+	-O3 -DNDEBUG \
 	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
 	-fvisibility=hidden
 
