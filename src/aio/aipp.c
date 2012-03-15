@@ -101,15 +101,15 @@ tb_size_t tb_aipp_size(tb_aipp_t* aipp)
 	tb_assert_and_check_return_val(aipp && aipp->hash, 0);
 	return tb_hash_size(aipp->hash);
 }
-tb_size_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata)
+tb_bool_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->addo, 0);
-	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash) < aipp->maxn, 0);
-	tb_assert_and_check_return_val(handle && etype, 0);
+	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->addo, TB_FALSE);
+	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash) < aipp->maxn, TB_FALSE);
+	tb_assert_and_check_return_val(handle && etype, TB_FALSE);
 
 	// add object to native
-	if (!aipp->rtor->addo(aipp->rtor, handle, etype)) return 0;
+	if (!aipp->rtor->addo(aipp->rtor, handle, etype)) return TB_FALSE;
 
 	// add object to hash
 	tb_aioo_t o;
@@ -117,23 +117,23 @@ tb_size_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_
 	tb_hash_set(aipp->hash, handle, &o);
 	
 	// ok
-	return tb_hash_size(aipp->hash);
+	return TB_TRUE;
 }
-tb_size_t tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle)
+tb_bool_t tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->delo, 0);
-	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash), 0);
-	tb_assert_and_check_return_val(handle, 0);
+	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->delo, TB_FALSE);
+	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash), TB_FALSE);
+	tb_assert_and_check_return_val(handle, TB_FALSE);
 
 	// del object from native
-	if (!aipp->rtor->delo(aipp->rtor, handle)) return 0;
+	if (!aipp->rtor->delo(aipp->rtor, handle)) return TB_FALSE;
 
 	// del object from hash
 	tb_hash_del(aipp->hash, handle);
 	
 	// ok
-	return tb_hash_size(aipp->hash);
+	return TB_TRUE;
 }
 tb_size_t tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle)
 {

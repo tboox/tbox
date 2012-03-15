@@ -25,6 +25,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	tb_handle_t 	sock = TB_NULL;
 	tb_handle_t 	aicp = TB_NULL;
+	tb_handle_t 	aico = TB_NULL;
 	tb_aice_t 		aice = {0};
 
 	// open sock
@@ -35,15 +36,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	aicp = tb_aicp_init(TB_AIOO_OTYPE_SOCK, 1);
 	tb_assert_and_check_goto(aicp, end);
 
-	// add aico
-	if (!tb_aicp_addo(aicp, sock, tb_aicb_work_func, "work")) goto end;
+	// init aico
+	aico = tb_aicp_addo(aicp, sock, tb_aicb_work_func, "work");
+	tb_assert_and_check_goto(aico, end);
 
 	// post conn
 	tb_print("[demo]: conn: post");
-	aice.code = TB_AICE_CODE_CONN;
-	aice.u.conn.port = tb_stou32(argv[2]);
-	tb_ipv4_set(&aice.u.conn.host, argv[1]);
-	tb_aicp_adde(aicp, sock, &aice);
+	tb_aicp_conn(aicp, aico, argv[1], tb_stou32(argv[2]));
 
 	// loop
 	while (1)

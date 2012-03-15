@@ -103,18 +103,18 @@ tb_size_t 		tb_aipp_size(tb_aipp_t* aipp);
  * @param 	etype 	the event type
  * @param 	odata 	the object data
  *
- * @return 	the number of the objects, return 0 if failed
+ * @return 	return TB_FALSE if failed
  */
-tb_size_t 		tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
+tb_bool_t 		tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
 
 /*!del the aio object
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  *
- * @return 	the number of the objects, return 0 if failed
+ * @return 	return TB_FALSE if failed
  */
-tb_size_t 		tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
+tb_bool_t 		tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
 
 /*!set the aio event
  *

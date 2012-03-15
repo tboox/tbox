@@ -2,14 +2,14 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios_armv7
+PLAT = windows_x86
 
 # root
-PRO_DIR = /Users/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = n
-SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
-BIN = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
+SDK = /home/ruki/programs/windows/cross
+BIN = /home/ruki/programs/windows/cross/bin
 HOST = mac
 CCACHE = ccache
 DISTCC =

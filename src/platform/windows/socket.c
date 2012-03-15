@@ -77,8 +77,8 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	}
 
 	// socket
-	tb_long_t fd = socket(AF_INET, t, p);
-//	SOCKET fd = WSASocket(AF_INET, t, p, TB_NULL, 0, WSA_FLAG_OVERLAPPED);
+//	tb_long_t fd = socket(AF_INET, t, p);
+	SOCKET fd = WSASocket(AF_INET, t, p, TB_NULL, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
 	tb_assert_and_check_return_val(fd >= 0, TB_NULL);
 
 	// non-block
