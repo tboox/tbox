@@ -126,7 +126,7 @@ tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
 	o.QuadPart = (LONGLONG)offset;
 	return SetFilePointerEx(hfile, o, &p, FILE_BEGIN)? TB_TRUE : TB_FALSE;
 }
-tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t size, tb_size_t flags)
+tb_bool_t tb_file_skip(tb_handle_t hfile, tb_hize_t size)
 {
 	tb_assert_and_check_return_val(hfile, TB_FALSE);
 

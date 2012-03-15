@@ -74,6 +74,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t 	sock = TB_NULL;
 	tb_handle_t 	work = TB_NULL;
 	tb_handle_t 	aicp = TB_NULL;
+	tb_handle_t 	aico = TB_NULL;
 	tb_aice_t 		aice = {0};
 	tb_aioo_t 		aioo = {0};
 
@@ -91,7 +92,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init aicp
 	aicp = tb_aicp_init(TB_AIOO_OTYPE_SOCK, 16);
 	tb_assert_and_check_goto(aicp, end);
-	if (!tb_aicp_addo(aicp, sock, tb_aicb_acpt_func, "acpt")) goto end;
+
+	// init aico
+	aico = tb_aicp_addo(aicp, sock, tb_aicb_acpt_func, "acpt");
+	tb_assert_and_check_goto(aico, end);
 
 	// init work
 	data[0] = (tb_size_t)aicp;
@@ -109,8 +113,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 		// acpt
 		tb_print("[demo]: acpt: post");
-		aice.code = TB_AICE_CODE_ACPT;
-		tb_aicp_adde(aicp, sock, &aice);
+		tb_aicp_acpt(aicp, aico);
 	}
 
 end:
