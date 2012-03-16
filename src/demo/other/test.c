@@ -19,15 +19,6 @@ int main(int argc, char** argv)
 	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
 #endif
 
-	tb_print("%f", 3.1415926);
-	tb_print("%.1f", 3.1415926);
-	tb_print("%.2f", 3.1415926);
-	tb_print("%.3f", 3.1415926);
-	tb_print("%.4f", 3.1415926);
-	tb_print("%.5f", 3.1415926);
-	tb_print("%.6f", 3.1415926);
-	tb_print("%.7f", 3.1415926);
-	tb_print("%.8f", 3.1415926);
 
 	return 0;
 }

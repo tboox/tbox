@@ -26,7 +26,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t 	sock = TB_NULL;
 	tb_handle_t 	aicp = TB_NULL;
 	tb_handle_t 	aico = TB_NULL;
-	tb_aice_t 		aice = {0};
 
 	// open sock
 	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
