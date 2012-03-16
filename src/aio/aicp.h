@@ -50,6 +50,9 @@ typedef struct __tb_aico_t
 	// the aicb
 	tb_aicb_t 				aicb;
 
+	// the self
+	tb_handle_t 			self;
+
 }tb_aico_t;
 
 // the aio event code type
@@ -58,12 +61,11 @@ typedef enum __tb_aice_code_t
  	TB_AICE_CODE_NULL 		= 0
 , 	TB_AICE_CODE_RESV 		= 1 	//!< for socket
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for socket
-, 	TB_AICE_CODE_ACPT 		= 3 	//!< for socket
-,	TB_AICE_CODE_READ 		= 4		//!< for all i/o object
-,	TB_AICE_CODE_WRIT 		= 5		//!< for all i/o object
-,	TB_AICE_CODE_SYNC 		= 6		//!< for all i/o object
-,	TB_AICE_CODE_SEEK 		= 7		//!< for all i/o object
-,	TB_AICE_CODE_SKIP 		= 8		//!< for all i/o object
+,	TB_AICE_CODE_READ 		= 3		//!< for all i/o object
+,	TB_AICE_CODE_WRIT 		= 4		//!< for all i/o object
+,	TB_AICE_CODE_SYNC 		= 5		//!< for all i/o object
+,	TB_AICE_CODE_SEEK 		= 6		//!< for all i/o object
+,	TB_AICE_CODE_SKIP 		= 7		//!< for all i/o object
 
 }tb_aice_code_t;
 
@@ -157,10 +159,16 @@ typedef struct __tb_aicp_reactor_t
 	tb_void_t 				(*exit)(struct __tb_aicp_reactor_t* reactor);
 
 	// addo
-	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_handle_t aico);
+	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
 	// delo
-	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_handle_t aico);
+	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
+
+	// post
+	tb_void_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice);
+
+	// wait
+	tb_long_t 				(*wait)(struct __tb_aicp_reactor_t* reactor, tb_long_t timeout);
 
 }tb_aicp_reactor_t;
 
@@ -173,7 +181,7 @@ typedef struct __tb_aicp_t
 	// the object maxn
 	tb_size_t 				maxn;
 
-	// the pool mutex
+	// the aicp mutex
 	tb_handle_t 			mutx;
 
 	// the aico pool
@@ -219,27 +227,8 @@ tb_handle_t 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, t
  *
  * @param 	aicp 	the aio pool
  * @param 	handle 	the aico handle
- *
- * @return 	return TB_FALSE if failed
  */
-tb_bool_t 		tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_aicb_t aicb, tb_pointer_t odata);
-
-/*!add the aio event
- *
- * @param 	aicp 	the aio pool
- * @param 	handle 	the aico handle
- * @param 	etype 	the event type
- *
- */
-tb_void_t 		tb_aicp_adde(tb_aicp_t* aicp, tb_handle_t aico, tb_aice_t const* aice);
-
-/*!del the aio event
- *
- * @param 	aicp 	the aio pool
- * @param 	handle 	the handle of the aio object
- *
- */
-tb_void_t 		tb_aicp_dele(tb_aicp_t* aicp, tb_handle_t aico, tb_aice_t const* aice);
+tb_void_t 		tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
 
 /*!set the aio odata
  *
@@ -250,19 +239,25 @@ tb_void_t 		tb_aicp_dele(tb_aicp_t* aicp, tb_handle_t aico, tb_aice_t const* aic
  */
 tb_void_t 		tb_aicp_setp(tb_aicp_t* aicp, tb_handle_t aico, tb_pointer_t odata);
 
+/*!post the aio event
+ *
+ * @param 	aicp 	the aio pool
+ * @param 	handle 	the aico handle
+ * @param 	etype 	the event type
+ *
+ */
+tb_void_t 		tb_aicp_post(tb_aicp_t* aicp, tb_handle_t aico, tb_aice_t const* aice);
+
 /// post resv 
 tb_void_t 		tb_aicp_resv(tb_aicp_t* aicp, tb_handle_t aico, tb_char_t const* name);
 
 /// post conn 
 tb_void_t 		tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t aico, tb_char_t const* host, tb_size_t port);
 
-/// post acpt
-tb_void_t 		tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t aico);
-
-/// post read data
+/// post read
 tb_void_t 		tb_aicp_read(tb_aicp_t* aicp, tb_handle_t aico, tb_byte_t* data, tb_size_t size);
 
-/// post writ data
+/// post writ
 tb_void_t 		tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t aico, tb_byte_t* data, tb_size_t size);
 
 /// post sync

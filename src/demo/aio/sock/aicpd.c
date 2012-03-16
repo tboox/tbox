@@ -4,23 +4,17 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_WORK_MAXN 		(3)
+
+/* ///////////////////////////////////////////////////////////////////////
  * aicb
  */
 static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
 {
-
-
-	// ok
-	return TB_TRUE;
-}
-static tb_bool_t tb_aicb_acpt_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
-{
 	// check
 	tb_assert_and_check_return_val(aicp && aico && aice, TB_FALSE);
-	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_ACPT, TB_FALSE);
-
-	// trace
-	tb_print("[demo]: acpt: ok: %s, data: %s", aice->ok, aico->aioo.odata);
 
 	// ok
 	return TB_TRUE;
@@ -33,7 +27,10 @@ static tb_pointer_t tb_work_thread(tb_pointer_t cb_data)
 {
 	tb_size_t* data = (tb_size_t*)cb_data;
 	tb_assert_and_check_goto(data, end);
-	tb_print("[demo]: work: init");
+
+	// id
+	tb_size_t id = data[2];
+	tb_print("[demo]: work[%d]: init", id);
 
 	// aicp
 	tb_handle_t aicp = (tb_handle_t)data[0];
@@ -56,7 +53,7 @@ static tb_pointer_t tb_work_thread(tb_pointer_t cb_data)
 
 end:
 	// exit work
-	tb_print("[demo]: work: exit");
+	tb_print("[demo]: work[%d]: exit", id);
 	tb_thread_return(TB_NULL);
 	return TB_NULL;
 }
@@ -70,12 +67,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init
-	tb_size_t 		data[2] = {0};
+	tb_size_t 		i = 0;
+	tb_size_t 		data[3] = {0};
+	tb_handle_t 	work[3] = {TB_NULL};
 	tb_handle_t 	sock = TB_NULL;
-	tb_handle_t 	work = TB_NULL;
 	tb_handle_t 	aicp = TB_NULL;
-	tb_handle_t 	aico = TB_NULL;
-	tb_aice_t 		aice = {0};
 	tb_aioo_t 		aioo = {0};
 
 	// open sock
@@ -93,15 +89,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	aicp = tb_aicp_init(TB_AIOO_OTYPE_SOCK, 16);
 	tb_assert_and_check_goto(aicp, end);
 
-	// init aico
-	aico = tb_aicp_addo(aicp, sock, tb_aicb_acpt_func, "acpt");
-	tb_assert_and_check_goto(aico, end);
-
 	// init work
 	data[0] = (tb_size_t)aicp;
 	data[1] = (tb_size_t)0;
-	work 	= tb_thread_init(TB_NULL, tb_work_thread, data, 0);
-	tb_assert_and_check_goto(work, end);
+	for (i = 0; i < TB_WORK_MAXN; i++)
+	{
+		data[2] = (tb_size_t)i;
+		work[i] 	= tb_thread_init(TB_NULL, tb_work_thread, data, 256 * 1024);
+		tb_assert_and_check_goto(work[i], end);
+		tb_msleep(500);
+	}
 
 	// listen...
 	while (1)
@@ -112,19 +109,30 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_goto(r > 0, end);
 
 		// acpt
-		tb_print("[demo]: acpt: post");
-		tb_aicp_acpt(aicp, aico);
+		tb_print("[demo]: aicp: acpt");
+		tb_handle_t c = tb_socket_accept(sock);
+		tb_assert_and_check_goto(c, end);
+
+		// init aico
+		tb_handle_t aico = tb_aicp_addo(aicp, c, tb_aicb_work_func, "work");
+		tb_assert_and_check_goto(aico, end);
+
+		// post read
+		tb_aicp_read(aicp, aico, tb_malloc(8192), 8192);
 	}
 
 end:
 
 	// kill work
-	if (work) 
+	for (i = 0; i < TB_WORK_MAXN; i++)
 	{
-		tb_atomic_set(&data[1], 1);
-		if (!tb_thread_wait(work, 5000))
-			tb_thread_kill(work);
-		tb_thread_exit(work);
+		if (work[i]) 
+		{
+			tb_atomic_set(&data[i], 1);
+			if (!tb_thread_wait(work[i], 5000))
+				tb_thread_kill(work[i]);
+			tb_thread_exit(work[i]);
+		}
 	}
 
 	// close sock
