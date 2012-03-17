@@ -165,7 +165,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	tb_assert_and_check_return_val(data_func.size && data_func.data && data_func.dupl && data_func.copy, TB_NULL);
 
 	// alloc hash
-	tb_hash_t* hash = (tb_hash_t*)tb_nalloc0(1, sizeof(tb_hash_t));
+	tb_hash_t* hash = (tb_hash_t*)tb_malloc0(sizeof(tb_hash_t));
 	tb_assert_and_check_return_val(hash, TB_NULL);
 
 	// init hash func
@@ -371,7 +371,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 		else
 		{
 			// alloc list
-			list = tb_nalloc0(1, sizeof(tb_hash_item_list_t) + TB_HASH_GROW_MIN * step);
+			list = tb_malloc0(sizeof(tb_hash_item_list_t) + TB_HASH_GROW_MIN * step);
 			tb_assert_and_check_return(list);
 
 			// init list

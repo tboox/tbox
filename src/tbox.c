@@ -88,9 +88,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert(tb_check_word_order());
 	tb_assert(tb_check_float_order());
 
-#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
 	// init memory pool
-	if (!tb_memory_init(data, size)) return TB_FALSE;
+#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return TB_FALSE;
 #endif
 
 	// init socket

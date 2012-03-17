@@ -43,7 +43,7 @@ tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// alloc aipp
-	tb_aipp_t* aipp = tb_nalloc0(1, sizeof(tb_aipp_t));
+	tb_aipp_t* aipp = tb_malloc0(sizeof(tb_aipp_t));
 	tb_assert_and_check_return_val(aipp, TB_NULL);
 
 	// init aipp

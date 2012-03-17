@@ -408,7 +408,7 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 tb_gstream_t* tb_gstream_init_sock()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_nalloc0(1, sizeof(tb_sstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_sstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// init base

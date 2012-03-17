@@ -157,7 +157,7 @@ tb_float_t tb_rand_float(tb_float_t b, tb_float_t e)
 tb_rand_linear_t* tb_rand_linear_init(tb_uint32_t seed)
 {
 	// alloc rand
-	tb_rand_linear_t* rand = tb_nalloc0(1, sizeof(tb_rand_linear_t));
+	tb_rand_linear_t* rand = tb_malloc0(sizeof(tb_rand_linear_t));
 	tb_assert_and_check_return_val(rand, TB_NULL);
 
 	// init rand
