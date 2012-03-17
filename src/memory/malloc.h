@@ -17,38 +17,94 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		malloc.h
+ * \file		memory.h
  *
  */
-#ifndef TB_MEMORY_MALLOC_H
-#define TB_MEMORY_MALLOC_H
+#ifndef TB_MEMORY_MEMORY_H
+#define TB_MEMORY_MEMORY_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "gpool.h"
+#include "prefix.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef TB_DEBUG
+#	define tb_memory_malloc(size) 				tb_memory_malloc_impl(size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_memory_malloc0(size) 				tb_memory_malloc0_impl(size, __tb_func__, __tb_line__, __tb_file__)
+
+#	define tb_memory_nalloc(item, size) 		tb_memory_nalloc_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_memory_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
+
+#	define tb_memory_ralloc(data, size) 		tb_memory_ralloc_impl(data, size, __tb_func__, __tb_line__, __tb_file__)
+# 	define tb_memory_free(data) 				tb_memory_free_impl(data, __tb_func__, __tb_line__, __tb_file__)
+#else
+#	define tb_memory_malloc(size) 				tb_memory_malloc_impl(size)
+#	define tb_memory_malloc0(size) 				tb_memory_malloc0_impl(size)
+
+#	define tb_memory_nalloc(item, size) 		tb_memory_nalloc_impl(item, size)
+#	define tb_memory_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size)
+
+#	define tb_memory_ralloc(data, size) 		tb_memory_ralloc_impl(data, size)
+# 	define tb_memory_free(data) 				tb_memory_free_impl(data)
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_bool_t 		tb_memory_init(tb_pointer_t data, tb_size_t size);
+
+// init
+tb_bool_t 		tb_memory_init(tb_pointer_t data, tb_size_t size, tb_size_t align);
+
+// exit
 tb_void_t 		tb_memory_exit();
 
+// malloc
 #ifndef TB_DEBUG
-tb_pointer_t 	tb_memory_allocate(tb_size_t size);
-tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size);
-tb_pointer_t 	tb_memory_reallocate(tb_pointer_t data, tb_size_t size);
-tb_void_t 		tb_memory_deallocate(tb_pointer_t data);
+tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size);
 #else
-tb_pointer_t 	tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_pointer_t 	tb_memory_reallocate(tb_pointer_t data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-tb_void_t 		tb_memory_deallocate(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
-tb_void_t 		tb_memory_dump();
-tb_bool_t 		tb_memory_check();
+// malloc0
+#ifndef TB_DEBUG
+tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size);
+#else
+tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+#endif
 
+// nalloc
+#ifndef TB_DEBUG
+tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size);
+#else
+tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+#endif
+
+// nalloc0
+#ifndef TB_DEBUG
+tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size);
+#else
+tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+#endif
+
+// ralloc
+#ifndef TB_DEBUG
+tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size);
+#else
+tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+#endif
+
+// free
+#ifndef TB_DEBUG
+tb_void_t 		tb_memory_free_impl(tb_pointer_t data);
+#else
+tb_void_t 		tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+#endif
+
+// dump
+tb_void_t 		tb_memory_dump();
 
 #endif
 
