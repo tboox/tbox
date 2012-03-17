@@ -174,11 +174,11 @@ tb_size_t tb_rbuffer_incr(tb_rbuffer_t* buffer)
 	if (!buffer->data)
 	{
 		// alloc the shared data pointer
-		buffer->data = tb_calloc(1, sizeof(tb_rbuffer_data_t*));
+		buffer->data = tb_nalloc0(1, sizeof(tb_rbuffer_data_t*));
 		tb_assert_and_check_goto(buffer->data, fail);
 
 		// alloc the shared data
-		data = tb_calloc(1, sizeof(tb_rbuffer_data_t));
+		data = tb_nalloc0(1, sizeof(tb_rbuffer_data_t));
 		tb_assert_and_check_goto(data, fail);
 	
 		// init the shared pointer

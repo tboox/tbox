@@ -93,7 +93,7 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_bool_t sync)
  */
 tb_gstream_t* tb_gstream_init_null()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_calloc(1, sizeof(tb_nstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_nalloc0(1, sizeof(tb_nstream_t));
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// init base

@@ -487,7 +487,7 @@ tb_handle_t tb_flv_init(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst, TB_NULL);
 
 	// alloc flv
-	tb_flv_t* flv = tb_calloc(1, sizeof(tb_flv_t));
+	tb_flv_t* flv = tb_nalloc0(1, sizeof(tb_flv_t));
 	tb_assert_and_check_return_val(flv, TB_NULL);
 
 	// init flv
@@ -608,7 +608,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 					&& !(flv->spank_type_ok & TB_FLV_SPANK_TYPE_SDATA)) 
 				{
 					// alloc data
-					tb_byte_t* data = tb_calloc(1, data_size);
+					tb_byte_t* data = tb_nalloc0(1, data_size);
 					tb_assert_goto(data, end);
 
 					// attach data
@@ -718,7 +718,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 							tb_assert(flv->audio_data);
 							flv->audio_maxn = data_size + 4096;
 							flv->audio_size = data_size;
-							flv->audio_data = tb_realloc(flv->audio_data, flv->audio_maxn);
+							flv->audio_data = tb_ralloc(flv->audio_data, flv->audio_maxn);
 						}
 						else flv->audio_size = data_size;
 
@@ -822,7 +822,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 							tb_assert(flv->video_data);
 							flv->video_maxn = data_size + 4096;
 							flv->video_size = data_size;
-							flv->video_data = tb_realloc(flv->video_data, flv->video_maxn);
+							flv->video_data = tb_ralloc(flv->video_data, flv->video_maxn);
 						}
 						else flv->video_size = data_size;
 

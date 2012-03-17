@@ -120,7 +120,7 @@ tb_byte_t* tb_pbuffer_resize(tb_pbuffer_t* buffer, tb_size_t n)
 
 		// realloc
 		buffer->size = n;
-		buffer->data = tb_realloc(buffer->data, buffer->maxn);
+		buffer->data = tb_ralloc(buffer->data, buffer->maxn);
 		tb_assert_and_check_goto(buffer->data, fail);
 	}
 

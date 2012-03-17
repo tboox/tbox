@@ -178,7 +178,7 @@ static tb_long_t tb_aipp_reactor_kqueue_wait(tb_aipp_reactor_t* reactor, tb_aioo
 	if (!rtor->evts)
 	{
 		rtor->evtn = grow;
-		rtor->evts = tb_calloc(rtor->evtn, sizeof(struct kevent));
+		rtor->evts = tb_nalloc0(rtor->evtn, sizeof(struct kevent));
 		tb_assert_and_check_return_val(rtor->evts, -1);
 	}
 
@@ -197,7 +197,7 @@ static tb_long_t tb_aipp_reactor_kqueue_wait(tb_aipp_reactor_t* reactor, tb_aioo
 		if (rtor->evtn > maxn) rtor->evtn = maxn;
 
 		// grow data
-		rtor->evts = tb_realloc(rtor->evts, rtor->evtn * sizeof(struct kevent));
+		rtor->evts = tb_ralloc(rtor->evts, rtor->evtn * sizeof(struct kevent));
 		tb_assert_and_check_return_val(rtor->evts, -1);
 	}
 	tb_assert(evtn <= rtor->evtn);
@@ -256,7 +256,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_kqueue_init(tb_aipp_t* aipp)
 	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE || aipp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_aipp_reactor_kqueue_t* rtor = tb_calloc(1, sizeof(tb_aipp_reactor_kqueue_t));
+	tb_aipp_reactor_kqueue_t* rtor = tb_nalloc0(1, sizeof(tb_aipp_reactor_kqueue_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base

@@ -33,7 +33,7 @@
 tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
-	sem_t* h = tb_calloc(1, sizeof(sem_t));
+	sem_t* h = tb_nalloc0(1, sizeof(sem_t));
 	tb_assert_and_check_return_val(h, TB_NULL);
 
 	// init

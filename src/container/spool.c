@@ -69,7 +69,7 @@ tb_spool_t* tb_spool_init(tb_size_t size)
 	tb_assert_and_check_return_val(size >= TB_GPOOL_SIZE_MIN, TB_NULL);
 
 	// alloc spool
-	tb_spool_t* spool = (tb_spool_t*)tb_calloc(1, sizeof(tb_spool_t));
+	tb_spool_t* spool = (tb_spool_t*)tb_nalloc0(1, sizeof(tb_spool_t));
 	tb_assert_and_check_return_val(spool, TB_NULL);
 
 	// init chunk list
