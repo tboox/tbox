@@ -152,7 +152,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 	tb_assert_static(sizeof(tb_handle_t) == sizeof(HANDLE));
 
 	// alloc reactor
-	tb_aipp_reactor_waito_t* rtor = tb_nalloc0(1, sizeof(tb_aipp_reactor_waito_t));
+	tb_aipp_reactor_waito_t* rtor = tb_malloc0(sizeof(tb_aipp_reactor_waito_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base

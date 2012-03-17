@@ -32,7 +32,7 @@
 tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
-	tb_size_t* e = tb_nalloc0(1, sizeof(tb_size_t));
+	tb_size_t* e = tb_malloc0(sizeof(tb_size_t));
 	tb_assert_and_check_return_val(e, TB_NULL);
 
 	// warning

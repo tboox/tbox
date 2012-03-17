@@ -107,7 +107,7 @@ tb_xml_node_t* tb_xml_node_init(tb_pointer_t document, tb_size_t type)
 	tb_assert_and_check_return_val(type < tb_arrayn(sizes) && sizes[type], TB_NULL);
 
 	// alloc node
-	tb_xml_node_t* node = tb_nalloc0(1, sizes[type]);
+	tb_xml_node_t* node = tb_malloc0(sizes[type]);
 	tb_assert_and_check_return_val(node, TB_NULL);
 
 	// init node

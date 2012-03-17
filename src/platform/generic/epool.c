@@ -70,7 +70,7 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// alloc
-	tb_epool_t* ep = tb_nalloc0(1, sizeof(tb_epool_t));
+	tb_epool_t* ep = tb_malloc0(sizeof(tb_epool_t));
 	tb_assert_and_check_return_val(ep, TB_NULL);
 
 	// init

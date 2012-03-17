@@ -189,7 +189,7 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 tb_zip_t* tb_zip_rlc_init(tb_size_t action)
 {
 	// alloc
-	tb_zip_t* zip = (tb_zip_t*)tb_nalloc0(1, sizeof(tb_zip_rlc_t));
+	tb_zip_t* zip = (tb_zip_t*)tb_malloc0(sizeof(tb_zip_rlc_t));
 	tb_assert_and_check_return_val(zip, TB_NULL);
 	
 	// init zip

@@ -55,7 +55,7 @@ static tb_void_t tb_spool_item_free(tb_item_func_t* func, tb_pointer_t item)
 	tb_spool_chunk_t* chunk = item;
 	if (chunk)
 	{
-		if (chunk->pool) tb_gpool_exit(chunk->pool);
+		if (chunk->pool) tb_vpool_exit(chunk->pool);
 		if (chunk->data) tb_free(chunk->data);
 	}
 }
@@ -66,10 +66,10 @@ static tb_void_t tb_spool_item_free(tb_item_func_t* func, tb_pointer_t item)
 tb_spool_t* tb_spool_init(tb_size_t size)
 {
 	// the chunk size cannot be too small for the memory pool
-	tb_assert_and_check_return_val(size >= TB_GPOOL_SIZE_MIN, TB_NULL);
+	tb_assert_and_check_return_val(size, TB_NULL);
 
 	// alloc spool
-	tb_spool_t* spool = (tb_spool_t*)tb_nalloc0(1, sizeof(tb_spool_t));
+	tb_spool_t* spool = (tb_spool_t*)tb_malloc0(sizeof(tb_spool_t));
 	tb_assert_and_check_return_val(spool, TB_NULL);
 
 	// init chunk list
@@ -124,7 +124,7 @@ tb_pointer_t tb_spool_malloc(tb_spool_t* spool, tb_size_t size)
 			tb_assert_and_check_return_val(chunk->pool && chunk->data && chunk->size, TB_NULL);
 
 			// try allocating it
-			tb_pointer_t p = tb_gpool_malloc(chunk->pool, size);
+			tb_pointer_t p = tb_vpool_malloc(chunk->pool, size);
 
 			// return it
 			if (p) return p;
@@ -145,7 +145,7 @@ tb_pointer_t tb_spool_malloc(tb_spool_t* spool, tb_size_t size)
 				tb_assert_and_check_return_val(chunk->pool && chunk->data && chunk->size, TB_NULL);
 
 				// try allocating it
-				tb_pointer_t p = tb_gpool_malloc(chunk->pool, size);
+				tb_pointer_t p = tb_vpool_malloc(chunk->pool, size);
 				if (p) 
 				{
 					// update predicted info
@@ -177,11 +177,11 @@ tb_pointer_t tb_spool_malloc(tb_spool_t* spool, tb_size_t size)
 				tb_assert_and_check_break(chunk->data);
 
 				// init chunk pool
-				chunk->pool = tb_gpool_init(chunk->data, chunk->size);
+				chunk->pool = tb_vpool_init(chunk->data, chunk->size, 0);
 				tb_assert_and_check_break(chunk->pool);
 
 				// try allocating it
-				tb_pointer_t p = tb_gpool_malloc(chunk->pool, size);
+				tb_pointer_t p = tb_vpool_malloc(chunk->pool, size);
 				if (p) 
 				{
 					// update predicted info
@@ -226,7 +226,7 @@ tb_pointer_t tb_spool_realloc(tb_spool_t* spool, tb_pointer_t data, tb_size_t si
 			tb_assert_and_check_return_val(chunk->pool && chunk->data && chunk->size, TB_NULL);
 
 			// try allocating it
-			tb_pointer_t p = tb_gpool_realloc(chunk->pool, data, size);
+			tb_pointer_t p = tb_vpool_ralloc(chunk->pool, data, size);
 
 			// return it
 			if (p) return p;
@@ -247,7 +247,7 @@ tb_pointer_t tb_spool_realloc(tb_spool_t* spool, tb_pointer_t data, tb_size_t si
 				tb_assert_and_check_return_val(chunk->pool && chunk->data && chunk->size, TB_NULL);
 
 				// try allocating it
-				tb_pointer_t p = tb_gpool_realloc(chunk->pool, data, size);
+				tb_pointer_t p = tb_vpool_ralloc(chunk->pool, data, size);
 				if (p) 
 				{
 					// update predicted info
@@ -279,11 +279,11 @@ tb_pointer_t tb_spool_realloc(tb_spool_t* spool, tb_pointer_t data, tb_size_t si
 				tb_assert_and_check_break(chunk->data);
 
 				// init chunk pool
-				chunk->pool = tb_gpool_init(chunk->data, chunk->size);
+				chunk->pool = tb_vpool_init(chunk->data, chunk->size, 0);
 				tb_assert_and_check_break(chunk->pool);
 
 				// try allocating it
-				tb_pointer_t p = tb_gpool_realloc(chunk->pool, data, size);
+				tb_pointer_t p = tb_vpool_ralloc(chunk->pool, data, size);
 				if (p) 
 				{
 					// update predicted info
@@ -319,7 +319,7 @@ tb_void_t tb_spool_free(tb_spool_t* spool, tb_pointer_t data)
 			tb_assert_and_check_return(chunk->pool && chunk->data && chunk->size);
 
 			// try freeing it
-			if (tb_gpool_free(chunk->pool, data)) return ;
+			if (tb_vpool_free(chunk->pool, data)) return ;
 		}
 	}
 
@@ -337,7 +337,7 @@ tb_void_t tb_spool_free(tb_spool_t* spool, tb_pointer_t data)
 				tb_assert_and_check_return(chunk->pool && chunk->data && chunk->size);
 
 				// try free it
-				if (tb_gpool_free(chunk->pool, data))
+				if (tb_vpool_free(chunk->pool, data))
 				{
 					// update predicted info
 					spool->pred = itor;

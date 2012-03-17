@@ -45,7 +45,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_return_val(maxn, TB_NULL);
 
 	// alloc aicp
-	tb_aicp_t* aicp = tb_nalloc0(1, sizeof(tb_aicp_t));
+	tb_aicp_t* aicp = tb_malloc0(sizeof(tb_aicp_t));
 	tb_assert_and_check_return_val(aicp, TB_NULL);
 
 	// init aicp

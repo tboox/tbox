@@ -27,7 +27,6 @@
  * includes
  */
 #include "prefix.h"
-#include "gpool.h"
 #include "vpool.h"
 #include "malloc.h"
 #include "pbuffer.h"

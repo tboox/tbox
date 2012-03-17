@@ -48,7 +48,7 @@ tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
 
 	// alloc fpool
-	tb_fpool_t* fpool = (tb_fpool_t*)tb_nalloc0(1, sizeof(tb_fpool_t));
+	tb_fpool_t* fpool = (tb_fpool_t*)tb_malloc0(sizeof(tb_fpool_t));
 	tb_assert_and_check_return_val(fpool, TB_NULL);
 
 	// init fpool
@@ -63,7 +63,7 @@ tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_goto(fpool->data, fail);
 
 	// alloc info
-	fpool->info = tb_nalloc0(1, (tb_align8(fpool->maxn) >> 3));
+	fpool->info = tb_malloc0((tb_align8(fpool->maxn) >> 3));
 	tb_assert_and_check_goto(fpool->info, fail);
 
 	// init predicted info

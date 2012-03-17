@@ -46,7 +46,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, TB_NULL);
 
 	// alloc vector
-	tb_vector_t* vector = (tb_vector_t*)tb_nalloc0(1, sizeof(tb_vector_t));
+	tb_vector_t* vector = (tb_vector_t*)tb_malloc0(sizeof(tb_vector_t));
 	tb_assert_and_check_return_val(vector, TB_NULL);
 
 	// init vector
