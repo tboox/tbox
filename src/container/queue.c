@@ -40,7 +40,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.dupl && func.data, TB_NULL);
 
 	// alloc queue
-	tb_queue_t* queue = (tb_queue_t*)tb_calloc(1, sizeof(tb_queue_t));
+	tb_queue_t* queue = (tb_queue_t*)tb_nalloc0(1, sizeof(tb_queue_t));
 	tb_assert_and_check_return_val(queue, TB_NULL);
 
 	// init queue
@@ -49,7 +49,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	tb_assert_and_check_goto(tb_ispow2(queue->maxn), fail);
 
 	// calloc data
-	queue->data = tb_calloc(queue->maxn, func.size);
+	queue->data = tb_nalloc0(queue->maxn, func.size);
 	tb_assert_and_check_goto(queue->data, fail);
 
 	return queue;

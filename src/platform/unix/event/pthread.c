@@ -48,7 +48,7 @@ typedef struct __tb_event_t
 tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
-	tb_event_t* e = tb_calloc(1, sizeof(tb_event_t));
+	tb_event_t* e = tb_nalloc0(1, sizeof(tb_event_t));
 	tb_assert_and_check_return_val(e, TB_NULL);
 
 	// init mutx

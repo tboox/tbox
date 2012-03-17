@@ -764,7 +764,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 tb_handle_t tb_http_init(tb_http_option_t const* option)
 {
 	// init http
-	tb_http_t* http = tb_calloc(1, sizeof(tb_http_t));
+	tb_http_t* http = tb_nalloc0(1, sizeof(tb_http_t));
 	tb_assert_and_check_return_val(http, TB_NULL);
 
 	// init stream

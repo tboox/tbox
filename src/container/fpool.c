@@ -48,7 +48,7 @@ tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
 
 	// alloc fpool
-	tb_fpool_t* fpool = (tb_fpool_t*)tb_calloc(1, sizeof(tb_fpool_t));
+	tb_fpool_t* fpool = (tb_fpool_t*)tb_nalloc0(1, sizeof(tb_fpool_t));
 	tb_assert_and_check_return_val(fpool, TB_NULL);
 
 	// init fpool
@@ -59,11 +59,11 @@ tb_fpool_t* tb_fpool_init(tb_size_t size, tb_size_t grow, tb_item_func_t func)
 	fpool->func.size = tb_align(func.size, TB_CPU_BITBYTE);
 
 	// alloc data
-	fpool->data = tb_calloc(fpool->maxn, fpool->func.size);
+	fpool->data = tb_nalloc0(fpool->maxn, fpool->func.size);
 	tb_assert_and_check_goto(fpool->data, fail);
 
 	// alloc info
-	fpool->info = tb_calloc(1, (tb_align8(fpool->maxn) >> 3));
+	fpool->info = tb_nalloc0(1, (tb_align8(fpool->maxn) >> 3));
 	tb_assert_and_check_goto(fpool->info, fail);
 
 	// init predicted info
@@ -137,12 +137,12 @@ tb_size_t tb_fpool_put(tb_fpool_t* fpool, tb_cpointer_t data)
 		tb_assert_and_check_return_val(fpool->maxn < TB_POOL_MAX_SIZE, 0);
 
 		// realloc data
-		fpool->data = (tb_byte_t*)tb_realloc(fpool->data, fpool->maxn * fpool->func.size);
+		fpool->data = (tb_byte_t*)tb_ralloc(fpool->data, fpool->maxn * fpool->func.size);
 		tb_assert_and_check_return_val(fpool->data, 0);
 		tb_memset(fpool->data + fpool->size * fpool->func.size, 0, fpool->grow * fpool->func.size);
 
 		// realloc info
-		fpool->info = (tb_byte_t*)tb_realloc(fpool->info, tb_align8(fpool->maxn) >> 3);
+		fpool->info = (tb_byte_t*)tb_ralloc(fpool->info, tb_align8(fpool->maxn) >> 3);
 		tb_assert_and_check_return_val(fpool->info, 0);
 		tb_memset(fpool->info + (tb_align8(fpool->size) >> 3), 0, tb_align8(fpool->grow) >> 3);
 

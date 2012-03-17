@@ -54,7 +54,7 @@ static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(aicp->type == TB_AIOO_OTYPE_FILE || aicp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_aicp_reactor_aipp_t* rtor = tb_calloc(1, sizeof(tb_aicp_reactor_aipp_t));
+	tb_aicp_reactor_aipp_t* rtor = tb_nalloc0(1, sizeof(tb_aicp_reactor_aipp_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base

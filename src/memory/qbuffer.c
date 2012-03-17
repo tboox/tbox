@@ -124,7 +124,7 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 		if (maxn > buffer->maxn)
 		{
 			buffer->head = TB_NULL;
-			buffer->data = tb_realloc(buffer->data, maxn);
+			buffer->data = tb_ralloc(buffer->data, maxn);
 			tb_assert_and_check_return_val(buffer->data, TB_NULL);
 			buffer->head = buffer->data;
 		}

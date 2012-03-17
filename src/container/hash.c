@@ -165,7 +165,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	tb_assert_and_check_return_val(data_func.size && data_func.data && data_func.dupl && data_func.copy, TB_NULL);
 
 	// alloc hash
-	tb_hash_t* hash = (tb_hash_t*)tb_calloc(1, sizeof(tb_hash_t));
+	tb_hash_t* hash = (tb_hash_t*)tb_nalloc0(1, sizeof(tb_hash_t));
 	tb_assert_and_check_return_val(hash, TB_NULL);
 
 	// init hash func
@@ -177,7 +177,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	tb_assert_and_check_goto(hash->hash_size <= TB_MAXU16, fail);
 
 	// init hash list
-	hash->hash_list = tb_calloc(hash->hash_size, sizeof(tb_size_t));
+	hash->hash_list = tb_nalloc0(hash->hash_size, sizeof(tb_size_t));
 	tb_assert_and_check_goto(hash->hash_list, fail);
 
 	return hash;
@@ -345,7 +345,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 				tb_assert_and_check_return(maxn > list->maxn);
 
 				// realloc it
-				list = tb_realloc(list, sizeof(tb_hash_item_list_t) + maxn * step);	
+				list = tb_ralloc(list, sizeof(tb_hash_item_list_t) + maxn * step);	
 				tb_assert_and_check_return(list);
 
 				// update the hash item maxn
@@ -371,7 +371,7 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 		else
 		{
 			// alloc list
-			list = tb_calloc(1, sizeof(tb_hash_item_list_t) + TB_HASH_GROW_MIN * step);
+			list = tb_nalloc0(1, sizeof(tb_hash_item_list_t) + TB_HASH_GROW_MIN * step);
 			tb_assert_and_check_return(list);
 
 			// init list

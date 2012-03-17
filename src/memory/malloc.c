@@ -73,9 +73,9 @@ tb_void_t tb_memory_exit()
 }
 
 #ifndef TB_DEBUG
-tb_pointer_t tb_memory_malloc_impl(tb_handle_t handle, tb_size_t size)
+tb_pointer_t tb_memory_malloc_impl(tb_size_t size)
 #else
-tb_pointer_t tb_memory_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -96,9 +96,9 @@ tb_pointer_t tb_memory_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 }
 
 #ifndef TB_DEBUG
-tb_pointer_t tb_memory_malloc0_impl(tb_handle_t handle, tb_size_t size)
+tb_pointer_t tb_memory_malloc0_impl(tb_size_t size)
 #else
-tb_pointer_t tb_memory_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -119,9 +119,9 @@ tb_pointer_t tb_memory_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_
 }
 
 #ifndef TB_DEBUG
-tb_pointer_t tb_memory_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_memory_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -142,9 +142,9 @@ tb_pointer_t tb_memory_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 }
 
 #ifndef TB_DEBUG
-tb_pointer_t tb_memory_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_memory_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -165,9 +165,9 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_
 }
 
 #ifndef TB_DEBUG
-tb_pointer_t tb_memory_ralloc_impl(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size)
 #else
-tb_pointer_t tb_memory_ralloc_impl(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -188,9 +188,9 @@ tb_pointer_t tb_memory_ralloc_impl(tb_handle_t handle, tb_byte_t* data, tb_size_
 }
 
 #ifndef TB_DEBUG
-tb_void_t tb_memory_free_impl(tb_handle_t handle, tb_byte_t* data)
+tb_void_t tb_memory_free_impl(tb_pointer_t data)
 #else
-tb_void_t tb_memory_free_impl(tb_handle_t handle, tb_byte_t* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_void_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 

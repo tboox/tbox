@@ -184,7 +184,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_poll_init(tb_aipp_t* aipp)
 	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE || aipp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
 
 	// alloc reactor
-	tb_aipp_reactor_poll_t* rtor = tb_calloc(1, sizeof(tb_aipp_reactor_poll_t));
+	tb_aipp_reactor_poll_t* rtor = tb_nalloc0(1, sizeof(tb_aipp_reactor_poll_t));
 	tb_assert_and_check_return_val(rtor, TB_NULL);
 
 	// init base

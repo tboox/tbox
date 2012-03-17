@@ -1063,7 +1063,7 @@ tb_bool_t tb_dns_list_init()
 	if (!g_dns_list)
 	{
 		// alloc list
-		g_dns_list = tb_calloc(1, sizeof(tb_dns_list_t));
+		g_dns_list = tb_nalloc0(1, sizeof(tb_dns_list_t));
 		tb_assert_and_check_return_val(g_dns_list, TB_FALSE);
 
 		// init mutx
@@ -1339,7 +1339,7 @@ tb_handle_t tb_dns_look_init(tb_char_t const* name)
 	tb_assert_return_val(!tb_ipv4_set(TB_NULL, name), TB_NULL);
 
 	// alloc
-	tb_dns_look_t* look = tb_calloc(1, sizeof(tb_dns_look_t));
+	tb_dns_look_t* look = tb_nalloc0(1, sizeof(tb_dns_look_t));
 	tb_assert_and_check_return_val(look, TB_NULL);
 
 	// init host

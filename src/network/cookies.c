@@ -515,7 +515,7 @@ static tb_void_t tb_cookies_spool_free(tb_item_func_t* func, tb_pointer_t item)
 tb_cookies_t* tb_cookies_init()
 {
 	// calloc
-	tb_cookies_t* cookies = (tb_cookies_t*)tb_calloc(1, sizeof(tb_cookies_t));
+	tb_cookies_t* cookies = (tb_cookies_t*)tb_nalloc0(1, sizeof(tb_cookies_t));
 	tb_assert_and_check_return_val(cookies, TB_NULL);
 
 	// init hmutex

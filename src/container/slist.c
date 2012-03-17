@@ -63,7 +63,7 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
 
 	// alloc slist
-	tb_slist_t* slist = (tb_slist_t*)tb_calloc(1, sizeof(tb_slist_t));
+	tb_slist_t* slist = (tb_slist_t*)tb_nalloc0(1, sizeof(tb_slist_t));
 	tb_assert_and_check_return_val(slist, TB_NULL);
 
 	// init slist
