@@ -27,6 +27,7 @@
  * includes
  */
 #include "config.h"
+#include "../memory/malloc.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -34,61 +35,21 @@
 
 // malloc & free
 #ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+#	define tb_malloc(size) 				tb_memory_malloc(size)
+#	define tb_malloc0(size) 			tb_memory_malloc0(size)
 
-# 	ifdef TB_DEBUG
-tb_pointer_t 		tb_memory_allocate(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-tb_pointer_t 		tb_memory_reallocate(tb_pointer_t data, tb_size_t size,tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
-tb_void_t 		tb_memory_deallocate(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-# 	else
-tb_pointer_t 		tb_memory_allocate(tb_size_t size);
-tb_pointer_t  	tb_memory_callocate(tb_size_t item, tb_size_t size);
-tb_pointer_t 		tb_memory_reallocate(tb_pointer_t data, tb_size_t size);
-tb_void_t 		tb_memory_deallocate(tb_pointer_t data);
-# 	endif
+#	define tb_nalloc(item, size) 		tb_memory_nalloc(item, size)
+#	define tb_nalloc0(item, size) 		tb_memory_nalloc0(item, size)
 
-# 	ifdef TB_DEBUG
-# 		define tb_malloc(size) 					tb_memory_allocate(size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_calloc(item, size) 			tb_memory_callocate(item, size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_realloc(data, size) 			tb_memory_reallocate(data, size, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_free(data) 					tb_memory_deallocate(data, __tb_func__, __tb_line__, __tb_file__)
-# 	else
-# 		define tb_malloc(size) 					tb_memory_allocate(size)
-# 		define tb_calloc(item, size) 			tb_memory_callocate(item, size)
-# 		define tb_realloc(data, size) 			tb_memory_reallocate(data, size)
-# 		define tb_free(data) 					tb_memory_deallocate(data)
-# 	endif
-
+#	define tb_ralloc(data, size) 		tb_memory_ralloc(data, size)
+# 	define tb_free(data) 				tb_memory_free(data)
 #else
 
 tb_pointer_t 	tb_malloc(tb_size_t size);
 tb_pointer_t 	tb_realloc(tb_pointer_t data, tb_size_t size);
 tb_pointer_t 	tb_calloc(tb_size_t item, tb_size_t size);
-tb_void_t 	tb_free(tb_pointer_t data);
+tb_void_t 		tb_free(tb_pointer_t data);
 
-#endif
-
-#if 0
-// new & delete
-#ifdef __cplusplus
-
-# 	ifdef TB_DEBUG
-__tb_inline__ tb_pointer_t 	operator new(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete(tb_pointer_t p) throw() 																	{ tb_free(p); 											}
-__tb_inline__ tb_pointer_t 	operator new[](tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file) throw () 	{ return tb_memory_allocate(size, func, line, file); 	}
-__tb_inline__ tb_void_t 	operator delete[](tb_pointer_t p) throw() 																{ tb_free(p); 											}
-# 	else
-__tb_inline__ tb_pointer_t 	operator new(tb_size_t size) throw () 	{ return tb_malloc(size); 	}
-__tb_inline__ tb_void_t 	operator delete(tb_pointer_t p) throw() 	{ tb_free(p); 				}
-__tb_inline__ tb_pointer_t 	operator new[](tb_size_t size) throw () { return tb_malloc(size); 	}
-__tb_inline__ tb_void_t 	operator delete[](tb_pointer_t p) throw() { tb_free(p); 				}
-# 	endif
-
-# 	ifdef TB_DEBUG
-# 		define new 			new(__tb_func__, __tb_line__, __tb_file__)
-# 	endif
-
-#endif
 #endif
 
 
