@@ -64,9 +64,6 @@ tb_void_t 		tb_vpool_exit(tb_handle_t handle);
 // clear
 tb_void_t 		tb_vpool_clear(tb_handle_t handle);
 
-// size
-tb_size_t 		tb_vpool_size(tb_handle_t handle);
-
 // malloc
 #ifndef TB_DEBUG
 tb_pointer_t 	tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size);

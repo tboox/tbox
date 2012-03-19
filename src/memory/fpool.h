@@ -17,35 +17,40 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memory.h
+ * \file		fpool.h
  *
  */
-#ifndef TB_MEMORY_H
-#define TB_MEMORY_H
+#ifndef TB_MEMORY_FPOOL_H
+#define TB_MEMORY_FPOOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "vpool.h"
-#include "fpool.h"
-#include "gpool.h"
-#include "spool.h"
-#include "malloc.h"
-#include "pbuffer.h"
-#include "sbuffer.h"
-#include "rbuffer.h"
-#include "qbuffer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * architecture
- *
- *  spool-----------\
- *            |     vpool --
- * malloc - gpool -|        | - data: |-------------------------------|
- *            |     fpool --
- *  rpool----------/
+ * interfaces
  */
 
-#endif
+// init
+tb_handle_t 	tb_fpool_init(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_size_t align);
 
+// exit
+tb_void_t 		tb_fpool_exit(tb_handle_t handle);
+
+// clear
+tb_void_t 		tb_fpool_clear(tb_handle_t handle);
+
+// malloc
+tb_pointer_t 	tb_fpool_malloc(tb_handle_t handle);
+
+// malloc0
+tb_pointer_t 	tb_fpool_malloc0(tb_handle_t handle);
+
+// free
+tb_bool_t 		tb_fpool_free(tb_handle_t handle, tb_pointer_t data);
+
+// dump
+tb_void_t 		tb_fpool_dump(tb_handle_t handle);
+
+#endif

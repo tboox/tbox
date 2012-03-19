@@ -29,8 +29,6 @@
 #include "prefix.h"
 #include "item.h"
 #include "hash.h"
-#include "fpool.h"
-#include "spool.h"
 #include "slist.h"
 #include "dlist.h"
 #include "queue.h"

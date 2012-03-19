@@ -15,6 +15,9 @@ tbox_C_FILES 			+= \
 						math/float \
 						math/fixed16 \
 						memory/vpool \
+						memory/fpool \
+						memory/gpool \
+						memory/spool \
 						memory/malloc \
 						memory/pbuffer \
 						memory/sbuffer \
@@ -27,8 +30,6 @@ tbox_C_FILES 			+= \
 						container/hash \
 						container/queue \
 						container/stack \
-						container/fpool \
-						container/spool \
 						container/slist \
 						container/dlist \
 						container/vector \
@@ -171,6 +172,9 @@ INC_FILES 				= \
 						prefix/trace.h \
 						prefix/config.h \
 						memory/vpool.h \
+						memory/fpool.h \
+						memory/gpool.h \
+						memory/spool.h \
 						memory/prefix.h \
 						memory/memory.h \
 						memory/malloc.h \
@@ -214,8 +218,6 @@ INC_FILES 				= \
 						container/hash.h \
 						container/slist.h \
 						container/dlist.h \
-						container/fpool.h \
-						container/spool.h \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \

@@ -29,7 +29,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_handle_t g_vpool = TB_NULL;
+static tb_handle_t g_gpool = TB_NULL;
 static tb_handle_t g_mutex = TB_NULL; 
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -43,23 +43,23 @@ tb_bool_t tb_memory_init(tb_pointer_t data, tb_size_t size, tb_size_t align)
 	if (!g_mutex) g_mutex = tb_mutex_init(TB_NULL);
 	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
 
-	// init vpool
+	// init gpool
 	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;
-	if (!g_vpool) g_vpool = tb_vpool_init(data, size, align);
+	if (!g_gpool) g_gpool = tb_gpool_init(data, size, align);
 	if (!tb_mutex_leave(g_mutex)) return TB_FALSE;
 
 	// ok?
-	return g_vpool? TB_TRUE : TB_FALSE;
+	return g_gpool? TB_TRUE : TB_FALSE;
 }
 tb_void_t tb_memory_exit()
 {
-	// exit vpool
+	// exit gpool
 	if (g_mutex && tb_mutex_enter(g_mutex))
 	{
-		if (g_vpool)
+		if (g_gpool)
 		{
-			tb_vpool_exit(g_vpool);
-			g_vpool = TB_NULL;
+			tb_gpool_exit(g_gpool);
+			g_gpool = TB_NULL;
 		}
 		if (g_mutex) tb_mutex_leave(g_mutex);
 	}
@@ -79,15 +79,15 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_vpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
 
 #ifndef TB_DEBUG
-	tb_byte_t* p = tb_vpool_malloc_impl(g_vpool, size);
+	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size);
 #else
-	tb_byte_t* p = tb_vpool_malloc_impl(g_vpool, size, func, line, file);
+	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size, func, line, file);
 #endif
 
 	// leave
@@ -102,15 +102,15 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_vpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
 
 #ifndef TB_DEBUG
-	tb_byte_t* p = tb_vpool_malloc0_impl(g_vpool, size);
+	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size);
 #else
-	tb_byte_t* p = tb_vpool_malloc0_impl(g_vpool, size, func, line, file);
+	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size, func, line, file);
 #endif
 
 	// leave
@@ -125,15 +125,15 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_vpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
 
 #ifndef TB_DEBUG
-	tb_byte_t* p = tb_vpool_nalloc_impl(g_vpool, item, size);
+	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size);
 #else
-	tb_byte_t* p = tb_vpool_nalloc_impl(g_vpool, item, size, func, line, file);
+	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size, func, line, file);
 #endif
 
 	// leave
@@ -148,15 +148,15 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_vpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
 
 #ifndef TB_DEBUG
-	tb_byte_t* p = tb_vpool_nalloc0_impl(g_vpool, item, size);
+	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size);
 #else
-	tb_byte_t* p = tb_vpool_nalloc0_impl(g_vpool, item, size, func, line, file);
+	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size, func, line, file);
 #endif
 
 	// leave
@@ -171,15 +171,15 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_vpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
 
 #ifndef TB_DEBUG
-	tb_byte_t* p = tb_vpool_ralloc_impl(g_vpool, data, size);
+	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size);
 #else
-	tb_byte_t* p = tb_vpool_ralloc_impl(g_vpool, data, size, func, line, file);
+	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size, func, line, file);
 #endif
 
 	// leave
@@ -194,15 +194,15 @@ tb_void_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 #endif
 {
 	// check 
-	tb_assert_and_check_return(g_vpool && g_mutex);
+	tb_assert_and_check_return(g_gpool && g_mutex);
 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return ;
 
 #ifndef TB_DEBUG
-	tb_vpool_free_impl(g_vpool, data);
+	tb_gpool_free_impl(g_gpool, data);
 #else
-	tb_vpool_free_impl(g_vpool, data, func, line, file);
+	tb_gpool_free_impl(g_gpool, data, func, line, file);
 #endif
 
 	// leave
@@ -213,13 +213,13 @@ tb_void_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 tb_void_t tb_memory_dump()
 {
 	// check 
-	tb_assert_and_check_return(g_vpool && g_mutex);
+	tb_assert_and_check_return(g_gpool && g_mutex);
 
 	// enter
 	if (tb_mutex_enter(g_mutex)) 
 	{
 		// dump
-		tb_vpool_dump(g_vpool);
+		tb_gpool_dump(g_gpool);
 
 		// leave
 		tb_mutex_leave(g_mutex);
