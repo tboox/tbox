@@ -27,7 +27,6 @@
  * includes
  */
 #include "prefix.h"
-#include "fpool.h"
 #include "item.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -77,8 +76,8 @@
  */
 typedef struct __tb_slist_t
 {
-	// the pool
-	tb_fpool_t* 			pool;
+	// the rpool
+	tb_handle_t 			pool;
 
 	// the head item 
 	tb_size_t 				head;

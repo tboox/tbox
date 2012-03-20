@@ -17,36 +17,56 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memory.h
+ * \file		rpool.h
  *
  */
-#ifndef TB_MEMORY_H
-#define TB_MEMORY_H
+#ifndef TB_MEMORY_RPOOL_H
+#define TB_MEMORY_RPOOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "vpool.h"
-#include "fpool.h"
-#include "gpool.h"
-#include "spool.h"
-#include "rpool.h"
-#include "malloc.h"
-#include "pbuffer.h"
-#include "sbuffer.h"
-#include "rbuffer.h"
-#include "qbuffer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * architecture
- *
- *  spool-----------\
- *            |     vpool --
- * malloc - gpool -|        | - data: |-------------------------------|
- *            |     fpool --
- *  rpool----------/
+ * macros
  */
+#define TB_RPOOL_GROW_MICRO 				(8096)
+#define TB_RPOOL_GROW_SMALL 				(65536)
+#define TB_RPOOL_GROW_LARGE 				(256 * 1024)
 
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_RPOOL_GROW_DEFAULT 			TB_RPOOL_GROW_SMALL
+#else
+# 	define TB_RPOOL_GROW_DEFAULT 			TB_RPOOL_GROW_LARGE
 #endif
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+// init
+tb_handle_t 	tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
+
+// exit
+tb_void_t 		tb_rpool_exit(tb_handle_t handle);
+
+// clear
+tb_void_t 		tb_rpool_clear(tb_handle_t handle);
+
+// malloc
+tb_pointer_t 	tb_rpool_malloc(tb_handle_t handle);
+
+// malloc0
+tb_pointer_t 	tb_rpool_malloc0(tb_handle_t handle);
+
+// memdup
+tb_pointer_t 	tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data);
+
+// free
+tb_bool_t 		tb_rpool_free(tb_handle_t handle, tb_pointer_t data);
+
+// dump
+tb_void_t 		tb_rpool_dump(tb_handle_t handle);
+
+#endif
