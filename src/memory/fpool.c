@@ -35,9 +35,6 @@
 // the magic number
 #define TB_FPOOL_MAGIC 							(0xdead)
 
-// the step maxn
-#define TB_FPOOL_STEP_MAXN 						(256)
-
 // the used sets
 #define tb_fpool_used_set1(used, i) 			do {(used)[(i) >> 3] |= (0x1 << ((i) & 7));} while (0)
 #define tb_fpool_used_set0(used, i) 			do {(used)[(i) >> 3] &= ~(0x1 << ((i) & 7));} while (0)
@@ -77,10 +74,10 @@ typedef struct __tb_fpool_t
 	tb_size_t 			magic 	: 16;
 
 	// the align
-	tb_size_t 			align 	: 8;
+	tb_size_t 			align 	: 16;
 
-	// the nhead
-	tb_size_t 			step 	: 8;
+	// the step
+	tb_size_t 			step;
 
 	// the maxn
 	tb_size_t 			maxn;
@@ -132,7 +129,6 @@ tb_handle_t tb_fpool_init(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_
 
 	// init step
 	fpool->step = tb_align(step, fpool->align);
-	tb_assert_and_check_return_val(tb_align(step, fpool->align) <= TB_FPOOL_STEP_MAXN, TB_NULL);
 
 	// init used
 	fpool->used = (tb_byte_t*)tb_align((tb_size_t)&fpool[1], fpool->align);

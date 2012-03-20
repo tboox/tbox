@@ -24,10 +24,9 @@
  * includes
  */
 #include "item.h"
-#include "spool.h"
-#include "fpool.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
+#include "../memory/memory.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -187,33 +186,26 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
 static tb_void_t tb_item_func_efm_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	tb_assert_and_check_return(func && item);
-	if (func->pool) tb_fpool_del(func->pool, *((tb_size_t*)item));
+	if (func->pool) tb_rpool_free(func->pool, *((tb_pointer_t*)item));
 	else if (*((tb_pointer_t*)item)) tb_free(*((tb_pointer_t*)item));
 }
 static tb_pointer_t tb_item_func_efm_data(tb_item_func_t* func, tb_cpointer_t item)
 {
 	tb_assert_and_check_return_val(func && item, TB_NULL);
-
-	if (func->pool) return tb_fpool_get(func->pool, *((tb_size_t*)item));
-	else return *((tb_pointer_t*)item);
+	return *((tb_pointer_t*)item);
 }
 static tb_void_t tb_item_func_efm_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
 
-	if (func->pool) *((tb_size_t*)item) = data? tb_fpool_put(func->pool, data) : 0;
+	if (func->pool) *((tb_pointer_t*)item) = data? tb_rpool_memdup(func->pool, data) : 0;
 	else if (func->priv) *((tb_pointer_t*)item) = data? tb_memdup(data, func->priv) : TB_NULL;
 }
 static tb_void_t tb_item_func_efm_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
 
-	if (func->pool) 
-	{
-		if (data) tb_fpool_set(func->pool, *((tb_size_t*)item), data);
-		else tb_fpool_clr(func->pool, *((tb_size_t*)item));
-	}
-	else if (*((tb_pointer_t*)item) && func->priv) 
+	if (*((tb_pointer_t*)item) && func->priv) 
 	{
 		if (data) tb_memcpy(*((tb_pointer_t*)item), data, func->priv);
 		else tb_memset(*((tb_pointer_t*)item), 0, func->priv);
@@ -327,7 +319,7 @@ static tb_void_t tb_item_func_ifm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_pointer_t spool)
+tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
 {
 	tb_item_func_t func;
 	tb_memset(&func, 0, sizeof(tb_item_func_t));
@@ -400,7 +392,7 @@ tb_item_func_t tb_item_func_ptr()
 
 	return func;
 }
-tb_item_func_t tb_item_func_efm(tb_size_t size, tb_pointer_t fpool)
+tb_item_func_t tb_item_func_efm(tb_size_t size, tb_handle_t rpool)
 {
 	tb_item_func_t func;
 	tb_memset(&func, 0, sizeof(tb_item_func_t));
@@ -420,8 +412,8 @@ tb_item_func_t tb_item_func_efm(tb_size_t size, tb_pointer_t fpool)
 	func.ndupl = tb_item_func_efm_ndupl;
 	func.ncopy = tb_item_func_efm_ncopy;
 
-	func.size = fpool? sizeof(tb_size_t) : sizeof(tb_pointer_t);
-	func.pool = fpool;
+	func.size = sizeof(tb_pointer_t);
+	func.pool = rpool;
 	func.priv = (tb_pointer_t)size;
 
 	return func;

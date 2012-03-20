@@ -57,14 +57,14 @@
 # 	define tb_spool_free(handle, data) 					tb_spool_free_impl(handle, data)
 #endif
 
-#define TB_SPOOL_SIZE_MICRO 				(8096)
-#define TB_SPOOL_SIZE_SMALL 				(65536)
-#define TB_SPOOL_SIZE_LARGE 				(256 * 1024)
+#define TB_SPOOL_GROW_MICRO 				(8096)
+#define TB_SPOOL_GROW_SMALL 				(65536)
+#define TB_SPOOL_GROW_LARGE 				(256 * 1024)
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_SPOOL_SIZE_DEFAULT 			TB_SPOOL_SIZE_SMALL
+# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_SIZE_SMALL
 #else
-# 	define TB_SPOOL_SIZE_DEFAULT 			TB_SPOOL_SIZE_LARGE
+# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_SIZE_LARGE
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@
  */
 
 // init
-tb_handle_t 	tb_spool_init(tb_size_t size, tb_size_t align);
+tb_handle_t 	tb_spool_init(tb_size_t grow, tb_size_t align);
 
 // exit
 tb_void_t 		tb_spool_exit(tb_handle_t handle);

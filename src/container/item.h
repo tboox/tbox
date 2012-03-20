@@ -71,7 +71,7 @@ typedef struct __tb_item_func_t
 	tb_size_t 				size;
 
 	// the item pool
-	tb_pointer_t 			pool;
+	tb_handle_t 			pool;
 
 	// the priv data
 	tb_pointer_t 			priv;
@@ -101,7 +101,7 @@ typedef struct __tb_item_func_t
  * using tb_spool_strdup if the spool exists
  *
  */
-tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_pointer_t spool); 
+tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
 
 // the integer item function
 tb_item_func_t 		tb_item_func_int();
@@ -113,11 +113,11 @@ tb_item_func_t 		tb_item_func_ptr();
  *
  * storing the index value in the internal item of the container
  *
- * using tb_malloc if the fpool is null, 
- * using tb_fpool_put if the fpool exists
+ * using tb_malloc if the rpool is null, 
+ * using tb_rpool_malloc if the rpool exists
  *
  */
-tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_pointer_t fpool);
+tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t rpool);
 
 /* the internal fixed memory item function
  *
