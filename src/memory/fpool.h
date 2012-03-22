@@ -33,7 +33,7 @@
  */
 
 // init
-tb_handle_t 	tb_fpool_init(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_size_t align);
+tb_handle_t 	tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
 
 // exit
 tb_void_t 		tb_fpool_exit(tb_handle_t handle);

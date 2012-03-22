@@ -111,13 +111,13 @@ typedef struct __tb_dns_list_t
 	tb_handle_t 	mutx;
 
 	// the spool
-	tb_spool_t* 	spool;
+	tb_handle_t		spool;
 
 	// the cache
 	tb_hash_t* 		cache;
 
 	// the times
-	tb_hize_t 	times;
+	tb_hize_t 		times;
 
 	// the expired
 	tb_size_t 		expired;
@@ -1071,7 +1071,7 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->mutx, fail);
 			
 		// init spool
-		g_dns_list->spool = tb_spool_init(TB_SPOOL_SIZE_DEFAULT);
+		g_dns_list->spool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
 		tb_assert_and_check_goto(g_dns_list->spool, fail);
 	
 		// init cache

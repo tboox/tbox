@@ -77,7 +77,7 @@ static tb_bool_t tb_aicp_reactor_iocp_addo(tb_aicp_reactor_t* reactor, tb_aico_t
 	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, TB_FALSE);
 
 	// attach aico to port
-	HANDLE port = CreateIoCompletionPort((HANDLE)aico->aioo.handle, rtor->port, aico->self, 0);
+	HANDLE port = CreateIoCompletionPort((HANDLE)aico->aioo.handle, rtor->port, aico, 0);
 	tb_assert_and_check_return_val(port == rtor->port, TB_FALSE);
 
 	// ok

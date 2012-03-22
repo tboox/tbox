@@ -77,7 +77,7 @@ typedef struct __tb_http_t
 	tb_gstream_t* 		stream;
 
 	// the spool
-	tb_spool_t* 		spool;
+	tb_handle_t			spool;
 
 	// the step
 	tb_size_t 			step;
@@ -772,7 +772,7 @@ tb_handle_t tb_http_init(tb_http_option_t const* option)
 	tb_assert_and_check_goto(http->stream, fail);
 
 	// init spool
-	http->spool = tb_spool_init(TB_SPOOL_SIZE_MICRO);
+	http->spool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
 	tb_assert_and_check_goto(http->spool, fail);
 
 	// init data

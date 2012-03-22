@@ -605,7 +605,7 @@ static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_str_test()
 {
-	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(vector);
 
 	tb_print("=============================================================");
@@ -665,7 +665,7 @@ static tb_void_t tb_vector_efm_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_efm_test()
 {
-	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_efm(11, tb_fpool_init(256, 256, tb_item_func_ifm(11, TB_NULL, TB_NULL))));
+	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(vector);
 
 	tb_print("=============================================================");

@@ -62,9 +62,9 @@
 #define TB_SPOOL_GROW_LARGE 				(256 * 1024)
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_SIZE_SMALL
+# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_GROW_SMALL
 #else
-# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_SIZE_LARGE
+# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_GROW_LARGE
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

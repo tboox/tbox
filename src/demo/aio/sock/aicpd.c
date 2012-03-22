@@ -114,7 +114,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_goto(c, end);
 
 		// init aico
-		tb_handle_t aico = tb_aicp_addo(aicp, c, tb_aicb_work_func, "work");
+		tb_aico_t const* aico = tb_aicp_addo(aicp, c, tb_aicb_work_func, "work");
 		tb_assert_and_check_goto(aico, end);
 
 		// post read

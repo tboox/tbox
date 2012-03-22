@@ -25,6 +25,7 @@
  * includes
  */
 #include "rpool.h"
+#include "../math/math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -70,6 +71,9 @@ typedef struct __tb_rpool_t
 	// the pools align
 	tb_size_t 			align;
 
+	// the size
+	tb_size_t 			size;
+
 	// the chunk pools
 	tb_rpool_chunk_t* 	pools;
 	tb_size_t 			pooln;
@@ -83,6 +87,11 @@ typedef struct __tb_rpool_t
 
 	// the chunk pred
 	tb_size_t 			pred;
+
+	// the info
+#ifdef TB_DEBUG
+	tb_rpool_info_t 	info;
+#endif
 
 }tb_rpool_t;
 
@@ -98,6 +107,9 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 	tb_rpool_t* rpool = (tb_rpool_t*)tb_malloc0(sizeof(tb_rpool_t));
 	tb_assert_and_check_return_val(rpool, TB_NULL);
 
+	// init pools size
+	rpool->size = 0;
+
 	// init pools align
 	rpool->align = align;
 
@@ -105,7 +117,7 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 	rpool->step = step;
 
 	// init chunk grow
-	rpool->grow = grow;
+	rpool->grow = tb_align_pow2((sizeof(tb_size_t) << 3) + grow * step);
 
 	// init chunk pools
 	rpool->pooln = 0;
@@ -174,6 +186,9 @@ tb_void_t tb_rpool_clear(tb_handle_t handle)
 			tb_fpool_clear(rpool->pools[i].pool);
 	}
 	
+	// reinit size
+	rpool->size = 0;
+
 	// reinit grow
 	rpool->grow = 0;
 
@@ -187,7 +202,14 @@ tb_void_t tb_rpool_clear(tb_handle_t handle)
 #endif
 
 }
+tb_size_t tb_rpool_size(tb_handle_t handle)
+{
+	// check 
+	tb_rpool_t* rpool = (tb_rpool_t*)handle;
+	tb_assert_and_check_return_val(rpool, 0);
 
+	return rpool->size;
+}
 tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 {
 	// check 
@@ -215,6 +237,9 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 			// ok
 			if (p) 
 			{
+				// size++
+				rpool->size++;
+
 				// pred++
 #ifdef TB_DEBUG
 				rpool->info.pred++;
@@ -240,6 +265,10 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 				// ok
 				if (p) 
 				{
+					// size++
+					rpool->size++;
+
+					// pred
 					rpool->pred = n + 1;
 					return p;
 				}
@@ -278,11 +307,15 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 		// ok
 		if (p) 
 		{
+			// size++
+			rpool->size++;
+
+			// pred
 			rpool->pred = ++rpool->pooln;
 			return p;
 		}
 		
-		tb_assert_message(0, "the chunk size may be too small: %lu < %lu", chunk->size, size);
+		tb_assert_message(0, "the chunk size may be too small: %lu < %lu", chunk->size, rpool->step);
 
 	} while (0);
 
@@ -315,7 +348,7 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
-	tb_assert_and_check_return_val(rpool && rpool->pools, TB_FALSE);
+	tb_assert_and_check_return_val(rpool && rpool->pools && rpool->size, TB_FALSE);
 
 	// no data?
 	tb_check_return_val(data, TB_TRUE);
@@ -334,28 +367,34 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 			tb_bool_t r = tb_fpool_free(fpool, data);
 
 			// ok
-			if (r) return r;
+			if (r) 
+			{
+				// size--
+				rpool->size--;
+				return TB_TRUE;
+			}
 		}
 	}
 
 	// free it from the existing pool
-	if (tb_slist_size(rpool->list))
+	tb_size_t n = rpool->pooln;
+	while (n--)
 	{
-		tb_size_t n = rpool->pooln;
-		while (n--)
+		tb_handle_t fpool = rpool->pools[n].pool;
+		if (fpool) 
 		{
-			tb_handle_t fpool = rpool->pools[n].pool;
-			if (fpool) 
-			{
-				// try free it
-				tb_bool_t r = tb_fpool_free(fpool, data);
+			// try free it
+			tb_bool_t r = tb_fpool_free(fpool, data);
 
-				// ok
-				if (r) 
-				{
-					rpool->pred = n + 1;
-					return TB_TRUE;
-				}
+			// ok
+			if (r) 
+			{
+				// size--
+				rpool->size--;
+		
+				// pred
+				rpool->pred = n + 1;
+				return TB_TRUE;
 			}
 		}
 	}
@@ -372,7 +411,7 @@ tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data)
 	tb_assert_and_check_return_val(rpool && data, TB_NULL);
 
 	tb_size_t 	n = rpool->step;
-	tb_char_t* 	p = tb_rpool_malloc(handle, n);
+	tb_char_t* 	p = tb_rpool_malloc(handle);
 	if (p) tb_memcpy(p, data, n);
 	return p;
 }
@@ -388,6 +427,7 @@ tb_void_t tb_rpool_dump(tb_handle_t handle)
 	tb_print("rpool: align: %lu", 	rpool->align);
 	tb_print("rpool: pooln: %p", 	rpool->pooln);
 	tb_print("rpool: poolm: %lu", 	rpool->poolm);
+	tb_print("rpool: size: %lu", 	rpool->size);
 	tb_print("rpool: grow: %lu", 	rpool->grow);
 	tb_print("rpool: pred: %lu%%", 	rpool->info.aloc? ((rpool->info.pred * 100) / rpool->info.aloc) : 0);
 

@@ -116,7 +116,7 @@ static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)
 }
 static tb_void_t tb_stack_efm_test()
 {	
-	tb_stack_t* stack = tb_stack_init(10, tb_item_func_efm(11, tb_fpool_init(256, 256, tb_item_func_ifm(11, TB_NULL, TB_NULL))));
+	tb_stack_t* stack = tb_stack_init(10, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(stack);
 
 	tb_print("=============================================================");

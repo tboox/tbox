@@ -44,18 +44,6 @@ typedef struct __tb_dlist_item_t
 }tb_dlist_item_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
- */
-
-static tb_void_t tb_dlist_item_free(tb_item_func_t* func, tb_pointer_t item)
-{
-	tb_assert_and_check_return(func && func->priv);
-	tb_dlist_t* dlist = func->priv;
-	if (dlist->func.free && item)
-		dlist->func.free(&dlist->func, &((tb_dlist_item_t*)item)[1]);
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -75,9 +63,10 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 	dlist->func = func;
 
 	// init pool, step = next + prev + data
-	dlist->pool = tb_fpool_init(grow, grow, tb_item_func_ifm(sizeof(tb_dlist_item_t) + func.size, tb_dlist_item_free, dlist));
+	dlist->pool = tb_rpool_init(grow, sizeof(tb_dlist_item_t) + func.size, 0);
 	tb_assert_and_check_goto(dlist->pool, fail);
 
+	// ok
 	return dlist;
 fail:
 	if (dlist) tb_dlist_exit(dlist);
@@ -92,7 +81,7 @@ tb_void_t tb_dlist_exit(tb_dlist_t* dlist)
 		tb_dlist_clear(dlist);
 
 		// free pool
-		if (dlist->pool) tb_fpool_exit(dlist->pool);
+		if (dlist->pool) tb_rpool_exit(dlist->pool);
 
 		// free it
 		tb_free(dlist);
@@ -102,8 +91,25 @@ tb_void_t tb_dlist_clear(tb_dlist_t* dlist)
 {
 	if (dlist) 
 	{
+		// free items
+		if (dlist->func.free)
+		{
+			tb_size_t itor = dlist->head;
+			while (itor)
+			{
+				// item
+				tb_dlist_item_t* item = (tb_dlist_item_t*)itor;
+
+				// free 
+				dlist->func.free(&dlist->func, &item[1]);
+		
+				// next
+				itor = item->next;
+			}
+		}
+
 		// clear pool
-		if (dlist->pool) tb_fpool_clear(dlist->pool);
+		if (dlist->pool) tb_rpool_clear(dlist->pool);
 
 		// reset it
 		dlist->head = 0;
@@ -124,15 +130,8 @@ tb_pointer_t tb_dlist_at_last(tb_dlist_t* dlist)
 }
 tb_cpointer_t tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor)
 {
-	// check 
-	tb_assert_and_check_return_val(dlist && dlist->pool, TB_NULL);
-
-	// get item
-	tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
-	tb_assert_and_check_return_val(item, TB_NULL);
-
-	// get data
-	return dlist->func.data(&dlist->func, &item[1]);
+	tb_assert_and_check_return_val(dlist && itor, TB_NULL);
+	return dlist->func.data(&dlist->func, &((tb_dlist_item_t const*)itor)[1]);
 }
 tb_cpointer_t tb_dlist_const_at_head(tb_dlist_t const* dlist)
 {
@@ -161,51 +160,31 @@ tb_size_t tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor)
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
 	if (!itor) return dlist->head;
-	else
-	{
-		// get item
-		tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
-		tb_assert_and_check_return_val(item, 0);
-
-		// get next
-		return item->next;
-	}
+	else return ((tb_dlist_item_t const*)itor)->next;
 }
 tb_size_t tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
 	if (!itor) return dlist->last;
-	else
-	{
-		// get item
-		tb_dlist_item_t const* item = tb_fpool_get(dlist->pool, itor);
-		tb_assert_and_check_return_val(item, 0);
-
-		// get prev
-		return item->prev;
-	}
+	else return ((tb_dlist_item_t const*)itor)->prev;
 }
 tb_size_t tb_dlist_size(tb_dlist_t const* dlist)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
-	return tb_fpool_size(dlist->pool);
+	return tb_rpool_size(dlist->pool);
 }
 tb_size_t tb_dlist_maxn(tb_dlist_t const* dlist)
 {
-	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
-	return tb_fpool_maxn(dlist->pool);
+	tb_assert_and_check_return_val(dlist, 0);
+	return TB_MAXU32;
 }
 tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 {
 	tb_assert_and_check_return_val(dlist && dlist->pool, 0);
 
-	// alloc a new node
-	tb_size_t node = tb_fpool_put(dlist->pool, TB_NULL);
-	tb_assert_and_check_return_val(node, 0);
-
-	// get the node data
-	tb_dlist_item_t* pnode = tb_fpool_get(dlist->pool, node);
+	// alloc the node data
+	tb_dlist_item_t* pnode = tb_rpool_malloc(dlist->pool);
 	tb_assert_and_check_return_val(pnode, 0);
 
 	// init node
@@ -214,6 +193,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 	dlist->func.dupl(&dlist->func, &pnode[1], data);
 
 	// is null?
+	tb_size_t node = (tb_size_t)pnode;
 	if (!dlist->head && !dlist->last)
 	{
 		/* dlist: 0 => node => 0
@@ -234,7 +214,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 			tb_size_t last = dlist->last;
 		
 			// the last data
-			tb_dlist_item_t* plast = tb_fpool_get(dlist->pool, last);
+			tb_dlist_item_t* plast = (tb_dlist_item_t*)last;
 			tb_assert_and_check_return_val(plast, 0);
 
 			// last <=> node <=> 0
@@ -251,7 +231,7 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 			tb_size_t head = dlist->head;
 		
 			// the head data
-			tb_dlist_item_t* phead = tb_fpool_get(dlist->pool, head);
+			tb_dlist_item_t* phead = (tb_dlist_item_t*)head;
 			tb_assert_and_check_return_val(phead, 0);
 
 			// 0 <=> node <=> head
@@ -268,14 +248,14 @@ tb_size_t tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 			tb_size_t body = itor;
 		
 			// the body data
-			tb_dlist_item_t* pbody = tb_fpool_get(dlist->pool, body);
+			tb_dlist_item_t* pbody = (tb_dlist_item_t*)body;
 			tb_assert_and_check_return_val(pbody, 0);
 
 			// the prev node 
 			tb_size_t prev = pbody->prev;
 
 			// the prev data
-			tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+			tb_dlist_item_t* pprev = (tb_dlist_item_t*)prev;
 			tb_assert_and_check_return_val(pprev, 0);
 
 			/* 0 <=> ... <=> prev <=> body <=> ... <=> 0
@@ -321,11 +301,14 @@ tb_size_t tb_dlist_ninsert_tail(tb_dlist_t* dlist, tb_cpointer_t data, tb_size_t
 }
 tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 {
-	tb_assert_and_check_return_val(dlist && dlist->pool, itor);
+	tb_assert_and_check_return_val(dlist && itor, itor);
 
-	// get item
-	tb_dlist_item_t* item = tb_fpool_get(dlist->pool, itor);
-	tb_assert_and_check_return_val(item, itor);
+	// the item
+	tb_dlist_item_t* item = (tb_dlist_item_t*)itor;
+
+	// free item
+	if (dlist->func.free)
+		dlist->func.free(&dlist->func, &item[1]);
 
 	// copy data to item
 	dlist->func.copy(&dlist->func, &item[1], data);
@@ -388,7 +371,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t itor)
 				tb_size_t next = tb_dlist_itor_next(dlist, itor);
 
 				// the next data
-				tb_dlist_item_t* pnext = tb_fpool_get(dlist->pool, next);
+				tb_dlist_item_t* pnext = (tb_dlist_item_t*)next;
 				tb_assert_and_check_return_val(pnext, 0);
 
 				/* 0 <=> node <=> next <=> ... <=> 0
@@ -407,7 +390,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t itor)
 				tb_size_t prev = tb_dlist_itor_prev(dlist, itor);
 
 				// the prev data
-				tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+				tb_dlist_item_t* pprev = (tb_dlist_item_t*)prev;
 				tb_assert_and_check_return_val(pprev, 0);
 
 				/* 0 <=> ... <=> prev <=> node <=> 0
@@ -426,21 +409,21 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t itor)
 				tb_size_t body = itor;
 	
 				// the body data
-				tb_dlist_item_t* pbody = tb_fpool_get(dlist->pool, body);
+				tb_dlist_item_t* pbody = (tb_dlist_item_t*)body;
 				tb_assert_and_check_return_val(pbody, 0);
 
 				// the next node
 				tb_size_t next = pbody->next;
 
 				// the next data
-				tb_dlist_item_t* pnext = tb_fpool_get(dlist->pool, next);
+				tb_dlist_item_t* pnext = (tb_dlist_item_t*)next;
 				tb_assert_and_check_return_val(pnext, 0);
 
 				// the prev node
 				tb_size_t prev = pbody->prev;
 
 				// the prev data
-				tb_dlist_item_t* pprev = tb_fpool_get(dlist->pool, prev);
+				tb_dlist_item_t* pprev = (tb_dlist_item_t*)prev;
 				tb_assert_and_check_return_val(pprev, 0);
 
 				/* 0 <=> ... <=> prev <=> body <=> next <=> ... <=> 0
@@ -454,8 +437,12 @@ tb_size_t tb_dlist_remove(tb_dlist_t* dlist, tb_size_t itor)
 			}
 		}
 
+		// free item
+		if (dlist->func.free)
+			dlist->func.free(&dlist->func, &((tb_dlist_item_t*)itor)[1]);
+
 		// free node
-		tb_fpool_del(dlist->pool, itor);
+		tb_rpool_free(dlist->pool, (tb_pointer_t)itor);
 	}
 
 	return node;
@@ -491,7 +478,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 	tb_assert_and_check_return(dlist && dlist->pool && func);
 
 	// pool
-	tb_fpool_t* pool = dlist->pool;
+	tb_handle_t pool = dlist->pool;
 
 	// step
 	tb_size_t 	step = dlist->func.size;
@@ -505,8 +492,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 	while (itor)
 	{
 		// node
-		tb_dlist_item_t* node = tb_fpool_get(dlist->pool, itor);
-		tb_assert_and_check_break(node);
+		tb_dlist_item_t* node = (tb_dlist_item_t*)itor;
 
 		// item
 		tb_pointer_t item = dlist->func.data(&dlist->func, &node[1]);
@@ -527,7 +513,11 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 			if (base == -1) base = prev;
 
 			// free item
-			tb_fpool_del(pool, itor);
+			if (dlist->func.free)
+				dlist->func.free(&dlist->func, &((tb_dlist_item_t*)itor)[1]);
+
+			// free item
+			tb_rpool_free(pool, (tb_pointer_t)itor);
 		}
 		
 		// remove items?
@@ -540,8 +530,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 				if (base)
 				{
 					// get the base data
-					tb_dlist_item_t* pbase = tb_fpool_get(pool, base);
-					tb_assert_and_check_goto(pbase, end);
+					tb_dlist_item_t* pbase = (tb_dlist_item_t*)base;
 
 					// base => next
 					pbase->next = next;
@@ -549,12 +538,8 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 					// has next
 					if (next) 
 					{
-						// get the next data
-						tb_dlist_item_t* pnext = tb_fpool_get(pool, next);
-						tb_assert_and_check_goto(pnext, end);
-
 						// next => base
-						pnext->prev = base;
+						((tb_dlist_item_t*)next)->prev = base;
 					}
 					// tail
 					else 

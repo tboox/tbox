@@ -56,7 +56,7 @@
  */
 
 // init
-tb_bool_t 		tb_memory_init(tb_pointer_t data, tb_size_t size, tb_size_t align);
+tb_bool_t 		tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 // exit
 tb_void_t 		tb_memory_exit();
