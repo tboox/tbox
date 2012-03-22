@@ -165,7 +165,7 @@ static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_str_test()
 {
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_SIZE_SMALL)));
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(queue);
 
 	tb_print("=============================================================");
@@ -216,7 +216,7 @@ static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_efm_test()
 {
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_efm(11, tb_fpool_init(256, 256, tb_item_func_ifm(11, TB_NULL, TB_NULL))));
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(queue);
 
 	tb_print("=============================================================");

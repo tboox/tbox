@@ -132,13 +132,13 @@ typedef struct __tb_vpool_t
 /* ///////////////////////////////////////////////////////////////////////
  * the implemention
  */
-tb_handle_t tb_vpool_init(tb_pointer_t data, tb_size_t size, tb_size_t align)
+tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
 	// check
 	tb_assert_and_check_return_val(data && size, TB_NULL);
 
 	// align data
-	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, vpool->align) - (tb_size_t)data;
+	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
 	tb_assert_and_check_return_val(size >= byte, TB_NULL);
 	size -= byte;
 	data += byte;

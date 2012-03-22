@@ -6,8 +6,6 @@ NAMES = \
 		hash \
 		slist \
 		dlist \
-		spool \
-		fpool \
 		queue \
 		stack \
 		vector

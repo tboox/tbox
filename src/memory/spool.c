@@ -81,6 +81,11 @@ typedef struct __tb_spool_t
 	// the chunk pred
 	tb_size_t 			pred;
 
+	// the info
+#ifdef TB_DEBUG
+	tb_spool_info_t 	info;
+#endif
+
 }tb_spool_t;
 
 
@@ -437,14 +442,14 @@ tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_s
 
 	size = tb_strnlen(data, size);
 #ifndef TB_DEBUG
-	tb_char_t* 	p = tb_spool_malloc_impl(handle, n + 1);
+	tb_char_t* 	p = tb_spool_malloc_impl(handle, size + 1);
 #else
-	tb_char_t* 	p = tb_spool_malloc_impl(handle, n + 1, func, line, file);
+	tb_char_t* 	p = tb_spool_malloc_impl(handle, size + 1, func, line, file);
 #endif
 	if (p)
 	{
-		tb_memcpy(p, data, n);
-		p[n] = '\0';
+		tb_memcpy(p, data, size);
+		p[size] = '\0';
 	}
 
 	return p;
@@ -485,26 +490,23 @@ tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	}
 
 	// free it from the existing pool
-	if (tb_slist_size(spool->list))
+	tb_size_t n = spool->pooln;
+	while (n--)
 	{
-		tb_size_t n = spool->pooln;
-		while (n--)
+		tb_handle_t vpool = spool->pools[n].pool;
+		if (vpool) 
 		{
-			tb_handle_t vpool = spool->pools[n].pool;
-			if (vpool) 
-			{
-				// try free it
+			// try free it
 #ifndef TB_DEBUG
-				tb_bool_t r = tb_vpool_free_impl(vpool, data);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data);
 #else
-				tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
 #endif
-				// ok
-				if (r) 
-				{
-					spool->pred = n + 1;
-					return TB_TRUE;
-				}
+			// ok
+			if (r) 
+			{
+				spool->pred = n + 1;
+				return TB_TRUE;
 			}
 		}
 	}

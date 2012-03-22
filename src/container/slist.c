@@ -42,18 +42,6 @@ typedef struct __tb_slist_item_t
 }tb_slist_item_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
- */
-
-static tb_void_t tb_slist_item_free(tb_item_func_t* func, tb_pointer_t item)
-{
-	tb_assert_and_check_return(func && func->priv);
-	tb_slist_t* slist = func->priv;
-	if (slist->func.free && item)
-		slist->func.free(&slist->func, &((tb_slist_item_t*)item)[1]);
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -73,9 +61,10 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 	slist->func = func;
 
 	// init pool, step = next + data
-	slist->pool = tb_fpool_init(grow, grow, tb_item_func_ifm(sizeof(tb_slist_item_t) + func.size, tb_slist_item_free, slist));
+	slist->pool = tb_rpool_init(grow, sizeof(tb_slist_item_t) + func.size, 0);
 	tb_assert_and_check_goto(slist->pool, fail);
 
+	// ok
 	return slist;
 fail:
 	if (slist) tb_slist_exit(slist);
@@ -90,7 +79,7 @@ tb_void_t tb_slist_exit(tb_slist_t* slist)
 		tb_slist_clear(slist);
 
 		// free pool
-		if (slist->pool) tb_fpool_exit(slist->pool);
+		if (slist->pool) tb_rpool_exit(slist->pool);
 
 		// free it
 		tb_free(slist);
@@ -100,8 +89,25 @@ tb_void_t tb_slist_clear(tb_slist_t* slist)
 {
 	if (slist) 
 	{
+		// free items
+		if (slist->func.free)
+		{
+			tb_size_t itor = slist->head;
+			while (itor)
+			{
+				// item
+				tb_slist_item_t* item = (tb_slist_item_t*)itor;
+
+				// free 
+				slist->func.free(&slist->func, &item[1]);
+		
+				// next
+				itor = item->next;
+			}
+		}
+
 		// clear pool
-		if (slist->pool) tb_fpool_clear(slist->pool);
+		if (slist->pool) tb_rpool_clear(slist->pool);
 
 		// reset it
 		slist->head = 0;
@@ -122,9 +128,8 @@ tb_pointer_t tb_slist_at_last(tb_slist_t* slist)
 }
 tb_cpointer_t tb_slist_itor_const_at(tb_slist_t const* slist, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(slist && slist->pool, TB_NULL);
-	tb_slist_item_t const* item = tb_fpool_get(slist->pool, itor);
-	return item? slist->func.data(&slist->func, &item[1]) : TB_NULL;
+	tb_assert_and_check_return_val(slist && itor, TB_NULL);
+	return slist->func.data(&slist->func, &((tb_slist_item_t const*)itor)[1]);
 }
 tb_cpointer_t tb_slist_const_at_head(tb_slist_t const* slist)
 {
@@ -150,9 +155,8 @@ tb_size_t tb_slist_itor_tail(tb_slist_t const* slist)
 }
 tb_size_t tb_slist_itor_next(tb_slist_t const* slist, tb_size_t itor)
 {
-	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	tb_slist_item_t const* item = tb_fpool_get(slist->pool, itor);
-	return item? item->next : 0;
+	tb_assert_and_check_return_val(slist && itor, 0);
+	return ((tb_slist_item_t const*)itor)->next;
 }
 tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 {
@@ -176,12 +180,12 @@ tb_size_t tb_slist_itor_prev(tb_slist_t const* slist, tb_size_t itor)
 tb_size_t tb_slist_size(tb_slist_t const* slist)
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	return tb_fpool_size(slist->pool);
+	return tb_rpool_size(slist->pool);
 }
 tb_size_t tb_slist_maxn(tb_slist_t const* slist)
 {
-	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	return tb_fpool_maxn(slist->pool);
+	tb_assert_and_check_return_val(slist, 0);
+	return TB_MAXU32;
 }
 /* insert node:
  *
@@ -216,12 +220,8 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t 
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
 
-	// alloc a new node
-	tb_size_t node = tb_fpool_put(slist->pool, TB_NULL);
-	tb_assert_and_check_return_val(node, 0);
-
-	// get the node data
-	tb_slist_item_t* pnode = tb_fpool_get(slist->pool, node);
+	// alloc the node data
+	tb_slist_item_t* pnode = tb_rpool_malloc(slist->pool);
 	tb_assert_and_check_return_val(pnode, 0);
 
 	// init node, inode => 0
@@ -232,6 +232,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t 
 	tb_size_t prev = itor;
 
 	// non-empty?
+	tb_size_t node = (tb_size_t)pnode;
 	if (slist->head)
 	{
 		// is head?
@@ -247,7 +248,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t 
 		else if (prev == slist->last)
 		{
 			// the prev data
-			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
 			tb_assert_and_check_return_val(pprev, 0);
 
 			// last => node => null
@@ -260,7 +261,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t 
 		else
 		{
 			// the prev data
-			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
 			tb_assert_and_check_return_val(pprev, 0);
 
 			// node => next
@@ -320,11 +321,14 @@ tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_cpointer_t data, tb_size_t
 }
 tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
-	tb_assert_and_check_return_val(slist && slist->pool, itor);
+	tb_assert_and_check_return_val(slist && itor, itor);
 
-	// get item
-	tb_slist_item_t* item = tb_fpool_get(slist->pool, itor);
-	tb_assert_and_check_return_val(item, itor);
+	// the item
+	tb_slist_item_t* item = (tb_slist_item_t*)itor;
+
+	// free item
+	if (slist->func.free)
+		slist->func.free(&slist->func, &item[1]);
 
 	// copy data to item
 	slist->func.copy(&slist->func, &item[1], data);
@@ -433,7 +437,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t itor)
 			midd = tb_slist_itor_next(slist, prev);
 
 			// get the prev data
-			tb_slist_item_t* pprev = tb_fpool_get(slist->pool, prev);
+			tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
 			tb_assert_and_check_return_val(pprev, 0);
 
 			// the next node
@@ -449,8 +453,12 @@ tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t itor)
 		// check
 		tb_assert_and_check_return_val(midd, 0);
 
+		// free item
+		if (slist->func.free)
+			slist->func.free(&slist->func, &((tb_slist_item_t*)midd)[1]);
+
 		// free node
-		tb_fpool_del(slist->pool, midd);
+		tb_rpool_free(slist->pool, (tb_pointer_t)midd);
 
 		// return next node
 		return next;
@@ -505,7 +513,7 @@ tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, 
 	tb_assert_and_check_return(slist && slist->pool && func);
 
 	// pool
-	tb_fpool_t* pool = slist->pool;
+	tb_handle_t pool = slist->pool;
 
 	// step
 	tb_size_t 	step = slist->func.size;
@@ -519,8 +527,7 @@ tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, 
 	while (itor)
 	{
 		// node
-		tb_slist_item_t* node = tb_fpool_get(slist->pool, itor);
-		tb_assert_and_check_break(node);
+		tb_slist_item_t* node = (tb_slist_item_t*)itor;
 
 		// item
 		tb_pointer_t item = slist->func.data(&slist->func, &node[1]);
@@ -541,7 +548,11 @@ tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, 
 			if (base == -1) base = prev;
 
 			// free item
-			tb_fpool_del(pool, itor);
+			if (slist->func.free)
+				slist->func.free(&slist->func, &((tb_slist_item_t*)itor)[1]);
+
+			// free item
+			tb_rpool_free(pool, (tb_pointer_t)itor);
 		}
 		
 		// remove items?
@@ -553,12 +564,8 @@ tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, 
 				// remove part
 				if (base)
 				{
-					// get the base data
-					tb_slist_item_t* pbase = tb_fpool_get(pool, base);
-					tb_assert_and_check_goto(pbase, end);
-
 					// base => next
-					pbase->next = next;
+					((tb_slist_item_t*)base)->next = next;
 
 					// update last
 					if (!next) slist->last = base;

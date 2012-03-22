@@ -29,7 +29,6 @@
 #include "prefix.h"
 #include "aioo.h"
 #include "../network/ipv4.h"
-#include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -49,9 +48,6 @@ typedef struct __tb_aico_t
 
 	// the aicb
 	tb_aicb_t 				aicb;
-
-	// the self
-	tb_handle_t 			self;
 
 }tb_aico_t;
 
@@ -185,7 +181,7 @@ typedef struct __tb_aicp_t
 	tb_handle_t 			mutx;
 
 	// the aico pool
-	tb_fpool_t* 			pool;
+	tb_handle_t 			pool;
 
 	// the reactor
 	tb_aicp_reactor_t* 		rtor;
@@ -203,71 +199,62 @@ typedef struct __tb_aicp_t
  *
  * @return 	the aio pool
  */
-tb_aicp_t* 		tb_aicp_init(tb_size_t type, tb_size_t maxn);
+tb_aicp_t* 			tb_aicp_init(tb_size_t type, tb_size_t maxn);
 
 /// exit the aio pool
-tb_void_t 		tb_aicp_exit(tb_aicp_t* aicp);
+tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
 
 /// the object maximum number of the aio pool
-tb_size_t 		tb_aicp_maxn(tb_aicp_t* aicp);
+tb_size_t 			tb_aicp_maxn(tb_aicp_t* aicp);
 
 /// the object number of the aio pool
-tb_size_t 		tb_aicp_size(tb_aicp_t* aicp);
+tb_size_t 			tb_aicp_size(tb_aicp_t* aicp);
 
 /*!add the aio object
  *
  * @param 	aicp 	the aio pool
  * @param 	handle 	the file or sock handle
  *
- * @return 	the aico handle
+ * @return 	the aico data
  */
-tb_handle_t 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata);
+tb_aico_t const* 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata);
 
 /*!del the aio object
  *
  * @param 	aicp 	the aio pool
  * @param 	handle 	the aico handle
  */
-tb_void_t 		tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
-
-/*!set the aio odata
- *
- * @param 	aicp 	the aio pool
- * @param 	handle 	the aico handle
- * @param 	odata 	the object data
- *
- */
-tb_void_t 		tb_aicp_setp(tb_aicp_t* aicp, tb_handle_t aico, tb_pointer_t odata);
+tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
 
 /*!post the aio event
  *
  * @param 	aicp 	the aio pool
- * @param 	handle 	the aico handle
+ * @param 	aico 	the aico data
  * @param 	etype 	the event type
  *
  */
-tb_void_t 		tb_aicp_post(tb_aicp_t* aicp, tb_handle_t aico, tb_aice_t const* aice);
+tb_void_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice);
 
 /// post resv 
-tb_void_t 		tb_aicp_resv(tb_aicp_t* aicp, tb_handle_t aico, tb_char_t const* name);
+tb_void_t 			tb_aicp_resv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* name);
 
 /// post conn 
-tb_void_t 		tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t aico, tb_char_t const* host, tb_size_t port);
+tb_void_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port);
 
 /// post read
-tb_void_t 		tb_aicp_read(tb_aicp_t* aicp, tb_handle_t aico, tb_byte_t* data, tb_size_t size);
+tb_void_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
 
 /// post writ
-tb_void_t 		tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t aico, tb_byte_t* data, tb_size_t size);
+tb_void_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
 
 /// post sync
-tb_void_t 		tb_aicp_sync(tb_aicp_t* aicp, tb_handle_t aico);
+tb_void_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
 
 /// post seek
-tb_void_t 		tb_aicp_seek(tb_aicp_t* aicp, tb_handle_t aico, tb_hize_t offset);
+tb_void_t 			tb_aicp_seek(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t offset);
 
 /// post skip
-tb_void_t 		tb_aicp_skip(tb_aicp_t* aicp, tb_handle_t aico, tb_hize_t size);
+tb_void_t 			tb_aicp_skip(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t size);
 
 /*!wait the aio objects in the pool
  *
@@ -279,9 +266,9 @@ tb_void_t 		tb_aicp_skip(tb_aicp_t* aicp, tb_handle_t aico, tb_hize_t size);
  *
  * @return 	return 1 if ok, return 0 if timeout, return -1 if error
  */
-tb_long_t 		tb_aicp_wait(tb_aicp_t* aicp, tb_long_t timeout);
+tb_long_t 			tb_aicp_wait(tb_aicp_t* aicp, tb_long_t timeout);
 
 // spak aice
-tb_long_t 		tb_aicp_spak(tb_aicp_t* aicp);
+tb_long_t 			tb_aicp_spak(tb_aicp_t* aicp);
 
 #endif
