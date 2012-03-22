@@ -69,6 +69,9 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// check
 	tb_assert_and_check_return_val(data && size, TB_NULL);
 
+	// align
+	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
 	tb_assert_and_check_return_val(size >= byte, TB_NULL);
@@ -82,7 +85,7 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	gpool->magic = TB_GPOOL_MAGIC;
 
 	// init align
-	gpool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	gpool->align = align;
 
 	// init data
 	gpool->data = (tb_byte_t*)tb_align((tb_size_t)&gpool[1], gpool->align);

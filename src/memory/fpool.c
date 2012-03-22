@@ -109,6 +109,9 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	// check
 	tb_assert_and_check_return_val(data && step && size, TB_NULL);
 
+	// align
+	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
 	tb_assert_and_check_return_val(size >= byte, TB_NULL);
@@ -125,7 +128,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	fpool->magic = TB_FPOOL_MAGIC;
 
 	// init align
-	fpool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	fpool->align = align;
 
 	// init step
 	fpool->step = tb_align(step, fpool->align);
