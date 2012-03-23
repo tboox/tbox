@@ -31,9 +31,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_RPOOL_GROW_MICRO 				(8096)
-#define TB_RPOOL_GROW_SMALL 				(65536)
-#define TB_RPOOL_GROW_LARGE 				(256 * 1024)
+#define TB_RPOOL_GROW_MICRO 				(128)
+#define TB_RPOOL_GROW_SMALL 				(1024)
+#define TB_RPOOL_GROW_LARGE 				(4096)
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
 # 	define TB_RPOOL_GROW_DEFAULT 			TB_RPOOL_GROW_SMALL

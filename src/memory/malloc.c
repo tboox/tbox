@@ -188,25 +188,28 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 }
 
 #ifndef TB_DEBUG
-tb_void_t tb_memory_free_impl(tb_pointer_t data)
+tb_size_t tb_memory_free_impl(tb_pointer_t data)
 #else
-tb_void_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_size_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return(g_gpool && g_mutex);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, 0);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return ;
+	if (!tb_mutex_enter(g_mutex)) return 0;
 
 #ifndef TB_DEBUG
-	tb_gpool_free_impl(g_gpool, data);
+	tb_size_t size = tb_gpool_free_impl(g_gpool, data);
 #else
-	tb_gpool_free_impl(g_gpool, data, func, line, file);
+	tb_size_t size = tb_gpool_free_impl(g_gpool, data, func, line, file);
 #endif
 
 	// leave
 	tb_mutex_leave(g_mutex);
+
+	// ok
+	return size;
 }
 
 #ifdef TB_DEBUG
