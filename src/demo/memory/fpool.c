@@ -9,7 +9,7 @@
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	// init
-	tb_handle_t fpool = tb_fpool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 64, 0);
+	tb_handle_t fpool = tb_fpool_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024, 64, 0);
 	tb_assert_and_check_return_val(fpool, 0);
 
 	__tb_volatile__ tb_hong_t 	time = tb_mclock();

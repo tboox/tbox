@@ -101,9 +101,9 @@ tb_pointer_t 	tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_siz
 
 // free
 #ifndef TB_DEBUG
-tb_bool_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data);
+tb_size_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data);
 #else
-tb_bool_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_size_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // dump

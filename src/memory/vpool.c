@@ -494,32 +494,53 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 
 	// free it first
 #ifndef TB_DEBUG
-	tb_vpool_free_impl(vpool, data);
+	tb_size_t n = tb_vpool_free_impl(vpool, data);
 #else
-	tb_vpool_free_impl(vpool, data, func, line, file);
+	tb_size_t n = tb_vpool_free_impl(vpool, data, func, line, file);
 #endif
 
 	// malloc it
 	// hack: pred => data now and the data is not cleared after freeing
 #ifndef TB_DEBUG
-	return tb_vpool_malloc_impl(vpool, size);
+	tb_pointer_t p = tb_vpool_malloc_impl(vpool, size);
 #else
-	return tb_vpool_malloc_impl(vpool, size, func, line, file);
+	tb_pointer_t p = tb_vpool_malloc_impl(vpool, size, func, line, file);
 #endif
+
+	if (p)
+	{
+		// need copy data if no enough
+		if (n < size) 
+		{
+			// the data have been changed now.
+			tb_assert_and_check_return_val(p != data, 0);
+
+			// copy it
+			tb_memcpy(p, data, n);
+		}
+		else
+		{
+			// the data is same now.
+			tb_assert_and_check_return_val(p == data, 0);
+		}
+	}
+	
+	// ok
+	return p;
 }
 
 #ifndef TB_DEBUG
-tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data)
+tb_size_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
-tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_size_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, TB_FALSE);
+	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, 0);
 
 	// no data?
-	tb_check_return_val(data, TB_TRUE);
+	tb_check_return_val(data, 0);
 
 	// pb & pe
 	tb_byte_t* 	pb = vpool->data;
@@ -528,7 +549,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	// the data
 	tb_byte_t* 	p = data;
 	tb_check_return_val(p, TB_NULL);
-	tb_assert_and_check_return_val(p >= pb && p < pe, TB_NULL);
+	tb_assert_and_check_return_val(p >= pb && p < pe, 0);
 
 	// the nhead
 	tb_size_t 	nhead = vpool->nhead;
@@ -538,9 +559,9 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	tb_size_t 			bsize = block->size;
 
 	// check 
-	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, TB_FALSE);	
-	tb_assert_and_check_return_val(!block->free, TB_FALSE);
-	tb_assert_and_check_return_val(block->size < vpool->size, TB_FALSE);
+	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, 0);	
+	tb_assert_and_check_return_val(!block->free, 0);
+	tb_assert_and_check_return_val(block->size < vpool->size, 0);
 
 	// merge it if the next block is free
 	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
@@ -558,7 +579,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 #endif
 
 	// ok
-	return TB_TRUE;
+	return block->size;
 }
 
 

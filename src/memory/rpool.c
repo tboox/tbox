@@ -295,7 +295,9 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 		// alloc chunk data
 		chunk->size = rpool->grow;
 		chunk->data = tb_malloc(chunk->size);
-		tb_assert_and_check_break(chunk->data);
+
+		// no space?
+		tb_check_break(chunk->data);
 
 		// init chunk pool
 		chunk->pool = tb_fpool_init(chunk->data, chunk->size, rpool->step, rpool->align);
@@ -425,7 +427,7 @@ tb_void_t tb_rpool_dump(tb_handle_t handle)
 
 	tb_print("======================================================================");
 	tb_print("rpool: align: %lu", 	rpool->align);
-	tb_print("rpool: pooln: %p", 	rpool->pooln);
+	tb_print("rpool: pooln: %lu", 	rpool->pooln);
 	tb_print("rpool: poolm: %lu", 	rpool->poolm);
 	tb_print("rpool: size: %lu", 	rpool->size);
 	tb_print("rpool: grow: %lu", 	rpool->grow);
