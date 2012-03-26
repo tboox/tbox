@@ -16,13 +16,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_return_val(spool, 0);
 
 	__tb_volatile__ tb_hong_t 	time = tb_mclock();
-	__tb_volatile__ tb_size_t 	size = 0xdead;
 	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
-	while (1)
+	__tb_volatile__ tb_size_t 	maxn = 100000;
+	while (maxn--)
 	{
-		size = (size * 10807 + 1) & 0xff;
-		data = tb_spool_malloc0(spool, size);
-		tb_check_break(data || !size);
+		data = tb_spool_malloc0(spool, 64);
+		tb_check_break(data);
 	}
 	time = tb_mclock() - time;
 

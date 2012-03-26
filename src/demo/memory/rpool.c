@@ -17,7 +17,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	__tb_volatile__ tb_hong_t 	time = tb_mclock();
 	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
-	while (1)
+	__tb_volatile__ tb_size_t 	maxn = 100000;
+	while (maxn--)
 	{
 		data = tb_rpool_malloc0(rpool);
 		tb_check_break(data);
