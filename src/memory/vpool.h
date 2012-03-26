@@ -61,6 +61,9 @@ tb_handle_t 	tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 // exit
 tb_void_t 		tb_vpool_exit(tb_handle_t handle);
 
+// full
+tb_size_t 		tb_vpool_full(tb_handle_t handle);
+
 // clear
 tb_void_t 		tb_vpool_clear(tb_handle_t handle);
 

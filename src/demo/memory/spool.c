@@ -20,7 +20,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
 	while (1)
 	{
-		size = (size * 10807 + 1) & 0xffff;
+		size = (size * 10807 + 1) & 0xff;
 		data = tb_spool_malloc0(spool, size);
 		tb_check_break(data || !size);
 	}
