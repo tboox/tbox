@@ -569,7 +569,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
 
-#if 1
+#if 0
 	tb_hash_test_s2i_func();
 	tb_hash_test_i2s_func();
 	tb_hash_test_m2m_func();
@@ -577,13 +577,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_hash_test_s2i_perf();
-	tb_hash_test_i2s_perf();
-	tb_hash_test_m2m_perf();
+//	tb_hash_test_s2i_perf();
+//	tb_hash_test_i2s_perf();
+//	tb_hash_test_m2m_perf();
 	tb_hash_test_i2i_perf();
 #endif
 
-#if 1
+#if 0
 	tb_hash_test_itor_perf();
 	tb_hash_test_walk_perf();
 #endif

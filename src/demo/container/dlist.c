@@ -986,14 +986,14 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_dlist_int_test();
 	tb_dlist_str_test();
 	tb_dlist_efm_test();
 	tb_dlist_ifm_test();
 #endif
 
-#if 0
+#if 1
 	tb_dlist_perf_test();
 #endif
 

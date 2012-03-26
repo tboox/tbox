@@ -545,7 +545,7 @@ static tb_void_t tb_slist_int_dump(tb_slist_t const* slist)
 	for (; itor != tail; itor = tb_slist_itor_next(slist, itor))
 	{
 		tb_char_t const* item = tb_slist_itor_const_at(slist, itor);
-		tb_print("int at[%d]: %x", itor, item);
+		tb_print("int at[%lx]: %x", itor, item);
 	}
 }
 static tb_void_t tb_slist_int_test()
@@ -621,7 +621,7 @@ static tb_void_t tb_slist_str_dump(tb_slist_t const* slist)
 	for (; itor != tail; itor = tb_slist_itor_next(slist, itor))
 	{
 		tb_char_t const* item = tb_slist_itor_const_at(slist, itor);
-		tb_print("str at[%d]: %s", itor, item);
+		tb_print("str at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_str_test()
@@ -697,7 +697,7 @@ static tb_void_t tb_slist_efm_dump(tb_slist_t const* slist)
 	for (; itor != tail; itor = tb_slist_itor_next(slist, itor))
 	{
 		tb_char_t const* item = tb_slist_itor_const_at(slist, itor);
-		tb_print("efm at[%d]: %s", itor, item);
+		tb_print("efm at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_efm_test()
@@ -777,7 +777,7 @@ static tb_void_t tb_slist_ifm_dump(tb_slist_t const* slist)
 	for (; itor != tail; itor = tb_slist_itor_next(slist, itor))
 	{
 		tb_char_t const* item = tb_slist_itor_const_at(slist, itor);
-		tb_print("ifm at[%d]: %s", itor, item);
+		tb_print("ifm at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_ifm_test()
@@ -988,14 +988,14 @@ int main(int argc, char** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_slist_int_test();
 	tb_slist_str_test();
 	tb_slist_efm_test();
 	tb_slist_ifm_test();
 #endif
 
-#if 0
+#if 1
 	tb_slist_perf_test();
 #endif
 

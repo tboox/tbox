@@ -185,6 +185,15 @@ tb_void_t tb_fpool_exit(tb_handle_t handle)
 	// clear head
 	tb_memset(fpool, 0, sizeof(tb_fpool_t));
 }
+tb_bool_t tb_fpool_full(tb_handle_t handle)
+{
+	// check 
+	tb_fpool_t* fpool = (tb_fpool_t*)handle;
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, TB_FALSE);
+
+	// full?
+	return fpool->size == fpool->maxn? TB_TRUE : TB_FALSE;
+}
 tb_void_t tb_fpool_clear(tb_handle_t handle)
 {
 	// check 
@@ -311,18 +320,23 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 {
 	// check 
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;
-	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, TB_FALSE);
-	tb_assert_and_check_return_val(fpool->step && fpool->size, TB_FALSE);
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC && fpool->step, TB_FALSE);
+
+	// check size
+	tb_check_return_val(fpool->size, TB_FALSE);
 
 	// check data
-	tb_assert_and_check_return_val(!(((tb_size_t)data) & (fpool->align - 1)), TB_FALSE);
+	tb_check_return_val(!(((tb_size_t)data) & (fpool->align - 1)), TB_FALSE);
+	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->maxn * fpool->step, TB_FALSE);
+	tb_check_return_val(!(((tb_byte_t*)data - fpool->data) % fpool->step), TB_FALSE);
 
-	// invalid data?
-	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->size, TB_FALSE);
+	// item
+	tb_size_t i = ((tb_byte_t*)data - fpool->data) / fpool->step;
+
+	// double free?
+	tb_assert_return_val(tb_fpool_used_bset(fpool->used, i), TB_TRUE);
 
 	// free it
-	tb_size_t i = ((tb_byte_t*)data - fpool->data) / fpool->step;
-	tb_assert_and_check_return_val(!(((tb_byte_t*)data - fpool->data) % fpool->step), TB_FALSE);
 	tb_fpool_used_set0(fpool->used, i);
 	
 	// predict it

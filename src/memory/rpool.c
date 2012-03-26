@@ -229,7 +229,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 
 		// the predicted pool
 		tb_handle_t fpool = rpool->pools[rpool->pred - 1].pool;
-		if (fpool) 
+		if (fpool && !tb_fpool_full(fpool)) 
 		{
 			// try allocating it
 			tb_pointer_t p = tb_fpool_malloc(fpool);
@@ -257,7 +257,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 		while (n--)
 		{
 			tb_handle_t fpool = rpool->pools[n].pool;
-			if (fpool) 
+			if (fpool && !tb_fpool_full(fpool)) 
 			{
 				// try allocating it
 				tb_pointer_t p = tb_fpool_malloc(fpool);
