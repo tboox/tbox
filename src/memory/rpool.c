@@ -111,7 +111,7 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 	rpool->size = 0;
 
 	// init pools align
-	rpool->align = align;
+	rpool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 
 	// init chunk step
 	rpool->step = step;

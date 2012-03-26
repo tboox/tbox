@@ -9,7 +9,7 @@
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	// init tbox
-	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
 
 	// init rpool
 	tb_handle_t rpool = tb_rpool_init(TB_RPOOL_GROW_DEFAULT, 64, 0);

@@ -25,6 +25,7 @@
  * includes
  */
 #include "spool.h"
+#include "../math/math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -101,7 +102,7 @@ tb_handle_t tb_spool_init(tb_size_t grow, tb_size_t align)
 	tb_assert_and_check_return_val(spool, TB_NULL);
 
 	// init pools align
-	spool->align = align;
+	spool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 
 	// init chunk grow
 	spool->grow = grow;
@@ -200,6 +201,9 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	// no size?
 	tb_check_return_val(size, TB_NULL);
 	
+	// the align size
+	tb_size_t asize = tb_align(size, spool->align);
+
 	// aloc++
 #ifdef TB_DEBUG
 	spool->info.aloc++;
@@ -213,7 +217,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 
 		// the predicted pool
 		tb_handle_t vpool = spool->pools[spool->pred - 1].pool;
-		if (vpool) 
+		if (vpool && (!tb_vpool_full(vpool) || asize <= tb_vpool_full(vpool))) 
 		{
 			// try allocating it
 #ifndef TB_DEBUG
@@ -244,6 +248,10 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 			tb_handle_t vpool = spool->pools[n].pool;
 			if (vpool) 
 			{
+				// no space?
+				tb_size_t full = tb_vpool_full(vpool);
+				tb_check_continue(!full || asize <= full);
+
 				// try allocating it
 #ifndef TB_DEBUG
 				tb_pointer_t p = tb_vpool_malloc_impl(vpool, size);
@@ -279,7 +287,9 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 		// alloc chunk data
 		chunk->size = spool->grow;
 		chunk->data = tb_malloc(chunk->size);
-		tb_assert_and_check_break(chunk->data);
+
+		// no space
+		tb_check_break(chunk->data);
 
 		// init chunk pool
 		chunk->pool = tb_vpool_init(chunk->data, chunk->size, spool->align);
@@ -546,7 +556,7 @@ tb_void_t tb_spool_dump(tb_handle_t handle)
 
 	tb_print("======================================================================");
 	tb_print("spool: align: %lu", 	spool->align);
-	tb_print("spool: pooln: %p", 	spool->pooln);
+	tb_print("spool: pooln: %lu", 	spool->pooln);
 	tb_print("spool: poolm: %lu", 	spool->poolm);
 	tb_print("spool: grow: %lu", 	spool->grow);
 	tb_print("spool: pred: %lu%%", 	spool->info.aloc? ((spool->info.pred * 100) / spool->info.aloc) : 0);
