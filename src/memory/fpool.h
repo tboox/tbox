@@ -38,6 +38,9 @@ tb_handle_t 	tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_s
 // exit
 tb_void_t 		tb_fpool_exit(tb_handle_t handle);
 
+// full
+tb_bool_t 		tb_fpool_full(tb_handle_t handle);
+
 // clear
 tb_void_t 		tb_fpool_clear(tb_handle_t handle);
 

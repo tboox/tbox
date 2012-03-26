@@ -591,8 +591,7 @@ tb_size_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 
 	// the data
 	tb_byte_t* 	p = data;
-	tb_check_return_val(p, TB_NULL);
-	tb_assert_and_check_return_val(p >= pb && p < pe, 0);
+	tb_check_return_val(p && p >= pb && p < pe, 0);
 
 	// the nhead
 	tb_size_t 	nhead = vpool->nhead;
@@ -601,10 +600,10 @@ tb_size_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
 	tb_size_t 			bsize = block->size;
 
-	// check 
-	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, 0);	
-	tb_assert_and_check_return_val(!block->free, 0);
+	// check block
+	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, 0);
 	tb_assert_and_check_return_val(block->size < vpool->size, 0);
+	tb_assert_and_check_return_val(!block->free, block->size);
 
 	// merge it if the next block is free
 	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
