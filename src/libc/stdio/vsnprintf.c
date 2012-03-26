@@ -643,19 +643,21 @@ get_qualifier:
 		// short & long => int
 	case 'h':
 	case 'l':
-		// %lxx
 #if TB_CPU_BITSIZE == 64
-		if (*p == 'l') 
-			e->qual = TB_PRINTF_QUAL_I64;
+		// %lxx: int64
+		if (*p == 'l') e->qual = TB_PRINTF_QUAL_I64;
+		else e->qual = TB_PRINTF_QUAL_I;
+#else
+		// %llx: int
+		e->qual = TB_PRINTF_QUAL_I;
 #endif
-		// %llxx
+		// %llx: int64
 		++p;
 		if (*p == 'l') 
 		{
 			e->qual = TB_PRINTF_QUAL_I64;
 			++p;
 		}
-		else e->qual = TB_PRINTF_QUAL_I;
 		break;
 	case 'I':
 		{

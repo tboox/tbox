@@ -25,6 +25,7 @@
  * includes
  */
 #include "spool.h"
+#include "vpool.h"
 #include "../math/math.h"
 
 /* ///////////////////////////////////////////////////////////////////////

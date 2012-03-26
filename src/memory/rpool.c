@@ -25,6 +25,7 @@
  * includes
  */
 #include "rpool.h"
+#include "fpool.h"
 #include "../math/math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
