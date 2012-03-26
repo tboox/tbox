@@ -207,6 +207,10 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 				// predict the next free block
 				vpool->pred = p + block->size;
 
+				// reset the next predicted block
+				if (vpool->pred == pe)
+					vpool->pred = TB_NULL;
+
 				// return data address
 				return p;
 			}
@@ -535,7 +539,6 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	if (!data) return tb_vpool_malloc_impl(vpool, size, func, line, file);
 #endif
 
-	// free it first
 #ifndef TB_DEBUG
 	tb_size_t n = tb_vpool_free_impl(vpool, data);
 #else

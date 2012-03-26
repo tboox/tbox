@@ -24,6 +24,7 @@
  * includes
  */
 #include "malloc.h"
+#include "gpool.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////

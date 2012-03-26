@@ -481,7 +481,7 @@ static tb_void_t tb_hash_test_itor_perf()
 	// performance
 	tb_hong_t t = tb_mclock();
 	__tb_volatile__ tb_hize_t test[3] = {0};
-	__tb_volatile__ tb_size_t 	itor = tb_hash_itor_head(hash);
+	__tb_volatile__ tb_size_t itor = tb_hash_itor_head(hash);
 	for (; itor != tb_hash_itor_tail(hash); )
 	{
 		__tb_volatile__ tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
@@ -569,7 +569,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_hash_test_s2i_func();
 	tb_hash_test_i2s_func();
 	tb_hash_test_m2m_func();
@@ -577,13 +577,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-//	tb_hash_test_s2i_perf();
-//	tb_hash_test_i2s_perf();
-//	tb_hash_test_m2m_perf();
+	tb_hash_test_s2i_perf();
+	tb_hash_test_i2s_perf();
+	tb_hash_test_m2m_perf();
 	tb_hash_test_i2i_perf();
 #endif
 
-#if 0
+#if 1
 	tb_hash_test_itor_perf();
 	tb_hash_test_walk_perf();
 #endif

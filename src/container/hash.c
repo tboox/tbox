@@ -34,9 +34,9 @@
  */
 
 // index
-#define TB_HASH_INDEX_MAKE(buck, item) 			((((item) & 0xffff) << (TB_CPU_BITSIZE >> 1)) | (buck) & 0xffff)
+#define TB_HASH_INDEX_MAKE(buck, item) 			(((tb_size_t)((item) & 0xffff) << 16) | (buck) & 0xffff)
 #define TB_HASH_INDEX_BUCK(index) 				((index) & 0xffff)
-#define TB_HASH_INDEX_ITEM(index) 				(((index) >> (TB_CPU_BITSIZE >> 1)) & 0xffff)
+#define TB_HASH_INDEX_ITEM(index) 				(((index) >> 16) & 0xffff)
 
 // grow
 #define TB_HASH_GROW_MIN 						(8)
