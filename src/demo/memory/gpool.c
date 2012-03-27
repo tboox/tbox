@@ -17,7 +17,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	while (maxn--)
 	{
-		data = tb_gpool_malloc0(gpool, 64);
+		data = tb_gpool_malloc(gpool, 64);
 		tb_check_break(data);
 	}
 	time = tb_mclock() - time;
@@ -26,7 +26,7 @@ end:
 
 	// dump
 #ifdef TB_DEBUG
-	tb_gpool_dump(gpool);
+//	tb_gpool_dump(gpool);
 #endif
 
 	// trace

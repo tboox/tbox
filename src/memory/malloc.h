@@ -98,9 +98,9 @@ tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t
 
 // free
 #ifndef TB_DEBUG
-tb_size_t 		tb_memory_free_impl(tb_pointer_t data);
+tb_bool_t 		tb_memory_free_impl(tb_pointer_t data);
 #else
-tb_size_t 		tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_bool_t 		tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // dump
