@@ -214,14 +214,14 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 }
 
 #ifndef TB_DEBUG
-tb_size_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data)
+tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
-tb_size_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, 0);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_FALSE);
 
 #ifndef TB_DEBUG
 	return tb_vpool_free_impl(gpool->vpool, data);

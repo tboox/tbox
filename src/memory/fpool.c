@@ -369,11 +369,13 @@ tb_void_t tb_fpool_dump(tb_handle_t handle)
 	tb_size_t 	m = fpool->maxn;
 	for (i = 0; i < m; ++i)
 	{
-		tb_print("\tfpool: block[%lu]: data: %p free: %lu"
-				, i
-				, fpool->data + i * fpool->step
-				, tb_fpool_used_bset(fpool->used, i)? 0 : 1
-				);
+		if (tb_fpool_used_bset(fpool->used, i))
+		{
+			tb_print("\tfpool: block[%lu]: data: %p"
+					, i
+					, fpool->data + i * fpool->step
+					);
+		}
 	}
 }
 #endif

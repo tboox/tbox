@@ -90,9 +90,73 @@ typedef struct __tb_spool_t
 
 }tb_spool_t;
 
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_pointer_t tb_vpool_ralloc_fast(tb_pointer_t vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 
 /* ///////////////////////////////////////////////////////////////////////
- * the implemention
+ * implemention
+ */
+static tb_pointer_t tb_spool_ralloc_fast(tb_spool_t* spool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
+{
+	// check 
+	tb_assert_and_check_return_val(spool && spool->pools, TB_NULL);
+
+	// no size?
+	tb_check_return_val(size, TB_NULL);
+
+	// check osize
+	tb_assert_and_check_return_val(osize && !*osize, TB_NULL);
+	
+	// reallocate it from the predicted pool first
+	if (spool->pred)
+	{
+		// check
+		tb_assert_and_check_return_val(spool->pred <= spool->pooln, TB_NULL);
+
+		// the predicted pool
+		tb_handle_t vpool = spool->pools[spool->pred - 1].pool;
+		if (vpool) 
+		{
+			// try reallocating it
+			tb_pointer_t p = tb_vpool_ralloc_fast(vpool, data, size, osize);
+
+			// ok?
+			tb_check_return_val(!p, p);
+
+			// no space?
+			tb_check_return_val(!*osize, TB_NULL);
+		}
+	}
+
+	// reallocate it from the existing pool
+	if (spool->pooln)
+	{
+		// allocate it from the last pool
+		tb_size_t n = spool->pooln;
+		while (n--)
+		{
+			tb_handle_t vpool = spool->pools[n].pool;
+			if (vpool) 
+			{
+				// try reallocating it
+				tb_pointer_t p = tb_vpool_ralloc_fast(vpool, data, size, osize);
+
+				// ok?
+				tb_check_return_val(!p, p);
+
+				// no space?
+				tb_check_return_val(!*osize, TB_NULL);
+			}
+		}
+	}
+
+	return TB_NULL;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
  */
 tb_handle_t tb_spool_init(tb_size_t grow, tb_size_t align)
 {
@@ -404,42 +468,34 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 #else
 	if (!data) return tb_spool_malloc_impl(spool, size, func, line, file);
 #endif
-
-	// free it first
-#ifndef TB_DEBUG
-	tb_size_t n = tb_spool_free_impl(spool, data);
-#else
-	tb_size_t n = tb_spool_free_impl(spool, data, func, line, file);
-#endif
+	
+	// ralloc it with fast mode if enough
+	tb_size_t 		osize = 0;
+	tb_pointer_t 	pdata = tb_spool_ralloc_fast(spool, data, size, &osize);
+	tb_check_return_val(!pdata, pdata);
+	tb_assert_and_check_return_val(osize < size, TB_NULL);
 
 	// malloc it
-	// hack: pred => data now and the data is not cleared after freeing
 #ifndef TB_DEBUG
-	tb_pointer_t p = tb_spool_malloc_impl(spool, size);
+	pdata = tb_spool_malloc_impl(spool, size);
 #else
-	tb_pointer_t p = tb_spool_malloc_impl(spool, size, func, line, file);
+	pdata = tb_spool_malloc_impl(spool, size, func, line, file);
+#endif
+	tb_check_return_val(pdata, TB_NULL);
+	tb_assert_and_check_return_val(pdata != data, pdata);
+
+	// copy data
+	tb_memcpy(pdata, data, osize);
+	
+	// free it
+#ifndef TB_DEBUG
+	tb_spool_free_impl(spool, data);
+#else
+	tb_spool_free_impl(spool, data, func, line, file);
 #endif
 
-	if (p)
-	{
-		// need copy data if no enough
-		if (n < size) 
-		{
-			// the data have been changed now.
-			tb_assert_and_check_return_val(p != data, 0);
-
-			// copy it
-			tb_memcpy(p, data, n);
-		}
-		else
-		{
-			// the data is same now.
-			tb_assert_and_check_return_val(p == data, 0);
-		}
-	}
-	
 	// ok
-	return p;
+	return pdata;
 }
 
 #ifndef TB_DEBUG
@@ -488,23 +544,23 @@ tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_s
 }
 
 #ifndef TB_DEBUG
-tb_size_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data)
+tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
-tb_size_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
 	tb_spool_t* spool = (tb_spool_t*)handle;
-	tb_assert_and_check_return_val(spool && spool->pools, 0);
+	tb_assert_and_check_return_val(spool && spool->pools, TB_FALSE);
 
 	// no data?
-	tb_check_return_val(data, 0);
+	tb_check_return_val(data, TB_TRUE);
 	
 	// free it from the predicted pool first
 	if (spool->pred)
 	{
 		// check
-		tb_assert_and_check_return_val(spool->pred <= spool->pooln, 0);
+		tb_assert_and_check_return_val(spool->pred <= spool->pooln, TB_FALSE);
 
 		// the predicted pool
 		tb_handle_t vpool = spool->pools[spool->pred - 1].pool;
@@ -512,9 +568,9 @@ tb_size_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		{
 			// try allocating it
 #ifndef TB_DEBUG
-			tb_size_t r = tb_vpool_free_impl(vpool, data);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data);
 #else
-			tb_size_t r = tb_vpool_free_impl(vpool, data, func, line, func);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
 #endif
 			// ok
 			if (r) return r;
@@ -530,9 +586,9 @@ tb_size_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		{
 			// try free it
 #ifndef TB_DEBUG
-			tb_size_t r = tb_vpool_free_impl(vpool, data);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data);
 #else
-			tb_size_t r = tb_vpool_free_impl(vpool, data, func, line, func);
+			tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
 #endif
 			// ok
 			if (r) 
@@ -545,7 +601,7 @@ tb_size_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 
 	// fail
 	tb_assert_message(0, "invalid free data address: %p", data);
-	return 0;
+	return TB_FALSE;
 }
 
 #ifdef TB_DEBUG

@@ -34,12 +34,18 @@
  */
 
 // index
-#define TB_HASH_INDEX_MAKE(buck, item) 			(((tb_size_t)((item) & 0xffff) << 16) | (buck) & 0xffff)
-#define TB_HASH_INDEX_BUCK(index) 				((index) & 0xffff)
-#define TB_HASH_INDEX_ITEM(index) 				(((index) >> 16) & 0xffff)
+#if TB_CPU_BITSIZE == 64
+# 	define TB_HASH_INDEX_MAKE(buck, item) 			(((tb_size_t)((item) & 0xffffffff) << 32) | (buck) & 0xffffffff)
+# 	define TB_HASH_INDEX_BUCK(index) 				((index) & 0xffffffff)
+# 	define TB_HASH_INDEX_ITEM(index) 				(((index) >> 32) & 0xffffffff)
+#else
+# 	define TB_HASH_INDEX_MAKE(buck, item) 			(((tb_size_t)((item) & 0xffff) << 16) | (buck) & 0xffff)
+# 	define TB_HASH_INDEX_BUCK(index) 				((index) & 0xffff)
+# 	define TB_HASH_INDEX_ITEM(index) 				(((index) >> 16) & 0xffff)
+#endif
 
 // grow
-#define TB_HASH_GROW_MIN 						(8)
+#define TB_HASH_GROW_MIN 							(8)
 
 /* ///////////////////////////////////////////////////////////////////////
  * details

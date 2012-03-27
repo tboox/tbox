@@ -20,7 +20,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	while (maxn--)
 	{
-		data = tb_spool_malloc0(spool, 64);
+		data = tb_spool_malloc(spool, 64);
 		tb_check_break(data);
 	}
 	time = tb_mclock() - time;
@@ -29,7 +29,7 @@ end:
 
 	// dump
 #ifdef TB_DEBUG
-	tb_spool_dump(spool);
+//	tb_spool_dump(spool);
 #endif
 
 	// trace
