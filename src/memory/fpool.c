@@ -185,15 +185,7 @@ tb_void_t tb_fpool_exit(tb_handle_t handle)
 	// clear head
 	tb_memset(fpool, 0, sizeof(tb_fpool_t));
 }
-tb_bool_t tb_fpool_full(tb_handle_t handle)
-{
-	// check 
-	tb_fpool_t* fpool = (tb_fpool_t*)handle;
-	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, TB_FALSE);
 
-	// full?
-	return fpool->size == fpool->maxn? TB_TRUE : TB_FALSE;
-}
 tb_void_t tb_fpool_clear(tb_handle_t handle)
 {
 	// check 

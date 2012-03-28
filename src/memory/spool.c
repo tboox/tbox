@@ -282,7 +282,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 
 		// the predicted pool
 		tb_handle_t vpool = spool->pools[spool->pred - 1].pool;
-		if (vpool && (!tb_vpool_full(vpool) || asize <= tb_vpool_full(vpool))) 
+		if (vpool) 
 		{
 			// try allocating it
 #ifndef TB_DEBUG
@@ -313,10 +313,6 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 			tb_handle_t vpool = spool->pools[n].pool;
 			if (vpool) 
 			{
-				// no space?
-				tb_size_t full = tb_vpool_full(vpool);
-				tb_check_continue(!full || asize <= full);
-
 				// try allocating it
 #ifndef TB_DEBUG
 				tb_pointer_t p = tb_vpool_malloc_impl(vpool, size);
