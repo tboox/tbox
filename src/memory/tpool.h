@@ -17,37 +17,50 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * \author		ruki
- * \file		memory.h
+ * \file		tpool.h
  *
  */
-#ifndef TB_MEMORY_H
-#define TB_MEMORY_H
+#ifndef TB_MEMORY_TPOOL_H
+#define TB_MEMORY_TPOOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "vpool.h"
-#include "fpool.h"
-#include "tpool.h"
-#include "gpool.h"
-#include "spool.h"
-#include "rpool.h"
-#include "malloc.h"
-#include "pbuffer.h"
-#include "sbuffer.h"
-#include "rbuffer.h"
-#include "qbuffer.h"
+
 
 /* ///////////////////////////////////////////////////////////////////////
- * architecture
- *
- *  spool-----------\
- *            |     vpool --
- * malloc - gpool -|        | - data: |-------------------------------|
- *            |     tpool --
- *  rpool---------- fpool --'
+ * interfaces
  */
 
-#endif
+// init
+tb_handle_t 	tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
+// exit
+tb_void_t 		tb_tpool_exit(tb_handle_t handle);
+
+// clear
+tb_void_t 		tb_tpool_clear(tb_handle_t handle);
+
+// malloc
+tb_pointer_t 	tb_tpool_malloc(tb_handle_t handle, tb_size_t size);
+
+// malloc0
+tb_pointer_t 	tb_tpool_malloc0(tb_handle_t handle, tb_size_t size);
+
+// nalloc
+tb_pointer_t  	tb_tpool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size);
+
+// nalloc0
+tb_pointer_t  	tb_tpool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size);
+
+// ralloc
+tb_pointer_t 	tb_tpool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
+
+// free
+tb_bool_t 		tb_tpool_free(tb_handle_t handle, tb_pointer_t data);
+
+// dump
+tb_void_t 		tb_tpool_dump(tb_handle_t handle);
+
+#endif

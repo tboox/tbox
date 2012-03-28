@@ -16,6 +16,7 @@ tbox_C_FILES 			+= \
 						math/fixed16 \
 						memory/vpool \
 						memory/fpool \
+						memory/tpool \
 						memory/gpool \
 						memory/spool \
 						memory/rpool \
@@ -174,7 +175,8 @@ INC_FILES 				= \
 						prefix/config.h \
 						memory/vpool.h \
 						memory/fpool.h \
-						memory/gpool.h \
+						memory/tpool.h \
+ 						memory/gpool.h \
 						memory/spool.h \
 						memory/rpool.h \
 						memory/prefix.h \
