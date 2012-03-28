@@ -91,6 +91,9 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size, func, line, file);
 #endif
 
+	// check
+	tb_assert(p);
+
 	// leave
 	tb_mutex_leave(g_mutex);
 	return p;
@@ -113,6 +116,9 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 #else
 	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size, func, line, file);
 #endif
+
+	// check
+	tb_assert(p);
 
 	// leave
 	tb_mutex_leave(g_mutex);
@@ -137,6 +143,9 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size, func, line, file);
 #endif
 
+	// check
+	tb_assert(p);
+
 	// leave
 	tb_mutex_leave(g_mutex);
 	return p;
@@ -159,6 +168,9 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 #else
 	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size, func, line, file);
 #endif
+
+	// check
+	tb_assert(p);
 
 	// leave
 	tb_mutex_leave(g_mutex);
@@ -183,6 +195,9 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size, func, line, file);
 #endif
 
+	// check
+	tb_assert(p);
+
 	// leave
 	tb_mutex_leave(g_mutex);
 	return p;
@@ -205,6 +220,9 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 #else
 	tb_bool_t r = tb_gpool_free_impl(g_gpool, data, func, line, file);
 #endif
+
+	// check
+	tb_assert(r);
 
 	// leave
 	tb_mutex_leave(g_mutex);

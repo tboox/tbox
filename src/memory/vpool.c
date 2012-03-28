@@ -137,9 +137,6 @@ typedef struct __tb_vpool_t
 // malloc from the given data address
 static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)
 {
-	// check
-	tb_assert_and_check_return_val(!vpool->full || size <= vpool->full, TB_NULL);
-
 	// pb & pe
 	tb_byte_t* 	pb = vpool->data;
 	tb_byte_t* 	pe = pb + vpool->size;
@@ -193,19 +190,22 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 					next->size = bsize - size - nhead;
 					next->free = 1;
 					block->size = size;
+
+					// predict the next free block
+					vpool->pred = p + block->size;
 				}
 				// use the whole block
 				else block->size = bsize;
 
-				// free the block
+				// alloc the block
 				block->free = 0;
 
-				// predict the next free block
-				vpool->pred = p + block->size;
-
-				// reset the next predicted block
-				if (vpool->pred == pe)
+				// reset the predicted block
+				if (vpool->pred == (tb_byte_t*)block || vpool->pred == pe)
 					vpool->pred = TB_NULL;
+
+				// reset full
+				vpool->full = 0;
 
 				// return data address
 				return p;
@@ -281,29 +281,50 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 	tb_assert_and_check_return_val(block->size < vpool->size, TB_NULL);
 	tb_assert_and_check_return_val(!block->free, TB_NULL);
 
-	// merge it if the next block is free
+	// osize
+	if (osize) *osize = block->size;
+
+	// ok?
+	if (block->size >= size) return data; 
+
+	// align size
+	tb_size_t asize = tb_align(size, vpool->align);
+
+	// merge it if the next block is free and the space is enough
 	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
-	if (next->free) 
+	if (next->free && block->size + nhead + next->size >= asize) 
 	{
 		// merge it
 		block->size += nhead + next->size;
 
-		// reset the next predicted block
-		if (vpool->pred == (tb_byte_t*)next)
+		// split it if the free block is too large
+		if (block->size > nhead + asize)
+		{
+			// split block
+			next = (tb_vpool_block_t*)(p + asize);
+			next->size = block->size - asize - nhead;
+			next->free = 1;
+			block->size = asize;
+
+			// predict the next free block
+			vpool->pred = p + block->size;
+		}
+
+		// reset the predicted block
+		if (vpool->pred == (tb_byte_t*)block || vpool->pred == pe)
 			vpool->pred = TB_NULL;
 
 		// reset full
 		vpool->full = 0;
+
+		// osize
+		if (osize) *osize = block->size;
+
+		// ok
+		return data;
 	}
 
-	// osize
-	if (osize) *osize = block->size;
-
-	// no space?
-	tb_check_return_val(block->size >= size, TB_NULL); 
-
-	// ok
-	return data;
+	return TB_NULL;
 }
 
 
@@ -413,15 +434,7 @@ tb_void_t tb_vpool_clear(tb_handle_t handle)
 	vpool->info.aloc = 0;
 #endif
 }
-tb_size_t tb_vpool_full(tb_handle_t handle)
-{
-	// check 
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, 0);
 
-	// full?
-	return vpool->full;
-}
 #ifndef TB_DEBUG
 tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size)
 #else
@@ -437,6 +450,9 @@ tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 
 	// align size
 	tb_size_t asize = tb_align(size, vpool->align);
+
+	// full?
+	tb_check_return_val(!vpool->full || asize <= vpool->full, TB_NULL);
 
 	// one tryn
 	tb_size_t tryn = 1;
@@ -583,17 +599,11 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	if (!data) return tb_vpool_malloc_impl(vpool, size, func, line, file);
 #endif
 	
-#if 1
 	// ralloc it with fast mode if enough
 	tb_size_t 		osize = 0;
 	tb_pointer_t 	pdata = tb_vpool_ralloc_fast(vpool, data, size, &osize);
 	tb_check_return_val(!pdata, pdata);
 	tb_assert_and_check_return_val(osize < size, TB_NULL);
-#else
-
-	tb_size_t 		osize = size;
-	tb_pointer_t 	pdata = TB_NULL;
-#endif
 
 	// malloc it
 #ifndef TB_DEBUG
