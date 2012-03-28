@@ -5,6 +5,7 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		vpool \
 		fpool \
+		tpool \
 		gpool \
 		spool \
 		rpool \
