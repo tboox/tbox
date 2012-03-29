@@ -260,7 +260,17 @@ tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 			b = i & 0x07;
 
 			// u++
-			if (!b) u = *p++;
+			if (!b) 
+			{
+				u = *p++;
+					
+				// skip the non-free byte
+				if (u == 0xff)
+				{
+					i += 7;
+					continue ;
+				}
+			}
 
 			// is free?
 			// if (!tb_fpool_used_bset(fpool->used, i))
@@ -318,8 +328,8 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 	tb_check_return_val(fpool->size, TB_FALSE);
 
 	// check data
+	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->maxn * fpool->step, TB_FALSE);	
 	tb_check_return_val(!(((tb_size_t)data) & (fpool->align - 1)), TB_FALSE);
-	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->maxn * fpool->step, TB_FALSE);
 	tb_check_return_val(!(((tb_byte_t*)data - fpool->data) % fpool->step), TB_FALSE);
 
 	// item
@@ -347,7 +357,7 @@ tb_void_t tb_fpool_dump(tb_handle_t handle)
 	tb_assert_and_check_return(fpool);
 
 	tb_print("======================================================================");
-	tb_print("fpool: magic: 0x%lx",	fpool->magic);
+	tb_print("fpool: magic: %#lx",	fpool->magic);
 	tb_print("fpool: align: %lu", 	fpool->align);
 	tb_print("fpool: data: %p", 	fpool->data);
 	tb_print("fpool: size: %lu", 	fpool->size);
@@ -361,13 +371,7 @@ tb_void_t tb_fpool_dump(tb_handle_t handle)
 	tb_size_t 	m = fpool->maxn;
 	for (i = 0; i < m; ++i)
 	{
-		if (tb_fpool_used_bset(fpool->used, i))
-		{
-			tb_print("\tfpool: block[%lu]: data: %p"
-					, i
-					, fpool->data + i * fpool->step
-					);
-		}
+		if (!(i & 0x7) && fpool->used[i >> 3]) tb_print("\tfpool: block[%lu]: %08b", i >> 3, fpool->used[i >> 3]);
 	}
 }
 #endif
