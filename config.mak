@@ -2,10 +2,10 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = linux_x86
+PLAT = mac_x86
 
 # root
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = y
 SDK = /home/ruki/programs/windows/cross

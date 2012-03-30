@@ -335,31 +335,16 @@
 
 // cl1, count leading bit 1
 #ifndef tb_bits_cl1_u32_be 
-# 	define tb_bits_cl1_u32_be(x) 		tb_bits_cl1_u32_be_inline(x)
+# 	define tb_bits_cl1_u32_be(x) 		tb_bits_cl0_u32_be(~(tb_uint32_t)(x))
 #endif
 #ifndef tb_bits_cl1_u32_le
-# 	define tb_bits_cl1_u32_le(x) 		tb_bits_cl1_u32_le_inline(x)
+# 	define tb_bits_cl1_u32_le(x) 		tb_bits_cl0_u32_le(~(tb_uint32_t)(x))
 #endif
 #ifndef tb_bits_cl1_u64_be
-# 	define tb_bits_cl1_u64_be(x) 		tb_bits_cl1_u64_be_inline(x)
+# 	define tb_bits_cl1_u64_be(x) 		tb_bits_cl0_u64_be(~(tb_uint64_t)(x))
 #endif
 #ifndef tb_bits_cl1_u64_le
-# 	define tb_bits_cl1_u64_le(x) 		tb_bits_cl1_u64_le_inline(x)
-#endif
-
-// cb0, count bit 0
-#ifdef TB_COMPILER_IS_GCC
-# 	define tb_bits_cb0_u32(x) 			((x)? (tb_size_t)__builtin_popcount(~(tb_uint32_t)(x)) : 32)
-# 	if TB_CPU_BITSIZE == 64
-# 	define tb_bits_cb0_u64(x) 			((x)? (tb_size_t)__builtin_popcountl(~(tb_uint64_t)(x)) : 64)
-# 	endif
-#endif
-
-#ifndef tb_bits_cb0_u32
-# 	define tb_bits_cb0_u32(x) 			tb_bits_cb0_u32_inline(x)
-#endif
-#ifndef tb_bits_cb0_u64
-# 	define tb_bits_cb0_u64(x) 			tb_bits_cb0_u64_inline(x)
+# 	define tb_bits_cl1_u64_le(x) 		tb_bits_cl0_u64_le(~(tb_uint64_t)(x))
 #endif
 
 // cb1, count bit 1
@@ -377,22 +362,30 @@
 # 	define tb_bits_cb1_u64(x) 			tb_bits_cb1_u64_inline(x)
 #endif
 
+// cb0, count bit 0
+#ifndef tb_bits_cb0_u32
+# 	define tb_bits_cb0_u32(x) 			((x)? (tb_size_t)tb_bits_cb1_u32(~(tb_uint32_t)(x)) : 32)
+#endif
+#ifndef tb_bits_cb0_u64
+# 	define tb_bits_cb0_u64(x) 			((x)? (tb_size_t)tb_bits_cb1_u64(~(tb_uint64_t)(x)) : 64)
+#endif
+
 /* fb0, find the first bit 0
  * 
  * find bit zero by little endian, fb0(...11101101) == 1
  * find bit zero by big endian, fb0(...11101101) == 27
  */
 #ifndef tb_bits_fb0_u32_be 
-# 	define tb_bits_fb0_u32_be(x) 		tb_bits_fb0_u32_be_inline(x)
+# 	define tb_bits_fb0_u32_be(x) 		((x)? tb_bits_cl0_u32_be(~(tb_uint32_t)(x)) : 0)
 #endif
 #ifndef tb_bits_fb0_u32_le
-# 	define tb_bits_fb0_u32_le(x) 		tb_bits_fb0_u32_le_inline(x)
+# 	define tb_bits_fb0_u32_le(x) 		((x)? tb_bits_cl0_u32_le(~(tb_uint32_t)(x)) : 0)
 #endif
 #ifndef tb_bits_fb0_u64_be 
-# 	define tb_bits_fb0_u64_be(x) 		tb_bits_fb0_u64_be_inline(x)
+# 	define tb_bits_fb0_u64_be(x) 		((x)? tb_bits_cl0_u64_be(~(tb_uint64_t)(x)) : 0)
 #endif
 #ifndef tb_bits_fb0_u64_le
-# 	define tb_bits_fb0_u64_le(x) 		tb_bits_fb0_u64_le_inline(x)
+# 	define tb_bits_fb0_u64_le(x) 		((x)? tb_bits_cl0_u64_le(~(tb_uint64_t)(x)) : 0)
 #endif
 
 // fb1, find the first bit 0
@@ -404,16 +397,16 @@
 #endif
 
 #ifndef tb_bits_fb1_u32_be 
-# 	define tb_bits_fb1_u32_be(x) 		tb_bits_fb1_u32_be_inline(x)
+# 	define tb_bits_fb1_u32_be(x) 		((x)? tb_bits_cl0_u32_be(x) : 32)
 #endif
 #ifndef tb_bits_fb1_u32_le
-# 	define tb_bits_fb1_u32_le(x) 		tb_bits_fb1_u32_le_inline(x)
+# 	define tb_bits_fb1_u32_le(x) 		((x)? tb_bits_cl0_u32_le(x) : 32)
 #endif
 #ifndef tb_bits_fb1_u64_be 
-# 	define tb_bits_fb1_u64_be(x) 		tb_bits_fb1_u64_be_inline(x)
+# 	define tb_bits_fb1_u64_be(x) 		((x)? tb_bits_cl0_u64_be(x) : 64)
 #endif
 #ifndef tb_bits_fb1_u64_le
-# 	define tb_bits_fb1_u64_le(x) 		tb_bits_fb1_u64_le_inline(x)
+# 	define tb_bits_fb1_u64_le(x) 		((x)? tb_bits_cl0_u64_le(x) : 64)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -508,119 +501,70 @@ static __tb_inline__ tb_size_t tb_bits_cl0_u64_le_inline(tb_uint64_t x)
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * cl1
- */
-static __tb_inline__ tb_size_t tb_bits_cl1_u32_be_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 0);
-
-	tb_trace_noimpl();
-	return 0;
-}
-static __tb_inline__ tb_size_t tb_bits_cl1_u32_le_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 0);
-
-	tb_trace_noimpl();
-	return 0;
-}
-static __tb_inline__ tb_size_t tb_bits_cl1_u64_be_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 0);
-
-	tb_size_t n = tb_bits_cl1_u32_be((tb_uint32_t)(x >> 32));
-	if (n == 32) n += tb_bits_cl1_u32_be((tb_uint32_t)x);
-
-    return n;
-}
-static __tb_inline__ tb_size_t tb_bits_cl1_u64_le_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 0);
-
-	tb_size_t n = tb_bits_cl1_u32_le((tb_uint32_t)x);
-	if (n == 32) n += tb_bits_cl1_u32_le((tb_uint32_t)(x >> 32));
-
-    return n;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * cb0
- */
-static __tb_inline__ tb_size_t tb_bits_cb0_u32_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 32);
-	tb_trace_noimpl();
-    return 0;
-}
-static __tb_inline__ tb_size_t tb_bits_cb0_u64_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 64);
-	tb_trace_noimpl();
-    return 0;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * cb1
  */
 static __tb_inline__ tb_size_t tb_bits_cb1_u32_inline(tb_uint32_t x)
 {
     tb_check_return_val(x, 0);
-	tb_trace_noimpl();
-    return 0;
+
+#if 0
+	/* 
+	 * 0x55555555 = 01010101010101010101010101010101 
+	 * 0x33333333 = 00110011001100110011001100110011 
+	 * 0x0f0f0f0f = 00001111000011110000111100001111 
+	 * 0x00ff00ff = 00000000111111110000000011111111 
+	 * 0x0000ffff = 00000000000000001111111111111111 
+	 */  
+
+	x = (x & 0x55555555) + ((x >> 1) & 0x55555555);  
+	x = (x & 0x33333333) + ((x >> 2) & 0x33333333);  
+	x = (x & 0x0f0f0f0f) + ((x >> 4) & 0x0f0f0f0f);  
+	x = (x & 0x00ff00ff) + ((x >> 8) & 0x00ff00ff);  
+	x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff); 
+#elif 0
+	// mit hackmem count
+	x = x - ((x >> 1) & 0x55555555);
+	x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+	x = (x + (x >> 4)) & 0x0f0f0f0f;
+	x = x + (x >> 8);
+	x = x + (x >> 16);
+	x &= 0x7f;
+#elif 0
+	x = x - ((x >> 1) & 0x55555555);
+	x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+	x = (x + (x >> 4) & 0x0f0f0f0f);
+	x = (x * 0x01010101) >> 24;
+#elif 0
+	x = x - ((x >> 1) & 0x55555555);
+	x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+	x = (x + (x >> 4) & 0x0f0f0f0f) % 255;
+#else
+	x = x - ((x >> 1) & 0x77777777) - ((x >> 2) & 0x33333333) - ((x >> 3) & 0x11111111);
+	x = (x + (x >> 4) & 0x0f0f0f0f);
+	x = (x * 0x01010101) >> 24;
+#endif
+
+    return x;
 }
 static __tb_inline__ tb_size_t tb_bits_cb1_u64_inline(tb_uint64_t x)
 {
     tb_check_return_val(x, 0);
-	tb_trace_noimpl();
-    return 0;
-}
 
-/* ///////////////////////////////////////////////////////////////////////
- * fb0
- */
-static __tb_inline__ tb_size_t tb_bits_fb0_u32_be_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 0);
-    return tb_bits_cl0_u32_be(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb0_u32_le_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 0);
-    return tb_bits_cl0_u32_le(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb0_u64_be_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 0);
-    return tb_bits_cl0_u64_be(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb0_u64_le_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 0);
-    return tb_bits_cl0_u64_le(~x);
-}
+#if 0
+	x = x - ((x >> 1) & 0x5555555555555555L);
+	x = (x & 0x3333333333333333L) + ((x >> 2) & 0x3333333333333333L);
+	x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0fL;
+	x = x + (x >> 8);
+	x = x + (x >> 16);
+	x = x + (x >> 32);
+	x &= 0x7f;
+#else
+	x = x - ((x >> 1) & 0x7777777777777777L) - ((x >> 2) & 0x3333333333333333L) - ((x >> 3) & 0x1111111111111111L);
+	x = (x + (x >> 4) & 0x0f0f0f0f0f0f0f0fL);
+	x = (x * 0x0101010101010101L) >> 56;
+#endif
 
-/* ///////////////////////////////////////////////////////////////////////
- * fb1
- */
-static __tb_inline__ tb_size_t tb_bits_fb1_u32_be_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 32);
-    return tb_bits_cl1_u32_be(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb1_u32_le_inline(tb_uint32_t x)
-{
-    tb_check_return_val(x, 32);
-    return tb_bits_cl1_u32_le(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb1_u64_be_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 64);
-    return tb_bits_cl1_u64_be(~x);
-}
-static __tb_inline__ tb_size_t tb_bits_fb1_u64_le_inline(tb_uint64_t x)
-{
-    tb_check_return_val(x, 64);
-    return tb_bits_cl1_u64_le(~x);
+    return x;
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
