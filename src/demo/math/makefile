@@ -6,6 +6,7 @@ NAMES = \
 		fixed \
 		float \
 		scalar \
+		int32 \
 		rand
 
 include $(SRC_DIR)/demo/makefile

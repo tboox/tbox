@@ -27,6 +27,7 @@
 #include "aicp.h"
 #include "aioo.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 #include "fpool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -102,7 +103,157 @@ typedef struct __tb_fpool_t
 }tb_fpool_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * the implemention
+ * implemention
+ */
+static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
+{
+	tb_pointer_t data = TB_NULL;
+	if (fpool->pred)
+	{
+		tb_size_t i = (fpool->pred - fpool->data) / fpool->step;
+		tb_assert_and_check_return_val(!((fpool->pred - fpool->data) % fpool->step), TB_NULL);
+		if (!tb_fpool_used_bset(fpool->used, i)) 
+		{
+			// ok
+			data = fpool->pred;
+			tb_fpool_used_set1(fpool->used, i);
+
+			// predict the next block
+			if (i + 1 < fpool->maxn && !tb_fpool_used_bset(fpool->used, i + 1))
+				fpool->pred = fpool->data + (i + 1) * fpool->step;
+
+#ifdef TB_DEBUG
+			// pred++
+			fpool->info.pred++;
+#endif
+		}
+	}
+
+	// ok?
+	return data;
+}
+
+#if TB_CPU_BITBYTE == 4
+static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
+{
+	tb_size_t 	i = 0;
+	tb_byte_t 	b = 0;
+	tb_byte_t 	u = 0;
+	tb_size_t 	m = tb_align(fpool->maxn, 32) >> 5;
+	tb_size_t* 	p = (tb_size_t*)fpool->used;
+	tb_size_t* 	e = (tb_size_t*)fpool->used + m;
+	tb_byte_t* 	d = TB_NULL;
+
+	// check align
+	tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), TB_NULL);
+
+	// find the free chunk, step * 32 items
+//	while (p < e && *p == 0xffffffff) p++;
+	while (p < e && !(*p + 1)) p++;
+
+	// find the free bit index
+	m = fpool->maxn;
+	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_u32_le(*p);
+	tb_check_return_val(i < m, TB_NULL);
+
+	// alloc it
+	d = fpool->data + i * fpool->step;
+	tb_fpool_used_set1(fpool->used, i);
+
+	// predict the next block
+	if (i + 1 < m && !tb_fpool_used_bset(fpool->used, i + 1))
+		fpool->pred = fpool->data + (i + 1) * fpool->step;
+
+	// ok?
+	return d;
+}
+#elif TB_CPU_BITBYTE == 8
+static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
+{
+	tb_size_t 	i = 0;
+	tb_byte_t 	b = 0;
+	tb_byte_t 	u = 0;
+	tb_size_t 	m = tb_align(fpool->maxn, 64) >> 6;
+	tb_size_t* 	p = (tb_size_t*)fpool->used;
+	tb_size_t* 	e = (tb_size_t*)fpool->used + m;
+	tb_byte_t* 	d = TB_NULL;
+
+	// check align
+	tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), TB_NULL);
+
+	// find the free chunk, step * 64 items
+//	while (p < e && *p == 0xffffffff) p++;
+	while (p < e && !(*p + 1)) p++;
+
+	// find the free bit index
+	m = fpool->maxn;
+	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_u64_le(*p);
+	tb_check_return_val(i < m, TB_NULL);
+
+	// alloc it
+	d = fpool->data + i * fpool->step;
+	tb_fpool_used_set1(fpool->used, i);
+
+	// predict the next block
+	if (i + 1 < m && !tb_fpool_used_bset(fpool->used, i + 1))
+		fpool->pred = fpool->data + (i + 1) * fpool->step;
+
+	// ok?
+	return d;
+}
+#else
+static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
+{
+	tb_size_t 	i = 0;
+	tb_size_t 	m = fpool->maxn;
+	tb_byte_t* 	p = fpool->used;
+	tb_byte_t 	u = *p;
+	tb_byte_t 	b = 0;
+	tb_byte_t* 	d = TB_NULL;
+	for (i = 0; i < m; ++i)
+	{
+		// bit
+		b = i & 0x07;
+
+		// u++
+		if (!b) 
+		{
+			u = *p++;
+				
+			// skip the non-free byte
+			//if (u == 0xff)
+			if (!(u + 1))
+			{
+				i += 7;
+				continue ;
+			}
+		}
+
+		// is free?
+		// if (!tb_fpool_used_bset(fpool->used, i))
+		if (!(u & (0x01 << b)))
+		{
+			// ok
+			d = fpool->data + i * fpool->step;
+			// tb_fpool_used_set1(fpool->used, i);
+			*(p - 1) |= (0x01 << b);
+
+			// predict the next block
+			if (i + 1 < m && !tb_fpool_used_bset(fpool->used, i + 1))
+				fpool->pred = fpool->data + (i + 1) * fpool->step;
+
+			break;
+		}
+	}
+
+	// ok?
+	return d;
+}
+#endif
+
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
  */
 tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align)
 {
@@ -111,6 +262,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	align = tb_max(align, TB_CPU_BITBYTE);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
@@ -224,71 +376,10 @@ tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 	tb_check_return_val(fpool->size < fpool->maxn, TB_NULL);
 
 	// predict it?
-	tb_pointer_t data = TB_NULL;
-	if (fpool->pred)
-	{
-		tb_size_t i = (fpool->pred - fpool->data) / fpool->step;
-		tb_assert_and_check_return_val(!((fpool->pred - fpool->data) % fpool->step), TB_NULL);
-		if (!tb_fpool_used_bset(fpool->used, i)) 
-		{
-			// ok
-			data = fpool->pred;
-			tb_fpool_used_set1(fpool->used, i);
-
-			// predict the next block
-			if (i + 1 < fpool->maxn && !tb_fpool_used_bset(fpool->used, i + 1))
-				fpool->pred = fpool->data + (i + 1) * fpool->step;
-
-#ifdef TB_DEBUG
-			// pred++
-			fpool->info.pred++;
-#endif
-		}
-	}
+	tb_pointer_t data = tb_fpool_malloc_pred(fpool);
 
 	// find the free block
-	if (!data)
-	{
-		tb_size_t 	i = 0;
-		tb_size_t 	m = fpool->maxn;
-		tb_byte_t* 	p = fpool->used;
-		tb_byte_t 	u = *p;
-		tb_byte_t 	b = 0;
-		for (i = 0; i < m; ++i)
-		{
-			// bit
-			b = i & 0x07;
-
-			// u++
-			if (!b) 
-			{
-				u = *p++;
-					
-				// skip the non-free byte
-				if (u == 0xff)
-				{
-					i += 7;
-					continue ;
-				}
-			}
-
-			// is free?
-			// if (!tb_fpool_used_bset(fpool->used, i))
-			if (!(u & (0x01 << b)))
-			{
-				// ok
-				data = fpool->data + i * fpool->step;
-				// tb_fpool_used_set1(fpool->used, i);
-				*(p - 1) |= (0x01 << b);
-
-				// predict the next block
-				if (i + 1 < m && !tb_fpool_used_bset(fpool->used, i + 1))
-					fpool->pred = fpool->data + (i + 1) * fpool->step;
-
-				break;
-			}
-		}
-	}
+	if (!data) data = tb_fpool_malloc_find(fpool);
 
 	// size++
 	if (data) fpool->size++;

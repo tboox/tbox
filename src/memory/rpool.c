@@ -26,7 +26,9 @@
  */
 #include "rpool.h"
 #include "fpool.h"
+#include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -113,6 +115,7 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 
 	// init pools align
 	rpool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	rpool->align = tb_max(rpool->align, TB_CPU_BITBYTE);
 
 	// init chunk step
 	rpool->step = step;

@@ -26,7 +26,7 @@ end:
 
 	// dump
 #ifdef TB_DEBUG
-//	tb_fpool_dump(fpool);
+	tb_fpool_dump(fpool);
 #endif
 
 	// trace

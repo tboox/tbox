@@ -24,6 +24,7 @@
  * includes
  */
 #include "int32.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
@@ -313,20 +314,6 @@ tb_uint32_t tb_int32_rlog2(tb_uint32_t x)
 	return m;
 }
 
-tb_size_t tb_int32_clz_generic(tb_uint32_t x)
-{
-    tb_check_return_val(x, 32);
-
-	tb_size_t n = 31;
-	if (x & 0xffff0000) { n -= 16; 	x >>= 16; 	}
-	if (x & 0xff00) 	{ n -= 8; 	x >>= 8; 	}
-	if (x & 0xf0) 		{ n -= 4; 	x >>= 4; 	}
-	if (x & 0xc) 		{ n -= 2; 	x >>= 2; 	}
-	if (x & 0x2) 		{ n--; 		x >>= 1; 	}
-
-    return n;
-}
-
 tb_int32_t tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits)
 {
 	tb_assert(y);
@@ -337,8 +324,8 @@ tb_int32_t tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits)
 	x = tb_abs(x);
 	y = tb_abs(y);
 
-	tb_int_t xbits = (tb_int_t)tb_int32_clz(x) - 1;
-	tb_int_t ybits = (tb_int_t)tb_int32_clz(y) - 1;
+	tb_int_t xbits = (tb_int_t)tb_bits_cl0_u32_be(x) - 1;
+	tb_int_t ybits = (tb_int_t)tb_bits_cl0_u32_be(y) - 1;
     tb_int_t bits = nbits - xbits + ybits;
  
 	// underflow?

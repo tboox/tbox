@@ -27,6 +27,7 @@
 #include "vpool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -338,6 +339,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	align = tb_max(align, TB_CPU_BITBYTE);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
