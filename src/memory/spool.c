@@ -26,7 +26,9 @@
  */
 #include "spool.h"
 #include "vpool.h"
+#include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -168,6 +170,7 @@ tb_handle_t tb_spool_init(tb_size_t grow, tb_size_t align)
 
 	// init pools align
 	spool->align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
+	spool->align = tb_max(spool->align, TB_CPU_BITBYTE);
 
 	// init chunk grow
 	spool->grow = grow;

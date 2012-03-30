@@ -50,7 +50,7 @@
 #define tb_align4(x) 			(((x) + 3) >> 2 << 2)
 #define tb_align8(x) 			(((x) + 7) >> 3 << 3)
 #define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
-#define tb_align_pow2(x) 		(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_int32_clz((tb_uint32_t)(x))))) : 2)
+#define tb_align_pow2(x) 		(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 2)
 
 
 #endif

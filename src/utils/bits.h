@@ -310,6 +310,112 @@
 #define tb_bits_ne_to_be_u64(x) 		tb_bits_be_to_ne_u64(x)
 #define tb_bits_ne_to_le_u64(x) 		tb_bits_le_to_ne_u64(x)
 
+// cl0, count leading bit 0
+#ifdef TB_COMPILER_IS_GCC
+# 	define tb_bits_cl0_u32_be(x) 		((x)? (tb_size_t)__builtin_clz((tb_uint32_t)(x)) : 32)
+# 	define tb_bits_cl0_u32_le(x) 		((x)? (tb_size_t)__builtin_ctz((tb_uint32_t)(x)) : 32)
+# 	if TB_CPU_BITSIZE == 64
+# 		define tb_bits_cl0_u64_be(x) 	((x)? (tb_size_t)__builtin_clzl((tb_uint64_t)(x)) : 64)
+# 		define tb_bits_cl0_u64_le(x) 	((x)? (tb_size_t)__builtin_ctzl((tb_uint64_t)(x)) : 64)
+# 	endif
+#endif
+
+#ifndef tb_bits_cl0_u32_be 
+# 	define tb_bits_cl0_u32_be(x) 		tb_bits_cl0_u32_be_inline(x)
+#endif
+#ifndef tb_bits_cl0_u32_le
+# 	define tb_bits_cl0_u32_le(x) 		tb_bits_cl0_u32_le_inline(x)
+#endif
+#ifndef tb_bits_cl0_u64_be
+# 	define tb_bits_cl0_u64_be(x) 		tb_bits_cl0_u64_be_inline(x)
+#endif
+#ifndef tb_bits_cl0_u64_le
+# 	define tb_bits_cl0_u64_le(x) 		tb_bits_cl0_u64_le_inline(x)
+#endif
+
+// cl1, count leading bit 1
+#ifndef tb_bits_cl1_u32_be 
+# 	define tb_bits_cl1_u32_be(x) 		tb_bits_cl1_u32_be_inline(x)
+#endif
+#ifndef tb_bits_cl1_u32_le
+# 	define tb_bits_cl1_u32_le(x) 		tb_bits_cl1_u32_le_inline(x)
+#endif
+#ifndef tb_bits_cl1_u64_be
+# 	define tb_bits_cl1_u64_be(x) 		tb_bits_cl1_u64_be_inline(x)
+#endif
+#ifndef tb_bits_cl1_u64_le
+# 	define tb_bits_cl1_u64_le(x) 		tb_bits_cl1_u64_le_inline(x)
+#endif
+
+// cb0, count bit 0
+#ifdef TB_COMPILER_IS_GCC
+# 	define tb_bits_cb0_u32(x) 			((x)? (tb_size_t)__builtin_popcount(~(tb_uint32_t)(x)) : 32)
+# 	if TB_CPU_BITSIZE == 64
+# 	define tb_bits_cb0_u64(x) 			((x)? (tb_size_t)__builtin_popcountl(~(tb_uint64_t)(x)) : 64)
+# 	endif
+#endif
+
+#ifndef tb_bits_cb0_u32
+# 	define tb_bits_cb0_u32(x) 			tb_bits_cb0_u32_inline(x)
+#endif
+#ifndef tb_bits_cb0_u64
+# 	define tb_bits_cb0_u64(x) 			tb_bits_cb0_u64_inline(x)
+#endif
+
+// cb1, count bit 1
+#ifdef TB_COMPILER_IS_GCC
+# 	define tb_bits_cb1_u32(x) 			((x)? (tb_size_t)__builtin_popcount((tb_uint32_t)(x)) : 0)
+# 	if TB_CPU_BITSIZE == 64
+# 	define tb_bits_cb1_u64(x) 			((x)? (tb_size_t)__builtin_popcountl((tb_uint64_t)(x)) : 0)
+# 	endif
+#endif
+
+#ifndef tb_bits_cb1_u32
+# 	define tb_bits_cb1_u32(x) 			tb_bits_cb1_u32_inline(x)
+#endif
+#ifndef tb_bits_cb1_u64
+# 	define tb_bits_cb1_u64(x) 			tb_bits_cb1_u64_inline(x)
+#endif
+
+/* fb0, find the first bit 0
+ * 
+ * find bit zero by little endian, fb0(...11101101) == 1
+ * find bit zero by big endian, fb0(...11101101) == 27
+ */
+#ifndef tb_bits_fb0_u32_be 
+# 	define tb_bits_fb0_u32_be(x) 		tb_bits_fb0_u32_be_inline(x)
+#endif
+#ifndef tb_bits_fb0_u32_le
+# 	define tb_bits_fb0_u32_le(x) 		tb_bits_fb0_u32_le_inline(x)
+#endif
+#ifndef tb_bits_fb0_u64_be 
+# 	define tb_bits_fb0_u64_be(x) 		tb_bits_fb0_u64_be_inline(x)
+#endif
+#ifndef tb_bits_fb0_u64_le
+# 	define tb_bits_fb0_u64_le(x) 		tb_bits_fb0_u64_le_inline(x)
+#endif
+
+// fb1, find the first bit 0
+#ifdef TB_COMPILER_IS_GCC
+# 	define tb_bits_fb1_u32_le(x) 		((x)? (tb_size_t)__builtin_ffs((tb_uint32_t)(x)) - 1 : 32)
+# 	if TB_CPU_BITSIZE == 64
+# 	define tb_bits_fb1_u64_le(x) 		((x)? (tb_size_t)__builtin_ffs((tb_uint64_t)(x)) - 1 : 64)
+# 	endif
+#endif
+
+#ifndef tb_bits_fb1_u32_be 
+# 	define tb_bits_fb1_u32_be(x) 		tb_bits_fb1_u32_be_inline(x)
+#endif
+#ifndef tb_bits_fb1_u32_le
+# 	define tb_bits_fb1_u32_le(x) 		tb_bits_fb1_u32_le_inline(x)
+#endif
+#ifndef tb_bits_fb1_u64_be 
+# 	define tb_bits_fb1_u64_be(x) 		tb_bits_fb1_u64_be_inline(x)
+#endif
+#ifndef tb_bits_fb1_u64_le
+# 	define tb_bits_fb1_u64_le(x) 		tb_bits_fb1_u64_le_inline(x)
+#endif
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -351,6 +457,170 @@ static __tb_inline__ tb_hize_t const tb_bits_swap_u64_inline(tb_hize_t x)
 	r.u32[1] = tb_bits_swap_u32(w.u32[0]);
 
 	return r.u64;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * cl0
+ */
+static __tb_inline__ tb_size_t tb_bits_cl0_u32_be_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 32);
+
+	tb_size_t n = 31;
+	if (x & 0xffff0000) { n -= 16; 	x >>= 16; 	}
+	if (x & 0xff00) 	{ n -= 8; 	x >>= 8; 	}
+	if (x & 0xf0) 		{ n -= 4; 	x >>= 4; 	}
+	if (x & 0xc) 		{ n -= 2; 	x >>= 2; 	}
+	if (x & 0x2) 		{ n--; 					}
+
+    return n;
+}
+static __tb_inline__ tb_size_t tb_bits_cl0_u32_le_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 32);
+
+	tb_size_t n = 31;
+	if (x & 0x0000ffff) { n -= 16; 	} else x >>= 16;
+	if (x & 0x00ff) 	{ n -= 8; 	} else x >>= 8;
+	if (x & 0x0f) 		{ n -= 4; 	} else x >>= 4;
+	if (x & 0x3) 		{ n -= 2; 	} else x >>= 2;
+	if (x & 0x1) 		{ n--; 		}
+
+    return n;
+}
+static __tb_inline__ tb_size_t tb_bits_cl0_u64_be_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 64);
+
+	tb_size_t n = tb_bits_cl0_u32_be((tb_uint32_t)(x >> 32));
+	if (n == 32) n += tb_bits_cl0_u32_be((tb_uint32_t)x);
+
+    return n;
+}
+static __tb_inline__ tb_size_t tb_bits_cl0_u64_le_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 64);
+
+	tb_size_t n = tb_bits_cl0_u32_le((tb_uint32_t)x);
+	if (n == 32) n += tb_bits_cl0_u32_le((tb_uint32_t)(x >> 32));
+
+    return n;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * cl1
+ */
+static __tb_inline__ tb_size_t tb_bits_cl1_u32_be_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 0);
+
+	tb_trace_noimpl();
+	return 0;
+}
+static __tb_inline__ tb_size_t tb_bits_cl1_u32_le_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 0);
+
+	tb_trace_noimpl();
+	return 0;
+}
+static __tb_inline__ tb_size_t tb_bits_cl1_u64_be_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 0);
+
+	tb_size_t n = tb_bits_cl1_u32_be((tb_uint32_t)(x >> 32));
+	if (n == 32) n += tb_bits_cl1_u32_be((tb_uint32_t)x);
+
+    return n;
+}
+static __tb_inline__ tb_size_t tb_bits_cl1_u64_le_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 0);
+
+	tb_size_t n = tb_bits_cl1_u32_le((tb_uint32_t)x);
+	if (n == 32) n += tb_bits_cl1_u32_le((tb_uint32_t)(x >> 32));
+
+    return n;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * cb0
+ */
+static __tb_inline__ tb_size_t tb_bits_cb0_u32_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 32);
+	tb_trace_noimpl();
+    return 0;
+}
+static __tb_inline__ tb_size_t tb_bits_cb0_u64_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 64);
+	tb_trace_noimpl();
+    return 0;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * cb1
+ */
+static __tb_inline__ tb_size_t tb_bits_cb1_u32_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 0);
+	tb_trace_noimpl();
+    return 0;
+}
+static __tb_inline__ tb_size_t tb_bits_cb1_u64_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 0);
+	tb_trace_noimpl();
+    return 0;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * fb0
+ */
+static __tb_inline__ tb_size_t tb_bits_fb0_u32_be_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 0);
+    return tb_bits_cl0_u32_be(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb0_u32_le_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 0);
+    return tb_bits_cl0_u32_le(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb0_u64_be_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 0);
+    return tb_bits_cl0_u64_be(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb0_u64_le_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 0);
+    return tb_bits_cl0_u64_le(~x);
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * fb1
+ */
+static __tb_inline__ tb_size_t tb_bits_fb1_u32_be_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 32);
+    return tb_bits_cl1_u32_be(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb1_u32_le_inline(tb_uint32_t x)
+{
+    tb_check_return_val(x, 32);
+    return tb_bits_cl1_u32_le(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb1_u64_be_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 64);
+    return tb_bits_cl1_u64_be(~x);
+}
+static __tb_inline__ tb_size_t tb_bits_fb1_u64_le_inline(tb_uint64_t x)
+{
+    tb_check_return_val(x, 64);
+    return tb_bits_cl1_u64_le(~x);
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT

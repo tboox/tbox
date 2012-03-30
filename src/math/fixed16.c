@@ -233,8 +233,8 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
 	if (x <= 2) return tb_int32_set_sign(TB_FIXED16_MAX, s);
 
 	// normalize
-	tb_int32_t clz = tb_int32_clz(x);
-	x = x << clz >> 16;
+	tb_int32_t cl0 = tb_bits_cl0_u32_be(x);
+	x = x << cl0 >> 16;
  
 	// compute 1 / x approximation (0.5 <= x < 1.0) 
 	// (2.90625 (~2.914) - 2 * x) >> 1
@@ -243,7 +243,7 @@ tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)
 	// newton-raphson iteration:
 	// x = r * (2 - x * r) = ((r / 2) * (1 - x * r / 2)) * 4
 	r = ((0x10000 - ((x * r) >> 16)) * r) >> 15;
-	r = ((0x10000 - ((x * r) >> 16)) * r) >> (30 - clz);
+	r = ((0x10000 - ((x * r) >> 16)) * r) >> (30 - cl0);
 
 	return tb_int32_set_sign(r, s);
 }

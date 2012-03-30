@@ -1,24 +1,15 @@
 #include "tbox.h"
 
-int test2_main(int argc, char** argv);
+tb_int_t test2_main(tb_int_t argc, tb_char_t** argv);
 
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// c++
 	test2_main(argc, argv);
 
-#if 0
-	tb_bool_t ret = tb_file_exists(argv[1]);
-	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
-#endif
 
-#if 0
-	tb_bool_t ret = tb_file_delete(argv[1], TB_FILE_TYPE_FILE);
-	tb_printf("[%s]: %s\n", ret? "true" : "false", argv[1]);
-#endif
-
-
+	tb_exit();
 	return 0;
 }

@@ -27,6 +27,7 @@
 #include "tpool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
