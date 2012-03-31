@@ -718,7 +718,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_test_bits_swap_u16();
 	tb_test_bits_swap_u32();
 	tb_test_bits_swap_u64();

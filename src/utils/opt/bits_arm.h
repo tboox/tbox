@@ -34,11 +34,15 @@
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 
+// swap
 #if TB_CONFIG_ARM_VERSION >= 6
-# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+# 	ifndef tb_bits_swap_u16
+# 		define tb_bits_swap_u16(x) 			tb_bits_swap_u16_asm(x)
+# 	endif
 #endif
-
-#define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#ifndef tb_bits_swap_u32
+# 	define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#endif
 
 // FIXME: for ios
 //#define tb_bits_get_ubits32_impl(p, b, n) 	tb_bits_get_ubits32_impl_asm(p, b, n)

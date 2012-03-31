@@ -34,10 +34,16 @@
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 
-#define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
-#define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
-
-#define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
+// swap
+#ifndef tb_bits_swap_u16
+# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+#endif
+#ifndef tb_bits_swap_u32
+# 	define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#endif
+#ifndef tb_bits_swap_u64
+# 	define tb_bits_swap_u64(x) 				tb_bits_swap_u64_asm(x)
+#endif
 
 #endif /* TB_CONFIG_ASSEMBLER_GAS */
 /* ///////////////////////////////////////////////////////////////////////

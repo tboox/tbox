@@ -31,9 +31,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_bits_swap_u16(x) 	tb_bits_swap_u16_asm(x)
-#define tb_bits_swap_u32(x) 	tb_bits_swap_u32_asm(x)
-
+// swap
+#ifndef tb_bits_swap_u16
+# 	define tb_bits_swap_u16(x) 				tb_bits_swap_u16_asm(x)
+#endif
+#ifndef tb_bits_swap_u32
+# 	define tb_bits_swap_u32(x) 				tb_bits_swap_u32_asm(x)
+#endif
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
