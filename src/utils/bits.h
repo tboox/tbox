@@ -28,6 +28,10 @@
  */
 #include "prefix.h"
 
+#ifdef TB_COMPILER_IS_GCC
+# 	include "opt/bits_gcc.h"
+#endif
+
 #if defined(TB_CONFIG_ARCH_x86)
 # 	include "opt/bits_x86.h"
 #elif defined(TB_CONFIG_ARCH_ARM)
@@ -311,15 +315,6 @@
 #define tb_bits_ne_to_le_u64(x) 		tb_bits_le_to_ne_u64(x)
 
 // cl0, count leading bit 0
-#ifdef TB_COMPILER_IS_GCC
-# 	define tb_bits_cl0_u32_be(x) 		((x)? (tb_size_t)__builtin_clz((tb_uint32_t)(x)) : 32)
-# 	define tb_bits_cl0_u32_le(x) 		((x)? (tb_size_t)__builtin_ctz((tb_uint32_t)(x)) : 32)
-# 	if TB_CPU_BITSIZE == 64
-# 		define tb_bits_cl0_u64_be(x) 	((x)? (tb_size_t)__builtin_clzl((tb_uint64_t)(x)) : 64)
-# 		define tb_bits_cl0_u64_le(x) 	((x)? (tb_size_t)__builtin_ctzl((tb_uint64_t)(x)) : 64)
-# 	endif
-#endif
-
 #ifndef tb_bits_cl0_u32_be 
 # 	define tb_bits_cl0_u32_be(x) 		tb_bits_cl0_u32_be_inline(x)
 #endif
@@ -348,13 +343,6 @@
 #endif
 
 // cb1, count bit 1
-#ifdef TB_COMPILER_IS_GCC
-# 	define tb_bits_cb1_u32(x) 			((x)? (tb_size_t)__builtin_popcount((tb_uint32_t)(x)) : 0)
-# 	if TB_CPU_BITSIZE == 64
-# 	define tb_bits_cb1_u64(x) 			((x)? (tb_size_t)__builtin_popcountl((tb_uint64_t)(x)) : 0)
-# 	endif
-#endif
-
 #ifndef tb_bits_cb1_u32
 # 	define tb_bits_cb1_u32(x) 			tb_bits_cb1_u32_inline(x)
 #endif
@@ -389,13 +377,6 @@
 #endif
 
 // fb1, find the first bit 0
-#ifdef TB_COMPILER_IS_GCC
-# 	define tb_bits_fb1_u32_le(x) 		((x)? (tb_size_t)__builtin_ffs((tb_uint32_t)(x)) - 1 : 32)
-# 	if TB_CPU_BITSIZE == 64
-# 	define tb_bits_fb1_u64_le(x) 		((x)? (tb_size_t)__builtin_ffs((tb_uint64_t)(x)) - 1 : 64)
-# 	endif
-#endif
-
 #ifndef tb_bits_fb1_u32_be 
 # 	define tb_bits_fb1_u32_be(x) 		((x)? tb_bits_cl0_u32_be(x) : 32)
 #endif

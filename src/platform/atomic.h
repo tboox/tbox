@@ -29,8 +29,9 @@
  */
 #include "prefix.h"
 
-#if defined(TB_COMPILER_IS_GCC) && \
-		(__GNUC__ >= 4 && __GNUC_MINOR__ >= 1)
+#if defined(TB_COMPILER_IS_GCC) \
+	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
+	&&	(__GNUC__ >= 4 && __GNUC_MINOR__ >= 1)
 # 	include "compiler/gcc/atomic.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)
 # 	include "windows/atomic.h"
