@@ -37,6 +37,9 @@
 // the magic number
 #define TB_GPOOL_MAGIC 							(0xdead)
 
+// the align maxn
+#define TB_GPOOL_ALIGN_MAXN 					(128)
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -73,6 +76,7 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 	align = tb_max(align, TB_CPU_BITBYTE);
+	tb_assert_and_check_return_val(align <= TB_GPOOL_ALIGN_MAXN, TB_NULL);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;

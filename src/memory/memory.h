@@ -42,12 +42,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * architecture
  *
- *  spool--------------\
- *                     |     vpool --
- *          malloc - gpool -|        | 
- *                           tpool ---- data: |-------------------------------|
- *                                   |
- *  rpool------------------- fpool --
+ * small block - spool ---\
+ *                        |   vpool --
+ * globl block - gpool ------|        | 
+ *                            tpool --|- data: |-------------------------------|
+ *                                    |
+ * fixed block - rpool ------ fpool --
  */
 
 #endif

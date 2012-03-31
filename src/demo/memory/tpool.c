@@ -25,7 +25,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// dump
 #ifdef TB_DEBUG
-//	tb_tpool_dump(tpool);
+	tb_tpool_dump(tpool);
 #endif
 
 	// trace

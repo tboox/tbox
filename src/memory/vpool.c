@@ -36,6 +36,9 @@
 // the magic number
 #define TB_VPOOL_MAGIC 							(0xdead)
 
+// the align maxn
+#define TB_VPOOL_ALIGN_MAXN 					(128)
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -340,6 +343,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 	align = tb_max(align, TB_CPU_BITBYTE);
+	tb_assert_and_check_return_val(align <= TB_VPOOL_ALIGN_MAXN, TB_NULL);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
@@ -693,7 +697,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 	tb_assert_and_check_return(vpool);
 
 	tb_print("======================================================================");
-	tb_print("vpool: magic: 0x%lx",	vpool->magic);
+	tb_print("vpool: magic: %#lx",	vpool->magic);
 	tb_print("vpool: nhead: %lu", 	vpool->nhead);
 	tb_print("vpool: align: %lu", 	vpool->align);
 	tb_print("vpool: data: %p", 	vpool->data);
