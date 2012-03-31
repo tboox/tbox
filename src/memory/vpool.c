@@ -653,7 +653,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 
 	// the data
 	tb_byte_t* 	p = data;
-	tb_check_return_val(p && p >= pb && p < pe, TB_FALSE);
+	tb_check_return_val(p >= pb && p < pe, TB_FALSE);
 
 	// the nhead
 	tb_size_t 	nhead = vpool->nhead;
