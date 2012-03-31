@@ -40,10 +40,14 @@
 # 	define TB_CPU_BITSIZE 		(64)
 # 	define TB_CPU_BITBYTE 		(8)
 # 	define TB_CPU_BITALIGN 		(7)
+# 	define TB_CPU_BIT32 		(0)
+# 	define TB_CPU_BIT64 		(1)
 #else
 # 	define TB_CPU_BITSIZE 		(32)
 # 	define TB_CPU_BITBYTE 		(4)
 # 	define TB_CPU_BITALIGN 		(3)
+# 	define TB_CPU_BIT32 		(1)
+# 	define TB_CPU_BIT64 		(0)
 #endif
 
 

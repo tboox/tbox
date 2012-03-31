@@ -142,9 +142,9 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 	tb_size_t 	i = 0;
 	tb_byte_t 	b = 0;
 	tb_byte_t 	u = 0;
-#if TB_CPU_BITSIZE == 64
+#if TB_CPU_BIT64
 	tb_size_t 	m = tb_align(fpool->maxn, 64) >> 6;
-#else
+#elif TB_CPU_BIT32
 	tb_size_t 	m = tb_align(fpool->maxn, 32) >> 5;
 #endif
 	tb_size_t* 	p = (tb_size_t*)fpool->used;
@@ -155,18 +155,30 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 	tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), TB_NULL);
 
 	// find the free chunk, step * 32|64 items
+#if 0
 //	while (p < e && *p == 0xffffffff) p++;
 //	while (p < e && *p == 0xffffffffffffffffL) p++;
 	while (p < e && !(*p + 1)) p++;
+#else
+	while (p + 7 < e)
+	{
+		if (p[0] + 1) { p += 0; break; }
+		if (p[1] + 1) { p += 1; break; }
+		if (p[2] + 1) { p += 2; break; }
+		if (p[3] + 1) { p += 3; break; }
+		if (p[4] + 1) { p += 4; break; }
+		if (p[5] + 1) { p += 5; break; }
+		if (p[6] + 1) { p += 6; break; }
+		if (p[7] + 1) { p += 7; break; }
+		p += 8;
+	}
+	while (p < e && !(*p + 1)) p++;	
+#endif
 	tb_check_return_val(p < e, TB_NULL);
 
 	// find the free bit index
 	m = fpool->maxn;
-#if TB_CPU_BITSIZE == 64
-	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_u64_le(*p);
-#else
-	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_u32_le(*p);
-#endif
+	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_le(*p);
 	tb_check_return_val(i < m, TB_NULL);
 
 	// alloc it
@@ -356,6 +368,7 @@ tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 	tb_check_return_val(fpool->size < fpool->maxn, TB_NULL);
 
 	// predict it?
+//	tb_pointer_t data = TB_NULL;
 	tb_pointer_t data = tb_fpool_malloc_pred(fpool);
 
 	// find the free block

@@ -390,6 +390,43 @@
 # 	define tb_bits_fb1_u64_le(x) 		((x)? tb_bits_cl0_u64_le(x) : 64)
 #endif
 
+// only for tb_size_t
+#if TB_CPU_BIT64
+
+# 	define tb_bits_swap(x) 				tb_bits_swap_u64(x)
+
+# 	define tb_bits_cl0_be(x) 			tb_bits_cl0_u64_be(x)
+# 	define tb_bits_cl0_le(x) 			tb_bits_cl0_u64_le(x)
+# 	define tb_bits_cl1_be(x) 			tb_bits_cl1_u64_be(x)
+# 	define tb_bits_cl1_le(x) 			tb_bits_cl1_u64_le(x)
+
+# 	define tb_bits_fb0_be(x) 			tb_bits_fb0_u64_be(x)
+# 	define tb_bits_fb0_le(x) 			tb_bits_fb0_u64_le(x)
+# 	define tb_bits_fb1_be(x) 			tb_bits_fb1_u64_be(x)
+# 	define tb_bits_fb1_le(x) 			tb_bits_fb1_u64_le(x)
+
+# 	define tb_bits_cb0(x) 				tb_bits_cb0_u64(x)
+# 	define tb_bits_cb1(x) 				tb_bits_cb1_u64(x)
+
+#elif TB_CPU_BIT32
+
+# 	define tb_bits_swap(x) 				tb_bits_swap_u32(x)
+
+# 	define tb_bits_cl0_be(x) 			tb_bits_cl0_u32_be(x)
+# 	define tb_bits_cl0_le(x) 			tb_bits_cl0_u32_le(x)
+# 	define tb_bits_cl1_be(x) 			tb_bits_cl1_u32_be(x)
+# 	define tb_bits_cl1_le(x) 			tb_bits_cl1_u32_le(x)
+
+# 	define tb_bits_fb0_be(x) 			tb_bits_fb0_u32_be(x)
+# 	define tb_bits_fb0_le(x) 			tb_bits_fb0_u32_le(x)
+# 	define tb_bits_fb1_be(x) 			tb_bits_fb1_u32_be(x)
+# 	define tb_bits_fb1_le(x) 			tb_bits_fb1_u32_le(x)
+
+# 	define tb_bits_cb0(x) 				tb_bits_cb0_u32(x)
+# 	define tb_bits_cb1(x) 				tb_bits_cb1_u32(x)
+
+#endif
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
