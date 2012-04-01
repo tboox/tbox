@@ -609,7 +609,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_size_t 		osize = 0;
 	tb_pointer_t 	pdata = tb_vpool_ralloc_fast(vpool, data, size, &osize);
 	tb_check_return_val(!pdata, pdata);
-	tb_assert_and_check_return_val(osize < size, TB_NULL);
+	tb_assert_and_check_return_val(osize && osize < size, TB_NULL);
 
 	// malloc it
 #ifndef TB_DEBUG
