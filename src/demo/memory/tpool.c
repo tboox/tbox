@@ -27,10 +27,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	__tb_volatile__ tb_size_t 	size = 0xdeaf;
+	__tb_volatile__ tb_size_t 	lmod = tb_tpool_limit(tpool) - 1;
+//	__tb_volatile__ tb_size_t 	lmod = 255;
 	while (maxn--)
 	{
 		size = (size * 10807 + 1) & 0xffffffff;
-		data = tb_tpool_malloc(tpool, (size & 511)? (size & 511) : 1);
+		data = tb_tpool_malloc(tpool, (size & lmod)? (size & lmod) : 1);
 		tb_check_break(data);
 	}
 	time = tb_mclock() - time;

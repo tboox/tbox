@@ -149,14 +149,15 @@ typedef struct __tb_tpool_t
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits)
+static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits, tb_size_t bitn)
 {
+	return 0;
 #if 0
 	tb_size_t 	blkn = TB_TPOOL_BLOCK_MAXN;
 	tb_size_t 	blks = ~body;
 	while (((((blks >> (TB_TPOOL_BLOCK_MAXN - blkn)) & bits) != bits) && blkn--)) ;
 	return TB_TPOOL_BLOCK_MAXN - blkn;
-#else
+#elif 0
 	tb_size_t 	blki = 0;
 	tb_size_t 	blkn = TB_TPOOL_BLOCK_MAXN;
 	tb_size_t 	blks = ~body;
@@ -173,11 +174,64 @@ static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits
 		blki += 8;
 	}
 	return blki;
+#else
+	tb_size_t 	blki = 0;
+	tb_size_t 	blkn = TB_TPOOL_BLOCK_MAXN;
+	tb_size_t 	blks = ~body;
+	tb_size_t 	blkb = 0;
+	while (blki < TB_TPOOL_BLOCK_MAXN)
+	{
+		blkb = (blks >> blki) & bits;
+		if (blkb != bits)
+		{
+//			tb_print("%llu", TB_TPOOL_BLOCK_MAXN - tb_bits_fb0_be(blkb | ~bits));
+			if (!blkb) blki += bitn;
+			else if (blkb == 1) blki++;
+			else blki += TB_TPOOL_BLOCK_MAXN - tb_bits_fb0_be(blkb | ~bits);
+		}
+		else break;
+	}
+	return blki;
 #endif
 }
 static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size)
-{
-	return TB_NULL;
+{	
+	// no pred?
+	tb_check_return_val(tpool->pred, TB_NULL);
+
+	// init
+	tb_size_t 	maxn = tpool->maxn;
+	tb_size_t 	pred = tpool->pred - 1;
+	tb_size_t* 	body = tpool->body + pred;
+	tb_size_t* 	last = tpool->last + pred;
+			
+	// the free block bit in the chunk
+	// e.g. 3 blocks => bits: 111
+	tb_size_t 	bitn = tb_align(size, tpool->step) / tpool->step;
+	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;
+	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
+	// find 
+	tb_size_t 	blki = tb_tpool_find_free(*body, bits, bitn);
+	tb_check_return_val(blki < TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
+	// alloc it
+	tb_byte_t* 	data = tpool->data + (pred * TB_TPOOL_BLOCK_MAXN + blki) * tpool->step;
+	*body |= bits << blki;
+	*last |= (tb_size_t)1 << (blki + bitn - 1);
+	
+	// the block is full? predict the next
+	if (!(*body + 1) && tpool->pred < maxn + 1) tpool->pred++;
+	// no predict if the last block is full
+	else tpool->pred = 0;
+
+	// update the info
+#ifdef TB_DEBUG
+	tpool->info.pred++;
+#endif
+
+	// ok
+	return data;
 }
 static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 {
@@ -203,14 +257,14 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 		// find chunk
 		do 
 		{
-			if (body[0] + 1) { i = 0; break; }
-			if (body[1] + 1) { i = 1; break; }
-			if (body[2] + 1) { i = 2; break; }
-			if (body[3] + 1) { i = 3; break; }
-			if (body[4] + 1) { i = 4; break; }
-			if (body[5] + 1) { i = 5; break; }
-			if (body[6] + 1) { i = 6; break; }
-			if (body[7] + 1) { i = 7; break; }
+			if (body[0] + 1 && tb_bits_cb0(body[0]) >= bitn) { i = 0; break; }
+			if (body[1] + 1 && tb_bits_cb0(body[1]) >= bitn) { i = 1; break; }
+			if (body[2] + 1 && tb_bits_cb0(body[2]) >= bitn) { i = 2; break; }
+			if (body[3] + 1 && tb_bits_cb0(body[3]) >= bitn) { i = 3; break; }
+			if (body[4] + 1 && tb_bits_cb0(body[4]) >= bitn) { i = 4; break; }
+			if (body[5] + 1 && tb_bits_cb0(body[5]) >= bitn) { i = 5; break; }
+			if (body[6] + 1 && tb_bits_cb0(body[6]) >= bitn) { i = 6; break; }
+			if (body[7] + 1 && tb_bits_cb0(body[7]) >= bitn) { i = 7; break; }
 			i = 8;
 
 		} while (0);
@@ -223,7 +277,7 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 			body += i;
 			
 			// find 
-			blki = tb_tpool_find_free(*body, bits);
+			blki = tb_tpool_find_free(*body, bits, bitn);
 
 			// ok?
 			if (blki < TB_TPOOL_BLOCK_MAXN)
@@ -244,10 +298,10 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 		{
 			// if (*body != 0xffffffff)
 			// if (*body != 0xffffffffffffffffL)
-			if (*body + 1)
+			if (*body + 1 && tb_bits_cb0(*body) >= bitn)
 			{
 				// find 
-				blki = tb_tpool_find_free(*body, bits);
+				blki = tb_tpool_find_free(*body, bits, bitn);
 
 				// ok?
 				if (blki < TB_TPOOL_BLOCK_MAXN)
@@ -265,12 +319,67 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 	// no space?
 	tb_check_return_val(body < tail && blki < TB_TPOOL_BLOCK_MAXN, TB_NULL);
 
-
 	// alloc it
 	data = tpool->data + ((body - tpool->body) * TB_TPOOL_BLOCK_MAXN + blki) * tpool->step;
 	*body |= bits << blki;
 	*last |= (tb_size_t)1 << (blki + bitn - 1);
+	
+	// predict the next
+	tpool->pred = (body - tpool->body) + 1;
+	if (tpool->pred < maxn + 1) tpool->pred++;
+	else tpool->pred = 0;
 
+	// ok
+	return data;
+}
+tb_pointer_t tb_tpool_ralloc_fast(tb_tpool_t* tpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
+{
+	// check
+	tb_assert_and_check_return_val(tpool && tpool->magic == TB_TPOOL_MAGIC, TB_NULL);
+
+	// check data
+	tb_check_return_val(data, TB_NULL);
+	tb_check_return_val(data >= tpool->data && data < tpool->data + tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN, TB_NULL);
+	tb_check_return_val(!(((tb_size_t)data) & (tpool->align - 1)), TB_NULL);
+	tb_check_return_val(!(((tb_byte_t*)data - tpool->data) % tpool->step), TB_NULL);
+
+	// the block bit index
+	tb_size_t 	blki = ((tb_byte_t*)data - tpool->data) / tpool->step;
+
+	// the body & last
+	tb_size_t* 	body = tpool->body + blki / TB_TPOOL_BLOCK_MAXN;
+	tb_size_t* 	last = tpool->last + (body - tpool->body);
+	blki &= TB_TPOOL_BLOCK_MAXN - 1;
+
+	// the block bit number
+	tb_size_t 	bitn = tb_bits_fb1_le(*last >> blki) + 1;	
+	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;	
+	tb_assert_and_check_return_val(bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
+	// osize
+	if (osize) *osize = bits + 1;
+
+	// free it first for realloc
+	tb_size_t 	b = *body;
+	tb_size_t 	l = *last;
+	b &= ~(bits << blki);
+	l &= ~((tb_size_t)1 << (blki + bitn - 1));
+	
+	// the new bits
+	bitn = tb_align(size, tpool->step) / tpool->step;
+	bits = ((tb_size_t)1 << bitn) - 1;
+	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
+	// find the free block
+	blki = tb_tpool_find_free(b, bits, bitn);
+	tb_check_return_val(blki < TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
+	// realloc it
+	b |= bits << blki;
+	l |= (tb_size_t)1 << (blki + bitn - 1);
+	*body = b;
+	*last = l;
+	
 	// ok
 	return data;
 }
@@ -400,6 +509,14 @@ tb_void_t tb_tpool_clear(tb_handle_t handle)
 #endif
 }
 
+tb_size_t tb_tpool_limit(tb_handle_t handle)
+{
+	// check
+	tb_tpool_t* tpool = (tb_tpool_t*)handle;
+	tb_assert_and_check_return_val(tpool && tpool->magic == TB_TPOOL_MAGIC, 0);
+
+	return (TB_TPOOL_BLOCK_MAXN * tpool->step);
+}
 tb_pointer_t tb_tpool_malloc(tb_handle_t handle, tb_size_t size)
 {
 	// check
@@ -411,6 +528,9 @@ tb_pointer_t tb_tpool_malloc(tb_handle_t handle, tb_size_t size)
 
 	// too large?
 	tb_check_return_val(size <= tpool->step * TB_TPOOL_BLOCK_MAXN, TB_NULL);
+	
+	// larger than limit, maybe slower
+	tb_assert(size <= tb_tpool_limit(tpool));
 
 	// full?
 	tb_check_return_val(!tpool->full, TB_NULL);
@@ -485,7 +605,39 @@ tb_pointer_t tb_tpool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size
 
 tb_pointer_t tb_tpool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
 {
-	return TB_NULL;
+	// check
+	tb_tpool_t* tpool = (tb_tpool_t*)handle;
+	tb_assert_and_check_return_val(tpool && tpool->magic == TB_TPOOL_MAGIC, TB_NULL);
+
+	// free it if no size
+	if (!size)
+	{
+		tb_tpool_free(tpool, data);
+		return TB_NULL;
+	}
+
+	// alloc it if no data?
+	if (!data) return tb_tpool_malloc(tpool, size);
+	
+	// ralloc it with fast mode if enough
+	tb_size_t 		osize = 0;
+	tb_pointer_t 	pdata = tb_tpool_ralloc_fast(tpool, data, size, &osize);
+	tb_check_return_val(!pdata, pdata);
+	tb_assert_and_check_return_val(osize && osize < size, TB_NULL);
+
+	// malloc it
+	pdata = tb_tpool_malloc(tpool, size);
+	tb_check_return_val(pdata, TB_NULL);
+	tb_assert_and_check_return_val(pdata != data, pdata);
+
+	// copy data
+	tb_memcpy(pdata, data, osize);
+	
+	// free it
+	tb_tpool_free(tpool, data);
+
+	// ok
+	return pdata;
 }
 
 tb_bool_t tb_tpool_free(tb_handle_t handle, tb_pointer_t data)
@@ -522,6 +674,16 @@ tb_bool_t tb_tpool_free(tb_handle_t handle, tb_pointer_t data)
 	*body &= ~(bits << blki);
 	*last &= ~((tb_size_t)1 << (blki + bitn - 1));
 
+	// null?
+	if (!*body)
+	{
+		// predict it
+		tpool->pred = (body - tpool->body) + 1;
+
+		// no full
+		tpool->full = 0;
+	}
+
 	// update the info
 #ifdef TB_DEBUG
 	tpool->info.used -= bitn * tpool->step;
@@ -541,6 +703,7 @@ tb_void_t tb_tpool_dump(tb_handle_t handle)
 	tb_print("======================================================================");
 	tb_print("tpool: magic: %#lx",	tpool->magic);
 	tb_print("tpool: align: %lu", 	tpool->align);
+	tb_print("tpool: limit: %lu", 	tb_tpool_limit(tpool));
 	tb_print("tpool: step: %lu", 	tpool->step);
 	tb_print("tpool: data: %p", 	tpool->data);
 	tb_print("tpool: size: %lu", 	tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN);

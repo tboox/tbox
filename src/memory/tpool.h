@@ -28,7 +28,6 @@
  */
 #include "prefix.h"
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -38,6 +37,9 @@ tb_handle_t 	tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 // exit
 tb_void_t 		tb_tpool_exit(tb_handle_t handle);
+
+// limit
+tb_size_t 		tb_tpool_limit(tb_handle_t handle);
 
 // clear
 tb_void_t 		tb_tpool_clear(tb_handle_t handle);
