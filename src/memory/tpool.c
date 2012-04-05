@@ -105,6 +105,18 @@ typedef struct __tb_tpool_info_t
  *       |-----|-----|------|--------- ... -----|------|------|----|--- ... ---------|
  *        step0 step1 step2                       stepi   ...
  *
+ * pred:
+ * pred[i]:       0               : no pred
+ * pred[0]:       1 x step        : |----------------------|-------------------------|---...   -------|
+ * pred[1]:       2 x step        : -|----------------------|-------------------------|---...   -------|
+ * pred[2]:       3 x step        : --|----------------------|-------------------------|---...   -------|
+ * pred[3]:       4 x step        : ---|----------------------|-------------------------|---...   -------|
+ * pred[4]:       5 x step        : ----|----------------------|-------------------------|---...   -------|
+ * pred[5]:       6 x step        : -----|----------------------|-------------------------|---...   -------|
+ * pred[6]:       7 x step        : ------|----------------------|-------------------------|---...   -------|
+ * ...
+ * pred[31|63]:   (32|64) x step
+ *
  * note:
  * 1. align bytes <= 64
  * 2. alloc bytes <= (32|64) * 16 == 512|1024 for one chunk
@@ -133,11 +145,11 @@ typedef struct __tb_tpool_t
 	// the maxn
 	tb_size_t 			maxn;
 
-	// the pred
-	tb_size_t 			pred;
-
 	// the data
 	tb_byte_t* 			data;
+
+	// the pred
+	tb_size_t 			pred[TB_TPOOL_BLOCK_MAXN];
 
 	// the info
 #ifdef TB_DEBUG
@@ -151,7 +163,6 @@ typedef struct __tb_tpool_t
  */
 static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits, tb_size_t bitn)
 {
-	return 0;
 #if 0
 	tb_size_t 	blkn = TB_TPOOL_BLOCK_MAXN;
 	tb_size_t 	blks = ~body;
@@ -184,7 +195,6 @@ static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits
 		blkb = (blks >> blki) & bits;
 		if (blkb != bits)
 		{
-//			tb_print("%llu", TB_TPOOL_BLOCK_MAXN - tb_bits_fb0_be(blkb | ~bits));
 			if (!blkb) blki += bitn;
 			else if (blkb == 1) blki++;
 			else blki += TB_TPOOL_BLOCK_MAXN - tb_bits_fb0_be(blkb | ~bits);
@@ -194,23 +204,17 @@ static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits
 	return blki;
 #endif
 }
-static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size)
+static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size, tb_size_t bits, tb_size_t bitn)
 {	
 	// no pred?
-	tb_check_return_val(tpool->pred, TB_NULL);
+	tb_check_return_val(tpool->pred[bitn - 1], TB_NULL);
 
 	// init
 	tb_size_t 	maxn = tpool->maxn;
-	tb_size_t 	pred = tpool->pred - 1;
+	tb_size_t 	pred = tpool->pred[bitn - 1] - 1;
 	tb_size_t* 	body = tpool->body + pred;
 	tb_size_t* 	last = tpool->last + pred;
-			
-	// the free block bit in the chunk
-	// e.g. 3 blocks => bits: 111
-	tb_size_t 	bitn = tb_align(size, tpool->step) / tpool->step;
-	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;
-	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
-
+		
 	// find 
 	tb_size_t 	blki = tb_tpool_find_free(*body, bits, bitn);
 	tb_check_return_val(blki < TB_TPOOL_BLOCK_MAXN, TB_NULL);
@@ -220,10 +224,14 @@ static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size)
 	*body |= bits << blki;
 	*last |= (tb_size_t)1 << (blki + bitn - 1);
 	
-	// the block is full? predict the next
-	if (!(*body + 1) && tpool->pred < maxn + 1) tpool->pred++;
-	// no predict if the last block is full
-	else tpool->pred = 0;
+	// full? no the next free block space
+	if (blki + bitn + bitn > TB_TPOOL_BLOCK_MAXN)
+	{
+		// the next
+		if (tpool->pred[bitn - 1] + TB_TPOOL_BLOCK_MAXN <= maxn) tpool->pred[bitn - 1] += TB_TPOOL_BLOCK_MAXN;
+		// no pred
+		else tpool->pred[bitn - 1] = 0;
+	}
 
 	// update the info
 #ifdef TB_DEBUG
@@ -233,19 +241,13 @@ static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size)
 	// ok
 	return data;
 }
-static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
+static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size, tb_size_t bits, tb_size_t bitn)
 {
 	// init
 	tb_size_t* 	body = tpool->body;
 	tb_size_t* 	last = tpool->last;
 	tb_size_t 	maxn = tpool->maxn;
 	tb_byte_t* 	data = TB_NULL;
-
-	// the free block bit in the chunk
-	// e.g. 3 blocks => bits: 111
-	tb_size_t 	bitn = tb_align(size, tpool->step) / tpool->step;
-	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;
-	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
 
 	// find the free bit index for the enough space in the little-endian sort
 	tb_size_t 	blki = TB_TPOOL_BLOCK_MAXN;
@@ -325,9 +327,15 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size)
 	*last |= (tb_size_t)1 << (blki + bitn - 1);
 	
 	// predict the next
-	tpool->pred = (body - tpool->body) + 1;
-	if (tpool->pred < maxn + 1) tpool->pred++;
-	else tpool->pred = 0;
+	tpool->pred[bitn - 1] = (body - tpool->body) + 1;
+	// full? no the next free block space
+	if (blki + bitn + bitn > TB_TPOOL_BLOCK_MAXN)
+	{
+		// the next
+		if (tpool->pred[bitn - 1] + TB_TPOOL_BLOCK_MAXN <= maxn) tpool->pred[bitn - 1] += TB_TPOOL_BLOCK_MAXN;
+		// no pred
+		else tpool->pred[bitn - 1] = 0;
+	}
 
 	// ok
 	return data;
@@ -435,7 +443,7 @@ tb_handle_t tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	 * maxn < left / ((1 + 4 * step) * 2 * sizeof(tb_size_t))
 	 */
 	tpool->maxn = (data + size - (tb_byte_t*)tpool->body) / ((1 + (tpool->step << 2)) * (sizeof(tb_size_t) << 1));
-	tb_assert_and_check_return_val(tpool->maxn, TB_NULL);
+	tb_assert_and_check_return_val(tpool->maxn >= TB_TPOOL_BLOCK_MAXN, TB_NULL);
 
 	// init last
 	tpool->last = tpool->body + tpool->maxn;
@@ -448,7 +456,7 @@ tb_handle_t tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_assert_and_check_return_val(tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN <= (data + size - tpool->data), TB_NULL);
 
 	// init pred => the first chunk index at used
-	tpool->pred = 0;
+	tb_size_t n = TB_TPOOL_BLOCK_MAXN; while (n--) tpool->pred[n] = n + 1;
 
 	// init info
 #ifdef TB_DEBUG
@@ -492,7 +500,7 @@ tb_void_t tb_tpool_clear(tb_handle_t handle)
 	if (tpool->last) tb_memset(tpool->last, 0, tpool->maxn * sizeof(tb_size_t));
 
 	// reinit pred
-	tpool->pred = 0;
+	tb_size_t n = TB_TPOOL_BLOCK_MAXN; while (n--) tpool->pred[n] = n + 1;
 	
 	// reinit full
 	tpool->full = 0;
@@ -535,12 +543,18 @@ tb_pointer_t tb_tpool_malloc(tb_handle_t handle, tb_size_t size)
 	// full?
 	tb_check_return_val(!tpool->full, TB_NULL);
 
+	// the free block bit in the chunk
+	// e.g. 3 blocks => bits: 111
+	tb_size_t 	bitn = tb_align(size, tpool->step) / tpool->step;
+	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;
+	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
+
 	// predict it?
-	tb_pointer_t data = TB_NULL;
-//	tb_pointer_t data = tb_tpool_malloc_pred(tpool, size);
+//	tb_pointer_t data = TB_NULL;
+	tb_pointer_t data = tb_tpool_malloc_pred(tpool, size, bits, bitn);
 
 	// find the free block
-	if (!data) data = tb_tpool_malloc_find(tpool, size);
+	if (!data) data = tb_tpool_malloc_find(tpool, size, bits, bitn);
 
 	// update info
 #ifdef TB_DEBUG
@@ -673,16 +687,12 @@ tb_bool_t tb_tpool_free(tb_handle_t handle, tb_pointer_t data)
 	// free it
 	*body &= ~(bits << blki);
 	*last &= ~((tb_size_t)1 << (blki + bitn - 1));
+		
+	// predict it
+	tpool->pred[bitn - 1] = (body - tpool->body) + 1;
 
-	// null?
-	if (!*body)
-	{
-		// predict it
-		tpool->pred = (body - tpool->body) + 1;
-
-		// no full
-		tpool->full = 0;
-	}
+	// null? no full
+	if (!*body) tpool->full = 0;
 
 	// update the info
 #ifdef TB_DEBUG
@@ -714,15 +724,29 @@ tb_void_t tb_tpool_dump(tb_handle_t handle)
 	tb_print("tpool: fail: %lu", 	tpool->info.fail);
 	tb_print("tpool: pred: %lu%%", 	tpool->info.aloc? ((tpool->info.pred * 100) / tpool->info.aloc) : 0);
 
+	tb_print("");
 	tb_size_t 	i = 0;
-	tb_size_t 	m = tpool->maxn;
+	tb_size_t 	m = TB_TPOOL_BLOCK_MAXN;
+	for (i = 0; i < m; i++)
+	{
+		tb_size_t pred = tpool->pred[i];
+#if TB_CPU_BIT64
+		tb_print("tpool: [%lu]: pred: %lu, body: %064lb, last: %064lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
+#elif TB_CPU_BIT32
+		tb_print("tpool: [%lu]: pred: %lu, body: %032lb, last: %032lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
+#endif
+	}
+
+	tb_print("");
+	m = tpool->maxn;
 	for (i = 0; i < m; i++)
 	{
 #if TB_CPU_BIT64
-		if (tpool->body[i]) tb_print("\ttpool: [%lu]: body: %064lb, last: %064lb", i, tpool->body[i], tpool->last[i]);
+		if (tpool->body[i]) tb_print("tpool: [%lu]: body: %064lb, last: %064lb", i, tpool->body[i], tpool->last[i]);
 #elif TB_CPU_BIT32
-		if (tpool->body[i]) tb_print("\ttpool: [%lu]: body: %032lb, last: %032lb", i, tpool->body[i], tpool->last[i]);
+		if (tpool->body[i]) tb_print("tpool: [%lu]: body: %032lb, last: %032lb", i, tpool->body[i], tpool->last[i]);
 #endif
 	}
+
 }
 #endif

@@ -28,7 +28,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	__tb_volatile__ tb_size_t 	size = 0xdeaf;
 	__tb_volatile__ tb_size_t 	lmod = tb_tpool_limit(tpool) - 1;
-//	__tb_volatile__ tb_size_t 	lmod = 255;
 	while (maxn--)
 	{
 		size = (size * 10807 + 1) & 0xffffffff;
