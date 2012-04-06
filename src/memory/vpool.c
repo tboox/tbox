@@ -324,6 +324,23 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 		// osize
 		if (osize) *osize = block->size;
 
+		// update the info
+#ifdef TB_DEBUG
+
+		// update the used size
+		vpool->info.used += block->size - bsize;
+
+		// update the need size
+		vpool->info.need += block->size - bsize;
+
+		// update the real size		
+		vpool->info.real += block->size - bsize;
+
+		// update the peak size
+		if (vpool->info.used > vpool->info.peak) vpool->info.peak = vpool->info.used;
+		
+#endif
+
 		// ok
 		return data;
 	}
@@ -503,7 +520,7 @@ end:
 		vpool->info.need += size;
 
 		// update the real size		
-		vpool->info.real += block->size;
+		vpool->info.real += vpool->nhead + block->size;
 
 		// update the peak size
 		if (vpool->info.used > vpool->info.peak) vpool->info.peak = vpool->info.used;
@@ -682,7 +699,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 
 	// update the info
 #ifdef TB_DEBUG
-	vpool->info.used -= block->size;
+	vpool->info.used -= bsize;
 #endif
 
 	// ok
@@ -700,12 +717,13 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 	tb_print("vpool: magic: %#lx",	vpool->magic);
 	tb_print("vpool: nhead: %lu", 	vpool->nhead);
 	tb_print("vpool: align: %lu", 	vpool->align);
+	tb_print("vpool: head: %lu", 	vpool->data - (tb_byte_t*)vpool);
 	tb_print("vpool: data: %p", 	vpool->data);
 	tb_print("vpool: size: %lu", 	vpool->size);
 	tb_print("vpool: full: %lu", 	vpool->full);
 	tb_print("vpool: used: %lu", 	vpool->info.used);
 	tb_print("vpool: peak: %lu", 	vpool->info.peak);
-	tb_print("vpool: wast: %lu%%", 	vpool->info.real? (vpool->info.real - vpool->info.need) * 100 / vpool->info.real : 0);
+	tb_print("vpool: wast: %lu%%", 	(vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
 	tb_print("vpool: fail: %lu", 	vpool->info.fail);
 	tb_print("vpool: pred: %lu%%", 	vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
 

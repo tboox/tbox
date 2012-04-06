@@ -365,31 +365,10 @@ tb_pointer_t tb_tpool_ralloc_fast(tb_tpool_t* tpool, tb_pointer_t data, tb_size_
 	tb_assert_and_check_return_val(bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
 
 	// osize
-	if (osize) *osize = bits + 1;
+	if (osize) *osize = bitn * tpool->step;
 
-	// free it first for realloc
-	tb_size_t 	b = *body;
-	tb_size_t 	l = *last;
-	b &= ~(bits << blki);
-	l &= ~((tb_size_t)1 << (blki + bitn - 1));
-	
-	// the new bits
-	bitn = tb_align(size, tpool->step) / tpool->step;
-	bits = ((tb_size_t)1 << bitn) - 1;
-	tb_assert_and_check_return_val(bitn && bitn <= TB_TPOOL_BLOCK_MAXN, TB_NULL);
-
-	// find the free block
-	blki = tb_tpool_find_free(b, bits, bitn);
-	tb_check_return_val(blki < TB_TPOOL_BLOCK_MAXN, TB_NULL);
-
-	// realloc it
-	b |= bits << blki;
-	l |= (tb_size_t)1 << (blki + bitn - 1);
-	*body = b;
-	*last = l;
-	
-	// ok
-	return data;
+	// ok?
+	return (tb_align(size, tpool->step) <= bitn * tpool->step)? data : TB_NULL;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -632,7 +611,10 @@ tb_pointer_t tb_tpool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t si
 
 	// alloc it if no data?
 	if (!data) return tb_tpool_malloc(tpool, size);
-	
+		
+	// larger than limit, maybe slower
+	tb_assert(size <= tb_tpool_limit(tpool));
+
 	// ralloc it with fast mode if enough
 	tb_size_t 		osize = 0;
 	tb_pointer_t 	pdata = tb_tpool_ralloc_fast(tpool, data, size, &osize);
@@ -715,12 +697,13 @@ tb_void_t tb_tpool_dump(tb_handle_t handle)
 	tb_print("tpool: align: %lu", 	tpool->align);
 	tb_print("tpool: limit: %lu", 	tb_tpool_limit(tpool));
 	tb_print("tpool: step: %lu", 	tpool->step);
+	tb_print("tpool: head: %lu", 	tpool->data - (tb_byte_t*)tpool);
 	tb_print("tpool: data: %p", 	tpool->data);
 	tb_print("tpool: size: %lu", 	tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN);
 	tb_print("tpool: full: %lu", 	tpool->full);
 	tb_print("tpool: used: %lu", 	tpool->info.used);
 	tb_print("tpool: peak: %lu", 	tpool->info.peak);
-	tb_print("tpool: wast: %lu%%", 	tpool->info.real? (tpool->info.real - tpool->info.need) * 100 / tpool->info.real : 0);
+	tb_print("tpool: wast: %lu%%", 	(tpool->info.real + (tpool->data - (tb_byte_t*)tpool) - tpool->info.need) * 100 / (tpool->info.real + (tpool->data - (tb_byte_t*)tpool)));
 	tb_print("tpool: fail: %lu", 	tpool->info.fail);
 	tb_print("tpool: pred: %lu%%", 	tpool->info.aloc? ((tpool->info.pred * 100) / tpool->info.aloc) : 0);
 

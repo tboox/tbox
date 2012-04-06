@@ -42,8 +42,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * architecture
  *
- * small block - spool ---\
- *                        |   vpool --
+ * small block - spool ------\
+ *                            vpool --
  * globl block - gpool ------|        | 
  *                            tpool --|- data: |-------------------------------|
  *                                    |

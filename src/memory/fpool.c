@@ -443,11 +443,13 @@ tb_void_t tb_fpool_dump(tb_handle_t handle)
 	tb_print("======================================================================");
 	tb_print("fpool: magic: %#lx",	fpool->magic);
 	tb_print("fpool: align: %lu", 	fpool->align);
+	tb_print("fpool: head: %lu", 	fpool->data - (tb_byte_t*)fpool);
 	tb_print("fpool: data: %p", 	fpool->data);
 	tb_print("fpool: size: %lu", 	fpool->size);
 	tb_print("fpool: step: %lu", 	fpool->step);
 	tb_print("fpool: maxn: %lu", 	fpool->maxn);
 	tb_print("fpool: peak: %lu", 	fpool->info.peak);
+	tb_print("fpool: wast: %lu%%", 	(fpool->data - (tb_byte_t*)fpool) * 100 / (fpool->maxn * fpool->step));
 	tb_print("fpool: fail: %lu", 	fpool->info.fail);
 	tb_print("fpool: pred: %lu%%", 	fpool->info.aloc? ((fpool->info.pred * 100) / fpool->info.aloc) : 0);
 
