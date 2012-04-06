@@ -9,6 +9,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// c++
 	test2_main(argc, argv);
 
+
 	tb_exit();
 	return 0;
 }

@@ -40,6 +40,9 @@
 // the align maxn
 #define TB_GPOOL_ALIGN_MAXN 					(128)
 
+// the tpool minn
+#define TB_GPOOL_TPOOL_MINN 					(512 * 1024)
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -58,6 +61,15 @@ typedef struct __tb_gpool_t
 
 	// the size
 	tb_size_t 		size;
+
+	// the tdata
+	tb_byte_t* 		tdata;
+
+	// the tsize
+	tb_size_t 		tsize;
+
+	// the tpool
+	tb_handle_t 	tpool;
 
 	// the vpool
 	tb_handle_t 	vpool;
@@ -104,6 +116,18 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// init vpool
 	gpool->vpool = tb_vpool_init(gpool->data, gpool->size, gpool->align);
 	tb_assert_and_check_return_val(gpool->vpool, TB_NULL);
+	
+	// init tpool
+	gpool->tsize = gpool->size >> 3;
+	if (gpool->tsize >= TB_GPOOL_TPOOL_MINN)
+	{
+		gpool->tdata = tb_vpool_malloc(gpool->vpool, gpool->tsize);
+		if (gpool->tdata)
+		{
+			gpool->tpool = tb_tpool_init(gpool->tdata, gpool->tsize, gpool->align);
+			tb_assert_and_check_return_val(gpool->tpool, TB_NULL);
+		}
+	}
 
 	// ok
 	return ((tb_handle_t)gpool);
@@ -119,9 +143,8 @@ tb_void_t tb_gpool_exit(tb_handle_t handle)
 
 	// exit vpool
 	if (gpool->vpool) tb_vpool_exit(gpool->vpool);
-	gpool->vpool = TB_NULL;
 
-	// clear head
+	// clear gpool
 	tb_memset(gpool, 0, sizeof(tb_gpool_t));	
 }
 tb_void_t tb_gpool_clear(tb_handle_t handle)
@@ -132,6 +155,15 @@ tb_void_t tb_gpool_clear(tb_handle_t handle)
 
 	// clear vpool
 	if (gpool->vpool) tb_vpool_clear(gpool->vpool);
+
+	// reinit tpool
+	gpool->tdata = TB_NULL;
+	gpool->tpool = TB_NULL;
+	if (gpool->tsize >= TB_GPOOL_TPOOL_MINN)
+	{
+		gpool->tdata = tb_vpool_malloc(gpool->vpool, gpool->tsize);
+		if (gpool->tdata) gpool->tpool = tb_tpool_init(gpool->tdata, gpool->tsize, gpool->align);
+	}
 }
 
 #ifndef TB_DEBUG
@@ -144,6 +176,14 @@ tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
 
+	// try malloc it from tpool
+	if (gpool->tpool && size <= tb_tpool_limit(gpool->tpool))
+	{
+		tb_pointer_t data = tb_tpool_malloc(gpool->tpool, size);
+		if (data) return data;
+	}
+
+	// malloc it from vpool
 #ifndef TB_DEBUG
 	return tb_vpool_malloc_impl(gpool->vpool, size);
 #else
@@ -161,6 +201,14 @@ tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
 
+	// try malloc it from tpool
+	if (gpool->tpool && size <= tb_tpool_limit(gpool->tpool))
+	{
+		tb_pointer_t data = tb_tpool_malloc0(gpool->tpool, size);
+		if (data) return data;
+	}
+
+	// malloc it from vpool
 #ifndef TB_DEBUG
 	return tb_vpool_malloc0_impl(gpool->vpool, size);
 #else
@@ -178,6 +226,14 @@ tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
 
+	// try malloc it from tpool
+	if (gpool->tpool && item * size <= tb_tpool_limit(gpool->tpool))
+	{
+		tb_pointer_t data = tb_tpool_nalloc(gpool->tpool, item, size);
+		if (data) return data;
+	}
+
+	// malloc it from vpool
 #ifndef TB_DEBUG
 	return tb_vpool_nalloc_impl(gpool->vpool, item, size);
 #else
@@ -195,6 +251,14 @@ tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
 
+	// try malloc it from tpool
+	if (gpool->tpool && item * size <= tb_tpool_limit(gpool->tpool))
+	{
+		tb_pointer_t data = tb_tpool_nalloc0(gpool->tpool, item, size);
+		if (data) return data;
+	}
+
+	// malloc it from vpool
 #ifndef TB_DEBUG
 	return tb_vpool_nalloc0_impl(gpool->vpool, item, size);
 #else
@@ -212,6 +276,36 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
 
+	// try ralloc it from tpool
+	if (gpool->tpool && data > gpool->tdata && data < gpool->tdata + gpool->tsize)
+	{
+		// ralloc it
+		tb_pointer_t pdata = TB_NULL;
+		if (size <= tb_tpool_limit(gpool->tpool) && (pdata = tb_tpool_ralloc(gpool->tpool, data, size))) return pdata;
+		else
+		{
+			// malloc it
+#ifndef TB_DEBUG
+			pdata = tb_vpool_malloc_impl(gpool->vpool, size);
+#else
+			pdata = tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
+#endif
+			tb_check_return_val(pdata, TB_NULL);
+			tb_assert_and_check_return_val(pdata != data, pdata);
+
+			// copy data
+			tb_size_t osize = tb_min(tb_tpool_limit(gpool->tpool), size);
+			tb_memcpy(pdata, data, osize);
+			
+			// free it
+			tb_tpool_free(gpool->tpool, data);
+
+			// ok
+			return pdata;
+		}
+	}
+
+	// ralloc it from vpool
 #ifndef TB_DEBUG
 	return tb_vpool_ralloc_impl(gpool->vpool, data, size);
 #else
@@ -229,6 +323,11 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_FALSE);
 
+	// free it to tpool
+	if (gpool->tpool && data > gpool->tdata && data < gpool->tdata + gpool->tsize)
+		return tb_tpool_free(gpool->tpool, data);
+
+	// free it to vpool
 #ifndef TB_DEBUG
 	return tb_vpool_free_impl(gpool->vpool, data);
 #else
@@ -244,6 +343,10 @@ tb_void_t tb_gpool_dump(tb_handle_t handle)
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
 	tb_assert_and_check_return(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool);
 
+	// dump tpool
+	if (gpool->tpool) tb_tpool_dump(gpool->tpool);
+
+	// dump vpool
 	tb_vpool_dump(gpool->vpool);
 }
 #endif
