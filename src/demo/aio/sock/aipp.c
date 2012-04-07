@@ -111,7 +111,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 				if (size)
 				{
-					tb_print("[demo]: recv[%u]: %sock", size, data);
+					tb_print("[demo]: recv[%u]: %s", size, data);
 					tb_test_sock_send(objs[i].handle, "ok", 3);
 				}
 				else

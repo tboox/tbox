@@ -197,7 +197,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 	tb_assert_and_check_goto(aicp->pool && tb_rpool_size(aicp->pool), end);
 
 	// del aico from native
-	if (!aicp->rtor->delo(aicp->rtor, (tb_aico_t const*)aico)) goto end;
+	if (!aicp->rtor->delo(aicp->rtor, aico)) goto end;
 
 	// del aico from pool
 	tb_rpool_free(aicp->pool, aico);
