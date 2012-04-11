@@ -206,9 +206,12 @@ end:
 	// leave 
 	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
 }
-tb_void_t tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
+tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
-	tb_assert_and_check_return_val(aicp && aico && aice, TB_NULL);
+	tb_assert_and_check_return_val(aicp && aice, TB_FALSE);
+
+	// init
+	tb_bool_t ok = TB_FALSE;
 
 	// enter 
 	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
@@ -217,90 +220,65 @@ tb_void_t tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* 
 	tb_assert_and_check_goto(aicp->rtor && aicp->rtor->post, end);
 
 	// add aice to native
-	aicp->rtor->post(aicp->rtor, aico, aice);
+	ok = aicp->rtor->post(aicp->rtor, aice);
 
 end:
 	// leave 
 	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+	
+	// ok?
+	return ok;
 }
-tb_void_t tb_aicp_resv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* name)
+tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return(aicp && aico && name);
+	tb_assert_and_check_return_val(aicp && aico && host && port, TB_FALSE);
 
 	// post
-	tb_aice_t aice;
-	aice.code = TB_AICE_CODE_RESV;
-	aice.u.resv.name = name;
-	tb_aicp_post(aicp, aico, &aice);
-}
-tb_void_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
-{
-	// check
-	tb_assert_and_check_return(aicp && aico && host && port);
-
-	// post
-	tb_aice_t aice;
+	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_CONN;
+	aice.aico = aico;
 	aice.u.conn.port = port;
 	if (tb_ipv4_set(&aice.u.conn.host, host))
-		tb_aicp_post(aicp, aico, &aice);
+		return tb_aicp_post(aicp, &aice);
+	return TB_FALSE;
 }
-tb_void_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return(aicp && aico && data && size);
+	tb_assert_and_check_return_val(aicp && aico && data && size, TB_FALSE);
 
 	// post
-	tb_aice_t aice;
+	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_READ;
+	aice.aico = aico;
 	aice.u.read.data = data;
 	aice.u.read.size = size;
-	tb_aicp_post(aicp, aico, &aice);
+	return tb_aicp_post(aicp, &aice);
 }
-tb_void_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return(aicp && aico && data && size);
+	tb_assert_and_check_return_val(aicp && aico && data && size, TB_FALSE);
 
 	// post
-	tb_aice_t aice;
+	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_WRIT;
+	aice.aico = aico;
 	aice.u.read.data = data;
 	aice.u.read.size = size;
-	tb_aicp_post(aicp, aico, &aice);
+	return tb_aicp_post(aicp, &aice);
 }
-tb_void_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
+tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
 	// check
-	tb_assert_and_check_return(aicp && aico);
+	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
 
 	// post
-	tb_aice_t aice;
+	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_SYNC;
-	tb_aicp_post(aicp, aico, &aice);
-}
-tb_void_t tb_aicp_seek(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t offset)
-{
-	// check
-	tb_assert_and_check_return(aicp && aico);
-
-	// post
-	tb_aice_t aice;
-	aice.code = TB_AICE_CODE_SEEK;
-	aice.u.seek.offset = offset;
-	tb_aicp_post(aicp, aico, &aice);
-}
-tb_void_t tb_aicp_skip(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t size)
-{
-	// check
-	tb_assert_and_check_return(aicp && aico && size);
-
-	// post
-	tb_aice_t aice;
-	aice.code = TB_AICE_CODE_SKIP;
-	aice.u.skip.size = size;
-	tb_aicp_post(aicp, aico, &aice);
+	aice.aico = aico;
+	return tb_aicp_post(aicp, &aice);
 }
 tb_long_t tb_aicp_wait(tb_aicp_t* aicp, tb_long_t timeout)
 {
