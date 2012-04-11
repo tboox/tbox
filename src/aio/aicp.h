@@ -55,23 +55,12 @@ typedef struct __tb_aico_t
 typedef enum __tb_aice_code_t
 {
  	TB_AICE_CODE_NULL 		= 0
-, 	TB_AICE_CODE_RESV 		= 1 	//!< for socket
+,	TB_AICE_CODE_SYNC 		= 1		//!< for file
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for socket
 ,	TB_AICE_CODE_READ 		= 3		//!< for all i/o object
 ,	TB_AICE_CODE_WRIT 		= 4		//!< for all i/o object
-,	TB_AICE_CODE_SYNC 		= 5		//!< for all i/o object
-,	TB_AICE_CODE_SEEK 		= 6		//!< for all i/o object
-,	TB_AICE_CODE_SKIP 		= 7		//!< for all i/o object
 
 }tb_aice_code_t;
-
-// the aio resv event type
-typedef struct __tb_aice_resv_t
-{
-	// the name
-	tb_char_t const* 		name;
-
-}tb_aice_resv_t;
 
 // the aio conn event type
 typedef struct __tb_aice_conn_t
@@ -106,40 +95,24 @@ typedef struct __tb_aice_writ_t
 
 }tb_aice_writ_t;
 
-// the aio seek event type
-typedef struct __tb_aice_seek_t
-{
-	// the offset
-	tb_hize_t 				offset;
-
-}tb_aice_seek_t;
-
-// the aio skip event type
-typedef struct __tb_aice_skip_t
-{
-	// the size
-	tb_hize_t 				size;
-
-}tb_aice_skip_t;
-
 // the aio call event type
 typedef struct __tb_aice_t
 {
+	// the ok
+	tb_long_t 				ok;
+
 	// the code
 	tb_size_t 				code;
 
-	// the ok
-	tb_long_t 				ok;
+	// the aico
+	tb_aico_t const* 		aico;
 
 	// the uion
 	union
 	{
-		tb_aice_resv_t 		resv;
 		tb_aice_conn_t 		conn;
 		tb_aice_read_t 		read;
 		tb_aice_writ_t 		writ;
-		tb_aice_seek_t 		seek;
-		tb_aice_skip_t 		skip;
 	} u;
 
 }tb_aice_t;
@@ -161,7 +134,7 @@ typedef struct __tb_aicp_reactor_t
 	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
 	// post
-	tb_void_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice);
+	tb_bool_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aice_t const* aice);
 
 	// wait
 	tb_long_t 				(*wait)(struct __tb_aicp_reactor_t* reactor, tb_long_t timeout);
@@ -182,6 +155,9 @@ typedef struct __tb_aicp_t
 
 	// the aico pool
 	tb_handle_t 			pool;
+
+	// the aice post
+	tb_handle_t 			post;
 
 	// the reactor
 	tb_aicp_reactor_t* 		rtor;
@@ -229,32 +205,24 @@ tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
 /*!post the aio event
  *
  * @param 	aicp 	the aio pool
- * @param 	aico 	the aico data
- * @param 	etype 	the event type
+ * @param 	aice 	the aice data
+ *
+ * @return 	return TB_TRUE if ok
  *
  */
-tb_void_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice);
-
-/// post resv 
-tb_void_t 			tb_aicp_resv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* name);
-
-/// post conn 
-tb_void_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port);
-
-/// post read
-tb_void_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
-
-/// post writ
-tb_void_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
 
 /// post sync
-tb_void_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
+tb_bool_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
 
-/// post seek
-tb_void_t 			tb_aicp_seek(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t offset);
+/// post conn 
+tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port);
 
-/// post skip
-tb_void_t 			tb_aicp_skip(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t size);
+/// post read
+tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
+
+/// post writ
+tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
 
 /*!wait the aio objects in the pool
  *
