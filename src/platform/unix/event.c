@@ -31,7 +31,7 @@
 #include <unistd.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 #if defined(TB_CONFIG_EVENT_HAVE_POSIX)

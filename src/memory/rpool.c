@@ -100,7 +100,7 @@ typedef struct __tb_rpool_t
 
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 {

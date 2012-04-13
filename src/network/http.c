@@ -114,7 +114,7 @@ static tb_char_t const* tb_http_methods[] =
 };
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_bool_t tb_http_option_init(tb_http_t* http)
 {

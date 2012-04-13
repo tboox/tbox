@@ -35,7 +35,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)

@@ -36,7 +36,7 @@
 # 	define TB_LIBC_STRING_OPT_MEMSET_U32
 #endif
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS

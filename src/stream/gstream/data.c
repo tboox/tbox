@@ -161,7 +161,7 @@ static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	return TB_FALSE;
 }
 /* ///////////////////////////////////////////////////////////////////////
- * interface implemention
+ * interface implementation
  */
 tb_gstream_t* tb_gstream_init_data()
 {

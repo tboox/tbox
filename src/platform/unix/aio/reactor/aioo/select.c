@@ -26,7 +26,7 @@
 #include <sys/select.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeout)
 {

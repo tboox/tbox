@@ -228,7 +228,7 @@ typedef struct __tb_dns_answer_t
 static tb_dns_list_t* 	g_dns_list = TB_NULL;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // size + data, e.g. .www.google.com => 3www6google3com

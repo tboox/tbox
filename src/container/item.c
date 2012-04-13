@@ -317,7 +317,7 @@ static tb_void_t tb_item_func_ifm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	if (func->ndupl) func->ndupl(func, item, data, size);
 }
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
 {

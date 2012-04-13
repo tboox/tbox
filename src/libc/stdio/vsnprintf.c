@@ -749,7 +749,7 @@ get_qualifier:
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 /*! format a string and place it in a buffer

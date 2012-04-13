@@ -129,7 +129,7 @@ static tb_bool_t tb_aicp_reactor_iocp_post_sync(tb_aicp_reactor_t* reactor, tb_a
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_bool_t tb_aicp_reactor_iocp_addo(tb_aicp_reactor_t* reactor, tb_aico_t const* aico)
 {

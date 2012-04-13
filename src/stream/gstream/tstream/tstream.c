@@ -33,7 +33,7 @@
 #include "../../../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_long_t tb_tstream_afill(tb_tstream_t* tst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {

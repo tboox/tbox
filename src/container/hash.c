@@ -160,7 +160,7 @@ static tb_bool_t tb_hash_item_at(tb_hash_t* hash, tb_size_t buck, tb_size_t item
 	return TB_TRUE;
 }
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)

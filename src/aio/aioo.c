@@ -33,7 +33,7 @@ tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
 tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata)
 {

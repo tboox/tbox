@@ -38,7 +38,7 @@ tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp);
 tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp);
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)

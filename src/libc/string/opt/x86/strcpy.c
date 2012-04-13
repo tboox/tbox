@@ -34,7 +34,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)

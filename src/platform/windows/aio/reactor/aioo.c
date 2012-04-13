@@ -35,7 +35,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #ifdef TB_CONFIG_AIO_HAVE_WAITO
 

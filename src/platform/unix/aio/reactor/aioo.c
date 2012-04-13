@@ -35,7 +35,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 #if defined(TB_CONFIG_AIO_HAVE_POLL)

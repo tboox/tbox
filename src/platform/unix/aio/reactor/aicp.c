@@ -28,7 +28,7 @@
 #include "aicp/aipp.c"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp)
 {

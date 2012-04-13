@@ -34,7 +34,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #ifdef TB_CONFIG_ASSEMBLER_GAS
 tb_long_t tb_strcmp(tb_char_t const* s1, tb_char_t const* s2)

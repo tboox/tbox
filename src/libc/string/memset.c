@@ -40,7 +40,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention 
+ * implementation 
  */
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
 tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)

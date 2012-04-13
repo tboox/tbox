@@ -30,7 +30,7 @@
 #include <errno.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size)

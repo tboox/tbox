@@ -26,7 +26,7 @@
 #include <sys/poll.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_long_t tb_aioo_reactor_poll_wait(tb_aioo_t* object, tb_long_t timeout)
 {

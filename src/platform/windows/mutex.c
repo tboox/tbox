@@ -28,7 +28,7 @@
 #include <windows.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_handle_t tb_mutex_init(tb_char_t const* name)
