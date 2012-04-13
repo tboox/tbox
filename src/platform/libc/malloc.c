@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_pointer_t tb_malloc(tb_size_t size)

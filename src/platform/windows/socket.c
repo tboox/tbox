@@ -35,7 +35,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_bool_t tb_socket_init()
 {

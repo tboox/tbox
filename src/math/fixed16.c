@@ -215,7 +215,7 @@ static tb_fixed16_t tb_fixed16_cordic_vector_asin(tb_fixed16_t m)
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_fixed16_t tb_fixed16_invert_int32(tb_fixed16_t x)

@@ -169,7 +169,7 @@ static tb_void_t tb_md5_transform(tb_uint32_t* sp, tb_uint32_t* ip)
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // set pseudo_rand to zero for rfc md5 implementation

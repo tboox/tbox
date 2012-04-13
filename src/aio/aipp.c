@@ -35,7 +35,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp);
 tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 {

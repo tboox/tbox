@@ -65,7 +65,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // file

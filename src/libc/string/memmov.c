@@ -39,7 +39,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention 
+ * implementation 
  */
 
 #if defined(TB_CONFIG_LIBC_HAVE_MEMMOV)

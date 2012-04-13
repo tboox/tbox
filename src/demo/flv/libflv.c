@@ -478,7 +478,7 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_bstream_t* bst)
 }
 
 /* ////////////////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_handle_t tb_flv_init(tb_gstream_t* gst)

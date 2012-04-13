@@ -56,7 +56,7 @@ static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path)
 	return (!tb_strnicmp(path, "file://", 7))? (path + 7) : path;
 }
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // file

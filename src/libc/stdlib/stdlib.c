@@ -27,7 +27,7 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_uint32_t tb_s2tou32(tb_char_t const* s)

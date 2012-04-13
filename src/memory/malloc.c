@@ -34,7 +34,7 @@ static tb_handle_t g_gpool = TB_NULL;
 static tb_handle_t g_mutex = TB_NULL; 
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {

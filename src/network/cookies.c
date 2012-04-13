@@ -510,7 +510,7 @@ static tb_void_t tb_cookies_spool_free(tb_item_func_t* func, tb_pointer_t item)
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_cookies_t* tb_cookies_init()
 {

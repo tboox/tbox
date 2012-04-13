@@ -106,7 +106,7 @@ typedef struct __tb_fpool_t
 }tb_fpool_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 {

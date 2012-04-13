@@ -34,7 +34,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)

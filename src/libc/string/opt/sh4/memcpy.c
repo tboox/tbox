@@ -35,7 +35,7 @@
 
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 #if 1
 tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)

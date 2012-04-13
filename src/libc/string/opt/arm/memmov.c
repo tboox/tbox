@@ -34,7 +34,7 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS

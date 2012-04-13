@@ -136,7 +136,7 @@ typedef struct __tb_vpool_t
 }tb_vpool_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 // malloc from the given data address
 static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)

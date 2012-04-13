@@ -65,7 +65,7 @@ static tb_bool_t tb_check_float_order()
 #endif
 }
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)

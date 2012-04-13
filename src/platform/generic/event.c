@@ -27,7 +27,7 @@
 #include "../atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_handle_t tb_event_init(tb_char_t const* name)
 {

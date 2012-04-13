@@ -91,8 +91,8 @@
 
 /* trace_impl
  *
- * only for the .c file, debug the module implemention
- * disable it if the module implemention is ok
+ * only for the .c file, debug the module implementation
+ * disable it if the module implementation is ok
  *
  * .e.g.1
  *

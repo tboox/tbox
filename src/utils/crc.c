@@ -230,7 +230,7 @@ static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] =
 };
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in)

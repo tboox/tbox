@@ -47,7 +47,7 @@ static __tb_inline__ tb_uint32_t tb_rand_linear_next_uint32(tb_rand_linear_t* ra
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // the global rand

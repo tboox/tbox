@@ -22,7 +22,7 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_long_t tb_aioo_reactor_waito_wait(tb_aioo_t* object, tb_long_t timeout)
 {

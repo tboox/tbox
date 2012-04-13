@@ -159,7 +159,7 @@ typedef struct __tb_tpool_t
 }tb_tpool_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits, tb_size_t bitn)
 {

@@ -27,7 +27,7 @@
 #include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_uint32_t tb_int32_sqrt(tb_uint32_t x)
 {

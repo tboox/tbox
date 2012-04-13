@@ -45,7 +45,7 @@ typedef struct __tb_aipp_reactor_epoll_t
 }tb_aipp_reactor_epoll_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_bool_t tb_aipp_reactor_epoll_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {

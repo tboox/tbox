@@ -98,7 +98,7 @@ typedef struct __tb_spool_t
 tb_pointer_t tb_vpool_ralloc_fast(tb_pointer_t vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_pointer_t tb_spool_ralloc_fast(tb_spool_t* spool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {

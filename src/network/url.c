@@ -33,7 +33,7 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 // init & exit

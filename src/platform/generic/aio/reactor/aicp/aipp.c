@@ -34,7 +34,7 @@ typedef struct __tb_aicp_reactor_aipp_t
 }tb_aicp_reactor_aipp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 static tb_void_t tb_aicp_reactor_aipp_exit(tb_aicp_reactor_t* reactor)

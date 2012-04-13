@@ -28,7 +28,7 @@
 # 	include "float.h"
 #endif
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 #ifdef TB_CONFIG_TYPE_FLOAT

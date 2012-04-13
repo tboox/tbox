@@ -28,7 +28,7 @@
 #include "stdio.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_int_t tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...)

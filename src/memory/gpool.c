@@ -78,7 +78,7 @@ typedef struct __tb_gpool_t
 
 
 /* ///////////////////////////////////////////////////////////////////////
- * the implemention
+ * the implementation
  */
 tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {

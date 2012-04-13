@@ -254,7 +254,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buff
 
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 

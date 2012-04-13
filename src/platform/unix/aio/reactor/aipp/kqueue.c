@@ -59,7 +59,7 @@ typedef struct __tb_aipp_reactor_kqueue_t
 }tb_aipp_reactor_kqueue_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 static tb_bool_t tb_aipp_reactor_kqueue_sync(tb_aipp_reactor_t* reactor, struct kevent* evts, tb_size_t evtn)
 {

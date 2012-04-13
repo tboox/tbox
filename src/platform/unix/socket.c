@@ -35,7 +35,7 @@
 #include <errno.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_bool_t tb_socket_init()
 {
