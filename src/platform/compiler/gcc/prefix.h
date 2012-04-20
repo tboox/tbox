@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		prefix.h
+ * @author		ruki
+ * @file		prefix.h
  *
  */
 #ifndef TB_PLATFROM_COMPILER_GCC_PREFIX_H

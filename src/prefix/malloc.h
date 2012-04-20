@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		malloc.h
+ * @author		ruki
+ * @file		malloc.h
  *
  */
 #ifndef TB_PREFIX_MALLOC_H

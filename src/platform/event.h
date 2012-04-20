@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		event.h
+ * @author		ruki
+ * @file		event.h
  *
  */
 #ifndef TB_PLATFORM_EVENT_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		scalar.h
+ * @author		ruki
+ * @file		scalar.h
  *
  */
 #ifndef TB_MATH_SCALAR_H

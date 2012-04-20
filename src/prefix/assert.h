@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		assert.h
+ * @author		ruki
+ * @file		assert.h
  *
  */
 #ifndef TB_PREFIX_ASSERT_H

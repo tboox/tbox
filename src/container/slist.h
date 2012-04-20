@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		slist.h
+ * @author		ruki
+ * @file		slist.h
  *
  */
 #ifndef TB_CONTAINER_SLIST_H

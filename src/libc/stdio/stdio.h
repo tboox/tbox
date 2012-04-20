@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		stdio.h
+ * @author		ruki
+ * @file		stdio.h
  *
  */
 #ifndef TB_LIBC_STDIO_H

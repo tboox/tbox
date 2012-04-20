@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		stack.h
+ * @author		ruki
+ * @file		stack.h
  *
  */
 #ifndef TB_CONTAINER_STACK_H
@@ -55,7 +55,7 @@
  * next: 	fast
  * prev: 	fast
  *
- * \note the itor of the same item is fixed
+ * @note the itor of the same item is fixed
  *
  */
 typedef tb_vector_t 			tb_stack_t;

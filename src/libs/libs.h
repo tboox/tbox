@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
- * \author		ruki
- * \file		libs.h
+ * @author		ruki
+ * @file		libs.h
  *
  */
 #ifndef TB_LIBS_H

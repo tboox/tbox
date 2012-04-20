@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		abort.h
+ * @author		ruki
+ * @file		abort.h
  *
  */
 #ifndef TB_PREFIX_ABORT_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		time.h
+ * @author		ruki
+ * @file		time.h
  *
  */
 #ifndef TB_UTILS_TIME_H

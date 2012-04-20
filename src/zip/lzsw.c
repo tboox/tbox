@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		zstream.c
+ * @author		ruki
+ * @file		zstream.c
  *
  */
 /* ///////////////////////////////////////////////////////////////////////
@@ -285,7 +285,7 @@ static tb_size_t tb_lzsw_window_find(tb_lzsw_deflate_window_t* window, tb_byte_t
 	{
 		tb_byte_t const* wq = wp;
 		tb_byte_t const* sq = sp;
-		// \note: address maybe generate overlap
+		// @note: address maybe generate overlap
 		for (; /*wq < we && */sq < se && *wq == *sq; wq++, sq++);
 		if ((wq - wp) > (me - mp))
 		{
@@ -344,7 +344,7 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 			//tb_trace("%d %d", p, n);
 #if 0 
 			// fill data
-			// \note: address maybe overlap
+			// @note: address maybe overlap
 			tb_memcpy(dp, window->we + p - window->wn, n);
 
 			// update dp

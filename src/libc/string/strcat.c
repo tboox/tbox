@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		strcat.c
+ * @author		ruki
+ * @file		strcat.c
  *
  */
 

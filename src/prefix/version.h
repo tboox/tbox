@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		version.h
+ * @author		ruki
+ * @file		version.h
  *
  */
 #ifndef TB_PREFIX_VERSION_H

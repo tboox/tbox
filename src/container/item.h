@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		item.h
+ * @author		ruki
+ * @file		item.h
  *
  */
 #ifndef TB_CONTAINER_ITEM_H

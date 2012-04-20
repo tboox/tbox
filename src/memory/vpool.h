@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		vpool.h
+ * @author		ruki
+ * @file		vpool.h
  *
  */
 #ifndef TB_MEMORY_VPOOL_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		nlist.h
+ * @author		ruki
+ * @file		nlist.h
  *
  */
 #ifndef TB_XML_NLIST_H

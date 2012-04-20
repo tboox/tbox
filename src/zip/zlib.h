@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		zlib.h
+ * @author		ruki
+ * @file		zlib.h
  *
  */
 #ifndef TB_ZIP_ZLIB_H

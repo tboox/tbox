@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		fixed30.h
+ * @author		ruki
+ * @file		fixed30.h
  *
  */
 #ifndef TB_MATH_FIXED30_H

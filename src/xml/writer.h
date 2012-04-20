@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		writer.h
+ * @author		ruki
+ * @file		writer.h
  *
  */
 #ifndef TB_XML_WRITER_H

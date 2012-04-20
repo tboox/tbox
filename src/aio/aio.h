@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		aio.h
+ * @author		ruki
+ * @file		aio.h
  *
  */
 #ifndef TB_AIO_H

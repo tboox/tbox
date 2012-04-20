@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		cookies.h
+ * @author		ruki
+ * @file		cookies.h
  *
  */
 #ifndef TB_NETWORK_COOKIES_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		rbuffer.h
+ * @author		ruki
+ * @file		rbuffer.h
  *
  */
 #ifndef TB_MEMORY_RBUFFER_H

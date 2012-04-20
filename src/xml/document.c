@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		document.c
+ * @author		ruki
+ * @file		document.c
  *
  */
 

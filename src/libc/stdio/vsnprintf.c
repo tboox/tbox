@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- ** \file		vsnprintf.c
+ * @author		ruki
+ * @file		vsnprintf.c
  *
  */
 
@@ -754,15 +754,14 @@ get_qualifier:
 
 /*! format a string and place it in a buffer
  *
- * \param s: the buffer to place the result into
- * \param n: the size of the buffer, including the trailing null space
- * \param fmt: the format string to use
- * \param args: arguments for the format string
+ * @param s 	the buffer to place the result into
+ * @param n 	the size of the buffer, including the trailing null space
+ * @param fmt 	the format string to use
+ * @param args 	arguments for the format string
  *
- * return the number of characters which would be generated for the given input, 
- * excluding the trailing '\0'.
+ * @return 		the number of characters which would be generated for the given input, excluding the trailing '\0'.
  *
- * format: %[flags][width][.precision][qualifier]type
+ * - format: %[flags][width][.precision][qualifier]type
  *
  * - flags:
  *   - default: right-justified, left-pad the output with spaces until the required length of output is attained. 
@@ -805,9 +804,7 @@ get_qualifier:
  *   - I32: 	32-bit integer
  *   - I64/ll: 	64-bit integer
  *
- * \note:
- * support: 		h, l, I8, I16, I32, I64, ll
- * not support: 	
+ * @note support h, l, I8, I16, I32, I64, ll
  *
  * - type(e.g. %d %x %u %% ...):
  *   - d, i: 	print an int as a signed decimal number. 
@@ -834,26 +831,26 @@ get_qualifier:
  *   - n: 		print nothing, but write number of characters successfully written so far into an integer pointer parameter.
  *   - %: 		%
  *
- * \note: 
- * support: 		d, i, u, o, u, x/X, b/B, f/F, c, s, %
- * not support: 	e/E, g/G, p, n
+ * @note support 		d, i, u, o, u, x/X, b/B, f/F, c, s
+ * @note not support 	e/E, g/G, p, n
  *
  * e.g.
- *  
- *  tb_printf("|hello world|\n");
-	tb_printf("|%-10s|%%|%10s|\n", "hello", "world");
-	tb_printf("|%#2c|%2.5c|%*c|\n", 'A', 'B', 5, 'C');
-	tb_printf("|%#2d|%#8.3o|%*.*d|\n", -56, 56, 10, 5, 56);
-	tb_printf("|%#-8.5x|%#2.9X|\n", 0x1f, 0x1f);
-	tb_printf("|%#-8.5b|%#2.9B|\n", 0x1f, 0x1f);
-	tb_printf("|%-6Id|%5I8u|%#I64x|%#llx|\n", 256, 255, (tb_int64_t)0x8fffffffffff, (tb_int64_t)0x8fffffffffff);
-	tb_printf("|%f|\n", -3.1415926535897932384626433832795);
-	tb_printf("|%f|%f|%f|\n", 3.14, 0, -0);
-	tb_printf("|%0.9f|\n", 3.1415926535897932384626433832795);
-	tb_printf("|%16.9f|\n", 3.1415926535897932384626433832795);
-	tb_printf("|%016.9f|\n", 3.14159);
-	tb_printf("|%lf|\n", 1.0 / 6.0);
-	tb_printf("|%f|\n", 0.0003141596);
+ * @code
+ * tb_printf("|hello world|\n");
+ * tb_printf("|%-10s|%%|%10s|\n", "hello", "world");
+ * tb_printf("|%#2c|%2.5c|%*c|\n", 'A', 'B', 5, 'C');
+ * tb_printf("|%#2d|%#8.3o|%*.*d|\n", -56, 56, 10, 5, 56);
+ * tb_printf("|%#-8.5x|%#2.9X|\n", 0x1f, 0x1f);
+ * tb_printf("|%#-8.5b|%#2.9B|\n", 0x1f, 0x1f);
+ * tb_printf("|%-6Id|%5I8u|%#I64x|%#llx|\n", 256, 255, (tb_int64_t)0x8fffffffffff, (tb_int64_t)0x8fffffffffff);
+ * tb_printf("|%f|\n", -3.1415926535897932384626433832795);
+ * tb_printf("|%f|%f|%f|\n", 3.14, 0, -0);
+ * tb_printf("|%0.9f|\n", 3.1415926535897932384626433832795);
+ * tb_printf("|%16.9f|\n", 3.1415926535897932384626433832795);
+ * tb_printf("|%016.9f|\n", 3.14159);
+ * tb_printf("|%lf|\n", 1.0 / 6.0);
+ * tb_printf("|%f|\n", 0.0003141596);
+ * @endcode
  *
  */
 tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)

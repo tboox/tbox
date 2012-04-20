@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		rand.h
+ * @author		ruki
+ * @file		rand.h
  *
  */
 #ifndef TB_MATH_RAND_H

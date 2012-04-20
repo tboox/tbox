@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		fixed30_arm.h
+ * @author		ruki
+ * @file		fixed30_arm.h
  *
  */
 #ifndef TB_MATH_OPT_FIXED30_ARM_H

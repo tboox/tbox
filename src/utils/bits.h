@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		bits.h
+ * @author		ruki
+ * @file		bits.h
  *
  */
 #ifndef TB_UTILS_BITS_H

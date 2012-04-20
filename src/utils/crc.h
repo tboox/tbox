@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		crc.h
+ * @author		ruki
+ * @file		crc.h
  *
  */
 #ifndef TB_UTILS_CRC_H

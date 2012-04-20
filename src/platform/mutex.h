@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		mutex.h
+ * @author		ruki
+ * @file		mutex.h
  *
  */
 #ifndef TB_PLATFORM_MUTEX_H

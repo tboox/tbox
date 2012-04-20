@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		sha.h
+ * @author		ruki
+ * @file		sha.h
  *
  */
 #ifndef TB_UTILS_SHA_H

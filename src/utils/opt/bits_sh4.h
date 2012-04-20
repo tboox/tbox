@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		bits_sh4.h
+ * @author		ruki
+ * @file		bits_sh4.h
  *
  */
 #ifndef TB_UTILS_OPT_BITS_SH4_H

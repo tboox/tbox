@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		check.h
+ * @author		ruki
+ * @file		check.h
  *
  */
 #ifndef TB_PREFIX_CHECK_H

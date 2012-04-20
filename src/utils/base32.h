@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		base32.h
+ * @author		ruki
+ * @file		base32.h
  *
  */
 #ifndef TB_UTILS_BASE32_H

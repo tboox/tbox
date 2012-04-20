@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		spool.h
+ * @author		ruki
+ * @file		spool.h
  *
  */
 #ifndef TB_MEMORY_SPOOL_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		int32.h
+ * @author		ruki
+ * @file		int32.h
  *
  */
 #ifndef TB_MATH_INT32_H
