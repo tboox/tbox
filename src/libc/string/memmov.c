@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		memmov.c
+ * @ingroup 	libc
  *
  */
 

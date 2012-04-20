@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		nlist.h
+ * @ingroup 	xml
  *
  */
 #ifndef TB_XML_NLIST_H

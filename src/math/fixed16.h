@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		fixed16.h
+ * @ingroup 	math
  *
  */
 #ifndef TB_MATH_FIXED16_H

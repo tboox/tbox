@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		utils.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_UTILS_H

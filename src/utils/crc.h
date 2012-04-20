@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		crc.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_CRC_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		vlc.h
+ * @ingroup 	zip
  *
  */
 #ifndef TB_ZIP_VLC_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		base.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_BASE64_H

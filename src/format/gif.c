@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		gif.c
+ * @ingroup 	format
  *
  */
 

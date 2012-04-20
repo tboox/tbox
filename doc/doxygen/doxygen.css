@@ -260,7 +260,8 @@ span.keywordflow {
 }
 
 span.comment {
-	color: #008000
+	color: #008000;
+	font-style: italic;
 }
 
 span.preprocessor {

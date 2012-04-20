@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		7z.c
+ * @ingroup 	format
  *
  */
 

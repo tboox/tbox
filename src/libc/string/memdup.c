@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		memdup.c
+ * @ingroup 	libc
  *
  */
 

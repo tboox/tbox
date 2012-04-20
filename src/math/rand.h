@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		rand.h
+ * @ingroup 	math
  *
  */
 #ifndef TB_MATH_RAND_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		wav.c
+ * @ingroup 	format
  *
  */
 

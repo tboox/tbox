@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		dns.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_DNS_H

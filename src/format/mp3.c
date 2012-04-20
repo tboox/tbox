@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		mp3.c
+ * @ingroup 	format
  *
  */
 

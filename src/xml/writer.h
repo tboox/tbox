@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		writer.h
+ * @ingroup 	xml
  *
  */
 #ifndef TB_XML_WRITER_H

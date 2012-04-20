@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		writer.c
+ * @ingroup 	xml
  *
  */
 

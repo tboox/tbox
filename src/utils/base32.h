@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		base32.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_BASE32_H

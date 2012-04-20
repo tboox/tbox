@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sha.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_SHA_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		bits.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_BITS_H

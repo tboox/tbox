@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		rstring.c
+ * @ingroup 	string
  *
  */
 

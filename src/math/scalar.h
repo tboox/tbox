@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		scalar.h
+ * @ingroup 	math
  *
  */
 #ifndef TB_MATH_SCALAR_H

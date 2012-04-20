@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		int32.h
+ * @ingroup 	math
  *
  */
 #ifndef TB_MATH_INT32_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		nlist.c
+ * @ingroup 	xml
  *
  */
 

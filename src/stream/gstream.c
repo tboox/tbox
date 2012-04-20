@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		gstream.c
+ * @ingroup 	stream
  *
  */
 

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		crc.c
+ * @ingroup 	utils
  *
  */
 

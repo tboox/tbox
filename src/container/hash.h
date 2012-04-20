@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		hash.h
+ * @ingroup 	container
  *
  */
 #ifndef TB_CONTAINER_HASH_H

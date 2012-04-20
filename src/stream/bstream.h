@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		bstream.h
+ * @ingroup 	stream
  *
  */
 #ifndef TB_STREAM_BSTREAM_H

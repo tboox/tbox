@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		snprintf.c
+ * @ingroup 	libc
  *
  */
 

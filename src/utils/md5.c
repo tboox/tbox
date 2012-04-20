@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		md5.c
+ * @ingroup 	utils
  *
  */
 

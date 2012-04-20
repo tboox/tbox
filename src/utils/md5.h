@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		md5.h
+ * @ingroup 	utils
  *
  */
 #ifndef TB_UTILS_MD5_H

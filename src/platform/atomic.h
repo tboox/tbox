@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		atomic.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_ATOMIC_H

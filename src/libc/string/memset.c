@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		memset.c
+ * @ingroup 	libc
  *
  */
 

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		mutex.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_MUTEX_H

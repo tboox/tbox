@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		vector.h
+ * @ingroup 	container
  *
  */
 #ifndef TB_CONTAINER_VECTOR_H
