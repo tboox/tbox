@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		xml.h
+ * @defgroup 	xml
  *
  */
 #ifndef TB_XML_H

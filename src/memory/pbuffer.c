@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		pbuffer.c
+ * @ingroup 	memory
  *
  */
 

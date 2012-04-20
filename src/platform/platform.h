@@ -17,7 +17,8 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		platform.h
+ * @defgroup 	platform
  *
  */
 #ifndef TB_PLATFROM_H

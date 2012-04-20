@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		utils.h
+ * @defgroup 	utils
  *
  */
 #ifndef TB_UTILS_H

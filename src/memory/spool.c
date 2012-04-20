@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		spool.c
+ * @ingroup 	memory
  *
  */
 

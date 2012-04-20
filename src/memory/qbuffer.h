@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		qbuffer.h
+ * @ingroup 	memory
  *
  */
 #ifndef TB_MEMORY_QBUFFER_H

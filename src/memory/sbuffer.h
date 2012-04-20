@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sbuffer.h
+ * @ingroup 	memory
  *
  */
 #ifndef TB_MEMORY_SBUFFER_H

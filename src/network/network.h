@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		network.h
+ * @defgroup 	network
  *
  */
 #ifndef TB_NETWORK_H

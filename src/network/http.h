@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		http.h
+ * @ingroup 	network
  *
  */
 #ifndef TB_NETWORK_HTTP_H

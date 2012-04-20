@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		libc.h
+ * @defgroup 	libc
  *
  */
 #ifndef TB_LIBC_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		memory.h
+ * @defgroup 	memory
  *
  */
 #ifndef TB_MEMORY_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		string.h
+ * @defgroup 	string
  *
  */
 #ifndef TB_STRING_H
