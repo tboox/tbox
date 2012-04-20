@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sbuffer.c
+ * @ingroup 	memory
  *
  */
 

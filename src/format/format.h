@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		format.h
+ * @defgroup 	format
  *
  */
 

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		aicp.h
+ * @ingroup 	aio
  *
  */
 #ifndef TB_AIO_CALL_POOL_H

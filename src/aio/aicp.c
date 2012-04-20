@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		aicp.c
+ * @ingroup 	aio
  *
  */
 

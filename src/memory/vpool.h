@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		vpool.h
+ * @ingroup 	memory
  *
  */
 #ifndef TB_MEMORY_VPOOL_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		container.h
+ * @defgroup 	container
  *
  */
 #ifndef TB_CONTAINER_H

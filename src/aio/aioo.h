@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		aioo.h
+ * @ingroup 	aio
  *
  */
 #ifndef TB_AIO_OBJECT_H

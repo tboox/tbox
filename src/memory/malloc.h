@@ -17,7 +17,8 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		memory.h
+ * @file		malloc.h
+ * @ingroup 	memory
  *
  */
 #ifndef TB_MEMORY_MEMORY_H

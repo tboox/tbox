@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		stream.h
+ * @defgroup 	stream
  *
  */
 #ifndef TB_STREAM_H

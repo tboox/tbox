@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		aipp.h
+ * @ingroup 	aio
  *
  */
 #ifndef TB_AIO_POLL_POOL_H

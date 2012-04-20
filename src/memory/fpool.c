@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		fpool.c
+ * @ingroup 	memory
  *
  */
 

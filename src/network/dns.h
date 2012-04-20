@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		dns.h
+ * @ingroup 	network
  *
  */
 #ifndef TB_NETWORK_DNS_H

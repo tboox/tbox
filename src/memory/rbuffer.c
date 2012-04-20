@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		rbuffer.c
+ * @ingroup 	memory
  *
  */
 

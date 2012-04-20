@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		url.h
+ * @ingroup 	network
  *
  */
 #ifndef TB_NETWORK_URL_H

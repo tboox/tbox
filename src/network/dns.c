@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		dns.c
+ * @ingroup 	network
  *
  */
 
