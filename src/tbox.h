@@ -52,11 +52,19 @@ extern "C" {
  * interfaces
  */
 
-// init & exit
+/*!init the tbox library
+ *
+ * @param data the memory data, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
+ * @param size the memory size, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
+ *
+ * @return return TB_TRUE if ok
+ */
 tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
+
+/// exit the tbox library
 tb_void_t 			tb_exit();
 
-// version
+/// the tbox version string
 tb_char_t const* 	tb_version();
 
 
