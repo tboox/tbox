@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		cpu.h
+ * @author		ruki
+ * @file		cpu.h
  *
  */
 #ifndef TB_PREFIX_CPU_H

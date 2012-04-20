@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		unicode_gb2312.c
+ * @author		ruki
+ * @file		unicode_gb2312.c
  *
  */
 /* ///////////////////////////////////////////////////////////////////////

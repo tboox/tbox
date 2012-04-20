@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		fixed16_arm.h
+ * @author		ruki
+ * @file		fixed16_arm.h
  *
  */
 #ifndef TB_MATH_OPT_FLOAT_ARM_H

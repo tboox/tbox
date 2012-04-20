@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		dns.h
+ * @author		ruki
+ * @file		dns.h
  *
  */
 #ifndef TB_PLATFORM_DNS_H

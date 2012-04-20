@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		dlist.h
+ * @author		ruki
+ * @file		dlist.h
  *
  */
 #ifndef TB_CONTAINER_DLIST_H

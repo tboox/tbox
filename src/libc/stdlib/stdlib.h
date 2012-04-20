@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		stdlib.h
+ * @author		ruki
+ * @file		stdlib.h
  *
  */
 #ifndef TB_LIBC_STDLIB_H

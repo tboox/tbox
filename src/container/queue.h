@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		queue.h
+ * @author		ruki
+ * @file		queue.h
  *
  */
 #ifndef TB_CONTAINER_QUEUE_H
@@ -67,7 +67,7 @@
  * next: 	fast
  * prev: 	fast
  *
- * \note the index of the same item is mutable
+ * @note the index of the same item is mutable
  *
  */
 typedef struct __tb_queue_t

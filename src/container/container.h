@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		container.h
+ * @author		ruki
+ * @file		container.h
  *
  */
 #ifndef TB_CONTAINER_H

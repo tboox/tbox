@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		md5.h
+ * @author		ruki
+ * @file		md5.h
  *
  */
 #ifndef TB_UTILS_MD5_H

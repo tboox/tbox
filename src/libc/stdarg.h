@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		stdarg.h
+ * @author		ruki
+ * @file		stdarg.h
  *
  */
 #ifndef TB_LIBC_STDARG_H

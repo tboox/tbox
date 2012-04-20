@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		fpool.h
+ * @author		ruki
+ * @file		fpool.h
  *
  */
 #ifndef TB_MEMORY_FPOOL_H

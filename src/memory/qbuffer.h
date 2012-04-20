@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		qbuffer.h
+ * @author		ruki
+ * @file		qbuffer.h
  *
  */
 #ifndef TB_MEMORY_QBUFFER_H

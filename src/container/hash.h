@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		hash.h
+ * @author		ruki
+ * @file		hash.h
  *
  */
 #ifndef TB_CONTAINER_HASH_H
@@ -89,7 +89,7 @@ typedef struct __tb_hash_item_list_t
  *                      |     |                                              
  *                       -----  
  *
- * \note the itor of the same item is mutable
+ * @note the itor of the same item is mutable
  */
 typedef struct __tb_hash_t
 {
@@ -154,7 +154,7 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * head: => the first item
  * tail: => behind the last item, no item
  *
- * \note the index of the same item is mutable, only for iterator
+ * @note the index of the same item is mutable, only for iterator
  */
 tb_hash_item_t* 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
 tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t itor);

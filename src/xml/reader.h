@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		reader.h
+ * @author		ruki
+ * @file		reader.h
  *
  */
 #ifndef TB_XML_READER_H

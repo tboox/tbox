@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		string.h
+ * @author		ruki
+ * @file		string.h
  *
  */
 #ifndef TB_STRING_H

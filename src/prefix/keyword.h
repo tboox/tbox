@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		keyword.h
+ * @author		ruki
+ * @file		keyword.h
  *
  */
 #ifndef TB_PREFIX_KEYWORD_H

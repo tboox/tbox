@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		aipp.h
+ * @author		ruki
+ * @file		aipp.h
  *
  */
 #ifndef TB_AIO_POLL_POOL_H

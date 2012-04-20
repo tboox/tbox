@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		rlc.h
+ * @author		ruki
+ * @file		rlc.h
  *
  */
 #ifndef TB_ZIP_RLC_H

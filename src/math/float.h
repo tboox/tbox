@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		float.h
+ * @author		ruki
+ * @file		float.h
  *
  */
 #ifndef TB_MATH_FLOAT_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		socket.h
+ * @author		ruki
+ * @file		socket.h
  *
  */
 #ifndef TB_PLATFORM_SOCKET_H

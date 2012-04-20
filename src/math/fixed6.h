@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		fixed6.h
+ * @author		ruki
+ * @file		fixed6.h
  *
  */
 #ifndef TB_MATH_FIXED6_H
@@ -96,7 +96,7 @@ static __tb_inline__ tb_int_t tb_fixed6_to_int_check(tb_fixed6_t x)
 }
 #endif
 
-// \note the return value is the fixed16 type
+// @note the return value is the fixed16 type
 static __tb_inline__ tb_fixed16_t tb_fixed6_div_inline(tb_fixed6_t x, tb_fixed6_t y)
 {
 	tb_assert(y != 0);

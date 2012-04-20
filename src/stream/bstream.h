@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		bstream.h
+ * @author		ruki
+ * @file		bstream.h
  *
  */
 #ifndef TB_STREAM_BSTREAM_H

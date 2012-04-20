@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		vlc.h
+ * @author		ruki
+ * @file		vlc.h
  *
  */
 #ifndef TB_ZIP_VLC_H

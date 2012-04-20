@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		compiler.h
+ * @author		ruki
+ * @file		compiler.h
  *
  */
 #ifndef TB_PREFIX_COMPILER_H

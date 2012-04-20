@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		arch.h
+ * @author		ruki
+ * @file		arch.h
  *
  */
 #ifndef TB_PREFIX_ARCH_H

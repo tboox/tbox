@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		http.h
+ * @author		ruki
+ * @file		http.h
  *
  */
 #ifndef TB_NETWORK_HTTP_H

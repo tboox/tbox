@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		event.c
+ * @author		ruki
+ * @file		event.c
  *
  */
 

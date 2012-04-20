@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		thread.h
+ * @author		ruki
+ * @file		thread.h
  *
  */
 #ifndef TB_PLATFORM_THREAD_H

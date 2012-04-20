@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		trace.h
+ * @author		ruki
+ * @file		trace.h
  *
  */
 #ifndef TB_PREFIX_TRACE_H

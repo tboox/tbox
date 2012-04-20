@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		prefix.h
+ * @author		ruki
+ * @file		prefix.h
  *
  */
 #ifndef TB_ENCODING_PREFIX_H

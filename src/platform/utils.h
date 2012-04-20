@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		utils.h
+ * @author		ruki
+ * @file		utils.h
  *
  */
 #ifndef TB_PLATFORM_UTILS_H

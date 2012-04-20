@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		gzip.h
+ * @author		ruki
+ * @file		gzip.h
  *
  */
 #ifndef TB_ZIP_GZIP_H

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		gzip.c
+ * @author		ruki
+ * @file		gzip.c
  *
  */
 /* ///////////////////////////////////////////////////////////////////////

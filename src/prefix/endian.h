@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		endian.h
+ * @author		ruki
+ * @file		endian.h
  *
  */
 #ifndef TB_PREFIX_ENDIAN_H

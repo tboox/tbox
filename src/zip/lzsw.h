@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		lzsw.h
+ * @author		ruki
+ * @file		lzsw.h
  *
  */
 #ifndef TB_STREAM_ZSTREAM_LZSW_H

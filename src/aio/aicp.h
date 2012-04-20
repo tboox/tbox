@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		aicp.h
+ * @author		ruki
+ * @file		aicp.h
  *
  */
 #ifndef TB_AIO_CALL_POOL_H

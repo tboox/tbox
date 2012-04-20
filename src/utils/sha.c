@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		sha.c
+ * @author		ruki
+ * @file		sha.c
  *
  */
 

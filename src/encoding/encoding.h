@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		encoding.c
+ * @author		ruki
+ * @file		encoding.c
  *
  */
 #ifndef TB_ENCODING_H

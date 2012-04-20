@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		document.h
+ * @author		ruki
+ * @file		document.h
  *
  */
 #ifndef TB_XML_DOCUMENT_H

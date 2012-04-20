@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		ctype.h
+ * @author		ruki
+ * @file		ctype.h
  *
  */
 #ifndef TB_LIBC_CTYPE_H

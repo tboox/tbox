@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		vector.h
+ * @author		ruki
+ * @file		vector.h
  *
  */
 #ifndef TB_CONTAINER_VECTOR_H
@@ -68,7 +68,7 @@
  * next: fast
  * prev: fast
  *
- * \note the itor of the same item is mutable
+ * @note the itor of the same item is mutable
  *
  */
 typedef struct __tb_vector_t

@@ -16,8 +16,8 @@
  * 
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
- * \author		ruki
- * \file		tbox.h
+ * @author		ruki
+ * @file		tbox.h
  *
  */
 #ifndef TB_TBOX_H
@@ -54,10 +54,10 @@ extern "C" {
 
 /*!init the tbox library
  *
- * @param data the memory data, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
- * @param size the memory size, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
+ * @param data 	the memory data, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
+ * @param size 	the memory size, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
  *
- * @return return TB_TRUE if ok
+ * @return ok: TB_TRUE, fail: TB_FALSE
  */
 tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
 
