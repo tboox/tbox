@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		bits.c
+ * @ingroup 	utils
  *
  */
 

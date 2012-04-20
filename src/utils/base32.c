@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		base32.c
+ * @ingroup 	utils
  *
  */
 

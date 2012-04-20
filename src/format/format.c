@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		format.c
+ * @ingroup 	format
  *
  */
 

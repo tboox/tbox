@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		mstream.c
+ * @ingroup 	stream
  *
  */
 

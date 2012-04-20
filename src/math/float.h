@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		float.h
+ * @ingroup 	math
  *
  */
 #ifndef TB_MATH_FLOAT_H

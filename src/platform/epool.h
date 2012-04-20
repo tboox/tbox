@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		epool.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_EPOOL_H

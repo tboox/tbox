@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		event.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_EVENT_H

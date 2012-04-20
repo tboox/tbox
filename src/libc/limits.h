@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		limits.h
+ * @ingroup 	libc
  *
  */
 #ifndef TB_LIBC_LIMITS_H

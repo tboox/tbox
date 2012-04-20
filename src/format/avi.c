@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		avi.c
+ * @ingroup 	format
  *
  */
 

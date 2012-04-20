@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		lzsw.h
+ * @ingroup 	zip
  *
  */
 #ifndef TB_STREAM_ZSTREAM_LZSW_H

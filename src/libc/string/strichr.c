@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		strichr.c
+ * @ingroup 	libc
  *
  */
 

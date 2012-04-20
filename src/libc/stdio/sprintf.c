@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sprintf.c
+ * @ingroup 	libc
  *
  */
 

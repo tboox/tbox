@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		strnicmp.c
+ * @ingroup 	libc
  *
  */
 

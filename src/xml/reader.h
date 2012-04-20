@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		reader.h
+ * @ingroup 	xml
  *
  */
 #ifndef TB_XML_READER_H

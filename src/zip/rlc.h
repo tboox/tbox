@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		rlc.h
+ * @ingroup 	zip
  *
  */
 #ifndef TB_ZIP_RLC_H

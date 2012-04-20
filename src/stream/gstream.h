@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		gstream.h
+ * @ingroup 	stream
  *
  */
 #ifndef TB_STREAM_GSTREAM_H

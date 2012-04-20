@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		document.h
+ * @ingroup 	xml
  *
  */
 #ifndef TB_XML_DOCUMENT_H

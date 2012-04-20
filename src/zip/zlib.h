@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		zlib.h
+ * @ingroup 	zip
  *
  */
 #ifndef TB_ZIP_ZLIB_H

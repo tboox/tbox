@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		thread.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_THREAD_H

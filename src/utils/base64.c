@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		base64.c
+ * @ingroup 	utils
  *
  */
 

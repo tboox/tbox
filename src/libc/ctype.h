@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		ctype.h
+ * @ingroup 	libc
  *
  */
 #ifndef TB_LIBC_CTYPE_H

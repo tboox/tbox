@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		pdf.c
+ * @ingroup 	format
  *
  */
 

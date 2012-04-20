@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		stdarg.h
+ * @ingroup 	libc
  *
  */
 #ifndef TB_LIBC_STDARG_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		pstring.h
+ * @ingroup 	string
  *
  */
 #ifndef TB_STRING_PSTRING_H

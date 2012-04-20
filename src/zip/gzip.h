@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		gzip.h
+ * @ingroup 	zip
  *
  */
 #ifndef TB_ZIP_GZIP_H

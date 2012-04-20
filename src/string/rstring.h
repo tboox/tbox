@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		rstring.h
+ * @ingroup 	string
  *
  */
 #ifndef TB_STRING_RSTRING_H

@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		strnlen.c
+ * @ingroup 	libc
  *
  */
 

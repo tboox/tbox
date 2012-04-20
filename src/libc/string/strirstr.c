@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		strirstr.c
+ * @ingroup 	libc
  *
  */
 

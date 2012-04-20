@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		bmp.c
+ * @ingroup 	format
  *
  */
 

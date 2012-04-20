@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sha.c
+ * @ingroup 	utils
  *
  */
 

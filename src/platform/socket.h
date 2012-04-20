@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		socket.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_SOCKET_H

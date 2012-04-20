@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		file.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_FILE_H
