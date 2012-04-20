@@ -17,6 +17,7 @@ u : update
 o : output
 e : error
 w : warning
+d : doc
 
 # #####################################################
 # make projects
@@ -75,6 +76,10 @@ error : .null
 warning : .null
 	@echo warning $(PRO_NAME)
 	@cat /tmp/$(PRO_NAME).out | grep warning
+
+# make doc
+doc : .null
+	doxygen ./doc/doxygen/doxygen.conf
 
 .null :
 
