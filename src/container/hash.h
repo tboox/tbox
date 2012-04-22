@@ -47,18 +47,18 @@
  * types
  */
 
-// the hash item type
+/// the hash item type
 typedef struct __tb_hash_item_t
 {
-	// the item name
+	/// the item name
 	tb_pointer_t 			name;
 
-	// the item data
+	/// the item data
 	tb_pointer_t 			data;
 
 }tb_hash_item_t;
 
-// the hash item list type
+/// the hash item list type
 typedef struct __tb_hash_item_list_t
 {
 	tb_size_t 				size;
@@ -66,9 +66,9 @@ typedef struct __tb_hash_item_list_t
 
 }tb_hash_item_list_t;
 
-/* the hash type
+/*!the hash type
  *
- *
+ * <pre>
  *                 0        1        3       ...     ...                n       n + 1
  * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
  *                         |
@@ -90,24 +90,26 @@ typedef struct __tb_hash_item_list_t
  *                      |     |                                              
  *                       -----  
  *
+ * </pre>
+ *
  * @note the itor of the same item is mutable
  */
 typedef struct __tb_hash_t
 {
-	// the hash list
+	/// the hash list
 	tb_hash_item_list_t** 	hash_list;
 	tb_size_t 				hash_size;
 
-	// the item size
+	/// the item size
 	tb_size_t 				item_size;
 
-	// the item maxn
+	/// the item maxn
 	tb_size_t 				item_maxn;
 
-	// the hash item
+	/// the hash item
 	tb_hash_item_t 			hash_item;
 
-	// the hash func
+	/// the hash func
 	tb_item_func_t 			name_func;
 	tb_item_func_t 			data_func;
 
@@ -139,8 +141,9 @@ tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
 // debug
 tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
 
-/* iterator
+/*!iterator
  * 
+ * @code
  * tb_size_t itor = tb_hash_itor_head(hash);
  * tb_size_t tail = tb_hash_itor_tail(hash);
  * for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
@@ -151,9 +154,12 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  *
  * 		}
  * }
+ * @endcode
  *
+ * <pre>
  * head: => the first item
  * tail: => behind the last item, no item
+ * </pre>
  *
  * @note the index of the same item is mutable, only for iterator
  */
@@ -163,13 +169,14 @@ tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
 tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
-/* walk
+/*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
+ * @code
  * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(hash && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(hash && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
@@ -178,12 +185,13 @@ tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
  * 		// *bdel = TB_TRUE;
  *
  * 		// ok
- *  	return TB_TRUE;
+ * 		return TB_TRUE;
  *
- *  fail:
- *  	// break
- *   	return TB_FALSE;
+ * fail:
+ * 		// break
+ * 		return TB_FALSE;
  * }
+ * @endcode
  *
  */
 tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);

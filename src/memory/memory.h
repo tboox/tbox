@@ -40,15 +40,16 @@
 #include "rbuffer.h"
 #include "qbuffer.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * architecture
+/*!architecture
  *
+ * <pre>
  * small block - spool ------\
  *                            vpool --
  * globl block - gpool ------|        | 
  *                            tpool --|- data: |-------------------------------|
  *                                    |
  * fixed block - rpool ------ fpool --
+ * </pre>
  */
 
 #endif

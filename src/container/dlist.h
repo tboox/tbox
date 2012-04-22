@@ -34,9 +34,10 @@
  * types
  */
 
-/* the double list type
+/*!the double list type
  *
  *
+ * <pre>
  * dlist: 0 => |-----| => |-------------------------------------------------=> |------| => |------| => 0
  *       tail   head                                                                         last     tail
  *        |                                                                                            |
@@ -45,7 +46,7 @@
  * head: => the first item
  * last: => the last item
  * tail: => behind the last item, no item
-
+ *
  * performance: 
  *
  * insert:
@@ -75,6 +76,7 @@
  * iterator:
  * next: fast
  * prev: fast
+ * </pre>
  *
  */
 typedef struct __tb_dlist_t
@@ -140,8 +142,9 @@ tb_size_t 			tb_dlist_size(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
 
 
-/* iterator
+/*!iterator
  * 
+ * @code
  * tb_size_t itor = tb_dlist_itor_head(dlist);
  * tb_size_t tail = tb_dlist_itor_tail(dlist);
  * for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
@@ -152,6 +155,7 @@ tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
  * 			// ...
  * 		}
  * }
+ * @endcode
  *
  */
 tb_pointer_t 		tb_dlist_itor_at(tb_dlist_t* dlist, tb_size_t itor);
@@ -163,13 +167,14 @@ tb_size_t 			tb_dlist_itor_last(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor);
 tb_size_t 			tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor);
 
-/* walk
+/*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
+ * @code
  * tb_bool_t tb_dlist_item_func(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(dlist && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(dlist && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
@@ -178,12 +183,13 @@ tb_size_t 			tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor);
  * 		// *bdel = TB_TRUE;
  *
  * 		// ok
- *  	return TB_TRUE;
+ * 		return TB_TRUE;
  *
- *  fail:
- *  	// break
- *   	return TB_FALSE;
+ * fail:
+ * 		// break
+ * 		return TB_FALSE;
  * }
+ * @endcode
  *
  */
 tb_void_t 			tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
