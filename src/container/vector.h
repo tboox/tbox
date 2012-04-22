@@ -34,8 +34,9 @@
  * types
  */
 
-/* the vector type
+/*!the vector type
  *
+ * <pre>
  * vector: |-----|--------------------------------------------------------|------|
  *       head                                                           last    tail
  *
@@ -68,6 +69,7 @@
  * iterator:
  * next: fast
  * prev: fast
+ * </pre>
  *
  * @note the itor of the same item is mutable
  *
@@ -129,8 +131,9 @@ tb_void_t 	 		tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t s
 tb_void_t 	 		tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
 tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
 
-/* iterator
+/*!iterator
  * 
+ * @code
  * tb_size_t itor = tb_vector_itor_head(vector);
  * tb_size_t tail = tb_vector_itor_tail(vector);
  * for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
@@ -141,6 +144,8 @@ tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
  * 			// ...
  * 		}
  * }
+ * @endcode
+ *
  */
 tb_pointer_t 		tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor);
 tb_cpointer_t 		tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor);
@@ -155,13 +160,14 @@ tb_size_t 			tb_vector_itor_prev(tb_vector_t const* vector, tb_size_t itor);
 tb_size_t 			tb_vector_size(tb_vector_t const* vector);
 tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
 
-/* walk
+/*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
+ * @code
  * tb_bool_t tb_vector_item_func(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(vector && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(vector && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
@@ -170,12 +176,13 @@ tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
  * 		// *bdel = TB_TRUE;
  *
  * 		// ok
- *  	return TB_TRUE;
+ * 		return TB_TRUE;
  *
- *  fail:
- *  	// break
- *   	return TB_FALSE;
+ * fail:
+ * 		// break
+ * 		return TB_FALSE;
  * }
+ * @endcode
  *
  */
 tb_void_t 			tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);

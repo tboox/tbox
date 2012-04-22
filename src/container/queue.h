@@ -47,8 +47,9 @@
  * types
  */
 
-/* the queue type
+/*!the queue type
  *
+ * <pre>
  * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
  *       head                                                           last    tail
  *
@@ -67,6 +68,7 @@
  * iterator:
  * next: 	fast
  * prev: 	fast
+ * </pre>
  *
  * @note the index of the same item is mutable
  *
@@ -106,8 +108,9 @@ tb_pointer_t 	 	tb_queue_get(tb_queue_t* queue);
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
 tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
 
-/* iterator
+/*!iterator
  * 
+ * @code
  * tb_size_t itor = tb_queue_itor_head(queue);
  * tb_size_t tail = tb_queue_itor_tail(queue);
  * for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
@@ -118,6 +121,7 @@ tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
  * 			// ...
  * 		}
  * }
+ * @endcode
  *
  */
 tb_pointer_t 		tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor);
@@ -135,13 +139,14 @@ tb_size_t 			tb_queue_maxn(tb_queue_t const* queue);
 tb_bool_t 			tb_queue_full(tb_queue_t const* queue);
 tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
 
-/* walk
+/*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
+ * @code
  * tb_bool_t tb_queue_item_func(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(queue && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(queue && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
@@ -150,12 +155,13 @@ tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
  * 		// *bdel = TB_TRUE;
  *
  * 		// ok
- *  	return TB_TRUE;
+ * 		return TB_TRUE;
  *
- *  fail:
- *  	// break
- *   	return TB_FALSE;
+ * 	fail:
+ * 		// break
+ * 		return TB_FALSE;
  * }
+ * @endcode
  *
  */
 tb_void_t 			tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);

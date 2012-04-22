@@ -80,7 +80,7 @@
  * types
  */
 
-// the gstream type
+/// the gstream type
 typedef enum __tb_gstream_type_t
 {
  	TB_GSTREAM_TYPE_NULL 			= 0
@@ -92,7 +92,7 @@ typedef enum __tb_gstream_type_t
 
 }tb_gstream_type_t;
 
-// the tstream type
+/// the tstream type
 typedef enum __tb_tstream_type_t
 {
  	TB_TSTREAM_TYPE_NULL 			= 0
@@ -101,7 +101,7 @@ typedef enum __tb_tstream_type_t
 
 }tb_tstream_type_t;
 
-// the gstream command type
+/// the gstream command type
 typedef enum __tb_gstream_cmd_t
 {
 	TB_GSTREAM_CMD_NULL 				= 0
@@ -155,55 +155,55 @@ typedef enum __tb_gstream_cmd_t
 
 }tb_gstream_cmd_t;
 
-// the generic stream type
+/// the generic stream type
 typedef struct __tb_gstream_t
 {	
-	// the stream type
+	/// the stream type
 	tb_size_t 			type 		: 8;
 
-	// is opened?
+	/// is opened?
 	tb_size_t 			bopened 	: 1;
 
-	// is writed?
+	/// is writed?
 	tb_size_t 			bwrited 	: 1;
 
-	// the timeout: ms
+	/// the timeout: ms
 	tb_size_t 			timeout 	: 22;
 
-	// the url
+	/// the url
 	tb_url_t 			url;
 
-	// the cache
+	/// the cache
 	tb_qbuffer_t 		cache;
 
-	// the offset
+	/// the offset
 	tb_hize_t 			offset;
 
-	// wait the aio event
+	/// wait the aio event
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
-	// async open
+	/// async open
 	tb_long_t 			(*aopen)(struct __tb_gstream_t* gst);
 
-	// async close
+	/// async close
 	tb_long_t 			(*aclose)(struct __tb_gstream_t* gst);
 
-	// async read
+	/// async read
 	tb_long_t 			(*aread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
-	// async writ
+	/// async writ
 	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
-	// seek
+	/// seek
 	tb_long_t 			(*aseek)(struct __tb_gstream_t* gst, tb_hize_t offset);
 
-	// size
+	/// size
 	tb_hize_t 			(*size)(struct __tb_gstream_t* gst);
 
-	// free
+	/// free
 	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
-	// ctrl
+	/// ctrl
 	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
 
 }tb_gstream_t;
@@ -213,7 +213,7 @@ typedef struct __tb_gstream_t
  * interfaces
  */
 
-// exit stream
+/// exit stream
 tb_void_t 			tb_gstream_exit(tb_gstream_t* gst);
 
 // init stream
@@ -226,36 +226,38 @@ tb_gstream_t* 		tb_gstream_init_zip();
 tb_gstream_t* 		tb_gstream_init_encoding();
 tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
 
-/* init stream from url
+/*!init stream from url
  *
+ * <pre>
  * file://path or unix path: e.g. /root/xxxx/file
  * files://home/file
  * sock://host:port?tcp=
  * socks://host:port?udp=
  * http://host:port/path?arg0=&arg1=...
  * https://host:port/path?arg0=&arg1=...
+ * </pre>
  */
 tb_gstream_t* 		tb_gstream_init_from_url(tb_char_t const* url);
 
-// init stream from data
+/// init stream from data
 tb_gstream_t* 		tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size);
 
-// init stream from file
+/// init stream from file
 tb_gstream_t* 		tb_gstream_init_from_file(tb_char_t const* path);
 
-// init stream from sock
+/// init stream from sock
 tb_gstream_t* 		tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
 
-// init stream from http or https
+/// init stream from http or https
 tb_gstream_t* 		tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
 
-// init stream from null
+/// init stream from null
 tb_gstream_t* 		tb_gstream_init_from_null(tb_gstream_t* gst);
 
-// init stream from zip
+/// init stream from zip
 tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
 
-// init stream from encoding
+/// init stream from encoding
 tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
 
 /*!wait the gstream 
@@ -271,19 +273,19 @@ tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, t
  */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
-// clear stream cache and reset status, but not close it
+/// clear stream cache and reset status, but not close it
 tb_void_t 			tb_gstream_clear(tb_gstream_t* gst);
 
-// async open, allow multiple called before closing 
+/// async open, allow multiple called before closing 
 tb_long_t 			tb_gstream_aopen(tb_gstream_t* gst);
 
-// block open, allow multiple called before closing 
+/// block open, allow multiple called before closing 
 tb_bool_t 			tb_gstream_bopen(tb_gstream_t* gst);
 
-// async close, allow multiple called
+/// async close, allow multiple called
 tb_long_t 			tb_gstream_aclose(tb_gstream_t* gst);
 
-// block close, allow multiple called
+/// block close, allow multiple called
 tb_bool_t 			tb_gstream_bclose(tb_gstream_t* gst);
 
 // async read & writ data
@@ -314,7 +316,7 @@ tb_bool_t 			tb_gstream_bseek(tb_gstream_t* gst, tb_hize_t offset);
 tb_long_t 			tb_gstream_askip(tb_gstream_t* gst, tb_hize_t size);
 tb_bool_t 			tb_gstream_bskip(tb_gstream_t* gst, tb_hize_t size);
 
-// block writ format data
+/// block writ format data
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 
 // block load & save data
@@ -376,7 +378,7 @@ tb_hize_t 			tb_gstream_left(tb_gstream_t const* gst);
 tb_hize_t 			tb_gstream_offset(tb_gstream_t const* gst);
 tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 
-// ctrl
+/// ctrl
 tb_bool_t 			tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...);
 
 #endif

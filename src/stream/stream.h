@@ -31,11 +31,10 @@
 #include "bstream.h"
 #include "gstream.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * architecture
+/*!architecture
  *
  *
- *    
+ * <pre>   
  *     bstream
  *        |         
  *        |                                               - dstream(data) - no wait
@@ -78,7 +77,7 @@
  *     files://...
  *     socks://...
  *     https://...
- *
+ * </pre>
  *
  */
 

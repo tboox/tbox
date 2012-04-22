@@ -35,8 +35,9 @@
  * types
  */
 
-/* the stack type
+/*!the stack type
  *
+ * <pre>
  * stack: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
  *       head                                                           last    tail
  *
@@ -55,6 +56,7 @@
  * iterator:
  * next: 	fast
  * prev: 	fast
+ * </pre>
  *
  * @note the itor of the same item is fixed
  *
@@ -83,8 +85,9 @@ tb_void_t 	 		tb_stack_put(tb_stack_t* stack, tb_cpointer_t data);
 tb_void_t 	 		tb_stack_pop(tb_stack_t* stack);
 tb_pointer_t 	 	tb_stack_top(tb_stack_t* stack);
 
-/* iterator
+/*!iterator
  * 
+ * @code
  * tb_size_t itor = tb_stack_itor_head(stack);
  * tb_size_t tail = tb_stack_itor_tail(stack);
  * for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
@@ -95,6 +98,7 @@ tb_pointer_t 	 	tb_stack_top(tb_stack_t* stack);
  * 			// ...
  * 		}
  * }
+ * @endcode
  */
 tb_pointer_t 		tb_stack_itor_at(tb_stack_t* stack, tb_size_t itor);
 tb_cpointer_t 		tb_stack_itor_const_at(tb_stack_t const* stack, tb_size_t itor);
@@ -109,13 +113,14 @@ tb_size_t 			tb_stack_itor_prev(tb_stack_t const* stack, tb_size_t itor);
 tb_size_t 			tb_stack_size(tb_stack_t const* stack);
 tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
 
-/* walk
+/*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
+ * @code
  * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(stack && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(stack && bdel, TB_FALSE);
  *
  * 		// is tail?
  * 		if (!item) ;
@@ -124,12 +129,13 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * 		// *bdel = TB_TRUE;
  *
  * 		// ok
- *  	return TB_TRUE;
+ * 		return TB_TRUE;
  *
- *  fail:
- *  	// break
- *   	return TB_FALSE;
+ * fail:
+ * 		// break
+ * 		return TB_FALSE;
  * }
+ * @endcode
  *
  */
 tb_void_t 			tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);

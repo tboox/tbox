@@ -49,7 +49,7 @@ typedef tb_void_t 			(*tb_item_func_nfree_t)(struct __tb_item_func_t* func, tb_p
 typedef tb_void_t 			(*tb_item_func_ndupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
 typedef tb_void_t 			(*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
 
-// the item type
+/// the item type
 typedef enum __tb_item_type_t
 {
 	TB_ITEM_TYPE_NUL 	= 0 	//!< null
@@ -62,19 +62,19 @@ typedef enum __tb_item_type_t
 
 }tb_item_type_t;
 
-// the item func type
+/// the item func type
 typedef struct __tb_item_func_t
 {
-	// the item type
+	/// the item type
 	tb_size_t 				type;
 
-	// the item size
+	/// the item size
 	tb_size_t 				size;
 
-	// the item pool
+	/// the item pool
 	tb_handle_t 			pool;
 
-	// the priv data
+	/// the priv data
 	tb_pointer_t 			priv;
 
 	// the item func
@@ -96,7 +96,7 @@ typedef struct __tb_item_func_t
  * interfaces
  */
 
-/* the c-string item function
+/*!the c-string item function
  *
  * using tb_strdup if the spool is null, 
  * using tb_spool_strdup if the spool exists
@@ -104,13 +104,13 @@ typedef struct __tb_item_func_t
  */
 tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
 
-// the integer item function
+/// the integer item function
 tb_item_func_t 		tb_item_func_int();
 
-// the pointer item function
+/// the pointer item function
 tb_item_func_t 		tb_item_func_ptr();
 
-/* the external fixed memory item function
+/*!the external fixed memory item function
  *
  * storing the index value in the internal item of the container
  *
@@ -120,7 +120,7 @@ tb_item_func_t 		tb_item_func_ptr();
  */
 tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t rpool);
 
-/* the internal fixed memory item function
+/*!the internal fixed memory item function
  *
  * storing it in the internal item of the container directly for saving memory
  *
