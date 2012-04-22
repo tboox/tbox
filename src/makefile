@@ -276,6 +276,7 @@ INC_FILES 				= \
 						utils/opt/bits_x86.h \
 						utils/opt/bits_arm.h \
 						utils/opt/bits_sh4.h \
+						utils/opt/bits_gcc.h \
 						utils/opt/prefix.h \
 						utils/base64.h \
 						xml/xml.h \
