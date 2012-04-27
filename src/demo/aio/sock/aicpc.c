@@ -11,21 +11,6 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
 	// check
 	tb_assert_and_check_return_val(aicp && aico && aice, TB_FALSE);
 
-	switch (aice->code)
-	{
-	case TB_AICE_CODE_CONN:
-		break;
-	case TB_AICE_CODE_READ:
-		tb_print("read: %ld size: %lu, data: %s", aice->ok, aice->u.read.size, aice->u.read.data);
-		tb_aicp_writ(aicp, aico, "ok", 3);
-		break;
-	case TB_AICE_CODE_WRIT:
-		tb_print("writ: %ld size: %lu, data: %s", aice->ok, aice->u.writ.size, aice->u.writ.data);
-		break;
-	default:
-		break;
-	}
-
 	// ok
 	return TB_TRUE;
 }
@@ -59,21 +44,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_print("[demo]: conn: post");
 	if (!tb_aicp_conn(aicp, aico, argv[1], tb_stou32(argv[2]))) goto end;
 
-	// loop
-	while (1)
+	// spak
+	tb_long_t r = -1;
+	while ((r = tb_aicp_spak(aicp, -1)) >= 0)
 	{
-		// spak
-		tb_print("[demo]: aicp: spak");
-		tb_long_t r = tb_aicp_spak(aicp);
-		tb_assert_and_check_goto(r >= 0, end);
-		
-		// no aice?
-		tb_check_continue(!r);
-
-		// wait
-		tb_print("[demo]: aicp: wait");
-		r = tb_aicp_wait(aicp, -1);
-		tb_assert_and_check_goto(r >= 0, end);
+		// timeout? sleep some time
+		if (!r) tb_msleep(200);
 	}
 	
 end:

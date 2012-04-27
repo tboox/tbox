@@ -2,10 +2,10 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios_x86
+PLAT = linux_x86
 
 # root
-PRO_DIR = /Users/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = n
 SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk
