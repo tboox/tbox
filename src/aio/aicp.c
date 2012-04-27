@@ -230,6 +230,28 @@ end:
 	// ok?
 	return ok;
 }
+tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
+
+	// post
+	tb_aice_t aice = {0};
+	aice.code = TB_AICE_CODE_SYNC;
+	aice.aico = aico;
+	return tb_aicp_post(aicp, &aice);
+}
+tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
+
+	// post
+	tb_aice_t aice = {0};
+	aice.code = TB_AICE_CODE_ACPT;
+	aice.aico = aico;
+	return tb_aicp_post(aicp, &aice);
+}
 tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
 {
 	// check
@@ -254,7 +276,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	aice.code = TB_AICE_CODE_READ;
 	aice.aico = aico;
 	aice.u.read.data = data;
-	aice.u.read.size = size;
+	aice.u.read.maxn = size;
 	return tb_aicp_post(aicp, &aice);
 }
 tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
@@ -267,40 +289,31 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	aice.code = TB_AICE_CODE_WRIT;
 	aice.aico = aico;
 	aice.u.read.data = data;
-	aice.u.read.size = size;
+	aice.u.read.maxn = size;
 	return tb_aicp_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
-
-	// post
-	tb_aice_t aice = {0};
-	aice.code = TB_AICE_CODE_SYNC;
-	aice.aico = aico;
-	return tb_aicp_post(aicp, &aice);
-}
-tb_long_t tb_aicp_wait(tb_aicp_t* aicp, tb_long_t timeout)
+tb_long_t tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(aicp, -1);
 	
 	// init
-	tb_long_t (*wait)(tb_aicp_reactor_t* , tb_long_t ) = TB_NULL;
+	tb_long_t (*spak)(tb_aicp_reactor_t* , tb_long_t ) = TB_NULL;
 
 	// enter 
 	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
 
 	// check
-	if (aicp->rtor) wait = aicp->rtor->wait;
+	if (aicp->rtor) spak = aicp->rtor->spak;
 
 	// leave 
 	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
 
-	// wait
-	return wait? wait(aicp->rtor, timeout) : -1;
+	// spak
+	return spak? spak(aicp->rtor, timeout) : -1;
 }
-tb_long_t tb_aicp_spak(tb_aicp_t* aicp)
+
+/// kill
+tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {
-	return 0;
 }
+
