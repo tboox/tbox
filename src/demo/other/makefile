@@ -5,7 +5,6 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		test \
 		encoding \
-		format \
 		stdlib \
 		xml
 

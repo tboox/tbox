@@ -61,24 +61,6 @@ tbox_C_FILES 			+= \
 						zip/zlib \
 						zip/gzip \
 						zip/zlibraw \
-						format/format \
-						format/flv \
-						format/avi \
-						format/mp3 \
-						format/wav \
-						format/bmp \
-						format/gif \
-						format/jpg \
-						format/png \
-						format/swf \
-						format/zip \
-						format/bz2 \
-						format/gz \
-						format/7z \
-						format/pdf \
-						format/xml \
-						format/htm \
-						format/txt \
 						utils/bits \
 						utils/time \
 						utils/md5 \
@@ -262,8 +244,6 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
-						format/format.h \
-						format/prefix.h \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \

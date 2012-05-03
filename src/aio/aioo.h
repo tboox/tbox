@@ -37,19 +37,19 @@
 // the event type
 typedef enum __tb_aioo_etype_t
 {
- 	TB_AIOO_ETYPE_NULL 	= 0
+ 	TB_AIOO_ETYPE_NULL 	= 0 	//!< for null
 , 	TB_AIOO_ETYPE_CONN 	= 1 	//!< for socket
 , 	TB_AIOO_ETYPE_ACPT 	= 2 	//!< for socket
 ,	TB_AIOO_ETYPE_READ 	= 4		//!< for all i/o object
 ,	TB_AIOO_ETYPE_WRIT 	= 8		//!< for all i/o object
-, 	TB_AIOO_ETYPE_EALL 	= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT | TB_AIOO_ETYPE_ACPT | TB_AIOO_ETYPE_CONN
+, 	TB_AIOO_ETYPE_EALL 	= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT | TB_AIOO_ETYPE_ACPT | TB_AIOO_ETYPE_CONN //!< for all
 
 }tb_aioo_etype_t;
 
 // the object type
 typedef enum __tb_aioo_otype_t
 {
- 	TB_AIOO_OTYPE_NULL 	= 0
+ 	TB_AIOO_OTYPE_NULL 	= 0 	//!< for null
 , 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
 ,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
 

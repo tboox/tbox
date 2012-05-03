@@ -50,12 +50,15 @@ typedef struct __tb_aico_t
 	// the aicb
 	tb_aicb_t 				aicb;
 
+	// the aice
+//	tb_aice_t 				aice;
+
 }tb_aico_t;
 
 // the aio event code type
 typedef enum __tb_aice_code_t
 {
- 	TB_AICE_CODE_NULL 		= 0
+ 	TB_AICE_CODE_NULL 		= 0 	//!< for null
 ,	TB_AICE_CODE_SYNC 		= 1		//!< for file
 , 	TB_AICE_CODE_ACPT 		= 2 	//!< for socket
 , 	TB_AICE_CODE_CONN 		= 3 	//!< for socket
@@ -128,9 +131,6 @@ typedef struct __tb_aice_t
 	// the code
 	tb_size_t 				code;
 
-	// the aico
-	tb_aico_t const* 		aico;
-
 	// the uion
 	union
 	{
@@ -160,7 +160,7 @@ typedef struct __tb_aicp_reactor_t
 	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
 	// post
-	tb_bool_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aice_t const* aice);
+	tb_bool_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice);
 
 	// spak
 	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_long_t timeout);
@@ -182,9 +182,6 @@ typedef struct __tb_aicp_t
 	// the aico pool
 	tb_handle_t 			pool;
 
-	// the aice post
-	tb_handle_t 			post;
-
 	// the reactor
 	tb_aicp_reactor_t* 		rtor;
 
@@ -194,16 +191,16 @@ typedef struct __tb_aicp_t
  * interfaces
  */
 
-/*!init the aio pool
+/*!init the aio call pool
  *
  * @param 	type 	the object type
  * @param 	maxn 	the maximum number of concurrent objects
  *
- * @return 	the aio pool
+ * @return 	the aio call pool
  */
 tb_aicp_t* 			tb_aicp_init(tb_size_t type, tb_size_t maxn);
 
-/// exit the aio pool
+/// exit the aio call pool
 tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
 
 /// the object maximum number of the aio pool
@@ -212,31 +209,34 @@ tb_size_t 			tb_aicp_maxn(tb_aicp_t* aicp);
 /// the object number of the aio pool
 tb_size_t 			tb_aicp_size(tb_aicp_t* aicp);
 
-/*!add the aio object
+/*!add the aio call object
  *
- * @param 	aicp 	the aio pool
+ * @param 	aicp 	the aio call pool
  * @param 	handle 	the file or sock handle
+ * @param 	aicb 	the aio callback
+ * @param 	odata 	the aio callback data
  *
- * @return 	the aico data
+ * @return 	the aico call object
  */
 tb_aico_t const* 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata);
 
 /*!del the aio object
  *
- * @param 	aicp 	the aio pool
- * @param 	handle 	the aico handle
+ * @param 	aicp 	the aio call pool
+ * @param 	aico 	the aio call object
  */
 tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
 
 /*!post the aio event
  *
- * @param 	aicp 	the aio pool
- * @param 	aice 	the aice data
+ * @param 	aicp 	the aio call pool
+ * @param 	aico 	the aio call object
+ * @param 	aice 	the aio call event
  *
  * @return 	return TB_TRUE if ok
  *
  */
-tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
+tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice);
 
 /// post sync
 tb_bool_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
