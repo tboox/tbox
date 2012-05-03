@@ -88,9 +88,6 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 {
 	if (aicp)
 	{
-		// enter 
-		if (aicp->mutx) tb_mutex_enter(aicp->mutx);
-
 		// exit reactor
 		if (aicp->rtor)
 		{
@@ -98,6 +95,9 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			aicp->rtor->exit(aicp->rtor);
 			aicp->rtor = TB_NULL;
 		}
+
+		// enter 
+		if (aicp->mutx) tb_mutex_enter(aicp->mutx);
 
 		// exit pool
 		if (aicp->pool) tb_rpool_exit(aicp->pool);
@@ -117,18 +117,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 tb_size_t tb_aicp_maxn(tb_aicp_t* aicp)
 {
 	tb_assert_and_check_return_val(aicp, 0);
-	
-	// enter 
-	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
-
-	// maxn
-	tb_size_t maxn = aicp->maxn;
-
-	// leave 
-	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
-
-	// ok
-	return maxn;
+	return aicp->maxn;
 }
 tb_size_t tb_aicp_size(tb_aicp_t* aicp)
 {
@@ -207,28 +196,14 @@ end:
 	// leave 
 	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
 }
-tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
+tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
 {
-	tb_assert_and_check_return_val(aicp && aice, TB_FALSE);
-
-	// init
-	tb_bool_t ok = TB_FALSE;
-
-	// enter 
-	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
-
 	// check
-	tb_assert_and_check_goto(aicp->rtor && aicp->rtor->post, end);
+	tb_assert_and_check_return_val(aicp && aico && aice, TB_FALSE);
+	tb_assert_and_check_return_val(aicp->rtor && aicp->rtor->post, TB_FALSE);
 
 	// add aice to native
-	ok = aicp->rtor->post(aicp->rtor, aice);
-
-end:
-	// leave 
-	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
-	
-	// ok?
-	return ok;
+	return aicp->rtor->post(aicp->rtor, aico, aice);
 }
 tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
@@ -238,8 +213,7 @@ tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_SYNC;
-	aice.aico = aico;
-	return tb_aicp_post(aicp, &aice);
+	return tb_aicp_post(aicp, aico, &aice);
 }
 tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
@@ -249,8 +223,7 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_ACPT;
-	aice.aico = aico;
-	return tb_aicp_post(aicp, &aice);
+	return tb_aicp_post(aicp, aico, &aice);
 }
 tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
 {
@@ -260,10 +233,9 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* 
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_CONN;
-	aice.aico = aico;
 	aice.u.conn.port = port;
 	if (tb_ipv4_set(&aice.u.conn.host, host))
-		return tb_aicp_post(aicp, &aice);
+		return tb_aicp_post(aicp, aico, &aice);
 	return TB_FALSE;
 }
 tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
@@ -274,10 +246,9 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_READ;
-	aice.aico = aico;
 	aice.u.read.data = data;
 	aice.u.read.maxn = size;
-	return tb_aicp_post(aicp, &aice);
+	return tb_aicp_post(aicp, aico, &aice);
 }
 tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
 {
@@ -287,29 +258,17 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_WRIT;
-	aice.aico = aico;
 	aice.u.read.data = data;
 	aice.u.read.maxn = size;
-	return tb_aicp_post(aicp, &aice);
+	return tb_aicp_post(aicp, aico, &aice);
 }
 tb_long_t tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(aicp, -1);
-	
-	// init
-	tb_long_t (*spak)(tb_aicp_reactor_t* , tb_long_t ) = TB_NULL;
-
-	// enter 
-	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
-
 	// check
-	if (aicp->rtor) spak = aicp->rtor->spak;
-
-	// leave 
-	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+	tb_assert_and_check_return_val(aicp && aicp->rtor && aicp->rtor->spak, -1);
 
 	// spak
-	return spak? spak(aicp->rtor, timeout) : -1;
+	return aicp->rtor->spak(aicp->rtor, timeout);
 }
 
 /// kill

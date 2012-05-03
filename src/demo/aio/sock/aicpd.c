@@ -106,7 +106,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_msleep(500);
 	}
 
-	// addo acpt
+	// addo sock
 	tb_aico_t const* aico = tb_aicp_addo(aicp, sock, tb_aicb_work_func, "work");
 	tb_assert_and_check_goto(aico, end);
 

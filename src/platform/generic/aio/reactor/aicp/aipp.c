@@ -37,47 +37,6 @@ typedef struct __tb_aicp_reactor_aipp_t
 }tb_aicp_reactor_aipp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * post
- */
-static tb_bool_t tb_aicp_reactor_aipp_post_sync(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
-{
-
-	// ok
-	return TB_TRUE;
-}
-
-static tb_bool_t tb_aicp_reactor_aipp_post_acpt(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
-{
-
-	// ok
-	return TB_TRUE;
-}
-static tb_bool_t tb_aicp_reactor_aipp_post_conn(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
-{
-
-	// ok
-	return TB_TRUE;
-}
-static tb_bool_t tb_aicp_reactor_aipp_post_read(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
-{	
-	// check
-	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, TB_FALSE);
-
-	// ok
-	return TB_TRUE;
-}
-static tb_bool_t tb_aicp_reactor_aipp_post_writ(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
-{
-	// check
-	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, TB_FALSE);
-
-	// ok
-	return TB_TRUE;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_bool_t tb_aicp_reactor_aipp_addo(tb_aicp_reactor_t* reactor, tb_aico_t const* aico)
@@ -98,22 +57,10 @@ static tb_bool_t tb_aicp_reactor_aipp_delo(tb_aicp_reactor_t* reactor, tb_aico_t
 	// delo
 	return tb_aipp_delo(rtor->aipp, aico->aioo.handle);
 }
-static tb_bool_t tb_aicp_reactor_aipp_post(tb_aicp_reactor_t* reactor, tb_aice_t const* aice)
+static tb_bool_t tb_aicp_reactor_aipp_post(tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice)
 {
-	// post
-	static tb_bool_t (*s_post[])(tb_aicp_reactor_t* , tb_aice_t const* ) = 
-	{
-		TB_NULL
-	,	tb_aicp_reactor_aipp_post_sync
-	,	tb_aicp_reactor_aipp_post_acpt
-	,	tb_aicp_reactor_aipp_post_conn
-	,	tb_aicp_reactor_aipp_post_read
-	,	tb_aicp_reactor_aipp_post_writ
-	};
-	tb_assert_and_check_return(aice->code < tb_arrayn(s_post));
 
-	// post aice
-	return (s_post[aice->code])? s_post[aice->code](reactor, aice) : TB_FALSE;
+	return TB_FALSE;
 }
 
 static tb_long_t tb_aicp_reactor_aipp_spak(tb_aicp_reactor_t* reactor, tb_long_t timeout)
