@@ -44,8 +44,8 @@
  * types
  */
 
-// the vpool info type
 #ifdef TB_DEBUG
+/// the vpool info type
 typedef struct __tb_vpool_info_t
 {
 	// the used size
@@ -72,39 +72,40 @@ typedef struct __tb_vpool_info_t
 }tb_vpool_info_t;
 #endif
 
-// the vpool block type
+/// the vpool block type
 typedef struct __tb_vpool_block_t
 {
-	// the block size
+	/// the block size
 	tb_size_t 			size 	: (TB_CPU_BITSIZE - 1);
 
-	// is free?
+	/// is free?
 	tb_size_t 			free 	: 1;
 
 #ifdef TB_DEBUG
 
-	// the magic
+	/// the magic
 	tb_size_t 			magic 	: 16;
 
-	// the line 
+	/// the line 
 	tb_size_t 			line 	: 16;
 
-	// the file
+	/// the file
 	tb_char_t const* 	file;
 
-	// the func
+	/// the func
 	tb_char_t const* 	func;
 
 #endif
 
 }tb_vpool_block_t;
 
-/* the variable pool type
+/*!the variable pool type
  *
+ * <pre>
  * |-----------||||||---------------------|||||||----------------------------------|
  *     head    [head         data         ]
  *                     block0 							block1 ...
- *
+ * </pre>
  */
 typedef struct __tb_vpool_t
 {

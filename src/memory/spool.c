@@ -44,7 +44,7 @@
  * types
  */
 
-// the pool chunk type
+/// the pool chunk type
 typedef struct __tb_spool_chunk_t
 {
 	// the vpool
@@ -56,7 +56,7 @@ typedef struct __tb_spool_chunk_t
 
 }tb_spool_chunk_t;
 
-// the spool info type
+/// the spool info type
 #ifdef TB_DEBUG
 typedef struct __tb_spool_info_t
 {
@@ -69,7 +69,7 @@ typedef struct __tb_spool_info_t
 }tb_spool_info_t;
 #endif
 
-// the small or string pool
+/// the small or string pool
 typedef struct __tb_spool_t
 {
 	// the pools align

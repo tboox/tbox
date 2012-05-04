@@ -49,58 +49,60 @@
  * types
  */
 
-// the fpool info type
 #ifdef TB_DEBUG
+/// the fpool info type
 typedef struct __tb_fpool_info_t
 {
-	// the peak size
+	/// the peak size
 	tb_size_t 			peak;
 
-	// the fail count
+	/// the fail count
 	tb_size_t 			fail;
 
-	// the pred count
+	/// the pred count
 	tb_size_t 			pred;
 
-	// the aloc count
+	/// the aloc count
 	tb_size_t 			aloc;
 
 }tb_fpool_info_t;
 #endif
 
-/* the fixed pool type
+/*!the fixed pool type
  *
+ * <pre>
  * |---------|-----------------|-----------------------------------------------|
- *    head          used                            data                         
+ *    head          used                            data     
+ * </pre>
  */
 typedef struct __tb_fpool_t
 {
-	// the magic 
+	/// the magic 
 	tb_size_t 			magic 	: 16;
 
-	// the align
+	/// the align
 	tb_size_t 			align 	: 16;
 
-	// the step
+	/// the step
 	tb_size_t 			step;
 
-	// the maxn
+	/// the maxn
 	tb_size_t 			maxn;
 
-	// the size
+	/// the size
 	tb_size_t 			size;
 
-	// the data
+	/// the data
 	tb_byte_t* 			data;
 
-	// the used
+	/// the used
 	tb_byte_t* 			used;
 
-	// the pred
+	/// the pred
 	tb_byte_t* 			pred;
 
-	// the info
 #ifdef TB_DEBUG
+	/// the info
 	tb_fpool_info_t 	info;
 #endif
 
