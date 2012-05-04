@@ -36,7 +36,6 @@ extern "C" {
 #include "container/container.h"
 #include "encoding/encoding.h"
 #include "network/network.h"
-#include "format/format.h"
 #include "memory/memory.h"
 #include "stream/stream.h"
 #include "string/string.h"

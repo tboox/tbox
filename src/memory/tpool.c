@@ -47,8 +47,8 @@
  * types
  */
 
-// the tpool info type
 #ifdef TB_DEBUG
+// the tpool info type
 typedef struct __tb_tpool_info_t
 {
 	// the used size
@@ -75,8 +75,9 @@ typedef struct __tb_tpool_info_t
 }tb_tpool_info_t;
 #endif
 
-/* the tiny pool type
+/*!the tiny pool type
  *
+ * <pre>
  * pool: |---------|-----------------|-----------------------------------------------|
  *           head          used                            data                         
  *                 |--------|--------|
@@ -122,37 +123,38 @@ typedef struct __tb_tpool_info_t
  * 1. align bytes <= 64
  * 2. alloc bytes <= (32|64) * 16 == 512|1024 for one chunk
  * 3. step bytes == max(align, 16)
+ * </pre>
  */
 typedef struct __tb_tpool_t
 {
-	// the magic 
+	/// the magic 
 	tb_size_t 			magic 	: 16;
 
-	// the align
+	/// the align
 	tb_size_t 			align 	: 7;
 
-	// the step
+	/// the step
 	tb_size_t 			step 	: 7;
 
-	// the full
+	/// the full
 	tb_size_t 			full 	: 1;
 
-	// the body
+	/// the body
 	tb_size_t* 			body;
 
-	// the last
+	/// the last
 	tb_size_t* 			last;
 
-	// the maxn
+	/// the maxn
 	tb_size_t 			maxn;
 
-	// the data
+	/// the data
 	tb_byte_t* 			data;
 
-	// the pred
+	/// the pred
 	tb_size_t 			pred[TB_TPOOL_BLOCK_MAXN];
 
-	// the info
+	/// the info
 #ifdef TB_DEBUG
 	tb_tpool_info_t 	info;
 #endif
@@ -415,12 +417,14 @@ tb_handle_t tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_assert_and_check_return_val(data + size > (tb_byte_t*)tpool->body, TB_NULL);
 	tb_assert_and_check_return_val(!(((tb_size_t)tpool->body) & (TB_CPU_BITBYTE - 1)), TB_NULL);
 
-	/* init maxn
+	/*!init maxn
 	 *
+	 * <pre>
 	 * body + last + data < left
 	 * sizeof(tb_size_t) * maxn * 2 + maxn * sizeof(tb_size_t) * 8 * step < left
 	 * sizeof(tb_size_t) * maxn * 2 * (1 + 4 * step) < left
 	 * maxn < left / ((1 + 4 * step) * 2 * sizeof(tb_size_t))
+	 * </pre>
 	 */
 	tpool->maxn = (data + size - (tb_byte_t*)tpool->body) / ((1 + (tpool->step << 2)) * (sizeof(tb_size_t) << 1));
 	tb_assert_and_check_return_val(tpool->maxn >= TB_TPOOL_BLOCK_MAXN, TB_NULL);

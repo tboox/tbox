@@ -48,31 +48,31 @@
  * types
  */
 
-// the generic pool type
+/// the generic pool type
 typedef struct __tb_gpool_t
 {
-	// the magic 
+	/// the magic 
 	tb_size_t 		magic 	: 16;
 
-	// the align
+	/// the align
 	tb_size_t 		align 	: 8;
 
-	// the data
+	/// the data
 	tb_byte_t* 		data;
 
-	// the size
+	/// the size
 	tb_size_t 		size;
 
-	// the tdata
+	/// the tdata
 	tb_byte_t* 		tdata;
 
-	// the tsize
+	/// the tsize
 	tb_size_t 		tsize;
 
-	// the tpool
+	/// the tpool
 	tb_handle_t 	tpool;
 
-	// the vpool
+	/// the vpool
 	tb_handle_t 	vpool;
 
 }tb_gpool_t;

@@ -44,7 +44,7 @@
  * types
  */
 
-// the pool chunk type
+/// the pool chunk type
 typedef struct __tb_rpool_chunk_t
 {
 	// the fpool
@@ -56,8 +56,8 @@ typedef struct __tb_rpool_chunk_t
 
 }tb_rpool_chunk_t;
 
-// the rpool info type
 #ifdef TB_DEBUG
+/// the rpool info type
 typedef struct __tb_rpool_info_t
 {
 	// the pred count
@@ -69,7 +69,7 @@ typedef struct __tb_rpool_info_t
 }tb_rpool_info_t;
 #endif
 
-// the small or string pool
+/// the small or string pool
 typedef struct __tb_rpool_t
 {
 	// the pools align

@@ -58,7 +58,15 @@ typedef struct __tb_aipp_reactor_t
 
 }tb_aipp_reactor_t;
 
-// the aio poll pool type
+/*!the aio poll pool type
+ *
+ * <pre>
+ * objs: |-----|------|------|--- ... ...---|-------|
+ * wait:    |            |
+ * evet:   read         writ ...
+ * </pre>
+ *
+ */
 typedef struct __tb_aipp_t
 {
 	// the object type

@@ -3,7 +3,7 @@
 	modified by RossCairns.com
 */
 
-body, table, div, p, dl, code{
+body, table, div, p, dl, code, pre{
 	font-family: Courier New;
 	font-size: 12px;
 }
