@@ -45,8 +45,13 @@ tb_long_t 		tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
 tb_bool_t 		tb_thread_suspend(tb_handle_t handle);
 tb_bool_t 		tb_thread_resume(tb_handle_t handle);
 
-// kill & return
+// kill
 tb_bool_t 		tb_thread_kill(tb_handle_t handle);
+
+// self
+tb_handle_t 	tb_thread_self();
+
+// return
 tb_void_t 		tb_thread_return(tb_pointer_t value);
 
 #endif

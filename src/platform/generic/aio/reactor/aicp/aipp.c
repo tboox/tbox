@@ -57,13 +57,7 @@ static tb_bool_t tb_aicp_reactor_aipp_delo(tb_aicp_reactor_t* reactor, tb_aico_t
 	// delo
 	return tb_aipp_delo(rtor->aipp, aico->aioo.handle);
 }
-static tb_bool_t tb_aicp_reactor_aipp_post(tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice)
-{
-
-	return TB_FALSE;
-}
-
-static tb_long_t tb_aicp_reactor_aipp_spak(tb_aicp_reactor_t* reactor, tb_long_t timeout)
+static tb_long_t tb_aicp_reactor_aipp_spak(tb_aicp_reactor_t* reactor, tb_aice_t const* post, tb_aice_t const** resp)
 {
 	// check
 	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
@@ -101,7 +95,6 @@ static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 	rtor->base.exit = tb_aicp_reactor_aipp_exit;
 	rtor->base.addo = tb_aicp_reactor_aipp_addo;
 	rtor->base.delo = tb_aicp_reactor_aipp_delo;
-	rtor->base.post = tb_aicp_reactor_aipp_post;
 	rtor->base.spak = tb_aicp_reactor_aipp_spak;
 
 	// init aipp
