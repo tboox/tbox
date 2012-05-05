@@ -74,4 +74,7 @@ tb_bool_t tb_thread_resume(tb_handle_t handle)
 	if (handle) return ((DWORD)-1 != ResumeThread(handle))? TB_TRUE : TB_FALSE;
 	return TB_FALSE;
 }
-
+tb_handle_t tb_thread_self()
+{
+	return (tb_handle_t)GetCurrentThread();
+}

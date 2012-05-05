@@ -44,13 +44,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_print("[demo]: conn: post");
 	if (!tb_aicp_conn(aicp, aico, argv[1], tb_stou32(argv[2]))) goto end;
 
-	// spak
-	tb_long_t r = -1;
-	while ((r = tb_aicp_spak(aicp, -1)) >= 0)
-	{
-		// timeout? sleep some time
-		if (!r) tb_msleep(200);
-	}
+	// spak & done
+	while (tb_aicp_spak(aicp) && tb_aicp_done(aicp)) ;
 	
 end:
 

@@ -54,13 +54,8 @@ static tb_pointer_t tb_work_thread(tb_pointer_t cb_data)
 	tb_handle_t aicp = (tb_handle_t)data[0];
 	tb_assert_and_check_goto(aicp, end);
 
-	// spak
-	tb_long_t r = -1;
-	while ((r = tb_aicp_spak(aicp, -1)) >= 0)
-	{
-		// timeout? sleep some time
-		if (!r) tb_msleep(200);
-	}
+	// done
+	while (tb_aicp_done(aicp)) tb_msleep(200);
 
 end:
 	// exit work
@@ -113,8 +108,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// post acpt
 	if (!tb_aicp_acpt(aicp, aico)) goto end;
 
-	// ...
-	getchar();
+	// spak
+	while (tb_aicp_spak(aicp)) ;
 
 end:
 

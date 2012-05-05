@@ -62,10 +62,16 @@ tb_void_t tb_thread_return(tb_pointer_t value)
 }
 tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
-	return TB_TRUE;
+	tb_trace_noimpl();
+	return TB_FALSE;
 }
 tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
-	return TB_TRUE;
+	tb_trace_noimpl();
+	return TB_FALSE;
+}
+tb_handle_t tb_thread_self()
+{
+	return (tb_handle_t)pthread_self();
 }
 

@@ -30,32 +30,30 @@
 #include "prefix.h"
 #include "aioo.h"
 #include "../network/ipv4.h"
+#include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the callback type
 struct __tb_aico_t;
 struct __tb_aice_t;
 struct __tb_aicp_t;
+/// the callback type
 typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aico_t const* aico, struct __tb_aice_t const* aice);
 
-// the aio call object type
+/// the aio call object type
 typedef struct __tb_aico_t
 {
-	// the aioo
+	/// the aioo
 	tb_aioo_t 				aioo;
 
-	// the aicb
+	/// the aicb
 	tb_aicb_t 				aicb;
-
-	// the aice
-//	tb_aice_t 				aice;
 
 }tb_aico_t;
 
-// the aio event code type
+/// the aio event code type
 typedef enum __tb_aice_code_t
 {
  	TB_AICE_CODE_NULL 		= 0 	//!< for null
@@ -67,71 +65,74 @@ typedef enum __tb_aice_code_t
 
 }tb_aice_code_t;
 
-// the aio sync event type
+/// the aio sync event type
 typedef struct __tb_aice_sync_t
 {
-	// the ok
+	/// the ok
 	tb_bool_t 				ok;
 
 }tb_aice_sync_t;
 
-// the aio acpt event type
+/// the aio acpt event type
 typedef struct __tb_aice_acpt_t
 {
-	// the client socket 
+	/// the client socket 
 	tb_handle_t 			sock;
 
 }tb_aice_acpt_t;
 
-// the aio conn event type
+/// the aio conn event type
 typedef struct __tb_aice_conn_t
 {
-	// the ok
+	/// the ok
 	tb_size_t 				ok 		: 1;
 
-	// the port
+	/// the port
 	tb_size_t 				port 	: 31;
 
-	// the host
+	/// the host
 	tb_ipv4_t 				host;
 
 }tb_aice_conn_t;
 
-// the aio read event type
+/// the aio read event type
 typedef struct __tb_aice_read_t
 {
-	// the read data
+	/// the read data
 	tb_byte_t* 				data;
 
-	// the data maxn
+	/// the data maxn
 	tb_size_t 				maxn;
 
-	// the data size
+	/// the data size
 	tb_long_t 				size;
 
 }tb_aice_read_t;
 
-// the aio writ event type
+/// the aio writ event type
 typedef struct __tb_aice_writ_t
 {
-	// the writ data
+	/// the writ data
 	tb_byte_t* 				data;
 
-	// the data maxn
+	/// the data maxn
 	tb_size_t 				maxn;
 
-	// the data size
+	/// the data size
 	tb_long_t 				size;
 
 }tb_aice_writ_t;
 
-// the aio call event type
+/// the aio call event type
 typedef struct __tb_aice_t
 {
-	// the code
+	/// the code
 	tb_size_t 				code;
 
-	// the uion
+	/// the aico
+	tb_pointer_t 			aico;
+
+	/// the uion
 	union
 	{
 		tb_aice_sync_t 		sync;
@@ -143,29 +144,40 @@ typedef struct __tb_aice_t
 
 }tb_aice_t;
 
-// the aio poll pool reactor type
 typedef struct __tb_aicp_t;
+/// the aio poll pool reactor type
 typedef struct __tb_aicp_reactor_t
 {
-	// the reference to the aio pool
+	/// the reference to the aio pool
 	struct __tb_aicp_t* 	aicp;
 
-	// exit
+	/// exit
 	tb_void_t 				(*exit)(struct __tb_aicp_reactor_t* reactor);
 
-	// addo
+	/// addo
 	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
-	// delo
+	/// delo
 	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
-	// post
-	tb_bool_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico, tb_aice_t const* aice);
-
-	// spak
-	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_long_t timeout);
+	/// spak
+	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_aice_t const* post, tb_aice_t const** resp);
 
 }tb_aicp_reactor_t;
+
+/// the aicp mutex type
+typedef struct __tb_aicp_mutx_t
+{
+	/// the pool mutx
+	tb_handle_t 			pool;
+
+	/// the post mutx
+	tb_handle_t 			post;
+
+	/// the resp mutx
+	tb_handle_t 			resp;
+
+}tb_aicp_mutx_t;
 
 /*!the aio call pool type
  *
@@ -204,53 +216,76 @@ typedef struct __tb_aicp_reactor_t
  * iocp: |------------------------------------------------|    |     |    |               |
  *       |                 wait port                      |    |     |    |               |
  *       '------------------------------------------------'    '-----'    |               |
- *            |   |         |      |                              |       |               |
- *            |   |         |      |                              |       |               |
- *            |   |         |      |                              |    --->---            |
- *            |   |         |      |                              |   | spank |           |
- *            |   |         |      |                              |    ---<---            |
- *            |   |         |      |                              |       |               |
- *       |------------------------------------------------|       |       |               |
- * aice: | aice0 aice1  | aice2  aice3  |     ...         |       |       |               |
- *       |------------------------------------------------|       |       |               |
- * tid:  |    tid0      |     tid1      |     ...         |-------'       |               |
- *       |------------------------------------------------|               |               |
- *             |               |------------------------------------------'               |
- *             |               |                                                          |
- * queue:      |     [lock]    |         <= output aice to queue by tid                   |
- *             |               |         <= the aices of the same aico must be in the same worker queue
- *             |               |                                                          |
- *       |------------------------------|                                                 |
- * done: |  worker0     |   worker1     | <= do caller in the worker thread, aico & aice cannot been modified
- *       '------------------------------'                                                 |
- *             |               |                                                          |
- *            ...             ...                                                         |
- *         post evet          end ------                                                  |
- *             |                        |                                                 |
- *             '------------------------|------------------------------------------------>'
+ *                 |           |           |                      |       |               |
+ *                 |           |           |                      |       |               |
+ *                 |           |           |                      |    --->---            |
+ *                 |           |           |                      |   | spank |           |
+ *                 |           |           |                      |    ---<---            |
+ *                 |           |           |                      |       |               |
+ * resp: |---------------------|----------------------------------'-------'               |
+ *                             |                                                          |
+ * queue:      [lock]          |         <= output aice to queue                          |
+ *                             |                                                          |
+ *                             |                                                          |
+ *                             |                                                          |
+ *         |---------------------------------------------|                                |
+ * worker: |  worker0    |   worker1    |    ...         | <= aico is readonly for worker |
+ *         '---------------------------------------------'                                |
+ *                |             |               |                                         |
+ *                ------------------------------                                          |
+ *                       [lock] |        <= the aices of the same aico must be in the same worker queue
+ *                ------------------------------                                          |
+ *                |             |               |                                         |
+ * aices:  |---------------------------------------------|                                |
+ *         |    aice0    |    aice2     |     ...        |                                |
+ *         |    aice1    |    aice3     |     ...        |                                |
+ *         |     ...     |    aice4     |     ...        |                                |
+ *         |     ...     |     ...      |     ...        |                                |
+ *         '---------------------------------------------'                                |
+ *                |              |              |                                         | 
+ * done:   |---------------------------------------------|                                |
+ *         |   caller0   |   caller2    |     ...        |                                |
+ *         |   caller1   |     ...      |     ...        |                                |
+ *         |     ...     |   caller2    |     ...        |                                |
+ *         |     ...     |     ...      |     ...        |                                |
+ *         |---------------------------------------------|                                |
+ *                |              |                                                        | 
+ *               ...            ...                                                       |
+ *           post evet          end ----                                                  |
+ *                |                     |                                                 |
+ *                '---------------------|------------------------------------------------>'
  *                                      |
- * kill:                      ...       |
- *                             |        |
- * exit:                      ...     <-
+ * kill:               ...              |
+ *                      |               |
+ * exit:               ...    <---------'
  *
  * </pre>
  *
  */
 typedef struct __tb_aicp_t
 {
-	// the object type
+	/// the object type
 	tb_size_t 				type;
 
-	// the object maxn
+	/// the object maxn
 	tb_size_t 				maxn;
 
-	// the aicp mutex
-	tb_handle_t 			mutx;
+	/// is killed?
+	tb_size_t 				kill;
 
-	// the aico pool
+	/// the aicp mutx
+	tb_aicp_mutx_t 			mutx;
+
+	/// the aico pool
 	tb_handle_t 			pool;
 
-	// the reactor
+	/// the aice post
+	tb_queue_t* 			post;
+
+	/// the aice resp
+	tb_queue_t* 			resp;
+
+	/// the reactor
 	tb_aicp_reactor_t* 		rtor;
 
 }tb_aicp_t;
@@ -298,13 +333,10 @@ tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
 /*!post the aio event
  *
  * @param 	aicp 	the aio call pool
- * @param 	aico 	the aio call object
  * @param 	aice 	the aio call event
  *
- * @return 	return TB_TRUE if ok
- *
  */
-tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice);
+tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
 
 /// post sync
 tb_bool_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
@@ -321,14 +353,34 @@ tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* dat
 /// post writ
 tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
 
-/*!spak the aio objects in the pool
+/*!spak aices in the spak worker thread
  *
- * @param 	aicp 	the aio pool
- * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ * @note only one thread
  *
- * @return  1: ok, 0: timeout, -1: error
+ * @code
+ * tb_pointer_t spak_worker_thread(tb_pointer_t)
+ * {
+ * 		// wait will be called, so need not sleep
+ * 		while (tb_aicp_spak(aicp)) ;
+ * }
+ * @endcode
+ *
  */
-tb_long_t 			tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout);
+tb_bool_t 			tb_aicp_spak(tb_aicp_t* aicp);
+
+/*!spdoneak aices in the call worker thread
+ *
+ * @note one or some thread
+ *
+ * @code
+ * tb_pointer_t call_worker_thread(tb_pointer_t)
+ * {
+ * 		while (tb_aicp_done(aicp)) tb_msleep(200);
+ * }
+ * @endcode
+ *
+ */
+tb_bool_t 			tb_aicp_done(tb_aicp_t* aicp);
 
 /// kill
 tb_void_t 			tb_aicp_kill(tb_aicp_t* aicp);
