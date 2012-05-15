@@ -558,6 +558,18 @@ tb_void_t tb_bstream_set_s16_be(tb_bstream_t* bst, tb_sint16_t val)
 	tb_bits_set_s16_be(bst->p, val);
 	bst->p += 2;
 }
+tb_void_t tb_bstream_set_u24_be(tb_bstream_t* bst, tb_uint32_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_u24_be(bst->p, val);
+	bst->p += 3;
+}
+tb_void_t tb_bstream_set_s24_be(tb_bstream_t* bst, tb_sint32_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_s24_be(bst->p, val);
+	bst->p += 3;
+}
 tb_void_t tb_bstream_set_u32_be(tb_bstream_t* bst, tb_uint32_t val)
 {
 	tb_assert(!bst->b);
