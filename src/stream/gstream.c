@@ -223,9 +223,6 @@ end:
 }
 static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	// last operaton is read
-	tb_assert_and_check_return_val(!gst->bwrited, -1);
-
 	// init
 	tb_long_t r = 1;
 
@@ -250,9 +247,6 @@ static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gst, tb_byte_t* data, tb_
 }
 static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	// last operaton is writ
-	tb_assert_and_check_return_val(gst->bwrited, -1);
-
 	// init 
 	tb_long_t r = -1;
 
@@ -735,10 +729,13 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_long_t tb_gstream_afread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gst, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened, -1);
 
-	// flush readed cache data if the last operaton is read
-	tb_check_return_val(!gst->bwrited, -1);
+	// check cache
+	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
+
+	// the cache is writed-cache now, need call afwrit or bfwrit first.
+	tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
 
 	// flush it
 	return tb_gstream_cache_afread(gst, data, size);
@@ -746,10 +743,13 @@ tb_long_t tb_gstream_afread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_long_t tb_gstream_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gst, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened, -1);
 
-	// flush writed cache data if the last operaton is writ
-	tb_check_return_val(gst->bwrited, -1);
+	// check cache
+	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
+
+	// the cache is readed-cache now, need call afread or bfread first.
+	tb_assert_and_check_return_val(gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
 
 	// flush it
 	return tb_gstream_cache_afwrit(gst, data, size);
@@ -1385,7 +1385,7 @@ tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	tb_assert_and_check_return_val(gst && ist, 0);	
 
 	// read data
-	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
+	tb_byte_t 	data[TB_GSTREAM_BLOCK_MAXN];
 	tb_hize_t 	read = 0;
 	tb_hize_t 	left = tb_gstream_left(ist);
 	do
