@@ -88,10 +88,6 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
 
-	// open
-	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
-	tb_assert_and_check_return_val(sst->sock, -1);
-
 	// port
 	tb_size_t port = tb_url_port_get(&gst->url);
 	tb_assert_and_check_return_val(port, -1);
@@ -164,6 +160,10 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		else if (args && !tb_strnicmp(args, "tcp=", 4)) sst->type = TB_SOCKET_TYPE_TCP;
 	}
 	else host = sst->ipv4;
+
+	// open
+	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
+	tb_assert_and_check_return_val(sst->sock, -1);
 
 	// tcp
 	tb_long_t r = -1;
@@ -267,6 +267,9 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			// ipv4
 			tb_assert_and_check_return_val(sst->ipv4[0], -1);
 
+			// wait first
+			tb_check_return_val(sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ), 0);
+
 			// read data
 			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
 			tb_check_return_val(r >= 0, -1);
@@ -274,14 +277,16 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			// no data?
 			if (!r)
 			{
-				// end? read x, read 0
-				tb_check_return_val(!sst->read, -1);
+				// FIXME: end? read x, read 0
+			//	tb_check_return_val(!sst->read, -1);
 
-				// abort? read 0, read 0
-				tb_check_return_val(!sst->tryn, -1);
-
-				// tryn++
-				sst->tryn++;
+				// FIXME: abort? read 0, read 0, ...
+				if (sst->tryn++ > 10)
+				{
+					// abort
+					sst->tryn = 0;
+					return -1;
+				}
 			}
 			else sst->tryn = 0;
 		}
@@ -393,8 +398,9 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	case TB_SSTREAM_CMD_SET_TYPE:
 		{
 			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
-			sst->type = (tb_size_t)tb_va_arg(args, tb_size_t);
-			tb_assert_and_check_return_val(sst->type == TB_SOCKET_TYPE_TCP || sst->type == TB_SOCKET_TYPE_UDP, TB_FALSE);
+			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
+			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, TB_FALSE);
+			sst->type = type;
 			return TB_TRUE;
 		}
 	default:
