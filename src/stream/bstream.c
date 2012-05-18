@@ -312,6 +312,24 @@ tb_sint32_t tb_bstream_get_s32_be(tb_bstream_t* bst)
 	return val;
 	
 }
+tb_uint64_t tb_bstream_get_u64_be(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_uint64_t val = tb_bits_get_u64_be(bst->p);;
+	bst->p += 8;
+	return val;
+	
+}
+tb_sint64_t tb_bstream_get_s64_be(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_sint64_t val = tb_bits_get_s64_be(bst->p);
+	bst->p += 8;
+	return val;
+	
+}
 tb_uint32_t tb_bstream_get_u24_le(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
@@ -345,6 +363,24 @@ tb_sint32_t tb_bstream_get_s32_le(tb_bstream_t* bst)
 	
 	tb_sint32_t val = tb_bits_get_s32_le(bst->p);
 	bst->p += 4;
+	return val;
+	
+}
+tb_uint64_t tb_bstream_get_u64_le(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_uint64_t val = tb_bits_get_u64_le(bst->p);
+	bst->p += 8;
+	return val;
+	
+}
+tb_sint64_t tb_bstream_get_s64_le(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_sint64_t val = tb_bits_get_s64_le(bst->p);
+	bst->p += 8;
 	return val;
 	
 }
@@ -546,6 +582,18 @@ tb_void_t tb_bstream_set_s32_le(tb_bstream_t* bst, tb_sint32_t val)
 	tb_bits_set_s32_le(bst->p, val);
 	bst->p += 4;
 }
+tb_void_t tb_bstream_set_u64_le(tb_bstream_t* bst, tb_uint64_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_u64_le(bst->p, val);
+	bst->p += 8;
+}
+tb_void_t tb_bstream_set_s64_le(tb_bstream_t* bst, tb_sint64_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_s64_le(bst->p, val);
+	bst->p += 8;
+}
 tb_void_t tb_bstream_set_u16_be(tb_bstream_t* bst, tb_uint16_t val)
 {
 	tb_assert(!bst->b);
@@ -582,7 +630,18 @@ tb_void_t tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val)
 	tb_bits_set_s32_be(bst->p, val);
 	bst->p += 4;
 }
-
+tb_void_t tb_bstream_set_u64_be(tb_bstream_t* bst, tb_uint64_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_u64_be(bst->p, val);
+	bst->p += 8;
+}
+tb_void_t tb_bstream_set_s64_be(tb_bstream_t* bst, tb_sint64_t val)
+{
+	tb_assert(!bst->b);
+	tb_bits_set_s64_be(bst->p, val);
+	bst->p += 8;
+}
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_bstream_set_float_le(tb_bstream_t* bst, tb_float_t val)
 {

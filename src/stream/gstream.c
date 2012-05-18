@@ -1254,6 +1254,18 @@ tb_sint32_t tb_gstream_bread_s32_le(tb_gstream_t* gst)
 	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_s32_le(b);
 }
+tb_uint64_t tb_gstream_bread_u64_le(tb_gstream_t* gst)
+{
+	tb_byte_t b[8];
+	if (!tb_gstream_bread(gst, b, 8)) return 0;
+	return tb_bits_get_u64_le(b);
+}
+tb_sint64_t tb_gstream_bread_s64_le(tb_gstream_t* gst)
+{	
+	tb_byte_t b[8];
+	if (!tb_gstream_bread(gst, b, 8)) return 0;
+	return tb_bits_get_s64_le(b);
+}
 tb_uint16_t tb_gstream_bread_u16_be(tb_gstream_t* gst)
 {	
 	tb_byte_t b[2];
@@ -1289,6 +1301,18 @@ tb_sint32_t tb_gstream_bread_s32_be(tb_gstream_t* gst)
 	tb_byte_t b[4];
 	if (!tb_gstream_bread(gst, b, 4)) return 0;
 	return tb_bits_get_s32_be(b);
+}
+tb_uint64_t tb_gstream_bread_u64_be(tb_gstream_t* gst)
+{
+	tb_byte_t b[8];
+	if (!tb_gstream_bread(gst, b, 8)) return 0;
+	return tb_bits_get_u64_be(b);
+}
+tb_sint64_t tb_gstream_bread_s64_be(tb_gstream_t* gst)
+{	
+	tb_byte_t b[8];
+	if (!tb_gstream_bread(gst, b, 8)) return 0;
+	return tb_bits_get_s64_be(b);
 }
 tb_bool_t tb_gstream_bwrit_u8(tb_gstream_t* gst, tb_uint8_t val)
 {
@@ -1341,7 +1365,18 @@ tb_bool_t tb_gstream_bwrit_s32_le(tb_gstream_t* gst, tb_sint32_t val)
 	tb_bits_set_s32_le(b, val);
 	return tb_gstream_bwrit(gst, b, 4);
 }
-
+tb_bool_t tb_gstream_bwrit_u64_le(tb_gstream_t* gst, tb_uint64_t val)
+{	
+	tb_byte_t b[8];
+	tb_bits_set_u64_le(b, val);
+	return tb_gstream_bwrit(gst, b, 8);
+}
+tb_bool_t tb_gstream_bwrit_s64_le(tb_gstream_t* gst, tb_sint64_t val)
+{
+	tb_byte_t b[8];
+	tb_bits_set_s64_le(b, val);
+	return tb_gstream_bwrit(gst, b, 8);
+}
 tb_bool_t tb_gstream_bwrit_u16_be(tb_gstream_t* gst, tb_uint16_t val)
 {
 	tb_byte_t b[2];
@@ -1367,7 +1402,6 @@ tb_bool_t tb_gstream_bwrit_s24_be(tb_gstream_t* gst, tb_sint32_t val)
 	tb_bits_set_s24_be(b, val);
 	return tb_gstream_bwrit(gst, b, 3);
 }
-
 tb_bool_t tb_gstream_bwrit_u32_be(tb_gstream_t* gst, tb_uint32_t val)
 {	
 	tb_byte_t b[4];
@@ -1379,6 +1413,18 @@ tb_bool_t tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val)
 	tb_byte_t b[4];
 	tb_bits_set_s32_be(b, val);
 	return tb_gstream_bwrit(gst, b, 4);
+}
+tb_bool_t tb_gstream_bwrit_u64_be(tb_gstream_t* gst, tb_uint64_t val)
+{	
+	tb_byte_t b[8];
+	tb_bits_set_u64_be(b, val);
+	return tb_gstream_bwrit(gst, b, 8);
+}
+tb_bool_t tb_gstream_bwrit_s64_be(tb_gstream_t* gst, tb_sint64_t val)
+{
+	tb_byte_t b[8];
+	tb_bits_set_s64_be(b, val);
+	return tb_gstream_bwrit(gst, b, 8);
 }
 tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 {
