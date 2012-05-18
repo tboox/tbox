@@ -51,6 +51,8 @@
 # 	define tb_gstream_bread_s24_ne(gst) 		tb_gstream_bread_s24_be(gst)
 # 	define tb_gstream_bread_u32_ne(gst) 		tb_gstream_bread_u32_be(gst)
 # 	define tb_gstream_bread_s32_ne(gst) 		tb_gstream_bread_s32_be(gst)
+# 	define tb_gstream_bread_u64_ne(gst) 		tb_gstream_bread_u64_be(gst)
+# 	define tb_gstream_bread_s64_ne(gst) 		tb_gstream_bread_s64_be(gst)
 
 # 	define tb_gstream_bwrit_u16_ne(gst, val) 	tb_gstream_bwrit_u16_be(gst, val)
 # 	define tb_gstream_bwrit_s16_ne(gst, val)	tb_gstream_bwrit_s16_be(gst, val)
@@ -58,6 +60,8 @@
 # 	define tb_gstream_bwrit_s24_ne(gst, val)	tb_gstream_bwrit_s24_be(gst, val)
 # 	define tb_gstream_bwrit_u32_ne(gst, val)	tb_gstream_bwrit_u32_be(gst, val)
 # 	define tb_gstream_bwrit_s32_ne(gst, val) 	tb_gstream_bwrit_s32_be(gst, val)
+# 	define tb_gstream_bwrit_u64_ne(gst, val)	tb_gstream_bwrit_u64_be(gst, val)
+# 	define tb_gstream_bwrit_s64_ne(gst, val) 	tb_gstream_bwrit_s64_be(gst, val)
 
 #else
 # 	define tb_gstream_bread_u16_ne(gst) 		tb_gstream_bread_u16_le(gst)
@@ -66,6 +70,8 @@
 # 	define tb_gstream_bread_s24_ne(gst) 		tb_gstream_bread_s24_le(gst)
 # 	define tb_gstream_bread_u32_ne(gst) 		tb_gstream_bread_u32_le(gst)
 # 	define tb_gstream_bread_s32_ne(gst) 		tb_gstream_bread_s32_le(gst)
+# 	define tb_gstream_bread_u64_ne(gst) 		tb_gstream_bread_u64_le(gst)
+# 	define tb_gstream_bread_s64_ne(gst) 		tb_gstream_bread_s64_le(gst)
 
 # 	define tb_gstream_bwrit_u16_ne(gst, val) 	tb_gstream_bwrit_u16_le(gst, val)
 # 	define tb_gstream_bwrit_s16_ne(gst, val)	tb_gstream_bwrit_s16_le(gst, val)
@@ -73,6 +79,8 @@
 # 	define tb_gstream_bwrit_s24_ne(gst, val)	tb_gstream_bwrit_s24_le(gst, val)
 # 	define tb_gstream_bwrit_u32_ne(gst, val)	tb_gstream_bwrit_u32_le(gst, val)
 # 	define tb_gstream_bwrit_s32_ne(gst, val) 	tb_gstream_bwrit_s32_le(gst, val)
+# 	define tb_gstream_bwrit_u64_ne(gst, val)	tb_gstream_bwrit_u64_le(gst, val)
+# 	define tb_gstream_bwrit_s64_ne(gst, val) 	tb_gstream_bwrit_s64_le(gst, val)
 
 #endif
 
@@ -340,6 +348,9 @@ tb_sint32_t 		tb_gstream_bread_s24_le(tb_gstream_t* gst);
 tb_uint32_t 		tb_gstream_bread_u32_le(tb_gstream_t* gst);
 tb_sint32_t 		tb_gstream_bread_s32_le(tb_gstream_t* gst);
 
+tb_uint64_t 		tb_gstream_bread_u64_le(tb_gstream_t* gst);
+tb_sint64_t 		tb_gstream_bread_s64_le(tb_gstream_t* gst);
+
 tb_uint16_t 		tb_gstream_bread_u16_be(tb_gstream_t* gst);
 tb_sint16_t 		tb_gstream_bread_s16_be(tb_gstream_t* gst);
 
@@ -348,6 +359,9 @@ tb_sint32_t 		tb_gstream_bread_s24_be(tb_gstream_t* gst);
 
 tb_uint32_t 		tb_gstream_bread_u32_be(tb_gstream_t* gst);
 tb_sint32_t 		tb_gstream_bread_s32_be(tb_gstream_t* gst);
+
+tb_uint64_t 		tb_gstream_bread_u64_be(tb_gstream_t* gst);
+tb_sint64_t 		tb_gstream_bread_s64_be(tb_gstream_t* gst);
 
 // block writ integer
 tb_bool_t			tb_gstream_bwrit_u8(tb_gstream_t* gst, tb_uint8_t val);
@@ -362,6 +376,9 @@ tb_bool_t 			tb_gstream_bwrit_s24_le(tb_gstream_t* gst, tb_sint32_t val);
 tb_bool_t 			tb_gstream_bwrit_u32_le(tb_gstream_t* gst, tb_uint32_t val);
 tb_bool_t 			tb_gstream_bwrit_s32_le(tb_gstream_t* gst, tb_sint32_t val);
 
+tb_bool_t 			tb_gstream_bwrit_u64_le(tb_gstream_t* gst, tb_uint64_t val);
+tb_bool_t 			tb_gstream_bwrit_s64_le(tb_gstream_t* gst, tb_sint64_t val);
+
 tb_bool_t 			tb_gstream_bwrit_u16_be(tb_gstream_t* gst, tb_uint16_t val);
 tb_bool_t 			tb_gstream_bwrit_s16_be(tb_gstream_t* gst, tb_sint16_t val);
 
@@ -370,6 +387,9 @@ tb_bool_t 			tb_gstream_bwrit_s24_be(tb_gstream_t* gst, tb_sint32_t val);
 
 tb_bool_t 			tb_gstream_bwrit_u32_be(tb_gstream_t* gst, tb_uint32_t val);
 tb_bool_t 			tb_gstream_bwrit_s32_be(tb_gstream_t* gst, tb_sint32_t val);
+
+tb_bool_t 			tb_gstream_bwrit_u64_be(tb_gstream_t* gst, tb_uint64_t val);
+tb_bool_t 			tb_gstream_bwrit_s64_be(tb_gstream_t* gst, tb_sint64_t val);
 
 // status
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gst);
