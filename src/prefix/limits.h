@@ -40,6 +40,10 @@
 #define TB_MINS32 				(0x80000001)
 #define TB_MAXU32 				(0xffffffff)
 #define TB_MINU32 				(0)
+#define TB_MAXS64 				(0x7fffffffffffffffLL)
+#define TB_MINS64 				(0x8000000000000001LL)
+#define TB_MAXU64 				(0xffffffffffffffffULL)
+#define TB_MINU64 				(0)
 #define TB_NAN32 				(0x80000000)
 
 
