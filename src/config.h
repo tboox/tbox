@@ -56,7 +56,7 @@
 
 // memory
 #define TB_CONFIG_MEMORY_MODE_SMALL
-#define TB_CONFIG_MEMORY_POOL_ENABLE
+//#define TB_CONFIG_MEMORY_POOL_ENABLE
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 
 // event
@@ -105,5 +105,5 @@
 // config
 #ifndef tbox_AUTO_CONFIG_H
 #define tbox_AUTO_CONFIG_H
-#define tbox_CONFIG_DEBUG 1
+#define tbox_CONFIG_DEBUG 0
 #endif
