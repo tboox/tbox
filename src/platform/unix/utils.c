@@ -29,6 +29,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#ifdef TB_CONFIG_OS_ANDROID
+# 	include <android/log.h>     
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -60,7 +63,11 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 	tb_va_format(msg, 4096, fmt, &ret);
 	if (ret >= 0) msg[ret] = '\0';
 
+#ifdef TB_CONFIG_OS_ANDROID
+	__android_log_print(ANDROID_LOG_DEBUG, "", "%s", msg);
+#else
 	printf("%s", msg);
+#endif
 }
 
 // mclock
