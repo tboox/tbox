@@ -267,28 +267,15 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			// ipv4
 			tb_assert_and_check_return_val(sst->ipv4[0], -1);
 
-			// wait first
-			tb_check_return_val(sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ), 0);
-
 			// read data
 			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
 			tb_check_return_val(r >= 0, -1);
 
-			// no data?
-			if (!r)
-			{
-				// FIXME: end? read x, read 0
-			//	tb_check_return_val(!sst->read, -1);
+			// abort?
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
 
-				// FIXME: abort? read 0, read 0, ...
-				if (sst->tryn++ > 10)
-				{
-					// abort
-					sst->tryn = 0;
-					return -1;
-				}
-			}
-			else sst->tryn = 0;
+			// clear wait
+			if (r > 0) sst->wait = 0;
 		}
 		break;
 	default:

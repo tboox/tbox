@@ -42,6 +42,8 @@
 # 	define tb_bstream_get_s24_ne(bst) 			tb_bstream_get_s24_be(bst)
 # 	define tb_bstream_get_u32_ne(bst) 			tb_bstream_get_u32_be(bst)
 # 	define tb_bstream_get_s32_ne(bst) 			tb_bstream_get_s32_be(bst)
+# 	define tb_bstream_get_u64_ne(bst) 			tb_bstream_get_u64_be(bst)
+# 	define tb_bstream_get_s64_ne(bst) 			tb_bstream_get_s64_be(bst)
 
 # 	define tb_bstream_set_u16_ne(bst, val) 		tb_bstream_set_u16_be(bst, val)
 # 	define tb_bstream_set_s16_ne(bst, val)		tb_bstream_set_s16_be(bst, val)
@@ -49,6 +51,8 @@
 # 	define tb_bstream_set_s24_ne(bst, val)		tb_bstream_set_s24_be(bst, val)
 # 	define tb_bstream_set_u32_ne(bst, val)		tb_bstream_set_u32_be(bst, val)
 # 	define tb_bstream_set_s32_ne(bst, val) 		tb_bstream_set_s32_be(bst, val)
+# 	define tb_bstream_set_u64_ne(bst, val)		tb_bstream_set_u64_be(bst, val)
+# 	define tb_bstream_set_s64_ne(bst, val) 		tb_bstream_set_s64_be(bst, val)
 
 #else
 # 	define tb_bstream_get_u16_ne(bst) 			tb_bstream_get_u16_le(bst)
@@ -57,6 +61,8 @@
 # 	define tb_bstream_get_s24_ne(bst) 			tb_bstream_get_s24_le(bst)
 # 	define tb_bstream_get_u32_ne(bst) 			tb_bstream_get_u32_le(bst)
 # 	define tb_bstream_get_s32_ne(bst) 			tb_bstream_get_s32_le(bst)
+# 	define tb_bstream_get_u64_ne(bst) 			tb_bstream_get_u64_le(bst)
+# 	define tb_bstream_get_s64_ne(bst) 			tb_bstream_get_s64_le(bst)
 
 # 	define tb_bstream_set_u16_ne(bst, val) 		tb_bstream_set_u16_le(bst, val)
 # 	define tb_bstream_set_s16_ne(bst, val)		tb_bstream_set_s16_le(bst, val)
@@ -64,6 +70,8 @@
 # 	define tb_bstream_set_s24_ne(bst, val)		tb_bstream_set_s24_le(bst, val)
 # 	define tb_bstream_set_u32_ne(bst, val)		tb_bstream_set_u32_le(bst, val)
 # 	define tb_bstream_set_s32_ne(bst, val) 		tb_bstream_set_s32_le(bst, val)
+# 	define tb_bstream_set_u64_ne(bst, val)		tb_bstream_set_u64_le(bst, val)
+# 	define tb_bstream_set_s64_ne(bst, val) 		tb_bstream_set_s64_le(bst, val)
 
 #endif
 
@@ -129,6 +137,9 @@ tb_sint32_t 		tb_bstream_get_s24_le(tb_bstream_t* bst);
 tb_uint32_t 		tb_bstream_get_u32_le(tb_bstream_t* bst);
 tb_sint32_t 		tb_bstream_get_s32_le(tb_bstream_t* bst);
 
+tb_uint64_t 		tb_bstream_get_u64_le(tb_bstream_t* bst);
+tb_sint64_t 		tb_bstream_get_s64_le(tb_bstream_t* bst);
+
 tb_uint16_t 		tb_bstream_get_u16_be(tb_bstream_t* bst);
 tb_sint16_t 		tb_bstream_get_s16_be(tb_bstream_t* bst);
 
@@ -137,6 +148,9 @@ tb_sint32_t 		tb_bstream_get_s24_be(tb_bstream_t* bst);
 
 tb_uint32_t 		tb_bstream_get_u32_be(tb_bstream_t* bst);
 tb_sint32_t 		tb_bstream_get_s32_be(tb_bstream_t* bst);
+
+tb_uint64_t 		tb_bstream_get_u64_be(tb_bstream_t* bst);
+tb_sint64_t 		tb_bstream_get_s64_be(tb_bstream_t* bst);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t 			tb_bstream_get_float_le(tb_bstream_t* bst);
@@ -176,6 +190,9 @@ tb_void_t 			tb_bstream_set_s24_le(tb_bstream_t* bst, tb_sint32_t val);
 tb_void_t 			tb_bstream_set_u32_le(tb_bstream_t* bst, tb_uint32_t val);
 tb_void_t 			tb_bstream_set_s32_le(tb_bstream_t* bst, tb_sint32_t val);
 
+tb_void_t 			tb_bstream_set_u64_le(tb_bstream_t* bst, tb_uint64_t val);
+tb_void_t 			tb_bstream_set_s64_le(tb_bstream_t* bst, tb_sint64_t val);
+
 tb_void_t 			tb_bstream_set_u16_be(tb_bstream_t* bst, tb_uint16_t val);
 tb_void_t 			tb_bstream_set_s16_be(tb_bstream_t* bst, tb_sint16_t val);
 
@@ -184,6 +201,9 @@ tb_void_t 			tb_bstream_set_s24_be(tb_bstream_t* bst, tb_sint32_t val);
 
 tb_void_t 			tb_bstream_set_u32_be(tb_bstream_t* bst, tb_uint32_t val);
 tb_void_t 			tb_bstream_set_s32_be(tb_bstream_t* bst, tb_sint32_t val);
+
+tb_void_t 			tb_bstream_set_u64_be(tb_bstream_t* bst, tb_uint64_t val);
+tb_void_t 			tb_bstream_set_s64_be(tb_bstream_t* bst, tb_sint64_t val);
 
 tb_void_t 			tb_bstream_set_ubits32(tb_bstream_t* bst, tb_uint32_t val, tb_size_t nbits);
 tb_void_t 			tb_bstream_set_sbits32(tb_bstream_t* bst, tb_sint32_t val, tb_size_t nbits);
