@@ -101,6 +101,21 @@
 #define tb_bits_set_u32_ne_impl(p, x) 	do { *((tb_uint32_t*)(p)) = (tb_uint32_t)(x); } while (0)
 #define tb_bits_set_s32_ne_impl(p, x) 	tb_bits_set_u32_ne_impl(p, x)
 
+// 64-bits
+#define tb_bits_get_u64_le_impl(p) 		((tb_uint64_t)*((p) + 7) << 56 | (tb_uint64_t)*((p) + 6) << 48 | (tb_uint64_t)*((p) + 5) << 40 | (tb_uint64_t)*((p) + 4) << 32 | (tb_uint64_t)*((p) + 3) << 24 | (tb_uint64_t)*((p) + 2) << 16 | (tb_uint64_t)*((p) + 1) << 8 | (tb_uint64_t)*(p))
+#define tb_bits_get_s64_le_impl(p) 		tb_bits_get_u64_le_impl(p)
+#define tb_bits_get_u64_be_impl(p) 		((tb_uint64_t)*(p) << 56 | (tb_uint64_t)*((p) + 1) << 48 | (tb_uint64_t)*((p) + 2) << 40 | (tb_uint64_t)*((p) + 3) << 32 | (tb_uint64_t)*((p) + 4) << 24 | (tb_uint64_t)*((p) + 5) << 16 | (tb_uint64_t)*((p) + 6) << 8 | (tb_uint64_t)*((p) + 7))
+#define tb_bits_get_s64_be_impl(p) 		tb_bits_get_u64_be_impl(p)
+#define tb_bits_get_u64_ne_impl(p) 		(*((tb_uint64_t*)(p)))
+#define tb_bits_get_s64_ne_impl(p) 		tb_bits_get_u64_ne_impl(p)
+
+#define tb_bits_set_u64_le_impl(p, x) 	do { *(p) = (tb_uint64_t)(x) & 0xff; *((p) + 1) = ((tb_uint64_t)(x) >> 8) & 0xff; *((p) + 2) = ((tb_uint64_t)(x) >> 16) & 0xff; *((p) + 3) = ((tb_uint64_t)(x) >> 24) & 0xff; *((p) + 4) = ((tb_uint64_t)(x) >> 32) & 0xff; *((p) + 5) = ((tb_uint64_t)(x) >> 40) & 0xff; *((p) + 6) = ((tb_uint64_t)(x) >> 48) & 0xff; *((p) + 7) = ((tb_uint64_t)(x) >> 56) & 0xff;} while (0)
+#define tb_bits_set_s64_le_impl(p, x) 	tb_bits_set_u64_le_impl(p, x)
+#define tb_bits_set_u64_be_impl(p, x) 	do { *(p) = ((tb_uint64_t)(x) >> 56) & 0xff; *((p) + 1) = ((tb_uint64_t)(x) >> 48) & 0xff; *((p) + 2) = ((tb_uint64_t)(x) >> 40) & 0xff; *((p) + 3) = ((tb_uint64_t)(x) >> 32) & 0xff; *((p) + 4) = ((tb_uint64_t)(x) >> 24) & 0xff; *((p) + 5) = ((tb_uint64_t)(x) >> 16) & 0xff; *((p) + 6) = ((tb_uint64_t)(x) >> 8) & 0xff; *((p) + 7) = (tb_uint64_t)(x) & 0xff; } while (0)
+#define tb_bits_set_s64_be_impl(p, x) 	tb_bits_set_u64_be_impl(p, x)
+#define tb_bits_set_u64_ne_impl(p, x) 	do { *((tb_uint64_t*)(p)) = (tb_uint64_t)(x); } while (0)
+#define tb_bits_set_s64_ne_impl(p, x) 	tb_bits_set_u64_ne_impl(p, x)
+
 // float
 #ifdef TB_CONFIG_TYPE_FLOAT
 
@@ -174,6 +189,17 @@
 # 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_ne_impl(p, x)
 # 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_ne_impl(p, x)
 
+// 64-bits
+# 	define tb_bits_get_u64_le(p) 		tb_bits_get_u64_le_impl(p)
+# 	define tb_bits_get_s64_le(p) 		tb_bits_get_s64_le_impl(p)
+# 	define tb_bits_get_u64_be(p) 		tb_bits_get_u64_ne_impl(p)
+# 	define tb_bits_get_s64_be(p) 		tb_bits_get_s64_ne_impl(p)
+
+# 	define tb_bits_set_u64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_s64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_u64_be(p, x) 	tb_bits_set_u64_ne_impl(p, x)
+# 	define tb_bits_set_s64_be(p, x) 	tb_bits_set_s64_ne_impl(p, x)
+
 # 	else
 
 // 16-bits
@@ -208,6 +234,17 @@
 # 	define tb_bits_set_s32_le(p, x) 	tb_bits_set_u32_le_impl(p, x)
 # 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_be_impl(p, x)
 # 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_be_impl(p, x)
+
+// 64-bits
+# 	define tb_bits_get_u64_le(p) 		tb_bits_get_u64_ne_impl(p)
+# 	define tb_bits_get_s64_le(p) 		tb_bits_get_s64_ne_impl(p)
+# 	define tb_bits_get_u64_be(p) 		tb_bits_get_u64_be_impl(p)
+# 	define tb_bits_get_s64_be(p) 		tb_bits_get_s64_be_impl(p)
+
+# 	define tb_bits_set_u64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_s64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_u64_be(p, x) 	tb_bits_set_u64_be_impl(p, x)
+# 	define tb_bits_set_s64_be(p, x) 	tb_bits_set_s64_be_impl(p, x)
 
 # 	endif /* TB_WORDS_BIGENDIAN */
 
@@ -245,6 +282,17 @@
 # 	define tb_bits_set_u32_be(p, x) 	tb_bits_set_u32_be_impl(p, x)
 # 	define tb_bits_set_s32_be(p, x) 	tb_bits_set_s32_be_impl(p, x)
 
+// 64-bits
+# 	define tb_bits_get_u64_le(p) 		tb_bits_get_u64_le_impl(p)
+# 	define tb_bits_get_s64_le(p) 		tb_bits_get_s64_le_impl(p)
+# 	define tb_bits_get_u64_be(p) 		tb_bits_get_u64_be_impl(p)
+# 	define tb_bits_get_s64_be(p) 		tb_bits_get_s64_be_impl(p)
+
+# 	define tb_bits_set_u64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_s64_le(p, x) 	tb_bits_set_u64_le_impl(p, x)
+# 	define tb_bits_set_u64_be(p, x) 	tb_bits_set_u64_be_impl(p, x)
+# 	define tb_bits_set_s64_be(p, x) 	tb_bits_set_s64_be_impl(p, x)
+
 #endif /* TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE */
 
 #ifdef TB_WORDS_BIGENDIAN
@@ -254,6 +302,8 @@
 # 	define tb_bits_get_s24_ne(p) 		tb_bits_get_s24_be(p)
 # 	define tb_bits_get_u32_ne(p) 		tb_bits_get_u32_be(p)
 # 	define tb_bits_get_s32_ne(p) 		tb_bits_get_s32_be(p)
+# 	define tb_bits_get_u64_ne(p) 		tb_bits_get_u64_be(p)
+# 	define tb_bits_get_s64_ne(p) 		tb_bits_get_s64_be(p)
 
 # 	define tb_bits_set_u16_ne(p, x) 	tb_bits_set_u16_be(p, x)
 # 	define tb_bits_set_s16_ne(p, x)		tb_bits_set_s16_be(p, x)
@@ -261,6 +311,8 @@
 # 	define tb_bits_set_s24_ne(p, x)		tb_bits_set_s24_be(p, x)
 # 	define tb_bits_set_u32_ne(p, x)		tb_bits_set_u32_be(p, x)
 # 	define tb_bits_set_s32_ne(p, x) 	tb_bits_set_s32_be(p, x)
+# 	define tb_bits_set_u64_ne(p, x)		tb_bits_set_u64_be(p, x)
+# 	define tb_bits_set_s64_ne(p, x) 	tb_bits_set_s64_be(p, x)
 
 #else
 # 	define tb_bits_get_u16_ne(p) 		tb_bits_get_u16_le(p)
@@ -269,6 +321,8 @@
 # 	define tb_bits_get_s24_ne(p) 		tb_bits_get_s24_le(p)
 # 	define tb_bits_get_u32_ne(p) 		tb_bits_get_u32_le(p)
 # 	define tb_bits_get_s32_ne(p) 		tb_bits_get_s32_le(p)
+# 	define tb_bits_get_u64_ne(p) 		tb_bits_get_u64_le(p)
+# 	define tb_bits_get_s64_ne(p) 		tb_bits_get_s64_le(p)
 
 # 	define tb_bits_set_u16_ne(p, x) 	tb_bits_set_u16_le(p, x)
 # 	define tb_bits_set_s16_ne(p, x)		tb_bits_set_s16_le(p, x)
@@ -276,6 +330,8 @@
 # 	define tb_bits_set_s24_ne(p, x)		tb_bits_set_s24_le(p, x)
 # 	define tb_bits_set_u32_ne(p, x)		tb_bits_set_u32_le(p, x)
 # 	define tb_bits_set_s32_ne(p, x) 	tb_bits_set_s32_le(p, x)
+# 	define tb_bits_set_u64_ne(p, x)		tb_bits_set_u64_le(p, x)
+# 	define tb_bits_set_s64_ne(p, x) 	tb_bits_set_s64_le(p, x)
 
 #endif /* TB_WORDS_BIGENDIAN */
 
