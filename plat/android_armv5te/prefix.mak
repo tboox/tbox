@@ -39,6 +39,7 @@ CPPFLAGS_RELEASE 	= \
 CPPFLAGS_DEBUG 	= -g
 CPPFLAGS 		= \
 				-c -Wall \
+				-march=armv5te \
 				-I$(SDK)/platforms/android-4/arch-arm/usr/include 
 CPPFLAGS-I 		= -I
 CPPFLAGS-o 		= -o
