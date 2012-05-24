@@ -2,7 +2,7 @@
 TB_CONFIG_DEMO 					= y
 
 # plat
-TB_CONFIG_PLAT 					= android_arm
+TB_CONFIG_PLAT 					= android_armv5te
 
 # arch
 TB_CONFIG_ARCH 					= arm

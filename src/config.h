@@ -10,7 +10,7 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 			(4)
+#define TB_CONFIG_ARM_VERSION 				(5)
 //#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
