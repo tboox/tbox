@@ -71,6 +71,7 @@ tb_bool_t 			tb_qbuffer_null(tb_qbuffer_t const* buffer);
 // modifiors
 tb_void_t 			tb_qbuffer_clear(tb_qbuffer_t* buffer);
 tb_byte_t* 			tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn);
+tb_long_t 			tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size);
 
 // read & writ
 tb_long_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);

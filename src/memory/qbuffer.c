@@ -137,7 +137,25 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 	// ok
 	return buffer->data;
 }
+tb_long_t tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size)
+{
+	tb_assert_and_check_return_val(buffer, -1);
 
+	// no data?
+	tb_check_return_val(buffer->data && buffer->size && size, 0);
+	tb_assert_and_check_return_val(buffer->head, -1);
+
+	// read data
+	tb_long_t read = buffer->size > size? size : buffer->size;
+	buffer->head += read;
+	buffer->size -= read;
+
+	// null? reset head
+	if (!buffer->size) buffer->head = buffer->data;
+
+	// ok
+	return read;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * read & writ
  */
