@@ -174,7 +174,7 @@ static tb_hize_t tb_fstream_size(tb_gstream_t* gst)
 {	
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && fst->file, 0);
-	return fst->size;
+	return tb_file_size(fst->file);
 }
 static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {

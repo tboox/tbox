@@ -131,38 +131,48 @@ end:
 }
 static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	// read data from cache first
-	tb_long_t read = tb_qbuffer_read(&gst->cache, data, size);
-	tb_check_return_val(read >= 0, -1);
-
-	// enough?
-	tb_check_goto(read < size, end);
-
-	// cache is null now.
-	tb_assert_and_check_return_val(tb_qbuffer_null(&gst->cache), -1);
-
-	// enter cache for push
-	tb_size_t 	push = 0;
-	tb_byte_t* 	tail = tb_qbuffer_push_init(&gst->cache, &push);
-	tb_assert_and_check_return_val(tail && push, -1);
-
-	// push data to cache from stream
-	tb_assert(gst->aread);
-	tb_long_t 	real = gst->aread(gst, tail, push, TB_FALSE);
-	tb_check_return_val(real >= 0, -1);
-
-	// read the left data from cache
-	if (real > 0) 
+	tb_long_t read = 0;
+	if (gst->bcached)
 	{
-		// leave cache for push
-		tb_qbuffer_push_done(&gst->cache, real);
+		// read data from cache first
+		read = tb_qbuffer_read(&gst->cache, data, size);
+		tb_check_return_val(read >= 0, -1);
 
-		// read cache
-		real = tb_qbuffer_read(&gst->cache, data + read, tb_min(real, size - read));
+		// enough?
+		tb_check_goto(read < size, end);
+
+		// cache is null now.
+		tb_assert_and_check_return_val(tb_qbuffer_null(&gst->cache), -1);
+
+		// enter cache for push
+		tb_size_t 	push = 0;
+		tb_byte_t* 	tail = tb_qbuffer_push_init(&gst->cache, &push);
+		tb_assert_and_check_return_val(tail && push, -1);
+
+		// push data to cache from stream
+		tb_assert(gst->aread);
+		tb_long_t 	real = gst->aread(gst, tail, push, TB_FALSE);
 		tb_check_return_val(real >= 0, -1);
 
-		// update read 
-		read += real;
+		// read the left data from cache
+		if (real > 0) 
+		{
+			// leave cache for push
+			tb_qbuffer_push_done(&gst->cache, real);
+
+			// read cache
+			real = tb_qbuffer_read(&gst->cache, data + read, tb_min(real, size - read));
+			tb_check_return_val(real >= 0, -1);
+
+			// update read 
+			read += real;
+		}
+	}
+	else 
+	{
+		// read it directly
+		read = gst->aread(gst, data, size, TB_FALSE);
+		tb_check_return_val(read >= 0, -1);
 	}
 
 end:
@@ -177,38 +187,48 @@ end:
 }
 static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
-	// writ data to cache first
-	tb_long_t writ = tb_qbuffer_writ(&gst->cache, data, size);
-	tb_check_return_val(writ >= 0, -1);
-	
-	// enough?
-	tb_check_goto(writ < size, end);
-
-	// cache is full now.
-	tb_assert_and_check_return_val(tb_qbuffer_full(&gst->cache), -1);
-
-	// enter cache for pull
-	tb_size_t 	pull = 0;
-	tb_byte_t* 	head = tb_qbuffer_pull_init(&gst->cache, &pull);
-	tb_assert_and_check_return_val(head && pull, -1);
-
-	// pull data to stream from cache
-	tb_assert(gst->awrit);
-	tb_long_t 	real = gst->awrit(gst, head, pull, TB_FALSE);
-	tb_check_return_val(real >= 0, -1);
-
-	// writ the left data to cache
-	if (real > 0)
+	tb_long_t writ = 0;
+	if (gst->bcached)
 	{
-		// leave cache for pull
-		tb_qbuffer_pull_done(&gst->cache, real);
+		// writ data to cache first
+		writ = tb_qbuffer_writ(&gst->cache, data, size);
+		tb_check_return_val(writ >= 0, -1);
+		
+		// enough?
+		tb_check_goto(writ < size, end);
 
-		// writ cache
-		real = tb_qbuffer_writ(&gst->cache, data + writ, tb_min(real, size - writ));
+		// cache is full now.
+		tb_assert_and_check_return_val(tb_qbuffer_full(&gst->cache), -1);
+
+		// enter cache for pull
+		tb_size_t 	pull = 0;
+		tb_byte_t* 	head = tb_qbuffer_pull_init(&gst->cache, &pull);
+		tb_assert_and_check_return_val(head && pull, -1);
+
+		// pull data to stream from cache
+		tb_assert(gst->awrit);
+		tb_long_t 	real = gst->awrit(gst, head, pull, TB_FALSE);
 		tb_check_return_val(real >= 0, -1);
 
-		// update writ 
-		writ += real;
+		// writ the left data to cache
+		if (real > 0)
+		{
+			// leave cache for pull
+			tb_qbuffer_pull_done(&gst->cache, real);
+
+			// writ cache
+			real = tb_qbuffer_writ(&gst->cache, data + writ, tb_min(real, size - writ));
+			tb_check_return_val(real >= 0, -1);
+
+			// update writ 
+			writ += real;
+		}
+	}
+	else 
+	{
+		// writ it directly
+		writ = gst->awrit(gst, data, size, TB_FALSE);
+		tb_check_return_val(writ >= 0, -1);
 	}
 
 end:
@@ -304,7 +324,7 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 		// bwrited will be clear
 		tb_assert_and_check_return_val(!gst->bwrited, -1);
 	}
-	else
+	else if (gst->bcached)
 	{
 		tb_size_t 	size = 0;
 		tb_hize_t 	curt = tb_gstream_offset(gst);
@@ -409,6 +429,7 @@ tb_bool_t tb_gstream_init(tb_gstream_t* gst)
 
 	// init cache
 	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
+	gst->bcached = 1;
 
 	// ok
 	return TB_TRUE;
@@ -585,7 +606,7 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, -1);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
+	tb_assert_and_check_return_val(gst->bcached && tb_qbuffer_maxn(&gst->cache), -1);
 
 	// the cache is writed-cache now, need call afwrit or bfwrit first.
 	tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1); 
@@ -948,13 +969,9 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
 
-	// curt & size
-	tb_hize_t size = tb_gstream_size(gst);
+	// need seek?
 	tb_hize_t curt = tb_gstream_offset(gst);
 	tb_check_return_val(offset != curt, 1);
-
-	// limit offset
-	if (size && offset > size) offset = size;
 
 	// try seek to cache
 	tb_long_t r = tb_gstream_cache_seek(gst, offset);
@@ -964,6 +981,13 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	else if (!r) return 0;
 	else
 	{
+		// must be read mode
+		tb_assert_and_check_return_val(!gst->bwrited, -1);
+
+		// limit offset
+		tb_hize_t size = tb_gstream_size(gst);
+		if (size && offset > size) offset = size;
+
 		// forward it?
 		tb_assert_and_check_return_val(offset > curt, -1);
 
@@ -1159,7 +1183,9 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 			{
 				tb_qbuffer_resize(&gst->cache, cache);
 				if (tb_qbuffer_maxn(&gst->cache)) ret = TB_TRUE;
+				gst->bcached = 1;
 			}
+			else gst->bcached = 0;
 		}
 		break;
 	case TB_GSTREAM_CMD_GET_CACHE:
