@@ -175,8 +175,11 @@ typedef struct __tb_gstream_t
 	/// is writed?
 	tb_size_t 			bwrited 	: 1;
 
+	/// is cached?
+	tb_size_t 			bcached 	: 1;
+
 	/// the timeout: ms
-	tb_size_t 			timeout 	: 22;
+	tb_size_t 			timeout 	: 21;
 
 	/// the url
 	tb_url_t 			url;
