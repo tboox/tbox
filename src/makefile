@@ -182,7 +182,6 @@ INC_FILES 				= \
 						math/fixed16.h \
 						math/fixed30.h \
 						math/int32.h \
-						math/scalar.h \
 						math/opt/prefix.h \
 						math/opt/float_x86.h \
 						math/opt/float_arm.h \
