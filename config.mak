@@ -7,7 +7,7 @@ PLAT = linux_x86
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
-DEBUG = n
+DEBUG = y
 SDK = /home/ruki/programs/android-ndk-r6
 BIN = /home/ruki/programs/android-ndk-r6/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
 HOST = mac

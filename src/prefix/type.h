@@ -104,13 +104,6 @@ typedef tb_int32_t 					tb_fixed16_t;
 typedef tb_int32_t 					tb_fixed30_t;
 typedef tb_fixed16_t 				tb_fixed_t;
 
-// scalar
-#ifdef TB_CONFIG_TYPE_SCALAR_IS_FIXED
-typedef tb_fixed_t 					tb_scalar_t;
-#else
-typedef tb_float_t 					tb_scalar_t;
-#endif
-
 // atomic
 typedef __tb_volatile__ tb_size_t 	tb_atomic_t;
 
