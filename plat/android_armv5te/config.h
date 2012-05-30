@@ -54,7 +54,6 @@
 
 // type
 #define TB_CONFIG_TYPE_FLOAT
-#define TB_CONFIG_TYPE_SCALAR_IS_FIXED
 
 // optimization
 //#define TB_CONFIG_OPTI_SSE2_ENABLE

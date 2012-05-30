@@ -5,7 +5,6 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		fixed \
 		float \
-		scalar \
 		int32 \
 		rand
 
