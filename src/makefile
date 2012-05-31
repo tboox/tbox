@@ -283,8 +283,8 @@ INC_FILES 				= \
 						libc/stdio/stdio.h \
 						libc/string/prefix.h \
 						libc/string/string.h \
-						libs/prefix.h \
-						libs/libs.h 
+						third/prefix.h \
+						third/third.h 
 
 # zlib files
 zlib_C_FILES 			= \
@@ -312,11 +312,11 @@ zlib_INC_FILES 			= \
 						zlib.h \
 						zutil.h
 
-zlib_C_FILES 						:= $(addprefix libs/zlib/,$(zlib_C_FILES))
-tbox_C_FILES-$(TB_CONFIG_LIBS_ZLIB)	+= $(zlib_C_FILES)
+zlib_C_FILES 						:= $(addprefix third/zlib/,$(zlib_C_FILES))
+tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB)+= $(zlib_C_FILES)
 
-zlib_INC_FILES 						:= $(addprefix libs/zlib/,$(zlib_INC_FILES))
-INC_FILES-$(TB_CONFIG_LIBS_ZLIB) 	+= $(zlib_INC_FILES)
+zlib_INC_FILES 						:= $(addprefix third/zlib/,$(zlib_INC_FILES))
+INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
 
 # sub-projects
 ifeq ($(TB_CONFIG_DEMO),y)

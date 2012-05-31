@@ -20,8 +20,8 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_LIBS_PREFIX_H
-#define TB_LIBS_PREFIX_H
+#ifndef TB_THIRD_PREFIX_H
+#define TB_THIRD_PREFIX_H
 
 
 /* ///////////////////////////////////////////////////////////////////////

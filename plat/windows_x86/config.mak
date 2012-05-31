@@ -17,8 +17,8 @@ TB_CONFIG_API_THRD 				= windows
 TB_CONFIG_API_EVET 				= windows
 TB_CONFIG_API_ASIO 				= windows
 
-# libs
-TB_CONFIG_LIBS_ZLIB 			= y
+# third party
+TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
 TB_CONFIG_MEMORY_POOL_ENABLE 	= y
