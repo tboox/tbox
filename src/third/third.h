@@ -17,18 +17,18 @@
  * Copyright (C) 2009 - 2010, ruki All rights reserved.
  *
  * @author		ruki
- * @file		libs.h
+ * @file		third.h
  *
  */
-#ifndef TB_LIBS_H
-#define TB_LIBS_H
+#ifndef TB_THIRD_H
+#define TB_THIRD_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 
-#ifdef TB_CONFIG_LIBS_ZLIB
+#ifdef TB_CONFIG_THIRD_ZLIB
 # 	include "zlib/zlib.h"
 #endif
 

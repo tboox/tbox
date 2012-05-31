@@ -40,12 +40,12 @@ extern "C" {
 #include "stream/stream.h"
 #include "string/string.h"
 #include "utils/utils.h"
+#include "third/third.h"
 #include "math/math.h"
 #include "libc/libc.h"
 #include "aio/aio.h"
 #include "xml/xml.h"
 #include "zip/zip.h"
-#include "libs/libs.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

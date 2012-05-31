@@ -73,8 +73,8 @@
 //#define TB_CONFIG_AIO_HAVE_WAITO
 //#define TB_CONFIG_AIO_HAVE_IOCP
 
-// libs
-#define TB_CONFIG_LIBS_ZLIB
+// third party
+#define TB_CONFIG_THIRD_ZLIB
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
