@@ -8,7 +8,6 @@
  */
 #include "libflv.h"
 #include <stdlib.h>
-#include <stdio.h>
 
 /* ////////////////////////////////////////////////////////////////////////////////
  * types
@@ -269,7 +268,7 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 			if (!tb_flv_sdata_string_spank(flv, &name)) return TB_FALSE;
 
 			// update spath
-			tb_int_t ret = snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
+			tb_int_t ret = tb_snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
 			tb_assert_and_check_return_val(ret > 0, TB_FALSE);
 			flv->stail += ret;
 			*flv->stail = '\0';
@@ -420,7 +419,7 @@ static tb_bool_t tb_flv_sdata_object_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 	tb_trace_impl("[object_name]: %s", tb_flv_sdata_value_to_string(flv, &name));
 
 	// update spath
-	tb_int_t ret = snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
+	tb_int_t ret = tb_snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
 	tb_assert_and_check_return_val(ret > 0, TB_FALSE);
 	flv->stail += ret;
 	*flv->stail = '\0';

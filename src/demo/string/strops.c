@@ -1,4 +1,5 @@
 #include "tbox.h"
+#include <stdlib.h>
 
 #define TB_TEST_CMP 		(0)
 #define TB_TEST_LEN 		(0)
@@ -105,7 +106,7 @@ static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strncpy(%s, %d) = %s\n", t, s2, size, s1);
 }
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 

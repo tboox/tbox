@@ -538,11 +538,11 @@ static tb_size_t tb_vector_iterator_prev_test()
 }
 static tb_void_t tb_vector_int_dump(tb_vector_t const* vector)
 {
-	tb_print("int size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_print("tb_int_t size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
 	tb_size_t itor = tb_vector_itor_head(vector);
 	tb_size_t tail = tb_vector_itor_tail(vector);
 	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
-		tb_print("int at[%d]: %x", itor, tb_vector_itor_const_at(vector, itor));
+		tb_print("tb_int_t at[%d]: %x", itor, tb_vector_itor_const_at(vector, itor));
 }
 static tb_void_t tb_vector_int_test()
 {
@@ -908,7 +908,7 @@ static tb_void_t tb_vector_test_walk_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 

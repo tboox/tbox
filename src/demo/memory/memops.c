@@ -2,7 +2,8 @@
  * includes
  */ 
 #include "tbox.h"
-#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * check
@@ -55,7 +56,7 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 
 	return TB_TRUE;
 }
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_hong_t dt = 0;

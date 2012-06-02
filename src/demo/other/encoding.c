@@ -1,4 +1,12 @@
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
 #include "tbox.h"
+#include <stdlib.h>
+
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
 
 static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 {
@@ -47,7 +55,7 @@ static tb_void_t save(tb_char_t const* path, tb_byte_t const* data, tb_size_t si
 	}
 }
 
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 	

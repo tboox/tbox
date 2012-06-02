@@ -46,6 +46,6 @@ typedef union __tb_ipv4_t
 
 tb_void_t 			tb_ipv4_clr(tb_ipv4_t* ipv4);
 tb_uint32_t 		tb_ipv4_set(tb_ipv4_t* ipv4, tb_char_t const* ip);
-tb_char_t const* 	tb_ipv4_get(tb_ipv4_t* ipv4, tb_char_t* data, tb_size_t maxn);
+tb_char_t const* 	tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn);
 
 #endif

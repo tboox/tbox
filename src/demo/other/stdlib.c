@@ -1,4 +1,9 @@
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
 #include "tbox.h"
+#include <stdlib.h>
+#include <ctype.h>
 
 #define TB_TEST_ISXXX 			(0)
 
@@ -88,7 +93,7 @@ static tb_void_t tb_test_stof(tb_char_t const* s, tb_float_t val)
 	tb_printf("stof(%s) = %lf [?= %lf]\n", s, tb_stof(s), val);
 }
 #endif
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 

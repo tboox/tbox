@@ -107,11 +107,11 @@ static tb_size_t tb_queue_iterator_prev_test()
 }
 static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 {
-	tb_print("int size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_print("tb_int_t size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_queue_itor_head(queue);
 	tb_size_t tail = tb_queue_itor_tail(queue);
 	for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
-		tb_print("int at[%d]: %u", itor, tb_queue_itor_const_at(queue, itor));
+		tb_print("tb_int_t at[%d]: %u", itor, tb_queue_itor_const_at(queue, itor));
 }
 static tb_void_t tb_queue_int_test()
 {
@@ -424,7 +424,7 @@ static tb_void_t tb_queue_test_walk_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 

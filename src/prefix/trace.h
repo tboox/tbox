@@ -27,6 +27,7 @@
  * includes
  */
 #include "config.h"
+#include "type.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -168,6 +169,12 @@
 
 // nosafe
 #define tb_trace_nosafe() 									tb_trace_warning("no_safe")
+
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+
+tb_void_t 		tb_printf(tb_char_t const* fmt, ...);
 
 #endif
 
