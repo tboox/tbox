@@ -35,7 +35,7 @@
  */
 static tb_void_t tb_hash_test_s2i_func()
 {
-	// init hash: str => int
+	// init hash: str => tb_int_t
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(TB_TRUE, TB_NULL), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
@@ -109,7 +109,7 @@ static tb_void_t tb_hash_test_s2i_func()
 }
 static tb_void_t tb_hash_test_s2i_perf()
 {
-	// init hash: str => int
+	// init hash: str => tb_int_t
 	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(TB_TRUE, pool), tb_item_func_int());
 	tb_assert_and_check_return(hash);
@@ -123,7 +123,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_hong_t t = tb_mclock();
 	while (n--) 
 	{
-		tb_int_t r = snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
+		tb_int_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
 		tb_hash_test_set_s2i(hash, s); 
 		tb_hash_test_get_s2i(hash, s);
@@ -136,7 +136,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 }
 static tb_void_t tb_hash_test_i2s_func()
 {
-	// init hash: int => str
+	// init hash: tb_int_t => str
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_int(), tb_item_func_str(TB_TRUE, TB_NULL));
 	tb_assert_and_check_return(hash);
 
@@ -205,7 +205,7 @@ static tb_void_t tb_hash_test_i2s_func()
 }
 static tb_void_t tb_hash_test_i2s_perf()
 {
-	// init hash: int => str
+	// init hash: tb_int_t => str
 	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_str(TB_TRUE, pool));
 	tb_assert_and_check_return(hash);
@@ -371,7 +371,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 }
 static tb_void_t tb_hash_test_i2i_func()
 {
-	// init hash: int => str
+	// init hash: tb_int_t => str
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_int(), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 
@@ -440,7 +440,7 @@ static tb_void_t tb_hash_test_i2i_func()
 }
 static tb_void_t tb_hash_test_i2i_perf()
 {
-	// init hash: int => str
+	// init hash: tb_int_t => str
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
 	tb_assert_and_check_return(hash);
 

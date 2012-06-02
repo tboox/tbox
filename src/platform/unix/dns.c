@@ -46,7 +46,7 @@ tb_void_t tb_dns_local_init()
 	 *
 	 */
 	tb_gstream_t* gst = tb_gstream_init_from_url("/etc/resolv.conf");
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return(gst);
 
 	// open
 	if (!tb_gstream_bopen(gst)) goto end;

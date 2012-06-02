@@ -540,13 +540,13 @@ static tb_size_t tb_slist_iterator_prev_test()
 }
 static tb_void_t tb_slist_int_dump(tb_slist_t const* slist)
 {
-	tb_print("int size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_print("tb_int_t size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
 	tb_size_t itor = tb_slist_itor_head(slist);
 	tb_size_t tail = tb_slist_itor_tail(slist);
 	for (; itor != tail; itor = tb_slist_itor_next(slist, itor))
 	{
 		tb_char_t const* item = tb_slist_itor_const_at(slist, itor);
-		tb_print("int at[%lx]: %x", itor, item);
+		tb_print("tb_int_t at[%lx]: %x", itor, item);
 	}
 }
 static tb_void_t tb_slist_int_test()
@@ -985,7 +985,7 @@ static tb_void_t tb_slist_test_walk_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-int main(int argc, char** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 

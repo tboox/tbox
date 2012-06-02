@@ -102,7 +102,7 @@ fail:
 	if (ipv4) ipv4->u32 = 0;
 	return 0;
 }
-tb_char_t const* tb_ipv4_get(tb_ipv4_t* ipv4, tb_char_t* data, tb_size_t maxn)
+tb_char_t const* tb_ipv4_get(tb_ipv4_t const* ipv4, tb_char_t* data, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(ipv4 && data && maxn > 15, TB_NULL);
 

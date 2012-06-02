@@ -1,5 +1,13 @@
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
 #include "tbox.h"
-int main(int argc, char** argv)
+#include <stdlib.h>
+
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!argv[1]) return 0;
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;

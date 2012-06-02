@@ -87,7 +87,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 	case TB_URL_PROTO_FILE:
 		{
 			// check
-			tb_check_return(tb_sstring_size(&url->path));
+			tb_check_return_val(tb_sstring_size(&url->path), TB_NULL);
 
 			// add protocol
 			if (url->bssl) tb_pstring_cstrncpy(&url->urls, "files://", 8);
@@ -101,7 +101,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 	case TB_URL_PROTO_HTTP:
 		{
 			// check
-			tb_check_return(url->port && tb_sstring_size(&url->host));
+			tb_check_return_val(url->port && tb_sstring_size(&url->host), TB_NULL);
 
 			// add protocol
 			if (url->poto == TB_URL_PROTO_HTTP) tb_pstring_cstrcpy(&url->urls, "http");

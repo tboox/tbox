@@ -46,7 +46,7 @@ CFLAGS 				= \
 					-std=c99 \
 					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-Wdeclaration-after-statement -Wno-parentheses \
+					-Wno-parentheses \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
 					-Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wwrite-strings \
 					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
