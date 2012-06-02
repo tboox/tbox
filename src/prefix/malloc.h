@@ -34,7 +34,7 @@
  */
 
 // malloc & free
-#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+#ifdef TB_CONFIG_MEMORY_POOL
 #	define tb_malloc(size) 				tb_memory_malloc(size)
 #	define tb_malloc0(size) 			tb_memory_malloc0(size)
 

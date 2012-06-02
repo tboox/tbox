@@ -33,8 +33,8 @@
  * interfaces
  */
 
-tb_int_t tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...);
-tb_int_t tb_snprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, ...);
-tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args);
+tb_long_t tb_sprintf(tb_char_t* s, tb_char_t const* fmt, ...);
+tb_long_t tb_snprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, ...);
+tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args);
 
 #endif

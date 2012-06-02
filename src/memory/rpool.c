@@ -27,9 +27,11 @@
  */
 #include "rpool.h"
 #include "fpool.h"
+#include "malloc.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros

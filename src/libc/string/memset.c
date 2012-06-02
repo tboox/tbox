@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "string.h"
 #include "../../utils/utils.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_MEMSET

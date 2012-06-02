@@ -1,4 +1,5 @@
 #include "tbox.h"
+#include <stdlib.h>
 
 static tb_fixed_t tb_fixed_test_angle[360] = 
 {

@@ -39,7 +39,7 @@ static tb_void_t tb_zip_vlc_golomb_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bs
 		avg = ((tb_zip_vlc_golomb_t*)vlc)->total / ((tb_zip_vlc_golomb_t*)vlc)->count;
 	//tb_trace("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
 
-	tb_int_t m = TB_MATH_IRLOG2I(avg);
+	tb_int_t m = tb_int32_rlog2(avg);
 #else
 	tb_int_t m = ((tb_zip_vlc_golomb_t*)vlc)->defm;
 #endif
@@ -73,7 +73,7 @@ static tb_uint32_t tb_zip_vlc_golomb_get(tb_zip_vlc_t* vlc, tb_bstream_t const* 
 		avg = ((tb_zip_vlc_golomb_t*)vlc)->total / ((tb_zip_vlc_golomb_t*)vlc)->count;
 	//tb_trace("%d %d", avg, ((tb_zip_vlc_golomb_t*)vlc)->count);
 
-	tb_int_t m = TB_MATH_IRLOG2I(avg);
+	tb_int_t m = tb_int32_rlog2(avg);
 #else
 	tb_int_t m = ((tb_zip_vlc_golomb_t*)vlc)->defm;
 #endif

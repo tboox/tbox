@@ -27,9 +27,11 @@
  */
 #include "gpool.h"
 #include "vpool.h"
+#include "tpool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros

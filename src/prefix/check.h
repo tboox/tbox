@@ -42,15 +42,6 @@
 #define tb_check_abort(x) 								do { if (!(x)) {__tb_volatile__ tb_int_t* p = 0; *p = 0;} } while (0)
 #define tb_check_continue(x) 							{ if (!(x)) continue ; }
 
-#if 1
-// check: discard
-#define tb_check_return(x) 							do { if (!(x)) return ; } while (0)
-#define tb_check_return_VAL(x, v) 					do { if (!(x)) return (v); } while (0)
-#define TB_IF_FAIL_GOTO(x, b) 							do { if (!(x)) goto b; } while (0)
-#define TB_IF_FAIL_BREAK(x) 							{ if (!(x)) break ; }
-#define TB_IF_FAIL_ABORT(x) 							do { if (!(x)) {tb_abort();} } while (0)
-#define TB_IF_FAIL_CONTINUE(x) 							{ if (!(x)) continue ; }
-#endif
 
 #endif
 

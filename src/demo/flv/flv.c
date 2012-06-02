@@ -3,6 +3,7 @@
  */
 #include "tbox.h"
 #include "libflv.h"
+#include <stdlib.h>
 
 /* /////////////////////////////////////////////////////////
  * types

@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "string.h"
 #ifdef TB_CONFIG_LIBC_HAVE_STRNCAT
 # 	include <string.h>
 #endif

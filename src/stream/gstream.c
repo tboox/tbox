@@ -353,7 +353,7 @@ ok:
 	gst->offset = offset;
 	return 1;
 }
-tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst, -1);
 

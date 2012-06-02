@@ -28,6 +28,7 @@
 #include "node.h"
 #include "nlist.h"
 #include "document.h"
+#include "../string/string.h"
 #include "../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -57,7 +58,7 @@ static tb_xml_node_t* tb_xml_node_childs_select_node(tb_xml_node_t* node, tb_sst
 			// append path
 			tb_sstring_clear(&s);
 			if (parent) tb_sstring_strcat(&s, parent);
-			tb_sstring_strfcat(&s, "/%s", tb_pstring_cstr(&item->name));
+			tb_sstring_cstrfcat(&s, "/%s", tb_pstring_cstr(&item->name));
 
 			// is this?
 			if (!tb_sstring_cstrcmp(&s, path))

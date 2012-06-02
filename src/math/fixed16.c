@@ -26,6 +26,7 @@
 #include "fixed16.h"
 #include "fixed30.h"
 #include "int32.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals

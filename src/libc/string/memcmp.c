@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "string.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_MEMCMP
 # 	if defined(TB_CONFIG_ARCH_x86)

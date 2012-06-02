@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../thread.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <errno.h>

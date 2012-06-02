@@ -24,6 +24,7 @@
  * includes
  */
 #include "rand.h"
+#include "../memory/memory.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////

@@ -1,6 +1,12 @@
-#include "stdio.h"
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
 #include "tbox.h"
+#include <stdio.h>
 
+/* ///////////////////////////////////////////////////////////////////////
+ * check
+ */ 
 static tb_bool_t check_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
 {
 	tb_uint8_t* p = (tb_uint8_t*)dst;

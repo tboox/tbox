@@ -53,8 +53,8 @@ extern "C" {
 
 /*!init the tbox library
  *
- * @param data 	the memory data, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
- * @param size 	the memory size, uses it when TB_CONFIG_MEMORY_POOL_ENABLE is enabled
+ * @param data 	the memory data, uses it when TB_CONFIG_MEMORY_POOL is enabled
+ * @param size 	the memory size, uses it when TB_CONFIG_MEMORY_POOL is enabled
  *
  * @return ok: TB_TRUE, fail: TB_FALSE
  */
