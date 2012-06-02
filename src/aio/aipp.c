@@ -27,6 +27,7 @@
  */
 #include "aipp.h"
 #include "aioo.h"
+#include "../math/math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration

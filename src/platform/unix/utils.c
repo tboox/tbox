@@ -25,9 +25,11 @@
  * includes
  */
 #include "prefix.h"
+#include "../utils.h"
 #include "../../libc/libc.h"
 #include <unistd.h>
 #include <time.h>
+#include <stdio.h>
 #include <sys/time.h>
 #ifdef TB_CONFIG_OS_ANDROID
 # 	include <android/log.h>     

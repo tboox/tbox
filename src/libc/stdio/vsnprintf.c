@@ -26,6 +26,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stdio/stdio.h"
 #include "../../math/math.h"
 #include "../../utils/utils.h"
 #include "../string/string.h"
@@ -854,7 +855,7 @@ get_qualifier:
  * @endcode
  *
  */
-tb_int_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)
+tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)
 {
 	if ((tb_int_t)n < 0 || !s || !fmt) return 0;
 

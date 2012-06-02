@@ -89,7 +89,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert(tb_check_float_order());
 
 	// init memory pool
-#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+#ifdef TB_CONFIG_MEMORY_POOL
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return TB_FALSE;
 #endif
 
@@ -119,7 +119,7 @@ tb_void_t tb_exit()
 	// exit socket
 	tb_socket_exit();
 
-#ifdef TB_CONFIG_MEMORY_POOL_ENABLE
+#ifdef TB_CONFIG_MEMORY_POOL
 	//tb_memory_dump();
 	tb_memory_exit();
 #endif

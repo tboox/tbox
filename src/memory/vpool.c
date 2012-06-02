@@ -259,6 +259,7 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	// fail
 	return TB_NULL;
 }
+tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
 	// check

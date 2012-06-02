@@ -27,6 +27,7 @@
 #include "dlist.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
+#include "../memory/memory.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////

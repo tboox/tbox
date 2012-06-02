@@ -39,6 +39,12 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp);
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 #if defined(TB_CONFIG_AIO_HAVE_EPOLL)

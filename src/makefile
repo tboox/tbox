@@ -111,7 +111,7 @@ tbox_C_FILES 			+= \
 						libc/string/strnirchr
 
 # pool
-ifeq ($(TB_CONFIG_MEMORY_POOL_ENABLE),n)
+ifeq ($(TB_CONFIG_MEMORY_POOL),n)
 tbox_C_FILES 			+= \
 						platform/libc/malloc 
 endif

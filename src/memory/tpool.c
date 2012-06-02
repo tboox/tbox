@@ -343,6 +343,7 @@ static tb_pointer_t tb_tpool_malloc_find(tb_tpool_t* tpool, tb_size_t size, tb_s
 	// ok
 	return data;
 }
+tb_pointer_t tb_tpool_ralloc_fast(tb_tpool_t* tpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
 tb_pointer_t tb_tpool_ralloc_fast(tb_tpool_t* tpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
 	// check

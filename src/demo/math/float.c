@@ -1,4 +1,5 @@
 #include "tbox.h"
+#include <stdlib.h>
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 

@@ -33,25 +33,32 @@ MAKE 				= make
 PWD 				= pwd
 
 # cppflags: c/c++ files
-CPPFLAGS_RELEASE 	= \
-					-O2 -DNDEBUG \
-					-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-					-march=native -pipe # gcc >= 4.2.3
-
+CPPFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CPPFLAGS_DEBUG 		= -g
-CPPFLAGS 			= -c -Wall -msse2
+CPPFLAGS 			= -c -Wall -msse3 
 CPPFLAGS-I 			= -I
 CPPFLAGS-o 			= -o
 
 # cflags: c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
-CFLAGS 				= 
+CFLAGS 				= \
+					-std=c99 \
+					-fomit-frame-pointer \
+					-D_GNU_SOURCE=1 -D_REENTRANT \
+					-Wdeclaration-after-statement -Wno-parentheses \
+					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
+					-Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wwrite-strings \
+					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
+					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
+					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
 # cxxflags: c++ files
 CXXFLAGS_RELEASE 	= -fno-rtti
 CXXFLAGS_DEBUG 		= 
-CXXFLAGS 			= 
+CXXFLAGS 			= \
+					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
+					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
 LDFLAGS_RELEASE 	= -s -Wl,-O2,--sort-common,--as-needed

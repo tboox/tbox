@@ -1,5 +1,5 @@
 #include "tbox.h"
-
+#include <stdlib.h>
 
 static tb_void_t tb_rand_test_uint32(tb_uint32_t b, tb_uint32_t e)
 {

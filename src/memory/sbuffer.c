@@ -26,6 +26,7 @@
  * includes
  */
 #include "sbuffer.h"
+#include "malloc.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 

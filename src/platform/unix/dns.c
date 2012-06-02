@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../../libc/libc.h"
 #include "../../stream/stream.h"
+#include "../../network/network.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

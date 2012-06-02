@@ -35,6 +35,13 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 

@@ -762,7 +762,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
  * interfaces
  */
 
-tb_handle_t tb_http_init(tb_http_option_t const* option)
+tb_handle_t tb_http_init()
 {
 	// init http
 	tb_http_t* http = tb_malloc0(sizeof(tb_http_t));
