@@ -24,7 +24,9 @@
  * includes
  */
 #include <sys/epoll.h>
-#include <sys/unistd.h>
+#ifndef TB_CONFIG_OS_ANDROID
+# 	include <sys/unistd.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
