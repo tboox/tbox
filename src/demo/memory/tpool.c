@@ -10,7 +10,7 @@
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	// init
-	tb_handle_t tpool = tb_tpool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
+	tb_handle_t tpool = tb_tpool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024 >> 3, 0);
 	tb_assert_and_check_return_val(tpool, 0);
 
 #if 0
@@ -28,7 +28,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	__tb_volatile__ tb_size_t 	size = 0xdeaf;
-	__tb_volatile__ tb_size_t 	lmod = tb_tpool_limit(tpool) - 1;
+	__tb_volatile__ tb_size_t 	lmod = 511;//tb_tpool_limit(tpool) - 1;
 	while (maxn--)
 	{
 		size = (size * 10807 + 1) & 0xffffffff;

@@ -29,11 +29,11 @@
 #include "string.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_STRNCPY
-# 	if defined(TB_CONFIG_ARCH_x86)
+# 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strncpy.c"
-# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 	elif defined(TB_ARCH_ARM)
 # 		include "opt/arm/strncpy.c"
-# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 	elif defined(TB_ARCH_SH4)
 # 		include "opt/sh4/strncpy.c"
 # 	endif
 #else

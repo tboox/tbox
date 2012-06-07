@@ -2,16 +2,16 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = linux_x86
+PLAT = linux_x64
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = n
-SDK = /home/ruki/programs/android-ndk-r6
-BIN = /home/ruki/programs/android-ndk-r6/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
+SDK = /home/ruki/programs/android-ndk-r8
+BIN = /home/ruki/programs/android-ndk-r8/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
 HOST = mac
-CCACHE = ccache
+CCACHE =
 DISTCC =
 
 # export

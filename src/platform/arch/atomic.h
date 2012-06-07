@@ -29,11 +29,11 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_ARCH_x86)
+#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
 # 	include "x86/atomic.h"
-#elif defined(TB_CONFIG_ARCH_ARM)
+#elif defined(TB_ARCH_ARM)
 # 	include "arm/atomic.h"
-#elif defined(TB_CONFIG_ARCH_SH4)
+#elif defined(TB_ARCH_SH4)
 # 	include "sh4/atomic.h"
 #endif
 

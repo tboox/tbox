@@ -34,6 +34,8 @@
 
 #if defined(TB_CONFIG_ARCH_x86)
 # 	define TB_ARCH_x86
+#elif defined(TB_CONFIG_ARCH_x64)
+# 	define TB_ARCH_x64
 #elif defined(TB_CONFIG_ARCH_ARM)
 # 	define TB_ARCH_ARM
 #elif defined(TB_CONFIG_ARCH_SH4)
