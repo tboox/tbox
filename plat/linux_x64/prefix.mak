@@ -18,6 +18,7 @@ ASM_SUFFIX 			= .S
 # tool
 PRE 				= 
 CC 					= $(PRE)gcc
+#CC 				= $(PRE)icc
 AR 					= $(PRE)ar
 STRIP 				= $(PRE)strip
 RANLIB 				= $(PRE)ranlib
@@ -34,7 +35,7 @@ PWD 				= pwd
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CPPFLAGS_DEBUG 		= -g
-CPPFLAGS 			= -c -Wall -msse4 -march=i686 
+CPPFLAGS 			= -c -Wall -msse4 -m64
 CPPFLAGS-I 			= -I
 CPPFLAGS-o 			= -o
 
@@ -60,7 +61,7 @@ CXXFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
-LDFLAGS_RELEASE 	=
+LDFLAGS_RELEASE 	= 
 LDFLAGS_DEBUG 		= 
 LDFLAGS 			= 
 LDFLAGS-L 			= -L
@@ -70,7 +71,7 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf 
+ASFLAGS 			= -f elf -m amd64
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
