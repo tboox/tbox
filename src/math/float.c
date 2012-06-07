@@ -24,6 +24,7 @@
  * includes
  */
 #include "int32.h"
+#include <math.h>
 #ifdef TB_CONFIG_TYPE_FLOAT
 # 	include "float.h"
 #endif

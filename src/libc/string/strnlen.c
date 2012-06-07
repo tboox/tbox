@@ -28,11 +28,11 @@
 #include "string.h"
 
 #ifndef TB_CONFIG_LIBC_HAVE_STRNLEN
-# 	if defined(TB_CONFIG_ARCH_x86)
+# 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strnlen.c"
-# 	elif defined(TB_CONFIG_ARCH_ARM)
+# 	elif defined(TB_ARCH_ARM)
 # 		include "opt/arm/strnlen.c"
-# 	elif defined(TB_CONFIG_ARCH_SH4)
+# 	elif defined(TB_ARCH_SH4)
 # 		include "opt/sh4/strnlen.c"
 # 	endif
 #else

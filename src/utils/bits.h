@@ -33,11 +33,11 @@
 # 	include "opt/bits_gcc.h"
 #endif
 
-#if defined(TB_CONFIG_ARCH_x86)
+#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
 # 	include "opt/bits_x86.h"
-#elif defined(TB_CONFIG_ARCH_ARM)
+#elif defined(TB_ARCH_ARM)
 # 	include "opt/bits_arm.h"
-#elif defined(TB_CONFIG_ARCH_SH4)
+#elif defined(TB_ARCH_SH4)
 # 	include "opt/bits_sh4.h"
 #endif
 

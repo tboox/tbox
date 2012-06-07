@@ -120,7 +120,8 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	gpool->vpool = tb_vpool_init(gpool->data, gpool->size, gpool->align);
 	tb_assert_and_check_return_val(gpool->vpool, TB_NULL);
 	
-#ifndef TB_DEBUG
+	// FIXME: alloc will be too slower now if space is small
+#if 0
 	// init tpool
 	gpool->tsize = gpool->size >> 3;
 	if (gpool->tsize >= TB_GPOOL_TPOOL_MINN)
