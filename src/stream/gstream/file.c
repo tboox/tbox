@@ -55,6 +55,9 @@ typedef struct __tb_fstream_t
 	// the wait event
 	tb_long_t 			wait;
 
+	// the file bref
+	tb_size_t 			bref;
+
 	// the file flags
 	tb_size_t 			flags;
 
@@ -74,6 +77,12 @@ static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst && !fst->file, -1);
 
+	// init
+	fst->wait = 0;
+	
+	// no reference?
+	tb_check_return_val(!(fst->file && fst->bref), 1);
+
 	// url
 	tb_char_t const* url = tb_url_get(&gst->url);
 	tb_assert_and_check_return_val(url, -1);
@@ -82,10 +91,6 @@ static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 	fst->file = tb_file_init(url, fst->flags);
 	tb_assert_and_check_return_val(fst->file, -1);
 
-	// init size
-	fst->size = tb_file_size(fst->file);
-	fst->wait = 0;
-	
 	// ok
 	return 1;
 }
@@ -97,11 +102,11 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 	if (fst->file)
 	{
 		// close file
-		if (!tb_file_exit(fst->file)) return 0;
+		if (!fst->bref) if (!tb_file_exit(fst->file)) return 0;
 
-		// clear 
+		// reset
 		fst->file = TB_NULL;
-		fst->size = 0;
+		fst->bref = 0;
 		fst->wait = 0;
 	}
 
@@ -201,6 +206,20 @@ static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	case TB_FSTREAM_CMD_SET_FLAGS:
 		fst->flags = (tb_size_t)tb_va_arg(args, tb_size_t);
 		return TB_TRUE;
+	case TB_FSTREAM_CMD_SET_HANDLE:
+		{
+			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			fst->file = handle;
+			fst->bref = handle? 1 : 0;
+			return TB_TRUE;
+		}
+	case TB_FSTREAM_CMD_GET_HANDLE:
+		{
+			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(phandle, TB_FALSE);
+			*phandle = fst->file;
+			return TB_TRUE;
+		}
 	default:
 		break;
 	}

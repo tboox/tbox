@@ -57,7 +57,10 @@ typedef struct __tb_sstream_t
 	tb_handle_t 		hdns;
 
 	// the sock type
-	tb_size_t 			type : 24;
+	tb_size_t 			type : 23;
+
+	// the sock bref
+	tb_size_t 			bref : 1;
 
 	// the try number
 	tb_size_t 			tryn : 8;
@@ -87,6 +90,15 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
+
+	// clear
+	sst->wait = 0;
+	sst->tryn = 0;
+	sst->read = 0;
+	sst->writ = 0;
+
+	// no reference?
+	tb_check_return_val(!(sst->sock && sst->bref), 1);
 
 	// port
 	tb_size_t port = tb_url_port_get(&gst->url);
@@ -187,12 +199,6 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		break;
 	}
 
-	// clear
-	sst->wait = 0;
-	sst->tryn = 0;
-	sst->read = 0;
-	sst->writ = 0;
-
 	// ok?
 	return r;
 
@@ -212,11 +218,15 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
 
-	// close socket
+	// has socket?
 	if (sst->sock)
 	{
-		if (!tb_socket_close(sst->sock)) return 0;
+		// close it
+		if (!sst->bref) if (!tb_socket_close(sst->sock)) return 0;
+
+		// reset
 		sst->sock = TB_NULL;
+		sst->bref = 0;
 	}
 
 	// clear 
@@ -391,6 +401,21 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, TB_FALSE);
 			sst->type = type;
+			return TB_TRUE;
+		}
+	case TB_SSTREAM_CMD_SET_HANDLE:
+		{
+			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
+			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			sst->sock = handle;
+			sst->bref = handle? 1 : 0;
+			return TB_TRUE;
+		}
+	case TB_SSTREAM_CMD_GET_HANDLE:
+		{
+			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(phandle, TB_FALSE);
+			*phandle = sst->sock;
 			return TB_TRUE;
 		}
 	default:

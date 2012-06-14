@@ -40,9 +40,9 @@
 // socket proto
 typedef enum __tb_socket_type_t
 {
- 	TB_SOCKET_TYPE_NUL 	= 0
-,	TB_SOCKET_TYPE_TCP
-, 	TB_SOCKET_TYPE_UDP
+ 	TB_SOCKET_TYPE_NUL = 0
+,	TB_SOCKET_TYPE_TCP = 1
+, 	TB_SOCKET_TYPE_UDP = 2
 
 }tb_socket_type_t;
 
