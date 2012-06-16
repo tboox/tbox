@@ -2,7 +2,7 @@
 #define TB_CONFIG_H
 
 // arch
-#define TB_CONFIG_ARCH_x86
+#define TB_CONFIG_ARCH_x64
 //#define TB_CONFIG_ARCH_ARM
 //#define TB_CONFIG_ARCH_MIPS
 //#define TB_CONFIG_ARCH_SPARC
@@ -12,7 +12,7 @@
 // os
 #define TB_CONFIG_OS_MAC
 #define TB_CONFIG_OS_MAC_VERSION_MAJOR 	(10)
-#define TB_CONFIG_OS_MAC_VERSION_MINOR 	(6)
+#define TB_CONFIG_OS_MAC_VERSION_MINOR 	(7)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN

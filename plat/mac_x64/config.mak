@@ -2,10 +2,10 @@
 TB_CONFIG_DEMO 					= y
 
 # plat
-TB_CONFIG_PLAT 					= mac_x86
+TB_CONFIG_PLAT 					= mac_x64
 
 # arch
-TB_CONFIG_ARCH 					= x86
+TB_CONFIG_ARCH 					= x64
 
 # api
 TB_CONFIG_API_DNS 				= unix
