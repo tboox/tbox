@@ -110,6 +110,26 @@
 # 		define tb_fixed16_div(x, y) 		tb_int32_div(x, y, 16)
 # 	endif
 #endif
+	
+// imul
+#ifndef tb_fixed16_imul
+# 	define tb_fixed16_imul(x, y) 			tb_fixed16_mul(x, tb_int_to_fixed16(y))
+#endif
+
+// idiv
+#ifndef tb_fixed16_idiv
+# 	define tb_fixed16_idiv(x, y) 			tb_fixed16_div(x, tb_int_to_fixed16(y))
+#endif
+
+// lsh
+#ifndef tb_fixed16_lsh
+# 	define tb_fixed16_lsh(x, y) 			((x) << (y))
+#endif
+	
+// rsh
+#ifndef tb_fixed16_rsh
+# 	define tb_fixed16_rsh(x, y) 			((x) >> (y))
+#endif
 
 // invert: 1 / x
 #ifndef tb_fixed16_invert

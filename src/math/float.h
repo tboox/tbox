@@ -78,6 +78,26 @@
 # 	define tb_float_div(x, y) 			((x) / (y))
 #endif
 
+// imul
+#ifndef tb_float_imul
+# 	define tb_float_imul(x, y) 			((x) * (tb_float_t)(y))
+#endif
+
+// idiv
+#ifndef tb_float_idiv
+# 	define tb_float_idiv(x, y) 			((x) / (tb_float_t)(y))
+#endif
+
+// lsh
+#ifndef tb_float_lsh
+# 	define tb_float_lsh(x, y) 			((x) * (tb_float_t)(1 << (y)))
+#endif
+
+// rsh
+#ifndef tb_float_rsh
+# 	define tb_float_rsh(x, y) 			((x) / (tb_float_t)(1 << (y)))
+#endif
+	
 // invert: 1 / x
 #ifndef tb_float_invert
 # 	define tb_float_invert(x) 			tb_float_div(TB_FLOAT_ONE, x)
