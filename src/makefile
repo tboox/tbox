@@ -12,7 +12,7 @@ tbox_C_FILES 			+= \
 						tbox \
 						math/int32 \
 						math/rand \
-						math/float \
+						math/double \
 						math/fixed16 \
 						memory/vpool \
 						memory/fpool \
@@ -176,16 +176,16 @@ INC_FILES 				= \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
-						math/float.h \
+						math/double.h \
 						math/fixed.h \
 						math/fixed6.h \
 						math/fixed16.h \
 						math/fixed30.h \
 						math/int32.h \
 						math/opt/prefix.h \
-						math/opt/float_x86.h \
-						math/opt/float_arm.h \
-						math/opt/float_sh4.h \
+						math/opt/double_x86.h \
+						math/opt/double_arm.h \
+						math/opt/double_sh4.h \
 						math/opt/fixed16_x86.h \
 						math/opt/fixed16_arm.h \
 						math/opt/fixed16_sh4.h \

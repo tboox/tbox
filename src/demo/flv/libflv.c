@@ -149,7 +149,7 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 
 	return tb_pstring_cstr(&flv->string);
 }
-static tb_float_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_value_t const* value)
+static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_value_t const* value)
 {
 	switch (value->type)
 	{
@@ -999,7 +999,7 @@ tb_size_t tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb
 	}
 	return 0;
 }
-tb_float_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size)
+tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size)
 {
 	// attach data
 	tb_bstream_t bst;
@@ -1223,7 +1223,7 @@ tb_float_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t si
 
 			if (time_scale > 0 && num_units_in_tick > 0)
 			{
-				tb_float_t framerate = time_scale / (2.0 * num_units_in_tick);
+				tb_double_t framerate = time_scale / (2.0 * num_units_in_tick);
 				tb_trace_impl("\t\t\tfixed => framerate: %f", framerate);
 				return framerate;
 			}

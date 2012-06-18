@@ -31,7 +31,7 @@
 #include "int32.h"
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
+# 	include "double.h"
 #endif
 
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x86)
@@ -57,14 +57,14 @@
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	ifndef tb_fixed30_to_float
-# 		define tb_fixed30_to_float(x) 		(((x) * 0.00000000093132257f))
+# 	ifndef tb_fixed30_to_double
+# 		define tb_fixed30_to_double(x) 		(((x) * 0.00000000093132257f))
 # 	endif
-# 	ifndef tb_float_to_fixed30
+# 	ifndef tb_double_to_fixed30
 # 		ifdef TB_DEBUG
-# 			define tb_float_to_fixed30(x) 	tb_float_to_fixed30_check(x)
+# 			define tb_double_to_fixed30(x) 	tb_double_to_fixed30_check(x)
 # 		else
-# 			define tb_float_to_fixed30(x) 	((tb_fixed30_t)((x) * TB_FIXED30_ONE))
+# 			define tb_double_to_fixed30(x) 	((tb_fixed30_t)((x) * TB_FIXED30_ONE))
 # 		endif
 # 	endif
 #endif
@@ -87,7 +87,7 @@
 # 	if 1
 # 		define tb_fixed30_mul(x, y) 		tb_fixed30_mul_int64(x, y)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
-# 		define tb_fixed30_mul(x, y) 		tb_fixed30_mul_float(x, y)
+# 		define tb_fixed30_mul(x, y) 		tb_fixed30_mul_double(x, y)
 # 	else
 # 		define tb_fixed30_mul(x, y) 		tb_fixed30_mul_int32(x, y)
 # 	endif
@@ -98,7 +98,7 @@
 # 	if 1
 # 		define tb_fixed30_div(x, y) 		tb_fixed30_div_int64(x, y)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
-# 		define tb_fixed30_div(x, y) 		tb_fixed30_div_float(x, y)
+# 		define tb_fixed30_div(x, y) 		tb_fixed30_div_double(x, y)
 # 	else
 # 		define tb_fixed30_div(x, y) 		tb_int32_div(x, y, 30)
 # 	endif
@@ -109,7 +109,7 @@
 # 	if 1
 # 		define tb_fixed30_sqre(x) 			tb_fixed30_sqre_int64(x)
 # 	elif defined(TB_CONFIG_TYPE_FLOAT)
-# 		define tb_fixed30_sqre(x) 			tb_fixed30_sqre_float(x)
+# 		define tb_fixed30_sqre(x) 			tb_fixed30_sqre_double(x)
 # 	else
 # 		define tb_fixed30_sqre(x) 			tb_fixed30_sqre_int32(x)
 # 	endif
@@ -126,7 +126,7 @@
 
 #ifdef TB_DEBUG
 # 	ifdef TB_CONFIG_TYPE_FLOAT
-static __tb_inline__ tb_fixed30_t tb_float_to_fixed30_check(tb_float_t x)
+static __tb_inline__ tb_fixed30_t tb_double_to_fixed30_check(tb_double_t x)
 {
 	// check overflow, [-2., 2.]
 	tb_assert(x >= -2. && x <= 2.);
@@ -156,19 +156,19 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_int64(tb_fixed30_t x)
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-static __tb_inline__ tb_fixed30_t tb_fixed30_mul_float(tb_fixed30_t x, tb_fixed30_t y)
+static __tb_inline__ tb_fixed30_t tb_fixed30_mul_double(tb_fixed30_t x, tb_fixed30_t y)
 {
-	return tb_float_to_fixed30(tb_float_mul(tb_fixed30_to_float(x), tb_fixed30_to_float(y)));
+	return tb_double_to_fixed30(tb_double_mul(tb_fixed30_to_double(x), tb_fixed30_to_double(y)));
 }
-static __tb_inline__ tb_fixed30_t tb_fixed30_div_float(tb_fixed30_t x, tb_fixed30_t y)
+static __tb_inline__ tb_fixed30_t tb_fixed30_div_double(tb_fixed30_t x, tb_fixed30_t y)
 {
 	tb_assert(y);
-	return tb_float_to_fixed30((tb_float_t)x / y);
-	//return tb_float_to_fixed30(tb_float_div(tb_fixed30_to_float(x), tb_fixed30_to_float(y)));
+	return tb_double_to_fixed30((tb_double_t)x / y);
+	//return tb_double_to_fixed30(tb_double_div(tb_fixed30_to_double(x), tb_fixed30_to_double(y)));
 }
-static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_float(tb_fixed30_t x)
+static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_double(tb_fixed30_t x)
 {
-	return tb_float_to_fixed30(tb_float_sqre(tb_fixed30_to_float(x)));
+	return tb_double_to_fixed30(tb_double_sqre(tb_fixed30_to_double(x)));
 }
 #endif
 

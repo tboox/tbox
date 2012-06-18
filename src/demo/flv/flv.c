@@ -147,7 +147,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 			size = tb_flv_video_h264_sps_analyze_remove_emulation(data, size);
 
 			// analyze framerate
-			tb_float_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
+			tb_double_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
 			tb_print("[demo]: sps_framerate: %f", framerate);
 
 			// free data

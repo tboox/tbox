@@ -115,11 +115,11 @@ static tb_void_t tb_fixed16_cordic_rotation(tb_fixed30_t* x0, tb_fixed30_t* y0, 
 #if 1
 		atan2i = *patan2i++;
 #elif 0
-		atan2i = tb_float_to_fixed16(atan(1. / (1 << i)) * (1 << 15) / TB_FLOAT_PI);
-		//tb_printf(",\t0x%x\t// %f\n", atan2i, atan(1. / (1 << i)) * 180 / TB_FLOAT_PI);
+		atan2i = tb_double_to_fixed16(atan(1. / (1 << i)) * (1 << 15) / TB_DOUBLE_PI);
+		//tb_printf(",\t0x%x\t// %f\n", atan2i, atan(1. / (1 << i)) * 180 / TB_DOUBLE_PI);
 #else
-		//atan2i = tb_float_to_fixed16(atan(1. / (1 << i))) * 0x28be;
-		//tb_printf(",\t0x%x\t// %f\n", atan2i, atan(1. / (1 << i)) * 180 / TB_FLOAT_PI);
+		//atan2i = tb_double_to_fixed16(atan(1. / (1 << i))) * 0x28be;
+		//tb_printf(",\t0x%x\t// %f\n", atan2i, atan(1. / (1 << i)) * 180 / TB_DOUBLE_PI);
 #endif
 
 		if (z >= 0) 

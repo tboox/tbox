@@ -93,9 +93,10 @@ typedef tb_int64_t					tb_sint64_t;
 typedef tb_sint64_t					tb_hong_t;
 typedef tb_uint64_t					tb_hize_t;
 
-// float
+// double
 #ifdef TB_CONFIG_TYPE_FLOAT
-typedef double 						tb_float_t;
+typedef float 						tb_float_t;
+typedef double 						tb_double_t;
 #endif
 
 // fixed
