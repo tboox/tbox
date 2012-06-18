@@ -386,94 +386,94 @@ tb_sint64_t tb_bstream_get_s64_le(tb_bstream_t* bst)
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t tb_bstream_get_float_le(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_le(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_float_le(bst->p);
+	tb_double_t val = tb_bits_get_float_le(bst->p);
 	bst->p += 4;
 	return val;
 }
-tb_float_t tb_bstream_get_float_be(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_be(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_float_be(bst->p);
+	tb_double_t val = tb_bits_get_float_be(bst->p);
 	bst->p += 4;
 	return val;
 }
 
-tb_float_t tb_bstream_get_double_ble(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_ble(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_ble(bst->p);
+	tb_double_t val = tb_bits_get_double_ble(bst->p);
 	bst->p += 8;
 	return val;
 }
-tb_float_t tb_bstream_get_double_bbe(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_bbe(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_bbe(bst->p);
+	tb_double_t val = tb_bits_get_double_bbe(bst->p);
 	bst->p += 8;
 	return val;
 }
-tb_float_t tb_bstream_get_double_bne(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_bne(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_bne(bst->p);
-	bst->p += 8;
-	return val;
-}
-
-tb_float_t tb_bstream_get_double_lle(tb_bstream_t* bst)
-{
-	tb_assert(!bst->b);
-	
-	tb_float_t val = tb_bits_get_double_lle(bst->p);
-	bst->p += 8;
-	return val;
-}
-tb_float_t tb_bstream_get_double_lbe(tb_bstream_t* bst)
-{
-	tb_assert(!bst->b);
-	
-	tb_float_t val = tb_bits_get_double_lbe(bst->p);
-	bst->p += 8;
-	return val;
-}
-tb_float_t tb_bstream_get_double_lne(tb_bstream_t* bst)
-{
-	tb_assert(!bst->b);
-	
-	tb_float_t val = tb_bits_get_double_lne(bst->p);
+	tb_double_t val = tb_bits_get_double_bne(bst->p);
 	bst->p += 8;
 	return val;
 }
 
-tb_float_t tb_bstream_get_double_nle(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_lle(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_nle(bst->p);
+	tb_double_t val = tb_bits_get_double_lle(bst->p);
 	bst->p += 8;
 	return val;
 }
-tb_float_t tb_bstream_get_double_nbe(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_lbe(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_nbe(bst->p);
+	tb_double_t val = tb_bits_get_double_lbe(bst->p);
 	bst->p += 8;
 	return val;
 }
-tb_float_t tb_bstream_get_double_nne(tb_bstream_t* bst)
+tb_double_t tb_bstream_get_double_lne(tb_bstream_t* bst)
 {
 	tb_assert(!bst->b);
 	
-	tb_float_t val = tb_bits_get_double_nne(bst->p);
+	tb_double_t val = tb_bits_get_double_lne(bst->p);
+	bst->p += 8;
+	return val;
+}
+
+tb_double_t tb_bstream_get_double_nle(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_double_t val = tb_bits_get_double_nle(bst->p);
+	bst->p += 8;
+	return val;
+}
+tb_double_t tb_bstream_get_double_nbe(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_double_t val = tb_bits_get_double_nbe(bst->p);
+	bst->p += 8;
+	return val;
+}
+tb_double_t tb_bstream_get_double_nne(tb_bstream_t* bst)
+{
+	tb_assert(!bst->b);
+	
+	tb_double_t val = tb_bits_get_double_nne(bst->p);
 	bst->p += 8;
 	return val;
 }
@@ -643,77 +643,77 @@ tb_void_t tb_bstream_set_s64_be(tb_bstream_t* bst, tb_sint64_t val)
 	bst->p += 8;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t tb_bstream_set_float_le(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_le(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_float_le(bst->p, val);
 	bst->p += 4;
 }
-tb_void_t tb_bstream_set_float_be(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_be(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_float_be(bst->p, val);
 	bst->p += 4;
 }
-tb_void_t tb_bstream_set_double_ble(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_ble(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_ble(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_bbe(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_bbe(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_bbe(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_bne(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_bne(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_bne(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_lle(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_lle(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_lle(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_lbe(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_lbe(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_lbe(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_lne(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_lne(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_lne(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_nle(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_nle(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_nle(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_nbe(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_nbe(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	
 	tb_bits_set_double_nbe(bst->p, val);
 	bst->p += 8;
 }
-tb_void_t tb_bstream_set_double_nne(tb_bstream_t* bst, tb_float_t val)
+tb_void_t tb_bstream_set_double_nne(tb_bstream_t* bst, tb_double_t val)
 {
 	tb_assert(!bst->b);
 	

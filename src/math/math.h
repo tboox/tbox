@@ -35,7 +35,7 @@
 #include "fixed30.h"
 #include "fixed.h"
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
+# 	include "double.h"
 #endif
 
 #endif

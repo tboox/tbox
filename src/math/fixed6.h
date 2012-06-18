@@ -46,11 +46,11 @@
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	ifndef tb_fixed6_to_float
-# 		define tb_fixed6_to_float(x) 	(((x) * 0.015625))
+# 	ifndef tb_fixed6_to_double
+# 		define tb_fixed6_to_double(x) 	(((x) * 0.015625))
 # 	endif
-# 	ifndef tb_float_to_fixed6
-# 		define tb_float_to_fixed6(x) 	((tb_fixed6_t)((x) * TB_FIXED6_ONE))
+# 	ifndef tb_double_to_fixed6
+# 		define tb_double_to_fixed6(x) 	((tb_fixed6_t)((x) * TB_FIXED6_ONE))
 # 	endif
 #endif
 

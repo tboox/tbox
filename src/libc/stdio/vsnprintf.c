@@ -43,6 +43,7 @@ typedef enum __tb_printf_type_t
 , 	TB_PRINTF_TYPE_CHAR
 , 	TB_PRINTF_TYPE_CHAR_PERCENT
 , 	TB_PRINTF_TYPE_FLOAT
+, 	TB_PRINTF_TYPE_DOUBLE
 , 	TB_PRINTF_TYPE_STRING
 , 	TB_PRINTF_TYPE_WIDTH
 , 	TB_PRINTF_TYPE_PRECISION
@@ -65,7 +66,9 @@ typedef enum __tb_printf_extra_t
 typedef enum __tb_printf_qual_t
 {
 	TB_PRINTF_QUAL_NONE
-, 	TB_PRINTF_QUAL_I
+, 	TB_PRINTF_QUAL_H
+, 	TB_PRINTF_QUAL_L
+, 	TB_PRINTF_QUAL_LL
 , 	TB_PRINTF_QUAL_I8
 , 	TB_PRINTF_QUAL_I16
 , 	TB_PRINTF_QUAL_I32
@@ -438,13 +441,130 @@ static tb_char_t* tb_printf_int32(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	return pb;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-// only support double float-point 
 static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_float_t num)
+{
+	// digits
+	tb_char_t 	ints[32] = {0};
+	tb_char_t 	decs[32] = {0};
+	tb_long_t 	ints_i = 0, decs_i = 0;
+
+	// FIXME: for inf nan
+	// ...
+
+	// sign: + -
+	tb_char_t sign = 0;
+	if (e.extra & TB_PRINTF_EXTRA_SIGNED)
+	{
+		if (num < 0) 
+		{
+			sign = '-';
+			--e.width;
+		}
+		else if (e.flags & TB_PRINTF_FLAG_PLUS)
+		{
+			sign = '+';
+			--e.width;
+		}
+	}
+
+	// adjust sign
+	if (num < 0) num = -num;
+
+	// default precision: 6
+	if (e.precision <= 0) e.precision = 6;
+
+	// round? i.dddddddd5 => i.ddddddde
+	tb_uint32_t p = 1;
+	tb_size_t 	n = e.precision;
+	while (n--) p *= 10;
+	if (((tb_uint32_t)(num * p * 10) % 10) > 4) 
+		num += 1. / (tb_float_t)p;
+
+	// get integer & decimal
+	tb_int32_t integer = (tb_int32_t)num;
+	tb_float_t decimal = num - integer;
+
+	// convert integer => digits string in reverse order
+	if (integer == 0) ints[ints_i++] = '0';
+	else 
+	{
+		if (integer < 0) integer = -integer; 
+		do 
+		{
+			ints[ints_i++] = (integer % 10) + '0';
+			integer /= 10;
+		}
+		while (integer);
+	}
+
+	// convert decimal => digits string in positive order
+	if (decimal == 0) decs[decs_i++] = '0';
+	else 
+	{
+		tb_long_t d = (tb_long_t)(decimal * 10);
+		do 
+		{
+			decs[decs_i++] = d + '0';
+			decimal = decimal * 10 - d;
+			d = (tb_long_t)(decimal * 10);
+		}
+		while (decs_i < e.precision);
+	}
+
+	// adjust precision
+	if (decs_i > e.precision) 
+		decs_i = e.precision;
+
+	// fill spaces at left side, e.g. "   0.31415926"
+	e.width -= ints_i + 1 + e.precision;
+	if (!(e.flags & (TB_PRINTF_FLAG_LEFT + TB_PRINTF_FLAG_ZERO)))
+	{
+		while (--e.width >= 0)
+			if (pb < pe) *pb++ = ' ';
+	}
+
+	// append sign: + / -
+	if (sign && (pb < pe)) *pb++ = sign;
+
+	// fill 0 or spaces, e.g. "00003.1415926"
+	if (!(e.flags & TB_PRINTF_FLAG_LEFT))
+	{
+		tb_char_t c = (e.flags & TB_PRINTF_FLAG_ZERO)? '0' : ' ';
+		while (--e.width >= 0)
+			if (pb < pe) *pb++ = c;
+	}
+
+	// append integer
+	while (--ints_i >= 0) 
+		if (pb < pe) *pb++ = ints[ints_i];
+
+	// append .
+	if (pb < pe) *pb++ = '.';
+
+	// append decimal
+	tb_int_t decs_n = decs_i;
+	while (--decs_i >= 0) 
+		if (pb < pe) *pb++ = decs[decs_n - decs_i - 1];
+
+	// fill 0 if precision is larger, e.g. "0.3140000"
+	while (decs_n <= --e.precision) 
+		if (pb < pe) *pb++ = '0';
+
+	// trailing space padding for left-justified flags, e.g. "0.31415926   "
+	while (--e.width >= 0)
+		if (pb < pe) *pb++ = ' ';
+
+	return pb;
+}
+static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_t e, tb_double_t num)
 {
 	// digits
 	tb_char_t 	ints[64] = {0};
 	tb_char_t 	decs[64] = {0};
 	tb_long_t 	ints_i = 0, decs_i = 0;
+
+	// FIXME: for inf nan
+	// ...
 
 	// sign: + -
 	tb_char_t sign = 0;
@@ -473,11 +593,11 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	tb_size_t 	n = e.precision;
 	while (n--) p *= 10;
 	if (((tb_uint64_t)(num * p * 10) % 10) > 4) 
-		num += 1. / (tb_float_t)p;
+		num += 1. / (tb_double_t)p;
 
 	// get integer & decimal
 	tb_int64_t integer = (tb_int64_t)num;
-	tb_float_t decimal = num - integer;
+	tb_double_t decimal = num - integer;
 
 	// convert integer => digits string in reverse order
 	if (integer == 0) ints[ints_i++] = '0';
@@ -644,20 +764,15 @@ get_qualifier:
 	{
 		// short & long => int
 	case 'h':
+		e->qual = TB_PRINTF_QUAL_H;
+		++p;
+		break;
 	case 'l':
-#if TB_CPU_BITSIZE == 64
-		// %lxx: int64
-		if (*p == 'l') e->qual = TB_PRINTF_QUAL_I64;
-		else e->qual = TB_PRINTF_QUAL_I;
-#else
-		// %llx: int
-		e->qual = TB_PRINTF_QUAL_I;
-#endif
-		// %llx: int64
+		e->qual = TB_PRINTF_QUAL_L;
 		++p;
 		if (*p == 'l') 
 		{
-			e->qual = TB_PRINTF_QUAL_I64;
+			e->qual = TB_PRINTF_QUAL_LL;
 			++p;
 		}
 		break;
@@ -671,7 +786,7 @@ get_qualifier:
 			case 16: e->qual = TB_PRINTF_QUAL_I16; break;
 			case 32: e->qual = TB_PRINTF_QUAL_I32; break;
 			case 64: e->qual = TB_PRINTF_QUAL_I64; break;
-			default: e->qual = TB_PRINTF_QUAL_I; break;
+			default: break;
 			}
 			break;
 		}
@@ -799,8 +914,8 @@ get_qualifier:
  *   			e.g. printf("%.*s", 3, "abcdef") will result in "abc" being printed.
  *
  * - qualifier:
- *   - h: 		short integer or single float-point
- *   - l: 		long integer or double float-point
+ *   - h: 		short integer or single double-point
+ *   - l: 		long integer or double double-point
  *   - I8: 		8-bit integer
  *   - I16: 	16-bit integer
  *   - I32: 	32-bit integer
@@ -941,14 +1056,19 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
 			// get an integer for %d %u %x ...
 		case TB_PRINTF_TYPE_INT:
 			{
-				if (e.qual != TB_PRINTF_QUAL_I64)
+				if ( 	e.qual == TB_PRINTF_QUAL_I64
+#if TB_CPU_BIT64
+					|| 	e.qual == TB_PRINTF_QUAL_L
+#endif
+					|| 	e.qual == TB_PRINTF_QUAL_LL)
+					pb = tb_printf_int64(pb, pe, e, tb_va_arg(args, tb_uint64_t));
+				else
 				{
 					tb_uint32_t num = 0;
 					if (e.extra & TB_PRINTF_EXTRA_SIGNED)
 					{
 						switch (e.qual)
 						{
-						case TB_PRINTF_QUAL_I: 		num = tb_va_arg(args, tb_int_t); break;
 						case TB_PRINTF_QUAL_I8:		num = (tb_int8_t)tb_va_arg(args, tb_int_t); break;
 						case TB_PRINTF_QUAL_I16:	num = (tb_int16_t)tb_va_arg(args, tb_int_t); break;
 						case TB_PRINTF_QUAL_I32:	num = tb_va_arg(args, tb_int32_t); break;
@@ -959,7 +1079,6 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
 					{
 						switch (e.qual)
 						{
-						case TB_PRINTF_QUAL_I: 		num = tb_va_arg(args, tb_uint_t); break;
 						case TB_PRINTF_QUAL_I8:		num = (tb_uint8_t)tb_va_arg(args, tb_uint_t); break;
 						case TB_PRINTF_QUAL_I16:	num = (tb_uint16_t)tb_va_arg(args, tb_uint_t); break;
 						case TB_PRINTF_QUAL_I32:	num = tb_va_arg(args, tb_uint32_t); break;
@@ -968,14 +1087,21 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
 					}
 					pb = tb_printf_int32(pb, pe, e, num);
 				}
-				else pb = tb_printf_int64(pb, pe, e, tb_va_arg(args, tb_uint64_t));
 				break;
 			}
 #ifdef TB_CONFIG_TYPE_FLOAT
 		case TB_PRINTF_TYPE_FLOAT:
 			{
-				tb_float_t num = tb_va_arg(args, tb_float_t);
-				pb = tb_printf_float(pb, pe, e, num);
+				if (e.qual == TB_PRINTF_QUAL_L)
+				{
+					tb_double_t num = tb_va_arg(args, tb_double_t);
+					pb = tb_printf_double(pb, pe, e, num);
+				}
+				else 
+				{
+					tb_float_t num = tb_va_arg(args, tb_double_t);
+					pb = tb_printf_float(pb, pe, e, num);
+				}
 				break;
 			}
 #endif

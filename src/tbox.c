@@ -42,7 +42,7 @@ static tb_bool_t tb_check_word_order()
 	return (p[0] == 0x34 && p[1] == 0x12)? TB_TRUE : TB_FALSE;
 #endif
 }
-static tb_bool_t tb_check_float_order()
+static tb_bool_t tb_check_double_order()
 {
 #ifdef TB_CONFIG_TYPE_FLOAT
 	union 
@@ -86,7 +86,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 	// check byteorder
 	tb_assert(tb_check_word_order());
-	tb_assert(tb_check_float_order());
+	tb_assert(tb_check_double_order());
 
 	// init memory pool
 #ifdef TB_CONFIG_MEMORY_POOL

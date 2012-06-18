@@ -73,7 +73,7 @@ static tb_void_t tb_test_sbtoi32(tb_char_t const* s, tb_int_t base, tb_int32_t v
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-static tb_void_t tb_test_sbtof(tb_char_t const* s, tb_int_t base, tb_float_t val)
+static tb_void_t tb_test_sbtof(tb_char_t const* s, tb_int_t base, tb_double_t val)
 {
 	tb_printf("s%dtof(%s) = %lf [?= %lf]\n", base, s, tb_sbtof(s, base), val);
 }
@@ -88,7 +88,7 @@ static tb_void_t tb_test_stoi32(tb_char_t const* s, tb_int32_t val)
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-static tb_void_t tb_test_stof(tb_char_t const* s, tb_float_t val)
+static tb_void_t tb_test_stof(tb_char_t const* s, tb_double_t val)
 {
 	tb_printf("stof(%s) = %lf [?= %lf]\n", s, tb_stof(s), val);
 }

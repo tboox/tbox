@@ -153,20 +153,20 @@ tb_uint64_t 		tb_bstream_get_u64_be(tb_bstream_t* bst);
 tb_sint64_t 		tb_bstream_get_s64_be(tb_bstream_t* bst);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t 			tb_bstream_get_float_le(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_float_be(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_le(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_be(tb_bstream_t* bst);
 
-tb_float_t 			tb_bstream_get_double_ble(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_bbe(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_bne(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_ble(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_bbe(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_bne(tb_bstream_t* bst);
 
-tb_float_t 			tb_bstream_get_double_lle(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_lbe(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_lne(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_lle(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_lbe(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_lne(tb_bstream_t* bst);
 
-tb_float_t 			tb_bstream_get_double_nle(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_nbe(tb_bstream_t* bst);
-tb_float_t 			tb_bstream_get_double_nne(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_nle(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_nbe(tb_bstream_t* bst);
+tb_double_t 		tb_bstream_get_double_nne(tb_bstream_t* bst);
 #endif
 
 tb_uint32_t 		tb_bstream_get_ubits32(tb_bstream_t* bst, tb_size_t nbits);
@@ -212,20 +212,20 @@ tb_size_t 			tb_bstream_set_data(tb_bstream_t* bst, tb_byte_t const* data, tb_si
 tb_char_t*			tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t 			tb_bstream_set_float_le(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_float_be(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_le(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_be(tb_bstream_t* bst, tb_double_t val);
 
-tb_void_t 			tb_bstream_set_double_ble(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_bbe(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_bne(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_ble(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_bbe(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_bne(tb_bstream_t* bst, tb_double_t val);
 
-tb_void_t 			tb_bstream_set_double_lle(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_lbe(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_lne(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_lle(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_lbe(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_lne(tb_bstream_t* bst, tb_double_t val);
 
-tb_void_t 			tb_bstream_set_double_nle(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_nbe(tb_bstream_t* bst, tb_float_t val);
-tb_void_t 			tb_bstream_set_double_nne(tb_bstream_t* bst, tb_float_t val);
+tb_void_t 			tb_bstream_set_double_nle(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_nbe(tb_bstream_t* bst, tb_double_t val);
+tb_void_t 			tb_bstream_set_double_nne(tb_bstream_t* bst, tb_double_t val);
 #endif
 
 // peek

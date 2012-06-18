@@ -139,7 +139,7 @@ typedef struct __tb_flv_sdata_value_t
 
 	union 
 	{
-		tb_float_t 						number;
+		tb_double_t 						number;
 		tb_bool_t 						boolean;
 		tb_flv_sdata_string_t 			string;
 		struct __tb_flv_sdata_value_t* 	array;
@@ -209,6 +209,6 @@ tb_bool_t 	tb_flv_spank(tb_handle_t hflv);
  */
 
 tb_size_t 	tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb_size_t sps_size);
-tb_float_t 	tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size);
+tb_double_t 	tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size);
 
 #endif

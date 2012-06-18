@@ -206,7 +206,7 @@ tb_void_t tb_xml_writer_attributes_add_int(tb_xml_writer_t* writer, tb_char_t co
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_void_t tb_xml_writer_attributes_add_float(tb_xml_writer_t* writer, tb_char_t const* name, tb_float_t value)
+tb_void_t tb_xml_writer_attributes_add_double(tb_xml_writer_t* writer, tb_char_t const* name, tb_double_t value)
 {
 	tb_assert(writer && name);
 	if (!writer || !name) return ;

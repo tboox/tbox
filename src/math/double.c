@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		float.c
+ * @file		double.c
  *
  */
 /* ///////////////////////////////////////////////////////////////////////
@@ -26,64 +26,64 @@
 #include "int32.h"
 #include <math.h>
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
+# 	include "double.h"
 #endif
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t tb_float_sqrt_generic(tb_float_t x)
+tb_double_t tb_double_sqrt_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
 	return sqrt(x);
 }
-tb_float_t tb_float_sin_generic(tb_float_t x)
+tb_double_t tb_double_sin_generic(tb_double_t x)
 {
 	return sin(x);
 }
-tb_float_t tb_float_cos_generic(tb_float_t x)
+tb_double_t tb_double_cos_generic(tb_double_t x)
 {
 	return cos(x);
 }
-tb_void_t tb_float_sincos_generic(tb_float_t x, tb_float_t* s, tb_float_t* c)
+tb_void_t tb_double_sincos_generic(tb_double_t x, tb_double_t* s, tb_double_t* c)
 {
 	if (s) *s = sin(x);
 	if (c) *c = cos(x);
 }
-tb_float_t tb_float_tan_generic(tb_float_t x)
+tb_double_t tb_double_tan_generic(tb_double_t x)
 {
 	return tan(x);
 }
-tb_float_t tb_float_asin_generic(tb_float_t x)
+tb_double_t tb_double_asin_generic(tb_double_t x)
 {
 	return asin(x);
 }
-tb_float_t tb_float_acos_generic(tb_float_t x)
+tb_double_t tb_double_acos_generic(tb_double_t x)
 {
 	return acos(x);
 }
-tb_float_t tb_float_atan_generic(tb_float_t x)
+tb_double_t tb_double_atan_generic(tb_double_t x)
 {
 	return atan(x);
 }
-tb_float_t tb_float_atan2_generic(tb_float_t y, tb_float_t x)
+tb_double_t tb_double_atan2_generic(tb_double_t y, tb_double_t x)
 {
 	return atan2(y, x);
 }
-tb_float_t tb_float_exp_generic(tb_float_t x)
+tb_double_t tb_double_exp_generic(tb_double_t x)
 {
 #if 1
-	tb_float_t a = x - (tb_int_t)x;
-	return (tb_float_expi(((tb_int_t)x)) * tb_float_exp1(a));
+	tb_double_t a = x - (tb_int_t)x;
+	return (tb_double_expi(((tb_int_t)x)) * tb_double_exp1(a));
 #else
 	return exp(x);
 #endif
 }
-tb_float_t tb_float_expi_generic(tb_uint16_t x)
+tb_double_t tb_double_expi_generic(tb_uint16_t x)
 {
 	// x = [-31, 31]
-	static tb_float_t table[47] = 
+	static tb_double_t table[47] = 
 	{
 		// [-15, -1]
 		0.000000
@@ -141,19 +141,19 @@ tb_float_t tb_float_expi_generic(tb_uint16_t x)
 	};
 	return table[((x) + 15) & 0x3f];
 }
-tb_uint32_t tb_float_ilog2_generic(tb_float_t x)
+tb_uint32_t tb_double_ilog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_log2(tb_float_round(x));
+	return tb_int32_log2(tb_double_round(x));
 }
-tb_uint32_t tb_float_iclog2_generic(tb_float_t x)
+tb_uint32_t tb_double_iclog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_clog2(tb_float_round(x));
+	return tb_int32_clog2(tb_double_round(x));
 }
-tb_uint32_t tb_float_irlog2_generic(tb_float_t x)
+tb_uint32_t tb_double_irlog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_rlog2(tb_float_round(x));
+	return tb_int32_rlog2(tb_double_round(x));
 }
 #endif
