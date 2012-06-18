@@ -55,11 +55,17 @@
 #endif
 
 #ifdef TB_DEBUG
-# 	define tb_int_to_fixed6(x) 		tb_int_to_fixed6_check(x)
-# 	define tb_fixed6_to_int(x) 		tb_fixed6_to_int_check(x)
+# 	define tb_int_to_fixed6(x) 		tb_long_to_fixed6_check(x)
+# 	define tb_fixed6_to_int(x) 		tb_fixed6_to_long_check(x)
+
+# 	define tb_long_to_fixed6(x) 	tb_long_to_fixed6_check(x)
+# 	define tb_fixed6_to_long(x) 	tb_fixed6_to_long_check(x)
 #else
 # 	define tb_int_to_fixed6(x) 		(tb_fixed6_t)((x) << 6)
 # 	define tb_fixed6_to_int(x) 		(tb_int_t)((x) >> 6)
+
+# 	define tb_long_to_fixed6(x) 	(tb_fixed6_t)((x) << 6)
+# 	define tb_fixed6_to_long(x) 	(tb_long_t)((x) >> 6)
 #endif
 
 #define tb_fixed6_to_fixed16(x) 	((x) << 10)
@@ -83,13 +89,13 @@
  */
 
 #ifdef TB_DEBUG
-static __tb_inline__ tb_fixed6_t tb_int_to_fixed6_check(tb_int_t x)
+static __tb_inline__ tb_fixed6_t tb_long_to_fixed6_check(tb_long_t x)
 {
 	// check overflow
 	tb_assert(x >= -1024 && x <= 1024);
 	return (x << 6);
 }
-static __tb_inline__ tb_int_t tb_fixed6_to_int_check(tb_fixed6_t x)
+static __tb_inline__ tb_long_t tb_fixed6_to_int_check(tb_fixed6_t x)
 {
 	// no overflow, < int16 ?
 	tb_assert(x == (tb_int16_t)x);

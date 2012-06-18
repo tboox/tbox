@@ -960,13 +960,13 @@ get_qualifier:
  * tb_printf("|%#-8.5x|%#2.9X|\n", 0x1f, 0x1f);
  * tb_printf("|%#-8.5b|%#2.9B|\n", 0x1f, 0x1f);
  * tb_printf("|%-6Id|%5I8u|%#I64x|%#llx|\n", 256, 255, (tb_int64_t)0x8fffffffffff, (tb_int64_t)0x8fffffffffff);
- * tb_printf("|%f|\n", -3.1415926535897932384626433832795);
- * tb_printf("|%f|%f|%f|\n", 3.14, 0, -0);
+ * tb_printf("|%lf|\n", -3.1415926535897932384626433832795);
+ * tb_printf("|%lf|%lf|%lf|\n", 3.14, 0, -0);
  * tb_printf("|%0.9f|\n", 3.1415926535897932384626433832795);
  * tb_printf("|%16.9f|\n", 3.1415926535897932384626433832795);
  * tb_printf("|%016.9f|\n", 3.14159);
  * tb_printf("|%lf|\n", 1.0 / 6.0);
- * tb_printf("|%f|\n", 0.0003141596);
+ * tb_printf("|%lf|\n", 0.0003141596);
  * @endcode
  *
  */

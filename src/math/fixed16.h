@@ -67,11 +67,17 @@
 #endif
 
 #ifdef TB_DEBUG
-# 	define tb_int_to_fixed16(x) 			tb_int_to_fixed16_check(x)
-# 	define tb_fixed16_to_int(x) 			tb_fixed16_to_int_check(x)
+# 	define tb_int_to_fixed16(x) 			tb_long_to_fixed16_check(x)
+# 	define tb_fixed16_to_int(x) 			tb_fixed16_to_long_check(x)
+
+# 	define tb_long_to_fixed16(x) 			tb_long_to_fixed16_check(x)
+# 	define tb_fixed16_to_long(x) 			tb_fixed16_to_long_check(x)
 #else
 # 	define tb_int_to_fixed16(x) 			(tb_fixed16_t)((x) << 16)
 # 	define tb_fixed16_to_int(x) 			(tb_int_t)((x) >> 16)
+
+# 	define tb_long_to_fixed16(x) 			(tb_fixed16_t)((x) << 16)
+# 	define tb_fixed16_to_long(x) 			(tb_long_t)((x) >> 16)
 #endif
 
 // round
@@ -284,13 +290,13 @@ tb_fixed16_t 	tb_fixed16_exp_int32(tb_fixed16_t x);
  */
 
 #ifdef TB_DEBUG
-static __tb_inline__ tb_fixed16_t tb_int_to_fixed16_check(tb_int_t x)
+static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 {
 	// check overflow
 	tb_assert(x >= TB_MINS16 && x <= TB_MAXS16);
 	return (x << 16);
 }
-static __tb_inline__ tb_int_t tb_fixed16_to_int_check(tb_fixed16_t x)
+static __tb_inline__ tb_long_t tb_fixed16_to_long_check(tb_fixed16_t x)
 {
 	// check overflow
 	tb_assert(x != TB_FIXED16_NAN);

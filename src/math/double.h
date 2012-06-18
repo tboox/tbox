@@ -53,9 +53,11 @@
 #define TB_DOUBLE_SQRT2 				(1.4142135623730951)
 
 // cast
-#define tb_double_to_double(x) 			((tb_double_t)(x))
 #define tb_int_to_double(x) 			((tb_double_t)(x))
 #define tb_double_to_int(x) 			((tb_int_t)(x))
+
+#define tb_long_to_double(x) 			((tb_double_t)(x))
+#define tb_double_to_long(x) 			((tb_long_t)(x))
 
 // round
 #define tb_double_round(x) 				((x) > 0? (tb_int32_t)((x) + 0.5) : (tb_int32_t)((x) - 0.5))
