@@ -111,7 +111,7 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 	switch (value->type)
 	{
 	case TB_FLV_SDATA_TYPE_NUMBER:
-		tb_pstring_cstrfcpy(&flv->string, "%f", value->u.number);
+		tb_pstring_cstrfcpy(&flv->string, "%lf", value->u.number);
 		break;
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
 		tb_pstring_cstrfcpy(&flv->string, "%s", value->u.boolean? "true" : "false");
@@ -1224,7 +1224,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 			if (time_scale > 0 && num_units_in_tick > 0)
 			{
 				tb_double_t framerate = time_scale / (2.0 * num_units_in_tick);
-				tb_trace_impl("\t\t\tfixed => framerate: %f", framerate);
+				tb_trace_impl("\t\t\tfixed => framerate: %lf", framerate);
 				return framerate;
 			}
 		}

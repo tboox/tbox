@@ -24,7 +24,7 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 	switch (value->type)
 	{
 	case TB_FLV_SDATA_TYPE_NUMBER:
-		tb_print("[demo]: %s = %f", spath, value->u.number);
+		tb_print("[demo]: %s = %lf", spath, value->u.number);
 		break;
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
 		tb_print("[demo]: %s = %s", spath, value->u.boolean? "true" : "false");
@@ -148,7 +148,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 
 			// analyze framerate
 			tb_double_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
-			tb_print("[demo]: sps_framerate: %f", framerate);
+			tb_print("[demo]: sps_framerate: %lf", framerate);
 
 			// free data
 			tb_free(data);

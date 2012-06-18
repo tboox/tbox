@@ -53,6 +53,9 @@
 #define tb_int_to_fixed(x) 			tb_int_to_fixed16(x)
 #define tb_fixed_to_int(x) 			tb_fixed16_to_int(x)
 
+#define tb_long_to_fixed(x) 		tb_long_to_fixed16(x)
+#define tb_fixed_to_long(x) 		tb_fixed16_to_long(x)
+
 #define tb_fixed6_to_fixed(x) 		tb_fixed6_to_fixed16(x)
 #define tb_fixed_to_fixed6(x) 		tb_fixed16_to_fixed6(x)
 
