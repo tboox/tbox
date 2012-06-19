@@ -17,27 +17,24 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		isinf.c
+ * @ingroup 	math
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-# 	include "double.h"
-#endif
+#include "math.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
 
+tb_long_t tb_isinf(tb_double_t x)
+{
+	tb_ieee_double_t e; e.d = x;
+	tb_int32_t 		t = e.i.l | ((e.i.h & 0x7fffffff) ^ 0x7ff00000);
+	t |= -t;
+	return (tb_long_t)(~(t >> 31) & (e.i.h >> 30));
+}

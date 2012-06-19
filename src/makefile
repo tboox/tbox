@@ -12,6 +12,7 @@ tbox_C_FILES 			+= \
 						tbox \
 						math/int32 \
 						math/rand \
+						math/float \
 						math/double \
 						math/fixed16 \
 						memory/vpool \
@@ -108,7 +109,11 @@ tbox_C_FILES 			+= \
 						libc/string/strrchr \
 						libc/string/strirchr \
 						libc/string/strnrchr \
-						libc/string/strnirchr
+						libc/string/strnirchr \
+						libm/isinf \
+						libm/isinff \
+						libm/isnan \
+						libm/isnanf 
 
 # pool
 ifeq ($(TB_CONFIG_MEMORY_POOL),n)
@@ -176,6 +181,7 @@ INC_FILES 				= \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
+						math/float.h \
 						math/double.h \
 						math/fixed.h \
 						math/fixed6.h \
@@ -183,9 +189,6 @@ INC_FILES 				= \
 						math/fixed30.h \
 						math/int32.h \
 						math/opt/prefix.h \
-						math/opt/double_x86.h \
-						math/opt/double_arm.h \
-						math/opt/double_sh4.h \
 						math/opt/fixed16_x86.h \
 						math/opt/fixed16_arm.h \
 						math/opt/fixed16_sh4.h \
@@ -284,7 +287,10 @@ INC_FILES 				= \
 						libc/string/prefix.h \
 						libc/string/string.h \
 						third/prefix.h \
-						third/third.h 
+						third/third.h \
+						libm/prefix.h \
+						libm/math.h \
+						libm/libm.h
 
 # zlib files
 zlib_C_FILES 			= \

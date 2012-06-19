@@ -17,23 +17,18 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		fixed16_arm.h
+ * @file		libm.h
+ * @defgroup 	libm
  *
  */
-#ifndef TB_MATH_OPT_FLOAT_ARM_H
-#define TB_MATH_OPT_FLOAT_ARM_H
+#ifndef TB_LIBM_H
+#define TB_LIBM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-
+#include "math.h"
 
 
 #endif
-

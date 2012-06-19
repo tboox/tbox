@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../libm/prefix.h"
 
 #ifdef TB_COMPILER_IS_GCC
 # 	include "opt/bits_gcc.h"
@@ -652,13 +653,7 @@ static __tb_inline__ tb_float_t tb_bits_get_float_le_inline(tb_byte_t const* p)
 	&& !defined(TB_WORDS_BIGENDIAN)
 	return *((tb_float_t*)p);
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.i = tb_bits_get_u32_le(p);
 	return conv.f;
 #endif
@@ -669,13 +664,7 @@ static __tb_inline__ tb_float_t tb_bits_get_float_be_inline(tb_byte_t const* p)
 	&& defined(TB_WORDS_BIGENDIAN)
 	return *((tb_float_t*)p);
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.i = tb_bits_get_u32_be(p);
 	return conv.f;
 #endif
@@ -685,13 +674,7 @@ static __tb_inline__ tb_float_t tb_bits_get_float_ne_inline(tb_byte_t const* p)
 #ifdef TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 	return *((tb_float_t*)p);
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.i = tb_bits_get_u32_ne(p);
 	return conv.f;
 #endif
@@ -707,13 +690,7 @@ static __tb_inline__ tb_void_t tb_bits_set_float_le_inline(tb_byte_t* p, tb_floa
 	&& !defined(TB_WORDS_BIGENDIAN)
 	*((tb_float_t*)p) = x;
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.f = x;
 	tb_bits_set_u32_le(p, conv.i);
 #endif
@@ -724,13 +701,7 @@ static __tb_inline__ tb_void_t tb_bits_set_float_be_inline(tb_byte_t* p, tb_floa
 	&& defined(TB_WORDS_BIGENDIAN)
 	*((tb_float_t*)p) = x;
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.f = x;
 	tb_bits_set_u32_be(p, conv.i);
 #endif
@@ -740,13 +711,7 @@ static __tb_inline__ tb_void_t tb_bits_set_float_ne_inline(tb_byte_t* p, tb_floa
 #ifdef TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 	*((tb_float_t*)p) = x;
 #else
-	union 
-	{
-		tb_uint32_t i;
-		tb_float_t 	f;
-
-	} conv;
-
+	tb_ieee_float_t conv;
 	conv.f = x;
 	tb_bits_set_u32_ne(p, conv.i);
 #endif

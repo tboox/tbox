@@ -17,23 +17,54 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		fixed16_x86.h
+ * @file		prefix.h
  *
  */
-#ifndef TB_MATH_OPT_FLOAT_x86_H
-#define TB_MATH_OPT_FLOAT_x86_H
+#ifndef TB_LIBM_PREFIX_H
+#define TB_LIBM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * types
  */
 
+// the ieee float type
+typedef union __tb_ieee_float_t
+{
+	tb_float_t 	f;
+	tb_uint32_t i;
 
+}tb_ieee_float_t;
+
+// the ieee double type
+#ifdef TB_FLOAT_BIGENDIAN
+typedef union __tb_ieee_double_t
+{
+	tb_double_t d;
+	struct
+	{
+		tb_uint32_t h;
+		tb_uint32_t l;
+
+	}i;
+
+}tb_ieee_double_t;
+#else
+typedef union __tb_ieee_double_t
+{
+	tb_double_t d;
+	struct
+	{
+		tb_uint32_t l;
+		tb_uint32_t h;
+	}i;
+
+}tb_ieee_double_t;
+#endif
 
 
 #endif
-
