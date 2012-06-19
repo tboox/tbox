@@ -18,26 +18,27 @@
  *
  * @author		ruki
  * @file		math.h
- * @defgroup 	math
+ * @ingroup 	math
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_LIBM_MATH_H
+#define TB_LIBM_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-# 	include "double.h"
-#endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+// isinf
+tb_long_t tb_isinf(tb_double_t x);
+tb_long_t tb_isinff(tb_float_t x);
+
+// isnan
+tb_long_t tb_isnan(tb_double_t x);
+tb_long_t tb_isnanf(tb_float_t x);
 
 #endif
-

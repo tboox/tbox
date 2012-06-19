@@ -4,6 +4,7 @@ include $(PRO_DIR)/prefix.mak
 # module name
 NAMES = \
 		fixed \
+		float \
 		double \
 		int32 \
 		rand

@@ -30,14 +30,6 @@
 #include "prefix.h"
 #include <math.h>
 
-#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
-# 	include "opt/double_x86.h"
-#elif defined(TB_ARCH_ARM)
-# 	include "opt/double_arm.h"
-#elif defined(TB_ARCH_SH4)
-# 	include "opt/double_sh4.h"
-#endif
-
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
