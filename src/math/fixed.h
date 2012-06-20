@@ -46,8 +46,8 @@
 
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
-# 	define tb_fixed_to_double(x) 	tb_fixed16_to_double(x)
-# 	define tb_double_to_fixed(x) 	tb_double_to_fixed16(x)
+# 	define tb_fixed_to_float(x) 	tb_fixed16_to_float(x)
+# 	define tb_float_to_fixed(x) 	tb_float_to_fixed16(x)
 #endif
 
 #define tb_int_to_fixed(x) 			tb_int_to_fixed16(x)

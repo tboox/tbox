@@ -17,74 +17,25 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		float.c
+ * @file		expi.c
+ * @ingroup 	libm
  *
  */
+
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "int32.h"
-#include "../libm/libm.h"
-#include <math.h>
-#ifdef TB_CONFIG_TYPE_FLOAT
-# 	include "float.h"
-#endif
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
+#include "math.h"
 
-#ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t tb_float_sqrt_generic(tb_float_t x)
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+tb_double_t tb_expi(tb_long_t x)
 {
-	tb_assert(x > 0);
-	return sqrtf(x);
-}
-tb_float_t tb_float_sin_generic(tb_float_t x)
-{
-	return sinf(x);
-}
-tb_float_t tb_float_cos_generic(tb_float_t x)
-{
-	return cosf(x);
-}
-tb_void_t tb_float_sincos_generic(tb_float_t x, tb_float_t* s, tb_float_t* c)
-{
-	if (s) *s = sinf(x);
-	if (c) *c = cosf(x);
-}
-tb_float_t tb_float_tan_generic(tb_float_t x)
-{
-	return tanf(x);
-}
-tb_float_t tb_float_asin_generic(tb_float_t x)
-{
-	return asinf(x);
-}
-tb_float_t tb_float_acos_generic(tb_float_t x)
-{
-	return acosf(x);
-}
-tb_float_t tb_float_atan_generic(tb_float_t x)
-{
-	return atanf(x);
-}
-tb_float_t tb_float_atan2_generic(tb_float_t y, tb_float_t x)
-{
-	return atan2f(y, x);
-}
-tb_float_t tb_float_exp_generic(tb_float_t x)
-{
-#if 1
-	tb_float_t a = x - (tb_int_t)x;
-	return (tb_float_expi(((tb_int_t)x)) * tb_float_exp1(a));
-#else
-	return expf(x);
-#endif
-}
-tb_float_t tb_float_expi_generic(tb_uint16_t x)
-{
+	tb_assert(x >= -31 && x <= 31);
+
 	// x = [-31, 31]
-	static tb_float_t table[47] = 
+	static tb_double_t table[47] = 
 	{
 		// [-15, -1]
 		0.000000
@@ -142,19 +93,3 @@ tb_float_t tb_float_expi_generic(tb_uint16_t x)
 	};
 	return table[((x) + 15) & 0x3f];
 }
-tb_uint32_t tb_float_ilog2_generic(tb_float_t x)
-{
-	tb_assert(x > 0);
-	return tb_int32_log2(tb_round(x));
-}
-tb_uint32_t tb_float_iclog2_generic(tb_float_t x)
-{
-	tb_assert(x > 0);
-	return tb_int32_clog2(tb_round(x));
-}
-tb_uint32_t tb_float_irlog2_generic(tb_float_t x)
-{
-	tb_assert(x > 0);
-	return tb_int32_rlog2(tb_round(x));
-}
-#endif

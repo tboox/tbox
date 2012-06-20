@@ -43,11 +43,63 @@
  */
 
 // isinf
-tb_long_t tb_isinf(tb_double_t x);
-tb_long_t tb_isinff(tb_float_t x);
+tb_long_t 		tb_isinf(tb_double_t x);
+tb_long_t 		tb_isinff(tb_float_t x);
 
 // isnan
-tb_long_t tb_isnan(tb_double_t x);
-tb_long_t tb_isnanf(tb_float_t x);
+tb_long_t 		tb_isnan(tb_double_t x);
+tb_long_t 		tb_isnanf(tb_float_t x);
+
+// sqrt
+tb_double_t 	tb_sqrt(tb_double_t x);
+tb_float_t 		tb_sqrtf(tb_float_t x);
+
+// sin
+tb_double_t 	tb_sin(tb_double_t x);
+tb_float_t 		tb_sinf(tb_float_t x);
+
+// cos
+tb_double_t 	tb_cos(tb_double_t x);
+tb_float_t 		tb_cosf(tb_float_t x);
+
+// tan
+tb_double_t 	tb_tan(tb_double_t x);
+tb_float_t 		tb_tanf(tb_float_t x);
+
+// atan
+tb_double_t 	tb_atan(tb_double_t x);
+tb_float_t 		tb_atanf(tb_float_t x);
+
+// exp
+tb_double_t 	tb_exp(tb_double_t x);
+tb_float_t 		tb_expf(tb_float_t x);
+
+// expi
+tb_double_t 	tb_expi(tb_long_t x);
+tb_float_t 		tb_expif(tb_long_t x);
+
+// exp1
+tb_double_t 	tb_exp1(tb_double_t x);
+tb_float_t 		tb_exp1f(tb_float_t x);
+
+// asin
+tb_double_t 	tb_asin(tb_double_t x);
+tb_float_t 		tb_asinf(tb_float_t x);
+
+// acos
+tb_double_t 	tb_acos(tb_double_t x);
+tb_float_t 		tb_acosf(tb_float_t x);
+
+// atan2
+tb_double_t 	tb_atan2(tb_double_t y, tb_double_t x);
+tb_float_t 		tb_atan2f(tb_float_t y, tb_float_t x);
+
+// log2
+tb_double_t 	tb_log2(tb_double_t x);
+tb_float_t 		tb_log2f(tb_float_t x);
+
+// sincos
+tb_void_t 		tb_sincos(tb_double_t x, tb_double_t* s, tb_double_t* c);
+tb_void_t 		tb_sincosf(tb_float_t x, tb_float_t* s, tb_float_t* c);
 
 #endif

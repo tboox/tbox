@@ -12,8 +12,6 @@ tbox_C_FILES 			+= \
 						tbox \
 						math/int32 \
 						math/rand \
-						math/float \
-						math/double \
 						math/fixed16 \
 						memory/vpool \
 						memory/fpool \
@@ -115,7 +113,33 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isinf \
 						libm/isinff \
 						libm/isnan \
-						libm/isnanf 
+						libm/isnanf \
+						libm/sqrt \
+						libm/sqrtf \
+						libm/sin \
+						libm/sinf \
+						libm/cos \
+						libm/cosf \
+						libm/tan \
+						libm/tanf \
+						libm/atan \
+						libm/atanf \
+						libm/asin \
+						libm/asinf \
+						libm/acos \
+						libm/acosf \
+						libm/exp \
+						libm/expf \
+						libm/expi \
+						libm/expif \
+						libm/exp1 \
+						libm/exp1f \
+						libm/atan2 \
+						libm/atan2f \
+						libm/log2 \
+						libm/log2f \
+						libm/sincos \
+						libm/sincosf 
 
 # pool
 ifeq ($(TB_CONFIG_MEMORY_POOL),n)
@@ -183,8 +207,6 @@ INC_FILES 				= \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
-						math/float.h \
-						math/double.h \
 						math/fixed.h \
 						math/fixed6.h \
 						math/fixed16.h \
@@ -292,7 +314,16 @@ INC_FILES 				= \
 						third/third.h \
 						libm/prefix.h \
 						libm/math.h \
-						libm/libm.h
+						libm/libm.h \
+						libm/inf.h \
+						libm/nan.h \
+						libm/maf.h \
+						libm/mif.h \
+						libm/pi.h \
+						libm/fabs.h \
+						libm/round.h \
+						libm/ceil.h \
+						libm/floor.h
 
 # zlib files
 zlib_C_FILES 			= \
