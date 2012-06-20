@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		isinf.c
- * @ingroup 	math
+ * @ingroup 	libm
  *
  */
 

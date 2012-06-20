@@ -2,7 +2,7 @@
 #define TB_CONFIG_H
 
 // arch
-#define TB_CONFIG_ARCH_x64
+#define TB_CONFIG_ARCH_x86
 //#define TB_CONFIG_ARCH_ARM
 //#define TB_CONFIG_ARCH_MIPS
 //#define TB_CONFIG_ARCH_SPARC

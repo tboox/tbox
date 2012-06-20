@@ -27,8 +27,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "math.h"
-
+#ifdef TB_CONFIG_TYPE_FLOAT
+# 	include "prefix.h"
+# 	include "math.h"
+#endif
 
 #endif

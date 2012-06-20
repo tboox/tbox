@@ -17,24 +17,21 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		isnan.c
+ * @file		pi.h
  * @ingroup 	libm
  *
  */
+#ifndef TB_LIBM_PI_H
+#define TB_LIBM_PI_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "math.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * macros
  */
-tb_long_t tb_isnan(tb_double_t x)
-{
-	tb_ieee_double_t e; e.d = x;
-	tb_int32_t 		t = e.i.h & 0x7fffffff;
-	t |= (tb_uint32_t)(e.i.l | (-e.i.l)) >> 31;
-	t = 0x7ff00000 - t;
-	return (tb_long_t)(((tb_uint32_t)t) >> 31);
-}
+#define TB_PI 	(3.141592653589793)
+
+#endif

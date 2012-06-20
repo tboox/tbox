@@ -1,8 +1,12 @@
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
 #include "tbox.h"
 #include <stdlib.h>
 
-#ifdef TB_CONFIG_TYPE_FLOAT
-
+/* ///////////////////////////////////////////////////////////////////////
+ * globals
+ */ 
 static tb_float_t tb_float_test_angle[360] = 
 {
 	0.000000
@@ -370,11 +374,11 @@ static tb_float_t tb_float_test_angle[360] =
 
 static tb_float_t tb_float_test_arc[5][5] = 
 {
-	{TB_FLOAT_INF, 0.000000, 0.000000, 0.000000, 0.000000}
-, 	{TB_FLOAT_INF, 1.000000, 0.500000, 0.333333, 0.250000}
-, 	{TB_FLOAT_INF, 2.000000, 1.000000, 0.666667, 0.500000}
-, 	{TB_FLOAT_INF, 3.000000, 1.500000, 1.000000, 0.750000}
-, 	{TB_FLOAT_INF, 4.000000, 2.000000, 1.333333, 1.000000}
+	{TB_INF, 0.000000, 0.000000, 0.000000, 0.000000}
+, 	{TB_INF, 1.000000, 0.500000, 0.333333, 0.250000}
+, 	{TB_INF, 2.000000, 1.000000, 0.666667, 0.500000}
+, 	{TB_INF, 3.000000, 1.500000, 1.000000, 0.750000}
+, 	{TB_INF, 4.000000, 2.000000, 1.333333, 1.000000}
 
 };
 
@@ -482,17 +486,17 @@ static tb_float_t tb_float_test_atan_a[] =
 ,	9.800000
 ,	10.000000
 };
-#include "stdio.h"
+/* ///////////////////////////////////////////////////////////////////////
+ * test
+ */ 
 static tb_void_t tb_float_test_constant()
 {
-	tb_printf("[float]: one = %f\n", (TB_FLOAT_ONE));
-	tb_printf("[float]: half = %f\n", (TB_FLOAT_HALF));
-	tb_printf("[float]: max = %f\n", (TB_FLOAT_MAX));
-	tb_printf("[float]: min = %f\n", (TB_FLOAT_MIN));
-	tb_printf("[float]: nan = %f\n", (TB_FLOAT_NAN));
-	tb_printf("[float]: inf = %f\n", (TB_FLOAT_INF));
-	tb_printf("[float]: pi = %f\n", (TB_FLOAT_PI));
-	tb_printf("[float]: sqrt2 = %f\n", (TB_FLOAT_SQRT2));
+	tb_printf("[float]: max = %f\n", TB_MAF);
+	tb_printf("[float]: min = %f\n", TB_MIF);
+	tb_printf("[float]: nan = %f\n", TB_NAN);
+	tb_printf("[float]: inf = %f\n", TB_INF);
+	tb_printf("[float]: isinf = %ld\n", tb_isinff(TB_INF));
+	tb_printf("[float]: isnan = %ld\n", tb_isnanf(TB_NAN));
 }
 static tb_void_t tb_float_test_round(tb_float_t x)
 {
@@ -501,7 +505,7 @@ static tb_void_t tb_float_test_round(tb_float_t x)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		r = tb_float_round(x);
+		r = tb_round(x);
 	}
 	t = tb_mclock() - t;
 	tb_printf("[float]: round(%f): %ld, %lld ms\n", (x), r, t);
@@ -513,7 +517,7 @@ static tb_void_t tb_float_test_floor(tb_float_t x)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		r = tb_float_floor(x);
+		r = tb_floor(x);
 	}
 	t = tb_mclock() - t;
 	tb_printf("[float]: floor(%f): %ld, %lld ms\n", (x), r, t);
@@ -525,7 +529,7 @@ static tb_void_t tb_float_test_ceil(tb_float_t x)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		r = tb_float_ceil(x);
+		r = tb_ceil(x);
 	}
 	t = tb_mclock() - t;
 	tb_printf("[float]: ceil(%f): %ld, %lld ms\n", (x), r, t);
@@ -537,7 +541,7 @@ static tb_void_t tb_float_test_mul(tb_float_t a, tb_float_t b)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		r = tb_float_mul(a, b);
+		r = a * b;
 	}
 	t = tb_mclock() - t;
 	tb_printf("[float]: mul(%f, %f): %f, %lld ms\n", (a), (b), (r), t);
@@ -550,34 +554,10 @@ static tb_void_t tb_float_test_div(tb_float_t a, tb_float_t b)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		r = tb_float_div(a, b);
+		r = a / b;
 	}
 	t = tb_mclock() - t;
 	tb_printf("[float]: div(%f, %f): %f, %lld ms\n", (a), (b), (r), t);
-}
-static tb_void_t tb_float_test_invert(tb_float_t x)
-{
-	__tb_volatile__ tb_long_t 		n = 10000000;
-	__tb_volatile__ tb_float_t 		r = 0;
-	tb_hong_t t = tb_mclock();
-	while (n--)
-	{
-		r = tb_float_invert(x);
-	}
-	t = tb_mclock() - t;
-	tb_printf("[float]: invert(%f): %f, %lld ms\n", (x), (r), t);
-}
-static tb_void_t tb_float_test_sqre(tb_float_t x)
-{
-	__tb_volatile__ tb_long_t 		n = 10000000;
-	__tb_volatile__ tb_float_t 		r = 0;
-	tb_hong_t t = tb_mclock();
-	while (n--)
-	{
-		r = tb_float_sqre(x);
-	}
-	t = tb_mclock() - t;
-	tb_printf("[float]: sqre(%f): %f, %lld ms\n", (x), (r), t);
 }
 static tb_void_t tb_float_test_sqrt(tb_float_t x)
 {
@@ -665,7 +645,7 @@ static tb_void_t tb_float_test_sin()
 	tb_long_t i = 0;
 	for (i = 0; i < 360; i++)
 	{
-		tb_printf(",\t%f\n", (i * TB_FLOAT_PI / 180));
+		tb_printf(",\t%f\n", (i * TB_PI / 180));
 	}
 #endif
 }
@@ -850,31 +830,29 @@ static tb_void_t tb_float_test_atan()
 
 	tb_printf("[float]: atan, %lld ms\n", t);
 }
-#endif
 
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
 tb_long_t main(tb_long_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-#ifdef TB_CONFIG_TYPE_FLOAT
 	tb_float_test_constant();
-	tb_float_test_round(TB_FLOAT_PI);
-	tb_float_test_round(-TB_FLOAT_PI);
-	tb_float_test_floor(TB_FLOAT_PI);
-	tb_float_test_floor(-TB_FLOAT_PI);
-	tb_float_test_ceil(TB_FLOAT_PI);
-	tb_float_test_ceil(-TB_FLOAT_PI);
-	tb_float_test_mul(TB_FLOAT_PI, -TB_FLOAT_PI);
-	tb_float_test_div(TB_FLOAT_ONE, TB_FLOAT_PI);
-	tb_float_test_invert(TB_FLOAT_PI);
-	tb_float_test_sqre(TB_FLOAT_PI);
-	tb_float_test_sqre(-TB_FLOAT_PI);
-	tb_float_test_sqrt(TB_FLOAT_PI);
-	tb_float_test_exp(TB_FLOAT_PI);
-	tb_float_test_ilog2(TB_FLOAT_PI);
+	tb_float_test_round(TB_PI);
+	tb_float_test_round(-TB_PI);
+	tb_float_test_floor(TB_PI);
+	tb_float_test_floor(-TB_PI);
+	tb_float_test_ceil(TB_PI);
+	tb_float_test_ceil(-TB_PI);
+	tb_float_test_mul(TB_PI, -TB_PI);
+	tb_float_test_div(1., TB_PI);
+	tb_float_test_sqrt(TB_PI);
+	tb_float_test_exp(TB_PI);
+	tb_float_test_ilog2(TB_PI);
 	tb_float_test_ilog2(1024.0);
-	tb_float_test_iclog2(TB_FLOAT_PI);
-	tb_float_test_irlog2(TB_FLOAT_PI);
+	tb_float_test_iclog2(TB_PI);
+	tb_float_test_irlog2(TB_PI);
 	tb_float_test_sin();
 	tb_float_test_cos();
 	tb_float_test_tan();
@@ -882,8 +860,8 @@ tb_long_t main(tb_long_t argc, tb_char_t** argv)
 	tb_float_test_asin();
 	tb_float_test_acos();
 	tb_float_test_atan();
-#endif
 
+	tb_exit();
 	return 0;
 }
 

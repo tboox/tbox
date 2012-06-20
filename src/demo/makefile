@@ -58,6 +58,8 @@ $(1)_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" $(demo_CPPFLAGS)
 $(1)_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE $(demo_CPPFLAGS-y)
 $(1)_LDFLAGS 			+= $(demo_LDFLAGS)
 endef
+NAMES += $(NAMES-y)
+NAMES-y =
 $(foreach name, $(NAMES), $(eval $(call MAKE_MODULES,$(name))))
 
 include $(PRO_DIR)/suffix.mak

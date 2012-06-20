@@ -43,6 +43,7 @@ extern "C" {
 #include "third/third.h"
 #include "math/math.h"
 #include "libc/libc.h"
+#include "libm/libm.h"
 #include "aio/aio.h"
 #include "xml/xml.h"
 #include "zip/zip.h"

@@ -34,30 +34,12 @@
  * macros
  */
 
-// constant
-#define TB_DOUBLE_ONE 					(1.0f)
-#define TB_DOUBLE_HALF 					(0.5f)
-#define TB_DOUBLE_MAX 					(HUGE_VAL)
-#define TB_DOUBLE_MIN 					(-TB_DOUBLE_MAX)
-#define TB_DOUBLE_NAN 					(NAN)
-#define TB_DOUBLE_INF					(INFINITY)
-#define TB_DOUBLE_PI 					(3.141592653589793)
-#define TB_DOUBLE_SQRT2 				(1.4142135623730951)
-
 // cast
 #define tb_int_to_double(x) 			((tb_double_t)(x))
 #define tb_double_to_int(x) 			((tb_int_t)(x))
 
 #define tb_long_to_double(x) 			((tb_double_t)(x))
 #define tb_double_to_long(x) 			((tb_long_t)(x))
-
-// round
-#define tb_double_round(x) 				((x) > 0? (tb_int32_t)((x) + 0.5) : (tb_int32_t)((x) - 0.5))
-#define tb_double_ceil(x) 				((x) > 0? (tb_int32_t)((x) + 0.9999999999) : (tb_int32_t)(x))
-#define tb_double_floor(x) 				((x) > 0? (tb_int32_t)(x) : (tb_int32_t)((x) - 0.9999999999))
-
-// abs
-#define tb_double_abs(x) 				tb_abs(x)
 
 // avg
 #define tb_double_avg(x, y) 			(((x) + (y)) * 0.5)
