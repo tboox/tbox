@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		prefix.h
+ * @ingroup 	libm
  *
  */
 #ifndef TB_LIBM_PREFIX_H

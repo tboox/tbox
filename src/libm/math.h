@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		math.h
- * @ingroup 	math
+ * @ingroup 	libm
  *
  */
 #ifndef TB_LIBM_MATH_H
@@ -28,6 +28,15 @@
  * includes
  */
 #include "prefix.h"
+#include "nan.h"
+#include "inf.h"
+#include "maf.h"
+#include "mif.h"
+#include "pi.h"
+#include "fabs.h"
+#include "round.h"
+#include "ceil.h"
+#include "floor.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

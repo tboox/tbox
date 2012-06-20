@@ -109,7 +109,9 @@ tbox_C_FILES 			+= \
 						libc/string/strrchr \
 						libc/string/strirchr \
 						libc/string/strnrchr \
-						libc/string/strnirchr \
+						libc/string/strnirchr
+
+tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isinf \
 						libm/isinff \
 						libm/isnan \

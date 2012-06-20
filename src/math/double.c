@@ -24,6 +24,7 @@
  * includes
  */
 #include "int32.h"
+#include "../libm/libm.h"
 #include <math.h>
 #ifdef TB_CONFIG_TYPE_FLOAT
 # 	include "double.h"
@@ -144,16 +145,16 @@ tb_double_t tb_double_expi_generic(tb_uint16_t x)
 tb_uint32_t tb_double_ilog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_log2(tb_double_round(x));
+	return tb_int32_log2(tb_round(x));
 }
 tb_uint32_t tb_double_iclog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_clog2(tb_double_round(x));
+	return tb_int32_clog2(tb_round(x));
 }
 tb_uint32_t tb_double_irlog2_generic(tb_double_t x)
 {
 	tb_assert(x > 0);
-	return tb_int32_rlog2(tb_double_round(x));
+	return tb_int32_rlog2(tb_round(x));
 }
 #endif

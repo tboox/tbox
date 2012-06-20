@@ -28,6 +28,7 @@
 #include "prefix.h"
 #include "../stdio/stdio.h"
 #include "../../math/math.h"
+#include "../../libm/libm.h"
 #include "../../utils/utils.h"
 #include "../string/string.h"
 
@@ -448,8 +449,22 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	tb_char_t 	decs[32] = {0};
 	tb_long_t 	ints_i = 0, decs_i = 0;
 
-	// FIXME: for inf nan
-	// ...
+	// for inf nan
+	if (tb_isinff(num))
+	{
+		if (pb < pe && num < 0) *pb++ = '-';
+		if (pb < pe) *pb++ = 'i';
+		if (pb < pe) *pb++ = 'n';
+		if (pb < pe) *pb++ = 'f';
+		return pb;
+	}
+	else if (tb_isnanf(num))
+	{
+		if (pb < pe) *pb++ = 'n';
+		if (pb < pe) *pb++ = 'a';
+		if (pb < pe) *pb++ = 'n';
+		return pb;
+	}
 
 	// sign: + -
 	tb_char_t sign = 0;
@@ -563,8 +578,23 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 	tb_char_t 	decs[64] = {0};
 	tb_long_t 	ints_i = 0, decs_i = 0;
 
-	// FIXME: for inf nan
-	// ...
+	// for inf nan
+	if (tb_isinf(num))
+	{
+		if (pb < pe && num < 0) *pb++ = '-';
+		if (pb < pe) *pb++ = 'i';
+		if (pb < pe) *pb++ = 'n';
+		if (pb < pe) *pb++ = 'f';
+		return pb;
+	}
+	else if (tb_isnan(num))
+	{
+		if (pb < pe) *pb++ = 'n';
+		if (pb < pe) *pb++ = 'a';
+		if (pb < pe) *pb++ = 'n';
+		return pb;
+	}
+
 
 	// sign: + -
 	tb_char_t sign = 0;

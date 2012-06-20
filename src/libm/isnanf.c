@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		isnanf.c
- * @ingroup 	math
+ * @ingroup 	libm
  *
  */
 
@@ -34,7 +34,6 @@ tb_long_t tb_isnanf(tb_float_t x)
 {
 	tb_ieee_float_t e; e.f = x;
 	tb_int32_t 		t = e.i & 0x7fffffff;
-	t |= -t;
 	t = 0x7f800000 - t;
  	return (tb_long_t)(((tb_uint32_t)(t)) >> 31);
 }
