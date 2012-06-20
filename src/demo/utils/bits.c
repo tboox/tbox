@@ -379,6 +379,7 @@ static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 
 	tb_print("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
@@ -467,10 +468,10 @@ static tb_void_t tb_test_bits_double_lle(tb_double_t x)
 
 	tb_print("[bitops]: double_lle set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_double_be(tb_double_t x)
+static tb_void_t tb_test_bits_float_be(tb_float_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -487,12 +488,12 @@ static tb_void_t tb_test_bits_double_be(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_be set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_print("[bitops]: float_be set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
 }
-static tb_void_t tb_test_bits_double_le(tb_double_t x)
+static tb_void_t tb_test_bits_float_le(tb_float_t x)
 {
 	__tb_volatile__ tb_byte_t 	p[8] = {0};
-	__tb_volatile__ tb_double_t 	y = 0;
+	__tb_volatile__ tb_float_t 	y = 0;
 	__tb_volatile__ tb_size_t 	n1 = 100000000;
 	__tb_volatile__ tb_size_t 	n2 = 100000000;
 	__tb_volatile__ tb_hong_t 	ts = 0;
@@ -509,8 +510,9 @@ static tb_void_t tb_test_bits_double_le(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_le set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_print("[bitops]: float_le set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
 }
+#endif
 static tb_void_t tb_test_bits_cl0_u32_be(tb_uint32_t x)
 {
 	__tb_volatile__ tb_size_t 	i = 0;
@@ -780,6 +782,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_s16_le(4321);
 	tb_test_bits_s16_le(-4321);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 	tb_print("");
 	tb_test_bits_double_bbe(3.1415926);
 	tb_test_bits_double_ble(3.1415926);
@@ -793,6 +796,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	tb_test_bits_double_be(3.1415926);
 	tb_test_bits_double_le(3.1415926);
+#endif
 #endif
 
 #if 1

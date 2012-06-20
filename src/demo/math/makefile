@@ -2,8 +2,8 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES := fixed int32 rand
-NAMES-$(TB_CONFIG_TYPE_FLOAT) := float double
+NAMES := int32 rand
+NAMES-$(TB_CONFIG_TYPE_FLOAT) := fixed float double
 
 include $(SRC_DIR)/demo/makefile
 
