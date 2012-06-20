@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../libm/prefix.h"
+#include "../libm/libm.h"
 
 #ifdef TB_COMPILER_IS_GCC
 # 	include "opt/bits_gcc.h"

@@ -17,23 +17,26 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		exp.c
+ * @ingroup 	libm
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
+#include "math.h"
+#include <math.h>
 
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+tb_double_t tb_exp(tb_double_t x)
+{
+#if 0
+	return exp(x);
+#else
+	tb_float_t a = x - (tb_long_t)x;
+	return (tb_expi(((tb_long_t)x)) * tb_exp1(a));
 #endif
-
+}

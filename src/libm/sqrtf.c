@@ -17,23 +17,21 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		sqrtf.c
+ * @ingroup 	libm
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
+#include "math.h"
+#include <math.h>
 
-#endif
-
+/* ///////////////////////////////////////////////////////////////////////
+ * implemention
+ */
+tb_float_t tb_sqrtf(tb_float_t x)
+{
+	return sqrtf(x);
+}
