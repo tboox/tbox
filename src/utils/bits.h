@@ -719,7 +719,7 @@ static __tb_inline__ tb_void_t tb_bits_set_float_ne_inline(tb_byte_t* p, tb_floa
 
 
 /* ///////////////////////////////////////////////////////////////////////
- * get tb_double_t
+ * get double
  */
 static __tb_inline__ tb_double_t tb_bits_get_double_bbe_inline(tb_byte_t const* p)
 {
@@ -911,7 +911,7 @@ static __tb_inline__ tb_double_t tb_bits_get_double_nne_inline(tb_byte_t const* 
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * set tb_double_t
+ * set double
  */
 
 // big double endian & big words endian
