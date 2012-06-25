@@ -34,7 +34,9 @@
  * macros
  */
 
-#if defined(TB_COMPILER_IS_GCC) && __GNUC__ >= 3 && __GNUC_MINOR__ >= 3
+#if defined(TB_COMPILER_IS_GCC) \
+		&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
+			&& TB_COMPILER_VERSION_BE(3, 3)
 # 	define TB_INF	(__builtin_inff ())
 #else
 # 	define TB_INF	TB_MAF

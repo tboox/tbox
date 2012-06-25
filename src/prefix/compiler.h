@@ -35,6 +35,11 @@
 // intel c++
 #if defined(__INTEL_COMPILER)
 #	define TB_COMPILER_IS_INTEL
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(__INTEL_COMPILER > ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(__INTEL_COMPILER >= ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__INTEL_COMPILER == ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(__INTEL_COMPILER < ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(__INTEL_COMPILER <= ((major) * 100 + (minor)))
 #	define TB_COMPILER_STRING 						"Intel C/C++"
 #	if (__INTEL_COMPILER == 600)
 #		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 6.0"
@@ -57,6 +62,11 @@
 // borland c++
 #elif defined(__BORLANDC__)
 #	define TB_COMPILER_IS_BORLAND
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(__BORLANDC__ > ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(__BORLANDC__ >= ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__BORLANDC__ == ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(__BORLANDC__ < ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(__BORLANDC__ <= ((major) * 100 + (minor)))
 #	define TB_COMPILER_STRING						"Borland C/C++"
 #	if 0
 #		define TB_COMPILER_VERSION_STRING			"Borland C++ 4.52"
@@ -77,6 +87,11 @@
 // gnu c/c++ 
 #elif defined(__GNUC__)
 #	define TB_COMPILER_IS_GCC
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) > ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) >= ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) == ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) < ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) <= ((major) * 100 + (minor)))
 #	define TB_COMPILER_STRING						"GNU C/C++"
 #	if  __GNUC__ == 2
 #		if __GNUC_MINOR__ < 95
@@ -86,7 +101,7 @@
 #		elif __GNUC_MINOR__ == 96
 #			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 2.96"
 #		else
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ >2.96&&<3.0"
+#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ > 2.9 6&& < 3.0"
 #		endif
 #	elif __GNUC__ == 3
 #		if __GNUC_MINOR__ == 2
@@ -96,7 +111,7 @@
 #		elif __GNUC_MINOR__ == 4
 #			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 3.4"
 #		else
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ >3.4&&<4.0"
+#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ > 3.4 && < 4.0"
 #		endif
 #	elif __GNUC__ == 4
 #		if __GNUC_MINOR__ == 1
@@ -115,6 +130,11 @@
 // watcom c/c++ 
 #elif defined(__WATCOMC__)
 #	define TB_COMPILER_IS_WATCOM
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(__WATCOMC__ > ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(__WATCOMC__ >= ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__WATCOMC__ == ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(__WATCOMC__ < ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(__WATCOMC__ <= ((major) * 100 + (minor)))
 #	define TB_COMPILER_STRING 						"Watcom C/C++"
 #	if (__WATCOMC__ == 1100)
 #		define TB_COMPILER_VERSION_STRING 			"Watcom C/C++ 11.0"
@@ -141,6 +161,11 @@
 // digital mars c/c++
 #elif defined(__DMC__)
 #	define TB_COMPILER_IS_DMC
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(__DMC__ > ((major) * 256 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(__DMC__ >= ((major) * 256 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__DMC__ == ((major) * 256 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(__DMC__ < ((major) * 256 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(__DMC__ <= ((major) * 256 + (minor)))
 #	define TB_COMPILER_STRING 						"Digital Mars C/C++"
 #	if (__DMC__ < 0x0826)
 #		error Only versions 8.26 and later of the Digital Mars C/C++ compilers are supported by the EXTL libraries
@@ -167,6 +192,11 @@
 // codeplay vectorc c/c++
 #elif defined(__VECTORC)
 #	define TB_COMPILER_IS_VECTORC
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(__VECTORC > (major))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(__VECTORC >= (major))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__VECTORC == (major))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(__VECTORC < (major))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(__VECTORC <= (major))
 #	define TB_COMPILER_VERSION_STRING 				"CodePlay VectorC C/C++"
 #	if (__VECTORC == 1)
 #		define TB_COMPILER_VERSION_STRING 			"CodePlay VectorC C/C++"
@@ -177,6 +207,11 @@
 // visual c++
 #elif defined(_MSC_VER)
 #	define TB_COMPILER_IS_MSVC
+# 	define TB_COMPILER_VERSION_BT(major, minor) 	(_MSC_VER > ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_BE(major, minor) 	(_MSC_VER >= ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_EQ(major, minor) 	(_MSC_VER == ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LT(major, minor) 	(_MSC_VER < ((major) * 100 + (minor)))
+# 	define TB_COMPILER_VERSION_LE(major, minor) 	(_MSC_VER <= ((major) * 100 + (minor)))
 #		define TB_COMPILER_STRING					"Visual C++"
 #	if defined(TB_FORCE_MSVC_4_2) && (_MSC_VER == 1020)
 #		define TB_COMPILER_VERSION_STRING			"Visual C++ 4.2"
