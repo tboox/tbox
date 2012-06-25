@@ -33,9 +33,11 @@
  * macros
  */
 
-#if defined(TB_COMPILER_IS_GCC) && __GNUC__ >= 3 && __GNUC_MINOR__ >= 3
+#if defined(TB_COMPILER_IS_GCC) \
+		&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
+			&& TB_COMPILER_VERSION_BE(3, 3)
 # 	define TB_MAF 		(__builtin_huge_val())
-#elif defined(TB_COMPILER_IS_GCC) && __GNUC__ >= 2 && __GNUC_MINOR__ >= 96
+#elif defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(2, 96)
 #	define TB_MAF 		(__extension__ 0x1.0p2047)
 #elif defined(TB_COMPILER_IS_GCC)
 # 	define TB_MAF 		(__extension__ ((union { unsigned __l __attribute__((__mode__(__DI__))); tb_double_t __d; }) { __l: 0x7ff0000000000000ULL }).__d)
