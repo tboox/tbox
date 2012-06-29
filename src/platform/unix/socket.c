@@ -34,12 +34,17 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
+#include <signal.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_socket_init()
 {
+	// ignore sigpipe
+	signal(SIGPIPE, SIG_IGN);
+
+	// ok
 	return TB_TRUE;
 }
 tb_void_t tb_socket_exit()
