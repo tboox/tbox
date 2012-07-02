@@ -341,6 +341,10 @@
 # 	define tb_bits_swap_u16(x) 			tb_bits_swap_u16_inline(x)
 #endif
 
+#ifndef tb_bits_swap_u24
+# 	define tb_bits_swap_u24(x) 			tb_bits_swap_u24_inline(x)
+#endif
+
 #ifndef tb_bits_swap_u32
 # 	define tb_bits_swap_u32(x) 			tb_bits_swap_u32_inline(x)
 #endif
@@ -352,6 +356,8 @@
 #ifdef TB_WORDS_BIGENDIAN
 # 	define tb_bits_be_to_ne_u16(x) 		(x)
 # 	define tb_bits_le_to_ne_u16(x) 		tb_bits_swap_u16(x)
+# 	define tb_bits_be_to_ne_u24(x) 		(x)
+# 	define tb_bits_le_to_ne_u24(x) 		tb_bits_swap_u24(x)
 # 	define tb_bits_be_to_ne_u32(x) 		(x)
 # 	define tb_bits_le_to_ne_u32(x) 		tb_bits_swap_u32(x)
 # 	define tb_bits_be_to_ne_u64(x) 		(x)
@@ -359,6 +365,8 @@
 #else
 # 	define tb_bits_be_to_ne_u16(x) 		tb_bits_swap_u16(x)
 # 	define tb_bits_le_to_ne_u16(x) 		(x)
+# 	define tb_bits_be_to_ne_u24(x) 		tb_bits_swap_u24(x)
+# 	define tb_bits_le_to_ne_u24(x) 		(x)
 # 	define tb_bits_be_to_ne_u32(x) 		tb_bits_swap_u32(x)
 # 	define tb_bits_le_to_ne_u32(x) 		(x)
 # 	define tb_bits_be_to_ne_u64(x) 		tb_bits_swap_u64(x)
@@ -367,6 +375,8 @@
 
 #define tb_bits_ne_to_be_u16(x) 		tb_bits_be_to_ne_u16(x)
 #define tb_bits_ne_to_le_u16(x) 		tb_bits_le_to_ne_u16(x)
+#define tb_bits_ne_to_be_u24(x) 		tb_bits_be_to_ne_u24(x)
+#define tb_bits_ne_to_le_u24(x) 		tb_bits_le_to_ne_u24(x)
 #define tb_bits_ne_to_be_u32(x) 		tb_bits_be_to_ne_u32(x)
 #define tb_bits_ne_to_le_u32(x) 		tb_bits_le_to_ne_u32(x)
 #define tb_bits_ne_to_be_u64(x) 		tb_bits_be_to_ne_u64(x)
@@ -568,6 +578,10 @@ static __tb_inline__ tb_uint16_t const tb_bits_swap_u16_inline(tb_uint16_t x)
 {
     x = (x >> 8) | (x << 8);
     return x;
+}
+static __tb_inline__ tb_uint32_t const tb_bits_swap_u24_inline(tb_uint32_t x)
+{
+    return (x >> 16) | (x & 0x0000ff00) | (x << 16);
 }
 static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_inline(tb_uint32_t x)
 {
