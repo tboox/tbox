@@ -108,4 +108,9 @@
 #define TB_CONFIG_LIBC_HAVE_STRNICMP
 
 
+// libm
+#define TB_CONFIG_LIBM_HAVE_SINCOS
+#define TB_CONFIG_LIBM_HAVE_SINCOSF
+
+
 #endif
