@@ -29,7 +29,11 @@ ifeq ($(TB_CONFIG_PLAT),linux_arm)
 demo_LIBS 				= z m dl pthread
 endif
 
-ifeq ($(TB_CONFIG_PLAT),ios_arm)
+ifeq ($(TB_CONFIG_PLAT),ios_armv6)
+demo_LIBS 				= stdc++ z m dl pthread
+endif
+
+ifeq ($(TB_CONFIG_PLAT),ios_armv7)
 demo_LIBS 				= stdc++ z m dl pthread
 endif
 

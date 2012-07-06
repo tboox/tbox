@@ -2,7 +2,7 @@
 TB_CONFIG_DEMO 					= y
 
 # plat
-TB_CONFIG_PLAT 					= ios_arm
+TB_CONFIG_PLAT 					= ios_armv6
 
 # arch
 TB_CONFIG_ARCH 					= arm
@@ -22,3 +22,7 @@ TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
 TB_CONFIG_MEMORY_POOL 			= n
+
+# float
+TB_CONFIG_TYPE_FLOAT 			= y
+
