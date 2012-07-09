@@ -1,5 +1,5 @@
 # demo
-TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO 					= n
 
 # plat
 TB_CONFIG_PLAT 					= android_armv5te
@@ -22,3 +22,7 @@ TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
 TB_CONFIG_MEMORY_POOL 			= n
+
+# float
+TB_CONFIG_TYPE_FLOAT 			= y
+
