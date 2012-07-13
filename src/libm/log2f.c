@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		log2.c
+ * @file		log2f.c
  * @ingroup 	libm
  *
  */
@@ -31,7 +31,11 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-tb_double_t tb_log2(tb_double_t x)
+tb_float_t tb_log2f(tb_float_t x)
 {
-	return log2(x);
+#ifdef TB_CONFIG_LIBM_HAVE_LOG2F
+	return log2f(x);
+#else
+	return logf(x) / logf(2);
+#endif
 }

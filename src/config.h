@@ -10,7 +10,7 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 				(6)
+#define TB_CONFIG_ARM_VERSION 				(5)
 //#define TA_CONFIG_ARM_THUMB
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
@@ -108,9 +108,11 @@
 #define TB_CONFIG_LIBC_HAVE_STRNICMP
 
 // libm
-#define TB_CONFIG_LIBM_HAVE_SINCOS
-#define TB_CONFIG_LIBM_HAVE_SINCOSF
+//#define TB_CONFIG_LIBM_HAVE_SINCOS
+//#define TB_CONFIG_LIBM_HAVE_SINCOSF
 
+//#define TB_CONFIG_LIBM_HAVE_LOG2
+//#define TB_CONFIG_LIBM_HAVE_LOG2F
 
 #endif
 // config

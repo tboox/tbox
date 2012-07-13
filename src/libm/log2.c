@@ -31,7 +31,11 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-tb_float_t tb_log2f(tb_float_t x)
+tb_double_t tb_log2(tb_double_t x)
 {
-	return log2f(x);
+#ifdef TB_CONFIG_LIBM_HAVE_LOG2
+	return log2(x);
+#else
+	return log(x) / log(2);
+#endif
 }
