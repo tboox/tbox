@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = android_armv6
+PLAT = android_armv5te
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
