@@ -27,7 +27,12 @@
  * includes
  */
 #include "../prefix.h"
+#include "../libc/libc.h"
+#include "../utils/utils.h"
 #include "../stream/stream.h"
 #include "../string/string.h"
+#include "../memory/memory.h"
+#include "../platform/platform.h"
+
 
 #endif

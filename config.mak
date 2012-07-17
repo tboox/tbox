@@ -2,12 +2,12 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = android_armv5te
+PLAT = linux_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
-DEBUG = n
+DEBUG = y
 SDK = /home/ruki/programs/android-ndk-r8
 BIN = /home/ruki/programs/android-ndk-r8/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
 HOST = mac

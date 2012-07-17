@@ -67,11 +67,8 @@ tbox_C_FILES 			+= \
 						utils/crc \
 						utils/base32 \
 						utils/base64 \
-						xml/document \
 						xml/node \
-						xml/nlist \
 						xml/reader \
-						xml/writer \
 						aio/aioo \
 						aio/aipp \
 						aio/aicp \
@@ -287,11 +284,9 @@ INC_FILES 				= \
 						utils/base64.h \
 						xml/xml.h \
 						xml/prefix.h \
-						xml/document.h \
 						xml/node.h \
 						xml/reader.h \
 						xml/writer.h \
-						xml/nlist.h \
 						zip/prefix.h \
 						zip/zip.h \
 						zip/vlc.h \
@@ -361,6 +356,7 @@ INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
 ifeq ($(TB_CONFIG_DEMO),y)
 SUB_PROS 				= \
 					  	demo/aio \
+					  	demo/xml \
 					  	demo/flv \
 					  	demo/math \
 					  	demo/utils \

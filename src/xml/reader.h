@@ -31,30 +31,13 @@
 #include "node.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_XML_READER_ATTRIBUTES_MAX 		(256)
-#else
-# 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)
-#endif
-
-
-#ifdef TB_DEBUG
-# 	define TB_XML_READER_DUMP(r) 				tb_xml_reader_dump(r)
-#else 
-# 	define TB_XML_READER_DUMP(r)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
 // the reader event type
 typedef enum __tb_xml_reader_event_t
 {
-	TB_XML_READER_EVENT_NULL 					= 0
+	TB_XML_READER_EVENT_NONE 					= 0
 , 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 1
 , 	TB_XML_READER_EVENT_DOCUMENT_END 			= 2
 , 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 3
@@ -66,69 +49,36 @@ typedef enum __tb_xml_reader_event_t
 
 }tb_xml_reader_event_t;
 
-// the xml reader - StAX
-typedef struct __tb_xml_reader_t
-{
-	// the reference to stream
-	tb_gstream_t* 			gst;
-
-	// the event
-	tb_size_t 				event;
-
-	// the cache character
-	tb_char_t 				cache;
-
-	// the version
-	tb_pstring_t 			version;
-
-	// the encoding
-	tb_pstring_t 			encoding;
-
-	// the element
-	tb_pstring_t 			element;
-
-	// the element name
-	tb_pstring_t 			name;
-
-	// the text
-	tb_pstring_t 			text;
-
-	// the attributes
-	tb_xml_attribute_t 		attributes[TB_XML_READER_ATTRIBUTES_MAX];
-	tb_size_t 				attributes_n;
-
-}tb_xml_reader_t;
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// open & close
-tb_xml_reader_t* 		tb_xml_reader_open(tb_gstream_t* gst);
-tb_void_t 				tb_xml_reader_close(tb_xml_reader_t* reader);
+/// init
+tb_handle_t 			tb_xml_reader_init(tb_gstream_t* gst);
 
-// iterator
-tb_bool_t 				tb_xml_reader_has_next(tb_xml_reader_t* reader);
-tb_size_t 				tb_xml_reader_next(tb_xml_reader_t* reader);
+/// exit
+tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
 
-// seek: /root/node/item
-tb_bool_t 				tb_xml_reader_seek(tb_xml_reader_t* reader, tb_char_t const* path);
+/// next
+tb_size_t 				tb_xml_reader_next(tb_handle_t reader);
 
-// debug
-tb_void_t 				tb_xml_reader_dump(tb_xml_reader_t* reader);
+/// goto: /root/node/item
+tb_bool_t 				tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path);
 
-// getter
-tb_size_t 				tb_xml_reader_get_event(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_version(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_encoding(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_text(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_comment(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_cdata(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_element_name(tb_xml_reader_t* reader);
-tb_size_t 				tb_xml_reader_get_attribute_count(tb_xml_reader_t* reader);
-tb_pstring_t const* 	tb_xml_reader_get_attribute_name(tb_xml_reader_t* reader, tb_int_t index);
-tb_pstring_t const* 	tb_xml_reader_get_attribute_value_by_index(tb_xml_reader_t* reader, tb_int_t index);
-tb_pstring_t const* 	tb_xml_reader_get_attribute_value_by_name(tb_xml_reader_t* reader, tb_char_t const* name);
+/// version
+tb_char_t const* 		tb_xml_reader_version(tb_handle_t reader);
+
+/// encoding
+tb_char_t const* 		tb_xml_reader_encoding(tb_handle_t reader);
+
+/// text
+tb_char_t const* 		tb_xml_reader_text(tb_handle_t reader);
+
+/// cdata
+tb_char_t const* 		tb_xml_reader_cdata(tb_handle_t reader);
+
+/// comment
+tb_char_t const* 		tb_xml_reader_comment(tb_handle_t reader);
 
 #endif

@@ -106,7 +106,7 @@ static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_
 	{
 		// read data
 		tb_long_t real = gst->aread(gst, tail + need, push - need, TB_FALSE);
-		tb_assert_and_check_return_val(real >= 0, -1);
+		tb_check_return_val(real >= 0, -1);
 
 		// update need
 		need += real;
@@ -495,6 +495,18 @@ tb_void_t tb_gstream_clear(tb_gstream_t* gst)
 
 	// clear cache
 	tb_qbuffer_clear(&gst->cache);
+}
+tb_bool_t tb_gstream_beof(tb_gstream_t* gst)
+{
+	// already been opened?
+	tb_assert_and_check_return_val(gst && gst->bopened, TB_TRUE);
+
+	// size
+	tb_hong_t size = tb_gstream_size(gst);
+	tb_hong_t offt = tb_gstream_offset(gst);
+
+	// eof?
+	return size && offt >= size? TB_TRUE : TB_FALSE;
 }
 tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {

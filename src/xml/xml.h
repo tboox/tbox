@@ -29,9 +29,6 @@
  */
 #include "prefix.h"
 #include "node.h"
-#include "document.h"
-#include "nlist.h"
 #include "reader.h"
-#include "writer.h"
 
 #endif
