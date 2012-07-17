@@ -28,28 +28,60 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				{
 				case TB_XML_READER_EVENT_DOCUMENT_BEG: 
 					{
-					//	tb_print("<?xml version = \"%s\" encoding = \"%s\" ?>"
+					//	tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n"
 					//		, tb_xml_reader_version(reader), tb_xml_reader_encoding(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_DOCUMENT_END: 
 					{
-						//tb_print();
 					}
 					break;
+				case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+					{
+						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
+						if (!attr) tb_printf("\n<%s/>\n", name);
+						else
+						{
+							tb_printf("\n<%s", name);
+							for (; attr; attr = attr->next)
+								tb_printf(" %s = \"%s\"", tb_pstring_cstr(&attr->name), tb_pstring_cstr(&attr->data));
+							tb_printf("/>\n");
+						}
+					}
+					break;
+				case TB_XML_READER_EVENT_ELEMENT_BEG: 
+					{
+						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
+						if (!attr) tb_printf("\n<%s>", name);
+						else
+						{
+							tb_printf("\n<%s", name);
+							for (; attr; attr = attr->next)
+								tb_printf(" %s = \"%s\"", tb_pstring_cstr(&attr->name), tb_pstring_cstr(&attr->data));
+							tb_printf(">");
+						}
+					}
+					break;
+				case TB_XML_READER_EVENT_ELEMENT_END: 
+					{
+						tb_printf("</%s>\n", tb_xml_reader_name(reader));
+					}
+				break;
 				case TB_XML_READER_EVENT_TEXT: 
 					{
-						tb_print("%s", tb_xml_reader_text(reader));
+						tb_printf("%s", tb_xml_reader_text(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_CDATA: 
 					{
-						tb_print("<![CDATA[%s]]>", tb_xml_reader_cdata(reader));
+						tb_printf("<![CDATA[%s]]>\n", tb_xml_reader_cdata(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_COMMENT: 
 					{
-						tb_print("<!--%s-->", tb_xml_reader_comment(reader));
+						tb_printf("<!--%s-->\n", tb_xml_reader_comment(reader));
 					}
 					break;
 				default:

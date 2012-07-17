@@ -72,6 +72,9 @@ tb_char_t const* 		tb_xml_reader_version(tb_handle_t reader);
 /// encoding
 tb_char_t const* 		tb_xml_reader_encoding(tb_handle_t reader);
 
+/// name
+tb_char_t const* 		tb_xml_reader_name(tb_handle_t reader);
+
 /// text
 tb_char_t const* 		tb_xml_reader_text(tb_handle_t reader);
 
@@ -80,5 +83,8 @@ tb_char_t const* 		tb_xml_reader_cdata(tb_handle_t reader);
 
 /// comment
 tb_char_t const* 		tb_xml_reader_comment(tb_handle_t reader);
+
+/// attributes
+tb_xml_node_t const* 	tb_xml_reader_attributes(tb_handle_t reader);
 
 #endif

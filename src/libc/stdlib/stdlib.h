@@ -80,12 +80,12 @@ tb_uint32_t 		tb_sbtou32(tb_char_t const* s, tb_int_t base);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
 
-tb_double_t 			tb_s2tof(tb_char_t const* s);
-tb_double_t 			tb_s8tof(tb_char_t const* s);
-tb_double_t 			tb_s10tof(tb_char_t const* s);
-tb_double_t 			tb_s16tof(tb_char_t const* s);
-tb_double_t 			tb_stof(tb_char_t const* s);
-tb_double_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
+tb_float_t 			tb_s2tof(tb_char_t const* s);
+tb_float_t 			tb_s8tof(tb_char_t const* s);
+tb_float_t 			tb_s10tof(tb_char_t const* s);
+tb_float_t 			tb_s16tof(tb_char_t const* s);
+tb_float_t 			tb_stof(tb_char_t const* s);
+tb_float_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
 
 #endif
 
