@@ -37,9 +37,9 @@
  */
 
 #ifdef TB_CONFIG_MEMORY_MODE_SMALL
-# 	define TB_XML_READER_ATTRIBUTES_MAX 		(256)
+# 	define TB_XML_READER_ATTRIBUTES_MAXN 		(64)
 #else
-# 	define TB_XML_READER_ATTRIBUTES_MAX 		(512)
+# 	define TB_XML_READER_ATTRIBUTES_MAXN 		(128)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -71,6 +71,9 @@ typedef struct __tb_xml_reader_t
 
 	// the text
 	tb_pstring_t 			text;
+
+	// the attributes
+	tb_xml_attribute_t 		attributes[TB_XML_READER_ATTRIBUTES_MAXN];
 
 }tb_xml_reader_t;
 
@@ -131,9 +134,11 @@ tb_handle_t tb_xml_reader_init(tb_gstream_t* gst)
 	tb_xml_reader_t* reader = (tb_xml_reader_t*)tb_malloc0(sizeof(tb_xml_reader_t));
 	tb_assert_and_check_return_val(reader, TB_NULL);
 
-	// init
+	// init stream
 	reader->istream = gst;
 	reader->rstream = gst;
+
+	// init string
 	tb_pstring_init(&reader->version);
 	tb_pstring_init(&reader->encoding);
 	tb_pstring_init(&reader->element);
@@ -141,6 +146,15 @@ tb_handle_t tb_xml_reader_init(tb_gstream_t* gst)
 	tb_pstring_init(&reader->text);
 	tb_pstring_cstrcpy(&reader->version, "2.0");
 	tb_pstring_cstrcpy(&reader->encoding, "utf-8");
+
+	// init attributes
+	tb_size_t i = 0;
+	for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
+	{
+		tb_xml_node_t* node = (tb_xml_node_t*)(reader->attributes + i);
+		tb_pstring_init(&node->name);
+		tb_pstring_init(&node->data);
+	}
 
 	// ok
 	return reader;
@@ -169,6 +183,15 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
 		// exit text
 		tb_pstring_exit(&xreader->text);
 
+		// exit attributes
+		tb_int_t i = 0;
+		for (i = 0; i < TB_XML_READER_ATTRIBUTES_MAXN; i++)
+		{
+			tb_xml_node_t* node = (tb_xml_node_t*)(xreader->attributes + i);
+			tb_pstring_exit(&node->name);
+			tb_pstring_exit(&node->data);
+		}
+
 		// free it
 		tb_free(xreader);
 	}
@@ -181,136 +204,139 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 	// reset event
 	xreader->event = TB_XML_READER_EVENT_NONE;
 
-	// peek character
-	tb_char_t* pc = TB_NULL;
-	if (!tb_gstream_bneed(xreader->rstream, &pc, 1) || !pc) goto end;
-
-	// is element?
-	if (*pc == '<') 
+	// next
+	while (!xreader->event)
 	{
-		// parse element: <...>
-		tb_char_t const* element = tb_xml_reader_element_parse(xreader);
-		tb_assert_and_check_goto(element, end);
+		// peek character
+		tb_char_t* pc = TB_NULL;
+		if (!tb_gstream_bneed(xreader->rstream, &pc, 1) || !pc) break;
 
-		// is document begin: <?xml version="..." encoding=".." ?>
-		tb_size_t size = tb_pstring_size(&xreader->element);
-		if (size > 4 
-			&& element[0] == '?'
-			&& element[1] == 'x'
-			&& element[2] == 'm'
-			&& element[3] == 'l')
+		// is element?
+		if (*pc == '<') 
 		{
-			// update event
-			xreader->event = TB_XML_READER_EVENT_DOCUMENT_BEG;
+			// parse element: <...>
+			tb_char_t const* element = tb_xml_reader_element_parse(xreader);
+			tb_assert_and_check_break(element);
 
-		}
-		// is element end: </name>
-		else if (size > 1 && element[0] == '/')
-		{
-			// update event
-			xreader->event = TB_XML_READER_EVENT_ELEMENT_END;
-		}
-		// is comment: <!-- text -->
-		else if (size >= 3
-			&& element[0] == '!'
-			&& element[1] == '-' 
-			&& element[2] == '-')
-		{
-			// no comment end?
-			if (element[size - 2] != '-' || element[size - 1] != '-')
+			// is document begin: <?xml version="..." encoding=".." ?>
+			tb_size_t size = tb_pstring_size(&xreader->element);
+			if (size > 4 
+				&& element[0] == '?'
+				&& element[1] == 'x'
+				&& element[2] == 'm'
+				&& element[3] == 'l')
 			{
-				// patch '>'
-				tb_pstring_chrcat(&xreader->element, '>');
-
-				// seek to comment end
-				tb_char_t ch = '\0';
-				tb_int_t n = 0;
-				while (ch = tb_gstream_bread_s8(xreader->rstream))
-				{
-					// -->
-					if (n == 2 && ch == '>') break;
-					else
-					{
-						// append it
-						tb_pstring_chrcat(&xreader->element, ch);
-
-						if (ch == '-') n++;
-						else n = 0;
-					}
-				}
-
 				// update event
-				if (ch != '\0') xreader->event = TB_XML_READER_EVENT_COMMENT;
+				xreader->event = TB_XML_READER_EVENT_DOCUMENT_BEG;
+
 			}
-			else xreader->event = TB_XML_READER_EVENT_COMMENT;
-		}
-		// is cdata: <![CDATA[ text ]]>
-		else if (size >= 8
-			&& element[0] == '!'
-			&& element[1] == '[' 
-			&& element[2] == 'C' 
-			&& element[3] == 'D'
-			&& element[4] == 'A' 
-			&& element[5] == 'T' 
-			&& element[6] == 'A'
-			&& element[7] == '[')
-		{
-			if (element[size - 2] != ']' || element[size - 1] != ']')
+			// is element end: </name>
+			else if (size > 1 && element[0] == '/')
 			{
-				// patch '>'
-				tb_pstring_chrcat(&xreader->element, '>');
-
-				// seek to cdata end
-				tb_char_t ch = '\0';
-				tb_int_t n = 0;
-				while (ch = tb_gstream_bread_s8(xreader->rstream))
-				{
-					// ]]>
-					if (n == 2 && ch == '>') break;
-					else
-					{
-						// append it
-						tb_pstring_chrcat(&xreader->element, ch);
-
-						if (ch == ']') n++;
-						else n = 0;
-					}
-				}
-
 				// update event
-				if (ch != '\0') xreader->event = TB_XML_READER_EVENT_CDATA;
+				xreader->event = TB_XML_READER_EVENT_ELEMENT_END;
 			}
-			else xreader->event = TB_XML_READER_EVENT_CDATA;
+			// is comment: <!-- text -->
+			else if (size >= 3
+				&& element[0] == '!'
+				&& element[1] == '-' 
+				&& element[2] == '-')
+			{
+				// no comment end?
+				if (element[size - 2] != '-' || element[size - 1] != '-')
+				{
+					// patch '>'
+					tb_pstring_chrcat(&xreader->element, '>');
+
+					// seek to comment end
+					tb_char_t ch = '\0';
+					tb_int_t n = 0;
+					while (ch = tb_gstream_bread_s8(xreader->rstream))
+					{
+						// -->
+						if (n == 2 && ch == '>') break;
+						else
+						{
+							// append it
+							tb_pstring_chrcat(&xreader->element, ch);
+
+							if (ch == '-') n++;
+							else n = 0;
+						}
+					}
+
+					// update event
+					if (ch != '\0') xreader->event = TB_XML_READER_EVENT_COMMENT;
+				}
+				else xreader->event = TB_XML_READER_EVENT_COMMENT;
+			}
+			// is cdata: <![CDATA[ text ]]>
+			else if (size >= 8
+				&& element[0] == '!'
+				&& element[1] == '[' 
+				&& element[2] == 'C' 
+				&& element[3] == 'D'
+				&& element[4] == 'A' 
+				&& element[5] == 'T' 
+				&& element[6] == 'A'
+				&& element[7] == '[')
+			{
+				if (element[size - 2] != ']' || element[size - 1] != ']')
+				{
+					// patch '>'
+					tb_pstring_chrcat(&xreader->element, '>');
+
+					// seek to cdata end
+					tb_char_t ch = '\0';
+					tb_int_t n = 0;
+					while (ch = tb_gstream_bread_s8(xreader->rstream))
+					{
+						// ]]>
+						if (n == 2 && ch == '>') break;
+						else
+						{
+							// append it
+							tb_pstring_chrcat(&xreader->element, ch);
+
+							if (ch == ']') n++;
+							else n = 0;
+						}
+					}
+
+					// update event
+					if (ch != '\0') xreader->event = TB_XML_READER_EVENT_CDATA;
+				}
+				else xreader->event = TB_XML_READER_EVENT_CDATA;
+			}
+			// is empty element: <name/>
+			else if (size > 1 && element[size - 1] == '/')
+			{
+				// update event
+				xreader->event = TB_XML_READER_EVENT_ELEMENT_EMPTY;
+			}
+			// is element begin: <name>
+			else
+			{
+				// update event
+				xreader->event = TB_XML_READER_EVENT_ELEMENT_BEG;
+			}
+
+			// trace
+	//		tb_trace_impl("<%s>", element);
 		}
-		// is empty element: <name/>
-		else if (size > 1 && element[size - 1] == '/')
+		// is text: <> text </>
+		else if (*pc)
 		{
-			// update event
-			xreader->event = TB_XML_READER_EVENT_ELEMENT_EMPTY;
-		}
-		// is element begin: <name>
-		else
-		{
-			// update event
-			xreader->event = TB_XML_READER_EVENT_ELEMENT_BEG;
-		}
+			// parse text: <> ... <>
+			tb_char_t const* text = tb_xml_reader_text_parse(xreader);
+			if (text && tb_pstring_cstrcmp(&xreader->text, "\r\n") && tb_pstring_cstrcmp(&xreader->text, "\n"))
+				xreader->event = TB_XML_READER_EVENT_TEXT;
 
-		// trace
-//		tb_trace_impl("<%s>", element);
-	}
-	// is text: <> text </>
-	else if (*pc)
-	{
-		// parse text: <> ... <>
-		tb_char_t const* text = tb_xml_reader_text_parse(xreader);
-		if (text && tb_pstring_cstrcmp(&xreader->text, "\r\n") && tb_pstring_cstrcmp(&xreader->text, "\n"))
-			xreader->event = TB_XML_READER_EVENT_TEXT;
-
-		// trace
-//		tb_trace_impl("%s", text);
+			// trace
+	//		tb_trace_impl("%s", text);
+		}
 	}
 
-end:
 	// ok?
 	return xreader->event;
 }
@@ -354,3 +380,76 @@ tb_char_t const* tb_xml_reader_text(tb_handle_t reader)
 	// text
 	return tb_pstring_cstr(&xreader->text);
 }
+tb_char_t const* tb_xml_reader_name(tb_handle_t reader)
+{
+	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
+	tb_assert_and_check_return_val(xreader && ( xreader->event == TB_XML_READER_EVENT_ELEMENT_BEG
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_END
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), TB_NULL);
+
+	// init
+	tb_char_t const* p = TB_NULL;
+	tb_char_t const* b = tb_pstring_cstr(&xreader->element);
+	tb_char_t const* e = b + tb_pstring_size(&xreader->element);
+	tb_assert_and_check_return_val(b, TB_NULL);
+
+	// </name> or <name ... />
+	if (b < e && *b == '/') b++;
+	for (p = b; p < e && *p && !tb_isspace(*p) && *p != '/'; p++) ;
+
+	// ok?
+	return p > b? tb_pstring_cstrncpy(&xreader->name, b, p - b) : TB_NULL;
+}
+tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
+{
+	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
+	tb_assert_and_check_return_val(xreader && ( xreader->event == TB_XML_READER_EVENT_ELEMENT_BEG
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_END
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), TB_NULL);
+
+	// init
+	tb_char_t const* p = tb_pstring_cstr(&xreader->element);
+	tb_char_t const* e = p + tb_pstring_size(&xreader->element);
+
+	// init string
+	tb_pstring_t s;
+	tb_pstring_init(&s);
+
+	// parse attributes
+	tb_size_t n = 0;
+	tb_size_t b = 1;
+	for (; p < e && *p; p++)
+	{
+		tb_char_t ch = *p;
+		if (tb_isspace(ch) || ch == '=' || p == e - 1)
+		{
+			// node
+			tb_xml_node_t* prev = n > 0? (tb_xml_node_t*)&xreader->attributes[n - 1] : TB_NULL;
+			tb_xml_node_t* node = (tb_xml_node_t*)&xreader->attributes[n];
+			if (b) tb_pstring_strcpy(&node->name, &s);
+			else
+			{
+				// init data
+				tb_pstring_strcpy(&node->data, &s);
+
+				// append node
+				if (prev) prev->next = node;
+				node->next = TB_NULL;
+
+				// next
+				n++;
+				b = 1;
+			}
+			tb_pstring_clear(&s);
+			if (ch == '=') b = 0;
+		}
+		else if (ch != '\"' && ch != '\'') tb_pstring_chrcat(&s, ch);
+	}
+
+	// exit string
+	tb_pstring_exit(&s);
+
+	// ok?
+	return n? (tb_xml_node_t*)&xreader->attributes[0] : TB_NULL;
+}
+

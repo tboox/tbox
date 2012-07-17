@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = linux_x86
+PLAT = linux_x64
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox

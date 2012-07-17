@@ -223,7 +223,9 @@ tb_char_t const* tb_sstring_cstrncpy(tb_sstring_t* string, tb_char_t const* s, t
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
 
-	return tb_sbuffer_memncpy(string, s, n + 1);
+	tb_char_t* p = tb_sbuffer_memncpy(string, s, n + 1);
+	if (p) p[tb_sstring_size(string)] = '\0';
+	return p;
 }
 tb_char_t const* tb_sstring_cstrfcpy(tb_sstring_t* string, tb_char_t const* fmt, ...)
 {
@@ -272,7 +274,9 @@ tb_char_t const* tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s)
 tb_char_t const* tb_sstring_cstrncat(tb_sstring_t* string, tb_char_t const* s, tb_size_t n)
 {
 	tb_assert_and_check_return_val(string && s && n, TB_NULL);
-	return tb_sbuffer_memncpyp(string, tb_sstring_size(string), s, n + 1);
+	tb_char_t* p = tb_sbuffer_memncpyp(string, tb_sstring_size(string), s, n + 1);
+	if (p) p[tb_sstring_size(string)] = '\0';
+	return p;
 }
 tb_char_t const* tb_sstring_cstrfcat(tb_sstring_t* string, tb_char_t const* fmt, ...)
 {

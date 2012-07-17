@@ -231,7 +231,7 @@ tb_uint32_t tb_sbtou32(tb_char_t const* s, tb_int_t base)
 	else return 0;
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
-tb_double_t tb_s2tof(tb_char_t const* s)
+tb_float_t tb_s2tof(tb_char_t const* s)
 {
 	tb_assert(s);
 	if (!s) return 0.;
@@ -254,8 +254,8 @@ tb_double_t tb_s2tof(tb_char_t const* s)
 	// compute double: lhs.rhs
 	tb_int_t 	dec = 0;
 	tb_uint32_t lhs = 0;
-	tb_double_t 	rhs = 0.;
-	tb_double_t 	val = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
 	tb_int_t 	zeros = 0;
 	tb_int8_t 	decimals[256];
 	tb_int8_t* 	d = decimals;
@@ -309,9 +309,9 @@ tb_double_t tb_s2tof(tb_char_t const* s)
 	while (d-- > decimals) rhs = (rhs + *d) / 2;
 
 	// merge 
-	return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
 }
-tb_double_t tb_s8tof(tb_char_t const* s)
+tb_float_t tb_s8tof(tb_char_t const* s)
 {
 	tb_assert(s);
 	if (!s) return 0.;
@@ -333,8 +333,8 @@ tb_double_t tb_s8tof(tb_char_t const* s)
 	// compute double: lhs.rhs
 	tb_int_t 	dec = 0;
 	tb_uint32_t lhs = 0;
-	tb_double_t 	rhs = 0.;
-	tb_double_t 	val = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
 	tb_int_t 	zeros = 0;
 	tb_int8_t 	decimals[256];
 	tb_int8_t* 	d = decimals;
@@ -388,9 +388,9 @@ tb_double_t tb_s8tof(tb_char_t const* s)
 	while (d-- > decimals) rhs = (rhs + *d) / 8;
 
 	// merge 
-	return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
 }
-tb_double_t tb_s10tof(tb_char_t const* s)
+tb_float_t tb_s10tof(tb_char_t const* s)
 {
 	tb_assert(s);
 	if (!s) return 0.;
@@ -412,8 +412,8 @@ tb_double_t tb_s10tof(tb_char_t const* s)
 	// compute double: lhs.rhs
 	tb_int_t 	dec = 0;
 	tb_uint32_t lhs = 0;
-	tb_double_t 	rhs = 0.;
-	tb_double_t 	val = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
 	tb_int_t 	zeros = 0;
 	tb_int8_t 	decimals[256];
 	tb_int8_t* 	d = decimals;
@@ -467,9 +467,9 @@ tb_double_t tb_s10tof(tb_char_t const* s)
 	while (d-- > decimals) rhs = (rhs + *d) / 10;
 
 	// merge 
-	return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
 }
-tb_double_t tb_s16tof(tb_char_t const* s)
+tb_float_t tb_s16tof(tb_char_t const* s)
 {
 	tb_assert(s);
 	if (!s) return 0.;
@@ -492,8 +492,8 @@ tb_double_t tb_s16tof(tb_char_t const* s)
 	// compute double: lhs.rhs
 	tb_int_t 	dec = 0;
 	tb_uint32_t lhs = 0;
-	tb_double_t 	rhs = 0.;
-	tb_double_t 	val = 0;
+	tb_float_t 	rhs = 0.;
+	tb_float_t 	val = 0;
 	tb_int_t 	zeros = 0;
 	tb_int8_t 	decimals[256];
 	tb_int8_t* 	d = decimals;
@@ -589,9 +589,9 @@ tb_double_t tb_s16tof(tb_char_t const* s)
 	while (d-- > decimals) rhs = (rhs + *d) / 16;
 
 	// merge 
-	return (sign? ((tb_double_t)lhs + rhs) * -1. : ((tb_double_t)lhs + rhs));
+	return (sign? ((tb_float_t)lhs + rhs) * -1. : ((tb_float_t)lhs + rhs));
 }
-tb_double_t tb_stof(tb_char_t const* s)
+tb_float_t tb_stof(tb_char_t const* s)
 {
 	tb_assert(s);
 	if (!s) return 0;
@@ -614,9 +614,9 @@ tb_double_t tb_stof(tb_char_t const* s)
 	}
 	else return tb_s10tof(s);
 }
-tb_double_t tb_sbtof(tb_char_t const* s, tb_int_t base)
+tb_float_t tb_sbtof(tb_char_t const* s, tb_int_t base)
 {
-	typedef tb_double_t (*tb_t)(tb_char_t const*);
+	typedef tb_float_t (*tb_t)(tb_char_t const*);
 	tb_t convs[] =
 	{
 		TB_NULL
