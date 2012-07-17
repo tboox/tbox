@@ -2,12 +2,7 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = \
-		test \
-		encoding \
-		stdlib 
-
-test_CPP_FILES = test2
+NAMES = walker
 
 include $(SRC_DIR)/demo/makefile
 

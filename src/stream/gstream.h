@@ -288,6 +288,9 @@ tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, t
  */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
+/// is end?
+tb_bool_t 			tb_gstream_beof(tb_gstream_t* gst);
+
 /// clear stream cache and reset status, but not close it
 tb_void_t 			tb_gstream_clear(tb_gstream_t* gst);
 
