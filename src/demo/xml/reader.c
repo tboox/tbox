@@ -116,7 +116,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 						while (t--) tb_printf("\t");
 						tb_printf("</%s>\n", tb_xml_reader_name(reader));
 					}
-				break;
+					break;
 				case TB_XML_READER_EVENT_TEXT: 
 					{
 						tb_size_t t = d;
