@@ -34,6 +34,15 @@
 #include "../encoding/encoding.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_XML_WRITER_ELEMENTS_GROW 		(32)
+#else
+# 	define TB_XML_WRITER_ELEMENTS_GROW 		(64)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -45,6 +54,15 @@ typedef struct __tb_xml_writer_t
 
 	// is format?
 	tb_bool_t 				bformat;
+	
+	// spool
+	tb_handle_t 			spool;
+
+	// stack
+	tb_stack_t* 			elements;
+
+	// attributes
+	tb_hash_t* 				attributes;
 
 }tb_xml_writer_t;
 
@@ -52,67 +70,257 @@ typedef struct __tb_xml_writer_t
  * implementation
  */
 
-tb_handle_t tb_xml_writer_init(tb_gstream_t* gst, tb_bool_t bformat)
+tb_handle_t tb_xml_writer_init(tb_gstream_t* wstream, tb_bool_t bformat)
 {
 	// check
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(wstream, TB_NULL);
 
 	// alloc
 	tb_xml_writer_t* writer = tb_malloc0(sizeof(tb_xml_writer_t));
 	tb_assert_and_check_return_val(writer, TB_NULL);
 
 	// init
-	writer->wstream = gst;
-	writer->bformat = bformat;
+	writer->wstream 	= wstream;
+	writer->bformat 	= bformat;
+
+	// init spool
+	writer->spool 		= tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_assert_and_check_goto(writer->spool, fail);
+	
+	// init elements
+	writer->elements 	= tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(TB_FALSE, writer->spool));
+	tb_assert_and_check_goto(writer->elements, fail);
+
+	// init attributes
+	writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(TB_FALSE, writer->spool), tb_item_func_str(TB_FALSE, writer->spool));
+	tb_assert_and_check_goto(writer->attributes, fail);
 
 	// ok
 	return writer;
+
+fail:
+	if (writer) tb_xml_writer_exit(writer);
+	return TB_NULL;
 }
 tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	if (xwriter)
+	{
+		// exit attributes
+		if (xwriter->attributes) tb_hash_exit(xwriter->attributes);
+
+		// exit elements
+		if (xwriter->elements) tb_stack_exit(xwriter->elements);
+
+		// exit spool
+		if (xwriter->spool) tb_spool_exit(xwriter->spool);
+
+		// free it
+		tb_free(xwriter);
+	}
 }
 tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 {
 }
 tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* encoding)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream);
+
+	tb_gstream_printf(xwriter->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", encoding? encoding : "utf-8");
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && data);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	tb_gstream_printf(xwriter->wstream, "<![CDATA[%s]]>", data);
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_text(tb_handle_t writer, tb_char_t const* text)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && text);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	tb_gstream_printf(xwriter->wstream, "%s", text);
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_comment(tb_handle_t writer, tb_char_t const* comment)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && comment);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	tb_gstream_printf(xwriter->wstream, "<!--%s-->", comment);
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->attributes && name);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	// writ name
+	tb_gstream_printf(xwriter->wstream, "<%s", name);
+
+	// writ attributes
+	if (tb_hash_size(xwriter->attributes))
+	{
+		tb_size_t itor = tb_hash_itor_head(xwriter->attributes);
+		tb_size_t tail = tb_hash_itor_tail(xwriter->attributes);
+		for (; itor != tail; itor = tb_hash_itor_next(xwriter->attributes, itor))
+		{
+			tb_hash_item_t const* item = tb_hash_itor_const_at(xwriter->attributes, itor);
+			if (item && item->name && item->data)
+				tb_gstream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
+		}
+		tb_hash_clear(xwriter->attributes);
+	}
+
+	// writ end
+	tb_gstream_printf(xwriter->wstream, "/>");
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes && name);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	// writ name
+	tb_gstream_printf(xwriter->wstream, "<%s", name);
+
+	// writ attributes
+	if (tb_hash_size(xwriter->attributes))
+	{
+		tb_size_t itor = tb_hash_itor_head(xwriter->attributes);
+		tb_size_t tail = tb_hash_itor_tail(xwriter->attributes);
+		for (; itor != tail; itor = tb_hash_itor_next(xwriter->attributes, itor))
+		{
+			tb_hash_item_t const* item = tb_hash_itor_const_at(xwriter->attributes, itor);
+			if (item && item->name && item->data)
+				tb_gstream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
+		}
+		tb_hash_clear(xwriter->attributes);
+	}
+
+	// writ end
+	tb_gstream_printf(xwriter->wstream, ">");
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
+
+	// put name
+	tb_stack_put(xwriter->elements, name);
 }
-tb_void_t tb_xml_writer_element_leave(tb_handle_t writer, tb_char_t const* name)
+tb_void_t tb_xml_writer_element_leave(tb_handle_t writer)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream && xwriter->elements && xwriter->attributes);
+
+	// writ tabs
+	if (xwriter->bformat)
+	{
+		tb_size_t t = tb_stack_size(xwriter->elements);
+		if (t) t--;
+		while (t--) tb_gstream_printf(xwriter->wstream, "\t");
+	}
+
+	// writ name
+	tb_char_t const* name = tb_stack_top(xwriter->elements);
+	tb_assert_and_check_return(name);
+
+	tb_gstream_printf(xwriter->wstream, "</%s>", name);
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
+
+	// pop name
+	tb_stack_pop(xwriter->elements);
 }
 tb_void_t tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* name, tb_long_t value)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+
+	tb_char_t data[64] = {0};
+	tb_snprintf(data, 64, "%ld", value);
+	tb_hash_set(xwriter->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_bool(tb_handle_t writer, tb_char_t const* name, tb_bool_t value)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+
+	tb_char_t data[64] = {0};
+	tb_snprintf(data, 64, "%s", value? "true" : "false");
+	tb_hash_set(xwriter->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_cstr(tb_handle_t writer, tb_char_t const* name, tb_char_t const* value)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name && value);
+
+	tb_hash_set(xwriter->attributes, name, value);
 }
 tb_void_t tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* name, tb_char_t const* format, ...)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name && format);
+
+	tb_size_t size = 0;
+	tb_char_t data[8192] = {0};
+	tb_va_format(data, 8192, format, &size);
+	tb_hash_set(xwriter->attributes, name, data);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_void_t tb_xml_writer_attributes_float(tb_handle_t writer, tb_char_t const* name, tb_float_t value)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+
+	tb_char_t data[64] = {0};
+	tb_snprintf(data, 64, "%f", value);
+	tb_hash_set(xwriter->attributes, name, data);
 }
 tb_void_t tb_xml_writer_attributes_double(tb_handle_t writer, tb_char_t const* name, tb_double_t value)
 {
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->attributes && name);
+
+	tb_char_t data[64] = {0};
+	tb_snprintf(data, 64, "%lf", value);
+	tb_hash_set(xwriter->attributes, name, data);
 }
 #endif
 

@@ -33,6 +33,7 @@
 #include "../string/string.h"
 #include "../memory/memory.h"
 #include "../platform/platform.h"
+#include "../container/container.h"
 
 
 #endif

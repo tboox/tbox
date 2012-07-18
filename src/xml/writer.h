@@ -65,7 +65,7 @@ tb_void_t 				tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* n
 /// element: <name> ...
 tb_void_t 				tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name);
 /// element: ... </name>
-tb_void_t 				tb_xml_writer_element_leave(tb_handle_t writer, tb_char_t const* name);
+tb_void_t 				tb_xml_writer_element_leave(tb_handle_t writer);
 
 /// attributes: long
 tb_void_t 				tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* name, tb_long_t value);
