@@ -30,5 +30,6 @@
 #include "prefix.h"
 #include "node.h"
 #include "reader.h"
+#include "writer.h"
 
 #endif

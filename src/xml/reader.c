@@ -251,6 +251,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					tb_size_t encoding = TB_ENCODING_UTF8;
 					if (!tb_pstring_cstricmp(&xreader->encoding, "gb2312") || !tb_pstring_cstricmp(&xreader->encoding, "gbk")) 
 						encoding = TB_ENCODING_GB2312;
+					else tb_trace_impl("the encoding: %s is not supported", tb_pstring_cstr(&xreader->encoding));
 
 					// init transform stream
 					if (encoding != TB_ENCODING_UTF8)

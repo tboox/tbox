@@ -2,7 +2,7 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = walker
+NAMES = reader writer document xpath
 
 include $(SRC_DIR)/demo/makefile
 
