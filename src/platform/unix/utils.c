@@ -60,9 +60,9 @@ tb_void_t tb_sleep(tb_size_t s)
 // printf
 tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
-	tb_int_t ret = 0;
-	tb_char_t msg[4096];
-	tb_va_format(msg, 4096, fmt, &ret);
+	tb_long_t ret = 0;
+	tb_char_t msg[8192] = {0};
+	tb_va_format(msg, 8192, fmt, &ret);
 	if (ret >= 0) msg[ret] = '\0';
 
 #ifdef TB_CONFIG_OS_ANDROID
