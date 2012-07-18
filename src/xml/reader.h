@@ -38,14 +38,15 @@
 typedef enum __tb_xml_reader_event_t
 {
 	TB_XML_READER_EVENT_NONE 					= 0
-, 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 1
-, 	TB_XML_READER_EVENT_DOCUMENT_END 			= 2
-, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 3
-, 	TB_XML_READER_EVENT_ELEMENT_END 			= 4
-, 	TB_XML_READER_EVENT_ELEMENT_EMPTY 			= 5
-, 	TB_XML_READER_EVENT_COMMENT					= 6
-, 	TB_XML_READER_EVENT_TEXT					= 7
-, 	TB_XML_READER_EVENT_CDATA					= 8
+, 	TB_XML_READER_EVENT_DOCUMENT_TYPE 			= 1
+, 	TB_XML_READER_EVENT_DOCUMENT_BEG 			= 2
+, 	TB_XML_READER_EVENT_DOCUMENT_END 			= 3
+, 	TB_XML_READER_EVENT_ELEMENT_BEG 			= 4
+, 	TB_XML_READER_EVENT_ELEMENT_END 			= 5
+, 	TB_XML_READER_EVENT_ELEMENT_EMPTY 			= 6
+, 	TB_XML_READER_EVENT_COMMENT					= 7
+, 	TB_XML_READER_EVENT_TEXT					= 8
+, 	TB_XML_READER_EVENT_CDATA					= 9
 
 }tb_xml_reader_event_t;
 
@@ -62,6 +63,9 @@ tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
 
 /// next
 tb_size_t 				tb_xml_reader_next(tb_handle_t reader);
+
+/// stream
+tb_gstream_t* 			tb_xml_reader_stream(tb_handle_t reader);
 
 /// goto: /root/node/item
 tb_bool_t 				tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path);

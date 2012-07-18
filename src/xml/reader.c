@@ -110,13 +110,13 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 	tb_char_t* pc = TB_NULL;
 	while (tb_gstream_bneed(reader->rstream, &pc, 1) && pc)
 	{
-		// append text
-		if (*pc != '<') 
+		// is end? </ ..>
+		if (pc[0] == '<') return tb_pstring_cstr(&reader->text);
+		else
 		{
 			tb_pstring_chrcat(&reader->text, *pc);
 			if (!tb_gstream_bskip(reader->rstream, 1)) return TB_NULL;
 		}
-		else return tb_pstring_cstr(&reader->text);
 	}
 	return TB_NULL;
 }
@@ -196,6 +196,13 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
 		tb_free(xreader);
 	}
 }
+tb_gstream_t* tb_xml_reader_stream(tb_handle_t reader)
+{
+	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
+	tb_assert_and_check_return_val(xreader, TB_NULL);
+
+	return xreader->rstream;
+}
 tb_size_t tb_xml_reader_next(tb_handle_t reader)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
@@ -220,15 +227,17 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 
 			// is document begin: <?xml version="..." encoding=".." ?>
 			tb_size_t size = tb_pstring_size(&xreader->element);
-			if (size > 4 
-				&& element[0] == '?'
-				&& element[1] == 'x'
-				&& element[2] == 'm'
-				&& element[3] == 'l')
+			if (size > 4 && !tb_strnicmp(element, "?xml", 4))
 			{
 				// update event
 				xreader->event = TB_XML_READER_EVENT_DOCUMENT_BEG;
 
+			}
+			// is document type: <!DOCTYPE ... >
+			else if (size > 8 && !tb_strnicmp(element, "!DOCTYPE", 8))
+			{
+				// update event
+				xreader->event = TB_XML_READER_EVENT_DOCUMENT_TYPE;
 			}
 			// is element end: </name>
 			else if (size > 1 && element[0] == '/')
@@ -237,10 +246,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				xreader->event = TB_XML_READER_EVENT_ELEMENT_END;
 			}
 			// is comment: <!-- text -->
-			else if (size >= 3
-				&& element[0] == '!'
-				&& element[1] == '-' 
-				&& element[2] == '-')
+			else if (size >= 3 && !tb_strncmp(element, "!--", 3))
 			{
 				// no comment end?
 				if (element[size - 2] != '-' || element[size - 1] != '-')
@@ -271,15 +277,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				else xreader->event = TB_XML_READER_EVENT_COMMENT;
 			}
 			// is cdata: <![CDATA[ text ]]>
-			else if (size >= 8
-				&& element[0] == '!'
-				&& element[1] == '[' 
-				&& element[2] == 'C' 
-				&& element[3] == 'D'
-				&& element[4] == 'A' 
-				&& element[5] == 'T' 
-				&& element[6] == 'A'
-				&& element[7] == '[')
+			else if (size >= 8 && !tb_strnicmp(element, "![CDATA[", 8))
 			{
 				if (element[size - 2] != ']' || element[size - 1] != ']')
 				{
@@ -322,7 +320,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 			}
 
 			// trace
-	//		tb_trace_impl("<%s>", element);
+//			tb_trace_impl("<%s>", element);
 		}
 		// is text: <> text </>
 		else if (*pc)
@@ -333,7 +331,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				xreader->event = TB_XML_READER_EVENT_TEXT;
 
 			// trace
-	//		tb_trace_impl("%s", text);
+//			tb_trace_impl("%s", text);
 		}
 	}
 
@@ -400,6 +398,7 @@ tb_char_t const* tb_xml_reader_name(tb_handle_t reader)
 	// ok?
 	return p > b? tb_pstring_cstrncpy(&xreader->name, b, p - b) : TB_NULL;
 }
+#if 0
 tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
@@ -421,7 +420,7 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 	for (; p < e && *p; p++)
 	{
 		tb_char_t ch = *p;
-		if (tb_isspace(ch) || ch == '=' || p == e - 1)
+		if (ch == '=' || p == e - 1)
 		{
 			// node
 			tb_xml_node_t* prev = n > 0? (tb_xml_node_t*)&xreader->attributes[n - 1] : TB_NULL;
@@ -443,7 +442,7 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 			tb_pstring_clear(&s);
 			if (ch == '=') b = 0;
 		}
-		else if (ch != '\"' && ch != '\'') tb_pstring_chrcat(&s, ch);
+		else tb_pstring_chrcat(&s, ch);
 	}
 
 	// exit string
@@ -452,4 +451,66 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 	// ok?
 	return n? (tb_xml_node_t*)&xreader->attributes[0] : TB_NULL;
 }
+#else
+tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
+{
+	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
+	tb_assert_and_check_return_val(xreader && ( xreader->event == TB_XML_READER_EVENT_ELEMENT_BEG
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_END
+											|| 	xreader->event == TB_XML_READER_EVENT_ELEMENT_EMPTY), TB_NULL);
 
+	// init
+	tb_char_t const* p = tb_pstring_cstr(&xreader->element);
+	tb_char_t const* e = p + tb_pstring_size(&xreader->element);
+
+	// init name & data
+	tb_pstring_t name;
+	tb_pstring_t data;
+	tb_pstring_init(&name);
+	tb_pstring_init(&data);
+
+	// parse attributes
+	tb_size_t n = 0;
+	while (p < e)
+	{
+		// parse name
+		tb_pstring_clear(&name);
+		for (; p < e && *p != '='; p++) if (!tb_isspace(*p)) tb_pstring_chrcat(&name, *p);
+		if (*p != '=') break;
+
+		// parse data
+		tb_pstring_clear(&data);
+		for (p++; p < e && (*p != '\'' && *p != '\"'); p++) ;
+		if (*p != '\'' && *p != '\"') break;
+		for (p++; p < e && (*p != '\'' && *p != '\"'); p++) tb_pstring_chrcat(&data, *p);
+		if (*p != '\'' && *p != '\"') break;
+		p++;
+
+		// append node
+		if (tb_pstring_cstr(&name) && tb_pstring_cstr(&data))
+		{
+			// node
+			tb_xml_node_t* prev = n > 0? (tb_xml_node_t*)&xreader->attributes[n - 1] : TB_NULL;
+			tb_xml_node_t* node = (tb_xml_node_t*)&xreader->attributes[n];
+
+			// init node
+			tb_pstring_strcpy(&node->name, &name);
+			tb_pstring_strcpy(&node->data, &data);
+
+			// append node
+			if (prev) prev->next = node;
+			node->next = TB_NULL;
+
+			// next
+			n++;
+		}
+	}
+
+	// exit name & data
+	tb_pstring_exit(&name);
+	tb_pstring_exit(&data);
+
+	// ok?
+	return n? (tb_xml_node_t*)&xreader->attributes[0] : TB_NULL;
+}
+#endif
