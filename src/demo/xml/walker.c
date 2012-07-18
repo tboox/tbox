@@ -25,17 +25,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_size_t e = TB_XML_READER_EVENT_NONE;
 			while (e = tb_xml_reader_next(reader))
 			{
-#if 1
 				switch (e)
 				{
-				case TB_XML_READER_EVENT_DOCUMENT_BEG: 
+				case TB_XML_READER_EVENT_DOCUMENT: 
 					{
-					//	tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n"
-					//		, tb_xml_reader_version(reader), tb_xml_reader_encoding(reader));
-					}
-					break;
-				case TB_XML_READER_EVENT_DOCUMENT_END: 
-					{
+						tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n"
+							, tb_xml_reader_version(reader), tb_xml_reader_encoding(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_DOCUMENT_TYPE: 
@@ -149,7 +144,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				default:
 					break;
 				}
-#endif
 			}
 
 			// exit reader
