@@ -69,6 +69,7 @@ tbox_C_FILES 			+= \
 						utils/base64 \
 						xml/node \
 						xml/reader \
+						xml/writer \
 						aio/aioo \
 						aio/aipp \
 						aio/aicp \
