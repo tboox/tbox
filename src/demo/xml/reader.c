@@ -20,10 +20,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_handle_t reader = tb_xml_reader_init(gst);
 		if (reader)
 		{
+			// goto
+			tb_bool_t ok = TB_TRUE;
+			if (argv[2]) ok = tb_xml_reader_goto(reader, argv[2]);
+
 			// walk
-			tb_size_t d = 0;
 			tb_size_t e = TB_XML_READER_EVENT_NONE;
-			while (e = tb_xml_reader_next(reader))
+			while (ok && (e = tb_xml_reader_next(reader)))
 			{
 				switch (e)
 				{
@@ -40,9 +43,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
 					{
-						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_char_t const* 		name = tb_xml_reader_element(reader);
 						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
-						tb_size_t 				t = d;
+						tb_size_t 				t = tb_xml_reader_level(reader);
 						while (t--) tb_printf("\t");
 						if (!attr) tb_printf("<%s/>\n", name);
 						else
@@ -56,9 +59,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_ELEMENT_BEG: 
 					{
-						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_char_t const* 		name = tb_xml_reader_element(reader);
 						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);	
-						tb_size_t 				t = d;
+						tb_size_t 				t = tb_xml_reader_level(reader) - 1;
 						while (t--) tb_printf("\t");
 						if (!attr) tb_printf("<%s>\n", name);
 						else
@@ -68,58 +71,18 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 								tb_printf(" %s = \"%s\"", tb_pstring_cstr(&attr->name), tb_pstring_cstr(&attr->data));
 							tb_printf(">\n");
 						}
-						d++;
-						
-						// for html
-						if (!tb_stricmp(name, "hr")) d--;
-						if (!tb_stricmp(name, "br")) d--;
-						if (!tb_stricmp(name, "img")) d--;
-						if (!tb_stricmp(name, "meta")) d--;
-						if (!tb_stricmp(name, "base")) d--;
-						if (!tb_stricmp(name, "link")) d--;
-						if (!tb_stricmp(name, "area")) d--;
-						if (!tb_stricmp(name, "input")) d--;
-						if (!tb_stricmp(name, "param")) d--;
-						if (!tb_stricmp(name, "script") || !tb_stricmp(name, "style"))
-						{
-							tb_gstream_t* gst = tb_xml_reader_stream(reader);
-							if (gst)
-							{
-								tb_pstring_t s;
-								tb_pstring_init(&s);
-								tb_char_t* pc = TB_NULL;
-								while (tb_gstream_bneed(gst, &pc, 9) && pc)
-								{
-									// is end? </ ..>
-									if (!tb_strncmp(pc, "</script>", 9) || !tb_strncmp(pc, "</style>", 8)) break;
-									else
-									{
-										tb_pstring_chrcat(&s, *pc);
-										if (!tb_gstream_bskip(gst, 1)) break;
-									}
-								}
-								if (tb_pstring_cstr(&s))
-								{
-									tb_size_t t = d;
-									while (t--) tb_printf("\t");
-									tb_printf("%s", tb_pstring_cstr(&s));
-									tb_printf("\n");
-								}
-								tb_pstring_exit(&s);
-							}
-						}
 					}
 					break;
 				case TB_XML_READER_EVENT_ELEMENT_END: 
 					{
-						tb_size_t t = --d;
+						tb_size_t t = tb_xml_reader_level(reader);
 						while (t--) tb_printf("\t");
-						tb_printf("</%s>\n", tb_xml_reader_name(reader));
+						tb_printf("</%s>\n", tb_xml_reader_element(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_TEXT: 
 					{
-						tb_size_t t = d;
+						tb_size_t t = tb_xml_reader_level(reader);
 						while (t--) tb_printf("\t");
 						tb_printf("%s", tb_xml_reader_text(reader));
 						tb_printf("\n");
@@ -127,7 +90,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_CDATA: 
 					{
-						tb_size_t t = d;
+						tb_size_t t = tb_xml_reader_level(reader);
 						while (t--) tb_printf("\t");
 						tb_printf("<![CDATA[%s]]>", tb_xml_reader_cdata(reader));
 						tb_printf("\n");
@@ -135,7 +98,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_COMMENT: 
 					{
-						tb_size_t t = d;
+						tb_size_t t = tb_xml_reader_level(reader);
 						while (t--) tb_printf("\t");
 						tb_printf("<!--%s-->", tb_xml_reader_comment(reader));
 						tb_printf("\n");

@@ -65,6 +65,9 @@ tb_handle_t 			tb_xml_reader_init(tb_gstream_t* gst);
 /// exit
 tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
 
+/// clear, @note the stream will be reseted
+tb_void_t 				tb_xml_reader_clear(tb_handle_t reader);
+
 /*!next for iterator
  *
  * @code
@@ -96,7 +99,7 @@ tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
  *					break;
  *				case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
  *					{
- *						tb_char_t const* 		name = tb_xml_reader_name(reader);
+ *						tb_char_t const* 		name = tb_xml_reader_element(reader);
  *						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
  *						if (!attr) tb_printf("<%s/>\n", name);
  *						else
@@ -110,7 +113,7 @@ tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
  *					break;
  *				case TB_XML_READER_EVENT_ELEMENT_BEG: 
  *					{
- *						tb_char_t const* 		name = tb_xml_reader_name(reader);
+ *						tb_char_t const* 		name = tb_xml_reader_element(reader);
  *						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
  *						if (!attr) tb_printf("<%s>\n", name);
  *						else
@@ -124,7 +127,7 @@ tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
  *					break;
  *				case TB_XML_READER_EVENT_ELEMENT_END: 
  *					{
- *						tb_printf("</%s>\n", tb_xml_reader_name(reader));
+ *						tb_printf("</%s>\n", tb_xml_reader_element(reader));
  *					}
  *				break;
  *				case TB_XML_READER_EVENT_TEXT: 
@@ -161,7 +164,17 @@ tb_size_t 				tb_xml_reader_next(tb_handle_t reader);
 /// stream
 tb_gstream_t* 			tb_xml_reader_stream(tb_handle_t reader);
 
-/// goto: /root/node/item
+/// level
+tb_size_t 				tb_xml_reader_level(tb_handle_t reader);
+
+/*!goto: /root/node/item
+ *
+ * @param reader 	the reader handle
+ * @param path 		the xml path
+ * @return 			ok: TB_TRUE
+ *
+ * @note the stream will be reseted
+ */
 tb_bool_t 				tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path);
 
 /// load document or node
@@ -173,8 +186,8 @@ tb_char_t const* 		tb_xml_reader_version(tb_handle_t reader);
 /// encoding, default: utf-8
 tb_char_t const* 		tb_xml_reader_encoding(tb_handle_t reader);
 
-/// name
-tb_char_t const* 		tb_xml_reader_name(tb_handle_t reader);
+/// element
+tb_char_t const* 		tb_xml_reader_element(tb_handle_t reader);
 
 /// text
 tb_char_t const* 		tb_xml_reader_text(tb_handle_t reader);

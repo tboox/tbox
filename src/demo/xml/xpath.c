@@ -40,7 +40,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
 					{
-						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_char_t const* 		name = tb_xml_reader_element(reader);
 						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);
 						tb_size_t 				t = d;
 						while (t--) tb_printf("\t");
@@ -56,7 +56,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					break;
 				case TB_XML_READER_EVENT_ELEMENT_BEG: 
 					{
-						tb_char_t const* 		name = tb_xml_reader_name(reader);
+						tb_char_t const* 		name = tb_xml_reader_element(reader);
 						tb_xml_node_t const* 	attr = tb_xml_reader_attributes(reader);	
 						tb_size_t 				t = d;
 						while (t--) tb_printf("\t");
@@ -114,7 +114,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					{
 						tb_size_t t = --d;
 						while (t--) tb_printf("\t");
-						tb_printf("</%s>\n", tb_xml_reader_name(reader));
+						tb_printf("</%s>\n", tb_xml_reader_element(reader));
 					}
 				break;
 				case TB_XML_READER_EVENT_TEXT: 

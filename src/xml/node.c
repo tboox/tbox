@@ -147,10 +147,10 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		}
 
 		// free childs
-		if (node->childs)
+		if (node->chead)
 		{
 			tb_xml_node_t* save = TB_NULL;
-			tb_xml_node_t* next = node->childs;
+			tb_xml_node_t* next = node->chead;
 			while (next)
 			{
 				// save
@@ -165,10 +165,10 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		}
 
 		// free attributes
-		if (node->attributes)
+		if (node->ahead)
 		{
 			tb_xml_node_t* save = TB_NULL;
-			tb_xml_node_t* next = node->attributes;
+			tb_xml_node_t* next = node->ahead;
 			while (next)
 			{
 				// save
@@ -184,6 +184,117 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 
 		// free it
 		tb_free(node);
+	}
+}
+tb_void_t tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next)
+{
+	// check
+	tb_assert_and_check_return(node && next);
+
+	// init
+	next->parent = node->parent;
+	next->next = node->next;
+
+	// next
+	node->next = next;
+}
+tb_void_t tb_xml_node_remove_next(tb_xml_node_t* node)
+{
+	// check
+	tb_assert_and_check_return(node);
+
+	// next
+	tb_xml_node_t* next = node->next;
+
+	// save
+	tb_xml_node_t* save = next? next->next : TB_NULL;
+
+	// exit
+	if (next) tb_xml_node_exit(next);
+
+	// next
+	node->next = save;
+}
+tb_void_t tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child)
+{
+	// check
+	tb_assert_and_check_return(node && child);
+
+	// init
+	child->parent = node;
+
+	// append
+	if (node->chead) 
+	{
+		child->next = node->chead;
+		node->chead = child;
+	}
+	else
+	{
+		tb_assert(!node->ctail);
+		node->ctail = node->chead = child;
+	}
+}
+tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
+{
+	// check
+	tb_assert_and_check_return(node && child);
+
+	// init
+	child->parent = node;
+	child->next = TB_NULL;
+
+	// append
+	if (node->ctail) 
+	{
+		node->ctail->next = child;
+		node->ctail = child;
+	}
+	else
+	{
+		tb_assert(!node->chead);
+		node->ctail = node->chead = child;
+	}
+}
+tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute)
+{
+	// check
+	tb_assert_and_check_return(node && attribute);
+
+	// init
+	attribute->parent = node;
+
+	// append
+	if (node->ahead) 
+	{
+		attribute->next = node->ahead;
+		node->ahead = attribute;
+	}
+	else
+	{
+		tb_assert(!node->atail);
+		node->atail = node->ahead = attribute;
+	}
+}
+tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute)
+{
+	// check
+	tb_assert_and_check_return(node && attribute);
+
+	// init
+	attribute->parent = node;
+	attribute->next = TB_NULL;
+
+	// append
+	if (node->atail) 
+	{
+		node->atail->next = attribute;
+		node->atail = attribute;
+	}
+	else
+	{
+		tb_assert(!node->ahead);
+		node->atail = node->ahead = attribute;
 	}
 }
 

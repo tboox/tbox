@@ -71,14 +71,16 @@ typedef struct __tb_xml_node_t
 	// the next
 	struct __tb_xml_node_t* 	next;
 
-	// the parent
-	struct __tb_xml_node_t* 	parent;
-
 	// the childs
-	struct __tb_xml_node_t* 	childs;
+	struct __tb_xml_node_t* 	chead;
+	struct __tb_xml_node_t* 	ctail;
 
 	// the attributes
-	struct __tb_xml_node_t* 	attributes;
+	struct __tb_xml_node_t* 	ahead;
+	struct __tb_xml_node_t* 	atail;
+
+	// the parent
+	struct __tb_xml_node_t* 	parent;
 
 }tb_xml_node_t;
 
@@ -167,6 +169,24 @@ tb_xml_node_t* 		tb_xml_node_init_document(tb_char_t const* version, tb_char_t c
 
 /// exit node 
 tb_void_t 			tb_xml_node_exit(tb_xml_node_t* node);
+
+/// insert the next node
+tb_void_t 			tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next);
+
+/// remove the next node
+tb_void_t 			tb_xml_node_remove_next(tb_xml_node_t* node);
+
+/// append the node to the chead
+tb_void_t 			tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child);
+
+/// append the node to the ctail
+tb_void_t 			tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child);
+
+/// append the node to the ahead
+tb_void_t 			tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute);
+
+/// append the node to the atail
+tb_void_t 			tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute);
 
 
 #endif
