@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"xml"
+//#define TB_TRACE_IMPL_TAG 		"xml"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -122,6 +122,75 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 }
 tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 {
+	tb_assert_and_check_return(writer && node);
+	switch (node->type)
+	{
+	case TB_XML_NODE_TYPE_DOCUMENT:
+		{
+			// document
+			tb_xml_document_t* document = (tb_xml_document_t*)node;
+			tb_xml_writer_document(writer, tb_pstring_cstr(&document->version), tb_pstring_cstr(&document->encoding));
+
+			// childs
+			tb_xml_node_t* next = node->chead;
+			while (next)
+			{
+				// save
+				tb_xml_writer_save(writer, next);
+
+				// next
+				next = next->next;
+			}
+		}
+		break;
+	case TB_XML_NODE_TYPE_ELEMENT:
+		{
+			// attributes
+			tb_xml_node_t* attr = node->ahead;
+			while (attr)
+			{
+				// save
+				tb_xml_writer_attributes_cstr(writer, tb_pstring_cstr(&attr->name), tb_pstring_cstr(&attr->data));
+
+				// next
+				attr = attr->next;
+			}
+
+			// childs
+			tb_xml_node_t* next = node->chead;
+			if (next)
+			{
+				// enter
+				tb_xml_writer_element_enter(writer, tb_pstring_cstr(&node->name));
+
+				// init
+				while (next)
+				{
+					// save
+					tb_xml_writer_save(writer, next);
+
+					// next
+					next = next->next;
+				}
+
+				// leave
+				tb_xml_writer_element_leave(writer);
+			}
+			else tb_xml_writer_element_empty(writer, tb_pstring_cstr(&node->name));
+		}
+		break;
+	case TB_XML_NODE_TYPE_COMMENT:
+		tb_xml_writer_comment(writer, tb_pstring_cstr(&node->data));
+		break;
+	case TB_XML_NODE_TYPE_CDATA:
+		tb_xml_writer_cdata(writer, tb_pstring_cstr(&node->data));
+		break;
+	case TB_XML_NODE_TYPE_TEXT:
+		tb_xml_writer_text(writer, tb_pstring_cstr(&node->data));
+		break;
+	default:
+		break;
+	}
 }
 tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* encoding)
 {
