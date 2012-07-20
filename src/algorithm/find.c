@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		find.c
+ * @ingroup 	algorithm
  *
  */
 

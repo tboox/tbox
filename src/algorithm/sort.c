@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sort.c
+ * @ingroup 	algorithm
  *
  */
 

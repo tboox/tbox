@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		algorithm.h
+ * @defgroup 	algorithm
  *
  */
 #ifndef TB_ALGORITHM_H

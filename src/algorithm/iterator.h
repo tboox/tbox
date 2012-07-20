@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		iterator.h
+ * @ingroup 	algorithm
  *
  */
 #ifndef TB_ALGORITHM_ITERATOR_H
