@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		iterator.c
+ * @ingroup 	algorithm
  *
  */
 

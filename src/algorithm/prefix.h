@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		prefix.h
+ * @ingroup 	algorithm
  *
  */
 #ifndef TB_ALGORITHM_PREFIX_H

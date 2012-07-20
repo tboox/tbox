@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		find.h
+ * @ingroup 	algorithm
  *
  */
 #ifndef TB_ALGORITHM_FIND_H

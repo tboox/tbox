@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		sort.h
+ * @ingroup 	algorithm
  *
  */
 #ifndef TB_ALGORITHM_SORT_H
