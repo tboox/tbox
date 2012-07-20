@@ -27,6 +27,9 @@ tbox_C_FILES 			+= \
 						string/pstring \
 						string/sstring \
 						string/rstring \
+						algorithm/find \
+						algorithm/sort \
+						algorithm/iterator \
 						container/item \
 						container/hash \
 						container/queue \
@@ -222,6 +225,11 @@ INC_FILES 				= \
 						string/pstring.h \
 						string/sstring.h \
 						string/rstring.h \
+						algorithm/prefix.h \
+						algorithm/algorithm.h \
+						algorithm/find.h \
+						algorithm/sort.h \
+						algorithm/iterator.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
@@ -367,6 +375,7 @@ SUB_PROS 				= \
 					  	demo/stream \
 					  	demo/network \
 					  	demo/platform \
+					  	demo/algorithm \
 					  	demo/container
 
 
