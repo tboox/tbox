@@ -34,14 +34,17 @@
  * interfaces
  */
 
-/// the adaptive finder
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+/// the finder
+tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
 
-/// the order finder
-tb_size_t tb_order_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+// the finder for all
+tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t item);
 
-/// the binary finder
-tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+/// the binary finder for ascending
+tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
+
+/// the binary finder for all
+tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t item);
 
 
 #endif

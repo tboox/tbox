@@ -34,14 +34,36 @@
  * interfaces
  */
 
-/// the adaptive sorter
-tb_size_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+/// the sorter
+tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail);
 
-/// the bubble sorter
-tb_size_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+/// the sorter for all
+tb_void_t tb_sort_all(tb_iterator_t* iterator);
 
-/// the quick sorter
-tb_size_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
+/// the bubble sorter, O(n^2)
+tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail);
+
+/// the bubble sorter for all
+tb_void_t tb_bubble_sort_all(tb_iterator_t* iterator);
+
+/// the insert sorter, O(n^2)
+tb_void_t tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail);
+
+/// the insert sorter for all
+tb_void_t tb_insert_sort_all(tb_iterator_t* iterator);
+
+/// the quick sorter, O(nlog(n))
+tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail);
+
+/// the quick sorter for all
+tb_void_t tb_quick_sort_all(tb_iterator_t* iterator);
+
+/// the heap sorter, O(nlog(n))
+tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail);
+
+/// the heap sorter for all
+tb_void_t tb_heap_sort_all(tb_iterator_t* iterator);
+
 
 
 #endif

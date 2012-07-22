@@ -31,15 +31,43 @@
  * implementation
  */
 
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
-	return 0;
+	// check
+	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_FORWARD, tail);
+
+	// find
+	tb_size_t itor;
+	for (itor = head; itor != tail; itor = tb_iterator_next(iterator, itor)) 
+		if (!tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item)) break;
+
+	// ok?
+	return itor;
 }
-tb_size_t tb_order_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t item)
 {
-	return 0;
+	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
 }
-tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
+tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
-	return 0;
+	// check
+	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_RACCESS, tail);
+
+	// find
+	tb_size_t l = head;
+	tb_size_t r = tail;
+	tb_size_t m = tb_iterator_midd(iterator, l, r);
+	while (tb_iterator_diff(iterator, r, l) > 1)
+	{
+		if (tb_iterator_comp(iterator, item, tb_iterator_item(iterator, m)) < 0) r = m;
+		else l = m;
+		m = tb_iterator_midd(iterator, l, r);
+	}
+
+	// ok?
+	return m;
+}
+tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t item)
+{
+	return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
 }
