@@ -32,9 +32,10 @@ extern "C" {
  * includes
  */
 #include "prefix.h"
-#include "platform/platform.h"
+#include "algorithm/algorithm.h"
 #include "container/container.h"
 #include "encoding/encoding.h"
+#include "platform/platform.h"
 #include "network/network.h"
 #include "memory/memory.h"
 #include "stream/stream.h"
