@@ -85,14 +85,14 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	for (i = (hole - 1) / 2; hole > top && (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), item) < 0); i = (hole - 1) / 2)
 	{	
 		// copy item: parent => hole
-		tb_iterator_copy(iterator, tb_iterator_item(iterator, head + i), item);
+		tb_iterator_copy(iterator, head + i, item);
 
 		// move node: hole => parent
 		hole = i;
 	}
 
 	// copy item
-	tb_iterator_copy(iterator, tb_iterator_item(iterator, head + hole), item);
+	tb_iterator_copy(iterator, head + hole, item);
 }
 /*!adjust heap
  *
@@ -149,7 +149,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), tb_iterator_item(iterator, head + i - 1)) < 0) --i;
 
 		// larger child => hole
-		tb_iterator_copy(iterator, tb_iterator_item(iterator, head + hole), tb_iterator_item(iterator, head + i));
+		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + i));
 
 		// move the hole down to it's larger child node 
 		hole = i;
@@ -158,7 +158,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 	if (i == bottom)
 	{	
 		// bottom child => hole
-		tb_iterator_copy(iterator, tb_iterator_item(iterator, head + hole), tb_iterator_item(iterator, head + bottom - 1));
+		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + bottom - 1));
 
 		// move hole down to bottom
 		hole = bottom - 1;
@@ -222,7 +222,7 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t h
 	tb_cpointer_t item = tb_iterator_save(iterator, tail - 1);
 
 	// top => last
-	tb_iterator_copy(iterator, tb_iterator_item(iterator, tail - 1), tb_iterator_item(iterator, head));
+	tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
 
 	// reheap it
 	tb_heap_adjust(iterator, head, 0, tail - head - 1, item);
@@ -256,18 +256,14 @@ tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	// init
 	tb_size_t 		itor1;
 	tb_size_t 		itor2;
-	tb_pointer_t 	item1 = TB_NULL;
-	tb_pointer_t 	item2 = TB_NULL;
 
 	// sort
 	for (itor1 = head; itor1 != tail; itor1 = tb_iterator_next(iterator, itor1))
 	{
 		for (itor2 = itor1, itor2 = tb_iterator_next(iterator, itor2); itor2 != tail; itor2 = tb_iterator_next(iterator, itor2))
 		{
-			item1 = tb_iterator_item(iterator, itor1);
-			item2 = tb_iterator_item(iterator, itor2);
-			if (tb_iterator_comp(iterator, item2, item1) < 0)
-				tb_iterator_swap(iterator, item2, item1);
+			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, itor2), tb_iterator_item(iterator, itor1)) < 0)
+				tb_iterator_swap(iterator, itor2, itor1);
 		}
 	}
 }
@@ -325,10 +321,10 @@ tb_void_t tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 
 		// look for hole and move elements[hole, next - 1] => [hole + 1, next]
 		for (last = next; last != head && (last = tb_iterator_prev(iterator, last), tb_iterator_comp(iterator, item, tb_iterator_item(iterator, last)) < 0); next = last)
-				tb_iterator_copy(iterator, tb_iterator_item(iterator, next), tb_iterator_item(iterator, last));
+				tb_iterator_copy(iterator, next, tb_iterator_item(iterator, last));
 
 		// item => hole
-		tb_iterator_copy(iterator, tb_iterator_item(iterator, next), item);
+		tb_iterator_copy(iterator, next, item);
 	}
 }
 tb_void_t tb_insert_sort_all(tb_iterator_t* iterator)
@@ -354,7 +350,7 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, r), key) < 0) break;
 		if (r != l) 
 		{
-			tb_iterator_copy(iterator, tb_iterator_item(iterator, l), tb_iterator_item(iterator, r));
+			tb_iterator_copy(iterator, l, tb_iterator_item(iterator, r));
 			l++;
 		}
 
@@ -363,13 +359,13 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, l), key) > 0) break;
 		if (l != r) 
 		{
-			tb_iterator_copy(iterator, tb_iterator_item(iterator, r), tb_iterator_item(iterator, l));
+			tb_iterator_copy(iterator, r, tb_iterator_item(iterator, l));
 			r--;
 		}
 	}
 
 	// key => hole
-	tb_iterator_copy(iterator, tb_iterator_item(iterator, l), key);
+	tb_iterator_copy(iterator, l, key);
 
 	// sort [head, hole - 1]
 	tb_quick_sort(iterator, head, l);
