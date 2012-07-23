@@ -55,6 +55,9 @@ typedef struct __tb_iterator_t
 	/// the iterator size
 	tb_pointer_t 			size;
 
+	/// the iterator temp
+	tb_pointer_t 			temp;
+
 	/// the iterator priv
 	tb_pointer_t 			priv;
 
@@ -125,24 +128,13 @@ tb_long_t 		tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpo
 tb_iterator_t 	tb_iterator_int(tb_long_t* data, tb_size_t size);
 
 /// the string iterator
-tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size);
+tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
 
 /// the pointer iterator
 tb_iterator_t 	tb_iterator_ptr(tb_pointer_t* data, tb_size_t size);
 
 /// the memory iterator
-tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
+tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
 
-/// the integer reverse iterator
-tb_iterator_t 	tb_riterator_int(tb_long_t* data, tb_size_t size);
-
-/// the string reverse iterator
-tb_iterator_t 	tb_riterator_str(tb_char_t** data, tb_size_t size);
-
-/// the pointer reverse iterator
-tb_iterator_t 	tb_riterator_ptr(tb_pointer_t* data, tb_size_t size);
-
-/// the memory reverse iterator
-tb_iterator_t 	tb_riterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
 
 #endif
