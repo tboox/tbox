@@ -48,16 +48,6 @@ static tb_size_t tb_iterator_int_prev(tb_iterator_t* iterator, tb_size_t itor)
 	tb_assert_return_val(itor, 0);
 	return itor - 1;
 }
-static tb_size_t tb_iterator_int_midd(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
-{
-	tb_assert_return(ltor < iterator->size && rtor < iterator->size);
-	return (ltor + rtor) >> 1;
-}
-static tb_long_t tb_iterator_int_diff(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
-{
-	tb_assert_return(ltor < iterator->size && rtor < iterator->size);
-	return ((tb_long_t)ltor - (tb_long_t)rtor);
-}
 static tb_pointer_t tb_iterator_int_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(itor < iterator->size, TB_NULL);
@@ -106,16 +96,6 @@ tb_size_t tb_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 	tb_assert_return_val(iterator && iterator->next, 0);
 	return iterator->next(iterator, itor);
 }
-tb_size_t tb_iterator_midd(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
-{
-	tb_assert_return_val(iterator && iterator->midd, 0);
-	return iterator->midd(iterator, ltor, rtor);
-}
-tb_long_t tb_iterator_diff(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
-{
-	tb_assert_return_val(iterator && iterator->diff, 0);
-	return iterator->diff(iterator, ltor, rtor);
-}
 tb_pointer_t tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(iterator && iterator->item, TB_NULL);
@@ -157,8 +137,6 @@ tb_iterator_t tb_iterator_int(tb_long_t* data, tb_size_t size)
 	itor.tail = tb_iterator_int_tail;
 	itor.prev = tb_iterator_int_prev;
 	itor.next = tb_iterator_int_next;
-	itor.midd = tb_iterator_int_midd;
-	itor.diff = tb_iterator_int_diff;
 	itor.item = tb_iterator_int_item;
 	itor.save = tb_iterator_int_save;
 	itor.swap = tb_iterator_int_swap;

@@ -73,12 +73,6 @@ typedef struct __tb_iterator_t
 	/// the iterator next
 	tb_size_t 				(*next)(struct __tb_iterator_t* iterator, tb_size_t itor);
 
-	/// the iterator midd
-	tb_size_t 				(*midd)(struct __tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
-
-	/// the iterator diff
-	tb_long_t 				(*diff)(struct __tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
-
 	/// the iterator item
 	tb_pointer_t 			(*item)(struct __tb_iterator_t* iterator, tb_size_t itor);
 
@@ -111,12 +105,6 @@ tb_size_t 		tb_iterator_prev(tb_iterator_t* iterator, tb_size_t itor);
 
 /// the iterator next
 tb_size_t 		tb_iterator_next(tb_iterator_t* iterator, tb_size_t itor);
-
-/// the iterator midd
-tb_size_t 		tb_iterator_midd(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
-
-/// the iterator diff
-tb_long_t 		tb_iterator_diff(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
 
 /// the iterator item
 tb_pointer_t 	tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor);
