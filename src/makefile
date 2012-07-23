@@ -29,7 +29,6 @@ tbox_C_FILES 			+= \
 						string/rstring \
 						algorithm/find \
 						algorithm/sort \
-						algorithm/iterator \
 						container/item \
 						container/hash \
 						container/queue \
@@ -37,6 +36,7 @@ tbox_C_FILES 			+= \
 						container/slist \
 						container/dlist \
 						container/vector \
+						container/iterator \
 						network/dns \
 						network/url \
 						network/ipv4 \
@@ -229,7 +229,6 @@ INC_FILES 				= \
 						algorithm/algorithm.h \
 						algorithm/find.h \
 						algorithm/sort.h \
-						algorithm/iterator.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
@@ -239,6 +238,7 @@ INC_FILES 				= \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \
+						algorithm/iterator.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \
