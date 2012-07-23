@@ -52,34 +52,37 @@ static tb_size_t tb_iterator_int_prev(tb_iterator_t* iterator, tb_size_t itor)
 static tb_pointer_t tb_iterator_int_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(itor < iterator->size, TB_NULL);
-	return &(((tb_long_t*)iterator->data)[itor]);
+	return (tb_pointer_t)((tb_long_t*)iterator->data)[itor];
 }
 static tb_pointer_t tb_iterator_int_save(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(itor < iterator->size, TB_NULL);
 	iterator->temp = (tb_pointer_t)((tb_long_t*)iterator->data)[itor];
-	return (tb_pointer_t)&iterator->temp;
+	return iterator->temp;
 }
-static tb_void_t tb_iterator_int_swap(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_void_t tb_iterator_int_swap(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
 {
-	tb_long_t item = *((tb_long_t*)ltem);
-	*((tb_long_t*)ltem) = *((tb_long_t*)rtem);
-	*((tb_long_t*)rtem) = item;
+	tb_assert_return(ltor < iterator->size && rtor < iterator->size);
+	tb_long_t item = ((tb_long_t*)iterator->data)[ltor];
+	((tb_long_t*)iterator->data)[ltor] = ((tb_long_t*)iterator->data)[rtor];
+	((tb_long_t*)iterator->data)[rtor] = item;
 }
-static tb_void_t tb_iterator_int_copy(tb_iterator_t* iterator, tb_cpointer_t dtem, tb_cpointer_t stem)
+static tb_void_t tb_iterator_int_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	*((tb_long_t*)dtem) = *((tb_long_t*)stem);
+	tb_assert_return(itor < iterator->size);
+	((tb_long_t*)iterator->data)[itor] = (tb_long_t)item;
 }
 static tb_long_t tb_iterator_int_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return *((tb_long_t*)ltem) - *((tb_long_t*)rtem);
+	return (tb_long_t)ltem - (tb_long_t)rtem;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * string
  */
 static tb_long_t tb_iterator_str_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return iterator->priv? tb_strcmp(*((tb_char_t const**)ltem), *((tb_char_t const**)rtem)) : tb_stricmp(*((tb_char_t const**)ltem), *((tb_char_t const**)rtem));
+	tb_assert_return_val(ltem && rtem, 0);
+	return iterator->priv? tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem) : tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
 }
 /* ///////////////////////////////////////////////////////////////////////
  * pointer
@@ -87,27 +90,29 @@ static tb_long_t tb_iterator_str_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 static tb_pointer_t tb_iterator_ptr_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(itor < iterator->size, TB_NULL);
-	return (tb_pointer_t)&(((tb_pointer_t*)iterator->data)[itor]);
+	return ((tb_pointer_t*)iterator->data)[itor];
 }
 static tb_pointer_t tb_iterator_ptr_save(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_assert_return_val(itor < iterator->size, TB_NULL);
 	iterator->temp = ((tb_pointer_t*)iterator->data)[itor];
-	return (tb_pointer_t)&iterator->temp;
+	return iterator->temp;
 }
-static tb_void_t tb_iterator_ptr_swap(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_void_t tb_iterator_ptr_swap(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
 {
-	tb_pointer_t item = *((tb_pointer_t*)ltem);
-	*((tb_pointer_t*)ltem) = *((tb_pointer_t*)rtem);
-	*((tb_pointer_t*)rtem) = item;
+	tb_assert_return(ltor < iterator->size && rtor < iterator->size);
+	tb_pointer_t item = ((tb_pointer_t*)iterator->data)[ltor];
+	((tb_pointer_t*)iterator->data)[ltor] = ((tb_pointer_t*)iterator->data)[rtor];
+	((tb_pointer_t*)iterator->data)[rtor] = item;
 }
-static tb_void_t tb_iterator_ptr_copy(tb_iterator_t* iterator, tb_cpointer_t dtem, tb_cpointer_t stem)
+static tb_void_t tb_iterator_ptr_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	*((tb_pointer_t*)dtem) = *((tb_pointer_t*)stem);
+	tb_assert_return(itor < iterator->size);
+	((tb_pointer_t*)iterator->data)[itor] = item;
 }
 static tb_long_t tb_iterator_ptr_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	return *((tb_pointer_t*)ltem) - *((tb_pointer_t*)rtem);
+	return ltem - rtem;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * memory
@@ -123,14 +128,20 @@ static tb_pointer_t tb_iterator_mem_save(tb_iterator_t* iterator, tb_size_t itor
 	tb_memcpy(iterator->temp, (tb_byte_t*)iterator->data + itor * iterator->step, iterator->step);
 	return iterator->temp;
 }
-static tb_void_t tb_iterator_mem_swap(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+static tb_void_t tb_iterator_mem_swap(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
 {
+	tb_assert_return(ltor < iterator->size && rtor < iterator->size);
+
 	// init temp
 	tb_byte_t 	data[8192];
 	tb_byte_t* 	temp = TB_NULL;
 	if (iterator->step < 8192) temp = data;
 	else temp = tb_malloc(iterator->step);
 	tb_assert_return(temp);
+
+	// item
+	tb_pointer_t ltem = (tb_byte_t*)iterator->data + ltor * iterator->step;
+	tb_pointer_t rtem = (tb_byte_t*)iterator->data + rtor * iterator->step;
 	
 	// swap
 	tb_memcpy(temp, ltem, iterator->step);
@@ -140,12 +151,14 @@ static tb_void_t tb_iterator_mem_swap(tb_iterator_t* iterator, tb_cpointer_t lte
 	// exit temp
 	if (temp != data && temp) tb_free(temp);
 }
-static tb_void_t tb_iterator_mem_copy(tb_iterator_t* iterator, tb_cpointer_t dtem, tb_cpointer_t stem)
+static tb_void_t tb_iterator_mem_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_memcpy(dtem, stem, iterator->step);
+	tb_assert_return(itor < iterator->size && item);
+	tb_memcpy((tb_byte_t*)iterator->data + itor * iterator->step, item, iterator->step);
 }
 static tb_long_t tb_iterator_mem_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
+	tb_assert_return_val(ltem && rtem, 0);
 	return tb_memcmp(ltem, rtem, iterator->step);
 }
 /* ///////////////////////////////////////////////////////////////////////
@@ -181,19 +194,19 @@ tb_pointer_t tb_iterator_save(tb_iterator_t* iterator, tb_size_t itor)
 	tb_assert_return_val(iterator && iterator->save, TB_NULL);
 	return iterator->save(iterator, itor);
 }
-tb_void_t tb_iterator_swap(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+tb_void_t tb_iterator_swap(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor)
 {
-	tb_assert_return(iterator && iterator->swap && ltem && rtem);
-	return iterator->swap(iterator, ltem, rtem);
+	tb_assert_return(iterator && iterator->swap);
+	return iterator->swap(iterator, ltor, rtor);
 }
-tb_void_t tb_iterator_copy(tb_iterator_t* iterator, tb_cpointer_t dtem, tb_cpointer_t stem)
+tb_void_t tb_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_assert_return(iterator && iterator->copy && dtem && stem);
-	return iterator->copy(iterator, dtem, stem);
+	tb_assert_return(iterator && iterator->copy);
+	return iterator->copy(iterator, itor, item);
 }
 tb_long_t tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	tb_assert_return_val(iterator && iterator->comp && ltem && rtem, 0);
+	tb_assert_return_val(iterator && iterator->comp, 0);
 	return iterator->comp(iterator, ltem, rtem);
 }
 tb_iterator_t tb_iterator_int(tb_long_t* data, tb_size_t size)
