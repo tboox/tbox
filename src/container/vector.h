@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "item.h"
+#include "iterator.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -76,6 +77,9 @@
  */
 typedef struct __tb_vector_t
 {
+	// the itor
+	tb_iterator_t 			itor;
+
 	// the data
 	tb_byte_t* 				data;
 	tb_size_t 				size;

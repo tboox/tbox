@@ -35,5 +35,6 @@
 #include "queue.h"
 #include "stack.h"
 #include "vector.h"
+#include "iterator.h"
 
 #endif

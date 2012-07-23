@@ -18,11 +18,11 @@
  *
  * @author		ruki
  * @file		iterator.h
- * @ingroup 	algorithm
+ * @ingroup 	container
  *
  */
-#ifndef TB_ALGORITHM_ITERATOR_H
-#define TB_ALGORITHM_ITERATOR_H
+#ifndef TB_CONTAINER_ITERATOR_H
+#define TB_CONTAINER_ITERATOR_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -97,6 +97,21 @@ typedef struct __tb_iterator_t
  * interfaces
  */
 
+/// init iterator for integer
+tb_iterator_t 	tb_iterator_init_int(tb_long_t* data, tb_size_t size);
+
+/// init iterator for string
+tb_iterator_t 	tb_iterator_init_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
+
+/// init iterator for pointer
+tb_iterator_t 	tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size);
+
+/// init iterator for memory
+tb_iterator_t 	tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
+
+/// exit iterator
+tb_void_t 		tb_iterator_exit(tb_iterator_t* iterator);
+
 /// the iterator head
 tb_size_t 		tb_iterator_head(tb_iterator_t* iterator);
 
@@ -123,18 +138,5 @@ tb_void_t 		tb_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointe
 
 /// the iterator comp
 tb_long_t 		tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
-
-/// the integer iterator
-tb_iterator_t 	tb_iterator_int(tb_long_t* data, tb_size_t size);
-
-/// the string iterator
-tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
-
-/// the pointer iterator
-tb_iterator_t 	tb_iterator_ptr(tb_pointer_t* data, tb_size_t size);
-
-/// the memory iterator
-tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
-
 
 #endif

@@ -16,7 +16,7 @@ static tb_void_t tb_sort_int_test(tb_size_t n)
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	tb_rand_clear();
@@ -34,6 +34,9 @@ static tb_void_t tb_sort_int_test(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -46,7 +49,7 @@ static tb_void_t tb_sort_int_test_bubble(tb_size_t n)
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	tb_rand_clear();
@@ -64,6 +67,9 @@ static tb_void_t tb_sort_int_test_bubble(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -76,7 +82,7 @@ static tb_void_t tb_sort_int_test_insert(tb_size_t n)
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	tb_rand_clear();
@@ -94,6 +100,9 @@ static tb_void_t tb_sort_int_test_insert(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -106,7 +115,7 @@ static tb_void_t tb_sort_int_test_quick(tb_size_t n)
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	tb_rand_clear();
@@ -124,6 +133,9 @@ static tb_void_t tb_sort_int_test_quick(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -136,7 +148,7 @@ static tb_void_t tb_sort_int_test_heap(tb_size_t n)
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	tb_rand_clear();
@@ -154,6 +166,9 @@ static tb_void_t tb_sort_int_test_heap(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -170,7 +185,7 @@ static tb_void_t tb_sort_str_test(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_rand_clear();
@@ -194,6 +209,9 @@ static tb_void_t tb_sort_str_test(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// exit pool
 	tb_spool_exit(pool);
 
@@ -213,7 +231,7 @@ static tb_void_t tb_sort_str_test_bubble(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_rand_clear();
@@ -237,6 +255,9 @@ static tb_void_t tb_sort_str_test_bubble(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// exit pool
 	tb_spool_exit(pool);
 
@@ -256,7 +277,7 @@ static tb_void_t tb_sort_str_test_insert(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_rand_clear();
@@ -280,6 +301,9 @@ static tb_void_t tb_sort_str_test_insert(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// exit pool
 	tb_spool_exit(pool);
 
@@ -299,7 +323,7 @@ static tb_void_t tb_sort_str_test_quick(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_rand_clear();
@@ -323,6 +347,9 @@ static tb_void_t tb_sort_str_test_quick(tb_size_t n)
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// exit pool
 	tb_spool_exit(pool);
 
@@ -342,7 +369,7 @@ static tb_void_t tb_sort_str_test_heap(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_rand_clear();
@@ -365,6 +392,9 @@ static tb_void_t tb_sort_str_test_heap(tb_size_t n)
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
+
+	// exit iterator
+	tb_iterator_exit(&iterator);
 
 	// exit pool
 	tb_spool_exit(pool);

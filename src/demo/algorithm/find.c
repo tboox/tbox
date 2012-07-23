@@ -17,7 +17,7 @@ static tb_void_t tb_find_int_test()
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	for (i = 0; i < n; i++) data[i] = i;
@@ -34,6 +34,9 @@ static tb_void_t tb_find_int_test()
 	// time
 	tb_print("tb_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// free
 	tb_free(data);
 }
@@ -47,7 +50,7 @@ static tb_void_t tb_find_int_test_binary()
 	tb_assert_and_check_return(data);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_int(data, n);
+	tb_iterator_t iterator = tb_iterator_init_int(data, n);
 
 	// make
 	for (i = 0; i < n; i++) data[i] = i;
@@ -63,6 +66,9 @@ static tb_void_t tb_find_int_test_binary()
 
 	// time
 	tb_print("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
+
+	// exit iterator
+	tb_iterator_exit(&iterator);
 
 	// free
 	tb_free(data);
@@ -81,7 +87,7 @@ static tb_void_t tb_find_str_test()
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_char_t s[256] = {0};
@@ -104,6 +110,9 @@ static tb_void_t tb_find_str_test()
 	// time
 	tb_print("tb_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
 
+	// exit iterator
+	tb_iterator_exit(&iterator);
+
 	// exit pool
 	tb_spool_exit(pool);
 
@@ -124,7 +133,7 @@ static tb_void_t tb_find_str_test_binary()
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_init_str(data, n, TB_TRUE);
 
 	// make
 	tb_char_t s[256] = {0};
@@ -146,6 +155,9 @@ static tb_void_t tb_find_str_test_binary()
 
 	// time
 	tb_print("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
+
+	// exit iterator
+	tb_iterator_exit(&iterator);
 
 	// exit pool
 	tb_spool_exit(pool);

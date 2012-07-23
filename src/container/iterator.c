@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		iterator.c
- * @ingroup 	algorithm
+ * @ingroup 	container
  *
  */
 
@@ -164,6 +164,117 @@ static tb_long_t tb_iterator_mem_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_iterator_t tb_iterator_init_int(tb_long_t* data, tb_size_t size)
+{
+	// check
+	tb_assert(data && size);
+
+	// init
+	tb_iterator_t itor;
+	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+	itor.data = (tb_pointer_t)data;
+	itor.size = size;
+	itor.temp = TB_NULL;
+	itor.priv = TB_NULL;
+	itor.step = sizeof(tb_long_t);
+	itor.head = tb_iterator_int_head;
+	itor.tail = tb_iterator_int_tail;
+	itor.prev = tb_iterator_int_prev;
+	itor.next = tb_iterator_int_next;
+	itor.item = tb_iterator_int_item;
+	itor.save = tb_iterator_int_save;
+	itor.swap = tb_iterator_int_swap;
+	itor.copy = tb_iterator_int_copy;
+	itor.comp = tb_iterator_int_comp;
+
+	// ok
+	return itor;
+}
+tb_iterator_t tb_iterator_init_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase)
+{	
+	// check
+	tb_assert(data && size);
+
+	// init
+	tb_iterator_t itor;
+	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+	itor.data = (tb_pointer_t)data;
+	itor.size = size;
+	itor.temp = TB_NULL;
+	itor.priv = (tb_pointer_t)bcase;
+	itor.step = sizeof(tb_char_t*);
+	itor.head = tb_iterator_int_head;
+	itor.tail = tb_iterator_int_tail;
+	itor.prev = tb_iterator_int_prev;
+	itor.next = tb_iterator_int_next;
+	itor.item = tb_iterator_ptr_item;
+	itor.save = tb_iterator_ptr_save;
+	itor.swap = tb_iterator_ptr_swap;
+	itor.copy = tb_iterator_ptr_copy;
+	itor.comp = tb_iterator_str_comp;
+
+	// ok
+	return itor;
+}
+tb_iterator_t tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size)
+{
+	// check
+	tb_assert(data && size);
+
+	// init
+	tb_iterator_t itor;
+	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+	itor.data = (tb_pointer_t)data;
+	itor.size = size;
+	itor.temp = TB_NULL;
+	itor.priv = TB_NULL;
+	itor.step = sizeof(tb_pointer_t);
+	itor.head = tb_iterator_int_head;
+	itor.tail = tb_iterator_int_tail;
+	itor.prev = tb_iterator_int_prev;
+	itor.next = tb_iterator_int_next;
+	itor.item = tb_iterator_ptr_item;
+	itor.save = tb_iterator_ptr_save;
+	itor.swap = tb_iterator_ptr_swap;
+	itor.copy = tb_iterator_ptr_copy;
+	itor.comp = tb_iterator_ptr_comp;
+
+	// ok
+	return itor;
+}
+tb_iterator_t tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp)
+{
+	// check
+	tb_assert(data && size && temp);
+
+	// init
+	tb_iterator_t itor;
+	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+	itor.data = (tb_pointer_t)data;
+	itor.size = size;
+	itor.temp = temp;
+	itor.priv = TB_NULL;
+	itor.step = step;
+	itor.head = tb_iterator_int_head;
+	itor.tail = tb_iterator_int_tail;
+	itor.prev = tb_iterator_int_prev;
+	itor.next = tb_iterator_int_next;
+	itor.item = tb_iterator_mem_item;
+	itor.save = tb_iterator_mem_save;
+	itor.swap = tb_iterator_mem_swap;
+	itor.copy = tb_iterator_mem_copy;
+	itor.comp = tb_iterator_mem_comp;
+
+	// ok
+	return itor;
+}
+tb_void_t tb_iterator_exit(tb_iterator_t* iterator)
+{
+	if (iterator)
+	{
+		tb_memset(iterator, 0, sizeof(tb_iterator_t));
+	}
+}
 tb_size_t tb_iterator_head(tb_iterator_t* iterator)
 {
 	tb_assert_and_check_return_val(iterator && iterator->head, 0);
@@ -208,109 +319,5 @@ tb_long_t tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpoin
 {
 	tb_assert_return_val(iterator && iterator->comp, 0);
 	return iterator->comp(iterator, ltem, rtem);
-}
-tb_iterator_t tb_iterator_int(tb_long_t* data, tb_size_t size)
-{
-	// check
-	tb_assert(data && size);
-
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.size = size;
-	itor.temp = TB_NULL;
-	itor.priv = TB_NULL;
-	itor.step = sizeof(tb_long_t);
-	itor.head = tb_iterator_int_head;
-	itor.tail = tb_iterator_int_tail;
-	itor.prev = tb_iterator_int_prev;
-	itor.next = tb_iterator_int_next;
-	itor.item = tb_iterator_int_item;
-	itor.save = tb_iterator_int_save;
-	itor.swap = tb_iterator_int_swap;
-	itor.copy = tb_iterator_int_copy;
-	itor.comp = tb_iterator_int_comp;
-
-	// ok
-	return itor;
-}
-tb_iterator_t tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase)
-{	
-	// check
-	tb_assert(data && size);
-
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.size = size;
-	itor.temp = TB_NULL;
-	itor.priv = (tb_pointer_t)bcase;
-	itor.step = sizeof(tb_char_t*);
-	itor.head = tb_iterator_int_head;
-	itor.tail = tb_iterator_int_tail;
-	itor.prev = tb_iterator_int_prev;
-	itor.next = tb_iterator_int_next;
-	itor.item = tb_iterator_ptr_item;
-	itor.save = tb_iterator_ptr_save;
-	itor.swap = tb_iterator_ptr_swap;
-	itor.copy = tb_iterator_ptr_copy;
-	itor.comp = tb_iterator_str_comp;
-
-	// ok
-	return itor;
-}
-tb_iterator_t tb_iterator_ptr(tb_pointer_t* data, tb_size_t size)
-{
-	// check
-	tb_assert(data && size);
-
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.size = size;
-	itor.temp = TB_NULL;
-	itor.priv = TB_NULL;
-	itor.step = sizeof(tb_pointer_t);
-	itor.head = tb_iterator_int_head;
-	itor.tail = tb_iterator_int_tail;
-	itor.prev = tb_iterator_int_prev;
-	itor.next = tb_iterator_int_next;
-	itor.item = tb_iterator_ptr_item;
-	itor.save = tb_iterator_ptr_save;
-	itor.swap = tb_iterator_ptr_swap;
-	itor.copy = tb_iterator_ptr_copy;
-	itor.comp = tb_iterator_ptr_comp;
-
-	// ok
-	return itor;
-}
-tb_iterator_t tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp)
-{
-	// check
-	tb_assert(data && size && temp);
-
-	// init
-	tb_iterator_t itor;
-	itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	itor.data = (tb_pointer_t)data;
-	itor.size = size;
-	itor.temp = temp;
-	itor.priv = TB_NULL;
-	itor.step = step;
-	itor.head = tb_iterator_int_head;
-	itor.tail = tb_iterator_int_tail;
-	itor.prev = tb_iterator_int_prev;
-	itor.next = tb_iterator_int_next;
-	itor.item = tb_iterator_mem_item;
-	itor.save = tb_iterator_mem_save;
-	itor.swap = tb_iterator_mem_swap;
-	itor.copy = tb_iterator_mem_copy;
-	itor.comp = tb_iterator_mem_comp;
-
-	// ok
-	return itor;
 }
 
