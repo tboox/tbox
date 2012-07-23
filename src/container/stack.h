@@ -72,11 +72,8 @@ tb_stack_t* 		tb_stack_init(tb_size_t grow, tb_item_func_t func);
 tb_void_t 			tb_stack_exit(tb_stack_t* stack);
 
 // accessors
-tb_pointer_t 		tb_stack_at_head(tb_stack_t* stack);
-tb_pointer_t 		tb_stack_at_last(tb_stack_t* stack);
-
-tb_cpointer_t 		tb_stack_const_at_head(tb_stack_t const* stack);
-tb_cpointer_t 		tb_stack_const_at_last(tb_stack_t const* stack);
+tb_pointer_t 		tb_stack_head(tb_stack_t* stack);
+tb_pointer_t 		tb_stack_last(tb_stack_t* stack);
 
 // modifiors
 tb_void_t 			tb_stack_clear(tb_stack_t* stack);
@@ -84,30 +81,6 @@ tb_void_t 			tb_stack_clear(tb_stack_t* stack);
 tb_void_t 	 		tb_stack_put(tb_stack_t* stack, tb_cpointer_t data);
 tb_void_t 	 		tb_stack_pop(tb_stack_t* stack);
 tb_pointer_t 	 	tb_stack_top(tb_stack_t* stack);
-
-/*!iterator
- * 
- * @code
- * tb_size_t itor = tb_stack_itor_head(stack);
- * tb_size_t tail = tb_stack_itor_tail(stack);
- * for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
- * {
- * 		tb_cpointer_t data = tb_stack_itor_const_at(stack, itor);
- * 		if (data)
- * 		{
- * 			// ...
- * 		}
- * }
- * @endcode
- */
-tb_pointer_t 		tb_stack_itor_at(tb_stack_t* stack, tb_size_t itor);
-tb_cpointer_t 		tb_stack_itor_const_at(tb_stack_t const* stack, tb_size_t itor);
-
-tb_size_t 			tb_stack_itor_head(tb_stack_t const* stack);
-tb_size_t 			tb_stack_itor_tail(tb_stack_t const* stack);
-tb_size_t 			tb_stack_itor_last(tb_stack_t const* stack);
-tb_size_t 			tb_stack_itor_next(tb_stack_t const* stack, tb_size_t itor);
-tb_size_t 			tb_stack_itor_prev(tb_stack_t const* stack, tb_size_t itor);
 
 // attributes
 tb_size_t 			tb_stack_size(tb_stack_t const* stack);

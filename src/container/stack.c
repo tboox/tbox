@@ -56,51 +56,15 @@ tb_void_t tb_stack_pop(tb_stack_t* stack)
 }
 tb_pointer_t tb_stack_top(tb_stack_t* stack)
 {
-	return tb_vector_at_last(stack);
+	return tb_vector_last(stack);
 }
-tb_pointer_t tb_stack_at_head(tb_stack_t* stack)
+tb_pointer_t tb_stack_head(tb_stack_t* stack)
 {
-	return tb_vector_at_head(stack);
+	return tb_vector_head(stack);
 }
-tb_pointer_t tb_stack_at_last(tb_stack_t* stack)
+tb_pointer_t tb_stack_last(tb_stack_t* stack)
 {
-	return tb_vector_at_last(stack);
-}
-tb_cpointer_t tb_stack_const_at_head(tb_stack_t const* stack)
-{
-	return tb_vector_const_at_head(stack);
-}
-tb_cpointer_t tb_stack_const_at_last(tb_stack_t const* stack)
-{
-	return tb_vector_const_at_last(stack);
-}
-tb_pointer_t tb_stack_itor_at(tb_stack_t* stack, tb_size_t itor)
-{
-	return tb_vector_itor_at(stack, itor);
-}
-tb_cpointer_t tb_stack_itor_const_at(tb_stack_t const* stack, tb_size_t itor)
-{
-	return tb_vector_itor_const_at(stack, itor);
-}
-tb_size_t tb_stack_itor_head(tb_stack_t const* stack)
-{
-	return tb_vector_itor_head(stack);
-}
-tb_size_t tb_stack_itor_last(tb_stack_t const* stack)
-{
-	return tb_vector_itor_last(stack);
-}
-tb_size_t tb_stack_itor_tail(tb_stack_t const* stack)
-{
-	return tb_vector_itor_tail(stack);
-}
-tb_size_t tb_stack_itor_next(tb_stack_t const* stack, tb_size_t itor)
-{
-	return tb_vector_itor_next(stack, itor);
-}
-tb_size_t tb_stack_itor_prev(tb_stack_t const* stack, tb_size_t itor)
-{
-	return tb_vector_itor_prev(stack, itor);
+	return tb_vector_last(stack);
 }
 tb_size_t tb_stack_size(tb_stack_t const* stack)
 {
@@ -109,7 +73,6 @@ tb_size_t tb_stack_size(tb_stack_t const* stack)
 tb_size_t tb_stack_maxn(tb_stack_t const* stack)
 {
 	return tb_vector_maxn(stack);
-
 }
 tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {

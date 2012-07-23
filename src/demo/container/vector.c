@@ -31,8 +31,8 @@ static tb_size_t tb_vector_insert_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -60,8 +60,8 @@ static tb_size_t tb_vector_insert_head_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -89,8 +89,8 @@ static tb_size_t tb_vector_insert_tail_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -120,8 +120,8 @@ static tb_size_t tb_vector_ninsert_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n + 1);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -148,8 +148,8 @@ static tb_size_t tb_vector_ninsert_head_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -176,8 +176,8 @@ static tb_size_t tb_vector_ninsert_tail_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xf);
-	tb_assert(tb_vector_const_at_last(vector) == 0xf);
+	tb_assert(tb_vector_head(vector) == 0xf);
+	tb_assert(tb_vector_last(vector) == 0xf);
 
 	// clear it
 	tb_vector_clear(vector);
@@ -347,8 +347,8 @@ static tb_size_t tb_vector_replace_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xd);
-	tb_assert(tb_vector_const_at_last(vector) == 0xd);
+	tb_assert(tb_vector_head(vector) == 0xd);
+	tb_assert(tb_vector_last(vector) == 0xd);
 
 	// exit
 	tb_vector_exit(vector);
@@ -373,7 +373,7 @@ static tb_size_t tb_vector_replace_head_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xd);
+	tb_assert(tb_vector_head(vector) == 0xd);
 
 	// exit
 	tb_vector_exit(vector);
@@ -398,7 +398,7 @@ static tb_size_t tb_vector_replace_last_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_last(vector) == 0xd);
+	tb_assert(tb_vector_last(vector) == 0xd);
 
 
 	// exit
@@ -423,8 +423,8 @@ static tb_size_t tb_vector_nreplace_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xd);
-	tb_assert(tb_vector_const_at_last(vector) == 0xd);
+	tb_assert(tb_vector_head(vector) == 0xd);
+	tb_assert(tb_vector_last(vector) == 0xd);
 
 	// exit
 	tb_vector_exit(vector);
@@ -448,8 +448,8 @@ static tb_size_t tb_vector_nreplace_head_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xd);
-	tb_assert(tb_vector_const_at_last(vector) == 0xd);
+	tb_assert(tb_vector_head(vector) == 0xd);
+	tb_assert(tb_vector_last(vector) == 0xd);
 
 	// exit
 	tb_vector_exit(vector);
@@ -473,8 +473,8 @@ static tb_size_t tb_vector_nreplace_last_test()
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
-	tb_assert(tb_vector_const_at_head(vector) == 0xd);
-	tb_assert(tb_vector_const_at_last(vector) == 0xd);
+	tb_assert(tb_vector_head(vector) == 0xd);
+	tb_assert(tb_vector_last(vector) == 0xd);
 
 
 	// exit
