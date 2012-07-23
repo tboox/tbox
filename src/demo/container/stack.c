@@ -40,8 +40,8 @@ static tb_size_t tb_stack_put_and_pop_test()
 
 	// check
 	tb_assert(tb_stack_size(stack) == 10);
-	tb_assert(tb_stack_const_at_head(stack) == 0x0);
-	tb_assert(tb_stack_const_at_last(stack) == 0xf);
+	tb_assert(tb_stack_head(stack) == 0x0);
+	tb_assert(tb_stack_last(stack) == 0xf);
 
 	// clear it
 	tb_stack_clear(stack);
@@ -60,13 +60,14 @@ static tb_size_t tb_stack_iterator_next_test()
 	tb_stack_t* stack = tb_stack_init(n, tb_item_func_int());
 	tb_assert_and_check_return_val(stack, 0);
 
-	while (n--) tb_stack_put(stack, 0xf);
-	__tb_volatile__ tb_size_t itor = tb_stack_itor_head(stack);
-	__tb_volatile__ tb_size_t tail = tb_stack_itor_tail(stack);
+	tb_size_t i;
+	for (i = 0; i < n; i++) tb_stack_put(stack, 0xf);
+	__tb_volatile__ tb_size_t itor = tb_iterator_head(stack);
+	__tb_volatile__ tb_size_t tail = tb_iterator_tail(stack);
 	tb_hong_t t = tb_mclock();
-	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
+	for (; itor != tail; itor = tb_iterator_next(stack, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(stack, itor);
 	}
 	t = tb_mclock() - t;
 
@@ -85,16 +86,17 @@ static tb_size_t tb_stack_iterator_prev_test()
 	tb_stack_t* stack = tb_stack_init(n, tb_item_func_int());
 	tb_assert_and_check_return_val(stack, 0);
 
-	while (n--) tb_stack_put(stack, 0xf);
-	__tb_volatile__ tb_size_t itor = tb_stack_itor_last(stack);
-	__tb_volatile__ tb_size_t head = tb_stack_itor_head(stack);
+	tb_size_t i;
+	for (i = 0; i < n; i++) tb_stack_put(stack, 0xf);
+	__tb_volatile__ tb_size_t itor = tb_iterator_last(stack);
+	__tb_volatile__ tb_size_t head = tb_iterator_head(stack);
 	tb_hong_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_stack_itor_const_at(stack, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(stack, itor);
 
 		if (itor == head) break;
-		itor = tb_stack_itor_prev(stack, itor);
+		itor = tb_iterator_prev(stack, itor);
 	}
 	t = tb_mclock() - t;
 
@@ -110,10 +112,10 @@ static tb_size_t tb_stack_iterator_prev_test()
 static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)
 {
 	tb_print("efm size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
-	tb_size_t itor = tb_stack_itor_head(stack);
-	tb_size_t tail = tb_stack_itor_tail(stack);
-	for (; itor != tail; itor = tb_stack_itor_next(stack, itor))
-		tb_print("efm at[%d]: %s", itor, tb_stack_itor_const_at(stack, itor));
+	tb_size_t itor = tb_iterator_head(stack);
+	tb_size_t tail = tb_iterator_tail(stack);
+	for (; itor != tail; itor = tb_iterator_next(stack, itor))
+		tb_print("efm at[%d]: %s", itor, tb_iterator_item(stack, itor));
 }
 static tb_void_t tb_stack_efm_test()
 {	
@@ -173,7 +175,7 @@ static tb_void_t tb_stack_perf_test()
 	score += tb_stack_iterator_prev_test();
 
 	tb_print("=============================================================");
-	tb_print("score: %d", score / 100);
+	tb_print("score: %lu", score / 100);
 
 }
 /* ///////////////////////////////////////////////////////////////////////

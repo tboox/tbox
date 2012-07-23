@@ -156,60 +156,18 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 		vector->size = 0;
 	}
 }
-tb_pointer_t tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(vector && vector->size && itor < vector->maxn, 0);
-	return vector->func.data(&vector->func, vector->data + itor * vector->func.size);
-}
 tb_pointer_t tb_vector_data(tb_vector_t* vector)
 {
 	tb_assert_and_check_return_val(vector, TB_NULL);
 	return vector->data;
 }
-tb_pointer_t tb_vector_at_head(tb_vector_t* vector)
+tb_pointer_t tb_vector_head(tb_vector_t* vector)
 {
-	return tb_vector_itor_at(vector, tb_vector_itor_head(vector));
+	return tb_iterator_item(vector, tb_iterator_head(vector));
 }
-tb_pointer_t tb_vector_at_last(tb_vector_t* vector)
+tb_pointer_t tb_vector_last(tb_vector_t* vector)
 {
-	return tb_vector_itor_at(vector, tb_vector_itor_last(vector));
-}
-tb_cpointer_t tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(vector && vector->size && itor < vector->maxn, 0);
-	return vector->func.data(&vector->func, vector->data + itor * vector->func.size);
-}
-tb_cpointer_t tb_vector_const_at_head(tb_vector_t const* vector)
-{
-	return tb_vector_itor_const_at(vector, tb_vector_itor_head(vector));
-}
-tb_cpointer_t tb_vector_const_at_last(tb_vector_t const* vector)
-{
-	return tb_vector_itor_const_at(vector, tb_vector_itor_last(vector));
-}
-tb_size_t tb_vector_itor_head(tb_vector_t const* vector)
-{
-	return 0;
-}
-tb_size_t tb_vector_itor_last(tb_vector_t const* vector)
-{
-	tb_assert_and_check_return_val(vector && vector->size, 0);
-	return (vector->size - 1);
-}
-tb_size_t tb_vector_itor_tail(tb_vector_t const* vector)
-{
-	tb_assert_and_check_return_val(vector, 0);
-	return vector->size;
-}
-tb_size_t tb_vector_itor_next(tb_vector_t const* vector, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(vector, 0);
-	return (itor < vector->size)? (itor + 1) : vector->size;
-}
-tb_size_t tb_vector_itor_prev(tb_vector_t const* vector, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(vector, 0);
-	return (itor)? (itor - 1) : 0;
+	return tb_iterator_item(vector, tb_iterator_last(vector));
 }
 tb_size_t tb_vector_size(tb_vector_t const* vector)
 {

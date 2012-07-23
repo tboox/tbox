@@ -101,11 +101,8 @@ tb_void_t 			tb_vector_exit(tb_vector_t* vector);
 
 // accessors
 tb_pointer_t 		tb_vector_data(tb_vector_t* vector);
-tb_pointer_t 		tb_vector_at_head(tb_vector_t* vector);
-tb_pointer_t 		tb_vector_at_last(tb_vector_t* vector);
-
-tb_cpointer_t 		tb_vector_const_at_head(tb_vector_t const* vector);
-tb_cpointer_t 		tb_vector_const_at_last(tb_vector_t const* vector);
+tb_pointer_t 		tb_vector_head(tb_vector_t* vector);
+tb_pointer_t 		tb_vector_last(tb_vector_t* vector);
 
 // modifiors
 tb_bool_t 			tb_vector_resize(tb_vector_t* vector, tb_size_t size);
@@ -134,31 +131,6 @@ tb_void_t 	 		tb_vector_remove_last(tb_vector_t* vector);
 tb_void_t 	 		tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size);
 tb_void_t 	 		tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
 tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
-
-/*!iterator
- * 
- * @code
- * tb_size_t itor = tb_vector_itor_head(vector);
- * tb_size_t tail = tb_vector_itor_tail(vector);
- * for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
- * {
- * 		tb_cpointer_t data = tb_vector_itor_const_at(vector, itor);
- * 		if (data)
- * 		{
- * 			// ...
- * 		}
- * }
- * @endcode
- *
- */
-tb_pointer_t 		tb_vector_itor_at(tb_vector_t* vector, tb_size_t itor);
-tb_cpointer_t 		tb_vector_itor_const_at(tb_vector_t const* vector, tb_size_t itor);
-
-tb_size_t 			tb_vector_itor_head(tb_vector_t const* vector);
-tb_size_t 			tb_vector_itor_tail(tb_vector_t const* vector);
-tb_size_t 			tb_vector_itor_last(tb_vector_t const* vector);
-tb_size_t 			tb_vector_itor_next(tb_vector_t const* vector, tb_size_t itor);
-tb_size_t 			tb_vector_itor_prev(tb_vector_t const* vector, tb_size_t itor);
 
 // attributes
 tb_size_t 			tb_vector_size(tb_vector_t const* vector);
