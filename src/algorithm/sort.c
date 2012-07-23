@@ -26,6 +26,7 @@
  * includes
  */
 #include "sort.h"
+#include "../libc/libc.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * head
@@ -84,15 +85,15 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	tb_size_t i = 0;
 	for (i = (hole - 1) / 2; hole > top && (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), item) < 0); i = (hole - 1) / 2)
 	{	
-		// copy item: parent => hole
-		tb_iterator_copy(iterator, head + i, item);
+		// move item: parent => hole
+		tb_iterator_move(iterator, head + i, item);
 
 		// move node: hole => parent
 		hole = i;
 	}
 
-	// copy item
-	tb_iterator_copy(iterator, head + hole, item);
+	// move item
+	tb_iterator_move(iterator, head + hole, item);
 }
 /*!adjust heap
  *
@@ -149,7 +150,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), tb_iterator_item(iterator, head + i - 1)) < 0) --i;
 
 		// larger child => hole
-		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + i));
+		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + i));
 
 		// move the hole down to it's larger child node 
 		hole = i;
@@ -158,7 +159,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 	if (i == bottom)
 	{	
 		// bottom child => hole
-		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + bottom - 1));
+		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + bottom - 1));
 
 		// move hole down to bottom
 		hole = bottom - 1;
@@ -186,20 +187,32 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
  */
 static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 {
+	// init
+	tb_size_t 		step = tb_iterator_step(iterator);
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
+
 	// make
 	tb_size_t hole;
 	tb_size_t bottom = tail - head;
 	for (hole = bottom / 2; hole > 0; )
 	{
-		// reheap top half, bottom to top
 		--hole;
-		tb_heap_adjust(iterator, head, hole, bottom, tb_iterator_save(iterator, head + hole));
+
+		// save hole
+		if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, head + hole);
+		else tb_memcpy(temp, tb_iterator_item(iterator, head + hole), step);
+
+		// reheap top half, bottom to top
+		tb_heap_adjust(iterator, head, hole, bottom, temp);
 	}
+
+	// free
+	if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
 
 	// check
 	tb_assert(tb_heap_check(iterator, head, tail));
 }
-
 /*!pop the top of heap to last and reheap
  *
  * <pre>
@@ -216,13 +229,10 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
  *                                (hole)
  * </pre>
  */   
-static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
+static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
-	// item
-	tb_cpointer_t item = tb_iterator_save(iterator, tail - 1);
-
 	// top => last
-	tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
+	tb_iterator_move(iterator, tail - 1, tb_iterator_item(iterator, head));
 
 	// reheap it
 	tb_heap_adjust(iterator, head, 0, tail - head - 1, item);
@@ -254,18 +264,28 @@ tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	tb_check_return(head != tail);
 
 	// init
-	tb_size_t 		itor1;
-	tb_size_t 		itor2;
+	tb_size_t 		step = tb_iterator_step(iterator);
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
 	// sort
+	tb_size_t 		itor1, itor2;
 	for (itor1 = head; itor1 != tail; itor1 = tb_iterator_next(iterator, itor1))
 	{
 		for (itor2 = itor1, itor2 = tb_iterator_next(iterator, itor2); itor2 != tail; itor2 = tb_iterator_next(iterator, itor2))
 		{
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, itor2), tb_iterator_item(iterator, itor1)) < 0)
-				tb_iterator_swap(iterator, itor2, itor1);
+			{
+				if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, itor1);
+				else tb_memcpy(temp, tb_iterator_item(iterator, itor1), step);
+				tb_iterator_move(iterator, itor1, tb_iterator_item(iterator, itor2));
+				tb_iterator_move(iterator, itor2, temp);
+			}
 		}
 	}
+
+	// free
+	if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
 }
 tb_void_t tb_bubble_sort_all(tb_iterator_t* iterator)
 {
@@ -311,21 +331,30 @@ tb_void_t tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	// check
 	tb_assert_and_check_return(iterator && iterator->mode & TB_ITERATOR_MODE_BDIRECT);
 	tb_check_return(head != tail);
+	
+	// init
+	tb_size_t 		step = tb_iterator_step(iterator);
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
-	tb_size_t last;
-	tb_size_t next;
+	// sort
+	tb_size_t last, next;
 	for (next = tb_iterator_next(iterator, head); next != tail; next = tb_iterator_next(iterator, next))
 	{
-		// save item
-		tb_cpointer_t item = tb_iterator_save(iterator, next);
+		// save next
+		if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, next);
+		else tb_memcpy(temp, tb_iterator_item(iterator, next), step);
 
 		// look for hole and move elements[hole, next - 1] => [hole + 1, next]
-		for (last = next; last != head && (last = tb_iterator_prev(iterator, last), tb_iterator_comp(iterator, item, tb_iterator_item(iterator, last)) < 0); next = last)
-				tb_iterator_copy(iterator, next, tb_iterator_item(iterator, last));
+		for (last = next; last != head && (last = tb_iterator_prev(iterator, last), tb_iterator_comp(iterator, temp, tb_iterator_item(iterator, last)) < 0); next = last)
+				tb_iterator_move(iterator, next, tb_iterator_item(iterator, last));
 
 		// item => hole
-		tb_iterator_copy(iterator, next, item);
+		tb_iterator_move(iterator, next, temp);
 	}
+
+	// free
+	if (temp && step > sizeof(tb_pointer_t)) tb_free(temp);
 }
 tb_void_t tb_insert_sort_all(tb_iterator_t* iterator)
 {
@@ -337,10 +366,16 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 	tb_assert_and_check_return(iterator && iterator->mode & TB_ITERATOR_MODE_RACCESS);
 	tb_check_return(head != tail);
 
-	// hole => key
-	tb_cpointer_t key = tb_iterator_save(iterator, head);
-
 	// init
+	tb_size_t 		step = tb_iterator_step(iterator);
+	tb_pointer_t 	key = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || key);
+
+	// hole => key
+	if (step <= sizeof(tb_pointer_t)) key = tb_iterator_item(iterator, head);
+	else tb_memcpy(key, tb_iterator_item(iterator, head), step);
+
+	// sort
 	tb_size_t l = head;
 	tb_size_t r = tail - 1;
 	while (r > l)
@@ -350,7 +385,7 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, r), key) < 0) break;
 		if (r != l) 
 		{
-			tb_iterator_copy(iterator, l, tb_iterator_item(iterator, r));
+			tb_iterator_move(iterator, l, tb_iterator_item(iterator, r));
 			l++;
 		}
 
@@ -359,19 +394,22 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, l), key) > 0) break;
 		if (l != r) 
 		{
-			tb_iterator_copy(iterator, r, tb_iterator_item(iterator, l));
+			tb_iterator_move(iterator, r, tb_iterator_item(iterator, l));
 			r--;
 		}
 	}
 
 	// key => hole
-	tb_iterator_copy(iterator, l, key);
+	tb_iterator_move(iterator, l, key);
 
 	// sort [head, hole - 1]
 	tb_quick_sort(iterator, head, l);
 
 	// sort [hole + 1, tail]
 	tb_quick_sort(iterator, ++l, tail);
+
+	// free
+	if (key && step > sizeof(tb_pointer_t)) tb_free(key);
 }
 tb_void_t tb_quick_sort_all(tb_iterator_t* iterator)
 {
@@ -491,9 +529,24 @@ tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 	// make
 	tb_heap_make(iterator, head, tail);
 
-	// pop0
+	// init
+	tb_size_t 		step = tb_iterator_step(iterator);
+	tb_pointer_t 	last = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || last);
+
+	// pop0 ...
 	for (; tail > head + 1; tail--)
-		tb_heap_pop0(iterator, head, tail);
+	{
+		// save last
+		if (step <= sizeof(tb_pointer_t)) last = tb_iterator_item(iterator, tail - 1);
+		else tb_memcpy(last, tb_iterator_item(iterator, tail - 1), step);
+
+		// pop0
+		tb_heap_pop0(iterator, head, tail, last);
+	}
+
+	// free
+	if (last && step > sizeof(tb_pointer_t)) tb_free(last);
 }
 tb_void_t tb_heap_sort_all(tb_iterator_t* iterator)
 {
