@@ -238,7 +238,7 @@ INC_FILES 				= \
 						container/queue.h \
 						container/stack.h \
 						container/vector.h \
-						algorithm/iterator.h \
+						container/iterator.h \
 						platform/platform.h \
 						platform/prefix.h \
 						platform/dns.h \

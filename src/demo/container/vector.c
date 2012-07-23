@@ -268,7 +268,7 @@ static tb_size_t tb_vector_nremove_test()
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
 	tb_hong_t t = tb_mclock();
-	tb_vector_nremove(vector, tb_vector_itor_head(vector), n);
+	tb_vector_nremove(vector, tb_iterator_head(vector), n);
 	t = tb_mclock() - t;
 
 	// time
@@ -336,10 +336,10 @@ static tb_size_t tb_vector_replace_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	__tb_volatile__ tb_size_t itor = tb_vector_itor_head(vector);
-	__tb_volatile__ tb_size_t tail = tb_vector_itor_tail(vector);
+	__tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
+	__tb_volatile__ tb_size_t tail = tb_iterator_tail(vector);
 	tb_hong_t t = tb_mclock();
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor)) tb_vector_replace(vector, itor, 0xd);
+	for (; itor != tail; itor = tb_iterator_next(vector, itor)) tb_vector_replace(vector, itor, 0xd);
 	t = tb_mclock() - t;
 
 	// time
@@ -415,7 +415,7 @@ static tb_size_t tb_vector_nreplace_test()
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
 	tb_hong_t t = tb_mclock();
-	tb_vector_nreplace(vector, tb_vector_itor_head(vector), 0xd, n);
+	tb_vector_nreplace(vector, tb_iterator_head(vector), 0xd, n);
 	t = tb_mclock() - t;
 
 	// time
@@ -491,12 +491,12 @@ static tb_size_t tb_vector_iterator_next_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	__tb_volatile__ tb_size_t itor = tb_vector_itor_head(vector);
-	__tb_volatile__ tb_size_t tail = tb_vector_itor_tail(vector);
+	__tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
+	__tb_volatile__ tb_size_t tail = tb_iterator_tail(vector);
 	tb_hong_t t = tb_mclock();
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
+	for (; itor != tail; itor = tb_iterator_next(vector, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_vector_itor_const_at(vector, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(vector, itor);
 	}
 	t = tb_mclock() - t;
 
@@ -516,15 +516,15 @@ static tb_size_t tb_vector_iterator_prev_test()
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
-	__tb_volatile__ tb_size_t itor = tb_vector_itor_last(vector);
-	__tb_volatile__ tb_size_t head = tb_vector_itor_head(vector);
+	__tb_volatile__ tb_size_t itor = tb_iterator_last(vector);
+	__tb_volatile__ tb_size_t head = tb_iterator_head(vector);
 	tb_hong_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_vector_itor_const_at(vector, itor);
+		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(vector, itor);
 
 		if (itor == head) break;
-		itor = tb_vector_itor_prev(vector, itor);
+		itor = tb_iterator_prev(vector, itor);
 	}
 	t = tb_mclock() - t;
 
@@ -539,10 +539,10 @@ static tb_size_t tb_vector_iterator_prev_test()
 static tb_void_t tb_vector_int_dump(tb_vector_t const* vector)
 {
 	tb_print("tb_int_t size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
-	tb_size_t itor = tb_vector_itor_head(vector);
-	tb_size_t tail = tb_vector_itor_tail(vector);
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
-		tb_print("tb_int_t at[%d]: %x", itor, tb_vector_itor_const_at(vector, itor));
+	tb_size_t itor = tb_iterator_head(vector);
+	tb_size_t tail = tb_iterator_tail(vector);
+	for (; itor != tail; itor = tb_iterator_next(vector, itor))
+		tb_print("tb_int_t at[%d]: %x", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_int_test()
 {
@@ -599,10 +599,10 @@ static tb_void_t tb_vector_int_test()
 static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 {
 	tb_print("str size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
-	tb_size_t itor = tb_vector_itor_head(vector);
-	tb_size_t tail = tb_vector_itor_tail(vector);
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
-		tb_print("str at[%d]: %s", itor, tb_vector_itor_const_at(vector, itor));
+	tb_size_t itor = tb_iterator_head(vector);
+	tb_size_t tail = tb_iterator_tail(vector);
+	for (; itor != tail; itor = tb_iterator_next(vector, itor))
+		tb_print("str at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_str_test()
 {
@@ -659,10 +659,10 @@ static tb_void_t tb_vector_str_test()
 static tb_void_t tb_vector_efm_dump(tb_vector_t const* vector)
 {
 	tb_print("efm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
-	tb_size_t itor = tb_vector_itor_head(vector);
-	tb_size_t tail = tb_vector_itor_tail(vector);
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
-		tb_print("efm at[%d]: %s", itor, tb_vector_itor_const_at(vector, itor));
+	tb_size_t itor = tb_iterator_head(vector);
+	tb_size_t tail = tb_iterator_tail(vector);
+	for (; itor != tail; itor = tb_iterator_next(vector, itor))
+		tb_print("efm at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_efm_test()
 {
@@ -719,10 +719,10 @@ static tb_void_t tb_vector_efm_test()
 static tb_void_t tb_vector_ifm_dump(tb_vector_t const* vector)
 {
 	tb_print("ifm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
-	tb_size_t itor = tb_vector_itor_head(vector);
-	tb_size_t tail = tb_vector_itor_tail(vector);
-	for (; itor != tail; itor = tb_vector_itor_next(vector, itor))
-		tb_print("ifm at[%d]: %s", itor, tb_vector_itor_const_at(vector, itor));
+	tb_size_t itor = tb_iterator_head(vector);
+	tb_size_t tail = tb_iterator_tail(vector);
+	for (; itor != tail; itor = tb_iterator_next(vector, itor))
+		tb_print("ifm at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -835,10 +835,10 @@ static tb_void_t tb_vector_test_itor_perf()
 	// performance
 	tb_hong_t t = tb_mclock();
 	__tb_volatile__ tb_hize_t test[2] = {0};
-	__tb_volatile__ tb_size_t 	itor = tb_vector_itor_head(vector);
-	for (; itor != tb_vector_itor_tail(vector); )
+	__tb_volatile__ tb_size_t itor = tb_iterator_head(vector);
+	for (; itor != tb_iterator_tail(vector); )
 	{
-		__tb_volatile__ tb_size_t item = tb_vector_itor_const_at(vector, itor);
+		__tb_volatile__ tb_size_t item = tb_iterator_item(vector, itor);
 		if (!(((tb_size_t)item >> 25) & 0x1))
 		{
 			// remove, hack: the itor of the same item is mutable
@@ -853,7 +853,7 @@ static tb_void_t tb_vector_test_itor_perf()
 			test[1]++;
 		}
 
-		itor = tb_vector_itor_next(vector, itor);
+		itor = tb_iterator_next(vector, itor);
 	}
 	t = tb_mclock() - t;
 	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
@@ -912,14 +912,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	tb_vector_int_test();
 	tb_vector_str_test();
 	tb_vector_efm_test();
 	tb_vector_ifm_test();
 #endif
 
-#if 0
+#if 1
 	tb_vector_perf_test();
 #endif
 
@@ -928,5 +928,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_vector_test_walk_perf();
 #endif
 
+	tb_exit();
 	return 0;
 }

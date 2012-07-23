@@ -55,9 +55,6 @@ typedef struct __tb_iterator_t
 	/// the iterator size
 	tb_pointer_t 			size;
 
-	/// the iterator temp
-	tb_pointer_t 			temp;
-
 	/// the iterator priv
 	tb_pointer_t 			priv;
 
@@ -79,14 +76,8 @@ typedef struct __tb_iterator_t
 	/// the iterator item
 	tb_pointer_t 			(*item)(struct __tb_iterator_t* iterator, tb_size_t itor);
 
-	/// the iterator save
-	tb_pointer_t 			(*save)(struct __tb_iterator_t* iterator, tb_size_t itor);
-
-	/// the iterator swap
-	tb_void_t 				(*swap)(struct __tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
-
-	/// the iterator copy
-	tb_void_t 				(*copy)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
+	/// the iterator move
+	tb_void_t 				(*move)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
 
 	/// the iterator comp
 	tb_long_t 				(*comp)(struct __tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
@@ -97,23 +88,26 @@ typedef struct __tb_iterator_t
  * interfaces
  */
 
-/// init iterator for integer
-tb_iterator_t 	tb_iterator_init_int(tb_long_t* data, tb_size_t size);
+/// the integer iterator
+tb_iterator_t 	tb_iterator_int(tb_long_t* data, tb_size_t size);
 
-/// init iterator for string
-tb_iterator_t 	tb_iterator_init_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
+/// the string iterator
+tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase);
 
-/// init iterator for pointer
-tb_iterator_t 	tb_iterator_init_ptr(tb_pointer_t* data, tb_size_t size);
+/// the pointer iterator
+tb_iterator_t 	tb_iterator_ptr(tb_pointer_t* data, tb_size_t size);
 
-/// init iterator for memory
-tb_iterator_t 	tb_iterator_init_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
+/// the memory iterator 
+tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
 
-/// exit iterator
-tb_void_t 		tb_iterator_exit(tb_iterator_t* iterator);
+/// the iterator step
+tb_size_t 		tb_iterator_step(tb_iterator_t* iterator);
 
 /// the iterator head
 tb_size_t 		tb_iterator_head(tb_iterator_t* iterator);
+
+/// the iterator last
+tb_size_t 		tb_iterator_last(tb_iterator_t* iterator);
 
 /// the iterator tail
 tb_size_t 		tb_iterator_tail(tb_iterator_t* iterator);
@@ -127,14 +121,8 @@ tb_size_t 		tb_iterator_next(tb_iterator_t* iterator, tb_size_t itor);
 /// the iterator item
 tb_pointer_t 	tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor);
 
-/// the iterator save
-tb_pointer_t 	tb_iterator_save(tb_iterator_t* iterator, tb_size_t itor);
-
-/// the iterator swap
-tb_void_t 		tb_iterator_swap(tb_iterator_t* iterator, tb_size_t ltor, tb_size_t rtor);
-
-/// the iterator copy
-tb_void_t 		tb_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
+/// the iterator move
+tb_void_t 		tb_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
 
 /// the iterator comp
 tb_long_t 		tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);

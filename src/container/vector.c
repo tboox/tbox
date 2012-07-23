@@ -40,7 +40,51 @@
 /* ///////////////////////////////////////////////////////////////////////
  * iterator
  */
+static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
+{
+	return 0;
+}
+static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
+{
+	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_assert_return_val(vector, 0);
+	return vector->size;
+}
+static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_assert_return_val(vector && itor < vector->size, vector->size);
+	return itor + 1;
+}
+static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_assert_return_val(itor, 0);
+	return itor - 1;
+}
+static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_assert_return_val(vector && itor < vector->size, TB_NULL);
+	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
+}
+static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+{
+	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_assert_return(vector);
 
+	if (iterator->step > sizeof(tb_pointer_t))
+	{
+		tb_assert_return(item);
+		tb_memcpy(vector->data + itor * iterator->step, item, iterator->step);
+	}
+	else *((tb_pointer_t*)(vector->data + itor * iterator->step)) = item;
+}
+static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+{
+	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_assert_return_val(vector && vector->comp, 0);
+	return vector->func.comp(&vector->func, ltem, rtem);
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -60,6 +104,21 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	vector->maxn = grow;
 	vector->func = func;
 	tb_assert_and_check_goto(vector->maxn < TB_VECTOR_MAX_SIZE, fail);
+
+	// init iterator
+	vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
+	vector->itor.data = (tb_pointer_t)vector;
+	vector->itor.size = 0;
+	vector->itor.priv = TB_NULL;
+	vector->itor.step = func.size;
+	vector->itor.head = tb_vector_iterator_head;
+	vector->itor.tail = tb_vector_iterator_tail;
+	vector->itor.prev = tb_vector_iterator_prev;
+	vector->itor.next = tb_vector_iterator_next;
+	vector->itor.item = tb_vector_iterator_item;
+	vector->itor.move = tb_vector_iterator_move;
+	vector->itor.comp = tb_vector_iterator_comp;
+
 
 	// calloc data
 	vector->data = tb_nalloc0(vector->maxn, func.size);
