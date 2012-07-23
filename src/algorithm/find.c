@@ -56,12 +56,12 @@ tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	// find
 	tb_size_t l = head;
 	tb_size_t r = tail;
-	tb_size_t m = tb_iterator_midd(iterator, l, r);
-	while (tb_iterator_diff(iterator, r, l) > 1)
+	tb_size_t m = (l + r) >> 1;
+	while (r > l + 1)
 	{
 		if (tb_iterator_comp(iterator, item, tb_iterator_item(iterator, m)) < 0) r = m;
 		else l = m;
-		m = tb_iterator_midd(iterator, l, r);
+		m = (l + r) >> 1;
 	}
 
 	// ok?
