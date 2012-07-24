@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "item.h"
+#include "iterator.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -81,6 +82,9 @@
  */
 typedef struct __tb_dlist_t
 {
+	/// the itor
+	tb_iterator_t 			itor;
+
 	// the pool
 	tb_handle_t 			pool;
 
@@ -104,11 +108,8 @@ tb_dlist_t* 		tb_dlist_init(tb_size_t grow, tb_item_func_t func);
 tb_void_t 			tb_dlist_exit(tb_dlist_t* dlist);
 
 // accessors
-tb_pointer_t 		tb_dlist_at_head(tb_dlist_t* dlist);
-tb_pointer_t 		tb_dlist_at_last(tb_dlist_t* dlist);
-
-tb_cpointer_t 		tb_dlist_const_at_head(tb_dlist_t const* dlist);
-tb_cpointer_t 		tb_dlist_const_at_last(tb_dlist_t const* dlist);
+tb_pointer_t 		tb_dlist_head(tb_dlist_t* dlist);
+tb_pointer_t 		tb_dlist_last(tb_dlist_t* dlist);
 
 // modifiors
 tb_void_t 			tb_dlist_clear(tb_dlist_t* dlist);
@@ -140,32 +141,6 @@ tb_size_t 			tb_dlist_nremove_last(tb_dlist_t* dlist, tb_size_t size);
 // attributes
 tb_size_t 			tb_dlist_size(tb_dlist_t const* dlist);
 tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
-
-
-/*!iterator
- * 
- * @code
- * tb_size_t itor = tb_dlist_itor_head(dlist);
- * tb_size_t tail = tb_dlist_itor_tail(dlist);
- * for (; itor != tail; itor = tb_dlist_itor_next(dlist, itor))
- * {
- * 		tb_byte_t const* data = tb_dlist_itor_const_at(dlist, itor);
- * 		if (data)
- * 		{
- * 			// ...
- * 		}
- * }
- * @endcode
- *
- */
-tb_pointer_t 		tb_dlist_itor_at(tb_dlist_t* dlist, tb_size_t itor);
-tb_cpointer_t 		tb_dlist_itor_const_at(tb_dlist_t const* dlist, tb_size_t itor);
-
-tb_size_t 			tb_dlist_itor_head(tb_dlist_t const* dlist);
-tb_size_t 			tb_dlist_itor_tail(tb_dlist_t const* dlist);
-tb_size_t 			tb_dlist_itor_last(tb_dlist_t const* dlist);
-tb_size_t 			tb_dlist_itor_next(tb_dlist_t const* dlist, tb_size_t itor);
-tb_size_t 			tb_dlist_itor_prev(tb_dlist_t const* dlist, tb_size_t itor);
 
 /*!walk
  *

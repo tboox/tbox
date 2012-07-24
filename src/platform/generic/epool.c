@@ -225,7 +225,7 @@ tb_void_t tb_epool_post(tb_handle_t epool, tb_handle_t event)
 		tb_assert_and_check_goto(ep->spak && ep->list && tb_dlist_size(ep->list), end);
 
 		// get event
-		tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, event);
+		tb_event_t* e = (tb_event_t*)tb_iterator_item(ep->list, event);
 		tb_assert_and_check_goto(e, end);
 
 		// post event 
@@ -251,12 +251,12 @@ tb_void_t tb_epool_kill(tb_handle_t epool)
 		tb_assert_and_check_goto(ep->spak && ep->list, end);
 
 		// post events
-		tb_size_t itor = tb_dlist_itor_head(ep->list);
-		tb_size_t tail = tb_dlist_itor_tail(ep->list);
-		for (; itor != tail; itor = tb_dlist_itor_next(ep->list, itor))
+		tb_size_t itor = tb_iterator_head(ep->list);
+		tb_size_t tail = tb_iterator_tail(ep->list);
+		for (; itor != tail; itor = tb_iterator_next(ep->list, itor))
 		{
 			// get event
-			tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, itor);
+			tb_event_t* e = (tb_event_t*)tb_iterator_item(ep->list, itor);
 			tb_assert_and_check_continue(e);
 
 			// post event
@@ -305,12 +305,12 @@ tb_long_t tb_epool_wait(tb_handle_t epool, tb_eobject_t* objs, tb_size_t maxn, t
 
 	// wait events
 	tb_size_t n = 0;
-	tb_size_t itor = tb_dlist_itor_head(ep->list);
-	tb_size_t tail = tb_dlist_itor_tail(ep->list);
-	for (; itor != tail && n < maxn; itor = tb_dlist_itor_next(ep->list, itor))
+	tb_size_t itor = tb_iterator_head(ep->list);
+	tb_size_t tail = tb_iterator_tail(ep->list);
+	for (; itor != tail && n < maxn; itor = tb_iterator_next(ep->list, itor))
 	{
 		// get event
-		tb_event_t* e = (tb_event_t*)tb_dlist_itor_at(ep->list, itor);
+		tb_event_t* e = (tb_event_t*)tb_iterator_item(ep->list, itor);
 		tb_assert_and_check_continue(e);
 
 		// wait post

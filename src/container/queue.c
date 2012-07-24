@@ -32,6 +32,61 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * iterator
+ */
+static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue, 0);
+
+	return queue->head;
+}
+static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue, 0);
+
+	return queue->tail;
+}
+static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue, 0);
+
+	return ((itor + 1) & (queue->maxn - 1));
+}
+static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue, 0);
+
+	return ((itor + queue->maxn - 1) & (queue->maxn - 1));
+}
+static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue && itor < queue->maxn, TB_NULL);
+	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
+}
+static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return(queue);
+
+	if (iterator->step > sizeof(tb_pointer_t))
+	{
+		tb_assert_return(item);
+		tb_memcpy(queue->data + itor * iterator->step, item, iterator->step);
+	}
+	else *((tb_pointer_t*)(queue->data + itor * iterator->step)) = item;
+}
+static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
+{
+	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_assert_return_val(queue && queue->func.comp, 0);
+	return queue->func.comp(&queue->func, ltem, rtem);
+}
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -49,6 +104,20 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	queue->maxn = tb_align_pow2(maxn + 1); // + tail
 	queue->func = func;
 	tb_assert_and_check_goto(tb_ispow2(queue->maxn), fail);
+
+	// init iterator
+	queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
+	queue->itor.data = (tb_pointer_t)queue;
+	queue->itor.size = 0;
+	queue->itor.priv = TB_NULL;
+	queue->itor.step = func.size;
+	queue->itor.head = tb_queue_iterator_head;
+	queue->itor.tail = tb_queue_iterator_tail;
+	queue->itor.prev = tb_queue_iterator_prev;
+	queue->itor.next = tb_queue_iterator_next;
+	queue->itor.item = tb_queue_iterator_item;
+	queue->itor.move = tb_queue_iterator_move;
+	queue->itor.comp = tb_queue_iterator_comp;
 
 	// calloc data
 	queue->data = tb_nalloc0(queue->maxn, func.size);
@@ -97,57 +166,15 @@ tb_void_t tb_queue_pop(tb_queue_t* queue)
 }
 tb_pointer_t tb_queue_get(tb_queue_t* queue)
 {
-	return tb_queue_at_head(queue);
+	return tb_queue_head(queue);
 }
-tb_pointer_t tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor)
+tb_pointer_t tb_queue_head(tb_queue_t* queue)
 {
-	return (tb_pointer_t)tb_queue_itor_const_at(queue, itor);
+	return tb_iterator_item(queue, tb_iterator_head(queue));
 }
-tb_pointer_t tb_queue_at_head(tb_queue_t* queue)
+tb_pointer_t tb_queue_last(tb_queue_t* queue)
 {
-	return tb_queue_itor_at(queue, tb_queue_itor_head(queue));
-}
-tb_pointer_t tb_queue_at_last(tb_queue_t* queue)
-{
-	return tb_queue_itor_at(queue, tb_queue_itor_last(queue));
-}
-tb_cpointer_t tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor)
-{
-	tb_assert_abort(queue && !tb_queue_null(queue) && itor < queue->maxn);
-	return queue->func.data((tb_item_func_t*)&queue->func, queue->data + itor * queue->func.size);
-}
-tb_cpointer_t tb_queue_const_at_head(tb_queue_t const* queue)
-{
-	return tb_queue_itor_const_at(queue, tb_queue_itor_head(queue));
-}
-tb_cpointer_t tb_queue_const_at_last(tb_queue_t const* queue)
-{
-	return tb_queue_itor_const_at(queue, tb_queue_itor_last(queue));
-}
-tb_size_t tb_queue_itor_head(tb_queue_t const* queue)
-{
-	tb_assert_and_check_return_val(queue, 0);
-	return queue->head;
-}
-tb_size_t tb_queue_itor_last(tb_queue_t const* queue)
-{
-	tb_assert_and_check_return_val(queue && !tb_queue_null(queue), 0);
-	return ((queue->tail + queue->maxn - 1) & (queue->maxn - 1));
-}
-tb_size_t tb_queue_itor_tail(tb_queue_t const* queue)
-{
-	tb_assert_and_check_return_val(queue, 0);
-	return queue->tail;
-}
-tb_size_t tb_queue_itor_next(tb_queue_t const* queue, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(queue, 0);
-	return ((itor + 1) & (queue->maxn - 1));
-}
-tb_size_t tb_queue_itor_prev(tb_queue_t const* queue, tb_size_t itor)
-{
-	tb_assert_and_check_return_val(queue, 0);
-	return ((itor + queue->maxn - 1) & (queue->maxn - 1));
+	return tb_iterator_item(queue, tb_iterator_last(queue));
 }
 tb_size_t tb_queue_size(tb_queue_t const* queue)
 {
