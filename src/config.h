@@ -2,7 +2,7 @@
 #define TB_CONFIG_H
 
 // arch
-#define TB_CONFIG_ARCH_x64
+#define TB_CONFIG_ARCH_x86
 //#define TB_CONFIG_ARCH_ARM
 //#define TB_CONFIG_ARCH_MIPS
 //#define TB_CONFIG_ARCH_SPARC
@@ -102,6 +102,7 @@
 // libm
 #define TB_CONFIG_LIBM_HAVE_SINCOS
 #define TB_CONFIG_LIBM_HAVE_SINCOSF
+
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
 
@@ -109,5 +110,5 @@
 // config
 #ifndef tbox_AUTO_CONFIG_H
 #define tbox_AUTO_CONFIG_H
-#define tbox_CONFIG_DEBUG 0
+#define tbox_CONFIG_DEBUG 1
 #endif

@@ -82,7 +82,7 @@ static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector && vector->comp, 0);
+	tb_assert_return_val(vector && vector->func.comp, 0);
 	return vector->func.comp(&vector->func, ltem, rtem);
 }
 /* ///////////////////////////////////////////////////////////////////////
@@ -118,7 +118,6 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	vector->itor.item = tb_vector_iterator_item;
 	vector->itor.move = tb_vector_iterator_move;
 	vector->itor.comp = tb_vector_iterator_comp;
-
 
 	// calloc data
 	vector->data = tb_nalloc0(vector->maxn, func.size);

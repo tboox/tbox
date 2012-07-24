@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "item.h"
+#include "iterator.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -96,6 +97,9 @@ typedef struct __tb_hash_item_list_t
  */
 typedef struct __tb_hash_t
 {
+	// the item itor
+	tb_iterator_t 			item_itor;
+
 	/// the hash list
 	tb_hash_item_list_t** 	hash_list;
 	tb_size_t 				hash_size;
@@ -125,10 +129,6 @@ tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 
 // accessors & modifiors
 tb_void_t 				tb_hash_clear(tb_hash_t* hash);
-tb_void_t 				tb_hash_remove(tb_hash_t* hash, tb_size_t itor);
-
-tb_pointer_t 			tb_hash_at(tb_hash_t* hash, tb_cpointer_t name);
-tb_cpointer_t 			tb_hash_const_at(tb_hash_t const* hash, tb_cpointer_t name);
 
 tb_pointer_t 			tb_hash_get(tb_hash_t* hash, tb_cpointer_t name);
 tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
@@ -140,34 +140,6 @@ tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
 
 // debug
 tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
-
-/*!iterator
- * 
- * @code
- * tb_size_t itor = tb_hash_itor_head(hash);
- * tb_size_t tail = tb_hash_itor_tail(hash);
- * for (; itor != tail; itor = tb_hash_itor_next(hash, itor))
- * {
- * 		tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
- * 		if (item)
- * 		{
- *
- * 		}
- * }
- * @endcode
- *
- * <pre>
- * head: => the first item
- * tail: => behind the last item, no item
- * </pre>
- *
- * @note the index of the same item is mutable, only for iterator
- */
-tb_hash_item_t* 		tb_hash_itor_at(tb_hash_t* hash, tb_size_t itor);
-tb_hash_item_t const* 	tb_hash_itor_const_at(tb_hash_t const* hash, tb_size_t itor);
-tb_size_t 				tb_hash_itor_head(tb_hash_t const* hash);
-tb_size_t 				tb_hash_itor_tail(tb_hash_t const* hash);
-tb_size_t 				tb_hash_itor_next(tb_hash_t const* hash, tb_size_t itor);
 
 /*!walk
  *

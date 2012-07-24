@@ -15,20 +15,20 @@
 #endif
 
 #define tb_hash_test_set_s2i(h, s) 		do {tb_size_t n = tb_strlen(s); tb_hash_set(h, s, n); } while (0);
-#define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen(s) == (tb_size_t)tb_hash_const_at(h, s)); } while (0);
-#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); tb_assert(!tb_hash_const_at(h, s)); } while (0);
+#define tb_hash_test_get_s2i(h, s) 		do {tb_assert(tb_strlen(s) == (tb_size_t)tb_hash_get(h, s)); } while (0);
+#define tb_hash_test_del_s2i(h, s) 		do {tb_hash_del(h, s); tb_assert(!tb_hash_get(h, s)); } while (0);
 
 #define tb_hash_test_set_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_hash_set(h, i, s); } while (0);
-#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_const_at(h, i))); } while (0);
-#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_const_at(h, i)); } while (0);
+#define tb_hash_test_get_i2s(h, i) 		do {tb_char_t s[256] = {0}; tb_snprintf(s, 256, "%u", i); tb_assert(!tb_strcmp(s, tb_hash_get(h, i))); } while (0);
+#define tb_hash_test_del_i2s(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
 
 #define tb_hash_test_set_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_set(h, item, item); } while (0);
-#define tb_hash_test_get_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_assert(!tb_memcmp(item, tb_hash_const_at(h, item), step)); } while (0);
-#define tb_hash_test_del_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_del(h, item); tb_assert(!tb_hash_const_at(h, item)); } while (0);
+#define tb_hash_test_get_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_assert(!tb_memcmp(item, tb_hash_get(h, item), step)); } while (0);
+#define tb_hash_test_del_m2m(h, i) 		do {tb_memset_u32(item, i, step >> 2); tb_hash_del(h, item); tb_assert(!tb_hash_get(h, item)); } while (0);
 
 #define tb_hash_test_set_i2i(h, i) 		do {tb_hash_set(h, i, i); } while (0);
-#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == tb_hash_const_at(h, i)); } while (0);
-#define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_const_at(h, i)); } while (0);
+#define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
 
 /* ///////////////////////////////////////////////////////////////////////
  * details
@@ -461,57 +461,6 @@ static tb_void_t tb_hash_test_i2i_perf()
 
 	tb_hash_exit(hash);
 }
-static tb_void_t tb_hash_test_itor_perf()
-{
-	// init hash
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_int(), tb_item_func_int());
-	tb_assert_and_check_return(hash);
-
-	// clear rand
-	tb_rand_clear();
-
-	// add items
-	__tb_volatile__ tb_size_t n = 100000;
-	while (n--) 
-	{
-		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
-		tb_hash_test_set_i2i(hash, i); 
-		tb_hash_test_get_i2i(hash, i);
-	}
-
-	// performance
-	tb_hong_t t = tb_mclock();
-	__tb_volatile__ tb_hize_t test[3] = {0};
-	__tb_volatile__ tb_size_t itor = tb_hash_itor_head(hash);
-	for (; itor != tb_hash_itor_tail(hash); )
-	{
-		__tb_volatile__ tb_hash_item_t const* item = tb_hash_itor_const_at(hash, itor);
-		if (item) 
-		{
-			if (!(((tb_size_t)item->data >> 25) & 0x1))
-			{
-				// remove, hack: the itor of the same item is mutable
-				tb_hash_remove(hash, itor);
-
-				// continue 
-				continue ;
-			}
-			else
-			{
-				test[0] += (tb_size_t)item->name;
-				test[1] += (tb_size_t)item->data;
-
-				test[2]++;
-			}
-		}
-
-		itor = tb_hash_itor_next(hash, itor);
-	}
-	t = tb_mclock() - t;
-	tb_print("name: %llx, data: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], test[2], tb_hash_size(hash), t);
-
-	tb_hash_exit(hash);
-}
 static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	tb_assert_and_check_return_val(hash && bdel && data, TB_FALSE);
@@ -585,7 +534,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_hash_test_itor_perf();
 	tb_hash_test_walk_perf();
 #endif
 

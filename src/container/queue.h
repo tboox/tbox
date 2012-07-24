@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "item.h"
+#include "iterator.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -75,6 +76,9 @@
  */
 typedef struct __tb_queue_t
 {
+	// the itor
+	tb_iterator_t 			itor;
+
 	// the data
 	tb_byte_t* 				data;
 	tb_size_t 				head;
@@ -95,11 +99,8 @@ tb_queue_t* 		tb_queue_init(tb_size_t maxn, tb_item_func_t func);
 tb_void_t 			tb_queue_exit(tb_queue_t* queue);
 
 // accessors & modifiors
-tb_pointer_t 		tb_queue_at_head(tb_queue_t* queue);
-tb_pointer_t 		tb_queue_at_last(tb_queue_t* queue);
-
-tb_cpointer_t 		tb_queue_const_at_head(tb_queue_t const* queue);
-tb_cpointer_t 		tb_queue_const_at_last(tb_queue_t const* queue);
+tb_pointer_t 		tb_queue_head(tb_queue_t* queue);
+tb_pointer_t 		tb_queue_last(tb_queue_t* queue);
 
 tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_cpointer_t data);
 tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
@@ -107,31 +108,6 @@ tb_pointer_t 	 	tb_queue_get(tb_queue_t* queue);
 
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
 tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
-
-/*!iterator
- * 
- * @code
- * tb_size_t itor = tb_queue_itor_head(queue);
- * tb_size_t tail = tb_queue_itor_tail(queue);
- * for (; itor != tail; itor = tb_queue_itor_next(queue, itor))
- * {
- * 		tb_cpointer_t data = tb_queue_itor_const_at(queue, itor);
- * 		if (data)
- * 		{
- * 			// ...
- * 		}
- * }
- * @endcode
- *
- */
-tb_pointer_t 		tb_queue_itor_at(tb_queue_t* queue, tb_size_t itor);
-tb_cpointer_t 		tb_queue_itor_const_at(tb_queue_t const* queue, tb_size_t itor);
-
-tb_size_t 			tb_queue_itor_head(tb_queue_t const* queue);
-tb_size_t 			tb_queue_itor_tail(tb_queue_t const* queue);
-tb_size_t 			tb_queue_itor_last(tb_queue_t const* queue);
-tb_size_t 			tb_queue_itor_next(tb_queue_t const* queue, tb_size_t itor);
-tb_size_t 			tb_queue_itor_prev(tb_queue_t const* queue, tb_size_t itor);
 
 // attributes
 tb_size_t 			tb_queue_size(tb_queue_t const* queue);

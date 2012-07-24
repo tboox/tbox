@@ -389,11 +389,11 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		tb_pstring_cstrfcat(&http->data, "HTTP/1.%1u\r\n", http->option.version);
 
 		// append key: value
-		tb_size_t itor = tb_hash_itor_head(http->option.head);
-		tb_size_t tail = tb_hash_itor_tail(http->option.head);
-		for (; itor != tail; itor = tb_hash_itor_next(http->option.head, itor))
+		tb_size_t itor = tb_iterator_head(http->option.head);
+		tb_size_t tail = tb_iterator_tail(http->option.head);
+		for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
 		{
-			tb_hash_item_t const* item = tb_hash_itor_const_at(http->option.head, itor);
+			tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
 			if (item && item->name && item->data) 
 				tb_pstring_cstrfcat(&http->data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
 		}
