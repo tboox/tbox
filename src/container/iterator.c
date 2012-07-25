@@ -186,7 +186,7 @@ tb_iterator_t tb_iterator_ptr(tb_pointer_t* data, tb_size_t size)
 	// ok
 	return itor;
 }
-tb_iterator_t tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp)
+tb_iterator_t tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step)
 {
 	// check
 	tb_assert(data && size && temp);
