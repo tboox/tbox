@@ -98,7 +98,7 @@ tb_iterator_t 	tb_iterator_str(tb_char_t** data, tb_size_t size, tb_bool_t bcase
 tb_iterator_t 	tb_iterator_ptr(tb_pointer_t* data, tb_size_t size);
 
 /// the memory iterator 
-tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step, tb_pointer_t temp);
+tb_iterator_t 	tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step);
 
 /// the iterator step
 tb_size_t 		tb_iterator_step(tb_iterator_t* iterator);
