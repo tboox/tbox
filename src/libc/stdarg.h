@@ -49,7 +49,7 @@
 #define tb_va_format(s, n, fmt, r) \
 do \
 { \
-	tb_int_t __tb_ret = 0; \
+	tb_long_t __tb_ret = 0; \
 	tb_va_list_t __tb_varg_list; \
     tb_va_start(__tb_varg_list, fmt); \
     __tb_ret = tb_vsnprintf(s, (n), fmt, __tb_varg_list); \
