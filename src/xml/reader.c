@@ -708,6 +708,10 @@ tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 	tb_pstring_init(&name);
 	tb_pstring_init(&data);
 
+	// skip name
+	while (p < e && *p && !tb_isspace(*p)) p++;
+	while (p < e && *p && tb_isspace(*p)) p++;
+
 	// parse attributes
 	tb_size_t n = 0;
 	while (p < e)
