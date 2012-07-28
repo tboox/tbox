@@ -34,16 +34,16 @@
  */
 
 /// the finder
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
+tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
 
 // the finder for all
-tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t item);
+tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
 
 /// the binary finder for ascending
-tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item);
+tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
 
 /// the binary finder for all
-tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t item);
+tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
 
 
 #endif

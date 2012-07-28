@@ -31,7 +31,7 @@
  * implementation
  */
 
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_FORWARD, tail);
@@ -39,16 +39,16 @@ tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cp
 	// find
 	tb_size_t itor;
 	for (itor = head; itor != tail; itor = tb_iterator_next(iterator, itor)) 
-		if (!tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), item)) break;
+		if (!tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), data)) break;
 
 	// ok?
 	return itor;
 }
-tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t item)
+tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data)
 {
-	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), data);
 }
-tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
+tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_RACCESS, tail);
@@ -59,15 +59,15 @@ tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	tb_size_t m = (l + r) >> 1;
 	while (r > l + 1)
 	{
-		if (tb_iterator_comp(iterator, item, tb_iterator_item(iterator, m)) < 0) r = m;
+		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, m), data) > 0) r = m;
 		else l = m;
 		m = (l + r) >> 1;
 	}
 
 	// ok?
-	return !tb_iterator_comp(iterator, item, tb_iterator_item(iterator, m))? m : tail;
+	return !tb_iterator_comp(iterator, tb_iterator_item(iterator, m), data)? m : tail;
 }
-tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t item)
+tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t data)
 {
-	return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), item);
+	return tb_binary_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), data);
 }
