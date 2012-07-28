@@ -297,22 +297,22 @@ tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt,
 tb_long_t tb_pstring_strcmp(tb_pstring_t* string, tb_pstring_t const* s)
 {
 	tb_assert_and_check_return_val(string && s, 0);
-	return tb_pstring_cstrncmp(string, s, tb_pstring_size(s));
+	return tb_pstring_cstrncmp(string, tb_pstring_cstr(s), tb_pstring_size(s) + 1);
 }
 tb_long_t tb_pstring_strimp(tb_pstring_t* string, tb_pstring_t const* s)
 {
 	tb_assert_and_check_return_val(string && s, 0);
-	return tb_pstring_cstrnicmp(string, s, tb_pstring_size(s));
+	return tb_pstring_cstrnicmp(string, tb_pstring_cstr(s), tb_pstring_size(s) + 1);
 }
 tb_long_t tb_pstring_cstrcmp(tb_pstring_t* string, tb_char_t const* s)
 {
 	tb_assert_and_check_return_val(string && s, 0);
-	return tb_pstring_cstrncmp(string, s, tb_strlen(s));
+	return tb_pstring_cstrncmp(string, s, tb_strlen(s) + 1);
 }
 tb_long_t tb_pstring_cstricmp(tb_pstring_t* string, tb_char_t const* s)
 {
 	tb_assert_and_check_return_val(string && s, 0);
-	return tb_pstring_cstrnicmp(string, s, tb_strlen(s));
+	return tb_pstring_cstrnicmp(string, s, tb_strlen(s) + 1);
 }
 tb_long_t tb_pstring_cstrncmp(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
