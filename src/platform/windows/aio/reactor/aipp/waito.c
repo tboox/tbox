@@ -64,11 +64,11 @@ static tb_bool_t tb_aipp_reactor_waito_delo(tb_aipp_reactor_t* reactor, tb_handl
 	tb_assert_and_check_return_val(rtor && rtor->hdls, TB_FALSE);
 
 	// find hdl
-	tb_size_t itor = tb_vector_itor_head(rtor->hdls);
-	tb_size_t tail = tb_vector_itor_tail(rtor->hdls);
-	for (; itor != tail; itor = tb_vector_itor_next(rtor->hdls, itor))
+	tb_size_t itor = tb_iterator_head(rtor->hdls);
+	tb_size_t tail = tb_iterator_tail(rtor->hdls);
+	for (; itor != tail; itor = tb_iterator_next(rtor->hdls, itor))
 	{
-		tb_handle_t hdl = (tb_handle_t)tb_vector_itor_at(rtor->hdls, itor);
+		tb_handle_t hdl = (tb_handle_t)tb_iterator_item(rtor->hdls, itor);
 		if (hdl == handle) break;
 	}
 	tb_assert_and_check_return_val(itor != tail, TB_FALSE);

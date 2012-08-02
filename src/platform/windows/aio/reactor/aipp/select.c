@@ -134,11 +134,11 @@ static tb_long_t tb_aipp_reactor_select_wait(tb_aipp_reactor_t* reactor, tb_aioo
 	
 	// sync
 	tb_size_t n = 0;
-	tb_size_t itor = tb_hash_itor_head(reactor->aipp->hash);
-	tb_size_t tail = tb_hash_itor_tail(reactor->aipp->hash);
-	for (; itor != tail && n < objm; itor = tb_hash_itor_next(reactor->aipp->hash, itor))
+	tb_size_t itor = tb_iterator_head(reactor->aipp->hash);
+	tb_size_t tail = tb_iterator_tail(reactor->aipp->hash);
+	for (; itor != tail && n < objm; itor = tb_iterator_next(reactor->aipp->hash, itor))
 	{
-		tb_hash_item_t* item = tb_hash_itor_at(reactor->aipp->hash, itor);
+		tb_hash_item_t* item = tb_iterator_item(reactor->aipp->hash, itor);
 		if (item)
 		{
 			tb_long_t 		fd = (tb_long_t)item->name - 1;
