@@ -74,11 +74,11 @@ static tb_bool_t tb_aipp_reactor_poll_seto(tb_aipp_reactor_t* reactor, tb_handle
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// set pfd
-	tb_size_t itor = tb_vector_itor_head(rtor->pfds);
-	tb_size_t tail = tb_vector_itor_tail(rtor->pfds);
-	for (; itor != tail; itor = tb_vector_itor_next(rtor->pfds, itor))
+	tb_size_t itor = tb_iterator_head(rtor->pfds);
+	tb_size_t tail = tb_iterator_tail(rtor->pfds);
+	for (; itor != tail; itor = tb_iterator_next(rtor->pfds, itor))
 	{
-		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(rtor->pfds, itor);
+		struct pollfd* pfd = (struct pollfd*)tb_iterator_item(rtor->pfds, itor);
 		if (pfd && pfd->fd == fd)
 		{
 			pfd->events = 0;
@@ -102,11 +102,11 @@ static tb_bool_t tb_aipp_reactor_poll_delo(tb_aipp_reactor_t* reactor, tb_handle
 	tb_assert_and_check_return_val(fd >= 0, TB_FALSE);
 
 	// find pfd
-	tb_size_t itor = tb_vector_itor_head(rtor->pfds);
-	tb_size_t tail = tb_vector_itor_tail(rtor->pfds);
-	for (; itor != tail; itor = tb_vector_itor_next(rtor->pfds, itor))
+	tb_size_t itor = tb_iterator_head(rtor->pfds);
+	tb_size_t tail = tb_iterator_tail(rtor->pfds);
+	for (; itor != tail; itor = tb_iterator_next(rtor->pfds, itor))
 	{
-		struct pollfd* pfd = (struct pollfd*)tb_vector_itor_at(rtor->pfds, itor);
+		struct pollfd* pfd = (struct pollfd*)tb_iterator_item(rtor->pfds, itor);
 		if (pfd && pfd->fd == fd) break;
 	}
 	tb_assert_and_check_return_val(itor != tail, TB_FALSE);
