@@ -28,6 +28,7 @@
  */
 #include "../prefix.h"
 #include "../../../aio/aio.h"
+#include "../../../libc/libc.h"
 #include "../../../math/math.h"
 #include "../../../memory/memory.h"
 #include "../../../container/container.h"

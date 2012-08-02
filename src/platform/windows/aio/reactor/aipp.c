@@ -38,6 +38,7 @@
  * implementation
  */
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
+tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp);
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_waito_init(aipp);
@@ -45,6 +46,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 #endif
 
 #ifdef TB_CONFIG_AIO_HAVE_SELECT
+tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
 tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_select_init(aipp);

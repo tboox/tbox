@@ -86,9 +86,11 @@ static tb_bool_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	olap->data.len 	= aice->u.read.size;
 	olap->aice 		= *aice;
 
+#if 0
 	// post recv
 	LONG n = WSARecv((tb_long_t)aice->aico->aioo.handle - 1, &olap->data, 1, &olap->size, &olap->flag, olap, TB_NULL);
 	tb_check_goto((SOCKET_ERROR != n) || (WSA_IO_PENDING == WSAGetLastError()), fail);
+#endif
 
 	// ok
 	return TB_TRUE;
@@ -110,9 +112,11 @@ static tb_bool_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 	olap->data.len 	= aice->u.writ.size;
 	olap->aice 		= *aice;
 
+#if 0
 	// post send
 	LONG n = WSASend((tb_long_t)aice->aico->aioo.handle - 1, &olap->data, 1, &olap->size, &olap->flag, olap, TB_NULL);
 	tb_check_goto((SOCKET_ERROR != n) || (WSA_IO_PENDING == WSAGetLastError()), fail);
+#endif
 
 	// ok
 	return TB_TRUE;
@@ -175,7 +179,7 @@ static tb_long_t tb_aicp_reactor_iocp_wait(tb_aicp_reactor_t* reactor, tb_long_t
 	// check
 	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
-
+#if 0
 	// wait
 	tb_iocp_olap_t* olap = TB_NULL;
 	DWORD 			size = 0;
@@ -186,7 +190,7 @@ static tb_long_t tb_aicp_reactor_iocp_wait(tb_aicp_reactor_t* reactor, tb_long_t
 	tb_check_return_val(r && aico && olap && aico == olap->aice.aico, -1);
 
 	tb_long_t ok = 1;
-#if 0
+
 	// done
 	olap->aice.ok = size;
 
@@ -195,12 +199,12 @@ static tb_long_t tb_aicp_reactor_iocp_wait(tb_aicp_reactor_t* reactor, tb_long_t
 
 	// free olap
 	tb_rpool_free(rtor->pool, olap);
-#else
-	// post to sort queue
-#endif
 
 	// ok
 	return ok;
+#else
+	return -1;
+#endif
 }
 
 static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
@@ -242,8 +246,8 @@ static tb_aicp_reactor_t* tb_aicp_reactor_iocp_init(tb_aicp_t* aicp)
 	rtor->base.exit = tb_aicp_reactor_iocp_exit;
 	rtor->base.addo = tb_aicp_reactor_iocp_addo;
 	rtor->base.delo = tb_aicp_reactor_iocp_delo;
-	rtor->base.post = tb_aicp_reactor_iocp_post;
-	rtor->base.wait = tb_aicp_reactor_iocp_wait;
+//	rtor->base.post = tb_aicp_reactor_iocp_post;
+//	rtor->base.wait = tb_aicp_reactor_iocp_wait;
 
 	// init port
 	rtor->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, TB_NULL, 0, 0);

@@ -35,10 +35,12 @@
  */
 
 #ifdef TB_CONFIG_AIO_HAVE_IOCP
+tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp);
 tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp)
 {
 	return tb_aicp_reactor_iocp_init(aicp);
 }
+tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp);
 tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp)
 {
 	return tb_aicp_reactor_iocp_init(aicp);
