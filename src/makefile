@@ -261,6 +261,7 @@ INC_FILES 				= \
 						platform/arch/arm/atomic.h \
 						platform/arch/sh4/prefix.h \
 						platform/arch/sh4/atomic.h \
+						platform/windows/atomic.h \
 						platform/generic/prefix.h \
 						platform/generic/atomic.h \
 						network/prefix.h \
