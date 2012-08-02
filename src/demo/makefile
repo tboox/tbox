@@ -25,7 +25,7 @@ ifeq ($(TB_CONFIG_PLAT),mac_x64)
 demo_LIBS 				= z m dl pthread
 endif
 
-ifeq ($(TB_CONFIG_PLAT),windows_x86)
+ifeq ($(TB_CONFIG_PLAT),mingw_x86)
 demo_LIBS 				= ws2_32
 endif
 

@@ -2,14 +2,14 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = windows_x86
+PLAT = mingw_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = n
-SDK = /home/ruki/programs/windows/cross
-BIN = /home/ruki/programs/windows/cross/bin
+SDK =
+BIN =
 HOST = mac
 CCACHE = ccache
 DISTCC =

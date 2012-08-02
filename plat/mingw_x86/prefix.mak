@@ -15,8 +15,14 @@ DLL_SUFFIX 			= .so
 
 ASM_SUFFIX 			= .S
 
-# tool
+# prefix
+ifeq ($(BIN),)
+PRE 				= i686-w64-mingw32-
+else
 PRE 				= $(BIN)/i686-w64-mingw32-
+endif
+
+# tool
 CC 					= $(PRE)gcc
 AR 					= $(PRE)ar
 STRIP 				= $(PRE)strip
