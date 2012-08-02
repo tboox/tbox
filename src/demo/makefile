@@ -9,6 +9,10 @@ ifeq ($(TB_CONFIG_PLAT),linux_x64)
 demo_LIBS 				= z m dl pthread
 endif
 
+ifeq ($(TB_CONFIG_PLAT),cygwin_x86)
+demo_LIBS 				= z m dl pthread
+endif
+
 ifeq ($(TB_CONFIG_PLAT),freebsd_x86)
 demo_LIBS 				= z m pthread
 endif
