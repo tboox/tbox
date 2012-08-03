@@ -36,6 +36,6 @@ tb_double_t tb_log2(tb_double_t x)
 #ifdef TB_CONFIG_LIBM_HAVE_LOG2
 	return log2(x);
 #else
-	return log(x) / log(2);
+	return log(x) * 1.44269504088896340736;
 #endif
 }
