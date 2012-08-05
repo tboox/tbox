@@ -68,6 +68,8 @@ tb_void_t tb_url_clear(tb_url_t* url)
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
+	url->bwin = 0;
+	url->pwin = 0;
 	tb_ipv4_clr(&url->ipv4);
 	tb_sstring_clear(&url->host);
 	tb_sstring_clear(&url->path);
@@ -90,8 +92,16 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 			tb_check_return_val(tb_sstring_size(&url->path), TB_NULL);
 
 			// add protocol
-			if (url->bssl) tb_pstring_cstrncpy(&url->urls, "files://", 8);
-			else tb_pstring_cstrncpy(&url->urls, "file://", 7);
+			if (!url->bwin)
+			{
+				if (url->bssl) tb_pstring_cstrncpy(&url->urls, "files://", 8);
+				else tb_pstring_cstrncpy(&url->urls, "file://", 7);
+			}
+			else
+			{
+				tb_assert(url->pwin);
+				tb_pstring_cstrfcpy(&url->urls, "%c:/", url->pwin);
+			}
 
 			// add path
 			tb_pstring_cstrncat(&url->urls, tb_sstring_cstr(&url->path), tb_sstring_size(&url->path));
@@ -186,6 +196,14 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 		url->bssl = 1;
 		p += 8;
 	}
+	else if (tb_isalpha(p[0]) && p[1] == ':' && p[2] == '/')
+	{
+		url->poto = TB_URL_PROTO_FILE;
+		url->bssl = 0;
+		url->bwin = 1;
+		url->pwin = *p;
+		p += 3;
+	}
 	else goto fail;
 
 	// end?
@@ -218,7 +236,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	}
 
 	// parse path
-	if (*p != '/') tb_sstring_chrcat(&url->path, '/');
+	if (*p != '/' && !url->bwin) tb_sstring_chrcat(&url->path, '/');
 	while (*p && *p != '?' && *p != '&' && *p != '=') tb_sstring_chrcat(&url->path, *p++);
 
 	// parse args
@@ -238,6 +256,8 @@ tb_void_t tb_url_cpy(tb_url_t* url, tb_url_t const* u)
 	url->poto = u->poto;
 	url->port = u->port;
 	url->bssl = u->bssl;
+	url->bwin = u->bwin;
+	url->pwin = u->pwin;
 	tb_sstring_strcpy(&url->host, &u->host);
 	tb_sstring_strcpy(&url->path, &u->path);
 	tb_pstring_strcpy(&url->args, &u->args);
