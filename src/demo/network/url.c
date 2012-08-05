@@ -77,6 +77,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("HTTP://LOCALHOST/RUKI/FILE.TXT?ARG0=11111&ARG1=222222");
 	tb_url_test_set("HTTP://LOCALHOST:8080/RUKI/FILE.TXT?XXXX&SDS");
 
+	tb_url_test_set("C:/HOME/RUKI/FILE.TXT");
+	tb_url_test_set("d:/home/ruki/file.txt");
+
 	tb_exit();
 	return 0;
 }
