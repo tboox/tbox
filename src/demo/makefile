@@ -26,7 +26,7 @@ demo_LIBS 				= z m dl pthread
 endif
 
 ifeq ($(TB_CONFIG_PLAT),mingw_x86)
-demo_LIBS 				= ws2_32
+demo_LIBS 				= ws2_32 
 endif
 
 ifeq ($(TB_CONFIG_PLAT),linux_arm)
