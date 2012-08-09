@@ -68,7 +68,7 @@ CXXFLAGS 			= \
 # ldflags
 LDFLAGS_RELEASE 	=
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= 
+LDFLAGS 			= -static
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
