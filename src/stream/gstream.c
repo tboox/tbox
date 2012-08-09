@@ -393,6 +393,8 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 		t = TB_GSTREAM_TYPE_FILE;
 	else if (!tb_strnicmp(p, "socks://", 8))
 		t = TB_GSTREAM_TYPE_SOCK;
+	else if (tb_isalpha(p[0]) && p[1] == ':' && p[2] == '/')
+		t = TB_GSTREAM_TYPE_FILE;
 	else return TB_NULL;
 	tb_assert_and_check_goto(t && t < tb_arrayn(g_gstream_table), fail);
 
