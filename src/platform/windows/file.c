@@ -43,7 +43,12 @@
 static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(path && data && maxn > 3, TB_NULL);
-	if (path[0] == '/' && path[2] == '/') 
+
+	// is windows path? .e.g c:/home/file.txt
+	if (tb_isalpha(path[0]) && path[1] == ':' && path[2] == '/')
+		return path;
+	// /c/home/file.txt => c:/home/file.txt
+	else if (path[0] == '/' && path[2] == '/') 
 	{
 		data[0] = path[1];
 		data[1] = ':';
@@ -52,6 +57,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
+	// file:///c/home/file.txt => c:/home/file.txt
 	else if (!tb_strnicmp(path, "file://", 7)) 
 	{
 		data[0] = path[8];
