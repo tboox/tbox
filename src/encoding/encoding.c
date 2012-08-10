@@ -70,7 +70,7 @@ static tb_uint32_t tb_encoding_gb2312_from_unicode(tb_uint32_t ch)
 	// is ascii?
 	if (ch <= 0x7f) return ch;
 
-	// { find the gb2312 character
+	// find the gb2312 character
 	tb_int_t left = 0;
 	tb_int_t right = (g_encoding_unicode_to_gb2312_table_size / sizeof(g_encoding_unicode_to_gb2312_table_data[0])) - 1;
 	while (left <= right)
@@ -86,7 +86,6 @@ static tb_uint32_t tb_encoding_gb2312_from_unicode(tb_uint32_t ch)
 		if (ch > mid_unicode) left = mid + 1;
 		else right = mid - 1;
 	}
-	// }
 
 	return 0;
 }

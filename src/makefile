@@ -68,6 +68,7 @@ tbox_C_FILES 			+= \
 						utils/md5 \
 						utils/sha \
 						utils/crc \
+						utils/url \
 						utils/base32 \
 						utils/base64 \
 						xml/node \
@@ -284,6 +285,7 @@ INC_FILES 				= \
 						utils/sha.h \
 						utils/md5.h \
 						utils/crc.h \
+						utils/url.h \
 						utils/base32.h \
 						utils/base64.h \
 						utils/opt/bits_x86.h \
