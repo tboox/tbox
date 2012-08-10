@@ -45,6 +45,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("file:///home/ruki/file.txt");
 	tb_url_test_set("sock://localhost:8080");
 	tb_url_test_set("sock://localhost:8080/ruki/file.txt");
+	tb_url_test_set("rtsp://localhost:8080");
+	tb_url_test_set("rtsp://localhost:8080/ruki/file.txt");
 	tb_url_test_set("http://localhost");
 	tb_url_test_set("http://localhost:80");
 	tb_url_test_set("http://localhost:8080");

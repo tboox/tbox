@@ -6,6 +6,7 @@ NAMES = \
 		base32 \
 		base64 \
 		bits \
+		url \
 		crc \
 		md5 \
 		sha \

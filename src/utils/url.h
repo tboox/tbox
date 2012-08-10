@@ -17,25 +17,23 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		url.h
+ * @ingroup 	utils
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
+#ifndef TB_UTILS_URL_H
+#define TB_UTILS_URL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "time.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_size_t tb_url_encode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+tb_size_t tb_url_decode(tb_char_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
 
 #endif
+

@@ -109,13 +109,15 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 		break;
 	case TB_URL_PROTO_SOCK:
 	case TB_URL_PROTO_HTTP:
+	case TB_URL_PROTO_RTSP:
 		{
 			// check
 			tb_check_return_val(url->port && tb_sstring_size(&url->host), TB_NULL);
 
 			// add protocol
 			if (url->poto == TB_URL_PROTO_HTTP) tb_pstring_cstrcpy(&url->urls, "http");
-			else tb_pstring_cstrcpy(&url->urls, "sock");
+			else if (url->poto == TB_URL_PROTO_SOCK) tb_pstring_cstrcpy(&url->urls, "sock");
+			else tb_pstring_cstrcpy(&url->urls, "rtsp");
 
 			// add ssl
 			if (url->bssl) tb_pstring_chrcat(&url->urls, 's');
@@ -178,6 +180,12 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 		url->bssl = 0;
 		p += 7;
 	}
+	else if (!tb_strnicmp(p, "rtsp://", 7))
+	{
+		url->poto = TB_URL_PROTO_RTSP;
+		url->bssl = 0;
+		p += 7;
+	}
 	else if (!tb_strnicmp(p, "https://", 8))
 	{
 		url->poto = TB_URL_PROTO_HTTP;
@@ -196,6 +204,12 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 		url->bssl = 1;
 		p += 8;
 	}
+	else if (!tb_strnicmp(p, "rtsps://", 8))
+	{
+		url->poto = TB_URL_PROTO_RTSP;
+		url->bssl = 1;
+		p += 8;
+	}
 	else if (tb_isalpha(p[0]) && p[1] == ':' && p[2] == '/')
 	{
 		url->poto = TB_URL_PROTO_FILE;
@@ -209,8 +223,8 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	// end?
 	tb_assert_and_check_goto(*p, fail);
 
-	// parse host and port for http or sock
-	if (url->poto == TB_URL_PROTO_HTTP || url->poto == TB_URL_PROTO_SOCK)
+	// parse host and port for http or sock or rtsp
+	if (url->poto == TB_URL_PROTO_HTTP || url->poto == TB_URL_PROTO_SOCK || url->poto == TB_URL_PROTO_RTSP)
 	{
 		// parse host
 		while (*p && *p != '/' && *p != ':') tb_sstring_chrcat(&url->host, *p++);
