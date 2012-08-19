@@ -52,13 +52,17 @@ typedef tb_void_t 			(*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_p
 /// the item type
 typedef enum __tb_item_type_t
 {
-	TB_ITEM_TYPE_NUL 	= 0 	//!< null
-,	TB_ITEM_TYPE_STR 	= 1 	//!< c-string
-,	TB_ITEM_TYPE_INT 	= 2 	//!< integer
-,	TB_ITEM_TYPE_PTR 	= 3 	//!< pointer
-,	TB_ITEM_TYPE_EFM 	= 4 	//!< external fixed memory
-,	TB_ITEM_TYPE_IFM 	= 5 	//!< internal fixed memory
-,	TB_ITEM_TYPE_OTR 	= 6 	//!< other
+	TB_ITEM_TYPE_NUL 		= 0 	//!< null
+,	TB_ITEM_TYPE_LONG 		= 1 	//!< integer for tb_long_t
+,	TB_ITEM_TYPE_SIZE 		= 2 	//!< integer for tb_size_t
+,	TB_ITEM_TYPE_UINT8 		= 3 	//!< integer for tb_uint8_t
+,	TB_ITEM_TYPE_UINT16 	= 4 	//!< integer for tb_uint16_t
+,	TB_ITEM_TYPE_UINT32 	= 5 	//!< integer for tb_uint32_t
+,	TB_ITEM_TYPE_STR 		= 6 	//!< c-string
+,	TB_ITEM_TYPE_PTR 		= 7 	//!< pointer
+,	TB_ITEM_TYPE_EFM 		= 8 	//!< external fixed memory
+,	TB_ITEM_TYPE_IFM 		= 9 	//!< internal fixed memory
+,	TB_ITEM_TYPE_OTR 		= 10 	//!< other
 
 }tb_item_type_t;
 
@@ -96,6 +100,21 @@ typedef struct __tb_item_func_t
  * interfaces
  */
 
+/// the integer item function for tb_long_t
+tb_item_func_t 		tb_item_func_long();
+
+/// the integer item function for tb_size_t
+tb_item_func_t 		tb_item_func_size();
+
+/// the integer item function for tb_uint8_t
+tb_item_func_t 		tb_item_func_uint8();
+
+/// the integer item function for tb_uint16_t
+tb_item_func_t 		tb_item_func_uint16();
+
+/// the integer item function for tb_uint32_t
+tb_item_func_t 		tb_item_func_uint32();
+
 /*!the c-string item function
  *
  * using tb_strdup if the spool is null, 
@@ -103,9 +122,6 @@ typedef struct __tb_item_func_t
  *
  */
 tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
-
-/// the integer item function
-tb_item_func_t 		tb_item_func_int();
 
 /// the pointer item function
 tb_item_func_t 		tb_item_func_ptr();

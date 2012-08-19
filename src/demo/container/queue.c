@@ -10,7 +10,7 @@
 static tb_size_t tb_queue_put_and_pop_test()
 {
 	// init
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_int());
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
 	tb_queue_put(queue, 0);
@@ -56,7 +56,7 @@ static tb_size_t tb_queue_iterator_next_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_queue_t* queue = tb_queue_init(n, tb_item_func_int());
+	tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
 	while (n--) tb_queue_put(queue, 0xf);
@@ -81,7 +81,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 {
 	// init
 	tb_size_t n = 1000000;
-	tb_queue_t* queue = tb_queue_init(n, tb_item_func_int());
+	tb_queue_t* queue = tb_queue_init(n, tb_item_func_long());
 	tb_assert_and_check_return_val(queue, 0);
 
 	while (n--) tb_queue_put(queue, 0xf);
@@ -115,7 +115,7 @@ static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_int_test()
 {
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_int());
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
 	tb_assert_and_check_return(queue);
 
 	tb_print("=============================================================");
@@ -334,7 +334,7 @@ static tb_void_t tb_queue_perf_test()
 static tb_void_t tb_queue_test_itor_perf()
 {
 	// init queue
-	tb_queue_t* 	queue = tb_queue_init(100000, tb_item_func_int());
+	tb_queue_t* 	queue = tb_queue_init(100000, tb_item_func_long());
 	tb_assert_and_check_return(queue);
 
 	// clear rand
@@ -402,7 +402,7 @@ static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, 
 static tb_void_t tb_queue_test_walk_perf()
 {
 	// init queue
-	tb_queue_t* 	queue = tb_queue_init(100000, tb_item_func_int());
+	tb_queue_t* 	queue = tb_queue_init(100000, tb_item_func_long());
 	tb_assert_and_check_return(queue);
 
 	// clear rand
