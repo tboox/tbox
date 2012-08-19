@@ -17,7 +17,7 @@
 static tb_size_t tb_dlist_insert_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	// insert one first
@@ -49,7 +49,7 @@ static tb_size_t tb_dlist_insert_test()
 static tb_size_t tb_dlist_insert_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -78,7 +78,7 @@ static tb_size_t tb_dlist_insert_head_test()
 static tb_size_t tb_dlist_insert_tail_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -107,7 +107,7 @@ static tb_size_t tb_dlist_insert_tail_test()
 static tb_size_t tb_dlist_ninsert_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	// insert one first
@@ -138,7 +138,7 @@ static tb_size_t tb_dlist_ninsert_test()
 static tb_size_t tb_dlist_ninsert_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -166,7 +166,7 @@ static tb_size_t tb_dlist_ninsert_head_test()
 static tb_size_t tb_dlist_ninsert_tail_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -194,7 +194,7 @@ static tb_size_t tb_dlist_ninsert_tail_test()
 static tb_size_t tb_dlist_remove_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -218,7 +218,7 @@ static tb_size_t tb_dlist_remove_test()
 static tb_size_t tb_dlist_remove_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -240,7 +240,7 @@ static tb_size_t tb_dlist_remove_head_test()
 static tb_size_t tb_dlist_remove_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -264,7 +264,7 @@ static tb_size_t tb_dlist_remove_last_test()
 static tb_size_t tb_dlist_nremove_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -287,7 +287,7 @@ static tb_size_t tb_dlist_nremove_test()
 static tb_size_t tb_dlist_nremove_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -310,7 +310,7 @@ static tb_size_t tb_dlist_nremove_head_test()
 static tb_size_t tb_dlist_nremove_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -333,7 +333,7 @@ static tb_size_t tb_dlist_nremove_last_test()
 static tb_size_t tb_dlist_replace_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -360,7 +360,7 @@ static tb_size_t tb_dlist_replace_test()
 static tb_size_t tb_dlist_replace_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -385,7 +385,7 @@ static tb_size_t tb_dlist_replace_head_test()
 static tb_size_t tb_dlist_replace_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
@@ -411,7 +411,7 @@ static tb_size_t tb_dlist_replace_last_test()
 static tb_size_t tb_dlist_nreplace_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -436,7 +436,7 @@ static tb_size_t tb_dlist_nreplace_test()
 static tb_size_t tb_dlist_nreplace_head_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -461,7 +461,7 @@ static tb_size_t tb_dlist_nreplace_head_test()
 static tb_size_t tb_dlist_nreplace_last_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -488,7 +488,7 @@ static tb_size_t tb_dlist_nreplace_last_test()
 static tb_size_t tb_dlist_iterator_next_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
@@ -513,7 +513,7 @@ static tb_size_t tb_dlist_iterator_next_test()
 static tb_size_t tb_dlist_iterator_prev_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 10000;
@@ -551,7 +551,7 @@ static tb_void_t tb_dlist_int_dump(tb_dlist_t const* dlist)
 }
 static tb_void_t tb_dlist_int_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
@@ -888,7 +888,7 @@ static tb_void_t tb_dlist_perf_test()
 static tb_void_t tb_dlist_test_itor_perf()
 {
 	// init dlist
-	tb_dlist_t* 	dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* 	dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return(dlist);
 
 	// clear rand
@@ -960,7 +960,7 @@ static tb_bool_t tb_dlist_test_walk_item(tb_dlist_t* dlist, tb_pointer_t* item, 
 static tb_void_t tb_dlist_test_walk_perf()
 {
 	// init dlist
-	tb_dlist_t* 	dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_int());
+	tb_dlist_t* 	dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return(dlist);
 
 	// clear rand
