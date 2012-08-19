@@ -209,6 +209,11 @@ tb_iterator_t tb_iterator_mem(tb_pointer_t data, tb_size_t size, tb_size_t step)
 	// ok
 	return itor;
 }
+tb_size_t tb_iterator_mode(tb_iterator_t* iterator)
+{
+	tb_assert_and_check_return_val(iterator, 0);
+	return iterator->mode;
+}
 tb_size_t tb_iterator_step(tb_iterator_t* iterator)
 {
 	tb_assert_and_check_return_val(iterator, 0);
