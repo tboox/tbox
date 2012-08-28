@@ -84,22 +84,36 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 	path = tb_file_path_to_windows(path, data, 4096);
 	tb_assert_and_check_return_val(path, TB_NULL);
 
+	// init access
 	DWORD access = GENERIC_READ;
 	if (flags & TB_FILE_RO) access = GENERIC_READ;
 	else if (flags & TB_FILE_WO) access = GENERIC_WRITE;
 	else if (flags & TB_FILE_RW) access = GENERIC_READ | GENERIC_WRITE;
 
+	// init share
 	DWORD share = FILE_SHARE_READ;
 	if (flags & TB_FILE_RO) share = FILE_SHARE_READ;
 	else if (flags & TB_FILE_WO) share = FILE_SHARE_WRITE;
 	else if (flags & TB_FILE_RW) share = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
+	// init flag
 	DWORD cflag = 0;
 	if (flags & TB_FILE_CREAT) cflag |= CREATE_ALWAYS;
 	else if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
 	if (!cflag) cflag |= OPEN_EXISTING;
 
+	// init file
 	HANDLE hfile = CreateFile(path, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	// append?
+	if (hfile != INVALID_HANDLE_VALUE && (flags & TB_FILE_APPEND))
+	{
+		// seek to end
+		tb_hize_t size = tb_file_size((tb_handle_t)hfile);
+		if (size) tb_file_seek((tb_handle_t)hfile, size);
+	}
+
+	// ok?
 	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : TB_NULL;
 }
 tb_bool_t tb_file_exit(tb_handle_t hfile)
