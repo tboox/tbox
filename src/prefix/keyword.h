@@ -39,6 +39,10 @@
 #define __tb_file__ 				TB_CONFIG_KEYWORD_FILE
 #define __tb_line__ 				TB_CONFIG_KEYWORD_LINE
 #define __tb_volatile__ 			volatile
+#define __tb_cdecl__ 				TB_CONFIG_KEYWORD_CDECL
+#define __tb_stdcall__ 				TB_CONFIG_KEYWORD_STDCALL
+#define __tb_fastcall__ 			TB_CONFIG_KEYWORD_FASTCALL
+#define __tb_thiscall__ 			TB_CONFIG_KEYWORD_THISCALL
 
 #if defined(TB_COMPILER_IS_GCC) && __GNUC__ > 2
 # 	define __tb_likely__(x) 		__builtin_expect((x), 1)
