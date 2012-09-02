@@ -17,27 +17,41 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		packed_e.h
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "dns.h"
-#include "file.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "dynamic.h"
+#include "config.h"
+#include "compiler.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
 
+/* packed
+ *
+ * #include "tbox/prefix/packed.h"
+ * typedef struct __tb_xxxxx_t
+ * {
+ * 		tb_byte_t 	a;
+ * 		tb_uint32_t b;
+ *
+ * } __tb_packed__ tb_xxxxx_t;
+ *
+ * #include "tbox/prefix/packed.h"
+ *
+ * sizeof(tb_xxxxx_t) == 5
+ *
+ */
+#ifdef TB_COMPILER_IS_MSVC
+# 	ifndef TB_PACKED_ENTER
+# 		pragma pack(push, 1)
+# 		define TB_PACKED_ENTER
+# 	else
+# 		pragma pack(pop)
+# 		undef TB_PACKED_ENTER
+# 	endif
 #endif

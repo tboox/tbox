@@ -152,6 +152,7 @@ endif
 # platform
 tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_DNS)/dns \
+						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
@@ -187,6 +188,7 @@ INC_FILES 				= \
 						prefix/check.h \
 						prefix/abort.h \
 						prefix/trace.h \
+						prefix/packed.h \
 						prefix/config.h \
 						memory/vpool.h \
 						memory/fpool.h \
@@ -251,6 +253,7 @@ INC_FILES 				= \
 						platform/event.h \
 						platform/epool.h \
 						platform/atomic.h \
+						platform/dynamic.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \

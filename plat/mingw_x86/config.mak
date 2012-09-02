@@ -9,6 +9,7 @@ TB_CONFIG_ARCH 					= x86
 
 # api
 TB_CONFIG_API_DNS 				= windows
+TB_CONFIG_API_DLL 				= windows
 TB_CONFIG_API_FILE 				= windows
 TB_CONFIG_API_SOCK 				= windows
 TB_CONFIG_API_UTIL 				= windows
