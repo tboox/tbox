@@ -35,18 +35,6 @@
 # 	define TB_CONFIG_ASSEMBLER_GAS
 #endif
 
-// keyword
-#define TB_CONFIG_KEYWORD_INLINE		inline
-#define TB_CONFIG_KEYWORD_REGISTER		register
-#define TB_CONFIG_KEYWORD_ASM 			__asm__
-#define TB_CONFIG_KEYWORD_FUNC			__FUNCTION__
-#define TB_CONFIG_KEYWORD_LINE			__LINE__
-#define TB_CONFIG_KEYWORD_FILE			__FILE__
-#define TB_CONFIG_KEYWORD_CDECL			__cdecl
-#define TB_CONFIG_KEYWORD_STDCALL		__stdcall
-#define TB_CONFIG_KEYWORD_FASTCALL		__fastcall
-#define TB_CONFIG_KEYWORD_THISCALL		__thiscall
-
 // type
 #define TB_CONFIG_TYPE_FLOAT
 

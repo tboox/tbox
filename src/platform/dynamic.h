@@ -1,4 +1,4 @@
-/*!The Treasure Box Library
+/*!The Treasure Box dynamic
  * 
  * TBox is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,27 +17,28 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		mutex.h
+ * @ingroup 	dynamic
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_DYNAMIC_H
+#define TB_PLATFORM_DYNAMIC_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "file.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "dynamic.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+// init & exit
+tb_handle_t 	tb_dynamic_init(tb_char_t const* name);
+tb_void_t 		tb_dynamic_exit(tb_handle_t dynamic);
+
+// func
+tb_pointer_t 	tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name);
 
 #endif

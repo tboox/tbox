@@ -7,6 +7,19 @@
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
+#include "prefix/packed.h"
+typedef struct __tb_xxxxx_t
+{
+ 		tb_byte_t 	a;
+ 		tb_uint32_t b;
+
+} __tb_packed__ tb_xxxxx_t;
+#include "prefix/packed.h"
+
+tb_void_t __tb_inline_force__ add(int a);
+tb_void_t __tb_inline_force__ add(int a)
+{
+}
 
 tb_int_t test2_main(tb_int_t argc, tb_char_t** argv);
 
@@ -17,18 +30,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// c++
 	test2_main(argc, argv);
 
-	tb_byte_t byte[1] = {0xf0};
-	tb_gstream_t* gst = tb_gstream_init_from_url("sock://255.255.255.255:9090?udp=");
-	tb_gstream_bopen(gst);
-	tb_print("1");
-//	tb_gstream_bwrit(gst, byte, 1);
-	tb_print("2");
-//	tb_gstream_bfwrit(gst, TB_NULL, 0);
-	tb_print("3");
-	tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, -1);
-	tb_print("4");
-	tb_gstream_bread(gst, byte, 1);
-	tb_print("%x", byte[0]);
+	tb_print("%d", sizeof(tb_xxxxx_t));
 
 	tb_exit();
 	return 0;
