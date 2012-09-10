@@ -56,7 +56,7 @@
 // conversion
 #ifdef TB_CONFIG_TYPE_FLOAT
 # 	ifndef tb_fixed16_to_float
-# 		define tb_fixed16_to_float(x) 		(((x) * 1.5258789e-5))
+# 		define tb_fixed16_to_float(x) 		((tb_float_t)((x) * 1.5258789e-5))
 # 	endif
 # 	ifndef tb_float_to_fixed16
 # 		define tb_float_to_fixed16(x) 		((tb_fixed16_t)((x) * TB_FIXED16_ONE))

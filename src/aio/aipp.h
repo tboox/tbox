@@ -35,7 +35,7 @@
  * types
  */
 // the aio poll pool reactor type
-typedef struct __tb_aipp_t;
+struct __tb_aipp_t;
 typedef struct __tb_aipp_reactor_t
 {
 	// the reference to the aio pool

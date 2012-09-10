@@ -144,7 +144,7 @@ typedef struct __tb_aice_t
 
 }tb_aice_t;
 
-typedef struct __tb_aicp_t;
+struct __tb_aicp_t;
 /// the aio poll pool reactor type
 typedef struct __tb_aicp_reactor_t
 {

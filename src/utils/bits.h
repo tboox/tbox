@@ -718,7 +718,7 @@ static __tb_inline__ tb_size_t tb_bits_cb1_u64_inline(tb_uint64_t x)
 	x = (x * 0x0101010101010101ULL) >> 56;
 #endif
 
-    return x;
+    return (tb_size_t)x;
 }
 
 #ifdef TB_CONFIG_TYPE_FLOAT
