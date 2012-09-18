@@ -625,9 +625,9 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						tb_size_t type = tb_bstream_get_u8(&flv->sdata_bst);
 						tb_assert_goto(type == TB_FLV_SDATA_TYPE_STRING, end);
 						
-						// get onMetaData object
+						// get object list
 						tb_flv_sdata_value_t sdata;
-						if (!tb_flv_sdata_object_spank(flv, &sdata)) goto end;
+						if (!tb_flv_sdata_objects_spank(flv, &sdata)) goto end;
 					}
 
 					// callback
