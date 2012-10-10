@@ -53,9 +53,9 @@
 
 # 	define __tb_inline__ 			__inline__
 # 	define __tb_inline_force__ 		__inline__ __attribute__((always_inline))
-# 	define __tb_cdecl__ 	
-# 	define __tb_stdcall__ 			__attribute__((regparm(0)))
-# 	define __tb_fastcall__ 			__attribute__((regparm(3)))
+# 	define __tb_cdecl__ 			__attribute__((__cdecl__))
+# 	define __tb_stdcall__ 			__attribute__((__stdcall__))
+# 	define __tb_fastcall__ 			__attribute__((__fastcall__))
 # 	define __tb_thiscall__ 			__attribute__((__thiscall__))
 # 	define __tb_packed__ 			__attribute__((packed, aligned(1)))
 
