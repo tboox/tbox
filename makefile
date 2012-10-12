@@ -159,6 +159,7 @@ config :
 	@echo "PRO_NAME =" $(PRO_NAME) 						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
 	@echo "SDK =" $(SDK) 								>> config.mak
+	@echo "NDK =" $(NDK) 								>> config.mak
 	@echo "BIN =" $(BIN) 								>> config.mak
 	@echo "HOST =" $(HOST) 								>> config.mak
 	@echo "CCACHE =" $(CCACHE) 							>> config.mak
@@ -170,6 +171,7 @@ config :
 	@echo "export PRO_NAME" 		 					>> config.mak
 	@echo "export DEBUG" 			 					>> config.mak
 	@echo "export SDK" 				 					>> config.mak
+	@echo "export NDK" 				 					>> config.mak
 	@echo "export BIN" 				 					>> config.mak
 	@echo "export HOST" 			 					>> config.mak
 	@echo "export CCACHE" 			 					>> config.mak

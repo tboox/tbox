@@ -35,12 +35,21 @@
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
 	tb_assert_and_check_return_val(name, TB_NULL);
+
+	// clear error
+	dlerror();
+
+	// open
 	tb_handle_t dynamic = dlopen(name, RTLD_LAZY);
+
+	// error?
 	if (dlerror()) 
 	{
 		dlclose(dynamic);
 		dynamic = TB_NULL;
 	}
+
+	// ok?
 	return dynamic;
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
