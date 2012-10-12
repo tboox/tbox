@@ -34,7 +34,8 @@ PWD 				= pwd
 # cppflags: c/c++ files
 CPPFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CPPFLAGS_DEBUG 		= -g
-CPPFLAGS 			= -c -Wall -march=armv6 -I$(SDK)/platforms/android-4/arch-arm/usr/include 
+CPPFLAGS 			= -c -Wall -fomit-frame-pointer -march=armv6 \
+					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
 CPPFLAGS-I 			= -I
 CPPFLAGS-o 			= -o
 
@@ -43,7 +44,6 @@ CFLAGS_RELEASE 		=
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
 					-std=c99 \
-					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
 					-Wno-parentheses \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
@@ -57,8 +57,8 @@ CXXFLAGS_RELEASE 	= -fno-rtti
 CXXFLAGS_DEBUG 		= 
 CXXFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
-					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
-
+					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 \
+					-I$(NDK)/sources/cxx-stl/stlport/stlport
 
 # ldflags
 LDFLAGS_RELEASE 	=
