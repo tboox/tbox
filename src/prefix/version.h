@@ -32,10 +32,10 @@
  * macros
  */
 
-// version: v1.4.4
+// version: v1.4.6
 #define TB_VERSION_MAJOR 			(1)
 #define TB_VERSION_MINOR 			(4)
-#define TB_VERSION_ALTER 			(5)
+#define TB_VERSION_ALTER 			(6)
 
 #endif
 
