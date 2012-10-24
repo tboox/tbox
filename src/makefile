@@ -141,7 +141,8 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/log2 \
 						libm/log2f \
 						libm/sincos \
-						libm/sincosf 
+						libm/sincosf \
+						libm/pow
 
 # pool
 ifeq ($(TB_CONFIG_MEMORY_POOL),n)
