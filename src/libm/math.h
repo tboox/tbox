@@ -102,4 +102,8 @@ tb_float_t 		tb_log2f(tb_float_t x);
 tb_void_t 		tb_sincos(tb_double_t x, tb_double_t* s, tb_double_t* c);
 tb_void_t 		tb_sincosf(tb_float_t x, tb_float_t* s, tb_float_t* c);
 
+// pow
+tb_double_t 	tb_pow(tb_double_t x, tb_double_t y);
+tb_float_t 		tb_powf(tb_float_t x, tb_float_t y);
+
 #endif

@@ -2,15 +2,15 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = android_armv6
+PLAT = mingw_x86
 
 # root
 PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 DEBUG = n
-SDK = /home/ruki/programs/android-sdk-linux_x86
+SDK = /home/ruki/programs/windows/cross
 NDK = /home/ruki/programs/android-ndk-r8
-BIN = /home/ruki/programs/android-ndk-r8/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
+BIN = /home/ruki/programs/windows/cross/bin
 HOST = mac
 CCACHE = ccache
 DISTCC =
