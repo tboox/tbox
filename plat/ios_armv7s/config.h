@@ -19,7 +19,7 @@
 
 // os
 #define TB_CONFIG_OS_IOS
-#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(5)
+#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(6)
 #define TB_CONFIG_OS_IOS_VERSION_MINOR 	(0)
 
 // cpu
@@ -106,9 +106,4 @@
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
 
-#endif
-// config
-#ifndef tbox_AUTO_CONFIG_H
-#define tbox_AUTO_CONFIG_H
-#define tbox_CONFIG_DEBUG 0
 #endif
