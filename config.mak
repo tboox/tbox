@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # architecture
-PLAT = ios_armv7
+PLAT = mac_x64
 
 # root
 PRO_DIR = /Users/ruki/projects/personal/tbox
