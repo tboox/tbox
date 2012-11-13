@@ -7,6 +7,7 @@ NAMES = \
 		url \
 		ipv4 \
 		http \
+		whois \
 		cookies
 
 include $(SRC_DIR)/demo/makefile
