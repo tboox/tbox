@@ -9,9 +9,7 @@
  */
 #define TB_DNS_TEST_INVALID_HOST 		(0)
 #define TB_DNS_TEST_MORE_HOST 			(1)
-
 #define TB_DNS_TEST_HOST_SOME 			(0)
-#define TB_DNS_TEST_HOST_WALK 			(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -66,127 +64,6 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 }
 #endif
 
-static tb_bool_t tb_dns_test_walk_2()
-{
-	// table
-	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
-	tb_char_t p[] = {'w', 'w', 'w', '.', 'x', 'x', '.', 'c', 'o', 'm', '\0'};
-
-	// ipv4
-	tb_ipv4_t ipv4;
-
-	// walk
-	tb_size_t i = 0;
-	tb_size_t j = 0;
-	tb_size_t b = 0;
-	for (i = 26; i < 26 * 26; i++)
-	{
-		j = i;
-		b = j % 26; j /= 26; p[5] = t[b];
-		b = j % 26; p[4] = t[b];
-
-		tb_print("%s: %s", p, tb_dns_look_done(p, &ipv4)? "ok" : "no");
-	}
-}
-static tb_bool_t tb_dns_test_walk_3()
-{
-	// table
-	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
-	tb_char_t p[] = {'w', 'w', 'w', '.', 'x', 'x', 'x', '.', 'c', 'o', 'm', '\0'};
-
-	// ipv4
-	tb_ipv4_t ipv4;
-
-	// walk
-	tb_size_t i = 0;
-	tb_size_t j = 0;
-	tb_size_t b = 0;
-	for (i = 26 * 26; i < 26 * 26 * 26; i++)
-	{
-		j = i;
-		b = j % 26; j /= 26; p[6] = t[b];
-		b = j % 26; j /= 26; p[5] = t[b];
-		b = j % 26; p[4] = t[b];
-
-		tb_print("%s: %s", p, tb_dns_look_done(p, &ipv4)? "ok" : "no");
-	}
-}
-static tb_bool_t tb_dns_test_walk_4()
-{
-	// table
-	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
-	tb_char_t p[] = {'w', 'w', 'w', '.', 'x', 'x', 'x', 'x', '.', 'c', 'o', 'm', '\0'};
-
-	// ipv4
-	tb_ipv4_t ipv4;
-
-	// walk
-	tb_size_t i = 0;
-	tb_size_t j = 0;
-	tb_size_t b = 0;
-	for (i = 26 * 26 * 26; i < 26 * 26 * 26 * 26; i++)
-	{
-		j = i;
-		b = j % 26; j /= 26; p[7] = t[b];
-		b = j % 26; j /= 26; p[6] = t[b];
-		b = j % 26; j /= 26; p[5] = t[b];
-		b = j % 26; p[4] = t[b];
-
-		tb_print("%s: %s", p, tb_dns_look_done(p, &ipv4)? "ok" : "no");
-	}
-}
-static tb_bool_t tb_dns_test_walk_5()
-{
-	// table
-	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
-	tb_char_t p[] = {'w', 'w', 'w', '.', 'x', 'x', 'x', 'x', 'x', '.', 'c', 'o', 'm', '\0'};
-
-	// ipv4
-	tb_ipv4_t ipv4;
-
-	// walk
-	tb_size_t i = 0;
-	tb_size_t j = 0;
-	tb_size_t b = 0;
-	for (i = 26 * 26 * 26 * 26; i < 26 * 26 * 26 * 26 * 26; i++)
-	{
-		j = i;
-		b = j % 26; j /= 26; p[8] = t[b];
-		b = j % 26; j /= 26; p[7] = t[b];
-		b = j % 26; j /= 26; p[6] = t[b];
-		b = j % 26; j /= 26; p[5] = t[b];
-		b = j % 26; p[4] = t[b];
-
-		tb_print("%s: %s", p, tb_dns_look_done(p, &ipv4)? "ok" : "no");
-	}
-}
-
-static tb_bool_t tb_dns_test_walk_6()
-{
-	// table
-	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
-	tb_char_t p[] = {'w', 'w', 'w', '.', 'x', 'x', 'x', 'x', 'x', 'x', '.', 'c', 'o', 'm', '\0'};
-
-	// ipv4
-	tb_ipv4_t ipv4;
-
-	// walk
-	tb_size_t i = 0;
-	tb_size_t j = 0;
-	tb_size_t b = 0;
-	for (i = 26 * 26 * 26 * 26 * 26; i < 26 * 26 * 26 * 26 * 26 * 26; i++)
-	{
-		j = i;
-		b = j % 26; j /= 26; p[9] = t[b];
-		b = j % 26; j /= 26; p[8] = t[b];
-		b = j % 26; j /= 26; p[7] = t[b];
-		b = j % 26; j /= 26; p[6] = t[b];
-		b = j % 26; j /= 26; p[5] = t[b];
-		b = j % 26; p[4] = t[b];
-
-		tb_print("%s: %s", p, tb_dns_look_done(p, &ipv4)? "ok" : "no");
-	}
-}
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
@@ -406,12 +283,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_dns_test_done("www.ted.com");
 	time = tb_mclock() - time;
 	tb_print("[demo]: done %lld ms", time);
-#elif TB_DNS_TEST_HOST_WALK
-	tb_dns_test_walk_2();
-	tb_dns_test_walk_3();
-	tb_dns_test_walk_4();
-	tb_dns_test_walk_5();
-	tb_dns_test_walk_6();
 #else
 	tb_dns_test_done(argv[1]);
 #endif
