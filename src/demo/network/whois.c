@@ -234,6 +234,47 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 	// exit ping
 	tb_free(ping);
 }
+static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
+{
+	// init stream
+	tb_gstream_t* gst = tb_gstream_init_from_url(file);
+	tb_assert_and_check_return_val(gst, TB_FALSE);
+
+	// init ping
+	tb_char_t const* ping = tb_malloc0(1000 * 16);
+	tb_assert_and_check_return_val(gst, ping);
+
+	// open
+	tb_size_t n = 0;
+	if (tb_gstream_bopen(gst))
+	{
+		while (tb_gstream_bread_line(gst, &ping[n * 16], 15) > 0)
+			n++;
+	}
+
+	// exit stream
+	tb_gstream_exit(gst);
+
+	// walk
+	tb_size_t i = 0;
+	tb_size_t j = 0;
+	tb_size_t k = 0;
+	for (i = 0; i < n; i++)
+	{
+		for (j = 0; j < n; j++)
+		{
+			for (k = 0; k < n; k++)
+			{
+				tb_char_t p[61] = {0};
+				tb_long_t r = tb_snprintf(p, 60, "%s%s%s.com", &ping[i * 16], &ping[j * 16], &ping[k * 16]);
+				tb_print("%s: %s", p, tb_whois_test_no_match_com(p)? "ok" : "no");
+			}
+		}
+	}
+	
+	// exit ping
+	tb_free(ping);
+}
 static tb_bool_t tb_whois_test_walk_num_1()
 {
 	// table
@@ -377,7 +418,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 //	tb_whois_test_walk_num_4();
 //	tb_whois_test_walk_num_5();
 //	tb_whois_test_walk_num_6();
-	tb_whois_test_walk_ping_2(argv[1]);	
+//	tb_whois_test_walk_ping_2(argv[1]);	
+	tb_whois_test_walk_ping_3(argv[1]);	
 #else
 	tb_whois_test_done(argv[1]);
 #endif
