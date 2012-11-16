@@ -2,16 +2,13 @@
 
 # path
 SRC_DIR 		= $(PRO_DIR)/src
-BIN_DIR 		= $(PRO_DIR)/bin/$(PLAT)
-INC_DIR 		= $(PRO_DIR)/inc/$(PLAT)
-LIB_DIR 		= $(PRO_DIR)/lib/$(PLAT)
+BIN_DIR 		= $(PRO_DIR)/bin/$(PLAT)/$(ARCH)
+INC_DIR 		= $(PRO_DIR)/inc/$(PLAT)/$(ARCH)
+LIB_DIR 		= $(PRO_DIR)/lib/$(PLAT)/$(ARCH)
+
 PLAT_DIR 		= $(PRO_DIR)/plat/$(PLAT)
 PSRC_DIR 		= $(PRO_DIR)/src/pro
 
-# default path
-INC_DIR_DEF 	= $(PRO_DIR)/inc/$(PLAT)
-LIB_DIR_DEF 	= $(PRO_DIR)/lib/$(PLAT)
-
-# architecture makefile
+# platform prefix
 -include 		$(PLAT_DIR)/prefix.mak
 
