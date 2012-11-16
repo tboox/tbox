@@ -1,8 +1,9 @@
 # demo
 TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS				= stdc++ z m dl pthread
 
 # plat
-TB_CONFIG_PLAT 					= ios_armv6
+TB_CONFIG_PLAT 					= ios_arm
 
 # arch
 TB_CONFIG_ARCH 					= arm

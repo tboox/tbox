@@ -13,25 +13,33 @@ INC_FILES += $(INC_FILES-y)
 # ccache hook compiler for optimizating make
 ifneq ($(CCACHE),)
 CC := $(CCACHE) $(CC)
+MM := $(CCACHE) $(MM)
 endif
 
 # distcc hook compiler for optimizating make
 ifneq ($(DISTCC),)
 CC := $(DISTCC) $(CC)
+MM := $(DISTCC) $(MM)
 AS := $(DISTCC) $(AS)
 endif
 
 # append debug cflags
 ifeq ($(DEBUG),y)
 CFLAGS := $(CFLAGS) $(CFLAGS_DEBUG)
-CPPFLAGS := $(CPPFLAGS) $(CPPFLAGS_DEBUG)
-CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_DEBUG)
+CXFLAGS := $(CXFLAGS) $(CXFLAGS_DEBUG)
+CCFLAGS := $(CCFLAGS) $(CCFLAGS_DEBUG)
+MFLAGS := $(MFLAGS) $(MFLAGS_DEBUG)
+MMFLAGS := $(MMFLAGS) $(MMFLAGS_DEBUG)
+MXFLAGS := $(MXFLAGS) $(MXFLAGS_DEBUG)
 LDFLAGS := $(LDFLAGS) $(LDFLAGS_DEBUG)
 ASFLAGS := $(ASFLAGS) $(ASFLAGS_DEBUG)
 else
 CFLAGS := $(CFLAGS) $(CFLAGS_RELEASE) 
-CPPFLAGS := $(CPPFLAGS) $(CPPFLAGS_RELEASE) 
-CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_RELEASE) 
+CXFLAGS := $(CXFLAGS) $(CXFLAGS_RELEASE) 
+CCFLAGS := $(CCFLAGS) $(CCFLAGS_RELEASE) 
+MFLAGS := $(MFLAGS) $(MFLAGS_RELEASE)
+MMFLAGS := $(MMFLAGS) $(MMFLAGS_RELEASE)
+MXFLAGS := $(MXFLAGS) $(MXFLAGS_RELEASE)
 LDFLAGS := $(LDFLAGS) $(LDFLAGS_RELEASE) 
 ASFLAGS := $(ASFLAGS) $(ASFLAGS_RELEASE) 
 endif
@@ -39,7 +47,10 @@ endif
 # append source files
 define MAKE_DEFINE_FILES
 $(1)_C_FILES += $($(1)_C_FILES-y)
+$(1)_CC_FILES += $($(1)_CC_FILES-y)
 $(1)_CPP_FILES += $($(1)_CPP_FILES-y)
+$(1)_M_FILES += $($(1)_M_FILES-y)
+$(1)_MM_FILES += $($(1)_MM_FILES-y)
 $(1)_ASM_FILES += $($(1)_ASM_FILES-y)
 $(1)_OBJ_FILES += $($(1)_OBJ_FILES-y)
 $(1)_INC_DIR += $($(1)_INC_DIR-y)
@@ -51,7 +62,10 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FILES,$(name))))
 # remove repeat source files
 define REMOVE_REPEAT_FILES
 $(1)_C_FILES := $(sort $($(1)_C_FILES))
+$(1)_CC_FILES := $(sort $($(1)_CC_FILES))
 $(1)_CPP_FILES := $(sort $($(1)_CPP_FILES))
+$(1)_M_FILES := $(sort $($(1)_M_FILES))
+$(1)_MM_FILES := $(sort $($(1)_MM_FILES))
 $(1)_ASM_FILES := $(sort $($(1)_ASM_FILES))
 $(1)_OBJ_FILES := $(sort $($(1)_OBJ_FILES))
 $(1)_INC_DIR := $(sort $($(1)_INC_DIR))
@@ -63,8 +77,11 @@ $(foreach name, $(NAMES), $(eval $(call REMOVE_REPEAT_FILES,$(name))))
 # cflags & ldflags
 define MAKE_DEFINE_FLAGS
 $(1)_CFLAGS := $(CFLAGS) $($(1)_CFLAGS) $($(1)_CFLAGS-y)
-$(1)_CXXFLAGS := $(CXXFLAGS) $($(1)_CXXFLAGS) $($(1)_CXXFLAGS-y)
-$(1)_CPPFLAGS := $(CPPFLAGS) $(addprefix $(CPPFLAGS-I), $(INC_DIR)) $(addprefix $(CPPFLAGS-I), $($(1)_INC_DIR)) $($(1)_CPPFLAGS) $($(1)_CPPFLAGS-y)
+$(1)_CCFLAGS := $(CCFLAGS) $($(1)_CCFLAGS) $($(1)_CCFLAGS-y)
+$(1)_CXFLAGS := $(CXFLAGS) $(addprefix $(CXFLAGS-I), $(INC_DIR)) $(addprefix $(CXFLAGS-I), $($(1)_INC_DIR)) $($(1)_CXFLAGS) $($(1)_CXFLAGS-y)
+$(1)_MFLAGS := $(MFLAGS) $($(1)_MFLAGS) $($(1)_MFLAGS-y)
+$(1)_MMFLAGS := $(MMFLAGS) $($(1)_MMFLAGS) $($(1)_MMFLAGS-y)
+$(1)_MXFLAGS := $(MXFLAGS) $(addprefix $(MXFLAGS-I), $(INC_DIR)) $(addprefix $(MXFLAGS-I), $($(1)_INC_DIR)) $($(1)_MXFLAGS) $($(1)_MXFLAGS-y)
 $(1)_LDFLAGS := $(LDFLAGS) $(addprefix $(LDFLAGS-L), $(LIB_DIR)) $(addprefix $(LDFLAGS-L), $($(1)_LIB_DIR)) $(addprefix $(LDFLAGS-l), $($(1)_LIBS)) $($(1)_LDFLAGS) $($(1)_LDFLAGS-y)
 $(1)_ASFLAGS := $(ASFLAGS) $(addprefix $(ASFLAGS-I), $(INC_DIR)) $(addprefix $(ASFLAGS-I), $($(1)_INC_DIR)) $($(1)_ASFLAGS) $($(1)_ASFLAGS-y)
 $(1)_ARFLAGS := $(ARFLAGS) $($(1)_ARFLAGS-y)
@@ -75,9 +92,9 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_FLAGS,$(name))))
 # generate objects & source files list
 define MAKE_DEFINE_OBJS_SRCS
 $(1)_OBJS := $(addsuffix $(OBJ_SUFFIX), $($(1)_FILES))
-$(1)_SRCS := $(addsuffix .c, $($(1)_C_FILES)) $(addsuffix .cpp, $($(1)_CPP_FILES)) $(addsuffix $(ASM_SUFFIX), $($(1)_ASM_FILES))
+$(1)_SRCS := $(addsuffix .c, $($(1)_C_FILES)) $(addsuffix .cc, $($(1)_CC_FILES)) $(addsuffix .cpp, $($(1)_CPP_FILES)) $(addsuffix .m, $($(1)_M_FILES)) $(addsuffix .mm, $($(1)_MM_FILES)) $(addsuffix $(ASM_SUFFIX), $($(1)_ASM_FILES))
 endef
-$(foreach name, $(NAMES), $(eval $(name)_FILES := $($(name)_C_FILES) $($(name)_CPP_FILES) $($(name)_ASM_FILES)))
+$(foreach name, $(NAMES), $(eval $(name)_FILES := $($(name)_C_FILES) $($(name)_CC_FILES) $($(name)_CPP_FILES) $($(name)_M_FILES) $($(name)_MM_FILES) $($(name)_ASM_FILES)))
 $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_OBJS_SRCS,$(name))))
 
 #############################################################
@@ -87,19 +104,37 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_OBJS_SRCS,$(name))))
 define MAKE_OBJ_C
 $(1)$(OBJ_SUFFIX) : $(1).c
 	@echo $(CCACHE) $(DISTCC) compile $(1).c
-	@$(CC) $(2) $(3) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).c 2>>/tmp/$(PRO_NAME).out
+	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).c 2>>/tmp/$(PRO_NAME).out
+endef
+
+define MAKE_OBJ_CC
+$(1)$(OBJ_SUFFIX) : $(1).cc
+	@echo $(CCACHE) $(DISTCC) compile $(1).cc
+	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cc 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_CPP
 $(1)$(OBJ_SUFFIX) : $(1).cpp
 	@echo $(CCACHE) $(DISTCC) compile $(1).cpp
-	@$(CC) $(2) $(3) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cpp 2>>/tmp/$(PRO_NAME).out
+	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cpp 2>>/tmp/$(PRO_NAME).out
+endef
+
+define MAKE_OBJ_M
+$(1)$(OBJ_SUFFIX) : $(1).m
+	@echo $(CCACHE) $(DISTCC) compile $(1).m
+	@$(MM) -x objective-c $(2) $(3) $(MXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).m 2>>/tmp/$(PRO_NAME).out
+endef
+
+define MAKE_OBJ_MM
+$(1)$(OBJ_SUFFIX) : $(1).mm
+	@echo $(CCACHE) $(DISTCC) compile $(1).mm
+	@$(MM) -x objective-c++ $(2) $(3) $(MXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).mm 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_CC
 $(1)$(OBJ_SUFFIX) : $(1)$(ASM_SUFFIX)
 	@echo $(CCACHE) $(DISTCC) compile $(1)$(ASM_SUFFIX)
-	@$(CC) $(2) $(CPPFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
+	@$(CC) $(2) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_AS
@@ -117,12 +152,15 @@ $(1)_$(2)_all: $($(2)_PREFIX)$(1)$($(2)_SUFFIX)
 	$($(1)_SUFFIX_CMD5)
 
 $($(2)_PREFIX)$(1)$($(2)_SUFFIX): $($(1)_OBJS) $(addsuffix $(OBJ_SUFFIX), $($(1)_OBJ_FILES))
-$(foreach file, $($(1)_C_FILES), $(eval $(call MAKE_OBJ_C,$(file),$($(1)_CPPFLAGS),$($(1)_CFLAGS))))
-$(foreach file, $($(1)_CPP_FILES), $(eval $(call MAKE_OBJ_CPP,$(file),$($(1)_CPPFLAGS),$($(1)_CXXFLAGS))))
+$(foreach file, $($(1)_C_FILES), $(eval $(call MAKE_OBJ_C,$(file),$($(1)_CXFLAGS),$($(1)_CFLAGS))))
+$(foreach file, $($(1)_CC_FILES), $(eval $(call MAKE_OBJ_CC,$(file),$($(1)_CXFLAGS),$($(1)_CCFLAGS))))
+$(foreach file, $($(1)_CPP_FILES), $(eval $(call MAKE_OBJ_CPP,$(file),$($(1)_CXFLAGS),$($(1)_CCFLAGS))))
+$(foreach file, $($(1)_M_FILES), $(eval $(call MAKE_OBJ_M,$(file),$($(1)_MXFLAGS),$($(1)_MFLAGS))))
+$(foreach file, $($(1)_MM_FILES), $(eval $(call MAKE_OBJ_MM,$(file),$($(1)_MXFLAGS),$($(1)_MMFLAGS))))
 
 $(if $(AS)
 ,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_AS,$(file),$($(1)_ASFLAGS))))
-,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_CC,$(file),$($(1)_CPPFLAGS))))
+,$(foreach file, $($(1)_ASM_FILES), $(eval $(call MAKE_OBJ_ASM_WITH_CC,$(file),$($(1)_CXFLAGS))))
 )
 
 

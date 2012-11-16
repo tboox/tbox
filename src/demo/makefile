@@ -21,28 +21,12 @@ ifeq ($(TB_CONFIG_PLAT),solaris_x86)
 demo_LIBS 				= z m pthread
 endif
 
-ifeq ($(TB_CONFIG_PLAT),mac_x64)
-demo_LIBS 				= z m dl pthread
-endif
-
 ifeq ($(TB_CONFIG_PLAT),mingw_x86)
 demo_LIBS 				= ws2_32 
 endif
 
 ifeq ($(TB_CONFIG_PLAT),linux_arm)
 demo_LIBS 				= z m dl pthread
-endif
-
-ifeq ($(TB_CONFIG_PLAT),ios_armv6)
-demo_LIBS 				= stdc++ z m dl pthread
-endif
-
-ifeq ($(TB_CONFIG_PLAT),ios_armv7)
-demo_LIBS 				= stdc++ z m dl pthread
-endif
-
-ifeq ($(TB_CONFIG_PLAT),ios_armv7s)
-demo_LIBS 				= stdc++ z m dl pthread
 endif
 
 ifeq ($(TB_CONFIG_PLAT),ios_x86)
@@ -63,11 +47,11 @@ define MAKE_MODULES
 $(1)_TYPE 				= BIN
 $(1)_C_FILES 			+= $(1)
 $(1)_OBJ_FILES 			+= $(demo_OBJ_FILES)
-$(1)_LIBS 				+= tbox $(demo_LIBS)
+$(1)_LIBS 				+= tbox $(TB_CONFIG_DEMO_LIBS)
 $(1)_LIB_DIR 			+= ../.. $(demo_LIB_DIR)
 $(1)_INC_DIR 			+= ../.. $(demo_INC_DIR)
-$(1)_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" $(demo_CPPFLAGS)
-$(1)_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE $(demo_CPPFLAGS-y)
+$(1)_CXFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" $(demo_CXFLAGS)
+$(1)_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE $(demo_CXFLAGS-y)
 $(1)_LDFLAGS 			+= $(demo_LDFLAGS)
 endef
 NAMES += $(NAMES-y)

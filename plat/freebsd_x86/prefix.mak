@@ -33,15 +33,15 @@ MAKE 			= make
 PWD 			= pwd
 
 # cppflags: c/c++ files
-CPPFLAGS_RELEASE 	= \
+CXFLAGS_RELEASE 	= \
 	-O2 -DNDEBUG \
 	-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
 	-march=native -pipe # gcc >= 4.2.3
 
-CPPFLAGS_DEBUG 	= -g
-CPPFLAGS 		= -c -Wall -msse2
-CPPFLAGS-I 		= -I
-CPPFLAGS-o 		= -o
+CXFLAGS_DEBUG 	= -g
+CXFLAGS 		= -c -Wall -msse2
+CXFLAGS-I 		= -I
+CXFLAGS-o 		= -o
 
 # cflags: c files
 CFLAGS_RELEASE 	= 
@@ -49,9 +49,9 @@ CFLAGS_DEBUG 	=
 CFLAGS 			= 
 
 # cxxflags: c++ files
-CXXFLAGS_RELEASE = -fno-rtti
-CXXFLAGS_DEBUG 	= 
-CXXFLAGS 		= 
+CCFLAGS_RELEASE = -fno-rtti
+CCFLAGS_DEBUG 	= 
+CCFLAGS 		= 
 
 # ldflags
 LDFLAGS_RELEASE = -s -Wl,-O2,--sort-common,--as-needed

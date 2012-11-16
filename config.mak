@@ -1,25 +1,33 @@
 # config
 IS_CONFIG = yes
 
-# architecture
-PLAT = mac_x64
-
-# root
+# project
 PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
+
+# debug
 DEBUG = n
-SDK = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk
+
+# platform
+PLAT = mac_x64
+
+# architecture
+ARCH = armv7s
+
+# toolchain
+SDK = 6.0
 NDK = /home/ruki/programs/android-ndk-r8
-BIN = /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
+BIN =
 HOST = mac
 CCACHE = ccache
 DISTCC =
 
 # export
-export PLAT
 export PRO_DIR
 export PRO_NAME
 export DEBUG
+export PLAT
+export ARCH
 export SDK
 export NDK
 export BIN

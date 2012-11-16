@@ -1,5 +1,6 @@
 # demo
 TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS				= z m dl pthread
 
 # plat
 TB_CONFIG_PLAT 					= mac_x64

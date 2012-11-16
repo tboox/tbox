@@ -166,8 +166,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aicp
 
 # flags
-tbox_CPPFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
-tbox_CPPFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
+tbox_CXFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" 
+tbox_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
 
 # header files
 INC_FILES 				= \

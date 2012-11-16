@@ -48,6 +48,18 @@ install : .null
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
 
+# make ios_arm
+ios_arm : .null
+	make config PLAT=ios_arm ARCH=armv7 DEBUG=$(DEBUG) SDK=$(SDK)
+	make clean; make ; make install 
+	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7.a 
+	make config PLAT=ios_arm ARCH=armv7s DEBUG=$(DEBUG) SDK=$(SDK)
+	make clean; make ; make install 
+	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7s.a 
+	@xcrun -sdk iphoneos lipo -create -arch armv7 /tmp/libtbox_armv7.a -arch armv7s /tmp/libtbox_armv7s.a -output $(BIN_DIR)/lib/libtbox.a
+	-@$(RM) /tmp/libtbox_armv7.a 
+	-@$(RM) /tmp/libtbox_armv7s.a 
+
 # make clean
 clean : .null
 	@echo "" > /tmp/$(PRO_NAME).out
@@ -151,13 +163,20 @@ config :
 	@echo "# config"                      				> config.mak
 	@echo "IS_CONFIG = yes" 							>> config.mak
 	@echo ""                              				>> config.mak
-	@echo "# architecture"                				>> config.mak
-	@echo "PLAT =" $(PLAT) 								>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# root"                						>> config.mak
+	@echo "# project"              						>> config.mak
 	@echo "PRO_DIR =" $(PRO_DIR) 						>> config.mak
 	@echo "PRO_NAME =" $(PRO_NAME) 						>> config.mak
+	@echo ""                              				>> config.mak
+	@echo "# debug"              						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
+	@echo ""                              				>> config.mak
+	@echo "# platform"      	          				>> config.mak
+	@echo "PLAT =" $(PLAT) 								>> config.mak
+	@echo ""                              				>> config.mak
+	@echo "# architecture"                				>> config.mak
+	@echo "ARCH =" $(ARCH) 								>> config.mak
+	@echo ""                              				>> config.mak
+	@echo "# toolchain"            						>> config.mak
 	@echo "SDK =" $(SDK) 								>> config.mak
 	@echo "NDK =" $(NDK) 								>> config.mak
 	@echo "BIN =" $(BIN) 								>> config.mak
@@ -166,10 +185,11 @@ config :
 	@echo "DISTCC =" $(DISTCC) 							>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# export"									>> config.mak
-	@echo "export PLAT"					 				>> config.mak
 	@echo "export PRO_DIR" 		 						>> config.mak
 	@echo "export PRO_NAME" 		 					>> config.mak
 	@echo "export DEBUG" 			 					>> config.mak
+	@echo "export PLAT"					 				>> config.mak
+	@echo "export ARCH"					 				>> config.mak
 	@echo "export SDK" 				 					>> config.mak
 	@echo "export NDK" 				 					>> config.mak
 	@echo "export BIN" 				 					>> config.mak
