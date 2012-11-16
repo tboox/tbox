@@ -39,14 +39,22 @@ install : .null
 	@echo install $(PRO_NAME)
 	-@$(RMDIR) $(BIN_DIR)
 	-@$(MKDIR) $(BIN_DIR)
-	-@$(RMDIR) $(BIN_DIR)/inc
-	-@$(RMDIR) $(BIN_DIR)/lib
-	-@$(RMDIR) $(BIN_DIR)/obj
 	-@$(MKDIR) $(BIN_DIR)/inc
 	-@$(MKDIR) $(BIN_DIR)/lib
 	-@$(MKDIR) $(BIN_DIR)/obj
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
+
+# make prefix
+prefix : .null
+	-@$(RMDIR) $(PRE_DIR)
+	-@$(MKDIR) $(PRE_DIR)
+	-@$(MKDIR) $(PRE_DIR)/inc
+	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)
+	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
+	-@$(MKDIR) $(PRE_DIR)/lib
+	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)
+	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
 
 # make ios_arm
 ios_arm : .null
