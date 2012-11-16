@@ -16,13 +16,13 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # tool
-PRE 				= $(BIN)/arm-linux-androideabi-
+PRE 				= 
 CC 					= $(PRE)gcc
 AR 					= $(PRE)ar
 STRIP 				= $(PRE)strip
 RANLIB 				= $(PRE)ranlib
 LD 					= $(PRE)g++
-AS					= 
+AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
 CP 					= cp
@@ -31,19 +31,29 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
-# cppflags: c/c++ files
+# arch flags
+ifeq ($(ARCH),x86)
+ARCH_CXFLAGS 		= -march=i686
+endif
+
+ifeq ($(ARCH),x64)
+ARCH_CXFLAGS 		= -m64
+ARCH_ASFLAGS 		= -m amd64
+endif
+
+# cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=armv6 \
-					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
+CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
-# cflags: c files
+# cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
 					-std=c99 \
+					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
 					-Wno-parentheses \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
@@ -52,13 +62,12 @@ CFLAGS 				= \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
-# cxxflags: c++ files
+# ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	= -fno-rtti
 CCFLAGS_DEBUG 		= 
 CCFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
-					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 \
-					-I$(NDK)/sources/cxx-stl/stlport/stlport
+					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
 LDFLAGS_RELEASE 	=
@@ -71,7 +80,7 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= 
+ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
@@ -79,7 +88,7 @@ ASFLAGS-o 			= -o
 ARFLAGS 			= -cr
 
 # share ldflags
-SHFLAGS 			= 
+SHFLAGS 			= -shared -Wl,-soname
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak

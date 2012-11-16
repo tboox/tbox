@@ -2,22 +2,22 @@
 IS_CONFIG = yes
 
 # project
-PRO_DIR = /Users/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
 DEBUG = n
 
 # platform
-PLAT = mac_x64
+PLAT = linux
 
 # architecture
-ARCH = armv7s
+ARCH = x86
 
 # toolchain
-SDK = 6.0
+SDK = /home/ruki/programs/android-sdk-linux_x86
 NDK = /home/ruki/programs/android-ndk-r8
-BIN =
+BIN = /home/ruki/programs/windows/cross/bin
 HOST = mac
 CCACHE = ccache
 DISTCC =

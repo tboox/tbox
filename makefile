@@ -111,7 +111,12 @@ endif
 
 # platform
 ifeq ($(PLAT),)
-PLAT := linux_x86
+PLAT := linux
+endif
+
+# architecture
+ifeq ($(ARCH),)
+ARCH := x86
 endif
 
 # linux, cygwin, mac

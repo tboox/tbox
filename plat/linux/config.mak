@@ -1,11 +1,9 @@
 # demo
 TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS 			= z m dl pthread
 
 # plat
-TB_CONFIG_PLAT 					= linux_x64
-
-# arch
-TB_CONFIG_ARCH 					= x64
+TB_CONFIG_PLAT 					= linux
 
 # api
 TB_CONFIG_API_DNS 				= unix
@@ -26,4 +24,3 @@ TB_CONFIG_MEMORY_POOL 			= y
 
 # float
 TB_CONFIG_TYPE_FLOAT 			= y
-

@@ -1,11 +1,9 @@
 # demo
 TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS				= ws2_32
 
 # plat
-TB_CONFIG_PLAT 					= mingw_x86
-
-# arch
-TB_CONFIG_ARCH 					= x86
+TB_CONFIG_PLAT 					= mingw
 
 # api
 TB_CONFIG_API_DNS 				= windows
