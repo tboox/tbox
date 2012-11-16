@@ -2,7 +2,11 @@
 #define TB_CONFIG_H
 
 // arch
-#define TB_CONFIG_ARCH_x86
+#if defined(__tb_arch_x86__)
+# 	define TB_CONFIG_ARCH_x86
+#elif defined(__tb_arch_x64__)
+# 	define TB_CONFIG_ARCH_x64
+#endif
 //#define TB_CONFIG_ARCH_ARM
 //#define TB_CONFIG_ARCH_MIPS
 //#define TB_CONFIG_ARCH_SPARC
@@ -10,9 +14,9 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // os
-#define TB_CONFIG_OS_IOS
-#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(5)
-#define TB_CONFIG_OS_IOS_VERSION_MINOR 	(0)
+#define TB_CONFIG_OS_MAC
+#define TB_CONFIG_OS_MAC_VERSION_MAJOR 	(10)
+#define TB_CONFIG_OS_MAC_VERSION_MINOR 	(7)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
@@ -91,6 +95,11 @@
 #define TB_CONFIG_LIBC_HAVE_STRNCMP
 #define TB_CONFIG_LIBC_HAVE_STRNICMP
 
+// libm
+//#define TB_CONFIG_LIBM_HAVE_SINCOS
+//#define TB_CONFIG_LIBM_HAVE_SINCOSF
+#define TB_CONFIG_LIBM_HAVE_LOG2
+#define TB_CONFIG_LIBM_HAVE_LOG2F
 
 
 #endif

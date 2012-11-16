@@ -1,14 +1,13 @@
 # demo
 TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS				= z m dl pthread
 
 # plat
-TB_CONFIG_PLAT 					= ios_x86
-
-# arch
-TB_CONFIG_ARCH 					= x86
+TB_CONFIG_PLAT 					= mac
 
 # api
 TB_CONFIG_API_DNS 				= unix
+TB_CONFIG_API_DLL 				= unix
 TB_CONFIG_API_FILE 				= unix
 TB_CONFIG_API_SOCK 				= unix
 TB_CONFIG_API_UTIL 				= unix
@@ -22,3 +21,6 @@ TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
 TB_CONFIG_MEMORY_POOL 			= n
+
+# float
+TB_CONFIG_TYPE_FLOAT 			= y

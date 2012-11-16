@@ -3,10 +3,7 @@ TB_CONFIG_DEMO 					= y
 TB_CONFIG_DEMO_LIBS				= stdc++ z m dl pthread
 
 # plat
-TB_CONFIG_PLAT 					= ios_arm
-
-# arch
-TB_CONFIG_ARCH 					= arm
+TB_CONFIG_PLAT 					= ios
 
 # api
 TB_CONFIG_API_DNS 				= unix
