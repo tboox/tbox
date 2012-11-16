@@ -32,6 +32,19 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
+# cpu flags
+ifeq ($(ARCH),armv6)
+CPU_CXFLAGS 		= -mcpu=arm1176jzf-s
+endif
+
+ifeq ($(ARCH),armv7)
+CPU_CXFLAGS 		= -mcpu=cortex-a8
+endif
+
+ifeq ($(ARCH),armv7s)
+CPU_CXFLAGS 		= -mcpu=cortex-a8
+endif
+
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= \
 					-O3 -DNDEBUG \
@@ -40,7 +53,7 @@ CXFLAGS_RELEASE 	= \
 
 CXFLAGS_DEBUG 		= -g 
 CXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__ -c -Wall  \
-					-mthumb -mcpu=cortex-a8 -miphoneos-version-min=$(SDK) \
+					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
@@ -65,7 +78,7 @@ MXFLAGS_RELEASE 	= \
 
 MXFLAGS_DEBUG 		= -g -DDEBUG=1
 MXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__  -c -Wall  \
-					-mthumb -mcpu=cortex-a8 -miphoneos-version-min=$(SDK) \
+					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \

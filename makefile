@@ -12,6 +12,7 @@ include config.mak
 a : all
 f : config
 i : install
+p : prefix
 c : clean
 u : update
 o : output
@@ -47,7 +48,8 @@ install : .null
 
 # make prefix
 prefix : .null
-	-@$(RMDIR) $(PRE_DIR)
+	-@$(RMDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/$(PRO_NAME)
+	-@$(RM) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX)
 	-@$(MKDIR) $(PRE_DIR)
 	-@$(MKDIR) $(PRE_DIR)/inc
 	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)
@@ -55,18 +57,12 @@ prefix : .null
 	-@$(MKDIR) $(PRE_DIR)/lib
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
+	-@$(CP) -r $(BIN_DIR)/inc/$(PRO_NAME) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CP) $(BIN_DIR)/lib/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/
 
-# make ios_arm
-ios_arm : .null
-	make config PLAT=ios ARCH=armv7 DEBUG=$(DEBUG) SDK=$(SDK)
-	make clean; make ; make install 
-	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7.a 
-	make config PLAT=ios ARCH=armv7s DEBUG=$(DEBUG) SDK=$(SDK)
-	make clean; make ; make install 
-	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7s.a 
-	@xcrun -sdk iphoneos lipo -create -arch armv7 /tmp/libtbox_armv7.a -arch armv7s /tmp/libtbox_armv7s.a -output $(BIN_DIR)/lib/libtbox.a
-	-@$(RM) /tmp/libtbox_armv7.a 
-	-@$(RM) /tmp/libtbox_armv7s.a 
+# make lipo
+lipo : .null
+	./tool/lipo $(PRO_NAME) $(DEBUG) $(SDK) $(ARCH1) $(ARCH2)
 
 # make clean
 clean : .null
@@ -81,6 +77,7 @@ update : .null
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) update
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR) install
+	@$(MAKE) --no-print-directory prefix
 
 # make output
 output : .null
