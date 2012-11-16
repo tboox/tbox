@@ -1,11 +1,9 @@
 # demo
-TB_CONFIG_DEMO 					= n
+TB_CONFIG_DEMO 					= y
+TB_CONFIG_DEMO_LIBS				= stdc++ log gcc c m dl
 
 # plat
-TB_CONFIG_PLAT 					= android_armv5te
-
-# arch
-TB_CONFIG_ARCH 					= arm
+TB_CONFIG_PLAT 					= android
 
 # api
 TB_CONFIG_API_DNS 				= unix

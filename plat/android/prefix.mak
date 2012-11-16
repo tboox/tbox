@@ -16,14 +16,13 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # tool
-PRE 				= 
+PRE 				= $(BIN)/arm-linux-androideabi-
 CC 					= $(PRE)gcc
-#CC 				= $(PRE)icc
 AR 					= $(PRE)ar
 STRIP 				= $(PRE)strip
 RANLIB 				= $(PRE)ranlib
 LD 					= $(PRE)g++
-AS					= yasm
+AS					= 
 RM 					= rm -f
 RMDIR 				= rm -rf
 CP 					= cp
@@ -32,19 +31,19 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
-# cppflags: c/c++ files
+# cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -mssse3 -m64
+CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=$(ARCH) -D__tb_arch_$(ARCH)__\
+					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
-# cflags: c files
+# cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
 					-std=c99 \
-					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
 					-Wno-parentheses \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
@@ -53,17 +52,21 @@ CFLAGS 				= \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
-# cxxflags: c++ files
-CCFLAGS_RELEASE 	= -fno-rtti
+# ccflags: .cc/.cpp files
+CCFLAGS_RELEASE 	=
 CCFLAGS_DEBUG 		= 
 CCFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
-					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
+					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600 \
+					-I$(NDK)/sources/cxx-stl/stlport/stlport
 
 # ldflags
-LDFLAGS_RELEASE 	= 
+LDFLAGS_RELEASE 	=
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= 
+LDFLAGS 			= -nostdlib \
+					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
+					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_dynamic.o \
+					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtend_android.o
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
@@ -71,7 +74,7 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf -m amd64
+ASFLAGS 			= 
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
@@ -79,7 +82,7 @@ ASFLAGS-o 			= -o
 ARFLAGS 			= -cr
 
 # share ldflags
-SHFLAGS 			= -shared -Wl,-soname
+SHFLAGS 			= 
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak

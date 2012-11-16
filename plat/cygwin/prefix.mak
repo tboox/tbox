@@ -31,14 +31,19 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
-# cppflags: c/c++ files
+# arch flags
+ifeq ($(ARCH),x86)
+ARCH_CXFLAGS 		= -march=i686
+endif
+
+# cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
 CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -mssse3 -march=i686 
+CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
-# cflags: c files
+# cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
@@ -52,8 +57,8 @@ CFLAGS 				= \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
-# cxxflags: c++ files
-CCFLAGS_RELEASE 	= -fno-rtti
+# ccflags: .cc/.cpp files
+CCFLAGS_RELEASE 	= 
 CCFLAGS_DEBUG 		= 
 CCFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
