@@ -38,11 +38,11 @@ MAKE 				= make
 PWD 				= pwd
 
 # cppflags: c/c++ files
-CPPFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
-CPPFLAGS_DEBUG 		= -g
-CPPFLAGS 			= -c -Wall -mssse3 -march=i686 
-CPPFLAGS-I 			= -I
-CPPFLAGS-o 			= -o
+CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
+CXFLAGS_DEBUG 		= -g
+CXFLAGS 			= -c -Wall -mssse3 -march=i686 
+CXFLAGS-I 			= -I
+CXFLAGS-o 			= -o
 
 # cflags: c files
 CFLAGS_RELEASE 		= 
@@ -59,9 +59,9 @@ CFLAGS 				= \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
 # cxxflags: c++ files
-CXXFLAGS_RELEASE 	= -fno-rtti
-CXXFLAGS_DEBUG 		= 
-CXXFLAGS 			= \
+CCFLAGS_RELEASE 	= -fno-rtti
+CCFLAGS_DEBUG 		= 
+CCFLAGS 			= \
 					-D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 

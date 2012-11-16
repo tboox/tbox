@@ -10,8 +10,18 @@
 //#define TB_CONFIG_ARCH_SH4
 
 // arm
-#define TB_CONFIG_ARM_VERSION 	(7)
-#define TA_CONFIG_ARM_THUMB
+#if defined(__armv5__)
+# 	define TB_CONFIG_ARM_VERSION 			(5)
+#elif defined(__armv6__)
+# 	define TB_CONFIG_ARM_VERSION 			(6)
+#elif defined(__armv7__)
+# 	define TB_CONFIG_ARM_VERSION 			(7)
+#elif defined(__armv7s__)
+# 	define TB_CONFIG_ARM_VERSION 			(7)
+#endif
+#ifdef __thumb__
+# 	define TA_CONFIG_ARM_THUMB
+#endif
 //#define TA_CONFIG_ARM_JAZELLE
 //#define TA_CONFIG_ARM_VFP
 //#define TA_CONFIG_ARM_MMU 
