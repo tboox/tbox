@@ -23,7 +23,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// cc
 	test_cc_main(argc, argv);
 
-#ifdef TB_CONFIG_OS_IOS
+#if defined(TB_CONFIG_OS_IOS) || defined(TB_CONFIG_OS_MAC)
 	// m
 	test_m_main(argc, argv);
 	// mm

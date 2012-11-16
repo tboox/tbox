@@ -50,10 +50,10 @@ install : .null
 
 # make ios_arm
 ios_arm : .null
-	make config PLAT=ios_arm ARCH=armv7 DEBUG=$(DEBUG) SDK=$(SDK)
+	make config PLAT=ios ARCH=armv7 DEBUG=$(DEBUG) SDK=$(SDK)
 	make clean; make ; make install 
 	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7.a 
-	make config PLAT=ios_arm ARCH=armv7s DEBUG=$(DEBUG) SDK=$(SDK)
+	make config PLAT=ios ARCH=armv7s DEBUG=$(DEBUG) SDK=$(SDK)
 	make clean; make ; make install 
 	@$(CP) $(BIN_DIR)/lib/libtbox.a /tmp/libtbox_armv7s.a 
 	@xcrun -sdk iphoneos lipo -create -arch armv7 /tmp/libtbox_armv7.a -arch armv7s /tmp/libtbox_armv7s.a -output $(BIN_DIR)/lib/libtbox.a
