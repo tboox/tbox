@@ -20,12 +20,12 @@
 # 	define TB_CONFIG_ARM_VERSION 			(7)
 #endif
 #ifdef __thumb__
-# 	define TA_CONFIG_ARM_THUMB
+# 	define TB_CONFIG_ARM_THUMB
 #endif
-//#define TA_CONFIG_ARM_JAZELLE
-//#define TA_CONFIG_ARM_VFP
-//#define TA_CONFIG_ARM_MMU 
-//#define TA_CONFIG_ARM_MPU 
+//#define TB_CONFIG_ARM_JAZELLE
+//#define TB_CONFIG_ARM_VFP
+//#define TB_CONFIG_ARM_MMU 
+//#define TB_CONFIG_ARM_MPU 
 
 // os
 #define TB_CONFIG_OS_IOS

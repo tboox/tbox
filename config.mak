@@ -9,10 +9,10 @@ PRO_NAME = tbox
 DEBUG = n
 
 # platform
-PLAT = mac
+PLAT = ios
 
 # architecture
-ARCH = x64
+ARCH = armv6
 
 # toolchain
 SDK = 5.1
