@@ -77,6 +77,7 @@ tb_pointer_t 		tb_stack_last(tb_stack_t* stack);
 
 // modifiors
 tb_void_t 			tb_stack_clear(tb_stack_t* stack);
+tb_void_t 			tb_stack_copy(tb_stack_t* stack, tb_stack_t* copy);
 
 tb_void_t 	 		tb_stack_put(tb_stack_t* stack, tb_cpointer_t data);
 tb_void_t 	 		tb_stack_pop(tb_stack_t* stack);

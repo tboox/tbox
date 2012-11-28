@@ -155,6 +155,32 @@ tb_void_t tb_vector_clear(tb_vector_t* vector)
 		vector->size = 0;
 	}
 }
+tb_void_t tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy)
+{
+	tb_assert_and_check_return(vector && copy);
+
+	// null? clear it
+	if (!copy->size) 
+	{
+		tb_vector_clear(vector);
+		return ;
+	}
+	
+	
+	// resize if small
+	if (vector->size < copy->size) tb_vector_resize(vector, copy->size);
+	tb_assert_and_check_return(vector->data && copy->data && vector->size >= copy->size);
+
+	// copy data
+	if (copy->data != vector->data) tb_memcpy(vector->data, copy->data, copy->size * copy->func.size);
+
+	// copy info
+	vector->size = copy->size;
+	vector->maxn = copy->maxn;
+	vector->grow = copy->grow;
+	vector->func = copy->func;
+	vector->itor = copy->itor;
+}
 tb_pointer_t tb_vector_data(tb_vector_t* vector)
 {
 	tb_assert_and_check_return_val(vector, TB_NULL);

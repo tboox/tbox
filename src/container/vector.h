@@ -107,6 +107,7 @@ tb_pointer_t 		tb_vector_last(tb_vector_t* vector);
 // modifiors
 tb_bool_t 			tb_vector_resize(tb_vector_t* vector, tb_size_t size);
 tb_void_t 			tb_vector_clear(tb_vector_t* vector);
+tb_void_t 			tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy);
 
 tb_void_t 	 		tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
 tb_void_t 	 		tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data);
