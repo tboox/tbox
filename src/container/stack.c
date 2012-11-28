@@ -46,6 +46,10 @@ tb_void_t tb_stack_clear(tb_stack_t* stack)
 {
 	tb_vector_clear(stack);
 }
+tb_void_t tb_stack_copy(tb_stack_t* stack, tb_stack_t* copy)
+{
+	tb_vector_copy(stack, copy);
+}
 tb_void_t tb_stack_put(tb_stack_t* stack, tb_cpointer_t data)
 {
 	tb_vector_insert_tail(stack, data);
