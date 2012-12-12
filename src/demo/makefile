@@ -11,6 +11,7 @@ $(1)_INC_DIR 			+= ../.. $(demo_INC_DIR)
 $(1)_CXFLAGS 			+= -DTB_PRINT_TAG=\"tbox\" $(demo_CXFLAGS)
 $(1)_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE $(demo_CXFLAGS-y)
 $(1)_LDFLAGS 			+= $(demo_LDFLAGS)
+$(1)_SUFFIX_CMD1 		+= $(TB_CONFIG_DEMO_CMD1)
 endef
 NAMES += $(NAMES-y)
 NAMES-y =

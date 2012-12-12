@@ -9,15 +9,15 @@ PRO_NAME = tbox
 DEBUG = n
 
 # platform
-PLAT = mac
+PLAT = ios
 
 # architecture
-ARCH = x64
+ARCH = armv7
 
 # toolchain
-SDK = 5.1
+SDK = 6.0
 NDK = /home/ruki/programs/android-ndk-r8
-BIN = /home/ruki/programs/windows/cross/bin
+BIN =
 HOST = mac
 CCACHE = ccache
 DISTCC =
