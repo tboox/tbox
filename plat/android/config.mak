@@ -1,6 +1,7 @@
 # demo
 TB_CONFIG_DEMO 					= y
 TB_CONFIG_DEMO_LIBS				= stdc++ log gcc c m dl
+TB_CONFIG_DEMO_CMD1 			=
 
 # plat
 TB_CONFIG_PLAT 					= android
