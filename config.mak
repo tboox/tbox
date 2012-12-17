@@ -12,7 +12,7 @@ DEBUG = n
 PLAT = ios
 
 # architecture
-ARCH = armv7
+ARCH = armv7s
 
 # toolchain
 SDK = 6.0

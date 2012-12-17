@@ -129,6 +129,9 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 				host = tb_url_host_get(&gst->url);
 				tb_assert_and_check_return_val(host, -1);
 
+				// init dns list
+				tb_dns_list_init();
+			
 				// try get ipv4
 				if (!tb_dns_look_try4(host, &addr))
 				{

@@ -10,8 +10,8 @@ OBJ_SUFFIX 			= .o
 LIB_PREFIX 			= lib
 LIB_SUFFIX 			= .a
 
-DLL_PREFIX 			= lib
-DLL_SUFFIX 			= .so
+DLL_PREFIX 			= 
+DLL_SUFFIX 			= .dylib
 
 ASM_SUFFIX 			= .S
 
@@ -118,7 +118,7 @@ ASFLAGS-o 			= -o
 ARFLAGS 			= -cr
 
 # share ldflags
-SHFLAGS 			= -shared -Wl,-soname
+SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
 
 # config
 include 			$(PLAT_DIR)/config.mak
