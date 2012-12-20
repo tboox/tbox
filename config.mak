@@ -12,10 +12,10 @@ DEBUG = n
 PLAT = ios
 
 # architecture
-ARCH = armv7s
+ARCH = armv7
 
 # toolchain
-SDK = 6.0
+SDK = 5.1
 NDK = /home/ruki/programs/android-ndk-r8
 BIN =
 HOST = mac
