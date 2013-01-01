@@ -191,6 +191,27 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		tb_free(node);
 	}
 }
+
+tb_xml_node_t* tb_xml_node_chead(tb_xml_node_t const* node)
+{
+	tb_assert_and_check_return_val(node, TB_NULL);
+	return node->chead;
+}
+tb_size_t tb_xml_node_csize(tb_xml_node_t const* node)
+{
+	tb_assert_and_check_return_val(node, 0);
+	return node->csize;
+}
+tb_xml_node_t* tb_xml_node_ahead(tb_xml_node_t const* node)
+{
+	tb_assert_and_check_return_val(node, TB_NULL);
+	return node->ahead;
+}
+tb_size_t tb_xml_node_asize(tb_xml_node_t const* node)
+{
+	tb_assert_and_check_return_val(node, 0);
+	return node->asize;
+}
 tb_void_t tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next)
 {
 	// check
@@ -233,11 +254,13 @@ tb_void_t tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child)
 	{
 		child->next = node->chead;
 		node->chead = child;
+		node->csize++;
 	}
 	else
 	{
 		tb_assert(!node->ctail);
 		node->ctail = node->chead = child;
+		node->csize = 1;
 	}
 }
 tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
@@ -254,11 +277,13 @@ tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
 	{
 		node->ctail->next = child;
 		node->ctail = child;
+		node->csize++;
 	}
 	else
 	{
 		tb_assert(!node->chead);
 		node->ctail = node->chead = child;
+		node->csize = 1;
 	}
 }
 tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute)
@@ -274,11 +299,13 @@ tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute
 	{
 		attribute->next = node->ahead;
 		node->ahead = attribute;
+		node->asize++;
 	}
 	else
 	{
 		tb_assert(!node->atail);
 		node->atail = node->ahead = attribute;
+		node->asize = 1;
 	}
 }
 tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute)
@@ -295,11 +322,13 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute
 	{
 		node->atail->next = attribute;
 		node->atail = attribute;
+		node->asize++;
 	}
 	else
 	{
 		tb_assert(!node->ahead);
 		node->atail = node->ahead = attribute;
+		node->asize = 1;
 	}
 }
 
