@@ -23,13 +23,22 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_handle_t writer = tb_xml_writer_init(ost, TB_TRUE);
 		if (reader && writer)
 		{
+#if 0
 			// goto
 			tb_bool_t ok = TB_TRUE;
 			if (argv[3]) ok = tb_xml_reader_goto(reader, argv[3]);
 
 			// load & save;
 			if (ok) tb_xml_writer_save(writer, tb_xml_reader_load(reader));
+#else
+			tb_xml_node_t* root = tb_xml_reader_load(reader);
 
+			// goto
+			if (argv[3]) root = tb_xml_node_goto(root, argv[3]);
+
+			// load & save;
+			if (root) tb_xml_writer_save(writer, root);
+#endif
 			// exit reader & writer 
 			tb_xml_reader_exit(reader);
 			tb_xml_writer_exit(writer);

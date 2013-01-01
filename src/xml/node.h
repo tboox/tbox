@@ -170,6 +170,9 @@ tb_xml_node_t* 		tb_xml_node_init_document(tb_char_t const* version, tb_char_t c
 /// exit node 
 tb_void_t 			tb_xml_node_exit(tb_xml_node_t* node);
 
+/// goto the node
+tb_xml_node_t* 		tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path);
+
 /// insert the next node
 tb_void_t 			tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next);
 
