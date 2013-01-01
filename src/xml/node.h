@@ -74,10 +74,12 @@ typedef struct __tb_xml_node_t
 	// the childs
 	struct __tb_xml_node_t* 	chead;
 	struct __tb_xml_node_t* 	ctail;
+	tb_size_t 					csize;
 
 	// the attributes
 	struct __tb_xml_node_t* 	ahead;
 	struct __tb_xml_node_t* 	atail;
+	tb_size_t 					asize;
 
 	// the parent
 	struct __tb_xml_node_t* 	parent;
@@ -172,6 +174,18 @@ tb_void_t 			tb_xml_node_exit(tb_xml_node_t* node);
 
 /// goto the node
 tb_xml_node_t* 		tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path);
+
+/// the head of the childs
+tb_xml_node_t* 		tb_xml_node_chead(tb_xml_node_t const* node);
+
+/// the size of the childs
+tb_size_t 			tb_xml_node_csize(tb_xml_node_t const* node);
+
+/// the head of the attributes
+tb_xml_node_t* 		tb_xml_node_ahead(tb_xml_node_t const* node);
+
+/// the size of the attributes
+tb_size_t 			tb_xml_node_asize(tb_xml_node_t const* node);
 
 /// insert the next node
 tb_void_t 			tb_xml_node_insert_next(tb_xml_node_t* node, tb_xml_node_t* next);

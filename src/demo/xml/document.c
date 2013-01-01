@@ -36,8 +36,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// goto
 			if (argv[3]) root = tb_xml_node_goto(root, argv[3]);
 
-			// load & save;
-			if (root) tb_xml_writer_save(writer, root);
+			// save
+			if (root) 
+			{
+				// trace
+				tb_print("csize: %u", tb_xml_node_csize(root));
+				tb_print("asize: %u", tb_xml_node_asize(root));
+
+				// save
+				tb_xml_writer_save(writer, root);
+			}
 #endif
 			// exit reader & writer 
 			tb_xml_reader_exit(reader);
