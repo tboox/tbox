@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"xml"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "node.h"
@@ -296,5 +301,59 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute
 		tb_assert(!node->ahead);
 		node->atail = node->ahead = attribute;
 	}
+}
+
+tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
+{
+	tb_assert_and_check_return_val(node && path, TB_NULL);
+	tb_trace_impl("root: %s goto: %s", tb_pstring_cstr(&node->name), path);
+
+	// skip '/'
+	tb_char_t const* p = path; while (*p && *p == '/') p++;
+
+	// is self?
+	if (!*p) return node;
+
+	// size
+	tb_size_t n = tb_strlen(p);
+
+	// walk the child nodes
+	tb_xml_node_t* root = node;
+	tb_xml_node_t* head = node->chead;
+	tb_xml_node_t* tail = node->ctail;
+	for (node = head; node; node = node->next)
+	{
+		if (node->type == TB_XML_NODE_TYPE_ELEMENT)
+		{
+			// size
+			tb_size_t m = tb_pstring_size(&node->name);
+
+			// trace
+			tb_trace_impl("%s", tb_pstring_cstr(&node->name));
+
+			// has it?
+			if (!tb_pstring_cstrncmp(&node->name, p, m))
+			{
+				// is it?
+				if (m == n) return node;
+				else if (m < n)
+				{
+					// skip this node
+					tb_char_t const* q = p + m;	
+
+					// is root?
+					if (*q == '/')
+					{
+						// goto the child node
+						tb_xml_node_t* c = tb_xml_node_goto(node, q);
+						if (c) return c;
+					}
+				}
+			}
+		}
+	}
+
+	// no
+	return TB_NULL;
 }
 
