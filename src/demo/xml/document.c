@@ -20,7 +20,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// init reader & writer
 		tb_handle_t reader = tb_xml_reader_init(ist);
-		tb_handle_t writer = tb_xml_writer_init(ost, TB_TRUE);
+		tb_handle_t writer = tb_xml_writer_init(ost, TB_FALSE);
 		if (reader && writer)
 		{
 #if 0
@@ -43,8 +43,78 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				tb_print("csize: %u", tb_xml_node_csize(root));
 				tb_print("asize: %u", tb_xml_node_asize(root));
 
+				// remove
+				{
+					tb_xml_node_t* dict = tb_xml_node_goto(root, "/plist/dict");
+
+#if 1
+					tb_xml_node_t* 	prev = TB_NULL;
+					tb_xml_node_t* 	node = tb_xml_node_chead(dict);
+					tb_bool_t 		rval = TB_FALSE;
+					while (node)
+					{
+						if (node->type == TB_XML_NODE_TYPE_ELEMENT)
+						{
+							if (!rval && !tb_pstring_cstricmp(&node->name, "key"))
+							{
+								tb_xml_node_t* value = tb_xml_node_chead(node);
+								if (value && value->type == TB_XML_NODE_TYPE_TEXT)
+								{
+									tb_print("<key>%s</key>", tb_pstring_cstr(&value->data));
+									if ( 	!tb_pstring_cstricmp(&value->data, "accountInfo")
+										|| 	!tb_pstring_cstricmp(&value->data, "appleId")
+										|| 	!tb_pstring_cstricmp(&value->data, "purchaseDate"))
+									{
+										// remove key
+										if (prev) 
+										{
+											tb_xml_node_remove_next(prev);
+											node = prev->next;
+										}
+										else 
+										{
+											tb_xml_node_remove_chead(dict);
+											node = dict->chead;
+										}
+										
+										// remove value next
+										rval = TB_TRUE;
+										continue ;
+									}
+								}
+							}
+							else if (rval)
+							{
+								// remove value
+								if (prev) 
+								{
+									tb_xml_node_remove_next(prev);
+									node = prev->next;
+								}
+								else 
+								{
+									tb_xml_node_remove_chead(dict);
+									node = dict->chead;
+								}
+								
+								// remove key next
+								rval = TB_FALSE;
+								continue ;
+							}
+						}
+
+						// next
+						prev = node;
+						node = node->next;
+					}
+#endif
+				}
+
 				// save
 				tb_xml_writer_save(writer, root);
+
+				// exit
+				tb_xml_node_exit(root);
 			}
 #endif
 			// exit reader & writer 

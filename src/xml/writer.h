@@ -51,6 +51,9 @@ tb_void_t 				tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node);
 /// document: <?xml version = \"...\" encoding = \"...\" ?>
 tb_void_t 				tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* encoding);
 
+/// document: <!DOCTYPE type>
+tb_void_t 				tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type);
+
 /// cdata: <![CDATA[...]]>
 tb_void_t 				tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data);
 
