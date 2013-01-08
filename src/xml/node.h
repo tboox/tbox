@@ -147,6 +147,17 @@ typedef struct __tb_xml_document_t
 
 }tb_xml_document_t;
 
+/// the xml document type type
+typedef struct __tb_xml_document_type_t
+{
+	// the node base
+	tb_xml_node_t 				base;
+
+	// the type 
+	tb_pstring_t 				type;
+
+}tb_xml_document_type_t;
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -168,6 +179,9 @@ tb_xml_node_t* 		tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t con
 
 /// init document 
 tb_xml_node_t* 		tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* encoding);
+
+/// init document type
+tb_xml_node_t* 		tb_xml_node_init_document_type(tb_char_t const* type);
 
 /// exit node 
 tb_void_t 			tb_xml_node_exit(tb_xml_node_t* node);
@@ -198,6 +212,12 @@ tb_void_t 			tb_xml_node_append_chead(tb_xml_node_t* node, tb_xml_node_t* child)
 
 /// append the node to the ctail
 tb_void_t 			tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child);
+
+/// remove the node from the chead
+tb_void_t 			tb_xml_node_remove_chead(tb_xml_node_t* node);
+
+/// remove the node from the ctail
+tb_void_t 			tb_xml_node_remove_ctail(tb_xml_node_t* node);
 
 /// append the node to the ahead
 tb_void_t 			tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute);

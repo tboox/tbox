@@ -198,6 +198,9 @@ tb_char_t const* 		tb_xml_reader_cdata(tb_handle_t reader);
 /// comment
 tb_char_t const* 		tb_xml_reader_comment(tb_handle_t reader);
 
+/// doctype
+tb_char_t const* 		tb_xml_reader_doctype(tb_handle_t reader);
+
 /// attributes
 tb_xml_node_t const* 	tb_xml_reader_attributes(tb_handle_t reader);
 

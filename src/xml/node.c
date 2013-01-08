@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"xml"
+#define TB_TRACE_IMPL_TAG 		"xml"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -136,6 +136,23 @@ tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t con
 	// ok
 	return node;
 }
+tb_xml_node_t* tb_xml_node_init_document_type(tb_char_t const* type)
+{
+	// alloc
+	tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_document_type_t));
+	tb_assert_and_check_return_val(node, TB_NULL);
+
+	// init 
+	node->type = TB_XML_NODE_TYPE_DOCUMENT_TYPE;
+	tb_pstring_init(&node->name);
+	tb_pstring_init(&node->data);
+	tb_pstring_init(&((tb_xml_document_type_t*)node)->type);
+	tb_pstring_cstrcpy(&node->name, "#doctype");
+	tb_pstring_cstrcpy(&((tb_xml_document_type_t*)node)->type, type? type : "");
+
+	// ok
+	return node;
+}
 tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 {
 	if (node)
@@ -151,6 +168,10 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 			tb_pstring_exit(&((tb_xml_document_t*)node)->encoding);
 		}
 
+		// free type
+		if (node->type == TB_XML_NODE_TYPE_DOCUMENT_TYPE)
+			tb_pstring_exit(&((tb_xml_document_type_t*)node)->type);
+
 		// free childs
 		if (node->chead)
 		{
@@ -162,7 +183,7 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 				save = next->next;
 				
 				// exit
-				tb_xml_node_exit(node);
+				tb_xml_node_exit(next);
 
 				// next
 				next = save;
@@ -180,7 +201,7 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 				save = next->next;
 				
 				// exit
-				tb_xml_node_exit(node);
+				tb_xml_node_exit(next);
 
 				// next
 				next = save;
@@ -285,6 +306,49 @@ tb_void_t tb_xml_node_append_ctail(tb_xml_node_t* node, tb_xml_node_t* child)
 		node->ctail = node->chead = child;
 		node->csize = 1;
 	}
+}
+tb_void_t tb_xml_node_remove_chead(tb_xml_node_t* node)
+{
+	// check
+	tb_assert_and_check_return(node);
+
+	// null?
+	tb_check_return(node->chead);
+
+	// remove
+	if (node->chead != node->ctail) 
+	{
+		// save
+		tb_xml_node_t* save = node->chead;
+
+		// remove
+		node->chead = save->next;
+
+		// exit
+		tb_xml_node_exit(save);
+
+		// size--
+		node->csize--;
+	}
+	else
+	{
+		// save
+		tb_xml_node_t* save = node->chead;
+
+		// remove
+		node->chead = TB_NULL;
+		node->ctail = TB_NULL;
+
+		// exit
+		tb_xml_node_exit(save);
+
+		// size--
+		node->csize--;
+	}
+}
+tb_void_t tb_xml_node_remove_ctail(tb_xml_node_t* node)
+{
+	tb_trace_noimpl();
 }
 tb_void_t tb_xml_node_append_ahead(tb_xml_node_t* node, tb_xml_node_t* attribute)
 {

@@ -143,6 +143,13 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 			}
 		}
 		break;
+	case TB_XML_NODE_TYPE_DOCUMENT_TYPE:
+		{
+			// document type
+			tb_xml_document_type_t* doctype = (tb_xml_document_type_t*)node;
+			tb_xml_writer_document_type(writer, tb_pstring_cstr(&doctype->type));
+		}
+		break;
 	case TB_XML_NODE_TYPE_ELEMENT:
 		{
 			// attributes
@@ -198,6 +205,14 @@ tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, t
 	tb_assert_and_check_return(xwriter && xwriter->wstream);
 
 	tb_gstream_printf(xwriter->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", encoding? encoding : "utf-8");
+	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
+}
+tb_void_t tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type)
+{
+	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
+	tb_assert_and_check_return(xwriter && xwriter->wstream);
+
+	tb_gstream_printf(xwriter->wstream, "<!DOCTYPE %s>", type? type : "");
 	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data)

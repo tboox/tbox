@@ -528,7 +528,17 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
 		switch (e)
 		{
 		case TB_XML_READER_EVENT_DOCUMENT:
+			break;
 		case TB_XML_READER_EVENT_DOCUMENT_TYPE:
+			{
+				// init
+				tb_xml_node_t* doctype = tb_xml_node_init_document_type(tb_xml_reader_doctype(reader));
+				tb_assert_and_check_goto(doctype, fail);
+				
+				// append
+				tb_xml_node_append_ctail(node, doctype); 
+				tb_assert_and_check_goto(doctype->parent, fail);
+			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
 			{
@@ -689,7 +699,18 @@ tb_char_t const* tb_xml_reader_element(tb_handle_t reader)
 	// ok?
 	return p > b? tb_pstring_cstrncpy(&xreader->name, b, p - b) : TB_NULL;
 }
+tb_char_t const* tb_xml_reader_doctype(tb_handle_t reader)
+{
+	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
+	tb_assert_and_check_return_val(xreader && xreader->event == TB_XML_READER_EVENT_DOCUMENT_TYPE, TB_NULL);
 
+	// doctype
+	tb_char_t const* p = tb_pstring_cstr(&xreader->element);
+	tb_assert_and_check_return_val(p, TB_NULL);
+
+	// skip !DOCTYPE
+	return (p + 9);
+}
 tb_xml_node_t const* tb_xml_reader_attributes(tb_handle_t reader)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
