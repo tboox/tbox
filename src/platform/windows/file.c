@@ -237,11 +237,9 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
 		// file size
 		info->size = ((tb_hong_t)st.nFileSizeHigh << 32) | st.nFileSizeLow;
-
-		// ok
-		return TB_TRUE;
 	}
 
-	return TB_FALSE;
+	// ok
+	return TB_TRUE;
 }
 

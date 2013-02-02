@@ -161,12 +161,9 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
 			// file size
 			info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
-
-			// ok
-			return TB_TRUE;
 		}
 	}
-	return TB_FALSE;
+	return TB_TRUE;
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
