@@ -98,25 +98,25 @@ static tb_object_t* tb_number_copy(tb_object_t* object)
 	switch (number->type)
 	{
 	case TB_NUMBER_TYPE_UINT64:
-		return tb_number_init_uint64(number->v.u64);
+		return tb_number_init_from_uint64(number->v.u64);
 	case TB_NUMBER_TYPE_SINT64:
-		return tb_number_init_sint64(number->v.s64);
+		return tb_number_init_from_sint64(number->v.s64);
 	case TB_NUMBER_TYPE_UINT32:
-		return tb_number_init_uint32(number->v.u32);
+		return tb_number_init_from_uint32(number->v.u32);
 	case TB_NUMBER_TYPE_SINT32:
-		return tb_number_init_sint32(number->v.s32);
+		return tb_number_init_from_sint32(number->v.s32);
 	case TB_NUMBER_TYPE_UINT16:
-		return tb_number_init_uint16(number->v.u16);
+		return tb_number_init_from_uint16(number->v.u16);
 	case TB_NUMBER_TYPE_SINT16:
-		return tb_number_init_sint16(number->v.s16);
+		return tb_number_init_from_sint16(number->v.s16);
 	case TB_NUMBER_TYPE_UINT8:
-		return tb_number_init_uint8(number->v.u8);
+		return tb_number_init_from_uint8(number->v.u8);
 	case TB_NUMBER_TYPE_SINT8:
-		return tb_number_init_sint8(number->v.s8);
+		return tb_number_init_from_sint8(number->v.s8);
 	case TB_NUMBER_TYPE_FLOAT:
-		return tb_number_init_float(number->v.f);
+		return tb_number_init_from_float(number->v.f);
 	case TB_NUMBER_TYPE_DOUBLE:
-		return tb_number_init_double(number->v.d);
+		return tb_number_init_from_double(number->v.d);
 	default:
 		break;
 	}
@@ -126,6 +126,49 @@ static tb_object_t* tb_number_copy(tb_object_t* object)
 static tb_void_t tb_number_exit(tb_object_t* object)
 {
 	if (object) tb_free(object);
+}
+static tb_void_t tb_number_cler(tb_object_t* object)
+{
+	// check
+	tb_number_t* number = (tb_number_t*)object;
+	tb_assert_and_check_return(number);
+
+	// cler
+	switch (number->type)
+	{
+	case TB_NUMBER_TYPE_UINT64:
+		number->v.u64 = 0;
+		break;
+	case TB_NUMBER_TYPE_SINT64:
+		number->v.s64 = 0;
+		break;
+	case TB_NUMBER_TYPE_UINT32:
+		number->v.u32 = 0;
+		break;
+	case TB_NUMBER_TYPE_SINT32:
+		number->v.s32 = 0;
+		break;
+	case TB_NUMBER_TYPE_UINT16:
+		number->v.u16 = 0;
+		break;
+	case TB_NUMBER_TYPE_SINT16:
+		number->v.s16 = 0;
+		break;
+	case TB_NUMBER_TYPE_UINT8:
+		number->v.u8 = 0;
+		break;
+	case TB_NUMBER_TYPE_SINT8:
+		number->v.s8 = 0;
+		break;
+	case TB_NUMBER_TYPE_FLOAT:
+		number->v.f = 0.;
+		break;
+	case TB_NUMBER_TYPE_DOUBLE:
+		number->v.d = 0.;
+		break;
+	default:
+		break;
+	}
 }
 static tb_number_t* tb_number_init_base()
 {
@@ -138,6 +181,7 @@ static tb_number_t* tb_number_init_base()
 
 	// init base
 	number->base.copy = tb_number_copy;
+	number->base.cler = tb_number_cler;
 	number->base.exit = tb_number_exit;
 
 	// ok
@@ -153,7 +197,7 @@ fail:
  * interfaces
  */
 
-tb_object_t* tb_number_init_uint8(tb_uint8_t value)
+tb_object_t* tb_number_init_from_uint8(tb_uint8_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -167,7 +211,7 @@ tb_object_t* tb_number_init_uint8(tb_uint8_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_sint8(tb_sint8_t value)
+tb_object_t* tb_number_init_from_sint8(tb_sint8_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -181,7 +225,7 @@ tb_object_t* tb_number_init_sint8(tb_sint8_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_uint16(tb_uint16_t value)
+tb_object_t* tb_number_init_from_uint16(tb_uint16_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -195,7 +239,7 @@ tb_object_t* tb_number_init_uint16(tb_uint16_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_sint16(tb_sint16_t value)
+tb_object_t* tb_number_init_from_sint16(tb_sint16_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -209,7 +253,7 @@ tb_object_t* tb_number_init_sint16(tb_sint16_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_uint32(tb_uint32_t value)
+tb_object_t* tb_number_init_from_uint32(tb_uint32_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -223,7 +267,7 @@ tb_object_t* tb_number_init_uint32(tb_uint32_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_sint32(tb_sint32_t value)
+tb_object_t* tb_number_init_from_sint32(tb_sint32_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -237,7 +281,7 @@ tb_object_t* tb_number_init_sint32(tb_sint32_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_uint64(tb_uint64_t value)
+tb_object_t* tb_number_init_from_uint64(tb_uint64_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -251,7 +295,7 @@ tb_object_t* tb_number_init_uint64(tb_uint64_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_sint64(tb_sint64_t value)
+tb_object_t* tb_number_init_from_sint64(tb_sint64_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -265,7 +309,7 @@ tb_object_t* tb_number_init_sint64(tb_sint64_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_float(tb_float_t value)
+tb_object_t* tb_number_init_from_float(tb_float_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();
@@ -279,7 +323,7 @@ tb_object_t* tb_number_init_float(tb_float_t value)
 	return number;
 }
 
-tb_object_t* tb_number_init_double(tb_double_t value)
+tb_object_t* tb_number_init_from_double(tb_double_t value)
 {
 	// make
 	tb_number_t* number = tb_number_init_base();

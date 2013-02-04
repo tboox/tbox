@@ -56,7 +56,7 @@ static __tb_inline__ tb_data_t* tb_data_cast(tb_object_t* object)
 }
 static tb_object_t* tb_data_copy(tb_object_t* object)
 {
-	return tb_data_init(tb_data_addr(object), tb_data_size(object));
+	return tb_data_init_from_data(tb_data_addr(object), tb_data_size(object));
 }
 static tb_void_t tb_data_exit(tb_object_t* object)
 {
@@ -66,6 +66,11 @@ static tb_void_t tb_data_exit(tb_object_t* object)
 		tb_pbuffer_exit(&data->buff);
 		tb_free(data);
 	}
+}
+static tb_void_t tb_data_cler(tb_object_t* object)
+{
+	tb_data_t* data = tb_data_cast(object);
+	if (data) tb_pbuffer_clear(&data->buff);
 }
 static tb_data_t* tb_data_init_base()
 {
@@ -78,6 +83,7 @@ static tb_data_t* tb_data_init_base()
 
 	// init base
 	data->base.copy = tb_data_copy;
+	data->base.cler = tb_data_cler;
 	data->base.exit = tb_data_exit;
 
 	// ok
@@ -92,7 +98,7 @@ fail:
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_data_init(tb_pointer_t addr, tb_size_t size)
+tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 {
 	// make
 	tb_data_t* data = tb_data_init_base();
@@ -103,6 +109,26 @@ tb_object_t* tb_data_init(tb_pointer_t addr, tb_size_t size)
 
 	// copy data
 	if (addr && size) tb_pbuffer_memncpy(&data->buff, addr, size);
+
+	// ok
+	return data;
+
+	// no
+fail:
+	tb_data_exit(data);
+	return tb_null;
+}
+tb_object_t* tb_data_init_from_pbuf(tb_pbuffer_t* pbuf)
+{	
+	// make
+	tb_data_t* data = tb_data_init_base();
+	tb_assert_and_check_return_val(data, tb_null);
+
+	// init buff
+	if (!tb_pbuffer_init(&data->buff)) goto fail;
+
+	// copy data
+	if (pbuf) tb_pbuffer_memcpy(&data->buff, pbuf);
 
 	// ok
 	return data;
