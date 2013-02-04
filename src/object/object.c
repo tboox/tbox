@@ -56,6 +56,14 @@ tb_void_t tb_object_exit(tb_object_t* object)
 	// exit
 	tb_object_dec(object);
 }
+tb_void_t tb_object_cler(tb_object_t* object)
+{
+	// check
+	tb_assert_and_check_return(object);
+
+	// clear
+	if (object->cler) object->cler(object);
+}
 tb_object_t* tb_object_copy(tb_object_t* object)
 {
 	// check

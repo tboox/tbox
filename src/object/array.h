@@ -32,21 +32,83 @@
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* 	tb_array_init(tb_size_t capacity);
 
-tb_size_t 		tb_array_size(tb_object_t* array);
+/*! init array
+ *
+ * @param grow		the array grow
+ *
+ * @return 			the array object
+ */
+tb_object_t* 		tb_array_init(tb_size_t grow);
 
-tb_void_t 		tb_array_clear(tb_object_t* array);
+/*! the array size
+ *
+ * @param array		the array object
+ *
+ * @return 			the array size
+ */
+tb_size_t 			tb_array_size(tb_object_t* array);
 
-tb_object_t 	tb_array_get(tb_object_t* array, tb_size_t index);
+/*! the array item at index
+ *
+ * @param array		the array object
+ * @param index		the array index
+ *
+ * @return 			the array item
+ */
+tb_object_t* 		tb_array_item(tb_object_t* array, tb_size_t index);
 
-tb_void_t 		tb_array_del(tb_object_t* array, tb_size_t index);
+/*! the array iterator
+ *
+ * @param array		the array object
+ *
+ * @return 			the array iterator
+ *
+ * @code
+ * tb_iterator_t* 	iterator = tb_array_itor(array);
+ * tb_size_t 		itor = tb_iterator_head(iterator);
+ * tb_size_t 		tail = tb_iterator_tail(iterator);
+ * for (; itor !- tail; itor = tb_iterator_next(iterator, itor))
+ * {
+ * 		tb_object_t* item = tb_iterator_item(iterator, itor);
+ * 		if (item)
+ * 		{
+ * 			// ...
+ * 		}
+ * }
+ * @codeend
+ */
+tb_iterator_t* 		tb_array_itor(tb_object_t* array);
 
-tb_void_t 		tb_array_add(tb_object_t* array, tb_object_t object);
+/*! remove the item from index
+ *
+ * @param array		the array object
+ * @param index		the array index
+ */
+tb_void_t 			tb_array_remove(tb_object_t* array, tb_size_t index);
 
-tb_void_t 		tb_array_ins(tb_object_t* array, tb_size_t index, tb_object_t object);
+/*! append item to array
+ *
+ * @param array		the array object
+ * @param index		the array index
+ */
+tb_void_t 			tb_array_append(tb_object_t* array, tb_object_t* item);
 
-tb_void_t 		tb_array_set(tb_object_t* array, tb_size_t index, tb_object_t object);
+/*! insert item to array
+ *
+ * @param array		the array object
+ * @param index		the array index
+ * @param item		the array item
+ */
+tb_void_t 			tb_array_insert(tb_object_t* array, tb_size_t index, tb_object_t* item);
+
+/*! replace item to array
+ *
+ * @param array		the array object
+ * @param index		the array index
+ * @param item		the array item
+ */
+tb_void_t 			tb_array_replace(tb_object_t* array, tb_size_t index, tb_object_t* item);
 
 #endif
 

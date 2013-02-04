@@ -61,6 +61,7 @@ tbox_C_FILES 			+= \
 						object/string \
 						object/number \
 						object/boolean \
+						object/dictionary \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \

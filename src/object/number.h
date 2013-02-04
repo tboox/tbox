@@ -60,7 +60,7 @@ typedef enum __tb_number_type_e
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_uint8(tb_uint8_t value);
+tb_object_t* 		tb_number_init_from_uint8(tb_uint8_t value);
 
 /*! init number from sint8
  *
@@ -68,7 +68,7 @@ tb_object_t* 	tb_number_init_uint8(tb_uint8_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_sint8(tb_sint8_t value);
+tb_object_t* 		tb_number_init_from_sint8(tb_sint8_t value);
 
 /*! init number from uint16
  *
@@ -76,7 +76,7 @@ tb_object_t* 	tb_number_init_sint8(tb_sint8_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_uint16(tb_uint16_t value);
+tb_object_t* 		tb_number_init_from_uint16(tb_uint16_t value);
 
 /*! init number from sint16
  *
@@ -84,7 +84,7 @@ tb_object_t* 	tb_number_init_uint16(tb_uint16_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_sint16(tb_sint16_t value);
+tb_object_t* 		tb_number_init_from_sint16(tb_sint16_t value);
 
 /*! init number from uint32
  *
@@ -92,7 +92,7 @@ tb_object_t* 	tb_number_init_sint16(tb_sint16_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_uint32(tb_uint32_t value);
+tb_object_t* 		tb_number_init_from_uint32(tb_uint32_t value);
 
 /*! init number from sint32
  *
@@ -100,7 +100,7 @@ tb_object_t* 	tb_number_init_uint32(tb_uint32_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_sint32(tb_sint32_t value);
+tb_object_t* 		tb_number_init_from_sint32(tb_sint32_t value);
 
 /*! init number from uint64
  *
@@ -108,7 +108,7 @@ tb_object_t* 	tb_number_init_sint32(tb_sint32_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_uint64(tb_uint64_t value);
+tb_object_t* 		tb_number_init_from_uint64(tb_uint64_t value);
 
 /*! init number from sint64
  *
@@ -116,7 +116,7 @@ tb_object_t* 	tb_number_init_uint64(tb_uint64_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_sint64(tb_sint64_t value);
+tb_object_t* 		tb_number_init_from_sint64(tb_sint64_t value);
 
 /*! init number from float
  *
@@ -124,7 +124,7 @@ tb_object_t* 	tb_number_init_sint64(tb_sint64_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_float(tb_float_t value);
+tb_object_t* 		tb_number_init_from_float(tb_float_t value);
 
 /*! init number from double
  *
@@ -132,7 +132,7 @@ tb_object_t* 	tb_number_init_float(tb_float_t value);
  *
  * @return 			the number object
  */
-tb_object_t* 	tb_number_init_double(tb_double_t value);
+tb_object_t* 		tb_number_init_from_double(tb_double_t value);
 
 /*! the number type
  *
@@ -140,7 +140,7 @@ tb_object_t* 	tb_number_init_double(tb_double_t value);
  *
  * @return 			the number type
  */
-tb_size_t 		tb_number_type(tb_object_t* number);
+tb_size_t 			tb_number_type(tb_object_t* number);
 
 /*! the uint8 value of the number
  *
@@ -148,7 +148,7 @@ tb_size_t 		tb_number_type(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_uint8_t 		tb_number_uint8(tb_object_t* number);
+tb_uint8_t 			tb_number_uint8(tb_object_t* number);
 
 /*! the sint8 value of the number
  *
@@ -156,7 +156,7 @@ tb_uint8_t 		tb_number_uint8(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_sint8_t 		tb_number_sint8(tb_object_t* number);
+tb_sint8_t 			tb_number_sint8(tb_object_t* number);
 
 /*! the uint16 value of the number
  *
@@ -164,7 +164,7 @@ tb_sint8_t 		tb_number_sint8(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_uint16_t 	tb_number_uint16(tb_object_t* number);
+tb_uint16_t 		tb_number_uint16(tb_object_t* number);
 
 /*! the sint16 value of the number
  *
@@ -172,7 +172,7 @@ tb_uint16_t 	tb_number_uint16(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_sint16_t 	tb_number_sint16(tb_object_t* number);
+tb_sint16_t 		tb_number_sint16(tb_object_t* number);
 
 /*! the uint32 value of the number
  *
@@ -180,7 +180,7 @@ tb_sint16_t 	tb_number_sint16(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_uint32_t 	tb_number_uint32(tb_object_t* number);
+tb_uint32_t 		tb_number_uint32(tb_object_t* number);
 
 /*! the sint32 value of the number
  *
@@ -188,7 +188,7 @@ tb_uint32_t 	tb_number_uint32(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_sint32_t 	tb_number_sint32(tb_object_t* number);
+tb_sint32_t 		tb_number_sint32(tb_object_t* number);
 
 /*! the uint64 value of the number
  *
@@ -196,7 +196,7 @@ tb_sint32_t 	tb_number_sint32(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_uint64_t 	tb_number_uint64(tb_object_t* number);
+tb_uint64_t 		tb_number_uint64(tb_object_t* number);
 
 /*! the sint64 value of the number
  *
@@ -204,7 +204,7 @@ tb_uint64_t 	tb_number_uint64(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_sint64_t 	tb_number_sint64(tb_object_t* number);
+tb_sint64_t 		tb_number_sint64(tb_object_t* number);
 
 /*! the float value of the number
  *
@@ -212,7 +212,7 @@ tb_sint64_t 	tb_number_sint64(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_float_t 		tb_number_float(tb_object_t* number);
+tb_float_t 			tb_number_float(tb_object_t* number);
 
 /*! the double value of the number
  *
@@ -220,7 +220,7 @@ tb_float_t 		tb_number_float(tb_object_t* number);
  *
  * @return 			the number value
  */
-tb_double_t 	tb_number_double(tb_object_t* number);
+tb_double_t 		tb_number_double(tb_object_t* number);
 
 #endif
 

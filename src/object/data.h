@@ -33,14 +33,22 @@
  * interfaces
  */
 
-/*! init data 
+/*! init data from data
  *
  * @param data 		the data
  * @param size 		the size
  *
  * @return 			the data object
  */
-tb_object_t* 	tb_data_init(tb_pointer_t data, tb_size_t size);
+tb_object_t* 		tb_data_init_from_data(tb_pointer_t data, tb_size_t size);
+
+/*! init data from pbuffer
+ *
+ * @param pbuf 		the pbuffer
+ *
+ * @return 			the data object
+ */
+tb_object_t* 		tb_data_init_from_pbuf(tb_pbuffer_t* pbuf);
 
 /*! the data address
  *
@@ -48,7 +56,7 @@ tb_object_t* 	tb_data_init(tb_pointer_t data, tb_size_t size);
  *
  * @return 			the data address
  */
-tb_pointer_t 	tb_data_addr(tb_object_t* data);
+tb_pointer_t 		tb_data_addr(tb_object_t* data);
 
 /*! the data size
  *
@@ -56,7 +64,7 @@ tb_pointer_t 	tb_data_addr(tb_object_t* data);
  *
  * @return 			the data size
  */
-tb_size_t 		tb_data_size(tb_object_t* data);
+tb_size_t 			tb_data_size(tb_object_t* data);
 
 /*! the data buffer
  *
@@ -64,7 +72,7 @@ tb_size_t 		tb_data_size(tb_object_t* data);
  *
  * @return 			the data buffer
  */
-tb_pbuffer_t* 	tb_data_buff(tb_object_t* data);
+tb_pbuffer_t* 		tb_data_buff(tb_object_t* data);
 
 #endif
 

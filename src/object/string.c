@@ -56,7 +56,7 @@ static __tb_inline__ tb_string_t* tb_string_cast(tb_object_t* object)
 }
 static tb_object_t* tb_string_copy(tb_object_t* object)
 {
-	return tb_string_init_cstr(tb_string_cstr(object));
+	return tb_string_init_from_cstr(tb_string_cstr(object));
 }
 static tb_void_t tb_string_exit(tb_object_t* object)
 {
@@ -66,6 +66,11 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 		tb_pstring_exit(&string->pstr);
 		tb_free(string);
 	}
+}
+static tb_void_t tb_string_cler(tb_object_t* object)
+{
+	tb_string_t* string = tb_string_cast(object);
+	if (string) tb_pstring_clear(&string->pstr);
 }
 static tb_string_t* tb_string_init_base()
 {
@@ -78,6 +83,7 @@ static tb_string_t* tb_string_init_base()
 
 	// init base
 	string->base.copy = tb_string_copy;
+	string->base.cler = tb_string_cler;
 	string->base.exit = tb_string_exit;
 
 	// ok
@@ -92,7 +98,7 @@ fail:
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_string_init_cstr(tb_char_t const* cstr)
+tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 {
 	// make
 	tb_string_t* string = tb_string_init_base();
@@ -103,6 +109,26 @@ tb_object_t* tb_string_init_cstr(tb_char_t const* cstr)
 
 	// copy string
 	if (cstr) tb_pstring_cstrcpy(&string->pstr, cstr);
+
+	// ok
+	return string;
+
+	// no
+fail:
+	tb_string_exit(string);
+	return tb_null;
+}
+tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
+{
+	// make
+	tb_string_t* string = tb_string_init_base();
+	tb_assert_and_check_return_val(string, tb_null);
+
+	// init pstr
+	if (!tb_pstring_init(&string->pstr)) goto fail;
+
+	// copy string
+	if (pstr) tb_pstring_strcpy(&string->pstr, pstr);
 
 	// ok
 	return string;

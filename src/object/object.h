@@ -33,6 +33,7 @@
 #include "string.h"
 #include "number.h"
 #include "boolean.h"
+#include "dictionary.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -46,7 +47,7 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 		tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
+tb_bool_t 			tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
 
 /*! exit object
  *
@@ -54,7 +55,13 @@ tb_bool_t 		tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type);
  *
  * @note the reference count must be one
  */
-tb_void_t 		tb_object_exit(tb_object_t* object);
+tb_void_t 			tb_object_exit(tb_object_t* object);
+
+/*! cler object
+ *
+ * @param object 	the object pointer
+ */
+tb_void_t 			tb_object_cler(tb_object_t* object);
 
 /*! copy object
  *
@@ -62,7 +69,7 @@ tb_void_t 		tb_object_exit(tb_object_t* object);
  *
  * @return 			the object copy
  */
-tb_object_t* 	tb_object_copy(tb_object_t* object);
+tb_object_t* 		tb_object_copy(tb_object_t* object);
 
 /*! the object type
  *
@@ -70,7 +77,7 @@ tb_object_t* 	tb_object_copy(tb_object_t* object);
  *
  * @return 			the object type
  */
-tb_size_t 		tb_object_type(tb_object_t* object);
+tb_size_t 			tb_object_type(tb_object_t* object);
 
 /*! the object reference count
  *
@@ -78,19 +85,19 @@ tb_size_t 		tb_object_type(tb_object_t* object);
  *
  * @return 			the object reference count
  */
-tb_size_t 		tb_object_ref(tb_object_t* object);
+tb_size_t 			tb_object_ref(tb_object_t* object);
 
 /*! increase the object reference count
  *
  * @param object 	the object pointer
  */
-tb_void_t 		tb_object_inc(tb_object_t* object);
+tb_void_t 			tb_object_inc(tb_object_t* object);
 
 /*! decrease the object reference count, will free it if --refn == 0
  *
  * @param object 	the object pointer
  */
-tb_void_t 		tb_object_dec(tb_object_t* object);
+tb_void_t 			tb_object_dec(tb_object_t* object);
 
 #endif
 
