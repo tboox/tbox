@@ -392,6 +392,7 @@ SUB_PROS 				= \
 					  	demo/math \
 					  	demo/utils \
 					  	demo/other \
+					  	demo/object \
 					  	demo/memory \
 					  	demo/string \
 					  	demo/stream \
