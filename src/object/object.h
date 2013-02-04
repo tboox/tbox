@@ -63,6 +63,25 @@ tb_void_t 			tb_object_exit(tb_object_t* object);
  */
 tb_void_t 			tb_object_cler(tb_object_t* object);
 
+/*! load object
+ *
+ * @param gst 		the stream
+ * @param format 	the object format
+ *
+ * @return 			the object pointer
+ */
+tb_object_t* 		tb_object_load(tb_gstream_t* gst, tb_size_t format);
+
+/*! save object
+ *
+ * @param object 	the object pointer
+ * @param gst 		the stream
+ * @param format 	the object format
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_save(tb_object_t* object, tb_gstream_t* gst, tb_size_t format);
+
 /*! copy object
  *
  * @param object 	the object pointer

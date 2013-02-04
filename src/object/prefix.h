@@ -59,6 +59,16 @@ typedef enum __tb_object_flag_e
 
 }tb_object_flag_e;
 
+/// the object format enum
+typedef enum __tb_object_format_e
+{
+	TB_OBJECT_FORMAT_NONE 		= 0
+,	TB_OBJECT_FORMAT_XML 		= 1
+,	TB_OBJECT_FORMAT_BIN 		= 2
+,	TB_OBJECT_FORMAT_USER 		= 3 //!< the user defined type, ...
+
+}tb_object_format_e;
+
 /// the object type
 typedef struct __tb_object_t
 {

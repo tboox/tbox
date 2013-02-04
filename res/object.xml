@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dict>
+	<key>string</key>
+	<string>hello wolrd!</string>
+
+	<key>integer</key>
+	<number>31415926</number>
+
+	<key>float</key>
+	<number>3.1415926</number>
+
+	<key>boolean0</key>
+	<false/>
+
+	<key>boolean1</key>
+	<true/>
+
+	<key>data</key><data/>
+
+	<key>array</key>
+	<array>
+		<string>hello wolrd!</string>
+		<number>31415926</number>
+		<number>3.1415926</number>
+		<false/>
+		<true/>
+	<array/>
+</dict>
