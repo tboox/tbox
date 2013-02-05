@@ -256,19 +256,15 @@ end:
 }
 static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
 {
-	// check
-	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
-	tb_assert_and_check_return_val(dictionary, tb_false);
-
 	// writ
-	if (tb_dictionary_size(dictionary))
+	if (tb_dictionary_size(object))
 	{
 		// writ beg
 		tb_object_writ_tab(gst, level);
 		tb_gstream_printf(gst, "<dict>\n");
 
 		// walk
-		tb_iterator_t* 	iterator = tb_dictionary_itor(dictionary);
+		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
 		tb_size_t 		itor = tb_iterator_head(iterator);
 		tb_size_t 		tail = tb_iterator_tail(iterator);
 		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
