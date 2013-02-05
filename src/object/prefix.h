@@ -28,8 +28,16 @@
  * includes
  */
 #include "../prefix.h"
+#include "../xml/xml.h"
 #include "../stream/stream.h"
 #include "../container/container.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// writ tab
+#define tb_object_writ_tab(gst, tab) 		do { tb_size_t t = (tab); while (t--) tb_gstream_printf((gst), "\t"); } while (0);
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -91,5 +99,11 @@ typedef struct __tb_object_t
 	tb_void_t 				(*exit)(struct __tb_object_t* object);
 
 }tb_object_t;
+
+/// the xml reader func type
+typedef tb_object_t* 		(*tb_object_xml_reader_func_t)(tb_handle_t reader, tb_size_t event);
+
+/// the xml writer func type
+typedef tb_bool_t 			(*tb_object_xml_writer_func_t)(tb_object_t* object, tb_gstream_t* gst, tb_size_t level);
 
 #endif

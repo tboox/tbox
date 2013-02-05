@@ -39,6 +39,30 @@
  * interfaces
  */
 
+/*! init object reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_init_reader();
+
+/*! exit object reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_object_exit_reader();
+
+/*! init object writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_init_writer();
+
+/*! exit object writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_void_t 			tb_object_exit_writer();
+
 /*! init object
  *
  * @param object 	the object pointer
@@ -63,16 +87,16 @@ tb_void_t 			tb_object_exit(tb_object_t* object);
  */
 tb_void_t 			tb_object_cler(tb_object_t* object);
 
-/*! load object
+/*! read object
  *
  * @param gst 		the stream
  * @param format 	the object format
  *
  * @return 			the object pointer
  */
-tb_object_t* 		tb_object_load(tb_gstream_t* gst, tb_size_t format);
+tb_object_t* 		tb_object_read(tb_gstream_t* gst, tb_size_t format);
 
-/*! save object
+/*! writ object
  *
  * @param object 	the object pointer
  * @param gst 		the stream
@@ -80,7 +104,7 @@ tb_object_t* 		tb_object_load(tb_gstream_t* gst, tb_size_t format);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_object_save(tb_object_t* object, tb_gstream_t* gst, tb_size_t format);
+tb_bool_t 			tb_object_writ(tb_object_t* object, tb_gstream_t* gst, tb_size_t format);
 
 /*! copy object
  *
@@ -97,6 +121,22 @@ tb_object_t* 		tb_object_copy(tb_object_t* object);
  * @return 			the object type
  */
 tb_size_t 			tb_object_type(tb_object_t* object);
+
+/*! the object description
+ *
+ * @param object 	the object pointer
+ * @param data 		the description data
+ * @param size 		the description maxn
+ *
+ * @return 			the object description string
+ */
+tb_char_t const*	tb_object_desc(tb_object_t* object, tb_char_t* data, tb_size_t maxn);
+
+/*! dump the object
+ *
+ * @param object 	the object pointer
+ */
+tb_void_t 			tb_object_dump(tb_object_t* object);
 
 /*! the object reference count
  *
@@ -117,6 +157,40 @@ tb_void_t 			tb_object_inc(tb_object_t* object);
  * @param object 	the object pointer
  */
 tb_void_t 			tb_object_dec(tb_object_t* object);
+
+/*! set xml object reader
+ *
+ * @param type 		the reader type
+ * @param func 		the reader func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_xml_reader(tb_char_t const* type, tb_object_xml_reader_func_t func);
+
+/*! get xml object reader
+ *
+ * @param type 		the reader type
+ *
+ * @return 			the reader func
+ */
+tb_pointer_t 		tb_object_get_xml_reader(tb_char_t const* type);
+
+/*! set xml object writer
+ *
+ * @param type 		the writer type
+ * @param func 		the writer func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_xml_writer(tb_size_t type, tb_object_xml_writer_func_t func);
+
+/*! get xml object writer
+ *
+ * @param type 		the writer type
+ *
+ * @return 			the writer func
+ */
+tb_pointer_t 		tb_object_get_xml_writer(tb_size_t type);
 
 #endif
 

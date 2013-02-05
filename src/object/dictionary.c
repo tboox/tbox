@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
@@ -43,7 +48,7 @@ typedef struct __tb_dictionary_t
 	// the object hash
 	tb_hash_t* 			hash;
 
-	// the string pool
+	// the dictionary pool
 	tb_handle_t 		pool;
 
 }tb_dictionary_t;
@@ -147,10 +152,168 @@ static tb_void_t tb_dictionary_item_free(tb_item_func_t* func, tb_pointer_t item
 	// refn--
 	tb_object_dec(object);
 }
+static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO);
+
+	// init key name
+	tb_sstring_t 	kname;
+	tb_char_t 		kdata[8192];
+	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
+
+	// init dictionary
+	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT);
+	tb_assert_and_check_return_val(dictionary, tb_null);
+
+	// walk
+	tb_bool_t 	ok = tb_false;
+	tb_bool_t 	key = tb_false;
+	while ((event = tb_xml_reader_next(reader)) && !ok)
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				tb_trace_impl("%s", name);
+
+				// is key
+				if (!tb_stricmp(name, "key")) key = tb_true;
+				else if (!key)
+				{
+					// func
+					tb_object_xml_reader_func_t func = tb_object_get_xml_reader(name);
+					tb_assert_and_check_goto(func, end);
+
+					// read
+					tb_object_t* object = func(reader, event);
+					tb_trace_impl("%s => %p", tb_sstring_cstr(&kname), object);
+					tb_assert_and_check_goto(object, end);
+
+					// set key & value
+					if (tb_sstring_size(&kname) && dictionary) 
+						tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), object);
+
+					// clear key name
+					tb_sstring_clear(&kname);
+				}
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "dict")) ok = tb_true;
+				else if (!tb_stricmp(name, "key")) key = tb_false;
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				if (key)
+				{
+					// text
+					tb_char_t* text = tb_xml_reader_text(reader);
+					tb_assert_and_check_goto(text, end);
+
+					// writ key name
+					tb_sstring_cstrcpy(&kname, text);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// fail
+	if (!ok) 
+	{
+		tb_object_exit(dictionary);
+		dictionary = tb_null;
+	}
+
+	// exit key name
+	tb_sstring_exit(&kname);
+
+	// ok?
+	return dictionary;
+}
+static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
+	tb_assert_and_check_return_val(dictionary, tb_false);
+
+	// writ
+	if (tb_dictionary_size(dictionary))
+	{
+		// writ beg
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<dict>\n");
+
+		// walk
+		tb_iterator_t* 	iterator = tb_dictionary_itor(dictionary);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
+			if (item && item->key && item->val)
+			{
+				// writ key
+				tb_object_writ_tab(gst, level + 1);
+				tb_gstream_printf(gst, "<key>%s</key>\n", item->key);
+
+				// func
+				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->val->type);
+				tb_assert_and_check_return_val(func, tb_false);
+
+				// writ val
+				if (!func(item->val, gst, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "</dict>\n");
+	}
+	else 
+	{
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<dict/>\n");
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_dictionary_init_reader()
+{
+	return tb_object_set_xml_reader("dict", tb_dictionary_read_xml);
+}
+tb_bool_t tb_dictionary_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xml);
+}
 tb_object_t* tb_dictionary_init(tb_size_t size)
 {
 	// make

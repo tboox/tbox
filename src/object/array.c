@@ -23,9 +23,23 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+# 	define TB_ARRAY_GROW 			(64)
+#else
+# 	define TB_ARRAY_GROW 			(256)
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -135,10 +149,130 @@ static tb_void_t tb_array_item_free(tb_item_func_t* func, tb_pointer_t item)
 	// refn--
 	tb_object_dec(object);
 }
+static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_array_init(TB_ARRAY_GROW);
+
+	// init array
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW);
+	tb_assert_and_check_return_val(array, tb_null);
+
+	// walk
+	tb_bool_t ok = tb_false;
+	while ((event = tb_xml_reader_next(reader)) && !ok)
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				tb_trace_impl("item: %s", name);
+
+				// func
+				tb_object_xml_reader_func_t func = tb_object_get_xml_reader(name);
+				tb_assert_and_check_goto(func, end);
+
+				// read
+				tb_object_t* object = func(reader, event);
+
+				// append object
+				if (array && object) tb_array_append(array, object);
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "array")) ok = tb_true;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// fail
+	if (!ok)
+	{
+		if (array) tb_object_exit(array);
+		array = tb_null;
+	}
+
+	// ok?
+	return array;
+}
+static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_array_t* array = tb_array_cast(object);
+	tb_assert_and_check_return_val(array, tb_false);
+
+	// writ
+	if (tb_array_size(array))
+	{
+		// writ beg
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<array>\n");
+
+		// walk
+		tb_iterator_t* 	iterator = tb_array_itor(array);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_object_t* item = tb_iterator_item(iterator, itor);
+			if (item)
+			{
+				// func
+				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->type);
+				tb_assert_and_check_return_val(func, tb_false);
+
+				// writ
+				if (!func(item, gst, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "</array>\n");
+	}
+	else 
+	{
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<array/>\n");
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_array_init_reader()
+{
+	return tb_object_set_xml_reader("array", tb_array_read_xml);
+}
+tb_bool_t tb_array_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_xml);
+}
 tb_object_t* tb_array_init(tb_size_t grow)
 {
 	// make

@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
@@ -63,7 +68,38 @@ static tb_object_t* tb_boolean_copy(tb_object_t* object)
 	// copy
 	return (tb_object_t*)tb_boolean_init(boolean->value);
 }
+static tb_object_t* tb_boolean_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// name
+	tb_char_t const* name = tb_xml_reader_element(reader);
+	tb_assert_and_check_return_val(name, tb_null);
+	tb_trace_impl("boolean: %s", name);
+
+	// the boolean value
+	tb_bool_t val = tb_false;
+	if (!tb_stricmp(name, "true")) val = tb_true;
+	else if (!tb_stricmp(name, "false")) val = tb_false;
+	else return tb_null;
+
+	// ok?
+	return tb_boolean_init(val);
+}
+static tb_bool_t tb_boolean_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_boolean_t* boolean = tb_boolean_cast(object);
+	tb_assert_and_check_return_val(boolean, tb_false);
+
+	// writ
+	tb_object_writ_tab(gst, level);
+	tb_gstream_printf(gst, "<%s/>\n", boolean->value? "true" : "false");
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
@@ -75,6 +111,7 @@ static tb_boolean_t const g_boolean_true =
 ,	TB_OBJECT_TYPE_BOOLEAN
 , 	1
 , 	tb_boolean_copy
+, 	tb_null
 , 	tb_null
 , 	tb_true
 
@@ -88,6 +125,7 @@ static tb_boolean_t const g_boolean_false =
 , 	1
 , 	tb_boolean_copy
 , 	tb_null
+, 	tb_null
 , 	tb_false
 
 };
@@ -95,6 +133,16 @@ static tb_boolean_t const g_boolean_false =
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_boolean_init_reader()
+{
+	if (!tb_object_set_xml_reader("true", tb_boolean_read_xml)) return tb_false;
+	if (!tb_object_set_xml_reader("false", tb_boolean_read_xml)) return tb_false;
+	return tb_true;
+}
+tb_bool_t tb_boolean_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_BOOLEAN, tb_boolean_writ_xml);
+}
 tb_object_t const* tb_boolean_init(tb_bool_t value)
 {
 	return value? tb_boolean_true() : tb_boolean_false();

@@ -3,6 +3,9 @@
 	<key>string</key>
 	<string>hello wolrd!</string>
 
+	<key>中文</key>
+	<string>你好！</string>
+
 	<key>integer</key>
 	<number>31415926</number>
 
@@ -24,5 +27,5 @@
 		<number>3.1415926</number>
 		<false/>
 		<true/>
-	<array/>
+	</array>
 </dict>

@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
@@ -94,10 +99,79 @@ fail:
 	if (string) tb_free(string);
 	return tb_null;
 }
+static tb_object_t* tb_string_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_string_init_from_cstr(tb_null);
+
+	// walk
+	tb_object_t* string = tb_null;
+	while (event = tb_xml_reader_next(reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "string")) goto end;
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_impl("string: %s", text);
+				
+				// string
+				string = tb_string_init_from_cstr(text);
+				tb_assert_and_check_goto(string, end);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// ok?
+	return string;
+}
+static tb_bool_t tb_string_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_string_t* string = tb_string_cast(object);
+	tb_assert_and_check_return_val(string, tb_false);
+
+	// writ
+	tb_object_writ_tab(gst, level);
+	if (tb_pstring_size(&string->pstr))
+		tb_gstream_printf(gst, "<string>%s</string>\n", tb_pstring_cstr(&string->pstr));
+	else tb_gstream_printf(gst, "<string/>\n");
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_string_init_reader()
+{
+	return tb_object_set_xml_reader("string", tb_string_read_xml);
+}
+tb_bool_t tb_string_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_xml);
+}
 tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 {
 	// make

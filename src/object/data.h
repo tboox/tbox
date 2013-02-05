@@ -33,6 +33,18 @@
  * interfaces
  */
 
+/*! init data reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_data_init_reader();
+
+/*! init data writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_data_init_writer();
+
 /*! init data from data
  *
  * @param data 		the data

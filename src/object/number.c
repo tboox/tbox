@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
@@ -192,11 +197,132 @@ fail:
 	if (number) tb_free(number);
 	return tb_null;
 }
+static tb_object_t* tb_number_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_number_init_from_uint32(0);
+
+	// walk
+	tb_object_t* number = tb_null;
+	while (event = tb_xml_reader_next(reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "number")) goto end;
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_impl("number: %s", text);
+
+				// has sign? is float?
+				tb_size_t s = 0;
+				tb_size_t f = 0;
+				tb_char_t const* p = text;
+				for (; *p; p++)
+				{
+					if (!s && *p == '-') s = 1;
+					if (!f && *p == '.') f = 1;
+					if (s && f) break;
+				}
+				
+				// number
+				if (f) number = tb_number_init_from_float(tb_atof(text));
+				else number = s? tb_number_init_from_sint64(tb_stoi64(text)) : tb_number_init_from_uint64(tb_stou64(text));
+				tb_assert_and_check_goto(number, end);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// ok?
+	return number;
+}
+static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// writ
+	switch (number->type)
+	{
+	case TB_NUMBER_TYPE_UINT64:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%llu</number>\n", number->v.u64);
+		break;
+	case TB_NUMBER_TYPE_SINT64:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%lld</number>\n", number->v.s64);
+		break;
+	case TB_NUMBER_TYPE_UINT32:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%u</number>\n", number->v.u32);
+		break;
+	case TB_NUMBER_TYPE_SINT32:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%d</number>\n", number->v.s32);
+		break;
+	case TB_NUMBER_TYPE_UINT16:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%u</number>\n", number->v.u16);
+		break;
+	case TB_NUMBER_TYPE_SINT16:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%d</number>\n", number->v.s16);
+		break;
+	case TB_NUMBER_TYPE_UINT8:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%u</number>\n", number->v.u8);
+		break;
+	case TB_NUMBER_TYPE_SINT8:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%d</number>\n", number->v.s8);
+		break;
+	case TB_NUMBER_TYPE_FLOAT:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%f</number>\n", number->v.f);
+		break;
+	case TB_NUMBER_TYPE_DOUBLE:
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<number>%lf</number>\n", number->v.d);
+		break;
+	default:
+		break;
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
+tb_bool_t tb_number_init_reader()
+{
+	return tb_object_set_xml_reader("number", tb_number_read_xml);
+}
+tb_bool_t tb_number_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_xml);
+}
 tb_object_t* tb_number_init_from_uint8(tb_uint8_t value)
 {
 	// make

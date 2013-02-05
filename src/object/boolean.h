@@ -33,6 +33,18 @@
  * interfaces
  */
 
+/*! init boolean reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_boolean_init_reader();
+
+/*! init boolean writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_boolean_init_writer();
+
 /*! init boolean
  *
  * @param value 	the value

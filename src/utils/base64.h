@@ -33,7 +33,7 @@
  * interfaces
  */
 tb_size_t tb_base64_encode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
-tb_size_t tb_base64_decode(tb_byte_t const* ib, tb_size_t in, tb_char_t* ob, tb_size_t on);
+tb_size_t tb_base64_decode(tb_char_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
 
 #endif
 

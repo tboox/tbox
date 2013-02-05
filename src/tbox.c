@@ -99,6 +99,10 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	// init rand
 	if (!tb_rand_init()) return tb_false;
 
+	// init object
+	if (!tb_object_init_reader()) return tb_false;
+	if (!tb_object_init_writer()) return tb_false;
+
 	// ok
 	tb_trace("init: ok");
 
@@ -121,6 +125,10 @@ tb_void_t tb_exit()
 	tb_memory_exit();
 #endif
 	
+	// exit object
+	tb_object_exit_reader();
+	tb_object_exit_writer();
+
 	// ok
 	tb_trace("exit: ok");
 }
