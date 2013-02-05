@@ -2,17 +2,17 @@
 IS_CONFIG = yes
 
 # project
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
 DEBUG = n
 
 # platform
-PLAT = linux
+PLAT = mac
 
 # architecture
-ARCH = x86
+ARCH = x64
 
 # toolchain
 SDK = 5.1

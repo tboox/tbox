@@ -83,7 +83,7 @@ typedef struct __tb_sstream_t
  */
 static __tb_inline__ tb_sstream_t* tb_sstream_cast(tb_gstream_t* gst)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_SOCK, tb_null);
 	return (tb_sstream_t*)gst;
 }
 static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
@@ -105,7 +105,7 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(port, -1);
 
 	// ipv4
-	tb_char_t const* host = TB_NULL;
+	tb_char_t const* host = tb_null;
 	if (!sst->ipv4[0])
 	{
 		tb_ipv4_t const* ipv4 = tb_url_ipv4_get(&gst->url);
@@ -152,7 +152,7 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 			if (sst->hdns) 
 			{
 				tb_dns_look_exit(sst->hdns);
-				sst->hdns = TB_NULL;
+				sst->hdns = tb_null;
 			}
 
 			// ipv4 => host
@@ -211,7 +211,7 @@ fail:
 	if (sst && sst->hdns)
 	{
 		tb_dns_look_exit(sst->hdns);
-		sst->hdns = TB_NULL;
+		sst->hdns = tb_null;
 	}
 
 	return -1;
@@ -228,7 +228,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 		if (!sst->bref) if (!tb_socket_close(sst->sock)) return 0;
 
 		// reset
-		sst->sock = TB_NULL;
+		sst->sock = tb_null;
 		sst->bref = 0;
 	}
 
@@ -377,7 +377,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 
 		// wait the gst
 		tb_aioo_t o;
-		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, TB_NULL);
+		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, tb_null);
 		sst->wait = tb_aioo_wait(&o, timeout);
 	}
 	else
@@ -394,37 +394,37 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
-	tb_assert_and_check_return_val(sst, TB_FALSE);
+	tb_assert_and_check_return_val(sst, tb_false);
 
 	switch (cmd)
 	{
 	case TB_SSTREAM_CMD_SET_TYPE:
 		{
-			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
+			tb_assert_and_check_return_val(!gst->bopened, tb_false);
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
-			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, TB_FALSE);
+			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, tb_false);
 			sst->type = type;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_SSTREAM_CMD_SET_HANDLE:
 		{
-			tb_assert_and_check_return_val(!gst->bopened, TB_FALSE);
+			tb_assert_and_check_return_val(!gst->bopened, tb_false);
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
 			sst->sock = handle;
 			sst->bref = handle? 1 : 0;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_SSTREAM_CMD_GET_HANDLE:
 		{
 			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
-			tb_assert_and_check_return_val(phandle, TB_FALSE);
+			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = sst->sock;
-			return TB_TRUE;
+			return tb_true;
 		}
 	default:
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -433,7 +433,7 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 tb_gstream_t* tb_gstream_init_sock()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_sstream_t));
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
@@ -447,7 +447,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->awrit 	= tb_sstream_awrit;
 	gst->ctrl 	= tb_sstream_ctrl;
 	gst->wait 	= tb_sstream_wait;
-	sst->sock 	= TB_NULL;
+	sst->sock 	= tb_null;
 	sst->type 	= TB_SOCKET_TYPE_TCP;
 
 	// ok
@@ -455,16 +455,16 @@ tb_gstream_t* tb_gstream_init_sock()
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
-	tb_assert_and_check_return_val(host && port, TB_NULL);
+	tb_assert_and_check_return_val(host && port, tb_null);
 
 	// init sock stream
 	tb_gstream_t* gst = tb_gstream_init_sock();
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// ioctl
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
@@ -477,5 +477,5 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }

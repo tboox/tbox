@@ -73,11 +73,11 @@ typedef struct __tb_xml_writer_t
 tb_handle_t tb_xml_writer_init(tb_gstream_t* wstream, tb_bool_t bformat)
 {
 	// check
-	tb_assert_and_check_return_val(wstream, TB_NULL);
+	tb_assert_and_check_return_val(wstream, tb_null);
 
 	// alloc
 	tb_xml_writer_t* writer = tb_malloc0(sizeof(tb_xml_writer_t));
-	tb_assert_and_check_return_val(writer, TB_NULL);
+	tb_assert_and_check_return_val(writer, tb_null);
 
 	// init
 	writer->wstream 	= wstream;
@@ -88,11 +88,11 @@ tb_handle_t tb_xml_writer_init(tb_gstream_t* wstream, tb_bool_t bformat)
 	tb_assert_and_check_goto(writer->spool, fail);
 	
 	// init elements
-	writer->elements 	= tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(TB_FALSE, writer->spool));
+	writer->elements 	= tb_stack_init(TB_XML_WRITER_ELEMENTS_GROW, tb_item_func_str(tb_false, writer->spool));
 	tb_assert_and_check_goto(writer->elements, fail);
 
 	// init attributes
-	writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(TB_FALSE, writer->spool), tb_item_func_str(TB_FALSE, writer->spool));
+	writer->attributes 	= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, writer->spool), tb_item_func_str(tb_false, writer->spool));
 	tb_assert_and_check_goto(writer->attributes, fail);
 
 	// ok
@@ -100,7 +100,7 @@ tb_handle_t tb_xml_writer_init(tb_gstream_t* wstream, tb_bool_t bformat)
 
 fail:
 	if (writer) tb_xml_writer_exit(writer);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 {

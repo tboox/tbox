@@ -43,9 +43,9 @@ tb_bool_t tb_socket_init()
 	if (WSAStartup(MAKEWORD(2, 2), &WSAData))
 	{
 		WSACleanup();
-		return TB_FALSE;
+		return tb_false;
 	}
-	return TB_TRUE;
+	return tb_true;
 }
 tb_void_t tb_socket_exit()
 {
@@ -53,7 +53,7 @@ tb_void_t tb_socket_exit()
 }
 tb_handle_t tb_socket_open(tb_size_t type)
 {
-	tb_assert_and_check_return_val(type, TB_NULL);
+	tb_assert_and_check_return_val(type, tb_null);
 	
 	// init type & protocol
 	tb_size_t t = 0;
@@ -73,13 +73,13 @@ tb_handle_t tb_socket_open(tb_size_t type)
 		}
 		break;
 	default:
-		return TB_NULL;
+		return tb_null;
 	}
 
 	// socket
 //	tb_long_t fd = socket(AF_INET, t, p);
-	SOCKET fd = WSASocket(AF_INET, t, p, TB_NULL, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
-	tb_assert_and_check_return_val(fd >= 0, TB_NULL);
+	SOCKET fd = WSASocket(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED); //!< for iocp
+	tb_assert_and_check_return_val(fd >= 0, tb_null);
 
 	// non-block
 	tb_ulong_t nb = 1;
@@ -90,7 +90,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 
 fail: 
 	if (fd >= 0) closesocket(fd);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
@@ -124,7 +124,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 
 tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 {
-	tb_assert_and_check_return_val(handle && port, TB_FALSE);
+	tb_assert_and_check_return_val(handle && port, tb_false);
 
 	// init
 	SOCKADDR_IN d = {0};
@@ -133,14 +133,14 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 	d.sin_addr.S_un.S_addr = htonl(INADDR_ANY); 
 
 	// bind 
-    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return TB_FALSE;
+    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
 
 	// listen
-    return (listen((tb_long_t)handle - 1, 20) < 0)? TB_FALSE : TB_TRUE;
+    return (listen((tb_long_t)handle - 1, 20) < 0)? tb_false : tb_true;
 }
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_NULL);
+	tb_assert_and_check_return_val(handle, tb_null);
 
 	// accept  
 	SOCKADDR_IN d;
@@ -148,7 +148,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	tb_long_t 	r = accept((tb_long_t)handle - 1, (struct sockaddr *)&d, &n);
 
 	// no client?
-	tb_check_return_val(r > 0, TB_NULL);
+	tb_check_return_val(r > 0, tb_null);
 
 	// non-block
 	tb_ulong_t nb = 1;
@@ -159,13 +159,13 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 
 fail: 
 	if (r >= 0) closesocket(r);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_bool_t tb_socket_close(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	return !closesocket((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(handle, tb_false);
+	return !closesocket((tb_long_t)handle - 1)? tb_true : tb_false;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

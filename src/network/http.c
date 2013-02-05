@@ -126,23 +126,23 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	http->option.version 	= TB_HTTP_VERSION_11;
 
 	// init url
-	if (!tb_url_init(&http->option.url)) return TB_FALSE;
+	if (!tb_url_init(&http->option.url)) return tb_false;
 
 	// init post
-	if (!tb_pstring_init(&http->option.post)) return TB_FALSE;
+	if (!tb_pstring_init(&http->option.post)) return tb_false;
 
 	// init head
-	http->option.head = tb_hash_init(8, tb_item_func_str(TB_FALSE, http->spool), tb_item_func_str(TB_FALSE, http->spool));
-	tb_assert_and_check_return_val(http->option.head, TB_FALSE);
+	http->option.head = tb_hash_init(8, tb_item_func_str(tb_false, http->spool), tb_item_func_str(tb_false, http->spool));
+	tb_assert_and_check_return_val(http->option.head, tb_false);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_void_t tb_http_option_exit(tb_http_t* http)
 {
 	// exit head
 	if (http->option.head) tb_hash_exit(http->option.head);
-	http->option.head = TB_NULL;
+	http->option.head = tb_null;
 
 	// exit post
 	tb_pstring_exit(&http->option.post);
@@ -153,9 +153,9 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 static tb_bool_t tb_http_status_init(tb_http_t* http)
 {
 	http->status.version = TB_HTTP_VERSION_11;
-	if (!tb_pstring_init(&http->status.content_type)) return TB_FALSE;
-	if (!tb_pstring_init(&http->status.location)) return TB_FALSE;
-	return TB_TRUE;
+	if (!tb_pstring_init(&http->status.content_type)) return tb_false;
+	if (!tb_pstring_init(&http->status.location)) return tb_false;
+	return tb_true;
 }
 static tb_void_t tb_http_status_exit(tb_http_t* http)
 {
@@ -441,7 +441,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	http->step &= ~TB_HTTP_STEP_NEVT;
 
 	// flush writed data
-	tb_long_t r = tb_gstream_afwrit(http->stream, TB_NULL, 0);
+	tb_long_t r = tb_gstream_afwrit(http->stream, tb_null, 0);
 
 	// continue it if has data
 	tb_check_return_val(r < 0, 0);
@@ -475,7 +475,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 	// line && size
 	tb_char_t* 	line = tb_pstring_cstr(&http->data);
 	tb_size_t 	size = tb_pstring_size(&http->data);
-	tb_assert_and_check_return_val(line && size, TB_FALSE);
+	tb_assert_and_check_return_val(line && size, tb_false);
 
 	// init 
 	tb_char_t* 	p = line;
@@ -485,31 +485,31 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 	{
 		// seek to the http version
 		while (*p && *p != '.') p++; 
-		tb_assert_and_check_return_val(*p, TB_FALSE);
+		tb_assert_and_check_return_val(*p, tb_false);
 		p++;
 
 		// parse version
-		tb_assert_and_check_return_val((*p - '0') < 2, TB_FALSE);
+		tb_assert_and_check_return_val((*p - '0') < 2, tb_false);
 		http->status.version = *p - '0';
 	
 		// seek to the http code
 		p++; while (tb_isspace(*p)) p++;
 
 		// parse code
-		tb_assert_and_check_return_val(*p && tb_isdigit(*p), TB_FALSE);
+		tb_assert_and_check_return_val(*p && tb_isdigit(*p), tb_false);
 		http->status.code = tb_stou32(p);
 
 		// check error code: 4xx & 5xx
-		if (http->status.code >= 400 && http->status.code < 600) return TB_FALSE;
+		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
 	}
 	// key: value?
 	else
 	{
 		// seek to value
 		while (*p && *p != ':') p++;
-		tb_assert_and_check_return_val(*p, TB_FALSE);
+		tb_assert_and_check_return_val(*p, tb_false);
 		p++; while (tb_isspace(*p)) p++;
-		tb_assert_and_check_return_val(*p, TB_FALSE);
+		tb_assert_and_check_return_val(*p, tb_false);
 
 		// parse content size
 		if (!tb_strnicmp(line, "Content-Length", 14))
@@ -554,7 +554,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		else if (!tb_strnicmp(line, "Content-Type", 12)) 
 		{
 			tb_pstring_cstrcpy(&http->status.content_type, p);
-			tb_assert_and_check_return_val(tb_pstring_size(&http->status.content_type), TB_FALSE);
+			tb_assert_and_check_return_val(tb_pstring_size(&http->status.content_type), tb_false);
 		}
 		// parse transfer encoding
 		else if (!tb_strnicmp(line, "Transfer-Encoding", 17))
@@ -565,7 +565,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		else if (!tb_strnicmp(line, "Location", 8)) 
 		{
 			// redirect? check code: 301 - 303
-			tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, TB_FALSE);
+			tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, tb_false);
 
 			// init redirect
 			http->rdtn = 0;
@@ -581,7 +581,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_long_t tb_http_response(tb_http_t* http)
 {
@@ -683,7 +683,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		else
 		{
 			// flush readed data
-			tb_long_t r = tb_gstream_afread(http->stream, TB_NULL, 0);
+			tb_long_t r = tb_gstream_afread(http->stream, tb_null, 0);
 
 			// continue it if has data
 			tb_check_return_val(r < 0, 0);
@@ -766,7 +766,7 @@ tb_handle_t tb_http_init()
 {
 	// init http
 	tb_http_t* http = tb_malloc0(sizeof(tb_http_t));
-	tb_assert_and_check_return_val(http, TB_NULL);
+	tb_assert_and_check_return_val(http, tb_null);
 
 	// init stream
 	http->stream = tb_gstream_init_sock();
@@ -790,7 +790,7 @@ tb_handle_t tb_http_init()
 
 fail:
 	if (http) tb_http_exit((tb_handle_t)http);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_http_exit(tb_handle_t handle)
 {
@@ -812,11 +812,11 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 
 		// exit spool
 		if (http->spool) tb_spool_exit(http->spool);
-		http->spool = TB_NULL;
+		http->spool = tb_null;
 
 		// exit stream
 		if (http->stream) tb_gstream_exit(http->stream);
-		http->stream = TB_NULL;
+		http->stream = tb_null;
 
 		// free it
 		tb_free(http);
@@ -870,7 +870,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 tb_bool_t tb_http_bopen(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// dump option
 #if defined(TB_DEBUG) && defined(TB_TRACE_IMPL_TAG)
@@ -897,7 +897,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	if (r <= 0) tb_http_bclose(handle);
 
 	// ok?
-	return r > 0? TB_TRUE : TB_FALSE;
+	return r > 0? tb_true : tb_false;
 }
 tb_long_t tb_http_aclose(tb_handle_t handle)
 {
@@ -949,7 +949,7 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 tb_bool_t tb_http_bclose(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// try opening it
 	tb_long_t 	r = 0;
@@ -964,7 +964,7 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 	}
 
 	// ok?
-	return r > 0? TB_TRUE : TB_FALSE;
+	return r > 0? tb_true : tb_false;
 }
 tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 {
@@ -989,7 +989,7 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// init step
 	http->step &= ~TB_HTTP_STEP_SEEK;
@@ -1009,7 +1009,7 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 	http->step &= ~TB_HTTP_STEP_SEEK;
 
 	// ok?
-	return r > 0? TB_TRUE : TB_FALSE;
+	return r > 0? tb_true : tb_false;
 }
 tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -1030,7 +1030,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream, TB_FALSE);
+	tb_assert_and_check_return_val(http && http->stream, tb_false);
 
 	// writ
 	tb_long_t writ = 0;
@@ -1058,12 +1058,12 @@ tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	}
 
 	// ok?
-	return writ == size? TB_TRUE : TB_FALSE;
+	return writ == size? tb_true : tb_false;
 }
 tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {	
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream, TB_FALSE);
+	tb_assert_and_check_return_val(http && http->stream, tb_false);
 
 	// read
 	tb_long_t read = 0;
@@ -1091,18 +1091,18 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	}
 
 	// ok?
-	return read == size? TB_TRUE : TB_FALSE;
+	return read == size? tb_true : tb_false;
 }
 tb_http_option_t* tb_http_option(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http, TB_NULL);
+	tb_assert_and_check_return_val(http, tb_null);
 	return &http->option;
 }
 tb_http_status_t const* tb_http_status(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http, TB_NULL);
+	tb_assert_and_check_return_val(http, tb_null);
 	return &http->status;
 }
 

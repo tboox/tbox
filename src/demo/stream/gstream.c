@@ -10,7 +10,7 @@
 static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
 {
 	tb_print("[demo]: response: %s", line);
-	return TB_TRUE;
+	return tb_true;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * main
@@ -27,7 +27,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// ioctl
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
-		tb_http_option_t* option = TB_NULL;
+		tb_http_option_t* option = tb_null;
 		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
 		if (option) option->hfunc = tb_http_test_hfunc;
 	}
@@ -52,7 +52,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_hize_t 		read = 0;
-	tb_bool_t 		wait = TB_FALSE;
+	tb_bool_t 		wait = tb_false;
 	tb_hize_t 		left = tb_gstream_left(ist);
 	tb_hong_t 		base = tb_mclock();
 	tb_hong_t 		basc = tb_mclock();

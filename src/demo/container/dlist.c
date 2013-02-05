@@ -627,7 +627,7 @@ static tb_void_t tb_dlist_str_dump(tb_dlist_t const* dlist)
 }
 static tb_void_t tb_dlist_str_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
@@ -936,7 +936,7 @@ static tb_void_t tb_dlist_test_itor_perf()
 }
 static tb_bool_t tb_dlist_test_walk_item(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(dlist && bdel && data, TB_FALSE);
+	tb_assert_and_check_return_val(dlist && bdel && data, tb_false);
 
 	tb_hize_t* test = data;
 	if (item)
@@ -946,7 +946,7 @@ static tb_bool_t tb_dlist_test_walk_item(tb_dlist_t* dlist, tb_pointer_t* item, 
 //		if (!(i & 0x7))
 //		if (1)
 //		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
-			*bdel = TB_TRUE;
+			*bdel = tb_true;
 		else
 		{
 			test[0] += i;
@@ -955,7 +955,7 @@ static tb_bool_t tb_dlist_test_walk_item(tb_dlist_t* dlist, tb_pointer_t* item, 
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_void_t tb_dlist_test_walk_perf()
 {

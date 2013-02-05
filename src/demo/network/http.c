@@ -14,7 +14,7 @@
 static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
 {
 	// check
-	tb_assert_and_check_return_val(http && line, TB_FALSE);
+	tb_assert_and_check_return_val(http && line, tb_false);
 
 	// option 
 	tb_http_option_t* 	option = tb_http_option(http);
@@ -31,15 +31,15 @@ static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
 		// seek to value
 		tb_char_t const* p = line;
 		while (*p && *p != ':') p++;
-		tb_assert_and_check_return_val(*p, TB_FALSE);
+		tb_assert_and_check_return_val(*p, tb_false);
 		p++; while (tb_isspace(*p)) p++;
-		tb_assert_and_check_return_val(*p, TB_FALSE);
+		tb_assert_and_check_return_val(*p, tb_false);
 
 		tb_char_t const* url = tb_url_get(&option->url);
 		if (url) tb_cookies_set_from_url(cookies, url, p);
 	}
 
-	return TB_TRUE;
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

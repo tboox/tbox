@@ -57,19 +57,19 @@ tb_bool_t tb_time_to_local(tb_hong_t time, tb_time_t* local)
 		local->milliseconds = 0;
 
 		// check
-		if (local->year < 2000 || local->year > 3000) return TB_FALSE;
-		if (!local->month || local->month > 12) return TB_FALSE;
-		if (!local->day || local->day > 31) return TB_FALSE;
-		if (local->hours > 23) return TB_FALSE;
-		if (local->minutes > 59) return TB_FALSE;
-		if (local->seconds > 59) return TB_FALSE;
-		if (local->milliseconds > 999) return TB_FALSE;
-		if (local->wday > 6) return TB_FALSE;
-		if (local->yday > 365) return TB_FALSE;
+		if (local->year < 2000 || local->year > 3000) return tb_false;
+		if (!local->month || local->month > 12) return tb_false;
+		if (!local->day || local->day > 31) return tb_false;
+		if (local->hours > 23) return tb_false;
+		if (local->minutes > 59) return tb_false;
+		if (local->seconds > 59) return tb_false;
+		if (local->milliseconds > 999) return tb_false;
+		if (local->wday > 6) return tb_false;
+		if (local->yday > 365) return tb_false;
 
-		return TB_TRUE;
+		return tb_true;
 	}
-	return TB_FALSE;
+	return tb_false;
 #else
 	// for beigin: gmt+8
 	time += 8 * 3600 * 1000;
@@ -96,19 +96,19 @@ tb_bool_t tb_time_to_utc(tb_hong_t time, tb_time_t* utc)
 		utc->milliseconds = 0;
 
 		// check
-		if (utc->year < 2000 || utc->year > 3000) return TB_FALSE;
-		if (!utc->month || utc->month > 12) return TB_FALSE;
-		if (!utc->day || utc->day > 31) return TB_FALSE;
-		if (utc->hours > 23) return TB_FALSE;
-		if (utc->minutes > 59) return TB_FALSE;
-		if (utc->seconds > 59) return TB_FALSE;
-		if (utc->milliseconds > 999) return TB_FALSE;
-		if (utc->wday > 6) return TB_FALSE;
-		if (utc->yday > 365) return TB_FALSE;
+		if (utc->year < 2000 || utc->year > 3000) return tb_false;
+		if (!utc->month || utc->month > 12) return tb_false;
+		if (!utc->day || utc->day > 31) return tb_false;
+		if (utc->hours > 23) return tb_false;
+		if (utc->minutes > 59) return tb_false;
+		if (utc->seconds > 59) return tb_false;
+		if (utc->milliseconds > 999) return tb_false;
+		if (utc->wday > 6) return tb_false;
+		if (utc->yday > 365) return tb_false;
 
-		return TB_TRUE;
+		return tb_true;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 
 // local => time
@@ -118,24 +118,24 @@ tb_bool_t tb_time_from_local(tb_hong_t* time, tb_time_t const* local)
 	{
 		// for beigin: gmt+8
 		*time += 8 * 3600 * 1000;
-		return TB_TRUE;
+		return tb_true;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 
 // utc => time
 tb_bool_t tb_time_from_utc(tb_hong_t* time, tb_time_t const* utc)
 {
 	// check
-	if (utc->year < 2000 || utc->year > 3000) return TB_FALSE;
-	if (!utc->month || utc->month > 12) return TB_FALSE;
-	if (!utc->day || utc->day > 31) return TB_FALSE;
-	if (utc->hours > 23) return TB_FALSE;
-	if (utc->minutes > 59) return TB_FALSE;
-	if (utc->seconds > 59) return TB_FALSE;
-	if (utc->milliseconds > 999) return TB_FALSE;
-	if (utc->wday > 6) return TB_FALSE;
-	if (utc->yday > 365) return TB_FALSE;
+	if (utc->year < 2000 || utc->year > 3000) return tb_false;
+	if (!utc->month || utc->month > 12) return tb_false;
+	if (!utc->day || utc->day > 31) return tb_false;
+	if (utc->hours > 23) return tb_false;
+	if (utc->minutes > 59) return tb_false;
+	if (utc->seconds > 59) return tb_false;
+	if (utc->milliseconds > 999) return tb_false;
+	if (utc->wday > 6) return tb_false;
+	if (utc->yday > 365) return tb_false;
 
 	if (time) 
 	{
@@ -157,10 +157,10 @@ tb_bool_t tb_time_from_utc(tb_hong_t* time, tb_time_t const* utc)
 		t += utc->milliseconds;
 		*time = t;
 
-		return TB_TRUE;
+		return tb_true;
 	}
 
-	return TB_FALSE;
+	return tb_false;
 }
 
 tb_char_t const* tb_time_week(tb_time_t const* time)

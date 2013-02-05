@@ -122,20 +122,20 @@ tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
  * @code
  * tb_bool_t tb_queue_item_func(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- * 		tb_assert_and_check_return_val(queue && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(queue && bdel, tb_false);
  *
  * 		// is tail?
  * 		if (!item) ;
  *
  * 		// delete it?
- * 		// *bdel = TB_TRUE;
+ * 		// *bdel = tb_true;
  *
  * 		// ok
- * 		return TB_TRUE;
+ * 		return tb_true;
  *
  * 	fail:
  * 		// break
- * 		return TB_FALSE;
+ * 		return tb_false;
  * }
  * @endcode
  *

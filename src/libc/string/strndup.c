@@ -34,7 +34,7 @@
 
 tb_char_t* tb_strndup(tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	__tb_register__ tb_char_t* p;
 

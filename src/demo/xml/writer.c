@@ -17,7 +17,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_gstream_ctrl(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
 	if (gst && tb_gstream_bopen(gst))
 	{
-		tb_handle_t writer = tb_xml_writer_init(gst, TB_TRUE);
+		tb_handle_t writer = tb_xml_writer_init(gst, tb_true);
 		if (writer)
 		{
 			tb_xml_writer_document(writer, "1.0", "utf-8");
@@ -32,7 +32,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				tb_xml_writer_element_leave(writer);
 
 				tb_xml_writer_attributes_long(writer, "id", 2);
-				tb_xml_writer_attributes_bool(writer, "bool", TB_TRUE);
+				tb_xml_writer_attributes_bool(writer, "bool", tb_true);
 				tb_xml_writer_element_enter(writer, "label_2");
 				tb_xml_writer_text(writer, "characters");
 				tb_xml_writer_element_leave(writer);
@@ -43,7 +43,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				tb_xml_writer_text(writer, "characters");
 
 					tb_xml_writer_attributes_long(writer, "id", -4);
-					tb_xml_writer_attributes_bool(writer, "bool", TB_FALSE);
+					tb_xml_writer_attributes_bool(writer, "bool", tb_false);
 					tb_xml_writer_element_empty(writer, "label_4");
 
 					tb_xml_writer_element_empty(writer, "label_5");

@@ -53,8 +53,8 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeou
 	fd_set 	rfds;
 	fd_set 	wfds;
 	fd_set 	efds;
-	fd_set* prfds = (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT)? &rfds : TB_NULL;
-	fd_set* pwfds = (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)? &wfds : TB_NULL;
+	fd_set* prfds = (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT)? &rfds : tb_null;
+	fd_set* pwfds = (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)? &wfds : tb_null;
 
 	if (prfds)
 	{
@@ -76,7 +76,7 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeou
 						, prfds
 						, pwfds
 						, &efds
-						, timeout >= 0? &t : TB_NULL);
+						, timeout >= 0? &t : tb_null);
 	tb_assert_and_check_return_val(r >= 0, -1);
 
 	// timeout?

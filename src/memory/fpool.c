@@ -113,11 +113,11 @@ typedef struct __tb_fpool_t
  */
 static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 {
-	tb_pointer_t data = TB_NULL;
+	tb_pointer_t data = tb_null;
 	if (fpool->pred)
 	{
 		tb_size_t i = (fpool->pred - fpool->data) / fpool->step;
-		tb_assert_and_check_return_val(!((fpool->pred - fpool->data) % fpool->step), TB_NULL);
+		tb_assert_and_check_return_val(!((fpool->pred - fpool->data) % fpool->step), tb_null);
 		if (!tb_fpool_used_bset(fpool->used, i)) 
 		{
 			// ok
@@ -152,10 +152,10 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 #endif
 	tb_size_t* 	p = (tb_size_t*)fpool->used;
 	tb_size_t* 	e = (tb_size_t*)fpool->used + m;
-	tb_byte_t* 	d = TB_NULL;
+	tb_byte_t* 	d = tb_null;
 
 	// check align
-	tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), TB_NULL);
+	tb_assert_and_check_return_val(!(((tb_size_t)p) & (TB_CPU_BITBYTE - 1)), tb_null);
 
 	// find the free chunk, step * 32|64 items
 #if 0
@@ -177,12 +177,12 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 	}
 	while (p < e && !(*p + 1)) p++;	
 #endif
-	tb_check_return_val(p < e, TB_NULL);
+	tb_check_return_val(p < e, tb_null);
 
 	// find the free bit index
 	m = fpool->maxn;
 	i = (((tb_byte_t*)p - fpool->used) << 3) + tb_bits_fb0_le(*p);
-	tb_check_return_val(i < m, TB_NULL);
+	tb_check_return_val(i < m, tb_null);
 
 	// alloc it
 	d = fpool->data + i * fpool->step;
@@ -203,7 +203,7 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 	tb_byte_t* 	p = fpool->used;
 	tb_byte_t 	u = *p;
 	tb_byte_t 	b = 0;
-	tb_byte_t* 	d = TB_NULL;
+	tb_byte_t* 	d = tb_null;
 	for (i = 0; i < m; ++i)
 	{
 		// bit
@@ -252,19 +252,19 @@ static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align)
 {
 	// check
-	tb_assert_and_check_return_val(data && step && size, TB_NULL);
+	tb_assert_and_check_return_val(data && step && size, tb_null);
 
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 	align = tb_max(align, TB_CPU_BITBYTE);
-	tb_assert_and_check_return_val(align <= TB_FPOOL_ALIGN_MAXN, TB_NULL);
+	tb_assert_and_check_return_val(align <= TB_FPOOL_ALIGN_MAXN, tb_null);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
-	tb_assert_and_check_return_val(size >= byte, TB_NULL);
+	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
-	tb_assert_and_check_return_val(size, TB_NULL);
+	tb_assert_and_check_return_val(size, tb_null);
 
 	// init data
 	tb_memset(data, 0, size);
@@ -283,7 +283,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 
 	// init used
 	fpool->used = (tb_byte_t*)tb_align((tb_size_t)&fpool[1], fpool->align);
-	tb_assert_and_check_return_val(data + size > fpool->used, TB_NULL);
+	tb_assert_and_check_return_val(data + size > fpool->used, tb_null);
 
 	/* init maxn
 	 *
@@ -296,12 +296,12 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	 * maxn < (left * 8 - 7) / (1 + step * 8)
 	 */
 	fpool->maxn = (((data + size - fpool->used) << 3) - 7) / (1 + (fpool->step << 3));
-	tb_assert_and_check_return_val(fpool->maxn, TB_NULL);
+	tb_assert_and_check_return_val(fpool->maxn, tb_null);
 
 	// init data
 	fpool->data = (tb_byte_t*)tb_align((tb_size_t)fpool->used + (tb_align8(fpool->maxn) >> 3), fpool->align);
-	tb_assert_and_check_return_val(data + size > fpool->data, TB_NULL);
-	tb_assert_and_check_return_val(fpool->maxn * fpool->step <= (data + size - fpool->data), TB_NULL);
+	tb_assert_and_check_return_val(data + size > fpool->data, tb_null);
+	tb_assert_and_check_return_val(fpool->maxn * fpool->step <= (data + size - fpool->data), tb_null);
 
 	// init size
 	fpool->size = 0;
@@ -364,14 +364,14 @@ tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 {
 	// check 
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;
-	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, TB_NULL);
-	tb_assert_and_check_return_val(fpool->step, TB_NULL);
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, tb_null);
+	tb_assert_and_check_return_val(fpool->step, tb_null);
 
 	// no space?
-	tb_check_return_val(fpool->size < fpool->maxn, TB_NULL);
+	tb_check_return_val(fpool->size < fpool->maxn, tb_null);
 
 	// predict it?
-//	tb_pointer_t data = TB_NULL;
+//	tb_pointer_t data = tb_null;
 	tb_pointer_t data = tb_fpool_malloc_pred(fpool);
 
 	// find the free block
@@ -394,7 +394,7 @@ tb_pointer_t tb_fpool_malloc0(tb_handle_t handle)
 {
 	// check 
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;
-	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, TB_NULL);
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, tb_null);
 
 	// malloc
 	tb_pointer_t p = tb_fpool_malloc(handle);
@@ -409,21 +409,21 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 {
 	// check 
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;
-	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC && fpool->step, TB_FALSE);
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC && fpool->step, tb_false);
 
 	// check size
-	tb_check_return_val(fpool->size, TB_FALSE);
+	tb_check_return_val(fpool->size, tb_false);
 
 	// check data
-	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->maxn * fpool->step, TB_FALSE);	
-	tb_check_return_val(!(((tb_size_t)data) & (fpool->align - 1)), TB_FALSE);
-	tb_check_return_val(!(((tb_byte_t*)data - fpool->data) % fpool->step), TB_FALSE);
+	tb_check_return_val(data >= fpool->data && (tb_byte_t*)data + fpool->step <= fpool->data + fpool->maxn * fpool->step, tb_false);	
+	tb_check_return_val(!(((tb_size_t)data) & (fpool->align - 1)), tb_false);
+	tb_check_return_val(!(((tb_byte_t*)data - fpool->data) % fpool->step), tb_false);
 
 	// item
 	tb_size_t i = ((tb_byte_t*)data - fpool->data) / fpool->step;
 
 	// double free?
-	tb_assert_return_val(tb_fpool_used_bset(fpool->used, i), TB_TRUE);
+	tb_assert_return_val(tb_fpool_used_bset(fpool->used, i), tb_true);
 
 	// free it
 	tb_fpool_used_set0(fpool->used, i);
@@ -435,7 +435,7 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 	fpool->size--;
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 #ifdef TB_DEBUG
 tb_void_t tb_fpool_dump(tb_handle_t handle)

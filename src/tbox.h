@@ -58,7 +58,7 @@ extern "C" {
  * @param data 	the memory data, uses it when TB_CONFIG_MEMORY_POOL is enabled
  * @param size 	the memory size, uses it when TB_CONFIG_MEMORY_POOL is enabled
  *
- * @return ok: TB_TRUE, fail: TB_FALSE
+ * @return ok: tb_true, fail: tb_false
  */
 tb_bool_t 			tb_init(tb_byte_t* data, tb_size_t size);
 

@@ -307,14 +307,14 @@ static tb_bstream_t* tb_zstream_inflate_lzsw_transform(tb_tstream_t* st)
 {
 	tb_lzsw_inflate_zstream_t* zst = (tb_lzsw_inflate_zstream_t*)st;
 	tb_assert(zst);
-	if (!zst) return TB_NULL;
+	if (!zst) return tb_null;
 
 	// get dst
 	tb_byte_t* dp = st->dst.p;
 	tb_byte_t* de = st->dst.e;
 	tb_byte_t* db = dp;
 	tb_assert(dp && de);
-	if (!dp || !de) return TB_NULL;
+	if (!dp || !de) return tb_null;
 
 	// get src
 	tb_bstream_t* src = tb_tstream_src(st);
@@ -412,14 +412,14 @@ static tb_bstream_t* tb_zstream_deflate_lzsw_transform(tb_tstream_t* st)
 {
 	tb_lzsw_deflate_zstream_t* zst = (tb_lzsw_deflate_zstream_t*)st;
 	tb_assert(zst);
-	if (!zst) return TB_NULL;
+	if (!zst) return tb_null;
 
 	// get src
 	tb_byte_t* sp = st->src.p;
 	tb_byte_t* se = st->src.e;
 	tb_byte_t* sb = sp;
 	tb_assert(sp && se);
-	if (!sp || !se) return TB_NULL;
+	if (!sp || !se) return tb_null;
 
 	// get dst
 	tb_bstream_t* dst = tb_tstream_dst(st);
@@ -536,7 +536,7 @@ static tb_void_t tb_zstream_deflate_lzsw_close(tb_tstream_t* st)
 tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 {
 	tb_assert(zst);
-	if (!zst) return TB_NULL;
+	if (!zst) return tb_null;
 
 	// init 
 	tb_memset(zst, 0, sizeof(tb_lzsw_inflate_zstream_t));
@@ -566,7 +566,7 @@ tb_tstream_t* tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst)
 tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 {
 	tb_assert(zst);
-	if (!zst) return TB_NULL;
+	if (!zst) return tb_null;
 
 	// init 
 	tb_memset(zst, 0, sizeof(tb_lzsw_deflate_zstream_t));
@@ -591,7 +591,7 @@ tb_tstream_t* tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst)
 	// init window
 	zst->window.mb = TB_MATH_ICLOG2I(TB_LZSW_WINDOW_SIZE_MAX);
 #if TB_LZSW_WINDOW_HASH_FIND
-	zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, TB_NULL, TB_NULL);
+	zst->window.pool = tb_pool_init(sizeof(tb_lzsw_node_t), TB_LZSW_WINDOW_SIZE_MAX, 0, tb_null, tb_null);
 #endif
 
 	return ((tb_tstream_t*)zst);
@@ -603,5 +603,5 @@ tb_tstream_t* tb_zstream_open_lzsw(tb_lzsw_zstream_t* zst, tb_size_t action)
 		return tb_zstream_open_lzsw_inflate((tb_lzsw_inflate_zstream_t*)zst);
 	else if (action == TB_ZSTREAM_ACTION_DEFLATE)
 		return tb_zstream_open_lzsw_deflate((tb_lzsw_deflate_zstream_t*)zst);
-	else return TB_NULL;
+	else return tb_null;
 }

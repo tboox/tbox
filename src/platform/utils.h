@@ -55,4 +55,7 @@ tb_hong_t 		tb_uclock();
 // the milliseconds from 1970-01-01 00:00:00:000
 tb_hong_t 		tb_time();
 
+// the host name
+tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);
+
 #endif

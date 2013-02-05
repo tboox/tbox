@@ -40,7 +40,7 @@
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
 tb_pointer_t tb_memcmp(tb_cpointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 
 }

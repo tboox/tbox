@@ -10,10 +10,10 @@
 static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && aice, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico && aice, tb_false);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -25,9 +25,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init
-	tb_handle_t 	sock = TB_NULL;
-	tb_handle_t 	aicp = TB_NULL;
-	tb_handle_t 	aico = TB_NULL;
+	tb_handle_t 	sock = tb_null;
+	tb_handle_t 	aicp = tb_null;
+	tb_handle_t 	aico = tb_null;
 
 	// open sock
 	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);

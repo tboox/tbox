@@ -60,7 +60,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_bind(sock, tb_stou32(argv[1]))) goto end;
 
 	// add aioo
-	if (!tb_aipp_addo(aipp, sock, TB_AIOO_ETYPE_ACPT, TB_NULL)) goto end;
+	if (!tb_aipp_addo(aipp, sock, TB_AIOO_ETYPE_ACPT, tb_null)) goto end;
 
 	// accept
 	tb_aioo_t objs[16];
@@ -95,7 +95,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (c)
 				{
 					tb_print("[demo]: accept ok");
-					if (!tb_aipp_addo(aipp, c, TB_AIOO_ETYPE_READ, TB_NULL)) goto end;
+					if (!tb_aipp_addo(aipp, c, TB_AIOO_ETYPE_READ, tb_null)) goto end;
 				}
 				else
 				{

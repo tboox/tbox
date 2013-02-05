@@ -10,7 +10,7 @@
 static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
 {
 	tb_print("[demo]: response: %s", line);
-	return TB_TRUE;
+	return tb_true;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * main
@@ -36,7 +36,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init option
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
-		tb_http_option_t* option = TB_NULL;
+		tb_http_option_t* option = tb_null;
 		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
 		if (option) 
 		{

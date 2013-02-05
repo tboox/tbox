@@ -34,7 +34,7 @@
 
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(name, TB_NULL);
+	tb_assert_and_check_return_val(name, tb_null);
 
 	// clear error
 	dlerror();
@@ -46,7 +46,7 @@ tb_handle_t tb_dynamic_init(tb_char_t const* name)
 	if (dlerror()) 
 	{
 		dlclose(dynamic);
-		dynamic = TB_NULL;
+		dynamic = tb_null;
 	}
 
 	// ok?
@@ -60,6 +60,11 @@ tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 }
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(dynamic && name, TB_NULL);
+	tb_assert_and_check_return_val(dynamic && name, tb_null);
+	return (tb_pointer_t)dlsym(dynamic, name);
+}
+tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
+{
+	tb_assert_and_check_return_val(dynamic && name, tb_null);
 	return (tb_pointer_t)dlsym(dynamic, name);
 }

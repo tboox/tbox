@@ -14,11 +14,11 @@ static tb_bool_t check_memset_u8(tb_byte_t* dst, tb_uint8_t src, tb_size_t size)
 	tb_uint8_t* e = p + size;
 	while (p < e)
 	{
-		if (*p != src) return TB_FALSE;
+		if (*p != src) return tb_false;
 		p++;
 	}
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t check_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t size)
 {
@@ -26,11 +26,11 @@ static tb_bool_t check_memset_u16(tb_byte_t* dst, tb_uint16_t src, tb_size_t siz
 	tb_uint16_t* e = p + size;
 	while (p < e)
 	{
-		if (*p != src) return TB_FALSE;
+		if (*p != src) return tb_false;
 		p++;
 	}
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t check_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
@@ -38,11 +38,11 @@ static tb_bool_t check_memset_u24(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 	tb_byte_t* e = p + (size * 3);
 	while (p < e)
 	{
-		if ((*((tb_uint32_t*)p) & 0xffffff) != (src & 0xffffff)) return TB_FALSE;
+		if ((*((tb_uint32_t*)p) & 0xffffff) != (src & 0xffffff)) return tb_false;
 		p += 3;
 	}
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t size)
 {
@@ -50,11 +50,11 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 	tb_uint32_t* e = p + size;
 	while (p < e)
 	{
-		if (*p != src) return TB_FALSE;
+		if (*p != src) return tb_false;
 		p++;
 	}
 
-	return TB_TRUE;
+	return tb_true;
 }
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {

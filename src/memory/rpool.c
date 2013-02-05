@@ -107,11 +107,11 @@ typedef struct __tb_rpool_t
  */
 tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 {
-	tb_assert_and_check_return_val(grow && step, TB_NULL);
+	tb_assert_and_check_return_val(grow && step, tb_null);
 
 	// init rpool
 	tb_rpool_t* rpool = (tb_rpool_t*)tb_malloc0(sizeof(tb_rpool_t));
-	tb_assert_and_check_return_val(rpool, TB_NULL);
+	tb_assert_and_check_return_val(rpool, tb_null);
 
 	// init pools size
 	rpool->size = 0;
@@ -146,7 +146,7 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 
 fail:
 	if (rpool) tb_rpool_exit(rpool);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_void_t tb_rpool_exit(tb_handle_t handle)
@@ -221,7 +221,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
-	tb_assert_and_check_return_val(rpool && rpool->pools, TB_NULL);
+	tb_assert_and_check_return_val(rpool && rpool->pools, tb_null);
 
 	// aloc++
 #ifdef TB_DEBUG
@@ -232,7 +232,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 	if (rpool->pred)
 	{
 		// check
-		tb_assert_and_check_return_val(rpool->pred <= rpool->pooln, TB_NULL);
+		tb_assert_and_check_return_val(rpool->pred <= rpool->pooln, tb_null);
 
 		// the predicted pool
 		tb_handle_t fpool = rpool->pools[rpool->pred - 1].pool;
@@ -289,7 +289,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 		// grow
 		rpool->poolm += TB_RPOOL_CHUNK_GROW;
 		rpool->pools = (tb_handle_t*)tb_ralloc(rpool->pools, rpool->poolm * sizeof(tb_rpool_chunk_t));
-		tb_assert_and_check_return_val(rpool->pools, TB_NULL);
+		tb_assert_and_check_return_val(rpool->pools, tb_null);
 	}
 	
 	// append a new pool for allocation
@@ -334,14 +334,14 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 	tb_memset(chunk, 0, sizeof(tb_rpool_chunk_t));
 
 	// fail
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_pointer_t tb_rpool_malloc0(tb_handle_t handle)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
-	tb_assert_and_check_return_val(rpool && rpool->pools, TB_NULL);
+	tb_assert_and_check_return_val(rpool && rpool->pools, tb_null);
 
 	// malloc
 	tb_byte_t* p = tb_rpool_malloc(handle);
@@ -357,16 +357,16 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
-	tb_assert_and_check_return_val(rpool && rpool->pools && rpool->size, TB_FALSE);
+	tb_assert_and_check_return_val(rpool && rpool->pools && rpool->size, tb_false);
 
 	// no data?
-	tb_check_return_val(data, TB_TRUE);
+	tb_check_return_val(data, tb_true);
 	
 	// free it from the predicted pool first
 	if (rpool->pred)
 	{
 		// check
-		tb_assert_and_check_return_val(rpool->pred <= rpool->pooln, TB_NULL);
+		tb_assert_and_check_return_val(rpool->pred <= rpool->pooln, tb_null);
 
 		// the predicted pool
 		tb_handle_t fpool = rpool->pools[rpool->pred - 1].pool;
@@ -380,7 +380,7 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 			{
 				// size--
 				rpool->size--;
-				return TB_TRUE;
+				return tb_true;
 			}
 		}
 	}
@@ -403,21 +403,21 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 		
 				// pred
 				rpool->pred = n + 1;
-				return TB_TRUE;
+				return tb_true;
 			}
 		}
 	}
 
 	// fail
 	tb_assert_message(0, "invalid free data address: %p", data);
-	return TB_FALSE;
+	return tb_false;
 }
 
 tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
-	tb_assert_and_check_return_val(rpool && data, TB_NULL);
+	tb_assert_and_check_return_val(rpool && data, tb_null);
 
 	tb_size_t 	n = rpool->step;
 	tb_char_t* 	p = tb_rpool_malloc(handle);

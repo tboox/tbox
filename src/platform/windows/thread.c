@@ -34,7 +34,7 @@
 tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size)
 {
 	HANDLE handle = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)callback, (LPVOID)cb_data, 0, NULL);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
+	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)
 {
@@ -57,8 +57,8 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 }
 tb_bool_t tb_thread_kill(tb_handle_t handle)
 {
-	if (handle) return TerminateThread(handle, 0)? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
+	if (handle) return TerminateThread(handle, 0)? tb_true : tb_false;
+	return tb_false;
 }
 tb_void_t tb_thread_return(tb_pointer_t value)
 {
@@ -66,13 +66,13 @@ tb_void_t tb_thread_return(tb_pointer_t value)
 }
 tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
-	if (handle) return ((DWORD)-1 != SuspendThread(handle))? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
+	if (handle) return ((DWORD)-1 != SuspendThread(handle))? tb_true : tb_false;
+	return tb_false;
 }
 tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
-	if (handle) return ((DWORD)-1 != ResumeThread(handle))? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
+	if (handle) return ((DWORD)-1 != ResumeThread(handle))? tb_true : tb_false;
+	return tb_false;
 }
 tb_handle_t tb_thread_self()
 {

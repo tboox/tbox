@@ -29,7 +29,7 @@ static tb_void_t tb_find_int_test()
 	time = tb_mclock() - time;
 
 	// item
-	tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : TB_NULL;
+	tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
 	tb_print("tb_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
@@ -59,7 +59,7 @@ static tb_void_t tb_find_int_test_binary()
 	time = tb_mclock() - time;
 
 	// item
-	tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : TB_NULL;
+	tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
 	tb_print("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
@@ -81,7 +81,7 @@ static tb_void_t tb_find_str_test()
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_char_t s[256] = {0};
@@ -99,7 +99,7 @@ static tb_void_t tb_find_str_test()
 	time = tb_mclock() - time;
 
 	// item
-	tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : TB_NULL;
+	tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
 	tb_print("tb_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
@@ -124,7 +124,7 @@ static tb_void_t tb_find_str_test_binary()
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_char_t s[256] = {0};
@@ -142,7 +142,7 @@ static tb_void_t tb_find_str_test_binary()
 	time = tb_mclock() - time;
 
 	// item
-	tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : TB_NULL;
+	tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
 	tb_print("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);

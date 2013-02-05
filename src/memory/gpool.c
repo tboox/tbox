@@ -86,16 +86,16 @@ typedef struct __tb_gpool_t
 tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
 	// check
-	tb_assert_and_check_return_val(data && size, TB_NULL);
+	tb_assert_and_check_return_val(data && size, tb_null);
 
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 	align = tb_max(align, TB_CPU_BITBYTE);
-	tb_assert_and_check_return_val(align <= TB_GPOOL_ALIGN_MAXN, TB_NULL);
+	tb_assert_and_check_return_val(align <= TB_GPOOL_ALIGN_MAXN, tb_null);
 
 	// align data
 	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
-	tb_assert_and_check_return_val(size >= byte, TB_NULL);
+	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
 
@@ -110,15 +110,15 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 
 	// init data
 	gpool->data = (tb_byte_t*)tb_align((tb_size_t)&gpool[1], gpool->align);
-	tb_assert_and_check_return_val(data + size > gpool->data, TB_NULL);
+	tb_assert_and_check_return_val(data + size > gpool->data, tb_null);
 
 	// init size
 	gpool->size = (tb_byte_t*)data + size - gpool->data;
-	tb_assert_and_check_return_val(gpool->size, TB_NULL);
+	tb_assert_and_check_return_val(gpool->size, tb_null);
 
 	// init vpool
 	gpool->vpool = tb_vpool_init(gpool->data, gpool->size, gpool->align);
-	tb_assert_and_check_return_val(gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool->vpool, tb_null);
 	
 	// FIXME: alloc will be too slower now if space is small
 #if 0
@@ -130,7 +130,7 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 		if (gpool->tdata)
 		{
 			gpool->tpool = tb_tpool_init(gpool->tdata, gpool->tsize, gpool->align);
-			tb_assert_and_check_return_val(gpool->tpool, TB_NULL);
+			tb_assert_and_check_return_val(gpool->tpool, tb_null);
 		}
 	}
 #endif
@@ -163,8 +163,8 @@ tb_void_t tb_gpool_clear(tb_handle_t handle)
 	if (gpool->vpool) tb_vpool_clear(gpool->vpool);
 
 	// reinit tpool
-	gpool->tdata = TB_NULL;
-	gpool->tpool = TB_NULL;
+	gpool->tdata = tb_null;
+	gpool->tpool = tb_null;
 	if (gpool->tsize >= TB_GPOOL_TPOOL_MINN)
 	{
 		gpool->tdata = tb_vpool_malloc(gpool->vpool, gpool->tsize);
@@ -180,7 +180,7 @@ tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_null);
 
 	// try malloc it from tpool
 	if (gpool->tpool && size <= tb_tpool_limit(gpool->tpool))
@@ -205,7 +205,7 @@ tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_null);
 
 	// try malloc it from tpool
 	if (gpool->tpool && size <= tb_tpool_limit(gpool->tpool))
@@ -230,7 +230,7 @@ tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_null);
 
 	// try malloc it from tpool
 	if (gpool->tpool && item * size <= tb_tpool_limit(gpool->tpool))
@@ -255,7 +255,7 @@ tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_null);
 
 	// try malloc it from tpool
 	if (gpool->tpool && item * size <= tb_tpool_limit(gpool->tpool))
@@ -280,13 +280,13 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_NULL);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_null);
 
 	// try ralloc it from tpool
 	if (gpool->tpool && data > gpool->tdata && data < gpool->tdata + gpool->tsize)
 	{
 		// ralloc it
-		tb_pointer_t pdata = TB_NULL;
+		tb_pointer_t pdata = tb_null;
 		if (size <= tb_tpool_limit(gpool->tpool) && (pdata = tb_tpool_ralloc(gpool->tpool, data, size))) return pdata;
 		else
 		{
@@ -296,7 +296,7 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 #else
 			pdata = tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
 #endif
-			tb_check_return_val(pdata, TB_NULL);
+			tb_check_return_val(pdata, tb_null);
 			tb_assert_and_check_return_val(pdata != data, pdata);
 
 			// copy data
@@ -327,7 +327,7 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
-	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, TB_FALSE);
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, tb_false);
 
 	// free it to tpool
 	if (gpool->tpool && data > gpool->tdata && data < gpool->tdata + gpool->tsize)

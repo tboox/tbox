@@ -45,14 +45,14 @@ tb_bool_t tb_socket_init()
 	signal(SIGPIPE, SIG_IGN);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 tb_void_t tb_socket_exit()
 {
 }
 tb_handle_t tb_socket_open(tb_size_t type)
 {
-	tb_assert_and_check_return_val(type, TB_NULL);
+	tb_assert_and_check_return_val(type, tb_null);
 	
 	// init type & protocol
 	tb_size_t t = 0;
@@ -72,12 +72,12 @@ tb_handle_t tb_socket_open(tb_size_t type)
 		}
 		break;
 	default:
-		return TB_NULL;
+		return tb_null;
 	}
 
 	// socket
 	tb_long_t fd = socket(AF_INET, t, p);
-	tb_assert_and_check_return_val(fd >= 0, TB_NULL);
+	tb_assert_and_check_return_val(fd >= 0, tb_null);
 
 	// non-block
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
@@ -120,7 +120,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 
 tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 {
-	tb_assert_and_check_return_val(handle && port, TB_FALSE);
+	tb_assert_and_check_return_val(handle && port, tb_false);
 
 	// init
 	struct sockaddr_in d = {0};
@@ -129,14 +129,14 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 	d.sin_addr.s_addr = INADDR_ANY;
 
 	// bind 
-    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return TB_FALSE;
+    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
 
 	// listen
-    return (listen((tb_long_t)handle - 1, 20) < 0)? TB_FALSE : TB_TRUE;
+    return (listen((tb_long_t)handle - 1, 20) < 0)? tb_false : tb_true;
 }
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_NULL);
+	tb_assert_and_check_return_val(handle, tb_null);
 
 	// accept  
 	struct sockaddr_in d;
@@ -144,7 +144,7 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	tb_long_t 	r = accept((tb_long_t)handle - 1, (struct sockaddr *)&d, &n);
 
 	// no client?
-	tb_check_return_val(r > 0, TB_NULL);
+	tb_check_return_val(r > 0, tb_null);
 
 	// non-block
 	fcntl(r, F_SETFL, fcntl(r, F_GETFL) | O_NONBLOCK);
@@ -155,8 +155,8 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 
 tb_bool_t tb_socket_close(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_FALSE);
-	return !close((tb_long_t)handle - 1)? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(handle, tb_false);
+	return !close((tb_long_t)handle - 1)? tb_true : tb_false;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

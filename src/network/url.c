@@ -40,16 +40,16 @@
 // init & exit
 tb_bool_t tb_url_init(tb_url_t* url)
 {
-	tb_assert_and_check_return_val(url, TB_FALSE);
+	tb_assert_and_check_return_val(url, tb_false);
 	url->poto = TB_URL_PROTO_NULL;
 	url->port = 0;
 	url->bssl = 0;
 	tb_ipv4_clr(&url->ipv4);
-	if (!tb_sstring_init(&url->host, url->data, TB_URL_HOST_MAX)) return TB_FALSE;
-	if (!tb_sstring_init(&url->path, url->data + TB_URL_HOST_MAX, TB_URL_PATH_MAX)) return TB_FALSE;
-	if (!tb_pstring_init(&url->args)) return TB_FALSE;
-	if (!tb_pstring_init(&url->urls)) return TB_FALSE;
-	return TB_TRUE;
+	if (!tb_sstring_init(&url->host, url->data, TB_URL_HOST_MAX)) return tb_false;
+	if (!tb_sstring_init(&url->path, url->data + TB_URL_HOST_MAX, TB_URL_PATH_MAX)) return tb_false;
+	if (!tb_pstring_init(&url->args)) return tb_false;
+	if (!tb_pstring_init(&url->urls)) return tb_false;
+	return tb_true;
 }
 tb_void_t tb_url_exit(tb_url_t* url)
 {
@@ -78,7 +78,7 @@ tb_void_t tb_url_clear(tb_url_t* url)
 }
 tb_char_t const* tb_url_get(tb_url_t* url)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
+	tb_assert_and_check_return_val(url, tb_null);
 
 	// init 
 	tb_pstring_clear(&url->urls);
@@ -89,7 +89,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 	case TB_URL_PROTO_FILE:
 		{
 			// check
-			tb_check_return_val(tb_sstring_size(&url->path), TB_NULL);
+			tb_check_return_val(tb_sstring_size(&url->path), tb_null);
 
 			// add protocol
 			if (!url->bwin)
@@ -112,7 +112,7 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 	case TB_URL_PROTO_RTSP:
 		{
 			// check
-			tb_check_return_val(url->port && tb_sstring_size(&url->host), TB_NULL);
+			tb_check_return_val(url->port && tb_sstring_size(&url->host), tb_null);
 
 			// add protocol
 			if (url->poto == TB_URL_PROTO_HTTP) tb_pstring_cstrcpy(&url->urls, "http");
@@ -151,11 +151,11 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 	}
 
 	// ok?
-	return tb_pstring_size(&url->urls)? tb_pstring_cstr(&url->urls) : TB_NULL;
+	return tb_pstring_size(&url->urls)? tb_pstring_cstr(&url->urls) : tb_null;
 }
 tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 {
-	tb_assert_and_check_return_val(url && u, TB_FALSE);
+	tb_assert_and_check_return_val(url && u, tb_false);
 	
 	// init
 	tb_url_clear(url);
@@ -258,11 +258,11 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	if (*p) tb_pstring_cstrcpy(&url->args, p);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 
 fail:
 	tb_url_clear(url);
-	return TB_FALSE;
+	return tb_false;
 }
 tb_void_t tb_url_cpy(tb_url_t* url, tb_url_t const* u)
 {
@@ -279,8 +279,8 @@ tb_void_t tb_url_cpy(tb_url_t* url, tb_url_t const* u)
 }
 tb_bool_t tb_url_ssl_get(tb_url_t const* url)
 {
-	tb_assert_and_check_return_val(url, TB_FALSE);
-	return url->bssl? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(url, tb_false);
+	return url->bssl? tb_true : tb_false;
 }
 tb_void_t tb_url_ssl_set(tb_url_t* url, tb_bool_t bssl)
 {
@@ -309,8 +309,8 @@ tb_void_t tb_url_port_set(tb_url_t* url, tb_size_t port)
 }
 tb_char_t const* tb_url_host_get(tb_url_t const* url)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_sstring_size(&url->host)? tb_sstring_cstr(&url->host) : TB_NULL;
+	tb_assert_and_check_return_val(url, tb_null);
+	return tb_sstring_size(&url->host)? tb_sstring_cstr(&url->host) : tb_null;
 }
 tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 {
@@ -335,7 +335,7 @@ tb_void_t tb_url_host_set(tb_url_t* url, tb_char_t const* host)
 }
 tb_ipv4_t const* tb_url_ipv4_get(tb_url_t const* url)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
+	tb_assert_and_check_return_val(url, tb_null);
 	return &(url->ipv4);
 }
 tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
@@ -360,8 +360,8 @@ tb_void_t tb_url_ipv4_set(tb_url_t* url, tb_ipv4_t const* ipv4)
 }
 tb_char_t const* tb_url_path_get(tb_url_t const* url)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_sstring_size(&url->path)? tb_sstring_cstr(&url->path) : TB_NULL;
+	tb_assert_and_check_return_val(url, tb_null);
+	return tb_sstring_size(&url->path)? tb_sstring_cstr(&url->path) : tb_null;
 }
 tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 {
@@ -375,8 +375,8 @@ tb_void_t tb_url_path_set(tb_url_t* url, tb_char_t const* path)
 }
 tb_char_t const* tb_url_args_get(tb_url_t const* url)
 {
-	tb_assert_and_check_return_val(url, TB_NULL);
-	return tb_pstring_size(&url->args)? tb_pstring_cstr(&url->args) : TB_NULL;
+	tb_assert_and_check_return_val(url, tb_null);
+	return tb_pstring_size(&url->args)? tb_pstring_cstr(&url->args) : tb_null;
 }
 tb_void_t tb_url_args_set(tb_url_t* url, tb_char_t const* args)
 {

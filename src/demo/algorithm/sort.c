@@ -170,7 +170,7 @@ static tb_void_t tb_sort_str_test(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_rand_clear();
@@ -213,7 +213,7 @@ static tb_void_t tb_sort_str_test_bubble(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_rand_clear();
@@ -256,7 +256,7 @@ static tb_void_t tb_sort_str_test_insert(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_rand_clear();
@@ -299,7 +299,7 @@ static tb_void_t tb_sort_str_test_quick(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_rand_clear();
@@ -342,7 +342,7 @@ static tb_void_t tb_sort_str_test_heap(tb_size_t n)
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
-	tb_iterator_t iterator = tb_iterator_str(data, n, TB_TRUE);
+	tb_iterator_t iterator = tb_iterator_str(data, n, tb_true);
 
 	// make
 	tb_rand_clear();

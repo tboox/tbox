@@ -16,7 +16,7 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 	{
 		static tb_char_t const* poto[] = 
 		{
-			TB_NULL
+			tb_null
 		, 	"file"
 		, 	"sock"
 		, 	"http"

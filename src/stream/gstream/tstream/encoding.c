@@ -50,7 +50,7 @@ typedef struct __tb_estream_t
 static __tb_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ENCODING, TB_NULL);
+	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ENCODING, tb_null);
 	return (tb_estream_t*)tst;
 }
 static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
@@ -63,33 +63,33 @@ static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
 static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_estream_t* est = tb_estream_cast(gst);
-	tb_assert_and_check_return_val(est, TB_FALSE);
+	tb_assert_and_check_return_val(est, tb_false);
 
 	switch (cmd)
 	{
 	case TB_ESTREAM_CMD_GET_IE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			tb_assert_and_check_return_val(pe && est->ic, TB_FALSE);
+			tb_assert_and_check_return_val(pe && est->ic, tb_false);
 			*pe = est->ic->encoding;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_ESTREAM_CMD_GET_OE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			tb_assert_and_check_return_val(pe && est->oc, TB_FALSE);
+			tb_assert_and_check_return_val(pe && est->oc, tb_false);
 			*pe = est->oc->encoding;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_ESTREAM_CMD_SET_IE:
 		{
 			est->ic = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
-			return est->ic? TB_TRUE : TB_FALSE;
+			return est->ic? tb_true : tb_false;
 		}
 	case TB_ESTREAM_CMD_SET_OE:
 		{
 			est->oc = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
-			return est->oc? TB_TRUE : TB_FALSE;
+			return est->oc? tb_true : tb_false;
 		}
 	default:
 		break;
@@ -151,7 +151,7 @@ static tb_long_t tb_estream_spak(tb_gstream_t* gst, tb_bool_t sync)
 tb_gstream_t* tb_gstream_init_encoding()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_estream_t));
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
@@ -173,16 +173,16 @@ tb_gstream_t* tb_gstream_init_encoding()
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_gstream_t* tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe)
 {
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// create encoding stream
 	tb_gstream_t* est = tb_gstream_init_encoding();
-	tb_assert_and_check_return_val(est, TB_NULL);
+	tb_assert_and_check_return_val(est, tb_null);
 
 	// set gstream
 	if (!tb_gstream_ctrl(est, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
@@ -197,5 +197,5 @@ tb_gstream_t* tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_
 
 fail:
 	if (est) tb_gstream_exit(est);
-	return TB_NULL;
+	return tb_null;
 }

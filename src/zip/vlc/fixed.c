@@ -50,11 +50,11 @@ tb_zip_vlc_t* tb_zip_vlc_fixed_open(tb_zip_vlc_fixed_t* fixed, tb_byte_t nbits)
 	((tb_zip_vlc_t*)fixed)->type = TB_ZIP_VLC_TYPE_FIXED;
 	((tb_zip_vlc_t*)fixed)->set = tb_zip_vlc_fixed_set;
 	((tb_zip_vlc_t*)fixed)->get = tb_zip_vlc_fixed_get;
-	((tb_zip_vlc_t*)fixed)->close = TB_NULL;
+	((tb_zip_vlc_t*)fixed)->close = tb_null;
 	fixed->nbits = nbits;
 
 	// check
-	tb_assert_and_check_return_val(nbits <= 32, TB_NULL);
+	tb_assert_and_check_return_val(nbits <= 32, tb_null);
 
 	return (tb_zip_vlc_t*)fixed;
 }

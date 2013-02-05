@@ -180,35 +180,35 @@ static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_valu
 
 static tb_bool_t tb_flv_sdata_number_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 8, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 8, tb_false);
 
 	value->type = TB_FLV_SDATA_TYPE_NUMBER;
 	value->u.number = tb_bstream_get_double_bbe(&flv->sdata_bst);
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_boolean_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, tb_false);
 
 	value->type = TB_FLV_SDATA_TYPE_BOOLEAN;
-	value->u.boolean = tb_bstream_get_u8(&flv->sdata_bst)? TB_TRUE : TB_FALSE;
-	return TB_TRUE;
+	value->u.boolean = tb_bstream_get_u8(&flv->sdata_bst)? tb_true : tb_false;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 2, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 2, tb_false);
 
 	// read size
 	tb_uint16_t size = tb_bstream_get_u16_be(&flv->sdata_bst);
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, tb_false);
 
 	// too larger? skip it
 	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bstream_skip(&flv->sdata_bst, size);
 	else
 	{
 		// read data
-		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return TB_FALSE;
+		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -217,29 +217,29 @@ static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 	}
 	value->type = TB_FLV_SDATA_TYPE_STRING;
 	value->u.string.size = size;
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_movieclip_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	return TB_FALSE;
+	return tb_false;
 }
 static tb_bool_t tb_flv_sdata_null_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	value->type = TB_FLV_SDATA_TYPE_NULL;
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_undefined_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	value->type = TB_FLV_SDATA_TYPE_UNDEFINED;
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	return TB_FALSE;
+	return tb_false;
 }
 static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
 
 	// read size
 	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
@@ -265,11 +265,11 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 
 			// read name
 			tb_flv_sdata_value_t name;
-			if (!tb_flv_sdata_string_spank(flv, &name)) return TB_FALSE;
+			if (!tb_flv_sdata_string_spank(flv, &name)) return tb_false;
 
 			// update spath
 			tb_int_t ret = tb_snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
-			tb_assert_and_check_return_val(ret > 0, TB_FALSE);
+			tb_assert_and_check_return_val(ret > 0, tb_false);
 			flv->stail += ret;
 			*flv->stail = '\0';
 			tb_trace_impl("[spath]: %s", flv->spath);
@@ -307,11 +307,11 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 	// ok
 	value->type = TB_FLV_SDATA_TYPE_ECMAARRAY;
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
 	
 	// read size
 	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
@@ -327,7 +327,7 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
 	tb_uint32_t i = 0;
 	for (i = 0; i < size && tb_bstream_left(&flv->sdata_bst); i++)
 	{
-		if (!tb_flv_sdata_value_spank(flv, &data)) return TB_FALSE;
+		if (!tb_flv_sdata_value_spank(flv, &data)) return tb_false;
 		tb_trace_impl("[strictarray: %d]: %s", i, tb_flv_sdata_value_to_string(flv, &data));
 
 		// callback
@@ -337,29 +337,29 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
 	// ok
 	value->type = TB_FLV_SDATA_TYPE_STRICTARRAY;
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_date_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 10, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 10, tb_false);
 	tb_bstream_skip(&flv->sdata_bst, 10);
 	value->type = TB_FLV_SDATA_TYPE_DATE;
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
 
 	// read size
 	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, tb_false);
 
 	// too larger? skip it
 	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bstream_skip(&flv->sdata_bst, size);
 	else
 	{
 		// read data
-		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return TB_FALSE;
+		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -368,11 +368,11 @@ static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value
 	}
 	value->type = TB_FLV_SDATA_TYPE_LONGSTRING;
 	value->u.string.size = size;
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_value_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, TB_FALSE);
+	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, tb_false);
 
 	value->type = tb_bstream_get_u8(&flv->sdata_bst);
 	//tb_trace_impl("value type: %x", value->type);
@@ -406,7 +406,7 @@ static tb_bool_t tb_flv_sdata_value_spank(tb_flv_t* flv, tb_flv_sdata_value_t* v
 		tb_trace_impl("unknown value type: %x", value->type);
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 static tb_bool_t tb_flv_sdata_object_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
@@ -415,12 +415,12 @@ static tb_bool_t tb_flv_sdata_object_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 
 	// get name
 	tb_flv_sdata_value_t name;
-	if (!tb_flv_sdata_string_spank(flv, &name)) return TB_FALSE;
+	if (!tb_flv_sdata_string_spank(flv, &name)) return tb_false;
 	tb_trace_impl("[object_name]: %s", tb_flv_sdata_value_to_string(flv, &name));
 
 	// update spath
 	tb_int_t ret = tb_snprintf(stail, flv->spath + TB_FLV_SDATA_STRING_MAX - stail, ".%s", tb_flv_sdata_value_to_string(flv, &name));
-	tb_assert_and_check_return_val(ret > 0, TB_FALSE);
+	tb_assert_and_check_return_val(ret > 0, tb_false);
 	flv->stail += ret;
 	*flv->stail = '\0';
 	tb_trace_impl("[spath]: %s", flv->spath);
@@ -440,7 +440,7 @@ static tb_bool_t tb_flv_sdata_object_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 	// ok
 	value->type = TB_FLV_SDATA_TYPE_OBJECT;
 
-	return TB_TRUE;
+	return tb_true;
 }
 
 static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
@@ -459,11 +459,11 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
 
 		// get object
 		tb_flv_sdata_value_t object;
-		if (!tb_flv_sdata_object_spank(flv, &object)) return TB_FALSE;
+		if (!tb_flv_sdata_object_spank(flv, &object)) return tb_false;
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_bstream_t* bst)
 {
@@ -485,11 +485,11 @@ static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_bstream_t* bst)
 tb_handle_t tb_flv_init(tb_gstream_t* gst)
 {
 	// check 
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// alloc flv
 	tb_flv_t* flv = tb_malloc0(sizeof(tb_flv_t));
-	tb_assert_and_check_return_val(flv, TB_NULL);
+	tb_assert_and_check_return_val(flv, tb_null);
 
 	// init flv
 	flv->gst 	= gst;
@@ -503,7 +503,7 @@ tb_handle_t tb_flv_init(tb_gstream_t* gst)
 
 fail:
 	if (flv) tb_flv_exit(flv);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_flv_exit(tb_handle_t hflv)
 {
@@ -540,16 +540,16 @@ tb_void_t tb_flv_exit(tb_handle_t hflv)
 tb_bool_t tb_flv_spank(tb_handle_t hflv)
 {
 	tb_flv_t* flv = (tb_flv_t*)hflv;
-	tb_assert_and_check_return_val(flv, TB_FALSE);
+	tb_assert_and_check_return_val(flv, tb_false);
 
 	// init variables
 	tb_bstream_t 	bst;
 	tb_byte_t 		tag[16];
-	tb_bool_t 		ret = TB_FALSE;
+	tb_bool_t 		ret = tb_false;
 
 	// get stream
 	tb_gstream_t* gst = flv->gst;
-	tb_assert_and_check_return_val(gst, TB_FALSE);
+	tb_assert_and_check_return_val(gst, tb_false);
 
 	// spank hdata?
 	if ((flv->spank_type & TB_FLV_SPANK_TYPE_HDATA)
@@ -871,7 +871,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 
 ok:
 	// ok
-	ret = TB_TRUE;
+	ret = tb_true;
 
 end:
 	tb_trace_impl("spank %s", ret? "ok" : "fail");
@@ -880,10 +880,10 @@ end:
 tb_bool_t tb_flv_ioctl(tb_handle_t hflv, tb_size_t cmd, ...)
 {
 	tb_flv_t* flv = (tb_flv_t*)hflv;
-	tb_assert_and_check_return_val(flv, TB_FALSE);
+	tb_assert_and_check_return_val(flv, tb_false);
 
 	// init
-	tb_bool_t 		ret = TB_FALSE;
+	tb_bool_t 		ret = tb_false;
 	tb_va_list_t 	arg; 
 	tb_va_start(arg, cmd);
 
@@ -894,70 +894,70 @@ tb_bool_t tb_flv_ioctl(tb_handle_t hflv, tb_size_t cmd, ...)
 		{
 			flv->sdata_cb_func = (tb_flv_sdata_cb_func_t)tb_va_arg(arg, tb_flv_sdata_cb_func_t);
 			flv->sdata_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_SDATA_DATA:
 		{
 			flv->sdata_data_cb_func = (tb_flv_sdata_data_cb_func_t)tb_va_arg(arg, tb_flv_sdata_cb_func_t);
 			flv->sdata_data_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_HDATA:
 		{
 			flv->hdata_cb_func = (tb_flv_hdata_cb_func_t)tb_va_arg(arg, tb_flv_hdata_cb_func_t);
 			flv->hdata_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_AUDIO_CONFIG:
 		{
 			flv->audio_config_cb_func = (tb_flv_audio_config_cb_func_t)tb_va_arg(arg, tb_flv_audio_config_cb_func_t);
 			flv->audio_config_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_VIDEO_CONFIG:	
 		{
 			flv->video_config_cb_func = (tb_flv_video_config_cb_func_t)tb_va_arg(arg, tb_flv_video_config_cb_func_t);
 			flv->video_config_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_AUDIO_DATA:
 		{
 			flv->audio_data_cb_func = (tb_flv_audio_data_cb_func_t)tb_va_arg(arg, tb_flv_audio_data_cb_func_t);
 			flv->audio_data_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_CB_VIDEO_DATA:	
 		{
 			flv->video_data_cb_func = (tb_flv_video_data_cb_func_t)tb_va_arg(arg, tb_flv_video_data_cb_func_t);
 			flv->video_data_cb_data = (tb_pointer_t)tb_va_arg(arg, tb_pointer_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_SET_STREAM:
 		{
 			flv->gst = (tb_gstream_t*)tb_va_arg(arg, tb_gstream_t*);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_GET_STREAM:
 		{
 			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(arg, tb_gstream_t**);
-			tb_assert_and_check_return_val(pgst, TB_FALSE);
+			tb_assert_and_check_return_val(pgst, tb_false);
 			
 			*(pgst) = flv->gst;
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_SPANK_TYPE:
 		{
 			flv->spank_type = (tb_size_t)tb_va_arg(arg, tb_size_t);
-			ret = TB_TRUE;
+			ret = tb_true;
 		}
 		break;
 	default:

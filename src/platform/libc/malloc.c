@@ -33,22 +33,22 @@
 
 tb_pointer_t tb_malloc(tb_size_t size)
 {
-	tb_check_return_val(size, TB_NULL);
+	tb_check_return_val(size, tb_null);
 	return malloc(size);
 }
 tb_pointer_t tb_malloc0(tb_size_t size)
 {
-	tb_check_return_val(size, TB_NULL);	
+	tb_check_return_val(size, tb_null);	
 	return calloc(1, size);
 }
 tb_pointer_t tb_nalloc(tb_size_t item, tb_size_t size)
 {
-	tb_check_return_val(item && size, TB_NULL);	
+	tb_check_return_val(item && size, tb_null);	
 	return malloc(item * size);
 }
 tb_pointer_t tb_nalloc0(tb_size_t item, tb_size_t size)
 {
-	tb_check_return_val(item && size, TB_NULL);		
+	tb_check_return_val(item && size, tb_null);		
 	return calloc(item, size);
 }
 tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
@@ -56,7 +56,7 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 	if (!size) 
 	{
 		free(data);
-		return TB_NULL;
+		return tb_null;
 	}
 	else if (!data) return malloc(size);
 	else return realloc(data, size);

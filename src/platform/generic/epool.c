@@ -67,25 +67,25 @@ typedef struct __tb_epool_t
 tb_handle_t tb_epool_init(tb_size_t maxn)
 {
 	// check
-	tb_assert_and_check_return_val(maxn, TB_NULL);
+	tb_assert_and_check_return_val(maxn, tb_null);
 
 	// alloc
 	tb_epool_t* ep = tb_malloc0(sizeof(tb_epool_t));
-	tb_assert_and_check_return_val(ep, TB_NULL);
+	tb_assert_and_check_return_val(ep, tb_null);
 
 	// init
 	ep->maxn = maxn;
 
 	// init mutx
-	ep->mutx = tb_mutex_init(TB_NULL);
+	ep->mutx = tb_mutex_init(tb_null);
 	tb_assert_and_check_goto(ep->mutx, fail);
 
 	// init spank
-	ep->spak = tb_event_init(TB_NULL);
+	ep->spak = tb_event_init(tb_null);
 	tb_assert_and_check_goto(ep->spak, fail);
 
 	// init events
-	ep->list = tb_dlist_init(tb_align8((ep->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_event_t), TB_NULL, TB_NULL));
+	ep->list = tb_dlist_init(tb_align8((ep->maxn >> 3) + 1), tb_item_func_ifm(sizeof(tb_event_t), tb_null, tb_null));
 	tb_assert_and_check_goto(ep->list, fail);
 	
 	// ok
@@ -93,7 +93,7 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 
 fail:
 	if (ep) tb_epool_exit(ep);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_epool_exit(tb_handle_t epool)
 {
@@ -167,7 +167,7 @@ end:
 tb_handle_t tb_epool_adde(tb_handle_t epool, tb_pointer_t edata)
 {
 	tb_epool_t* ep = (tb_epool_t*)epool;
-	tb_assert_and_check_return_val(ep && ep->mutx, TB_NULL);
+	tb_assert_and_check_return_val(ep && ep->mutx, tb_null);
 
 	// enter
 	tb_size_t itor = 0;
@@ -277,7 +277,7 @@ tb_long_t tb_epool_wait(tb_handle_t epool, tb_eobject_t* objs, tb_size_t maxn, t
 
 	// get spak
 	tb_long_t 	r = -1;
-	tb_handle_t spak = TB_NULL;
+	tb_handle_t spak = tb_null;
 	if (tb_mutex_enter(ep->mutx))
 	{
 		// check

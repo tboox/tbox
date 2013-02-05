@@ -34,7 +34,7 @@
 tb_handle_t tb_mutex_init(tb_char_t const* name)
 {
 	HANDLE handle = CreateMutex(NULL, FALSE, name);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
+	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_mutex_exit(tb_handle_t handle)
 {
@@ -42,11 +42,11 @@ tb_void_t tb_mutex_exit(tb_handle_t handle)
 }
 tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
-	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return TB_TRUE;
-	return TB_FALSE;
+	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
+	return tb_false;
 }
 tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
-	if (handle) return ReleaseMutex(handle)? TB_TRUE : TB_FALSE;
-	return TB_FALSE;
+	if (handle) return ReleaseMutex(handle)? tb_true : tb_false;
+	return tb_false;
 }

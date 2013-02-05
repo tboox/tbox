@@ -17,7 +17,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_return_val(rpool, 0);
 
 	__tb_volatile__ tb_hong_t 	time = tb_mclock();
-	__tb_volatile__ tb_byte_t* 	data = TB_NULL;
+	__tb_volatile__ tb_byte_t* 	data = tb_null;
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	while (maxn--)
 	{

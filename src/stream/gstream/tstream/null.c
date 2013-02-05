@@ -45,7 +45,7 @@ typedef struct __tb_nstream_t
 static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NULL, TB_NULL);
+	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NULL, tb_null);
 	return (tb_nstream_t*)tst;
 }
 static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_bool_t sync)
@@ -94,7 +94,7 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 tb_gstream_t* tb_gstream_init_null()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_nstream_t));
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
@@ -116,16 +116,16 @@ tb_gstream_t* tb_gstream_init_null()
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_gstream_t* tb_gstream_init_from_null(tb_gstream_t* gst)
 {
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init the null stream
 	tb_gstream_t* nst = tb_gstream_init_null();
-	tb_assert_and_check_return_val(nst, TB_NULL);
+	tb_assert_and_check_return_val(nst, tb_null);
 
 	// set gstream
 	if (!tb_gstream_ctrl(nst, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
@@ -134,5 +134,5 @@ tb_gstream_t* tb_gstream_init_from_null(tb_gstream_t* gst)
 
 fail:
 	if (nst) tb_gstream_exit(nst);
-	return TB_NULL;
+	return tb_null;
 }

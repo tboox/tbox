@@ -81,7 +81,7 @@ static tb_size_t tb_dlist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 static tb_pointer_t tb_dlist_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist && itor, TB_NULL);
+	tb_assert_return_val(dlist && itor, tb_null);
 	return dlist->func.data(&dlist->func, &((tb_dlist_item_t const*)itor)[1]);
 }
 static tb_void_t tb_dlist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
@@ -110,12 +110,12 @@ static tb_long_t tb_dlist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
-	tb_assert_and_check_return_val(grow, TB_NULL);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, TB_NULL);
+	tb_assert_and_check_return_val(grow, tb_null);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, tb_null);
 
 	// alloc dlist
 	tb_dlist_t* dlist = (tb_dlist_t*)tb_malloc0(sizeof(tb_dlist_t));
-	tb_assert_and_check_return_val(dlist, TB_NULL);
+	tb_assert_and_check_return_val(dlist, tb_null);
 
 	// init dlist
 	dlist->head = 0;
@@ -126,7 +126,7 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 	dlist->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
 	dlist->itor.data = (tb_pointer_t)dlist;
 	dlist->itor.size = 0;
-	dlist->itor.priv = TB_NULL;
+	dlist->itor.priv = tb_null;
 	dlist->itor.step = func.size;
 	dlist->itor.head = tb_dlist_iterator_head;
 	dlist->itor.tail = tb_dlist_iterator_tail;
@@ -144,7 +144,7 @@ tb_dlist_t* tb_dlist_init(tb_size_t grow, tb_item_func_t func)
 	return dlist;
 fail:
 	if (dlist) tb_dlist_exit(dlist);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_void_t tb_dlist_exit(tb_dlist_t* dlist)
@@ -512,7 +512,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 	// walk
 	tb_size_t 	base = -1;
 	tb_size_t 	prev = 0;
-	tb_bool_t 	bdel = TB_FALSE;
+	tb_bool_t 	bdel = tb_false;
 	tb_size_t 	itor = dlist->head;
 	while (itor)
 	{
@@ -526,7 +526,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 		tb_size_t next = node->next;
 	
 		// bdel
-		bdel = TB_FALSE;
+		bdel = tb_false;
 
 		// callback: item
 		if (!func(dlist, &item, &bdel, data)) goto end;
@@ -591,7 +591,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, 
 	}
 
 	// callback: tail
-	if (!func(dlist, TB_NULL, &bdel, data)) goto end;
+	if (!func(dlist, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

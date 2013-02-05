@@ -64,7 +64,7 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor
 static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector && itor < vector->size, TB_NULL);
+	tb_assert_return_val(vector && itor < vector->size, tb_null);
 	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
 }
 static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
@@ -91,12 +91,12 @@ static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t 
 tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
-	tb_assert_and_check_return_val(grow, TB_NULL);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, TB_NULL);
+	tb_assert_and_check_return_val(grow, tb_null);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, tb_null);
 
 	// alloc vector
 	tb_vector_t* vector = (tb_vector_t*)tb_malloc0(sizeof(tb_vector_t));
-	tb_assert_and_check_return_val(vector, TB_NULL);
+	tb_assert_and_check_return_val(vector, tb_null);
 
 	// init vector
 	vector->grow = grow;
@@ -109,7 +109,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
 	vector->itor.data = (tb_pointer_t)vector;
 	vector->itor.size = 0;
-	vector->itor.priv = TB_NULL;
+	vector->itor.priv = tb_null;
 	vector->itor.step = func.size;
 	vector->itor.head = tb_vector_iterator_head;
 	vector->itor.tail = tb_vector_iterator_tail;
@@ -126,7 +126,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	return vector;
 fail:
 	if (vector) tb_vector_exit(vector);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_void_t tb_vector_exit(tb_vector_t* vector)
@@ -183,7 +183,7 @@ tb_void_t tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy)
 }
 tb_pointer_t tb_vector_data(tb_vector_t* vector)
 {
-	tb_assert_and_check_return_val(vector, TB_NULL);
+	tb_assert_and_check_return_val(vector, tb_null);
 	return vector->data;
 }
 tb_pointer_t tb_vector_head(tb_vector_t* vector)
@@ -206,7 +206,7 @@ tb_size_t tb_vector_maxn(tb_vector_t const* vector)
 }
 tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 {
-	tb_assert_and_check_return_val(vector, TB_FALSE);
+	tb_assert_and_check_return_val(vector, tb_false);
 	
 	// free items if the vector is decreased
 	if (size < vector->size)
@@ -221,14 +221,14 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	{
 		tb_size_t omaxn = vector->maxn;
 		vector->maxn = tb_align4(size + vector->grow);
-		tb_assert_and_check_return_val(vector->maxn < TB_VECTOR_MAX_SIZE, TB_FALSE);
+		tb_assert_and_check_return_val(vector->maxn < TB_VECTOR_MAX_SIZE, tb_false);
 
 		// realloc data
 		vector->data = (tb_byte_t*)tb_ralloc(vector->data, vector->maxn * vector->func.size);
-		tb_assert_and_check_return_val(vector->data, TB_FALSE);
+		tb_assert_and_check_return_val(vector->data, tb_false);
 
 		// must be align by 4-bytes
-		tb_assert_and_check_return_val(!(((tb_size_t)(vector->data)) & 3), TB_FALSE);
+		tb_assert_and_check_return_val(!(((tb_size_t)(vector->data)) & 3), tb_false);
 
 		// clear the grow data
 		tb_memset(vector->data + vector->size * vector->func.size, 0, (vector->maxn - omaxn) * vector->func.size);
@@ -237,7 +237,7 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 
 	// update size
 	vector->size = size;
-	return TB_TRUE;
+	return tb_true;
 }
 tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
@@ -440,14 +440,14 @@ tb_void_t tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vec
 	tb_size_t 	b = -1;
 	tb_size_t 	n = vector->size;
 	tb_byte_t* 	d = vector->data;
-	tb_bool_t 	bdel = TB_FALSE;
+	tb_bool_t 	bdel = tb_false;
 	for (i = 0; i < n; i++)
 	{
 		// item
 		tb_pointer_t item = vector->func.data(&vector->func, d + i * step);
 
 		// bdel
-		bdel = TB_FALSE;
+		bdel = tb_false;
 
 		// callback: item
 		if (!func(vector, &item, &bdel, data)) goto end;
@@ -505,7 +505,7 @@ tb_void_t tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vec
 	}
 
 	// callback: tail
-	if (!func(vector, TB_NULL, &bdel, data)) goto end;
+	if (!func(vector, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

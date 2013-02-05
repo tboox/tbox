@@ -144,20 +144,20 @@ tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
  * @code
  * tb_bool_t tb_vector_item_func(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- * 		tb_assert_and_check_return_val(vector && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(vector && bdel, tb_false);
  *
  * 		// is tail?
  * 		if (!item) ;
  *
  * 		// delete it?
- * 		// *bdel = TB_TRUE;
+ * 		// *bdel = tb_true;
  *
  * 		// ok
- * 		return TB_TRUE;
+ * 		return tb_true;
  *
  * fail:
  * 		// break
- * 		return TB_FALSE;
+ * 		return tb_false;
  * }
  * @endcode
  *

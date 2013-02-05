@@ -42,7 +42,7 @@
  */
 static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t* data, tb_size_t maxn)
 {
-	tb_assert_and_check_return_val(path && data && maxn > 3, TB_NULL);
+	tb_assert_and_check_return_val(path && data && maxn > 3, tb_null);
 
 	// is windows path? .e.g c:/home/file.txt
 	if (tb_isalpha(path[0]) && path[1] == ':' && path[2] == '/')
@@ -67,7 +67,7 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
-	return TB_NULL;
+	return tb_null;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -77,12 +77,12 @@ static tb_char_t const* tb_file_path_to_windows(tb_char_t const* path, tb_char_t
 // file
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 {
-	tb_assert_and_check_return_val(path, TB_NULL);
+	tb_assert_and_check_return_val(path, tb_null);
 
 	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	tb_assert_and_check_return_val(path, TB_NULL);
+	tb_assert_and_check_return_val(path, tb_null);
 
 	// init access
 	DWORD access = GENERIC_READ;
@@ -114,12 +114,12 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 	}
 
 	// ok?
-	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : TB_NULL;
+	return hfile != INVALID_HANDLE_VALUE? (tb_handle_t)hfile : tb_null;
 }
 tb_bool_t tb_file_exit(tb_handle_t hfile)
 {
-	tb_assert_and_check_return_val(hfile, TB_FALSE);
-	return CloseHandle(hfile)? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(hfile, tb_false);
+	return CloseHandle(hfile)? tb_true : tb_false;
 }
 tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
@@ -139,21 +139,21 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 }
 tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
 {
-	tb_assert_and_check_return_val(hfile, TB_FALSE);
+	tb_assert_and_check_return_val(hfile, tb_false);
 
 	LARGE_INTEGER o = {0};
 	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)offset;
-	return SetFilePointerEx(hfile, o, &p, FILE_BEGIN)? TB_TRUE : TB_FALSE;
+	return SetFilePointerEx(hfile, o, &p, FILE_BEGIN)? tb_true : tb_false;
 }
 tb_bool_t tb_file_skip(tb_handle_t hfile, tb_hize_t size)
 {
-	tb_assert_and_check_return_val(hfile, TB_FALSE);
+	tb_assert_and_check_return_val(hfile, tb_false);
 
 	LARGE_INTEGER o = {0};
 	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)size;
-	return SetFilePointerEx(hfile, o, &p, FILE_CURRENT)? TB_TRUE : TB_FALSE;
+	return SetFilePointerEx(hfile, o, &p, FILE_CURRENT)? tb_true : tb_false;
 }
 tb_hize_t tb_file_size(tb_handle_t hfile)
 {
@@ -164,31 +164,31 @@ tb_hize_t tb_file_size(tb_handle_t hfile)
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 	
 	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
-		return CreateDirectory(path, NULL)? TB_TRUE : TB_FALSE;
+		return CreateDirectory(path, NULL)? tb_true : tb_false;
 	case TB_FILE_TYPE_FILE:
 		{
 			HANDLE hfile = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (hfile != INVALID_HANDLE_VALUE) 
 			{
 				CloseHandle(hfile);
-				return TB_TRUE;
+				return tb_true;
 			}
 		}
 	default:
 		tb_assert(0);
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 {
@@ -214,16 +214,16 @@ tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// unix path => windows 
 	tb_char_t data[4096];
 	path = tb_file_path_to_windows(path, data, 4096);
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// get attributes
 	WIN32_FILE_ATTRIBUTE_DATA st = {0};
-	if (!GetFileAttributesEx(path, GetFileExInfoStandard, &st)) return TB_FALSE;
+	if (!GetFileAttributesEx(path, GetFileExInfoStandard, &st)) return tb_false;
 
 	// get info
 	if (info)
@@ -240,6 +240,6 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 

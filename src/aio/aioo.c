@@ -82,7 +82,7 @@ tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout)
 	// the reactor 
 	static tb_long_t (*wait[])(tb_aioo_t*, tb_long_t) =
 	{
-		TB_NULL
+		tb_null
 
 		// for file
 	, 	tb_aioo_reactor_file_wait

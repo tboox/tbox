@@ -171,7 +171,7 @@ tb_size_t 				tb_xml_reader_level(tb_handle_t reader);
  *
  * @param reader 	the reader handle
  * @param path 		the xml path
- * @return 			ok: TB_TRUE
+ * @return 			ok: tb_true
  *
  * @note the stream will be reseted
  */
