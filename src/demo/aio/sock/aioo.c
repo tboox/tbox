@@ -10,7 +10,7 @@
 static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t const* ip, tb_size_t port)
 {
 	// add event
-	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_CONN)) return TB_FALSE;
+	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_CONN)) return tb_false;
 
 	// connect...
 	while (1)
@@ -32,14 +32,14 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t con
 			if (etype < 0)
 			{
 				tb_print("connect failed");
-				return TB_FALSE;
+				return tb_false;
 			}
 
 			// timeout?
 			if (!etype)
 			{
 				tb_print("connect timeout");
-				return TB_FALSE;
+				return tb_false;
 			}
 
 			// has connect?
@@ -49,7 +49,7 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t con
 		else 
 		{
 			tb_print("connect error.");
-			return TB_FALSE;
+			return tb_false;
 		}
 	}
 
@@ -58,7 +58,7 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t con
 
 	// ok
 	tb_print("connect ok.");
-	return TB_TRUE;
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -67,11 +67,11 @@ static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t con
 static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data, tb_size_t size)
 {
 	// add event
-	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_WRIT)) return TB_FALSE;
+	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_WRIT)) return tb_false;
 
 	// send
 	tb_size_t send = 0;
-	tb_bool_t wait = TB_FALSE;
+	tb_bool_t wait = tb_false;
 	while (send < size)
 	{
 		// try to send data
@@ -82,7 +82,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 			send += n;
 
 			// no waiting
-			wait = TB_FALSE;
+			wait = tb_false;
 		}
 		else if (!n && !wait)
 		{
@@ -108,7 +108,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_WRIT);
 
 			// be waiting
-			wait = TB_TRUE;
+			wait = tb_true;
 		}
 		else break;
 	}
@@ -117,7 +117,7 @@ static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 	tb_aioo_dele(o, TB_AIOO_ETYPE_WRIT);
 
 	// ok?
-	return send == size? TB_TRUE : TB_FALSE;
+	return send == size? tb_true : tb_false;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 
 	// recv
 	tb_size_t recv = 0;
-	tb_bool_t wait = TB_FALSE;
+	tb_bool_t wait = tb_false;
 	while (recv < size)
 	{
 		// try to recv data
@@ -141,7 +141,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 			recv += n;
 
 			// no waiting
-			wait = TB_FALSE;
+			wait = tb_false;
 		}
 		else if (!n && !wait)
 		{
@@ -167,7 +167,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
 			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_READ);
 
 			// be waiting
-			wait = TB_TRUE;
+			wait = tb_true;
 		}
 		else break;
 	}
@@ -191,7 +191,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init aioo
 	tb_aioo_t o;
-	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NULL, TB_NULL);
+	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NULL, tb_null);
 
 	// connect
 	if (!tb_test_sock_connect(s, &o, argv[1], tb_stou32(argv[2]))) goto end;

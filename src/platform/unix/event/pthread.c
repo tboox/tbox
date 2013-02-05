@@ -49,13 +49,13 @@ tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
 	tb_event_t* e = tb_malloc0(sizeof(tb_event_t));
-	tb_assert_and_check_return_val(e, TB_NULL);
+	tb_assert_and_check_return_val(e, tb_null);
 
 	// init mutx
-	if (!pthread_mutex_init(&e->mutx, TB_NULL))
+	if (!pthread_mutex_init(&e->mutx, tb_null))
 	{
 		// init cond
-		if (!pthread_cond_init(&e->cond, TB_NULL))
+		if (!pthread_cond_init(&e->cond, tb_null))
 			return (tb_handle_t)e;
 
 		// free mutx
@@ -66,7 +66,7 @@ tb_handle_t tb_event_init(tb_char_t const* name)
 	tb_free(e);
 
 	// fail
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
@@ -101,7 +101,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// init time
 	struct timespec t = {0};
-	t.tv_sec = time(TB_NULL);
+	t.tv_sec = time(tb_null);
 	if (timeout > 0)
 	{
 		t.tv_sec += timeout / 1000;

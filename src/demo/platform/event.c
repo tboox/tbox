@@ -51,8 +51,8 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 
 end:
 	tb_print("[thread: %u]: exit", it? it->i : 0);
-	tb_thread_return(TB_NULL);
-	return TB_NULL;
+	tb_thread_return(tb_null);
+	return tb_null;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -70,8 +70,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	for (i = 0; i < TB_TEST_ITEM_MAX; i++)
 	{
 		it[i].i = i;
-		it[i].e = tb_event_init(TB_NULL);
-		it[i].t = tb_thread_init(TB_NULL, tb_test_thread, it + i, 0);
+		it[i].e = tb_event_init(tb_null);
+		it[i].t = tb_thread_init(tb_null, tb_test_thread, it + i, 0);
 		tb_assert_and_check_goto(it[i].t, end);
 	}
 	tb_msleep(100);

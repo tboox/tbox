@@ -46,13 +46,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMMOV)
 tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return memmove(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMMOV)
 tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 	__tb_register__ tb_byte_t* 			s = s1;
 	__tb_register__ tb_byte_t const* 	p = s2;

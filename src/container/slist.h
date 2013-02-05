@@ -149,20 +149,20 @@ tb_size_t 			tb_slist_maxn(tb_slist_t const* slist);
  * @code
  * tb_bool_t tb_slist_item_func(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- *  	tb_assert_and_check_return_val(slist && bdel, TB_FALSE);
+ *  	tb_assert_and_check_return_val(slist && bdel, tb_false);
  *
  * 		// is tail?
  * 		if (!item) ;
  *
  * 		// delete it?
- * 		// *bdel = TB_TRUE;
+ * 		// *bdel = tb_true;
  *
  * 		// ok
- * 		return TB_TRUE;
+ * 		return tb_true;
  *
  * fail:
  * 		// break
- * 		return TB_FALSE;
+ * 		return tb_false;
  * }
  * @endcode
  *

@@ -43,7 +43,7 @@ static tb_bool_t tb_aicp_reactor_aipp_addo(tb_aicp_reactor_t* reactor, tb_aico_t
 {
 	// check
 	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, tb_false);
 
 	// addo
 	return tb_aipp_addo(rtor->aipp, aico->aioo.handle, aico->aioo.otype, aico);
@@ -52,7 +52,7 @@ static tb_bool_t tb_aicp_reactor_aipp_delo(tb_aicp_reactor_t* reactor, tb_aico_t
 {
 	// check
 	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->aipp && reactor->aicp, tb_false);
 
 	// delo
 	return tb_aipp_delo(rtor->aipp, aico->aioo.handle);
@@ -83,12 +83,12 @@ static tb_void_t tb_aicp_reactor_aipp_exit(tb_aicp_reactor_t* reactor)
 static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aicp->type == TB_AIOO_OTYPE_FILE || aicp->type == TB_AIOO_OTYPE_SOCK, TB_NULL);
+	tb_assert_and_check_return_val(aicp && aicp->maxn, tb_null);
+	tb_assert_and_check_return_val(aicp->type == TB_AIOO_OTYPE_FILE || aicp->type == TB_AIOO_OTYPE_SOCK, tb_null);
 
 	// alloc reactor
 	tb_aicp_reactor_aipp_t* rtor = tb_malloc0(sizeof(tb_aicp_reactor_aipp_t));
-	tb_assert_and_check_return_val(rtor, TB_NULL);
+	tb_assert_and_check_return_val(rtor, tb_null);
 
 	// init base
 	rtor->base.aicp = aicp;
@@ -106,6 +106,6 @@ static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 
 fail:
 	if (rtor) tb_aicp_reactor_aipp_exit(rtor);
-	return TB_NULL;
+	return tb_null;
 }
 

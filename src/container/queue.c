@@ -65,7 +65,7 @@ static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_queue_t* queue = (tb_queue_t*)iterator->data;
-	tb_assert_return_val(queue && itor < queue->maxn, TB_NULL);
+	tb_assert_return_val(queue && itor < queue->maxn, tb_null);
 	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
 }
 static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
@@ -93,12 +93,12 @@ static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
 	// check
-	tb_assert_and_check_return_val(maxn, TB_NULL);
-	tb_assert_and_check_return_val(func.size && func.dupl && func.data, TB_NULL);
+	tb_assert_and_check_return_val(maxn, tb_null);
+	tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
 
 	// alloc queue
 	tb_queue_t* queue = (tb_queue_t*)tb_malloc0(sizeof(tb_queue_t));
-	tb_assert_and_check_return_val(queue, TB_NULL);
+	tb_assert_and_check_return_val(queue, tb_null);
 
 	// init queue
 	queue->maxn = tb_align_pow2(maxn + 1); // + tail
@@ -109,7 +109,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
 	queue->itor.data = (tb_pointer_t)queue;
 	queue->itor.size = 0;
-	queue->itor.priv = TB_NULL;
+	queue->itor.priv = tb_null;
 	queue->itor.step = func.size;
 	queue->itor.head = tb_queue_iterator_head;
 	queue->itor.tail = tb_queue_iterator_tail;
@@ -126,7 +126,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	return queue;
 fail:
 	if (queue) tb_queue_exit(queue);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_void_t tb_queue_exit(tb_queue_t* queue)
@@ -188,13 +188,13 @@ tb_size_t tb_queue_maxn(tb_queue_t const* queue)
 }
 tb_bool_t tb_queue_full(tb_queue_t const* queue)
 {
-	tb_assert_and_check_return_val(queue, TB_TRUE);
-	return ((queue->head == ((queue->tail + 1) & (queue->maxn - 1)))? TB_TRUE : TB_FALSE);
+	tb_assert_and_check_return_val(queue, tb_true);
+	return ((queue->head == ((queue->tail + 1) & (queue->maxn - 1)))? tb_true : tb_false);
 }
 tb_bool_t tb_queue_null(tb_queue_t const* queue)
 {
-	tb_assert_and_check_return_val(queue, TB_TRUE);
-	return ((queue->head == queue->tail)? TB_TRUE : TB_FALSE);
+	tb_assert_and_check_return_val(queue, tb_true);
+	return ((queue->head == queue->tail)? tb_true : tb_false);
 }
 tb_void_t tb_queue_remove(tb_queue_t* queue, tb_size_t itor)
 {
@@ -209,7 +209,7 @@ tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, 
 	tb_assert_and_check_return(step);
 
 	// walk
-	tb_bool_t 	bdel = TB_FALSE;
+	tb_bool_t 	bdel = tb_false;
 	tb_byte_t* 	base = queue->data;
 	tb_size_t 	itor = queue->head;
 	tb_size_t 	tail = queue->tail;
@@ -220,7 +220,7 @@ tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, 
 		tb_pointer_t item = queue->func.data(&queue->func, base + itor * step);
 
 		// bdel
-		bdel = TB_FALSE;
+		bdel = tb_false;
 
 		// callback: item
 		if (!func(queue, &item, &bdel, data)) goto end;
@@ -233,7 +233,7 @@ tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, 
 	}
 
 	// callback: tail
-	if (!func(queue, TB_NULL, &bdel, data)) goto end;
+	if (!func(queue, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

@@ -33,7 +33,7 @@
 
 tb_char_t* tb_strnrchr(tb_char_t const* s, tb_size_t n, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 	
 	tb_char_t const* p = s + n - 1;
 	while (p >= s && *p)
@@ -41,5 +41,5 @@ tb_char_t* tb_strnrchr(tb_char_t const* s, tb_size_t n, tb_char_t c)
 		if (*p == c) return (tb_char_t*)p;
 		p--;
 	}
-	return TB_NULL;
+	return tb_null;
 }

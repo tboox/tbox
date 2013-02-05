@@ -36,15 +36,15 @@
  */
 tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn)
 {
-	tb_assert_and_check_return_val(buffer, TB_FALSE);
+	tb_assert_and_check_return_val(buffer, tb_false);
 
 	// init 
-	buffer->data = TB_NULL;
-	buffer->head = TB_NULL;
+	buffer->data = tb_null;
+	buffer->head = tb_null;
 	buffer->size = 0;
 	buffer->maxn = maxn;
 
-	return TB_TRUE;
+	return tb_true;
 }
 tb_void_t tb_qbuffer_exit(tb_qbuffer_t* buffer)
 {
@@ -60,18 +60,18 @@ tb_void_t tb_qbuffer_exit(tb_qbuffer_t* buffer)
  */
 tb_byte_t* tb_qbuffer_data(tb_qbuffer_t const* buffer)
 {
-	tb_assert_and_check_return_val(buffer, TB_NULL);
+	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->data;
 }
 tb_byte_t* tb_qbuffer_head(tb_qbuffer_t const* buffer)
 {
-	tb_assert_and_check_return_val(buffer, TB_NULL);
+	tb_assert_and_check_return_val(buffer, tb_null);
 	return buffer->head;
 }
 tb_byte_t* tb_qbuffer_tail(tb_qbuffer_t const* buffer)
 {
-	tb_assert_and_check_return_val(buffer, TB_NULL);
-	return buffer->head? buffer->head + buffer->size : TB_NULL;
+	tb_assert_and_check_return_val(buffer, tb_null);
+	return buffer->head? buffer->head + buffer->size : tb_null;
 }
 tb_size_t tb_qbuffer_size(tb_qbuffer_t const* buffer)
 {
@@ -90,13 +90,13 @@ tb_size_t tb_qbuffer_left(tb_qbuffer_t const* buffer)
 }
 tb_bool_t tb_qbuffer_full(tb_qbuffer_t const* buffer)
 {
-	tb_assert_and_check_return_val(buffer, TB_FALSE);
-	return buffer->size == buffer->maxn? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(buffer, tb_false);
+	return buffer->size == buffer->maxn? tb_true : tb_false;
 }
 tb_bool_t tb_qbuffer_null(tb_qbuffer_t const* buffer)
 {
-	tb_assert_and_check_return_val(buffer, TB_FALSE);
-	return buffer->size? TB_FALSE : TB_TRUE;
+	tb_assert_and_check_return_val(buffer, tb_false);
+	return buffer->size? tb_false : tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ tb_void_t tb_qbuffer_clear(tb_qbuffer_t* buffer)
 }
 tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 {
-	tb_assert_and_check_return_val(buffer && maxn && maxn >= buffer->size, TB_NULL);
+	tb_assert_and_check_return_val(buffer && maxn && maxn >= buffer->size, tb_null);
 
 	// has data?
 	if (buffer->data)
@@ -125,9 +125,9 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 		// realloc
 		if (maxn > buffer->maxn)
 		{
-			buffer->head = TB_NULL;
+			buffer->head = tb_null;
 			buffer->data = tb_ralloc(buffer->data, maxn);
-			tb_assert_and_check_return_val(buffer->data, TB_NULL);
+			tb_assert_and_check_return_val(buffer->data, tb_null);
 			buffer->head = buffer->data;
 		}
 	}
@@ -222,11 +222,11 @@ tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 
 tb_byte_t* tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size)
 {
-	tb_assert_and_check_return_val(buffer, TB_NULL);
+	tb_assert_and_check_return_val(buffer, tb_null);
 
 	// no data?
-	tb_check_return_val(buffer->data && buffer->size, TB_NULL);
-	tb_assert_and_check_return_val(buffer->head, TB_NULL);
+	tb_check_return_val(buffer->data && buffer->size, tb_null);
+	tb_assert_and_check_return_val(buffer->head, tb_null);
 
 	// ok
 	if (size) *size = buffer->size;
@@ -245,7 +245,7 @@ tb_void_t tb_qbuffer_pull_done(tb_qbuffer_t* buffer, tb_size_t size)
 }
 tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
 {
-	tb_assert_and_check_return_val(buffer && buffer->maxn, TB_NULL);
+	tb_assert_and_check_return_val(buffer && buffer->maxn, tb_null);
 
 	// no data?
 	if (!buffer->data)
@@ -257,11 +257,11 @@ tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
 		buffer->head = buffer->data;
 		buffer->size = 0;
 	}
-	tb_assert_and_check_return_val(buffer->data && buffer->head, TB_NULL);
+	tb_assert_and_check_return_val(buffer->data && buffer->head, tb_null);
 
 	// no left?
 	tb_size_t left = buffer->maxn - buffer->size;
-	tb_check_return_val(left, TB_NULL);
+	tb_check_return_val(left, tb_null);
 
 	// move data to head
 	if (buffer->head != buffer->data)

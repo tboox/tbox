@@ -35,17 +35,17 @@ tb_zip_t* tb_zip_init(tb_size_t algo, tb_size_t action)
 	// table
 	static tb_zip_t* (*s_init[])(tb_size_t action) =
 	{
-		TB_NULL
+		tb_null
 	, 	tb_zip_rlc_init
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_zip_zlibraw_init
 	, 	tb_zip_zlib_init
 	, 	tb_zip_gzip_init
-	, 	TB_NULL
+	, 	tb_null
 	};
-	tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], TB_NULL);
+	tb_assert_and_check_return_val(algo < tb_arrayn(s_init) && s_init[algo], tb_null);
 
 	// init
 	return s_init[algo](action);
@@ -58,17 +58,17 @@ tb_void_t tb_zip_exit(tb_zip_t* zip)
 	// table
 	static tb_void_t (*s_exit[])(tb_zip_t* zip) =
 	{
-		TB_NULL
+		tb_null
 	, 	tb_zip_rlc_exit
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_zip_zlibraw_exit
 	, 	tb_zip_zlib_exit
 	, 	tb_zip_gzip_exit
-	, 	TB_NULL
+	, 	tb_null
 	};
-	tb_assert_and_check_return_val(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo], TB_NULL);
+	tb_assert_and_check_return_val(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo], tb_null);
 
 	// exit
 	s_exit[zip->algo](zip);

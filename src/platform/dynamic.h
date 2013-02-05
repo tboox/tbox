@@ -38,7 +38,10 @@
 tb_handle_t 	tb_dynamic_init(tb_char_t const* name);
 tb_void_t 		tb_dynamic_exit(tb_handle_t dynamic);
 
-// func
+// the func address
 tb_pointer_t 	tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name);
+
+// the variable address
+tb_pointer_t 	tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name);
 
 #endif

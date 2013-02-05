@@ -38,13 +38,13 @@
 #ifdef TB_CONFIG_LIBC_HAVE_STRSTR
 tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return strstr(s1, s2);
 }
 #else
 tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 	__tb_register__ tb_char_t const* s = s1;
 	__tb_register__ tb_char_t const* p = s2;
@@ -60,12 +60,12 @@ tb_char_t* tb_strstr(tb_char_t const* s1, tb_char_t const* s2)
 		else 
 		{
 			p = s2;
-			if (!*s) return TB_NULL;
+			if (!*s) return tb_null;
 			s = ++s1;
 		}
 
 	} while (1);
 
-	return TB_NULL;
+	return tb_null;
 }
 #endif

@@ -432,13 +432,13 @@ static __tb_inline__ tb_uint32_t tb_fixed16_irlog2_int32(tb_fixed16_t x)
 static __tb_inline__ tb_fixed16_t tb_fixed16_sin_int32(tb_fixed16_t x)
 {
 	tb_fixed16_t s = 0;
-	tb_fixed16_sincos_int32(x, &s, TB_NULL);
+	tb_fixed16_sincos_int32(x, &s, tb_null);
 	return s;
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_cos_int32(tb_fixed16_t x)
 {
 	tb_fixed16_t c = 0;
-	tb_fixed16_sincos_int32(x, TB_NULL, &c);
+	tb_fixed16_sincos_int32(x, tb_null, &c);
 	return c;
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_tan_int32(tb_fixed16_t x)

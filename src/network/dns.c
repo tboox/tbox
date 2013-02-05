@@ -226,7 +226,7 @@ typedef struct __tb_dns_answer_t
  */
 
 // the dns list
-static tb_dns_list_t* 	g_dns_list = TB_NULL;
+static tb_dns_list_t* 	g_dns_list = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -235,7 +235,7 @@ static tb_dns_list_t* 	g_dns_list = TB_NULL;
 // size + data, e.g. .www.google.com => 3www6google3com
 static tb_char_t const* tb_dns_encode_name(tb_char_t* name)
 {
-	tb_assert_and_check_return_val(name && name[0] == '.', TB_NULL);
+	tb_assert_and_check_return_val(name && name[0] == '.', tb_null);
 	
 	// encode
 	tb_size_t 	n = 0;
@@ -298,7 +298,7 @@ static tb_char_t const* tb_dns_parse_name(tb_bstream_t* bst, tb_char_t* name)
 		tb_bstream_goto(bst, p);
 		return name;
 	}
-	else return TB_NULL;
+	else return tb_null;
 }
 static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 {
@@ -315,7 +315,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	tb_bstream_t 	bst;
 	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
 	tb_size_t 		size = 0;
-	tb_char_t* 		p = TB_NULL;
+	tb_char_t* 		p = tb_null;
 	tb_bstream_attach(&bst, rpkt, TB_DNS_RPKT_MAXN);
 
 	// identification number
@@ -419,7 +419,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// wait
 			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_WRIT, TB_NULL);
+			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_WRIT, tb_null);
 			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
 
 			// fail or timeout?
@@ -445,7 +445,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// wait
 			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, TB_NULL);
+			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, tb_null);
 			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
 			//tb_trace_impl("wait %d", r);
 
@@ -481,7 +481,7 @@ end:
 }
 static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(cache && bdel && data, TB_FALSE);
+	tb_assert_and_check_return_val(cache && bdel && data, tb_false);
 
 	// the expired time
 	tb_dns_list_t* list = (tb_dns_list_t*)data;
@@ -489,13 +489,13 @@ static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 	{
 		// address
 		tb_dns_addr_t const* addr = item->data;
-		tb_assert_and_check_return_val(addr, TB_FALSE);
+		tb_assert_and_check_return_val(addr, tb_false);
 
 		// is expired?
 		if (addr->time < list->expired)
 		{
 			// remove it
-			*bdel = TB_TRUE;
+			*bdel = tb_true;
 
 			// trace
 			tb_trace_impl("cache: clr %s => %u.%u.%u.%u, time: %u, size: %u"
@@ -514,11 +514,11 @@ static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_dns_look_stat(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(cache && bdel && data, TB_FALSE);
+	tb_assert_and_check_return_val(cache && bdel && data, tb_false);
 
 	tb_size_t* stat = (tb_size_t*)data;
 	if (item && item->data)
@@ -530,7 +530,7 @@ static tb_bool_t tb_dns_look_stat(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 {
@@ -625,7 +625,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 		tb_bstream_t 	bst;
 		tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
 		tb_size_t 		size = 0;
-		tb_byte_t* 		p = TB_NULL;
+		tb_byte_t* 		p = tb_null;
 		tb_bstream_attach(&bst, rpkt, TB_DNS_RPKT_MAXN);
 
 		// identification number
@@ -787,7 +787,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	tb_size_t 			size = tb_sbuffer_size(&look->rpkt);
 
 	// check
-	tb_assert_and_check_return_val(rpkt && size >= TB_DNS_HEADER_SIZE, TB_FALSE);
+	tb_assert_and_check_return_val(rpkt && size >= TB_DNS_HEADER_SIZE, tb_false);
 
 	// parse dns header
 	tb_bstream_t 	bst;
@@ -808,18 +808,18 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	tb_trace_impl("");
 
 	// check header
-	tb_assert_and_check_return_val(header.id == TB_DNS_HEADER_MAGIC, TB_FALSE);
+	tb_assert_and_check_return_val(header.id == TB_DNS_HEADER_MAGIC, tb_false);
 
 	// skip questions, only one question now.
 	// name + question1 + question2 + ...
-	tb_assert_and_check_return_val(header.question == 1, TB_FALSE);
+	tb_assert_and_check_return_val(header.question == 1, tb_false);
 #if 1
 	tb_bstream_skip_string(&bst);
 	tb_bstream_skip(&bst, 4);
 #else
 	tb_char_t* name = tb_bstream_get_string(&bst);
 	//name = tb_dns_decode_name(name);
-	tb_assert_and_check_return_val(name, TB_FALSE);
+	tb_assert_and_check_return_val(name, tb_false);
 	tb_bstream_skip(&bst, 4);
 	tb_trace_impl("response: name: %s", name);
 #endif
@@ -884,7 +884,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	}
 
 	// found it?
-	tb_check_return_val(found, TB_FALSE);
+	tb_check_return_val(found, tb_false);
 
 #if 0
 	// parse authorities
@@ -966,7 +966,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 #endif
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 {
@@ -1065,10 +1065,10 @@ tb_bool_t tb_dns_list_init()
 	{
 		// alloc list
 		g_dns_list = tb_malloc0(sizeof(tb_dns_list_t));
-		tb_assert_and_check_return_val(g_dns_list, TB_FALSE);
+		tb_assert_and_check_return_val(g_dns_list, tb_false);
 
 		// init mutx
-		g_dns_list->mutx = tb_mutex_init(TB_NULL);
+		g_dns_list->mutx = tb_mutex_init(tb_null);
 		tb_assert_and_check_goto(g_dns_list->mutx, fail);
 			
 		// init spool
@@ -1076,7 +1076,7 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->spool, fail);
 	
 		// init cache
-		g_dns_list->cache = tb_hash_init(tb_align8(tb_int32_sqrt(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(TB_FALSE, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), TB_NULL, TB_NULL));
+		g_dns_list->cache = tb_hash_init(tb_align8(tb_int32_sqrt(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), tb_null, tb_null));
 		tb_assert_and_check_goto(g_dns_list->cache, fail);
 	}
 
@@ -1088,11 +1088,11 @@ tb_bool_t tb_dns_list_init()
 	tb_dns_local_init();
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 
 fail:
 	tb_dns_list_exit();
-	return TB_FALSE;
+	return tb_false;
 }
 tb_void_t tb_dns_list_adds(tb_char_t const* host)
 {
@@ -1168,7 +1168,7 @@ tb_void_t tb_dns_list_dels(tb_char_t const* host)
 			tb_dns_host_t* list = g_dns_list->list;
 
 			// ipv4
-			tb_uint32_t ipv4 = tb_ipv4_set(TB_NULL, host);
+			tb_uint32_t ipv4 = tb_ipv4_set(tb_null, host);
 
 			// find it
 			tb_size_t i = 0;
@@ -1197,7 +1197,7 @@ tb_void_t tb_dns_list_exit()
 	tb_dns_local_exit();
 
 	// exit list
-	tb_handle_t mutx = TB_NULL;
+	tb_handle_t mutx = tb_null;
 	if (g_dns_list)
 	{
 		// enter
@@ -1208,19 +1208,19 @@ tb_void_t tb_dns_list_exit()
 		{
 			// save mutx
 			mutx = g_dns_list->mutx;
-			g_dns_list->mutx = TB_NULL;
+			g_dns_list->mutx = tb_null;
 
 			// exit cache
 			if (g_dns_list->cache) tb_hash_exit(g_dns_list->cache);
-			g_dns_list->cache = TB_NULL;
+			g_dns_list->cache = tb_null;
 
 			// exit spool
 			if (g_dns_list->spool) tb_spool_exit(g_dns_list->spool);
-			g_dns_list->spool = TB_NULL;
+			g_dns_list->spool = tb_null;
 
 			// free it
 			tb_free(g_dns_list);
-			g_dns_list = TB_NULL;
+			g_dns_list = tb_null;
 
 			// free mutx
 			if (mutx) 
@@ -1271,13 +1271,13 @@ tb_void_t tb_dns_list_dump()
  */
 tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
-	tb_assert_and_check_return_val(name && ipv4, TB_FALSE);
+	tb_assert_and_check_return_val(name && ipv4, tb_false);
 
 	// trace
 	tb_trace_impl("try4: %s", name);
 
 	// is ipv4?
-	tb_check_return_val(!tb_ipv4_set(ipv4, name), TB_TRUE);
+	tb_check_return_val(!tb_ipv4_set(ipv4, name), tb_true);
 
 	// clear ipv4
 	tb_ipv4_clr(ipv4);
@@ -1330,18 +1330,18 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 	tb_trace_impl("try4: %s", ipv4->u32? "ok" : "failed");
 
 	// ok?
-	return ipv4->u32? TB_TRUE : TB_FALSE;
+	return ipv4->u32? tb_true : tb_false;
 }
 tb_handle_t tb_dns_look_init(tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(name, TB_NULL);
+	tb_assert_and_check_return_val(name, tb_null);
 
 	// must be not ipv4
-	tb_assert_return_val(!tb_ipv4_set(TB_NULL, name), TB_NULL);
+	tb_assert_return_val(!tb_ipv4_set(tb_null, name), tb_null);
 
 	// alloc
 	tb_dns_look_t* look = tb_malloc0(sizeof(tb_dns_look_t));
-	tb_assert_and_check_return_val(look, TB_NULL);
+	tb_assert_and_check_return_val(look, tb_null);
 
 	// init host
 	if (!tb_sstring_init(&look->host, look->data, TB_DNS_HOST_MAXN)) goto fail;
@@ -1376,7 +1376,7 @@ tb_handle_t tb_dns_look_init(tb_char_t const* name)
 
 fail:
 	if (look) tb_dns_look_exit(look);
-	return TB_NULL;
+	return tb_null;
 }
 tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_ipv4_t* ipv4)
 {
@@ -1453,7 +1453,7 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 	if (e)
 	{
 		// wait
-		tb_aioo_seto(&o, look->sock, TB_AIOO_OTYPE_SOCK, e, TB_NULL);
+		tb_aioo_seto(&o, look->sock, TB_AIOO_OTYPE_SOCK, e, tb_null);
 		r = tb_aioo_wait(&o, timeout);
 
 		// fail or timeout?
@@ -1477,11 +1477,11 @@ tb_void_t tb_dns_look_exit(tb_handle_t handle)
 }
 tb_bool_t tb_dns_look_done(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
-	tb_assert_and_check_return_val(name && ipv4, TB_FALSE);
+	tb_assert_and_check_return_val(name && ipv4, tb_false);
 
 	// init
 	tb_handle_t handle = tb_dns_look_init(name);
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// spak
 	tb_long_t r = -1;
@@ -1498,6 +1498,6 @@ end:
 	tb_dns_look_exit(handle);
 
 	// ok
-	return r > 0? TB_TRUE : TB_FALSE;
+	return r > 0? tb_true : tb_false;
 }
 

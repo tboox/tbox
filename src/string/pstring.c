@@ -44,7 +44,7 @@
  */
 tb_bool_t tb_pstring_init(tb_pstring_t* string)
 {
-	tb_assert_and_check_return_val(string, TB_FALSE);
+	tb_assert_and_check_return_val(string, tb_false);
 	return tb_pbuffer_init(string);
 }
 tb_void_t tb_pstring_exit(tb_pstring_t* string)
@@ -57,7 +57,7 @@ tb_void_t tb_pstring_exit(tb_pstring_t* string)
  */
 tb_char_t const* tb_pstring_cstr(tb_pstring_t const* string)
 {
-	tb_assert_and_check_return_val(string, TB_NULL);
+	tb_assert_and_check_return_val(string, tb_null);
 	return (tb_char_t const*)tb_pbuffer_data(string);
 }
 tb_size_t tb_pstring_size(tb_pstring_t const* string)
@@ -84,7 +84,7 @@ tb_void_t tb_pstring_clear(tb_pstring_t* string)
 }
 tb_char_t const* tb_pstring_strip(tb_pstring_t* string, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string, TB_NULL);
+	tb_assert_and_check_return_val(string, tb_null);
 
 	// out?
 	tb_check_return_val(n < tb_pstring_size(string), tb_pstring_cstr(string));
@@ -204,24 +204,24 @@ tb_long_t tb_pstring_cstrirstr(tb_pstring_t const* string, tb_size_t p, tb_char_
  */
 tb_char_t const* tb_pstring_strcpy(tb_pstring_t* string, tb_pstring_t const* s)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	tb_size_t n = tb_pstring_size(s);
 	if (n) return tb_pstring_cstrncpy(string, tb_pstring_cstr(s), n);
 	else
 	{
 		tb_pstring_clear(string);
-		return TB_NULL;
+		return tb_null;
 	}
 }
 tb_char_t const* tb_pstring_cstrcpy(tb_pstring_t* string, tb_char_t const* s)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncpy(string, s, tb_strlen(s));
 }
 tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && s && n, TB_NULL);
+	tb_assert_and_check_return_val(string && s && n, tb_null);
 
 	tb_char_t* p = tb_pbuffer_memncpy(string, s, n + 1);
 	if (p) p[tb_pstring_size(string)] = '\0';
@@ -229,13 +229,13 @@ tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, t
 }
 tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
-	tb_assert_and_check_return_val(string && fmt, TB_NULL);
+	tb_assert_and_check_return_val(string && fmt, tb_null);
 
 	// format data
 	tb_char_t p[TB_PSTRING_FMTD_SIZE] = {0};
 	tb_size_t n = 0;
 	tb_va_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
-	tb_assert_and_check_return_val(n, TB_NULL);
+	tb_assert_and_check_return_val(n, tb_null);
 	
 	return tb_pstring_cstrncpy(string, p, n);
 }
@@ -244,7 +244,7 @@ tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt,
  */
 tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 {
-	tb_assert_and_check_return_val(string, TB_NULL);
+	tb_assert_and_check_return_val(string, tb_null);
 	
 	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, 2);
 	if (p) p[tb_pstring_size(string)] = '\0';
@@ -252,7 +252,7 @@ tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 }
 tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string, TB_NULL);
+	tb_assert_and_check_return_val(string, tb_null);
 
 	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, n + 1);
 	if (p) p[tb_pstring_size(string)] = '\0';
@@ -263,30 +263,30 @@ tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t
  */
 tb_char_t const* tb_pstring_strcat(tb_pstring_t* string, tb_pstring_t const* s)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncat(string, tb_pstring_cstr(s), tb_pstring_size(s));
 }
 tb_char_t const* tb_pstring_cstrcat(tb_pstring_t* string, tb_char_t const* s)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncat(string, s, tb_strlen(s));
 }
 tb_char_t const* tb_pstring_cstrncat(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
-	tb_assert_and_check_return_val(string && s && n, TB_NULL);
+	tb_assert_and_check_return_val(string && s && n, tb_null);
 	tb_char_t* p = tb_pbuffer_memncpyp(string, tb_pstring_size(string), s, n + 1);
 	if (p) p[tb_pstring_size(string)] = '\0';
 	return p;
 }
 tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
-	tb_assert_and_check_return_val(string && fmt, TB_NULL);
+	tb_assert_and_check_return_val(string && fmt, tb_null);
 
 	// format data
 	tb_char_t p[TB_PSTRING_FMTD_SIZE] = {0};
 	tb_long_t n = 0;
 	tb_va_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
-	tb_assert_and_check_return_val(n, TB_NULL);
+	tb_assert_and_check_return_val(n, tb_null);
 	
 	return tb_pstring_cstrncat(string, p, n);
 }

@@ -55,8 +55,8 @@ end:
 
 	// exit thread
 	tb_print("[thread]: exit");
-	tb_thread_return(TB_NULL);
-	return TB_NULL;
+	tb_thread_return(tb_null);
+	return tb_null;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -75,11 +75,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init event
 	tb_size_t 	i = 0;
-	tb_handle_t e[TB_TEST_ITEM_MAX] = {TB_NULL};
+	tb_handle_t e[TB_TEST_ITEM_MAX] = {tb_null};
 	for (i = 0; i < TB_TEST_ITEM_MAX; i++) e[i] = tb_epool_adde(it.e, i);
 
 	// init thread
-	it.t = tb_thread_init(TB_NULL, tb_test_thread, &it, 0);
+	it.t = tb_thread_init(tb_null, tb_test_thread, &it, 0);
 	tb_assert_and_check_goto(it.t, end);
 	tb_msleep(100);
 

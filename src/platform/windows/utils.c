@@ -29,6 +29,7 @@
 #include "../../math/math.h"
 #include <stdio.h>
 #include <windows.h>
+#include <winsock2.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -88,4 +89,9 @@ tb_hong_t tb_time()
 	return 0;
 }
 
+// the host name
+tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
+{
+	return !gethostname(name, size)? tb_true : tb_false;
+}
 

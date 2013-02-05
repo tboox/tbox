@@ -166,7 +166,7 @@ static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 }
 static tb_void_t tb_queue_str_test()
 {
-	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
+	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(queue);
 
 	tb_print("=============================================================");
@@ -376,7 +376,7 @@ static tb_void_t tb_queue_test_itor_perf()
 }
 static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(queue && bdel && data, TB_FALSE);
+	tb_assert_and_check_return_val(queue && bdel && data, tb_false);
 
 	tb_hize_t* test = data;
 	if (item)
@@ -387,7 +387,7 @@ static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, 
 //		if (!(i & 0x7))
 //		if (1)
 //		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
-			*bdel = TB_TRUE;
+			*bdel = tb_true;
 		else
 #endif
 		{
@@ -397,7 +397,7 @@ static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, 
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_void_t tb_queue_test_walk_perf()
 {

@@ -39,16 +39,16 @@ static __tb_inline__ tb_bool_t tb_heap_check(tb_iterator_t* iterator, tb_size_t 
 		for (root = head; ++head != tail; ++root)
 		{
 			// root < left?
-			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return TB_FALSE;
+			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
 			// end?
 			else if (++head == tail) break;
 			// root < right?
-			else if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return TB_FALSE;
+			else if (tb_iterator_comp(iterator, tb_iterator_item(iterator, root), tb_iterator_item(iterator, head)) < 0) return tb_false;
 		}
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 /*!push heap
  *
@@ -189,7 +189,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
 {
 	// init
 	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
 	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
 	// make
@@ -265,7 +265,7 @@ tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 
 	// init
 	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
 	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
 	// sort
@@ -334,7 +334,7 @@ tb_void_t tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 	
 	// init
 	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_pointer_t 	temp = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
 	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || temp);
 
 	// sort
@@ -368,7 +368,7 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 
 	// init
 	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	key = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_pointer_t 	key = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
 	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || key);
 
 	// hole => key
@@ -531,7 +531,7 @@ tb_void_t tb_heap_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 
 	// init
 	tb_size_t 		step = tb_iterator_step(iterator);
-	tb_pointer_t 	last = step > sizeof(tb_pointer_t)? tb_malloc(step) : TB_NULL;
+	tb_pointer_t 	last = step > sizeof(tb_pointer_t)? tb_malloc(step) : tb_null;
 	tb_assert_and_check_return(step <= sizeof(tb_pointer_t) || last);
 
 	// pop0 ...

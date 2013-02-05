@@ -606,7 +606,7 @@ static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 }
 static tb_void_t tb_vector_str_test()
 {
-	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(TB_TRUE, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
+	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(vector);
 
 	tb_print("=============================================================");
@@ -862,7 +862,7 @@ static tb_void_t tb_vector_test_itor_perf()
 }
 static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(vector && bdel && data, TB_FALSE);
+	tb_assert_and_check_return_val(vector && bdel && data, tb_false);
 
 	tb_hize_t* test = data;
 	if (item)
@@ -872,7 +872,7 @@ static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t* ite
 //		if (!(i & 0x7))
 //		if (1)
 //		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
-			*bdel = TB_TRUE;
+			*bdel = tb_true;
 		else
 		{
 			test[0] += i;
@@ -881,7 +881,7 @@ static tb_bool_t tb_vector_test_walk_item(tb_vector_t* vector, tb_pointer_t* ite
 	}
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_void_t tb_vector_test_walk_perf()
 {

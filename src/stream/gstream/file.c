@@ -69,7 +69,7 @@ typedef struct __tb_fstream_t
  */
 static __tb_inline__ tb_fstream_t* tb_fstream_cast(tb_gstream_t* gst)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FILE, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FILE, tb_null);
 	return (tb_fstream_t*)gst;
 }
 static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
@@ -105,7 +105,7 @@ static tb_long_t tb_fstream_aclose(tb_gstream_t* gst)
 		if (!fst->bref) if (!tb_file_exit(fst->file)) return 0;
 
 		// reset
-		fst->file = TB_NULL;
+		fst->file = tb_null;
 		fst->bref = 0;
 		fst->wait = 0;
 	}
@@ -188,7 +188,7 @@ static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 
 	// aioo
 	tb_aioo_t o;
-	tb_aioo_seto(&o, fst->file, TB_AIOO_OTYPE_FILE, etype, TB_NULL);
+	tb_aioo_seto(&o, fst->file, TB_AIOO_OTYPE_FILE, etype, tb_null);
 
 	// wait
 	fst->wait = tb_aioo_wait(&o, timeout);
@@ -199,31 +199,31 @@ static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
-	tb_assert_and_check_return_val(fst, TB_FALSE);
+	tb_assert_and_check_return_val(fst, tb_false);
 
 	switch (cmd)
 	{
 	case TB_FSTREAM_CMD_SET_FLAGS:
 		fst->flags = (tb_size_t)tb_va_arg(args, tb_size_t);
-		return TB_TRUE;
+		return tb_true;
 	case TB_FSTREAM_CMD_SET_HANDLE:
 		{
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
 			fst->file = handle;
 			fst->bref = handle? 1 : 0;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_FSTREAM_CMD_GET_HANDLE:
 		{
 			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
-			tb_assert_and_check_return_val(phandle, TB_FALSE);
+			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = fst->file;
-			return TB_TRUE;
+			return tb_true;
 		}
 	default:
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -232,7 +232,7 @@ static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 tb_gstream_t* tb_gstream_init_file()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_fstream_t));
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
@@ -248,7 +248,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->size 	= tb_fstream_size;
 	gst->wait 	= tb_fstream_wait;
 	gst->ctrl 	= tb_fstream_ctrl;
-	fst->file 	= TB_NULL;
+	fst->file 	= tb_null;
 	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
 
 	// resize file cache
@@ -259,16 +259,16 @@ tb_gstream_t* tb_gstream_init_file()
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 {
-	tb_assert_and_check_return_val(path, TB_NULL);
+	tb_assert_and_check_return_val(path, tb_null);
 
 	// init file stream
 	tb_gstream_t* gst = tb_gstream_init_file();
-	tb_assert_and_check_return_val(gst, TB_NULL);
+	tb_assert_and_check_return_val(gst, tb_null);
 
 	// set path
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
@@ -277,5 +277,5 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 
 fail:
 	if (gst) tb_gstream_exit(gst);
-	return TB_NULL;
+	return tb_null;
 }

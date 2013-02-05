@@ -42,11 +42,11 @@ tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
 tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 {
 	// check
-	tb_assert_and_check_return_val(maxn, TB_NULL);
+	tb_assert_and_check_return_val(maxn, tb_null);
 
 	// alloc aipp
 	tb_aipp_t* aipp = tb_malloc0(sizeof(tb_aipp_t));
-	tb_assert_and_check_return_val(aipp, TB_NULL);
+	tb_assert_and_check_return_val(aipp, tb_null);
 
 	// init aipp
 	aipp->type = type;
@@ -55,7 +55,7 @@ tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 	// reactors
 	static tb_aipp_reactor_t* (*s_init[])(tb_aipp_t*) = 
 	{
-		TB_NULL
+		tb_null
 	, 	tb_aipp_reactor_file_init
 	,	tb_aipp_reactor_sock_init
 	
@@ -63,7 +63,7 @@ tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);
 
 	// init hash
-	aipp->hash = tb_hash_init(tb_align8(tb_int32_sqrt(maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_aioo_t), TB_NULL, TB_NULL));
+	aipp->hash = tb_hash_init(tb_align8(tb_int32_sqrt(maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_aioo_t), tb_null, tb_null));
 	tb_assert_and_check_goto(aipp->hash, fail);
 
 	// init reactor
@@ -75,7 +75,7 @@ tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 
 fail:
 	if (aipp) tb_aipp_exit(aipp);
-	return TB_NULL;
+	return tb_null;
 }
 
 tb_void_t tb_aipp_exit(tb_aipp_t* aipp)
@@ -106,12 +106,12 @@ tb_size_t tb_aipp_size(tb_aipp_t* aipp)
 tb_bool_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->addo, TB_FALSE);
-	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash) < aipp->maxn, TB_FALSE);
-	tb_assert_and_check_return_val(handle && etype, TB_FALSE);
+	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->addo, tb_false);
+	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash) < aipp->maxn, tb_false);
+	tb_assert_and_check_return_val(handle && etype, tb_false);
 
 	// add object to native
-	if (!aipp->rtor->addo(aipp->rtor, handle, etype)) return TB_FALSE;
+	if (!aipp->rtor->addo(aipp->rtor, handle, etype)) return tb_false;
 
 	// add object to hash
 	tb_aioo_t o;
@@ -119,23 +119,23 @@ tb_bool_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_
 	tb_hash_set(aipp->hash, handle, &o);
 	
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 tb_bool_t tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->delo, TB_FALSE);
-	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash), TB_FALSE);
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(aipp && aipp->rtor && aipp->rtor->delo, tb_false);
+	tb_assert_and_check_return_val(aipp->hash && tb_hash_size(aipp->hash), tb_false);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// del object from native
-	if (!aipp->rtor->delo(aipp->rtor, handle)) return TB_FALSE;
+	if (!aipp->rtor->delo(aipp->rtor, handle)) return tb_false;
 
 	// del object from hash
 	tb_hash_del(aipp->hash, handle);
 	
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 tb_size_t tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle)
 {

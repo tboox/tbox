@@ -46,13 +46,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMSET)
 tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 	return memset(s, c, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMSET_U8)
 tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	__tb_register__ tb_byte_t* p = s;
 	if (!n) return s;
@@ -80,7 +80,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U16
 tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 2-bytes 
 	tb_assert(!(((tb_size_t)s) & 0x1));
@@ -112,7 +112,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U24
 tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	__tb_register__ tb_byte_t* p = s;
 	if (!n) return s;
@@ -144,7 +144,7 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #ifndef TB_LIBC_STRING_OPT_MEMSET_U32
 tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	// align by 4-bytes 
 	tb_assert(!(((tb_size_t)s) & 0x3));

@@ -172,13 +172,13 @@ static tb_bool_t tb_flv_audio_data_cb_func(tb_byte_t const* head_data, tb_size_t
 	tb_print("[demo]: audio_data_size: %u %u, dts: %u, dt: %u", head_size, body_size, dts, dts - info->audio_dts_last);
 	info->audio_dts_last = dts;
 
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_sint32_t cts, tb_pointer_t cb_data)
 {
 	tb_flv_info_t* info = cb_data;
 	tb_uint8_t 	flags = head_data[11];
-	tb_bool_t 	bkeyframe = (flags & TB_FLV_VIDEO_FRAMETYPE_MASK) == TB_FLV_FRAME_TYPE_KEY? TB_TRUE : TB_FALSE;
+	tb_bool_t 	bkeyframe = (flags & TB_FLV_VIDEO_FRAMETYPE_MASK) == TB_FLV_FRAME_TYPE_KEY? tb_true : tb_false;
 
 	tb_print("[demo]: =================================================================================");
 	tb_print("[demo]: video_data_size: %u %u, dts: %u, cts: %d, pts: %u, dt: %u, %s", head_size, body_size, dts, cts, dts + (cts > 0? cts : 0), dts - info->video_dts_last, bkeyframe? "iframe" : "xframe");
@@ -214,7 +214,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 	}
 
 
-	return TB_TRUE;
+	return tb_true;
 }
 
 

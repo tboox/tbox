@@ -46,13 +46,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_MEMCPY)
 tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return memcpy(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMCPY)
 tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 #ifdef TB_CONFIG_BINARY_SMALL
 	__tb_register__ tb_byte_t* p1 = s1;

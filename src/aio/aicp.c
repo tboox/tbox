@@ -46,11 +46,11 @@ tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp);
 tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 {
 	// check
-	tb_assert_and_check_return_val(maxn, TB_NULL);
+	tb_assert_and_check_return_val(maxn, tb_null);
 
 	// alloc aicp
 	tb_aicp_t* aicp = tb_malloc0(sizeof(tb_aicp_t));
-	tb_assert_and_check_return_val(aicp, TB_NULL);
+	tb_assert_and_check_return_val(aicp, tb_null);
 
 	// init aicp
 	aicp->type = type;
@@ -60,7 +60,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	// reactors
 	static tb_aicp_reactor_t* (*s_init[])(tb_aicp_t*) = 
 	{
-		TB_NULL
+		tb_null
 	, 	tb_aicp_reactor_file_init
 	,	tb_aicp_reactor_sock_init
 	
@@ -68,9 +68,9 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);
 
 	// init mutx
-	aicp->mutx.pool = tb_mutex_init(TB_NULL);
-	aicp->mutx.post = tb_mutex_init(TB_NULL);
-	aicp->mutx.resp = tb_mutex_init(TB_NULL);
+	aicp->mutx.pool = tb_mutex_init(tb_null);
+	aicp->mutx.post = tb_mutex_init(tb_null);
+	aicp->mutx.resp = tb_mutex_init(tb_null);
 	tb_assert_and_check_goto(aicp->mutx.pool && aicp->mutx.post && aicp->mutx.resp, fail);
 
 	// init pool
@@ -78,11 +78,11 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// init post
-	aicp->post = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), TB_NULL, TB_NULL));
+	aicp->post = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
 	tb_assert_and_check_goto(aicp->post, fail);
 
 	// init resp
-	aicp->resp = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), TB_NULL, TB_NULL));
+	aicp->resp = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
 	tb_assert_and_check_goto(aicp->resp, fail);
 
 	// init reactor
@@ -94,7 +94,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 
 fail:
 	if (aicp) tb_aicp_exit(aicp);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 {
@@ -115,7 +115,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		{
 			tb_assert(aicp->rtor && aicp->rtor->exit);
 			aicp->rtor->exit(aicp->rtor);
-			aicp->rtor = TB_NULL;
+			aicp->rtor = tb_null;
 		}
 
 		// exit resp
@@ -124,7 +124,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			tb_mutex_enter(aicp->mutx.resp);
 
 			if (aicp->resp) tb_queue_exit(aicp->resp);
-			aicp->resp = TB_NULL;
+			aicp->resp = tb_null;
 
 			tb_mutex_leave(aicp->mutx.resp);
 		}
@@ -135,7 +135,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			tb_mutex_enter(aicp->mutx.post);
 
 			if (aicp->post) tb_queue_exit(aicp->post);
-			aicp->post = TB_NULL;
+			aicp->post = tb_null;
 
 			tb_mutex_leave(aicp->mutx.post);
 		}
@@ -146,18 +146,18 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			tb_mutex_enter(aicp->mutx.pool);
 
 			if (aicp->pool) tb_rpool_exit(aicp->pool);
-			aicp->pool = TB_NULL;
+			aicp->pool = tb_null;
 
 			tb_mutex_leave(aicp->mutx.pool);
 		}
 
 		// exit mutx
 		if (aicp->mutx.resp) tb_mutex_exit(aicp->mutx.resp);
-		aicp->mutx.resp = TB_NULL;
+		aicp->mutx.resp = tb_null;
 		if (aicp->mutx.post) tb_mutex_exit(aicp->mutx.post);
-		aicp->mutx.post = TB_NULL;
+		aicp->mutx.post = tb_null;
 		if (aicp->mutx.pool) tb_mutex_exit(aicp->mutx.pool);
-		aicp->mutx.pool = TB_NULL;
+		aicp->mutx.pool = tb_null;
 
 		// free aicp
 		tb_free(aicp);
@@ -186,10 +186,10 @@ tb_size_t tb_aicp_size(tb_aicp_t* aicp)
 }
 tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata)
 {
-	tb_assert_and_check_return_val(aicp && handle && aicb, TB_NULL);
+	tb_assert_and_check_return_val(aicp && handle && aicb, tb_null);
 
 	// init aico
-	tb_aico_t* aico = TB_NULL;
+	tb_aico_t* aico = tb_null;
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
@@ -214,7 +214,7 @@ tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aic
 	
 	// del aico from pool
 	tb_rpool_free(aicp->pool, aico);
-	aico = TB_NULL;
+	aico = tb_null;
 
 end:
 
@@ -226,7 +226,7 @@ end:
 }
 tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
-	tb_assert_and_check_return_val(aicp && aico, TB_NULL);
+	tb_assert_and_check_return_val(aicp && aico, tb_null);
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
@@ -248,17 +248,17 @@ end:
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->post && aice, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aicp->post && aice, tb_false);
 
 	// enter 
 	if (aicp->mutx.post) tb_mutex_enter(aicp->mutx.post);
 
 	// post aice
-	tb_bool_t ok = TB_FALSE;
+	tb_bool_t ok = tb_false;
 	if (!tb_queue_full(aicp->post)) 
 	{
 		tb_queue_put(aicp->post, aice);
-		ok = TB_TRUE;
+		ok = tb_true;
 	}
 
 	// leave 
@@ -270,7 +270,7 @@ tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico, tb_false);
 
 	// post
 	tb_aice_t aice = {0};
@@ -281,7 +281,7 @@ tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico, tb_false);
 
 	// post
 	tb_aice_t aice = {0};
@@ -292,7 +292,7 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && host && port, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico && host && port, tb_false);
 
 	// post
 	tb_aice_t aice = {0};
@@ -301,12 +301,12 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* 
 	aice.aico = aico;
 	if (tb_ipv4_set(&aice.u.conn.host, host))
 		return tb_aicp_post(aicp, &aice);
-	return TB_FALSE;
+	return tb_false;
 }
 tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
 
 	// post
 	tb_aice_t aice = {0};
@@ -319,7 +319,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
 
 	// post
 	tb_aice_t aice = {0};
@@ -332,13 +332,13 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->post && aicp->resp && aicp->rtor && aicp->rtor->spak, TB_FALSE);
+	tb_assert_and_check_return_val(aicp && aicp->post && aicp->resp && aicp->rtor && aicp->rtor->spak, tb_false);
 
 	// enter 
 	if (aicp->mutx.post) tb_mutex_enter(aicp->mutx.post);
 
 	// get the posted aice
-	tb_aice_t const* post = TB_NULL;
+	tb_aice_t const* post = tb_null;
 	if (!tb_queue_null(aicp->post)) 
 	{
 		post = tb_queue_get(aicp->post);
@@ -349,18 +349,18 @@ tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)
 	if (aicp->mutx.post) tb_mutex_leave(aicp->mutx.post);
 
 	// killed?
-	tb_check_return_val(!tb_atomic_get(&aicp->kill), TB_FALSE);
+	tb_check_return_val(!tb_atomic_get(&aicp->kill), tb_false);
 
 	// spak
-	tb_aice_t const* 	resp = TB_NULL;
+	tb_aice_t const* 	resp = tb_null;
 	tb_long_t 			resn = aicp->rtor->spak(aicp->rtor, post, &resp);
 
 	// killed?
-	tb_check_return_val(resn >= 0, TB_FALSE);
-	tb_check_return_val(!tb_atomic_get(&aicp->kill), TB_FALSE);
+	tb_check_return_val(resn >= 0, tb_false);
+	tb_check_return_val(!tb_atomic_get(&aicp->kill), tb_false);
 	
 	// no aice?
-	tb_check_return_val(resn, TB_TRUE);
+	tb_check_return_val(resn, tb_true);
 
 	// enter 
 	if (aicp->mutx.resp) tb_mutex_enter(aicp->mutx.resp);
@@ -373,12 +373,12 @@ tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)
 	if (aicp->mutx.resp) tb_mutex_leave(aicp->mutx.resp);
 		
 	// ok?
-	return tb_atomic_get(&aicp->kill)? TB_FALSE : TB_TRUE;
+	return tb_atomic_get(&aicp->kill)? tb_false : tb_true;
 }
 
 tb_bool_t tb_aicp_done(tb_aicp_t* aicp)
 {
-	return TB_FALSE;
+	return tb_false;
 }
 
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)

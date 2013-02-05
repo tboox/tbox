@@ -46,13 +46,13 @@
 #if defined(TB_CONFIG_LIBC_HAVE_STRCPY)
 tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return strcpy(s1, s2);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRCPY)
 tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 {
-	tb_assert_and_check_return_val(s1 && s2, TB_NULL);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 	__tb_register__ tb_char_t* s = s1;
 	if (s1 == s2) return s;

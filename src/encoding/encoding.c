@@ -334,7 +334,7 @@ static tb_encoder_t g_encoders[] =
 {
 	{TB_ENCODING_ASCII, 	0x00000000, 		0x000000ff, tb_encoding_ascii_get_unicode, 		tb_encoding_ascii_set_unicode, 		tb_encoding_ascii_from_unicode, 	tb_encoding_ascii_to_unicode}
 ,	{TB_ENCODING_GB2312, 	0x00003000, 		0x00009f44, tb_encoding_gb2312_get_unicode, 	tb_encoding_gb2312_set_unicode, 	tb_encoding_gb2312_from_unicode, 	tb_encoding_gb2312_to_unicode}
-,	{TB_ENCODING_GBK, 		0x00000000/*0x8040*/, 0x00000000/*0xfefe*/, TB_NULL, 				TB_NULL, 							TB_NULL, 							TB_NULL}
+,	{TB_ENCODING_GBK, 		0x00000000/*0x8040*/, 0x00000000/*0xfefe*/, tb_null, 				tb_null, 							tb_null, 							tb_null}
 ,	{TB_ENCODING_UTF8, 		0x00000000, 		0x0000ffff,	tb_encoding_utf8_get_unicode, 		tb_encoding_utf8_set_unicode,		tb_encoding_utf8_from_unicode, 		tb_encoding_utf8_to_unicode}
 ,	{TB_ENCODING_UNICODE, 	0x00000000, 		0x0000ffff, tb_encoding_unicode_get_unicode, 	tb_encoding_unicode_set_unicode, 	tb_encoding_unicode_from_unicode, 	tb_encoding_unicode_to_unicode}
 };
@@ -351,7 +351,7 @@ tb_encoder_t const* tb_encoding_get_encoder(tb_size_t encoding)
 		tb_assert(encoder->encoding == idx);
 		return encoder;
 	}
-	return TB_NULL;
+	return tb_null;
 }
 tb_size_t tb_encoding_convert_string(tb_size_t src_e, tb_size_t dst_e, tb_byte_t const* src_s, tb_size_t src_n, tb_byte_t* dst_s, tb_size_t dst_n)
 {

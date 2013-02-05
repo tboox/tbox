@@ -35,8 +35,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_rand_t* 		g_rand = TB_NULL;
-static tb_handle_t 		g_mutex = TB_NULL;
+static tb_rand_t* 		g_rand = tb_null;
+static tb_handle_t 		g_mutex = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
  * details
@@ -54,14 +54,14 @@ static __tb_inline__ tb_uint32_t tb_rand_linear_next_uint32(tb_rand_linear_t* ra
 // the global rand
 tb_bool_t tb_rand_init()
 {
-	if (!g_mutex) g_mutex = tb_mutex_init(TB_NULL);
-	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
+	if (!g_mutex) g_mutex = tb_mutex_init(tb_null);
+	tb_assert_and_check_return_val(g_mutex, tb_false);
 
-	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_enter(g_mutex)) return tb_false;
 	if (!g_rand) g_rand = tb_rand_linear_init(TB_RAND_LINEAR_SEED);
-	if (!tb_mutex_leave(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_leave(g_mutex)) return tb_false;
 
-	return g_rand? TB_TRUE : TB_FALSE;
+	return g_rand? tb_true : tb_false;
 }
 tb_void_t tb_rand_exit()
 {
@@ -70,7 +70,7 @@ tb_void_t tb_rand_exit()
 		if (g_rand)
 		{
 			tb_rand_linear_exit(g_rand);
-			g_rand = TB_NULL;
+			g_rand = tb_null;
 		}
 		tb_mutex_leave(g_mutex);
 	}
@@ -78,7 +78,7 @@ tb_void_t tb_rand_exit()
 	if (g_mutex)	
 	{
 		tb_mutex_exit(g_mutex);
-		g_mutex = TB_NULL;
+		g_mutex = tb_null;
 	}
 }
 tb_void_t tb_rand_clear()
@@ -159,7 +159,7 @@ tb_rand_linear_t* tb_rand_linear_init(tb_uint32_t seed)
 {
 	// alloc rand
 	tb_rand_linear_t* rand = tb_malloc0(sizeof(tb_rand_linear_t));
-	tb_assert_and_check_return_val(rand, TB_NULL);
+	tb_assert_and_check_return_val(rand, tb_null);
 
 	// init rand
 	rand->seed = seed;

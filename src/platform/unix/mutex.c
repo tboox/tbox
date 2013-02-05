@@ -37,7 +37,7 @@
 tb_handle_t tb_mutex_init(tb_char_t const* name)
 {
 	pthread_mutex_t* pmutex = malloc(sizeof(pthread_mutex_t));
-	if (!pmutex || 0 != pthread_mutex_init(pmutex, TB_NULL)) return TB_NULL;
+	if (!pmutex || 0 != pthread_mutex_init(pmutex, tb_null)) return tb_null;
 	else return ((tb_handle_t)pmutex);
 }
 tb_void_t tb_mutex_exit(tb_handle_t handle)
@@ -53,15 +53,15 @@ tb_void_t tb_mutex_exit(tb_handle_t handle)
 }
 tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
-	if (0 != pthread_mutex_lock((pthread_mutex_t*)handle)) return TB_FALSE;
-	else return TB_TRUE;
+	if (0 != pthread_mutex_lock((pthread_mutex_t*)handle)) return tb_false;
+	else return tb_true;
 }
 tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
-	tb_assert_and_check_return_val(handle, TB_FALSE);
+	tb_assert_and_check_return_val(handle, tb_false);
 
-	if (0 != pthread_mutex_unlock((pthread_mutex_t*)handle)) return TB_FALSE;
-	else return TB_TRUE;
+	if (0 != pthread_mutex_unlock((pthread_mutex_t*)handle)) return tb_false;
+	else return tb_true;
 }

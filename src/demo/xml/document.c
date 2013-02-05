@@ -20,12 +20,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// init reader & writer
 		tb_handle_t reader = tb_xml_reader_init(ist);
-		tb_handle_t writer = tb_xml_writer_init(ost, TB_FALSE);
+		tb_handle_t writer = tb_xml_writer_init(ost, tb_false);
 		if (reader && writer)
 		{
 #if 0
 			// goto
-			tb_bool_t ok = TB_TRUE;
+			tb_bool_t ok = tb_true;
 			if (argv[3]) ok = tb_xml_reader_goto(reader, argv[3]);
 
 			// load & save;
@@ -48,9 +48,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_xml_node_t* dict = tb_xml_node_goto(root, "/plist/dict");
 
 #if 1
-					tb_xml_node_t* 	prev = TB_NULL;
+					tb_xml_node_t* 	prev = tb_null;
 					tb_xml_node_t* 	node = tb_xml_node_chead(dict);
-					tb_bool_t 		rval = TB_FALSE;
+					tb_bool_t 		rval = tb_false;
 					while (node)
 					{
 						if (node->type == TB_XML_NODE_TYPE_ELEMENT)
@@ -78,7 +78,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 										}
 										
 										// remove value next
-										rval = TB_TRUE;
+										rval = tb_true;
 										continue ;
 									}
 								}
@@ -98,7 +98,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 								}
 								
 								// remove key next
-								rval = TB_FALSE;
+								rval = tb_false;
 								continue ;
 							}
 						}

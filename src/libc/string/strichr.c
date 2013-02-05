@@ -33,7 +33,7 @@
 
 tb_char_t* tb_strichr(tb_char_t const* s, tb_char_t c)
 {
-	tb_assert_and_check_return_val(s, TB_NULL);
+	tb_assert_and_check_return_val(s, tb_null);
 
 	tb_byte_t const* 	p = (tb_byte_t const*)s;
 	tb_byte_t 			b = tb_tolower((tb_byte_t)c);
@@ -45,5 +45,5 @@ tb_char_t* tb_strichr(tb_char_t const* s, tb_char_t c)
 
 	}
 
-	return TB_NULL;
+	return tb_null;
 }

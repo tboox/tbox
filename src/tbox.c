@@ -36,10 +36,10 @@ static tb_bool_t tb_check_word_order()
 
 #ifdef TB_WORDS_BIGENDIAN
 	// is big endian?
-	return (p[0] == 0x12 && p[1] == 0x34)? TB_TRUE : TB_FALSE;
+	return (p[0] == 0x12 && p[1] == 0x34)? tb_true : tb_false;
 #else
 	// is little endian?
-	return (p[0] == 0x34 && p[1] == 0x12)? TB_TRUE : TB_FALSE;
+	return (p[0] == 0x34 && p[1] == 0x12)? tb_true : tb_false;
 #endif
 }
 static tb_bool_t tb_check_double_order()
@@ -55,13 +55,13 @@ static tb_bool_t tb_check_double_order()
 
 # 	ifdef TB_FLOAT_BIGENDIAN
 	// is big endian?
-	return (!conv.i[1] && conv.i[0])? TB_TRUE : TB_FALSE;
+	return (!conv.i[1] && conv.i[0])? tb_true : tb_false;
 # 	else
 	// is little endian?
-	return (!conv.i[0] && conv.i[1])? TB_TRUE : TB_FALSE;
+	return (!conv.i[0] && conv.i[1])? tb_true : tb_false;
 # 	endif
 #else
-	return TB_TRUE;
+	return tb_true;
 #endif
 }
 /* ///////////////////////////////////////////////////////////////////////
@@ -90,19 +90,19 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 	// init memory pool
 #ifdef TB_CONFIG_MEMORY_POOL
-	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return TB_FALSE;
+	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
 #endif
 
 	// init socket
-	if (!tb_socket_init()) return TB_FALSE;
+	if (!tb_socket_init()) return tb_false;
 
 	// init rand
-	if (!tb_rand_init()) return TB_FALSE;
+	if (!tb_rand_init()) return tb_false;
 
 	// ok
 	tb_trace("init: ok");
 
-	return TB_TRUE;
+	return tb_true;
 }
 
 tb_void_t tb_exit()

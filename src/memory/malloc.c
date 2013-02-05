@@ -31,27 +31,27 @@
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_handle_t g_gpool = TB_NULL;
-static tb_handle_t g_mutex = TB_NULL; 
+static tb_handle_t g_gpool = tb_null;
+static tb_handle_t g_mutex = tb_null; 
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
-	tb_assert_and_check_return_val(data && size, TB_FALSE);
+	tb_assert_and_check_return_val(data && size, tb_false);
 
 	// init mutex
-	if (!g_mutex) g_mutex = tb_mutex_init(TB_NULL);
-	tb_assert_and_check_return_val(g_mutex, TB_FALSE);
+	if (!g_mutex) g_mutex = tb_mutex_init(tb_null);
+	tb_assert_and_check_return_val(g_mutex, tb_false);
 
 	// init gpool
-	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_enter(g_mutex)) return tb_false;
 	if (!g_gpool) g_gpool = tb_gpool_init(data, size, align);
-	if (!tb_mutex_leave(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_leave(g_mutex)) return tb_false;
 
 	// ok?
-	return g_gpool? TB_TRUE : TB_FALSE;
+	return g_gpool? tb_true : tb_false;
 }
 tb_void_t tb_memory_exit()
 {
@@ -61,7 +61,7 @@ tb_void_t tb_memory_exit()
 		if (g_gpool)
 		{
 			tb_gpool_exit(g_gpool);
-			g_gpool = TB_NULL;
+			g_gpool = tb_null;
 		}
 		if (g_mutex) tb_mutex_leave(g_mutex);
 	}
@@ -70,7 +70,7 @@ tb_void_t tb_memory_exit()
 	if (g_mutex)	
 	{
 		tb_mutex_exit(g_mutex);
-		g_mutex = TB_NULL;
+		g_mutex = tb_null;
 	}
 }
 
@@ -81,10 +81,10 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
+	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
 #ifndef TB_DEBUG
 	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size);
@@ -107,10 +107,10 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
+	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
 #ifndef TB_DEBUG
 	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size);
@@ -133,10 +133,10 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
+	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
 #ifndef TB_DEBUG
 	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size);
@@ -159,10 +159,10 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
+	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
 #ifndef TB_DEBUG
 	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size);
@@ -185,10 +185,10 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_NULL);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_NULL;
+	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
 #ifndef TB_DEBUG
 	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size);
@@ -211,10 +211,10 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, TB_FALSE);
+	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_false);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return TB_FALSE;
+	if (!tb_mutex_enter(g_mutex)) return tb_false;
 
 #ifndef TB_DEBUG
 	tb_bool_t r = tb_gpool_free_impl(g_gpool, data);

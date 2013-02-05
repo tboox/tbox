@@ -33,8 +33,8 @@
 
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(name, TB_NULL);
-	return (tb_handle_t)LoadLibraryA(name);
+	tb_assert_and_check_return_val(name, tb_null);
+	return (tb_handle_t)LoadLibraryExA(name, tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
 }
 tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 {
@@ -43,6 +43,11 @@ tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
 }
 tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
 {
-	tb_assert_and_check_return_val(dynamic && name, TB_NULL);
+	tb_assert_and_check_return_val(dynamic && name, tb_null);
+	return (tb_pointer_t)GetProcAddress(dynamic, name);
+}
+tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
+{
+	tb_assert_and_check_return_val(dynamic && name, tb_null);
 	return (tb_pointer_t)GetProcAddress(dynamic, name);
 }

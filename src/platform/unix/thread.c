@@ -37,7 +37,7 @@
 tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size)
 {
 	pthread_t handle;
-	if (0 != pthread_create(&handle, NULL, callback, cb_data)) return TB_NULL;
+	if (0 != pthread_create(&handle, NULL, callback, cb_data)) return tb_null;
 	else return ((tb_handle_t)handle);
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)
@@ -55,7 +55,7 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 }
 tb_bool_t tb_thread_kill(tb_handle_t handle)
 {
-	return TB_TRUE;
+	return tb_true;
 }
 tb_void_t tb_thread_return(tb_pointer_t value)
 {
@@ -64,12 +64,12 @@ tb_void_t tb_thread_return(tb_pointer_t value)
 tb_bool_t tb_thread_suspend(tb_handle_t handle)
 {
 	tb_trace_noimpl();
-	return TB_FALSE;
+	return tb_false;
 }
 tb_bool_t tb_thread_resume(tb_handle_t handle)
 {
 	tb_trace_noimpl();
-	return TB_FALSE;
+	return tb_false;
 }
 tb_handle_t tb_thread_self()
 {

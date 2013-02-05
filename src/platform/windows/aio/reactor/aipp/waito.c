@@ -42,26 +42,26 @@ typedef struct __tb_aipp_reactor_waito_t
 static tb_bool_t tb_aipp_reactor_waito_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
 {
 	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aipp && reactor->aipp->hash, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->hdls && reactor->aipp && reactor->aipp->hash, tb_false);
 
 	// check
-	tb_assert_and_check_return_val(tb_hash_size(reactor->aipp->hash) < MAXIMUM_WAIT_OBJECTS, TB_FALSE);
+	tb_assert_and_check_return_val(tb_hash_size(reactor->aipp->hash) < MAXIMUM_WAIT_OBJECTS, tb_false);
 
 	// add hdl
 	tb_vector_insert_tail(rtor->hdls, handle);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_aipp_reactor_waito_seto(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
 {
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_bool_t tb_aipp_reactor_waito_delo(tb_aipp_reactor_t* reactor, tb_handle_t handle)
 {
 	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->hdls, TB_FALSE);
+	tb_assert_and_check_return_val(rtor && rtor->hdls, tb_false);
 
 	// find hdl
 	tb_size_t itor = tb_iterator_head(rtor->hdls);
@@ -71,13 +71,13 @@ static tb_bool_t tb_aipp_reactor_waito_delo(tb_aipp_reactor_t* reactor, tb_handl
 		tb_handle_t hdl = (tb_handle_t)tb_iterator_item(rtor->hdls, itor);
 		if (hdl == handle) break;
 	}
-	tb_assert_and_check_return_val(itor != tail, TB_FALSE);
+	tb_assert_and_check_return_val(itor != tail, tb_false);
 	
 	// del hdl
 	tb_vector_remove(rtor->hdls, itor);
 
 	// ok
-	return TB_TRUE;
+	return tb_true;
 }
 static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
@@ -147,13 +147,13 @@ static tb_void_t tb_aipp_reactor_waito_exit(tb_aipp_reactor_t* reactor)
 static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->maxn, TB_NULL);
-	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE, TB_NULL);
+	tb_assert_and_check_return_val(aipp && aipp->maxn, tb_null);
+	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE, tb_null);
 	tb_assert_static(sizeof(tb_handle_t) == sizeof(HANDLE));
 
 	// alloc reactor
 	tb_aipp_reactor_waito_t* rtor = tb_malloc0(sizeof(tb_aipp_reactor_waito_t));
-	tb_assert_and_check_return_val(rtor, TB_NULL);
+	tb_assert_and_check_return_val(rtor, tb_null);
 
 	// init base
 	rtor->base.aipp = aipp;
@@ -172,6 +172,6 @@ static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 
 fail:
 	if (rtor) tb_aipp_reactor_waito_exit(rtor);
-	return TB_NULL;
+	return tb_null;
 }
 

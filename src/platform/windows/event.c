@@ -34,8 +34,8 @@
 
 tb_handle_t tb_event_init(tb_char_t const* name)
 {
-	HANDLE handle = CreateEvent(TB_NULL, FALSE, FALSE, name);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : TB_NULL);
+	HANDLE handle = CreateEvent(tb_null, FALSE, FALSE, name);
+	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {

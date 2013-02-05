@@ -43,13 +43,13 @@ tb_handle_t tb_event_init(tb_char_t const* name)
 
 	// init semaphore
 	tb_long_t h = semget((key_t)k, 1, IPC_CREAT | IPC_EXCL | 0666);
-	tb_assert_and_check_return_val(h >= 0 || errno == EEXIST, TB_NULL);
+	tb_assert_and_check_return_val(h >= 0 || errno == EEXIST, tb_null);
 
 	// exists?
 	if (errno == EEXIST)
 	{
 		h = semget((key_t)k, 1, 0);
-		tb_assert_and_check_return_val(h >= 0, TB_NULL);
+		tb_assert_and_check_return_val(h >= 0, tb_null);
 	}
 
 ok:
@@ -103,7 +103,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 	sb.sem_flg = SEM_UNDO;
 
 	// wait semaphore
-	tb_long_t r = semtimedop(h, &sb, 1, timeout >= 0? &t : TB_NULL);
+	tb_long_t r = semtimedop(h, &sb, 1, timeout >= 0? &t : tb_null);
 
 	// ok?
     tb_check_return_val(r, 1);

@@ -60,33 +60,33 @@ end:
  */
 tb_tstream_t* tb_tstream_cast(tb_gstream_t* gst)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_TRAN, TB_NULL);
+	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_TRAN, tb_null);
 	return (tb_tstream_t*)gst;
 }
 tb_bool_t tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst, TB_FALSE);
+	tb_assert_and_check_return_val(tst, tb_false);
 
 	switch (cmd)
 	{
 	case TB_TSTREAM_CMD_GET_GSTREAM:
 		{
 			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(args, tb_gstream_t**);
-			tb_assert_and_check_return_val(pgst, TB_FALSE);
+			tb_assert_and_check_return_val(pgst, tb_false);
 			*pgst = tst->gst;
-			return TB_TRUE;
+			return tb_true;
 		}
 	case TB_TSTREAM_CMD_SET_GSTREAM:
 		{
 			tst->gst = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
-			tb_assert_and_check_return_val(tst->gst, TB_FALSE);
-			return TB_TRUE;
+			tb_assert_and_check_return_val(tst->gst, tb_false);
+			return tb_true;
 		}
 	default:
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 tb_long_t tb_tstream_aopen(tb_gstream_t* gst)
 {
@@ -139,7 +139,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 		// flush data?
 		if (sync)
 		{
-			tb_long_t r = tb_gstream_afread(tst->gst, TB_NULL, 0);
+			tb_long_t r = tb_gstream_afread(tst->gst, tb_null, 0);
 			tb_check_return_val(r < 0, r);
 		}
 
@@ -219,7 +219,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 	// spak it
 	tb_long_t r = 0;
 	tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
-	while ((r = tst->spak(gst, tst->read < 0? TB_TRUE : sync)) > 0) ;
+	while ((r = tst->spak(gst, tst->read < 0? tb_true : sync)) > 0) ;
 	tb_trace_impl("spak: %u", tst->on);
 
 	// continue to read the output data
@@ -253,7 +253,7 @@ end:
 tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst, TB_NULL);
+	tb_assert_and_check_return_val(tst, tb_null);
 
 	if (tst->read > 0) return etype;
 	else if (!tst->read) 

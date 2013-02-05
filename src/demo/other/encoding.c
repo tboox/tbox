@@ -12,14 +12,14 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 {
 	tb_handle_t hfile = tb_file_init(path, TB_FILE_RO);
 
-	tb_byte_t* p = TB_NULL;
+	tb_byte_t* p = tb_null;
 	if (hfile)
 	{
 		tb_hong_t file_size = tb_file_size(hfile);
 		if  (file_size <= 0) return 0;
 		
 		p = (tb_byte_t*)tb_malloc(file_size + 1);
-		if (!p) return TB_NULL;
+		if (!p) return tb_null;
 
 		tb_hong_t read_n = 0;
 		while (read_n < file_size) 
@@ -32,7 +32,7 @@ static tb_char_t* load(tb_char_t const* path, tb_size_t* size)
 		if (read_n < file_size) 
 		{
 			tb_free(p);
-			return TB_NULL;
+			return tb_null;
 		}
 		p[read_n] = 0;
 		if (size) *size = read_n;

@@ -9,8 +9,7 @@ NAMES = \
 		url \
 		crc \
 		md5 \
-		sha \
-		time
+		sha
 
 include $(SRC_DIR)/demo/makefile
 

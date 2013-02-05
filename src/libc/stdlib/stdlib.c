@@ -208,22 +208,22 @@ tb_uint32_t tb_sbtou32(tb_char_t const* s, tb_int_t base)
 	typedef tb_uint32_t (*tb_t)(tb_char_t const*);
 	tb_t convs[] =
 	{
-		TB_NULL
-	, 	TB_NULL
+		tb_null
+	, 	tb_null
 	,	tb_s2tou32
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_s8tou32
-	, 	TB_NULL
+	, 	tb_null
 	, 	tb_s10tou32
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_s16tou32
 	};
 	tb_assert(base < tb_arrayn(convs));
@@ -619,22 +619,22 @@ tb_float_t tb_sbtof(tb_char_t const* s, tb_int_t base)
 	typedef tb_float_t (*tb_t)(tb_char_t const*);
 	tb_t convs[] =
 	{
-		TB_NULL
-	, 	TB_NULL
+		tb_null
+	, 	tb_null
 	,	tb_s2tof
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_s8tof
-	, 	TB_NULL
+	, 	tb_null
 	, 	tb_s10tof
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
-	, 	TB_NULL
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
 	, 	tb_s16tof
 	};
 	tb_assert(base < tb_arrayn(convs));

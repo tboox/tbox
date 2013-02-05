@@ -35,14 +35,14 @@
  */
 
 // bool values
-#define TB_TRUE						((tb_bool_t)1)
-#define	TB_FALSE					((tb_bool_t)0)
+#define tb_true						((tb_bool_t)1)
+#define	tb_false					((tb_bool_t)0)
 
 // null
 #ifdef __cplusplus
-# 	define TB_NULL 					(0)
+# 	define tb_null 					(0)
 #else
-# 	define TB_NULL 					((tb_pointer_t)0)
+# 	define tb_null 					((tb_pointer_t)0)
 #endif
 
 // check config

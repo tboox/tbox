@@ -745,16 +745,16 @@ static tb_int_t tb_printf_entry(tb_char_t const* fmt, tb_printf_entry_t* e)
 	e->flags = TB_PRINTF_FLAG_NONE;
 	while (1)
 	{
-		tb_bool_t is_found = TB_TRUE;
+		tb_bool_t is_found = tb_true;
 		switch (*p)
 		{
 		case '+': e->flags |= TB_PRINTF_FLAG_PLUS; break;
 		case '-': e->flags |= TB_PRINTF_FLAG_LEFT; break;
 		case '0': e->flags |= TB_PRINTF_FLAG_ZERO; break;
 		case '#': e->flags |= TB_PRINTF_FLAG_PFIX; break;
-		default: is_found = TB_FALSE; break;
+		default: is_found = tb_false; break;
 		}
-		if (is_found == TB_FALSE) break;
+		if (is_found == tb_false) break;
 		else ++p;
 	}
 

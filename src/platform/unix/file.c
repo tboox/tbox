@@ -51,7 +51,7 @@
  */
 static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path)
 {
-	tb_assert_and_check_return_val(path, TB_NULL);
+	tb_assert_and_check_return_val(path, tb_null);
 
 	return (!tb_strnicmp(path, "file://", 7))? (path + 7) : path;
 }
@@ -62,7 +62,7 @@ static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path)
 // file
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 {
-	tb_assert_and_check_return_val(path, TB_NULL);
+	tb_assert_and_check_return_val(path, tb_null);
 
 	// path => unix
 	path = tb_file_path_to_unix(path);
@@ -93,12 +93,12 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 	tb_long_t fd = open(path, flag, mode);
 
 	// ok?
-	return (fd < 0)? TB_NULL : ((tb_handle_t)(fd + 1));
+	return (fd < 0)? tb_null : ((tb_handle_t)(fd + 1));
 }
 tb_bool_t tb_file_exit(tb_handle_t hfile)
 {
-	tb_assert_and_check_return_val(hfile, TB_FALSE);
-	return !close((tb_long_t)hfile - 1)? TB_TRUE : TB_FALSE;
+	tb_assert_and_check_return_val(hfile, tb_false);
+	return !close((tb_long_t)hfile - 1)? tb_true : tb_false;
 }
 tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
@@ -120,13 +120,13 @@ tb_void_t tb_file_sync(tb_handle_t hfile)
 }
 tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
 {
-	tb_assert_and_check_return_val(hfile, TB_FALSE);
+	tb_assert_and_check_return_val(hfile, tb_false);
 
-	return (offset == lseek((tb_long_t)hfile - 1, offset, SEEK_SET))? TB_TRUE : TB_FALSE;
+	return (offset == lseek((tb_long_t)hfile - 1, offset, SEEK_SET))? tb_true : tb_false;
 }
 tb_bool_t tb_file_skip(tb_handle_t hfile, tb_hize_t size)
 {
-	return (lseek((tb_long_t)hfile - 1, size, SEEK_CUR) >= 0)? TB_TRUE : TB_FALSE;
+	return (lseek((tb_long_t)hfile - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
 }
 tb_hize_t tb_file_size(tb_handle_t hfile)
 {
@@ -137,13 +137,13 @@ tb_hize_t tb_file_size(tb_handle_t hfile)
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// path => unix
 	path = tb_file_path_to_unix(path);
 
 	// exists?
-	tb_check_return_val(!access(path, F_OK), TB_FALSE);
+	tb_check_return_val(!access(path, F_OK), tb_false);
 
 	// get info
 	if (info)
@@ -163,11 +163,11 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 			info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 		}
 	}
-	return TB_TRUE;
+	return tb_true;
 }
 tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 {
-	tb_assert_and_check_return_val(path, TB_FALSE);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// path => unix
 	path = tb_file_path_to_unix(path);
@@ -176,21 +176,21 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
-		return !mkdir(path, S_IRWXU)? TB_TRUE : TB_FALSE;
+		return !mkdir(path, S_IRWXU)? tb_true : tb_false;
 	case TB_FILE_TYPE_FILE:
 		{
 			tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
 			if (fd >= 0) 
 			{
 				close(fd); 
-				return TB_TRUE;
+				return tb_true;
 			}
 		}
 		break;
 	default:
 		break;
 	}
-	return TB_FALSE;
+	return tb_false;
 }
 tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
 {

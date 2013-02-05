@@ -193,8 +193,8 @@ tb_size_t tb_bstream_left_bits(tb_bstream_t* bst)
 }
 tb_bool_t tb_bstream_valid(tb_bstream_t* bst)
 {
-	if (!bst || !bst->p || !bst->e || !bst->n || bst->p > bst->e) return TB_FALSE;
-	return TB_TRUE;
+	if (!bst || !bst->p || !bst->e || !bst->n || bst->p > bst->e) return tb_false;
+	return tb_true;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * skip
@@ -510,7 +510,7 @@ tb_char_t const* tb_bstream_get_string(tb_bstream_t* bst)
 	while (*p && p < bst->e) p++;
 
 	// is string with '\0' ?
-	if ((*p)) return TB_NULL;
+	if ((*p)) return tb_null;
 
 	tb_char_t const* s = (tb_char_t const*)bst->p;
 	bst->p += p - bst->p + 1;

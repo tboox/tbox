@@ -21,7 +21,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		if (reader)
 		{
 			// goto
-			tb_bool_t ok = TB_TRUE;
+			tb_bool_t ok = tb_true;
 			if (argv[2]) ok = tb_xml_reader_goto(reader, argv[2]);
 
 			// walk

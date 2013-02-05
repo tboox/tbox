@@ -10,7 +10,7 @@
 static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_aioo_t* oo, tb_byte_t* data, tb_size_t size)
 {
 	tb_size_t writ = 0;
-	tb_bool_t wait = TB_FALSE;
+	tb_bool_t wait = tb_false;
 	while (writ < size)
 	{
 		// try to writ data
@@ -21,7 +21,7 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_aioo_t* oo, tb_byte_t* 
 			writ += n;
 
 			// no waiting
-			wait = TB_FALSE;
+			wait = tb_false;
 		}
 		else if (!n && !wait)
 		{
@@ -38,11 +38,11 @@ static tb_bool_t tb_test_file_writ(tb_handle_t ofile, tb_aioo_t* oo, tb_byte_t* 
 			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_WRIT);
 
 			// be waiting
-			wait = TB_TRUE;
+			wait = tb_true;
 		}
 		else break;
 	}
-	return writ == size? TB_TRUE : TB_FALSE;
+	return writ == size? tb_true : tb_false;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * main
@@ -63,13 +63,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init aio
 	tb_aioo_t io;
 	tb_aioo_t oo;
-	tb_aioo_seto(&io, ifile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_READ, TB_NULL);
-	tb_aioo_seto(&oo, ofile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT, TB_NULL);
+	tb_aioo_seto(&io, ifile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_READ, tb_null);
+	tb_aioo_seto(&oo, ofile, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT, tb_null);
 
 	// read file
 	tb_byte_t 	data[4096];
 	tb_hize_t read = 0;
-	tb_bool_t 	wait = TB_FALSE;
+	tb_bool_t 	wait = tb_false;
 	while (1)//read < isize)
 	{
 		// try to read data
@@ -83,7 +83,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			read += n;
 
 			// no waiting
-			wait = TB_FALSE;
+			wait = tb_false;
 		}
 		else if (!n)
 		{
@@ -116,7 +116,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_READ);
 
 			// be waiting
-			wait = TB_TRUE;
+			wait = tb_true;
 		}
 		else break;
 	}

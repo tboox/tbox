@@ -94,20 +94,20 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * @code
  * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
- * 		tb_assert_and_check_return_val(stack && bdel, TB_FALSE);
+ * 		tb_assert_and_check_return_val(stack && bdel, tb_false);
  *
  * 		// is tail?
  * 		if (!item) ;
  *
  * 		// delete it?
- * 		// *bdel = TB_TRUE;
+ * 		// *bdel = tb_true;
  *
  * 		// ok
- * 		return TB_TRUE;
+ * 		return tb_true;
  *
  * fail:
  * 		// break
- * 		return TB_FALSE;
+ * 		return tb_false;
  * }
  * @endcode
  *

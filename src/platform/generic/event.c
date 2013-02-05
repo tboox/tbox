@@ -33,7 +33,7 @@ tb_handle_t tb_event_init(tb_char_t const* name)
 {
 	// alloc
 	tb_size_t* e = tb_malloc0(sizeof(tb_size_t));
-	tb_assert_and_check_return_val(e, TB_NULL);
+	tb_assert_and_check_return_val(e, tb_null);
 
 	// warning
 	tb_warning("the event impl maybe not fast");
@@ -43,7 +43,7 @@ tb_handle_t tb_event_init(tb_char_t const* name)
 
 fail:
 	if (e) tb_free(e);
-	return TB_NULL;
+	return tb_null;
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
