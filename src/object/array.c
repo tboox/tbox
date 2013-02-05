@@ -219,19 +219,15 @@ end:
 }
 static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
 {
-	// check
-	tb_array_t* array = tb_array_cast(object);
-	tb_assert_and_check_return_val(array, tb_false);
-
 	// writ
-	if (tb_array_size(array))
+	if (tb_array_size(object))
 	{
 		// writ beg
 		tb_object_writ_tab(gst, level);
 		tb_gstream_printf(gst, "<array>\n");
 
 		// walk
-		tb_iterator_t* 	iterator = tb_array_itor(array);
+		tb_iterator_t* 	iterator = tb_array_itor(object);
 		tb_size_t 		itor = tb_iterator_head(iterator);
 		tb_size_t 		tail = tb_iterator_tail(iterator);
 		for (; itor != tail; itor = tb_iterator_next(iterator, itor))

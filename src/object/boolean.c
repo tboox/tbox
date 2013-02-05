@@ -89,13 +89,9 @@ static tb_object_t* tb_boolean_read_xml(tb_handle_t reader, tb_size_t event)
 }
 static tb_bool_t tb_boolean_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
 {
-	// check
-	tb_boolean_t* boolean = tb_boolean_cast(object);
-	tb_assert_and_check_return_val(boolean, tb_false);
-
 	// writ
 	tb_object_writ_tab(gst, level);
-	tb_gstream_printf(gst, "<%s/>\n", boolean->value? "true" : "false");
+	tb_gstream_printf(gst, "<%s/>\n", tb_boolean_bool(object)? "true" : "false");
 
 	// ok
 	return tb_true;

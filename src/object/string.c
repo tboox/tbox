@@ -121,7 +121,12 @@ static tb_object_t* tb_string_read_xml(tb_handle_t reader, tb_size_t event)
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
-				if (!tb_stricmp(name, "string")) goto end;
+				if (!tb_stricmp(name, "string"))
+				{
+					// empty?
+					if (!string) string = tb_string_init_from_cstr(tb_null);
+					goto end;
+				}
 			}
 			break;
 		case TB_XML_READER_EVENT_TEXT: 
@@ -148,14 +153,10 @@ end:
 }
 static tb_bool_t tb_string_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
 {
-	// check
-	tb_string_t* string = tb_string_cast(object);
-	tb_assert_and_check_return_val(string, tb_false);
-
 	// writ
 	tb_object_writ_tab(gst, level);
-	if (tb_pstring_size(&string->pstr))
-		tb_gstream_printf(gst, "<string>%s</string>\n", tb_pstring_cstr(&string->pstr));
+	if (tb_string_size(object))
+		tb_gstream_printf(gst, "<string>%s</string>\n", tb_string_cstr(object));
 	else tb_gstream_printf(gst, "<string/>\n");
 
 	// ok

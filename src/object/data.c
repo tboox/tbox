@@ -122,7 +122,12 @@ static tb_object_t* tb_data_read_xml(tb_handle_t reader, tb_size_t event)
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
-				if (!tb_stricmp(name, "data")) goto end;
+				if (!tb_stricmp(name, "data"))
+				{
+					// empty?
+					if (!data) data = tb_data_init_from_data(tb_null, 0);
+					goto end;
+				}
 			}
 			break;
 		case TB_XML_READER_EVENT_TEXT: 
@@ -168,20 +173,16 @@ end:
 }
 static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
 {
-	// check
-	tb_data_t* data = tb_data_cast(object);
-	tb_assert_and_check_return_val(data, tb_false);
-
 	// no empty?
-	if (tb_data_size(data))
+	if (tb_data_size(object))
 	{
 		// writ beg
 		tb_object_writ_tab(gst, level);
 		tb_gstream_printf(gst, "<data>\n");
 
 		// decode base64 data
-		tb_byte_t const* 	ib = tb_data_addr(data);
-		tb_size_t 			in = tb_data_size(data); 
+		tb_byte_t const* 	ib = tb_data_addr(object);
+		tb_size_t 			in = tb_data_size(object); 
 		tb_size_t 			on = in << 1;
 		tb_char_t* 			ob = tb_malloc0(on);
 		tb_assert_and_check_return_val(ob && on, tb_false);
