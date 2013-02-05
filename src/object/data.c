@@ -23,10 +23,15 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"object"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "object.h"
-#include "../memory/memory.h"
+#include "../utils/utils.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -94,10 +99,138 @@ fail:
 	if (data) tb_free(data);
 	return tb_null;
 }
+static tb_object_t* tb_data_read_xml(tb_handle_t reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && event, tb_null);
 
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_data_init_from_data(tb_null, 0);
+
+	// walk
+	tb_char_t* 		base64 	= tb_null;
+	tb_object_t* 	data 	= tb_null;
+	while (event = tb_xml_reader_next(reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "data")) goto end;
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_impl("data: %s", text);
+
+				// base64
+				base64 = tb_strdup(text);
+				tb_char_t* p = base64;
+				tb_char_t* q = p;
+				for (; *p; p++) if (!tb_isspace(*p)) *q++ = *p;
+				*q = '\0';
+
+				// decode base64 data
+				tb_char_t const* 	ib = base64;
+				tb_size_t 			in = tb_strlen(base64); 
+				tb_size_t 			on = in;
+				tb_byte_t* 			ob = tb_malloc0(on);
+				tb_assert_and_check_goto(ob && on, end);
+				on = tb_base64_decode(ib, in, ob, on);
+				tb_trace_impl("base64: %u => %u", in, on);
+				
+				// init data
+				data = tb_data_init_from_data(ob, on); tb_free(ob);
+				tb_assert_and_check_goto(data, end);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// free
+	if (base64) tb_free(base64);
+
+	// ok?
+	return data;
+}
+static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+{
+	// check
+	tb_data_t* data = tb_data_cast(object);
+	tb_assert_and_check_return_val(data, tb_false);
+
+	// no empty?
+	if (tb_data_size(data))
+	{
+		// writ beg
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<data>\n");
+
+		// decode base64 data
+		tb_byte_t const* 	ib = tb_data_addr(data);
+		tb_size_t 			in = tb_data_size(data); 
+		tb_size_t 			on = in << 1;
+		tb_char_t* 			ob = tb_malloc0(on);
+		tb_assert_and_check_return_val(ob && on, tb_false);
+		on = tb_base64_encode(ib, in, ob, on);
+		tb_trace_impl("base64: %u => %u", in, on);
+
+		// writ data
+		tb_char_t const* 	p = ob;
+		tb_char_t const* 	e = ob + on;
+		tb_size_t 			n = 0;
+		for (; p < e && *p; p++, n++)
+		{
+			if (!(n & 63))
+			{
+				if (n) tb_gstream_printf(gst, "\n");
+				tb_object_writ_tab(gst, level);
+			}
+			else tb_gstream_printf(gst, "%c", *p);
+		}
+		tb_gstream_printf(gst, "\n");
+
+		// free it
+		tb_free(ob);
+					
+		// writ end
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "</data>\n");
+	}
+	else 
+	{
+		// writ
+		tb_object_writ_tab(gst, level);
+		tb_gstream_printf(gst, "<data/>\n");
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+tb_bool_t tb_data_init_reader()
+{
+	return tb_object_set_xml_reader("data", tb_data_read_xml);
+}
+tb_bool_t tb_data_init_writer()
+{
+	return tb_object_set_xml_writer(TB_OBJECT_TYPE_DATA, tb_data_writ_xml);
+}
 tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 {
 	// make

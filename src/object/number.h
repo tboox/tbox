@@ -54,6 +54,18 @@ typedef enum __tb_number_type_e
  * interfaces
  */
 
+/*! init number reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_init_reader();
+
+/*! init number writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_init_writer();
+
 /*! init number from uint8
  *
  * @param value 	the value

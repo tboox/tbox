@@ -33,6 +33,18 @@
  * interfaces
  */
 
+/*! init array reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_array_init_reader();
+
+/*! init array writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_array_init_writer();
+
 /*! init array
  *
  * @param grow		the array grow
@@ -68,7 +80,7 @@ tb_object_t* 		tb_array_item(tb_object_t* array, tb_size_t index);
  * tb_iterator_t* 	iterator = tb_array_itor(array);
  * tb_size_t 		itor = tb_iterator_head(iterator);
  * tb_size_t 		tail = tb_iterator_tail(iterator);
- * for (; itor !- tail; itor = tb_iterator_next(iterator, itor))
+ * for (; itor != tail; itor = tb_iterator_next(iterator, itor))
  * {
  * 		tb_object_t* item = tb_iterator_item(iterator, itor);
  * 		if (item)

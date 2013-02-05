@@ -61,6 +61,18 @@ typedef struct __tb_dictionary_item_t
  * interfaces
  */
 
+/*! init dictionary reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_dictionary_init_reader();
+
+/*! init dictionary writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_dictionary_init_writer();
+
 /*! init dictionary
  *
  * @param size			the dictionary size
