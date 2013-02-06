@@ -55,6 +55,12 @@ tbox_C_FILES 			+= \
 						stream/gstream/tstream/null \
 						stream/gstream/tstream/zip \
 						stream/gstream/tstream/encoding \
+						object/object \
+						object/data \
+						object/array \
+						object/string \
+						object/number \
+						object/boolean \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -282,6 +288,14 @@ INC_FILES 				= \
 						stream/stream.h \
 						stream/bstream.h \
 						stream/gstream.h \
+						object/prefix.h \
+						object/object.h \
+						object/data.h \
+						object/array.h \
+						object/number.h \
+						object/string.h \
+						object/boolean.h \
+						object/dictionary.h \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \
