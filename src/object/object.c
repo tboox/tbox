@@ -257,15 +257,20 @@ tb_void_t tb_object_dump(tb_object_t* object)
 	// desc
 	if (tb_object_desc(object, data, maxn)) 
 	{
-		tb_char_t const* 	p = data;
+		tb_char_t const* 	p = tb_strstr(data, "?>");
 		tb_char_t 			b[4096 + 1];
-		while (*p)
+		if (p)
 		{
-			tb_char_t* 			q = b;
-			tb_char_t const* 	d = b + 4096;
-			for (; q < d && *p; p++, q++) *q = *p;
-			*q = '\0';
-			tb_printf("%s", b);
+			p += 2;
+			while (*p && tb_isspace(*p)) p++;
+			while (*p)
+			{
+				tb_char_t* 			q = b;
+				tb_char_t const* 	d = b + 4096;
+				for (; q < d && *p; p++, q++) *q = *p;
+				*q = '\0';
+				tb_printf("%s", b);
+			}
 		}
 	}
 
