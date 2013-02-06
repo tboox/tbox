@@ -184,7 +184,11 @@ static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
 				tb_object_t* object = func(reader, event);
 
 				// append object
-				if (array && object) tb_array_append(array, object);
+				if (array && object) 
+					tb_array_append(array, object);
+
+				// refn--
+				if (object) tb_object_dec(object);
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 

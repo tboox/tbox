@@ -202,6 +202,9 @@ static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
 					if (tb_sstring_size(&kname) && dictionary) 
 						tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), object);
 
+					// refn--
+					if (object) tb_object_dec(object);
+
 					// clear key name
 					tb_sstring_clear(&kname);
 				}
