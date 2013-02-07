@@ -142,8 +142,8 @@ typedef struct __tb_xml_document_t
 	// the version
 	tb_pstring_t 				version;
 
-	// the encoding 
-	tb_pstring_t 				encoding;
+	// the charset 
+	tb_pstring_t 				charset;
 
 }tb_xml_document_t;
 

@@ -183,8 +183,8 @@ tb_xml_node_t* 			tb_xml_reader_load(tb_handle_t reader);
 /// version
 tb_char_t const* 		tb_xml_reader_version(tb_handle_t reader);
 
-/// encoding, default: utf-8
-tb_char_t const* 		tb_xml_reader_encoding(tb_handle_t reader);
+/// charset, default: utf-8
+tb_char_t const* 		tb_xml_reader_charset(tb_handle_t reader);
 
 /// element
 tb_char_t const* 		tb_xml_reader_element(tb_handle_t reader);

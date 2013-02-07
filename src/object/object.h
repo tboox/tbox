@@ -87,6 +87,22 @@ tb_void_t 			tb_object_exit(tb_object_t* object);
  */
 tb_void_t 			tb_object_cler(tb_object_t* object);
 
+/*! set the object private data
+ *
+ * @param object 	the object pointer
+ * @param priv 		the private data
+ *
+ */
+tb_void_t 			tb_object_setp(tb_object_t* object, tb_cpointer_t priv);
+
+/*! get the object private data
+ *
+ * @param object 	the object pointer
+ *
+ * @return 			the private data
+ */
+tb_cpointer_t 		tb_object_getp(tb_object_t* object);
+
 /*! read object
  *
  * @param gst 		the stream

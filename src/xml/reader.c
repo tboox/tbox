@@ -31,7 +31,7 @@
  * includes
  */
 #include "reader.h"
-#include "../encoding/encoding.h"
+#include "../charset/charset.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -64,8 +64,8 @@ typedef struct __tb_xml_reader_t
 	// the version
 	tb_pstring_t 			version;
 
-	// the encoding
-	tb_pstring_t 			encoding;
+	// the charset
+	tb_pstring_t 			charset;
 
 	// the element
 	tb_pstring_t 			element;
@@ -144,12 +144,12 @@ tb_handle_t tb_xml_reader_init(tb_gstream_t* gst)
 
 	// init string
 	tb_pstring_init(&reader->version);
-	tb_pstring_init(&reader->encoding);
+	tb_pstring_init(&reader->charset);
 	tb_pstring_init(&reader->element);
 	tb_pstring_init(&reader->name);
 	tb_pstring_init(&reader->text);
 	tb_pstring_cstrcpy(&reader->version, "2.0");
-	tb_pstring_cstrcpy(&reader->encoding, "utf-8");
+	tb_pstring_cstrcpy(&reader->charset, "utf-8");
 
 	// init attributes
 	tb_size_t i = 0;
@@ -175,8 +175,8 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
 		// exit version
 		tb_pstring_exit(&xreader->version);
 
-		// exit encoding
-		tb_pstring_exit(&xreader->encoding);
+		// exit charset
+		tb_pstring_exit(&xreader->charset);
 
 		// exit element
 		tb_pstring_exit(&xreader->element);
@@ -265,7 +265,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 			tb_char_t const* element = tb_xml_reader_element_parse(xreader);
 			tb_assert_and_check_break(element);
 
-			// is document begin: <?xml version="..." encoding=".." ?>
+			// is document begin: <?xml version="..." charset=".." ?>
 			tb_size_t size = tb_pstring_size(&xreader->element);
 			if (size > 4 && !tb_strnicmp(element, "?xml", 4))
 			{
@@ -275,30 +275,30 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				// remove ?xml
 				tb_pstring_cstrncpy(&xreader->element, element + 4, size - 4);
 
-				// update version & encoding
+				// update version & charset
 				tb_xml_node_t const* attr = tb_xml_reader_attributes(reader);	
 				for (; attr; attr = attr->next)
 				{
 					if (!tb_pstring_cstricmp(&attr->name, "version")) tb_pstring_strcpy(&xreader->version, &attr->data);
-					if (!tb_pstring_cstricmp(&attr->name, "encoding")) tb_pstring_strcpy(&xreader->encoding, &attr->data);
+					if (!tb_pstring_cstricmp(&attr->name, "encoding")) tb_pstring_strcpy(&xreader->charset, &attr->data);
 				}
 
 				// transform stream => utf-8
-				if (tb_pstring_cstricmp(&xreader->encoding, "utf-8") && tb_pstring_cstricmp(&xreader->encoding, "utf8"))
+				if (tb_pstring_cstricmp(&xreader->charset, "utf-8") && tb_pstring_cstricmp(&xreader->charset, "utf8"))
 				{
-					// encoding
-					tb_size_t encoding = TB_ENCODING_UTF8;
-					if (!tb_pstring_cstricmp(&xreader->encoding, "gb2312") || !tb_pstring_cstricmp(&xreader->encoding, "gbk")) 
-						encoding = TB_ENCODING_GB2312;
-					else tb_trace_impl("the encoding: %s is not supported", tb_pstring_cstr(&xreader->encoding));
+					// charset
+					tb_size_t charset = TB_CHARSET_TYPE_UTF8;
+					if (!tb_pstring_cstricmp(&xreader->charset, "gb2312") || !tb_pstring_cstricmp(&xreader->charset, "gbk")) 
+						charset = TB_CHARSET_TYPE_GB2312;
+					else tb_trace_impl("the charset: %s is not supported", tb_pstring_cstr(&xreader->charset));
 
 					// init transform stream
-					if (encoding != TB_ENCODING_UTF8)
+					if (charset != TB_CHARSET_TYPE_UTF8)
 					{
-						xreader->tstream = tb_gstream_init_from_encoding(xreader->istream, encoding, TB_ENCODING_UTF8);
+						xreader->tstream = tb_gstream_init_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
 						if (xreader->tstream && tb_gstream_bopen(xreader->tstream))
 							xreader->rstream = xreader->tstream;
-						tb_pstring_cstrcpy(&xreader->encoding, "utf-8");
+						tb_pstring_cstrcpy(&xreader->charset, "utf-8");
 					}
 				}
 			}
@@ -521,7 +521,7 @@ tb_xml_node_t* tb_xml_reader_load(tb_handle_t reader)
 		// init document node
 		if (!node)
 		{
-			node = tb_xml_node_init_document(tb_xml_reader_version(reader), tb_xml_reader_encoding(reader));
+			node = tb_xml_node_init_document(tb_xml_reader_version(reader), tb_xml_reader_charset(reader));
 			tb_assert_and_check_goto(node && !node->parent, fail);
 		}
 
@@ -635,13 +635,13 @@ tb_char_t const* tb_xml_reader_version(tb_handle_t reader)
 	// text
 	return tb_pstring_cstr(&xreader->version);
 }
-tb_char_t const* tb_xml_reader_encoding(tb_handle_t reader)
+tb_char_t const* tb_xml_reader_charset(tb_handle_t reader)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
 	tb_assert_and_check_return_val(xreader, tb_null);
 
 	// text
-	return tb_pstring_cstr(&xreader->encoding);
+	return tb_pstring_cstr(&xreader->charset);
 }
 tb_char_t const* tb_xml_reader_comment(tb_handle_t reader)
 {

@@ -89,6 +89,9 @@ typedef struct __tb_object_t
 	/// the object reference count
 	tb_size_t 				refn;
 
+	/// the object private data
+	tb_cpointer_t 			priv;
+
 	/// the copy func
 	struct __tb_object_t* 	(*copy)(struct __tb_object_t* object);
 

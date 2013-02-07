@@ -106,6 +106,7 @@ static tb_boolean_t const g_boolean_true =
 	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
 ,	TB_OBJECT_TYPE_BOOLEAN
 , 	1
+, 	tb_null
 , 	tb_boolean_copy
 , 	tb_null
 , 	tb_null
@@ -119,6 +120,7 @@ static tb_boolean_t const g_boolean_false =
 	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
 ,	TB_OBJECT_TYPE_BOOLEAN
 , 	1
+, 	tb_null
 , 	tb_boolean_copy
 , 	tb_null
 , 	tb_null

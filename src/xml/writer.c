@@ -31,7 +31,7 @@
  * includes
  */
 #include "writer.h"
-#include "../encoding/encoding.h"
+#include "../charset/charset.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -129,7 +129,7 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 		{
 			// document
 			tb_xml_document_t* document = (tb_xml_document_t*)node;
-			tb_xml_writer_document(writer, tb_pstring_cstr(&document->version), tb_pstring_cstr(&document->encoding));
+			tb_xml_writer_document(writer, tb_pstring_cstr(&document->version), tb_pstring_cstr(&document->charset));
 
 			// childs
 			tb_xml_node_t* next = node->chead;
@@ -199,12 +199,12 @@ tb_void_t tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node)
 		break;
 	}
 }
-tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* encoding)
+tb_void_t tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* charset)
 {
 	tb_xml_writer_t* xwriter = (tb_xml_writer_t*)writer;
 	tb_assert_and_check_return(xwriter && xwriter->wstream);
 
-	tb_gstream_printf(xwriter->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", encoding? encoding : "utf-8");
+	tb_gstream_printf(xwriter->wstream, "<?xml version=\"%s\" encoding=\"%s\"?>", version? version : "2.0", charset? charset : "utf-8");
 	if (xwriter->bformat) tb_gstream_printf(xwriter->wstream, "\n");
 }
 tb_void_t tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type)

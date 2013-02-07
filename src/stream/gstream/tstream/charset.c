@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		estream.c
+ * @file		cstream.c
  *
  */
 /* ///////////////////////////////////////////////////////////////////////
@@ -25,71 +25,73 @@
  */
 #include "prefix.h"
 #include "tstream.h"
-#include "../../../encoding/encoding.h"
+#include "../../../charset/charset.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the encoding stream type
-typedef struct __tb_estream_t
+// the charset stream type
+typedef struct __tb_cstream_t
 {
 	// the stream base
 	tb_tstream_t 			base;
 
-	// the encoder
-	tb_encoder_t const* 	ic;
-	tb_encoder_t const* 	oc;
+	// the from type
+	tb_size_t 				ftype;
 
-}tb_estream_t;
+	// the to type
+	tb_size_t 				ttype;
+
+}tb_cstream_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implements
  */
 
-static __tb_inline__ tb_estream_t* tb_estream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_cstream_t* tb_cstream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ENCODING, tb_null);
-	return (tb_estream_t*)tst;
+	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_CHARSET, tb_null);
+	return (tb_cstream_t*)tst;
 }
-static tb_long_t tb_estream_aopen(tb_gstream_t* gst)
+static tb_long_t tb_cstream_aopen(tb_gstream_t* gst)
 {
-	tb_estream_t* est = tb_estream_cast(gst);
-	tb_assert_and_check_return_val(est && est->ic && est->oc, -1);
+	tb_cstream_t* cst = tb_cstream_cast(gst);
+	tb_assert_and_check_return_val(cst && cst->ftype && cst->ttype, -1);
 
 	return tb_tstream_aopen(gst);
 }
-static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_cstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
-	tb_estream_t* est = tb_estream_cast(gst);
-	tb_assert_and_check_return_val(est, tb_false);
+	tb_cstream_t* cst = tb_cstream_cast(gst);
+	tb_assert_and_check_return_val(cst, tb_false);
 
 	switch (cmd)
 	{
-	case TB_ESTREAM_CMD_GET_IE:
+	case TB_CSTREAM_CMD_GET_FTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			tb_assert_and_check_return_val(pe && est->ic, tb_false);
-			*pe = est->ic->encoding;
+			tb_assert_and_check_return_val(pe, tb_false);
+			*pe = cst->ftype;
 			return tb_true;
 		}
-	case TB_ESTREAM_CMD_GET_OE:
+	case TB_CSTREAM_CMD_GET_TTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			tb_assert_and_check_return_val(pe && est->oc, tb_false);
-			*pe = est->oc->encoding;
+			tb_assert_and_check_return_val(pe, tb_false);
+			*pe = cst->ttype;
 			return tb_true;
 		}
-	case TB_ESTREAM_CMD_SET_IE:
+	case TB_CSTREAM_CMD_SET_FTYPE:
 		{
-			est->ic = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
-			return est->ic? tb_true : tb_false;
+			cst->ftype = (tb_size_t)tb_va_arg(args, tb_size_t);
+			return TB_CHARSET_TYPE_OK(cst->ftype)? tb_true : tb_false;
 		}
-	case TB_ESTREAM_CMD_SET_OE:
+	case TB_CSTREAM_CMD_SET_TTYPE:
 		{
-			est->oc = (tb_encoder_t const*)tb_encoding_get_encoder((tb_size_t)tb_va_arg(args, tb_size_t));
-			return est->oc? tb_true : tb_false;
+			cst->ttype = (tb_size_t)tb_va_arg(args, tb_size_t);
+			return TB_CHARSET_TYPE_OK(cst->ttype)? tb_true : tb_false;
 		}
 	default:
 		break;
@@ -98,16 +100,14 @@ static tb_bool_t tb_estream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_long_t tb_estream_spak(tb_gstream_t* gst, tb_bool_t sync)
+static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
-	tb_estream_t* est = tb_estream_cast(gst);
+	tb_cstream_t* cst = tb_cstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(est && tst, -1);
+	tb_assert_and_check_return_val(cst && tst, -1);
 
 	// the convecter
-	tb_assert_and_check_return_val(est->ic && est->oc, -1);
-	tb_encoder_t const* ic = est->ic;
-	tb_encoder_t const* oc = est->oc;
+	tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(cst->ftype) && TB_CHARSET_TYPE_OK(cst->ttype), -1);
 
 	// the input
 	tb_assert_and_check_return_val(tst->ip, -1);
@@ -124,12 +124,13 @@ static tb_long_t tb_estream_spak(tb_gstream_t* gst, tb_bool_t sync)
 	tb_check_return_val(op < oe, 0);
 
 	// spak it
-	tb_uint32_t ch;
-	while (ip < ie && op < oe)
-	{
-		if (!ic->get(&ch, &ip, ie - ip)) break;
-		if (!oc->set(ch, &op, oe - op)) break;
-	}
+	tb_bstream_t ist;
+	tb_bstream_t ost;
+	tb_bstream_attach(&ist, ib, ie - ib);
+	tb_bstream_attach(&ost, ob, oe - ob);
+	if (tb_charset_conv_bst(cst->ftype, cst->ttype, &ist, &ost) < 0) return -1;
+	ip = tb_bstream_pos(&ist);
+	op = tb_bstream_pos(&ost);
 
 	// check
 	tb_assert_and_check_return_val(ip >= ib && ip <= ie, -1);
@@ -148,9 +149,9 @@ static tb_long_t tb_estream_spak(tb_gstream_t* gst, tb_bool_t sync)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_init_encoding()
+tb_gstream_t* tb_gstream_init_charset()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_estream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_cstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
@@ -158,15 +159,15 @@ tb_gstream_t* tb_gstream_init_encoding()
 
 	// init gstream
 	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->aopen 	= tb_estream_aopen;
+	gst->aopen 	= tb_cstream_aopen;
 	gst->aread 	= tb_tstream_aread;
 	gst->aclose	= tb_tstream_aclose;
 	gst->wait	= tb_tstream_wait;
-	gst->ctrl 	= tb_estream_ctrl;
+	gst->ctrl 	= tb_cstream_ctrl;
 
 	// init tstream
-	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_ENCODING;
-	((tb_tstream_t*)gst)->spak = tb_estream_spak;
+	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_CHARSET;
+	((tb_tstream_t*)gst)->spak = tb_cstream_spak;
 
 	// ok
 	return gst;
@@ -176,26 +177,26 @@ fail:
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe)
+tb_gstream_t* tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t ftype, tb_size_t ttype)
 {
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// create encoding stream
-	tb_gstream_t* est = tb_gstream_init_encoding();
-	tb_assert_and_check_return_val(est, tb_null);
+	// create charset stream
+	tb_gstream_t* cst = tb_gstream_init_charset();
+	tb_assert_and_check_return_val(cst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(est, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
 		
-	// set input encoding
-	if (!tb_gstream_ctrl(est, TB_ESTREAM_CMD_SET_IE, ie)) goto fail;
+	// set from charset type
+	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CMD_SET_FTYPE, ftype)) goto fail;
 		
-	// set output encoding
-	if (!tb_gstream_ctrl(est, TB_ESTREAM_CMD_SET_OE, oe)) goto fail;
+	// set to charset type
+	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CMD_SET_TTYPE, ttype)) goto fail;
 	
-	return est;
+	return cst;
 
 fail:
-	if (est) tb_gstream_exit(est);
+	if (cst) tb_gstream_exit(cst);
 	return tb_null;
 }

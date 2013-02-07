@@ -104,7 +104,7 @@ typedef enum __tb_gstream_type_t
 typedef enum __tb_tstream_type_t
 {
  	TB_TSTREAM_TYPE_NULL 			= 0
-, 	TB_TSTREAM_TYPE_ENCODING 		= 1
+, 	TB_TSTREAM_TYPE_CHARSET 		= 1
 , 	TB_TSTREAM_TYPE_ZIP 			= 2
 
 }tb_tstream_type_t;
@@ -152,12 +152,12 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_TSTREAM_CMD_GET_GSTREAM 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_NULL, 1)
 ,	TB_TSTREAM_CMD_SET_GSTREAM 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_NULL, 2)
 
-	// the estream
-,	TB_ESTREAM_CMD_GET_IE 				= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_ENCODING, 1)
-,	TB_ESTREAM_CMD_GET_OE 				= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_ENCODING, 2)
+	// the cstream
+,	TB_CSTREAM_CMD_GET_FTYPE 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_CHARSET, 1)
+,	TB_CSTREAM_CMD_GET_TTYPE 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_CHARSET, 2)
 
-,	TB_ESTREAM_CMD_SET_IE 				= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_ENCODING, 3)
-,	TB_ESTREAM_CMD_SET_OE 				= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_ENCODING, 4)
+,	TB_CSTREAM_CMD_SET_FTYPE 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_CHARSET, 3)
+,	TB_CSTREAM_CMD_SET_TTYPE 			= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_CHARSET, 4)
 
 	// the zstream
 ,	TB_ZSTREAM_CMD_GET_ALGO				= TB_TSTREAM_CMD(TB_TSTREAM_TYPE_ZIP, 1)
@@ -238,7 +238,7 @@ tb_gstream_t* 		tb_gstream_init_sock();
 tb_gstream_t* 		tb_gstream_init_http();
 tb_gstream_t* 		tb_gstream_init_null();
 tb_gstream_t* 		tb_gstream_init_zip();
-tb_gstream_t* 		tb_gstream_init_encoding();
+tb_gstream_t* 		tb_gstream_init_charset();
 tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
 
 /*!init stream from url
@@ -272,8 +272,8 @@ tb_gstream_t* 		tb_gstream_init_from_null(tb_gstream_t* gst);
 /// init stream from zip
 tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
 
-/// init stream from encoding
-tb_gstream_t* 		tb_gstream_init_from_encoding(tb_gstream_t* gst, tb_size_t ie, tb_size_t oe);
+/// init stream from charset
+tb_gstream_t* 		tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t fr, tb_size_t to);
 
 /*!wait the gstream 
  *

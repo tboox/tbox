@@ -42,9 +42,12 @@ tbox_C_FILES 			+= \
 						network/ipv4 \
 						network/http \
 						network/cookies \
-						encoding/encoding \
-						encoding/unicode_gb2312 \
-						encoding/gb2312_unicode \
+						charset/charset \
+						charset/ascii \
+						charset/utf8 \
+						charset/utf16 \
+						charset/ucs4 \
+						charset/gb2312 \
 						stream/bstream \
 						stream/gstream \
 						stream/gstream/http \
@@ -52,9 +55,9 @@ tbox_C_FILES 			+= \
 						stream/gstream/data \
 						stream/gstream/sock \
 						stream/gstream/tstream/tstream \
+						stream/gstream/tstream/charset \
 						stream/gstream/tstream/null \
 						stream/gstream/tstream/zip \
-						stream/gstream/tstream/encoding \
 						object/object \
 						object/data \
 						object/array \
@@ -283,8 +286,8 @@ INC_FILES 				= \
 						network/url.h \
 						network/dns.h \
 						network/cookies.h \
-						encoding/encoding.h \
-						encoding/prefix.h \
+						charset/charset.h \
+						charset/prefix.h \
 						stream/prefix.h \
 						stream/stream.h \
 						stream/bstream.h \
