@@ -117,7 +117,7 @@ tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const
 	// ok
 	return node;
 }
-tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* encoding)
+tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t const* charset)
 {
 	// alloc
 	tb_xml_node_t* node = tb_malloc0(sizeof(tb_xml_document_t));
@@ -128,10 +128,10 @@ tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t con
 	tb_pstring_init(&node->name);
 	tb_pstring_init(&node->data);
 	tb_pstring_init(&((tb_xml_document_t*)node)->version);
-	tb_pstring_init(&((tb_xml_document_t*)node)->encoding);
+	tb_pstring_init(&((tb_xml_document_t*)node)->charset);
 	tb_pstring_cstrcpy(&node->name, "#document");
 	tb_pstring_cstrcpy(&((tb_xml_document_t*)node)->version, version? version : "2.0");
-	tb_pstring_cstrcpy(&((tb_xml_document_t*)node)->encoding, encoding? encoding : "utf-8");
+	tb_pstring_cstrcpy(&((tb_xml_document_t*)node)->charset, charset? charset : "utf-8");
 
 	// ok
 	return node;
@@ -161,11 +161,11 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 		tb_pstring_exit(&node->name);
 		tb_pstring_exit(&node->data);
 
-		// free version & encoding for document
+		// free version & charset for document
 		if (node->type == TB_XML_NODE_TYPE_DOCUMENT)
 		{
 			tb_pstring_exit(&((tb_xml_document_t*)node)->version);
-			tb_pstring_exit(&((tb_xml_document_t*)node)->encoding);
+			tb_pstring_exit(&((tb_xml_document_t*)node)->charset);
 		}
 
 		// free type

@@ -17,15 +17,32 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		ucs4.c
+ * @ingroup 	charset
  *
  */
-#ifndef TB_ENCODING_PREFIX_H
-#define TB_ENCODING_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
+#include "../stream/stream.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_long_t tb_charset_ucs4_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs4_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch)
+{
+	*ch = be? tb_bstream_get_u32_be(bst) : tb_bstream_get_u32_le(bst);
+	return 1;
+}
+
+tb_long_t tb_charset_ucs4_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs4_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch)
+{
+	if (be) tb_bstream_set_u32_be(bst, ch);
+	else tb_bstream_set_u32_le(bst, ch);
+	return 1;
+}
+

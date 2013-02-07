@@ -33,7 +33,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				case TB_XML_READER_EVENT_DOCUMENT: 
 					{
 						tb_printf("<?xml version = \"%s\" encoding = \"%s\" ?>\n"
-							, tb_xml_reader_version(reader), tb_xml_reader_encoding(reader));
+							, tb_xml_reader_version(reader), tb_xml_reader_charset(reader));
 					}
 					break;
 				case TB_XML_READER_EVENT_DOCUMENT_TYPE: 
