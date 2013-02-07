@@ -6,7 +6,7 @@ PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
+DEBUG = n
 
 # platform
 PLAT = linux

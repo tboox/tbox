@@ -46,6 +46,8 @@ tbox_C_FILES 			+= \
 						charset/ascii \
 						charset/utf8 \
 						charset/utf16 \
+						charset/utf32 \
+						charset/ucs2 \
 						charset/ucs4 \
 						charset/gb2312 \
 						stream/bstream \

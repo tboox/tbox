@@ -78,6 +78,14 @@ tb_long_t tb_charset_utf8_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_utf16_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_utf16_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
+// utf32
+tb_long_t tb_charset_utf32_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf32_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+
+// ucs2
+tb_long_t tb_charset_ucs2_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs2_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+
 // ucs4
 tb_long_t tb_charset_ucs4_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_ucs4_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
@@ -96,9 +104,11 @@ static tb_charset_t g_charsets[] =
 	{TB_CHARSET_TYPE_ASCII, 	"ascii", 	tb_charset_ascii_get, 	tb_charset_ascii_set 	}
 ,	{TB_CHARSET_TYPE_GB2312, 	"gb2312", 	tb_charset_gb2312_get, 	tb_charset_gb2312_set 	}
 ,	{TB_CHARSET_TYPE_GBK, 		"gbk", 		tb_charset_gb2312_get, 	tb_charset_gb2312_set 	}
+,	{TB_CHARSET_TYPE_UCS2, 		"ucs3", 	tb_charset_ucs2_get, 	tb_charset_ucs2_set 	}
 ,	{TB_CHARSET_TYPE_UCS4, 		"ucs4", 	tb_charset_ucs4_get, 	tb_charset_ucs4_set 	}
-,	{TB_CHARSET_TYPE_UTF16, 	"utf16", 	tb_charset_utf16_get, 	tb_charset_utf16_get 	}
-,	{TB_CHARSET_TYPE_UTF8, 		"utf8", 	tb_charset_utf8_get, 	tb_charset_utf8_get 	}
+,	{TB_CHARSET_TYPE_UTF16, 	"utf16", 	tb_charset_utf16_get, 	tb_charset_utf16_set 	}
+,	{TB_CHARSET_TYPE_UTF32, 	"utf32", 	tb_charset_utf32_get, 	tb_charset_utf32_set 	}
+,	{TB_CHARSET_TYPE_UTF8, 		"utf8", 	tb_charset_utf8_get, 	tb_charset_utf8_set 	}
 };
 
 /* ///////////////////////////////////////////////////////////////////////
