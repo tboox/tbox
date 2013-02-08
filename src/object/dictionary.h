@@ -50,7 +50,7 @@
 typedef struct __tb_dictionary_item_t
 {
 	/// the key
-	tb_char_t const* 		key;
+	tb_object_t* 			key;
 
 	/// the value
 	tb_object_t* 			val;
@@ -104,7 +104,7 @@ tb_size_t 				tb_dictionary_size(tb_object_t* dictionary);
  * 		tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
  * 		if (item)
  * 		{
- * 			tb_char_t const* 	key = item->key;
+ * 			tb_object_t* 		key = item->key;
  * 			tb_object_t* 		val = item->val;
  *
  * 			// ...
@@ -121,14 +121,14 @@ tb_iterator_t* 			tb_dictionary_itor(tb_object_t* dictionary);
  *
  * @return 				the dictionary value
  */
-tb_object_t* 			tb_dictionary_val(tb_object_t* dictionary, tb_char_t const* key);
+tb_object_t* 			tb_dictionary_val(tb_object_t* dictionary, tb_object_t* key);
 
 /*! del dictionary item
  *
  * @param dictionary	the dictionary object
  * @param key			the key
  */
-tb_void_t 				tb_dictionary_del(tb_object_t* dictionary, tb_char_t const* key);
+tb_void_t 				tb_dictionary_del(tb_object_t* dictionary, tb_object_t* key);
 
 /*! set dictionary item
  *
@@ -136,7 +136,7 @@ tb_void_t 				tb_dictionary_del(tb_object_t* dictionary, tb_char_t const* key);
  * @param key			the key
  * @param val			the value
  */
-tb_void_t 				tb_dictionary_set(tb_object_t* dictionary, tb_char_t const* key, tb_object_t* val);
+tb_void_t 				tb_dictionary_set(tb_object_t* dictionary, tb_object_t* key, tb_object_t* val);
 
 #endif
 
