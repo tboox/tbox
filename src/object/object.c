@@ -178,6 +178,9 @@ tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 	object->flag = flag;
 	object->type = type;
 	object->refn = 1;
+
+	// ok
+	return tb_true;
 }
 tb_void_t tb_object_exit(tb_object_t* object)
 {
@@ -283,6 +286,7 @@ tb_void_t tb_object_dump(tb_object_t* object)
 				*q = '\0';
 				tb_printf("%s", b);
 			}
+			tb_printf("\n");
 		}
 	}
 

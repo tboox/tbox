@@ -4,7 +4,6 @@ include $(PRO_DIR)/prefix.mak
 # module name
 NAMES = \
 		test \
-		charset \
 		stdlib 
 
 test_CPP_FILES 	= test_cpp
