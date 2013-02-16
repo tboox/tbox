@@ -343,7 +343,7 @@ tb_bool_t tb_dictionary_init_reader()
 {
 	if (!tb_object_set_xml_reader("dict", tb_dictionary_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_read_bin)) return tb_false;
-	return tb_false;
+	return tb_true;
 }
 tb_bool_t tb_dictionary_init_writer()
 {
