@@ -135,9 +135,16 @@ static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->head <= dst->data + dst->size, -1);
 
+	// left
+	tb_size_t left = dst->data + dst->size - dst->head;
+
+	// wait 
 	tb_long_t 	e = 0;
-	if (etype & TB_AIOO_ETYPE_READ) e |= TB_AIOO_ETYPE_READ;
-	if (etype & TB_AIOO_ETYPE_WRIT) e |= TB_AIOO_ETYPE_WRIT;
+	if (left)
+	{
+		if (etype & TB_AIOO_ETYPE_READ) e |= TB_AIOO_ETYPE_READ;
+		if (etype & TB_AIOO_ETYPE_WRIT) e |= TB_AIOO_ETYPE_WRIT;
+	}
 	return e;
 }
 static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)

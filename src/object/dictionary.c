@@ -51,6 +51,9 @@ typedef struct __tb_dictionary_t
 	// the dictionary pool
 	tb_handle_t 		pool;
 
+	// increase refn?
+	tb_bool_t 			incr;
+
 }tb_dictionary_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -71,7 +74,7 @@ static tb_object_t* tb_dictionary_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// init copy
-	tb_dictionary_t* copy = tb_dictionary_init(dictionary->size);
+	tb_dictionary_t* copy = tb_dictionary_init(dictionary->size, dictionary->incr);
 	tb_assert_and_check_return_val(copy, tb_null);
 
 	// walk copy
@@ -159,7 +162,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO);
+		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO, tb_true);
 
 	// init key name
 	tb_sstring_t 	kname;
@@ -167,7 +170,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
 	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
 
 	// init dictionary
-	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT);
+	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_true);
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// walk
@@ -351,14 +354,15 @@ tb_bool_t tb_dictionary_init_writer()
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_bin)) return tb_false;
 	return tb_true;
 }
-tb_object_t* tb_dictionary_init(tb_size_t size)
+tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 {
 	// make
 	tb_dictionary_t* dictionary = tb_dictionary_init_base();
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
-	// init size
+	// init
 	dictionary->size = size;
+	dictionary->incr = incr;
 
 	// init item func
 	tb_item_func_t func = tb_item_func_ptr();
@@ -422,10 +426,15 @@ tb_void_t tb_dictionary_set(tb_object_t* object, tb_char_t const* key, tb_object
 	tb_assert_and_check_return(dictionary && dictionary->hash && key && val);
 
 	// refn++
-	tb_object_inc(val);
+	if (dictionary->incr) tb_object_inc(val);
 
 	// add
 	return tb_hash_set(dictionary->hash, key, val);
 }
+tb_void_t tb_dictionary_incr(tb_object_t* object, tb_bool_t incr)
+{
+	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
+	tb_assert_and_check_return(dictionary);
 
-
+	dictionary->incr = incr;
+}

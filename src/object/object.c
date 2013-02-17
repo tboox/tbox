@@ -104,7 +104,13 @@ static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst)
 	tb_gstream_printf(gst, "<?xml version=\"2.0\" encoding=\"utf-8\"?>\n");
 
 	// writ
-	return func(object, gst, 0);
+	tb_bool_t ok = func(object, gst, 0);
+
+	// flush
+	tb_gstream_bfwrit(gst, tb_null, 0);
+
+	// ok
+	return ok;
 }
 static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 {
@@ -167,6 +173,9 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst)
 
 	// writ end
 	if (!tb_gstream_bwrit_u8(gst, 0)) return tb_false;
+
+	// flush
+	tb_gstream_bfwrit(gst, tb_null, 0);
 
 	// ok
 	return tb_true;

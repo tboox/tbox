@@ -12,7 +12,7 @@ DEBUG = n
 PLAT = linux
 
 # architecture
-ARCH = x86
+ARCH = x64
 
 # toolchain
 SDK = 5.1

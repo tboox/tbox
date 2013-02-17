@@ -54,6 +54,9 @@ typedef struct __tb_array_t
 	// the vector
 	tb_vector_t* 		vector;
 
+	// is increase refn?
+	tb_bool_t 			incr;
+
 }tb_array_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -86,7 +89,7 @@ static tb_object_t* tb_array_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(array && array->vector, tb_null);
 
 	// init copy
-	tb_array_t* copy = tb_array_init(array->vector->grow);
+	tb_array_t* copy = tb_array_init(array->vector->grow, array->incr);
 	tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
 	// refn++
@@ -156,10 +159,10 @@ static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-		return tb_array_init(TB_ARRAY_GROW);
+		return tb_array_init(TB_ARRAY_GROW, tb_true);
 
 	// init array
-	tb_object_t* array = tb_array_init(TB_ARRAY_GROW);
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_true);
 	tb_assert_and_check_return_val(array, tb_null);
 
 	// walk
@@ -306,7 +309,7 @@ tb_bool_t tb_array_init_writer()
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_bin)) return tb_false;
 	return tb_true;
 }
-tb_object_t* tb_array_init(tb_size_t grow)
+tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)
 {
 	// make
 	tb_array_t* array = tb_array_init_base();
@@ -319,6 +322,9 @@ tb_object_t* tb_array_init(tb_size_t grow)
 	// init vector
 	array->vector = tb_vector_init(grow, func);
 	tb_assert_and_check_goto(array->vector, fail);
+
+	// init incr
+	array->incr = incr;
 
 	// ok
 	return array;
@@ -366,7 +372,7 @@ tb_void_t tb_array_append(tb_object_t* object, tb_object_t* item)
 	tb_assert_and_check_return(array && array->vector && item);
 
 	// refn++
-	tb_object_inc(item);
+	if (array->incr) tb_object_inc(item);
 
 	// insert
 	tb_vector_insert_tail(array->vector, item);
@@ -377,7 +383,7 @@ tb_void_t tb_array_insert(tb_object_t* object, tb_size_t index, tb_object_t* ite
 	tb_assert_and_check_return(array && array->vector && item);
 
 	// refn++
-	tb_object_inc(item);
+	if (array->incr) tb_object_inc(item);
 
 	// insert
 	tb_vector_insert(array->vector, index, item);
@@ -388,9 +394,15 @@ tb_void_t tb_array_replace(tb_object_t* object, tb_size_t index, tb_object_t* it
 	tb_assert_and_check_return(array && array->vector && item);
 
 	// refn++
-	tb_object_inc(item);
+	if (array->incr) tb_object_inc(item);
 
 	// replace
 	tb_vector_replace(array->vector, index, item);
 }
+tb_void_t tb_array_incr(tb_object_t* object, tb_bool_t incr)
+{
+	tb_array_t* array = tb_array_cast(object);
+	tb_assert_and_check_return(array);
 
+	array->incr = incr;
+}
