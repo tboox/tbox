@@ -76,10 +76,11 @@ tb_bool_t 				tb_dictionary_init_writer();
 /*! init dictionary
  *
  * @param size			the dictionary size
+ * @param incr			is increase refn?
  *
  * @return 				the dictionary object
  */
-tb_object_t* 			tb_dictionary_init(tb_size_t size);
+tb_object_t* 			tb_dictionary_init(tb_size_t size, tb_size_t incr);
 
 /*! the dictionary size
  *
@@ -88,6 +89,13 @@ tb_object_t* 			tb_dictionary_init(tb_size_t size);
  * @return 				the dictionary size
  */
 tb_size_t 				tb_dictionary_size(tb_object_t* dictionary);
+
+/*! set the dictionary incr
+ *
+ * @param dictionary	the dictionary object
+ * @param incr			is increase refn?
+ */
+tb_void_t 				tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
 
 /*! the dictionary iterator
  *

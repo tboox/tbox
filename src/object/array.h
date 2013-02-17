@@ -48,10 +48,11 @@ tb_bool_t 			tb_array_init_writer();
 /*! init array
  *
  * @param grow		the array grow
+ * @param incr		is increase refn?
  *
  * @return 			the array object
  */
-tb_object_t* 		tb_array_init(tb_size_t grow);
+tb_object_t* 		tb_array_init(tb_size_t grow, tb_bool_t incr);
 
 /*! the array size
  *
@@ -69,6 +70,13 @@ tb_size_t 			tb_array_size(tb_object_t* array);
  * @return 			the array item
  */
 tb_object_t* 		tb_array_item(tb_object_t* array, tb_size_t index);
+
+/*! set the array incr
+ *
+ * @param array	the array object
+ * @param incr			is increase refn?
+ */
+tb_void_t 				tb_array_incr(tb_object_t* array, tb_bool_t incr);
 
 /*! the array iterator
  *

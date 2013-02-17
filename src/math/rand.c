@@ -81,6 +81,21 @@ tb_void_t tb_rand_exit()
 		g_mutex = tb_null;
 	}
 }
+tb_void_t tb_rand_seed(tb_uint32_t seed)
+{
+	// check 
+	tb_assert_and_check_return(g_rand && g_mutex);
+
+	// lock
+	if (tb_mutex_enter(g_mutex))
+	{
+		// seed
+		tb_rand_linear_seed(g_rand, seed);
+
+		// unlock
+		tb_mutex_leave(g_mutex);
+	}
+}
 tb_void_t tb_rand_clear()
 {
 	// check 
@@ -171,6 +186,12 @@ tb_void_t tb_rand_linear_exit(tb_rand_linear_t* rand)
 {
 	if (rand) tb_free(rand);
 }
+tb_void_t tb_rand_linear_seed(tb_rand_linear_t* rand, tb_uint32_t seed)
+{
+	tb_assert_and_check_return(rand);
+	rand->seed = seed;
+	rand->data = seed;
+}
 tb_void_t tb_rand_linear_clear(tb_rand_linear_t* rand)
 {
 	tb_assert_and_check_return(rand);
@@ -178,8 +199,24 @@ tb_void_t tb_rand_linear_clear(tb_rand_linear_t* rand)
 	// init rand
 	rand->data = rand->seed;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
+tb_float_t tb_rand_linear_float(tb_rand_linear_t* rand, tb_float_t b, tb_float_t e)
+{
+	tb_assert_and_check_return_val(rand && e > b, 0);
+	return (b + (((tb_float_t)tb_rand_linear_next_uint32(rand) * (e - b)) / TB_MAXU32));
+}
 tb_uint32_t tb_rand_linear_uint32(tb_rand_linear_t* rand, tb_uint32_t b, tb_uint32_t e)
 {
+	return (tb_uint32_t)tb_rand_linear_float(rand, (tb_float_t)b, (tb_float_t)e);
+}
+tb_sint32_t tb_rand_linear_sint32(tb_rand_linear_t* rand, tb_sint32_t b, tb_sint32_t e)
+{
+	return (tb_sint32_t)tb_rand_linear_float(rand, (tb_float_t)b, (tb_float_t)e);
+}
+#else
+tb_uint32_t tb_rand_linear_uint32(tb_rand_linear_t* rand, tb_uint32_t b, tb_uint32_t e)
+{
+	// FIXME: for small range
 	tb_assert_and_check_return_val(rand && e > b, 0);
 	return (b + (tb_rand_linear_next_uint32(rand) % (e - b)));
 }
@@ -187,13 +224,6 @@ tb_sint32_t tb_rand_linear_sint32(tb_rand_linear_t* rand, tb_sint32_t b, tb_sint
 {
 	tb_assert_and_check_return_val(rand && e > b, 0);
 	return (b + (tb_sint32_t)(tb_rand_linear_next_uint32(rand) % (e - b)));
-}
-
-#ifdef TB_CONFIG_TYPE_FLOAT
-tb_float_t tb_rand_linear_float(tb_rand_linear_t* rand, tb_float_t b, tb_float_t e)
-{
-	tb_assert_and_check_return_val(rand && e > b, 0);
-	return (b + (((tb_float_t)tb_rand_linear_next_uint32(rand) * (e - b)) / TB_MAXU32));
 }
 #endif
 

@@ -1066,7 +1066,7 @@ tb_hize_t tb_gstream_offset(tb_gstream_t const* gst)
 tb_hize_t tb_gstream_left(tb_gstream_t const* gst)
 {
 	tb_hize_t size = tb_gstream_size(gst);
-	return (size > gst->offset? (size - gst->offset) : -1);
+	return ((size && size >= gst->offset)? (size - gst->offset) : -1);
 }
 tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
 {	
