@@ -79,7 +79,7 @@ typedef struct __tb_file_info_t
 	tb_size_t 			type;
 
 	// the file size
-	tb_hize_t 		size;
+	tb_hize_t 			size;
 
 }tb_file_info_t;
 
