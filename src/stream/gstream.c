@@ -855,6 +855,7 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		{
 			// writ data
 			tb_long_t n = tb_gstream_afwrit(gst, data + writ, size - writ);	
+
 			if (n > 0) writ += n;
 			else if (!n)
 			{
