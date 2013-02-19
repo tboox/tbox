@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+#define TB_TRACE_IMPL_TAG 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -152,7 +152,7 @@ static tb_object_t* tb_data_read_xml(tb_handle_t reader, tb_size_t event)
 				tb_assert_and_check_goto(ob && on, end);
 				on = tb_base64_decode(ib, in, ob, on);
 				tb_trace_impl("base64: %u => %u", in, on);
-				
+
 				// init data
 				data = tb_data_init_from_data(ob, on); tb_free(ob);
 				tb_assert_and_check_goto(data, end);
@@ -200,7 +200,7 @@ static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_siz
 				if (n) tb_gstream_printf(gst, "\n");
 				tb_object_writ_tab(gst, level);
 			}
-			else tb_gstream_printf(gst, "%c", *p);
+			tb_gstream_printf(gst, "%c", *p);
 		}
 		tb_gstream_printf(gst, "\n");
 
