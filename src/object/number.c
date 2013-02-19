@@ -308,16 +308,33 @@ static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_s
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_number_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+{
+	tb_trace_noimpl();
+	return tb_null;
+}
+static tb_bool_t tb_number_writ_bin(tb_object_t* object, tb_gstream_t* gst)
+{
+	// writ type & size
+	if (!tb_object_writ_bin_type_size(gst, object->type, 0xf)) return tb_false;
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_bool_t tb_number_init_reader()
 {
-	return tb_object_set_xml_reader("number", tb_number_read_xml);
+	if (!tb_object_set_xml_reader("number", tb_number_read_xml)) return tb_false;
+	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_NUMBER, tb_number_read_bin)) return tb_false;
+	return tb_true;
 }
 tb_bool_t tb_number_init_writer()
 {
-	return tb_object_set_xml_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_xml);
+	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_xml)) return tb_false;
+	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_bin)) return tb_false;
+	return tb_true;
 }
 tb_object_t* tb_number_init_from_uint8(tb_uint8_t value)
 {

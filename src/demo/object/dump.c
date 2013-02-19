@@ -17,8 +17,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (gst && tb_gstream_bopen(gst))
 	{
 		// read
-		tb_object_t* object = tb_object_read(gst, TB_OBJECT_FORMAT_XML);
-		if (!object) object = tb_object_read(gst, TB_OBJECT_FORMAT_BIN);
+		tb_object_t* object = tb_object_read(gst, TB_OBJECT_FORMAT_BIN);
+		if (!object) object = tb_object_read(gst, TB_OBJECT_FORMAT_XML);
 
 		// writ
 		if (object) tb_object_dump(object);
