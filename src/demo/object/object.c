@@ -19,11 +19,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (ist && ost && tb_gstream_bopen(ist) && tb_gstream_bopen(ost))
 	{
 		// read
-		tb_object_t* object = tb_object_read(ist, TB_OBJECT_FORMAT_XML);
-		if (!object) object = tb_object_read(ist, TB_OBJECT_FORMAT_BIN);
+		tb_object_t* object = tb_object_read(ist, TB_OBJECT_FORMAT_BIN);
+		if (!object) object = tb_object_read(ist, TB_OBJECT_FORMAT_XML);
 
 		// writ
-		if (object) tb_object_writ(object, ost, TB_OBJECT_FORMAT_XML);
+		if (object) tb_object_writ(object, ost, tb_atoi(argv[3])? TB_OBJECT_FORMAT_BIN : TB_OBJECT_FORMAT_XML);
 	
 		// exit stream
 		tb_gstream_exit(ist);

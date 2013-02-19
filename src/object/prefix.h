@@ -39,6 +39,13 @@
 // writ tab
 #define tb_object_writ_tab(gst, tab) 		do { tb_size_t t = (tab); while (t--) tb_gstream_printf((gst), "\t"); } while (0);
 
+// bytes
+#define tb_object_need_bytes(x) 			\
+											(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
+											(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
+											(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
+											(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -108,5 +115,53 @@ typedef tb_object_t* 		(*tb_object_xml_reader_func_t)(tb_handle_t reader, tb_siz
 
 /// the xml writer func type
 typedef tb_bool_t 			(*tb_object_xml_writer_func_t)(tb_object_t* object, tb_gstream_t* gst, tb_size_t level);
+
+/// the bin reader func type
+typedef tb_object_t* 		(*tb_object_bin_reader_func_t)(tb_gstream_t* gst, tb_size_t type, tb_size_t size);
+
+/// the bin writer func type
+typedef tb_bool_t 			(*tb_object_bin_writer_func_t)(tb_object_t* object, tb_gstream_t* gst);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+static __tb_inline__ tb_bool_t tb_object_writ_bin_type_size(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(type <= 0xff, tb_false);
+
+	// byte for size
+	tb_size_t sizeb = tb_object_need_bytes(size);
+	tb_assert_and_check_return_val(sizeb < 8, tb_false);
+
+	// flag for size
+	tb_size_t sizef = (sizeb == 1)? 0xd : ((sizeb == 2)? 0xe : 0xf);
+
+	// writ flag 
+	tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xd? (tb_uint8_t)size : sizef);
+	if (!tb_gstream_bwrit_u8(gst, flag)) return tb_false;
+
+	// writ type
+	if (type >= 0xf) if (!tb_gstream_bwrit_u8(gst, (tb_uint8_t)type)) return tb_false;
+
+	// writ size
+	switch (sizeb)
+	{
+	case 1:
+		if (!tb_gstream_bwrit_u8(gst, (tb_uint8_t)size)) return tb_false;
+		break;
+	case 2:
+		if (!tb_gstream_bwrit_u16_be(gst, (tb_uint16_t)size)) return tb_false;
+		break;
+	case 4:
+		if (!tb_gstream_bwrit_u32_be(gst, (tb_uint32_t)size)) return tb_false;
+		break;
+	default:
+		break;
+	}
+
+	// ok
+	return tb_true;
+}
 
 #endif

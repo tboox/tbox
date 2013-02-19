@@ -161,7 +161,6 @@ static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
 		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO);
 
-#error
 	// init key name
 	tb_sstring_t 	kname;
 	tb_char_t 		kdata[8192];
@@ -277,13 +276,9 @@ static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, 
 			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 			if (item && item->key && item->val)
 			{
-				// check
-				tb_assert_and_check_return_val(tb_object_type(item->key) == TB_OBJECT_TYPE_STRING, tb_false);
-				tb_check_continue(tb_string_cstr(item->key));
-
 				// writ key
 				tb_object_writ_tab(gst, level + 1);
-				tb_gstream_printf(gst, "<key>%s</key>\n", tb_string_cstr(item->key));
+				tb_gstream_printf(gst, "<key>%s</key>\n", item->key);
 
 				// func
 				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->val->type);
@@ -307,16 +302,54 @@ static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, 
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_dictionary_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+{
+	tb_trace_noimpl();
+	return tb_null;
+}
+static tb_bool_t tb_dictionary_writ_bin(tb_object_t* object, tb_gstream_t* gst)
+{
+	// writ type & size
+	if (!tb_object_writ_bin_type_size(gst, object->type, tb_dictionary_size(object))) return tb_false;
+
+	// walk
+	tb_iterator_t* 	iterator = tb_dictionary_itor(object);
+	tb_size_t 		itor = tb_iterator_head(iterator);
+	tb_size_t 		tail = tb_iterator_tail(iterator);
+	for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+	{
+		tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
+		if (item)
+		{
+			tb_char_t const* 	key = item->key;
+			tb_object_t* 		val = item->val;
+			if (key && val)
+			{
+				// writ val
+				tb_object_bin_writer_func_t func = tb_object_get_bin_writer(val->type);
+				tb_assert_and_check_return_val(func, tb_false);
+				func(val, gst);
+			}
+		}
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_bool_t tb_dictionary_init_reader()
 {
-	return tb_object_set_xml_reader("dict", tb_dictionary_read_xml);
+	if (!tb_object_set_xml_reader("dict", tb_dictionary_read_xml)) return tb_false;
+	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_read_bin)) return tb_false;
+	return tb_false;
 }
 tb_bool_t tb_dictionary_init_writer()
 {
-	return tb_object_set_xml_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xml);
+	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xml)) return tb_false;
+	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_bin)) return tb_false;
+	return tb_true;
 }
 tb_object_t* tb_dictionary_init(tb_size_t size)
 {
@@ -327,20 +360,16 @@ tb_object_t* tb_dictionary_init(tb_size_t size)
 	// init size
 	dictionary->size = size;
 
-	// init key func
-	tb_item_func_t kfunc = tb_item_func_ptr();
-	kfunc.free = tb_dictionary_item_free;
-
-	// init val func
-	tb_item_func_t vfunc = tb_item_func_ptr();
-	vfunc.free = tb_dictionary_item_free;
+	// init item func
+	tb_item_func_t func = tb_item_func_ptr();
+	func.free = tb_dictionary_item_free;
 
 	// init pool
 	dictionary->pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
 	tb_assert_and_check_goto(dictionary->pool, fail);
 
 	// init hash
-	dictionary->hash = tb_hash_init(size, kfunc, vfunc);
+	dictionary->hash = tb_hash_init(size, tb_item_func_str(tb_true, dictionary->pool), func);
 	tb_assert_and_check_goto(dictionary->hash, fail);
 
 	// ok
@@ -370,36 +399,29 @@ tb_iterator_t* tb_dictionary_itor(tb_object_t* object)
 	return (tb_iterator_t*)dictionary->hash;
 }
 
-tb_object_t* tb_dictionary_val(tb_object_t* object, tb_object_t* key)
+tb_object_t* tb_dictionary_val(tb_object_t* object, tb_char_t const* key)
 {
-	// check
 	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
 	tb_assert_and_check_return_val(dictionary && dictionary->hash && key, tb_null);
-	tb_assert_and_check_return_val(tb_object_type(key) == TB_OBJECT_TYPE_STRING, tb_null);
 
 	// value
 	return tb_hash_get(dictionary->hash, key);
 }
 
-tb_void_t tb_dictionary_del(tb_object_t* object, tb_object_t* key)
+tb_void_t tb_dictionary_del(tb_object_t* object, tb_char_t const* key)
 {
-	// check
 	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
 	tb_assert_and_check_return(dictionary && dictionary->hash && key);
-	tb_assert_and_check_return(tb_object_type(key) == TB_OBJECT_TYPE_STRING);
 
 	// del
 	return tb_hash_del(dictionary->hash, key);
 }
-tb_void_t tb_dictionary_set(tb_object_t* object, tb_object_t* key, tb_object_t* val)
+tb_void_t tb_dictionary_set(tb_object_t* object, tb_char_t const* key, tb_object_t* val)
 {
-	// check
 	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
 	tb_assert_and_check_return(dictionary && dictionary->hash && key && val);
-	tb_assert_and_check_return(tb_object_type(key) == TB_OBJECT_TYPE_STRING);
 
 	// refn++
-	tb_object_inc(key);
 	tb_object_inc(val);
 
 	// add
