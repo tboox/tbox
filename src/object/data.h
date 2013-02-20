@@ -45,6 +45,15 @@ tb_bool_t 			tb_data_init_reader();
  */
 tb_bool_t 			tb_data_init_writer();
 
+/*! init data from url
+ *
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the data object
+ */
+tb_object_t* 		tb_data_init_from_url(tb_char_t const* url);
+
 /*! init data from data
  *
  * @param data 		the data
@@ -85,6 +94,14 @@ tb_size_t 			tb_data_size(tb_object_t* data);
  * @return 			the data buffer
  */
 tb_pbuffer_t* 		tb_data_buff(tb_object_t* data);
+
+/*! writ data to url
+ *
+ * @param data 		the data object
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_data_writ_to_url(tb_object_t* data, tb_char_t const* url);
 
 #endif
 
