@@ -249,6 +249,40 @@ tb_bool_t tb_data_init_writer()
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DATA, tb_data_writ_bin)) return tb_false;
 	return tb_true;
 }
+tb_object_t* tb_data_init_from_url(tb_char_t const* url)
+{
+	// check
+	tb_assert_and_check_return_val(url, tb_null);
+
+	// init stream
+	tb_gstream_t* gst = tb_gstream_init_from_url(url);
+	tb_assert_and_check_return_val(gst, tb_null);
+
+	// make stream
+	tb_object_t* object = tb_null;
+	if (tb_gstream_bopen(gst))
+	{
+		// size
+		tb_size_t size = (tb_size_t)tb_gstream_size(gst);
+		if (size)
+		{
+			tb_byte_t* data = tb_malloc0(size);
+			if (data) 
+			{
+				if (tb_gstream_bread(gst, data, size))
+					object = tb_data_init_from_data(data, size);
+				tb_free(data);
+			}
+		}
+		else object = tb_data_init_from_data(tb_null, 0);
+
+		// exit stream
+		tb_gstream_exit(gst);
+	}
+
+	// ok?
+	return object;
+}
 tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 {
 	// make
@@ -316,4 +350,31 @@ tb_pbuffer_t* tb_data_buff(tb_object_t* object)
 	// buff
 	return &data->buff;
 }
+tb_bool_t tb_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
+{
+	// check
+	tb_data_t* data = tb_data_cast(object);
+	tb_assert_and_check_return_val(data && tb_data_addr(data) && url, tb_false);
 
+	// make stream
+	tb_gstream_t* gst = tb_gstream_init_from_url(url);
+	tb_assert_and_check_return_val(gst, tb_false);
+
+	// ctrl
+	if (tb_gstream_type(gst) == TB_GSTREAM_TYPE_FILE)
+		tb_gstream_ctrl(gst, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	
+	// open stream
+	tb_bool_t ok = tb_false;
+	if (tb_gstream_bopen(gst))
+	{
+		// writ stream
+		if (tb_gstream_bwrit(gst, tb_data_addr(data), tb_data_size(data))) ok = tb_true;
+	}
+
+	// exit stream
+	tb_gstream_exit(gst);
+
+	// ok?
+	return ok;
+}
