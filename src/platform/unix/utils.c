@@ -69,6 +69,7 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 	__android_log_print(ANDROID_LOG_DEBUG, "tbox", "%s", msg);
 #else
 	printf("%s", msg);
+	fflush(stdout);
 #endif
 }
 
