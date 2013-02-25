@@ -17,24 +17,25 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		time.c
+ * @ingroup 	libc
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+#include "time.h"
+#include "../../../platform/platform.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_time_t tb_time()
+{
+	// time
+	tb_timeval_t tv = {0};
+	return tb_gettimeofday(&tv, tb_null)? tv.tv_sec : (tb_time_t)-1;
+}
+

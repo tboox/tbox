@@ -17,24 +17,46 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		gmtime.c
+ * @ingroup 	libc
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
-
+#include "time.h"
+#ifdef TB_CONFIG_LIBC_HAVE_GMTIME
+# 	include <time.h>
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_bool_t tb_gmtime(tb_time_t time, tb_tm_t* tm)
+{
+#ifdef TB_CONFIG_LIBC_HAVE_GMTIME
+	// gmtime
+	struct tm* ptm = gmtime(&time);
+	if (ptm && tm)
+	{
+		tm->second = ptm->tm_sec;
+		tm->minute = ptm->tm_min;
+		tm->hour = ptm->tm_hour;
+		tm->mday = ptm->tm_mday;
+		tm->month = ptm->tm_mon + 1;
+		tm->year = ptm->tm_year + 1900;
+		tm->week = ptm->tm_wday;
+		tm->yday = ptm->tm_yday;
+		tm->isdst = ptm->tm_isdst;
+	}
+
+	// ok?
+	return ptm? tb_true : tb_false;
+#else
+	tb_trace_noimpl();
+	return tb_false;
+#endif
+}
+

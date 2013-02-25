@@ -87,11 +87,12 @@ static tb_object_t* tb_boolean_read_xml(tb_handle_t reader, tb_size_t event)
 	// ok?
 	return tb_boolean_init(val);
 }
-static tb_bool_t tb_boolean_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_boolean_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// writ
-	tb_object_writ_tab(gst, level);
-	tb_gstream_printf(gst, "<%s/>\n", tb_boolean_bool(object)? "true" : "false");
+	tb_object_writ_tab(gst, deflate, level);
+	tb_gstream_printf(gst, "<%s/>", tb_boolean_bool(object)? "true" : "false");
+	tb_object_writ_newline(gst, deflate);
 
 	// ok
 	return tb_true;

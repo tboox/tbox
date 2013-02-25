@@ -62,6 +62,7 @@ tbox_C_FILES 			+= \
 						stream/gstream/tstream/zip \
 						object/object \
 						object/data \
+						object/date \
 						object/array \
 						object/string \
 						object/number \
@@ -76,7 +77,6 @@ tbox_C_FILES 			+= \
 						zip/gzip \
 						zip/zlibraw \
 						utils/bits \
-						utils/time \
 						utils/md5 \
 						utils/sha \
 						utils/crc \
@@ -89,6 +89,11 @@ tbox_C_FILES 			+= \
 						aio/aioo \
 						aio/aipp \
 						aio/aicp \
+						libc/misc/time/time \
+						libc/misc/time/mktime \
+						libc/misc/time/gmmktime \
+						libc/misc/time/gmtime \
+						libc/misc/time/localtime \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
@@ -173,6 +178,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_THRD)/thread \
 						platform/$(TB_CONFIG_API_EVET)/event \
 						platform/$(TB_CONFIG_API_EVET)/epool \
+						platform/$(TB_CONFIG_API_TIME)/time \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aipp \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aicp
@@ -259,6 +265,7 @@ INC_FILES 				= \
 						platform/prefix.h \
 						platform/dns.h \
 						platform/file.h \
+						platform/time.h \
 						platform/utils.h \
 						platform/mutex.h \
 						platform/thread.h \
@@ -297,6 +304,7 @@ INC_FILES 				= \
 						object/prefix.h \
 						object/object.h \
 						object/data.h \
+						object/date.h \
 						object/array.h \
 						object/number.h \
 						object/string.h \
@@ -305,7 +313,6 @@ INC_FILES 				= \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \
-						utils/time.h \
 						utils/sha.h \
 						utils/md5.h \
 						utils/crc.h \
@@ -332,17 +339,20 @@ INC_FILES 				= \
 						zip/gzip.h \
 						libc/prefix.h \
 						libc/libc.h \
-						libc/ctype.h \
-						libc/limits.h \
-						libc/stdarg.h \
 						libc/stdlib/prefix.h \
 						libc/stdlib/stdlib.h \
 						libc/stdio/prefix.h \
 						libc/stdio/stdio.h \
 						libc/string/prefix.h \
 						libc/string/string.h \
-						third/prefix.h \
-						third/third.h \
+						libc/misc/misc.h \
+						libc/misc/prefix.h \
+						libc/misc/ctype.h \
+						libc/misc/limits.h \
+						libc/misc/stdarg.h \
+						libc/misc/time/prefix.h \
+						libc/misc/time/time.h \
+						libc/misc/time/type.h \
 						libm/prefix.h \
 						libm/math.h \
 						libm/libm.h \
@@ -354,7 +364,10 @@ INC_FILES 				= \
 						libm/fabs.h \
 						libm/round.h \
 						libm/ceil.h \
-						libm/floor.h
+						libm/floor.h \
+						third/prefix.h \
+						third/third.h
+
 
 # zlib files
 zlib_C_FILES 			= \
@@ -394,6 +407,7 @@ SUB_PROS 				= \
 					  	demo/aio \
 					  	demo/xml \
 					  	demo/flv \
+						demo/libc \
 					  	demo/math \
 					  	demo/utils \
 					  	demo/other \

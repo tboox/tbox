@@ -224,14 +224,15 @@ end:
 	// ok?
 	return array;
 }
-static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// writ
 	if (tb_array_size(object))
 	{
 		// writ beg
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<array>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<array>");
+		tb_object_writ_newline(gst, deflate);
 
 		// walk
 		tb_iterator_t* 	iterator = tb_array_itor(object);
@@ -248,18 +249,20 @@ static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_si
 				tb_assert_and_check_return_val(func, tb_false);
 
 				// writ
-				if (!func(item, gst, level + 1)) return tb_false;
+				if (!func(item, gst, deflate, level + 1)) return tb_false;
 			}
 		}
 
 		// writ end
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "</array>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "</array>");
+		tb_object_writ_newline(gst, deflate);
 	}
 	else 
 	{
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<array/>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<array/>");
+		tb_object_writ_newline(gst, deflate);
 	}
 
 	// ok

@@ -17,24 +17,41 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		gmmktime.c
+ * @ingroup 	libc
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+#include "time.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+
+tb_time_t tb_gmmktime(tb_tm_t const* tm)
+{
+	// check
+	tb_assert_and_check_return_val(tm, -1);
+
+	tb_long_t y = tm->year;
+	tb_long_t m = tm->month;
+	tb_long_t d = tm->mday;
+
+	if (m < 3) 
+	{
+		m += 12;
+		y--;
+	}
+
+	tb_time_t time = 86400 * (d + (153 * m - 457) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 719469);
+	time += 3600 * tm->hour;
+	time += 60 * tm->minute;
+	time += tm->second;
+
+	// time
+	return time;
+}
+

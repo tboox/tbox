@@ -17,24 +17,55 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		date.h
+ * @ingroup 	object
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
+#ifndef TB_OBJECT_DATE_H
+#define TB_OBJECT_DATE_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init date reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_date_init_reader();
+
+/*! init date writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_date_init_writer();
+
+/*! init date from now
+ *
+ * @return 			the date object
+ */
+tb_object_t* 		tb_date_init_from_now();
+
+/*! init date from time
+ *
+ * @param 			the date time
+ *
+ * @return 			the date object
+ */
+tb_object_t* 		tb_date_init_from_time(tb_time_t time);
+
+/*! the date time
+ *
+ * @param 			the date object
+ *
+ * @return 			the date time
+ */
+tb_time_t 			tb_date_time(tb_object_t* date);
 
 #endif
+

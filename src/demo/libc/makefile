@@ -3,9 +3,9 @@ include $(PRO_DIR)/prefix.mak
 
 # module name
 NAMES = \
-		pstring \
-		sstring \
-		rstring
+		time \
+		stdlib \
+		string
 
 include $(SRC_DIR)/demo/makefile
 

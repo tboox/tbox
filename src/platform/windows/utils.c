@@ -26,7 +26,6 @@
  */
 #include "../utils.h"
 #include "../../libc/libc.h"
-#include "../../math/math.h"
 #include <stdio.h>
 #include <windows.h>
 #include <winsock2.h>
@@ -35,25 +34,6 @@
  * implementation
  */
 
-// usleep
-tb_void_t tb_usleep(tb_size_t us)
-{
-	Sleep(1);
-}
-
-// msleep
-tb_void_t tb_msleep(tb_size_t ms)
-{
-	Sleep(ms);
-}
-
-// sleep
-tb_void_t tb_sleep(tb_size_t s)
-{
-	Sleep(s * 1000);
-}
-
-// printf
 tb_void_t tb_printf(tb_char_t const* fmt, ...)
 {
 	tb_int_t ret = 0;
@@ -64,32 +44,6 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 	printf("%s", msg);
 }
 
-// mclock
-tb_hong_t tb_mclock()
-{
-	return (tb_hong_t)GetTickCount();
-}
-
-// uclock
-tb_hong_t tb_uclock()
-{
-	LARGE_INTEGER f = {0};
-    if (!QueryPerformanceFrequency(&f)) return 0;
-	tb_assert_and_check_return_val(f.QuadPart, 0);
-
-	LARGE_INTEGER t = {0};
-	if (!QueryPerformanceCounter(&t)) return 0;
-	tb_assert_and_check_return_val(t.QuadPart, 0);
-	
-	return (t.QuadPart * 1000000) / f.QuadPart;
-}
-tb_hong_t tb_time()
-{
-	tb_trace_noimpl();
-	return 0;
-}
-
-// the host name
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
 	return !gethostname(name, size)? tb_true : tb_false;

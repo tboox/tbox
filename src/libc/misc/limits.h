@@ -17,57 +17,20 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		stdarg.h
+ * @file		limits.h
  * @ingroup 	libc
  *
  */
-#ifndef TB_LIBC_STDARG_H
-#define TB_LIBC_STDARG_H
+#ifndef TB_LIBC_MISC_LIMITS_H
+#define TB_LIBC_MISC_LIMITS_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#ifndef TB_COMPILER_IS_GCC
-# 	include <stdarg.h>
-#endif
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_COMPILER_IS_GCC
-# 	define tb_va_start(v, l)	__builtin_va_start(v, l)
-# 	define tb_va_end(v)			__builtin_va_end(v)
-# 	define tb_va_arg(v, l)		__builtin_va_arg(v, l)
-#else
-# 	define tb_va_start(v, l) 	va_start(v, l)
-# 	define tb_va_end(v) 		va_end(v)
-# 	define tb_va_arg(v, l) 		va_arg(v, l)
-#endif
-
-// varg
-#define tb_va_format(s, n, fmt, r) \
-do \
-{ \
-	tb_long_t __tb_ret = 0; \
-	tb_va_list_t __tb_varg_list; \
-    tb_va_start(__tb_varg_list, fmt); \
-    __tb_ret = tb_vsnprintf(s, (n), fmt, __tb_varg_list); \
-    tb_va_end(__tb_varg_list); \
-	if (__tb_ret >= 0) s[__tb_ret] = '\0'; \
-	if (r) *r = __tb_ret > 0? __tb_ret : 0; \
- \
-} while (0) 
-
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-#ifdef TB_COMPILER_IS_GCC
-typedef __builtin_va_list 	tb_va_list_t;
-#else
-typedef va_list 			tb_va_list_t;
-#endif
 
 #endif

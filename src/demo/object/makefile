@@ -2,7 +2,7 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = object dump
+NAMES = bin xml dump
 
 include $(SRC_DIR)/demo/makefile
 

@@ -151,13 +151,14 @@ end:
 	// ok?
 	return string;
 }
-static tb_bool_t tb_string_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_string_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// writ
-	tb_object_writ_tab(gst, level);
+	tb_object_writ_tab(gst, deflate, level);
 	if (tb_string_size(object))
-		tb_gstream_printf(gst, "<string>%s</string>\n", tb_string_cstr(object));
-	else tb_gstream_printf(gst, "<string/>\n");
+		tb_gstream_printf(gst, "<string>%s</string>", tb_string_cstr(object));
+	else tb_gstream_printf(gst, "<string/>");
+	tb_object_writ_newline(gst, deflate);
 
 	// ok
 	return tb_true;

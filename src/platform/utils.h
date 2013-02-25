@@ -34,26 +34,8 @@
  * interfaces
  */
 
-// usleep
-tb_void_t 		tb_usleep(tb_size_t us);
-
-// msleep
-tb_void_t 		tb_msleep(tb_size_t ms);
-
-// sleep
-tb_void_t 		tb_sleep(tb_size_t s);
-
 // printf
 tb_void_t 		tb_printf(tb_char_t const* fmt, ...);
-
-// clock, ms
-tb_hong_t 		tb_mclock();
-
-// clock, us
-tb_hong_t 		tb_uclock();
-
-// the milliseconds from 1970-01-01 00:00:00:000
-tb_hong_t 		tb_time();
 
 // the host name
 tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);

@@ -37,14 +37,17 @@
  */
 
 // writ tab
-#define tb_object_writ_tab(gst, tab) 		do { tb_size_t t = (tab); while (t--) tb_gstream_printf((gst), "\t"); } while (0);
+#define tb_object_writ_tab(gst, deflate, tab) 	if (!(deflate)) { tb_size_t t = (tab); while (t--) tb_gstream_printf((gst), "\t"); } 
+
+// writ '\n'
+#define tb_object_writ_newline(gst, deflate) 	if (!(deflate)) tb_gstream_printf((gst), "\n"); 
 
 // bytes
-#define tb_object_need_bytes(x) 			\
-											(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
-											(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
-											(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
-											(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
+#define tb_object_need_bytes(x) 				\
+												(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
+												(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
+												(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
+												(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -77,10 +80,10 @@ typedef enum __tb_object_flag_e
 /// the object format enum
 typedef enum __tb_object_format_e
 {
-	TB_OBJECT_FORMAT_NONE 		= 0
-,	TB_OBJECT_FORMAT_XML 		= 1
-,	TB_OBJECT_FORMAT_BIN 		= 2
-,	TB_OBJECT_FORMAT_USER 		= 3 //!< the user defined type, ...
+	TB_OBJECT_FORMAT_NONE 		= 0x0000
+,	TB_OBJECT_FORMAT_XML 		= 0x0001
+,	TB_OBJECT_FORMAT_BIN 		= 0x0002
+,	TB_OBJECT_FORMAT_DEFLATE 	= 0x0100
 
 }tb_object_format_e;
 
@@ -114,7 +117,7 @@ typedef struct __tb_object_t
 typedef tb_object_t* 		(*tb_object_xml_reader_func_t)(tb_handle_t reader, tb_size_t event);
 
 /// the xml writer func type
-typedef tb_bool_t 			(*tb_object_xml_writer_func_t)(tb_object_t* object, tb_gstream_t* gst, tb_size_t level);
+typedef tb_bool_t 			(*tb_object_xml_writer_func_t)(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level);
 
 /// the bin reader func type
 typedef tb_object_t* 		(*tb_object_bin_reader_func_t)(tb_gstream_t* gst, tb_size_t type, tb_size_t size);
