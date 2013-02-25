@@ -17,24 +17,34 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		type.h
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
+#ifndef TB_LIBC_MISC_TIME_TYPE_H
+#define TB_LIBC_MISC_TIME_TYPE_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+#include "../prefix.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the tm type
+typedef struct __tb_tm_t
+{
+	tb_long_t 	second;
+	tb_long_t 	minute;
+	tb_long_t 	hour;
+	tb_long_t 	mday;
+	tb_long_t 	month;
+	tb_long_t 	year;
+	tb_long_t 	week;
+	tb_long_t 	yday;
+	tb_long_t 	isdst;
+
+}tb_tm_t;
 
 #endif

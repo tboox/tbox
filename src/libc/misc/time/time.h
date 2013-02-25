@@ -17,45 +17,60 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.c
+ * @file		time.h
+ * @ingroup 	libc
  *
  */
+#ifndef TB_LIBC_MISC_TIME_H
+#define TB_LIBC_MISC_TIME_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "../utils.h"
-#include "../../libc/libc.h"
-#include <unistd.h>
-#include <stdio.h>
-#ifdef TB_CONFIG_OS_ANDROID
-# 	include <android/log.h>     
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
 
-// printf
-tb_void_t tb_printf(tb_char_t const* fmt, ...)
-{
-	tb_long_t ret = 0;
-	tb_char_t msg[8192] = {0};
-	tb_va_format(msg, 8192, fmt, &ret);
-	if (ret >= 0) msg[ret] = '\0';
+/*! the time as the number of seconds since the epoch, 1970-01-01 00:00:00 +0000 (utc)
+ *
+ * @return 				the returned time or -1
+ */
+tb_time_t 				tb_time();
 
-#ifdef TB_CONFIG_OS_ANDROID
-	__android_log_print(ANDROID_LOG_DEBUG, "tbox", "%s", msg);
-#else
-	printf("%s", msg);
-	fflush(stdout);
+/*! the gmt time
+ *
+ * @param 				the time value
+ * @param 				the gmt time pointer
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_gmtime(tb_time_t time, tb_tm_t* tm);
+
+/*! the local time
+ *
+ * @param 				the time value
+ * @param 				the local time pointer
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_localtime(tb_time_t time, tb_tm_t* tm);
+
+/*! make the time value from the local time
+ *
+ * @param 				the time
+ *
+ * @return 				the time value
+ */
+tb_time_t 				tb_mktime(tb_tm_t const* tm);
+
+/*! make the time value from the gmt time
+ *
+ * @param 				the time
+ *
+ * @return 				the time value
+ */
+tb_time_t 				tb_gmmktime(tb_tm_t const* tm);
+
 #endif
-}
-
-// the host name
-tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
-{
-	return !gethostname(name, size)? tb_true : tb_false;
-}
-

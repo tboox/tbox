@@ -17,24 +17,16 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		prefix.h
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
+#ifndef TB_LIBC_MISC_PREFIX_H
+#define TB_LIBC_MISC_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "base32.h"
-#include "base64.h"
+#include "../prefix.h"
+
 
 #endif

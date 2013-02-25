@@ -18,11 +18,11 @@
  *
  * @author		ruki
  * @file		time.h
- * @ingroup 	utils
+ * @ingroup 	platform
  *
  */
-#ifndef TB_UTILS_TIME_H
-#define TB_UTILS_TIME_H
+#ifndef TB_PLATFORM_TIME_H
+#define TB_PLATFORM_TIME_H
 
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -31,43 +31,25 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the time type
-typedef struct __tb_time_t
-{
-	tb_int_t 	year; 			// [1900, 2299]
-	tb_int_t 	month; 			// [1, 12]
-	tb_int_t 	day; 			// [1, 31]
-	tb_int_t 	hours; 			// [0, 23]
-	tb_int_t 	minutes; 		// [0, 59]
-	tb_int_t 	seconds; 		// [0, 59]
-	tb_int_t 	milliseconds; 	// [0, 999]
-	tb_int_t 	wday; 			// days since sunday: [0, 6]
-	tb_int_t 	yday; 			// days since january 1: [0, 365]
-	tb_int_t 	isdst; 			// daylight savings time flag: 
-
-}tb_time_t;
-
-/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// time => local
-tb_bool_t 			tb_time_to_local(tb_hong_t time, tb_time_t* local);
+// usleep
+tb_void_t 		tb_usleep(tb_size_t us);
 
-// time => utc/gmt
-tb_bool_t 			tb_time_to_utc(tb_hong_t time, tb_time_t* utc);
+// msleep
+tb_void_t 		tb_msleep(tb_size_t ms);
 
-// local => time
-tb_bool_t 			tb_time_from_local(tb_hong_t* time, tb_time_t const* local);
+// sleep
+tb_void_t 		tb_sleep(tb_size_t s);
 
-// utc/gmt => time
-tb_bool_t 			tb_time_from_utc(tb_hong_t* time, tb_time_t const* utc);
+// clock, ms
+tb_hong_t 		tb_mclock();
 
-// week
-tb_char_t const* 	tb_time_week(tb_time_t const* time);
+// clock, us
+tb_hong_t 		tb_uclock();
 
-	
+// get the time from 1970-01-01 00:00:00:000
+tb_bool_t 		tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz);
+
 #endif

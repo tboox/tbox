@@ -17,20 +17,21 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		limits.h
+ * @file		misc.h
  * @ingroup 	libc
  *
  */
-#ifndef TB_LIBC_LIMITS_H
-#define TB_LIBC_LIMITS_H
+#ifndef TB_LIBC_MISC_H
+#define TB_LIBC_MISC_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+#include "ctype.h"
+#include "stdarg.h"
+#include "limits.h"
+#include "./time/time.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */
 
 #endif

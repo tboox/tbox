@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "data.h"
+#include "date.h"
 #include "array.h"
 #include "string.h"
 #include "number.h"
@@ -106,11 +107,27 @@ tb_cpointer_t 		tb_object_getp(tb_object_t* object);
 /*! read object
  *
  * @param gst 		the stream
- * @param format 	the object format
  *
  * @return 			the object pointer
  */
-tb_object_t* 		tb_object_read(tb_gstream_t* gst, tb_size_t format);
+tb_object_t* 		tb_object_read(tb_gstream_t* gst);
+
+/*! read object from data
+ *
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the object pointer
+ */
+tb_object_t* 		tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
+
+/*! read object from url
+ *
+ * @param url 		the url
+ *
+ * @return 			the object pointer
+ */
+tb_object_t* 		tb_object_read_from_url(tb_char_t const* url);
 
 /*! writ object
  *
@@ -121,6 +138,16 @@ tb_object_t* 		tb_object_read(tb_gstream_t* gst, tb_size_t format);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_object_writ(tb_object_t* object, tb_gstream_t* gst, tb_size_t format);
+
+/*! writ object to url
+ *
+ * @param object	the object pointer
+ * @param url 		the url
+ * @param format 	the format
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format);
 
 /*! copy object
  *
@@ -138,15 +165,14 @@ tb_object_t* 		tb_object_copy(tb_object_t* object);
  */
 tb_size_t 			tb_object_type(tb_object_t* object);
 
-/*! the object description
+/*! the object data
  *
- * @param object 	the object pointer
- * @param data 		the description data
- * @param size 		the description maxn
+ * @param object	the object pointer
+ * @param format 	the format
  *
- * @return 			the object description string
+ * @return 			the data object
  */
-tb_char_t const*	tb_object_desc(tb_object_t* object, tb_char_t* data, tb_size_t maxn);
+tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
 
 /*! dump the object
  *

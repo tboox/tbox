@@ -171,13 +171,13 @@ end:
 	// ok?
 	return data;
 }
-static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// no empty?
 	if (tb_data_size(object))
 	{
 		// writ beg
-		tb_object_writ_tab(gst, level);
+		tb_object_writ_tab(gst, deflate, level);
 		tb_gstream_printf(gst, "<data>\n");
 
 		// decode base64 data
@@ -198,7 +198,7 @@ static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_siz
 			if (!(n & 63))
 			{
 				if (n) tb_gstream_printf(gst, "\n");
-				tb_object_writ_tab(gst, level);
+				tb_object_writ_tab(gst, deflate, level);
 			}
 			tb_gstream_printf(gst, "%c", *p);
 		}
@@ -208,13 +208,13 @@ static tb_bool_t tb_data_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_siz
 		tb_free(ob);
 					
 		// writ end
-		tb_object_writ_tab(gst, level);
+		tb_object_writ_tab(gst, deflate, level);
 		tb_gstream_printf(gst, "</data>\n");
 	}
 	else 
 	{
 		// writ
-		tb_object_writ_tab(gst, level);
+		tb_object_writ_tab(gst, deflate, level);
 		tb_gstream_printf(gst, "<data/>\n");
 	}
 

@@ -260,14 +260,15 @@ end:
 	// ok?
 	return dictionary;
 }
-static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// writ
 	if (tb_dictionary_size(object))
 	{
 		// writ beg
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<dict>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<dict>");
+		tb_object_writ_newline(gst, deflate);
 
 		// walk
 		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
@@ -280,26 +281,29 @@ static tb_bool_t tb_dictionary_writ_xml(tb_object_t* object, tb_gstream_t* gst, 
 			if (item && item->key && item->val)
 			{
 				// writ key
-				tb_object_writ_tab(gst, level + 1);
-				tb_gstream_printf(gst, "<key>%s</key>\n", item->key);
+				tb_object_writ_tab(gst, deflate, level + 1);
+				tb_gstream_printf(gst, "<key>%s</key>", item->key);
+				tb_object_writ_newline(gst, deflate);
 
 				// func
 				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->val->type);
 				tb_assert_and_check_return_val(func, tb_false);
 
 				// writ val
-				if (!func(item->val, gst, level + 1)) return tb_false;
+				if (!func(item->val, gst, deflate, level + 1)) return tb_false;
 			}
 		}
 
 		// writ end
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "</dict>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "</dict>");
+		tb_object_writ_newline(gst, deflate);
 	}
 	else 
 	{
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<dict/>\n");
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<dict/>");
+		tb_object_writ_newline(gst, deflate);
 	}
 
 	// ok

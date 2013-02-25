@@ -107,8 +107,36 @@ typedef tb_int32_t 					tb_fixed16_t;
 typedef tb_int32_t 					tb_fixed30_t;
 typedef tb_fixed16_t 				tb_fixed_t;
 
-// atomic
+// the atomic type
 typedef __tb_volatile__ tb_size_t 	tb_atomic_t;
+
+/// the time type
+typedef tb_hong_t 					tb_time_t;
+
+/// the suseconds type
+typedef tb_long_t 					tb_suseconds_t;
+
+/// the timeval type
+typedef struct __tb_timeval_t
+{
+	/// the seconds
+	tb_time_t      					tv_sec;
+
+	// the useconds
+	tb_suseconds_t 					tv_usec;
+
+}tb_timeval_t;
+
+/// the timezone type
+typedef struct __tb_timezone_t
+{
+	/// the minutes west of greenwich
+	tb_int_t 						tz_minuteswest;
+
+	/// the type of dst correction
+	tb_int_t 						tz_dsttime;
+
+}tb_timezone_t;
 
 #endif
 

@@ -26,7 +26,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../stdio/stdio.h"
+#include "stdio.h"
 #include "../../math/math.h"
 #include "../../libm/libm.h"
 #include "../../utils/utils.h"

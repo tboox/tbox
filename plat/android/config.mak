@@ -16,6 +16,7 @@ TB_CONFIG_API_MUTX 				= unix
 TB_CONFIG_API_THRD 				= unix
 TB_CONFIG_API_EVET 				= unix
 TB_CONFIG_API_ASIO 				= unix
+TB_CONFIG_API_TIME 				= unix
 
 # third party
 TB_CONFIG_THIRD_ZLIB 			= y

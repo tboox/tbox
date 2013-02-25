@@ -28,9 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#include "ctype.h"
-#include "limits.h"
-#include "stdarg.h"
+#include "misc/misc.h"
 #include "stdio/stdio.h"
 #include "stdlib/stdlib.h"
 #include "string/string.h"

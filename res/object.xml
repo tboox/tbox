@@ -20,6 +20,9 @@
 
 	<key>data</key><data/>
 
+	<key>date</key>
+	<date>2013-02-25 17:26:30</date>
+
 	<key>array</key>
 	<array>
 		<string>hello wolrd!</string>

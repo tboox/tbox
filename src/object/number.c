@@ -256,50 +256,60 @@ end:
 	// ok?
 	return number;
 }
-static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_size_t level)
+static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
 {
 	// writ
 	switch (tb_number_type(object))
 	{
 	case TB_NUMBER_TYPE_UINT64:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%llu</number>\n", tb_number_uint64(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%llu</number>", tb_number_uint64(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT64:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%lld</number>\n", tb_number_sint64(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%lld</number>", tb_number_sint64(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT32:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%u</number>\n", tb_number_uint32(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint32(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT32:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%d</number>\n", tb_number_sint32(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint32(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT16:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%u</number>\n", tb_number_uint16(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint16(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT16:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%d</number>\n", tb_number_sint16(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint16(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT8:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%u</number>\n", tb_number_uint8(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint8(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT8:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%d</number>\n", tb_number_sint8(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint8(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_FLOAT:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%f</number>\n", tb_number_float(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%f</number>", tb_number_float(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	case TB_NUMBER_TYPE_DOUBLE:
-		tb_object_writ_tab(gst, level);
-		tb_gstream_printf(gst, "<number>%lf</number>\n", tb_number_double(object));
+		tb_object_writ_tab(gst, deflate, level);
+		tb_gstream_printf(gst, "<number>%lf</number>", tb_number_double(object));
+		tb_object_writ_newline(gst, deflate);
 		break;
 	default:
 		break;

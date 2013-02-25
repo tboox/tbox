@@ -27,8 +27,8 @@
  * includes
  */
 #include "../prefix.h"
-#include "ctype.h"
-#include "limits.h"
-#include "stdarg.h"
+#include "./misc/ctype.h"
+#include "./misc/limits.h"
+#include "./misc/stdarg.h"
 
 #endif

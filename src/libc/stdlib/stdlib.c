@@ -182,6 +182,7 @@ tb_uint32_t tb_s16tou32(tb_char_t const* s)
 }
 tb_uint32_t tb_stou32(tb_char_t const* s)
 {
+	if (!s) tb_abort();
 	tb_assert(s);
 	if (!s) return 0;
 

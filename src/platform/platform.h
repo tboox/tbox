@@ -30,6 +30,7 @@
 #include "prefix.h"
 #include "dns.h"
 #include "file.h"
+#include "time.h"
 #include "utils.h"
 #include "mutex.h"
 #include "event.h"
