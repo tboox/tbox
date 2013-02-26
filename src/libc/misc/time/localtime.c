@@ -39,7 +39,8 @@ tb_bool_t tb_localtime(tb_time_t time, tb_tm_t* tm)
 {
 #ifdef TB_CONFIG_LIBC_HAVE_LOCALTIME
 	// localtime
-	struct tm* ptm = localtime(&time);
+	time_t t = (time_t)time;
+	struct tm* ptm = localtime(&t);
 	if (ptm && tm)
 	{
 		tm->second = ptm->tm_sec;

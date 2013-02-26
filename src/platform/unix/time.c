@@ -66,12 +66,25 @@ tb_hong_t tb_uclock()
 
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-	// check
-	tb_assert_static(sizeof(tb_time_t) == sizeof(time_t));
-	tb_assert_static(sizeof(tb_suseconds_t) == sizeof(suseconds_t));
-	tb_assert_static(sizeof(tb_timeval_t) == sizeof(struct timeval));
-	tb_assert_static(sizeof(tb_timezone_t) == sizeof(struct timezone));
+	// gettimeofday
+	struct timeval ttv = {0};
+	struct timezone ttz = {0};
+	if (gettimeofday(&ttv, &ttz)) return tb_false;
 
-	// ok?
-	return !gettimeofday(tv, tz)? tb_true : tb_false;
+	// tv
+	if (tv) 
+	{
+		tv->tv_sec = (tb_time_t)ttv.tv_sec;
+		tv->tv_usec = (tb_suseconds_t)ttv.tv_usec;
+	}
+
+	// tz
+	if (tz) 
+	{
+		tz->tz_minuteswest = ttz.tz_minuteswest;
+		tz->tz_dsttime = ttz.tz_dsttime;
+	}
+
+	// ok
+	return tb_true;
 }
