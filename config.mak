@@ -9,15 +9,15 @@ PRO_NAME = tbox
 DEBUG = n
 
 # platform
-PLAT = linux
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # toolchain
-SDK = 5.1
+SDK = /home/ruki/programs/windows/cross
 NDK = /home/ruki/programs/android-ndk-r8
-BIN =
+BIN = /home/ruki/programs/windows/cross/bin
 HOST = mac
 CCACHE = ccache
 DISTCC =
