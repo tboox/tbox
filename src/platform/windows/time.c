@@ -67,8 +67,23 @@ tb_hong_t tb_uclock()
 
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)
 {
-	tb_trace_noimpl();
+	union 
+	{
+		tb_uint64_t ns100; //< time since 1 Jan 1601 in 100ns units
+		FILETIME 	ft;
 
-	// ok?
-	return tb_false;
+	}now;
+
+	if (tv)
+	{
+		GetSystemTimeAsFileTime(&now.ft);
+		tv->tv_sec 	= (tb_time_t)((now.ns100 - 116444736000000000ULL) / 10000000ULL);
+		tv->tv_usec = (tb_suseconds_t)((now.ns100 / 10ULL) % 1000000ULL);
+	}
+
+	// tz is not implementated now.
+	tb_assert_and_check_return_val(!tz, tb_false);
+
+	// ok
+	return tb_true;
 }
