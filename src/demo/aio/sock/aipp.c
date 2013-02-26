@@ -84,11 +84,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			continue ;
 		}
 
-		// ok?
-		tb_assert_and_check_break(objs);
 		tb_size_t i = 0;
 		for (i = 0; i < objn; i++)
 		{
+			tb_assert_and_check_break(objs[i].handle);
 			if (objs[i].etype & TB_AIOO_ETYPE_ACPT)
 			{
 				tb_handle_t c = tb_socket_accept(sock);
@@ -105,8 +104,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			}
 			else if (objs[i].etype & TB_AIOO_ETYPE_READ)
 			{
-				tb_assert_and_check_break(objs[i].handle);
-
 				tb_char_t data[4096] = {0};
 				tb_size_t size = tb_test_sock_recv(objs[i].handle, data, 4096);
 
