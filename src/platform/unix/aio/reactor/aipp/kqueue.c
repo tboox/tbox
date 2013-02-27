@@ -217,6 +217,7 @@ static tb_long_t tb_aipp_reactor_kqueue_wait(tb_aipp_reactor_t* reactor, tb_aioo
 		o->handle = (tb_handle_t)e->udata;
 		o->otype = reactor->aipp->type;
 		o->etype = 0;
+		o->odata = p->odata;
 		if (e->filter == EVFILT_READ) 
 		{
 			o->etype |= TB_AIOO_ETYPE_READ;
