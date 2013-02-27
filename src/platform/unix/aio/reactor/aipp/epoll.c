@@ -163,6 +163,7 @@ static tb_long_t tb_aipp_reactor_epoll_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 		o->handle = h;
 		o->otype = reactor->aipp->type;
 		o->etype = 0;
+		o->odata = p->odata;
 		if (e->events & EPOLLIN) 
 		{
 			o->etype |= TB_AIOO_ETYPE_READ;

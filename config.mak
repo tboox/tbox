@@ -9,10 +9,10 @@ PRO_NAME = tbox
 DEBUG = n
 
 # platform
-PLAT = mingw
+PLAT = linux
 
 # architecture
-ARCH = x86
+ARCH = x64
 
 # toolchain
 SDK = /home/ruki/programs/windows/cross
