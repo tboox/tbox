@@ -128,6 +128,20 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 	d.sin_port = htons(port);
 	d.sin_addr.s_addr = INADDR_ANY;
 
+	// reuse addr
+#ifdef SO_REUSEADDR
+	tb_int_t reuseaddr = 1;
+	if (setsockopt((tb_long_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+		tb_trace("reuseaddr: %lu failed", port);
+#endif
+
+	// reuse port
+#ifdef SO_REUSEPORT
+	tb_int_t reuseport = 1;
+	if (setsockopt((tb_long_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+		tb_trace("reuseport: %lu failed", port);
+#endif
+
 	// bind 
     if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
 
