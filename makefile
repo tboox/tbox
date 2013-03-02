@@ -87,7 +87,7 @@ output : .null
 # make error
 error : .null
 	@echo error $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined"
+	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|错误"
 
 # make warning
 warning : .null
