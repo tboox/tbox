@@ -16,10 +16,16 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
-ifeq ($(BIN),)
+ifeq ($(ARCH),x86)
 PRE 				= i686-w64-mingw32-
-else
-PRE 				= $(BIN)/i686-w64-mingw32-
+endif
+
+ifeq ($(ARCH),x64)
+PRE 				= x86_64-w64-mingw32-
+endif
+
+ifneq ($(BIN),)
+PRE 				= $(BIN)/$(PRE)
 endif
 
 # tool
@@ -40,6 +46,11 @@ PWD 				= pwd
 # arch flags
 ifeq ($(ARCH),x86)
 ARCH_CXFLAGS 		= -march=i686
+endif
+
+ifeq ($(ARCH),x64)
+#ARCH_CXFLAGS 		= -m64
+#ARCH_ASFLAGS 		= -m amd64
 endif
 
 # cxflags: .c/.cc/.cpp files
@@ -81,7 +92,7 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf 
+ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
 
