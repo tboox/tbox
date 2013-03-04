@@ -36,7 +36,9 @@
 #if defined (__LP64__) \
 	|| defined (__64BIT__) \
 		|| defined (_LP64) \
-		|| (__WORDSIZE == 64)
+			|| defined (__tb_arch_x64__) \
+				|| (__WORDSIZE == 64) \
+					|| defined(__tb_arch_x64__)
 # 	define TB_CPU_BITSIZE 		(64)
 # 	define TB_CPU_BITBYTE 		(8)
 # 	define TB_CPU_BITALIGN 		(7)
