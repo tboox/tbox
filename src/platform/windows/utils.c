@@ -42,6 +42,7 @@ tb_void_t tb_printf(tb_char_t const* fmt, ...)
 	if (ret >= 0) msg[ret] = '\0';
 
 	printf("%s", msg);
+	fflush(stdout);
 }
 
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
