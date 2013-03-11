@@ -47,24 +47,24 @@ static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector, 0);
+	tb_assert_and_check_return_val(vector, 0);
 	return vector->size;
 }
 static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector && itor < vector->size, vector->size);
+	tb_assert_and_check_return_val(vector && itor < vector->size, vector->size);
 	return itor + 1;
 }
 static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_assert_return_val(itor, 0);
+	tb_assert_and_check_return_val(itor, 0);
 	return itor - 1;
 }
 static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector && itor < vector->size, tb_null);
+	tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
 	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
 }
 static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
@@ -82,7 +82,7 @@ static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
 	tb_vector_t* vector = (tb_vector_t*)iterator->data;
-	tb_assert_return_val(vector && vector->func.comp, 0);
+	tb_assert_and_check_return_val(vector && vector->func.comp, 0);
 	return vector->func.comp(&vector->func, ltem, rtem);
 }
 /* ///////////////////////////////////////////////////////////////////////

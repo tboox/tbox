@@ -168,7 +168,7 @@ static tb_bool_t tb_hash_item_at(tb_hash_t* hash, tb_size_t buck, tb_size_t item
 static tb_size_t tb_hash_iterator_head(tb_iterator_t* iterator)
 {
 	tb_hash_t* hash = (tb_hash_t*)iterator->data;
-	tb_assert_return_val(hash, 0);
+	tb_assert_and_check_return_val(hash, 0);
 
 	// find the head
 	tb_size_t i = 0;
@@ -183,14 +183,14 @@ static tb_size_t tb_hash_iterator_head(tb_iterator_t* iterator)
 static tb_size_t tb_hash_iterator_tail(tb_iterator_t* iterator)
 {
 	tb_hash_t* hash = (tb_hash_t*)iterator->data;
-	tb_assert_return_val(hash, 0);
+	tb_assert_and_check_return_val(hash, 0);
 
 	return 0;
 }
 static tb_size_t tb_hash_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_hash_t* hash = (tb_hash_t*)iterator->data;
-	tb_assert_return_val(hash && hash->hash_list && hash->hash_size, 0);
+	tb_assert_and_check_return_val(hash && hash->hash_list && hash->hash_size, 0);
 
 	// buck & item
 	tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
@@ -219,7 +219,7 @@ static tb_size_t tb_hash_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 static tb_pointer_t tb_hash_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_hash_t* hash = (tb_hash_t*)iterator->data;
-	tb_assert_return_val(hash && itor, 0);
+	tb_assert_and_check_return_val(hash && itor, 0);
 
 	// get buck & item
 	tb_size_t buck = TB_HASH_INDEX_BUCK(itor);
@@ -259,7 +259,7 @@ static tb_void_t tb_hash_iterator_move(tb_iterator_t* iterator, tb_size_t itor, 
 static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
 	tb_hash_t* hash = (tb_hash_t*)iterator->data;
-	tb_assert_return_val(hash && hash->name_func.comp && ltem && rtem, 0);
+	tb_assert_and_check_return_val(hash && hash->name_func.comp && ltem && rtem, 0);
 	
 	return hash->name_func.comp(&hash->name_func, ((tb_hash_item_t*)ltem)->name, ((tb_hash_item_t*)rtem)->name);
 }

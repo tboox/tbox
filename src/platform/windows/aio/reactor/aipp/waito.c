@@ -100,8 +100,8 @@ static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 	tb_check_return_val(hdli >= WAIT_OBJECT_0, -1);
 
 	// has more event?
-	tb_size_t hdln = 0;
-	while (hdli < WAIT_OBJECT_0 + hdlm && hdln < objm)
+	tb_size_t objn = 0;
+	while (hdli < WAIT_OBJECT_0 + hdlm && objn < objm)
 	{
 		// get object
 		hdli -= WAIT_OBJECT_0;
@@ -109,11 +109,11 @@ static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 		tb_assert_and_check_return_val(o, -1);
 
 		// add object
-		objs[hdli] = *o;
+		objs[objn] = *o;
 
 		// next
 		hdli++;
-		hdln++;
+		objn++;
 
 		// end?
 		tb_check_break(hdli < hdlm);
@@ -129,7 +129,7 @@ static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 	}
 
 	// ok
-	return hdln;
+	return objn;
 }
 static tb_void_t tb_aipp_reactor_waito_exit(tb_aipp_reactor_t* reactor)
 {

@@ -76,7 +76,7 @@ typedef struct __tb_vpool_info_t
 typedef struct __tb_vpool_block_t
 {
 	/// the block size
-	tb_size_t 			size 	: (TB_CPU_BITSIZE - 1);
+	tb_size_t 			size 	: ((sizeof(tb_size_t) << 3) - 1);
 
 	/// is free?
 	tb_size_t 			free 	: 1;

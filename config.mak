@@ -12,7 +12,7 @@ DEBUG = n
 PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # toolchain
 SDK = /home/ruki/programs/windows/cross
