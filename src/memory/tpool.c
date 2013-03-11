@@ -41,7 +41,7 @@
 #define TB_TPOOL_ALIGN_MAXN 					(64)
 
 // the block maxn in the chunk
-#define TB_TPOOL_BLOCK_MAXN 					(TB_CPU_BITSIZE)
+#define TB_TPOOL_BLOCK_MAXN 					(sizeof(tb_size_t) << 3)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types

@@ -79,8 +79,9 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert_static(sizeof(tb_uint16_t) == 2);
 	tb_assert_static(sizeof(tb_uint32_t) == 4);
 	tb_assert_static(sizeof(tb_hize_t) == 8);
-	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_size_t) << 3));
-	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
+	// note: maybe different for windows x64
+//	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_size_t) << 3));
+//	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_pointer_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
 

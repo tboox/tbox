@@ -51,21 +51,21 @@ typedef struct __tb_dlist_item_t
 static tb_size_t tb_dlist_iterator_head(tb_iterator_t* iterator)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist, 0);
+	tb_assert_and_check_return_val(dlist, 0);
 
 	return dlist->head;
 }
 static tb_size_t tb_dlist_iterator_tail(tb_iterator_t* iterator)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist, 0);
+	tb_assert_and_check_return_val(dlist, 0);
 
 	return 0;
 }
 static tb_size_t tb_dlist_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist, 0);
+	tb_assert_and_check_return_val(dlist, 0);
 
 	if (!itor) return dlist->head;
 	else return ((tb_dlist_item_t const*)itor)->next;
@@ -73,7 +73,7 @@ static tb_size_t tb_dlist_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 static tb_size_t tb_dlist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist, 0);
+	tb_assert_and_check_return_val(dlist, 0);
 
 	if (!itor) return dlist->last;
 	else return ((tb_dlist_item_t const*)itor)->prev;
@@ -81,7 +81,7 @@ static tb_size_t tb_dlist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 static tb_pointer_t tb_dlist_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist && itor, tb_null);
+	tb_assert_and_check_return_val(dlist && itor, tb_null);
 	return dlist->func.data(&dlist->func, &((tb_dlist_item_t const*)itor)[1]);
 }
 static tb_void_t tb_dlist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
@@ -99,7 +99,7 @@ static tb_void_t tb_dlist_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 static tb_long_t tb_dlist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
 	tb_dlist_t* dlist = (tb_dlist_t*)iterator->data;
-	tb_assert_return_val(dlist && dlist->func.comp, 0);
+	tb_assert_and_check_return_val(dlist && dlist->func.comp, 0);
 	return dlist->func.comp(&dlist->func, ltem, rtem);
 }
 
