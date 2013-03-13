@@ -86,8 +86,11 @@ static tb_long_t tb_aipp_reactor_waito_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 
 	// hdls
 	tb_handle_t*	hdls = (tb_handle_t*)tb_vector_data(rtor->hdls);
+	tb_assert_and_check_return_val(hdls, -1);
+
+	// hdlm
 	tb_size_t 		hdlm = tb_vector_size(rtor->hdls);
-	tb_assert_and_check_return_val(hdls && hdlm, -1);
+	tb_check_return_val(hdlm, 0);
 
 	// wait
 	tb_long_t 		hdli = WaitForMultipleObjects((DWORD)hdlm, (HANDLE const*)hdls, FALSE, timeout >= 0? timeout : INFINITE);
