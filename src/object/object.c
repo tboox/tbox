@@ -338,9 +338,12 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 		data = data? tb_ralloc(data, maxn) : tb_malloc(maxn);
 		tb_assert_and_check_break(data);
 
-		// open stream
+		// init stream
 		tb_gstream_t* gst = tb_gstream_init_from_data(data, maxn);
-		if (gst && tb_gstream_bopen(gst))
+		tb_assert_and_check_break(gst);
+
+		// open stream
+		if (tb_gstream_bopen(gst))
 		{
 			// writ object
 			if (tb_object_writ(object, gst, format))
@@ -356,10 +359,10 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 				}
 				else maxn <<= 1;
 			}
-
-			// exit stream
-			tb_gstream_exit(gst);
 		}
+
+		// exit stream
+		tb_gstream_exit(gst);
 
 	} while (!odata);
 
@@ -370,10 +373,10 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 	// ok?
 	return odata;
 }
-tb_void_t tb_object_dump(tb_object_t* object)
+tb_object_t* tb_object_dump(tb_object_t* object)
 {
 	// check
-	tb_assert_and_check_return(object);
+	tb_assert_and_check_return_val(object, tb_null);
 
 	// data
 	tb_object_t* odata = tb_object_data(object, TB_OBJECT_FORMAT_XML);
@@ -405,6 +408,8 @@ tb_void_t tb_object_dump(tb_object_t* object)
 		// exit data
 		tb_object_exit(odata);
 	}
+
+	return object;
 }
 tb_size_t tb_object_ref(tb_object_t* object)
 {
@@ -457,14 +462,13 @@ tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 
 	// make stream
 	tb_gstream_t* gst = tb_gstream_init_from_data(data, size);
-	if (gst && tb_gstream_bopen(gst))
-	{
-		// read object
-		object = tb_object_read(gst);
+	tb_assert_and_check_return_val(gst, tb_null);
 
-		// exit stream
-		tb_gstream_exit(gst);
-	}
+	// read object
+	if (tb_gstream_bopen(gst)) object = tb_object_read(gst);
+
+	// exit stream
+	tb_gstream_exit(gst);
 
 	// ok?
 	return object;
@@ -479,14 +483,13 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 
 	// make stream
 	tb_gstream_t* gst = tb_gstream_init_from_url(url);
-	if (gst && tb_gstream_bopen(gst))
-	{
-		// read object
-		object = tb_object_read(gst);
+	tb_assert_and_check_return_val(gst, tb_null);
 
-		// exit stream
-		tb_gstream_exit(gst);
-	}
+	// read object
+	if (tb_gstream_bopen(gst)) object = tb_object_read(gst);
+
+	// exit stream
+	tb_gstream_exit(gst);
 
 	// ok?
 	return object;

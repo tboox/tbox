@@ -685,6 +685,14 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	// check block
 	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, tb_false);
 	tb_assert_and_check_return_val(block->size < vpool->size, tb_false);
+
+	// double free?
+	if (block->free)
+	{
+		// trace
+		tb_trace("vpool: double free at %s(): %d, file: %s", block->func, block->line, block->file);
+		return tb_true;
+	}
 	tb_assert_and_check_return_val(!block->free, tb_true);
 
 	// merge it if the next block is free
