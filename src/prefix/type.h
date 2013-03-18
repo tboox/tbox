@@ -59,11 +59,8 @@
 // basic
 typedef signed int					tb_int_t;
 typedef unsigned int				tb_uint_t;
-typedef signed long					tb_long_t;
-typedef unsigned long				tb_ulong_t;
 typedef signed short				tb_short_t;
 typedef unsigned short				tb_ushort_t;
-typedef tb_ulong_t					tb_size_t;
 typedef tb_int_t					tb_bool_t;
 typedef signed char					tb_int8_t;
 typedef tb_int8_t					tb_sint8_t;
@@ -93,18 +90,19 @@ typedef unsigned long long 			tb_uint64_t;
 #endif
 typedef tb_int64_t					tb_sint64_t;
 
+// hong & hize
 typedef tb_sint64_t					tb_hong_t;
 typedef tb_uint64_t					tb_hize_t;
 
 // long & size
 #if (TB_CPU_BITSIZE == 64)
-//typedef tb_sint64_t					tb_long_t;
-//typedef tb_uint64_t					tb_ulong_t;
+typedef tb_sint64_t					tb_long_t;
+typedef tb_uint64_t					tb_ulong_t;
 #else
-//typedef tb_sint32_t					tb_long_t;
-//typedef tb_uint32_t					tb_ulong_t;
+typedef tb_sint32_t					tb_long_t;
+typedef tb_uint32_t					tb_ulong_t;
 #endif
-//typedef tb_ulong_t					tb_size_t;
+typedef tb_ulong_t					tb_size_t;
 
 // double
 #ifdef TB_CONFIG_TYPE_FLOAT

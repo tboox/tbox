@@ -115,7 +115,7 @@ tb_item_func_t 		tb_item_func_uint16();
 /// the integer item function for tb_uint32_t
 tb_item_func_t 		tb_item_func_uint32();
 
-/*!the c-string item function
+/*! the c-string item function
  *
  * using tb_strdup if the spool is null, 
  * using tb_spool_strdup if the spool exists
@@ -123,7 +123,10 @@ tb_item_func_t 		tb_item_func_uint32();
  */
 tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
 
-/// the pointer item function
+/*! the pointer item function
+ *
+ * @note if the free func have been hooked, the nfree need hook too.
+ */
 tb_item_func_t 		tb_item_func_ptr();
 
 /*!the external fixed memory item function

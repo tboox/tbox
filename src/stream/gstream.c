@@ -284,7 +284,8 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_
 
 	// writ data to stream
 	tb_long_t 	writ = gst->awrit(gst, head, pull, tb_false);
-	tb_assert_and_check_return_val(writ >= 0 && writ <= pull, -1);
+	tb_check_goto(writ >= 0, end);
+	tb_assert_and_check_return_val(writ <= pull, -1);
 
 	// leave cache for pull
 	tb_qbuffer_pull_done(&gst->cache, writ);

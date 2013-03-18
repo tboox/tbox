@@ -177,8 +177,10 @@ tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
 /*! dump the object
  *
  * @param object 	the object pointer
+ *
+ * @return 			the object pointer
  */
-tb_void_t 			tb_object_dump(tb_object_t* object);
+tb_object_t* 		tb_object_dump(tb_object_t* object);
 
 /*! the object reference count
  *

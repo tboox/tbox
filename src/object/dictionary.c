@@ -154,6 +154,14 @@ static tb_void_t tb_dictionary_item_free(tb_item_func_t* func, tb_pointer_t item
 
 	// refn--
 	tb_object_dec(object);
+
+	// clear
+	if (item) *((tb_object_t**)item) = tb_null;
+}
+static tb_void_t tb_dictionary_item_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
+{
+	tb_assert_and_check_return(func && func->size && item);
+	while (size--) tb_dictionary_item_free(func, (tb_byte_t*)item + size * func->size);
 }
 static tb_object_t* tb_dictionary_read_xml(tb_handle_t reader, tb_size_t event)
 {
@@ -370,7 +378,8 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 
 	// init item func
 	tb_item_func_t func = tb_item_func_ptr();
-	func.free = tb_dictionary_item_free;
+	func.free 	= tb_dictionary_item_free;
+	func.nfree 	= tb_dictionary_item_nfree;
 
 	// init pool
 	dictionary->pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);

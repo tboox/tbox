@@ -287,7 +287,6 @@ static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_cpointer_t data,
 }
 static tb_long_t tb_item_func_ptr_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
-	tb_assert((tb_size_t)ldata <= TB_MAXS32 && (tb_size_t)rdata <= TB_MAXS32);
 	return (ldata - rdata);
 }
 static tb_pointer_t tb_item_func_ptr_data(tb_item_func_t* func, tb_cpointer_t item)
@@ -311,12 +310,15 @@ static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_pointer_t item)
 static tb_void_t tb_item_func_ptr_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
-
 	*((tb_pointer_t*)item) = data;
 }
 static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(func && item);
+	tb_assert(func->free == tb_item_func_ptr_free);
+
+	// clear
 	if (size) tb_memset(item, 0, size * func->size);
 }
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)

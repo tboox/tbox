@@ -79,9 +79,8 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert_static(sizeof(tb_uint16_t) == 2);
 	tb_assert_static(sizeof(tb_uint32_t) == 4);
 	tb_assert_static(sizeof(tb_hize_t) == 8);
-	// note: maybe different for windows x64
-//	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_size_t) << 3));
-//	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
+	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_size_t) << 3));
+	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_long_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_pointer_t) << 3));
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
 
@@ -120,15 +119,18 @@ tb_void_t tb_exit()
 
 	// exit socket
 	tb_socket_exit();
-
-#ifdef TB_CONFIG_MEMORY_POOL
-	//tb_memory_dump();
-	tb_memory_exit();
-#endif
 	
 	// exit object
 	tb_object_exit_reader();
 	tb_object_exit_writer();
+
+	// exit memory
+#ifdef TB_CONFIG_MEMORY_POOL
+# 	ifdef TB_DEBUG
+	tb_memory_dump();
+# 	endif
+	tb_memory_exit();
+#endif
 
 	// ok
 	tb_trace("exit: ok");
