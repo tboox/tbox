@@ -161,7 +161,8 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	tb_url_clear(url);
 
 	// parse proto
-	tb_char_t const* p = u;
+	tb_char_t const* 	p = u;
+	tb_char_t 			data[4096] = {0};
 	if (!tb_strnicmp(p, "http://", 7)) 
 	{
 		url->poto = TB_URL_PROTO_HTTP;
@@ -210,13 +211,21 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 		url->bssl = 1;
 		p += 8;
 	}
-	else if (tb_isalpha(p[0]) && p[1] == ':' && p[2] == '/')
+	// for windows style path
+	else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
 	{
 		url->poto = TB_URL_PROTO_FILE;
 		url->bssl = 0;
 		url->bwin = 1;
 		url->pwin = *p;
-		p += 3;
+		// '\\' => '/'
+		{
+			tb_char_t* 			q = data;
+			tb_char_t* 			e = data + 4096;
+			for (p += 3; q < e && *p; q++, p++) *q = (*p != '\\')? *p : '/';
+			if (q < e) *q = '\0';
+		}
+		p = data;
 	}
 	else goto fail;
 
