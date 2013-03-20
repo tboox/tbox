@@ -80,18 +80,30 @@ fail:
 
 tb_void_t tb_aipp_exit(tb_aipp_t* aipp)
 {
-	if (aipp)
-	{
-		// exit reactor
-		tb_assert(aipp->rtor && aipp->rtor->exit);
+	// check
+	tb_assert_and_check_return(aipp);
+
+	// exit reactor
+	if (aipp->rtor && aipp->rtor->exit)
 		aipp->rtor->exit(aipp->rtor);
 
-		// exit hash
-		if (aipp->hash) tb_hash_exit(aipp->hash);
+	// exit hash
+	if (aipp->hash) tb_hash_exit(aipp->hash);
 
-		// free aipp
-		tb_free(aipp);
-	}
+	// free aipp
+	tb_free(aipp);
+}
+tb_void_t tb_aipp_cler(tb_aipp_t* aipp)
+{
+	// check
+	tb_assert_and_check_return(aipp);
+
+	// clear reactor
+	if (aipp->rtor && aipp->rtor->cler)
+		aipp->rtor->cler(aipp->rtor);
+
+	// clear hash
+	if (aipp->hash) tb_hash_clear(aipp->hash);
 }
 tb_size_t tb_aipp_maxn(tb_aipp_t* aipp)
 {

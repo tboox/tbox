@@ -172,7 +172,6 @@ static tb_long_t tb_aipp_reactor_select_wait(tb_aipp_reactor_t* reactor, tb_aioo
 	// ok
 	return n;
 }
-
 static tb_void_t tb_aipp_reactor_select_exit(tb_aipp_reactor_t* reactor)
 {
 	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
@@ -190,6 +189,20 @@ static tb_void_t tb_aipp_reactor_select_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+static tb_void_t tb_aipp_reactor_select_cler(tb_aipp_reactor_t* reactor)
+{
+	tb_aipp_reactor_select_t* rtor = (tb_aipp_reactor_select_t*)reactor;
+	if (rtor)
+	{
+		// free fds
+		FD_ZERO(&rtor->rfdi);
+		FD_ZERO(&rtor->wfdi);
+		FD_ZERO(&rtor->efdi);
+		FD_ZERO(&rtor->rfdo);
+		FD_ZERO(&rtor->wfdo);
+		FD_ZERO(&rtor->efdo);
+	}
+}
 static tb_aipp_reactor_t* tb_aipp_reactor_select_init(tb_aipp_t* aipp)
 {
 	// check
@@ -203,6 +216,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_select_init(tb_aipp_t* aipp)
 	// init base
 	rtor->base.aipp = aipp;
 	rtor->base.exit = tb_aipp_reactor_select_exit;
+	rtor->base.cler = tb_aipp_reactor_select_cler;
 	rtor->base.addo = tb_aipp_reactor_select_addo;
 	rtor->base.seto = tb_aipp_reactor_select_seto;
 	rtor->base.delo = tb_aipp_reactor_select_delo;

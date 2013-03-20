@@ -2,11 +2,11 @@
 IS_CONFIG = yes
 
 # project
-PRO_DIR = /home/ruki/projects/tbox
+PRO_DIR = /home/wangrunqing/projects/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = n
+DEBUG = y
 
 # platform
 PLAT = mingw
