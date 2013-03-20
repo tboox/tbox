@@ -146,7 +146,15 @@ static tb_void_t tb_aipp_reactor_waito_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-
+static tb_void_t tb_aipp_reactor_waito_cler(tb_aipp_reactor_t* reactor)
+{
+	tb_aipp_reactor_waito_t* rtor = (tb_aipp_reactor_waito_t*)reactor;
+	if (rtor)
+	{
+		// clear hdls
+		if (rtor->hdls) tb_vector_clear(rtor->hdls);
+	}
+}
 static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 {
 	// check
@@ -161,6 +169,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 	// init base
 	rtor->base.aipp = aipp;
 	rtor->base.exit = tb_aipp_reactor_waito_exit;
+	rtor->base.cler = tb_aipp_reactor_waito_cler;
 	rtor->base.addo = tb_aipp_reactor_waito_addo;
 	rtor->base.seto = tb_aipp_reactor_waito_seto;
 	rtor->base.delo = tb_aipp_reactor_waito_delo;

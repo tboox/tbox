@@ -177,6 +177,15 @@ static tb_void_t tb_aipp_reactor_poll_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+static tb_void_t tb_aipp_reactor_poll_cler(tb_aipp_reactor_t* reactor)
+{
+	tb_aipp_reactor_poll_t* rtor = (tb_aipp_reactor_poll_t*)reactor;
+	if (rtor)
+	{
+		// clear pfds
+		if (rtor->pfds) tb_vector_clear(rtor->pfds);
+	}
+}
 static tb_aipp_reactor_t* tb_aipp_reactor_poll_init(tb_aipp_t* aipp)
 {
 	// check
@@ -190,6 +199,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_poll_init(tb_aipp_t* aipp)
 	// init base
 	rtor->base.aipp = aipp;
 	rtor->base.exit = tb_aipp_reactor_poll_exit;
+	rtor->base.cler = tb_aipp_reactor_poll_cler;
 	rtor->base.addo = tb_aipp_reactor_poll_addo;
 	rtor->base.seto = tb_aipp_reactor_poll_seto;
 	rtor->base.delo = tb_aipp_reactor_poll_delo;

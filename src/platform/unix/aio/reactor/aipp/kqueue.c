@@ -85,7 +85,7 @@ static tb_bool_t tb_aipp_reactor_kqueue_addo(tb_aipp_reactor_t* reactor, tb_hand
 
 	// add event
 	struct kevent 	e[2];
-	tb_size_t 			n = 0;
+	tb_size_t 		n = 0;
 	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) 
 	{
 		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
@@ -250,6 +250,20 @@ static tb_void_t tb_aipp_reactor_kqueue_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+static tb_void_t tb_aipp_reactor_kqueue_cler(tb_aipp_reactor_t* reactor)
+{
+	tb_aipp_reactor_kqueue_t* rtor = (tb_aipp_reactor_kqueue_t*)reactor;
+	if (rtor)
+	{
+		// close kqfd
+		if (rtor->kqfd >= 0)
+		{
+			// FIXME 
+			close(rtor->kqfd);
+			rtor->kqfd = kqueue();
+		}
+	}
+}
 static tb_aipp_reactor_t* tb_aipp_reactor_kqueue_init(tb_aipp_t* aipp)
 {
 	// check
@@ -263,6 +277,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_kqueue_init(tb_aipp_t* aipp)
 	// init base
 	rtor->base.aipp = aipp;
 	rtor->base.exit = tb_aipp_reactor_kqueue_exit;
+	rtor->base.cler = tb_aipp_reactor_kqueue_cler;
 	rtor->base.addo = tb_aipp_reactor_kqueue_addo;
 	rtor->base.seto = tb_aipp_reactor_kqueue_seto;
 	rtor->base.delo = tb_aipp_reactor_kqueue_delo;

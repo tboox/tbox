@@ -44,6 +44,9 @@ typedef struct __tb_aipp_reactor_t
 	// exit
 	tb_void_t 				(*exit)(struct __tb_aipp_reactor_t* reactor);
 
+	// cler
+	tb_void_t 				(*cler)(struct __tb_aipp_reactor_t* reactor);
+
 	// addo
 	tb_bool_t 				(*addo)(struct __tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
 
@@ -94,18 +97,27 @@ typedef struct __tb_aipp_t
  *
  * @return 	the aio pool
  */
-tb_aipp_t* 		tb_aipp_init(tb_size_t type, tb_size_t maxn);
+tb_aipp_t* 			tb_aipp_init(tb_size_t type, tb_size_t maxn);
 
-/// exit the aio pool
-tb_void_t 		tb_aipp_exit(tb_aipp_t* aipp);
+/*! exit the aio pool
+ *
+ * @param 	aipp 	the aio pool
+ */
+tb_void_t 			tb_aipp_exit(tb_aipp_t* aipp);
+
+/*! cler the aio pool
+ *
+ * @param 	aipp 	the aio pool
+ */
+tb_void_t 			tb_aipp_cler(tb_aipp_t* aipp);
 
 /// the object maximum number of the aio pool
-tb_size_t 		tb_aipp_maxn(tb_aipp_t* aipp);
+tb_size_t 			tb_aipp_maxn(tb_aipp_t* aipp);
 
 /// the object number of the aio pool
-tb_size_t 		tb_aipp_size(tb_aipp_t* aipp);
+tb_size_t 			tb_aipp_size(tb_aipp_t* aipp);
 
-/*!add the aio object
+/*! add the aio object
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
@@ -114,62 +126,62 @@ tb_size_t 		tb_aipp_size(tb_aipp_t* aipp);
  *
  * @return 	return tb_false if failed
  */
-tb_bool_t 		tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
+tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
 
-/*!del the aio object
+/*! del the aio object
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  *
  * @return 	return tb_false if failed
  */
-tb_bool_t 		tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
+tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
 
-/*!set the aio event
+/*! set the aio event
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  * @param 	etype 	the event type
  *
  */
-tb_size_t 		tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
+tb_size_t 			tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
 
-/*!set the aio event
+/*! set the aio event
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  * @param 	etype 	the event type
  *
  */
-tb_void_t 		tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
+tb_void_t 			tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*!add the aio event
+/*! add the aio event
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  * @param 	etype 	the event type
  *
  */
-tb_void_t 		tb_aipp_adde(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
+tb_void_t 			tb_aipp_adde(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*!del the aio event
+/*! del the aio event
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  *
  */
-tb_void_t 		tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
+tb_void_t 			tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*!set the aio odata
+/*! set the aio odata
  *
  * @param 	aipp 	the aio pool
  * @param 	handle 	the handle of the aio object
  * @param 	odata 	the object data
  *
  */
-tb_void_t 		tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata);
+tb_void_t 			tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata);
 
-/*!wait the aio objects in the pool
+/*! wait the aio objects in the pool
  *
  * blocking wait the multiple event objects
  * return the event number if ok, otherwise return 0 for timeout
@@ -181,6 +193,6 @@ tb_void_t 		tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata
  *
  * @return 	the event number, return 0 if timeout, return -1 if error
  */
-tb_long_t 		tb_aipp_wait(tb_aipp_t* aipp, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
+tb_long_t 			tb_aipp_wait(tb_aipp_t* aipp, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
 
 #endif

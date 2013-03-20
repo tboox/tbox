@@ -196,6 +196,20 @@ static tb_void_t tb_aipp_reactor_epoll_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+static tb_void_t tb_aipp_reactor_epoll_cler(tb_aipp_reactor_t* reactor)
+{
+	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	if (rtor)
+	{
+		// close fd
+		if (rtor->epfd) close(rtor->epfd);
+		rtor->epfd = 0;
+
+		// FIXME: re-init it
+		if (rtor->base.aipp) rtor->epfd = epoll_create(rtor->base.aipp->maxn);
+		tb_assert(rtor->epfd >= 0);
+	}
+}
 static tb_aipp_reactor_t* tb_aipp_reactor_epoll_init(tb_aipp_t* aipp)
 {
 	// check
@@ -209,6 +223,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_epoll_init(tb_aipp_t* aipp)
 	// init base
 	rtor->base.aipp = aipp;
 	rtor->base.exit = tb_aipp_reactor_epoll_exit;
+	rtor->base.cler = tb_aipp_reactor_epoll_cler;
 	rtor->base.addo = tb_aipp_reactor_epoll_addo;
 	rtor->base.seto = tb_aipp_reactor_epoll_seto;
 	rtor->base.delo = tb_aipp_reactor_epoll_delo;
