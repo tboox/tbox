@@ -133,7 +133,7 @@ static __tb_inline__ tb_bool_t tb_object_writ_bin_type_size(tb_gstream_t* gst, t
 	// check
 	tb_assert_and_check_return_val(type <= 0xff, tb_false);
 
-	// byte for size
+	// byte for size < 64bits
 	tb_size_t sizeb = tb_object_need_bytes(size);
 	tb_assert_and_check_return_val(sizeb < 8, tb_false);
 
@@ -144,27 +144,65 @@ static __tb_inline__ tb_bool_t tb_object_writ_bin_type_size(tb_gstream_t* gst, t
 	tb_uint8_t flag = ((type < 0xf? (tb_uint8_t)type : 0xf) << 4) | (size < 0xd? (tb_uint8_t)size : sizef);
 	if (!tb_gstream_bwrit_u8(gst, flag)) return tb_false;
 
+	// trace
+//	tb_trace("writ: type: %lu, size: %lu", type, size);
+
 	// writ type
 	if (type >= 0xf) if (!tb_gstream_bwrit_u8(gst, (tb_uint8_t)type)) return tb_false;
 
 	// writ size
-	switch (sizeb)
+	if (size >= 0xd)
 	{
-	case 1:
-		if (!tb_gstream_bwrit_u8(gst, (tb_uint8_t)size)) return tb_false;
+		switch (sizeb)
+		{
+		case 1:
+			if (!tb_gstream_bwrit_u8(gst, (tb_uint8_t)size)) return tb_false;
+			break;
+		case 2:
+			if (!tb_gstream_bwrit_u16_be(gst, (tb_uint16_t)size)) return tb_false;
+			break;
+		case 4:
+			if (!tb_gstream_bwrit_u32_be(gst, (tb_uint32_t)size)) return tb_false;
+			break;
+		default:
+			tb_assert_and_check_return_val(0, tb_false);
+			break;
+		}
+	}
+
+	// ok
+	return tb_true;
+}
+static __tb_inline__ tb_void_t tb_object_read_bin_type_size(tb_gstream_t* gst, tb_size_t* ptype, tb_size_t* psize)
+{
+	// the flag
+	tb_uint8_t flag = tb_gstream_bread_u8(gst);
+
+	// the type & size
+	tb_size_t type = flag >> 4;
+	tb_size_t size = flag & 0x0f;
+	if (type == 0xf) type = tb_gstream_bread_u8(gst);
+	switch (size)
+	{
+	case 0xd:
+		size = tb_gstream_bread_u8(gst);
 		break;
-	case 2:
-		if (!tb_gstream_bwrit_u16_be(gst, (tb_uint16_t)size)) return tb_false;
+	case 0xe:
+		size = tb_gstream_bread_u16_be(gst);
 		break;
-	case 4:
-		if (!tb_gstream_bwrit_u32_be(gst, (tb_uint32_t)size)) return tb_false;
+	case 0xf:
+		size = tb_gstream_bread_u32_be(gst);
 		break;
 	default:
 		break;
 	}
 
-	// ok
-	return tb_true;
+	// trace
+//	tb_trace("type: %lu, size: %lu", type, size);
+
+	// save
+	if (ptype) *ptype = type;
+	if (psize) *psize = size;
 }
 
 #endif
