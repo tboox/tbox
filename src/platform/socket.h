@@ -31,50 +31,133 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
-// socket proto
-typedef enum __tb_socket_type_t
-{
- 	TB_SOCKET_TYPE_NUL = 0
-,	TB_SOCKET_TYPE_TCP = 1
-, 	TB_SOCKET_TYPE_UDP = 2
 
-}tb_socket_type_t;
+/// the socket type enum
+typedef enum __tb_socket_type_e
+{
+ 	TB_SOCKET_TYPE_NUL 	= 0
+,	TB_SOCKET_TYPE_TCP 	= 1
+, 	TB_SOCKET_TYPE_UDP 	= 2
+
+}tb_socket_type_e;
+
+/// the socket kill enum
+typedef enum __tb_socket_kill_e
+{
+ 	TB_SOCKET_KILL_RO 	= 0
+,	TB_SOCKET_KILL_WO 	= 1
+, 	TB_SOCKET_KILL_RW 	= 2
+
+}tb_socket_kill_e;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init & exit
-tb_bool_t 		tb_socket_init();
-tb_void_t 		tb_socket_exit();
+/*! init socket
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_socket_init();
 
-// open
-tb_handle_t 	tb_socket_open(tb_size_t type);
+/// exit socket
+tb_void_t 			tb_socket_exit();
 
-// connect
-tb_long_t 		tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
+/*! open socket
+ *
+ * @param type 		the socket type
+ *
+ * @return 			the socket handle
+ */
+tb_handle_t 		tb_socket_open(tb_size_t type);
 
-// bind 
-tb_bool_t 		tb_socket_bind(tb_handle_t handle, tb_size_t port);
+/*! connect socket
+ *
+ * @param handle 	the socket handle
+ * @param ip 		the ip address
+ * @param port 		the port
+ *
+ * @return 			ok: 1, continue: 0; failed: -1
+ */
+tb_long_t 			tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
 
-// accept
-tb_handle_t 	tb_socket_accept(tb_handle_t handle);
+/*! bind socket
+ *
+ * @param handle 	the socket handle
+ * @param port 		the bind port
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_socket_bind(tb_handle_t handle, tb_size_t port);
 
-// close
-tb_bool_t 		tb_socket_close(tb_handle_t handle);
+/*! accept socket
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			the client socket handle
+ */
+tb_handle_t 		tb_socket_accept(tb_handle_t handle);
 
-// recv & send
-tb_long_t 		tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-tb_long_t 		tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+/*! kill socket
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_socket_kill(tb_handle_t handle, tb_size_t mode);
 
-// recv & send for udp
-tb_long_t 		tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
-tb_long_t 		tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
+/*! close socket
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_socket_close(tb_handle_t handle);
+
+/*! recv the socket data
+ *
+ * @param handle 	the socket handle
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+/*! send the socket data
+ *
+ * @param handle 	the socket handle
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+/*! recv the socket data for udp
+ *
+ * @param handle 	the socket handle
+ * @param host 		the host
+ * @param port 		the port
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
+
+/*! send the socket data for udp
+ *
+ * @param handle 	the socket handle
+ * @param host 		the host
+ * @param port 		the port
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
 	
 #endif
