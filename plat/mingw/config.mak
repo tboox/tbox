@@ -22,7 +22,7 @@ TB_CONFIG_API_TIME				= windows
 TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
-TB_CONFIG_MEMORY_POOL 			= n
+TB_CONFIG_MEMORY_POOL 			= y
 
 # float
 TB_CONFIG_TYPE_FLOAT 			= y

@@ -17,15 +17,15 @@ ASM_SUFFIX 			= .S
 
 # prefix
 ifeq ($(ARCH),x86)
-PRE 				= i686-w64-mingw32-
+PRE 				:= i686-w64-mingw32-
 endif
 
 ifeq ($(ARCH),x64)
-PRE 				= x86_64-w64-mingw32-
+PRE 				:= x86_64-w64-mingw32-
 endif
 
 ifneq ($(BIN),)
-PRE 				= $(BIN)/$(PRE)
+PRE 				:= $(BIN)/$(PRE)
 endif
 
 # tool
