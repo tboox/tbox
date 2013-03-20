@@ -235,8 +235,11 @@ static tb_object_t* tb_date_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_
 }
 static tb_bool_t tb_date_writ_bin(tb_object_t* object, tb_gstream_t* gst)
 {
-	tb_trace_noimpl();
-	return tb_false;
+	// writ type & size
+	if (!tb_object_writ_bin_type_size(gst, object->type, sizeof(tb_time_t))) return tb_false;
+
+	// ok
+	return tb_true;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

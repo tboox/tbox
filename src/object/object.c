@@ -115,50 +115,25 @@ static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_b
 }
 static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 {
-	// init 
-	tb_object_t* object = tb_null;
-
 	// read bin header
 	tb_byte_t data[32] = {0};
 	if (!tb_gstream_bread(gst, data, 5)) return tb_null;
 
 	// check 
-	if (!tb_strnicmp(data, "tbo00", 5)) return tb_null;
+	if (tb_strnicmp(data, "tbo00", 5)) return tb_null;
 
-	// walk
-	tb_uint8_t flag = 0;
-	while (flag = tb_gstream_bread_u8(gst))
-	{
-		// type & size
-		tb_size_t type = flag >> 4;
-		tb_size_t size = flag & 0x0f;
-		if (type == 0xf) type = tb_gstream_bread_u8(gst);
-		switch (size)
-		{
-		case 0xd:
-			size = tb_gstream_bread_u8(gst);
-			break;
-		case 0xe:
-			size = tb_gstream_bread_u16_be(gst);
-			break;
-		case 0xf:
-			size = tb_gstream_bread_u32_be(gst);
-			break;
-		default:
-			tb_assert_and_check_return_val(0, tb_null);
-			break;
-		}
-		tb_trace_impl("type: %lu, size: %lu", type, size);
-	
-		// func
-		tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
-		tb_assert_and_check_return_val(func, tb_null);
+	// the type & size
+	tb_size_t type = 0;
+	tb_size_t size = 0;
+	tb_object_read_bin_type_size(gst, &type, &size);
+	tb_trace_impl("type: %lu, size: %lu", type, size);
 
-		tb_object_t* o = func(gst, type, size);
-	}
+	// the func
+	tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
+	tb_assert_and_check_return_val(func, tb_null);
 
-	// ok?
-	return object;
+	// read it
+	return func(gst, type, size);
 }
 static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
 {
