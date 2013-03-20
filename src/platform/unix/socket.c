@@ -52,6 +52,7 @@ tb_void_t tb_socket_exit()
 }
 tb_handle_t tb_socket_open(tb_size_t type)
 {
+	// check
 	tb_assert_and_check_return_val(type, tb_null);
 	
 	// init type & protocol
@@ -76,7 +77,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	}
 
 	// socket
-	tb_long_t fd = socket(AF_INET, t, p);
+	tb_int_t fd = socket(AF_INET, t, p);
 	tb_assert_and_check_return_val(fd >= 0, tb_null);
 
 	// non-block
@@ -88,6 +89,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
+	// check
 	tb_assert_and_check_return_val(handle && ip && port, -1);
 
 	// init
@@ -106,7 +108,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 #endif
 
 	// connect
-	tb_long_t r = connect((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d));
+	tb_long_t r = connect((tb_int_t)handle - 1, (struct sockaddr *)&d, sizeof(d));
 
 	// ok?
 	if (!r || errno == EISCONN) return 1;
@@ -120,6 +122,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 
 tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 {
+	// check
 	tb_assert_and_check_return_val(handle && port, tb_false);
 
 	// init
@@ -131,31 +134,32 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
 	// reuse addr
 #ifdef SO_REUSEADDR
 	tb_int_t reuseaddr = 1;
-	if (setsockopt((tb_long_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+	if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
 		tb_trace("reuseaddr: %lu failed", port);
 #endif
 
 	// reuse port
 #ifdef SO_REUSEPORT
 	tb_int_t reuseport = 1;
-	if (setsockopt((tb_long_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+	if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
 		tb_trace("reuseport: %lu failed", port);
 #endif
 
 	// bind 
-    if (bind((tb_long_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
+    if (bind((tb_int_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
 
 	// listen
-    return (listen((tb_long_t)handle - 1, 20) < 0)? tb_false : tb_true;
+    return (listen((tb_int_t)handle - 1, 20) < 0)? tb_false : tb_true;
 }
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
+	// check
 	tb_assert_and_check_return_val(handle, tb_null);
 
 	// accept  
 	struct sockaddr_in d;
 	tb_int_t 	n = sizeof(struct sockaddr_in);
-	tb_long_t 	r = accept((tb_long_t)handle - 1, (struct sockaddr *)&d, &n);
+	tb_long_t 	r = accept((tb_int_t)handle - 1, (struct sockaddr *)&d, &n);
 
 	// no client?
 	tb_check_return_val(r > 0, tb_null);
@@ -166,19 +170,47 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	// ok
 	return r + 1;
 }
+tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
+{
+	// check
+	tb_assert_and_check_return_val(handle, tb_false);
 
+	// init how
+	tb_int_t how = SHUT_RDWR;
+	switch (mode)
+	{
+	case TB_SOCKET_KILL_RO:
+		how = SHUT_RD;
+		break;
+	case TB_SOCKET_KILL_WO:
+		how = SHUT_WR;
+		break;
+	case TB_SOCKET_KILL_RW:
+		how = SHUT_RDWR;
+		break;
+	default:
+		break;
+	}
+
+	// kill it
+	return !shutdown((tb_int_t)handle - 1, how)? tb_true : tb_false;
+}
 tb_bool_t tb_socket_close(tb_handle_t handle)
 {
+	// check
 	tb_assert_and_check_return_val(handle, tb_false);
-	return !close((tb_long_t)handle - 1)? tb_true : tb_false;
+
+	// close it
+	return !close((tb_int_t)handle - 1)? tb_true : tb_false;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(handle && data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = recv((tb_long_t)handle - 1, data, size, 0);
+	tb_long_t r = recv((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
 
 	// ok?
 	if (r >= 0) return r;
@@ -191,11 +223,12 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 }
 tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(handle && data, -1);
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = send((tb_long_t)handle - 1, data, size, 0);
+	tb_long_t r = send((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
 
 	// ok?
 	if (r >= 0) return r;
@@ -210,6 +243,7 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 // recv & send for udp
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(handle && ip && port && data, -1);
 	tb_check_return_val(size, 0);
 
@@ -221,7 +255,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 
 	// recv
 	tb_int_t 	n = sizeof(d);
-	tb_long_t 	r = recvfrom((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, &n);
+	tb_long_t 	r = recvfrom((tb_int_t)handle - 1, data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
 	// ok?
 	if (r >= 0) return r;
@@ -234,6 +268,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 }
 tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(handle && ip && port && data, -1);
 	tb_check_return_val(size, 0);
 
@@ -244,7 +279,7 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	if (!inet_aton(ip, &(d.sin_addr))) return -1;
 
 	// send
-	tb_long_t 	r = sendto((tb_long_t)handle - 1, data, size, 0, (struct sockaddr*)&d, sizeof(d));
+	tb_long_t 	r = sendto((tb_int_t)handle - 1, data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
 
 	// ok?
 	if (r >= 0) return r;
