@@ -316,10 +316,17 @@ static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item,
 {
 	// check
 	tb_assert_and_check_return(func && item);
-	tb_assert(func->free == tb_item_func_ptr_free);
 
-	// clear
-	if (size) tb_memset(item, 0, size * func->size);
+	// the free is not hooked? or null
+	if (func->free == tb_item_func_ptr_free || !func->free)
+	{
+		// clear
+		if (size) tb_memset(item, 0, size * func->size);
+	}
+	else
+	{
+		while (size--) func->free(func, (tb_byte_t*)item + size * func->size);
+	}
 }
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {

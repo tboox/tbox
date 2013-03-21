@@ -197,10 +197,10 @@ fail:
 	if (number) tb_free(number);
 	return tb_null;
 }
-static tb_object_t* tb_number_read_xml(tb_handle_t reader, tb_size_t event)
+static tb_object_t* tb_number_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
-	tb_assert_and_check_return_val(reader && event, tb_null);
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
@@ -208,14 +208,14 @@ static tb_object_t* tb_number_read_xml(tb_handle_t reader, tb_size_t event)
 
 	// walk
 	tb_object_t* number = tb_null;
-	while (event = tb_xml_reader_next(reader))
+	while (event = tb_xml_reader_next(reader->reader))
 	{
 		switch (event)
 		{
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
@@ -225,7 +225,7 @@ static tb_object_t* tb_number_read_xml(tb_handle_t reader, tb_size_t event)
 		case TB_XML_READER_EVENT_TEXT: 
 			{
 				// text
-				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
 				tb_trace_impl("number: %s", text);
 
@@ -256,60 +256,63 @@ end:
 	// ok?
 	return number;
 }
-static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
+static tb_bool_t tb_number_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
 	// writ
 	switch (tb_number_type(object))
 	{
 	case TB_NUMBER_TYPE_UINT64:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%llu</number>", tb_number_uint64(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%llu</number>", tb_number_uint64(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT64:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%lld</number>", tb_number_sint64(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%lld</number>", tb_number_sint64(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT32:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint32(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint32(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT32:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint32(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint32(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT16:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint16(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint16(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT16:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint16(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint16(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_UINT8:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%u</number>", tb_number_uint8(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint8(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_SINT8:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%d</number>", tb_number_sint8(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint8(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_FLOAT:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%f</number>", tb_number_float(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%f</number>", tb_number_float(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	case TB_NUMBER_TYPE_DOUBLE:
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<number>%lf</number>", tb_number_double(object));
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<number>%lf</number>", tb_number_double(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
 	default:
 		break;
@@ -318,15 +321,121 @@ static tb_bool_t tb_number_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_b
 	// ok
 	return tb_true;
 }
-static tb_object_t* tb_number_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+static tb_object_t* tb_number_read_bin(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
-	tb_trace_noimpl();
-	return tb_null;
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
+
+	// the number type
+	tb_size_t number_type = (tb_size_t)size;
+
+	// read number
+	tb_object_t* number = tb_null;
+	switch (number_type)
+	{
+	case TB_NUMBER_TYPE_UINT64:
+		number = tb_number_init_from_uint64(tb_gstream_bread_u64_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_SINT64:
+		number = tb_number_init_from_sint64(tb_gstream_bread_s64_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_UINT32:
+		number = tb_number_init_from_uint32(tb_gstream_bread_u32_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_SINT32:
+		number = tb_number_init_from_sint32(tb_gstream_bread_s32_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_UINT16:
+		number = tb_number_init_from_uint16(tb_gstream_bread_u16_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_SINT16:
+		number = tb_number_init_from_sint16(tb_gstream_bread_s16_be(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_UINT8:
+		number = tb_number_init_from_uint8(tb_gstream_bread_u8(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_SINT8:
+		number = tb_number_init_from_sint8(tb_gstream_bread_s8(reader->stream));
+		break;
+	case TB_NUMBER_TYPE_FLOAT:
+		{
+			tb_byte_t data[4] = {0};
+			if (!tb_gstream_bread(reader->stream, data, 4)) return tb_null;
+			number = tb_number_init_from_float(tb_bits_get_float_be(data));
+		}
+		break;
+	case TB_NUMBER_TYPE_DOUBLE:
+		{
+			tb_byte_t data[8] = {0};
+			if (!tb_gstream_bread(reader->stream, data, 8)) return tb_null;
+			number = tb_number_init_from_double(tb_bits_get_double_bbe(data));
+		}
+		break;
+	default:
+		tb_assert_and_check_return_val(0, tb_null);
+		break;
+	}
+
+	// ok?
+	return number;
 }
-static tb_bool_t tb_number_writ_bin(tb_object_t* object, tb_gstream_t* gst)
+static tb_bool_t tb_number_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
-	// writ type & size
-	if (!tb_object_writ_bin_type_size(gst, object->type, 0xf)) return tb_false;
+	// check
+	tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
+
+	// the number
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// writ type
+	if (!tb_object_writ_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_number_type(object))) return tb_false;
+
+	// writ number
+	switch (tb_number_type(object))
+	{
+	case TB_NUMBER_TYPE_UINT64:
+		if (!tb_gstream_bwrit_u64_be(writer->stream, tb_number_uint64(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_SINT64:
+		if (!tb_gstream_bwrit_s64_be(writer->stream, tb_number_sint64(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_UINT32:
+		if (!tb_gstream_bwrit_u32_be(writer->stream, tb_number_uint32(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_SINT32:
+		if (!tb_gstream_bwrit_s32_be(writer->stream, tb_number_sint32(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_UINT16:
+		if (!tb_gstream_bwrit_u16_be(writer->stream, tb_number_uint16(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_SINT16:
+		if (!tb_gstream_bwrit_s16_be(writer->stream, tb_number_sint16(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_UINT8:
+		if (!tb_gstream_bwrit_u8(writer->stream, tb_number_uint8(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_SINT8:
+		if (!tb_gstream_bwrit_s8(writer->stream, tb_number_sint8(object))) return tb_false;
+		break;
+	case TB_NUMBER_TYPE_FLOAT:
+		{
+			tb_byte_t data[4];
+			tb_bits_set_float_be(data, tb_number_float(object));
+			if (!tb_gstream_bwrit(writer->stream, data, 4)) return tb_false;
+		}
+		break;
+	case TB_NUMBER_TYPE_DOUBLE:
+		{
+			tb_byte_t data[8];
+			tb_bits_set_double_bbe(data, tb_number_double(object));
+			if (!tb_gstream_bwrit(writer->stream, data, 8)) return tb_false;
+		}
+		break;
+	default:
+		tb_assert_and_check_return_val(0, tb_false);
+		break;
+	}
 
 	// ok
 	return tb_true;

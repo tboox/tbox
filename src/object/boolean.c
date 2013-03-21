@@ -68,13 +68,13 @@ static tb_object_t* tb_boolean_copy(tb_object_t* object)
 	// copy
 	return (tb_object_t*)tb_boolean_init(boolean->value);
 }
-static tb_object_t* tb_boolean_read_xml(tb_handle_t reader, tb_size_t event)
+static tb_object_t* tb_boolean_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
-	tb_assert_and_check_return_val(reader && event, tb_null);
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// name
-	tb_char_t const* name = tb_xml_reader_element(reader);
+	tb_char_t const* name = tb_xml_reader_element(reader->reader);
 	tb_assert_and_check_return_val(name, tb_null);
 	tb_trace_impl("boolean: %s", name);
 
@@ -87,28 +87,34 @@ static tb_object_t* tb_boolean_read_xml(tb_handle_t reader, tb_size_t event)
 	// ok?
 	return tb_boolean_init(val);
 }
-static tb_bool_t tb_boolean_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
+static tb_bool_t tb_boolean_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
 	// writ
-	tb_object_writ_tab(gst, deflate, level);
-	tb_gstream_printf(gst, "<%s/>", tb_boolean_bool(object)? "true" : "false");
-	tb_object_writ_newline(gst, deflate);
+	tb_object_writ_tab(writer->stream, writer->deflate, level);
+	tb_gstream_printf(writer->stream, "<%s/>", tb_boolean_bool(object)? "true" : "false");
+	tb_object_writ_newline(writer->stream, writer->deflate);
 
 	// ok
 	return tb_true;
 }
-static tb_object_t* tb_boolean_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+static tb_object_t* tb_boolean_read_bin(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
-	tb_trace_noimpl();
-	return tb_null;
-}
-static tb_bool_t tb_boolean_writ_bin(tb_object_t* object, tb_gstream_t* gst)
-{
-	// writ type & size
-	if (!tb_object_writ_bin_type_size(gst, object->type, 0xf)) return tb_false;
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
-	// ok
-	return tb_true;
+	// ok?
+	return tb_boolean_init(size? tb_true : tb_false);
+}
+static tb_bool_t tb_boolean_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
+{
+	// check
+	tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
+
+	// writ type & bool
+	return tb_object_writ_bin_type_size(writer->stream, object->type, tb_boolean_bool(object));
 }
 /* ///////////////////////////////////////////////////////////////////////
  * globals

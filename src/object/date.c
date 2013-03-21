@@ -95,10 +95,10 @@ fail:
 	if (date) tb_free(date);
 	return tb_null;
 }
-static tb_object_t* tb_date_read_xml(tb_handle_t reader, tb_size_t event)
+static tb_object_t* tb_date_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
-	tb_assert_and_check_return_val(reader && event, tb_null);
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
@@ -106,14 +106,14 @@ static tb_object_t* tb_date_read_xml(tb_handle_t reader, tb_size_t event)
 
 	// walk
 	tb_object_t* 	date 	= tb_null;
-	while (event = tb_xml_reader_next(reader))
+	while (event = tb_xml_reader_next(reader->reader))
 	{
 		switch (event)
 		{
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
@@ -128,7 +128,7 @@ static tb_object_t* tb_date_read_xml(tb_handle_t reader, tb_size_t event)
 		case TB_XML_READER_EVENT_TEXT: 
 			{
 				// text
-				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
 				tb_trace_impl("date: %s", text);
 
@@ -190,21 +190,24 @@ end:
 	// ok?
 	return date;
 }
-static tb_bool_t tb_date_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
+static tb_bool_t tb_date_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
 	// no empty?
 	tb_time_t time = tb_date_time(object);
 	if (time > 0)
 	{
 		// writ beg
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<date>");
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<date>");
 
 		// writ date
 		tb_tm_t date = {0};
 		if (tb_localtime(time, &date))
 		{
-			tb_gstream_printf(gst, 	"%04ld-%02ld-%02ld %02ld:%02ld:%02ld"
+			tb_gstream_printf(writer->stream, 	"%04ld-%02ld-%02ld %02ld:%02ld:%02ld"
 								, 	date.year
 								, 	date.month
 								, 	date.mday
@@ -214,32 +217,35 @@ static tb_bool_t tb_date_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_boo
 		}
 					
 		// writ end
-		tb_gstream_printf(gst, "</date>");
-		tb_object_writ_newline(gst, deflate);
+		tb_gstream_printf(writer->stream, "</date>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 	else 
 	{
 		// writ
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<date/>");
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<date/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_object_t* tb_date_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+static tb_object_t* tb_date_read_bin(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
-	tb_trace_noimpl();
-	return tb_null;
-}
-static tb_bool_t tb_date_writ_bin(tb_object_t* object, tb_gstream_t* gst)
-{
-	// writ type & size
-	if (!tb_object_writ_bin_type_size(gst, object->type, sizeof(tb_time_t))) return tb_false;
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
 	// ok
-	return tb_true;
+	return tb_date_init_from_time((tb_time_t)size);
+}
+static tb_bool_t tb_date_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
+{
+	// check
+	tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
+
+	// writ type & time
+	return tb_object_writ_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_date_time(object));
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
