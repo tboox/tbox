@@ -164,6 +164,22 @@ typedef struct __tb_object_bin_writer_t
 
 }tb_object_bin_writer_t;
 
+/// the object jsn reader type
+typedef struct __tb_object_jsn_reader_t
+{
+	// the stream
+	tb_gstream_t* 			stream;
+
+}tb_object_jsn_reader_t;
+
+/// the object jsn writer type
+typedef struct __tb_object_jsn_writer_t
+{
+	// the stream
+	tb_gstream_t* 			stream;
+
+}tb_object_jsn_writer_t;
+
 /// the xml reader func type
 typedef tb_object_t* 		(*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
 
@@ -175,6 +191,12 @@ typedef tb_object_t* 		(*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* re
 
 /// the bin writer func type
 typedef tb_bool_t 			(*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_t* object);
+
+/// the jsn reader func type
+typedef tb_object_t* 		(*tb_object_jsn_reader_func_t)(tb_object_jsn_reader_t* reader);
+
+/// the jsn writer func type
+typedef tb_bool_t 			(*tb_object_jsn_writer_func_t)(tb_object_jsn_writer_t* writer, tb_object_t* object);
 
 /* ///////////////////////////////////////////////////////////////////////
  * inlines

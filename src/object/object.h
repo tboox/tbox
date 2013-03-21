@@ -312,5 +312,39 @@ tb_bool_t 			tb_object_set_bin_writer(tb_size_t type, tb_object_bin_writer_func_
  */
 tb_pointer_t 		tb_object_get_bin_writer(tb_size_t type);
 
+/*! set jsn object reader
+ *
+ * @param type 		the object type name
+ * @param func 		the reader func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_jsn_reader(tb_char_t const* type, tb_object_jsn_reader_func_t func);
+
+/*! get jsn object reader
+ *
+ * @param type 		the object type name
+ *
+ * @return 			the reader func
+ */
+tb_pointer_t 		tb_object_get_jsn_reader(tb_char_t const* type);
+
+/*! set jsn object writer
+ *
+ * @param type 		the object type
+ * @param func 		the writer func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t func);
+
+/*! get jsn object writer
+ *
+ * @param type 		the object type
+ *
+ * @return 			the writer func
+ */
+tb_pointer_t 		tb_object_get_jsn_writer(tb_size_t type);
+
 #endif
 
