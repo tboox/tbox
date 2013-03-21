@@ -54,15 +54,16 @@ static tb_hash_t* 				g_object_bin_writer = tb_null;
 static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
 {
 	// init reader 
-	tb_handle_t reader = tb_xml_reader_init(gst);
-	tb_assert_and_check_return_val(reader, tb_null);
+	tb_object_xml_reader_t reader = {0};
+	reader.reader = tb_xml_reader_init(gst);
+	tb_assert_and_check_return_val(reader.reader, tb_null);
 
 	// init object
 	tb_object_t* object = tb_null;
 
 	// walk
 	tb_size_t event = TB_XML_READER_EVENT_NONE;
-	while ((event = tb_xml_reader_next(reader)) && !object)
+	while ((event = tb_xml_reader_next(reader.reader)) && !object)
 	{
 		switch (event)
 		{
@@ -70,7 +71,7 @@ static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
 		case TB_XML_READER_EVENT_ELEMENT_BEG: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader.reader);
 				tb_assert_and_check_goto(name, end);
 
 				// func
@@ -78,7 +79,7 @@ static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
 				tb_assert_and_check_goto(func, end);
 
 				// read
-				object = func(reader, event);
+				object = func(&reader, event);
 			}
 			break;
 		default:
@@ -89,13 +90,18 @@ static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
 end:
 
 	// exit reader
-	tb_xml_reader_exit(reader);
+	tb_xml_reader_exit(reader.reader);
 
 	// ok?
 	return object;
 }
 static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
 {
+	// init writer 
+	tb_object_xml_writer_t writer = {0};
+	writer.stream 	= gst;
+	writer.deflate 	= deflate;
+
 	// func
 	tb_object_xml_writer_func_t func = tb_object_get_xml_writer(object->type);
 	tb_assert_and_check_return_val(func, tb_false);
@@ -105,7 +111,7 @@ static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_b
 	tb_object_writ_newline(gst, deflate);
 
 	// writ
-	tb_bool_t ok = func(object, gst, deflate, 0);
+	tb_bool_t ok = func(&writer, object, 0);
 
 	// flush
 	tb_gstream_bfwrit(gst, tb_null, 0);
@@ -122,39 +128,78 @@ static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 	// check 
 	if (tb_strnicmp(data, "tbo00", 5)) return tb_null;
 
+	// init
+	tb_object_t* 			object = tb_null;
+	tb_object_bin_reader_t 	reader = {0};
+
+	// init reader
+	reader.stream 			= gst;
+	reader.list 			= tb_vector_init(256, tb_item_func_ptr());
+	tb_assert_and_check_return_val(reader.list, tb_null);
+
 	// the type & size
-	tb_size_t type = 0;
-	tb_size_t size = 0;
+	tb_size_t 				type = 0;
+	tb_uint64_t 			size = 0;
 	tb_object_read_bin_type_size(gst, &type, &size);
-	tb_trace_impl("type: %lu, size: %lu", type, size);
+
+	// trace
+	tb_trace_impl("root: type: %lu, size: %llu", type, size);
 
 	// the func
 	tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
-	tb_assert_and_check_return_val(func, tb_null);
+	tb_assert_and_check_goto(func, end);
 
 	// read it
-	return func(gst, type, size);
+	object = func(&reader, type, size);
+
+end:
+
+	// exit the list
+	if (reader.list) tb_vector_exit(reader.list);
+
+	// ok?
+	return object;
 }
 static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
 {
-	// func
+	// check
+	tb_assert_and_check_return_val(object && gst, tb_false);
+
+	// the func
 	tb_object_bin_writer_func_t func = tb_object_get_bin_writer(object->type);
 	tb_assert_and_check_return_val(func, tb_false);
 
 	// writ bin header
 	if (!tb_gstream_bwrit(gst, "tbo00", 5)) return tb_false;
 
-	// writ
-	if (!func(object, gst)) return tb_false;
+	// init
+	tb_bool_t 				ok = tb_false;
+	tb_object_bin_writer_t 	writer = {0};
 
-	// writ end
-	if (!tb_gstream_bwrit_u8(gst, 0)) return tb_false;
+	// init writer
+	writer.stream 			= gst;
+	writer.hash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(), tb_item_func_uint32());
+	tb_assert_and_check_return_val(writer.hash, tb_false);
+
+	// writ
+	if (!func(&writer, object)) goto end;
 
 	// flush
 	tb_gstream_bfwrit(gst, tb_null, 0);
 
 	// ok
-	return tb_true;
+	ok = tb_true;
+
+end:
+
+	// exit the hash
+	if (writer.hash) tb_hash_exit(writer.hash);
+
+	// exit the data
+	if (writer.data) tb_free(writer.data);
+
+	// ok?
+	return ok;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

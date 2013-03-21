@@ -155,27 +155,22 @@ static tb_void_t tb_array_item_free(tb_item_func_t* func, tb_pointer_t item)
 	// clear
 	if (item) *((tb_object_t**)item) = tb_null;
 }
-static tb_void_t tb_array_item_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
-{
-	tb_assert_and_check_return(func && func->size && item);
-	while (size--) tb_array_item_free(func, (tb_byte_t*)item + size * func->size);
-}
-static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
+static tb_object_t* tb_array_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
-	tb_assert_and_check_return_val(reader && event, tb_null);
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
-		return tb_array_init(TB_ARRAY_GROW, tb_true);
+		return tb_array_init(TB_ARRAY_GROW, tb_false);
 
 	// init array
-	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_true);
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_false);
 	tb_assert_and_check_return_val(array, tb_null);
 
 	// walk
 	tb_bool_t ok = tb_false;
-	while ((event = tb_xml_reader_next(reader)) && !ok)
+	while ((event = tb_xml_reader_next(reader->reader)) && !ok)
 	{
 		switch (event)
 		{
@@ -183,7 +178,7 @@ static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
 		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
 				tb_trace_impl("item: %s", name);
 
@@ -195,17 +190,13 @@ static tb_object_t* tb_array_read_xml(tb_handle_t reader, tb_size_t event)
 				tb_object_t* object = func(reader, event);
 
 				// append object
-				if (array && object) 
-					tb_array_append(array, object);
-
-				// refn--
-				if (object) tb_object_dec(object);
+				if (object) tb_array_append(array, object);
 			}
 			break;
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
@@ -232,15 +223,18 @@ end:
 	// ok?
 	return array;
 }
-static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
+static tb_bool_t tb_array_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
 	// writ
 	if (tb_array_size(object))
 	{
 		// writ beg
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<array>");
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<array>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 
 		// walk
 		tb_iterator_t* 	iterator = tb_array_itor(object);
@@ -257,34 +251,103 @@ static tb_bool_t tb_array_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bo
 				tb_assert_and_check_return_val(func, tb_false);
 
 				// writ
-				if (!func(item, gst, deflate, level + 1)) return tb_false;
+				if (!func(writer, item, level + 1)) return tb_false;
 			}
 		}
 
 		// writ end
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "</array>");
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "</array>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 	else 
 	{
-		tb_object_writ_tab(gst, deflate, level);
-		tb_gstream_printf(gst, "<array/>");
-		tb_object_writ_newline(gst, deflate);
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<array/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_object_t* tb_array_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+static tb_object_t* tb_array_read_bin(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
-	tb_trace_noimpl();
-	return tb_null;
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
+
+	// empty?
+	if (!size) return tb_array_init(TB_ARRAY_GROW, tb_false);
+
+	// init array
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_false);
+	tb_assert_and_check_return_val(array, tb_null);
+
+	// walk
+	tb_size_t i = 0;
+	tb_size_t n = (tb_size_t)size;
+	for (i = 0; i < n; i++)
+	{
+		// the type & size
+		tb_size_t 				type = 0;
+		tb_uint64_t 			size = 0;
+		tb_object_read_bin_type_size(reader->stream, &type, &size);
+
+		// trace
+		tb_trace_impl("item: type: %lu, size: %llu", type, size);
+
+		// is index?
+		tb_object_t* item = tb_null;
+		if (!type)
+		{
+			// the object index
+			tb_size_t index = (tb_size_t)size;
+		
+			// check
+			tb_assert_and_check_break(index < tb_vector_size(reader->list));
+
+			// the item
+			item = (tb_object_t*)tb_iterator_item(reader->list, index);
+
+			// refn++
+			if (item) tb_object_inc(item);
+		}
+		else
+		{
+			// the reader func
+			tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
+			tb_assert_and_check_break(func);
+
+			// read it
+			item = func(reader, type, size);
+
+			// save it
+			tb_vector_insert_tail(reader->list, item);
+		}
+
+		// check
+		tb_assert_and_check_break(item);
+
+		// append item
+		tb_array_append(array, item);
+	}
+
+	// failed?
+	if (i != n)
+	{
+		if (array) tb_object_exit(array);
+		array = tb_null;
+	}
+
+	// ok?
+	return array;
 }
-static tb_bool_t tb_array_writ_bin(tb_object_t* object, tb_gstream_t* gst)
+static tb_bool_t tb_array_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
+	// check
+	tb_assert_and_check_return_val(object && writer && writer->stream && writer->hash, tb_false);
+
 	// writ type & size
-	if (!tb_object_writ_bin_type_size(gst, object->type, tb_array_size(object))) return tb_false;
+	if (!tb_object_writ_bin_type_size(writer->stream, object->type, tb_array_size(object))) return tb_false;
 
 	// walk
 	tb_iterator_t* 	iterator = tb_array_itor(object);
@@ -295,10 +358,25 @@ static tb_bool_t tb_array_writ_bin(tb_object_t* object, tb_gstream_t* gst)
 		tb_object_t* item = tb_iterator_item(iterator, itor);
 		if (item)
 		{
-			// writ item
-			tb_object_bin_writer_func_t func = tb_object_get_bin_writer(item->type);
-			tb_assert_and_check_return_val(func, tb_false);
-			func(item, gst);
+			// exists?
+			tb_size_t index = (tb_size_t)tb_hash_get(writer->hash, item);
+			if (index)
+			{
+				// writ index
+				if (!tb_object_writ_bin_type_size(writer->stream, 0, (tb_uint64_t)(index - 1))) return tb_false;
+			}
+			else
+			{
+				// the func
+				tb_object_bin_writer_func_t func = tb_object_get_bin_writer(item->type);
+				tb_assert_and_check_return_val(func, tb_false);
+
+				// writ it
+				func(writer, item);
+
+				// save index
+				tb_hash_set(writer->hash, item, (tb_cpointer_t)(++writer->index));
+			}
 		}
 	}
 
@@ -329,7 +407,6 @@ tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)
 	// init item func
 	tb_item_func_t func = tb_item_func_ptr();
 	func.free 	= tb_array_item_free;
-	func.nfree 	= tb_array_item_nfree;
 
 	// init vector
 	array->vector = tb_vector_init(grow, func);

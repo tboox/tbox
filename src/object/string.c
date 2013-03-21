@@ -99,10 +99,10 @@ fail:
 	if (string) tb_free(string);
 	return tb_null;
 }
-static tb_object_t* tb_string_read_xml(tb_handle_t reader, tb_size_t event)
+static tb_object_t* tb_string_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
-	tb_assert_and_check_return_val(reader && event, tb_null);
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// empty?
 	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
@@ -110,14 +110,14 @@ static tb_object_t* tb_string_read_xml(tb_handle_t reader, tb_size_t event)
 
 	// walk
 	tb_object_t* string = tb_null;
-	while (event = tb_xml_reader_next(reader))
+	while (event = tb_xml_reader_next(reader->reader))
 	{
 		switch (event)
 		{
 		case TB_XML_READER_EVENT_ELEMENT_END: 
 			{
 				// name
-				tb_char_t const* name = tb_xml_reader_element(reader);
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
 				
 				// is end?
@@ -132,7 +132,7 @@ static tb_object_t* tb_string_read_xml(tb_handle_t reader, tb_size_t event)
 		case TB_XML_READER_EVENT_TEXT: 
 			{
 				// text
-				tb_char_t const* text = tb_xml_reader_text(reader);
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
 				tb_trace_impl("string: %s", text);
 				
@@ -151,30 +151,101 @@ end:
 	// ok?
 	return string;
 }
-static tb_bool_t tb_string_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate, tb_size_t level)
+static tb_bool_t tb_string_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
 	// writ
-	tb_object_writ_tab(gst, deflate, level);
+	tb_object_writ_tab(writer->stream, writer->deflate, level);
 	if (tb_string_size(object))
-		tb_gstream_printf(gst, "<string>%s</string>", tb_string_cstr(object));
-	else tb_gstream_printf(gst, "<string/>");
-	tb_object_writ_newline(gst, deflate);
+		tb_gstream_printf(writer->stream, "<string>%s</string>", tb_string_cstr(object));
+	else tb_gstream_printf(writer->stream, "<string/>");
+	tb_object_writ_newline(writer->stream, writer->deflate);
 
 	// ok
 	return tb_true;
 }
-static tb_object_t* tb_string_read_bin(tb_gstream_t* gst, tb_size_t type, tb_size_t size)
+static tb_object_t* tb_string_read_bin(tb_object_bin_reader_t* reader, tb_size_t type, tb_uint64_t size)
 {
-	tb_trace_noimpl();
-	return tb_null;
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
+
+	// empty?
+	if (!size) return tb_string_init_from_cstr(tb_null);
+
+	// make data
+	tb_char_t* data = tb_malloc0((tb_size_t)size + 1);
+	tb_assert_and_check_return_val(data, tb_null);
+
+	// read data
+	if (!tb_gstream_bread(reader->stream, data, (tb_size_t)size)) 
+	{
+		tb_free(data);
+		return tb_null;
+	}
+
+	// decode string
+	{
+		tb_byte_t* 	pb = data;
+		tb_byte_t* 	pe = data + size;
+		tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
+		for (; pb < pe && *pb; pb++, xb++) *pb ^= xb;
+	}
+
+	// make string
+	tb_object_t* string = tb_string_init_from_cstr(data); 
+
+	// exit data
+	tb_free(data);
+
+	// ok?
+	return string;
 }
-static tb_bool_t tb_string_writ_bin(tb_object_t* object, tb_gstream_t* gst)
+static tb_bool_t tb_string_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
+	// check
+	tb_assert_and_check_return_val(object && writer && writer->stream, tb_false);
+
+	// the data & size
+	tb_char_t const* 	data = tb_string_cstr(object);
+	tb_size_t 			size = tb_string_size(object);
+
 	// writ type & size
-	if (!tb_object_writ_bin_type_size(gst, object->type, tb_string_size(object))) return tb_false;
+	if (!tb_object_writ_bin_type_size(writer->stream, object->type, size)) return tb_false;
 
-	// ok
-	return tb_true;
+	// empty?
+	tb_check_return_val(size, tb_true);
+
+	// check
+	tb_assert_and_check_return_val(data, tb_false);
+
+	// make the encoder data
+	if (!writer->data)
+	{
+		writer->maxn = tb_max(size, 8192);
+		writer->data = tb_malloc0(writer->maxn);
+	}
+	else if (writer->maxn < size)
+	{
+		writer->maxn = size;
+		writer->data = tb_ralloc(writer->data, writer->maxn);
+	}
+	tb_assert_and_check_return_val(writer->data && size <= writer->maxn, tb_false);
+
+	// copy data to encoder
+	tb_memcpy(writer->data, data, size);
+
+	// encode data
+	tb_byte_t* 	pb = data;
+	tb_byte_t* 	pe = data + size;
+	tb_byte_t* 	qb = writer->data;
+	tb_byte_t* 	qe = writer->data + writer->maxn;
+	tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
+	for (; pb < pe && qb < qe && *pb; pb++, qb++, xb++) *qb = *pb ^ xb;
+
+	// writ it
+	return tb_gstream_bwrit(writer->stream, writer->data, size);
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
