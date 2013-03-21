@@ -48,6 +48,12 @@ static tb_hash_t* 				g_object_bin_reader = tb_null;
 // the object bin writer
 static tb_hash_t* 				g_object_bin_writer = tb_null;
 
+// the object jsn reader
+static tb_hash_t* 				g_object_jsn_reader = tb_null;
+
+// the object jsn writer
+static tb_hash_t* 				g_object_jsn_writer = tb_null;
+
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -201,7 +207,16 @@ end:
 	// ok?
 	return ok;
 }
-
+static tb_object_t* tb_object_read_jsn(tb_gstream_t* gst)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
+static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
+{
+	tb_trace_noimpl();
+	return tb_false;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -241,6 +256,10 @@ tb_void_t tb_object_exit_reader()
 	// exit the object bin reader
 	if (g_object_bin_reader) tb_hash_exit(g_object_bin_reader);
 	g_object_bin_reader = tb_null;
+	
+	// exit the object jsn reader
+	if (g_object_jsn_reader) tb_hash_exit(g_object_jsn_reader);
+	g_object_jsn_reader = tb_null;
 }
 tb_bool_t tb_object_init_writer()
 {
@@ -277,6 +296,10 @@ tb_void_t tb_object_exit_writer()
 	// exit the object bin writer
 	if (g_object_bin_writer) tb_hash_exit(g_object_bin_writer);
 	g_object_bin_writer = tb_null;
+
+	// exit the object jsn writer
+	if (g_object_jsn_writer) tb_hash_exit(g_object_jsn_writer);
+	g_object_jsn_writer = tb_null;
 }
 tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 {
@@ -536,13 +559,19 @@ tb_object_t* tb_object_read(tb_gstream_t* gst)
 	// check
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// probe format
+	// need
 	tb_byte_t* p = tb_null;
-	if (!tb_gstream_bneed(gst, &p, 3)) return tb_null;
+	if (!tb_gstream_bneed(gst, &p, 5)) return tb_null;
 	tb_assert_and_check_return_val(p, tb_null);
 
-	// read
-	return !tb_strnicmp(p, "tbo", 3)? tb_object_read_bin(gst) : tb_object_read_xml(gst);
+	// is tbox data?
+	if (!tb_strnicmp(p, "tbo", 3)) return tb_object_read_bin(gst);
+
+	// is xml data?
+	if (!tb_strnicmp(p, "<?xml", 5)) return tb_object_read_xml(gst);
+
+	// try to read the jsn data
+	return tb_object_read_jsn(gst);
 }
 tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 {
@@ -598,6 +627,8 @@ tb_bool_t tb_object_writ(tb_object_t* object, tb_gstream_t* gst, tb_size_t forma
 		return tb_object_writ_xml(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	case TB_OBJECT_FORMAT_BIN:
 		return tb_object_writ_bin(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+	case TB_OBJECT_FORMAT_JSN:
+		return tb_object_writ_jsn(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	default:
 		tb_assert(0);
 		break;
@@ -724,4 +755,52 @@ tb_pointer_t tb_object_get_bin_writer(tb_size_t type)
 
 	// get
 	return tb_hash_get(g_object_bin_writer, (tb_pointer_t)type);
+}
+tb_bool_t tb_object_set_jsn_reader(tb_char_t const* type, tb_object_jsn_reader_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init reader
+	if (!g_object_jsn_reader)
+		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_ptr());
+	tb_assert_and_check_return_val(g_object_jsn_reader, tb_false);
+
+	// set
+	tb_hash_set(g_object_jsn_reader, type, func);
+
+	// ok
+	return tb_true;
+}
+tb_pointer_t tb_object_get_jsn_reader(tb_char_t const* type)
+{
+	// check
+	tb_assert_and_check_return_val(g_object_jsn_reader, tb_null);
+
+	// get
+	return tb_hash_get(g_object_jsn_reader, type);
+}
+tb_bool_t tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init writer
+	if (!g_object_jsn_writer)
+		g_object_jsn_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr());
+	tb_assert_and_check_return_val(g_object_jsn_writer, tb_false);
+
+	// set
+	tb_hash_set(g_object_jsn_writer, (tb_pointer_t)type, func);
+
+	// ok
+	return tb_true;
+}
+tb_pointer_t tb_object_get_jsn_writer(tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(g_object_jsn_writer, tb_null);
+
+	// get
+	return tb_hash_get(g_object_jsn_writer, (tb_pointer_t)type);
 }
