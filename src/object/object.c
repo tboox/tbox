@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_IMPL_TAG 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -392,6 +392,78 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 
 	// ok?
 	return odata;
+}
+tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path)
+{
+	// check
+	tb_assert_and_check_return_val(object, tb_null);
+
+	// null?
+	tb_check_return_val(path, object);
+
+	// walk
+	tb_char_t const* p = path;
+	tb_char_t const* e = path + tb_strlen(path);
+	while (p < e && object)
+	{
+		// done seek
+		switch (*p)
+		{
+		case '.':
+			{
+				// check
+				tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_DICTIONARY, tb_null);
+
+				// skip
+				p++;
+
+				// read the key name
+				tb_char_t 	key[4096] = {0};
+				tb_char_t* 	kb = key;
+				tb_char_t* 	ke = key + 4095;
+				for (; p < e && kb < ke && *p && (*p != '.' && *p != '[' && *p != ']'); p++, kb++) *kb = *p;
+
+				// trace
+				tb_trace_impl("key: %s", key);
+			
+				// the value
+				object = tb_dictionary_val(object, key);
+			}
+			break;
+		case '[':
+			{
+				// check
+				tb_assert_and_check_return_val(tb_object_type(object) == TB_OBJECT_TYPE_ARRAY, tb_null);
+
+				// skip
+				p++;
+
+				// read the item index
+				tb_char_t 	index[32] = {0};
+				tb_char_t* 	ib = index;
+				tb_char_t* 	ie = index + 31;
+				for (; p < e && ib < ie && *p && tb_isdigit10(*p); p++, ib++) *ib = *p;
+
+				// trace
+				tb_trace_impl("index: %s", index);
+
+				// check
+				tb_size_t i = tb_atoi(index);
+				tb_assert_and_check_return_val(i < tb_array_size(object), tb_null);
+
+				// the value
+				object = tb_array_item(object, i);
+			}
+			break;
+		case ']':
+		default:
+			p++;
+			break;
+		}
+	}
+
+	// ok?
+	return object;
 }
 tb_object_t* tb_object_dump(tb_object_t* object)
 {
