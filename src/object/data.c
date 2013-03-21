@@ -248,7 +248,7 @@ static tb_object_t* tb_data_read_bin(tb_object_bin_reader_t* reader, tb_size_t t
 		tb_byte_t* 	pb = data;
 		tb_byte_t* 	pe = data + size;
 		tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
-		for (; pb < pe && *pb; pb++, xb++) *pb ^= xb;
+		for (; pb < pe; pb++, xb++) *pb ^= xb;
 	}
 
 	// make the data object
@@ -300,7 +300,7 @@ static tb_bool_t tb_data_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* o
 	tb_byte_t* 	qb = writer->data;
 	tb_byte_t* 	qe = writer->data + writer->maxn;
 	tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
-	for (; pb < pe && qb < qe && *pb; pb++, qb++, xb++) *qb = *pb ^ xb;
+	for (; pb < pe && qb < qe; pb++, qb++, xb++) *qb = *pb ^ xb;
 
 	// writ it
 	return tb_gstream_bwrit(writer->stream, writer->data, size);

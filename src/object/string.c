@@ -190,7 +190,7 @@ static tb_object_t* tb_string_read_bin(tb_object_bin_reader_t* reader, tb_size_t
 		tb_byte_t* 	pb = data;
 		tb_byte_t* 	pe = data + size;
 		tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
-		for (; pb < pe && *pb; pb++, xb++) *pb ^= xb;
+		for (; pb < pe; pb++, xb++) *pb ^= xb;
 	}
 
 	// make string
