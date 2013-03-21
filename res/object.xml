@@ -23,6 +23,12 @@
 	<key>date</key>
 	<date>2013-02-25 17:26:30</date>
 
+	<key>dict2</key>
+	<dict>
+		<key>string</key>
+		<string>hello wolrd!</string>
+	</dict>
+
 	<key>array</key>
 	<array>
 		<string>hello wolrd!</string>
@@ -33,5 +39,11 @@
 		<false/>
 		<true/>
 		<true/>
+
+		<dict>
+			<key>string</key>
+			<string>hello wolrd!</string>
+		</dict>
+
 	</array>
 </dict>

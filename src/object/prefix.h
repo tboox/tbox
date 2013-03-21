@@ -80,10 +80,11 @@ typedef enum __tb_object_flag_e
 /// the object format enum
 typedef enum __tb_object_format_e
 {
-	TB_OBJECT_FORMAT_NONE 		= 0x0000
-,	TB_OBJECT_FORMAT_XML 		= 0x0001
-,	TB_OBJECT_FORMAT_BIN 		= 0x0002
-,	TB_OBJECT_FORMAT_DEFLATE 	= 0x0100
+	TB_OBJECT_FORMAT_NONE 		= 0x0000 	//!< none
+,	TB_OBJECT_FORMAT_XML 		= 0x0001 	//!< the xml format
+,	TB_OBJECT_FORMAT_BIN 		= 0x0002 	//!< the tbox format
+,	TB_OBJECT_FORMAT_JSN 		= 0x0003 	//!< the json format
+,	TB_OBJECT_FORMAT_DEFLATE 	= 0x0100 	//!< deflate?
 
 }tb_object_format_e;
 

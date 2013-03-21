@@ -174,6 +174,48 @@ tb_size_t 			tb_object_type(tb_object_t* object);
  */
 tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
 
+/*! seek to the object for the gived path
+ *
+ * <pre>
+ *
+ * xml:
+ *
+ * <dict>
+		<key>string</key>
+		<string>hello wolrd!</string>
+
+		<key>integer</key>
+		<number>31415926</number>
+
+		<key>array</key>
+		<array>
+			<string>hello wolrd!</string>
+			<number>31415926</number>
+			<number>3.1415926</number>
+			<false/>
+			<true/>
+			<dict>
+				<key>string</key>
+				<string>hello wolrd!</string>
+			</dict>
+		</array>
+	</dict>
+ *
+ * path:
+ *
+ * 1. ".string" 			: hello wolrd!
+ * 2. ".array[1]" 			: 31415926
+ * 2. ".array[5].string" 	: hello wolrd!
+ * 
+ * </pre>
+ *
+ * @param object	the object pointer
+ * @param path 		the object path
+ *
+ * @return 			the object pointer
+ */
+tb_object_t* 		tb_object_seek(tb_object_t* object, tb_char_t const* path);
+
 /*! dump the object
  *
  * @param object 	the object pointer
