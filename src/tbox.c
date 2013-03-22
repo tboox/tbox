@@ -105,10 +105,8 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 	// ok
 	tb_trace("init: ok");
-
 	return tb_true;
 }
-
 tb_void_t tb_exit()
 {
 	// exit object
