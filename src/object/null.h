@@ -17,13 +17,12 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @ingroup 	platform
+ * @file		null.h
+ * @ingroup 	object
  *
  */
-#ifndef TB_PLATFORM_UTILS_H
-#define TB_PLATFORM_UTILS_H
-
+#ifndef TB_OBJECT_NULL_H
+#define TB_OBJECT_NULL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -34,7 +33,24 @@
  * interfaces
  */
 
-// the host name
-tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);
+/*! init null reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_null_init_reader();
+
+/*! init null writer
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_null_init_writer();
+
+/*! init null
+ *
+ * @return 			the null object
+ */
+tb_object_t const* 	tb_null_init();
+
 
 #endif
+

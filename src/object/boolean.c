@@ -66,7 +66,7 @@ static tb_object_t* tb_boolean_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(boolean, tb_null);
 
 	// copy
-	return (tb_object_t*)tb_boolean_init(boolean->value);
+	return object;
 }
 static tb_object_t* tb_boolean_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {

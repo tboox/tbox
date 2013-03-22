@@ -93,8 +93,8 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
 #endif
 
-	// init socket
-	if (!tb_socket_init()) return tb_false;
+	// init platform
+	if (!tb_platform_init()) return tb_false;
 
 	// init rand
 	if (!tb_rand_init()) return tb_false;
@@ -111,18 +111,15 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 
 tb_void_t tb_exit()
 {
-	// exit dns
-	tb_dns_list_exit();
-	
-	// exit rand
-	tb_rand_exit();
-
-	// exit socket
-	tb_socket_exit();
-	
 	// exit object
 	tb_object_exit_reader();
 	tb_object_exit_writer();
+	
+	// exit rand
+	tb_rand_exit();
+	
+	// exit platform
+	tb_platform_exit();
 
 	// exit memory
 #ifdef TB_CONFIG_MEMORY_POOL

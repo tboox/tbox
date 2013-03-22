@@ -61,6 +61,7 @@ tbox_C_FILES 			+= \
 						stream/gstream/tstream/null \
 						stream/gstream/tstream/zip \
 						object/object \
+						object/null \
 						object/data \
 						object/date \
 						object/array \
@@ -169,6 +170,7 @@ endif
 
 # platform
 tbox_C_FILES 			+= \
+						platform/platform \
 						platform/$(TB_CONFIG_API_DNS)/dns \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
@@ -179,6 +181,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_EVET)/event \
 						platform/$(TB_CONFIG_API_EVET)/epool \
 						platform/$(TB_CONFIG_API_TIME)/time \
+						platform/$(TB_CONFIG_API_PRINTF)/printf \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aipp \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aicp
@@ -272,6 +275,7 @@ INC_FILES 				= \
 						platform/socket.h \
 						platform/event.h \
 						platform/epool.h \
+						platform/printf.h \
 						platform/atomic.h \
 						platform/dynamic.h \
 						platform/compiler/prefix.h \
@@ -303,6 +307,7 @@ INC_FILES 				= \
 						stream/gstream.h \
 						object/prefix.h \
 						object/object.h \
+						object/null.h \
 						object/data.h \
 						object/date.h \
 						object/array.h \

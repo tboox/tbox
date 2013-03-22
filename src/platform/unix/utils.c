@@ -26,32 +26,11 @@
  */
 #include "prefix.h"
 #include "../utils.h"
-#include "../../libc/libc.h"
 #include <unistd.h>
-#include <stdio.h>
-#ifdef TB_CONFIG_OS_ANDROID
-# 	include <android/log.h>     
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-// printf
-tb_void_t tb_printf(tb_char_t const* fmt, ...)
-{
-	tb_long_t ret = 0;
-	tb_char_t msg[8192] = {0};
-	tb_va_format(msg, 8192, fmt, &ret);
-	if (ret >= 0) msg[ret] = '\0';
-
-#ifdef TB_CONFIG_OS_ANDROID
-	__android_log_print(ANDROID_LOG_DEBUG, "tbox", "%s", msg);
-#else
-	printf("%s", msg);
-	fflush(stdout);
-#endif
-}
 
 // the host name
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)

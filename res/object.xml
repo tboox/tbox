@@ -3,6 +3,9 @@
 	<key>string</key>
 	<string>hello wolrd!</string>
 
+	<key>empty</key>
+	<null/>
+
 	<key>中文</key>
 	<string>你好！</string>
 
@@ -39,6 +42,7 @@
 		<false/>
 		<true/>
 		<true/>
+		<null/>
 
 		<dict>
 			<key>string</key>

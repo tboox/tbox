@@ -64,7 +64,8 @@ typedef enum __tb_object_type_e
 ,	TB_OBJECT_TYPE_NUMBER 		= 5
 ,	TB_OBJECT_TYPE_BOOLEAN 		= 6
 ,	TB_OBJECT_TYPE_DICTIONARY 	= 7
-,	TB_OBJECT_TYPE_USER 		= 8 //!< the user defined type, ...
+,	TB_OBJECT_TYPE_NULL 		= 8
+,	TB_OBJECT_TYPE_USER 		= 9 //!< the user defined type, ...
 
 }tb_object_type_e;
 
