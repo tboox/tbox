@@ -20,7 +20,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// seek?
 		tb_object_t* object = root;
-		if (argv[2]) object = tb_object_seek(root, argv[2]);
+		if (argv[2]) object = tb_object_seek(root, argv[2], TB_OBJECT_TYPE_NONE);
 
 		// dump object
 		if (object) tb_object_dump(object);

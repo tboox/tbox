@@ -422,7 +422,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 	// ok?
 	return odata;
 }
-tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path)
+tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_t type)
 {
 	// check
 	tb_assert_and_check_return_val(object, tb_null);
@@ -489,6 +489,13 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path)
 			p++;
 			break;
 		}
+	}
+
+	// check it, if not none
+	if (object && type != TB_OBJECT_TYPE_NONE) 
+	{
+		// is this type?
+		if (tb_object_type(object) != type) return tb_null;
 	}
 
 	// ok?
