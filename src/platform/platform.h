@@ -38,7 +38,20 @@
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"
+#include "printf.h"
 #include "dynamic.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*!init the platform
+ *
+ * @return tb_true or tb_false
+ */
+tb_bool_t 	tb_platform_init();
+
+/// exit the platform 
+tb_void_t 	tb_platform_exit();
 
 #endif

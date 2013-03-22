@@ -17,6 +17,7 @@ TB_CONFIG_API_THRD 				= windows
 TB_CONFIG_API_EVET 				= windows
 TB_CONFIG_API_ASIO 				= windows
 TB_CONFIG_API_TIME				= windows
+TB_CONFIG_API_PRINTF 			= windows
 
 # third party
 TB_CONFIG_THIRD_ZLIB 			= y

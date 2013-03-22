@@ -17,24 +17,41 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @ingroup 	platform
+ * @file		platform.c
+ * @defgroup 	platform
  *
  */
-#ifndef TB_PLATFORM_UTILS_H
-#define TB_PLATFORM_UTILS_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "platform.h"
+#include "../network/network.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
 
-// the host name
-tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);
+tb_bool_t tb_platform_init()
+{
+	// init printf
+	if (!tb_printf_init(TB_PRINTF_MODE_STDOUT, tb_null)) return tb_false;
 
-#endif
+	// init socket
+	if (!tb_socket_init()) return tb_false;
+
+	// ok
+	return tb_true;
+}
+tb_void_t tb_platform_exit()
+{
+	// exit dns
+	tb_dns_list_exit();
+
+	// exit socket
+	tb_socket_exit();
+
+	// exit printf
+	tb_printf_exit();
+}
+

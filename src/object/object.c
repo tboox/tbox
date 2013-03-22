@@ -223,6 +223,9 @@ static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_b
 
 tb_bool_t tb_object_init_reader()
 {
+	// init null
+	if (!tb_null_init_reader()) return tb_false;
+
 	// init data
 	if (!tb_data_init_reader()) return tb_false;
 
@@ -263,6 +266,9 @@ tb_void_t tb_object_exit_reader()
 }
 tb_bool_t tb_object_init_writer()
 {
+	// init null
+	if (!tb_null_init_writer()) return tb_false;
+
 	// init data
 	if (!tb_data_init_writer()) return tb_false;
 

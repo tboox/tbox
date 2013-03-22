@@ -25,7 +25,7 @@
  * includes
  */
 #include "../utils.h"
-#include "../../libc/libc.h"
+#include "../utils.h"
 #include <stdio.h>
 #include <windows.h>
 #include <winsock2.h>
@@ -33,17 +33,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-tb_void_t tb_printf(tb_char_t const* fmt, ...)
-{
-	tb_int_t ret = 0;
-	tb_char_t msg[4096];
-	tb_va_format(msg, 4096, fmt, &ret);
-	if (ret >= 0) msg[ret] = '\0';
-
-	printf("%s", msg);
-	fflush(stdout);
-}
 
 tb_bool_t tb_hostname(tb_char_t* name, tb_size_t size)
 {
