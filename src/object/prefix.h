@@ -179,6 +179,9 @@ typedef struct __tb_object_jsn_writer_t
 	// the stream
 	tb_gstream_t* 			stream;
 
+	// is deflate?
+	tb_bool_t 				deflate;
+
 }tb_object_jsn_writer_t;
 
 /// the xml reader func type
@@ -194,10 +197,10 @@ typedef tb_object_t* 		(*tb_object_bin_reader_func_t)(tb_object_bin_reader_t* re
 typedef tb_bool_t 			(*tb_object_bin_writer_func_t)(tb_object_bin_writer_t* writer, tb_object_t* object);
 
 /// the jsn reader func type
-typedef tb_object_t* 		(*tb_object_jsn_reader_func_t)(tb_object_jsn_reader_t* reader);
+typedef tb_object_t* 		(*tb_object_jsn_reader_func_t)(tb_object_jsn_reader_t* reader, tb_char_t type);
 
 /// the jsn writer func type
-typedef tb_bool_t 			(*tb_object_jsn_writer_func_t)(tb_object_jsn_writer_t* writer, tb_object_t* object);
+typedef tb_bool_t 			(*tb_object_jsn_writer_func_t)(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level);
 
 /* ///////////////////////////////////////////////////////////////////////
  * inlines

@@ -247,6 +247,55 @@ static tb_bool_t tb_string_writ_bin(tb_object_bin_writer_t* writer, tb_object_t*
 	// writ it
 	return tb_gstream_bwrit(writer->stream, writer->data, size);
 }
+static tb_object_t* tb_string_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t type)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && (type == '\"' || type == '\''), tb_null);
+
+	// init data
+	tb_pstring_t data;
+	if (!tb_pstring_init(&data)) return tb_null;
+
+	// walk
+	tb_char_t ch;
+	while (tb_gstream_left(reader->stream)) 
+	{
+		// read one character
+		ch = tb_gstream_bread_s8(reader->stream);
+
+		// end?
+		if (ch == '\"' || ch == '\'') break;
+		// append character
+		else tb_pstring_chrcat(&data, ch);
+	}
+
+	// init string
+	tb_object_t* string = tb_string_init_from_cstr(tb_pstring_cstr(&data));
+
+	// trace
+	tb_trace_impl("string: %s", tb_pstring_cstr(&data));
+
+	// exit data
+	tb_pstring_exit(&data);
+
+	// ok?
+	return string;
+}
+static tb_bool_t tb_string_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	if (tb_string_size(object))
+		tb_gstream_printf(writer->stream, "\"%s\"", tb_string_cstr(object));
+	else tb_gstream_printf(writer->stream, "\"\"");
+	tb_object_writ_newline(writer->stream, writer->deflate);
+
+	// ok
+	return tb_true;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -254,12 +303,15 @@ tb_bool_t tb_string_init_reader()
 {
 	if (!tb_object_set_xml_reader("string", tb_string_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_STRING, tb_string_read_bin)) return tb_false;
+	if (!tb_object_set_jsn_reader('\"', tb_string_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('\'', tb_string_read_jsn)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_string_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_bin)) return tb_false;
+	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_jsn)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
