@@ -1003,5 +1003,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_dlist_test_walk_perf();
 #endif
 
+	tb_exit();
 	return 0;
 }
