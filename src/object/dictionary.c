@@ -283,14 +283,14 @@ static tb_bool_t tb_dictionary_writ_xml(tb_object_xml_writer_t* writer, tb_objec
 			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 			if (item && item->key && item->val)
 			{
+				// func
+				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->val->type);
+				tb_assert_and_check_continue(func);
+
 				// writ key
 				tb_object_writ_tab(writer->stream, writer->deflate, level + 1);
 				tb_gstream_printf(writer->stream, "<key>%s</key>", item->key);
 				tb_object_writ_newline(writer->stream, writer->deflate);
-
-				// func
-				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->val->type);
-				tb_assert_and_check_return_val(func, tb_false);
 
 				// writ val
 				if (!func(writer, item->val, level + 1)) return tb_false;
@@ -490,6 +490,154 @@ static tb_bool_t tb_dictionary_writ_bin(tb_object_bin_writer_t* writer, tb_objec
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_dictionary_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t type)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && type == '{', tb_null);
+
+	// init key name
+	tb_sstring_t 	kname;
+	tb_char_t 		kdata[8192];
+	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
+
+	// init dictionary
+	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_false);
+	tb_assert_and_check_return_val(dictionary, tb_null);
+
+	// walk
+	tb_char_t ch;
+	tb_bool_t ok = tb_false;
+	tb_bool_t bkey = tb_false;
+	tb_size_t bstr = 0;
+	while (tb_gstream_left(reader->stream)) 
+	{
+		// read one character
+		ch = tb_gstream_bread_s8(reader->stream);
+
+		// end?
+		if (ch == '}') break;
+		// no space? skip ','
+		else if (!tb_isspace(ch) && ch != ',')
+		{
+			// no key?
+			if (!bkey)
+			{
+				// is str?
+				if (ch == '\"' || ch == '\'') bstr = !bstr;
+				// is key end?
+				else if (!bstr && ch == ':') bkey = tb_true;
+				// append key
+				else if (bstr) tb_sstring_chrcat(&kname, ch);
+			}
+			// key ok? read val
+			else
+			{
+				// trace
+				tb_trace_impl("key: %s", tb_sstring_cstr(&kname));
+
+				// the func
+				tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(ch);
+				tb_assert_and_check_goto(func, end);
+
+				// read val
+				tb_object_t* val = func(reader, ch);
+				tb_assert_and_check_goto(val, end);
+
+				// set key => val
+				tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), val);
+
+				// reset key
+				bstr = 0;
+				bkey = tb_false;
+				tb_sstring_clear(&kname);
+			}
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// failed?
+	if (!ok && dictionary)
+	{
+		tb_object_exit(dictionary);
+		dictionary = tb_null;
+	}
+
+	// exit key name
+	tb_sstring_exit(&kname);
+
+	// ok?
+	return dictionary;
+}
+static tb_bool_t tb_dictionary_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	if (tb_dictionary_size(object))
+	{
+		// writ beg
+		tb_gstream_printf(writer->stream, "{");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// walk
+		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		head = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
+			if (item && item->key && item->val)
+			{
+				// func
+				tb_object_jsn_writer_func_t func = tb_object_get_jsn_writer(item->val->type);
+				tb_assert_and_check_continue(func);
+
+				// writ tab
+				if (itor != head)
+				{
+					tb_object_writ_tab(writer->stream, writer->deflate, level);
+					tb_gstream_printf(writer->stream, ",");
+					tb_object_writ_tab(writer->stream, writer->deflate, 1);
+				}
+				else tb_object_writ_tab(writer->stream, writer->deflate, level + 1);
+
+				// writ key
+				tb_gstream_printf(writer->stream, "\"%s\":", item->key);
+
+				// writ spaces
+				if (!writer->deflate) tb_gstream_printf(writer->stream, " ");
+				if (item->val->type == TB_OBJECT_TYPE_DICTIONARY || item->val->type == TB_OBJECT_TYPE_ARRAY)
+				{
+					tb_object_writ_newline(writer->stream, writer->deflate);
+					tb_object_writ_tab(writer->stream, writer->deflate, level + 1);
+				}
+
+				// writ val
+				if (!func(writer, item->val, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "}");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		tb_gstream_printf(writer->stream, "{}");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -497,12 +645,14 @@ tb_bool_t tb_dictionary_init_reader()
 {
 	if (!tb_object_set_xml_reader("dict", tb_dictionary_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_read_bin)) return tb_false;
+	if (!tb_object_set_jsn_reader('{', tb_dictionary_read_jsn)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_dictionary_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_bin)) return tb_false;
+	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_jsn)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)

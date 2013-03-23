@@ -248,7 +248,7 @@ static tb_bool_t tb_array_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* 
 			{
 				// func
 				tb_object_xml_writer_func_t func = tb_object_get_xml_writer(item->type);
-				tb_assert_and_check_return_val(func, tb_false);
+				tb_assert_and_check_continue(func);
 
 				// writ
 				if (!func(writer, item, level + 1)) return tb_false;
@@ -383,6 +383,112 @@ static tb_bool_t tb_array_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* 
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_array_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t type)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream && type == '[', tb_null);
+
+	// init array
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_false);
+	tb_assert_and_check_return_val(array, tb_null);
+
+	// walk
+	tb_char_t ch;
+	tb_bool_t ok = tb_false;
+	while (tb_gstream_left(reader->stream)) 
+	{
+		// read one character
+		ch = tb_gstream_bread_s8(reader->stream);
+
+		// end?
+		if (ch == ']') break;
+		// no space? skip ','
+		else if (!tb_isspace(ch) && ch != ',')
+		{
+			// the func
+			tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(ch);
+			tb_assert_and_check_goto(func, end);
+
+			// read item
+			tb_object_t* item = func(reader, ch);
+			tb_assert_and_check_goto(item, end);
+
+			// append item
+			tb_array_append(array, item);
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// failed?
+	if (!ok && array)
+	{
+		tb_object_exit(array);
+		array = tb_null;
+	}
+
+	// ok?
+	return array;
+}
+static tb_bool_t tb_array_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	if (tb_array_size(object))
+	{
+		// writ beg
+		tb_gstream_printf(writer->stream, "[");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// walk
+		tb_iterator_t* 	iterator = tb_array_itor(object);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		head = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_object_t* item = tb_iterator_item(iterator, itor);
+			if (item)
+			{
+				// func
+				tb_object_jsn_writer_func_t func = tb_object_get_jsn_writer(item->type);
+				tb_assert_and_check_continue(func);
+
+				// writ tab
+				if (itor != head)
+				{
+					tb_object_writ_tab(writer->stream, writer->deflate, level);
+					tb_gstream_printf(writer->stream, ",");
+					tb_object_writ_tab(writer->stream, writer->deflate, 1);
+				}
+				else tb_object_writ_tab(writer->stream, writer->deflate, level + 1);
+
+				// writ
+				if (!func(writer, item, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "]");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		tb_gstream_printf(writer->stream, "[]");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -390,12 +496,14 @@ tb_bool_t tb_array_init_reader()
 {
 	if (!tb_object_set_xml_reader("array", tb_array_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_ARRAY, tb_array_read_bin)) return tb_false;
+	if (!tb_object_set_jsn_reader('[', tb_array_read_jsn)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_array_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_bin)) return tb_false;
+	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_jsn)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)

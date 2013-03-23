@@ -440,6 +440,147 @@ static tb_bool_t tb_number_writ_bin(tb_object_bin_writer_t* writer, tb_object_t*
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_number_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t type)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream, tb_null);
+
+	// init data
+	tb_sstring_t 	data;
+	tb_char_t 		buff[256];
+	if (!tb_sstring_init(&data, buff, 256)) return tb_null;
+
+	// init
+	tb_object_t* number = tb_null;
+
+	// append character
+	tb_sstring_chrcat(&data, type);
+
+	// walk
+	tb_char_t ch;
+	tb_bool_t bs = (type == '-')? tb_true : tb_false;
+	tb_bool_t bf = (type == '.')? tb_true : tb_false;
+	while (tb_gstream_left(reader->stream)) 
+	{
+		// need one character
+		tb_byte_t* p = tb_null;
+		if (!tb_gstream_bneed(reader->stream, &p, 1) && p) goto end;
+
+		// the character
+		tb_char_t ch = *p;
+
+		// is float?
+		if (!bf && ch == '.') bf = tb_true;
+		else if (bf && ch == '.') goto end;
+
+		// append character
+		if (tb_isdigit10(ch) || ch == '.' || ch == 'e' || ch == 'E' || ch == '-' || ch == '+') 
+			tb_sstring_chrcat(&data, ch);
+		else break;
+
+		// skip it
+		tb_gstream_bskip(reader->stream, 1);
+	}
+
+	// check
+	tb_assert_and_check_goto(tb_sstring_size(&data), end);
+
+	// trace
+	tb_trace_impl("number: %s", tb_sstring_cstr(&data));
+
+	// init number 
+	if (bf) number = tb_number_init_from_float(tb_stof(tb_sstring_cstr(&data)));
+	else if (bs) 
+	{
+		tb_sint64_t value = tb_stoi64(tb_sstring_cstr(&data));
+		tb_size_t 	bytes = tb_object_need_bytes(-value);
+		switch (bytes)
+		{
+		case 1: number = tb_number_init_from_sint8((tb_sint8_t)value); break;
+		case 2: number = tb_number_init_from_sint16((tb_sint16_t)value); break;
+		case 4: number = tb_number_init_from_sint32((tb_sint32_t)value); break;
+		case 8: number = tb_number_init_from_sint64((tb_sint64_t)value); break;
+		default: break;
+		}
+		
+	}
+	else 
+	{
+		tb_uint64_t value = tb_stou64(tb_sstring_cstr(&data));
+		tb_size_t 	bytes = tb_object_need_bytes(value);
+		switch (bytes)
+		{
+		case 1: number = tb_number_init_from_uint8((tb_uint8_t)value); break;
+		case 2: number = tb_number_init_from_uint16((tb_uint16_t)value); break;
+		case 4: number = tb_number_init_from_uint32((tb_uint32_t)value); break;
+		case 8: number = tb_number_init_from_uint64((tb_uint64_t)value); break;
+		default: break;
+		}
+	}
+
+end:
+
+	// exit data
+	tb_sstring_exit(&data);
+
+	// ok?
+	return number;
+}
+static tb_bool_t tb_number_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	switch (tb_number_type(object))
+	{
+	case TB_NUMBER_TYPE_UINT64:
+		tb_gstream_printf(writer->stream, "%llu", tb_number_uint64(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_SINT64:
+		tb_gstream_printf(writer->stream, "%lld", tb_number_sint64(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_UINT32:
+		tb_gstream_printf(writer->stream, "%u", tb_number_uint32(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_SINT32:
+		tb_gstream_printf(writer->stream, "%d", tb_number_sint32(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_UINT16:
+		tb_gstream_printf(writer->stream, "%u", tb_number_uint16(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_SINT16:
+		tb_gstream_printf(writer->stream, "%d", tb_number_sint16(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_UINT8:
+		tb_gstream_printf(writer->stream, "%u", tb_number_uint8(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_SINT8:
+		tb_gstream_printf(writer->stream, "%d", tb_number_sint8(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_FLOAT:
+		tb_gstream_printf(writer->stream, "%f", tb_number_float(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	case TB_NUMBER_TYPE_DOUBLE:
+		tb_gstream_printf(writer->stream, "%lf", tb_number_double(object));
+		tb_object_writ_newline(writer->stream, writer->deflate);
+		break;
+	default:
+		break;
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -447,12 +588,28 @@ tb_bool_t tb_number_init_reader()
 {
 	if (!tb_object_set_xml_reader("number", tb_number_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_NUMBER, tb_number_read_bin)) return tb_false;
+	if (!tb_object_set_jsn_reader('0', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('1', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('2', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('3', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('4', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('5', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('6', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('7', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('8', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('9', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('.', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('-', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('+', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('e', tb_number_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('E', tb_number_read_jsn)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_number_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_bin)) return tb_false;
+	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_NUMBER, tb_number_writ_jsn)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_number_init_from_uint8(tb_uint8_t value)

@@ -209,13 +209,50 @@ end:
 }
 static tb_object_t* tb_object_read_jsn(tb_gstream_t* gst)
 {
-	tb_trace_noimpl();
-	return tb_false;
+	// check
+	tb_assert_and_check_return_val(gst, tb_null);
+
+	// init reader
+	tb_object_jsn_reader_t reader = {0};
+	reader.stream = gst;
+
+	// skip spaces
+	tb_char_t type;
+	while (tb_gstream_left(gst)) 
+	{
+		type = tb_gstream_bread_s8(gst);
+		if (!tb_isspace(type)) break;
+	}
+
+	// empty?
+	tb_check_return_val(tb_gstream_left(gst), tb_null);
+
+	// the func
+	tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(type);
+	tb_assert_and_check_return_val(func, tb_null);
+
+	// read it
+	return func(&reader, type);
 }
 static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
 {
-	tb_trace_noimpl();
-	return tb_false;
+	// init writer 
+	tb_object_jsn_writer_t writer = {0};
+	writer.stream 	= gst;
+	writer.deflate 	= deflate;
+
+	// func
+	tb_object_jsn_writer_func_t func = tb_object_get_jsn_writer(object->type);
+	tb_assert_and_check_return_val(func, tb_false);
+
+	// writ
+	tb_bool_t ok = func(&writer, object, 0);
+
+	// flush
+	tb_gstream_bfwrit(gst, tb_null, 0);
+
+	// ok
+	return ok;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -762,29 +799,29 @@ tb_pointer_t tb_object_get_bin_writer(tb_size_t type)
 	// get
 	return tb_hash_get(g_object_bin_writer, (tb_pointer_t)type);
 }
-tb_bool_t tb_object_set_jsn_reader(tb_char_t const* type, tb_object_jsn_reader_func_t func)
+tb_bool_t tb_object_set_jsn_reader(tb_char_t type, tb_object_jsn_reader_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(type && func, tb_false);
 
 	// init reader
 	if (!g_object_jsn_reader)
-		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_ptr());
+		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint8(), tb_item_func_ptr());
 	tb_assert_and_check_return_val(g_object_jsn_reader, tb_false);
 
 	// set
-	tb_hash_set(g_object_jsn_reader, type, func);
+	tb_hash_set(g_object_jsn_reader, (tb_cpointer_t)type, func);
 
 	// ok
 	return tb_true;
 }
-tb_pointer_t tb_object_get_jsn_reader(tb_char_t const* type)
+tb_pointer_t tb_object_get_jsn_reader(tb_char_t type)
 {
 	// check
 	tb_assert_and_check_return_val(g_object_jsn_reader, tb_null);
 
 	// get
-	return tb_hash_get(g_object_jsn_reader, type);
+	return tb_hash_get(g_object_jsn_reader, (tb_cpointer_t)type);
 }
 tb_bool_t tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t func)
 {

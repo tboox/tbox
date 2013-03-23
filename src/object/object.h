@@ -320,7 +320,7 @@ tb_pointer_t 		tb_object_get_bin_writer(tb_size_t type);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_object_set_jsn_reader(tb_char_t const* type, tb_object_jsn_reader_func_t func);
+tb_bool_t 			tb_object_set_jsn_reader(tb_char_t type, tb_object_jsn_reader_func_t func);
 
 /*! get jsn object reader
  *
@@ -328,7 +328,7 @@ tb_bool_t 			tb_object_set_jsn_reader(tb_char_t const* type, tb_object_jsn_reade
  *
  * @return 			the reader func
  */
-tb_pointer_t 		tb_object_get_jsn_reader(tb_char_t const* type);
+tb_pointer_t 		tb_object_get_jsn_reader(tb_char_t type);
 
 /*! set jsn object writer
  *

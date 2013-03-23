@@ -76,6 +76,69 @@ static tb_bool_t tb_null_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* o
 	// writ type & null
 	return tb_object_writ_bin_type_size(writer->stream, object->type, 0);
 }
+static tb_object_t* tb_null_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t type)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->stream, tb_null);
+
+	// init data
+	tb_sstring_t 	data;
+	tb_char_t 		buff[256];
+	if (!tb_sstring_init(&data, buff, 256)) return tb_null;
+
+	// init 
+	tb_object_t* null = tb_null;
+
+	// append character
+	tb_sstring_chrcat(&data, type);
+
+	// walk
+	while (tb_gstream_left(reader->stream)) 
+	{
+		// need one character
+		tb_byte_t* p = tb_null;
+		if (!tb_gstream_bneed(reader->stream, &p, 1) && p) goto end;
+
+		// the character
+		tb_char_t ch = *p;
+
+		// append character
+		if (tb_isalpha(ch)) tb_sstring_chrcat(&data, ch);
+		else break;
+
+		// skip it
+		tb_gstream_bskip(reader->stream, 1);
+	}
+
+	// check
+	tb_assert_and_check_goto(tb_sstring_size(&data), end);
+
+	// trace
+	tb_trace_impl("null: %s", tb_sstring_cstr(&data));
+
+	// null?
+	if (!tb_stricmp(tb_sstring_cstr(&data), "null")) null = tb_null_init();
+
+end:
+
+	// exit data
+	tb_sstring_exit(&data);
+
+	// ok?
+	return null;
+}
+static tb_bool_t tb_null_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	tb_gstream_printf(writer->stream, "null");
+	tb_object_writ_newline(writer->stream, writer->deflate);
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
@@ -100,12 +163,15 @@ tb_bool_t tb_null_init_reader()
 {
 	if (!tb_object_set_xml_reader("null", tb_null_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_NULL, tb_null_read_bin)) return tb_false;
+	if (!tb_object_set_jsn_reader('n', tb_null_read_jsn)) return tb_false;
+	if (!tb_object_set_jsn_reader('N', tb_null_read_jsn)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_null_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_NULL, tb_null_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_NULL, tb_null_writ_bin)) return tb_false;
+	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_NULL, tb_null_writ_jsn)) return tb_false;
 	return tb_true;
 }
 tb_object_t const* tb_null_init()
