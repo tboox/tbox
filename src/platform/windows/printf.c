@@ -27,6 +27,8 @@
 #include "prefix.h"
 #include "../printf.h"
 #include "../mutex.h"
+#include "../file.h"
+#include "../../stream/stream.h"
 #include "../../libc/libc.h"
 #include <windows.h>
 #include <stdio.h>
@@ -45,7 +47,7 @@ typedef struct __tb_printf_t
 	tb_handle_t 	mutx;
 
 	// the file
-	FILE* 			file;
+	tb_gstream_t* 	file;
 
 }tb_printf_t;
 
@@ -74,8 +76,8 @@ tb_void_t tb_printf_exit()
 
 	// exit file
 	if (g_printf.mode == TB_PRINTF_MODE_FILE && g_printf.file)
-		fclose(g_printf.file);
-	g_printf.file = stdout;
+		tb_gstream_exit(g_printf.file);
+	g_printf.file = tb_null;
 	g_printf.mode = TB_PRINTF_MODE_STDOUT;
 
 	// leave
@@ -90,33 +92,38 @@ tb_bool_t tb_printf_reset(tb_size_t mode, tb_char_t const* path)
 	// enter
 	if (g_printf.mutx) tb_mutex_enter(g_printf.mutx);
 
-	// init mode
-	g_printf.mode = mode;
-
 	// exit file
 	if (g_printf.mode == TB_PRINTF_MODE_FILE && g_printf.file)
-		fclose(g_printf.file);
+		tb_gstream_exit(g_printf.file);
 	g_printf.file = tb_null;
 
-	// init file
-	switch (mode)
+	// is file?
+	if (mode == TB_PRINTF_MODE_FILE)
 	{
-	case TB_PRINTF_MODE_STDERR:
-		g_printf.file = stderr;
-		break;
-	case TB_PRINTF_MODE_FILE:
-		g_printf.file = fopen(path, "w");
-		if (!g_printf.file)
+		if (path)
 		{
-			g_printf.file = stdout;
-			g_printf.mode = TB_PRINTF_MODE_STDOUT;
+			// init file
+			g_printf.file = tb_gstream_init_from_url(path);
+			if (g_printf.file)
+			{
+				// ctrl
+				if (tb_gstream_type(g_printf.file) == TB_GSTREAM_TYPE_FILE) 
+					tb_gstream_ctrl(g_printf.file, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_RW | TB_FILE_CREAT | TB_FILE_TRUNC);
+			
+				// open 
+				if (!tb_gstream_bopen(g_printf.file))
+				{
+					tb_gstream_exit(g_printf.file);
+					g_printf.file = tb_null;
+				}
+
+				// init mode
+				g_printf.mode = TB_PRINTF_MODE_FILE;
+			}
 		}
-		break;
-	case TB_PRINTF_MODE_STDOUT:
-	default:
-		g_printf.file = stdout;
-		break;
+		else g_printf.mode = TB_PRINTF_MODE_STDOUT;
 	}
+	else g_printf.mode = mode;
 
 	// leave
 	if (g_printf.mutx) tb_mutex_leave(g_printf.mutx);
@@ -136,10 +143,12 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 	if (size >= 0) info[size] = '\0';
 
 	// printf
-	if (g_printf.file)
+	if (g_printf.file) tb_gstream_printf(g_printf.file, "%s", info);
+	else 
 	{
-		fprintf(g_printf.file, "%s", info);
-		fflush(g_printf.file);
+		FILE* file = (g_printf.mode == TB_PRINTF_MODE_STDERR)? stderr : stdout;
+		fprintf(file, "%s", info);
+		fflush(file);
 	}
 
 	// leave
