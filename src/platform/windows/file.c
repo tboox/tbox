@@ -99,7 +99,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 	// init flag
 	DWORD cflag = 0;
 	if (flags & TB_FILE_CREAT) cflag |= OPEN_ALWAYS;
-	else if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
+	if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
 	if (!cflag) cflag |= OPEN_EXISTING;
 
 	// init file

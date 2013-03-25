@@ -101,6 +101,7 @@ tb_handle_t tb_gpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 
 	// init gpool
 	tb_gpool_t* gpool = data;
+	tb_memset(gpool, 0, sizeof(tb_gpool_t));
 
 	// init magic
 	gpool->magic = TB_GPOOL_MAGIC;
