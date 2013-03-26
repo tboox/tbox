@@ -98,12 +98,13 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
 
 	// init flag
 	DWORD cflag = 0;
-	if (flags & TB_FILE_CREAT) cflag |= OPEN_ALWAYS;
-	if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
+	if (flags & (TB_FILE_CREAT | TB_FILE_TRUNC)) cflag |= CREATE_ALWAYS;
+	else if (flags & TB_FILE_CREAT) cflag |= CREATE_NEW;
+	else if (flags & TB_FILE_TRUNC) cflag |= TRUNCATE_EXISTING;
 	if (!cflag) cflag |= OPEN_EXISTING;
 
 	// init file
-	HANDLE hfile = CreateFile(path, access, share, NULL, cflag, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hfile = CreateFile(path, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
 
 	// append?
 	if (hfile != INVALID_HANDLE_VALUE && (flags & TB_FILE_APPEND))
@@ -125,13 +126,13 @@ tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(hfile, -1);
 	DWORD real_size = 0;
-	return ReadFile(hfile, data, size, &real_size, NULL)? (tb_long_t)real_size : -1;
+	return ReadFile(hfile, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(hfile, -1);
 	DWORD real_size = 0;
-	return WriteFile(hfile, data, size, &real_size, NULL)? (tb_long_t)real_size : -1;
+	return WriteFile(hfile, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
 tb_void_t tb_file_sync(tb_handle_t hfile)
 {
@@ -174,10 +175,10 @@ tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
 	switch (type)
 	{
 	case TB_FILE_TYPE_DIR:
-		return CreateDirectory(path, NULL)? tb_true : tb_false;
+		return CreateDirectory(path, tb_null)? tb_true : tb_false;
 	case TB_FILE_TYPE_FILE:
 		{
-			HANDLE hfile = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+			HANDLE hfile = CreateFile(path, GENERIC_WRITE, FILE_SHARE_WRITE, tb_null, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, tb_null);
 			if (hfile != INVALID_HANDLE_VALUE) 
 			{
 				CloseHandle(hfile);
