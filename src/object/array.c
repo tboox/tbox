@@ -170,7 +170,7 @@ static tb_object_t* tb_array_read_xml(tb_object_xml_reader_t* reader, tb_size_t 
 
 	// walk
 	tb_bool_t ok = tb_false;
-	while ((event = tb_xml_reader_next(reader->reader)) && !ok)
+	while (!ok && (event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{
