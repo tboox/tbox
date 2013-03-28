@@ -179,7 +179,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_object_xml_reader_t* reader, tb_si
 	// walk
 	tb_bool_t 	ok = tb_false;
 	tb_bool_t 	key = tb_false;
-	while ((event = tb_xml_reader_next(reader->reader)) && !ok)
+	while (!ok && (event = tb_xml_reader_next(reader->reader)))
 	{
 		switch (event)
 		{

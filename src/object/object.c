@@ -69,7 +69,7 @@ static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
 
 	// walk
 	tb_size_t event = TB_XML_READER_EVENT_NONE;
-	while ((event = tb_xml_reader_next(reader.reader)) && !object)
+	while (!object && (event = tb_xml_reader_next(reader.reader)))
 	{
 		switch (event)
 		{
