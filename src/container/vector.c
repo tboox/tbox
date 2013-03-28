@@ -58,6 +58,7 @@ static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor
 }
 static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
+	if (!itor) tb_abort();
 	tb_assert_and_check_return_val(itor, 0);
 	return itor - 1;
 }
