@@ -3,6 +3,9 @@
 	<key>string</key>
 	<string>hello wolrd!</string>
 
+	<key>com.xxx.xxx</key>
+	<string>hello wolrd!</string>
+
 	<key>empty</key>
 	<null/>
 

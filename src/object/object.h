@@ -185,6 +185,9 @@ tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
 		<key>string</key>
 		<string>hello wolrd!</string>
 
+		<key>com.xxx.xxx</key>
+		<string>hello wolrd!</string>
+
 		<key>integer</key>
 		<number>31415926</number>
 
@@ -206,7 +209,8 @@ tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
  *
  * 1. ".string" 			: hello wolrd!
  * 2. ".array[1]" 			: 31415926
- * 2. ".array[5].string" 	: hello wolrd!
+ * 3. ".array[5].string" 	: hello wolrd!
+ * 4. ".com\\.xxx\\.xxx" 	: hello wolrd!
  * 
  * </pre>
  *

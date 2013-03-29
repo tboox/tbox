@@ -366,10 +366,6 @@ tb_void_t tb_object_exit(tb_object_t* object)
 	// readonly?
 	tb_check_return(!(object->flag & TB_OBJECT_FLAG_READONLY));
 
-	// refn must be 1
-	tb_size_t refn = tb_object_ref(object);
-	tb_assert_and_check_return(refn == 1);
-
 	// exit
 	tb_object_dec(object);
 }
@@ -487,7 +483,11 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
 				tb_char_t 	key[4096] = {0};
 				tb_char_t* 	kb = key;
 				tb_char_t* 	ke = key + 4095;
-				for (; p < e && kb < ke && *p && (*p != '.' && *p != '[' && *p != ']'); p++, kb++) *kb = *p;
+				for (; p < e && kb < ke && *p && (*p != '.' && *p != '[' && *p != ']'); p++, kb++) 
+				{
+					if (*p == '\\') p++;
+					*kb = *p;
+				}
 
 				// trace
 				tb_trace_impl("key: %s", key);
@@ -600,9 +600,14 @@ tb_void_t tb_object_dec(tb_object_t* object)
 	// readonly?
 	tb_check_return(!(object->flag & TB_OBJECT_FLAG_READONLY));
 
+	// check refn
+	tb_assert_and_check_return(object->refn);
+
 	// refn--
-	if (object->refn > 1) object->refn--;
-	else if (object->exit) object->exit(object);
+	object->refn--;
+
+	// exit it?
+	if (!object->refn && object->exit) object->exit(object);
 }
 tb_object_t* tb_object_read(tb_gstream_t* gst)
 {
