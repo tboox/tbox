@@ -52,8 +52,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init file
-	tb_handle_t ifile = tb_file_init(argv[1], TB_FILE_RO);
-	tb_handle_t ofile = tb_file_init(argv[2], TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	tb_handle_t ifile = tb_file_init(argv[1], TB_FILE_MODE_RO);
+	tb_handle_t ofile = tb_file_init(argv[2], TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 	tb_assert_and_check_goto(ifile && ofile, end);
 
 	// file size

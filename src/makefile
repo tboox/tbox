@@ -182,6 +182,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_EVET)/epool \
 						platform/$(TB_CONFIG_API_TIME)/time \
 						platform/$(TB_CONFIG_API_PRINTF)/printf \
+						platform/$(TB_CONFIG_API_FILE)/directory \
+						platform/$(TB_CONFIG_API_PROCESS)/process \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aipp \
 						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aicp
@@ -278,6 +280,8 @@ INC_FILES 				= \
 						platform/printf.h \
 						platform/atomic.h \
 						platform/dynamic.h \
+						platform/process.h \
+						platform/directory.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \

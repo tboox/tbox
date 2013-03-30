@@ -31,7 +31,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
 		if (option) option->hfunc = tb_http_test_hfunc;
 	}
-	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_FLAGS, TB_FILE_WO | TB_FILE_CREAT | TB_FILE_TRUNC);
+	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) 
+		tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
 	// open stream
 	tb_hong_t itime = tb_mclock();

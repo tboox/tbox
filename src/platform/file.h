@@ -31,26 +31,21 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_FILENAME_MAX_SIZE 	(4096)
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the file flag type
-typedef enum __tb_file_flag_t
+// the file mode type
+typedef enum __tb_file_mode_t
 {
-	TB_FILE_RO 		= 1
-, 	TB_FILE_WO 		= 2
-, 	TB_FILE_RW 		= 4
-, 	TB_FILE_CREAT 	= 8
-, 	TB_FILE_APPEND 	= 16
-, 	TB_FILE_TRUNC 	= 32
-, 	TB_FILE_BINARY 	= 64
+	TB_FILE_MODE_RO 	= 1
+, 	TB_FILE_MODE_WO 	= 2
+, 	TB_FILE_MODE_RW 	= 4
+, 	TB_FILE_MODE_CREAT 	= 8
+, 	TB_FILE_MODE_APPEND = 16
+, 	TB_FILE_MODE_TRUNC 	= 32
+, 	TB_FILE_MODE_BINARY = 64
 
-}tb_file_flag_t;
+}tb_file_mode_t;
 
 // the file seek type
 typedef enum __tb_file_seek_flag_t
@@ -87,31 +82,98 @@ typedef struct __tb_file_info_t
  * file interfaces
  */
 
-// open & close
-tb_handle_t 			tb_file_init(tb_char_t const* path, tb_size_t flags);
-tb_bool_t 				tb_file_exit(tb_handle_t hfile);
+/*! init the file
+ * 
+ * @param path 			the file path
+ * @param mode 			the file mode
+ *
+ * @return 				the file handle
+ */
+tb_handle_t 			tb_file_init(tb_char_t const* path, tb_size_t mode);
 
-// read & writ
-tb_long_t 				tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size);
-tb_long_t 				tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size);
+/*! exit the file
+ * 
+ * @param file 			the file handle
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_exit(tb_handle_t file);
 
-// seek
-tb_bool_t 				tb_file_seek(tb_handle_t hfile, tb_hize_t offset);
+/*! read the file data
+ * 
+ * @param file 			the file handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size);
 
-// skip
-tb_bool_t 				tb_file_skip(tb_handle_t hfile, tb_hize_t size);
+/*! writ the file data
+ * 
+ * @param file 			the file handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size);
 
-// sync
-tb_void_t 				tb_file_sync(tb_handle_t hfile);
+/*! seek the file offset
+ * 
+ * @param file 			the file handle
+ * @param offset 		the file offset
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_seek(tb_handle_t file, tb_hize_t offset);
 
-// accessors
-tb_hize_t 				tb_file_size(tb_handle_t hfile);
+/*! skip the file size
+ * 
+ * @param file 			the file handle
+ * @param size 			the file size
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_skip(tb_handle_t file, tb_hize_t size);
 
-// info
+/*! sync the file data
+ * 
+ * @param file 			the file handle
+ */
+tb_void_t 				tb_file_sync(tb_handle_t file);
+
+/*! the file size
+ * 
+ * @param file 			the file handle
+ *
+ * @return 				the file size
+ */
+tb_hize_t 				tb_file_size(tb_handle_t file);
+
+/*! the file info for file or directory
+ * 
+ * @param file 			the file handle
+ * @param info 			the file info
+ *
+ * @return 				tb_true or tb_false
+ */
 tb_bool_t 				tb_file_info(tb_char_t const* path, tb_file_info_t* info);
 
-// create & delete
-tb_bool_t 				tb_file_create(tb_char_t const* path, tb_size_t type);
-tb_void_t 				tb_file_delete(tb_char_t const* path, tb_size_t type);
+/*! create the file
+ * 
+ * @param path 			the file path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_create(tb_char_t const* path);
+
+/*! remove the file
+ * 
+ * @param path 			the file path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_remove(tb_char_t const* path);
 
 #endif

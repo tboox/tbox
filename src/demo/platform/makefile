@@ -6,7 +6,9 @@ NAMES = \
 		atomic \
 		event \
 		epool \
-		utils
+		utils \
+		process \
+		directory 
 
 include $(SRC_DIR)/demo/makefile
 

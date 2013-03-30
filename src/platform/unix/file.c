@@ -26,12 +26,8 @@
  */
 #include "prefix.h"
 #include "../file.h"
-#include "../../math/math.h"
-#include "../../libc/libc.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/poll.h>
-#include <sys/select.h>
 #include <fcntl.h>
 #include <stdio.h>
 #ifndef TB_CONFIG_OS_ANDROID
@@ -39,108 +35,116 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * path
- */
-
-/* transform the file path to the unix style
- *
- * /home/ruki/file.txt
- * file:///home/ruki/file.txt
- *
- * => /home/ruki/file.txt
- */
-static tb_char_t const* tb_file_path_to_unix(tb_char_t const* path)
-{
-	tb_assert_and_check_return_val(path, tb_null);
-
-	return (!tb_strnicmp(path, "file://", 7))? (path + 7) : path;
-}
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
 // file
-tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t flags)
+tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
+	// check
 	tb_assert_and_check_return_val(path, tb_null);
 
 	// path => unix
-	path = tb_file_path_to_unix(path);
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_null);
 
-	// flag
-	tb_size_t flag = 0;
-	if (flags & TB_FILE_RO) flag |= O_RDONLY;
-	else if (flags & TB_FILE_WO) flag |= O_WRONLY;
-	else if (flags & TB_FILE_RW) flag |= O_RDWR;
+	// flags
+	tb_size_t flags = 0;
+	if (mode & TB_FILE_MODE_RO) flags |= O_RDONLY;
+	else if (mode & TB_FILE_MODE_WO) flags |= O_WRONLY;
+	else if (mode & TB_FILE_MODE_RW) flags |= O_RDWR;
 
-	if (flags & TB_FILE_CREAT) flag |= O_CREAT;
-	if (flags & TB_FILE_APPEND) flag |= O_APPEND;
-	if (flags & TB_FILE_TRUNC) flag |= O_TRUNC;
+	if (mode & TB_FILE_MODE_CREAT) flags |= O_CREAT;
+	if (mode & TB_FILE_MODE_APPEND) flags |= O_APPEND;
+	if (mode & TB_FILE_MODE_TRUNC) flags |= O_TRUNC;
 
 	// noblock
-	flag |= O_NONBLOCK;
+	flags |= O_NONBLOCK;
 
-	// mode
-	tb_size_t mode = 0;
-	if (flags & TB_FILE_CREAT) 
+	// modes
+	tb_size_t modes = 0;
+	if (mode & TB_FILE_MODE_CREAT) 
 	{
-		//if ((flags & TB_FILE_RO) | (flags & TB_FILE_RW)) mode |= S_IREAD;
-		//if ((flags & TB_FILE_WO) | (flags & TB_FILE_RW)) mode |= S_IWRITE;
-		mode = 0777;
+		//if ((mode & TB_FILE_MODE_RO) | (mode & TB_FILE_MODE_RW)) modes |= S_IREAD;
+		//if ((mode & TB_FILE_MODE_WO) | (mode & TB_FILE_MODE_RW)) modes |= S_IWRITE;
+		modes = 0777;
 	}
 
 	// open it
-	tb_long_t fd = open(path, flag, mode);
+	tb_long_t fd = open(path, flags, modes);
 
 	// ok?
 	return (fd < 0)? tb_null : ((tb_handle_t)(fd + 1));
 }
-tb_bool_t tb_file_exit(tb_handle_t hfile)
+tb_bool_t tb_file_exit(tb_handle_t file)
 {
-	tb_assert_and_check_return_val(hfile, tb_false);
-	return !close((tb_long_t)hfile - 1)? tb_true : tb_false;
+	// check
+	tb_assert_and_check_return_val(file, tb_false);
+
+	// close it
+	return !close((tb_long_t)file - 1)? tb_true : tb_false;
 }
-tb_long_t tb_file_read(tb_handle_t hfile, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
 {
-	tb_assert_and_check_return_val(hfile, -1);
-	return read((tb_long_t)hfile - 1, data, size);
+	// check
+	tb_assert_and_check_return_val(file, -1);
+
+	// read it
+	return read((tb_long_t)file - 1, data, size);
 }
-tb_long_t tb_file_writ(tb_handle_t hfile, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 {
-	tb_assert_and_check_return_val(hfile, -1);
-	return write((tb_long_t)hfile - 1, data, size);
+	// check
+	tb_assert_and_check_return_val(file, -1);
+
+	// writ it
+	return write((tb_long_t)file - 1, data, size);
 }
-tb_void_t tb_file_sync(tb_handle_t hfile)
+tb_void_t tb_file_sync(tb_handle_t file)
 {
+	// check
+	tb_assert_and_check_return(file);
+
+	// sync
 #ifdef TB_CONFIG_OS_LINUX
-	if (hfile) fdatasync((tb_long_t)hfile - 1);
+	if (file) fdatasync((tb_long_t)file - 1);
 #else
-	if (hfile) fsync((tb_long_t)hfile - 1);
+	if (file) fsync((tb_long_t)file - 1);
 #endif
 }
-tb_bool_t tb_file_seek(tb_handle_t hfile, tb_hize_t offset)
+tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
 {
-	tb_assert_and_check_return_val(hfile, tb_false);
+	// check
+	tb_assert_and_check_return_val(file, tb_false);
 
-	return (offset == lseek((tb_long_t)hfile - 1, offset, SEEK_SET))? tb_true : tb_false;
+	// seek
+	return (offset == lseek((tb_long_t)file - 1, offset, SEEK_SET))? tb_true : tb_false;
 }
-tb_bool_t tb_file_skip(tb_handle_t hfile, tb_hize_t size)
+tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
 {
-	return (lseek((tb_long_t)hfile - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
-}
-tb_hize_t tb_file_size(tb_handle_t hfile)
-{
-	tb_assert_and_check_return_val(hfile, 0);
+	// check
+	tb_assert_and_check_return_val(file, tb_false);
 
+	// skip
+	return (lseek((tb_long_t)file - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
+}
+tb_hize_t tb_file_size(tb_handle_t file)
+{
+	// check
+	tb_assert_and_check_return_val(file, 0);
+
+	// the file size
 	struct stat st = {0};
-	return !fstat((tb_long_t)hfile - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+	return !fstat((tb_long_t)file - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
+	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// path => unix
-	path = tb_file_path_to_unix(path);
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// exists?
 	tb_check_return_val(!access(path, F_OK), tb_false);
@@ -163,42 +167,38 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 			info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 		}
 	}
+
+	// ok
 	return tb_true;
 }
-tb_bool_t tb_file_create(tb_char_t const* path, tb_size_t type)
+tb_bool_t tb_file_create(tb_char_t const* path)
 {
+	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// path => unix
-	path = tb_file_path_to_unix(path);
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_false);
 
-	// create file
-	switch (type)
-	{
-	case TB_FILE_TYPE_DIR:
-		return !mkdir(path, S_IRWXU)? tb_true : tb_false;
-	case TB_FILE_TYPE_FILE:
-		{
-			tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
-			if (fd >= 0) 
-			{
-				close(fd); 
-				return tb_true;
-			}
-		}
-		break;
-	default:
-		break;
-	}
-	return tb_false;
+	// create it
+	tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
+	tb_assert_and_check_return_val(fd >= 0, tb_false);
+
+	// close it
+	close(fd);
+
+	// ok
+	return tb_true;
 }
-tb_void_t tb_file_delete(tb_char_t const* path, tb_size_t type)
+tb_bool_t tb_file_remove(tb_char_t const* path)
 {
-	tb_assert_and_check_return(path);
+	// check
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// path => unix
-	path = tb_file_path_to_unix(path);
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_false);
 
 	// remove it
-	remove(path);
+	return !remove(path)? tb_true : tb_false;
 }

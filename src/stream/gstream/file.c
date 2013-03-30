@@ -58,8 +58,8 @@ typedef struct __tb_fstream_t
 	// the file bref
 	tb_size_t 			bref;
 
-	// the file flags
-	tb_size_t 			flags;
+	// the file mode
+	tb_size_t 			mode;
 
 }tb_fstream_t;
 
@@ -88,7 +88,7 @@ static tb_long_t tb_fstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(url, -1);
 
 	// open file
-	fst->file = tb_file_init(url, fst->flags);
+	fst->file = tb_file_init(url, fst->mode);
 	tb_assert_and_check_return_val(fst->file, -1);
 
 	// ok
@@ -203,8 +203,8 @@ static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 	switch (cmd)
 	{
-	case TB_FSTREAM_CMD_SET_FLAGS:
-		fst->flags = (tb_size_t)tb_va_arg(args, tb_size_t);
+	case TB_FSTREAM_CMD_SET_MODE:
+		fst->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
 		return tb_true;
 	case TB_FSTREAM_CMD_SET_HANDLE:
 		{
@@ -249,7 +249,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->wait 	= tb_fstream_wait;
 	gst->ctrl 	= tb_fstream_ctrl;
 	fst->file 	= tb_null;
-	fst->flags 	= TB_FILE_RO | TB_FILE_BINARY;
+	fst->mode 	= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// resize file cache
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
