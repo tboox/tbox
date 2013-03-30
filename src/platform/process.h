@@ -17,43 +17,29 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		process.h
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_PROCESS_H
+#define TB_PLATFORM_PROCESS_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "dynamic.h"
-#include "process.h"
-#include "directory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*!init the platform
+/*! done the command line
+ * 
+ * @param line 			the command line
  *
- * @return tb_true or tb_false
+ * @return 				tb_true or tb_false
  */
-tb_bool_t 	tb_platform_init();
-
-/// exit the platform 
-tb_void_t 	tb_platform_exit();
+tb_bool_t 				tb_process_done(tb_char_t const* line);
 
 #endif

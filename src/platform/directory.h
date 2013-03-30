@@ -17,43 +17,55 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		directory.h
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_DIRECTORY_H
+#define TB_PLATFORM_DIRECTORY_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "dynamic.h"
-#include "process.h"
-#include "directory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*!init the platform
+/*! create the directory
+ * 
+ * @param path 			the directory path
  *
- * @return tb_true or tb_false
+ * @return 				tb_true or tb_false
  */
-tb_bool_t 	tb_platform_init();
+tb_bool_t 				tb_directory_create(tb_char_t const* path);
 
-/// exit the platform 
-tb_void_t 	tb_platform_exit();
+/*! remove the directory
+ * 
+ * @param path 			the directory path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_directory_remove(tb_char_t const* path);
+
+/*! the temporary directory
+ * 
+ * @param path 			the directory path data
+ * @param maxn 			the directory path maxn
+ *
+ * @return 				the directory path size
+ */
+tb_size_t 				tb_directory_temp(tb_char_t* path, tb_size_t maxn);
+
+/*! the current directory
+ * 
+ * @param path 			the directory path data
+ * @param maxn 			the directory path maxn
+ *
+ * @return 				the directory path size
+ */
+tb_size_t 				tb_directory_curt(tb_char_t* path, tb_size_t maxn);
 
 #endif
