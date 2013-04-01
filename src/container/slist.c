@@ -95,7 +95,7 @@ static tb_pointer_t tb_slist_iterator_item(tb_iterator_t* iterator, tb_size_t it
 static tb_void_t tb_slist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	tb_slist_t* slist = (tb_slist_t*)iterator->data;
-	tb_assert_return(slist && itor);
+	tb_assert_and_check_return(slist && itor);
 
 	if (iterator->step > sizeof(tb_pointer_t))
 	{

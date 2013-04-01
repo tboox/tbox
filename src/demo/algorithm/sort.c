@@ -23,7 +23,6 @@ static tb_void_t tb_sort_int_test(tb_size_t n)
 	for (i = 0; i < n; i++) data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -53,7 +52,6 @@ static tb_void_t tb_sort_int_test_bubble(tb_size_t n)
 	for (i = 0; i < n; i++) data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_bubble_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -83,7 +81,6 @@ static tb_void_t tb_sort_int_test_insert(tb_size_t n)
 	for (i = 0; i < n; i++) data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_insert_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -113,7 +110,6 @@ static tb_void_t tb_sort_int_test_quick(tb_size_t n)
 	for (i = 0; i < n; i++) data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
 	
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_quick_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -143,7 +139,6 @@ static tb_void_t tb_sort_int_test_heap(tb_size_t n)
 	for (i = 0; i < n; i++) data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
 	
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_heap_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -183,7 +178,6 @@ static tb_void_t tb_sort_str_test(tb_size_t n)
 	}
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -226,7 +220,6 @@ static tb_void_t tb_sort_str_test_bubble(tb_size_t n)
 	}
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_bubble_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -269,7 +262,6 @@ static tb_void_t tb_sort_str_test_insert(tb_size_t n)
 	}
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_insert_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -312,7 +304,6 @@ static tb_void_t tb_sort_str_test_quick(tb_size_t n)
 	}
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_quick_sort_all(&iterator);
 	time = tb_mclock() - time;
@@ -355,7 +346,6 @@ static tb_void_t tb_sort_str_test_heap(tb_size_t n)
 	}
 
 	// sort
-	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
 	tb_heap_sort_all(&iterator);
 	time = tb_mclock() - time;

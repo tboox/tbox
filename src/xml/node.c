@@ -411,9 +411,7 @@ tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
 	tb_size_t n = tb_strlen(p);
 
 	// walk the child nodes
-	tb_xml_node_t* root = node;
 	tb_xml_node_t* head = node->chead;
-	tb_xml_node_t* tail = node->ctail;
 	for (node = head; node; node = node->next)
 	{
 		if (node->type == TB_XML_NODE_TYPE_ELEMENT)

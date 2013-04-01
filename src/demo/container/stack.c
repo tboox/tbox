@@ -68,6 +68,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	for (; itor != tail; itor = tb_iterator_next(stack, itor))
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(stack, itor);
+		tb_used(item);
 	}
 	t = tb_mclock() - t;
 
@@ -94,6 +95,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 	while (1)
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(stack, itor);
+		tb_used(item);
 
 		if (itor == head) break;
 		itor = tb_iterator_prev(stack, itor);

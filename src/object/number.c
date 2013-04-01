@@ -457,7 +457,6 @@ static tb_object_t* tb_number_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 	tb_sstring_chrcat(&data, type);
 
 	// walk
-	tb_char_t ch;
 	tb_bool_t bs = (type == '-')? tb_true : tb_false;
 	tb_bool_t bf = (type == '.')? tb_true : tb_false;
 	while (tb_gstream_left(reader->stream)) 

@@ -190,7 +190,6 @@ static __tb_inline__ tb_size_t tb_tpool_find_free(tb_size_t body, tb_size_t bits
 	return blki;
 #else
 	tb_size_t 	blki = 0;
-	tb_size_t 	blkn = TB_TPOOL_BLOCK_MAXN;
 	tb_size_t 	blks = ~body;
 	tb_size_t 	blkb = 0;
 	while (blki < TB_TPOOL_BLOCK_MAXN)
@@ -365,7 +364,6 @@ tb_pointer_t tb_tpool_ralloc_fast(tb_tpool_t* tpool, tb_pointer_t data, tb_size_
 
 	// the block bit number
 	tb_size_t 	bitn = tb_bits_fb1_le(*last >> blki) + 1;	
-	tb_size_t 	bits = ((tb_size_t)1 << bitn) - 1;	
 	tb_assert_and_check_return_val(bitn <= TB_TPOOL_BLOCK_MAXN, tb_null);
 
 	// osize

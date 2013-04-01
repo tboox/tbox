@@ -143,8 +143,6 @@ static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 {
 	tb_size_t 	i = 0;
-	tb_byte_t 	b = 0;
-	tb_byte_t 	u = 0;
 #if TB_CPU_BIT64
 	tb_size_t 	m = tb_align(fpool->maxn, 64) >> 6;
 #elif TB_CPU_BIT32

@@ -223,7 +223,7 @@ static tb_size_t tb_slist_remove_head_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_slist_remove_head(slist);
 	t = tb_mclock() - t;
@@ -245,7 +245,7 @@ static tb_size_t tb_slist_remove_last_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_slist_remove_last(slist);
 	t = tb_mclock() - t;
@@ -268,7 +268,7 @@ static tb_size_t tb_slist_nremove_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nremove(slist, tb_iterator_head(slist), n);
 	t = tb_mclock() - t;
@@ -291,7 +291,7 @@ static tb_size_t tb_slist_nremove_head_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nremove_head(slist, n);
 	t = tb_mclock() - t;
@@ -314,7 +314,7 @@ static tb_size_t tb_slist_nremove_last_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nremove_last(slist, n);
 	t = tb_mclock() - t;
@@ -365,7 +365,7 @@ static tb_size_t tb_slist_replace_head_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_slist_replace_head(slist, 0xe);
 	t = tb_mclock() - t;
@@ -390,7 +390,7 @@ static tb_size_t tb_slist_replace_last_test()
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	for (i = 0; i < n; i++) tb_slist_replace_last(slist, 0xe);
 	t = tb_mclock() - t;
@@ -415,7 +415,7 @@ static tb_size_t tb_slist_nreplace_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nreplace(slist, tb_iterator_head(slist), 0xe, n);
 	t = tb_mclock() - t;
@@ -440,7 +440,7 @@ static tb_size_t tb_slist_nreplace_head_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nreplace_head(slist, 0xe, n);
 	t = tb_mclock() - t;
@@ -465,7 +465,7 @@ static tb_size_t tb_slist_nreplace_last_test()
 	tb_assert_and_check_return_val(slist, 0);
 
 	tb_size_t n = 1000000;
-	tb_size_t itor = tb_slist_ninsert_head(slist, 0xd, n);
+	tb_slist_ninsert_head(slist, 0xd, n);
 	tb_hong_t t = tb_mclock();
 	tb_slist_nreplace_last(slist, 0xe, n);
 	t = tb_mclock() - t;
@@ -499,6 +499,7 @@ static tb_size_t tb_slist_iterator_next_test()
 	for (; itor != tail; itor = tb_iterator_next(slist, itor))
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(slist, itor);
+		tb_used(item);
 	}
 	t = tb_mclock() - t;
 
@@ -524,6 +525,7 @@ static tb_size_t tb_slist_iterator_prev_test()
 	while (1)
 	{
 		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(slist, itor);
+		tb_used(item);
 
 		if (itor == head) break;
 		itor = tb_iterator_prev(slist, itor);

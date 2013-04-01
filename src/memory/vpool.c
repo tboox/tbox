@@ -281,7 +281,9 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 	
 	// the block
 	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
+#ifdef TB_DEBUG
 	tb_size_t 			bsize = block->size;
+#endif
 
 	// check block
 	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, tb_null);
@@ -680,7 +682,9 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	
 	// the block
 	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
+#ifdef TB_DEBUG
 	tb_size_t 			bsize = block->size;
+#endif
 
 	// check block
 	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, tb_false);

@@ -75,9 +75,7 @@ tb_long_t tb_charset_utf16_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_utf16_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch)
 {
 	// init
-	tb_byte_t* 	p = tb_bstream_pos(bst);
-	tb_byte_t* 	q = p;
-	tb_size_t 	n = tb_bstream_left(bst);
+	tb_size_t n = tb_bstream_left(bst);
 
 	if (ch <= 0x0000ffff) 
 	{

@@ -187,9 +187,9 @@ static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_uint8_t const bu
 
 static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buffer[64])
 {
-	tb_uint32_t 	i, a, b, c, d, e, f, g, h;
+	tb_uint32_t i, a, b, c, d, e, f, g, h;
 	tb_uint32_t block[64];
-	tb_uint32_t T1, T2;
+	tb_uint32_t T1;
 
 	a = state[0];
 	b = state[1];
@@ -201,6 +201,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buff
 	h = state[7];
 
 #ifdef TB_CONFIG_BINARY_SMALL
+	tb_uint32_t T2;
 	for (i = 0; i < 64; i++) 
 	{
 		if (i < 16) T1 = blk0(i);
