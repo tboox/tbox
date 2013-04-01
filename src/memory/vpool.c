@@ -307,7 +307,7 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 		block->size += nhead + next->size;
 
 		// split it if the free block is too large
-		if (block->size > nhead + asize)
+		if (block->size > asize + nhead)
 		{
 			// split block
 			next = (tb_vpool_block_t*)(p + asize);
@@ -316,11 +316,10 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 			block->size = asize;
 
 			// predict the next free block
-			vpool->pred = p + block->size;
+			vpool->pred = next;
 		}
-
 		// reset the predicted block
-		if (vpool->pred == (tb_byte_t*)block || vpool->pred == pe)
+		else if (vpool->pred == (tb_byte_t*)block || vpool->pred == (tb_byte_t*)next || vpool->pred == pe)
 			vpool->pred = tb_null;
 
 		// reset full
