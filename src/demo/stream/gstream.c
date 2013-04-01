@@ -53,7 +53,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
 	tb_hize_t 		read = 0;
-	tb_bool_t 		wait = tb_false;
 	tb_hize_t 		left = tb_gstream_left(ist);
 	tb_hong_t 		base = tb_mclock();
 	tb_hong_t 		basc = tb_mclock();

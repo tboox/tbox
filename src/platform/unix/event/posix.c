@@ -62,8 +62,7 @@ tb_void_t tb_event_post(tb_handle_t handle)
 	tb_assert_and_check_return(handle);
 	sem_t* h = (sem_t*)handle;
 
-	tb_long_t r = sem_post(h);
-    tb_assert(r != -1);
+	sem_post(h);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {

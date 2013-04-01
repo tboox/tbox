@@ -315,7 +315,6 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 	tb_bstream_t 	bst;
 	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
 	tb_size_t 		size = 0;
-	tb_char_t* 		p = tb_null;
 	tb_bstream_attach(&bst, rpkt, TB_DNS_RPKT_MAXN);
 
 	// identification number
@@ -834,8 +833,7 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 		tb_trace_impl("response: answer: %d", i);
 
 		// parse dns name
-		tb_char_t const* name = tb_dns_parse_name(&bst, answer.name);
-		tb_trace_impl("response: name: %s", name? name : "");
+		tb_trace_impl("response: name: %s", tb_dns_parse_name(&bst, answer.name));
 
 		// parse resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);

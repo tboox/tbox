@@ -272,9 +272,6 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	// no size?
 	tb_check_return_val(size, tb_null);
 	
-	// the align size
-	tb_size_t asize = tb_align(size, spool->align);
-
 	// aloc++
 #ifdef TB_DEBUG
 	spool->info.aloc++;

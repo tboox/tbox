@@ -207,7 +207,6 @@ static tb_size_t tb_hash_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 
 	// find the next from the next buckets
 	tb_size_t i;
-	tb_size_t j;
 	tb_size_t n = hash->hash_size;
 	for (i = buck + 1; i < n; i++)
 	{
@@ -244,7 +243,7 @@ static tb_void_t tb_hash_iterator_move(tb_iterator_t* iterator, tb_size_t itor, 
 
 	// step
 	tb_size_t step = hash->name_func.size + hash->data_func.size;
-	tb_assert_and_check_return_val(step, tb_false);
+	tb_assert_and_check_return(step);
 
 	// list
 	tb_hash_item_list_t* list = hash->hash_list[b];
@@ -371,7 +370,7 @@ tb_pointer_t tb_hash_get(tb_hash_t* hash, tb_cpointer_t name)
 	if (tb_hash_item_find(hash, name, &buck, &item))
 	{
 		tb_pointer_t data = tb_null;
-		if (tb_hash_item_at(hash, buck, item, tb_null, &data)) return (tb_cpointer_t)data;
+		if (tb_hash_item_at(hash, buck, item, tb_null, &data)) return (tb_pointer_t)data;
 	}
 	return tb_null;
 }
@@ -679,11 +678,11 @@ tb_void_t tb_hash_dump(tb_hash_t const* hash)
 	}
 
 	tb_print("");
-	tb_size_t itor = tb_iterator_head(hash);
-	tb_size_t tail = tb_iterator_tail(hash);
-	for (; itor != tail; itor = tb_iterator_next(hash, itor))
+	tb_size_t itor = tb_iterator_head((tb_iterator_t*)hash);
+	tb_size_t tail = tb_iterator_tail((tb_iterator_t*)hash);
+	for (; itor != tail; itor = tb_iterator_next((tb_iterator_t*)hash, itor))
 	{
-		tb_hash_item_t const* item = tb_iterator_item(hash, itor);
+		tb_hash_item_t const* item = tb_iterator_item((tb_iterator_t*)hash, itor);
 		if (item)
 		{
 			if (hash->name_func.cstr && hash->data_func.cstr) 

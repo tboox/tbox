@@ -196,7 +196,6 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fs
 
 	// walk
 	tb_uint32_t 		ch;
-	tb_long_t 			cn = 0;
 	tb_byte_t const* 	tp = tb_bstream_pos(tst);
 	while (tb_bstream_left(fst) && tb_bstream_left(tst))
 	{
@@ -229,7 +228,7 @@ tb_long_t tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const
 	// init bstream
 	tb_bstream_t ist;
 	tb_bstream_t ost;
-	tb_bstream_attach(&ist, idata, isize);
+	tb_bstream_attach(&ist, (tb_pointer_t)idata, isize);
 	tb_bstream_attach(&ost, odata, osize);
 
 	// conv

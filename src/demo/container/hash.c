@@ -214,7 +214,6 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_rand_clear();
 
 	// performance
-	__tb_volatile__ tb_char_t s[256] = {0};
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
 	while (n--) 

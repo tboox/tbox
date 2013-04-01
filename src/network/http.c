@@ -588,7 +588,6 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	tb_check_return_val(!(http->step & TB_HTTP_STEP_RESP), 1);
 
 	// init
-	tb_long_t 			r = -1;
 	tb_char_t 			ch[1];
 	tb_long_t 			cn = 0;
 

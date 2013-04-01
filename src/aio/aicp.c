@@ -226,7 +226,8 @@ end:
 }
 tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
-	tb_assert_and_check_return_val(aicp && aico, tb_null);
+	// check
+	tb_assert_and_check_return(aicp && aico);
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
@@ -239,7 +240,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 	if (!aicp->rtor->delo(aicp->rtor, aico)) goto end;
 
 	// del aico from pool
-	tb_rpool_free(aicp->pool, aico);
+	tb_rpool_free(aicp->pool, (tb_pointer_t)aico);
 
 end:
 	// leave 
@@ -275,7 +276,7 @@ tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_SYNC;
-	aice.aico = aico;
+	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
 tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
@@ -286,7 +287,7 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_ACPT;
-	aice.aico = aico;
+	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
 tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port)
@@ -298,7 +299,7 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* 
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_CONN;
 	aice.u.conn.port = port;
-	aice.aico = aico;
+	aice.aico = (tb_pointer_t)aico;
 	if (tb_ipv4_set(&aice.u.conn.host, host))
 		return tb_aicp_post(aicp, &aice);
 	return tb_false;
@@ -313,7 +314,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	aice.code = TB_AICE_CODE_READ;
 	aice.u.read.data = data;
 	aice.u.read.maxn = size;
-	aice.aico = aico;
+	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
 tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
@@ -326,7 +327,7 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	aice.code = TB_AICE_CODE_WRIT;
 	aice.u.read.data = data;
 	aice.u.read.maxn = size;
-	aice.aico = aico;
+	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
 tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)

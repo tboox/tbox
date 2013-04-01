@@ -226,7 +226,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 		for (j = 0; j < n; j++)
 		{
 			tb_char_t p[41] = {0};
-			tb_long_t r = tb_snprintf(p, 40, "%s%s.cn", &ping[i * 16], &ping[j * 16]);
+			tb_snprintf(p, 40, "%s%s.cn", &ping[i * 16], &ping[j * 16]);
 			tb_print("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
 		}
 	}
@@ -266,7 +266,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 			for (k = 0; k < n; k++)
 			{
 				tb_char_t p[61] = {0};
-				tb_long_t r = tb_snprintf(p, 60, "%s%s%s.cn", &ping[i * 16], &ping[j * 16], &ping[k * 16]);
+				tb_snprintf(p, 60, "%s%s%s.cn", &ping[i * 16], &ping[j * 16], &ping[k * 16]);
 				tb_print("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
 			}
 		}

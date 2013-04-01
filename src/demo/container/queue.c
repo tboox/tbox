@@ -66,6 +66,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	for (; itor != tail; itor = tb_iterator_next(queue, itor))
 	{
 		__tb_volatile__ tb_cpointer_t item = tb_iterator_item(queue, itor);
+		tb_used(item);
 	}
 	t = tb_mclock() - t;
 
@@ -91,6 +92,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	while (1)
 	{
 		__tb_volatile__ tb_cpointer_t item = tb_iterator_item(queue, itor);
+		tb_used(item);
 
 		if (itor == head) break;
 		itor = tb_iterator_prev(queue, itor);
