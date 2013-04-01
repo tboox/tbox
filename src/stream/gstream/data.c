@@ -110,6 +110,7 @@ static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// writ data
 	tb_memcpy(dst->head, data, size);
 	dst->head += size;
+
 	return left? (tb_long_t)(size) : -1; // force end if full
 }
 static tb_hize_t tb_dstream_size(tb_gstream_t const* gst)
