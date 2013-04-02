@@ -46,7 +46,7 @@ ARCH_LDFLAGS 		=
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
+CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g
 CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
@@ -100,7 +100,7 @@ MMFLAGS_DEBUG 		=
 MMFLAGS 			=
 
 # ldflags
-LDFLAGS_RELEASE 	= 
+LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
 LDFLAGS 			= $(ARCH_LDFLAGS)
 LDFLAGS-L 			= -L
