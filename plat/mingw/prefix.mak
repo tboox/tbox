@@ -54,7 +54,7 @@ ifeq ($(ARCH),x64)
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
+CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g
 CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
@@ -82,7 +82,7 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
-LDFLAGS_RELEASE 	=
+LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
 LDFLAGS 			= -static
 LDFLAGS-L 			= -L

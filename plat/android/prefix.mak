@@ -32,7 +32,7 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check
+CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g
 CXFLAGS 			= -c -Wall -fomit-frame-pointer -march=$(ARCH) -D__tb_arch_$(ARCH)__\
 					  -I$(NDK)/platforms/android-8/arch-arm/usr/include 
@@ -61,7 +61,7 @@ CCFLAGS 			= \
 					-I$(NDK)/sources/cxx-stl/stlport/stlport
 
 # ldflags
-LDFLAGS_RELEASE 	=
+LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
 LDFLAGS 			= -nostdlib \
 					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
