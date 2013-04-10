@@ -146,8 +146,8 @@ static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 
 	// attach bstream
 	tb_bstream_t ist, ost;
-	tb_bstream_attach(&ist, ip, ie - ip);
-	tb_bstream_attach(&ost, op, oe - op);
+	tb_bstream_init(&ist, ip, ie - ip);
+	tb_bstream_init(&ost, op, oe - op);
 
 	// spak it
 	tb_long_t r = tb_zip_spak(zst->zip, &ist, &ost, sync);

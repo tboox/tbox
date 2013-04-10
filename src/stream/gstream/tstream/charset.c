@@ -126,8 +126,8 @@ static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 	// spak it
 	tb_bstream_t ist;
 	tb_bstream_t ost;
-	tb_bstream_attach(&ist, ib, ie - ib);
-	tb_bstream_attach(&ost, ob, oe - ob);
+	tb_bstream_init(&ist, ib, ie - ib);
+	tb_bstream_init(&ost, ob, oe - ob);
 	if (tb_charset_conv_bst(cst->ftype, cst->ttype, &ist, &ost) < 0) return -1;
 	ip = tb_bstream_pos(&ist);
 	op = tb_bstream_pos(&ost);

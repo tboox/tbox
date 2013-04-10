@@ -228,8 +228,8 @@ tb_long_t tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const
 	// init bstream
 	tb_bstream_t ist;
 	tb_bstream_t ost;
-	tb_bstream_attach(&ist, (tb_pointer_t)idata, isize);
-	tb_bstream_attach(&ost, odata, osize);
+	tb_bstream_init(&ist, (tb_pointer_t)idata, isize);
+	tb_bstream_init(&ost, odata, osize);
 
 	// conv
 	return tb_charset_conv_bst(ftype, ttype, &ist, &ost);

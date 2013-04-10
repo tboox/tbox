@@ -91,7 +91,7 @@ static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size
 
 	// attach data
 	tb_bstream_t bst;
-	tb_bstream_attach(&bst, body_data, body_size);
+	tb_bstream_init(&bst, body_data, body_size);
 	
 	// get object type
 	tb_byte_t object_type = tb_bstream_get_ubits32(&bst, 5);
@@ -115,7 +115,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 	tb_print("[demo]: =================================================================================");
 	tb_print("[demo]: video_config_size: %d %d", head_size, body_size);
 	tb_bstream_t 	bst;
-	tb_bstream_attach(&bst, body_data, body_size);
+	tb_bstream_init(&bst, body_data, body_size);
 
 	tb_uint8_t configure_version 		= tb_bstream_get_u8(&bst);
 	tb_uint8_t avc_profile_indication 	= tb_bstream_get_u8(&bst);
@@ -186,7 +186,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 
 	// set unit data
 	tb_bstream_t bst;
-	tb_bstream_attach(&bst, body_data, body_size);
+	tb_bstream_init(&bst, body_data, body_size);
 	tb_size_t unit_size = tb_bstream_get_u32_be(&bst);
 	tb_size_t read_size = 4;
 	while (read_size + unit_size <= body_size)
