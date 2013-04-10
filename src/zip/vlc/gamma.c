@@ -112,13 +112,13 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 		// is out?
 		if ((q << 1) + 1 > 16) break;
 
-		tb_bstream_attach(&bst, d, 4);
+		tb_bstream_init(&bst, d, 4);
 		for (i = 0; i < q; i++) tb_bstream_set_u1(&bst, 1);
 		tb_bstream_set_u1(&bst, 0);
 		for (i = 0; i < q; i++, r >>= 1) tb_bstream_set_u1(&bst, r & 0x1);
 
 		tb_printf("x = 0x%04x, q = %d: ", x, q);
-		tb_bstream_attach(&bst, d, 4);
+		tb_bstream_init(&bst, d, 4);
 		for (q = 0; tb_bstream_get_u1(&bst); q++) tb_printf("1");
 		tb_printf("0 ");
 		for (i = 0; i < q; i++) tb_printf("%d", tb_bstream_get_u1(&bst));

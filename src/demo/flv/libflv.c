@@ -580,7 +580,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 	{
 		// read flv tag
 		if (!tb_gstream_bread(gst, tag, 15)) goto end;
-		tb_bstream_attach(&bst, tag, 15);
+		tb_bstream_init(&bst, tag, 15);
 		tb_uint32_t 	ptag_size = tb_bstream_get_u32_be(&bst);
 		tb_uint8_t 		tag_type = tb_bstream_get_u8(&bst);
 		tb_uint32_t 	data_size = tb_bstream_get_u24_be(&bst);
@@ -613,7 +613,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 					tb_assert_goto(data, end);
 
 					// attach data
-					tb_bstream_attach(&flv->sdata_bst, data, data_size);
+					tb_bstream_init(&flv->sdata_bst, data, data_size);
 
 					// read data
 					if (!tb_gstream_bread(gst, data, data_size)) goto end;
@@ -1003,7 +1003,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 {
 	// attach data
 	tb_bstream_t bst;
-	tb_bstream_attach(&bst, data, size);
+	tb_bstream_init(&bst, data, size);
 
 	// skip forbidden_zero_bit & nal_ref_idc & nal_unit_type
 	tb_bstream_skip(&bst, 1);

@@ -157,13 +157,13 @@ tb_zip_vlc_t* tb_zip_vlc_golomb_open(tb_zip_vlc_golomb_t* golomb, tb_size_t defm
 		// is out?
 		if (q + 1 + m > (8 << 3)) break;
 
-		tb_bstream_attach(&bst, d, 8);
+		tb_bstream_init(&bst, d, 8);
 		for (i = 0; i < q; i++) tb_bstream_set_u1(&bst, 1);
 		tb_bstream_set_u1(&bst, 0);
 		for (i = 0; i < m; i++, r >>= 1) tb_bstream_set_u1(&bst, r & 0x1);
 
 		tb_printf("x = 0x%04x, q = %d, m = %d: ", x, q, m);
-		tb_bstream_attach(&bst, d, 8);
+		tb_bstream_init(&bst, d, 8);
 		while (tb_bstream_get_u1(&bst)) tb_printf("1");
 		tb_printf("0 ");
 		for (i = 0; i < m; i++) tb_printf("%d", tb_bstream_get_u1(&bst));
