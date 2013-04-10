@@ -200,7 +200,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 		else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
 
 		// file size
-		info->size = ((tb_hong_t)st.nFileSizeHigh << 32) | st.nFileSizeLow;
+		info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
 	}
 
 	// ok
