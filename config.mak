@@ -2,17 +2,17 @@
 IS_CONFIG = yes
 
 # project
-PRO_DIR = /Users/ruki/projects/personal/tbox
+PRO_DIR = /home/wangrunqing/projects/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = n
+DEBUG = y
 
 # platform
-PLAT = mac
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # toolchain
 SDK = /home/ruki/programs/windows/cross
