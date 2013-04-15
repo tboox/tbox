@@ -231,6 +231,207 @@ tb_uint32_t tb_sbtou32(tb_char_t const* s, tb_int_t base)
 	if (convs[base]) return convs[base](s);
 	else return 0;
 }
+
+tb_uint64_t tb_s2tou64(tb_char_t const* s)
+{
+	tb_assert(s);
+	if (!s) return 0;
+
+	// skip space
+	while (tb_isspace(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0b"
+	if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
+		s += 2;
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint64_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (tb_isdigit2(ch))
+			val = (val << 1) + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint64_t tb_s8tou64(tb_char_t const* s)
+{
+	tb_assert(s);
+	if (!s) return 0;
+
+	// skip space
+	while (tb_isspace(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint64_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (tb_isdigit8(ch))
+			val = (val << 3) + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+
+tb_uint64_t tb_s10tou64(tb_char_t const* s)
+{
+	tb_assert(s);
+	if (!s) return 0;
+
+	// skip space
+	while (tb_isspace(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint64_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (tb_isdigit10(ch))
+			val = val * 10 + (ch - '0');
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint64_t tb_s16tou64(tb_char_t const* s)
+{
+	tb_assert(s);
+	if (!s) return 0;
+
+	// skip space
+	while (tb_isspace(*s)) s++;
+
+	// has sign?
+	tb_int_t sign = 0;
+	if (*s == '-') 
+	{
+		sign = 1;
+		s++;
+	}
+
+	// skip "0x"
+	if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+		s += 2;
+
+	// skip '0'
+	while ((*s) == '0') s++;
+
+	// compute number
+	tb_uint64_t val = 0;
+	while (*s)
+	{
+		tb_char_t ch = *s;
+		if (tb_isdigit10(ch))
+			val = (val << 4) + (ch - '0');
+		else if (ch > ('a' - 1) && ch < ('f' + 1))
+			val = (val << 4) + (ch - 'a') + 10;
+		else if (ch > ('A' - 1) && ch < ('F' + 1))
+			val = (val << 4) + (ch - 'A') + 10;
+		else break;
+	
+		s++;
+	}
+
+	if (sign) val = ~val + 1;;
+	return val;
+}
+tb_uint64_t tb_stou64(tb_char_t const* s)
+{
+	if (!s) tb_abort();
+	tb_assert(s);
+	if (!s) return 0;
+
+	// skip space
+	tb_char_t const* p = s;
+	while (tb_isspace(*p)) p++;
+
+	// has sign?
+	if (*p == '-') p++;
+
+	// is hex?
+	if (*p++ == '0')
+	{
+		if (*p == 'x' || *p == 'X')
+			return tb_s16tou64(s);
+		else if (*p == 'b' || *p == 'B')
+			return tb_s2tou64(s);
+		else return tb_s8tou64(s);
+	}
+	else return tb_s10tou64(s);
+}
+tb_uint64_t tb_sbtou64(tb_char_t const* s, tb_int_t base)
+{
+	typedef tb_uint64_t (*tb_t)(tb_char_t const*);
+	tb_t convs[] =
+	{
+		tb_null
+	, 	tb_null
+	,	tb_s2tou64
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_s8tou64
+	, 	tb_null
+	, 	tb_s10tou64
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_null
+	, 	tb_s16tou64
+	};
+	tb_assert(base < tb_arrayn(convs));
+	if (convs[base]) return convs[base](s);
+	else return 0;
+}
 #ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_s2tof(tb_char_t const* s)
 {

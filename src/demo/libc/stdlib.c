@@ -5,19 +5,24 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */ 
 #define TB_TEST_ISXXX 			(0)
 
 #define TB_TEST_TOLOWER 		(0)
 #define TB_TEST_TOUPPER 		(0)
 
-#define TB_TEST_SBTOI32 	(1)
-#define TB_TEST_SBTOU32 	(1)
-#define TB_TEST_SBTOF 		(1)
+#define TB_TEST_SBTOI32 		(1)
+#define TB_TEST_SBTOU32 		(1)
+#define TB_TEST_SBTOF 			(1)
 
-#define TB_TEST_STOI32 	(1)
-#define TB_TEST_STOU32 	(1)
+#define TB_TEST_STOI32 			(1)
+#define TB_TEST_STOU32 			(1)
 
-
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */ 
 static tb_void_t tb_check_is()
 {
 	tb_int_t i = 0;
