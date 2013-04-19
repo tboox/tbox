@@ -833,7 +833,8 @@ static tb_bool_t tb_dns_look_resp_done(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 		tb_trace_impl("response: answer: %d", i);
 
 		// parse dns name
-		tb_trace_impl("response: name: %s", tb_dns_parse_name(&bst, answer.name));
+		tb_char_t const* name = tb_dns_parse_name(&bst, answer.name); tb_used(name);
+		tb_trace_impl("response: name: %s", name);
 
 		// parse resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);
