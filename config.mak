@@ -6,13 +6,13 @@ PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
+DEBUG = n
 
 # platform
-PLAT = linux
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # toolchain
 SDK = /home/ruki/programs/windows/cross
