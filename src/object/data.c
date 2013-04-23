@@ -147,14 +147,18 @@ static tb_object_t* tb_data_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 				// decode base64 data
 				tb_char_t const* 	ib = base64;
 				tb_size_t 			in = tb_strlen(base64); 
-				tb_size_t 			on = in;
-				tb_byte_t* 			ob = tb_malloc0(on);
-				tb_assert_and_check_goto(ob && on, end);
-				on = tb_base64_decode(ib, in, ob, on);
-				tb_trace_impl("base64: %u => %u", in, on);
+				if (in)
+				{
+					tb_size_t 			on = in;
+					tb_byte_t* 			ob = tb_malloc0(on);
+					tb_assert_and_check_goto(ob && on, end);
+					on = tb_base64_decode(ib, in, ob, on);
+					tb_trace_impl("base64: %u => %u", in, on);
 
-				// init data
-				data = tb_data_init_from_data(ob, on); tb_free(ob);
+					// init data
+					data = tb_data_init_from_data(ob, on); tb_free(ob);
+				}
+				else data = tb_data_init_from_data(tb_null, 0);
 				tb_assert_and_check_goto(data, end);
 			}
 			break;
