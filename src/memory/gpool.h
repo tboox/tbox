@@ -32,7 +32,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 #	define tb_gpool_malloc(handle, size) 				tb_gpool_malloc_impl(handle, size, __tb_func__, __tb_line__, __tb_file__)
 #	define tb_gpool_malloc0(handle, size) 				tb_gpool_malloc0_impl(handle, size, __tb_func__, __tb_line__, __tb_file__)
 
@@ -66,42 +66,42 @@ tb_void_t 		tb_gpool_exit(tb_handle_t handle);
 tb_void_t 		tb_gpool_clear(tb_handle_t handle);
 
 // malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t 	tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size);
 #else
 tb_pointer_t 	tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // malloc0
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t 	tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size);
 #else
 tb_pointer_t 	tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t  	tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size);
 #else
 tb_pointer_t  	tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc0
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t  	tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size);
 #else
 tb_pointer_t  	tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // ralloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t 	tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
 #else
 tb_pointer_t 	tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 #endif
 
 // free
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_bool_t 		tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data);
 #else
 tb_bool_t 		tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);

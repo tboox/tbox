@@ -173,7 +173,7 @@ tb_void_t tb_gpool_clear(tb_handle_t handle)
 	}
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -191,14 +191,14 @@ tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	}
 
 	// malloc it from vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_malloc_impl(gpool->vpool, size);
 #else
 	return tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -216,14 +216,14 @@ tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	}
 
 	// malloc it from vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_malloc0_impl(gpool->vpool, size);
 #else
 	return tb_vpool_malloc0_impl(gpool->vpool, size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -241,14 +241,14 @@ tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 	}
 
 	// malloc it from vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_nalloc_impl(gpool->vpool, item, size);
 #else
 	return tb_vpool_nalloc_impl(gpool->vpool, item, size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -266,14 +266,14 @@ tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	}
 
 	// malloc it from vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_nalloc0_impl(gpool->vpool, item, size);
 #else
 	return tb_vpool_nalloc0_impl(gpool->vpool, item, size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
 #else
 tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -292,7 +292,7 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 		else
 		{
 			// malloc it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 			pdata = tb_vpool_malloc_impl(gpool->vpool, size);
 #else
 			pdata = tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
@@ -313,14 +313,14 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	}
 
 	// ralloc it from vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_ralloc_impl(gpool->vpool, data, size);
 #else
 	return tb_vpool_ralloc_impl(gpool->vpool, data, size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
 tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -335,7 +335,7 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		return tb_tpool_free(gpool->tpool, data);
 
 	// free it to vpool
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_free_impl(gpool->vpool, data);
 #else
 	return tb_vpool_free_impl(gpool->vpool, data, func, line, file);
@@ -343,7 +343,7 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 }
 
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_gpool_dump(tb_handle_t handle)
 {
 	// check 

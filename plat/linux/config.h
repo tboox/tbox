@@ -1,18 +1,6 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
-// arch
-#if defined(__tb_arch_x86__)
-# 	define TB_CONFIG_ARCH_x86
-#elif defined(__tb_arch_x64__)
-# 	define TB_CONFIG_ARCH_x64
-#endif
-//#define TB_CONFIG_ARCH_ARM
-//#define TB_CONFIG_ARCH_MIPS
-//#define TB_CONFIG_ARCH_SPARC
-//#define TB_CONFIG_ARCH_PPC
-//#define TB_CONFIG_ARCH_SH4
-
 // os
 #define TB_CONFIG_OS_LINUX
 #define TB_CONFIG_OS_LINUX_VERSION_MAJOR 	(2)
@@ -44,14 +32,14 @@
 #define TB_CONFIG_TYPE_FLOAT
 
 // optimization
-#define TB_CONFIG_OPTI_SSE2_ENABLE
-
-// binary
-//#define TB_CONFIG_BINARY_SMALL
+#if defined(__tb_arch_x86__) || defined(__tb_arch_x64__)
+# 	define TB_CONFIG_OPTI_SSE2_ENABLE
+#endif
 
 // memory
-#define TB_CONFIG_MEMORY_MODE_SMALL
-#define TB_CONFIG_MEMORY_POOL
+#ifdef __tb_debug__
+# 	define TB_CONFIG_MEMORY_POOL
+#endif
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 
 // event

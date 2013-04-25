@@ -15,13 +15,19 @@ DLL_SUFFIX 			= .so
 
 ASM_SUFFIX 			= .S
 
+# prefix
+ifneq ($(BIN),)
+PRE_ 				:= $(BIN)/$(PRE)
+else
+PRE_ 				:=
+endif
+
 # tool
-PRE 				= 
-CC 					= $(PRE)gcc
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)g++
+CC 					= $(PRE_)gcc
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
+LD 					= $(PRE_)g++
 AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -31,22 +37,31 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
-# arch flags
+# cxflags: .c/.cc/.cpp files
+CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check #-fvisibility=hidden
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
+CXFLAGS-I 			= -I
+CXFLAGS-o 			= -o
+
+# arch
 ifeq ($(ARCH),x86)
-ARCH_CXFLAGS 		= -march=i686
+CXFLAGS 			+= -march=i686 -mssse3 
 endif
 
 ifeq ($(ARCH),x64)
-ARCH_CXFLAGS 		= -m64
-ARCH_ASFLAGS 		= -m amd64
+CXFLAGS 			+= -m64 -mssse3
 endif
 
-# cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
-CXFLAGS-I 			= -I
-CXFLAGS-o 			= -o
+# opti
+ifeq ($(SMALL),y)
+CXFLAGS_RELEASE 	+= -Os
+else
+CXFLAGS_RELEASE 	+= -O3
+endif
+
+# small
+CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 
@@ -55,12 +70,14 @@ CFLAGS 				= \
 					-std=c99 \
 					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
+					-fno-math-errno \
 					-Wno-parentheses -Wstrict-prototypes \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wno-pointer-sign -Wwrite-strings \
-					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
-					-Werror=unused-variable -Werror=implicit-function-declaration -Werror=missing-prototypes 
+					-Wpointer-arith -Wwrite-strings \
+					-Wundef -Wmissing-prototypes  \
+#					-fno-signed-zeros -fno-tree-vectorize \
+					-Werror=unused-variable -Wtype-limits -Wno-pointer-sign -Wno-pointer-to-int-cast \
+					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 #					-Werror
 
 # ccflags: .cc/.cpp files
@@ -73,7 +90,7 @@ CCFLAGS 			= \
 # ldflags
 LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= 
+LDFLAGS 			= -static
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
@@ -81,9 +98,13 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
+ASFLAGS 			= -f elf
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
+
+ifeq ($(ARCH),x64)
+ASFLAGS 			+= -m amd64
+endif
 
 # arflags
 ARFLAGS 			= -cr

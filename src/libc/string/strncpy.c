@@ -61,7 +61,7 @@ tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 #if 1
 	tb_size_t sn = tb_strlen(s2);
 	tb_memcpy(s1, s2, tb_min(sn + 1, n));
-#elif defined(TB_CONFIG_BINARY_SMALL)
+#elif defined(__tb_small__)
 	while (n) 
 	{
 		if ((*s = *s2)) s2++; 

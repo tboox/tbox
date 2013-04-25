@@ -54,7 +54,7 @@
 # 	endif
 #endif
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 # 	define tb_int_to_fixed6(x) 		tb_long_to_fixed6_check(x)
 # 	define tb_fixed6_to_int(x) 		tb_fixed6_to_long_check(x)
 
@@ -88,7 +88,7 @@
  * inlines
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 static __tb_inline__ tb_fixed6_t tb_long_to_fixed6_check(tb_long_t x)
 {
 	// check overflow

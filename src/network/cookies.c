@@ -743,7 +743,7 @@ tb_char_t const* tb_cookies_get_from_url(tb_cookies_t* cookies, tb_char_t const*
 }
 
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 {
 	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);

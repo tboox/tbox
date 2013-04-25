@@ -625,7 +625,7 @@ end:
 
 	return ;
 }
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_hash_dump(tb_hash_t const* hash)
 {
 	tb_assert_and_check_return(hash && hash->hash_list);

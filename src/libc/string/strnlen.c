@@ -56,7 +56,7 @@ tb_size_t tb_strnlen(tb_char_t const* s, tb_size_t n)
 
 	__tb_register__ tb_char_t const* p = s;
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	while (n-- && *p) ++p;
 	return p - s;
 #else

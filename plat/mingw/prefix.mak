@@ -43,22 +43,31 @@ MKDIR 				= mkdir -p
 MAKE 				= make
 PWD 				= pwd
 
-# arch flags
+# cxflags: .c/.cc/.cpp files
+CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
+CXFLAGS-I 			= -I
+CXFLAGS-o 			= -o
+
+# arch
 ifeq ($(ARCH),x86)
-ARCH_CXFLAGS 		= -march=i686
+CXFLAGS 			+= -march=i686 -mssse3 
 endif
 
 ifeq ($(ARCH),x64)
-#ARCH_CXFLAGS 		= -m64
-#ARCH_ASFLAGS 		= -m amd64
+CXFLAGS 			+= -m64 -mssse3 
 endif
 
-# cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
-CXFLAGS-I 			= -I
-CXFLAGS-o 			= -o
+# opti
+ifeq ($(SMALL),y)
+CXFLAGS_RELEASE 	+= -Os
+else
+CXFLAGS_RELEASE 	+= -O3
+endif
+
+# small
+CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 
@@ -95,6 +104,11 @@ ASFLAGS_DEBUG 		=
 ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
+
+# arch
+ifeq ($(ARCH),x64)
+ASFLAGS 			+= -m amd64
+endif
 
 # arflags
 ARFLAGS 			= -cr

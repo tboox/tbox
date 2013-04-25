@@ -872,7 +872,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, tb_false);
 
 	// dump option
-#if defined(TB_DEBUG) && defined(TB_TRACE_IMPL_TAG)
+#if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
 	tb_http_option_dump(handle);
 #endif
 
@@ -888,7 +888,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	}
 
 	// dump status
-#if defined(TB_DEBUG) && defined(TB_TRACE_IMPL_TAG)
+#if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
 	tb_http_status_dump(handle);
 #endif
 
@@ -1105,7 +1105,7 @@ tb_http_status_t const* tb_http_status(tb_handle_t handle)
 	return &http->status;
 }
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_http_option_dump(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;

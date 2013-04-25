@@ -8,7 +8,7 @@
  * macros
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 # 	define tb_hash_test_dump(h) 		tb_hash_dump(h)
 #else
 # 	define tb_hash_test_dump(h)

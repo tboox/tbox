@@ -63,7 +63,7 @@
 # 	endif
 #endif
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 # 	define tb_int_to_fixed16(x) 			tb_long_to_fixed16_check(x)
 # 	define tb_fixed16_to_int(x) 			tb_fixed16_to_long_check(x)
 
@@ -286,7 +286,7 @@ tb_fixed16_t 	tb_fixed16_exp_int32(tb_fixed16_t x);
  * inlines
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 static __tb_inline__ tb_fixed16_t tb_long_to_fixed16_check(tb_long_t x)
 {
 	// check overflow

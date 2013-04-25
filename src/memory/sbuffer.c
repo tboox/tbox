@@ -34,7 +34,7 @@
  * macros
  */
 // the maximum grow size of value buffer 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_SBUFFER_GROW_SIZE 		(64)
 #else
 # 	define TB_SBUFFER_GROW_SIZE 		(256)

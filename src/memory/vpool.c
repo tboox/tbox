@@ -44,7 +44,7 @@
  * types
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 /// the vpool info type
 typedef struct __tb_vpool_info_t
 {
@@ -81,7 +81,7 @@ typedef struct __tb_vpool_block_t
 	/// is free?
 	tb_size_t 			free 	: 1;
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 
 	/// the magic
 	tb_size_t 			magic 	: 16;
@@ -131,7 +131,7 @@ typedef struct __tb_vpool_t
 	tb_size_t 			full;
 	
 	// the info 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_vpool_info_t 	info;
 #endif
 
@@ -281,7 +281,7 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 	
 	// the block
 	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_size_t 			bsize = block->size;
 #endif
 
@@ -329,7 +329,7 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 		if (osize) *osize = block->size;
 
 		// update the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 
 		// update the used size
 		vpool->info.used += block->size - bsize;
@@ -406,7 +406,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	vpool->full = 0;
 
 	// init info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	vpool->info.used = 0;
 	vpool->info.peak = 0;
 	vpool->info.need = 0;
@@ -451,7 +451,7 @@ tb_void_t tb_vpool_clear(tb_handle_t handle)
 	vpool->full = 0;
 
 	// reinit info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	vpool->info.used = 0;
 	vpool->info.peak = 0;
 	vpool->info.need = 0;
@@ -462,7 +462,7 @@ tb_void_t tb_vpool_clear(tb_handle_t handle)
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -499,7 +499,7 @@ tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 end:
 
 	// update the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	if (p) 
 	{			
 		// the block
@@ -544,14 +544,14 @@ end:
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_vpool_malloc_impl(handle, size);
 #else
 	tb_byte_t* p = tb_vpool_malloc_impl(handle, size, func, line, file);
@@ -564,7 +564,7 @@ tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -574,14 +574,14 @@ tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_malloc_impl(handle, item * size);
 #else
 	return tb_vpool_malloc_impl(handle, item * size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -591,14 +591,14 @@ tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_vpool_malloc0_impl(handle, item * size);
 #else
 	return tb_vpool_malloc0_impl(handle, item * size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
 #else
 tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -611,7 +611,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	// free it if no size
 	if (!size)
 	{
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 		tb_vpool_free_impl(vpool, data);
 #else
 		tb_vpool_free_impl(vpool, data, func, line, file);
@@ -620,7 +620,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	}
 
 	// alloc it if no data?
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	if (!data) return tb_vpool_malloc_impl(vpool, size);
 #else
 	if (!data) return tb_vpool_malloc_impl(vpool, size, func, line, file);
@@ -633,7 +633,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_assert_and_check_return_val(osize && osize < size, tb_null);
 
 	// malloc it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	pdata = tb_vpool_malloc_impl(vpool, size);
 #else
 	pdata = tb_vpool_malloc_impl(vpool, size, func, line, file);
@@ -645,7 +645,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_memcpy(pdata, data, osize);
 	
 	// free it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_vpool_free_impl(vpool, data);
 #else
 	tb_vpool_free_impl(vpool, data, func, line, file);
@@ -655,7 +655,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	return pdata;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
 tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -681,7 +681,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	
 	// the block
 	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_size_t 			bsize = block->size;
 #endif
 
@@ -712,7 +712,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	vpool->full = 0;
 
 	// update the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	vpool->info.used -= bsize;
 #endif
 
@@ -721,7 +721,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 }
 
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_vpool_dump(tb_handle_t handle)
 {
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;

@@ -1,5 +1,4 @@
 # demo
-TB_CONFIG_DEMO 					= y
 TB_CONFIG_DEMO_LIBS				= z m dl pthread
 TB_CONFIG_DEMO_CMD1 			=
 
@@ -24,7 +23,7 @@ TB_CONFIG_API_PROCESS 			= unix
 TB_CONFIG_THIRD_ZLIB 			= y
 
 # memory
-TB_CONFIG_MEMORY_POOL 			= n
+TB_CONFIG_MEMORY_POOL 			= $(DEBUG)
 
 # float
 TB_CONFIG_TYPE_FLOAT 			= y

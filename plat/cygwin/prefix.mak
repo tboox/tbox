@@ -33,15 +33,25 @@ PWD 				= pwd
 
 # arch flags
 ifeq ($(ARCH),x86)
-ARCH_CXFLAGS 		= -march=i686
+ARCH_CXFLAGS 		= -march=i686 -mssse3
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -O3 -DNDEBUG -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g
-CXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
+CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS 			= -c -Wall $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
+
+# opti
+ifeq ($(SMALL),y)
+CXFLAGS_RELEASE 	+= -Os
+else
+CXFLAGS_RELEASE 	+= -O3
+endif
+
+# small
+CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 

@@ -14,7 +14,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_byte_t* 	p = argv[1];
 	tb_size_t 	n = tb_strlen(p);
 
-#ifndef TB_CONFIG_BINARY_SMALL
+#ifndef __tb_small__
 	tb_printf("[crc]: TB_CRC_MODE_8_ATM = %x\n", tb_crc_encode(TB_CRC_MODE_8_ATM, 0, p, n));
 	tb_printf("[crc]: TB_CRC_MODE_16_ANSI = %x\n", tb_crc_encode(TB_CRC_MODE_16_ANSI, 0, p, n));
 	tb_printf("[crc]: TB_CRC_MODE_16_CCITT = %x\n", tb_crc_encode(TB_CRC_MODE_16_CCITT, 0, p, n));

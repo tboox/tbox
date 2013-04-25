@@ -34,7 +34,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_URL_HOST_MAX 		(32)
 # 	define TB_URL_PATH_MAX 		(1024)
 #else

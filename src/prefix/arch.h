@@ -32,19 +32,24 @@
  * macros
  */
 
-#if defined(TB_CONFIG_ARCH_x86)
+#if defined(__tb_arch_x86__)
 # 	define TB_ARCH_x86
-#elif defined(TB_CONFIG_ARCH_x64)
+#elif defined(__tb_arch_x64__)
 # 	define TB_ARCH_x64
-#elif defined(TB_CONFIG_ARCH_ARM)
+#elif defined(__tb_arch_arm__) \
+	|| defined(__tb_arch_armv5__) \
+	|| defined(__tb_arch_armv5te__) \
+	|| defined(__tb_arch_armv6__) \
+	|| defined(__tb_arch_armv7__) \
+	|| defined(__tb_arch_armv7s__)
 # 	define TB_ARCH_ARM
-#elif defined(TB_CONFIG_ARCH_SH4)
+#elif defined(__tb_arch_sh4__)
 # 	define TB_ARCH_SH4
-#elif defined(TB_CONFIG_ARCH_MIPS)
+#elif defined(__tb_arch_mips__)
 # 	define TB_ARCH_MIPS
-#elif defined(TB_CONFIG_ARCH_SPARC)
+#elif defined(__tb_arch_sparc__)
 # 	define TB_ARCH_SPARC
-#elif defined(TB_CONFIG_ARCH_PPC)
+#elif defined(__tb_arch_ppc__)
 # 	define TB_ARCH_PPC
 #else
 # 	error unknown arch

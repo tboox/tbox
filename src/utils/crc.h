@@ -36,7 +36,7 @@
 // the crc mode type
 typedef enum __tb_crc_mode_t
 {
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	TB_CRC_MODE_16_CCITT 	= 0
 ,	TB_CRC_MODE_32_IEEE_LE 	= 1
 ,	TB_CRC_MODE_MAX 		= 2
