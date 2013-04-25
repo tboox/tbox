@@ -46,12 +46,8 @@ CPU_CXFLAGS 		= -mcpu=cortex-a8
 endif
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= \
-					-O3 -DNDEBUG \
-					-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-					-fvisibility=hidden
-
-CXFLAGS_DEBUG 		= -g 
+CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__ -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
@@ -59,6 +55,16 @@ CXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__ -c -Wall  \
 					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
+
+# opti
+ifeq ($(SMALL),y)
+CXFLAGS_RELEASE 	+= -Os
+else
+CXFLAGS_RELEASE 	+= -O3
+endif
+
+# small
+CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 

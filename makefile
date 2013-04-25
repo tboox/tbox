@@ -87,7 +87,7 @@ output : .null
 # make error
 error : .null
 	@echo error $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|错误"
+	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|cannot|错误"
 
 # make warning
 warning : .null
@@ -134,10 +134,14 @@ ifeq ($(DEBUG),)
 DEBUG := n
 endif
 
-ifeq ($(DEBUG),y)
-IS_DEBUG = 1
-else
-IS_DEBUG = 0
+# small
+ifeq ($(SMALL),)
+SMALL := n
+endif
+
+# demo
+ifeq ($(DEMO),)
+DEMO := n
 endif
 
 # project
@@ -162,13 +166,6 @@ config :
 	# generate config.h
 	-cp ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
 
-	# append config.h
-	@echo "// config" 									>> ${shell pwd}/src/config.h
-	@echo "#ifndef $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}/src/config.h
-	@echo "#define $(PRO_NAME)_AUTO_CONFIG_H" 			>> ${shell pwd}/src/config.h
-	@echo "#define $(PRO_NAME)_CONFIG_DEBUG $(IS_DEBUG)">> ${shell pwd}/src/config.h
-	@echo "#endif" 										>> ${shell pwd}/src/config.h
-
 	# generate config.mak
 	@echo "# config"                      				> config.mak
 	@echo "IS_CONFIG = yes" 							>> config.mak
@@ -180,16 +177,23 @@ config :
 	@echo "# debug"              						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
 	@echo ""                              				>> config.mak
+	@echo "# small"              						>> config.mak
+	@echo "SMALL =" $(SMALL) 							>> config.mak
+	@echo ""                              				>> config.mak
 	@echo "# platform"      	          				>> config.mak
 	@echo "PLAT =" $(PLAT) 								>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# architecture"                				>> config.mak
 	@echo "ARCH =" $(ARCH) 								>> config.mak
 	@echo ""                              				>> config.mak
+	@echo "# demo" 			               				>> config.mak
+	@echo "DEMO =" $(DEMO) 								>> config.mak
+	@echo ""                              				>> config.mak
 	@echo "# toolchain"            						>> config.mak
 	@echo "SDK =" $(SDK) 								>> config.mak
 	@echo "NDK =" $(NDK) 								>> config.mak
 	@echo "BIN =" $(BIN) 								>> config.mak
+	@echo "PRE =" $(PRE) 								>> config.mak
 	@echo "HOST =" $(HOST) 								>> config.mak
 	@echo "CCACHE =" $(CCACHE) 							>> config.mak
 	@echo "DISTCC =" $(DISTCC) 							>> config.mak
@@ -198,11 +202,14 @@ config :
 	@echo "export PRO_DIR" 		 						>> config.mak
 	@echo "export PRO_NAME" 		 					>> config.mak
 	@echo "export DEBUG" 			 					>> config.mak
+	@echo "export SMALL" 			 					>> config.mak
 	@echo "export PLAT"					 				>> config.mak
 	@echo "export ARCH"					 				>> config.mak
+	@echo "export DEMO"					 				>> config.mak
 	@echo "export SDK" 				 					>> config.mak
 	@echo "export NDK" 				 					>> config.mak
 	@echo "export BIN" 				 					>> config.mak
+	@echo "export PRE" 				 					>> config.mak
 	@echo "export HOST" 			 					>> config.mak
 	@echo "export CCACHE" 			 					>> config.mak
 	@echo "export DISTCC" 			 					>> config.mak

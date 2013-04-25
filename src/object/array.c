@@ -35,7 +35,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_ARRAY_GROW 			(64)
 #else
 # 	define TB_ARRAY_GROW 			(256)

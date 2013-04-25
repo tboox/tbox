@@ -74,9 +74,6 @@ tbox_C_FILES 			+= \
 						zip/vlc/golomb \
 						zip/vlc/gamma \
 						zip/rlc \
-						zip/zlib \
-						zip/gzip \
-						zip/zlibraw \
 						utils/bits \
 						utils/md5 \
 						utils/sha \
@@ -128,6 +125,11 @@ tbox_C_FILES 			+= \
 						libc/string/strirchr \
 						libc/string/strnrchr \
 						libc/string/strnirchr
+
+tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB) += \
+						zip/zlib \
+						zip/gzip \
+						zip/zlibraw \
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isinf \
@@ -411,7 +413,7 @@ zlib_INC_FILES 						:= $(addprefix third/zlib/,$(zlib_INC_FILES))
 INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
 
 # sub-projects
-ifeq ($(TB_CONFIG_DEMO),y)
+ifeq ($(DEMO),y)
 SUB_PROS 				= \
 					  	demo/aio \
 					  	demo/xml \

@@ -49,7 +49,7 @@
  * types
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 /// the fpool info type
 typedef struct __tb_fpool_info_t
 {
@@ -101,7 +101,7 @@ typedef struct __tb_fpool_t
 	/// the pred
 	tb_byte_t* 			pred;
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	/// the info
 	tb_fpool_info_t 	info;
 #endif
@@ -128,7 +128,7 @@ static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 			if (i + 1 < fpool->maxn && !tb_fpool_used_bset(fpool->used, i + 1))
 				fpool->pred = fpool->data + (i + 1) * fpool->step;
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 			// pred++
 			fpool->info.pred++;
 #endif
@@ -308,7 +308,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	fpool->pred = fpool->data;
 
 	// init info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	fpool->info.peak = 0;
 	fpool->info.fail = 0;
 	fpool->info.pred = 0;
@@ -350,7 +350,7 @@ tb_void_t tb_fpool_clear(tb_handle_t handle)
 	fpool->pred = fpool->data;
 	
 	// reinit info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	fpool->info.peak = 0;
 	fpool->info.fail = 0;
 	fpool->info.pred = 0;
@@ -379,7 +379,7 @@ tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 	if (data) fpool->size++;
 
 	// update info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	if (fpool->size > fpool->info.peak) fpool->info.peak = fpool->size;
 	fpool->info.fail += data? 0 : 1;
 	fpool->info.aloc++;
@@ -435,7 +435,7 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 	// ok
 	return tb_true;
 }
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_fpool_dump(tb_handle_t handle)
 {
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;

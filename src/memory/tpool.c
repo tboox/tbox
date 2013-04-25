@@ -47,7 +47,7 @@
  * types
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 // the tpool info type
 typedef struct __tb_tpool_info_t
 {
@@ -155,7 +155,7 @@ typedef struct __tb_tpool_t
 	tb_size_t 			pred[TB_TPOOL_BLOCK_MAXN];
 
 	/// the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_tpool_info_t 	info;
 #endif
 
@@ -236,7 +236,7 @@ static tb_pointer_t tb_tpool_malloc_pred(tb_tpool_t* tpool, tb_size_t size, tb_s
 	}
 
 	// update the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tpool->info.pred++;
 #endif
 
@@ -442,7 +442,7 @@ tb_handle_t tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_size_t n = TB_TPOOL_BLOCK_MAXN; while (n--) tpool->pred[n] = n + 1;
 
 	// init info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tpool->info.used = 0;
 	tpool->info.peak = 0;
 	tpool->info.need = 0;
@@ -489,7 +489,7 @@ tb_void_t tb_tpool_clear(tb_handle_t handle)
 	tpool->full = 0;
 	
 	// reinit info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tpool->info.used = 0;
 	tpool->info.peak = 0;
 	tpool->info.need = 0;
@@ -540,7 +540,7 @@ tb_pointer_t tb_tpool_malloc(tb_handle_t handle, tb_size_t size)
 	if (!data) data = tb_tpool_malloc_find(tpool, size, bits, bitn);
 
 	// update info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	if (data)
 	{
 		// update the used size
@@ -681,7 +681,7 @@ tb_bool_t tb_tpool_free(tb_handle_t handle, tb_pointer_t data)
 	if (!*body) tpool->full = 0;
 
 	// update the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tpool->info.used -= bitn * tpool->step;
 #endif
 
@@ -690,7 +690,7 @@ tb_bool_t tb_tpool_free(tb_handle_t handle, tb_pointer_t data)
 }
 
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_tpool_dump(tb_handle_t handle)
 {
 	tb_tpool_t* tpool = (tb_tpool_t*)handle;

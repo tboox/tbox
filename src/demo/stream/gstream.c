@@ -105,7 +105,7 @@ end:
 	tb_gstream_exit(ist);
 	tb_gstream_exit(ost);
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 //	tb_memory_dump();
 #endif
 

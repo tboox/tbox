@@ -8,16 +8,23 @@ PRO_NAME = tbox
 # debug
 DEBUG = n
 
+# small
+SMALL = y
+
 # platform
-PLAT = mingw
+PLAT = linux
 
 # architecture
-ARCH = x86
+ARCH = x64
+
+# demo
+DEMO = y
 
 # toolchain
-SDK = /home/ruki/programs/windows/cross
+SDK =
 NDK = /home/ruki/programs/android-ndk-r8
 BIN =
+PRE =
 HOST = mac
 CCACHE = ccache
 DISTCC =
@@ -26,11 +33,14 @@ DISTCC =
 export PRO_DIR
 export PRO_NAME
 export DEBUG
+export SMALL
 export PLAT
 export ARCH
+export DEMO
 export SDK
 export NDK
 export BIN
+export PRE
 export HOST
 export CCACHE
 export DISTCC

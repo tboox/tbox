@@ -86,7 +86,7 @@ static __tb_inline__ tb_uint32_t const tb_bits_swap_u32_asm(tb_uint32_t x)
 #if 0
 static __tb_inline__ tb_uint32_t tb_bits_get_ubits32_impl_asm(tb_byte_t const* p, tb_size_t b, tb_size_t n)
 {
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	__tb_register__ tb_uint32_t x;
 	__tb_asm__ __tb_volatile__
 	(

@@ -109,7 +109,7 @@ static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_uint8_t const bu
 	d = state[3];
 	e = state[4];
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	for (i = 0; i < 80; i++)
 	{
 		tb_int_t t;
@@ -200,7 +200,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buff
 	g = state[6];
 	h = state[7];
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	tb_uint32_t T2;
 	for (i = 0; i < 64; i++) 
 	{
@@ -327,7 +327,7 @@ tb_void_t tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
 	j = (tb_uint32_t)sha->count & 63;
 	sha->count += size;
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	for (i = 0; i < size; i++) 
 	{
 		sha->buffer[j++] = data[i];

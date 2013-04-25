@@ -1,14 +1,6 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
-// arch
-#define TB_CONFIG_ARCH_x86
-//#define TB_CONFIG_ARCH_ARM
-//#define TB_CONFIG_ARCH_MIPS
-//#define TB_CONFIG_ARCH_SPARC
-//#define TB_CONFIG_ARCH_PPC
-//#define TB_CONFIG_ARCH_SH4
-
 // os
 #define TB_CONFIG_OS_WINDOWS
 
@@ -41,12 +33,10 @@
 // optimization
 #define TB_CONFIG_OPTI_SSE2_ENABLE
 
-// binary
-//#define TB_CONFIG_BINARY_SMALL
-
 // memory
-#define TB_CONFIG_MEMORY_MODE_SMALL
-//#define TB_CONFIG_MEMORY_POOL
+#ifdef __tb_debug__
+# 	define TB_CONFIG_MEMORY_POOL
+#endif
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 
 // event

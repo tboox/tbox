@@ -32,7 +32,7 @@
  */
 static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] = 
 {
-#ifndef TB_CONFIG_BINARY_SMALL
+#ifndef __tb_small__
 	// TB_CRC_MODE_8_ATM
 	{
 		0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31
@@ -95,7 +95,7 @@ static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] =
 	}
 #endif
 	// TB_CRC_MODE_16_CCITT
-#ifndef TB_CONFIG_BINARY_SMALL
+#ifndef __tb_small__
 , 	{
 #else
 	{
@@ -134,7 +134,7 @@ static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] =
 	,	0x176e, 0x367e, 0x554e, 0x745e, 0x932e, 0xb23e, 0xd10e, 0xf01e
 	}
 
-#ifndef TB_CONFIG_BINARY_SMALL
+#ifndef __tb_small__
 	// TB_CRC_MODE_32_IEEE
 , 	{
 		0x00000000, 0xb71dc104, 0x6e3b8209, 0xd926430d, 0xdc760413, 0x6b6bc517

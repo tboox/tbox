@@ -38,7 +38,7 @@
 #define TB_QUEUE_SIZE_SMALL 				(255)
 #define TB_QUEUE_SIZE_LARGE 				(65535)
 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_SMALL
 #else
 # 	define TB_QUEUE_SIZE_DEFAULT 			TB_QUEUE_SIZE_LARGE

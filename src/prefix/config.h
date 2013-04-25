@@ -32,11 +32,6 @@
  * macros
  */
 
-// is debug?
-#if tbox_CONFIG_DEBUG
-# 	define TB_DEBUG
-#endif
-
 
 #endif
 

@@ -36,7 +36,7 @@
 #define TB_RPOOL_GROW_SMALL 				(1024)
 #define TB_RPOOL_GROW_LARGE 				(4096)
 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_RPOOL_GROW_DEFAULT 			TB_RPOOL_GROW_SMALL
 #else
 # 	define TB_RPOOL_GROW_DEFAULT 			TB_RPOOL_GROW_LARGE

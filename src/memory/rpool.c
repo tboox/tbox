@@ -36,7 +36,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_RPOOL_CHUNK_GROW 			(8)
 #else
 # 	define TB_RPOOL_CHUNK_GROW 			(16)
@@ -58,7 +58,7 @@ typedef struct __tb_rpool_chunk_t
 
 }tb_rpool_chunk_t;
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 /// the rpool info type
 typedef struct __tb_rpool_info_t
 {
@@ -95,7 +95,7 @@ typedef struct __tb_rpool_t
 	tb_size_t 			pred;
 
 	// the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_rpool_info_t 	info;
 #endif
 
@@ -136,7 +136,7 @@ tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 	rpool->pred = 0;
 
 	// init info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	rpool->info.pred = 0;
 	rpool->info.aloc = 0;
 #endif
@@ -203,7 +203,7 @@ tb_void_t tb_rpool_clear(tb_handle_t handle)
 	rpool->pred = 0;
 
 	// reinit info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	rpool->info.pred = 0;
 	rpool->info.aloc = 0;
 #endif
@@ -224,7 +224,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 	tb_assert_and_check_return_val(rpool && rpool->pools, tb_null);
 
 	// aloc++
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	rpool->info.aloc++;
 #endif
 
@@ -248,7 +248,7 @@ tb_pointer_t tb_rpool_malloc(tb_handle_t handle)
 				rpool->size++;
 
 				// pred++
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 				rpool->info.pred++;
 #endif
 				return p;
@@ -425,7 +425,7 @@ tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data)
 	return p;
 }
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_rpool_dump(tb_handle_t handle)
 {
 	// check 

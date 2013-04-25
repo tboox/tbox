@@ -32,7 +32,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_print("%s", tb_cookies_get_from_url(cookies, "http://pingfore.qq.com/pingd?dm=qzone.qq.com&url=login/qzone_n&tt=-&rdm=-&rurl=-&pvid=7466815060&scr=-&scl=-&lang=-&java=1&cc=-&pf=-&tz=-8&ct=-&vs=3.3&emu=0.20486706611700356"));
 	tb_print("%s", tb_cookies_get_from_url(cookies, "http://mail.163.com:2000/?Session=LZBMQVW&View=Menu"));
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	// dump
 	tb_cookies_dump(cookies);
 #endif

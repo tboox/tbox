@@ -58,7 +58,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 	tb_byte_t b = (tb_byte_t)c;
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	while (n--) *p++ = b;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;
@@ -90,7 +90,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 	tb_uint16_t b = (tb_uint16_t)c;
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	while (n--) *p++ = b;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;
@@ -118,7 +118,7 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 	tb_byte_t* e = p + (n * 3);
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	for (; p < e; p += 3) tb_bits_set_u24_ne(p, c);
 #else
 	tb_size_t l = n & 0x3; n -= l;
@@ -153,7 +153,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 	tb_uint32_t b = (tb_uint32_t)c;
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	while (n--) *p++ = b;
 #else
 	tb_size_t l = n & 0x3; n = (n - l) >> 2;

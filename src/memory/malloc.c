@@ -74,7 +74,7 @@ tb_void_t tb_memory_exit()
 	}
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_memory_malloc_impl(tb_size_t size)
 #else
 tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -86,7 +86,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size);
 #else
 	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size, func, line, file);
@@ -100,7 +100,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_memory_malloc0_impl(tb_size_t size)
 #else
 tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -112,7 +112,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size);
 #else
 	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size, func, line, file);
@@ -126,7 +126,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -138,7 +138,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size);
 #else
 	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size, func, line, file);
@@ -152,7 +152,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -164,7 +164,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size);
 #else
 	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size, func, line, file);
@@ -178,7 +178,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size)
 #else
 tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -190,7 +190,7 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_null;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size);
 #else
 	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size, func, line, file);
@@ -204,7 +204,7 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_bool_t tb_memory_free_impl(tb_pointer_t data)
 #else
 tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -216,7 +216,7 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 	// enter
 	if (!tb_mutex_enter(g_mutex)) return tb_false;
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_bool_t r = tb_gpool_free_impl(g_gpool, data);
 #else
 	tb_bool_t r = tb_gpool_free_impl(g_gpool, data, func, line, file);
@@ -232,7 +232,7 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 	return r;
 }
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_memory_dump()
 {
 	// check 

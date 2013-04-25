@@ -33,7 +33,7 @@
  * macros
  */
 // the maximum grow size of value string 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_PSTRING_FMTD_SIZE 		(4096)
 #else
 # 	define TB_PSTRING_FMTD_SIZE 		(8192)

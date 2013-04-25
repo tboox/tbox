@@ -58,7 +58,7 @@
 # 		define tb_fixed30_to_float(x) 		(((x) * 0.00000000093132257f))
 # 	endif
 # 	ifndef tb_float_to_fixed30
-# 		ifdef TB_DEBUG
+# 		ifdef __tb_debug__
 # 			define tb_float_to_fixed30(x) 	tb_float_to_fixed30_check(x)
 # 		else
 # 			define tb_float_to_fixed30(x) 	((tb_fixed30_t)((x) * TB_FIXED30_ONE))
@@ -66,7 +66,7 @@
 # 	endif
 #endif
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 # 	define tb_fixed16_to_fixed30(x) 		tb_fixed16_to_fixed30_check(x)
 #else
 # 	define tb_fixed16_to_fixed30(x) 		((x) << 14)
@@ -121,7 +121,7 @@
  * inlines
  */
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 # 	ifdef TB_CONFIG_TYPE_FLOAT
 static __tb_inline__ tb_fixed30_t tb_float_to_fixed30_check(tb_float_t x)
 {

@@ -76,7 +76,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 	// dump
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_tpool_dump(tpool);
 #endif
 

@@ -63,7 +63,7 @@
 #define TB_DNS_NAME_MAXN 			(256)
 
 // the cache maximum size
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_DNS_CACHE_MAXN 		(64)
 #else
 # 	define TB_DNS_CACHE_MAXN 		(256)
@@ -1233,7 +1233,7 @@ tb_void_t tb_dns_list_exit()
 		}
 	}
 }
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_dns_list_dump()
 {	
 	tb_assert_and_check_return(g_dns_list);

@@ -126,7 +126,7 @@ end:
 	if (option && option->udata) 
 	{
 		// dump cookies
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 		tb_cookies_dump(option->udata);
 #endif
 

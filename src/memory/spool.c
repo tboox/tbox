@@ -36,7 +36,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_SPOOL_CHUNK_GROW 			(8)
 #else
 # 	define TB_SPOOL_CHUNK_GROW 			(16)
@@ -59,7 +59,7 @@ typedef struct __tb_spool_chunk_t
 }tb_spool_chunk_t;
 
 /// the spool info type
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 typedef struct __tb_spool_info_t
 {
 	// the pred count
@@ -89,7 +89,7 @@ typedef struct __tb_spool_t
 	tb_size_t 			pred;
 
 	// the info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	tb_spool_info_t 	info;
 #endif
 
@@ -188,7 +188,7 @@ tb_handle_t tb_spool_init(tb_size_t grow, tb_size_t align)
 	spool->pred = 0;
 
 	// init info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	spool->info.pred = 0;
 	spool->info.aloc = 0;
 #endif
@@ -252,14 +252,14 @@ tb_void_t tb_spool_clear(tb_handle_t handle)
 	spool->pred = 0;
 
 	// reinit info
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	spool->info.pred = 0;
 	spool->info.aloc = 0;
 #endif
 
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -273,7 +273,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	tb_check_return_val(size, tb_null);
 	
 	// aloc++
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 	spool->info.aloc++;
 #endif
 
@@ -288,7 +288,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 		if (vpool) 
 		{
 			// try allocating it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 			tb_pointer_t p = tb_vpool_malloc_impl(vpool, size);
 #else
 			tb_pointer_t p = tb_vpool_malloc_impl(vpool, size, func, line, func);
@@ -298,7 +298,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 			if (p) 
 			{
 				// pred++
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 				spool->info.pred++;
 #endif
 				return p;
@@ -317,7 +317,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 			if (vpool) 
 			{
 				// try allocating it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 				tb_pointer_t p = tb_vpool_malloc_impl(vpool, size);
 #else
 				tb_pointer_t p = tb_vpool_malloc_impl(vpool, size, func, line, func);
@@ -360,7 +360,7 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 		tb_assert_and_check_break(chunk->pool);
 
 		// try allocating it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 		tb_pointer_t p = tb_vpool_malloc_impl(chunk->pool, size);
 #else
 		tb_pointer_t p = tb_vpool_malloc_impl(chunk->pool, size, func, line, func);
@@ -386,14 +386,14 @@ tb_pointer_t tb_spool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	return tb_null;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_spool_malloc0_impl(tb_handle_t handle, tb_size_t size)
 #else
 tb_pointer_t tb_spool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_byte_t* p = tb_spool_malloc_impl(handle, size);
 #else
 	tb_byte_t* p = tb_spool_malloc_impl(handle, size, func, line, file);
@@ -406,7 +406,7 @@ tb_pointer_t tb_spool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_spool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_spool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -416,14 +416,14 @@ tb_pointer_t tb_spool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_spool_malloc_impl(handle, item * size);
 #else
 	return tb_spool_malloc_impl(handle, item * size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_spool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
 #else
 tb_pointer_t tb_spool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -433,14 +433,14 @@ tb_pointer_t tb_spool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	return tb_spool_malloc0_impl(handle, item * size);
 #else
 	return tb_spool_malloc0_impl(handle, item * size, func, line, file);
 #endif
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
 #else
 tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -453,7 +453,7 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	// free it if no size
 	if (!size)
 	{
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 		tb_spool_free_impl(spool, data);
 #else
 		tb_spool_free_impl(spool, data, func, line, file);
@@ -462,7 +462,7 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	}
 
 	// alloc it if no data?
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	if (!data) return tb_spool_malloc_impl(spool, size);
 #else
 	if (!data) return tb_spool_malloc_impl(spool, size, func, line, file);
@@ -475,7 +475,7 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_assert_and_check_return_val(osize < size, tb_null);
 
 	// malloc it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	pdata = tb_spool_malloc_impl(spool, size);
 #else
 	pdata = tb_spool_malloc_impl(spool, size, func, line, file);
@@ -487,7 +487,7 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_memcpy(pdata, data, osize);
 	
 	// free it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_spool_free_impl(spool, data);
 #else
 	tb_spool_free_impl(spool, data, func, line, file);
@@ -497,7 +497,7 @@ tb_pointer_t tb_spool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	return pdata;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_char_t* tb_spool_strdup_impl(tb_handle_t handle, tb_char_t const* data)
 #else
 tb_char_t* tb_spool_strdup_impl(tb_handle_t handle, tb_char_t const* data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -506,7 +506,7 @@ tb_char_t* tb_spool_strdup_impl(tb_handle_t handle, tb_char_t const* data, tb_ch
 	tb_assert_and_check_return_val(handle && data, tb_null);
 
 	tb_size_t 	n = tb_strlen(data);
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_char_t* 	p = tb_spool_malloc_impl(handle, n + 1);
 #else
 	tb_char_t* 	p = tb_spool_malloc_impl(handle, n + 1, func, line, file);
@@ -519,7 +519,7 @@ tb_char_t* tb_spool_strdup_impl(tb_handle_t handle, tb_char_t const* data, tb_ch
 
 	return p;}
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size)
 #else
 tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -528,7 +528,7 @@ tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_s
 	tb_assert_and_check_return_val(handle && data, tb_null);
 
 	size = tb_strnlen(data, size);
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 	tb_char_t* 	p = tb_spool_malloc_impl(handle, size + 1);
 #else
 	tb_char_t* 	p = tb_spool_malloc_impl(handle, size + 1, func, line, file);
@@ -542,7 +542,7 @@ tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_s
 	return p;
 }
 
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data)
 #else
 tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
@@ -566,7 +566,7 @@ tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		if (vpool) 
 		{
 			// try allocating it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 			tb_bool_t r = tb_vpool_free_impl(vpool, data);
 #else
 			tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
@@ -584,7 +584,7 @@ tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		if (vpool) 
 		{
 			// try free it
-#ifndef TB_DEBUG
+#ifndef __tb_debug__
 			tb_bool_t r = tb_vpool_free_impl(vpool, data);
 #else
 			tb_bool_t r = tb_vpool_free_impl(vpool, data, func, line, func);
@@ -603,7 +603,7 @@ tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	return tb_false;
 }
 
-#ifdef TB_DEBUG
+#ifdef __tb_debug__
 tb_void_t tb_spool_dump(tb_handle_t handle)
 {
 	// check 

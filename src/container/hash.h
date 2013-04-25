@@ -38,7 +38,7 @@
 #define TB_HASH_SIZE_SMALL 					(256)
 #define TB_HASH_SIZE_LARGE 					(65536)
 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_SMALL
 #else
 # 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_LARGE

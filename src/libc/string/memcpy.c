@@ -54,7 +54,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
-#ifdef TB_CONFIG_BINARY_SMALL
+#ifdef __tb_small__
 	__tb_register__ tb_byte_t* p1 = s1;
 	__tb_register__ tb_byte_t* p2 = s2;
 	if (p1 == p2 || !n) return s1;
@@ -77,7 +77,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 	}
 	while (l--) *p1++ = *p2++;
 	return s1;
-#endif /* TB_CONFIG_BINARY_SMALL */
+#endif /* __tb_small__ */
 }
 #endif
 

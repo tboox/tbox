@@ -34,7 +34,7 @@
  */
 
 // the tstream cache maxn
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_TSTREAM_CACHE_MAXN 					(4096)
 #else
 # 	define TB_TSTREAM_CACHE_MAXN 					(8192)

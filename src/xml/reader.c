@@ -37,7 +37,7 @@
  * macros
  */
 
-#ifdef TB_CONFIG_MEMORY_MODE_SMALL
+#ifdef __tb_small__
 # 	define TB_XML_READER_ATTRIBUTES_MAXN 		(64)
 #else
 # 	define TB_XML_READER_ATTRIBUTES_MAXN 		(128)
