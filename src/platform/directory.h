@@ -24,11 +24,16 @@
 #ifndef TB_PLATFORM_DIRECTORY_H
 #define TB_PLATFORM_DIRECTORY_H
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+/// the directory walk func type
+typedef tb_void_t 		(*tb_directory_walk_func_t)(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -67,5 +72,15 @@ tb_size_t 				tb_directory_temp(tb_char_t* path, tb_size_t maxn);
  * @return 				the directory path size
  */
 tb_size_t 				tb_directory_curt(tb_char_t* path, tb_size_t maxn);
+
+/*! the directory walk
+ *
+ * @param path 			the directory path
+ * @param recursion 	is recursion?
+ * @param func 			the callback func
+ * @param data 			the callback data
+ * 
+ */
+tb_void_t 				tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_directory_walk_func_t func, tb_cpointer_t data);
 
 #endif
