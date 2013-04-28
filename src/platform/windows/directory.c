@@ -29,6 +29,20 @@
 #include "../directory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * callback
+ */
+static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
+{
+	// check
+	tb_assert_and_check_return(path && info);
+
+	// remove file
+	if (info->type == TB_FILE_TYPE_FILE) tb_file_remove(path);
+	// remvoe directory
+	else if (info->type == TB_FILE_TYPE_DIRECTORY) RemoveDirectoryA(path);
+}
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_directory_create(tb_char_t const* path)
@@ -53,6 +67,9 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 	tb_char_t data[8192] = {0};
 	path = tb_path_to_windows(path, data, 8192);
 	tb_assert_and_check_return_val(path, tb_false);
+
+	// walk remove
+	tb_directory_walk(path, tb_true, tb_directory_walk_remove, tb_null);
 
 	// remove it
 	return RemoveDirectoryA(path)? tb_true : tb_false;
@@ -110,11 +127,11 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_direc
 				tb_file_info_t info = {0};
 				if (tb_file_info(temp, &info))
 				{
+					// walk to the next directory
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp, recursion, func, data);
+	
 					// do callback
 					func(temp, &info, data);
-
-					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIR && recursion) tb_directory_walk(temp, recursion, func, data);
 				}
 			}
 

@@ -160,7 +160,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 		if (!stat(path, &st))
 		{
 			// file type
-			if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIR;
+			if (S_ISDIR(st.st_mode)) info->type = TB_FILE_TYPE_DIRECTORY;
 			else info->type = TB_FILE_TYPE_FILE;
 
 			// file size
@@ -207,4 +207,20 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 
 	// remove it
 	return !remove(path)? tb_true : tb_false;
+}
+tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
+{
+	// check
+	tb_assert_and_check_return_val(path && dest, tb_false);
+
+	// path => unix
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// dest => unix
+	dest = tb_path_to_unix(dest);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// rename
+	return !rename(path, dest)? tb_true : tb_false;
 }
