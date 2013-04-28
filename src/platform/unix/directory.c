@@ -25,11 +25,13 @@
  * includes
  */
 #include "prefix.h"
+#include "../file.h"
 #include "../directory.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <dirent.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
 #endif
@@ -85,4 +87,50 @@ tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 	// ok?
 	return size;
 }
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_directory_walk_func_t func, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(path && func);
 
+	// last
+	tb_long_t 		last = tb_strlen(path) - 1;
+	tb_assert_and_check_return(last >= 0);
+
+	// init info
+	tb_char_t 		temp[4096] = {0};
+	DIR* 			directory = tb_null;
+	if (directory = opendir(path))
+	{
+		// walk
+		struct dirent* item = tb_null;
+		while (item = readdir(directory))
+		{
+			// check
+			tb_assert_and_check_continue(item->d_name && item->d_reclen);
+
+			// the item name
+			tb_char_t name[1024] = {0};
+			tb_strncpy(name, item->d_name, tb_min(item->d_reclen, 1024));
+			if (tb_strcmp(name, ".") && tb_strcmp(name, ".."))
+			{
+				// the temp path
+				tb_long_t n = tb_snprintf(temp, 4096, "%s%s%s", path, path[last] == '/'? "" : "/", name);
+				if (n >= 0) temp[n] = '\0';
+
+				// the file info
+				tb_file_info_t info = {0};
+				if (tb_file_info(temp, &info))
+				{
+					// do callback
+					func(temp, &info, data);
+
+					// walk to the next directory
+					if (info.type == TB_FILE_TYPE_DIR && recursion) tb_directory_walk(temp, recursion, func, data);
+				}
+			}
+		}
+
+		// exit directory
+		closedir(directory);
+	}
+}

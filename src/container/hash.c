@@ -200,7 +200,7 @@ static tb_size_t tb_hash_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 	// the current bucket & item
 	buck--;
 	item--;
-	tb_assert_and_check_return_val(buck < hash->hash_size && (item + 1) < TB_MAXU16, 0);
+	tb_assert_and_check_return_val(buck < hash->hash_size && (item + 1) < 65536, 0);
 
 	// find the next from the current bucket first
 	if (hash->hash_list[buck] && item + 1 < hash->hash_list[buck]->size) return TB_HASH_INDEX_MAKE(buck + 1, item + 2);
@@ -297,7 +297,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 
 	// init hash size
 	hash->hash_size = tb_align_pow2(size);
-	tb_assert_and_check_goto(hash->hash_size <= TB_MAXU16, fail);
+	tb_assert_and_check_goto(hash->hash_size <= 65536, fail);
 
 	// init hash list
 	hash->hash_list = tb_nalloc0(hash->hash_size, sizeof(tb_size_t));
