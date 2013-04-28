@@ -76,6 +76,12 @@ typedef struct __tb_file_info_t
 	// the file size
 	tb_hize_t 			size;
 
+	// the last access time
+	tb_time_t 			atime;
+
+	// the last modify time
+	tb_time_t 			mtime;
+
 }tb_file_info_t;
 
 /* ///////////////////////////////////////////////////////////////////////

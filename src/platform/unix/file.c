@@ -165,6 +165,12 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
 			// file size
 			info->size = st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+
+			// the last access time
+			info->atime = (tb_time_t)st.st_atime;
+
+			// the last modify time
+			info->mtime = (tb_time_t)st.st_mtime;
 		}
 	}
 

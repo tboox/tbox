@@ -2,7 +2,7 @@
 IS_CONFIG = yes
 
 # project
-PRO_DIR = /home/wangrunqing/projects/tbox
+PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
@@ -12,10 +12,10 @@ DEBUG = y
 SMALL = n
 
 # platform
-PLAT = mingw
+PLAT = linux
 
 # architecture
-ARCH = x86
+ARCH = x64
 
 # demo
 DEMO = y
