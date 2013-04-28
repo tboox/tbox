@@ -9,7 +9,24 @@
  */ 
 static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
 {
-	tb_print("path[%c]: %s, size: %llu", info->type == TB_FILE_TYPE_DIR? 'd' : 'f', path, info->size);
+	// check
+	tb_assert_and_check_return(path && info);
+
+	// the modify time
+	tb_tm_t mtime = {0};
+	tb_localtime(info->mtime, &mtime);
+
+	// dump
+	tb_print( "path[%c]: %s, size: %llu, mtime: %04ld-%02ld-%02ld %02ld:%02ld:%02ld"
+			, info->type == TB_FILE_TYPE_DIR? 'd' : 'f'
+			, path
+			, info->size
+			, mtime.year
+			, mtime.month
+			, mtime.mday
+			, mtime.hour
+			, mtime.minute
+			, mtime.second);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
