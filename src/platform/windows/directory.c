@@ -89,7 +89,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_direc
 
 	// add \*.*
 	tb_char_t 			temp[4096] = {0};
-	tb_snprintf(temp, "%s%s*.*", path, path[last] == '\\'? "" : "\\");
+	tb_snprintf(temp, 4095, "%s%s*.*", path, path[last] == '\\'? "" : "\\");
 
 	// init info
 	WIN32_FIND_DATAA 	find = {0};
@@ -103,7 +103,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_direc
 			if (tb_strcmp(find.cFileName, ".") && tb_strcmp(find.cFileName, ".."))
 			{
 				// the temp path
-				tb_long_t n = tb_snprintf(temp, 4096, "%s%s%s", path, path[last] == '\\'? "" : "\\", find.cFileName);
+				tb_long_t n = tb_snprintf(temp, 4095, "%s%s%s", path, path[last] == '\\'? "" : "\\", find.cFileName);
 				if (n >= 0) temp[n] = '\0';
 
 				// the file info
