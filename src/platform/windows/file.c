@@ -142,6 +142,43 @@ tb_hize_t tb_file_size(tb_handle_t file)
 	LARGE_INTEGER p = {0};
 	return GetFileSizeEx(file, &p)? (tb_hong_t)p.QuadPart : 0;
 }
+tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
+{
+	// check
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// unix path => windows 
+	tb_char_t data[8192] = {0};
+	path = tb_path_to_windows(path, data, 8192);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// get attributes
+	WIN32_FILE_ATTRIBUTE_DATA st = {0};
+	if (!GetFileAttributesExA(path, GetFileExInfoStandard, &st)) return tb_false;
+
+	// get info
+	if (info)
+	{
+		// init info
+		tb_memset(info, 0, sizeof(tb_file_info_t));
+
+		// file type
+		if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) info->type = TB_FILE_TYPE_DIRECTORY;
+		else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
+
+		// file size
+		info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
+
+		// the last access time
+		info->atime = tb_filetime_to_time(st.ftLastAccessTime);
+
+		// the last modify time
+		info->mtime = tb_filetime_to_time(st.ftLastWriteTime);
+	}
+
+	// ok
+	return tb_true;
+}
 tb_bool_t tb_file_create(tb_char_t const* path)
 {
 	// check
@@ -175,41 +212,22 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 	// remote it
 	return DeleteFileA(path)? tb_true : tb_false;
 }
-tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
+tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 {
 	// check
-	tb_assert_and_check_return_val(path, tb_false);
-
+	tb_assert_and_check_return_val(path && dest, tb_false);
+	
 	// unix path => windows 
-	tb_char_t data[8192] = {0};
-	path = tb_path_to_windows(path, data, 8192);
+	tb_char_t data0[4096] = {0};
+	path = tb_path_to_windows(path, data0, 4096);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// get attributes
-	WIN32_FILE_ATTRIBUTE_DATA st = {0};
-	if (!GetFileAttributesExA(path, GetFileExInfoStandard, &st)) return tb_false;
+	// unix dest => windows 
+	tb_char_t data1[4096] = {0};
+	dest = tb_path_to_windows(dest, data1, 4096);
+	tb_assert_and_check_return_val(dest, tb_false);
 
-	// get info
-	if (info)
-	{
-		// init info
-		tb_memset(info, 0, sizeof(tb_file_info_t));
-
-		// file type
-		if (st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) info->type = TB_FILE_TYPE_DIR;
-		else if (st.dwFileAttributes != 0xffffffff) info->type = TB_FILE_TYPE_FILE;
-
-		// file size
-		info->size = ((tb_hize_t)st.nFileSizeHigh << 32) | (tb_hize_t)st.nFileSizeLow;
-
-		// the last access time
-		info->atime = tb_filetime_to_time(st.ftLastAccessTime);
-
-		// the last modify time
-		info->mtime = tb_filetime_to_time(st.ftLastWriteTime);
-	}
-
-	// ok
-	return tb_true;
+	// rename it
+	return MoveFileEx(path, dest, MOVEFILE_REPLACE_EXISTING);
 }
 

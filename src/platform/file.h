@@ -60,7 +60,7 @@ typedef enum __tb_file_seek_flag_t
 typedef enum __tb_file_type_t
 {
 	TB_FILE_TYPE_NULL 	= 0
-,	TB_FILE_TYPE_DIR 	= 1
+,	TB_FILE_TYPE_DIRECTORY 	= 1
 , 	TB_FILE_TYPE_FILE 	= 2 
 , 	TB_FILE_TYPE_DOT 	= 3
 , 	TB_FILE_TYPE_DOT2 	= 4
@@ -181,5 +181,14 @@ tb_bool_t 				tb_file_create(tb_char_t const* path);
  * @return 				tb_true or tb_false
  */
 tb_bool_t 				tb_file_remove(tb_char_t const* path);
+
+/*! rename the file
+ * 
+ * @param path 			the source file path
+ * @param dest 			the destination file path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_rename(tb_char_t const* path, tb_char_t const* dest);
 
 #endif

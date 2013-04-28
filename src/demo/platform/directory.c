@@ -18,7 +18,7 @@ static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
 
 	// dump
 	tb_print( "path[%c]: %s, size: %llu, mtime: %04ld-%02ld-%02ld %02ld:%02ld:%02ld"
-			, info->type == TB_FILE_TYPE_DIR? 'd' : 'f'
+			, info->type == TB_FILE_TYPE_DIRECTORY? 'd' : 'f'
 			, path
 			, info->size
 			, mtime.year
@@ -37,6 +37,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+#if 1
 	// temporary
 	tb_char_t temp[4096] = {0};
 	if (tb_directory_temp(temp, 4096)) tb_print("temporary: %s", temp);
@@ -47,6 +48,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// current
 	tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_directory_walk_func, tb_null);
+#else
+	tb_directory_remove(argv[1]);
+#endif
 
 	// exit
 	tb_exit();
