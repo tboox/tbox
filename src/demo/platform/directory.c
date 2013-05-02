@@ -37,7 +37,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-#if 1
+#if 0
 	// temporary
 	tb_char_t temp[4096] = {0};
 	if (tb_directory_temp(temp, 4096)) tb_print("temporary: %s", temp);
@@ -47,9 +47,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (tb_directory_curt(curt, 4096)) tb_print("current: %s", curt);
 
 	// current
-	tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_directory_walk_func, tb_null);
-#else
+	tb_directory_walk(argv[1]? argv[1] : curt, tb_true, tb_true, tb_directory_walk_func, tb_null);
+#elif 0
 	tb_directory_remove(argv[1]);
+#else
+	tb_directory_copy(argv[1], argv[2]);
 #endif
 
 	// exit

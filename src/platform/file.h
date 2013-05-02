@@ -37,33 +37,33 @@
 // the file mode type
 typedef enum __tb_file_mode_t
 {
-	TB_FILE_MODE_RO 	= 1
-, 	TB_FILE_MODE_WO 	= 2
-, 	TB_FILE_MODE_RW 	= 4
-, 	TB_FILE_MODE_CREAT 	= 8
-, 	TB_FILE_MODE_APPEND = 16
-, 	TB_FILE_MODE_TRUNC 	= 32
-, 	TB_FILE_MODE_BINARY = 64
+	TB_FILE_MODE_RO 		= 1
+, 	TB_FILE_MODE_WO 		= 2
+, 	TB_FILE_MODE_RW 		= 4
+, 	TB_FILE_MODE_CREAT 		= 8
+, 	TB_FILE_MODE_APPEND 	= 16
+, 	TB_FILE_MODE_TRUNC 		= 32
+, 	TB_FILE_MODE_BINARY 	= 64
 
 }tb_file_mode_t;
 
 // the file seek type
 typedef enum __tb_file_seek_flag_t
 {
- 	TB_FILE_SEEK_BEG 	= 0
-, 	TB_FILE_SEEK_CUR 	= 1
-, 	TB_FILE_SEEK_END 	= 2
+ 	TB_FILE_SEEK_BEG 		= 0
+, 	TB_FILE_SEEK_CUR 		= 1
+, 	TB_FILE_SEEK_END 		= 2
 
 }tb_file_seek_flag_t;
 
 // the file type
 typedef enum __tb_file_type_t
 {
-	TB_FILE_TYPE_NULL 	= 0
+	TB_FILE_TYPE_NULL 		= 0
 ,	TB_FILE_TYPE_DIRECTORY 	= 1
-, 	TB_FILE_TYPE_FILE 	= 2 
-, 	TB_FILE_TYPE_DOT 	= 3
-, 	TB_FILE_TYPE_DOT2 	= 4
+, 	TB_FILE_TYPE_FILE 		= 2 
+, 	TB_FILE_TYPE_DOT 		= 3
+, 	TB_FILE_TYPE_DOT2 		= 4
 
 }tb_file_type_t;
 
@@ -71,16 +71,16 @@ typedef enum __tb_file_type_t
 typedef struct __tb_file_info_t
 {
 	// the file type
-	tb_size_t 			type;
+	tb_size_t 				type;
 
 	// the file size
-	tb_hize_t 			size;
+	tb_hize_t 				size;
 
 	// the last access time
-	tb_time_t 			atime;
+	tb_time_t 				atime;
 
 	// the last modify time
-	tb_time_t 			mtime;
+	tb_time_t 				mtime;
 
 }tb_file_info_t;
 
@@ -165,6 +165,15 @@ tb_hize_t 				tb_file_size(tb_handle_t file);
  * @return 				tb_true or tb_false
  */
 tb_bool_t 				tb_file_info(tb_char_t const* path, tb_file_info_t* info);
+
+/*! copy the file
+ * 
+ * @param path 			the file path
+ * @param dest 			the dest path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_copy(tb_char_t const* path, tb_char_t const* dest);
 
 /*! create the file
  * 

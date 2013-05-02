@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../../stream/stream.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -176,6 +177,53 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
 	// ok
 	return tb_true;
+}
+tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
+{
+	// check
+	tb_assert_and_check_return_val(path && dest, tb_false);
+
+	// path => unix
+	path = tb_path_to_unix(path);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// dest => unix
+	dest = tb_path_to_unix(dest);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// copy file
+	tb_bool_t 	ok = tb_false;
+	tb_handle_t ist = tb_null;
+	tb_handle_t ost = tb_null;
+	do
+	{
+		// init stream
+		ist = tb_gstream_init_from_url(path);
+		ost = tb_gstream_init_from_url(dest);
+		tb_assert_and_check_break(ist && ost);
+
+		// ctrl stream
+		tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+
+		// open stream
+		if (!tb_gstream_bopen(ist)) break;
+		if (!tb_gstream_bopen(ost)) break;
+
+		// copy stream
+		tb_hize_t size = tb_gstream_size(ist);
+		tb_hize_t save = tb_gstream_save(ist, ost);
+
+		// ok?
+		ok = save == size? tb_true : tb_false;
+
+	} while (0);
+
+	// exit stream
+	if (ist) tb_gstream_exit(ist);
+	if (ost) tb_gstream_exit(ost);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
 {

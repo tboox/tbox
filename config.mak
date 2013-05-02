@@ -6,7 +6,7 @@ PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = n
+DEBUG = y
 
 # small
 SMALL = n
