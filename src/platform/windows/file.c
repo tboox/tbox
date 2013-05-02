@@ -179,6 +179,24 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 	// ok
 	return tb_true;
 }
+tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
+{
+	// check
+	tb_assert_and_check_return_val(path && dest, tb_false);
+
+	// unix path => windows 
+	tb_char_t data0[4096] = {0};
+	path = tb_path_to_windows(path, data0, 4096);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// unix dest => windows 
+	tb_char_t data1[4096] = {0};
+	dest = tb_path_to_windows(dest, data1, 4096);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// copy
+	return CopyFileA(path, dest, FALSE)? tb_true : tb_false;
+}
 tb_bool_t tb_file_create(tb_char_t const* path)
 {
 	// check

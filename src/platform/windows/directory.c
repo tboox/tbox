@@ -41,6 +41,51 @@ static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
 	// remvoe directory
 	else if (info->type == TB_FILE_TYPE_DIRECTORY) RemoveDirectoryA(path);
 }
+static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
+{
+	// check
+	tb_assert_and_check_return(path && info && data);
+
+	// the dest directory
+	tb_char_t const* dest = (tb_char_t const*)((tb_cpointer_t*)data)[0];
+	tb_assert_and_check_return(dest);
+
+	// the file name
+	tb_size_t size = (tb_size_t)((tb_cpointer_t*)data)[1];
+	tb_char_t const* name = path + size;
+
+	// the ok pointer
+	tb_size_t* ok = (tb_size_t*)&((tb_cpointer_t*)data)[2];
+	tb_check_return(*ok);
+
+	// the dest file path
+	tb_char_t dpath[8192] = {0};
+	tb_snprintf(dpath, 8192, "%s\\%s", dest, name[0] == '\\'? name + 1 : name);
+//	tb_print("%s => %s", path, dpath);
+
+	// remove the dest file first
+	tb_file_info_t dinfo = {0};
+	if (tb_file_info(dpath, &dinfo))
+	{
+		if (dinfo.type == TB_FILE_TYPE_FILE)
+			tb_file_remove(dpath);
+		if (dinfo.type == TB_FILE_TYPE_DIRECTORY)
+			tb_directory_remove(dpath);
+	}
+
+	// copy 
+	switch (info->type)
+	{
+	case TB_FILE_TYPE_FILE:
+		if (!tb_file_copy(path, dpath)) *ok = 0;
+		break;
+	case TB_FILE_TYPE_DIRECTORY:
+		if (!tb_directory_create(dpath)) *ok = 0;
+		break;
+	default:
+		break;
+	}
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -69,7 +114,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// walk remove
-	tb_directory_walk(path, tb_true, tb_directory_walk_remove, tb_null);
+	tb_directory_walk(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
 	// remove it
 	return RemoveDirectoryA(path)? tb_true : tb_false;
@@ -90,7 +135,7 @@ tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 	// the current directory
 	return (tb_size_t)GetCurrentDirectoryA(maxn, path);
 }
-tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_directory_walk_func_t func, tb_cpointer_t data)
+tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return(path && func);
@@ -127,11 +172,14 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_direc
 				tb_file_info_t info = {0};
 				if (tb_file_info(temp, &info))
 				{
+					// do callback
+					if (prefix) func(temp, &info, data);
+
 					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp, recursion, func, data);
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp, recursion, prefix, func, data);
 	
 					// do callback
-					func(temp, &info, data);
+					if (!prefix) func(temp, &info, data);
 				}
 			}
 
@@ -141,3 +189,26 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_direc
 		FindClose(directory);
 	}
 }
+tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
+{
+	// unix path => windows 
+	tb_char_t data0[4096] = {0};
+	path = tb_path_to_windows(path, data0, 4096);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// unix dest => windows 
+	tb_char_t data1[4096] = {0};
+	dest = tb_path_to_windows(dest, data1, 4096);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// walk copy
+	tb_cpointer_t data[2] = {0};
+	data[0] = (tb_cpointer_t)dest;
+	data[1] = (tb_cpointer_t)tb_strlen(path);
+	data[2] = (tb_cpointer_t)1;
+	tb_directory_walk(path, tb_true, tb_true, tb_directory_walk_copy, data);
+
+	// ok?
+	return data[2]? tb_true : tb_false;
+}
+
