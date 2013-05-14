@@ -38,12 +38,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hong_t itime = tb_mclock();
 	if (!tb_gstream_bopen(ist)) goto end;
 	itime = tb_mclock() - itime;
-	tb_print("[gst]: open ist: %llu ms", itime);
 
 	tb_hong_t otime = tb_mclock();
 	if (!tb_gstream_bopen(ost)) goto end;
 	otime = tb_mclock() - otime;
-	tb_print("[gst]: open ost: %llu ms", otime);
 
 #if 0
 	// save stream

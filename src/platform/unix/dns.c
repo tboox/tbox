@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../file.h"
 #include "../../libc/libc.h"
 #include "../../stream/stream.h"
 #include "../../network/network.h"
@@ -37,6 +38,9 @@ tb_void_t tb_dns_local_init()
 	// init
 	tb_long_t size = 0;
 	tb_char_t line[8192];
+
+	// check
+	if (!tb_file_info("/etc/resolv.conf", tb_null)) return ;
 
 	/* try get list from "/etc/resolv.conf"
 	 *

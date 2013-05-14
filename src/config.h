@@ -35,7 +35,7 @@
 
 // memory
 #ifdef __tb_debug__
-# 	define TB_CONFIG_MEMORY_POOL
+//# 	define TB_CONFIG_MEMORY_POOL
 #endif
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 

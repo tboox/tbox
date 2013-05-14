@@ -120,16 +120,18 @@ typedef enum __tb_gstream_cmd_t
 ,	TB_GSTREAM_CMD_GET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 3)
 ,	TB_GSTREAM_CMD_GET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 4)
 ,	TB_GSTREAM_CMD_GET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 5)
-,	TB_GSTREAM_CMD_GET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 6)
-,	TB_GSTREAM_CMD_GET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 7)
+,	TB_GSTREAM_CMD_GET_SFUNC 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 6)
+,	TB_GSTREAM_CMD_GET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 7)
+,	TB_GSTREAM_CMD_GET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 8)
 
 ,	TB_GSTREAM_CMD_SET_URL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 11)
 ,	TB_GSTREAM_CMD_SET_HOST 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 12)
 ,	TB_GSTREAM_CMD_SET_PORT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 13)
 ,	TB_GSTREAM_CMD_SET_PATH 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 14)
 ,	TB_GSTREAM_CMD_SET_SSL 				= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 15)
-,	TB_GSTREAM_CMD_SET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 16)
-,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 17)
+,	TB_GSTREAM_CMD_SET_SFUNC 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 16)
+,	TB_GSTREAM_CMD_SET_CACHE 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 17)
+,	TB_GSTREAM_CMD_SET_TIMEOUT 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_NULL, 18)
 
 	// the dstream
 ,	TB_DSTREAM_CMD_SET_DATA 			= TB_GSTREAM_CMD(TB_GSTREAM_TYPE_DATA, 1)
@@ -167,6 +169,24 @@ typedef enum __tb_gstream_cmd_t
 
 }tb_gstream_cmd_t;
 
+/// the gstream ssl func type
+struct __tb_gstream_t;
+typedef struct __tb_gstream_sfunc_t
+{
+	/// the init func
+	tb_handle_t 		(*init)(struct __tb_gstream_t* gst);
+
+	/// the exit func
+	tb_void_t 			(*exit)(tb_handle_t ssl);
+
+	/// the read func
+	tb_long_t 			(*read)(tb_handle_t ssl, tb_byte_t* data, tb_size_t size);
+
+	/// the writ func
+	tb_long_t 			(*writ)(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size);
+
+}tb_gstream_sfunc_t;
+
 /// the generic stream type
 typedef struct __tb_gstream_t
 {	
@@ -193,6 +213,9 @@ typedef struct __tb_gstream_t
 
 	/// the offset
 	tb_hize_t 			offset;
+
+	/// the ssl func
+	tb_gstream_sfunc_t 	sfunc;
 
 	/// wait the aio event
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);

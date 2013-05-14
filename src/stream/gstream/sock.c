@@ -71,6 +71,9 @@ typedef struct __tb_sstream_t
 	// the read & writ
 	tb_size_t 			read;
 	tb_size_t 			writ;
+	
+	// the ssl handle
+	tb_handle_t 		ssl;
 
 	// the ipv4 string
 	tb_char_t 			ipv4[16];
@@ -193,6 +196,19 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 
 			// ok
 			tb_trace_impl("connect: ok");
+
+			// ssl? init it
+			if (tb_url_ssl_get(&gst->url))
+			{
+				// init
+				if (gst->sfunc.init) sst->ssl = gst->sfunc.init(gst);
+				tb_assert_and_check_goto(sst->ssl, fail);
+
+				// check sfunc
+				tb_assert_and_check_goto(gst->sfunc.read, fail);
+				tb_assert_and_check_goto(gst->sfunc.writ, fail);
+				tb_assert_and_check_goto(gst->sfunc.exit, fail);
+			}
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -224,6 +240,10 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	// has socket?
 	if (sst->sock)
 	{
+		// exit ssl
+		if (sst->ssl) gst->sfunc.exit(sst->ssl);
+		sst->ssl = tb_null;
+
 		// close it
 		if (!sst->bref) if (!tb_socket_close(sst->sock)) return 0;
 
@@ -261,7 +281,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// read data
-			r = tb_socket_recv(sst->sock, data, size);
+			r = (sst->ssl)? gst->sfunc.read(sst->ssl, data, size) : tb_socket_recv(sst->sock, data, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -320,7 +340,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// writ data
-			r = tb_socket_send(sst->sock, data, size);
+			r = (sst->ssl)? gst->sfunc.writ(sst->ssl, data, size) : tb_socket_send(sst->sock, data, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
