@@ -11,6 +11,7 @@ include config.mak
 # #
 a : all
 f : config
+r : rebuild
 i : install
 p : prefix
 c : clean
@@ -33,6 +34,15 @@ all : .null
 	@echo "" > /tmp/$(PRO_NAME).out
 	@echo make $(PRO_NAME)
 	@$(MAKE) --no-print-directory -C $(SRC_DIR)
+
+# make rebuild
+rebuild : .null
+	@$(MAKE) f
+	@$(MAKE) c
+	-@$(MAKE) -j4
+	@$(MAKE)
+	@$(MAKE) i
+	@$(MAKE) p
 
 # make install
 install : .null
@@ -134,6 +144,13 @@ ifeq ($(DEBUG),)
 DEBUG := n
 endif
 
+# debug type
+ifeq ($(DEBUG),y)
+DTYPE := d
+else
+DTYPE := r
+endif
+
 # small
 ifeq ($(SMALL),)
 SMALL := n
@@ -176,6 +193,7 @@ config :
 	@echo ""                              				>> config.mak
 	@echo "# debug"              						>> config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> config.mak
+	@echo "DTYPE =" $(DTYPE) 							>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# small"              						>> config.mak
 	@echo "SMALL =" $(SMALL) 							>> config.mak
@@ -202,6 +220,7 @@ config :
 	@echo "export PRO_DIR" 		 						>> config.mak
 	@echo "export PRO_NAME" 		 					>> config.mak
 	@echo "export DEBUG" 			 					>> config.mak
+	@echo "export DTYPE" 			 					>> config.mak
 	@echo "export SMALL" 			 					>> config.mak
 	@echo "export PLAT"					 				>> config.mak
 	@echo "export ARCH"					 				>> config.mak
