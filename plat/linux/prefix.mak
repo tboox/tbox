@@ -75,7 +75,7 @@ CFLAGS 				= \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
 					-Wpointer-arith -Wwrite-strings \
 					-Wundef -Wmissing-prototypes  \
-#					-fno-signed-zeros -fno-tree-vectorize \
+					-fno-signed-zeros -fno-tree-vectorize \
 					-Werror=unused-variable -Wtype-limits -Wno-pointer-sign -Wno-pointer-to-int-cast \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 #					-Werror

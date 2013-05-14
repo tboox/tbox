@@ -7,15 +7,16 @@ PRO_NAME = tbox
 
 # debug
 DEBUG = y
+DTYPE = d
 
 # small
-SMALL = n
+SMALL = y
 
 # platform
-PLAT = linux
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # demo
 DEMO = n
@@ -33,6 +34,7 @@ DISTCC =
 export PRO_DIR
 export PRO_NAME
 export DEBUG
+export DTYPE
 export SMALL
 export PLAT
 export ARCH
