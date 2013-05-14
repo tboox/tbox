@@ -10,7 +10,7 @@ DEBUG = y
 DTYPE = d
 
 # small
-SMALL = y
+SMALL = n
 
 # platform
 PLAT = mingw
@@ -19,7 +19,7 @@ PLAT = mingw
 ARCH = x86
 
 # demo
-DEMO = n
+DEMO = y
 
 # toolchain
 SDK =

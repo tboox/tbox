@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"gst"
+//#define TB_TRACE_IMPL_TAG 			"gstream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -77,7 +77,6 @@ static tb_gstream_item_t g_gstream_table[] =
 ,	{TB_GSTREAM_TYPE_HTTP, tb_gstream_init_http}
 ,	{TB_GSTREAM_TYPE_DATA, tb_gstream_init_data}
 };
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * details
@@ -397,7 +396,11 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	// for windows style path
 	else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
 		t = TB_GSTREAM_TYPE_FILE;
-	else return tb_null;
+	else 
+	{
+		tb_trace("[gstream]: invalid url: %s", url);
+		return tb_null;
+	}
 	tb_assert_and_check_goto(t && t < tb_arrayn(g_gstream_table), fail);
 
 	// init stream
@@ -1189,6 +1192,24 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 			if (pssl)
 			{
 				*pssl = tb_url_ssl_get(&gst->url);
+				ret = tb_true;
+			}
+		}
+		break;
+	case TB_GSTREAM_CMD_SET_SFUNC:
+		{
+			tb_gstream_sfunc_t const* sfunc = (tb_bool_t)tb_va_arg(args, tb_gstream_sfunc_t*);
+			if (sfunc) gst->sfunc = *sfunc;
+			else tb_memset(&gst->sfunc, 0, sizeof(tb_gstream_sfunc_t));
+			ret = tb_true;
+		}
+		break;
+	case TB_GSTREAM_CMD_GET_SFUNC:
+		{
+			tb_gstream_sfunc_t* sfunc = (tb_bool_t*)tb_va_arg(args, tb_gstream_sfunc_t*);
+			if (sfunc)
+			{
+				*sfunc = gst->sfunc;
 				ret = tb_true;
 			}
 		}

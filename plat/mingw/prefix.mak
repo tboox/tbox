@@ -44,7 +44,8 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+#CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_RELEASE 	= -g -freg-struct-return -fno-bounds-check
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
@@ -63,7 +64,8 @@ endif
 ifeq ($(SMALL),y)
 CXFLAGS_RELEASE 	+= -Os
 else
-CXFLAGS_RELEASE 	+= -O3
+#CXFLAGS_RELEASE 	+= -O3
+CXFLAGS_RELEASE 	+= 
 endif
 
 # small
@@ -74,7 +76,6 @@ CFLAGS_RELEASE 		=
 CFLAGS_DEBUG 		= 
 CFLAGS 				= \
 					-std=c99 \
-					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
 					-Wno-parentheses \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
@@ -82,6 +83,7 @@ CFLAGS 				= \
 					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
+#					-fomit-frame-pointer \
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	=
