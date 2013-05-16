@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		isinff.c
+ * @file		isinf.c
  * @ingroup 	libm
  *
  */
@@ -31,11 +31,10 @@
  * implemention
  */
 
-tb_long_t tb_isinf(tb_float_t x)
+tb_long_t tb_isin(tb_double_t x)
 {
-	tb_ieee_float_t e; e.f = x;
-	tb_int32_t 		t = e.i & 0x7fffffff;
-	t ^= 0x7f800000;
+	tb_ieee_double_t e; e.d = x;
+	tb_int32_t 		t = e.i.l | ((e.i.h & 0x7fffffff) ^ 0x7ff00000);
 	t |= -t;
-	return (tb_long_t)(~(t >> 31) & (e.i >> 30));
+	return (tb_long_t)(~(t >> 31) & (e.i.h >> 30));
 }

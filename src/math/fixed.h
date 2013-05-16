@@ -91,8 +91,6 @@
 #define tb_fixed_exp1(x) 			tb_fixed16_exp1(x)
 #define tb_fixed_expi(x) 			tb_fixed16_expi(x)
 #define tb_fixed_ilog2(x) 			tb_fixed16_ilog2(x)
-#define tb_fixed_iclog2(x) 			tb_fixed16_iclog2(x)
-#define tb_fixed_irlog2(x) 			tb_fixed16_irlog2(x)
 
 
 

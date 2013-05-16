@@ -495,7 +495,7 @@ static tb_void_t tb_float_test_constant()
 	tb_printf("[float]: min = %f\n", TB_MIF);
 	tb_printf("[float]: nan = %f\n", TB_NAN);
 	tb_printf("[float]: inf = %f\n", TB_INF);
-	tb_printf("[float]: isinf = %ld\n", tb_isinff(TB_INF));
+	tb_printf("[float]: isinf = %ld\n", tb_isinf(TB_INF));
 	tb_printf("[float]: isnan = %ld\n", tb_isnanf(TB_NAN));
 }
 static tb_void_t tb_float_test_round(tb_float_t x)

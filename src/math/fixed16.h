@@ -263,14 +263,6 @@
 # 	define tb_fixed16_ilog2(x) 				tb_fixed16_ilog2_int32(x)
 #endif
 
-#ifndef tb_fixed16_iclog2
-# 	define tb_fixed16_iclog2(x) 			tb_fixed16_iclog2_int32(x)
-#endif
-
-#ifndef tb_fixed16_irlog2
-# 	define tb_fixed16_irlog2(x) 			tb_fixed16_irlog2_int32(x)
-#endif
-
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -409,24 +401,12 @@ static __tb_inline__ tb_fixed16_t tb_fixed16_sqre_int32(tb_fixed16_t x)
 static __tb_inline__ tb_fixed16_t tb_fixed16_sqrt_int32(tb_fixed16_t x)
 {
 	tb_assert(x > 0);
-	return (x > 0? (tb_int32_sqrt(x) << 8) : 0);
+	return (x > 0? (tb_isqrti(x) << 8) : 0);
 }
 static __tb_inline__ tb_uint32_t tb_fixed16_ilog2_int32(tb_fixed16_t x)
 {
 	tb_assert(x > 0);
-	tb_uint32_t lg = tb_int32_log2(x);
-	return (lg > 16? (lg - 16) : 0);
-}
-static __tb_inline__ tb_uint32_t tb_fixed16_iclog2_int32(tb_fixed16_t x)
-{
-	tb_assert(x > 0);
-	tb_uint32_t lg = tb_int32_clog2(x);
-	return (lg > 16? (lg - 16) : 0);
-}
-static __tb_inline__ tb_uint32_t tb_fixed16_irlog2_int32(tb_fixed16_t x)
-{
-	tb_assert(x > 0);
-	tb_uint32_t lg = tb_int32_rlog2(x);
+	tb_uint32_t lg = tb_ilog2i(x);
 	return (lg > 16? (lg - 16) : 0);
 }
 static __tb_inline__ tb_fixed16_t tb_fixed16_sin_int32(tb_fixed16_t x)

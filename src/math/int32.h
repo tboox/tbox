@@ -33,10 +33,6 @@
  * macros
  */
 
-// constant
-#define TB_INT32_MAX 					(TB_MAXS32)
-#define TB_INT32_MIN 					(TB_MINS32)
-
 // sign
 #define tb_int32_get_sign(x) 			tb_int32_get_sign_inline(x)
 #define tb_int32_set_sign(x, s) 		tb_int32_set_sign_inline(x, s)
@@ -47,14 +43,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-// sqrt
-tb_uint32_t tb_int32_sqrt(tb_uint32_t x);
-
-// log2
-tb_uint32_t tb_int32_log2(tb_uint32_t x);
-tb_uint32_t tb_int32_clog2(tb_uint32_t x);
-tb_uint32_t tb_int32_rlog2(tb_uint32_t x);
 
 // div
 tb_int32_t 	tb_int32_div(tb_int32_t x, tb_int32_t y, tb_int_t nbits);
@@ -82,6 +70,5 @@ static __tb_inline__ tb_long_t tb_int32_nz_inline(tb_uint32_t x)
 	//return (x? 1 : 0);
 	return ((x | (0 - x)) >> 31);
 }
-
 #endif
 

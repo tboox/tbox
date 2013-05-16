@@ -219,7 +219,7 @@ static __tb_inline__ tb_fixed30_t tb_fixed30_sqre_int32(tb_fixed30_t x)
 static __tb_inline__ tb_fixed30_t tb_fixed30_sqrt_int32(tb_fixed30_t x)
 {
 	tb_assert(x > 0);
-	return (x > 0? (tb_int32_sqrt(x) << 15) : 0);
+	return (x > 0? (tb_isqrti(x) << 15) : 0);
 }
 
 

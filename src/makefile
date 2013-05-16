@@ -107,6 +107,7 @@ tbox_C_FILES 			+= \
 						libc/string/strncat \
 						libc/string/strcpy \
 						libc/string/strncpy \
+						libc/string/strlcpy \
 						libc/string/strdup \
 						libc/string/strndup \
 						libc/string/strcmp \
@@ -124,7 +125,10 @@ tbox_C_FILES 			+= \
 						libc/string/strrchr \
 						libc/string/strirchr \
 						libc/string/strnrchr \
-						libc/string/strnirchr
+						libc/string/strnirchr \
+						libm/idivi8 \
+						libm/ilog2i \
+						libm/isqrti \
 
 tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB) += \
 						zip/zlib \
@@ -132,8 +136,8 @@ tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB) += \
 						zip/zlibraw \
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
+						libm/isin \
 						libm/isinf \
-						libm/isinff \
 						libm/isnan \
 						libm/isnanf \
 						libm/sqrt \
@@ -418,6 +422,7 @@ SUB_PROS 				= \
 					  	demo/aio \
 					  	demo/xml \
 					  	demo/flv \
+						demo/libm \
 						demo/libc \
 					  	demo/math \
 					  	demo/utils \

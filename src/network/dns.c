@@ -1075,7 +1075,7 @@ tb_bool_t tb_dns_list_init()
 		tb_assert_and_check_goto(g_dns_list->spool, fail);
 	
 		// init cache
-		g_dns_list->cache = tb_hash_init(tb_align8(tb_int32_sqrt(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), tb_null, tb_null));
+		g_dns_list->cache = tb_hash_init(tb_align8(tb_isqrti(TB_DNS_CACHE_MAXN) + 1), tb_item_func_str(tb_false, g_dns_list->spool), tb_item_func_ifm(sizeof(tb_dns_addr_t), tb_null, tb_null));
 		tb_assert_and_check_goto(g_dns_list->cache, fail);
 	}
 

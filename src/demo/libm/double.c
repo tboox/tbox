@@ -496,7 +496,7 @@ static tb_void_t tb_double_test_constant()
 	tb_printf("[double]: min = %lf\n", TB_MIF);
 	tb_printf("[double]: nan = %lf\n", TB_NAN);
 	tb_printf("[double]: inf = %lf\n", TB_INF);
-	tb_printf("[double]: isinf = %ld\n", tb_isinf(TB_INF));
+	tb_printf("[double]: isinf = %ld\n", tb_isin(TB_INF));
 	tb_printf("[double]: isnan = %ld\n", tb_isnan(TB_NAN));
 }
 static tb_void_t tb_double_test_round(tb_double_t x)

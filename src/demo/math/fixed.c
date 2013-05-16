@@ -601,30 +601,6 @@ static tb_void_t tb_fixed_test_ilog2(tb_fixed_t x)
 	t = tb_mclock() - t;
 	tb_printf("[fixed]: ilog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
 }
-static tb_void_t tb_fixed_test_iclog2(tb_fixed_t x)
-{
-	__tb_volatile__ tb_int_t 	n = 10000000;
-	__tb_volatile__ tb_uint32_t 	r = 0;
-	tb_hong_t t = tb_mclock();
-	while (n--)
-	{
-		r = tb_fixed_iclog2(x);
-	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: iclog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
-}
-static tb_void_t tb_fixed_test_irlog2(tb_fixed_t x)
-{
-	__tb_volatile__ tb_int_t 	n = 10000000;
-	__tb_volatile__ tb_uint32_t 	r = 0;
-	tb_hong_t t = tb_mclock();
-	while (n--)
-	{
-		r = tb_fixed_irlog2(x);
-	}
-	t = tb_mclock() - t;
-	tb_printf("[fixed]: irlog2(%f) = %d, %lld ms\n", tb_fixed_to_float(x), r, t);
-}
 static tb_void_t tb_fixed_test_exp(tb_fixed_t x)
 {
 	__tb_volatile__ tb_int_t 	n = 10000000;
@@ -866,8 +842,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_fixed_test_exp(TB_FIXED_PI);
 	tb_fixed_test_ilog2(TB_FIXED_PI);
 	tb_fixed_test_ilog2(tb_float_to_fixed(1024.));
-	tb_fixed_test_iclog2(TB_FIXED_PI);
-	tb_fixed_test_irlog2(TB_FIXED_PI);
 	tb_fixed_test_sin();
 	tb_fixed_test_cos();
 	tb_fixed_test_tan();
