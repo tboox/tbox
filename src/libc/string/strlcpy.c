@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		strncpy.c
+ * @file		strlcpy.c
  * @ingroup 	libc
  *
  */
@@ -27,13 +27,13 @@
  */
 #include "string.h"
 
-#ifndef TB_CONFIG_LIBC_HAVE_STRNCPY
+#ifndef TB_CONFIG_LIBC_HAVE_STRLCPY
 # 	if defined(TB_ARCH_x86)
-# 		include "opt/x86/strncpy.c"
+# 		include "opt/x86/strlcpy.c"
 # 	elif defined(TB_ARCH_ARM)
-# 		include "opt/arm/strncpy.c"
+# 		include "opt/arm/strlcpy.c"
 # 	elif defined(TB_ARCH_SH4)
-# 		include "opt/sh4/strncpy.c"
+# 		include "opt/sh4/strlcpy.c"
 # 	endif
 #else
 # 	include <string.h>
@@ -43,38 +43,38 @@
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-#if defined(TB_CONFIG_LIBC_HAVE_STRNCPY)
-tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+#if defined(TB_CONFIG_LIBC_HAVE_STRLCPY)
+tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
-	return strncpy(s1, s2, n);
+	tb_assert_and_check_return_val(s1 && s2, 0);
+	return strlcpy(s1, s2, n);
 }
-#elif !defined(TB_LIBC_STRING_OPT_STRNCPY)
-tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+#elif !defined(TB_LIBC_STRING_OPT_STRLCPY)
+tb_size_t tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
 	// check
-	tb_assert_and_check_return_val(s1 && s2, s1);
+	tb_assert_and_check_return_val(s1 && s2, 0);
 
 	// no size or same? 
-	tb_check_return_val(n && s1 != s2, s1);
+	tb_check_return_val(n && s1 != s2, tb_strlen(s1));
 
 	// copy
 #if 0
-	tb_char_t* s = s1;
-	while (n) 
+	tb_char_t const* s = s2; --n;
+	while (*s1 = *s2) 
 	{
-		if (*s = *s2) s2++;
-		++s;
-		--n;
+		if (n) 
+		{
+			--n;
+			++s1;
+		}
+		++s2;
 	}
-	return s1;
+	return s2 - s;
 #else
 	tb_size_t sn = tb_strlen(s2);
-	tb_size_t cn = tb_min(sn, n);
-	tb_size_t fn = sn < n? n - sn : 0;
-	tb_memcpy(s1, s2, cn);
-	if (fn) tb_memset(s1 + cn, 0, fn);
-	return s1;
+	tb_memcpy(s1, s2, tb_min(sn + 1, n));
+	return tb_min(sn, n);
 #endif
 }
 #endif

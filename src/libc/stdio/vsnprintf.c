@@ -450,7 +450,7 @@ static tb_char_t* tb_printf_float(tb_char_t* pb, tb_char_t* pe, tb_printf_entry_
 	tb_long_t 	ints_i = 0, decs_i = 0;
 
 	// for inf nan
-	if (tb_isinff(num))
+	if (tb_isinf(num))
 	{
 		if (pb < pe && num < 0) *pb++ = '-';
 		if (pb < pe) *pb++ = 'i';
@@ -579,7 +579,7 @@ static tb_char_t* tb_printf_double(tb_char_t* pb, tb_char_t* pe, tb_printf_entry
 	tb_long_t 	ints_i = 0, decs_i = 0;
 
 	// for inf nan
-	if (tb_isinf(num))
+	if (tb_isin(num))
 	{
 		if (pb < pe && num < 0) *pb++ = '-';
 		if (pb < pe) *pb++ = 'i';

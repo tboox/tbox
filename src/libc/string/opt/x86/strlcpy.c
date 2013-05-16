@@ -17,25 +17,48 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		isinff.c
- * @ingroup 	libm
+ * @file		strlcpy.c
  *
  */
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "math.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * macros
  */
+#ifdef TB_CONFIG_ASSEMBLER_GAS
+//# 	define TB_LIBC_STRING_OPT_STRLCPY
+#endif
 
-tb_long_t tb_isinff(tb_float_t x)
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+#if 0//def TB_CONFIG_ASSEMBLER_GAS
+tb_char_t* tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_ieee_float_t e; e.f = x;
-	tb_int32_t 		t = e.i & 0x7fffffff;
-	t ^= 0x7f800000;
-	t |= -t;
-	return (tb_long_t)(~(t >> 31) & (e.i >> 30));
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
+
+	tb_size_t d0, d1, d2, d3;
+	__tb_asm__ __tb_volatile__
+	(
+		"1:\n"
+		" 	decl %2\n"
+		" 	js 2f\n"
+		" 	lodsb\n"
+		" 	stosb\n"
+		" 	testb %%al, %%al\n"
+		" 	jne 1b\n"
+		" 	rep\n"
+		" 	stosb\n"
+		"2:"
+
+		: "=&S" (d0), "=&D" (d1), "=&c" (d2), "=&a" (d3)
+		: "0" (s2), "1" (s1), "2" (n) 
+		: "memory"
+	);
+	return s1;
 }
+#endif

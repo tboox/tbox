@@ -55,7 +55,7 @@ static __tb_inline__ tb_char_t const* tb_path_to_windows(tb_char_t const* path, 
 		data[0] = path[1];
 		data[1] = ':';
 		data[2] = '/';
-		tb_strncpy(data + 3, path + 2, maxn - 3);
+		tb_strlcpy(data + 3, path + 2, maxn - 3);
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}
@@ -65,7 +65,7 @@ static __tb_inline__ tb_char_t const* tb_path_to_windows(tb_char_t const* path, 
 		data[0] = path[8];
 		data[1] = ':';
 		data[2] = '/';
-		tb_strncpy(data + 3, path + 9, maxn - 3);
+		tb_strlcpy(data + 3, path + 9, maxn - 3);
 		//tb_trace("[file]: path: %s => %s", path, data);
 		return data;
 	}

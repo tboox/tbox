@@ -99,7 +99,7 @@ static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 	tb_hong_t t = tb_mclock();
 	while (n--)
 	{
-		tb_strncpy(s1, s2, size);
+		tb_strlcpy(s1, s2, size);
 	}
 	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strncpy(%s, %d) = %s\n", t, s2, size, s1);

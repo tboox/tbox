@@ -66,6 +66,7 @@ tb_char_t* 		tb_strncat(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
 // strcpy
 tb_char_t* 		tb_strcpy(tb_char_t* s1, tb_char_t const* s2);
 tb_char_t* 		tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
+tb_size_t 		tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n);
 
 // strcmp
 tb_long_t 		tb_strcmp(tb_char_t const* s1, tb_char_t const* s2);
