@@ -1,10 +1,26 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// arm
+#if defined(__tb_arch_armv5te__)
+# 	define TB_CONFIG_ARM_VERSION 			(5)
+#elif defined(__tb_arch_armv6__)
+# 	define TB_CONFIG_ARM_VERSION 			(6)
+#elif defined(__tb_arch_armv7__)
+# 	define TB_CONFIG_ARM_VERSION 			(7)
+#endif
+#ifdef __thumb__
+# 	define TB_CONFIG_ARM_THUMB
+#endif
+//#define TB_CONFIG_ARM_JAZELLE
+//#define TB_CONFIG_ARM_VFP
+//#define TB_CONFIG_ARM_MMU 
+//#define TB_CONFIG_ARM_MPU 
+
 // os
-#define TB_CONFIG_OS_LINUX
-#define TB_CONFIG_OS_LINUX_VERSION_MAJOR 	(2)
-#define TB_CONFIG_OS_LINUX_VERSION_MINOR 	(6)
+#define TB_CONFIG_OS_ANDROID
+#define TB_CONFIG_OS_ANDROID_VERSION_MAJOR 	(1)
+#define TB_CONFIG_OS_ANDROID_VERSION_MINOR 	(5)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
@@ -32,9 +48,7 @@
 #define TB_CONFIG_TYPE_FLOAT
 
 // optimization
-#if defined(__tb_arch_x86__) || defined(__tb_arch_x64__)
-# 	define TB_CONFIG_OPTI_SSE2_ENABLE
-#endif
+//#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // memory
 #ifdef __tb_debug__
@@ -69,12 +83,12 @@
 #define TB_CONFIG_LIBC_HAVE_STRCAT
 #define TB_CONFIG_LIBC_HAVE_STRNCAT
 
-//#define TB_CONFIG_LIBC_HAVE_STRCPY
-//#define TB_CONFIG_LIBC_HAVE_STRNCPY
+#define TB_CONFIG_LIBC_HAVE_STRCPY
+#define TB_CONFIG_LIBC_HAVE_STRNCPY
 //#define TB_CONFIG_LIBC_HAVE_STRLCPY
 
 #define TB_CONFIG_LIBC_HAVE_STRLEN 
-#define TB_CONFIG_LIBC_HAVE_STRNLEN
+//#define TB_CONFIG_LIBC_HAVE_STRNLEN
 
 #define TB_CONFIG_LIBC_HAVE_STRSTR
 #define TB_CONFIG_LIBC_HAVE_STRISTR
@@ -89,10 +103,11 @@
 #define TB_CONFIG_LIBC_HAVE_LOCALTIME
 
 // libm
-#define TB_CONFIG_LIBM_HAVE_SINCOS
-#define TB_CONFIG_LIBM_HAVE_SINCOSF
+//#define TB_CONFIG_LIBM_HAVE_SINCOS
+//#define TB_CONFIG_LIBM_HAVE_SINCOSF
 
-#define TB_CONFIG_LIBM_HAVE_LOG2
-#define TB_CONFIG_LIBM_HAVE_LOG2F
+//#define TB_CONFIG_LIBM_HAVE_LOG2
+//#define TB_CONFIG_LIBM_HAVE_LOG2F
+
 
 #endif
