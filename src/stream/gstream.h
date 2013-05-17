@@ -170,11 +170,10 @@ typedef enum __tb_gstream_cmd_t
 }tb_gstream_cmd_t;
 
 /// the gstream ssl func type
-struct __tb_gstream_t;
 typedef struct __tb_gstream_sfunc_t
 {
 	/// the init func
-	tb_handle_t 		(*init)(struct __tb_gstream_t* gst);
+	tb_handle_t 		(*init)(tb_handle_t gst);
 
 	/// the exit func
 	tb_void_t 			(*exit)(tb_handle_t ssl);

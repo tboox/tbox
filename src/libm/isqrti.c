@@ -30,7 +30,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-tb_size_t tb_isqrti(tb_size_t x)
+tb_uint32_t tb_isqrti(tb_uint32_t x)
 {
 #if 0
 	// lookup + newton 

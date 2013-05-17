@@ -30,7 +30,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implemention
  */
-tb_size_t tb_idivi8(tb_size_t x, tb_uint8_t y)
+tb_uint32_t tb_idivi8(tb_uint32_t x, tb_uint8_t y)
 {
 	/* x * inverse[y] >> 32 == x / y for all 0 <= x <= 16909558 && 2 <= y <= 256 for x > 16909558
 	 * is an overestimate by less than 1 part in 1 << 24

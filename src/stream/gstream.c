@@ -1198,7 +1198,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 		break;
 	case TB_GSTREAM_CMD_SET_SFUNC:
 		{
-			tb_gstream_sfunc_t const* sfunc = (tb_bool_t)tb_va_arg(args, tb_gstream_sfunc_t*);
+			tb_gstream_sfunc_t const* sfunc = (tb_gstream_sfunc_t const*)tb_va_arg(args, tb_gstream_sfunc_t*);
 			if (sfunc) gst->sfunc = *sfunc;
 			else tb_memset(&gst->sfunc, 0, sizeof(tb_gstream_sfunc_t));
 			ret = tb_true;
@@ -1206,7 +1206,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 		break;
 	case TB_GSTREAM_CMD_GET_SFUNC:
 		{
-			tb_gstream_sfunc_t* sfunc = (tb_bool_t*)tb_va_arg(args, tb_gstream_sfunc_t*);
+			tb_gstream_sfunc_t* sfunc = (tb_gstream_sfunc_t*)tb_va_arg(args, tb_gstream_sfunc_t*);
 			if (sfunc)
 			{
 				*sfunc = gst->sfunc;

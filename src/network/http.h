@@ -85,6 +85,23 @@ typedef struct __tb_http_range_t
 
 }tb_http_range_t;
 
+// the http ssl func type
+typedef struct __tb_http_sfunc_t
+{
+	/// the init func
+	tb_handle_t 		(*init)(tb_handle_t gst);
+
+	/// the exit func
+	tb_void_t 			(*exit)(tb_handle_t ssl);
+
+	/// the read func
+	tb_long_t 			(*read)(tb_handle_t ssl, tb_byte_t* data, tb_size_t size);
+
+	/// the writ func
+	tb_long_t 			(*writ)(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size);
+
+}tb_http_sfunc_t;
+
 // the http option type
 typedef struct __tb_http_option_t
 {
@@ -120,6 +137,9 @@ typedef struct __tb_http_option_t
 
 	// the user data
 	tb_pointer_t 		udata;
+
+	// the ssl func
+	tb_http_sfunc_t 	sfunc;
 
 	// the head func
 	tb_bool_t 			(*hfunc)(tb_handle_t http, tb_char_t const* line);

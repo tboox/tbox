@@ -112,12 +112,12 @@ tb_float_t 		tb_powf(tb_float_t x, tb_float_t y);
 #endif
 
 // ilog2i
-tb_size_t 		tb_ilog2i(tb_size_t x);
+tb_uint32_t 	tb_ilog2i(tb_uint32_t x);
 
 // isqrti
-tb_size_t 		tb_isqrti(tb_size_t x);
+tb_uint32_t 	tb_isqrti(tb_uint32_t x);
 
 // idivi8
-tb_size_t 		tb_idivi8(tb_size_t x, tb_uint8_t y);
+tb_uint32_t 	tb_idivi8(tb_uint32_t x, tb_uint8_t y);
 
 #endif
