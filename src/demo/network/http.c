@@ -5,13 +5,9 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/* ///////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
+static tb_bool_t tb_http_demo_hfunc(tb_handle_t http, tb_char_t const* line)
 {
 	// check
 	tb_assert_and_check_return_val(http && line, tb_false);
@@ -41,12 +37,35 @@ static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
 
 	return tb_true;
 }
+static tb_handle_t tb_http_demo_sfunc_init(tb_handle_t gst)
+{
+	tb_print("[demo]: ssl: init: %p", gst);
+	tb_handle_t sock = tb_null;
+	if (gst && tb_gstream_type(gst)) 
+		tb_gstream_ctrl(gst, TB_SSTREAM_CMD_GET_HANDLE, &sock);
+	return sock;
+}
+static tb_void_t tb_http_demo_sfunc_exit(tb_handle_t ssl)
+{
+	tb_print("[demo]: ssl: exit");
+}
+static tb_long_t tb_http_demo_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
+{
+	tb_print("[demo]: ssl: read: %lu", size);
+	return ssl? tb_socket_recv(ssl, data, size) : -1;
+}
+static tb_long_t tb_http_demo_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
+{
+	tb_print("[demo]: ssl: writ: %lu", size);
+	return ssl? tb_socket_send(ssl, data, size) : -1;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init http
@@ -77,8 +96,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// redirect
 //	option->rdtm = 0;
 
+	// init ssl func
+	option->sfunc.init = tb_http_demo_sfunc_init;
+	option->sfunc.exit = tb_http_demo_sfunc_exit;
+	option->sfunc.read = tb_http_demo_sfunc_read;
+	option->sfunc.writ = tb_http_demo_sfunc_writ;
+
 	// init head func
-	option->hfunc = tb_http_test_hfunc;
+	option->hfunc = tb_http_demo_hfunc;
 
 	// open http
 	tb_hong_t t = tb_mclock();
@@ -138,6 +163,5 @@ end:
 
 	// exit tbox
 	tb_exit();
-
 	return 0;
 }

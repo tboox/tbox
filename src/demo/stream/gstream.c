@@ -7,29 +7,66 @@
 /* ///////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_bool_t tb_http_test_hfunc(tb_handle_t http, tb_char_t const* line)
+static tb_bool_t tb_gstream_demo_hfunc(tb_handle_t http, tb_char_t const* line)
 {
 	tb_print("[demo]: response: %s", line);
 	return tb_true;
 }
+static tb_handle_t tb_gstream_demo_sfunc_init(tb_handle_t gst)
+{
+	tb_print("[demo]: ssl: init: %p", gst);
+	tb_handle_t sock = tb_null;
+	if (gst && tb_gstream_type(gst)) 
+		tb_gstream_ctrl(gst, TB_SSTREAM_CMD_GET_HANDLE, &sock);
+	return sock;
+}
+static tb_void_t tb_gstream_demo_sfunc_exit(tb_handle_t ssl)
+{
+	tb_print("[demo]: ssl: exit");
+}
+static tb_long_t tb_gstream_demo_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
+{
+	tb_print("[demo]: ssl: read: %lu", size);
+	return ssl? tb_socket_recv(ssl, data, size) : -1;
+}
+static tb_long_t tb_gstream_demo_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
+{
+	tb_print("[demo]: ssl: writ: %lu", size);
+	return ssl? tb_socket_send(ssl, data, size) : -1;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-	// create stream
+	// init stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
-	if (!ist || !ost) goto end;
+	tb_assert_and_check_goto(ist && ost, end);
 	
-	// ioctl
+	// init sfunc
+	tb_gstream_sfunc_t sfunc = 
+	{
+		tb_gstream_demo_sfunc_init
+	,	tb_gstream_demo_sfunc_exit
+	,	tb_gstream_demo_sfunc_read
+	,	tb_gstream_demo_sfunc_writ
+	};
+
+	// ctrl
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
+		// init hfunc
 		tb_http_option_t* option = tb_null;
 		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
-		if (option) option->hfunc = tb_http_test_hfunc;
+		if (option) option->hfunc = tb_gstream_demo_hfunc;
+
+		// init sfunc
+		tb_gstream_ctrl(ist, TB_GSTREAM_CMD_SET_SFUNC, &sfunc);
 	}
 	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) 
 		tb_gstream_ctrl(ost, TB_FSTREAM_CMD_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
@@ -93,20 +130,17 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	} while(1);
 
+	// trace
 	tb_print("[gst]: load: %llu bytes, size: %llu bytes, time: %llu ms", read, tb_gstream_size(ist), tb_mclock() - base);
 #endif
 
 end:
 
-
-	// destroy stream
+	// exit stream
 	tb_gstream_exit(ist);
 	tb_gstream_exit(ost);
 
-#ifdef __tb_debug__
-//	tb_memory_dump();
-#endif
-
+	// exit tbox
 	tb_exit();
 	return 0;
 }

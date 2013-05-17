@@ -275,11 +275,12 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 		// clear status
 		tb_http_status_clear(http);
 
-		// set url
+		// ctrl stream
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CMD_SET_SSL, tb_url_ssl_get(&http->option.url));
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CMD_SET_HOST, tb_url_host_get(&http->option.url));
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CMD_SET_PORT, tb_url_port_get(&http->option.url));
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CMD_SET_PATH, tb_url_path_get(&http->option.url));
+		tb_gstream_ctrl(http->stream, TB_GSTREAM_CMD_SET_SFUNC, &http->option.sfunc);
 	}
 
 	// tryn++

@@ -32,7 +32,7 @@
  * implemention
  */
 
-tb_size_t tb_ilog2i(tb_size_t x)
+tb_uint32_t tb_ilog2i(tb_uint32_t x)
 {
 #if 0
 	static tb_uint32_t table[32] = 
