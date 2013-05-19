@@ -3,11 +3,12 @@ include $(PRO_DIR)/prefix.mak
 
 # module name
 NAMES = \
-		atomic \
 		file \
+		path \
 		event \
 		epool \
 		utils \
+		atomic \
 		process \
 		directory 
 

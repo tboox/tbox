@@ -162,18 +162,12 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 
 	// parse proto
 	tb_char_t const* 	p = u;
-	tb_char_t 			data[4096] = {0};
+	tb_char_t 			full[TB_PATH_MAXN];
 	if (!tb_strnicmp(p, "http://", 7)) 
 	{
 		url->poto = TB_URL_PROTO_HTTP;
 		url->bssl = 0;
 		p += 7;
-	}
-	else if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
-	{
-		url->poto = TB_URL_PROTO_FILE;
-		url->bssl = 0;
-		if (*p != '/') p += 7;
 	}
 	else if (!tb_strnicmp(p, "sock://", 7))
 	{
@@ -193,41 +187,51 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 		url->bssl = 1;
 		p += 8;
 	}
-	else if (!tb_strnicmp(p, "files://", 8))
-	{
-		url->poto = TB_URL_PROTO_FILE;
-		url->bssl = 1;
-		p += 8;
-	}
 	else if (!tb_strnicmp(p, "socks://", 8))
 	{
 		url->poto = TB_URL_PROTO_SOCK;
 		url->bssl = 1;
 		p += 8;
 	}
-	else if (!tb_strnicmp(p, "rtsps://", 8))
+	else if (!tb_strstr(p, "://")) 
 	{
-		url->poto = TB_URL_PROTO_RTSP;
-		url->bssl = 1;
-		p += 8;
-	}
-	// for windows style path
-	else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
-	{
-		url->poto = TB_URL_PROTO_FILE;
-		url->bssl = 0;
-		url->bwin = 1;
-		url->pwin = *p;
-		// '\\' => '/'
+		// the full path
+		p = tb_path_full(u, full, TB_PATH_MAXN);
+		tb_assert_and_check_goto(p, fail);
+
+		// for unix style path
+		if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
 		{
-			tb_char_t* 			q = data;
-			tb_char_t* 			e = data + 4096;
-			for (p += 3; q < e && *p; q++, p++) *q = (*p != '\\')? *p : '/';
-			if (q < e) *q = '\0';
+			url->poto = TB_URL_PROTO_FILE;
+			url->bssl = 0;
+			if (*p != '/') p += 7;
 		}
-		p = data;
+		// for windows style path
+		else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
+		{
+			url->poto = TB_URL_PROTO_FILE;
+			url->bssl = 0;
+			url->bwin = 1;
+			url->pwin = *p;
+
+			// '\\' => '/'
+			{
+				tb_char_t* 			q = p + 3;
+				tb_char_t* 			e = p + TB_PATH_MAXN - 1;
+				for (; q < e && *q; q++) *q = (*q != '\\')? *q : '/';
+				*q = '\0';
+			}
+
+			// skip the drive prefix
+			p += 3;
+		}
+		else goto fail;
 	}
-	else goto fail;
+	else
+	{
+		tb_trace("[http]: unknown prefix for url: %s", p);
+		goto fail;
+	}
 
 	// end?
 	tb_assert_and_check_goto(*p, fail);

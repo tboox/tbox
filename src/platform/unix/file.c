@@ -26,11 +26,13 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../path.h"
 #include "../../stream/stream.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
 #endif
@@ -45,8 +47,9 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	// check
 	tb_assert_and_check_return_val(path, tb_null);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_null);
 
 	// flags
@@ -143,8 +146,9 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// exists?
@@ -183,12 +187,14 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 	// check
 	tb_assert_and_check_return_val(path && dest, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// dest => unix
-	dest = tb_path_to_unix(dest);
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// copy file
@@ -230,8 +236,9 @@ tb_bool_t tb_file_create(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// create it
@@ -249,8 +256,9 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// remove it
@@ -261,14 +269,17 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	// check
 	tb_assert_and_check_return_val(path && dest, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// dest => unix
-	dest = tb_path_to_unix(dest);
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// rename
 	return !rename(path, dest)? tb_true : tb_false;
 }
+

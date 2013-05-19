@@ -13,10 +13,10 @@ DTYPE = d
 SMALL = n
 
 # platform
-PLAT = android
+PLAT = linux
 
 # architecture
-ARCH = armv6
+ARCH = x64
 
 # demo
 DEMO = y
@@ -24,8 +24,8 @@ DEMO = y
 # toolchain
 SDK =
 NDK = /home/ruki/programs/android-ndk-r8
-BIN = /home/ruki/programs/android-ndk-r8/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
-PRE = /home/ruki/programs/android-ndk-r8/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/arm-linux-androideabi-
+BIN =
+PRE = i686-w64-mingw32-
 HOST = mac
 CCACHE = ccache
 DISTCC =

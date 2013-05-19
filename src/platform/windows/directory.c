@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../path.h"
 #include "../directory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -95,9 +96,9 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 	
-	// unix path => windows 
-	tb_char_t data[8192] = {0};
-	path = tb_path_to_windows(path, data, 8192);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// create it
@@ -108,9 +109,9 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 	
-	// unix path => windows 
-	tb_char_t data[8192] = {0};
-	path = tb_path_to_windows(path, data, 8192);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// walk remove
@@ -140,9 +141,9 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 	// check
 	tb_assert_and_check_return(path && func);
 	
-	// unix path => windows 
-	tb_char_t buff[4096] = {0};
-	path = tb_path_to_windows(path, buff, 4096);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return(path);
 
 	// last
@@ -191,14 +192,14 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-	// unix path => windows 
-	tb_char_t data0[4096] = {0};
-	path = tb_path_to_windows(path, data0, 4096);
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// unix dest => windows 
-	tb_char_t data1[4096] = {0};
-	dest = tb_path_to_windows(dest, data1, 4096);
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy

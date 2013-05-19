@@ -17,16 +17,35 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @path		path.h
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_GENERIC_PREFIX_H
-#define TB_PLATFROM_GENERIC_PREFIX_H
+#ifndef TB_PLATFORM_PATH_H
+#define TB_PLATFORM_PATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_PATH_MAXN 		(4096)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! the full path
+ * 
+ * @param path 			the path path
+ * @param full 			the full path
+ * @param maxn 			the path maxn
+ *
+ * @return 				the full path
+ */
+tb_char_t const* 		tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t maxn);
 
 #endif

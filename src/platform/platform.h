@@ -29,6 +29,7 @@
  */
 #include "prefix.h"
 #include "dns.h"
+#include "path.h"
 #include "file.h"
 #include "time.h"
 #include "utils.h"

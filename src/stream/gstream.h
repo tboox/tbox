@@ -267,7 +267,6 @@ tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
  *
  * <pre>
  * file://path or unix path: e.g. /root/xxxx/file
- * files://home/file
  * sock://host:port?tcp=
  * socks://host:port?udp=
  * http://host:port/path?arg0=&arg1=...
