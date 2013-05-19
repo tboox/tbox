@@ -383,22 +383,17 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_char_t const* 	p = url;
 	if (!tb_strnicmp(p, "http://", 7)) 
 		t = TB_GSTREAM_TYPE_HTTP;
-	else if ((*p == '/') || (!tb_strnicmp(p, "file://", 7))) 
-		t = TB_GSTREAM_TYPE_FILE;
 	else if (!tb_strnicmp(p, "sock://", 7))
 		t = TB_GSTREAM_TYPE_SOCK;
 	else if (!tb_strnicmp(p, "https://", 8))
 		t = TB_GSTREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "files://", 8))
-		t = TB_GSTREAM_TYPE_FILE;
 	else if (!tb_strnicmp(p, "socks://", 8))
 		t = TB_GSTREAM_TYPE_SOCK;
-	// for windows style path
-	else if (tb_isalpha(p[0]) && p[1] == ':' && (p[2] == '/' || p[2] == '\\'))
+	else if (!tb_strstr(p, "://")) 
 		t = TB_GSTREAM_TYPE_FILE;
 	else 
 	{
-		tb_trace("[gstream]: invalid url: %s", url);
+		tb_trace("[gstream]: unknown prefix for url: %s", url);
 		return tb_null;
 	}
 	tb_assert_and_check_goto(t && t < tb_arrayn(g_gstream_table), fail);

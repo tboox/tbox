@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../file.h"
+#include "../path.h"
 #include "../directory.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -111,8 +112,9 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// create it
@@ -120,8 +122,9 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
 {
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// walk remove
@@ -159,8 +162,9 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 	// check
 	tb_assert_and_check_return(path && func);
 
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full[TB_PATH_MAXN];
+	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return(path);
 
 	// last
@@ -210,12 +214,14 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-	// path => unix
-	path = tb_path_to_unix(path);
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// dest => unix
-	dest = tb_path_to_unix(dest);
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy

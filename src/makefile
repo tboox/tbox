@@ -87,6 +87,7 @@ tbox_C_FILES 			+= \
 						aio/aioo \
 						aio/aipp \
 						aio/aicp \
+						platform/path \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -287,6 +288,7 @@ INC_FILES 				= \
 						platform/atomic.h \
 						platform/dynamic.h \
 						platform/process.h \
+						platform/atomic.h \
 						platform/directory.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
@@ -300,8 +302,6 @@ INC_FILES 				= \
 						platform/arch/sh4/prefix.h \
 						platform/arch/sh4/atomic.h \
 						platform/windows/atomic.h \
-						platform/generic/prefix.h \
-						platform/generic/atomic.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \

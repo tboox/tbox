@@ -25,5 +25,5 @@
  * includes
  */
 #include "../prefix.h"
-#include "../../../../generic/aio/reactor/aicp/aipp.c"
+#include "../../../../aio/reactor/aicp/aipp.c"
 

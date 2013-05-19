@@ -81,6 +81,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	tb_url_test_set("C:/HOME/RUKI/FILE.TXT");
 	tb_url_test_set("d:/home/ruki/file.txt");
+	tb_url_test_set("d:\\home\\ruki\\file.txt");
+
+	tb_url_test_set("/home/ruki/file.txt");
+	tb_url_test_set("ruki/file.txt");
+	tb_url_test_set("./ruki/file.txt");
+	tb_url_test_set("../ruki/file.txt");
+	tb_url_test_set("../../ruki/file.txt");
+	tb_url_test_set("..\\..\\ruki\\file.txt");
+	tb_url_test_set("../../ruki/../file.txt");
 
 	tb_exit();
 	return 0;

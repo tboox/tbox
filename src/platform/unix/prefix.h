@@ -29,24 +29,4 @@
 #include "../prefix.h"
 #include "../../libc/libc.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * inlines
- */
-
-/* transform the path to the unix style
- *
- * /home/ruki/file.txt
- * file:///home/ruki/file.txt
- *
- * => /home/ruki/file.txt
- */
-static __tb_inline__ tb_char_t const* tb_path_to_unix(tb_char_t const* path)
-{
-	// check
-	tb_assert_and_check_return_val(path, tb_null);
-
-	// done
-	return (!tb_strnicmp(path, "file://", 7))? (path + 7) : path;
-}
-
 #endif
