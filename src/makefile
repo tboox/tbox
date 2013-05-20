@@ -277,6 +277,7 @@ INC_FILES 				= \
 						platform/prefix.h \
 						platform/dns.h \
 						platform/file.h \
+						platform/path.h \
 						platform/time.h \
 						platform/utils.h \
 						platform/mutex.h \
