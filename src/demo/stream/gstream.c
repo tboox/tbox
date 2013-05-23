@@ -16,7 +16,7 @@ static tb_handle_t tb_gstream_demo_sfunc_init(tb_handle_t gst)
 {
 	tb_print("[demo]: ssl: init: %p", gst);
 	tb_handle_t sock = tb_null;
-	if (gst && tb_gstream_type(gst)) 
+	if (gst && tb_gstream_type(gst) == TB_GSTREAM_TYPE_SOCK) 
 		tb_gstream_ctrl(gst, TB_SSTREAM_CMD_GET_HANDLE, &sock);
 	return sock;
 }

@@ -1095,6 +1095,7 @@ fail:
 }
 tb_void_t tb_dns_list_adds(tb_char_t const* host)
 {
+	// check
 	tb_assert_and_check_return(host);
 
 	// init item
@@ -1236,6 +1237,7 @@ tb_void_t tb_dns_list_exit()
 #ifdef __tb_debug__
 tb_void_t tb_dns_list_dump()
 {	
+	// check
 	tb_assert_and_check_return(g_dns_list);
 
 	// enter
