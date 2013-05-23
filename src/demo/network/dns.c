@@ -72,6 +72,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+	// init dns
+	tb_dns_list_init();
+
 	// test the invalid host
 #if TB_DNS_TEST_INVALID_HOST
 	// add not dns host
