@@ -1,12 +1,12 @@
 # main makefile
 
-# #####################################################
+# ######################################################################################
 # includes
 # #
 ${shell if [ ! -f "config.mak" ]; then touch config.mak; fi }
 include config.mak
 
-# #####################################################
+# ######################################################################################
 # make shortcut
 # #
 a : all
@@ -20,11 +20,12 @@ o : output
 e : error
 w : warning
 d : doc
+h : help
 
-# #####################################################
+# ######################################################################################
 # make projects
 # #
-ifeq ($(IS_CONFIG), yes)
+ifeq ($(IS_CONFIG), y)
 
 # include prefix
 include prefix.mak
@@ -108,19 +109,32 @@ warning : .null
 doc : .null
 	doxygen ./doc/doxygen/doxygen.conf
 
-.null :
-
 else
 
-# #####################################################
+# ######################################################################################
 # no-config
 # #
-all :
-	@echo "please make config..."
+all : 		help
+rebuild : 	help
+install : 	help
+prefix : 	help
+lipo : 		help
+clean : 	help
+update : 	help
+output : 	help
+error : 	help
+warning : 	help
+doc : 		help
 
 endif
 
-# #####################################################
+# ######################################################################################
+# null
+# #
+
+.null :
+
+# ######################################################################################
 # config
 # #
 
@@ -179,13 +193,22 @@ else
 DISTCC 		:= 
 endif
 
-config :
-	# generate config.h
-	-cp ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
+config : .null
+	-@$(CP) ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
+	@echo "config: ==================================================================="
+	@echo "config: name: \t" 							$(PRO_NAME)
+	@echo "config: plat: \t" 							$(PLAT)
+	@echo "config: arch: \t" 							$(ARCH)
+	@echo "config: demo: \t" 							$(DEMO)
+	@echo "config: debug: \t" 							$(DEBUG)
+	@echo "config: bin: \t" 							$(BIN)
+	@echo "config: pre: \t" 							$(PRE)
+	@echo "config: sdk: \t" 							$(SDK)
+	@echo "config: ndk: \t" 							$(NDK)
+	@echo "config: ==================================================================="
 
-	# generate config.mak
 	@echo "# config"                      				> config.mak
-	@echo "IS_CONFIG = yes" 							>> config.mak
+	@echo "IS_CONFIG = y" 								>> config.mak
 	@echo ""                              				>> config.mak
 	@echo "# project"              						>> config.mak
 	@echo "PRO_DIR =" $(PRO_DIR) 						>> config.mak
@@ -233,4 +256,27 @@ config :
 	@echo "export CCACHE" 			 					>> config.mak
 	@echo "export DISTCC" 			 					>> config.mak
 
+# ######################################################################################
+# help
+# #
+
+# make help
+help : .null
+	@echo "help: ==================================================================="
+	@echo "help: make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=]"
+	@echo "help: make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]"
+	@echo "help: make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [NDK=..] [SDK=..]"
+	@echo "help: make lipo ARCH1=armv6 ARCH2=armv7 DEBUG=[y|n] SDK=[5.0|5.1|6.0|..]"
+	@echo "help: make [all]"
+	@echo "help: make doc|d"
+	@echo "help: make help|h"
+	@echo "help: make clean|c"
+	@echo "help: make error|e"
+	@echo "help: make update|u"
+	@echo "help: make output|o"
+	@echo "help: make prefix|p"
+	@echo "help: make rebuild|r"
+	@echo "help: make install|i"
+	@echo "help: make warning|w"
+	@echo "help: ==================================================================="
 
