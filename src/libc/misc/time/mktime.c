@@ -47,7 +47,7 @@ tb_time_t tb_mktime(tb_tm_t const* tm)
 	t.tm_hour = tm->hour;
 	t.tm_mday = tm->mday;
 	t.tm_mon = tm->month - 1;
-	t.tm_year = tm->year - 1900;
+	t.tm_year = tm->year > 1900? tm->year - 1900 : tm->year;
 	t.tm_wday = tm->week;
 	t.tm_yday = tm->yday;
 	t.tm_isdst = tm->isdst;

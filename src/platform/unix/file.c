@@ -282,4 +282,21 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	// rename
 	return !rename(path, dest)? tb_true : tb_false;
 }
+tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
+{
+	// check
+	tb_assert_and_check_return_val(path && dest, tb_false);
 
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// symlink
+	return !symlink(path, dest)? tb_true : tb_false;
+}
