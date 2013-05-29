@@ -51,7 +51,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #elif 0
 	tb_directory_remove(argv[1]);
 #else
-	tb_directory_copy(argv[1], argv[2]);
+	tb_file_link(argv[1], argv[2]);
 #endif
 
 	// exit

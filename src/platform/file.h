@@ -209,4 +209,13 @@ tb_bool_t 				tb_file_rename(tb_char_t const* path, tb_char_t const* dest);
  */
 tb_char_t const* 		tb_file_full(tb_char_t const* path, tb_char_t* full, tb_size_t maxn);
 
+/*! link the file
+ * 
+ * @param path 			the source file path
+ * @param dest 			the destination file path
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_file_link(tb_char_t const* path, tb_char_t const* dest);
+
 #endif

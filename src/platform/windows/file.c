@@ -249,4 +249,30 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	// rename it
 	return MoveFileEx(path, dest, MOVEFILE_REPLACE_EXISTING);
 }
+tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
+{
+#if 0
+	// check
+	tb_assert_and_check_return_val(path && dest, tb_false);
 
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
+	tb_assert_and_check_return_val(path, tb_false);
+
+	// the dest path
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+	tb_assert_and_check_return_val(dest, tb_false);
+
+	// not exists?
+	tb_file_info_t info = {0};
+	if (!tb_file_info(path, &info)) return tb_false;
+
+	// symlink, supported: >= vista
+	return !CreateSymbolicLinkA(dest, path, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
+#else
+	tb_trace_noimpl();
+	return tb_false;
+#endif
+}
