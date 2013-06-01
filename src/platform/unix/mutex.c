@@ -33,7 +33,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_handle_t tb_mutex_init(tb_char_t const* name)
 {
 	pthread_mutex_t* pmutex = malloc(sizeof(pthread_mutex_t));
