@@ -124,7 +124,7 @@ typedef struct __tb_http_option_t
 	tb_url_t 			url;
 
 	// the post data
-	tb_pstring_t 		post;
+	tb_pbuffer_t 		post;
 
 	// the head hash
 	tb_hash_t* 			head;
