@@ -109,13 +109,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	option->method = TB_HTTP_METHOD_POST;
 
 	// init post
-	tb_pbuffer_memncpy(&option->post, "city=shanghai", tb_strlen("city=shanghai\r\n"));
+	option->post = tb_strlen(argv[2]);
 
 	// open http
 	tb_hong_t t = tb_mclock();
 	if (!tb_http_bopen(http)) goto end;
 	t = tb_mclock() - t;
 	tb_print("[demo]: open: %llu ms", t);
+
+	// writ post
+	tb_http_bwrit(http, argv[2], option->post);
 
 	// read data
 	tb_byte_t 		data[8192];
