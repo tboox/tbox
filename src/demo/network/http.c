@@ -105,6 +105,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init head func
 	option->hfunc = tb_http_demo_hfunc;
 
+	// init method
+	option->method = TB_HTTP_METHOD_POST;
+
+	// init post
+	tb_pbuffer_memncpy(&option->post, "city=shanghai", tb_strlen("city=shanghai\r\n"));
+
 	// open http
 	tb_hong_t t = tb_mclock();
 	if (!tb_http_bopen(http)) goto end;
@@ -114,18 +120,32 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
-	tb_hize_t 	size = status->content_size;
+	tb_hize_t 		size = status->content_size;
 	do
 	{
 		// read data
-		tb_long_t n = tb_http_aread(http, data, 8192);
-		tb_print("[demo]: read: %d", n);
-		if (n > 0)
+		tb_long_t real = tb_http_aread(http, data, 8192);
+		tb_print("[demo]: read: %d", real);
+		if (real > 0)
 		{
-			// update read
-			read += n;
+			// dump data
+			tb_char_t const* 	p = data;
+			tb_char_t const* 	e = data + real;
+			tb_char_t 			b[8192 + 1];
+			while (p < e && *p)
+			{
+				tb_char_t* 			q = b;
+				tb_char_t const* 	d = b + 4096;
+				for (; q < d && p < e && *p; p++, q++) *q = *p;
+				*q = '\0';
+				tb_printf("%s", b);
+			}
+			tb_printf("\n");
+
+			// save read
+			read += real;
 		}
-		else if (!n) 
+		else if (!real) 
 		{
 			// wait
 			tb_print("[demo]: wait");

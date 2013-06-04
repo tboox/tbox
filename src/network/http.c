@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"http"
+#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -129,7 +129,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	if (!tb_url_init(&http->option.url)) return tb_false;
 
 	// init post
-	if (!tb_pstring_init(&http->option.post)) return tb_false;
+	if (!tb_pbuffer_init(&http->option.post)) return tb_false;
 
 	// init head
 	http->option.head = tb_hash_init(8, tb_item_func_str(tb_false, http->spool), tb_item_func_str(tb_false, http->spool));
@@ -145,7 +145,7 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 	http->option.head = tb_null;
 
 	// exit post
-	tb_pstring_exit(&http->option.post);
+	tb_pbuffer_exit(&http->option.post);
 
 	// exit url
 	tb_url_exit(&http->option.url);
@@ -357,7 +357,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
-			tb_size_t size = tb_pstring_size(&http->option.post);
+			tb_size_t size = tb_pbuffer_size(&http->option.post);
 			tb_assert_and_check_return_val(size, -1);
 			
 			tb_sstring_cstrfcpy(&s, "%u", size);
@@ -412,31 +412,67 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		tb_trace_impl("request:\n%s", tb_pstring_cstr(&http->data));
 	}
 
-	// data && size
-	tb_char_t const* 	data = tb_pstring_cstr(&http->data);
-	tb_size_t 			size = tb_pstring_size(&http->data);
+	// the head data && size
+	tb_char_t const* 	head_data = tb_pstring_cstr(&http->data);
+	tb_size_t 			head_size = tb_pstring_size(&http->data);
+	tb_assert_and_check_return_val(head_data && head_size, -1);
+	
+	// the post data & size
+	tb_byte_t const* 	post_data = tb_pbuffer_data(&http->option.post);
+	tb_size_t 			post_size = tb_pbuffer_size(&http->option.post);
 
-	// check
-	tb_assert_and_check_return_val(data && size && http->size < size, -1);
-
-	// need wait if no data
-	http->step &= ~TB_HTTP_STEP_NEVT;
-
-	// send request
-	tb_trace_impl("request: try");
-	while (http->size < size)
+	// send head
+	if (http->size < head_size)
 	{
-		// writ data
-		tb_long_t n = tb_gstream_awrit(http->stream, data + http->size, size - http->size);
-		tb_assert_and_check_return_val(n >= 0, -1);
+		// need wait if no data
+		http->step &= ~TB_HTTP_STEP_NEVT;
 
-		// no data? 
-		tb_check_return_val(n, 0);
+		// send head
+		tb_trace_impl("request: send: head: %lu <? %lu", http->size, head_size);
+		while (http->size < head_size)
+		{
+			// writ data
+			tb_long_t real = tb_gstream_awrit(http->stream, head_data + http->size, head_size - http->size);
+			tb_assert_and_check_return_val(real >= 0, -1);
 
-		// update size
-		http->size += n;
+			// no data? 
+			tb_check_return_val(real, 0);
+
+			// update size
+			http->size += real;
+		}
+
+		// check
+		tb_assert_and_check_return_val(http->size == head_size, -1);
 	}
-	tb_assert_and_check_return_val(http->size == size, -1);
+
+	// send post
+	if (http->option.method == TB_HTTP_METHOD_POST && http->size < head_size + post_size)
+	{
+		// check
+		tb_assert_and_check_return_val(post_data, -1);
+
+		// need wait if no data
+		http->step &= ~TB_HTTP_STEP_NEVT;
+
+		// send head
+		tb_trace_impl("request: send: post: %lu <? %lu", http->size, head_size + post_size);
+		while (http->size < head_size + post_size)
+		{
+			// writ data
+			tb_size_t writ = http->size - head_size;
+			tb_long_t real = tb_gstream_awrit(http->stream, post_data + writ, post_size - writ);
+			tb_assert_and_check_return_val(real >= 0, -1);
+
+			// no data? 
+			tb_check_return_val(real, 0);
+
+			// update size
+			http->size += real;
+		}
+		tb_assert_and_check_return_val(http->size == head_size + post_size, -1);
+	}
+	tb_print("%lu %lu", head_size, post_size);
 
 	// need wait if no data
 	http->step &= ~TB_HTTP_STEP_NEVT;
