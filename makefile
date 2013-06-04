@@ -34,7 +34,7 @@ include prefix.mak
 all : .null
 	@echo "" > /tmp/$(PRO_NAME).out
 	@echo make $(PRO_NAME)
-	@$(MAKE) --no-print-directory -C $(SRC_DIR)
+	@$(MAKE) --no-print-directory -C $(SRC_DIR) 
 
 # make rebuild
 rebuild : .null
@@ -98,7 +98,7 @@ output : .null
 # make error
 error : .null
 	@echo error $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|cannot|错误"
+	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|cannot|错误" | cat
 
 # make warning
 warning : .null

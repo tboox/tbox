@@ -123,8 +123,8 @@ typedef struct __tb_http_option_t
 	// the url
 	tb_url_t 			url;
 
-	// the post data
-	tb_pbuffer_t 		post;
+	// the post size
+	tb_hize_t 			post;
 
 	// the head hash
 	tb_hash_t* 			head;
@@ -163,6 +163,9 @@ typedef struct __tb_http_status_t
 
 	// is chunked?
 	tb_uint16_t 		bchunked	: 1;
+
+	// the post size
+	tb_hize_t 			post_size;
 
 	// the document size
 	tb_hize_t 			document_size;

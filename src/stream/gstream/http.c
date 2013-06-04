@@ -83,8 +83,20 @@ static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
-	// recv data
+	// read data
 	return tb_http_aread(hst->http, data, size);
+}
+static tb_long_t tb_hstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+{
+	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_assert_and_check_return_val(hst && hst->http, -1);
+
+	// check
+	tb_check_return_val(data, -1);
+	tb_check_return_val(size, 0);
+
+	// writ data
+	return tb_http_awrit(hst->http, data, size);
 }
 static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 {
@@ -385,6 +397,7 @@ tb_gstream_t* tb_gstream_init_http()
 	gst->aopen 	= tb_hstream_aopen;
 	gst->aclose = tb_hstream_aclose;
 	gst->aread 	= tb_hstream_aread;
+	gst->awrit 	= tb_hstream_awrit;
 	gst->aseek 	= tb_hstream_aseek;
 	gst->size 	= tb_hstream_size;
 	gst->wait 	= tb_hstream_wait;

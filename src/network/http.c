@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"http"
+//#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -62,6 +62,7 @@ typedef enum __tb_http_state_t
 ,	TB_HTTP_STEP_RESP 	= 4
 ,	TB_HTTP_STEP_SEEK 	= 8
 ,	TB_HTTP_STEP_NEVT 	= 16
+,	TB_HTTP_STEP_POST 	= 32
 
 }tb_http_state_t;
 
@@ -124,12 +125,10 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	http->option.rdtm 		= TB_HTTP_MRDT_DEFAULT;
 	http->option.timeout 	= TB_HTTP_TIMEOUT_DEFAULT;
 	http->option.version 	= TB_HTTP_VERSION_11;
+	http->option.post 		= 0;
 
 	// init url
 	if (!tb_url_init(&http->option.url)) return tb_false;
-
-	// init post
-	if (!tb_pbuffer_init(&http->option.post)) return tb_false;
 
 	// init head
 	http->option.head = tb_hash_init(8, tb_item_func_str(tb_false, http->spool), tb_item_func_str(tb_false, http->spool));
@@ -143,9 +142,6 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 	// exit head
 	if (http->option.head) tb_hash_exit(http->option.head);
 	http->option.head = tb_null;
-
-	// exit post
-	tb_pbuffer_exit(&http->option.post);
 
 	// exit url
 	tb_url_exit(&http->option.url);
@@ -167,6 +163,7 @@ static tb_void_t tb_http_status_clear(tb_http_t* http)
 	http->status.code = 0;
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
+	http->status.post_size = 0;
 	tb_pstring_clear(&http->status.content_type);
 	tb_pstring_clear(&http->status.location);
 
@@ -357,10 +354,8 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
-			tb_size_t size = tb_pbuffer_size(&http->option.post);
-			tb_assert_and_check_return_val(size, -1);
-			
-			tb_sstring_cstrfcpy(&s, "%u", size);
+			// append post size
+			tb_sstring_cstrfcpy(&s, "%llu", http->option.post);
 			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&s));
 		}
 
@@ -417,10 +412,6 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	tb_size_t 			head_size = tb_pstring_size(&http->data);
 	tb_assert_and_check_return_val(head_data && head_size, -1);
 	
-	// the post data & size
-	tb_byte_t const* 	post_data = tb_pbuffer_data(&http->option.post);
-	tb_size_t 			post_size = tb_pbuffer_size(&http->option.post);
-
 	// send head
 	if (http->size < head_size)
 	{
@@ -446,34 +437,6 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		tb_assert_and_check_return_val(http->size == head_size, -1);
 	}
 
-	// send post
-	if (http->option.method == TB_HTTP_METHOD_POST && http->size < head_size + post_size)
-	{
-		// check
-		tb_assert_and_check_return_val(post_data, -1);
-
-		// need wait if no data
-		http->step &= ~TB_HTTP_STEP_NEVT;
-
-		// send head
-		tb_trace_impl("request: send: post: %lu <? %lu", http->size, head_size + post_size);
-		while (http->size < head_size + post_size)
-		{
-			// writ data
-			tb_size_t writ = http->size - head_size;
-			tb_long_t real = tb_gstream_awrit(http->stream, post_data + writ, post_size - writ);
-			tb_assert_and_check_return_val(real >= 0, -1);
-
-			// no data? 
-			tb_check_return_val(real, 0);
-
-			// update size
-			http->size += real;
-		}
-		tb_assert_and_check_return_val(http->size == head_size + post_size, -1);
-	}
-	tb_print("%lu %lu", head_size, post_size);
-
 	// need wait if no data
 	http->step &= ~TB_HTTP_STEP_NEVT;
 
@@ -490,6 +453,13 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	// reset data
 	http->size = 0;
 	tb_pstring_clear(&http->data);
+
+	// send post
+	if (http->option.method == TB_HTTP_METHOD_POST)
+	{	
+		http->step &= ~TB_HTTP_STEP_NEVT;
+		http->step |= TB_HTTP_STEP_POST;
+	}
 
 	// ok
 	tb_trace_impl("request: ok");
@@ -892,13 +862,17 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	r = tb_http_request(http);
 	tb_check_return_val(r > 0, r);
 		
-	// response
-	r = tb_http_response(http);
-	tb_check_return_val(r > 0, r);
+	// no post? wait response
+	if (!(http->step & TB_HTTP_STEP_POST))
+	{
+		// response
+		r = tb_http_response(http);
+		tb_check_return_val(r > 0, r);
 
-	// redirect
-	r = tb_http_redirect(http);
-	tb_check_return_val(r > 0, r);
+		// redirect
+		r = tb_http_redirect(http);
+		tb_check_return_val(r > 0, r);
+	}
 
 	// ok
 	return r;
@@ -1050,15 +1024,52 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream, -1);
+	tb_assert_and_check_return_val(http && http->stream && (http->step & TB_HTTP_STEP_POST), -1);
 
-	// writ
-	return http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
+	// writ the post data
+	tb_hong_t ok = http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
+	tb_check_return_val(ok >= 0, -1);
+
+	// save the post size
+	if (ok > 0) http->status.post_size += ok;
+
+	// finish post? flush it
+	if (http->status.post_size >= http->option.post)
+	{
+		// flush writed data
+		ok = tb_gstream_afwrit(http->stream, tb_null, 0);
+
+		// continue it if has data
+		tb_check_return_val(ok < 0, 0);
+	}
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
+
+	// has post? 
+	if (http->step & TB_HTTP_STEP_POST)
+	{
+		// finish post? read response
+		tb_assert_and_check_return_val(http->status.post_size >= http->option.post, -1);
+
+		// response
+		tb_long_t ok = tb_http_response(http);
+		tb_check_return_val(ok > 0, ok);
+
+		// redirect
+		ok = tb_http_redirect(http);
+		tb_assert_and_check_return_val(ok != 0, -1); // FIXME: post redirect is not supported
+		tb_check_return_val(ok > 0, ok);
+
+		// reset status
+		http->status.post_size = 0;
+		http->step &= ~TB_HTTP_STEP_POST;
+	}
 
 	// read
 	return http->status.bchunked? tb_http_chunked_aread(http, data, size) : tb_gstream_aread(http->stream, data, size);
@@ -1148,7 +1159,7 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return(http);
 
-	tb_trace("[http]: =============================================");
+	tb_trace("[http]: ======================================================================");
 	tb_trace("[http]: option: ");
 	tb_trace("[http]: option: url: %s", tb_url_get(&http->option.url));
 	tb_trace("[http]: option: version: HTTP/1.%1u", http->option.version);
@@ -1163,7 +1174,7 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	tb_assert_and_check_return(handle);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_trace("[http]: =============================================");
+	tb_trace("[http]: ======================================================================");
 	tb_trace("[http]: status: ");
 	tb_trace("[http]: status: code: %d", http->status.code);
 	tb_trace("[http]: status: version: HTTP/1.%1u", http->status.version);

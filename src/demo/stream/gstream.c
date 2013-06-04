@@ -60,10 +60,20 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// ctrl
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
-		// init hfunc
+		// init option
 		tb_http_option_t* option = tb_null;
 		tb_gstream_ctrl(ist, TB_HSTREAM_CMD_GET_OPTION, &option);
-		if (option) option->hfunc = tb_gstream_demo_hfunc;
+		if (option)
+		{
+			// init hfunc
+			option->hfunc = tb_gstream_demo_hfunc;
+
+			// init method
+			option->method = TB_HTTP_METHOD_POST;
+
+			// init post
+			option->post = tb_strlen(argv[3]);
+		}
 
 		// init sfunc
 		tb_gstream_ctrl(ist, TB_GSTREAM_CMD_SET_SFUNC, &sfunc);
@@ -79,6 +89,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hong_t otime = tb_mclock();
 	if (!tb_gstream_bopen(ost)) goto end;
 	otime = tb_mclock() - otime;
+
+	// writ post
+	tb_gstream_bwrit(ist, argv[3], tb_strlen(argv[3]));
+	tb_gstream_bfwrit(ist, tb_null, 0);
 
 #if 0
 	// save stream
