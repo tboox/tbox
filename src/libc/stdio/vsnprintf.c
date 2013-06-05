@@ -1002,17 +1002,19 @@ get_qualifier:
  */
 tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)
 {
-	if ((tb_int_t)n < 0 || !s || !fmt) return 0;
+	if (!n || !s || !fmt) return 0;
 
 	tb_char_t* pb = s;
 	tb_char_t* pe = s + n;
 
+#if 0
 	// pe must be larger than pb
 	if (pe < pb) 
 	{
 		pe = ((tb_char_t*)-1);
 		n = (tb_size_t)(pe - pb);
 	}
+#endif
 
 	// parse format
 	tb_printf_entry_t e = {0};
@@ -1144,15 +1146,6 @@ tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_li
 			break;
 		}
 	}
-
-#if 0
-	// != 0, the string is null-truncated
-	if (n > 0) 
-	{
-		if (pb < pe) *pb = '\0';
-		else pe[-1] = '\0';
-	}
-#endif
 
 	// the trailing null byte doesn't count towards the total
 	return (pb - s);

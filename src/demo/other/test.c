@@ -30,6 +30,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	test_mm_main(argc, argv);
 #endif
 
+	tb_char_t data[100] = {0};
+	tb_sprintf(data, "%s", "sssss");
+	tb_print("%s", data);
+
 	// exit
 	tb_exit();
 	return 0;
