@@ -117,8 +117,35 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 	path = tb_path_full(path, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// create it
-	return !mkdir(path, S_IRWXU)? tb_true : tb_false;
+	// make it
+	tb_bool_t ok = !mkdir(path, S_IRWXU)? tb_true : tb_false;
+	if (!ok)
+	{
+		// make directory
+		tb_char_t 			temp[TB_PATH_MAXN] = {0};
+		tb_char_t const* 	p = full;
+		tb_char_t* 			t = temp;
+		tb_char_t const* 	e = temp + TB_PATH_MAXN - 1;
+		for (; t < e && *p; t++) 
+		{
+			*t = *p;
+			if (*p == '/')
+			{
+				// make directory if not exists
+				if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU);
+
+				// skip repeat '/'
+				while (*p && *p == '/') p++;
+			}
+			else p++;
+		}
+
+		// make it again
+		ok = !mkdir(path, S_IRWXU)? tb_true : tb_false;
+	}
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_directory_remove(tb_char_t const* path)
 {

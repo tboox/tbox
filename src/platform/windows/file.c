@@ -64,6 +64,30 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
 	// init file
 	HANDLE file = CreateFileA(path, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+	if (file == INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_CREAT))
+	{
+		// make directory
+		tb_char_t 			temp[TB_PATH_MAXN] = {0};
+		tb_char_t const* 	p = full;
+		tb_char_t* 			t = temp;
+		tb_char_t const* 	e = temp + TB_PATH_MAXN - 1;
+		for (; t < e && *p; t++) 
+		{
+			*t = *p;
+			if (*p == '\\' || *p == '/')
+			{
+				// make directory if not exists
+				if (!tb_file_info(temp, tb_null)) CreateDirectoryA(temp, tb_null);
+
+				// skip repeat '\\' or '/'
+				while (*p && (*p == '\\' || *p == '/')) p++;
+			}
+			else p++;
+		}
+
+		// init it again
+		file = CreateFileA(path, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+	}
 
 	// append?
 	if (file != INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_APPEND))
@@ -202,21 +226,13 @@ tb_bool_t tb_file_create(tb_char_t const* path)
 {
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
-	
-	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
 
-	// create it
-	HANDLE file = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_WRITE, tb_null, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, tb_null);
-	tb_assert_and_check_return_val(file != INVALID_HANDLE_VALUE, tb_false);
+	// make it
+	tb_handle_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
+	if (file) tb_file_exit(file);
 
-	// close it
-	CloseHandle(file);
-
-	// ok
-	return tb_true;
+	// ok?
+	return file? tb_true : tb_false;
 }
 tb_bool_t tb_file_remove(tb_char_t const* path)
 {

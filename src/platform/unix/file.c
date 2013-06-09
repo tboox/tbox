@@ -76,6 +76,30 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 
 	// open it
 	tb_long_t fd = open(path, flags, modes);
+	if (fd < 0 && (mode & TB_FILE_MODE_CREAT))
+	{
+		// make directory
+		tb_char_t 			temp[TB_PATH_MAXN] = {0};
+		tb_char_t const* 	p = full;
+		tb_char_t* 			t = temp;
+		tb_char_t const* 	e = temp + TB_PATH_MAXN - 1;
+		for (; t < e && *p; t++) 
+		{
+			*t = *p;
+			if (*p == '/')
+			{
+				// make directory if not exists
+				if (!tb_file_info(temp, tb_null)) mkdir(temp, S_IRWXU);
+
+				// skip repeat '/'
+				while (*p && *p == '/') p++;
+			}
+			else p++;
+		}
+
+		// open it again
+		fd = open(path, flags, modes);
+	}
 
 	// ok?
 	return (fd < 0)? tb_null : ((tb_handle_t)(fd + 1));
@@ -236,20 +260,12 @@ tb_bool_t tb_file_create(tb_char_t const* path)
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
 
-	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	// make it
+	tb_handle_t file = tb_file_init(path, TB_FILE_MODE_CREAT | TB_FILE_MODE_WO | TB_FILE_MODE_TRUNC);
+	if (file) tb_file_exit(file);
 
-	// create it
-	tb_long_t fd = open(path, O_CREAT | O_TRUNC, 0777);
-	tb_assert_and_check_return_val(fd >= 0, tb_false);
-
-	// close it
-	close(fd);
-
-	// ok
-	return tb_true;
+	// ok?
+	return file? tb_true : tb_false;
 }
 tb_bool_t tb_file_remove(tb_char_t const* path)
 {
