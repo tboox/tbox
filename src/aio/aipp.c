@@ -168,7 +168,7 @@ tb_void_t tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype)
 	// check
 	tb_assert_and_check_return(aipp && aipp->rtor && aipp->rtor->seto);
 	tb_assert_and_check_return(aipp->hash && tb_hash_size(aipp->hash));
-	tb_assert_and_check_return(handle && etype);
+	tb_assert_and_check_return(handle);
 
 	// get object from hash
 	tb_aioo_t* o = tb_hash_get(aipp->hash, handle);
