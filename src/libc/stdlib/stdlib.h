@@ -49,15 +49,15 @@
 #define tb_sbtoi64(s, b) 			((tb_int64_t)tb_sbtou64(s, b))
 
 // c porting
-#define tb_atoi(s) 					(tb_stoi32(s))
-#define tb_atoll(s) 				(tb_stoi64(s))
-#define tb_atof(s) 					tb_stof(s)
+#define tb_atoi(s) 					tb_s10toi32(s)
+#define tb_atoll(s) 				tb_s10toi64(s)
+#define tb_atof(s) 					tb_s10tof(s)
 
-#define tb_strtod(s, e) 			tb_stof(s)
-#define tb_strtold(s, e) 			tb_stof(s)
+#define tb_strtod(s, e) 			tb_s10tof(s)
+#define tb_strtold(s, e) 			tb_s10tof(s)
 
-#define tb_strtol(s, e, b) 			(tb_sbtoi32(s, b))
-#define tb_strtoll(s, e, b) 		(tb_sbtoi64(s, b))
+#define tb_strtol(s, e, b) 			tb_sbtoi32(s, b)
+#define tb_strtoll(s, e, b) 		tb_sbtoi64(s, b)
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
