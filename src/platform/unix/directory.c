@@ -252,7 +252,7 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy
-	tb_cpointer_t data[2] = {0};
+	tb_cpointer_t data[3] = {0};
 	data[0] = (tb_cpointer_t)dest;
 	data[1] = (tb_cpointer_t)tb_strlen(path);
 	data[2] = (tb_cpointer_t)1;

@@ -51,7 +51,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 #elif 0
 	tb_directory_remove(argv[1]);
 #else
-	tb_directory_create(argv[1]);
+//	tb_directory_walk(argv[1], tb_true, tb_true, tb_directory_walk_func, tb_null);
+	tb_directory_copy(argv[1], argv[2]);
 #endif
 
 	// exit
