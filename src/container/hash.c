@@ -265,7 +265,6 @@ static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
 	// check
