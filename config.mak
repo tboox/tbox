@@ -19,7 +19,7 @@ PLAT = linux
 ARCH = x64
 
 # demo
-DEMO = y
+DEMO = n
 
 # toolchain
 SDK =

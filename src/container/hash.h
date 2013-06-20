@@ -39,9 +39,9 @@
 #define TB_HASH_SIZE_LARGE 					(65536)
 
 #ifdef __tb_small__
-# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_SMALL
+# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_MICRO
 #else
-# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_LARGE
+# 	define TB_HASH_SIZE_DEFAULT 			TB_HASH_SIZE_SMALL
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
