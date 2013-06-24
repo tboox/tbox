@@ -6,8 +6,8 @@ PRO_DIR = /home/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
-DTYPE = d
+DEBUG = n
+DTYPE = r
 
 # small
 SMALL = y
@@ -25,7 +25,7 @@ DEMO = n
 SDK =
 NDK = /home/ruki/programs/android-ndk-r8e
 BIN =
-PRE = i686-w64-mingw32-
+PRE = /home/ruki/programs/android-ndk-r8e/toolchains/arm-linux-androideabi-4.7/prebuilt/linux-x86_64/bin/arm-linux-androideabi-
 HOST = mac
 CCACHE = ccache
 DISTCC =

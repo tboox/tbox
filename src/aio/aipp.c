@@ -168,7 +168,7 @@ tb_void_t tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype)
 	// check
 	tb_assert_and_check_return(aipp && aipp->rtor && aipp->rtor->seto);
 	tb_assert_and_check_return(aipp->hash && tb_hash_size(aipp->hash));
-	tb_assert_and_check_return(handle);
+	tb_assert_and_check_return(handle && etype);
 
 	// get object from hash
 	tb_aioo_t* o = tb_hash_get(aipp->hash, handle);
@@ -242,6 +242,17 @@ tb_void_t tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata)
 
 	// update the object data
 	o->odata = odata;
+}
+tb_pointer_t tb_aipp_getp(tb_aipp_t* aipp, tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(aipp && aipp->hash && tb_hash_size(aipp->hash) && handle, tb_null);
+
+	// get object from hash
+	tb_aioo_t* o = tb_hash_get(aipp->hash, handle);
+	
+	// the object data
+	return o? o->odata : tb_null;
 }
 tb_long_t tb_aipp_wait(tb_aipp_t* aipp, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout)
 {	
