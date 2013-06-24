@@ -732,6 +732,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 {
 	// check data
+	tb_assert_and_check_abort(gst && data);
 	tb_assert_and_check_return_val(gst && data, tb_false);
 	tb_check_return_val(size, tb_true);
 

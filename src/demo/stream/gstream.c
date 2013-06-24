@@ -91,8 +91,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	otime = tb_mclock() - otime;
 
 	// writ post
-	tb_gstream_bwrit(ist, argv[3], tb_strlen(argv[3]));
-	tb_gstream_bfwrit(ist, tb_null, 0);
+//	tb_gstream_bwrit(ist, argv[3], tb_strlen(argv[3]));
+//	tb_gstream_bfwrit(ist, tb_null, 0);
 
 #if 0
 	// save stream

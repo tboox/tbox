@@ -181,6 +181,15 @@ tb_void_t 			tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
  */
 tb_void_t 			tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata);
 
+/*! get the aio odata
+ *
+ * @param 	aipp 	the aio pool
+ * @param 	handle 	the handle of the aio object
+ *
+ * @return 			the object data
+ */
+tb_pointer_t 		tb_aipp_getp(tb_aipp_t* aipp, tb_handle_t handle);
+
 /*! wait the aio objects in the pool
  *
  * blocking wait the multiple event objects
