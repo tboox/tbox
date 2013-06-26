@@ -50,7 +50,7 @@
 
 #ifdef TB_ASSERT_ENABLE
 # 	define tb_assert_tag(tag, x)							do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); } } while(0)
-# 	define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); __tb_volatile__ tb_int_t* p = 0; *p = 0; } } while(0)
+# 	define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); *((__tb_volatile__ tb_int_t*)0) = 0; } } while(0)
 # 	define tb_assert_return_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return ; } } while(0)
 # 	define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
 # 	define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
