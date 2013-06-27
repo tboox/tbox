@@ -304,6 +304,9 @@ tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t d
 {
 	tb_assert_and_check_return(vector && vector->data && itor <= vector->size);
 
+	// free item
+	vector->func.free(&vector->func, vector->data + itor * vector->func.size);
+
 	// copy data
 	vector->func.copy(&vector->func, vector->data + itor * vector->func.size, data);
 }
@@ -323,6 +326,9 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t 
 
 	// strip size
 	if (itor + size > vector->size) size = vector->size - itor;
+
+	// free data
+	vector->func.nfree(&vector->func, vector->data + itor * vector->func.size, size);
 
 	// copy data
 	vector->func.ncopy(&vector->func, vector->data + itor * vector->func.size, data, size);
@@ -347,7 +353,7 @@ tb_void_t tb_vector_remove(tb_vector_t* vector, tb_size_t itor)
 
 		// move data if itor is not last
 		if (itor < vector->size - 1) tb_memmov(vector->data + itor * vector->func.size, vector->data + (itor + 1) * vector->func.size, (vector->size - itor - 1) * vector->func.size);
-		
+
 		// resize
 		vector->size--;
 	}

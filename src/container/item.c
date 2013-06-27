@@ -266,17 +266,8 @@ static tb_void_t tb_item_func_str_copy(tb_item_func_t* func, tb_pointer_t item, 
 {
 	tb_assert_and_check_return(func && item);
 
-	tb_pointer_t p = *((tb_pointer_t*)item);
-	if (func->pool) 
-	{
-		if (p) tb_spool_free(func->pool, p);
-		*((tb_pointer_t*)item) = data? tb_spool_strdup(func->pool, data) : tb_null;
-	}
-	else
-	{
-		if (p) tb_free(p);
-		*((tb_pointer_t*)item) = data? tb_strdup(data) : tb_null;
-	}
+	if (func->pool) *((tb_pointer_t*)item) = data? tb_spool_strdup(func->pool, data) : tb_null;
+	else *((tb_pointer_t*)item) = data? tb_strdup(data) : tb_null;
 }
 
 // the pointer
@@ -311,9 +302,6 @@ static tb_void_t tb_item_func_ptr_copy(tb_item_func_t* func, tb_pointer_t item, 
 {
 	tb_assert_and_check_return(func && item);
 
-	// free it first
-	if (func->free) func->free(func, item);
-
 	// copy it
 	*((tb_pointer_t*)item) = data;
 }
@@ -336,9 +324,6 @@ static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item,
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return(func && item);
-
-	// free it first
-	if (func->nfree) func->nfree(func, item, size);
 
 	// copy it
 	if (func->size == 4) tb_memset_u32(item, data, size);
