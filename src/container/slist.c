@@ -355,7 +355,10 @@ tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data
 	// the item
 	tb_slist_item_t* item = (tb_slist_item_t*)itor;
 
-	// copy data to item
+	// free item
+	slist->func.free(&slist->func, &item[1]);
+
+	// copy data
 	slist->func.copy(&slist->func, &item[1], data);
 
 	return itor;
