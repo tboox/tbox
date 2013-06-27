@@ -310,6 +310,11 @@ static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_pointer_t item)
 static tb_void_t tb_item_func_ptr_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	tb_assert_and_check_return(func && item);
+
+	// free it first
+	if (func->free) func->free(func, item);
+
+	// copy it
 	*((tb_pointer_t*)item) = data;
 }
 static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
@@ -332,6 +337,10 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
 {
 	tb_assert_and_check_return(func && item);
 
+	// free it first
+	if (func->nfree) func->nfree(func, item, size);
+
+	// copy it
 	if (func->size == 4) tb_memset_u32(item, data, size);
 	else while (size--) ((tb_pointer_t*)item)[size] = data;
 }
