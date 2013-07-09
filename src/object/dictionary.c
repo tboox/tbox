@@ -146,18 +146,6 @@ fail:
 	if (dictionary) tb_free(dictionary);
 	return tb_null;
 }
-static tb_void_t tb_dictionary_item_free(tb_item_func_t* func, tb_pointer_t item)
-{
-	// object
-	tb_object_t* object = item? *((tb_object_t**)item) : tb_null;
-	tb_check_return(object);
-
-	// refn--
-	tb_object_dec(object);
-
-	// clear
-	if (item) *((tb_object_t**)item) = tb_null;
-}
 static tb_object_t* tb_dictionary_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {
 	// check
@@ -666,8 +654,7 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 	dictionary->incr = incr;
 
 	// init item func
-	tb_item_func_t func = tb_item_func_ptr();
-	func.free 	= tb_dictionary_item_free;
+	tb_item_func_t func = tb_item_func_obj();
 
 	// init pool
 	dictionary->pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
@@ -726,11 +713,11 @@ tb_void_t tb_dictionary_set(tb_object_t* object, tb_char_t const* key, tb_object
 	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
 	tb_assert_and_check_return(dictionary && dictionary->hash && key && val);
 
-	// refn++
-	if (dictionary->incr) tb_object_inc(val);
-
 	// add
-	return tb_hash_set(dictionary->hash, key, val);
+	tb_hash_set(dictionary->hash, key, val);
+
+	// refn--
+	if (!dictionary->incr) tb_object_dec(val);
 }
 tb_void_t tb_dictionary_incr(tb_object_t* object, tb_bool_t incr)
 {

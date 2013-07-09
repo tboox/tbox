@@ -28,6 +28,7 @@
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 #include "../memory/memory.h"
+#include "../object/object.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -266,6 +267,10 @@ static tb_void_t tb_item_func_str_copy(tb_item_func_t* func, tb_pointer_t item, 
 {
 	tb_assert_and_check_return(func && item);
 
+	// free it
+	if (func->free) func->free(func, item);
+
+	// copy it
 	if (func->pool) *((tb_pointer_t*)item) = data? tb_spool_strdup(func->pool, data) : tb_null;
 	else *((tb_pointer_t*)item) = data? tb_strdup(data) : tb_null;
 }
@@ -289,7 +294,7 @@ static tb_pointer_t tb_item_func_ptr_data(tb_item_func_t* func, tb_cpointer_t it
 static tb_char_t const* tb_item_func_ptr_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	tb_assert_and_check_return_val(func && cstr, "");
-	tb_long_t n = tb_snprintf(cstr, maxn, "%x", data);
+	tb_long_t n = tb_snprintf(cstr, maxn, "%p", data);
 	if (n > 0) cstr[n] = '\0';
 	return (tb_char_t const*)cstr;
 }
@@ -328,6 +333,59 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	// copy it
 	if (func->size == 4) tb_memset_u32(item, data, size);
 	else while (size--) ((tb_pointer_t*)item)[size] = data;
+}
+
+// the object
+static tb_char_t const* tb_item_func_obj_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
+{
+	// check
+	tb_assert_and_check_return_val(func && cstr, "");
+
+	// format
+	tb_long_t n = tb_snprintf(cstr, maxn, "<object: %p>", data);
+	if (n > 0) cstr[n] = '\0';
+	return (tb_char_t const*)cstr;
+}
+static tb_void_t tb_item_func_obj_free(tb_item_func_t* func, tb_pointer_t item)
+{
+	// check
+	tb_assert_and_check_return(func && item);
+
+	// exit
+	tb_object_t* object = *((tb_object_t**)item);
+	if (object)
+	{
+		tb_object_exit(object);
+		*((tb_object_t**)item) = tb_null;
+	}
+}
+static tb_void_t tb_item_func_obj_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(func && item);
+
+	// refn++
+	if (data) tb_object_inc(data);
+
+	// copy it
+	*((tb_pointer_t*)item) = data;
+}
+static tb_void_t tb_item_func_obj_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(func && item);
+
+	// save the previous object
+	tb_object_t* object = *((tb_object_t**)item);
+
+	// refn++
+	if (data) tb_object_inc(data);
+
+	// copy it
+	*((tb_pointer_t*)item) = data;
+
+	// refn--
+	if (object) tb_object_dec(object);
 }
 
 // the external fixed memory
@@ -633,6 +691,30 @@ tb_item_func_t tb_item_func_ptr()
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
+
+	return func;
+}
+tb_item_func_t tb_item_func_obj()
+{
+	tb_item_func_t func;
+	tb_memset(&func, 0, sizeof(tb_item_func_t));
+	func.type = TB_ITEM_TYPE_OBJ;
+
+	func.hash = tb_item_func_ptr_hash;
+	func.comp = tb_item_func_ptr_comp;
+
+	func.data = tb_item_func_ptr_data;
+	func.cstr = tb_item_func_obj_cstr;
+
+	func.free = tb_item_func_obj_free;
+	func.dupl = tb_item_func_obj_dupl;
+	func.copy = tb_item_func_obj_copy;
+
+	func.nfree = tb_item_func_efm_nfree;
+	func.ndupl = tb_item_func_efm_ndupl;
+	func.ncopy = tb_item_func_efm_ncopy;
+
+	func.size = sizeof(tb_object_t*);
 
 	return func;
 }
