@@ -2,12 +2,12 @@
 IS_CONFIG = y
 
 # project
-PRO_DIR = /home/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
-DTYPE = d
+DEBUG = n
+DTYPE = r
 
 # small
 SMALL = y

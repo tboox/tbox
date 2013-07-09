@@ -62,7 +62,8 @@ typedef enum __tb_item_type_t
 ,	TB_ITEM_TYPE_PTR 		= 7 	//!< pointer
 ,	TB_ITEM_TYPE_EFM 		= 8 	//!< external fixed memory
 ,	TB_ITEM_TYPE_IFM 		= 9 	//!< internal fixed memory
-,	TB_ITEM_TYPE_OTR 		= 10 	//!< other
+,	TB_ITEM_TYPE_OBJ 		= 10 	//!< object
+,	TB_ITEM_TYPE_OTR 		= 11 	//!< other
 
 }tb_item_type_t;
 
@@ -128,6 +129,10 @@ tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool);
  * @note if the free func have been hooked, the nfree need hook too.
  */
 tb_item_func_t 		tb_item_func_ptr();
+
+/*! the object item function 
+ */
+tb_item_func_t 		tb_item_func_obj();
 
 /*!the external fixed memory item function
  *

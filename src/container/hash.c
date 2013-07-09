@@ -438,9 +438,6 @@ tb_void_t tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data)
 		tb_hash_item_list_t* list = hash->hash_list[buck];
 		tb_assert_and_check_return(list && list->size && item < list->size);
 
-		// free item
-		hash->data_func.free(&hash->data_func, ((tb_byte_t*)&list[1]) + item * step + hash->name_func.size);
-
 		// copy data
 		hash->data_func.copy(&hash->data_func, ((tb_byte_t*)&list[1]) + item * step + hash->name_func.size, data);
 	}
