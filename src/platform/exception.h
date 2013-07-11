@@ -27,190 +27,24 @@
  * includes
  */
 #include "prefix.h"
-#include "../libc/misc/setjmp.h"
-#include "../libc/string/string.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */ 
-
-#if defined(tb_setjmp) && defined(tb_longjmp) && defined(TB_CONFIG_OS_WINDOWS)
-
-# 	if defined(TB_COMPILER_IS_MSVC)
-# 		define __tb_try 				__try
-# 		define __tb_except 				__except(1)
-# 		define __tb_end 				
-# 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
-# 		define __tb_try \
-		{ \
-			/* init */ \
-			tb_exception_handler_t __h = {0}; \
-			tb_exception_registration_t __r = {0}; \
-			\
-			/* init handler */ \
-			__r.handler = tb_exception_handler_func; \
-			__r.exception_handler = &__h;                                     \
-			__tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
-			__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
-			\
-			/* save jmpbuf */ \
-			tb_int_t __j = tb_setjmp(__h.jmpbuf); \
-			if(!__j) \
-			{
-
-
-# 		define __tb_except \
-		} \
-		/*PEXCEPTION_RECORD rec = &__h.record;*/ \
-		/*PCONTEXT ctx = &__h.context;*/ \
-		\
-		__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
-		if (__j)
-
-# 		define __tb_end }
-# 	else
-# 		define __tb_try 				if (1)
-# 		define __tb_except 				if (0)
-# 		define __tb_end 				
-# 	endif
-
-#else
-
-# 	define __tb_try 				if (1)
-# 	define __tb_except 				if (0)
-# 	define __tb_end 				
-
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/exception.h"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
- */ 
-
-// for mingw
-#if defined(tb_setjmp) \
-	&& defined(tb_longjmp) \
-	&& defined(TB_CONFIG_OS_WINDOWS) \
-	&& !defined(TB_COMPILER_IS_MSVC) \
-	&& defined(TB_CONFIG_ASSEMBLER_GAS) \
-	&& !TB_CPU_BIT64
-
-#include "../prefix/packed.h"
-
-// the seh expception handler func type
-typedef tb_int_t (*tb_exception_handler_func_t)(tb_pointer_t, tb_pointer_t, tb_pointer_t, tb_pointer_t);
-
-// the expception float context type
-typedef struct __tb_exception_context_float_t 
-{
-	tb_uint32_t							controlword;
-	tb_uint32_t							statusword;
-	tb_uint32_t							tagword;
-	tb_uint32_t							erroroffset;
-	tb_uint32_t							errorselector;
-	tb_uint32_t							dataoffset;
-	tb_uint32_t							dataselector;
-	tb_byte_t							registerarea[80];
-	tb_uint32_t							cr0npxstate;
-
-}__tb_packed__ tb_exception_context_float_t ;
-
-// the expception context type
-typedef struct __tb_exception_context_t
-{
-	tb_uint32_t							contextflags;
-	tb_uint32_t							dr0;
-	tb_uint32_t							dr1;
-	tb_uint32_t							dr2;
-	tb_uint32_t							dr3;
-	tb_uint32_t							dr6;
-	tb_uint32_t							dr7;
-	tb_exception_context_float_t 		floatsave;
-	tb_uint32_t							seggs;
-	tb_uint32_t							segfs;
-	tb_uint32_t							seges;
-	tb_uint32_t							segds;
-	tb_uint32_t							edi;
-	tb_uint32_t							esi;
-	tb_uint32_t							ebx;
-	tb_uint32_t							edx;
-	tb_uint32_t							ecx;
-	tb_uint32_t							eax;
-	tb_uint32_t							ebp;
-	tb_uint32_t							eip;
-	tb_uint32_t							segcs;
-	tb_uint32_t							eflags;
-	tb_uint32_t							esp;
-	tb_uint32_t							segss;
-	tb_byte_t							extendedregisters[512];
-
-}__tb_packed__ tb_exception_context_t;
-
-// the expception record type
-typedef struct __tb_exception_record_t
-{
-	// the expception code
-	tb_uint32_t 						exception_code;
-
-	// the expception flags
-	tb_uint32_t 						exception_flags;
-
-	// the expception record
-	struct __tb_exception_record_t* 	exception_record;
-
-	// the expception address
-	tb_pointer_t 						exception_address;
-
-	// the parameters number
-	tb_uint32_t 						number_parameters;
-
-	// the expception information
-	tb_pointer_t 						exception_information[15];
-
-}__tb_packed__ tb_exception_record_t;
-
-// the expception registration type
-struct __tb_exception_handler_t;
-typedef struct __tb_exception_registration_t
-{
-	// the previous seh exception registration
-	struct __tb_exception_registration_t* 	prev;
-
-	// the exception handler
-	tb_exception_handler_func_t  			handler;
-
-	// the seh handler
-	struct __tb_exception_handler_t* 		exception_handler;
-
-}tb_exception_registration_t;
-
-// the exception handler type
-typedef struct __tb_exception_handler_t
-{
-	// the jmpbuf
-	tb_jmpbuf_t 							jmpbuf;
-
-	// the exception record
-	tb_exception_record_t 					record;
-
-	// the context
-	tb_exception_context_t 					context;    
-
-}tb_exception_handler_t;
-
-#include "../prefix/packed.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * handler
+ * macros
  */
-static tb_int_t tb_exception_handler_func(tb_pointer_t record, tb_exception_registration_t* reg, tb_pointer_t context, tb_pointer_t record2)
-{
-	tb_assert(reg && reg->exception_handler && context && record);
-	if (context) tb_memcpy(&reg->exception_handler->context, context, sizeof(tb_exception_context_t));
-	if (record) tb_memcpy(&reg->exception_handler->record, record, sizeof(tb_exception_record_t));
-	tb_longjmp(reg->exception_handler->jmpbuf, 1);
-}
+#ifndef __tb_try
+# 	define __tb_try 				if (1)
+#endif
 
-#endif /* for mingw */
+#ifndef __tb_except
+# 	define __tb_except 				if (0)
+#endif
+
+#ifndef __tb_end
+# 	define __tb_end 				
+#endif
 
 #endif
 
