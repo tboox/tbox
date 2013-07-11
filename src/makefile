@@ -172,7 +172,7 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 # pool
 ifeq ($(TB_CONFIG_MEMORY_POOL),n)
 tbox_C_FILES 			+= \
-						platform/libc/malloc 
+						platform/$(TB_CONFIG_API_MEMORY)/malloc 
 endif
 
 # platform
@@ -291,6 +291,7 @@ INC_FILES 				= \
 						platform/process.h \
 						platform/atomic.h \
 						platform/directory.h \
+						platform/exception.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \
@@ -366,6 +367,7 @@ INC_FILES 				= \
 						libc/misc/ctype.h \
 						libc/misc/limits.h \
 						libc/misc/stdarg.h \
+						libc/misc/setjmp.h \
 						libc/misc/time/prefix.h \
 						libc/misc/time/time.h \
 						libc/misc/time/type.h \

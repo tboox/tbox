@@ -30,7 +30,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
+tb_bool_t tb_malloc_init()
+{
+	return tb_true;
+}
+tb_void_t tb_malloc_exit()
+{
+}
 tb_pointer_t tb_malloc(tb_size_t size)
 {
 	tb_check_return_val(size, tb_null);

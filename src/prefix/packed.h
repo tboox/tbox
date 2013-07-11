@@ -33,6 +33,7 @@
 
 /* packed
  *
+ * // #define TB_PACKED_ALIGN 4
  * #include "tbox/prefix/packed.h"
  * typedef struct __tb_xxxxx_t
  * {
@@ -48,10 +49,15 @@
  */
 #ifdef TB_COMPILER_IS_MSVC
 # 	ifndef TB_PACKED_ENTER
-# 		pragma pack(push, 1)
+# 		ifdef TB_PACKED_ALIGN
+# 			pragma pack(push, TB_PACKED_ALIGN)
+# 		else
+# 			pragma pack(push, 1)
+# 		endif
 # 		define TB_PACKED_ENTER
 # 	else
 # 		pragma pack(pop)
 # 		undef TB_PACKED_ENTER
+# 		undef TB_PACKED_ALIGN
 # 	endif
 #endif
