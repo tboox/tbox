@@ -43,6 +43,7 @@
 #include "dynamic.h"
 #include "process.h"
 #include "directory.h"
+#include "exception.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

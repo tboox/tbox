@@ -28,7 +28,7 @@
  */
 #include "../prefix.h"
 #include "../../libc/libc.h"
-#include "windows.h"
+#include <windows.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * inlines
