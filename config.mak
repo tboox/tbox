@@ -6,20 +6,20 @@ PRO_DIR = /home/ruki/projects/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = n
-DTYPE = r
+DEBUG = y
+DTYPE = d
 
 # small
 SMALL = y
 
 # platform
-PLAT = linux
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # demo
-DEMO = n
+DEMO = y
 
 # toolchain
 SDK =

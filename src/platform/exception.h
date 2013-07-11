@@ -37,11 +37,11 @@
 #if defined(tb_setjmp) && defined(tb_longjmp) && defined(TB_CONFIG_OS_WINDOWS)
 
 # 	if defined(TB_COMPILER_IS_MSVC)
-# 		define __tb_try__ 				__try
-# 		define __tb_except__ 			__except(1)
-# 		define __tb_end__ 				
+# 		define __tb_try 				__try
+# 		define __tb_except 				__except(1)
+# 		define __tb_end 				
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
-# 		define __tb_try__ \
+# 		define __tb_try \
 		{ \
 			/* init */ \
 			tb_exception_handler_t __h = {0}; \
@@ -59,7 +59,7 @@
 			{
 
 
-# 		define __tb_except__ \
+# 		define __tb_except \
 		} \
 		/*PEXCEPTION_RECORD rec = &__h.record;*/ \
 		/*PCONTEXT ctx = &__h.context;*/ \
@@ -67,19 +67,18 @@
 		__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
 		if (__j)
 
-# 		define __tb_end__ }
+# 		define __tb_end }
 # 	else
-# 		define __tb_try__ 				if (1)
-# 		define __tb_except__ 			if (0)
-# 		define __tb_finally__ 			if (1)
-# 		define __tb_end__ 				
+# 		define __tb_try 				if (1)
+# 		define __tb_except 				if (0)
+# 		define __tb_end 				
 # 	endif
 
 #else
 
-# 	define __tb_try__ 				if (1)
-# 	define __tb_except__ 			if (0)
-# 	define __tb_end__ 				
+# 	define __tb_try 				if (1)
+# 	define __tb_except 				if (0)
+# 	define __tb_end 				
 
 #endif
 
