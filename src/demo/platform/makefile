@@ -10,6 +10,7 @@ NAMES = \
 		utils \
 		atomic \
 		process \
+		exception \
 		directory 
 
 include $(SRC_DIR)/demo/makefile
