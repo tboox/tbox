@@ -29,6 +29,8 @@
 #include "prefix.h"
 #if defined(TB_CONFIG_OS_WINDOWS)
 # 	include "windows/exception.h"
+#elif defined(tb_signal)
+# 	include "unix/exception.h"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

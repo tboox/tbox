@@ -34,24 +34,66 @@
  * interfaces
  */
 
-// init & exit
-tb_handle_t 	tb_thread_init(tb_char_t const* name, tb_pointer_t (*callback)(tb_pointer_t), tb_pointer_t cb_data, tb_size_t stack_size);
-tb_void_t 		tb_thread_exit(tb_handle_t handle);
+/*! init thread
+ *
+ * @param name 			the thread name
+ * @param func 			the thread func
+ * @param data 			the thread data
+ * @param stack 		the thread stack size
+ *
+ * @return 				the thread handle
+ */
+tb_handle_t 			tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_pointer_t data, tb_size_t stack);
 
-// wait
-tb_long_t 		tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
+/*! exit thread
+ *
+ * @param handle 		the thread handle
+ */
+tb_void_t 				tb_thread_exit(tb_handle_t handle);
 
-// suspend & resume
-tb_bool_t 		tb_thread_suspend(tb_handle_t handle);
-tb_bool_t 		tb_thread_resume(tb_handle_t handle);
+/*! wait thread
+ *
+ * @param handle 		the thread handle
+ * @param timeout 		the timeout
+ *
+ * @return 				ok: 1, timeout: 0, error: -1
+ */
+tb_long_t 				tb_thread_wait(tb_handle_t handle, tb_long_t timeout);
 
-// kill
-tb_bool_t 		tb_thread_kill(tb_handle_t handle);
+/*! suspend thread
+ *
+ * @param handle 		the thread handle
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_thread_suspend(tb_handle_t handle);
 
-// self
-tb_handle_t 	tb_thread_self();
+/*! resume thread
+ *
+ * @param handle 		the thread handle
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_thread_resume(tb_handle_t handle);
 
-// return
-tb_void_t 		tb_thread_return(tb_pointer_t value);
+/*! kill thread
+ *
+ * @param handle 		the thread handle
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_thread_kill(tb_handle_t handle);
+
+/*! the self thread handle
+ *
+ * @return 				the self thread handle
+ */
+tb_handle_t 			tb_thread_self();
+
+/*! return the thread value
+ *
+ * @param value 		the value pointer
+ */
+tb_void_t 				tb_thread_return(tb_pointer_t value);
 
 #endif

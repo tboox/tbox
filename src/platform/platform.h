@@ -36,6 +36,7 @@
 #include "mutex.h"
 #include "event.h"
 #include "epool.h"
+#include "tstore.h"
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"

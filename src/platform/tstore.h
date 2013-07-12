@@ -17,47 +17,30 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.c
- * @defgroup 	platform
+ * @file		tstore.h
+ * @ingroup 	platform
  *
  */
+#ifndef TB_PLATFORM_TSTORE_H
+#define TB_PLATFORM_TSTORE_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "platform.h"
-#include "../network/network.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
 
-tb_bool_t tb_platform_init()
-{
-	// init printf
-	if (!tb_printf_init(TB_PRINTF_MODE_STDOUT, tb_null)) return tb_false;
+/*! init tstore
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_tstore_init();
 
-	// init socket
-	if (!tb_socket_init()) return tb_false;
+/// exit tstore
+tb_void_t 				tb_tstore_exit();
 
-	// init tstore
-	if (!tb_tstore_init()) return tb_false;
-
-	// ok
-	return tb_true;
-}
-tb_void_t tb_platform_exit()
-{
-	// exit dns
-	tb_dns_list_exit();
-
-	// exit tstore
-	tb_tstore_exit();
-
-	// exit socket
-	tb_socket_exit();
-
-	// exit printf
-	tb_printf_exit();
-}
-
+#endif

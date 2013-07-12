@@ -8,6 +8,10 @@
 /* ///////////////////////////////////////////////////////////////////////
  * test
  */
+static tb_void_t tb_exception_handler(tb_int_t signo)
+{
+	tb_print("handler: %p", tb_thread_self());
+}
 static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 {
 	// self
@@ -53,6 +57,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+
+	tb_signal(TB_SIGSEGV, &tb_exception_handler);
 
 	// done
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
