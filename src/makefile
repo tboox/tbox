@@ -87,7 +87,6 @@ tbox_C_FILES 			+= \
 						aio/aioo \
 						aio/aipp \
 						aio/aicp \
-						platform/path \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -177,6 +176,8 @@ endif
 
 # platform
 tbox_C_FILES 			+= \
+						platform/path \
+						platform/tstore \
 						platform/platform \
 						platform/$(TB_CONFIG_API_DNS)/dns \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
@@ -281,6 +282,7 @@ INC_FILES 				= \
 						platform/time.h \
 						platform/utils.h \
 						platform/mutex.h \
+						platform/tstore.h \
 						platform/thread.h \
 						platform/socket.h \
 						platform/event.h \
@@ -369,6 +371,7 @@ INC_FILES 				= \
 						libc/misc/limits.h \
 						libc/misc/stdarg.h \
 						libc/misc/setjmp.h \
+						libc/misc/signal.h \
 						libc/misc/time/prefix.h \
 						libc/misc/time/time.h \
 						libc/misc/time/type.h \
