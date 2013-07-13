@@ -34,11 +34,34 @@
  * interfaces
  */
 
-tb_handle_t 	tb_event_init(tb_char_t const* name);
-tb_void_t 		tb_event_exit(tb_handle_t handle);
+/*! init event
+ * 
+ * @param name 		the event name
+ *
+ * @return 			the event handle
+ */
+tb_handle_t 		tb_event_init(tb_char_t const* name);
 
-tb_void_t 		tb_event_post(tb_handle_t handle);
-tb_long_t 		tb_event_wait(tb_handle_t handle, tb_long_t timeout);
+/*! exit event
+ * 
+ * @param handle 	the event handle
+ */
+tb_void_t 			tb_event_exit(tb_handle_t handle);
+
+/*! init event
+ * 
+ * @param handle 	the event handle
+ */
+tb_void_t 			tb_event_post(tb_handle_t handle);
+
+/*! init event
+ * 
+ * @param handle 	the event handle
+ * @param timeout 	the timeout
+ *
+ * @return 			ok: 1, timeout: 0, fail: -1
+ */
+tb_long_t 			tb_event_wait(tb_handle_t handle, tb_long_t timeout);
 
 	
 #endif

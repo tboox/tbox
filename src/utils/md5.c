@@ -177,6 +177,10 @@ static tb_void_t tb_md5_transform(tb_uint32_t* sp, tb_uint32_t* ip)
 // set pseudo_rand to zero for rfc md5 implementation
 tb_void_t tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand)
 {
+	// check
+	tb_assert_and_check_return(md5);
+
+	// init
 	md5->i[0] = md5->i[1] = (tb_uint32_t)0;
 
 	// load magic initialization constants 
@@ -188,6 +192,10 @@ tb_void_t tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand)
 
 tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
 {
+	// check
+	tb_assert_and_check_return(md5 && data);
+
+	// init
 	tb_uint32_t ip[16];
 	tb_size_t 	i = 0, ii = 0;
 
@@ -224,6 +232,10 @@ tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
 
 tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
 {
+	// check
+	tb_assert_and_check_return(md5 && data);
+
+	// init
 	tb_uint32_t ip[16];
 	tb_int_t 	mdi = 0;
 	tb_size_t 	i = 0;
@@ -266,12 +278,11 @@ tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
 
 tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on)
 {
-	tb_md5_t md5;
-
 	// check
 	tb_assert_and_check_return_val(ib && in && ob && on >= 16, 0);
 
 	// init 
+	tb_md5_t md5;
 	tb_md5_init(&md5, 0);
 
 	// spank
