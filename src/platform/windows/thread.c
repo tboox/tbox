@@ -33,7 +33,7 @@
 
 tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_pointer_t data, tb_size_t stack)
 {
-	HANDLE handle = CreateThread(NULL, (DWORD)stack_size, (LPTHREAD_START_ROUTINE)func, (LPVOID)data, 0, NULL);
+	HANDLE handle = CreateThread(NULL, (DWORD)stack, (LPTHREAD_START_ROUTINE)func, (LPVOID)data, 0, NULL);
 	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)

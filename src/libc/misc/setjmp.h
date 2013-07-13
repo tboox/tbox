@@ -28,19 +28,35 @@
  * includes
  */
 #include "prefix.h"
+#if defined(TB_CONFIG_LIBC_HAVE_SETJMP) || defined(TB_CONFIG_LIBC_HAVE_SIGSETJMP)
+# 	include <setjmp.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#if defined(TB_COMPILER_IS_GCC)
-# 	define tb_setjmp(buf) 			__builtin_setjmp(buf)
-# 	define tb_longjmp(buf, val) 	__builtin_longjmp(buf, val)
-#elif defined(TB_CONFIG_LIBC_HAVE_SETJMP)
-# 	define tb_setjmp(buf) 			setjmp(buf)
-# 	define tb_longjmp(buf, val) 	longjmp(buf, val)
+
+// setjmp
+#ifdef TB_CONFIG_LIBC_HAVE_SETJMP
+# 	if defined(TB_COMPILER_IS_GCC)
+# 		define tb_setjmp(buf) 			__builtin_setjmp(buf)
+# 		define tb_longjmp(buf, val) 	__builtin_longjmp(buf, val)
+# 	else
+# 		define tb_setjmp(buf) 			setjmp(buf)
+# 		define tb_longjmp(buf, val) 	longjmp(buf, val)
+# 	endif
 #else
 # 	undef tb_setjmp
 # 	undef tb_longjmp
+#endif
+
+// sigsetjmp
+#ifdef TB_CONFIG_LIBC_HAVE_SIGSETJMP
+# 	define tb_sigsetjmp(buf, sig) 		sigsetjmp(buf, sig)
+# 	define tb_siglongjmp(buf, val) 		siglongjmp(buf, val)
+#else
+# 	undef tb_sigsetjmp
+# 	undef tb_siglongjmp
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -48,27 +64,14 @@
  */
 
 // the jmpbuf type
-#if defined(tb_setjmp)
-# 	if defined(TB_ARCH_x86)
-	typedef tb_int_t tb_jmpbuf_t[6];
-# 	elif defined(TB_ARCH_x64)
-# 		if TB_CPU_BIT64
-		typedef tb_int_t tb_jmpbuf_t[8];
-# 		else
-		typedef tb_int_t tb_jmpbuf_t[6];
-# 		endif
-# 	else
-# 		undef tb_setjmp
-# 		undef tb_longjmp
-# 	endif
+#ifdef TB_CONFIG_LIBC_HAVE_SETJMP
+typedef jmp_buf 	tb_jmpbuf_t;
 #endif
 
-/* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-#if defined(tb_setjmp) && defined(TB_CONFIG_LIBC_HAVE_SETJMP)
-tb_int_t 	setjmp(tb_jmpbuf_t buf);
-tb_void_t 	longjmp(tb_jmpbuf_t buf, tb_int_t val);
+// the sigjmpbuf type
+#ifdef TB_CONFIG_LIBC_HAVE_SIGSETJMP
+typedef sigjmp_buf 	tb_sigjmpbuf_t;
 #endif
+
 
 #endif

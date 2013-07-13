@@ -28,6 +28,9 @@
  * includes
  */
 #include "prefix.h"
+#ifdef TB_CONFIG_LIBC_HAVE_SIGNAL
+# 	include <signal.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -74,22 +77,6 @@
 # 	define TB_SIGPWR 						(30) 					// power failure restart (system v).
 # 	define TB_SIGSYS 						(31) 					// bad system call.
 # 	define TB_SIGUNUSED 					(31)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the signal function type
-#if defined(tb_signal)
-typedef tb_void_t (*tb_signal_func_t)(tb_int_t sig);
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-#if defined(tb_signal)
-tb_signal_func_t 	signal(tb_int_t sig, tb_signal_func_t func);
 #endif
 
 #endif
