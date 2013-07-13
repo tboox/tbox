@@ -31,10 +31,34 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the tstore data type enum
+typedef enum __tb_tstore_data_type_e
+{
+	TB_TSTORE_DATA_TYPE_NONE 		= 0
+,	TB_TSTORE_DATA_TYPE_EXCEPTION 	= 1
+,	TB_TSTORE_DATA_TYPE_USER 		= 2
+
+}tb_tstore_data_type_e;
+
+// the tstore data type
+typedef struct __tb_tstore_data_t
+{
+	// the data type
+	tb_size_t 		type;
+
+	// the free func
+	tb_void_t 		(*free)(struct __tb_tstore_data_t* data);
+
+}tb_tstore_data_t;
+
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init tstore
+/*! init tstore for thread store
  *
  * @return 				tb_true or tb_false
  */
@@ -42,5 +66,17 @@ tb_bool_t 				tb_tstore_init();
 
 /// exit tstore
 tb_void_t 				tb_tstore_exit();
+
+/*! set tstore data
+ *
+ * @param data 			the tstore data
+ */
+tb_void_t 				tb_tstore_setp(tb_tstore_data_t const* data);
+
+/*! get tstore data
+ *
+ * @return 				the tstore data
+ */
+tb_tstore_data_t* 		tb_tstore_getp();
 
 #endif

@@ -27,15 +27,19 @@
  * includes
  */
 #include "prefix.h"
-#if defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/exception.h"
-#elif defined(tb_signal)
-# 	include "unix/exception.h"
+#ifdef TB_EXCEPTION_ENABLE
+# 	include "../libc/misc/signal.h"
+# 	if defined(TB_CONFIG_OS_WINDOWS)
+# 		include "windows/exception.h"
+# 	elif defined(tb_signal)
+# 		include "unix/exception.h"
+# 	endif
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
+
 #ifndef __tb_try
 # 	define __tb_try 				if (1)
 #endif

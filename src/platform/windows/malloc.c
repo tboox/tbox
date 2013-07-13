@@ -55,9 +55,6 @@ tb_bool_t tb_malloc_init()
 			tb_mutex_exit(mutex);
 	}
 
-	// init data
-	tb_pointer_t data = tb_null;
-
 	// enter mutex
 	if (g_mutex) tb_mutex_enter(g_mutex);
 
@@ -92,7 +89,7 @@ tb_pointer_t tb_malloc(tb_size_t size)
 	// check
 	tb_check_return_val(size, tb_null);
 
-	// init mutex?
+	// init malloc?
 	if (!tb_malloc_init()) return tb_null;
 
 	// init data
@@ -115,7 +112,7 @@ tb_pointer_t tb_malloc0(tb_size_t size)
 	// check
 	tb_check_return_val(size, tb_null);
 
-	// init mutex?
+	// init malloc?
 	if (!tb_malloc_init()) return tb_null;
 
 	// init data
