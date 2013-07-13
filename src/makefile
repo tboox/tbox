@@ -307,6 +307,8 @@ INC_FILES 				= \
 						platform/arch/sh4/atomic.h \
 						platform/windows/atomic.h \
 						platform/windows/exception.h \
+						platform/unix/prefix.h \
+						platform/unix/exception.h \
 						network/prefix.h \
 						network/network.h \
 						network/http.h \

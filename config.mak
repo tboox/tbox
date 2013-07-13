@@ -23,7 +23,7 @@ DEMO = y
 
 # toolchain
 SDK =
-NDK = /home/ruki/programs/android-ndk-r8e
+NDK =
 BIN =
 PRE = i686-w64-mingw32-
 HOST = mac

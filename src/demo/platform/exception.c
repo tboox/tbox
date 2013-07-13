@@ -16,18 +16,24 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	// trace
 	tb_print("thread[%p]: init", self);
 
-	// done
+	// try0
 	tb_size_t i = 0;
 	__tb_try 
 	{
+		// try1
 		tb_print("thread[%p]: try0: b: %lu", self, i++);
 		__tb_try 
 		{
+			// trace
 			tb_print("thread[%p]: try1: b: %lu", self, i++);
+
+			// abort
 			tb_abort();
 //			tb_memset(&i, 0, 8192); // FIXME
 //			__tb_volatile__ tb_size_t a = 0; a /= a;
 //			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
+		
+			// trace
 			tb_print("thread[%p]: try1: e: %lu", self, i++);
 		}
 		__tb_except
@@ -35,13 +41,23 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 			tb_print("thread[%p]: except1: %lu", self, i++);
 		}
 		__tb_end
-		tb_print("thread[%p]: end1: %lu", self, i);
+			
+		// end
+		tb_print("thread[%p]: end1: b: %lu", self, i);
+
+		// abort
+		tb_abort();
+
+		// end
+		tb_print("thread[%p]: end1: e: %lu", self, i);
 	}
 	__tb_except
 	{
 		tb_print("thread[%p]: except0: %lu", self, i++);
 	}
 	__tb_end
+
+	// end
 	tb_print("thread[%p]: end0: %lu", self, i);
 
 	// trace
@@ -57,11 +73,34 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+#if 1
 	// done
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
+#else
+	__tb_try 
+	{
+		tb_abort();
+	}
+	__tb_except
+	{
+		tb_print("except");
+	}
+	__tb_end
+
+	__tb_try 
+	{
+		tb_abort();
+	}
+	__tb_except
+	{
+		tb_print("except");
+	}
+	__tb_end
+
+#endif
 
 	// wait
 	getchar();
