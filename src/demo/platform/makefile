@@ -9,6 +9,7 @@ NAMES = \
 		epool \
 		utils \
 		atomic \
+		tstore \
 		process \
 		exception \
 		directory 

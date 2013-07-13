@@ -39,6 +39,8 @@
 # 		define __tb_except 				__except(1)
 # 		define __tb_end 				
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
+
+		// try
 # 		define __tb_try \
 		{ \
 			/* init */ \
@@ -46,7 +48,7 @@
 			tb_exception_registration_t __r = {0}; \
 			\
 			/* init handler */ \
-			__r.handler = tb_exception_handler_func; \
+			__r.handler = tb_exception_func_impl; \
 			__r.exception_handler = &__h;                                     \
 			__tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
 			__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
@@ -56,7 +58,7 @@
 			if(!__j) \
 			{
 
-
+		// except
 # 		define __tb_except \
 		} \
 		/*PEXCEPTION_RECORD rec = &__h.record;*/ \
@@ -65,6 +67,7 @@
 		__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
 		if (__j)
 
+		// end
 # 		define __tb_end }
 # 	endif
 #endif
@@ -83,7 +86,7 @@
 #include "../../prefix/packed.h"
 
 // the seh expception handler func type
-typedef tb_int_t (*tb_exception_handler_func_t)(tb_pointer_t, tb_pointer_t, tb_pointer_t, tb_pointer_t);
+typedef tb_int_t (*tb_exception_func_t)(tb_pointer_t, tb_pointer_t, tb_pointer_t, tb_pointer_t);
 
 // the expception float context type
 typedef struct __tb_exception_context_float_t 
@@ -162,7 +165,7 @@ typedef struct __tb_exception_registration_t
 	struct __tb_exception_registration_t* 	prev;
 
 	// the exception handler
-	tb_exception_handler_func_t  			handler;
+	tb_exception_func_t  			handler;
 
 	// the seh handler
 	struct __tb_exception_handler_t* 		exception_handler;
@@ -188,7 +191,7 @@ typedef struct __tb_exception_handler_t
 /* ///////////////////////////////////////////////////////////////////////
  * handler
  */
-static tb_int_t tb_exception_handler_func(tb_pointer_t record, tb_exception_registration_t* reg, tb_pointer_t context, tb_pointer_t record2)
+static tb_int_t tb_exception_func_impl(tb_pointer_t record, tb_exception_registration_t* reg, tb_pointer_t context, tb_pointer_t record2)
 {
 	tb_assert(reg && reg->exception_handler && context && record);
 	if (context) tb_memcpy(&reg->exception_handler->context, context, sizeof(tb_exception_context_t));
