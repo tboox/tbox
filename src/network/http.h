@@ -185,53 +185,147 @@ typedef struct __tb_http_status_t
  * interfaces
  */
 
-// init & exit
+/*! init http
+ *
+ * return 				the http handle
+ */
 tb_handle_t 			tb_http_init();
+
+/*! exit http
+ *
+ * @param handle 		the http handle
+ */
 tb_void_t 				tb_http_exit(tb_handle_t handle);
 
-/*!wait the http 
+/*! wait the http 
  *
  * blocking wait the single event object, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param 	handle 	the http handle 
- * @param 	etype 	the waited event type, return the needed event type if TB_AIOO_ETYPE_NULL
- * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ * @param handle 		the http handle 
+ * @param etype 		the waited event type, return the needed event type if TB_AIOO_ETYPE_NULL
+ * @param timeout 		the timeout value, return immediately if 0, infinity if -1
  *
- * @return 	the event type, return 0 if timeout, return -1 if error
+ * @return 				the event type, return 0 if timeout, return -1 if error
  */
 tb_long_t 				tb_http_wait(tb_handle_t handle, tb_size_t etype, tb_long_t timeout);
 
-// async open, allow multiple called before closing 
+/*! async open, allow multiple called before closing 
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				ok: 1, continue: 0, fail: -1
+ */
 tb_long_t 				tb_http_aopen(tb_handle_t handle);
 
-// block open, allow multiple called before closing 
+/*! block open, allow multiple called before closing 
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				tb_true or tb_false
+ */
 tb_bool_t 				tb_http_bopen(tb_handle_t handle);
 
-// async close, allow multiple called
+/*! async close, allow multiple called
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				ok: 1, continue: 0, fail: -1
+ */
 tb_long_t 				tb_http_aclose(tb_handle_t handle);
 
-// block close, allow multiple called
+/*! block close, allow multiple called
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				tb_true or tb_false
+ */
 tb_bool_t 				tb_http_bclose(tb_handle_t handle);
 
-// seek
+/*! async seek
+ *
+ * @param handle 		the http handle
+ * @param offset 		the offset
+ *
+ * @return 				ok: 1, continue: 0, fail: -1
+ */
 tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_hize_t offset);
+
+/*! block seek
+ *
+ * @param handle 		the http handle
+ * @param offset 		the offset
+ *
+ * @return 				tb_true or tb_false
+ */
 tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_hize_t offset);
 
-// async writ & read
+/*! async writ
+ *
+ * @param handle 		the http handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				ok: real size, continue: 0, fail: -1
+ */
 tb_long_t 				tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+/*! block writ
+ *
+ * @param handle 		the http handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+
+/*! async read
+ *
+ * @param handle 		the http handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				ok: real size, continue: 0, fail: -1
+ */
 tb_long_t 				tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
-// block writ & read
-tb_bool_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+/*! block read
+ *
+ * @param handle 		the http handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				tb_true or tb_false
+ */
 tb_bool_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
-// option
+/*! the http option
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				the http option
+ */
 tb_http_option_t* 		tb_http_option(tb_handle_t handle);
+
+/*! dump the http option
+ *
+ * @param handle 		the http handle
+ */
 tb_void_t 				tb_http_option_dump(tb_handle_t handle);
 
-// status
+/*! the http status
+ *
+ * @param handle 		the http handle
+ *
+ * @return 				the http status
+ */
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
+
+/*! dump the http status
+ *
+ * @param handle 		the http handle
+ */
 tb_void_t 				tb_http_status_dump(tb_handle_t handle);
 
 #endif

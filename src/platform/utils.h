@@ -34,7 +34,13 @@
  * interfaces
  */
 
-// the host name
+/*! the host name
+ *
+ * @param name 	the hostname data
+ * @param size 	the hostname size
+ *
+ * @return 		tb_true or tb_false
+ */
 tb_bool_t 		tb_hostname(tb_char_t* name, tb_size_t size);
 
 #endif
