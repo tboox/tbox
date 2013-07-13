@@ -37,11 +37,13 @@
 # 	if defined(TB_COMPILER_IS_MSVC)
 # 		define __tb_try 				__try
 # 		define __tb_except 				__except(1)
+# 		define __tb_leave				__leave
 # 		define __tb_end 				
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
 
 		// try
 # 		define __tb_try \
+		do \
 		{ \
 			/* init */ \
 			tb_exception_handler_t __h = {0}; \
@@ -60,15 +62,20 @@
 
 		// except
 # 		define __tb_except \
-		} \
-		/*PEXCEPTION_RECORD rec = &__h.record;*/ \
-		/*PCONTEXT ctx = &__h.context;*/ \
-		\
-		__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
-		if (__j)
+			} \
+			/*PEXCEPTION_RECORD rec = &__h.record;*/ \
+			/*PCONTEXT ctx = &__h.context;*/ \
+			\
+			__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
+			if (__j)
 
 		// end
-# 		define __tb_end }
+# 		define __tb_end \
+		} while (0);
+
+		// leave
+# 		define __tb_leave 	break
+
 # 	endif
 #endif
 

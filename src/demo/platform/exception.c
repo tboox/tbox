@@ -17,7 +17,8 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	tb_print("thread[%p]: init", self);
 
 	// try0
-	tb_size_t i = 0;
+//	tb_size_t i = 0; // FIXME: maybe restored after exception, will leak memory if i is handle
+	__tb_volatile__ tb_size_t i = 0;
 	__tb_try 
 	{
 		// try1
@@ -25,6 +26,8 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 		__tb_try 
 		{
 			// trace
+			// FIXME: debug: if i is been stored in the stack, it will be modified after exception
+			// FIXME: relase: if i is been stored in the register, it will be restored after exception
 			tb_print("thread[%p]: try1: b: %lu", self, i++);
 
 			// abort
@@ -79,6 +82,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
+#elif 0
+	__tb_try 
+	{
+		tb_print("try: b");
+		__tb_leave;
+		tb_print("try: e");
+	}
+	__tb_except
+	{
+		tb_print("except");
+	}
+	__tb_end
+	tb_print("end");
 #else
 	__tb_try 
 	{

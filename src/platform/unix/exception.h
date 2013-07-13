@@ -58,6 +58,7 @@ typedef struct __tb_exception_list_t
 
 	// try
 # 	define __tb_try \
+	do \
 	{ \
 		/* init exception data */ \
 		tb_exception_list_t* __l = tb_null; \
@@ -90,15 +91,19 @@ typedef struct __tb_exception_list_t
 
 	// except
 # 	define __tb_except \
-	} \
-	\
-	/* pop the jmpbuf */ \
-	if (__j && __l && __l->stack) tb_stack_pop(__l->stack); \
-	/* exception been catched? */ \
-	if (__j)
+		} \
+		\
+		/* pop the jmpbuf */ \
+		if (__j && __l && __l->stack) tb_stack_pop(__l->stack); \
+		/* exception been catched? */ \
+		if (__j)
 
 	// end
-# 	define __tb_end }
+# 	define __tb_end \
+	} while (0);
+
+	// leave
+# 	define __tb_leave 	break
 
 	// init
 # 	define tb_exception_init tb_exception_init_impl
