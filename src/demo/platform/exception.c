@@ -24,8 +24,10 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 		__tb_try 
 		{
 			tb_print("thread[%p]: try1: b: %lu", self, i++);
-			tb_abort();
-			//__tb_volatile__ tb_size_t a = 0; a /= a;
+//			tb_abort();
+//			tb_memset(&i, 0, 8192);
+//			__tb_volatile__ tb_size_t a = 0; a /= a;
+			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
 			tb_print("thread[%p]: try1: e: %lu", self, i++);
 		}
 		__tb_except
