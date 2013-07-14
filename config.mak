@@ -13,10 +13,10 @@ DTYPE = r
 SMALL = y
 
 # platform
-PLAT = linux
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # demo
 DEMO = y
