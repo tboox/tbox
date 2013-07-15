@@ -36,7 +36,7 @@
 
 # 	if defined(TB_COMPILER_IS_MSVC)
 # 		define __tb_try 				__try
-# 		define __tb_except 				__except(1)
+# 		define __tb_except(x) 			__except(((x) > 0)? 1 : 0)
 # 		define __tb_leave				__leave
 # 		define __tb_end 				
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
@@ -51,7 +51,8 @@
 			\
 			/* init handler */ \
 			__r.handler = tb_exception_func_impl; \
-			__r.exception_handler = &__h;                                     \
+			__r.exception_handler = &__h; \
+			/* push seh */ \
 			__tb_asm__ __tb_volatile__ ("movl %%fs:0, %0" : "=r" (__r.prev)); \
 			__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (&__r)); \
 			\
@@ -61,11 +62,20 @@
 			{
 
 		// except
-# 		define __tb_except \
+# 		define __tb_except(x) \
 			} \
-			/*PEXCEPTION_RECORD rec = &__h.record;*/ \
-			/*PCONTEXT ctx = &__h.context;*/ \
 			\
+			/* do not this catch? goto the top exception stack */ \
+			if (__j && !(x)) \
+			{ \
+				if (__r.prev && __r.prev->exception_handler) tb_longjmp(__r.prev->exception_handler->jmpbuf, 1); \
+				else \
+				{ \
+					/* no exception handler */ \
+					tb_assert_and_check_break(0); \
+				} \
+			} \
+			/* pop seh */ \
 			__tb_asm__ __tb_volatile__ ("movl %0, %%fs:0" : : "r" (__r.prev)); \
 			if (__j)
 
@@ -172,7 +182,7 @@ typedef struct __tb_exception_registration_t
 	struct __tb_exception_registration_t* 	prev;
 
 	// the exception handler
-	tb_exception_func_t  			handler;
+	tb_exception_func_t  					handler;
 
 	// the seh handler
 	struct __tb_exception_handler_t* 		exception_handler;

@@ -21,50 +21,54 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_try 
 	{
-		// try1
 		tb_print("thread[%p]: try0: b: %lu", self, i++);
 		__tb_try 
 		{
-			// trace
-			// FIXME: debug: if i is been stored in the stack, it will be modified after exception
-			// FIXME: relase: if i is been stored in the register, it will be restored after exception
 			tb_print("thread[%p]: try1: b: %lu", self, i++);
+			__tb_try 
+			{
+				// trace
+				// FIXME: debug: if i is been stored in the stack, it will be modified after exception
+				// FIXME: relase: if i is been stored in the register, it will be restored after exception
+				tb_print("thread[%p]: try2: b: %lu", self, i++);
 
-			// abort
-			tb_abort();
-//			tb_memset(&i, 0, 8192); // FIXME
-//			__tb_volatile__ tb_size_t a = 0; a /= a;
-//			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
-		
-			// trace
+				// abort
+				tb_abort();
+	//			tb_memset(&i, 0, 8192); // FIXME
+	//			__tb_volatile__ tb_size_t a = 0; a /= a;
+	//			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
+	
+				// trace
+				tb_print("thread[%p]: try2: e: %lu", self, i++);
+			}
+			__tb_except(0)
+			{
+				tb_print("thread[%p]: except2: %lu", self, i++);
+			}
+			__tb_end
 			tb_print("thread[%p]: try1: e: %lu", self, i++);
 		}
-		__tb_except
+		__tb_except(1)
 		{
 			tb_print("thread[%p]: except1: %lu", self, i++);
 		}
 		__tb_end
-			
-		// end
-		tb_print("thread[%p]: end1: b: %lu", self, i);
+		tb_print("thread[%p]: try0: e: %lu", self, i);
 
 		// abort
 		tb_abort();
 
 		// end
-		tb_print("thread[%p]: end1: e: %lu", self, i);
+		tb_print("thread[%p]: end0: e: %lu", self, i);
 	}
-	__tb_except
+	__tb_except(1)
 	{
 		tb_print("thread[%p]: except0: %lu", self, i++);
 	}
 	__tb_end
 
-	// end
-	tb_print("thread[%p]: end0: %lu", self, i);
-
 	// trace
-	tb_print("thread[%p]: exit", self);
+	tb_print("thread[%p]: exit: %lu", self, i);
 	tb_thread_return(tb_null);
 	return tb_null;
 }
