@@ -47,7 +47,7 @@
 
 // except
 #ifndef __tb_except
-# 	define __tb_except 									while (0); if (0)
+# 	define __tb_except(x) 								while (0); if (0)
 #endif
 
 // leave

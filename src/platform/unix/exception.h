@@ -90,11 +90,26 @@ typedef struct __tb_exception_list_t
 		{
 
 	// except
-# 	define __tb_except \
+# 	define __tb_except(x) \
 		} \
 		\
 		/* pop the jmpbuf */ \
-		if (__j && __l && __l->stack) tb_stack_pop(__l->stack); \
+		if (__l && __l->stack) tb_stack_pop(__l->stack); \
+		/* do not this catch? */ \
+		if (__j && !(x)) \
+		{ \
+			/* goto the top exception stack */ \
+			if (__l && __l->stack && tb_stack_size(__l->stack)) \
+			{ \
+				tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(__l->stack); \
+				if (jmpbuf) tb_siglongjmp(*jmpbuf, 1); \
+			} \
+			else \
+			{ \
+				/* no exception handler */ \
+				tb_assert_and_check_break(0); \
+			} \
+		} \
 		/* exception been catched? */ \
 		if (__j)
 
@@ -118,7 +133,7 @@ typedef struct __tb_exception_list_t
 static tb_void_t tb_exception_func_impl(tb_int_t sig)
 {
 	tb_exception_list_t* list = (tb_exception_list_t*)tb_tstore_getp();
-	if (list && list->stack) 
+	if (list && list->stack && tb_stack_size(list->stack)) 
 	{
 		tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(list->stack);
 		if (jmpbuf) tb_siglongjmp(*jmpbuf, 1);
