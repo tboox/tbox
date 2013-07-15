@@ -930,4 +930,133 @@ tb_double_t tb_number_double(tb_object_t* object)
 	tb_assert(0);
 	return 0;
 }
+tb_bool_t tb_number_uint8_set(tb_object_t* object, tb_uint8_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
 
+	// init value
+	number->type = TB_NUMBER_TYPE_UINT8;
+	number->v.u8 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_sint8_set(tb_object_t* object, tb_sint8_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_SINT8;
+	number->v.s8 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_uint16_set(tb_object_t* object, tb_uint16_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_UINT16;
+	number->v.u16 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_sint16_set(tb_object_t* object, tb_sint16_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_SINT16;
+	number->v.s16 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_uint32_set(tb_object_t* object, tb_uint32_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_UINT32;
+	number->v.u32 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_sint32_set(tb_object_t* object, tb_sint32_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_SINT32;
+	number->v.s32 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_uint64_set(tb_object_t* object, tb_uint64_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_UINT64;
+	number->v.u64 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_sint64_set(tb_object_t* object, tb_sint64_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_SINT64;
+	number->v.s64 = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_float_set(tb_object_t* object, tb_float_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_FLOAT;
+	number->v.f = value;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_number_double_set(tb_object_t* object, tb_double_t value)
+{	
+	// check
+	tb_number_t* number = tb_number_cast(object);
+	tb_assert_and_check_return_val(number, tb_false);
+
+	// init value
+	number->type = TB_NUMBER_TYPE_DOUBLE;
+	number->v.d = value;
+
+	// ok
+	return tb_true;
+}

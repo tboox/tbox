@@ -548,7 +548,7 @@ tb_object_t* tb_object_dump(tb_object_t* object)
 	if (odata)
 	{
 		// data & size 
-		tb_byte_t const* 	data = tb_data_addr(odata);
+		tb_byte_t const* 	data = tb_data_getp(odata);
 		tb_size_t 			size = tb_data_size(odata);
 		if (data && size)
 		{

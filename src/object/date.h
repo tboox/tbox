@@ -67,5 +67,22 @@ tb_object_t* 		tb_date_init_from_time(tb_time_t time);
  */
 tb_time_t 			tb_date_time(tb_object_t* date);
 
+/*! set the date time
+ *
+ * @param 			the date object
+ * @param 			the date time
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_date_time_set(tb_object_t* date, tb_time_t time);
+
+/*! set the date time for now
+ *
+ * @param 			the date object
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_date_time_set_now(tb_object_t* date);
+
 #endif
 

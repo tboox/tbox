@@ -295,3 +295,27 @@ tb_time_t tb_date_time(tb_object_t* object)
 	// time
 	return date->time;
 }
+tb_bool_t tb_date_time_set(tb_object_t* object, tb_time_t time)
+{
+	// check
+	tb_date_t* date = tb_date_cast(object);
+	tb_assert_and_check_return_val(date, tb_false);
+
+	// set time
+	date->time = time;
+
+	// ok
+	return tb_true;
+}
+tb_bool_t tb_date_time_set_now(tb_object_t* object)
+{
+	// check
+	tb_date_t* date = tb_date_cast(object);
+	tb_assert_and_check_return_val(date, tb_false);
+
+	// set time
+	date->time = tb_time();
+
+	// ok
+	return tb_true;
+}

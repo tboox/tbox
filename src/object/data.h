@@ -71,13 +71,23 @@ tb_object_t* 		tb_data_init_from_data(tb_pointer_t data, tb_size_t size);
  */
 tb_object_t* 		tb_data_init_from_pbuf(tb_pbuffer_t* pbuf);
 
-/*! the data address
+/*! get the data 
  *
  * @param data 		the data object
  *
  * @return 			the data address
  */
-tb_pointer_t 		tb_data_addr(tb_object_t* data);
+tb_pointer_t 		tb_data_getp(tb_object_t* data);
+
+/*! set the data 
+ *
+ * @param data 		the data object
+ * @param addr 		the data address
+ * @param size 		the data size
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_data_setp(tb_object_t* data, tb_pointer_t addr, tb_size_t size);
 
 /*! the data size
  *
