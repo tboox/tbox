@@ -234,5 +234,95 @@ tb_float_t 			tb_number_float(tb_object_t* number);
  */
 tb_double_t 		tb_number_double(tb_object_t* number);
 
+/*! set the uint8 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_uint8_set(tb_object_t* number, tb_uint8_t value);
+
+/*! set the sint8 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_sint8_set(tb_object_t* number, tb_sint8_t value);
+
+/*! set the uint16 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_uint16_set(tb_object_t* number, tb_uint16_t value);
+
+/*! set the sint16 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_sint16_set(tb_object_t* number, tb_sint16_t value);
+
+/*! set the uint32 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_uint32_set(tb_object_t* number, tb_uint32_t value);
+
+/*! set the sint32 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_sint32_set(tb_object_t* number, tb_sint32_t value);
+
+/*! set the uint64 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_uint64_set(tb_object_t* number, tb_uint64_t value);
+
+/*! set the sint64 value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_sint64_set(tb_object_t* number, tb_sint64_t value);
+
+/*! set the float value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_float_set(tb_object_t* number, tb_float_t value);
+
+/*! set the double value 
+ *
+ * @param object 	the object pointer
+ * @param value 	the number value
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_number_double_set(tb_object_t* number, tb_double_t value);
+
 #endif
 

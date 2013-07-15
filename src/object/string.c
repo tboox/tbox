@@ -363,6 +363,18 @@ tb_char_t* tb_string_cstr(tb_object_t* object)
 	// cstr
 	return tb_pstring_cstr(&string->pstr);
 }
+tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
+{
+	// check
+	tb_string_t* string = tb_string_cast(object);
+	tb_assert_and_check_return_val(string && cstr, 0);
+
+	// copy string
+	tb_pstring_cstrcpy(&string->pstr, cstr);
+
+	// ok?
+	return tb_pstring_size(&string->pstr);
+}
 tb_size_t tb_string_size(tb_object_t* object)
 {
 	// check
