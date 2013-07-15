@@ -305,6 +305,7 @@ INC_FILES 				= \
 						platform/arch/arm/atomic.h \
 						platform/arch/sh4/prefix.h \
 						platform/arch/sh4/atomic.h \
+						platform/windows/prefix.h \
 						platform/windows/atomic.h \
 						platform/windows/exception.h \
 						platform/unix/prefix.h \
