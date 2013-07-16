@@ -1,0 +1,31 @@
+1. configure
+make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=]
+make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
+make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [NDK=..] [SDK=..]
+
+2. build
+make [all]
+make rebuild|r
+make lipo ARCH1=armv6 ARCH2=armv7 DEBUG=[y|n] SDK=[5.0|5.1|6.0|..] // for ios 
+
+3. update build
+make update|u
+
+4. clean build
+make clean|c
+
+5. install
+make prefix|p
+make install|i
+
+6. make info
+make error|e
+make output|o
+make warning|w
+
+7. make document
+make doc|d
+
+8. help
+make help|h
+
