@@ -262,21 +262,5 @@ config : .null
 
 # make help
 help : .null
-	@echo "help: ==================================================================="
-	@echo "help: make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=]"
-	@echo "help: make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]"
-	@echo "help: make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [BIN=] [PRE=] [NDK=..] [SDK=..]"
-	@echo "help: make lipo ARCH1=armv6 ARCH2=armv7 DEBUG=[y|n] SDK=[5.0|5.1|6.0|..]"
-	@echo "help: make [all]"
-	@echo "help: make doc|d"
-	@echo "help: make help|h"
-	@echo "help: make clean|c"
-	@echo "help: make error|e"
-	@echo "help: make update|u"
-	@echo "help: make output|o"
-	@echo "help: make prefix|p"
-	@echo "help: make rebuild|r"
-	@echo "help: make install|i"
-	@echo "help: make warning|w"
-	@echo "help: ==================================================================="
+	@cat ./README
 
