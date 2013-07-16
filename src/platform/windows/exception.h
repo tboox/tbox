@@ -36,7 +36,7 @@
 
 # 	if defined(TB_COMPILER_IS_MSVC)
 # 		define __tb_try 				__try
-# 		define __tb_except(x) 			__except(((x) > 0)? 1 : 0)
+# 		define __tb_except(x) 			__except(!!(x))
 # 		define __tb_leave				__leave
 # 		define __tb_end 				
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && !TB_CPU_BIT64
@@ -65,6 +65,8 @@
 # 		define __tb_except(x) \
 			} \
 			\
+			/* check */ \
+			tb_assert(x >= 0); \
 			/* do not this catch? goto the top exception stack */ \
 			if (__j && !(x)) \
 			{ \

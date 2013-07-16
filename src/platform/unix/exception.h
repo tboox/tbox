@@ -93,6 +93,8 @@ typedef struct __tb_exception_list_t
 # 	define __tb_except(x) \
 		} \
 		\
+		/* check */ \
+		tb_assert(x >= 0); \
 		/* pop the jmpbuf */ \
 		if (__l && __l->stack) tb_stack_pop(__l->stack); \
 		/* do not this catch? */ \
