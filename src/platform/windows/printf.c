@@ -56,7 +56,7 @@ typedef struct __tb_printf_t
  */
 
 // the printf
-static tb_printf_t 	g_printf = {0};
+static tb_printf_t 	g_printf = {TB_PRINTF_MODE_STDOUT, tb_null, tb_null};
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
