@@ -57,7 +57,7 @@ typedef struct __tb_printf_t
  */
 
 // the printf
-static tb_printf_t 	g_printf = {0};
+static tb_printf_t 	g_printf = {TB_PRINTF_MODE_STDOUT, tb_null, tb_null};
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -149,6 +149,12 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 	{
 		fprintf(g_printf.file, "%s", info);
 		fflush(g_printf.file);
+	}
+	else 
+	{
+		FILE* file = (g_printf.mode == TB_PRINTF_MODE_STDERR)? stderr : stdout;
+		fprintf(file, "%s", info);
+		fflush(file);
 	}
 #endif
 
