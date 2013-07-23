@@ -57,7 +57,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// bind 
 	tb_print("[demo]: bind port: %u", tb_stou32(argv[1]));
-	if (!tb_socket_bind(sock, tb_stou32(argv[1]))) goto end;
+	if (!tb_socket_bind(sock, tb_null, tb_stou32(argv[1]))) goto end;
+
+	// listen sock
+	if (!tb_socket_listen(sock)) goto end;
 
 	// add aioo
 	if (!tb_aipp_addo(aipp, sock, TB_AIOO_ETYPE_ACPT, tb_null)) goto end;

@@ -124,19 +124,24 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	return -1;
 }
 
-tb_bool_t tb_socket_bind(tb_handle_t handle, tb_size_t port)
+tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(handle && port, tb_false);
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// init
 	SOCKADDR_IN d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = htonl(INADDR_ANY); 
+	d.sin_addr.S_un.S_addr = ip? inet_addr(ip) : htonl(INADDR_ANY); 
 
 	// bind 
-    if (bind((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, sizeof(d)) < 0) return tb_false;
+    return (bind((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, sizeof(d)) < 0)? tb_false : tb_true;
+}
+tb_bool_t tb_socket_listen(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, tb_false);
 
 	// listen
     return (listen((SOCKET)((tb_long_t)handle - 1), 20) < 0)? tb_false : tb_true;

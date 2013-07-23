@@ -86,7 +86,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// bind port
 	tb_print("[demo]: bind: %u", tb_stou32(argv[1]));
-	if (!tb_socket_bind(sock, tb_stou32(argv[1]))) goto end;
+	if (!tb_socket_bind(sock, tb_null, tb_stou32(argv[1]))) goto end;
+
+	// listen sock
+	if (!tb_socket_listen(sock)) goto end;
 
 	// init aicp
 	aicp = tb_aicp_init(TB_AIOO_OTYPE_SOCK, 16);

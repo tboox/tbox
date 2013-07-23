@@ -1,10 +1,28 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// arm
+#if defined(__tb_arch_armv5__)
+# 	define TB_CONFIG_ARM_VERSION 			(5)
+#elif defined(__tb_arch_armv6__)
+# 	define TB_CONFIG_ARM_VERSION 			(6)
+#elif defined(__tb_arch_armv7__)
+# 	define TB_CONFIG_ARM_VERSION 			(7)
+#elif defined(__tb_arch_armv7s__)
+# 	define TB_CONFIG_ARM_VERSION 			(7)
+#endif
+#ifdef __thumb__
+# 	define TB_CONFIG_ARM_THUMB
+#endif
+//#define TB_CONFIG_ARM_JAZELLE
+//#define TB_CONFIG_ARM_VFP
+//#define TB_CONFIG_ARM_MMU 
+//#define TB_CONFIG_ARM_MPU 
+
 // os
-#define TB_CONFIG_OS_MAC
-#define TB_CONFIG_OS_MAC_VERSION_MAJOR 	(10)
-#define TB_CONFIG_OS_MAC_VERSION_MINOR 	(7)
+#define TB_CONFIG_OS_IOS
+#define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(5)
+#define TB_CONFIG_OS_IOS_VERSION_MINOR 	(0)
 
 // cpu
 //#define TB_CONFIG_CPU_BIGENDIAN
@@ -32,7 +50,7 @@
 #define TB_CONFIG_TYPE_FLOAT
 
 // optimization
-#define TB_CONFIG_OPTI_SSE2_ENABLE
+//#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // memory
 #ifdef __tb_debug__
@@ -51,7 +69,7 @@
 //#define TB_CONFIG_AIO_HAVE_EPOLL
 #define TB_CONFIG_AIO_HAVE_POLL
 //#define TB_CONFIG_AIO_HAVE_PORT
-#define TB_CONFIG_AIO_HAVE_KQUEUE
+//#define TB_CONFIG_AIO_HAVE_KQUEUE
 //#define TB_CONFIG_AIO_HAVE_WAITO
 //#define TB_CONFIG_AIO_HAVE_IOCP
 
@@ -60,7 +78,7 @@
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
-#define TB_CONFIG_LIBC_HAVE_MEMSET
+//#define TB_CONFIG_LIBC_HAVE_MEMSET
 #define TB_CONFIG_LIBC_HAVE_MEMMOV
 #define TB_CONFIG_LIBC_HAVE_MEMCMP
 
@@ -72,7 +90,7 @@
 //#define TB_CONFIG_LIBC_HAVE_STRLCPY
 
 #define TB_CONFIG_LIBC_HAVE_STRLEN 
-#define TB_CONFIG_LIBC_HAVE_STRNLEN
+//#define TB_CONFIG_LIBC_HAVE_STRNLEN
 
 #define TB_CONFIG_LIBC_HAVE_STRSTR
 #define TB_CONFIG_LIBC_HAVE_STRISTR
@@ -91,10 +109,9 @@
 #define TB_CONFIG_LIBC_HAVE_SIGSETJMP
 
 // libm
-//#define TB_CONFIG_LIBM_HAVE_SINCOS
+#define TB_CONFIG_LIBM_HAVE_SINCOS
 //#define TB_CONFIG_LIBM_HAVE_SINCOSF
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
-
 
 #endif
