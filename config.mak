@@ -6,17 +6,17 @@ PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
-DTYPE = d
+DEBUG = n
+DTYPE = r
 
 # small
 SMALL = y
 
 # platform
-PLAT = mac
+PLAT = ios
 
 # architecture
-ARCH = x64
+ARCH = armv7
 
 # demo
 DEMO = n
@@ -25,7 +25,7 @@ DEMO = n
 SDK = 5.1
 NDK =
 BIN =
-PRE =
+PRE = xcrun -sdk iphoneos
 HOST = mac
 CCACHE = ccache
 DISTCC =

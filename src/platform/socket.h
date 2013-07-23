@@ -86,11 +86,20 @@ tb_long_t 			tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_
 /*! bind socket
  *
  * @param handle 	the socket handle
+ * @param ip 		the ip address
  * @param port 		the bind port
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_socket_bind(tb_handle_t handle, tb_size_t port);
+tb_bool_t 			tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
+
+/*! listen socket
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_socket_listen(tb_handle_t handle);
 
 /*! accept socket
  *

@@ -30,8 +30,10 @@
 #include "../../libc/libc.h"
 #include <unistd.h>
 #include <stdio.h>
-#ifdef TB_CONFIG_OS_ANDROID
+#if defined(TB_CONFIG_OS_ANDROID)
 # 	include <android/log.h>     
+#elif defined(TB_CONFIG_OS_IOS)
+# 	include <asl.h>
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -68,11 +70,7 @@ tb_bool_t tb_printf_init(tb_size_t mode, tb_char_t const* path)
 	if (!g_printf.mutx) g_printf.mutx = tb_mutex_init(tb_null);
 
 	// ok?
-#ifdef TB_CONFIG_OS_ANDROID
-	return tb_true;
-#else
 	return tb_printf_reset(mode, path);
-#endif
 }
 tb_void_t tb_printf_exit()
 {
@@ -142,21 +140,44 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 	tb_va_format(info, 8192, format, &size);
 	if (size >= 0) info[size] = '\0';
 
-#ifdef TB_CONFIG_OS_ANDROID
-	__android_log_print(ANDROID_LOG_DEBUG, "tbox", "%s", info);
-#else
+	// print to file
 	if (g_printf.file)
 	{
-		fprintf(g_printf.file, "%s", info);
-		fflush(g_printf.file);
+#if defined(TB_CONFIG_OS_ANDROID)
+		if (g_printf.mode != TB_PRINTF_MODE_FILE) __android_log_print(ANDROID_LOG_DEBUG, TB_PRINT_TAG, "%s", info);
+		else
+#elif defined(TB_CONFIG_OS_IOS)
+		/*
+		 * ASL_LEVEL_EMERG   0
+		 * ASL_LEVEL_ALERT   1
+		 * ASL_LEVEL_CRIT    2
+		 * ASL_LEVEL_ERR     3
+		 * ASL_LEVEL_WARNING 4 //< for NSLog      
+		 * ASL_LEVEL_NOTICE  5 //< show 
+		 *
+		 * ASL_LEVEL_INFO    6
+		 * ASL_LEVEL_DEBUG   7
+		 */
+		if (g_printf.mode != TB_PRINTF_MODE_FILE) asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, info);
+		else
+#endif
+		{
+			fprintf(g_printf.file, "%s", info);
+			fflush(g_printf.file);
+		}
 	}
 	else 
 	{
+#if defined(TB_CONFIG_OS_ANDROID)
+		__android_log_print(ANDROID_LOG_DEBUG, TB_PRINT_TAG, "%s", info);
+#elif defined(TB_CONFIG_OS_IOS)
+		asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, info);
+#else
 		FILE* file = (g_printf.mode == TB_PRINTF_MODE_STDERR)? stderr : stdout;
 		fprintf(file, "%s", info);
 		fflush(file);
-	}
 #endif
+	}
 
 	// leave
 	if (g_printf.mutx) tb_mutex_leave(g_printf.mutx);
