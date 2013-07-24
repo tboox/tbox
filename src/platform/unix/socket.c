@@ -137,7 +137,7 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 
 	// reuse addr
 #ifdef SO_REUSEADDR
-	if (ip)
+	//if (ip)
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
