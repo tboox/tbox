@@ -6,8 +6,8 @@ PRO_DIR = /Users/ruki/projects/personal/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = n
-DTYPE = r
+DEBUG = y
+DTYPE = d
 
 # small
 SMALL = y
@@ -19,7 +19,7 @@ PLAT = ios
 ARCH = armv7
 
 # demo
-DEMO = n
+DEMO = y
 
 # toolchain
 SDK = 5.1

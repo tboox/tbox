@@ -145,7 +145,6 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 	{
 #if defined(TB_CONFIG_OS_ANDROID)
 		if (g_printf.mode != TB_PRINTF_MODE_FILE) __android_log_print(ANDROID_LOG_DEBUG, TB_PRINT_TAG, "%s", info);
-		else
 #elif defined(TB_CONFIG_OS_IOS)
 		/*
 		 * ASL_LEVEL_EMERG   0
@@ -159,7 +158,6 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 		 * ASL_LEVEL_DEBUG   7
 		 */
 		if (g_printf.mode != TB_PRINTF_MODE_FILE) asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, info);
-		else
 #endif
 		{
 			fprintf(g_printf.file, "%s", info);
@@ -172,11 +170,11 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 		__android_log_print(ANDROID_LOG_DEBUG, TB_PRINT_TAG, "%s", info);
 #elif defined(TB_CONFIG_OS_IOS)
 		asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, info);
-#else
+#endif
+
 		FILE* file = (g_printf.mode == TB_PRINTF_MODE_STDERR)? stderr : stdout;
 		fprintf(file, "%s", info);
 		fflush(file);
-#endif
 	}
 
 	// leave
