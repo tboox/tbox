@@ -204,6 +204,7 @@ tb_long_t tb_pstring_cstrirstr(tb_pstring_t const* string, tb_size_t p, tb_char_
  */
 tb_char_t const* tb_pstring_strcpy(tb_pstring_t* string, tb_pstring_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
 	tb_size_t n = tb_pstring_size(s);
@@ -216,11 +217,13 @@ tb_char_t const* tb_pstring_strcpy(tb_pstring_t* string, tb_pstring_t const* s)
 }
 tb_char_t const* tb_pstring_cstrcpy(tb_pstring_t* string, tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncpy(string, s, tb_strlen(s));
 }
 tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(string && s && n, tb_null);
 
 	tb_char_t* p = tb_pbuffer_memncpy(string, s, n + 1);
@@ -229,6 +232,7 @@ tb_char_t const* tb_pstring_cstrncpy(tb_pstring_t* string, tb_char_t const* s, t
 }
 tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
+	// check
 	tb_assert_and_check_return_val(string && fmt, tb_null);
 
 	// format data
@@ -244,6 +248,7 @@ tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt,
  */
 tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 {
+	// check
 	tb_assert_and_check_return_val(string, tb_null);
 	
 	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, 2);
@@ -252,6 +257,7 @@ tb_char_t const* tb_pstring_chrcat(tb_pstring_t* string, tb_char_t c)
 }
 tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(string, tb_null);
 
 	tb_char_t* p = tb_pbuffer_memnsetp(string, tb_pstring_size(string), c, n + 1);
@@ -263,16 +269,19 @@ tb_char_t const* tb_pstring_chrncat(tb_pstring_t* string, tb_char_t c, tb_size_t
  */
 tb_char_t const* tb_pstring_strcat(tb_pstring_t* string, tb_pstring_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncat(string, tb_pstring_cstr(s), tb_pstring_size(s));
 }
 tb_char_t const* tb_pstring_cstrcat(tb_pstring_t* string, tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 	return tb_pstring_cstrncat(string, s, tb_strlen(s));
 }
 tb_char_t const* tb_pstring_cstrncat(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(string && s && n, tb_null);
 	tb_char_t* p = tb_pbuffer_memncpyp(string, tb_pstring_size(string), s, n + 1);
 	if (p) p[tb_pstring_size(string)] = '\0';
@@ -280,6 +289,7 @@ tb_char_t const* tb_pstring_cstrncat(tb_pstring_t* string, tb_char_t const* s, t
 }
 tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt, ...)
 {
+	// check
 	tb_assert_and_check_return_val(string && fmt, tb_null);
 
 	// format data
@@ -296,31 +306,37 @@ tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt,
  */
 tb_long_t tb_pstring_strcmp(tb_pstring_t* string, tb_pstring_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_pstring_cstrncmp(string, tb_pstring_cstr(s), tb_pstring_size(s) + 1);
 }
 tb_long_t tb_pstring_strimp(tb_pstring_t* string, tb_pstring_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_pstring_cstrnicmp(string, tb_pstring_cstr(s), tb_pstring_size(s) + 1);
 }
 tb_long_t tb_pstring_cstrcmp(tb_pstring_t* string, tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_pstring_cstrncmp(string, s, tb_strlen(s) + 1);
 }
 tb_long_t tb_pstring_cstricmp(tb_pstring_t* string, tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_pstring_cstrnicmp(string, s, tb_strlen(s) + 1);
 }
 tb_long_t tb_pstring_cstrncmp(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_strncmp(tb_pstring_cstr(string), s, n);
 }
 tb_long_t tb_pstring_cstrnicmp(tb_pstring_t* string, tb_char_t const* s, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(string && s, 0);
 	return tb_strnicmp(tb_pstring_cstr(string), s, n);
 }
