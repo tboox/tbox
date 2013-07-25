@@ -77,12 +77,8 @@ CCFLAGS_DEBUG 		=
 CCFLAGS 			= 
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= \
-					-O3 -DNDEBUG \
-					-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-					-fvisibility=hidden
-
-MXFLAGS_DEBUG 		= -g -DDEBUG=1
+MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
+MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__  -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
@@ -93,6 +89,16 @@ MXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__  -c -Wall  \
 					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
 MXFLAGS-I 			= -I
 MXFLAGS-o 			= -o
+
+# opti
+ifeq ($(SMALL),y)
+MXFLAGS_RELEASE 	+= -Os
+else
+MXFLAGS_RELEASE 	+= -O3
+endif
+
+# small
+MXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # mflags: .m files
 MFLAGS_RELEASE 		= 
