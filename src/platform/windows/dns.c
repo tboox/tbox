@@ -32,7 +32,4 @@
 tb_void_t tb_dns_local_init()
 {
 }
-tb_void_t tb_dns_local_exit()
-{
-}
 
