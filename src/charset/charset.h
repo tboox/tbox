@@ -72,6 +72,36 @@ typedef enum __tb_charset_type_e
 
 }tb_charset_type_e;
 
+/// the charset type
+typedef struct __tb_charset_t
+{
+	/// the charset type
+	tb_size_t 			type;
+
+	/// the charset name
+	tb_char_t const* 	name;
+
+	/*! get ucs4 character
+	 *
+	 * return: -1, 0 or 1
+	 *
+	 * -1: 	failed, break it
+	 * 0: 	no character, skip and continue it
+	 * 1: 	ok, continue it
+	 */
+	tb_long_t 			(*get)(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+
+	/*! set ucs4 character
+	 *
+	 * return: -1, 0 or 1
+	 *
+	 * -1: 	failed, break it
+	 * 0: 	no character, skip and continue it
+	 * 1: 	ok, continue it
+	 */
+	tb_long_t 			(*set)(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+
+}tb_charset_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -87,11 +117,19 @@ tb_char_t const* 	tb_charset_name(tb_size_t type);
 
 /*! the charset type
  *
- * @param type 		the charset name
+ * @param name 		the charset name
  *
  * @return 			the charset type
  */
 tb_size_t 			tb_charset_type(tb_char_t const* name);
+
+/*! find the charset
+ *
+ * @param type 		the charset type
+ *
+ * @return 			the charset pointer
+ */
+tb_charset_t const* tb_charset_find(tb_size_t type);
 
 /*! convert charset from bstream
  *
