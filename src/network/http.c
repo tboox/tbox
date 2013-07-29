@@ -757,7 +757,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 
 	// set range
 	http->option.range.bof = offset;
-	http->option.range.eof = 0;
+	http->option.range.eof = http->status.document_size? http->status.document_size - 1 : 0;
 
 	// ok
 	tb_trace_impl("seek: %llu", offset);
