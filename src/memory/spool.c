@@ -50,11 +50,11 @@
 typedef struct __tb_spool_chunk_t
 {
 	// the vpool
-	tb_handle_t 	pool;
+	tb_handle_t 		pool;
 
 	// the chunk
-	tb_byte_t* 		data;
-	tb_size_t 		size;
+	tb_byte_t* 			data;
+	tb_size_t 			size;
 
 }tb_spool_chunk_t;
 

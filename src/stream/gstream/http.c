@@ -91,12 +91,8 @@ static tb_long_t tb_hstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
-	// check
-	tb_check_return_val(data, -1);
-	tb_check_return_val(size, 0);
-
-	// writ data
-	return tb_http_awrit(hst->http, data, size);
+	// writ data or afwrit data
+	return sync? tb_http_afwrit(hst->http, data, size) : tb_http_awrit(hst->http, data, size);
 }
 static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 {

@@ -58,9 +58,9 @@
 #define tb_bits_set_s8(p, x) 				tb_bits_set_u8(p, x)
 
 // 16-bits
-#define tb_bits_get_u16_le_impl(p) 			(*((p) + 1) << 8 | *(p))
+#define tb_bits_get_u16_le_impl(p) 			((tb_uint16_t)(*((p) + 1) << 8 | *(p)))
 #define tb_bits_get_s16_le_impl(p) 			tb_bits_get_u16_le_impl(p)
-#define tb_bits_get_u16_be_impl(p) 			(*((p)) << 8 | *((p) + 1))
+#define tb_bits_get_u16_be_impl(p) 			((tb_uint16_t)(*((p)) << 8 | *((p) + 1)))
 #define tb_bits_get_s16_be_impl(p) 			tb_bits_get_u16_be_impl(p)
 #define tb_bits_get_u16_ne_impl(p) 			(*((tb_uint16_t*)(p)))
 #define tb_bits_get_s16_ne_impl(p) 			tb_bits_get_u16_ne_impl(p)
@@ -73,11 +73,11 @@
 #define tb_bits_set_s16_ne_impl(p, x) 		tb_bits_set_u16_ne_impl(p, x)
 
 // 24-bits
-#define tb_bits_get_u24_le_impl(p) 			(*((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
+#define tb_bits_get_u24_le_impl(p) 			((tb_uint32_t)(*((p) + 2) << 16 | *((p) + 1) << 8 | *(p)))
 #define tb_bits_get_s24_le_impl(p) 			((tb_bits_get_u24_le_impl(p) + 0xff800000) ^ 0xff800000)
-#define tb_bits_get_u24_be_impl(p) 			(*(p) << 16 | *((p) + 1) << 8 | *((p) + 2))
+#define tb_bits_get_u24_be_impl(p) 			((tb_uint32_t)(*(p) << 16 | *((p) + 1) << 8 | *((p) + 2)))
 #define tb_bits_get_s24_be_impl(p) 			((tb_bits_get_u24_be_impl(p) + 0xff800000) ^ 0xff800000)
-#define tb_bits_get_u24_ne_impl(p) 			(*((tb_uint32_t*)(p)) & 0x00ffffff)
+#define tb_bits_get_u24_ne_impl(p) 			((tb_uint32_t)(*((tb_uint32_t*)(p)) & 0x00ffffff))
 #define tb_bits_get_s24_ne_impl(p) 			((tb_bits_get_u24_ne_impl(p) + 0xff800000) ^ 0xff800000)
 
 #define tb_bits_set_u24_le_impl(p, x) 		tb_bits_set_u24_le_inline(p, x)
@@ -88,9 +88,9 @@
 #define tb_bits_set_s24_ne_impl(p, x) 		tb_bits_set_u24_ne_impl(p, x)
 
 // 32-bits
-#define tb_bits_get_u32_le_impl(p) 			(*((p) + 3) << 24 | *((p) + 2) << 16 | *((p) + 1) << 8 | *(p))
+#define tb_bits_get_u32_le_impl(p) 			((tb_uint32_t)(*((p) + 3) << 24 | *((p) + 2) << 16 | *((p) + 1) << 8 | *(p)))
 #define tb_bits_get_s32_le_impl(p) 			tb_bits_get_u32_le_impl(p)
-#define tb_bits_get_u32_be_impl(p) 			(*(p) << 24 | *((p) + 1) << 16 | *((p) + 2) << 8 | *((p) + 3))
+#define tb_bits_get_u32_be_impl(p) 			((tb_uint32_t)(*(p) << 24 | *((p) + 1) << 16 | *((p) + 2) << 8 | *((p) + 3)))
 #define tb_bits_get_s32_be_impl(p) 			tb_bits_get_u32_be_impl(p)
 #define tb_bits_get_u32_ne_impl(p) 			(*((tb_uint32_t*)(p)))
 #define tb_bits_get_s32_ne_impl(p) 			tb_bits_get_u32_ne_impl(p)
