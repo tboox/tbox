@@ -34,6 +34,7 @@
 #include "gpool.h"
 #include "spool.h"
 #include "rpool.h"
+#include "cspool.h"
 #include "malloc.h"
 #include "pbuffer.h"
 #include "sbuffer.h"

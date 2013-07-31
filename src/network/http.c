@@ -419,7 +419,6 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		http->step &= ~TB_HTTP_STEP_NEVT;
 
 		// send head
-		tb_trace_impl("request: send: head: %lu <? %lu", http->size, head_size);
 		while (http->size < head_size)
 		{
 			// writ data
@@ -432,6 +431,9 @@ static tb_long_t tb_http_request(tb_http_t* http)
 			// update size
 			http->size += real;
 		}
+
+		// trace
+		tb_trace_impl("request: send: head: %lu <? %lu", http->size, head_size);
 
 		// check
 		tb_assert_and_check_return_val(http->size == head_size, -1);
@@ -1023,8 +1025,10 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 }
 tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream && (http->step & TB_HTTP_STEP_POST), -1);
+	tb_assert_and_check_return_val(http->status.post_size < http->option.post, -1);
 
 	// writ the post data
 	tb_hong_t ok = http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
@@ -1032,16 +1036,6 @@ tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 	// save the post size
 	if (ok > 0) http->status.post_size += ok;
-
-	// finish post? flush it
-	if (http->status.post_size >= http->option.post)
-	{
-		// flush writed data
-		ok = tb_gstream_afwrit(http->stream, tb_null, 0);
-
-		// continue it if has data
-		tb_check_return_val(ok < 0, 0);
-	}
 
 	// ok?
 	return ok;
@@ -1139,6 +1133,70 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 	// ok?
 	return read == size? tb_true : tb_false;
+}
+tb_long_t tb_http_afwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+{
+	// check
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream, -1);
+
+	// afwrit
+	return tb_gstream_afwrit(http->stream, data, size);
+}
+tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+{
+	// check
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream, tb_false);
+
+	// has data
+	if (data && size)
+	{
+		// writ data to cache
+		tb_long_t writ = 0;
+		while (writ < size)
+		{
+			// writ data
+			tb_long_t n = tb_gstream_afwrit(http->stream, data + writ, size - writ);	
+
+			if (n > 0) writ += n;
+			else if (!n)
+			{
+				// wait
+				tb_long_t e = tb_gstream_wait(http->stream, TB_AIOO_ETYPE_WRIT, http->option.timeout);
+				tb_assert_and_check_break(e >= 0);
+
+				// timeout?
+				tb_check_break(e);
+
+				// has writ?
+				tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+			}
+			else break;
+		}
+
+		// ok?
+		return (writ == size? tb_true : tb_false);
+	}
+	// only flush the cache data
+	else
+	{
+		while (!tb_gstream_afwrit(http->stream, tb_null, 0))
+		{
+			// wait
+			tb_long_t e = tb_gstream_wait(http->stream, TB_AIOO_ETYPE_WRIT, http->option.timeout);
+			tb_assert_and_check_break(e >= 0);
+
+			// timeout?
+			tb_check_break(e);
+
+			// has writ?
+			tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+		}
+	}
+
+	// ok
+	return tb_true;
 }
 tb_http_option_t* tb_http_option(tb_handle_t handle)
 {

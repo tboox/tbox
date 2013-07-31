@@ -119,6 +119,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// writ post
 	tb_http_bwrit(http, argv[2], option->post);
+	tb_http_bfwrit(http, tb_null, 0);
 
 	// read data
 	tb_byte_t 		data[8192];
