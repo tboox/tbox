@@ -194,7 +194,7 @@ DISTCC 		:=
 endif
 
 config : .null
-	-@$(CP) ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
+	-@cp ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
 	@echo "config: ==================================================================="
 	@echo "config: name: \t" 							$(PRO_NAME)
 	@echo "config: plat: \t" 							$(PLAT)
