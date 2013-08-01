@@ -26,6 +26,7 @@
  */
 #include "malloc.h"
 #include "gpool.h"
+#include "scache.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -51,10 +52,18 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	if (!tb_mutex_leave(g_mutex)) return tb_false;
 
 	// ok?
-	return g_gpool? tb_true : tb_false;
+	return g_gpool? tb_scache_init(align) : tb_false;
 }
 tb_void_t tb_memory_exit()
 {
+	// exit scache
+	tb_scache_exit();
+
+	// dump gpool
+#ifdef __tb_debug__
+	tb_memory_dump();
+#endif
+
 	// exit gpool
 	if (g_mutex && tb_mutex_enter(g_mutex))
 	{

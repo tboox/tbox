@@ -79,7 +79,7 @@ typedef struct __tb_aipp_t
 	tb_size_t 				maxn;
 
 	// the objects hash
-	tb_hash_t* 				hash;
+	tb_handle_t 			hash;
 
 	// the reactor
 	tb_aipp_reactor_t* 		rtor;

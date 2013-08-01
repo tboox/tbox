@@ -47,28 +47,28 @@ typedef struct __tb_slist_item_t
  */
 static tb_size_t tb_slist_iterator_head(tb_iterator_t* iterator)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
 	return slist->head;
 }
 static tb_size_t tb_slist_iterator_tail(tb_iterator_t* iterator)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
 	return 0;
 }
 static tb_size_t tb_slist_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist && itor, 0);
 
 	return ((tb_slist_item_t const*)itor)->next;
 }
 static tb_size_t tb_slist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
 	// is tail?
@@ -88,13 +88,13 @@ static tb_size_t tb_slist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 }
 static tb_pointer_t tb_slist_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist && itor, tb_null);
 	return slist->func.data(&slist->func, &((tb_slist_item_t const*)itor)[1]);
 }
 static tb_void_t tb_slist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return(slist && itor);
 
 	if (iterator->step > sizeof(tb_pointer_t))
@@ -106,7 +106,7 @@ static tb_void_t tb_slist_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 }
 static tb_long_t tb_slist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	tb_slist_t* slist = (tb_slist_t*)iterator->data;
+	tb_slist_t* slist = (tb_slist_t*)iterator;
 	tb_assert_and_check_return_val(slist && slist->func.comp, 0);
 	return slist->func.comp(&slist->func, ltem, rtem);
 }
@@ -132,7 +132,6 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	slist->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-	slist->itor.data = (tb_pointer_t)slist;
 	slist->itor.size = 0;
 	slist->itor.priv = tb_null;
 	slist->itor.step = func.size;

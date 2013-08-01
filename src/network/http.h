@@ -127,7 +127,7 @@ typedef struct __tb_http_option_t
 	tb_hize_t 			post;
 
 	// the head hash
-	tb_hash_t* 			head;
+	tb_handle_t 		head;
 
 	// timeout: ms
 	tb_size_t 			timeout;

@@ -133,9 +133,6 @@ tb_void_t tb_exit()
 
 	// exit memory
 #ifdef TB_CONFIG_MEMORY_POOL
-# 	ifdef __tb_debug__
-	tb_memory_dump();
-# 	endif
 	tb_memory_exit();
 #else
 	tb_malloc_exit();

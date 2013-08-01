@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		cspool.h
+ * @file		scache.h
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_CSPOOL_H
-#define TB_MEMORY_CSPOOL_H
+#ifndef TB_MEMORY_scache_H
+#define TB_MEMORY_scache_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -33,7 +33,7 @@
  * interfaces
  */
 
-/*! init const string pool
+/*! init string cache for small, readonly and repeat strings
  *
  * readonly, strip repeat strings and decrease memory fragmens
  *
@@ -41,38 +41,29 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_cspool_init(tb_size_t align);
+tb_bool_t 			tb_scache_init(tb_size_t align);
 
-/// exit cspool
-tb_void_t 			tb_cspool_exit();
+/// exit scache
+tb_void_t 			tb_scache_exit();
 
-/// clear cspool
-tb_void_t 			tb_cspool_clear();
+/// clear scache
+tb_void_t 			tb_scache_clear();
 
-/*! duplicate string to cspool
+/*! put string to scache
  *
  * @param data 		the string data
  *
  * @return 			the string data
  */
-tb_char_t*			tb_cspool_strdup(tb_char_t const* data);
+tb_char_t const*	tb_scache_put(tb_char_t const* data);
 
-/*! duplicate string to cspool with size
- *
- * @param data 		the string data
- * @param size 		the string size
- *
- * @return 			the string data
- */
-tb_char_t* 			tb_cspool_strndup(tb_char_t const* data, tb_size_t size);
-
-/*! free string from cspool
+/*! del string from scache
  *
  * @param data 		the string data
  */
-tb_void_t 			tb_cspool_free(tb_char_t* data);
+tb_void_t 			tb_scache_del(tb_char_t const* data);
 
-/// dump cspool
-tb_void_t 			tb_cspool_dump();
+/// dump scache
+tb_void_t 			tb_scache_dump();
 
 #endif

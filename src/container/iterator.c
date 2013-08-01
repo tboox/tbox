@@ -248,6 +248,11 @@ tb_pointer_t tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 	tb_assert_return_val(iterator && iterator->item, tb_null);
 	return iterator->item(iterator, itor);
 }
+tb_void_t tb_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
+{
+	tb_assert_return(iterator && iterator->delt);
+	return iterator->delt(iterator, itor);
+}
 tb_void_t tb_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	tb_assert_return(iterator && iterator->move);

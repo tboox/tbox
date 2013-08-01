@@ -522,6 +522,30 @@ static tb_void_t tb_item_func_ifm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	// copy item
 	if (func->ndupl) func->ndupl(func, item, data, size);
 }
+// the string for scache 
+static tb_void_t tb_item_func_scache_free(tb_item_func_t* func, tb_pointer_t item)
+{
+	tb_assert_and_check_return(func && item);
+	if (*((tb_pointer_t*)item)) tb_scache_del(*((tb_pointer_t*)item));
+}
+static tb_void_t tb_item_func_scache_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+{
+	tb_assert_and_check_return(func && item);
+
+	if (data) *((tb_pointer_t*)item) = tb_scache_put(data);
+	else *((tb_pointer_t*)item) = tb_null;
+}
+static tb_void_t tb_item_func_scache_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+{
+	tb_assert_and_check_return(func && item);
+
+	// free it
+	if (func->free) func->free(func, item);
+
+	// copy it
+	*((tb_pointer_t*)item) = data? tb_scache_put(data) : tb_null;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -766,6 +790,30 @@ tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_poi
 
 	func.size = size;
 	func.priv = priv;
+
+	return func;
+}
+tb_item_func_t tb_item_func_scache(tb_bool_t bcase)
+{
+	tb_item_func_t func;
+	tb_memset(&func, 0, sizeof(tb_item_func_t));
+	func.type = TB_ITEM_TYPE_SCACHE;
+	func.hash = tb_item_func_str_hash;
+	func.comp = tb_item_func_str_comp;
+
+	func.data = tb_item_func_ptr_data;
+	func.cstr = tb_item_func_str_cstr;
+
+	func.free = tb_item_func_scache_free;
+	func.dupl = tb_item_func_scache_dupl;
+	func.copy = tb_item_func_scache_copy;
+
+	func.nfree = tb_item_func_efm_nfree;
+	func.ndupl = tb_item_func_efm_ndupl;
+	func.ncopy = tb_item_func_efm_ncopy;
+
+	func.size = sizeof(tb_pointer_t);
+	func.priv = (tb_pointer_t)bcase;
 
 	return func;
 }

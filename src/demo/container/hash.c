@@ -36,7 +36,7 @@
 static tb_void_t tb_hash_test_s2i_func()
 {
 	// init hash: str => tb_int_t
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
+	tb_handle_t hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -110,8 +110,8 @@ static tb_void_t tb_hash_test_s2i_func()
 static tb_void_t tb_hash_test_s2i_perf()
 {
 	// init hash: str => tb_int_t
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_true, pool), tb_item_func_long());
+	tb_handle_t 	pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_true, pool), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -137,7 +137,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 static tb_void_t tb_hash_test_i2s_func()
 {
 	// init hash: tb_int_t => str
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
+	tb_handle_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -207,7 +207,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 {
 	// init hash: tb_int_t => str
 	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_str(tb_true, pool));
+	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_str(tb_true, pool));
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -233,8 +233,8 @@ static tb_void_t tb_hash_test_m2m_func()
 	tb_size_t const	step = 256;
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
-	tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_efm(step, tb_null), tb_item_func_efm(step, tb_null));
-	//tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	tb_handle_t 	hash = tb_hash_init(8, tb_item_func_efm(step, tb_null), tb_item_func_efm(step, tb_null));
+	//tb_handle_t 	hash = tb_hash_init(8, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -346,8 +346,8 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_byte_t 		item[step];
 	// init hash: mem => mem
 	tb_handle_t 	pool = tb_rpool_init(256, step, 0);
-	//tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
-	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	//tb_handle_t 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
+	tb_handle_t 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -371,7 +371,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 static tb_void_t tb_hash_test_i2i_func()
 {
 	// init hash: tb_int_t => str
-	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_long());
+	tb_handle_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -440,7 +440,7 @@ static tb_void_t tb_hash_test_i2i_func()
 static tb_void_t tb_hash_test_i2i_perf()
 {
 	// init hash: tb_int_t => str
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
+	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -460,7 +460,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 
 	tb_hash_exit(hash);
 }
-static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_hash_test_walk_item(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	tb_assert_and_check_return_val(hash && bdel && data, tb_false);
 
@@ -487,7 +487,7 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 static tb_void_t tb_hash_test_walk_perf()
 {
 	// init hash
-	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
+	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -536,6 +536,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hash_test_walk_perf();
 #endif
 
-
+	tb_exit();
 	return 0;
 }
