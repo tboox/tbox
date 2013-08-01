@@ -97,5 +97,50 @@ tb_char_t* 		tb_strirstr(tb_char_t const* s1, tb_char_t const* s2);
 tb_char_t* 		tb_strnrstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
 tb_char_t* 		tb_strnirstr(tb_char_t const* s1, tb_size_t n, tb_char_t const* s2);
 
+// wcslen
+tb_size_t 		tb_wcslen(tb_wchar_t const* s);
+tb_size_t 		tb_wcsnlen(tb_wchar_t const* s, tb_size_t n);
+
+// wcsdup
+tb_wchar_t* 	tb_wcsdup(tb_wchar_t const* s);
+tb_wchar_t* 	tb_wcsndup(tb_wchar_t const* s, tb_size_t n);
+
+// wcscat
+tb_wchar_t* 	tb_wcscat(tb_wchar_t* s1, tb_wchar_t const* s2);
+tb_wchar_t* 	tb_wcsncat(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n);
+
+// wcscpy
+tb_wchar_t* 	tb_wcscpy(tb_wchar_t* s1, tb_wchar_t const* s2);
+tb_wchar_t* 	tb_wcsncpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n);
+tb_size_t 		tb_wcslcpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n);
+
+// wcscmp
+tb_long_t 		tb_wcscmp(tb_wchar_t const* s1, tb_wchar_t const* s2);
+tb_long_t 		tb_wcsncmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t n);
+
+tb_long_t 		tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2);
+tb_long_t 		tb_wcsnicmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t n);
+
+// wcschr
+tb_wchar_t* 	tb_wcschr(tb_wchar_t const* s, tb_wchar_t c);
+tb_wchar_t* 	tb_wcsichr(tb_wchar_t const* s, tb_wchar_t c);
+
+// wcsrchr
+tb_wchar_t* 	tb_wcsrchr(tb_wchar_t const* s, tb_wchar_t c);
+tb_wchar_t* 	tb_wcsirchr(tb_wchar_t const* s, tb_wchar_t c);
+
+tb_wchar_t* 	tb_wcsnrchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c);
+tb_wchar_t* 	tb_wcsnirchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c);
+
+// wcsstr
+tb_wchar_t* 	tb_wcsstr(tb_wchar_t const* s1, tb_wchar_t const* s2);
+tb_wchar_t* 	tb_wcsistr(tb_wchar_t const* s1, tb_wchar_t const* s2);
+
+// wcsrstr
+tb_wchar_t* 	tb_wcsrstr(tb_wchar_t const* s1, tb_wchar_t const* s2);
+tb_wchar_t* 	tb_wcsirstr(tb_wchar_t const* s1, tb_wchar_t const* s2);
+
+tb_wchar_t* 	tb_wcsnrstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2);
+tb_wchar_t* 	tb_wcsnirstr(tb_wchar_t const* s1, tb_size_t n, tb_wchar_t const* s2);
 
 #endif

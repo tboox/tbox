@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		stricmp.c
+ * @file		mbstowcs.c
  * @ingroup 	libc
  *
  */
@@ -25,28 +25,44 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-# 	include <string.h>
+#include "stdlib.h"
+#ifdef TB_CONFIG_LIBC_HAVE_MBSTOWCS
+# 	include <stdlib.h>
+#else
+# 	include "../../charset/charset.h"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+
+#ifdef TB_CONFIG_LIBC_HAVE_MBSTOWCS
+tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strcasecmp(s1, s2);
+	return mbstowcs(s1, s2, n);
 }
 #else
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2) return 0;
+	tb_assert_static(sizeof(tb_wchar_t) == 4);
 
+	// init
 	tb_long_t r = 0;
-	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
-	return r;
+	tb_size_t l = tb_strlen(s2);
+	
+	// atow
+	if (l) 
+	{
+		r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UCS4, s2, l, s1, n << 2);
+		if (r > 0) r >>= 2;
+	}
+	
+	// strip
+	if (r >= 0) s1[r] = L'\0';
+
+	// ok?
+	return r > 0? r : 0;
 }
 #endif

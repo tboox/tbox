@@ -26,7 +26,6 @@
  * includes
  */
 #include "string.h"
-
 #ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
 # 	include <string.h>
 #endif

@@ -17,36 +17,25 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		stricmp.c
- * @ingroup 	libc
+ * @file		printf.c
  *
  */
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-# 	include <string.h>
-#endif
+#include "printf.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_void_t tb_wprintf(tb_wchar_t const* format, ...)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strcasecmp(s1, s2);
-}
-#else
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
-{
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2) return 0;
+	// format info
+	tb_long_t size = 0;
+	tb_char_t info[8192] = {0};
+	tb_va_format(info, 8192, format, &size);
+	if (size >= 0) info[size] = '\0';
 
-	tb_long_t r = 0;
-	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
-	return r;
 }
-#endif
+

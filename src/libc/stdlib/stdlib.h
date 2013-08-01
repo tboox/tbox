@@ -59,6 +59,12 @@
 #define tb_strtol(s, e, b) 			tb_sbtoi32(s, b)
 #define tb_strtoll(s, e, b) 		tb_sbtoi64(s, b)
 
+// atow
+#define tb_atow(s1, s2, n) 			tb_mbstowcs(s1, s2, n)
+
+// wtoa
+#define tb_wtoa(s1, s2, n) 			tb_wcstombs(s1, s2, n)
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -87,6 +93,12 @@ tb_float_t 			tb_stof(tb_char_t const* s);
 tb_float_t 			tb_sbtof(tb_char_t const* s, tb_int_t base);
 
 #endif
+
+// mbstowcs
+tb_size_t 			tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n);
+
+// wcstombs
+tb_size_t 			tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n);
 
 
 #endif

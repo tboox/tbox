@@ -72,4 +72,7 @@ tb_bool_t 		tb_printf_reset(tb_size_t mode, tb_char_t const* path);
 /// printf
 tb_void_t 		tb_printf(tb_char_t const* format, ...);
 
+/// wprintf
+tb_void_t 		tb_wprintf(tb_wchar_t const* format, ...);
+
 #endif
