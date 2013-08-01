@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		stricmp.c
+ * @file		wcsncmp.c
  * @ingroup 	libc
  *
  */
@@ -26,27 +26,22 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-# 	include <string.h>
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_long_t tb_wcsncmp(tb_wchar_t const* s1, tb_wchar_t const* s2, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strcasecmp(s1, s2);
+	tb_check_return_val(s1 != s2 && n, 0);
+		
+	// done
+	while (n && (*((tb_wchar_t *)s1) == *((tb_wchar_t *)s2)))
+	{
+		if (!*s1++) return 0;
+		++s2;
+		--n;
+	}
+	return n? (*((tb_wchar_t *)s1) - *((tb_wchar_t *)s2)) : 0;
 }
-#else
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
-{
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2) return 0;
-
-	tb_long_t r = 0;
-	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
-	return r;
-}
-#endif

@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		stricmp.c
+ * @file		wcsncpy.c
  * @ingroup 	libc
  *
  */
@@ -26,27 +26,45 @@
  * includes
  */
 #include "string.h"
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-# 	include <string.h>
+#ifdef TB_CONFIG_LIBC_HAVE_WCSNCPY
+# 	include <wchar.h>
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
  */
-#ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+#ifdef TB_CONFIG_LIBC_HAVE_WCSNCPY
+tb_wchar_t* tb_wcsncpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	return strcasecmp(s1, s2);
+	tb_assert_and_check_return_val(s1 && s2, tb_null);
+	return wcsncpy(s1, s2, n);
 }
 #else
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+tb_wchar_t* tb_wcsncpy(tb_wchar_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2) return 0;
+	// check
+	tb_assert_and_check_return_val(s1 && s2, s1);
 
-	tb_long_t r = 0;
-	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
-	return r;
+	// no size or same? 
+	tb_check_return_val(n && s1 != s2, s1);
+
+	// copy
+#if 0
+	tb_wchar_t* s = s1;
+	while (n) 
+	{
+		if (*s = *s2) s2++;
+		++s;
+		--n;
+	}
+	return s1;
+#else
+	tb_size_t sn = tb_wcslen(s2);
+	tb_size_t cn = tb_min(sn, n);
+	tb_size_t fn = sn < n? n - sn : 0;
+	tb_memcpy(s1, s2, cn * sizeof(tb_wchar_t));
+	if (fn) tb_memset(s1 + cn, 0, fn * sizeof(tb_wchar_t));
+	return s1;
+#endif
 }
 #endif

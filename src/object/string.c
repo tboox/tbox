@@ -348,7 +348,7 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 			// the string size
 			string->csize = size;
 		}
-		else tb_pstring_cstrcpy(&string->pstr, cstr);
+		else tb_pstring_cstrncpy(&string->pstr, cstr, size);
 	}
 
 	// ok
@@ -426,7 +426,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 		else 
 		{
 			// copy string
-			tb_pstring_cstrcpy(&string->pstr, cstr);
+			tb_pstring_cstrncpy(&string->pstr, cstr, size);
 			size = tb_pstring_size(&string->pstr);
 
 			// remove string from scache

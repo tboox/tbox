@@ -98,6 +98,8 @@ tbox_C_FILES 			+= \
 						libc/stdio/snprintf \
 						libc/stdio/vsnprintf \
 						libc/stdlib/stdlib \
+						libc/stdlib/mbstowcs \
+						libc/stdlib/wcstombs \
 						libc/string/memset \
 						libc/string/memcpy \
 						libc/string/memcmp \
@@ -128,6 +130,31 @@ tbox_C_FILES 			+= \
 						libc/string/strirchr \
 						libc/string/strnrchr \
 						libc/string/strnirchr \
+						libc/string/wcslen \
+						libc/string/wcsnlen \
+						libc/string/wcscat \
+						libc/string/wcsncat \
+						libc/string/wcscpy \
+						libc/string/wcsncpy \
+						libc/string/wcslcpy \
+						libc/string/wcsdup \
+						libc/string/wcsndup \
+						libc/string/wcscmp \
+						libc/string/wcsncmp \
+						libc/string/wcsicmp \
+						libc/string/wcsnicmp \
+						libc/string/wcsstr \
+						libc/string/wcsistr \
+						libc/string/wcsrstr \
+						libc/string/wcsirstr \
+						libc/string/wcsnrstr \
+						libc/string/wcsnirstr \
+						libc/string/wcschr \
+						libc/string/wcsichr \
+						libc/string/wcsrchr \
+						libc/string/wcsirchr \
+						libc/string/wcsnrchr \
+						libc/string/wcsnirchr \
 						libm/idivi8 \
 						libm/ilog2i \
 						libm/isqrti \

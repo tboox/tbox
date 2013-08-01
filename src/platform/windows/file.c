@@ -31,8 +31,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-// file
 tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 {
 	// check
@@ -263,7 +261,7 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// rename it
-	return MoveFileEx(path, dest, MOVEFILE_REPLACE_EXISTING);
+	return MoveFileExA(path, dest, MOVEFILE_REPLACE_EXISTING);
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {
