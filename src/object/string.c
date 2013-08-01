@@ -38,7 +38,7 @@
  */
 
 // the scache string size
-#define TB_STRING_SCACHE_SIZE 		(512)
+#define TB_STRING_SCACHE_SIZE 		(64)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -83,7 +83,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	{
 		if (string->cdata) tb_scache_del(string->cdata);
 		tb_pstring_exit(&string->pstr);
-		tb_free(string);
+		tb_opool_del(string);
 	}
 }
 static tb_void_t tb_string_cler(tb_object_t* object)
@@ -100,11 +100,8 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 static tb_string_t* tb_string_init_base()
 {
 	// make
-	tb_string_t* string = tb_malloc0(sizeof(tb_string_t));
+	tb_string_t* string = tb_opool_get(sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
 	tb_assert_and_check_return_val(string, tb_null);
-
-	// init object
-	if (!tb_object_init(string, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING)) goto fail;
 
 	// init base
 	string->base.copy = tb_string_copy;
@@ -113,11 +110,6 @@ static tb_string_t* tb_string_init_base()
 
 	// ok
 	return string;
-
-	// no
-fail:
-	if (string) tb_free(string);
-	return tb_null;
 }
 static tb_object_t* tb_string_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {

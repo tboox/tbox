@@ -66,7 +66,7 @@ static tb_object_t* tb_date_copy(tb_object_t* object)
 static tb_void_t tb_date_exit(tb_object_t* object)
 {
 	tb_date_t* date = tb_date_cast(object);
-	if (date) tb_free(date);
+	if (date) tb_opool_del(date);
 }
 static tb_void_t tb_date_cler(tb_object_t* object)
 {
@@ -76,11 +76,8 @@ static tb_void_t tb_date_cler(tb_object_t* object)
 static tb_date_t* tb_date_init_base()
 {
 	// make
-	tb_date_t* date = tb_malloc0(sizeof(tb_date_t));
+	tb_date_t* date = tb_opool_get(sizeof(tb_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
 	tb_assert_and_check_return_val(date, tb_null);
-
-	// init object
-	if (!tb_object_init(date, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE)) goto fail;
 
 	// init base
 	date->base.copy = tb_date_copy;
@@ -89,11 +86,6 @@ static tb_date_t* tb_date_init_base()
 
 	// ok
 	return date;
-
-	// no
-fail:
-	if (date) tb_free(date);
-	return tb_null;
 }
 static tb_object_t* tb_date_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {

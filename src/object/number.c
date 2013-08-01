@@ -130,7 +130,7 @@ static tb_object_t* tb_number_copy(tb_object_t* object)
 }
 static tb_void_t tb_number_exit(tb_object_t* object)
 {
-	if (object) tb_free(object);
+	if (object) tb_opool_del(object);
 }
 static tb_void_t tb_number_cler(tb_object_t* object)
 {
@@ -178,11 +178,8 @@ static tb_void_t tb_number_cler(tb_object_t* object)
 static tb_number_t* tb_number_init_base()
 {
 	// make
-	tb_number_t* number = tb_malloc0(sizeof(tb_number_t));
+	tb_number_t* number = tb_opool_get(sizeof(tb_number_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER);
 	tb_assert_and_check_return_val(number, tb_null);
-
-	// init object
-	if (!tb_object_init(number, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_NUMBER)) goto fail;
 
 	// init base
 	number->base.copy = tb_number_copy;
@@ -191,11 +188,6 @@ static tb_number_t* tb_number_init_base()
 
 	// ok
 	return number;
-
-	// no
-fail:
-	if (number) tb_free(number);
-	return tb_null;
 }
 static tb_object_t* tb_number_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {

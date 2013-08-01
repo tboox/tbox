@@ -58,14 +58,14 @@
 # 	define tb_spool_free(handle, data) 					tb_spool_free_impl(handle, data)
 #endif
 
-#define TB_SPOOL_GROW_MICRO 				(8096)
-#define TB_SPOOL_GROW_SMALL 				(65536)
-#define TB_SPOOL_GROW_LARGE 				(256 * 1024)
+#define TB_SPOOL_GROW_MICRO 							(8096)
+#define TB_SPOOL_GROW_SMALL 							(65536)
+#define TB_SPOOL_GROW_LARGE 							(256 * 1024)
 
 #ifdef __tb_small__
-# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_GROW_SMALL
+# 	define TB_SPOOL_GROW_DEFAULT 						TB_SPOOL_GROW_SMALL
 #else
-# 	define TB_SPOOL_GROW_DEFAULT 			TB_SPOOL_GROW_LARGE
+# 	define TB_SPOOL_GROW_DEFAULT 						TB_SPOOL_GROW_LARGE
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
