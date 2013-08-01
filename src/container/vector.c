@@ -46,13 +46,13 @@ static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 }
 static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
 {
-	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_vector_t* vector = (tb_vector_t*)iterator;
 	tb_assert_and_check_return_val(vector, 0);
 	return vector->size;
 }
 static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_vector_t* vector = (tb_vector_t*)iterator;
 	tb_assert_and_check_return_val(vector && itor < vector->size, vector->size);
 	return itor + 1;
 }
@@ -64,13 +64,13 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor
 }
 static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_vector_t* vector = (tb_vector_t*)iterator;
 	tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
 	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
 }
 static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_vector_t* vector = (tb_vector_t*)iterator;
 	tb_assert_return(vector);
 
 	if (iterator->step > sizeof(tb_pointer_t))
@@ -82,7 +82,7 @@ static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor
 }
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	tb_vector_t* vector = (tb_vector_t*)iterator->data;
+	tb_vector_t* vector = (tb_vector_t*)iterator;
 	tb_assert_and_check_return_val(vector && vector->func.comp, 0);
 	return vector->func.comp(&vector->func, ltem, rtem);
 }
@@ -108,7 +108,6 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 
 	// init iterator
 	vector->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE | TB_ITERATOR_MODE_RACCESS;
-	vector->itor.data = (tb_pointer_t)vector;
 	vector->itor.size = 0;
 	vector->itor.priv = tb_null;
 	vector->itor.step = func.size;

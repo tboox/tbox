@@ -517,7 +517,8 @@ tb_char_t* tb_spool_strdup_impl(tb_handle_t handle, tb_char_t const* data, tb_ch
 		p[n] = '\0';
 	}
 
-	return p;}
+	return p;
+}
 
 #ifndef __tb_debug__
 tb_char_t* tb_spool_strndup_impl(tb_handle_t handle, tb_char_t const* data, tb_size_t size)

@@ -41,7 +41,7 @@
  */
 
 // the store
-static tb_hash_t* 	g_store = tb_null;
+static tb_handle_t 	g_store = tb_null;
 
 // the mutex
 static tb_handle_t 	g_mutex = tb_null;

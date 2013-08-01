@@ -36,41 +36,41 @@
  */
 static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return queue->head;
 }
 static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return queue->tail;
 }
 static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return ((itor + 1) & (queue->maxn - 1));
 }
 static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return ((itor + queue->maxn - 1) & (queue->maxn - 1));
 }
 static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue && itor < queue->maxn, tb_null);
 	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
 }
 static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_return(queue);
 
 	if (iterator->step > sizeof(tb_pointer_t))
@@ -82,7 +82,7 @@ static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator->data;
+	tb_queue_t* queue = (tb_queue_t*)iterator;
 	tb_assert_and_check_return_val(queue && queue->func.comp, 0);
 	return queue->func.comp(&queue->func, ltem, rtem);
 }
@@ -107,7 +107,6 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 
 	// init iterator
 	queue->itor.mode = TB_ITERATOR_MODE_FORWARD | TB_ITERATOR_MODE_REVERSE;
-	queue->itor.data = (tb_pointer_t)queue;
 	queue->itor.size = 0;
 	queue->itor.priv = tb_null;
 	queue->itor.step = func.size;

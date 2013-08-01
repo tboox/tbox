@@ -37,22 +37,22 @@
  */
 
 // the object xml reader
-static tb_hash_t* 				g_object_xml_reader = tb_null;
+static tb_handle_t 				g_object_xml_reader = tb_null;
 
 // the object xml writer
-static tb_hash_t* 				g_object_xml_writer = tb_null;
+static tb_handle_t 				g_object_xml_writer = tb_null;
 
 // the object bin reader
-static tb_hash_t* 				g_object_bin_reader = tb_null;
+static tb_handle_t 				g_object_bin_reader = tb_null;
 
 // the object bin writer
-static tb_hash_t* 				g_object_bin_writer = tb_null;
+static tb_handle_t 				g_object_bin_writer = tb_null;
 
 // the object jsn reader
-static tb_hash_t* 				g_object_jsn_reader = tb_null;
+static tb_handle_t 				g_object_jsn_reader = tb_null;
 
 // the object jsn writer
-static tb_hash_t* 				g_object_jsn_writer = tb_null;
+static tb_handle_t 				g_object_jsn_writer = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation

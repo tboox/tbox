@@ -34,6 +34,13 @@
 #include "../string/string.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the scache string size
+#define TB_STRING_SCACHE_SIZE 		(512)
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -45,6 +52,12 @@ typedef struct __tb_string_t
 
 	// the pstring
 	tb_pstring_t 		pstr;
+
+	// the cache data
+	tb_char_t const* 	cdata;
+
+	// the cache size
+	tb_size_t 			csize;
 
 }tb_string_t;
 
@@ -68,6 +81,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	tb_string_t* string = tb_string_cast(object);
 	if (string) 
 	{
+		if (string->cdata) tb_scache_del(string->cdata);
 		tb_pstring_exit(&string->pstr);
 		tb_free(string);
 	}
@@ -75,7 +89,13 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 static tb_void_t tb_string_cler(tb_object_t* object)
 {
 	tb_string_t* string = tb_string_cast(object);
-	if (string) tb_pstring_clear(&string->pstr);
+	if (string) 
+	{
+		if (string->cdata) tb_scache_del(string->cdata);
+		string->cdata = tb_null;
+		string->csize = 0;
+		tb_pstring_clear(&string->pstr);
+	}
 }
 static tb_string_t* tb_string_init_base()
 {
@@ -324,7 +344,20 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 	if (!tb_pstring_init(&string->pstr)) goto fail;
 
 	// copy string
-	if (cstr) tb_pstring_cstrcpy(&string->pstr, cstr);
+	if (cstr) 
+	{
+		tb_size_t size = tb_strlen(cstr);
+		if (size < TB_STRING_SCACHE_SIZE) 
+		{
+			// put string to scache
+			string->cdata = tb_scache_put(cstr);
+			tb_assert_and_check_goto(string->cdata, fail);
+
+			// the string size
+			string->csize = size;
+		}
+		else tb_pstring_cstrcpy(&string->pstr, cstr);
+	}
 
 	// ok
 	return string;
@@ -344,7 +377,20 @@ tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
 	if (!tb_pstring_init(&string->pstr)) goto fail;
 
 	// copy string
-	if (pstr) tb_pstring_strcpy(&string->pstr, pstr);
+	if (pstr) 
+	{
+		tb_size_t size = tb_pstring_size(&string->pstr);
+		if (size < TB_STRING_SCACHE_SIZE) 
+		{
+			// put string to scache
+			string->cdata = tb_scache_put(tb_pstring_cstr(pstr));
+			tb_assert_and_check_goto(string->cdata, fail);
+
+			// the string size
+			string->csize = size;
+		}
+		else tb_pstring_strcpy(&string->pstr, pstr);
+	}
 
 	// ok
 	return string;
@@ -354,14 +400,14 @@ fail:
 	tb_string_exit(string);
 	return tb_null;
 }
-tb_char_t* tb_string_cstr(tb_object_t* object)
+tb_char_t const* tb_string_cstr(tb_object_t* object)
 {
 	// check
 	tb_string_t* string = tb_string_cast(object);
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// cstr
-	return tb_pstring_cstr(&string->pstr);
+	return string->cdata? string->cdata : tb_pstring_cstr(&string->pstr);
 }
 tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 {
@@ -369,11 +415,37 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 	tb_string_t* string = tb_string_cast(object);
 	tb_assert_and_check_return_val(string && cstr, 0);
 
-	// copy string
-	tb_pstring_cstrcpy(&string->pstr, cstr);
+	tb_size_t size = 0;
+	if (cstr) 
+	{
+		size = tb_strlen(cstr);
+		if (size < TB_STRING_SCACHE_SIZE) 
+		{
+			// put string to scache
+			tb_char_t const* cdata = tb_scache_put(cstr);
+			if (cdata)
+			{
+				// save string
+				if (string->cdata) tb_scache_del(string->cdata);
+				string->cdata = cdata;
+				string->csize = size;
+			}
+		}
+		else 
+		{
+			// copy string
+			tb_pstring_cstrcpy(&string->pstr, cstr);
+			size = tb_pstring_size(&string->pstr);
+
+			// remove string from scache
+			if (string->cdata) tb_scache_del(string->cdata);
+			string->cdata = tb_null;
+			string->csize = 0;
+		}
+	}
 
 	// ok?
-	return tb_pstring_size(&string->pstr);
+	return size;
 }
 tb_size_t tb_string_size(tb_object_t* object)
 {
@@ -382,15 +454,6 @@ tb_size_t tb_string_size(tb_object_t* object)
 	tb_assert_and_check_return_val(string, 0);
 
 	// size
-	return tb_pstring_size(&string->pstr);
-}
-tb_pstring_t* tb_string_pstr(tb_object_t* object)
-{
-	// check
-	tb_string_t* string = tb_string_cast(object);
-	tb_assert_and_check_return_val(string, tb_null);
-
-	// pstr
-	return &string->pstr;
+	return string->cdata? string->csize : tb_pstring_size(&string->pstr);
 }
 

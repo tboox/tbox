@@ -195,6 +195,9 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 					tb_vpool_block_t* next = (tb_vpool_block_t*)(p + size);
 					next->size = bsize - size - nhead;
 					next->free = 1;
+				#ifdef __tb_debug__
+					next->magic = TB_VPOOL_MAGIC;
+				#endif
 					block->size = size;
 
 					// predict the next free block
@@ -398,6 +401,9 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// init block, only one free block now.
 	((tb_vpool_block_t*)vpool->data)->free = 1;
 	((tb_vpool_block_t*)vpool->data)->size = vpool->size - vpool->nhead;
+#ifdef __tb_debug__
+	((tb_vpool_block_t*)vpool->data)->magic = TB_VPOOL_MAGIC;
+#endif
 
 	// init pred
 	vpool->pred = vpool->data;

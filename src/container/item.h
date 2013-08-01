@@ -63,7 +63,8 @@ typedef enum __tb_item_type_t
 ,	TB_ITEM_TYPE_EFM 		= 8 	//!< external fixed memory
 ,	TB_ITEM_TYPE_IFM 		= 9 	//!< internal fixed memory
 ,	TB_ITEM_TYPE_OBJ 		= 10 	//!< object
-,	TB_ITEM_TYPE_OTR 		= 11 	//!< other
+,	TB_ITEM_TYPE_SCACHE 	= 11 	//!< scache
+,	TB_ITEM_TYPE_OTR 		= 12 	//!< other
 
 }tb_item_type_t;
 
@@ -101,55 +102,95 @@ typedef struct __tb_item_func_t
  * interfaces
  */
 
-/// the integer item function for tb_long_t
+/*! the integer item function for tb_long_t 
+ *
+ * @return 			the item func
+ */
 tb_item_func_t 		tb_item_func_long();
 
-/// the integer item function for tb_size_t
+/*! the integer item function for tb_size_t
+ *
+ * @return 			the item func
+ */
 tb_item_func_t 		tb_item_func_size();
 
-/// the integer item function for tb_uint8_t
+/*! the integer item function for tb_uint8_t
+ *
+ * @return 			the item func
+ */
 tb_item_func_t 		tb_item_func_uint8();
 
-/// the integer item function for tb_uint16_t
+/*! the integer item function for tb_uint16_t
+ *
+ * @return 			the item func
+ */
 tb_item_func_t 		tb_item_func_uint16();
 
-/// the integer item function for tb_uint32_t
+/*! the integer item function for tb_uint32_t
+ *
+ * @return 			the item func
+ */
 tb_item_func_t 		tb_item_func_uint32();
 
-/*! the c-string item function
+/*! the string item function
  *
  * using tb_strdup if the spool is null, 
  * using tb_spool_strdup if the spool exists
  *
+ * @param bcase 	is case?
+ * @param spool 	the string pool
+
+ * @return 			the item func
  */
 tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool); 
 
 /*! the pointer item function
  *
  * @note if the free func have been hooked, the nfree need hook too.
+ *
+ * @return 			the item func
  */
 tb_item_func_t 		tb_item_func_ptr();
 
 /*! the object item function 
+ *
+ * @return 			the item func
  */
 tb_item_func_t 		tb_item_func_obj();
 
-/*!the external fixed memory item function
+/*! the external fixed memory item function
  *
  * storing the index value in the internal item of the container
  *
  * using tb_malloc if the rpool is null, 
  * using tb_rpool_malloc if the rpool exists
  *
+ * @param size 		the item size
+ * @param rpool 	the item rpool
+ *
+ * @return 			the item func
  */
 tb_item_func_t 		tb_item_func_efm(tb_size_t size, tb_handle_t rpool);
 
-/*!the internal fixed memory item function
+/*! the internal fixed memory item function
  *
  * storing it in the internal item of the container directly for saving memory
  *
+ * @param size 		the item size
+ * @param free 		the item free func
+ * @param priv 		the private data of the item free func
+ *
+ * @return 			the item func
  */
 tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_pointer_t priv);
+
+/*! the string item function for scache
+ *
+ * @param bcase 	is case?
+
+ * @return 			the item func
+ */
+tb_item_func_t 		tb_item_func_scache(tb_bool_t bcase); 
 
 #endif
 

@@ -115,7 +115,7 @@ typedef struct __tb_dns_list_t
 	tb_handle_t			spool;
 
 	// the cache
-	tb_hash_t* 			cache;
+	tb_handle_t 			cache;
 
 	// the times
 	tb_hize_t 			times;
@@ -481,7 +481,7 @@ end:
 	// ok
 	return rate;
 }
-static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_dns_look_clr4(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	tb_assert_and_check_return_val(cache && bdel && data, tb_false);
 
@@ -518,7 +518,7 @@ static tb_bool_t tb_dns_look_clr4(tb_hash_t* cache, tb_hash_item_t* item, tb_boo
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_dns_look_stat(tb_hash_t* cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_dns_look_stat(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	tb_assert_and_check_return_val(cache && bdel && data, tb_false);
 
@@ -553,7 +553,7 @@ static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
 	if (g_list)
 	{
 		// cache
-		tb_hash_t* cache = g_list->cache;
+		tb_handle_t cache = g_list->cache;
 		if (cache)
 		{
 			// remove the expired items if full
@@ -1286,7 +1286,7 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 	if (g_list)
 	{
 		// cache
-		tb_hash_t* cache = g_list->cache;
+		tb_handle_t cache = g_list->cache;
 		if (cache)
 		{
 			// exists?

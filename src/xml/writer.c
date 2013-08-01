@@ -62,7 +62,7 @@ typedef struct __tb_xml_writer_t
 	tb_stack_t* 			elements;
 
 	// attributes
-	tb_hash_t* 				attributes;
+	tb_handle_t 			attributes;
 
 }tb_xml_writer_t;
 

@@ -67,7 +67,7 @@ tb_object_t* 		tb_string_init_from_pstr(tb_pstring_t* pstr);
  *
  * @return 			the c-string
  */
-tb_char_t* 			tb_string_cstr(tb_object_t* string);
+tb_char_t const* 	tb_string_cstr(tb_object_t* string);
 
 /*! set the c-string
  *
@@ -85,14 +85,6 @@ tb_size_t 			tb_string_cstr_set(tb_object_t* string, tb_char_t const* cstr);
  * @return 			the string size
  */
 tb_size_t 			tb_string_size(tb_object_t* string);
-
-/*! the pstring for the string
- *
- * @param string 	the string object
- *
- * @return 			the pstring
- */
-tb_pstring_t* 		tb_string_pstr(tb_object_t* string);
 
 #endif
 

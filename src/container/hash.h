@@ -59,94 +59,95 @@ typedef struct __tb_hash_item_t
 
 }tb_hash_item_t;
 
-/// the hash item list type
-typedef struct __tb_hash_item_list_t
-{
-	tb_size_t 				size;
-	tb_size_t 				maxn;
-
-}tb_hash_item_list_t;
-
-/*!the hash type
- *
- * <pre>
- *                 0        1        3       ...     ...                n       n + 1
- * hash_list: |--------|--------|--------|--------|--------|--------|--------|--------|
- *                         |
- *                       -----    
- * item_list:           |     |       key:0                                      
- *                       -----   
- *                      |     |       key:1                                              
- *                       -----               <= insert by binary search algorithm
- *                      |     |       key:2                                               
- *                       -----  
- *                      |     |       key:3                                               
- *                       -----   
- *                      |     |       key:4                                               
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *                      |     |                                              
- *                       -----  
- *
- * </pre>
- *
- * @note the itor of the same item is mutable
- */
-typedef struct __tb_hash_t
-{
-	// the item itor
-	tb_iterator_t 			item_itor;
-
-	/// the hash list
-	tb_hash_item_list_t** 	hash_list;
-	tb_size_t 				hash_size;
-
-	/// the item size
-	tb_size_t 				item_size;
-
-	/// the item maxn
-	tb_size_t 				item_maxn;
-
-	/// the hash item
-	tb_hash_item_t 			hash_item;
-
-	/// the hash func
-	tb_item_func_t 			name_func;
-	tb_item_func_t 			data_func;
-
-}tb_hash_t;
-
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init & exit
-tb_hash_t* 				tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
-tb_void_t 				tb_hash_exit(tb_hash_t* hash);
+/*! init hash
+ *
+ * @param size 			the hash size
+ * @param name_func 	the hash name func
+ * @param data_func 	the hash data func
+ *
+ * @return 				the hash handle
+ */
+tb_handle_t 			tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
 
-// accessors & modifiors
-tb_void_t 				tb_hash_clear(tb_hash_t* hash);
+/*! exit hash
+ *
+ * @param hash 			the hash handle
+ */
+tb_void_t 				tb_hash_exit(tb_handle_t hash);
 
-tb_pointer_t 			tb_hash_get(tb_hash_t* hash, tb_cpointer_t name);
-tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
-tb_void_t 	 			tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
+/*! clear hash
+ *
+ * @param hash 			the hash handle
+ */
+tb_void_t 				tb_hash_clear(tb_handle_t hash);
 
-// attributes
-tb_size_t 				tb_hash_size(tb_hash_t const* hash);
-tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
+/*! get hash item itor
+ *
+ * @param hash 			the hash handle
+ * @param name 			the hash item name
+ *
+ * @return 				the hash itor, @note: itor => item maybe changed if insert or remove item
+ */
+tb_size_t				tb_hash_itor(tb_handle_t hash, tb_cpointer_t name);
 
-// debug
-tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
+/*! get hash item data
+ *
+ * @param hash 			the hash handle
+ * @param name 			the hash item name
+ *
+ * @return 				the hash item data
+ */
+tb_pointer_t 			tb_hash_get(tb_handle_t hash, tb_cpointer_t name);
 
-/*!walk
+/*! del hash item
+ *
+ * @param hash 			the hash handle
+ * @param name 			the hash item name
+ */
+tb_void_t 	 			tb_hash_del(tb_handle_t hash, tb_cpointer_t name);
+
+/*! set hash item
+ *
+ * @param hash 			the hash handle
+ * @param name 			the hash item name
+ * @param data 			the hash item data
+ *
+ * @return 				the hash itor, @note: itor => item maybe changed if insert or remove item
+ */
+tb_size_t 		 		tb_hash_set(tb_handle_t hash, tb_cpointer_t name, tb_cpointer_t data);
+
+/*! the hash size
+ *
+ * @param hash 			the hash handle
+ *
+ * @return 				the hash size
+ */
+tb_size_t 				tb_hash_size(tb_handle_t hash);
+
+/*! the hash maxn
+ *
+ * @param hash 			the hash handle
+ *
+ * @return 				the hash maxn
+ */
+tb_size_t 				tb_hash_maxn(tb_handle_t hash);
+
+/*! dump hash
+ *
+ * @param hash 			the hash handle
+ */
+tb_void_t 				tb_hash_dump(tb_handle_t hash);
+
+/*! walk hash items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_hash_item_func(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
  * 		tb_assert_and_check_return_val(hash && bdel, tb_false);
  *
@@ -165,8 +166,12 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * }
  * @endcode
  *
+ * @param hash 			the hash handle
+ * @param func 			the walk callback func
+ * @param data 			the walk callback data
+ *
  */
-tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 				tb_hash_walk(tb_handle_t hash, tb_bool_t (*func)(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
 
 #endif
 

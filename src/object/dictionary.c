@@ -46,10 +46,10 @@ typedef struct __tb_dictionary_t
 	tb_size_t 			size;
 
 	// the object hash
-	tb_hash_t* 			hash;
+	tb_handle_t 		hash;
 
-	// the dictionary pool
-	tb_handle_t 		pool;
+//	// the dictionary pool
+//	tb_handle_t 		pool;
 
 	// increase refn?
 	tb_bool_t 			incr;
@@ -107,8 +107,8 @@ static tb_void_t tb_dictionary_exit(tb_object_t* object)
 	dictionary->hash = tb_null;
 
 	// exit pool
-	if (dictionary->pool) tb_spool_exit(dictionary->pool);
-	dictionary->pool = tb_null;
+//	if (dictionary->pool) tb_spool_exit(dictionary->pool);
+//	dictionary->pool = tb_null;
 
 	// exit it
 	tb_free(dictionary);
@@ -122,7 +122,7 @@ static tb_void_t tb_dictionary_cler(tb_object_t* object)
 	if (dictionary->hash) tb_hash_clear(dictionary->hash);
 
 	// clear
-	if (dictionary->pool) tb_spool_clear(dictionary->pool);
+//	if (dictionary->pool) tb_spool_clear(dictionary->pool);
 }
 static tb_dictionary_t* tb_dictionary_init_base()
 {
@@ -657,11 +657,12 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 	tb_item_func_t func = tb_item_func_obj();
 
 	// init pool
-	dictionary->pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
-	tb_assert_and_check_goto(dictionary->pool, fail);
+//	dictionary->pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+//	tb_assert_and_check_goto(dictionary->pool, fail);
 
 	// init hash
-	dictionary->hash = tb_hash_init(size, tb_item_func_str(tb_true, dictionary->pool), func);
+//	dictionary->hash = tb_hash_init(size, tb_item_func_str(tb_true, dictionary->pool), func);
+	dictionary->hash = tb_hash_init(size, tb_item_func_scache(tb_true), func);
 	tb_assert_and_check_goto(dictionary->hash, fail);
 
 	// ok
