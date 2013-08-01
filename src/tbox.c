@@ -38,7 +38,7 @@ tb_void_t tb_malloc_exit();
 /* ///////////////////////////////////////////////////////////////////////
  * helper
  */
-static tb_bool_t tb_check_word_order()
+static tb_bool_t tb_check_order_word()
 {
 	tb_uint16_t x = 0x1234;
 	tb_byte_t const* p = (tb_byte_t const*)&x;
@@ -51,7 +51,7 @@ static tb_bool_t tb_check_word_order()
 	return (p[0] == 0x34 && p[1] == 0x12)? tb_true : tb_false;
 #endif
 }
-static tb_bool_t tb_check_double_order()
+static tb_bool_t tb_check_order_double()
 {
 #ifdef TB_CONFIG_TYPE_FLOAT
 	union 
@@ -95,8 +95,8 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert_static(TB_CPU_BITSIZE == (sizeof(tb_handle_t) << 3));
 
 	// check byteorder
-	tb_assert(tb_check_word_order());
-	tb_assert(tb_check_double_order());
+	tb_assert(tb_check_order_word());
+	tb_assert(tb_check_order_double());
 
 	// init memory pool
 #ifdef TB_CONFIG_MEMORY_POOL
@@ -112,8 +112,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	if (!tb_rand_init()) return tb_false;
 
 	// init object
-	if (!tb_object_init_reader()) return tb_false;
-	if (!tb_object_init_writer()) return tb_false;
+	if (!tb_object_context_init()) return tb_false;
 
 	// ok
 	tb_trace("init: ok");
@@ -122,8 +121,7 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 tb_void_t tb_exit()
 {
 	// exit object
-	tb_object_exit_reader();
-	tb_object_exit_writer();
+	tb_object_context_exit();
 	
 	// exit rand
 	tb_rand_exit();

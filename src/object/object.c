@@ -254,11 +254,7 @@ static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_b
 	// ok
 	return ok;
 }
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-tb_bool_t tb_object_init_reader()
+static tb_bool_t tb_object_init_reader()
 {
 	// init null
 	if (!tb_null_init_reader()) return tb_false;
@@ -287,7 +283,7 @@ tb_bool_t tb_object_init_reader()
 	// ok
 	return tb_true;
 }
-tb_void_t tb_object_exit_reader()
+static tb_void_t tb_object_exit_reader()
 {
 	// exit the object xml reader
 	if (g_object_xml_reader) tb_hash_exit(g_object_xml_reader);
@@ -301,7 +297,7 @@ tb_void_t tb_object_exit_reader()
 	if (g_object_jsn_reader) tb_hash_exit(g_object_jsn_reader);
 	g_object_jsn_reader = tb_null;
 }
-tb_bool_t tb_object_init_writer()
+static tb_bool_t tb_object_init_writer()
 {
 	// init null
 	if (!tb_null_init_writer()) return tb_false;
@@ -330,7 +326,7 @@ tb_bool_t tb_object_init_writer()
 	// ok
 	return tb_true;
 }
-tb_void_t tb_object_exit_writer()
+static tb_void_t tb_object_exit_writer()
 {
 	// exit the object xml writer
 	if (g_object_xml_writer) tb_hash_exit(g_object_xml_writer);
@@ -343,6 +339,31 @@ tb_void_t tb_object_exit_writer()
 	// exit the object jsn writer
 	if (g_object_jsn_writer) tb_hash_exit(g_object_jsn_writer);
 	g_object_jsn_writer = tb_null;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_bool_t tb_object_context_init()
+{
+	// init opool
+	if (!tb_opool_init()) return tb_false;
+
+	// init object
+	if (!tb_object_init_reader()) return tb_false;
+	if (!tb_object_init_writer()) return tb_false;
+
+	// ok
+	return tb_true;
+}
+tb_void_t tb_object_context_exit()
+{
+	// exit object
+	tb_object_exit_reader();
+	tb_object_exit_writer();
+
+	// exit opool
+	tb_opool_exit();
 }
 tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 {

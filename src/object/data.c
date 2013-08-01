@@ -69,7 +69,7 @@ static tb_void_t tb_data_exit(tb_object_t* object)
 	if (data) 
 	{
 		tb_pbuffer_exit(&data->buff);
-		tb_free(data);
+		tb_opool_del(data);
 	}
 }
 static tb_void_t tb_data_cler(tb_object_t* object)
@@ -80,11 +80,8 @@ static tb_void_t tb_data_cler(tb_object_t* object)
 static tb_data_t* tb_data_init_base()
 {
 	// make
-	tb_data_t* data = tb_malloc0(sizeof(tb_data_t));
+	tb_data_t* data = tb_opool_get(sizeof(tb_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
 	tb_assert_and_check_return_val(data, tb_null);
-
-	// init object
-	if (!tb_object_init(data, TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA)) goto fail;
 
 	// init base
 	data->base.copy = tb_data_copy;
@@ -93,11 +90,6 @@ static tb_data_t* tb_data_init_base()
 
 	// ok
 	return data;
-
-	// no
-fail:
-	if (data) tb_free(data);
-	return tb_null;
 }
 static tb_object_t* tb_data_read_xml(tb_object_xml_reader_t* reader, tb_size_t event)
 {

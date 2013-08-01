@@ -31,6 +31,7 @@
 #include "null.h"
 #include "data.h"
 #include "date.h"
+#include "opool.h"
 #include "array.h"
 #include "string.h"
 #include "number.h"
@@ -41,29 +42,14 @@
  * interfaces
  */
 
-/*! init object reader
+/*! init object context
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_object_init_reader();
+tb_bool_t 			tb_object_context_init();
 
-/*! exit object reader
- *
- * @return 			tb_true or tb_false
- */
-tb_void_t 			tb_object_exit_reader();
-
-/*! init object writer
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_object_init_writer();
-
-/*! exit object writer
- *
- * @return 			tb_true or tb_false
- */
-tb_void_t 			tb_object_exit_writer();
+/// exit object context
+tb_void_t 			tb_object_context_exit();
 
 /*! init object
  *

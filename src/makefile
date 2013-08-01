@@ -65,6 +65,7 @@ tbox_C_FILES 			+= \
 						object/null \
 						object/data \
 						object/date \
+						object/opool \
 						object/array \
 						object/string \
 						object/number \
@@ -330,6 +331,7 @@ INC_FILES 				= \
 						object/null.h \
 						object/data.h \
 						object/date.h \
+						object/opool.h \
 						object/array.h \
 						object/number.h \
 						object/string.h \
