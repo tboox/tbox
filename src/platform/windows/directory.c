@@ -93,6 +93,60 @@ static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
 		break;
 	}
 }
+static tb_void_t tb_directory_walk_impl(tb_wchar_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(path && func);
+
+	// last
+	tb_long_t 			last = tb_wcslen(path) - 1;
+	tb_assert_and_check_return(last >= 0);
+
+	// add \*.*
+	tb_wchar_t 			temp_w[4096] = {0};
+	tb_char_t 			temp_a[4096] = {0};
+	tb_swprintf(temp_w, 4095, L"%s%s*.*", path, path[last] == L'\\'? L"" : L"\\");
+
+	// init info
+	WIN32_FIND_DATAW 	find = {0};
+	HANDLE 				directory = INVALID_HANDLE_VALUE;
+	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp_w, &find)))
+	{
+		// walk
+		do
+		{
+			// check
+			if (tb_wcscmp(find.cFileName, L".") && tb_wcscmp(find.cFileName, L".."))
+			{
+				// the temp path
+				tb_long_t n = tb_swprintf(temp_w, 4095, L"%s%s%s", path, path[last] == L'\\'? L"" : L"\\", find.cFileName);
+				if (n >= 0 && n < 4096) temp_w[n] = L'\0';
+
+				// wtoa temp
+				n = tb_wtoa(temp_a, temp_w, 4095);
+				if (n >= 0 && n < 4096) temp_a[n] = '\0';
+
+				// the file info
+				tb_file_info_t info = {0};
+				if (tb_file_info(temp_a, &info))
+				{
+					// do callback
+					if (prefix) func(temp_a, &info, data);
+
+					// walk to the next directory
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk_impl(temp_w, recursion, prefix, func, data);
+	
+					// do callback
+					if (!prefix) func(temp_a, &info, data);
+				}
+			}
+
+		} while (FindNextFileW(directory, &find));
+
+		// exit directory
+		FindClose(directory);
+	}
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -146,7 +200,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// walk remove
-	tb_directory_walk(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
+	tb_directory_walk_impl(full, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
 	// remove it
 	return RemoveDirectoryW(full)? tb_true : tb_false;
@@ -182,56 +236,8 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 
 	// the full path
 	tb_wchar_t full[TB_PATH_MAXN];
-	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return ;
-
-	// last
-	tb_long_t 			last = tb_wcslen(full) - 1;
-	tb_assert_and_check_return(last >= 0);
-
-	// add \*.*
-	tb_wchar_t 			temp_w[4096] = {0};
-	tb_char_t 			temp_a[4096] = {0};
-	tb_swprintf(temp_w, 4095, L"%s%s*.*", full, full[last] == L'\\'? L"" : L"\\");
-
-	// init info
-	WIN32_FIND_DATAW 	find = {0};
-	HANDLE 				directory = INVALID_HANDLE_VALUE;
-	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp_w, &find)))
-	{
-		// walk
-		do
-		{
-			// check
-			if (tb_wcscmp(find.cFileName, L".") && tb_wcscmp(find.cFileName, L".."))
-			{
-				// the temp path
-				tb_long_t n = tb_swprintf(temp_w, 4095, L"%s%s%s", full, full[last] == L'\\'? L"" : L"\\", find.cFileName);
-				if (n >= 0 && n < 4096) temp_w[n] = L'\0';
-
-				// wtoa temp
-				n = tb_wtoa(temp_a, temp_w, 4095);
-				if (n >= 0 && n < 4096) temp_a[n] = '\0';
-
-				// the file info
-				tb_file_info_t info = {0};
-				if (tb_file_info(temp_a, &info))
-				{
-					// do callback
-					if (prefix) func(temp_a, &info, data);
-
-					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp_a, recursion, prefix, func, data);
-	
-					// do callback
-					if (!prefix) func(temp_a, &info, data);
-				}
-			}
-
-		} while (FindNextFileW(directory, &find));
-
-		// exit directory
-		FindClose(directory);
-	}
+	if (tb_path_full_w(path, full, TB_PATH_MAXN))
+		tb_directory_walk_impl(full, recursion, prefix, func, data);
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {

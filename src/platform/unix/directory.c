@@ -103,7 +103,56 @@ static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
 		break;
 	}
 }
+static tb_void_t tb_directory_walk_impl(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(path && func);
 
+	// last
+	tb_long_t 		last = tb_strlen(path) - 1;
+	tb_assert_and_check_return(last >= 0);
+
+	// init info
+	tb_char_t 		temp[4096] = {0};
+	DIR* 			directory = tb_null;
+	if (directory = opendir(path))
+	{
+		// walk
+		struct dirent* item = tb_null;
+		while (item = readdir(directory))
+		{
+			// check
+			tb_assert_and_check_continue(item->d_name && item->d_reclen);
+
+			// the item name
+			tb_char_t name[1024] = {0};
+			tb_strlcpy(name, item->d_name, tb_min(item->d_reclen, 1023));
+			if (tb_strcmp(name, ".") && tb_strcmp(name, ".."))
+			{
+				// the temp path
+				tb_long_t n = tb_snprintf(temp, 4095, "%s%s%s", path, path[last] == '/'? "" : "/", name);
+				if (n >= 0) temp[n] = '\0';
+
+				// the file info
+				tb_file_info_t info = {0};
+				if (tb_file_info(temp, &info))
+				{
+					// do callback
+					if (prefix) func(temp, &info, data);
+
+					// walk to the next directory
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk_impl(temp, recursion, prefix, func, data);
+	
+					// do callback
+					if (!prefix) func(temp, &info, data);
+				}
+			}
+		}
+
+		// exit directory
+		closedir(directory);
+	}
+}
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -155,7 +204,7 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// walk remove
-	tb_directory_walk(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
+	tb_directory_walk_impl(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
 	// remove it
 	return !remove(path)? tb_true : tb_false;
@@ -189,54 +238,19 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 	// check
 	tb_assert_and_check_return(path && func);
 
-	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return(path);
-
-	// last
-	tb_long_t 		last = tb_strlen(path) - 1;
-	tb_assert_and_check_return(last >= 0);
-
-	// init info
-	tb_char_t 		temp[4096] = {0};
-	DIR* 			directory = tb_null;
-	if (directory = opendir(path))
+	// exists?
+	tb_file_info_t info = {0};
+	if (tb_file_info(path, &info) && info.type == TB_FILE_TYPE_DIRECTORY) 
+		tb_directory_walk_impl(path, recursion, prefix, func, data);
+	else
 	{
+		// the full path
+		tb_char_t full[TB_PATH_MAXN];
+		path = tb_path_full(path, full, TB_PATH_MAXN);
+		tb_assert_and_check_return(path);
+
 		// walk
-		struct dirent* item = tb_null;
-		while (item = readdir(directory))
-		{
-			// check
-			tb_assert_and_check_continue(item->d_name && item->d_reclen);
-
-			// the item name
-			tb_char_t name[1024] = {0};
-			tb_strlcpy(name, item->d_name, tb_min(item->d_reclen, 1023));
-			if (tb_strcmp(name, ".") && tb_strcmp(name, ".."))
-			{
-				// the temp path
-				tb_long_t n = tb_snprintf(temp, 4095, "%s%s%s", path, path[last] == '/'? "" : "/", name);
-				if (n >= 0) temp[n] = '\0';
-
-				// the file info
-				tb_file_info_t info = {0};
-				if (tb_file_info(temp, &info))
-				{
-					// do callback
-					if (prefix) func(temp, &info, data);
-
-					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp, recursion, prefix, func, data);
-	
-					// do callback
-					if (!prefix) func(temp, &info, data);
-				}
-			}
-		}
-
-		// exit directory
-		closedir(directory);
+		tb_directory_walk_impl(path, recursion, prefix, func, data);
 	}
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
@@ -256,7 +270,7 @@ tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 	data[0] = (tb_cpointer_t)dest;
 	data[1] = (tb_cpointer_t)tb_strlen(path);
 	data[2] = (tb_cpointer_t)1;
-	tb_directory_walk(path, tb_true, tb_true, tb_directory_walk_copy, data);
+	tb_directory_walk_impl(path, tb_true, tb_true, tb_directory_walk_copy, data);
 
 	// ok?
 	return data[2]? tb_true : tb_false;
