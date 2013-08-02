@@ -49,15 +49,8 @@ tb_size_t tb_mbstowcs(tb_wchar_t* s1, tb_char_t const* s2, tb_size_t n)
 	tb_assert_static(sizeof(tb_wchar_t) == 4);
 
 	// init
-	tb_long_t r = 0;
-	tb_size_t l = tb_strlen(s2);
-	
-	// atow
-	if (l) 
-	{
-		r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UCS4, s2, l, s1, n << 2);
-		if (r > 0) r >>= 2;
-	}
+	tb_long_t r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UCS4 | TB_CHARSET_TYPE_LE, s2, s1, n << 2);
+	if (r > 0) r >>= 2;
 	
 	// strip
 	if (r >= 0) s1[r] = L'\0';

@@ -971,7 +971,7 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...)
 	tb_size_t size = 0;
 
 	// format data
-    tb_va_format(data, TB_GSTREAM_BLOCK_MAXN, fmt, &size);
+    tb_vsnprintf_format(data, TB_GSTREAM_BLOCK_MAXN, fmt, &size);
 	tb_check_return_val(size, 0);
 
 	// writ data

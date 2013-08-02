@@ -96,7 +96,9 @@ tbox_C_FILES 			+= \
 						libc/misc/time/localtime \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
+						libc/stdio/swprintf \
 						libc/stdio/vsnprintf \
+						libc/stdio/vswprintf \
 						libc/stdlib/stdlib \
 						libc/stdlib/mbstowcs \
 						libc/stdlib/wcstombs \
@@ -206,6 +208,7 @@ endif
 # platform
 tbox_C_FILES 			+= \
 						platform/path \
+						platform/printf \
 						platform/tstore \
 						platform/platform \
 						platform/$(TB_CONFIG_API_DNS)/dns \

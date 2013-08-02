@@ -33,7 +33,20 @@
 
 tb_wchar_t* tb_wcsichr(tb_wchar_t const* s, tb_wchar_t c)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
-	tb_trace_noimpl();
+
+	// init
+	tb_wchar_t const* 	p = s;
+	tb_wchar_t 			b = tb_tolower(c);
+
+	// find
+	while (*p)
+	{
+		if (tb_tolower(*p) == b) return (tb_wchar_t*)p;
+		p++;
+
+	}
+
 	return tb_null;
 }

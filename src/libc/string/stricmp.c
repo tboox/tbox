@@ -42,9 +42,11 @@ tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 #else
 tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
-	if (s1 == s2) return 0;
+	tb_check_return_val(s1 != s2, 0);
 
+	// done
 	tb_long_t r = 0;
 	while (((s1 == s2) || !(r = ((tb_long_t)(tb_tolower(*((tb_byte_t* )s1)))) - tb_tolower(*((tb_byte_t* )s2)))) && (++s2, *s1++));
 	return r;

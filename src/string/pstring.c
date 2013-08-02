@@ -238,7 +238,7 @@ tb_char_t const* tb_pstring_cstrfcpy(tb_pstring_t* string, tb_char_t const* fmt,
 	// format data
 	tb_char_t p[TB_PSTRING_FMTD_SIZE] = {0};
 	tb_size_t n = 0;
-	tb_va_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
+	tb_vsnprintf_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
 	tb_assert_and_check_return_val(n, tb_null);
 	
 	return tb_pstring_cstrncpy(string, p, n);
@@ -295,7 +295,7 @@ tb_char_t const* tb_pstring_cstrfcat(tb_pstring_t* string, tb_char_t const* fmt,
 	// format data
 	tb_char_t p[TB_PSTRING_FMTD_SIZE] = {0};
 	tb_long_t n = 0;
-	tb_va_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
+	tb_vsnprintf_format(p, TB_PSTRING_FMTD_SIZE, fmt, &n);
 	tb_assert_and_check_return_val(n, tb_null);
 	
 	return tb_pstring_cstrncat(string, p, n);
