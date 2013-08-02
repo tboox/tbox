@@ -26,7 +26,6 @@
  */
 #include "malloc.h"
 #include "gpool.h"
-#include "scache.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -38,7 +37,7 @@ static tb_handle_t g_mutex = tb_null;
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
+tb_bool_t tb_malloc_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
 	tb_assert_and_check_return_val(data && size, tb_false);
 
@@ -52,18 +51,10 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	if (!tb_mutex_leave(g_mutex)) return tb_false;
 
 	// ok?
-	return g_gpool? tb_scache_init(align) : tb_false;
+	return g_gpool? tb_true : tb_false;
 }
-tb_void_t tb_memory_exit()
+tb_void_t tb_malloc_exit()
 {
-	// exit scache
-	tb_scache_exit();
-
-	// dump gpool
-#ifdef __tb_debug__
-	tb_memory_dump();
-#endif
-
 	// exit gpool
 	if (g_mutex && tb_mutex_enter(g_mutex))
 	{
@@ -83,10 +74,27 @@ tb_void_t tb_memory_exit()
 	}
 }
 
+#ifdef __tb_debug__
+tb_void_t tb_malloc_dump()
+{
+	// check 
+	tb_assert_and_check_return(g_gpool && g_mutex);
+
+	// enter
+	if (tb_mutex_enter(g_mutex)) 
+	{
+		// dump
+		tb_gpool_dump(g_gpool);
+
+		// leave
+		tb_mutex_leave(g_mutex);
+	}
+}
+#endif
 #ifndef __tb_debug__
-tb_pointer_t tb_memory_malloc_impl(tb_size_t size)
+tb_pointer_t tb_malloc_malloc_impl(tb_size_t size)
 #else
-tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_malloc_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -110,9 +118,9 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_memory_malloc0_impl(tb_size_t size)
+tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size)
 #else
-tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -136,9 +144,9 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -162,9 +170,9 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -188,9 +196,9 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size)
 #else
-tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -214,9 +222,9 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 }
 
 #ifndef __tb_debug__
-tb_bool_t tb_memory_free_impl(tb_pointer_t data)
+tb_bool_t tb_malloc_free_impl(tb_pointer_t data)
 #else
-tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_malloc_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
@@ -241,20 +249,3 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 	return r;
 }
 
-#ifdef __tb_debug__
-tb_void_t tb_memory_dump()
-{
-	// check 
-	tb_assert_and_check_return(g_gpool && g_mutex);
-
-	// enter
-	if (tb_mutex_enter(g_mutex)) 
-	{
-		// dump
-		tb_gpool_dump(g_gpool);
-
-		// leave
-		tb_mutex_leave(g_mutex);
-	}
-}
-#endif

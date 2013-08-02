@@ -20,7 +20,7 @@ tbox_C_FILES 			+= \
 						memory/spool \
 						memory/rpool \
 						memory/scache \
-						memory/malloc \
+						memory/memory \
 						memory/pbuffer \
 						memory/sbuffer \
 						memory/rbuffer \
@@ -200,9 +200,10 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/pow
 
 # pool
-ifeq ($(TB_CONFIG_MEMORY_POOL),n)
-tbox_C_FILES 			+= \
-						platform/$(TB_CONFIG_API_MEMORY)/malloc 
+ifeq ($(TB_CONFIG_MEMORY_POOL),y)
+tbox_C_FILES 			+= memory/malloc
+else
+tbox_C_FILES 			+= platform/$(TB_CONFIG_API_MEMORY)/malloc 
 endif
 
 # platform

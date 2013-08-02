@@ -539,11 +539,14 @@ static tb_void_t tb_item_func_scache_copy(tb_item_func_t* func, tb_pointer_t ite
 {
 	tb_assert_and_check_return(func && item);
 
-	// free it
+	// copy it, refn++
+	tb_pointer_t copy = data? tb_scache_put(data) : tb_null;
+
+	// free it, refn--
 	if (func->free) func->free(func, item);
 
-	// copy it
-	*((tb_pointer_t*)item) = data? tb_scache_put(data) : tb_null;
+	// save it
+	*((tb_pointer_t*)item) = copy;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

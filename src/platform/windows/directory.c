@@ -189,14 +189,14 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 	tb_assert_and_check_return(last >= 0);
 
 	// add \*.*
-	tb_wchar_t 			temp[4096] = {0};
-	tb_swprintf(temp, 4095, L"%s%s*.*", full, full[last] == L'\\'? L"" : L"\\");
-	tb_wprintf(L"ddddddxx: %s\n", temp);
+	tb_wchar_t 			temp_w[4096] = {0};
+	tb_char_t 			temp_a[4096] = {0};
+	tb_swprintf(temp_w, 4095, L"%s%s*.*", full, full[last] == L'\\'? L"" : L"\\");
 
 	// init info
 	WIN32_FIND_DATAW 	find = {0};
 	HANDLE 				directory = INVALID_HANDLE_VALUE;
-	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp, &find)))
+	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp_w, &find)))
 	{
 		// walk
 		do
@@ -204,18 +204,13 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 			// check
 			if (tb_wcscmp(find.cFileName, L".") && tb_wcscmp(find.cFileName, L".."))
 			{
-				tb_wprintf(L"xx: %s\n", find.cFileName);
 				// the temp path
-				tb_long_t n = tb_swprintf(temp, 4095, L"%s%s%s", full, full[last] == L'\\'? L"" : L"\\", find.cFileName);
-				if (n >= 0 && n < 4096) temp[n] = L'\0';
-				tb_wprintf(L"xx: %s\n", temp);
+				tb_long_t n = tb_swprintf(temp_w, 4095, L"%s%s%s", full, full[last] == L'\\'? L"" : L"\\", find.cFileName);
+				if (n >= 0 && n < 4096) temp_w[n] = L'\0';
 
 				// wtoa temp
-				tb_char_t* temp_a = (tb_char_t*)full;
-				n = tb_wtoa(temp_a, temp, 4095);
+				n = tb_wtoa(temp_a, temp_w, 4095);
 				if (n >= 0 && n < 4096) temp_a[n] = '\0';
-				tb_print("xa: %s\n", temp_a);
-				break;
 
 				// the file info
 				tb_file_info_t info = {0};
@@ -232,7 +227,7 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 				}
 			}
 
-		} while (FindNextFile(directory, &find));
+		} while (FindNextFileW(directory, &find));
 
 		// exit directory
 		FindClose(directory);
@@ -240,9 +235,14 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
+	// the full path
+	tb_char_t full0[TB_PATH_MAXN];
+	path = tb_path_full(path, full0, TB_PATH_MAXN);
+	tb_assert_and_check_return_val(path, tb_false);
+
 	// the dest path
-	tb_char_t full[TB_PATH_MAXN];
-	dest = tb_path_full(dest, full, TB_PATH_MAXN);
+	tb_char_t full1[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy

@@ -27,15 +27,6 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-
-#ifndef TB_CONFIG_MEMORY_POOL
-tb_bool_t tb_malloc_init();
-tb_void_t tb_malloc_exit();
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
  * helper
  */
 static tb_bool_t tb_check_order_word()
@@ -98,12 +89,8 @@ tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
 	tb_assert(tb_check_order_word());
 	tb_assert(tb_check_order_double());
 
-	// init memory pool
-#ifdef TB_CONFIG_MEMORY_POOL
+	// init memory
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
-#else
-	if (!tb_malloc_init()) return tb_false;
-#endif
 
 	// init platform
 	if (!tb_platform_init()) return tb_false;
@@ -130,11 +117,7 @@ tb_void_t tb_exit()
 	tb_platform_exit();
 
 	// exit memory
-#ifdef TB_CONFIG_MEMORY_POOL
 	tb_memory_exit();
-#else
-	tb_malloc_exit();
-#endif
 
 	// ok
 	tb_trace("exit: ok");
