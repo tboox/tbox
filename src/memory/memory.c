@@ -1,4 +1,4 @@
-/*!The Treasure Box dynamic
+/*!The Treasure Box Library
  * 
  * TBox is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,44 +17,53 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		dynamic.c
+ * @file		memory.c
+ * @defgroup 	memory
  *
  */
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../dynamic.h"
+#include "memory.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+#ifndef TB_CONFIG_MEMORY_POOL
+tb_bool_t tb_malloc_init();
+tb_void_t tb_malloc_exit();
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
+{
+	// init malloc pool
+#ifdef TB_CONFIG_MEMORY_POOL
+	if (!tb_malloc_init(data, size, TB_CPU_BITBYTE)) return tb_false;
+#else
+	if (!tb_malloc_init()) return tb_false;
+#endif
 
-tb_handle_t tb_dynamic_init(tb_char_t const* name)
-{
-	// check
-	tb_assert_and_check_return_val(name, tb_null);
+	// init scache
+	if (!tb_scache_init(align)) return tb_false;
 
-	// atow
-	tb_wchar_t temp[TB_PATH_MAXN] = {0};
-	if (!tb_atow(temp, name, TB_PATH_MAXN)) return tb_null;
+	// ok
+	return tb_true;
+}
+tb_void_t tb_memory_exit()
+{
+	// exit scache
+	tb_scache_exit();
 
-	// load
-	return (tb_handle_t)LoadLibraryExW(temp, tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
+	// dump malloc
+#ifdef TB_CONFIG_MEMORY_POOL
+	tb_malloc_dump();
+#endif
+
+	// exit malloc
+	tb_malloc_exit();
 }
-tb_void_t tb_dynamic_exit(tb_handle_t dynamic)
-{
-	tb_assert_and_check_return(dynamic);
-	FreeLibrary(dynamic);
-}
-tb_pointer_t tb_dynamic_func(tb_handle_t dynamic, tb_char_t const* name)
-{
-	tb_assert_and_check_return_val(dynamic && name, tb_null);
-	return (tb_pointer_t)GetProcAddress(dynamic, name);
-}
-tb_pointer_t tb_dynamic_pvar(tb_handle_t dynamic, tb_char_t const* name)
-{
-	tb_assert_and_check_return_val(dynamic && name, tb_null);
-	return (tb_pointer_t)GetProcAddress(dynamic, name);
-}
+

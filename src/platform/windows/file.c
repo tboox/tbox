@@ -172,7 +172,7 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 
 	// the full path
 	tb_wchar_t full[TB_PATH_MAXN];
-	if (!tb_path_full(path, full, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// get attributes
 	WIN32_FILE_ATTRIBUTE_DATA st = {0};
@@ -208,11 +208,11 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 
 	// the full path
 	tb_wchar_t full0[TB_PATH_MAXN];
-	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
 	tb_wchar_t full1[TB_PATH_MAXN];
-	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// copy
 	return CopyFileW(full0, full1, FALSE)? tb_true : tb_false;
@@ -236,7 +236,7 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 	
 	// the full path
 	tb_wchar_t full[TB_PATH_MAXN];
-	if (!tb_path_full(path, full, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// remote it
 	return DeleteFileW(full)? tb_true : tb_false;
@@ -248,11 +248,11 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	
 	// the full path
 	tb_wchar_t full0[TB_PATH_MAXN];
-	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
 	tb_wchar_t full1[TB_PATH_MAXN];
-	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// rename it
 	return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
@@ -265,18 +265,18 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 
 	// the full path
 	tb_wchar_t full0[TB_PATH_MAXN];
-	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
 	tb_wchar_t full1[TB_PATH_MAXN];
-	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
+	if (!tb_path_full_w(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// not exists?
 	tb_file_info_t info = {0};
 	if (!tb_file_info(full0, &info)) return tb_false;
 
 	// symlink, supported: >= vista
-	return !CreateSymbolicLinkA(full1, full0, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
+	return !CreateSymbolicLinkW(full1, full0, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
 #else
 	tb_trace_noimpl();
 	return tb_false;

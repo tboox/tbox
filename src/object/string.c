@@ -339,16 +339,19 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 	if (cstr) 
 	{
 		tb_size_t size = tb_strlen(cstr);
-		if (size < TB_STRING_SCACHE_SIZE) 
+		if (size)
 		{
-			// put string to scache
-			string->cdata = tb_scache_put(cstr);
-			tb_assert_and_check_goto(string->cdata, fail);
+			if (size < TB_STRING_SCACHE_SIZE) 
+			{
+				// put string to scache
+				string->cdata = tb_scache_put(cstr);
+				tb_assert_and_check_goto(string->cdata, fail);
 
-			// the string size
-			string->csize = size;
+				// the string size
+				string->csize = size;
+			}
+			else tb_pstring_cstrncpy(&string->pstr, cstr, size);
 		}
-		else tb_pstring_cstrncpy(&string->pstr, cstr, size);
 	}
 
 	// ok
@@ -411,23 +414,36 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 	if (cstr) 
 	{
 		size = tb_strlen(cstr);
-		if (size < TB_STRING_SCACHE_SIZE) 
+		if (size)
 		{
-			// put string to scache
-			tb_char_t const* cdata = tb_scache_put(cstr);
-			if (cdata)
+			if (size < TB_STRING_SCACHE_SIZE) 
 			{
-				// save string
+				// put string to scache
+				tb_char_t const* cdata = tb_scache_put(cstr);
+				if (cdata)
+				{
+					// save string
+					if (string->cdata) tb_scache_del(string->cdata);
+					string->cdata = cdata;
+					string->csize = size;
+				}
+			}
+			else 
+			{
+				// copy string
+				tb_pstring_cstrncpy(&string->pstr, cstr, size);
+				size = tb_pstring_size(&string->pstr);
+
+				// remove string from scache
 				if (string->cdata) tb_scache_del(string->cdata);
-				string->cdata = cdata;
-				string->csize = size;
+				string->cdata = tb_null;
+				string->csize = 0;
 			}
 		}
-		else 
+		else
 		{
-			// copy string
-			tb_pstring_cstrncpy(&string->pstr, cstr, size);
-			size = tb_pstring_size(&string->pstr);
+			// clear string
+			tb_pstring_clear(&string->pstr);
 
 			// remove string from scache
 			if (string->cdata) tb_scache_del(string->cdata);

@@ -35,11 +35,17 @@
 #include "spool.h"
 #include "rpool.h"
 #include "scache.h"
-#include "malloc.h"
 #include "pbuffer.h"
 #include "sbuffer.h"
 #include "rbuffer.h"
 #include "qbuffer.h"
+#ifdef TB_CONFIG_MEMORY_POOL
+# 	include "malloc.h"
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * description
+ */
 
 /*!architecture
  *
@@ -52,6 +58,23 @@
  * fixed block - rpool ------ fpool --
  * </pre>
  */
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init
+ *
+ * @param data 			the memory pool data
+ * @param size 			the memory pool size
+ * @param align 		the memory pool data align bytes
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+
+/// exit
+tb_void_t 				tb_memory_exit();
 
 #endif
 

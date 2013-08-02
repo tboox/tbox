@@ -27,7 +27,9 @@
  * includes
  */
 #include "config.h"
-#include "../memory/malloc.h"
+#ifdef TB_CONFIG_MEMORY_POOL
+# 	include "../memory/malloc.h"
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -35,14 +37,14 @@
 
 // malloc & free
 #ifdef TB_CONFIG_MEMORY_POOL
-#	define tb_malloc(size) 				tb_memory_malloc(size)
-#	define tb_malloc0(size) 			tb_memory_malloc0(size)
+#	define tb_malloc(size) 				tb_malloc_malloc(size)
+#	define tb_malloc0(size) 			tb_malloc_malloc0(size)
 
-#	define tb_nalloc(item, size) 		tb_memory_nalloc(item, size)
-#	define tb_nalloc0(item, size) 		tb_memory_nalloc0(item, size)
+#	define tb_nalloc(item, size) 		tb_malloc_nalloc(item, size)
+#	define tb_nalloc0(item, size) 		tb_malloc_nalloc0(item, size)
 
-#	define tb_ralloc(data, size) 		tb_memory_ralloc(data, size)
-# 	define tb_free(data) 				tb_memory_free(data)
+#	define tb_ralloc(data, size) 		tb_malloc_ralloc(data, size)
+# 	define tb_free(data) 				tb_malloc_free(data)
 #else
 
 tb_pointer_t 	tb_malloc(tb_size_t size);

@@ -21,8 +21,8 @@
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_MEMORY_H
-#define TB_MEMORY_MEMORY_H
+#ifndef TB_MEMORY_MALLOC_H
+#define TB_MEMORY_MALLOC_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -33,23 +33,23 @@
  * macros
  */
 #ifdef __tb_debug__
-#	define tb_memory_malloc(size) 				tb_memory_malloc_impl(size, __tb_func__, __tb_line__, __tb_file__)
-#	define tb_memory_malloc0(size) 				tb_memory_malloc0_impl(size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_malloc_malloc(size) 				tb_malloc_malloc_impl(size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_malloc_malloc0(size) 				tb_malloc_malloc0_impl(size, __tb_func__, __tb_line__, __tb_file__)
 
-#	define tb_memory_nalloc(item, size) 		tb_memory_nalloc_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
-#	define tb_memory_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_malloc_nalloc(item, size) 		tb_malloc_nalloc_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_malloc_nalloc0(item, size) 		tb_malloc_nalloc0_impl(item, size, __tb_func__, __tb_line__, __tb_file__)
 
-#	define tb_memory_ralloc(data, size) 		tb_memory_ralloc_impl(data, size, __tb_func__, __tb_line__, __tb_file__)
-# 	define tb_memory_free(data) 				tb_memory_free_impl(data, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_malloc_ralloc(data, size) 		tb_malloc_ralloc_impl(data, size, __tb_func__, __tb_line__, __tb_file__)
+# 	define tb_malloc_free(data) 				tb_malloc_free_impl(data, __tb_func__, __tb_line__, __tb_file__)
 #else
-#	define tb_memory_malloc(size) 				tb_memory_malloc_impl(size)
-#	define tb_memory_malloc0(size) 				tb_memory_malloc0_impl(size)
+#	define tb_malloc_malloc(size) 				tb_malloc_malloc_impl(size)
+#	define tb_malloc_malloc0(size) 				tb_malloc_malloc0_impl(size)
 
-#	define tb_memory_nalloc(item, size) 		tb_memory_nalloc_impl(item, size)
-#	define tb_memory_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size)
+#	define tb_malloc_nalloc(item, size) 		tb_malloc_nalloc_impl(item, size)
+#	define tb_malloc_nalloc0(item, size) 		tb_malloc_nalloc0_impl(item, size)
 
-#	define tb_memory_ralloc(data, size) 		tb_memory_ralloc_impl(data, size)
-# 	define tb_memory_free(data) 				tb_memory_free_impl(data)
+#	define tb_malloc_ralloc(data, size) 		tb_malloc_ralloc_impl(data, size)
+# 	define tb_malloc_free(data) 				tb_malloc_free_impl(data)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -57,55 +57,55 @@
  */
 
 // init
-tb_bool_t 		tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+tb_bool_t 		tb_malloc_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 // exit
-tb_void_t 		tb_memory_exit();
+tb_void_t 		tb_malloc_exit();
+
+// dump
+tb_void_t 		tb_malloc_dump();
 
 // malloc
 #ifndef __tb_debug__
-tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size);
+tb_pointer_t 	tb_malloc_malloc_impl(tb_size_t size);
 #else
-tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_malloc_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // malloc0
 #ifndef __tb_debug__
-tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size);
+tb_pointer_t 	tb_malloc_malloc0_impl(tb_size_t size);
 #else
-tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_malloc_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc
 #ifndef __tb_debug__
-tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size);
+tb_pointer_t  	tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size);
 #else
-tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc0
 #ifndef __tb_debug__
-tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size);
+tb_pointer_t  	tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size);
 #else
-tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // ralloc
 #ifndef __tb_debug__
-tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size);
+tb_pointer_t 	tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size);
 #else
-tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 #endif
 
 // free
 #ifndef __tb_debug__
-tb_bool_t 		tb_memory_free_impl(tb_pointer_t data);
+tb_bool_t 		tb_malloc_free_impl(tb_pointer_t data);
 #else
-tb_bool_t 		tb_memory_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_bool_t 		tb_malloc_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
-
-// dump
-tb_void_t 		tb_memory_dump();
 
 #endif
 
