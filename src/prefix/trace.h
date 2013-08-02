@@ -52,6 +52,20 @@
 #	define tb_print
 #endif
 
+// wprint
+#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
+# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#		define tb_wprint_tag(tag, fmt, ...)					do { tb_wprintf(L"[" tag "]: " fmt "\n" , __VA_ARGS__); } while (0)
+# 		define tb_wprint(fmt, ...)							tb_wprint_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
+# 	else
+#		define tb_wprint_tag(tag, fmt, arg ...)				do { tb_wprintf(L"[" tag "]: " fmt "\n" , ## arg); } while (0)
+# 		define tb_wprint(fmt, arg ...)						tb_wprint_tag(TB_PRINT_TAG, fmt, ## arg)
+# 	endif
+#else
+#	define tb_wprint_tag
+#	define tb_wprint
+#endif
+
 // trace_tag, the private macro
 #if defined(TB_TRACE_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
@@ -175,6 +189,7 @@
  */
 
 tb_void_t 		tb_printf(tb_char_t const* fmt, ...);
+tb_void_t 		tb_wprintf(tb_wchar_t const* fmt, ...);
 
 #endif
 
