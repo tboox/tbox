@@ -37,7 +37,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-#if 0
+#if 1
 	// temporary
 	tb_char_t temp[4096] = {0};
 	if (tb_directory_temp(temp, 4096)) tb_print("temporary: %s", temp);

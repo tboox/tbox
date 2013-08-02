@@ -45,15 +45,18 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 {
 	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
-	tb_assert_static(sizeof(tb_wchar_t) == 4);
 
 	// init
 	tb_long_t r = 0;
 	tb_size_t l = tb_wcslen(s2);
 	
 	// atow
-	if (l) r = tb_charset_conv_data(TB_CHARSET_TYPE_UCS4 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, s2, l << 2, s1, n);
-	
+	if (l) 
+	{
+		tb_size_t e = (sizeof(tb_wchar_t) == 4)? TB_CHARSET_TYPE_UCS4 : TB_CHARSET_TYPE_UCS2;
+		r = tb_charset_conv_data(e | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, s2, l * sizeof(tb_wchar_t), s1, n);
+	}
+
 	// strip
 	if (r >= 0) s1[r] = '\0';
 

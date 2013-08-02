@@ -34,14 +34,14 @@
 tb_long_t tb_charset_ucs2_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
 tb_long_t tb_charset_ucs2_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch)
 {
-	tb_trace_noimpl();
-	return -1;
+	*ch = be? tb_bstream_get_u16_be(bst) : tb_bstream_get_u16_le(bst);
+	return 1;
 }
 
 tb_long_t tb_charset_ucs2_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
 tb_long_t tb_charset_ucs2_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch)
 {
-	tb_trace_noimpl();
-	return -1;
+	if (be) tb_bstream_set_u16_be(bst, ch);
+	else tb_bstream_set_u16_le(bst, ch);
+	return 1;
 }
-

@@ -33,14 +33,15 @@
 tb_void_t tb_wprintf(tb_wchar_t const* format, ...)
 {
 	// format info
-	tb_long_t size = 0;
-	tb_wchar_t info[8192] = {0};
+	tb_long_t 	size = 0;
+	tb_wchar_t 	info[8192] = {0};
 	tb_vswprintf_format(info, 8191, format, &size);
-	if (size >= 0) info[size] = L'\0';
+	if (size >= 0 && size < 8192) info[size] = L'\0';
 
 	// wtoa
 	tb_char_t text[8192] = {0};
-	tb_wtoa(text, info, 8191);
+	size = tb_wtoa(text, info, 8191);
+	if (size >= 0 && size < 8192) text[size] = '\0';
 
 	// printf
 	tb_printf("%s", text);
