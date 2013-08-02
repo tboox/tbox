@@ -52,7 +52,7 @@ tb_size_t tb_wcstombs(tb_char_t* s1, tb_wchar_t const* s2, tb_size_t n)
 	tb_size_t l = tb_wcslen(s2);
 	
 	// atow
-	if (l) r = tb_charset_conv_cstr(TB_CHARSET_TYPE_UCS4, TB_CHARSET_TYPE_UTF8, s2, l << 2, s1, n);
+	if (l) r = tb_charset_conv_data(TB_CHARSET_TYPE_UCS4 | TB_CHARSET_TYPE_LE, TB_CHARSET_TYPE_UTF8, s2, l << 2, s1, n);
 	
 	// strip
 	if (r >= 0) s1[r] = '\0';

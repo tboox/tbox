@@ -33,11 +33,14 @@
 
 tb_char_t* tb_strichr(tb_char_t const* s, tb_char_t c)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
 
+	// init
 	tb_byte_t const* 	p = (tb_byte_t const*)s;
 	tb_byte_t 			b = tb_tolower((tb_byte_t)c);
 
+	// find
 	while (*p)
 	{
 		if (tb_tolower(*p) == b) return (tb_char_t*)p;

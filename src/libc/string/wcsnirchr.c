@@ -33,7 +33,16 @@
 
 tb_wchar_t* tb_wcsnirchr(tb_wchar_t const* s, tb_size_t n, tb_wchar_t c)
 {
+	// check
 	tb_assert_and_check_return_val(s, tb_null);
-	tb_trace_noimpl();
+
+	// done
+	tb_wchar_t const* 	p = s + n - 1;
+	tb_wchar_t 			b = tb_tolower(c);
+	while (p >= s && *p)
+	{
+		if (tb_tolower(*p) == b) return (tb_wchar_t*)p;
+		p--;
+	}
 	return tb_null;
 }

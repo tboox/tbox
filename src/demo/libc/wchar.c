@@ -8,7 +8,7 @@
  * macros
  */
 #define TB_TEST_CMP 		(0)
-#define TB_TEST_LEN 		(0)
+#define TB_TEST_LEN 		(1)
 #define TB_TEST_CPY 		(1)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -117,40 +117,40 @@ tb_int_t main(tb_int_t argc, tb_wchar_t** argv)
 
 #if TB_TEST_CMP
 	tb_wprintf(L"=================================================================\n");
-	tb_test_wcscmp(L"", "");
-	tb_test_wcscmp(L"1", "1");
-	tb_test_wcscmp(L"1234567890", "1234567890");
-	tb_test_wcscmp(L"1234567890abcbefg", "1234567890ABCBEFG");
-	tb_test_wcscmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz");
-	tb_test_wcscmp(L"1234", "1234567890");
-	tb_test_wcscmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz1234567890");
+	tb_test_wcscmp(L"", L"");
+	tb_test_wcscmp(L"1", L"1");
+	tb_test_wcscmp(L"1234567890", L"1234567890");
+	tb_test_wcscmp(L"1234567890abcbefg", L"1234567890ABCBEFG");
+	tb_test_wcscmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz");
+	tb_test_wcscmp(L"1234", L"1234567890");
+	tb_test_wcscmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz1234567890");
 
 	tb_wprintf(L"\n");
-	tb_test_wcsicmp(L"", "");
-	tb_test_wcsicmp(L"1", "1");
-	tb_test_wcsicmp(L"1234567890", "1234567890");
-	tb_test_wcsicmp(L"1234567890abcbefg", "1234567890ABCBEFG");
-	tb_test_wcsicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz");
-	tb_test_wcsicmp(L"1234", "1234567890");
-	tb_test_wcsicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz1234567890");
+	tb_test_wcsicmp(L"", L"");
+	tb_test_wcsicmp(L"1", L"1");
+	tb_test_wcsicmp(L"1234567890", L"1234567890");
+	tb_test_wcsicmp(L"1234567890abcbefg", L"1234567890ABCBEFG");
+	tb_test_wcsicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz");
+	tb_test_wcsicmp(L"1234", L"1234567890");
+	tb_test_wcsicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz1234567890");
 
 	tb_wprintf(L"\n");
-	tb_test_wcsncmp(L"", "", 10);
-	tb_test_wcsncmp(L"1", "1", 10);
-	tb_test_wcsncmp(L"1234567890", "1234567890", 10);
-	tb_test_wcsncmp(L"1234567890abcbefg", "1234567890ABCBEFG", 10);
-	tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz", 10);
-	tb_test_wcsncmp(L"1234", "1234567890", 10);
-	tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz1234567890", 20);
+	tb_test_wcsncmp(L"", L"", 10);
+	tb_test_wcsncmp(L"1", L"1", 10);
+	tb_test_wcsncmp(L"1234567890", L"1234567890", 10);
+	tb_test_wcsncmp(L"1234567890abcbefg", L"1234567890ABCBEFG", 10);
+	tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz", 10);
+	tb_test_wcsncmp(L"1234", L"1234567890", 10);
+	tb_test_wcsncmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz1234567890", 20);
 	
 	tb_wprintf(L"\n");
-	tb_test_wcsnicmp(L"", "", 10);
-	tb_test_wcsnicmp(L"1", "1", 10);
-	tb_test_wcsnicmp(L"1234567890", "1234567890", 10);
-	tb_test_wcsnicmp(L"1234567890abcbefg", "1234567890ABCBEFG", 10);
-	tb_test_wcsnicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz", 10);
-	tb_test_wcsnicmp(L"1234", "1234567890", 10);
-	tb_test_wcsnicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", "abcdefghijklmnopqrstuvwxyz1234567890", 20);
+	tb_test_wcsnicmp(L"", L"", 10);
+	tb_test_wcsnicmp(L"1", L"1", 10);
+	tb_test_wcsnicmp(L"1234567890", L"1234567890", 10);
+	tb_test_wcsnicmp(L"1234567890abcbefg", L"1234567890ABCBEFG", 10);
+	tb_test_wcsnicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz", 10);
+	tb_test_wcsnicmp(L"1234", L"1234567890", 10);
+	tb_test_wcsnicmp(L"abcdefghijklmnopqrstuvwxyz1234567890", L"abcdefghijklmnopqrstuvwxyz1234567890", 20);
 
 #endif
 

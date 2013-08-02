@@ -42,8 +42,16 @@ tb_long_t tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 #else
 tb_long_t tb_wcsicmp(tb_wchar_t const* s1, tb_wchar_t const* s2)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
-	tb_trace_noimpl();
-	return 0;
+	tb_check_return_val(s1 != s2, 0);
+
+	// done
+	while ((*s1 == *s2) || (tb_tolower(*s1) == tb_tolower(*s2)))
+	{
+		if (!*s1++) return 0;
+		++s2;
+	}
+	return (((tb_wchar_t)tb_tolower(*s1)) < ((tb_wchar_t)tb_tolower(*s2))) ? -1 : 1;
 }
 #endif

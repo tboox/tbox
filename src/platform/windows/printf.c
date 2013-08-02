@@ -139,7 +139,7 @@ tb_void_t tb_printf(tb_char_t const* format, ...)
 	// format info
 	tb_long_t size = 0;
 	tb_char_t info[8192] = {0};
-	tb_va_format(info, 8192, format, &size);
+	tb_vsnprintf_format(info, 8192, format, &size);
 	if (size >= 0) info[size] = '\0';
 
 	// printf

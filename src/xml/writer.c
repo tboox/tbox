@@ -384,7 +384,7 @@ tb_void_t tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* n
 
 	tb_size_t size = 0;
 	tb_char_t data[8192] = {0};
-	tb_va_format(data, 8192, format, &size);
+	tb_vsnprintf_format(data, 8192, format, &size);
 	tb_hash_set(xwriter->attributes, name, data);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
