@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../path.h"
+#include "../printf.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -37,9 +38,8 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	tb_assert_and_check_return_val(path, tb_null);
 
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_null);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_null;
 
 	// init access
 	DWORD access = GENERIC_READ;
@@ -61,30 +61,30 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	if (!cflag) cflag |= OPEN_EXISTING;
 
 	// init file
-	HANDLE file = CreateFileA(path, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+	HANDLE file = CreateFileW(full, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
 	if (file == INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_CREAT))
 	{
 		// make directory
-		tb_char_t 			temp[TB_PATH_MAXN] = {0};
-		tb_char_t const* 	p = full;
-		tb_char_t* 			t = temp;
-		tb_char_t const* 	e = temp + TB_PATH_MAXN - 1;
+		tb_wchar_t 			temp[TB_PATH_MAXN] = {0};
+		tb_wchar_t const* 	p = full;
+		tb_wchar_t* 		t = temp;
+		tb_wchar_t const* 	e = temp + TB_PATH_MAXN - 1;
 		for (; t < e && *p; t++) 
 		{
 			*t = *p;
-			if (*p == '\\' || *p == '/')
+			if (*p == L'\\' || *p == L'/')
 			{
 				// make directory if not exists
-				if (!tb_file_info(temp, tb_null)) CreateDirectoryA(temp, tb_null);
+				if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
 
 				// skip repeat '\\' or '/'
-				while (*p && (*p == '\\' || *p == '/')) p++;
+				while (*p && (*p == L'\\' || *p == L'/')) p++;
 			}
 			else p++;
 		}
 
 		// init it again
-		file = CreateFileA(path, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+		file = CreateFileW(full, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
 	}
 
 	// append?
@@ -171,13 +171,12 @@ tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// get attributes
 	WIN32_FILE_ATTRIBUTE_DATA st = {0};
-	if (!GetFileAttributesExA(path, GetFileExInfoStandard, &st)) return tb_false;
+	if (!GetFileAttributesExW(full, GetFileExInfoStandard, &st)) return tb_false;
 
 	// get info
 	if (info)
@@ -208,17 +207,15 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(path && dest, tb_false);
 
 	// the full path
-	tb_char_t full0[TB_PATH_MAXN];
-	path = tb_path_full(path, full0, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full0[TB_PATH_MAXN];
+	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
-	tb_char_t full1[TB_PATH_MAXN];
-	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(dest, tb_false);
+	tb_wchar_t full1[TB_PATH_MAXN];
+	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// copy
-	return CopyFileA(path, dest, FALSE)? tb_true : tb_false;
+	return CopyFileW(full0, full1, FALSE)? tb_true : tb_false;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
 {
@@ -238,12 +235,11 @@ tb_bool_t tb_file_remove(tb_char_t const* path)
 	tb_assert_and_check_return_val(path, tb_false);
 	
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// remote it
-	return DeleteFileA(path)? tb_true : tb_false;
+	return DeleteFileW(full)? tb_true : tb_false;
 }
 tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 {
@@ -251,17 +247,15 @@ tb_bool_t tb_file_rename(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(path && dest, tb_false);
 	
 	// the full path
-	tb_char_t full0[TB_PATH_MAXN];
-	path = tb_path_full(path, full0, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full0[TB_PATH_MAXN];
+	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
-	tb_char_t full1[TB_PATH_MAXN];
-	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(dest, tb_false);
+	tb_wchar_t full1[TB_PATH_MAXN];
+	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// rename it
-	return MoveFileExA(path, dest, MOVEFILE_REPLACE_EXISTING);
+	return MoveFileExW(full0, full1, MOVEFILE_REPLACE_EXISTING);
 }
 tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 {
@@ -270,21 +264,19 @@ tb_bool_t tb_file_link(tb_char_t const* path, tb_char_t const* dest)
 	tb_assert_and_check_return_val(path && dest, tb_false);
 
 	// the full path
-	tb_char_t full0[TB_PATH_MAXN];
-	path = tb_path_full(path, full0, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full0[TB_PATH_MAXN];
+	if (!tb_path_full(path, full0, TB_PATH_MAXN)) return tb_false;
 
 	// the dest path
-	tb_char_t full1[TB_PATH_MAXN];
-	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(dest, tb_false);
+	tb_wchar_t full1[TB_PATH_MAXN];
+	if (!tb_path_full(dest, full1, TB_PATH_MAXN)) return tb_false;
 
 	// not exists?
 	tb_file_info_t info = {0};
-	if (!tb_file_info(path, &info)) return tb_false;
+	if (!tb_file_info(full0, &info)) return tb_false;
 
 	// symlink, supported: >= vista
-	return !CreateSymbolicLinkA(dest, path, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
+	return !CreateSymbolicLinkA(full1, full0, info.bdir? SYMBOLIC_LINK_FLAG_DIRECTORY : 0)? tb_true : tb_false;
 #else
 	tb_trace_noimpl();
 	return tb_false;

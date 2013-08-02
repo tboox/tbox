@@ -30,7 +30,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	test_mm_main(argc, argv);
 #endif
 
-
 	// exit
 	tb_exit();
 	return 0;

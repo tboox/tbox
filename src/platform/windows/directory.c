@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../path.h"
+#include "../printf.h"
 #include "../directory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -40,7 +41,12 @@ static tb_void_t tb_directory_walk_remove(tb_char_t const* path, tb_file_info_t 
 	// remove file
 	if (info->type == TB_FILE_TYPE_FILE) tb_file_remove(path);
 	// remvoe directory
-	else if (info->type == TB_FILE_TYPE_DIRECTORY) RemoveDirectoryA(path);
+	else if (info->type == TB_FILE_TYPE_DIRECTORY)
+	{
+		tb_char_t temp[TB_PATH_MAXN] = {0};
+		if (tb_atow(temp, path, TB_PATH_MAXN))
+			RemoveDirectoryW(temp);
+	}
 }
 static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t const* info, tb_pointer_t data)
 {
@@ -95,37 +101,36 @@ tb_bool_t tb_directory_create(tb_char_t const* path)
 {
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
-	
+
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_null;
 
 	// make it
-	tb_bool_t ok = CreateDirectoryA(path, tb_null)? tb_true : tb_false;
+	tb_bool_t ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
 	if (!ok)
 	{
 		// make directory
-		tb_char_t 			temp[TB_PATH_MAXN] = {0};
-		tb_char_t const* 	p = full;
-		tb_char_t* 			t = temp;
-		tb_char_t const* 	e = temp + TB_PATH_MAXN - 1;
+		tb_wchar_t 			temp[TB_PATH_MAXN] = {0};
+		tb_wchar_t const* 	p = full;
+		tb_wchar_t* 		t = temp;
+		tb_wchar_t const* 	e = temp + TB_PATH_MAXN - 1;
 		for (; t < e && *p; t++) 
 		{
 			*t = *p;
-			if (*p == '\\' || *p == '/')
+			if (*p == L'\\' || *p == L'/')
 			{
 				// make directory if not exists
-				if (!tb_file_info(temp, tb_null)) CreateDirectoryA(temp, tb_null);
+				if (INVALID_FILE_ATTRIBUTES == GetFileAttributesW(temp)) CreateDirectoryW(temp, tb_null);
 
 				// skip repeat '\\' or '/'
-				while (*p && (*p == '\\' || *p == '/')) p++;
+				while (*p && (*p == L'\\' || *p == L'/')) p++;
 			}
 			else p++;
 		}
 
 		// make it again
-		ok = CreateDirectoryA(path, tb_null)? tb_true : tb_false;
+		ok = CreateDirectoryW(full, tb_null)? tb_true : tb_false;
 	}
 
 	// ok?
@@ -135,17 +140,16 @@ tb_bool_t tb_directory_remove(tb_char_t const* path)
 {
 	// check
 	tb_assert_and_check_return_val(path, tb_false);
-	
+
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return tb_false;
 
 	// walk remove
 	tb_directory_walk(path, tb_true, tb_false, tb_directory_walk_remove, tb_null);
 
 	// remove it
-	return RemoveDirectoryA(path)? tb_true : tb_false;
+	return RemoveDirectoryW(full)? tb_true : tb_false;
 }
 tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
 {
@@ -153,61 +157,78 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
 	tb_assert_and_check_return_val(path && maxn > 4, 0);
 
 	// the temporary directory
-	return (tb_size_t)GetTempPathA(maxn, path);
+	tb_wchar_t 	temp[TB_PATH_MAXN] = {0};
+	tb_size_t 	size = (tb_size_t)GetTempPathW(TB_PATH_MAXN, temp);
+
+	// wtoa
+	return tb_wtoa(path, temp, maxn);
 }
 tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 {
 	// check
-	tb_assert_and_check_return_val(path && maxn, 0);
+	tb_assert_and_check_return_val(path && maxn > 4, 0);
 
 	// the current directory
-	return (tb_size_t)GetCurrentDirectoryA(maxn, path);
+	tb_wchar_t 	curt[TB_PATH_MAXN] = {0};
+	tb_size_t 	size = (tb_size_t)GetCurrentDirectoryW(TB_PATH_MAXN, curt);
+
+	// wtoa
+	return tb_wtoa(path, curt, maxn);
 }
 tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_t prefix, tb_directory_walk_func_t func, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return(path && func);
-	
+
 	// the full path
-	tb_char_t full[TB_PATH_MAXN];
-	path = tb_path_full(path, full, TB_PATH_MAXN);
-	tb_assert_and_check_return(path);
+	tb_wchar_t full[TB_PATH_MAXN];
+	if (!tb_path_full_w(path, full, TB_PATH_MAXN)) return ;
 
 	// last
-	tb_long_t 			last = tb_strlen(path) - 1;
+	tb_long_t 			last = tb_wcslen(full) - 1;
 	tb_assert_and_check_return(last >= 0);
 
 	// add \*.*
-	tb_char_t 			temp[4096] = {0};
-	tb_snprintf(temp, 4095, "%s%s*.*", path, path[last] == '\\'? "" : "\\");
+	tb_wchar_t 			temp[4096] = {0};
+	tb_swprintf(temp, 4095, L"%s%s*.*", full, full[last] == L'\\'? L"" : L"\\");
+	tb_wprintf(L"ddddddxx: %s\n", temp);
 
 	// init info
-	WIN32_FIND_DATAA 	find = {0};
+	WIN32_FIND_DATAW 	find = {0};
 	HANDLE 				directory = INVALID_HANDLE_VALUE;
-	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileA(temp, &find)))
+	if (INVALID_HANDLE_VALUE != (directory = FindFirstFileW(temp, &find)))
 	{
 		// walk
 		do
 		{
 			// check
-			if (tb_strcmp(find.cFileName, ".") && tb_strcmp(find.cFileName, ".."))
+			if (tb_wcscmp(find.cFileName, L".") && tb_wcscmp(find.cFileName, L".."))
 			{
+				tb_wprintf(L"xx: %s\n", find.cFileName);
 				// the temp path
-				tb_long_t n = tb_snprintf(temp, 4095, "%s%s%s", path, path[last] == '\\'? "" : "\\", find.cFileName);
-				if (n >= 0) temp[n] = '\0';
+				tb_long_t n = tb_swprintf(temp, 4095, L"%s%s%s", full, full[last] == L'\\'? L"" : L"\\", find.cFileName);
+				if (n >= 0 && n < 4096) temp[n] = L'\0';
+				tb_wprintf(L"xx: %s\n", temp);
+
+				// wtoa temp
+				tb_char_t* temp_a = (tb_char_t*)full;
+				n = tb_wtoa(temp_a, temp, 4095);
+				if (n >= 0 && n < 4096) temp_a[n] = '\0';
+				tb_print("xa: %s\n", temp_a);
+				break;
 
 				// the file info
 				tb_file_info_t info = {0};
-				if (tb_file_info(temp, &info))
+				if (tb_file_info(temp_a, &info))
 				{
 					// do callback
-					if (prefix) func(temp, &info, data);
+					if (prefix) func(temp_a, &info, data);
 
 					// walk to the next directory
-					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp, recursion, prefix, func, data);
+					if (info.type == TB_FILE_TYPE_DIRECTORY && recursion) tb_directory_walk(temp_a, recursion, prefix, func, data);
 	
 					// do callback
-					if (!prefix) func(temp, &info, data);
+					if (!prefix) func(temp_a, &info, data);
 				}
 			}
 
@@ -219,14 +240,9 @@ tb_void_t tb_directory_walk(tb_char_t const* path, tb_bool_t recursion, tb_bool_
 }
 tb_bool_t tb_directory_copy(tb_char_t const* path, tb_char_t const* dest)
 {
-	// the full path
-	tb_char_t full0[TB_PATH_MAXN];
-	path = tb_path_full(path, full0, TB_PATH_MAXN);
-	tb_assert_and_check_return_val(path, tb_false);
-
 	// the dest path
-	tb_char_t full1[TB_PATH_MAXN];
-	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
+	tb_char_t full[TB_PATH_MAXN];
+	dest = tb_path_full(dest, full, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
 	// walk copy

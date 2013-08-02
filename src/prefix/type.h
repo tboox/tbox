@@ -72,13 +72,19 @@ typedef tb_int_t					tb_int32_t;
 typedef tb_int32_t					tb_sint32_t;
 typedef tb_uint_t					tb_uint32_t;
 typedef char 						tb_char_t;
-typedef tb_int32_t 					tb_wchar_t;
 typedef tb_int32_t 					tb_uchar_t;
 typedef tb_uint8_t					tb_byte_t;
 typedef void 						tb_void_t;
 typedef tb_void_t* 					tb_pointer_t;
 typedef tb_void_t const* 			tb_cpointer_t;
 typedef tb_pointer_t 				tb_handle_t;
+
+// wchar
+#ifdef TB_CONFIG_OS_WINDOWS
+typedef tb_int16_t 					tb_wchar_t;
+#else
+typedef tb_int32_t 					tb_wchar_t;
+#endif
 
 // int64
 #ifdef TB_COMPILER_IS_MSVC
