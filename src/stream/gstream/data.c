@@ -155,7 +155,7 @@ static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 	switch (cmd)
 	{
-	case TB_DSTREAM_CMD_SET_DATA:
+	case TB_DSTREAM_CTRL_SET_DATA:
 		{
 			dst->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
 			dst->size = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -206,7 +206,7 @@ tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// set data & size
-	if (!tb_gstream_ctrl(gst, TB_DSTREAM_CMD_SET_DATA, data, size)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_DSTREAM_CTRL_SET_DATA, data, size)) goto fail;
 	
 	return gst;
 

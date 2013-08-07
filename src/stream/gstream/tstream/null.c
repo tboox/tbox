@@ -45,7 +45,7 @@ typedef struct __tb_nstream_t
 static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
 {
 	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NULL, tb_null);
+	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NONE, tb_null);
 	return (tb_nstream_t*)tst;
 }
 static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_bool_t sync)
@@ -108,7 +108,7 @@ tb_gstream_t* tb_gstream_init_null()
 	gst->ctrl	= tb_tstream_ctrl;
 
 	// init tstream
-	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_NULL;
+	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_NONE;
 	((tb_tstream_t*)gst)->spak = tb_nstream_spak;
 
 	// ok
@@ -128,7 +128,7 @@ tb_gstream_t* tb_gstream_init_from_null(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(nst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(nst, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(nst, TB_TSTREAM_CTRL_SET_GSTREAM, gst)) goto fail;
 	
 	return nst;
 

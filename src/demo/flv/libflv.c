@@ -125,7 +125,7 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 	case TB_FLV_SDATA_TYPE_MOVIECLIP:
 		tb_pstring_cstrfcpy(&flv->string, "movieclip");
 		break;
-	case TB_FLV_SDATA_TYPE_NULL:
+	case TB_FLV_SDATA_TYPE_NONE:
 		tb_pstring_cstrfcpy(&flv->string, "null");
 		break;
 	case TB_FLV_SDATA_TYPE_UNDEFINED:
@@ -161,7 +161,7 @@ static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_valu
 	case TB_FLV_SDATA_TYPE_LONGSTRING:
 	case TB_FLV_SDATA_TYPE_OBJECT:
 	case TB_FLV_SDATA_TYPE_MOVIECLIP:
-	case TB_FLV_SDATA_TYPE_NULL:
+	case TB_FLV_SDATA_TYPE_NONE:
 	case TB_FLV_SDATA_TYPE_UNDEFINED:
 	case TB_FLV_SDATA_TYPE_REFERENCE:
 	case TB_FLV_SDATA_TYPE_ECMAARRAY:
@@ -225,7 +225,7 @@ static tb_bool_t tb_flv_sdata_movieclip_spank(tb_flv_t* flv, tb_flv_sdata_value_
 }
 static tb_bool_t tb_flv_sdata_null_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	value->type = TB_FLV_SDATA_TYPE_NULL;
+	value->type = TB_FLV_SDATA_TYPE_NONE;
 	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_undefined_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
@@ -394,7 +394,7 @@ static tb_bool_t tb_flv_sdata_value_spank(tb_flv_t* flv, tb_flv_sdata_value_t* v
 		return tb_flv_sdata_boolean_spank(flv, value);
 	case TB_FLV_SDATA_TYPE_DATE:
 		return tb_flv_sdata_date_spank(flv, value);
-	case TB_FLV_SDATA_TYPE_NULL:
+	case TB_FLV_SDATA_TYPE_NONE:
 		return tb_flv_sdata_null_spank(flv, value);
 	case TB_FLV_SDATA_TYPE_UNDEFINED:
 		return tb_flv_sdata_undefined_spank(flv, value);

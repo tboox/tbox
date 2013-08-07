@@ -203,17 +203,17 @@ static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 	switch (cmd)
 	{
-	case TB_FSTREAM_CMD_SET_MODE:
+	case TB_FSTREAM_CTRL_SET_MODE:
 		fst->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
 		return tb_true;
-	case TB_FSTREAM_CMD_SET_HANDLE:
+	case TB_FSTREAM_CTRL_SET_HANDLE:
 		{
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
 			fst->file = handle;
 			fst->bref = handle? 1 : 0;
 			return tb_true;
 		}
-	case TB_FSTREAM_CMD_GET_HANDLE:
+	case TB_FSTREAM_CTRL_GET_HANDLE:
 		{
 			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
@@ -252,7 +252,7 @@ tb_gstream_t* tb_gstream_init_file()
 	fst->mode 	= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// resize file cache
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
 
 	// ok
 	return gst;
@@ -271,7 +271,7 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// set path
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_URL, path)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_URL, path)) goto fail;
 	
 	return gst;
 

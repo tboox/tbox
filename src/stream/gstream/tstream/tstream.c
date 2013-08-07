@@ -70,14 +70,14 @@ tb_bool_t tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 
 	switch (cmd)
 	{
-	case TB_TSTREAM_CMD_GET_GSTREAM:
+	case TB_TSTREAM_CTRL_GET_GSTREAM:
 		{
 			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(args, tb_gstream_t**);
 			tb_assert_and_check_return_val(pgst, tb_false);
 			*pgst = tst->gst;
 			return tb_true;
 		}
-	case TB_TSTREAM_CMD_SET_GSTREAM:
+	case TB_TSTREAM_CTRL_SET_GSTREAM:
 		{
 			tst->gst = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
 			tb_assert_and_check_return_val(tst->gst, tb_false);

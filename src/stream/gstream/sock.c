@@ -218,16 +218,30 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		break;
 	}
 
+	// save state
+	gst->state = TB_GSTREAM_STATE_OK;
+
 	// ok?
 	return r;
 
 fail:
 
-	// exit dns
-	if (sst && sst->hdns)
+	// failed?
+	if (sst)
 	{
-		tb_dns_look_exit(sst->hdns);
-		sst->hdns = tb_null;
+		// dns failed?
+		if (sst->hdns)
+		{
+			// save state
+			gst->state = TB_SSTREAM_STATE_DNS_FAILED;
+
+			// exit dns
+			tb_dns_look_exit(sst->hdns);
+			sst->hdns = tb_null;
+		}
+		// ssl or connect failed?
+		else if (sst->type == TB_SOCKET_TYPE_TCP)
+			gst->state = tb_url_ssl_get(&gst->url)? TB_SSTREAM_STATE_SSL_FAILED : TB_SSTREAM_STATE_CONNECT_FAILED;
 	}
 
 	return -1;
@@ -418,7 +432,7 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 	switch (cmd)
 	{
-	case TB_SSTREAM_CMD_SET_TYPE:
+	case TB_SSTREAM_CTRL_SET_TYPE:
 		{
 			tb_assert_and_check_return_val(!gst->bopened, tb_false);
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -426,7 +440,7 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 			sst->type = type;
 			return tb_true;
 		}
-	case TB_SSTREAM_CMD_SET_HANDLE:
+	case TB_SSTREAM_CTRL_SET_HANDLE:
 		{
 			tb_assert_and_check_return_val(!gst->bopened, tb_false);
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -434,7 +448,7 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 			sst->bref = handle? 1 : 0;
 			return tb_true;
 		}
-	case TB_SSTREAM_CMD_GET_HANDLE:
+	case TB_SSTREAM_CTRL_GET_HANDLE:
 		{
 			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
@@ -487,10 +501,10 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// ioctl
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CMD_SET_SSL, bssl)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_SSTREAM_CMD_SET_TYPE, type)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_SSTREAM_CTRL_SET_TYPE, type)) goto fail;
 	
 	// ok
 	return gst;
