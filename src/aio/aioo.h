@@ -37,7 +37,7 @@
 // the event type
 typedef enum __tb_aioo_etype_t
 {
- 	TB_AIOO_ETYPE_NULL 	= 0 	//!< for null
+ 	TB_AIOO_ETYPE_NONE 	= 0 	//!< for null
 , 	TB_AIOO_ETYPE_CONN 	= 1 	//!< for socket
 , 	TB_AIOO_ETYPE_ACPT 	= 2 	//!< for socket
 ,	TB_AIOO_ETYPE_READ 	= 4		//!< for all i/o object
@@ -49,7 +49,7 @@ typedef enum __tb_aioo_etype_t
 // the object type
 typedef enum __tb_aioo_otype_t
 {
- 	TB_AIOO_OTYPE_NULL 	= 0 	//!< for null
+ 	TB_AIOO_OTYPE_NONE 	= 0 	//!< for null
 , 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
 ,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
 
@@ -121,7 +121,7 @@ tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype);
  * @return 	the event type
  *          return 0 if timeout
  *          return -1 if error
- *          return the need event type if object->etype == TB_AIOO_ETYPE_NULL
+ *          return the need event type if object->etype == TB_AIOO_ETYPE_NONE
  */
 tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout);
 

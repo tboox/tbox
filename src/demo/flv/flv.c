@@ -36,7 +36,7 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 	case TB_FLV_SDATA_TYPE_MOVIECLIP:
 		tb_print("[demo]: %s = movieclip", spath);
 		break;
-	case TB_FLV_SDATA_TYPE_NULL:
+	case TB_FLV_SDATA_TYPE_NONE:
 		tb_print("[demo]: %s = null", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_UNDEFINED:

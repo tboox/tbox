@@ -205,7 +205,7 @@ tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aic
 	// init aico
 	aico->aioo.handle = handle;
 	aico->aioo.otype = aicp->type;
-	aico->aioo.etype = TB_AIOO_ETYPE_NULL;
+	aico->aioo.etype = TB_AIOO_ETYPE_NONE;
 	aico->aioo.odata = odata;
 	aico->aicb = aicb;
 

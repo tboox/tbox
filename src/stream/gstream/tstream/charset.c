@@ -69,26 +69,26 @@ static tb_bool_t tb_cstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 
 	switch (cmd)
 	{
-	case TB_CSTREAM_CMD_GET_FTYPE:
+	case TB_CSTREAM_CTRL_GET_FTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe, tb_false);
 			*pe = cst->ftype;
 			return tb_true;
 		}
-	case TB_CSTREAM_CMD_GET_TTYPE:
+	case TB_CSTREAM_CTRL_GET_TTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe, tb_false);
 			*pe = cst->ttype;
 			return tb_true;
 		}
-	case TB_CSTREAM_CMD_SET_FTYPE:
+	case TB_CSTREAM_CTRL_SET_FTYPE:
 		{
 			cst->ftype = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_CHARSET_TYPE_OK(cst->ftype)? tb_true : tb_false;
 		}
-	case TB_CSTREAM_CMD_SET_TTYPE:
+	case TB_CSTREAM_CTRL_SET_TTYPE:
 		{
 			cst->ttype = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_CHARSET_TYPE_OK(cst->ttype)? tb_true : tb_false;
@@ -186,13 +186,13 @@ tb_gstream_t* tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t ftype, t
 	tb_assert_and_check_return_val(cst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(cst, TB_TSTREAM_CMD_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_TSTREAM_CTRL_SET_GSTREAM, gst)) goto fail;
 		
 	// set from charset type
-	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CMD_SET_FTYPE, ftype)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CTRL_SET_FTYPE, ftype)) goto fail;
 		
 	// set to charset type
-	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CMD_SET_TTYPE, ttype)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CTRL_SET_TTYPE, ttype)) goto fail;
 	
 	return cst;
 

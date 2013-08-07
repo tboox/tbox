@@ -58,7 +58,7 @@ typedef enum __tb_file_seek_flag_t
 // the file type
 typedef enum __tb_file_type_t
 {
-	TB_FILE_TYPE_NULL 		= 0
+	TB_FILE_TYPE_NONE 		= 0
 ,	TB_FILE_TYPE_DIRECTORY 	= 1
 , 	TB_FILE_TYPE_FILE 		= 2 
 , 	TB_FILE_TYPE_DOT 		= 3

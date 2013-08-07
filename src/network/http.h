@@ -45,47 +45,95 @@
  * types
  */
 
-// the http method constant
-typedef enum __tb_http_method_t
+/// the http method enum
+typedef enum __tb_http_method_e
 {
- 	TB_HTTP_METHOD_GET 		= 0
-, 	TB_HTTP_METHOD_POST 	= 1
-, 	TB_HTTP_METHOD_HEAD 	= 2
-, 	TB_HTTP_METHOD_PUT 		= 3
-,	TB_HTTP_METHOD_OPTIONS 	= 4
-, 	TB_HTTP_METHOD_DELETE 	= 5
-, 	TB_HTTP_METHOD_TRACE 	= 6
-, 	TB_HTTP_METHOD_CONNECT 	= 7
+ 	TB_HTTP_METHOD_GET 				= 0
+, 	TB_HTTP_METHOD_POST 			= 1
+, 	TB_HTTP_METHOD_HEAD 			= 2
+, 	TB_HTTP_METHOD_PUT 				= 3
+,	TB_HTTP_METHOD_OPTIONS 			= 4
+, 	TB_HTTP_METHOD_DELETE 			= 5
+, 	TB_HTTP_METHOD_TRACE 			= 6
+, 	TB_HTTP_METHOD_CONNECT 			= 7
 
-}tb_http_method_t;
+}tb_http_method_e;
 
-// the http version constant
-typedef enum __tb_http_version_t
+/// the http version enum
+typedef enum __tb_http_version_e
 {
- 	TB_HTTP_VERSION_10 		= 0
-, 	TB_HTTP_VERSION_11 		= 1
+ 	TB_HTTP_VERSION_10 				= 0
+, 	TB_HTTP_VERSION_11 				= 1
 
-}tb_http_version_t;
+}tb_http_version_e;
 
-// the http seek type
-typedef enum __tb_http_seek_t
+/// the http seek enum
+typedef enum __tb_http_seek_e
 {
- 	TB_HTTP_SEEK_BEG 		= 0
-, 	TB_HTTP_SEEK_CUR 		= 1
-, 	TB_HTTP_SEEK_END 		= 2
+ 	TB_HTTP_SEEK_BEG 				= 0
+, 	TB_HTTP_SEEK_CUR 				= 1
+, 	TB_HTTP_SEEK_END 				= 2
 
-}tb_http_seek_t;
+}tb_http_seek_e;
 
-// the http range type
+/// the http error enum
+typedef enum __tb_http_error_e
+{
+	TB_HTTP_ERROR_OK 				= 0
+,	TB_HTTP_ERROR_RESPONSE_204 		= 1
+,	TB_HTTP_ERROR_RESPONSE_300 		= 2
+,	TB_HTTP_ERROR_RESPONSE_301 		= 3
+,	TB_HTTP_ERROR_RESPONSE_302 		= 4
+,	TB_HTTP_ERROR_RESPONSE_303 		= 5
+,	TB_HTTP_ERROR_RESPONSE_304 		= 6
+,	TB_HTTP_ERROR_RESPONSE_400 		= 7
+,	TB_HTTP_ERROR_RESPONSE_401 		= 8
+,	TB_HTTP_ERROR_RESPONSE_402 		= 9
+,	TB_HTTP_ERROR_RESPONSE_403 		= 10
+,	TB_HTTP_ERROR_RESPONSE_404 		= 11
+,	TB_HTTP_ERROR_RESPONSE_405 		= 12
+,	TB_HTTP_ERROR_RESPONSE_406 		= 13
+,	TB_HTTP_ERROR_RESPONSE_407 		= 14
+,	TB_HTTP_ERROR_RESPONSE_408 		= 15
+,	TB_HTTP_ERROR_RESPONSE_409 		= 16
+,	TB_HTTP_ERROR_RESPONSE_410 		= 17
+,	TB_HTTP_ERROR_RESPONSE_411 		= 18
+,	TB_HTTP_ERROR_RESPONSE_412 		= 19
+,	TB_HTTP_ERROR_RESPONSE_413 		= 20
+,	TB_HTTP_ERROR_RESPONSE_414 		= 21
+,	TB_HTTP_ERROR_RESPONSE_415 		= 22
+,	TB_HTTP_ERROR_RESPONSE_416 		= 23
+,	TB_HTTP_ERROR_RESPONSE_500 		= 24
+,	TB_HTTP_ERROR_RESPONSE_501 		= 25
+,	TB_HTTP_ERROR_RESPONSE_502 		= 26
+,	TB_HTTP_ERROR_RESPONSE_503 		= 27
+,	TB_HTTP_ERROR_RESPONSE_504 		= 28
+,	TB_HTTP_ERROR_RESPONSE_505 		= 29
+,	TB_HTTP_ERROR_RESPONSE_506 		= 30
+,	TB_HTTP_ERROR_RESPONSE_507 		= 31
+,	TB_HTTP_ERROR_RESPONSE_UNK 		= 32
+,	TB_HTTP_ERROR_RESPONSE_NUL 		= 33
+, 	TB_HTTP_ERROR_UNKNOWN 			= 34
+,	TB_HTTP_ERROR_DNS_FAILED 		= 35
+,	TB_HTTP_ERROR_SSL_FAILED 		= 36
+,	TB_HTTP_ERROR_CONNECT_FAILED	= 37
+,	TB_HTTP_ERROR_REQUEST_FAILED	= 38
+,	TB_HTTP_ERROR_WAIT_FAILED		= 39
+
+}tb_http_error_e;
+
+/// the http range type
 typedef struct __tb_http_range_t
 {
-	// range
-	tb_hize_t 		bof;
-	tb_hize_t 		eof;
+	/// the begin offset
+	tb_hize_t 			bof;
+
+	/// the end offset
+	tb_hize_t 			eof;
 
 }tb_http_range_t;
 
-// the http ssl func type
+/// the http ssl func type
 typedef struct __tb_http_sfunc_t
 {
 	/// the init func
@@ -102,46 +150,46 @@ typedef struct __tb_http_sfunc_t
 
 }tb_http_sfunc_t;
 
-// the http option type
+/// the http option type
 typedef struct __tb_http_option_t
 {
-	// the method
+	/// the method
 	tb_uint16_t 		method 		: 4;
 
-	// the max redirect
+	/// the max redirect
 	tb_uint16_t 		rdtm 		: 9;
 
-	// the http version
+	/// the http version
 	tb_uint16_t 		version 	: 1;
 
-	// is alive?
+	/// is alive?
 	tb_uint16_t 		balive 		: 1;
 
-	// is chunked?
+	/// is chunked?
 	tb_uint16_t 		bchunked 	: 1;
 
-	// the url
+	/// the url
 	tb_url_t 			url;
 
-	// the post size
+	/// the post size
 	tb_hize_t 			post;
 
-	// the head hash
+	/// the head hash
 	tb_handle_t 		head;
 
-	// timeout: ms
+	/// timeout: ms
 	tb_size_t 			timeout;
 
-	// range
+	/// range
 	tb_http_range_t 	range;
 
-	// the user data
+	/// the user data
 	tb_pointer_t 		udata;
 
-	// the ssl func
+	/// the ssl func
 	tb_http_sfunc_t 	sfunc;
 
-	// the head func
+	/// the head func
 	tb_bool_t 			(*hfunc)(tb_handle_t http, tb_char_t const* line);
 
 }tb_http_option_t;
@@ -149,34 +197,37 @@ typedef struct __tb_http_option_t
 // the http status type
 typedef struct __tb_http_status_t
 {
-	// the http code
+	/// the http code
 	tb_uint16_t 		code 		: 10;
 
-	// the http version
+	/// the http version
 	tb_uint16_t 		version 	: 1;
 
-	// is keep alive?
+	/// is keep alive?
 	tb_uint16_t 		balive		: 1;
 
-	// be able to seek?
+	/// be able to seek?
 	tb_uint16_t 		bseeked		: 1;
 
-	// is chunked?
+	/// is chunked?
 	tb_uint16_t 		bchunked	: 1;
 
-	// the post size
+	/// the error
+	tb_size_t 			error;
+
+	/// the post size
 	tb_hize_t 			post_size;
 
-	// the document size
+	/// the document size
 	tb_hize_t 			document_size;
 
-	// the current content size, maybe in range
+	/// the current content size, maybe in range
 	tb_hize_t 			content_size;
 
-	// the content type
+	/// the content type
 	tb_pstring_t 		content_type;
 
-	// the location
+	/// the location
 	tb_pstring_t 		location;
 
 }tb_http_status_t;
@@ -203,7 +254,7 @@ tb_void_t 				tb_http_exit(tb_handle_t handle);
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param handle 		the http handle 
- * @param etype 		the waited event type, return the needed event type if TB_AIOO_ETYPE_NULL
+ * @param etype 		the waited event type, return the needed event type if TB_AIOO_ETYPE_NONE
  * @param timeout 		the timeout value, return immediately if 0, infinity if -1
  *
  * @return 				the event type, return 0 if timeout, return -1 if error

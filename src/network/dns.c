@@ -1429,7 +1429,7 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// has aio event?
 	tb_aioo_t o;
-	tb_size_t e = TB_AIOO_ETYPE_NULL;
+	tb_size_t e = TB_AIOO_ETYPE_NONE;
 	if (!(look->step & TB_DNS_STEP_NEVT))
 	{
 		if (!(look->step & TB_DNS_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
