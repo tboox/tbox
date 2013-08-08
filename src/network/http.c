@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"http"
+//#define TB_TRACE_IMPL_TAG 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -536,6 +536,19 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		tb_assert_and_check_return_val(*p && tb_isdigit(*p), tb_false);
 		http->status.code = tb_stou32(p);
 
+		// save error
+		if (http->status.code == 200 || http->status.code == 206)
+			http->status.error = TB_HTTP_ERROR_OK;
+		else if (http->status.code == 204)
+			http->status.error = TB_HTTP_ERROR_RESPONSE_204;
+		else if (http->status.code >= 300 && http->status.code <= 304)
+			http->status.error = TB_HTTP_ERROR_RESPONSE_300 + (http->status.code - 300);
+		else if (http->status.code >= 400 && http->status.code <= 416)
+			http->status.error = TB_HTTP_ERROR_RESPONSE_400 + (http->status.code - 400);
+		else if (http->status.code >= 500 && http->status.code <= 507)
+			http->status.error = TB_HTTP_ERROR_RESPONSE_500 + (http->status.code - 500);
+		else http->status.error = TB_HTTP_ERROR_RESPONSE_UNK;
+
 		// check error code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
 	}
@@ -681,19 +694,6 @@ static tb_long_t tb_http_response(tb_http_t* http)
 			http->size++;
 		}
 	}
-
-	// save error
-	if (http->status.code == 200 || http->status.code == 206)
-		http->status.error = TB_HTTP_ERROR_OK;
-	else if (http->status.code == 204)
-		http->status.error = TB_HTTP_ERROR_RESPONSE_204;
-	else if (http->status.code >= 300 && http->status.code <= 304)
-		http->status.error = TB_HTTP_ERROR_RESPONSE_300 + (http->status.code - 300);
-	else if (http->status.code >= 400 && http->status.code <= 416)
-		http->status.error = TB_HTTP_ERROR_RESPONSE_400 + (http->status.code - 400);
-	else if (http->status.code >= 500 && http->status.code <= 507)
-		http->status.error = TB_HTTP_ERROR_RESPONSE_500 + (http->status.code - 500);
-	else http->status.error = TB_HTTP_ERROR_RESPONSE_UNK;
 
 	// finish it
 	http->step |= TB_HTTP_STEP_RESP;
