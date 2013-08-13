@@ -2,30 +2,30 @@
 IS_CONFIG = y
 
 # project
-PRO_DIR = /Users/ruki/projects/personal/tbox
+PRO_DIR = /home/ruki/projects/tbox
 PRO_NAME = tbox
 
 # debug
-DEBUG = y
-DTYPE = d
+DEBUG = n
+DTYPE = r
 
 # small
 SMALL = y
 
 # platform
-PLAT = mac
+PLAT = mingw
 
 # architecture
-ARCH = x64
+ARCH = x86
 
 # demo
-DEMO = y
+DEMO = n
 
 # toolchain
 SDK = 5.1
 NDK =
 BIN =
-PRE =
+PRE = i686-w64-mingw32-
 HOST = linux
 CCACHE = ccache
 DISTCC =
