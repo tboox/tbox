@@ -39,7 +39,7 @@
 #define tb_check_return_val(x, v) 						do { if (!(x)) return (v); } while (0)
 #define tb_check_goto(x, b) 							do { if (!(x)) goto b; } while (0)
 #define tb_check_break(x) 								{ if (!(x)) break ; }
-#define tb_check_abort(x) 								do { if (!(x)) *((__tb_volatile__ tb_int_t*)0) = 0; } while (0)
+#define tb_check_abort(x) 								do { if (!(x)) tb_abort(); } while (0)
 #define tb_check_continue(x) 							{ if (!(x)) continue ; }
 
 

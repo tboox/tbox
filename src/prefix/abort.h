@@ -33,8 +33,15 @@
  * macros
  */
 
+// abort impl
+#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
+# 	define tb_abort_impl() 								do { __tb_asm__ __tb_volatile__ ("int3"); } while (0)
+#else
+# 	define tb_abort_impl() 								do { *((__tb_volatile__ tb_int_t*)0) = 0; } while (0)
+#endif
+
 // abort
-#define tb_abort_tag(tag)								do { tb_trace_line_tag(tag, "[abort]: "); __tb_volatile__ tb_int_t* p = 0; *p = 0; } while(0)
+#define tb_abort_tag(tag)								do { tb_trace_line_tag(tag, "[abort]: "); tb_abort_impl(); } while(0)
 #define tb_abort()										tb_abort_tag(TB_PRINT_TAG)
 
 #endif
