@@ -140,6 +140,7 @@ static tb_void_t tb_exception_func_impl(tb_int_t sig)
 		tb_sigjmpbuf_t* jmpbuf = (tb_sigjmpbuf_t*)tb_stack_top(list->stack);
 		if (jmpbuf) tb_siglongjmp(*jmpbuf, 1);
 	}
+	else tb_print("exception: unknown signal: %d", sig);
 }
 static tb_bool_t tb_exception_init_impl()
 {
