@@ -196,12 +196,12 @@ static tb_long_t tb_fstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	// ok?
 	return fst->wait;
 }
-static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
 	tb_fstream_t* fst = tb_fstream_cast(gst);
 	tb_assert_and_check_return_val(fst, tb_false);
 
-	switch (cmd)
+	switch (ctrl)
 	{
 	case TB_FSTREAM_CTRL_SET_MODE:
 		fst->mode = (tb_size_t)tb_va_arg(args, tb_size_t);

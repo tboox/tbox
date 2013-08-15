@@ -154,22 +154,19 @@ typedef struct __tb_http_sfunc_t
 typedef struct __tb_http_option_t
 {
 	/// the method
-	tb_uint32_t 		method 		: 4;
+	tb_uint16_t 		method 		: 4;
 
 	/// the max redirect
-	tb_uint32_t 		rdtm 		: 9;
+	tb_uint16_t 		rdtm 		: 9;
 
 	/// the http version
-	tb_uint32_t 		version 	: 1;
+	tb_uint16_t 		version 	: 1;
 
 	/// is alive?
-	tb_uint32_t 		balive 		: 1;
-
-	/// is chunked?
-	tb_uint32_t 		bchunked 	: 1;
+	tb_uint16_t 		balive 		: 1;
 
 	/// is unzip for gzip encoding?
-	tb_uint32_t 		bunzip 	: 1;
+	tb_uint16_t 		bunzip 		: 1;
 
 	/// the url
 	tb_url_t 			url;

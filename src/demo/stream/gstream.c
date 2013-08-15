@@ -48,19 +48,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
 	tb_assert_and_check_return_val(ist && ost, 0);
 	
-	// init sfunc
-	tb_gstream_sfunc_t sfunc = 
-	{
-		tb_gstream_demo_sfunc_init
-	,	tb_gstream_demo_sfunc_exit
-	,	tb_gstream_demo_sfunc_read
-	,	tb_gstream_demo_sfunc_writ
-	};
-
 	// ctrl
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
 #if 0
+		// init sfunc
+		static tb_gstream_sfunc_t sfunc = 
+		{
+			tb_gstream_demo_sfunc_init
+		,	tb_gstream_demo_sfunc_exit
+		,	tb_gstream_demo_sfunc_read
+		,	tb_gstream_demo_sfunc_writ
+		};
+
 		// init option
 		tb_http_option_t* option = tb_null;
 		tb_gstream_ctrl(ist, TB_HSTREAM_CTRL_GET_OPTION, &option);

@@ -59,6 +59,7 @@ tbox_C_FILES 			+= \
 						stream/gstream/sock \
 						stream/gstream/tstream/tstream \
 						stream/gstream/tstream/charset \
+						stream/gstream/tstream/chunked \
 						stream/gstream/tstream/null \
 						stream/gstream/tstream/zip \
 						object/object \

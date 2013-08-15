@@ -82,6 +82,9 @@ typedef struct __tb_http_t
 	// the sstream
 	tb_gstream_t* 		sstream;
 
+	// the kstream
+	tb_gstream_t* 		kstream;
+
 	// the zstream
 	tb_gstream_t* 		zstream;
 
@@ -100,10 +103,6 @@ typedef struct __tb_http_t
 	// the data && size for request and response
 	tb_pstring_t 		data;
 	tb_size_t 			size;
-
-	// the chunk size
-	tb_size_t 			chunked_read;
-	tb_size_t 			chunked_size;
 
 }tb_http_t;
 
@@ -185,92 +184,6 @@ static tb_void_t tb_http_status_clear(tb_http_t* http)
 	http->status.bseeked = 0;
 	http->status.document_size = 0;
 #endif
-}
-/* chunked_data
- *
- *   head     data   tail
- * ea5\r\n ..........\r\n e65\r\n..............\r\n 0\r\n\r\n
- * ---------------------- ------------------------- ---------
- *        chunk0                  chunk1               end
- */
-static tb_long_t tb_http_chunked_aread(tb_http_t* http, tb_byte_t* data, tb_size_t size)
-{
-	// parse chunked head and chunked tail
-	if (!http->chunked_size || http->chunked_read >= http->chunked_size)
-	{
-		// read chunked line
-		tb_char_t 			ch[1];
-		tb_long_t 			cn = 0;
-		while (1)
-		{
-			// read char
-			cn = tb_gstream_aread(http->stream, ch, 1);
-			tb_check_return_val(cn >= 0, -1);
-
-			// no data? 
-			tb_check_return_val(cn, 0);
-
-			// there should be no '\0'
-			tb_assert_and_check_return_val(*ch, -1);
-
-			// append char to line
-			if (*ch != '\n') tb_pstring_chrcat(&http->data, *ch);
-			// is line end?
-			else
-			{
-				// strip '\r' if exists
-				tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
-				tb_size_t 			pn = tb_pstring_size(&http->data);
-				tb_assert_and_check_return_val(pb, -1);
-
-				if (pb[pn - 1] == '\r')
-					tb_pstring_strip(&http->data, pn - 1);
-
-				// is chunked tail? only "\r\n"
-				if (!tb_pstring_size(&http->data)) 
-				{
-					// reset chunked size
-					http->chunked_read = 0;
-					http->chunked_size = 0;
-
-					// continue
-					return 0;
-				}
-				// is chunked head? parse size
-				else
-				{
-					// parse size
-					http->chunked_size = tb_s16tou32(pb);
-
-					// is file end? "0\r\n\r\n"
-					tb_check_return_val(http->chunked_size, -1);
-
-					// clear data
-					tb_pstring_clear(&http->data);
-
-					// ok
-					break;
-				}
-			}
-		}
-	}
-
-	// check
-	tb_assert_and_check_return_val(http->chunked_read < http->chunked_size, -1);
-
-	// read chunked data
-	tb_long_t r = tb_gstream_aread(http->stream, data, tb_min(size, http->chunked_size - http->chunked_read));
-
-	// update read
-	if (r > 0) http->chunked_read += r;
-
-	// ok
-	return r;
-}
-static tb_long_t tb_http_chunked_awrit(tb_http_t* http, tb_byte_t* data, tb_size_t size)
-{
-	tb_trace_noimpl();
-	return -1;
 }
 static tb_long_t tb_http_connect(tb_http_t* http)
 {
@@ -719,18 +632,25 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	http->size = 0;
 	tb_pstring_clear(&http->data);
 
-	// reset chunked size
-	http->chunked_read = 0;
-	http->chunked_size = 0;
+	// switch to kstream if chunked
+	if (http->status.bchunked)
+	{
+		// init kstream
+		http->stream = http->kstream = tb_gstream_init_from_chunked(http->stream);
+		tb_assert_and_check_return_val(http->stream, -1);
+
+		// open kstream, need not async
+		if (!tb_gstream_bopen(http->kstream)) return -1;
+
+		// disable seek
+		http->status.bseeked = 0;
+	}
 
 	// switch to zstream if gzip or deflate
 	if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 	{
-		// chunked not supported now
-		tb_assert_and_check_return_val(!http->status.bchunked, -1);
-
 		// init zstream
-		http->stream = http->zstream = tb_gstream_init_from_zip(http->sstream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+		http->stream = http->zstream = tb_gstream_init_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 		tb_assert_and_check_return_val(http->stream, -1);
 
 		// open zstream, need not async
@@ -752,17 +672,26 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 	// redirect
 	if (http->rdtn < http->option.rdtm)
 	{
+		// exit zstream
+		if (http->zstream)
+		{
+			tb_gstream_exit(http->zstream);
+			http->zstream = tb_null;
+		}
+
+		// exit kstream
+		if (http->kstream)
+		{
+			tb_gstream_exit(http->kstream);
+			http->kstream = tb_null;
+		}
+
+		// switch to sstream
+		http->stream = http->sstream;
+
 		// not keep-alive?
 		if (!http->status.balive) 
 		{
-			// zstream now? switch to sstream
-			if (http->zstream)
-			{
-				tb_gstream_exit(http->zstream);
-				http->zstream = tb_null;
-				http->stream = http->sstream;
-			}
-
 			// close stream
 			tb_long_t r = tb_gstream_aclose(http->stream);
 			tb_assert_and_check_return_val(r >= 0, -1);
@@ -796,10 +725,6 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		http->step = ((http->step & TB_HTTP_STEP_SEEK)? TB_HTTP_STEP_SEEK : TB_HTTP_STEP_NONE) | TB_HTTP_STEP_NEVT;
 		http->tryn = 0;
 
-		// reset chunk size
-		http->chunked_read = 0;
-		http->chunked_size = 0;
-
 		// clear some status
 		http->status.code = 0;
 		http->status.bgzip = 0;
@@ -822,17 +747,26 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 	// check
 	tb_check_return_val(!(http->step & TB_HTTP_STEP_SEEK), 1);
 	
+	// exit zstream
+	if (http->zstream)
+	{
+		tb_gstream_exit(http->zstream);
+		http->zstream = tb_null;
+	}
+
+	// exit kstream
+	if (http->kstream)
+	{
+		tb_gstream_exit(http->kstream);
+		http->kstream = tb_null;
+	}
+
+	// switch to sstream
+	http->stream = http->sstream;
+
 	// not keep-alive?
 	if (!http->status.balive) 
 	{
-		// zstream now? switch to sstream
-		if (http->zstream)
-		{
-			tb_gstream_exit(http->zstream);
-			http->zstream = tb_null;
-			http->stream = http->sstream;
-		}
-
 		// close stream
 		tb_long_t r = tb_gstream_aclose(http->stream);
 		tb_assert_and_check_return_val(r >= 0, -1);
@@ -853,10 +787,6 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 	// reset step, no event now, need not wait
 	http->step = TB_HTTP_STEP_SEEK | TB_HTTP_STEP_NEVT;
 	http->tryn = 0;
-
-	// reset chunk size
-	http->chunked_read = 0;
-	http->chunked_size = 0;
 
 	// set range
 	http->option.range.bof = offset;
@@ -1056,21 +986,30 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 
 	// have step? clear it
 	if (http->step)
-	{
+	{	
+		// exit zstream
+		if (http->zstream)
+		{
+			tb_gstream_exit(http->zstream);
+			http->zstream = tb_null;
+		}
+
+		// exit kstream
+		if (http->kstream)
+		{
+			tb_gstream_exit(http->kstream);
+			http->kstream = tb_null;
+		}
+
+		// switch to sstream
+		http->stream = http->sstream;
+
 		// connected?
 		if (http->step & TB_HTTP_STEP_CONN) 
 		{
 			// not keep-alive?
 			if (!http->status.balive)
 			{
-				// zstream now? switch to sstream
-				if (http->zstream)
-				{
-					tb_gstream_exit(http->zstream);
-					http->zstream = tb_null;
-					http->stream = http->sstream;
-				}
-
 				// close stream
 				tb_long_t r = tb_gstream_aclose(http->stream);
 				tb_assert_and_check_return_val(r >= 0, -1);
@@ -1095,10 +1034,6 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 
 		// clear redirect
 		http->rdtn = 0;
-
-		// reset chunk size
-		http->chunked_read = 0;
-		http->chunked_size = 0;
 	}
 
 	// ok
@@ -1126,9 +1061,11 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 }
 tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
-	
+	tb_assert_and_check_return_val(http->status.bseeked, -1);
+
 	// check stream
 	tb_long_t r = -1;
 
@@ -1177,7 +1114,7 @@ tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(http->status.post_size < http->option.post, -1);
 
 	// writ the post data
-	tb_hong_t ok = http->option.bchunked? tb_http_chunked_awrit(http, data, size) : tb_gstream_awrit(http->stream, data, size);
+	tb_hong_t ok = tb_gstream_awrit(http->stream, data, size);
 	tb_check_return_val(ok >= 0, -1);
 
 	// save the post size
@@ -1212,7 +1149,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	}
 
 	// read
-	return http->status.bchunked? tb_http_chunked_aread(http, data, size) : tb_gstream_aread(http->stream, data, size);
+	return tb_gstream_aread(http->stream, data, size);
 }
 tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -1360,38 +1297,41 @@ tb_http_status_t const* tb_http_status(tb_handle_t handle)
 #ifdef __tb_debug__
 tb_void_t tb_http_option_dump(tb_handle_t handle)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return(http);
 
-	tb_trace("[http]: ======================================================================");
-	tb_trace("[http]: option: ");
-	tb_trace("[http]: option: url: %s", tb_url_get(&http->option.url));
-	tb_trace("[http]: option: version: HTTP/1.%1u", http->option.version);
-	tb_trace("[http]: option: method: %s", http->option.method < tb_arrayn(tb_http_methods)? tb_http_methods[http->option.method] : "none");
-	tb_trace("[http]: option: rdtm: %d", http->option.rdtm);
-	tb_trace("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
-	tb_trace("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
-	tb_trace("[http]: option: balive: %s", http->option.balive? "true" : "false");
-	tb_trace("[http]: option: bchunked: %s", http->option.bchunked? "true" : "false");
+	// trace
+	tb_print("[http]: ======================================================================");
+	tb_print("[http]: option: ");
+	tb_print("[http]: option: url: %s", tb_url_get(&http->option.url));
+	tb_print("[http]: option: version: HTTP/1.%1u", http->option.version);
+	tb_print("[http]: option: method: %s", http->option.method < tb_arrayn(tb_http_methods)? tb_http_methods[http->option.method] : "none");
+	tb_print("[http]: option: rdtm: %d", http->option.rdtm);
+	tb_print("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
+	tb_print("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
+	tb_print("[http]: option: balive: %s", http->option.balive? "true" : "false");
 }
 tb_void_t tb_http_status_dump(tb_handle_t handle)
 {
+	// check
 	tb_assert_and_check_return(handle);
 	tb_http_t* http = (tb_http_t*)handle;
 
-	tb_trace("[http]: ======================================================================");
-	tb_trace("[http]: status: ");
-	tb_trace("[http]: status: code: %d", http->status.code);
-	tb_trace("[http]: status: version: HTTP/1.%1u", http->status.version);
-	tb_trace("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
-	tb_trace("[http]: status: content:size: %llu", http->status.content_size);
-	tb_trace("[http]: status: document:size: %llu", http->status.document_size);
-	tb_trace("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
-	tb_trace("[http]: option: bgzip: %s", http->status.bgzip? "true" : "false");
-	tb_trace("[http]: option: bdeflate: %s", http->status.bdeflate? "true" : "false");
-	tb_trace("[http]: status: balive: %s", http->status.balive? "true" : "false");
-	tb_trace("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
-	tb_trace("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
+	// trace
+	tb_print("[http]: ======================================================================");
+	tb_print("[http]: status: ");
+	tb_print("[http]: status: code: %d", http->status.code);
+	tb_print("[http]: status: version: HTTP/1.%1u", http->status.version);
+	tb_print("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
+	tb_print("[http]: status: content:size: %llu", http->status.content_size);
+	tb_print("[http]: status: document:size: %llu", http->status.document_size);
+	tb_print("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
+	tb_print("[http]: option: bgzip: %s", http->status.bgzip? "true" : "false");
+	tb_print("[http]: option: bdeflate: %s", http->status.bdeflate? "true" : "false");
+	tb_print("[http]: status: balive: %s", http->status.balive? "true" : "false");
+	tb_print("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
+	tb_print("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
 }
 #endif
 

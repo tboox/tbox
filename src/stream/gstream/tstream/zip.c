@@ -55,12 +55,14 @@ typedef struct __tb_zstream_t
 
 static __tb_inline__ tb_zstream_t* tb_zstream_cast(tb_gstream_t* gst)
 {
+	// check
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_ZIP, tb_null);
 	return (tb_zstream_t*)tst;
 }
 static tb_long_t tb_zstream_aopen(tb_gstream_t* gst)
 {
+	// check
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst && !zst->zip, -1);
 
@@ -73,6 +75,7 @@ static tb_long_t tb_zstream_aopen(tb_gstream_t* gst)
 }
 static tb_long_t tb_zstream_aclose(tb_gstream_t* gst)
 {
+	// check
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst, -1);
 
@@ -86,12 +89,14 @@ static tb_long_t tb_zstream_aclose(tb_gstream_t* gst)
 	// close tstream
 	return tb_tstream_aclose(gst);
 }
-static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
+	// check
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_assert_and_check_return_val(zst, tb_false);
 
-	switch (cmd)
+	// ctrl
+	switch (ctrl)
 	{
 	case TB_ZSTREAM_CTRL_GET_ALGO:
 		{
@@ -122,11 +127,11 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	}
 
 	// routine to tstream 
-	return tb_tstream_ctrl(gst, cmd, args);
+	return tb_tstream_ctrl(gst, ctrl, args);
 }
-#include "../../../object/object.h"
 static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
+	// check
 	tb_zstream_t* zst = tb_zstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	tb_assert_and_check_return_val(zst && zst->zip && tst, -1);
@@ -177,6 +182,7 @@ static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
  */
 tb_gstream_t* tb_gstream_init_zip()
 {
+	// check
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_zstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
@@ -204,6 +210,7 @@ fail:
 }
 tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
 {
+	// check
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// create encoding stream

@@ -296,6 +296,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 		{
 			// read data
 			r = (sst->ssl)? gst->sfunc.read(sst->ssl, data, size) : tb_socket_recv(sst->sock, data, size);
+			tb_trace_impl("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -316,6 +317,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 
 			// read data
 			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
+			tb_trace_impl("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -355,6 +357,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 		{
 			// writ data
 			r = (sst->ssl)? gst->sfunc.writ(sst->ssl, data, size) : tb_socket_send(sst->sock, data, size);
+			tb_trace_impl("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -375,6 +378,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 
 			// writ data
 			r = tb_socket_usend(sst->sock, sst->ipv4, port, data, size);
+			tb_trace_impl("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// no data?
@@ -413,11 +417,13 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 		tb_aioo_t o;
 		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, tb_null);
 		sst->wait = tb_aioo_wait(&o, timeout);
+		tb_trace_impl("wait: %ld", sst->wait);
 	}
 	else
 	{
 		// wait the dns
 		sst->wait = tb_dns_look_wait(sst->hdns, timeout);
+		tb_trace_impl("wait: %ld", sst->wait);
 
 		// clear tryn
 		if (sst->wait) sst->tryn = 0;
@@ -425,12 +431,12 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 
 	return sst->wait;
 }
-static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, tb_false);
 
-	switch (cmd)
+	switch (ctrl)
 	{
 	case TB_SSTREAM_CTRL_SET_TYPE:
 		{

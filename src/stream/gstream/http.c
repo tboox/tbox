@@ -186,12 +186,12 @@ static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_hstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_hstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, tb_false);
 
-	switch (cmd)
+	switch (ctrl)
 	{
 	case TB_GSTREAM_CTRL_SET_URL:
 		{
