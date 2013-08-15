@@ -51,16 +51,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_gstream_bopen(ist)) goto end;
 	if (!tb_gstream_bopen(ost)) goto end;
 	if (!tb_gstream_bopen(zst)) goto end;
-	
-#if 0
-	// save stream
-	tb_hize_t size = tb_gstream_save(zst, ost);
-	tb_print("save: %llu bytes", size);
-#else
+
 	// read data
 	tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
-	tb_hize_t 	read = 0;
-	tb_hize_t 	left = tb_gstream_left(zst);
+	tb_hize_t 		read = 0;
+	tb_hize_t 		left = tb_gstream_left(zst);
 	tb_hong_t 		base = tb_mclock();
 	tb_hong_t 		basc = tb_mclock();
 	do
@@ -103,8 +98,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	} while(1);
 
 	tb_print("[gst]: load: %llu bytes, size: %llu bytes, time: %llu ms", read, tb_gstream_size(ist), tb_mclock() - base);
-#endif
-
 
 end:
 

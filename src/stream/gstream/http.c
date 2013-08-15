@@ -155,7 +155,7 @@ static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 	tb_assert_and_check_return_val(status, 0);
 
 	// document_size
-	return status->document_size;
+	return (!status->bgzip && !status->bdeflate)? status->document_size : 0;
 }
 static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {

@@ -78,6 +78,18 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 		// init sfunc
 		tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_SET_SFUNC, &sfunc);
+#elif 1	
+		// init option
+		tb_http_option_t* option = tb_null;
+		tb_gstream_ctrl(ist, TB_HSTREAM_CTRL_GET_OPTION, &option);
+		if (option)
+		{
+			// auto unzip
+			option->bunzip = 1;
+
+			// need gzip
+			tb_hash_set(option->head, "Accept-Encoding", "gzip,deflate");
+		}
 #endif
 	}
 	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) 
@@ -106,7 +118,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// read data
 		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
-//		tb_trace("read: %d, offset: %llu, left: %llu, size: %llu", n, tb_gstream_offset(ist), tb_gstream_left(ist), tb_gstream_size(ist));
+		tb_print("[gst]: read: %ld, offset: %llu, left: %llu, size: %llu", n, tb_gstream_offset(ist), tb_gstream_left(ist), tb_gstream_size(ist));
 		if (n > 0)
 		{
 			// writ data
@@ -122,7 +134,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
-			tb_check_break(e);
+			tb_assert_and_check_break(e);
 
 			// has read?
 			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
