@@ -148,12 +148,12 @@ static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 	}
 	return e;
 }
-static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
 	tb_dstream_t* dst = tb_dstream_cast(gst);
 	tb_assert_and_check_return_val(dst, tb_false);
 
-	switch (cmd)
+	switch (ctrl)
 	{
 	case TB_DSTREAM_CTRL_SET_DATA:
 		{

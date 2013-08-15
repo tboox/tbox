@@ -39,6 +39,10 @@
 #define tb_max(x, y) 			(((x) > (y))? (x) : (y))
 #define tb_min(x, y) 			(((x) < (y))? (x) : (y))
 
+// min3 & max3
+#define tb_max3(x, y, z) 		(((x) > (y))? (((x) > (z))? (x) : (z)) : (((y) > (z))? (y) : (z)))
+#define tb_min3(x, y, z) 		(((x) < (y))? (((x) < (z))? (x) : (z)) : (((y) < (z))? (y) : (z)))
+
 // the number of entries in the array
 #define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
 

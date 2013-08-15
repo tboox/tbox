@@ -1146,17 +1146,17 @@ tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
 	tb_assert_and_check_return_val(gst, 0);
 	return gst->timeout;
 }
-tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
+tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, ...)
 {	
 	tb_assert_and_check_return_val(gst && gst->ctrl, tb_false);
 
 	// init args
 	tb_va_list_t args;
-    tb_va_start(args, cmd);
+    tb_va_start(args, ctrl);
 
 	// ctrl for gstream
 	tb_bool_t ret = tb_false;
-	switch (cmd)
+	switch (ctrl)
 	{
 	case TB_GSTREAM_CTRL_SET_URL:
 		{
@@ -1325,10 +1325,10 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...)
 
 	// reset args
 	tb_va_end(args);
-    tb_va_start(args, cmd);
+    tb_va_start(args, ctrl);
 
 	// ctrl for native stream
-	ret = (gst->ctrl(gst, cmd, args) || ret)? tb_true : tb_false;
+	ret = (gst->ctrl(gst, ctrl, args) || ret)? tb_true : tb_false;
 
 	// exit args
 	tb_va_end(args);

@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"tst"
+#define TB_TRACE_IMPL_TAG 			"tst"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -226,7 +226,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 		}
 
 		// trace
-		tb_trace_impl("fill: %ld <? %lu", tst->in, ln - tst->in);		
+		tb_trace_impl("fill: %ld <? %lu", tst->in, ln);		
 	}
 
 	// input enough or end? spak it
@@ -259,24 +259,33 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 		}
 	}
 	// no output? end?
-	else if (tst->read < 0) return -1;
-
+	else if (!tst->in && tst->read < 0) 
+	{
+		tb_trace_impl("end");
+		return -1;
+	}
 end:
 
 	// ok?
-	tb_trace_impl("read: %u", read);
+	tb_trace_impl("read: %u, left: %lu", read, tst->in);
 	return read;
 }
 tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
 {
+	// check
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	tb_assert_and_check_return_val(tst, tb_null);
 
+	// has read
 	if (tst->read > 0) return etype;
+	// no read? wait it
 	else if (!tst->read) 
 	{
 		tb_trace_impl("wait: %u, timeout: %d", etype, timeout);
 		return tb_gstream_wait(tst->gst, etype, timeout);
 	}
+	// has left input? abort it if read empty next
+	else if (tst->in) return etype;
+	// end
 	else return -1;
 }

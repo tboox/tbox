@@ -37,8 +37,8 @@
  */
 
 // the stream command
-#define TB_GSTREAM_CTRL(type, cmd) 				(((type) << 16) | (cmd))
-#define TB_TSTREAM_CTRL(type, cmd) 				TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_TRAN, (((type) << 8) | (cmd)))
+#define TB_GSTREAM_CTRL(type, ctrl) 			(((type) << 16) | (ctrl))
+#define TB_TSTREAM_CTRL(type, ctrl) 			TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_TRAN, (((type) << 8) | (ctrl)))
 
 // the stream state
 #define TB_GSTREAM_STATE(type, state) 			(((type) << 16) | (state))
@@ -109,6 +109,7 @@ typedef enum __tb_tstream_type_t
  	TB_TSTREAM_TYPE_NONE 			= 0
 , 	TB_TSTREAM_TYPE_CHARSET 		= 1
 , 	TB_TSTREAM_TYPE_ZIP 			= 2
+, 	TB_TSTREAM_TYPE_CHUNKED 		= 3
 
 }tb_tstream_type_t;
 
@@ -296,7 +297,7 @@ typedef struct __tb_gstream_t
 	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
 
 	/// ctrl
-	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
+	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args);
 
 }tb_gstream_t;
 
@@ -346,6 +347,12 @@ tb_gstream_t* 		tb_gstream_init_zip();
  * @return 			the stream
  */
 tb_gstream_t* 		tb_gstream_init_charset();
+
+/*! init chunked stream 
+ *
+ * @return 			the stream
+ */
+tb_gstream_t* 		tb_gstream_init_chunked();
 
 /*! init stream 
  *
@@ -442,6 +449,14 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
  * @return 			the stream
  */
 tb_gstream_t* 		tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t fr, tb_size_t to);
+
+/*! init stream from chunked
+ *
+ * @param gst 		the stream
+ *
+ * @return 			the stream
+ */
+tb_gstream_t* 		tb_gstream_init_from_chunked(tb_gstream_t* gst);
 
 /*! wait stream 
  *
@@ -1050,11 +1065,11 @@ tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gst);
 /*! ctrl stream
  *
  * @param gst 		the stream
- * @param cmd 		the ctrl command
+ * @param ctrl 		the ctrl command
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, ...);
+tb_bool_t 			tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, ...);
 
 #endif
 
