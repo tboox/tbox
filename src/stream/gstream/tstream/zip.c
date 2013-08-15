@@ -124,6 +124,7 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
+#include "../../../object/object.h"
 static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
 {
 	tb_zstream_t* zst = tb_zstream_cast(gst);

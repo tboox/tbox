@@ -34,11 +34,7 @@
  */
 
 // the tstream cache maxn
-#ifdef __tb_small__
-# 	define TB_TSTREAM_CACHE_MAXN 					(4096)
-#else
-# 	define TB_TSTREAM_CACHE_MAXN 					(8192)
-#endif
+#define TB_TSTREAM_CACHE_MAXN 					(TB_GSTREAM_BLOCK_MAXN)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types

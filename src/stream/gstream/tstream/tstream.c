@@ -43,13 +43,20 @@ static tb_long_t tb_tstream_afill(tb_tstream_t* tst, tb_byte_t* data, tb_size_t 
 	{
 		// read data
 		fill = tb_gstream_aread(tst->gst, data, size);
+		tb_trace_impl("read: %ld <? %lu", fill, size);
 		tb_check_goto(fill < 0, end);
 
 		// end? sync data
 		fill = tb_gstream_afread(tst->gst, data, size);
+		tb_trace_impl("sync: %ld <? %lu", fill, size);
 	}
 	// sync data
-	else fill = tb_gstream_afread(tst->gst, data, size);
+	else 
+	{
+		// sync data
+		fill = tb_gstream_afread(tst->gst, data, size);
+		tb_trace_impl("sync: %ld <? %lu", fill, size);
+	}
 
 end:
 	// ok?
@@ -211,16 +218,25 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 			tb_hize_t o = tb_gstream_offset(tst->gst);
 
 			// is end?
-			if (n && o >= n) tst->read = -1;
+			if (n && o >= n) 
+			{
+				tst->read = -1;
+				tb_trace_impl("end");
+			}
 		}
-		tb_trace_impl("fill: %d", tst->read);
+
+		// trace
+		tb_trace_impl("fill: %ld <? %lu", tst->in, ln - tst->in);		
 	}
 
-	// spak it
-	tb_long_t r = 0;
-	tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
-	while ((r = tst->spak(gst, tst->read < 0? tb_true : sync)) > 0) ;
-	tb_trace_impl("spak: %u", tst->on);
+	// input enough or end? spak it
+	if (tst->in >= ln || tst->read < 0)
+	{
+		// spak it
+		tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
+		if (tst->spak(gst, tst->read < 0? tb_true : sync) < 0) return -1;
+		tb_trace_impl("spak: %lu, left: %lu", tst->on, tst->in);
+	}
 
 	// continue to read the output data
 	if (tst->on > 0)
@@ -246,6 +262,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 	else if (tst->read < 0) return -1;
 
 end:
+
 	// ok?
 	tb_trace_impl("read: %u", read);
 	return read;

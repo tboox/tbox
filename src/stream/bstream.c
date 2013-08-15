@@ -39,7 +39,7 @@
 tb_bool_t tb_bstream_init(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(bst && data && size, tb_false);
+	tb_assert_and_check_return_val(bst && data, tb_false);
 
 	// init
 	bst->p 	= data;
