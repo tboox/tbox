@@ -1268,6 +1268,7 @@ tb_void_t tb_dns_list_dump()
  */
 tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
+	// check
 	tb_assert_and_check_return_val(name && ipv4, tb_false);
 
 	// trace

@@ -1,5 +1,5 @@
 # demo
-TB_CONFIG_DEMO_LIBS				= ws2_32
+TB_CONFIG_DEMO_LIBS				= iphlpapi ws2_32
 TB_CONFIG_DEMO_CMD1 			=
 
 # plat
