@@ -19,7 +19,7 @@ PLAT = mac
 ARCH = x64
 
 # demo
-DEMO = y
+DEMO = n
 
 # toolchain
 SDK = 5.1

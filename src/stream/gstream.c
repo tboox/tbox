@@ -137,8 +137,8 @@ static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		read = tb_qbuffer_read(&gst->cache, data, size);
 		tb_check_return_val(read >= 0, -1);
 
-		// enough?
-		tb_check_goto(read < size, end);
+		// empty? full it from stream
+		tb_check_goto(!read, end);
 
 		// cache is null now.
 		tb_assert_and_check_return_val(tb_qbuffer_null(&gst->cache), -1);
@@ -193,8 +193,8 @@ static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		writ = tb_qbuffer_writ(&gst->cache, data, size);
 		tb_check_return_val(writ >= 0, -1);
 		
-		// enough?
-		tb_check_goto(writ < size, end);
+		// full? writ data to stream from cache
+		tb_check_goto(!writ, end);
 
 		// cache is full now.
 		tb_assert_and_check_return_val(tb_qbuffer_full(&gst->cache), -1);
