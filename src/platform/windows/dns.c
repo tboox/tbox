@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"dns"
+//#define TB_TRACE_IMPL_TAG 		"dns"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -32,6 +32,7 @@
 #include "prefix.h"
 #include <winsock2.h>
 #include <iphlpapi.h>
+#include "../../network/network.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -60,8 +61,8 @@ tb_void_t tb_dns_local_init()
 		if (GetNetworkParams(info, &size) != NO_ERROR) break;
 
 		// trace
-		tb_trace_impl("host: %s", 	info->HostName);
-		tb_trace_impl("domain: %s", info->DomainName);
+//		tb_trace_impl("host: %s", 	info->HostName);
+//		tb_trace_impl("domain: %s", info->DomainName);
 		tb_trace_impl("dns: %s", 	info->DnsServerList.IpAddress.String);
 
 		// add the first dns address
