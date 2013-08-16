@@ -74,7 +74,4 @@ end:
 	// exit
 	if (gst) tb_gstream_exit(gst);
 }
-tb_void_t tb_dns_local_exit()
-{
-}
 
