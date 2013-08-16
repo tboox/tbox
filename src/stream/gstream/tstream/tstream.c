@@ -259,7 +259,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 		}
 	}
 	// no output? end?
-	else if (!tst->in && tst->read < 0) 
+	else if (!tst->in && !read && tst->read < 0) 
 	{
 		tb_trace_impl("end");
 		return -1;
