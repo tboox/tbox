@@ -176,13 +176,13 @@
 #endif
 
 // noimpl
-#define tb_trace_noimpl() 									tb_trace_line("[no_impl]:")
+#define tb_trace_noimpl() 									tb_trace_line("[noimpl]:")
 
 // warning
 #define tb_warning 											tb_trace_warning
 
 // nosafe
-#define tb_trace_nosafe() 									tb_trace_warning("no_safe")
+#define tb_trace_nosafe() 									tb_trace_warning("nosafe")
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
