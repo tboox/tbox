@@ -11,6 +11,7 @@
 *.swo
 *.bak
 *.orig
+.svn
 .DS_Store
 gmon.out
 other

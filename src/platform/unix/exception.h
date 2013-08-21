@@ -60,6 +60,9 @@ typedef struct __tb_exception_list_t
 # 	define __tb_try \
 	do \
 	{ \
+		/* init exception first */ \
+		tb_exception_init_impl(); \
+		\
 		/* init exception data */ \
 		tb_exception_list_t* __l = tb_null; \
 		if (!(__l = (tb_exception_list_t*)tb_tstore_getp())) \
@@ -142,14 +145,17 @@ static tb_void_t tb_exception_func_impl(tb_int_t sig)
 	}
 	else tb_print("exception: unknown signal: %d", sig);
 }
-static tb_bool_t tb_exception_init_impl()
+static tb_void_t tb_exception_init_impl()
 {
-//	tb_signal(TB_SIGINT, tb_exception_func_impl);
-	tb_signal(TB_SIGFPE, tb_exception_func_impl);
-	tb_signal(TB_SIGBUS, tb_exception_func_impl);
-	tb_signal(TB_SIGSEGV, tb_exception_func_impl);
-//	tb_signal(TB_SIGTRAP, tb_exception_func_impl);
-	return tb_true;
+	static tb_atomic_t s_init = 0;
+	if (!tb_atomic_fetch_and_set(&s_init, 1))
+	{
+//		tb_signal(TB_SIGINT, tb_exception_func_impl);
+		tb_signal(TB_SIGFPE, tb_exception_func_impl);
+		tb_signal(TB_SIGBUS, tb_exception_func_impl);
+		tb_signal(TB_SIGSEGV, tb_exception_func_impl);
+//		tb_signal(TB_SIGTRAP, tb_exception_func_impl);
+	}
 }
 static tb_void_t tb_exception_list_free(tb_tstore_data_t* data)
 {

@@ -92,7 +92,7 @@ tb_void_t tb_event_post(tb_handle_t handle)
 
 	// post signal
 	tb_long_t r = pthread_cond_signal(&e->cond);
-	tb_assert(!r);
+	tb_assert(!r); tb_used(r);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
