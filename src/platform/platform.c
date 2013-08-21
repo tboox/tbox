@@ -43,11 +43,6 @@ tb_bool_t tb_platform_init()
 	// init tstore
 	if (!tb_tstore_init()) return tb_false;
 
-	// init exception
-#ifdef tb_exception_init
-	if (!tb_exception_init()) return tb_false;
-#endif
-
 	// ok
 	return tb_true;
 }
@@ -55,11 +50,6 @@ tb_void_t tb_platform_exit()
 {
 	// exit dns
 	tb_dns_list_exit();
-
-	// exit exception
-#ifdef tb_exception_exit
-	tb_exception_exit();
-#endif
 
 	// exit tstore
 	tb_tstore_exit();

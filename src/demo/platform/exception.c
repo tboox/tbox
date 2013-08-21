@@ -33,9 +33,8 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 				tb_print("thread[%p]: try2: b: %lu", self, i++);
 
 				// abort
-				tb_abort();
 	//			tb_memset(&i, 0, 8192); // FIXME
-	//			__tb_volatile__ tb_size_t a = 0; a /= a;
+				*((__tb_volatile__ tb_size_t*)0) = 0;
 	//			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
 	
 				// trace
@@ -56,7 +55,7 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 		tb_print("thread[%p]: try0: e: %lu", self, i);
 
 		// abort
-		tb_abort();
+		*((__tb_volatile__ tb_size_t*)0) = 0;
 
 		// end
 		tb_print("thread[%p]: end0: e: %lu", self, i);

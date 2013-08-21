@@ -65,11 +65,13 @@ CFLAGS 				= \
 					-std=c99 \
 					-fomit-frame-pointer \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
-					-Wall -Wno-parentheses \
+					-fno-math-errno \
+					-Wno-parentheses -Wstrict-prototypes \
 					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
-					-Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wwrite-strings \
-					-Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
-					-Wstrict-prototypes -fno-math-errno -fno-tree-vectorize \
+					-Wpointer-arith -Wwrite-strings \
+					-Wundef -Wmissing-prototypes  \
+					-fno-tree-vectorize \
+					-Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
 # ccflags: .cc/.cpp files
