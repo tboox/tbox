@@ -307,12 +307,12 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 {
 	tb_hize_t count = tb_bits_be_to_ne_u64(sha->count << 3);
 
-	tb_sha_spank(sha, "\200", 1);
+	tb_sha_spak(sha, "\200", 1);
 
 	while ((sha->count & 63) != 56)
-		tb_sha_spank(sha, "", 1);
+		tb_sha_spak(sha, "", 1);
 
-	tb_sha_spank(sha, (tb_byte_t*)&count, 8);
+	tb_sha_spak(sha, (tb_byte_t*)&count, 8);
 
 	tb_uint32_t i = 0;
 	tb_uint32_t n = sha->digest_len;
@@ -320,7 +320,7 @@ tb_void_t tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size)
 	for (i = 0; i < n; i++)
 		tb_bits_set_u32_be(data + (i << 2), sha->state[i]);
 }
-tb_void_t tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size)
 {
 	tb_uint32_t i, j;
 
@@ -362,7 +362,7 @@ tb_size_t tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t in, tb_by
 	tb_sha_init(&sha, mode);
 
 	// spank
-	tb_sha_spank(&sha, ib, in);
+	tb_sha_spak(&sha, ib, in);
 
 	// exit
 	tb_sha_exit(&sha, ob, on);

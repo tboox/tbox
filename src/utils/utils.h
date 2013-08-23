@@ -36,5 +36,6 @@
 #include "url.h"
 #include "base32.h"
 #include "base64.h"
+#include "option.h"
 
 #endif

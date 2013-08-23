@@ -190,7 +190,7 @@ tb_void_t tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand)
 	md5->sp[3] = (tb_uint32_t)0x10325476 + (pseudo_rand * 97);
 }
 
-tb_void_t tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
+tb_void_t tb_md5_spak(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(md5 && data);
@@ -251,7 +251,7 @@ tb_void_t tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size)
 
 	// pad out to 56 mod 64
 	pad_n = (mdi < 56) ? (56 - mdi) : (120 - mdi);
-	tb_md5_spank (md5, g_md5_padding, pad_n);
+	tb_md5_spak (md5, g_md5_padding, pad_n);
 
 	// append length ip bits and transform
 	for (i = 0, ii = 0; i < 14; i++, ii += 4)
@@ -286,7 +286,7 @@ tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_siz
 	tb_md5_init(&md5, 0);
 
 	// spank
-	tb_md5_spank(&md5, ib, in);
+	tb_md5_spak(&md5, ib, in);
 
 	// exit
 	tb_md5_exit(&md5, ob, on);

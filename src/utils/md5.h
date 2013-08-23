@@ -47,11 +47,39 @@ typedef struct __tb_md5_t
  * interfaces
  */
 
-tb_void_t 	tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand);
-tb_void_t 	tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size);
-tb_void_t 	tb_md5_spank(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size);
+/*! init md5 
+ *
+ * @param md5 			the md5
+ * @param pseudo_rand 	the pseudo rand
+ */
+tb_void_t 				tb_md5_init(tb_md5_t* md5, tb_uint32_t pseudo_rand);
 
-tb_size_t 	tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
+/*! exit md5 
+ *
+ * @param md5 			the md5
+ * @param data 			the data
+ * @param size 			the size
+ */
+tb_void_t 				tb_md5_exit(tb_md5_t* md5, tb_byte_t* data, tb_size_t size);
+
+/*! spak md5 
+ *
+ * @param md5 			the md5
+ * @param data 			the data
+ * @param size 			the size
+ */
+tb_void_t 				tb_md5_spak(tb_md5_t* md5, tb_byte_t const* data, tb_size_t size);
+
+/*! encode md5 
+ *
+ * @param ib 			the input data
+ * @param in 			the input size
+ * @param ob 			the output data
+ * @param on 			the output size
+ *
+ * @return 				the real size
+ */
+tb_size_t 				tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_size_t on);
 
 #endif
 

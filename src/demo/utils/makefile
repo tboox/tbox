@@ -5,6 +5,7 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		base32 \
 		base64 \
+		option \
 		bits \
 		url \
 		crc \

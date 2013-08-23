@@ -33,7 +33,7 @@
  * types
  */
 
-// the crc mode type
+/// the crc mode type
 typedef enum __tb_crc_mode_t
 {
 #ifdef __tb_small__
@@ -54,7 +54,17 @@ typedef enum __tb_crc_mode_t
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in);
+
+/*! encode crc
+ *
+ * @param mode 		the crc mode
+ * @param crc 		the initial crc value
+ * @param ib		the input data
+ * @param in 		the input size
+ *
+ * @return 			the crc value
+ */
+tb_uint32_t 		tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in);
 
 #endif
 
