@@ -130,6 +130,7 @@ tb_object_t* 		tb_number_init_from_uint64(tb_uint64_t value);
  */
 tb_object_t* 		tb_number_init_from_sint64(tb_sint64_t value);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 /*! init number from float
  *
  * @param value 	the value
@@ -145,6 +146,7 @@ tb_object_t* 		tb_number_init_from_float(tb_float_t value);
  * @return 			the number object
  */
 tb_object_t* 		tb_number_init_from_double(tb_double_t value);
+#endif
 
 /*! the number type
  *
@@ -218,6 +220,7 @@ tb_uint64_t 		tb_number_uint64(tb_object_t* number);
  */
 tb_sint64_t 		tb_number_sint64(tb_object_t* number);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 /*! the float value of the number
  *
  * @param object 	the object pointer
@@ -233,6 +236,7 @@ tb_float_t 			tb_number_float(tb_object_t* number);
  * @return 			the number value
  */
 tb_double_t 		tb_number_double(tb_object_t* number);
+#endif
 
 /*! set the uint8 value 
  *
@@ -306,6 +310,7 @@ tb_bool_t 			tb_number_uint64_set(tb_object_t* number, tb_uint64_t value);
  */
 tb_bool_t 			tb_number_sint64_set(tb_object_t* number, tb_sint64_t value);
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 /*! set the float value 
  *
  * @param object 	the object pointer
@@ -323,6 +328,7 @@ tb_bool_t 			tb_number_float_set(tb_object_t* number, tb_float_t value);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_number_double_set(tb_object_t* number, tb_double_t value);
+#endif
 
 #endif
 

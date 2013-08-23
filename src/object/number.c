@@ -72,11 +72,13 @@ typedef struct __tb_number_t
 		// the sint64
 		tb_sint64_t 	s64;
 	
+#ifdef TB_CONFIG_TYPE_FLOAT
 		// the float
 		tb_float_t 		f;
 	
 		// the double
 		tb_double_t 	d;
+#endif
 	
 	}v;
 
@@ -118,10 +120,12 @@ static tb_object_t* tb_number_copy(tb_object_t* object)
 		return tb_number_init_from_uint8(number->v.u8);
 	case TB_NUMBER_TYPE_SINT8:
 		return tb_number_init_from_sint8(number->v.s8);
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		return tb_number_init_from_float(number->v.f);
 	case TB_NUMBER_TYPE_DOUBLE:
 		return tb_number_init_from_double(number->v.d);
+#endif
 	default:
 		break;
 	}
@@ -165,12 +169,14 @@ static tb_void_t tb_number_cler(tb_object_t* object)
 	case TB_NUMBER_TYPE_SINT8:
 		number->v.s8 = 0;
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		number->v.f = 0.;
 		break;
 	case TB_NUMBER_TYPE_DOUBLE:
 		number->v.d = 0.;
 		break;
+#endif
 	default:
 		break;
 	}
@@ -233,7 +239,11 @@ static tb_object_t* tb_number_read_xml(tb_object_xml_reader_t* reader, tb_size_t
 				}
 				
 				// number
+#ifdef TB_NUMBER_TYPE_FLOAT
 				if (f) number = tb_number_init_from_double(tb_atof(text));
+#else
+				if (f) tb_trace_noimpl();
+#endif
 				else number = s? tb_number_init_from_sint64(tb_stoi64(text)) : tb_number_init_from_uint64(tb_stou64(text));
 				tb_assert_and_check_goto(number, end);
 			}
@@ -296,6 +306,7 @@ static tb_bool_t tb_number_writ_xml(tb_object_xml_writer_t* writer, tb_object_t*
 		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint8(object));
 		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		tb_object_writ_tab(writer->stream, writer->deflate, level);
 		tb_gstream_printf(writer->stream, "<number>%f</number>", tb_number_float(object));
@@ -306,6 +317,7 @@ static tb_bool_t tb_number_writ_xml(tb_object_xml_writer_t* writer, tb_object_t*
 		tb_gstream_printf(writer->stream, "<number>%lf</number>", tb_number_double(object));
 		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
+#endif
 	default:
 		break;
 	}
@@ -349,6 +361,7 @@ static tb_object_t* tb_number_read_bin(tb_object_bin_reader_t* reader, tb_size_t
 	case TB_NUMBER_TYPE_SINT8:
 		number = tb_number_init_from_sint8(tb_gstream_bread_s8(reader->stream));
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		{
 			tb_byte_t data[4] = {0};
@@ -363,6 +376,7 @@ static tb_object_t* tb_number_read_bin(tb_object_bin_reader_t* reader, tb_size_t
 			number = tb_number_init_from_double(tb_bits_get_double_bbe(data));
 		}
 		break;
+#endif
 	default:
 		tb_assert_and_check_return_val(0, tb_null);
 		break;
@@ -410,6 +424,7 @@ static tb_bool_t tb_number_writ_bin(tb_object_bin_writer_t* writer, tb_object_t*
 	case TB_NUMBER_TYPE_SINT8:
 		if (!tb_gstream_bwrit_s8(writer->stream, tb_number_sint8(object))) return tb_false;
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		{
 			tb_byte_t data[4];
@@ -424,6 +439,7 @@ static tb_bool_t tb_number_writ_bin(tb_object_bin_writer_t* writer, tb_object_t*
 			if (!tb_gstream_bwrit(writer->stream, data, 8)) return tb_false;
 		}
 		break;
+#endif
 	default:
 		tb_assert_and_check_return_val(0, tb_false);
 		break;
@@ -480,7 +496,11 @@ static tb_object_t* tb_number_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 	tb_trace_impl("number: %s", tb_sstring_cstr(&data));
 
 	// init number 
+#ifdef TB_NUMBER_TYPE_FLOAT
 	if (bf) number = tb_number_init_from_float(tb_stof(tb_sstring_cstr(&data)));
+#else
+	if (bf) tb_trace_noimpl();
+#endif
 	else if (bs) 
 	{
 		tb_sint64_t value = tb_stoi64(tb_sstring_cstr(&data));
@@ -557,6 +577,7 @@ static tb_bool_t tb_number_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t*
 		tb_gstream_printf(writer->stream, "%d", tb_number_sint8(object));
 		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		tb_gstream_printf(writer->stream, "%f", tb_number_float(object));
 		tb_object_writ_newline(writer->stream, writer->deflate);
@@ -565,6 +586,7 @@ static tb_bool_t tb_number_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t*
 		tb_gstream_printf(writer->stream, "%lf", tb_number_double(object));
 		tb_object_writ_newline(writer->stream, writer->deflate);
 		break;
+#endif
 	default:
 		break;
 	}
@@ -715,6 +737,7 @@ tb_object_t* tb_number_init_from_sint64(tb_sint64_t value)
 	return number;
 }
 
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_object_t* tb_number_init_from_float(tb_float_t value)
 {
 	// make
@@ -742,6 +765,7 @@ tb_object_t* tb_number_init_from_double(tb_double_t value)
 	// ok
 	return number;
 }
+#endif
 
 tb_size_t tb_number_type(tb_object_t* object)
 {
@@ -802,10 +826,12 @@ tb_uint64_t tb_number_uint64(tb_object_t* object)
 		return number->v.u8;
 	case TB_NUMBER_TYPE_SINT8:
 		return number->v.s8;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		return (tb_uint64_t)number->v.f;
 	case TB_NUMBER_TYPE_DOUBLE:
 		return (tb_uint64_t)number->v.d;
+#endif
 	default:
 		break;
 	}
@@ -839,10 +865,12 @@ tb_sint64_t tb_number_sint64(tb_object_t* object)
 		return number->v.u8;
 	case TB_NUMBER_TYPE_SINT8:
 		return number->v.s8;
+#ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
 		return (tb_sint64_t)number->v.f;
 	case TB_NUMBER_TYPE_DOUBLE:
 		return (tb_sint64_t)number->v.d;
+#endif
 	default:
 		break;
 	}
@@ -850,6 +878,7 @@ tb_sint64_t tb_number_sint64(tb_object_t* object)
 	tb_assert(0);
 	return 0;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_float_t tb_number_float(tb_object_t* object)
 {
 	// check
@@ -922,6 +951,7 @@ tb_double_t tb_number_double(tb_object_t* object)
 	tb_assert(0);
 	return 0;
 }
+#endif
 tb_bool_t tb_number_uint8_set(tb_object_t* object, tb_uint8_t value)
 {	
 	// check
@@ -1026,6 +1056,7 @@ tb_bool_t tb_number_sint64_set(tb_object_t* object, tb_sint64_t value)
 	// ok
 	return tb_true;
 }
+#ifdef TB_CONFIG_TYPE_FLOAT
 tb_bool_t tb_number_float_set(tb_object_t* object, tb_float_t value)
 {	
 	// check
@@ -1052,3 +1083,4 @@ tb_bool_t tb_number_double_set(tb_object_t* object, tb_double_t value)
 	// ok
 	return tb_true;
 }
+#endif

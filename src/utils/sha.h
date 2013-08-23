@@ -57,11 +57,39 @@ typedef enum __tb_sha_mode_t
  * interfaces
  */
 
-tb_void_t 	tb_sha_init(tb_sha_t* sha, tb_size_t mode);
-tb_void_t 	tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size);
-tb_void_t 	tb_sha_spank(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size);
+/*! init sha 
+ *
+ * @param sha 			the sha
+ * @param mode 			the mode
+ */
+tb_void_t 				tb_sha_init(tb_sha_t* sha, tb_size_t mode);
 
-tb_size_t 	tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t ip, tb_byte_t* ob, tb_size_t on);
+/*! exit sha 
+ *
+ * @param sha 			the sha
+ * @param data 			the data
+ * @param size 			the size
+ */
+tb_void_t 				tb_sha_exit(tb_sha_t* sha, tb_byte_t* data, tb_size_t size);
+
+/*! spak sha 
+ *
+ * @param sha 			the sha
+ * @param data 			the data
+ * @param size 			the size
+ */
+tb_void_t 				tb_sha_spak(tb_sha_t* sha, tb_byte_t const* data, tb_size_t size);
+
+/*! encode sha 
+ *
+ * @param ib 			the input data
+ * @param in 			the input size
+ * @param ob 			the output data
+ * @param on 			the output size
+ *
+ * @return 				the real size
+ */
+tb_size_t 				tb_sha_encode(tb_size_t mode, tb_byte_t const* ib, tb_size_t ip, tb_byte_t* ob, tb_size_t on);
 
 #endif
 
