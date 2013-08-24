@@ -250,7 +250,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** a
 		tb_assert_and_check_return_val(p && p < e, tb_false);
 
 		// is long key?
-		if (p + 3 < e && p[0] == '-' && p[1] == '-' && tb_isalpha(p[2]))
+		if (p + 2 < e && p[0] == '-' && p[1] == '-' && tb_isalpha(p[2]))
 		{
 			// the key
 			tb_char_t key[512] = {0};
@@ -351,7 +351,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** a
 			}
 		}
 		// is short key?
-		else if (p + 2 < e && p[0] == '-' && tb_isalpha(p[1]))
+		else if (p + 1 < e && p[0] == '-' && tb_isalpha(p[1]))
 		{
 			// the key
 			tb_char_t key[512] = {0};
