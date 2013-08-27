@@ -97,9 +97,12 @@ static tb_long_t tb_hstream_aopen(tb_gstream_t* gst)
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
+			tb_print("1111: tb_hstream_aopen b: %lld", tb_http_option(hst->http)->post);
+
 	// open it
 	tb_long_t ok = tb_http_aopen(hst->http);
 
+			tb_print("1111: tb_hstream_aopen e: %lld", tb_http_option(hst->http)->post);
 	// save state
 	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_hstream_state(hst);
 
