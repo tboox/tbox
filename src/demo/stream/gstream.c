@@ -235,13 +235,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				// post-data?
 				if (tb_option_find(option, "post-data"))
 				{
+					// the post data
 					tb_char_t const* data = tb_option_item_cstr(option, "post-data");
-#if 1
-					if (!tb_gstream_bwrit(ist, data, tb_strlen(data))) break;
-					if (!tb_gstream_bfwrit(ist, tb_null, 0)) break;
-#else
+
+					// flush writing the post data
 					if (!tb_gstream_bfwrit(ist, data, tb_strlen(data))) break;
-#endif
 				}
 				// post-file?
 				else if (tb_option_find(option, "post-file"))

@@ -1100,12 +1100,28 @@ tb_bool_t tb_dns_list_init()
 	// init local
 	if (ok) 
 	{
-		// add the hosts
-		tb_dns_list_adds("8.8.4.4");
-		tb_dns_list_adds("8.8.8.8");
-
 		// add the hosts from local
 		tb_dns_local_init();
+		
+		// has local hosts?
+		tb_bool_t local = tb_false;
+		{
+			// enter
+			if (g_mutex) tb_mutex_enter(g_mutex);
+
+			// ok?
+			if (g_list && g_list->size) local = tb_true;
+
+			// leave
+			if (g_mutex) tb_mutex_leave(g_mutex);
+		}
+
+		// add the hosts if no local
+		if (!local)
+		{
+			tb_dns_list_adds("8.8.4.4");
+			tb_dns_list_adds("8.8.8.8");
+		}
 	}
 
 	// ok?

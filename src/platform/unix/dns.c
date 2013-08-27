@@ -56,9 +56,9 @@ tb_void_t tb_dns_local_init()
 	if (!tb_gstream_bopen(gst)) goto end;
 
 	// read
-	while ((size = tb_gstream_bread_line(gst, line, 8192)) > 0)
+	while ((size = tb_gstream_bread_line(gst, line, 8192)) >= 0)
 	{
-		if (!tb_strnicmp(line, "nameserver", 10))
+		if (size && !tb_strnicmp(line, "nameserver", 10))
 		{
 			// seek to host
 			tb_char_t const* p = line + 10;

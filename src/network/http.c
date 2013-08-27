@@ -1114,7 +1114,7 @@ tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(http->status.post_size < http->option.post, -1);
 
 	// writ the post data
-	tb_hong_t ok = tb_gstream_awrit(http->stream, data, size);
+	tb_long_t ok = tb_gstream_awrit(http->stream, data, size);
 	tb_check_return_val(ok >= 0, -1);
 
 	// save the post size
@@ -1194,12 +1194,12 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	while (read < size)
 	{
 		// read data
-		tb_long_t n = tb_http_aread(handle, data + read, size - read);
+		tb_long_t real = tb_http_aread(handle, data + read, size - read);
 
 		// update size
-		if (n > 0) read += n;
+		if (real > 0) read += real;
 		// no data?
-		else if (!n)
+		else if (!real)
 		{
 			// wait
 			tb_long_t e = tb_http_wait(handle, TB_AIOO_ETYPE_READ, http->option.timeout);
@@ -1221,10 +1221,33 @@ tb_long_t tb_http_afwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream, -1);
+	tb_assert_and_check_return_val(http && http->stream && (http->step & TB_HTTP_STEP_POST), -1);
 
-	// afwrit
-	return tb_gstream_afwrit(http->stream, data, size);
+	// has post data? flush it
+	tb_long_t ok = 0;
+	if (data && size)
+	{
+		// check
+		tb_assert_and_check_return_val(http->status.post_size < http->option.post, -1);
+
+		// flush writing the post data
+		ok = tb_gstream_afwrit(http->stream, data, size);
+		tb_check_return_val(ok >= 0, -1);
+
+		// save the post size
+		if (ok > 0) http->status.post_size += ok;
+	}
+	else 
+	{
+		// check
+		tb_assert_and_check_return_val(http->status.post_size == http->option.post, -1);
+
+		// flush stream
+		ok = tb_gstream_afwrit(http->stream, tb_null, 0);
+	}
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -1240,10 +1263,12 @@ tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		while (writ < size)
 		{
 			// writ data
-			tb_long_t n = tb_gstream_afwrit(http->stream, data + writ, size - writ);	
+			tb_long_t real = tb_gstream_afwrit(http->stream, data + writ, size - writ);	
 
-			if (n > 0) writ += n;
-			else if (!n)
+			// has data?
+			if (real > 0) writ += real;
+			// no data?
+			else if (!real)
 			{
 				// wait
 				tb_long_t e = tb_gstream_wait(http->stream, TB_AIOO_ETYPE_WRIT, http->option.timeout);
