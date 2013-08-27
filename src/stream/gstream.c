@@ -269,27 +269,24 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_
 	// init 
 	tb_long_t r = -1;
 
-	// only flush writ data if no cache
-	if (tb_qbuffer_null(&gst->cache)) 
+	// flush cache first if has cache
+	if (!tb_qbuffer_null(&gst->cache)) 
 	{
-		r = gst->awrit(gst, data, size, tb_true);
-		goto end;
+		// enter cache for pull
+		tb_size_t 	pull = 0;
+		tb_byte_t* 	head = tb_qbuffer_pull_init(&gst->cache, &pull);
+		tb_assert_and_check_return_val(head && pull, -1);
+
+		// writ data to stream
+		tb_long_t 	writ = gst->awrit(gst, head, pull, tb_false);
+		tb_check_goto(writ >= 0, end);
+		tb_assert_and_check_return_val(writ <= pull, -1);
+
+		// leave cache for pull
+		tb_qbuffer_pull_done(&gst->cache, writ);
 	}
 
-	// enter cache for pull
-	tb_size_t 	pull = 0;
-	tb_byte_t* 	head = tb_qbuffer_pull_init(&gst->cache, &pull);
-	tb_assert_and_check_return_val(head && pull, -1);
-
-	// writ data to stream
-	tb_long_t 	writ = gst->awrit(gst, head, pull, tb_false);
-	tb_check_goto(writ >= 0, end);
-	tb_assert_and_check_return_val(writ <= pull, -1);
-
-	// leave cache for pull
-	tb_qbuffer_pull_done(&gst->cache, writ);
-
-	// ok?
+	// flush data if no cache
 	if (tb_qbuffer_null(&gst->cache))
 	{
 		// flush writ data
@@ -310,6 +307,7 @@ end:
 }
 static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 {
+	// init
 	tb_long_t r = -1;
 
 	// flush writed data first
@@ -779,9 +777,9 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	while (read < size)
 	{
 		// read data
-		tb_long_t n = tb_gstream_aread(gst, data + read, size - read);	
-		if (n > 0) read += n;
-		else if (!n)
+		tb_long_t real = tb_gstream_aread(gst, data + read, size - read);	
+		if (real > 0) read += real;
+		else if (!real)
 		{
 			// wait
 			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
@@ -812,9 +810,9 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	while (writ < size)
 	{
 		// writ data
-		tb_long_t n = tb_gstream_awrit(gst, data + writ, size - writ);	
-		if (n > 0) writ += n;
-		else if (!n)
+		tb_long_t real = tb_gstream_awrit(gst, data + writ, size - writ);	
+		if (real > 0) writ += real;
+		else if (!real)
 		{
 			// wait
 			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
@@ -873,9 +871,11 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		while (read < size)
 		{
 			// read data
-			tb_long_t n = tb_gstream_afread(gst, data + read, size - read);	
-			if (n > 0) read += n;
-			else if (!n)
+			tb_long_t real = tb_gstream_afread(gst, data + read, size - read);	
+			// has data?
+			if (real > 0) read += real;
+			// no data?
+			else if (!real)
 			{
 				// wait
 				tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
@@ -926,10 +926,12 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		while (writ < size)
 		{
 			// writ data
-			tb_long_t n = tb_gstream_afwrit(gst, data + writ, size - writ);	
+			tb_long_t real = tb_gstream_afwrit(gst, data + writ, size - writ);	
 
-			if (n > 0) writ += n;
-			else if (!n)
+			// has data?
+			if (real > 0) writ += real;
+			// no data?
+			else if (!real)
 			{
 				// wait
 				tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
@@ -998,7 +1000,9 @@ tb_long_t tb_gstream_bread_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t si
 			if (!ch) break;
 		}
 	}
-	return 0;
+
+	// end?
+	return tb_gstream_beof(gst)? -1 : 0;
 }
 tb_long_t tb_gstream_bwrit_line(tb_gstream_t* gst, tb_char_t* data, tb_size_t size)
 {
@@ -1568,16 +1572,16 @@ tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 	do
 	{
 		// read data
-		tb_long_t n = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
-		if (n > 0)
+		tb_long_t real = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
+		if (real > 0)
 		{
 			// writ data
-			if (!tb_gstream_bwrit(gst, data, n)) break;
+			if (!tb_gstream_bwrit(gst, data, real)) break;
 
 			// update read
-			read += n;
+			read += real;
 		}
-		else if (!n) 
+		else if (!real) 
 		{
 			// wait
 			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, ist->timeout);
