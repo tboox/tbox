@@ -29,7 +29,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * helper
  */
-static tb_bool_t tb_check_order_word()
+static __tb_inline__ tb_bool_t tb_check_order_word()
 {
 	tb_uint16_t x = 0x1234;
 	tb_byte_t const* p = (tb_byte_t const*)&x;
@@ -42,7 +42,7 @@ static tb_bool_t tb_check_order_word()
 	return (p[0] == 0x34 && p[1] == 0x12)? tb_true : tb_false;
 #endif
 }
-static tb_bool_t tb_check_order_double()
+static __tb_inline__ tb_bool_t tb_check_order_double()
 {
 #ifdef TB_CONFIG_TYPE_FLOAT
 	union 
@@ -64,14 +64,50 @@ static tb_bool_t tb_check_order_double()
 	return tb_true;
 #endif
 }
+static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
+{
+#ifdef __tb_debug__
+	if (!(mode & TB_MODE_DEBUG))
+	{
+		tb_print("[tbox]: [warning]: libtbox.a has __tb_debug__ but tbox/tbox.h not");
+		return tb_false;
+	}
+#else
+	if (mode & TB_MODE_DEBUG)
+	{
+		tb_print("[tbox]: [warning]: tbox/tbox.h has __tb_debug__ but libtbox.a not");
+		return tb_false;
+	}
+#endif
 
+#ifdef __tb_small__
+	if (!(mode & TB_MODE_SMALL))
+	{
+		tb_print("[tbox]: [warning]: libtbox.a has __tb_small__ but tbox/tbox.h not");
+		return tb_false;
+	}
+#else
+	if (mode & TB_MODE_SMALL)
+	{
+		tb_print("[tbox]: [warning]: tbox/tbox.h has __tb_small__ but libtbox.a not");
+		return tb_false;
+	}
+#endif
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-tb_bool_t tb_init(tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode)
 {
+	// trace
 	tb_trace("init: %p %lu", data, size);
+
+	// check mode
+	if (!tb_check_mode(mode)) return tb_false;
 
 	// check types
 	tb_assert_static(sizeof(tb_byte_t) == 1);

@@ -201,6 +201,7 @@ config : .null
 	@echo "config: arch: \t" 							$(ARCH)
 	@echo "config: demo: \t" 							$(DEMO)
 	@echo "config: debug: \t" 							$(DEBUG)
+	@echo "config: small: \t" 							$(SMALL)
 	@echo "config: bin: \t" 							$(BIN)
 	@echo "config: pre: \t" 							$(PRE)
 	@echo "config: sdk: \t" 							$(SDK)
