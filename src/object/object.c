@@ -462,10 +462,19 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 				}
 				else maxn <<= 1;
 			}
+			else maxn <<= 1;
+		
+			// exit stream
+			tb_gstream_exit(gst);
 		}
+		else
+		{
+			// exit stream
+			tb_gstream_exit(gst);
 
-		// exit stream
-		tb_gstream_exit(gst);
+			// break
+			break;
+		}
 
 	} while (!odata);
 
