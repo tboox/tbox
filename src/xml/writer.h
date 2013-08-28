@@ -34,54 +34,130 @@
  * interfaces
  */
 
-/*!init writer
+/*! init the xml writer
  *
- * @param gst 		the stream
- * @param bformat 	is format xml?
- * @return 			the writer handle
+ * @param gst 			the stream
+ * @param bformat 		is format xml?
+ * @return 				the writer handle
  */
 tb_handle_t 			tb_xml_writer_init(tb_gstream_t* gst, tb_bool_t bformat);
 
-/// exit
+/*! exit the xml writer
+ *
+ * @param writer 		the xml writer
+ */
 tb_void_t 				tb_xml_writer_exit(tb_handle_t writer);
 
-/// save document or node
+/*! save the xml document or node
+ *
+ * @param writer 		the xml writer
+ * @param node 			the xml node
+ */
 tb_void_t 				tb_xml_writer_save(tb_handle_t writer, tb_xml_node_t const* node);
 
-/// document: <?xml version = \"...\" encoding = \"...\" ?>
+/*! writ the xml document node: <?xml version = \"...\" encoding = \"...\" ?>
+ *
+ * @param writer 		the xml writer 
+ * @param version 		the xml version
+ * @param encoding 		the xml encoding
+ */
 tb_void_t 				tb_xml_writer_document(tb_handle_t writer, tb_char_t const* version, tb_char_t const* encoding);
 
-/// document: <!DOCTYPE type>
+/*! writ the xml document type: <!DOCTYPE type>
+ *
+ * @param writer 		the xml writer
+ * @param type 			the xml document type
+ */
 tb_void_t 				tb_xml_writer_document_type(tb_handle_t writer, tb_char_t const* type);
 
-/// cdata: <![CDATA[...]]>
+/*! writ the xml cdata: <![CDATA[...]]>
+ *
+ * @param writer 		the xml writer
+ * @param data 			the xml cdata 
+ */
 tb_void_t 				tb_xml_writer_cdata(tb_handle_t writer, tb_char_t const* data);
 
-/// text
+/*! writ the xml text
+ *
+ * @param writer 		the xml writer
+ * @param text 			the xml text 
+ */
 tb_void_t 				tb_xml_writer_text(tb_handle_t writer, tb_char_t const* text);
 
-/// comment: <!-- ... -->
+/*! writ the xml comment: <!-- ... -->
+ *
+ * @param writer 		the xml writer
+ * @param comment 		the xml comment 
+ */
 tb_void_t 				tb_xml_writer_comment(tb_handle_t writer, tb_char_t const* comment);
 
-/// element: <name/>
+/*! writ the empty xml element: <name/>
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml element name 
+ */
 tb_void_t 				tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name);
-/// element: <name> ...
+
+/*! writ the xml element head: <name> ...
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml element name 
+ */
 tb_void_t 				tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name);
-/// element: ... </name>
+
+/*! writ the xml element tail: ... </name>
+ *
+ * @param writer 		the xml writer
+ */
 tb_void_t 				tb_xml_writer_element_leave(tb_handle_t writer);
 
-/// attributes: long
+/*! writ the xml attribute for long value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param value 		the xml attribute value
+ */
 tb_void_t 				tb_xml_writer_attributes_long(tb_handle_t writer, tb_char_t const* name, tb_long_t value);
-/// attributes: boolean
+
+/*! writ the xml attribute for boolean value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param value 		the xml attribute value
+ */
 tb_void_t 				tb_xml_writer_attributes_bool(tb_handle_t writer, tb_char_t const* name, tb_bool_t value);
-/// attributes: c-string
+
+/*! writ the xml attribute for cstr value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param value 		the xml attribute value
+ */
 tb_void_t 				tb_xml_writer_attributes_cstr(tb_handle_t writer, tb_char_t const* name, tb_char_t const* value);
-/// attributes: format
+
+/*! writ the xml attribute for format value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param format 		the xml attribute format
+ */
 tb_void_t 				tb_xml_writer_attributes_format(tb_handle_t writer, tb_char_t const* name, tb_char_t const* format, ...);
+
 #ifdef TB_CONFIG_TYPE_FLOAT
-/// attributes: float
+/*! writ the xml attribute for float value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param value 		the xml attribute value
+ */
 tb_void_t 				tb_xml_writer_attributes_float(tb_handle_t writer, tb_char_t const* name, tb_float_t value);
-/// attributes: double
+
+/*! writ the xml attribute for double value
+ *
+ * @param writer 		the xml writer
+ * @param name 			the xml attribute name
+ * @param value 		the xml attribute value
+ */
 tb_void_t 				tb_xml_writer_attributes_double(tb_handle_t writer, tb_char_t const* name, tb_double_t value);
 #endif
 
