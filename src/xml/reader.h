@@ -55,20 +55,29 @@ typedef enum __tb_xml_reader_event_t
  */
 
 
-/*!init reader
+/*! init the xml reader
  *
- * @param gst 		the stream
- * @return 			the reader handle
+ * @param gst 			the stream
+ * @return 				the reader handle
  */
 tb_handle_t 			tb_xml_reader_init(tb_gstream_t* gst);
 
-/// exit
+/*! exit the xml reader
+ *
+ * @param reader 		the xml reader
+ */
 tb_void_t 				tb_xml_reader_exit(tb_handle_t reader);
 
-/// clear, @note the stream will be reseted
+/*! clear the xml reader, @note the stream will be reseted
+ *
+ * @param reader 		the xml reader
+ */
 tb_void_t 				tb_xml_reader_clear(tb_handle_t reader);
 
-/*!next for iterator
+/*! the next iterator for the xml reader
+ *
+ * @param reader 		the xml reader
+ * @return 				the iterator event 
  *
  * @code
  *
@@ -161,47 +170,91 @@ tb_void_t 				tb_xml_reader_clear(tb_handle_t reader);
  */
 tb_size_t 				tb_xml_reader_next(tb_handle_t reader);
 
-/// stream
+/*! the xml stream
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml stream
+ */
 tb_gstream_t* 			tb_xml_reader_stream(tb_handle_t reader);
 
-/// level
+/*! the xml level
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml level for tab spaces
+ */
 tb_size_t 				tb_xml_reader_level(tb_handle_t reader);
 
-/*!goto: /root/node/item
+/*! seek to the given node for xml, .e.g /root/node/item
  *
- * @param reader 	the reader handle
- * @param path 		the xml path
- * @return 			ok: tb_true
+ * @param reader 		the reader handle
+ * @param path 			the xml path
+ * @return 				tb_true or tb_false
  *
  * @note the stream will be reseted
  */
 tb_bool_t 				tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path);
 
-/// load document or node
+/*! load the xml 
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml root node
+ */
 tb_xml_node_t* 			tb_xml_reader_load(tb_handle_t reader);
 
-/// version
+/*! the xml version
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml version
+ */
 tb_char_t const* 		tb_xml_reader_version(tb_handle_t reader);
 
-/// charset, default: utf-8
+/*! the xml charset
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml charset
+ */
 tb_char_t const* 		tb_xml_reader_charset(tb_handle_t reader);
 
-/// element
+/*! the current xml element name
+ *
+ * @param reader 		the xml reader
+ * @return 				the current xml element name
+ */
 tb_char_t const* 		tb_xml_reader_element(tb_handle_t reader);
 
-/// text
+/*! the current xml node text
+ *
+ * @param reader 		the xml reader
+ * @return 				the current xml node text
+ */
 tb_char_t const* 		tb_xml_reader_text(tb_handle_t reader);
 
-/// cdata
+/*! the current xml node cdata
+ *
+ * @param reader 		the xml reader
+ * @return 				the current xml node cdata
+ */
 tb_char_t const* 		tb_xml_reader_cdata(tb_handle_t reader);
 
-/// comment
+/*! the current xml node comment
+ *
+ * @param reader 		the xml reader
+ * @return 				the current xml node comment
+ */
 tb_char_t const* 		tb_xml_reader_comment(tb_handle_t reader);
 
-/// doctype
+/*! the xml document type
+ *
+ * @param reader 		the xml reader
+ * @return 				the xml document type
+ */
 tb_char_t const* 		tb_xml_reader_doctype(tb_handle_t reader);
 
-/// attributes
+/*! the current xml node attributes
+ *
+ * @param reader 		the xml reader
+ * @return 				the current xml node attributes
+ */
 tb_xml_node_t const* 	tb_xml_reader_attributes(tb_handle_t reader);
 
 #endif
