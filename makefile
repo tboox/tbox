@@ -98,12 +98,12 @@ output : .null
 # make error
 error : .null
 	@echo error $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep -Pi "error|undefined|cannot|错误" | cat
+	@cat /tmp/$(PRO_NAME).out | egrep -i "error|undefined|cannot|错误" | cat
 
 # make warning
 warning : .null
 	@echo warning $(PRO_NAME)
-	@cat /tmp/$(PRO_NAME).out | grep warning
+	@cat /tmp/$(PRO_NAME).out | egrep warning
 
 # make doc
 doc : .null

@@ -22,7 +22,7 @@ ARCH = x64
 DEMO = n
 
 # toolchain
-SDK =
+SDK = 6.1
 NDK =
 BIN =
 PRE =
