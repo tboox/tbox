@@ -194,7 +194,8 @@ DISTCC 		:=
 endif
 
 config : .null
-	-@cp ${shell pwd}/plat/$(PLAT)/config.h ${shell pwd}/src/config.h
+	-@cp ./plat/$(PLAT)/config.h ./src/config.h
+	-@sed -i -e "s/\[build\]/\(`date +%Y%m%k%M`\)/g" ./src/config.h
 	@echo "config: ==================================================================="
 	@echo "config: name: \t" 							$(PRO_NAME)
 	@echo "config: plat: \t" 							$(PLAT)

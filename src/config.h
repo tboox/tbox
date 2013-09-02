@@ -104,5 +104,7 @@
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
 
+// version
+#define TB_CONFIG_VERSION_BUILD 		(2013092312)
 
 #endif

@@ -122,4 +122,7 @@
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
 
+// the build version
+#define TB_CONFIG_VERSION_BUILD 		[build]
+
 #endif

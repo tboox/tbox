@@ -54,6 +54,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// done help
 			if (tb_option_find(option, "help"))
 				tb_option_help(option);
+			// done version
+			else if (tb_option_find(option, "version"))
+			{
+				tb_version_t const* version = tb_version();
+				if (version) tb_print("version: tbox-v%u.%u.%u.%lu", version->major, version->minor, version->alter, version->build);
+			}
 			else
 			{
 				// done integer
