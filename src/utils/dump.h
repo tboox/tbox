@@ -17,26 +17,41 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		dump.h
+ * @ingroup 	utils
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
+#ifndef TB_UTILS_DUMP_H
+#define TB_UTILS_DUMP_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "dump.h"
-#include "base32.h"
-#include "base64.h"
-#include "option.h"
+#include "../stream/stream.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! dump data
+ *
+ * @param data 		the data
+ * @param size 		the size
+ */
+tb_void_t 			tb_dump_data(tb_byte_t const* data, tb_size_t size);
+
+/*! dump data from url
+ *
+ * @param url 		the url
+ */
+tb_void_t 			tb_dump_data_from_url(tb_char_t const* url);
+
+/*! dump data from stream
+ *
+ * @param gst 		the stream
+ */
+tb_void_t 			tb_dump_data_from_stream(tb_gstream_t* gst);
 
 #endif
+

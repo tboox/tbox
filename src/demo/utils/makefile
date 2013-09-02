@@ -6,6 +6,7 @@ NAMES = \
 		base32 \
 		base64 \
 		option \
+		dump \
 		bits \
 		url \
 		crc \

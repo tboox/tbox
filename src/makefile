@@ -84,6 +84,7 @@ tbox_C_FILES 			+= \
 						utils/sha \
 						utils/crc \
 						utils/url \
+						utils/dump \
 						utils/base32 \
 						utils/base64 \
 						xml/node \
