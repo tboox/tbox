@@ -545,7 +545,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** a
 	}
 
 	// ok
-	return tb_option_check(option);
+	return tb_true;//tb_option_check(option);
 }
 tb_void_t tb_option_dump(tb_handle_t handle)
 {

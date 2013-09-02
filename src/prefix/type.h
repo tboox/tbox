@@ -158,6 +158,23 @@ typedef struct __tb_timezone_t
 
 }tb_timezone_t;
 
+/// the version
+typedef struct __tb_version_t
+{
+	/// the major
+	tb_byte_t 						major;
+
+	/// the minor 
+	tb_byte_t 						minor;
+
+	/// the alter
+	tb_byte_t 						alter;
+
+	/// the build
+	tb_size_t 						build;
+
+}tb_version_t;
+
 #endif
 
 

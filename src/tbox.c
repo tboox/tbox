@@ -101,13 +101,16 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
  * implementation
  */
 
-tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode)
+tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_size_t build)
 {
 	// trace
 	tb_trace("init: %p %lu", data, size);
 
 	// check mode
 	if (!tb_check_mode(mode)) return tb_false;
+
+	// check build
+	tb_assert(build == TB_CONFIG_VERSION_BUILD);
 
 	// check types
 	tb_assert_static(sizeof(tb_byte_t) == 1);
@@ -160,15 +163,17 @@ tb_void_t tb_exit()
 	tb_trace("exit: ok");
 }
 
-tb_char_t const* tb_version()
+tb_version_t const* tb_version()
 {
-	static tb_char_t version_data[32] = {0};
-	static tb_size_t version_size = 0;
-	
-	if (!version_size)
+	// init version
+	static tb_version_t s_version = {0};
+	if (!s_version.major)
 	{
-		version_size = tb_snprintf(version_data, 32, "tbox-v%u.%u.%u", TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER);
-		version_data[version_size] = '\0';
+		s_version.major = TB_VERSION_MAJOR;
+		s_version.minor = TB_VERSION_MINOR;
+		s_version.alter = TB_VERSION_ALTER;
+		s_version.build = TB_CONFIG_VERSION_BUILD;
 	}
-	return version_data;
+
+	return &s_version;
 }

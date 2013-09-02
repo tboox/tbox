@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 // init tbox
-#define tb_init(data, size) 	tb_init_for_mode(data, size, __tb_mode_debug__ | __tb_mode_small__)
+#define tb_init(data, size) 	tb_init_for_mode(data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), (tb_size_t)TB_CONFIG_VERSION_BUILD)
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -82,16 +82,17 @@ extern "C" {
  * @param data 		the memory data, uses it when TB_CONFIG_MEMORY_POOL is enabled
  * @param size 		the memory size, uses it when TB_CONFIG_MEMORY_POOL is enabled
  * @param mode 		the compile mode for check __tb_small__ and __tb_debug__
+ * @param build 	the build version
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode);
+tb_bool_t 			tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_size_t build);
 
 /// exit the tbox library
 tb_void_t 			tb_exit();
 
 /// the tbox version string
-tb_char_t const* 	tb_version();
+tb_version_t const*	tb_version();
 
 
 // c plus plus
