@@ -34,7 +34,8 @@
  */
 
 // is
-#define tb_isspace(x) 				((x) == 0x20 || ((x) > 0x8 && (x) < 0xe))
+#define tb_isspace(x) 				(((x) == 0x20) || ((x) > 0x8 && (x) < 0xe))
+#define tb_isgraph(x) 				((x) > 0x1f && (x) < 0x7f)
 #define tb_isalpha(x) 				(((x) > 0x40 && (x) < 0x5b) || ((x) > 0x60 && (x) < 0x7b))
 #define tb_isupper(x) 				((x) > 0x40 && (x) < 0x5b)
 #define tb_islower(x) 				((x) > 0x60 && (x) < 0x7b)
