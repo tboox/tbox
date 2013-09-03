@@ -26,31 +26,48 @@
  * includes
  */
 #include "prefix.h"
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_backtrace_init()
+tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
-	tb_trace_noimpl();
-	return tb_null;
+	// note: cannot use assert
+	tb_check_return_val(frames && nframe, 0);
+
+	// backtrace
+	nframe = backtrace(frames, nframe + nskip);
+
+	// skip frames
+	if (nframe)
+	{
+		nskip = tb_min(nframe, nskip);
+		if (nskip) 
+		{
+			tb_memmov(frames, frames + nskip, (nframe - nskip) * sizeof(tb_cpointer_t));
+			nframe -= nskip;
+		}
+	}
+
+	// ok?
+	return nframe;
 }
-tb_void_t tb_backtrace_exit(tb_handle_t backtrace)
+tb_handle_t tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe)
 {
-	tb_trace_noimpl();
+	tb_check_return_val(frames && nframe, tb_null);
+	return (tb_handle_t)backtrace_symbols(frames, nframe);
 }
-tb_size_t tb_backtrace_size(tb_handle_t backtrace)
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
-	tb_trace_noimpl();
-	return 0;
+	tb_check_return_val(symbols && frames && nframe && iframe < nframe, tb_null);
+	return ((tb_char_t const**)symbols)[iframe];
 }
-tb_cpointer_t tb_backtrace_getp(tb_handle_t backtrace, tb_size_t frame)
+tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
 {
-	tb_trace_noimpl();
-	return tb_null;
+	if (symbols) free(symbols);
 }
-tb_char_t const* tb_backtrace_name(tb_handle_t backtrace, tb_size_t frame)
-{
-	tb_trace_noimpl();
-	return tb_null;
-}
+

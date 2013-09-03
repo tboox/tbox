@@ -35,12 +35,21 @@
  * macros
  */
 
+// the assert backtrace prefix
+#define TB_ASSERT_BACKTRACE_PREFIX 							"\t"
+
+// the assert backtrace nframe
+#define TB_ASSERT_BACKTRACE_NFRAME 							(10)
+
+// the assert backtrace dump
+#define tb_assert_backtrace_dump() 							tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, TB_ASSERT_BACKTRACE_NFRAME)
+
 // assert
 #if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 # 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
-#		define tb_assert_message_tag(tag, x, fmt, ...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, __VA_ARGS__); } } while(0)
+#		define tb_assert_message_tag(tag, x, fmt, ...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
 # 	else
-#		define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); } } while(0)
+#		define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
 # 	endif
 #elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
 #	define tb_assert_message_tag(...)
@@ -49,13 +58,13 @@
 #endif
 
 #ifdef TB_ASSERT_ENABLE
-# 	define tb_assert_tag(tag, x)							do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); } } while(0)
-# 	define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_abort(); } } while(0)
-# 	define tb_assert_return_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return ; } } while(0)
-# 	define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); return (v); } } while(0)
-# 	define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); goto b; } } while(0)
-# 	define tb_assert_break_tag(tag, x)						{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); break ; } }
-# 	define tb_assert_continue_tag(tag, x)					{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); continue ; } }
+# 	define tb_assert_tag(tag, x)							do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); } } while(0)
+# 	define tb_assert_abort_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); tb_abort(); } } while(0)
+# 	define tb_assert_return_tag(tag, x)						do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); return ; } } while(0)
+# 	define tb_assert_return_val_tag(tag, x, v)				do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); return (v); } } while(0)
+# 	define tb_assert_goto_tag(tag, x, b)					do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); goto b; } } while(0)
+# 	define tb_assert_break_tag(tag, x)						{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); break ; } }
+# 	define tb_assert_continue_tag(tag, x)					{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); tb_assert_backtrace_dump(); continue ; } }
 # 	define tb_assert_and_check_abort_tag(tag, x)			tb_assert_abort_tag(tag, x)
 # 	define tb_assert_and_check_return_tag(tag, x)			tb_assert_return_tag(tag, x)
 # 	define tb_assert_and_check_return_val_tag(tag, x, v)	tb_assert_return_val_tag(tag, x, v)
@@ -103,6 +112,11 @@
 #define tb_assert_and_check_continue(x)						tb_assert_and_check_continue_tag(TB_PRINT_TAG, x)
 
 #define tb_assert_static(x) 								do { typedef int __tb_static_assert__[(x)? 1 : -1]; } while(0)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_size_t nframe);
 
 #endif
 

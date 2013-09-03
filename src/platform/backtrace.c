@@ -34,4 +34,47 @@
 # 	include "arch/backtrace.c"
 #endif
 
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe)
+{
+	// check
+	tb_check_return(nframe < 256);
 
+	// the frames
+	tb_cpointer_t frames_data[256] = {0};
+	if (!frames)
+	{
+		nframe = tb_backtrace_frames(frames_data, nframe, 2);
+		frames = frames_data;
+	}
+
+	// dump frames
+	if (frames && nframe)
+	{
+		// init symbols
+		tb_handle_t symbols = tb_backtrace_symbols_init(frames, nframe);
+		if (symbols)
+		{
+			// walk
+			tb_size_t i = 0;
+			for (i = 0; i < nframe; i++)
+			{
+				tb_print("%s[%p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+			}
+		
+			// exit symbols
+			tb_backtrace_symbols_exit(symbols);
+		}
+		else
+		{
+			// walk
+			tb_size_t i = 0;
+			for (i = 0; i < nframe; i++)
+			{
+				tb_print("%s[%p]", prefix? prefix : "", frames[i]);
+			}
+		}
+	}
+}

@@ -11,6 +11,7 @@ NAMES = \
 		atomic \
 		tstore \
 		process \
+		backtrace \
 		exception \
 		directory 
 

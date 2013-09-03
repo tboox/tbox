@@ -50,6 +50,7 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 		__tb_except(1)
 		{
 			tb_print("thread[%p]: except1: %lu", self, i++);
+			tb_backtrace_dump("\t\t", 10);
 		}
 		__tb_end
 		tb_print("thread[%p]: try0: e: %lu", self, i);
@@ -63,6 +64,7 @@ static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	__tb_except(1)
 	{
 		tb_print("thread[%p]: except0: %lu", self, i++);
+		tb_backtrace_dump("\t", 10);
 	}
 	__tb_end
 

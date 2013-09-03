@@ -24,56 +24,57 @@
 #ifndef TB_PLATFORM_BACKTRACE_H
 #define TB_PLATFORM_BACKTRACE_H
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init backtrace  
+/*! get backtrace frames
  *
- * @return 				the backtrace handle
+ * @param frames 		the backtrace frames
+ * @param nframe 		the backtrace frame maxn
+ * @param nskip 		the backtrace frame skip
+ *
+ * @return 				the real backtrace frame count
  */
-tb_handle_t 			tb_backtrace_init();
+tb_size_t 				tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip);
 
-/*! exit backtrace
+/*! init backtrace frame symbols
  *
- * @param backtrace 	the backtrace handle
+ * @param frames 		the backtrace frames
+ * @param nframe 		the backtrace frame count
+ *
+ * @return 				the backtrace frame symbols handle
  */
-tb_void_t 				tb_backtrace_exit(tb_handle_t backtrace);
+tb_handle_t 			tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe);
 
-/*! the backtrace frame size
+/*! get backtrace frame symbol name
  *
- * @param backtrace 	the backtrace handle
+ * @param symbols 		the symbols handle
+ * @param frames 		the backtrace frames
+ * @param nframe 		the backtrace frame count
+ * @param frame 		the backtrace frame index
  *
- * @return 				the frame size
+ * @return 				the symbol name
  */
-tb_size_t 				tb_backtrace_size(tb_handle_t backtrace);
+tb_char_t const* 		tb_backtrace_symbols_name(tb_handle_t symbols, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe);
 
-/*! the backtrace frame address
+/*! exit backtrace frame symbols
  *
- * @param backtrace 	the backtrace handle
- * @param frame 		the frame index
- *
- * @return 				the frame address
+ * @param symbols 		the symbols handle
  */
-tb_cpointer_t 			tb_backtrace_getp(tb_handle_t backtrace, tb_size_t frame);
+tb_void_t 				tb_backtrace_symbols_exit(tb_handle_t symbols);
 
-/*! the backtrace frame symbol name
+/*! dump backtrace
  *
- * @param backtrace 	the backtrace handle
- * @param frame 		the frame index
- *
- * @return 				the frame symbol name
+ * @param prefix 		the backtrace prefix
+ * @param frames 		the backtrace frames, dump the current frames if null
+ * @param nframe 		the backtrace frame count
  */
-tb_char_t const* 		tb_backtrace_name(tb_handle_t backtrace, tb_size_t frame);
+tb_void_t 				tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe);
 
 #endif
