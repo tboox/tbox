@@ -87,9 +87,9 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
-LDFLAGS_RELEASE 	= -s
-LDFLAGS_DEBUG 		= -pg
-LDFLAGS 			= -static
+LDFLAGS_RELEASE 	= -static -s
+LDFLAGS_DEBUG 		= -rdynamic -pg
+LDFLAGS 			= 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o

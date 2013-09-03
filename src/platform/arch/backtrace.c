@@ -30,27 +30,23 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_backtrace_init()
-{
-	tb_trace_noimpl();
-	return tb_null;
-}
-tb_void_t tb_backtrace_exit(tb_handle_t backtrace)
-{
-	tb_trace_noimpl();
-}
-tb_size_t tb_backtrace_size(tb_handle_t backtrace)
+tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
 	tb_trace_noimpl();
 	return 0;
 }
-tb_cpointer_t tb_backtrace_getp(tb_handle_t backtrace, tb_size_t frame)
+tb_handle_t tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe)
 {
 	tb_trace_noimpl();
 	return tb_null;
 }
-tb_char_t const* tb_backtrace_name(tb_handle_t backtrace, tb_size_t frame)
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
 	tb_trace_noimpl();
 	return tb_null;
 }
+tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
+{
+	tb_trace_noimpl();
+}
+
