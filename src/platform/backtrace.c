@@ -17,47 +17,21 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		backtrace.c
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "dynamic.h"
-#include "process.h"
 #include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*!init the platform
- *
- * @return tb_true or tb_false
- */
-tb_bool_t 	tb_platform_init();
-
-/// exit the platform 
-tb_void_t 	tb_platform_exit();
-
+#if defined(TB_CONFIG_LIBC_HAVE_BACKTRACE)
+# 	include "libc/backtrace.c"
+#elif defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/backtrace.c"
+#else
+# 	include "arch/backtrace.c"
 #endif
+
+

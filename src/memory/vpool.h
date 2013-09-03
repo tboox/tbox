@@ -108,6 +108,6 @@ tb_bool_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t 
 #endif
 
 // dump
-tb_void_t 		tb_vpool_dump(tb_handle_t handle);
+tb_void_t 		tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix);
 
 #endif

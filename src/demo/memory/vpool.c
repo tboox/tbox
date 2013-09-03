@@ -42,7 +42,7 @@ end:
 
 	// dump
 #ifdef __tb_debug__
-	tb_vpool_dump(vpool);
+	tb_vpool_dump(vpool, tb_null);
 #endif
 
 	// trace
