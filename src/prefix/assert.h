@@ -36,13 +36,13 @@
  */
 
 // the assert backtrace prefix
-#define TB_ASSERT_BACKTRACE_PREFIX 							"\t"
+#define TB_ASSERT_BACKTRACE_PREFIX 							"    "
 
 // the assert backtrace nframe
 #define TB_ASSERT_BACKTRACE_NFRAME 							(10)
 
 // the assert backtrace dump
-#define tb_assert_backtrace_dump() 							tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, TB_ASSERT_BACKTRACE_NFRAME)
+#define tb_assert_backtrace_dump() 							tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, tb_null, TB_ASSERT_BACKTRACE_NFRAME)
 
 // assert
 #if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
@@ -116,7 +116,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_size_t nframe);
+tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe);
 
 #endif
 

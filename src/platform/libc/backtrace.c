@@ -39,19 +39,25 @@ tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t
 	// note: cannot use assert
 	tb_check_return_val(frames && nframe, 0);
 
-	// backtrace
-	nframe = backtrace(frames, nframe + nskip);
-
-	// skip frames
-	if (nframe)
+	// skip some frames?
+	if (nskip)
 	{
-		nskip = tb_min(nframe, nskip);
-		if (nskip) 
-		{
-			tb_memmov(frames, frames + nskip, (nframe - nskip) * sizeof(tb_cpointer_t));
-			nframe -= nskip;
-		}
+		// init temp frames
+		tb_cpointer_t 	temp[256] = {0};
+		tb_check_return_val(nframe + nskip < 256, 0);
+
+		// done backtrace
+		tb_size_t 		size = backtrace(temp, nframe + nskip);
+		tb_check_return_val(nskip < size, 0);
+
+		// update nframe
+		nframe = tb_min(nframe, size - nskip);
+
+		// save to frames
+		tb_memcpy(frames, temp + nskip, nframe * sizeof(tb_cpointer_t));
 	}
+	// backtrace
+	else nframe = backtrace(frames, nframe);
 
 	// ok?
 	return nframe;
