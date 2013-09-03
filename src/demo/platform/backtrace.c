@@ -10,7 +10,7 @@
 tb_void_t tb_demo_test3();
 tb_void_t tb_demo_test3()
 {
-	tb_backtrace_dump("\t", 10);
+	tb_backtrace_dump("\t", tb_null, 10);
 }
 static tb_void_t tb_demo_test2()
 {

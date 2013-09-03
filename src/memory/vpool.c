@@ -29,6 +29,7 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -95,6 +96,8 @@ typedef struct __tb_vpool_block_t
 	/// the func
 	tb_char_t const* 	func;
 
+	/// the frames
+	tb_cpointer_t 		frames[5];
 #endif
 
 }tb_vpool_block_t;
@@ -523,6 +526,10 @@ end:
 		// set func
 		block->func = func;
 
+		// set frames
+		tb_size_t nframe = tb_backtrace_frames(block->frames, tb_arrayn(block->frames), 5);
+		if (nframe < tb_arrayn(block->frames)) tb_memset(block->frames, 0, (tb_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
+
 		// update the used size
 		vpool->info.used += block->size;
 
@@ -700,6 +707,16 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	{
 		// trace
 		tb_trace("vpool: double free at %s(): %d, file: %s", block->func, block->line, block->file);
+
+		// dump frames
+		{
+			// the frames count
+			tb_size_t nframe = 0;
+			while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
+
+			// dump backtrace
+			tb_backtrace_dump("vpool:     ", block->frames, nframe);
+		}
 		return tb_true;
 	}
 	tb_assert_and_check_return_val(!block->free, tb_true);
@@ -770,6 +787,20 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 						, prev->line
 						, prev->file
 						);
+
+				// dump frames
+				{
+					// the backtrace prefix 
+					tb_char_t backtrace_prefix[64] = {0};
+					tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
+
+					// the frames count
+					tb_size_t nframe = 0;
+					while (nframe < tb_arrayn(prev->frames) && prev->frames[nframe]) nframe++;
+
+					// dump backtrace
+					tb_backtrace_dump(backtrace_prefix, prev->frames, nframe);
+				}
 			}
 
 			// out of range
@@ -780,6 +811,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 		// no free?
 		if (!block->free)
 		{
+			// dump leak
 			tb_print("%s: block[%lu]: data: %p size: %lu free: %lu at %s(): %d, file: %s"
 					, prefix
 					, i++
@@ -790,6 +822,20 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 					, block->line
 					, block->file
 					);
+
+			// dump frames
+			{
+				// the backtrace prefix 
+				tb_char_t backtrace_prefix[64] = {0};
+				tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
+
+				// the frames count
+				tb_size_t nframe = 0;
+				while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
+
+				// dump backtrace
+				tb_backtrace_dump(backtrace_prefix, block->frames, nframe);
+			}
 
 			// leak
 			ok = tb_false;			
