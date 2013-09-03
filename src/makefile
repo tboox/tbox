@@ -380,6 +380,7 @@ INC_FILES 				= \
 						utils/option.h \
 						utils/crc.h \
 						utils/url.h \
+						utils/dump.h \
 						utils/base32.h \
 						utils/base64.h \
 						utils/opt/bits_x86.h \
