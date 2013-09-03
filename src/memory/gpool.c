@@ -354,6 +354,6 @@ tb_void_t tb_gpool_dump(tb_handle_t handle)
 	if (gpool->tpool) tb_tpool_dump(gpool->tpool);
 
 	// dump vpool
-	tb_vpool_dump(gpool->vpool);
+	tb_vpool_dump(gpool->vpool, "gpool");
 }
 #endif

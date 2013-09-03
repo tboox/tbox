@@ -216,6 +216,7 @@ tbox_C_FILES 			+= \
 						platform/printf \
 						platform/tstore \
 						platform/platform \
+						platform/backtrace \
 						platform/$(TB_CONFIG_API_DNS)/dns \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
@@ -332,6 +333,7 @@ INC_FILES 				= \
 						platform/atomic.h \
 						platform/directory.h \
 						platform/exception.h \
+						platform/backtrace.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \

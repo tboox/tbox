@@ -30,7 +30,7 @@ end:
 
 	// dump
 #ifdef __tb_debug__
-//	tb_spool_dump(spool);
+//	tb_spool_dump(spool, tb_null);
 #endif
 
 	// trace

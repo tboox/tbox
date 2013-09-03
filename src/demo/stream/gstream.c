@@ -71,14 +71,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		// init option
 		option = tb_option_init("gstream", "the gstream demo", g_options);
 		tb_assert_and_check_break(option);
-
+	
 		// done option
 		if (tb_option_done(option, argc - 1, &argv[1]))
 		{
 			// debug & verbose
 			tb_bool_t debug = tb_option_find(option, "debug");
 			tb_bool_t verbose = tb_option_find(option, "no-verbose")? tb_false : tb_true;
-			
+		
 			// done url
 			if (tb_option_find(option, "url")) 
 			{

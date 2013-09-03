@@ -162,7 +162,7 @@ tb_void_t tb_opool_dump()
 	if (g_mutx) tb_mutex_enter(g_mutx);
 
 	// dump
-	if (g_pool) tb_spool_dump(g_pool);
+	if (g_pool) tb_spool_dump(g_pool, "opool");
 
 	// leave
 	if (g_mutx) tb_mutex_leave(g_mutx);

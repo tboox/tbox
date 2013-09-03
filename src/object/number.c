@@ -239,7 +239,7 @@ static tb_object_t* tb_number_read_xml(tb_object_xml_reader_t* reader, tb_size_t
 				}
 				
 				// number
-#ifdef TB_NUMBER_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_FLOAT
 				if (f) number = tb_number_init_from_double(tb_atof(text));
 #else
 				if (f) tb_trace_noimpl();
@@ -496,7 +496,7 @@ static tb_object_t* tb_number_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 	tb_trace_impl("number: %s", tb_sstring_cstr(&data));
 
 	// init number 
-#ifdef TB_NUMBER_TYPE_FLOAT
+#ifdef TB_CONFIG_TYPE_FLOAT
 	if (bf) number = tb_number_init_from_float(tb_stof(tb_sstring_cstr(&data)));
 #else
 	if (bf) tb_trace_noimpl();

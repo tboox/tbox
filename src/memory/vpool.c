@@ -728,25 +728,16 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 
 
 #ifdef __tb_debug__
-tb_void_t tb_vpool_dump(tb_handle_t handle)
+tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;
 	tb_assert_and_check_return(vpool);
 
+	// prefix
+	if (!prefix) prefix = "vpool";
+
 	// dump
 	tb_print("======================================================================");
-	tb_print("vpool: magic: %#lx",	vpool->magic);
-	tb_print("vpool: nhead: %lu", 	vpool->nhead);
-	tb_print("vpool: align: %lu", 	vpool->align);
-	tb_print("vpool: head: %lu", 	vpool->data - (tb_byte_t*)vpool);
-	tb_print("vpool: data: %p", 	vpool->data);
-	tb_print("vpool: size: %lu", 	vpool->size);
-	tb_print("vpool: full: %lu", 	vpool->full);
-	tb_print("vpool: used: %lu", 	vpool->info.used);
-	tb_print("vpool: peak: %lu", 	vpool->info.peak);
-	tb_print("vpool: wast: %lu%%", 	(vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
-	tb_print("vpool: fail: %lu", 	vpool->info.fail);
-	tb_print("vpool: pred: %lu%%", 	vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
 
 	// walk
 	tb_size_t 			i = 0;
@@ -755,6 +746,8 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 	tb_size_t 			nhead = vpool->nhead;
 	tb_vpool_block_t* 	prev = tb_null;
 	tb_size_t 			prev_i = 0;
+	tb_bool_t 			ok = tb_true;
+	tb_size_t 			frag = 0;
 	while (pb + nhead < pe)
 	{
 		// the block
@@ -764,10 +757,11 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 		if (block->magic != TB_VPOOL_MAGIC)
 		{
 			// trace
-			tb_print("\tvpool: out of range!");
+			tb_print("%s: out of range!", prefix);
 			if (prev)
 			{
-				tb_print("\tvpool: block[%lu]: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+				tb_print("%s: block[%lu]: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+						, prefix
 						, prev_i
 						, (tb_byte_t const*)prev + nhead
 						, prev->size
@@ -777,13 +771,17 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 						, prev->file
 						);
 			}
+
+			// out of range
+			ok = tb_false;
 			break;
 		}
 
 		// no free?
 		if (!block->free)
 		{
-			tb_print("\tvpool: block[%lu]: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+			tb_print("%s: block[%lu]: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+					, prefix
 					, i++
 					, pb + nhead
 					, block->size
@@ -792,21 +790,45 @@ tb_void_t tb_vpool_dump(tb_handle_t handle)
 					, block->line
 					, block->file
 					);
+
+			// leak
+			ok = tb_false;			
 		}
 		else
 		{
-			tb_print("\tvpool: block[%lu]: data: %p size: %lu free: %lu"
+#if 0
+			
+			tb_print("%s: block[%lu]: data: %p size: %lu free: %lu"
+					, prefix
 					, i++
 					, pb + nhead
 					, block->size
 					, 1
 					);
+#endif
 		}
 
 		// next
 		pb += nhead + block->size;
 		prev = block;
 		prev_i = i - 1;
+		frag++;
 	}
+
+	// dump 
+	if (!ok) tb_print("");
+//	tb_print("%s: magic: %#lx",		prefix, vpool->magic);
+//	tb_print("%s: nhead: %lu", 		prefix, vpool->nhead);
+	tb_print("%s: align: %lu", 		prefix, vpool->align);
+//	tb_print("%s: head: %lu", 		prefix, vpool->data - (tb_byte_t*)vpool);
+//	tb_print("%s: data: %p", 		prefix, vpool->data);
+	tb_print("%s: size: %lu", 		prefix, vpool->size);
+	tb_print("%s: full: %s", 		prefix, vpool->full? "true" : "false");
+	tb_print("%s: used: %lu", 		prefix, vpool->info.used);
+	tb_print("%s: peak: %lu", 		prefix, vpool->info.peak);
+	tb_print("%s: wast: %lu%%", 	prefix, (vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
+	tb_print("%s: fail: %lu", 		prefix, vpool->info.fail);
+	tb_print("%s: pred: %lu%%", 	prefix, vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
+	tb_print("%s: frag: %lu", 		prefix, frag);
 }
 #endif

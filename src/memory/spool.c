@@ -605,25 +605,30 @@ tb_bool_t tb_spool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 }
 
 #ifdef __tb_debug__
-tb_void_t tb_spool_dump(tb_handle_t handle)
+tb_void_t tb_spool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {
 	// check 
 	tb_spool_t* spool = (tb_spool_t*)handle;
 	tb_assert_and_check_return(spool && spool->pools);
 
+	// prefix
+	if (!prefix) prefix = "spool";
+
+#if 0
 	tb_print("======================================================================");
-	tb_print("spool: align: %lu", 	spool->align);
-	tb_print("spool: pooln: %lu", 	spool->pooln);
-	tb_print("spool: poolm: %lu", 	spool->poolm);
-	tb_print("spool: grow: %lu", 	spool->grow);
-	tb_print("spool: pred: %lu%%", 	spool->info.aloc? ((spool->info.pred * 100) / spool->info.aloc) : 0);
+	tb_print("%s: align: %lu", 		prefix, spool->align);
+	tb_print("%s: pooln: %lu", 		prefix, spool->pooln);
+	tb_print("%s: poolm: %lu", 		prefix, spool->poolm);
+	tb_print("%s: grow: %lu", 		prefix, spool->grow);
+	tb_print("%s: pred: %lu%%", 	prefix, spool->info.aloc? ((spool->info.pred * 100) / spool->info.aloc) : 0);
+#endif
 
 	tb_size_t i = 0;
 	tb_size_t n = spool->pooln;
 	for (i = 0; i < n; i++)
 	{
 		tb_handle_t vpool = spool->pools[i].pool;
-		if (vpool) tb_vpool_dump(vpool);
+		if (vpool) tb_vpool_dump(vpool, prefix);
 	}
 }
 #endif
