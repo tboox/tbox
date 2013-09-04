@@ -75,9 +75,6 @@ tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t
 				func(GetCurrentProcess(), tb_null, TRUE);
 				init = tb_true;
 			}
-
-			// exit dynamic
-			FreeLibrary(library);
 		}
 	}
 
@@ -136,7 +133,6 @@ tb_void_t tb_backtrace_symbols_exit(tb_handle_t handle)
 	tb_symbols_t* symbols = (tb_symbols_t*)handle;
 	if (symbols) 
 	{
-		if (symbols->library) FreeLibrary(symbols->library);
 		if (symbols->symbol) free(symbols->symbol);
 		free(symbols);
 	}
