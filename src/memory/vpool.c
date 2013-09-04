@@ -97,7 +97,7 @@ typedef struct __tb_vpool_block_t
 	tb_char_t const* 	func;
 
 	/// the frames
-	tb_cpointer_t 		frames[5];
+	tb_cpointer_t 		frames[16];
 #endif
 
 }tb_vpool_block_t;
