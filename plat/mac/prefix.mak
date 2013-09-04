@@ -108,9 +108,9 @@ MMFLAGS_DEBUG 		=
 MMFLAGS 			=
 
 # ldflags
-LDFLAGS_RELEASE 	= -s
-LDFLAGS_DEBUG 		= 
-LDFLAGS 			= $(ARCH_LDFLAGS)
+LDFLAGS_RELEASE 	= -static -s
+LDFLAGS_DEBUG 		= -rdynamic -pg
+LDFLAGS 			= 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
