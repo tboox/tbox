@@ -708,6 +708,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		// trace
 		tb_trace("vpool: double free at %s(): %d, file: %s", block->func, block->line, block->file);
 
+#ifdef __tb_debug__
 		// dump frames
 		{
 			// the frames count
@@ -717,6 +718,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 			// dump backtrace
 			tb_backtrace_dump("vpool:     ", block->frames, nframe);
 		}
+#endif
 		return tb_true;
 	}
 	tb_assert_and_check_return_val(!block->free, tb_true);
