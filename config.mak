@@ -19,7 +19,7 @@ PLAT = mingw
 ARCH = x86
 
 # demo
-DEMO = y
+DEMO = n
 
 # toolchain
 SDK = 6.1
