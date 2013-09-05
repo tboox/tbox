@@ -33,17 +33,45 @@
  * interfaces
  */
 
-/// the finder
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
+/*! the finder
+ *
+ * @param iterator 	the iterator
+ * @param head 		the iterator head
+ * @param tail 		the iterator tail
+ * @param data 		the finded data
+ *
+ * @return 			the iterator itor
+ */
+tb_size_t 			tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
 
-// the finder for all
-tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
+/*! the finder for all
+ *
+ * @param iterator 	the iterator
+ * @param data 		the finded data
+ *
+ * @return 			the iterator itor
+ */
+tb_size_t 			tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
 
-/// the binary finder for ascending
-tb_size_t tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
+/*! the binary finder for ascending
+ *
+ * @param iterator 	the iterator
+ * @param head 		the iterator head
+ * @param tail 		the iterator tail
+ * @param data 		the finded data
+ *
+ * @return 			the iterator itor
+ */
+tb_size_t 			tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
 
-/// the binary finder for all
-tb_size_t tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
+/*! the binary finder for all
+ *
+ * @param iterator 	the iterator
+ * @param data 		the finded data
+ *
+ * @return 			the iterator itor
+ */
+tb_size_t 			tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t data);
 
 
 #endif
