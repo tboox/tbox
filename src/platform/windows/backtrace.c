@@ -34,14 +34,18 @@
  */
 
 // the dynamic func
-typedef BOOL WINAPI (*tb_SymInitialize_t)(HANDLE hProcess, PCTSTR UserSearchPath, BOOL fInvadeProcess);
-typedef BOOL WINAPI (*tb_SymFromAddr_t)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
+typedef BOOL WINAPI 	(*tb_SymInitialize_t)(HANDLE hProcess, PCTSTR UserSearchPath, BOOL fInvadeProcess);
+typedef BOOL WINAPI 	(*tb_SymFromAddr_t)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
+typedef DWORD WINAPI 	(*tb_SymSetOptions_t)(DWORD SymOptions);
 
 // the symbols type
 typedef struct __tb_symbols_t
 {
-	// the symbol func
-	tb_SymFromAddr_t 	func;
+	// SymFromAddr
+	tb_SymFromAddr_t 	pSymFromAddr;
+
+	// SymSetOptions
+	tb_SymSetOptions_t 	pSymSetOptions;
 
 	// the dynamic library
 	HANDLE 				library;
@@ -94,20 +98,24 @@ tb_handle_t tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe)
 	tb_check_return_val(symbols, tb_null);
 
 	// make symbol
-	symbols->symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 4096 * sizeof(tb_char_t), 1);
+	symbols->symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(tb_char_t), 1);
 	tb_check_goto(symbols->symbol, fail);
 
 	// init symbol
-	symbols->symbol->MaxNameLen = 4095;
+	symbols->symbol->MaxNameLen = MAX_SYM_NAME;
 	symbols->symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
 	// init dynamic
 	symbols->library = LoadLibraryExA("dbghelp.dll", tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
 	tb_check_goto(symbols->library, fail);
 
-	// init func
-	symbols->func = (tb_SymFromAddr_t)GetProcAddress(symbols->library, "SymFromAddr");
-	tb_check_goto(symbols->func, fail);
+	// init SymFromAddr
+	symbols->pSymFromAddr = (tb_SymFromAddr_t)GetProcAddress(symbols->library, "SymFromAddr");
+	tb_check_goto(symbols->pSymFromAddr, fail);
+
+	// init SymSetOptions
+	symbols->pSymSetOptions = (tb_SymSetOptions_t)GetProcAddress(symbols->library, "SymSetOptions");
+	tb_check_goto(symbols->pSymSetOptions, fail);
 
 	// ok
 	return symbols;
@@ -120,10 +128,10 @@ tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_cpointer_t* fr
 {
 	// check
 	tb_symbols_t* symbols = (tb_symbols_t*)handle;
-	tb_check_return_val(symbols && symbols->func && symbols->symbol && frames && nframe && iframe < nframe, tb_null);
+	tb_check_return_val(symbols && symbols->pSymFromAddr && symbols->symbol && frames && nframe && iframe < nframe, tb_null);
 
 	// done symbol
-	if (!symbols->func(GetCurrentProcess(), (DWORD64)(frames[iframe]), 0, symbols->symbol)) return tb_null;
+	if (!symbols->pSymFromAddr(GetCurrentProcess(), (DWORD64)(frames[iframe]), 0, symbols->symbol)) return tb_null;
 	
 	// the symbol name
 	return symbols->symbol->Name;
