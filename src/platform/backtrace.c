@@ -61,7 +61,11 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_s
 			tb_size_t i = 0;
 			for (i = 0; i < nframe; i++)
 			{
-				tb_print("%s[%p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+#if TB_CPU_BIT64
+				tb_print("%s[%016p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+#else
+				tb_print("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+#endif
 			}
 		
 			// exit symbols
@@ -73,7 +77,11 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_s
 			tb_size_t i = 0;
 			for (i = 0; i < nframe; i++)
 			{
-				tb_print("%s[%p]", prefix? prefix : "", frames[i]);
+#if TB_CPU_BIT64
+				tb_print("%s[%016p]", prefix? prefix : "", frames[i]);
+#else
+				tb_print("%s[%08p]", prefix? prefix : "", frames[i]);
+#endif				
 			}
 		}
 	}
