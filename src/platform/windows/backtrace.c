@@ -71,13 +71,19 @@ tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t
 		HANDLE library = LoadLibraryExA("dbghelp.dll", tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
 		if (library)
 		{
-			// init func
-			tb_SymInitialize_t func = (tb_SymInitialize_t)GetProcAddress(library, "SymInitialize");
-			if (func)
+			// init SymInitialize
+			tb_SymInitialize_t pSymInitialize = (tb_SymInitialize_t)GetProcAddress(library, "SymInitialize");
+			if (pSymInitialize)
 			{
+#if 0
+				// init options
+				tb_SymSetOptions_t pSymSetOptions = (tb_SymSetOptions_t)GetProcAddress(library, "SymSetOptions");
+				if (pSymSetOptions) pSymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
+#endif
+
 				// init symbols
-				func(GetCurrentProcess(), tb_null, TRUE);
-				init = tb_true;
+				if (pSymInitialize(GetCurrentProcess(), tb_null, TRUE))
+					init = tb_true;
 			}
 		}
 	}
