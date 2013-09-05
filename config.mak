@@ -13,19 +13,19 @@ DTYPE = d
 SMALL = y
 
 # platform
-PLAT = ios
+PLAT = mac
 
 # architecture
-ARCH = armv7
+ARCH = x64
 
 # demo
-DEMO = y
+DEMO = n
 
 # toolchain
-SDK = 6.1
+SDK =
 NDK =
 BIN =
-PRE = xcrun -sdk iphoneos
+PRE =
 HOST = linux
 CCACHE = ccache
 DISTCC =
