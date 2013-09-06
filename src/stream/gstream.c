@@ -1563,6 +1563,7 @@ tb_bool_t tb_gstream_bwrit_s64_be(tb_gstream_t* gst, tb_sint64_t val)
 }
 tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 {
+	// check
 	tb_assert_and_check_return_val(gst && ist, 0);	
 
 	// read data
@@ -1600,6 +1601,7 @@ tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 
 	} while(1);
 
+	// ok?
 	return read;
 }
 tb_hize_t tb_gstream_save(tb_gstream_t* gst, tb_gstream_t* ost)
