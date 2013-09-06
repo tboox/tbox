@@ -8,7 +8,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * test
  */
-static tb_cpointer_t tb_exception_test(tb_cpointer_t data)
+tb_cpointer_t tb_exception_test(tb_cpointer_t data);
+tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 {
 	// self
 	tb_handle_t self = tb_thread_self();
