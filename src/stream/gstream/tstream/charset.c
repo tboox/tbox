@@ -100,7 +100,7 @@ static tb_bool_t tb_cstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, cmd, args);
 }
-static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_bool_t sync)
+static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_long_t sync)
 {
 	tb_cstream_t* cst = tb_cstream_cast(gst);
 	tb_tstream_t* tst = tb_tstream_cast(gst);

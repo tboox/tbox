@@ -36,11 +36,30 @@
  * interfaces
  */
 
-// open & close
+/*! init zip
+ *
+ * @param algo 		the zip zlgo
+ * @param action 	the zip action
+ *
+ * @return 			the zip
+ */
 tb_zip_t* 			tb_zip_init(tb_size_t algo, tb_size_t action);
+
+/*! exit zip
+ *
+ * @param zip 		the zip
+ */
 tb_void_t 			tb_zip_exit(tb_zip_t* zip);
 
-// spak
-tb_long_t 			tb_zip_spak(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_bool_t sync);
+/*! spak
+ *
+ * @param zip 		the zip
+ * @param ist 		the input stream
+ * @param ost 		the output stream
+ * @param sync 		sync? 1: sync, 0: no sync, -1: end
+ *
+ * @return 			1: ok, 0: continue, -1: end
+ */
+tb_long_t 			tb_zip_spak(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_long_t sync);
 
 #endif

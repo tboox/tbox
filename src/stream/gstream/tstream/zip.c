@@ -129,7 +129,7 @@ static tb_bool_t tb_zstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
 	// routine to tstream 
 	return tb_tstream_ctrl(gst, ctrl, args);
 }
-static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_bool_t sync)
+static tb_long_t tb_zstream_spak(tb_gstream_t* gst, tb_long_t sync)
 {
 	// check
 	tb_zstream_t* zst = tb_zstream_cast(gst);
