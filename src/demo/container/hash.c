@@ -516,7 +516,7 @@ static tb_void_t tb_hash_test_walk_perf()
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
+	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 #if 1
 	tb_hash_test_s2i_func();

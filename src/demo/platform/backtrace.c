@@ -10,7 +10,10 @@
 tb_void_t tb_demo_test3();
 tb_void_t tb_demo_test3()
 {
-	tb_backtrace_dump("\t", tb_null, 10);
+	tb_cpointer_t data = tb_malloc0(10);
+	tb_memset(data, 0, 11);
+	tb_free(data);
+//	tb_backtrace_dump("\t", tb_null, 10);
 }
 static tb_void_t tb_demo_test2()
 {
