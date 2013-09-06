@@ -35,7 +35,7 @@
  * types
  */
 
-/*!the single list type
+/*! the single list type
  *
  * <pre>
  * slist: |-----| => |-------------------------------------------------=> |------| => |------| => null
@@ -100,49 +100,271 @@ typedef struct __tb_slist_t
  * interfaces
  */
 
-// init & exit
+/*! init slist
+ *
+ * @param grow 		the item grow
+ * @param func 		the item func
+ *
+ * @return 			the slist
+ */
 tb_slist_t* 		tb_slist_init(tb_size_t grow, tb_item_func_t func);
+
+/*! exit slist
+ *
+ * @param slist 	the slist
+ */
 tb_void_t 			tb_slist_exit(tb_slist_t* slist);
 
-// accessors & modifiors
+/*! the slist head item
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the head item
+ */
 tb_pointer_t 		tb_slist_head(tb_slist_t* slist);
+
+/*! the slist last item
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the last item
+ */
 tb_pointer_t 		tb_slist_last(tb_slist_t* slist);
 
+/*! clear slist
+ *
+ * @param slist 	the slist
+ */
 tb_void_t 			tb_slist_clear(tb_slist_t* slist);
 
+/*! insert the next item
+ *
+ * @param slist 	the slist
+ * @param itor 		the prev item itor
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_insert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data);
+
+/*! insert the next item
+ *
+ * @param slist 	the slist
+ * @param itor 		the prev item itor
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data);
+
+/*! insert the head item
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_insert_head(tb_slist_t* slist, tb_cpointer_t data);
+
+/*! insert the tail item
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t data);
 
+/*! insert the next items
+ *
+ * @param slist 	the slist
+ * @param itor 		the prev item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_ninsert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the next items
+ *
+ * @param slist 	the slist
+ * @param itor 		the prev item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the head items
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_ninsert_head(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the tail items
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_ninsert_tail(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size);
 
+/*! replace the item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data);
+
+/*! replace the head item
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_replace_head(tb_slist_t* slist, tb_cpointer_t data);
+
+/*! replace the tail item
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ *
+ * @return 			the item itor
+ */
 tb_size_t 			tb_slist_replace_last(tb_slist_t* slist, tb_cpointer_t data);
 
+/*! replace the items
+ *
+ * @param slist 	the slist
+ * @param itor 		the first item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_nreplace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! replace the head items
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_nreplace_head(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size);
+
+/*! replace the tail items
+ *
+ * @param slist 	the slist
+ * @param data 		the item data
+ * @param size 		the item count
+ *
+ * @return 			the first item itor
+ */
 tb_size_t 			tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size);
 
+/*! remove the next item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ *
+ * @return 			the prev item itor
+ */
 tb_size_t 			tb_slist_remove(tb_slist_t* slist, tb_size_t itor);
+
+/*! remove the next item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ *
+ * @return 			the prev item itor
+ */
 tb_size_t 			tb_slist_remove_next(tb_slist_t* slist, tb_size_t itor);
+
+/*! remove the head item
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the head item itor
+ */
 tb_size_t 			tb_slist_remove_head(tb_slist_t* slist);
+
+/*! remove the last item
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the last item itor
+ */
 tb_size_t 			tb_slist_remove_last(tb_slist_t* slist);
 
+/*! remove the next items
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ * @param size 		the item count
+ *
+ * @return 			the prev item itor
+ */
 tb_size_t 			tb_slist_nremove(tb_slist_t* slist, tb_size_t itor, tb_size_t size);
+
+/*! remove the next items
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ * @param size 		the item count
+ *
+ * @return 			the prev item itor
+ */
 tb_size_t 			tb_slist_nremove_next(tb_slist_t* slist, tb_size_t itor, tb_size_t size);
+
+/*! remove the head items
+ *
+ * @param slist 	the slist
+ * @param size 		the item count
+ *
+ * @return 			the head item itor
+ */
 tb_size_t 			tb_slist_nremove_head(tb_slist_t* slist, tb_size_t size);
+
+/*! remove the last items
+ *
+ * @param slist 	the slist
+ * @param size 		the item count
+ *
+ * @return 			the last item itor
+ */
 tb_size_t 			tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size);
 
-// attributes
+/*! the item count
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the item count
+ */
 tb_size_t 			tb_slist_size(tb_slist_t const* slist);
+
+/*! the item max count
+ *
+ * @param slist 	the slist
+ *
+ * @return 			the item max count
+ */
 tb_size_t 			tb_slist_maxn(tb_slist_t const* slist);
 
-/*!walk
+/*! walk list items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
@@ -165,6 +387,10 @@ tb_size_t 			tb_slist_maxn(tb_slist_t const* slist);
  * 		return tb_false;
  * }
  * @endcode
+ *
+ * @param slist 	the slist
+ * @param func 		the walk func
+ * @param data 		the walk data
  *
  */
 tb_void_t 			tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
