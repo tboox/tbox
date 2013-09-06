@@ -143,6 +143,48 @@ typedef struct __tb_vpool_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifdef __tb_debug__
+// dump backtrace
+static tb_void_t tb_vpool_dump_backtrace(tb_char_t const* prefix, tb_vpool_block_t* block)
+{
+	if (block)
+	{
+		// the frames count
+		tb_size_t nframe = 0;
+		while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
+
+		// dump backtrace
+		tb_backtrace_dump(prefix, block->frames, nframe);
+	}
+}
+static tb_vpool_block_t* tb_vpool_find_out_of_range(tb_vpool_t* vpool)
+{
+	// check
+	tb_assert_and_check_return(vpool);
+
+	// walk
+	tb_byte_t* 			pb = vpool->data;
+	tb_byte_t* 			pe = pb + vpool->size;
+	tb_size_t 			nhead = vpool->nhead;
+	tb_vpool_block_t* 	prev = tb_null;
+	while (pb + nhead < pe)
+	{
+		// the block
+		tb_vpool_block_t* block = (tb_vpool_block_t*)pb;
+
+		// out of range?
+		if (block->magic != TB_VPOOL_MAGIC || block->size >= vpool->size)
+			return prev;	
+
+		// next
+		pb += nhead + block->size;
+		prev = block;
+	}
+
+	// no find
+	return tb_null;
+}
+#endif
 // malloc from the given data address
 static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)
 {
@@ -167,8 +209,8 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	tb_assert(!((tb_size_t)data & (vpool->align - 1)));
 
 	// find the free block
-	tb_size_t 	maxn = 1;
-	tb_byte_t* 	pred = tb_null;
+	tb_size_t 			maxn = 1;
+	tb_byte_t* 			pred = tb_null;
 	while (p + nhead < pe && tryn)
 	{
 		// the block
@@ -178,6 +220,27 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 		// allocate if the block is free
 		if (block->free)
 		{
+			// out of range?
+#ifdef __tb_debug__
+			if (block->magic != TB_VPOOL_MAGIC || bsize >= vpool->size) 
+			{
+				// trace
+				tb_trace("vpool: out of range");
+
+				// find the previous block
+				tb_vpool_block_t* prev = tb_vpool_find_out_of_range(vpool);
+
+				// dump backtrace
+				if (prev) tb_vpool_dump_backtrace("vpool:     ", prev);
+
+				// abort
+				tb_abort();
+				return tb_false;
+			}
+#else
+			tb_check_abort(bsize < vpool->size);
+#endif
+
 			// predict the max free block
 			if (bsize > maxn) 
 			{
@@ -509,6 +572,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	vpool->info.fail = 0;
 	vpool->info.pred = 0;
 	vpool->info.aloc = 0;
+	if (vpool->nhead < vpool->size) tb_memset(vpool->data + vpool->nhead, 0xcc, vpool->size - vpool->nhead);
 #endif
 
 	// ok
@@ -718,9 +782,26 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	tb_size_t 			bsize = block->size;
 #endif
 
-	// check block
-	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, tb_false);
-	tb_assert_and_check_return_val(block->size < vpool->size, tb_false);
+	// out of range?
+#ifdef __tb_debug__
+	if (block->magic != TB_VPOOL_MAGIC || block->size >= vpool->size) 
+	{
+		// trace
+		tb_trace("vpool: out of range");
+
+		// find the previous block
+		tb_vpool_block_t* prev = tb_vpool_find_out_of_range(vpool);
+
+		// dump backtrace
+		if (prev) tb_vpool_dump_backtrace("vpool:     ", prev);
+
+		// abort
+		tb_abort();
+		return tb_false;
+	}
+#else
+	tb_check_abort(block->size < vpool->size);
+#endif
 
 	// double free?
 	if (block->free)
@@ -729,22 +810,36 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		tb_trace("vpool: double free at %s(): %d, file: %s", block->func, block->line, block->file);
 
 #ifdef __tb_debug__
-		// dump frames
-		{
-			// the frames count
-			tb_size_t nframe = 0;
-			while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
-
-			// dump backtrace
-			tb_backtrace_dump("vpool:     ", block->frames, nframe);
-		}
+		// dump backtrace
+		tb_vpool_dump_backtrace("vpool:     ", block);
 #endif
+
 		return tb_true;
 	}
 	tb_assert_and_check_return_val(!block->free, tb_true);
 
-	// merge it if the next block is free
+	// check the next block
 	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
+
+#ifdef __tb_debug__
+	// out of range?
+	if (next->magic != TB_VPOOL_MAGIC || next->size >= vpool->size) 
+	{
+		// trace
+		tb_trace("vpool: out of range at %s(): %d, file: %s", block->func, block->line, block->file);
+
+		// dump backtrace
+		tb_vpool_dump_backtrace("vpool:     ", block);
+
+		// abort
+		tb_abort();
+		return tb_false;
+	}
+#else
+	tb_check_abort(next->size < vpool->size);
+#endif
+
+	// merge it if the next block is free
 	if (next->free) block->size += nhead + next->size;
 
 	// free it
@@ -759,6 +854,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	// update the info
 #ifdef __tb_debug__
 	vpool->info.used -= bsize;
+	if (block->size) tb_memset(p, 0xcc, block->size);
 #endif
 
 	// ok
@@ -816,12 +912,8 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 					tb_char_t backtrace_prefix[64] = {0};
 					tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
 
-					// the frames count
-					tb_size_t nframe = 0;
-					while (nframe < tb_arrayn(prev->frames) && prev->frames[nframe]) nframe++;
-
 					// dump backtrace
-					tb_backtrace_dump(backtrace_prefix, prev->frames, nframe);
+					tb_vpool_dump_backtrace(backtrace_prefix, prev);
 				}
 			}
 
@@ -851,12 +943,8 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 				tb_char_t backtrace_prefix[64] = {0};
 				tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
 
-				// the frames count
-				tb_size_t nframe = 0;
-				while (nframe < tb_arrayn(block->frames) && block->frames[nframe]) nframe++;
-
 				// dump backtrace
-				tb_backtrace_dump(backtrace_prefix, block->frames, nframe);
+				tb_vpool_dump_backtrace(backtrace_prefix, block);
 			}
 
 			// leak
