@@ -39,7 +39,7 @@ static __tb_inline__ tb_zip_zlibraw_t* tb_zip_zlibraw_cast(tb_zip_t* zip)
 	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_ZLIBRAW, tb_null);
 	return (tb_zip_zlibraw_t*)zip;
 }
-static tb_long_t tb_zip_zlibraw_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_bool_t sync)
+static tb_long_t tb_zip_zlibraw_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_long_t sync)
 {
 	tb_zip_zlibraw_t* zlibraw = tb_zip_zlibraw_cast(zip);
 	tb_assert_and_check_return_val(zlibraw && ist && ost, -1);
@@ -62,9 +62,9 @@ static tb_long_t tb_zip_zlibraw_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, t
 	zlibraw->zst.avail_out = (uInt)(oe - op);
 
 	// deflate 
-	tb_int_t r = deflate(&zlibraw->zst, sync? Z_SYNC_FLUSH : Z_NO_FLUSH);
+	tb_int_t r = deflate(&zlibraw->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	tb_trace_impl("deflate: %u => %u, sync: %u", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
+	tb_trace_impl("deflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
 
 	// update 
 	ist->p = (tb_byte_t*)zlibraw->zst.next_in;
@@ -76,7 +76,7 @@ static tb_long_t tb_zip_zlibraw_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, t
 	// ok?
 	return (ost->p - op);
 }
-static tb_long_t tb_zip_zlibraw_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_bool_t sync)
+static tb_long_t tb_zip_zlibraw_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_long_t sync)
 {
 	tb_zip_zlibraw_t* zlibraw = tb_zip_zlibraw_cast(zip);
 	tb_assert_and_check_return_val(zlibraw && ist && ost, -1);
@@ -99,9 +99,9 @@ static tb_long_t tb_zip_zlibraw_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, t
 	zlibraw->zst.avail_out = (uInt)(oe - op);
 
 	// inflate 
-	tb_int_t r = inflate(&zlibraw->zst, sync? Z_SYNC_FLUSH : Z_NO_FLUSH);
+	tb_int_t r = inflate(&zlibraw->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	tb_trace_impl("inflate: %u => %u, sync: %u", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
+	tb_trace_impl("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)zlibraw->zst.next_out - op, sync);
 
 	// update 
 	ist->p = (tb_byte_t*)zlibraw->zst.next_in;

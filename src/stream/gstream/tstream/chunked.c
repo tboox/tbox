@@ -98,7 +98,7 @@ static tb_long_t tb_kstream_aclose(tb_gstream_t* gst)
  * ---------------------- ------------------------- ---------
  *        chunk0                  chunk1               end
  */
-static tb_long_t tb_kstream_spak(tb_gstream_t* gst, tb_bool_t sync)
+static tb_long_t tb_kstream_spak(tb_gstream_t* gst, tb_long_t sync)
 {
 	// check
 	tb_kstream_t* kst = tb_kstream_cast(gst);

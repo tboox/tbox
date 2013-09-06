@@ -234,7 +234,7 @@ tb_long_t tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, t
 	{
 		// spak it
 		tb_assert_and_check_return_val(!tst->on && tst->op == tst->ob, -1);
-		if (tst->spak(gst, tst->read < 0? tb_true : sync) < 0) return -1;
+		if (tst->spak(gst, (tb_long_t)((tst->read < 0)? -1 : (sync? 1 : 0))) < 0) return -1;
 		tb_trace_impl("spak: %lu, left: %lu", tst->on, tst->in);
 	}
 

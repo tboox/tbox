@@ -17,20 +17,22 @@ static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* l
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// create stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_DEFLATE);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_DEFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_DEFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_DEFLATE);
 	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);	
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_INFLATE);
-	//tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_DEFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_GZIP, TB_ZIP_ACTION_DEFLATE);	
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_INFLATE);
+//	tb_gstream_t* zst = tb_gstream_init_from_zip(ist, TB_ZIP_ALGO_ZLIBRAW, TB_ZIP_ACTION_DEFLATE);
 
+	// check
 	if (!ist || !ost || !zst) goto end;
 
 	// init option
@@ -97,15 +99,17 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	} while(1);
 
+	// dump
 	tb_print("[gst]: load: %llu bytes, size: %llu bytes, time: %llu ms", read, tb_gstream_size(ist), tb_mclock() - base);
 
 end:
 
-	// destroy stream
+	// exit stream
 	tb_gstream_exit(zst);
 	tb_gstream_exit(ist);
 	tb_gstream_exit(ost);
 
+	// exit tbox
 	tb_exit();
 	return 0;
 }

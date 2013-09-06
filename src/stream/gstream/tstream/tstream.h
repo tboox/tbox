@@ -67,7 +67,7 @@ typedef struct __tb_tstream_t
 	tb_size_t 			on;
 
 	// spak
-	tb_long_t 			(*spak)(tb_gstream_t* gst, tb_bool_t sync);
+	tb_long_t 			(*spak)(tb_gstream_t* gst, tb_long_t sync);
 
 }tb_tstream_t;
 
