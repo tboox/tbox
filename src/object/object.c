@@ -455,11 +455,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 				tb_size_t size = (tb_size_t)tb_gstream_offset(gst);
 
 				// the data object
-				if (size < maxn) 
-				{
-					odata = tb_data_init_from_data(data, size);
-					data[size] = '\0';
-				}
+				if (size < maxn) odata = tb_data_init_from_data(data, size);
 				else maxn <<= 1;
 			}
 			else maxn <<= 1;
@@ -583,16 +579,17 @@ tb_object_t* tb_object_dump(tb_object_t* object)
 		if (data && size)
 		{
 			tb_char_t const* 	p = tb_strstr(data, "?>");
+			tb_char_t const* 	e = data + size;
 			tb_char_t 			b[4096 + 1];
-			if (p)
+			if (p && p + 2 < e)
 			{
 				p += 2;
-				while (*p && tb_isspace(*p)) p++;
-				while (*p)
+				while (p < e && *p && tb_isspace(*p)) p++;
+				while (p < e && *p)
 				{
 					tb_char_t* 			q = b;
 					tb_char_t const* 	d = b + 4096;
-					for (; q < d && *p; p++, q++) *q = *p;
+					for (; p < e && q < d && *p; p++, q++) *q = *p;
 					*q = '\0';
 					tb_printf("%s", b);
 				}

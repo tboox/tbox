@@ -254,6 +254,7 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t item)
 	{
 		if (func->pool) tb_spool_free(func->pool, *((tb_pointer_t*)item));
 		else tb_free(*((tb_pointer_t*)item));
+		*((tb_pointer_t*)item) = tb_null;
 	}
 }
 static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -392,8 +393,12 @@ static tb_void_t tb_item_func_obj_copy(tb_item_func_t* func, tb_pointer_t item, 
 static tb_void_t tb_item_func_efm_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	tb_assert_and_check_return(func && item);
-	if (func->pool) tb_rpool_free(func->pool, *((tb_pointer_t*)item));
-	else if (*((tb_pointer_t*)item)) tb_free(*((tb_pointer_t*)item));
+	if (*((tb_pointer_t*)item)) 
+	{
+		if (func->pool) tb_rpool_free(func->pool, *((tb_pointer_t*)item));
+		else tb_free(*((tb_pointer_t*)item));
+		*((tb_pointer_t*)item) = tb_null;
+	}
 }
 static tb_pointer_t tb_item_func_efm_data(tb_item_func_t* func, tb_cpointer_t item)
 {

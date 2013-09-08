@@ -629,7 +629,8 @@ static tb_void_t tb_slist_str_dump(tb_slist_t const* slist)
 }
 static tb_void_t tb_slist_str_test()
 {
-	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
+	tb_handle_t spool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_str(tb_true, spool));
 	tb_assert_and_check_return(slist);
 
 	tb_size_t 			i = 0;
@@ -691,6 +692,7 @@ static tb_void_t tb_slist_str_test()
 	tb_slist_str_dump(slist);
 
 	tb_slist_exit(slist);
+	tb_spool_exit(spool);
 }
 static tb_void_t tb_slist_efm_dump(tb_slist_t const* slist)
 {
@@ -705,7 +707,8 @@ static tb_void_t tb_slist_efm_dump(tb_slist_t const* slist)
 }
 static tb_void_t tb_slist_efm_test()
 {
-	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
+	tb_handle_t rpool = tb_rpool_init(256, 11, 0);
+	tb_slist_t* slist = tb_slist_init(TB_SLIST_GROW_SIZE, tb_item_func_efm(11, rpool));
 	tb_assert_and_check_return(slist);
 
 	tb_size_t 			i = 0;
@@ -767,6 +770,7 @@ static tb_void_t tb_slist_efm_test()
 	tb_slist_efm_dump(slist);
 
 	tb_slist_exit(slist);
+	tb_rpool_exit(rpool);
 }
 static tb_void_t tb_slist_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -989,6 +993,7 @@ static tb_void_t tb_slist_test_walk_perf()
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 #if 1
@@ -1007,5 +1012,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_slist_test_walk_perf();
 #endif
 
+	// exit tbox
+	tb_exit();
 	return 0;
 }

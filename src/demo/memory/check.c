@@ -7,20 +7,31 @@
 /* ///////////////////////////////////////////////////////////////////////
  * test
  */
-tb_void_t tb_demo_test3();
-tb_void_t tb_demo_test3()
+tb_void_t tb_demo_overflow();
+tb_void_t tb_demo_overflow()
 {
-	tb_backtrace_dump("\t", tb_null, 10);
+	tb_cpointer_t data = tb_malloc0(10);
+	if (data)
+	{
+		tb_memset(data, 0, 11);
+		tb_free(data);
+	}
 }
-static tb_void_t tb_demo_test2()
+tb_void_t tb_demo_free2();
+tb_void_t tb_demo_free2()
 {
-	tb_demo_test3();
+	tb_cpointer_t data = tb_malloc0(10);
+	if (data)
+	{
+		tb_free(data);
+		tb_free(data);
+	}
 }
-tb_void_t tb_demo_test(tb_size_t size);
-tb_void_t tb_demo_test(tb_size_t size)
+tb_void_t tb_demo_leak();
+tb_void_t tb_demo_leak()
 {
-	if (size) tb_demo_test(size - 1);
-	else tb_demo_test2();
+	tb_cpointer_t data = tb_malloc0(10);
+	tb_used(data);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -32,7 +43,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// done 
-	tb_demo_test(argv[1]? tb_atoi(argv[1]) : 10);
+	tb_demo_leak();
+	tb_demo_free2();
+	tb_demo_overflow();
 
 	// exit
 	tb_exit();
