@@ -59,18 +59,13 @@ install : .null
 
 # make prefix
 prefix : .null
-	-@$(RMDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/$(PRO_NAME)
-	-@$(RM) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX)
-	-@$(MKDIR) $(PRE_DIR)
-	-@$(MKDIR) $(PRE_DIR)/inc
-	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)
 	-@$(MKDIR) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)
-	-@$(MKDIR) $(PRE_DIR)/lib
-	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)
 	-@$(MKDIR) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)
-	-@$(CP) -r $(BIN_DIR)/inc/$(PRO_NAME) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
+	-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME) $(PRE_DIR)/inc/$(PLAT)/$(ARCH)/
 	-@$(CP) $(BIN_DIR)/lib/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX) $(PRE_DIR)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(DTYPE)$(LIB_SUFFIX)
-	$(if $(PREFIX),-@$(CP) -r $(BIN_DIR)/inc/$(PRO_NAME) $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
+	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/inc/$(PLAT)/$(ARCH),)
+	$(if $(PREFIX),-@$(MKDIR) $(PREFIX)/lib/$(PLAT)/$(ARCH),)
+	$(if $(PREFIX),-@$(CPDIR) $(BIN_DIR)/inc/$(PRO_NAME) $(PREFIX)/inc/$(PLAT)/$(ARCH)/,)
 	$(if $(PREFIX),-@$(CP) $(BIN_DIR)/lib/$(LIB_PREFIX)$(PRO_NAME)$(LIB_SUFFIX) $(PREFIX)/lib/$(PLAT)/$(ARCH)/$(LIB_PREFIX)$(PRO_NAME)$(DTYPE)$(LIB_SUFFIX),)
 
 # make lipo
