@@ -9,6 +9,7 @@ NAMES = \
 		gpool \
 		spool \
 		rpool \
+		check \
 		scache \
 		pbuffer \
 		sbuffer \
