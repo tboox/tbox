@@ -277,10 +277,10 @@ static tb_vpool_block_t* tb_vpool_overflow_find(tb_vpool_t* vpool)
 }
 #endif
 
+#ifdef __tb_debug__
 static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* block, tb_vpool_block_t* prev)
 {
 	// overflow?
-#ifdef __tb_debug__
 	if (block->magic != TB_VPOOL_MAGIC || !block->size || block->size >= vpool->size) 
 	{
 		// find the previous block if null
@@ -360,14 +360,19 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 			return tb_false;
 		}
 	}
+	// ok
+	return tb_true;
+}
 #else
+static __tb_inline__ tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* block, tb_vpool_block_t* prev)
+{
 	// check
-	tb_check_return_val(bsize < vpool->size, tb_false);
-#endif
+	tb_check_return_val(block->size < vpool->size, tb_false);
 
 	// ok
 	return tb_true;
 }
+#endif
 
 // malloc from the given data address
 static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)
