@@ -13,7 +13,7 @@ DTYPE = d
 SMALL = y
 
 # prefix
-PREFIX = ../gbox2
+PREFIX = ../idevice
 
 # platform
 PLAT = linux

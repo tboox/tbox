@@ -148,9 +148,12 @@ tb_item_func_t 		tb_item_func_str(tb_bool_t bcase, tb_handle_t spool);
  *
  * @note if the free func have been hooked, the nfree need hook too.
  *
+ * @param free 		the item free func
+ * @param priv 		the private data of the item free func
+ *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_ptr();
+tb_item_func_t 		tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv);
 
 /*! the object item function 
  *

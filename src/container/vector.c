@@ -301,10 +301,8 @@ tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t data, tb_siz
 }
 tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
+	// check
 	tb_assert_and_check_return(vector && vector->data && itor <= vector->size);
-
-	// free item
-	vector->func.free(&vector->func, vector->data + itor * vector->func.size);
 
 	// copy data
 	vector->func.copy(&vector->func, vector->data + itor * vector->func.size, data);
@@ -325,9 +323,6 @@ tb_void_t tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t 
 
 	// strip size
 	if (itor + size > vector->size) size = vector->size - itor;
-
-	// free data
-	vector->func.nfree(&vector->func, vector->data + itor * vector->func.size, size);
 
 	// copy data
 	vector->func.ncopy(&vector->func, vector->data + itor * vector->func.size, data, size);

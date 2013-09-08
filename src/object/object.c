@@ -140,7 +140,7 @@ static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 
 	// init reader
 	reader.stream 			= gst;
-	reader.list 			= tb_vector_init(256, tb_item_func_ptr());
+	reader.list 			= tb_vector_init(256, tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(reader.list, tb_null);
 
 	// the type & size
@@ -184,7 +184,7 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_b
 
 	// init writer
 	writer.stream 			= gst;
-	writer.hash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(), tb_item_func_uint32());
+	writer.hash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
 	tb_assert_and_check_return_val(writer.hash, tb_false);
 
 	// writ
@@ -749,7 +749,7 @@ tb_bool_t tb_object_set_xml_reader(tb_char_t const* type, tb_object_xml_reader_f
 
 	// init reader
 	if (!g_object_xml_reader)
-		g_object_xml_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr());
+		g_object_xml_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_xml_reader, tb_false);
 
 	// set
@@ -773,7 +773,7 @@ tb_bool_t tb_object_set_xml_writer(tb_size_t type, tb_object_xml_writer_func_t f
 
 	// init writer
 	if (!g_object_xml_writer)
-		g_object_xml_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr());
+		g_object_xml_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_xml_writer, tb_false);
 
 	// set
@@ -797,7 +797,7 @@ tb_bool_t tb_object_set_bin_reader(tb_size_t type, tb_object_bin_reader_func_t f
 
 	// init reader
 	if (!g_object_bin_reader)
-		g_object_bin_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr());
+		g_object_bin_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_bin_reader, tb_false);
 
 	// set
@@ -821,7 +821,7 @@ tb_bool_t tb_object_set_bin_writer(tb_size_t type, tb_object_bin_writer_func_t f
 
 	// init writer
 	if (!g_object_bin_writer)
-		g_object_bin_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr());
+		g_object_bin_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_bin_writer, tb_false);
 
 	// set
@@ -845,7 +845,7 @@ tb_bool_t tb_object_set_jsn_reader(tb_char_t type, tb_object_jsn_reader_func_t f
 
 	// init reader
 	if (!g_object_jsn_reader)
-		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint8(), tb_item_func_ptr());
+		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint8(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_jsn_reader, tb_false);
 
 	// set
@@ -869,7 +869,7 @@ tb_bool_t tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t f
 
 	// init writer
 	if (!g_object_jsn_writer)
-		g_object_jsn_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr());
+		g_object_jsn_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_return_val(g_object_jsn_writer, tb_false);
 
 	// set

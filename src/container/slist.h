@@ -137,20 +137,20 @@ tb_pointer_t 		tb_slist_last(tb_slist_t* slist);
  */
 tb_void_t 			tb_slist_clear(tb_slist_t* slist);
 
-/*! insert the next item
+/*! insert the prev item
  *
  * @param slist 	the slist
- * @param itor 		the prev item itor
+ * @param itor 		the item itor
  * @param data 		the item data
  *
  * @return 			the item itor
  */
-tb_size_t 			tb_slist_insert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data);
+tb_size_t 			tb_slist_insert_prev(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data);
 
 /*! insert the next item
  *
  * @param slist 	the slist
- * @param itor 		the prev item itor
+ * @param itor 		the item itor
  * @param data 		the item data
  *
  * @return 			the item itor
@@ -175,7 +175,7 @@ tb_size_t 			tb_slist_insert_head(tb_slist_t* slist, tb_cpointer_t data);
  */
 tb_size_t 			tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t data);
 
-/*! insert the next items
+/*! insert the prev items
  *
  * @param slist 	the slist
  * @param itor 		the prev item itor
@@ -184,7 +184,7 @@ tb_size_t 			tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t data);
  *
  * @return 			the first item itor
  */
-tb_size_t 			tb_slist_ninsert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t 			tb_slist_ninsert_prev(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 
 /*! insert the next items
  *
@@ -276,7 +276,7 @@ tb_size_t 			tb_slist_nreplace_head(tb_slist_t* slist, tb_cpointer_t data, tb_si
  */
 tb_size_t 			tb_slist_nreplace_last(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size);
 
-/*! remove the next item
+/*! remove the item
  *
  * @param slist 	the slist
  * @param itor 		the item itor
@@ -347,6 +347,44 @@ tb_size_t 			tb_slist_nremove_head(tb_slist_t* slist, tb_size_t size);
  * @return 			the last item itor
  */
 tb_size_t 			tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size);
+
+/*! moveto the prev item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ * @param move 		the move itor
+ *
+ * @return 			the move itor
+ */
+tb_size_t 			tb_slist_moveto_prev(tb_slist_t* slist, tb_size_t itor, tb_size_t move);
+
+/*! moveto the next item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ * @param move 		the move itor
+ *
+ * @return 			the move itor
+ */
+tb_size_t 			tb_slist_moveto_next(tb_slist_t* slist, tb_size_t itor, tb_size_t move);
+
+/*! moveto the head item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ *
+ * @return 			the move itor
+ */
+tb_size_t 			tb_slist_moveto_head(tb_slist_t* slist, tb_size_t move);
+
+/*! moveto the tail item
+ *
+ * @param slist 	the slist
+ * @param itor 		the item itor
+ *
+ * @return 			the move itor
+ */
+tb_size_t 			tb_slist_moveto_tail(tb_slist_t* slist, tb_size_t move);
 
 /*! the item count
  *

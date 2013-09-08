@@ -84,12 +84,8 @@ tb_bool_t tb_tstore_init()
 	// no store?
 	if (!g_store) 
 	{
-		// init item func
-		tb_item_func_t func = tb_item_func_ptr(); 
-		func.free = tb_tstore_free;
-
 		// init store
-		g_store = tb_hash_init(8, tb_item_func_ptr(), func);
+		g_store = tb_hash_init(8, tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_tstore_free, tb_null));
 	}
 
 	// leave mutex

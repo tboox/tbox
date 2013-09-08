@@ -26,11 +26,11 @@ static tb_size_t tb_slist_insert_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
 	tb_hong_t t = tb_mclock();
-	for (i = 0; i < n; i++) tb_slist_insert(slist, itor, 0xd);
+	for (i = 0; i < n; i++) tb_slist_insert_prev(slist, itor, 0xd);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_insert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_print("tb_slist_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n + 1);
@@ -115,11 +115,11 @@ static tb_size_t tb_slist_ninsert_test()
 
 	tb_size_t n = 1000000;
 	tb_hong_t t = tb_mclock();
-	tb_slist_ninsert(slist, itor, 0xd, n);
+	tb_slist_ninsert_prev(slist, itor, 0xd, n);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_ninsert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_print("tb_slist_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n + 1);
@@ -563,16 +563,16 @@ static tb_void_t tb_slist_int_test()
 	tb_print("insert:");
 	tb_slist_ninsert_head(slist, 0xa, 10);
 	i = tb_slist_ninsert_tail(slist, 0xf, 10);
-	j = tb_slist_insert(slist, i, 0);
-	tb_slist_insert(slist, i, 1);
-	tb_slist_insert(slist, i, 2);
-	tb_slist_insert(slist, i, 3);
-	tb_slist_insert(slist, i, 4);
-	tb_slist_insert(slist, i, 5);
-	tb_slist_insert(slist, i, 6);
-	tb_slist_insert(slist, i, 7);
-	tb_slist_insert(slist, i, 8);
-	tb_slist_insert(slist, i, 9);
+	j = tb_slist_insert_prev(slist, i, 0);
+	tb_slist_insert_prev(slist, i, 1);
+	tb_slist_insert_prev(slist, i, 2);
+	tb_slist_insert_prev(slist, i, 3);
+	tb_slist_insert_prev(slist, i, 4);
+	tb_slist_insert_prev(slist, i, 5);
+	tb_slist_insert_prev(slist, i, 6);
+	tb_slist_insert_prev(slist, i, 7);
+	tb_slist_insert_prev(slist, i, 8);
+	tb_slist_insert_prev(slist, i, 9);
 	tb_slist_insert_head(slist, 4);
 	tb_slist_insert_head(slist, 3);
 	tb_slist_insert_head(slist, 2);
@@ -606,7 +606,13 @@ static tb_void_t tb_slist_int_test()
 	tb_slist_nreplace_head(slist, 0xf, 10);
 	tb_slist_nreplace_last(slist, 0xa, 10);
 	tb_slist_replace_head(slist, 0);
-	tb_slist_replace_last(slist, 0);
+	tb_slist_replace_last(slist, 1);
+	tb_slist_int_dump(slist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_slist_moveto_head(slist, tb_iterator_last(slist));
+	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_int_dump(slist);
 
 	tb_print("=============================================================");
@@ -640,16 +646,16 @@ static tb_void_t tb_slist_str_test()
 	tb_print("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
-	j = tb_slist_insert(slist, i, "0000000000");
-	tb_slist_insert(slist, i, "1111111111");
-	tb_slist_insert(slist, i, "2222222222");
-	tb_slist_insert(slist, i, "3333333333");
-	tb_slist_insert(slist, i, "4444444444");
-	tb_slist_insert(slist, i, "5555555555");
-	tb_slist_insert(slist, i, "6666666666");
-	tb_slist_insert(slist, i, "7777777777");
-	tb_slist_insert(slist, i, "8888888888");
-	tb_slist_insert(slist, i, "9999999999");
+	j = tb_slist_insert_prev(slist, i, "0000000000");
+	tb_slist_insert_prev(slist, i, "1111111111");
+	tb_slist_insert_prev(slist, i, "2222222222");
+	tb_slist_insert_prev(slist, i, "3333333333");
+	tb_slist_insert_prev(slist, i, "4444444444");
+	tb_slist_insert_prev(slist, i, "5555555555");
+	tb_slist_insert_prev(slist, i, "6666666666");
+	tb_slist_insert_prev(slist, i, "7777777777");
+	tb_slist_insert_prev(slist, i, "8888888888");
+	tb_slist_insert_prev(slist, i, "9999999999");
 	tb_slist_insert_head(slist, "4444444444");
 	tb_slist_insert_head(slist, "3333333333");
 	tb_slist_insert_head(slist, "2222222222");
@@ -683,7 +689,13 @@ static tb_void_t tb_slist_str_test()
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
-	tb_slist_replace_last(slist, "OOOOOOOOOO");
+	tb_slist_replace_last(slist, "IIIIIIIIII");
+	tb_slist_str_dump(slist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_slist_moveto_head(slist, tb_iterator_last(slist));
+	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_str_dump(slist);
 
 	tb_print("=============================================================");
@@ -718,16 +730,16 @@ static tb_void_t tb_slist_efm_test()
 	tb_print("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
-	j = tb_slist_insert(slist, i, "0000000000");
-	tb_slist_insert(slist, i, "1111111111");
-	tb_slist_insert(slist, i, "2222222222");
-	tb_slist_insert(slist, i, "3333333333");
-	tb_slist_insert(slist, i, "4444444444");
-	tb_slist_insert(slist, i, "5555555555");
-	tb_slist_insert(slist, i, "6666666666");
-	tb_slist_insert(slist, i, "7777777777");
-	tb_slist_insert(slist, i, "8888888888");
-	tb_slist_insert(slist, i, "9999999999");
+	j = tb_slist_insert_prev(slist, i, "0000000000");
+	tb_slist_insert_prev(slist, i, "1111111111");
+	tb_slist_insert_prev(slist, i, "2222222222");
+	tb_slist_insert_prev(slist, i, "3333333333");
+	tb_slist_insert_prev(slist, i, "4444444444");
+	tb_slist_insert_prev(slist, i, "5555555555");
+	tb_slist_insert_prev(slist, i, "6666666666");
+	tb_slist_insert_prev(slist, i, "7777777777");
+	tb_slist_insert_prev(slist, i, "8888888888");
+	tb_slist_insert_prev(slist, i, "9999999999");
 	tb_slist_insert_head(slist, "4444444444");
 	tb_slist_insert_head(slist, "3333333333");
 	tb_slist_insert_head(slist, "2222222222");
@@ -761,7 +773,13 @@ static tb_void_t tb_slist_efm_test()
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
-	tb_slist_replace_last(slist, "OOOOOOOOOO");
+	tb_slist_replace_last(slist, "IIIIIIIIII");
+	tb_slist_efm_dump(slist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_slist_moveto_head(slist, tb_iterator_last(slist));
+	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_efm_dump(slist);
 
 	tb_print("=============================================================");
@@ -799,16 +817,16 @@ static tb_void_t tb_slist_ifm_test()
 	tb_print("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
-	j = tb_slist_insert(slist, i, "0000000000");
-	tb_slist_insert(slist, i, "1111111111");
-	tb_slist_insert(slist, i, "2222222222");
-	tb_slist_insert(slist, i, "3333333333");
-	tb_slist_insert(slist, i, "4444444444");
-	tb_slist_insert(slist, i, "5555555555");
-	tb_slist_insert(slist, i, "6666666666");
-	tb_slist_insert(slist, i, "7777777777");
-	tb_slist_insert(slist, i, "8888888888");
-	tb_slist_insert(slist, i, "9999999999");
+	j = tb_slist_insert_prev(slist, i, "0000000000");
+	tb_slist_insert_prev(slist, i, "1111111111");
+	tb_slist_insert_prev(slist, i, "2222222222");
+	tb_slist_insert_prev(slist, i, "3333333333");
+	tb_slist_insert_prev(slist, i, "4444444444");
+	tb_slist_insert_prev(slist, i, "5555555555");
+	tb_slist_insert_prev(slist, i, "6666666666");
+	tb_slist_insert_prev(slist, i, "7777777777");
+	tb_slist_insert_prev(slist, i, "8888888888");
+	tb_slist_insert_prev(slist, i, "9999999999");
 	tb_slist_insert_head(slist, "4444444444");
 	tb_slist_insert_head(slist, "3333333333");
 	tb_slist_insert_head(slist, "2222222222");
@@ -842,7 +860,13 @@ static tb_void_t tb_slist_ifm_test()
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
-	tb_slist_replace_last(slist, "OOOOOOOOOO");
+	tb_slist_replace_last(slist, "IIIIIIIIII");
+	tb_slist_ifm_dump(slist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_slist_moveto_head(slist, tb_iterator_last(slist));
+	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_ifm_dump(slist);
 
 	tb_print("=============================================================");

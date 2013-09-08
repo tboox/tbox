@@ -176,7 +176,7 @@ static tb_aipp_reactor_t* tb_aipp_reactor_waito_init(tb_aipp_t* aipp)
 	rtor->base.wait = tb_aipp_reactor_waito_wait;
 
 	// init hdls
-	rtor->hdls = tb_vector_init(tb_align8((aipp->maxn >> 3) + 1), tb_item_func_ptr());
+	rtor->hdls = tb_vector_init(tb_align8((aipp->maxn >> 3) + 1), tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->hdls, fail);
 
 	// ok

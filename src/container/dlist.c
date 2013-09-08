@@ -329,17 +329,16 @@ tb_size_t tb_dlist_ninsert_tail(tb_dlist_t* dlist, tb_cpointer_t data, tb_size_t
 }
 tb_size_t tb_dlist_replace(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data)
 {
+	// check
 	tb_assert_and_check_return_val(dlist && itor, itor);
 
 	// the item
 	tb_dlist_item_t* item = (tb_dlist_item_t*)itor;
 
-	// free item
-	dlist->func.free(&dlist->func, &item[1]);
-
 	// copy data
 	dlist->func.copy(&dlist->func, &item[1], data);
 
+	// ok
 	return itor;
 }
 tb_size_t tb_dlist_replace_head(tb_dlist_t* dlist, tb_cpointer_t data)

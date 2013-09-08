@@ -63,7 +63,7 @@ tb_aipp_t* tb_aipp_init(tb_size_t type, tb_size_t maxn)
 	tb_assert_and_check_goto(type < tb_arrayn(s_init), fail);
 
 	// init hash
-	aipp->hash = tb_hash_init(tb_align8(tb_isqrti(maxn) + 1), tb_item_func_ptr(), tb_item_func_ifm(sizeof(tb_aioo_t), tb_null, tb_null));
+	aipp->hash = tb_hash_init(tb_align8(tb_isqrti(maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ifm(sizeof(tb_aioo_t), tb_null, tb_null));
 	tb_assert_and_check_goto(aipp->hash, fail);
 
 	// init reactor
