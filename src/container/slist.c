@@ -239,11 +239,10 @@ tb_size_t tb_slist_maxn(tb_slist_t const* slist)
  *         head                  last    tail
  *
  */
-tb_size_t tb_slist_insert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
+tb_size_t tb_slist_insert_prev(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
 	return tb_slist_insert_next(slist, tb_iterator_prev(slist, itor), data);
 }
-
 tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
@@ -318,13 +317,13 @@ tb_size_t tb_slist_insert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t 
 
 tb_size_t tb_slist_insert_head(tb_slist_t* slist, tb_cpointer_t data)
 {
-	return tb_slist_insert(slist, tb_iterator_head(slist), data);
+	return tb_slist_insert_prev(slist, tb_iterator_head(slist), data);
 }
 tb_size_t tb_slist_insert_tail(tb_slist_t* slist, tb_cpointer_t data)
 {
-	return tb_slist_insert(slist, tb_iterator_tail(slist), data);
+	return tb_slist_insert_prev(slist, tb_iterator_tail(slist), data);
 }
-tb_size_t tb_slist_ninsert(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_size_t tb_slist_ninsert_prev(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
 	return tb_slist_ninsert_next(slist, tb_iterator_prev(slist, itor), data, size);
 }
@@ -341,11 +340,11 @@ tb_size_t tb_slist_ninsert_next(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t
 }
 tb_size_t tb_slist_ninsert_head(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_ninsert(slist, tb_iterator_head(slist), data, size);
+	return tb_slist_ninsert_prev(slist, tb_iterator_head(slist), data, size);
 }
 tb_size_t tb_slist_ninsert_tail(tb_slist_t* slist, tb_cpointer_t data, tb_size_t size)
 {
-	return tb_slist_ninsert(slist, tb_iterator_tail(slist), data, size);
+	return tb_slist_ninsert_prev(slist, tb_iterator_tail(slist), data, size);
 }
 tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data)
 {
@@ -354,12 +353,10 @@ tb_size_t tb_slist_replace(tb_slist_t* slist, tb_size_t itor, tb_cpointer_t data
 	// the item
 	tb_slist_item_t* item = (tb_slist_item_t*)itor;
 
-	// free item
-	slist->func.free(&slist->func, &item[1]);
-
 	// copy data
-	slist->func.copy(&slist->func, &item[1], data);
+	slist->func.dupl(&slist->func, &item[1], data);
 
+	// ok
 	return itor;
 }
 tb_size_t tb_slist_replace_head(tb_slist_t* slist, tb_cpointer_t data)
@@ -428,70 +425,68 @@ tb_size_t tb_slist_remove(tb_slist_t* slist, tb_size_t itor)
 }
 tb_size_t tb_slist_remove_next(tb_slist_t* slist, tb_size_t itor)
 {
+	// check
 	tb_assert_and_check_return_val(slist && slist->pool, itor);
+
+	// non-empty?
+	tb_check_return_val(slist->head, itor);
 
 	// the prev node
 	tb_size_t prev = itor;
 
-	// non-empty?
-	if (slist->head)
+	// the next node
+	tb_size_t next = 0;
+
+	// the midd node
+	tb_size_t midd = 0;
+	
+	// remove head?
+	if (!prev)
 	{
-		// the next node
-		tb_size_t next = 0;
-
 		// the midd node
-		tb_size_t midd = 0;
-		
-		// remove head?
-		if (!prev)
+		midd = slist->head;
+
+		// only one item?
+		if (midd == slist->last)
 		{
-			// the midd node
-			midd = slist->head;
-
-			// only one item?
-			if (midd == slist->last)
-			{
-				slist->head = 0;
-				slist->last = 0;
-			}
-			// update head
-			else slist->head = next = tb_iterator_next(slist, midd);
+			slist->head = 0;
+			slist->last = 0;
 		}
-		// remove body?
-		else
-		{
-			// the midd node
-			midd = tb_iterator_next(slist, prev);
+		// update head
+		else slist->head = next = tb_iterator_next(slist, midd);
+	}
+	// remove body?
+	else
+	{
+		// the midd node
+		midd = tb_iterator_next(slist, prev);
 
-			// get the prev data
-			tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
-			tb_assert_and_check_return_val(pprev, 0);
+		// get the prev data
+		tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
+		tb_assert_and_check_return_val(pprev, itor);
 
-			// the next node
-			next = tb_iterator_next(slist, midd);
+		// the next node
+		next = tb_iterator_next(slist, midd);
 
-			// prev => next
-			pprev->next = next;
+		// prev => next
+		pprev->next = next;
 
-			// update last if midd is last
-			if (midd == slist->last) slist->last = next = prev;
-		}
-
-		// check
-		tb_assert_and_check_return_val(midd, 0);
-
-		// free item
-		if (slist->func.free)
-			slist->func.free(&slist->func, &((tb_slist_item_t*)midd)[1]);
-
-		// free node
-		tb_rpool_free(slist->pool, (tb_pointer_t)midd);
-
-		// return next node
-		return next;
+		// update last if midd is last
+		if (midd == slist->last) slist->last = next = prev;
 	}
 
-	return itor;
+	// check
+	tb_assert_and_check_return_val(midd, itor);
+
+	// free item
+	if (slist->func.free)
+		slist->func.free(&slist->func, &((tb_slist_item_t*)midd)[1]);
+
+	// free node
+	tb_rpool_free(slist->pool, (tb_pointer_t)midd);
+
+	// return next node
+	return next;
 }
 tb_size_t tb_slist_remove_head(tb_slist_t* slist)
 {
@@ -535,8 +530,79 @@ tb_size_t tb_slist_nremove_last(tb_slist_t* slist, tb_size_t size)
 
 	return tb_iterator_last(slist);
 }
+tb_size_t tb_slist_moveto_prev(tb_slist_t* slist, tb_size_t itor, tb_size_t move)
+{
+	return tb_slist_moveto_next(slist, tb_iterator_prev(slist, itor), move);
+}
+tb_size_t tb_slist_moveto_next(tb_slist_t* slist, tb_size_t itor, tb_size_t move)
+{
+	// check
+	tb_assert_and_check_return_val(slist && slist->pool, move);
+
+	// non-empty?
+	tb_check_return_val(slist->head, move);
+
+	// the prev node
+	tb_size_t prev = tb_iterator_prev(slist, move);
+
+	// the next node
+	tb_size_t next = 0;
+
+	// the midd node
+	tb_size_t midd = 0;
+	
+	// remove head?
+	if (!prev)
+	{
+		// the midd node
+		midd = slist->head;
+
+		// only one item?
+		if (midd == slist->last)
+		{
+			slist->head = 0;
+			slist->last = 0;
+		}
+		// update head
+		else slist->head = next = tb_iterator_next(slist, midd);
+	}
+	// remove body?
+	else
+	{
+		// the midd node
+		midd = tb_iterator_next(slist, prev);
+
+		// get the prev data
+		tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
+		tb_assert_and_check_return_val(pprev, move);
+
+		// the next node
+		next = tb_iterator_next(slist, midd);
+
+		// prev => next
+		pprev->next = next;
+
+		// update last if midd is last
+		if (midd == slist->last) slist->last = next = prev;
+	}
+
+	// check
+	tb_assert_and_check_return_val(midd && midd == move, move);
+
+	// insert to next
+	return tb_slist_insert_next(slist, itor, tb_iterator_item(slist, midd));
+}
+tb_size_t tb_slist_moveto_head(tb_slist_t* slist, tb_size_t move)
+{
+	return tb_slist_moveto_prev(slist, tb_iterator_head(slist), move);
+}
+tb_size_t tb_slist_moveto_tail(tb_slist_t* slist, tb_size_t move)
+{
+	return tb_slist_moveto_prev(slist, tb_iterator_tail(slist), move);
+}
 tb_void_t tb_slist_walk(tb_slist_t* slist, tb_bool_t (*func)(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {
+	// check
 	tb_assert_and_check_return(slist && slist->pool && func);
 
 	// pool

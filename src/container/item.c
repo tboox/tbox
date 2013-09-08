@@ -306,7 +306,12 @@ static tb_void_t tb_item_func_ptr_free(tb_item_func_t* func, tb_pointer_t item)
 }
 static tb_void_t tb_item_func_ptr_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
+	// check
 	tb_assert_and_check_return(func && item);
+
+	// the free is hooked? free it 
+	if (func->free != tb_item_func_ptr_free && func->free)
+		func->free(func, item);
 
 	// copy it
 	*((tb_pointer_t*)item) = data;
@@ -316,22 +321,29 @@ static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item,
 	// check
 	tb_assert_and_check_return(func && item);
 
-	// the free is not hooked? or null
-	if (func->free == tb_item_func_ptr_free || !func->free)
+	// the free is hooked? free it 
+	if (func->free != tb_item_func_ptr_free && func->free)
 	{
-		// clear
-		if (size) tb_memset(item, 0, size * func->size);
+		tb_size_t n = size;
+		while (n--) func->free(func, (tb_byte_t*)item + n * func->size);
 	}
-	else
-	{
-		while (size--) func->free(func, (tb_byte_t*)item + size * func->size);
-	}
+
+	// clear
+	if (size) tb_memset(item, 0, size * func->size);
 }
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(func && item);
 
-	// copy it
+	// the free is hooked? free items 
+	if (func->free != tb_item_func_ptr_free && func->free)
+	{
+		tb_size_t n = size;
+		while (n--) func->free(func, (tb_byte_t*)item + n * func->size);
+	}
+
+	// copy items
 	if (func->size == 4) tb_memset_u32(item, data, size);
 	else while (size--) ((tb_pointer_t*)item)[size] = data;
 }
@@ -414,8 +426,10 @@ static tb_void_t tb_item_func_efm_dupl(tb_item_func_t* func, tb_pointer_t item, 
 }
 static tb_void_t tb_item_func_efm_copy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
+	// check
 	tb_assert_and_check_return(func && item);
 
+	// copy it
 	if (*((tb_pointer_t*)item) && func->priv) 
 	{
 		if (data) tb_memcpy(*((tb_pointer_t*)item), data, func->priv);
@@ -702,7 +716,7 @@ tb_item_func_t tb_item_func_str(tb_bool_t bcase, tb_handle_t spool)
 
 	return func;
 }
-tb_item_func_t tb_item_func_ptr()
+tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv)
 {
 	tb_item_func_t func;
 	tb_memset(&func, 0, sizeof(tb_item_func_t));
@@ -714,7 +728,7 @@ tb_item_func_t tb_item_func_ptr()
 	func.data = tb_item_func_ptr_data;
 	func.cstr = tb_item_func_ptr_cstr;
 
-	func.free = tb_item_func_ptr_free;
+	func.free = free? free : tb_item_func_ptr_free;
 	func.dupl = tb_item_func_ptr_copy;
 	func.copy = tb_item_func_ptr_copy;
 
@@ -723,6 +737,7 @@ tb_item_func_t tb_item_func_ptr()
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
+	func.priv = tb_null;
 
 	return func;
 }

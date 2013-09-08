@@ -52,12 +52,15 @@
 typedef struct __tb_hash_item_t
 {
 	/// the item name
-	tb_pointer_t 			name;
+	tb_pointer_t 		name;
 
 	/// the item data
-	tb_pointer_t 			data;
+	tb_pointer_t 		data;
 
 }tb_hash_item_t;
+
+/// the hash type
+typedef tb_void_t 		tb_hash_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
