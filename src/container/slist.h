@@ -35,66 +35,8 @@
  * types
  */
 
-/*! the single list type
- *
- * <pre>
- * slist: |-----| => |-------------------------------------------------=> |------| => |------| => null
- *         head                                                                         last      tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- 
- * performance: 
- *
- * insert:
- * insert midd: slow
- * insert head: fast
- * insert tail: fast
- * insert next: fast
- * 
- * ninsert:
- * ninsert midd: slow
- * ninsert head: fast
- * ninsert tail: fast
- * ninsert next: fast
- *
- * remove:
- * remove midd: slow
- * remove head: fast
- * remove last: slow
- * remove next: fast
- *
- * nremove:
- * nremove midd: slow
- * nremove head: fast
- * nremove last: slow
- * nremove next: fast
- *
- * iterator:
- * next: fast
- * prev: slow
- * </pre>
- *
- */
-typedef struct __tb_slist_t
-{
-	/// the itor
-	tb_iterator_t 			itor;
-
-	/// the rpool
-	tb_handle_t 			pool;
-
-	/// the head item 
-	tb_size_t 				head;
-
-	/// the last item
-	tb_size_t 				last;
-
-	/// the item func
-	tb_item_func_t 			func;
-
-}tb_slist_t;
+/// the slist type
+typedef tb_void_t 	tb_slist_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -115,13 +57,19 @@ tb_slist_t* 		tb_slist_init(tb_size_t grow, tb_item_func_t func);
  */
 tb_void_t 			tb_slist_exit(tb_slist_t* slist);
 
+/*! clear slist
+ *
+ * @param slist 	the slist
+ */
+tb_void_t 			tb_slist_clear(tb_slist_t* slist);
+
 /*! the slist head item
  *
  * @param slist 	the slist
  *
  * @return 			the head item
  */
-tb_pointer_t 		tb_slist_head(tb_slist_t* slist);
+tb_pointer_t 		tb_slist_head(tb_slist_t const* slist);
 
 /*! the slist last item
  *
@@ -129,13 +77,7 @@ tb_pointer_t 		tb_slist_head(tb_slist_t* slist);
  *
  * @return 			the last item
  */
-tb_pointer_t 		tb_slist_last(tb_slist_t* slist);
-
-/*! clear slist
- *
- * @param slist 	the slist
- */
-tb_void_t 			tb_slist_clear(tb_slist_t* slist);
+tb_pointer_t 		tb_slist_last(tb_slist_t const* slist);
 
 /*! insert the prev item
  *
