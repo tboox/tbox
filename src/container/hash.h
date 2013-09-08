@@ -72,85 +72,85 @@ typedef tb_void_t 		tb_hash_t;
  * @param name_func 	the hash name func
  * @param data_func 	the hash data func
  *
- * @return 				the hash handle
+ * @return 				the hash
  */
-tb_handle_t 			tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
+tb_hash_t* 				tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func);
 
 /*! exit hash
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  */
-tb_void_t 				tb_hash_exit(tb_handle_t hash);
+tb_void_t 				tb_hash_exit(tb_hash_t* hash);
 
 /*! clear hash
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  */
-tb_void_t 				tb_hash_clear(tb_handle_t hash);
+tb_void_t 				tb_hash_clear(tb_hash_t* hash);
 
 /*! get hash item itor
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  * @param name 			the hash item name
  *
  * @return 				the hash itor, @note: itor => item maybe changed if insert or remove item
  */
-tb_size_t				tb_hash_itor(tb_handle_t hash, tb_cpointer_t name);
+tb_size_t				tb_hash_itor(tb_hash_t const* hash, tb_cpointer_t name);
 
 /*! get hash item data
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  * @param name 			the hash item name
  *
  * @return 				the hash item data
  */
-tb_pointer_t 			tb_hash_get(tb_handle_t hash, tb_cpointer_t name);
+tb_pointer_t 			tb_hash_get(tb_hash_t const* hash, tb_cpointer_t name);
 
 /*! del hash item
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  * @param name 			the hash item name
  */
-tb_void_t 	 			tb_hash_del(tb_handle_t hash, tb_cpointer_t name);
+tb_void_t 	 			tb_hash_del(tb_hash_t* hash, tb_cpointer_t name);
 
 /*! set hash item
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  * @param name 			the hash item name
  * @param data 			the hash item data
  *
  * @return 				the hash itor, @note: itor => item maybe changed if insert or remove item
  */
-tb_size_t 		 		tb_hash_set(tb_handle_t hash, tb_cpointer_t name, tb_cpointer_t data);
+tb_size_t 		 		tb_hash_set(tb_hash_t* hash, tb_cpointer_t name, tb_cpointer_t data);
 
 /*! the hash size
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  *
  * @return 				the hash size
  */
-tb_size_t 				tb_hash_size(tb_handle_t hash);
+tb_size_t 				tb_hash_size(tb_hash_t const* hash);
 
 /*! the hash maxn
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  *
  * @return 				the hash maxn
  */
-tb_size_t 				tb_hash_maxn(tb_handle_t hash);
+tb_size_t 				tb_hash_maxn(tb_hash_t const* hash);
 
 /*! dump hash
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  */
-tb_void_t 				tb_hash_dump(tb_handle_t hash);
+tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
 
 /*! walk hash items
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_hash_item_func(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
  * {
  * 		tb_assert_and_check_return_val(hash && bdel, tb_false);
  *
@@ -169,12 +169,12 @@ tb_void_t 				tb_hash_dump(tb_handle_t hash);
  * }
  * @endcode
  *
- * @param hash 			the hash handle
+ * @param hash 			the hash
  * @param func 			the walk callback func
  * @param data 			the walk callback data
  *
  */
-tb_void_t 				tb_hash_walk(tb_handle_t hash, tb_bool_t (*func)(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
 
 #endif
 

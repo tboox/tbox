@@ -372,14 +372,14 @@ static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
+tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t data_func)
 {
 	// check
 	tb_assert_and_check_return_val(size, tb_null);
 	tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_null);
 	tb_assert_and_check_return_val(data_func.size && data_func.data && data_func.dupl && data_func.copy, tb_null);
 
-	// alloc hash
+	// make hash
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)tb_malloc0(sizeof(tb_hash_impl_t));
 	tb_assert_and_check_return_val(hash, tb_null);
 
@@ -410,12 +410,12 @@ tb_handle_t tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_
 	tb_assert_and_check_goto(hash->hash_list, fail);
 
 	// ok
-	return (tb_handle_t)hash;
+	return (tb_hash_t*)hash;
 fail:
 	if (hash) tb_hash_exit(hash);
 	return tb_null;
 }
-tb_void_t tb_hash_exit(tb_handle_t handle)
+tb_void_t tb_hash_exit(tb_hash_t* handle)
 {
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
 	if (hash)
@@ -430,7 +430,7 @@ tb_void_t tb_hash_exit(tb_handle_t handle)
 		tb_free(hash);
 	}
 }
-tb_void_t tb_hash_clear(tb_handle_t handle)
+tb_void_t tb_hash_clear(tb_hash_t* handle)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
@@ -472,10 +472,10 @@ tb_void_t tb_hash_clear(tb_handle_t handle)
 	hash->item_maxn = 0;
 	tb_memset(&hash->hash_item, 0, sizeof(tb_hash_item_t));
 }
-tb_size_t tb_hash_itor(tb_handle_t handle, tb_cpointer_t name)
+tb_size_t tb_hash_itor(tb_hash_t const* handle, tb_cpointer_t name)
 {
 	// check
-	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
+	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, 0);
 
 	// find
@@ -483,10 +483,10 @@ tb_size_t tb_hash_itor(tb_handle_t handle, tb_cpointer_t name)
 	tb_size_t item = 0;
 	return tb_hash_item_find(hash, name, &buck, &item)? TB_HASH_INDEX_MAKE(buck + 1, item + 1) : 0;
 }
-tb_pointer_t tb_hash_get(tb_handle_t handle, tb_cpointer_t name)
+tb_pointer_t tb_hash_get(tb_hash_t const* handle, tb_cpointer_t name)
 {
 	// check
-	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
+	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, tb_null);
 
 	// find
@@ -499,7 +499,7 @@ tb_pointer_t tb_hash_get(tb_handle_t handle, tb_cpointer_t name)
 	}
 	return tb_null;
 }
-tb_void_t tb_hash_del(tb_handle_t handle, tb_cpointer_t name)
+tb_void_t tb_hash_del(tb_hash_t* handle, tb_cpointer_t name)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
@@ -511,7 +511,7 @@ tb_void_t tb_hash_del(tb_handle_t handle, tb_cpointer_t name)
 	if (tb_hash_item_find(hash, name, &buck, &item))
 		tb_hash_iterator_delt((tb_iterator_t*)hash, TB_HASH_INDEX_MAKE(buck + 1, item + 1));
 }
-tb_size_t tb_hash_set(tb_handle_t handle, tb_cpointer_t name, tb_cpointer_t data)
+tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
@@ -603,19 +603,19 @@ tb_size_t tb_hash_set(tb_handle_t handle, tb_cpointer_t name, tb_cpointer_t data
 	// ok?
 	return TB_HASH_INDEX_MAKE(buck + 1, item + 1);
 }
-tb_size_t tb_hash_size(tb_handle_t handle)
+tb_size_t tb_hash_size(tb_hash_t const* handle)
 {
-	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
+	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, 0);
 	return hash->item_size;
 }
-tb_size_t tb_hash_maxn(tb_handle_t handle)
+tb_size_t tb_hash_maxn(tb_hash_t const* handle)
 {
-	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
+	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return_val(hash, 0);
 	return hash->item_maxn;
 }
-tb_void_t tb_hash_walk(tb_handle_t handle, tb_bool_t (*func)(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
@@ -727,10 +727,10 @@ end:
 	return ;
 }
 #ifdef __tb_debug__
-tb_void_t tb_hash_dump(tb_handle_t handle)
+tb_void_t tb_hash_dump(tb_hash_t const* handle)
 {
 	// check
-	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
+	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
 	tb_assert_and_check_return(hash && hash->hash_list);
 
 	// the step

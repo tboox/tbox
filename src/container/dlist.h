@@ -114,11 +114,13 @@ tb_pointer_t 		tb_dlist_last(tb_dlist_t* dlist);
 // modifiors
 tb_void_t 			tb_dlist_clear(tb_dlist_t* dlist);
 
-tb_size_t 			tb_dlist_insert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data);
+tb_size_t 			tb_dlist_insert_prev(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data);
+tb_size_t 			tb_dlist_insert_next(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data);
 tb_size_t 			tb_dlist_insert_head(tb_dlist_t* dlist, tb_cpointer_t data);
 tb_size_t 			tb_dlist_insert_tail(tb_dlist_t* dlist, tb_cpointer_t data);
 
-tb_size_t 			tb_dlist_ninsert(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t 			tb_dlist_ninsert_prev(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+tb_size_t 			tb_dlist_ninsert_next(tb_dlist_t* dlist, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
 tb_size_t 			tb_dlist_ninsert_head(tb_dlist_t* dlist, tb_cpointer_t data, tb_size_t size);
 tb_size_t 			tb_dlist_ninsert_tail(tb_dlist_t* dlist, tb_cpointer_t data, tb_size_t size);
 

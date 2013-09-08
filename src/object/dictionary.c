@@ -46,7 +46,7 @@ typedef struct __tb_dictionary_t
 	tb_size_t 			size;
 
 	// the object hash
-	tb_handle_t 		hash;
+	tb_hash_t* 			hash;
 
 	// increase refn?
 	tb_bool_t 			incr;

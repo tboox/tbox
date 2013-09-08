@@ -26,11 +26,11 @@ static tb_size_t tb_dlist_insert_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 10000;
 	tb_hong_t t = tb_mclock();
-	for (i = 0; i < n; i++) tb_dlist_insert(dlist, itor, 0xd);
+	for (i = 0; i < n; i++) tb_dlist_insert_prev(dlist, itor, 0xd);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_dlist_insert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_dlist_size(dlist), tb_dlist_maxn(dlist));
+	tb_print("tb_dlist_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_dlist_size(dlist), tb_dlist_maxn(dlist));
 
 	// check
 	tb_assert(tb_dlist_size(dlist) == n + 1);
@@ -115,11 +115,11 @@ static tb_size_t tb_dlist_ninsert_test()
 
 	tb_size_t n = 1000000;
 	tb_hong_t t = tb_mclock();
-	tb_dlist_ninsert(dlist, itor, 0xd, n);
+	tb_dlist_ninsert_prev(dlist, itor, 0xd, n);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_dlist_ninsert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_dlist_size(dlist), tb_dlist_maxn(dlist));
+	tb_print("tb_dlist_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_dlist_size(dlist), tb_dlist_maxn(dlist));
 
 	// check
 	tb_assert(tb_dlist_size(dlist) == n + 1);
@@ -563,16 +563,16 @@ static tb_void_t tb_dlist_int_test()
 	tb_print("insert:");
 	tb_dlist_ninsert_head(dlist, 0xa, 10);
 	i = tb_dlist_ninsert_tail(dlist, 0xf, 10);
-	j = tb_dlist_insert(dlist, i, 0);
-	tb_dlist_insert(dlist, i, 1);
-	tb_dlist_insert(dlist, i, 2);
-	tb_dlist_insert(dlist, i, 3);
-	tb_dlist_insert(dlist, i, 4);
-	tb_dlist_insert(dlist, i, 5);
-	tb_dlist_insert(dlist, i, 6);
-	tb_dlist_insert(dlist, i, 7);
-	tb_dlist_insert(dlist, i, 8);
-	tb_dlist_insert(dlist, i, 9);
+	j = tb_dlist_insert_prev(dlist, i, 0);
+	tb_dlist_insert_prev(dlist, i, 1);
+	tb_dlist_insert_prev(dlist, i, 2);
+	tb_dlist_insert_prev(dlist, i, 3);
+	tb_dlist_insert_prev(dlist, i, 4);
+	tb_dlist_insert_prev(dlist, i, 5);
+	tb_dlist_insert_prev(dlist, i, 6);
+	tb_dlist_insert_prev(dlist, i, 7);
+	tb_dlist_insert_prev(dlist, i, 8);
+	tb_dlist_insert_prev(dlist, i, 9);
 	tb_dlist_insert_head(dlist, 4);
 	tb_dlist_insert_head(dlist, 3);
 	tb_dlist_insert_head(dlist, 2);
@@ -639,16 +639,16 @@ static tb_void_t tb_dlist_str_test()
 	tb_print("insert:");
 	tb_dlist_ninsert_head(dlist, "HHHHHHHHHH", 10);
 	i = tb_dlist_ninsert_tail(dlist, "TTTTTTTTTT", 10);
-	j = tb_dlist_insert(dlist, i, "0000000000");
-	tb_dlist_insert(dlist, i, "1111111111");
-	tb_dlist_insert(dlist, i, "2222222222");
-	tb_dlist_insert(dlist, i, "3333333333");
-	tb_dlist_insert(dlist, i, "4444444444");
-	tb_dlist_insert(dlist, i, "5555555555");
-	tb_dlist_insert(dlist, i, "6666666666");
-	tb_dlist_insert(dlist, i, "7777777777");
-	tb_dlist_insert(dlist, i, "8888888888");
-	tb_dlist_insert(dlist, i, "9999999999");
+	j = tb_dlist_insert_prev(dlist, i, "0000000000");
+	tb_dlist_insert_prev(dlist, i, "1111111111");
+	tb_dlist_insert_prev(dlist, i, "2222222222");
+	tb_dlist_insert_prev(dlist, i, "3333333333");
+	tb_dlist_insert_prev(dlist, i, "4444444444");
+	tb_dlist_insert_prev(dlist, i, "5555555555");
+	tb_dlist_insert_prev(dlist, i, "6666666666");
+	tb_dlist_insert_prev(dlist, i, "7777777777");
+	tb_dlist_insert_prev(dlist, i, "8888888888");
+	tb_dlist_insert_prev(dlist, i, "9999999999");
 	tb_dlist_insert_head(dlist, "4444444444");
 	tb_dlist_insert_head(dlist, "3333333333");
 	tb_dlist_insert_head(dlist, "2222222222");
@@ -715,16 +715,16 @@ static tb_void_t tb_dlist_efm_test()
 	tb_print("insert:");
 	tb_dlist_ninsert_head(dlist, "HHHHHHHHHH", 10);
 	i = tb_dlist_ninsert_tail(dlist, "TTTTTTTTTT", 10);
-	j = tb_dlist_insert(dlist, i, "0000000000");
-	tb_dlist_insert(dlist, i, "1111111111");
-	tb_dlist_insert(dlist, i, "2222222222");
-	tb_dlist_insert(dlist, i, "3333333333");
-	tb_dlist_insert(dlist, i, "4444444444");
-	tb_dlist_insert(dlist, i, "5555555555");
-	tb_dlist_insert(dlist, i, "6666666666");
-	tb_dlist_insert(dlist, i, "7777777777");
-	tb_dlist_insert(dlist, i, "8888888888");
-	tb_dlist_insert(dlist, i, "9999999999");
+	j = tb_dlist_insert_prev(dlist, i, "0000000000");
+	tb_dlist_insert_prev(dlist, i, "1111111111");
+	tb_dlist_insert_prev(dlist, i, "2222222222");
+	tb_dlist_insert_prev(dlist, i, "3333333333");
+	tb_dlist_insert_prev(dlist, i, "4444444444");
+	tb_dlist_insert_prev(dlist, i, "5555555555");
+	tb_dlist_insert_prev(dlist, i, "6666666666");
+	tb_dlist_insert_prev(dlist, i, "7777777777");
+	tb_dlist_insert_prev(dlist, i, "8888888888");
+	tb_dlist_insert_prev(dlist, i, "9999999999");
 	tb_dlist_insert_head(dlist, "4444444444");
 	tb_dlist_insert_head(dlist, "3333333333");
 	tb_dlist_insert_head(dlist, "2222222222");
@@ -795,16 +795,16 @@ static tb_void_t tb_dlist_ifm_test()
 	tb_print("insert:");
 	tb_dlist_ninsert_head(dlist, "HHHHHHHHHH", 10);
 	i = tb_dlist_ninsert_tail(dlist, "TTTTTTTTTT", 10);
-	j = tb_dlist_insert(dlist, i, "0000000000");
-	tb_dlist_insert(dlist, i, "1111111111");
-	tb_dlist_insert(dlist, i, "2222222222");
-	tb_dlist_insert(dlist, i, "3333333333");
-	tb_dlist_insert(dlist, i, "4444444444");
-	tb_dlist_insert(dlist, i, "5555555555");
-	tb_dlist_insert(dlist, i, "6666666666");
-	tb_dlist_insert(dlist, i, "7777777777");
-	tb_dlist_insert(dlist, i, "8888888888");
-	tb_dlist_insert(dlist, i, "9999999999");
+	j = tb_dlist_insert_prev(dlist, i, "0000000000");
+	tb_dlist_insert_prev(dlist, i, "1111111111");
+	tb_dlist_insert_prev(dlist, i, "2222222222");
+	tb_dlist_insert_prev(dlist, i, "3333333333");
+	tb_dlist_insert_prev(dlist, i, "4444444444");
+	tb_dlist_insert_prev(dlist, i, "5555555555");
+	tb_dlist_insert_prev(dlist, i, "6666666666");
+	tb_dlist_insert_prev(dlist, i, "7777777777");
+	tb_dlist_insert_prev(dlist, i, "8888888888");
+	tb_dlist_insert_prev(dlist, i, "9999999999");
 	tb_dlist_insert_head(dlist, "4444444444");
 	tb_dlist_insert_head(dlist, "3333333333");
 	tb_dlist_insert_head(dlist, "2222222222");

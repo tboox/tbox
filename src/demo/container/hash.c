@@ -36,7 +36,7 @@
 static tb_void_t tb_hash_test_s2i_func()
 {
 	// init hash: str => tb_int_t
-	tb_handle_t hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -137,7 +137,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 static tb_void_t tb_hash_test_i2s_func()
 {
 	// init hash: tb_int_t => str
-	tb_handle_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -371,7 +371,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 static tb_void_t tb_hash_test_i2i_func()
 {
 	// init hash: tb_int_t => str
-	tb_handle_t hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_long());
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -460,7 +460,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 
 	tb_hash_exit(hash);
 }
-static tb_bool_t tb_hash_test_walk_item(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	tb_assert_and_check_return_val(hash && bdel && data, tb_false);
 
