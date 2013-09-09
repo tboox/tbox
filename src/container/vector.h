@@ -95,20 +95,73 @@ typedef struct __tb_vector_t
  * interfaces
  */
 
-// init & exit
+/*! init vector
+ *
+ * @param grow 		the item grow
+ * @param func 		the item func
+ *
+ * @return 			the vector
+ */
 tb_vector_t* 		tb_vector_init(tb_size_t grow, tb_item_func_t func);
+
+/*! exist vector
+ *
+ * @param vector 	the vector
+ */
 tb_void_t 			tb_vector_exit(tb_vector_t* vector);
 
-// accessors
+/*! the vector data
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector data
+ */
 tb_pointer_t 		tb_vector_data(tb_vector_t* vector);
+
+/*! the vector head item
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector head item
+ */
 tb_pointer_t 		tb_vector_head(tb_vector_t* vector);
+
+/*! the vector last item
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector last item
+ */
 tb_pointer_t 		tb_vector_last(tb_vector_t* vector);
 
-// modifiors
+/*! resize the vector
+ *
+ * @param vector 	the vector
+ * @param size 		the vector size
+ *
+ * @return 			tb_true or tb_false
+ */
 tb_bool_t 			tb_vector_resize(tb_vector_t* vector, tb_size_t size);
+
+/*! clear the vector
+ *
+ * @param vector 	the vector
+ */
 tb_void_t 			tb_vector_clear(tb_vector_t* vector);
+
+/*! copy the vector
+ *
+ * @param vector 	the vector
+ * @param copy 		the copied vector
+ */
 tb_void_t 			tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy);
 
+/*! insert the vector item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 	 		tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
 tb_void_t 	 		tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data);
 tb_void_t 	 		tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t data);
@@ -133,8 +186,20 @@ tb_void_t 	 		tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t s
 tb_void_t 	 		tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
 tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
 
-// attributes
+/*! the vector size
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector size
+ */
 tb_size_t 			tb_vector_size(tb_vector_t const* vector);
+
+/*! the vector maxn
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector size
+ */
 tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
 
 /*!walk
