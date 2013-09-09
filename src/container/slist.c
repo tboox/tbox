@@ -614,7 +614,7 @@ tb_size_t tb_slist_moveto_next(tb_slist_t* handle, tb_size_t itor, tb_size_t mov
 {
 	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)handle;
-	tb_assert_and_check_return_val(slist && slist->pool, move);
+	tb_assert_and_check_return_val(slist && slist->pool && move, move);
 
 	// non-empty?
 	tb_check_return_val(slist->head, move);
