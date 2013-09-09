@@ -316,6 +316,14 @@ static tb_void_t tb_item_func_ptr_copy(tb_item_func_t* func, tb_pointer_t item, 
 	// copy it
 	*((tb_pointer_t*)item) = data;
 }
+static tb_void_t tb_item_func_ptr_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+{
+	// check
+	tb_assert_and_check_return(func && item);
+
+	// dupl it
+	*((tb_pointer_t*)item) = data;
+}
 static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item, tb_size_t size)
 {
 	// check
@@ -330,6 +338,15 @@ static tb_void_t tb_item_func_ptr_nfree(tb_item_func_t* func, tb_pointer_t item,
 
 	// clear
 	if (size) tb_memset(item, 0, size * func->size);
+}
+static tb_void_t tb_item_func_ptr_ndupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return(func && item);
+
+	// dupl items
+	if (func->size == 4) tb_memset_u32(item, data, size);
+	else while (size--) ((tb_pointer_t*)item)[size] = data;
 }
 static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size)
 {
@@ -729,11 +746,11 @@ tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv)
 	func.cstr = tb_item_func_ptr_cstr;
 
 	func.free = free? free : tb_item_func_ptr_free;
-	func.dupl = tb_item_func_ptr_copy;
+	func.dupl = tb_item_func_ptr_dupl;
 	func.copy = tb_item_func_ptr_copy;
 
 	func.nfree = tb_item_func_ptr_nfree;
-	func.ndupl = tb_item_func_ptr_ncopy;
+	func.ndupl = tb_item_func_ptr_ndupl;
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
