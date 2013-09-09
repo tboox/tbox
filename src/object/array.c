@@ -89,7 +89,7 @@ static tb_object_t* tb_array_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(array && array->vector, tb_null);
 
 	// init copy
-	tb_array_t* copy = tb_array_init(array->vector->grow, array->incr);
+	tb_array_t* copy = tb_array_init(tb_vector_grow(array->vector), array->incr);
 	tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
 	// refn++

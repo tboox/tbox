@@ -35,61 +35,8 @@
  * types
  */
 
-/*!the vector type
- *
- * <pre>
- * vector: |-----|--------------------------------------------------------|------|
- *       head                                                           last    tail
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * insert:
- * insert midd: slow
- * insert head: slow
- * insert tail: fast
- *
- * ninsert:
- * ninsert midd: fast
- * ninsert head: fast
- * ninsert tail: fast
- *
- * remove:
- * remove midd: slow
- * remove head: slow
- * remove last: fast
- *
- * nremove:
- * nremove midd: fast
- * nremove head: fast
- * nremove last: fast
- *
- * iterator:
- * next: fast
- * prev: fast
- * </pre>
- *
- * @note the itor of the same item is mutable
- *
- */
-typedef struct __tb_vector_t
-{
-	// the itor
-	tb_iterator_t 			itor;
-
-	// the data
-	tb_byte_t* 				data;
-	tb_size_t 				size;
-	tb_size_t 				grow;
-	tb_size_t 				maxn;
-
-	// the func
-	tb_item_func_t 			func;
-
-}tb_vector_t;
+/// the vector type
+typedef tb_void_t 	tb_vector_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -154,7 +101,7 @@ tb_void_t 			tb_vector_clear(tb_vector_t* vector);
  * @param vector 	the vector
  * @param copy 		the copied vector
  */
-tb_void_t 			tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy);
+tb_void_t 			tb_vector_copy(tb_vector_t* vector, tb_vector_t const* copy);
 
 /*! insert the vector prev item
  *
@@ -324,6 +271,14 @@ tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
  */
 tb_size_t 			tb_vector_size(tb_vector_t const* vector);
 
+/*! the vector grow
+ *
+ * @param vector 	the vector
+ *
+ * @return 			the vector grow
+ */
+tb_size_t 			tb_vector_grow(tb_vector_t const* vector);
+
 /*! the vector maxn
  *
  * @param vector 	the vector
@@ -356,6 +311,9 @@ tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
  * }
  * @endcode
  *
+ * @param vector 	the vector
+ * @param func 		the walk func
+ * @param data 		the walk data
  */
 tb_void_t 			tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
 
