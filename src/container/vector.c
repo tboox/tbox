@@ -239,8 +239,9 @@ tb_bool_t tb_vector_resize(tb_vector_t* vector, tb_size_t size)
 	vector->size = size;
 	return tb_true;
 }
-tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
+tb_void_t tb_vector_insert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {
+	// check
 	tb_assert_and_check_return(vector && vector->data && vector->func.size && itor <= vector->size);
 
 	// save size
@@ -259,18 +260,21 @@ tb_void_t tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t da
 	// duplicate data
 	vector->func.dupl(&vector->func, vector->data + itor * vector->func.size, data);
 }
+tb_void_t tb_vector_insert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
+{
+	tb_vector_insert_prev(vector, tb_iterator_next(vector, itor), data);
+}
 tb_void_t tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data)
 {
-	tb_assert_and_check_return(vector);
-	tb_vector_insert(vector, 0, data);
+	tb_vector_insert_prev(vector, 0, data);
 }
 tb_void_t tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t data)
 {
-	tb_assert_and_check_return(vector);
-	tb_vector_insert(vector, vector->size, data);
+	tb_vector_insert_prev(vector, vector->size, data);
 }
-tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+tb_void_t tb_vector_ninsert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(vector && vector->data && size && itor <= vector->size);
 
 	// save size
@@ -289,15 +293,17 @@ tb_void_t tb_vector_ninsert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t d
 	// duplicate data
 	vector->func.ndupl(&vector->func, vector->data + itor * vector->func.size, data, size);
 }
+tb_void_t tb_vector_ninsert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size)
+{
+	tb_vector_ninsert_prev(vector, tb_iterator_next(vector, itor), data, size);
+}
 tb_void_t tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
-	tb_assert_and_check_return(vector);
-	tb_vector_ninsert(vector, 0, data, size);
+	tb_vector_ninsert_prev(vector, 0, data, size);
 }
 tb_void_t tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size)
 {
-	tb_assert_and_check_return(vector);
-	tb_vector_ninsert(vector, vector->size, data, size);
+	tb_vector_ninsert_prev(vector, vector->size, data, size);
 }
 tb_void_t tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data)
 {

@@ -156,34 +156,164 @@ tb_void_t 			tb_vector_clear(tb_vector_t* vector);
  */
 tb_void_t 			tb_vector_copy(tb_vector_t* vector, tb_vector_t* copy);
 
-/*! insert the vector item
+/*! insert the vector prev item
  *
  * @param vector 	the vector
  * @param itor 		the item itor
  * @param data 		the item data
  */
-tb_void_t 	 		tb_vector_insert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
+tb_void_t 	 		tb_vector_insert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
+
+/*! insert the vector next item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
+tb_void_t 	 		tb_vector_insert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
+
+/*! insert the vector head item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 	 		tb_vector_insert_head(tb_vector_t* vector, tb_cpointer_t data);
+
+/*! insert the vector tail item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 	 		tb_vector_insert_tail(tb_vector_t* vector, tb_cpointer_t data);
 
-tb_void_t 	 		tb_vector_ninsert(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+/*! insert the vector prev items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
+tb_void_t 	 		tb_vector_ninsert_prev(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the vector next items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
+tb_void_t 	 		tb_vector_ninsert_next(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the vector head items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_ninsert_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size);
+
+/*! insert the vector tail items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_ninsert_tail(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size);
 
+/*! replace the vector item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 	 		tb_vector_replace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data);
+
+/*! replace the vector head item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 			tb_vector_replace_head(tb_vector_t* vector, tb_cpointer_t data);
+
+/*! replace the vector last item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ */
 tb_void_t 	 		tb_vector_replace_last(tb_vector_t* vector, tb_cpointer_t data);
 
+/*! replace the vector items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nreplace(tb_vector_t* vector, tb_size_t itor, tb_cpointer_t data, tb_size_t size);
+
+/*! replace the vector head items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nreplace_head(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size);
+
+/*! replace the vector last items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param data 		the item data
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nreplace_last(tb_vector_t* vector, tb_cpointer_t data, tb_size_t size);
 
+/*! remove the vector item
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ */
 tb_void_t 			tb_vector_remove(tb_vector_t* vector, tb_size_t itor);
+
+/*! remove the vector head item
+ *
+ * @param vector 	the vector
+ */
 tb_void_t 	 		tb_vector_remove_head(tb_vector_t* vector);
+
+/*! remove the vector last item
+ *
+ * @param vector 	the vector
+ */
 tb_void_t 	 		tb_vector_remove_last(tb_vector_t* vector);
 
+/*! remove the vector items
+ *
+ * @param vector 	the vector
+ * @param itor 		the item itor
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nremove(tb_vector_t* vector, tb_size_t itor, tb_size_t size);
+
+/*! remove the vector head items
+ *
+ * @param vector 	the vector
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nremove_head(tb_vector_t* vector, tb_size_t size);
+
+/*! remove the vector last items
+ *
+ * @param vector 	the vector
+ * @param size 		the item count
+ */
 tb_void_t 	 		tb_vector_nremove_last(tb_vector_t* vector, tb_size_t size);
 
 /*! the vector size
