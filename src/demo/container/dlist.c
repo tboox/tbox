@@ -606,7 +606,13 @@ static tb_void_t tb_dlist_int_test()
 	tb_dlist_nreplace_head(dlist, 0xf, 10);
 	tb_dlist_nreplace_last(dlist, 0xa, 10);
 	tb_dlist_replace_head(dlist, 0);
-	tb_dlist_replace_last(dlist, 0);
+	tb_dlist_replace_last(dlist, 1);
+	tb_dlist_int_dump(dlist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
+	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
 	tb_dlist_int_dump(dlist);
 
 	tb_print("=============================================================");
@@ -629,7 +635,8 @@ static tb_void_t tb_dlist_str_dump(tb_dlist_t const* dlist)
 }
 static tb_void_t tb_dlist_str_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
+	tb_handle_t spool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_str(tb_true, spool));
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
@@ -682,7 +689,13 @@ static tb_void_t tb_dlist_str_test()
 	tb_dlist_nreplace_head(dlist, "TTTTTTTTTT", 10);
 	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
 	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
-	tb_dlist_replace_last(dlist, "OOOOOOOOOO");
+	tb_dlist_replace_last(dlist, "IIIIIIIIII");
+	tb_dlist_str_dump(dlist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
+	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
 	tb_dlist_str_dump(dlist);
 
 	tb_print("=============================================================");
@@ -691,6 +704,7 @@ static tb_void_t tb_dlist_str_test()
 	tb_dlist_str_dump(dlist);
 
 	tb_dlist_exit(dlist);
+	tb_spool_exit(spool);
 }
 static tb_void_t tb_dlist_efm_dump(tb_dlist_t const* dlist)
 {
@@ -705,7 +719,8 @@ static tb_void_t tb_dlist_efm_dump(tb_dlist_t const* dlist)
 }
 static tb_void_t tb_dlist_efm_test()
 {
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
+	tb_handle_t rpool = tb_rpool_init(256, 11, 0);
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_efm(11, rpool));
 	tb_assert_and_check_return(dlist);
 
 	tb_size_t 			i = 0;
@@ -758,7 +773,13 @@ static tb_void_t tb_dlist_efm_test()
 	tb_dlist_nreplace_head(dlist, "TTTTTTTTTT", 10);
 	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
 	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
-	tb_dlist_replace_last(dlist, "OOOOOOOOOO");
+	tb_dlist_replace_last(dlist, "IIIIIIIIII");
+	tb_dlist_efm_dump(dlist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
+	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
 	tb_dlist_efm_dump(dlist);
 
 	tb_print("=============================================================");
@@ -767,6 +788,7 @@ static tb_void_t tb_dlist_efm_test()
 	tb_dlist_efm_dump(dlist);
 
 	tb_dlist_exit(dlist);
+	tb_rpool_exit(rpool);
 }
 static tb_void_t tb_dlist_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
@@ -838,7 +860,13 @@ static tb_void_t tb_dlist_ifm_test()
 	tb_dlist_nreplace_head(dlist, "TTTTTTTTTT", 10);
 	tb_dlist_nreplace_last(dlist, "HHHHHHHHHH", 10);
 	tb_dlist_replace_head(dlist, "OOOOOOOOOO");
-	tb_dlist_replace_last(dlist, "OOOOOOOOOO");
+	tb_dlist_replace_last(dlist, "IIIIIIIIII");
+	tb_dlist_ifm_dump(dlist);
+
+	tb_print("=============================================================");
+	tb_print("moveto:");
+	tb_dlist_moveto_head(dlist, tb_iterator_last(dlist));
+	tb_dlist_moveto_tail(dlist, tb_iterator_next(dlist, tb_iterator_head(dlist)));
 	tb_dlist_ifm_dump(dlist);
 
 	tb_print("=============================================================");
@@ -903,6 +931,7 @@ static tb_void_t tb_dlist_test_itor_perf()
 	// performance
 	tb_hong_t t = tb_mclock();
 	__tb_volatile__ tb_hize_t test[2] = {0};
+	__tb_volatile__ tb_size_t 	prev = 0;
 	__tb_volatile__ tb_size_t 	itor = tb_iterator_head(dlist);
 	for (; itor != tb_iterator_tail(dlist); )
 	{
@@ -914,7 +943,7 @@ static tb_void_t tb_dlist_test_itor_perf()
 			tb_size_t next = tb_iterator_next(dlist, itor);
 
 			// remove
-			tb_dlist_remove(dlist, itor);
+			tb_dlist_remove_next(dlist, prev);
 
 			// next
 			itor = next;
@@ -929,6 +958,7 @@ static tb_void_t tb_dlist_test_itor_perf()
 			test[1]++;
 		}
 
+		prev = itor;
 		itor = tb_iterator_next(dlist, itor);
 	}
 	t = tb_mclock() - t;
@@ -987,6 +1017,7 @@ static tb_void_t tb_dlist_test_walk_perf()
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
 
 #if 1
@@ -1005,6 +1036,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_dlist_test_walk_perf();
 #endif
 
+	// exit tbox
 	tb_exit();
 	return 0;
 }
