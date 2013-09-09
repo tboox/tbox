@@ -32,45 +32,91 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/*! the queue type
+ *
+ * <pre>
+ * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
+ *       head                                                           last    tail
+ *
+ * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
+ *                   last  tail                       head                
+ *
+ * head: => the first item
+ * last: => the last item
+ * tail: => behind the last item, no item
+ *
+ * performance: 
+ *
+ * push: 	fast
+ * pop: 	fast
+ *
+ * iterator:
+ * next: 	fast
+ * prev: 	fast
+ * </pre>
+ *
+ * @note the index of the same item is mutable
+ *
+ */
+typedef struct __tb_queue_impl_t
+{
+	// the itor
+	tb_iterator_t 			itor;
+
+	// the data
+	tb_byte_t* 				data;
+	tb_size_t 				head;
+	tb_size_t 				tail;
+	tb_size_t 				maxn;
+
+	// the func
+	tb_item_func_t 			func;
+
+}tb_queue_impl_t;
+
+/* ///////////////////////////////////////////////////////////////////////
  * iterator
  */
 static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return queue->head;
 }
 static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return queue->tail;
 }
 static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return ((itor + 1) & (queue->maxn - 1));
 }
 static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
 	return ((itor + queue->maxn - 1) & (queue->maxn - 1));
 }
 static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue && itor < queue->maxn, tb_null);
 	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
 }
 static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_return(queue);
 
 	if (iterator->step > sizeof(tb_pointer_t))
@@ -82,7 +128,7 @@ static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
-	tb_queue_t* queue = (tb_queue_t*)iterator;
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue && queue->func.comp, 0);
 	return queue->func.comp(&queue->func, ltem, rtem);
 }
@@ -97,7 +143,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	tb_assert_and_check_return_val(func.size && func.dupl && func.data, tb_null);
 
 	// alloc queue
-	tb_queue_t* queue = (tb_queue_t*)tb_malloc0(sizeof(tb_queue_t));
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)tb_malloc0(sizeof(tb_queue_impl_t));
 	tb_assert_and_check_return_val(queue, tb_null);
 
 	// init queue
@@ -128,8 +174,9 @@ fail:
 	return tb_null;
 }
 
-tb_void_t tb_queue_exit(tb_queue_t* queue)
-{
+tb_void_t tb_queue_exit(tb_queue_t* handle)
+{	
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	if (queue)
 	{
 		// clear data
@@ -142,8 +189,9 @@ tb_void_t tb_queue_exit(tb_queue_t* queue)
 		tb_free(queue);
 	}
 }
-tb_void_t tb_queue_clear(tb_queue_t* queue)
+tb_void_t tb_queue_clear(tb_queue_t* handle)
 {
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	if (queue) 
 	{
 		while (!tb_queue_null(queue)) tb_queue_pop(queue);
@@ -151,56 +199,76 @@ tb_void_t tb_queue_clear(tb_queue_t* queue)
 		queue->tail = 0;
 	}
 }
-tb_void_t tb_queue_put(tb_queue_t* queue, tb_cpointer_t data)
-{
+tb_void_t tb_queue_put(tb_queue_t* handle, tb_cpointer_t data)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return(queue && !tb_queue_full(queue));
+
 	queue->func.dupl(&queue->func, queue->data + queue->tail * queue->func.size, data);
 	queue->tail = ((queue->tail + 1) & (queue->maxn - 1));
 }
-tb_void_t tb_queue_pop(tb_queue_t* queue)
-{
+tb_void_t tb_queue_pop(tb_queue_t* handle)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return(queue && !tb_queue_null(queue));
+
 	if (queue->func.free) queue->func.free(&queue->func, queue->data + queue->head * queue->func.size);
 	queue->head = ((queue->head + 1) & (queue->maxn - 1));
 }
-tb_pointer_t tb_queue_get(tb_queue_t* queue)
+tb_pointer_t tb_queue_get(tb_queue_t const* handle)
 {
-	return tb_queue_head(queue);
+	return tb_queue_head(handle);
 }
-tb_pointer_t tb_queue_head(tb_queue_t* queue)
+tb_pointer_t tb_queue_head(tb_queue_t const* handle)
 {
-	return tb_iterator_item(queue, tb_iterator_head(queue));
+	return tb_iterator_item(handle, tb_iterator_head(handle));
 }
-tb_pointer_t tb_queue_last(tb_queue_t* queue)
+tb_pointer_t tb_queue_last(tb_queue_t const* handle)
 {
-	return tb_iterator_item(queue, tb_iterator_last(queue));
+	return tb_iterator_item(handle, tb_iterator_last(handle));
 }
-tb_size_t tb_queue_size(tb_queue_t const* queue)
-{
+tb_size_t tb_queue_size(tb_queue_t const* handle)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return_val(queue, 0);
+
 	return ((queue->tail + queue->maxn - queue->head) & (queue->maxn - 1));
 }
-tb_size_t tb_queue_maxn(tb_queue_t const* queue)
-{
+tb_size_t tb_queue_maxn(tb_queue_t const* handle)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return_val(queue, 0);
+
 	return (queue->maxn? queue->maxn - 1 : 0);
 }
-tb_bool_t tb_queue_full(tb_queue_t const* queue)
-{
+tb_bool_t tb_queue_full(tb_queue_t const* handle)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return_val(queue, tb_true);
+
 	return ((queue->head == ((queue->tail + 1) & (queue->maxn - 1)))? tb_true : tb_false);
 }
-tb_bool_t tb_queue_null(tb_queue_t const* queue)
-{
+tb_bool_t tb_queue_null(tb_queue_t const* handle)
+{	
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return_val(queue, tb_true);
+
 	return ((queue->head == queue->tail)? tb_true : tb_false);
 }
-tb_void_t tb_queue_remove(tb_queue_t* queue, tb_size_t itor)
+tb_void_t tb_queue_remove(tb_queue_t* handle, tb_size_t itor)
 {
 	tb_trace_noimpl();
 }
-tb_void_t tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
 {
+	// check
+	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
 	tb_assert_and_check_return(queue && queue->data && queue->maxn && func);
 
 	// step

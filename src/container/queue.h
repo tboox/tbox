@@ -48,74 +48,111 @@
  * types
  */
 
-/*!the queue type
- *
- * <pre>
- * queue: |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||------|
- *       head                                                           last    tail
- *
- * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
- *                   last  tail                       head                
- *
- * head: => the first item
- * last: => the last item
- * tail: => behind the last item, no item
- *
- * performance: 
- *
- * push: 	fast
- * pop: 	fast
- *
- * iterator:
- * next: 	fast
- * prev: 	fast
- * </pre>
- *
- * @note the index of the same item is mutable
- *
- */
-typedef struct __tb_queue_t
-{
-	// the itor
-	tb_iterator_t 			itor;
-
-	// the data
-	tb_byte_t* 				data;
-	tb_size_t 				head;
-	tb_size_t 				tail;
-	tb_size_t 				maxn;
-
-	// the func
-	tb_item_func_t 			func;
-
-}tb_queue_t;
+/// the queue type
+typedef tb_void_t 	tb_queue_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init & exit
+/*! init queue
+ *
+ * @param maxn 		the item maxn
+ * @param func 		the item func
+ *
+ * @return 			the queue
+ */
 tb_queue_t* 		tb_queue_init(tb_size_t maxn, tb_item_func_t func);
+
+/*! exit queue
+ *
+ * @param queue 	the queue
+ */
 tb_void_t 			tb_queue_exit(tb_queue_t* queue);
 
-// accessors & modifiors
-tb_pointer_t 		tb_queue_head(tb_queue_t* queue);
-tb_pointer_t 		tb_queue_last(tb_queue_t* queue);
+/*! the queue head item
+ *
+ * @param queue 	the queue
+ *
+ * @return 			the head item
+ */
+tb_pointer_t 		tb_queue_head(tb_queue_t const* queue);
 
-tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_cpointer_t data);
-tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
-tb_pointer_t 	 	tb_queue_get(tb_queue_t* queue);
+/*! the queue last item
+ *
+ * @param queue 	the queue
+ *
+ * @return 			the last item
+ */
+tb_pointer_t 		tb_queue_last(tb_queue_t const* queue);
 
+/*! clear the queue
+ *
+ * @param queue 	the queue
+ */
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
+
+/*! remove the queue item
+ *
+ * @param queue 	the queue
+ * @param itor 		the item itor
+ */
 tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
 
-// attributes
+/*! put the queue item
+ *
+ * @param queue 	the queue
+ * @param data 		the item data
+ */
+tb_void_t 	 		tb_queue_put(tb_queue_t* queue, tb_cpointer_t data);
+
+/*! pop the queue item
+ *
+ * @param queue 	the queue
+ */
+tb_void_t 	 		tb_queue_pop(tb_queue_t* queue);
+
+/*! get the queue item
+ *
+ * @param queue 	the queue
+ *
+ * @return 			the queue item
+ */
+tb_pointer_t 	 	tb_queue_get(tb_queue_t const* queue);
+
+/*! the queue size
+ *
+ * @param queue 	the queue
+ *
+ * @return 			the queue size
+ */
 tb_size_t 			tb_queue_size(tb_queue_t const* queue);
+
+/*! the queue maxn
+ *
+ * @param queue 	the queue
+ *
+ * @return 			the queue maxn
+ */
 tb_size_t 			tb_queue_maxn(tb_queue_t const* queue);
+
+/*! the queue full?
+ *
+ * @param queue 	the queue
+ *
+ * @return 			tb_true or tb_false
+ */
 tb_bool_t 			tb_queue_full(tb_queue_t const* queue);
+
+/*! the queue null?
+ *
+ * @param queue 	the queue
+ *
+ * @return 			tb_true or tb_false
+ */
 tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
 
-/*!walk
+/*! walk the queue
  *
  * be faster than the iterator mode, optimizate to remove items for walking
  *
@@ -138,6 +175,10 @@ tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
  * 		return tb_false;
  * }
  * @endcode
+ * 
+ * @param queue 	the queue
+ * @param func 		the walk func
+ * @param data 		the walk data
  *
  */
 tb_void_t 			tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
