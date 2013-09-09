@@ -559,7 +559,7 @@ tb_void_t tb_array_insert(tb_object_t* object, tb_size_t index, tb_object_t* ite
 	tb_assert_and_check_return(array && array->vector && item);
 
 	// insert
-	tb_vector_insert(array->vector, index, item);
+	tb_vector_insert_prev(array->vector, index, item);
 
 	// refn--
 	if (!array->incr) tb_object_dec(item);

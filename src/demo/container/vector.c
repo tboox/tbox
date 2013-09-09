@@ -23,11 +23,11 @@ static tb_size_t tb_vector_insert_test()
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
 	tb_hong_t t = tb_mclock();
-	for (i = 0; i < n; i++) tb_vector_insert(vector, tb_vector_size(vector) >> 1, 0xf);
+	for (i = 0; i < n; i++) tb_vector_insert_prev(vector, tb_vector_size(vector) >> 1, 0xf);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_insert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_print("tb_vector_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -112,11 +112,11 @@ static tb_size_t tb_vector_ninsert_test()
 
 	tb_size_t n = 1000000;
 	tb_hong_t t = tb_mclock();
-	tb_vector_ninsert(vector, 1, 0xf, n);
+	tb_vector_ninsert_prev(vector, 1, 0xf, n);
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_ninsert(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_print("tb_vector_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n + 1);
@@ -555,16 +555,16 @@ static tb_void_t tb_vector_int_test()
 	tb_print("insert:");
 	tb_vector_ninsert_head(vector, 0xa, 10); 
 	tb_vector_ninsert_tail(vector, 0xf, 10);
-	tb_vector_insert(vector, 10, 0);
-	tb_vector_insert(vector, 10, 1);
-	tb_vector_insert(vector, 10, 2);
-	tb_vector_insert(vector, 10, 3);
-	tb_vector_insert(vector, 10, 4);
-	tb_vector_insert(vector, 10, 5);
-	tb_vector_insert(vector, 10, 6);
-	tb_vector_insert(vector, 10, 7);
-	tb_vector_insert(vector, 10, 8);
-	tb_vector_insert(vector, 10, 9);
+	tb_vector_insert_prev(vector, 10, 0);
+	tb_vector_insert_prev(vector, 10, 1);
+	tb_vector_insert_prev(vector, 10, 2);
+	tb_vector_insert_prev(vector, 10, 3);
+	tb_vector_insert_prev(vector, 10, 4);
+	tb_vector_insert_prev(vector, 10, 5);
+	tb_vector_insert_prev(vector, 10, 6);
+	tb_vector_insert_prev(vector, 10, 7);
+	tb_vector_insert_prev(vector, 10, 8);
+	tb_vector_insert_prev(vector, 10, 9);
 	tb_vector_insert_head(vector, 4);
 	tb_vector_insert_head(vector, 3);
 	tb_vector_insert_head(vector, 2);
@@ -615,16 +615,16 @@ static tb_void_t tb_vector_str_test()
 	tb_print("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
-	tb_vector_insert(vector, 10, "0000000000");
-	tb_vector_insert(vector, 10, "1111111111");
-	tb_vector_insert(vector, 10, "2222222222");
-	tb_vector_insert(vector, 10, "3333333333");
-	tb_vector_insert(vector, 10, "4444444444");
-	tb_vector_insert(vector, 10, "5555555555");
-	tb_vector_insert(vector, 10, "6666666666");
-	tb_vector_insert(vector, 10, "7777777777");
-	tb_vector_insert(vector, 10, "8888888888");
-	tb_vector_insert(vector, 10, "9999999999");
+	tb_vector_insert_prev(vector, 10, "0000000000");
+	tb_vector_insert_prev(vector, 10, "1111111111");
+	tb_vector_insert_prev(vector, 10, "2222222222");
+	tb_vector_insert_prev(vector, 10, "3333333333");
+	tb_vector_insert_prev(vector, 10, "4444444444");
+	tb_vector_insert_prev(vector, 10, "5555555555");
+	tb_vector_insert_prev(vector, 10, "6666666666");
+	tb_vector_insert_prev(vector, 10, "7777777777");
+	tb_vector_insert_prev(vector, 10, "8888888888");
+	tb_vector_insert_prev(vector, 10, "9999999999");
 	tb_vector_insert_head(vector, "4444444444");
 	tb_vector_insert_head(vector, "3333333333");
 	tb_vector_insert_head(vector, "2222222222");
@@ -675,16 +675,16 @@ static tb_void_t tb_vector_efm_test()
 	tb_print("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
-	tb_vector_insert(vector, 10, "0000000000");
-	tb_vector_insert(vector, 10, "1111111111");
-	tb_vector_insert(vector, 10, "2222222222");
-	tb_vector_insert(vector, 10, "3333333333");
-	tb_vector_insert(vector, 10, "4444444444");
-	tb_vector_insert(vector, 10, "5555555555");
-	tb_vector_insert(vector, 10, "6666666666");
-	tb_vector_insert(vector, 10, "7777777777");
-	tb_vector_insert(vector, 10, "8888888888");
-	tb_vector_insert(vector, 10, "9999999999");
+	tb_vector_insert_prev(vector, 10, "0000000000");
+	tb_vector_insert_prev(vector, 10, "1111111111");
+	tb_vector_insert_prev(vector, 10, "2222222222");
+	tb_vector_insert_prev(vector, 10, "3333333333");
+	tb_vector_insert_prev(vector, 10, "4444444444");
+	tb_vector_insert_prev(vector, 10, "5555555555");
+	tb_vector_insert_prev(vector, 10, "6666666666");
+	tb_vector_insert_prev(vector, 10, "7777777777");
+	tb_vector_insert_prev(vector, 10, "8888888888");
+	tb_vector_insert_prev(vector, 10, "9999999999");
 	tb_vector_insert_head(vector, "4444444444");
 	tb_vector_insert_head(vector, "3333333333");
 	tb_vector_insert_head(vector, "2222222222");
@@ -739,16 +739,16 @@ static tb_void_t tb_vector_ifm_test()
 	tb_print("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
-	tb_vector_insert(vector, 10, "0000000000");
-	tb_vector_insert(vector, 10, "1111111111");
-	tb_vector_insert(vector, 10, "2222222222");
-	tb_vector_insert(vector, 10, "3333333333");
-	tb_vector_insert(vector, 10, "4444444444");
-	tb_vector_insert(vector, 10, "5555555555");
-	tb_vector_insert(vector, 10, "6666666666");
-	tb_vector_insert(vector, 10, "7777777777");
-	tb_vector_insert(vector, 10, "8888888888");
-	tb_vector_insert(vector, 10, "9999999999");
+	tb_vector_insert_prev(vector, 10, "0000000000");
+	tb_vector_insert_prev(vector, 10, "1111111111");
+	tb_vector_insert_prev(vector, 10, "2222222222");
+	tb_vector_insert_prev(vector, 10, "3333333333");
+	tb_vector_insert_prev(vector, 10, "4444444444");
+	tb_vector_insert_prev(vector, 10, "5555555555");
+	tb_vector_insert_prev(vector, 10, "6666666666");
+	tb_vector_insert_prev(vector, 10, "7777777777");
+	tb_vector_insert_prev(vector, 10, "8888888888");
+	tb_vector_insert_prev(vector, 10, "9999999999");
 	tb_vector_insert_head(vector, "4444444444");
 	tb_vector_insert_head(vector, "3333333333");
 	tb_vector_insert_head(vector, "2222222222");
