@@ -97,6 +97,12 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 	// ok
 	return tb_true;
 }
+static __tb_inline__ tb_void_t tb_version_dump()
+{
+	tb_version_t const* version = tb_version();
+	if (version) tb_trace("version: tbox-v%u.%u.%u.%lu", version->major, version->minor, version->alter, version->build);
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -128,6 +134,9 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_s
 	// check byteorder
 	tb_assert(tb_check_order_word());
 	tb_assert(tb_check_order_double());
+
+	// dump version
+	tb_version_dump();
 
 	// init memory
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;

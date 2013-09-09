@@ -107,7 +107,7 @@ MMFLAGS_DEBUG 		=
 MMFLAGS 			=
 
 # ldflags
-LDFLAGS_RELEASE 	= -static -s
+LDFLAGS_RELEASE 	= -s
 LDFLAGS_DEBUG 		= -rdynamic -pg
 LDFLAGS 			= 
 LDFLAGS-L 			= -L
