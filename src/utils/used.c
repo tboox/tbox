@@ -17,27 +17,20 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		utils.h
- * @defgroup 	utils
+ * @file		used.c
+ * @ingroup 	utils
  *
  */
-#ifndef TB_UTILS_H
-#define TB_UTILS_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "bits.h"
-#include "sha.h"
-#include "md5.h"
-#include "crc.h"
-#include "url.h"
-#include "dump.h"
 #include "used.h"
-#include "base32.h"
-#include "base64.h"
-#include "option.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_void_t tb_used_ptr(tb_cpointer_t variable)
+{
+}
+

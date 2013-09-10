@@ -85,6 +85,7 @@ tbox_C_FILES 			+= \
 						utils/crc \
 						utils/url \
 						utils/dump \
+						utils/used \
 						utils/base32 \
 						utils/base64 \
 						xml/node \
@@ -382,6 +383,7 @@ INC_FILES 				= \
 						utils/option.h \
 						utils/crc.h \
 						utils/url.h \
+						utils/used.h \
 						utils/dump.h \
 						utils/base32.h \
 						utils/base64.h \
