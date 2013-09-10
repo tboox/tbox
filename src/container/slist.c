@@ -574,18 +574,18 @@ tb_size_t tb_slist_remove_next(tb_slist_t* handle, tb_size_t itor)
 	tb_assert_and_check_return_val(slist && slist->pool, itor);
 
 	// detach next
-	tb_size_t midd = tb_slist_detach_next(slist, itor);
-	tb_assert_and_check_return_val(midd, itor);
+	tb_size_t node = tb_slist_detach_next(slist, itor);
+	tb_assert_and_check_return_val(node, itor);
 
 	// next item
-	tb_size_t next = tb_iterator_next(slist, midd);
+	tb_size_t next = tb_iterator_next(slist, node);
 
 	// free item
 	if (slist->func.free)
-		slist->func.free(&slist->func, &((tb_slist_item_t*)midd)[1]);
+		slist->func.free(&slist->func, &((tb_slist_item_t*)node)[1]);
 
 	// free node
-	tb_rpool_free(slist->pool, (tb_pointer_t)midd);
+	tb_rpool_free(slist->pool, (tb_pointer_t)node);
 
 	// return next node
 	return next;
@@ -646,11 +646,11 @@ tb_size_t tb_slist_moveto_next(tb_slist_t* handle, tb_size_t itor, tb_size_t mov
 	tb_assert_and_check_return_val(slist && slist->pool && move, move);
 
 	// detach move
-	tb_size_t midd = tb_slist_detach_next(slist, tb_iterator_prev(slist, move));
-	tb_assert_and_check_return_val(midd && midd == move, move);
+	tb_size_t node = tb_slist_detach_next(slist, tb_iterator_prev(slist, move));
+	tb_assert_and_check_return_val(node && node == move, move);
 
 	// attach move to next
-	return tb_slist_attach_next(slist, itor, midd);
+	return tb_slist_attach_next(slist, itor, node);
 }
 tb_size_t tb_slist_moveto_head(tb_slist_t* handle, tb_size_t move)
 {
