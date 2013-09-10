@@ -496,7 +496,7 @@ tb_size_t tb_slist_replace(tb_slist_t* handle, tb_size_t itor, tb_cpointer_t dat
 	tb_slist_item_t* item = (tb_slist_item_t*)itor;
 
 	// copy data
-	slist->func.dupl(&slist->func, &item[1], data);
+	slist->func.copy(&slist->func, &item[1], data);
 
 	// ok
 	return itor;
