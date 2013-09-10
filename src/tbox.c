@@ -97,26 +97,38 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 	// ok
 	return tb_true;
 }
-static __tb_inline__ tb_void_t tb_version_dump()
+static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 {
 	tb_version_t const* version = tb_version();
-	if (version) tb_trace("version: tbox-v%u.%u.%u.%lu", version->major, version->minor, version->alter, version->build);
+	if (version) 
+	{
+		// ok
+		if ((tb_size_t)tb_atoll(build) == version->build)
+		{
+			tb_trace("version: tbox-v%u.%u.%u.%lu", version->major, version->minor, version->alter, version->build);
+			return tb_true;
+		}
+		else
+		{
+			tb_trace("version: tbox-v%u.%u.%u.%lu != %s", version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
+		}
+	}
+
+	// no
+	return tb_false;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_size_t build)
+tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_char_t const* build)
 {
 	// trace
 	tb_trace("init: %p %lu", data, size);
 
 	// check mode
 	if (!tb_check_mode(mode)) return tb_false;
-
-	// check build
-	tb_assert(build == TB_CONFIG_VERSION_BUILD);
 
 	// check types
 	tb_assert_static(sizeof(tb_byte_t) == 1);
@@ -135,9 +147,6 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_s
 	tb_assert(tb_check_order_word());
 	tb_assert(tb_check_order_double());
 
-	// dump version
-	tb_version_dump();
-
 	// init memory
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
 
@@ -149,6 +158,9 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_s
 
 	// init object
 	if (!tb_object_context_init()) return tb_false;
+
+	// check version
+	tb_version_check(build);
 
 	// ok
 	tb_trace("init: ok");
@@ -174,6 +186,9 @@ tb_void_t tb_exit()
 
 tb_version_t const* tb_version()
 {
+	// init version tag for binary search
+	static __tb_volatile__ tb_char_t const* s_vtag = "[tbox]: [vtag]: " TB_CONFIG_VERSION_BUILD; tb_used(s_vtag);
+
 	// init version
 	static tb_version_t s_version = {0};
 	if (!s_version.major)
@@ -181,7 +196,7 @@ tb_version_t const* tb_version()
 		s_version.major = TB_VERSION_MAJOR;
 		s_version.minor = TB_VERSION_MINOR;
 		s_version.alter = TB_VERSION_ALTER;
-		s_version.build = TB_CONFIG_VERSION_BUILD;
+		s_version.build = (tb_size_t)tb_atoll(TB_CONFIG_VERSION_BUILD);
 	}
 
 	return &s_version;
