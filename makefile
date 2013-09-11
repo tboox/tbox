@@ -142,7 +142,27 @@ endif
 
 # architecture
 ifeq ($(ARCH),)
+
+ifeq ($(PLAT),mingw)
 ARCH := x86
+endif
+
+ifeq ($(PLAT),mac)
+ARCH := x$(shell getconf LONG_BIT)
+endif
+
+ifeq ($(PLAT),linux)
+ARCH := x$(shell getconf LONG_BIT)
+endif
+
+ifeq ($(PLAT),ios)
+ARCH := armv7
+endif
+
+ifeq ($(PLAT),android)
+ARCH := armv7
+endif
+
 endif
 
 # linux, cygwin, mac
@@ -164,7 +184,7 @@ endif
 
 # small
 ifeq ($(SMALL),)
-SMALL := n
+SMALL := y
 endif
 
 # demo

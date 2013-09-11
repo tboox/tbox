@@ -34,6 +34,7 @@
 
 tb_handle_t tb_dynamic_init(tb_char_t const* name)
 {
+	// check
 	tb_assert_and_check_return_val(name, tb_null);
 
 	// clear error
