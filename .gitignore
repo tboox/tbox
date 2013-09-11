@@ -11,6 +11,8 @@
 *.swo
 *.bak
 *.orig
+config.mak
+src/config.h
 .svn
 .DS_Store
 gmon.out
