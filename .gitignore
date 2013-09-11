@@ -11,7 +11,7 @@
 *.swo
 *.bak
 *.orig
-config.mak
+.config.mak
 src/config.h
 .svn
 .DS_Store

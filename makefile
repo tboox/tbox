@@ -3,8 +3,8 @@
 # ######################################################################################
 # includes
 # #
-${shell if [ ! -f "config.mak" ]; then touch config.mak; fi }
-include config.mak
+${shell if [ ! -f ".config.mak" ]; then touch .config.mak; fi }
+include .config.mak
 
 # ######################################################################################
 # make shortcut
@@ -227,57 +227,57 @@ config : .null
 	@echo "config: ndk:      " 							$(NDK)
 	@echo "config: ==================================================================="
 
-	@echo "# config"                      				> config.mak
-	@echo "IS_CONFIG = y" 								>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# project"              						>> config.mak
-	@echo "PRO_DIR =" $(PRO_DIR) 						>> config.mak
-	@echo "PRO_NAME =" $(PRO_NAME) 						>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# debug"              						>> config.mak
-	@echo "DEBUG =" $(DEBUG) 							>> config.mak
-	@echo "DTYPE =" $(DTYPE) 							>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# small"              						>> config.mak
-	@echo "SMALL =" $(SMALL) 							>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# prefix"              						>> config.mak
-	@echo "PREFIX =" $(PREFIX) 							>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# platform"      	          				>> config.mak
-	@echo "PLAT =" $(PLAT) 								>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# architecture"                				>> config.mak
-	@echo "ARCH =" $(ARCH) 								>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# demo" 			               				>> config.mak
-	@echo "DEMO =" $(DEMO) 								>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# toolchain"            						>> config.mak
-	@echo "SDK =" $(SDK) 								>> config.mak
-	@echo "NDK =" $(NDK) 								>> config.mak
-	@echo "BIN =" $(BIN) 								>> config.mak
-	@echo "PRE =" $(PRE) 								>> config.mak
-	@echo "HOST =" $(HOST) 								>> config.mak
-	@echo "CCACHE =" $(CCACHE) 							>> config.mak
-	@echo "DISTCC =" $(DISTCC) 							>> config.mak
-	@echo ""                              				>> config.mak
-	@echo "# export"									>> config.mak
-	@echo "export PRO_DIR" 		 						>> config.mak
-	@echo "export PRO_NAME" 		 					>> config.mak
-	@echo "export DEBUG" 			 					>> config.mak
-	@echo "export DTYPE" 			 					>> config.mak
-	@echo "export SMALL" 			 					>> config.mak
-	@echo "export PLAT"					 				>> config.mak
-	@echo "export ARCH"					 				>> config.mak
-	@echo "export DEMO"					 				>> config.mak
-	@echo "export SDK" 				 					>> config.mak
-	@echo "export NDK" 				 					>> config.mak
-	@echo "export BIN" 				 					>> config.mak
-	@echo "export PRE" 				 					>> config.mak
-	@echo "export HOST" 			 					>> config.mak
-	@echo "export CCACHE" 			 					>> config.mak
-	@echo "export DISTCC" 			 					>> config.mak
+	@echo "# config"                      				> .config.mak
+	@echo "IS_CONFIG = y" 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# project"              						>> .config.mak
+	@echo "PRO_DIR =" $(PRO_DIR) 						>> .config.mak
+	@echo "PRO_NAME =" $(PRO_NAME) 						>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# debug"              						>> .config.mak
+	@echo "DEBUG =" $(DEBUG) 							>> .config.mak
+	@echo "DTYPE =" $(DTYPE) 							>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# small"              						>> .config.mak
+	@echo "SMALL =" $(SMALL) 							>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# prefix"              						>> .config.mak
+	@echo "PREFIX =" $(PREFIX) 							>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# platform"      	          				>> .config.mak
+	@echo "PLAT =" $(PLAT) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# architecture"                				>> .config.mak
+	@echo "ARCH =" $(ARCH) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# demo" 			               				>> .config.mak
+	@echo "DEMO =" $(DEMO) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# toolchain"            						>> .config.mak
+	@echo "SDK =" $(SDK) 								>> .config.mak
+	@echo "NDK =" $(NDK) 								>> .config.mak
+	@echo "BIN =" $(BIN) 								>> .config.mak
+	@echo "PRE =" $(PRE) 								>> .config.mak
+	@echo "HOST =" $(HOST) 								>> .config.mak
+	@echo "CCACHE =" $(CCACHE) 							>> .config.mak
+	@echo "DISTCC =" $(DISTCC) 							>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# export"									>> .config.mak
+	@echo "export PRO_DIR" 		 						>> .config.mak
+	@echo "export PRO_NAME" 		 					>> .config.mak
+	@echo "export DEBUG" 			 					>> .config.mak
+	@echo "export DTYPE" 			 					>> .config.mak
+	@echo "export SMALL" 			 					>> .config.mak
+	@echo "export PLAT"					 				>> .config.mak
+	@echo "export ARCH"					 				>> .config.mak
+	@echo "export DEMO"					 				>> .config.mak
+	@echo "export SDK" 				 					>> .config.mak
+	@echo "export NDK" 				 					>> .config.mak
+	@echo "export BIN" 				 					>> .config.mak
+	@echo "export PRE" 				 					>> .config.mak
+	@echo "export HOST" 			 					>> .config.mak
+	@echo "export CCACHE" 			 					>> .config.mak
+	@echo "export DISTCC" 			 					>> .config.mak
 
 # ######################################################################################
 # help
