@@ -171,7 +171,7 @@ typedef struct __tb_version_t
 	tb_byte_t 						alter;
 
 	/// the build
-	tb_size_t 						build;
+	tb_hize_t 						build;
 
 }tb_version_t;
 
