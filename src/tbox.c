@@ -103,14 +103,14 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 	if (version) 
 	{
 		// ok
-		if ((tb_size_t)tb_atoll(build) == version->build)
+		if ((tb_hize_t)tb_atoll(build) == version->build)
 		{
-			tb_trace("version: tbox-v%u.%u.%u.%lu", version->major, version->minor, version->alter, version->build);
+			tb_trace("version: tbox-%lub-v%u.%u.%u.%llu", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build);
 			return tb_true;
 		}
 		else
 		{
-			tb_trace("version: tbox-v%u.%u.%u.%lu != %s", version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
+			tb_trace("version: tbox-%lub-v%u.%u.%u.%llu != %s", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
 		}
 	}
 
@@ -196,7 +196,7 @@ tb_version_t const* tb_version()
 		s_version.major = TB_VERSION_MAJOR;
 		s_version.minor = TB_VERSION_MINOR;
 		s_version.alter = TB_VERSION_ALTER;
-		s_version.build = (tb_size_t)tb_atoll(TB_CONFIG_VERSION_BUILD);
+		s_version.build = (tb_hize_t)tb_atoll(TB_CONFIG_VERSION_BUILD);
 	}
 
 	return &s_version;

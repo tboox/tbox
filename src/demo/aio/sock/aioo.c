@@ -183,6 +183,7 @@ static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data,
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// open socket

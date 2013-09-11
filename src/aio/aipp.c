@@ -129,7 +129,7 @@ tb_bool_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_
 	tb_aioo_t o;
 	tb_aioo_seto(&o, handle, aipp->type, etype, odata);
 	tb_hash_set(aipp->hash, handle, &o);
-	
+
 	// ok
 	return tb_true;
 }
