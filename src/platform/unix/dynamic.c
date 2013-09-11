@@ -45,7 +45,7 @@ tb_handle_t tb_dynamic_init(tb_char_t const* name)
 	// error?
 	if (dlerror()) 
 	{
-		dlclose(dynamic);
+		if (dynamic) dlclose(dynamic);
 		dynamic = tb_null;
 	}
 
