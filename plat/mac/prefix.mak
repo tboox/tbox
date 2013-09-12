@@ -41,7 +41,7 @@ CXFLAGS-o 			= -o
 
 # arch
 ifeq ($(ARCH),x86)
-CXFLAGS 			+= -arch i386 -mssse3
+CXFLAGS 			+= -m32 -mssse3
 endif
 
 ifeq ($(ARCH),x64)
@@ -106,9 +106,19 @@ MMFLAGS_RELEASE 	=
 MMFLAGS_DEBUG 		=	 
 MMFLAGS 			=
 
+# arch
+ifeq ($(ARCH),x86)
+MXFLAGS 			+= -m32
+endif
+
+# arch
+ifeq ($(ARCH),x64)
+MXFLAGS 			+= -m64
+endif
+
 # ldflags
 LDFLAGS_RELEASE 	= -s
-LDFLAGS_DEBUG 		= -rdynamic -pg
+LDFLAGS_DEBUG 		= -rdynamic
 LDFLAGS 			= 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
@@ -116,7 +126,13 @@ LDFLAGS-o 			= -o
 
 # arch
 ifeq ($(ARCH),x86)
-LDFLAGS 			+= -arch i386
+LDFLAGS 			+= -m32
+endif
+
+# arch
+ifeq ($(ARCH),x64)
+LDFLAGS 			+= -m64
+LDFLAGS_DEBUG 		+= -pg
 endif
 
 # asflags
@@ -128,11 +144,11 @@ ASFLAGS-o 			= -o
 
 # arch
 ifeq ($(ARCH),x86)
-ASFLAGS 			+= -arch i386
+ASFLAGS 			+= -m32
 endif
 
 ifeq ($(ARCH),x64)
-ASFLAGS 			+= -m amd64
+ASFLAGS 			+= -m64
 endif
 
 # arflags
