@@ -132,6 +132,12 @@ tb_item_func_t 		tb_item_func_uint16();
  */
 tb_item_func_t 		tb_item_func_uint32();
 
+/*! the integer item function for tb_uint64_t
+ *
+ * @return 			the item func
+ */
+tb_item_func_t 		tb_item_func_uint64();
+
 /*! the string item function
  *
  * using tb_strdup if the spool is null, 

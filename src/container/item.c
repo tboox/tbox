@@ -32,10 +32,8 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * the item for long
  */
-
-// the integer for tb_long_t
 static tb_long_t tb_item_func_long_comp(tb_item_func_t* func, tb_cpointer_t ldata, tb_cpointer_t rdata)
 {
 	return ((tb_long_t)ldata > (tb_long_t)rdata? 1 : ((tb_long_t)ldata < (tb_long_t)rdata? -1 : 0));
@@ -67,7 +65,9 @@ static tb_void_t tb_item_func_long_ncopy(tb_item_func_t* func, tb_pointer_t item
 	else while (size--) ((tb_long_t*)item)[size] = (tb_long_t)data;
 }
 
-// the integer for tb_size_t
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for size
+ */
 static tb_size_t tb_item_func_size_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
@@ -112,7 +112,10 @@ static tb_void_t tb_item_func_size_ncopy(tb_item_func_t* func, tb_pointer_t item
 	if (func->size == 4) tb_memset_u32(item, data, size);
 	else while (size--) ((tb_size_t*)item)[size] = (tb_size_t)data;
 }
-// the integer for tb_uint8_t
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for uint8
+ */
 static tb_size_t tb_item_func_uint8_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
@@ -150,7 +153,10 @@ static tb_void_t tb_item_func_uint8_ncopy(tb_item_func_t* func, tb_pointer_t ite
 	tb_assert_and_check_return(func && item);
 	tb_memset(item, data, size);
 }
-// the integer for tb_uint16_t
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for uint16
+ */
 static tb_size_t tb_item_func_uint16_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
@@ -188,7 +194,10 @@ static tb_void_t tb_item_func_uint16_ncopy(tb_item_func_t* func, tb_pointer_t it
 	tb_assert_and_check_return(func && item);
 	tb_memset_u16(item, (tb_uint16_t)data, size);
 }
-// the integer for tb_uint32_t
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for uint32
+ */
 static tb_size_t tb_item_func_uint32_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
@@ -226,7 +235,10 @@ static tb_void_t tb_item_func_uint32_ncopy(tb_item_func_t* func, tb_pointer_t it
 	tb_assert_and_check_return(func && item);
 	tb_memset_u32(item, (tb_uint32_t)data, size);
 }
-// the cstring
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for string
+ */
 static tb_size_t tb_item_func_str_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && data && tb_ispow2(size), 0);
@@ -276,7 +288,9 @@ static tb_void_t tb_item_func_str_copy(tb_item_func_t* func, tb_pointer_t item, 
 	else *((tb_pointer_t*)item) = data? tb_strdup(data) : tb_null;
 }
 
-// the pointer
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for pointer
+ */
 static tb_size_t tb_item_func_ptr_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && tb_ispow2(size), 0);
@@ -365,7 +379,9 @@ static tb_void_t tb_item_func_ptr_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	else while (size--) ((tb_pointer_t*)item)[size] = data;
 }
 
-// the object
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for object
+ */
 static tb_char_t const* tb_item_func_obj_cstr(tb_item_func_t* func, tb_cpointer_t data, tb_char_t* cstr, tb_size_t maxn)
 {
 	// check
@@ -418,7 +434,9 @@ static tb_void_t tb_item_func_obj_copy(tb_item_func_t* func, tb_pointer_t item, 
 	if (object) tb_object_dec(object);
 }
 
-// the external fixed memory
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for the external fixed memory
+ */
 static tb_void_t tb_item_func_efm_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	tb_assert_and_check_return(func && item);
@@ -490,7 +508,10 @@ static tb_void_t tb_item_func_efm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	if (func->copy)
 		while (size--) func->copy(func, (tb_byte_t*)item + size * func->size, data);
 }
-// the internal fixed memory
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the item for the internal fixed memory
+ */
 static tb_size_t tb_item_func_ifm_hash(tb_item_func_t* func, tb_cpointer_t data, tb_size_t size)
 {
 	tb_assert_and_check_return_val(func && func->size && data && tb_ispow2(size), 0);
