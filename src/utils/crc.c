@@ -236,10 +236,26 @@ static tb_uint32_t const g_crc_table[TB_CRC_MODE_MAX][257] =
 
 tb_uint32_t tb_crc_encode(tb_crc_mode_t mode, tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in)
 {
-	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX, 0);
+	// check
+	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && ib, 0);
+
+	// done
 	tb_byte_t const* 	ie = ib + in;
 	tb_uint32_t const* 	pt = &g_crc_table[mode];
-	while (ib < ie)
-        crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+	while (ib < ie) crc = pt[((tb_uint8_t)crc) ^ *ib++] ^ (crc >> 8);
+
+	// ok?
+	return crc;
+}
+tb_uint32_t tb_crc_encode_cstr(tb_crc_mode_t mode, tb_uint32_t crc, tb_char_t const* cstr)
+{
+	// check
+	tb_assert_and_check_return_val(mode < TB_CRC_MODE_MAX && cstr, 0);
+
+	// done
+	tb_uint32_t const* 	pt = &g_crc_table[mode];
+	while (*cstr) crc = pt[((tb_uint8_t)crc) ^ *cstr++] ^ (crc >> 8);
+
+	// ok?
 	return crc;
 }
