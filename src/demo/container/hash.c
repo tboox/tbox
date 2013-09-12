@@ -133,7 +133,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 		tb_hash_test_get_s2i(hash, s);
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_print("s2i: time: %lld", t);
 
 	tb_hash_exit(hash);
 	tb_spool_exit(pool);
@@ -227,7 +227,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 		tb_hash_test_get_i2s(hash, i);
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_print("i2s: time: %lld", t);
 
 	tb_hash_exit(hash);
 	tb_spool_exit(pool);
@@ -367,7 +367,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 		tb_hash_test_get_m2m(hash, i);
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_print("m2m: time: %lld", t);
 
 	tb_hash_exit(hash);
 	tb_rpool_exit(pool);
@@ -460,7 +460,7 @@ static tb_void_t tb_hash_test_i2i_perf()
 		tb_hash_test_get_i2i(hash, i);
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_print("i2i: time: %lld", t);
 
 	tb_hash_exit(hash);
 }
@@ -552,7 +552,7 @@ static tb_void_t tb_hash_test_i2t_perf()
 		tb_hash_test_get_i2t(hash, i);
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_print("i2t: time: %lld", t);
 
 	tb_hash_exit(hash);
 }
