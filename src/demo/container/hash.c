@@ -30,12 +30,16 @@
 #define tb_hash_test_get_i2i(h, i) 		do {tb_assert(i == tb_hash_get(h, i)); } while (0);
 #define tb_hash_test_del_i2i(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
 
+#define tb_hash_test_set_i2t(h, i) 		do {tb_hash_set(h, i, tb_true); } while (0);
+#define tb_hash_test_get_i2t(h, i) 		do {tb_assert(tb_hash_get(h, i)); } while (0);
+#define tb_hash_test_del_i2t(h, i) 		do {tb_hash_del(h, i); tb_assert(!tb_hash_get(h, i)); } while (0);
+
 /* ///////////////////////////////////////////////////////////////////////
  * details
  */
 static tb_void_t tb_hash_test_s2i_func()
 {
-	// init hash: str => tb_int_t
+	// init hash
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_str(tb_true, tb_null), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
@@ -109,9 +113,9 @@ static tb_void_t tb_hash_test_s2i_func()
 }
 static tb_void_t tb_hash_test_s2i_perf()
 {
-	// init hash: str => tb_int_t
+	// init hash
 	tb_handle_t 	pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
-	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_true, pool), tb_item_func_long());
+	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_true, pool), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -136,7 +140,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 }
 static tb_void_t tb_hash_test_i2s_func()
 {
-	// init hash: tb_int_t => str
+	// init hash
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_str(tb_true, tb_null));
 	tb_assert_and_check_return(hash);
 
@@ -205,9 +209,9 @@ static tb_void_t tb_hash_test_i2s_func()
 }
 static tb_void_t tb_hash_test_i2s_perf()
 {
-	// init hash: tb_int_t => str
+	// init hash
 	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
-	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_str(tb_true, pool));
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_str(tb_true, pool));
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -230,11 +234,11 @@ static tb_void_t tb_hash_test_i2s_perf()
 }
 static tb_void_t tb_hash_test_m2m_func()
 {
+	// init hash
 	tb_size_t const	step = 256;
 	tb_byte_t 		item[step];
-	// init hash: mem => mem
-	tb_handle_t 	hash = tb_hash_init(8, tb_item_func_efm(step, tb_null), tb_item_func_efm(step, tb_null));
-	//tb_handle_t 	hash = tb_hash_init(8, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	tb_hash_t* 		hash = tb_hash_init(8, tb_item_func_efm(step, tb_null), tb_item_func_efm(step, tb_null));
+	//tb_hash_t* 	hash = tb_hash_init(8, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// set
@@ -342,12 +346,12 @@ static tb_void_t tb_hash_test_m2m_func()
 }
 static tb_void_t tb_hash_test_m2m_perf()
 {
+	// init hash: mem => mem
 	tb_size_t const	step = 12;
 	tb_byte_t 		item[step];
-	// init hash: mem => mem
 	tb_handle_t 	pool = tb_rpool_init(256, step, 0);
-	//tb_handle_t 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
-	tb_handle_t 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
+	//tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -370,7 +374,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 }
 static tb_void_t tb_hash_test_i2i_func()
 {
-	// init hash: tb_int_t => str
+	// init hash
 	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
@@ -439,8 +443,8 @@ static tb_void_t tb_hash_test_i2i_func()
 }
 static tb_void_t tb_hash_test_i2i_perf()
 {
-	// init hash: tb_int_t => str
-	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
+	// init hash
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -454,6 +458,98 @@ static tb_void_t tb_hash_test_i2i_perf()
 		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
 		tb_hash_test_set_i2i(hash, i); 
 		tb_hash_test_get_i2i(hash, i);
+	}
+	t = tb_mclock() - t;
+	tb_print("time: %lld", t);
+
+	tb_hash_exit(hash);
+}
+static tb_void_t tb_hash_test_i2t_func()
+{
+	// init hash
+	tb_hash_t* hash = tb_hash_init(8, tb_item_func_long(), tb_item_func_true());
+	tb_assert_and_check_return(hash);
+
+	// set
+	tb_hash_test_set_i2t(hash, 0);
+	tb_hash_test_set_i2t(hash, 1);
+	tb_hash_test_set_i2t(hash, 12);
+	tb_hash_test_set_i2t(hash, 123);
+	tb_hash_test_set_i2t(hash, 1234);
+	tb_hash_test_set_i2t(hash, 12345);
+	tb_hash_test_set_i2t(hash, 123456);
+	tb_hash_test_set_i2t(hash, 1234567);
+	tb_hash_test_set_i2t(hash, 12345678);
+	tb_hash_test_set_i2t(hash, 123456789);
+	tb_hash_test_set_i2t(hash, 876543210);
+	tb_hash_test_set_i2t(hash, 76543210);
+	tb_hash_test_set_i2t(hash, 6543210);
+	tb_hash_test_set_i2t(hash, 543210);
+	tb_hash_test_set_i2t(hash, 43210);
+	tb_hash_test_set_i2t(hash, 3210);
+	tb_hash_test_set_i2t(hash, 210);
+	tb_hash_test_set_i2t(hash, 10);
+	tb_hash_test_set_i2t(hash, 0);
+	tb_hash_test_dump(hash);
+
+	// get
+	tb_hash_test_get_i2t(hash, 0);
+	tb_hash_test_get_i2t(hash, 1);
+	tb_hash_test_get_i2t(hash, 12);
+	tb_hash_test_get_i2t(hash, 123);
+	tb_hash_test_get_i2t(hash, 1234);
+	tb_hash_test_get_i2t(hash, 12345);
+	tb_hash_test_get_i2t(hash, 123456);
+	tb_hash_test_get_i2t(hash, 1234567);
+	tb_hash_test_get_i2t(hash, 12345678);
+	tb_hash_test_get_i2t(hash, 123456789);
+	tb_hash_test_get_i2t(hash, 876543210);
+	tb_hash_test_get_i2t(hash, 76543210);
+	tb_hash_test_get_i2t(hash, 6543210);
+	tb_hash_test_get_i2t(hash, 543210);
+	tb_hash_test_get_i2t(hash, 43210);
+	tb_hash_test_get_i2t(hash, 3210);
+	tb_hash_test_get_i2t(hash, 210);
+	tb_hash_test_get_i2t(hash, 10);
+	tb_hash_test_get_i2t(hash, 0);
+
+	// del
+	tb_hash_test_del_i2t(hash, 0);
+	tb_hash_test_del_i2t(hash, 1);
+	tb_hash_test_del_i2t(hash, 12);
+	tb_hash_test_del_i2t(hash, 123);
+	tb_hash_test_del_i2t(hash, 1234);
+	tb_hash_test_del_i2t(hash, 12345);
+	tb_hash_test_del_i2t(hash, 123456);
+	tb_hash_test_del_i2t(hash, 1234567);
+	tb_hash_test_del_i2t(hash, 12345678);
+	tb_hash_test_del_i2t(hash, 123456789);
+	tb_hash_test_del_i2t(hash, 123456789);
+	tb_hash_test_dump(hash);
+
+	// clear
+	tb_hash_clear(hash);
+	tb_hash_test_dump(hash);
+
+	tb_hash_exit(hash);
+}
+static tb_void_t tb_hash_test_i2t_perf()
+{
+	// init hash
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_true());
+	tb_assert_and_check_return(hash);
+
+	// clear rand
+	tb_rand_clear();
+
+	// performance
+	__tb_volatile__ tb_size_t n = 100000;
+	tb_hong_t t = tb_mclock();
+	while (n--) 
+	{
+		tb_size_t i = tb_rand_uint32(0, TB_MAXU32);
+		tb_hash_test_set_i2t(hash, i); 
+		tb_hash_test_get_i2t(hash, i);
 	}
 	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
@@ -487,7 +583,7 @@ static tb_bool_t tb_hash_test_walk_item(tb_hash_t* hash, tb_hash_item_t* item, t
 static tb_void_t tb_hash_test_walk_perf()
 {
 	// init hash
-	tb_handle_t 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
+	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
 	// clear rand
@@ -523,6 +619,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hash_test_i2s_func();
 	tb_hash_test_m2m_func();
 	tb_hash_test_i2i_func();
+	tb_hash_test_i2t_func();
 #endif
 
 #if 1
@@ -530,6 +627,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hash_test_i2s_perf();
 	tb_hash_test_m2m_perf();
 	tb_hash_test_i2i_perf();
+	tb_hash_test_i2t_perf();
 #endif
 
 #if 1

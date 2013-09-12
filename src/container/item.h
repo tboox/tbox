@@ -52,19 +52,20 @@ typedef tb_void_t 			(*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_p
 /// the item type
 typedef enum __tb_item_type_t
 {
-	TB_ITEM_TYPE_NUL 		= 0 	//!< null
+	TB_ITEM_TYPE_NULL 		= 0 	//!< null
 ,	TB_ITEM_TYPE_LONG 		= 1 	//!< integer for tb_long_t
 ,	TB_ITEM_TYPE_SIZE 		= 2 	//!< integer for tb_size_t
 ,	TB_ITEM_TYPE_UINT8 		= 3 	//!< integer for tb_uint8_t
 ,	TB_ITEM_TYPE_UINT16 	= 4 	//!< integer for tb_uint16_t
 ,	TB_ITEM_TYPE_UINT32 	= 5 	//!< integer for tb_uint32_t
-,	TB_ITEM_TYPE_STR 		= 6 	//!< c-string
+,	TB_ITEM_TYPE_STR 		= 6 	//!< string
 ,	TB_ITEM_TYPE_PTR 		= 7 	//!< pointer
 ,	TB_ITEM_TYPE_EFM 		= 8 	//!< external fixed memory
 ,	TB_ITEM_TYPE_IFM 		= 9 	//!< internal fixed memory
 ,	TB_ITEM_TYPE_OBJ 		= 10 	//!< object
 ,	TB_ITEM_TYPE_SCACHE 	= 11 	//!< scache
-,	TB_ITEM_TYPE_OTR 		= 12 	//!< other
+,	TB_ITEM_TYPE_TRUE 		= 12 	//!< true
+,	TB_ITEM_TYPE_OTR 		= 13 	//!< other
 
 }tb_item_type_t;
 
@@ -101,6 +102,12 @@ typedef struct __tb_item_func_t
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
+
+/*! the true item function for hash data: null 
+ *
+ * @return 			the item func
+ */
+tb_item_func_t 		tb_item_func_true();
 
 /*! the integer item function for tb_long_t 
  *
