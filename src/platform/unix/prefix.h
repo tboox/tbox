@@ -28,5 +28,6 @@
  */
 #include "../prefix.h"
 #include "../../libc/libc.h"
+#include "../../utils/utils.h"
 
 #endif

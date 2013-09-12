@@ -56,9 +56,6 @@
 #define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
 #define tb_align_pow2(x) 		(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 2)
 
-// used
-//#define tb_used(p) 				do { if (p); } while (0);
-
 
 #endif
 
