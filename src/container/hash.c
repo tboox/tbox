@@ -377,7 +377,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	// check
 	tb_assert_and_check_return_val(size, tb_null);
 	tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_null);
-	tb_assert_and_check_return_val(data_func.size && data_func.data && data_func.dupl && data_func.copy, tb_null);
+	tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.copy, tb_null);
 
 	// make hash
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)tb_malloc0(sizeof(tb_hash_impl_t));
