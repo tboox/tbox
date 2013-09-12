@@ -635,11 +635,8 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 	dictionary->size = size;
 	dictionary->incr = incr;
 
-	// init item func
-	tb_item_func_t func = tb_item_func_obj();
-
 	// init hash
-	dictionary->hash = tb_hash_init(size, tb_item_func_scache(tb_true), func);
+	dictionary->hash = tb_hash_init(size, tb_item_func_scache(tb_true), tb_item_func_obj());
 	tb_assert_and_check_goto(dictionary->hash, fail);
 
 	// ok

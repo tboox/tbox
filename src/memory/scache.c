@@ -112,11 +112,12 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 	if (g_mutx) tb_mutex_enter(g_mutx);
 
 	// done
-	tb_hash_item_t const* item = tb_null;
+	tb_char_t const* cstr = tb_null;
 	if (g_hash)
 	{
 		// exists?
-		tb_size_t itor = 0;
+		tb_size_t 				itor = 0;
+		tb_hash_item_t const* 	item = tb_null;
 		if ((itor = tb_hash_itor(g_hash, data)) && (item = tb_iterator_item(g_hash, itor)))
 		{
 			// refn
@@ -143,12 +144,16 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 			if (itor = tb_hash_set(g_hash, data, 1))
 				item = tb_iterator_item(g_hash, itor);
 		}
+
+		// save the cstr
+		if (item) cstr = item->name;
 	}
+
 	// leave
 	if (g_mutx) tb_mutex_leave(g_mutx);
 
 	// ok?
-	return item? (tb_char_t*)item->name : tb_null;
+	return cstr;
 }
 tb_void_t tb_scache_del(tb_char_t const* data)
 {
