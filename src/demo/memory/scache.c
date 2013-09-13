@@ -27,8 +27,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		tb_int_t r = tb_snprintf(s, 256, "%u", tb_rand_uint32(0, 10000)); 
 		s[r] == '\0'; 
+#if 1
 		tb_scache_put(s); 
 		if (!(n & 15)) tb_scache_del(s);
+#else
+		tb_free(tb_strdup(s));
+#endif
 	}
 	t = tb_mclock() - t;
 	tb_print("time: %lld", t);
