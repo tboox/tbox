@@ -413,15 +413,20 @@ tb_bool_t tb_rpool_free(tb_handle_t handle, tb_pointer_t data)
 	return tb_false;
 }
 
-tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data)
+tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_cpointer_t data)
 {
 	// check 
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
 	tb_assert_and_check_return_val(rpool && data, tb_null);
 
+	// init
 	tb_size_t 	n = rpool->step;
 	tb_char_t* 	p = tb_rpool_malloc(handle);
+
+	// copy
 	if (p) tb_memcpy(p, data, n);
+
+	// ok?
 	return p;
 }
 
