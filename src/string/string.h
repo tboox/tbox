@@ -30,7 +30,6 @@
 #include "prefix.h"
 #include "pstring.h"
 #include "sstring.h"
-#include "rstring.h"
 
 #endif
 
