@@ -46,31 +46,74 @@
  * interfaces
  */
 
-// init
-tb_handle_t 	tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
+/*! init regular pool
+ *
+ * @param grow 		the grow
+ * @param step 		the step
+ * @param align 	the align
+ *
+ * @return 			the pool handle
+ */
+tb_handle_t 		tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align);
 
-// exit
-tb_void_t 		tb_rpool_exit(tb_handle_t handle);
+/*! exit regular pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_rpool_exit(tb_handle_t handle);
 
-// size
-tb_size_t 		tb_rpool_size(tb_handle_t handle);
+/*! the regular pool item count
+ *
+ * @param handle 	the pool handle
+ *
+ * @return 			the item count
+ */
+tb_size_t 			tb_rpool_size(tb_handle_t handle);
 
-// clear
-tb_void_t 		tb_rpool_clear(tb_handle_t handle);
+/*! clear regular pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_rpool_clear(tb_handle_t handle);
 
-// malloc
-tb_pointer_t 	tb_rpool_malloc(tb_handle_t handle);
+/*! malloc regular pool data
+ *
+ * @param handle 	the pool handle
+ * 
+ * @return 			the data pointer
+ */
+tb_pointer_t 		tb_rpool_malloc(tb_handle_t handle);
 
-// malloc0
-tb_pointer_t 	tb_rpool_malloc0(tb_handle_t handle);
+/*! malloc regular pool data and clear it
+ *
+ * @param handle 	the pool handle
+ *
+ * @return 			the data pointer
+ */
+tb_pointer_t 		tb_rpool_malloc0(tb_handle_t handle);
 
-// memdup
-tb_pointer_t 	tb_rpool_memdup(tb_handle_t handle, tb_pointer_t data);
+/*! duplicate regular pool data 
+ *
+ * @param handle 	the pool handle
+ * @param data		the data pointer
+ *
+ * @return 			the duplicated data pointer
+ */
+tb_pointer_t 		tb_rpool_memdup(tb_handle_t handle, tb_cpointer_t data);
 
-// free
-tb_bool_t 		tb_rpool_free(tb_handle_t handle, tb_pointer_t data);
+/*! free regular pool data
+ *
+ * @param handle 	the pool handle
+ * @param data 		the pool item data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_rpool_free(tb_handle_t handle, tb_pointer_t data);
 
-// dump
-tb_void_t 		tb_rpool_dump(tb_handle_t handle);
+/*! dump regular pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_rpool_dump(tb_handle_t handle);
 
 #endif

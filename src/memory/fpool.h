@@ -33,25 +33,75 @@
  * interfaces
  */
 
-// init
-tb_handle_t 	tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
+/*! init fixed pool
+ *
+ * @param data 		the data
+ * @param size 		the size
+ * @param step 		the step
+ * @param align 	the align
+ *
+ * @return 			the pool handle
+ */
+tb_handle_t 		tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
 
-// exit
-tb_void_t 		tb_fpool_exit(tb_handle_t handle);
+/*! exit fixed pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_fpool_exit(tb_handle_t handle);
 
-// clear
-tb_void_t 		tb_fpool_clear(tb_handle_t handle);
+/*! the fixed pool item count
+ *
+ * @param handle 	the pool handle
+ *
+ * @return 			the item count
+ */
+tb_size_t 			tb_fpool_size(tb_handle_t handle);
 
-// malloc
-tb_pointer_t 	tb_fpool_malloc(tb_handle_t handle);
+/*! clear fixed pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_fpool_clear(tb_handle_t handle);
 
-// malloc0
-tb_pointer_t 	tb_fpool_malloc0(tb_handle_t handle);
+/*! malloc fixed pool data
+ *
+ * @param handle 	the pool handle
+ * 
+ * @return 			the data pointer
+ */
+tb_pointer_t 		tb_fpool_malloc(tb_handle_t handle);
 
-// free
-tb_bool_t 		tb_fpool_free(tb_handle_t handle, tb_pointer_t data);
+/*! malloc fixed pool data and clear it
+ *
+ * @param handle 	the pool handle
+ *
+ * @return 			the data pointer
+ */
+tb_pointer_t 		tb_fpool_malloc0(tb_handle_t handle);
 
-// dump
-tb_void_t 		tb_fpool_dump(tb_handle_t handle);
+/*! duplicate fixed pool data 
+ *
+ * @param handle 	the pool handle
+ * @param data		the data pointer
+ *
+ * @return 			the duplicated data pointer
+ */
+tb_pointer_t 		tb_fpool_memdup(tb_handle_t handle, tb_cpointer_t data);
+
+/*! free fixed pool data
+ *
+ * @param handle 	the pool handle
+ * @param data 		the pool item data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_fpool_free(tb_handle_t handle, tb_pointer_t data);
+
+/*! dump fixed pool
+ *
+ * @param handle 	the pool handle
+ */
+tb_void_t 			tb_fpool_dump(tb_handle_t handle);
 
 #endif

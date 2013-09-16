@@ -62,7 +62,9 @@
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
-//#define TB_CONFIG_LIBC_HAVE_MEMSET
+#ifdef __tb_arch_x64__
+# 	define TB_CONFIG_LIBC_HAVE_MEMSET
+#endif
 #define TB_CONFIG_LIBC_HAVE_MEMMOV
 #define TB_CONFIG_LIBC_HAVE_MEMCMP
 #define TB_CONFIG_LIBC_HAVE_STRCAT

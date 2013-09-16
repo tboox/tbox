@@ -357,7 +357,15 @@ tb_void_t tb_fpool_clear(tb_handle_t handle)
 	fpool->info.aloc = 0;
 #endif
 }
+tb_size_t tb_fpool_size(tb_handle_t handle)
+{
+	// check 
+	tb_fpool_t* fpool = (tb_fpool_t*)handle;
+	tb_assert_and_check_return_val(fpool && fpool->magic == TB_FPOOL_MAGIC, 0);
 
+	// size
+	return fpool->size;
+}
 tb_pointer_t tb_fpool_malloc(tb_handle_t handle)
 {
 	// check 
@@ -399,6 +407,22 @@ tb_pointer_t tb_fpool_malloc0(tb_handle_t handle)
 
 	// clear
 	if (p) tb_memset(p, 0, fpool->step);
+
+	// ok?
+	return p;
+}
+tb_pointer_t tb_fpool_memdup(tb_handle_t handle, tb_cpointer_t data)
+{
+	// check 
+	tb_fpool_t* fpool = (tb_fpool_t*)handle;
+	tb_assert_and_check_return_val(fpool && data, tb_null);
+
+	// init
+	tb_size_t 	n = fpool->step;
+	tb_char_t* 	p = tb_fpool_malloc(handle);
+
+	// copy
+	if (p) tb_memcpy(p, data, n);
 
 	// ok?
 	return p;

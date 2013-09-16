@@ -1024,8 +1024,8 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	block->real = 0;
 
 	// fill 0xcc
-	if (bsize) tb_memset(p, 0xcc, bsize);
-	if (bsize < block->size) tb_memset(p + bsize, 0xcc, nhead);
+	if (bsize + nhead < block->size) tb_memset(p, 0xcc, bsize + nhead);
+	else if (bsize) tb_memset(p, 0xcc, bsize);
 #endif
 
 	// ok
