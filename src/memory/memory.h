@@ -37,7 +37,6 @@
 #include "scache.h"
 #include "pbuffer.h"
 #include "sbuffer.h"
-#include "rbuffer.h"
 #include "qbuffer.h"
 #ifdef TB_CONFIG_MEMORY_POOL
 # 	include "malloc.h"
