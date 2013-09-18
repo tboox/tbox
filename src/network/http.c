@@ -482,7 +482,9 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		while (*p && *p != ':') p++;
 		tb_assert_and_check_return_val(*p, tb_false);
 		p++; while (tb_isspace(*p)) p++;
-		tb_assert_and_check_return_val(*p, tb_false);
+
+		// no value
+		tb_check_return_val(*p, tb_true);
 
 		// parse content size
 		if (!tb_strnicmp(line, "Content-Length", 14))
