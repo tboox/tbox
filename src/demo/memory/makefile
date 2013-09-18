@@ -13,7 +13,6 @@ NAMES = \
 		scache \
 		pbuffer \
 		sbuffer \
-		rbuffer \
 		qbuffer \
 		memops
 

@@ -23,7 +23,6 @@ tbox_C_FILES 			+= \
 						memory/memory \
 						memory/pbuffer \
 						memory/sbuffer \
-						memory/rbuffer \
 						memory/qbuffer \
 						string/pstring \
 						string/sstring \
@@ -272,7 +271,6 @@ INC_FILES 				= \
 						memory/malloc.h \
 						memory/pbuffer.h \
 						memory/sbuffer.h \
-						memory/rbuffer.h \
 						memory/qbuffer.h \
 						aio/aio.h \
 						aio/prefix.h \
