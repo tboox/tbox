@@ -324,7 +324,7 @@ static tb_object_t* tb_array_read_bin(tb_object_bin_reader_t* reader, tb_size_t 
 static tb_bool_t tb_array_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
 	// check
-	tb_assert_and_check_return_val(object && writer && writer->stream && writer->hash, tb_false);
+	tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
 
 	// writ type & size
 	if (!tb_object_writ_bin_type_size(writer->stream, object->type, tb_array_size(object))) return tb_false;
@@ -339,7 +339,7 @@ static tb_bool_t tb_array_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* 
 		if (item)
 		{
 			// exists?
-			tb_size_t index = (tb_size_t)tb_hash_get(writer->hash, item);
+			tb_size_t index = (tb_size_t)tb_hash_get(writer->ohash, item);
 			if (index)
 			{
 				// writ index
@@ -355,7 +355,7 @@ static tb_bool_t tb_array_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* 
 				func(writer, item);
 
 				// save index
-				tb_hash_set(writer->hash, item, (tb_cpointer_t)(++writer->index));
+				tb_hash_set(writer->ohash, item, (tb_cpointer_t)(++writer->index));
 			}
 		}
 	}

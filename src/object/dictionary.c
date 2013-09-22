@@ -297,10 +297,10 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 	// walk
 	tb_size_t 		i = 0;
 	tb_size_t 		n = (tb_size_t)size;
-	tb_object_t* 	key = tb_null;
 	for (i = 0; i < n; i++)
 	{
 		// read key
+		tb_object_t* key = tb_null;
 		do
 		{
 			// the type & size
@@ -311,15 +311,37 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 			// trace
 			tb_trace_impl("key: type: %lu, size: %llu", type, size);
 
-			// check
-			tb_assert_and_check_break(type == TB_OBJECT_TYPE_STRING);
+			// is index?
+			if (!type)
+			{
+				// the object index
+				tb_size_t index = (tb_size_t)size;
+			
+				// check
+				tb_assert_and_check_break(index < tb_vector_size(reader->list));
 
-			// the string reader func
-			tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
-			tb_assert_and_check_break(func);
+				// the item
+				key = (tb_object_t*)tb_iterator_item(reader->list, index);
+			}
+			else
+			{
+				// check
+				tb_assert_and_check_break(type == TB_OBJECT_TYPE_STRING);
 
-			// read it
-			key = func(reader, type, size);
+				// the reader func
+				tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
+				tb_assert_and_check_break(func);
+
+				// read it
+				key = func(reader, type, size);
+				tb_assert_and_check_break(key);
+
+				// save it
+				tb_vector_insert_tail(reader->list, key);
+
+				// refn--
+				tb_object_dec(key);
+			}
 
 		} while (0);
 
@@ -364,7 +386,7 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 				val = func(reader, type, size);
 
 				// save it
-				tb_vector_insert_tail(reader->list, val);
+				if (val) tb_vector_insert_tail(reader->list, val);
 			}
 		
 		} while (0);
@@ -374,10 +396,6 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 
 		// set key => val
 		tb_dictionary_set(dictionary, tb_string_cstr(key), val);
-
-		// exit key
-		tb_object_exit(key);
-		key = tb_null;
 	}
 
 	// failed?
@@ -387,16 +405,13 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 		dictionary = tb_null;
 	}
 
-	// exit the key 
-	if (key) tb_object_exit(key);
-
 	// ok?
 	return dictionary;
 }
 static tb_bool_t tb_dictionary_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
 	// check
-	tb_assert_and_check_return_val(object && writer && writer->stream && writer->hash, tb_false);
+	tb_assert_and_check_return_val(object && writer && writer->stream && writer->ohash, tb_false);
 
 	// writ type & size
 	if (!tb_object_writ_bin_type_size(writer->stream, object->type, tb_dictionary_size(object))) return tb_false;
@@ -416,25 +431,38 @@ static tb_bool_t tb_dictionary_writ_bin(tb_object_bin_writer_t* writer, tb_objec
 			{
 				// writ key
 				{
-					// the string writer func
-					tb_object_bin_writer_func_t func = tb_object_get_bin_writer(TB_OBJECT_TYPE_STRING);
-					tb_assert_and_check_return_val(func, tb_false);
+					// exists?
+					tb_size_t index = (tb_size_t)tb_hash_get(writer->shash, key);
+					if (index)
+					{
+						// writ index
+						if (!tb_object_writ_bin_type_size(writer->stream, 0, (tb_uint64_t)(index - 1))) return tb_false;
+					}
+					else
+					{
+						// the func
+						tb_object_bin_writer_func_t func = tb_object_get_bin_writer(TB_OBJECT_TYPE_STRING);
+						tb_assert_and_check_return_val(func, tb_false);
 
-					// make the key object
-					tb_object_t* okey = tb_string_init_from_cstr(key);
-					tb_assert_and_check_return_val(okey, tb_false);
+						// make the key object
+						tb_object_t* okey = tb_string_init_from_cstr(key);
+						tb_assert_and_check_return_val(okey, tb_false);
 
-					// writ it
-					func(writer, okey);
+						// writ it
+						func(writer, okey);
 
-					// exit it
-					tb_object_exit(okey);
+						// exit it
+						tb_object_exit(okey);
+
+						// save index
+						tb_hash_set(writer->shash, key, (tb_cpointer_t)(++writer->index));
+					}
 				}
 
 				// writ val
 				{
 					// exists?
-					tb_size_t index = (tb_size_t)tb_hash_get(writer->hash, val);
+					tb_size_t index = (tb_size_t)tb_hash_get(writer->ohash, val);
 					if (index)
 					{
 						// writ index
@@ -450,7 +478,7 @@ static tb_bool_t tb_dictionary_writ_bin(tb_object_bin_writer_t* writer, tb_objec
 						func(writer, val);
 
 						// save index
-						tb_hash_set(writer->hash, val, (tb_cpointer_t)(++writer->index));
+						tb_hash_set(writer->ohash, val, (tb_cpointer_t)(++writer->index));
 					}
 				}
 			}

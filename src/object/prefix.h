@@ -152,7 +152,10 @@ typedef struct __tb_object_bin_writer_t
 	tb_gstream_t* 			stream;
 
 	// the object hash
-	tb_handle_t 			hash;
+	tb_hash_t* 				ohash;
+
+	// the string hash
+	tb_hash_t* 				shash;
 
 	// the object index
 	tb_size_t 				index;
