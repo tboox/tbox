@@ -140,7 +140,7 @@ static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 
 	// init reader
 	reader.stream 			= gst;
-	reader.list 			= tb_vector_init(256, tb_item_func_ptr(tb_null, tb_null));
+	reader.list 			= tb_vector_init(256, tb_item_func_obj());
 	tb_assert_and_check_return_val(reader.list, tb_null);
 
 	// the type & size
@@ -184,14 +184,15 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_b
 
 	// init writer
 	writer.stream 			= gst;
-	writer.hash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-	tb_assert_and_check_return_val(writer.hash, tb_false);
+	writer.ohash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
+	writer.shash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_uint32());
+	tb_assert_and_check_return_val(writer.shash && writer.ohash, tb_false);
 
 	// writ
 	if (!func(&writer, object)) goto end;
 
 	// flush
-	tb_gstream_bfwrit(gst, tb_null, 0);
+	if (!tb_gstream_bfwrit(gst, tb_null, 0)) goto end;
 
 	// ok
 	ok = tb_true;
@@ -199,7 +200,8 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_b
 end:
 
 	// exit the hash
-	if (writer.hash) tb_hash_exit(writer.hash);
+	if (writer.ohash) tb_hash_exit(writer.ohash);
+	if (writer.shash) tb_hash_exit(writer.shash);
 
 	// exit the data
 	if (writer.data) tb_free(writer.data);
