@@ -39,6 +39,14 @@ static tb_handle_t g_heap = tb_null;
 static tb_handle_t g_mutex = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+#ifndef TB_CONFIG_MEMORY_POOL
+tb_bool_t tb_malloc_init(tb_noarg_t);
+tb_void_t tb_malloc_exit(tb_noarg_t);
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_malloc_init()

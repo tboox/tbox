@@ -35,11 +35,11 @@
  */
 
 // the host list
-tb_bool_t 			tb_dns_list_init();
+tb_bool_t 			tb_dns_list_init(tb_noarg_t);
 tb_void_t 			tb_dns_list_adds(tb_char_t const* host);
 tb_void_t 			tb_dns_list_dels(tb_char_t const* host);
-tb_void_t 			tb_dns_list_exit();
-tb_void_t 			tb_dns_list_dump();
+tb_void_t 			tb_dns_list_exit(tb_noarg_t);
+tb_void_t 			tb_dns_list_dump(tb_noarg_t);
 
 // look ipv4 for async
 tb_handle_t 		tb_dns_look_init(tb_char_t const* name);

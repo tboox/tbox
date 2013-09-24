@@ -18,7 +18,7 @@ static tb_size_t tb_vector_insert_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
@@ -47,7 +47,7 @@ static tb_size_t tb_vector_insert_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
@@ -76,7 +76,7 @@ static tb_size_t tb_vector_insert_tail_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
@@ -105,7 +105,7 @@ static tb_size_t tb_vector_ninsert_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	// insert one first
 	tb_vector_insert_head(vector, 0xf);
@@ -136,7 +136,7 @@ static tb_size_t tb_vector_ninsert_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_hong_t t = tb_mclock();
@@ -164,7 +164,7 @@ static tb_size_t tb_vector_ninsert_tail_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_hong_t t = tb_mclock();
@@ -193,7 +193,7 @@ static tb_size_t tb_vector_remove_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
@@ -217,7 +217,7 @@ static tb_size_t tb_vector_remove_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 100000;
@@ -239,7 +239,7 @@ static tb_size_t tb_vector_remove_last_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
@@ -263,7 +263,7 @@ static tb_size_t tb_vector_nremove_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -286,7 +286,7 @@ static tb_size_t tb_vector_nremove_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -309,7 +309,7 @@ static tb_size_t tb_vector_nremove_last_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -332,7 +332,7 @@ static tb_size_t tb_vector_replace_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -359,7 +359,7 @@ static tb_size_t tb_vector_replace_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
@@ -384,7 +384,7 @@ static tb_size_t tb_vector_replace_last_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_size_t n = 1000000;
@@ -410,7 +410,7 @@ static tb_size_t tb_vector_nreplace_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -435,7 +435,7 @@ static tb_size_t tb_vector_nreplace_head_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -460,7 +460,7 @@ static tb_size_t tb_vector_nreplace_last_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -487,7 +487,7 @@ static tb_size_t tb_vector_iterator_next_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);
@@ -513,7 +513,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 {
 	// init
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
-	tb_assert_and_check_return(vector);
+	tb_assert_and_check_return_val(vector, 0);
 
 	tb_size_t n = 1000000;
 	tb_vector_ninsert_head(vector, 0xf, n);

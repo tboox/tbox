@@ -251,7 +251,7 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 static tb_vpool_block_t* tb_vpool_overflow_find(tb_vpool_t* vpool)
 {
 	// check
-	tb_assert_and_check_return(vpool);
+	tb_assert_and_check_return_val(vpool, tb_null);
 
 	// walk
 	tb_byte_t* 			pb = vpool->data;

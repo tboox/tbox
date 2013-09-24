@@ -37,7 +37,7 @@
  *
  * @return 				the returned time or -1
  */
-tb_time_t 				tb_time();
+tb_time_t 				tb_time(tb_noarg_t);
 
 /*! the gmt time
  *

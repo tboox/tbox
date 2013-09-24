@@ -48,13 +48,13 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_opool_init();
+tb_bool_t 			tb_opool_init(tb_noarg_t);
 
 /// exit opool
-tb_void_t 			tb_opool_exit();
+tb_void_t 			tb_opool_exit(tb_noarg_t);
 
 /// clear opool
-tb_void_t 			tb_opool_clear();
+tb_void_t 			tb_opool_clear(tb_noarg_t);
 
 /*! get object from opool
  *
@@ -81,6 +81,6 @@ tb_void_t 			tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_si
 #endif
 
 /// dump opool
-tb_void_t 			tb_opool_dump();
+tb_void_t 			tb_opool_dump(tb_noarg_t);
 
 #endif

@@ -107,43 +107,43 @@ typedef struct __tb_item_func_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_true();
+tb_item_func_t 		tb_item_func_true(tb_noarg_t);
 
 /*! the integer item function for tb_long_t 
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_long();
+tb_item_func_t 		tb_item_func_long(tb_noarg_t);
 
 /*! the integer item function for tb_size_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_size();
+tb_item_func_t 		tb_item_func_size(tb_noarg_t);
 
 /*! the integer item function for tb_uint8_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_uint8();
+tb_item_func_t 		tb_item_func_uint8(tb_noarg_t);
 
 /*! the integer item function for tb_uint16_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_uint16();
+tb_item_func_t 		tb_item_func_uint16(tb_noarg_t);
 
 /*! the integer item function for tb_uint32_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_uint32();
+tb_item_func_t 		tb_item_func_uint32(tb_noarg_t);
 
 /*! the integer item function for tb_uint64_t
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_uint64();
+tb_item_func_t 		tb_item_func_uint64(tb_noarg_t);
 
 /*! the string item function
  *
@@ -172,7 +172,7 @@ tb_item_func_t 		tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv);
  *
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_obj();
+tb_item_func_t 		tb_item_func_obj(tb_noarg_t);
 
 /*! the external fixed memory item function
  *

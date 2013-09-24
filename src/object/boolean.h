@@ -37,13 +37,13 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_boolean_init_reader();
+tb_bool_t 			tb_boolean_init_reader(tb_noarg_t);
 
 /*! init boolean writer
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_boolean_init_writer();
+tb_bool_t 			tb_boolean_init_writer(tb_noarg_t);
 
 /*! init boolean
  *
@@ -57,13 +57,13 @@ tb_object_t const* 	tb_boolean_init(tb_bool_t value);
  *
  * @return 			the boolean object
  */
-tb_object_t const* 	tb_boolean_true();
+tb_object_t const* 	tb_boolean_true(tb_noarg_t);
 
 /*! the boolean value: false
  *
  * @return 			the boolean object
  */
-tb_object_t const* 	tb_boolean_false();
+tb_object_t const* 	tb_boolean_false(tb_noarg_t);
 
 /*! the boolean value
  *

@@ -55,9 +55,9 @@
  *
  * @return tb_true or tb_false
  */
-tb_bool_t 	tb_platform_init();
+tb_bool_t 	tb_platform_init(tb_noarg_t);
 
 /// exit the platform 
-tb_void_t 	tb_platform_exit();
+tb_void_t 	tb_platform_exit(tb_noarg_t);
 
 #endif

@@ -60,10 +60,10 @@ typedef enum __tb_socket_kill_e
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_socket_init();
+tb_bool_t 			tb_socket_init(tb_noarg_t);
 
 /// exit socket
-tb_void_t 			tb_socket_exit();
+tb_void_t 			tb_socket_exit(tb_noarg_t);
 
 /*! open socket
  *

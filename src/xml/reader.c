@@ -272,7 +272,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				// update event
 				xreader->event = TB_XML_READER_EVENT_DOCUMENT;
 
-				// remove ?xml
+				// remove ?xml, @note: overlap buffer
 				tb_pstring_cstrncpy(&xreader->element, element + 4, size - 4);
 
 				// update version & charset

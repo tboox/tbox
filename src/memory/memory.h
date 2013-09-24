@@ -73,7 +73,7 @@
 tb_bool_t 				tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 /// exit
-tb_void_t 				tb_memory_exit();
+tb_void_t 				tb_memory_exit(tb_noarg_t);
 
 #endif
 

@@ -88,7 +88,7 @@ tb_bool_t 				tb_thread_kill(tb_handle_t handle);
  *
  * @return 				the self thread handle
  */
-tb_handle_t 			tb_thread_self();
+tb_handle_t 			tb_thread_self(tb_noarg_t);
 
 /*! return the thread value
  *

@@ -110,7 +110,7 @@ static tb_void_t tb_test_wcsncpy(tb_wchar_t const* s2, tb_size_t size)
 	t = tb_mclock() - t;
 	tb_wprintf(L"%lld ms, tb_test_wcsncpy(%s, %d) = %s\n", t, s2, size, s1);
 }
-tb_int_t main(tb_int_t argc, tb_wchar_t** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;

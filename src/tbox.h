@@ -89,10 +89,10 @@ extern "C" {
 tb_bool_t 			tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_char_t const* build);
 
 /// exit the tbox library
-tb_void_t 			tb_exit();
+tb_void_t 			tb_exit(tb_noarg_t);
 
 /// the tbox version string
-tb_version_t const*	tb_version();
+tb_version_t const*	tb_version(tb_noarg_t);
 
 
 // c plus plus

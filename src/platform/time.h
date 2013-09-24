@@ -44,10 +44,10 @@ tb_void_t 		tb_msleep(tb_size_t ms);
 tb_void_t 		tb_sleep(tb_size_t s);
 
 // clock, ms
-tb_hong_t 		tb_mclock();
+tb_hong_t 		tb_mclock(tb_noarg_t);
 
 // clock, us
-tb_hong_t 		tb_uclock();
+tb_hong_t 		tb_uclock(tb_noarg_t);
 
 // get the time from 1970-01-01 00:00:00:000
 tb_bool_t 		tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz);

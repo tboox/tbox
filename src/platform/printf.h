@@ -58,7 +58,7 @@ typedef enum __tb_printf_mode_e
 tb_bool_t 		tb_printf_init(tb_size_t mode, tb_char_t const* path);
 
 /// exit the printf
-tb_void_t 		tb_printf_exit();
+tb_void_t 		tb_printf_exit(tb_noarg_t);
 
 /*! reset printf
  *
