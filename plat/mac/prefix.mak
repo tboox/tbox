@@ -15,14 +15,21 @@ DLL_SUFFIX 			= .dylib
 
 ASM_SUFFIX 			= .S
 
+# cc
+CC_ 				:= ${shell if [ -f "/usr/bin/clang" ]; then echo "clang"; elif [ -f "/usr/local/bin/clang" ]; then echo "clang"; else echo "gcc"; fi }
+CC_CHECK 			= ${shell if $(CC_) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+
+# ld
+LD_ 				:= ${shell if [ -f "/usr/bin/clang++" ]; then echo "clang++"; elif [ -f "/usr/local/bin/clang++" ]; then echo "clang++"; else echo "g++"; fi }
+LD_CHECK 			= ${shell if $(LD_) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+
 # tool
-PRE 				= 
-CC 					= $(PRE)gcc
-MM 					= $(PRE)gcc
+CC 					= $(PRE)$(CC_)
+MM 					= $(PRE)$(CC_)
 AR 					= $(PRE)ar
 STRIP 				= $(PRE)strip
 RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)g++
+LD 					= $(PRE)$(LD_)
 AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -34,7 +41,7 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS_DEBUG 		= -g -D__tb_debug__ -fno-omit-frame-pointer $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
 CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -46,6 +53,7 @@ endif
 
 ifeq ($(ARCH),x64)
 CXFLAGS 			+= -m64 -mssse3
+CXFLAGS_DEBUG 		+= -pg
 endif
 
 # opti
@@ -81,12 +89,8 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= \
-					-O3 -DNDEBUG \
-					-fomit-frame-pointer -freg-struct-return -fno-bounds-check \
-					-fvisibility=hidden
-
-MXFLAGS_DEBUG 		= -g -DDEBUG=1
+MXFLAGS_RELEASE 	= -O3 -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
+MXFLAGS_DEBUG 		= -g -D__tb_debug__ -fno-omit-frame-pointer $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
 MXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__ \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
@@ -118,7 +122,7 @@ endif
 
 # ldflags
 LDFLAGS_RELEASE 	= -s
-LDFLAGS_DEBUG 		= -rdynamic
+LDFLAGS_DEBUG 		= -rdynamic $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
 LDFLAGS 			= 
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l

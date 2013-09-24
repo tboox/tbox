@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #ifndef TB_CONFIG_OS_ANDROID
-# 	include <sys/unistd.h>
+# 	include <unistd.h>
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

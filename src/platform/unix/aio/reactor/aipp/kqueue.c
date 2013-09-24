@@ -26,6 +26,9 @@
 #include <errno.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#ifndef TB_CONFIG_OS_ANDROID
+# 	include <unistd.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
