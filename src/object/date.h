@@ -37,19 +37,19 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_date_init_reader();
+tb_bool_t 			tb_date_init_reader(tb_noarg_t);
 
 /*! init date writer
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_date_init_writer();
+tb_bool_t 			tb_date_init_writer(tb_noarg_t);
 
 /*! init date from now
  *
  * @return 			the date object
  */
-tb_object_t* 		tb_date_init_from_now();
+tb_object_t* 		tb_date_init_from_now(tb_noarg_t);
 
 /*! init date from time
  *

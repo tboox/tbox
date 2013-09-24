@@ -194,8 +194,8 @@ tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t cons
 	tb_byte_t* d = tb_pbuffer_resize(buffer, p + n);
 	tb_assert_and_check_return_val(d, tb_null);
 
-	// memcpy
-	tb_memcpy(d + p, b, n);
+	// safer than memcpy, buffer maybe overlap
+	tb_memmov(d + p, b, n);
 
 	return d;
 }

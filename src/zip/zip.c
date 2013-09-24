@@ -68,7 +68,7 @@ tb_void_t tb_zip_exit(tb_zip_t* zip)
 	, 	tb_zip_gzip_exit
 	, 	tb_null
 	};
-	tb_assert_and_check_return_val(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo], tb_null);
+	tb_assert_and_check_return(zip->algo < tb_arrayn(s_exit) && s_exit[zip->algo]);
 
 	// exit
 	s_exit[zip->algo](zip);

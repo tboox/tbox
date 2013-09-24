@@ -233,7 +233,7 @@ typedef struct __tb_cookies_t
  */
 
 // init & exit
-tb_cookies_t* 		tb_cookies_init();
+tb_cookies_t* 		tb_cookies_init(tb_noarg_t);
 tb_void_t 			tb_cookies_exit(tb_cookies_t* cookies);
 
 /* get & set

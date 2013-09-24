@@ -799,7 +799,7 @@ static tb_void_t tb_double_test_atan()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_long_t main(tb_long_t argc, tb_char_t** argv)
+tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 

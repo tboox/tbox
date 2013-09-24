@@ -60,10 +60,10 @@
 tb_bool_t 		tb_malloc_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
 // exit
-tb_void_t 		tb_malloc_exit();
+tb_void_t 		tb_malloc_exit(tb_noarg_t);
 
 // dump
-tb_void_t 		tb_malloc_dump();
+tb_void_t 		tb_malloc_dump(tb_noarg_t);
 
 // malloc
 #ifndef __tb_debug__

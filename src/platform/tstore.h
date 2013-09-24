@@ -62,10 +62,10 @@ typedef struct __tb_tstore_data_t
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_tstore_init();
+tb_bool_t 				tb_tstore_init(tb_noarg_t);
 
 /// exit tstore
-tb_void_t 				tb_tstore_exit();
+tb_void_t 				tb_tstore_exit(tb_noarg_t);
 
 /*! set tstore data
  *
@@ -77,6 +77,6 @@ tb_void_t 				tb_tstore_setp(tb_tstore_data_t const* data);
  *
  * @return 				the tstore data
  */
-tb_tstore_data_t* 		tb_tstore_getp();
+tb_tstore_data_t* 		tb_tstore_getp(tb_noarg_t);
 
 #endif

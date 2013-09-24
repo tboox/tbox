@@ -44,10 +44,10 @@
 tb_bool_t 			tb_scache_init(tb_size_t align);
 
 /// exit scache
-tb_void_t 			tb_scache_exit();
+tb_void_t 			tb_scache_exit(tb_noarg_t);
 
 /// clear scache
-tb_void_t 			tb_scache_clear();
+tb_void_t 			tb_scache_clear(tb_noarg_t);
 
 /*! put string to scache
  *
@@ -64,6 +64,6 @@ tb_char_t const*	tb_scache_put(tb_char_t const* data);
 tb_void_t 			tb_scache_del(tb_char_t const* data);
 
 /// dump scache
-tb_void_t 			tb_scache_dump();
+tb_void_t 			tb_scache_dump(tb_noarg_t);
 
 #endif

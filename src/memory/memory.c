@@ -31,8 +31,8 @@
  * declaration
  */
 #ifndef TB_CONFIG_MEMORY_POOL
-tb_bool_t tb_malloc_init();
-tb_void_t tb_malloc_exit();
+tb_bool_t tb_malloc_init(tb_noarg_t);
+tb_void_t tb_malloc_exit(tb_noarg_t);
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

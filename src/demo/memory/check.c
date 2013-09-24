@@ -7,7 +7,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * test
  */
-tb_void_t tb_demo_overflow();
+tb_void_t tb_demo_overflow(tb_noarg_t);
 tb_void_t tb_demo_overflow()
 {
 	tb_cpointer_t data = tb_malloc0(10);
@@ -17,7 +17,7 @@ tb_void_t tb_demo_overflow()
 		tb_free(data);
 	}
 }
-tb_void_t tb_demo_free2();
+tb_void_t tb_demo_free2(tb_noarg_t);
 tb_void_t tb_demo_free2()
 {
 	tb_cpointer_t data = tb_malloc0(10);
@@ -27,11 +27,17 @@ tb_void_t tb_demo_free2()
 		tb_free(data);
 	}
 }
-tb_void_t tb_demo_leak();
+tb_void_t tb_demo_leak(tb_noarg_t);
 tb_void_t tb_demo_leak()
 {
 	tb_cpointer_t data = tb_malloc0(10);
 	tb_used(data);
+}
+tb_void_t tb_demo_stack(tb_noarg_t);
+tb_void_t tb_demo_stack()
+{
+	__tb_volatile__ tb_size_t data[10] = {0};
+	data[11] = 0;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -45,6 +51,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// done 
 	tb_demo_leak();
 	tb_demo_free2();
+	tb_demo_stack();
 	tb_demo_overflow();
 
 	// exit

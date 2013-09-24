@@ -246,7 +246,7 @@ typedef struct __tb_http_status_t
  *
  * return 				the http handle
  */
-tb_handle_t 			tb_http_init();
+tb_handle_t 			tb_http_init(tb_noarg_t);
 
 /*! exit http
  *

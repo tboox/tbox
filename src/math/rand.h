@@ -67,11 +67,11 @@ typedef struct __tb_rand_linear_t
  */
 
 // the global rand
-tb_bool_t 			tb_rand_init();
-tb_void_t 			tb_rand_exit();
+tb_bool_t 			tb_rand_init(tb_noarg_t);
+tb_void_t 			tb_rand_exit(tb_noarg_t);
 
 tb_void_t 			tb_rand_seed(tb_uint32_t seed);
-tb_void_t 			tb_rand_clear();
+tb_void_t 			tb_rand_clear(tb_noarg_t);
 
 tb_uint32_t 		tb_rand_uint32(tb_uint32_t b, tb_uint32_t e);
 tb_sint32_t 		tb_rand_sint32(tb_sint32_t b, tb_sint32_t e);

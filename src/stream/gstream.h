@@ -310,49 +310,49 @@ typedef struct __tb_gstream_t
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_data();
+tb_gstream_t* 		tb_gstream_init_data(tb_noarg_t);
 
 /*! init file stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_file();
+tb_gstream_t* 		tb_gstream_init_file(tb_noarg_t);
 
 /*! init sock stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_sock();
+tb_gstream_t* 		tb_gstream_init_sock(tb_noarg_t);
 
 /*! init http stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_http();
+tb_gstream_t* 		tb_gstream_init_http(tb_noarg_t);
 
 /*! init null stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_null();
+tb_gstream_t* 		tb_gstream_init_null(tb_noarg_t);
 
 /*! init zip stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_zip();
+tb_gstream_t* 		tb_gstream_init_zip(tb_noarg_t);
 
 /*! init charset stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_charset();
+tb_gstream_t* 		tb_gstream_init_charset(tb_noarg_t);
 
 /*! init chunked stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_chunked();
+tb_gstream_t* 		tb_gstream_init_chunked(tb_noarg_t);
 
 /*! init stream 
  *

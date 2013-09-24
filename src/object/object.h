@@ -46,10 +46,10 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_object_context_init();
+tb_bool_t 			tb_object_context_init(tb_noarg_t);
 
 /// exit object context
-tb_void_t 			tb_object_context_exit();
+tb_void_t 			tb_object_context_exit(tb_noarg_t);
 
 /*! init object
  *
