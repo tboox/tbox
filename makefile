@@ -196,6 +196,11 @@ ifeq ($(DEMO),)
 DEMO := n
 endif
 
+# profile
+ifeq ($(PROF),)
+PROF := n
+endif
+
 # project
 PRO_DIR 	:= ${shell pwd}
 PRO_NAME 	:= ${shell basename ${shell pwd}}
@@ -222,6 +227,7 @@ config : .null
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
 	@echo "config: demo:     " 							$(DEMO)
+	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
 	@echo "config: prefix:   " 							$(PREFIX)
@@ -237,6 +243,9 @@ config : .null
 	@echo "# project"              						>> .config.mak
 	@echo "PRO_DIR =" $(PRO_DIR) 						>> .config.mak
 	@echo "PRO_NAME =" $(PRO_NAME) 						>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# profile"              						>> .config.mak
+	@echo "PROF =" $(PROF) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# debug"              						>> .config.mak
 	@echo "DEBUG =" $(DEBUG) 							>> .config.mak
@@ -274,6 +283,7 @@ config : .null
 	@echo "export SMALL" 			 					>> .config.mak
 	@echo "export PLAT"					 				>> .config.mak
 	@echo "export ARCH"					 				>> .config.mak
+	@echo "export PROF"					 				>> .config.mak
 	@echo "export DEMO"					 				>> .config.mak
 	@echo "export SDK" 				 					>> .config.mak
 	@echo "export NDK" 				 					>> .config.mak

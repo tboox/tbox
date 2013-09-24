@@ -131,43 +131,43 @@ $(foreach name, $(NAMES), $(eval $(call MAKE_DEFINE_OBJS_SRCS,$(name))))
 
 define MAKE_OBJ_C
 $(1)$(OBJ_SUFFIX) : $(1).c
-	@echo $(CCACHE) $(DISTCC) compile $(1).c
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).c
 	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).c 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_CC
 $(1)$(OBJ_SUFFIX) : $(1).cc
-	@echo $(CCACHE) $(DISTCC) compile $(1).cc
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).cc
 	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cc 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_CPP
 $(1)$(OBJ_SUFFIX) : $(1).cpp
-	@echo $(CCACHE) $(DISTCC) compile $(1).cpp
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).cpp
 	@$(CC) $(2) $(3) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).cpp 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_M
 $(1)$(OBJ_SUFFIX) : $(1).m
-	@echo $(CCACHE) $(DISTCC) compile $(1).m
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).m
 	@$(MM) -x objective-c $(2) $(3) $(MXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).m 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_MM
 $(1)$(OBJ_SUFFIX) : $(1).mm
-	@echo $(CCACHE) $(DISTCC) compile $(1).mm
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1).mm
 	@$(MM) -x objective-c++ $(2) $(3) $(MXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1).mm 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_CC
 $(1)$(OBJ_SUFFIX) : $(1)$(ASM_SUFFIX)
-	@echo $(CCACHE) $(DISTCC) compile $(1)$(ASM_SUFFIX)
+	@echo $(CCACHE) $(DISTCC) compile.$(DTYPE) $(1)$(ASM_SUFFIX)
 	@$(CC) $(2) $(CXFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
 endef
 
 define MAKE_OBJ_ASM_WITH_AS
 $(1)$(OBJ_SUFFIX) : $(1)$(ASM_SUFFIX)
-	@echo compile $(1)$(ASM_SUFFIX)
+	@echo compile.$(DTYPE) $(1)$(ASM_SUFFIX)
 	@$(AS) $(2) $(ASFLAGS-o) $(1)$(OBJ_SUFFIX) $(1)$(ASM_SUFFIX) 2>>/tmp/$(PRO_NAME).out
 endef
 
