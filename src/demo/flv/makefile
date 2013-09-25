@@ -2,7 +2,8 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES-$(TB_CONFIG_TYPE_FLOAT) = flv
+NAMES 							:= 
+NAMES-$(TB_CONFIG_TYPE_FLOAT) 	:= flv
 
 flv_C_FILES += libflv
 
