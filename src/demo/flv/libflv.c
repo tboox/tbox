@@ -258,7 +258,7 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 			if (tb_bstream_left(&flv->sdata_bst) >= 3 
 				&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 			{
-				tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst);
+				tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
 				tb_trace_impl("ecmaarray end: %x", end);
 				break;
 			}
@@ -299,7 +299,7 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 		if (tb_bstream_left(&flv->sdata_bst) >= 3 
 			&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 		{
-			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst);
+			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
 			tb_trace_impl("ecmaarray end: %x", end);
 		}
 	}
@@ -452,7 +452,7 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
 		if (tb_bstream_left(&flv->sdata_bst) >= 3 
 			&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 		{
-			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst);
+			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
 			tb_trace_impl("objects end: %x", end);
 			break;
 		}
@@ -581,7 +581,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 		// read flv tag
 		if (!tb_gstream_bread(gst, tag, 15)) goto end;
 		tb_bstream_init(&bst, tag, 15);
-		tb_uint32_t 	ptag_size = tb_bstream_get_u32_be(&bst);
+		tb_uint32_t 	ptag_size = tb_bstream_get_u32_be(&bst); tb_used(ptag_size);
 		tb_uint8_t 		tag_type = tb_bstream_get_u8(&bst);
 		tb_uint32_t 	data_size = tb_bstream_get_u24_be(&bst);
 		tb_uint32_t 	dts = tb_bstream_get_u24_be(&bst);
@@ -1012,12 +1012,15 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	tb_trace_impl("profile_idc: %x", profile_idc);
 
 	tb_size_t constraint_setn_flag = tb_bstream_get_u8(&bst);
+	tb_used(constraint_setn_flag);
 	tb_trace_impl("constraint_setn_flag: %x", constraint_setn_flag);
 
 	tb_size_t level_idc = tb_bstream_get_u8(&bst);
+	tb_used(level_idc);
 	tb_trace_impl("level_idc: %x", level_idc);
 
 	tb_size_t seq_parameter_set_id = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+	tb_used(seq_parameter_set_id);
 	tb_trace_impl("seq_parameter_set_id: %x", seq_parameter_set_id);
 
 	if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc == 244 || profile_idc == 44 || profile_idc == 83 || profile_idc == 86 || profile_idc == 118 || profile_idc == 128 ) 
@@ -1027,17 +1030,20 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 
 		if (chroma_format_idc == 3)
 		{
-			tb_size_t separate_colour_plane_flag = tb_bstream_get_u1(&bst);
+			tb_size_t separate_colour_plane_flag = tb_bstream_get_u1(&bst); tb_used(separate_colour_plane_flag);
 			tb_trace_impl("\t\tseparate_colour_plane_flag: %x", separate_colour_plane_flag);
 		}
 
-		tb_size_t bit_depth_luma_minus8 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_size_t bit_depth_luma_minus8 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst); 
+		tb_used(bit_depth_luma_minus8);
 		tb_trace_impl("\tbit_depth_luma_minus8: %x", bit_depth_luma_minus8);
 	
 		tb_size_t bit_depth_chroma_minus8 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(bit_depth_chroma_minus8);
 		tb_trace_impl("\tbit_depth_chroma_minus8: %x", bit_depth_chroma_minus8);
 	
 		tb_size_t qpprime_y_zero_transform_bypass_flag = tb_bstream_get_u1(&bst);
+		tb_used(qpprime_y_zero_transform_bypass_flag);
 		tb_trace_impl("\tqpprime_y_zero_transform_bypass_flag: %x", qpprime_y_zero_transform_bypass_flag);
 	
 		tb_size_t seq_scaling_matrix_present_flag = tb_bstream_get_u1(&bst);
@@ -1073,6 +1079,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	}
 
 	tb_size_t log2_max_frame_num_minus4 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+	tb_used(log2_max_frame_num_minus4);
 	tb_trace_impl("log2_max_frame_num_minus4: %x", log2_max_frame_num_minus4);
 
 	tb_size_t pic_order_cnt_type = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
@@ -1081,17 +1088,21 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	if (pic_order_cnt_type == 0) 
 	{
 		tb_size_t log2_max_pic_order_cnt_lsb_minus4 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(log2_max_pic_order_cnt_lsb_minus4);
 		tb_trace_impl("\tlog2_max_pic_order_cnt_lsb_minus4: %x", log2_max_pic_order_cnt_lsb_minus4);
 	}
 	else if (pic_order_cnt_type == 1) 
 	{
 		tb_size_t delta_pic_order_always_zero_flag = tb_bstream_get_u1(&bst);
+		tb_used(delta_pic_order_always_zero_flag);
 		tb_trace_impl("\tdelta_pic_order_always_zero_flag: %x", delta_pic_order_always_zero_flag);
 
 		tb_size_t offset_for_non_ref_pic = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(offset_for_non_ref_pic);
 		tb_trace_impl("\toffset_for_non_ref_pic: %x", offset_for_non_ref_pic);
 
 		tb_size_t offset_for_top_to_bottom_field = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(offset_for_top_to_bottom_field);
 		tb_trace_impl("\toffset_for_top_to_bottom_field: %x", offset_for_top_to_bottom_field);
 
 		tb_size_t num_ref_frames_in_pic_order_cnt_cycle = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
@@ -1101,19 +1112,24 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		for (i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; ++i)
 		{
 			tb_size_t offset_for_ref_frame = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+			tb_used(offset_for_ref_frame);
 			tb_trace_impl("\t\toffset_for_ref_frame[%u]: %x", i, offset_for_ref_frame);
 		}
 	}
 	tb_size_t max_num_ref_frames = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+	tb_used(max_num_ref_frames);
 	tb_trace_impl("max_num_ref_frames: %x", max_num_ref_frames);
 
 	tb_size_t gaps_in_frame_num_value_allowed_flag = tb_bstream_get_u1(&bst);
+	tb_used(gaps_in_frame_num_value_allowed_flag);
 	tb_trace_impl("gaps_in_frame_num_value_allowed_flag: %x", gaps_in_frame_num_value_allowed_flag);
 	
 	tb_size_t pic_width_in_mbs_minus1 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+	tb_used(pic_width_in_mbs_minus1);
 	tb_trace_impl("pic_width_in_mbs_minus1: %x", pic_width_in_mbs_minus1);
 
 	tb_size_t pic_height_in_map_units_minus1 = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+	tb_used(pic_height_in_map_units_minus1);
 	tb_trace_impl("pic_height_in_map_units_minus1: %x", pic_height_in_map_units_minus1);
 
 	tb_size_t frame_mbs_only_flag = tb_bstream_get_u1(&bst);
@@ -1122,10 +1138,12 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	if (!frame_mbs_only_flag) 
 	{
 		tb_size_t mb_adaptive_frame_field_flag = tb_bstream_get_u1(&bst);
+		tb_used(mb_adaptive_frame_field_flag);
 		tb_trace_impl("\tmb_adaptive_frame_field_flag: %x", mb_adaptive_frame_field_flag);
 	}
 
 	tb_size_t direct_8x8_inference_flag = tb_bstream_get_u1(&bst);
+	tb_used(direct_8x8_inference_flag);
 	tb_trace_impl("direct_8x8_inference_flag: %x", direct_8x8_inference_flag);
 
 	tb_size_t frame_cropping_flag = tb_bstream_get_u1(&bst);
@@ -1134,15 +1152,19 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	if (frame_cropping_flag)
 	{
 		tb_size_t frame_crop_left_offset = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(frame_crop_left_offset);
 		tb_trace_impl("\tframe_crop_left_offset: %x", frame_crop_left_offset);
 
 		tb_size_t frame_crop_right_offset = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(frame_crop_right_offset);
 		tb_trace_impl("\tframe_crop_right_offset: %x", frame_crop_right_offset);
 
 		tb_size_t frame_crop_top_offset = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(frame_crop_top_offset);
 		tb_trace_impl("\tframe_crop_top_offset: %x", frame_crop_top_offset);
 
 		tb_size_t frame_crop_bottom_offset = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+		tb_used(frame_crop_bottom_offset);
 		tb_trace_impl("\tframe_crop_bottom_offset: %x", frame_crop_bottom_offset);
 	}
 
@@ -1161,10 +1183,10 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 
 			if (aspect_ratio_idc == 255)
 			{		
-				tb_size_t sar_width = tb_bstream_get_ubits32(&bst, 16);
+				tb_size_t sar_width = tb_bstream_get_ubits32(&bst, 16); tb_used(sar_width);
 				tb_trace_impl("\t\t\tsar_width: %x", sar_width);
 
-				tb_size_t sar_height = tb_bstream_get_ubits32(&bst, 16);
+				tb_size_t sar_height = tb_bstream_get_ubits32(&bst, 16); tb_used(sar_height);
 				tb_trace_impl("\t\t\tsar_height: %x", sar_height);
 			}
 		}
@@ -1174,6 +1196,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		if (overscan_info_present_flag)
 		{	
 			tb_size_t overscan_appropriate_flag = tb_bstream_get_u1(&bst);
+			tb_used(overscan_appropriate_flag);
 			tb_trace_impl("\t\toverscan_appropriate_flag: %x", overscan_appropriate_flag);
 		}
 		
@@ -1201,9 +1224,11 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		if (chroma_loc_info_present_flag)
 		{
 			tb_size_t chroma_sample_loc_type_top_field = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+			tb_used(chroma_sample_loc_type_top_field);
 			tb_trace_impl("\t\tchroma_sample_loc_type_top_field: %x", chroma_sample_loc_type_top_field);
 
 			tb_size_t chroma_sample_loc_type_bottom_field = tb_flv_video_h264_sps_analyze_get_exp_golomb(&bst);
+			tb_used(chroma_sample_loc_type_bottom_field);
 			tb_trace_impl("\t\tchroma_sample_loc_type_bottom_field: %x", chroma_sample_loc_type_bottom_field);
 		}
 
@@ -1219,6 +1244,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 			tb_trace_impl("\t\ttime_scale: %x", time_scale);
 	
 			tb_size_t fixed_frame_rate_flag = tb_bstream_get_u1(&bst);
+			tb_used(fixed_frame_rate_flag);
 			tb_trace_impl("\t\tfixed_frame_rate_flag: %x", fixed_frame_rate_flag);
 
 			if (time_scale > 0 && num_units_in_tick > 0)
