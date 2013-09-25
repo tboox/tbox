@@ -15,29 +15,39 @@ DLL_SUFFIX 			= .dylib
 
 ASM_SUFFIX 			= .S
 
+# prefix
+PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),)
+
 # cc
 CC_ 				:= ${shell if [ -f "/usr/bin/clang" ]; then echo "clang"; elif [ -f "/usr/local/bin/clang" ]; then echo "clang"; else echo "gcc"; fi }
+CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
+CC 					= $(PRE_)$(CC_)
 ifeq ($(CXFLAGS_CHECK),)
-CC_CHECK 			= ${shell if $(CC_) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
 CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
 export CXFLAGS_CHECK
 endif
 
 # ld
 LD_ 				:= ${shell if [ -f "/usr/bin/clang++" ]; then echo "clang++"; elif [ -f "/usr/local/bin/clang++" ]; then echo "clang++"; else echo "g++"; fi }
+LD_ 				:= $(if $(findstring y,$(PROF)),g++,$(LD_))
+LD 					= $(PRE_)$(LD_)
 ifeq ($(LDFLAGS_CHECK),)
-LD_CHECK 			= ${shell if $(LD_) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
+LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
 LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
 export LDFLAGS_CHECK
 endif
 
+# cpu bits
+BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
+BITS 				:= $(if $(findstring x86,$(ARCH)),32,)
+BITS 				:= $(if $(BITS),$(BITS),$(shell getconf LONG_BIT))
+
 # tool
-CC 					= $(PRE)$(CC_)
-MM 					= $(PRE)$(CC_)
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)$(LD_)
+MM 					= $(PRE_)$(CC_)
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
 AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -49,20 +59,10 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g -D__tb_debug__ -fno-omit-frame-pointer 
-CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
+CXFLAGS_DEBUG 		= -g -D__tb_debug__ 
+CXFLAGS 			= -m$(BITS) -c -Wall -D__tb_arch_$(ARCH)__ -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
-
-# arch
-ifeq ($(ARCH),x86)
-CXFLAGS 			+= -m32 -mssse3
-endif
-
-ifeq ($(ARCH),x64)
-CXFLAGS 			+= -m64 -mssse3
-CXFLAGS_DEBUG 		+= -pg
-endif
 
 # opti
 ifeq ($(SMALL),y)
@@ -108,9 +108,9 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= -O3 -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g -D__tb_debug__ -fno-omit-frame-pointer $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
-MXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__ \
+MXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+MXFLAGS_DEBUG 		= -g -D__tb_debug__ 
+MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__ \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
@@ -118,6 +118,27 @@ MXFLAGS 			= -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__ \
 					"-DIBAction=void)__attribute__((ibaction)" 
 MXFLAGS-I 			= -I
 MXFLAGS-o 			= -o
+
+# opti
+ifeq ($(SMALL),y)
+MXFLAGS_RELEASE 	+= -Os
+else
+MXFLAGS_RELEASE 	+= -O3
+endif
+
+# prof
+ifeq ($(PROF),y)
+MXFLAGS 			+= -g -fno-omit-frame-pointer 
+ifeq ($(ARCH),x64)
+MXFLAGS 			+= -pg
+endif
+else
+MXFLAGS_RELEASE 	+= -fomit-frame-pointer 
+MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(CXFLAGS_CHECK)
+endif
+
+# small
+MXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # mflags: .m files
 MFLAGS_RELEASE 		= 
@@ -129,33 +150,13 @@ MMFLAGS_RELEASE 	=
 MMFLAGS_DEBUG 		=	 
 MMFLAGS 			=
 
-# arch
-ifeq ($(ARCH),x86)
-MXFLAGS 			+= -m32
-endif
-
-# arch
-ifeq ($(ARCH),x64)
-MXFLAGS 			+= -m64
-endif
-
 # ldflags
 LDFLAGS_RELEASE 	= 
 LDFLAGS_DEBUG 		= -rdynamic 
-LDFLAGS 			= 
+LDFLAGS 			= -m$(BITS)
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
-
-# arch
-ifeq ($(ARCH),x86)
-LDFLAGS 			+= -m32
-endif
-
-# arch
-ifeq ($(ARCH),x64)
-LDFLAGS 			+= -m64
-endif
 
 # prof
 ifeq ($(PROF),y)
@@ -170,18 +171,9 @@ endif
 # asflags
 ASFLAGS_RELEASE 	= Wa,-march=native
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
+ASFLAGS 			= -m$(BITS) -f elf $(ARCH_ASFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
-
-# arch
-ifeq ($(ARCH),x86)
-ASFLAGS 			+= -m32
-endif
-
-ifeq ($(ARCH),x64)
-ASFLAGS 			+= -m64
-endif
 
 # arflags
 ARFLAGS 			= -cr
