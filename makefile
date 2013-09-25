@@ -136,70 +136,34 @@ endif
 # #
 
 # platform
-ifeq ($(PLAT),)
-PLAT := linux
-endif
+PLAT := $(if $(PLAT),$(PLAT),linux)
 
 # architecture
 ifeq ($(ARCH),)
 
-ifeq ($(PLAT),mingw)
-ARCH := x86
-endif
+ARCH := $(if $(findstring mingw,$(PLAT)),x86,$(ARCH))
+ARCH := $(if $(findstring mac,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
+ARCH := $(if $(findstring linux,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
+ARCH := $(if $(findstring x32,$(ARCH)),x86,$(ARCH))
+ARCH := $(if $(findstring ios,$(PLAT)),armv7,$(ARCH))
+ARCH := $(if $(findstring android,$(PLAT)),armv7,$(ARCH))
 
-ifeq ($(PLAT),mac)
-ARCH := x$(shell getconf LONG_BIT)
-endif
-
-ifeq ($(PLAT),linux)
-ARCH := x$(shell getconf LONG_BIT)
-endif
-
-ifeq ($(ARCH),x32)
-ARCH := x86
-endif
-
-ifeq ($(PLAT),ios)
-ARCH := armv7
-endif
-
-ifeq ($(PLAT),android)
-ARCH := armv7
-endif
-
-endif
-
-# linux, cygwin, mac
-ifeq ($(HOST),)
-HOST := linux
 endif
 
 # debug
-ifeq ($(DEBUG),)
-DEBUG := n
-endif
+DEBUG := $(if $(DEBUG),$(DEBUG),y)
 
 # debug type
-ifeq ($(DEBUG),y)
-DTYPE := d
-else
-DTYPE := r
-endif
+DTYPE := $(if $(findstring y,$(DEBUG)),d,r)
 
 # small
-ifeq ($(SMALL),)
-SMALL := y
-endif
+SMALL := $(if $(SMALL),$(SMALL),y)
 
 # demo
-ifeq ($(DEMO),)
-DEMO := n
-endif
+DEMO := $(if $(DEMO),$(DEMO),y)
 
 # profile
-ifeq ($(PROF),)
-PROF := n
-endif
+PROF := $(if $(PROF),$(PROF),n)
 
 # project
 PRO_DIR 	:= ${shell pwd}
