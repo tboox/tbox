@@ -29,6 +29,7 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -113,11 +114,17 @@ typedef struct __tb_fpool_t
  */
 static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 {
+	// init data
 	tb_pointer_t data = tb_null;
+
+	// has pred?
 	if (fpool->pred)
 	{
+		// init index
 		tb_size_t i = (fpool->pred - fpool->data) / fpool->step;
 		tb_assert_and_check_return_val(!((fpool->pred - fpool->data) % fpool->step), tb_null);
+
+		// is free?
 		if (!tb_fpool_used_bset(fpool->used, i)) 
 		{
 			// ok
@@ -142,6 +149,7 @@ static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 #if 1
 static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 {
+	tb_print("tb_fpool_malloc_find");
 	tb_size_t 	i = 0;
 #if TB_CPU_BIT64
 	tb_size_t 	m = tb_align(fpool->maxn, 64) >> 6;
