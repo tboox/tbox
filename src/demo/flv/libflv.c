@@ -623,7 +623,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 					{
 						// the first value must be string : onMetaData
 						tb_size_t type = tb_bstream_get_u8(&flv->sdata_bst);
-						tb_assert_goto(type == TB_FLV_SDATA_TYPE_STRING, end);
+						tb_assert_and_check_goto(type == TB_FLV_SDATA_TYPE_STRING, end);
 						
 						// get object list
 						tb_flv_sdata_value_t sdata;

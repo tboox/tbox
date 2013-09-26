@@ -118,6 +118,7 @@ typedef struct __tb_hash_impl_t
  */
 
 #if 0
+// linear finder
 static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_size_t* pbuck, tb_size_t* pitem)
 {
 	tb_assert_and_check_return_val(hash && hash->hash_list && hash->hash_size, tb_false);
@@ -158,8 +159,10 @@ static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_
 	return !r? tb_true : tb_false;
 }
 #else
+// binary finder
 static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_size_t* pbuck, tb_size_t* pitem)
 {
+	// check
 	tb_assert_and_check_return_val(hash && hash->hash_list && hash->hash_size, tb_false);
 	
 	// get step

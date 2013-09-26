@@ -16,24 +16,20 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
-ifeq ($(ARCH),x86)
-PRE 				:= i686-w64-mingw32-
-endif
+PRE 				:= $(if $(findstring x86,$(ARCH)),i686-w64-mingw32-,$(PRE))
+PRE 				:= $(if $(findstring x64,$(ARCH)),x86_64-w64-mingw32-,$(PRE))
+PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),$(PRE))
 
-ifeq ($(ARCH),x64)
-PRE 				:= x86_64-w64-mingw32-
-endif
-
-ifneq ($(BIN),)
-PRE 				:= $(BIN)/$(PRE)
-endif
+# cpu bits
+BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
+BITS 				:= $(if $(findstring x86,$(ARCH)),32,)
 
 # tool
-CC 					= $(PRE)gcc
-AR 					= $(PRE)ar
-STRIP 				= $(PRE)strip
-RANLIB 				= $(PRE)ranlib
-LD 					= $(PRE)g++
+CC 					= $(PRE_)gcc
+AR 					= $(PRE_)ar
+STRIP 				= $(PRE_)strip
+RANLIB 				= $(PRE_)ranlib
+LD 					= $(PRE_)g++
 AS					= 
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -44,26 +40,25 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden -fomit-frame-pointer
+CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden 
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
-CXFLAGS 			= -c -Wall -D__tb_arch_$(ARCH)__
+CXFLAGS 			= -m$(BITS) -c -Wall -D__tb_arch_$(ARCH)__ -mssse3 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
-
-# arch
-ifeq ($(ARCH),x86)
-CXFLAGS 			+= -march=i686 -mssse3 
-endif
-
-ifeq ($(ARCH),x64)
-CXFLAGS 			+= -m64 -mssse3 
-endif
 
 # opti
 ifeq ($(SMALL),y)
 CXFLAGS_RELEASE 	+= -Os
 else
 CXFLAGS_RELEASE 	+= -O3
+endif
+
+# prof
+ifeq ($(PROF),y)
+CXFLAGS 			+= -g -fno-omit-frame-pointer 
+else
+CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
+CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer 
 endif
 
 # small
@@ -90,9 +85,9 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # ldflags
-LDFLAGS_RELEASE 	= -s
+LDFLAGS_RELEASE 	= $(if $(findstring y,$(PROF)),,-s)
 LDFLAGS_DEBUG 		= 
-LDFLAGS 			= -static
+LDFLAGS 			= -m$(BITS) -static
 LDFLAGS-L 			= -L
 LDFLAGS-l 			= -l
 LDFLAGS-o 			= -o
@@ -100,14 +95,9 @@ LDFLAGS-o 			= -o
 # asflags
 ASFLAGS_RELEASE 	= 
 ASFLAGS_DEBUG 		= 
-ASFLAGS 			= -f elf $(ARCH_ASFLAGS)
+ASFLAGS 			= -m$(BITS) -f elf $(ARCH_ASFLAGS)
 ASFLAGS-I 			= -I
 ASFLAGS-o 			= -o
-
-# arch
-ifeq ($(ARCH),x64)
-ASFLAGS 			+= -m amd64
-endif
 
 # arflags
 ARFLAGS 			= -cr
