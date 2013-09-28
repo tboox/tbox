@@ -342,8 +342,25 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 #endif
 }
 
-
 #ifdef __tb_debug__
+tb_size_t tb_gpool_data_size(tb_handle_t handle, tb_cpointer_t data)
+{
+	// check 
+	tb_gpool_t* gpool = (tb_gpool_t*)handle;
+	tb_assert_and_check_return_val(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool, 0);
+
+	// the data size
+	return tb_vpool_data_size(gpool->vpool, data);
+}
+tb_void_t tb_gpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix)
+{
+	// check 
+	tb_gpool_t* gpool = (tb_gpool_t*)handle;
+	tb_assert_and_check_return(gpool && gpool->magic == TB_GPOOL_MAGIC && gpool->vpool);
+
+	// the data dump
+	tb_vpool_data_dump(gpool->vpool, data, prefix);
+}
 tb_void_t tb_gpool_dump(tb_handle_t handle)
 {
 	// check 

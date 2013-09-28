@@ -44,7 +44,7 @@
  */
 
 #if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
 	tb_size_t edi;
 	__tb_asm__ __tb_volatile__
@@ -72,7 +72,7 @@ static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb
 #endif
 
 #ifdef TB_CONFIG_OPTI_SSE2_ENABLE
-static __tb_inline__ tb_void_t tb_memset_u8_opt_v2(tb_byte_t* s, tb_byte_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
     if (n >= 64) 
 	{
@@ -101,15 +101,15 @@ static __tb_inline__ tb_void_t tb_memset_u8_opt_v2(tb_byte_t* s, tb_byte_t c, tb
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
+	tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
 # 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
-	tb_memset_u8_opt_v2(s, (tb_byte_t)c, n);
+	tb_memset_impl_u8_opt_v2(s, (tb_byte_t)c, n);
 # 	else
 # 		error
 # 	endif
@@ -120,7 +120,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 
 #if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
 	// align by 4-bytes 
 	if (((tb_size_t)s) & 0x3)
@@ -140,7 +140,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t 
 #endif
 
 #ifdef TB_CONFIG_OPTI_SSE2_ENABLE
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
     if (n >= 32) 
 	{
@@ -169,7 +169,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -179,12 +179,12 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
 		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
-	if (n < 2049) tb_memset_u16_opt_v2(s, (tb_uint16_t)c, n);
-	else tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	if (n < 2049) tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
+	else tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
 # 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
-	tb_memset_u16_opt_v2(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
 # 	else
 # 		error
 # 	endif
@@ -194,7 +194,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #endif
 
 #if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
 	__tb_asm__ __tb_volatile__
 	(
@@ -207,7 +207,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t 
 #endif
 
 #ifdef TB_CONFIG_OPTI_SSE2_ENABLE
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
     if (n >= 16) 
 	{
@@ -236,7 +236,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -246,12 +246,12 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
 	defined(TB_CONFIG_OPTI_SSE2_ENABLE)
-	if (n < 2049) tb_memset_u32_opt_v2(s, (tb_uint32_t)c, n);
-	else tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	if (n < 2049) tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
+	else tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
-	tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
 # 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
-	tb_memset_u32_opt_v2(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
 # 	else
 # 		error
 # 	endif

@@ -185,6 +185,7 @@ tb_byte_t* tb_pbuffer_memncpy(tb_pbuffer_t* buffer, tb_byte_t const* b, tb_size_
 }
 tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t const* b, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(buffer && b, tb_null);
 	
 	// check
@@ -197,6 +198,7 @@ tb_byte_t* tb_pbuffer_memncpyp(tb_pbuffer_t* buffer, tb_size_t p, tb_byte_t cons
 	// safer than memcpy, buffer maybe overlap
 	tb_memmov(d + p, b, n);
 
+	// ok
 	return d;
 }
 /* ///////////////////////////////////////////////////////////////////////

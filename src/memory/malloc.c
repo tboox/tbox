@@ -73,8 +73,41 @@ tb_void_t tb_malloc_exit()
 		g_mutex = tb_null;
 	}
 }
-
 #ifdef __tb_debug__
+tb_size_t tb_malloc_data_size(tb_cpointer_t data)
+{
+	// check 
+	tb_check_return_val(g_gpool && g_mutex, 0);
+
+	// try to enter, ensure outside the gpool
+	tb_size_t size = 0;
+	if (tb_mutex_enter_try(g_mutex))
+	{
+		// size
+		size = tb_gpool_data_size(g_gpool, data);
+
+		// leave
+		tb_mutex_leave(g_mutex);
+	}
+
+	// ok?
+	return size;
+}
+tb_void_t tb_malloc_data_dump(tb_cpointer_t data, tb_char_t const* prefix)
+{
+	// check 
+	tb_check_return(g_gpool && g_mutex);
+
+	// try to enter, ensure outside the gpool
+	if (tb_mutex_enter_try(g_mutex))
+	{
+		// dump
+		tb_gpool_data_dump(g_gpool, data, prefix);
+
+		// leave
+		tb_mutex_leave(g_mutex);
+	}
+}
 tb_void_t tb_malloc_dump()
 {
 	// check 

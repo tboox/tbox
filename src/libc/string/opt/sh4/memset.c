@@ -40,14 +40,14 @@
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
 
 }
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
@@ -55,7 +55,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 # 	if 1
 	memset(s, c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
+	tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
 # 	else
 # 		error
 # 	endif
@@ -66,7 +66,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
 	/* align by 4-bytes */
 	if (((tb_size_t)s) & 0x3)
@@ -126,7 +126,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t 
 		);
 	}
 }
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
 	/* align by 4-bytes */
 	if (((tb_size_t)s) & 0x3)
@@ -149,7 +149,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -158,7 +158,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
 # 	else
 # 		error
 # 	endif
@@ -168,7 +168,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #endif
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
 	tb_size_t l = n & 0x3;
 	s += (n << 2);
@@ -201,7 +201,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t 
 		); 
 	}
 }
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
 	tb_size_t l = n & 0x3;
 	s += (n << 2);
@@ -254,7 +254,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t 
 		); 
 	}
 }
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v3(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v3(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {	
 	s += n << 2;
 	__tb_asm__ __tb_volatile__
@@ -270,7 +270,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v3(tb_uint32_t* s, tb_uint32_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -279,7 +279,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
 # 	else
 # 		error
 # 	endif

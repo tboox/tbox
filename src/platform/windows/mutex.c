@@ -45,6 +45,11 @@ tb_bool_t tb_mutex_enter(tb_handle_t handle)
 	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, INFINITE)) return tb_true;
 	return tb_false;
 }
+tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+{
+	if (handle && WAIT_OBJECT_0 == WaitForSingleObject(handle, 0)) return tb_true;
+	return tb_false;
+}
 tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
 	if (handle) return ReleaseMutex(handle)? tb_true : tb_false;
