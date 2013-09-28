@@ -39,7 +39,7 @@
  */
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
 	// cache line: 16-bytes
 	__tb_asm__ __tb_volatile__
@@ -77,14 +77,14 @@ static __tb_inline__ tb_void_t tb_memset_u8_opt_v1(tb_byte_t* s, tb_byte_t c, tb
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U8
-tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
 	// align: 3 + cache: 16
-	if (n > 19) tb_memset_u8_opt_v1(s, (tb_byte_t)c, n);
+	if (n > 19) tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
 	else
 	{
 		__tb_register__ tb_byte_t* 	p = s;
@@ -101,7 +101,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
 	// cache line: 16-bytes
 	__tb_asm__ __tb_volatile__
@@ -128,7 +128,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v1(tb_uint16_t* s, tb_uint16_t 
 		: "r3", "r4", "r5"
 	);
 }
-static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
 	// cache line: 32-bytes
 	__tb_asm__ __tb_volatile__
@@ -160,7 +160,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_opt_v2(tb_uint16_t* s, tb_uint16_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U16
-tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -169,7 +169,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	if (n > 8) tb_memset_u16_opt_v1(s, (tb_uint16_t)c, n);
+	if (n > 8) tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
 	else
 	{
 		__tb_register__ tb_uint16_t* 	p = s;
@@ -185,7 +185,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 #endif
 
 #ifdef TB_CONFIG_ASSEMBLER_GAS
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
 	// cache line: 16-bytes
 	__tb_asm__ __tb_volatile__
@@ -206,7 +206,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v1(tb_uint32_t* s, tb_uint32_t 
 		: "r3", "r4", "r5"
 	);
 }
-static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
+static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
 	// cache line: 32-bytes
 	__tb_asm__ __tb_volatile__
@@ -233,7 +233,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_opt_v2(tb_uint32_t* s, tb_uint32_t 
 #endif
 
 #ifdef TB_LIBC_STRING_OPT_MEMSET_U32
-tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
+static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s, tb_null);
 
@@ -242,7 +242,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS)
-	if (n > 4) tb_memset_u32_opt_v1(s, (tb_uint32_t)c, n);
+	if (n > 4) tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
 	else
 	{
 		__tb_register__ tb_uint32_t* 	p = s;

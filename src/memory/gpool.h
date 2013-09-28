@@ -107,6 +107,12 @@ tb_bool_t 		tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data);
 tb_bool_t 		tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
+// data size
+tb_size_t 		tb_gpool_data_size(tb_handle_t handle, tb_cpointer_t data);
+
+// data dump
+tb_void_t 		tb_gpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix);
+
 // dump
 tb_void_t 		tb_gpool_dump(tb_handle_t handle);
 

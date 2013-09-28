@@ -42,7 +42,6 @@ tb_handle_t tb_mutex_init(tb_char_t const* name)
 tb_void_t tb_mutex_exit(tb_handle_t handle)
 {
 	tb_assert_and_check_return(handle);
-
 	pthread_mutex_t* pmutex = (pthread_mutex_t*)handle;
 	if (pmutex)
 	{
@@ -53,14 +52,18 @@ tb_void_t tb_mutex_exit(tb_handle_t handle)
 tb_bool_t tb_mutex_enter(tb_handle_t handle)
 {
 	tb_assert_and_check_return_val(handle, tb_false);
-
 	if (0 != pthread_mutex_lock((pthread_mutex_t*)handle)) return tb_false;
+	else return tb_true;
+}
+tb_bool_t tb_mutex_enter_try(tb_handle_t handle)
+{
+	tb_assert_and_check_return_val(handle, tb_false);
+	if (0 != pthread_mutex_trylock((pthread_mutex_t*)handle)) return tb_false;
 	else return tb_true;
 }
 tb_bool_t tb_mutex_leave(tb_handle_t handle)
 {
 	tb_assert_and_check_return_val(handle, tb_false);
-
 	if (0 != pthread_mutex_unlock((pthread_mutex_t*)handle)) return tb_false;
 	else return tb_true;
 }

@@ -34,10 +34,42 @@
  * interfaces
  */
 
-tb_handle_t 	tb_mutex_init(tb_char_t const* name);
-tb_void_t 		tb_mutex_exit(tb_handle_t handle);
+/*! init mutex
+ *
+ * @param name 		the mutex name
+ *
+ * @return 			the mutex handle
+ */
+tb_handle_t 		tb_mutex_init(tb_char_t const* name);
 
-tb_bool_t 		tb_mutex_enter(tb_handle_t handle);
-tb_bool_t 		tb_mutex_leave(tb_handle_t handle);
+/* exit mutex
+ *
+ * @param handle 	the mutex handle
+ */
+tb_void_t 			tb_mutex_exit(tb_handle_t handle);
+
+/* enter mutex
+ *
+ * @param handle 	the mutex handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_mutex_enter(tb_handle_t handle);
+
+/* try to enter mutex
+ *
+ * @param handle 	the mutex handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_mutex_enter_try(tb_handle_t handle);
+
+/* leave mutex
+ *
+ * @param handle 	the mutex handle
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_mutex_leave(tb_handle_t handle);
 
 #endif

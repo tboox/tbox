@@ -1031,11 +1031,63 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 	// ok
 	return tb_true;
 }
-
-
 #ifdef __tb_debug__
+tb_size_t tb_vpool_data_size(tb_handle_t handle, tb_cpointer_t data)
+{
+	// check
+	tb_vpool_t* vpool = (tb_vpool_t*)handle;
+	tb_assert_and_check_return_val(vpool, 0);
+	tb_check_return_val(data, 0);
+
+	// is this vpool?
+	tb_check_return_val(data >= (tb_byte_t const*)vpool->data + vpool->nhead && data < (tb_byte_t const*)vpool->data + vpool->size, 0);
+
+	// the data block
+	tb_vpool_block_t const* block = ((tb_vpool_block_t const*)((tb_byte_t const*)data - vpool->nhead));
+
+	// check magic
+	tb_check_return_val(block->magic == TB_VPOOL_MAGIC && !block->free, 0);
+
+	// the real size
+	return block->real;
+}
+tb_void_t tb_vpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix)
+{
+	// check
+	tb_vpool_t* vpool = (tb_vpool_t*)handle;
+	tb_assert_and_check_return(vpool);
+	tb_check_return(data);
+
+	// is this vpool?
+	tb_check_return(data >= (tb_byte_t const*)vpool->data + vpool->nhead && data < (tb_byte_t const*)vpool->data + vpool->size);
+
+	// the data block
+	tb_vpool_block_t const* block = ((tb_vpool_block_t const*)((tb_byte_t const*)data - vpool->nhead));
+
+	// check magic
+	tb_check_return(block->magic == TB_VPOOL_MAGIC && !block->free);
+
+	// dump
+	tb_print("%s: data: %p size: %lu at %s(): %d, file: %s"
+			, prefix
+			, data
+			, block->real
+			, block->func
+			, block->line
+			, block->file
+			);
+
+	// dump backtrace
+	tb_char_t tag[1024] = {0};
+	tb_snprintf(tag, "%s:     ", prefix);
+	tb_vpool_dump_backtrace(tag, block);
+
+	// dump data
+	tb_vpool_dump_data(data, block->real);
+}
 tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {
+	// check
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;
 	tb_assert_and_check_return(vpool);
 

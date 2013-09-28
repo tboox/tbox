@@ -65,6 +65,12 @@ tb_void_t 		tb_malloc_exit(tb_noarg_t);
 // dump
 tb_void_t 		tb_malloc_dump(tb_noarg_t);
 
+// data size
+tb_size_t 		tb_malloc_data_size(tb_cpointer_t data);
+
+// data dump
+tb_void_t 		tb_malloc_data_dump(tb_cpointer_t data, tb_char_t const* prefix);
+
 // malloc
 #ifndef __tb_debug__
 tb_pointer_t 	tb_malloc_malloc_impl(tb_size_t size);
