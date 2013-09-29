@@ -64,14 +64,6 @@ static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_si
  */
 tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
-	// check
-#ifdef __tb_debug__
-	{
-		// check overflow? 
-		tb_strlen(s2);
-	}
-#endif
-
 	// done
 	return tb_strncmp_impl(s1, s2, n);
 }
