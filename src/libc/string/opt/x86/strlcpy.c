@@ -37,9 +37,9 @@
  * implementation
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
-tb_char_t* tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
+static tb_size_t tb_strlcpy_impl(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 {
-	tb_assert_and_check_return_val(s1 && s2, tb_null);
+	tb_assert_and_check_return_val(s1 && s2, 0);
 
 	tb_size_t d0, d1, d2, d3;
 	__tb_asm__ __tb_volatile__
@@ -59,6 +59,7 @@ tb_char_t* tb_strlcpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 		: "0" (s2), "1" (s1), "2" (n) 
 		: "memory"
 	);
-	return s1;
+	// FIXME
+	//return s1;
 }
 #endif

@@ -44,13 +44,13 @@
  */
 
 #if defined(TB_CONFIG_LIBC_HAVE_MEMMOV)
-tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
+static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return memmove(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_MEMMOV)
-tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
+static tb_pointer_t tb_memmov_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
@@ -77,3 +77,38 @@ tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 	return s1;
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_pointer_t tb_memmov(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// overflow dst?
+		tb_size_t n1 = tb_malloc_data_size(s1);
+		if (n1 && n > n1)
+		{
+			tb_print("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
+			tb_malloc_data_dump(s1, "\t[malloc]: [from]: ");
+			tb_abort();
+		}
+
+		// overflow src?
+		tb_size_t n2 = tb_malloc_data_size(s2);
+		if (n2 && n > n2)
+		{
+			tb_print("[memmov]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_backtrace_dump("[memmov]: [overflow]: ", tb_null, 10);
+			tb_malloc_data_dump(s2, "\t[malloc]: [from]: ");
+			tb_abort();
+		}
+	}
+#endif
+
+	// done
+	return tb_memmov_impl(s1, s2, n);
+}
+

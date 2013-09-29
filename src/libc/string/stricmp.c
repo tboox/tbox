@@ -31,16 +31,16 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
 #ifdef TB_CONFIG_LIBC_HAVE_STRICMP
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	return strcasecmp(s1, s2);
 }
 #else
-tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+static tb_long_t tb_stricmp_impl(tb_char_t const* s1, tb_char_t const* s2)
 {
 	// check
 	tb_assert_and_check_return_val(s1 && s2, 0);
@@ -52,3 +52,21 @@ tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
 	return r;
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_long_t tb_stricmp(tb_char_t const* s1, tb_char_t const* s2)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// check overflow? 
+		tb_strlen(s1);
+		tb_strlen(s2);
+	}
+#endif
+
+	// done
+	return tb_stricmp_impl(s1, s2);
+}

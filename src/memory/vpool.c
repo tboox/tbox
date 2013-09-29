@@ -1083,7 +1083,7 @@ tb_void_t tb_vpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t c
 	tb_vpool_dump_backtrace(tag, block);
 
 	// dump data
-	tb_vpool_dump_data(data, block->real);
+	tb_vpool_dump_data(data, tb_min(block->real, 4096));
 }
 tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {

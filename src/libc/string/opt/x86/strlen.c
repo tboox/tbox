@@ -37,7 +37,7 @@
  * implementation
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
-tb_size_t tb_strlen(tb_char_t const* s)
+static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
 	tb_assert_and_check_return_val(s, 0);
 
