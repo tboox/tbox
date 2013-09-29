@@ -83,9 +83,6 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 	// check
 #ifdef __tb_debug__
 	{
-		// overflow src? 
-		tb_strlen(s1);
-
 		// overflow dst? 
 		tb_size_t n2 = tb_strlen(s2);
 
