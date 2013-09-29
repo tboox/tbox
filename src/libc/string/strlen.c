@@ -26,7 +26,6 @@
  * includes
  */
 #include "string.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_STRLEN
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strlen.c"
@@ -40,22 +39,21 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
-
 #if defined(TB_CONFIG_LIBC_HAVE_STRLEN)
-tb_size_t tb_strlen(tb_char_t const* s)
+static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
 	tb_assert_and_check_return_val(s, 0);
 	return strlen(s);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRLEN)
-tb_size_t tb_strlen(tb_char_t const* s)
+static tb_size_t tb_strlen_impl(tb_char_t const* s)
 {
+	// check
 	tb_assert_and_check_return_val(s, 0);
 
 	__tb_register__ tb_char_t const* p = s;
-
 #ifdef __tb_small__
 	while (*p) p++;
 	return (p - s);
@@ -72,3 +70,33 @@ tb_size_t tb_strlen(tb_char_t const* s)
 #endif
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_size_t tb_strlen(tb_char_t const* s)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// overflow? 
+		tb_size_t size = tb_malloc_data_size(s);
+		if (size)
+		{
+			// no '\0'?
+			tb_size_t real = tb_strnlen(s, size);
+			if (s[real])
+			{
+				tb_print("[strlen]: [overflow]: [%p, %lu]", s, size);
+				tb_backtrace_dump("[strlen]: [overflow]: ", tb_null, 10);
+				tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
+				tb_abort();
+			}
+		}
+	}
+#endif
+
+	// done
+	return tb_strlen_impl(s);
+}
+

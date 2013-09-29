@@ -26,7 +26,6 @@
  * includes
  */
 #include "string.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_STRCPY
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strcpy.c"
@@ -40,17 +39,16 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
-
 #if defined(TB_CONFIG_LIBC_HAVE_STRCPY)
-tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
+static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 {
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 	return strcpy(s1, s2);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRCPY)
-tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
+static tb_char_t* tb_strcpy_impl(tb_char_t* s1, tb_char_t const* s2)
 {
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
@@ -76,3 +74,33 @@ tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
 	return s;
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_char_t* tb_strcpy(tb_char_t* s1, tb_char_t const* s2)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// overflow src? 
+		tb_strlen(s1);
+
+		// overflow dst? 
+		tb_size_t n2 = tb_strlen(s2);
+
+		// strcpy overflow? 
+		tb_size_t n1 = tb_malloc_data_size(s1);
+		if (n1 && n2 + 1 > n1)
+		{
+			tb_print("[strcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n2, s1, n1);
+			tb_backtrace_dump("[strcpy]: [overflow]: ", tb_null, 10);
+			tb_malloc_data_dump(s2, "\t[malloc]: [from]: ");
+			tb_abort();
+		}
+	}
+#endif
+
+	// done
+	return tb_strcpy_impl(s1, s2);
+}

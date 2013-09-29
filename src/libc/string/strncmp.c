@@ -26,7 +26,6 @@
  * includes
  */
 #include "string.h"
-
 #ifndef TB_CONFIG_LIBC_HAVE_STRNCMP
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strncmp.c"
@@ -40,16 +39,16 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
 #if defined(TB_CONFIG_LIBC_HAVE_STRNCMP)
-tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	return strncmp(s1, s2, n);
 }
 #elif !defined(TB_LIBC_STRING_OPT_STRNCMP)
-tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	if (s1 == s2 || !n) return 0;
@@ -59,3 +58,20 @@ tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 	return r;
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// check overflow? 
+		tb_strlen(s2);
+	}
+#endif
+
+	// done
+	return tb_strncmp_impl(s1, s2, n);
+}

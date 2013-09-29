@@ -31,16 +31,16 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces 
+ * implementation 
  */
 #ifdef TB_CONFIG_LIBC_HAVE_STRNICMP
-tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	return strncasecmp(s1, s2, n);
 }
 #else
-tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static tb_long_t tb_strnicmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 	if (s1 == s2 || !n) return 0;
@@ -50,3 +50,20 @@ tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 	return r;
 }
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces 
+ */
+tb_long_t tb_strnicmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+{
+	// check
+#ifdef __tb_debug__
+	{
+		// check overflow? 
+		tb_strlen(s2);
+	}
+#endif
+
+	// done
+	return tb_strnicmp_impl(s1, s2, n);
+}

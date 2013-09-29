@@ -37,7 +37,7 @@
  * implementation
  */
 #if 0//def TB_CONFIG_ASSEMBLER_GAS
-tb_long_t tb_strncmp(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
+static tb_long_t tb_strncmp_impl(tb_char_t const* s1, tb_char_t const* s2, tb_size_t n)
 {
 	tb_assert_and_check_return_val(s1 && s2, 0);
 

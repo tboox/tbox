@@ -17,6 +17,17 @@ tb_void_t tb_demo_overflow()
 		tb_free(data);
 	}
 }
+tb_void_t tb_demo_cstring(tb_noarg_t);
+tb_void_t tb_demo_cstring()
+{
+	tb_char_t* data = tb_malloc0(10);
+	if (data)
+	{
+		tb_memset(data, 'c', 10);
+		tb_strlen(data);
+		tb_free(data);
+	}
+}
 tb_void_t tb_demo_free2(tb_noarg_t);
 tb_void_t tb_demo_free2()
 {
@@ -63,6 +74,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 //	tb_demo_free2();
 //	tb_demo_stack();
 //	tb_demo_overflow();
+	tb_demo_cstring();
 	tb_demo_overlap();
 
 	// exit
