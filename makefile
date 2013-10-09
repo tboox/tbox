@@ -111,17 +111,37 @@ else
 # ######################################################################################
 # no-config
 # #
-all : 		help
-rebuild : 	help
-install : 	help
-prefix : 	help
+all : 
+	make f
+	make r
+
+rebuild :
+	make f
+	make r
+
+install :
+	make f
+	make i
+
+prefix :
+	make f
+	make p
+
 lipo : 		help
-clean : 	help
-update : 	help
+clean :
+	make f
+	make c
+
+update :
+	make f
+	make u
+
 output : 	help
 error : 	help
 warning : 	help
-doc : 		help
+doc :
+	make f
+	make d
 
 endif
 
