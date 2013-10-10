@@ -38,7 +38,6 @@ all : .null
 
 # make rebuild
 rebuild : .null
-	@$(MAKE) f
 	@$(MAKE) c
 	-@$(MAKE) -j4
 	@$(MAKE)
@@ -136,9 +135,9 @@ update :
 	make f
 	make u
 
-output : 	help
-error : 	help
-warning : 	help
+output : 	
+error : 	
+warning : 	
 doc :
 	make f
 	make d
@@ -156,6 +155,9 @@ endif
 # #
 
 # platform
+PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
+PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
+PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
 PLAT := $(if $(PLAT),$(PLAT),linux)
 
 # architecture
