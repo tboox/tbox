@@ -376,12 +376,6 @@ tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)
 	// ok?
 	return tb_atomic_get(&aicp->kill)? tb_false : tb_true;
 }
-
-tb_bool_t tb_aicp_done(tb_aicp_t* aicp)
-{
-	return tb_false;
-}
-
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {
 	tb_assert_and_check_return(aicp);

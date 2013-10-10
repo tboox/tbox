@@ -30,54 +30,52 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* aioo, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* aioo, tb_long_t timeout);
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata)
+tb_void_t tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata)
 {
-	tb_assert_and_check_return(object);
-	object->otype = otype;
-	object->etype = etype;
-	object->odata = odata;
-	object->handle = handle;
+	tb_assert_and_check_return(aioo);
+	aioo->otype = otype;
+	aioo->etype = etype;
+	aioo->odata = odata;
+	aioo->handle = handle;
 }
-tb_size_t tb_aioo_type(tb_aioo_t* object)
+tb_size_t tb_aioo_type(tb_aioo_t* aioo)
 {
-	tb_assert_and_check_return_val(object, TB_AIOO_OTYPE_NONE);
-	return object->otype;
+	tb_assert_and_check_return_val(aioo, TB_AIOO_OTYPE_NONE);
+	return aioo->otype;
 }
-tb_size_t tb_aioo_gete(tb_aioo_t* object)
+tb_size_t tb_aioo_gete(tb_aioo_t* aioo)
 {
-	tb_assert_and_check_return_val(object, TB_AIOO_ETYPE_NONE);
-	return object->etype;
+	tb_assert_and_check_return_val(aioo, TB_AIOO_ETYPE_NONE);
+	return aioo->etype;
 }
-tb_size_t tb_aioo_sete(tb_aioo_t* object, tb_size_t etype)
+tb_void_t tb_aioo_sete(tb_aioo_t* aioo, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(object, TB_AIOO_OTYPE_NONE);
+	tb_assert_and_check_return(aioo);
+	aioo->etype = etype;
+}
+tb_size_t tb_aioo_adde(tb_aioo_t* aioo, tb_size_t etype)
+{
+	tb_assert_and_check_return_val(aioo, TB_AIOO_OTYPE_NONE);
 
-	object->etype = etype;
-	return object->etype;
+	aioo->etype |= etype;
+	return aioo->etype;
 }
-tb_size_t tb_aioo_adde(tb_aioo_t* object, tb_size_t etype)
+tb_size_t tb_aioo_dele(tb_aioo_t* aioo, tb_size_t etype)
 {
-	tb_assert_and_check_return_val(object, TB_AIOO_OTYPE_NONE);
+	tb_assert_and_check_return_val(aioo, TB_AIOO_OTYPE_NONE);
 
-	object->etype |= etype;
-	return object->etype;
+	aioo->etype &= ~etype;
+	return aioo->etype;
 }
-tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype)
+tb_long_t tb_aioo_wait(tb_aioo_t* aioo, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(object, TB_AIOO_OTYPE_NONE);
-
-	object->etype &= ~etype;
-	return object->etype;
-}
-tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	tb_assert_and_check_return_val(object && object->handle, 0);
+	tb_assert_and_check_return_val(aioo && aioo->handle, 0);
 
 	// the reactor 
 	static tb_long_t (*wait[])(tb_aioo_t*, tb_long_t) =
@@ -93,10 +91,10 @@ tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout)
 	};
 
 	// check
-	tb_assert_and_check_return_val(object->otype < tb_arrayn(wait), 0);
-	tb_assert_and_check_return_val(wait[object->otype], 0);
+	tb_assert_and_check_return_val(aioo->otype < tb_arrayn(wait), 0);
+	tb_assert_and_check_return_val(wait[aioo->otype], 0);
  
-	// wait object
-	return wait[object->otype](object, timeout);
+	// wait aioo
+	return wait[aioo->otype](aioo, timeout);
 }
 

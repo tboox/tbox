@@ -34,34 +34,35 @@
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
-// the aio poll pool reactor type
+
+// the aioo poll pool reactor type
 struct __tb_aipp_t;
 typedef struct __tb_aipp_reactor_t
 {
-	// the reference to the aio pool
+	/// aipp
 	struct __tb_aipp_t* 	aipp;
 
-	// exit
+	/// exit
 	tb_void_t 				(*exit)(struct __tb_aipp_reactor_t* reactor);
 
-	// cler
+	/// cler
 	tb_void_t 				(*cler)(struct __tb_aipp_reactor_t* reactor);
 
-	// addo
+	/// addo
 	tb_bool_t 				(*addo)(struct __tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype);
 
-	// seto
+	/// seto
 	tb_bool_t 				(*seto)(struct __tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj);
 
-	// delo
+	/// delo
 	tb_bool_t 				(*delo)(struct __tb_aipp_reactor_t* reactor, tb_handle_t handle);
 
-	// wait
+	/// wait
 	tb_long_t 				(*wait)(struct __tb_aipp_reactor_t* reactor, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
 
 }tb_aipp_reactor_t;
 
-/*!the aio poll pool type
+/*! the aioo poll pool type
  *
  * <pre>
  * objs: |-----|------|------|--- ... ...---|-------|
@@ -72,16 +73,16 @@ typedef struct __tb_aipp_reactor_t
  */
 typedef struct __tb_aipp_t
 {
-	// the object type
+	/// the object type
 	tb_size_t 				type;
 
-	// the object maxn
+	/// the object maxn
 	tb_size_t 				maxn;
 
-	// the objects hash
+	/// the objects hash
 	tb_handle_t 			hash;
 
-	// the reactor
+	/// the reactor
 	tb_aipp_reactor_t* 		rtor;
 
 }tb_aipp_t;
@@ -90,37 +91,37 @@ typedef struct __tb_aipp_t
  * interfaces
  */
 
-/*!init the aio pool
+/*!init the aioo poll pool
  *
  * @param 	type 	the object type
  * @param 	maxn 	the maximum number of concurrent objects
  *
- * @return 	the aio pool
+ * @return 	the aioo poll pool
  */
 tb_aipp_t* 			tb_aipp_init(tb_size_t type, tb_size_t maxn);
 
-/*! exit the aio pool
+/*! exit the aioo poll pool
  *
- * @param 	aipp 	the aio pool
+ * @param 	aipp 	the aioo poll pool
  */
 tb_void_t 			tb_aipp_exit(tb_aipp_t* aipp);
 
-/*! cler the aio pool
+/*! cler the aioo poll pool
  *
- * @param 	aipp 	the aio pool
+ * @param 	aipp 	the aioo poll pool
  */
 tb_void_t 			tb_aipp_cler(tb_aipp_t* aipp);
 
-/// the object maximum number of the aio pool
+/// the object maximum number of the aioo poll pool
 tb_size_t 			tb_aipp_maxn(tb_aipp_t* aipp);
 
-/// the object number of the aio pool
+/// the object number of the aioo poll pool
 tb_size_t 			tb_aipp_size(tb_aipp_t* aipp);
 
 /*! add the aio object
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  * @param 	etype 	the event type
  * @param 	odata 	the object data
  *
@@ -130,8 +131,8 @@ tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, 
 
 /*! del the aio object
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  *
  * @return 	return tb_false if failed
  */
@@ -139,8 +140,8 @@ tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
 
 /*! set the aio event
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  * @param 	etype 	the event type
  *
  */
@@ -148,8 +149,8 @@ tb_size_t 			tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
 
 /*! set the aio event
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  * @param 	etype 	the event type
  *
  */
@@ -157,8 +158,8 @@ tb_void_t 			tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
 /*! add the aio event
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  * @param 	etype 	the event type
  *
  */
@@ -166,16 +167,16 @@ tb_void_t 			tb_aipp_adde(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
 /*! del the aio event
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  *
  */
 tb_void_t 			tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
 /*! set the aio odata
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  * @param 	odata 	the object data
  *
  */
@@ -183,8 +184,8 @@ tb_void_t 			tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odat
 
 /*! get the aio odata
  *
- * @param 	aipp 	the aio pool
- * @param 	handle 	the handle of the aio object
+ * @param 	aipp 	the aioo poll pool
+ * @param 	handle 	the aioo native handle
  *
  * @return 			the object data
  */
@@ -195,7 +196,7 @@ tb_pointer_t 		tb_aipp_getp(tb_aipp_t* aipp, tb_handle_t handle);
  * blocking wait the multiple event objects
  * return the event number if ok, otherwise return 0 for timeout
  *
- * @param 	aipp 	the aio pool
+ * @param 	aipp 	the aioo poll pool
  * @param 	aioo 	the aio objects
  * @param 	maxn 	the maximum size of the aio objects
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
