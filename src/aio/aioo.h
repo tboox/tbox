@@ -76,54 +76,72 @@ typedef struct __tb_aioo_t
  * interfaces
  */
 
-/// set the aio object
-tb_void_t tb_aioo_seto(tb_aioo_t* object, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata);
+/*! set the aioo
+ *
+ * @param aioo 		the aioo
+ * @param handle 	the aioo native handle
+ * @param otype 	the aioo type
+ * @param etype 	the aioo event type
+ * @param odata 	the aioo data
+ */
+tb_void_t 			tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata);
 
-/// get the object type
-tb_size_t tb_aioo_type(tb_aioo_t* object);
+/*! the aioo type
+ *
+ * @param aioo 		the aioo
+ *
+ * @return 			the aioo type
+ */
+tb_size_t 			tb_aioo_type(tb_aioo_t* aioo);
 
-/// get the event type
-tb_size_t tb_aioo_gete(tb_aioo_t* object);
+/*! the aioo event type
+ *
+ * @param aioo 		the aioo
+ *
+ * @return 			the aioo event type
+ */
+tb_size_t 			tb_aioo_gete(tb_aioo_t* aioo);
 
-/// set the event type
-tb_size_t tb_aioo_sete(tb_aioo_t* object, tb_size_t etype);
+/*! set the aioo event type
+ *
+ * @param aioo 		the aioo
+ * @param etype 	the aioo event type
+ */
+tb_void_t 			tb_aioo_sete(tb_aioo_t* aioo, tb_size_t etype);
 
-/*!add the event type
+/*! add the aioo event type
  *
  * add the event type by 'or' before waiting it
  *
- * @param 	object 	the aio object
- * @param 	type 	the event type
+ * @param aioo 		the aioo
+ * @param type 		the aioo event type
  *
- * @return 	the new event type
+ * @return 			the aioo new event type
  */
-tb_size_t tb_aioo_adde(tb_aioo_t* object, tb_size_t etype);
+tb_size_t 			tb_aioo_adde(tb_aioo_t* aioo, tb_size_t etype);
 
-/*!delete the event type
+/*! del the aioo event type
  *
- * delete the event type by 'and' before waiting it
+ * del the event type by 'and' before waiting it
  *
- * @param 	object 	the aio object
- * @param 	type 	the event type
+ * @param aioo 		the aioo
+ * @param type 		the aioo event type
  *
- * @return 	the new event type
+ * @return 			the aioo new event type
  */
-tb_size_t tb_aioo_dele(tb_aioo_t* object, tb_size_t etype);
+tb_size_t 			tb_aioo_dele(tb_aioo_t* aioo, tb_size_t etype);
 
-/*!wait the aio object
+/*! wait the aio aioo
  *
- * blocking wait the single event object, so need not aipp 
+ * blocking wait the single event aioo, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param 	object 	the aio object
- * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ * @param aioo 		the aio aioo
+ * @param timeout 	the timeout value, return immediately if 0, infinity if -1
  *
- * @return 	the event type
- *          return 0 if timeout
- *          return -1 if error
- *          return the need event type if object->etype == TB_AIOO_ETYPE_NONE
+ * @return 			the event type or timeout: 0 or error: -1
  */
-tb_long_t tb_aioo_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t 			tb_aioo_wait(tb_aioo_t* aioo, tb_long_t timeout);
 
 
 #endif

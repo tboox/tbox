@@ -21,13 +21,14 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
+	// init tbox
+	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
 	// init
 	tb_handle_t 	sock = tb_null;
 	tb_handle_t 	aicp = tb_null;
 	tb_handle_t 	aico = tb_null;
+	tb_size_t 		port = argv[1]? tb_stou32(argv[1]) : 9090;
 
 	// open sock
 	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
@@ -42,13 +43,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aico, end);
 
 	// post conn
-	tb_print("[demo]: conn: post");
-	if (!tb_aicp_conn(aicp, aico, argv[1], tb_stou32(argv[2]))) goto end;
+	tb_print("conn: %lu: ..", port);
+	if (!tb_aicp_conn(aicp, aico, "127.0.0.1", port)) goto end;
 
-	// spak & done
-	while (tb_aicp_spak(aicp) && tb_aicp_done(aicp)) ;
+	// spak aicp
+	while (tb_aicp_spak(aicp)) ;
 	
 end:
+
+	// trace
+	tb_print("end");
 
 	// close sock
 	if (sock) tb_socket_close(sock);
@@ -56,7 +60,7 @@ end:
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
 
-	// exit
+	// exit tbox
 	tb_exit();
 	return 0;
 }
