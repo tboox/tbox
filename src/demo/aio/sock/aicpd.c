@@ -5,11 +5,6 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_WORK_MAXN 		(3)
-
-/* ///////////////////////////////////////////////////////////////////////
  * aicb
  */
 static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
@@ -45,7 +40,7 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
 			if (aice->u.read.data) tb_free(aice->u.read.data);
 
 			// post writ
-			if (!tb_aicp_writ(aicp, aico, "ok", 3)) return tb_false;
+			if (!tb_aicp_writ(aicp, aico, "hello", sizeof("hello"))) return tb_false;
 		}
 		break;
 	case TB_AICE_CODE_WRIT:

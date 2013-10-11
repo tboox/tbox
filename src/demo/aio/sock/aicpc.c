@@ -12,6 +12,42 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
 	// check
 	tb_assert_and_check_return_val(aicp && aico && aice, tb_false);
 
+	// done
+	switch (aice->code)
+	{
+	case TB_AICE_CODE_CONN:
+		{
+			// trace
+			tb_print("conn[%p]: ok", aico->aioo.handle);
+
+			// post writ to server
+			if (!tb_aicp_writ(aicp, aico, "hello", sizeof("hello"))) return tb_false;
+		}
+		break;
+	case TB_AICE_CODE_READ:
+		{
+			// trace
+			tb_print("read[%p]: size: %ld, maxn: %lu, data: %s", aico->aioo.handle, aice->u.read.size, aice->u.read.maxn, aice->u.read.data);
+
+			// exit data
+			if (aice->u.read.data) tb_free(aice->u.read.data);
+		}
+		break;
+	case TB_AICE_CODE_WRIT:
+		{
+			// trace
+			tb_print("writ[%p]: size: %ld maxn: %lu, data: %s", aico->aioo.handle, aice->u.read.size, aice->u.writ.maxn, aice->u.writ.data);
+	
+			// post read from server
+			if (!tb_aicp_read(aicp, aico, tb_malloc0(1024), 1024)) return tb_false;
+		}
+		break;
+	default:
+		break;
+	}
+
+	// FIXME: done close
+
 	// ok
 	return tb_true;
 }
