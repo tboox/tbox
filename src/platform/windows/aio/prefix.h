@@ -31,7 +31,9 @@
 #include "../../../libc/libc.h"
 #include "../../../math/math.h"
 #include "../../../memory/memory.h"
+#include "../../../platform/platform.h"
 #include "../../../container/container.h"
+#include "windows.h"
 #include "winsock2.h"
 
 #endif

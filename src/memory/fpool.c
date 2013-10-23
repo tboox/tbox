@@ -36,7 +36,7 @@
  */
 
 // the magic number
-#define TB_FPOOL_MAGIC 							(0xdead)
+#define TB_FPOOL_MAGIC 							(0xdeaf)
 
 // the align maxn
 #define TB_FPOOL_ALIGN_MAXN 					(128)

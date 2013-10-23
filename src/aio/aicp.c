@@ -42,6 +42,31 @@ tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp);
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->post && aice, tb_false);
+
+	// enter 
+	if (aicp->mutx.post) tb_mutex_enter(aicp->mutx.post);
+
+	// post aice
+	tb_bool_t ok = tb_false;
+	if (!tb_queue_full(aicp->post)) 
+	{
+		tb_queue_put(aicp->post, aice);
+		ok = tb_true;
+	}
+
+	// leave 
+	if (aicp->mutx.post) tb_mutex_leave(aicp->mutx.post);
+	
+	// ok?
+	return ok;
+}
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
 
 tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 {
@@ -70,8 +95,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	// init mutx
 	aicp->mutx.pool = tb_mutex_init(tb_null);
 	aicp->mutx.post = tb_mutex_init(tb_null);
-	aicp->mutx.resp = tb_mutex_init(tb_null);
-	tb_assert_and_check_goto(aicp->mutx.pool && aicp->mutx.post && aicp->mutx.resp, fail);
+	tb_assert_and_check_goto(aicp->mutx.pool && aicp->mutx.post, fail);
 
 	// init pool
 	aicp->pool = tb_rpool_init(tb_align_pow2((maxn >> 3) + 1), sizeof(tb_aico_t), 0);
@@ -80,10 +104,6 @@ tb_aicp_t* tb_aicp_init(tb_size_t type, tb_size_t maxn)
 	// init post
 	aicp->post = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
 	tb_assert_and_check_goto(aicp->post, fail);
-
-	// init resp
-	aicp->resp = tb_queue_init(TB_QUEUE_SIZE_DEFAULT, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
-	tb_assert_and_check_goto(aicp->resp, fail);
 
 	// init reactor
 	if (s_init[type]) aicp->rtor = s_init[type](aicp);
@@ -118,17 +138,6 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			aicp->rtor = tb_null;
 		}
 
-		// exit resp
-		if (aicp->mutx.resp) 
-		{
-			tb_mutex_enter(aicp->mutx.resp);
-
-			if (aicp->resp) tb_queue_exit(aicp->resp);
-			aicp->resp = tb_null;
-
-			tb_mutex_leave(aicp->mutx.resp);
-		}
-
 		// exit post
 		if (aicp->mutx.post) 
 		{
@@ -152,8 +161,6 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		}
 
 		// exit mutx
-		if (aicp->mutx.resp) tb_mutex_exit(aicp->mutx.resp);
-		aicp->mutx.resp = tb_null;
 		if (aicp->mutx.post) tb_mutex_exit(aicp->mutx.post);
 		aicp->mutx.post = tb_null;
 		if (aicp->mutx.pool) tb_mutex_exit(aicp->mutx.pool);
@@ -170,13 +177,14 @@ tb_size_t tb_aicp_maxn(tb_aicp_t* aicp)
 }
 tb_size_t tb_aicp_size(tb_aicp_t* aicp)
 {
-	tb_assert_and_check_return_val(aicp, 0);
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->pool, 0);
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
 
 	// size
-	tb_size_t size = aicp->pool? tb_rpool_size(aicp->pool) : 0;
+	tb_size_t size = tb_rpool_size(aicp->pool);
 
 	// leave 
 	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
@@ -186,37 +194,46 @@ tb_size_t tb_aicp_size(tb_aicp_t* aicp)
 }
 tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata)
 {
-	tb_assert_and_check_return_val(aicp && handle && aicb, tb_null);
-
-	// init aico
-	tb_aico_t* aico = tb_null;
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->rtor && aicp->rtor->addo && aicp->pool && handle, tb_null);
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
 
-	// check
-	tb_assert_and_check_goto(aicp->rtor && aicp->rtor->addo, end);
-	tb_assert_and_check_goto(aicp->pool && tb_rpool_size(aicp->pool) < aicp->maxn, end);
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_aico_t* 	aico = tb_null;
+	do
+	{
+		// check
+		tb_assert_and_check_break(tb_rpool_size(aicp->pool) < aicp->maxn);
 
-	// add aico to pool
-	aico = (tb_aico_t*)tb_rpool_malloc0(aicp->pool);
-	tb_assert_and_check_goto(aico, end);
+		// add aico to pool
+		aico = (tb_aico_t*)tb_rpool_malloc0(aicp->pool);
+		tb_assert_and_check_break(aico);
 
-	// init aico
-	aico->aioo.handle = handle;
-	aico->aioo.otype = aicp->type;
-	aico->aioo.etype = TB_AIOO_ETYPE_NONE;
-	aico->aioo.odata = odata;
-	aico->aicb = aicb;
+		// init aico
+		aico->aioo.handle = handle;
+		aico->aioo.otype = aicp->type;
+		aico->aioo.etype = TB_AIOO_ETYPE_NONE;
+		aico->aioo.odata = odata;
+		aico->aicb = aicb;
 
-	// add aico to native
-	if (aicp->rtor->addo(aicp->rtor, aico)) goto end;
-	
-	// del aico from pool
-	tb_rpool_free(aicp->pool, aico);
-	aico = tb_null;
+		// add aico to native
+		if (!aicp->rtor->addo(aicp->rtor, aico)) break;
 
-end:
+		// ok
+		ok = tb_true;
+		
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// del aico from pool
+		tb_rpool_free(aicp->pool, aico);
+		aico = tb_null;
+	}
 
 	// leave 
 	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
@@ -227,46 +244,27 @@ end:
 tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
 	// check
-	tb_assert_and_check_return(aicp && aico);
+	tb_assert_and_check_return(aicp && aicp->rtor && aicp->rtor->delo && aicp->pool && aico);
 
 	// enter 
 	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
 
-	// check
-	tb_assert_and_check_goto(aicp->rtor && aicp->rtor->delo, end);
-	tb_assert_and_check_goto(aicp->pool && tb_rpool_size(aicp->pool), end);
+	// done
+	do
+	{
+		// check
+		tb_assert_and_check_break(tb_rpool_size(aicp->pool));
 
-	// del aico from native
-	if (!aicp->rtor->delo(aicp->rtor, aico)) goto end;
+		// del aico from native
+		if (!aicp->rtor->delo(aicp->rtor, aico)) break;
 
-	// del aico from pool
-	tb_rpool_free(aicp->pool, (tb_pointer_t)aico);
+		// del aico from pool
+		tb_rpool_free(aicp->pool, (tb_pointer_t)aico);
 
-end:
+	} while (0);
+
 	// leave 
 	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
-}
-tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->post && aice, tb_false);
-
-	// enter 
-	if (aicp->mutx.post) tb_mutex_enter(aicp->mutx.post);
-
-	// post aice
-	tb_bool_t ok = tb_false;
-	if (!tb_queue_full(aicp->post)) 
-	{
-		tb_queue_put(aicp->post, aice);
-		ok = tb_true;
-	}
-
-	// leave 
-	if (aicp->mutx.post) tb_mutex_leave(aicp->mutx.post);
-	
-	// ok?
-	return ok;
 }
 tb_bool_t tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
@@ -287,6 +285,17 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico)
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_ACPT;
+	aice.aico = (tb_pointer_t)aico;
+	return tb_aicp_post(aicp, &aice);
+}
+tb_bool_t tb_aicp_clos(tb_aicp_t* aicp, tb_aico_t const* aico)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aico, tb_false);
+
+	// post
+	tb_aice_t aice = {0};
+	aice.code = TB_AICE_CODE_CLOS;
 	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
@@ -317,7 +326,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
@@ -325,56 +334,39 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	// post
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_WRIT;
-	aice.u.read.data = data;
-	aice.u.read.maxn = size;
+	aice.u.writ.data = data;
+	aice.u.writ.maxn = size;
 	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_spak(tb_aicp_t* aicp)
+tb_long_t tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->post && aicp->resp && aicp->rtor && aicp->rtor->spak, tb_false);
-
-	// enter 
-	if (aicp->mutx.post) tb_mutex_enter(aicp->mutx.post);
-
-	// get the posted aice
-	tb_aice_t const* post = tb_null;
-	if (!tb_queue_null(aicp->post)) 
-	{
-		post = tb_queue_get(aicp->post);
-		tb_queue_pop(aicp->post);
-	}
-
-	// leave 
-	if (aicp->mutx.post) tb_mutex_leave(aicp->mutx.post);
-
-	// killed?
-	tb_check_return_val(!tb_atomic_get(&aicp->kill), tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->post && aicp->rtor && aicp->rtor->spak, -1);
 
 	// spak
-	tb_aice_t const* 	resp = tb_null;
-	tb_long_t 			resn = aicp->rtor->spak(aicp->rtor, post, &resp);
+	tb_aice_t 	resp = {0};
+	tb_long_t	ok = aicp->rtor->spak(aicp->rtor, &resp, timeout);
+	tb_assert_and_check_return_val(ok >= 0, -1);
 
 	// killed?
-	tb_check_return_val(resn >= 0, tb_false);
-	tb_check_return_val(!tb_atomic_get(&aicp->kill), tb_false);
+	tb_check_return_val(!tb_atomic_get(&aicp->kill), -1);
 	
-	// no aice?
-	tb_check_return_val(resn, tb_true);
+	// timeout?
+	tb_check_return_val(ok, 0);
 
-	// enter 
-	if (aicp->mutx.resp) tb_mutex_enter(aicp->mutx.resp);
+	// aico
+	tb_aico_t const* aico = (tb_aico_t const*)resp.aico;
+	tb_assert_and_check_return_val(aico, -1);
 
-	// push resp aices
-	tb_size_t i = 0;
-	for (i = 0; i < resn; i++) tb_queue_put(aicp->resp, &resp[i]);
+	// done aicb
+	if (aico->aicb) if (!aico->aicb(aicp, aico, &resp)) return -1;
 
-	// leave 
-	if (aicp->mutx.resp) tb_mutex_leave(aicp->mutx.resp);
-		
+	// killed?
+	tb_check_return_val(!tb_atomic_get(&aicp->kill), -1);
+
 	// ok?
-	return tb_atomic_get(&aicp->kill)? tb_false : tb_true;
+	return ok;
 }
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {

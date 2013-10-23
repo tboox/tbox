@@ -53,17 +53,26 @@ typedef struct __tb_aico_t
 
 }tb_aico_t;
 
-/// the aico event code type
-typedef enum __tb_aice_code_t
+/// the aico event code enum
+typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NULL 		= 0 	//!< for null
 ,	TB_AICE_CODE_SYNC 		= 1		//!< for file
-, 	TB_AICE_CODE_ACPT 		= 2 	//!< for socket
-, 	TB_AICE_CODE_CONN 		= 3 	//!< for socket
-,	TB_AICE_CODE_READ 		= 4		//!< for all i/o object
-,	TB_AICE_CODE_WRIT 		= 5		//!< for all i/o object
+, 	TB_AICE_CODE_ACPT 		= 2 	//!< for sock
+, 	TB_AICE_CODE_CONN 		= 3 	//!< for sock
+, 	TB_AICE_CODE_CLOS 		= 4 	//!< for file or sock
+,	TB_AICE_CODE_READ 		= 5		//!< for file or sock
+,	TB_AICE_CODE_WRIT 		= 6		//!< for file or sock
+,	TB_AICE_CODE_ERRO 		= 7		//!< for file or sock
 
-}tb_aice_code_t;
+}tb_aice_code_e;
+
+/// the aico error code enum
+typedef enum __tb_aice_error_e
+{
+ 	TB_AICE_ERROR_UNKNOWN 	= 0
+
+}tb_aice_error_e;
 
 /// the aico sync event type
 typedef struct __tb_aice_sync_t
@@ -81,19 +90,35 @@ typedef struct __tb_aice_acpt_t
 
 }tb_aice_acpt_t;
 
+/// the aico erro event type
+typedef struct __tb_aice_erro_t
+{
+	/// the code
+	tb_size_t 				code;
+
+}tb_aice_erro_t;
+
 /// the aico conn event type
 typedef struct __tb_aice_conn_t
 {
 	/// the ok
-	tb_size_t 				ok 		: 1;
+	tb_long_t 				ok;
 
 	/// the port
-	tb_size_t 				port 	: 31;
+	tb_size_t 				port;
 
 	/// the host
 	tb_ipv4_t 				host;
 
 }tb_aice_conn_t;
+
+/// the aico clos event type
+typedef struct __tb_aice_clos_t
+{
+	/// the ok
+	tb_bool_t 				ok;
+
+}tb_aice_clos_t;
 
 /// the aico read event type
 typedef struct __tb_aice_read_t
@@ -130,7 +155,7 @@ typedef struct __tb_aice_t
 	tb_size_t 				code;
 
 	/// the aico
-	tb_pointer_t 			aico;
+	tb_aico_t* 				aico;
 
 	/// the uion
 	union
@@ -138,6 +163,8 @@ typedef struct __tb_aice_t
 		tb_aice_sync_t 		sync;
 		tb_aice_acpt_t 		acpt;
 		tb_aice_conn_t 		conn;
+		tb_aice_clos_t 		clos;
+		tb_aice_erro_t 		erro;
 		tb_aice_read_t 		read;
 		tb_aice_writ_t 		writ;
 	} u;
@@ -161,7 +188,7 @@ typedef struct __tb_aicp_reactor_t
 	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
 
 	/// spak
-	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_aice_t const* post, tb_aice_t const** resp);
+	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_aice_t* resp, tb_long_t timeout);
 
 }tb_aicp_reactor_t;
 
@@ -173,9 +200,6 @@ typedef struct __tb_aicp_mutx_t
 
 	/// the post mutx
 	tb_handle_t 			post;
-
-	/// the resp mutx
-	tb_handle_t 			resp;
 
 }tb_aicp_mutx_t;
 
@@ -196,7 +220,7 @@ typedef struct __tb_aicp_mutx_t
  *       '------------------------------------------------'                               |
  *                             |                                                          |
  *                             |                                                          |
- * queue:      [lock]          |         <= input aice to queue                           |
+ * queue:      [lock]          |         <= input aices                                   |
  *                             |                                                          |
  *                             |------------------------------------------                |
  *                             |                                  |       |               |
@@ -224,17 +248,11 @@ typedef struct __tb_aicp_mutx_t
  *                 |           |           |                      |       |               |
  * resp: |---------------------|----------------------------------'-------'               |
  *                             |                                                          |
- * queue:      [lock]          |         <= output aice to queue                          |
- *                             |                                                          |
- *                             |                                                          |
+ *                             |         <= output aices                                  |
  *                             |                                                          |
  *         |---------------------------------------------|                                |
  * worker: |  worker0    |   worker1    |    ...         | <= aico is readonly for worker |
  *         '---------------------------------------------'                                |
- *                |             |               |                                         |
- *                ------------------------------                                          |
- *                       [lock] |        <= the aices of the same aico must be in the same worker queue
- *                 -----------------------------                                          |
  *                |             |               |                                         |
  * aices:  |---------------------------------------------|                                |
  *         |    aice0    |    aice2     |     ...        |                                |
@@ -242,7 +260,7 @@ typedef struct __tb_aicp_mutx_t
  *         |     ...     |    aice4     |     ...        |                                |
  *         |     ...     |     ...      |     ...        |                                |
  *         '---------------------------------------------'                                |
- *                |              |              |                                         | 
+ *                |              |              |                                         |  *                             |                                                          |
  * done:   |---------------------------------------------|                                |
  *         |   caller0   |   caller2    |     ...        |                                |
  *         |   caller1   |     ...      |     ...        |                                |
@@ -282,9 +300,6 @@ typedef struct __tb_aicp_t
 	/// the aice post
 	tb_queue_t* 			post;
 
-	/// the aice resp
-	tb_queue_t* 			resp;
-
 	/// the reactor
 	tb_aicp_reactor_t* 		rtor;
 
@@ -304,6 +319,8 @@ typedef struct __tb_aicp_t
 tb_aicp_t* 			tb_aicp_init(tb_size_t type, tb_size_t maxn);
 
 /*! exit the aicp
+ *
+ * @note 			not multi-thread safe
  *
  * @param aicp 		the aicp
  */ 	
@@ -343,15 +360,6 @@ tb_aico_t const* 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t ai
  */
 tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
 
-/*! post the aico event
- *
- * @param aicp 		the aicp
- * @param aice 		the aico event
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
-
 /*! post the sync event
  *
  * @param aicp 		the aicp
@@ -369,6 +377,15 @@ tb_bool_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico);
+
+/*! post the clos event
+ *
+ * @param aicp 		the aicp
+ * @param aice 		the aico event *
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_clos(tb_aicp_t* aicp, tb_aico_t const* aico);
 
 /*! post the conn event
  *
@@ -401,22 +418,24 @@ tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* dat
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size);
 
-/*! spak aicp for only one thread
+/*! spak aicp
  *
  * @code
  * tb_pointer_t spak_worker_thread(tb_pointer_t)
  * {
  * 		// wait will be called, so need not sleep
- * 		while (tb_aicp_spak(aicp)) ;
+ * 		while (tb_aicp_spak(aicp, -1) >= 0) ;
  * }
  * @endcode
  *
  * @param aicp 		the aicp
- * @return 			tb_true or tb_false
+ * @param timeout 	the timeout
+ *
+ * @return 			ok: the aice count, timeout: 0, fail: < 0
  */
-tb_bool_t 			tb_aicp_spak(tb_aicp_t* aicp);
+tb_long_t 			tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout);
 
 /*! kill the spak
  *
