@@ -97,14 +97,6 @@ typedef struct __tb_file_info_t
  */
 tb_handle_t 			tb_file_init(tb_char_t const* path, tb_size_t mode);
 
-/*! the file native handle
- * 
- * @param file 			the file handle
- *
- * @return 				the file native handle
- */
-tb_handle_t 			tb_file_native(tb_handle_t file);
-
 /*! exit the file
  * 
  * @param file 			the file handle
