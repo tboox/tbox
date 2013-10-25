@@ -136,12 +136,12 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
 	tb_assert_and_check_return_val(aice && aice->aico && aice->aico->aioo.handle, -1);
 
-	tb_print("tb_aicp_reactor_iocp_post_read b: %p %lu", aice->u.read.data, aice->u.read.maxn);
+	tb_print("tb_aicp_reactor_iocp_post_read b: %p %lu", aice->u.read.data, aice->u.read.size);
 	// init olap
 	tb_iocp_olap_t* olap = tb_rpool_malloc0(rtor->pool);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->data.buf 	= aice->u.read.data;
-	olap->data.len 	= aice->u.read.maxn;
+	olap->data.len 	= aice->u.read.size;
 	olap->aice 		= *aice;
 
 	// post recv
@@ -150,13 +150,13 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	tb_print("real: %ld %d", real, WSAGetLastError());
 
 	// finished?
-	if (real == aice->u.read.maxn)
+	if (real == aice->u.read.size)
 	{
 		// remove olap
 		if (olap) tb_rpool_free(rtor->pool, olap);
 
 		// the real size
-		aice->u.read.size = real;
+		aice->u.read.real = real;
 		return real;
 	}
 
@@ -189,7 +189,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 
 	tb_print("tb_aicp_reactor_iocp_post_read e");
 	// failed
-	aice->u.read.size = -1;
+	aice->u.read.real = -1;
 	return -1;
 }
 static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_aice_t* aice, tb_long_t timeout)
@@ -199,12 +199,12 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
 	tb_assert_and_check_return_val(aice && aice->aico && aice->aico->aioo.handle, -1);
 
-	tb_print("tb_aicp_reactor_iocp_post_writ b: %p %lu", aice->u.writ.data, aice->u.writ.maxn);
+	tb_print("tb_aicp_reactor_iocp_post_writ b: %p %lu", aice->u.writ.data, aice->u.writ.size);
 	// init olap
 	tb_iocp_olap_t* olap = tb_rpool_malloc0(rtor->pool);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->data.buf 	= aice->u.writ.data;
-	olap->data.len 	= aice->u.writ.maxn;
+	olap->data.len 	= aice->u.writ.size;
 	olap->aice 		= *aice;
 
 	// post send
@@ -212,13 +212,13 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 	tb_print("real: %ld %d", real, WSAGetLastError());
 
 	// finished?
-	if (real == aice->u.writ.maxn)
+	if (real == aice->u.writ.size)
 	{
 		// remove olap
 		if (olap) tb_rpool_free(rtor->pool, olap);
 
 		// the real size
-		aice->u.writ.size = real;
+		aice->u.writ.real = real;
 		return real;
 	}
 
@@ -251,7 +251,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 
 	tb_print("tb_aicp_reactor_iocp_post_writ e");
 	// failed
-	aice->u.writ.size = -1;
+	aice->u.writ.real = -1;
 	return -1;
 }
 static tb_long_t tb_aicp_reactor_iocp_post_aice(tb_aicp_reactor_t* reactor, tb_aice_t* aice, tb_long_t timeout)
@@ -362,14 +362,14 @@ static tb_long_t tb_aicp_reactor_iocp_spak(tb_aicp_reactor_t* reactor, tb_aice_t
 	case TB_AICE_CODE_READ:
 		{
 			*resp = olap->aice;
-			resp->u.read.size = real;
+			resp->u.read.real = real;
 			ok = 1;
 		}
 		break;
 	case TB_AICE_CODE_WRIT:
 		{
 			*resp = olap->aice;
-			resp->u.writ.size = real;
+			resp->u.writ.real = real;
 			ok = 1;
 		}
 		break;

@@ -126,11 +126,11 @@ typedef struct __tb_aice_read_t
 	/// the read data
 	tb_byte_t* 				data;
 
-	/// the data maxn
-	tb_size_t 				maxn;
-
 	/// the data size
-	tb_long_t 				size;
+	tb_size_t 				size;
+
+	/// the data real
+	tb_long_t 				real;
 
 }tb_aice_read_t;
 
@@ -140,11 +140,11 @@ typedef struct __tb_aice_writ_t
 	/// the writ data
 	tb_byte_t* 				data;
 
-	/// the data maxn
-	tb_size_t 				maxn;
-
 	/// the data size
-	tb_long_t 				size;
+	tb_size_t 				size;
+
+	/// the data real
+	tb_long_t 				real;
 
 }tb_aice_writ_t;
 
