@@ -60,8 +60,12 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	else if (mode & TB_FILE_MODE_TRUNC) cflag |= TRUNCATE_EXISTING;
 	if (!cflag) cflag |= OPEN_EXISTING;
 
+	// init attr
+	DWORD attr = FILE_ATTRIBUTE_NORMAL;
+	if (mode & TB_FILE_MODE_AICP) attr |= FILE_FLAG_OVERLAPPED;
+
 	// init file
-	HANDLE file = CreateFileW(full, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+	HANDLE file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
 	if (file == INVALID_HANDLE_VALUE && (mode & TB_FILE_MODE_CREAT))
 	{
 		// make directory
@@ -84,7 +88,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 		}
 
 		// init it again
-		file = CreateFileW(full, access, share, tb_null, cflag, FILE_ATTRIBUTE_NORMAL, tb_null);
+		file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
 	}
 
 	// append?
@@ -164,14 +168,6 @@ tb_hize_t tb_file_size(tb_handle_t file)
 	// the file size
 	LARGE_INTEGER p = {0};
 	return GetFileSizeEx(file, &p)? (tb_hong_t)p.QuadPart : 0;
-}
-tb_handle_t tb_file_native(tb_handle_t file)
-{
-	// check
-	tb_assert_and_check_return_val(file, tb_null);
-
-	// the native handle
-	return (tb_handle_t)((tb_long_t)file - 1);
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
