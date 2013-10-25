@@ -165,6 +165,14 @@ tb_hize_t tb_file_size(tb_handle_t file)
 	struct stat st = {0};
 	return !fstat((tb_long_t)file - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 }
+tb_handle_t tb_file_native(tb_handle_t file)
+{
+	// check
+	tb_assert_and_check_return_val(file, tb_null);
+
+	// the native handle
+	return (tb_handle_t)((tb_long_t)file - 1);
+}
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {
 	// check

@@ -34,7 +34,7 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
 	case TB_AICE_CODE_READ:
 		{
 			// trace
-			tb_print("read[%p]: size: %ld, maxn: %lu, data: %s", aico->aioo.handle, aice->u.read.size, aice->u.read.maxn, aice->u.read.size? aice->u.read.data : tb_null);
+			tb_print("read[%p]: size: %ld, maxn: %lu, data: %s", aico->aioo.handle, aice->u.read.real, aice->u.read.size, aice->u.read.real? aice->u.read.data : tb_null);
 
 			// post writ
 			if (!tb_aicp_writ(aicp, aico, "hello", sizeof("hello"))) return tb_false;
@@ -46,13 +46,13 @@ static tb_bool_t tb_aicb_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_ai
 	case TB_AICE_CODE_WRIT:
 		{
 			// trace
-			tb_print("writ[%p]: size: %ld maxn: %lu, data: %s", aico->aioo.handle, aice->u.writ.size, aice->u.writ.maxn, aice->u.writ.size? aice->u.writ.data : tb_null);
+			tb_print("writ[%p]: size: %ld maxn: %lu, data: %s", aico->aioo.handle, aice->u.writ.real, aice->u.writ.size, aice->u.writ.real? aice->u.writ.data : tb_null);
 		}
 		break;
 	case TB_AICE_CODE_CLOS:
 		{
 			// trace
-			tb_print("clos[%p]: %ld", aico->aioo.handle, aice->u.conn.ok);
+			tb_print("clos[%p]: %ld", aico->aioo.handle, aice->u.clos.ok);
 
 			// free data
 			if (aico->aioo.odata) tb_free(aico->aioo.odata);

@@ -322,7 +322,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, 
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_READ;
 	aice.u.read.data = data;
-	aice.u.read.maxn = size;
+	aice.u.read.size = size;
 	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
@@ -335,7 +335,7 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* 
 	tb_aice_t aice = {0};
 	aice.code = TB_AICE_CODE_WRIT;
 	aice.u.writ.data = data;
-	aice.u.writ.maxn = size;
+	aice.u.writ.size = size;
 	aice.aico = (tb_pointer_t)aico;
 	return tb_aicp_post(aicp, &aice);
 }
