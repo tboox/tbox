@@ -29,98 +29,80 @@
  */
 #include "prefix.h"
 #include "aioo.h"
-#include "../network/ipv4.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-struct __tb_aico_t;
 struct __tb_aice_t;
 struct __tb_aicp_t;
 /// the callback type
-typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aico_t const* aico, struct __tb_aice_t const* aice);
+typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aice_t const* aice);
 
-/// the aioo call object type
-typedef struct __tb_aico_t
-{
-	/// the aioo
-	tb_aioo_t 				aioo;
-
-	/// the aicb
-	tb_aicb_t 				aicb;
-
-}tb_aico_t;
-
-/// the aico event code enum
+/// the aice code enum
 typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NULL 		= 0 	//!< for null
-,	TB_AICE_CODE_SYNC 		= 1		//!< for file
-, 	TB_AICE_CODE_ACPT 		= 2 	//!< for sock
-, 	TB_AICE_CODE_CONN 		= 3 	//!< for sock
-, 	TB_AICE_CODE_CLOS 		= 4 	//!< for file or sock
-,	TB_AICE_CODE_READ 		= 5		//!< for file or sock
-,	TB_AICE_CODE_WRIT 		= 6		//!< for file or sock
-,	TB_AICE_CODE_ERRO 		= 7		//!< for file or sock
+, 	TB_AICE_CODE_ACPT 		= 1 	//!< for sock
+, 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
+,	TB_AICE_CODE_RECV 		= 3		//!< for sock
+,	TB_AICE_CODE_SEND 		= 4		//!< for sock
+,	TB_AICE_CODE_READ 		= 5		//!< for file
+,	TB_AICE_CODE_WRIT 		= 6		//!< for file
 
 }tb_aice_code_e;
 
-/// the aico error code enum
-typedef enum __tb_aice_error_e
+/// the aice state code enum
+typedef enum __tb_aice_state_e
 {
- 	TB_AICE_ERROR_UNKNOWN 	= 0
+ 	TB_AICE_STATE_OK 					= 0
+, 	TB_AICE_STATE_FAILED 				= 1
+, 	TB_AICE_STATE_TIMEOUT 				= 2
+,	TB_AICE_STATE_CLOSED 				= 3
 
-}tb_aice_error_e;
+}tb_aice_state_e;
 
-/// the aico sync event type
-typedef struct __tb_aice_sync_t
-{
-	/// the ok
-	tb_bool_t 				ok;
-
-}tb_aice_sync_t;
-
-/// the aico acpt event type
+/// the acpt aice type
 typedef struct __tb_aice_acpt_t
 {
 	/// the client socket 
 	tb_handle_t 			sock;
 
+	/// the timeout
+	tb_long_t 				timeout;
+
 }tb_aice_acpt_t;
 
-/// the aico erro event type
-typedef struct __tb_aice_erro_t
-{
-	/// the code
-	tb_size_t 				code;
-
-}tb_aice_erro_t;
-
-/// the aico conn event type
+/// the conn aice type
 typedef struct __tb_aice_conn_t
 {
-	/// the ok
-	tb_long_t 				ok;
-
 	/// the port
 	tb_size_t 				port;
 
-	/// the host
-	tb_ipv4_t 				host;
+	/// the host, @note: reference only
+	tb_char_t const* 		host;
+
+	/// the timeout
+	tb_long_t 				timeout;
 
 }tb_aice_conn_t;
 
-/// the aico clos event type
-typedef struct __tb_aice_clos_t
+/// the real aice type
+typedef struct __tb_aice_real_t
 {
-	/// the ok
-	tb_bool_t 				ok;
+	/// the read data
+	tb_byte_t* 				data;
 
-}tb_aice_clos_t;
+	/// the data size
+	tb_size_t 				size;
 
-/// the aico read event type
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_real_t;
+
+/// the read aice type
 typedef struct __tb_aice_read_t
 {
 	/// the read data
@@ -130,11 +112,14 @@ typedef struct __tb_aice_read_t
 	tb_size_t 				size;
 
 	/// the data real
-	tb_long_t 				real;
+	tb_size_t 				real;
+
+	/// the file seek
+	tb_hize_t 				seek;
 
 }tb_aice_read_t;
 
-/// the aico writ event type
+/// the writ aice type
 typedef struct __tb_aice_writ_t
 {
 	/// the writ data
@@ -144,29 +129,73 @@ typedef struct __tb_aice_writ_t
 	tb_size_t 				size;
 
 	/// the data real
-	tb_long_t 				real;
+	tb_size_t 				real;
+
+	/// the file seek
+	tb_hize_t 				seek;
 
 }tb_aice_writ_t;
 
-/// the aico event type
+/// the recv aice type
+typedef struct __tb_aice_recv_t
+{
+	/// the recv data
+	tb_byte_t* 				data;
+
+	/// the data size
+	tb_size_t 				size;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_recv_t;
+
+/// the send aice type
+typedef struct __tb_aice_send_t
+{
+	/// the send data
+	tb_byte_t* 				data;
+
+	/// the data size
+	tb_size_t 				size;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_send_t;
+
+/// the aice type
 typedef struct __tb_aice_t
 {
 	/// the code
-	tb_size_t 				code;
+	tb_size_t 				code 	: 8;
 
-	/// the aico
-	tb_aico_t* 				aico;
+	/// the state
+	tb_size_t 				state 	: 8;
+
+	/// the otype
+	tb_size_t 				otype 	: 8;
+
+	/// the handle
+	tb_handle_t 			handle;
+
+	/// the aicb
+	tb_aicb_t 				aicb;
+
+	/// the data
+	tb_cpointer_t 			data;
 
 	/// the uion
 	union
 	{
-		tb_aice_sync_t 		sync;
 		tb_aice_acpt_t 		acpt;
 		tb_aice_conn_t 		conn;
-		tb_aice_clos_t 		clos;
-		tb_aice_erro_t 		erro;
 		tb_aice_read_t 		read;
 		tb_aice_writ_t 		writ;
+		tb_aice_recv_t 		recv;
+		tb_aice_send_t 		send;
+		tb_aice_real_t 		real;
+
 	} u;
 
 }tb_aice_t;
@@ -182,10 +211,10 @@ typedef struct __tb_aicp_reactor_t
 	tb_void_t 				(*exit)(struct __tb_aicp_reactor_t* reactor);
 
 	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
+	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t otype);
 
 	/// delo
-	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_aico_t const* aico);
+	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle);
 
 	/// spak
 	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_aice_t* resp, tb_long_t timeout);
@@ -195,11 +224,11 @@ typedef struct __tb_aicp_reactor_t
 /// the aicp mutex type
 typedef struct __tb_aicp_mutx_t
 {
-	/// the pool mutx
-	tb_handle_t 			pool;
-
 	/// the post mutx
 	tb_handle_t 			post;
+
+	/// the pool mutx
+	tb_handle_t 			pool;
 
 }tb_aicp_mutx_t;
 
@@ -282,9 +311,6 @@ typedef struct __tb_aicp_mutx_t
  */
 typedef struct __tb_aicp_t
 {
-	/// the object type
-	tb_size_t 				type;
-
 	/// the object maxn
 	tb_size_t 				maxn;
 
@@ -294,7 +320,7 @@ typedef struct __tb_aicp_t
 	/// the aicp mutx
 	tb_aicp_mutx_t 			mutx;
 
-	/// the aico pool
+	/// the data pool
 	tb_handle_t 			pool;
 
 	/// the aice post
@@ -311,12 +337,11 @@ typedef struct __tb_aicp_t
 
 /*! init the aicp
  *
- * @param type 		the aico type
  * @param maxn 		the aico maxn
  *
  * @return 			the aicp
  */
-tb_aicp_t* 			tb_aicp_init(tb_size_t type, tb_size_t maxn);
+tb_aicp_t* 			tb_aicp_init(tb_size_t maxn);
 
 /*! exit the aicp
  *
@@ -326,116 +351,114 @@ tb_aicp_t* 			tb_aicp_init(tb_size_t type, tb_size_t maxn);
  */ 	
 tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
 
-/*! the aico maxn
- *
- * @param aicp 		the aicp
- *
- * @return 			the aico maxn
- */
-tb_size_t 			tb_aicp_maxn(tb_aicp_t* aicp);
-
-/*! the aico size
- *
- * @param aicp 		the aicp
- *
- * @return 			the aico size
- */
-tb_size_t 			tb_aicp_size(tb_aicp_t* aicp);
-
 /*! add the aico
  *
  * @param aicp 		the aicp
- * @param handle 	the aico native handle: file or sock
- * @param aicb 		the aico callback, @note: cannot done weight work
- * @param odata 	the aico data for callback
- *
- * @return 			the aico
+ * @param handle 	the handle
+ * @param otype 	the otype
  */
-tb_aico_t const* 	tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb, tb_pointer_t odata);
+tb_bool_t 			tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t otype);
 
 /*! del the aico
  *
  * @param aicp 		the aicp
- * @param aico 		the aico
+ * @param handle 	the handle
  */
-tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico);
-
-/*! post the sync event
- *
- * @param aicp 		the aicp
- * @param aice 		the aico event
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aicp_sync(tb_aicp_t* aicp, tb_aico_t const* aico);
+tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t handle);
 
 /*! post the acpt event
  *
  * @param aicp 		the aicp
- * @param aice 		the aico event *
+ * @param handle 	the handle
+ * @param timeout 	the timeout
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico);
-
-/*! post the clos event
- *
- * @param aicp 		the aicp
- * @param aice 		the aico event *
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aicp_clos(tb_aicp_t* aicp, tb_aico_t const* aico);
+tb_bool_t 			tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_long_t timeout, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! post the conn event
  *
  * @param aicp 		the aicp
- * @param aice 		the aico event
+ * @param handle 	the handle
  * @param host 		the host
  * @param port 		the port
+ * @param timeout 	the timeout
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port);
+tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_long_t timeout, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
-/*! post the read event
+/*! post the read event for file
  *
  * @param aicp 		the aicp
- * @param aice 		the aico event
+ * @param handle 	the handle
+ * @param seek 		the seek
  * @param data 		the data
  * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
-/*! post the writ event
+/*! post the writ event for file
  *
  * @param aicp 		the aicp
- * @param aice 		the aico event
+ * @param handle 	the handle
+ * @param seek 		the seek
  * @param data 		the data
  * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size);
+tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
-/*! spak aicp
+/*! post the recv event for sock
+ *
+ * @param aicp 		the aicp
+ * @param handle 	the handle
+ * @param data 		the data
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the send event for sock
+ *
+ * @param aicp 		the aicp
+ * @param handle 	the handle
+ * @param data 		the data
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_send(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! loop aicp
  *
  * @code
- * tb_pointer_t spak_worker_thread(tb_pointer_t)
+ * tb_pointer_t worker_thread(tb_pointer_t)
  * {
- * 		// wait will be called, so need not sleep
- * 		while (tb_aicp_spak(aicp, -1) >= 0) ;
+ * 		tb_aicp_loop(aicp, -1);
  * }
  * @endcode
  *
  * @param aicp 		the aicp
- * @param timeout 	the timeout
- *
- * @return 			ok: the aice count, timeout: 0, fail: < 0
+ * @param timeout 	the timeout 
  */
-tb_long_t 			tb_aicp_spak(tb_aicp_t* aicp, tb_long_t timeout);
+tb_void_t 			tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout);
 
 /*! kill the spak
  *

@@ -30,13 +30,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp);
-tb_aicp_reactor_t* tb_aicp_reactor_file_init(tb_aicp_t* aicp)
-{
-	return tb_aicp_reactor_aipp_init(aicp);
-}
-tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp);
-tb_aicp_reactor_t* tb_aicp_reactor_sock_init(tb_aicp_t* aicp)
+tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp);
+tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp)
 {
 	return tb_aicp_reactor_aipp_init(aicp);
 }

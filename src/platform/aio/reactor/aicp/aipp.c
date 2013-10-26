@@ -39,7 +39,8 @@ typedef struct __tb_aicp_reactor_aipp_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_reactor_aipp_addo(tb_aicp_reactor_t* reactor, tb_aico_t const* aico)
+#if 0
+static tb_bool_t tb_aicp_reactor_aipp_addo(tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t otype)
 {
 	// check
 	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
@@ -48,7 +49,7 @@ static tb_bool_t tb_aicp_reactor_aipp_addo(tb_aicp_reactor_t* reactor, tb_aico_t
 	// addo
 	return tb_aipp_addo(rtor->aipp, aico->aioo.handle, aico->aioo.otype, aico);
 }
-static tb_bool_t tb_aicp_reactor_aipp_delo(tb_aicp_reactor_t* reactor, tb_aico_t const* aico)
+static tb_bool_t tb_aicp_reactor_aipp_delo(tb_aicp_reactor_t* reactor, tb_handle_t handle)
 {
 	// check
 	tb_aicp_reactor_aipp_t* rtor = (tb_aicp_reactor_aipp_t*)reactor;
@@ -80,22 +81,23 @@ static tb_void_t tb_aicp_reactor_aipp_exit(tb_aicp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+#endif
 static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->maxn, tb_null);
-	tb_assert_and_check_return_val(aicp->type == TB_AIOO_OTYPE_FILE || aicp->type == TB_AIOO_OTYPE_SOCK, tb_null);
 
+#if 0
 	// alloc reactor
 	tb_aicp_reactor_aipp_t* rtor = tb_malloc0(sizeof(tb_aicp_reactor_aipp_t));
 	tb_assert_and_check_return_val(rtor, tb_null);
 
 	// init base
 	rtor->base.aicp = aicp;
-	rtor->base.exit = tb_aicp_reactor_aipp_exit;
-	rtor->base.addo = tb_aicp_reactor_aipp_addo;
-	rtor->base.delo = tb_aicp_reactor_aipp_delo;
-	rtor->base.spak = tb_aicp_reactor_aipp_spak;
+//	rtor->base.exit = tb_aicp_reactor_aipp_exit;
+//	rtor->base.addo = tb_aicp_reactor_aipp_addo;
+//	rtor->base.delo = tb_aicp_reactor_aipp_delo;
+//	rtor->base.spak = tb_aicp_reactor_aipp_spak;
 
 	// init aipp
 	rtor->aipp = tb_aipp_init(aicp->type, aicp->maxn);
@@ -107,5 +109,9 @@ static tb_aicp_reactor_t* tb_aicp_reactor_aipp_init(tb_aicp_t* aicp)
 fail:
 	if (rtor) tb_aicp_reactor_aipp_exit(rtor);
 	return tb_null;
+#else
+	tb_trace_noimpl();
+	return tb_null;
+#endif
 }
 

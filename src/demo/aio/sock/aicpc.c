@@ -15,11 +15,8 @@ typedef struct __tb_demo_context_t
 	// the file
 	tb_handle_t 		file;
 
-	// the aico sock
-	tb_aico_t const* 	aico_sock;
-
-	// the aico file
-	tb_aico_t const* 	aico_file;
+	// the size
+	tb_hize_t 			size;
 
 	// the data sock
 	tb_byte_t 			data_sock[8192];
@@ -30,126 +27,137 @@ typedef struct __tb_demo_context_t
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * worker
+ * implementation
  */
-static tb_bool_t tb_demo_sock_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice);
+static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && aice, tb_false);
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_WRIT, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aico->aioo.odata;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
 	tb_assert_and_check_return_val(context, tb_false);
 
-	// done
-	switch (aice->code)
+	// ok?
+	if (aice->state == TB_AICE_STATE_OK)
 	{
-	case TB_AICE_CODE_CONN:
+		// trace
+		tb_print("writ[%p]: real: %lu, size: %lu", aice->handle, aice->u.writ.real, aice->u.writ.size);
+
+		// continue?
+		if (aice->u.writ.real < aice->u.writ.size)
 		{
-			// trace
-			tb_print("conn[%p]: %ld", aico->aioo.handle, aice->u.conn.ok);
-
-			// ok?
-			if (aice->u.conn.ok > 0)
-			{
-				// post read from server
-				if (!tb_aicp_read(aicp, aico, context->data_sock, sizeof(context->data_sock))) return tb_false;
-			}
+			// post writ to file
+			if (!tb_aicp_writ(aicp, aice->handle, aice->u.writ.seek + aice->u.writ.real, aice->u.writ.data + aice->u.writ.real, aice->u.writ.size - aice->u.writ.real, tb_demo_file_writ_func, context)) return tb_false;
 		}
-		break;
-	case TB_AICE_CODE_READ:
+		// ok? 
+		else
 		{
-			// trace
-			tb_print("read[%p]: real: %ld, size: %lu", aico->aioo.handle, aice->u.read.real, aice->u.read.size);
-
-			// post writ to file, FIXME: queued multi-data, multi-sync
-			if (!tb_aicp_writ(aicp, context->aico_file, aice->u.read.data, aice->u.read.real)) return tb_false;
-
-			// post read from server
-			if (!tb_aicp_read(aicp, aico, context->data_sock, sizeof(context->data_sock))) return tb_false;
+			// post recv from server
+			if (!tb_aicp_recv(aicp, context->sock, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
 		}
-		break;
-	case TB_AICE_CODE_CLOS:
-		{
-			// trace
-			tb_print("clos[%p]: %ld", aico->aioo.handle, aice->u.clos.ok);
-
-			// post sync to file
-//			if (!tb_aicp_sync(aicp, context->aico_file)) return tb_false;
-
-			// post clos to file
-			if (!tb_aicp_clos(aicp, context->aico_file)) return tb_false;
-
-			// exit spak
-			return tb_false;
-		}
-		break;
-	case TB_AICE_CODE_ERRO:
-		{
-			// trace
-			tb_print("erro[%p]: %ld", aico->aioo.handle, aice->u.erro.code);
-
-			// exit spak
-			return tb_false;
-		}
-		break;
-	default:
-		tb_assert_and_check_return_val(0, tb_false);
-		break;
+	}
+	// closed or failed?
+	else
+	{
+		if (aice->state == TB_AICE_STATE_CLOSED)
+			tb_print("writ[%p]: closed", aice->handle);
+		else tb_print("writ[%p]: state: %lu", aice->handle, aice->state);
+		return tb_false;
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_demo_file_work_func(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aico && aice, tb_false);
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_RECV, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aico->aioo.odata;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
 	tb_assert_and_check_return_val(context, tb_false);
 
-	// done
-	switch (aice->code)
+	// ok?
+	if (aice->state == TB_AICE_STATE_OK)
 	{
-	case TB_AICE_CODE_WRIT:
-		{
-			// trace
-			tb_print("writ[%p]: real: %ld, size: %lu", aico->aioo.handle, aice->u.writ.real, aice->u.writ.size);
-	
-		}
-		break;
-	case TB_AICE_CODE_CLOS:
-		{
-			// trace
-			tb_print("clos[%p]: %ld", aico->aioo.handle, aice->u.clos.ok);
+		// trace
+		tb_print("recv[%p]: real: %lu, size: %lu", aice->handle, aice->u.recv.real, aice->u.recv.size);
 
-			// exit spak
-			return tb_false;
-		}
-		break;
-	case TB_AICE_CODE_ERRO:
+		// has data?
+		if (aice->u.recv.real)
 		{
-			// trace
-			tb_print("erro[%p]: %ld", aico->aioo.handle, aice->u.erro.code);
+			// post writ to file
+			if (!tb_aicp_writ(aicp, context->file, context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
 
-			// exit spak
-			return tb_false;
+			// save size
+			context->size += aice->u.recv.real;
 		}
-		break;
-	default:
-		break;
+		// no data?
+		else
+		{	
+			// post recv from server
+			if (!tb_aicp_recv(aicp, context->sock, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
+		}
+	}
+	// closed or failed?
+	else
+	{
+		if (aice->state == TB_AICE_STATE_CLOSED)
+			tb_print("writ[%p]: closed", aice->handle);
+		else tb_print("writ[%p]: state: %lu", aice->handle, aice->state);
+		return tb_false;
 	}
 
 	// ok
 	return tb_true;
 }
+static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_CONN, tb_false);
+
+	// the context
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_assert_and_check_return_val(context, tb_false);
+
+	// connection ok?
+	if (aice->state == TB_AICE_STATE_OK)
+	{
+		// trace
+		tb_print("conn[%p]: ok", aice->handle);
+
+		// post recv from server
+		if (!tb_aicp_recv(aicp, aice->handle, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
+	}
+	// timeout?
+	else if (aice->state == TB_AICE_STATE_TIMEOUT)
+	{
+		// exit loop
+		tb_print("conn[%p]: timeout", aice->handle);
+		return tb_false;
+	}
+	// failed?
+	else
+	{
+		// exit loop
+		tb_print("conn[%p]: state: %lu", aice->handle, aice->state);
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// check
+	tb_assert_and_check_return_val(argv[1], 0);
+
 	// init tbox
 	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
@@ -158,7 +166,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_demo_context_t 	context = {0};
 
 	// init aicp
-	aicp = tb_aicp_init(TB_AIOO_OTYPE_SOCK, 1);
+	aicp = tb_aicp_init(2);
 	tb_assert_and_check_goto(aicp, end);
 
 	// open sock
@@ -169,20 +177,18 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	context.file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_AICP);
 	tb_assert_and_check_goto(context.file, end);
 
-	// init aico sock
-	context.aico_sock = tb_aicp_addo(aicp, context.sock, tb_demo_sock_work_func, &context);
-	tb_assert_and_check_goto(context.aico_sock, end);
+	// addo sock
+	if (!tb_aicp_addo(aicp, context.sock, TB_AIOO_OTYPE_SOCK)) goto end;
 
-	// init aico file
-	context.aico_file = tb_aicp_addo(aicp, context.file, tb_demo_file_work_func, &context);
-	tb_assert_and_check_goto(context.aico_file, end);
+	// addo file
+	if (!tb_aicp_addo(aicp, context.file, TB_AIOO_OTYPE_FILE)) goto end;
 
 	// post conn
 	tb_print("conn: ..");
-	if (!tb_aicp_conn(aicp, context.aico_sock, "127.0.0.1", 9090)) goto end;
+	if (!tb_aicp_conn(aicp, context.sock, "127.0.0.1", 9090, 15000, tb_demo_sock_conn_func, &context)) goto end;
 
-	// spak aicp
-	while (tb_aicp_spak(aicp, 1000) >= 0) ;
+	// loop aicp
+	tb_aicp_loop(aicp, -1);
 	
 end:
 
@@ -191,6 +197,12 @@ end:
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
+
+	// exit sock
+	if (context.sock) tb_socket_close(context.sock);
+
+	// exit file
+	if (context.file) tb_file_exit(context.file);
 
 	// exit tbox
 	tb_exit();

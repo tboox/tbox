@@ -112,12 +112,6 @@ tb_void_t 			tb_aipp_exit(tb_aipp_t* aipp);
  */
 tb_void_t 			tb_aipp_cler(tb_aipp_t* aipp);
 
-/// the object maximum number of the aioo poll pool
-tb_size_t 			tb_aipp_maxn(tb_aipp_t* aipp);
-
-/// the object number of the aioo poll pool
-tb_size_t 			tb_aipp_size(tb_aipp_t* aipp);
-
 /*! add the aio object
  *
  * @param 	aipp 	the aioo poll pool
@@ -125,7 +119,7 @@ tb_size_t 			tb_aipp_size(tb_aipp_t* aipp);
  * @param 	etype 	the event type
  * @param 	odata 	the object data
  *
- * @return 	return tb_false if failed
+ * @return 	 		tb_true or tb_false
  */
 tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
 
@@ -134,7 +128,7 @@ tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, 
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
  *
- * @return 	return tb_false if failed
+ * @return 	 		tb_true or tb_false
  */
 tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
 
@@ -144,6 +138,7 @@ tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
  * @param 	handle 	the aioo native handle
  * @param 	etype 	the event type
  *
+ * @return 			the new event type
  */
 tb_size_t 			tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
 
