@@ -105,18 +105,6 @@ tb_void_t tb_aipp_cler(tb_aipp_t* aipp)
 	// clear hash
 	if (aipp->hash) tb_hash_clear(aipp->hash);
 }
-tb_size_t tb_aipp_maxn(tb_aipp_t* aipp)
-{
-	// check
-	tb_assert_and_check_return_val(aipp, 0);
-	return aipp->maxn;
-}
-tb_size_t tb_aipp_size(tb_aipp_t* aipp)
-{
-	// check
-	tb_assert_and_check_return_val(aipp && aipp->hash, 0);
-	return tb_hash_size(aipp->hash);
-}
 tb_bool_t tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata)
 {
 	// check

@@ -71,8 +71,8 @@ tb_bool_t tb_thread_resume(tb_handle_t handle)
 	tb_trace_noimpl();
 	return tb_false;
 }
-tb_handle_t tb_thread_self()
+tb_size_t tb_thread_self()
 {
-	return (tb_handle_t)pthread_self();
+	return (tb_size_t)pthread_self();
 }
 

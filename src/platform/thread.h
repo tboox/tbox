@@ -84,11 +84,11 @@ tb_bool_t 				tb_thread_resume(tb_handle_t handle);
  */
 tb_bool_t 				tb_thread_kill(tb_handle_t handle);
 
-/*! the self thread handle
+/*! the self thread identifier
  *
- * @return 				the self thread handle
+ * @return 				the self thread identifier
  */
-tb_handle_t 			tb_thread_self(tb_noarg_t);
+tb_size_t 				tb_thread_self(tb_noarg_t);
 
 /*! return the thread value
  *
