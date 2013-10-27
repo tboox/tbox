@@ -26,9 +26,34 @@
  */
 #define TB_IOCP_WORK_MAXN 			(64)
 
+// from mswsock.h
+#define TB_IOCP_WSAID_ACCEPTEX 					{0xb5367df1, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+#define TB_IOCP_WSAID_TRANSMITFILE 				{0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+#define TB_IOCP_WSAID_GETACCEPTEXSOCKADDRS 		{0xb5367df2, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+#define TB_IOCP_WSAID_CONNECTEX 				{0x25a207b9, 0xddf3, 0x4660, {0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e}}
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
+
+// the acceptex func type from mswsock.h
+typedef BOOL (WINAPI* tb_iocp_acceptex_func_t)( 	SOCKET sListenSocket
+												,	SOCKET sAcceptSocket
+												,	PVOID lpOutputBuffer
+												,	DWORD dwReceiveDataLength
+												,	DWORD dwLocalAddressLength
+												,	DWORD dwRemoteAddressLength
+												,	LPDWORD lpdwBytesReceived
+												,	LPOVERLAPPED lpOverlapped);
+
+// the connectex func type from mswsock.h
+typedef BOOL (WINAPI* tb_iocp_connectex_func_t)( 	SOCKET s
+												, 	struct sockaddr const*name
+												,	tb_int_t namelen
+												,	PVOID lpSendBuffer
+												,	DWORD dwSendDataLength
+												,	LPDWORD lpdwBytesSent
+												,	LPOVERLAPPED lpOverlapped);
 
 // the overlap type
 typedef struct __tb_iocp_olap_t
@@ -59,6 +84,9 @@ typedef struct __tb_aicp_reactor_iocp_t
 	// the olap pool, FIXME: lock
 	tb_handle_t 			pool;
 
+	// the acceptex func
+	tb_iocp_acceptex_func_t acceptex;
+
 }tb_aicp_reactor_iocp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -68,7 +96,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 {
 	// check
 	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_assert_and_check_return_val(rtor && rtor->port && rtor->acceptex && reactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_ACPT, -1);
@@ -76,18 +104,46 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 	// trace
 	tb_trace_impl("accept: ..");
 
-	// post acpt
-	tb_long_t ok = -1;
-	tb_aioo_t aioo = {0};
-	tb_aioo_seto(&aioo, aice->handle, aice->otype, TB_AIOO_ETYPE_ACPT, tb_null);
-	if ((ok = tb_aioo_wait(&aioo, aice->u.acpt.timeout)) > 0)
+	// init olap
+	tb_iocp_olap_t* olap = tb_rpool_malloc0(rtor->pool);
+	tb_assert_and_check_return_val(olap, -1);
+	olap->data.len 	= (sizeof(SOCKADDR_IN) + 16) << 1;
+	olap->data.buf 	= tb_malloc0(olap->data.len); // FIXME
+	olap->aice 		= *aice;
+	tb_print("%d", olap->data.len);
+
+
+	aice->u.acpt.sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+
+	DWORD real = 0;
+	BOOL ok = rtor->acceptex( 	(SOCKET)aice->handle - 1
+							, 	(SOCKET)aice->u.acpt.sock - 1
+							, 	olap->data.buf
+							, 	0
+							, 	sizeof(SOCKADDR_IN) + 16
+							, 	sizeof(SOCKADDR_IN) + 16
+							, 	&real
+							, 	olap);
+	tb_print("%d %d", ok, WSAGetLastError());
+
+	// finished?
+	if (ok)
 	{
-		aice->u.acpt.sock = tb_socket_accept(aice->handle);
-		if (!aice->u.acpt.sock) ok = -1;
+		// remove olap
+		if (olap) tb_rpool_free(rtor->pool, olap);
+
+		// done resp
+		return 1;
 	}
 
-	// ok?
-	aice->state = (ok > 0? TB_AICE_STATE_OK : (!ok? TB_AICE_STATE_TIMEOUT : TB_AICE_STATE_FAILED));
+	// pending? continue it
+	if (WSA_IO_PENDING == WSAGetLastError()) return 0;
+
+	// remove olap
+	if (olap) tb_rpool_free(rtor->pool, olap);
+
+	// failed
+	aice->state = TB_AICE_STATE_FAILED;
 
 	// done resp
 	return 1;
@@ -107,7 +163,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 
 	// post conn
 	tb_long_t ok = -1;
-	while (!(ok = tb_socket_connect(aice->handle, aice->u.conn.host, aice->u.conn.port)))
+	while (!(ok = tb_socket_connect(aice->handle, aice->u.conn.host, aice->u.conn.port))) // FIXME: dns
 	{
 		// wait
 		tb_aioo_t aioo = {0};
@@ -422,12 +478,15 @@ static tb_long_t tb_aicp_reactor_iocp_spak(tb_aicp_reactor_t* reactor, tb_aice_t
 		tb_check_return_val(!ok, ok);
 	}
 
+	// trace
+	tb_trace_impl("GetQueuedCompletionStatus[%lu]: ..", tb_thread_self());
+
 	// wait
 	DWORD 			real = 0;
 	tb_size_t 		otype = 0;
 	tb_iocp_olap_t* olap = tb_null;
 	BOOL 			wait = GetQueuedCompletionStatus(rtor->port, (LPDWORD)&real, (LPDWORD)&otype, &olap, timeout < 0? INFINITE : timeout);
-	tb_trace_impl("GetQueuedCompletionStatus: %d error: %u", wait, GetLastError());
+	tb_trace_impl("GetQueuedCompletionStatus[%lu]: %d error: %u", tb_thread_self(), wait, GetLastError());
 
 	// timeout?
 	if (!wait && WAIT_TIMEOUT == GetLastError()) return 0;
@@ -474,6 +533,9 @@ static tb_long_t tb_aicp_reactor_iocp_spak(tb_aicp_reactor_t* reactor, tb_aice_t
 	case TB_AICE_CODE_WRIT:
 		resp->u.real.real = real;
 		break;
+	case TB_AICE_CODE_ACPT:
+		tb_print("acpt: ok");
+		break;
 	default:
 		ok = -1;
 		tb_assert(0);
@@ -510,6 +572,40 @@ static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
+static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_acceptex_func()
+{
+	// done
+	tb_long_t 				ok = -1;
+	tb_handle_t 			sock = tb_null;
+	tb_iocp_acceptex_func_t acceptex = tb_null;
+	do
+	{
+		// init sock
+		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+		tb_assert_and_check_break(sock);
+
+		// get the acceptex func address
+		DWORD 	real = 0;
+		GUID 	guid = TB_IOCP_WSAID_ACCEPTEX;
+		ok = WSAIoctl( 	(SOCKET)sock - 1
+					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
+					, 	&guid
+					, 	sizeof(GUID)
+					, 	&acceptex
+					, 	sizeof(tb_iocp_acceptex_func_t)
+					, 	&real
+					, 	tb_null
+					, 	tb_null);
+		tb_assert_and_check_break(!ok && acceptex);
+
+	} while (0);
+
+	// exit sock
+	if (sock) tb_socket_close(sock);
+
+	// ok?
+	return !ok? acceptex : tb_null;
+}
 static tb_aicp_reactor_t* tb_aicp_reactor_iocp_init(tb_aicp_t* aicp)
 {
 	// check
@@ -525,6 +621,8 @@ static tb_aicp_reactor_t* tb_aicp_reactor_iocp_init(tb_aicp_t* aicp)
 	rtor->base.addo = tb_aicp_reactor_iocp_addo;
 	rtor->base.delo = tb_aicp_reactor_iocp_delo;
 	rtor->base.spak = tb_aicp_reactor_iocp_spak;
+	rtor->acceptex = tb_aicp_reactor_iocp_acceptex_func();
+	tb_assert_and_check_goto(rtor->acceptex, fail);
 
 	// init port
 	rtor->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
