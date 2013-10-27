@@ -52,6 +52,7 @@ static tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 	tb_bool_t ok = tb_false;
 	if (!tb_queue_full(aicp->post)) 
 	{
+		tb_print("post: %lu", aice->code);
 		tb_queue_put(aicp->post, aice);
 		ok = tb_true;
 	}
