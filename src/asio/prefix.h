@@ -17,39 +17,17 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aipp.c
+ * @file		prefix.h
  *
  */
+#ifndef TB_ASIO_PREFIX_H
+#define TB_ASIO_PREFIX_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
-#ifdef TB_CONFIG_AIO_HAVE_WAITO
-# 	include "aipp/waito.c"
+
 #endif
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-# 	include "aipp/select.c"
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp);
-tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
-{
-	return tb_aipp_reactor_waito_init(aipp);
-}
-#endif
-
-#ifdef TB_CONFIG_AIO_HAVE_SELECT
-tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
-tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
-{
-	return tb_aipp_reactor_select_init(aipp);
-}
-#endif
-

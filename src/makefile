@@ -1,4 +1,4 @@
-# sub-makefile
+# prefix
 include $(PRO_DIR)/prefix.mak
 
 # module name
@@ -89,9 +89,9 @@ tbox_C_FILES 			+= \
 						xml/node \
 						xml/reader \
 						xml/writer \
-						aio/aioo \
-						aio/aipp \
-						aio/aicp \
+						asio/aioo \
+						asio/aipp \
+						asio/aicp \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -229,9 +229,9 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_PRINTF)/printf \
 						platform/$(TB_CONFIG_API_FILE)/directory \
 						platform/$(TB_CONFIG_API_PROCESS)/process \
-						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aioo \
-						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aipp \
-						platform/$(TB_CONFIG_API_ASIO)/aio/reactor/aicp
+						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aioo \
+						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aipp \
+						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aicp
 
 # flags
 tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" 
@@ -272,11 +272,11 @@ INC_FILES 				= \
 						memory/pbuffer.h \
 						memory/sbuffer.h \
 						memory/qbuffer.h \
-						aio/aio.h \
-						aio/prefix.h \
-						aio/aioo.h \
-						aio/aipp.h \
-						aio/aicp.h \
+						asio/asio.h \
+						asio/prefix.h \
+						asio/aioo.h \
+						asio/aipp.h \
+						asio/aicp.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -467,10 +467,10 @@ tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB)+= $(zlib_C_FILES)
 zlib_INC_FILES 						:= $(addprefix third/zlib/,$(zlib_INC_FILES))
 INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
 
-# sub-projects
+# demos
 ifeq ($(DEMO),y)
 SUB_PROS 				= \
-					  	demo/aio \
+					  	demo/asio \
 					  	demo/xml \
 					  	demo/flv \
 						demo/libm \
@@ -490,5 +490,6 @@ SUB_PROS 				= \
 
 endif
 
+# suffix
 include $(PRO_DIR)/suffix.mak
 

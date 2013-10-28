@@ -272,7 +272,7 @@ typedef struct __tb_gstream_t
 	/// the ssl func
 	tb_gstream_sfunc_t 	sfunc;
 
-	/// wait the aio event
+	/// wait the asio event
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
 
 	/// async open

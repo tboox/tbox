@@ -1,4 +1,4 @@
-# sub-makefile
+# preifx
 include $(PRO_DIR)/prefix.mak
 
 # module name

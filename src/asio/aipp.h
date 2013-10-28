@@ -18,11 +18,11 @@
  *
  * @author		ruki
  * @file		aipp.h
- * @ingroup 	aio
+ * @ingroup 	asio
  *
  */
-#ifndef TB_AIO_POLL_POOL_H
-#define TB_AIO_POLL_POOL_H
+#ifndef TB_ASIO_POLL_POOL_H
+#define TB_ASIO_POLL_POOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -112,7 +112,7 @@ tb_void_t 			tb_aipp_exit(tb_aipp_t* aipp);
  */
 tb_void_t 			tb_aipp_cler(tb_aipp_t* aipp);
 
-/*! add the aio object
+/*! add the asio object
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -123,7 +123,7 @@ tb_void_t 			tb_aipp_cler(tb_aipp_t* aipp);
  */
 tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, tb_pointer_t odata);
 
-/*! del the aio object
+/*! del the asio object
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -132,7 +132,7 @@ tb_bool_t 			tb_aipp_addo(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype, 
  */
 tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
 
-/*! set the aio event
+/*! set the asio event
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -142,7 +142,7 @@ tb_bool_t 			tb_aipp_delo(tb_aipp_t* aipp, tb_handle_t handle);
  */
 tb_size_t 			tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
 
-/*! set the aio event
+/*! set the asio event
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -151,7 +151,7 @@ tb_size_t 			tb_aipp_gete(tb_aipp_t* aipp, tb_handle_t handle);
  */
 tb_void_t 			tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*! add the aio event
+/*! add the asio event
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -160,7 +160,7 @@ tb_void_t 			tb_aipp_sete(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
  */
 tb_void_t 			tb_aipp_adde(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*! del the aio event
+/*! del the asio event
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -168,7 +168,7 @@ tb_void_t 			tb_aipp_adde(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
  */
 tb_void_t 			tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
 
-/*! set the aio odata
+/*! set the asio odata
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -177,7 +177,7 @@ tb_void_t 			tb_aipp_dele(tb_aipp_t* aipp, tb_handle_t handle, tb_size_t etype);
  */
 tb_void_t 			tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odata);
 
-/*! get the aio odata
+/*! get the asio odata
  *
  * @param 	aipp 	the aioo poll pool
  * @param 	handle 	the aioo native handle
@@ -186,14 +186,14 @@ tb_void_t 			tb_aipp_setp(tb_aipp_t* aipp, tb_handle_t handle, tb_pointer_t odat
  */
 tb_pointer_t 		tb_aipp_getp(tb_aipp_t* aipp, tb_handle_t handle);
 
-/*! wait the aio objects in the pool
+/*! wait the asio objects in the pool
  *
  * blocking wait the multiple event objects
  * return the event number if ok, otherwise return 0 for timeout
  *
  * @param 	aipp 	the aioo poll pool
- * @param 	aioo 	the aio objects
- * @param 	maxn 	the maximum size of the aio objects
+ * @param 	aioo 	the asio objects
+ * @param 	maxn 	the maximum size of the asio objects
  * @param 	timeout the timeout value, return immediately if 0, infinity if -1
  *
  * @return 	the event number, return 0 if timeout, return -1 if error

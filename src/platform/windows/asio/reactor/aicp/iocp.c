@@ -869,18 +869,12 @@ static tb_void_t tb_aicp_reactor_iocp_kill(tb_aicp_reactor_t* reactor)
 	tb_size_t work = tb_atomic_get(&reactor->aicp->work);
 
 	// trace
-	tb_trace_impl("kill: %lu: ..", work);
+	tb_trace_impl("kill: %lu", work);
 
 	// kill workers
 	tb_size_t i = 0;
 	for (i = 0; i < work; i++) PostQueuedCompletionStatus(rtor->port, 0, 0, tb_null);
-	
-	// wait workers 
-	tb_hong_t time = tb_mclock();
-	while (tb_atomic_get(&reactor->aicp->work) && (tb_mclock() < time + 5000)) tb_msleep(500);
 
-	// trace
-	tb_trace_impl("kill: %lu: %s", work, tb_atomic_get(&reactor->aicp->work)? "no" : "ok");
 }
 static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
 {
@@ -888,7 +882,7 @@ static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
 	if (rtor)
 	{
 		// trace
-		tb_trace_impl("exit: ..");
+		tb_trace_impl("exit");
 
 		// exit port
 		if (rtor->port) CloseHandle(rtor->port);
@@ -906,9 +900,6 @@ static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
 
 		// free it
 		tb_free(rtor);
-
-		// trace
-		tb_trace_impl("exit: ok");
 	}
 }
 static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_acceptex_func()

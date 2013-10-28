@@ -2,11 +2,8 @@
 include $(PRO_DIR)/prefix.mak
 
 # module name
-NAMES = \
-		time \
-		wchar \
-		stdlib \
-		string
+NAMES = aippc aippd aicpc aicpd
 
+# suffix
 include $(SRC_DIR)/demo/makefile
 

@@ -26,7 +26,7 @@
  */
 #include "bstream.h"
 #include "gstream.h"
-#include "../aio/aio.h"
+#include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../memory/memory.h"
