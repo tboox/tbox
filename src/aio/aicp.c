@@ -267,7 +267,7 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb_func,
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_long_t timeout, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->rtor && aicp->rtor->post && handle && host && port, tb_false);
@@ -281,7 +281,6 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* hos
 	aice.handle 		= handle;
 	aice.u.conn.host 	= tb_aicp_pool_strdup(aicp, host);
 	aice.u.conn.port 	= port;
-	aice.u.conn.timeout	= timeout;
 	tb_assert_and_check_return_val(aice.u.conn.host, tb_false);
 
 	// post
@@ -370,6 +369,9 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 	// check
 	tb_assert_and_check_return(aicp && aicp->rtor && aicp->rtor->spak);
 
+	// worker++
+	tb_atomic_fetch_and_inc(&aicp->work);
+
 	// loop
 	while (!tb_atomic_get(&aicp->kill))
 	{
@@ -396,6 +398,9 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 		// exit resp
 		tb_aicp_aice_exit(aicp, &resp);
 	}
+
+	// worker--
+	tb_atomic_fetch_and_dec(&aicp->work);
 }
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {

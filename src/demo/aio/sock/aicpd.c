@@ -75,7 +75,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
 			tb_print("send[%p]: closed", aice->handle);
-		else tb_print("send[%p]: state: %lu", aice->handle, aice->state);
+		else tb_print("send[%p]: failed: %lu", aice->handle, aice->state);
 		tb_demo_context_exit(aicp, context);
 	}
 
@@ -118,7 +118,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
 			tb_print("read[%p]: closed", aice->handle);
-		else tb_print("read[%p]: state: %lu", aice->handle, aice->state);
+		else tb_print("read[%p]: failed: %lu", aice->handle, aice->state);
 		tb_demo_context_exit(aicp, context);
 	}
 
@@ -190,7 +190,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	else
 	{
 		// exit loop
-		tb_print("acpt[%p]: state: %lu", aice->handle, aice->state);
+		tb_print("acpt[%p]: failed: %lu", aice->handle, aice->state);
 		return tb_false;
 	}
 

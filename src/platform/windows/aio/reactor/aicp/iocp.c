@@ -573,24 +573,28 @@ static tb_long_t tb_aicp_reactor_iocp_save_conn(tb_aicp_reactor_iocp_t* rtor, tb
 	// save resp
 	*resp = olap->aice;
 
-	// done
-	tb_long_t ok = -1;
-	if (wait) ok = 1;
 	// failed? done error
-	else
+	if (!wait)
 	{
 		// done error
 		switch (GetLastError())
 		{
+			// refused?
+		case ERROR_CONNECTION_REFUSED:
+			// timeout?
+		case ERROR_SEM_TIMEOUT:
+			resp->state = TB_AICE_STATE_FAILED;
+			break;
 		// unknown error
 		default:
+			resp->state = TB_AICE_STATE_FAILED;
 			tb_trace_impl("conn: unknown error: %u", GetLastError());
 			break;
 		}
 	}
 
-	// ok?
-	return ok;
+	// ok
+	return 1;
 }
 static tb_long_t tb_aicp_reactor_iocp_save_recv(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
@@ -859,16 +863,24 @@ static tb_void_t tb_aicp_reactor_iocp_kill(tb_aicp_reactor_t* reactor)
 {
 	// check
 	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->port);
+	tb_assert_and_check_return(rtor && rtor->port && reactor->aicp);
+
+	// the worker size
+	tb_size_t work = tb_atomic_get(&reactor->aicp->work);
 
 	// trace
-	tb_trace_impl("kill: ..");
+	tb_trace_impl("kill: %lu: ..", work);
 
-	// kill it, FIXME: for null aice
-	BOOL ok = PostQueuedCompletionStatus(rtor->port, 0, 0, tb_null);
+	// kill workers
+	tb_size_t i = 0;
+	for (i = 0; i < work; i++) PostQueuedCompletionStatus(rtor->port, 0, 0, tb_null);
+	
+	// wait workers 
+	tb_hong_t time = tb_mclock();
+	while (tb_atomic_get(&reactor->aicp->work) && (tb_mclock() < time + 5000)) tb_msleep(500);
 
 	// trace
-	tb_trace_impl("kill: %s", ok? "ok" : "no");
+	tb_trace_impl("kill: %lu: %s", work, tb_atomic_get(&reactor->aicp->work)? "no" : "ok");
 }
 static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
 {
