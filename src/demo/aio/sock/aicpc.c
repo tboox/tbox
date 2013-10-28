@@ -66,7 +66,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
 			tb_print("writ[%p]: closed", aice->handle);
-		else tb_print("writ[%p]: state: %lu", aice->handle, aice->state);
+		else tb_print("writ[%p]: failed: %lu", aice->handle, aice->state);
 		return tb_false;
 	}
 
@@ -123,7 +123,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
 			tb_print("writ[%p]: closed", aice->handle);
-		else tb_print("writ[%p]: state: %lu", aice->handle, aice->state);
+		else tb_print("writ[%p]: failed: %lu", aice->handle, aice->state);
 		return tb_false;
 	}
 
@@ -148,18 +148,11 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// post recv from server
 		if (!tb_aicp_recv(aicp, aice->handle, 8192, tb_demo_sock_recv_func, context)) return tb_false;
 	}
-	// timeout?
-	else if (aice->state == TB_AICE_STATE_TIMEOUT)
-	{
-		// exit loop
-		tb_print("conn[%p]: timeout", aice->handle);
-		return tb_false;
-	}
 	// failed?
 	else
 	{
 		// exit loop
-		tb_print("conn[%p]: state: %lu", aice->handle, aice->state);
+		tb_print("conn[%p]: failed: %lu", aice->handle, aice->state);
 		return tb_false;
 	}
 
@@ -202,7 +195,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// post conn
 	tb_print("conn: ..");
-	if (!tb_aicp_conn(aicp, context.sock, "127.0.0.1", 9090, 15000, tb_demo_sock_conn_func, &context)) goto end;
+	if (!tb_aicp_conn(aicp, context.sock, "127.0.0.1", 9090, tb_demo_sock_conn_func, &context)) goto end;
 
 	// loop aicp
 	tb_aicp_loop(aicp, -1);

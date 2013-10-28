@@ -58,8 +58,7 @@ typedef enum __tb_aice_state_e
 {
  	TB_AICE_STATE_OK 					= 0
 , 	TB_AICE_STATE_FAILED 				= 1
-, 	TB_AICE_STATE_TIMEOUT 				= 2
-,	TB_AICE_STATE_CLOSED 				= 3
+,	TB_AICE_STATE_CLOSED 				= 2
 
 }tb_aice_state_e;
 
@@ -79,9 +78,6 @@ typedef struct __tb_aice_conn_t
 
 	/// the host, @note: reference only
 	tb_char_t const* 		host;
-
-	/// the timeout
-	tb_long_t 				timeout;
 
 }tb_aice_conn_t;
 
@@ -311,6 +307,9 @@ typedef struct __tb_aicp_t
 	/// the reactor
 	tb_aicp_reactor_t* 		rtor;
 
+	// the worker size
+	tb_atomic_t 			work;
+
 }tb_aicp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -365,13 +364,12 @@ tb_bool_t 			tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb_fu
  * @param handle 	the handle
  * @param host 		the host
  * @param port 		the port
- * @param timeout 	the timeout
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_long_t timeout, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! post the read event for file
  *
