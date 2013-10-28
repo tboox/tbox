@@ -19,12 +19,6 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
-	// the data sock
-	tb_byte_t 			data_sock[8192];
-
-	// the data file
-	tb_byte_t 			data_file[8192];
-
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -73,7 +67,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, context->data_file, sizeof(context->data_file), tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -116,7 +110,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{	
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, context->data_file, sizeof(context->data_file), tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -170,7 +164,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			if (!tb_aicp_addo(aicp, context->file, TB_AIOO_OTYPE_FILE)) break;
 
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, context->data_file, sizeof(context->data_file), tb_demo_file_read_func, context)) break;
+			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) break;
 
 			// ok
 			ok = tb_true;
@@ -189,13 +183,8 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{
 			// continue it
-			if (!tb_aicp_acpt(aicp, aice->handle, 10000, tb_demo_sock_acpt_func, path)) return tb_false;
+			if (!tb_aicp_acpt(aicp, aice->handle, tb_demo_sock_acpt_func, path)) return tb_false;
 		}
-	}
-	// timeout? continue it
-	else if (aice->state == TB_AICE_STATE_TIMEOUT)
-	{
-		if (!tb_aicp_acpt(aicp, aice->handle, 10000, tb_demo_sock_acpt_func, path)) return tb_false;
 	}
 	// failed?
 	else
@@ -218,7 +207,7 @@ static tb_pointer_t tb_demo_loop_thread(tb_pointer_t data)
 	tb_print("[loop: %lu]: init", self);
 
 	// loop aicp
-	if (aicp) tb_aicp_loop(aicp, 5000);
+	if (aicp) tb_aicp_loop(aicp, -1);
 	
 	// trace
 	tb_print("[loop: %lu]: exit", self);
@@ -261,14 +250,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_aicp_addo(aicp, sock, TB_AIOO_OTYPE_SOCK)) goto end;
 
 	// post acpt
-	if (!tb_aicp_acpt(aicp, sock, 10000, tb_demo_sock_acpt_func, argv[1])) goto end;
+	if (!tb_aicp_acpt(aicp, sock, tb_demo_sock_acpt_func, argv[1])) goto end;
 
 	// done loop
 	loop[0] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
 	loop[1] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[2] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[3] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[4] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
+	loop[2] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
+	loop[3] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
 
 	// wait exit
 	getchar();
@@ -287,7 +275,7 @@ end:
 		tb_handle_t* l = loop;
 		for (; *l; l++)
 		{
-			if (!tb_thread_wait(*l, 5000))
+			if (!tb_thread_wait(*l, -1))
 				tb_thread_kill(*l);
 			tb_thread_exit(*l);
 		}
