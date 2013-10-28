@@ -18,11 +18,14 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
-	// the data sock
-	tb_byte_t 			data_sock[8192];
+	// the time
+	tb_hong_t 			time;
 
-	// the data file
-	tb_byte_t 			data_file[8192];
+	// the peak
+	tb_size_t 			peak;
+
+	// the sped
+	tb_size_t 			sped;
 
 }tb_demo_context_t;
 
@@ -55,7 +58,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, 8192, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -83,7 +86,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("recv[%p]: real: %lu, size: %lu", aice->handle, aice->u.recv.real, aice->u.recv.size);
+		tb_print("recv[%p]: real: %lu, size: %lu, sped: %lu KB/s", aice->handle, aice->u.recv.real, aice->u.recv.size, context->sped / 1000);
 
 		// has data?
 		if (aice->u.recv.real)
@@ -93,12 +96,26 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 
 			// save size
 			context->size += aice->u.recv.real;
+
+			// compute speed
+			context->peak += aice->u.recv.real;
+			if (!context->time) 
+			{
+				context->time = tb_mclock();
+				context->sped = context->peak;
+			}
+			else if (tb_mclock() > context->time + 1000)
+			{
+				context->sped = context->peak;
+				context->peak = 0;
+				context->time = tb_mclock();
+			}
 		}
 		// no data?
 		else
 		{	
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, 8192, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -129,7 +146,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		tb_print("conn[%p]: ok", aice->handle);
 
 		// post recv from server
-		if (!tb_aicp_recv(aicp, aice->handle, context->data_sock, sizeof(context->data_sock), tb_demo_sock_recv_func, context)) return tb_false;
+		if (!tb_aicp_recv(aicp, aice->handle, 8192, tb_demo_sock_recv_func, context)) return tb_false;
 	}
 	// timeout?
 	else if (aice->state == TB_AICE_STATE_TIMEOUT)
