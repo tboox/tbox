@@ -26,13 +26,13 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_AIO_HAVE_EPOLL)
+#if defined(TB_CONFIG_ASIO_HAVE_EPOLL)
 # 	include "aipp/epoll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
+#elif defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
 # 	include "aipp/kqueue.c"
-#elif defined(TB_CONFIG_AIO_HAVE_POLL)
+#elif defined(TB_CONFIG_ASIO_HAVE_POLL)
 # 	include "aipp/poll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
+#elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
 # 	include "aipp/select.c"
 #else
 # 	error have not available event mode
@@ -47,7 +47,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_AIO_HAVE_EPOLL)
+#if defined(TB_CONFIG_ASIO_HAVE_EPOLL)
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_epoll_init(aipp);
@@ -56,7 +56,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_epoll_init(aipp);
 }
-#elif defined(TB_CONFIG_AIO_HAVE_KQUEUE)
+#elif defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_kqueue_init(aipp);
@@ -65,7 +65,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_kqueue_init(aipp);
 }
-#elif defined(TB_CONFIG_AIO_HAVE_POLL)
+#elif defined(TB_CONFIG_ASIO_HAVE_POLL)
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_poll_init(aipp);
@@ -74,7 +74,7 @@ tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_poll_init(aipp);
 }
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
+#elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
 tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
 {
 	return tb_aipp_reactor_select_init(aipp);

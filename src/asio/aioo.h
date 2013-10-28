@@ -18,11 +18,11 @@
  *
  * @author		ruki
  * @file		aioo.h
- * @ingroup 	aio
+ * @ingroup 	asio
  *
  */
-#ifndef TB_AIO_OBJECT_H
-#define TB_AIO_OBJECT_H
+#ifndef TB_ASIO_OBJECT_H
+#define TB_ASIO_OBJECT_H
 
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ typedef enum __tb_aioo_otype_t
 
 }tb_aioo_otype_t;
 
-// the aio object type
+// the asio object type
 typedef struct __tb_aioo_t
 {
 	// the object type
@@ -131,12 +131,12 @@ tb_size_t 			tb_aioo_adde(tb_aioo_t* aioo, tb_size_t etype);
  */
 tb_size_t 			tb_aioo_dele(tb_aioo_t* aioo, tb_size_t etype);
 
-/*! wait the aio aioo
+/*! wait the asio aioo
  *
  * blocking wait the single event aioo, so need not aipp 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param aioo 		the aio aioo
+ * @param aioo 		the asio aioo
  * @param timeout 	the timeout value, return immediately if 0, infinity if -1
  *
  * @return 			the event type or timeout: 0 or error: -1

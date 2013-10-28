@@ -5,6 +5,11 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_DEMO_SOCK_RECV_MAXN 			(65536)
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 typedef struct __tb_demo_context_t
@@ -58,7 +63,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, 8192, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -115,7 +120,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{	
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, 8192, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -146,7 +151,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		tb_print("conn[%p]: ok", aice->handle);
 
 		// post recv from server
-		if (!tb_aicp_recv(aicp, aice->handle, 8192, tb_demo_sock_recv_func, context)) return tb_false;
+		if (!tb_aicp_recv(aicp, aice->handle, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 	}
 	// failed?
 	else

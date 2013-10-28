@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		aicp.c
- * @ingroup 	aio
+ * @ingroup 	asio
  *
  */
 
@@ -183,7 +183,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	tb_assert_and_check_goto(aicp->mutx.pool, fail);
 
 	// init pool
-	aicp->pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	aicp->pool = tb_spool_init((tb_isqrti(maxn) + 1) * TB_SPOOL_GROW_SMALL, 0);
 	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// init reactor
@@ -201,15 +201,12 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 {
 	if (aicp)
 	{
-		// is killed?
-		if (!tb_atomic_get(&aicp->kill))
-		{
-			// kill
-			tb_aicp_kill(aicp);
-
-			// sleep some time
-			tb_msleep(500);
-		}
+		// kill all
+		if (!tb_atomic_get(&aicp->kill)) tb_aicp_kill(aicp);
+	
+		// wait workers 
+		tb_hong_t time = tb_mclock();
+		while (tb_atomic_get(&aicp->work) && (tb_mclock() < time + 5000)) tb_msleep(500);
 
 		// exit reactor
 		if (aicp->rtor)

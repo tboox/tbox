@@ -6,6 +6,11 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_DEMO_FILE_READ_MAXN 			(65536)
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 typedef struct __tb_demo_context_t
@@ -67,7 +72,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -110,7 +115,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{	
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -164,7 +169,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			if (!tb_aicp_addo(aicp, context->file, TB_AIOO_OTYPE_FILE)) break;
 
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, 8192, tb_demo_file_read_func, context)) break;
+			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
 
 			// ok
 			ok = tb_true;

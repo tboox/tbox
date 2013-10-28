@@ -32,7 +32,7 @@
  */
 #include "dns.h"
 #include "ipv4.h"
-#include "../aio/aio.h"
+#include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -1444,7 +1444,7 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 	tb_dns_look_t* look = (tb_dns_look_t*)handle;
 	tb_assert_and_check_return_val(look && look->sock, -1);
 
-	// has aio event?
+	// has asio event?
 	tb_aioo_t o;
 	tb_size_t e = TB_AIOO_ETYPE_NONE;
 	if (!(look->step & TB_DNS_STEP_NEVT))

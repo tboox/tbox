@@ -26,42 +26,33 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_AIO_HAVE_POLL)
-# 	include "aioo/poll.c"
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-# 	include "aioo/select.c"
-#else
-# 	error have not available event mode
+#ifdef TB_CONFIG_ASIO_HAVE_WAITO
+# 	include "aioo/waito.c"
 #endif
 
-/* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+# 	include "aioo/select.c"
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifdef TB_CONFIG_ASIO_HAVE_WAITO
 
-#if defined(TB_CONFIG_AIO_HAVE_POLL)
+tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
 tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
 {
-	return tb_aioo_reactor_poll_wait(object, timeout);
+	return tb_aioo_reactor_waito_wait(object, timeout);
 }
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_poll_wait(object, timeout);
-}
-#elif defined(TB_CONFIG_AIO_HAVE_SELECT)
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_select_wait(object, timeout);
-}
+#endif
+
+
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
 tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
 {
 	return tb_aioo_reactor_select_wait(object, timeout);
 }
+
 #endif
 
