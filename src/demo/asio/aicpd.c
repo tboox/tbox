@@ -60,7 +60,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("send[%p]: real: %lu, size: %lu", aice->handle, aice->u.send.real, aice->u.send.size);
+//		tb_print("send[%p]: real: %lu, size: %lu", aice->handle, aice->u.send.real, aice->u.send.size);
 
 		// continue?
 		if (aice->u.send.real < aice->u.send.size)
@@ -100,7 +100,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("read[%p]: real: %lu, size: %lu", aice->handle, aice->u.read.real, aice->u.read.size);
+//		tb_print("read[%p]: real: %lu, size: %lu", aice->handle, aice->u.read.real, aice->u.read.size);
 
 		// has data?
 		if (aice->u.read.real)

@@ -5,211 +5,163 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * connect
+ * macros
  */
-static tb_bool_t tb_test_sock_connect(tb_handle_t s, tb_aioo_t* o, tb_char_t const* ip, tb_size_t port)
-{
-	// add event
-	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_CONN)) return tb_false;
+#define TB_DEMO_SOCK_RECV_MAXN 			(65536)
 
-	// connect...
-	while (1)
-	{
-		// connecting
-		tb_print("connecting %s:%u", ip, port);
-		tb_long_t r = tb_socket_connect(s, ip, port);
-
-		// ok
-		if (r > 0) break;
-		// continue ?
-		else if (!r)
-		{
-			// waiting...
-			tb_print("connect waiting...");
-			tb_long_t etype = tb_aioo_wait(o, 10000);
-
-			// error?
-			if (etype < 0)
-			{
-				tb_print("connect failed");
-				return tb_false;
-			}
-
-			// timeout?
-			if (!etype)
-			{
-				tb_print("connect timeout");
-				return tb_false;
-			}
-
-			// has connect?
-			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_CONN);
-		}
-		// error
-		else 
-		{
-			tb_print("connect error.");
-			return tb_false;
-		}
-	}
-
-	// del event
-	tb_aioo_dele(o, TB_AIOO_ETYPE_CONN);
-
-	// ok
-	tb_print("connect ok.");
-	return tb_true;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * send
- */
-static tb_bool_t tb_test_sock_send(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data, tb_size_t size)
-{
-	// add event
-	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_WRIT)) return tb_false;
-
-	// send
-	tb_size_t send = 0;
-	tb_bool_t wait = tb_false;
-	while (send < size)
-	{
-		// try to send data
-		tb_long_t n = tb_socket_send(s, data + send, size - send);
-		if (n > 0)
-		{
-			// update send
-			send += n;
-
-			// no waiting
-			wait = tb_false;
-		}
-		else if (!n && !wait)
-		{
-			// waiting...
-			tb_print("send waiting...");
-			tb_long_t etype = tb_aioo_wait(o, 10000);
-
-			// error?
-			if (etype < 0)
-			{
-				tb_print("send failed");
-				break ; 
-			}
-
-			// timeout?
-			if (!etype)
-			{
-				tb_print("send timeout");
-				break ; 
-			}
-
-			// has send?
-			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_WRIT);
-
-			// be waiting
-			wait = tb_true;
-		}
-		else break;
-	}
-	
-	// del event
-	tb_aioo_dele(o, TB_AIOO_ETYPE_WRIT);
-
-	// ok?
-	return send == size? tb_true : tb_false;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * recv
- */
-static tb_size_t tb_test_sock_recv(tb_handle_t s, tb_aioo_t* o, tb_byte_t* data, tb_size_t size)
-{
-	// add event
-	if (!tb_aioo_adde(o, TB_AIOO_ETYPE_READ)) return 0;
-
-	// recv
-	tb_size_t recv = 0;
-	tb_bool_t wait = tb_false;
-	while (recv < size)
-	{
-		// try to recv data
-		tb_long_t n = tb_socket_recv(s, data + recv, size - recv);
-		if (n > 0)
-		{
-			// update recv
-			recv += n;
-
-			// no waiting
-			wait = tb_false;
-		}
-		else if (!n && !wait)
-		{
-			// waiting...
-			tb_print("recv waiting...");
-			tb_long_t etype = tb_aioo_wait(o, 1000);
-
-			// error?
-			if (etype < 0)
-			{
-				tb_print("recv failed");
-				break ; 
-			}
-
-			// timeout?
-			if (!etype)
-			{
-				tb_print("recv timeout");
-				break ; 
-			}
-
-			// has recv?
-			tb_assert_and_check_break(etype & TB_AIOO_ETYPE_READ);
-
-			// be waiting
-			wait = tb_true;
-		}
-		else break;
-	}
-	
-	// del event
-	tb_aioo_dele(o, TB_AIOO_ETYPE_READ);
-
-	// ok?
-	return recv;
-}
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
+	// check
+	tb_assert_and_check_return_val(argv[1], 0);
+
 	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
-	// open socket
-	tb_handle_t s = tb_socket_open(TB_SOCKET_TYPE_TCP);
-	tb_assert_and_check_goto(s, end);
+	// init sock
+	tb_handle_t sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+	tb_assert_and_check_goto(sock, end);
 
-	// init aioo
-	tb_aioo_t o;
-	tb_aioo_seto(&o, s, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_NONE, tb_null);
+	// init file
+	tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY);
+	tb_assert_and_check_goto(file, end);
 
-	// connect
-	if (!tb_test_sock_connect(s, &o, argv[1], tb_stou32(argv[2]))) goto end;
+	// init data
+	tb_byte_t* data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
+	tb_assert_and_check_goto(data, end);
 
-	// send
-	if (!tb_test_sock_send(s, &o, "hello world", 12)) goto end;
-	tb_print("send: %s", "hello world");
+	// done conn
+	tb_long_t conn = -1;
+	while (!(conn = tb_socket_connect(sock, "127.0.0.1", 9090)))
+	{
+		// wait
+		tb_aioo_t aioo;
+		tb_aioo_seto(&aioo, sock, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_CONN, tb_null);
+		conn = tb_aioo_wait(&aioo, 20000);
+		tb_check_break(conn > 0);
+	}
 
-	// recv
-	tb_char_t data[4096] = {0};
-	tb_size_t size = tb_test_sock_recv(s, &o, data, 4096);
-	tb_print("recv[%u]: %s", size, data);
+	// ok?
+	if (conn > 0) tb_print("conn[%p]: ok", sock);
+	// timeout?
+	else if (!conn) tb_print("conn[%p]: timeout", sock);
+	// failed?
+	else tb_print("conn[%p]: failed", sock);
+
+	// done sock
+	tb_size_t peak = 0;
+	tb_size_t sped = 0;
+	tb_hong_t time = 0;
+	tb_hize_t size = 0;
+	tb_bool_t wait = tb_false;
+	while (1)
+	{
+		// recv data
+		tb_long_t real = tb_socket_recv(sock, data, TB_DEMO_SOCK_RECV_MAXN);
+		if (real > 0)
+		{
+			// save size
+			size += real;
+
+			// trace
+//			tb_print("recv[%p]: real: %ld", sock, real);
+
+			// compute speed
+			peak += real;
+			if (!time) 
+			{
+				time = tb_mclock();
+				sped = peak;
+			}
+			else if (tb_mclock() > time + 1000)
+			{
+				sped = peak;
+				peak = 0;
+				time = tb_mclock();
+	
+				// trace
+				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", sock, size, sped / 1000);
+			}
+
+			// init wait
+			wait = tb_false;
+
+			// done file
+			tb_size_t need = real;
+			tb_size_t writ = 0;
+			while (writ < need)
+			{
+				// writ data
+				real = tb_file_writ(file, data + writ, need - writ);
+				if (real > 0)
+				{
+					// trace
+//					tb_print("writ[%p]: real: %ld", file, real);
+
+					// save writ
+					writ += real;
+					wait = tb_false;
+				}
+				else if (!real && !wait)
+				{
+					// wait
+					tb_aioo_t aioo;
+					tb_aioo_seto(&aioo, file, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT, tb_null);
+					if (tb_aioo_wait(&aioo, -1) <= 0) 
+					{
+						tb_print("writ[%p]: wait: failed", file);
+						break;
+					}
+					wait = tb_true;
+				}
+				else
+				{
+					tb_print("writ[%p]: failed", file);
+				}
+			}
+
+			// init wait
+			wait = tb_false;
+		}
+		else if (!real && !wait)
+		{
+			// wait
+			tb_aioo_t aioo;
+			tb_aioo_seto(&aioo, sock, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, tb_null);
+			if (tb_aioo_wait(&aioo, -1) <= 0) 
+			{
+				tb_print("recv[%p]: wait: failed", sock);
+				break;
+			}
+			wait = tb_true;
+		}
+		else if (!real)
+		{
+			tb_print("recv[%p]: closed", sock);
+			break;
+		}
+		else 
+		{
+			tb_print("recv[%p]: failed", sock);
+			break;
+		}
+	}
 
 end:
 
-	// close socket
-	if (s) tb_socket_close(s);
+	// trace
+	tb_print("end");
+
+	// exit sock
+	if (sock) tb_socket_close(sock);
+
+	// exit file
+	if (file) tb_file_exit(file);
+
+	// exit data
+	if (data) tb_free(data);
 
 	// exit
 	tb_exit();

@@ -51,7 +51,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("writ[%p]: real: %lu, size: %lu", aice->handle, aice->u.writ.real, aice->u.writ.size);
+//		tb_print("writ[%p]: real: %lu, size: %lu", aice->handle, aice->u.writ.real, aice->u.writ.size);
 
 		// continue?
 		if (aice->u.writ.real < aice->u.writ.size)
@@ -91,7 +91,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("recv[%p]: real: %lu, size: %lu, sped: %lu KB/s", aice->handle, aice->u.recv.real, aice->u.recv.size, context->sped / 1000);
+//		tb_print("recv[%p]: real: %lu, size: %lu", aice->handle, aice->u.recv.real, aice->u.recv.size);
 
 		// has data?
 		if (aice->u.recv.real)
@@ -114,6 +114,9 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 				context->sped = context->peak;
 				context->peak = 0;
 				context->time = tb_mclock();
+	
+				// trace
+				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->handle, context->size, context->sped / 1000);
 			}
 		}
 		// no data?
