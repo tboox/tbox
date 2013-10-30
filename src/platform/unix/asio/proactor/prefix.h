@@ -17,35 +17,15 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		waito.c
+ * @file		prefix.h
  *
  */
+#ifndef TB_PLATFROM_UNIX_ASIO_PROACTOR_PREFIX_H
+#define TB_PLATFROM_UNIX_ASIO_PROACTOR_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * includes
  */
-static tb_long_t tb_aioo_reactor_waito_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	tb_assert_and_check_return_val(object && object->handle, -1);
+#include "../prefix.h"
 
-	// type
-	tb_size_t otype = object->otype;
-	tb_size_t etype = object->etype;
-	
-	// check
-	tb_assert_and_check_return_val(otype == TB_AIOO_OTYPE_FILE, -1);
-
-	// select
-	DWORD r = WaitForSingleObject(object->handle, timeout >= 0? timeout : INFINITE);
-	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
-
-	// timeout?
-	tb_check_return_val(r != WAIT_TIMEOUT, 0);
-
-	// error?
-	tb_check_return_val(r == WAIT_OBJECT_0, -1);
-
-	// ok
-	return etype;
-}
-
+#endif

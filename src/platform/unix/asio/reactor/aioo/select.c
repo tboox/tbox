@@ -28,17 +28,16 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeout)
+static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* aioo, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(object, -1);
+	// check
+	tb_assert_and_check_return_val(aioo, -1);
 
 	// type
-	tb_size_t otype = object->otype;
-	tb_size_t etype = object->etype;
-	tb_assert_and_check_return_val(otype == TB_AIOO_OTYPE_FILE || otype == TB_AIOO_OTYPE_SOCK, -1);
+	tb_size_t aioe = aioo->aioe;
 
 	// fd
-	tb_long_t fd = ((tb_long_t)object->handle) - 1;
+	tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, -1);
 	
 	// init time
@@ -53,8 +52,8 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeou
 	fd_set 	rfds;
 	fd_set 	wfds;
 	fd_set 	efds;
-	fd_set* prfds = (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT)? &rfds : tb_null;
-	fd_set* pwfds = (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN)? &wfds : tb_null;
+	fd_set* prfds = (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT)? &rfds : tb_null;
+	fd_set* pwfds = (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN)? &wfds : tb_null;
 
 	if (prfds)
 	{
@@ -83,28 +82,25 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* object, tb_long_t timeou
 	tb_check_return_val(r, 0);
 
 	// error?
-	if (otype == TB_AIOO_OTYPE_SOCK)
-	{
-		tb_int_t o = 0;
-		tb_int_t n = sizeof(tb_int_t);
-		getsockopt(fd, SOL_SOCKET, SO_ERROR, &o, &n);
-		if (o) return -1;
-	}
+	tb_int_t o = 0;
+	tb_int_t n = sizeof(tb_int_t);
+	getsockopt(fd, SOL_SOCKET, SO_ERROR, &o, &n);
+	if (o) return -1;
 
 	// ok
 	tb_long_t e = 0;
 	if (prfds && FD_ISSET(fd, &rfds)) 
 	{
-		e |= TB_AIOO_ETYPE_READ;
-		if (etype & TB_AIOO_ETYPE_ACPT) e |= TB_AIOO_ETYPE_ACPT;
+		e |= TB_AIOE_RECV;
+		if (aioe & TB_AIOE_ACPT) e |= TB_AIOE_ACPT;
 	}
 	if (pwfds && FD_ISSET(fd, &wfds)) 
 	{
-		e |= TB_AIOO_ETYPE_WRIT;
-		if (etype & TB_AIOO_ETYPE_CONN) e |= TB_AIOO_ETYPE_CONN;
+		e |= TB_AIOE_SEND;
+		if (aioe & TB_AIOE_CONN) e |= TB_AIOE_CONN;
 	}
-	if (FD_ISSET(fd, &efds) && !(e & (TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT))) 
-		e |= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT;
+	if (FD_ISSET(fd, &efds) && !(e & (TB_AIOE_RECV | TB_AIOE_SEND))) 
+		e |= TB_AIOE_RECV | TB_AIOE_SEND;
 	return e;
 }
 

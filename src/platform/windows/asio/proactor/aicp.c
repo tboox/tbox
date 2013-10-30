@@ -17,9 +17,19 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		iocp.c
+ * @file		aicp.c
  *
  */
+
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 			"proactor"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -71,11 +81,11 @@ typedef struct __tb_iocp_olap_t
 
 }tb_iocp_olap_t;
 
-// the iocp reactor type
-typedef struct __tb_aicp_reactor_iocp_t
+// the iocp proactor type
+typedef struct __tb_aicp_proactor_iocp_t
 {
-	// the reactor base
-	tb_aicp_reactor_t 			base;
+	// the proactor base
+	tb_aicp_proactor_t 			base;
 
 	// the i/o completion port
 	HANDLE 						port;
@@ -92,47 +102,47 @@ typedef struct __tb_aicp_reactor_iocp_t
 	// the connectex func
 	tb_iocp_connectex_func_t 	connectex;
 
-}tb_aicp_reactor_iocp_t;
+}tb_aicp_proactor_iocp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * post
  */
-static tb_pointer_t tb_aicp_reactor_iocp_malloc0(tb_aicp_reactor_iocp_t* rtor)
+static tb_pointer_t tb_aicp_proactor_iocp_malloc0(tb_aicp_proactor_iocp_t* ptor)
 {
 	// check
-	tb_assert_and_check_return_val(rtor, tb_null);
+	tb_assert_and_check_return_val(ptor, tb_null);
 
 	// enter 
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
 	// make data
-	tb_pointer_t data = rtor->pool? tb_rpool_malloc0(rtor->pool) : tb_null;
+	tb_pointer_t data = ptor->pool? tb_rpool_malloc0(ptor->pool) : tb_null;
 
 	// leave 
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 	
 	// ok?
 	return data;
 }
-static tb_void_t tb_aicp_reactor_iocp_free(tb_aicp_reactor_iocp_t* rtor, tb_cpointer_t data)
+static tb_void_t tb_aicp_proactor_iocp_free(tb_aicp_proactor_iocp_t* ptor, tb_cpointer_t data)
 {
 	// check
-	tb_assert_and_check_return(rtor);
+	tb_assert_and_check_return(ptor);
 
 	// enter 
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
 	// free data
-	if (data) tb_rpool_free(rtor->pool, data);
+	if (data) tb_rpool_free(ptor->pool, data);
 
 	// leave 
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 }
-static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && rtor->acceptex && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && ptor->acceptex && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_ACPT, -1);
@@ -147,12 +157,12 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 	do
 	{
 		// make olap
-		olap = tb_aicp_reactor_iocp_malloc0(rtor);
+		olap = tb_aicp_proactor_iocp_malloc0(ptor);
 		tb_assert_and_check_break(olap);
 
 		// init olap, hack: sizeof(tb_iocp_olap_t) >= olap->data.len
 		olap->data.len 			= (sizeof(SOCKADDR_IN) + 16) << 1;
-		olap->data.buf 			= (tb_byte_t*)tb_aicp_reactor_iocp_malloc0(rtor);
+		olap->data.buf 			= (tb_byte_t*)tb_aicp_proactor_iocp_malloc0(ptor);
 		olap->aice 				= *aice;
 		olap->aice.u.acpt.sock 	= tb_socket_open(TB_SOCKET_TYPE_TCP);
 		tb_assert_static(sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1));
@@ -163,7 +173,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 
 		// done acceptex
 		DWORD real = 0;
-		acceptex_ok = rtor->acceptex( 	(SOCKET)aice->handle - 1
+		acceptex_ok = ptor->acceptex( 	(SOCKET)aice->handle - 1
 									, 	(SOCKET)olap->aice.u.acpt.sock - 1
 									, 	olap->data.buf
 									, 	0
@@ -175,7 +185,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 		tb_check_break(acceptex_ok);
 
 		// finished? remove olap and done resp directly
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	} while (0);
 
@@ -183,13 +193,13 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 	if (ok < 0)
 	{
 		// exit data
-		if (olap->data.buf) tb_aicp_reactor_iocp_free(rtor, olap->data.buf);
+		if (olap->data.buf) tb_aicp_proactor_iocp_free(ptor, olap->data.buf);
 
 		// exit sock
 		if (olap->aice.u.acpt.sock) tb_socket_close(olap->aice.u.acpt.sock);
 
 		// exit olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 	}
 	else if (!acceptex_ok)
 	{
@@ -199,13 +209,13 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 		else
 		{
 			// exit data
-			if (olap->data.buf) tb_aicp_reactor_iocp_free(rtor, olap->data.buf);
+			if (olap->data.buf) tb_aicp_proactor_iocp_free(ptor, olap->data.buf);
 
 			// exit sock
 			if (olap->aice.u.acpt.sock) tb_socket_close(olap->aice.u.acpt.sock);
 
 			// exit olap
-			if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+			if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 			// failed
 			aice->state = TB_AICE_STATE_FAILED;
@@ -218,11 +228,11 @@ static tb_long_t tb_aicp_reactor_iocp_post_acpt(tb_aicp_reactor_t* reactor, tb_a
 	// done resp?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_CONN, -1);
@@ -239,7 +249,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 	do
 	{
 		// make olap
-		olap = tb_aicp_reactor_iocp_malloc0(rtor);
+		olap = tb_aicp_proactor_iocp_malloc0(ptor);
 		tb_assert_and_check_break(olap);
 
 		// init olap
@@ -262,7 +272,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(aice->u.conn.port);
 		addr.sin_addr.S_un.S_addr = inet_addr(aice->u.conn.host);
-		connectex_ok = rtor->connectex( 	(SOCKET)aice->handle - 1
+		connectex_ok = ptor->connectex( 	(SOCKET)aice->handle - 1
 										, 	(struct sockaddr const*)&addr
 										, 	sizeof(addr)
 										, 	tb_null
@@ -273,7 +283,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 		tb_check_break(connectex_ok);
 
 		// finished? remove olap and done resp directly
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	} while (0);
 
@@ -281,7 +291,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 	if (ok < 0)
 	{
 		// exit olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 	}
 	else if (!connectex_ok)
 	{
@@ -291,7 +301,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 		else
 		{
 			// exit olap
-			if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+			if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 			// failed
 			aice->state = TB_AICE_STATE_FAILED;
@@ -308,18 +318,18 @@ static tb_long_t tb_aicp_reactor_iocp_post_conn(tb_aicp_reactor_t* reactor, tb_a
 	// done resp?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_post_recv(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {	
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_RECV, -1);
 	tb_assert_and_check_return_val(aice->u.recv.data && aice->u.recv.size , -1);
 
 	// init olap
-	tb_iocp_olap_t* olap = tb_aicp_reactor_iocp_malloc0(rtor);
+	tb_iocp_olap_t* olap = tb_aicp_proactor_iocp_malloc0(ptor);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->data.buf 	= aice->u.recv.data;
 	olap->data.len 	= aice->u.recv.size;
@@ -334,7 +344,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_recv(tb_aicp_reactor_t* reactor, tb_a
 	if (real > 0)
 	{
 		// remove olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 		// the real size
 		aice->u.recv.real = real;
@@ -347,7 +357,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_recv(tb_aicp_reactor_t* reactor, tb_a
 	if (!real || WSA_IO_PENDING == WSAGetLastError()) return 0;
 
 	// remove olap
-	if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+	if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	// done error
 	switch (WSAGetLastError())
@@ -366,18 +376,18 @@ static tb_long_t tb_aicp_reactor_iocp_post_recv(tb_aicp_reactor_t* reactor, tb_a
 	// done resp
 	return 1;
 }
-static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {	
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_READ, -1);
 	tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size , -1);
 
 	// init olap
-	tb_iocp_olap_t* olap = tb_aicp_reactor_iocp_malloc0(rtor);
+	tb_iocp_olap_t* olap = tb_aicp_proactor_iocp_malloc0(ptor);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->aice 			= *aice;
 	olap->base.Offset 	= aice->u.read.seek;
@@ -392,7 +402,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	if (ok || real > 0)
 	{
 		// remove olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 		// the real size
 		aice->u.read.real = real;
@@ -405,7 +415,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	if (!real || ERROR_IO_PENDING == GetLastError()) return 0;
 
 	// remove olap
-	if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+	if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	// failed
 	aice->state = TB_AICE_STATE_FAILED;
@@ -413,18 +423,18 @@ static tb_long_t tb_aicp_reactor_iocp_post_read(tb_aicp_reactor_t* reactor, tb_a
 	// done resp
 	return 1;
 }
-static tb_long_t tb_aicp_reactor_iocp_post_send(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_SEND, -1);
 	tb_assert_and_check_return_val(aice->u.send.data && aice->u.send.size , -1);
 
 	// init olap
-	tb_iocp_olap_t* olap = tb_aicp_reactor_iocp_malloc0(rtor);
+	tb_iocp_olap_t* olap = tb_aicp_proactor_iocp_malloc0(ptor);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->data.buf 	= aice->u.send.data;
 	olap->data.len 	= aice->u.send.size;
@@ -438,7 +448,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_send(tb_aicp_reactor_t* reactor, tb_a
 	if (real > 0)
 	{
 		// remove olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 		// the real size
 		aice->u.send.real = real;
@@ -451,7 +461,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_send(tb_aicp_reactor_t* reactor, tb_a
 	if (!real || WSA_IO_PENDING == WSAGetLastError()) return 0;
 
 	// remove olap
-	if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+	if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	// done error
 	switch (WSAGetLastError())
@@ -470,18 +480,18 @@ static tb_long_t tb_aicp_reactor_iocp_post_send(tb_aicp_reactor_t* reactor, tb_a
 	// done resp
 	return 1;
 }
-static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_aice_t* aice)
+static tb_long_t tb_aicp_proactor_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_WRIT, -1);
 	tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size , -1);
 
 	// init olap
-	tb_iocp_olap_t* olap = tb_aicp_reactor_iocp_malloc0(rtor);
+	tb_iocp_olap_t* olap = tb_aicp_proactor_iocp_malloc0(ptor);
 	tb_assert_and_check_return_val(olap, -1);
 	olap->aice 			= *aice;
 	olap->base.Offset 	= aice->u.writ.seek;
@@ -496,7 +506,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 	if (ok || real > 0)
 	{
 		// remove olap
-		if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+		if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 		// the real size
 		aice->u.writ.real = real;
@@ -509,7 +519,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 	if (!real || ERROR_IO_PENDING == GetLastError()) return 0;
 
 	// remove olap
-	if (olap) tb_aicp_reactor_iocp_free(rtor, olap);
+	if (olap) tb_aicp_proactor_iocp_free(ptor, olap);
 
 	// failed
 	aice->state = TB_AICE_STATE_FAILED;
@@ -521,7 +531,7 @@ static tb_long_t tb_aicp_reactor_iocp_post_writ(tb_aicp_reactor_t* reactor, tb_a
 /* ///////////////////////////////////////////////////////////////////////
  * save resp
  */
-static tb_long_t tb_aicp_reactor_iocp_save_acpt(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -558,14 +568,14 @@ static tb_long_t tb_aicp_reactor_iocp_save_acpt(tb_aicp_reactor_iocp_t* rtor, tb
 	}
 
 	// exit data
-	if (olap->data.buf) tb_aicp_reactor_iocp_free(rtor, olap->data.buf);
+	if (olap->data.buf) tb_aicp_proactor_iocp_free(ptor, olap->data.buf);
 	olap->data.buf = tb_null;
 	olap->data.len = 0;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_conn(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -596,7 +606,7 @@ static tb_long_t tb_aicp_reactor_iocp_save_conn(tb_aicp_reactor_iocp_t* rtor, tb
 	// ok
 	return 1;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_recv(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -637,7 +647,7 @@ static tb_long_t tb_aicp_reactor_iocp_save_recv(tb_aicp_reactor_iocp_t* rtor, tb
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_send(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -678,7 +688,7 @@ static tb_long_t tb_aicp_reactor_iocp_save_send(tb_aicp_reactor_iocp_t* rtor, tb
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_read(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -719,7 +729,7 @@ static tb_long_t tb_aicp_reactor_iocp_save_read(tb_aicp_reactor_iocp_t* rtor, tb
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_writ(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
@@ -760,86 +770,86 @@ static tb_long_t tb_aicp_reactor_iocp_save_writ(tb_aicp_reactor_iocp_t* rtor, tb
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_reactor_iocp_save_resp(tb_aicp_reactor_iocp_t* rtor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_aicp_proactor_iocp_save_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
 	// save
-	static tb_bool_t (*s_save[])(tb_aicp_reactor_iocp_t* , tb_aice_t* , tb_iocp_olap_t* , tb_size_t , tb_bool_t ) = 
+	static tb_bool_t (*s_save[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_iocp_olap_t* , tb_size_t , tb_bool_t ) = 
 	{
 		tb_null
-	,	tb_aicp_reactor_iocp_save_acpt
-	,	tb_aicp_reactor_iocp_save_conn
-	,	tb_aicp_reactor_iocp_save_recv
-	,	tb_aicp_reactor_iocp_save_send
-	,	tb_aicp_reactor_iocp_save_read
-	,	tb_aicp_reactor_iocp_save_writ
+	,	tb_aicp_proactor_iocp_save_acpt
+	,	tb_aicp_proactor_iocp_save_conn
+	,	tb_aicp_proactor_iocp_save_recv
+	,	tb_aicp_proactor_iocp_save_send
+	,	tb_aicp_proactor_iocp_save_read
+	,	tb_aicp_proactor_iocp_save_writ
 	};
 	tb_assert_and_check_return(olap->aice.code < tb_arrayn(s_save));
 
 	// save aice
-	return (s_save[olap->aice.code])? s_save[olap->aice.code](rtor, resp, olap, real, wait) : -1;
+	return (s_save[olap->aice.code])? s_save[olap->aice.code](ptor, resp, olap, real, wait) : -1;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_reactor_iocp_addo(tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t otype)
+static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp && handle && otype, tb_false);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && handle && type, tb_false);
 
 	// attach aico to port
-	HANDLE port = CreateIoCompletionPort((HANDLE)handle, rtor->port, (ULONG*)otype, 0);
-	tb_assert_and_check_return_val(port == rtor->port, tb_false);
+	HANDLE port = CreateIoCompletionPort((HANDLE)handle, ptor->port, (ULONG*)type, 0);
+	tb_assert_and_check_return_val(port == ptor->port, tb_false);
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aicp_reactor_iocp_delo(tb_aicp_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && reactor->aicp && handle, tb_false);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && handle, tb_false);
 
 	// ok
 	return tb_true;
 }
-static tb_long_t tb_aicp_reactor_iocp_post(tb_aicp_reactor_t* reactor, tb_aice_t* reqt)
+static tb_long_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t* reqt)
 {
 	// post
-	static tb_long_t (*s_post[])(tb_aicp_reactor_t* , tb_aice_t*) = 
+	static tb_long_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t*) = 
 	{
 		tb_null
-	,	tb_aicp_reactor_iocp_post_acpt
-	,	tb_aicp_reactor_iocp_post_conn
-	,	tb_aicp_reactor_iocp_post_recv
-	,	tb_aicp_reactor_iocp_post_send
-	,	tb_aicp_reactor_iocp_post_read
-	,	tb_aicp_reactor_iocp_post_writ
+	,	tb_aicp_proactor_iocp_post_acpt
+	,	tb_aicp_proactor_iocp_post_conn
+	,	tb_aicp_proactor_iocp_post_recv
+	,	tb_aicp_proactor_iocp_post_send
+	,	tb_aicp_proactor_iocp_post_read
+	,	tb_aicp_proactor_iocp_post_writ
 	};
 	tb_assert_and_check_return(reqt->code < tb_arrayn(s_post));
 
 	// post reqt
-	return (s_post[reqt->code])? s_post[reqt->code](reactor, reqt) : -1;
+	return (s_post[reqt->code])? s_post[reqt->code](proactor, reqt) : -1;
 }
 
-static tb_long_t tb_aicp_reactor_iocp_spak(tb_aicp_reactor_t* reactor, tb_aice_t* resp, tb_long_t timeout)
+static tb_long_t tb_aicp_proactor_iocp_spak(tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->port && resp, -1);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && resp, -1);
 
 	// trace
 	tb_trace_impl("spak[%lu]: ..", tb_thread_self());
 
 	// wait
 	DWORD 			real = 0;
-	tb_size_t 		otype = 0;
+	tb_size_t 		type = 0;
 	tb_iocp_olap_t* olap = tb_null;
-	BOOL 			wait = GetQueuedCompletionStatus(rtor->port, (LPDWORD)&real, (LPDWORD)&otype, &olap, timeout < 0? INFINITE : timeout);
+	BOOL 			wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&type, &olap, timeout < 0? INFINITE : timeout);
 
 	// trace
 	tb_trace_impl("spak[%lu]: %d error: %u", tb_thread_self(), wait, GetLastError());
@@ -848,61 +858,61 @@ static tb_long_t tb_aicp_reactor_iocp_spak(tb_aicp_reactor_t* reactor, tb_aice_t
 	if (!wait && WAIT_TIMEOUT == GetLastError()) return 0;
 
 	// killed?
-	if (wait && !otype) return -1;
+	if (wait && !type) return -1;
 
 	// save resp
-	tb_long_t ok = tb_aicp_reactor_iocp_save_resp(rtor, resp, olap, (tb_size_t)real, wait? tb_true : tb_false);
+	tb_long_t ok = tb_aicp_proactor_iocp_save_resp(ptor, resp, olap, (tb_size_t)real, wait? tb_true : tb_false);
 
 	// free olap
-	tb_aicp_reactor_iocp_free(rtor, olap);
+	tb_aicp_proactor_iocp_free(ptor, olap);
 
 	// ok?
 	return ok;
 }
-static tb_void_t tb_aicp_reactor_iocp_kill(tb_aicp_reactor_t* reactor)
+static tb_void_t tb_aicp_proactor_iocp_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->port && reactor->aicp);
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return(ptor && ptor->port && proactor->aicp);
 
 	// the worker size
-	tb_size_t work = tb_atomic_get(&reactor->aicp->work);
+	tb_size_t work = tb_atomic_get(&proactor->aicp->work);
 
 	// trace
 	tb_trace_impl("kill: %lu", work);
 
 	// kill workers
 	tb_size_t i = 0;
-	for (i = 0; i < work; i++) PostQueuedCompletionStatus(rtor->port, 0, 0, tb_null);
+	for (i = 0; i < work; i++) PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
 
 }
-static tb_void_t tb_aicp_reactor_iocp_exit(tb_aicp_reactor_t* reactor)
+static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 {
-	tb_aicp_reactor_iocp_t* rtor = (tb_aicp_reactor_iocp_t*)reactor;
-	if (rtor)
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	if (ptor)
 	{
 		// trace
 		tb_trace_impl("exit");
 
 		// exit port
-		if (rtor->port) CloseHandle(rtor->port);
-		rtor->port = tb_null;
+		if (ptor->port) CloseHandle(ptor->port);
+		ptor->port = tb_null;
 
 		// exit pool
-		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
-		if (rtor->pool) tb_rpool_exit(rtor->pool);
-		rtor->pool = tb_null;
-		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
+		if (ptor->pool) tb_rpool_exit(ptor->pool);
+		ptor->pool = tb_null;
+		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 
 		// exit mutx
-		if (rtor->mutx) tb_mutex_exit(rtor->mutx);
-		rtor->mutx = tb_null;
+		if (ptor->mutx) tb_mutex_exit(ptor->mutx);
+		ptor->mutx = tb_null;
 
 		// free it
-		tb_free(rtor);
+		tb_free(ptor);
 	}
 }
-static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_acceptex_func()
+static tb_iocp_acceptex_func_t tb_aicp_proactor_iocp_acceptex_func()
 {
 	// done
 	tb_long_t 				ok = -1;
@@ -936,7 +946,7 @@ static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_acceptex_func()
 	// ok?
 	return !ok? acceptex : tb_null;
 }
-static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_connectex_func()
+static tb_iocp_acceptex_func_t tb_aicp_proactor_iocp_connectex_func()
 {
 	// done
 	tb_long_t 					ok = -1;
@@ -970,41 +980,46 @@ static tb_iocp_acceptex_func_t tb_aicp_reactor_iocp_connectex_func()
 	// ok?
 	return !ok? connectex : tb_null;
 }
-static tb_aicp_reactor_t* tb_aicp_reactor_iocp_init(tb_aicp_t* aicp)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
+tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->maxn, tb_null);
 
-	// alloc reactor
-	tb_aicp_reactor_iocp_t* rtor = tb_malloc0(sizeof(tb_aicp_reactor_iocp_t));
-	tb_assert_and_check_return_val(rtor, tb_null);
+	// alloc proactor
+	tb_aicp_proactor_iocp_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_iocp_t));
+	tb_assert_and_check_return_val(ptor, tb_null);
 
 	// init base
-	rtor->base.aicp 	= aicp;
-	rtor->base.kill 	= tb_aicp_reactor_iocp_kill;
-	rtor->base.exit 	= tb_aicp_reactor_iocp_exit;
-	rtor->base.addo 	= tb_aicp_reactor_iocp_addo;
-	rtor->base.delo 	= tb_aicp_reactor_iocp_delo;
-	rtor->base.post 	= tb_aicp_reactor_iocp_post;
-	rtor->base.spak 	= tb_aicp_reactor_iocp_spak;
-	rtor->acceptex 		= tb_aicp_reactor_iocp_acceptex_func();
-	rtor->connectex 	= tb_aicp_reactor_iocp_connectex_func();
-	rtor->mutx 			= tb_mutex_init(tb_null);
-	tb_assert_and_check_goto(rtor->acceptex && rtor->connectex, fail);
+	ptor->base.aicp 	= aicp;
+	ptor->base.kill 	= tb_aicp_proactor_iocp_kill;
+	ptor->base.exit 	= tb_aicp_proactor_iocp_exit;
+	ptor->base.addo 	= tb_aicp_proactor_iocp_addo;
+	ptor->base.delo 	= tb_aicp_proactor_iocp_delo;
+	ptor->base.post 	= tb_aicp_proactor_iocp_post;
+	ptor->base.spak 	= tb_aicp_proactor_iocp_spak;
+	ptor->acceptex 		= tb_aicp_proactor_iocp_acceptex_func();
+	ptor->connectex 	= tb_aicp_proactor_iocp_connectex_func();
+	ptor->mutx 			= tb_mutex_init(tb_null);
+	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex, fail);
 
 	// init port
-	rtor->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
-	tb_assert_and_check_goto(rtor->port && rtor->port != INVALID_HANDLE_VALUE, fail);
+	ptor->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);
+	tb_assert_and_check_goto(ptor->port && ptor->port != INVALID_HANDLE_VALUE, fail);
 
 	// init pool
-	rtor->pool = tb_rpool_init((aicp->maxn << 1) + 16, sizeof(tb_iocp_olap_t), 0);
-	tb_assert_and_check_goto(rtor->pool, fail);
+	ptor->pool = tb_rpool_init((aicp->maxn << 1) + 16, sizeof(tb_iocp_olap_t), 0);
+	tb_assert_and_check_goto(ptor->pool, fail);
 
 	// ok
-	return (tb_aicp_reactor_t*)rtor;
+	return (tb_aicp_proactor_t*)ptor;
 
 fail:
-	if (rtor) tb_aicp_reactor_iocp_exit(rtor);
+	if (ptor) tb_aicp_proactor_iocp_exit(ptor);
 	return tb_null;
 }
 

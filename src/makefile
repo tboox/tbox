@@ -90,7 +90,7 @@ tbox_C_FILES 			+= \
 						xml/reader \
 						xml/writer \
 						asio/aioo \
-						asio/aipp \
+						asio/aiop \
 						asio/aicp \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
@@ -230,8 +230,8 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_FILE)/directory \
 						platform/$(TB_CONFIG_API_PROCESS)/process \
 						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aioo \
-						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aipp \
-						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aicp
+						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aiop \
+						platform/$(TB_CONFIG_API_ASIO)/asio/proactor/aicp
 
 # flags
 tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" 
@@ -275,7 +275,7 @@ INC_FILES 				= \
 						asio/asio.h \
 						asio/prefix.h \
 						asio/aioo.h \
-						asio/aipp.h \
+						asio/aiop.h \
 						asio/aicp.h \
 						math/prefix.h \
 						math/math.h \

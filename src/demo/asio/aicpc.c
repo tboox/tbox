@@ -196,10 +196,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(context.file, end);
 
 	// addo sock
-	if (!tb_aicp_addo(aicp, context.sock, TB_AIOO_OTYPE_SOCK)) goto end;
+	if (!tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK)) goto end;
 
 	// addo file
-	if (!tb_aicp_addo(aicp, context.file, TB_AIOO_OTYPE_FILE)) goto end;
+	if (!tb_aicp_addo(aicp, context.file, TB_AICO_TYPE_FILE)) goto end;
 
 	// post conn
 	tb_print("conn: ..");

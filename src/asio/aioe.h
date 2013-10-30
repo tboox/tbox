@@ -17,13 +17,34 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aipp.c
+ * @file		aioe.h
+ * @ingroup 	asio
  *
  */
+#ifndef TB_ASIO_AIOE_H
+#define TB_ASIO_AIOE_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../../../../asio/reactor/aicp/aipp.c"
+#include "prefix.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the aioe enum, only for sock
+typedef enum __tb_aioe_e
+{
+ 	TB_AIOE_NONE 	= 0
+, 	TB_AIOE_CONN 	= 1
+, 	TB_AIOE_ACPT 	= 2
+,	TB_AIOE_RECV 	= 4
+,	TB_AIOE_SEND 	= 8
+, 	TB_AIOE_EALL 	= TB_AIOE_RECV | TB_AIOE_SEND | TB_AIOE_ACPT | TB_AIOE_CONN
+
+}tb_aioe_e;
+
+
+#endif

@@ -163,10 +163,10 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file);
 
 			// addo sock
-			if (!tb_aicp_addo(aicp, context->sock, TB_AIOO_OTYPE_SOCK)) break;
+			if (!tb_aicp_addo(aicp, context->sock, TB_AICO_TYPE_SOCK)) break;
 
 			// addo file
-			if (!tb_aicp_addo(aicp, context->file, TB_AIOO_OTYPE_FILE)) break;
+			if (!tb_aicp_addo(aicp, context->file, TB_AICO_TYPE_FILE)) break;
 
 			// post read from file
 			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
@@ -252,7 +252,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// addo sock
-	if (!tb_aicp_addo(aicp, sock, TB_AIOO_OTYPE_SOCK)) goto end;
+	if (!tb_aicp_addo(aicp, sock, TB_AICO_TYPE_SOCK)) goto end;
 
 	// post acpt
 	if (!tb_aicp_acpt(aicp, sock, tb_demo_sock_acpt_func, argv[1])) goto end;

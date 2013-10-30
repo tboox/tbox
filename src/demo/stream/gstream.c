@@ -323,14 +323,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					else if (!real) 
 					{
 						// wait
-						tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, tb_gstream_timeout(ist));
+						tb_long_t e = tb_gstream_wait(ist, TB_GSTREAM_WAIT_READ, tb_gstream_timeout(ist));
 						tb_assert_and_check_break(e >= 0);
 
 						// timeout?
 						tb_assert_and_check_break(e);
 
 						// has read?
-						tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+						tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 					}
 					// end
 					else break;

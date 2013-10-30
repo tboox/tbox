@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../network/url.h"
 #include "../memory/memory.h"
@@ -91,8 +92,18 @@
  * types
  */
 
-/// the gstream type
-typedef enum __tb_gstream_type_t
+/// the gstream wait enum
+typedef enum __tb_gstream_wait_e
+{
+ 	TB_GSTREAM_WAIT_NONE 			= TB_AIOE_NONE
+, 	TB_GSTREAM_WAIT_READ 			= TB_AIOE_RECV
+, 	TB_GSTREAM_WAIT_WRIT 			= TB_AIOE_SEND
+, 	TB_GSTREAM_WAIT_EALL 			= TB_AIOE_EALL
+
+}tb_gstream_wait_e;
+
+/// the gstream enum
+typedef enum __tb_gstream_type_e
 {
  	TB_GSTREAM_TYPE_NONE 			= 0
 , 	TB_GSTREAM_TYPE_FILE 			= 1
@@ -101,17 +112,17 @@ typedef enum __tb_gstream_type_t
 , 	TB_GSTREAM_TYPE_DATA 			= 4
 , 	TB_GSTREAM_TYPE_TRAN 			= 5
 
-}tb_gstream_type_t;
+}tb_gstream_type_e;
 
-/// the tstream type
-typedef enum __tb_tstream_type_t
+/// the tstream enum
+typedef enum __tb_tstream_type_e
 {
  	TB_TSTREAM_TYPE_NONE 			= 0
 , 	TB_TSTREAM_TYPE_CHARSET 		= 1
 , 	TB_TSTREAM_TYPE_ZIP 			= 2
 , 	TB_TSTREAM_TYPE_CHUNKED 		= 3
 
-}tb_tstream_type_t;
+}tb_tstream_type_e;
 
 /// the gstream ctrl enum
 typedef enum __tb_gstream_ctrl_e
@@ -272,8 +283,8 @@ typedef struct __tb_gstream_t
 	/// the ssl func
 	tb_gstream_sfunc_t 	sfunc;
 
-	/// wait the asio event
-	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+	/// wait 
+	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
 
 	/// async open
 	tb_long_t 			(*aopen)(struct __tb_gstream_t* gst);
@@ -460,16 +471,16 @@ tb_gstream_t* 		tb_gstream_init_from_chunked(tb_gstream_t* gst);
 
 /*! wait stream 
  *
- * blocking wait the single event object, so need not aipp 
+ * blocking wait the single event object, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param gst 		the gstream 
- * @param etype 	the waited event type, return the needed event type if TB_AIOO_ETYPE_NONE
+ * @param wait 		the wait type
  * @param timeout 	the timeout value, return immediately if 0, infinity if -1
  *
  * @return 			the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+tb_long_t 			tb_gstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
 
 /*! the stream state
  *

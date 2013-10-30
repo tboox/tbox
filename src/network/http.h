@@ -256,16 +256,16 @@ tb_void_t 				tb_http_exit(tb_handle_t handle);
 
 /*! wait the http 
  *
- * blocking wait the single event object, so need not aipp 
+ * blocking wait the single event object, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
  * @param handle 		the http handle 
- * @param etype 		the waited event type, return the needed event type if TB_AIOO_ETYPE_NONE
+ * @param aioe 			the aioe
  * @param timeout 		the timeout value, return immediately if 0, infinity if -1
  *
  * @return 				the event type, return 0 if timeout, return -1 if error
  */
-tb_long_t 				tb_http_wait(tb_handle_t handle, tb_size_t etype, tb_long_t timeout);
+tb_long_t 				tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout);
 
 /*! async open, allow multiple called before closing 
  *

@@ -421,7 +421,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// wait
 			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_WRIT, tb_null);
+			tb_aioo_seto(&o, handle, TB_AIOE_SEND, tb_null);
 			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
 
 			// fail or timeout?
@@ -447,7 +447,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 
 			// wait
 			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, tb_null);
+			tb_aioo_seto(&o, handle, TB_AIOE_RECV, tb_null);
 			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
 			//tb_trace_impl("wait %d", r);
 
@@ -1446,11 +1446,11 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 
 	// has asio event?
 	tb_aioo_t o;
-	tb_size_t e = TB_AIOO_ETYPE_NONE;
+	tb_size_t e = TB_AIOE_NONE;
 	if (!(look->step & TB_DNS_STEP_NEVT))
 	{
-		if (!(look->step & TB_DNS_STEP_REQT)) e = TB_AIOO_ETYPE_WRIT;
-		else if (!(look->step & TB_DNS_STEP_RESP)) e = TB_AIOO_ETYPE_READ;
+		if (!(look->step & TB_DNS_STEP_REQT)) e = TB_AIOE_SEND;
+		else if (!(look->step & TB_DNS_STEP_RESP)) e = TB_AIOE_RECV;
 	}
 
 	// need wait?
@@ -1458,7 +1458,7 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 	if (e)
 	{
 		// wait
-		tb_aioo_seto(&o, look->sock, TB_AIOO_OTYPE_SOCK, e, tb_null);
+		tb_aioo_seto(&o, look->sock, e, tb_null);
 		r = tb_aioo_wait(&o, timeout);
 
 		// fail or timeout?

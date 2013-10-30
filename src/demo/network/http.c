@@ -153,14 +153,14 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		{
 			// wait
 			tb_print("[demo]: wait");
-			tb_long_t e = tb_http_wait(http, TB_AIOO_ETYPE_READ, option->timeout);
+			tb_long_t e = tb_http_wait(http, TB_AIOE_RECV, option->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+			tb_assert_and_check_break(e & TB_AIOE_RECV);
 		}
 		else break;
 

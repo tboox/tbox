@@ -34,10 +34,10 @@
  */
 
 // the epoll reactor type
-typedef struct __tb_aipp_reactor_epoll_t
+typedef struct __tb_aiop_reactor_epoll_t
 {
 	// the reactor base
-	tb_aipp_reactor_t 		base;
+	tb_aiop_reactor_t 		base;
 
 	// the epoll fd
 	tb_long_t 				epfd;
@@ -46,14 +46,15 @@ typedef struct __tb_aipp_reactor_epoll_t
 	struct epoll_event* 	evts;
 	tb_size_t 				evtn;
 	
-}tb_aipp_reactor_epoll_t;
+}tb_aiop_reactor_epoll_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aipp_reactor_epoll_addo(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype)
+static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe)
 {
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, tb_false);
 
 	// fd
@@ -62,8 +63,8 @@ static tb_bool_t tb_aipp_reactor_epoll_addo(tb_aipp_reactor_t* reactor, tb_handl
 
 	// init 
 	struct epoll_event e = {0};
-	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) e.events |= EPOLLIN;
-	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN) e.events |= EPOLLOUT;
+	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) e.events |= EPOLLIN;
+	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) e.events |= EPOLLOUT;
 	e.events |= EPOLLET;
 	e.data.u64 = (tb_hize_t)handle;
 
@@ -73,9 +74,10 @@ static tb_bool_t tb_aipp_reactor_epoll_addo(tb_aipp_reactor_t* reactor, tb_handl
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aipp_reactor_epoll_seto(tb_aipp_reactor_t* reactor, tb_handle_t handle, tb_size_t etype, tb_aioo_t const* obj)
+static tb_bool_t tb_aiop_reactor_epoll_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe, tb_aioo_t const* obj)
 {
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, tb_false);
 
 	// fd
@@ -84,8 +86,8 @@ static tb_bool_t tb_aipp_reactor_epoll_seto(tb_aipp_reactor_t* reactor, tb_handl
 
 	// init 
 	struct epoll_event e = {0};
-	if (etype & TB_AIOO_ETYPE_READ || etype & TB_AIOO_ETYPE_ACPT) e.events |= EPOLLIN | EPOLLET;
-	if (etype & TB_AIOO_ETYPE_WRIT || etype & TB_AIOO_ETYPE_CONN) e.events |= EPOLLOUT | EPOLLET;
+	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) e.events |= EPOLLIN | EPOLLET;
+	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) e.events |= EPOLLOUT | EPOLLET;
 	e.data.u64 = (tb_hize_t)handle;
 
 	// ctrl
@@ -94,9 +96,10 @@ static tb_bool_t tb_aipp_reactor_epoll_seto(tb_aipp_reactor_t* reactor, tb_handl
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aipp_reactor_epoll_delo(tb_aipp_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0, tb_false);
 
 	// fd
@@ -110,13 +113,14 @@ static tb_bool_t tb_aipp_reactor_epoll_delo(tb_aipp_reactor_t* reactor, tb_handl
 	// ok
 	return tb_true;
 }
-static tb_long_t tb_aipp_reactor_epoll_wait(tb_aipp_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
+static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0 && reactor->aipp && reactor->aipp->hash, -1);
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->epfd >= 0 && reactor->aiop && reactor->aiop->hash, -1);
 
 	// init grow
-	tb_size_t maxn = reactor->aipp->maxn;
+	tb_size_t maxn = reactor->aiop->maxn;
 	tb_size_t grow = tb_align8((maxn >> 3) + 1);
 
 	// init events
@@ -157,33 +161,32 @@ static tb_long_t tb_aipp_reactor_epoll_wait(tb_aipp_reactor_t* reactor, tb_aioo_
 		struct epoll_event* e = rtor->evts + i;
 		tb_aioo_t* 			o = objs + i;
 		tb_handle_t 		h = (tb_handle_t)e->data.u64;
-		tb_aioo_t* 			p = tb_hash_get(reactor->aipp->hash, h);
+		tb_aioo_t* 			p = tb_hash_get(reactor->aiop->hash, h);
 		tb_assert_and_check_return_val(p, -1);
 
 		o->handle = h;
-		o->otype = reactor->aipp->type;
-		o->etype = 0;
-		o->odata = p->odata;
+		o->aioe = 0;
+		o->data = p->data;
 		if (e->events & EPOLLIN) 
 		{
-			o->etype |= TB_AIOO_ETYPE_READ;
-			if (p->etype & TB_AIOO_ETYPE_ACPT) o->etype |= TB_AIOO_ETYPE_ACPT;
+			o->aioe |= TB_AIOE_RECV;
+			if (p->aioe & TB_AIOE_ACPT) o->aioe |= TB_AIOE_ACPT;
 		}
 		if (e->events & EPOLLOUT) 
 		{
-			o->etype |= TB_AIOO_ETYPE_WRIT;
-			if (p->etype & TB_AIOO_ETYPE_CONN) o->etype |= TB_AIOO_ETYPE_CONN;
+			o->aioe |= TB_AIOE_SEND;
+			if (p->aioe & TB_AIOE_CONN) o->aioe |= TB_AIOE_CONN;
 		}
-		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->etype & TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT)) 
-			o->etype |= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT;
+		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->aioe & TB_AIOE_RECV | TB_AIOE_SEND)) 
+			o->aioe |= TB_AIOE_RECV | TB_AIOE_SEND;
 	}
 
 	// ok
 	return evtn;
 }
-static tb_void_t tb_aipp_reactor_epoll_exit(tb_aipp_reactor_t* reactor)
+static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
 {
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	if (rtor)
 	{
 		// free events
@@ -196,9 +199,9 @@ static tb_void_t tb_aipp_reactor_epoll_exit(tb_aipp_reactor_t* reactor)
 		tb_free(rtor);
 	}
 }
-static tb_void_t tb_aipp_reactor_epoll_cler(tb_aipp_reactor_t* reactor)
+static tb_void_t tb_aiop_reactor_epoll_cler(tb_aiop_reactor_t* reactor)
 {
-	tb_aipp_reactor_epoll_t* rtor = (tb_aipp_reactor_epoll_t*)reactor;
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	if (rtor)
 	{
 		// close fd
@@ -206,38 +209,37 @@ static tb_void_t tb_aipp_reactor_epoll_cler(tb_aipp_reactor_t* reactor)
 		rtor->epfd = 0;
 
 		// FIXME: re-init it
-		if (rtor->base.aipp) rtor->epfd = epoll_create(rtor->base.aipp->maxn);
+		if (rtor->base.aiop) rtor->epfd = epoll_create(rtor->base.aiop->maxn);
 		tb_assert(rtor->epfd >= 0);
 	}
 }
-static tb_aipp_reactor_t* tb_aipp_reactor_epoll_init(tb_aipp_t* aipp)
+static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 {
 	// check
-	tb_assert_and_check_return_val(aipp && aipp->maxn, tb_null);
-	tb_assert_and_check_return_val(aipp->type == TB_AIOO_OTYPE_FILE || aipp->type == TB_AIOO_OTYPE_SOCK, tb_null);
+	tb_assert_and_check_return_val(aiop && aiop->maxn, tb_null);
 
 	// alloc reactor
-	tb_aipp_reactor_epoll_t* rtor = tb_malloc0(sizeof(tb_aipp_reactor_epoll_t));
+	tb_aiop_reactor_epoll_t* rtor = tb_malloc0(sizeof(tb_aiop_reactor_epoll_t));
 	tb_assert_and_check_return_val(rtor, tb_null);
 
 	// init base
-	rtor->base.aipp = aipp;
-	rtor->base.exit = tb_aipp_reactor_epoll_exit;
-	rtor->base.cler = tb_aipp_reactor_epoll_cler;
-	rtor->base.addo = tb_aipp_reactor_epoll_addo;
-	rtor->base.seto = tb_aipp_reactor_epoll_seto;
-	rtor->base.delo = tb_aipp_reactor_epoll_delo;
-	rtor->base.wait = tb_aipp_reactor_epoll_wait;
+	rtor->base.aiop = aiop;
+	rtor->base.exit = tb_aiop_reactor_epoll_exit;
+	rtor->base.cler = tb_aiop_reactor_epoll_cler;
+	rtor->base.addo = tb_aiop_reactor_epoll_addo;
+	rtor->base.seto = tb_aiop_reactor_epoll_seto;
+	rtor->base.delo = tb_aiop_reactor_epoll_delo;
+	rtor->base.wait = tb_aiop_reactor_epoll_wait;
 
 	// init epoll
-	rtor->epfd = epoll_create(aipp->maxn);
+	rtor->epfd = epoll_create(aiop->maxn);
 	tb_assert_and_check_goto(rtor->epfd >= 0, fail);
 
 	// ok
-	return (tb_aipp_reactor_t*)rtor;
+	return (tb_aiop_reactor_t*)rtor;
 
 fail:
-	if (rtor) tb_aipp_reactor_epoll_exit(rtor);
+	if (rtor) tb_aiop_reactor_epoll_exit(rtor);
 	return tb_null;
 }
 

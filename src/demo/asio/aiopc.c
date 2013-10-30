@@ -38,7 +38,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// wait
 		tb_aioo_t aioo;
-		tb_aioo_seto(&aioo, sock, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_CONN, tb_null);
+		tb_aioo_seto(&aioo, sock, TB_AIOE_CONN, tb_null);
 		conn = tb_aioo_wait(&aioo, 20000);
 		tb_check_break(conn > 0);
 	}
@@ -49,6 +49,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	else if (!conn) tb_print("conn[%p]: timeout", sock);
 	// failed?
 	else tb_print("conn[%p]: failed", sock);
+	tb_check_goto(conn > 0, end);
 
 	// done sock
 	tb_size_t peak = 0;
@@ -104,18 +105,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					writ += real;
 					wait = tb_false;
 				}
-				else if (!real && !wait)
-				{
-					// wait
-					tb_aioo_t aioo;
-					tb_aioo_seto(&aioo, file, TB_AIOO_OTYPE_FILE, TB_AIOO_ETYPE_WRIT, tb_null);
-					if (tb_aioo_wait(&aioo, -1) <= 0) 
-					{
-						tb_print("writ[%p]: wait: failed", file);
-						break;
-					}
-					wait = tb_true;
-				}
+				else if (!real && !wait) wait = tb_true;
 				else
 				{
 					tb_print("writ[%p]: failed", file);
@@ -129,22 +119,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		{
 			// wait
 			tb_aioo_t aioo;
-			tb_aioo_seto(&aioo, sock, TB_AIOO_OTYPE_SOCK, TB_AIOO_ETYPE_READ, tb_null);
+			tb_aioo_seto(&aioo, sock, TB_AIOE_RECV, tb_null);
 			if (tb_aioo_wait(&aioo, -1) <= 0) 
 			{
 				tb_print("recv[%p]: wait: failed", sock);
 				break;
 			}
-			wait = tb_true;
 		}
-		else if (!real)
+		else
 		{
 			tb_print("recv[%p]: closed", sock);
-			break;
-		}
-		else 
-		{
-			tb_print("recv[%p]: failed", sock);
 			break;
 		}
 	}
