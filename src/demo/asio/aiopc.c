@@ -38,7 +38,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	{
 		// wait
 		tb_aioo_t aioo;
-		tb_aioo_seto(&aioo, sock, TB_AIOE_CONN, tb_null);
+		tb_aioo_seto(&aioo, sock, TB_AIOE_CODE_CONN, tb_null);
 		conn = tb_aioo_wait(&aioo, 20000);
 		tb_check_break(conn > 0);
 	}
@@ -55,6 +55,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_size_t peak = 0;
 	tb_size_t sped = 0;
 	tb_hong_t time = 0;
+	tb_hong_t base = tb_mclock();
 	tb_hize_t size = 0;
 	tb_bool_t wait = tb_false;
 	while (1)
@@ -119,12 +120,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		{
 			// wait
 			tb_aioo_t aioo;
-			tb_aioo_seto(&aioo, sock, TB_AIOE_RECV, tb_null);
+			tb_aioo_seto(&aioo, sock, TB_AIOE_CODE_RECV, tb_null);
 			if (tb_aioo_wait(&aioo, -1) <= 0) 
 			{
 				tb_print("recv[%p]: wait: failed", sock);
 				break;
 			}
+			wait = tb_true;
 		}
 		else
 		{
@@ -132,6 +134,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			break;
 		}
 	}
+	
+	// trace
+	if (sock) tb_print("recv[%p]: size: %llu, sped: %llu KB/s", sock, size, size / (tb_mclock() - base));
 
 end:
 

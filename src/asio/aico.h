@@ -34,12 +34,12 @@
  * types
  */
 
-// the aico type
+/// the aico type
 typedef enum __tb_aico_type_t
 {
  	TB_AICO_TYPE_NONE 	= 0 	//!< for null
 , 	TB_AICO_TYPE_FILE 	= 1 	//!< for file
-,	TB_AICO_TYPE_SOCK 	= 2 	//!< for socket
+,	TB_AICO_TYPE_SOCK 	= 2 	//!< for sock
 
 }tb_aico_type_t;
 

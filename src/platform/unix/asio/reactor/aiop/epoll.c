@@ -63,9 +63,8 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 
 	// init 
 	struct epoll_event e = {0};
-	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) e.events |= EPOLLIN;
-	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) e.events |= EPOLLOUT;
-	e.events |= EPOLLET;
+	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
+	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
 	e.data.u64 = (tb_hize_t)handle;
 
 	// ctrl
@@ -86,8 +85,8 @@ static tb_bool_t tb_aiop_reactor_epoll_seto(tb_aiop_reactor_t* reactor, tb_handl
 
 	// init 
 	struct epoll_event e = {0};
-	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) e.events |= EPOLLIN | EPOLLET;
-	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) e.events |= EPOLLOUT | EPOLLET;
+	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
+	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
 	e.data.u64 = (tb_hize_t)handle;
 
 	// ctrl
@@ -169,16 +168,16 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioo_
 		o->data = p->data;
 		if (e->events & EPOLLIN) 
 		{
-			o->aioe |= TB_AIOE_RECV;
-			if (p->aioe & TB_AIOE_ACPT) o->aioe |= TB_AIOE_ACPT;
+			o->aioe |= TB_AIOE_CODE_RECV;
+			if (p->aioe & TB_AIOE_CODE_ACPT) o->aioe |= TB_AIOE_CODE_ACPT;
 		}
 		if (e->events & EPOLLOUT) 
 		{
-			o->aioe |= TB_AIOE_SEND;
-			if (p->aioe & TB_AIOE_CONN) o->aioe |= TB_AIOE_CONN;
+			o->aioe |= TB_AIOE_CODE_SEND;
+			if (p->aioe & TB_AIOE_CODE_CONN) o->aioe |= TB_AIOE_CODE_CONN;
 		}
-		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->aioe & TB_AIOE_RECV | TB_AIOE_SEND)) 
-			o->aioe |= TB_AIOE_RECV | TB_AIOE_SEND;
+		if (e->events & (EPOLLHUP | EPOLLERR) && !(o->aioe & TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND)) 
+			o->aioe |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 	}
 
 	// ok

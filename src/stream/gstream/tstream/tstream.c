@@ -270,22 +270,22 @@ end:
 	tb_trace_impl("read: %u, left: %lu", read, tst->in);
 	return read;
 }
-tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_tstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
 	// check
 	tb_tstream_t* tst = tb_tstream_cast(gst);
 	tb_assert_and_check_return_val(tst, tb_null);
 
 	// has read
-	if (tst->read > 0) return etype;
+	if (tst->read > 0) return wait;
 	// no read? wait it
 	else if (!tst->read) 
 	{
-		tb_trace_impl("wait: %u, timeout: %d", etype, timeout);
-		return tb_gstream_wait(tst->gst, etype, timeout);
+		tb_trace_impl("wait: %u, timeout: %d", wait, timeout);
+		return tb_gstream_wait(tst->gst, wait, timeout);
 	}
 	// has left input? abort it if read empty next
-	else if (tst->in) return etype;
+	else if (tst->in) return wait;
 	// end
 	else return -1;
 }

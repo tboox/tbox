@@ -876,12 +876,12 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 	tb_assert_and_check_return_val(http && http->stream, -1);
 	
 	// wait event
-	tb_size_t e = TB_AIOE_NONE;
+	tb_size_t e = TB_AIOE_CODE_NONE;
 	if (!(http->step & TB_HTTP_STEP_NEVT))
 	{
-		if (!(http->step & TB_HTTP_STEP_CONN)) e = TB_AIOE_CONN;
-		else if (!(http->step & TB_HTTP_STEP_REQT)) e = TB_AIOE_SEND;
-		else if (!(http->step & TB_HTTP_STEP_RESP)) e = TB_AIOE_RECV;
+		if (!(http->step & TB_HTTP_STEP_CONN)) e = TB_AIOE_CODE_CONN;
+		else if (!(http->step & TB_HTTP_STEP_REQT)) e = TB_AIOE_CODE_SEND;
+		else if (!(http->step & TB_HTTP_STEP_RESP)) e = TB_AIOE_CODE_RECV;
 		else e = aioe;
 	}
 		
@@ -964,7 +964,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	while (!(r = tb_http_aopen(handle)))
 	{
 		// wait
-		r = tb_http_wait(handle, TB_AIOE_EALL, http->option.timeout);
+		r = tb_http_wait(handle, TB_AIOE_CODE_EALL, http->option.timeout);
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -1096,7 +1096,7 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 	while (!(r = tb_http_aseek(handle, offset)))
 	{
 		// wait
-		r = tb_http_wait(handle, TB_AIOE_EALL, http->option.timeout);
+		r = tb_http_wait(handle, TB_AIOE_CODE_EALL, http->option.timeout);
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -1171,14 +1171,14 @@ tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		else if (!n)
 		{
 			// wait
-			tb_long_t e = tb_http_wait(handle, TB_AIOE_SEND, http->option.timeout);
+			tb_long_t e = tb_http_wait(handle, TB_AIOE_CODE_SEND, http->option.timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOE_SEND);
+			tb_assert_and_check_break(e & TB_AIOE_CODE_SEND);
 		}
 		else break;
 	}
@@ -1204,14 +1204,14 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		else if (!real)
 		{
 			// wait
-			tb_long_t e = tb_http_wait(handle, TB_AIOE_RECV, http->option.timeout);
+			tb_long_t e = tb_http_wait(handle, TB_AIOE_CODE_RECV, http->option.timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOE_RECV);
+			tb_assert_and_check_break(e & TB_AIOE_CODE_RECV);
 		}
 		else break;
 	}
@@ -1273,14 +1273,14 @@ tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(http->stream, TB_AIOE_SEND, http->option.timeout);
+				tb_long_t e = tb_gstream_wait(http->stream, TB_AIOE_CODE_SEND, http->option.timeout);
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
 				tb_check_break(e);
 
 				// has writ?
-				tb_assert_and_check_break(e & TB_AIOE_SEND);
+				tb_assert_and_check_break(e & TB_AIOE_CODE_SEND);
 			}
 			else break;
 		}
@@ -1294,14 +1294,14 @@ tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		while (!tb_gstream_afwrit(http->stream, tb_null, 0))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(http->stream, TB_AIOE_SEND, http->option.timeout);
+			tb_long_t e = tb_gstream_wait(http->stream, TB_AIOE_CODE_SEND, http->option.timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has writ?
-			tb_assert_and_check_break(e & TB_AIOE_SEND);
+			tb_assert_and_check_break(e & TB_AIOE_CODE_SEND);
 		}
 	}
 

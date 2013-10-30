@@ -50,7 +50,7 @@ typedef struct __tb_aicp_proactor_t
 	tb_void_t 				(*exit)(struct __tb_aicp_proactor_t* proactor);
 
 	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t otype);
+	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type);
 
 	/// delo
 	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle);

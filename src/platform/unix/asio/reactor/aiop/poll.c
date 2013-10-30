@@ -55,8 +55,8 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle
 	// init pfd
 	struct pollfd pfd = {0};
 	pfd.fd = fd;
-	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) pfd.events |= POLLIN;
-	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) pfd.events |= POLLOUT;
+	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
+	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
 	// add pfd
 	tb_vector_insert_tail(rtor->pfds, &pfd);
@@ -82,8 +82,8 @@ static tb_bool_t tb_aiop_reactor_poll_seto(tb_aiop_reactor_t* reactor, tb_handle
 		if (pfd && pfd->fd == fd)
 		{
 			pfd->events = 0;
-			if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) pfd->events |= POLLIN;
-			if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) pfd->events |= POLLOUT;
+			if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
+			if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd->events |= POLLOUT;
 			break;
 		}
 	}
@@ -147,16 +147,16 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t
 		tb_long_t e = 0;
 		if (p->revents & POLLIN)
 		{
-			e |= TB_AIOE_RECV;
-			if (o->aioe & TB_AIOE_ACPT) e |= TB_AIOE_ACPT;
+			e |= TB_AIOE_CODE_RECV;
+			if (o->aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
 		}
 		if (p->revents & POLLOUT) 
 		{
-			e |= TB_AIOE_SEND;
-			if (o->aioe & TB_AIOE_CONN) e |= TB_AIOE_CONN;
+			e |= TB_AIOE_CODE_SEND;
+			if (o->aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
 		}
-		if ((p->revents & POLLHUP) && !(e & (TB_AIOE_RECV | TB_AIOE_SEND))) 
-			e |= TB_AIOE_RECV | TB_AIOE_SEND;
+		if ((p->revents & POLLHUP) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+			e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 
 		// add object
 		if (e) objs[n++] = *o;

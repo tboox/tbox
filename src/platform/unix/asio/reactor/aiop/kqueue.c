@@ -89,12 +89,12 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_hand
 	// add event
 	struct kevent 	e[2];
 	tb_size_t 		n = 0;
-	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) 
+	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) 
 	{
 		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
-	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN)
+	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN)
 	{
 		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
@@ -119,22 +119,22 @@ static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_hand
 	// add event
 	struct kevent 	e[2];
 	tb_size_t 		n = 0;
-	if (adde & TB_AIOE_RECV || adde & TB_AIOE_ACPT) 
+	if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
 	{
 		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
-	else if (dele & TB_AIOE_RECV || dele & TB_AIOE_ACPT) 
+	else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
 	{
 		EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, handle);
 		n++;
 	}
-	if (adde & TB_AIOE_SEND || adde & TB_AIOE_CONN)
+	if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
 	{
 		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
-	else if (dele & TB_AIOE_SEND || dele & TB_AIOE_CONN)
+	else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
 	{
 		EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, handle);
 		n++;
@@ -218,21 +218,20 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 		tb_assert_and_check_return_val(p, -1);
 
 		o->handle = (tb_handle_t)e->udata;
-		o->otype = reactor->aiop->type;
 		o->aioe = 0;
-		o->odata = p->odata;
+		o->data = p->data;
 		if (e->filter == EVFILT_READ) 
 		{
-			o->aioe |= TB_AIOE_RECV;
-			if (p->aioe & TB_AIOE_ACPT) o->aioe |= TB_AIOE_ACPT;
+			o->aioe |= TB_AIOE_CODE_RECV;
+			if (p->aioe & TB_AIOE_CODE_ACPT) o->aioe |= TB_AIOE_CODE_ACPT;
 		}
 		if (e->filter == EVFILT_WRITE) 
 		{
-			o->aioe |= TB_AIOE_SEND;
-			if (p->aioe & TB_AIOE_CONN) o->aioe |= TB_AIOE_CONN;
+			o->aioe |= TB_AIOE_CODE_SEND;
+			if (p->aioe & TB_AIOE_CODE_CONN) o->aioe |= TB_AIOE_CODE_CONN;
 		}
-		if (e->flags & EV_ERROR && !(o->aioe & TB_AIOE_RECV | TB_AIOE_SEND)) 
-			o->aioe |= TB_AIOE_RECV | TB_AIOE_SEND;
+		if (e->flags & EV_ERROR && !(o->aioe & TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND)) 
+			o->aioe |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 	}
 
 	// ok

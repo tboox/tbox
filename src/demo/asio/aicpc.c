@@ -26,6 +26,9 @@ typedef struct __tb_demo_context_t
 	// the time
 	tb_hong_t 			time;
 
+	// the base
+	tb_hong_t 			base;
+
 	// the peak
 	tb_size_t 			peak;
 
@@ -107,6 +110,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			if (!context->time) 
 			{
 				context->time = tb_mclock();
+				context->base = tb_mclock();
 				context->sped = context->peak;
 			}
 			else if (tb_mclock() > context->time + 1000)
@@ -207,7 +211,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// loop aicp
 	tb_aicp_loop(aicp, -1);
-	
+		
+	// trace
+	tb_print("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
+
 end:
 
 	// trace

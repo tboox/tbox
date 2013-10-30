@@ -34,17 +34,17 @@
  * types
  */
 
-// the aioe enum, only for sock
-typedef enum __tb_aioe_e
+/// the aioe code enum, only for sock
+typedef enum __tb_aioe_code_e
 {
- 	TB_AIOE_NONE 	= 0
-, 	TB_AIOE_CONN 	= 1
-, 	TB_AIOE_ACPT 	= 2
-,	TB_AIOE_RECV 	= 4
-,	TB_AIOE_SEND 	= 8
-, 	TB_AIOE_EALL 	= TB_AIOE_RECV | TB_AIOE_SEND | TB_AIOE_ACPT | TB_AIOE_CONN
+ 	TB_AIOE_CODE_NONE 	= 0
+, 	TB_AIOE_CODE_CONN 	= 1
+, 	TB_AIOE_CODE_ACPT 	= 2
+,	TB_AIOE_CODE_RECV 	= 4
+,	TB_AIOE_CODE_SEND 	= 8
+, 	TB_AIOE_CODE_EALL 	= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND | TB_AIOE_CODE_ACPT | TB_AIOE_CODE_CONN
 
-}tb_aioe_e;
+}tb_aioe_code_e;
 
 
 #endif
