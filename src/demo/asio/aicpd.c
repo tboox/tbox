@@ -24,6 +24,9 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
+	// the data
+	tb_byte_t* 			data;
+
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -43,6 +46,7 @@ static tb_void_t tb_demo_context_exit(tb_aicp_t* aicp, tb_demo_context_t* contex
 			tb_aicp_delo(aicp, context->sock);
 			tb_socket_close(context->sock);
 		}
+		if (context->data) tb_free(context->data);
 		tb_free(context);
 	}
 }
@@ -72,7 +76,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -115,7 +119,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else 
 		{	
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
+			if (!tb_aicp_read(aicp, context->file, context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -160,7 +164,8 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			// init context
 			context->sock = aice->u.acpt.sock;
 			context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_AICP);
-			tb_assert_and_check_break(context->file);
+			context->data = tb_malloc(TB_DEMO_FILE_READ_MAXN);
+			tb_assert_and_check_break(context->file && context->data);
 
 			// addo sock
 			if (!tb_aicp_addo(aicp, context->sock, TB_AICO_TYPE_SOCK)) break;
@@ -169,7 +174,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			if (!tb_aicp_addo(aicp, context->file, TB_AICO_TYPE_FILE)) break;
 
 			// post read from file
-			if (!tb_aicp_read(aicp, context->file, context->size, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
+			if (!tb_aicp_read(aicp, context->file, context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
 
 			// ok
 			ok = tb_true;

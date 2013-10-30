@@ -40,102 +40,6 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_pointer_t tb_aicp_pool_malloc(tb_aicp_t* aicp, tb_size_t size)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->pool && size, tb_null);
-
-	// enter 
-	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
-
-	// make data
-	tb_pointer_t data = tb_spool_malloc(aicp->pool, size);
-
-	// leave 
-	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
-	
-	// ok?
-	return data;
-}
-static tb_pointer_t tb_aicp_pool_memdup(tb_aicp_t* aicp, tb_cpointer_t data, tb_size_t size)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->pool && data && size, tb_null);
-
-	// enter 
-	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
-
-	// make copy
-	tb_pointer_t copy = tb_spool_malloc(aicp->pool, size);
-	if (copy) tb_memcpy(copy, data, size);
-
-	// leave 
-	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
-	
-	// ok?
-	return copy;
-}
-static tb_char_t* tb_aicp_pool_strdup(tb_aicp_t* aicp, tb_char_t const* data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->pool && data, tb_null);
-
-	// enter 
-	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
-
-	// make copy
-	tb_char_t* copy = tb_spool_strdup(aicp->pool, data);
-
-	// leave 
-	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
-	
-	// ok?
-	return copy;
-}
-static tb_void_t tb_aicp_pool_free(tb_aicp_t* aicp, tb_cpointer_t data)
-{
-	// check
-	tb_assert_and_check_return(aicp && aicp->pool);
-
-	// enter 
-	if (aicp->mutx.pool) tb_mutex_enter(aicp->mutx.pool);
-
-	// free data
-	if (data) tb_spool_free(aicp->pool, data);
-
-	// leave 
-	if (aicp->mutx.pool) tb_mutex_leave(aicp->mutx.pool);
-}
-static tb_void_t tb_aicp_aice_exit(tb_aicp_t* aicp, tb_aice_t* aice)
-{
-	// check
-	tb_assert_and_check_return(aicp && aice);
-
-	// null?
-	tb_check_return(aice->code);
-
-	// done
-	switch (aice->code)
-	{
-	case TB_AICE_CODE_RECV:
-		if (aice->u.recv.data) tb_aicp_pool_free(aicp, aice->u.recv.data);
-		break;
-	case TB_AICE_CODE_SEND:
-		if (aice->u.send.data) tb_aicp_pool_free(aicp, aice->u.send.data);
-		break;
-	case TB_AICE_CODE_READ:
-		if (aice->u.read.data) tb_aicp_pool_free(aicp, aice->u.read.data);
-		break;
-	case TB_AICE_CODE_WRIT:
-		if (aice->u.writ.data) tb_aicp_pool_free(aicp, aice->u.writ.data);
-		break;
-	case TB_AICE_CODE_CONN:
-		if (aice->u.conn.host) tb_aicp_pool_free(aicp, aice->u.conn.host);
-		break;
-	default:
-		break;
-	}
-}
 static tb_bool_t tb_aicp_aice_post(tb_aicp_t* aicp, tb_aice_t* aice)
 {
 	// check
@@ -154,9 +58,6 @@ static tb_bool_t tb_aicp_aice_post(tb_aicp_t* aicp, tb_aice_t* aice)
 			tb_aicp_kill(aicp);
 		}
 	}
-
-	// exit aice
-	if (ok > 0 || ok < 0) tb_aicp_aice_exit(aicp, aice);
 
 	// ok?
 	return (ok >= 0)? tb_true : tb_false;
@@ -177,14 +78,6 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	// init aicp
 	aicp->maxn = maxn;
 	aicp->kill = 0;
-
-	// init mutx
-	aicp->mutx.pool = tb_mutex_init(tb_null);
-	tb_assert_and_check_goto(aicp->mutx.pool, fail);
-
-	// init pool
-	aicp->pool = tb_spool_init((tb_isqrti(maxn) + 1) * TB_SPOOL_GROW_SMALL, 0);
-	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// init proactor
 	aicp->ptor = tb_aicp_proactor_init(aicp);
@@ -215,18 +108,6 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			aicp->ptor->exit(aicp->ptor);
 			aicp->ptor = tb_null;
 		}
-
-		// exit pool
-		if (aicp->mutx.pool) 
-		{
-			tb_mutex_enter(aicp->mutx.pool);
-			if (aicp->pool) tb_spool_exit(aicp->pool); aicp->pool = tb_null;
-			tb_mutex_leave(aicp->mutx.pool);
-		}
-
-		// exit mutx
-		if (aicp->mutx.pool) tb_mutex_exit(aicp->mutx.pool);
-		aicp->mutx.pool = tb_null;
 
 		// free aicp
 		tb_free(aicp);
@@ -276,17 +157,16 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* hos
 	aice.data 			= aicb_data;
 	aice.type 			= TB_AICO_TYPE_SOCK;
 	aice.handle 		= handle;
-	aice.u.conn.host 	= tb_aicp_pool_strdup(aicp, host);
+	aice.u.conn.host 	= host;
 	aice.u.conn.port 	= port;
-	tb_assert_and_check_return_val(aice.u.conn.host, tb_false);
 
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && size, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
@@ -296,9 +176,8 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_s
 	aice.type 			= TB_AICO_TYPE_FILE;
 	aice.handle 		= handle;
 	aice.u.read.seek 	= seek;
-	aice.u.read.data 	= tb_aicp_pool_malloc(aicp, size);
+	aice.u.read.data 	= data;
 	aice.u.read.size 	= size;
-	tb_assert_and_check_return_val(aice.u.read.data, tb_false);
 
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
@@ -316,17 +195,16 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_b
 	aice.type 			= TB_AICO_TYPE_FILE;
 	aice.handle 		= handle;
 	aice.u.writ.seek 	= seek;
-	aice.u.writ.data 	= tb_aicp_pool_memdup(aicp, data, size);
+	aice.u.writ.data 	= data;
 	aice.u.writ.size 	= size;
-	tb_assert_and_check_return_val(aice.u.writ.data, tb_false);
 
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
 }
-tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && size, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
@@ -335,9 +213,8 @@ tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t size, tb_a
 	aice.data 			= aicb_data;
 	aice.type 			= TB_AICO_TYPE_SOCK;
 	aice.handle 		= handle;
-	aice.u.recv.data 	= tb_aicp_pool_malloc(aicp, size);
+	aice.u.recv.data 	= data;
 	aice.u.recv.size 	= size;
-	tb_assert_and_check_return_val(aice.u.recv.data, tb_false);
 
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
@@ -354,9 +231,8 @@ tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t const* dat
 	aice.data 			= aicb_data;
 	aice.type 			= TB_AICO_TYPE_SOCK;
 	aice.handle 		= handle;
-	aice.u.send.data 	= tb_aicp_pool_memdup(aicp, data, size);
+	aice.u.send.data 	= data;
 	aice.u.send.size 	= size;
-	tb_assert_and_check_return_val(aice.u.send.data, tb_false);
 
 	// post
 	return tb_aicp_aice_post(aicp, &aice);
@@ -380,20 +256,13 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 		if (ok < 0) tb_aicp_kill(aicp);
 
 		// killed? break it
-		if (tb_atomic_get(&aicp->kill))
-		{
-			tb_aicp_aice_exit(aicp, &resp);
-			break;
-		}
+		tb_check_break(!tb_atomic_get(&aicp->kill));
 		
 		// timeout?
 		tb_check_continue(ok);
 
 		// done aicb
 		if (resp.aicb && !resp.aicb(aicp, &resp)) break;
-
-		// exit resp
-		tb_aicp_aice_exit(aicp, &resp);
 	}
 
 	// worker--
