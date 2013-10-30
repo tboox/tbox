@@ -91,12 +91,12 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_size_t 		n = 0;
 	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) 
 	{
-		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
+		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN)
 	{
-		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 
@@ -121,7 +121,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_hand
 	tb_size_t 		n = 0;
 	if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
 	{
-		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
+		EV_SET(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 	else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
@@ -131,7 +131,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_hand
 	}
 	if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
 	{
-		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, NOTE_EOF, 0, handle);
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, 0, handle);
 		n++;
 	}
 	else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
