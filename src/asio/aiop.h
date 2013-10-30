@@ -63,9 +63,9 @@ typedef struct __tb_aiop_reactor_t
 
 }tb_aiop_reactor_t;
 
-/*! the asio pool pool type
+/*! the asio pool pool type 
  *
- * @note only for sock
+ * @note only for sock and using level triggered mode default
  *
  * <pre>
  * objs: |-----|------|------|--- ... ...---|-------|

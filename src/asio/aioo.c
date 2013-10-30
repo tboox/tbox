@@ -47,7 +47,7 @@ tb_void_t tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t aioe, tb_p
 tb_size_t tb_aioo_gete(tb_aioo_t* aioo)
 {
 	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_NONE);
+	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
 	return aioo->aioe;
 }
 tb_void_t tb_aioo_sete(tb_aioo_t* aioo, tb_size_t aioe)
@@ -59,7 +59,7 @@ tb_void_t tb_aioo_sete(tb_aioo_t* aioo, tb_size_t aioe)
 tb_size_t tb_aioo_adde(tb_aioo_t* aioo, tb_size_t aioe)
 {
 	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_NONE);
+	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
 
 	aioo->aioe |= aioe;
 	return aioo->aioe;
@@ -67,7 +67,7 @@ tb_size_t tb_aioo_adde(tb_aioo_t* aioo, tb_size_t aioe)
 tb_size_t tb_aioo_dele(tb_aioo_t* aioo, tb_size_t aioe)
 {
 	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_NONE);
+	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
 
 	aioo->aioe &= ~aioe;
 	return aioo->aioe;

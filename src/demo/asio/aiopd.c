@@ -78,7 +78,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_listen(sock)) goto end;
 
 	// add sock
-	if (!tb_aiop_addo(aiop, sock, TB_AIOE_ACPT, tb_null)) goto end;
+	if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
 
 	// accept
 	tb_aioo_t objs[16];
@@ -96,7 +96,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_assert_and_check_break(objs[i].handle);
 
 			// acpt?
-			if (objs[i].aioe & TB_AIOE_ACPT)
+			if (objs[i].aioe & TB_AIOE_CODE_ACPT)
 			{
 				// done acpt
 				tb_bool_t 			ok = tb_false;
@@ -120,7 +120,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context->data);
 
 					// addo sock
-					if (!tb_aiop_addo(aiop, context->sock, TB_AIOE_SEND, context)) break;
+					if (!tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
 
 					// trace
 					tb_print("acpt[%p]: ok", context->sock);
@@ -140,7 +140,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 					// done send
 					context->send = real;
-					real = tb_socket_send(context->sock, context->data, context->send);
+					real = tb_socket_send(context->sock, context->data + context->real, context->send - context->real);
 					if (real >= 0)
 					{
 						// save real
@@ -170,7 +170,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				}
 			}
 			// writ?
-			else if (objs[i].aioe & TB_AIOE_SEND)
+			else if (objs[i].aioe & TB_AIOE_CODE_SEND)
 			{
 				// the context
 				tb_demo_context_t* context = (tb_demo_context_t*)objs[i].data;

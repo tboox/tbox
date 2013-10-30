@@ -50,14 +50,14 @@ typedef struct __tb_aicp_proactor_aiop_t
  * implementation
  */
 #if 0
-static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t otype)
+static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->aiop && proactor->aicp, tb_false);
 
 	// addo
-	return tb_aiop_addo(ptor->aiop, aico->aioo.handle, aico->aioo.otype, aico);
+	return tb_aiop_addo(ptor->aiop, aico->aioo.handle, aico->aioo.type, aico);
 }
 static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
 {

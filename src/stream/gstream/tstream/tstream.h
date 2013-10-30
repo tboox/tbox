@@ -86,7 +86,7 @@ tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
 tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 // wait
-tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout);
+tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
 
 // ctrl
 tb_bool_t 		tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);

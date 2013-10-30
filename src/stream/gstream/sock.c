@@ -300,7 +300,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_RECV)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_CODE_RECV)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;
@@ -321,7 +321,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_RECV)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_CODE_RECV)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;
@@ -361,7 +361,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_SEND)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_CODE_SEND)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;

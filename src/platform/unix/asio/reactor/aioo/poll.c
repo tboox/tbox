@@ -42,8 +42,8 @@ static tb_long_t tb_aioo_reactor_poll_wait(tb_aioo_t* aioo, tb_long_t timeout)
 	// init
 	struct pollfd pfd = {0};
 	pfd.fd = fd;
-	if (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT) pfd.events |= POLLIN;
-	if (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN) pfd.events |= POLLOUT;
+	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
+	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
 	// poll
 	tb_long_t r = poll(&pfd, 1, timeout);
@@ -62,16 +62,16 @@ static tb_long_t tb_aioo_reactor_poll_wait(tb_aioo_t* aioo, tb_long_t timeout)
 	tb_long_t e = 0;
 	if (pfd.revents & POLLIN) 
 	{
-		e |= TB_AIOE_RECV;
-		if (aioe & TB_AIOE_ACPT) e |= TB_AIOE_ACPT;
+		e |= TB_AIOE_CODE_RECV;
+		if (aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
 	}
 	if (pfd.revents & POLLOUT) 
 	{
-		e |= TB_AIOE_SEND;
-		if (aioe & TB_AIOE_CONN) e |= TB_AIOE_CONN;
+		e |= TB_AIOE_CODE_SEND;
+		if (aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
 	}
-	if ((pfd.revents & POLLHUP) && !(e & (TB_AIOE_RECV | TB_AIOE_SEND))) 
-		e |= TB_AIOE_RECV | TB_AIOE_SEND;
+	if ((pfd.revents & POLLHUP) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+		e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 	return e;
 }
 

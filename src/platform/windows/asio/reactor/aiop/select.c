@@ -62,8 +62,8 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	if (fd > rtor->sfdm) rtor->sfdm = fd;
 	
 	// init fds
-	fd_set* prfds = (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT)? &rtor->rfdi : tb_null;
-	fd_set* pwfds = (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN)? &rtor->wfdi : tb_null;
+	fd_set* prfds = (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT)? &rtor->rfdi : tb_null;
+	fd_set* pwfds = (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN)? &rtor->wfdi : tb_null;
 	if (prfds) FD_SET(fd, prfds);
 	if (pwfds) FD_SET(fd, pwfds);
 	FD_SET(fd, &rtor->efdi);
@@ -81,8 +81,8 @@ static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_hand
 	tb_assert_and_check_return_val(fd >= 0, tb_false);
 
 	// set fds
-	fd_set* prfds = (aioe & TB_AIOE_RECV || aioe & TB_AIOE_ACPT)? &rtor->rfdi : tb_null;
-	fd_set* pwfds = (aioe & TB_AIOE_SEND || aioe & TB_AIOE_CONN)? &rtor->wfdi : tb_null;
+	fd_set* prfds = (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT)? &rtor->rfdi : tb_null;
+	fd_set* pwfds = (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN)? &rtor->wfdi : tb_null;
 	if (prfds) FD_SET(fd, prfds); else FD_CLR(fd, prfds);
 	if (pwfds) FD_SET(fd, pwfds); else FD_CLR(fd, pwfds);
 	if (prfds || pwfds) FD_SET(fd, &rtor->efdi); else FD_CLR(fd, &rtor->efdi);
@@ -148,16 +148,16 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 				tb_long_t e = 0;
 				if (FD_ISSET(fd, &rtor->rfdo)) 
 				{
-					e |= TB_AIOE_RECV;
-					if (o->aioe & TB_AIOE_ACPT) e |= TB_AIOE_ACPT;
+					e |= TB_AIOE_CODE_RECV;
+					if (o->aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
 				}
 				if (FD_ISSET(fd, &rtor->wfdo)) 
 				{
-					e |= TB_AIOE_SEND;
-					if (o->aioe & TB_AIOE_CONN) e |= TB_AIOE_CONN;
+					e |= TB_AIOE_CODE_SEND;
+					if (o->aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
 				}
-				if (FD_ISSET(fd, &rtor->efdo) && !(e & (TB_AIOE_RECV | TB_AIOE_SEND))) 
-					e |= TB_AIOE_RECV | TB_AIOE_SEND;
+				if (FD_ISSET(fd, &rtor->efdo) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+					e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 					
 				// add object
 				if (e) objs[n++] = *o;
