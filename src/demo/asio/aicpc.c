@@ -35,6 +35,9 @@ typedef struct __tb_demo_context_t
 	// the sped
 	tb_size_t 			sped;
 
+	// the data
+	tb_byte_t* 			data;
+
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -66,7 +69,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -127,7 +130,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		else
 		{	
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->sock, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
@@ -158,7 +161,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		tb_print("conn[%p]: ok", aice->handle);
 
 		// post recv from server
-		if (!tb_aicp_recv(aicp, aice->handle, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+		if (!tb_aicp_recv(aicp, aice->handle, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 	}
 	// failed?
 	else
@@ -199,6 +202,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	context.file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_AICP);
 	tb_assert_and_check_goto(context.file, end);
 
+	// init data
+	context.data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
+	tb_assert_and_check_goto(context.data, end);
+
 	// addo sock
 	if (!tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK)) goto end;
 
@@ -228,6 +235,9 @@ end:
 
 	// exit file
 	if (context.file) tb_file_exit(context.file);
+
+	// exit data
+	if (context.data) tb_free(context.data);
 
 	// exit tbox
 	tb_exit();

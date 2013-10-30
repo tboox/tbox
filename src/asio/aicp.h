@@ -63,14 +63,6 @@ typedef struct __tb_aicp_proactor_t
 
 }tb_aicp_proactor_t;
 
-/// the aicp mutex type
-typedef struct __tb_aicp_mutx_t
-{
-	/// the pool mutx
-	tb_handle_t 			pool;
-
-}tb_aicp_mutx_t;
-
 /*! the aico pool type
  *
  * <pre>
@@ -156,12 +148,6 @@ typedef struct __tb_aicp_t
 	/// is killed?
 	tb_size_t 				kill;
 
-	/// the aicp mutx
-	tb_aicp_mutx_t 			mutx;
-
-	/// the data pool
-	tb_handle_t 			pool;
-
 	/// the proactor
 	tb_aicp_proactor_t* 	ptor;
 
@@ -234,13 +220,14 @@ tb_bool_t 			tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* 
  * @param aicp 		the aicp
  * @param handle 	the handle
  * @param seek 		the seek
+ * @param data 		the data
  * @param size 		the size
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! post the writ event for file
  *
@@ -260,13 +247,14 @@ tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, t
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
+ * @param data 		the data
  * @param size 		the size
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! post the send event for sock
  *
