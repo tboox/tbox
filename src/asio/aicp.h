@@ -21,189 +21,47 @@
  * @ingroup 	asio
  *
  */
-#ifndef TB_ASIO_CALL_POOL_H
-#define TB_ASIO_CALL_POOL_H
+#ifndef TB_ASIO_AICP_H
+#define TB_ASIO_AICP_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "aioo.h"
+#include "aice.h"
+#include "aico.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-struct __tb_aice_t;
 struct __tb_aicp_t;
-/// the callback type
-typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aice_t const* aice);
-
-/// the aice code enum
-typedef enum __tb_aice_code_e
-{
- 	TB_AICE_CODE_NULL 		= 0 	//!< for null
-, 	TB_AICE_CODE_ACPT 		= 1 	//!< for sock
-, 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
-,	TB_AICE_CODE_RECV 		= 3		//!< for sock
-,	TB_AICE_CODE_SEND 		= 4		//!< for sock
-,	TB_AICE_CODE_READ 		= 5		//!< for file
-,	TB_AICE_CODE_WRIT 		= 6		//!< for file
-
-}tb_aice_code_e;
-
-/// the aice state code enum
-typedef enum __tb_aice_state_e
-{
- 	TB_AICE_STATE_OK 					= 0
-, 	TB_AICE_STATE_FAILED 				= 1
-,	TB_AICE_STATE_CLOSED 				= 2
-
-}tb_aice_state_e;
-
-/// the acpt aice type
-typedef struct __tb_aice_acpt_t
-{
-	/// the client socket 
-	tb_handle_t 			sock;
-
-}tb_aice_acpt_t;
-
-/// the conn aice type
-typedef struct __tb_aice_conn_t
-{
-	/// the port
-	tb_size_t 				port;
-
-	/// the host, @note: reference only
-	tb_char_t const* 		host;
-
-}tb_aice_conn_t;
-
-/// the read aice type
-typedef struct __tb_aice_read_t
-{
-	/// the read data
-	tb_byte_t* 				data;
-
-	/// the data size
-	tb_size_t 				size;
-
-	/// the data real
-	tb_size_t 				real;
-
-	/// the file seek
-	tb_hize_t 				seek;
-
-}tb_aice_read_t;
-
-/// the writ aice type
-typedef struct __tb_aice_writ_t
-{
-	/// the writ data
-	tb_byte_t* 				data;
-
-	/// the data size
-	tb_size_t 				size;
-
-	/// the data real
-	tb_size_t 				real;
-
-	/// the file seek
-	tb_hize_t 				seek;
-
-}tb_aice_writ_t;
-
-/// the recv aice type
-typedef struct __tb_aice_recv_t
-{
-	/// the recv data
-	tb_byte_t* 				data;
-
-	/// the data size
-	tb_size_t 				size;
-
-	/// the data real
-	tb_size_t 				real;
-
-}tb_aice_recv_t;
-
-/// the send aice type
-typedef struct __tb_aice_send_t
-{
-	/// the send data
-	tb_byte_t* 				data;
-
-	/// the data size
-	tb_size_t 				size;
-
-	/// the data real
-	tb_size_t 				real;
-
-}tb_aice_send_t;
-
-/// the aice type
-typedef struct __tb_aice_t
-{
-	/// the code
-	tb_size_t 				code 	: 8;
-
-	/// the state
-	tb_size_t 				state 	: 8;
-
-	/// the otype
-	tb_size_t 				otype 	: 8;
-
-	/// the handle
-	tb_handle_t 			handle;
-
-	/// the aicb
-	tb_aicb_t 				aicb;
-
-	/// the data
-	tb_cpointer_t 			data;
-
-	/// the uion
-	union
-	{
-		tb_aice_acpt_t 		acpt;
-		tb_aice_conn_t 		conn;
-		tb_aice_read_t 		read;
-		tb_aice_writ_t 		writ;
-		tb_aice_recv_t 		recv;
-		tb_aice_send_t 		send;
-
-	} u;
-
-}tb_aice_t;
-
-struct __tb_aicp_t;
-/// the aico pool reactor type
-typedef struct __tb_aicp_reactor_t
+/// the aico pool proactor type
+typedef struct __tb_aicp_proactor_t
 {
 	/// aicp
 	struct __tb_aicp_t* 	aicp;
 
 	/// kill
-	tb_void_t 				(*kill)(struct __tb_aicp_reactor_t* reactor);
+	tb_void_t 				(*kill)(struct __tb_aicp_proactor_t* proactor);
 
 	/// exit
-	tb_void_t 				(*exit)(struct __tb_aicp_reactor_t* reactor);
+	tb_void_t 				(*exit)(struct __tb_aicp_proactor_t* proactor);
 
 	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle, tb_size_t otype);
+	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t otype);
 
 	/// delo
-	tb_bool_t 				(*delo)(struct __tb_aicp_reactor_t* reactor, tb_handle_t handle);
+	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle);
 
 	/// post
-	tb_long_t 				(*post)(struct __tb_aicp_reactor_t* reactor, tb_aice_t* reqt);
+	tb_long_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* reqt);
 
 	/// spak
-	tb_long_t 				(*spak)(struct __tb_aicp_reactor_t* reactor, tb_aice_t* resp, tb_long_t timeout);
+	tb_long_t 				(*spak)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout);
 
-}tb_aicp_reactor_t;
+}tb_aicp_proactor_t;
 
 /// the aicp mutex type
 typedef struct __tb_aicp_mutx_t
@@ -234,7 +92,7 @@ typedef struct __tb_aicp_mutx_t
  *                             |                                                          |
  *                             |------------------------------------------                |
  *                             |                                  |       |               |
- * aipp: |------|-------|-------|-------|---- ... --|-----|    |-----|    |               |
+ * aiop: |------|-------|-------|-------|---- ... --|-----|    |-----|    |               |
  * aico: | aico0  aico1   aico2   aico3       ...         |    |  |  |    |               |
  * wait: |------|-------|-------|-------|---- ... --|-----|    |aice4|    |               |
  *       |   |              |                             |    |  |  |    |               |
@@ -242,7 +100,7 @@ typedef struct __tb_aicp_mutx_t
  *       |   |              |                             |    |  |  |    |               |
  *       | aice1           ...                            |    |aice6|    |               |
  *       |   |                                            |    |  |  |    |               |
- *       | aice3                                          |    |aice7| <= the other aices queue which is not support for aipp or iocp
+ *       | aice3                                          |    |aice7| <= the other aices queue which is not support for aiop or iocp
  *       |   |                                            |    |  |  | <= spank it first if non-empty and no waiting
  *       |  ...                                           |    | ... |    |               |
  *       '------------------------------------------------'    |     |    |               |
@@ -304,8 +162,8 @@ typedef struct __tb_aicp_t
 	/// the data pool
 	tb_handle_t 			pool;
 
-	/// the reactor
-	tb_aicp_reactor_t* 		rtor;
+	/// the proactor
+	tb_aicp_proactor_t* 	ptor;
 
 	// the worker size
 	tb_atomic_t 			work;
@@ -336,9 +194,9 @@ tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
- * @param otype 	the otype
+ * @param type 		the aico type
  */
-tb_bool_t 			tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t otype);
+tb_bool_t 			tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
 
 /*! del the aico
  *

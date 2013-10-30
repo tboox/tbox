@@ -25,11 +25,6 @@
  * includes
  */
 #include "prefix.h"
-
-#ifdef TB_CONFIG_ASIO_HAVE_WAITO
-# 	include "aioo/waito.c"
-#endif
-
 #ifdef TB_CONFIG_ASIO_HAVE_SELECT
 # 	include "aioo/select.c"
 #endif
@@ -37,19 +32,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_ASIO_HAVE_WAITO
-
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout);
-tb_long_t tb_aioo_reactor_file_wait(tb_aioo_t* object, tb_long_t timeout)
-{
-	return tb_aioo_reactor_waito_wait(object, timeout);
-}
-#endif
-
-
 #ifdef TB_CONFIG_ASIO_HAVE_SELECT
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout);
-tb_long_t tb_aioo_reactor_sock_wait(tb_aioo_t* object, tb_long_t timeout)
+tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout)
 {
 	return tb_aioo_reactor_select_wait(object, timeout);
 }

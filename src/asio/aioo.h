@@ -21,9 +21,8 @@
  * @ingroup 	asio
  *
  */
-#ifndef TB_ASIO_OBJECT_H
-#define TB_ASIO_OBJECT_H
-
+#ifndef TB_ASIO_AIOO_H
+#define TB_ASIO_AIOO_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -34,40 +33,16 @@
  * types
  */
 
-// the event type
-typedef enum __tb_aioo_etype_t
-{
- 	TB_AIOO_ETYPE_NONE 	= 0 	//!< for null
-, 	TB_AIOO_ETYPE_CONN 	= 1 	//!< for socket
-, 	TB_AIOO_ETYPE_ACPT 	= 2 	//!< for socket
-,	TB_AIOO_ETYPE_READ 	= 4		//!< for all i/o object
-,	TB_AIOO_ETYPE_WRIT 	= 8		//!< for all i/o object
-, 	TB_AIOO_ETYPE_EALL 	= TB_AIOO_ETYPE_READ | TB_AIOO_ETYPE_WRIT | TB_AIOO_ETYPE_ACPT | TB_AIOO_ETYPE_CONN //!< for all
-
-}tb_aioo_etype_t;
-
-// the object type
-typedef enum __tb_aioo_otype_t
-{
- 	TB_AIOO_OTYPE_NONE 	= 0 	//!< for null
-, 	TB_AIOO_OTYPE_FILE 	= 1 	//!< for file
-,	TB_AIOO_OTYPE_SOCK 	= 2 	//!< for socket
-
-}tb_aioo_otype_t;
-
-// the asio object type
+/// the asio type, only for sock
 typedef struct __tb_aioo_t
 {
-	// the object type
-	tb_size_t 		otype 	: 8;
+	// the aioe
+	tb_size_t 		aioe;
 
-	// the event type
-	tb_size_t 		etype 	: 24;
+	// the data
+	tb_pointer_t 	data;
 
-	// the object data
-	tb_pointer_t 	odata;
-
-	// the object handle
+	// the handle
 	tb_handle_t 	handle;
 
 }tb_aioo_t;
@@ -80,66 +55,57 @@ typedef struct __tb_aioo_t
  *
  * @param aioo 		the aioo
  * @param handle 	the aioo native handle
- * @param otype 	the aioo type
- * @param etype 	the aioo event type
- * @param odata 	the aioo data
+ * @param aioe 		the aioe
+ * @param data 		the aioo data
  */
-tb_void_t 			tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t otype, tb_size_t etype, tb_pointer_t odata);
+tb_void_t 			tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t aioe, tb_pointer_t data);
 
-/*! the aioo type
+/*! get the aioe 
  *
  * @param aioo 		the aioo
  *
- * @return 			the aioo type
- */
-tb_size_t 			tb_aioo_type(tb_aioo_t* aioo);
-
-/*! the aioo event type
- *
- * @param aioo 		the aioo
- *
- * @return 			the aioo event type
+ * @return 			the aioe
  */
 tb_size_t 			tb_aioo_gete(tb_aioo_t* aioo);
 
-/*! set the aioo event type
+/*! set the aioe
  *
  * @param aioo 		the aioo
- * @param etype 	the aioo event type
+ * @param aioe 		the aioe
  */
-tb_void_t 			tb_aioo_sete(tb_aioo_t* aioo, tb_size_t etype);
+tb_void_t 			tb_aioo_sete(tb_aioo_t* aioo, tb_size_t aioe);
 
-/*! add the aioo event type
+/*! add the aioe
  *
  * add the event type by 'or' before waiting it
  *
  * @param aioo 		the aioo
- * @param type 		the aioo event type
+ * @param type 		the aioe
  *
- * @return 			the aioo new event type
+ * @return 			the new aioe
  */
-tb_size_t 			tb_aioo_adde(tb_aioo_t* aioo, tb_size_t etype);
+tb_size_t 			tb_aioo_adde(tb_aioo_t* aioo, tb_size_t aioe);
 
-/*! del the aioo event type
+/*! del the aioe
  *
  * del the event type by 'and' before waiting it
  *
  * @param aioo 		the aioo
- * @param type 		the aioo event type
+ * @param type 		the aioe
  *
- * @return 			the aioo new event type
+ * @return 			the new aioe
  */
-tb_size_t 			tb_aioo_dele(tb_aioo_t* aioo, tb_size_t etype);
+tb_size_t 			tb_aioo_dele(tb_aioo_t* aioo, tb_size_t aioe);
 
 /*! wait the asio aioo
  *
- * blocking wait the single event aioo, so need not aipp 
+ * blocking wait the single event aioo, so need not aiop 
  * return the event type if ok, otherwise return 0 for timeout
  *
- * @param aioo 		the asio aioo
+ * @param aioo 		the aioo
  * @param timeout 	the timeout value, return immediately if 0, infinity if -1
  *
- * @return 			the event type or timeout: 0 or error: -1
+ * @return 			the aioe or timeout: 0 or error: -1
  */
 tb_long_t 			tb_aioo_wait(tb_aioo_t* aioo, tb_long_t timeout);
 

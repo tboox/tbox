@@ -17,22 +17,15 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aicp.c
+ * @file		prefix.h
  *
  */
+#ifndef TB_PLATFROM_WINDOWS_ASIO_PROACTOR_PREFIX_H
+#define TB_PLATFROM_WINDOWS_ASIO_PROACTOR_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "aicp/aipp.c"
+#include "../prefix.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp);
-tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp)
-{
-	return tb_aicp_reactor_aipp_init(aicp);
-}
-
+#endif

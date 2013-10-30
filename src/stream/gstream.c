@@ -351,20 +351,20 @@ ok:
 	gst->offset = offset;
 	return 1;
 }
-static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
 	tb_assert_and_check_return_val(gst, -1);
 
 	// wait the native event first
-	tb_long_t e = gst->wait(gst, etype, timeout);
+	tb_long_t e = gst->wait(gst, wait, timeout);
 	tb_assert_and_check_return_val(e >= 0, -1);
 	
 	// no event?
 	tb_check_return_val(!e, e);
 
 	// wait for cache
-	if ((etype & TB_AIOO_ETYPE_READ) && !tb_qbuffer_null(&gst->cache)) e |= TB_AIOO_ETYPE_READ;
-	if ((etype & TB_AIOO_ETYPE_WRIT) && !tb_qbuffer_full(&gst->cache)) e |= TB_AIOO_ETYPE_WRIT;
+	if ((wait & TB_GSTREAM_WAIT_READ) && !tb_qbuffer_null(&gst->cache)) e |= TB_GSTREAM_WAIT_READ;
+	if ((wait & TB_GSTREAM_WAIT_WRIT) && !tb_qbuffer_full(&gst->cache)) e |= TB_GSTREAM_WAIT_WRIT;
 
 	return e;
 }
@@ -458,26 +458,27 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 		tb_free(gst);
 	}
 }
-tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+tb_long_t tb_gstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
+	// check
 	tb_assert_and_check_return_val(gst && gst->wait, -1);
 	
 	// have readed event for cache?
-	if (etype & TB_AIOO_ETYPE_READ)
+	if (wait & TB_GSTREAM_WAIT_READ)
 	{
 		// the cache is writed-cache now, need call afwrit or bfwrit first.
 		tb_assert_and_check_return_val(!gst->bwrited || tb_qbuffer_null(&gst->cache), -1);
 	}
 
 	// have writed event for cache?
-	if (etype & TB_AIOO_ETYPE_WRIT)
+	if (wait & TB_GSTREAM_WAIT_WRIT)
 	{
 		// the cache is readed-cache now, need call afread or bfread first.
 		tb_assert_and_check_return_val(gst->bwrited || tb_qbuffer_null(&gst->cache), -1);
 	}
 
 	// wait
-	tb_long_t ok = tb_gstream_cache_wait(gst, etype, timeout);
+	tb_long_t ok = tb_gstream_cache_wait(gst, wait, timeout);
 
 	// wait failed
 	if (ok < 0 && !gst->state) gst->state = TB_GSTREAM_STATE_WAIT_FAILED;
@@ -609,7 +610,7 @@ tb_bool_t tb_gstream_bopen(tb_gstream_t* gst)
 	while (!(r = tb_gstream_aopen(gst)))
 	{
 		// wait
-		r = tb_gstream_wait(gst, TB_AIOO_ETYPE_EALL, gst->timeout);
+		r = tb_gstream_wait(gst, TB_GSTREAM_WAIT_EALL, gst->timeout);
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -714,14 +715,14 @@ tb_bool_t tb_gstream_bneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 		if (!(need - prev))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+			tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_READ, gst->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 		}
 		else prev = need;
 	}
@@ -772,6 +773,10 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(gst && data, tb_false);
 	tb_check_return_val(size, tb_true);
 
+	// check the left
+	tb_hize_t left = tb_gstream_left(gst);
+	tb_check_return_val(size <= left, tb_false);
+
 	// read data from cache
 	tb_long_t read = 0;
 	while (read < size)
@@ -782,14 +787,14 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		else if (!real)
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+			tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_READ, gst->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 		}
 		else break;
 	}
@@ -815,14 +820,14 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		else if (!real)
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
+			tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_WRIT, gst->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has writ?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_WRIT);
 		}
 		else break;
 	}
@@ -878,14 +883,14 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+				tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_READ, gst->timeout);
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
 				tb_check_break(e);
 
 				// has read?
-				tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+				tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 			}
 			else break;
 		}
@@ -899,14 +904,14 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		while (!tb_gstream_afread(gst, tb_null, 0))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, gst->timeout);
+			tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_READ, gst->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 		}
 	}
 
@@ -934,14 +939,14 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
+				tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_WRIT, gst->timeout);
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
 				tb_check_break(e);
 
 				// has writ?
-				tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+				tb_assert_and_check_break(e & TB_GSTREAM_WAIT_WRIT);
 			}
 			else break;
 		}
@@ -955,14 +960,14 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 		while (!tb_gstream_afwrit(gst, tb_null, 0))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_WRIT, gst->timeout);
+			tb_long_t e = tb_gstream_wait(gst, TB_GSTREAM_WAIT_WRIT, gst->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has writ?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_WRIT);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_WRIT);
 		}
 	}
 
@@ -1107,7 +1112,7 @@ tb_bool_t tb_gstream_bseek(tb_gstream_t* gst, tb_hize_t offset)
 	while (!(r = tb_gstream_aseek(gst, offset)))
 	{
 		// wait
-		r = tb_gstream_wait(gst, TB_AIOO_ETYPE_EALL, gst->timeout);
+		r = tb_gstream_wait(gst, TB_GSTREAM_WAIT_EALL, gst->timeout);
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -1585,14 +1590,14 @@ tb_hize_t tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist)
 		else if (!real) 
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(ist, TB_AIOO_ETYPE_READ, ist->timeout);
+			tb_long_t e = tb_gstream_wait(ist, TB_GSTREAM_WAIT_READ, ist->timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
 			tb_check_break(e);
 
 			// has read?
-			tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
 		}
 		else break;
 

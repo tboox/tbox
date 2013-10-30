@@ -300,7 +300,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_RECV)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;
@@ -321,7 +321,7 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_READ)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_RECV)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;
@@ -361,7 +361,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
-			if (!r && sst->wait > 0 && (sst->wait & TB_AIOO_ETYPE_WRIT)) return -1;
+			if (!r && sst->wait > 0 && (sst->wait & TB_AIOE_SEND)) return -1;
 
 			// clear wait
 			if (r > 0) sst->wait = 0;
@@ -403,7 +403,7 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	// ok?
 	return r;
 }
-static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
@@ -415,7 +415,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t t
 
 		// wait the gst
 		tb_aioo_t o;
-		tb_aioo_seto(&o, sst->sock, TB_AIOO_OTYPE_SOCK, etype, tb_null);
+		tb_aioo_seto(&o, sst->sock, wait, tb_null);
 		sst->wait = tb_aioo_wait(&o, timeout);
 		tb_trace_impl("wait: %ld", sst->wait);
 	}

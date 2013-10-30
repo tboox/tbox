@@ -103,14 +103,14 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gst, TB_AIOO_ETYPE_READ, tb_gstream_timeout(gst));
+				tb_long_t e = tb_gstream_wait(gst, TB_AIOE_RECV, tb_gstream_timeout(gst));
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
 				tb_check_break(e);
 
 				// has read?
-				tb_assert_and_check_break(e & TB_AIOO_ETYPE_READ);
+				tb_assert_and_check_break(e & TB_AIOE_RECV);
 			}
 			else break;
 		}

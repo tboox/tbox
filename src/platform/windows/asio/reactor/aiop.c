@@ -17,32 +17,26 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aicp.c
+ * @file		aiop.c
  *
  */
-
-/* ///////////////////////////////////////////////////////////////////////
- * trace
- */
-//#define TB_TRACE_IMPL_TAG 			"reactor"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_ASIO_HAVE_IOCP
-# 	include "aicp/iocp.c"
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+# 	include "aiop/select.c"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-#ifdef TB_CONFIG_ASIO_HAVE_IOCP
-tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp);
-tb_aicp_reactor_t* tb_aicp_reactor_init(tb_aicp_t* aicp)
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
+tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {
-	return tb_aicp_reactor_iocp_init(aicp);
+	return tb_aiop_reactor_select_init(aiop);
 }
 #endif
 

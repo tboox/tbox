@@ -29,7 +29,10 @@
  */
 #include "prefix.h"
 #include "aioo.h"
-#include "aipp.h"
+#include "aioe.h"
+#include "aiop.h"
+#include "aico.h"
+#include "aice.h"
 #include "aicp.h"
 
 

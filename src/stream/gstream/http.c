@@ -172,13 +172,13 @@ static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	// seek
 	return tb_http_aseek(hst->http, offset);
 }
-static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t etype, tb_long_t timeout)
+static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
 	tb_hstream_t* hst = tb_hstream_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// wait
-	tb_long_t ok = tb_http_wait(hst->http, etype, timeout);
+	tb_long_t ok = tb_http_wait(hst->http, wait, timeout);
 
 	// save state
 	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_hstream_state(hst);

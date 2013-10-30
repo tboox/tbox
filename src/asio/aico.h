@@ -17,39 +17,31 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aipp.c
+ * @file		aico.h
+ * @ingroup 	asio
  *
  */
+#ifndef TB_ASIO_AICO_H
+#define TB_ASIO_AICO_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
 
-#ifdef TB_CONFIG_ASIO_HAVE_WAITO
-# 	include "aipp/waito.c"
-#endif
-
-#ifdef TB_CONFIG_ASIO_HAVE_SELECT
-# 	include "aipp/select.c"
-#endif
-
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * types
  */
-#ifdef TB_CONFIG_ASIO_HAVE_SELECT
-tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp);
-tb_aipp_reactor_t* tb_aipp_reactor_file_init(tb_aipp_t* aipp)
-{
-	return tb_aipp_reactor_waito_init(aipp);
-}
-#endif
 
-#ifdef TB_CONFIG_ASIO_HAVE_SELECT
-tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp);
-tb_aipp_reactor_t* tb_aipp_reactor_sock_init(tb_aipp_t* aipp)
+// the aico type
+typedef enum __tb_aico_type_t
 {
-	return tb_aipp_reactor_select_init(aipp);
-}
-#endif
+ 	TB_AICO_TYPE_NONE 	= 0 	//!< for null
+, 	TB_AICO_TYPE_FILE 	= 1 	//!< for file
+,	TB_AICO_TYPE_SOCK 	= 2 	//!< for socket
 
+}tb_aico_type_t;
+
+
+#endif
