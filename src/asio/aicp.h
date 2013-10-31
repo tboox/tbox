@@ -56,7 +56,7 @@ typedef struct __tb_aicp_proactor_t
 	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle);
 
 	/// post
-	tb_long_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* reqt);
+	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size);
 
 	/// spak
 	tb_long_t 				(*spak)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout);
@@ -190,6 +190,16 @@ tb_bool_t 			tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
  * @param handle 	the handle
  */
 tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t handle);
+
+/*! post the event
+ *
+ * @param aicp 		the aicp
+ * @param list 		the aice list
+ * @param size 		the aice size
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size);
 
 /*! post the acpt event
  *
