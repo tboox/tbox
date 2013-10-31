@@ -1030,6 +1030,8 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.delo 	= tb_aicp_proactor_iocp_delo;
 	ptor->base.post 	= tb_iocp_post;
 	ptor->base.spak 	= tb_aicp_proactor_iocp_spak;
+
+	// init func
 	ptor->acceptex 		= tb_iocp_func_acceptex();
 	ptor->connectex 	= tb_iocp_func_connectex();
 	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex, fail);

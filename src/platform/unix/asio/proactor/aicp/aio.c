@@ -108,7 +108,7 @@ static tb_void_t tb_aio_aice_exit(tb_aicp_proactor_aio_t* ptor, tb_aio_aice_t* d
 	// check
 	tb_assert_and_check_return(ptor);
 
-	// enter 
+	// enter
 	if (ptor->mutx.post) tb_mutex_enter(ptor->mutx.post);
 
 	// free data
@@ -124,13 +124,24 @@ static tb_void_t tb_aio_aice_exit(tb_aicp_proactor_aio_t* ptor, tb_aio_aice_t* d
 static tb_void_t tb_aio_resp_post(tb_aicp_proactor_aio_t* ptor, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return(ptor && ptor->resp && aice);
+	tb_assert_and_check_return(ptor && ptor->resp && ptor->wait && aice);
 
 	// enter 
 	if (ptor->mutx.resp) tb_mutex_enter(ptor->mutx.resp);
 
 	// post aice
-	if (!tb_queue_full(ptor->resp)) tb_queue_put(ptor->resp, aice);
+	tb_bool_t ok = tb_false;
+	if (!tb_queue_full(ptor->resp)) 
+	{
+		// put
+		tb_queue_put(ptor->resp, aice);
+
+		// trace
+		tb_trace_impl("post: resp: %lu", tb_queue_size(ptor->resp));
+
+		// ok
+		ok = tb_true;
+	}
 	else
 	{
 		// assert
@@ -139,6 +150,9 @@ static tb_void_t tb_aio_resp_post(tb_aicp_proactor_aio_t* ptor, tb_aice_t const*
 
 	// leave 
 	if (ptor->mutx.resp) tb_mutex_leave(ptor->mutx.resp);
+
+	// post wait
+	if (ok) tb_event_post(ptor->wait);
 }
 static tb_void_t tb_aio_resp_recv(sigval_t sigval)  
 {
@@ -515,6 +529,20 @@ static tb_bool_t tb_aio_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const*
 	// trace
 	tb_trace_impl("connect: %s:%lu", aice->u.conn.host, aice->u.conn.port);
 
+	tb_long_t ok = 0;
+	while (!(ok = tb_socket_connect(aice->handle, aice->u.conn.host, aice->u.conn.port)))
+	{
+		tb_aioo_t aioo;
+		tb_aioo_seto(&aioo, aice->handle, TB_AIOE_CODE_CONN, tb_null);
+		tb_aioo_wait(&aioo, -1);
+	}
+	tb_print("conn: %ld", ok);
+	if (ok > 0)
+	{
+		// post resp
+		tb_aio_resp_post(ptor, aice);
+	}
+
 	// ok
 	return tb_true;
 }
@@ -760,7 +788,7 @@ static tb_long_t tb_aicp_proactor_aio_spak(tb_aicp_proactor_t* proactor, tb_aice
 	tb_assert_and_check_return_val(ptor && ptor->wait && resp, -1);
 
 	// trace
-	tb_trace_impl("spak[%lu]: ..", tb_thread_self());
+	tb_trace_impl("spak[%u]: ..", (tb_uint16_t)tb_thread_self());
 
 	// wait
 	tb_long_t ok = tb_event_wait(ptor->wait, timeout);
@@ -794,6 +822,9 @@ static tb_long_t tb_aicp_proactor_aio_spak(tb_aicp_proactor_t* proactor, tb_aice
 	// leave 
 	if (ptor->mutx.resp) tb_mutex_leave(ptor->mutx.resp);
 
+	// trace
+	tb_trace_impl("spak[%u]: %ld", (tb_uint16_t)tb_thread_self(), ok);
+
 	// ok?
 	return ok;
 }
@@ -801,10 +832,12 @@ static tb_void_t tb_aicp_proactor_aio_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_aio_t* ptor = (tb_aicp_proactor_aio_t*)proactor;
-	tb_assert_and_check_return(ptor && proactor->aicp);
+	tb_assert_and_check_return(ptor);
 
 	// trace
 	tb_trace_impl("kill");
+
+	// FIXME: done aio_cancel
 
 	// post wait
 	if (ptor->wait) tb_event_post(ptor->wait);
@@ -857,13 +890,14 @@ static tb_aicp_proactor_t* tb_aicp_proactor_aio_init(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(ptor, tb_null);
 
 	// init base
+	ptor->base.aicp = aicp;
 	ptor->base.kill = tb_aicp_proactor_aio_kill;
 	ptor->base.exit = tb_aicp_proactor_aio_exit;
 	ptor->base.addo = tb_aicp_proactor_aio_addo;
 	ptor->base.delo = tb_aicp_proactor_aio_delo;
 	ptor->base.post = tb_aicp_proactor_aio_post;
 	ptor->base.spak = tb_aicp_proactor_aio_spak;
-
+	
 	// init mutx
 	ptor->mutx.post = tb_mutex_init(tb_null);
 	ptor->mutx.resp = tb_mutex_init(tb_null);

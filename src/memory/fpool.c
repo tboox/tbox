@@ -467,6 +467,10 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 	// ok
 	return tb_true;
 }
+tb_void_t tb_fpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_handle_t pool, tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
+{
+}
+
 #ifdef __tb_debug__
 tb_void_t tb_fpool_dump(tb_handle_t handle)
 {
