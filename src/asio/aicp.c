@@ -38,32 +38,6 @@
 tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-static tb_bool_t tb_aicp_aice_post(tb_aicp_t* aicp, tb_aice_t* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
-
-	// post
-	tb_long_t ok = aicp->ptor->post(aicp->ptor, aice);
-
-	// done it now?
-	if (ok > 0)
-	{
-		// done aicb
-		if (aice->aicb && !aice->aicb(aicp, aice))
-		{
-			// kill all loops
-			tb_aicp_kill(aicp);
-		}
-	}
-
-	// ok?
-	return (ok >= 0)? tb_true : tb_false;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
@@ -129,6 +103,14 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t handle)
 	// delo
 	aicp->ptor->delo(aicp->ptor, handle);
 }
+tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && list && size, tb_false);
+
+	// post
+	return aicp->ptor->post(aicp->ptor, list, size);
+}
 tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
@@ -143,7 +125,7 @@ tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb_func,
 	aice.handle 		= handle;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -161,7 +143,7 @@ tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* hos
 	aice.u.conn.port 	= port;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -180,7 +162,7 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_b
 	aice.u.read.size 	= size;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -199,7 +181,7 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_b
 	aice.u.writ.size 	= size;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -217,7 +199,7 @@ tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_
 	aice.u.recv.size 	= size;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -235,7 +217,7 @@ tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t const* dat
 	aice.u.send.size 	= size;
 
 	// post
-	return tb_aicp_aice_post(aicp, &aice);
+	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 {

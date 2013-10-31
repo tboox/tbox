@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		platform.c
- * @defgroup 	platform
+ * @ingroup 	platform
  *
  */
 

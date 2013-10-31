@@ -18,6 +18,7 @@
  *
  * @author		ruki
  * @file		exception.h
+ * @ingroup 	platform
  *
  */
 #ifndef TB_PLATFORM_UNIX_EXCEPTION_H
