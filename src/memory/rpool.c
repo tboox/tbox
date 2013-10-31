@@ -429,6 +429,9 @@ tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_cpointer_t data)
 	// ok?
 	return p;
 }
+tb_void_t tb_rpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_handle_t pool, tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
+{
+}
 
 #ifdef __tb_debug__
 tb_void_t tb_rpool_dump(tb_handle_t handle)
