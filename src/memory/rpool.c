@@ -101,9 +101,34 @@ typedef struct __tb_rpool_t
 
 }tb_rpool_t;
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
+ */
+static tb_bool_t tb_rpool_item_func(tb_pointer_t item, tb_pointer_t data)
+{
+	// check
+	tb_pointer_t* rdata = (tb_pointer_t*)data;
+	tb_assert_and_check_return_val(rdata, tb_false);
+
+	// the func
+	typedef tb_bool_t (*func_t)(tb_pointer_t , tb_pointer_t );
+	func_t func = (func_t)rdata[0];
+
+	// the data
+	data = rdata[1];
+
+	// done func
+	tb_bool_t ok = (tb_pointer_t)func(item, data);
+
+	// save it
+	rdata[2] = (tb_pointer_t)ok;
+
+	// ok?
+	return ok;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
  */
 tb_handle_t tb_rpool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 {
@@ -429,8 +454,30 @@ tb_pointer_t tb_rpool_memdup(tb_handle_t handle, tb_cpointer_t data)
 	// ok?
 	return p;
 }
-tb_void_t tb_rpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_handle_t pool, tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_rpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
 {
+	// check 
+	tb_rpool_t* rpool = (tb_rpool_t*)handle;
+	tb_assert_and_check_return(rpool && func);
+
+	// walk pools
+	tb_size_t i = 0;
+	tb_size_t n = rpool->pooln;
+	for (i = 0; i < n; i++)
+	{
+		if (rpool->pools[i].pool) 
+		{
+			// done walk
+			tb_pointer_t rdata[3];
+			rdata[0] = (tb_cpointer_t)func;
+			rdata[1] = data;
+			rdata[2] = tb_true;
+			tb_fpool_walk(rpool->pools[i].pool, tb_rpool_item_func, rdata);
+
+			// ok?
+			if (!rdata[2]) break;
+		}
+	}
 }
 
 #ifdef __tb_debug__

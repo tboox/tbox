@@ -117,6 +117,18 @@ static tb_void_t tb_aio_aice_exit(tb_aicp_proactor_aio_t* ptor, tb_aio_aice_t* d
 	// leave 
 	if (ptor->mutx.post) tb_mutex_leave(ptor->mutx.post);
 }
+static tb_bool_t tb_aio_aice_kill(tb_pointer_t item, tb_pointer_t data)
+{
+	// check
+	tb_aio_aice_t* aio_aice = (tb_aio_aice_t*)item;
+	tb_assert_and_check_return_val(aio_aice, tb_false);
+
+	// done cancel
+	aio_cancel((tb_long_t)aio_aice->aice.handle - 1, (struct aiocb*)aio_aice);
+
+	// ok?
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * resp
@@ -137,7 +149,7 @@ static tb_void_t tb_aio_resp_post(tb_aicp_proactor_aio_t* ptor, tb_aice_t const*
 		tb_queue_put(ptor->resp, aice);
 
 		// trace
-		tb_trace_impl("post: resp: %lu", tb_queue_size(ptor->resp));
+		tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
 
 		// ok
 		ok = tb_true;
@@ -197,6 +209,22 @@ static tb_void_t tb_aio_resp_recv(sigval_t sigval)
 			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
 		}
 		break;
+	case EAGAIN:
+		{
+			// save resp
+			aio_aice->aice.state 		= TB_AICE_STATE_CLOSED;
+			aio_aice->aice.u.recv.real  = 0;
+
+			// post resp
+			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
+	
+			// exit aice
+			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
+
+			// trace
+			tb_trace_impl("recv[%p]: again", aio_aice->aice.handle);
+		}
+		break;
 		// canceled
 	case ECANCELED:
 		{
@@ -207,9 +235,6 @@ static tb_void_t tb_aio_resp_recv(sigval_t sigval)
 			// post resp
 			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
 	
-			// exit aice
-			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
-
 			// trace
 			tb_trace_impl("recv[%p]: canceled", aio_aice->aice.handle);
 		}
@@ -282,6 +307,22 @@ static tb_void_t tb_aio_resp_send(sigval_t sigval)
 			// exit aice
 			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
 		}
+		break;	
+	case EAGAIN:
+		{
+			// save resp
+			aio_aice->aice.state 		= TB_AICE_STATE_CLOSED;
+			aio_aice->aice.u.send.real  = 0;
+
+			// post resp
+			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
+	
+			// exit aice
+			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
+
+			// trace
+			tb_trace_impl("send[%p]: again", aio_aice->aice.handle);
+		}
 		break;
 		// canceled
 	case ECANCELED:
@@ -293,9 +334,6 @@ static tb_void_t tb_aio_resp_send(sigval_t sigval)
 			// post resp
 			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
 	
-			// exit aice
-			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
-
 			// trace
 			tb_trace_impl("send[%p]: canceled", aio_aice->aice.handle);
 		}
@@ -369,6 +407,22 @@ static tb_void_t tb_aio_resp_read(sigval_t sigval)
 			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
 		}
 		break;
+	case EAGAIN:
+		{
+			// save resp
+			aio_aice->aice.state 		= TB_AICE_STATE_CLOSED;
+			aio_aice->aice.u.read.real  = 0;
+
+			// post resp
+			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
+	
+			// exit aice
+			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
+
+			// trace
+			tb_trace_impl("read[%p]: again", aio_aice->aice.handle);
+		}
+		break;
 		// canceled
 	case ECANCELED:
 		{
@@ -379,9 +433,6 @@ static tb_void_t tb_aio_resp_read(sigval_t sigval)
 			// post resp
 			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
 	
-			// exit aice
-			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
-
 			// trace
 			tb_trace_impl("read[%p]: canceled", aio_aice->aice.handle);
 		}
@@ -455,6 +506,22 @@ static tb_void_t tb_aio_resp_writ(sigval_t sigval)
 			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
 		}
 		break;
+	case EAGAIN:
+		{
+			// save resp
+			aio_aice->aice.state 		= TB_AICE_STATE_CLOSED;
+			aio_aice->aice.u.writ.real  = 0;
+
+			// post resp
+			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
+	
+			// exit aice
+			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
+
+			// trace
+			tb_trace_impl("writ[%p]: again", aio_aice->aice.handle);
+		}
+		break;
 		// canceled
 	case ECANCELED:
 		{
@@ -465,9 +532,6 @@ static tb_void_t tb_aio_resp_writ(sigval_t sigval)
 			// post resp
 			tb_aio_resp_post(aio_aice->ptor, &aio_aice->aice);
 	
-			// exit aice
-			tb_aio_aice_exit(aio_aice->ptor, aio_aice);
-
 			// trace
 			tb_trace_impl("writ[%p]: canceled", aio_aice->aice.handle);
 		}
@@ -788,7 +852,7 @@ static tb_long_t tb_aicp_proactor_aio_spak(tb_aicp_proactor_t* proactor, tb_aice
 	tb_assert_and_check_return_val(ptor && ptor->wait && resp, -1);
 
 	// trace
-	tb_trace_impl("spak[%u]: ..", (tb_uint16_t)tb_thread_self());
+//	tb_trace_impl("spak[%u]: ..", (tb_uint16_t)tb_thread_self());
 
 	// wait
 	tb_long_t ok = tb_event_wait(ptor->wait, timeout);
@@ -811,6 +875,9 @@ static tb_long_t tb_aicp_proactor_aio_spak(tb_aicp_proactor_t* proactor, tb_aice
 			// save resp
 			*resp = *aice;
 
+			// trace
+			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->resp));
+
 			// pop it
 			tb_queue_pop(ptor->resp);
 
@@ -821,9 +888,6 @@ static tb_long_t tb_aicp_proactor_aio_spak(tb_aicp_proactor_t* proactor, tb_aice
 
 	// leave 
 	if (ptor->mutx.resp) tb_mutex_leave(ptor->mutx.resp);
-
-	// trace
-	tb_trace_impl("spak[%u]: %ld", (tb_uint16_t)tb_thread_self(), ok);
 
 	// ok?
 	return ok;
@@ -837,7 +901,17 @@ static tb_void_t tb_aicp_proactor_aio_kill(tb_aicp_proactor_t* proactor)
 	// trace
 	tb_trace_impl("kill");
 
-	// FIXME: done aio_cancel
+	// enter
+	if (ptor->mutx.post) tb_mutex_enter(ptor->mutx.post);
+
+	// walk kill
+	tb_rpool_walk(ptor->post, tb_aio_aice_kill, ptor);
+
+	// leave
+	if (ptor->mutx.post) tb_mutex_leave(ptor->mutx.post);
+
+	// wait some time
+	tb_msleep(500);
 
 	// post wait
 	if (ptor->wait) tb_event_post(ptor->wait);

@@ -149,7 +149,6 @@ static tb_pointer_t tb_fpool_malloc_pred(tb_fpool_t* fpool)
 #if 1
 static tb_pointer_t tb_fpool_malloc_find(tb_fpool_t* fpool)
 {
-	tb_print("tb_fpool_malloc_find");
 	tb_size_t 	i = 0;
 #if TB_CPU_BIT64
 	tb_size_t 	m = tb_align(fpool->maxn, 64) >> 6;
@@ -467,8 +466,56 @@ tb_bool_t tb_fpool_free(tb_handle_t handle, tb_pointer_t data)
 	// ok
 	return tb_true;
 }
-tb_void_t tb_fpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_handle_t pool, tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
+tb_void_t tb_fpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data)
 {
+	// check 
+	tb_fpool_t* fpool = (tb_fpool_t*)handle;
+	tb_assert_and_check_return(fpool && fpool->magic == TB_FPOOL_MAGIC && fpool->maxn && fpool->step && func);
+
+	// walk
+	tb_size_t 	i = 0;
+	tb_size_t 	m = fpool->maxn;
+	tb_byte_t* 	p = fpool->used;
+	tb_byte_t 	u = *p;
+	tb_byte_t 	b = 0;
+	for (i = 0; i < m; ++i)
+	{
+		// bit
+		b = i & 0x07;
+
+		// u++
+		if (!b) 
+		{
+			u = *p++;
+				
+			// this byte is all occupied?
+			//if (u == 0xff)
+			if (!(u + 1))
+			{
+				// done func
+				func(fpool->data + (i + 0) * fpool->step, data);
+				func(fpool->data + (i + 1) * fpool->step, data);
+				func(fpool->data + (i + 2) * fpool->step, data);
+				func(fpool->data + (i + 3) * fpool->step, data);
+				func(fpool->data + (i + 4) * fpool->step, data);
+				func(fpool->data + (i + 5) * fpool->step, data);
+				func(fpool->data + (i + 6) * fpool->step, data);
+				func(fpool->data + (i + 7) * fpool->step, data);
+
+				// skip this byte and continue it
+				i += 7;
+				continue ;
+			}
+		}
+
+		// is occupied?
+		// if (tb_fpool_used_bset(fpool->used, i))
+		if ((u & (0x01 << b)))
+		{
+			// done func
+			func(fpool->data + i * fpool->step, data);
+		}
+	}
 }
 
 #ifdef __tb_debug__
