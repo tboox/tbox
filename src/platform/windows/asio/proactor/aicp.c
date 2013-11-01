@@ -213,21 +213,22 @@ static tb_iocp_func_connectex_t tb_iocp_func_connectex()
 /* ///////////////////////////////////////////////////////////////////////
  * post
  */
-static tb_long_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && ptor->acceptex && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && ptor->acceptex && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_ACPT, -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_ACPT, tb_false);
 	
 	// trace
 	tb_trace_impl("accept: ..");
 
 	// done
-	tb_long_t 		ok = -1;
+	tb_bool_t 		ok = tb_false;
 	tb_iocp_olap_t* olap = tb_null;
+	tb_bool_t 		init_ok = tb_false;
 	tb_bool_t 		acceptex_ok = tb_false;
 	do
 	{
@@ -242,9 +243,7 @@ static tb_long_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 		olap->aice.u.acpt.sock 	= tb_socket_open(TB_SOCKET_TYPE_TCP);
 		tb_assert_static(sizeof(tb_iocp_olap_t) >= ((sizeof(SOCKADDR_IN) + 16) << 1));
 		tb_assert_and_check_break(olap->data.buf && olap->aice.u.acpt.sock);
-
-		// ok and done resp
-		ok = 1;
+		init_ok = tb_true;
 
 		// done acceptex
 		DWORD real = 0;
@@ -259,16 +258,33 @@ static tb_long_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 		tb_trace_impl("acceptex: %d, error: %d", acceptex_ok, WSAGetLastError());
 		tb_check_break(acceptex_ok);
 
-		// FIXME: directly done sock if ok
-		// ...
+		// post resp
+		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) break;
 
-		// finished? remove olap and done resp directly
-		if (olap) tb_iocp_olap_exit(ptor, olap);
+		// ok
+		ok = tb_true;
 
 	} while (0);
 
-	// error? remove olap
-	if (ok < 0)
+	// acceptex failed? 
+	if (init_ok && !acceptex_ok)
+	{
+		// pending? continue it
+		if (WSA_IO_PENDING == WSAGetLastError()) ok = tb_true;
+		// failed? remove olap
+		else
+		{
+			// post failed
+			olap->aice.state = TB_AICE_STATE_FAILED;
+			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) ok = tb_true;
+
+			// trace
+			tb_trace_impl("acceptex: unknown error: %d", WSAGetLastError());
+		}
+	}
+
+	// failed? remove olap
+	if (!ok)
 	{
 		// exit data
 		if (olap->data.buf) tb_iocp_olap_exit(ptor, olap->data.buf);
@@ -279,49 +295,27 @@ static tb_long_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 		// exit olap
 		if (olap) tb_iocp_olap_exit(ptor, olap);
 	}
-	else if (!acceptex_ok)
-	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) ok = 0;
-		// failed? remove olap
-		else
-		{
-			// exit data
-			if (olap->data.buf) tb_iocp_olap_exit(ptor, olap->data.buf);
 
-			// exit sock
-			if (olap->aice.u.acpt.sock) tb_socket_close(olap->aice.u.acpt.sock);
-
-			// exit olap
-			if (olap) tb_iocp_olap_exit(ptor, olap);
-
-			// failed
-			aice->state = TB_AICE_STATE_FAILED;
-
-			// trace
-			tb_trace_impl("acceptex: unknown error: %d", WSAGetLastError());
-		}
-	}
-
-	// done resp?
+	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_CONN, -1);
-	tb_assert_and_check_return_val(aice->u.conn.host && aice->u.conn.port , -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_CONN, tb_false);
+	tb_assert_and_check_return_val(aice->u.conn.host && aice->u.conn.port, tb_false);
 	
 	// trace
 	tb_trace_impl("connect: %s:%lu", aice->u.conn.host, aice->u.conn.port);
 
 	// done
-	tb_long_t 		ok = -1;
+	tb_bool_t 		ok = tb_false;
 	tb_iocp_olap_t* olap = tb_null;
+	tb_bool_t 		init_ok = tb_false;
 	tb_bool_t 		connectex_ok = tb_false;
 	tb_bool_t 		bind_ok = tb_false;
 	do
@@ -329,12 +323,10 @@ static tb_long_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 		// make olap
 		olap = tb_iocp_olap_init(ptor);
 		tb_assert_and_check_break(olap);
+		init_ok = tb_true;
 
 		// init olap
 		olap->aice = *aice;
-
-		// ok and done resp
-		ok = 1;
 
 		// bind it first for connectex
 		SOCKADDR_IN local;
@@ -360,55 +352,54 @@ static tb_long_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 		tb_trace_impl("connectex: %d, error: %d", connectex_ok, WSAGetLastError());
 		tb_check_break(connectex_ok);
 
-		// finished? remove olap and done resp directly
-		if (olap) tb_iocp_olap_exit(ptor, olap);
+		// post resp
+		if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) break;
+
+		// ok
+		ok = tb_true;
 
 	} while (0);
 
-	// error? remove olap
-	if (ok < 0)
+	// connectex failed?
+	if (init_ok && bind_ok && !connectex_ok)
+	{
+		// pending? continue it
+		if (WSA_IO_PENDING == WSAGetLastError()) ok = tb_true;
+		// failed? remove olap
+		else
+		{
+			// post failed
+			olap->aice.state = TB_AICE_STATE_FAILED;
+			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) ok = tb_true;
+
+			// trace
+			tb_trace_impl("connectex: unknown error: %d", WSAGetLastError());
+		}
+	}
+
+	// failed? remove olap
+	if (!ok)
 	{
 		// exit olap
 		if (olap) tb_iocp_olap_exit(ptor, olap);
 	}
-	else if (!connectex_ok)
-	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) ok = 0;
-		// failed? remove olap
-		else
-		{
-			// exit olap
-			if (olap) tb_iocp_olap_exit(ptor, olap);
 
-			// failed
-			aice->state = TB_AICE_STATE_FAILED;
-
-			// connectex: unknown error?
-			if (bind_ok)
-			{
-				// trace
-				tb_trace_impl("connectex: unknown error: %d", WSAGetLastError());
-			}
-		}
-	}
-
-	// done resp?
+	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {	
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_RECV, -1);
-	tb_assert_and_check_return_val(aice->u.recv.data && aice->u.recv.size , -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_RECV, tb_false);
+	tb_assert_and_check_return_val(aice->u.recv.data && aice->u.recv.size, tb_false);
 
 	// init olap
 	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
-	tb_assert_and_check_return_val(olap, -1);
+	tb_assert_and_check_return_val(olap, tb_false);
 	olap->data.buf 	= aice->u.recv.data;
 	olap->data.len 	= aice->u.recv.size;
 	olap->aice 		= *aice;
@@ -418,55 +409,55 @@ static tb_long_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 	tb_long_t 	real = WSARecv((SOCKET)aice->handle - 1, &olap->data, 1, &olap->size, &flag, olap, tb_null);
 	tb_trace_impl("WSARecv: %ld, error: %d", real, WSAGetLastError());
 
+	// pending? continue it
+	if (!real || WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+
 	// ok?
 	if (real > 0)
 	{
-		// remove olap
-		if (olap) tb_iocp_olap_exit(ptor, olap);
+		// post resp
+		olap->aice.u.recv.real = real;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
+	}
+	else
+	{
+		// done error
+		switch (WSAGetLastError())
+		{
+		// closed?
+		case WSAECONNABORTED:
+		case WSAECONNRESET:
+			olap->aice.state = TB_AICE_STATE_CLOSED;
+			break;
+		// failed?
+		default:
+			olap->aice.state = TB_AICE_STATE_FAILED;
+			break;
+		}
 
-		// the real size
-		aice->u.recv.real = real;
-
-		// done resp
-		return real;
+		// post state
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
 	}
 
-	// pending? continue it
-	if (!real || WSA_IO_PENDING == WSAGetLastError()) return 0;
-
-	// remove olap
+	// exit olap
 	if (olap) tb_iocp_olap_exit(ptor, olap);
 
-	// done error
-	switch (WSAGetLastError())
-	{
-	// closed?
-	case WSAECONNABORTED:
-	case WSAECONNRESET:
-		aice->state = TB_AICE_STATE_CLOSED;
-		break;
-	// failed?
-	default:
-		aice->state = TB_AICE_STATE_FAILED;
-		break;
-	}
-
-	// done resp
-	return 1;
+	// failed
+	return tb_false;
 }
-static tb_long_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_SEND, -1);
-	tb_assert_and_check_return_val(aice->u.send.data && aice->u.send.size , -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_SEND, tb_false);
+	tb_assert_and_check_return_val(aice->u.send.data && aice->u.send.size, tb_false);
 
 	// init olap
 	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
-	tb_assert_and_check_return_val(olap, -1);
+	tb_assert_and_check_return_val(olap, tb_false);
 	olap->data.buf 	= aice->u.send.data;
 	olap->data.len 	= aice->u.send.size;
 	olap->aice 		= *aice;
@@ -475,55 +466,55 @@ static tb_long_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 	tb_long_t real = WSASend((SOCKET)aice->handle - 1, &olap->data, 1, &olap->size, 0, olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", real, WSAGetLastError());
 
+	// pending? continue it
+	if (!real || WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+
 	// ok?
 	if (real > 0)
 	{
-		// remove olap
-		if (olap) tb_iocp_olap_exit(ptor, olap);
-
-		// the real size
-		aice->u.send.real = real;
-
-		// done resp
-		return real;
+		// post resp
+		olap->aice.u.send.real = real;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
 	}
+	else
+	{
+		// done error
+		switch (WSAGetLastError())
+		{
+		// closed?
+		case WSAECONNABORTED:
+		case WSAECONNRESET:
+			olap->aice.state = TB_AICE_STATE_CLOSED;
+			break;
+		// failed?
+		default:
+			olap->aice.state = TB_AICE_STATE_FAILED;
+			break;
+		}
 
-	// pending? continue it
-	if (!real || WSA_IO_PENDING == WSAGetLastError()) return 0;
+		// post state
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
+	}
 
 	// remove olap
 	if (olap) tb_iocp_olap_exit(ptor, olap);
 
-	// done error
-	switch (WSAGetLastError())
-	{
-	// closed?
-	case WSAECONNABORTED:
-	case WSAECONNRESET:
-		aice->state = TB_AICE_STATE_CLOSED;
-		break;
-	// failed?
-	default:
-		aice->state = TB_AICE_STATE_FAILED;
-		break;
-	}
-
-	// done resp
-	return 1;
+	// failed
+	return tb_false;
 }
-static tb_long_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {	
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_READ, -1);
-	tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size , -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_READ, tb_false);
+	tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, tb_false);
 
 	// init olap
 	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
-	tb_assert_and_check_return_val(olap, -1);
+	tb_assert_and_check_return_val(olap, tb_false);
 	olap->aice 			= *aice;
 	olap->base.Offset 	= aice->u.read.seek;
 
@@ -533,44 +524,42 @@ static tb_long_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 	BOOL 		ok = ReadFile((HANDLE)aice->handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, olap);
 	tb_trace_impl("ReadFile: %u, error: %d", real, GetLastError());
 
+	// pending? continue it
+	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+
 	// finished?
 	if (ok || real > 0)
 	{
-		// remove olap
-		if (olap) tb_iocp_olap_exit(ptor, olap);
-
-		// the real size
-		aice->u.read.real = real;
-
-		// done resp
-		return real;
+		// post resp
+		olap->aice.u.read.real = real;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
 	}
-
-	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return 0;
+	else 
+	{
+		// post failed
+		olap->aice.state = TB_AICE_STATE_FAILED;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
+	}
 
 	// remove olap
 	if (olap) tb_iocp_olap_exit(ptor, olap);
 
 	// failed
-	aice->state = TB_AICE_STATE_FAILED;
-
-	// done resp
-	return 1;
+	return tb_false;
 }
-static tb_long_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t* aice)
+static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_WRIT, -1);
-	tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size , -1);
+	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_WRIT, tb_false);
+	tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, tb_false);
 
 	// init olap
 	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
-	tb_assert_and_check_return_val(olap, -1);
+	tb_assert_and_check_return_val(olap, tb_false);
 	olap->aice 			= *aice;
 	olap->base.Offset 	= aice->u.writ.seek;
 
@@ -580,30 +569,28 @@ static tb_long_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t* aice
 	BOOL 		ok = WriteFile((HANDLE)aice->handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, olap);
 	tb_trace_impl("WriteFile: %u, error: %d", real, GetLastError());
 
+	// pending? continue it
+	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+
 	// finished?
 	if (ok || real > 0)
 	{
-		// remove olap
-		if (olap) tb_iocp_olap_exit(ptor, olap);
-
-		// the real size
-		aice->u.writ.real = real;
-
-		// done resp
-		return real;
+		// post resp
+		olap->aice.u.writ.real = real;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
 	}
-
-	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return 0;
+	else
+	{
+		// post failed
+		olap->aice.state = TB_AICE_STATE_FAILED;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aice->type, olap)) return tb_true;
+	}
 
 	// remove olap
 	if (olap) tb_iocp_olap_exit(ptor, olap);
 
 	// failed
-	aice->state = TB_AICE_STATE_FAILED;
-
-	// done resp
-	return 1;
+	return tb_false;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -901,38 +888,33 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && list && size, tb_false);
 
-#if 0
-	// init post
-	static tb_long_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t*) = 
+	// walk post
+	tb_size_t i = 0;
+	for (i = 0; i < size; i++)
 	{
-		tb_null
-	,	tb_iocp_post_acpt
-	,	tb_iocp_post_conn
-	,	tb_iocp_post_recv
-	,	tb_iocp_post_send
-	,	tb_iocp_post_read
-	,	tb_iocp_post_writ
-	};
-	tb_assert_and_check_return_val(reqt->code < tb_arrayn(s_post) && s_post[reqt->code], tb_false);
+		// the aice
+		tb_aice_t const* aice = &list[i];
 
-	// post reqt, FIXME: for list
-	tb_aice_t aice = *list;
-	tb_long_t ok = s_post[reqt->code](proactor, &aice);
+		// init post
+		static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
+		{
+			tb_null
+		,	tb_iocp_post_acpt
+		,	tb_iocp_post_conn
+		,	tb_iocp_post_recv
+		,	tb_iocp_post_send
+		,	tb_iocp_post_read
+		,	tb_iocp_post_writ
+		};
+		tb_assert_and_check_return_val(aice->code < tb_arrayn(s_post) && s_post[aice->code], tb_false);
 
-	// done it directly now if ok
-	if (ok > 0)
-	{
-		// FIXME
-//		PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
+		// post aice
+		if (!s_post[aice->code](proactor, aice)) return tb_false;
 	}
 
-	// ok?
-	return ok >= 0? tb_true : tb_false;
-#else
-	return tb_false;
-#endif
+	// ok
+	return tb_true;
 }
-
 static tb_long_t tb_aicp_proactor_iocp_spak(tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout)
 {
 	// check
@@ -1028,7 +1010,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.exit 	= tb_aicp_proactor_iocp_exit;
 	ptor->base.addo 	= tb_aicp_proactor_iocp_addo;
 	ptor->base.delo 	= tb_aicp_proactor_iocp_delo;
-	ptor->base.post 	= tb_iocp_post;
+	ptor->base.post 	= tb_aicp_proactor_iocp_post;
 	ptor->base.spak 	= tb_aicp_proactor_iocp_spak;
 
 	// init func

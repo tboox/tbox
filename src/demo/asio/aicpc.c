@@ -137,8 +137,8 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	else
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("writ[%p]: closed", aice->handle);
-		else tb_print("writ[%p]: failed: %lu", aice->handle, aice->state);
+			tb_print("recv[%p]: closed", aice->handle);
+		else tb_print("recv[%p]: failed: %lu", aice->handle, aice->state);
 		return tb_false;
 	}
 
