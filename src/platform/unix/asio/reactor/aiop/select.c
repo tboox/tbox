@@ -46,6 +46,9 @@ typedef struct __tb_aiop_reactor_select_t
 	fd_set 					rfdo;
 	fd_set 					wfdo;
 	fd_set 					efdo;
+
+	// the mutx
+	tb_handle_t 			mutx;
 	
 }tb_aiop_reactor_select_t;
 
@@ -54,6 +57,7 @@ typedef struct __tb_aiop_reactor_select_t
  */
 static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe)
 {
+	// check
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, tb_false);
 
@@ -61,6 +65,9 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, tb_false);
 	tb_assert_and_check_return_val(tb_hash_size(reactor->aiop->hash) < FD_SETSIZE, tb_false);
+
+	// enter
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
 
 	// update fd max
 	if (fd > rtor->sfdm) rtor->sfdm = fd;
@@ -72,17 +79,24 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	if (pwfds) FD_SET(fd, pwfds);
 	FD_SET(fd, &rtor->efdi);
 
+	// leave
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
 	// ok
 	return tb_true;
 }
 static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe, tb_aioo_t const* obj)
 {
+	// check
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor, tb_false);
 
 	// fd
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, tb_false);
+
+	// enter
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
 
 	// set fds
 	fd_set* prfds = (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT)? &rtor->rfdi : tb_null;
@@ -91,11 +105,15 @@ static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_hand
 	if (pwfds) FD_SET(fd, pwfds); else FD_CLR(fd, pwfds);
 	if (prfds || pwfds) FD_SET(fd, &rtor->efdi); else FD_CLR(fd, &rtor->efdi);
 
+	// leave
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
 	// ok
 	return tb_true;
 }
 static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
+	// check
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor, tb_false);
 
@@ -103,16 +121,23 @@ static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_hand
 	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, tb_false);
 
+	// enter
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+
 	// del fds
 	FD_CLR(fd, &rtor->rfdi);
 	FD_CLR(fd, &rtor->wfdi);
 	FD_CLR(fd, &rtor->efdi);
+
+	// leave
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
 
 	// ok
 	return tb_true;
 }
 static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
 {	
+	// check
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && reactor->aiop && reactor->aiop->hash, -1);
 
@@ -124,13 +149,20 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioo
 		t.tv_usec = (timeout % 1000) * 1000;
 	}
 
+	// enter
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+
 	// init fdo
+	tb_size_t sfdm = rtor->sfdm;
 	tb_memcpy(&rtor->rfdo, &rtor->rfdi, sizeof(fd_set));
 	tb_memcpy(&rtor->wfdo, &rtor->wfdi, sizeof(fd_set));
 	tb_memcpy(&rtor->efdo, &rtor->efdi, sizeof(fd_set));
 
+	// leave
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
 	// wait
-	tb_long_t sfdn = select(rtor->sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
+	tb_long_t sfdn = select(sfdm + 1, &rtor->rfdo, &rtor->wfdo, &rtor->efdo, timeout >= 0? &t : tb_null);
 	tb_assert_and_check_return_val(sfdn >= 0, -1);
 
 	// timeout?
@@ -178,12 +210,18 @@ static tb_void_t tb_aiop_reactor_select_exit(tb_aiop_reactor_t* reactor)
 	if (rtor)
 	{
 		// free fds
+		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
 		FD_ZERO(&rtor->rfdi);
 		FD_ZERO(&rtor->wfdi);
 		FD_ZERO(&rtor->efdi);
 		FD_ZERO(&rtor->rfdo);
 		FD_ZERO(&rtor->wfdo);
 		FD_ZERO(&rtor->efdo);
+		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
+		// exit mutx
+		if (rtor->mutx) tb_mutex_exit(rtor->mutx);
+		rtor->mutx = tb_null;
 
 		// free it
 		tb_free(rtor);
@@ -195,12 +233,15 @@ static tb_void_t tb_aiop_reactor_select_cler(tb_aiop_reactor_t* reactor)
 	if (rtor)
 	{
 		// free fds
+		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+		rtor->sfdm = 0;
 		FD_ZERO(&rtor->rfdi);
 		FD_ZERO(&rtor->wfdi);
 		FD_ZERO(&rtor->efdi);
 		FD_ZERO(&rtor->rfdo);
 		FD_ZERO(&rtor->wfdo);
 		FD_ZERO(&rtor->efdo);
+		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
 	}
 }
 static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
@@ -228,6 +269,10 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	FD_ZERO(&rtor->rfdo);
 	FD_ZERO(&rtor->wfdo);
 	FD_ZERO(&rtor->efdo);
+
+	// init mutx
+	rtor->mutx = tb_mutex_init(tb_null);
+	tb_assert_and_check_goto(rtor->mutx, fail);
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;
