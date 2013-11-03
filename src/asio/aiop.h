@@ -65,7 +65,7 @@ typedef struct __tb_aiop_reactor_t
 
 /*! the asio pool pool type 
  *
- * @note only for sock and using level triggered mode default
+ * @note only for sock and using level triggered mode 
  *
  * <pre>
  * objs: |-----|------|------|--- ... ...---|-------|
@@ -79,7 +79,7 @@ typedef struct __tb_aiop_t
 	/// the object maxn
 	tb_size_t 				maxn;
 
-	/// the objects hash
+	/// the objects hash, FIXME: multi-thread safe for epoll, try to remove aioo and using strong aioe
 	tb_handle_t 			hash;
 
 	/// the reactor

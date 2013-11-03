@@ -33,6 +33,17 @@
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the aicp post maxn
+#ifdef __tb_small__
+# 	define TB_AICP_POST_MAXN 				(256)
+#else
+# 	define TB_AICP_POST_MAXN 				(1024)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 

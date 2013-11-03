@@ -106,7 +106,8 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t handle)
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && list && size, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
+	tb_assert_and_check_return_val(list && size && size <= TB_AICP_POST_MAXN, tb_false);
 
 	// post
 	return aicp->ptor->post(aicp->ptor, list, size);
