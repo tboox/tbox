@@ -594,14 +594,14 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * save resp
+ * spak 
  */
-static tb_long_t tb_iocp_save_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
 	// done
@@ -640,12 +640,12 @@ static tb_long_t tb_iocp_save_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_save_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
 	// failed? done error
@@ -671,15 +671,15 @@ static tb_long_t tb_iocp_save_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// ok
 	return 1;
 }
-static tb_long_t tb_iocp_save_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
-	// ok? save the size
+	// ok? spak the size
 	tb_long_t ok = -1;
 	if (wait) 
 	{
@@ -706,21 +706,21 @@ static tb_long_t tb_iocp_save_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 	}
 
-	// save the real size	
+	// spak the real size	
 	resp->u.recv.real = real;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_save_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
-	// ok? save the size
+	// ok? spak the size
 	tb_long_t ok = -1;
 	if (wait) 
 	{
@@ -747,21 +747,21 @@ static tb_long_t tb_iocp_save_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 	}
 
-	// save the real size	
+	// spak the real size	
 	resp->u.send.real = real;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_save_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
-	// ok? save the size
+	// ok? spak the size
 	tb_long_t ok = -1;
 	if (wait) 
 	{
@@ -788,21 +788,21 @@ static tb_long_t tb_iocp_save_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 	}
 
-	// save the real size	
+	// spak the real size	
 	resp->u.read.real = real;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_save_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save resp
+	// spak resp
 	*resp = olap->aice;
 
-	// ok? save the size
+	// ok? spak the size
 	tb_long_t ok = -1;
 	if (wait) 
 	{
@@ -829,32 +829,32 @@ static tb_long_t tb_iocp_save_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 	}
 
-	// save the real size	
+	// spak the real size	
 	resp->u.writ.real = real;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_iocp_save_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
 	// check?
 	tb_assert_and_check_return_val(resp && olap, -1);
 
-	// save
-	static tb_bool_t (*s_save[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_iocp_olap_t* , tb_size_t , tb_bool_t ) = 
+	// init spak
+	static tb_bool_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_iocp_olap_t* , tb_size_t , tb_bool_t ) = 
 	{
 		tb_null
-	,	tb_iocp_save_acpt
-	,	tb_iocp_save_conn
-	,	tb_iocp_save_recv
-	,	tb_iocp_save_send
-	,	tb_iocp_save_read
-	,	tb_iocp_save_writ
+	,	tb_iocp_spak_acpt
+	,	tb_iocp_spak_conn
+	,	tb_iocp_spak_recv
+	,	tb_iocp_spak_send
+	,	tb_iocp_spak_read
+	,	tb_iocp_spak_writ
 	};
-	tb_assert_and_check_return(olap->aice.code < tb_arrayn(s_save));
+	tb_assert_and_check_return_val(olap->aice.code < tb_arrayn(s_spak), -1);
 
-	// save aice
-	return (s_save[olap->aice.code])? s_save[olap->aice.code](ptor, resp, olap, real, wait) : -1;
+	// done spak
+	return (s_spak[olap->aice.code])? s_spak[olap->aice.code](ptor, resp, olap, real, wait) : -1;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -939,8 +939,8 @@ static tb_long_t tb_aicp_proactor_iocp_spak(tb_aicp_proactor_t* proactor, tb_aic
 	// killed?
 	if (wait && !type) return -1;
 
-	// save resp
-	tb_long_t ok = tb_iocp_save_resp(ptor, resp, olap, (tb_size_t)real, wait? tb_true : tb_false);
+	// spak resp
+	tb_long_t ok = tb_iocp_spak_resp(ptor, resp, olap, (tb_size_t)real, wait? tb_true : tb_false);
 
 	// free olap
 	tb_iocp_olap_exit(ptor, olap);

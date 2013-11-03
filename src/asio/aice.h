@@ -49,6 +49,7 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_SEND 		= 4		//!< for sock
 ,	TB_AICE_CODE_READ 		= 5		//!< for file
 ,	TB_AICE_CODE_WRIT 		= 6		//!< for file
+, 	TB_AICE_CODE_MAXN 		= 7
 
 }tb_aice_code_e;
 
