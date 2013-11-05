@@ -36,7 +36,15 @@
  * types
  */
 
-// the aiop reactor type
+/// the aiop flag enum
+typedef enum __tb_aiop_flag_e
+{
+	TB_AIOP_FLAG_NONE
+,	TB_AIOP_FLAG_HAS_ET 		//!< has edge triggered mode, using TB_AIOE_FLAG_ET for aiop post
+
+}tb_aiop_flag_e;
+
+/// the aiop reactor type
 struct __tb_aiop_t;
 typedef struct __tb_aiop_reactor_t
 {
@@ -49,23 +57,26 @@ typedef struct __tb_aiop_reactor_t
 	/// cler
 	tb_void_t 				(*cler)(struct __tb_aiop_reactor_t* reactor);
 
-	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe);
+	/// flag
+	tb_size_t 				(*flag)(struct __tb_aiop_reactor_t* reactor);
 
-	/// seto
-	tb_bool_t 				(*seto)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe, tb_aioo_t const* aioo);
+	/// addo
+	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle);
 
 	/// delo
 	tb_bool_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle);
+
+	/// post
+	tb_bool_t 				(*post)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_aioe_t const* list, tb_size_t size);
 
 	/// wait
 	tb_long_t 				(*wait)(struct __tb_aiop_reactor_t* reactor, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
 
 }tb_aiop_reactor_t;
 
-/*! the asio pool pool type 
+/*! the asio poll pool type 
  *
- * @note only for sock and using level triggered mode 
+ * @note only for sock and using level triggered mode default
  *
  * <pre>
  * objs: |-----|------|------|--- ... ...---|-------|
@@ -79,9 +90,6 @@ typedef struct __tb_aiop_t
 	/// the object maxn
 	tb_size_t 				maxn;
 
-	/// the objects hash, FIXME: multi-thread safe for epoll, try to remove aioo and using strong aioe
-	tb_handle_t 			hash;
-
 	/// the reactor
 	tb_aiop_reactor_t* 		rtor;
 
@@ -93,110 +101,107 @@ typedef struct __tb_aiop_t
 
 /*! init the aiop
  *
- * @param 	maxn 	the maximum number of concurrent objects
+ * @param maxn 		the maximum number of concurrent objects
  *
- * @return 	the aiop
+ * @return 			the aiop
  */
 tb_aiop_t* 			tb_aiop_init(tb_size_t maxn);
 
 /*! exit the aiop
  *
- * @param 	aiop 	the aiop
+ * @param aiop 		the aiop
  */
 tb_void_t 			tb_aiop_exit(tb_aiop_t* aiop);
 
 /*! cler the aiop
  *
- * @param 	aiop 	the aiop
+ * @param aiop 		the aiop
  */
 tb_void_t 			tb_aiop_cler(tb_aiop_t* aiop);
 
-/*! add the asio object
+/*! the aiop flag
  *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- * @param 	aioe 	the aioe
- * @param 	data 	the aioo data
+ * @param aiop 		the aiop
  *
- * @return 	 		tb_true or tb_false
+ * @return 			the flag
  */
-tb_bool_t 			tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t aioe, tb_pointer_t data);
+tb_size_t 			tb_aiop_flag(tb_aiop_t const* aiop);
 
-/*! del the asio object
+/*! addo the aioo
  *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- *
- * @return 	 		tb_true or tb_false
- */
-tb_bool_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle);
-
-/*! set the asio event
- *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- * @param 	aioe 	the aioe
+ * @param aiop 		the aiop
+ * @param handle 	the handle
  *
  * @return 			the new aioe
  */
-tb_size_t 			tb_aiop_gete(tb_aiop_t* aiop, tb_handle_t handle);
+tb_bool_t 			tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle);
+
+/*! delo the aioo
+ *
+ * @param aiop 		the aiop
+ * @param handle 	the handle
+ *
+ */
+tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle);
+
+/*! post the aioe list
+ *
+ * @param aiop 		the aiop
+ * @param list 		the list
+ * @param size 		the size
+ *
+ * @return 	 		tb_true or tb_false
+ */
+tb_bool_t 			tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size);
 
 /*! set the asio event
  *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- * @param 	aioe 	the aioe
+ * @param aiop 		the aiop
+ * @param handle 	the handle
+ * @param code 		the code
+ * @param flag 		the flag
+ * @param data 		the data
  *
+ * @return 			tb_true or tb_false
  */
-tb_void_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t aioe);
+tb_bool_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
 /*! add the asio event
  *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- * @param 	aioe 	the aioe
+ * @param aiop 		the aiop
+ * @param handle 	the handle
+ * @param code 		the code
+ * @param flag 		the flag
+ * @param data 		the data
  *
+ * @return 			tb_true or tb_false
  */
-tb_void_t 			tb_aiop_adde(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t aioe);
+tb_bool_t 			tb_aiop_adde(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
 /*! del the asio event
  *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
+ * @param aiop 		the aiop
+ * @param handle 	the handle
+ * @param code 		the code
+ * @param flag 		the flag
+ * @param data 		the data
  *
+ * @return 			tb_true or tb_false *
  */
-tb_void_t 			tb_aiop_dele(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t aioe);
-
-/*! set the asio data
- *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- * @param 	data 	the aioo data
- *
- */
-tb_void_t 			tb_aiop_setp(tb_aiop_t* aiop, tb_handle_t handle, tb_pointer_t data);
-
-/*! get the asio data
- *
- * @param 	aiop 	the aiop
- * @param 	handle 	the handle
- *
- * @return 			the aioo data
- */
-tb_pointer_t 		tb_aiop_getp(tb_aiop_t* aiop, tb_handle_t handle);
+tb_bool_t 			tb_aiop_dele(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
 /*! wait the asio objects in the pool
  *
  * blocking wait the multiple event objects
  * return the event number if ok, otherwise return 0 for timeout
  *
- * @param 	aiop 	the aiop
- * @param 	aioo 	the asio objects
- * @param 	maxn 	the maximum size of the asio objects
- * @param 	timeout the timeout value, return immediately if 0, infinity if -1
+ * @param aiop 		the aiop
+ * @param list 		the aioe list
+ * @param maxn 		the aioe maxn
+ * @param timeout 	the timeout, infinity: -1
  *
- * @return 	the event number, return 0 if timeout, return -1 if error
+ * @return 			> 0: the aioe list size, 0: timeout, -1: failed
  */
-tb_long_t 			tb_aiop_wait(tb_aiop_t* aiop, tb_aioo_t* aioo, tb_size_t maxn, tb_long_t timeout);
+tb_long_t 			tb_aiop_wait(tb_aiop_t* aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout);
 
 #endif

@@ -25,7 +25,6 @@
  * includes
  */
 #include "prefix.h"
-
 #if defined(TB_CONFIG_ASIO_HAVE_POLL)
 # 	include "aioo/poll.c"
 #elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
@@ -37,22 +36,21 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
 #if defined(TB_CONFIG_ASIO_HAVE_POLL)
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout)
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
-	return tb_aioo_reactor_poll_wait(object, timeout);
+	return tb_aioo_reactor_poll_wait(handle, code, timeout);
 }
 #elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout)
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
-	return tb_aioo_reactor_select_wait(object, timeout);
+	return tb_aioo_reactor_select_wait(handle, code, timeout);
 }
 #endif
 

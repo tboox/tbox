@@ -31,53 +31,17 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* aioo, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_aioo_seto(tb_aioo_t* aioo, tb_handle_t handle, tb_size_t aioe, tb_pointer_t data)
+tb_long_t tb_aioo_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
 	// check
-	tb_assert_and_check_return(aioo);
-	aioo->aioe = aioe;
-	aioo->data = data;
-	aioo->handle = handle;
-}
-tb_size_t tb_aioo_gete(tb_aioo_t* aioo)
-{
-	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
-	return aioo->aioe;
-}
-tb_void_t tb_aioo_sete(tb_aioo_t* aioo, tb_size_t aioe)
-{
-	// check
-	tb_assert_and_check_return(aioo);
-	aioo->aioe = aioe;
-}
-tb_size_t tb_aioo_adde(tb_aioo_t* aioo, tb_size_t aioe)
-{
-	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
-
-	aioo->aioe |= aioe;
-	return aioo->aioe;
-}
-tb_size_t tb_aioo_dele(tb_aioo_t* aioo, tb_size_t aioe)
-{
-	// check
-	tb_assert_and_check_return_val(aioo, TB_AIOE_CODE_NONE);
-
-	aioo->aioe &= ~aioe;
-	return aioo->aioe;
-}
-tb_long_t tb_aioo_wait(tb_aioo_t* aioo, tb_long_t timeout)
-{
-	// check
-	tb_assert_and_check_return_val(aioo && aioo->handle, 0);
+	tb_assert_and_check_return_val(handle && code, 0);
 
 	// wait aioo
-	return tb_aioo_reactor_wait(aioo, timeout);
+	return tb_aioo_reactor_wait(handle, code, timeout);
 }
 

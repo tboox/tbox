@@ -28,22 +28,16 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_aioo_reactor_poll_wait(tb_aioo_t* aioo, tb_long_t timeout)
+static tb_long_t tb_aioo_reactor_poll_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(aioo, -1);
+	// check
+	tb_assert_and_check_return_val(handle, -1);
 
-	// type
-	tb_size_t aioe = aioo->aioe;
-
-	// fd
-	tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, -1);
-	
 	// init
 	struct pollfd pfd = {0};
-	pfd.fd = fd;
-	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
-	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
+	pfd.fd = ((tb_long_t)handle) - 1;
+	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
+	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
 	// poll
 	tb_long_t r = poll(&pfd, 1, timeout);
@@ -63,12 +57,12 @@ static tb_long_t tb_aioo_reactor_poll_wait(tb_aioo_t* aioo, tb_long_t timeout)
 	if (pfd.revents & POLLIN) 
 	{
 		e |= TB_AIOE_CODE_RECV;
-		if (aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
+		if (code & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
 	}
 	if (pfd.revents & POLLOUT) 
 	{
 		e |= TB_AIOE_CODE_SEND;
-		if (aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
+		if (code & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
 	}
 	if ((pfd.revents & POLLHUP) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
 		e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
