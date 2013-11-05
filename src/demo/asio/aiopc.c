@@ -37,9 +37,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	while (!(conn = tb_socket_connect(sock, "127.0.0.1", 9090)))
 	{
 		// wait
-		tb_aioo_t aioo;
-		tb_aioo_seto(&aioo, sock, TB_AIOE_CODE_CONN, tb_null);
-		conn = tb_aioo_wait(&aioo, 20000);
+		conn = tb_aioo_wait(sock, TB_AIOE_CODE_CONN, 20000);
 		tb_check_break(conn > 0);
 	}
 
@@ -119,9 +117,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		else if (!real && !wait)
 		{
 			// wait
-			tb_aioo_t aioo;
-			tb_aioo_seto(&aioo, sock, TB_AIOE_CODE_RECV, tb_null);
-			if (tb_aioo_wait(&aioo, -1) <= 0) 
+			if (tb_aioo_wait(sock, TB_AIOE_CODE_RECV, -1) <= 0) 
 			{
 				tb_print("recv[%p]: wait: failed", sock);
 				break;

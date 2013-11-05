@@ -420,9 +420,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 			tb_check_goto(!writ, end);
 
 			// wait
-			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOE_CODE_SEND, tb_null);
-			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
+			r = tb_aioo_wait(handle, TB_AIOE_CODE_SEND, TB_DNS_TIMEOUT);
 
 			// fail or timeout?
 			tb_check_goto(r > 0, end);
@@ -446,9 +444,7 @@ static tb_long_t tb_dns_host_rate(tb_char_t const* host)
 			tb_check_break(!read);
 
 			// wait
-			tb_aioo_t o;
-			tb_aioo_seto(&o, handle, TB_AIOE_CODE_RECV, tb_null);
-			r = tb_aioo_wait(&o, TB_DNS_TIMEOUT);
+			r = tb_aioo_wait(handle, TB_AIOE_CODE_RECV, TB_DNS_TIMEOUT);
 			//tb_trace_impl("wait %d", r);
 
 			// fail or timeout?
@@ -1458,8 +1454,7 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 	if (e)
 	{
 		// wait
-		tb_aioo_seto(&o, look->sock, e, tb_null);
-		r = tb_aioo_wait(&o, timeout);
+		r = tb_aioo_wait(look->sock, e, timeout);
 
 		// fail or timeout?
 		tb_check_return_val(r > 0, r);

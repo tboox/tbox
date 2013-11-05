@@ -77,26 +77,29 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// listen sock
 	if (!tb_socket_listen(sock)) goto end;
 
-	// add sock
-	if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
+	// addo sock
+	if (!tb_aiop_addo(aiop, sock)) goto end;
+
+	// sete sock
+	if (!tb_aiop_sete(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
 
 	// accept
-	tb_aioo_t objs[16];
+	tb_aioe_t list[16];
 	while (1)
 	{
 		// wait
-		tb_long_t objn = tb_aiop_wait(aiop, objs, 16, -1);
+		tb_long_t objn = tb_aiop_wait(aiop, list, 16, -1);
 		tb_assert_and_check_break(objn > 0);
 
-		// walk objs
+		// walk list
 		tb_size_t i = 0;
 		for (i = 0; i < objn; i++)
 		{
 			// check
-			tb_assert_and_check_break(objs[i].handle);
+			tb_assert_and_check_break(list[i].handle);
 
 			// acpt?
-			if (objs[i].aioe & TB_AIOE_CODE_ACPT)
+			if (list[i].code & TB_AIOE_CODE_ACPT)
 			{
 				// done acpt
 				tb_bool_t 			ok = tb_false;
@@ -108,7 +111,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context);
 
 					// init sock
-					context->sock = tb_socket_accept(objs[i].handle);
+					context->sock = tb_socket_accept(list[i].handle);
 					tb_assert_and_check_break(context->sock);
 
 					// init file
@@ -120,7 +123,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context->data);
 
 					// addo sock
-					if (!tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
+					if (!tb_aiop_addo(aiop, context->sock)) break;
+
+					// adde sock
+					if (!tb_aiop_sete(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
 
 					// trace
 					tb_print("acpt[%p]: ok", context->sock);
@@ -170,29 +176,29 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				}
 			}
 			// writ?
-			else if (objs[i].aioe & TB_AIOE_CODE_SEND)
+			else if (list[i].code & TB_AIOE_CODE_SEND)
 			{
 				// the context
-				tb_demo_context_t* context = (tb_demo_context_t*)objs[i].data;
+				tb_demo_context_t* context = (tb_demo_context_t*)list[i].data;
 				tb_assert_and_check_break(context);
 
 				// continue to send it if not finished
 				if (context->real < context->send)
 				{
 					// done send
-					tb_long_t real = tb_socket_send(objs[i].handle, context->data + context->real, context->send - context->real);
+					tb_long_t real = tb_socket_send(list[i].handle, context->data + context->real, context->send - context->real);
 					if (real > 0)
 					{
 						// save real
 						context->real += real;
 
 						// trace
-//						tb_print("send[%p]: real: %ld", objs[i].handle, real);
+//						tb_print("send[%p]: real: %ld", list[i].handle, real);
 					}
 					else
 					{
 						// trace
-						tb_print("send[%p]: closed", objs[i].handle);
+						tb_print("send[%p]: closed", list[i].handle);
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -220,19 +226,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 						// done send
 						context->send = real;
-						real = tb_socket_send(objs[i].handle, context->data, context->send);
+						real = tb_socket_send(list[i].handle, context->data, context->send);
 						if (real >= 0)
 						{
 							// save real
 							context->real += real;
 
 							// trace
-//							tb_print("send[%p]: real: %ld", objs[i].handle, real);
+//							tb_print("send[%p]: real: %ld", list[i].handle, real);
 						}
 						else
 						{
 							// trace
-							tb_print("send[%p]: closed", objs[i].handle);
+							tb_print("send[%p]: closed", list[i].handle);
 
 							// exit context
 							tb_demo_context_exit(aiop, context);
@@ -242,7 +248,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					else
 					{
 						// trace
-						tb_print("read[%p]: closed", objs[i].handle);
+						tb_print("read[%p]: closed", list[i].handle);
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -252,7 +258,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				else 
 				{
 					// trace
-					tb_print("read[%p]: closed", objs[i].handle);
+					tb_print("read[%p]: closed", list[i].handle);
 
 					// exit context
 					tb_demo_context_exit(aiop, context);
@@ -262,7 +268,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// error?
 			else 
 			{
-				tb_print("aioo[%p]: unknown aioe: %lu", objs[i].handle, objs[i].aioe);
+				tb_print("aioe[%p]: unknown code: %lu", list[i].handle, list[i].code);
 				break;
 			}
 		}

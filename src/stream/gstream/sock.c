@@ -414,9 +414,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t ti
 		tb_assert_and_check_return_val(sst->sock, -1);
 
 		// wait the gst
-		tb_aioo_t o;
-		tb_aioo_seto(&o, sst->sock, wait, tb_null);
-		sst->wait = tb_aioo_wait(&o, timeout);
+		sst->wait = tb_aioo_wait(sst->sock, wait, timeout);
 		tb_trace_impl("wait: %ld", sst->wait);
 	}
 	else

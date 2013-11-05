@@ -28,16 +28,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* aioo, tb_long_t timeout)
+static tb_long_t tb_aioo_reactor_select_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
 	// check
-	tb_assert_and_check_return_val(aioo, -1);
-
-	// type
-	tb_size_t aioe = aioo->aioe;
+	tb_assert_and_check_return_val(handle, -1);
 
 	// fd
-	tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
+	tb_long_t fd = ((tb_long_t)handle) - 1;
 	tb_assert_and_check_return_val(fd >= 0, -1);
 	
 	// init time
@@ -52,8 +49,8 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* aioo, tb_long_t timeout)
 	fd_set 	rfds;
 	fd_set 	wfds;
 	fd_set 	efds;
-	fd_set* prfds = (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT)? &rfds : tb_null;
-	fd_set* pwfds = (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN)? &wfds : tb_null;
+	fd_set* prfds = (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT)? &rfds : tb_null;
+	fd_set* pwfds = (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)? &wfds : tb_null;
 
 	if (prfds)
 	{
@@ -92,12 +89,12 @@ static tb_long_t tb_aioo_reactor_select_wait(tb_aioo_t* aioo, tb_long_t timeout)
 	if (prfds && FD_ISSET(fd, &rfds)) 
 	{
 		e |= TB_AIOE_CODE_RECV;
-		if (aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
+		if (code & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
 	}
 	if (pwfds && FD_ISSET(fd, &wfds)) 
 	{
 		e |= TB_AIOE_CODE_SEND;
-		if (aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
+		if (code & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
 	}
 	if (FD_ISSET(fd, &efds) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
 		e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
