@@ -565,6 +565,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 	tb_size_t 	n = vector->size;
 	tb_byte_t* 	d = vector->data;
 	tb_bool_t 	bdel = tb_false;
+	tb_bool_t 	stop = tb_false;
 	for (i = 0; i < n; i++)
 	{
 		// item
@@ -574,7 +575,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(vector, &item, &bdel, data)) goto end;
+		if (!func(vector, &item, &bdel, data)) stop = tb_true;
 
 		// free it?
 		if (bdel)
@@ -587,7 +588,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 		}
 
 		// remove items?
-		if (!bdel || i + 1 == n)
+		if (!bdel || i + 1 == n || stop)
 		{
 			// has deleted items?
 			if (b != -1)
@@ -625,6 +626,9 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 
 			// reset
 			b = -1;
+
+			// stop?
+			tb_check_goto(!stop, end);
 		}
 	}
 

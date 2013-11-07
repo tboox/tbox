@@ -82,29 +82,21 @@ tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
 	if (aiop->rtor && aiop->rtor->cler)
 		aiop->rtor->cler(aiop->rtor);
 }
-tb_size_t tb_aiop_flag(tb_aiop_t* aiop)
-{
-	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->flag, TB_AIOP_FLAG_NONE);
-
-	// flag
-	return aiop->rtor->flag(aiop->rtor);
-}
-tb_bool_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle)
+tb_bool_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_false);
 
 	// addo
-	return aiop->rtor->addo(aiop->rtor, handle);
+	return aiop->rtor->addo(aiop->rtor, handle, code, data);
 }
-tb_bool_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
+tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->delo && handle, tb_false);
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->delo && handle);
 
 	// delo
-	return aiop->rtor->delo(aiop->rtor, handle);
+	aiop->rtor->delo(aiop->rtor, handle);
 }
 tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size)
 {
@@ -117,49 +109,17 @@ tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size)
 tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return(aiop && handle && code, tb_false);
+	tb_assert_and_check_return_val(aiop && handle && code, tb_false);
 
 	// init aioe
 	tb_aioe_t aioe;
 	aioe.code = code;
-	aioe.flag = TB_AIOE_FLAG_SETE;
 	aioe.data = data;
 	aioe.handle = handle;
 
 	// post aioe
 	return tb_aiop_post(aiop, &aioe, 1);
 }
-tb_bool_t tb_aiop_adde(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
-{
-	// check
-	tb_assert_and_check_return(aiop && handle && code, tb_false);
-
-	// init aioe
-	tb_aioe_t aioe;
-	aioe.code = code;
-	aioe.flag = TB_AIOE_FLAG_ADDE;
-	aioe.data = data;
-	aioe.handle = handle;
-
-	// post aioe
-	return tb_aiop_post(aiop, &aioe, 1);
-}
-tb_bool_t tb_aiop_dele(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
-{
-	// check
-	tb_assert_and_check_return(aiop && handle && code, tb_false);
-
-	// init aioe
-	tb_aioe_t aioe;
-	aioe.code = code;
-	aioe.flag = TB_AIOE_FLAG_DELE;
-	aioe.data = data;
-	aioe.handle = handle;
-
-	// post aioe
-	return tb_aiop_post(aiop, &aioe, 1);
-}
-
 tb_long_t tb_aiop_wait(tb_aiop_t* aiop, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
 	// check

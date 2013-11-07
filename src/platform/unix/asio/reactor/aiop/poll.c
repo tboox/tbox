@@ -29,6 +29,28 @@
  * types
  */
 
+// the poll aioo type
+typedef struct __tb_poll_aioo_t
+{
+	// the code
+	tb_size_t 				code;
+
+	// the data
+	tb_pointer_t 			data;
+
+}tb_poll_aioo_t;
+
+// the poll mutx type
+typedef struct __tb_poll_mutx_t
+{
+	// the pfds
+	tb_handle_t 			pfds;
+
+	// the hash
+	tb_handle_t 			hash;
+
+}tb_poll_mutx_t;
+
 // the poll reactor type
 typedef struct __tb_aiop_reactor_poll_t
 {
@@ -41,113 +63,176 @@ typedef struct __tb_aiop_reactor_poll_t
 	// the copy fds
 	tb_vector_t* 			cfds;
 
+	// the hash
+	tb_hash_t* 				hash;
+
 	// the mutx
-	tb_handle_t 			mutx;
+	tb_poll_mutx_t 			mutx;
 
 }tb_aiop_reactor_poll_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe)
+static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds, tb_false);
+	// check
+	tb_assert_and_check_return_val(vector && bdel && data, tb_false);
 
-	// fd
-	tb_long_t fd = ((tb_long_t)handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, tb_false);
-	
-	// init pfd
-	struct pollfd pfd = {0};
-	pfd.fd = fd;
-	if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
-	if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
+	// the fd
+	tb_long_t fd = (tb_long_t)data;
 
-	// add pfd
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
-	tb_vector_insert_tail(rtor->pfds, &pfd);
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+	// find and remove it
+	if (item)
+	{
+		// is this?
+		struct pollfd* pfd = (struct pollfd*)*item;
+		if (pfd && pfd->fd == fd) 
+		{
+			// remove it
+			*bdel = tb_true;
+
+			// break
+			return tb_false;
+		}
+	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aiop_reactor_poll_seto(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t aioe, tb_aioo_t const* obj)
+static tb_bool_t tb_poll_walk_sete(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds, tb_false);
+	// check
+	tb_assert_and_check_return_val(vector && bdel, tb_false);
 
-	// fd
-	tb_long_t fd = ((tb_long_t)handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, tb_false);
+	// the aioe
+	tb_aioe_t const* aioe = (tb_size_t)data;
 
-	// enter
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
-
-	// set pfd
-	tb_size_t itor = tb_iterator_head(rtor->pfds);
-	tb_size_t tail = tb_iterator_tail(rtor->pfds);
-	for (; itor != tail; itor = tb_iterator_next(rtor->pfds, itor))
+	// find and remove it
+	if (item)
 	{
-		struct pollfd* pfd = (struct pollfd*)tb_iterator_item(rtor->pfds, itor);
-		if (pfd && pfd->fd == fd)
+		// is this?
+		struct pollfd* pfd = (struct pollfd*)*item;
+		if (pfd && pfd->fd == ((tb_long_t)aioe->handle - 1)) 
 		{
 			pfd->events = 0;
-			if (aioe & TB_AIOE_CODE_RECV || aioe & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
-			if (aioe & TB_AIOE_CODE_SEND || aioe & TB_AIOE_CODE_CONN) pfd->events |= POLLOUT;
-			break;
+			if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
+			if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN) pfd->events |= POLLOUT;
+
+			// break
+			return tb_false;
 		}
 	}
 
-	// leave
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
-
 	// ok
-	return itor != tail? tb_true : tb_false;
+	return tb_true;
 }
-static tb_bool_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds, tb_false);
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && handle, tb_false);
 
-	// fd
-	tb_long_t fd = ((tb_long_t)handle) - 1;
-	tb_assert_and_check_return_val(fd >= 0, tb_false);
+	// init pfd
+	struct pollfd pfd = {0};
+	pfd.fd = ((tb_long_t)handle) - 1;
+	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) pfd.events |= POLLIN;
+	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) pfd.events |= POLLOUT;
 
-	// enter
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	// add pfd, TODO: addo by binary search
+	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+	tb_vector_insert_tail(rtor->pfds, &pfd);
+	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
-	// find pfd
-	tb_size_t itor = tb_iterator_head(rtor->pfds);
-	tb_size_t tail = tb_iterator_tail(rtor->pfds);
-	for (; itor != tail; itor = tb_iterator_next(rtor->pfds, itor))
+	// add handle => aioo
+	tb_bool_t ok = tb_false;
+	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+	if (rtor->hash) 
 	{
-		struct pollfd* pfd = (struct pollfd*)tb_iterator_item(rtor->pfds, itor);
-		if (pfd && pfd->fd == fd) break;
+		tb_poll_aioo_t aioo;
+		aioo.code = code;
+		aioo.data = data;
+		tb_hash_set(rtor->hash, handle, &aioo);
+		ok = tb_true;
+	}
+	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
+{
+	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && aioe, tb_false);
+
+	// sete it, TODO: sete by binary search
+	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+	tb_vector_walk(rtor->pfds, tb_poll_walk_sete, aioe);
+	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+
+	// set handle => aioo
+	tb_bool_t ok = tb_false;
+	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+	if (rtor->hash) 
+	{
+		tb_poll_aioo_t* aioo = (tb_poll_aioo_t*)tb_hash_get(rtor->hash, aioe->handle);
+		if (aioo)
+		{
+			aioo->code = aioe->code;
+			aioo->data = aioe->data;
+			ok = tb_true;
+		}
+	}
+	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+
+	// ok?
+	return ok;
+}
+static tb_void_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+{
+	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->pfds && rtor->cfds && handle);
+
+	// delo it, TODO: delo by binary search
+	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+	tb_vector_walk(rtor->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)handle) - 1));
+	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+
+	// del handle => aioo
+	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+	if (rtor->hash) tb_hash_del(rtor->hash, handle);
+	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+}
+static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
+{
+	// check
+	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return_val(rtor && rtor->pfds && list && size, tb_false);
+
+	// walk list
+	tb_size_t i = 0;
+	tb_size_t post = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the aioe
+		tb_aioe_t const* aioe = &list[i];
+		if (aioe)
+		{
+			if (tb_aiop_reactor_poll_sete(reactor, aioe)) post++;
+		}
 	}
 
-	// del pfd
-	if (itor != tail) tb_vector_remove(rtor->pfds, itor);
-
-	// leave
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
-
-	// ok
-	return itor != tail? tb_true : tb_false;
+	// ok?
+	return post? tb_true : tb_false;
 }
-static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* objs, tb_size_t objm, tb_long_t timeout)
+static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && reactor->aiop && reactor->aiop->hash, -1);
-
-	// enter
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && reactor->aiop, -1);
 
 	// copy pfds
+	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
 	tb_vector_copy(rtor->cfds, rtor->pfds);
-
-	// leave
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
 	// cfds
 	struct pollfd* 	cfds = (struct pollfd*)tb_vector_data(rtor->cfds);
@@ -164,29 +249,46 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioo_t
 	// sync
 	tb_size_t i = 0;
 	tb_size_t n = 0;
-	for (i = 0; i < cfdm && n < objm; i++)
+	for (i = 0; i < cfdm && n < maxn; i++)
 	{
-		struct pollfd* 	p = cfds + i;
-		tb_aioo_t* 	o = tb_hash_get(reactor->aiop->hash, (p->fd + 1));
-		tb_assert_and_check_return_val(o, -1);
-		
-		// add event
-		tb_long_t e = 0;
-		if (p->revents & POLLIN)
-		{
-			e |= TB_AIOE_CODE_RECV;
-			if (o->aioe & TB_AIOE_CODE_ACPT) e |= TB_AIOE_CODE_ACPT;
-		}
-		if (p->revents & POLLOUT) 
-		{
-			e |= TB_AIOE_CODE_SEND;
-			if (o->aioe & TB_AIOE_CODE_CONN) e |= TB_AIOE_CODE_CONN;
-		}
-		if ((p->revents & POLLHUP) && !(e & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
-			e |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
+		// the handle
+		tb_handle_t handle = (tb_handle_t)(cfds[i].fd + 1);
+		tb_assert_and_check_return_val(handle, -1);
 
-		// add object
-		if (e) objs[n++] = *o;
+		// the events
+		tb_size_t events = cfds[i].revents;
+		tb_check_continue(events);
+
+		// the aioo
+		if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+		tb_poll_aioo_t aioo = {0};
+		if (rtor->hash)
+		{
+			tb_poll_aioo_t const* item = (tb_poll_aioo_t const*)tb_hash_get(rtor->hash, handle);
+			if (item) aioo = *item;
+		}
+		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+		tb_assert_and_check_return_val(aioo.code, -1);
+		
+		// init aioe
+		tb_aioe_t 	aioe = {0};
+		aioe.data 	= aioo.data;
+		aioe.handle = handle;
+		if (events & POLLIN)
+		{
+			aioe.code |= TB_AIOE_CODE_RECV;
+			if (aioo.code & TB_AIOE_CODE_ACPT) aioe.code |= TB_AIOE_CODE_ACPT;
+		}
+		if (events & POLLOUT) 
+		{
+			aioe.code |= TB_AIOE_CODE_SEND;
+			if (aioo.code & TB_AIOE_CODE_CONN) aioe.code |= TB_AIOE_CODE_CONN;
+		}
+		if ((events & POLLHUP) && !(aioo.code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+			aioe.code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
+
+		// save aioe
+		list[n++] = aioe;
 	}
 
 	// ok
@@ -198,18 +300,26 @@ static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
 	if (rtor)
 	{
 		// exit pfds
-		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+		if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
 		if (rtor->pfds) tb_vector_exit(rtor->pfds);
 		rtor->pfds = tb_null;
-		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+		if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
 		// exit cfds
 		if (rtor->cfds) tb_vector_exit(rtor->cfds);
 		rtor->cfds = tb_null;
 
+		// exit hash
+		if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+		if (rtor->hash) tb_hash_exit(rtor->hash);
+		rtor->hash = tb_null;
+		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+
 		// exit mutx
-		if (rtor->mutx) tb_mutex_exit(rtor->mutx);
-		rtor->mutx = tb_null;
+		if (rtor->mutx.pfds) tb_mutex_exit(rtor->mutx.pfds);
+		rtor->mutx.pfds = tb_null;
+		if (rtor->mutx.hash) tb_mutex_exit(rtor->mutx.hash);
+		rtor->mutx.hash = tb_null;
 
 		// free it
 		tb_free(rtor);
@@ -221,9 +331,14 @@ static tb_void_t tb_aiop_reactor_poll_cler(tb_aiop_reactor_t* reactor)
 	if (rtor)
 	{
 		// clear pfds
-		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+		if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
 		if (rtor->pfds) tb_vector_clear(rtor->pfds);
-		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+		if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+
+		// clear hash
+		if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+		if (rtor->hash) tb_hash_clear(rtor->hash);
+		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 	}
 }
 static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
@@ -240,13 +355,14 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	rtor->base.exit = tb_aiop_reactor_poll_exit;
 	rtor->base.cler = tb_aiop_reactor_poll_cler;
 	rtor->base.addo = tb_aiop_reactor_poll_addo;
-	rtor->base.seto = tb_aiop_reactor_poll_seto;
 	rtor->base.delo = tb_aiop_reactor_poll_delo;
+	rtor->base.post = tb_aiop_reactor_poll_post;
 	rtor->base.wait = tb_aiop_reactor_poll_wait;
 
 	// init mutx
-	rtor->mutx = tb_mutex_init(tb_null);
-	tb_assert_and_check_goto(rtor->mutx, fail);
+	rtor->mutx.pfds = tb_mutex_init(tb_null);
+	rtor->mutx.hash = tb_mutex_init(tb_null);
+	tb_assert_and_check_goto(rtor->mutx.pfds && rtor->mutx.hash, fail);
 
 	// init pfds
 	rtor->pfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), tb_null, tb_null));
@@ -255,6 +371,10 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	// init cfds
 	rtor->cfds = tb_vector_init(tb_align8((aiop->maxn >> 3) + 1), tb_item_func_ifm(sizeof(struct pollfd), tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->cfds, fail);
+
+	// init hash
+	rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ifm(sizeof(tb_poll_aioo_t), tb_null, tb_null));
+	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

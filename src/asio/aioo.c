@@ -31,7 +31,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
