@@ -33,6 +33,17 @@
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the aiop post maxn
+#ifdef __tb_small__
+# 	define TB_AIOP_POST_MAXN 				(256)
+#else
+# 	define TB_AIOP_POST_MAXN 				(1024)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 

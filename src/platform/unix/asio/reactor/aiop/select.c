@@ -215,7 +215,7 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
 	}
 
 	// ok?
-	return post? tb_true : tb_false;
+	return post == size? tb_true : tb_false;
 }
 static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
