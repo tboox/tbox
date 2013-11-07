@@ -33,10 +33,10 @@
  * implementation
  */
 #ifdef TB_CONFIG_ASIO_HAVE_SELECT
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout);
-tb_long_t tb_aioo_reactor_wait(tb_aioo_t* object, tb_long_t timeout)
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
+tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {
-	return tb_aioo_reactor_select_wait(object, timeout);
+	return tb_aioo_reactor_select_wait(handle, code, timeout);
 }
 
 #endif

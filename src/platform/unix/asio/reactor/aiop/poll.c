@@ -159,6 +159,21 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle
 	// ok?
 	return ok;
 }
+static tb_void_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+{
+	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->pfds && rtor->cfds && handle);
+
+	// delo it, TODO: delo by binary search
+	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+	tb_vector_walk(rtor->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)handle) - 1));
+	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+
+	// del handle => aioo
+	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+	if (rtor->hash) tb_hash_del(rtor->hash, handle);
+	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+}
 static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
@@ -187,21 +202,6 @@ static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t
 	// ok?
 	return ok;
 }
-static tb_void_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
-{
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->pfds && rtor->cfds && handle);
-
-	// delo it, TODO: delo by binary search
-	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
-	tb_vector_walk(rtor->pfds, tb_poll_walk_delo, (tb_pointer_t)(((tb_long_t)handle) - 1));
-	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
-
-	// del handle => aioo
-	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
-	if (rtor->hash) tb_hash_del(rtor->hash, handle);
-	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
-}
 static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
 {
 	// check
@@ -227,7 +227,7 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
 static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && reactor->aiop, -1);
+	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && reactor->aiop && list && maxn, -1);
 
 	// copy pfds
 	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
