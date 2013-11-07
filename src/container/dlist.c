@@ -652,6 +652,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 	tb_size_t 	prev = 0;
 	tb_bool_t 	bdel = tb_false;
 	tb_size_t 	itor = dlist->head;
+	tb_bool_t 	stop = tb_false;
 	while (itor)
 	{
 		// node
@@ -667,7 +668,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(dlist, &item, &bdel, data)) goto end;
+		if (!func(dlist, &item, &bdel, data)) stop = tb_true;
 
 		// free it?
 		if (bdel)
@@ -684,7 +685,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 		}
 		
 		// remove items?
-		if (!bdel || !next)
+		if (!bdel || !next || stop)
 		{
 			// has deleted items?
 			if (base != -1)
@@ -721,6 +722,9 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 
 			// reset
 			base = -1;
+
+			// stop?
+			tb_check_goto(!stop, end);
 		}
 
 		// next

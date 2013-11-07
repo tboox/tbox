@@ -78,10 +78,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_socket_listen(sock)) goto end;
 
 	// addo sock
-	if (!tb_aiop_addo(aiop, sock)) goto end;
-
-	// sete sock
-	if (!tb_aiop_sete(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
+	if (!tb_aiop_addo(aiop, sock, TB_AIOE_CODE_ACPT, tb_null)) goto end;
 
 	// accept
 	tb_aioe_t list[16];
@@ -123,10 +120,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context->data);
 
 					// addo sock
-					if (!tb_aiop_addo(aiop, context->sock)) break;
-
-					// adde sock
-					if (!tb_aiop_sete(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
+					if (!tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
 
 					// trace
 					tb_print("acpt[%p]: ok", context->sock);

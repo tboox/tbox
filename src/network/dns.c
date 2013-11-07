@@ -115,7 +115,7 @@ typedef struct __tb_dns_list_t
 	tb_handle_t			spool;
 
 	// the cache
-	tb_handle_t 			cache;
+	tb_handle_t 		cache;
 
 	// the times
 	tb_hize_t 			times;
@@ -1441,7 +1441,6 @@ tb_long_t tb_dns_look_wait(tb_handle_t handle, tb_long_t timeout)
 	tb_assert_and_check_return_val(look && look->sock, -1);
 
 	// has asio event?
-	tb_aioo_t o;
 	tb_size_t e = TB_AIOE_CODE_NONE;
 	if (!(look->step & TB_DNS_STEP_NEVT))
 	{

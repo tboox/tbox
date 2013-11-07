@@ -645,6 +645,7 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 			tb_size_t j = 0;
 			tb_size_t b = -1;
 			tb_size_t l = list->size;
+			tb_bool_t stop = tb_false;
 			for (j = 0; j < l; j++)
 			{
 				// init item
@@ -656,7 +657,7 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 				bdel = tb_false;
 
 				// callback: item
-				if (!func(hash, &item, &bdel, data)) goto end;
+				if (!func(hash, &item, &bdel, data)) stop = tb_true;
 
 				// free it?
 				if (bdel)
@@ -670,7 +671,7 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 				}
 
 				// remove items?
-				if (!bdel || j + 1 == l)
+				if (!bdel || j + 1 == l || stop)
 				{
 					// has deleted items?
 					if (b != -1)
@@ -717,6 +718,9 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 
 					// reset
 					b = -1;
+
+					// stop?
+					tb_check_goto(!stop, end);
 				}
 			}
 		}

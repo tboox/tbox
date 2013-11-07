@@ -111,7 +111,7 @@ static tb_bool_t tb_aiop_reactor_select_seto(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_void_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
 	// check
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;

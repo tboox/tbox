@@ -143,7 +143,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_seto(tb_aiop_reactor_t* reactor, tb_hand
 	// ok
 	return tb_aiop_reactor_kqueue_sync(reactor, e, n);
 }
-static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+static tb_void_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
 {
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->kqfd >= 0, tb_false);

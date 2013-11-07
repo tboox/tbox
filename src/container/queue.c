@@ -281,6 +281,7 @@ tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle
 	tb_size_t 	itor = queue->head;
 	tb_size_t 	tail = queue->tail;
 	tb_size_t 	maxn = queue->maxn;
+	tb_bool_t 	stop = tb_false;
 	for (; itor != tail; itor = (itor + 1) & (maxn - 1))
 	{
 		// item
@@ -290,13 +291,16 @@ tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(queue, &item, &bdel, data)) goto end;
+		if (!func(queue, &item, &bdel, data)) stop = tb_true;
 
 		// free it?
 		if (bdel)
 		{
 			tb_trace_noimpl();
 		}
+
+		// stop?
+		tb_check_goto(!stop, end);
 	}
 
 	// callback: tail
