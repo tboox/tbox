@@ -97,6 +97,21 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 	// ok?
 	return ok;
 }
+static tb_void_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
+{
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->epfd > 0 && handle);
+
+	// delo
+	struct epoll_event e = {0};
+	if (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, ((tb_long_t)handle) - 1, &e) < 0) return ;
+
+	// del handle => aioo
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	if (rtor->hash) tb_hash_del(rtor->hash, handle);
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+}
 static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
 	// check
@@ -151,21 +166,6 @@ static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_
 
 	// ok?
 	return post? tb_true : tb_false;
-}
-static tb_void_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_handle_t handle)
-{
-	// check
-	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->epfd > 0 && handle);
-
-	// delo
-	struct epoll_event e = {0};
-	if (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, ((tb_long_t)handle) - 1, &e) < 0) return ;
-
-	// del handle => aioo
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
-	if (rtor->hash) tb_hash_del(rtor->hash, handle);
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
 }
 static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
