@@ -56,7 +56,7 @@ typedef struct __tb_aiop_reactor_kqueue_t
 	tb_long_t 				kqfd;
 
 	// the events
-	struct kevent64_s* 			evts;
+	struct kevent64_s* 		evts;
 	tb_size_t 				evtn;
 	
 }tb_aiop_reactor_kqueue_t;
@@ -114,13 +114,13 @@ static tb_void_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_hand
 	EV_SET64(&e[1], fd, EVFILT_WRITE, EV_DELETE, 0, 0, 0, 0, 0);
 
 	// ok?
-	return tb_aiop_reactor_kqueue_sync(reactor, e, 2);
+	tb_aiop_reactor_kqueue_sync(reactor, e, 2);
 }
 static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
 {
 	// check
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && list && size && size <= TB_AIOP_POST_MAXN, tb_false);
+	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
+	tb_assert_and_check_return_val(rtor && list && size && size <= TB_AIOP_POST_MAXN, tb_false);
 
 	// init kevents
 	struct kevent64_s 	e[TB_AIOP_POST_MAXN << 2];
@@ -145,11 +145,11 @@ static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe
 			// adde
 			if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) 
 			{
-				EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, aioe->code, aioe->data); n++;
+				EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
 			}
 			if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN)
 			{
-				EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, aioe->code, aioe->data); n++;
+				EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
 			}
 
 			// post++
@@ -163,7 +163,7 @@ static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe
 	// ok?
 	return tb_aiop_reactor_kqueue_sync(reactor, e, n);
 }
-static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo_t* list, tb_size_t maxn, tb_long_t timeout)
+static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
 	// check
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
@@ -189,7 +189,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioo
 	}
 
 	// wait events
-	tb_long_t evtn = kevent64_s(rtor->kqfd, tb_null, 0, rtor->evts, rtor->evtn, timeout >= 0? &t : tb_null);
+	tb_long_t evtn = kevent64(rtor->kqfd, tb_null, 0, rtor->evts, rtor->evtn, 0, timeout >= 0? &t : tb_null);
 	tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
 	
 	// timeout?
@@ -263,7 +263,6 @@ static tb_void_t tb_aiop_reactor_kqueue_cler(tb_aiop_reactor_t* reactor)
 		// close kqfd
 		if (rtor->kqfd >= 0)
 		{
-			// FIXME 
 			close(rtor->kqfd);
 			rtor->kqfd = kqueue();
 		}
