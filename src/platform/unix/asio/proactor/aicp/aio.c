@@ -713,24 +713,6 @@ static tb_bool_t tb_aio_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const*
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_proactor_aio_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
-{
-	// check
-	tb_aicp_proactor_aio_t* ptor = (tb_aicp_proactor_aio_t*)proactor;
-	tb_assert_and_check_return_val(ptor && handle && type, tb_false);
-
-	// need this type?
-	return tb_aicp_proactor_unix_need(ptor->uptr, type, ptor->indx)? tb_true : tb_false;
-}
-static tb_bool_t tb_aicp_proactor_aio_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
-{
-	// check
-	tb_aicp_proactor_aio_t* ptor = (tb_aicp_proactor_aio_t*)proactor;
-	tb_assert_and_check_return_val(ptor && handle, tb_false);
-
-	// ok
-	return tb_true;
-}
 static tb_bool_t tb_aicp_proactor_aio_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {
 	// check
@@ -816,29 +798,27 @@ static tb_void_t tb_aicp_proactor_aio_exit(tb_aicp_proactor_t* proactor)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-static tb_aicp_proactor_t* tb_aicp_proactor_aio_init(tb_aicp_proactor_unix_t* uptr)
+static tb_void_t tb_aicp_proactor_aio_init(tb_aicp_proactor_unix_t* uptr)
 {
 	// check
-	tb_assert_and_check_return_val(uptr && uptr->base.aicp && uptr->base.aicp->maxn, tb_null);
+	tb_assert_and_check_return(uptr && uptr->base.aicp && uptr->base.aicp->maxn);
 
 	// need this proactor?
-	tb_check_return_val( 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT]
-						, 	tb_null);
+	tb_check_return( 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT]
+					);
 
 	// make proactor
 	tb_aicp_proactor_aio_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_aio_t));
-	tb_assert_and_check_return_val(ptor, tb_null);
+	tb_assert_and_check_return(ptor);
 
 	// init base
 	ptor->uptr = uptr;
 	ptor->base.aicp = uptr->base.aicp;
 	ptor->base.kill = tb_aicp_proactor_aio_kill;
 	ptor->base.exit = tb_aicp_proactor_aio_exit;
-	ptor->base.addo = tb_aicp_proactor_aio_addo;
-	ptor->base.delo = tb_aicp_proactor_aio_delo;
 	ptor->base.post = tb_aicp_proactor_aio_post;
 	
 	// init mutx
@@ -860,10 +840,9 @@ static tb_aicp_proactor_t* tb_aicp_proactor_aio_init(tb_aicp_proactor_unix_t* up
 	if (!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT]) uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT] = ptor->indx;
 
 	// ok
-	return (tb_aicp_proactor_t*)ptor;
+	return ;
 
 fail:
 	if (ptor) tb_aicp_proactor_aio_exit(ptor);
-	return tb_null;
 }
 
