@@ -69,20 +69,56 @@ typedef struct __tb_aicp_proactor_unix_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_bool_t tb_aicp_proactor_unix_need(tb_aicp_proactor_t* proactor, tb_size_t type, tb_size_t indx)
+{
+	// check
+	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
+	tb_assert_and_check_return_val(ptor && indx, tb_false);
+
+	// need this type for this proactor index?
+	switch (type)
+	{
+	case TB_AICO_TYPE_SOCK:
+		{
+			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV] == indx) return tb_true;
+			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND] == indx) return tb_true;
+			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT] == indx) return tb_true;
+			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_CONN] == indx) return tb_true;
+		}
+		break;
+	case TB_AICO_TYPE_FILE:
+		{
+			if (ptor->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ] == indx) return tb_true;
+			if (ptor->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT] == indx) return tb_true;
+		}
+		break;
+	default:
+		break;
+	}
+
+	// no
+	return tb_false;
+}
+
 static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
 	tb_assert_and_check_return_val(ptor && handle && type, tb_false);
 
-	// addo handle to all proactors
+	// walk proactors
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
 	tb_size_t addo = 0;
 	for (; i < n; i++) 
 	{
-		tb_aicp_proactor_t* item = ptor->ptor_list[i];
-		if (item && item->addo(item, handle, type)) addo++;
+		// need this?
+		if (tb_aicp_proactor_unix_need(proactor, type, i + 1))
+		{
+			// addo it
+			tb_aicp_proactor_t* item = ptor->ptor_list[i];
+			if (item && item->addo && item->addo(item, handle, type)) addo++;
+		}
 	}
 
 	// ok?
@@ -94,14 +130,14 @@ static tb_bool_t tb_aicp_proactor_unix_delo(tb_aicp_proactor_t* proactor, tb_han
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
 	tb_assert_and_check_return_val(ptor && handle, tb_false);
 
-	// delo handle to all proactors
+	// walk proactors
 	tb_size_t delo = 0;
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
 	for (; i < n; i++) 
 	{
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
-		if (item && item->delo(item, handle)) delo++;
+		if (item && item->delo && item->delo(item, handle)) delo++;
 	}
 
 	// ok?
@@ -285,47 +321,19 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 	// post wait
 	if (ok) tb_event_post(ptor->wait);
 }
-static __tb_inline__ tb_bool_t tb_aicp_proactor_unix_need(tb_aicp_proactor_t* proactor, tb_size_t type, tb_size_t indx)
-{
-	// check
-	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return_val(ptor && indx, tb_false);
-
-	// need this type for this proactor index?
-	switch (type)
-	{
-	case TB_AICO_TYPE_SOCK:
-		{
-			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV] == indx) return tb_true;
-			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND] == indx) return tb_true;
-			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT] == indx) return tb_true;
-			if (ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_CONN] == indx) return tb_true;
-		}
-		break;
-	case TB_AICO_TYPE_FILE:
-		{
-			if (ptor->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ] == indx) return tb_true;
-			if (ptor->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT] == indx) return tb_true;
-		}
-		break;
-	default:
-		break;
-	}
-
-	// no
-	return tb_false;
-}
 
 /* ///////////////////////////////////////////////////////////////////////
  * proactors
  */
-#ifdef TB_CONFIG_ASIO_HAVE_EPOLL
+#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
 # 	include "aicp/epoll.c"
 #endif
 
 #ifdef TB_CONFIG_ASIO_HAVE_AIO
 # 	include "aicp/aio.c"
 #endif
+
+#include "aicp/aiop.c"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -362,30 +370,23 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->wait, fail);
 
 	// init epoll proactor
-#ifdef TB_CONFIG_ASIO_HAVE_EPOLL
-	if (!tb_aicp_proactor_epoll_init(ptor)) goto fail;
+#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
+	tb_aicp_proactor_epoll_init(ptor);
 #endif
 
 	// init kqueue proactor
 #if 0//defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
-	if (!tb_aicp_proactor_kqueue_init(ptor)) goto fail;
+	tb_aicp_proactor_kqueue_init(ptor);
 #endif
 
 	// init aio proactor
 #ifdef TB_CONFIG_ASIO_HAVE_AIO
-	if (!tb_aicp_proactor_aio_init(ptor)) goto fail;
+	tb_aicp_proactor_aio_init(ptor);
 #endif
 
-	// init poll proactor
-#if 0//defined(TB_CONFIG_ASIO_HAVE_POLL)
-	if (!tb_aicp_proactor_poll_init(ptor)) goto fail;
-#endif
-	
-	// init select proactor
-#if 0//defined(TB_CONFIG_ASIO_HAVE_SELECT)
-	if (!tb_aicp_proactor_select_init(ptor)) goto fail;
-#endif
-	
+	// init aiop proactor
+	tb_aicp_proactor_aiop_init(ptor);
+
 	// check 
 	tb_assert_and_check_goto(ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT], fail);
 	tb_assert_and_check_goto(ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_CONN], fail);

@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		epoll.c
+ * @file		aiop.c
  * @ingroup 	platform
  */
 
@@ -25,24 +25,19 @@
  * trace
  */
 #undef TB_TRACE_IMPL_TAG
-#define TB_TRACE_IMPL_TAG 				"epoll"
+#define TB_TRACE_IMPL_TAG 				"aiop"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
-#include <sys/epoll.h>
-#include <fcntl.h>
-#ifndef TB_CONFIG_OS_ANDROID
-# 	include <sys/unistd.h>
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the epoll proactor type
-typedef struct __tb_aicp_proactor_epoll_t
+// the aiop proactor type
+typedef struct __tb_aicp_proactor_aiop_t
 {
 	// the proactor base
 	tb_aicp_proactor_t 					base;
@@ -52,14 +47,10 @@ typedef struct __tb_aicp_proactor_epoll_t
 
 	// the proactor indx
 	tb_size_t 							indx;
-	
-	// the epoll fd
-	tb_long_t 							epfd;
 
-	// the epoll events
-	struct epoll_event* 				evts;
-	tb_size_t 							evtm;
-	
+	// the aiop
+	tb_aiop_t* 							aiop;
+
 	// the aice pool
 	tb_handle_t 						pool;
 	
@@ -69,12 +60,12 @@ typedef struct __tb_aicp_proactor_epoll_t
 	// the spak loop
 	tb_handle_t 						loop;
 
-}tb_aicp_proactor_epoll_t;
+}tb_aicp_proactor_aiop_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * aice
  */
-static tb_aice_t* tb_epoll_aice_init(tb_aicp_proactor_epoll_t* ptor)
+static tb_aice_t* tb_aiop_aice_init(tb_aicp_proactor_aiop_t* ptor)
 {
 	// check
 	tb_assert_and_check_return_val(ptor, tb_null);
@@ -91,7 +82,7 @@ static tb_aice_t* tb_epoll_aice_init(tb_aicp_proactor_epoll_t* ptor)
 	// ok?
 	return (tb_aice_t*)data;
 }
-static tb_void_t tb_epoll_aice_exit(tb_aicp_proactor_epoll_t* ptor, tb_aice_t* data)
+static tb_void_t tb_aiop_aice_exit(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* data)
 {
 	// check
 	tb_assert_and_check_return(ptor);
@@ -109,7 +100,7 @@ static tb_void_t tb_epoll_aice_exit(tb_aicp_proactor_epoll_t* ptor, tb_aice_t* d
 /* ///////////////////////////////////////////////////////////////////////
  * post
  */
-static tb_bool_t tb_epoll_post_acpt(tb_aicp_proactor_epoll_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_post_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
 	tb_assert_and_check_return_val(ptor, tb_false);
@@ -120,10 +111,10 @@ static tb_bool_t tb_epoll_post_acpt(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 	// ok?
 	return tb_false;
 }
-static tb_bool_t tb_epoll_post_conn(tb_aicp_proactor_epoll_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_post_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
-	tb_assert_and_check_return_val(ptor && ptor->epfd, tb_false);
+	tb_assert_and_check_return_val(ptor, tb_false);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->handle && aice->code == TB_AICE_CODE_CONN, tb_false);
@@ -147,19 +138,13 @@ static tb_bool_t tb_epoll_post_conn(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 		do
 		{
 			// make reqt
-			reqt = tb_epoll_aice_init(ptor);
+			reqt = tb_aiop_aice_init(ptor);
 			tb_assert_and_check_break(reqt);
 
 			// init reqt
 			*reqt = *aice;
 
-			// init 
-			struct epoll_event e = {0};
-			e.events |= EPOLLOUT;
-			e.data.u64 = (tb_hize_t)reqt;
-
-			// ctrl
-			if (epoll_ctl(ptor->epfd, EPOLL_CTL_MOD, ((tb_long_t)aice->handle) - 1, &e) < 0) break;
+			// TODO
 
 			// ok
 			done = tb_true;
@@ -169,7 +154,7 @@ static tb_bool_t tb_epoll_post_conn(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 		// error?
 		if (!done)
 		{
-			if (reqt) tb_epoll_aice_exit(ptor, reqt);
+			if (reqt) tb_aiop_aice_exit(ptor, reqt);
 			return tb_false;
 		}
 	}
@@ -185,7 +170,7 @@ static tb_bool_t tb_epoll_post_conn(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_epoll_post_recv(tb_aicp_proactor_epoll_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_post_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
 	tb_assert_and_check_return_val(ptor, tb_false);
@@ -197,7 +182,7 @@ static tb_bool_t tb_epoll_post_recv(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 	// ok?
 	return tb_false;
 }
-static tb_bool_t tb_epoll_post_send(tb_aicp_proactor_epoll_t* ptor, tb_aice_t const* aice)
+static tb_bool_t tb_aiop_post_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
 	tb_assert_and_check_return_val(ptor, tb_false);
@@ -213,13 +198,13 @@ static tb_bool_t tb_epoll_post_send(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 /* ///////////////////////////////////////////////////////////////////////
  * spak 
  */
-static tb_bool_t tb_epoll_spak_resp(tb_aicp_proactor_epoll_t* ptor, tb_aice_t const* resp, tb_size_t events)
+static tb_bool_t tb_aiop_spak_resp(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* resp, tb_size_t events)
 {
 	// check?
 	tb_assert_and_check_return_val(ptor && resp, tb_false);
 
 	// init spak
-	static tb_bool_t (*s_spak[])(tb_aicp_proactor_epoll_t* , tb_aice_t const* , tb_size_t) = 
+	static tb_bool_t (*s_spak[])(tb_aicp_proactor_aiop_t* , tb_aice_t const* , tb_size_t) = 
 	{
 		tb_null
 	,	tb_null
@@ -238,21 +223,22 @@ static tb_bool_t tb_epoll_spak_resp(tb_aicp_proactor_epoll_t* ptor, tb_aice_t co
 /* ///////////////////////////////////////////////////////////////////////
  * loop
  */
-static tb_pointer_t tb_epoll_spak_loop(tb_pointer_t data)
+static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 {
 	// check
-	tb_aicp_proactor_epoll_t* 	ptor = (tb_aicp_proactor_epoll_t*)data;
+	tb_aicp_proactor_aiop_t* 	ptor = (tb_aicp_proactor_aiop_t*)data;
 	tb_aicp_t* 					aicp = ptor? ptor->base.aicp : tb_null;
-	tb_assert_and_check_goto(ptor && ptor->epfd > 0 && ptor->evts && aicp, end);
+	tb_assert_and_check_goto(ptor && aicp, end);
 
 	// trace
 	tb_trace_impl("loop: init");
 
+#if 0
 	// loop 
 	while (!tb_atomic_get(&aicp->kill))
 	{
 		// wait events
-		tb_long_t evtn = epoll_wait(ptor->epfd, ptor->evts, ptor->evtm, -1);
+		tb_long_t evtn = aiop_wait(ptor->epfd, ptor->evts, ptor->evtm, -1);
 		tb_assert_and_check_break(evtn >= 0 && evtn <= ptor->evtm);
 		
 		// timeout?
@@ -267,9 +253,10 @@ static tb_pointer_t tb_epoll_spak_loop(tb_pointer_t data)
 			tb_assert_and_check_goto(aice, end);
 
 			// spak resp
-			if (!tb_epoll_spak_resp(ptor, aice, ptor->evts[i].events)) goto end;
+			if (!tb_aiop_spak_resp(ptor, aice, ptor->evts[i].events)) goto end;
 		}
 	}
+#endif
 	
 end:
 	// trace
@@ -286,46 +273,28 @@ end:
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_proactor_epoll_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
+static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_aicp_proactor_epoll_t* ptor = (tb_aicp_proactor_epoll_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->epfd && handle && type, tb_false);
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptro->aiop && handle && type == TB_AICO_TYPE_SOCK, tb_false);
 
-	// need this type?
-	if (!tb_aicp_proactor_unix_need(ptor->uptr, type, ptor->indx)) return tb_false;
-
-	// init 
-	struct epoll_event e = {0};
-	e.data.u64 = (tb_hize_t)handle;
-
-	// ctrl
-	if (epoll_ctl(ptor->epfd, EPOLL_CTL_ADD, ((tb_long_t)handle) - 1, &e) < 0) 
-	{
-		tb_trace_impl("addo[%p]: %lu: failed", handle, type);
-		return tb_false;
-	}
-
-	// ok
-	return tb_true;
+	// addo
+	return tb_aiop_addo(ptor->aiop, handle, TB_AIOE_CODE_NONE, tb_null);
 }
-static tb_bool_t tb_aicp_proactor_epoll_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
+static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
 {
 	// check
-	tb_aicp_proactor_epoll_t* ptor = (tb_aicp_proactor_epoll_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->epfd && handle, tb_false);
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->aiop && handle, tb_false);
 
-	// ctrl
-	struct epoll_event e = {0};
-	if (epoll_ctl(ptor->epfd, EPOLL_CTL_DEL, ((tb_long_t)handle) - 1, &e) < 0) return tb_false;
-
-	// ok
-	return tb_true;
+	// delo
+	return tb_aiop_delo(ptor->aiop, handle);
 }
-static tb_bool_t tb_aicp_proactor_epoll_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
+static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {
 	// check
-	tb_aicp_proactor_epoll_t* ptor = (tb_aicp_proactor_epoll_t*)proactor;
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return_val(ptor && list && size, tb_false);
 
 	// walk list
@@ -339,10 +308,10 @@ static tb_bool_t tb_aicp_proactor_epoll_post(tb_aicp_proactor_t* proactor, tb_ai
 		static tb_long_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
 		{
 			tb_null
-		,	tb_epoll_post_acpt
-		,	tb_epoll_post_conn
-		,	tb_epoll_post_recv
-		,	tb_epoll_post_send
+		,	tb_aiop_post_acpt
+		,	tb_aiop_post_conn
+		,	tb_aiop_post_recv
+		,	tb_aiop_post_send
 		,	tb_null
 		,	tb_null
 		};
@@ -355,18 +324,18 @@ static tb_bool_t tb_aicp_proactor_epoll_post(tb_aicp_proactor_t* proactor, tb_ai
 	// ok
 	return tb_true;
 }
-static tb_void_t tb_aicp_proactor_epoll_kill(tb_aicp_proactor_t* proactor)
+static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
-	tb_aicp_proactor_epoll_t* ptor = (tb_aicp_proactor_epoll_t*)proactor;
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return(ptor);
 
 	// trace
 	tb_trace_impl("kill");
 }
-static tb_void_t tb_aicp_proactor_epoll_exit(tb_aicp_proactor_t* proactor)
+static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 {
-	tb_aicp_proactor_epoll_t* ptor = (tb_aicp_proactor_epoll_t*)proactor;
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	if (ptor)
 	{
 		// trace
@@ -381,19 +350,15 @@ static tb_void_t tb_aicp_proactor_epoll_exit(tb_aicp_proactor_t* proactor)
 			ptor->loop = tb_null;
 		}
 
-		// exit events
-		if (ptor->evts) tb_free(ptor->evts);
-		ptor->evts = tb_null;
-
-		// exit fd
-		if (ptor->epfd > 0) close(ptor->epfd);
-		ptor->epfd = 0;
-
 		// exit pool
 		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 		if (ptor->pool) tb_rpool_exit(ptor->pool);
 		ptor->pool = tb_null;
 		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
+
+		// exit aiop
+		if (ptor->aiop) tb_aiop_exit(ptor->aiop);
+		ptor->aiop = tb_null;
 
 		// exit mutx
 		if (ptor->mutx) tb_mutex_exit(ptor->mutx);
@@ -407,52 +372,47 @@ static tb_void_t tb_aicp_proactor_epoll_exit(tb_aicp_proactor_t* proactor)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-static tb_void_t tb_aicp_proactor_epoll_init(tb_aicp_proactor_unix_t* uptr)
+static tb_void_t tb_aicp_proactor_aiop_init(tb_aicp_proactor_unix_t* uptr)
 {
 	// check
-	tb_assert_and_check_return_val(uptr && uptr->base.aicp && uptr->base.aicp->maxn, tb_null);
+	tb_assert_and_check_return(uptr && uptr->base.aicp && uptr->base.aicp->maxn);
 
 	// need this proactor?
-	tb_check_return_val( 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_CONN]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV]
-						|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND]
-						, 	tb_null);
+	tb_check_return( 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_CONN]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_RECV]
+					|| 	!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND]
+					);
 
 	// make proactor
-	tb_aicp_proactor_epoll_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_epoll_t));
-	tb_assert_and_check_return_val(ptor, tb_null);
+	tb_aicp_proactor_aiop_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_aiop_t));
+	tb_assert_and_check_return(ptor);
 
 	// init base
 	ptor->uptr = uptr;
 	ptor->base.aicp = uptr->base.aicp;
-	ptor->base.kill = tb_aicp_proactor_epoll_kill;
-	ptor->base.exit = tb_aicp_proactor_epoll_exit;
-	ptor->base.addo = tb_aicp_proactor_epoll_addo;
-	ptor->base.delo = tb_aicp_proactor_epoll_delo;
-	ptor->base.post = tb_aicp_proactor_epoll_post;
+	ptor->base.kill = tb_aicp_proactor_aiop_kill;
+	ptor->base.exit = tb_aicp_proactor_aiop_exit;
+	ptor->base.addo = tb_aicp_proactor_aiop_addo;
+	ptor->base.delo = tb_aicp_proactor_aiop_delo;
+	ptor->base.post = tb_aicp_proactor_aiop_post;
 
 	// init mutx
 	ptor->mutx = tb_mutex_init(tb_null);
 	tb_assert_and_check_goto(ptor->mutx, fail);
 
+	// init aiop
+	ptor->aiop = tb_aiop_init(uptr->base.aicp->maxn);
+	tb_assert_and_check_goto(ptor->aiop, fail);
+
 	// init pool
 	ptor->pool = tb_rpool_init((uptr->base.aicp->maxn << 1) + 16, sizeof(tb_aice_t), 0);
 	tb_assert_and_check_goto(ptor->pool, fail);
 
-	// init epoll
-	ptor->epfd = epoll_create(uptr->base.aicp->maxn);
-	tb_assert_and_check_goto(ptor->epfd > 0, fail);
-
-	// init events
-	ptor->evtm = uptr->base.aicp->maxn;
-	ptor->evts = tb_nalloc0(ptor->evtm, sizeof(struct epoll_event));
-	tb_assert_and_check_goto(ptor->evts, fail);
-
 	// init loop
-	ptor->loop = tb_thread_init(tb_null, tb_epoll_spak_loop, ptor, 0);
+	ptor->loop = tb_thread_init(tb_null, tb_aiop_spak_loop, ptor, 0);
 	tb_assert_and_check_goto(ptor->loop, fail);
-
+	
 	// add this proactor to the unix proactor list
 	uptr->ptor_list[uptr->ptor_size++] = (tb_aicp_proactor_t*)ptor;
 	ptor->indx = uptr->ptor_size;
@@ -464,10 +424,9 @@ static tb_void_t tb_aicp_proactor_epoll_init(tb_aicp_proactor_unix_t* uptr)
 	if (!uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND]) uptr->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_SEND] = ptor->indx;
 
 	// ok
-	return (tb_aicp_proactor_t*)ptor;
+	return ;
 
 fail:
-	if (ptor) tb_aicp_proactor_epoll_exit(ptor);
-	return tb_null;
+	if (ptor) tb_aicp_proactor_aiop_exit(ptor);
 }
 
