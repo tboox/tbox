@@ -873,14 +873,11 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_han
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
+static tb_void_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && handle, tb_false);
-
-	// ok
-	return tb_true;
+	tb_assert_and_check_return(ptor && ptor->port && proactor->aicp && handle);
 }
 static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {

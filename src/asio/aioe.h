@@ -43,6 +43,7 @@ typedef enum __tb_aioe_code_e
 ,	TB_AIOE_CODE_RECV 		= 0x0004
 ,	TB_AIOE_CODE_SEND 		= 0x0008
 , 	TB_AIOE_CODE_EALL 		= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND | TB_AIOE_CODE_ACPT | TB_AIOE_CODE_CONN
+,	TB_AIOE_CODE_ONESHOT 	= 0x0010
 
 }tb_aioe_code_e;
 
