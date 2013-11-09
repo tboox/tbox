@@ -64,7 +64,7 @@ typedef struct __tb_aicp_proactor_t
 	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type);
 
 	/// delo
-	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle);
+	tb_void_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle);
 
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size);

@@ -88,13 +88,14 @@ static tb_bool_t tb_aiop_reactor_kqueue_addo(tb_aiop_reactor_t* reactor, tb_hand
 	// add event
 	struct kevent64_s 	e[2];
 	tb_size_t 			n = 0;
+	tb_size_t 			oneshot = (code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
 	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) 
 	{
-		EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, code, data); n++;
+		EV_SET64(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, code, data); n++;
 	}
 	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN)
 	{
-		EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, code, data); n++;
+		EV_SET64(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, handle, code, data); n++;
 	}
 
 	// ok?
@@ -143,13 +144,14 @@ static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe
 			EV_SET64(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, tb_null, aioe->handle, aioe->code, aioe->data); n++;
 
 			// adde
+			tb_size_t oneshot = (aioe->code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
 			if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) 
 			{
-				EV_SET64(&e[n], fd, EVFILT_READ, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
+				EV_SET64(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
 			}
 			if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN)
 			{
-				EV_SET64(&e[n], fd, EVFILT_WRITE, EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
+				EV_SET64(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, tb_null, aioe->handle, aioe->code, aioe->data); n++;
 			}
 
 			// post++

@@ -264,8 +264,19 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
 		tb_poll_aioo_t aioo = {0};
 		if (rtor->hash)
 		{
-			tb_poll_aioo_t const* item = (tb_poll_aioo_t const*)tb_hash_get(rtor->hash, handle);
-			if (item) aioo = *item;
+			tb_poll_aioo_t* item = (tb_poll_aioo_t*)tb_hash_get(rtor->hash, handle);
+			if (item) 
+			{
+				// save it
+				aioo = *item;
+
+				// oneshot? clear it
+				if (aioo.code & TB_AIOE_CODE_ONESHOT)
+				{
+					item.code = TB_AIOE_CODE_NONE;
+					item.data = tb_null;
+				}
+			}
 		}
 		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 		tb_assert_and_check_return_val(aioo.code, -1);
@@ -289,6 +300,15 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
 
 		// save aioe
 		list[n++] = aioe;
+
+		// oneshot?
+		if (aioo.code & TB_AIOE_CODE_ONESHOT)
+		{
+			if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+			if ((aioo.code & TB_AIOE_CODE_RECV) || (aioo.code & TB_AIOE_CODE_ACPT)) rtor->pfds[i].events &= ~POLLIN;
+			if ((aioo.code & TB_AIOE_CODE_SEND) || (aioo.code & TB_AIOE_CODE_CONN)) rtor->pfds[i].events &= ~POLLOUT;
+			if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+		}
 	}
 
 	// ok

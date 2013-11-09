@@ -250,6 +250,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 	// timeout?
 	tb_check_return_val(sfdn, 0);
 	
+	// enter
+	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+
 	// sync
 	tb_size_t n = 0;
 	tb_size_t itor = tb_iterator_head(rtor->hash);
@@ -267,7 +270,7 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 			tb_long_t 				fd = (tb_long_t)item->name - 1;
 
 			// the aioo
-			tb_select_aioo_t const* aioo = (tb_select_aioo_t const*)item->data;
+			tb_select_aioo_t* aioo = (tb_select_aioo_t*)item->data;
 			tb_assert_and_check_return_val(aioo, -1);
 
 			// init aioe
@@ -287,10 +290,44 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 			if (FD_ISSET(fd, &rtor->efdo) && !(aioe.code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
 				aioe.code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 				
-			// save aioe
-			if (aioe.code) list[n++] = aioe;
+			// ok?
+			if (aioe.code) 
+			{
+				// save aioe
+				list[n++] = aioe;
+
+				// oneshot? clear it
+				if (aioo->code & TB_AIOE_CODE_ONESHOT)
+				{
+					// clear aioo
+					aioo->code = TB_AIOE_CODE_NONE;
+					aioo->data = tb_null;
+
+					// enter
+					if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+
+					tb_size_t rw = 0;
+					if ((aioo->code & TB_AIOE_CODE_RECV) || (aioo->code & TB_AIOE_CODE_ACPT)) 
+					{
+						rw++;
+						FD_CLR(fd, &rtor->rfdi);
+					}
+					if ((aioo->code & TB_AIOE_CODE_SEND) || (aioo->code & TB_AIOE_CODE_CONN))
+					{
+						rw++;
+						FD_CLR(fd, &rtor->wfdi);
+					}
+					if (rw == 2) FD_CLR(fd, &rtor->efdi);
+
+					// leave
+					if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+				}
+			}
 		}
 	}
+
+	// leave
+	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
 	// ok
 	return n;

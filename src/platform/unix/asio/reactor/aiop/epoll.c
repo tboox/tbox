@@ -78,6 +78,7 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 	struct epoll_event e = {0};
 	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
 	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+	if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 	e.data.u64 = (tb_hize_t)handle;
 	if (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, ((tb_long_t)handle) - 1, &e) < 0) return tb_false;
 
@@ -122,6 +123,7 @@ static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_
 	struct epoll_event e = {0};
 	if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
 	if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+	if (aioe->code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
 	e.data.u64 = (tb_hize_t)aioe->handle;
 
 	// sete

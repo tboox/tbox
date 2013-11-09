@@ -117,31 +117,33 @@ static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_han
 		{
 			// addo it
 			tb_aicp_proactor_t* item = ptor->ptor_list[i];
-			if (item && item->addo && item->addo(item, handle, type)) addo++;
+			if (item && item->addo) 
+			{
+				if (!item->addo(item, handle, type)) break;
+			}
+
+			// addo++
+			addo++;
 		}
 	}
 
 	// ok?
 	return addo? tb_true : tb_false;
 }
-static tb_bool_t tb_aicp_proactor_unix_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
+static tb_void_t tb_aicp_proactor_unix_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return_val(ptor && handle, tb_false);
+	tb_assert_and_check_return(ptor && handle);
 
 	// walk proactors
-	tb_size_t delo = 0;
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
 	for (; i < n; i++) 
 	{
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
-		if (item && item->delo && item->delo(item, handle)) delo++;
+		if (item && item->delo) item->delo(item, handle);
 	}
-
-	// ok?
-	return delo? tb_true : tb_false;
 }
 static tb_bool_t tb_aicp_proactor_unix_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {
@@ -172,7 +174,7 @@ static tb_bool_t tb_aicp_proactor_unix_post(tb_aicp_proactor_t* proactor, tb_aic
 	// post aice list
 	tb_size_t n = ptor->ptor_size;
 	tb_size_t post = 0;
-	for (; i < n; i++) 
+	for (i = 0; i < n; i++) 
 	{
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
 		if (aice_size[i] && item->post(item, aice_list[i], aice_size[i])) post++;
@@ -225,6 +227,29 @@ static tb_long_t tb_aicp_proactor_unix_spak(tb_aicp_proactor_t* proactor, tb_aic
 	// leave 
 	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 
+	// no aice? spak all proactors util get one
+	if (!ok)
+	{
+		// spak proactors
+		tb_size_t i = 0;
+		tb_size_t n = ptor->ptor_size;
+		for (; i < n; i++) 
+		{
+			tb_aicp_proactor_t* item = ptor->ptor_list[i];
+			if (item && item->spak) 
+			{
+				// spak it
+				ok = item->spak(item, resp, 0);
+
+				// error?
+				tb_assert_and_check_break(ok >= 0);
+
+				// no aice? continue it
+				tb_check_break(!ok);
+			}
+		}
+	}
+
 	// ok?
 	return ok;
 }
@@ -243,7 +268,7 @@ static tb_void_t tb_aicp_proactor_unix_kill(tb_aicp_proactor_t* proactor)
 	for (; i < n; i++) 
 	{
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
-		if (item) item->kill(item);
+		if (item && item->kill) item->kill(item);
 	}
 
 	// wait some time
@@ -291,35 +316,37 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->resp && ptor->wait && aice);
+	tb_assert_and_check_return(ptor && ptor->resp && ptor->wait);
 
-	// enter 
-	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
-
-	// post aice
-	tb_bool_t ok = tb_false;
-	if (!tb_queue_full(ptor->resp)) 
+	// has aice?
+	if (aice)
 	{
-		// put
-		tb_queue_put(ptor->resp, aice);
+		// enter 
+		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
-		// trace
-		tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
+		// post aice
+		if (!tb_queue_full(ptor->resp)) 
+		{
+			// put
+			tb_queue_put(ptor->resp, aice);
 
-		// ok
-		ok = tb_true;
+			// trace
+			tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
+
+			// post it
+			tb_event_post(ptor->wait);
+		}
+		else
+		{
+			// assert
+			tb_assert(0);
+		}
+
+		// leave 
+		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 	}
-	else
-	{
-		// assert
-		tb_assert(0);
-	}
-
-	// leave 
-	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
-
-	// post wait
-	if (ok) tb_event_post(ptor->wait);
+	// only post wait
+	else tb_event_post(ptor->wait);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -334,6 +361,7 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 #endif
 
 #include "aicp/aiop.c"
+#include "aicp/file.c"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -379,13 +407,16 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_aicp_proactor_kqueue_init(ptor);
 #endif
 
+	// init aiop proactor
+	tb_aicp_proactor_aiop_init(ptor);
+
+	// init file proactor
+	tb_aicp_proactor_file_init(ptor);
+
 	// init aio proactor
 #ifdef TB_CONFIG_ASIO_HAVE_AIO
 	tb_aicp_proactor_aio_init(ptor);
 #endif
-
-	// init aiop proactor
-	tb_aicp_proactor_aiop_init(ptor);
 
 	// check 
 	tb_assert_and_check_goto(ptor->ptor_post[TB_AICO_TYPE_SOCK][TB_AICE_CODE_ACPT], fail);

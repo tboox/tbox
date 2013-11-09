@@ -59,6 +59,7 @@ typedef enum __tb_aice_state_e
  	TB_AICE_STATE_OK 					= 0
 , 	TB_AICE_STATE_FAILED 				= 1
 ,	TB_AICE_STATE_CLOSED 				= 2
+,	TB_AICE_STATE_TIMEOUT 				= 3
 
 }tb_aice_state_e;
 
