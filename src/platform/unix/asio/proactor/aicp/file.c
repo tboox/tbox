@@ -64,6 +64,9 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 	// check
 	tb_aicp_proactor_file_t* ptor = (tb_aicp_proactor_file_t*)proactor;
 	tb_assert_and_check_return_val(ptor && list && size, tb_false);
+	
+	// enter 
+	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
 	// walk list
 	tb_size_t i = 0;
@@ -72,9 +75,6 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 	{
 		// the aice
 		tb_aice_t const* aice = &list[i];
-	
-		// enter 
-		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
 		// post aice
 		if (!tb_queue_full(ptor->resp)) 
@@ -84,9 +84,6 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 
 			// trace
 			tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
-
-			// only post wait
-			tb_aicp_proactor_unix_resp(ptor->uptr, tb_null);
 		}
 		else
 		{
@@ -97,9 +94,13 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 			tb_assert(0);
 		}
 
-		// leave 
-		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 	}
+
+	// leave 
+	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
+
+	// only post wait
+	if (ok) tb_aicp_proactor_unix_resp(ptor->uptr, tb_null);
 
 	// ok?
 	return ok;
@@ -146,11 +147,16 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 		{
 		case TB_AICE_CODE_READ:
 			{
-				// read
-				tb_long_t real = tb_file_read(resp->handle, resp->u.read.data, resp->u.read.size);
+				// seek
+				tb_long_t real = -1;
+				if (tb_file_seek(resp->handle, resp->u.read.seek))
+				{
+					// read
+					real = tb_file_read(resp->handle, resp->u.read.data, resp->u.read.size);
 
-				// trace
-				tb_trace_impl("read[%p]: %ld", resp->handle, real);
+					// trace
+					tb_trace_impl("read[%p]: %ld", resp->handle, real);
+				}
 
 				// ok?
 				if (real > 0) 
@@ -158,17 +164,24 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 					resp->u.read.real = real;
 					resp->state = TB_AICE_STATE_OK;
 				}
+				// closed
+				else if (!real) resp->state = TB_AICE_STATE_CLOSED;
 				// failed?
 				else resp->state = TB_AICE_STATE_FAILED;
 			}
 			break;
 		case TB_AICE_CODE_WRIT:
 			{
-				// writ
-				tb_long_t real = tb_file_writ(resp->handle, resp->u.writ.data, resp->u.writ.size);
-		
-				// writ
-				tb_trace_impl("writ[%p]: %ld", resp->handle, real);
+				// seek
+				tb_long_t real = -1;
+				if (tb_file_seek(resp->handle, resp->u.writ.seek))
+				{
+					// writ
+					real = tb_file_writ(resp->handle, resp->u.writ.data, resp->u.writ.size);
+			
+					// writ
+					tb_trace_impl("writ[%p]: %ld", resp->handle, real);
+				}
 				
 				// ok?
 				if (real > 0) 
@@ -176,6 +189,8 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 					resp->u.writ.real = real;
 					resp->state = TB_AICE_STATE_OK;
 				}
+				// closed
+				else if (!real) resp->state = TB_AICE_STATE_CLOSED;
 				// failed?
 				else resp->state = TB_AICE_STATE_FAILED;
 			}

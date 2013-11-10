@@ -24,6 +24,7 @@
  * includes
  */
 #include <sys/epoll.h>
+#include <sys/eventfd.h>  
 #include <fcntl.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
@@ -62,6 +63,9 @@ typedef struct __tb_aiop_reactor_epoll_t
 
 	// the mutx
 	tb_handle_t 			mutx;
+
+	// the kill
+	tb_long_t 				kill;
 	
 }tb_aiop_reactor_epoll_t;
 
@@ -220,6 +224,9 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		// the events
 		tb_size_t events = rtor->evts[i].events;
 
+		// killed?
+		if (handle == (tb_handle_t)(rtor->kill + 1) && (events & EPOLLIN)) return -1;
+
 		// the aioo
 		tb_epoll_aioo_t aioo = {0};
 		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
@@ -262,6 +269,10 @@ static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
 		if (rtor->evts) tb_free(rtor->evts);
 		rtor->evts = tb_null;
 
+		// exit kill
+		if (rtor->kill > 0) close(rtor->kill);
+		rtor->kill = 0;
+
 		// exit fd
 		if (rtor->epfd) close(rtor->epfd);
 		rtor->epfd = 0;
@@ -278,6 +289,19 @@ static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
 
 		// exit it
 		tb_free(rtor);
+	}
+}
+static tb_void_t tb_aiop_reactor_epoll_kill(tb_aiop_reactor_t* reactor)
+{
+	// check
+	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
+	tb_assert_and_check_return(rtor && rtor->epfd > 0);
+
+	// kill it
+	if (rtor->kill > 0) 
+	{
+		tb_uint64_t kill = 1;
+		write(rtor->kill, &kill, sizeof(tb_uint64_t));
 	}
 }
 static tb_void_t tb_aiop_reactor_epoll_cler(tb_aiop_reactor_t* reactor)
@@ -312,6 +336,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	rtor->base.aiop = aiop;
 	rtor->base.exit = tb_aiop_reactor_epoll_exit;
 	rtor->base.cler = tb_aiop_reactor_epoll_cler;
+	rtor->base.kill = tb_aiop_reactor_epoll_kill;
 	rtor->base.addo = tb_aiop_reactor_epoll_addo;
 	rtor->base.delo = tb_aiop_reactor_epoll_delo;
 	rtor->base.post = tb_aiop_reactor_epoll_post;
@@ -328,6 +353,13 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	// init hash
 	rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ifm(sizeof(tb_epoll_aioo_t), tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->hash, fail);
+
+	// init kill
+	rtor->kill = eventfd(0, EFD_SEMAPHORE);
+	tb_assert_and_check_goto(rtor->kill > 0, fail);
+
+	// addo kill
+	if (!tb_aiop_reactor_epoll_addo(rtor, (tb_handle_t)(rtor->kill + 1), TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

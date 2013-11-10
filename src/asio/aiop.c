@@ -82,6 +82,15 @@ tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
 	if (aiop->rtor && aiop->rtor->cler)
 		aiop->rtor->cler(aiop->rtor);
 }
+tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
+{
+	// check
+	tb_assert_and_check_return(aiop);
+
+	// kill reactor
+	if (aiop->rtor && aiop->rtor->kill)
+		aiop->rtor->kill(aiop->rtor);
+}
 tb_bool_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check

@@ -60,6 +60,9 @@ typedef struct __tb_aiop_reactor_t
 	/// cler
 	tb_void_t 				(*cler)(struct __tb_aiop_reactor_t* reactor);
 
+	/// kill
+	tb_void_t 				(*kill)(struct __tb_aiop_reactor_t* reactor);
+
 	/// addo
 	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
@@ -118,6 +121,12 @@ tb_void_t 			tb_aiop_exit(tb_aiop_t* aiop);
  * @param aiop 		the aiop
  */
 tb_void_t 			tb_aiop_cler(tb_aiop_t* aiop);
+
+/*! kill the aiop
+ *
+ * @param aiop 		the aiop
+ */
+tb_void_t 			tb_aiop_kill(tb_aiop_t* aiop);
 
 /*! addo the aioo
  *
