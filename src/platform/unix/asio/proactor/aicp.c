@@ -192,18 +192,11 @@ static tb_long_t tb_aicp_proactor_unix_spak(tb_aicp_proactor_t* proactor, tb_aic
 	// trace
 //	tb_trace_impl("spak[%u]: ..", (tb_uint16_t)tb_thread_self());
 
-	// wait
-	tb_long_t ok = tb_event_wait(ptor->wait, timeout);
-	tb_assert_and_check_return_val(ok >= 0, -1);
-
-	// timeout?
-	tb_check_return_val(ok > 0, 0);
-
 	// enter 
 	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
 
 	// post aice
-	ok = 0;
+	tb_long_t ok = 0;
 	if (!tb_queue_null(ptor->resp)) 
 	{
 		// get resp
@@ -250,17 +243,23 @@ static tb_long_t tb_aicp_proactor_unix_spak(tb_aicp_proactor_t* proactor, tb_aic
 		}
 	}
 
-	// ok?
-	return ok;
+	// no aice? wait it
+	tb_check_return_val(!ok, ok);
+
+	// wait
+	return tb_event_wait(ptor->wait, timeout);
 }
 static tb_void_t tb_aicp_proactor_unix_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return(ptor);
+	tb_assert_and_check_return(ptor && ptor->base.aicp && ptor->wait);
+
+	// the worker size
+	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
 
 	// trace
-	tb_trace_impl("kill");
+	tb_trace_impl("kill: %lu", work);
 
 	// kill all proactors
 	tb_size_t i = 0;
@@ -271,11 +270,8 @@ static tb_void_t tb_aicp_proactor_unix_kill(tb_aicp_proactor_t* proactor)
 		if (item && item->kill) item->kill(item);
 	}
 
-	// wait some time
-	tb_msleep(500);
-
 	// post wait
-	if (ptor->wait) tb_event_post(ptor->wait);
+	while (work--) tb_event_post(ptor->wait);
 }
 static tb_void_t tb_aicp_proactor_unix_exit(tb_aicp_proactor_t* proactor)
 {

@@ -24,6 +24,11 @@
  * includes
  */
 #include <sys/poll.h>
+#include <sys/eventfd.h>  
+#ifndef TB_CONFIG_OS_ANDROID
+# 	include <sys/unistd.h>
+#endif
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -69,6 +74,12 @@ typedef struct __tb_aiop_reactor_poll_t
 	// the mutx
 	tb_poll_mutx_t 			mutx;
 
+	// the spak
+	tb_long_t 				spak;
+	
+	// the kill
+	tb_long_t 				kill;
+	
 }tb_aiop_reactor_poll_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -156,6 +167,13 @@ static tb_bool_t tb_aiop_reactor_poll_addo(tb_aiop_reactor_t* reactor, tb_handle
 	}
 	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
+	// spak it
+	if (rtor->spak > 0 && code)
+	{
+		tb_uint64_t spak = 1;
+		if (sizeof(tb_uint64_t) != write(rtor->spak, &spak, sizeof(tb_uint64_t))) return tb_false;
+	}
+
 	// ok?
 	return ok;
 }
@@ -173,6 +191,13 @@ static tb_void_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_handle
 	if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
 	if (rtor->hash) tb_hash_del(rtor->hash, handle);
 	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+
+	// spak it
+	if (rtor->spak > 0)
+	{
+		tb_uint64_t spak = 1;
+		write(rtor->spak, &spak, sizeof(tb_uint64_t));
+	}
 }
 static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
@@ -221,98 +246,137 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
 		}
 	}
 
+	// spak it
+	if (post == size && rtor->spak > 0)
+	{
+		tb_uint64_t spak = 1;
+		if (sizeof(tb_uint64_t) != write(rtor->spak, &spak, sizeof(tb_uint64_t))) return tb_false;
+	}
+
 	// ok?
 	return post == size? tb_true : tb_false;
+}
+static tb_void_t tb_aiop_reactor_poll_kill(tb_aiop_reactor_t* reactor)
+{
+	// check
+	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
+	tb_assert_and_check_return(rtor);
+
+	// kill it
+	if (rtor->kill > 0) 
+	{
+		tb_uint64_t kill = 1;
+		write(rtor->kill, &kill, sizeof(tb_uint64_t));
+	}
 }
 static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && reactor->aiop && list && maxn, -1);
 
-	// copy pfds
-	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
-	tb_vector_copy(rtor->cfds, rtor->pfds);
-	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
-
-	// cfds
-	struct pollfd* 	cfds = (struct pollfd*)tb_vector_data(rtor->cfds);
-	tb_size_t 		cfdm = tb_vector_size(rtor->cfds);
-	tb_assert_and_check_return_val(cfds && cfdm, -1);
-
-	// wait
-	tb_long_t cfdn = poll(cfds, cfdm, timeout);
-	tb_assert_and_check_return_val(cfdn >= 0, -1);
-
-	// timeout?
-	tb_check_return_val(cfdn, 0);
-
-	// sync
-	tb_size_t i = 0;
-	tb_size_t n = 0;
-	for (i = 0; i < cfdm && n < maxn; i++)
+	// loop
+	tb_long_t wait = 0;
+	tb_hong_t time = tb_mclock();
+	while (!wait && (timeout < 0 || tb_mclock() < time + timeout))
 	{
-		// the handle
-		tb_handle_t handle = (tb_handle_t)(cfds[i].fd + 1);
-		tb_assert_and_check_return_val(handle, -1);
+		// copy pfds
+		if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+		tb_vector_copy(rtor->cfds, rtor->pfds);
+		if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
-		// the events
-		tb_size_t events = cfds[i].revents;
-		tb_check_continue(events);
+		// cfds
+		struct pollfd* 	cfds = (struct pollfd*)tb_vector_data(rtor->cfds);
+		tb_size_t 		cfdm = tb_vector_size(rtor->cfds);
+		tb_assert_and_check_return_val(cfds && cfdm, -1);
 
-		// the aioo
-		if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
-		tb_poll_aioo_t aioo = {0};
-		if (rtor->hash)
+		// wait
+		tb_long_t cfdn = poll(cfds, cfdm, timeout);
+		tb_assert_and_check_return_val(cfdn >= 0, -1);
+
+		// timeout?
+		tb_check_return_val(cfdn, 0);
+
+		// sync
+		tb_size_t i = 0;
+		for (i = 0; i < cfdm && wait < maxn; i++)
 		{
-			tb_poll_aioo_t* item = (tb_poll_aioo_t*)tb_hash_get(rtor->hash, handle);
-			if (item) 
-			{
-				// save it
-				aioo = *item;
+			// the handle
+			tb_handle_t handle = (tb_handle_t)(cfds[i].fd + 1);
+			tb_assert_and_check_return_val(handle, -1);
 
-				// oneshot? clear it
-				if (aioo.code & TB_AIOE_CODE_ONESHOT)
+			// the events
+			tb_size_t events = cfds[i].revents;
+			tb_check_continue(events);
+
+			// killed?
+			if (handle == (tb_handle_t)(rtor->kill + 1) && (events & POLLIN)) return -1;
+
+			// spak?
+			if (handle == (tb_handle_t)(rtor->spak + 1) && (events & POLLIN))
+			{
+				// read spak
+				tb_uint64_t spak = 0;
+				if (sizeof(tb_uint64_t) != read(rtor->spak, &spak, sizeof(tb_uint64_t))) return -1;
+
+				// continue it
+				continue ;
+			}
+
+			// the aioo
+			if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
+			tb_poll_aioo_t aioo = {0};
+			if (rtor->hash)
+			{
+				tb_poll_aioo_t* item = (tb_poll_aioo_t*)tb_hash_get(rtor->hash, handle);
+				if (item) 
 				{
-					item.code = TB_AIOE_CODE_NONE;
-					item.data = tb_null;
+					// save it
+					aioo = *item;
+
+					// oneshot? clear it
+					if (aioo.code & TB_AIOE_CODE_ONESHOT)
+					{
+						item->code = TB_AIOE_CODE_NONE;
+						item->data = tb_null;
+					}
 				}
 			}
-		}
-		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
-		tb_assert_and_check_return_val(aioo.code, -1);
-		
-		// init aioe
-		tb_aioe_t 	aioe = {0};
-		aioe.data 	= aioo.data;
-		aioe.handle = handle;
-		if (events & POLLIN)
-		{
-			aioe.code |= TB_AIOE_CODE_RECV;
-			if (aioo.code & TB_AIOE_CODE_ACPT) aioe.code |= TB_AIOE_CODE_ACPT;
-		}
-		if (events & POLLOUT) 
-		{
-			aioe.code |= TB_AIOE_CODE_SEND;
-			if (aioo.code & TB_AIOE_CODE_CONN) aioe.code |= TB_AIOE_CODE_CONN;
-		}
-		if ((events & POLLHUP) && !(aioo.code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
-			aioe.code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
+			if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+			tb_assert_and_check_return_val(aioo.code, -1);
+			
+			// init aioe
+			tb_aioe_t 	aioe = {0};
+			aioe.data 	= aioo.data;
+			aioe.handle = handle;
+			if (events & POLLIN)
+			{
+				aioe.code |= TB_AIOE_CODE_RECV;
+				if (aioo.code & TB_AIOE_CODE_ACPT) aioe.code |= TB_AIOE_CODE_ACPT;
+			}
+			if (events & POLLOUT) 
+			{
+				aioe.code |= TB_AIOE_CODE_SEND;
+				if (aioo.code & TB_AIOE_CODE_CONN) aioe.code |= TB_AIOE_CODE_CONN;
+			}
+			if ((events & POLLHUP) && !(aioo.code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
+				aioe.code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 
-		// save aioe
-		list[n++] = aioe;
+			// save aioe
+			list[wait++] = aioe;
 
-		// oneshot?
-		if (aioo.code & TB_AIOE_CODE_ONESHOT)
-		{
-			if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
-			if ((aioo.code & TB_AIOE_CODE_RECV) || (aioo.code & TB_AIOE_CODE_ACPT)) rtor->pfds[i].events &= ~POLLIN;
-			if ((aioo.code & TB_AIOE_CODE_SEND) || (aioo.code & TB_AIOE_CODE_CONN)) rtor->pfds[i].events &= ~POLLOUT;
-			if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+			// oneshot?
+			if (aioo.code & TB_AIOE_CODE_ONESHOT)
+			{
+				if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
+				struct pollfd* pfds = (struct pollfd*)tb_vector_data(rtor->pfds);
+				if (pfds) pfds[i].events = 0;
+				if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
+			}
 		}
 	}
 
 	// ok
-	return n;
+	return wait;
 }
 static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
 {
@@ -334,6 +398,14 @@ static tb_void_t tb_aiop_reactor_poll_exit(tb_aiop_reactor_t* reactor)
 		if (rtor->hash) tb_hash_exit(rtor->hash);
 		rtor->hash = tb_null;
 		if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
+
+		// exit spak
+		if (rtor->spak > 0) close(rtor->spak);
+		rtor->spak = tb_null;
+
+		// exit kill
+		if (rtor->kill > 0) close(rtor->kill);
+		rtor->kill = tb_null;
 
 		// exit mutx
 		if (rtor->mutx.pfds) tb_mutex_exit(rtor->mutx.pfds);
@@ -378,6 +450,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	rtor->base.delo = tb_aiop_reactor_poll_delo;
 	rtor->base.post = tb_aiop_reactor_poll_post;
 	rtor->base.wait = tb_aiop_reactor_poll_wait;
+	rtor->base.kill = tb_aiop_reactor_poll_kill;
 
 	// init mutx
 	rtor->mutx.pfds = tb_mutex_init(tb_null);
@@ -395,6 +468,20 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	// init hash
 	rtor->hash = tb_hash_init(tb_align8(tb_isqrti(aiop->maxn) + 1), tb_item_func_ptr(tb_null, tb_null), tb_item_func_ifm(sizeof(tb_poll_aioo_t), tb_null, tb_null));
 	tb_assert_and_check_goto(rtor->hash, fail);
+
+	// init spak
+	rtor->spak = eventfd(0, EFD_SEMAPHORE);
+	tb_assert_and_check_goto(rtor->spak > 0, fail);
+
+	// init kill
+	rtor->kill = eventfd(0, EFD_SEMAPHORE);
+	tb_assert_and_check_goto(rtor->kill > 0, fail);
+
+	// addo spak
+	if (!tb_aiop_reactor_poll_addo(rtor, (tb_handle_t)(rtor->spak + 1), TB_AIOE_CODE_RECV, tb_null)) goto fail;	
+
+	// addo kill
+	if (!tb_aiop_reactor_poll_addo(rtor, (tb_handle_t)(rtor->kill + 1), TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

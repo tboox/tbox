@@ -474,7 +474,12 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	{
 		// wait aioe
 		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, -1);
-		tb_assert_and_check_break(real >= 0 && real <= ptor->maxn);
+
+		// killed?
+		tb_check_break(real >= 0);
+
+		// error? out of range
+		tb_assert_and_check_break(real <= ptor->maxn);
 		
 		// timeout?
 		tb_check_continue(real);
@@ -491,6 +496,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_assert_and_check_break(ptor->list);
 		}
 
+		// enter 
+		if (ptor->mutx.resp) tb_mutex_enter(ptor->mutx.resp);
+
 		// walk aioe list
 		tb_size_t i = 0;
 		for (i = 0; i < real; i++)
@@ -503,9 +511,6 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_aice_t const* aice = aioe->data;
 			tb_assert_and_check_goto(aice && aice->handle && aice->handle == aioe->handle, end);
 
-			// enter 
-			if (ptor->mutx.resp) tb_mutex_enter(ptor->mutx.resp);
-
 			// post aice
 			if (!tb_queue_full(ptor->resp)) 
 			{
@@ -514,9 +519,6 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 
 				// trace
 				tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
-
-				// only post wait
-				tb_aicp_proactor_unix_resp(ptor->uptr, tb_null);
 			}
 			else
 			{
@@ -524,9 +526,13 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 				tb_assert(0);
 			}
 
-			// leave 
-			if (ptor->mutx.resp) tb_mutex_leave(ptor->mutx.resp);
 		}
+			
+		// leave 
+		if (ptor->mutx.resp) tb_mutex_leave(ptor->mutx.resp);
+
+		// only post wait
+		tb_aicp_proactor_unix_resp(ptor->uptr, tb_null);
 	}
 	
 end:
@@ -654,10 +660,13 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return(ptor);
+	tb_assert_and_check_return(ptor && ptor->aiop);
 
 	// trace
 	tb_trace_impl("kill");
+
+	// kill it
+	tb_aiop_kill(ptor->aiop);
 }
 static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 {

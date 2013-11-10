@@ -958,9 +958,7 @@ static tb_void_t tb_aicp_proactor_iocp_kill(tb_aicp_proactor_t* proactor)
 	tb_trace_impl("kill: %lu", work);
 
 	// kill workers
-	tb_size_t i = 0;
-	for (i = 0; i < work; i++) PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
-
+	while (work--) PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
 }
 static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 {
