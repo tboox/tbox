@@ -56,8 +56,8 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	tb_assert_and_check_return_val(type, tb_null);
 	
 	// init type & protocol
-	tb_size_t t = 0;
-	tb_size_t p = 0;
+	tb_int_t t = 0;
+	tb_int_t p = 0;
 	switch (type)
 	{
 	case TB_SOCKET_TYPE_TCP:
@@ -86,7 +86,40 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	// ok
 	return (fd + 1);
 }
+tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
+{
+	// check
+	tb_assert_and_check_return_val(type && pair, tb_false);
 
+	// init type
+	tb_int_t t = 0;
+	switch (type)
+	{
+	case TB_SOCKET_TYPE_TCP:
+		t = SOCK_STREAM;
+		break;
+	case TB_SOCKET_TYPE_UDP:
+		t = SOCK_DGRAM;
+		break;
+	default:
+		return tb_false;
+	}
+
+	// make pair
+	tb_int_t fd[2] = {0};
+	if (socketpair(AF_LOCAL, t, 0, fd) == -1) return tb_false;
+
+	// non-block
+	fcntl(fd[0], F_SETFL, fcntl(fd[0], F_GETFL) | O_NONBLOCK);
+	fcntl(fd[1], F_SETFL, fcntl(fd[1], F_GETFL) | O_NONBLOCK);
+
+	// save pair
+	pair[0] = fd[0] + 1;
+	pair[1] = fd[1] + 1;
+
+	// ok
+	return tb_true;
+}
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
 	// check

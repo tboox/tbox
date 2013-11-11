@@ -23,7 +23,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../spak.h"
 #include <sys/epoll.h>
 #include <fcntl.h>
 #ifndef TB_CONFIG_OS_ANDROID
@@ -65,7 +64,7 @@ typedef struct __tb_aiop_reactor_epoll_t
 	tb_handle_t 			mutx;
 
 	// the kill
-	tb_handle_t 			kill;
+	tb_handle_t 			kill[2];
 	
 }tb_aiop_reactor_epoll_t;
 
@@ -225,7 +224,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		tb_size_t events = rtor->evts[i].events;
 
 		// killed?
-		if (handle == rtor->kill && (events & EPOLLIN)) return -1;
+		if (handle == rtor->kill[1] && (events & EPOLLIN)) return -1;
 
 		// the aioo
 		tb_epoll_aioo_t aioo = {0};
@@ -270,8 +269,10 @@ static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
 		rtor->evts = tb_null;
 
 		// exit kill
-		if (rtor->kill > 0) close(rtor->kill);
-		rtor->kill = 0;
+		if (rtor->kill[0]) tb_socket_close(rtor->kill[0]);
+		if (rtor->kill[1]) tb_socket_close(rtor->kill[1]);
+		rtor->kill[0] = tb_null;
+		rtor->kill[1] = tb_null;
 
 		// exit fd
 		if (rtor->epfd) close(rtor->epfd);
@@ -298,7 +299,7 @@ static tb_void_t tb_aiop_reactor_epoll_kill(tb_aiop_reactor_t* reactor)
 	tb_assert_and_check_return(rtor);
 
 	// kill it
-	if (rtor->kill) tb_spak_post(rtor->kill);
+	if (rtor->kill[0]) tb_socket_send(rtor->kill[0], "k", 1);
 }
 static tb_void_t tb_aiop_reactor_epoll_cler(tb_aiop_reactor_t* reactor)
 {
@@ -351,11 +352,10 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init kill
-	rtor->kill = tb_spak_init();
-	tb_assert_and_check_goto(rtor->kill, fail);
+	if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, rtor->kill)) goto fail;
 
 	// addo kill
-	if (!tb_aiop_reactor_epoll_addo(rtor, rtor->kill, TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
+	if (!tb_aiop_reactor_epoll_addo(rtor, rtor->kill[1], TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

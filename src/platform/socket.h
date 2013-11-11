@@ -73,6 +73,15 @@ tb_void_t 			tb_socket_exit(tb_noarg_t);
  */
 tb_handle_t 		tb_socket_open(tb_size_t type);
 
+/*! open socket pair
+ *
+ * @param type 		the socket type
+ * @param pair 		the socket pair
+ *
+ * @return 			the socket handle
+ */
+tb_bool_t 			tb_socket_pair(tb_size_t type, tb_handle_t pair[2]);
+
 /*! connect socket
  *
  * @param handle 	the socket handle
