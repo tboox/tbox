@@ -24,12 +24,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "../spak.h"
 #ifndef TB_CONFIG_OS_WINDOWS
 # 	include <sys/select.h>
-# 	include <sys/eventfd.h>  
-# 	ifndef TB_CONFIG_OS_ANDROID
-# 		include <sys/unistd.h>
-# 	endif
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -83,10 +80,10 @@ typedef struct __tb_aiop_reactor_select_t
 	tb_select_mutx_t 		mutx;
 
 	// the spak
-	tb_long_t 				spak;
+	tb_handle_t 			spak;
 	
 	// the kill
-	tb_long_t 				kill;
+	tb_handle_t 			kill;
 	
 }tb_aiop_reactor_select_t;
 
@@ -136,10 +133,9 @@ static tb_bool_t tb_aiop_reactor_select_addo(tb_aiop_reactor_t* reactor, tb_hand
 	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
 	// spak it
-	if (rtor->spak > 0 && code)
+	if (rtor->spak && code)
 	{
-		tb_uint64_t spak = 1;
-		if (sizeof(tb_uint64_t) != write(rtor->spak, &spak, sizeof(tb_uint64_t))) return tb_false;
+		if (!tb_spak_post(rtor->spak)) return tb_false;
 	}
 
 	// ok?
@@ -171,11 +167,7 @@ static tb_void_t tb_aiop_reactor_select_delo(tb_aiop_reactor_t* reactor, tb_hand
 	if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
 
 	// spak it
-	if (rtor->spak > 0)
-	{
-		tb_uint64_t spak = 1;
-		write(rtor->spak, &spak, sizeof(tb_uint64_t));
-	}
+	if (rtor->spak > 0) tb_spak_post(rtor->spak);
 }
 static tb_bool_t tb_aiop_reactor_select_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
@@ -243,10 +235,9 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
 	}
 
 	// spak it
-	if (post == size && rtor->spak > 0)
+	if (post == size && rtor->spak)
 	{
-		tb_uint64_t spak = 1;
-		if (sizeof(tb_uint64_t) != write(rtor->spak, &spak, sizeof(tb_uint64_t))) return tb_false;
+		if (!tb_spak_post(rtor->spak)) return tb_false;
 	}
 
 	// ok?
@@ -259,11 +250,7 @@ static tb_void_t tb_aiop_reactor_select_kill(tb_aiop_reactor_t* reactor)
 	tb_assert_and_check_return(rtor);
 
 	// kill it
-	if (rtor->kill > 0) 
-	{
-		tb_uint64_t kill = 1;
-		write(rtor->kill, &kill, sizeof(tb_uint64_t));
-	}
+	if (rtor->kill) tb_spak_post(rtor->kill);
 }
 static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
@@ -319,18 +306,17 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 				tb_assert_and_check_return_val(handle, -1);
 
 				// killed?
-				if (handle == (tb_handle_t)(rtor->kill + 1) && FD_ISSET(rtor->kill, &rtor->rfdo)) 
+				if (handle == rtor->kill && FD_ISSET(((tb_long_t)rtor->kill - 1), &rtor->rfdo)) 
 				{
 					wait = -1;
 					break;
 				}
 
 				// spak?
-				if (handle == (tb_handle_t)(rtor->spak + 1) && FD_ISSET(rtor->spak, &rtor->rfdo))
+				if (handle == rtor->spak && FD_ISSET(((tb_long_t)rtor->spak - 1), &rtor->rfdo))
 				{
 					// read spak
-					tb_uint64_t spak = 0;
-					if (sizeof(tb_uint64_t) != read(rtor->spak, &spak, sizeof(tb_uint64_t))) wait = -1;
+					if (!tb_spak_cler(rtor->spak)) wait = -1;
 
 					// continue it
 					continue ;
@@ -489,18 +475,18 @@ static tb_aiop_reactor_t* tb_aiop_reactor_select_init(tb_aiop_t* aiop)
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init spak
-	rtor->spak = eventfd(0, EFD_SEMAPHORE);
-	tb_assert_and_check_goto(rtor->spak > 0, fail);
+	rtor->spak = tb_spak_init();
+	tb_assert_and_check_goto(rtor->spak, fail);
 
 	// init kill
-	rtor->kill = eventfd(0, EFD_SEMAPHORE);
-	tb_assert_and_check_goto(rtor->kill > 0, fail);
+	rtor->kill = tb_spak_init();
+	tb_assert_and_check_goto(rtor->kill, fail);
 
 	// addo spak
-	if (!tb_aiop_reactor_select_addo(rtor, (tb_handle_t)(rtor->spak + 1), TB_AIOE_CODE_RECV, tb_null)) goto fail;	
+	if (!tb_aiop_reactor_select_addo(rtor, rtor->spak, TB_AIOE_CODE_RECV, tb_null)) goto fail;	
 
 	// addo kill
-	if (!tb_aiop_reactor_select_addo(rtor, (tb_handle_t)(rtor->kill + 1), TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
+	if (!tb_aiop_reactor_select_addo(rtor, rtor->kill, TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

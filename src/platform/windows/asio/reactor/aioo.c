@@ -25,14 +25,14 @@
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
 # 	include "aioo/select.c"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_ASIO_HAVE_SELECT
+#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
 tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout);
 tb_long_t tb_aioo_reactor_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 {

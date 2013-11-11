@@ -23,8 +23,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "../spak.h"
 #include <sys/epoll.h>
-#include <sys/eventfd.h>  
 #include <fcntl.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
@@ -65,7 +65,7 @@ typedef struct __tb_aiop_reactor_epoll_t
 	tb_handle_t 			mutx;
 
 	// the kill
-	tb_long_t 				kill;
+	tb_handle_t 			kill;
 	
 }tb_aiop_reactor_epoll_t;
 
@@ -225,7 +225,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		tb_size_t events = rtor->evts[i].events;
 
 		// killed?
-		if (handle == (tb_handle_t)(rtor->kill + 1) && (events & EPOLLIN)) return -1;
+		if (handle == rtor->kill && (events & EPOLLIN)) return -1;
 
 		// the aioo
 		tb_epoll_aioo_t aioo = {0};
@@ -295,14 +295,10 @@ static tb_void_t tb_aiop_reactor_epoll_kill(tb_aiop_reactor_t* reactor)
 {
 	// check
 	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return(rtor && rtor->epfd > 0);
+	tb_assert_and_check_return(rtor);
 
 	// kill it
-	if (rtor->kill > 0) 
-	{
-		tb_uint64_t kill = 1;
-		write(rtor->kill, &kill, sizeof(tb_uint64_t));
-	}
+	if (rtor->kill) tb_spak_post(rtor->kill);
 }
 static tb_void_t tb_aiop_reactor_epoll_cler(tb_aiop_reactor_t* reactor)
 {
@@ -355,11 +351,11 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	tb_assert_and_check_goto(rtor->hash, fail);
 
 	// init kill
-	rtor->kill = eventfd(0, EFD_SEMAPHORE);
-	tb_assert_and_check_goto(rtor->kill > 0, fail);
+	rtor->kill = tb_spak_init();
+	tb_assert_and_check_goto(rtor->kill, fail);
 
 	// addo kill
-	if (!tb_aiop_reactor_epoll_addo(rtor, (tb_handle_t)(rtor->kill + 1), TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
+	if (!tb_aiop_reactor_epoll_addo(rtor, rtor->kill, TB_AIOE_CODE_RECV | TB_AIOE_CODE_ONESHOT, tb_null)) goto fail;	
 
 	// ok
 	return (tb_aiop_reactor_t*)rtor;

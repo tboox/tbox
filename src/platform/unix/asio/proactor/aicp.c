@@ -348,11 +348,11 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 /* ///////////////////////////////////////////////////////////////////////
  * proactors
  */
-#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
+#if 0//def TB_CONFIG_ASIO_POLL_HAVE_EPOLL
 # 	include "aicp/epoll.c"
 #endif
 
-#ifdef TB_CONFIG_ASIO_HAVE_AIO
+#ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
 # 	include "aicp/aio.c"
 #endif
 
@@ -394,12 +394,12 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->wait, fail);
 
 	// init epoll proactor
-#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
+#if 0//def TB_CONFIG_ASIO_POLL_HAVE_EPOLL
 	tb_aicp_proactor_epoll_init(ptor);
 #endif
 
 	// init kqueue proactor
-#if 0//defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
+#if 0//defined(TB_CONFIG_ASIO_POLL_HAVE_KQUEUE)
 	tb_aicp_proactor_kqueue_init(ptor);
 #endif
 
@@ -410,7 +410,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_aicp_proactor_file_init(ptor);
 
 	// init aio proactor
-#ifdef TB_CONFIG_ASIO_HAVE_AIO
+#ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
 	tb_aicp_proactor_aio_init(ptor);
 #endif
 

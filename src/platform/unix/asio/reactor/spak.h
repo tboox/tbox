@@ -17,26 +17,24 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aiop.c
+ * @file		spak.h
+ * @ingroup 	platform
  *
  */
+#ifndef TB_PLATFROM_UNIX_ASIO_REACTOR_SPAK_H
+#define TB_PLATFROM_UNIX_ASIO_REACTOR_SPAK_H
+
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
-# 	include "aiop/select.c"
+#if defined(TB_CONFIG_ASIO_SPAK_HAVE_EVENTFD)
+# 	include "./spak/eventfd.h"
+#elif defined(TB_CONFIG_ASIO_SPAK_HAVE_PIPE)
+# 	include "./spak/pipe.h"
+#else
+# 	include "./spak/sock.h"
 #endif
 
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
-tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
-tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
-{
-	return tb_aiop_reactor_select_init(aiop);
-}
 #endif
-
