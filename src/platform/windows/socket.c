@@ -97,12 +97,115 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 {
 	// check
 	tb_assert_and_check_return_val(type && pair, tb_false);
+	
+	// init pair
+	pair[0] = tb_null;
+	pair[1] = tb_null;
 
-	// TODO
-	tb_trace_noimpl();
+	// init type & protocol
+	tb_int_t t = 0;
+	tb_int_t p = 0;
+	switch (type)
+	{
+	case TB_SOCKET_TYPE_TCP:
+		{
+			t = SOCK_STREAM;
+			p = IPPROTO_TCP;
+		}
+		break;
+	case TB_SOCKET_TYPE_UDP:
+		{
+			t = SOCK_DGRAM;
+			p = IPPROTO_UDP;
+		}
+		break;
+	default:
+		return tb_false;
+	}
 
-	// ok
-	return tb_false;
+	// done
+	tb_bool_t 	ok = tb_false;
+	SOCKET 		listener = INVALID_SOCKET;
+	SOCKET 		sock1 = INVALID_SOCKET;
+	SOCKET 		sock2 = INVALID_SOCKET;
+	do
+	{
+		// init listener
+		listener = WSASocket(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED);
+		tb_assert_and_check_break(listener != INVALID_SOCKET);
+
+		// init bind address
+		SOCKADDR_IN b = {0};
+		b.sin_family = AF_INET;
+		b.sin_port = 0;
+		b.sin_addr.S_un.S_addr = htonl(INADDR_LOOPBACK); 
+
+		// reuse addr
+#ifdef SO_REUSEADDR
+		{
+			tb_int_t reuseaddr = 1;
+			if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+				break; 
+		}
+#endif
+
+		// bind it
+    	if (bind(listener, (struct sockaddr *)&b, sizeof(b)) == SOCKET_ERROR) break;
+
+		// get sock address
+		SOCKADDR_IN d = {0};
+		tb_int_t 	n = sizeof(SOCKADDR_IN);
+		if (getsockname(listener, (struct sockaddr *)&d, &n) == SOCKET_ERROR) break;
+		d.sin_addr.S_un.S_addr = htonl(INADDR_LOOPBACK);
+        d.sin_family = AF_INET;
+
+		// listen it
+		if (listen(listener, 1) == SOCKET_ERROR) break;
+
+		// init sock1
+		sock1 = WSASocket(AF_INET, t, p, tb_null, 0, WSA_FLAG_OVERLAPPED);
+		tb_assert_and_check_break(sock1 != INVALID_SOCKET);
+
+		// connect it
+		if (connect(sock1, &d, sizeof(d)) == SOCKET_ERROR) break;
+
+		// accept it
+		sock2 = accept(listener, tb_null, tb_null);
+		tb_assert_and_check_break(sock2 != INVALID_SOCKET);
+
+		// set non-block
+		tb_ulong_t nb = 1;
+		if (ioctlsocket(sock1, FIONBIO, &nb) == SOCKET_ERROR) break;
+		if (ioctlsocket(sock2, FIONBIO, &nb) == SOCKET_ERROR) break;
+
+		// ok 
+		ok = tb_true;
+
+	} while (0);
+
+	// exit listener
+	if (listener != INVALID_SOCKET) closesocket(listener);
+	listener = INVALID_SOCKET;
+
+	// failed? exit it
+	if (!ok)
+	{
+		// exit sock1
+		if (sock1 != INVALID_SOCKET) closesocket(sock1);
+		sock1 = INVALID_SOCKET;
+
+		// exit sock2
+		if (sock2 != INVALID_SOCKET) closesocket(sock2);
+		sock2 = INVALID_SOCKET;
+	}
+	else
+	{
+		pair[0] = (tb_handle_t)(sock1 + 1);
+		pair[1] = (tb_handle_t)(sock2 + 1);
+	}
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
@@ -151,7 +254,7 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
-			tb_trace("reuseaddr: %lu failed", port);
+			tb_trace("reuseaddr: %s failed", ip);
 	}
 #endif
 
