@@ -57,8 +57,8 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	tb_assert_and_check_return_val(type, tb_null);
 	
 	// init type & protocol
-	tb_size_t t = 0;
-	tb_size_t p = 0;
+	tb_int_t t = 0;
+	tb_int_t p = 0;
 	switch (type)
 	{
 	case TB_SOCKET_TYPE_TCP:
@@ -93,7 +93,17 @@ fail:
 	if (fd >= 0) closesocket(fd);
 	return tb_null;
 }
+tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
+{
+	// check
+	tb_assert_and_check_return_val(type && pair, tb_false);
 
+	// TODO
+	tb_trace_noimpl();
+
+	// ok
+	return tb_false;
+}
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
 	// check
@@ -134,6 +144,26 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
 	d.sin_addr.S_un.S_addr = ip? inet_addr(ip) : htonl(INADDR_ANY); 
+
+	// reuse addr
+#ifdef SO_REUSEADDR
+	//if (ip)
+	{
+		tb_int_t reuseaddr = 1;
+		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+			tb_trace("reuseaddr: %lu failed", port);
+	}
+#endif
+
+	// reuse port
+#ifdef SO_REUSEPORT
+	if (port)
+	{
+		tb_int_t reuseport = 1;
+		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+			tb_trace("reuseport: %lu failed", port);
+	}
+#endif
 
 	// bind 
     return (bind((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, sizeof(d)) < 0)? tb_false : tb_true;
