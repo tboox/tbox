@@ -77,11 +77,11 @@ tb_handle_t tb_epool_init(tb_size_t maxn)
 	ep->maxn = maxn;
 
 	// init mutx
-	ep->mutx = tb_mutex_init(tb_null);
+	ep->mutx = tb_mutex_init();
 	tb_assert_and_check_goto(ep->mutx, fail);
 
 	// init spank
-	ep->spak = tb_event_init(tb_null);
+	ep->spak = tb_event_init();
 	tb_assert_and_check_goto(ep->spak, fail);
 
 	// init events

@@ -520,7 +520,7 @@ tb_cookies_t* tb_cookies_init()
 	tb_assert_and_check_return_val(cookies, tb_null);
 
 	// init hmutex
-	cookies->hmutex = tb_mutex_init(tb_null);
+	cookies->hmutex = tb_mutex_init();
 	tb_assert_and_check_goto(cookies->hmutex, fail);
 
 	// init spool

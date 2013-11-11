@@ -344,7 +344,7 @@ static tb_aiop_reactor_t* tb_aiop_reactor_epoll_init(tb_aiop_t* aiop)
 	tb_assert_and_check_goto(rtor->epfd > 0, fail);
 
 	// init mutx
-	rtor->mutx = tb_mutex_init(tb_null);
+	rtor->mutx = tb_mutex_init();
 	tb_assert_and_check_goto(rtor->mutx, fail);
 
 	// init hash

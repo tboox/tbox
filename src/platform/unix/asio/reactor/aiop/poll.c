@@ -435,8 +435,8 @@ static tb_aiop_reactor_t* tb_aiop_reactor_poll_init(tb_aiop_t* aiop)
 	rtor->base.kill = tb_aiop_reactor_poll_kill;
 
 	// init mutx
-	rtor->mutx.pfds = tb_mutex_init(tb_null);
-	rtor->mutx.hash = tb_mutex_init(tb_null);
+	rtor->mutx.pfds = tb_mutex_init();
+	rtor->mutx.hash = tb_mutex_init();
 	tb_assert_and_check_goto(rtor->mutx.pfds && rtor->mutx.hash, fail);
 
 	// init pfds

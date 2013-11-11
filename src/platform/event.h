@@ -36,11 +36,9 @@
 
 /*! init event
  * 
- * @param name 		the event name
- *
  * @return 			the event handle
  */
-tb_handle_t 		tb_event_init(tb_char_t const* name);
+tb_handle_t 		tb_event_init(tb_noarg_t);
 
 /*! exit event
  * 

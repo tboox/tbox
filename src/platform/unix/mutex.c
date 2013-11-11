@@ -33,7 +33,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_mutex_init(tb_char_t const* name)
+tb_handle_t tb_mutex_init()
 {
 	pthread_mutex_t* pmutex = malloc(sizeof(pthread_mutex_t));
 	if (!pmutex || 0 != pthread_mutex_init(pmutex, tb_null)) return tb_null;

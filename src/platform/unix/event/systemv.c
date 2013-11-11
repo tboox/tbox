@@ -31,7 +31,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_event_init(tb_char_t const* name)
+tb_handle_t tb_event_init()
 {
 	// make key
 	tb_size_t k = IPC_PRIVATE;

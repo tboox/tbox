@@ -24,31 +24,30 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
+#include "time.h"
 #include "atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_event_init(tb_char_t const* name)
+tb_handle_t tb_event_init()
 {
-	// alloc
-	tb_size_t* e = tb_malloc0(sizeof(tb_size_t));
-	tb_assert_and_check_return_val(e, tb_null);
-
-	// warning
-	tb_warning("the event impl maybe not fast");
+	// make
+	tb_size_t* event = tb_malloc0(sizeof(tb_size_t));
+	tb_assert_and_check_return_val(event, tb_null);
 
 	// ok
-	return (tb_handle_t)e;
+	return (tb_handle_t)event;
 
 fail:
-	if (e) tb_free(e);
+	if (event) tb_free(event);
 	return tb_null;
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
+	// check
+	tb_size_t* event = (tb_size_t*)handle;
 	tb_assert_and_check_return(handle);
-	tb_size_t* e = (tb_size_t*)handle;
 
 	// post first
 	tb_event_post(handle);
@@ -57,20 +56,22 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 	tb_msleep(200);
 
 	// free it
-	tb_free(e);
+	tb_free(event);
 }
 tb_void_t tb_event_post(tb_handle_t handle)
 {
-	tb_assert_and_check_return(handle);
-	tb_size_t* e = (tb_size_t*)handle;
+	// check
+	tb_size_t* event = (tb_size_t*)handle;
+	tb_assert_and_check_return(event);
 
 	// post signal
-	tb_atomic_set(e, 1);
+	tb_atomic_set(event, 1);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(handle, -1);
-	tb_size_t* e = (tb_size_t*)handle;
+	// check
+	tb_size_t* event = (tb_size_t*)handle;
+	tb_assert_and_check_return_val(event, -1);
 
 	// init
 	tb_long_t 	r = 0;
@@ -80,7 +81,7 @@ tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 	while (1)
 	{
 		// get post
-		tb_size_t post = tb_atomic_fetch_and_set0(e);
+		tb_size_t post = tb_atomic_fetch_and_set0(event);
 
 		// has signal?
 		if (post == 1) 

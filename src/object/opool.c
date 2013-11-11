@@ -52,7 +52,7 @@ static tb_handle_t 				g_mutx = tb_null;
 tb_bool_t tb_opool_init()
 {
 	// init mutx
-	if (!g_mutx) g_mutx = tb_mutex_init(tb_null);
+	if (!g_mutx) g_mutx = tb_mutex_init();
 	tb_assert_and_check_return_val(g_mutx, tb_false);
 
 	// init pool

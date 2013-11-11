@@ -746,8 +746,8 @@ static tb_void_t tb_aicp_proactor_aiop_init(tb_aicp_proactor_unix_t* uptr)
 	ptor->base.spak = tb_aicp_proactor_aiop_spak;
 
 	// init mutx
-	ptor->mutx.pool = tb_mutex_init(tb_null);
-	ptor->mutx.resp = tb_mutex_init(tb_null);
+	ptor->mutx.pool = tb_mutex_init();
+	ptor->mutx.resp = tb_mutex_init();
 	tb_assert_and_check_goto(ptor->mutx.pool && ptor->mutx.resp, fail);
 
 	// init aiop

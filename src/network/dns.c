@@ -1052,7 +1052,7 @@ tb_bool_t tb_dns_list_init()
 	if (!tb_atomic_get((tb_atomic_t*)&g_mutex))
 	{	
 		// init mutex
-		tb_handle_t mutex = tb_mutex_init(tb_null);
+		tb_handle_t mutex = tb_mutex_init();
 		tb_assert_and_check_return_val(mutex, tb_false);
 	
 		// save mutex

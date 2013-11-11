@@ -1014,7 +1014,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex, fail);
 
 	// init mutx
-	ptor->mutx 			= tb_mutex_init(tb_null);
+	ptor->mutx 			= tb_mutex_init();
 	tb_assert_and_check_goto(ptor->mutx, fail);
 
 	// init port

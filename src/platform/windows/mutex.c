@@ -31,9 +31,9 @@
  * implementation
  */
 
-tb_handle_t tb_mutex_init(tb_char_t const* name)
+tb_handle_t tb_mutex_init()
 {
-	HANDLE handle = CreateMutex(NULL, FALSE, name);
+	HANDLE handle = CreateMutex(tb_null, FALSE, tb_null);
 	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_mutex_exit(tb_handle_t handle)
