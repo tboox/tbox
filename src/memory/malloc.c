@@ -42,7 +42,7 @@ tb_bool_t tb_malloc_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_assert_and_check_return_val(data && size, tb_false);
 
 	// init mutex
-	if (!g_mutex) g_mutex = tb_mutex_init(tb_null);
+	if (!g_mutex) g_mutex = tb_mutex_init();
 	tb_assert_and_check_return_val(g_mutex, tb_false);
 
 	// init gpool

@@ -32,9 +32,9 @@
  * implementation
  */
 
-tb_handle_t tb_event_init(tb_char_t const* name)
+tb_handle_t tb_event_init()
 {
-	HANDLE handle = CreateEvent(tb_null, FALSE, FALSE, name);
+	HANDLE handle = CreateEvent(tb_null, FALSE, FALSE, tb_null);
 	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
@@ -47,6 +47,7 @@ tb_void_t tb_event_post(tb_handle_t handle)
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
+	// check
 	tb_assert_and_check_return_val(handle, -1);
 
 	// wait

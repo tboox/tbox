@@ -36,11 +36,9 @@
 
 /*! init mutex
  *
- * @param name 		the mutex name
- *
  * @return 			the mutex handle
  */
-tb_handle_t 		tb_mutex_init(tb_char_t const* name);
+tb_handle_t 		tb_mutex_init(tb_noarg_t);
 
 /* exit mutex
  *

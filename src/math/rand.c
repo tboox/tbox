@@ -54,7 +54,7 @@ static __tb_inline__ tb_uint32_t tb_rand_linear_next_uint32(tb_rand_linear_t* ra
 // the global rand
 tb_bool_t tb_rand_init()
 {
-	if (!g_mutex) g_mutex = tb_mutex_init(tb_null);
+	if (!g_mutex) g_mutex = tb_mutex_init();
 	tb_assert_and_check_return_val(g_mutex, tb_false);
 
 	if (!tb_mutex_enter(g_mutex)) return tb_false;

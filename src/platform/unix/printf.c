@@ -67,7 +67,7 @@ static tb_printf_t 	g_printf = {TB_PRINTF_MODE_STDOUT, tb_null, tb_null};
 tb_bool_t tb_printf_init(tb_size_t mode, tb_char_t const* path)
 {
 	// init mutex
-	if (!g_printf.mutx) g_printf.mutx = tb_mutex_init(tb_null);
+	if (!g_printf.mutx) g_printf.mutx = tb_mutex_init();
 
 	// ok?
 	return tb_printf_reset(mode, path);

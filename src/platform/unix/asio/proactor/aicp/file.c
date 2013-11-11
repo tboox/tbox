@@ -252,7 +252,7 @@ static tb_void_t tb_aicp_proactor_file_init(tb_aicp_proactor_unix_t* uptr)
 	ptor->base.spak = tb_aicp_proactor_file_spak;
 
 	// init mutx
-	ptor->mutx = tb_mutex_init(tb_null);
+	ptor->mutx = tb_mutex_init();
 	tb_assert_and_check_goto(ptor->mutx, fail);
 
 	// init resp

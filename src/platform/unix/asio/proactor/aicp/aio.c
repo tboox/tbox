@@ -822,7 +822,7 @@ static tb_void_t tb_aicp_proactor_aio_init(tb_aicp_proactor_unix_t* uptr)
 	ptor->base.post = tb_aicp_proactor_aio_post;
 	
 	// init mutx
-	ptor->mutx.post = tb_mutex_init(tb_null);
+	ptor->mutx.post = tb_mutex_init();
 	tb_assert_and_check_goto(ptor->mutx.post, fail);
 
 	// init post

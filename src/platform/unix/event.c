@@ -36,8 +36,6 @@
 
 #if defined(TB_CONFIG_EVENT_HAVE_POSIX)
 # 	include "event/posix.c"
-#elif defined(TB_CONFIG_EVENT_HAVE_PTHREAD)
-# 	include "event/pthread.c"
 #elif defined(TB_CONFIG_EVENT_HAVE_SYSTEMV)
 # 	include "event/systemv.c"
 #else

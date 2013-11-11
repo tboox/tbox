@@ -30,7 +30,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_event_init(tb_char_t const* name)
+tb_handle_t tb_event_init()
 {
 	// alloc
 	sem_t* h = tb_malloc0(sizeof(sem_t));
@@ -47,8 +47,9 @@ fail:
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
-	tb_assert_and_check_return(handle);
+	// check
 	sem_t* h = (sem_t*)handle;
+	tb_assert_and_check_return(h);
 
 	// post first
 	tb_event_post(handle);
@@ -59,15 +60,17 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 }
 tb_void_t tb_event_post(tb_handle_t handle)
 {
-	tb_assert_and_check_return(handle);
+	// check
 	sem_t* h = (sem_t*)handle;
+	tb_assert_and_check_return(h);
 
 	sem_post(h);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
-	tb_assert_and_check_return_val(handle, -1);
+	// check
 	sem_t* h = (sem_t*)handle;
+	tb_assert_and_check_return_val(h, -1);
 
 	// init time
 	struct timespec t = {0};

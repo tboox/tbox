@@ -74,7 +74,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	for (i = 0; i < TB_TEST_ITEM_MAX; i++)
 	{
 		it[i].i = i;
-		it[i].e = tb_event_init(tb_null);
+		it[i].e = tb_event_init(); tb_event_post(it[i].e);
 		it[i].t = tb_thread_init(tb_null, tb_test_thread, it + i, 0);
 		tb_assert_and_check_goto(it[i].t, end);
 	}
