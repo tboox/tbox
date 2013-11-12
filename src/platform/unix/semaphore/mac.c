@@ -24,8 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../semaphore.h"
+#include <time.h>
 #include <mach/semaphore.h>
 #include <mach/task.h>
 #include <mach/mach.h>
@@ -89,11 +88,9 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
 	while (post--)
 	{
 		if (KERN_SUCCESS != semaphore_signal(semaphore->handle)) return tb_false;
+		tb_atomic_fetch_and_inc(&semaphore->value);
 	}
 
-	// save value
-	tb_atomic_fetch_and_add(&semaphore->value, post);
-	
 	// ok
 	return tb_true;
 }
@@ -113,13 +110,25 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 	tb_assert_and_check_return_val(semaphore, -1);
 
 	// init timespec
-	mach_timespec_t timespec = {0, 0};
+	mach_timespec_t spec = {0};
+	if (timeout > 0)
+	{
+		spec.tv_sec += timeout / 1000;
+		spec.tv_nsec += (timeout % 1000) * 1000000;
+	}
+	else if (timeout < 0) spec.tv_sec += 12 * 30 * 24 * 3600; // infinity: one year
 
 	// wait
-	tb_long_t ok = semaphore_timedwait(semaphore->handle, &timespec);
+	tb_long_t ok = semaphore_timedwait(semaphore->handle, spec);
+
+	// timeout?
+	tb_check_return_val(ok != KERN_OPERATION_TIMED_OUT, 0);
+
+	// ok?
+	tb_check_return_val(ok == KERN_SUCCESS, -1);
 
 	// check value
-	tb_assert_and_check_return_val(tb_atomic_get(&semaphore->value), -1);
+	tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&semaphore->value) > 0, -1);
 	
 	// value--
 	tb_atomic_fetch_and_dec(&semaphore->value);

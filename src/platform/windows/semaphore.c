@@ -133,7 +133,7 @@ tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
 
 	// check value
-	tb_assert_and_check_return_val(tb_atomic_get(&semaphore->value), -1);
+	tb_assert_and_check_return_val((tb_long_t)tb_atomic_get(&semaphore->value) > 0, -1);
 	
 	// value--
 	tb_atomic_fetch_and_dec(&semaphore->value);

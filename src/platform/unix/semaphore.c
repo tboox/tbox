@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../semaphore.h"
+#include "../platform.h"
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
@@ -38,6 +38,8 @@
 # 	include "semaphore/posix.c"
 #elif defined(TB_CONFIG_SEMAPHORE_HAVE_SYSTEMV)
 # 	include "semaphore/systemv.c"
+#elif defined(TB_CONFIG_OS_MAC)
+# 	include "semaphore/mac.c"
 #else
 # 	include "../semaphore.c"
 #endif
