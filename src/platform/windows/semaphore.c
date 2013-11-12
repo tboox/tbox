@@ -93,10 +93,18 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
 	// check
 	tb_semaphore_t* semaphore = (tb_semaphore_t*)handle;
 	tb_assert_and_check_return_val(semaphore && semaphore->handle && semaphore->handle != INVALID_HANDLE_VALUE && post, tb_false);
-
+	
+	// += post
+	tb_atomic_fetch_and_add(&semaphore->value, post);
+	
 	// post
 	LONG prev = 0;
-	if (!ReleaseSemaphore(semaphore->handle, (LONG)post, &prev) && prev >= 0) return tb_false;
+	if (!ReleaseSemaphore(semaphore->handle, (LONG)post, &prev) && prev >= 0) 
+	{
+		// restore
+		tb_atomic_fetch_and_sub(&semaphore->value, post);
+		return tb_false;
+	}
 
 	// check
 	tb_assert_and_check_return_val(prev + post <= TB_SEMAPHORE_VALUE_MAXN, tb_false);

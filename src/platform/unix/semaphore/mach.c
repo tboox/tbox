@@ -87,8 +87,19 @@ tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
 	// post
 	while (post--)
 	{
-		if (KERN_SUCCESS != semaphore_signal(semaphore->handle)) return tb_false;
-		tb_atomic_fetch_and_inc(&semaphore->value);
+		// +2 first
+		tb_atomic_fetch_and_add(&semaphore->value, 2);
+
+		// signal
+		if (KERN_SUCCESS != semaphore_signal(semaphore->handle)) 
+		{
+			// restore
+			tb_atomic_fetch_and_sub(&semaphore->value, 2);
+			return tb_false;
+		}
+
+		// -1
+		tb_atomic_fetch_and_dec(&semaphore->value);
 	}
 
 	// ok

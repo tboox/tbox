@@ -38,8 +38,8 @@
 # 	include "semaphore/posix.c"
 #elif defined(TB_CONFIG_SEMAPHORE_HAVE_SYSTEMV)
 # 	include "semaphore/systemv.c"
-#elif defined(TB_CONFIG_OS_MAC)
-# 	include "semaphore/mac.c"
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+# 	include "semaphore/mach.c"
 #else
 # 	include "../semaphore.c"
 #endif
