@@ -247,7 +247,7 @@ static tb_long_t tb_aicp_proactor_unix_spak(tb_aicp_proactor_t* proactor, tb_aic
 	tb_check_return_val(!ok, ok);
 
 	// wait
-	return tb_event_wait(ptor->wait, timeout);
+	return tb_semaphore_wait(ptor->wait, timeout);
 }
 static tb_void_t tb_aicp_proactor_unix_kill(tb_aicp_proactor_t* proactor)
 {
@@ -271,7 +271,7 @@ static tb_void_t tb_aicp_proactor_unix_kill(tb_aicp_proactor_t* proactor)
 	}
 
 	// post wait
-	while (work--) tb_event_post(ptor->wait);
+	if (work) tb_semaphore_post(ptor->wait, work);
 }
 static tb_void_t tb_aicp_proactor_unix_exit(tb_aicp_proactor_t* proactor)
 {
@@ -301,7 +301,7 @@ static tb_void_t tb_aicp_proactor_unix_exit(tb_aicp_proactor_t* proactor)
 		ptor->mutx = tb_null;
 
 		// exit wait
-		if (ptor->wait) tb_event_exit(ptor->wait);
+		if (ptor->wait) tb_semaphore_exit(ptor->wait);
 		ptor->wait = tb_null;
 
 		// free it
@@ -328,9 +328,6 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 
 			// trace
 			tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
-
-			// post it
-			tb_event_post(ptor->wait);
 		}
 		else
 		{
@@ -341,8 +338,15 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 		// leave 
 		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 	}
-	// only post wait
-	else tb_event_post(ptor->wait);
+
+	// the worker size
+	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
+
+	// the semaphore value
+	tb_long_t value = tb_semaphore_value(ptor->wait);
+
+	// post wait
+	if (value >= 0 && value < work) tb_semaphore_post(ptor->wait, work - value);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -390,17 +394,12 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->resp, fail);
 
 	// init wait
-	ptor->wait = tb_event_init();
+	ptor->wait = tb_semaphore_init(0);
 	tb_assert_and_check_goto(ptor->wait, fail);
 
 	// init epoll proactor
 #if 0//def TB_CONFIG_ASIO_POLL_HAVE_EPOLL
 	tb_aicp_proactor_epoll_init(ptor);
-#endif
-
-	// init kqueue proactor
-#if 0//defined(TB_CONFIG_ASIO_POLL_HAVE_KQUEUE)
-	tb_aicp_proactor_kqueue_init(ptor);
 #endif
 
 	// init aiop proactor
