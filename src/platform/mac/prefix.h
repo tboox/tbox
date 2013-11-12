@@ -17,43 +17,15 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		event.c
+ * @file		prefix.h
  *
  */
+#ifndef TB_PLATFROM_MAC_PREFIX_H
+#define TB_PLATFROM_MAC_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../event.h"
-#include "../semaphore.h"
+#include "../prefix.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_handle_t tb_event_init()
-{
-	return tb_semaphore_init(0);
-}
-tb_void_t tb_event_exit(tb_handle_t handle)
-{
-	if (handle) tb_semaphore_exit(handle);
-}
-tb_bool_t tb_event_post(tb_handle_t handle)
-{
-	// check
-	tb_assert_and_check_return_val(handle, tb_false);
-
-	// post
-	return tb_semaphore_post(handle, 1);
-}
-tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
-{
-	// check
-	tb_assert_and_check_return_val(handle, -1);
-
-	// wait
-	return tb_semaphore_wait(handle, timeout);
-}
-
-
+#endif
