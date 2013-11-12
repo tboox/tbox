@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		event.h
+ * @file		semaphore.h
  * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFORM_EVENT_H
-#define TB_PLATFORM_EVENT_H
+#ifndef TB_PLATFORM_SEMAPHORE_H
+#define TB_PLATFORM_SEMAPHORE_H
 
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -34,34 +34,45 @@
  * interfaces
  */
 
-/*! init event
+/*! init semaphore
+ *
+ * @param init 		the init semaphore value
  * 
- * @return 			the event handle
+ * @return 			the semaphore handle
  */
-tb_handle_t 		tb_event_init(tb_noarg_t);
+tb_handle_t 		tb_semaphore_init(tb_size_t init);
 
-/*! exit event
+/*! exit semaphore
  * 
- * @param handle 	the event handle
+ * @param handle 	the semaphore handle
  */
-tb_void_t 			tb_event_exit(tb_handle_t handle);
+tb_void_t 			tb_semaphore_exit(tb_handle_t handle);
 
-/*! post event
+/*! post semaphore
  * 
- * @param handle 	the event handle
+ * @param handle 	the semaphore handle
+ * @param post 		the post semaphore value
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_event_post(tb_handle_t handle);
+tb_bool_t 			tb_semaphore_post(tb_handle_t handle, tb_size_t post);
 
-/*! wait event
+/*! the semaphore value
  * 
- * @param handle 	the event handle
+ * @param handle 	the semaphore handle
+ *
+ * @return 			>= 0: the semaphore value, -1: failed
+ */
+tb_long_t 			tb_semaphore_value(tb_handle_t handle);
+
+/*! wait semaphore
+ * 
+ * @param handle 	the semaphore handle
  * @param timeout 	the timeout
  *
  * @return 			ok: 1, timeout: 0, fail: -1
  */
-tb_long_t 			tb_event_wait(tb_handle_t handle, tb_long_t timeout);
+tb_long_t 			tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout);
 
 	
 #endif

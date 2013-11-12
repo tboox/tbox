@@ -24,48 +24,86 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "../event.h"
-#include "windows.h"
+#include "time.h"
+#include "atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_handle_t tb_event_init()
 {
-	HANDLE handle = CreateEventA(tb_null, FALSE, FALSE, tb_null);
-	return ((handle != INVALID_HANDLE_VALUE)? handle : tb_null);
+	// make
+	tb_size_t* event = tb_malloc0(sizeof(tb_size_t));
+	tb_assert_and_check_return_val(event, tb_null);
+
+	// ok
+	return (tb_handle_t)event;
+
+fail:
+	if (event) tb_free(event);
+	return tb_null;
 }
 tb_void_t tb_event_exit(tb_handle_t handle)
 {
-	if (handle) CloseHandle(handle);
+	// check
+	tb_size_t* event = (tb_size_t*)handle;
+	tb_assert_and_check_return(handle);
+
+	// post first
+	tb_event_post(handle);
+
+	// wait some time
+	tb_msleep(200);
+
+	// free it
+	tb_free(event);
 }
-tb_bool_t tb_event_post(tb_handle_t handle)
+tb_void_t tb_event_post(tb_handle_t handle)
 {
 	// check
-	tb_assert_and_check_return_val(handle, tb_false);
-	
-	// post
-	return SetEvent(handle)? tb_true : tb_false;
+	tb_size_t* event = (tb_size_t*)handle;
+	tb_assert_and_check_return(event);
+
+	// post signal
+	tb_atomic_set(event, 1);
 }
 tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
 {
 	// check
-	tb_assert_and_check_return_val(handle, -1);
+	tb_size_t* event = (tb_size_t*)handle;
+	tb_assert_and_check_return_val(event, -1);
 
-	// wait
-	tb_long_t r = WaitForSingleObject(handle, timeout >= 0? timeout : INFINITE);
-	tb_assert_and_check_return_val(r != WAIT_FAILED, -1);
+	// init
+	tb_long_t 	r = 0;
+	tb_hong_t 	base = tb_mclock();
 
-	// timeout?
-	tb_check_return_val(r != WAIT_TIMEOUT, 0);
+	// wait 
+	while (1)
+	{
+		// get post
+		tb_size_t post = tb_atomic_fetch_and_set0(event);
 
-	// error?
-	tb_check_return_val(r >= WAIT_OBJECT_0, -1);
+		// has signal?
+		if (post == 1) 
+		{
+			r = 1;
+			break;
+		}
+		// error
+		else if (post != 0) 
+		{
+			r = -1;
+			break;
+		}
+		// no signal?
+		else
+		{
+			// timeout?
+			if (timeout >= 0 && tb_mclock() - base >= timeout) break;
+			else tb_msleep(200);
+		}
+	}
 
-	// ok
-	return 1;
+	return r;
 }
-
 

@@ -43,6 +43,7 @@
 #include "printf.h"
 #include "dynamic.h"
 #include "process.h"
+#include "semaphore.h"
 #include "backtrace.h"
 #include "directory.h"
 #include "exception.h"
