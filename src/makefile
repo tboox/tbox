@@ -223,8 +223,9 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_MUTX)/mutex \
 						platform/$(TB_CONFIG_API_SOCK)/socket \
 						platform/$(TB_CONFIG_API_THRD)/thread \
-						platform/$(TB_CONFIG_API_EVET)/event \
-						platform/$(TB_CONFIG_API_EVET)/epool \
+						platform/$(TB_CONFIG_API_EVENT)/event \
+						platform/$(TB_CONFIG_API_EVENT)/epool \
+						platform/$(TB_CONFIG_API_SEMAPHORE)/semaphore \
 						platform/$(TB_CONFIG_API_TIME)/time \
 						platform/$(TB_CONFIG_API_PRINTF)/printf \
 						platform/$(TB_CONFIG_API_FILE)/directory \

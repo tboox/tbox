@@ -30,14 +30,14 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_event_init()
+tb_handle_t tb_semaphore_init(tb_size_t init)
 {
 	// alloc
 	sem_t* h = tb_malloc0(sizeof(sem_t));
 	tb_assert_and_check_return_val(h, tb_null);
 
 	// init
-	if (sem_init(h, 0, 0) < 0) goto fail;
+	if (sem_init(h, 0, init) < 0) goto fail;
 
 	// ok
 	return (tb_handle_t)h;
@@ -45,7 +45,7 @@ tb_handle_t tb_event_init()
 fail:
 	return tb_null;
 }
-tb_void_t tb_event_exit(tb_handle_t handle)
+tb_void_t tb_semaphore_exit(tb_handle_t handle)
 {
 	// check
 	sem_t* h = (sem_t*)handle;
@@ -57,16 +57,32 @@ tb_void_t tb_event_exit(tb_handle_t handle)
 	// free it
 	tb_free(h);
 }
-tb_bool_t tb_event_post(tb_handle_t handle)
+tb_bool_t tb_semaphore_post(tb_handle_t handle, tb_size_t post)
 {
 	// check
 	sem_t* h = (sem_t*)handle;
-	tb_assert_and_check_return_val(h, tb_false);
+	tb_assert_and_check_return_val(h && post, tb_false);
 
-	// post
-	return !sem_post(h)? tb_true : tb_false;
+	// post 
+	while (post--)
+	{
+		if (sem_post(h) < 0) return tb_false;
+	}
+
+	// ok
+	return tb_true;
 }
-tb_long_t tb_event_wait(tb_handle_t handle, tb_long_t timeout)
+tb_long_t tb_semaphore_value(tb_handle_t handle)
+{
+	// check
+	sem_t* h = (sem_t*)handle;
+	tb_assert_and_check_return_val(h, -1);
+
+	// get value
+	tb_int_t value = 0;
+	return (!sem_getvalue(h, &value))? (tb_long_t)value : -1;
+}
+tb_long_t tb_semaphore_wait(tb_handle_t handle, tb_long_t timeout)
 {
 	// check
 	sem_t* h = (sem_t*)handle;

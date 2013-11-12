@@ -14,9 +14,10 @@
  */
 typedef struct __tb_test_item_t
 {
-	tb_handle_t 	e;
+	tb_handle_t 	s;
 	tb_handle_t 	t;
-	tb_size_t 		q;
+	tb_size_t 		i 	: 24;
+	tb_size_t 		q 	: 8;
 
 }tb_test_item_t;
 
@@ -32,15 +33,17 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 {
 	tb_test_item_t* it = (tb_test_item_t*)cb_data;
 	tb_assert_and_check_goto(it, end);
-	tb_print("[thread]: init");
+	tb_print("[thread: %u]: init", it->i);
 
 	// loop
-	tb_eobject_t o[TB_TEST_ITEM_MAX];
 	while (1)
 	{
+		// value
+		tb_print("[semaphore: %u]: %ld", it->i, tb_semaphore_value(it->s));
+
 		// wait
-		tb_print("[event]: wait");
-		tb_long_t r = tb_epool_wait(it->e, o, TB_TEST_ITEM_MAX, -1);
+		tb_print("[semaphore: %u]: wait", it->i);
+		tb_long_t r = tb_semaphore_wait(it->s, -1);
 		tb_assert_and_check_goto(r >= 0, end);
 
 		// quit?
@@ -50,15 +53,11 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		tb_check_continue(r);
 
 		// signal
-		tb_size_t i = 0;
-		for (i = 0; i < r; i++) 
-			tb_print("[event: %u]: signal", o[i].data);
+		tb_print("[semaphore: %u]: signal", it->i);
 	}
 
 end:
-
-	// exit thread
-	tb_print("[thread]: exit");
+	tb_print("[thread: %u]: exit", it? it->i : 0);
 	tb_thread_return(tb_null);
 	return tb_null;
 }
@@ -68,24 +67,20 @@ end:
  */
 tb_int_t main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init item
-	tb_test_item_t it = {0};
-
-	// init epool
-	it.e = tb_epool_init(TB_TEST_ITEM_MAX + 10);
-	tb_assert_and_check_return_val(it.e, 0);
-
-	// init event
-	tb_size_t 	i = 0;
-	tb_handle_t e[TB_TEST_ITEM_MAX] = {tb_null};
-	for (i = 0; i < TB_TEST_ITEM_MAX; i++) e[i] = tb_epool_adde(it.e, i);
+	tb_test_item_t it[TB_TEST_ITEM_MAX] = {0};
 
 	// init thread
-	it.t = tb_thread_init(tb_null, tb_test_thread, &it, 0);
-	tb_assert_and_check_goto(it.t, end);
+	tb_size_t i = 0;
+	for (i = 0; i < TB_TEST_ITEM_MAX; i++)
+	{
+		it[i].i = i;
+		it[i].s = tb_semaphore_init(0); tb_semaphore_post(it[i].s, 1);
+		it[i].t = tb_thread_init(tb_null, tb_test_thread, it + i, 0);
+		tb_assert_and_check_goto(it[i].t, end);
+	}
 	tb_msleep(100);
 
 	// post
@@ -106,9 +101,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					{
 						if (ch >= '0' && ch <= '9')
 						{
-							// post event
+							// post semaphore
 							tb_size_t i = ch - '0';
-							tb_epool_post(it.e, e[i]);
+							if (it[i].s) tb_semaphore_post(it[i].s, i + 1);
 						}
 					}
 					break;
@@ -118,24 +113,29 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	}
 
 end:
-	// quit thread
-	it.q = 1;
-
-	// kill events
-	tb_epool_kill(it.e);
-
-	// kill thread
-	if (it.t) 
+	// exit thread
+	for (i = 0; i < TB_TEST_ITEM_MAX; i++)
 	{
-		if (!tb_thread_wait(it.t, 5000))
-			tb_thread_kill(it.t);
-		tb_thread_exit(it.t);
+		// quit thread
+		it[i].q = 1;
+
+		// post semaphore
+		if (it[i].s) tb_semaphore_post(it[i].s, 1);
+
+		// kill thread
+		if (it[i].t) 
+		{
+			if (!tb_thread_wait(it[i].t, 5000))
+				tb_thread_kill(it[i].t);
+			tb_thread_exit(it[i].t);
+		}
+
+		// exit semaphore
+		if (it[i].s) tb_semaphore_exit(it[i].s);
 	}
 
-	// exit event
-	tb_epool_exit(it.e);
-
 	tb_print("quit");
+
 	tb_exit();
 	return 0;
 }
