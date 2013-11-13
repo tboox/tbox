@@ -106,6 +106,7 @@ static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_han
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
 	tb_assert_and_check_return_val(ptor && handle && type, tb_false);
 
+	tb_print("tb_aicp_proactor_unix_addo");
 	// walk proactors
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;

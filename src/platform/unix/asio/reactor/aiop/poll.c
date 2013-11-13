@@ -298,6 +298,9 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
 				continue ;
 			}
 
+			// filter spak
+			tb_check_continue(handle != rtor->spak[1]);
+
 			// the aioo
 			if (rtor->mutx.hash) tb_mutex_enter(rtor->mutx.hash);
 			tb_poll_aioo_t aioo = {0};
