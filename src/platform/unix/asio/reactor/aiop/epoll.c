@@ -77,13 +77,7 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd > 0 && handle, tb_false);
 
-	// addo
-	struct epoll_event e = {0};
-	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
-	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
-	if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
-	e.data.u64 = (tb_hize_t)handle;
-	if (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, ((tb_long_t)handle) - 1, &e) < 0) return tb_false;
+	tb_print("tb_aiop_reactor_epoll_addo b: %p %x", handle, code);
 
 	// add handle => aioo
 	tb_bool_t ok = tb_false;
@@ -97,6 +91,26 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_handl
 		ok = tb_true;
 	}
 	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
+	// check
+	tb_assert_and_check_return_val(ok, tb_false);
+
+	// addo
+	struct epoll_event e = {0};
+	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
+	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+	if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
+	e.data.u64 = (tb_hize_t)handle;
+	if (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, ((tb_long_t)handle) - 1, &e) < 0)
+	{
+		// del handle => aioo
+		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+		if (rtor->hash) tb_hash_del(rtor->hash, handle);
+		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+		ok = tb_false;
+	}
+
+	tb_print("tb_aiop_reactor_epoll_addo e: %p %x", handle, code);
 
 	// ok?
 	return ok;
@@ -122,6 +136,27 @@ static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_
 	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->epfd > 0 && aioe && aioe->handle, tb_false);
 
+	// set handle => aioo
+	tb_bool_t 			ok = tb_false;
+	tb_epoll_aioo_t 	prev = {0};
+	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+	if (rtor->hash) 
+	{
+		tb_epoll_aioo_t* aioo = (tb_epoll_aioo_t*)tb_hash_get(rtor->hash, aioe->handle);
+		if (aioo)
+		{
+			tb_print("sete: %p %x", aioe->handle, aioe->code);
+			prev = *aioo;
+			aioo->code = aioe->code;
+			aioo->data = aioe->data;
+			ok = tb_true;
+		}
+	}
+	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+
+	// check
+	tb_assert_and_check_return_val(ok, tb_false);
+
 	// init 
 	struct epoll_event e = {0};
 	if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
@@ -130,22 +165,14 @@ static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_
 	e.data.u64 = (tb_hize_t)aioe->handle;
 
 	// sete
-	if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, ((tb_long_t)aioe->handle) - 1, &e) < 0) return tb_false;
-
-	// set handle => aioo
-	tb_bool_t ok = tb_false;
-	if (rtor->mutx) tb_mutex_enter(rtor->mutx);
-	if (rtor->hash) 
+	if (epoll_ctl(rtor->epfd, EPOLL_CTL_MOD, ((tb_long_t)aioe->handle) - 1, &e) < 0) 
 	{
-		tb_epoll_aioo_t* aioo = (tb_epoll_aioo_t*)tb_hash_get(rtor->hash, aioe->handle);
-		if (aioo)
-		{
-			aioo->code = aioe->code;
-			aioo->data = aioe->data;
-			ok = tb_true;
-		}
+		// restore it
+		if (rtor->mutx) tb_mutex_enter(rtor->mutx);
+		if (rtor->hash) tb_hash_set(rtor->hash, aioe->handle, &prev);
+		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
+		ok = tb_false;
 	}
-	if (rtor->mutx) tb_mutex_leave(rtor->mutx);
 
 	// ok?
 	return ok;
@@ -214,6 +241,7 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 
 	// sync
 	tb_size_t i = 0;
+	tb_size_t wait = 0; 
 	for (i = 0; i < evtn; i++)
 	{
 		// the handle
@@ -223,8 +251,16 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		// the events
 		tb_size_t events = rtor->evts[i].events;
 
+		tb_print("events: %p %x", handle, events);
+
 		// killed?
 		if (handle == rtor->kill[1] && (events & EPOLLIN)) return -1;
+
+		// skip kill
+		tb_check_continue(handle != rtor->kill[1]);
+
+		// skip EPOLLHUP
+		if (events & EPOLLHUP) continue ;
 
 		// the aioo
 		tb_epoll_aioo_t aioo = {0};
@@ -233,15 +269,18 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		{
 			tb_epoll_aioo_t const* item = (tb_epoll_aioo_t const*)tb_hash_get(rtor->hash, handle);
 			if (item) aioo = *item;
+
+			tb_print("code: %p %x", handle, item? item->code : -1);
 		}
 		if (rtor->mutx) tb_mutex_leave(rtor->mutx);
 		tb_assert_and_check_return_val(aioo.code, -1);
 
 		// save aioe
-		tb_aioe_t* aioe = list + i;
+		tb_aioe_t* aioe = &list[wait++];
 		aioe->code = TB_AIOE_CODE_NONE;
 		aioe->data = aioo.data;
 		aioe->handle = handle;
+		tb_print("list: %lu %p, data: %p", i, aioe->handle, aioe->data);
 		if (events & EPOLLIN) 
 		{
 			aioe->code |= TB_AIOE_CODE_RECV;
@@ -252,12 +291,12 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 			aioe->code |= TB_AIOE_CODE_SEND;
 			if (aioo.code & TB_AIOE_CODE_CONN) aioe->code |= TB_AIOE_CODE_CONN;
 		}
-		if (events & (EPOLLHUP | EPOLLERR) && !(aioe->code & TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND)) 
+		if (events & (EPOLLRDHUP | EPOLLERR) && !(aioe->code & (TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND))) 
 			aioe->code |= TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND;
 	}
 
 	// ok
-	return evtn;
+	return wait;
 }
 static tb_void_t tb_aiop_reactor_epoll_exit(tb_aiop_reactor_t* reactor)
 {

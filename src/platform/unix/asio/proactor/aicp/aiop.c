@@ -505,6 +505,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 		{
 			// the aioe
 			tb_aioe_t const* aioe = &ptor->list[i];
+			tb_print("aioe: %lu %p, data: %p", i, aioe->handle, aioe->data);
 			tb_assert_and_check_goto(aioe->handle, end);
 
 			// the aice
@@ -556,6 +557,7 @@ static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_han
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->aiop && handle && type == TB_AICO_TYPE_SOCK, tb_false);
 
+	tb_print("tb_aicp_proactor_aiop_addo");
 	// addo
 	return tb_aiop_addo(ptor->aiop, handle, TB_AIOE_CODE_NONE, tb_null);
 }

@@ -310,6 +310,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 					continue ;
 				}
 
+				// filter spak
+				tb_check_continue(handle != rtor->spak[1]);
+
 				// the fd
 				tb_long_t fd = (tb_long_t)item->name - 1;
 
