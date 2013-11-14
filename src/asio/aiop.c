@@ -28,11 +28,55 @@
 #include "aiop.h"
 #include "aioo.h"
 #include "../math/math.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * aioo
+ */
+static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+{
+	// check
+	tb_assert_and_check_return_val(aiop && aiop->pool, tb_null);
+
+	// enter 
+	if (aiop->mutx) tb_mutex_enter(aiop->mutx);
+
+	// make aioo
+	tb_aioo_t* aioo = (tb_aioo_t*)tb_rpool_malloc0(aiop->pool);
+
+	// init aioo
+	if (aioo)
+	{
+		aioo->code = code;
+		aioo->data = data;
+		aioo->handle = handle;
+	}
+
+	// leave 
+	if (aiop->mutx) tb_mutex_leave(aiop->mutx);
+	
+	// ok?
+	return aioo;
+}
+static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_aioo_t const* aioo)
+{
+	// check
+	tb_assert_and_check_return(aiop && aiop->pool);
+
+	// enter 
+	if (aiop->mutx) tb_mutex_enter(aiop->mutx);
+
+	// exit aioo
+	if (aioo) tb_rpool_free(aiop->pool, aioo);
+
+	// leave 
+	if (aiop->mutx) tb_mutex_leave(aiop->mutx);
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -49,9 +93,23 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
 	// init aiop
 	aiop->maxn = maxn;
 
+	// init mutx
+	aiop->mutx = tb_mutex_init();
+	tb_assert_and_check_goto(aiop->mutx, fail);
+
+	// init pool
+	aiop->pool = tb_rpool_init((maxn >> 4) + 16, sizeof(tb_aioo_t), 0);
+	tb_assert_and_check_goto(aiop->pool, fail);
+
+	// init spak
+	if (!tb_socket_pair(TB_SOCKET_TYPE_TCP, aiop->spak)) goto fail;
+
 	// init reactor
 	aiop->rtor = tb_aiop_reactor_init(aiop);
 	tb_assert_and_check_goto(aiop->rtor, fail);
+
+	// addo spak
+	if (!tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null)) goto fail;	
 
 	// ok
 	return aiop;
@@ -70,6 +128,21 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 	if (aiop->rtor && aiop->rtor->exit)
 		aiop->rtor->exit(aiop->rtor);
 
+	// exit spak
+	if (aiop->spak[0]) tb_socket_close(aiop->spak[0]);
+	if (aiop->spak[1]) tb_socket_close(aiop->spak[1]);
+	aiop->spak[0] = tb_null;
+	aiop->spak[1] = tb_null;
+
+	// exit pool
+	if (aiop->mutx) tb_mutex_enter(aiop->mutx);
+	if (aiop->pool) tb_rpool_exit(aiop->pool);
+	aiop->pool = tb_null;
+	if (aiop->mutx) tb_mutex_leave(aiop->mutx);
+
+	// exit mutx
+	if (aiop->mutx) tb_mutex_exit(aiop->mutx);
+
 	// free aiop
 	tb_free(aiop);
 }
@@ -81,31 +154,58 @@ tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
 	// clear reactor
 	if (aiop->rtor && aiop->rtor->cler)
 		aiop->rtor->cler(aiop->rtor);
+
+	// clear pool
+	if (aiop->mutx) tb_mutex_enter(aiop->mutx);
+	if (aiop->pool) tb_rpool_clear(aiop->pool);
+	if (aiop->mutx) tb_mutex_leave(aiop->mutx);
+
+	// addo spak
+	if (aiop->spak[1]) tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null);	
 }
 tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
 {
 	// check
 	tb_assert_and_check_return(aiop);
 
-	// kill reactor
-	if (aiop->rtor && aiop->rtor->kill)
-		aiop->rtor->kill(aiop->rtor);
+	// kill it
+	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], "k", 1);
 }
-tb_bool_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+tb_aioo_t const* tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_false);
 
-	// addo
-	return aiop->rtor->addo(aiop->rtor, handle, code, data);
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_aioo_t* 	aioo = tb_null;
+	do
+	{
+		// init aioo
+		aioo = tb_aiop_aioo_init(aiop, handle, code, data);
+		tb_assert_and_check_break(aioo);
+		
+		// addo aioo
+		if (!aiop->rtor->addo(aiop->rtor, aioo)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? remove aioo
+	if (!ok && aioo) tb_aiop_aioo_exit(aiop, aioo);
+
+	// ok?
+	return aioo;
 }
-tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle)
+tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_aioo_t const* aioo)
 {
 	// check
-	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->delo && handle);
+	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->delo && aioo);
 
-	// delo
-	aiop->rtor->delo(aiop->rtor, handle);
+	// delo aioo
+	if (aiop->rtor->delo(aiop->rtor, aioo)) tb_aiop_aioo_exit(aiop, aioo);
 }
 tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size)
 {
@@ -115,16 +215,16 @@ tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size)
 	// post
 	return aiop->rtor->post(aiop->rtor, list, size);
 }
-tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_aioo_t const* aioo, tb_size_t code, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && handle && code, tb_false);
+	tb_assert_and_check_return_val(aiop && aioo && aioo->handle && code, tb_false);
 
 	// init aioe
 	tb_aioe_t aioe;
 	aioe.code = code;
 	aioe.data = data;
-	aioe.handle = handle;
+	aioe.aioo = aioo;
 
 	// post aioe
 	return tb_aiop_post(aiop, &aioe, 1);
