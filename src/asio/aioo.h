@@ -30,6 +30,25 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the aioo type
+typedef struct __tb_aioo_t
+{
+	// the code
+	tb_size_t 				code;
+
+	// the data
+	tb_pointer_t 			data;
+
+	// the handle 
+	tb_handle_t 			handle;
+
+}tb_aioo_t;
+
+
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 

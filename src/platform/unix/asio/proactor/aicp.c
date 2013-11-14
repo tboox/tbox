@@ -361,7 +361,7 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 # 	include "aicp/aio.c"
 #endif
 
-#include "aicp/aiop.c"
+//#include "aicp/aiop.c"
 #include "aicp/file.c"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 #endif
 
 	// init aiop proactor
-	tb_aicp_proactor_aiop_init(ptor);
+//	tb_aicp_proactor_aiop_init(ptor);
 
 	// init file proactor
 	tb_aicp_proactor_file_init(ptor);

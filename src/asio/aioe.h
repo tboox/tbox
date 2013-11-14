@@ -24,11 +24,11 @@
 #ifndef TB_ASIO_AIOE_H
 #define TB_ASIO_AIOE_H
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+#include "aioo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -53,11 +53,11 @@ typedef struct __tb_aioe_t
 	// the code
 	tb_size_t 				code;
 
-	// the handle 
-	tb_handle_t 			handle;
-
 	// the data
 	tb_pointer_t 			data;
+
+	// the aioo
+	tb_aioo_t* 				aioo;
 
 }tb_aioe_t;
 

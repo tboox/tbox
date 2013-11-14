@@ -60,14 +60,11 @@ typedef struct __tb_aiop_reactor_t
 	/// cler
 	tb_void_t 				(*cler)(struct __tb_aiop_reactor_t* reactor);
 
-	/// kill
-	tb_void_t 				(*kill)(struct __tb_aiop_reactor_t* reactor);
-
 	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
+	tb_bool_t 				(*addo)(struct __tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo);
 
 	/// delo
-	tb_void_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_handle_t handle);
+	tb_bool_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo);
 
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size);
@@ -90,12 +87,21 @@ typedef struct __tb_aiop_reactor_t
  */
 typedef struct __tb_aiop_t
 {
-	/// the object maxn
+	/// the aioo maxn
 	tb_size_t 				maxn;
+
+	/// the aioo pool
+	tb_handle_t 			pool;
+
+	/// the pool mutx
+	tb_handle_t 			mutx;
 
 	/// the reactor
 	tb_aiop_reactor_t* 		rtor;
 
+	// the spak
+	tb_handle_t 			spak[2];
+	
 }tb_aiop_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -135,17 +141,17 @@ tb_void_t 			tb_aiop_kill(tb_aiop_t* aiop);
  * @param code 		the code
  * @param data 		the data
  *
- * @return 			tb_true or tb_false
+ * @return 			the aioo
  */
-tb_bool_t 			tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
+tb_aioo_t const* 	tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
 /*! delo the aioo
  *
  * @param aiop 		the aiop
- * @param handle 	the handle
+ * @param aioo 		the aioo
  *
  */
-tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t handle);
+tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_aioo_t const* aioo);
 
 /*! post the aioe list
  *
@@ -160,13 +166,13 @@ tb_bool_t 			tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size
 /*! set the asie
  *
  * @param aiop 		the aiop
- * @param handle 	the handle
+ * @param aioo 		the aioo
  * @param code 		the code
  * @param data 		the data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
+tb_bool_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_aioo_t const* aioo, tb_size_t code, tb_pointer_t data);
 
 /*! wait the asio objects in the pool
  *

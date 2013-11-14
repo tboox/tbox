@@ -14,6 +14,9 @@
  */
 typedef struct __tb_demo_context_t
 {
+	// the aioo
+	tb_aioo_t const* 	aioo;
+
 	// the sock
 	tb_handle_t 		sock;
 
@@ -41,13 +44,23 @@ static tb_void_t tb_demo_context_exit(tb_aiop_t* aiop, tb_demo_context_t* contex
 {
 	if (context)
 	{
-		if (context->sock) 
-		{
-			tb_aiop_delo(aiop, context->sock);
-			tb_socket_close(context->sock);
-		}
+		// exit aioo
+		if (context->aioo) tb_aiop_delo(aiop, context->aioo);
+		context->aioo = tb_null;
+
+		// exit sock
+		if (context->sock) tb_socket_close(context->sock);
+		context->sock = tb_null;
+
+		// exit file
 		if (context->file) tb_file_exit(context->file);
+		context->file = tb_null;
+
+		// exit data
 		if (context->data) tb_free(context->data);
+		context->data = tb_null;
+
+		// exit it
 		tb_free(context);
 	}
 }
@@ -92,8 +105,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_size_t i = 0;
 		for (i = 0; i < objn; i++)
 		{
+			// the aioo 
+			tb_aioo_t const* aioo = list[i].aioo;
+
 			// check
-			tb_assert_and_check_break(list[i].handle);
+			tb_assert_and_check_break(aioo && aioo->handle);
 
 			// acpt?
 			if (list[i].code & TB_AIOE_CODE_ACPT)
@@ -108,7 +124,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context);
 
 					// init sock
-					context->sock = tb_socket_accept(list[i].handle);
+					context->sock = tb_socket_accept(aioo->handle);
 					tb_assert_and_check_break(context->sock);
 
 					// init file
@@ -120,7 +136,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context->data);
 
 					// addo sock
-					if (!tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context)) break;
+					context->aioo = tb_aiop_addo(aiop, context->sock, TB_AIOE_CODE_SEND, context);
+					tb_assert_and_check_break(context->aioo);
 
 					// trace
 					tb_print("acpt[%p]: ok", context->sock);
@@ -180,19 +197,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (context->real < context->send)
 				{
 					// done send
-					tb_long_t real = tb_socket_send(list[i].handle, context->data + context->real, context->send - context->real);
+					tb_long_t real = tb_socket_send(aioo->handle, context->data + context->real, context->send - context->real);
 					if (real > 0)
 					{
 						// save real
 						context->real += real;
 
 						// trace
-//						tb_print("send[%p]: real: %ld", list[i].handle, real);
+//						tb_print("send[%p]: real: %ld", aioo->handle, real);
 					}
 					else
 					{
 						// trace
-						tb_print("send[%p]: closed", list[i].handle);
+						tb_print("send[%p]: closed", aioo->handle);
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -220,19 +237,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 						// done send
 						context->send = real;
-						real = tb_socket_send(list[i].handle, context->data, context->send);
+						real = tb_socket_send(aioo->handle, context->data, context->send);
 						if (real >= 0)
 						{
 							// save real
 							context->real += real;
 
 							// trace
-//							tb_print("send[%p]: real: %ld", list[i].handle, real);
+//							tb_print("send[%p]: real: %ld", aioo->handle, real);
 						}
 						else
 						{
 							// trace
-							tb_print("send[%p]: closed", list[i].handle);
+							tb_print("send[%p]: closed", aioo->handle);
 
 							// exit context
 							tb_demo_context_exit(aiop, context);
@@ -242,7 +259,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					else
 					{
 						// trace
-						tb_print("read[%p]: closed", list[i].handle);
+						tb_print("read[%p]: closed", aioo->handle);
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -252,7 +269,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				else 
 				{
 					// trace
-					tb_print("read[%p]: closed", list[i].handle);
+					tb_print("read[%p]: closed", aioo->handle);
 
 					// exit context
 					tb_demo_context_exit(aiop, context);
@@ -262,7 +279,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// error?
 			else 
 			{
-				tb_print("aioe[%p]: unknown code: %lu", list[i].handle, list[i].code);
+				tb_print("aioe[%p]: unknown code: %lu", aioo->handle, list[i].code);
 				break;
 			}
 		}
