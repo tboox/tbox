@@ -100,7 +100,7 @@ static tb_bool_t tb_poll_walk_sete(tb_vector_t* vector, tb_pointer_t* item, tb_b
 
 	// the aioo
 	tb_aioo_t const* aioo = aioe->aioo;
-	tb_assert_and_check_return_val(aioo & aioo->handle, tb_false);
+	tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
 	// find and remove it
 	if (item)
