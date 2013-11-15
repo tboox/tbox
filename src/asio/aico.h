@@ -24,7 +24,6 @@
 #ifndef TB_ASIO_AICO_H
 #define TB_ASIO_AICO_H
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -34,15 +33,26 @@
  * types
  */
 
-/// the aico type
-typedef enum __tb_aico_type_t
+/// the aico type enum
+typedef enum __tb_aico_type_e
 {
  	TB_AICO_TYPE_NONE 	= 0 	//!< for null
 ,	TB_AICO_TYPE_SOCK 	= 1 	//!< for sock
 , 	TB_AICO_TYPE_FILE 	= 2 	//!< for file
 , 	TB_AICO_TYPE_MAXN 	= 3
 
-}tb_aico_type_t;
+}tb_aico_type_e;
+
+/// the aico type
+typedef struct __tb_aico_t
+{
+	/// the type
+	tb_size_t 			type;
+
+	/// the handle
+	tb_handle_t 		handle;
+
+}tb_aico_t;
 
 
 #endif

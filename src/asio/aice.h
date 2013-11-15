@@ -29,6 +29,7 @@
  * includes
  */
 #include "prefix.h"
+#include "aico.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -47,8 +48,8 @@ typedef enum __tb_aice_code_e
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
 ,	TB_AICE_CODE_RECV 		= 3		//!< for sock
 ,	TB_AICE_CODE_SEND 		= 4		//!< for sock
-,	TB_AICE_CODE_READ 		= 5		//!< for file
-,	TB_AICE_CODE_WRIT 		= 6		//!< for file
+,	TB_AICE_CODE_READ 		= 5		//!< for sock or file
+,	TB_AICE_CODE_WRIT 		= 6		//!< for sock or file
 , 	TB_AICE_CODE_MAXN 		= 7
 
 }tb_aice_code_e;
@@ -56,10 +57,10 @@ typedef enum __tb_aice_code_e
 /// the aice state code enum
 typedef enum __tb_aice_state_e
 {
- 	TB_AICE_STATE_OK 					= 0
-, 	TB_AICE_STATE_FAILED 				= 1
-,	TB_AICE_STATE_CLOSED 				= 2
-,	TB_AICE_STATE_TIMEOUT 				= 3
+ 	TB_AICE_STATE_OK 		= 0
+, 	TB_AICE_STATE_FAILED 	= 1
+,	TB_AICE_STATE_CLOSED 	= 2
+,	TB_AICE_STATE_TIMEOUT 	= 3
 
 }tb_aice_state_e;
 
@@ -148,22 +149,22 @@ typedef struct __tb_aice_send_t
 typedef struct __tb_aice_t
 {
 	/// the aice code
-	tb_size_t 				code 	: 8;
+	tb_size_t 				code 	: 4;
 
 	/// the state
-	tb_size_t 				state 	: 8;
+	tb_size_t 				state 	: 4;
 
-	/// the aico type
-	tb_size_t 				type 	: 8;
-
-	/// the handle
-	tb_handle_t 			handle;
+	/// the timeout, ms
+	tb_size_t 				timeout : 24;
 
 	/// the aicb
 	tb_aicb_t 				aicb;
 
 	/// the data
 	tb_cpointer_t 			data;
+
+	/// the aico
+	tb_aico_t const* 		aico;
 
 	/// the uion
 	union

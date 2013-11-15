@@ -42,7 +42,18 @@
  * types
  */
 
-// the aio proactor type
+// the unix aico type
+typedef struct __tb_unix_aico_t
+{
+	// the base
+	tb_aico_t 						base;
+
+	// the aico list for all proactors
+	tb_aico_t* 						aico_list[TB_AICP_PROACTOR_UNIX_MAXN];
+
+}tb_unix_aico_t;
+
+// the unix proactor type
 typedef struct __tb_aicp_proactor_unix_t
 {
 	// the proactor base
@@ -65,6 +76,33 @@ typedef struct __tb_aicp_proactor_unix_t
 	tb_aicp_proactor_t* 			ptor_list[TB_AICP_PROACTOR_UNIX_MAXN];
 
 }tb_aicp_proactor_unix_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * aico
+ */
+static __tb_inline__ tb_bool_t tb_unix_aico_addo(tb_aico_t* unix_aico, tb_size_t indx, tb_aico_t* aico)
+{
+	// check
+	tb_assert_and_check_return_val(unix_aico && aico && indx < TB_AICP_PROACTOR_UNIX_MAXN, tb_false);
+	tb_assert_and_check_return_val(unix_aico->type == aico->type && unix_aico->handle == aico->handle, tb_false);
+
+	// addo
+	((tb_unix_aico_t*)unix_aico)->aico_list[indx] = aico;
+
+	// ok
+	return tb_true;
+}
+static __tb_inline__  tb_bool_t tb_unix_aico_delo(tb_aico_t* unix_aico, tb_size_t indx)
+{
+	// check
+	tb_assert_and_check_return_val(unix_aico && indx < TB_AICP_PROACTOR_UNIX_MAXN, tb_false);
+
+	// delo
+	((tb_unix_aico_t*)unix_aico)->aico_list[indx] = tb_null;
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -99,14 +137,12 @@ static tb_bool_t tb_aicp_proactor_unix_need(tb_aicp_proactor_t* proactor, tb_siz
 	// no
 	return tb_false;
 }
-
-static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
+static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return_val(ptor && handle && type, tb_false);
+	tb_assert_and_check_return_val(ptor && aico && aico->handle, tb_false);
 
-	tb_print("tb_aicp_proactor_unix_addo");
 	// walk proactors
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
@@ -114,37 +150,42 @@ static tb_bool_t tb_aicp_proactor_unix_addo(tb_aicp_proactor_t* proactor, tb_han
 	for (; i < n; i++) 
 	{
 		// need this?
-		if (tb_aicp_proactor_unix_need(proactor, type, i + 1))
+		if (tb_aicp_proactor_unix_need(proactor, aico->type, i + 1))
 		{
-			// addo it
+			// the item
 			tb_aicp_proactor_t* item = ptor->ptor_list[i];
-			if (item && item->addo) 
-			{
-				if (!item->addo(item, handle, type)) break;
-			}
+			tb_assert_and_check_break(item && item->addo);
 
-			// addo++
-			addo++;
+			// addo aico
+			if (item->addo(item, aico)) addo++;
 		}
 	}
 
 	// ok?
 	return addo? tb_true : tb_false;
 }
-static tb_void_t tb_aicp_proactor_unix_delo(tb_aicp_proactor_t* proactor, tb_handle_t handle)
+static tb_bool_t tb_aicp_proactor_unix_delo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
 {
 	// check
 	tb_aicp_proactor_unix_t* ptor = (tb_aicp_proactor_unix_t*)proactor;
-	tb_assert_and_check_return(ptor && handle);
+	tb_assert_and_check_return_val(ptor && aico && aico->handle, tb_false);
 
 	// walk proactors
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
+	tb_size_t delo = 0;
 	for (; i < n; i++) 
 	{
+		// the item
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
-		if (item && item->delo) item->delo(item, handle);
+		tb_assert_and_check_break(item && item->delo);
+
+		// delo it
+		if (item->delo(item, aico)) delo++;
 	}
+
+	// ok?
+	return delo? tb_true : tb_false;
 }
 static tb_bool_t tb_aicp_proactor_unix_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {
@@ -160,15 +201,21 @@ static tb_bool_t tb_aicp_proactor_unix_post(tb_aicp_proactor_t* proactor, tb_aic
 	{
 		// the aice
 		tb_aice_t const* aice = &list[i];
-		tb_assert_and_check_break(aice->type < TB_AICO_TYPE_MAXN && aice->code < TB_AICE_CODE_MAXN);
+		tb_assert_and_check_break(aice->code < TB_AICE_CODE_MAXN);
+
+		// the aico
+		tb_aico_t const* aico = aice->aico;
+		tb_assert_and_check_break(aico->type < TB_AICO_TYPE_MAXN);
 
 		// the proactor index
-		tb_size_t indx = ptor->ptor_post[aice->type][aice->code];
+		tb_size_t indx = ptor->ptor_post[aico->type][aice->code];
 		tb_assert_and_check_break(indx && indx < TB_AICP_PROACTOR_UNIX_MAXN + 1);
+		indx--;
 
 		// append aice to the proactor
-		indx--;
 		aice_list[indx][aice_size[indx]++] = *aice;
+
+		// full?
 		tb_assert_and_check_break(aice_size[indx] + 1 < TB_AICP_POST_MAXN);
 	}
 
@@ -358,11 +405,11 @@ static tb_void_t tb_aicp_proactor_unix_resp(tb_aicp_proactor_t* proactor, tb_aic
 #endif
 
 #ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
-# 	include "aicp/aio.c"
+//# 	include "aicp/aio.c"
 #endif
 
 //#include "aicp/aiop.c"
-#include "aicp/file.c"
+//#include "aicp/file.c"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -379,6 +426,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 
 	// init base
 	ptor->base.aicp = aicp;
+	ptor->base.step = sizeof(tb_unix_aico_t);
 	ptor->base.kill = tb_aicp_proactor_unix_kill;
 	ptor->base.exit = tb_aicp_proactor_unix_exit;
 	ptor->base.addo = tb_aicp_proactor_unix_addo;
@@ -407,11 +455,11 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 //	tb_aicp_proactor_aiop_init(ptor);
 
 	// init file proactor
-	tb_aicp_proactor_file_init(ptor);
+//	tb_aicp_proactor_file_init(ptor);
 
 	// init aio proactor
 #ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
-	tb_aicp_proactor_aio_init(ptor);
+//	tb_aicp_proactor_aio_init(ptor);
 #endif
 
 	// check 

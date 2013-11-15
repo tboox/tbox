@@ -20,6 +20,9 @@ typedef struct __tb_demo_context_t
 	// the file
 	tb_handle_t 		file;
 
+	// the aico
+	tb_aico_t const* 	aico[2];
+
 	// the size
 	tb_hize_t 			size;
 
@@ -57,27 +60,27 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("writ[%p]: real: %lu, size: %lu", aice->handle, aice->u.writ.real, aice->u.writ.size);
+//		tb_print("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
 
 		// continue?
 		if (aice->u.writ.real < aice->u.writ.size)
 		{
 			// post writ to file
-			if (!tb_aicp_writ(aicp, aice->handle, aice->u.writ.seek + aice->u.writ.real, aice->u.writ.data + aice->u.writ.real, aice->u.writ.size - aice->u.writ.real, tb_demo_file_writ_func, context)) return tb_false;
+			if (!tb_aicp_writ(aicp, aice->aico, aice->u.writ.seek + aice->u.writ.real, aice->u.writ.data + aice->u.writ.real, aice->u.writ.size - aice->u.writ.real, tb_demo_file_writ_func, context)) return tb_false;
 		}
 		// ok? 
 		else
 		{
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, context->aico[0], context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
 	else
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("writ[%p]: closed", aice->handle);
-		else tb_print("writ[%p]: failed: %lu", aice->handle, aice->state);
+			tb_print("writ[%p]: closed", aice->aico);
+		else tb_print("writ[%p]: failed: %lu", aice->aico, aice->state);
 		return tb_false;
 	}
 
@@ -97,13 +100,13 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("recv[%p]: real: %lu, size: %lu", aice->handle, aice->u.recv.real, aice->u.recv.size);
+//		tb_print("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
 
 		// has data?
 		if (aice->u.recv.real)
 		{
 			// post writ to file
-			if (!tb_aicp_writ(aicp, context->file, context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
+			if (!tb_aicp_writ(aicp, context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
 
 			// save size
 			context->size += aice->u.recv.real;
@@ -123,22 +126,22 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 				context->time = tb_mclock();
 	
 				// trace
-				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->handle, context->size, context->sped / 1000);
+				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->aico, context->size, context->sped / 1000);
 			}
 		}
 		// no data?
 		else
 		{	
 			// post recv from server
-			if (!tb_aicp_recv(aicp, context->sock, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+			if (!tb_aicp_recv(aicp, aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 		}
 	}
 	// closed or failed?
 	else
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("recv[%p]: closed", aice->handle);
-		else tb_print("recv[%p]: failed: %lu", aice->handle, aice->state);
+			tb_print("recv[%p]: closed", aice->aico);
+		else tb_print("recv[%p]: failed: %lu", aice->aico, aice->state);
 		return tb_false;
 	}
 
@@ -158,16 +161,16 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("conn[%p]: ok", aice->handle);
+		tb_print("conn[%p]: ok", aice->aico);
 
 		// post recv from server
-		if (!tb_aicp_recv(aicp, aice->handle, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+		if (!tb_aicp_recv(aicp, aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 	}
 	// failed?
 	else
 	{
 		// exit loop
-		tb_print("conn[%p]: failed: %lu", aice->handle, aice->state);
+		tb_print("conn[%p]: failed: %lu", aice->aico, aice->state);
 		return tb_false;
 	}
 
@@ -207,14 +210,16 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(context.data, end);
 
 	// addo sock
-	if (!tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK)) goto end;
+	context.aico[0] = tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK);
+	tb_assert_and_check_goto(context.aico[0], end);
 
 	// addo file
-	if (!tb_aicp_addo(aicp, context.file, TB_AICO_TYPE_FILE)) goto end;
+	context.aico[1] = tb_aicp_addo(aicp, context.file, TB_AICO_TYPE_FILE);
+	tb_assert_and_check_goto(context.aico[1], end);
 
 	// post conn
 	tb_print("conn: ..");
-	if (!tb_aicp_conn(aicp, context.sock, "127.0.0.1", 9090, tb_demo_sock_conn_func, &context)) goto end;
+	if (!tb_aicp_conn(aicp, context.aico[0], "127.0.0.1", 9090, tb_demo_sock_conn_func, &context)) goto end;
 
 	// loop aicp
 	tb_aicp_loop(aicp, -1);
