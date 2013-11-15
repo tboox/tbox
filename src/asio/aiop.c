@@ -28,6 +28,8 @@
 #include "aiop.h"
 #include "aioo.h"
 #include "../math/math.h"
+#include "../utils/utils.h"
+#include "../memory/memory.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -194,7 +196,11 @@ tb_aioo_t const* tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t cod
 	} while (0);
 
 	// failed? remove aioo
-	if (!ok && aioo) tb_aiop_aioo_exit(aiop, aioo);
+	if (!ok && aioo) 
+	{
+		tb_aiop_aioo_exit(aiop, aioo);
+		aioo = tb_null;
+	}
 
 	// ok?
 	return aioo;

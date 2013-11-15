@@ -38,6 +38,48 @@
 tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 
 /* ///////////////////////////////////////////////////////////////////////
+ * aico
+ */
+static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && handle && type, tb_null);
+
+	// enter 
+	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+
+	// make aico
+	tb_aico_t* aico = aicp->pool? (tb_aico_t*)tb_rpool_malloc0(aicp->pool) : tb_null;
+
+	// init aico
+	if (aico)
+	{
+		aico->type 		= type;
+		aico->handle 	= handle;
+	}
+
+	// leave 
+	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+	
+	// ok?
+	return aico;
+}
+static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t const* aico)
+{
+	// check
+	tb_assert_and_check_return(aicp);
+
+	// enter 
+	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+
+	// exit it
+	if (aico) tb_rpool_free(aicp->pool, aico);
+
+	// leave 
+	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+}
+
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
@@ -55,7 +97,15 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 
 	// init proactor
 	aicp->ptor = tb_aicp_proactor_init(aicp);
-	tb_assert_and_check_goto(aicp->ptor, fail);
+	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
+
+	// init mutx
+	aicp->mutx = tb_mutex_init();
+	tb_assert_and_check_goto(aicp->mutx, fail);
+
+	// init pool
+	aicp->pool = tb_rpool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
+	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// ok
 	return aicp;
@@ -83,25 +133,60 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			aicp->ptor = tb_null;
 		}
 
+		// exit pool
+		if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+		if (aicp->pool) tb_rpool_exit(aicp->pool);
+		aicp->pool = tb_null;
+		if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+
+		// exit mutx
+		if (aicp->mutx) tb_mutex_exit(aicp->mutx);
+		aicp->mutx = tb_null;
+
 		// free aicp
 		tb_free(aicp);
 	}
 }
-tb_bool_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
+tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && handle && type, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && handle && type, tb_null);
 
-	// addo
-	return aicp->ptor->addo(aicp->ptor, handle, type);
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_aico_t* 	aico = tb_null;
+	do
+	{
+		// init aico
+		aico = tb_aicp_aico_init(aicp, handle, type);
+		tb_assert_and_check_break(aico);
+
+		// addo aico
+		if (!aicp->ptor->addo(aicp->ptor, aico)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? remove aico
+	if (!ok && aico) 
+	{
+		tb_aicp_aico_exit(aicp, aico);
+		aico = tb_null;
+	}
+
+	// ok?
+	return aico;
 }
-tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t handle)
+tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
 {
 	// check
-	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && handle);
+	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
 	// delo
-	aicp->ptor->delo(aicp->ptor, handle);
+	if (aicp->ptor->delo(aicp->ptor, (tb_aico_t*)aico))
+		tb_aicp_aico_exit(aicp, aico);
 }
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
 {
@@ -112,52 +197,83 @@ tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
 	// post
 	return aicp->ptor->post(aicp->ptor, list, size);
 }
-tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_handle_t handle, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
 	aice.code 			= TB_AICE_CODE_ACPT;
 	aice.aicb 			= aicb_func;
 	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_SOCK;
-	aice.handle 		= handle;
+	aice.aico 			= aico;
 
 	// post
 	return tb_aicp_post(aicp, &aice, 1);
 }
-tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && host && port, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico && host && port, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
 	aice.code 			= TB_AICE_CODE_CONN;
 	aice.aicb 			= aicb_func;
 	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_SOCK;
-	aice.handle 		= handle;
+	aice.aico 			= aico;
 	aice.u.conn.host 	= host;
 	aice.u.conn.port 	= port;
 
 	// post
 	return tb_aicp_post(aicp, &aice, 1);
 }
-tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico && data && size, tb_false);
+
+	// init
+	tb_aice_t 			aice = {0};
+	aice.code 			= TB_AICE_CODE_RECV;
+	aice.aicb 			= aicb_func;
+	aice.data 			= aicb_data;
+	aice.aico 			= aico;
+	aice.u.recv.data 	= data;
+	aice.u.recv.size 	= size;
+
+	// post
+	return tb_aicp_post(aicp, &aice, 1);
+}
+tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico && data && size, tb_false);
+
+	// init
+	tb_aice_t 			aice = {0};
+	aice.code 			= TB_AICE_CODE_SEND;
+	aice.aicb 			= aicb_func;
+	aice.data 			= aicb_data;
+	aice.aico 			= aico;
+	aice.u.send.data 	= data;
+	aice.u.send.size 	= size;
+
+	// post
+	return tb_aicp_post(aicp, &aice, 1);
+}
+tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico && data && size, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
 	aice.code 			= TB_AICE_CODE_READ;
 	aice.aicb 			= aicb_func;
 	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_FILE;
-	aice.handle 		= handle;
+	aice.aico 			= aico;
 	aice.u.read.seek 	= seek;
 	aice.u.read.data 	= data;
 	aice.u.read.size 	= size;
@@ -165,57 +281,20 @@ tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_b
 	// post
 	return tb_aicp_post(aicp, &aice, 1);
 }
-tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_handle_t handle, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
+tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aico && data && size, tb_false);
 
 	// init
 	tb_aice_t 			aice = {0};
 	aice.code 			= TB_AICE_CODE_WRIT;
 	aice.aicb 			= aicb_func;
 	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_FILE;
-	aice.handle 		= handle;
+	aice.aico 			= aico;
 	aice.u.writ.seek 	= seek;
 	aice.u.writ.data 	= data;
 	aice.u.writ.size 	= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
-
-	// init
-	tb_aice_t 			aice = {0};
-	aice.code 			= TB_AICE_CODE_RECV;
-	aice.aicb 			= aicb_func;
-	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_SOCK;
-	aice.handle 		= handle;
-	aice.u.recv.data 	= data;
-	aice.u.recv.size 	= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && handle && data && size, tb_false);
-
-	// init
-	tb_aice_t 			aice = {0};
-	aice.code 			= TB_AICE_CODE_SEND;
-	aice.aicb 			= aicb_func;
-	aice.data 			= aicb_data;
-	aice.type 			= TB_AICO_TYPE_SOCK;
-	aice.handle 		= handle;
-	aice.u.send.data 	= data;
-	aice.u.send.size 	= size;
 
 	// post
 	return tb_aicp_post(aicp, &aice, 1);
