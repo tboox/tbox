@@ -324,7 +324,12 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 		tb_check_continue(ok);
 
 		// done aicb
-		if (resp.aicb && !resp.aicb(aicp, &resp)) break;
+		if (resp.aicb && !resp.aicb(aicp, &resp)) 
+		{
+			// exit all loops
+			tb_aicp_kill(aicp);
+			break;
+		}
 	}
 
 	// worker--
