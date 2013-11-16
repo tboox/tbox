@@ -48,10 +48,10 @@ typedef struct __tb_aicp_proactor_file_t
 	// the proactor indx
 	tb_size_t 					indx;
 
-	// the aice resp
-	tb_queue_t* 				resp;
+	// the aice spak
+	tb_queue_t* 				spak;
 	
-	// the resp mutx
+	// the spak mutx
 	tb_handle_t 				mutx;
 
 }tb_aicp_proactor_file_t;
@@ -59,6 +59,24 @@ typedef struct __tb_aicp_proactor_file_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_bool_t tb_aicp_proactor_file_addo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+{
+	// check
+	tb_aicp_proactor_file_t* ptor = (tb_aicp_proactor_file_t*)proactor;
+	tb_assert_and_check_return_val(ptor && aico && aico->handle && aico->type == TB_AICO_TYPE_FILE, tb_false);
+	
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_aicp_proactor_file_delo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+{
+	// check
+	tb_aicp_proactor_file_t* ptor = (tb_aicp_proactor_file_t*)proactor;
+	tb_assert_and_check_return_val(ptor && aico && aico->handle && aico->type == TB_AICO_TYPE_FILE, tb_false);
+	
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
 {
 	// check
@@ -77,13 +95,13 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 		tb_aice_t const* aice = &list[i];
 
 		// post aice
-		if (!tb_queue_full(ptor->resp)) 
+		if (!tb_queue_full(ptor->spak)) 
 		{
 			// put
-			tb_queue_put(ptor->resp, aice);
+			tb_queue_put(ptor->spak, aice);
 
 			// trace
-			tb_trace_impl("resp: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->resp));
+			tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
 		}
 		else
 		{
@@ -99,8 +117,8 @@ static tb_bool_t tb_aicp_proactor_file_post(tb_aicp_proactor_t* proactor, tb_aic
 	// leave 
 	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 
-	// only post wait
-	if (ok) tb_aicp_proactor_unix_resp(ptor->uptr, tb_null);
+	// work it for all workers
+	tb_aicp_proactor_unix_work(ptor->uptr);
 
 	// ok?
 	return ok;
@@ -116,20 +134,20 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 
 	// post aice
 	tb_long_t ok = 0;
-	if (!tb_queue_null(ptor->resp)) 
+	if (!tb_queue_null(ptor->spak)) 
 	{
 		// get resp
-		tb_aice_t const* aice = tb_queue_get(ptor->resp);
+		tb_aice_t const* aice = tb_queue_get(ptor->spak);
 		if (aice) 
 		{
 			// save resp
 			*resp = *aice;
 
 			// trace
-			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->resp));
+			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
 
 			// pop it
-			tb_queue_pop(ptor->resp);
+			tb_queue_pop(ptor->spak);
 
 			// ok
 			ok = 1;
@@ -143,19 +161,24 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 	if (ok) 
 	{
 		// spak it
+		ok = -1;
 		switch (resp->code)
 		{
 		case TB_AICE_CODE_READ:
 			{
+				// the handle 
+				tb_handle_t handle = resp->aico? resp->aico->handle : tb_null;
+				tb_assert_and_check_break(handle);
+
 				// seek
 				tb_long_t real = -1;
-				if (tb_file_seek(resp->handle, resp->u.read.seek))
+				if (tb_file_seek(handle, resp->u.read.seek))
 				{
 					// read
-					real = tb_file_read(resp->handle, resp->u.read.data, resp->u.read.size);
+					real = tb_file_read(handle, resp->u.read.data, resp->u.read.size);
 
 					// trace
-					tb_trace_impl("read[%p]: %ld", resp->handle, real);
+					tb_trace_impl("read[%p]: %ld", handle, real);
 				}
 
 				// ok?
@@ -168,19 +191,26 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 				else if (!real) resp->state = TB_AICE_STATE_CLOSED;
 				// failed?
 				else resp->state = TB_AICE_STATE_FAILED;
+
+				// ok
+				ok = 1;
 			}
 			break;
 		case TB_AICE_CODE_WRIT:
 			{
+				// the handle 
+				tb_handle_t handle = resp->aico? resp->aico->handle : tb_null;
+				tb_assert_and_check_break(handle);
+
 				// seek
 				tb_long_t real = -1;
-				if (tb_file_seek(resp->handle, resp->u.writ.seek))
+				if (tb_file_seek(handle, resp->u.writ.seek))
 				{
 					// writ
-					real = tb_file_writ(resp->handle, resp->u.writ.data, resp->u.writ.size);
+					real = tb_file_writ(handle, resp->u.writ.data, resp->u.writ.size);
 			
 					// writ
-					tb_trace_impl("writ[%p]: %ld", resp->handle, real);
+					tb_trace_impl("writ[%p]: %ld", handle, real);
 				}
 				
 				// ok?
@@ -193,10 +223,12 @@ static tb_long_t tb_aicp_proactor_file_spak(tb_aicp_proactor_t* proactor, tb_aic
 				else if (!real) resp->state = TB_AICE_STATE_CLOSED;
 				// failed?
 				else resp->state = TB_AICE_STATE_FAILED;
+
+				// ok
+				ok = 1;
 			}
 			break;
 		default:
-			ok = -1;
 			break;
 		}
 	}
@@ -212,10 +244,10 @@ static tb_void_t tb_aicp_proactor_file_exit(tb_aicp_proactor_t* proactor)
 		// trace
 		tb_trace_impl("exit");
 
-		// exit resp
+		// exit spak
 		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
-		if (ptor->resp) tb_queue_exit(ptor->resp);
-		ptor->resp = tb_null;
+		if (ptor->spak) tb_queue_exit(ptor->spak);
+		ptor->spak = tb_null;
 		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
 
 		// exit mutx
@@ -247,6 +279,8 @@ static tb_void_t tb_aicp_proactor_file_init(tb_aicp_proactor_unix_t* uptr)
 	// init base
 	ptor->uptr = uptr;
 	ptor->base.aicp = uptr->base.aicp;
+	ptor->base.addo = tb_aicp_proactor_file_addo;
+	ptor->base.delo = tb_aicp_proactor_file_delo;
 	ptor->base.exit = tb_aicp_proactor_file_exit;
 	ptor->base.post = tb_aicp_proactor_file_post;
 	ptor->base.spak = tb_aicp_proactor_file_spak;
@@ -255,17 +289,17 @@ static tb_void_t tb_aicp_proactor_file_init(tb_aicp_proactor_unix_t* uptr)
 	ptor->mutx = tb_mutex_init();
 	tb_assert_and_check_goto(ptor->mutx, fail);
 
-	// init resp
-	ptor->resp = tb_queue_init((ptor->base.aicp->maxn << 2) + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
-	tb_assert_and_check_goto(ptor->resp, fail);
+	// init spak
+	ptor->spak = tb_queue_init((ptor->base.aicp->maxn << 2) + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
+	tb_assert_and_check_goto(ptor->spak, fail);
 
 	// add this proactor to the unix proactor list
-	uptr->ptor_list[uptr->ptor_size++] = (tb_aicp_proactor_t*)ptor;
-	ptor->indx = uptr->ptor_size;
+	ptor->indx = uptr->ptor_size++;
+	uptr->ptor_list[ptor->indx] = (tb_aicp_proactor_t*)ptor;
 
 	// attach index to some aice post
-	if (!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ]) uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ] = ptor->indx;
-	if (!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT]) uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT] = ptor->indx;
+	if (!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ]) uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_READ] = ptor->indx + 1;
+	if (!uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT]) uptr->ptor_post[TB_AICO_TYPE_FILE][TB_AICE_CODE_WRIT] = ptor->indx + 1;
 
 	// ok
 	return ;
