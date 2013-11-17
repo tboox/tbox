@@ -240,7 +240,7 @@ static tb_long_t tb_aicp_proactor_unix_spak(tb_aicp_proactor_t* proactor, tb_aic
 	tb_size_t i = 0;
 	tb_size_t n = ptor->ptor_size;
 	tb_long_t ok = 0;
-	for (; i < n; i++) 
+	for (i = 0; i < n; i++) 
 	{
 		tb_aicp_proactor_t* item = ptor->ptor_list[i];
 		if (item && item->spak) 
@@ -334,11 +334,15 @@ static tb_void_t tb_aicp_proactor_unix_work(tb_aicp_proactor_t* proactor)
 /* ///////////////////////////////////////////////////////////////////////
  * proactors
  */
-#if 0//def TB_CONFIG_ASIO_POLL_HAVE_EPOLL
+#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
 # 	include "aicp/epoll.c"
 #endif
 
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
+#ifdef TB_CONFIG_ASIO_HAVE_NAIO
+# 	include "aicp/naio.c"
+#endif
+
+#ifdef TB_CONFIG_ASIO_HAVE_AIO
 //# 	include "aicp/aio.c"
 #endif
 
@@ -372,18 +376,23 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->wait, fail);
 
 	// init epoll proactor
-#if 0//def TB_CONFIG_ASIO_POLL_HAVE_EPOLL
+#if 0//def TB_CONFIG_ASIO_HAVE_EPOLL
 	tb_aicp_proactor_epoll_init(ptor);
 #endif
 
 	// init aiop proactor
 	tb_aicp_proactor_aiop_init(ptor);
 
+	// init naio proactor using linux native aio
+#ifdef TB_CONFIG_ASIO_HAVE_NAIO
+	tb_aicp_proactor_naio_init(ptor);
+#endif
+
 	// init file proactor
 	tb_aicp_proactor_file_init(ptor);
 
 	// init aio proactor
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_AIO
+#ifdef TB_CONFIG_ASIO_HAVE_AIO
 //	tb_aicp_proactor_aio_init(ptor);
 #endif
 

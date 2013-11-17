@@ -25,14 +25,14 @@
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
 # 	include "aiop/select.c"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_CONFIG_ASIO_POLL_HAVE_SELECT
+#ifdef TB_CONFIG_ASIO_HAVE_SELECT
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {

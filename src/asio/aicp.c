@@ -302,7 +302,11 @@ tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, t
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 {
 	// check
-	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->spak);
+	tb_assert_and_check_return(aicp && aicp->ptor);
+
+	// the spak
+	tb_long_t (*spak)(tb_aicp_proactor_t* , tb_aice_t* , tb_long_t ) = aicp->ptor->spak;
+	tb_assert_and_check_return(spak);
 
 	// worker++
 	tb_atomic_fetch_and_inc(&aicp->work);
@@ -312,7 +316,7 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 	{
 		// spak
 		tb_aice_t 	resp = {0};
-		tb_long_t	ok = aicp->ptor->spak(aicp->ptor, &resp, timeout);
+		tb_long_t	ok = spak(aicp->ptor, &resp, timeout);
 
 		// failed? exit all loops
 		if (ok < 0) tb_aicp_kill(aicp);

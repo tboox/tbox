@@ -145,6 +145,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_aice_t const* aice = aioe->data;
 			tb_assert_and_check_goto(aice, end);
 
+			// have wait?
+			tb_check_continue(aice->code);
+
 			// post aice
 			if (!tb_queue_full(ptor->spak)) 
 			{
@@ -283,7 +286,7 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 
 	// reset wait
 	if (aiop_aico->wait) aiop_aico->wait--;
-	aiop_aico->aice.code = TB_AICE_CODE_NULL;
+	aiop_aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
 	return 1;
@@ -326,7 +329,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	
 	// reset wait
 	if (aiop_aico->wait) aiop_aico->wait--;
-	aiop_aico->aice.code = TB_AICE_CODE_NULL;
+	aiop_aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
 	return 1;
@@ -369,14 +372,14 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!recv) 
 	{
 		// wait it
-		if (!aiop_aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aiop_aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
 	else
 	{
 		// ok or closed?
-		aice->state = real < 0? TB_AICE_STATE_CLOSED : TB_AICE_STATE_OK;
+		aice->state = TB_AICE_STATE_OK;
 
 		// save the recv size
 		aice->u.recv.real = recv;
@@ -384,7 +387,7 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	
 	// reset wait
 	if (aiop_aico->wait) aiop_aico->wait--;
-	aiop_aico->aice.code = TB_AICE_CODE_NULL;
+	aiop_aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
 	return 1;
@@ -427,14 +430,14 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!send) 
 	{
 		// wait it
-		if (!aiop_aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aiop_aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
 	else
 	{
 		// ok or closed?
-		aice->state = real < 0? TB_AICE_STATE_CLOSED : TB_AICE_STATE_OK;
+		aice->state = TB_AICE_STATE_OK;
 
 		// save the send size
 		aice->u.send.real = send;
@@ -442,7 +445,7 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	
 	// reset wait
 	if (aiop_aico->wait) aiop_aico->wait--;
-	aiop_aico->aice.code = TB_AICE_CODE_NULL;
+	aiop_aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
 	return 1;

@@ -323,7 +323,7 @@ static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t
 				}
 			}
 			if (rtor->mutx.hash) tb_mutex_leave(rtor->mutx.hash);
-			tb_assert_and_check_return_val(aioo && code, -1);
+			tb_check_continue(aioo && code);
 			
 			// init aioe
 			tb_aioe_t 	aioe = {0};
