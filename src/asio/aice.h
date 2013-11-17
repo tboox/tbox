@@ -43,7 +43,7 @@ typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aice_t cons
 /// the aice code enum
 typedef enum __tb_aice_code_e
 {
- 	TB_AICE_CODE_NULL 		= 0 	//!< for null
+ 	TB_AICE_CODE_NONE 		= 0
 , 	TB_AICE_CODE_ACPT 		= 1 	//!< for sock
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
 ,	TB_AICE_CODE_RECV 		= 3		//!< for sock

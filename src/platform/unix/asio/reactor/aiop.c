@@ -26,13 +26,13 @@
  */
 #include "prefix.h"
 
-#if defined(TB_CONFIG_ASIO_POLL_HAVE_EPOLL)
+#if defined(TB_CONFIG_ASIO_HAVE_EPOLL)
 # 	include "aiop/epoll.c"
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_KQUEUE)
+#elif defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
 # 	include "aiop/kqueue.c"
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_POLL)
+#elif defined(TB_CONFIG_ASIO_HAVE_POLL)
 # 	include "aiop/poll.c"
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_SELECT)
+#elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
 # 	include "aiop/select.c"
 #else
 # 	error have not available event mode
@@ -46,22 +46,22 @@ tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop);
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_ASIO_POLL_HAVE_EPOLL)
+#if defined(TB_CONFIG_ASIO_HAVE_EPOLL)
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {
 	return tb_aiop_reactor_epoll_init(aiop);
 }
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_KQUEUE)
+#elif defined(TB_CONFIG_ASIO_HAVE_KQUEUE)
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {
 	return tb_aiop_reactor_kqueue_init(aiop);
 }
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_POLL)
+#elif defined(TB_CONFIG_ASIO_HAVE_POLL)
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {
 	return tb_aiop_reactor_poll_init(aiop);
 }
-#elif defined(TB_CONFIG_ASIO_POLL_HAVE_SELECT)
+#elif defined(TB_CONFIG_ASIO_HAVE_SELECT)
 tb_aiop_reactor_t* tb_aiop_reactor_init(tb_aiop_t* aiop)
 {
 	return tb_aiop_reactor_select_init(aiop);
