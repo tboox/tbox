@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"aicp_aiop"
+//#define TB_TRACE_IMPL_TAG 				"aicp_aiop"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -223,6 +223,9 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	, 	TB_AIOE_CODE_NONE
 	};
 	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_code) && s_code[aice->code], tb_false);
+				
+	// trace
+	tb_trace_impl("wait: code: %lu: ..", aice->code);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -256,6 +259,10 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	// failed? restore it
 	if (!ok) 
 	{
+		// trace
+		tb_trace_impl("wait: code: %lu: failed", aice->code);
+
+		// restore it
 		aico->aice = prev;
 		aico->wait = wait;
 	}
