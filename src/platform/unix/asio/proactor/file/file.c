@@ -177,4 +177,7 @@ static tb_long_t tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice)
 static tb_void_t tb_aicp_file_kill(tb_handle_t file)
 {
 }
+static tb_void_t tb_aicp_file_poll(tb_handle_t file)
+{
+}
 

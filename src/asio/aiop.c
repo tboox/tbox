@@ -144,6 +144,7 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 
 	// exit mutx
 	if (aiop->mutx) tb_mutex_exit(aiop->mutx);
+	aiop->mutx = tb_null;
 
 	// free aiop
 	tb_free(aiop);

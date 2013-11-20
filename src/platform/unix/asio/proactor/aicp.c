@@ -94,6 +94,7 @@ static tb_bool_t 	tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico);
 static tb_bool_t 	tb_aicp_file_post(tb_handle_t file, tb_aice_t const* list, tb_size_t size);
 static tb_long_t 	tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice);
 static tb_void_t 	tb_aicp_file_kill(tb_handle_t file);
+static tb_void_t 	tb_aicp_file_poll(tb_handle_t file);
 
 /* ///////////////////////////////////////////////////////////////////////
  * spak
@@ -164,24 +165,32 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_aice_t const* aice = aioe->data;
 			tb_assert_and_check_goto(aice, end);
 
+			// the aico
+			tb_aico_t const* aico = aice->aico;
+			tb_assert_and_check_goto(aico, end);
+
 			// have wait?
 			tb_check_continue(aice->code);
 
-			// post aice
-			if (!tb_queue_full(ptor->spak)) 
-			{
-				// put
-				tb_queue_put(ptor->spak, aice);
+			// trace
+			tb_trace_impl("wait: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
 
-				// trace
-				tb_trace_impl("wait: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
-			}
-			else
+			// sock?
+			if (aico->type == TB_AICO_TYPE_SOCK)
 			{
-				// assert
-				tb_assert(0);
+				// spak aice
+				if (!tb_queue_full(ptor->spak)) tb_queue_put(ptor->spak, aice);
+				else tb_assert(0);
 			}
+			else if (aico->type == TB_AICO_TYPE_FILE)
+			{
+				// check
+				tb_assert(ptor->file);
 
+				// poll file
+				if (ptor->file) tb_aicp_file_poll(ptor->file);
+			}
+			else tb_assert(0);
 		}
 			
 		// leave 
@@ -825,8 +834,7 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 /* ///////////////////////////////////////////////////////////////////////
  * file implementation
  */
-
-#if 0//defined(TB_CONFIG_ASIO_HAVE_NAIO)
+#if defined(TB_CONFIG_ASIO_HAVE_NAIO)
 # 	include "file/naio.c"
 #else
 # 	include "file/file.c"
