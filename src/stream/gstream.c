@@ -112,7 +112,7 @@ static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_
 	}
 	
 	// leave cache for push
-	tb_qbuffer_push_done(&gst->cache, need);
+	tb_qbuffer_push_exit(&gst->cache, need);
 
 end:
 
@@ -157,7 +157,7 @@ static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		if (real > 0) 
 		{
 			// leave cache for push
-			tb_qbuffer_push_done(&gst->cache, real);
+			tb_qbuffer_push_exit(&gst->cache, real);
 
 			// read cache
 			real = tb_qbuffer_read(&gst->cache, data + read, tb_min(real, size - read));
@@ -213,7 +213,7 @@ static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		if (real > 0)
 		{
 			// leave cache for pull
-			tb_qbuffer_pull_done(&gst->cache, real);
+			tb_qbuffer_pull_exit(&gst->cache, real);
 
 			// writ cache
 			real = tb_qbuffer_writ(&gst->cache, data + writ, tb_min(real, size - writ));
@@ -283,7 +283,7 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_
 		tb_assert_and_check_return_val(writ <= pull, -1);
 
 		// leave cache for pull
-		tb_qbuffer_pull_done(&gst->cache, writ);
+		tb_qbuffer_pull_exit(&gst->cache, writ);
 	}
 
 	// flush data if no cache
@@ -330,7 +330,7 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 		if (data && size && offset >= curt && offset <= curt + size)
 		{
 			// seek it at the cache
-			tb_qbuffer_pull_done(&gst->cache, (tb_size_t)(offset - curt));
+			tb_qbuffer_pull_exit(&gst->cache, (tb_size_t)(offset - curt));
 
 			// ok
 			goto ok;
@@ -414,8 +414,9 @@ fail:
 	return tb_null;
 }
 
-tb_bool_t tb_gstream_init(tb_gstream_t* gst)
+tb_bool_t tb_gstream_init(tb_gstream_t* gst, tb_size_t align)
 {
+	// check
 	tb_assert_and_check_return_val(gst, tb_false);
 
 	// clear
@@ -428,7 +429,7 @@ tb_bool_t tb_gstream_init(tb_gstream_t* gst)
 	if (!tb_url_init(&gst->url)) return tb_false;
 
 	// init cache
-	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
+	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT, align)) goto fail;
 	gst->bcached = 1;
 
 	// ok

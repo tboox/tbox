@@ -61,6 +61,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	if (mode & TB_FILE_MODE_CREAT) flags |= O_CREAT;
 	if (mode & TB_FILE_MODE_APPEND) flags |= O_APPEND;
 	if (mode & TB_FILE_MODE_TRUNC) flags |= O_TRUNC;
+	if (mode & TB_FILE_MODE_DIRECT) flags |= O_DIRECT;
 
 	// for native aio aicp
 #if defined(TB_CONFIG_ASIO_HAVE_NAIO)
@@ -149,16 +150,16 @@ tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size,
 	// writ it
 	return pwrite64((tb_int_t)file - 1, data, (size_t)size, offset);
 }
-tb_void_t tb_file_sync(tb_handle_t file)
+tb_bool_t tb_file_sync(tb_handle_t file)
 {
 	// check
-	tb_assert_and_check_return(file);
+	tb_assert_and_check_return_val(file, tb_false);
 
 	// sync
 #ifdef TB_CONFIG_OS_LINUX
-	if (file) fdatasync((tb_int_t)file - 1);
+	return !fdatasync((tb_int_t)file - 1)? tb_true : tb_false;
 #else
-	if (file) fsync((tb_int_t)file - 1);
+	return !fsync((tb_int_t)file - 1)? tb_true : tb_false;
 #endif
 }
 tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)

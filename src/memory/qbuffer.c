@@ -30,12 +30,12 @@
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * init & exit
  */
-tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn)
+tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn, tb_size_t align)
 {
+	// check
 	tb_assert_and_check_return_val(buffer, tb_false);
 
 	// init 
@@ -43,14 +43,17 @@ tb_bool_t tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn)
 	buffer->head = tb_null;
 	buffer->size = 0;
 	buffer->maxn = maxn;
+	buffer->align = align;
+	buffer->patch = 0;
 
+	// ok
 	return tb_true;
 }
 tb_void_t tb_qbuffer_exit(tb_qbuffer_t* buffer)
 {
 	if (buffer)
 	{
-		if (buffer->data) tb_free(buffer->data);
+		if (buffer->data) tb_free(buffer->data - buffer->patch);
 		tb_memset(buffer, 0, sizeof(tb_qbuffer_t));
 	}
 }
@@ -110,6 +113,7 @@ tb_void_t tb_qbuffer_clear(tb_qbuffer_t* buffer)
 }
 tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 {
+	// check
 	tb_assert_and_check_return_val(buffer && maxn && maxn >= buffer->size, tb_null);
 
 	// has data?
@@ -125,9 +129,28 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 		// realloc
 		if (maxn > buffer->maxn)
 		{
+			// init head
 			buffer->head = tb_null;
-			buffer->data = tb_ralloc(buffer->data, maxn);
+
+			// make data
+			buffer->data = tb_ralloc(buffer->data - buffer->patch, buffer->align? (maxn + buffer->align) : maxn);
 			tb_assert_and_check_return_val(buffer->data, tb_null);
+
+			// align?
+			if (buffer->align) 
+			{
+				// align it
+				tb_byte_t* buff = (tb_byte_t*)tb_align((tb_hize_t)buffer->data, (tb_hize_t)buffer->align);
+				tb_assert_and_check_return_val(buff >= buffer->data, tb_null);
+
+				// save patch
+				buffer->patch = buff - buffer->data;
+
+				// save data
+				buffer->data = buff;
+			}
+
+			// save head
 			buffer->head = buffer->data;
 		}
 	}
@@ -140,6 +163,7 @@ tb_byte_t* tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn)
 }
 tb_long_t tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(buffer, -1);
 
 	// no data?
@@ -162,6 +186,7 @@ tb_long_t tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size)
  */
 tb_long_t tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(buffer && data, -1);
 
 	// no data?
@@ -182,15 +207,31 @@ tb_long_t tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 }
 tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(buffer && data && buffer->maxn, -1);
 
 	// no data?
 	if (!buffer->data)
 	{
-		// alloc
-		buffer->data = tb_malloc(buffer->maxn);
+		// make data
+		buffer->data = tb_malloc(buffer->align? (buffer->maxn + buffer->align) : buffer->maxn);
+		tb_assert_and_check_return_val(buffer->data, -1);
 
-		// init 
+		// align?
+		if (buffer->align) 
+		{
+			// align it
+			tb_byte_t* buff = (tb_byte_t*)tb_align((tb_hize_t)buffer->data, (tb_hize_t)buffer->align);
+			tb_assert_and_check_return_val(buff >= buffer->data, -1);
+
+			// save patch
+			buffer->patch = buff - buffer->data;
+
+			// save data
+			buffer->data = buff;
+		}
+
+		// init it
 		buffer->head = buffer->data;
 		buffer->size = 0;
 	}
@@ -222,18 +263,22 @@ tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 
 tb_byte_t* tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size)
 {
+	// check
 	tb_assert_and_check_return_val(buffer, tb_null);
 
 	// no data?
 	tb_check_return_val(buffer->data && buffer->size, tb_null);
 	tb_assert_and_check_return_val(buffer->head, tb_null);
 
-	// ok
+	// save size
 	if (size) *size = buffer->size;
+
+	// ok
 	return buffer->head;
 }
-tb_void_t tb_qbuffer_pull_done(tb_qbuffer_t* buffer, tb_size_t size)
+tb_void_t tb_qbuffer_pull_exit(tb_qbuffer_t* buffer, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(buffer && buffer->head && size <= buffer->size);
 
 	// update
@@ -245,13 +290,29 @@ tb_void_t tb_qbuffer_pull_done(tb_qbuffer_t* buffer, tb_size_t size)
 }
 tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
 {
+	// check
 	tb_assert_and_check_return_val(buffer && buffer->maxn, tb_null);
 
 	// no data?
 	if (!buffer->data)
 	{
-		// alloc
-		buffer->data = tb_malloc(buffer->maxn);
+		// make data
+		buffer->data = tb_malloc(buffer->align? (buffer->maxn + buffer->align) : buffer->maxn);
+		tb_assert_and_check_return_val(buffer->data, tb_null);
+
+		// align?
+		if (buffer->align) 
+		{
+			// align it
+			tb_byte_t* buff = (tb_byte_t*)tb_align((tb_hize_t)buffer->data, (tb_hize_t)buffer->align);
+			tb_assert_and_check_return_val(buff >= buffer->data, tb_null);
+
+			// save patch
+			buffer->patch = buff - buffer->data;
+
+			// save data
+			buffer->data = buff;
+		}
 
 		// init 
 		buffer->head = buffer->data;
@@ -270,12 +331,15 @@ tb_byte_t* tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size)
 		buffer->head = buffer->data;
 	}
 
-	// ok
+	// save size
 	if (size) *size = left;
+
+	// ok
 	return buffer->head + buffer->size;
 }
-tb_void_t tb_qbuffer_push_done(tb_qbuffer_t* buffer, tb_size_t size)
+tb_void_t tb_qbuffer_push_exit(tb_qbuffer_t* buffer, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(buffer && buffer->head && buffer->size + size <= buffer->maxn);
 	buffer->size += size;
 }

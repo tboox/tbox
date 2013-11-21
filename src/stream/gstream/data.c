@@ -168,7 +168,7 @@ tb_gstream_t* tb_gstream_init_data()
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	if (!tb_gstream_init(gst, 0)) goto fail;
 
 	// init stream
 	gst->type 	= TB_GSTREAM_TYPE_DATA;

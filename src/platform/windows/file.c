@@ -63,6 +63,7 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	// init attr
 	DWORD attr = FILE_ATTRIBUTE_NORMAL;
 	if (mode & TB_FILE_MODE_AICP) attr |= FILE_FLAG_OVERLAPPED;
+	if (mode & TB_FILE_MODE_DIRECT) attr |= FILE_FLAG_NO_BUFFERING;
 
 	// init file
 	HANDLE file = CreateFileW(full, access, share, tb_null, cflag, attr, tb_null);
@@ -180,9 +181,10 @@ tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size,
 	// ok?
 	return real;
 }
-tb_void_t tb_file_sync(tb_handle_t file)
+tb_bool_t tb_file_sync(tb_handle_t file)
 {
-	if (file) FlushFileBuffers(file);
+	tb_assert_and_check_return_val(file, tb_false);
+	return FlushFileBuffers(file)? tb_true : tb_false;
 }
 tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
 {

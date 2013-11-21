@@ -30,13 +30,6 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// need larger cache for performance
-#define TB_FSTREAM_MCACHE_DEFAULT 		(8192 << 2)
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -135,7 +128,7 @@ static tb_long_t tb_fstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	
 end:
 	// sync data
-	if (sync) tb_file_sync(fst->file);
+	if (sync) if (!tb_file_sync(fst->file)) return -1;
 
 	// end?
 	return -1;
@@ -197,11 +190,12 @@ static tb_bool_t tb_fstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
 
 tb_gstream_t* tb_gstream_init_file()
 {
+	// make stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_fstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	if (!tb_gstream_init(gst, TB_FILE_DIRECT_ASIZE)) goto fail;
 
 	// init stream
 	tb_fstream_t* fst = (tb_fstream_t*)gst;
@@ -218,7 +212,7 @@ tb_gstream_t* tb_gstream_init_file()
 	fst->mode 	= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// resize file cache
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_CACHE, TB_FSTREAM_MCACHE_DEFAULT)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_CACHE, TB_FILE_DIRECT_CSIZE)) goto fail;
 
 	// ok
 	return gst;
