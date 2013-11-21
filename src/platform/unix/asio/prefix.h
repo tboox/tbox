@@ -27,6 +27,7 @@
  * includes
  */
 #include "../prefix.h"
+#include "../syscall.h"
 #include "../../../asio/asio.h"
 #include "../../../math/math.h"
 #include "../../../memory/memory.h"

@@ -134,6 +134,52 @@ tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 	DWORD real_size = 0;
 	return WriteFile(file, data, size, &real_size, tb_null)? (tb_long_t)real_size : -1;
 }
+tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && data, -1);
+
+	// save position
+	LARGE_INTEGER c = {0};
+	if (!SetFilePointerEx(file, c, &c, FILE_CURRENT)) return -1;
+
+	// seek 
+	LARGE_INTEGER o = {0};
+	o.QuadPart = (LONGLONG)offset;
+	if (!SetFilePointerEx(file, o, tb_null, FILE_BEGIN)) return -1;
+
+	// read
+	tb_long_t real = tb_file_read(file, data, size);
+
+	// restore position
+	if (!SetFilePointerEx(file, c, tb_null, FILE_BEGIN)) return -1;
+
+	// ok?
+	return real;
+}
+tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && data, -1);
+
+	// save position
+	LARGE_INTEGER c = {0};
+	if (!SetFilePointerEx(file, c, &c, FILE_CURRENT)) return -1;
+
+	// seek 
+	LARGE_INTEGER o = {0};
+	o.QuadPart = (LONGLONG)offset;
+	if (!SetFilePointerEx(file, o, tb_null, FILE_BEGIN)) return -1;
+
+	// writ
+	tb_long_t real = tb_file_writ(file, data, size);
+
+	// restore position
+	if (!SetFilePointerEx(file, c, tb_null, FILE_BEGIN)) return -1;
+
+	// ok?
+	return real;
+}
 tb_void_t tb_file_sync(tb_handle_t file)
 {
 	if (file) FlushFileBuffers(file);
@@ -145,9 +191,8 @@ tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
 
 	// seek
 	LARGE_INTEGER o = {0};
-	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)offset;
-	return SetFilePointerEx(file, o, &p, FILE_BEGIN)? tb_true : tb_false;
+	return SetFilePointerEx(file, o, tb_null, FILE_BEGIN)? tb_true : tb_false;
 }
 tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
 {
@@ -156,9 +201,8 @@ tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
 
 	// skip
 	LARGE_INTEGER o = {0};
-	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)size;
-	return SetFilePointerEx(file, o, &p, FILE_CURRENT)? tb_true : tb_false;
+	return SetFilePointerEx(file, o, tb_null, FILE_CURRENT)? tb_true : tb_false;
 }
 tb_hize_t tb_file_size(tb_handle_t file)
 {

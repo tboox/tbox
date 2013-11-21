@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"aicp_aiop"
+#define TB_TRACE_IMPL_TAG 				"aicp_aiop"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -723,44 +723,49 @@ static tb_long_t tb_aicp_proactor_aiop_spak(tb_aicp_proactor_t* proactor, tb_aic
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return_val(ptor && resp, -1);
 
-	// spak it
+	// enter 
+	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
+
+	// spak aice
 	tb_long_t ok = 0;
 	tb_bool_t null = tb_false;
-	while (!ok && !null)
+	if (!(null = tb_queue_null(ptor->spak))) 
 	{
-		// enter 
-		if (ptor->mutx) tb_mutex_enter(ptor->mutx);
-
-		// spak aice
-		if (!(null = tb_queue_null(ptor->spak))) 
+		// get resp
+		tb_aice_t const* aice = tb_queue_get(ptor->spak);
+		if (aice) 
 		{
-			// get resp
-			tb_aice_t const* aice = tb_queue_get(ptor->spak);
-			if (aice) 
-			{
-				// save resp
-				*resp = *aice;
+			// save resp
+			*resp = *aice;
 
-				// trace
-				tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
+			// trace
+			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
 
-				// pop it
-				tb_queue_pop(ptor->spak);
+			// pop it
+			tb_queue_pop(ptor->spak);
 
-				// ok
-				ok = 1;
-			}
+			// ok
+			ok = 1;
 		}
-
-		// leave 
-		if (ptor->mutx) tb_mutex_leave(ptor->mutx);
-
-		// ok? done it
-		if (ok) ok = tb_aiop_spak_done(ptor, resp);
 	}
 
-	// ok?
-	return ok;
+	// leave 
+	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
+
+	// done it
+	if (ok) ok = tb_aiop_spak_done(ptor, resp);
+
+	// null?
+	tb_check_return_val(!ok && null, ok);
+
+	// trace
+	tb_trace_impl("wait[%u]: ..", (tb_uint16_t)tb_thread_self());
+
+	// wait some time
+	if (tb_semaphore_wait(ptor->wait, timeout) < 0) return -1;
+
+	// timeout 
+	return 0;
 }
 static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {

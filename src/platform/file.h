@@ -125,6 +125,26 @@ tb_long_t 				tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size);
  */
 tb_long_t 				tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size);
 
+/*! read the file data from the given offset
+ * 
+ * @param file 			the file handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset);
+
+/*! writ the file data from the given offset
+ * 
+ * @param file 			the file handle
+ * @param data 			the data
+ * @param size 			the size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
+
 /*! seek the file offset
  * 
  * @param file 			the file handle

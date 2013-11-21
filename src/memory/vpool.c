@@ -38,9 +38,6 @@
 // the magic number
 #define TB_VPOOL_MAGIC 							(0xdead)
 
-// the align maxn
-#define TB_VPOOL_ALIGN_MAXN 					(128)
-
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -117,13 +114,13 @@ typedef struct __tb_vpool_block_t
 typedef struct __tb_vpool_t
 {
 	// the magic 
-	tb_size_t 			magic 	: 16;
+	tb_uint16_t 		magic;
 
 	// the align
-	tb_size_t 			align 	: 8;
+	tb_uint16_t 		align;
 
 	// the nhead
-	tb_size_t 			nhead 	: 8;
+	tb_uint16_t 		nhead;
 
 	// the pred
 	tb_byte_t* 			pred;
@@ -712,10 +709,9 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// align
 	align = align? tb_align_pow2(align) : TB_CPU_BITBYTE;
 	align = tb_max(align, TB_CPU_BITBYTE);
-	tb_assert_and_check_return_val(align <= TB_VPOOL_ALIGN_MAXN, tb_null);
 
 	// align data
-	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
+	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)data, (tb_hize_t)align) - (tb_hize_t)data);
 	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
@@ -736,7 +732,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	vpool->nhead = tb_align(sizeof(tb_vpool_block_t), vpool->align);
 
 	// init data
-	vpool->data = (tb_byte_t*)tb_align((tb_size_t)&vpool[1], vpool->align);
+	vpool->data = (tb_byte_t*)tb_align((tb_hize_t)&vpool[1], (tb_hize_t)vpool->align);
 	tb_assert_and_check_return_val(data + size > vpool->data, tb_null);
 
 	// init size
