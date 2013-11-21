@@ -39,13 +39,6 @@
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the data align size
-#define TB_NAIO_DATA_ALIGN_SIZE 				(512)
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -115,7 +108,7 @@ static tb_bool_t tb_aicp_iocb_init_read(tb_naio_t* naio, tb_aice_t const* aice, 
 	tb_assert_and_check_return_val(aico && aico->handle, tb_false);
 
 	// aligned?
-	tb_bool_t aligned = !((tb_hize_t)aice->u.read.data & (TB_NAIO_DATA_ALIGN_SIZE - 1))? tb_true : tb_false;
+	tb_bool_t aligned = !((tb_hize_t)aice->u.read.data & (TB_FILE_DIRECT_ASIZE - 1))? tb_true : tb_false;
 
 	// init iocb
 	iocb->aice 					= *aice;
@@ -128,7 +121,8 @@ static tb_bool_t tb_aicp_iocb_init_read(tb_naio_t* naio, tb_aice_t const* aice, 
 	iocb->base.aio_resfd 		= (tb_int_t)naio->spak - 1;
 	iocb->base.aio_data 		= (tb_pointer_t)aligned;
 	tb_assert_and_check_return_val(iocb->base.aio_buf, tb_false);
-	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_NAIO_DATA_ALIGN_SIZE - 1)), tb_false);
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_FILE_DIRECT_ASIZE - 1)), tb_false);
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_nbytes & (TB_FILE_DIRECT_ASIZE - 1)), tb_false);
 
 	// ok
 	return tb_true;
@@ -144,7 +138,7 @@ static tb_bool_t tb_aicp_iocb_init_writ(tb_naio_t* naio, tb_aice_t const* aice, 
 	tb_assert_and_check_return_val(aico && aico->handle, tb_false);
 
 	// aligned?
-	tb_bool_t aligned = !((tb_hize_t)aice->u.writ.data & (TB_NAIO_DATA_ALIGN_SIZE - 1))? tb_true : tb_false;
+	tb_bool_t aligned = !((tb_hize_t)aice->u.writ.data & (TB_FILE_DIRECT_ASIZE - 1))? tb_true : tb_false;
 
 	// init iocb
 	iocb->aice 					= *aice;
@@ -157,7 +151,9 @@ static tb_bool_t tb_aicp_iocb_init_writ(tb_naio_t* naio, tb_aice_t const* aice, 
 	iocb->base.aio_resfd 		= (tb_int_t)naio->spak - 1;
 	iocb->base.aio_data 		= (tb_pointer_t)aligned;
 	tb_assert_and_check_return_val(iocb->base.aio_buf, tb_false);
-	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_NAIO_DATA_ALIGN_SIZE - 1)), tb_false);
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_FILE_DIRECT_ASIZE - 1)), tb_false);
+	// FIXME
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_nbytes & (TB_FILE_DIRECT_ASIZE - 1)), tb_false);
 
 	// copy data
 	if (!aligned) tb_memcpy(iocb->base.aio_buf, aice->u.writ.data, aice->u.writ.size);
@@ -366,7 +362,7 @@ static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 	tb_assert_and_check_goto(naio->pool_iocb, fail);
 
 	// init data pool, aligned by 512 bytes
-	naio->pool_data = tb_spool_init(((ptor->base.aicp->maxn >> 4) + 16) << 16, TB_NAIO_DATA_ALIGN_SIZE);
+	naio->pool_data = tb_spool_init(((ptor->base.aicp->maxn >> 4) + 16) << 16, TB_FILE_DIRECT_ASIZE);
 	tb_assert_and_check_goto(naio->pool_data, fail);
 
 	// init ictx

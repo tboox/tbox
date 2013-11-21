@@ -30,6 +30,20 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// the aligned size for direct mode
+#define TB_FILE_DIRECT_ASIZE 			(512)
+
+/// the cached size for direct mode
+#ifdef __tb_small__
+# 	define TB_FILE_DIRECT_CSIZE 		(1 << 14)
+#else
+# 	define TB_FILE_DIRECT_CSIZE 		(1 << 17)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -43,7 +57,8 @@ typedef enum __tb_file_mode_t
 , 	TB_FILE_MODE_APPEND 	= 16 	//!< append
 , 	TB_FILE_MODE_TRUNC 		= 32 	//!< truncate
 , 	TB_FILE_MODE_BINARY 	= 64 	//!< binary
-, 	TB_FILE_MODE_AICP 		= 128 	//!< support for aicp
+, 	TB_FILE_MODE_DIRECT 	= 128 	//!< direct, no cache, @note data & size must be aligned by TB_FILE_DIRECT_ASIZE
+, 	TB_FILE_MODE_AICP 		= 256 	//!< support for aicp
 
 }tb_file_mode_t;
 
@@ -163,11 +178,11 @@ tb_bool_t 				tb_file_seek(tb_handle_t file, tb_hize_t offset);
  */
 tb_bool_t 				tb_file_skip(tb_handle_t file, tb_hize_t size);
 
-/*! sync the file data
+/*! fsync the file 
  * 
  * @param file 			the file handle
  */
-tb_void_t 				tb_file_sync(tb_handle_t file);
+tb_bool_t 				tb_file_sync(tb_handle_t file);
 
 /*! the file size
  * 

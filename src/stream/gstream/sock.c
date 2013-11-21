@@ -474,7 +474,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	if (!tb_gstream_init(gst, 0)) goto fail;
 
 	// init stream
 	tb_sstream_t* sst = (tb_sstream_t*)gst;

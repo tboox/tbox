@@ -48,42 +48,173 @@ typedef struct __tb_qbuffer_t
 	// the buffer maxn
 	tb_size_t 		maxn;
 
+	// the buffer align 
+	tb_uint16_t 	align;
+
+	// the buffer patch 
+	tb_uint16_t 	patch;
+
 }tb_qbuffer_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-// init & exit
-tb_bool_t			tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn);
+/*! init buffer
+ *
+ * @param buffer 	the buffer
+ * @param maxn 		the buffer maxn
+ * @param align 	the align size, only for the entire data address
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t			tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn, tb_size_t align);
+
+/*! exit buffer
+ *
+ * @param buffer 	the buffer
+ */
 tb_void_t 			tb_qbuffer_exit(tb_qbuffer_t* buffer);
 
-// accessors
+/*! the buffer data
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer data
+ */
 tb_byte_t* 			tb_qbuffer_data(tb_qbuffer_t const* buffer);
+
+/*! the buffer head
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer head
+ */
 tb_byte_t* 			tb_qbuffer_head(tb_qbuffer_t const* buffer);
+
+/*! the buffer tail
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer tail
+ */
 tb_byte_t* 			tb_qbuffer_tail(tb_qbuffer_t const* buffer);
+
+/*! the buffer maxn
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer maxn
+ */
 tb_size_t 			tb_qbuffer_maxn(tb_qbuffer_t const* buffer);
+
+/*! the buffer size
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer size
+ */
 tb_size_t 			tb_qbuffer_size(tb_qbuffer_t const* buffer);
+
+/*! the buffer left
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			the buffer left
+ */
 tb_size_t 			tb_qbuffer_left(tb_qbuffer_t const* buffer);
+
+/*! the buffer full?
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			tb_true or tb_false
+ */
 tb_bool_t 			tb_qbuffer_full(tb_qbuffer_t const* buffer);
+
+/*! the buffer null?
+ *
+ * @param buffer 	the buffer
+ *
+ * @return 			tb_true or tb_false
+ */
 tb_bool_t 			tb_qbuffer_null(tb_qbuffer_t const* buffer);
 
-// modifiors
+/*! clear buffer
+ *
+ * @param buffer 	the buffer
+ */
 tb_void_t 			tb_qbuffer_clear(tb_qbuffer_t* buffer);
+
+/*! resize buffer size
+ *
+ * @param buffer 	the buffer
+ * @param maxn 		the buffer maxn
+ *
+ * @return 			the buffer data
+ */
 tb_byte_t* 			tb_qbuffer_resize(tb_qbuffer_t* buffer, tb_size_t maxn);
+
+/*! skip buffer
+ *
+ * @param buffer 	the buffer
+ * @param size 		the skiped size
+ *
+ * @return 			the real size
+ */
 tb_long_t 			tb_qbuffer_skip(tb_qbuffer_t* buffer, tb_size_t size);
 
-// read & writ
+/*! read buffer
+ *
+ * @param buffer 	the buffer
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size
+ */
 tb_long_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+
+/*! writ buffer
+ *
+ * @param buffer 	the buffer
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size
+ */
 tb_long_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
 
-// pull
+/*! init pull buffer for reading
+ *
+ * @param buffer 	the buffer
+ * @param size 		the size
+ *
+ * @return 			the data
+ */
 tb_byte_t* 			tb_qbuffer_pull_init(tb_qbuffer_t* buffer, tb_size_t* size);
-tb_void_t 			tb_qbuffer_pull_done(tb_qbuffer_t* buffer, tb_size_t size);
 
-// push
+/*! exit pull buffer for reading
+ *
+ * @param buffer 	the buffer
+ * @param size 		the size
+ */
+tb_void_t 			tb_qbuffer_pull_exit(tb_qbuffer_t* buffer, tb_size_t size);
+
+/*! init push buffer for writing
+ *
+ * @param buffer 	the buffer
+ * @param size 		the size
+ *
+ * @return 			the data
+ */
 tb_byte_t* 			tb_qbuffer_push_init(tb_qbuffer_t* buffer, tb_size_t* size);
-tb_void_t 			tb_qbuffer_push_done(tb_qbuffer_t* buffer, tb_size_t size);
+
+/*! exit push buffer for writing
+ *
+ * @param buffer 	the buffer
+ * @param size 		the size
+ */
+tb_void_t 			tb_qbuffer_push_exit(tb_qbuffer_t* buffer, tb_size_t size);
 
 
 #endif
