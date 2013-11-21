@@ -79,10 +79,10 @@ typedef struct __tb_fpool_info_t
 typedef struct __tb_fpool_t
 {
 	/// the magic 
-	tb_size_t 			magic 	: 16;
+	tb_uint16_t 		magic;
 
 	/// the align
-	tb_size_t 			align 	: 16;
+	tb_uint16_t 		align;
 
 	/// the step
 	tb_size_t 			step;
@@ -265,7 +265,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	tb_assert_and_check_return_val(align <= TB_FPOOL_ALIGN_MAXN, tb_null);
 
 	// align data
-	tb_size_t byte = (tb_size_t)tb_align((tb_size_t)data, align) - (tb_size_t)data;
+	tb_size_t byte = (tb_size_t)((tb_hize_t)tb_align((tb_hize_t)data, align) - (tb_hize_t)data);
 	tb_assert_and_check_return_val(size >= byte, tb_null);
 	size -= byte;
 	data += byte;
@@ -287,7 +287,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	fpool->step = tb_align(step, fpool->align);
 
 	// init used
-	fpool->used = (tb_byte_t*)tb_align((tb_size_t)&fpool[1], fpool->align);
+	fpool->used = (tb_byte_t*)tb_align((tb_hize_t)&fpool[1], (tb_hize_t)fpool->align);
 	tb_assert_and_check_return_val(data + size > fpool->used, tb_null);
 
 	/* init maxn
@@ -304,7 +304,7 @@ tb_handle_t tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_si
 	tb_assert_and_check_return_val(fpool->maxn, tb_null);
 
 	// init data
-	fpool->data = (tb_byte_t*)tb_align((tb_size_t)fpool->used + (tb_align8(fpool->maxn) >> 3), fpool->align);
+	fpool->data = (tb_byte_t*)tb_align((tb_hize_t)fpool->used + (tb_align8(fpool->maxn) >> 3), (tb_hize_t)fpool->align);
 	tb_assert_and_check_return_val(data + size > fpool->data, tb_null);
 	tb_assert_and_check_return_val(fpool->maxn * fpool->step <= (data + size - fpool->data), tb_null);
 

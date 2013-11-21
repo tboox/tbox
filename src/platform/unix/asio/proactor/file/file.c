@@ -31,6 +31,9 @@
  * includes
  */
 #include "../prefix.h"
+#ifndef TB_CONFIG_OS_ANDROID
+# 	include <sys/unistd.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -109,16 +112,11 @@ static tb_long_t tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice)
 			tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 			tb_assert_and_check_break(handle);
 
-			// seek
-			tb_long_t real = -1;
-			if (tb_file_seek(handle, aice->u.read.seek))
-			{
-				// read
-				real = tb_file_read(handle, aice->u.read.data, aice->u.read.size);
+			// read it from the given offset
+			tb_long_t real = tb_file_pread(handle, aice->u.read.data, (size_t)aice->u.read.size, aice->u.read.seek);
 
-				// trace
-				tb_trace_impl("read[%p]: %ld", handle, real);
-			}
+			// trace
+			tb_trace_impl("read[%p]: %ld", handle, real);
 
 			// ok?
 			if (real > 0) 
@@ -141,17 +139,12 @@ static tb_long_t tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice)
 			tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 			tb_assert_and_check_break(handle);
 
-			// seek
-			tb_long_t real = -1;
-			if (tb_file_seek(handle, aice->u.writ.seek))
-			{
-				// writ
-				real = tb_file_writ(handle, aice->u.writ.data, aice->u.writ.size);
-		
-				// writ
-				tb_trace_impl("writ[%p]: %ld", handle, real);
-			}
-			
+			// writ it from the given offset
+			tb_long_t real = tb_file_pwrit(handle, aice->u.writ.data, (size_t)aice->u.read.size, aice->u.writ.seek);
+
+			// trace
+			tb_trace_impl("writ[%p]: %ld", handle, real);
+
 			// ok?
 			if (real > 0) 
 			{

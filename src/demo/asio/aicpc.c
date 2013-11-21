@@ -209,9 +209,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	context.data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN + 4096);
 	tb_assert_and_check_goto(context.data, end);
 
-	// FIXME
-	context.data = (tb_byte_t*)tb_align((tb_size_t)context.data, 4096);
-
 	// addo sock
 	context.aico[0] = tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK);
 	tb_assert_and_check_goto(context.aico[0], end);

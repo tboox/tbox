@@ -115,7 +115,7 @@ tb_bool_t tb_file_exit(tb_handle_t file)
 	tb_assert_and_check_return_val(file, tb_false);
 
 	// close it
-	return !close((tb_long_t)file - 1)? tb_true : tb_false;
+	return !close((tb_int_t)file - 1)? tb_true : tb_false;
 }
 tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
 {
@@ -123,7 +123,7 @@ tb_long_t tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(file, -1);
 
 	// read it
-	return read((tb_long_t)file - 1, data, size);
+	return read((tb_int_t)file - 1, data, size);
 }
 tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 {
@@ -131,7 +131,23 @@ tb_long_t tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(file, -1);
 
 	// writ it
-	return write((tb_long_t)file - 1, data, size);
+	return write((tb_int_t)file - 1, data, size);
+}
+tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file, -1);
+
+	// read it
+	return pread64((tb_int_t)file - 1, data, (size_t)size, offset);
+}
+tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file, -1);
+
+	// writ it
+	return pwrite64((tb_int_t)file - 1, data, (size_t)size, offset);
 }
 tb_void_t tb_file_sync(tb_handle_t file)
 {
@@ -140,9 +156,9 @@ tb_void_t tb_file_sync(tb_handle_t file)
 
 	// sync
 #ifdef TB_CONFIG_OS_LINUX
-	if (file) fdatasync((tb_long_t)file - 1);
+	if (file) fdatasync((tb_int_t)file - 1);
 #else
-	if (file) fsync((tb_long_t)file - 1);
+	if (file) fsync((tb_int_t)file - 1);
 #endif
 }
 tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
@@ -151,7 +167,7 @@ tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
 	tb_assert_and_check_return_val(file, tb_false);
 
 	// seek
-	return (offset == lseek((tb_long_t)file - 1, offset, SEEK_SET))? tb_true : tb_false;
+	return (offset == lseek((tb_int_t)file - 1, offset, SEEK_SET))? tb_true : tb_false;
 }
 tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
 {
@@ -159,7 +175,7 @@ tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
 	tb_assert_and_check_return_val(file, tb_false);
 
 	// skip
-	return (lseek((tb_long_t)file - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
+	return (lseek((tb_int_t)file - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
 }
 tb_hize_t tb_file_size(tb_handle_t file)
 {
@@ -168,7 +184,7 @@ tb_hize_t tb_file_size(tb_handle_t file)
 
 	// the file size
 	struct stat st = {0};
-	return !fstat((tb_long_t)file - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
+	return !fstat((tb_int_t)file - 1, &st) && st.st_size >= 0? (tb_hize_t)st.st_size : 0;
 }
 tb_bool_t tb_file_info(tb_char_t const* path, tb_file_info_t* info)
 {

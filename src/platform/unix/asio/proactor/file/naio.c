@@ -33,11 +33,17 @@
 #include "../prefix.h"
 #include <errno.h>
 #include <sys/eventfd.h>
-#include <sys/syscall.h>
 #include <linux/aio_abi.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the data align size
+#define TB_NAIO_DATA_ALIGN_SIZE 				(512)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -75,37 +81,25 @@ typedef struct __tb_naio_t
 	// the ictx
 	aio_context_t 				ictx;
 
-	// the pool
-	tb_handle_t 				pool;
-
 	// the mutx
 	tb_handle_t 				mutx;
+
+	// the iocb pool
+	tb_handle_t 				pool_iocb;
+
+	// the data pool
+	tb_handle_t 				pool_data;
 
 }tb_naio_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * naio interfaces
  */
-static __tb_inline__ tb_int_t tb_naio_setup(tb_int_t maxn, aio_context_t* pctx)
-{
-	return syscall(__NR_io_setup, maxn, pctx);
-}
-static __tb_inline__ tb_int_t tb_naio_submit(aio_context_t ictx, tb_long_t size, struct iocb** iocbs)
-{
-	return syscall(__NR_io_submit, ictx, size, iocbs);
-}
-static __tb_inline__ tb_int_t tb_naio_getevents(aio_context_t ictx, tb_long_t minn, tb_long_t maxn, struct io_event* ioces, struct timespec* timeout)
-{
-	return syscall(__NR_io_getevents, ictx, minn, maxn, ioces, timeout);
-}
-static __tb_inline__ tb_int_t tb_naio_cancel(struct iocb* iocb, struct io_event* ioce)
-{
-	return syscall(__NR_io_cancel, iocb, ioce);
-}
-static __tb_inline__ tb_int_t tb_naio_destroy(aio_context_t ictx)
-{
-	return syscall(__NR_io_destroy, ictx);
-}
+tb_syscall2(__NR_io_setup, 		tb_naio_setup, 		tb_int_t, 		maxn, aio_context_t*, 	pctx)
+tb_syscall3(__NR_io_submit, 	tb_naio_submit, 	aio_context_t, 	ictx, tb_long_t, 		size, struct iocb**, 	iocbs)
+tb_syscall5(__NR_io_getevents, 	tb_naio_getevents, 	aio_context_t, 	ictx, tb_long_t, 		minn, tb_long_t, 		maxn, struct io_event*, ioces, struct timespec*, timeout)
+tb_syscall3(__NR_io_cancel, 	tb_naio_cancel, 	aio_context_t, 	ictx, struct iocb*, 	iocb, struct io_event*, ioce)
+tb_syscall1(__NR_io_destroy, 	tb_naio_destroy, 	aio_context_t, 	ictx)
 
 /* ///////////////////////////////////////////////////////////////////////
  * iocb
@@ -120,16 +114,21 @@ static tb_bool_t tb_aicp_iocb_init_read(tb_naio_t* naio, tb_aice_t const* aice, 
 	tb_aico_t const* aico = aice->aico;
 	tb_assert_and_check_return_val(aico && aico->handle, tb_false);
 
+	// aligned?
+	tb_bool_t aligned = !((tb_hize_t)aice->u.read.data & (TB_NAIO_DATA_ALIGN_SIZE - 1))? tb_true : tb_false;
+
 	// init iocb
 	iocb->aice 					= *aice;
 	iocb->base.aio_fildes 		= (tb_int_t)aico->handle - 1;
 	iocb->base.aio_lio_opcode 	= IOCB_CMD_PREAD;
-	iocb->base.aio_buf 			= aice->u.read.data;
+	iocb->base.aio_buf 			= aligned? aice->u.read.data : tb_spool_malloc(naio->pool_data, aice->u.read.size);
 	iocb->base.aio_offset 		= aice->u.read.seek;
 	iocb->base.aio_nbytes 		= aice->u.read.size;
 	iocb->base.aio_flags 		= IOCB_FLAG_RESFD;
 	iocb->base.aio_resfd 		= (tb_int_t)naio->spak - 1;
-//	iocb->base.aio_data 		= (tb_uint64_t)naio;
+	iocb->base.aio_data 		= (tb_pointer_t)aligned;
+	tb_assert_and_check_return_val(iocb->base.aio_buf, tb_false);
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_NAIO_DATA_ALIGN_SIZE - 1)), tb_false);
 
 	// ok
 	return tb_true;
@@ -144,16 +143,24 @@ static tb_bool_t tb_aicp_iocb_init_writ(tb_naio_t* naio, tb_aice_t const* aice, 
 	tb_aico_t const* aico = aice->aico;
 	tb_assert_and_check_return_val(aico && aico->handle, tb_false);
 
+	// aligned?
+	tb_bool_t aligned = !((tb_hize_t)aice->u.writ.data & (TB_NAIO_DATA_ALIGN_SIZE - 1))? tb_true : tb_false;
+
 	// init iocb
 	iocb->aice 					= *aice;
 	iocb->base.aio_fildes 		= (tb_int_t)aico->handle - 1;
 	iocb->base.aio_lio_opcode 	= IOCB_CMD_PWRITE;
-	iocb->base.aio_buf 			= aice->u.writ.data;
+	iocb->base.aio_buf 			= aligned? aice->u.writ.data : tb_spool_malloc(naio->pool_data, aice->u.writ.size);
 	iocb->base.aio_offset 		= aice->u.writ.seek;
 	iocb->base.aio_nbytes 		= aice->u.writ.size;
 	iocb->base.aio_flags 		= IOCB_FLAG_RESFD;
 	iocb->base.aio_resfd 		= (tb_int_t)naio->spak - 1;
-//	iocb->base.aio_data 		= (tb_uint64_t)naio;
+	iocb->base.aio_data 		= (tb_pointer_t)aligned;
+	tb_assert_and_check_return_val(iocb->base.aio_buf, tb_false);
+	tb_assert_and_check_return_val(!((tb_hize_t)iocb->base.aio_buf & (TB_NAIO_DATA_ALIGN_SIZE - 1)), tb_false);
+
+	// copy data
+	if (!aligned) tb_memcpy(iocb->base.aio_buf, aice->u.writ.data, aice->u.writ.size);
 
 	// ok
 	return tb_true;
@@ -161,13 +168,13 @@ static tb_bool_t tb_aicp_iocb_init_writ(tb_naio_t* naio, tb_aice_t const* aice, 
 static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(naio && naio->pool && aice, tb_null);
+	tb_assert_and_check_return_val(naio && naio->pool_iocb && naio->pool_data && aice, tb_null);
 
 	// enter 
 	if (naio->mutx) tb_mutex_enter(naio->mutx);
 
 	// make iocb
-	tb_naio_iocb_t* iocb = (tb_naio_iocb_t*)tb_rpool_malloc0(naio->pool);
+	tb_naio_iocb_t* iocb = (tb_naio_iocb_t*)tb_rpool_malloc0(naio->pool_iocb);
 
 	// init iocb
 	if (iocb)
@@ -198,7 +205,15 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 		if (!ok) 
 		{
 			// exit iocb
-			if (iocb) tb_rpool_free(naio->pool, iocb);
+			if (iocb) 
+			{
+				// exit data
+				if (iocb->base.aio_buf && !iocb->base.aio_data) tb_spool_free(naio->pool_data, iocb->base.aio_buf);
+				iocb->base.aio_buf = tb_null;
+
+				// exit it
+				tb_rpool_free(naio->pool_iocb, iocb);
+			}
 			iocb = tb_null;
 		}
 	}
@@ -209,16 +224,24 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 	// ok?
 	return iocb;
 }
-static tb_void_t tb_aicp_iocb_exit(tb_naio_t* naio, tb_naio_iocb_t const* iocb)
+static tb_void_t tb_aicp_iocb_exit(tb_naio_t* naio, tb_naio_iocb_t* iocb)
 {
 	// check
-	tb_assert_and_check_return(naio && naio->pool);
+	tb_assert_and_check_return(naio && naio->pool_iocb && naio->pool_data);
 
 	// enter 
 	if (naio->mutx) tb_mutex_enter(naio->mutx);
 
 	// exit iocb
-	if (iocb) tb_rpool_free(naio->pool, iocb);
+	if (iocb) 
+	{
+		// exit data
+		if (iocb->base.aio_buf && !iocb->base.aio_data) tb_spool_free(naio->pool_data, iocb->base.aio_buf);
+		iocb->base.aio_buf = tb_null;
+
+		// exit it
+		tb_rpool_free(naio->pool_iocb, iocb);
+	}
 
 	// leave 
 	if (naio->mutx) tb_mutex_leave(naio->mutx);
@@ -243,11 +266,21 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 			// trace
 			tb_trace_impl("spak: read: %ld, size: %lu", real, iocb->aice.u.read.size);
 
-			// save size
+			// ok?
 			if (real > 0) 
 			{
-				iocb->aice.state = TB_AICE_STATE_OK;
+				// check
+				tb_assert_and_check_break(iocb->base.aio_buf);
+
+				// save data
+				if (iocb->aice.u.read.data != iocb->base.aio_buf)
+					tb_memcpy(iocb->aice.u.read.data, iocb->base.aio_buf, real);
+
+				// save size
 				iocb->aice.u.read.real = real;
+
+				// save state
+				iocb->aice.state = TB_AICE_STATE_OK;
 			}
 			// closed?
 			else if (!real) iocb->aice.state = TB_AICE_STATE_CLOSED;
@@ -270,7 +303,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 			// trace
 			tb_trace_impl("spak: writ: %ld, size: %lu", real, iocb->aice.u.writ.size);
 
-			// save size
+			// ok?
 			if (real > 0) 
 			{
 				iocb->aice.state = TB_AICE_STATE_OK;
@@ -328,9 +361,13 @@ static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 	naio->mutx = tb_mutex_init();
 	tb_assert_and_check_goto(naio->mutx, fail);
 
-	// init pool
-	naio->pool = tb_rpool_init((ptor->base.aicp->maxn >> 4) + 16, sizeof(tb_naio_iocb_t), 0);
-	tb_assert_and_check_goto(naio->pool, fail);
+	// init iocb pool
+	naio->pool_iocb = tb_rpool_init((ptor->base.aicp->maxn >> 4) + 16, sizeof(tb_naio_iocb_t), 0);
+	tb_assert_and_check_goto(naio->pool_iocb, fail);
+
+	// init data pool, aligned by 512 bytes
+	naio->pool_data = tb_spool_init(((ptor->base.aicp->maxn >> 4) + 16) << 16, TB_NAIO_DATA_ALIGN_SIZE);
+	tb_assert_and_check_goto(naio->pool_data, fail);
 
 	// init ictx
 	if (tb_naio_setup((tb_int_t)ptor->base.aicp->maxn, &naio->ictx)) goto fail;
@@ -382,8 +419,10 @@ static tb_void_t tb_aicp_file_exit(tb_handle_t handle)
 	
 		// exit pool
 		if (naio->mutx) tb_mutex_enter(naio->mutx);
-		if (naio->pool) tb_rpool_exit(naio->pool);
-		naio->pool = tb_null;
+		if (naio->pool_iocb) tb_rpool_exit(naio->pool_iocb);
+		if (naio->pool_data) tb_spool_exit(naio->pool_data);
+		naio->pool_iocb = tb_null;
+		naio->pool_data = tb_null;
 		if (naio->mutx) tb_mutex_leave(naio->mutx);
 
 		// exit mutx
