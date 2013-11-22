@@ -35,6 +35,9 @@
 #include <netdb.h>
 #include <errno.h>
 #include <signal.h>
+#if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+# 	include <sys/uio.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -258,10 +261,10 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = recv((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
+	tb_long_t real = recv((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
 
 	// ok?
-	if (r >= 0) return r;
+	if (real >= 0) return real;
 
 	// continue?
 	if (errno == EINTR || errno == EAGAIN) return 0;
@@ -276,10 +279,10 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = send((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
+	tb_long_t real = send((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
 
 	// ok?
-	if (r >= 0) return r;
+	if (real >= 0) return real;
 
 	// continue?
 	if (errno == EINTR || errno == EAGAIN) return 0;
@@ -287,8 +290,44 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// error
 	return -1;
 }
+tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(socket && list && size, -1);
 
-// recv & send for udp
+	// check iovec
+	tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
+	tb_assert_static(sizeof(size_t) == sizeof(tb_size_t));
+
+	// read it
+	tb_long_t real = readv((tb_int_t)socket - 1, list, size);
+
+	// ok?
+	if (real >= 0) return real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(socket && list && size, -1);
+
+	// writ it
+	tb_long_t real = writev((tb_int_t)socket - 1, list, size);
+
+	// ok?
+	if (real >= 0) return real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check

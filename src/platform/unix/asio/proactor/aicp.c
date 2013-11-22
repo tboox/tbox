@@ -357,10 +357,6 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// ok
 	return 1;
 }
-#ifndef TB_CONFIG_OS_ANDROID
-# 	include <unistd.h>
-#endif
-# 	include <errno.h>
 static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
@@ -380,17 +376,8 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_long_t real = 0;
 	while (recv < aice->u.recv.size)
 	{
-#if 0
 		// recv it
 		real = tb_socket_recv(aico->base.handle, aice->u.recv.data + recv, aice->u.recv.size - recv);
-#elif 1
-		real = read((tb_int_t)aico->base.handle - 1, aice->u.recv.data + recv, aice->u.recv.size - recv);
-#else
-		struct iovec iov[2];
-		iov[0].iov_base = aice->u.recv.data + recv;
-		iov[0].iov_len = aice->u.recv.size - recv;
-		real = readv((tb_int_t)aico->base.handle - 1, iov, 1);
-#endif
 
 		// save recv
 		if (real > 0) recv += real;
@@ -403,8 +390,6 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// no recv? 
 	if (!recv) 
 	{
-		if (real < 0) tb_print("%d", errno);
-//		real = 0;
 		// wait it
 		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed

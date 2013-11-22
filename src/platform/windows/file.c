@@ -140,22 +140,20 @@ tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hi
 	// check
 	tb_assert_and_check_return_val(file && data, -1);
 
-	// save position
-	LARGE_INTEGER c = {0};
-	if (!SetFilePointerEx(file, c, &c, FILE_CURRENT)) return -1;
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
 
-	// seek 
-	LARGE_INTEGER o = {0};
-	o.QuadPart = (LONGLONG)offset;
-	if (!SetFilePointerEx(file, o, tb_null, FILE_BEGIN)) return -1;
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
-	// read
+	// read it
 	tb_long_t real = tb_file_read(file, data, size);
 
-	// restore position
-	if (!SetFilePointerEx(file, c, tb_null, FILE_BEGIN)) return -1;
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
 
-	// ok?
+	// ok
 	return real;
 }
 tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
@@ -163,22 +161,138 @@ tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size,
 	// check
 	tb_assert_and_check_return_val(file && data, -1);
 
-	// save position
-	LARGE_INTEGER c = {0};
-	if (!SetFilePointerEx(file, c, &c, FILE_CURRENT)) return -1;
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
 
-	// seek 
-	LARGE_INTEGER o = {0};
-	o.QuadPart = (LONGLONG)offset;
-	if (!SetFilePointerEx(file, o, tb_null, FILE_BEGIN)) return -1;
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
-	// writ
+	// writ it
 	tb_long_t real = tb_file_writ(file, data, size);
 
-	// restore position
-	if (!SetFilePointerEx(file, c, tb_null, FILE_BEGIN)) return -1;
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+
+	// ok
+	return real;
+}
+tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// walk read
+	tb_size_t i = 0;
+	tb_size_t read = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_assert_and_check_return_val(data && need, -1);
+
+		// read it
+		tb_long_t real = tb_file_read(file, data, need);
+
+		// full? next it
+		if (real == need)
+		{
+			read += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) read += real;
+
+		// end
+		break;
+	}
 
 	// ok?
+	return read;
+}
+tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// walk writ
+	tb_size_t i = 0;
+	tb_size_t writ = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_assert_and_check_return_val(data && need, -1);
+
+		// writ it
+		tb_long_t real = tb_file_writ(file, data, need);
+
+		// full? next it
+		if (real == need)
+		{
+			writ += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) writ += real;
+
+		// end
+		break;
+	}
+
+	// ok?
+	return writ;
+}
+tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
+
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+
+	// read it
+	tb_long_t real = tb_file_readv(file, list, size);
+
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+
+	// ok
+	return real;
+}
+tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
+
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+
+	// writ it
+	tb_long_t real = tb_file_writv(file, list, size);
+
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+
+	// ok
 	return real;
 }
 tb_bool_t tb_file_sync(tb_handle_t file)
@@ -186,25 +300,24 @@ tb_bool_t tb_file_sync(tb_handle_t file)
 	tb_assert_and_check_return_val(file, tb_false);
 	return FlushFileBuffers(file)? tb_true : tb_false;
 }
-tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
+tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
 {
 	// check
-	tb_assert_and_check_return_val(file, tb_false);
+	tb_assert_and_check_return_val(file, -1);
 
 	// seek
 	LARGE_INTEGER o = {0};
+	LARGE_INTEGER p = {0};
 	o.QuadPart = (LONGLONG)offset;
-	return SetFilePointerEx(file, o, tb_null, FILE_BEGIN)? tb_true : tb_false;
+	return SetFilePointerEx(file, o, &p, mode)? (tb_hong_t)p.QuadPart : -1;
 }
-tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
+tb_hong_t tb_file_offset(tb_handle_t file)
 {
 	// check
-	tb_assert_and_check_return_val(file, tb_false);
+	tb_assert_and_check_return_val(file, -1);
 
-	// skip
-	LARGE_INTEGER o = {0};
-	o.QuadPart = (LONGLONG)size;
-	return SetFilePointerEx(file, o, tb_null, FILE_CURRENT)? tb_true : tb_false;
+	// the file size
+	return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
 }
 tb_hize_t tb_file_size(tb_handle_t file)
 {

@@ -20,13 +20,28 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_PREFIX_H
+#ifndef TB_PLATFORM_PREFIX_H
 #define TB_PLATFORM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the iovec type for readv, preadv, writv, pwritv, recvv, sendv
+typedef struct __tb_iovec_t
+{
+	/// the data
+	tb_byte_t* 				data;
+
+	/// the size
+	tb_size_t 				size;
+
+}tb_iovec_t;
 
 
 #endif

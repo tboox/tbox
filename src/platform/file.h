@@ -140,7 +140,7 @@ tb_long_t 				tb_file_read(tb_handle_t file, tb_byte_t* data, tb_size_t size);
  */
 tb_long_t 				tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t size);
 
-/*! read the file data from the given offset
+/*! pread the file data
  * 
  * @param file 			the file handle
  * @param data 			the data
@@ -150,7 +150,7 @@ tb_long_t 				tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t si
  */
 tb_long_t 				tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hize_t offset);
 
-/*! writ the file data from the given offset
+/*! pwrit the file data
  * 
  * @param file 			the file handle
  * @param data 			the data
@@ -160,23 +160,55 @@ tb_long_t 				tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, t
  */
 tb_long_t 				tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset);
 
+/*! readv the file data
+ * 
+ * @param file 			the file handle
+ * @param list 			the iovec list
+ * @param size 			the iovec size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size);
+
+/*! writv the file data
+ * 
+ * @param file 			the file handle
+ * @param list 			the iovec list
+ * @param size 			the iovec size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size);
+
+/*! preadv the file data 
+ * 
+ * @param file 			the file handle
+ * @param list 			the iovec list
+ * @param size 			the iovec size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
+
+/*! pwritv the file data 
+ * 
+ * @param file 			the file handle
+ * @param list 			the iovec list
+ * @param size 			the iovec size
+ *
+ * @return 				the real size or -1
+ */
+tb_long_t 				tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset);
+
 /*! seek the file offset
  * 
  * @param file 			the file handle
  * @param offset 		the file offset
+ * @param mode 			the seek mode
  *
- * @return 				tb_true or tb_false
+ * @return 				the real offset or -1
  */
-tb_bool_t 				tb_file_seek(tb_handle_t file, tb_hize_t offset);
-
-/*! skip the file size
- * 
- * @param file 			the file handle
- * @param size 			the file size
- *
- * @return 				tb_true or tb_false
- */
-tb_bool_t 				tb_file_skip(tb_handle_t file, tb_hize_t size);
+tb_hong_t 				tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode);
 
 /*! fsync the file 
  * 
@@ -191,6 +223,14 @@ tb_bool_t 				tb_file_sync(tb_handle_t file);
  * @return 				the file size
  */
 tb_hize_t 				tb_file_size(tb_handle_t file);
+
+/*! the file offset
+ * 
+ * @param file 			the file handle
+ *
+ * @return 				the file offset or -1
+ */
+tb_hong_t 				tb_file_offset(tb_handle_t file);
 
 /*! the file info for file or directory
  * 
