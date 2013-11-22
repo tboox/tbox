@@ -36,6 +36,9 @@
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <unistd.h>
 #endif
+#if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+# 	include <sys/uio.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -61,7 +64,11 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	if (mode & TB_FILE_MODE_CREAT) flags |= O_CREAT;
 	if (mode & TB_FILE_MODE_APPEND) flags |= O_APPEND;
 	if (mode & TB_FILE_MODE_TRUNC) flags |= O_TRUNC;
+
+	// dma mode, no cache
+#ifdef TB_CONFIG_OS_LINUX
 	if (mode & TB_FILE_MODE_DIRECT) flags |= O_DIRECT;
+#endif
 
 	// for native aio aicp
 #if defined(TB_CONFIG_ASIO_HAVE_NAIO)
@@ -140,7 +147,11 @@ tb_long_t tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, tb_hi
 	tb_assert_and_check_return_val(file, -1);
 
 	// read it
+#ifdef TB_CONFIG_OS_LINUX
 	return pread64((tb_int_t)file - 1, data, (size_t)size, offset);
+#else
+	return pread((tb_int_t)file - 1, data, (size_t)size, offset);
+#endif
 }
 tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size, tb_hize_t offset)
 {
@@ -148,7 +159,89 @@ tb_long_t tb_file_pwrit(tb_handle_t file, tb_byte_t const* data, tb_size_t size,
 	tb_assert_and_check_return_val(file, -1);
 
 	// writ it
+#ifdef TB_CONFIG_OS_LINUX
 	return pwrite64((tb_int_t)file - 1, data, (size_t)size, offset);
+#else
+	return pwrite((tb_int_t)file - 1, data, (size_t)size, offset);
+#endif
+}
+tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// check iovec
+	tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
+	tb_assert_static(sizeof(size_t) == sizeof(tb_size_t));
+
+	// read it
+	return readv((tb_int_t)file - 1, list, size);
+}
+tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// writ it
+	return writev((tb_int_t)file - 1, list, size);
+}
+tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// read it
+#ifdef TB_CONFIG_OS_LINUX
+	return preadv((tb_int_t)file - 1, list, size, offset);
+#else
+
+	// FIXME: lock it
+
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
+
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+
+	// read it
+	tb_long_t real = tb_file_readv(file, list, size);
+
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+
+	// ok
+	return real;
+#endif
+}
+tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && list && size, -1);
+
+	// writ it
+#ifdef TB_CONFIG_OS_LINUX
+	return pwritev((tb_int_t)file - 1, list, size, offset);
+#else
+
+	// FIXME: lock it
+
+	// save offset
+	tb_hong_t current = tb_file_offset(file);
+	tb_assert_and_check_return_val(current, -1);
+
+	// seek it
+	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+
+	// writ it
+	tb_long_t real = tb_file_writv(file, list, size);
+
+	// restore offset
+	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+
+	// ok
+	return real;
+#endif
 }
 tb_bool_t tb_file_sync(tb_handle_t file)
 {
@@ -162,21 +255,21 @@ tb_bool_t tb_file_sync(tb_handle_t file)
 	return !fsync((tb_int_t)file - 1)? tb_true : tb_false;
 #endif
 }
-tb_bool_t tb_file_seek(tb_handle_t file, tb_hize_t offset)
+tb_hong_t tb_file_seek(tb_handle_t file, tb_hong_t offset, tb_size_t mode)
 {
 	// check
-	tb_assert_and_check_return_val(file, tb_false);
+	tb_assert_and_check_return_val(file, -1);
 
 	// seek
-	return (offset == lseek((tb_int_t)file - 1, offset, SEEK_SET))? tb_true : tb_false;
+	return lseek((tb_int_t)file - 1, offset, mode);
 }
-tb_bool_t tb_file_skip(tb_handle_t file, tb_hize_t size)
+tb_hong_t tb_file_offset(tb_handle_t file)
 {
 	// check
-	tb_assert_and_check_return_val(file, tb_false);
+	tb_assert_and_check_return_val(file, -1);
 
-	// skip
-	return (lseek((tb_int_t)file - 1, size, SEEK_CUR) >= 0)? tb_true : tb_false;
+	// the offset
+	return tb_file_seek(file, (tb_hong_t)0, TB_FILE_SEEK_CUR);
 }
 tb_hize_t tb_file_size(tb_handle_t file)
 {

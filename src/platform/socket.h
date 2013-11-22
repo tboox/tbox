@@ -154,6 +154,26 @@ tb_long_t 			tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
  */
 tb_long_t 			tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
 
+/*! recvv the socket data
+ * 
+ * @param socket 	the socket handle
+ * @param list 		the iovec list
+ * @param size 		the iovec size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size);
+
+/*! sendv the socket data
+ * 
+ * @param socket	the socket handle
+ * @param list 		the iovec list
+ * @param size 		the iovec size
+ *
+ * @return 			the real size or -1
+ */
+tb_long_t 			tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size);
+
 /*! recv the socket data for udp
  *
  * @param handle 	the socket handle

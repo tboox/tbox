@@ -139,7 +139,7 @@ static tb_long_t tb_fstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	tb_assert_and_check_return_val(fst && fst->file, -1);
 
 	// seek
-	return (tb_file_seek(fst->file, offset))? 1 : -1;
+	return (tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG) == offset)? 1 : -1;
 }
 static tb_hize_t tb_fstream_size(tb_gstream_t* gst)
 {	

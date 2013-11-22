@@ -378,6 +378,82 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// error
 	return -1;
 }
+tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(socket && list && size, -1);
+
+	// walk read
+	tb_size_t i = 0;
+	tb_size_t read = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_assert_and_check_return_val(data && need, -1);
+
+		// read it
+		tb_long_t real = tb_socket_recv(socket, data, need);
+
+		// full? next it
+		if (real == need)
+		{
+			read += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) read += real;
+
+		// end
+		break;
+	}
+
+	// ok?
+	return read;
+}
+tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(socket && list && size, -1);
+
+	// walk writ
+	tb_size_t i = 0;
+	tb_size_t writ = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_assert_and_check_return_val(data && need, -1);
+
+		// writ it
+		tb_long_t real = tb_socket_send(socket, data, need);
+
+		// full? next it
+		if (real == need)
+		{
+			writ += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) writ += real;
+
+		// end
+		break;
+	}
+
+	// ok?
+	return writ;
+}
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check
