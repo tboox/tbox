@@ -470,11 +470,12 @@ static tb_bool_t tb_sstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
 
 tb_gstream_t* tb_gstream_init_sock()
 {
+	// make stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_sstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst, 0)) goto fail;
+	if (!tb_gstream_init(gst)) goto fail;
 
 	// init stream
 	tb_sstream_t* sst = (tb_sstream_t*)gst;
@@ -498,6 +499,7 @@ fail:
 
 tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
 {
+	// check
 	tb_assert_and_check_return_val(host && port, tb_null);
 
 	// init sock stream

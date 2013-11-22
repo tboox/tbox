@@ -48,12 +48,6 @@ typedef struct __tb_qbuffer_t
 	// the buffer maxn
 	tb_size_t 		maxn;
 
-	// the buffer align 
-	tb_uint16_t 	align;
-
-	// the buffer patch 
-	tb_uint16_t 	patch;
-
 }tb_qbuffer_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -64,11 +58,10 @@ typedef struct __tb_qbuffer_t
  *
  * @param buffer 	the buffer
  * @param maxn 		the buffer maxn
- * @param align 	the align size, only for the entire data address
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t			tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn, tb_size_t align);
+tb_bool_t			tb_qbuffer_init(tb_qbuffer_t* buffer, tb_size_t maxn);
 
 /*! exit buffer
  *

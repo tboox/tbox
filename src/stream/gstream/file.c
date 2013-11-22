@@ -195,7 +195,7 @@ tb_gstream_t* tb_gstream_init_file()
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst, TB_FILE_DIRECT_ASIZE)) goto fail;
+	if (!tb_gstream_init(gst)) goto fail;
 
 	// init stream
 	tb_fstream_t* fst = (tb_fstream_t*)gst;

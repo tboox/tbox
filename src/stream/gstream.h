@@ -368,11 +368,10 @@ tb_gstream_t* 		tb_gstream_init_chunked(tb_noarg_t);
 /*! init stream 
  *
  * @param gst 		the stream
- * @param align 	the cache align
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_init(tb_gstream_t* gst, tb_size_t align);
+tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
 
 /*! exit stream
  *
