@@ -265,13 +265,53 @@ tb_bool_t 			tb_aicp_recv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* dat
  * @param aicp 		the aicp
  * @param aico 		the aico
  * @param data 		the data
- * @param size 		the size
+ * @param size 		the size, send the left file data if size == 0
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_send(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the recvv event for sock
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_recvv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the sendv event for file
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_sendv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the sendfile event for file
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param file 		the file
+ * @param seek 		the seek
+ * @param size 		the size, send the left data if size == 0
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_sendfile(tb_aicp_t* aicp, tb_aico_t const* aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! post the read event for file
  *
@@ -300,6 +340,45 @@ tb_bool_t 			tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the readv event for file
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param seek 		the seek
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_readv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the writv event for file
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param seek 		the seek
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_writv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+
+/*! post the fsync event for file
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_fsync(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
 /*! loop aicp
  *

@@ -8,7 +8,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
+
+// read maxn
 #define TB_DEMO_FILE_READ_MAXN 			(65536)
+
+// mode
+//#define TB_DEMO_MODE_IOVEC
+#define TB_DEMO_MODE_SENDFILE
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -146,6 +152,34 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+static tb_bool_t tb_demo_sock_sendfile_func(tb_aicp_t* aicp, tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_SEND, tb_false);
+
+	// the context
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_assert_and_check_return_val(context, tb_false);
+
+	// ok?
+	if (aice->state == TB_AICE_STATE_OK)
+	{
+		// trace
+		tb_print("sendfile[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendfile.real, aice->u.sendfile.size);
+
+	}
+	// closed or failed?
+	else
+	{
+		if (aice->state == TB_AICE_STATE_CLOSED)
+			tb_print("send[%p]: closed", aice->aico);
+		else tb_print("send[%p]: failed: %lu", aice->aico, aice->state);
+		tb_demo_context_exit(aicp, context);
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
@@ -173,6 +207,19 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			context = tb_malloc0(sizeof(tb_demo_context_t));
 			tb_assert_and_check_break(context);
 
+#ifdef TB_DEMO_MODE_SENDFILE
+			// init context
+			context->sock = aice->u.acpt.sock;
+			context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_AICP);
+			tb_assert_and_check_break(context->file);
+
+			// addo sock
+			context->aico[0] = tb_aicp_addo(aicp, context->sock, TB_AICO_TYPE_SOCK);
+			tb_assert_and_check_break(context->aico[0]);
+
+			// post sendfile from file
+			if (!tb_aicp_sendfile(aicp, context->aico[0], context->file, 0ULL, 0ULL, tb_demo_sock_sendfile_func, context)) break;
+#else
 			// init context
 			context->sock = aice->u.acpt.sock;
 			context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_AICP);
@@ -189,7 +236,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 
 			// post read from file
 			if (!tb_aicp_read(aicp, context->aico[1], context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) break;
-
+#endif
 			// ok
 			ok = tb_true;
 

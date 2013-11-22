@@ -872,8 +872,14 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	,	tb_iocp_spak_conn
 	,	tb_iocp_spak_recv
 	,	tb_iocp_spak_send
+	,	tb_null // tb_iocp_spak_recvv
+	,	tb_null // tb_iocp_spak_sendv
+	,	tb_null // tb_iocp_spak_sendfile
 	,	tb_iocp_spak_read
 	,	tb_iocp_spak_writ
+	,	tb_null // tb_iocp_spak_readv
+	,	tb_null // tb_iocp_spak_writv
+	,	tb_null // tb_iocp_spak_fsync
 	};
 	tb_assert_and_check_return_val(olap->aice.code < tb_arrayn(s_spak), -1);
 
@@ -927,8 +933,14 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 		,	tb_iocp_post_conn
 		,	tb_iocp_post_recv
 		,	tb_iocp_post_send
+		,	tb_null // tb_iocp_post_recvv
+		,	tb_null // tb_iocp_post_sendv
+		,	tb_null // tb_iocp_post_sendfile
 		,	tb_iocp_post_read
 		,	tb_iocp_post_writ
+		,	tb_null // tb_iocp_post_readv
+		,	tb_null // tb_iocp_post_writv
+		,	tb_null // tb_iocp_post_fsync
 		};
 		tb_assert_and_check_return_val(aice->code < tb_arrayn(s_post) && s_post[aice->code], tb_false);
 

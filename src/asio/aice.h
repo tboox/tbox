@@ -30,6 +30,7 @@
  */
 #include "prefix.h"
 #include "aico.h"
+#include "../platform/prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -49,18 +50,17 @@ typedef enum __tb_aice_code_e
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
 ,	TB_AICE_CODE_RECV 		= 3		//!< for sock
 ,	TB_AICE_CODE_SEND 		= 4		//!< for sock
+,	TB_AICE_CODE_RECVV 		= 5		//!< for sock
+,	TB_AICE_CODE_SENDV 		= 6		//!< for sock
+,	TB_AICE_CODE_SENDFILE 	= 7		//!< for sock
 
-,	TB_AICE_CODE_READ 		= 5		//!< for file
-,	TB_AICE_CODE_WRIT 		= 6		//!< for file
-
-,	TB_AICE_CODE_RECVV 		= 7		//!< for sock
-,	TB_AICE_CODE_SENDV 		= 8		//!< for sock
-,	TB_AICE_CODE_SENDFILE 	= 9		//!< for sock
-
+,	TB_AICE_CODE_READ 		= 8		//!< for file
+,	TB_AICE_CODE_WRIT 		= 9		//!< for file
 ,	TB_AICE_CODE_READV 		= 10	//!< for file
 ,	TB_AICE_CODE_WRITV 		= 11	//!< for file
+,	TB_AICE_CODE_FSYNC 		= 12	//!< for file
 
-, 	TB_AICE_CODE_MAXN 		= 12
+, 	TB_AICE_CODE_MAXN 		= 13
 
 }tb_aice_code_e;
 
@@ -92,6 +92,85 @@ typedef struct __tb_aice_conn_t
 	tb_char_t const* 		host;
 
 }tb_aice_conn_t;
+
+/// the recv aice type
+typedef struct __tb_aice_recv_t
+{
+	/// the recv data
+	tb_byte_t* 				data;
+
+	/// the data size
+	tb_size_t 				size;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_recv_t;
+
+/// the send aice type
+typedef struct __tb_aice_send_t
+{
+	/// the send data
+	tb_byte_t* 				data;
+
+	/// the data size
+	tb_size_t 				size;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_send_t;
+
+/// the recvv aice type
+typedef struct __tb_aice_recvv_t
+{
+	/// the recv list
+	tb_iovec_t const* 		list;
+
+	/// the list size
+	tb_size_t 				size;
+
+	/// the file seek
+	tb_hize_t 				seek;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_recvv_t;
+
+/// the sendv aice type
+typedef struct __tb_aice_sendv_t
+{
+	/// the send list
+	tb_iovec_t const* 		list;
+
+	/// the list size
+	tb_size_t 				size;
+
+	/// the file seek
+	tb_hize_t 				seek;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_sendv_t;
+
+/// the sendfile aice type
+typedef struct __tb_aice_sendfile_t
+{
+	/// the file
+	tb_handle_t 			file;
+
+	/// the size
+	tb_hize_t 				size;
+
+	/// the seek
+	tb_hize_t 				seek;
+
+	/// the real
+	tb_hize_t 				real;
+
+}tb_aice_sendfile_t;
 
 /// the read aice type
 typedef struct __tb_aice_read_t
@@ -127,50 +206,39 @@ typedef struct __tb_aice_writ_t
 
 }tb_aice_writ_t;
 
-/// the recv aice type
-typedef struct __tb_aice_recv_t
+/// the readv aice type
+typedef struct __tb_aice_readv_t
 {
-	/// the recv data
-	tb_byte_t* 				data;
+	/// the read list
+	tb_iovec_t const* 		list;
 
-	/// the data size
+	/// the list size
 	tb_size_t 				size;
 
-	/// the data real
-	tb_size_t 				real;
-
-}tb_aice_recv_t;
-
-/// the send aice type
-typedef struct __tb_aice_send_t
-{
-	/// the send data
-	tb_byte_t* 				data;
-
-	/// the data size
-	tb_size_t 				size;
-
-	/// the data real
-	tb_size_t 				real;
-
-}tb_aice_send_t;
-
-/// the sendfile aice type
-typedef struct __tb_aice_sendfile_t
-{
-	/// the file
-	tb_handle_t 			file;
-
-	/// the size
-	tb_size_t 				size;
-
-	/// the seek
+	/// the file seek
 	tb_hize_t 				seek;
 
-	/// the real
+	/// the data real
 	tb_size_t 				real;
 
-}tb_aice_sendfile_t;
+}tb_aice_readv_t;
+
+/// the writv aice type
+typedef struct __tb_aice_writv_t
+{
+	/// the writ list
+	tb_iovec_t const* 		list;
+
+	/// the list size
+	tb_size_t 				size;
+
+	/// the file seek
+	tb_hize_t 				seek;
+
+	/// the data real
+	tb_size_t 				real;
+
+}tb_aice_writv_t;
 
 /// the aice type
 typedef struct __tb_aice_t
@@ -196,12 +264,20 @@ typedef struct __tb_aice_t
 	/// the uion
 	union
 	{
+		// for sock
 		tb_aice_acpt_t 		acpt;
 		tb_aice_conn_t 		conn;
-		tb_aice_read_t 		read;
-		tb_aice_writ_t 		writ;
 		tb_aice_recv_t 		recv;
 		tb_aice_send_t 		send;
+		tb_aice_recvv_t 	recvv;
+		tb_aice_sendv_t 	sendv;
+		tb_aice_sendfile_t 	sendfile;
+
+		// for file
+		tb_aice_read_t 		read;
+		tb_aice_writ_t 		writ;
+		tb_aice_readv_t 	readv;
+		tb_aice_writv_t 	writv;
 
 	} u;
 

@@ -228,6 +228,12 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	, 	TB_AIOE_CODE_CONN
 	, 	TB_AIOE_CODE_RECV
 	, 	TB_AIOE_CODE_SEND
+	, 	TB_AIOE_CODE_RECV
+	, 	TB_AIOE_CODE_SEND
+	, 	TB_AIOE_CODE_SEND
+	, 	TB_AIOE_CODE_NONE
+	, 	TB_AIOE_CODE_NONE
+	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
 	};
@@ -465,6 +471,63 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// ok
 	return 1;
 }
+static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+{
+	// check
+	tb_assert_and_check_return_val(ptor && aice, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_SENDFILE, -1);
+	tb_assert_and_check_return_val(aice->u.sendfile.file, -1);
+
+	// the aico
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+
+	// check wait
+	tb_assert_and_check_return_val(aico->wait < 2, -1);
+
+	// try to send it
+	tb_long_t 	real = 0;
+	tb_hize_t 	send = 0;
+	tb_hize_t 	seek = aice->u.sendfile.seek;
+	tb_hize_t 	size = aice->u.sendfile.size;
+	tb_handle_t file = aice->u.sendfile.file;
+	while (!size || send < size)
+	{
+		// send it
+		real = tb_socket_sendfile(aico->base.handle, file, seek + send, size? size - send : 0);
+		
+		// save send
+		if (real > 0) send += real;
+		else break;
+	}
+
+	// trace
+	tb_trace_impl("sendfile[%p]: %llu", aico->base.handle, send);
+
+	// no send? 
+	if (!send) 
+	{
+		// wait it
+		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		// closed
+		else aice->state = TB_AICE_STATE_CLOSED;
+	}
+	else
+	{
+		// ok or closed?
+		aice->state = TB_AICE_STATE_OK;
+
+		// save the send size
+		aice->u.sendfile.real = send;
+	}
+	
+	// reset wait
+	if (aico->wait) aico->wait--;
+	aico->aice.code = TB_AICE_CODE_NONE;
+
+	// ok
+	return 1;
+}
 static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
@@ -488,6 +551,12 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 			,	tb_aiop_spak_conn
 			,	tb_aiop_spak_recv
 			,	tb_aiop_spak_send
+			,	tb_null // tb_aiop_spak_recvv
+			,	tb_null // tb_aiop_spak_sendv
+			,	tb_aiop_spak_sendfile
+			,	tb_null
+			,	tb_null
+			,	tb_null
 			,	tb_null
 			,	tb_null
 			};
@@ -600,7 +669,7 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 	if (size == 1)
 	{
 		// the aico
-		tb_aico_t const* aico = list->aico;
+		tb_aico_t* aico = list->aico;
 		if (aico)
 		{
 			// done
@@ -661,7 +730,7 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 			tb_aice_t const* aice = &list[i];
 
 			// the aico
-			tb_aico_t const* aico = aice->aico;
+			tb_aico_t* aico = aice->aico;
 			tb_assert_and_check_continue(aico);
 
 			// done
