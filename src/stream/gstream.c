@@ -414,7 +414,7 @@ fail:
 	return tb_null;
 }
 
-tb_bool_t tb_gstream_init(tb_gstream_t* gst, tb_size_t align)
+tb_bool_t tb_gstream_init(tb_gstream_t* gst)
 {
 	// check
 	tb_assert_and_check_return_val(gst, tb_false);
@@ -429,7 +429,7 @@ tb_bool_t tb_gstream_init(tb_gstream_t* gst, tb_size_t align)
 	if (!tb_url_init(&gst->url)) return tb_false;
 
 	// init cache
-	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT, align)) goto fail;
+	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
 	gst->bcached = 1;
 
 	// ok

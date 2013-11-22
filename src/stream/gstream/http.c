@@ -443,7 +443,7 @@ tb_gstream_t* tb_gstream_init_http()
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
-	if (!tb_gstream_init(gst, 0)) goto fail;
+	if (!tb_gstream_init(gst)) goto fail;
 
 	// init stream
 	tb_hstream_t* hst = (tb_hstream_t*)gst;
