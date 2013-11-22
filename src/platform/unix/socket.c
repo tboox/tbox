@@ -326,6 +326,10 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// error
 	return -1;
 }
+tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_size_t size)
+{
+	return -1;
+}
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check

@@ -52,6 +52,11 @@ typedef struct __tb_aico_t
 	/// the handle
 	tb_handle_t 		handle;
 
+	/// the post size, must be zero or one
+#ifdef __tb_debug__
+	tb_atomic_t 		post;
+#endif
+
 }tb_aico_t;
 
 
