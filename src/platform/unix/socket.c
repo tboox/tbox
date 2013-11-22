@@ -35,9 +35,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <signal.h>
-#if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-# 	include <sys/uio.h>
-#endif
+#include <sys/uio.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation

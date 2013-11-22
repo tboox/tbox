@@ -97,7 +97,14 @@ tb_handle_t tb_file_init(tb_char_t const* path, tb_size_t mode)
 	{
 		// seek to end
 		tb_hize_t size = tb_file_size((tb_handle_t)file);
-		if (size) tb_file_seek((tb_handle_t)file, size);
+		if (size) 
+		{
+			if (size != tb_file_seek((tb_handle_t)file, size, TB_FILE_SEEK_BEG)) 
+			{
+				tb_file_exit((tb_handle_t)file);
+				file = INVALID_HANDLE_VALUE;
+			}
+		}
 	}
 
 	// ok?
@@ -190,7 +197,7 @@ tb_long_t tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
 		// the data & size
 		tb_byte_t* 	data = list[i].data;
 		tb_size_t 	need = list[i].size;
-		tb_assert_and_check_return_val(data && need, -1);
+		tb_check_break(data && need);
 
 		// read it
 		tb_long_t real = tb_file_read(file, data, need);
@@ -228,7 +235,7 @@ tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
 		// the data & size
 		tb_byte_t* 	data = list[i].data;
 		tb_size_t 	need = list[i].size;
-		tb_assert_and_check_return_val(data && need, -1);
+		tb_check_break(data && need);
 
 		// writ it
 		tb_long_t real = tb_file_writ(file, data, need);

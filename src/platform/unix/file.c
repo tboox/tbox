@@ -33,11 +33,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/uio.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <unistd.h>
-#endif
-#if defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-# 	include <sys/uio.h>
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

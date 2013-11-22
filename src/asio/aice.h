@@ -44,13 +44,23 @@ typedef tb_bool_t (*tb_aicb_t)(struct __tb_aicp_t* aicp, struct __tb_aice_t cons
 typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 		= 0
+
 , 	TB_AICE_CODE_ACPT 		= 1 	//!< for sock
 , 	TB_AICE_CODE_CONN 		= 2 	//!< for sock
 ,	TB_AICE_CODE_RECV 		= 3		//!< for sock
 ,	TB_AICE_CODE_SEND 		= 4		//!< for sock
+
 ,	TB_AICE_CODE_READ 		= 5		//!< for file
 ,	TB_AICE_CODE_WRIT 		= 6		//!< for file
-, 	TB_AICE_CODE_MAXN 		= 7
+
+,	TB_AICE_CODE_RECVV 		= 7		//!< for sock
+,	TB_AICE_CODE_SENDV 		= 8		//!< for sock
+,	TB_AICE_CODE_SENDFILE 	= 9		//!< for sock
+
+,	TB_AICE_CODE_READV 		= 10	//!< for file
+,	TB_AICE_CODE_WRITV 		= 11	//!< for file
+
+, 	TB_AICE_CODE_MAXN 		= 12
 
 }tb_aice_code_e;
 
@@ -92,11 +102,11 @@ typedef struct __tb_aice_read_t
 	/// the data size
 	tb_size_t 				size;
 
-	/// the data real
-	tb_size_t 				real;
-
 	/// the file seek
 	tb_hize_t 				seek;
+
+	/// the data real
+	tb_size_t 				real;
 
 }tb_aice_read_t;
 
@@ -109,11 +119,11 @@ typedef struct __tb_aice_writ_t
 	/// the data size
 	tb_size_t 				size;
 
-	/// the data real
-	tb_size_t 				real;
-
 	/// the file seek
 	tb_hize_t 				seek;
+
+	/// the data real
+	tb_size_t 				real;
 
 }tb_aice_writ_t;
 
@@ -144,6 +154,23 @@ typedef struct __tb_aice_send_t
 	tb_size_t 				real;
 
 }tb_aice_send_t;
+
+/// the sendfile aice type
+typedef struct __tb_aice_sendfile_t
+{
+	/// the file
+	tb_handle_t 			file;
+
+	/// the size
+	tb_size_t 				size;
+
+	/// the seek
+	tb_hize_t 				seek;
+
+	/// the real
+	tb_size_t 				real;
+
+}tb_aice_sendfile_t;
 
 /// the aice type
 typedef struct __tb_aice_t
