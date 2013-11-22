@@ -391,7 +391,7 @@ tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 		// the data & size
 		tb_byte_t* 	data = list[i].data;
 		tb_size_t 	need = list[i].size;
-		tb_assert_and_check_return_val(data && need, -1);
+		tb_check_break(data && need);
 
 		// read it
 		tb_long_t real = tb_socket_recv(socket, data, need);
@@ -429,7 +429,7 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 		// the data & size
 		tb_byte_t* 	data = list[i].data;
 		tb_size_t 	need = list[i].size;
-		tb_assert_and_check_return_val(data && need, -1);
+		tb_check_break(data && need);
 
 		// writ it
 		tb_long_t real = tb_socket_send(socket, data, need);
