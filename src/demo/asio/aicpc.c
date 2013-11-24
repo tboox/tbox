@@ -7,7 +7,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_DEMO_SOCK_RECV_MAXN 			(65536)
+#define TB_DEMO_SOCK_RECV_MAXN 			(1 << 16)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -62,6 +62,9 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// trace
 //		tb_print("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
 
+		// check
+		tb_assert(aice->u.writ.real);
+
 		// continue?
 		if (aice->u.writ.real < aice->u.writ.size)
 		{
@@ -102,38 +105,31 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// trace
 //		tb_print("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
 
-		// has data?
-		if (aice->u.recv.real)
+		// check
+		tb_assert(aice->u.recv.real);
+
+		// post writ to file
+		if (!tb_aicp_writ(aicp, context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
+
+		// save size
+		context->size += aice->u.recv.real;
+
+		// compute speed
+		context->peak += aice->u.recv.real;
+		if (!context->time) 
 		{
-			// post writ to file
-			if (!tb_aicp_writ(aicp, context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
-
-			// save size
-			context->size += aice->u.recv.real;
-
-			// compute speed
-			context->peak += aice->u.recv.real;
-			if (!context->time) 
-			{
-				context->time = tb_mclock();
-				context->base = tb_mclock();
-				context->sped = context->peak;
-			}
-			else if (tb_mclock() > context->time + 1000)
-			{
-				context->sped = context->peak;
-				context->peak = 0;
-				context->time = tb_mclock();
-	
-				// trace
-				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->aico, context->size, context->sped / 1000);
-			}
+			context->time = tb_mclock();
+			context->base = tb_mclock();
+			context->sped = context->peak;
 		}
-		// no data?
-		else
-		{	
-			// post recv from server
-			if (!tb_aicp_recv(aicp, aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+		else if (tb_mclock() > context->time + 1000)
+		{
+			context->sped = context->peak;
+			context->peak = 0;
+			context->time = tb_mclock();
+
+			// trace
+			tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->aico, context->size, context->sped / 1000);
 		}
 	}
 	// closed or failed?

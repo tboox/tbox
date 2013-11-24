@@ -476,7 +476,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	// check
 	tb_assert_and_check_return_val(ptor && aice, -1);
 	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_SENDFILE, -1);
-	tb_assert_and_check_return_val(aice->u.sendfile.file, -1);
+	tb_assert_and_check_return_val(aice->u.sendfile.file && aice->u.sendfile.size, -1);
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
@@ -491,10 +491,10 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	tb_hize_t 	seek = aice->u.sendfile.seek;
 	tb_hize_t 	size = aice->u.sendfile.size;
 	tb_handle_t file = aice->u.sendfile.file;
-	while (!size || send < size)
+	while (send < size)
 	{
 		// send it
-		real = tb_socket_sendfile(aico->base.handle, file, seek + send, size? size - send : 0);
+		real = tb_socket_sendfile(aico->base.handle, file, seek + send, size - send);
 		
 		// save send
 		if (real > 0) send += real;

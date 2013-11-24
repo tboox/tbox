@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/uio.h>
+#include <sys/sendfile.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -326,8 +327,27 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// error
 	return -1;
 }
-tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_size_t size)
+tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
 {
+	// check
+	tb_assert_and_check_return_val(socket && file && size, -1);
+
+	// send it
+#if defined(TB_CONFIG_OS_LINUX)
+	off_t seek = offset;
+	tb_hong_t real = sendfile((tb_int_t)socket - 1, (tb_int_t)file - 1, &seek, (size_t)size);
+#else
+	tb_hong_t real = -1;
+	tb_trace_noimpl();
+#endif
+
+	// ok?
+	if (real >= 0) return real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
 	return -1;
 }
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)

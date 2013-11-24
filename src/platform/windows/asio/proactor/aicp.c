@@ -64,6 +64,14 @@ typedef BOOL (WINAPI* tb_iocp_func_connectex_t)( 	SOCKET s
 												,	LPDWORD lpdwBytesSent
 												,	LPOVERLAPPED lpOverlapped);
 
+typedef BOOL (WINAPI* tb_iocp_func_transmitfile_t)( 	SOCKET hSocket
+												,		HANDLE hFile
+												,		DWORD nNumberOfBytesToWrite
+												,		DWORD nNumberOfBytesPerSend
+												,		LPOVERLAPPED lpOverlapped
+												,		LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
+												,		DWORD dwReserved);
+
 // the overlap type
 typedef struct __tb_iocp_olap_t
 {
@@ -101,6 +109,9 @@ typedef struct __tb_aicp_proactor_iocp_t
 
 	// the connectex func
 	tb_iocp_func_connectex_t 				connectex;
+
+	// the transmitfile func
+	tb_iocp_func_transmitfile_t 			transmitfile;
 
 }tb_aicp_proactor_iocp_t;
 
@@ -209,6 +220,40 @@ static tb_iocp_func_connectex_t tb_iocp_func_connectex()
 
 	// ok?
 	return !ok? connectex : tb_null;
+}
+static tb_iocp_func_transmitfile_t tb_iocp_func_transmitfile()
+{
+	// done
+	tb_long_t 					ok = -1;
+	tb_handle_t 				sock = tb_null;
+	tb_iocp_func_transmitfile_t transmitfile = tb_null;
+	do
+	{
+		// init sock
+		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+		tb_assert_and_check_break(sock);
+
+		// get the acceptex func address
+		DWORD 	real = 0;
+		GUID 	guid = TB_IOCP_WSAID_TRANSMITFILE;
+		ok = WSAIoctl( 	(SOCKET)sock - 1
+					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
+					, 	&guid
+					, 	sizeof(GUID)
+					, 	&transmitfile
+					, 	sizeof(tb_iocp_func_transmitfile_t)
+					, 	&real
+					, 	tb_null
+					, 	tb_null);
+		tb_assert_and_check_break(!ok && transmitfile);
+
+	} while (0);
+
+	// exit sock
+	if (sock) tb_socket_close(sock);
+
+	// ok?
+	return !ok? transmitfile : tb_null;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * post
@@ -518,6 +563,66 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// failed
 	return tb_false;
 }
+static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
+
+	// check aice
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
+	tb_assert_and_check_return_val(aice->u.sendfile.file && aice->u.sendfile.size, tb_false);
+
+	// the aico
+	tb_aico_t const* aico = aice->aico;
+	tb_assert_and_check_return_val(aico && aico->handle, tb_false);
+
+	// init olap
+	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
+	tb_assert_and_check_return_val(olap, tb_false);
+	olap->aice 			= *aice;
+	olap->base.Offset 	= aice->u.sendfile.seek;
+
+	// done send
+	tb_long_t real = ptor->transmitfile((SOCKET)aico->handle - 1, (HANDLE)aice->u.sendfile.file, (DWORD)aice->u.sendfile.size, (1 << 16), olap, tb_null, 0);
+	tb_trace_impl("sendfile: %ld, error: %d", real, WSAGetLastError());
+
+	// pending? continue it
+	if (!real || WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+
+	// ok?
+	if (real > 0)
+	{
+		// post resp
+		olap->aice.u.sendfile.real = real;
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, olap)) return tb_true;
+	}
+	else
+	{
+		// done error
+		switch (WSAGetLastError())
+		{
+		// closed?
+		case WSAECONNABORTED:
+		case WSAECONNRESET:
+			olap->aice.state = TB_AICE_STATE_CLOSED;
+			break;
+		// failed?
+		default:
+			olap->aice.state = TB_AICE_STATE_FAILED;
+			break;
+		}
+
+		// post state
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, olap)) return tb_true;
+	}
+
+	// remove olap
+	if (olap) tb_iocp_olap_exit(ptor, olap);
+
+	// failed
+	return tb_false;
+}
 static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {	
 	// check
@@ -731,7 +836,7 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	}
 
 	// spak the real size	
-	resp->u.read.real = real;
+	resp->u.recv.real = real;
 
 	// ok?
 	return ok;
@@ -772,7 +877,48 @@ static tb_long_t tb_iocp_spak_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	}
 
 	// spak the real size	
-	resp->u.writ.real = real;
+	resp->u.send.real = real;
+
+	// ok?
+	return ok;
+}
+static tb_long_t tb_iocp_spak_sendfile(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
+{
+	// check?
+	tb_assert_and_check_return_val(resp && olap, -1);
+
+	// spak resp
+	*resp = olap->aice;
+
+	// ok? spak the size
+	tb_long_t ok = -1;
+	if (wait) 
+	{
+		// peer closed?
+		if (!real) resp->state = TB_AICE_STATE_CLOSED;
+		ok = 1;
+	}
+	// failed? done error
+	else
+	{
+		// done error
+		switch (GetLastError())
+		{
+		// closed?
+		case ERROR_HANDLE_EOF:
+		case ERROR_NETNAME_DELETED:
+			resp->state = TB_AICE_STATE_CLOSED;
+			ok = 1;
+			break;
+		// unknown error
+		default:
+			tb_trace_impl("sendfile: unknown error: %u", GetLastError());
+			break;
+		}
+	}
+
+	// spak the real size	
+	resp->u.sendfile.real = real;
 
 	// ok?
 	return ok;
@@ -874,7 +1020,7 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	,	tb_iocp_spak_send
 	,	tb_null // tb_iocp_spak_recvv
 	,	tb_null // tb_iocp_spak_sendv
-	,	tb_null // tb_iocp_spak_sendfile
+	,	tb_iocp_spak_sendfile
 	,	tb_iocp_spak_read
 	,	tb_iocp_spak_writ
 	,	tb_null // tb_iocp_spak_readv
@@ -935,7 +1081,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 		,	tb_iocp_post_send
 		,	tb_null // tb_iocp_post_recvv
 		,	tb_null // tb_iocp_post_sendv
-		,	tb_null // tb_iocp_post_sendfile
+		,	tb_iocp_post_sendfile
 		,	tb_iocp_post_read
 		,	tb_iocp_post_writ
 		,	tb_null // tb_iocp_post_readv
@@ -1051,7 +1197,8 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	// init func
 	ptor->acceptex 		= tb_iocp_func_acceptex();
 	ptor->connectex 	= tb_iocp_func_connectex();
-	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex, fail);
+	ptor->transmitfile 	= tb_iocp_func_transmitfile();
+	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex && ptor->transmitfile, fail);
 
 	// init mutx
 	ptor->mutx 			= tb_mutex_init();

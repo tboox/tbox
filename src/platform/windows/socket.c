@@ -35,6 +35,63 @@
 #pragma comment(lib, "ws2_32.lib")
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_SOCKET_WSAID_TRANSMITFILE 		{0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+typedef BOOL (WINAPI* tb_socket_func_transmitfile_t)( 	SOCKET hSocket
+													,	HANDLE hFile
+													,	DWORD nNumberOfBytesToWrite
+													,	DWORD nNumberOfBytesPerSend
+													,	LPOVERLAPPED lpOverlapped
+													,	LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
+													,	DWORD dwReserved);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+static tb_socket_func_transmitfile_t tb_socket_func_transmitfile()
+{
+	// done
+	tb_long_t 								ok = -1;
+	tb_handle_t 							sock = tb_null;
+	static tb_socket_func_transmitfile_t 	transmitfile = tb_null;
+	do
+	{
+		// ok?
+		tb_check_return_val(!transmitfile, transmitfile);
+
+		// init sock
+		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+		tb_assert_and_check_break(sock);
+
+		// get the acceptex func address
+		DWORD 	real = 0;
+		GUID 	guid = TB_SOCKET_WSAID_TRANSMITFILE;
+		ok = WSAIoctl( 	(SOCKET)sock - 1
+					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
+					, 	&guid
+					, 	sizeof(GUID)
+					, 	&transmitfile
+					, 	sizeof(tb_socket_func_transmitfile_t)
+					, 	&real
+					, 	tb_null
+					, 	tb_null);
+		tb_assert_and_check_break(!ok && transmitfile);
+
+	} while (0);
+
+	// exit sock
+	if (sock) tb_socket_close(sock);
+
+	// ok?
+	return !ok? transmitfile : tb_null;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_socket_init()
@@ -343,10 +400,10 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = recv((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
+	tb_long_t real = recv((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
 
 	// ok?
-	if (r >= 0) return r;
+	if (real >= 0) return real;
 
 	// errno
 	tb_long_t e = WSAGetLastError();
@@ -364,10 +421,10 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t r = send((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
+	tb_long_t real = send((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0);
 
 	// ok?
-	if (r >= 0) return r;
+	if (real >= 0) return real;
 
 	// errno
 	tb_long_t e = WSAGetLastError();
@@ -453,6 +510,31 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 
 	// ok?
 	return writ;
+}
+tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+{
+	// check
+	tb_assert_and_check_return_val(socket && file && size, -1);
+
+	// the transmitfile func
+	tb_socket_func_transmitfile_t transmitfile = tb_socket_func_transmitfile();
+	tb_assert_and_check_return_val(transmitfile, -1);
+
+	// transmit it
+	OVERLAPPED 	olap = {0}; olap.Offset = offset;
+	tb_hong_t 	real = transmitfile((SOCKET)socket - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
+
+	// ok?
+	if (real >= 0) return real;
+
+	// errno
+	tb_long_t e = WSAGetLastError();
+
+	// continue?
+	if (e == WSAEWOULDBLOCK || e == WSAEINPROGRESS || e == WSA_IO_PENDING) return 0;
+
+	// error
+	return -1;
 }
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
