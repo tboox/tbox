@@ -36,7 +36,9 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/uio.h>
-#include <sys/sendfile.h>
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+# 	include <sys/sendfile.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -333,19 +335,19 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 	tb_assert_and_check_return_val(socket && file && size, -1);
 
 	// send it
-#if defined(TB_CONFIG_OS_LINUX)
-	off_t seek = offset;
-	tb_hong_t real = sendfile((tb_int_t)socket - 1, (tb_int_t)file - 1, &seek, (size_t)size);
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+	off_t 		seek = offset;
+	tb_hong_t 	real = sendfile((tb_int_t)socket - 1, (tb_int_t)file - 1, &seek, (size_t)size);
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+	off_t real = (off_t)size;
+	if (!sendfile((tb_int_t)file - 1, (tb_int_t)socket - 1, (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
 #else
 	tb_hong_t real = -1;
 	tb_trace_noimpl();
 #endif
 
-	// ok?
-	if (real >= 0) return real;
-
 	// continue?
-	if (errno == EINTR || errno == EAGAIN) return 0;
+	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
 
 	// error
 	return -1;
