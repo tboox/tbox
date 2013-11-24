@@ -10,7 +10,7 @@
  */
 
 // read maxn
-#define TB_DEMO_FILE_READ_MAXN 			(65536)
+#define TB_DEMO_FILE_READ_MAXN 			(1 << 16)
 
 // mode
 //#define TB_DEMO_MODE_IOVEC
@@ -33,14 +33,39 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
+#if defined(TB_DEMO_MODE_SENDFILE)
+#else
 	// the data
 	tb_byte_t* 			data;
+#endif
 
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+#ifdef TB_DEMO_MODE_SENDFILE
+static tb_void_t tb_demo_context_exit(tb_aicp_t* aicp, tb_demo_context_t* context)
+{
+	if (context)
+	{
+		// exit file
+		if (context->file) tb_file_exit(context->file);
+		context->file = tb_null;
+
+		// exit sock
+		if (context->sock) tb_socket_close(context->sock);
+		context->sock = tb_null;
+
+		// exit aico
+		if (context->aico[0]) tb_aicp_delo(aicp, context->aico[0]);
+		context->aico[0] = tb_null;
+
+		// exit
+		tb_free(context);
+	}
+}
+#else
 static tb_void_t tb_demo_context_exit(tb_aicp_t* aicp, tb_demo_context_t* context)
 {
 	if (context)
@@ -84,6 +109,9 @@ static tb_bool_t tb_demo_sock_send_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// trace
 //		tb_print("send[%p]: real: %lu, size: %lu", aice->aico, aice->u.send.real, aice->u.send.size);
 
+		// check
+		tb_assert(aice->u.send.real);
+
 		// continue?
 		if (aice->u.send.real < aice->u.send.size)
 		{
@@ -123,22 +151,15 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	{
 		// trace
 //		tb_print("read[%p]: real: %lu, size: %lu", aice->aico, aice->u.read.real, aice->u.read.size);
+			
+		// check
+		tb_assert(aice->u.read.real);
 
-		// has data?
-		if (aice->u.read.real)
-		{
-			// post send to client
-			if (!tb_aicp_send(aicp, context->aico[0], aice->u.read.data, aice->u.read.real, tb_demo_sock_send_func, context)) return tb_false;
+		// post send to client
+		if (!tb_aicp_send(aicp, context->aico[0], aice->u.read.data, aice->u.read.real, tb_demo_sock_send_func, context)) return tb_false;
 
-			// save size
-			context->size += aice->u.read.real;
-		}
-		// no data?
-		else 
-		{	
-			// post read from file
-			if (!tb_aicp_read(aicp, aice->aico, context->size, context->data, TB_DEMO_FILE_READ_MAXN, tb_demo_file_read_func, context)) return tb_false;
-		}
+		// save size
+		context->size += aice->u.read.real;
 	}
 	// closed or failed?
 	else
@@ -152,10 +173,13 @@ static tb_bool_t tb_demo_file_read_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#endif
+
+#ifdef TB_DEMO_MODE_SENDFILE
 static tb_bool_t tb_demo_sock_sendfile_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_SEND, tb_false);
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
 
 	// the context
 	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
@@ -165,21 +189,40 @@ static tb_bool_t tb_demo_sock_sendfile_func(tb_aicp_t* aicp, tb_aice_t const* ai
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("sendfile[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendfile.real, aice->u.sendfile.size);
+//		tb_print("sendfile[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendfile.real, aice->u.sendfile.size);
 
+		// check
+		tb_assert(aice->u.sendfile.real);
+
+		// save size
+		context->size += aice->u.sendfile.real;
+
+		// continue to send it?
+		if (aice->u.sendfile.real < aice->u.sendfile.size)
+		{
+			// post sendfile from file
+			if (!tb_aicp_sendfile(aicp, aice->aico, context->file, context->size, aice->u.sendfile.size - aice->u.sendfile.real, tb_demo_sock_sendfile_func, context)) return tb_false;
+		}
+		else 
+		{
+			tb_print("sendfile[%p]: finished", aice->aico);
+			tb_demo_context_exit(aicp, context);
+		}
 	}
 	// closed or failed?
 	else
 	{
 		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("send[%p]: closed", aice->aico);
-		else tb_print("send[%p]: failed: %lu", aice->aico, aice->state);
+			tb_print("sendfile[%p]: closed", aice->aico);
+		else tb_print("sendfile[%p]: failed: %lu", aice->aico, aice->state);
 		tb_demo_context_exit(aicp, context);
 	}
 
 	// ok
 	return tb_true;
 }
+#endif
+
 static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
@@ -218,7 +261,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			tb_assert_and_check_break(context->aico[0]);
 
 			// post sendfile from file
-			if (!tb_aicp_sendfile(aicp, context->aico[0], context->file, 0ULL, 0ULL, tb_demo_sock_sendfile_func, context)) break;
+			if (!tb_aicp_sendfile(aicp, context->aico[0], context->file, 0ULL, tb_file_size(context->file), tb_demo_sock_sendfile_func, context)) break;
 #else
 			// init context
 			context->sock = aice->u.acpt.sock;
