@@ -266,7 +266,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 			// init context
 			context->sock = aice->u.acpt.sock;
 			context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_AICP);
-			context->data = tb_malloc(TB_DEMO_FILE_READ_MAXN + 4096);
+			context->data = tb_malloc(TB_DEMO_FILE_READ_MAXN);
 			tb_assert_and_check_break(context->file && context->data);
 
 			// addo sock
