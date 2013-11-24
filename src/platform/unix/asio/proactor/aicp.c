@@ -471,6 +471,82 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// ok
 	return 1;
 }
+static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+{
+	// check
+	tb_assert_and_check_return_val(ptor && aice, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_RECVV, -1);
+	tb_assert_and_check_return_val(aice->u.recvv.list && aice->u.recvv.size, -1);
+
+	// the aico
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+
+	// check wait
+	tb_assert_and_check_return_val(aico->wait < 2, -1);
+
+	// recv it
+	tb_long_t real = tb_socket_recvv(aico->base.handle, aice->u.recvv.list, aice->u.recvv.size);
+
+	// trace
+	tb_trace_impl("recvv[%p]: %lu", aico->base.handle, real);
+
+	// ok? 
+	if (real > 0) 
+	{
+		aice->u.recvv.real = real;
+		aice->state = TB_AICE_STATE_OK;
+	}
+	// no recv?
+	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	// closed?
+	else aice->state = TB_AICE_STATE_CLOSED;
+	
+	// reset wait
+	if (aico->wait) aico->wait--;
+	aico->aice.code = TB_AICE_CODE_NONE;
+
+	// ok
+	return 1;
+}
+static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+{
+	// check
+	tb_assert_and_check_return_val(ptor && aice, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_SENDV, -1);
+	tb_assert_and_check_return_val(aice->u.sendv.list && aice->u.sendv.size, -1);
+
+	// the aico
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+
+	// check wait
+	tb_assert_and_check_return_val(aico->wait < 2, -1);
+
+	// send it
+	tb_long_t real = tb_socket_sendv(aico->base.handle, aice->u.sendv.list, aice->u.sendv.size);
+
+	// trace
+	tb_trace_impl("sendv[%p]: %lu", aico->base.handle, real);
+
+	// ok? 
+	if (real > 0) 
+	{
+		aice->u.sendv.real = real;
+		aice->state = TB_AICE_STATE_OK;
+	}
+	// no send?
+	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	// closed?
+	else aice->state = TB_AICE_STATE_CLOSED;
+	
+	// reset wait
+	if (aico->wait) aico->wait--;
+	aico->aice.code = TB_AICE_CODE_NONE;
+
+	// ok
+	return 1;
+}
 static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
@@ -551,8 +627,8 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 			,	tb_aiop_spak_conn
 			,	tb_aiop_spak_recv
 			,	tb_aiop_spak_send
-			,	tb_null // tb_aiop_spak_recvv
-			,	tb_null // tb_aiop_spak_sendv
+			,	tb_aiop_spak_recvv
+			,	tb_aiop_spak_sendv
 			,	tb_aiop_spak_sendfile
 			,	tb_null
 			,	tb_null

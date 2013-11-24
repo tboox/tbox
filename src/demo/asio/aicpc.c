@@ -202,7 +202,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(context.file, end);
 
 	// init data
-	context.data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN + 4096);
+	context.data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
 	tb_assert_and_check_goto(context.data, end);
 
 	// addo sock
