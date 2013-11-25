@@ -7,7 +7,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
+
+// recv maxn
 #define TB_DEMO_SOCK_RECV_MAXN 			(1 << 16)
+
+// mode
+//#define TB_DEMO_MODE_IOVEC
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -38,8 +43,22 @@ typedef struct __tb_demo_context_t
 	// the sped
 	tb_size_t 			sped;
 
+#ifdef TB_DEMO_MODE_IOVEC
+	// the post list
+	tb_iovec_t 			post_list[16];
+
+	// the post head
+	tb_iovec_t* 		post_head;
+
+	// the post tail
+	tb_iovec_t* 		post_tail;
+
+	// the post writ
+	tb_bool_t 			post_writ;
+#else
 	// the data
 	tb_byte_t* 			data;
+#endif
 
 }tb_demo_context_t;
 
@@ -47,6 +66,76 @@ typedef struct __tb_demo_context_t
  * implementation
  */
 static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice);
+#ifdef TB_DEMO_MODE_IOVEC
+static tb_bool_t tb_demo_file_writv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aice && aice->code == TB_AICE_CODE_WRITV, tb_false);
+
+	// the context
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_assert_and_check_return_val(context, tb_false);
+
+	// ok?
+	if (aice->state == TB_AICE_STATE_OK)
+	{
+		// trace
+//		tb_print("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
+
+		// check
+		tb_assert(aice->u.writ.real);
+
+		// update head
+		tb_size_t i = 0;
+		tb_size_t size = aice->u.writv.real;
+		for (i = 0; i < aice->u.writv.size; i++)
+		{
+			tb_iovec_t* iovec = &aice->u.writv.list[i];
+			if (iovec->size <= size) 
+			{
+				if (iovec->data) tb_free(iovec->data);
+				iovec->data = tb_null;
+				iovec->size = 0;
+				size -= iovec->size;
+			}
+			else 
+			{
+				iovec->data += size;
+				iovec->size -= size;
+				break;
+			}
+		}
+		context->post_head = aice->u.writv.list + i;
+
+		// null?
+		if (context->post_head >= context->post_tail)
+		{
+			context->post_head = context->post_list;
+			context->post_tail = context->post_list;
+	
+			// post recv from server
+			context->post_writ = tb_false;
+	//		if (!tb_aicp_recv(aicp, context->aico[0], tb_malloc(TB_DEMO_SOCK_RECV_MAXN), TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+		}
+		else
+		{
+			// post writ to file
+			if (!tb_aicp_writv(aicp, aice->aico, aice->u.writv.seek + aice->u.writv.real, context->post_head, context->post_tail - context->post_head, tb_demo_file_writv_func, context)) return tb_false;
+		}
+	}
+	// closed or failed?
+	else
+	{
+		if (aice->state == TB_AICE_STATE_CLOSED)
+			tb_print("writ[%p]: closed", aice->aico);
+		else tb_print("writ[%p]: failed: %lu", aice->aico, aice->state);
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
+#else
 static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
@@ -90,6 +179,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#endif
 static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
@@ -108,8 +198,30 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// check
 		tb_assert(aice->u.recv.real);
 
+#ifdef TB_DEMO_MODE_IOVEC
+		if (context->post_tail < context->post_list + tb_arrayn(context->post_list))
+		{
+			context->post_tail->data = aice->u.recv.data;
+			context->post_tail->size = aice->u.recv.real;
+			context->post_tail++;
+	
+			tb_print("%lu", context->post_tail - context->post_list);
+			if (!context->post_writ)
+			{
+				// post writ to file
+				context->post_writ = tb_true;
+				if (!tb_aicp_writv(aicp, context->aico[1], context->size, context->post_head, context->post_tail - context->post_head, tb_demo_file_writv_func, context)) return tb_false;
+			}
+		}
+		if (context->post_tail < context->post_list + tb_arrayn(context->post_list))
+		{
+			// post recv from server
+			if (!tb_aicp_recv(aicp, context->aico[0], tb_malloc(TB_DEMO_SOCK_RECV_MAXN), TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+		}
+#else
 		// post writ to file
 		if (!tb_aicp_writ(aicp, context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
+#endif
 
 		// save size
 		context->size += aice->u.recv.real;
@@ -159,8 +271,13 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aicp_t* aicp, tb_aice_t const* aice)
 		// trace
 		tb_print("conn[%p]: ok", aice->aico);
 
+#ifdef TB_DEMO_MODE_IOVEC
+		// post recv from server
+		if (!tb_aicp_recv(aicp, aice->aico, tb_malloc(TB_DEMO_SOCK_RECV_MAXN), TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+#else
 		// post recv from server
 		if (!tb_aicp_recv(aicp, aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
+#endif
 	}
 	// failed?
 	else
@@ -201,9 +318,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	context.file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC | TB_FILE_MODE_AICP);
 	tb_assert_and_check_goto(context.file, end);
 
+#ifdef TB_DEMO_MODE_IOVEC
+	context.post_writ = tb_false;
+	context.post_head = context.post_list;
+	context.post_tail = context.post_list;
+#else
 	// init data
 	context.data = tb_malloc(TB_DEMO_SOCK_RECV_MAXN);
 	tb_assert_and_check_goto(context.data, end);
+#endif
 
 	// addo sock
 	context.aico[0] = tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK);
@@ -237,8 +360,10 @@ end:
 	// exit file
 	if (context.file) tb_file_exit(context.file);
 
+#ifndef TB_DEMO_MODE_IOVEC
 	// exit data
 	if (context.data) tb_free(context.data);
+#endif
 
 	// exit tbox
 	tb_exit();
