@@ -8,9 +8,12 @@ NAMES = \
 		event \
 		epool \
 		utils \
+		ctime \
+		timer \
 		atomic \
 		tstore \
 		process \
+		atomic64 \
 		semaphore \
 		backtrace \
 		exception \

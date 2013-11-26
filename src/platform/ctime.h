@@ -17,51 +17,36 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		ctime.h
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_CTIME_H
+#define TB_PLATFORM_CTIME_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "ctime.h"
-#include "timer.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "dynamic.h"
-#include "process.h"
-#include "atomic64.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*!init the platform
+/*! spak ctime 
  *
- * @return tb_true or tb_false
+ * update the cached time for the external loop thread
+ *
+ * @return 			the old ctime value
  */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
+tb_time_t 			tb_ctime_spak(tb_noarg_t);
 
-/// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
+/*! the time as the number of seconds since the epoch, 1970-01-01 00:00:00 +0000 (utc)
+ *
+ * cache time, lower accuracy and faster than tb_time
+ *
+ * @return 			the now ctime value
+ */
+tb_time_t 			tb_ctime_time(tb_noarg_t);
 
 #endif

@@ -34,22 +34,43 @@
  * interfaces
  */
 
-// usleep
+/*! usleep
+ *
+ * @param us 	the microsecond time
+ */
 tb_void_t 		tb_usleep(tb_size_t us);
 
-// msleep
+/*! msleep
+ *
+ * @param ms 	the millisecond time
+ */
 tb_void_t 		tb_msleep(tb_size_t ms);
 
-// sleep
+/*! sleep
+ *
+ * @param s 	the second time
+ */
 tb_void_t 		tb_sleep(tb_size_t s);
 
-// clock, ms
+/*! clock, ms
+ *
+ * @return 		the mclock
+ */
 tb_hong_t 		tb_mclock(tb_noarg_t);
 
-// clock, us
+/*! uclock, us
+ *
+ * @return 		the uclock
+ */
 tb_hong_t 		tb_uclock(tb_noarg_t);
 
-// get the time from 1970-01-01 00:00:00:000
+/*! get the time from 1970-01-01 00:00:00:000
+ *
+ * @param tv 	the timeval
+ * @param tz 	the timezone
+ *
+ * @return 		tb_true or tb_false
+ */
 tb_bool_t 		tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz);
 
 #endif

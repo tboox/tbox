@@ -380,19 +380,18 @@ tb_bool_t 			tb_aicp_writv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t see
  */
 tb_bool_t 			tb_aicp_fsync(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
 
-/*! loop aicp
+/*! loop aicp for the external thread
  *
  * @code
- * tb_pointer_t worker_thread(tb_pointer_t)
+ * tb_pointer_t tb_aicp_worker_thread(tb_pointer_t)
  * {
- * 		tb_aicp_loop(aicp, -1);
+ * 		tb_aicp_loop(aicp);
  * }
  * @endcode
  *
  * @param aicp 		the aicp
- * @param timeout 	the timeout 
  */
-tb_void_t 			tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout);
+tb_void_t 			tb_aicp_loop(tb_aicp_t* aicp);
 
 /*! kill the spak
  *

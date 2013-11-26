@@ -43,6 +43,9 @@ tb_bool_t tb_platform_init()
 	// init tstore
 	if (!tb_tstore_init()) return tb_false;
 
+	// spak ctime
+	tb_ctime_spak();
+
 	// ok
 	return tb_true;
 }
