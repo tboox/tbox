@@ -26,6 +26,8 @@
  * includes
  */
 #include "platform.h"
+#include "../container/container.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -81,31 +83,68 @@ typedef struct __tb_timer_t
 /* ///////////////////////////////////////////////////////////////////////
  * tasks
  */
+static tb_bool_t tb_timer_tasks_walk(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	// check
+	tb_assert_and_check_return_val(slist && data, tb_false);
+
+	// the when
+	tb_hize_t when = *((tb_hize_t*)data);
+
+	// the task
+	tb_timer_task_t const* task = item? *((tb_timer_task_t const**)item) : tb_null;
+
+	// save when
+	if (task && task->when < when) *((tb_hize_t*)data) = task->when;
+
+	// ok
+	return tb_true;
+}
 static __tb_inline__ tb_handle_t tb_timer_tasks_init(tb_size_t maxn)
 {
-	return tb_null;
+	return tb_slist_init((maxn >> 4) + 16, tb_item_func_ifm(sizeof(tb_timer_task_t), tb_null, tb_null));
 }
 static __tb_inline__ tb_void_t tb_timer_tasks_exit(tb_handle_t tasks)
 {
+	tb_slist_exit(tasks);
 }
 static __tb_inline__ tb_handle_t tb_timer_tasks_add(tb_handle_t tasks, tb_timer_task_t const* task)
 {
-	return task;
+	return (tb_handle_t)tb_slist_insert_tail(tasks, task);
 }
 static __tb_inline__ tb_bool_t tb_timer_tasks_del(tb_handle_t tasks, tb_handle_t task)
 {
-	return tb_false;
-}
-static __tb_inline__ tb_void_t tb_timer_tasks_pop(tb_handle_t tasks)
-{
+	tb_slist_remove(tasks, task);
+	return tb_true;
 }
 static __tb_inline__ tb_handle_t tb_timer_tasks_top(tb_handle_t tasks)
 {
-	return tb_null;
+	// find top
+	tb_hize_t when = -1;
+	tb_size_t itor = tb_iterator_head(tasks);
+	tb_size_t task = itor;
+	for (; itor != tb_iterator_tail(tasks); itor = tb_iterator_next(tasks, itor))
+	{
+		tb_timer_task_t const* item = tb_iterator_item(tasks, itor);
+		if (item)
+		{
+			if (item && item->when < when) 
+			{
+				task = itor;
+				when = item->when;
+			}
+		}
+	}
+
+	return task;
+}
+static __tb_inline__ tb_void_t tb_timer_tasks_pop(tb_handle_t tasks)
+{
+	tb_timer_tasks_del(tasks, tb_timer_tasks_top(tasks));
 }
 static __tb_inline__ tb_timer_task_t* tb_timer_tasks_get(tb_handle_t tasks, tb_handle_t task)
 {
-	return tb_null;
+	return (tb_timer_task_t*)tb_iterator_item(tasks, (tb_size_t)task);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -252,9 +291,12 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 	{
 		// the timeout
 		tb_long_t timeout = tb_timer_timeout(handle);
-
+			
 		// wait some time
 		if (timeout) tb_msleep((tb_size_t)timeout);
+
+		// spak ctime
+		tb_ctime_spak();
 
 		// spak it
 		if (!tb_timer_spak(handle)) break;

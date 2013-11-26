@@ -34,10 +34,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_timer_task_run(timer, 1000, tb_timer_task_func, "every");
 	
 		// add task: one
-//		tb_timer_task_run(timer, 10000, tb_timer_task_func, "one");
+		tb_timer_task_run(timer, 10000, tb_timer_task_func, "one");
 		
 		// add task: after
-//		tb_timer_task_run_after(timer, 10000, 1000, tb_timer_task_func, "after");
+		tb_timer_task_run_after(timer, 10000, 5000, tb_timer_task_func, "after");
 
 		// wait
 		tb_timer_loop(timer);
