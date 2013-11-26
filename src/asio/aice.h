@@ -249,7 +249,7 @@ typedef struct __tb_aice_t
 	/// the state
 	tb_size_t 				state 	: 4;
 
-	/// the timeout, ms
+	/// the timeout(ms), @note infinity: 0 
 	tb_size_t 				timeout : 24;
 
 	/// the aicb

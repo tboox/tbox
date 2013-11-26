@@ -418,7 +418,7 @@ tb_bool_t tb_aicp_fsync(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_f
 	// post
 	return tb_aicp_post(aicp, &aice, 1);
 }
-tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
+tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor);
@@ -435,7 +435,10 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp, tb_long_t timeout)
 	{
 		// spak
 		tb_aice_t 	resp = {0};
-		tb_long_t	ok = spak(aicp->ptor, &resp, timeout);
+		tb_long_t	ok = spak(aicp->ptor, &resp, -1);
+
+		// spak ctime
+		tb_ctime_spak();
 
 		// failed? exit all loops
 		if (ok < 0) tb_aicp_kill(aicp);

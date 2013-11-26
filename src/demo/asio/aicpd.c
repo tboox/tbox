@@ -13,7 +13,6 @@
 #define TB_DEMO_FILE_READ_MAXN 			(1 << 16)
 
 // mode
-//#define TB_DEMO_MODE_IOVEC
 #define TB_DEMO_MODE_SENDFILE
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -33,8 +32,7 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
-#if defined(TB_DEMO_MODE_SENDFILE)
-#else
+#ifndef TB_DEMO_MODE_SENDFILE
 	// the data
 	tb_byte_t* 			data;
 #endif
@@ -321,7 +319,7 @@ static tb_pointer_t tb_demo_loop_thread(tb_pointer_t data)
 	tb_print("[loop: %lu]: init", self);
 
 	// loop aicp
-	if (aicp) tb_aicp_loop(aicp, -1);
+	if (aicp) tb_aicp_loop(aicp);
 	
 	// trace
 	tb_print("[loop: %lu]: exit", self);

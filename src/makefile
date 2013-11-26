@@ -212,6 +212,8 @@ endif
 # platform
 tbox_C_FILES 			+= \
 						platform/path \
+						platform/ctime \
+						platform/timer \
 						platform/printf \
 						platform/tstore \
 						platform/platform \
@@ -317,6 +319,8 @@ INC_FILES 				= \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
+						platform/timer.h \
+						platform/ctime.h \
 						platform/utils.h \
 						platform/mutex.h \
 						platform/tstore.h \
@@ -328,13 +332,14 @@ INC_FILES 				= \
 						platform/atomic.h \
 						platform/dynamic.h \
 						platform/process.h \
-						platform/atomic.h \
+						platform/atomic64.h \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/atomic.h \
+						platform/compiler/gcc/atomic64.h \
 						platform/arch/prefix.h \
 						platform/arch/atomic.h \
 						platform/arch/x86/prefix.h \
@@ -345,6 +350,7 @@ INC_FILES 				= \
 						platform/arch/sh4/atomic.h \
 						platform/windows/prefix.h \
 						platform/windows/atomic.h \
+						platform/windows/atomic64.h \
 						platform/windows/exception.h \
 						platform/unix/prefix.h \
 						platform/unix/exception.h \

@@ -128,7 +128,8 @@ typedef tb_int32_t 					tb_fixed30_t;
 typedef tb_fixed16_t 				tb_fixed_t;
 
 // the atomic type
-typedef __tb_volatile__ tb_size_t 	tb_atomic_t;
+typedef __tb_volatile__ tb_long_t 	tb_atomic_t;
+typedef __tb_volatile__ tb_hong_t 	tb_atomic64_t;
 
 /// the time type
 typedef tb_hong_t 					tb_time_t;

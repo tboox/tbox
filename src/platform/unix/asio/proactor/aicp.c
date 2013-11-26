@@ -129,6 +129,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 		// wait aioe
 		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, -1);
 
+		// spak ctime
+		tb_ctime_spak();
+
 		// killed?
 		tb_check_break(real >= 0);
 
