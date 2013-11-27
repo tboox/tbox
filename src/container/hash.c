@@ -200,7 +200,13 @@ static tb_bool_t tb_hash_item_find(tb_hash_impl_t* hash, tb_cpointer_t name, tb_
 		m = (l + r) >> 1;
 	}
 
-	// update item
+	/* update item
+	 *
+	 * @note: m is not the prev not same item if not finded and list has repeat items
+	 * but this hash not exists repeat
+	 *
+	 * @see tb_binary_pfind()
+	 */
 	if (pitem) *pitem = m;
 
 	// ok?

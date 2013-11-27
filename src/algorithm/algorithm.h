@@ -28,7 +28,8 @@
  * includes
  */
 #include "prefix.h"
-#include "find.h"
 #include "sort.h"
+#include "find.h"
+#include "pfind.h"
 
 #endif

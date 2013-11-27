@@ -145,9 +145,7 @@ tb_handle_t 		tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_si
  *
  * @param handle	the timer handle
  * @param task		the timer task
- *
- * @return 			the timer task
  */
-tb_bool_t 			tb_timer_task_del(tb_handle_t handle, tb_handle_t task);
+tb_void_t 			tb_timer_task_del(tb_handle_t handle, tb_handle_t task);
 
 #endif

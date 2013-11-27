@@ -46,6 +46,9 @@
 // the timer task type
 typedef struct __tb_timer_task_t
 {
+	// the id
+	tb_size_t 					id;
+
 	// the func
 	tb_timer_task_func_t 		func;
 
@@ -78,74 +81,117 @@ typedef struct __tb_timer_t
 	// the tasks
 	tb_handle_t 				tasks;
 
+	// the lastid
+	tb_atomic_t 				lastid;
+
 }tb_timer_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * tasks
  */
-static tb_bool_t tb_timer_tasks_walk(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+#if 1
+static tb_bool_t tb_timer_tasks_walk(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(slist && data, tb_false);
-
-	// the when
-	tb_hize_t when = *((tb_hize_t*)data);
+	tb_assert_and_check_return_val(bdel && data, tb_false);
 
 	// the task
 	tb_timer_task_t const* task = item? *((tb_timer_task_t const**)item) : tb_null;
 
-	// save when
-	if (task && task->when < when) *((tb_hize_t*)data) = task->when;
+	// is this?
+	if (task && task->id == (tb_size_t)data)
+	{
+		// remove it
+		*bdel = tb_true;
 
-	// ok
+		// break;
+		return tb_false;
+	}
+
+	// continue
 	return tb_true;
+}
+static tb_long_t tb_timer_tasks_comp(tb_iterator_t* iterator, tb_cpointer_t item, tb_cpointer_t task)
+{
+	// check
+	tb_assert_return_val(item && task, 0);
+
+	// the lhs
+	tb_hize_t lhs = ((tb_timer_task_t const*)item)->when;
+
+	// the rhs
+	tb_hize_t rhs = ((tb_timer_task_t const*)task)->when;
+
+	// comp
+	return ((lhs < rhs)? 1 : ((lhs > rhs)? -1 : 0));
 }
 static __tb_inline__ tb_handle_t tb_timer_tasks_init(tb_size_t maxn)
 {
-	return tb_slist_init((maxn >> 4) + 16, tb_item_func_ifm(sizeof(tb_timer_task_t), tb_null, tb_null));
+	return tb_vector_init((maxn >> 4) + 16, tb_item_func_ifm(sizeof(tb_timer_task_t), tb_null, tb_null));
 }
 static __tb_inline__ tb_void_t tb_timer_tasks_exit(tb_handle_t tasks)
 {
-	tb_slist_exit(tasks);
+	tb_vector_exit(tasks);
 }
-static __tb_inline__ tb_handle_t tb_timer_tasks_add(tb_handle_t tasks, tb_timer_task_t const* task)
+static __tb_inline__ tb_bool_t tb_timer_tasks_add(tb_handle_t tasks, tb_timer_task_t const* task)
 {
-	return (tb_handle_t)tb_slist_insert_tail(tasks, task);
-}
-static __tb_inline__ tb_bool_t tb_timer_tasks_del(tb_handle_t tasks, tb_handle_t task)
-{
-	tb_slist_remove(tasks, task);
-	return tb_true;
-}
-static __tb_inline__ tb_handle_t tb_timer_tasks_top(tb_handle_t tasks)
-{
-	// find top
-	tb_hize_t when = -1;
-	tb_size_t itor = tb_iterator_head(tasks);
-	tb_size_t task = itor;
-	for (; itor != tb_iterator_tail(tasks); itor = tb_iterator_next(tasks, itor))
+	// init comp
+	((tb_iterator_t*)tasks)->comp = tb_timer_tasks_comp;
+	
+	// find it by sort
+	tb_size_t tail = tb_iterator_tail(tasks);
+	tb_size_t prev = tail;
+//	tb_size_t itor = tb_pfind_all(tasks, &prev, task);
+	tb_size_t itor = tb_binary_pfind_all(tasks, &prev, task);
+
+	// finded? insert to prev
+	if (itor != tail) tb_vector_insert_prev(tasks, itor, task);
+	else
 	{
-		tb_timer_task_t const* item = tb_iterator_item(tasks, itor);
-		if (item)
-		{
-			if (item && item->when < when) 
-			{
-				task = itor;
-				when = item->when;
-			}
-		}
+		// insert to next
+		if (prev != tail) tb_vector_insert_next(tasks, prev, task);
+		// insert to head
+		else tb_vector_insert_head(tasks, task);
 	}
 
-	return task;
+#if 0
+	{
+		tb_print("find: %lu, prev: %lu", task->when, prev);
+		tb_size_t itor = tb_iterator_head(tasks);
+		tail = tb_iterator_tail(tasks);
+		for (; itor != tail; itor = tb_iterator_next(tasks, itor))
+		{
+			tb_timer_task_t const* item = tb_iterator_item(tasks, itor);
+			if (item) tb_print("%llu", item->when);
+		}
+	}
+#endif
+	
+	// ok
+	return tb_true;
+}
+static __tb_inline__ tb_void_t tb_timer_tasks_del(tb_handle_t tasks, tb_size_t id)
+{
+	// remove it
+	tb_vector_walk(tasks, tb_timer_tasks_walk, (tb_pointer_t)id);
+}
+static __tb_inline__ tb_bool_t tb_timer_tasks_top(tb_handle_t tasks, tb_timer_task_t* task)
+{
+	tb_timer_task_t const* item = (tb_timer_task_t const*)tb_vector_last(tasks);
+	if (item) 
+	{
+		*task = *item;
+		return tb_true;
+	}
+	return tb_false;
 }
 static __tb_inline__ tb_void_t tb_timer_tasks_pop(tb_handle_t tasks)
 {
-	tb_timer_tasks_del(tasks, tb_timer_tasks_top(tasks));
+	tb_vector_remove_last(tasks);
 }
-static __tb_inline__ tb_timer_task_t* tb_timer_tasks_get(tb_handle_t tasks, tb_handle_t task)
-{
-	return (tb_timer_task_t*)tb_iterator_item(tasks, (tb_size_t)task);
-}
+#else
+// TODO: using minheap faster
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -208,16 +254,11 @@ tb_size_t tb_timer_timeout(tb_handle_t handle)
 	// top task
 	tb_timer_task_t task = {0};
 	if (timer->mutx) tb_mutex_enter(timer->mutx);
-	tb_handle_t itor = tb_timer_tasks_top(timer->tasks);
-	if (itor)
-	{
-		tb_timer_task_t* item = tb_timer_tasks_get(timer->tasks, itor);
-		if (item) task = *item;
-	}
+	tb_bool_t ok = tb_timer_tasks_top(timer->tasks, &task);
 	if (timer->mutx) tb_mutex_leave(timer->mutx);
 
 	// no task? using the default timeout
-	tb_check_return_val(itor, TB_TIMER_TIMEOUT_DEFAULT);
+	tb_check_return_val(ok, TB_TIMER_TIMEOUT_DEFAULT);
 
 	// the now time
 	tb_hize_t now = TB_TIMER_NOW(timer);
@@ -240,40 +281,37 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	// top task
 	tb_timer_task_t task = {0};
 	if (timer->mutx) tb_mutex_enter(timer->mutx);
-	tb_handle_t itor = tb_timer_tasks_top(timer->tasks);
-	if (itor)
+	tb_bool_t ok = tb_timer_tasks_top(timer->tasks, &task);
+	if (ok)
 	{
-		tb_timer_task_t* item = tb_timer_tasks_get(timer->tasks, itor);
-		if (item) task = *item;
+		// the now time
+		tb_hize_t now = TB_TIMER_NOW(timer);
+
+		// timeout?
+		if (task.when <= now)
+		{
+			// update when
+			task.when = now + task.period;
+
+			// pop task, must pop it in the same lock, because the top maybe modified
+			tb_timer_tasks_pop(timer->tasks);
+		}
+		else ok = tb_false;
 	}
 	if (timer->mutx) tb_mutex_leave(timer->mutx);
 
-	// no task? 
-	tb_check_return_val(itor, tb_true);
+	// no task or no timeout?
+	tb_check_return_val(ok, tb_true);
 
 	// check task
 	tb_assert_and_check_return_val(task.func, tb_false);
 
-	// the now time
-	tb_hize_t now = TB_TIMER_NOW(timer);
-
-	// timeout?
-	tb_check_return_val(task.when <= now, tb_true);
-
 	// done task
-	if (!task.func(task.data))
+	if (task.func(task.data))
 	{
-		// remove task
+		// add task again
 		if (timer->mutx) tb_mutex_enter(timer->mutx);
-		tb_timer_tasks_pop(timer->tasks);
-		if (timer->mutx) tb_mutex_leave(timer->mutx);
-	}
-	else
-	{
-		// update task
-		if (timer->mutx) tb_mutex_enter(timer->mutx);
-		tb_timer_task_t* item = tb_timer_tasks_get(timer->tasks, itor);
-		if (item) item->when = now + item->period;
+		tb_timer_tasks_add(timer->tasks, &task);
 		if (timer->mutx) tb_mutex_leave(timer->mutx);
 	}
 
@@ -319,6 +357,7 @@ tb_handle_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 
 	// init task
 	tb_timer_task_t task = {0};
+	task.id 	= tb_atomic_inc_and_fetch(&timer->lastid);
 	task.func 	= func;
 	task.data 	= data;
 	task.when 	= when;
@@ -326,11 +365,11 @@ tb_handle_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 
 	// add task
 	if (timer->mutx) tb_mutex_enter(timer->mutx);
-	tb_handle_t itor = tb_timer_tasks_add(timer->tasks, &task);
+	tb_bool_t ok = tb_timer_tasks_add(timer->tasks, &task);
 	if (timer->mutx) tb_mutex_leave(timer->mutx);
 
 	// ok?
-	return itor;
+	return ok? task.id : tb_null;
 }
 tb_handle_t tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_timer_task_func_t func, tb_pointer_t data)
 {
@@ -341,18 +380,15 @@ tb_handle_t tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size
 	// run task
 	return tb_timer_task_run_at(handle, TB_TIMER_NOW(timer) + after, period, func, data);
 }
-tb_bool_t tb_timer_task_del(tb_handle_t handle, tb_handle_t task)
+tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t task)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
-	tb_assert_and_check_return_val(timer && timer->tasks && task, tb_false);
+	tb_assert_and_check_return(timer && timer->tasks && task);
 
 	// del task
 	if (timer->mutx) tb_mutex_enter(timer->mutx);
-	tb_handle_t ok = tb_timer_tasks_del(timer->tasks, &task);
+	tb_timer_tasks_del(timer->tasks, (tb_size_t)task);
 	if (timer->mutx) tb_mutex_leave(timer->mutx);
-
-	// ok?
-	return ok;
 }
 

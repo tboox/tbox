@@ -246,6 +246,10 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t h
 
 tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 {
+	// check
+	tb_check_return(iterator && head != tail);
+
+	// random access iterator? 
 	if (iterator->mode & TB_ITERATOR_MODE_RACCESS) 
 	{
 		if (tail > head + 100000) tb_heap_sort(iterator, head, tail);
