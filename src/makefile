@@ -26,8 +26,9 @@ tbox_C_FILES 			+= \
 						memory/qbuffer \
 						string/pstring \
 						string/sstring \
-						algorithm/find \
 						algorithm/sort \
+						algorithm/find \
+						algorithm/pfind \
 						container/item \
 						container/hash \
 						container/queue \
@@ -301,8 +302,9 @@ INC_FILES 				= \
 						string/sstring.h \
 						algorithm/prefix.h \
 						algorithm/algorithm.h \
-						algorithm/find.h \
 						algorithm/sort.h \
+						algorithm/find.h \
+						algorithm/pfind.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \
