@@ -240,10 +240,10 @@ static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t h
 	// check
 //	tb_assert(tb_heap_check(iterator, head, tail - head - 1));
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
 tb_void_t tb_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 {
 	// check
