@@ -93,8 +93,8 @@ typedef struct __tb_aiop_t
 	/// the aioo pool
 	tb_handle_t 			pool;
 
-	/// the pool mutx
-	tb_handle_t 			mutx;
+	/// the pool lock
+	tb_handle_t 			lock;
 
 	/// the reactor
 	tb_aiop_reactor_t* 		rtor;

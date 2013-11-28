@@ -171,8 +171,8 @@ typedef struct __tb_aicp_t
 	/// the aico pool
 	tb_handle_t 			pool;
 
-	/// the pool mutx
-	tb_handle_t 			mutx;
+	/// the pool lock
+	tb_handle_t 			lock;
 
 }tb_aicp_t;
 

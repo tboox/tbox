@@ -31,9 +31,9 @@
  * includes
  */
 #include "tstore.h"
-#include "mutex.h"
 #include "atomic.h"
 #include "thread.h"
+#include "spinlock.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -43,8 +43,8 @@
 // the store
 static tb_handle_t 	g_store = tb_null;
 
-// the mutex
-static tb_handle_t 	g_mutex = tb_null;
+// the lock
+static tb_handle_t 	g_lock = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
  * callback
@@ -67,19 +67,19 @@ static tb_void_t tb_tstore_free(tb_item_func_t* func, tb_pointer_t item)
 tb_bool_t tb_tstore_init()
 {
 	// init mutex?
-	if (!tb_atomic_get((tb_atomic_t*)&g_mutex))
+	if (!tb_atomic_get((tb_atomic_t*)&g_lock))
 	{
 		// init mutex
-		tb_handle_t mutex = tb_mutex_init();
+		tb_handle_t mutex = tb_spinlock_init();
 		tb_assert_and_check_return_val(mutex, tb_null);
 		
 		// exit mutex if the mutex have been inited already
-		if (tb_atomic_fetch_and_set((tb_atomic_t*)&g_mutex, mutex))
-			tb_mutex_exit(mutex);
+		if (tb_atomic_fetch_and_set((tb_atomic_t*)&g_lock, mutex))
+			tb_spinlock_exit(mutex);
 	}
 
 	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// no store?
 	if (!g_store) 
@@ -89,7 +89,7 @@ tb_bool_t tb_tstore_init()
 	}
 
 	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	if (g_lock) tb_spinlock_leave(g_lock);
 
 	// ok?
 	return g_store? tb_true : tb_false;
@@ -97,50 +97,50 @@ tb_bool_t tb_tstore_init()
 tb_void_t tb_tstore_exit()
 {	
 	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// exit store
 	if (g_store) tb_hash_exit(g_store);
 	g_store = tb_null;
 
 	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	if (g_lock) tb_spinlock_leave(g_lock);
 
 	// exit mutex
-	tb_handle_t mutex = g_mutex;
-	if (tb_atomic_fetch_and_set0((tb_atomic_t*)&g_mutex))
-		tb_mutex_exit(mutex);
+	tb_handle_t mutex = g_lock;
+	if (tb_atomic_fetch_and_set0((tb_atomic_t*)&g_lock))
+		tb_spinlock_exit(mutex);
 }
 tb_void_t tb_tstore_setp(tb_tstore_data_t const* data)
 {
 	// check
-	tb_check_return(tb_atomic_get((tb_atomic_t*)&g_mutex));
+	tb_check_return(tb_atomic_get((tb_atomic_t*)&g_lock));
 
 	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// get data
 	if (g_store) tb_hash_set(g_store, tb_thread_self(), data);
 
 	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	if (g_lock) tb_spinlock_leave(g_lock);
 }
 tb_tstore_data_t* tb_tstore_getp()
 {
 	// check
-	tb_check_return_val(tb_atomic_get((tb_atomic_t*)&g_mutex), tb_null);
+	tb_check_return_val(tb_atomic_get((tb_atomic_t*)&g_lock), tb_null);
 
 	// init data
 	tb_pointer_t data = tb_null;
 
 	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// get data
 	if (g_store) data = tb_hash_get(g_store, tb_thread_self());
 
 	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	if (g_lock) tb_spinlock_leave(g_lock);
 
 	// ok?
 	return (tb_tstore_data_t*)data;

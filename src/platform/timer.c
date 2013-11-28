@@ -72,8 +72,8 @@ typedef struct __tb_timer_t
 	// is stop?
 	tb_atomic_t 				stop;
 
-	// the mutx
-	tb_handle_t 				mutx;
+	// the lock
+	tb_handle_t 				lock;
 
 	// cache time?
 	tb_bool_t 					ctime;
@@ -209,9 +209,9 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 	timer->maxn 	= maxn;
 	timer->ctime 	= ctime;
 
-	// init mutx
-	timer->mutx 	= tb_mutex_init();
-	tb_assert_and_check_goto(timer->mutx, fail);
+	// init lock
+	timer->lock 	= tb_spinlock_init();
+	tb_assert_and_check_goto(timer->lock, fail);
 
 	// init tasks
 	timer->tasks 	= tb_timer_tasks_init(maxn);
@@ -232,14 +232,14 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		tb_atomic_set(&timer->stop, 1);
 
 		// exit tasks
-		if (timer->mutx) tb_mutex_enter(timer->mutx);
+		if (timer->lock) tb_spinlock_enter(timer->lock);
 		if (timer->tasks) tb_timer_tasks_exit(timer->tasks);
 		timer->tasks = tb_null;
-		if (timer->mutx) tb_mutex_leave(timer->mutx);
+		if (timer->lock) tb_spinlock_leave(timer->lock);
 
-		// exit mutx
-		if (timer->mutx) tb_mutex_exit(timer->mutx);
-		timer->mutx = tb_null;
+		// exit lock
+		if (timer->lock) tb_spinlock_exit(timer->lock);
+		timer->lock = tb_null;
 
 		// exit it
 		tb_free(timer);
@@ -253,9 +253,9 @@ tb_size_t tb_timer_timeout(tb_handle_t handle)
 
 	// top task
 	tb_timer_task_t task = {0};
-	if (timer->mutx) tb_mutex_enter(timer->mutx);
+	if (timer->lock) tb_spinlock_enter(timer->lock);
 	tb_bool_t ok = tb_timer_tasks_top(timer->tasks, &task);
-	if (timer->mutx) tb_mutex_leave(timer->mutx);
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 
 	// no task? using the default timeout
 	tb_check_return_val(ok, TB_TIMER_TIMEOUT_DEFAULT);
@@ -280,7 +280,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 
 	// top task
 	tb_timer_task_t task = {0};
-	if (timer->mutx) tb_mutex_enter(timer->mutx);
+	if (timer->lock) tb_spinlock_enter(timer->lock);
 	tb_bool_t ok = tb_timer_tasks_top(timer->tasks, &task);
 	if (ok)
 	{
@@ -298,7 +298,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 		}
 		else ok = tb_false;
 	}
-	if (timer->mutx) tb_mutex_leave(timer->mutx);
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 
 	// no task or no timeout?
 	tb_check_return_val(ok, tb_true);
@@ -310,9 +310,9 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	if (task.func(task.data))
 	{
 		// add task again
-		if (timer->mutx) tb_mutex_enter(timer->mutx);
+		if (timer->lock) tb_spinlock_enter(timer->lock);
 		tb_timer_tasks_add(timer->tasks, &task);
-		if (timer->mutx) tb_mutex_leave(timer->mutx);
+		if (timer->lock) tb_spinlock_leave(timer->lock);
 	}
 
 	// ok
@@ -364,9 +364,9 @@ tb_handle_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 	task.period = period;
 
 	// add task
-	if (timer->mutx) tb_mutex_enter(timer->mutx);
+	if (timer->lock) tb_spinlock_enter(timer->lock);
 	tb_bool_t ok = tb_timer_tasks_add(timer->tasks, &task);
-	if (timer->mutx) tb_mutex_leave(timer->mutx);
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 
 	// ok?
 	return ok? task.id : tb_null;
@@ -387,8 +387,8 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t task)
 	tb_assert_and_check_return(timer && timer->tasks && task);
 
 	// del task
-	if (timer->mutx) tb_mutex_enter(timer->mutx);
+	if (timer->lock) tb_spinlock_enter(timer->lock);
 	tb_timer_tasks_del(timer->tasks, (tb_size_t)task);
-	if (timer->mutx) tb_mutex_leave(timer->mutx);
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 }
 

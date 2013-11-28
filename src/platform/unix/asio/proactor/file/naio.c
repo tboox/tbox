@@ -74,8 +74,8 @@ typedef struct __tb_naio_t
 	// the ictx
 	aio_context_t 				ictx;
 
-	// the mutx
-	tb_handle_t 				mutx;
+	// the lock
+	tb_handle_t 				lock;
 
 	// the iocb pool
 	tb_handle_t 				pool_iocb;
@@ -167,7 +167,7 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 	tb_assert_and_check_return_val(naio && naio->pool_iocb && naio->pool_data && aice, tb_null);
 
 	// enter 
-	if (naio->mutx) tb_mutex_enter(naio->mutx);
+	if (naio->lock) tb_mutex_enter(naio->lock);
 
 	// make iocb
 	tb_naio_iocb_t* iocb = (tb_naio_iocb_t*)tb_rpool_malloc0(naio->pool_iocb);
@@ -215,7 +215,7 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 	}
 
 	// leave 
-	if (naio->mutx) tb_mutex_leave(naio->mutx);
+	if (naio->lock) tb_mutex_leave(naio->lock);
 	
 	// ok?
 	return iocb;
@@ -226,7 +226,7 @@ static tb_void_t tb_aicp_iocb_exit(tb_naio_t* naio, tb_naio_iocb_t* iocb)
 	tb_assert_and_check_return(naio && naio->pool_iocb && naio->pool_data);
 
 	// enter 
-	if (naio->mutx) tb_mutex_enter(naio->mutx);
+	if (naio->lock) tb_mutex_enter(naio->lock);
 
 	// exit iocb
 	if (iocb) 
@@ -240,7 +240,7 @@ static tb_void_t tb_aicp_iocb_exit(tb_naio_t* naio, tb_naio_iocb_t* iocb)
 	}
 
 	// leave 
-	if (naio->mutx) tb_mutex_leave(naio->mutx);
+	if (naio->lock) tb_mutex_leave(naio->lock);
 }
 static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_long_t res, tb_long_t res2)
 {
@@ -353,9 +353,9 @@ static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 	// init ptor
 	naio->ptor = ptor;
 
-	// init mutx
-	naio->mutx = tb_mutex_init();
-	tb_assert_and_check_goto(naio->mutx, fail);
+	// init lock
+	naio->lock = tb_mutex_init();
+	tb_assert_and_check_goto(naio->lock, fail);
 
 	// init iocb pool
 	naio->pool_iocb = tb_rpool_init((ptor->base.aicp->maxn >> 4) + 16, sizeof(tb_naio_iocb_t), 0);
@@ -414,16 +414,16 @@ static tb_void_t tb_aicp_file_exit(tb_handle_t handle)
 		naio->spak = tb_null;
 	
 		// exit pool
-		if (naio->mutx) tb_mutex_enter(naio->mutx);
+		if (naio->lock) tb_mutex_enter(naio->lock);
 		if (naio->pool_iocb) tb_rpool_exit(naio->pool_iocb);
 		if (naio->pool_data) tb_spool_exit(naio->pool_data);
 		naio->pool_iocb = tb_null;
 		naio->pool_data = tb_null;
-		if (naio->mutx) tb_mutex_leave(naio->mutx);
+		if (naio->lock) tb_mutex_leave(naio->lock);
 
-		// exit mutx
-		if (naio->mutx) tb_mutex_exit(naio->mutx);
-		naio->mutx = tb_null;
+		// exit lock
+		if (naio->lock) tb_mutex_exit(naio->lock);
+		naio->lock = tb_null;
 
 		// exit it
 		tb_free(naio);
