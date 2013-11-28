@@ -107,7 +107,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, tb_false);
 
 	// try lock it
-	return (!*((tb_atomic_t*)handle) && !tb_atomic_fetch_and_pset((tb_atomic_t*)handle, 0, 1))? tb_true : tb_false;
+	return tb_atomic_fetch_and_pset((tb_atomic_t*)handle, 0, 1)? tb_false : tb_true;
 }
 static __tb_inline_force__ tb_bool_t tb_spinlock_leave(tb_handle_t handle)
 {
