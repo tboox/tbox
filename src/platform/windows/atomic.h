@@ -49,6 +49,10 @@
 # 	define tb_atomic_pset(a, p, v) 				tb_atomic_fetch_and_pset_windows(a, p, v)
 #endif
 
+#ifndef tb_atomic_bool_and_pset
+# 	define tb_atomic_bool_and_pset(a, p, v) 	tb_atomic_bool_and_pset_windows(a, p, v)
+#endif
+
 #ifndef tb_atomic_fetch_and_set0
 # 	define tb_atomic_fetch_and_set0(a) 			tb_atomic_fetch_and_set_windows(a, 0)
 #endif

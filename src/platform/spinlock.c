@@ -17,53 +17,36 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		spinlock.c
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "ctime.h"
-#include "timer.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
 #include "spinlock.h"
-#include "atomic64.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
+#ifndef TB_CONFIG_SPINLOCK_ATOMIC_ENABLE
+# 	if defined(TB_CONFIG_OS_WINDOWS)
+# 		include "windows/spinlock.c"
+# 	else
+# 		include "unix/spinlock.c"
+# 	endif 
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
 
-/*!init the platform
- *
- * @return tb_true or tb_false
- */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
-
-/// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
-
+#ifdef TB_CONFIG_SPINLOCK_ATOMIC_ENABLE
+tb_handle_t tb_spinlock_init()
+{
+	return (tb_handle_t)tb_malloc0(sizeof(tb_atomic_t));
+}
+tb_void_t tb_spinlock_exit(tb_handle_t handle)
+{
+	if (handle) tb_free(handle);
+}
 #endif
+

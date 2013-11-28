@@ -5,6 +5,7 @@ include $(PRO_DIR)/prefix.mak
 NAMES = \
 		file \
 		path \
+		lock \
 		event \
 		epool \
 		utils \
@@ -13,6 +14,7 @@ NAMES = \
 		atomic \
 		tstore \
 		process \
+		barrier \
 		atomic64 \
 		semaphore \
 		backtrace \

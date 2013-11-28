@@ -17,53 +17,23 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		barrier.h
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_COMPILER_GCC_BARRIER_H
+#define TB_PLATFORM_COMPILER_GCC_BARRIER_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "ctime.h"
-#include "timer.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * macros
  */
 
-/*!init the platform
- *
- * @return tb_true or tb_false
- */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
-
-/// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
+#ifndef tb_barrier
+# 	define tb_barrier() 		__sync_synchronize()
+#endif
 
 #endif
