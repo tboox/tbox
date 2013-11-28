@@ -26,7 +26,8 @@
  * includes
  */
 #include "../sched.h"
-#ifdef TB_CONFIG_OS_LINUX
+#if defined(TB_CONFIG_OS_LINUX) || \
+		defined(TB_CONFIG_OS_ANDROID)
 # 	include <sched.h>
 #else
 # 	include <pthread.h>
@@ -37,7 +38,8 @@
  */
 tb_bool_t tb_sched_yield()
 {
-#ifdef TB_CONFIG_OS_LINUX
+#if defined(TB_CONFIG_OS_LINUX) || \
+		defined(TB_CONFIG_OS_ANDROID)
 	return !sched_yield()? tb_true : tb_false;
 #else
 	return !pthread_yield()? tb_true : tb_false;

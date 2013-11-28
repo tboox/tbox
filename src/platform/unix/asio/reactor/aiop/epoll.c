@@ -67,7 +67,9 @@ static tb_bool_t tb_aiop_reactor_epoll_addo(tb_aiop_reactor_t* reactor, tb_aioo_
 	struct epoll_event e = {0};
 	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
 	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+#ifdef EPOLLONESHOT // FIXME: no oneshot for android
 	if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
+#endif
 	e.data.u64 = (tb_hize_t)aioo;
 	return (epoll_ctl(rtor->epfd, EPOLL_CTL_ADD, ((tb_long_t)aioo->handle) - 1, &e) < 0)? tb_false : tb_true;
 }
@@ -101,7 +103,9 @@ static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_
 	struct epoll_event e = {0};
 	if (code & TB_AIOE_CODE_RECV || code & TB_AIOE_CODE_ACPT) e.events |= EPOLLIN;
 	if (code & TB_AIOE_CODE_SEND || code & TB_AIOE_CODE_CONN) e.events |= EPOLLOUT;
+#ifdef EPOLLONESHOT // FIXME: no oneshot for android
 	if (code & TB_AIOE_CODE_ONESHOT) e.events |= EPOLLONESHOT;
+#endif
 	e.data.u64 = (tb_hize_t)aioo;
 
 	// save aioo
