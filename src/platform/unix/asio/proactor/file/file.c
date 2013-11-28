@@ -60,7 +60,7 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* list, tb_s
 	tb_assert_and_check_return_val(ptor && list && size, tb_false);
 	
 	// enter 
-	if (ptor->mutx) tb_mutex_enter(ptor->mutx);
+	if (ptor->lock) tb_spinlock_enter(ptor->lock);
 
 	// walk list
 	tb_size_t i = 0;
@@ -91,7 +91,7 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* list, tb_s
 	}
 
 	// leave 
-	if (ptor->mutx) tb_mutex_leave(ptor->mutx);
+	if (ptor->lock) tb_spinlock_leave(ptor->lock);
 
 	// ok?
 	return ok;

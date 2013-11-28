@@ -46,7 +46,7 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 	tb_assert_and_check_return_val(aicp && handle && type, tb_null);
 
 	// enter 
-	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+	if (aicp->lock) tb_spinlock_enter(aicp->lock);
 
 	// make aico
 	tb_aico_t* aico = aicp->pool? (tb_aico_t*)tb_rpool_malloc0(aicp->pool) : tb_null;
@@ -59,7 +59,7 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 	}
 
 	// leave 
-	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+	if (aicp->lock) tb_spinlock_leave(aicp->lock);
 	
 	// ok?
 	return aico;
@@ -70,13 +70,13 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t const* aico)
 	tb_assert_and_check_return(aicp);
 
 	// enter 
-	if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+	if (aicp->lock) tb_spinlock_enter(aicp->lock);
 
 	// exit it
 	if (aico) tb_rpool_free(aicp->pool, aico);
 
 	// leave 
-	if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+	if (aicp->lock) tb_spinlock_leave(aicp->lock);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -99,9 +99,9 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	aicp->ptor = tb_aicp_proactor_init(aicp);
 	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
 
-	// init mutx
-	aicp->mutx = tb_mutex_init();
-	tb_assert_and_check_goto(aicp->mutx, fail);
+	// init lock
+	aicp->lock = tb_spinlock_init();
+	tb_assert_and_check_goto(aicp->lock, fail);
 
 	// init pool
 	aicp->pool = tb_rpool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
@@ -134,14 +134,14 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		}
 
 		// exit pool
-		if (aicp->mutx) tb_mutex_enter(aicp->mutx);
+		if (aicp->lock) tb_spinlock_enter(aicp->lock);
 		if (aicp->pool) tb_rpool_exit(aicp->pool);
 		aicp->pool = tb_null;
-		if (aicp->mutx) tb_mutex_leave(aicp->mutx);
+		if (aicp->lock) tb_spinlock_leave(aicp->lock);
 
-		// exit mutx
-		if (aicp->mutx) tb_mutex_exit(aicp->mutx);
-		aicp->mutx = tb_null;
+		// exit lock
+		if (aicp->lock) tb_spinlock_exit(aicp->lock);
+		aicp->lock = tb_null;
 
 		// free aicp
 		tb_free(aicp);

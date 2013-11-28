@@ -368,9 +368,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// done loop
 	loop[0] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[1] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[2] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
-//	loop[3] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
+	loop[1] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
+	loop[2] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
+	loop[3] = tb_thread_init(tb_null, tb_demo_loop_thread, aicp, 0);
 
 	// wait exit
 	getchar();

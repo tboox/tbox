@@ -46,7 +46,7 @@ typedef struct __tb_printf_t
 	// the mode
 	tb_size_t 		mode;
 
-	// the mutex 
+	// the mutx 
 	tb_handle_t 	mutx;
 
 	// the file
