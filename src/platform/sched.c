@@ -17,53 +17,23 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		sched.c
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "epool.h"
-#include "ctime.h"
-#include "timer.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "printf.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
+#include "sched.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
+#if defined(TB_CONFIG_OS_LINUX) || \
+		defined(TB_CONFIG_OS_MAC) || \
+			defined(TB_CONFIG_OS_IOS) || \
+				defined(TB_CONFIG_OS_ANDROID) \
 
-/*!init the platform
- *
- * @return tb_true or tb_false
- */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
-
-/// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
-
+# 	include "unix/sched.c"
 #endif

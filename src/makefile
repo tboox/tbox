@@ -215,8 +215,10 @@ tbox_C_FILES 			+= \
 						platform/path \
 						platform/ctime \
 						platform/timer \
+						platform/sched \
 						platform/printf \
 						platform/tstore \
+						platform/spinlock \
 						platform/platform \
 						platform/backtrace \
 						platform/$(TB_CONFIG_API_DNS)/dns \
@@ -332,26 +334,32 @@ INC_FILES 				= \
 						platform/epool.h \
 						platform/printf.h \
 						platform/atomic.h \
+						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \
+						platform/spinlock.h \
 						platform/atomic64.h \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
+						platform/compiler/gcc/barrier.h \
 						platform/compiler/gcc/atomic.h \
 						platform/compiler/gcc/atomic64.h \
 						platform/arch/prefix.h \
 						platform/arch/atomic.h \
+						platform/arch/barrier.h \
 						platform/arch/x86/prefix.h \
 						platform/arch/x86/atomic.h \
+						platform/arch/x86/barrier.h \
 						platform/arch/arm/prefix.h \
 						platform/arch/arm/atomic.h \
 						platform/arch/sh4/prefix.h \
 						platform/arch/sh4/atomic.h \
 						platform/windows/prefix.h \
 						platform/windows/atomic.h \
+						platform/windows/barrier.h \
 						platform/windows/atomic64.h \
 						platform/windows/exception.h \
 						platform/unix/prefix.h \
