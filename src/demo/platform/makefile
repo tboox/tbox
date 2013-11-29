@@ -11,6 +11,7 @@ NAMES = \
 		utils \
 		ctime \
 		timer \
+		ltimer \
 		atomic \
 		tstore \
 		process \

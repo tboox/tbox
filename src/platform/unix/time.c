@@ -54,14 +54,14 @@ tb_hong_t tb_mclock()
 {
 	tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+	return ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
 tb_hong_t tb_uclock()
 {
 	tb_timeval_t tv = {0};
     if (!tb_gettimeofday(&tv, tb_null)) return -1;
-	return (tv.tv_sec * 1000000 + tv.tv_usec);
+	return ((tb_hong_t)tv.tv_sec * 1000000 + tv.tv_usec);
 }
 
 tb_bool_t tb_gettimeofday(tb_timeval_t* tv, tb_timezone_t* tz)

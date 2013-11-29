@@ -39,14 +39,14 @@
  *
  * @return 			the old ctime value
  */
-tb_time_t 			tb_ctime_spak(tb_noarg_t);
+tb_hong_t 			tb_ctime_spak(tb_noarg_t);
 
-/*! the time as the number of seconds since the epoch, 1970-01-01 00:00:00 +0000 (utc)
+/*! the time as the number of ms since the epoch
  *
- * cache time, lower accuracy and faster than tb_time
+ * cache time, lower accuracy and faster
  *
  * @return 			the now ctime value
  */
-tb_time_t 			tb_ctime_time(tb_noarg_t);
+tb_hong_t 			tb_ctime_time(tb_noarg_t);
 
 #endif

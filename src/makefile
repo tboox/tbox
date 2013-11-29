@@ -214,8 +214,9 @@ endif
 tbox_C_FILES 			+= \
 						platform/path \
 						platform/ctime \
-						platform/timer \
 						platform/sched \
+						platform/timer \
+						platform/ltimer \
 						platform/printf \
 						platform/tstore \
 						platform/spinlock \
@@ -323,10 +324,11 @@ INC_FILES 				= \
 						platform/file.h \
 						platform/path.h \
 						platform/time.h \
-						platform/timer.h \
 						platform/ctime.h \
 						platform/utils.h \
 						platform/mutex.h \
+						platform/timer.h \
+						platform/ltimer.h \
 						platform/tstore.h \
 						platform/thread.h \
 						platform/socket.h \

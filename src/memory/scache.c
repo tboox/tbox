@@ -50,7 +50,7 @@ static tb_handle_t 		g_lock = tb_null;
 tb_bool_t tb_scache_init(tb_size_t align)
 {
 	// init lock
-	if (!g_lock) g_lock = tb_mutex_init();
+	if (!g_lock) g_lock = tb_spinlock_init();
 	tb_assert_and_check_return_val(g_lock, tb_false);
 
 	// init pool
@@ -72,7 +72,7 @@ tb_void_t tb_scache_exit()
 #endif
 
 	// enter
-	if (g_lock) tb_mutex_enter(g_lock);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// exit hash
 	if (g_hash) tb_hash_exit(g_hash);
@@ -83,16 +83,16 @@ tb_void_t tb_scache_exit()
 	g_pool = tb_null;
 
 	// leave
-	if (g_lock) tb_mutex_leave(g_lock);
+	if (g_lock) tb_spinlock_leave(g_lock);
 
 	// exit lock
-	if (g_lock) tb_mutex_exit(g_lock);
+	if (g_lock) tb_spinlock_exit(g_lock);
 	g_lock = tb_null;
 }
 tb_void_t tb_scache_clear()
 {
 	// enter
-	if (g_lock) tb_mutex_enter(g_lock);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// clear hash
 	if (g_hash) tb_hash_clear(g_hash);
@@ -101,7 +101,7 @@ tb_void_t tb_scache_clear()
 	if (g_pool) tb_spool_clear(g_pool);
 
 	// leave
-	if (g_lock) tb_mutex_leave(g_lock);
+	if (g_lock) tb_spinlock_leave(g_lock);
 }
 tb_char_t const* tb_scache_put(tb_char_t const* data)
 {
@@ -109,7 +109,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// enter
-	if (g_lock) tb_mutex_enter(g_lock);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// done
 	tb_char_t const* cstr = tb_null;
@@ -150,7 +150,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 	}
 
 	// leave
-	if (g_lock) tb_mutex_leave(g_lock);
+	if (g_lock) tb_spinlock_leave(g_lock);
 
 	// ok?
 	return cstr;
@@ -161,7 +161,7 @@ tb_void_t tb_scache_del(tb_char_t const* data)
 	tb_assert_and_check_return(data);
 
 	// enter
-	if (g_lock) tb_mutex_enter(g_lock);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// done
 	tb_hash_item_t const* item = tb_null;
@@ -182,13 +182,13 @@ tb_void_t tb_scache_del(tb_char_t const* data)
 	}
 
 	// leave
-	if (g_lock) tb_mutex_leave(g_lock);
+	if (g_lock) tb_spinlock_leave(g_lock);
 }
 #ifdef __tb_debug__
 tb_void_t tb_scache_dump()
 {
 	// enter
-	if (g_lock) tb_mutex_enter(g_lock);
+	if (g_lock) tb_spinlock_enter(g_lock);
 
 	// dump hash
 	if (g_hash && tb_hash_size(g_hash))
@@ -208,6 +208,6 @@ tb_void_t tb_scache_dump()
 	}
 
 	// leave
-	if (g_lock) tb_mutex_leave(g_lock);
+	if (g_lock) tb_spinlock_leave(g_lock);
 }
 #endif
