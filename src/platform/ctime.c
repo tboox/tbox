@@ -26,6 +26,7 @@
  * includes
  */
 #include "ctime.h"
+#include "time.h"
 #include "atomic64.h"
 #include "../libc/libc.h"
 
@@ -39,12 +40,20 @@ static tb_atomic64_t 	g_time = 0;
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_time_t tb_ctime_spak(tb_noarg_t)
+tb_hong_t tb_ctime_spak(tb_noarg_t)
 {
-	return (tb_time_t)tb_atomic64_fetch_and_set(&g_time, (tb_hong_t)tb_time());
+	// get the time
+	tb_timeval_t tv = {0};
+    if (!tb_gettimeofday(&tv, tb_null)) return -1;
+
+	// the time value
+	tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
+
+	// save it
+	return (tb_hong_t)tb_atomic64_fetch_and_set(&g_time, val);
 }
-tb_time_t tb_ctime_time(tb_noarg_t)
+tb_hong_t tb_ctime_time(tb_noarg_t)
 {
-	return (tb_time_t)tb_atomic64_get(&g_time);
+	return (tb_hong_t)tb_atomic64_get(&g_time);
 }
 

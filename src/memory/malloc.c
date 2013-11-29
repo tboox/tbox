@@ -28,66 +28,93 @@
 #include "gpool.h"
 #include "../platform/platform.h"
 
+
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_handle_t g_gpool = tb_null;
-static tb_handle_t g_mutex = tb_null; 
+
+// the pool
+static tb_handle_t g_pool = tb_null;
+
+// the lock
+static tb_atomic_t g_lock = 0; 
+
+/* ///////////////////////////////////////////////////////////////////////
+ * locker
+ */
+static __tb_inline_force__ tb_void_t tb_malloc_lock_enter(tb_noarg_t)
+{
+	// init tryn
+	__tb_volatile__ tb_size_t tryn = 5;
+
+	// lock it
+	while (tb_atomic_fetch_and_pset(&g_lock, 0, 1))
+	{
+		if (!tryn--)
+		{
+			// yield the processor
+			tb_sched_yield();
+//			tb_usleep(1);
+
+			// reset tryn
+			tryn = 5;
+		}
+	}
+}
+static __tb_inline_force__ tb_size_t tb_malloc_lock_enter_try(tb_noarg_t)
+{
+	// try lock it
+	return !tb_atomic_fetch_and_pset(&g_lock, 0, 1);
+}
+static __tb_inline_force__ tb_void_t tb_malloc_lock_leave(tb_noarg_t)
+{
+    g_lock = 0;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_malloc_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
+	// check
 	tb_assert_and_check_return_val(data && size, tb_false);
 
-	// init mutex
-	if (!g_mutex) g_mutex = tb_mutex_init();
-	tb_assert_and_check_return_val(g_mutex, tb_false);
-
-	// init gpool
-	if (!tb_mutex_enter(g_mutex)) return tb_false;
-	if (!g_gpool) g_gpool = tb_gpool_init(data, size, align);
-	if (!tb_mutex_leave(g_mutex)) return tb_false;
+	// init pool
+	tb_bool_t ok = tb_false;
+	tb_malloc_lock_enter();
+	if (!g_pool) g_pool = tb_gpool_init(data, size, align);
+	if (g_pool) ok = tb_true;
+	tb_malloc_lock_leave();
 
 	// ok?
-	return g_gpool? tb_true : tb_false;
+	return ok;
 }
 tb_void_t tb_malloc_exit()
 {
-	// exit gpool
-	if (g_mutex && tb_mutex_enter(g_mutex))
-	{
-		if (g_gpool)
-		{
-			tb_gpool_exit(g_gpool);
-			g_gpool = tb_null;
-		}
-		if (g_mutex) tb_mutex_leave(g_mutex);
-	}
+	// exit pool
+	tb_malloc_lock_enter();
+	if (g_pool) tb_gpool_exit(g_pool);
+	g_pool = tb_null;
+	tb_malloc_lock_leave();
 
-	// exit mutex
-	if (g_mutex)	
-	{
-		tb_mutex_exit(g_mutex);
-		g_mutex = tb_null;
-	}
+	// exit lock
+	g_lock = 0;
 }
 #ifdef __tb_debug__
 tb_size_t tb_malloc_data_size(tb_cpointer_t data)
 {
 	// check 
-	tb_check_return_val(g_gpool && g_mutex, 0);
+	tb_check_return_val(g_pool, 0);
 
-	// try to enter, ensure outside the gpool
+	// try to enter, ensure outside the pool
 	tb_size_t size = 0;
-	if (tb_mutex_enter_try(g_mutex))
+	if (tb_malloc_lock_enter_try())
 	{
 		// size
-		size = tb_gpool_data_size(g_gpool, data);
+		size = tb_gpool_data_size(g_pool, data);
 
 		// leave
-		tb_mutex_leave(g_mutex);
+		tb_malloc_lock_leave();
 	}
 
 	// ok?
@@ -96,32 +123,31 @@ tb_size_t tb_malloc_data_size(tb_cpointer_t data)
 tb_void_t tb_malloc_data_dump(tb_cpointer_t data, tb_char_t const* prefix)
 {
 	// check 
-	tb_check_return(g_gpool && g_mutex);
+	tb_check_return(g_pool);
 
-	// try to enter, ensure outside the gpool
-	if (tb_mutex_enter_try(g_mutex))
+	// try to enter, ensure outside the pool
+	if (tb_malloc_lock_enter_try())
 	{
 		// dump
-		tb_gpool_data_dump(g_gpool, data, prefix);
+		tb_gpool_data_dump(g_pool, data, prefix);
 
 		// leave
-		tb_mutex_leave(g_mutex);
+		tb_malloc_lock_leave();
 	}
 }
 tb_void_t tb_malloc_dump()
 {
 	// check 
-	tb_assert_and_check_return(g_gpool && g_mutex);
+	tb_assert_and_check_return(g_pool);
 
 	// enter
-	if (tb_mutex_enter(g_mutex)) 
-	{
-		// dump
-		tb_gpool_dump(g_gpool);
+	tb_malloc_lock_enter();
+	
+	// dump
+	tb_gpool_dump(g_pool);
 
-		// leave
-		tb_mutex_leave(g_mutex);
-	}
+	// leave
+	tb_malloc_lock_leave();
 }
 #endif
 #ifndef __tb_debug__
@@ -131,22 +157,22 @@ tb_pointer_t tb_malloc_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
+	tb_assert_and_check_return_val(g_pool, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_null;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size);
+	tb_byte_t* p = tb_gpool_malloc_impl(g_pool, size);
 #else
-	tb_byte_t* p = tb_gpool_malloc_impl(g_gpool, size, func, line, file);
+	tb_byte_t* p = tb_gpool_malloc_impl(g_pool, size, func, line, file);
 #endif
 
 	// check
 	tb_assert(p);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 	return p;
 }
 
@@ -157,22 +183,22 @@ tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
+	tb_assert_and_check_return_val(g_pool, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_null;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size);
+	tb_byte_t* p = tb_gpool_malloc0_impl(g_pool, size);
 #else
-	tb_byte_t* p = tb_gpool_malloc0_impl(g_gpool, size, func, line, file);
+	tb_byte_t* p = tb_gpool_malloc0_impl(g_pool, size, func, line, file);
 #endif
 
 	// check
 	tb_assert(p);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 	return p;
 }
 
@@ -183,22 +209,22 @@ tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
+	tb_assert_and_check_return_val(g_pool, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_null;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size);
+	tb_byte_t* p = tb_gpool_nalloc_impl(g_pool, item, size);
 #else
-	tb_byte_t* p = tb_gpool_nalloc_impl(g_gpool, item, size, func, line, file);
+	tb_byte_t* p = tb_gpool_nalloc_impl(g_pool, item, size, func, line, file);
 #endif
 
 	// check
 	tb_assert(p);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 	return p;
 }
 
@@ -209,22 +235,22 @@ tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
+	tb_assert_and_check_return_val(g_pool, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_null;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size);
+	tb_byte_t* p = tb_gpool_nalloc0_impl(g_pool, item, size);
 #else
-	tb_byte_t* p = tb_gpool_nalloc0_impl(g_gpool, item, size, func, line, file);
+	tb_byte_t* p = tb_gpool_nalloc0_impl(g_pool, item, size, func, line, file);
 #endif
 
 	// check
 	tb_assert(p);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 	return p;
 }
 
@@ -235,22 +261,22 @@ tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_null);
+	tb_assert_and_check_return_val(g_pool, tb_null);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_null;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size);
+	tb_byte_t* p = tb_gpool_ralloc_impl(g_pool, data, size);
 #else
-	tb_byte_t* p = tb_gpool_ralloc_impl(g_gpool, data, size, func, line, file);
+	tb_byte_t* p = tb_gpool_ralloc_impl(g_pool, data, size, func, line, file);
 #endif
 
 	// check
 	tb_assert(p);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 	return p;
 }
 
@@ -261,22 +287,22 @@ tb_bool_t tb_malloc_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(g_gpool && g_mutex, tb_false);
+	tb_assert_and_check_return_val(g_pool, tb_false);
 
 	// enter
-	if (!tb_mutex_enter(g_mutex)) return tb_false;
+	tb_malloc_lock_enter();
 
 #ifndef __tb_debug__
-	tb_bool_t r = tb_gpool_free_impl(g_gpool, data);
+	tb_bool_t r = tb_gpool_free_impl(g_pool, data);
 #else
-	tb_bool_t r = tb_gpool_free_impl(g_gpool, data, func, line, file);
+	tb_bool_t r = tb_gpool_free_impl(g_pool, data, func, line, file);
 #endif
 
 	// check
 	tb_assert(r);
 
 	// leave
-	tb_mutex_leave(g_mutex);
+	tb_malloc_lock_leave();
 
 	// ok
 	return r;

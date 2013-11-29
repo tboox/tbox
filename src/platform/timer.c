@@ -328,10 +328,10 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 	while (!tb_atomic_get(&timer->stop))
 	{
 		// the timeout
-		tb_long_t timeout = tb_timer_timeout(handle);
+		tb_size_t timeout = tb_timer_timeout(handle);
 			
 		// wait some time
-		if (timeout) tb_msleep((tb_size_t)timeout);
+		if (timeout) tb_msleep(timeout);
 
 		// spak ctime
 		tb_ctime_spak();

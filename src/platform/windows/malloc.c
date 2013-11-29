@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../mutex.h"
+#include "../sched.h"
 #include "../atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -35,8 +35,8 @@
 // the heap
 static tb_handle_t g_heap = tb_null;
 
-// the mutex
-static tb_handle_t g_mutex = tb_null;
+// the lock
+static tb_atomic_t g_lock = 0; 
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
@@ -47,70 +47,83 @@ tb_void_t tb_malloc_exit(tb_noarg_t);
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
+ * locker
+ */
+static __tb_inline_force__ tb_void_t tb_malloc_lock_enter(tb_noarg_t)
+{
+	// init tryn
+	__tb_volatile__ tb_size_t tryn = 5;
+
+	// lock it
+	while (tb_atomic_fetch_and_pset(&g_lock, 0, 1))
+	{
+		if (!tryn--)
+		{
+			// yield the processor
+			tb_sched_yield();
+//			tb_usleep(1);
+
+			// reset tryn
+			tryn = 5;
+		}
+	}
+}
+static __tb_inline_force__ tb_size_t tb_malloc_lock_enter_try(tb_noarg_t)
+{
+	// try lock it
+	return !tb_atomic_fetch_and_pset(&g_lock, 0, 1);
+}
+static __tb_inline_force__ tb_void_t tb_malloc_lock_leave(tb_noarg_t)
+{
+    g_lock = 0;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_malloc_init()
 {	
-	// init mutex?
-	if (!tb_atomic_get((tb_atomic_t*)&g_mutex))
-	{
-		// init mutex
-		tb_handle_t mutex = tb_mutex_init();
-		tb_assert_and_check_return_val(mutex, tb_null);
-		
-		// exit mutex if the mutex have been inited already
-		if (tb_atomic_fetch_and_set((tb_atomic_t*)&g_mutex, mutex))
-			tb_mutex_exit(mutex);
-	}
-
-	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
-
 	// init heap
+	tb_bool_t ok = tb_false;
+	tb_malloc_lock_enter();
 	if (!g_heap) g_heap = (tb_handle_t)HeapCreate(0, 0, 0);
-
-	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	if (g_heap) ok = tb_true;
+	tb_malloc_lock_leave();
 
 	// ok?
-	return g_heap? tb_true : tb_false;
+	return ok;
 }
 tb_void_t tb_malloc_exit()
 {	
-	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	// enter 
+	tb_malloc_lock_enter();
 
 	// exit heap
 	if (g_heap) HeapDestroy(g_heap);
 	g_heap = tb_null;
 
-	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	// leave
+	tb_malloc_lock_leave();
 
-	// exit mutex
-	tb_handle_t mutex = g_mutex;
-	if (tb_atomic_fetch_and_set0((tb_atomic_t*)&g_mutex))
-		tb_mutex_exit(mutex);
+	// exit lock
+	g_lock = 0;
 }
 tb_pointer_t tb_malloc(tb_size_t size)
 {
 	// check
 	tb_check_return_val(size, tb_null);
 
-	// init malloc?
-	if (!tb_malloc_init()) return tb_null;
-
 	// init data
 	tb_pointer_t data = tb_null;
 
-	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	// enter 
+	tb_malloc_lock_enter();
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, 0, (SIZE_T)size);
 
-	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	// leave
+	tb_malloc_lock_leave();
 
 	// ok?
 	return data;
@@ -120,20 +133,17 @@ tb_pointer_t tb_malloc0(tb_size_t size)
 	// check
 	tb_check_return_val(size, tb_null);
 
-	// init malloc?
-	if (!tb_malloc_init()) return tb_null;
-
 	// init data
 	tb_pointer_t data = tb_null;
 
-	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	// enter 
+	tb_malloc_lock_enter();
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, HEAP_ZERO_MEMORY, (SIZE_T)size);
 
-	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	// leave
+	tb_malloc_lock_leave();
 
 	// ok?
 	return data;
@@ -158,14 +168,14 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 	else if (!data) return tb_malloc(size);
 	else 
 	{
-		// enter mutex
-		if (g_mutex) tb_mutex_enter(g_mutex);
+		// enter 
+		tb_malloc_lock_enter();
 
 		// realloc
 		if (g_heap) data = (tb_pointer_t)HeapReAlloc((HANDLE)g_heap, 0, data, (SIZE_T)size);
 
-		// leave mutex
-		if (g_mutex) tb_mutex_leave(g_mutex);
+		// leave
+		tb_malloc_lock_leave();
 
 		// ok?
 		return data;
@@ -173,13 +183,13 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 }
 tb_void_t tb_free(tb_pointer_t data)
 {
-	// enter mutex
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	// enter 
+	tb_malloc_lock_enter();
 
 	// free data
 	if (g_heap && data) HeapFree((HANDLE)g_heap, 0, data);
 
-	// leave mutex
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	// leave
+	tb_malloc_lock_leave();
 }
 
