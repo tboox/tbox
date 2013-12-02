@@ -36,12 +36,12 @@
 /// the timer percision enum
 typedef enum __tb_ltimer_precision_e
 {
-	TB_LTIMER_PRECISION_MS 		= (1 << 0)
-,	TB_LTIMER_PRECISION_10MS 	= (1 << 3)
-,	TB_LTIMER_PRECISION_100MS 	= (1 << 6)
-,	TB_LTIMER_PRECISION_S 		= (1 << 9)
-,	TB_LTIMER_PRECISION_M 		= (1 << 15)
-,	TB_LTIMER_PRECISION_H 		= (1 << 21)
+	TB_LTIMER_PRECISION_MS 		= 0 	//!< (1 << 0)
+,	TB_LTIMER_PRECISION_10MS 	= 3 	//!< (1 << 3)
+,	TB_LTIMER_PRECISION_100MS 	= 6 	//!< (1 << 6)
+,	TB_LTIMER_PRECISION_S 		= 9 	//!< (1 << 9)
+,	TB_LTIMER_PRECISION_M 		= 15 	//!< (1 << 15)
+,	TB_LTIMER_PRECISION_H 		= 21 	//!< (1 << 21)
 
 }tb_ltimer_precision_e;
 
@@ -87,9 +87,9 @@ tb_size_t 			tb_ltimer_precision(tb_handle_t handle);
  *
  * @param handle	the timer handle
  *
- * @return 			the timer limit range: [now, limit)
+ * @return 			the timer limit range: [now, now + limit)
  */
-tb_hong_t 			tb_ltimer_limit(tb_handle_t handle);
+tb_size_t 			tb_ltimer_limit(tb_handle_t handle);
 
 /*! the timer timeout for spak 
  *
@@ -136,7 +136,39 @@ tb_bool_t 			tb_ltimer_spak(tb_handle_t handle);
  */
 tb_void_t 			tb_ltimer_loop(tb_handle_t handle);
 
-/*! run timer task after timeout
+/*! run timer task after timeout and will be auto-remove it after be expired
+ *
+ * @param handle	the timer handle
+ * @param period 	the period time, ms
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ */
+tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data);
+
+/*! run timer task at the absolute time and will be auto-remove it after be expired
+ *
+ * @param handle	the timer handle
+ * @param when 		the absolute time, ms
+ * @param period 	the period time, ms
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ */
+tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
+
+/*! run timer task after the relative time and will be auto-remove it after be expired
+ *
+ * @param handle	the timer handle
+ * @param after 	the after time, ms
+ * @param period 	the period time, ms
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ */
+tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
+
+/*! add and run timer task after timeout and need remove it manually
  *
  * @param handle	the timer handle
  * @param period 	the period time, ms
@@ -145,9 +177,9 @@ tb_void_t 			tb_ltimer_loop(tb_handle_t handle);
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data);
 
-/*! run timer task at the absolute time
+/*! add and run timer task at the absolute time and need remove it manually
  *
  * @param handle	the timer handle
  * @param when 		the absolute time, ms
@@ -157,9 +189,9 @@ tb_handle_t 		tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_ltime
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
 
-/*! run timer task after the relative time
+/*! add and run timer task after the relative time and need remove it manually
  *
  * @param handle	the timer handle
  * @param after 	the after time, ms
@@ -169,7 +201,7 @@ tb_handle_t 		tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data);
 
 /*! del timer task
  *

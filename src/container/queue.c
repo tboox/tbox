@@ -132,10 +132,10 @@ static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t l
 	tb_assert_and_check_return_val(queue && queue->func.comp, 0);
 	return queue->func.comp(&queue->func, ltem, rtem);
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
 tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 {
 	// check

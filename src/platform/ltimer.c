@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 				"ltimer"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "platform.h"
@@ -33,9 +38,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-
-// FIXME: the timer default timeout, 1s
-#define TB_TIMER_TIMEOUT_DEFAULT 		(1000)
 
 // the timer wheel maxn
 #ifdef __tb_small__
@@ -57,11 +59,14 @@ typedef struct __tb_ltimer_task_t
 	// the data
 	tb_pointer_t 				data;
 
-	// the when, -1: canceled
-	tb_atomic_t 				when;
+	// the when
+	tb_hong_t 					when;
 
 	// the period
-	tb_size_t 					period;
+	tb_uint32_t 				period 	: 30;
+
+	// the refn, <= 2
+	tb_uint32_t 				refn 	: 2;
 
 }tb_ltimer_task_t;
 
@@ -72,8 +77,11 @@ typedef struct __tb_ltimer_task_t
  * precision: 1ms
  *
  *          1ms   1ms   ..
- * wheel: |-----|-----|-----|-----|-----|-----|---- ... -----|
- *                           timeout
+ * wheel: |-----|-----|-----|-----|-----|-----|---- ... -----|  <= circle queue
+ *                             timers
+ *                    |-----------------------|
+ *                      head              tail
+ *                            timeout
  *                 btime ==================> now
  *                       |     |     |
  *                       |     |     |
@@ -87,8 +95,11 @@ typedef struct __tb_ltimer_t
 	// the maxn
 	tb_size_t 					maxn;
 
-	// is stop?
+	// is stoped?
 	tb_atomic_t 				stop;
+
+	// is worked?
+	tb_atomic_t 				work;
 
 	// the base time
 	tb_hong_t 					btime;
@@ -108,10 +119,19 @@ typedef struct __tb_ltimer_t
 	// the wheel
 	tb_vector_t* 				wheel[TB_TIMER_WHEEL_MAXN];
 
+	// the wheel base
+	tb_size_t 					wheel_base;
+
+	// the when minn
+	tb_atomic64_t 				when_minn;
+
+	// the when maxn
+	tb_hong_t 					when_maxn;
+
 }tb_ltimer_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * now
+ * implementation
  */
 static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
 {
@@ -126,14 +146,75 @@ static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
 	// using cached time
 	return tb_ctime_time();
 }
+static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t const* task)
+{
+	// check
+	tb_assert_and_check_return_val(timer && timer->pool, tb_false);
+	tb_assert_and_check_return_val(task && task->func && task->refn && task->when, tb_false);
+
+	// trace
+	tb_trace_impl("add: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// empty? update the time base
+		if (!tb_rpool_size(timer->pool)) 
+		{
+			timer->btime = tb_ltimer_now(timer);
+			timer->wheel_base = 0;
+		}
+		tb_trace_impl("add: btime: %lld, wheel_base: %lu", timer->btime, timer->wheel_base);
+
+		// the timer difference
+		tb_hong_t tdiff = task->when - timer->btime;
+		tb_assert_and_check_break(tdiff >= 0);
+		tb_trace_impl("add: tdiff: %lld", tdiff);
+
+		// the wheel difference
+		tb_size_t wdiff = (tb_size_t)(tdiff >> timer->precision);
+		tb_assert_and_check_break(wdiff < TB_TIMER_WHEEL_MAXN);
+		tb_trace_impl("add: wdiff: %lu", wdiff);
+
+		// the wheel index
+		tb_size_t windx = (timer->wheel_base + wdiff) & (TB_TIMER_WHEEL_MAXN - 1);
+		tb_trace_impl("add: windx: %lu", windx);
+
+		// the wheel list
+		tb_vector_t* wlist = timer->wheel[windx];
+		if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_TIMER_WHEEL_MAXN) + 16, tb_item_func_ptr(tb_null, tb_null));
+		tb_assert_and_check_break(wlist);
+
+		// add task to the wheel list
+		tb_vector_insert_tail(wlist, task);
+
+		// update when maxn
+		if (timer->when_maxn < 0 || task->when > timer->when_maxn) timer->when_maxn = task->when;
+
+		// update when minn and using atomic sync for tb_ltimer_timeout
+		if (timer->when_minn < 0 || task->when < timer->when_minn) tb_atomic64_set(&timer->when_minn, task->when);
+
+		// trace
+		tb_trace_impl("add: when_maxn: %lu", timer->when_maxn);
+		tb_trace_impl("add: when_minn: %lu", timer->when_minn);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
 tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t precision, tb_bool_t ctime)
 {
 	// check
-	tb_assert_and_check_return_val(maxn && precision && tb_ispow2(precision), tb_null);
+	tb_assert_and_check_return_val(maxn && precision < 32, tb_null);
 
 	// make timer
 	tb_ltimer_t* timer = tb_malloc0(sizeof(tb_ltimer_t));
@@ -144,6 +225,8 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t precision, tb_bool_t ctime)
 	timer->ctime 		= ctime;
 	timer->precision 	= precision;
 	timer->btime 		= tb_ltimer_now(timer);
+	timer->when_minn 	= -1;
+	timer->when_maxn 	= -1;
 
 	// init lock
 	timer->lock 		= tb_spinlock_init();
@@ -166,6 +249,13 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 	{
 		// stop it
 		tb_atomic_set(&timer->stop, 1);
+
+		// wait loop exit
+		tb_size_t tryn = 10;
+		while (tb_atomic_get(&timer->work) && tryn--) tb_msleep(500);
+
+		// warning
+		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[ltimer]: the loop has been not exited now!");
 
 		// enter
 		if (timer->lock) tb_spinlock_enter(timer->lock);
@@ -204,42 +294,163 @@ tb_size_t tb_ltimer_precision(tb_handle_t handle)
 	// the timer precision
 	return timer->precision;
 }
-tb_hong_t tb_ltimer_limit(tb_handle_t handle)
+tb_size_t tb_ltimer_limit(tb_handle_t handle)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer, -1);
+	tb_assert_and_check_return_val(timer, 0);
 
 	// the timer limit
-	return timer->btime + (timer->precision * (TB_TIMER_WHEEL_MAXN - 1));
+	return (TB_TIMER_WHEEL_MAXN << timer->precision);
 }
 tb_size_t tb_ltimer_timeout(tb_handle_t handle)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer, TB_TIMER_TIMEOUT_DEFAULT);
+	tb_assert_and_check_return_val(timer, 0);
+
+	// init timeout
+	tb_size_t timeout = 1 << timer->precision;
+
+	// the min when
+	tb_hong_t minn = (tb_hong_t)tb_atomic64_get(&timer->when_minn);
+
+	// the now time
+	tb_hong_t now = tb_ltimer_now(timer);
+
+	// update the lastest timeout if exists task
+	if (minn >= now) timeout = (tb_size_t)(minn - now);
+
+	// trace
+	tb_trace_impl("timeout: %lu", timeout);
 
 	// ok?
-	return 0;
+	return timeout;
 }
 tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer, tb_false);
+	tb_assert_and_check_return_val(timer && timer->pool, tb_false);
 
 	// stoped?
 	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_false);
 
+	// exists task?
+	tb_hong_t when_minn = (tb_hong_t)tb_atomic64_get(&timer->when_minn);
+	tb_check_return_val(when_minn > 0, tb_true);
 
-	// ok
-	return tb_true;
+	// enter
+	if (timer->lock) tb_spinlock_enter(timer->lock);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// trace
+		tb_trace_impl("spak: btime: %lld, wheel_base: %lu", timer->btime, timer->wheel_base);
+
+		// the min when
+		tb_hong_t minn = timer->when_minn;
+		tb_assert_and_check_break(minn > 0 && minn >= timer->btime);
+
+		// the max when
+		tb_hong_t maxn = timer->when_maxn;
+		tb_assert_and_check_break(maxn >= minn);
+
+		// the now time
+		tb_hong_t now = tb_ltimer_now(timer);
+		if (now < maxn) maxn = now;
+
+		// trace
+		tb_trace_impl("spak: when: minn: %lld, maxn: %lld, now: %lld", minn, maxn, now);
+
+		// the diff range
+		tb_size_t diff_minn = (tb_size_t)((minn - timer->btime) >> timer->precision);
+		tb_size_t diff_maxn = (tb_size_t)((maxn - timer->btime) >> timer->precision);
+		tb_assert_and_check_break(diff_minn < TB_TIMER_WHEEL_MAXN && diff_maxn < TB_TIMER_WHEEL_MAXN);
+
+		// trace
+		tb_trace_impl("spak: diff: minn: %lu, maxn: %lu", diff_minn, diff_maxn);
+
+		// walk the expired lists
+		tb_size_t i = 0;
+		for (i = diff_minn; i <= diff_maxn; i++)
+		{
+			// the wheel index
+			tb_size_t indx = (timer->wheel_base + i) & (TB_TIMER_WHEEL_MAXN - 1);
+
+			// the wheel list
+			tb_vector_t* list = timer->wheel[indx];
+			tb_check_continue(list && tb_vector_size(list));
+
+			// walk the wheel list
+			tb_size_t itor = tb_iterator_head(list);
+			tb_size_t tail = tb_iterator_tail(list);
+			for (; itor != tail; itor = tb_iterator_next(list, itor))
+			{
+				// the task
+				tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_iterator_item(list, itor);
+				if (task)
+				{
+					// trace
+					tb_trace_impl("spak: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+
+					// check refn
+					tb_assert(task->refn);
+
+					// done func
+					if (task->func && task->func(task->data))
+					{
+						// update when
+						task->when = now + task->period;
+
+						// continue the task
+						tb_ltimer_add_task(timer, task);
+					}
+					else
+					{
+						// remove it from pool directly
+						if (task->refn == 1) tb_rpool_free(timer->pool, task);
+
+						// refn--
+						if (task->refn) task->refn--;
+					}
+				}
+			}
+
+			// clear the wheel list
+			tb_vector_clear(list);
+		}
+
+		// update the base time
+		timer->btime = now;
+
+		// update the wheel base
+		timer->wheel_base = (timer->wheel_base + diff_maxn) & (TB_TIMER_WHEEL_MAXN - 1);
+		
+		// update the when range
+		// ...
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// leave
+	if (timer->lock) tb_spinlock_leave(timer->lock);
+
+	// ok?
+	return ok;
 }
 tb_void_t tb_ltimer_loop(tb_handle_t handle)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
 	tb_assert_and_check_return(timer);
+
+	// work++
+	tb_atomic_fetch_and_inc(&timer->work);
 
 	// loop
 	while (!tb_atomic_get(&timer->stop))
@@ -256,37 +467,132 @@ tb_void_t tb_ltimer_loop(tb_handle_t handle)
 		// spak it
 		if (!tb_ltimer_spak(handle)) break;
 	}
+
+	// work--
+	tb_atomic_fetch_and_dec(&timer->work);
 }
-tb_handle_t tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
 	tb_assert_and_check_return_val(timer && func, tb_null);
+
+	// add task
+	return tb_ltimer_task_add_at(handle, tb_ltimer_now(timer) + timeout, timeout, func, data);
+}
+tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
+{
+	// check
+	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
+	tb_assert_and_check_return_val(timer && timer->pool && func, tb_null);
+
+	// enter
+	if (timer->lock) tb_spinlock_enter(timer->lock);
+
+	// make task
+	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
+	if (task)
+	{
+		// init task
+		task->refn 		= 2;
+		task->func 		= func;
+		task->data 		= data;
+		task->when 		= when;
+		task->period 	= period;
+
+		// add task
+		if (!tb_ltimer_add_task(timer, task))
+		{
+			tb_rpool_free(timer->pool, task);
+			task = tb_null;
+		}
+	}
+
+	// leave
+	if (timer->lock) tb_spinlock_leave(timer->lock);
+
+	// ok?
+	return task;
+}
+tb_handle_t tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
+{
+	// check
+	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
+	tb_assert_and_check_return_val(timer && func, tb_null);
+
+	// add task
+	return tb_ltimer_task_add_at(handle, tb_ltimer_now(timer) + after, period, func, data);
+}
+tb_void_t tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_ltimer_task_func_t func, tb_pointer_t data)
+{
+	// check
+	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
+	tb_assert_and_check_return(timer && func);
 
 	// run task
-	return tb_ltimer_task_run_at(handle, tb_ltimer_now(timer) + timeout, timeout, func, data);
+	tb_ltimer_task_run_at(handle, tb_ltimer_now(timer) + timeout, timeout, func, data);
 }
-tb_handle_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer && func, tb_null);
+	tb_assert_and_check_return(timer && func);
 
-	return tb_null;
+	// enter
+	if (timer->lock) tb_spinlock_enter(timer->lock);
+
+	// make task
+	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
+	if (task)
+	{
+		// init task
+		task->refn 		= 1;
+		task->func 		= func;
+		task->data 		= data;
+		task->when 		= when;
+		task->period 	= period;
+
+		// add task
+		if (!tb_ltimer_add_task(timer, task))
+			tb_rpool_free(timer->pool, task);
+	}
+
+	// leave
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 }
-tb_handle_t tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_ltimer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer && func, tb_null);
+	tb_assert_and_check_return(timer && func);
 
 	// run task
-	return tb_ltimer_task_run_at(handle, tb_ltimer_now(timer) + after, period, func, data);
+	tb_ltimer_task_run_at(handle, tb_ltimer_now(timer) + after, period, func, data);
 }
-tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t task)
+tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 {
 	// check
-	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return(timer && task);
+	tb_ltimer_t* 		timer = (tb_ltimer_t*)handle;
+	tb_ltimer_task_t* 	task = (tb_ltimer_task_t*)htask;
+	tb_assert_and_check_return(timer && timer->pool && task);
+
+	// trace
+	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+
+	// enter
+	if (timer->lock) tb_spinlock_enter(timer->lock);
+
+	// remove it from pool directly if the task have been expired 
+	if (task->refn == 1) tb_rpool_free(timer->pool, task);
+
+	// refn--
+	if (task->refn) task->refn--;
+
+	// cancel task
+	task->func = tb_null;
+	task->data = tb_null;
+
+	// leave
+	if (timer->lock) tb_spinlock_leave(timer->lock);
 }
 
