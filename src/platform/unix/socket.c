@@ -279,7 +279,7 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_assert_and_check_return_val(handle && data, -1);
 	tb_check_return_val(size, 0);
 
-	// recv
+	// send
 	tb_long_t real = send((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
 
 	// ok?

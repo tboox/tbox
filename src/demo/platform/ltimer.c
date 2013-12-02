@@ -33,15 +33,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init timer
-//	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_MS, tb_false);
-	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_MS, tb_true);
+	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_MS, tb_false);
+//	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_MS, tb_true);
 //	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_S, tb_true);
 //	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_PRECISION_M, tb_true);
 
 	if (timer)
 	{
 		// the limit and precision
-		tb_hong_t limit 		= tb_ltimer_limit(timer);
+		tb_size_t limit 		= tb_ltimer_limit(timer);
 		tb_size_t precision 	= tb_ltimer_precision(timer);
 		switch (precision)
 		{
@@ -55,7 +55,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		}
 
 		// trace
-		tb_print("limit: %lld, precision: %lu", limit, precision);
+		tb_print("limit: %lu, precision: %lu", limit, precision);
 
 		// add task: every
 		tb_ltimer_task_run(timer, 1 * precision, tb_ltimer_task_func, "every");
