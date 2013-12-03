@@ -30,6 +30,8 @@
  * includes
  */
 #include "prefix.h"
+#include "../../../timer.h"
+#include "../../../ltimer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -82,6 +84,9 @@ typedef struct __tb_aicp_proactor_aiop_t
 	// the aioe size
 	tb_size_t 					maxn;
 
+	// the spak timer
+	tb_handle_t					timer;
+
 }tb_aicp_proactor_aiop_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -118,7 +123,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	// check
 	tb_aicp_proactor_aiop_t* 	ptor = (tb_aicp_proactor_aiop_t*)data;
 	tb_aicp_t* 					aicp = ptor? ptor->base.aicp : tb_null;
-	tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && aicp, end);
+	tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && ptor->timer && aicp, end);
 
 	// trace
 	tb_trace_impl("loop: init");
@@ -126,11 +131,17 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	// loop 
 	while (!tb_atomic_get(&aicp->kill))
 	{
+		// the timeout
+		tb_size_t timeout = tb_ltimer_timeout(ptor->timer);
+
 		// wait aioe
-		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, -1);
+		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, timeout);
 
 		// spak ctime
 		tb_ctime_spak();
+
+		// spak timer
+		if (!tb_ltimer_spak(ptor->timer)) break;
 
 		// killed?
 		tb_check_break(real >= 0);
@@ -975,6 +986,10 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 		if (ptor->wait) tb_semaphore_exit(ptor->wait);
 		ptor->wait = tb_null;
 
+		// exit timer
+		if (ptor->timer) tb_ltimer_exit(ptor->timer);
+		ptor->timer = tb_null;
+
 		// exit lock
 		if (ptor->lock) tb_spinlock_exit(ptor->lock);
 		ptor->lock = tb_null;
@@ -1029,7 +1044,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->aiop, fail);
 
 	// init spak
-	ptor->spak = tb_queue_init((aicp->maxn << 2) + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
+	ptor->spak = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
 	tb_assert_and_check_goto(ptor->spak, fail);
 
 	// init file
@@ -1040,6 +1055,10 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->maxn = tb_align8((aicp->maxn >> 3) + 1);
 	ptor->list = tb_nalloc0(ptor->maxn, sizeof(tb_aioe_t));
 	tb_assert_and_check_goto(ptor->list, fail);
+
+	// init timer
+	ptor->timer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+	tb_assert_and_check_goto(ptor->timer, fail);
 
 	// init loop
 	ptor->loop = tb_thread_init(tb_null, tb_aiop_spak_loop, ptor, 0);
