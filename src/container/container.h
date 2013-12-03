@@ -30,6 +30,7 @@
 #include "prefix.h"
 #include "item.h"
 #include "hash.h"
+#include "heap.h"
 #include "slist.h"
 #include "dlist.h"
 #include "queue.h"

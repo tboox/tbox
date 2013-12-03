@@ -31,6 +31,7 @@ tbox_C_FILES 			+= \
 						algorithm/pfind \
 						container/item \
 						container/hash \
+						container/heap \
 						container/queue \
 						container/stack \
 						container/slist \
@@ -312,6 +313,7 @@ INC_FILES 				= \
 						container/container.h \
 						container/item.h \
 						container/hash.h \
+						container/heap.h \
 						container/slist.h \
 						container/dlist.h \
 						container/queue.h \

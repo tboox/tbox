@@ -283,7 +283,7 @@ tb_size_t 			tb_vector_grow(tb_vector_t const* vector);
  *
  * @param vector 	the vector
  *
- * @return 			the vector size
+ * @return 			the vector maxn
  */
 tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
 

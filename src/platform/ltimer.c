@@ -430,8 +430,8 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 	// leave
 	if (timer->lock) tb_spinlock_leave(timer->lock);
 
-	// ok?
-	if (ok)
+	// ok? and exists expired task?
+	if (ok && tb_vector_size(timer->expired))
 	{
 		// done the expired task 
 		tb_vector_walk(timer->expired, tb_ltimer_expired_done, tb_null);
