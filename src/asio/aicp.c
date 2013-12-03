@@ -437,9 +437,6 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 		tb_aice_t 	resp = {0};
 		tb_long_t	ok = spak(aicp->ptor, &resp, -1);
 
-		// spak ctime
-		tb_ctime_spak();
-
 		// failed? exit all loops
 		if (ok < 0) tb_aicp_kill(aicp);
 
