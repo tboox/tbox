@@ -116,6 +116,13 @@ tb_void_t 	 		tb_heap_put(tb_heap_t* heap, tb_cpointer_t data);
  */
 tb_void_t 	 		tb_heap_pop(tb_heap_t* heap);
 
+/*! del the heap item
+ *
+ * @param heap 		the heap
+ * @param itor 		the itor
+ */
+tb_void_t 	 		tb_heap_del(tb_heap_t* heap, tb_size_t itor);
+
 /*!walk
  *
  * be faster than the iterator mode, optimizate to remove items for walking

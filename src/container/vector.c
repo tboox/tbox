@@ -34,7 +34,7 @@
  * macros
  */
 
-// max size
+// the item maxn
 #define TB_VECTOR_ITEM_MAXN				(1 << 30)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -102,37 +102,58 @@ typedef struct __tb_vector_impl_t
  */
 static tb_size_t tb_vector_iterator_head(tb_iterator_t* iterator)
 {
+	// check
+	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
+	tb_assert_and_check_return_val(vector, 0);
+
+	// head
 	return 0;
 }
 static tb_size_t tb_vector_iterator_tail(tb_iterator_t* iterator)
 {
+	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_and_check_return_val(vector, 0);
+
+	// tail
 	return vector->size;
 }
 static tb_size_t tb_vector_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-	tb_assert_and_check_return_val(vector && itor < vector->size, vector->size);
+	tb_assert_and_check_return_val(vector, 0);
+	tb_assert_and_check_return_val(itor < vector->size, vector->size);
+
+	// next
 	return itor + 1;
 }
 static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
-	if (!itor) tb_abort();
-	tb_assert_and_check_return_val(itor, 0);
+	// check
+	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
+	tb_assert_and_check_return_val(vector, 0);
+	tb_assert_and_check_return_val(itor && itor < vector->size, 0);
+
+	// prev
 	return itor - 1;
 }
 static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_and_check_return_val(vector && itor < vector->size, tb_null);
+	
+	// data
 	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
 }
 static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
+	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_return(vector);
 
+	// move
 	if (iterator->step > sizeof(tb_pointer_t))
 	{
 		tb_assert_return(item);
@@ -142,8 +163,11 @@ static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor
 }
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
+	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_and_check_return_val(vector && vector->func.comp, 0);
+
+	// comp
 	return vector->func.comp(&vector->func, ltem, rtem);
 }
 /* ///////////////////////////////////////////////////////////////////////
@@ -155,13 +179,13 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	tb_assert_and_check_return_val(grow, tb_null);
 	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, tb_null);
 
-	// alloc vector
+	// make vector
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)tb_malloc0(sizeof(tb_vector_impl_t));
 	tb_assert_and_check_return_val(vector, tb_null);
 
 	// init vector
-	vector->grow = grow;
 	vector->size = 0;
+	vector->grow = grow;
 	vector->maxn = grow;
 	vector->func = func;
 	tb_assert_and_check_goto(vector->maxn < TB_VECTOR_ITEM_MAXN, fail);
@@ -179,10 +203,11 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	vector->itor.move = tb_vector_iterator_move;
 	vector->itor.comp = tb_vector_iterator_comp;
 
-	// calloc data
+	// make data
 	vector->data = tb_nalloc0(vector->maxn, func.size);
 	tb_assert_and_check_goto(vector->data, fail);
 
+	// ok
 	return vector;
 fail:
 	if (vector) tb_vector_exit(vector);
@@ -199,6 +224,7 @@ tb_void_t tb_vector_exit(tb_vector_t* handle)
 
 		// free data
 		if (vector->data) tb_free(vector->data);
+		vector->data = tb_null;
 
 		// free it
 		tb_free(vector);
@@ -311,20 +337,21 @@ tb_bool_t tb_vector_resize(tb_vector_t* handle, tb_size_t size)
 	// resize buffer
 	if (size > vector->maxn)
 	{
-		tb_size_t omaxn = vector->maxn;
-		vector->maxn = tb_align4(size + vector->grow);
-		tb_assert_and_check_return_val(vector->maxn < TB_VECTOR_ITEM_MAXN, tb_false);
+		tb_size_t maxn = tb_align4(size + vector->grow);
+		tb_assert_and_check_return_val(maxn < TB_VECTOR_ITEM_MAXN, tb_false);
 
 		// realloc data
-		vector->data = (tb_byte_t*)tb_ralloc(vector->data, vector->maxn * vector->func.size);
+		vector->data = (tb_byte_t*)tb_ralloc(vector->data, maxn * vector->func.size);
 		tb_assert_and_check_return_val(vector->data, tb_false);
 
 		// must be align by 4-bytes
 		tb_assert_and_check_return_val(!(((tb_size_t)(vector->data)) & 3), tb_false);
 
 		// clear the grow data
-		tb_memset(vector->data + vector->size * vector->func.size, 0, (vector->maxn - omaxn) * vector->func.size);
+		tb_memset(vector->data + vector->size * vector->func.size, 0, (maxn - vector->maxn) * vector->func.size);
 
+		// save maxn
+		vector->maxn = maxn;
 	}
 
 	// update size
@@ -350,7 +377,7 @@ tb_void_t tb_vector_insert_prev(tb_vector_t* handle, tb_size_t itor, tb_cpointer
 	// move items if not at tail
 	if (osize != itor) tb_memmov(vector->data + (itor + 1) * vector->func.size, vector->data + itor * vector->func.size, (osize - itor) * vector->func.size);
 
-	// duplicate data
+	// save data
 	vector->func.dupl(&vector->func, vector->data + itor * vector->func.size, data);
 }
 tb_void_t tb_vector_insert_next(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t data)
