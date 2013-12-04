@@ -44,18 +44,20 @@
  * queue: ||||||||||||||-----|--------------------------||||||||||||||||||||||||||
  *                   last  tail                       head                
  *
- * head: => the first item
+ * head: => the head item
  * last: => the last item
  * tail: => behind the last item, no item
  *
  * performance: 
  *
- * push: 	fast
- * pop: 	fast
+ * put: O(1)
+ * pop: O(1)
  *
  * iterator:
- * next: 	fast
- * prev: 	fast
+ *
+ * next: fast
+ * prev: fast
+ *
  * </pre>
  *
  * @note the index of the same item is mutable
@@ -68,8 +70,14 @@ typedef struct __tb_queue_impl_t
 
 	// the data
 	tb_byte_t* 				data;
+	
+	// the head
 	tb_size_t 				head;
+
+	// the tail
 	tb_size_t 				tail;
+
+	// the maxn
 	tb_size_t 				maxn;
 
 	// the func
@@ -82,43 +90,56 @@ typedef struct __tb_queue_impl_t
  */
 static tb_size_t tb_queue_iterator_head(tb_iterator_t* iterator)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
+	// head
 	return queue->head;
 }
 static tb_size_t tb_queue_iterator_tail(tb_iterator_t* iterator)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
+	// tail
 	return queue->tail;
 }
 static tb_size_t tb_queue_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
+	// next
 	return ((itor + 1) & (queue->maxn - 1));
 }
 static tb_size_t tb_queue_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue, 0);
 
+	// prev
 	return ((itor + queue->maxn - 1) & (queue->maxn - 1));
 }
 static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue && itor < queue->maxn, tb_null);
+
+	// item
 	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
 }
 static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_return(queue);
 
+	// move
 	if (iterator->step > sizeof(tb_pointer_t))
 	{
 		tb_assert_return(item);
@@ -128,8 +149,11 @@ static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
+	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_and_check_return_val(queue && queue->func.comp, 0);
+
+	// comp
 	return queue->func.comp(&queue->func, ltem, rtem);
 }
 

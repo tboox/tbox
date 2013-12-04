@@ -15,6 +15,7 @@
 src/config.h
 .svn
 .DS_Store
+cscope.*
 gmon.out
 other
 doc

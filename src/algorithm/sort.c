@@ -83,8 +83,9 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	// (hole - 1) / 2: the parent node of the hole
 	// finds the final hole
 	tb_size_t i = 0;
-	for (i = (hole - 1) / 2; hole > top && (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), item) < 0); i = (hole - 1) / 2)
+	for (i = (hole - 1) >> 1; hole > top && (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), item) < 0); i = (hole - 1) >> 1)
 	{	
+		// FIXME?
 		// move item: parent => hole
 		tb_iterator_move(iterator, head + i, item);
 
@@ -95,10 +96,9 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	// move item
 	tb_iterator_move(iterator, head + hole, item);
 }
-/*!adjust heap
+/*! adjust heap
  *
  * <pre>
- * hole: top => bottom
  * init:
  *                                          16(head)
  *                               -------------------------
@@ -109,7 +109,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  *                       8(larger)      7           9             3
  *                   ---------       ----
  *                  |         |     |
- *                  2         4     1(bottom - 1)
+ *                  2         4     1(tail - 1)
  *
  * after:
  *                                          16(head)
@@ -121,7 +121,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  *                      (hole)          7           9             3
  *                   ---------       ----
  *                  |         |     |
- *                  2 (larger)4     1(bottom - 1)
+ *                  2 (larger)4     1(tail - 1)
  *
  * after:
  *                                          16(head)
@@ -133,36 +133,37 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  *                       4              7           9             3
  *                   ---------       ----
  *                  |         |     |
- *                  2      (hole)   1(bottom - 1)
+ *                  2      (hole)   1(tail - 1)
+ *
  * </pre>
  */
-static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t bottom, tb_cpointer_t item)
+static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item)
 {
 	// save top position
 	tb_size_t top = hole;
 
 	// 2 * hole + 2: the right child node of hole
-	tb_size_t i = (hole << 1) + 2;
-
-	for (; i < bottom; i = 2 * i + 2)
+	tb_size_t child = (hole << 1) + 2;
+	for (; child < tail; child = (child << 1) + 2)
 	{	
-		// gets the larger child node
-		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), tb_iterator_item(iterator, head + i - 1)) < 0) --i;
+		// the larger child node
+		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + child), tb_iterator_item(iterator, head + child - 1)) < 0) child--;
 
-		// larger child => hole
-		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + i));
+		// the larger child node => hole
+		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + child));
 
 		// move the hole down to it's larger child node 
-		hole = i;
+		hole = child;
 	}
 
-	if (i == bottom)
+	// no right child node? 
+	if (child == tail)
 	{	
-		// bottom child => hole
-		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + bottom - 1));
+		// the last child => hole
+		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
 
-		// move hole down to bottom
-		hole = bottom - 1;
+		// move hole down to tail
+		hole = tail - 1;
 	}
 
 	// push item into the hole
@@ -195,7 +196,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
 	// make
 	tb_size_t hole;
 	tb_size_t bottom = tail - head;
-	for (hole = bottom / 2; hole > 0; )
+	for (hole = (bottom >> 1); hole > 0; )
 	{
 		--hole;
 
