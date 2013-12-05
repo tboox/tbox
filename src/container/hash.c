@@ -386,7 +386,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	// check
 	tb_assert_and_check_return_val(size, tb_null);
 	tb_assert_and_check_return_val(name_func.size && name_func.hash && name_func.comp && name_func.data && name_func.dupl, tb_null);
-	tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.copy, tb_null);
+	tb_assert_and_check_return_val(data_func.data && data_func.dupl && data_func.repl, tb_null);
 
 	// make hash
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)tb_malloc0(sizeof(tb_hash_impl_t));
@@ -542,8 +542,8 @@ tb_size_t tb_hash_set(tb_hash_t* handle, tb_cpointer_t name, tb_cpointer_t data)
 		tb_hash_item_list_t* list = hash->hash_list[buck];
 		tb_assert_and_check_return_val(list && list->size && item < list->size, 0);
 
-		// copy data
-		hash->data_func.copy(&hash->data_func, ((tb_byte_t*)&list[1]) + item * step + hash->name_func.size, data);
+		// replace data
+		hash->data_func.repl(&hash->data_func, ((tb_byte_t*)&list[1]) + item * step + hash->name_func.size, data);
 	}
 	else
 	{

@@ -316,7 +316,7 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(grow, tb_null);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, tb_null);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
 
 	// alloc slist
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)tb_malloc0(sizeof(tb_slist_impl_t));
@@ -505,8 +505,8 @@ tb_size_t tb_slist_replace(tb_slist_t* handle, tb_size_t itor, tb_cpointer_t dat
 	// the item
 	tb_slist_item_t* item = (tb_slist_item_t*)itor;
 
-	// copy data
-	slist->func.copy(&slist->func, &item[1], data);
+	// replace data
+	slist->func.repl(&slist->func, &item[1], data);
 
 	// ok
 	return itor;

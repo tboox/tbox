@@ -38,14 +38,6 @@
 /// the heap type
 typedef tb_void_t 	tb_heap_t;
 
-/// the heap mode enum
-typedef enum __tb_heap_mode_e
-{
-	TB_HEAP_MODE_MIN 	= 0 	//!< the min-heap
-,	TB_HEAP_MODE_MAX 	= 1 	//!< the max-heap
-
-}tb_heap_mode_e;
-
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
