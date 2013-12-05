@@ -153,8 +153,8 @@ static tb_void_t tb_vector_iterator_copy(tb_iterator_t* iterator, tb_size_t itor
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_and_check_return(vector);
 
-	// move
-	vector->func.move(&vector->func, vector->data + itor * iterator->step, item);
+	// copy
+	vector->func.copy(&vector->func, vector->data + itor * iterator->step, item);
 }
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {

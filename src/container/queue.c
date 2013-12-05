@@ -139,8 +139,8 @@ static tb_void_t tb_queue_iterator_copy(tb_iterator_t* iterator, tb_size_t itor,
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
 	tb_assert_return(queue);
 
-	// move
-	queue->func.move(&queue->func, queue->data + itor * iterator->step, item);
+	// copy
+	queue->func.copy(&queue->func, queue->data + itor * iterator->step, item);
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
