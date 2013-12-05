@@ -41,9 +41,9 @@
 
 // the timer wheel maxn
 #ifdef __tb_small__
-# 	define TB_TIMER_WHEEL_MAXN 			(4096)
+# 	define TB_LTIMER_WHEEL_MAXN 			(4096)
 #else
-# 	define TB_TIMER_WHEEL_MAXN 			(8192)
+# 	define TB_LTIMER_WHEEL_MAXN 			(8192)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ typedef struct __tb_ltimer_t
 	tb_vector_t* 				expired;
 
 	// the wheel
-	tb_vector_t* 				wheel[TB_TIMER_WHEEL_MAXN];
+	tb_vector_t* 				wheel[TB_LTIMER_WHEEL_MAXN];
 
 	// the wheel base
 	tb_size_t 					wbase;
@@ -171,16 +171,16 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t const* 
 
 		// the wheel difference
 		tb_size_t wdiff = (tb_size_t)(tdiff / timer->tick);
-		tb_assert_and_check_break(wdiff < TB_TIMER_WHEEL_MAXN);
+		tb_assert_and_check_break(wdiff < TB_LTIMER_WHEEL_MAXN);
 		tb_trace_impl("add: wdiff: %lu", wdiff);
 
 		// the wheel index
-		tb_size_t windx = (timer->wbase + wdiff) & (TB_TIMER_WHEEL_MAXN - 1);
+		tb_size_t windx = (timer->wbase + wdiff) & (TB_LTIMER_WHEEL_MAXN - 1);
 		tb_trace_impl("add: windx: %lu", windx);
 
 		// the wheel list
 		tb_vector_t* wlist = timer->wheel[windx];
-		if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_TIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+		if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
 		tb_assert_and_check_break(wlist);
 
 		// add task to the wheel list
@@ -289,7 +289,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
 	tb_assert_and_check_goto(timer->pool, fail);
 
 	// init the expired tasks
-	timer->expired 		= tb_vector_init((maxn / TB_TIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
+	timer->expired 		= tb_vector_init((maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
 	tb_assert_and_check_goto(timer->expired, fail);
 
 	// ok
@@ -319,7 +319,7 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		// exit wheel
 		{
 			tb_size_t i = 0;
-			for (i = 0; i < TB_TIMER_WHEEL_MAXN; i++)
+			for (i = 0; i < TB_LTIMER_WHEEL_MAXN; i++)
 			{
 				if (timer->wheel[i]) tb_vector_exit(timer->wheel[i]);
 				timer->wheel[i] = tb_null;
@@ -352,7 +352,7 @@ tb_size_t tb_ltimer_limit(tb_handle_t handle)
 	tb_assert_and_check_return_val(timer, 0);
 
 	// the timer limit
-	return (TB_TIMER_WHEEL_MAXN * timer->tick);
+	return (TB_LTIMER_WHEEL_MAXN * timer->tick);
 }
 tb_size_t tb_ltimer_timeout(tb_handle_t handle)
 {
@@ -393,7 +393,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 
 		// the diff
 		tb_size_t diff = (tb_size_t)((now - timer->btime) / timer->tick);
-		tb_assert_and_check_break(diff < TB_TIMER_WHEEL_MAXN);
+		tb_assert_and_check_break(diff < TB_LTIMER_WHEEL_MAXN);
 
 		// trace
 		tb_trace_impl("spak: btime: %lld, wbase: %lu, now: %lld, diff: %lu", timer->btime, timer->wbase, now, diff);
@@ -403,7 +403,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 		for (i = 0; i <= diff; i++)
 		{
 			// the wheel index
-			tb_size_t indx = (timer->wbase + i) & (TB_TIMER_WHEEL_MAXN - 1);
+			tb_size_t indx = (timer->wbase + i) & (TB_LTIMER_WHEEL_MAXN - 1);
 
 			// the wheel list
 			tb_vector_t* list = timer->wheel[indx];
@@ -420,7 +420,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 		timer->btime = now;
 
 		// update the wheel base
-		timer->wbase = (timer->wbase + diff) & (TB_TIMER_WHEEL_MAXN - 1);
+		timer->wbase = (timer->wbase + diff) & (TB_LTIMER_WHEEL_MAXN - 1);
 		
 		// ok
 		ok = tb_true;
@@ -545,7 +545,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return(timer && func);
+	tb_assert_and_check_return(timer && timer->pool && func);
 
 	// enter
 	if (timer->lock) tb_spinlock_enter(timer->lock);

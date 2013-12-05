@@ -24,7 +24,6 @@
 #ifndef TB_PLATFORM_TIMER_H
 #define TB_PLATFORM_TIMER_H
 
-
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -37,10 +36,8 @@
 /*! the timer task func type
  *
  * @param data 		the timer data
- *
- * @return 			continue: tb_true, cancel: tb_false
  */
-typedef tb_bool_t 	(*tb_timer_task_func_t)(tb_pointer_t data);
+typedef tb_void_t 	(*tb_timer_task_func_t)(tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -48,6 +45,8 @@ typedef tb_bool_t 	(*tb_timer_task_func_t)(tb_pointer_t data);
 
 /*! init timer
  *
+ * lower tick and limit range, but faster
+ * 
  * @param maxn		the timer maxn
  * @param ctime		using ctime?
  *
@@ -69,7 +68,7 @@ tb_void_t 			tb_timer_exit(tb_handle_t handle);
  */
 tb_size_t 			tb_timer_timeout(tb_handle_t handle);
 
-/*! spak timer for the external loop
+/*! spak timer for the external loop at the single thread
  *
  * @code
  * tb_void_t tb_timer_loop()
@@ -106,40 +105,78 @@ tb_bool_t 			tb_timer_spak(tb_handle_t handle);
  */
 tb_void_t 			tb_timer_loop(tb_handle_t handle);
 
-/*! run timer task after timeout
+/*! run timer task after timeout and will be auto-remove it after be expired
  *
  * @param handle	the timer handle
  * @param period 	the period time, ms
+ * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
- * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_run(tb_handle_t handle, tb_size_t timeout, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_timer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
-/*! run timer task at the absolute time
+/*! run timer task at the absolute time and will be auto-remove it after be expired
  *
  * @param handle	the timer handle
  * @param when 		the absolute time, ms
  * @param period 	the period time, ms
+ * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
- * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
-/*! run timer task after the relative time
+/*! run timer task after the relative time and will be auto-remove it after be expired
  *
  * @param handle	the timer handle
  * @param after 	the after time, ms
  * @param period 	the period time, ms
+ * @param repeat 	is repeat?
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ */
+tb_void_t 			tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+
+/*! add and run timer task after timeout and need remove it manually
+ *
+ * @param handle	the timer handle
+ * @param period 	the period time, ms
+ * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_timer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+
+/*! add and run timer task at the absolute time and need remove it manually
+ *
+ * @param handle	the timer handle
+ * @param when 		the absolute time, ms
+ * @param period 	the period time, ms
+ * @param repeat 	is repeat?
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ * @return 			the timer task
+ */
+tb_handle_t 		tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+
+/*! add and run timer task after the relative time and need remove it manually
+ *
+ * @param handle	the timer handle
+ * @param after 	the after time, ms
+ * @param period 	the period time, ms
+ * @param repeat 	is repeat?
+ * @param func		the timer func
+ * @param data		the timer data
+ *
+ * @return 			the timer task
+ */
+tb_handle_t 		tb_timer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! del timer task
  *
