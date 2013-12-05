@@ -163,7 +163,7 @@ static tb_pointer_t tb_slist_iterator_item(tb_iterator_t* iterator, tb_size_t it
 	// data
 	return slist->func.data(&slist->func, &((tb_slist_item_t const*)itor)[1]);
 }
-static tb_void_t tb_slist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_slist_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
@@ -337,7 +337,7 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 	slist->itor.prev = tb_slist_iterator_prev;
 	slist->itor.next = tb_slist_iterator_next;
 	slist->itor.item = tb_slist_iterator_item;
-	slist->itor.move = tb_slist_iterator_move;
+	slist->itor.copy = tb_slist_iterator_copy;
 	slist->itor.comp = tb_slist_iterator_comp;
 
 	// init pool, step = next + data

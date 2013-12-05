@@ -124,7 +124,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 			tb_size_t refn = (tb_size_t)item->data;
 
 			// refn++
-			if (refn) tb_iterator_move(g_hash, itor, refn + 1);
+			if (refn) tb_iterator_copy(g_hash, itor, refn + 1);
 			// no refn? remove it
 			else
 			{
@@ -175,7 +175,7 @@ tb_void_t tb_scache_del(tb_char_t const* data)
 			tb_size_t refn = (tb_size_t)item->data;
 
 			// refn--
-			if (refn > 1) tb_iterator_move(g_hash, itor, refn - 1);
+			if (refn > 1) tb_iterator_copy(g_hash, itor, refn - 1);
 			// del it
 			else tb_iterator_delt(g_hash, itor);
 		}

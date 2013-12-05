@@ -147,7 +147,7 @@ static tb_pointer_t tb_vector_iterator_item(tb_iterator_t* iterator, tb_size_t i
 	// data
 	return vector->func.data(&vector->func, vector->data + itor * iterator->step);
 }
-static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_vector_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
@@ -195,7 +195,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 	vector->itor.prev = tb_vector_iterator_prev;
 	vector->itor.next = tb_vector_iterator_next;
 	vector->itor.item = tb_vector_iterator_item;
-	vector->itor.move = tb_vector_iterator_move;
+	vector->itor.copy = tb_vector_iterator_copy;
 	vector->itor.comp = tb_vector_iterator_comp;
 
 	// make data

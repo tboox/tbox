@@ -349,7 +349,7 @@ static tb_void_t tb_hash_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 	// update the hash item size
 	hash->item_size--;
 }
-static tb_void_t tb_hash_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t data)
+static tb_void_t tb_hash_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t data)
 {
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)iterator;
 	tb_assert_return(hash && hash->hash_list && hash->hash_size);
@@ -406,7 +406,7 @@ tb_hash_t* tb_hash_init(tb_size_t size, tb_item_func_t name_func, tb_item_func_t
 	hash->item_itor.prev = tb_null;
 	hash->item_itor.next = tb_hash_iterator_next;
 	hash->item_itor.item = tb_hash_iterator_item;
-	hash->item_itor.move = tb_hash_iterator_move;
+	hash->item_itor.copy = tb_hash_iterator_copy;
 	hash->item_itor.delt = tb_hash_iterator_delt;
 	hash->item_itor.comp = tb_hash_iterator_comp;
 
