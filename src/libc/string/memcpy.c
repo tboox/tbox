@@ -52,6 +52,7 @@ static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t 
 #elif !defined(TB_LIBC_STRING_OPT_MEMCPY)
 static tb_pointer_t tb_memcpy_impl(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s1 && s2, tb_null);
 
 #ifdef __tb_small__
@@ -110,9 +111,9 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 		}
 
 		// overlap?
-		if (n1 && s2 >= s1 && s2 < s1 + n1)
+		if ((s2 >= s1 && s2 < s1 + n) || (s1 >= s2 && s1 < s2 + n))
 		{
-			tb_print("[memcpy]: [overlap]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_print("[memcpy]: [overlap]: [%p, %lu] => [%p, %lu]", s2, n, s1, n);
 			tb_backtrace_dump("[memcpy]: [overlap]: ", tb_null, 10);
 			tb_malloc_data_dump(s1, "\t[malloc]: [from]: ");
 			tb_abort();

@@ -50,14 +50,14 @@ typedef enum __tb_heap_mode_e
  * interfaces
  */
 
-/*! init heap
+/*! init heap, default: minheap
  *
  * @param grow 		the item grow
  * @param func 		the item func
  *
  * @return 			the heap
  */
-tb_heap_t* 			tb_heap_init(tb_size_t mode, tb_size_t grow, tb_item_func_t func);
+tb_heap_t* 			tb_heap_init(tb_size_t grow, tb_item_func_t func);
 
 /*! exist heap
  *
