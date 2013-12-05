@@ -151,15 +151,10 @@ static tb_void_t tb_vector_iterator_move(tb_iterator_t* iterator, tb_size_t itor
 {
 	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
-	tb_assert_return(vector);
+	tb_assert_and_check_return(vector);
 
 	// move
-	if (iterator->step > sizeof(tb_pointer_t))
-	{
-		tb_assert_return(item);
-		tb_memcpy(vector->data + itor * iterator->step, item, iterator->step);
-	}
-	else *((tb_pointer_t*)(vector->data + itor * iterator->step)) = item;
+	vector->func.move(&vector->func, vector->data + itor * iterator->step, item);
 }
 static tb_long_t tb_vector_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {

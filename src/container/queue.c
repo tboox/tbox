@@ -140,12 +140,7 @@ static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor,
 	tb_assert_return(queue);
 
 	// move
-	if (iterator->step > sizeof(tb_pointer_t))
-	{
-		tb_assert_return(item);
-		tb_memcpy(queue->data + itor * iterator->step, item, iterator->step);
-	}
-	else *((tb_pointer_t*)(queue->data + itor * iterator->step)) = item;
+	queue->func.move(&queue->func, queue->data + itor * iterator->step, item);
 }
 static tb_long_t tb_queue_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {

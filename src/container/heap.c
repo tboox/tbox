@@ -21,6 +21,12 @@
  * @ingroup 	container
  *
  */
+
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 				"heap"
+
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -45,18 +51,18 @@
 /*! the heap type
  *
  * <pre>
- * heap:    16      14      10      8       7       9       3       2       4       1
+ * heap:    1      4      2      6       9       7       8       10       14       16
  *
- *                                          16(head)
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                              14                        10
+ *                              4                         2
  *                        --------------             -------------
  *                       |              |           |             |
- *                       8       (last / 2 - 1)7    9             3
+ *                       6       (last / 2 - 1)9    7             8
  *                   ---------       ----
  *                  |         |     |
- *                  2         4     1(last - 1)
+ *                  10        14    16(last - 1)
  * </pre>
  *
  * head: => the head item
@@ -99,6 +105,47 @@ typedef struct __tb_heap_impl_t
 	tb_item_func_t 			func;
 
 }tb_heap_impl_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * checker
+ */
+static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
+{
+	// init
+	tb_byte_t* 	data = heap->data;
+	tb_size_t 	tail = heap->size;
+	tb_size_t 	step = heap->func.size;
+	tb_size_t 	parent = 0;
+
+	// walk
+	for (; parent < tail; parent++)
+	{	
+		// the left child node
+		tb_size_t 	lchild 	= (parent << 1) + 1;
+		tb_check_break(lchild < tail);
+
+		// the parent data
+		tb_pointer_t parent_data = heap->func.data(&heap->func, data + parent * step);
+
+		// check?
+		if (heap->func.comp(&heap->func, heap->func.data(&heap->func, data + lchild * step), parent_data) < 0) 
+		{
+			tb_trace_impl("lchild[%lu]: invalid, parent: %lu", lchild, parent);
+			break;
+		}
+
+		// the right child node
+		tb_size_t 	rchild 	= (parent << 1) + 2;
+		tb_check_break(rchild < tail);
+
+		// check?
+		if (heap->func.comp(&heap->func, heap->func.data(&heap->func, data + rchild * step), parent_data) < 0) 
+		{
+			tb_trace_impl("rchild[%lu]: invalid, parent: %lu", rchild, parent);
+			break;
+		}
+	}
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * iterator
@@ -154,15 +201,10 @@ static tb_void_t tb_heap_iterator_move(tb_iterator_t* iterator, tb_size_t itor, 
 {
 	// check
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)iterator;
-	tb_assert_return(heap);
+	tb_assert_and_check_return(heap);
 
 	// move
-	if (iterator->step > sizeof(tb_pointer_t))
-	{
-		tb_assert_return(item);
-		tb_memcpy(heap->data + itor * iterator->step, item, iterator->step);
-	}
-	else *((tb_pointer_t*)(heap->data + itor * iterator->step)) = item;
+	heap->func.move(&heap->func, heap->data + itor * iterator->step, item);
 }
 static tb_long_t tb_heap_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
@@ -173,44 +215,47 @@ static tb_long_t tb_heap_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t lt
 	// comp
 	return heap->func.comp(&heap->func, ltem, rtem);
 }
+
 /*! remove the heap item
  *
  * <pre>
  * init:
- *                                          16(head)
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                           (hole)                       10
+ *                           (hole)                       2
  *                        --------------             -------------
  *                       |              |           |             |
- *                       8(larger)      7           9             3
- *                   ---------       ----
- *                  |         |     |
- *                  2         4     1(last)
+ *                       6(smaler)      9           7             8
+ *                   ---------       ----                                            (hole) <-
+ *                  |         |     |                                                         |
+ *                 10        16    8 (last)---------------------------------------------> 8 (val)
+ *
  *
  * after:
- *                                          16(head)
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                              8                        10
+ *                              6                         2
  *                        --------------             -------------
  *                       |              |           |             |
- *                      (hole)          7           9             3
- *                   ---------       ----
- *                  |         |     |
- *                  2 (larger)4     1(last)
+ *                     (hole)           9           7             8
+ *                   ---------                                                              <-
+ *                  |         |                                                               |
+ *                 10(smaller)16                                                          8 (val)
+ *
  *
  * after:
- *                                          16(head)
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                              8                        10
+ *                              6                         2
  *                        --------------             -------------
  *                       |              |           |             |
- *                       4              7           9             3
- *                   ---------       ----
- *                  |         |     |
- *                  2      (hole)   1(last)
+ *                       8              9           7             8
+ *                   ---------                                                              
+ *                  |         |                                                               
+ *                 10        16 
  * 
  * </pre>
  */
@@ -220,44 +265,125 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)iterator;
 	tb_assert_and_check_return(heap && heap->data && heap->size && itor < heap->size);
 
-	// init
-	tb_size_t 	hole = itor;
-	tb_byte_t* 	data = heap->data;
-	tb_size_t 	tail = heap->size;
-	tb_size_t 	step = heap->func.size;
+	// init func
+	tb_item_func_comp_t func_comp = heap->func.comp;
+	tb_item_func_data_t func_data = heap->func.data;
+	tb_assert_and_check_return(func_comp && func_data);
 
-	// 2 * hole + 2: the right child node of hole
-	tb_size_t 	child = (hole << 1) + 2;
-	for (; child < tail; child = (child << 1) + 2)
-	{	
-		// the larger child node
-		if (heap->func.comp(&heap->func, data + child * step, data + (child - 1) * step) < 0) child--;
+	// walk, 2 * hole + 1: the left child node of hole
+	tb_size_t 			hole = itor;
+	tb_byte_t* 			data = heap->data;
+	tb_size_t 			tail = heap->size;
+	tb_size_t 			last = heap->size - 1;
+	tb_size_t 			step = heap->func.size;
+	tb_size_t 			child = (hole << 1) + 1;
+	tb_pointer_t 		last_data = func_data(&heap->func, data + last * step);
+	switch (step)
+	{
+	case sizeof(tb_uint64_t):
+		{
+			for (; child < tail; child = (child << 1) + 1)
+			{	
+				// the smaller child node
+				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
 
-		// the larger child node => hole
-		tb_memcpy(data + hole * step, data + child * step, step);
+				// end?
+				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
 
-		// move the hole down to it's larger child node 
-		hole = child;
+				// the smaller child node => hole
+				*((tb_uint64_t*)(data + hole * step)) = *((tb_uint64_t*)(data + child * step));
+
+				// move the hole down to it's larger child node 
+				hole = child;
+			}
+		}
+		break;
+	case sizeof(tb_uint32_t):
+		{
+			for (; child < tail; child = (child << 1) + 1)
+			{	
+				// the smaller child node
+				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+
+				// end?
+				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+
+				// the smaller child node => hole
+				*((tb_uint32_t*)(data + hole * step)) = *((tb_uint32_t*)(data + child * step));
+
+				// move the hole down to it's larger child node 
+				hole = child;
+			}
+		}
+		break;
+	case sizeof(tb_uint16_t):
+		{
+			for (; child < tail; child = (child << 1) + 1)
+			{	
+				// the smaller child node
+				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+
+				// end?
+				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+
+				// the smaller child node => hole
+				*((tb_uint16_t*)(data + hole * step)) = *((tb_uint16_t*)(data + child * step));
+
+				// move the hole down to it's larger child node 
+				hole = child;
+			}
+		}
+		break;
+	case sizeof(tb_uint8_t):
+		{
+			for (; child < tail; child = (child << 1) + 1)
+			{	
+				// the smaller child node
+				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+
+				// end?
+				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+
+				// the smaller child node => hole
+				*((tb_uint8_t*)(data + hole * step)) = *((tb_uint8_t*)(data + child * step));
+
+				// move the hole down to it's larger child node 
+				hole = child;
+			}
+		}
+		break;
+	default:
+		for (; child < tail; child = (child << 1) + 1)
+		{	
+			// the smaller child node
+			if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+
+			// end?
+			if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+
+			// the smaller child node => hole
+			tb_memcpy(data + hole * step, data + child * step, step);
+
+			// move the hole down to it's larger child node 
+			hole = child;
+		}
+		break;
 	}
 
-	// no right child node? 
-	if (child == tail)
-	{	
-		// the last child => hole
-		tb_memcpy(data + hole * step, data + (tail - 1) * step, step);
+	// the last node => hole
+	if (hole != last) tb_memcpy(data + hole * step, data + last * step, step);
 
-		// move hole down to last
-		hole = tail - 1;
-	}
+	// size--
+	heap->size--;
 
-	// FIXME
+	// check
+//	tb_heap_check(heap);
 }
-
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-tb_heap_t* tb_heap_init(tb_size_t mode, tb_size_t grow, tb_item_func_t func)
+tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(grow, tb_null);
@@ -362,27 +488,29 @@ tb_pointer_t tb_heap_top(tb_heap_t* handle)
  *
  * <pre>
  * init:
- *                                          16(head)
+ * 
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                              14                        10
+ *                              4                         2
  *                        --------------             -------------
  *                       |              |           |             |
- *                       8(parent)      7           9             3
- *                   ---------      
+ *                       6(parent)      9           7             8
+ *                   ---------       
  *                  |         |     
- *                  2(last) (hole) <= 11(val)
+ *                  10(last) (hole) <= 5(val)
  * after:
- *                                          16(head)
+ *
+ *                                          1(head)
  *                               -------------------------
  *                              |                         |
- *                              14(parent)                10
+ *                              4                         2
  *                        --------------             -------------
  *                       |              |           |             |
- *                       11(hole)       7           9             3
- *                   ---------      
- *                  |         |    
- *                  2         8(last)
+ *                       5(hole)      9           7             8
+ *                   ---------       
+ *                  |         |     
+ *                  10(last)  6(last)
  * </pre>
  */
 tb_void_t tb_heap_put(tb_heap_t* handle, tb_cpointer_t data)
@@ -413,24 +541,87 @@ tb_void_t tb_heap_put(tb_heap_t* handle, tb_cpointer_t data)
 
 	// check
 	tb_assert_and_check_return(heap->size < heap->maxn);
+	
+	// init func
+	tb_item_func_comp_t func_comp = heap->func.comp;
+	tb_item_func_data_t func_data = heap->func.data;
+	tb_assert_and_check_return(func_comp && func_data);
 
-	// (hole - 1) / 2: the parent node of the hole
-	tb_size_t 	parent = 0;
-	tb_byte_t* 	head = heap->data;
-	tb_size_t 	hole = heap->size;
-	tb_size_t 	step = heap->func.size;
-	for (parent = (hole - 1) >> 1; hole > 0 && (heap->func.comp(&heap->func, head + parent * step, data) < 0); parent = (hole - 1) >> 1)
+	// walk, (hole - 1) / 2: the parent node of the hole
+	tb_size_t 			parent = 0;
+	tb_byte_t* 			head = heap->data;
+	tb_size_t 			hole = heap->size;
+	tb_size_t 			step = heap->func.size;
+	switch (step)
 	{
-		// move item: parent => hole
-		tb_memcpy(head + hole * step, head + parent * step, step);
+	case sizeof(tb_uint64_t):
+		{
+			for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->func, func_data(&heap->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+			{
+				// move item: parent => hole
+				*((tb_uint64_t*)(head + hole * step)) = *((tb_uint64_t*)(head + parent * step));
 
-		// move node: hole => parent
-		hole = parent;
+				// move node: hole => parent
+				hole = parent;
+			}
+		}
+		break;
+	case sizeof(tb_uint32_t):
+		{
+			for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->func, func_data(&heap->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+			{
+				// move item: parent => hole
+				*((tb_uint32_t*)(head + hole * step)) = *((tb_uint32_t*)(head + parent * step));
+
+				// move node: hole => parent
+				hole = parent;
+			}
+		}
+		break;
+	case sizeof(tb_uint16_t):
+		{
+			for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->func, func_data(&heap->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+			{
+				// move item: parent => hole
+				*((tb_uint16_t*)(head + hole * step)) = *((tb_uint16_t*)(head + parent * step));
+
+				// move node: hole => parent
+				hole = parent;
+			}
+		}
+		break;
+	case sizeof(tb_uint8_t):
+		{
+			for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->func, func_data(&heap->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+			{
+				// move item: parent => hole
+				*((tb_uint8_t*)(head + hole * step)) = *((tb_uint8_t*)(head + parent * step));
+
+				// move node: hole => parent
+				hole = parent;
+			}
+		}
+		break;
+	default:
+		for (parent = (hole - 1) >> 1; hole && (func_comp(&heap->func, func_data(&heap->func, head + parent * step), data) > 0); parent = (hole - 1) >> 1)
+		{
+			// move item: parent => hole
+			tb_memcpy(head + hole * step, head + parent * step, step);
+
+			// move node: hole => parent
+			hole = parent;
+		}
+		break;
 	}
 
 	// save data
 	heap->func.dupl(&heap->func, head + hole * step, data);
+
+	// size++
 	heap->size++;
+
+	// check
+//	tb_heap_check(heap);
 }
 tb_void_t tb_heap_pop(tb_heap_t* handle)
 {

@@ -44,10 +44,12 @@ typedef tb_char_t const* 	(*tb_item_func_cstr_t)(struct __tb_item_func_t* func, 
 typedef tb_void_t 			(*tb_item_func_free_t)(struct __tb_item_func_t* func, tb_pointer_t item);
 typedef tb_void_t 			(*tb_item_func_dupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
 typedef tb_void_t 			(*tb_item_func_copy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
+typedef tb_void_t 			(*tb_item_func_move_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data);
 
 typedef tb_void_t 			(*tb_item_func_nfree_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_size_t size);
 typedef tb_void_t 			(*tb_item_func_ndupl_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
 typedef tb_void_t 			(*tb_item_func_ncopy_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
+typedef tb_void_t 			(*tb_item_func_nmove_t)(struct __tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data, tb_size_t size);
 
 /// the item type
 typedef enum __tb_item_type_t
@@ -84,18 +86,20 @@ typedef struct __tb_item_func_t
 	/// the priv data
 	tb_pointer_t 			priv;
 
-	// the item func
+	/// the item func
 	tb_item_func_hash_t 	hash;
 	tb_item_func_comp_t 	comp;
 	tb_item_func_data_t 	data;
 	tb_item_func_cstr_t 	cstr;
 	tb_item_func_free_t 	free;
-	tb_item_func_dupl_t 	dupl;
-	tb_item_func_copy_t 	copy;
+	tb_item_func_dupl_t 	dupl; //!< duplicate data to item
+	tb_item_func_copy_t 	copy; //!< free and copy data to item, TODO: rename to repl
+	tb_item_func_move_t 	move; //!< only copy data to item, TODO: rename to copy
 
 	tb_item_func_nfree_t 	nfree;
 	tb_item_func_ndupl_t 	ndupl;
 	tb_item_func_ncopy_t 	ncopy;
+	tb_item_func_nmove_t 	nmove;
 
 }tb_item_func_t;
 

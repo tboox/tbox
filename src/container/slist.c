@@ -108,27 +108,34 @@ typedef struct __tb_slist_impl_t
  */
 static tb_size_t tb_slist_iterator_head(tb_iterator_t* iterator)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
+	// head
 	return slist->head;
 }
 static tb_size_t tb_slist_iterator_tail(tb_iterator_t* iterator)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
+	// tail
 	return 0;
 }
 static tb_size_t tb_slist_iterator_next(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist && itor, 0);
 
+	// next
 	return ((tb_slist_item_t const*)itor)->next;
 }
 static tb_size_t tb_slist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist, 0);
 
@@ -149,26 +156,29 @@ static tb_size_t tb_slist_iterator_prev(tb_iterator_t* iterator, tb_size_t itor)
 }
 static tb_pointer_t tb_slist_iterator_item(tb_iterator_t* iterator, tb_size_t itor)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist && itor, tb_null);
+
+	// data
 	return slist->func.data(&slist->func, &((tb_slist_item_t const*)itor)[1]);
 }
 static tb_void_t tb_slist_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return(slist && itor);
 
-	if (iterator->step > sizeof(tb_pointer_t))
-	{
-		tb_assert_return(item);
-		tb_memcpy(&((tb_slist_item_t const*)itor)[1], item, iterator->step);
-	}
-	else *((tb_pointer_t*)(&((tb_slist_item_t const*)itor)[1])) = item;
+	// move
+	slist->func.move(&slist->func, &((tb_slist_item_t const*)itor)[1], item);
 }
 static tb_long_t tb_slist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
+	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)iterator;
 	tb_assert_and_check_return_val(slist && slist->func.comp, 0);
+
+	// comp
 	return slist->func.comp(&slist->func, ltem, rtem);
 }
 
