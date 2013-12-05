@@ -79,8 +79,8 @@ typedef struct __tb_iterator_t
 	/// the iterator comp
 	tb_long_t 				(*comp)(struct __tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
 
-	/// the iterator move
-	tb_void_t 				(*move)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
+	/// the iterator copy
+	tb_void_t 				(*copy)(struct __tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
 
 	/// the iterator delt
 	tb_void_t 				(*delt)(struct __tb_iterator_t* iterator, tb_size_t itor);
@@ -130,8 +130,8 @@ tb_pointer_t 	tb_iterator_item(tb_iterator_t* iterator, tb_size_t itor);
 /// the iterator delt
 tb_void_t 		tb_iterator_delt(tb_iterator_t* iterator, tb_size_t itor);
 
-/// the iterator move
-tb_void_t 		tb_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
+/// the iterator copy
+tb_void_t 		tb_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item);
 
 /// the iterator comp
 tb_long_t 		tb_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);

@@ -87,14 +87,14 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 	{	
 		// FIXME?
 		// move item: parent => hole
-		tb_iterator_move(iterator, head + i, item);
+		tb_iterator_copy(iterator, head + i, item);
 
 		// move node: hole => parent
 		hole = i;
 	}
 
 	// move item
-	tb_iterator_move(iterator, head + hole, item);
+	tb_iterator_copy(iterator, head + hole, item);
 }
 /*! adjust heap
  *
@@ -150,7 +150,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 		if (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + child), tb_iterator_item(iterator, head + child - 1)) < 0) child--;
 
 		// the larger child node => hole
-		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + child));
+		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + child));
 
 		// move the hole down to it's larger child node 
 		hole = child;
@@ -160,7 +160,7 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 	if (child == tail)
 	{	
 		// the last child => hole
-		tb_iterator_move(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
+		tb_iterator_copy(iterator, head + hole, tb_iterator_item(iterator, head + tail - 1));
 
 		// move hole down to tail
 		hole = tail - 1;
@@ -233,7 +233,7 @@ static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t h
 static __tb_inline__ tb_void_t tb_heap_pop0(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t item)
 {
 	// top => last
-	tb_iterator_move(iterator, tail - 1, tb_iterator_item(iterator, head));
+	tb_iterator_copy(iterator, tail - 1, tb_iterator_item(iterator, head));
 
 	// reheap it
 	tb_heap_adjust(iterator, head, 0, tail - head - 1, item);
@@ -283,8 +283,8 @@ tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 			{
 				if (step <= sizeof(tb_pointer_t)) temp = tb_iterator_item(iterator, itor1);
 				else tb_memcpy(temp, tb_iterator_item(iterator, itor1), step);
-				tb_iterator_move(iterator, itor1, tb_iterator_item(iterator, itor2));
-				tb_iterator_move(iterator, itor2, temp);
+				tb_iterator_copy(iterator, itor1, tb_iterator_item(iterator, itor2));
+				tb_iterator_copy(iterator, itor2, temp);
 			}
 		}
 	}
@@ -352,10 +352,10 @@ tb_void_t tb_insert_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail
 
 		// look for hole and move elements[hole, next - 1] => [hole + 1, next]
 		for (last = next; last != head && (last = tb_iterator_prev(iterator, last), tb_iterator_comp(iterator, temp, tb_iterator_item(iterator, last)) < 0); next = last)
-				tb_iterator_move(iterator, next, tb_iterator_item(iterator, last));
+				tb_iterator_copy(iterator, next, tb_iterator_item(iterator, last));
 
 		// item => hole
-		tb_iterator_move(iterator, next, temp);
+		tb_iterator_copy(iterator, next, temp);
 	}
 
 	// free
@@ -390,7 +390,7 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, r), key) < 0) break;
 		if (r != l) 
 		{
-			tb_iterator_move(iterator, l, tb_iterator_item(iterator, r));
+			tb_iterator_copy(iterator, l, tb_iterator_item(iterator, r));
 			l++;
 		}
 
@@ -399,13 +399,13 @@ tb_void_t tb_quick_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
 			if (tb_iterator_comp(iterator, tb_iterator_item(iterator, l), key) > 0) break;
 		if (l != r) 
 		{
-			tb_iterator_move(iterator, r, tb_iterator_item(iterator, l));
+			tb_iterator_copy(iterator, r, tb_iterator_item(iterator, l));
 			r--;
 		}
 	}
 
 	// key => hole
-	tb_iterator_move(iterator, l, key);
+	tb_iterator_copy(iterator, l, key);
 
 	// sort [head, hole - 1]
 	tb_quick_sort(iterator, head, l);

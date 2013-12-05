@@ -197,7 +197,7 @@ static tb_pointer_t tb_heap_iterator_item(tb_iterator_t* iterator, tb_size_t ito
 	// data
 	return heap->func.data(&heap->func, heap->data + itor * iterator->step);
 }
-static tb_void_t tb_heap_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_heap_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	// check
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)iterator;
@@ -410,7 +410,7 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 	heap->itor.prev = tb_heap_iterator_prev;
 	heap->itor.next = tb_heap_iterator_next;
 	heap->itor.item = tb_heap_iterator_item;
-	heap->itor.move = tb_heap_iterator_move;
+	heap->itor.copy = tb_heap_iterator_copy;
 	heap->itor.comp = tb_heap_iterator_comp;
 	heap->itor.delt = tb_heap_iterator_delt;
 

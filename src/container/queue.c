@@ -133,7 +133,7 @@ static tb_pointer_t tb_queue_iterator_item(tb_iterator_t* iterator, tb_size_t it
 	// item
 	return queue->func.data(&queue->func, queue->data + itor * iterator->step);
 }
-static tb_void_t tb_queue_iterator_move(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
+static tb_void_t tb_queue_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, tb_cpointer_t item)
 {
 	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)iterator;
@@ -180,7 +180,7 @@ tb_queue_t* tb_queue_init(tb_size_t maxn, tb_item_func_t func)
 	queue->itor.prev = tb_queue_iterator_prev;
 	queue->itor.next = tb_queue_iterator_next;
 	queue->itor.item = tb_queue_iterator_item;
-	queue->itor.move = tb_queue_iterator_move;
+	queue->itor.copy = tb_queue_iterator_copy;
 	queue->itor.comp = tb_queue_iterator_comp;
 
 	// calloc data
