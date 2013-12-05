@@ -284,7 +284,7 @@ tb_void_t tb_queue_remove(tb_queue_t* handle, tb_size_t itor)
 {
 	tb_trace_noimpl();
 }
-tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data)
 {
 	// check
 	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
@@ -295,35 +295,21 @@ tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle
 	tb_assert_and_check_return(step);
 
 	// walk
-	tb_bool_t 	bdel = tb_false;
 	tb_byte_t* 	base = queue->data;
 	tb_size_t 	itor = queue->head;
 	tb_size_t 	tail = queue->tail;
 	tb_size_t 	maxn = queue->maxn;
-	tb_bool_t 	stop = tb_false;
 	for (; itor != tail; itor = (itor + 1) & (maxn - 1))
 	{
 		// item
 		tb_pointer_t item = queue->func.data(&queue->func, base + itor * step);
 
-		// bdel
-		bdel = tb_false;
-
 		// callback: item
-		if (!func(queue, &item, &bdel, data)) stop = tb_true;
-
-		// free it?
-		if (bdel)
-		{
-			tb_trace_noimpl();
-		}
-
-		// stop?
-		tb_check_goto(!stop, end);
+		if (!func(queue, &item, data)) goto end;
 	}
 
 	// callback: tail
-	if (!func(queue, tb_null, &bdel, data)) goto end;
+	if (!func(queue, tb_null, data)) goto end;
 
 end:
 	return ;

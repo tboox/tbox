@@ -633,7 +633,7 @@ tb_void_t tb_heap_del(tb_heap_t* handle, tb_size_t itor)
 {
 	tb_heap_iterator_delt(handle, itor);
 }
-tb_void_t tb_heap_walk(tb_heap_t* handle, tb_bool_t (*func)(tb_heap_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_heap_walk(tb_heap_t* handle, tb_bool_t (*func)(tb_heap_t* handle, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data)
 {
 	// check
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)handle;
@@ -645,89 +645,21 @@ tb_void_t tb_heap_walk(tb_heap_t* handle, tb_bool_t (*func)(tb_heap_t* handle, t
 
 	// walk
 	tb_size_t 	i = 0;
-	tb_size_t 	b = -1;
-	tb_size_t 	o = heap->size;
 	tb_size_t 	n = heap->size;
 	tb_byte_t* 	d = heap->data;
-	tb_bool_t 	bdel = tb_false;
-	tb_bool_t 	stop = tb_false;
 	for (i = 0; i < n; i++)
 	{
 		// item
 		tb_pointer_t item = heap->func.data(&heap->func, d + i * step);
 
-		// bdel
-		bdel = tb_false;
-
 		// callback: item
-		if (!func(heap, &item, &bdel, data)) stop = tb_true;
-
-		// free it?
-		if (bdel)
-		{
-			// save
-			if (b == -1) b = i;
-
-			// free item
-			if (heap->func.free) heap->func.free(&heap->func, d + i * step);
-		}
-
-		// remove items?
-		if (!bdel || i + 1 == n || stop)
-		{
-			// has deleted items?
-			if (b != -1)
-			{
-				// the removed items end
-				tb_size_t e = !bdel? i : i + 1;
-				if (e > b)
-				{
-					// the items number
-					tb_size_t m = e - b;
-					tb_assert(n >= m);
-//					tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
-
-					// remove items
-					if (e < n) tb_memmov(d + b * step, d + e * step, (n - e) * step);
-
-					// remove all?
-					if (n > m) 
-					{
-						// update the list size
-						n -= m;
-						heap->size = n;
-
-						// update i
-						i = b;
-					}
-					else
-					{
-						// update the list size
-						n = 0;
-						heap->size = 0;
-					}
-				}
-			}
-
-			// reset
-			b = -1;
-
-			// stop?
-			tb_check_goto(!stop, end);
-		}
+		if (!func(heap, &item, data)) goto end;
 	}
 
 	// callback: tail
-	if (!func(heap, tb_null, &bdel, data)) goto end;
+	if (!func(heap, tb_null, data)) goto end;
 
 end:
-
-	// the heap have been modified, adjust it 
-	if (o != heap->size)
-	{
-		// TODO
-		// adjust heap
-	}
 
 	return ;
 }
