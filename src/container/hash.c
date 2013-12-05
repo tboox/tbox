@@ -368,8 +368,8 @@ static tb_void_t tb_hash_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, 
 	tb_hash_item_list_t* list = hash->hash_list[b];
 	tb_check_return(list && list->size && i < list->size);
 
-	// note: move data only, will destroy hash index if move name
-	hash->data_func.move(&hash->data_func, ((tb_byte_t*)&list[1]) + i * step + hash->name_func.size, data);
+	// note: copy data only, will destroy hash index if copy name
+	hash->data_func.copy(&hash->data_func, ((tb_byte_t*)&list[1]) + i * step + hash->name_func.size, data);
 }
 static tb_long_t tb_hash_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {

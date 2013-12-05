@@ -109,6 +109,7 @@ typedef struct __tb_heap_impl_t
 /* ///////////////////////////////////////////////////////////////////////
  * checker
  */
+#ifdef __tb_debug__
 static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 {
 	// init
@@ -146,6 +147,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 		}
 	}
 }
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * iterator
@@ -203,8 +205,8 @@ static tb_void_t tb_heap_iterator_copy(tb_iterator_t* iterator, tb_size_t itor, 
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)iterator;
 	tb_assert_and_check_return(heap);
 
-	// move
-	heap->func.move(&heap->func, heap->data + itor * iterator->step, item);
+	// copy
+	heap->func.copy(&heap->func, heap->data + itor * iterator->step, item);
 }
 static tb_long_t tb_heap_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {

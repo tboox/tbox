@@ -165,8 +165,8 @@ static tb_void_t tb_dlist_iterator_copy(tb_iterator_t* iterator, tb_size_t itor,
 	tb_dlist_impl_t* dlist = (tb_dlist_impl_t*)iterator;
 	tb_assert_and_check_return(dlist && itor);
 
-	// move
-	dlist->func.move(&dlist->func, &((tb_dlist_item_t const*)itor)[1], item);
+	// copy
+	dlist->func.copy(&dlist->func, &((tb_dlist_item_t const*)itor)[1], item);
 }
 static tb_long_t tb_dlist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
