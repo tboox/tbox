@@ -387,7 +387,7 @@ tb_heap_t* tb_heap_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(grow, tb_null);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy, tb_null);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl, tb_null);
 
 	// make heap
 	tb_heap_impl_t* heap = (tb_heap_impl_t*)tb_malloc0(sizeof(tb_heap_impl_t));

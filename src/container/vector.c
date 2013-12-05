@@ -172,7 +172,7 @@ tb_vector_t* tb_vector_init(tb_size_t grow, tb_item_func_t func)
 {
 	// check
 	tb_assert_and_check_return_val(grow, tb_null);
-	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.copy && func.ndupl && func.ncopy, tb_null);
+	tb_assert_and_check_return_val(func.size && func.data && func.dupl && func.repl && func.ndupl && func.nrepl, tb_null);
 
 	// make vector
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)tb_malloc0(sizeof(tb_vector_impl_t));
@@ -427,8 +427,8 @@ tb_void_t tb_vector_replace(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t d
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
 	tb_assert_and_check_return(vector && vector->data && itor <= vector->size);
 
-	// copy data
-	vector->func.copy(&vector->func, vector->data + itor * vector->func.size, data);
+	// replace data
+	vector->func.repl(&vector->func, vector->data + itor * vector->func.size, data);
 }
 tb_void_t tb_vector_replace_head(tb_vector_t* handle, tb_cpointer_t data)
 {
@@ -452,8 +452,8 @@ tb_void_t tb_vector_nreplace(tb_vector_t* handle, tb_size_t itor, tb_cpointer_t 
 	// strip size
 	if (itor + size > vector->size) size = vector->size - itor;
 
-	// copy data
-	vector->func.ncopy(&vector->func, vector->data + itor * vector->func.size, data, size);
+	// replace data
+	vector->func.nrepl(&vector->func, vector->data + itor * vector->func.size, data, size);
 }
 tb_void_t tb_vector_nreplace_head(tb_vector_t* handle, tb_cpointer_t data, tb_size_t size)
 {
