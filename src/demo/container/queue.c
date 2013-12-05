@@ -376,26 +376,17 @@ static tb_void_t tb_queue_test_itor_perf()
 
 	tb_queue_exit(queue);
 }
-static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_queue_test_walk_item(tb_queue_t* queue, tb_pointer_t* item, tb_pointer_t data)
 {
-	tb_assert_and_check_return_val(queue && bdel && data, tb_false);
+	// check
+	tb_assert_and_check_return_val(queue && data, tb_false);
 
 	tb_hize_t* test = data;
 	if (item)
 	{
 		tb_size_t i = (tb_size_t)*item;
-#if 0
-		if (!((i >> 25) & 0x1))
-//		if (!(i & 0x7))
-//		if (1)
-//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
-			*bdel = tb_true;
-		else
-#endif
-		{
-			test[0] += i;
-			test[1]++;
-		}
+		test[0] += i;
+		test[1]++;
 	}
 
 	// ok

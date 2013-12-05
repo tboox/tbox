@@ -120,15 +120,12 @@ tb_void_t 	 		tb_heap_del(tb_heap_t* heap, tb_size_t itor);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_heap_item_func(tb_heap_t* heap, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_heap_item_func(tb_heap_t* heap, tb_pointer_t* item, tb_pointer_t data)
  * {
- * 		tb_assert_and_check_return_val(heap && bdel, tb_false);
+ * 		tb_assert_and_check_return_val(heap, tb_false);
  *
  * 		// is tail?
  * 		if (!item) ;
- *
- * 		// delete it?
- * 		// *bdel = tb_true;
  *
  * 		// ok
  * 		return tb_true;
@@ -143,7 +140,7 @@ tb_void_t 	 		tb_heap_del(tb_heap_t* heap, tb_size_t itor);
  * @param func 		the walk func
  * @param data 		the walk data
  */
-tb_void_t 			tb_heap_walk(tb_heap_t* heap, tb_bool_t (*func)(tb_heap_t* heap, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_heap_walk(tb_heap_t* heap, tb_bool_t (*func)(tb_heap_t* heap, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data);
 
 
 
