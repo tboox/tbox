@@ -82,18 +82,19 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
 {
 	// (hole - 1) / 2: the parent node of the hole
 	// finds the final hole
-	tb_size_t i = 0;
-	for (i = (hole - 1) >> 1; hole > top && (tb_iterator_comp(iterator, tb_iterator_item(iterator, head + i), item) < 0); i = (hole - 1) >> 1)
+	tb_size_t 		parent = 0;
+	tb_cpointer_t 	parent_item = tb_null;
+	for (parent = (hole - 1) >> 1; hole > top && (tb_iterator_comp(iterator, (parent_item = tb_iterator_item(iterator, head + parent)), item) < 0); parent = (hole - 1) >> 1)
 	{	
-		// FIXME?
 		// move item: parent => hole
-		tb_iterator_copy(iterator, head + i, item);
+//		tb_iterator_copy(iterator, head + parent, item);
+		tb_iterator_copy(iterator, head + hole, parent_item);
 
 		// move node: hole => parent
-		hole = i;
+		hole = parent;
 	}
 
-	// move item
+	// copy item
 	tb_iterator_copy(iterator, head + hole, item);
 }
 /*! adjust heap
@@ -139,6 +140,7 @@ static __tb_inline__ tb_void_t tb_heap_push(tb_iterator_t* iterator, tb_size_t h
  */
 static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t head, tb_size_t hole, tb_size_t tail, tb_cpointer_t item)
 {
+#if 0
 	// save top position
 	tb_size_t top = hole;
 
@@ -168,6 +170,36 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
 
 	// push item into the hole
 	tb_heap_push(iterator, head, hole, top, item);
+#else
+
+	// walk, 2 * hole + 1: the left child node of hole
+	tb_size_t 		child = (hole << 1) + 1;
+	tb_cpointer_t 	child_item = tb_null;
+	tb_cpointer_t 	child_item_r = tb_null;
+	for (; child < tail; child = (child << 1) + 1)
+	{	
+		// the larger child node
+		child_item = tb_iterator_item(iterator, head + child);
+		if (child + 1 < tail && tb_iterator_comp(iterator, child_item, (child_item_r = tb_iterator_item(iterator, head + child + 1))) < 0) 
+		{
+			child++;
+			child_item = child_item_r;
+		}
+
+		// end?
+		if (tb_iterator_comp(iterator, child_item, item) < 0) break;
+
+		// the larger child node => hole
+		tb_iterator_copy(iterator, head + hole, child_item);
+
+		// move the hole down to it's larger child node 
+		hole = child;
+	}
+
+	// copy item
+	tb_iterator_copy(iterator, head + hole, item);
+
+#endif
 }
 /*!make heap
  *
@@ -180,10 +212,10 @@ static __tb_inline__ tb_void_t tb_heap_adjust(tb_iterator_t* iterator, tb_size_t
  *                              14                        10
  *                        --------------             -------------
  *                       |              |           |             |
- *                       8       (bottom / 2 - 1)7  9             3
+ *                       8       (tail / 2 - 1)7    9             3
  *                   ---------       ----
  *                  |         |     |
- *                  2         4     1(bottom - 1)
+ *                  2         4     1(tail - 1)
  * </pre>
  */
 static __tb_inline__ tb_void_t tb_heap_make(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail)
