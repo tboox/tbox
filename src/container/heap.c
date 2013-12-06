@@ -273,27 +273,34 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 	tb_assert_and_check_return(func_comp && func_data);
 
 	// walk, 2 * hole + 1: the left child node of hole
-	tb_size_t 			hole = itor;
-	tb_byte_t* 			data = heap->data;
-	tb_size_t 			tail = heap->size;
-	tb_size_t 			last = heap->size - 1;
 	tb_size_t 			step = heap->func.size;
-	tb_size_t 			child = (hole << 1) + 1;
-	tb_pointer_t 		last_data = func_data(&heap->func, data + last * step);
+	tb_byte_t* 			head = heap->data;
+	tb_byte_t* 			hole = head + itor * step;
+	tb_byte_t* 			tail = head + heap->size * step;
+	tb_byte_t* 			last = head + (heap->size - 1) * step;
+	tb_byte_t* 			child = head + ((itor << 1) + 1) * step;
+	tb_pointer_t 		data_child = tb_null;
+	tb_pointer_t 		data_rchild = tb_null;
+	tb_pointer_t 		data_last = func_data(&heap->func, last);
 	switch (step)
 	{
 	case sizeof(tb_uint64_t):
 		{
-			for (; child < tail; child = (child << 1) + 1)
+			for (; child < tail; child = head + (((child - head) << 1) + step))
 			{	
 				// the smaller child node
-				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+				data_child = func_data(&heap->func, child);
+				if (child + step < tail && func_comp(&heap->func, data_child, (data_rchild = func_data(&heap->func, child + step))) > 0) 
+				{
+					child += step;
+					data_child = data_rchild;
+				}
 
 				// end?
-				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+				if (func_comp(&heap->func, data_child, data_last) > 0) break;
 
 				// the smaller child node => hole
-				*((tb_uint64_t*)(data + hole * step)) = *((tb_uint64_t*)(data + child * step));
+				*((tb_uint64_t*)hole) = *((tb_uint64_t*)child);
 
 				// move the hole down to it's larger child node 
 				hole = child;
@@ -302,16 +309,21 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 		break;
 	case sizeof(tb_uint32_t):
 		{
-			for (; child < tail; child = (child << 1) + 1)
+			for (; child < tail; child = head + (((child - head) << 1) + step))
 			{	
 				// the smaller child node
-				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+				data_child = func_data(&heap->func, child);
+				if (child + step < tail && func_comp(&heap->func, data_child, (data_rchild = func_data(&heap->func, child + step))) > 0) 
+				{
+					child += step;
+					data_child = data_rchild;
+				}
 
 				// end?
-				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+				if (func_comp(&heap->func, data_child, data_last) > 0) break;
 
 				// the smaller child node => hole
-				*((tb_uint32_t*)(data + hole * step)) = *((tb_uint32_t*)(data + child * step));
+				*((tb_uint32_t*)hole) = *((tb_uint32_t*)child);
 
 				// move the hole down to it's larger child node 
 				hole = child;
@@ -320,16 +332,21 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 		break;
 	case sizeof(tb_uint16_t):
 		{
-			for (; child < tail; child = (child << 1) + 1)
+			for (; child < tail; child = head + (((child - head) << 1) + step))
 			{	
 				// the smaller child node
-				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+				data_child = func_data(&heap->func, child);
+				if (child + step < tail && func_comp(&heap->func, data_child, (data_rchild = func_data(&heap->func, child + step))) > 0) 
+				{
+					child += step;
+					data_child = data_rchild;
+				}
 
 				// end?
-				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+				if (func_comp(&heap->func, data_child, data_last) > 0) break;
 
 				// the smaller child node => hole
-				*((tb_uint16_t*)(data + hole * step)) = *((tb_uint16_t*)(data + child * step));
+				*((tb_uint16_t*)hole) = *((tb_uint16_t*)child);
 
 				// move the hole down to it's larger child node 
 				hole = child;
@@ -338,42 +355,55 @@ static tb_void_t tb_heap_iterator_delt(tb_iterator_t* iterator, tb_size_t itor)
 		break;
 	case sizeof(tb_uint8_t):
 		{
-			for (; child < tail; child = (child << 1) + 1)
+			for (; child < tail; child = head + (((child - head) << 1) + step))
 			{	
 				// the smaller child node
-				if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
+				data_child = func_data(&heap->func, child);
+				if (child + step < tail && func_comp(&heap->func, data_child, (data_rchild = func_data(&heap->func, child + step))) > 0) 
+				{
+					child += step;
+					data_child = data_rchild;
+				}
 
 				// end?
-				if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
+				if (func_comp(&heap->func, data_child, data_last) > 0) break;
 
 				// the smaller child node => hole
-				*((tb_uint8_t*)(data + hole * step)) = *((tb_uint8_t*)(data + child * step));
+				*((tb_uint8_t*)hole) = *((tb_uint8_t*)child);
+
+				// move the hole down to it's larger child node 
+				hole = child;
+			}
+
+		}
+		break;
+	default:
+		{
+			for (; child < tail; child = head + (((child - head) << 1) + step))
+			{	
+				// the smaller child node
+				data_child = func_data(&heap->func, child);
+				if (child + step < tail && func_comp(&heap->func, data_child, (data_rchild = func_data(&heap->func, child + step))) > 0) 
+				{
+					child += step;
+					data_child = data_rchild;
+				}
+
+				// end?
+				if (func_comp(&heap->func, data_child, data_last) > 0) break;
+
+				// the smaller child node => hole
+				tb_memcpy(hole, child, step);
 
 				// move the hole down to it's larger child node 
 				hole = child;
 			}
 		}
 		break;
-	default:
-		for (; child < tail; child = (child << 1) + 1)
-		{	
-			// the smaller child node
-			if (child + 1 < tail && func_comp(&heap->func, func_data(&heap->func, data + child * step), func_data(&heap->func, data + (child + 1) * step)) > 0) child++;
-
-			// end?
-			if (func_comp(&heap->func, func_data(&heap->func, data + child * step), last_data) > 0) break;
-
-			// the smaller child node => hole
-			tb_memcpy(data + hole * step, data + child * step, step);
-
-			// move the hole down to it's larger child node 
-			hole = child;
-		}
-		break;
 	}
 
 	// the last node => hole
-	if (hole != last) tb_memcpy(data + hole * step, data + last * step, step);
+	if (hole != last) tb_memcpy(hole, last, step);
 
 	// size--
 	heap->size--;
