@@ -65,7 +65,7 @@ static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size
 	// ok?
 	return aioo;
 }
-static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_aioo_t const* aioo)
+static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_handle_t aioo)
 {
 	// check
 	tb_assert_and_check_return(aiop && aiop->pool);
@@ -174,7 +174,7 @@ tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
 	// kill it
 	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], "k", 1);
 }
-tb_aioo_t const* tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
+tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aiop && aiop->rtor && aiop->rtor->addo && handle, tb_false);
@@ -204,9 +204,9 @@ tb_aioo_t const* tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t cod
 	}
 
 	// ok?
-	return aioo;
+	return (tb_handle_t)aioo;
 }
-tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_aioo_t const* aioo)
+tb_void_t tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo)
 {
 	// check
 	tb_assert_and_check_return(aiop && aiop->rtor && aiop->rtor->delo && aioo);
@@ -222,11 +222,11 @@ tb_bool_t tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size)
 	// post
 	return aiop->rtor->post(aiop->rtor, list, size);
 }
-tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_aioo_t const* aioo, tb_size_t code, tb_pointer_t data)
+tb_bool_t tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(aiop && aioo && aioo->handle && code, tb_false);
-
+	tb_assert_and_check_return_val(aiop && aioo && tb_aioo_handle(aioo) && code, tb_false);
+ 
 	// init aioe
 	tb_aioe_t aioe;
 	aioe.code = code;

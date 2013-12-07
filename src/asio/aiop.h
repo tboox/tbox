@@ -143,7 +143,7 @@ tb_void_t 			tb_aiop_kill(tb_aiop_t* aiop);
  *
  * @return 			the aioo
  */
-tb_aioo_t const* 	tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
+tb_handle_t 		tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data);
 
 /*! delo the aioo
  *
@@ -151,7 +151,7 @@ tb_aioo_t const* 	tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t co
  * @param aioo 		the aioo
  *
  */
-tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_aioo_t const* aioo);
+tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo);
 
 /*! post the aioe list
  *
@@ -172,7 +172,7 @@ tb_bool_t 			tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_aioo_t const* aioo, tb_size_t code, tb_pointer_t data);
+tb_bool_t 			tb_aiop_sete(tb_aiop_t* aiop, tb_handle_t aioo, tb_size_t code, tb_pointer_t data);
 
 /*! wait the asio objects in the pool
  *
