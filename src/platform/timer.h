@@ -60,6 +60,12 @@ tb_handle_t 		tb_timer_init(tb_size_t maxn, tb_bool_t ctime);
  */
 tb_void_t 			tb_timer_exit(tb_handle_t handle);
 
+/*! clear timer
+ *
+ * @param handle	the timer handle
+ */
+tb_void_t 			tb_timer_clear(tb_handle_t handle);
+
 /*! the timer timeout for spak 
  *
  * @param handle	the timer handle

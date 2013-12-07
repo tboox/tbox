@@ -345,6 +345,34 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		tb_free(timer);
 	}
 }
+tb_void_t tb_ltimer_clear(tb_handle_t handle)
+{
+	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
+	if (timer)
+	{
+		// enter
+		if (timer->lock) tb_spinlock_enter(timer->lock);
+
+		// move to the wheel head
+		timer->btime = tb_ltimer_now(timer);
+		timer->wbase = 0;
+
+		// clear wheel
+		{
+			tb_size_t i = 0;
+			for (i = 0; i < TB_LTIMER_WHEEL_MAXN; i++)
+			{
+				if (timer->wheel[i]) tb_vector_clear(timer->wheel[i]);
+			}
+		}
+
+		// clear pool
+		if (timer->pool) tb_rpool_clear(timer->pool);
+
+		// leave
+		if (timer->lock) tb_spinlock_leave(timer->lock);
+	}
+}
 tb_size_t tb_ltimer_limit(tb_handle_t handle)
 {
 	// check
@@ -374,6 +402,9 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 
 	// the now time
 	tb_hong_t now = tb_ltimer_now(timer);
+
+	// clear expired
+	tb_vector_clear(timer->expired);
 
 	// enter
 	if (timer->lock) tb_spinlock_enter(timer->lock);
@@ -442,7 +473,6 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 		// exit the expired task
 		tb_pointer_t data[2]; data[0] = timer; data[1] = &now;
 		tb_vector_walk(timer->expired, tb_ltimer_expired_exit, data);
-		tb_vector_clear(timer->expired);
 
 		// leave
 		if (timer->lock) tb_spinlock_leave(timer->lock);

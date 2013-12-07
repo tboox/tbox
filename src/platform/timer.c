@@ -189,6 +189,24 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		tb_free(timer);
 	}
 }
+tb_void_t tb_timer_clear(tb_handle_t handle)
+{
+	tb_timer_t* timer = (tb_timer_t*)handle;
+	if (timer)
+	{
+		// enter
+		if (timer->lock) tb_spinlock_enter(timer->lock);
+
+		// clear heap
+		if (timer->heap) tb_heap_clear(timer->heap);
+
+		// clear pool
+		if (timer->pool) tb_rpool_clear(timer->pool);
+
+		// leave
+		if (timer->lock) tb_spinlock_leave(timer->lock);
+	}
+}
 tb_size_t tb_timer_timeout(tb_handle_t handle)
 {
 	// check

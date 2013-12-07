@@ -1025,7 +1025,7 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return(ptor);
+	tb_assert_and_check_return(ptor && ptor->timer && ptor->aiop && ptor->file);
 
 	// the worker size
 	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
@@ -1033,11 +1033,14 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 	// trace
 	tb_trace_impl("kill: %lu", work);
 
+	// clear timer
+	tb_ltimer_clear(ptor->timer);
+
 	// kill aiop
-	if (ptor->aiop) tb_aiop_kill(ptor->aiop);
+	tb_aiop_kill(ptor->aiop);
 
 	// kill file
-	if (ptor->file) tb_aicp_file_kill(ptor->file); 
+	tb_aicp_file_kill(ptor->file); 
 
 	// post wait
 	if (work) tb_semaphore_post(ptor->wait, work);
