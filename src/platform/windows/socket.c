@@ -414,7 +414,7 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// error
 	return -1;
 }
-tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(handle && data, -1);
