@@ -152,7 +152,7 @@ tb_long_t 			tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
  *
  * @return 			the real size or -1
  */
-tb_long_t 			tb_socket_send(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 
 /*! recvv the socket data
  * 

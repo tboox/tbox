@@ -554,6 +554,7 @@ tb_void_t tb_heap_put(tb_heap_t* handle, tb_cpointer_t data)
 	// full? grow it
 	if (heap->size == heap->maxn)
 	{
+		// the maxn
 		tb_size_t maxn = tb_align4(heap->maxn + heap->grow);
 		tb_assert_and_check_return(maxn < TB_HEAP_ITEM_MAXN);
 

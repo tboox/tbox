@@ -54,8 +54,14 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 	// init aico
 	if (aico)
 	{
+		aico->aicp 		= aicp;
 		aico->type 		= type;
 		aico->handle 	= handle;
+
+		// init timeout 
+		tb_size_t i = 0;
+		tb_size_t n = tb_arrayn(aico->timeout);
+		for (i = 0; i < n; i++) aico->timeout[i] = -1;
 	}
 
 	// leave 
@@ -64,7 +70,7 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 	// ok?
 	return aico;
 }
-static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t const* aico)
+static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
 {
 	// check
 	tb_assert_and_check_return(aicp);
@@ -147,7 +153,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		tb_free(aicp);
 	}
 }
-tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
+tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && handle && type, tb_null);
@@ -177,15 +183,15 @@ tb_aico_t const* tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t typ
 	}
 
 	// ok?
-	return aico;
+	return (tb_handle_t)aico;
 }
-tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_aico_t const* aico)
+tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
 	// delo
-	if (aicp->ptor->delo(aicp->ptor, (tb_aico_t*)aico))
+	if (aicp->ptor->delo(aicp->ptor, aico))
 		tb_aicp_aico_exit(aicp, aico);
 }
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
@@ -212,211 +218,6 @@ tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
 
 	// post
 	return aicp->ptor->post(aicp->ptor, list, size);
-}
-tb_bool_t tb_aicp_acpt(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_ACPT;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_conn(tb_aicp_t* aicp, tb_aico_t const* aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && host && port, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_CONN;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.conn.host 		= host;
-	aice.u.conn.port 		= port;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_recv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_RECV;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.recv.data 		= data;
-	aice.u.recv.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_send(tb_aicp_t* aicp, tb_aico_t const* aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_SEND;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.send.data 		= data;
-	aice.u.send.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_recvv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && list && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_RECVV;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.recvv.list 		= list;
-	aice.u.recvv.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_sendv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && list && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_SENDV;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.sendv.list 		= list;
-	aice.u.sendv.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_sendfile(tb_aicp_t* aicp, tb_aico_t const* aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && file, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_SENDFILE;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.sendfile.file 	= file;
-	aice.u.sendfile.seek 	= seek;
-	aice.u.sendfile.size 	= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_read(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_READ;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.read.seek 		= seek;
-	aice.u.read.data 		= data;
-	aice.u.read.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_writ(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && data && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_WRIT;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.writ.seek 		= seek;
-	aice.u.writ.data 		= data;
-	aice.u.writ.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_readv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && list && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_READV;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.readv.seek 		= seek;
-	aice.u.readv.list 		= list;
-	aice.u.readv.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_writv(tb_aicp_t* aicp, tb_aico_t const* aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico && list && size, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_WRITV;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.writv.seek 		= seek;
-	aice.u.writv.list 		= list;
-	aice.u.writv.size 		= size;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
-}
-tb_bool_t tb_aicp_fsync(tb_aicp_t* aicp, tb_aico_t const* aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
-{
-	// check
-	tb_assert_and_check_return_val(aicp && aico, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_FSYNC;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-
-	// post
-	return tb_aicp_post(aicp, &aice, 1);
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
@@ -450,7 +251,7 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 		tb_assert(resp.aico? (tb_atomic_fetch_and_set0(&resp.aico->post) == 1) : 0);
 
 		// done aicb
-		if (resp.aicb && !resp.aicb(aicp, &resp)) 
+		if (resp.aicb && !resp.aicb(&resp)) 
 		{
 			// exit all loops
 			tb_aicp_kill(aicp);
