@@ -15,7 +15,7 @@
 typedef struct __tb_demo_context_t
 {
 	// the aioo
-	tb_aioo_t const* 	aioo;
+	tb_handle_t 		aioo;
 
 	// the sock
 	tb_handle_t 		sock;
@@ -109,7 +109,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			tb_aioo_t const* aioo = list[i].aioo;
 
 			// check
-			tb_assert_and_check_break(aioo && aioo->handle);
+			tb_assert_and_check_break(aioo && tb_aioo_handle(aioo));
 
 			// acpt?
 			if (list[i].code & TB_AIOE_CODE_ACPT)
@@ -124,7 +124,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context);
 
 					// init sock
-					context->sock = tb_socket_accept(aioo->handle);
+					context->sock = tb_socket_accept(tb_aioo_handle(aioo));
 					tb_assert_and_check_break(context->sock);
 
 					// init file
@@ -197,19 +197,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				if (context->real < context->send)
 				{
 					// done send
-					tb_long_t real = tb_socket_send(aioo->handle, context->data + context->real, context->send - context->real);
+					tb_long_t real = tb_socket_send(tb_aioo_handle(aioo), context->data + context->real, context->send - context->real);
 					if (real > 0)
 					{
 						// save real
 						context->real += real;
 
 						// trace
-//						tb_print("send[%p]: real: %ld", aioo->handle, real);
+//						tb_print("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
 					}
 					else
 					{
 						// trace
-						tb_print("send[%p]: closed", aioo->handle);
+						tb_print("send[%p]: closed", tb_aioo_handle(aioo));
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -237,19 +237,19 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 						// done send
 						context->send = real;
-						real = tb_socket_send(aioo->handle, context->data, context->send);
+						real = tb_socket_send(tb_aioo_handle(aioo), context->data, context->send);
 						if (real >= 0)
 						{
 							// save real
 							context->real += real;
 
 							// trace
-//							tb_print("send[%p]: real: %ld", aioo->handle, real);
+//							tb_print("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
 						}
 						else
 						{
 							// trace
-							tb_print("send[%p]: closed", aioo->handle);
+							tb_print("send[%p]: closed", tb_aioo_handle(aioo));
 
 							// exit context
 							tb_demo_context_exit(aiop, context);
@@ -259,7 +259,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					else
 					{
 						// trace
-						tb_print("read[%p]: closed", aioo->handle);
+						tb_print("read[%p]: closed", tb_aioo_handle(aioo));
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -269,7 +269,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				else 
 				{
 					// trace
-					tb_print("read[%p]: closed", aioo->handle);
+					tb_print("read[%p]: closed", tb_aioo_handle(aioo));
 
 					// exit context
 					tb_demo_context_exit(aiop, context);
@@ -279,7 +279,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 			// error?
 			else 
 			{
-				tb_print("aioe[%p]: unknown code: %lu", aioo->handle, list[i].code);
+				tb_print("aioe[%p]: unknown code: %lu", tb_aioo_handle(aioo), list[i].code);
 				break;
 			}
 		}

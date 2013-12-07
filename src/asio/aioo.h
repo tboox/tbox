@@ -52,6 +52,22 @@ typedef struct __tb_aioo_t
  * interfaces
  */
 
+/*! the aioo type
+ *
+ * @param aioo 		the aioo
+ *
+ * @return 			the aioo data
+ */
+tb_pointer_t 		tb_aioo_data(tb_handle_t aioo);
+
+/*! the aioo handle
+ *
+ * @param aioo 		the aioo
+ *
+ * @return 			the aioo handle
+ */
+tb_handle_t 		tb_aioo_handle(tb_handle_t aioo);
+
 /*! wait the aioo
  *
  * blocking wait the single event aioo, so need not aiop 

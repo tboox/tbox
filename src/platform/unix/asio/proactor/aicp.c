@@ -82,7 +82,7 @@ typedef struct __tb_aiop_aico_t
 	tb_aicp_proactor_aiop_t* 	ptor;
 
 	// the aioo
-	tb_aioo_t const* 			aioo;
+	tb_handle_t 				aioo;
 
 	// the aice
 	tb_aice_t 					aice;
