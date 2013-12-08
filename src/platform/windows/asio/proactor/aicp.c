@@ -122,6 +122,28 @@ typedef struct __tb_aicp_proactor_iocp_t
 
 }tb_aicp_proactor_iocp_t;
 
+// the iocp aico type
+typedef struct __tb_iocp_aico_t
+{
+	// the base
+	tb_aico_t 								base;
+
+	// the ptor
+	tb_aicp_proactor_iocp_t* 				ptor;
+
+	// the olap
+	tb_iocp_olap_t* 						olap;
+
+	// the task
+	tb_handle_t 							task;
+
+}tb_iocp_aico_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data);
+
 /* ///////////////////////////////////////////////////////////////////////
  * olap
  */
@@ -329,7 +351,27 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 	if (init_ok && !acceptex_ok)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) ok = tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError()) 
+		{
+#if 0
+			// add timeout task
+			tb_long_t timeout = tb_aico_timeout_from_code(aico, aice->code);
+			if (timeout >= 0)
+			{
+				// the iocp aico
+				tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico; 
+				iocp_aico->olap = olap;
+				
+				// exit the old task
+				if (iocp_aico->task) tb_ltimer_task_del(ptor->timer, iocp_aico->task);
+
+				// add the new task
+				iocp_aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, aico);
+			}
+#endif
+			// ok
+			ok = tb_true;
+		}
 		// failed? remove olap
 		else
 		{
@@ -1006,7 +1048,32 @@ static tb_bool_t tb_iocp_post_fsync(tb_aicp_proactor_t* proactor, tb_aice_t cons
  */
 static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 {
+	// the aico
+	tb_aico_t* aico = data;
+	tb_assert_and_check_return(aico && aico->handle);
 
+	// trace
+	tb_trace_impl("timeout: handle: %p", aico->handle);
+
+	// cancel it
+	switch (aico->type)
+	{
+	case TB_AICO_TYPE_SOCK:
+		if (!CancelIo((SOCKET)aico->handle - 1))
+		{
+			tb_trace_impl("cancel: failed: %u", GetLastError());
+		}
+		break;
+	case TB_AICO_TYPE_FILE:
+		if (!CancelIo(aico->handle))
+		{
+			tb_trace_impl("cancel: failed: %u", GetLastError());
+		}
+		break;
+	default:
+		tb_assert(0);
+		break;
+	}
 }
 static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
@@ -1531,6 +1598,10 @@ static tb_bool_t tb_aicp_proactor_iocp_addo(tb_aicp_proactor_t* proactor, tb_aic
 	// attach aico to port
 	HANDLE port = CreateIoCompletionPort((HANDLE)aico->handle, ptor->port, (ULONG*)aico, 0);
 	tb_assert_and_check_return_val(port == ptor->port, tb_false);
+	
+	// the iocp aico
+	tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
+	iocp_aico->ptor = ptor;
 
 	// ok
 	return tb_true;
@@ -1540,6 +1611,14 @@ static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && aico && aico->handle, tb_false);
+		
+	// the iocp aico
+	tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
+	tb_assert_and_check_return_val(!iocp_aico->olap, tb_false);
+	
+	// del the timeout task
+	if (iocp_aico->task) tb_ltimer_task_del(ptor->timer, iocp_aico->task);
+	iocp_aico->task = tb_null;
 
 	// ok
 	return tb_true;
@@ -1702,7 +1781,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 
 	// init base
 	ptor->base.aicp 	= aicp;
-	ptor->base.step 	= sizeof(tb_aico_t);
+	ptor->base.step 	= sizeof(tb_iocp_aico_t);
 	ptor->base.kill 	= tb_aicp_proactor_iocp_kill;
 	ptor->base.exit 	= tb_aicp_proactor_iocp_exit;
 	ptor->base.addo 	= tb_aicp_proactor_iocp_addo;

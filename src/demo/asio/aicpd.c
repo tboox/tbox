@@ -56,7 +56,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->sock = tb_null;
 
 		// exit aico
-		if (context->aico[0]) tb_aicp_delo(tb_aico_aicp(context->aico[0]), context->aico[0]);
+		if (context->aico[0]) tb_aico_exit(context->aico[0]);
 		context->aico[0] = tb_null;
 
 		// exit
@@ -77,10 +77,10 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->sock = tb_null;
 
 		// exit aico
-		if (context->aico[0]) tb_aicp_delo(tb_aico_aicp(context->aico[0]), context->aico[0]);
+		if (context->aico[0]) tb_aico_exit(context->aico[0]);
 		context->aico[0] = tb_null;
 
-		if (context->aico[1]) tb_aicp_delo(tb_aico_aicp(context->aico[1]), context->aico[1]);
+		if (context->aico[1]) tb_aico_exit(context->aico[1]);
 		context->aico[1] = tb_null;
 		
 		// exit data
@@ -259,7 +259,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file);
 
 			// addo sock
-			context->aico[0] = tb_aicp_addo(aicp, context->sock, TB_AICO_TYPE_SOCK);
+			context->aico[0] = tb_aico_init(aicp, context->sock, TB_AICO_TYPE_SOCK);
 			tb_assert_and_check_break(context->aico[0]);
 
 			// post sendfile from file
@@ -272,11 +272,11 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file && context->data);
 
 			// addo sock
-			context->aico[0] = tb_aicp_addo(aicp, context->sock, TB_AICO_TYPE_SOCK);
+			context->aico[0] = tb_aico_init(aicp, context->sock, TB_AICO_TYPE_SOCK);
 			tb_assert_and_check_break(context->aico[0]);
 
 			// addo file
-			context->aico[1] = tb_aicp_addo(aicp, context->file, TB_AICO_TYPE_FILE);
+			context->aico[1] = tb_aico_init(aicp, context->file, TB_AICO_TYPE_FILE);
 			tb_assert_and_check_break(context->aico[1]);
 
 			// post read from file
@@ -373,7 +373,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// addo sock
-	aico = tb_aicp_addo(aicp, sock, TB_AICO_TYPE_SOCK);
+	aico = tb_aico_init(aicp, sock, TB_AICO_TYPE_SOCK);
 	tb_assert_and_check_goto(aico, end);
 
 	// init acpt timeout

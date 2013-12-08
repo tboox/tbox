@@ -164,6 +164,13 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 		// post recv from server
 		if (!tb_aico_recv(aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 	}
+	// timeout?
+	else if (aice->state == TB_AICE_STATE_TIMEOUT)
+	{
+		// exit loop
+		tb_print("conn[%p]: timeout", aice->aico);
+		return tb_false;
+	}
 	// failed?
 	else
 	{
@@ -208,11 +215,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(context.data, end);
 
 	// addo sock
-	context.aico[0] = tb_aicp_addo(aicp, context.sock, TB_AICO_TYPE_SOCK);
+	context.aico[0] = tb_aico_init(aicp, context.sock, TB_AICO_TYPE_SOCK);
 	tb_assert_and_check_goto(context.aico[0], end);
 
 	// addo file
-	context.aico[1] = tb_aicp_addo(aicp, context.file, TB_AICO_TYPE_FILE);
+	context.aico[1] = tb_aico_init(aicp, context.file, TB_AICO_TYPE_FILE);
 	tb_assert_and_check_goto(context.aico[1], end);
 
 	// init conn timeout

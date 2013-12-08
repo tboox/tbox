@@ -806,6 +806,7 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 
 	// the aiop aico
 	tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+	aiop_aico->ptor = tb_null;
 
 	// done
 	tb_bool_t ok = tb_false;
