@@ -85,6 +85,23 @@ typedef struct __tb_aico_t
  * interfaces
  */
 
+/*! init the aico
+ *
+ * @param aicp 		the aicp
+ * @param handle 	the handle
+ * @param type 		the aico type
+ *
+ * @return 			the aico
+ */
+tb_handle_t 		tb_aico_init(tb_handle_t aicp, tb_handle_t handle, tb_size_t type);
+
+/*! exit the aico
+ *
+ * @param aicp 		the aicp
+ * @param aico 		the aico
+ */
+tb_void_t 			tb_aico_exit(tb_handle_t aico);
+
 /*! the aico aicp
  *
  * @param aico 		the aico
