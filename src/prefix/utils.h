@@ -33,29 +33,40 @@
  */
 
 // abs
-#define tb_abs(x) 				((x) > 0? (x) : -(x))
+#define tb_abs(x) 						((x) > 0? (x) : -(x))
 
 // min & max
-#define tb_max(x, y) 			(((x) > (y))? (x) : (y))
-#define tb_min(x, y) 			(((x) < (y))? (x) : (y))
+#define tb_max(x, y) 					(((x) > (y))? (x) : (y))
+#define tb_min(x, y) 					(((x) < (y))? (x) : (y))
 
 // min3 & max3
-#define tb_max3(x, y, z) 		(((x) > (y))? (((x) > (z))? (x) : (z)) : (((y) > (z))? (y) : (z)))
-#define tb_min3(x, y, z) 		(((x) < (y))? (((x) < (z))? (x) : (z)) : (((y) < (z))? (y) : (z)))
+#define tb_max3(x, y, z) 				(((x) > (y))? (((x) > (z))? (x) : (z)) : (((y) > (z))? (y) : (z)))
+#define tb_min3(x, y, z) 				(((x) < (y))? (((x) < (z))? (x) : (z)) : (((y) < (z))? (y) : (z)))
 
 // the number of entries in the array
-#define tb_arrayn(x) 			(sizeof((x)) / sizeof((x)[0]))
+#define tb_arrayn(x) 					(sizeof((x)) / sizeof((x)[0]))
 
 // ispow2: 1, 2, 4, 8, 16, 32, ...
-#define tb_ispow2(x) 			(!((x) & ((x) - 1)) && (x))
+#define tb_ispow2(x) 					(!((x) & ((x) - 1)) && (x))
 
 // align
-#define tb_align2(x) 			(((x) + 1) >> 1 << 1)
-#define tb_align4(x) 			(((x) + 3) >> 2 << 2)
-#define tb_align8(x) 			(((x) + 7) >> 3 << 3)
-#define tb_align(x, b) 			(((x) + ((b) - 1)) & ~((b) - 1))
-#define tb_align_pow2(x) 		(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 2)
+#define tb_align2(x) 					(((x) + 1) >> 1 << 1)
+#define tb_align4(x) 					(((x) + 3) >> 2 << 2)
+#define tb_align8(x) 					(((x) + 7) >> 3 << 3)
+#define tb_align(x, b) 					(((x) + ((b) - 1)) & ~((b) - 1))
+#define tb_align_pow2(x) 				(((x) > 1)? (tb_ispow2(x)? (x) : (1 << (32 - tb_bits_cl0_u32_be((tb_uint32_t)(x))))) : 2)
 
+// offsetof
+#if defined(TB_COMPILER_IS_GCC) \
+	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
+		&&	TB_COMPILER_VERSION_BE(4, 1)
+# 	define tb_offsetof(s, m) 			(tb_size_t)__builtin_offsetof(s, m)
+#else
+# 	define tb_offsetof(s, m) 			(tb_size_t)&(((s const*)0)->m)
+#endif
+
+// check the offset and size of member for struct or union
+#define tb_memberof_eq(ls, lm, rs, rm) 	((tb_offsetof(ls, lm) == tb_offsetof(rs, rm)) && (sizeof(((ls const*)0)->lm) == sizeof(((rs const*)0)->rm)))
 
 #endif
 

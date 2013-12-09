@@ -32,6 +32,18 @@
  * types
  */
 
+#ifdef TB_CONFIG_OS_WINDOWS
+/// the iovec type for WSASend, WSARecv using WSABUF
+typedef struct __tb_iovec_t
+{
+	/// the size
+	tb_size_t 				size;
+
+	/// the data
+	tb_byte_t* 				data;
+
+}tb_iovec_t;
+#else
 /// the iovec type for readv, preadv, writv, pwritv, recvv, sendv
 typedef struct __tb_iovec_t
 {
@@ -42,6 +54,7 @@ typedef struct __tb_iovec_t
 	tb_size_t 				size;
 
 }tb_iovec_t;
+#endif
 
 
 #endif

@@ -88,7 +88,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
 	// ok
-	return (fd + 1);
+	return tb_fd2handle(fd);
 }
 tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 {
@@ -118,8 +118,8 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 	fcntl(fd[1], F_SETFL, fcntl(fd[1], F_GETFL) | O_NONBLOCK);
 
 	// save pair
-	pair[0] = fd[0] + 1;
-	pair[1] = fd[1] + 1;
+	pair[0] = tb_fd2handle(fd[0]);
+	pair[1] = tb_fd2handle(fd[1]);
 
 	// ok
 	return tb_true;
@@ -145,7 +145,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 #endif
 
 	// connect
-	tb_long_t r = connect((tb_int_t)handle - 1, (struct sockaddr *)&d, sizeof(d));
+	tb_long_t r = connect(tb_handle2fd(handle), (struct sockaddr *)&d, sizeof(d));
 
 	// ok?
 	if (!r || errno == EISCONN) return 1;
@@ -177,7 +177,7 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	//if (ip)
 	{
 		tb_int_t reuseaddr = 1;
-		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
+		if (setsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
 			tb_trace("reuseaddr: %lu failed", port);
 	}
 #endif
@@ -187,13 +187,13 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	if (port)
 	{
 		tb_int_t reuseport = 1;
-		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
+		if (setsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
 			tb_trace("reuseport: %lu failed", port);
 	}
 #endif
 
 	// bind 
-    return (bind((tb_int_t)handle - 1, (struct sockaddr *)&d, sizeof(d)) < 0)? tb_false : tb_true;
+    return (bind(tb_handle2fd(handle), (struct sockaddr *)&d, sizeof(d)) < 0)? tb_false : tb_true;
 }
 tb_bool_t tb_socket_listen(tb_handle_t handle)
 {
@@ -201,7 +201,7 @@ tb_bool_t tb_socket_listen(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, tb_false);
 
 	// listen
-    return (listen((tb_int_t)handle - 1, 20) < 0)? tb_false : tb_true;
+    return (listen(tb_handle2fd(handle), 20) < 0)? tb_false : tb_true;
 }
 tb_handle_t tb_socket_accept(tb_handle_t handle)
 {
@@ -211,16 +211,16 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	// accept  
 	struct sockaddr_in d;
 	tb_int_t 	n = sizeof(struct sockaddr_in);
-	tb_long_t 	r = accept((tb_int_t)handle - 1, (struct sockaddr *)&d, &n);
+	tb_long_t 	fd = accept(tb_handle2fd(handle), (struct sockaddr *)&d, &n);
 
 	// no client?
-	tb_check_return_val(r > 0, tb_null);
+	tb_check_return_val(fd > 0, tb_null);
 
 	// non-block
-	fcntl(r, F_SETFL, fcntl(r, F_GETFL) | O_NONBLOCK);
+	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
 
 	// ok
-	return r + 1;
+	return tb_fd2handle(fd);
 }
 tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
 {
@@ -245,7 +245,7 @@ tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
 	}
 
 	// kill it
-	return !shutdown((tb_int_t)handle - 1, how)? tb_true : tb_false;
+	return !shutdown(tb_handle2fd(handle), how)? tb_true : tb_false;
 }
 tb_bool_t tb_socket_close(tb_handle_t handle)
 {
@@ -253,7 +253,7 @@ tb_bool_t tb_socket_close(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, tb_false);
 
 	// close it
-	return !close((tb_int_t)handle - 1)? tb_true : tb_false;
+	return !close(tb_handle2fd(handle))? tb_true : tb_false;
 }
 tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -262,7 +262,7 @@ tb_long_t tb_socket_recv(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// recv
-	tb_long_t real = recv((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
+	tb_long_t real = recv(tb_handle2fd(handle), data, (tb_int_t)size, 0);
 
 	// ok?
 	if (real >= 0) return real;
@@ -280,7 +280,7 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t si
 	tb_check_return_val(size, 0);
 
 	// send
-	tb_long_t real = send((tb_int_t)handle - 1, data, (tb_int_t)size, 0);
+	tb_long_t real = send(tb_handle2fd(handle), data, (tb_int_t)size, 0);
 
 	// ok?
 	if (real >= 0) return real;
@@ -298,10 +298,11 @@ tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 
 	// check iovec
 	tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
-	tb_assert_static(sizeof(size_t) == sizeof(tb_size_t));
+	tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
+	tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
 
 	// read it
-	tb_long_t real = readv((tb_int_t)socket - 1, list, size);
+	tb_long_t real = readv(tb_handle2fd(socket), (struct iovec const*)list, size);
 
 	// ok?
 	if (real >= 0) return real;
@@ -317,8 +318,13 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// check
 	tb_assert_and_check_return_val(socket && list && size, -1);
 
+	// check iovec
+	tb_assert_static(sizeof(tb_iovec_t) == sizeof(struct iovec));
+	tb_assert_return_val(tb_memberof_eq(tb_iovec_t, data, struct iovec, iov_base), -1);
+	tb_assert_return_val(tb_memberof_eq(tb_iovec_t, size, struct iovec, iov_len), -1);
+
 	// writ it
-	tb_long_t real = writev((tb_int_t)socket - 1, list, size);
+	tb_long_t real = writev(tb_handle2fd(socket), (struct iovec const*)list, size);
 
 	// ok?
 	if (real >= 0) return real;
@@ -338,7 +344,7 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 
 	// send it
 	off_t 		seek = offset;
-	tb_hong_t 	real = sendfile((tb_int_t)socket - 1, (tb_int_t)file - 1, &seek, (size_t)size);
+	tb_hong_t 	real = sendfile(tb_handle2fd(socket), tb_handle2fd(file), &seek, (size_t)size);
 
 	// ok?
 	if (real >= 0) return real;
@@ -353,7 +359,7 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 
 	// send it
 	off_t real = (off_t)size;
-	if (!sendfile((tb_int_t)file - 1, (tb_int_t)socket - 1, (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
+	if (!sendfile(tb_handle2fd(file), tb_handle2fd(socket), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
 
 	// continue?
 	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
@@ -383,7 +389,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 
 	// recv
 	tb_int_t 	n = sizeof(d);
-	tb_long_t 	r = recvfrom((tb_int_t)handle - 1, data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
+	tb_long_t 	r = recvfrom(tb_handle2fd(handle), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
 	// ok?
 	if (r >= 0) return r;
@@ -407,7 +413,7 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	if (!inet_aton(ip, &(d.sin_addr))) return -1;
 
 	// send
-	tb_long_t 	r = sendto((tb_int_t)handle - 1, data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
+	tb_long_t 	r = sendto(tb_handle2fd(handle), data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
 
 	// ok?
 	if (r >= 0) return r;

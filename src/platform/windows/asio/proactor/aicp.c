@@ -703,7 +703,7 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init olap
 	tb_iocp_olap_t* olap = tb_iocp_olap_init(ptor);
 	tb_assert_and_check_return_val(olap, tb_false);
-	olap->data.buf 	= aice->u.sendv.list[0].data;
+	olap->data.buf 	= aice->u.sendv.list[0].data; // FIXME
 	olap->data.len 	= aice->u.sendv.list[0].size;
 	olap->aice 		= *aice;
 
@@ -1774,6 +1774,11 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->maxn, tb_null);
+
+	// check iovec
+	tb_assert_static(sizeof(tb_iovec_t) == sizeof(WSABUF));
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, data, WSABUF, buf), -1);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_iovec_t, size, WSABUF, len), -1);
 
 	// alloc proactor
 	tb_aicp_proactor_iocp_t* ptor = tb_malloc0(sizeof(tb_aicp_proactor_iocp_t));
