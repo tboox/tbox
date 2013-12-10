@@ -93,6 +93,7 @@ tbox_C_FILES 			+= \
 						xml/writer \
 						asio/aioo \
 						asio/aico \
+						asio/aice \
 						asio/aiop \
 						asio/aicp \
 						libc/misc/time/time \

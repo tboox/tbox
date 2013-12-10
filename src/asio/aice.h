@@ -358,6 +358,18 @@ typedef struct __tb_aice_t
 
 }tb_aice_t;
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! the aice state c-string
+ *
+ * @param aice 		the aice
+ *
+ * @return 			the aice state c-string
+ */
+tb_char_t const* 	tb_aice_state_cstr(tb_aice_t const* aice);
+
 
 
 #endif
