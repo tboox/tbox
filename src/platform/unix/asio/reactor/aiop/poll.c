@@ -188,7 +188,7 @@ static tb_bool_t tb_aiop_reactor_poll_delo(tb_aiop_reactor_t* reactor, tb_aioo_t
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
 	// check
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
@@ -207,37 +207,11 @@ static tb_bool_t tb_aiop_reactor_poll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t
 	tb_vector_walk(rtor->pfds, tb_poll_walk_sete, aioe);
 	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
+	// spak it
+	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], "p", 1);
+
 	// ok
 	return tb_true;
-}
-static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
-{
-	// check
-	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->pfds && list && size, tb_false);
-
-	// the aiop
-	tb_aiop_t* aiop = reactor->aiop;
-	tb_assert_and_check_return_val(aiop, tb_false);
-
-	// walk list
-	tb_size_t i = 0;
-	tb_size_t post = 0;
-	for (i = 0; i < size; i++)
-	{
-		// the aioe
-		tb_aioe_t const* aioe = &list[i];
-		if (aioe)
-		{
-			if (tb_aiop_reactor_poll_sete(reactor, aioe)) post++;
-		}
-	}
-
-	// spak it
-	if (post == size && aiop->spak[0]) tb_socket_send(aiop->spak[0], "p", 1);
-
-	// ok?
-	return post == size? tb_true : tb_false;
 }
 static tb_long_t tb_aiop_reactor_poll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	

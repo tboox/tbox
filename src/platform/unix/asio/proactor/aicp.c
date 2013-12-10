@@ -102,11 +102,11 @@ static tb_handle_t 	tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor);
 static tb_void_t 	tb_aicp_file_exit(tb_handle_t file);
 static tb_bool_t 	tb_aicp_file_addo(tb_handle_t file, tb_aico_t* aico);
 static tb_bool_t 	tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico);
-static tb_bool_t 	tb_aicp_file_post(tb_handle_t file, tb_aice_t const* list, tb_size_t size);
+static tb_bool_t 	tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice);
 static tb_long_t 	tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice);
 static tb_void_t 	tb_aicp_file_kill(tb_handle_t file);
 static tb_void_t 	tb_aicp_file_poll(tb_handle_t file);
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * spak
  */
@@ -842,129 +842,59 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
+static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->file && ptor->spak && list && size, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->file && ptor->spak && aice, tb_false);
 	
-	// init
+	// the aico
 	tb_bool_t ok = tb_true;
-
-	// only one?
-	if (size == 1)
+	tb_aico_t const* aico = aice->aico;
+	if (aico)
 	{
-		// the aico
-		tb_aico_t const* aico = list->aico;
-		if (aico)
+		// done
+		switch (aico->type)
 		{
-			// done
-			switch (aico->type)
+		case TB_AICO_TYPE_SOCK:
 			{
-			case TB_AICO_TYPE_SOCK:
+				// enter 
+				if (ptor->lock) tb_spinlock_enter(ptor->lock);
+
+				// post aice
+				if (!tb_queue_full(ptor->spak)) 
 				{
-					// enter 
-					if (ptor->lock) tb_spinlock_enter(ptor->lock);
+					// put
+					tb_queue_put(ptor->spak, aice);
 
-					// post aice
-					if (!tb_queue_full(ptor->spak)) 
-					{
-						// put
-						tb_queue_put(ptor->spak, list);
-
-						// trace
-						tb_trace_impl("post: code: %lu, size: %lu", list->code, tb_queue_size(ptor->spak));
-					}
-					else
-					{
-						// failed
-						ok = tb_false;
-
-						// assert
-						tb_assert(0);
-					}
-
-					// leave 
-					if (ptor->lock) tb_spinlock_leave(ptor->lock);
+					// trace
+					tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
 				}
-				break;
-			case TB_AICO_TYPE_FILE:
+				else
 				{
-					// post file
-					ok = tb_aicp_file_post(ptor->file, list, 1);
+					// failed
+					ok = tb_false;
+
+					// assert
+					tb_assert(0);
 				}
-				break;
-			default:
-				ok = tb_false;
-				break;
+
+				// leave 
+				if (ptor->lock) tb_spinlock_leave(ptor->lock);
 			}
-		}
-		else ok = tb_false;
-	}
-	else
-	{
-		// enter 
-		if (ptor->lock) tb_spinlock_enter(ptor->lock);
-
-		// walk list
-		tb_size_t i = 0;
-		tb_aice_t file_list[TB_AICP_POST_MAXN]; 
-		tb_size_t file_size = 0;
-		for (i = 0; i < size && ok; i++)
-		{
-			// the aice
-			tb_aice_t const* aice = &list[i];
-
-			// the aico
-			tb_aico_t const* aico = aice->aico;
-			tb_assert_and_check_continue(aico);
-
-			// done
-			switch (aico->type)
+			break;
+		case TB_AICO_TYPE_FILE:
 			{
-			case TB_AICO_TYPE_SOCK:
-				{
-					// post aice
-					if (!tb_queue_full(ptor->spak)) 
-					{
-						// put
-						tb_queue_put(ptor->spak, aice);
-
-						// trace
-						tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
-					}
-					else
-					{
-						// failed
-						ok = tb_false;
-
-						// assert
-						tb_assert(0);
-					}
-				}
-				break;
-			case TB_AICO_TYPE_FILE:
-				{
-					// check
-					tb_assert(file_size < TB_AICP_POST_MAXN);
-
-					// save it
-					if (file_size < TB_AICP_POST_MAXN) file_list[file_size++] = *aice;
-					else ok = tb_false;
-				}
-				break;
-			default:
-				ok = tb_false;
-				break;
+				// post file
+				ok = tb_aicp_file_post(ptor->file, aice);
 			}
+			break;
+		default:
+			ok = tb_false;
+			break;
 		}
-
-		// leave 
-		if (ptor->lock) tb_spinlock_leave(ptor->lock);
-
-		// post file
-		if (ok && file_size) ok = tb_aicp_file_post(ptor->file, file_list, file_size);
 	}
+	else ok = tb_false;
 
 	// work it 
 	tb_aiop_spak_work(ptor);

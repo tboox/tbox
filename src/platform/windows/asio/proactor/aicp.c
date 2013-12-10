@@ -1623,44 +1623,33 @@ static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size)
+static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && list && size, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && aice, tb_false);
 
-	// walk post
-	tb_size_t i = 0;
-	for (i = 0; i < size; i++)
+	// init post
+	static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
 	{
-		// the aice
-		tb_aice_t const* aice = &list[i];
+		tb_null
+	,	tb_iocp_post_acpt
+	,	tb_iocp_post_conn
+	,	tb_iocp_post_recv
+	,	tb_iocp_post_send
+	,	tb_iocp_post_recvv
+	,	tb_iocp_post_sendv
+	,	tb_iocp_post_sendfile
+	,	tb_iocp_post_read
+	,	tb_iocp_post_writ
+	,	tb_iocp_post_readv
+	,	tb_iocp_post_writv
+	,	tb_iocp_post_fsync
+	};
+	tb_assert_and_check_return_val(aice->code < tb_arrayn(s_post) && s_post[aice->code], tb_false);
 
-		// init post
-		static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
-		{
-			tb_null
-		,	tb_iocp_post_acpt
-		,	tb_iocp_post_conn
-		,	tb_iocp_post_recv
-		,	tb_iocp_post_send
-		,	tb_iocp_post_recvv
-		,	tb_iocp_post_sendv
-		,	tb_iocp_post_sendfile
-		,	tb_iocp_post_read
-		,	tb_iocp_post_writ
-		,	tb_iocp_post_readv
-		,	tb_iocp_post_writv
-		,	tb_iocp_post_fsync
-		};
-		tb_assert_and_check_return_val(aice->code < tb_arrayn(s_post) && s_post[aice->code], tb_false);
-
-		// post aice
-		if (!s_post[aice->code](proactor, aice)) return tb_false;
-	}
-
-	// ok
-	return tb_true;
+	// post aice
+	return s_post[aice->code](proactor, aice);
 }
 static tb_long_t tb_aicp_proactor_iocp_spak(tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout)
 {

@@ -33,17 +33,6 @@
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// the aicp post maxn
-#ifdef __tb_small__
-# 	define TB_AICP_POST_MAXN 				(256)
-#else
-# 	define TB_AICP_POST_MAXN 				(1024)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -70,7 +59,7 @@ typedef struct __tb_aicp_proactor_t
 	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
 
 	/// post
-	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* list, tb_size_t size);
+	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
 
 	/// spak
 	tb_long_t 				(*spak)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout);
@@ -134,7 +123,7 @@ typedef struct __tb_aicp_proactor_t
  *         |     ...     |    aice4     |     ...        |                                |
  *         |     ...     |     ...      |     ...        |                                |
  *         '---------------------------------------------'                                |
- *                |              |              |                                         |  *                             |                                                          |
+ *                |              |              |                                         |         
  * done:   |---------------------------------------------|                                |
  *         |   caller0   |   caller2    |     ...        |                                |
  *         |   caller1   |     ...      |     ...        |                                |
@@ -160,7 +149,7 @@ typedef struct __tb_aicp_t
 	tb_size_t 				maxn;
 
 	/// is killed?
-	tb_size_t 				kill;
+	tb_atomic_t 			kill;
 
 	/// the proactor
 	tb_aicp_proactor_t* 	ptor;
@@ -213,15 +202,14 @@ tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
  */
 tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
 
-/*! post the aice list
+/*! post the aice 
  *
  * @param aicp 		the aicp
- * @param list 		the aice list
- * @param size 		the aice size
+ * @param list 		the aice 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size);
+tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
 
 /*! loop aicp for the external thread
  *

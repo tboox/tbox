@@ -123,122 +123,56 @@ static tb_bool_t tb_aiop_reactor_kqueue_delo(tb_aiop_reactor_t* reactor, tb_aioo
 	// ok?
 	return tb_aiop_reactor_kqueue_sync(reactor, e, 2);
 }
-static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
+static tb_bool_t tb_aiop_reactor_kqueue_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
 	// check
 	tb_aiop_reactor_kqueue_t* rtor = (tb_aiop_reactor_kqueue_t*)reactor;
-	tb_assert_and_check_return_val(rtor && list && size && size <= TB_AIOP_POST_MAXN, tb_false);
+	tb_assert_and_check_return_val(rtor && aioe, tb_false);
 
-	// only one?
-	if (size == 1)
+	// the aioo
+	tb_aioo_t* aioo = aioe->aioo;
+	tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
+
+	// fd
+	tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
+
+	// change
+	tb_size_t adde = aioe->code & ~aioo->code;
+	tb_size_t dele = ~aioe->code & aioo->code;
+
+	// oneshot?
+	tb_size_t oneshot = (aioe->code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
+
+	// save aioo
+	aioo->code = aioe->code;
+	aioo->data = aioe->data;
+
+	// add event
+	struct kevent 	e[2];
+	tb_size_t 		n = 0;
+	if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
 	{
-		// the aioo
-		tb_aioo_t* aioo = list->aioo;
-		tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
-
-		// fd
-		tb_int_t fd = ((tb_int_t)aioo->handle) - 1;
-
-		// change
-		tb_size_t adde = list->code & ~aioo->code;
-		tb_size_t dele = ~list->code & aioo->code;
-
-		// oneshot?
-		tb_size_t oneshot = (list->code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
-
-		// save aioo
-		aioo->code = list->code;
-		aioo->data = list->data;
-
-		// add event
-		struct kevent 	e[2];
-		tb_size_t 		n = 0;
-		if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
-		{
-			EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
-			n++;
-		}
-		else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
-		{
-			EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, aioo);
-			n++;
-		}
-		if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
-		{
-			EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
-			n++;
-		}
-		else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
-		{
-			EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, aioo);
-			n++;
-		}
-
-		// ok?
-		return n? tb_aiop_reactor_kqueue_sync(reactor, e, n) : tb_true;
+		EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
+		n++;
 	}
-	else
+	else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
 	{
-		// walk list
-		tb_size_t 		i = 0;
-		tb_size_t 		n = 0;
-		tb_size_t 		post = 0;
-		struct kevent 	e[TB_AIOP_POST_MAXN << 1];
-		for (i = 0; i < size; i++)
-		{
-			// the aioe
-			tb_aioe_t const* aioe = &list[i];
-		
-			// the aioo
-			tb_aioo_t* aioo = aioe->aioo;
-			tb_assert_and_check_continue(aioo && aioo->handle);
-
-			// fd
-			tb_long_t fd = ((tb_long_t)aioo->handle) - 1;
-
-			// change
-			tb_size_t adde = aioe->code & ~aioo->code;
-			tb_size_t dele = ~aioe->code & aioo->code;
-			
-			// oneshot?
-			tb_size_t oneshot = (aioe->code & TB_AIOE_CODE_ONESHOT)? EV_ONESHOT : 0;
-
-			// save aioo
-			aioo->code = aioe->code;
-			aioo->data = aioe->data;
-
-			// add event
-			if (adde & TB_AIOE_CODE_RECV || adde & TB_AIOE_CODE_ACPT) 
-			{
-				EV_SET(&e[n], fd, EVFILT_READ, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
-				n++;
-			}
-			else if (dele & TB_AIOE_CODE_RECV || dele & TB_AIOE_CODE_ACPT) 
-			{
-				EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, aioo);
-				n++;
-			}
-			if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
-			{
-				EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
-				n++;
-			}
-			else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
-			{
-				EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, aioo);
-				n++;
-			}
-
-			// post++
-			post++;
-		}
-
-		// check
-		tb_assert_and_check_return_val(post == size, tb_false);
-
-		// ok?
-		return n? tb_aiop_reactor_kqueue_sync(reactor, e, n) : tb_true;
+		EV_SET(&e[n], fd, EVFILT_READ, EV_DELETE, 0, 0, aioo);
+		n++;
 	}
+	if (adde & TB_AIOE_CODE_SEND || adde & TB_AIOE_CODE_CONN)
+	{
+		EV_SET(&e[n], fd, EVFILT_WRITE, oneshot | EV_ADD | EV_ENABLE, NOTE_EOF, 0, aioo);
+		n++;
+	}
+	else if (dele & TB_AIOE_CODE_SEND || dele & TB_AIOE_CODE_CONN)
+	{
+		EV_SET(&e[n], fd, EVFILT_WRITE, EV_DELETE, 0, 0, aioo);
+		n++;
+	}
+
+	// ok?
+	return n? tb_aiop_reactor_kqueue_sync(reactor, e, n) : tb_true;
 }
 static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	
