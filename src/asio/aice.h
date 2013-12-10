@@ -46,7 +46,7 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_SEND 			= 4		//!< for sock
 ,	TB_AICE_CODE_RECVV 			= 5		//!< for sock
 ,	TB_AICE_CODE_SENDV 			= 6		//!< for sock
-,	TB_AICE_CODE_SENDFILE 		= 7		//!< for sock
+,	TB_AICE_CODE_SENDFILE 		= 7		//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
 ,	TB_AICE_CODE_READ 			= 8		//!< for file
 ,	TB_AICE_CODE_WRIT 			= 9		//!< for file
@@ -66,6 +66,7 @@ typedef enum __tb_aice_state_e
 ,	TB_AICE_STATE_CLOSED 		= 2
 , 	TB_AICE_STATE_PENDING 		= 3
 ,	TB_AICE_STATE_TIMEOUT 		= 4
+,	TB_AICE_STATE_NOTSUPPORTED 	= 5
 
 }tb_aice_state_e;
 
@@ -321,10 +322,10 @@ typedef struct __tb_aice_writv_t
 typedef struct __tb_aice_t
 {
 	/// the aice code
-	tb_uint32_t 				code 	: 4;
+	tb_uint32_t 				code 	: 8;
 
 	/// the state
-	tb_uint32_t 				state 	: 4;
+	tb_uint32_t 				state 	: 8;
 
 	/// the aicb
 	tb_aicb_t 					aicb;

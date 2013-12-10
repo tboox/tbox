@@ -214,6 +214,7 @@ endif
 
 # platform
 tbox_C_FILES 			+= \
+						platform/api \
 						platform/path \
 						platform/ctime \
 						platform/sched \

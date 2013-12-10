@@ -13,7 +13,7 @@
 #define TB_DEMO_FILE_READ_MAXN 			(1 << 16)
 
 // mode
-//#define TB_DEMO_MODE_SENDFILE
+#define TB_DEMO_MODE_SENDFILE
 
 /* ///////////////////////////////////////////////////////////////////////
  * types

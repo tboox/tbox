@@ -17,22 +17,15 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		api.c
  *
  */
-#ifndef TB_PLATFROM_WINDOWS_ASIO_PREFIX_H
-#define TB_PLATFROM_WINDOWS_ASIO_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../api.h"
-#include "../../../asio/asio.h"
-#include "../../../libc/libc.h"
-#include "../../../math/math.h"
-#include "../../../memory/memory.h"
-#include "../../../platform/platform.h"
-#include "../../../container/container.h"
-
+#include "prefix.h"
+#ifdef TB_CONFIG_OS_WINDOWS
+# 	include "windows/api.c"
 #endif
+

@@ -33,49 +33,8 @@
 #include "../../../ltimer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// from mswsock.h
-#define TB_IOCP_WSAID_ACCEPTEX 					{0xb5367df1, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
-#define TB_IOCP_WSAID_TRANSMITFILE 				{0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
-#define TB_IOCP_WSAID_GETACCEPTEXSOCKADDRS 		{0xb5367df2, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
-#define TB_IOCP_WSAID_CONNECTEX 				{0x25a207b9, 0xddf3, 0x4660, {0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e}}
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
-
-// the acceptex func type from mswsock.h
-typedef BOOL (WINAPI* tb_iocp_func_acceptex_t)( 	SOCKET sListenSocket
-												,	SOCKET sAcceptSocket
-												,	PVOID lpOutputBuffer
-												,	DWORD dwReceiveDataLength
-												,	DWORD dwLocalAddressLength
-												,	DWORD dwRemoteAddressLength
-												,	LPDWORD lpdwBytesReceived
-												,	LPOVERLAPPED lpOverlapped);
-
-// the connectex func type from mswsock.h
-typedef BOOL (WINAPI* tb_iocp_func_connectex_t)( 	SOCKET s
-												, 	struct sockaddr const*name
-												,	tb_int_t namelen
-												,	PVOID lpSendBuffer
-												,	DWORD dwSendDataLength
-												,	LPDWORD lpdwBytesSent
-												,	LPOVERLAPPED lpOverlapped);
-
-// the transmitfile func type from mswsock.h
-typedef BOOL (WINAPI* tb_iocp_func_transmitfile_t)( SOCKET hSocket
-												,	HANDLE hFile
-												,	DWORD nNumberOfBytesToWrite
-												,	DWORD nNumberOfBytesPerSend
-												,	LPOVERLAPPED lpOverlapped
-												,	LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
-												,	DWORD dwReserved);
-
-// the cancelioex func type from kernel32
-typedef BOOL (WINAPI* tb_iocp_func_cancelioex_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);
 
 // the iocp proactor type
 typedef struct __tb_aicp_proactor_iocp_t
@@ -98,17 +57,20 @@ typedef struct __tb_aicp_proactor_iocp_t
 	// the self for the timer loop
 	tb_atomic_t 							tself;
 
-	// the acceptex func
-	tb_iocp_func_acceptex_t 				acceptex;
+	// the AcceptEx func
+	tb_api_AcceptEx_t 						AcceptEx;
 
-	// the connectex func
-	tb_iocp_func_connectex_t 				connectex;
+	// the ConnectEx func
+	tb_api_ConnectEx_t 						ConnectEx;
 
-	// the transmitfile func
-	tb_iocp_func_transmitfile_t 			transmitfile;
+	// the TransmitFile func
+	tb_api_TransmitFile_t 					TransmitFile;
 
-	// the cancelioex func
-	tb_iocp_func_cancelioex_t 				cancelioex;
+	// the CancelIoEx func
+	tb_api_CancelIoEx_t 					CancelIoEx;
+
+	// the GetQueuedCompletionStatusEx func
+	tb_api_GetQueuedCompletionStatusEx_t 	GetQueuedCompletionStatusEx;
 
 }tb_aicp_proactor_iocp_t;
 
@@ -153,123 +115,6 @@ typedef struct __tb_iocp_loop_t
  */
 static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data);
 
-/* ///////////////////////////////////////////////////////////////////////
- * func
- */
-static tb_iocp_func_acceptex_t tb_iocp_func_acceptex()
-{
-	// done
-	tb_long_t 				ok = -1;
-	tb_handle_t 			sock = tb_null;
-	tb_iocp_func_acceptex_t acceptex = tb_null;
-	do
-	{
-		// init sock
-		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-		tb_assert_and_check_break(sock);
-
-		// get the acceptex func address
-		DWORD 	real = 0;
-		GUID 	guid = TB_IOCP_WSAID_ACCEPTEX;
-		ok = WSAIoctl( 	(SOCKET)sock - 1
-					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
-					, 	&guid
-					, 	sizeof(GUID)
-					, 	&acceptex
-					, 	sizeof(tb_iocp_func_acceptex_t)
-					, 	&real
-					, 	tb_null
-					, 	tb_null);
-		tb_assert_and_check_break(!ok && acceptex);
-
-	} while (0);
-
-	// exit sock
-	if (sock) tb_socket_close(sock);
-
-	// ok?
-	return !ok? acceptex : tb_null;
-}
-static tb_iocp_func_connectex_t tb_iocp_func_connectex()
-{
-	// done
-	tb_long_t 					ok = -1;
-	tb_handle_t 				sock = tb_null;
-	tb_iocp_func_connectex_t 	connectex = tb_null;
-	do
-	{
-		// init sock
-		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-		tb_assert_and_check_break(sock);
-
-		// get the acceptex func address
-		DWORD 	real = 0;
-		GUID 	guid = TB_IOCP_WSAID_CONNECTEX;
-		ok = WSAIoctl( 	(SOCKET)sock - 1
-					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
-					, 	&guid
-					, 	sizeof(GUID)
-					, 	&connectex
-					, 	sizeof(tb_iocp_func_connectex_t)
-					, 	&real
-					, 	tb_null
-					, 	tb_null);
-		tb_assert_and_check_break(!ok && connectex);
-
-	} while (0);
-
-	// exit sock
-	if (sock) tb_socket_close(sock);
-
-	// ok?
-	return !ok? connectex : tb_null;
-}
-static tb_iocp_func_transmitfile_t tb_iocp_func_transmitfile()
-{
-	// done
-	tb_long_t 					ok = -1;
-	tb_handle_t 				sock = tb_null;
-	tb_iocp_func_transmitfile_t transmitfile = tb_null;
-	do
-	{
-		// init sock
-		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-		tb_assert_and_check_break(sock);
-
-		// get the acceptex func address
-		DWORD 	real = 0;
-		GUID 	guid = TB_IOCP_WSAID_TRANSMITFILE;
-		ok = WSAIoctl( 	(SOCKET)sock - 1
-					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
-					, 	&guid
-					, 	sizeof(GUID)
-					, 	&transmitfile
-					, 	sizeof(tb_iocp_func_transmitfile_t)
-					, 	&real
-					, 	tb_null
-					, 	tb_null);
-		tb_assert_and_check_break(!ok && transmitfile);
-
-	} while (0);
-
-	// exit sock
-	if (sock) tb_socket_close(sock);
-
-	// ok?
-	return !ok? transmitfile : tb_null;
-}
-static tb_iocp_func_cancelioex_t tb_iocp_func_cancelioex()
-{
-	// the kernel32 module
-	HANDLE module = GetModuleHandleA("kernel32.dll");
-
-	// the cancelioex func
-	tb_iocp_func_cancelioex_t cancelioex = tb_null;
-	if (module) cancelioex = GetProcAddress(module, "CancelIoEx");
-
-	// ok?
-	return cancelioex;
-}
 /* ///////////////////////////////////////////////////////////////////////
  * priv
  */
@@ -329,7 +174,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && ptor->acceptex && proactor->aicp, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->port && ptor->AcceptEx && proactor->aicp, tb_false);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ACPT, tb_false);
@@ -345,7 +190,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// done
 	tb_bool_t 		ok = tb_false;
 	tb_bool_t 		init_ok = tb_false;
-	tb_bool_t 		acceptex_ok = tb_false;
+	tb_bool_t 		AcceptEx_ok = tb_false;
 	do
 	{
 		// init olap
@@ -359,9 +204,9 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 		tb_assert_and_check_break(aico->olap.aice.u.acpt.priv[0] && aico->olap.aice.u.acpt.sock);
 		init_ok = tb_true;
 
-		// done acceptex
+		// done AcceptEx
 		DWORD real = 0;
-		acceptex_ok = ptor->acceptex( 	(SOCKET)aico->base.handle - 1
+		AcceptEx_ok = ptor->AcceptEx( 	(SOCKET)aico->base.handle - 1
 									, 	(SOCKET)aico->olap.aice.u.acpt.sock - 1
 									, 	(tb_byte_t*)aico->olap.aice.u.acpt.priv[0]
 									, 	0
@@ -369,8 +214,8 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 									, 	sizeof(SOCKADDR_IN) + 16
 									, 	&real
 									, 	&aico->olap)? tb_true : tb_false;
-		tb_trace_impl("acceptex: %d, error: %d", acceptex_ok, WSAGetLastError());
-		tb_check_break(acceptex_ok);
+		tb_trace_impl("AcceptEx: %d, error: %d", AcceptEx_ok, WSAGetLastError());
+		tb_check_break(AcceptEx_ok);
 
 		// post ok
 		aico->olap.aice.state = TB_AICE_STATE_OK;
@@ -381,8 +226,8 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	} while (0);
 
-	// acceptex failed? 
-	if (init_ok && !acceptex_ok)
+	// AcceptEx failed? 
+	if (init_ok && !AcceptEx_ok)
 	{
 		// pending? continue it
 		if (WSA_IO_PENDING == WSAGetLastError()) 
@@ -401,7 +246,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) ok = tb_true;
 
 			// trace
-			tb_trace_impl("acceptex: unknown error: %d", WSAGetLastError());
+			tb_trace_impl("AcceptEx: unknown error: %d", WSAGetLastError());
 		}
 	}
 
@@ -441,7 +286,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// done
 	tb_bool_t 		ok = tb_false;
 	tb_bool_t 		init_ok = tb_false;
-	tb_bool_t 		connectex_ok = tb_false;
+	tb_bool_t 		ConnectEx_ok = tb_false;
 	do
 	{
 		// init olap
@@ -450,7 +295,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 		// init aice
 		aico->olap.aice = *aice;
 
-		// bind it first for connectex
+		// bind it first for ConnectEx
 		SOCKADDR_IN local;
 		local.sin_family = AF_INET;
 		local.sin_addr.S_un.S_addr = INADDR_ANY;
@@ -458,21 +303,21 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 		if (SOCKET_ERROR == bind((SOCKET)aico->base.handle - 1, (LPSOCKADDR)&local, sizeof(local))) break;
 		init_ok = tb_true;
 
-		// done connectex
+		// done ConnectEx
 		DWORD real = 0;
 		SOCKADDR_IN addr = {0};
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(aice->u.conn.port);
 		addr.sin_addr.S_un.S_addr = inet_addr(aice->u.conn.host);
-		connectex_ok = ptor->connectex( 	(SOCKET)aico->base.handle - 1
+		ConnectEx_ok = ptor->ConnectEx( 	(SOCKET)aico->base.handle - 1
 										, 	(struct sockaddr const*)&addr
 										, 	sizeof(addr)
 										, 	tb_null
 										, 	0
 										, 	&real
 										, 	&aico->olap)? tb_true : tb_false;
-		tb_trace_impl("connectex: %d, error: %d", connectex_ok, WSAGetLastError());
-		tb_check_break(connectex_ok);
+		tb_trace_impl("ConnectEx: %d, error: %d", ConnectEx_ok, WSAGetLastError());
+		tb_check_break(ConnectEx_ok);
 
 		// post ok
 		aico->olap.aice.state = TB_AICE_STATE_OK;
@@ -483,8 +328,8 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	} while (0);
 
-	// connectex failed?
-	if (init_ok && !connectex_ok)
+	// ConnectEx failed?
+	if (init_ok && !ConnectEx_ok)
 	{
 		// pending? continue it
 		if (WSA_IO_PENDING == WSAGetLastError()) 
@@ -503,7 +348,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 			if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) ok = tb_true;
 
 			// trace
-			tb_trace_impl("connectex: unknown error: %d", WSAGetLastError());
+			tb_trace_impl("ConnectEx: unknown error: %d", WSAGetLastError());
 		}
 	}
 
@@ -774,8 +619,16 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 	// init aice
 	aico->olap.aice = *aice;
 
+	// not supported?
+	if (!ptor->TransmitFile)
+	{
+		// post not supported
+		aico->olap.aice.state = TB_AICE_STATE_NOTSUPPORTED;
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;
+	}
+
 	// done send
-	tb_long_t real = ptor->transmitfile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendfile.file, (DWORD)aice->u.sendfile.size, (1 << 16), &aico->olap, tb_null, 0);
+	tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendfile.file, (DWORD)aice->u.sendfile.size, (1 << 16), &aico->olap, tb_null, 0);
 	tb_trace_impl("sendfile: %ld, error: %d", real, WSAGetLastError());
 
 	// pending? continue it
@@ -1091,27 +944,37 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 	{
 	case TB_AICO_TYPE_SOCK:
 		{
-			// exists cancelioex?
-			if (ptor->cancelioex)
+			// exists CancelIoEx?
+			if (ptor->CancelIoEx)
 			{
-				// cancelioex it
-				if (!ptor->cancelioex((SOCKET)aico->base.handle - 1, &aico->olap))
+				// CancelIoEx it
+				if (!ptor->CancelIoEx((SOCKET)aico->base.handle - 1, &aico->olap))
 				{
 					tb_trace_impl("cancel: failed: %u", GetLastError());
 				}
+			}
+			else
+			{
+				// TODO
+				// ..
 			}
 		}
 		break;
 	case TB_AICO_TYPE_FILE:
 		{
-			// exists cancelioex?
-			if (ptor->cancelioex)
+			// exists CancelIoEx?
+			if (ptor->CancelIoEx)
 			{
-				// cancelioex it
-				if (!ptor->cancelioex(aico->base.handle, &aico->olap))
+				// CancelIoEx it
+				if (!ptor->CancelIoEx(aico->base.handle, &aico->olap))
 				{
 					tb_trace_impl("cancel: failed: %u", GetLastError());
 				}
+			}
+			else
+			{
+				// TODO
+				// ..
 			}
 		}
 		break;
@@ -1129,8 +992,16 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = resp->u.acpt.sock? TB_AICE_STATE_OK : TB_AICE_STATE_FAILED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = resp->u.acpt.sock? TB_AICE_STATE_OK : TB_AICE_STATE_FAILED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1171,7 +1042,19 @@ static tb_long_t tb_iocp_spak_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_assert_and_check_return_val(resp, -1);
 
 	// ok
-	if (wait) resp->state = TB_AICE_STATE_OK;
+	if (wait) 
+	{
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = TB_AICE_STATE_OK;
+			break;
+		default:
+			break;
+		}
+	}
 	// failed? done error
 	else
 	{
@@ -1205,8 +1088,17 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
+
 		ok = 1;
 	}
 	// failed? done error
@@ -1248,8 +1140,16 @@ static tb_long_t tb_iocp_spak_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1291,8 +1191,16 @@ static tb_long_t tb_iocp_spak_recvv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1334,8 +1242,16 @@ static tb_long_t tb_iocp_spak_sendv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1377,8 +1293,16 @@ static tb_long_t tb_iocp_spak_sendfile(tb_aicp_proactor_iocp_t* ptor, tb_aice_t*
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1420,8 +1344,16 @@ static tb_long_t tb_iocp_spak_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1463,8 +1395,16 @@ static tb_long_t tb_iocp_spak_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1506,8 +1446,16 @@ static tb_long_t tb_iocp_spak_readv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1549,8 +1497,16 @@ static tb_long_t tb_iocp_spak_writv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		// save state
-		resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
+			break;
+		default:
+			break;
+		}
 		ok = 1;
 	}
 	// failed? done error
@@ -1592,7 +1548,17 @@ static tb_long_t tb_iocp_spak_fsync(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	tb_long_t ok = -1;
 	if (wait) 
 	{
-		resp->state = TB_AICE_STATE_OK;
+		// done state
+		switch (resp->state)
+		{
+		case TB_AICE_STATE_OK:
+		case TB_AICE_STATE_PENDING:
+			resp->state = TB_AICE_STATE_OK;
+			break;
+		default:
+			break;
+		}
+
 		ok = 1;
 	}
 	// failed? done error
@@ -1886,11 +1852,12 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.loop_spak 	= tb_aicp_proactor_iocp_loop_spak;
 
 	// init func
-	ptor->acceptex 		= tb_iocp_func_acceptex();
-	ptor->connectex 	= tb_iocp_func_connectex();
-	ptor->transmitfile 	= tb_iocp_func_transmitfile();
-	ptor->cancelioex 	= tb_iocp_func_cancelioex();
-	tb_assert_and_check_goto(ptor->acceptex && ptor->connectex && ptor->transmitfile, fail);
+	ptor->AcceptEx 						= tb_api_AcceptEx();
+	ptor->ConnectEx 					= tb_api_ConnectEx();
+	ptor->TransmitFile 					= tb_api_TransmitFile();
+	ptor->CancelIoEx 					= tb_api_CancelIoEx();
+	ptor->GetQueuedCompletionStatusEx 	= tb_api_GetQueuedCompletionStatusEx();
+	tb_assert_and_check_goto(ptor->AcceptEx && ptor->ConnectEx, fail);
 
 	// init lock
 	ptor->lock 			= tb_spinlock_init();
