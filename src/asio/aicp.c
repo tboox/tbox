@@ -43,13 +43,13 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && handle && type, tb_null);
+	tb_assert_and_check_return_val(aicp && aicp->pool && handle && type, tb_null);
 
 	// enter 
 	if (aicp->lock) tb_spinlock_enter(aicp->lock);
 
 	// make aico
-	tb_aico_t* aico = aicp->pool? (tb_aico_t*)tb_rpool_malloc0(aicp->pool) : tb_null;
+	tb_aico_t* aico = (tb_aico_t*)tb_rpool_malloc0(aicp->pool);
 
 	// init aico
 	if (aico)
@@ -73,7 +73,7 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
 {
 	// check
-	tb_assert_and_check_return(aicp);
+	tb_assert_and_check_return(aicp && aicp->pool);
 
 	// enter 
 	if (aicp->lock) tb_spinlock_enter(aicp->lock);
