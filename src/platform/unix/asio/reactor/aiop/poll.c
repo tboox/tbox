@@ -194,6 +194,10 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
 	tb_aiop_reactor_poll_t* rtor = (tb_aiop_reactor_poll_t*)reactor;
 	tb_assert_and_check_return_val(rtor && rtor->pfds && rtor->cfds && aioe, tb_false);
 
+	// the aiop
+	tb_aiop_t* aiop = reactor->aiop;
+	tb_assert_and_check_return_val(aiop, tb_false);
+
 	// the aioo
 	tb_aioo_t* aioo = aioe->aioo;
 	tb_assert_and_check_return_val(aioo, tb_false);

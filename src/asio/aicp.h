@@ -61,8 +61,14 @@ typedef struct __tb_aicp_proactor_t
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
 
+	/// loop: init
+	tb_handle_t 			(*loop_init)(struct __tb_aicp_proactor_t* proactor);
+
+	/// loop: exit
+	tb_void_t 				(*loop_exit)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop);
+
 	/// spak
-	tb_long_t 				(*spak)(struct __tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout);
+	tb_long_t 				(*loop_spak)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout);
 
 }tb_aicp_proactor_t;
 

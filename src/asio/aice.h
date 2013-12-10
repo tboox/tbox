@@ -75,6 +75,9 @@ typedef struct __tb_aice_acpt_t
 	/// the client socket 
 	tb_handle_t 				sock;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[3];
+
 }tb_aice_acpt_t;
 
 /// the conn aice type
@@ -86,35 +89,148 @@ typedef struct __tb_aice_conn_t
 	/// the host, @note: reference only
 	tb_char_t const* 			host;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[2];
+
 }tb_aice_conn_t;
 
-/// the recv aice type
+#ifdef TB_CONFIG_OS_WINDOWS
+/// the recv aice type, base: tb_iovec_t
 typedef struct __tb_aice_recv_t
 {
-	/// the recv data
-	tb_byte_t* 					data;
-
-	/// the data size
+	/// the data size for (tb_iovec_t*)->size
 	tb_size_t 					size;
+
+	/// the recv data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
 
 	/// the data real
 	tb_size_t 					real;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[1];
 
 }tb_aice_recv_t;
 
-/// the send aice type
+/// the send aice type, base: tb_iovec_t
 typedef struct __tb_aice_send_t
 {
-	/// the send data
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the send data for (tb_iovec_t*)->data
 	tb_byte_t const* 			data;
 
-	/// the data size
+	/// the data real
+	tb_size_t 					real;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[1];
+
+}tb_aice_send_t;
+
+/// the read aice type, base: tb_iovec_t
+typedef struct __tb_aice_read_t
+{
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the read data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
+
+	/// the file seek
+	tb_hize_t 					seek;
+
+	/// the data real
+	tb_size_t 					real;
+
+}tb_aice_read_t;
+
+/// the writ aice type, base: tb_iovec_t
+typedef struct __tb_aice_writ_t
+{
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the writ data for (tb_iovec_t*)->data
+	tb_byte_t const* 			data;
+
+	/// the file seek
+	tb_hize_t 					seek;
+
+	/// the data real
+	tb_size_t 					real;
+
+}tb_aice_writ_t;
+#else
+/// the recv aice type, base: tb_iovec_t
+typedef struct __tb_aice_recv_t
+{
+	/// the recv data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
+
+	/// the data size for (tb_iovec_t*)->size
 	tb_size_t 					size;
 
 	/// the data real
 	tb_size_t 					real;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[1];
+
+}tb_aice_recv_t;
+
+/// the send aice type, base: tb_iovec_t
+typedef struct __tb_aice_send_t
+{
+	/// the send data for (tb_iovec_t*)->data
+	tb_byte_t const* 			data;
+
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[1];
+
 }tb_aice_send_t;
+
+/// the read aice type, base: tb_iovec_t
+typedef struct __tb_aice_read_t
+{
+	/// the read data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
+
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the file seek
+	tb_hize_t 					seek;
+
+	/// the data real
+	tb_size_t 					real;
+
+}tb_aice_read_t;
+
+/// the writ aice type, base: tb_iovec_t
+typedef struct __tb_aice_writ_t
+{
+	/// the writ data for (tb_iovec_t*)->data
+	tb_byte_t const* 			data;
+
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the file seek
+	tb_hize_t 					seek;
+
+	/// the data real
+	tb_size_t 					real;
+
+}tb_aice_writ_t;
+#endif
 
 /// the recvv aice type
 typedef struct __tb_aice_recvv_t
@@ -166,40 +282,6 @@ typedef struct __tb_aice_sendfile_t
 	tb_hize_t 					real;
 
 }tb_aice_sendfile_t;
-
-/// the read aice type
-typedef struct __tb_aice_read_t
-{
-	/// the read data
-	tb_byte_t* 					data;
-
-	/// the data size
-	tb_size_t 					size;
-
-	/// the file seek
-	tb_hize_t 					seek;
-
-	/// the data real
-	tb_size_t 					real;
-
-}tb_aice_read_t;
-
-/// the writ aice type
-typedef struct __tb_aice_writ_t
-{
-	/// the writ data
-	tb_byte_t const* 			data;
-
-	/// the data size
-	tb_size_t 					size;
-
-	/// the file seek
-	tb_hize_t 					seek;
-
-	/// the data real
-	tb_size_t 					real;
-
-}tb_aice_writ_t;
 
 /// the readv aice type
 typedef struct __tb_aice_readv_t

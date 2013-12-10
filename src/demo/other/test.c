@@ -13,7 +13,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// trace
-	tb_print("%lu %lu", tb_offsetof(tb_iovec_t, data), tb_offsetof(tb_iovec_t, size));
+	tb_print("%lu", sizeof(tb_aice_t));
+	tb_print("%lu", tb_memtailof(tb_aice_t, u.acpt));
+	tb_print("%lu", tb_memdiffof(tb_aice_t, u, u.acpt));
 
 	// exit
 	tb_exit();

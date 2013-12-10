@@ -902,56 +902,6 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_proactor_aiop_spak(tb_aicp_proactor_t* proactor, tb_aice_t* resp, tb_long_t timeout)
-{
-	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && resp, -1);
-
-	// enter 
-	if (ptor->lock) tb_spinlock_enter(ptor->lock);
-
-	// spak aice
-	tb_long_t ok = 0;
-	tb_bool_t null = tb_false;
-	if (!(null = tb_queue_null(ptor->spak))) 
-	{
-		// get resp
-		tb_aice_t const* aice = tb_queue_get(ptor->spak);
-		if (aice) 
-		{
-			// save resp
-			*resp = *aice;
-
-			// trace
-			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
-
-			// pop it
-			tb_queue_pop(ptor->spak);
-
-			// ok
-			ok = 1;
-		}
-	}
-
-	// leave 
-	if (ptor->lock) tb_spinlock_leave(ptor->lock);
-
-	// done it
-	if (ok) ok = tb_aiop_spak_done(ptor, resp);
-
-	// null?
-	tb_check_return_val(!ok && null, ok);
-
-	// trace
-	tb_trace_impl("wait[%u]: ..", (tb_uint16_t)tb_thread_self());
-
-	// wait some time
-	if (tb_semaphore_wait(ptor->wait, timeout) < 0) return -1;
-
-	// timeout 
-	return 0;
-}
 static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
@@ -1027,6 +977,71 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 		tb_free(ptor);
 	}
 }
+static tb_handle_t tb_aicp_proactor_aiop_loop_init(tb_aicp_proactor_t* proactor)
+{
+	// check
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
+	tb_assert_and_check_return_val(ptor, tb_null);
+
+	return ptor;
+}
+static tb_void_t tb_aicp_proactor_aiop_loop_exit(tb_aicp_proactor_t* proactor, tb_handle_t loop)
+{
+	// check
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
+	tb_assert_and_check_return(ptor);
+
+}
+static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout)
+{
+	// check
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
+	tb_assert_and_check_return_val(ptor && resp, -1);
+
+	// enter 
+	if (ptor->lock) tb_spinlock_enter(ptor->lock);
+
+	// spak aice
+	tb_long_t ok = 0;
+	tb_bool_t null = tb_false;
+	if (!(null = tb_queue_null(ptor->spak))) 
+	{
+		// get resp
+		tb_aice_t const* aice = tb_queue_get(ptor->spak);
+		if (aice) 
+		{
+			// save resp
+			*resp = *aice;
+
+			// trace
+			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
+
+			// pop it
+			tb_queue_pop(ptor->spak);
+
+			// ok
+			ok = 1;
+		}
+	}
+
+	// leave 
+	if (ptor->lock) tb_spinlock_leave(ptor->lock);
+
+	// done it
+	if (ok) ok = tb_aiop_spak_done(ptor, resp);
+
+	// null?
+	tb_check_return_val(!ok && null, ok);
+
+	// trace
+	tb_trace_impl("wait[%u]: ..", (tb_uint16_t)tb_thread_self());
+
+	// wait some time
+	if (tb_semaphore_wait(ptor->wait, timeout) < 0) return -1;
+
+	// timeout 
+	return 0;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * file implementation
@@ -1051,14 +1066,16 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(ptor, tb_null);
 
 	// init base
-	ptor->base.aicp = aicp;
-	ptor->base.step = sizeof(tb_aiop_aico_t);
-	ptor->base.kill = tb_aicp_proactor_aiop_kill;
-	ptor->base.exit = tb_aicp_proactor_aiop_exit;
-	ptor->base.addo = tb_aicp_proactor_aiop_addo;
-	ptor->base.delo = tb_aicp_proactor_aiop_delo;
-	ptor->base.post = tb_aicp_proactor_aiop_post;
-	ptor->base.spak = tb_aicp_proactor_aiop_spak;
+	ptor->base.aicp 		= aicp;
+	ptor->base.step 		= sizeof(tb_aiop_aico_t);
+	ptor->base.kill 		= tb_aicp_proactor_aiop_kill;
+	ptor->base.exit 		= tb_aicp_proactor_aiop_exit;
+	ptor->base.addo 		= tb_aicp_proactor_aiop_addo;
+	ptor->base.delo 		= tb_aicp_proactor_aiop_delo;
+	ptor->base.post 		= tb_aicp_proactor_aiop_post;
+	ptor->base.loop_init 	= tb_aicp_proactor_aiop_loop_init;
+	ptor->base.loop_exit 	= tb_aicp_proactor_aiop_loop_exit;
+	ptor->base.loop_spak 	= tb_aicp_proactor_aiop_loop_spak;
 
 	// init lock
 	ptor->lock = tb_spinlock_init();
