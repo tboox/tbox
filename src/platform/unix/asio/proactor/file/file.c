@@ -53,41 +53,32 @@ static tb_bool_t tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico)
 {
 	return tb_true;
 }
-static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* list, tb_size_t size)
+static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
-	tb_assert_and_check_return_val(ptor && list && size, tb_false);
+	tb_assert_and_check_return_val(ptor && aice, tb_false);
 	
 	// enter 
 	if (ptor->lock) tb_spinlock_enter(ptor->lock);
 
-	// walk list
-	tb_size_t i = 0;
+	// post aice
 	tb_bool_t ok = tb_true;
-	for (i = 0; i < size && ok; i++)
+	if (!tb_queue_full(ptor->spak)) 
 	{
-		// the aice
-		tb_aice_t const* aice = &list[i];
+		// put
+		tb_queue_put(ptor->spak, aice);
 
-		// post aice
-		if (!tb_queue_full(ptor->spak)) 
-		{
-			// put
-			tb_queue_put(ptor->spak, aice);
+		// trace
+		tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
+	}
+	else
+	{
+		// failed
+		ok = tb_false;
 
-			// trace
-			tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
-		}
-		else
-		{
-			// failed
-			ok = tb_false;
-
-			// assert
-			tb_assert(0);
-		}
-
+		// assert
+		tb_assert(0);
 	}
 
 	// leave 

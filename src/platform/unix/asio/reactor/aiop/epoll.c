@@ -83,7 +83,7 @@ static tb_bool_t tb_aiop_reactor_epoll_delo(tb_aiop_reactor_t* reactor, tb_aioo_
 	struct epoll_event e = {0};
 	return (epoll_ctl(rtor->epfd, EPOLL_CTL_DEL, ((tb_long_t)aioo->handle) - 1, &e) < 0)? tb_false : tb_true;
 }
-static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
+static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe)
 {
 	// check
 	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
@@ -123,28 +123,6 @@ static tb_bool_t tb_aiop_reactor_epoll_sete(tb_aiop_reactor_t* reactor, tb_aioe_
 
 	// ok
 	return tb_true;
-}
-static tb_bool_t tb_aiop_reactor_epoll_post(tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size)
-{
-	// check
-	tb_aiop_reactor_epoll_t* rtor = (tb_aiop_reactor_epoll_t*)reactor;
-	tb_assert_and_check_return_val(rtor && rtor->epfd > 0 && list && size, tb_false);
-
-	// walk list
-	tb_size_t i = 0;
-	tb_size_t post = 0;
-	for (i = 0; i < size; i++)
-	{
-		// the aioe
-		tb_aioe_t const* aioe = &list[i];
-		if (aioe)
-		{
-			if (tb_aiop_reactor_epoll_sete(reactor, aioe)) post++;
-		}
-	}
-
-	// ok?
-	return post? tb_true : tb_false;
 }
 static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout)
 {	

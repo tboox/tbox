@@ -33,17 +33,6 @@
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// the aiop post maxn
-#ifdef __tb_small__
-# 	define TB_AIOP_POST_MAXN 				(256)
-#else
-# 	define TB_AIOP_POST_MAXN 				(1024)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -67,7 +56,7 @@ typedef struct __tb_aiop_reactor_t
 	tb_bool_t 				(*delo)(struct __tb_aiop_reactor_t* reactor, tb_aioo_t const* aioo);
 
 	/// post
-	tb_bool_t 				(*post)(struct __tb_aiop_reactor_t* reactor, tb_aioe_t const* list, tb_size_t size);
+	tb_bool_t 				(*post)(struct __tb_aiop_reactor_t* reactor, tb_aioe_t const* aioe);
 
 	/// wait
 	tb_long_t 				(*wait)(struct __tb_aiop_reactor_t* reactor, tb_aioe_t* list, tb_size_t maxn, tb_long_t timeout);
@@ -156,12 +145,11 @@ tb_void_t 			tb_aiop_delo(tb_aiop_t* aiop, tb_handle_t aioo);
 /*! post the aioe list
  *
  * @param aiop 		the aiop
- * @param list 		the list
- * @param size 		the size
+ * @param aioe 		the aioe
  *
  * @return 	 		tb_true or tb_false
  */
-tb_bool_t 			tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* list, tb_size_t size);
+tb_bool_t 			tb_aiop_post(tb_aiop_t* aiop, tb_aioe_t const* aioe);
 
 /*! set the asie
  *

@@ -194,30 +194,16 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	if (aicp->ptor->delo(aicp->ptor, aico))
 		tb_aicp_aico_exit(aicp, aico);
 }
-tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* list, tb_size_t size)
+tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
-	tb_assert_and_check_return_val(list && size && size <= TB_AICP_POST_MAXN, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
 
-	// post++
-#ifdef __tb_debug__
-	{
-		tb_size_t i = 0;
-		for (i = 0; i < size; i++)
-		{
-			// the aico
-			tb_aico_t* aico = list[i].aico;
-			tb_assert_and_check_return_val(aico, tb_false);
-
-			// post++
-			tb_assert_return_val(!tb_atomic_fetch_and_inc(&aico->post), tb_false);
-		}
-	}
-#endif
+	// check post
+	tb_assert_return_val(aice->aico? !tb_atomic_fetch_and_inc(&aice->aico->post) : 0, tb_false);
 
 	// post
-	return aicp->ptor->post(aicp->ptor, list, size);
+	return aicp->ptor->post(aicp->ptor, aice);
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
@@ -247,7 +233,7 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 		// timeout?
 		tb_check_continue(ok);
 
-		// post--
+		// check post
 		tb_assert(resp.aico? (tb_atomic_fetch_and_set0(&resp.aico->post) == 1) : 0);
 
 		// done aicb

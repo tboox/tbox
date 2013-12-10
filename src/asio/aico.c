@@ -106,7 +106,7 @@ tb_bool_t tb_aico_acpt(tb_handle_t haico, tb_aicb_t aicb_func, tb_cpointer_t aic
 	aice.aico 				= aico;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -125,7 +125,7 @@ tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port,
 	aice.u.conn.port 		= port;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_recv(tb_handle_t haico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -144,7 +144,7 @@ tb_bool_t tb_aico_recv(tb_handle_t haico, tb_byte_t* data, tb_size_t size, tb_ai
 	aice.u.recv.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_send(tb_handle_t haico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -163,7 +163,7 @@ tb_bool_t tb_aico_send(tb_handle_t haico, tb_byte_t const* data, tb_size_t size,
 	aice.u.send.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_recvv(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -182,7 +182,7 @@ tb_bool_t tb_aico_recvv(tb_handle_t haico, tb_iovec_t const* list, tb_size_t siz
 	aice.u.recvv.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_sendv(tb_handle_t haico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -201,7 +201,7 @@ tb_bool_t tb_aico_sendv(tb_handle_t haico, tb_iovec_t const* list, tb_size_t siz
 	aice.u.sendv.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_sendfile(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -221,7 +221,7 @@ tb_bool_t tb_aico_sendfile(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, 
 	aice.u.sendfile.size 	= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_read(tb_handle_t haico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -241,7 +241,7 @@ tb_bool_t tb_aico_read(tb_handle_t haico, tb_hize_t seek, tb_byte_t* data, tb_si
 	aice.u.read.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_writ(tb_handle_t haico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -261,7 +261,7 @@ tb_bool_t tb_aico_writ(tb_handle_t haico, tb_hize_t seek, tb_byte_t const* data,
 	aice.u.writ.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_readv(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -281,7 +281,7 @@ tb_bool_t tb_aico_readv(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* lis
 	aice.u.readv.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_writv(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -301,7 +301,7 @@ tb_bool_t tb_aico_writv(tb_handle_t haico, tb_hize_t seek, tb_iovec_t const* lis
 	aice.u.writv.size 		= size;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_fsync(tb_handle_t haico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data)
 {
@@ -318,6 +318,6 @@ tb_bool_t tb_aico_fsync(tb_handle_t haico, tb_aicb_t aicb_func, tb_cpointer_t ai
 	aice.aico 				= aico;
 
 	// post
-	return tb_aicp_post(aico->aicp, &aice, 1);
+	return tb_aicp_post(aico->aicp, &aice);
 }
 
