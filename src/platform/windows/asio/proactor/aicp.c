@@ -126,7 +126,7 @@ typedef struct __tb_iocp_aico_t
 	tb_aicp_proactor_iocp_t* 				ptor;
 
 	// the olap
-	tb_iocp_olap_t* 						olap;
+	tb_atomic_t 							olap;
 
 	// the task
 	tb_handle_t 							task;
@@ -290,6 +290,29 @@ static tb_iocp_func_transmitfile_t tb_iocp_func_transmitfile()
 /* ///////////////////////////////////////////////////////////////////////
  * post
  */
+static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_olap_t* olap)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && olap && olap->aice.aico, tb_false);
+	
+	// add timeout task
+	tb_long_t timeout = tb_aico_timeout_from_code(olap->aice.aico, olap->aice.code);
+	if (timeout >= 0)
+	{
+		// the iocp aico
+		tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)olap->aice.aico; 
+
+		// save olap
+		tb_atomic_set(&iocp_aico->olap, olap);
+		
+		// exit the old task
+		if (iocp_aico->task) tb_ltimer_task_del(ptor->timer, iocp_aico->task);
+
+		// add the new task
+		iocp_aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, iocp_aico);
+	}
+}
 static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
@@ -354,22 +377,9 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 		// pending? continue it
 		if (WSA_IO_PENDING == WSAGetLastError()) 
 		{
-#if 0
-			// add timeout task
-			tb_long_t timeout = tb_aico_timeout_from_code(aico, aice->code);
-			if (timeout >= 0)
-			{
-				// the iocp aico
-				tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico; 
-				iocp_aico->olap = olap;
-				
-				// exit the old task
-				if (iocp_aico->task) tb_ltimer_task_del(ptor->timer, iocp_aico->task);
+			// post timeout
+			tb_iocp_post_timeout(proactor, olap);
 
-				// add the new task
-				iocp_aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, aico);
-			}
-#endif
 			// ok
 			ok = tb_true;
 		}
@@ -472,7 +482,14 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 	if (init_ok && bind_ok && !connectex_ok)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) ok = tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError()) 
+		{	
+			// post timeout
+			tb_iocp_post_timeout(proactor, olap);
+
+			// ok
+			ok = tb_true;
+		}
 		// failed? remove olap
 		else
 		{
@@ -525,7 +542,14 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 	if (ok == SOCKET_ERROR)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError()) 
+		{
+			// post timeout 
+			tb_iocp_post_timeout(proactor, olap);
+
+			// ok
+			return tb_true;
+		}
 
 		// done error
 		switch (WSAGetLastError())
@@ -580,7 +604,14 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 	if (ok == SOCKET_ERROR)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError())
+		{
+			// post timeout 
+			tb_iocp_post_timeout(proactor, olap);
+
+			// ok
+			return tb_true;
+		}
 
 		// done error
 		switch (WSAGetLastError())
@@ -636,7 +667,14 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	if (ok == SOCKET_ERROR)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError()) 
+		{
+			// post timeout 
+			tb_iocp_post_timeout(proactor, olap);
+
+			// ok
+			return tb_true;
+		}
 
 		// done error
 		switch (WSAGetLastError())
@@ -691,7 +729,14 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	if (ok == SOCKET_ERROR)
 	{
 		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+		if (WSA_IO_PENDING == WSAGetLastError()) 
+		{
+			// post timeout 
+			tb_iocp_post_timeout(proactor, olap);
+
+			// ok
+			return tb_true;
+		}
 
 		// done error
 		switch (WSAGetLastError())
@@ -743,7 +788,14 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 	tb_trace_impl("sendfile: %ld, error: %d", real, WSAGetLastError());
 
 	// pending? continue it
-	if (!real || WSA_IO_PENDING == WSAGetLastError()) return tb_true;
+	if (!real || WSA_IO_PENDING == WSAGetLastError()) 
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, olap);
+
+		// ok
+		return tb_true;
+	}
 
 	// ok?
 	if (real > 0)
@@ -807,7 +859,14 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 	tb_trace_impl("ReadFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+	if (!real || ERROR_IO_PENDING == GetLastError())
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, olap);
+
+		// ok
+		return tb_true;
+	}
 
 	// finished?
 	if (ok || real > 0)
@@ -858,7 +917,14 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 	tb_trace_impl("WriteFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+	if (!real || ERROR_IO_PENDING == GetLastError())
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, olap);
+
+		// ok
+		return tb_true;
+	}
 
 	// finished?
 	if (ok || real > 0)
@@ -909,7 +975,14 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	tb_trace_impl("ReadFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+	if (!real || ERROR_IO_PENDING == GetLastError())
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, olap);
+
+		// ok
+		return tb_true;
+	}
 
 	// finished?
 	if (ok || real > 0)
@@ -960,7 +1033,14 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	tb_trace_impl("WriteFile: %u, error: %d", real, GetLastError());
 
 	// pending? continue it
-	if (!real || ERROR_IO_PENDING == GetLastError()) return tb_true;
+	if (!real || ERROR_IO_PENDING == GetLastError())
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, olap);
+
+		// ok
+		return tb_true;
+	}
 
 	// finished?
 	if (ok || real > 0)
@@ -1018,14 +1098,19 @@ static tb_bool_t tb_iocp_post_fsync(tb_aicp_proactor_t* proactor, tb_aice_t cons
 static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 {
 	// the aico
-	tb_aico_t* aico = data;
-	tb_assert_and_check_return(aico && aico->handle);
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
+	tb_assert_and_check_return(aico && aico->base.handle);
+
+	// the olap
+	tb_iocp_olap_t* olap = tb_atomic_fetch_and_set0(&aico->olap);
+	tb_check_return(olap);
 
 	// trace
-	tb_trace_impl("timeout: handle: %p", aico->handle);
+	tb_trace_impl("timeout[%p]: code: %lu", aico->base.handle, olap->aice.code);
 
 	// cancel it
-	switch (aico->type)
+#if 0
+	switch (aico->base.type)
 	{
 	case TB_AICO_TYPE_SOCK:
 		if (!CancelIo((SOCKET)aico->handle - 1))
@@ -1043,6 +1128,10 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 		tb_assert(0);
 		break;
 	}
+#endif
+
+	// exit olap
+//	tb_iocp_olap_exit(aico->ptor, olap);
 }
 static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_iocp_olap_t* olap, tb_size_t real, tb_bool_t wait)
 {
