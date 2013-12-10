@@ -65,8 +65,17 @@
 # 	define tb_offsetof(s, m) 			(tb_size_t)&(((s const*)0)->m)
 #endif
 
+// memsizeof
+#define tb_memsizeof(s, m) 				sizeof(((s const*)0)->m)
+
+// memtailof
+#define tb_memtailof(s, m) 				(tb_offsetof(s, m) + tb_memsizeof(s, m))
+
+// memdiffof: lm - rm
+#define tb_memdiffof(s, lm, rm) 		(tb_memtailof(s, lm) - tb_memtailof(s, rm))
+
 // check the offset and size of member for struct or union
-#define tb_memberof_eq(ls, lm, rs, rm) 	((tb_offsetof(ls, lm) == tb_offsetof(rs, rm)) && (sizeof(((ls const*)0)->lm) == sizeof(((rs const*)0)->rm)))
+#define tb_memberof_eq(ls, lm, rs, rm) 	((tb_offsetof(ls, lm) == tb_offsetof(rs, rm)) && (tb_memsizeof(ls, lm) == tb_memsizeof(rs, rm)))
 
 #endif
 

@@ -93,6 +93,16 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	// check
 	tb_assert_and_check_return_val(maxn, tb_null);
 
+	// check type
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, data, tb_iovec_t, data), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_recv_t, size, tb_iovec_t, size), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, data, tb_iovec_t, data), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_send_t, size, tb_iovec_t, size), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, data, tb_iovec_t, data), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_read_t, size, tb_iovec_t, size), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, data, tb_iovec_t, data), tb_null);
+	tb_assert_and_check_return_val(tb_memberof_eq(tb_aice_writ_t, size, tb_iovec_t, size), tb_null);
+
 	// alloc aicp
 	tb_aicp_t* aicp = tb_malloc0(sizeof(tb_aicp_t));
 	tb_assert_and_check_return_val(aicp, tb_null);
@@ -208,21 +218,28 @@ tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
 	// check
-	tb_assert_and_check_return(aicp && aicp->ptor);
+	tb_assert_and_check_return(aicp);
 
-	// the spak
-	tb_long_t (*spak)(tb_aicp_proactor_t* , tb_aice_t* , tb_long_t ) = aicp->ptor->spak;
-	tb_assert_and_check_return(spak);
+	// the ptor 
+	tb_aicp_proactor_t* ptor = aicp->ptor;
+	tb_assert_and_check_return(ptor && ptor->loop_init && ptor->loop_exit && ptor->loop_spak);
+
+	// the loop spak
+	tb_long_t (*loop_spak)(tb_aicp_proactor_t* , tb_handle_t, tb_aice_t* , tb_long_t ) = ptor->loop_spak;
 
 	// worker++
 	tb_atomic_fetch_and_inc(&aicp->work);
+
+	// init loop
+	tb_handle_t loop = ptor->loop_init(ptor);
+	tb_assert_and_check_return(loop);
 
 	// loop
 	while (!tb_atomic_get(&aicp->kill))
 	{
 		// spak
 		tb_aice_t 	resp = {0};
-		tb_long_t	ok = spak(aicp->ptor, &resp, -1);
+		tb_long_t	ok = loop_spak(ptor, loop, &resp, -1);
 
 		// failed? exit all loops
 		if (ok < 0) tb_aicp_kill(aicp);
@@ -244,6 +261,9 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 			break;
 		}
 	}
+
+	// exit loop
+	ptor->loop_exit(ptor, loop);
 
 	// worker--
 	tb_atomic_fetch_and_dec(&aicp->work);

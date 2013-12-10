@@ -166,6 +166,10 @@ static tb_bool_t tb_aiop_reactor_select_post(tb_aiop_reactor_t* reactor, tb_aioe
 	tb_aiop_reactor_select_t* rtor = (tb_aiop_reactor_select_t*)reactor;
 	tb_assert_and_check_return_val(rtor && aioe, tb_false);
 
+	// the aiop
+	tb_aiop_t* aiop = reactor->aiop;
+	tb_assert_and_check_return_val(aiop, tb_false);
+
 	// the aioo
 	tb_aioo_t* aioo = aioe->aioo;
 	tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
