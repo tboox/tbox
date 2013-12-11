@@ -401,20 +401,19 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, &aico->olap, tb_null);
 	tb_trace_impl("WSARecv: %ld, error: %d", ok, WSAGetLastError());
 
-	// always SOCKET_ERROR
-	tb_assert(ok == SOCKET_ERROR);
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
 	if (ok == SOCKET_ERROR)
 	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) 
-		{
-			// post timeout 
-			tb_iocp_post_timeout(proactor, aico);
-
-			// ok
-			return tb_true;
-		}
-
 		// done error
 		switch (WSAGetLastError())
 		{
@@ -461,20 +460,19 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, &aico->olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", ok, WSAGetLastError());
 
-	// always SOCKET_ERROR
-	tb_assert(ok == SOCKET_ERROR);
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
 	if (ok == SOCKET_ERROR)
 	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError())
-		{
-			// post timeout 
-			tb_iocp_post_timeout(proactor, aico);
-
-			// ok
-			return tb_true;
-		}
-
 		// done error
 		switch (WSAGetLastError())
 		{
@@ -522,20 +520,19 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, &aico->olap, tb_null);
 	tb_trace_impl("WSARecv: %ld, error: %d", ok, WSAGetLastError());
 
-	// always SOCKET_ERROR
-	tb_assert(ok == SOCKET_ERROR);
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
 	if (ok == SOCKET_ERROR)
 	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) 
-		{
-			// post timeout 
-			tb_iocp_post_timeout(proactor, aico);
-
-			// ok
-			return tb_true;
-		}
-
 		// done error
 		switch (WSAGetLastError())
 		{
@@ -582,20 +579,19 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, &aico->olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", ok, WSAGetLastError());
 
-	// always SOCKET_ERROR
-	tb_assert(ok == SOCKET_ERROR);
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
 	if (ok == SOCKET_ERROR)
 	{
-		// pending? continue it
-		if (WSA_IO_PENDING == WSAGetLastError()) 
-		{
-			// post timeout 
-			tb_iocp_post_timeout(proactor, aico);
-
-			// ok
-			return tb_true;
-		}
-
 		// done error
 		switch (WSAGetLastError())
 		{
@@ -959,6 +955,9 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 	// trace
 	tb_trace_impl("timeout[%p]: code: %lu", aico->base.handle, aico->olap.aice.code);
 
+	// save state: timeout
+	aico->olap.aice.state = TB_AICE_STATE_TIMEOUT;
+
 	// cancel it
 	switch (aico->base.type)
 	{
@@ -1043,7 +1042,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	}
 
 	// failed? exit sock
-	if (ok < 0)
+	if (resp->state != TB_AICE_STATE_OK)
 	{
 		if (resp->u.acpt.sock) tb_socket_close(resp->u.acpt.sock);
 		resp->u.acpt.sock = tb_null;
@@ -1710,14 +1709,30 @@ static tb_void_t tb_aicp_proactor_iocp_kill(tb_aicp_proactor_t* proactor)
 	// clear timer
 	tb_ltimer_clear(ptor->timer);
 
-	// the worker size
+	// the workers
 	tb_size_t work = tb_atomic_get(&proactor->aicp->work);
-
+	
 	// trace
 	tb_trace_impl("kill: %lu", work);
 
-	// kill workers
-	while (work--) PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
+	// using GetQueuedCompletionStatusEx?
+	if (ptor->GetQueuedCompletionStatusEx)
+	{
+		// kill workers
+		while (work--) 
+		{
+			// post kill
+			PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
+			
+			// wait some time
+			tb_msleep(200);
+		}
+	}
+	else
+	{
+		// kill workers
+		while (work--) PostQueuedCompletionStatus(ptor->port, 0, 0, tb_null);
+	}
 }
 static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 {
@@ -1849,15 +1864,8 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 			tb_iocp_aico_t* 	aico = (tb_iocp_aico_t* )entry->lpCompletionKey;
 			tb_iocp_olap_t* 	olap = (tb_iocp_olap_t*)entry->lpOverlapped;
 
-			// killed?
-			if (!aico) return -1;
-
-			// exit the aico task
-			if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-			aico->task = tb_null;
-
 			// check
-			tb_assert_and_check_return_val(olap, -1);
+			tb_assert_and_check_return_val(olap && aico, -1);
 
 			// save resp
 			*resp = olap->aice;
@@ -1884,6 +1892,17 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 			tb_size_t i = 0;
 			for (i = 0; i < size; i++) 
 			{
+				// exit the aico task
+				tb_iocp_aico_t* aico = (tb_iocp_aico_t* )loop->list[i].lpCompletionKey;
+				if (aico)
+				{
+					if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
+					aico->task = tb_null;
+				}
+				// killed?
+				else return -1;
+
+				// full?
 				if (!tb_queue_full(loop->spak))
 				{
 					// put it
@@ -1895,6 +1914,9 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 					tb_assert_and_check_return_val(0, -1);
 				}
 			}
+
+			// continue 
+			return 0;
 		}
 	}
 	else
