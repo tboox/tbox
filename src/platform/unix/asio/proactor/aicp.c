@@ -252,7 +252,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_assert_and_check_goto(aice, end);
 
 			// the aico
-			tb_aico_t const* aico = aice->aico;
+			tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 			tb_assert_and_check_goto(aico, end);
 
 			// have wait?
@@ -262,13 +262,17 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_trace_impl("wait: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
 
 			// sock?
-			if (aico->type == TB_AICO_TYPE_SOCK)
+			if (aico->base.type == TB_AICO_TYPE_SOCK)
 			{
+				// exit the aico task
+				if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
+				aico->task = tb_null;
+
 				// spak aice
 				if (!tb_queue_full(ptor->spak)) tb_queue_put(ptor->spak, aice);
 				else tb_assert(0);
 			}
-			else if (aico->type == TB_AICO_TYPE_FILE)
+			else if (aico->base.type == TB_AICO_TYPE_FILE)
 			{
 				// check
 				tb_assert(ptor->file);

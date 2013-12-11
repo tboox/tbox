@@ -13,7 +13,7 @@
 #define TB_DEMO_FILE_READ_MAXN 			(1 << 16)
 
 // mode
-#define TB_DEMO_MODE_SENDFILE
+//#define TB_DEMO_MODE_SENDFILE
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -126,9 +126,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("send[%p]: closed", aice->aico);
-		else tb_print("send[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("send[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		tb_demo_context_exit(context);
 	}
 
@@ -162,9 +160,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("read[%p]: closed", aice->aico);
-		else tb_print("read[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("read[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		tb_demo_context_exit(context);
 	}
 
@@ -210,9 +206,7 @@ static tb_bool_t tb_demo_sock_sendfile_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("sendfile[%p]: closed", aice->aico);
-		else tb_print("sendfile[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("sendfile[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		tb_demo_context_exit(context);
 	}
 
@@ -315,7 +309,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	else
 	{
 		// exit loop
-		tb_print("acpt[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("acpt[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
