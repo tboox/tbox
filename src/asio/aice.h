@@ -159,11 +159,11 @@ typedef struct __tb_aice_read_t
 	/// the read data for (tb_iovec_t*)->data
 	tb_byte_t* 					data;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_read_t;
 
@@ -176,11 +176,11 @@ typedef struct __tb_aice_writ_t
 	/// the writ data for (tb_iovec_t*)->data
 	tb_byte_t const* 			data;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_writ_t;
 #else
@@ -227,11 +227,11 @@ typedef struct __tb_aice_read_t
 	/// the data size for (tb_iovec_t*)->size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_read_t;
 
@@ -244,11 +244,11 @@ typedef struct __tb_aice_writ_t
 	/// the data size for (tb_iovec_t*)->size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_writ_t;
 #endif
@@ -262,11 +262,11 @@ typedef struct __tb_aice_recvv_t
 	/// the list size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_recvv_t;
 
@@ -279,11 +279,11 @@ typedef struct __tb_aice_sendv_t
 	/// the list size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_sendv_t;
 
@@ -296,11 +296,11 @@ typedef struct __tb_aice_sendfile_t
 	/// the size
 	tb_hize_t 					size;
 
-	/// the seek
-	tb_hize_t 					seek;
-
 	/// the real
 	tb_hize_t 					real;
+
+	/// the seek
+	tb_hize_t 					seek;
 
 }tb_aice_sendfile_t;
 
@@ -313,11 +313,11 @@ typedef struct __tb_aice_readv_t
 	/// the list size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_readv_t;
 
@@ -330,11 +330,11 @@ typedef struct __tb_aice_writv_t
 	/// the list size
 	tb_size_t 					size;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the data real
 	tb_size_t 					real;
+
+	/// the file seek
+	tb_hize_t 					seek;
 
 }tb_aice_writv_t;
 
