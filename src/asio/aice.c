@@ -35,6 +35,19 @@ tb_char_t const* tb_aice_state_cstr(tb_aice_t const* aice)
 	// check
 	tb_assert_and_check_return_val(aice, tb_null);
 
-	return tb_null;
+	// the state string
+	static tb_char_t const* state[] =
+	{
+	 	"ok"
+	, 	"failed"
+	, 	"closed"
+	, 	"pending"
+	, 	"timeout"
+	, 	"not supported"
+	};
+	tb_assert_and_check_return_val(aice->state < tb_arrayn(state), "unknown");
+
+	// ok
+	return state[aice->state];
 }
 

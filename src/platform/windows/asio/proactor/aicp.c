@@ -33,6 +33,17 @@
 #include "../../../ltimer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the olap list maxn for GetQueuedCompletionStatusEx and adapter to queue 
+#ifdef __tb_small__
+# 	define TB_IOCP_OLAP_LIST_MAXN 					(63)
+#else
+# 	define TB_IOCP_OLAP_LIST_MAXN 					(255)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -108,6 +119,12 @@ typedef struct __tb_iocp_loop_t
 	// the self
 	tb_handle_t 							self;
 
+	// the olap list
+	OVERLAPPED_ENTRY 						list[TB_IOCP_OLAP_LIST_MAXN];
+
+	// the aice spak 
+	tb_queue_t* 							spak;					
+
 }tb_iocp_loop_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -159,6 +176,9 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
 	tb_assert_and_check_return_val(ptor && aico, tb_false);
 	
+	// only for sock
+	tb_check_return(aico->base.type == TB_AICO_TYPE_SOCK);
+
 	// add timeout task
 	tb_long_t timeout = tb_aico_timeout_from_code(aico, aico->olap.aice.code);
 	if (timeout >= 0)
@@ -1729,6 +1749,26 @@ static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 		tb_free(ptor);
 	}
 }
+static tb_void_t tb_aicp_proactor_iocp_loop_exit(tb_aicp_proactor_t* proactor, tb_handle_t hloop)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return(ptor);
+
+	// the loop
+	tb_iocp_loop_t* loop = (tb_iocp_loop_t*)hloop;
+	tb_assert_and_check_return(loop);
+
+	// exit spak
+	if (loop->spak) tb_queue_exit(loop->spak);
+	loop->spak = tb_null;
+
+	// exit self
+	loop->self = tb_null;
+
+	// exit loop
+	tb_free(loop);
+}
 static tb_handle_t tb_aicp_proactor_iocp_loop_init(tb_aicp_proactor_t* proactor)
 {
 	// check
@@ -1743,26 +1783,18 @@ static tb_handle_t tb_aicp_proactor_iocp_loop_init(tb_aicp_proactor_t* proactor)
 	loop->self = tb_thread_self();
 	tb_assert_and_check_goto(loop->self, fail);
 
+	// init spak
+	if (ptor->GetQueuedCompletionStatusEx)
+	{
+		loop->spak = tb_queue_init(TB_IOCP_OLAP_LIST_MAXN, tb_item_func_ifm(sizeof(OVERLAPPED_ENTRY), tb_null, tb_null));
+		tb_assert_and_check_goto(loop->spak, fail);
+	}
+
 	// ok
 	return (tb_handle_t)loop;
 fail:
+	tb_aicp_proactor_iocp_loop_exit(proactor, (tb_handle_t)loop);
 	return tb_null;
-}
-static tb_void_t tb_aicp_proactor_iocp_loop_exit(tb_aicp_proactor_t* proactor, tb_handle_t hloop)
-{
-	// check
-	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return(ptor);
-
-	// the loop
-	tb_iocp_loop_t* loop = (tb_iocp_loop_t*)hloop;
-	tb_assert_and_check_return(loop);
-
-	// exit self
-	loop->self = tb_null;
-
-	// exit loop
-	tb_free(loop);
 }
 static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, tb_handle_t hloop, tb_aice_t* resp, tb_long_t timeout)
 {
@@ -1783,15 +1815,6 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 	// is the timer loop? 
 	tb_bool_t btimer = (!self || (self == loop->self))? tb_true : tb_false;
 
-	// update the timeout for the timer loop
-	if (btimer) timeout = tb_ltimer_timeout(ptor->timer);
-
-	// wait
-	DWORD 				real = 0;
-	tb_aico_t const* 	aico = tb_null;
-	tb_iocp_olap_t* 	olap = tb_null;
-	BOOL 				wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, &olap, timeout < 0? INFINITE : timeout);
-
 	// is the timer loop? spak timer
 	if (btimer)
 	{
@@ -1800,25 +1823,116 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 
 		// spak timer
 		if (!tb_ltimer_spak(ptor->timer)) return -1;
+
+		// update the timeout for the timer loop
+		timeout = tb_ltimer_timeout(ptor->timer);
 	}
 
-	// trace
-	tb_trace_impl("spak[%lu]: %d error: %u", tb_thread_self(), wait, GetLastError());
+	// exists GetQueuedCompletionStatusEx? using it
+	if (ptor->GetQueuedCompletionStatusEx)
+	{
+		// check
+		tb_assert_and_check_return_val(loop->spak, -1);
 
-	// timeout?
-	if (!wait && WAIT_TIMEOUT == GetLastError()) return 0;
+		// exists olap? spak it first
+		if (!tb_queue_null(loop->spak))
+		{
+			// the top entry
+			LPOVERLAPPED_ENTRY entry = (LPOVERLAPPED_ENTRY)tb_queue_get(loop->spak);
+			tb_assert_and_check_return_val(entry, -1);
 
-	// killed?
-	if (wait && !aico) return -1;
+			// pop the entry
+			tb_queue_pop(loop->spak);
+	
+			// init 
+			DWORD 				real = entry->dwNumberOfBytesTransferred;
+			tb_iocp_aico_t* 	aico = (tb_iocp_aico_t* )entry->lpCompletionKey;
+			tb_iocp_olap_t* 	olap = (tb_iocp_olap_t*)entry->lpOverlapped;
 
-	// check
-	tb_assert_and_check_return_val(olap, -1);
+			// killed?
+			if (!aico) return -1;
 
-	// save resp
-	*resp = olap->aice;
+			// exit the aico task
+			if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
+			aico->task = tb_null;
 
-	// spak resp
-	return tb_iocp_spak_resp(ptor, resp, (tb_size_t)real, wait? tb_true : tb_false);
+			// check
+			tb_assert_and_check_return_val(olap, -1);
+
+			// save resp
+			*resp = olap->aice;
+
+			// spak resp
+			return tb_iocp_spak_resp(ptor, resp, (tb_size_t)real, tb_true);
+		}
+		else
+		{
+			// wait
+			DWORD 	size = 0;
+			BOOL 	wait = ptor->GetQueuedCompletionStatusEx(ptor->port, loop->list, tb_arrayn(loop->list), &size, timeout, FALSE);
+
+			// trace
+			tb_trace_impl("spak[%lu]: wait: %d, size: %u, error: %u", loop->self, wait, size, GetLastError());
+
+			// timeout?
+			if (!wait && WAIT_TIMEOUT == GetLastError()) return 0;
+
+			// error?
+			tb_assert_and_check_return_val(wait, -1);
+
+			// put entries to the spak queue
+			tb_size_t i = 0;
+			for (i = 0; i < size; i++) 
+			{
+				if (!tb_queue_full(loop->spak))
+				{
+					// put it
+					tb_queue_put(loop->spak, &loop->list[i]);
+				}
+				else 
+				{
+					// full
+					tb_assert_and_check_return_val(0, -1);
+				}
+			}
+		}
+	}
+	else
+	{
+		// wait
+		DWORD 				real = 0;
+		tb_iocp_aico_t* 	aico = tb_null;
+		tb_iocp_olap_t* 	olap = tb_null;
+		BOOL 				wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, &olap, timeout < 0? INFINITE : timeout);
+
+		// trace
+		tb_trace_impl("spak[%lu]: wait: %d, error: %u", loop->self, wait, GetLastError());
+
+		// timeout?
+		if (!wait && WAIT_TIMEOUT == GetLastError()) return 0;
+
+		// killed?
+		if (wait && !aico) return -1;
+
+		// exit the aico task
+		if (aico)
+		{
+			if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
+			aico->task = tb_null;
+		}
+
+		// check
+		tb_assert_and_check_return_val(olap, -1);
+
+		// save resp
+		*resp = olap->aice;
+
+		// spak resp
+		return tb_iocp_spak_resp(ptor, resp, (tb_size_t)real, wait? tb_true : tb_false);
+	}
+
+	// failed
+	return -1;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

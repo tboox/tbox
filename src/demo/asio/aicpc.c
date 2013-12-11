@@ -137,9 +137,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("recv[%p]: closed", aice->aico);
-		else tb_print("recv[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("recv[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
@@ -164,18 +162,11 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 		// post recv from server
 		if (!tb_aico_recv(aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
 	}
-	// timeout?
-	else if (aice->state == TB_AICE_STATE_TIMEOUT)
-	{
-		// exit loop
-		tb_print("conn[%p]: timeout", aice->aico);
-		return tb_false;
-	}
-	// failed?
+	// timeout or failed?
 	else
 	{
 		// exit loop
-		tb_print("conn[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("conn[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
