@@ -41,10 +41,12 @@ typedef tb_bool_t (*tb_aicb_t)(struct __tb_aice_t const* aice);
 /// the aico type enum
 typedef enum __tb_aico_type_e
 {
- 	TB_AICO_TYPE_NONE 		= 0 	//!< for null
-,	TB_AICO_TYPE_SOCK 		= 1 	//!< for sock
-, 	TB_AICO_TYPE_FILE 		= 2 	//!< for file
-, 	TB_AICO_TYPE_MAXN 		= 3
+ 	TB_AICO_TYPE_NONE 		= 0 	//!< null
+,	TB_AICO_TYPE_SOCK 		= 1 	//!< sock
+, 	TB_AICO_TYPE_FILE 		= 2 	//!< file
+, 	TB_AICO_TYPE_TIMER 		= 3 	//!< timer
+, 	TB_AICO_TYPE_EVENT 		= 4 	//!< event
+, 	TB_AICO_TYPE_MAXN 		= 5
 
 }tb_aico_type_e;
 
@@ -85,15 +87,32 @@ typedef struct __tb_aico_t
  * interfaces
  */
 
-/*! init the aico
+/*! init the sock aico
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
- * @param type 		the aico type
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aico_init(tb_handle_t aicp, tb_handle_t handle, tb_size_t type);
+tb_handle_t 		tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle);
+
+/*! init the file aico
+ *
+ * @param aicp 		the aicp
+ * @param handle 	the handle
+ *
+ * @return 			the aico
+ */
+tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
+
+/*! init the timer aico
+ *
+ * @param aicp 		the aicp
+ * @param handle 	the handle
+ *
+ * @return 			the aico
+ */
+tb_handle_t 		tb_aico_init_timer(tb_handle_t aicp);
 
 /*! exit the aico
  *

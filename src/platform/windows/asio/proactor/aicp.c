@@ -31,6 +31,7 @@
  */
 #include "prefix.h"
 #include "winerror.h"
+#include "../../../ltimer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -61,6 +62,9 @@ typedef struct __tb_aicp_proactor_iocp_t
 	
 	// the pool lock
 	tb_handle_t 							lock;
+
+	// the timer
+	tb_handle_t 							timer;
 
 	// the self for the timer loop
 	tb_atomic_t 							tself;
@@ -171,7 +175,7 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && proactor->aicp && aico, tb_false);
+	tb_assert_and_check_return_val(ptor && aico, tb_false);
 	
 	// only for sock
 	tb_check_return(aico->base.type == TB_AICO_TYPE_SOCK);
@@ -181,10 +185,10 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 	if (timeout >= 0)
 	{
 		// exit the old task
-		if (aico->task) tb_aicp_timer_del(proactor->aicp, aico->task);
+		if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
 
 		// add the new task
-		aico->task = tb_aicp_timer_add(proactor->aicp, timeout, tb_false, tb_iocp_spak_timeout, aico);
+		aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, aico);
 	}
 }
 static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
@@ -1267,7 +1271,7 @@ static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_aic
 	tb_iocp_aico_t* iocp_aico = (tb_iocp_aico_t*)aico;
 
 	// exit the timeout task
-	if (iocp_aico->task) tb_aicp_timer_del(proactor->aicp, iocp_aico->task);
+	if (iocp_aico->task) tb_ltimer_task_del(ptor->timer, iocp_aico->task);
 	iocp_aico->task = tb_null;
 
 	// exit olap
@@ -1311,7 +1315,10 @@ static tb_void_t tb_aicp_proactor_iocp_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->port && proactor->aicp);
+	tb_assert_and_check_return(ptor && ptor->port && ptor->timer && proactor->aicp);
+
+	// clear timer
+	tb_ltimer_clear(ptor->timer);
 
 	// the workers
 	tb_size_t work = tb_atomic_get(&proactor->aicp->work);
@@ -1355,6 +1362,10 @@ static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 		if (ptor->pool) tb_rpool_exit(ptor->pool);
 		ptor->pool = tb_null;
 		if (ptor->lock) tb_spinlock_leave(ptor->lock);
+
+		// exit timer
+		if (ptor->timer) tb_ltimer_exit(ptor->timer);
+		ptor->timer = tb_null;
 
 		// exit lock
 		if (ptor->lock) tb_spinlock_exit(ptor->lock);
@@ -1415,7 +1426,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp && proactor->aicp && resp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->port && ptor->timer && resp, -1);
 
 	// the loop
 	tb_iocp_loop_t* loop = (tb_iocp_loop_t*)hloop;
@@ -1437,10 +1448,10 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		tb_ctime_spak();
 
 		// spak timer
-		if (!tb_aicp_timer_spak(proactor->aicp)) return -1;
+		if (!tb_ltimer_spak(ptor->timer)) return -1;
 
 		// update the timeout for the timer loop
-		timeout = tb_aicp_timer_timeout(proactor->aicp);
+		timeout = tb_ltimer_timeout(ptor->timer);
 	}
 
 	// exists GetQueuedCompletionStatusEx? using it
@@ -1501,7 +1512,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 				tb_iocp_aico_t* aico = (tb_iocp_aico_t* )loop->list[i].lpCompletionKey;
 				if (aico)
 				{
-					if (aico->task) tb_aicp_timer_del(proactor->aicp, aico->task);
+					if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
 					aico->task = tb_null;
 				}
 				// killed?
@@ -1547,7 +1558,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		// exit the aico task
 		if (aico)
 		{
-			if (aico->task) tb_aicp_timer_del(proactor->aicp, aico->task);
+			if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
 			aico->task = tb_null;
 		}
 
@@ -1614,6 +1625,10 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	// init pool
 	ptor->pool = tb_rpool_init((aicp->maxn << 1) + 16, ((sizeof(SOCKADDR_IN) + 16) << 1), 0);
 	tb_assert_and_check_goto(ptor->pool, fail);
+
+	// init timer
+	ptor->timer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+	tb_assert_and_check_goto(ptor->timer, fail);
 
 	// ok
 	return (tb_aicp_proactor_t*)ptor;

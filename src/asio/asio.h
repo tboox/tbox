@@ -34,8 +34,6 @@
 #include "aico.h"
 #include "aice.h"
 #include "aicp.h"
-#include "timer.h"
-#include "event.h"
 
 
 #endif
