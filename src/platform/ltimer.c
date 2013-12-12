@@ -54,7 +54,7 @@
 typedef struct __tb_ltimer_task_t
 {
 	// the func
-	tb_ltimer_task_func_t 		func;
+	tb_timer_task_func_t 		func;
 
 	// the data
 	tb_pointer_t 				data;
@@ -509,7 +509,7 @@ tb_void_t tb_ltimer_loop(tb_handle_t handle)
 	// work--
 	tb_atomic_fetch_and_dec(&timer->work);
 }
-tb_handle_t tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
@@ -518,7 +518,7 @@ tb_handle_t tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t 
 	// add task
 	return tb_ltimer_task_add_at(handle, tb_ltimer_now(timer) + timeout, timeout, repeat, func, data);
 }
-tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
@@ -553,7 +553,7 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	// ok?
 	return task;
 }
-tb_handle_t tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
@@ -562,7 +562,7 @@ tb_handle_t tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_siz
 	// add task
 	return tb_ltimer_task_add_at(handle, tb_ltimer_now(timer) + after, period, repeat, func, data);
 }
-tb_void_t tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
@@ -571,7 +571,7 @@ tb_void_t tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t re
 	// run task
 	tb_ltimer_task_run_at(handle, tb_ltimer_now(timer) + timeout, timeout, repeat, func, data);
 }
-tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
@@ -600,7 +600,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	// leave
 	if (timer->lock) tb_spinlock_leave(timer->lock);
 }
-tb_void_t tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_ltimer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;

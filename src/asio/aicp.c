@@ -120,13 +120,17 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	aicp->maxn = maxn;
 	aicp->kill = 0;
 
-	// init proactor
-	aicp->ptor = tb_aicp_proactor_init(aicp);
-	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
-
 	// init lock
 	aicp->lock = tb_spinlock_init();
 	tb_assert_and_check_goto(aicp->lock, fail);
+
+	// init timer
+	aicp->timer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+	tb_assert_and_check_goto(aicp->timer, fail);
+
+	// init proactor
+	aicp->ptor = tb_aicp_proactor_init(aicp);
+	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
 
 	// init pool
 	aicp->pool = tb_rpool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
@@ -158,6 +162,10 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 			aicp->ptor = tb_null;
 		}
 
+		// exit timer
+		if (aicp->timer) tb_ltimer_exit(aicp->timer);
+		aicp->timer = tb_null;
+
 		// exit pool
 		if (aicp->lock) tb_spinlock_enter(aicp->lock);
 		if (aicp->pool) tb_rpool_exit(aicp->pool);
@@ -171,6 +179,10 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		// free aicp
 		tb_free(aicp);
 	}
+}
+tb_hong_t tb_aicp_time(tb_aicp_t* aicp)
+{
+	return tb_ctime_time();
 }
 tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
@@ -280,11 +292,14 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 {
 	// check
-	tb_assert_and_check_return(aicp);
+	tb_assert_and_check_return(aicp && aicp->timer);
 
 	// kill it
 	if (!tb_atomic_fetch_and_set(&aicp->kill, 1))
 	{
+		// clear timer
+		tb_ltimer_clear(aicp->timer);
+
 		// kill proactor
 		if (aicp->ptor && aicp->ptor->kill) aicp->ptor->kill(aicp->ptor);
 	}
