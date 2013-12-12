@@ -192,12 +192,6 @@ tb_aicp_t* 			tb_aicp_init(tb_size_t maxn);
  */ 	
 tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
 
-/*! the aicp time
- *
- * @param aicp 		the aicp
- */ 	
-tb_hong_t 			tb_aicp_time(tb_aicp_t* aicp);
-
 /*! add the aico
  *
  * @param aicp 		the aicp

@@ -44,9 +44,8 @@ typedef enum __tb_aico_type_e
  	TB_AICO_TYPE_NONE 		= 0 	//!< null
 ,	TB_AICO_TYPE_SOCK 		= 1 	//!< sock
 , 	TB_AICO_TYPE_FILE 		= 2 	//!< file
-, 	TB_AICO_TYPE_TIMER 		= 3 	//!< timer
-, 	TB_AICO_TYPE_EVENT 		= 4 	//!< event
-, 	TB_AICO_TYPE_MAXN 		= 5
+, 	TB_AICO_TYPE_TASK 		= 3 	//!< task
+, 	TB_AICO_TYPE_MAXN 		= 4
 
 }tb_aico_type_e;
 
@@ -105,14 +104,22 @@ tb_handle_t 		tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle);
  */
 tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
 
-/*! init the timer aico
+/*! init the task aico
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aico_init_timer(tb_handle_t aicp);
+tb_handle_t 		tb_aico_init_task(tb_handle_t aicp);
+
+/*! kill the aico
+ *
+ * TODO
+ *
+ * @param aico 		the aico
+ */
+tb_void_t 			tb_aico_kill(tb_handle_t aico);
 
 /*! exit the aico
  *
@@ -170,7 +177,7 @@ tb_void_t 			tb_aico_timeout_set(tb_handle_t aico, tb_size_t type, tb_long_t tim
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the conn event
  *
@@ -182,7 +189,7 @@ tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_cpointer_t a
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the recv event for sock
  *
@@ -194,7 +201,7 @@ tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t por
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_recv(tb_handle_t aico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_recv(tb_handle_t aico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the send event for file
  *
@@ -206,7 +213,7 @@ tb_bool_t 			tb_aico_recv(tb_handle_t aico, tb_byte_t* data, tb_size_t size, tb_
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the recvv event for sock
  *
@@ -218,7 +225,7 @@ tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t siz
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the sendv event for file
  *
@@ -230,7 +237,7 @@ tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t s
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the sendfile event for file
  *
@@ -243,7 +250,7 @@ tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t s
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_sendfile(tb_handle_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_sendfile(tb_handle_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the read event for file
  *
@@ -256,7 +263,7 @@ tb_bool_t 			tb_aico_sendfile(tb_handle_t aico, tb_handle_t file, tb_hize_t seek
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_read(tb_handle_t aico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_read(tb_handle_t aico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the writ event for file
  *
@@ -269,7 +276,7 @@ tb_bool_t 			tb_aico_read(tb_handle_t aico, tb_hize_t seek, tb_byte_t* data, tb_
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_writ(tb_handle_t aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_writ(tb_handle_t aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the readv event for file
  *
@@ -282,7 +289,7 @@ tb_bool_t 			tb_aico_writ(tb_handle_t aico, tb_hize_t seek, tb_byte_t const* dat
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_readv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_readv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the writv event for file
  *
@@ -295,7 +302,7 @@ tb_bool_t 			tb_aico_readv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* l
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_writv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_writv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the fsync event for file
  *
@@ -305,7 +312,20 @@ tb_bool_t 			tb_aico_writv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* l
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_fsync(tb_handle_t aico, tb_aicb_t aicb_func, tb_cpointer_t aicb_data);
+tb_bool_t 			tb_aico_fsync(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+
+/*! run aico task after timeout and will be auto-remove it after be expired
+ *
+ * only once, need continue to call it again if want to repeat task
+ *
+ * @param aico 		the aico
+ * @param delay 	the delay time, ms
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_task_run(tb_handle_t aico, tb_size_t delay, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * inline
@@ -329,6 +349,8 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 	, 	-1
 	, 	-1
 	, 	-1
+	, 	-1
+
 	, 	-1
 	};
 	tb_assert_and_check_return_val(code < tb_arrayn(type) && type[code] != (tb_size_t)-1, -1);

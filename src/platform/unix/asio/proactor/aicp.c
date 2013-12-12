@@ -203,11 +203,11 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	// loop 
 	while (!tb_atomic_get(&aicp->kill))
 	{
-		// the timeout
-		tb_size_t timeout = tb_ltimer_timeout(ptor->timer);
+		// the delay
+		tb_size_t delay = tb_ltimer_delay(ptor->timer);
 
 		// wait aioe
-		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, timeout);
+		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, delay);
 
 		// spak ctime
 		tb_ctime_spak();
