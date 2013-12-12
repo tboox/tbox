@@ -17,68 +17,23 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		ltimer.h
- * @ingroup 	platform
+ * @file		timer.h
+ * @ingroup 	asio
  *
  */
-#ifndef TB_PLATFORM_LTIMER_H
-#define TB_PLATFORM_LTIMER_H
+#ifndef TB_ASIO_AICP_TIMER_H
+#define TB_ASIO_AICP_TIMER_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "timer.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-/// the timer tick enum
-typedef enum __tb_ltimer_tick_e
-{
-	TB_LTIMER_TICK_100MS 	= 100
-,	TB_LTIMER_TICK_S 		= 1000
-,	TB_LTIMER_TICK_M 		= 60000
-,	TB_LTIMER_TICK_H 		= 3600000
-
-}tb_ltimer_tick_e;
+#include "aicp.h"
+#include "../platform/timer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-/*! init timer
- *
- * lower tick and limit range, but faster
- * 
- * @param maxn		the timer maxn
- * @param tick		the timer tick
- * @param ctime		using ctime?
- *
- * @return 			the timer
- */
-tb_handle_t 		tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime);
-
-/*! exit timer
- *
- * @param handle	the timer handle
- */
-tb_void_t 			tb_ltimer_exit(tb_handle_t handle);
-
-/*! clear timer
- *
- * @param handle	the timer handle
- */
-tb_void_t 			tb_ltimer_clear(tb_handle_t handle);
-
-/*! the timer limit
- *
- * @param handle	the timer handle
- *
- * @return 			the timer limit range: [now, now + limit)
- */
-tb_size_t 			tb_ltimer_limit(tb_handle_t handle);
 
 /*! the timer timeout for spak 
  *
@@ -86,20 +41,20 @@ tb_size_t 			tb_ltimer_limit(tb_handle_t handle);
  *
  * @return 			the timer timeout
  */
-tb_size_t 			tb_ltimer_timeout(tb_handle_t handle);
+tb_size_t 			tb_aicp_timer_timeout(tb_aicp_t* aicp);
 
 /*! spak timer for the external loop at the single thread
  *
  * @code
- * tb_void_t tb_ltimer_loop()
+ * tb_void_t tb_aicp_timer_loop()
  * {
  * 		while (1)
  * 		{
  * 			// wait
- * 			wait(tb_ltimer_timeout(timer))
+ * 			wait(tb_aicp_timer_timeout(timer))
  *
  * 			// spak timer
- * 			tb_ltimer_spak(timer);
+ * 			tb_aicp_timer_spak(timer);
  *     	}
  * }
  * @endcode
@@ -108,22 +63,7 @@ tb_size_t 			tb_ltimer_timeout(tb_handle_t handle);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_ltimer_spak(tb_handle_t handle);
-
-/*! loop timer for the external thread
- *
- * @code
- * tb_void_t tb_ltimer_thread(tb_pointer_t)
- * {
- * 		tb_ltimer_loop(timer);
- * }
- * @endcode
- *
- * @param handle	the timer handle
- *
- * @return 			tb_true or tb_false
- */
-tb_void_t 			tb_ltimer_loop(tb_handle_t handle);
+tb_bool_t 			tb_aicp_timer_spak(tb_aicp_t* aicp);
 
 /*! run timer task after timeout and will be auto-remove it after be expired
  *
@@ -134,7 +74,7 @@ tb_void_t 			tb_ltimer_loop(tb_handle_t handle);
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! run timer task at the absolute time and will be auto-remove it after be expired
  *
@@ -146,7 +86,7 @@ tb_void_t 			tb_ltimer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! run timer task after the relative time and will be auto-remove it after be expired
  *
@@ -158,7 +98,7 @@ tb_void_t 			tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! add and run timer task after timeout and need remove it manually
  *
@@ -170,7 +110,7 @@ tb_void_t 			tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_si
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! add and run timer task at the absolute time and need remove it manually
  *
@@ -183,7 +123,7 @@ tb_handle_t 		tb_ltimer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! add and run timer task after the relative time and need remove it manually
  *
@@ -196,13 +136,13 @@ tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! del timer task
  *
  * @param handle	the timer handle
  * @param task		the timer task
  */
-tb_void_t 			tb_ltimer_task_del(tb_handle_t handle, tb_handle_t task);
+tb_void_t 			tb_aicp_timer_del(tb_aicp_t* aicp, tb_handle_t task);
 
 #endif

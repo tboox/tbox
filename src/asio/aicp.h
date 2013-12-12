@@ -30,6 +30,7 @@
 #include "prefix.h"
 #include "aice.h"
 #include "aico.h"
+#include "../platform/timer.h"
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -67,7 +68,7 @@ typedef struct __tb_aicp_proactor_t
 	/// loop: exit
 	tb_void_t 				(*loop_exit)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop);
 
-	/// spak
+	/// loop: spak
 	tb_long_t 				(*loop_spak)(struct __tb_aicp_proactor_t* proactor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout);
 
 }tb_aicp_proactor_t;
@@ -169,6 +170,9 @@ typedef struct __tb_aicp_t
 	/// the pool lock
 	tb_handle_t 			lock;
 
+	/// the timer
+	tb_handle_t 			timer;
+
 }tb_aicp_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -190,6 +194,12 @@ tb_aicp_t* 			tb_aicp_init(tb_size_t maxn);
  * @param aicp 		the aicp
  */ 	
 tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
+
+/*! the aicp time
+ *
+ * @param aicp 		the aicp
+ */ 	
+tb_hong_t 			tb_aicp_time(tb_aicp_t* aicp);
 
 /*! add the aico
  *
