@@ -97,6 +97,7 @@ tbox_C_FILES 			+= \
 						asio/aiop \
 						asio/aicp \
 						asio/timer \
+						asio/event \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -290,6 +291,7 @@ INC_FILES 				= \
 						asio/aiop.h \
 						asio/aicp.h \
 						asio/timer.h \
+						asio/event.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

@@ -47,7 +47,7 @@ tb_bool_t tb_aicp_timer_spak(tb_aicp_t* aicp)
 	// spak it
 	return tb_ltimer_spak(aicp->timer);
 }
-tb_handle_t tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->timer && func, tb_null);
@@ -55,7 +55,7 @@ tb_handle_t tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repe
 	// add task
 	return tb_ltimer_task_add(aicp->timer, timeout, repeat, func, data);
 }
-tb_handle_t tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->timer && func, tb_null);
@@ -63,7 +63,7 @@ tb_handle_t tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t peri
 	// add task
 	return tb_ltimer_task_add_at(aicp->timer, when, period, repeat, func, data);
 }
-tb_handle_t tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_handle_t tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->timer && func, tb_null);
@@ -71,7 +71,7 @@ tb_handle_t tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t 
 	// add task
 	return tb_ltimer_task_add_after(aicp->timer, after, period, repeat, func, data);
 }
-tb_void_t tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->timer && func);
@@ -79,7 +79,7 @@ tb_void_t tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat
 	// run task
 	tb_ltimer_task_run(aicp->timer, timeout, repeat, func, data);
 }
-tb_void_t tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->timer && func);
@@ -87,7 +87,7 @@ tb_void_t tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period
 	// run task
 	tb_ltimer_task_run_at(aicp->timer, when, period, repeat, func, data);
 }
-tb_void_t tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
+tb_void_t tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->timer && func);
