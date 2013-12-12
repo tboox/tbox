@@ -54,7 +54,9 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_WRITV 			= 11	//!< for file
 ,	TB_AICE_CODE_FSYNC 			= 12	//!< for file
 
-, 	TB_AICE_CODE_MAXN 			= 13
+,	TB_AICE_CODE_RUNTASK 		= 13	//!< for task
+
+, 	TB_AICE_CODE_MAXN 			= 14
 
 }tb_aice_code_e;
 
@@ -64,9 +66,10 @@ typedef enum __tb_aice_state_e
  	TB_AICE_STATE_OK 			= 0
 , 	TB_AICE_STATE_FAILED 		= 1
 ,	TB_AICE_STATE_CLOSED 		= 2
-, 	TB_AICE_STATE_PENDING 		= 3
-,	TB_AICE_STATE_TIMEOUT 		= 4
-,	TB_AICE_STATE_NOTSUPPORTED 	= 5
+,	TB_AICE_STATE_KILLED 		= 3
+, 	TB_AICE_STATE_PENDING 		= 4
+,	TB_AICE_STATE_TIMEOUT 		= 5
+,	TB_AICE_STATE_NOTSUPPORTED 	= 6
 
 }tb_aice_state_e;
 
@@ -77,7 +80,7 @@ typedef struct __tb_aice_acpt_t
 	tb_handle_t 				sock;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[3];
+	tb_handle_t 				priv[4];
 
 }tb_aice_acpt_t;
 
@@ -91,7 +94,7 @@ typedef struct __tb_aice_conn_t
 	tb_char_t const* 			host;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[2];
+	tb_handle_t 				reserved[3];
 
 }tb_aice_conn_t;
 
@@ -109,7 +112,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[1];
+	tb_handle_t 				reserved[2];
 
 }tb_aice_recv_t;
 
@@ -126,7 +129,7 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[1];
+	tb_handle_t 				reserved[2];
 
 }tb_aice_send_t;
 
@@ -177,7 +180,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[1];
+	tb_handle_t 				reserved[2];
 
 }tb_aice_recv_t;
 
@@ -194,7 +197,7 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[1];
+	tb_handle_t 				reserved[2];
 
 }tb_aice_send_t;
 
@@ -318,6 +321,17 @@ typedef struct __tb_aice_writv_t
 
 }tb_aice_writv_t;
 
+/// the runtask aice type
+typedef struct __tb_aice_runtask_t
+{
+	/// the when
+	tb_hize_t 					when;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				reserved[3];
+
+}tb_aice_runtask_t;
+
 /// the aice type
 typedef struct __tb_aice_t
 {
@@ -331,7 +345,7 @@ typedef struct __tb_aice_t
 	tb_aicb_t 					aicb;
 
 	/// the data
-	tb_cpointer_t 				data;
+	tb_pointer_t 				data;
 
 	/// the aico
 	tb_aico_t const* 			aico;
@@ -353,6 +367,9 @@ typedef struct __tb_aice_t
 		tb_aice_writ_t 			writ;
 		tb_aice_readv_t 		readv;
 		tb_aice_writv_t 		writv;
+
+		// for task
+		tb_aice_runtask_t 		runtask;
 
 	} u;
 

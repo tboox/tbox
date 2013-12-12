@@ -66,13 +66,13 @@ tb_void_t 			tb_timer_exit(tb_handle_t handle);
  */
 tb_void_t 			tb_timer_clear(tb_handle_t handle);
 
-/*! the timer timeout for spak 
+/*! the timer delay for spak 
  *
  * @param handle	the timer handle
  *
- * @return 			the timer timeout
+ * @return 			the timer delay
  */
-tb_size_t 			tb_timer_timeout(tb_handle_t handle);
+tb_size_t 			tb_timer_delay(tb_handle_t handle);
 
 /*! spak timer for the external loop at the single thread
  *
@@ -82,7 +82,7 @@ tb_size_t 			tb_timer_timeout(tb_handle_t handle);
  * 		while (1)
  * 		{
  * 			// wait
- * 			wait(tb_timer_timeout(timer))
+ * 			wait(tb_timer_delay(timer))
  *
  * 			// spak timer
  * 			tb_timer_spak(timer);
@@ -111,16 +111,16 @@ tb_bool_t 			tb_timer_spak(tb_handle_t handle);
  */
 tb_void_t 			tb_timer_loop(tb_handle_t handle);
 
-/*! run timer task after timeout and will be auto-remove it after be expired
+/*! run timer task after delay and will be auto-remove it after be expired
  *
  * @param handle	the timer handle
- * @param period 	the period time, ms
+ * @param delay 	the delay time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_timer_task_run(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_timer_task_run(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! run timer task at the absolute time and will be auto-remove it after be expired
  *
@@ -146,17 +146,17 @@ tb_void_t 			tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
  */
 tb_void_t 			tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
-/*! add and run timer task after timeout and need remove it manually
+/*! add and run timer task after delay and need remove it manually
  *
  * @param handle	the timer handle
- * @param period 	the period time, ms
+ * @param delay 	the delay time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_timer_task_add(tb_handle_t handle, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_timer_task_add(tb_handle_t handle, tb_size_t delay, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
 /*! add and run timer task at the absolute time and need remove it manually
  *

@@ -38,21 +38,21 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	if (timer)
 	{
-		// the limit and timeout
+		// the limit and delay
 		tb_size_t limit 		= tb_ltimer_limit(timer);
-		tb_size_t timeout 		= tb_ltimer_timeout(timer);
+		tb_size_t delay 		= tb_ltimer_delay(timer);
 
 		// trace
-		tb_print("limit: %lu, timeout: %lu", limit, timeout);
+		tb_print("limit: %lu, delay: %lu", limit, delay);
 
 		// add task: every
-		tb_ltimer_task_run(timer, 1 * timeout, tb_true, tb_ltimer_task_func, "every");
+		tb_ltimer_task_run(timer, 1 * delay, tb_true, tb_ltimer_task_func, "every");
 	
 		// add task: one
-		tb_ltimer_task_run(timer, 10 * timeout, tb_false, tb_ltimer_task_func, "one");
+		tb_ltimer_task_run(timer, 10 * delay, tb_false, tb_ltimer_task_func, "one");
 		
 		// add task: after
-		tb_ltimer_task_run_after(timer, 10 * timeout, 5 * timeout, tb_true, tb_ltimer_task_func, "after");
+		tb_ltimer_task_run_after(timer, 10 * delay, 5 * delay, tb_true, tb_ltimer_task_func, "after");
 
 		// wait
 		tb_ltimer_loop(timer);

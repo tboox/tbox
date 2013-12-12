@@ -43,7 +43,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->pool && handle && type, tb_null);
+	tb_assert_and_check_return_val(aicp && aicp->pool && type, tb_null);
 
 	// enter 
 	if (aicp->lock) tb_spinlock_enter(aicp->lock);
@@ -172,14 +172,10 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		tb_free(aicp);
 	}
 }
-tb_hong_t tb_aicp_time(tb_aicp_t* aicp)
-{
-	return tb_ctime_time();
-}
 tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && handle && type, tb_null);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && type, tb_null);
 
 	// done
 	tb_bool_t 	ok = tb_false;

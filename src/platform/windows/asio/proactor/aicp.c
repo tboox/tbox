@@ -1450,8 +1450,8 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		// spak timer
 		if (!tb_ltimer_spak(ptor->timer)) return -1;
 
-		// update the timeout for the timer loop
-		timeout = tb_ltimer_timeout(ptor->timer);
+		// update the delay for the timer loop
+		delay = tb_ltimer_delay(ptor->timer);
 	}
 
 	// exists GetQueuedCompletionStatusEx? using it
@@ -1490,7 +1490,7 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		{
 			// wait
 			DWORD 		size = 0;
-			BOOL 		wait = ptor->GetQueuedCompletionStatusEx(ptor->port, loop->list, tb_arrayn(loop->list), &size, timeout, FALSE);
+			BOOL 		wait = ptor->GetQueuedCompletionStatusEx(ptor->port, loop->list, tb_arrayn(loop->list), &size, delay, FALSE);
 
 			// the last error
 			tb_size_t 	error = (tb_size_t)GetLastError();
