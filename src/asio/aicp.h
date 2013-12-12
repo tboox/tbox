@@ -170,9 +170,6 @@ typedef struct __tb_aicp_t
 	/// the pool lock
 	tb_handle_t 			lock;
 
-	/// the timer
-	tb_handle_t 			timer;
-
 }tb_aicp_t;
 
 /* ///////////////////////////////////////////////////////////////////////

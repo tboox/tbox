@@ -32,10 +32,15 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_aico_init(tb_handle_t aicp, tb_handle_t handle, tb_size_t type)
+tb_handle_t tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle)
 {
 	// addo
-	return tb_aicp_addo(aicp, handle, type);
+	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_SOCK);
+}
+tb_handle_t tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle)
+{
+	// addo
+	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_FILE);
 }
 tb_void_t tb_aico_exit(tb_handle_t haico)
 {
