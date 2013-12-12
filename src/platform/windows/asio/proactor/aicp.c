@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "winerror.h"
 #include "../../../ltimer.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -714,7 +715,7 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, &aico->olap);
-	tb_trace_impl("ReadFile: %u, error: %d", real, GetLastError());
+	tb_trace_impl("ReadFile: real: %u, size: %lu, error: %d", real, aice->u.read.size, GetLastError());
 
 	// pending? continue it
 	if (!real || ERROR_IO_PENDING == GetLastError())
@@ -770,7 +771,7 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, &aico->olap);
-	tb_trace_impl("WriteFile: %u, error: %d", real, GetLastError());
+	tb_trace_impl("WriteFile: real: %u, size: %lu, error: %d", real, aice->u.writ.size, GetLastError());
 
 	// pending? continue it
 	if (!real || ERROR_IO_PENDING == GetLastError())
@@ -1010,7 +1011,9 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// done
 	switch (error)
 	{
-		// pending?
+		// ok or pending?
+	case ERROR_SUCCESS:
+	case WAIT_TIMEOUT:
 	case ERROR_IO_PENDING:
 		{
 			// done state
@@ -1027,6 +1030,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 		break;
 		// canceled? timeout?
+	case WSAEINTR:
 	case ERROR_OPERATION_ABORTED:
 		{
 			resp->state = TB_AICE_STATE_TIMEOUT;
@@ -1063,7 +1067,9 @@ static tb_long_t tb_iocp_spak_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// done
 	switch (error)
 	{
-		// pending?
+		// ok or pending?
+	case ERROR_SUCCESS:
+	case WAIT_TIMEOUT:
 	case ERROR_IO_PENDING:
 		{
 			// done state
@@ -1079,13 +1085,16 @@ static tb_long_t tb_iocp_spak_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 			}
 		}
 		break;
-		// refused?
+		// failed?
+	case WSAENOTCONN:
+	case WSAECONNREFUSED:
 	case ERROR_CONNECTION_REFUSED:
 		{
 			resp->state = TB_AICE_STATE_FAILED;
 		}
 		break;
 		// timeout?
+	case WSAEINTR:
 	case ERROR_SEM_TIMEOUT:
 	case ERROR_OPERATION_ABORTED:
 		{
@@ -1104,7 +1113,7 @@ static tb_long_t tb_iocp_spak_conn(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// ok
 	return 1;
 }
-static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+static tb_long_t tb_iocp_spak_iorw(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
 {
 	// check?
 	tb_assert_and_check_return_val(resp, -1);
@@ -1112,7 +1121,9 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// done 
 	switch (error)
 	{		
-		// pending?
+		// ok or pending?
+	case ERROR_SUCCESS:
+	case WAIT_TIMEOUT:
 	case ERROR_IO_PENDING:
 		{
 			// done state
@@ -1129,6 +1140,7 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 		break;
 		// closed?
+	case WSAECONNRESET:
 	case ERROR_HANDLE_EOF:
 	case ERROR_NETNAME_DELETED:
 		{
@@ -1136,6 +1148,7 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		}
 		break;
 		// canceled? timeout 
+	case WSAEINTR:
 	case ERROR_OPERATION_ABORTED:
 		{
 			resp->state = TB_AICE_STATE_TIMEOUT;
@@ -1145,429 +1158,13 @@ static tb_long_t tb_iocp_spak_recv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	default:
 		{
 			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("recv: unknown error: %u", error);
+			tb_trace_impl("iorw: code: %lu, unknown error: %u", resp->code, error);
 		}
 		break;
 	}
 
-	// save the real size	
+	// save the real size, @note: hack the real offset for the other io aice
 	if (resp->state == TB_AICE_STATE_OK) resp->u.recv.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_send(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("send: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.send.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_recvv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("recvv: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.recvv.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_sendv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("sendv: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.sendv.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_sendfile(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("sendfile: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.sendfile.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_read(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("read: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.read.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_writ(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("writ: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.writ.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_readv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("readv: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.readv.real = real;
-
-	// ok
-	return 1;
-}
-static tb_long_t tb_iocp_spak_writv(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// done 
-	switch (error)
-	{		
-		// pending?
-	case ERROR_IO_PENDING:
-		{
-			// done state
-			switch (resp->state)
-			{
-			case TB_AICE_STATE_OK:
-			case TB_AICE_STATE_PENDING:
-				resp->state = real? TB_AICE_STATE_OK : TB_AICE_STATE_CLOSED;
-				break;
-			default:
-				// using the self state here
-				break;
-			}
-		}
-		break;
-		// closed?
-	case ERROR_HANDLE_EOF:
-	case ERROR_NETNAME_DELETED:
-		{
-			resp->state = TB_AICE_STATE_CLOSED;
-		}
-		break;
-		// canceled? timeout 
-	case ERROR_OPERATION_ABORTED:
-		{
-			resp->state = TB_AICE_STATE_TIMEOUT;
-		}
-		break;
-		// unknown error
-	default:
-		{
-			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("writv: unknown error: %u", error);
-		}
-		break;
-	}
-
-	// save the real size	
-	if (resp->state == TB_AICE_STATE_OK) resp->u.writv.real = real;
 
 	// ok
 	return 1;
@@ -1580,7 +1177,9 @@ static tb_long_t tb_iocp_spak_fsync(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* re
 	// done 
 	switch (error)
 	{	
-		// pending?
+		// ok or pending?
+	case ERROR_SUCCESS:
+	case WAIT_TIMEOUT:
 	case ERROR_IO_PENDING:
 		{
 			// done state
@@ -1625,15 +1224,15 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 		tb_null
 	,	tb_iocp_spak_acpt
 	,	tb_iocp_spak_conn
-	,	tb_iocp_spak_recv
-	,	tb_iocp_spak_send
-	,	tb_iocp_spak_recvv
-	,	tb_iocp_spak_sendv
-	,	tb_iocp_spak_sendfile
-	,	tb_iocp_spak_read
-	,	tb_iocp_spak_writ
-	,	tb_iocp_spak_readv
-	,	tb_iocp_spak_writv
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
 	,	tb_iocp_spak_fsync
 	};
 	tb_assert_and_check_return_val(resp->code < tb_arrayn(s_spak), -1);
@@ -1875,7 +1474,8 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 			tb_size_t 			real = (tb_size_t)entry->dwNumberOfBytesTransferred;
 			tb_iocp_aico_t* 	aico = (tb_iocp_aico_t* )entry->lpCompletionKey;
 			tb_iocp_olap_t* 	olap = (tb_iocp_olap_t*)entry->lpOverlapped;
-			tb_size_t 			error = (tb_size_t)entry->Internal;
+			tb_size_t 			error = tb_winerror_from_nsstatus((tb_size_t)entry->Internal);
+			tb_trace("spak[%lu]: ntstatus: %lx, winerror: %lu", loop->self, (tb_size_t)entry->Internal, error);
 
 			// check
 			tb_assert_and_check_return_val(olap && aico, -1);
@@ -1896,10 +1496,10 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 			tb_size_t 	error = (tb_size_t)GetLastError();
 
 			// trace
-			tb_trace_impl("spak[%lu]: size: %u, error: %lu", loop->self, size, error);
+			tb_trace_impl("spak[%lu]: wait: %d, size: %u, error: %lu", loop->self, wait, size, error);
 
 			// timeout?
-			tb_check_return_val(error != WAIT_TIMEOUT, 0);
+			if (!wait && error == WAIT_TIMEOUT) return 0;
 
 			// error?
 			tb_assert_and_check_return_val(wait, -1);
@@ -1921,9 +1521,6 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 				// full?
 				if (!tb_queue_full(loop->spak))
 				{
-					// save error
-					loop->list[i].Internal = (ULONG_PTR)error;
-
 					// put it
 					tb_queue_put(loop->spak, &loop->list[i]);
 				}
@@ -1944,19 +1541,19 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 		DWORD 				real = 0;
 		tb_iocp_aico_t* 	aico = tb_null;
 		tb_iocp_olap_t* 	olap = tb_null;
-		GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, &olap, timeout < 0? INFINITE : timeout);
+		BOOL 				wait = GetQueuedCompletionStatus(ptor->port, (LPDWORD)&real, (LPDWORD)&aico, &olap, timeout < 0? INFINITE : timeout);
 
 		// the last error
 		tb_size_t 			error = (tb_size_t)GetLastError();
 
 		// trace
-		tb_trace_impl("spak[%lu]: real: %u, error: %lu", loop->self, real, error);
+		tb_trace_impl("spak[%lu]: wait: %d, real: %u, error: %lu", loop->self, wait, real, error);
 
 		// timeout?
-		tb_check_return_val(error != WAIT_TIMEOUT, 0);
+		if (!wait && error == WAIT_TIMEOUT) return 0;
 
 		// killed?
-		if (!aico) return -1;
+		if (wait && !aico) return -1;
 
 		// exit the aico task
 		if (aico)
