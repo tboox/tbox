@@ -27,9 +27,15 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
 #include "aicp.h"
 #include "../platform/timer.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the aicp timer func type
+typedef tb_timer_task_func_t 	tb_aicp_timer_func_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -37,7 +43,7 @@
 
 /*! the timer timeout for spak 
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  *
  * @return 			the timer timeout
  */
@@ -59,7 +65,7 @@ tb_size_t 			tb_aicp_timer_timeout(tb_aicp_t* aicp);
  * }
  * @endcode
  *
- * @param handle	the timer handle
+ * @param aicp	the timer aicp
  *
  * @return 			tb_true or tb_false
  */
@@ -67,18 +73,18 @@ tb_bool_t 			tb_aicp_timer_spak(tb_aicp_t* aicp);
 
 /*! run timer task after timeout and will be auto-remove it after be expired
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! run timer task at the absolute time and will be auto-remove it after be expired
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param when 		the absolute time, ms
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
@@ -86,11 +92,11 @@ tb_void_t 			tb_aicp_timer_run(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t rep
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! run timer task after the relative time and will be auto-remove it after be expired
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param after 	the after time, ms
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
@@ -98,11 +104,11 @@ tb_void_t 			tb_aicp_timer_run_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t per
  * @param data		the timer data
  *
  */
-tb_void_t 			tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_void_t 			tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! add and run timer task after timeout and need remove it manually
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
  * @param func		the timer func
@@ -110,11 +116,11 @@ tb_void_t 			tb_aicp_timer_run_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! add and run timer task at the absolute time and need remove it manually
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param when 		the absolute time, ms
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
@@ -123,11 +129,11 @@ tb_handle_t 		tb_aicp_timer_add(tb_aicp_t* aicp, tb_size_t timeout, tb_bool_t re
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! add and run timer task after the relative time and need remove it manually
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param after 	the after time, ms
  * @param period 	the period time, ms
  * @param repeat 	is repeat?
@@ -136,11 +142,11 @@ tb_handle_t 		tb_aicp_timer_add_at(tb_aicp_t* aicp, tb_hize_t when, tb_size_t pe
  *
  * @return 			the timer task
  */
-tb_handle_t 		tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_timer_add_after(tb_aicp_t* aicp, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_aicp_timer_func_t func, tb_pointer_t data);
 
 /*! del timer task
  *
- * @param handle	the timer handle
+ * @param aicp		the aicp
  * @param task		the timer task
  */
 tb_void_t 			tb_aicp_timer_del(tb_aicp_t* aicp, tb_handle_t task);
