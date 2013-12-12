@@ -40,7 +40,6 @@ typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 			= 0
 
-#if 1
 , 	TB_AICE_CODE_ACPT 			= 1 	//!< for sock
 , 	TB_AICE_CODE_CONN 			= 2 	//!< for sock
 ,	TB_AICE_CODE_RECV 			= 3		//!< for sock
@@ -56,25 +55,6 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_FSYNC 			= 12	//!< for file
 
 , 	TB_AICE_CODE_MAXN 			= 13
-
-#else
-, 	TB_AICE_CODE_ACPT 			= 1 	//!< for sock
-, 	TB_AICE_CODE_CONN 			= 2 	//!< for sock
-,	TB_AICE_CODE_READ 			= 3		//!< for file
-,	TB_AICE_CODE_WRIT 			= 4		//!< for file
-,	TB_AICE_CODE_READV 			= 5		//!< for file
-,	TB_AICE_CODE_WRITV 			= 6		//!< for file
-,	TB_AICE_CODE_FSYNC 			= 7		//!< for file
-
-,	TB_AICE_CODE_RECV 			= 8		//!< for sock
-,	TB_AICE_CODE_RECVV 			= 10	//!< for sock
-
-,	TB_AICE_CODE_SEND 			= 9		//!< for sock
-,	TB_AICE_CODE_SENDV 			= 11	//!< for sock
-,	TB_AICE_CODE_SENDFILE 		= 13	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
-
-, 	TB_AICE_CODE_MAXN 			= 14
-#endif
 
 }tb_aice_code_e;
 
