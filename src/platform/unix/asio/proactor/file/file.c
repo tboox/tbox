@@ -58,19 +58,23 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice, tb_false);
-	
+		
+	// the priority
+	tb_size_t priority = tb_aiop_aice_priority(aice);
+	tb_assert_and_check_return_val(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], tb_false);
+
 	// enter 
 	if (ptor->lock) tb_spinlock_enter(ptor->lock);
 
 	// post aice
 	tb_bool_t ok = tb_true;
-	if (!tb_queue_full(ptor->spak)) 
+	if (!tb_queue_full(ptor->spak[priority])) 
 	{
 		// put
-		tb_queue_put(ptor->spak, aice);
+		tb_queue_put(ptor->spak[priority], aice);
 
 		// trace
-		tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
+		tb_trace_impl("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 	}
 	else
 	{
