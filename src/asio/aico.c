@@ -56,6 +56,15 @@ tb_void_t tb_aico_exit(tb_handle_t haico)
 	// delo
 	tb_aicp_delo(aico->aicp, haico);
 }
+tb_void_t tb_aico_kill(tb_handle_t haico)
+{
+	// check
+	tb_aico_t const* aico = (tb_aico_t const*)haico;
+	tb_assert_and_check_return(aico && aico->aicp);
+
+	// kilo
+	tb_aicp_kilo(aico->aicp, haico);
+}
 tb_handle_t tb_aico_aicp(tb_handle_t haico)
 {
 	// check
