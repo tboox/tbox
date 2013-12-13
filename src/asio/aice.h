@@ -94,7 +94,7 @@ typedef struct __tb_aice_conn_t
 	tb_char_t const* 			host;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[3];
+	tb_handle_t 				priv[3];
 
 }tb_aice_conn_t;
 
@@ -112,7 +112,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[2];
+	tb_handle_t 				priv[2];
 
 }tb_aice_recv_t;
 
@@ -129,7 +129,7 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[2];
+	tb_handle_t 				priv[2];
 
 }tb_aice_send_t;
 
@@ -180,7 +180,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[2];
+	tb_handle_t 				priv[2];
 
 }tb_aice_recv_t;
 
@@ -197,7 +197,7 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[2];
+	tb_handle_t 				priv[2];
 
 }tb_aice_send_t;
 
@@ -328,7 +328,7 @@ typedef struct __tb_aice_runtask_t
 	tb_hize_t 					when;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				reserved[3];
+	tb_handle_t 				priv[3];
 
 }tb_aice_runtask_t;
 

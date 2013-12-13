@@ -316,6 +316,31 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
+	// ok?
+	if (aice->state == TB_AICE_STATE_OK)
+	{
+		// trace
+		tb_print("task[%p]: now: %lld", aice->aico, tb_ctime_time());
+
+		// run task
+		if (!tb_aico_task_run(aice->aico, 1000, tb_demo_task_func, aice->data)) return tb_false;
+	}
+	// failed?
+	else
+	{
+		// trace
+		tb_print("task[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		return tb_false;
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_pointer_t tb_demo_loop_thread(tb_pointer_t data)
 {
 	// aicp
@@ -350,6 +375,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t 		sock = tb_null;
 	tb_handle_t 		aicp = tb_null;
 	tb_handle_t 		aico = tb_null;
+	tb_handle_t 		task = tb_null;
 	tb_handle_t 		loop[16] = {0};
 
 	// open sock
@@ -369,6 +395,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// addo sock
 	aico = tb_aico_init_sock(aicp, sock);
 	tb_assert_and_check_goto(aico, end);
+
+	// addo task
+	task = tb_aico_init_task(aicp);
+	tb_assert_and_check_goto(task, end);
+
+	// run task
+	if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
 
 	// init acpt timeout
 	tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_ACPT, 10000);
@@ -404,6 +437,12 @@ end:
 			tb_thread_exit(*l);
 		}
 	}
+
+	// exit aico
+	if (aico) tb_aico_exit(aico);
+
+	// exit task
+	if (task) tb_aico_exit(task);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
