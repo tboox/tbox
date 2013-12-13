@@ -49,8 +49,12 @@ typedef struct __tb_aicp_proactor_aiop_t
 	// the wait aiop
 	tb_aiop_t* 					aiop;
 
-	// the aice spak
-	tb_queue_t* 				spak;
+	/* the aice spak
+	 *
+	 * index: 0: higher priority for conn, acpt and task
+	 * index: 1: lower priority for io aice 
+	 */
+	tb_queue_t* 				spak[2];
 	
 	// the spak lock
 	tb_handle_t 				lock;
@@ -128,11 +132,40 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
+	, 	TB_AIOE_CODE_NONE
 	};
 	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_code), TB_AIOE_CODE_NONE);
 	
 	// the aioe code
 	return s_code[aice->code];
+}
+static __tb_inline__ tb_size_t tb_aiop_aice_priority(tb_aice_t const* aice)
+{
+	// the priorities
+	static tb_size_t s_priorities[] =
+	{
+		1
+
+	, 	0 	// acpt
+	, 	0 	// conn
+	, 	1
+	, 	1
+	, 	1
+	, 	1
+	, 	1
+
+	, 	1
+	, 	1
+	, 	1
+	, 	1
+	, 	1
+
+	, 	0 	// task
+	};
+	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_priorities), 1);
+	
+	// the priority
+	return s_priorities[aice->code];
 }
 static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 {
@@ -158,9 +191,6 @@ static tb_void_t tb_aiop_spak_timeout(tb_pointer_t data)
 	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
 	tb_assert_and_check_return(ptor && ptor->aiop);
 
-	// trace
-	tb_trace_impl("timeout: code: %lu, size: %lu", aico->aice.code, tb_queue_size(ptor->spak));
-
 	// for sock
 	if (aico->base.type == TB_AICO_TYPE_SOCK)
 	{
@@ -172,14 +202,21 @@ static tb_void_t tb_aiop_spak_timeout(tb_pointer_t data)
 		aico->aioo = tb_null;
 	}
 
+	// the priority
+	tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
+	tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
+
 	// enter 
 	if (ptor->lock) tb_spinlock_enter(ptor->lock);
 
+	// trace
+	tb_trace_impl("timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+
 	// spak aice
 	tb_bool_t ok = tb_false;
-	if (!tb_queue_full(ptor->spak)) 
+	if (!tb_queue_full(ptor->spak[priority])) 
 	{
-		// timeout
+		// save state
 		switch (aico->base.type)
 		{
 		case TB_AICO_TYPE_SOCK:
@@ -194,7 +231,7 @@ static tb_void_t tb_aiop_spak_timeout(tb_pointer_t data)
 		}
 
 		// put it
-		tb_queue_put(ptor->spak, &aico->aice);
+		tb_queue_put(ptor->spak[priority], &aico->aice);
 
 		// ok
 		ok = tb_true;
@@ -275,8 +312,12 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			// have wait?
 			tb_check_continue(aice->code);
 
+			// the priority
+			tb_size_t priority = tb_aiop_aice_priority(aice);
+			tb_assert_and_check_goto(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], end);
+
 			// trace
-			tb_trace_impl("wait: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
+			tb_trace_impl("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 
 			// sock?
 			if (aico->base.type == TB_AICO_TYPE_SOCK)
@@ -286,7 +327,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 				aico->task = tb_null;
 
 				// spak aice
-				if (!tb_queue_full(ptor->spak)) tb_queue_put(ptor->spak, aice);
+				if (!tb_queue_full(ptor->spak[priority])) tb_queue_put(ptor->spak[priority], aice);
 				else tb_assert(0);
 			}
 			else if (aico->base.type == TB_AICO_TYPE_FILE)
@@ -1049,56 +1090,55 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->file && ptor->spak && aice, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->file && aice && aice->aico, tb_false);
 	
-	// the aico
-	tb_bool_t ok = tb_true;
-	tb_aico_t const* aico = aice->aico;
-	if (aico)
+	// the priority
+	tb_size_t priority = tb_aiop_aice_priority(aice);
+	tb_assert_and_check_return_val(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], tb_false);
+
+	// done
+	tb_bool_t 			ok = tb_true;
+	tb_aico_t const* 	aico = aice->aico;
+	switch (aico->type)
 	{
-		// done
-		switch (aico->type)
+	case TB_AICO_TYPE_SOCK:
+	case TB_AICO_TYPE_TASK:
 		{
-		case TB_AICO_TYPE_SOCK:
-		case TB_AICO_TYPE_TASK:
+			// enter 
+			if (ptor->lock) tb_spinlock_enter(ptor->lock);
+
+			// post aice
+			if (!tb_queue_full(ptor->spak[priority])) 
 			{
-				// enter 
-				if (ptor->lock) tb_spinlock_enter(ptor->lock);
+				// put
+				tb_queue_put(ptor->spak[priority], aice);
 
-				// post aice
-				if (!tb_queue_full(ptor->spak)) 
-				{
-					// put
-					tb_queue_put(ptor->spak, aice);
-
-					// trace
-					tb_trace_impl("post: code: %lu, size: %lu", aice->code, tb_queue_size(ptor->spak));
-				}
-				else
-				{
-					// failed
-					ok = tb_false;
-
-					// assert
-					tb_assert(0);
-				}
-
-				// leave 
-				if (ptor->lock) tb_spinlock_leave(ptor->lock);
+				// trace
+				tb_trace_impl("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 			}
-			break;
-		case TB_AICO_TYPE_FILE:
+			else
 			{
-				// post file
-				ok = tb_aicp_file_post(ptor->file, aice);
+				// failed
+				ok = tb_false;
+
+				// assert
+				tb_assert(0);
 			}
-			break;
-		default:
-			ok = tb_false;
-			break;
+
+			// leave 
+			if (ptor->lock) tb_spinlock_leave(ptor->lock);
 		}
+		break;
+	case TB_AICO_TYPE_FILE:
+		{
+			// post file
+			ok = tb_aicp_file_post(ptor->file, aice);
+		}
+		break;
+	default:
+		ok = tb_false;
+		break;
 	}
-	else ok = tb_false;
 
 	// work it 
 	tb_aiop_spak_work(ptor);
@@ -1153,8 +1193,10 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 
 		// exit spak
 		if (ptor->lock) tb_spinlock_enter(ptor->lock);
-		if (ptor->spak) tb_queue_exit(ptor->spak);
-		ptor->spak = tb_null;
+		if (ptor->spak[0]) tb_queue_exit(ptor->spak[0]);
+		if (ptor->spak[1]) tb_queue_exit(ptor->spak[1]);
+		ptor->spak[0] = tb_null;
+		ptor->spak[1] = tb_null;
 		if (ptor->lock) tb_spinlock_leave(ptor->lock);
 
 		// exit aiop
@@ -1200,31 +1242,55 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && resp, -1);
+	tb_assert_and_check_return_val(ptor && ptor->spak[0] && ptor->spak[1] && resp, -1);
 
 	// enter 
 	if (ptor->lock) tb_spinlock_enter(ptor->lock);
 
-	// spak aice
+	// spak aice from the higher priority spak first
 	tb_long_t ok = 0;
 	tb_bool_t null = tb_false;
-	if (!(null = tb_queue_null(ptor->spak))) 
+	if (!(null = tb_queue_null(ptor->spak[0]))) 
 	{
 		// get resp
-		tb_aice_t const* aice = tb_queue_get(ptor->spak);
+		tb_aice_t const* aice = tb_queue_get(ptor->spak[0]);
 		if (aice) 
 		{
 			// save resp
 			*resp = *aice;
 
 			// trace
-			tb_trace_impl("spak[%u]: code: %lu, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak));
+			tb_trace_impl("spak[%u]: code: %lu, priority: 0, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[0]));
 
 			// pop it
-			tb_queue_pop(ptor->spak);
+			tb_queue_pop(ptor->spak[0]);
 
 			// ok
 			ok = 1;
+		}
+	}
+
+	// no aice? spak aice from the lower priority spak next
+	if (!ok)
+	{
+		if (!(null = tb_queue_null(ptor->spak[1]))) 
+		{
+			// get resp
+			tb_aice_t const* aice = tb_queue_get(ptor->spak[1]);
+			if (aice) 
+			{
+				// save resp
+				*resp = *aice;
+
+				// trace
+				tb_trace_impl("spak[%u]: code: %lu, priority: 1, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[1]));
+
+				// pop it
+				tb_queue_pop(ptor->spak[1]);
+
+				// ok
+				ok = 1;
+			}
 		}
 	}
 
@@ -1295,8 +1361,9 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->aiop, fail);
 
 	// init spak
-	ptor->spak = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
-	tb_assert_and_check_goto(ptor->spak, fail);
+	ptor->spak[0] = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
+	ptor->spak[1] = tb_queue_init(aicp->maxn + 16, tb_item_func_ifm(sizeof(tb_aice_t), tb_null, tb_null));
+	tb_assert_and_check_goto(ptor->spak[0] && ptor->spak[1], fail);
 
 	// init file
 	ptor->file = tb_aicp_file_init(ptor);
