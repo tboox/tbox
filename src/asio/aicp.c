@@ -213,6 +213,14 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	if (aicp->ptor->delo(aicp->ptor, aico))
 		tb_aicp_aico_exit(aicp, aico);
 }
+tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
+{
+	// check
+	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->kilo && aico);
+
+	// kilo
+	aicp->ptor->kilo(aicp->ptor, aico);
+}
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check

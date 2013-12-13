@@ -1298,7 +1298,7 @@ static tb_long_t tb_iocp_spak_runtask(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* 
 	default:
 		{
 			resp->state = TB_AICE_STATE_FAILED;
-			tb_trace_impl("fsync: unknown error: %u", error);
+			tb_trace_impl("runtask: unknown error: %u", error);
 		}
 		break;
 	}
@@ -1393,6 +1393,15 @@ static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// exit ptor
 	iocp_aico->ptor = tb_null;
 
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_aicp_proactor_iocp_kilo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && aico, tb_false);
+		
 	// ok
 	return tb_true;
 }
@@ -1715,6 +1724,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.exit 		= tb_aicp_proactor_iocp_exit;
 	ptor->base.addo 		= tb_aicp_proactor_iocp_addo;
 	ptor->base.delo 		= tb_aicp_proactor_iocp_delo;
+	ptor->base.kilo 		= tb_aicp_proactor_iocp_kilo;
 	ptor->base.post 		= tb_aicp_proactor_iocp_post;
 	ptor->base.loop_init 	= tb_aicp_proactor_iocp_loop_init;
 	ptor->base.loop_exit 	= tb_aicp_proactor_iocp_loop_exit;
