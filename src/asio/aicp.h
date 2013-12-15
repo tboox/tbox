@@ -59,9 +59,6 @@ typedef struct __tb_aicp_proactor_t
 	/// delo
 	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
 
-	/// kilo
-	tb_bool_t 				(*kilo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
-
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
 
@@ -211,13 +208,6 @@ tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
  * @param aico 		the aico
  */
 tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
-
-/*! kil the aico
- *
- * @param aicp 		the aicp
- * @param aico 		the aico
- */
-tb_void_t 			tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico);
 
 /*! post the aice 
  *

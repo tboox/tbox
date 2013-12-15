@@ -113,12 +113,6 @@ tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
  */
 tb_handle_t 		tb_aico_init_task(tb_handle_t aicp);
 
-/*! kill the aico
- *
- * @param aico 		the aico
- */
-tb_void_t 			tb_aico_kill(tb_handle_t aico);
-
 /*! exit the aico
  *
  * @param aicp 		the aicp
