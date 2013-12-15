@@ -1074,18 +1074,6 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
-{
-	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->timer && aico, tb_false);
-
-	// no impl
-	tb_trace_noimpl();
-
-	// ok?
-	return tb_true;
-}
 static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
@@ -1342,7 +1330,6 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.exit 		= tb_aicp_proactor_aiop_exit;
 	ptor->base.addo 		= tb_aicp_proactor_aiop_addo;
 	ptor->base.delo 		= tb_aicp_proactor_aiop_delo;
-	ptor->base.kilo 		= tb_aicp_proactor_aiop_kilo;
 	ptor->base.post 		= tb_aicp_proactor_aiop_post;
 	ptor->base.loop_init 	= tb_aicp_proactor_aiop_loop_init;
 	ptor->base.loop_exit 	= tb_aicp_proactor_aiop_loop_exit;
