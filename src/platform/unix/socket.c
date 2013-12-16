@@ -157,10 +157,10 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	return -1;
 }
 
-tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(handle, tb_false);
+	tb_assert_and_check_return_val(handle, 0);
 
 	// init
 	struct sockaddr_in d = {0};
@@ -168,7 +168,7 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	d.sin_port = htons(port);
 	if (ip)
 	{
-		if (!inet_aton(ip, &(d.sin_addr))) return tb_false;
+		if (!inet_aton(ip, &(d.sin_addr))) return 0;
 	}
 	else d.sin_addr.s_addr = INADDR_ANY;
 
@@ -193,7 +193,18 @@ tb_bool_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 #endif
 
 	// bind 
-    return (bind(tb_handle2fd(handle), (struct sockaddr *)&d, sizeof(d)) < 0)? tb_false : tb_true;
+    if (bind(tb_handle2fd(handle), (struct sockaddr *)&d, sizeof(d)) < 0) return 0;
+	
+	// bind one random port? get the bound port
+	if (!port)
+	{
+		tb_int_t n = sizeof(d);
+		if (getsockname(tb_handle2fd(handle), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return 0;
+		port = ntohs(d.sin_port);
+	}
+
+	// ok?
+	return port;
 }
 tb_bool_t tb_socket_listen(tb_handle_t handle)
 {

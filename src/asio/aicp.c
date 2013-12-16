@@ -164,8 +164,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 		tb_spinlock_leave(&aicp->lock);
 
 		// exit lock
-		if (aicp->lock) tb_spinlock_exit(aicp->lock);
-		aicp->lock = tb_null;
+		tb_spinlock_exit(&aicp->lock);
 
 		// free aicp
 		tb_free(aicp);

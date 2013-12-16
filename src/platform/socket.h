@@ -96,11 +96,11 @@ tb_long_t 			tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_
  *
  * @param handle 	the socket handle
  * @param ip 		the ip address
- * @param port 		the bind port
+ * @param port 		the bind port, bind a random port if port == 0
  *
- * @return 			tb_true or tb_false
+ * @return 			the bound port, failed: 0
  */
-tb_bool_t 			tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
+tb_size_t 			tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port);
 
 /*! listen socket
  *
