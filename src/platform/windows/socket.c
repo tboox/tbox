@@ -332,7 +332,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	if (!port)
 	{
 		tb_int_t n = sizeof(d);
-		if (getsockname((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, (socklen_t *)&n) == -1) return 0;
+		if (getsockname((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, &n) == -1) return 0;
 		port = ntohs(d.sin_port);
 	}
 
