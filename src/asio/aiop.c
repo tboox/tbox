@@ -142,8 +142,7 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 	tb_spinlock_leave(&aiop->lock);
 
 	// exit lock
-	if (aiop->lock) tb_spinlock_exit(aiop->lock);
-	aiop->lock = tb_null;
+	tb_spinlock_exit(&aiop->lock);
 
 	// free aiop
 	tb_free(aiop);
