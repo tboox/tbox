@@ -131,6 +131,9 @@ typedef tb_fixed16_t 				tb_fixed_t;
 typedef __tb_volatile__ tb_long_t 	tb_atomic_t;
 typedef __tb_volatile__ tb_hong_t 	tb_atomic64_t;
 
+// the spinlock type
+typedef tb_atomic_t 				tb_spinlock_t;
+
 /// the time type
 typedef tb_hong_t 					tb_time_t;
 

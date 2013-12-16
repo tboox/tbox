@@ -111,7 +111,7 @@ typedef struct __tb_ltimer_t
 	tb_size_t 					tick;
 
 	// the lock
-	tb_handle_t 				lock;
+	tb_spinlock_t 				lock;
 
 	// the pool
 	tb_handle_t 				pool;
@@ -281,8 +281,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
 	timer->btime 		= tb_ltimer_now(timer);
 
 	// init lock
-	timer->lock 		= tb_spinlock_init();
-	tb_assert_and_check_goto(timer->lock, fail);
+	if (!tb_spinlock_init(&timer->lock)) goto fail;
 
 	// init pool
 	timer->pool 		= tb_rpool_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_t), 0);
@@ -314,7 +313,7 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[ltimer]: the loop has been not exited now!");
 
 		// enter
-		if (timer->lock) tb_spinlock_enter(timer->lock);
+		tb_spinlock_enter(&timer->lock);
 
 		// exit wheel
 		{
@@ -331,15 +330,14 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		timer->pool = tb_null;
 
 		// leave
-		if (timer->lock) tb_spinlock_leave(timer->lock);
+		tb_spinlock_leave(&timer->lock);
 
 		// exit the expired tasks
 		if (timer->expired) tb_vector_exit(timer->expired);
 		timer->expired = tb_null;
 
 		// exit lock
-		if (timer->lock) tb_spinlock_exit(timer->lock);
-		timer->lock = tb_null;
+		tb_spinlock_exit(&timer->lock);
 
 		// exit it
 		tb_free(timer);
@@ -351,7 +349,7 @@ tb_void_t tb_ltimer_clear(tb_handle_t handle)
 	if (timer)
 	{
 		// enter
-		if (timer->lock) tb_spinlock_enter(timer->lock);
+		tb_spinlock_enter(&timer->lock);
 
 		// move to the wheel head
 		timer->btime = tb_ltimer_now(timer);
@@ -370,7 +368,7 @@ tb_void_t tb_ltimer_clear(tb_handle_t handle)
 		if (timer->pool) tb_rpool_clear(timer->pool);
 
 		// leave
-		if (timer->lock) tb_spinlock_leave(timer->lock);
+		tb_spinlock_leave(&timer->lock);
 	}
 }
 tb_size_t tb_ltimer_limit(tb_handle_t handle)
@@ -407,7 +405,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 	tb_vector_clear(timer->expired);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -459,7 +457,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 	} while (0);
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 
 	// ok? and exists expired task?
 	if (ok && tb_vector_size(timer->expired))
@@ -468,14 +466,14 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 		tb_vector_walk(timer->expired, tb_ltimer_expired_done, tb_null);
 
 		// enter
-		if (timer->lock) tb_spinlock_enter(timer->lock);
+		tb_spinlock_enter(&timer->lock);
 
 		// exit the expired task
 		tb_pointer_t data[2]; data[0] = timer; data[1] = &now;
 		tb_vector_walk(timer->expired, tb_ltimer_expired_exit, data);
 
 		// leave
-		if (timer->lock) tb_spinlock_leave(timer->lock);
+		tb_spinlock_leave(&timer->lock);
 	}
 
 	// ok?
@@ -525,7 +523,7 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	tb_assert_and_check_return_val(timer && timer->pool && func, tb_null);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// make task
 	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
@@ -548,7 +546,7 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	}
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 
 	// ok?
 	return task;
@@ -578,7 +576,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	tb_assert_and_check_return(timer && timer->pool && func);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// make task
 	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
@@ -598,7 +596,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	}
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 }
 tb_void_t tb_ltimer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
@@ -620,7 +618,7 @@ tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// remove it from pool directly if the task have been expired 
 	if (task->refn == 1) tb_rpool_free(timer->pool, task);
@@ -634,6 +632,6 @@ tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 	task->repeat 	= 0;
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 }
 

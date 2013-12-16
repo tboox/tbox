@@ -46,7 +46,7 @@ static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size
 	tb_assert_and_check_return_val(aiop && aiop->pool, tb_null);
 
 	// enter 
-	if (aiop->lock) tb_spinlock_enter(aiop->lock);
+	tb_spinlock_enter(&aiop->lock);
 
 	// make aioo
 	tb_aioo_t* aioo = (tb_aioo_t*)tb_rpool_malloc0(aiop->pool);
@@ -60,7 +60,7 @@ static tb_aioo_t* tb_aiop_aioo_init(tb_aiop_t* aiop, tb_handle_t handle, tb_size
 	}
 
 	// leave 
-	if (aiop->lock) tb_spinlock_leave(aiop->lock);
+	tb_spinlock_leave(&aiop->lock);
 	
 	// ok?
 	return aioo;
@@ -71,13 +71,13 @@ static tb_void_t tb_aiop_aioo_exit(tb_aiop_t* aiop, tb_handle_t aioo)
 	tb_assert_and_check_return(aiop && aiop->pool);
 
 	// enter 
-	if (aiop->lock) tb_spinlock_enter(aiop->lock);
+	tb_spinlock_enter(&aiop->lock);
 
 	// exit aioo
 	if (aioo) tb_rpool_free(aiop->pool, aioo);
 
 	// leave 
-	if (aiop->lock) tb_spinlock_leave(aiop->lock);
+	tb_spinlock_leave(&aiop->lock);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -96,8 +96,7 @@ tb_aiop_t* tb_aiop_init(tb_size_t maxn)
 	aiop->maxn = maxn;
 
 	// init lock
-	aiop->lock = tb_spinlock_init();
-	tb_assert_and_check_goto(aiop->lock, fail);
+	if (!tb_spinlock_init(&aiop->lock)) goto fail;
 
 	// init pool
 	aiop->pool = tb_rpool_init((maxn >> 4) + 16, sizeof(tb_aioo_t), 0);
@@ -137,10 +136,10 @@ tb_void_t tb_aiop_exit(tb_aiop_t* aiop)
 	aiop->spak[1] = tb_null;
 
 	// exit pool
-	if (aiop->lock) tb_spinlock_enter(aiop->lock);
+	tb_spinlock_enter(&aiop->lock);
 	if (aiop->pool) tb_rpool_exit(aiop->pool);
 	aiop->pool = tb_null;
-	if (aiop->lock) tb_spinlock_leave(aiop->lock);
+	tb_spinlock_leave(&aiop->lock);
 
 	// exit lock
 	if (aiop->lock) tb_spinlock_exit(aiop->lock);
@@ -159,9 +158,9 @@ tb_void_t tb_aiop_cler(tb_aiop_t* aiop)
 		aiop->rtor->cler(aiop->rtor);
 
 	// clear pool
-	if (aiop->lock) tb_spinlock_enter(aiop->lock);
+	tb_spinlock_enter(&aiop->lock);
 	if (aiop->pool) tb_rpool_clear(aiop->pool);
-	if (aiop->lock) tb_spinlock_leave(aiop->lock);
+	tb_spinlock_leave(&aiop->lock);
 
 	// addo spak
 	if (aiop->spak[1]) tb_aiop_addo(aiop, aiop->spak[1], TB_AIOE_CODE_RECV, tb_null);	

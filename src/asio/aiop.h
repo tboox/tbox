@@ -83,7 +83,7 @@ typedef struct __tb_aiop_t
 	tb_handle_t 			pool;
 
 	/// the pool lock
-	tb_handle_t 			lock;
+	tb_spinlock_t 			lock;
 
 	/// the reactor
 	tb_aiop_reactor_t* 		rtor;

@@ -225,11 +225,11 @@ typedef struct __tb_dns_answer_t
  * globals
  */
 
-// the dns list
+// the list
 static tb_dns_list_t* 	g_list = tb_null;
 
-// the mutex
-static tb_handle_t 		g_mutex = tb_null;
+// the lock
+static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -530,81 +530,6 @@ static tb_bool_t tb_dns_look_stat(tb_handle_t cache, tb_hash_item_t* item, tb_bo
 	// ok
 	return tb_true;
 }
-static tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
-{
-	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
-
-	// trace
-	tb_trace_impl("add4: %s => %u.%u.%u.%u", name, ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
-
-	// init
-	tb_dns_addr_t addr;
-	addr.ipv4 = *ipv4;
-	addr.time = (tb_size_t)(tb_mclock() / 1000);
-
-	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
-
-	// has list?
-	if (g_list)
-	{
-		// cache
-		tb_handle_t cache = g_list->cache;
-		if (cache)
-		{
-			// remove the expired items if full
-			if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
-			{
-				// which is better? lol
-				// ...
-#if 1
-				// the expired time
-				g_list->expired = ((tb_size_t)(g_list->times / tb_hash_size(cache)) + 1);
-#else
-
-				// stat
-				tb_size_t stat[2] = {0};
-				tb_hash_walk(cache, tb_dns_look_stat, stat);
-
-				// the expired time
-				g_list->expired = tb_max(stat[0] + 1, ((stat[0] + stat[1]) >> 2));
-#endif
-
-				tb_assert(g_list->expired);
-				tb_trace_impl("cache: expired: %u", g_list->expired);
-
-				// remove the expired times
-				tb_hash_walk(cache, tb_dns_look_clr4, g_list);
-			}
-
-			// check
-			tb_assert(tb_hash_size(cache) < TB_DNS_CACHE_MAXN);
-
-			// add it
-			if (tb_hash_size(cache) < TB_DNS_CACHE_MAXN) 
-			{
-				// set
-				tb_hash_set(cache, name, &addr);
-
-				// update times
-				g_list->times += addr.time;
-
-				// trace
-				tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u, size: %u"
-					, name
-					, addr.ipv4.u8[0]
-					, addr.ipv4.u8[1]
-					, addr.ipv4.u8[2]
-					, addr.ipv4.u8[3]
-					, addr.time
-					, tb_hash_size(cache));
-			}
-		}
-	}
-
-	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
-}
 static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 {
 	tb_check_return_val(!(look->step & TB_DNS_STEP_REQT), 1);
@@ -708,7 +633,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 	if (!tb_sstring_size(&look->host))
 	{
 		// enter
-		if (g_mutex) tb_mutex_enter(g_mutex);
+		tb_spinlock_enter(&g_lock);
 
 		// host
 		if (g_list && look->itor)
@@ -720,7 +645,7 @@ static tb_long_t tb_dns_look_reqt(tb_dns_look_t* look)
 		}
 
 		// leave
-		if (g_mutex) tb_mutex_leave(g_mutex);
+		tb_spinlock_leave(&g_lock);
 	}
 
 	// host
@@ -967,7 +892,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 	if (!tb_sstring_size(&look->host))
 	{
 		// enter
-		if (g_mutex) tb_mutex_enter(g_mutex);
+		tb_spinlock_enter(&g_lock);
 
 		// host
 		if (g_list && look->itor)
@@ -979,7 +904,7 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
 		}
 
 		// leave
-		if (g_mutex )tb_mutex_leave(g_mutex);
+		tb_spinlock_leave(&g_lock);
 	}
 
 	// host
@@ -1048,20 +973,8 @@ static tb_long_t tb_dns_look_resp(tb_dns_look_t* look, tb_ipv4_t* ipv4)
  */
 tb_bool_t tb_dns_list_init()
 {
-	// no mutex?
-	if (!tb_atomic_get((tb_atomic_t*)&g_mutex))
-	{	
-		// init mutex
-		tb_handle_t mutex = tb_mutex_init();
-		tb_assert_and_check_return_val(mutex, tb_false);
-	
-		// save mutex
-		if (tb_atomic_fetch_and_set((tb_atomic_t*)&g_mutex, mutex))
-			tb_mutex_exit(mutex);
-	}
-
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// no list?
 	tb_bool_t ok = tb_false;
@@ -1091,7 +1004,7 @@ tb_bool_t tb_dns_list_init()
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 
 	// init local
 	if (ok) 
@@ -1103,13 +1016,13 @@ tb_bool_t tb_dns_list_init()
 		tb_bool_t local = tb_false;
 		{
 			// enter
-			if (g_mutex) tb_mutex_enter(g_mutex);
+			tb_spinlock_enter(&g_lock);
 
 			// ok?
 			if (g_list && g_list->size) local = tb_true;
 
 			// leave
-			if (g_mutex) tb_mutex_leave(g_mutex);
+			tb_spinlock_leave(&g_lock);
 		}
 
 		// add the hosts if no local
@@ -1137,7 +1050,7 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 		tb_check_goto(item.rate >= 0, fail);
 
 		// enter
-		if (g_mutex) tb_mutex_enter(g_mutex);
+		tb_spinlock_enter(&g_lock);
 
 		// has list?
 		if (g_list)
@@ -1167,7 +1080,7 @@ tb_void_t tb_dns_list_adds(tb_char_t const* host)
 		}
 
 		// leave
-		if (g_mutex) tb_mutex_leave(g_mutex);
+		tb_spinlock_leave(&g_lock);
 
 		// ok
 		return ;
@@ -1182,7 +1095,7 @@ tb_void_t tb_dns_list_dels(tb_char_t const* host)
 	tb_assert_and_check_return(host);
 
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// has list?
 	if (g_list)
@@ -1211,12 +1124,12 @@ tb_void_t tb_dns_list_dels(tb_char_t const* host)
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 }
 tb_void_t tb_dns_list_exit()
 {
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// exit list
 	if (g_list)
@@ -1235,12 +1148,7 @@ tb_void_t tb_dns_list_exit()
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
-
-	// exit mutex
-	tb_handle_t mutex = g_mutex;
-	if (tb_atomic_fetch_and_set0((tb_atomic_t*)&g_mutex))
-		tb_mutex_exit(mutex);
+	tb_spinlock_leave(&g_lock);
 }
 #ifdef __tb_debug__
 tb_void_t tb_dns_list_dump()
@@ -1249,7 +1157,7 @@ tb_void_t tb_dns_list_dump()
 	tb_assert_and_check_return(g_list);
 
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// list
 	tb_dns_host_t* list = g_list->list;
@@ -1271,13 +1179,88 @@ tb_void_t tb_dns_list_dump()
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 }
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * name
  */
+tb_void_t tb_dns_look_add4(tb_char_t const* name, tb_ipv4_t const* ipv4)
+{
+	tb_assert_and_check_return(name && ipv4 && ipv4->u32);
+
+	// trace
+	tb_trace_impl("add4: %s => %u.%u.%u.%u", name, ipv4->u8[0], ipv4->u8[1], ipv4->u8[2], ipv4->u8[3]);
+
+	// init
+	tb_dns_addr_t addr;
+	addr.ipv4 = *ipv4;
+	addr.time = (tb_size_t)(tb_mclock() / 1000);
+
+	// enter
+	tb_spinlock_enter(&g_lock);
+
+	// has list?
+	if (g_list)
+	{
+		// cache
+		tb_handle_t cache = g_list->cache;
+		if (cache)
+		{
+			// remove the expired items if full
+			if (tb_hash_size(cache) >= TB_DNS_CACHE_MAXN) 
+			{
+				// which is better? lol
+				// ...
+#if 1
+				// the expired time
+				g_list->expired = ((tb_size_t)(g_list->times / tb_hash_size(cache)) + 1);
+#else
+
+				// stat
+				tb_size_t stat[2] = {0};
+				tb_hash_walk(cache, tb_dns_look_stat, stat);
+
+				// the expired time
+				g_list->expired = tb_max(stat[0] + 1, ((stat[0] + stat[1]) >> 2));
+#endif
+
+				tb_assert(g_list->expired);
+				tb_trace_impl("cache: expired: %u", g_list->expired);
+
+				// remove the expired times
+				tb_hash_walk(cache, tb_dns_look_clr4, g_list);
+			}
+
+			// check
+			tb_assert(tb_hash_size(cache) < TB_DNS_CACHE_MAXN);
+
+			// add it
+			if (tb_hash_size(cache) < TB_DNS_CACHE_MAXN) 
+			{
+				// set
+				tb_hash_set(cache, name, &addr);
+
+				// update times
+				g_list->times += addr.time;
+
+				// trace
+				tb_trace_impl("cache: add %s => %u.%u.%u.%u, time: %u, size: %u"
+					, name
+					, addr.ipv4.u8[0]
+					, addr.ipv4.u8[1]
+					, addr.ipv4.u8[2]
+					, addr.ipv4.u8[3]
+					, addr.time
+					, tb_hash_size(cache));
+			}
+		}
+	}
+
+	// leave
+	tb_spinlock_leave(&g_lock);
+}
 tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 {
 	// check
@@ -1293,7 +1276,7 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 	tb_ipv4_clr(ipv4);
 
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// has list?
 	if (g_list)
@@ -1330,7 +1313,7 @@ tb_bool_t tb_dns_look_try4(tb_char_t const* name, tb_ipv4_t* ipv4)
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 
 	// trace
 	tb_trace_impl("try4: %s", ipv4->u32? "ok" : "failed");
@@ -1364,13 +1347,13 @@ tb_handle_t tb_dns_look_init(tb_char_t const* name)
 	tb_assert_and_check_goto(look->sock, fail);
 
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// init itor
 	if (g_list && g_list->size) look->itor = 1;
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 	tb_assert_and_check_goto(look->itor, fail);
 
 	// ok
@@ -1404,7 +1387,7 @@ tb_long_t tb_dns_look_spak(tb_handle_t handle, tb_ipv4_t* ipv4)
 fail:
 	
 	// enter
-	if (g_mutex) tb_mutex_enter(g_mutex);
+	tb_spinlock_enter(&g_lock);
 
 	// next
 	if (g_list)
@@ -1414,7 +1397,7 @@ fail:
 	}
 
 	// leave
-	if (g_mutex) tb_mutex_leave(g_mutex);
+	tb_spinlock_leave(&g_lock);
 
 	// try next host
 	if (look->itor)

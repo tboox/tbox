@@ -78,7 +78,7 @@ typedef struct __tb_timer_t
 	tb_bool_t 					ctime;
 
 	// the lock
-	tb_handle_t 				lock;
+	tb_spinlock_t 				lock;
 
 	// the pool
 	tb_handle_t 				pool;
@@ -135,8 +135,7 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 	timer->ctime 		= ctime;
 
 	// init lock
-	timer->lock 		= tb_spinlock_init();
-	tb_assert_and_check_goto(timer->lock, fail);
+	if (!tb_spinlock_init(&timer->lock)) goto fail;
 
 	// init pool
 	timer->pool 		= tb_rpool_init((maxn >> 2) + 16, sizeof(tb_timer_task_t), 0);
@@ -168,7 +167,7 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[timer]: the loop has been not exited now!");
 
 		// enter
-		if (timer->lock) tb_spinlock_enter(timer->lock);
+		tb_spinlock_enter(&timer->lock);
 
 		// exit heap
 		if (timer->heap) tb_heap_exit(timer->heap);
@@ -179,11 +178,10 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		timer->pool = tb_null;
 
 		// leave
-		if (timer->lock) tb_spinlock_leave(timer->lock);
+		tb_spinlock_leave(&timer->lock);
 
 		// exit lock
-		if (timer->lock) tb_spinlock_exit(timer->lock);
-		timer->lock = tb_null;
+		tb_spinlock_exit(&timer->lock);
 
 		// exit it
 		tb_free(timer);
@@ -195,7 +193,7 @@ tb_void_t tb_timer_clear(tb_handle_t handle)
 	if (timer)
 	{
 		// enter
-		if (timer->lock) tb_spinlock_enter(timer->lock);
+		tb_spinlock_enter(&timer->lock);
 
 		// clear heap
 		if (timer->heap) tb_heap_clear(timer->heap);
@@ -204,7 +202,7 @@ tb_void_t tb_timer_clear(tb_handle_t handle)
 		if (timer->pool) tb_rpool_clear(timer->pool);
 
 		// leave
-		if (timer->lock) tb_spinlock_leave(timer->lock);
+		tb_spinlock_leave(&timer->lock);
 	}
 }
 tb_size_t tb_timer_delay(tb_handle_t handle)
@@ -217,7 +215,7 @@ tb_size_t tb_timer_delay(tb_handle_t handle)
 	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), 0);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// done
 	tb_size_t delay = 0; 
@@ -236,7 +234,7 @@ tb_size_t tb_timer_delay(tb_handle_t handle)
 	}
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 
 	// ok?
 	return delay;
@@ -251,7 +249,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_false);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// done
 	tb_bool_t 				ok = tb_false;
@@ -311,7 +309,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 	} while (0);
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 
 	// done func
 	if (func) func(data);
@@ -363,7 +361,7 @@ tb_handle_t tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 	tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_null);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// make task
 	tb_timer_task_t* task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
@@ -382,7 +380,7 @@ tb_handle_t tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 	}
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 
 	// ok?
 	return task;
@@ -412,7 +410,7 @@ tb_void_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t per
 	tb_assert_and_check_return(timer && timer->pool && timer->heap && func);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// make task
 	tb_timer_task_t* task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
@@ -431,7 +429,7 @@ tb_void_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t per
 	}
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 }
 tb_void_t tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
@@ -453,7 +451,7 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t htask)
 	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
-	if (timer->lock) tb_spinlock_enter(timer->lock);
+	tb_spinlock_enter(&timer->lock);
 
 	// remove it from pool directly if the task have been expired 
 	if (task->refn == 1) tb_rpool_free(timer->pool, task);
@@ -467,6 +465,6 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t htask)
 	task->repeat 	= 0;
 
 	// leave
-	if (timer->lock) tb_spinlock_leave(timer->lock);
+	tb_spinlock_leave(&timer->lock);
 }
 

@@ -32,59 +32,61 @@
 #include "atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the initial value
+#define TB_SPINLOCK_INIT 			(0)
+
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 /*! init spinlock
  *
- * @return 			the spinlock handle
+ * @param lock 		the lock
+ *
+ * @return 			tb_true or tb_false
  */
-tb_handle_t 		tb_spinlock_init(tb_noarg_t);
+static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_t* lock)
+{
+	// check
+	tb_assert_and_check_return_val(lock, tb_false);
+
+	// init 
+	*lock = 0;
+
+	// ok
+	return tb_true;
+}
 
 /* exit spinlock
  *
- * @param handle 	the spinlock handle
+ * @param lock 		the lock
  */
-tb_void_t 			tb_spinlock_exit(tb_handle_t handle);
+static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_t* lock)
+{
+	// check
+	tb_assert_and_check_return(lock);
 
-#ifndef TB_CONFIG_SPINLOCK_ATOMIC_ENABLE
+	// exit 
+	*lock = 0;
+}
 
 /* enter spinlock
  *
- * @param handle 	the spinlock handle
- *
- * @return 			tb_true or tb_false
+ * @param lock 		the lock
  */
-tb_bool_t 			tb_spinlock_enter(tb_handle_t handle);
-
-/* try to enter spinlock
- *
- * @param handle 	the spinlock handle
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_spinlock_enter_try(tb_handle_t handle);
-
-/* leave spinlock
- *
- * @param handle 	the spinlock handle
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_spinlock_leave(tb_handle_t handle);
-
-#else
-
-static __tb_inline_force__ tb_bool_t tb_spinlock_enter(tb_handle_t handle)
+static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
 {
 	// check
-	tb_assert_and_check_return_val(handle, tb_false);
+	tb_assert_and_check_return(lock);
 
 	// init tryn
 	__tb_volatile__ tb_size_t tryn = 5;
 
 	// lock it
-	while (tb_atomic_fetch_and_pset((tb_atomic_t*)handle, 0, 1))
+	while (tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1))
 	{
 		if (!tryn--)
 		{
@@ -96,28 +98,34 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter(tb_handle_t handle)
 			tryn = 5;
 		}
 	}
-
-	// ok
-	return tb_true;
 }
 
-static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_handle_t handle)
+/* try to enter spinlock
+ *
+ * @param lock 		the lock
+ *
+ * @return 			tb_true or tb_false
+ */
+static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_t* lock)
 {
 	// check
-	tb_assert_and_check_return_val(handle, tb_false);
+	tb_assert_and_check_return_val(lock, tb_false);
 
 	// try lock it
-	return tb_atomic_fetch_and_pset((tb_atomic_t*)handle, 0, 1)? tb_false : tb_true;
+	return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
 }
-static __tb_inline_force__ tb_bool_t tb_spinlock_leave(tb_handle_t handle)
+
+/* leave spinlock
+ *
+ * @param lock 		the lock
+ */
+static __tb_inline_force__ tb_void_t tb_spinlock_leave(tb_spinlock_t* lock)
 {
 	// check
-	tb_assert_and_check_return_val(handle, tb_false);
+	tb_assert_and_check_return(lock);
 
-    *((tb_atomic_t*)handle) = 0;
-	return tb_true;
+	// leave
+    *((tb_atomic_t*)lock) = 0;
 }
-
-#endif
 
 #endif

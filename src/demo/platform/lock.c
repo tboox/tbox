@@ -49,13 +49,13 @@ static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
 #elif defined(TB_TEST_LOCK_SPINLOCK)
 		{
 			// enter
-			tb_spinlock_enter(lock);
+			tb_spinlock_enter(&lock);
 
 			// value++
 			g_value++;
 
 			// leave
-			tb_spinlock_leave(lock);
+			tb_spinlock_leave(&lock);
 		}
 #elif defined(TB_TEST_LOCK_ATOMIC)
 		tb_atomic_fetch_and_inc(&g_value);
@@ -84,8 +84,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t lock = tb_mutex_init();
 	tb_assert_and_check_goto(lock, end);
 #elif defined(TB_TEST_LOCK_SPINLOCK)
-	tb_handle_t lock = tb_spinlock_init();
-	tb_assert_and_check_goto(lock, end);
+	tb_handle_t lock = TB_SPINLOCK_INIT;
 #elif defined(TB_TEST_LOCK_ATOMIC)
 	tb_handle_t lock = tb_null; 
 #else
@@ -123,8 +122,7 @@ end:
 		if (lock) tb_mutex_exit(lock);
 		lock = tb_null;
 #elif defined(TB_TEST_LOCK_SPINLOCK)
-		if (lock) tb_spinlock_exit(lock);
-		lock = tb_null;
+		tb_spinlock_exit(&lock);
 #elif defined(TB_TEST_LOCK_ATOMIC)
 		lock = tb_null;
 #else
