@@ -223,7 +223,6 @@ tbox_C_FILES 			+= \
 						platform/ltimer \
 						platform/printf \
 						platform/tstore \
-						platform/spinlock \
 						platform/platform \
 						platform/backtrace \
 						platform/$(TB_CONFIG_API_DNS)/dns \

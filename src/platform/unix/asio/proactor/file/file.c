@@ -64,7 +64,7 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 	tb_assert_and_check_return_val(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], tb_false);
 
 	// enter 
-	if (ptor->lock) tb_spinlock_enter(ptor->lock);
+	tb_spinlock_enter(&ptor->lock);
 
 	// post aice
 	tb_bool_t ok = tb_true;
@@ -86,7 +86,7 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 	}
 
 	// leave 
-	if (ptor->lock) tb_spinlock_leave(ptor->lock);
+	tb_spinlock_leave(&ptor->lock);
 
 	// ok?
 	return ok;

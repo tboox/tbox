@@ -168,7 +168,7 @@ typedef struct __tb_aicp_t
 	tb_handle_t 			pool;
 
 	/// the pool lock
-	tb_handle_t 			lock;
+	tb_spinlock_t 			lock;
 
 }tb_aicp_t;
 

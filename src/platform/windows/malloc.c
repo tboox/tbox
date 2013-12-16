@@ -33,10 +33,10 @@
  */
 
 // the heap
-static tb_handle_t g_heap = tb_null;
+static tb_handle_t 		g_heap = tb_null;
 
 // the lock
-static tb_atomic_t g_lock = 0; 
+static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT; 
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
@@ -85,10 +85,10 @@ tb_bool_t tb_malloc_init()
 {	
 	// init heap
 	tb_bool_t ok = tb_false;
-	tb_malloc_lock_enter();
+	tb_spinlock_enter(&g_lock);
 	if (!g_heap) g_heap = (tb_handle_t)HeapCreate(0, 0, 0);
 	if (g_heap) ok = tb_true;
-	tb_malloc_lock_leave();
+	tb_spinlock_leave(&g_lock);
 
 	// ok?
 	return ok;
@@ -96,14 +96,14 @@ tb_bool_t tb_malloc_init()
 tb_void_t tb_malloc_exit()
 {	
 	// enter 
-	tb_malloc_lock_enter();
+	tb_spinlock_enter(&g_lock);
 
 	// exit heap
 	if (g_heap) HeapDestroy(g_heap);
 	g_heap = tb_null;
 
 	// leave
-	tb_malloc_lock_leave();
+	tb_spinlock_leave(&g_lock);
 
 	// exit lock
 	g_lock = 0;
@@ -117,13 +117,13 @@ tb_pointer_t tb_malloc(tb_size_t size)
 	tb_pointer_t data = tb_null;
 
 	// enter 
-	tb_malloc_lock_enter();
+	tb_spinlock_enter(&g_lock);
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, 0, (SIZE_T)size);
 
 	// leave
-	tb_malloc_lock_leave();
+	tb_spinlock_leave(&g_lock);
 
 	// ok?
 	return data;
@@ -137,13 +137,13 @@ tb_pointer_t tb_malloc0(tb_size_t size)
 	tb_pointer_t data = tb_null;
 
 	// enter 
-	tb_malloc_lock_enter();
+	tb_spinlock_enter(&g_lock);
 
 	// alloc data
 	if (g_heap) data = HeapAlloc((HANDLE)g_heap, HEAP_ZERO_MEMORY, (SIZE_T)size);
 
 	// leave
-	tb_malloc_lock_leave();
+	tb_spinlock_leave(&g_lock);
 
 	// ok?
 	return data;
@@ -169,13 +169,13 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 	else 
 	{
 		// enter 
-		tb_malloc_lock_enter();
+		tb_spinlock_enter(&g_lock);
 
 		// realloc
 		if (g_heap) data = (tb_pointer_t)HeapReAlloc((HANDLE)g_heap, 0, data, (SIZE_T)size);
 
 		// leave
-		tb_malloc_lock_leave();
+		tb_spinlock_leave(&g_lock);
 
 		// ok?
 		return data;
@@ -184,12 +184,12 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 tb_void_t tb_free(tb_pointer_t data)
 {
 	// enter 
-	tb_malloc_lock_enter();
+	tb_spinlock_enter(&g_lock);
 
 	// free data
 	if (g_heap && data) HeapFree((HANDLE)g_heap, 0, data);
 
 	// leave
-	tb_malloc_lock_leave();
+	tb_spinlock_leave(&g_lock);
 }
 

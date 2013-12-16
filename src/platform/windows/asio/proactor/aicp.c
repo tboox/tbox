@@ -142,13 +142,13 @@ static tb_byte_t* tb_iocp_priv_init(tb_aicp_proactor_iocp_t* ptor)
 	tb_assert_and_check_return_val(ptor && ptor->pool, tb_null);
 
 	// enter 
-	if (ptor->lock) tb_spinlock_enter(ptor->lock);
+	tb_spinlock_enter(&ptor->lock);
 
 	// make data
 	tb_byte_t* data = (tb_byte_t*)tb_rpool_malloc0(ptor->pool);
 
 	// leave 
-	if (ptor->lock) tb_spinlock_leave(ptor->lock);
+	tb_spinlock_leave(&ptor->lock);
 	
 	// ok?
 	return data;
@@ -159,13 +159,13 @@ static tb_void_t tb_iocp_priv_exit(tb_aicp_proactor_iocp_t* ptor, tb_byte_t* dat
 	tb_assert_and_check_return(ptor && ptor->pool);
 
 	// enter 
-	if (ptor->lock) tb_spinlock_enter(ptor->lock);
+	tb_spinlock_enter(&ptor->lock);
 
 	// exit data
 	if (data) tb_rpool_free(ptor->pool, data);
 
 	// leave 
-	if (ptor->lock) tb_spinlock_leave(ptor->lock);
+	tb_spinlock_leave(&ptor->lock);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -1472,18 +1472,17 @@ static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 		ptor->port = tb_null;
 
 		// exit pool
-		if (ptor->lock) tb_spinlock_enter(ptor->lock);
+		tb_spinlock_enter(&ptor->lock);
 		if (ptor->pool) tb_rpool_exit(ptor->pool);
 		ptor->pool = tb_null;
-		if (ptor->lock) tb_spinlock_leave(ptor->lock);
+		tb_spinlock_leave(&ptor->lock);
 
 		// exit timer
 		if (ptor->timer) tb_ltimer_exit(ptor->timer);
 		ptor->timer = tb_null;
 
 		// exit lock
-		if (ptor->lock) tb_spinlock_exit(ptor->lock);
-		ptor->lock = tb_null;
+		tb_spinlock_exit(&ptor->lock);
 
 		// free it
 		tb_free(ptor);
@@ -1729,8 +1728,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->AcceptEx && ptor->ConnectEx, fail);
 
 	// init lock
-	ptor->lock 			= tb_spinlock_init();
-	tb_assert_and_check_goto(ptor->lock, fail);
+	if (!tb_spinlock_init(&ptor->lock)) goto fail;
 
 	// init port
 	ptor->port = CreateIoCompletionPort(INVALID_HANDLE_VALUE, tb_null, 0, 0);

@@ -45,17 +45,13 @@
 static tb_handle_t 				g_pool = tb_null;
 
 // the lock
-static tb_handle_t 				g_lock = tb_null;
+static tb_spinlock_t 			g_lock = TB_SPINLOCK_INIT;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_opool_init()
 {
-	// init mutx
-	if (!g_lock) g_lock = tb_spinlock_init();
-	tb_assert_and_check_return_val(g_lock, tb_false);
-
 	// init pool
 	if (!g_pool) g_pool = tb_spool_init(TB_OPOOL_GROW, 0);
 	tb_assert_and_check_return_val(g_pool, tb_false);
@@ -71,29 +67,25 @@ tb_void_t tb_opool_exit()
 #endif
 
 	// enter
-	if (g_lock) tb_spinlock_enter(g_lock);
+	tb_spinlock_enter(&g_lock);
 
 	// exit pool
 	if (g_pool) tb_spool_exit(g_pool);
 	g_pool = tb_null;
 
 	// leave
-	if (g_lock) tb_spinlock_leave(g_lock);
-
-	// exit mutx
-	if (g_lock) tb_spinlock_exit(g_lock);
-	g_lock = tb_null;
+	tb_spinlock_leave(&g_lock);
 }
 tb_void_t tb_opool_clear()
 {
 	// enter
-	if (g_lock) tb_spinlock_enter(g_lock);
+	tb_spinlock_enter(&g_lock);
 
 	// clear pool
 	if (g_pool) tb_spool_clear(g_pool);
 
 	// leave
-	if (g_lock) tb_spinlock_leave(g_lock);
+	tb_spinlock_leave(&g_lock);
 }
 #ifndef __tb_debug__
 tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type)
@@ -105,7 +97,7 @@ tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, t
 	tb_assert_and_check_return_val(size && type, tb_null);
 
 	// enter
-	if (g_lock) tb_spinlock_enter(g_lock);
+	tb_spinlock_enter(&g_lock);
 
 	// make object
 #ifndef __tb_debug__
@@ -129,7 +121,7 @@ tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, t
 	}
 
 	// leave
-	if (g_lock) tb_spinlock_leave(g_lock);
+	tb_spinlock_leave(&g_lock);
 
 	// ok?
 	return object;
@@ -144,7 +136,7 @@ tb_void_t tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_size_
 	tb_assert_and_check_return(object);
 
 	// enter
-	if (g_lock) tb_spinlock_enter(g_lock);
+	tb_spinlock_enter(&g_lock);
 
 	// exit object
 #ifndef __tb_debug__
@@ -154,18 +146,18 @@ tb_void_t tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_size_
 #endif
 
 	// leave
-	if (g_lock) tb_spinlock_leave(g_lock);
+	tb_spinlock_leave(&g_lock);
 }
 #ifdef __tb_debug__
 tb_void_t tb_opool_dump()
 {
 	// enter
-	if (g_lock) tb_spinlock_enter(g_lock);
+	tb_spinlock_enter(&g_lock);
 
 	// dump
 	if (g_pool) tb_spool_dump(g_pool, "opool");
 
 	// leave
-	if (g_lock) tb_spinlock_leave(g_lock);
+	tb_spinlock_leave(&g_lock);
 }
 #endif
