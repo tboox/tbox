@@ -52,11 +52,12 @@ typedef enum __tb_aico_type_e
 /// the aico timeout enum, only for sock
 typedef enum __tb_aico_timeout_e
 {
- 	TB_AICO_TIMEOUT_ACPT 	= 0
-,	TB_AICO_TIMEOUT_CONN 	= 1
-, 	TB_AICO_TIMEOUT_RECV 	= 2
-, 	TB_AICO_TIMEOUT_SEND 	= 3
-, 	TB_AICO_TIMEOUT_MAXN 	= 4
+ 	TB_AICO_TIMEOUT_IPV4 	= 0
+ ,	TB_AICO_TIMEOUT_ACPT 	= 1
+,	TB_AICO_TIMEOUT_CONN 	= 2
+, 	TB_AICO_TIMEOUT_RECV 	= 3
+, 	TB_AICO_TIMEOUT_SEND 	= 4
+, 	TB_AICO_TIMEOUT_MAXN 	= 5
 
 }tb_aico_timeout_e;
 
@@ -161,7 +162,17 @@ tb_long_t 			tb_aico_timeout(tb_handle_t aico, tb_size_t type);
  */
 tb_void_t 			tb_aico_timeout_set(tb_handle_t aico, tb_size_t type, tb_long_t timeout);
 
-/*! post the acpt event
+/*! post the ipv4
+ *
+ * @param aico 		the aico
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_ipv4(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+
+/*! post the acpt
  *
  * @param aico 		the aico
  * @param aicb_func the callback func
@@ -171,7 +182,7 @@ tb_void_t 			tb_aico_timeout_set(tb_handle_t aico, tb_size_t type, tb_long_t tim
  */
 tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the conn event
+/*! post the conn
  *
  * @param aico 		the aico
  * @param host 		the host
@@ -183,7 +194,7 @@ tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t ai
  */
 tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the recv event for sock
+/*! post the recv for sock
  *
  * @param aico 		the aico
  * @param data 		the data
@@ -195,7 +206,7 @@ tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t por
  */
 tb_bool_t 			tb_aico_recv(tb_handle_t aico, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the send event for file
+/*! post the send for file
  *
  * @param aico 		the aico
  * @param data 		the data
@@ -207,7 +218,7 @@ tb_bool_t 			tb_aico_recv(tb_handle_t aico, tb_byte_t* data, tb_size_t size, tb_
  */
 tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the recvv event for sock
+/*! post the recvv for sock
  *
  * @param aico 		the aico
  * @param list 		the list
@@ -219,7 +230,7 @@ tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t siz
  */
 tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the sendv event for file
+/*! post the sendv for file
  *
  * @param aico 		the aico
  * @param list 		the list
@@ -231,7 +242,7 @@ tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t s
  */
 tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the sendfile event for file
+/*! post the sendfile for file
  *
  * @param aico 		the aico
  * @param file 		the file
@@ -244,7 +255,7 @@ tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t s
  */
 tb_bool_t 			tb_aico_sendfile(tb_handle_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the read event for file
+/*! post the read for file
  *
  * @param aico 		the aico
  * @param seek 		the seek
@@ -257,7 +268,7 @@ tb_bool_t 			tb_aico_sendfile(tb_handle_t aico, tb_handle_t file, tb_hize_t seek
  */
 tb_bool_t 			tb_aico_read(tb_handle_t aico, tb_hize_t seek, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the writ event for file
+/*! post the writ for file
  *
  * @param aico 		the aico
  * @param seek 		the seek
@@ -270,7 +281,7 @@ tb_bool_t 			tb_aico_read(tb_handle_t aico, tb_hize_t seek, tb_byte_t* data, tb_
  */
 tb_bool_t 			tb_aico_writ(tb_handle_t aico, tb_hize_t seek, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the readv event for file
+/*! post the readv for file
  *
  * @param aico 		the aico
  * @param seek 		the seek
@@ -283,7 +294,7 @@ tb_bool_t 			tb_aico_writ(tb_handle_t aico, tb_hize_t seek, tb_byte_t const* dat
  */
 tb_bool_t 			tb_aico_readv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the writv event for file
+/*! post the writv for file
  *
  * @param aico 		the aico
  * @param seek 		the seek
@@ -296,7 +307,7 @@ tb_bool_t 			tb_aico_readv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* l
  */
 tb_bool_t 			tb_aico_writv(tb_handle_t aico, tb_hize_t seek, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
-/*! post the fsync event for file
+/*! post the fsync for file
  *
  * @param aico 		the aico
  * @param aicb_func the callback func
@@ -329,6 +340,7 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 	{
 		-1
 
+	, 	TB_AICO_TIMEOUT_IPV4
 	, 	TB_AICO_TIMEOUT_ACPT
 	, 	TB_AICO_TIMEOUT_CONN
 	, 	TB_AICO_TIMEOUT_RECV

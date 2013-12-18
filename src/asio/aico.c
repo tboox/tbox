@@ -101,6 +101,10 @@ tb_void_t tb_aico_timeout_set(tb_handle_t haico, tb_size_t type, tb_long_t timeo
 	// set the aico timeout
 	tb_atomic_set((tb_atomic_t*)(aico->timeout + type), (tb_atomic_t)timeout);
 }
+tb_bool_t tb_aico_ipv4(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+{
+	return tb_false;
+}
 tb_bool_t tb_aico_acpt(tb_handle_t haico, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
 	// check
@@ -131,8 +135,12 @@ tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port,
 	aice.aicb 				= aicb_func;
 	aice.data 				= aicb_data;
 	aice.aico 				= aico;
-	aice.u.conn.host 		= host;
 	aice.u.conn.port 		= port;
+	if (!tb_ipv4_set(&aice.u.conn.ipv4, host)) 
+	{
+		tb_trace("host: %s must be ipv4 address", host);
+		return tb_false;
+	}
 
 	// post
 	return tb_aicp_post(aico->aicp, &aice);

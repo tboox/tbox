@@ -30,6 +30,7 @@
  */
 #include "prefix.h"
 #include "aico.h"
+#include "../network/ipv4.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -40,23 +41,24 @@ typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 			= 0
 
-, 	TB_AICE_CODE_ACPT 			= 1 	//!< for sock
-, 	TB_AICE_CODE_CONN 			= 2 	//!< for sock
-,	TB_AICE_CODE_RECV 			= 3		//!< for sock
-,	TB_AICE_CODE_SEND 			= 4		//!< for sock
-,	TB_AICE_CODE_RECVV 			= 5		//!< for sock
-,	TB_AICE_CODE_SENDV 			= 6		//!< for sock
-,	TB_AICE_CODE_SENDFILE 		= 7		//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+, 	TB_AICE_CODE_IPV4 			= 1 	//!< for sock
+, 	TB_AICE_CODE_ACPT 			= 2 	//!< for sock
+, 	TB_AICE_CODE_CONN 			= 3 	//!< for sock
+,	TB_AICE_CODE_RECV 			= 4		//!< for sock
+,	TB_AICE_CODE_SEND 			= 5		//!< for sock
+,	TB_AICE_CODE_RECVV 			= 6		//!< for sock
+,	TB_AICE_CODE_SENDV 			= 7		//!< for sock
+,	TB_AICE_CODE_SENDFILE 		= 8		//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
-,	TB_AICE_CODE_READ 			= 8		//!< for file
-,	TB_AICE_CODE_WRIT 			= 9		//!< for file
-,	TB_AICE_CODE_READV 			= 10	//!< for file
-,	TB_AICE_CODE_WRITV 			= 11	//!< for file
-,	TB_AICE_CODE_FSYNC 			= 12	//!< for file
+,	TB_AICE_CODE_READ 			= 9		//!< for file
+,	TB_AICE_CODE_WRIT 			= 10	//!< for file
+,	TB_AICE_CODE_READV 			= 11	//!< for file
+,	TB_AICE_CODE_WRITV 			= 12	//!< for file
+,	TB_AICE_CODE_FSYNC 			= 13	//!< for file
 
-,	TB_AICE_CODE_RUNTASK 		= 13	//!< for task
+,	TB_AICE_CODE_RUNTASK 		= 14	//!< for task
 
-, 	TB_AICE_CODE_MAXN 			= 14
+, 	TB_AICE_CODE_MAXN 			= 15
 
 }tb_aice_code_e;
 
@@ -72,6 +74,20 @@ typedef enum __tb_aice_state_e
 ,	TB_AICE_STATE_NOTSUPPORTED 	= 6
 
 }tb_aice_state_e;
+
+/// the ipv4 aice type
+typedef struct __tb_aice_ipv4_t
+{
+	/// the host
+	tb_char_t const* 			host;
+
+	/// the ipv4
+	tb_ipv4_t 					ipv4;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[3];
+
+}tb_aice_ipv4_t;
 
 /// the acpt aice type
 typedef struct __tb_aice_acpt_t
@@ -90,8 +106,8 @@ typedef struct __tb_aice_conn_t
 	/// the port
 	tb_size_t 					port;
 
-	/// the host, @note: reference only
-	tb_char_t const* 			host;
+	/// the ipv4
+	tb_ipv4_t 					ipv4;
 
 	/// the private data for using the left space of the union
 	tb_handle_t 				priv[3];
@@ -354,6 +370,7 @@ typedef struct __tb_aice_t
 	union
 	{
 		// for sock
+		tb_aice_ipv4_t 			ipv4;
 		tb_aice_acpt_t 			acpt;
 		tb_aice_conn_t 			conn;
 		tb_aice_recv_t 			recv;
