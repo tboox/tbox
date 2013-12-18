@@ -44,7 +44,7 @@
 #define tb_min3(x, y, z) 				(((x) < (y))? (((x) < (z))? (x) : (z)) : (((y) < (z))? (y) : (z)))
 
 // the number of entries in the array
-#define tb_arrayn(x) 					(sizeof((x)) / sizeof((x)[0]))
+#define tb_arrayn(x) 					((sizeof((x)) / sizeof((x)[0])))
 
 // ispow2: 1, 2, 4, 8, 16, 32, ...
 #define tb_ispow2(x) 					(!((x) & ((x) - 1)) && (x))

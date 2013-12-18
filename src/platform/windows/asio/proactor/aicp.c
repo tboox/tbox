@@ -295,14 +295,14 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
 	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
-	tb_assert_and_check_return_val(aice->u.conn.host && aice->u.conn.port, tb_false);
+	tb_assert_and_check_return_val(aice->u.conn.port, tb_false);
 	
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
 
 	// trace
-	tb_trace_impl("connect: %s:%lu", aice->u.conn.host, aice->u.conn.port);
+	tb_trace_impl("connect: %u.%u.%u.%u: %lu", aice->u.conn.ipv4.u8[0], aice->u.conn.ipv4.u8[1], aice->u.conn.ipv4.u8[2], aice->u.conn.ipv4.u8[3], aice->u.conn.port);
 
 	// done
 	tb_bool_t 		ok = tb_false;
@@ -329,7 +329,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 		SOCKADDR_IN addr = {0};
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(aice->u.conn.port);
-		addr.sin_addr.S_un.S_addr = inet_addr(aice->u.conn.host);
+		addr.sin_addr.S_un.S_addr = htonl(aice->u.conn.ipv4.u32);
 		ConnectEx_ok = ptor->ConnectEx( 	(SOCKET)aico->base.handle - 1
 										, 	(struct sockaddr const*)&addr
 										, 	sizeof(addr)
@@ -1315,6 +1315,7 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	static tb_bool_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
 	{
 		tb_null
+	,	tb_null
 	,	tb_iocp_spak_acpt
 	,	tb_iocp_spak_conn
 	,	tb_iocp_spak_iorw
@@ -1406,6 +1407,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
 	{
 		tb_null
+	,	tb_null
 	,	tb_iocp_post_acpt
 	,	tb_iocp_post_conn
 	,	tb_iocp_post_recv

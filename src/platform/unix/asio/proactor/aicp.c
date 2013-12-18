@@ -120,6 +120,7 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	static tb_size_t s_code[] =
 	{
 		TB_AIOE_CODE_NONE
+	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_ACPT
 	, 	TB_AIOE_CODE_CONN
 	, 	TB_AIOE_CODE_RECV
@@ -146,6 +147,7 @@ static __tb_inline__ tb_size_t tb_aiop_aice_priority(tb_aice_t const* aice)
 	{
 		1
 
+	, 	1 	
 	, 	0 	// acpt
 	, 	0 	// conn
 	, 	1
@@ -484,7 +486,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// check
 	tb_assert_and_check_return_val(ptor && aice, -1);
 	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_CONN, -1);
-	tb_assert_and_check_return_val(aice->u.conn.host && aice->u.conn.port, -1);
+	tb_assert_and_check_return_val(aice->u.conn.port, -1);
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
@@ -507,11 +509,16 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
+	// the host 
+	tb_char_t 			data[16] = {0};
+	tb_char_t const* 	host = tb_ipv4_get(&aice->u.conn.ipv4, data, 16);
+	tb_assert_and_check_return_val(host, -1);
+
 	// try to connect it
-	tb_long_t ok = tb_socket_connect(aico->base.handle, aice->u.conn.host, aice->u.conn.port);
+	tb_long_t ok = tb_socket_connect(aico->base.handle, host, aice->u.conn.port);
 
 	// trace
-	tb_trace_impl("conn[%p]: %ld", aico->base.handle, ok);
+	tb_trace_impl("conn[%p]: %s: %lu: %ld", aico->base.handle, host, aice->u.conn.port, ok);
 
 	// no connected? wait it
 	if (!ok) 
@@ -928,6 +935,7 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 			{
 				tb_null
 
+			,	tb_null
 			,	tb_aiop_spak_acpt
 			,	tb_aiop_spak_conn
 			,	tb_aiop_spak_recv
