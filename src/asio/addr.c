@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		aice.c
+ * @file		addr.c
  * @ingroup 	asio
  *
  */
@@ -25,29 +25,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "aice.h"
+#include "addr.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_char_t const* tb_aice_state_cstr(tb_aice_t const* aice)
+tb_bool_t tb_aicp_post_addr(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
-	// check
-	tb_assert_and_check_return_val(aice, tb_null);
-
-	// the state string
-	static tb_char_t const* state[] =
-	{
-	 	"ok"
-	, 	"failed"
-	, 	"closed"
-	, 	"pending"
-	, 	"timeout"
-	, 	"not supported"
-	};
-	tb_assert_and_check_return_val(aice->state < tb_arrayn(state), "unknown");
-
-	// ok
-	return state[aice->state];
+	return tb_false;
 }
-

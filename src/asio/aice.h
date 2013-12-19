@@ -41,7 +41,7 @@ typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 			= 0
 
-, 	TB_AICE_CODE_IPV4 			= 1 	//!< for sock
+, 	TB_AICE_CODE_ADDR 			= 1 	//!< for sock
 , 	TB_AICE_CODE_ACPT 			= 2 	//!< for sock
 , 	TB_AICE_CODE_CONN 			= 3 	//!< for sock
 ,	TB_AICE_CODE_RECV 			= 4		//!< for sock
@@ -68,15 +68,14 @@ typedef enum __tb_aice_state_e
  	TB_AICE_STATE_OK 			= 0
 , 	TB_AICE_STATE_FAILED 		= 1
 ,	TB_AICE_STATE_CLOSED 		= 2
-,	TB_AICE_STATE_KILLED 		= 3
-, 	TB_AICE_STATE_PENDING 		= 4
-,	TB_AICE_STATE_TIMEOUT 		= 5
-,	TB_AICE_STATE_NOTSUPPORTED 	= 6
+, 	TB_AICE_STATE_PENDING 		= 3
+,	TB_AICE_STATE_TIMEOUT 		= 4
+,	TB_AICE_STATE_NOTSUPPORTED 	= 5
 
 }tb_aice_state_e;
 
-/// the ipv4 aice type
-typedef struct __tb_aice_ipv4_t
+/// the addr aice type
+typedef struct __tb_aice_addr_t
 {
 	/// the host
 	tb_char_t const* 			host;
@@ -87,7 +86,7 @@ typedef struct __tb_aice_ipv4_t
 	/// the private data for using the left space of the union
 	tb_handle_t 				priv[3];
 
-}tb_aice_ipv4_t;
+}tb_aice_addr_t;
 
 /// the acpt aice type
 typedef struct __tb_aice_acpt_t
@@ -370,7 +369,7 @@ typedef struct __tb_aice_t
 	union
 	{
 		// for sock
-		tb_aice_ipv4_t 			ipv4;
+		tb_aice_addr_t 			addr;
 		tb_aice_acpt_t 			acpt;
 		tb_aice_conn_t 			conn;
 		tb_aice_recv_t 			recv;

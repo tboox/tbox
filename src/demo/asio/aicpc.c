@@ -83,9 +83,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		if (aice->state == TB_AICE_STATE_CLOSED)
-			tb_print("writ[%p]: closed", aice->aico);
-		else tb_print("writ[%p]: failed: %lu", aice->aico, aice->state);
+		tb_print("writ[%p]: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 

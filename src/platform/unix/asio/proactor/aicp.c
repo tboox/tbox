@@ -438,8 +438,8 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -448,9 +448,6 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -492,8 +489,8 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -502,9 +499,6 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -550,8 +544,8 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -560,9 +554,6 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -618,8 +609,8 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -628,9 +619,6 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -686,8 +674,8 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -696,9 +684,6 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -738,8 +723,8 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -748,9 +733,6 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -790,8 +772,8 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// timeout?
-	if (aice->state == TB_AICE_STATE_TIMEOUT)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
 		if (aico->wait) aico->wait--;
@@ -800,9 +782,6 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 		// ok
 		return 1;
 	}
-
-	// pending
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -861,12 +840,9 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico, -1);
 
-	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
 	{
-		// trace
-		tb_trace_impl("runtask: when: %llu, now: %lld: ok", aice->u.runtask.when, tb_ctime_time());
-
 		// reset wait
 		if (aico->wait) aico->wait--;
 		aico->aice.code = TB_AICE_CODE_NONE;
@@ -874,9 +850,6 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 		// ok
 		return 1;
 	}
-
-	// check
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
 
 	// now
 	tb_hong_t now = tb_ctime_time();

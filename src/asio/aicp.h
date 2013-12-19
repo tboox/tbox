@@ -212,7 +212,7 @@ tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
 /*! post the aice 
  *
  * @param aicp 		the aicp
- * @param list 		the aice 
+ * @param aice 		the aice 
  *
  * @return 			tb_true or tb_false
  */
