@@ -52,7 +52,7 @@ typedef enum __tb_aico_type_e
 /// the aico timeout enum, only for sock
 typedef enum __tb_aico_timeout_e
 {
- 	TB_AICO_TIMEOUT_IPV4 	= 0
+ 	TB_AICO_TIMEOUT_ADDR 	= 0
  ,	TB_AICO_TIMEOUT_ACPT 	= 1
 ,	TB_AICO_TIMEOUT_CONN 	= 2
 , 	TB_AICO_TIMEOUT_RECV 	= 3
@@ -162,15 +162,16 @@ tb_long_t 			tb_aico_timeout(tb_handle_t aico, tb_size_t type);
  */
 tb_void_t 			tb_aico_timeout_set(tb_handle_t aico, tb_size_t type, tb_long_t timeout);
 
-/*! post the ipv4
+/*! post the addr
  *
  * @param aico 		the aico
+ * @param host 		the host
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_ipv4(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+tb_bool_t 			tb_aico_addr(tb_handle_t aico, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the acpt
  *
@@ -340,7 +341,7 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 	{
 		-1
 
-	, 	TB_AICO_TIMEOUT_IPV4
+	, 	TB_AICO_TIMEOUT_ADDR
 	, 	TB_AICO_TIMEOUT_ACPT
 	, 	TB_AICO_TIMEOUT_CONN
 	, 	TB_AICO_TIMEOUT_RECV

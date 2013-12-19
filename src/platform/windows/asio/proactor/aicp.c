@@ -199,12 +199,18 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ACPT, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
-	
+
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+	{
+		aico->olap.aice = *aice;
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	}
+	
 	// trace
 	tb_trace_impl("accept: ..");
 
@@ -294,13 +300,19 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.conn.port, tb_false);
 	
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+	{
+		aico->olap.aice = *aice;
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	}
+	
 	// trace
 	tb_trace_impl("connect: %u.%u.%u.%u: %lu", aice->u.conn.ipv4.u8[0], aice->u.conn.ipv4.u8[1], aice->u.conn.ipv4.u8[2], aice->u.conn.ipv4.u8[3], aice->u.conn.port);
 
@@ -384,7 +396,6 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RECV, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.recv.data && aice->u.recv.size, tb_false);
 	
 	// the aico
@@ -397,6 +408,10 @@ static tb_bool_t tb_iocp_post_recv(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done recv
 	DWORD 		flag = 0;
 	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.recv, 1, tb_null, &flag, &aico->olap, tb_null);
@@ -444,7 +459,6 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SEND, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.send.data && aice->u.send.size, tb_false);
 	
 	// the aico
@@ -457,6 +471,10 @@ static tb_bool_t tb_iocp_post_send(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done send
 	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.send, 1, tb_null, 0, &aico->olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", ok, WSAGetLastError());
@@ -503,7 +521,6 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RECVV, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.recvv.list && aice->u.recvv.size, tb_false);
 	
 	// the aico
@@ -516,6 +533,10 @@ static tb_bool_t tb_iocp_post_recvv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done recv
 	DWORD 		flag = 0;
 	tb_long_t 	ok = WSARecv((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.recvv.list, (DWORD)aico->olap.aice.u.recvv.size, tb_null, &flag, &aico->olap, tb_null);
@@ -563,7 +584,6 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDV, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.sendv.list && aice->u.sendv.size, tb_false);
 	
 	// the aico
@@ -576,6 +596,10 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done send
 	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, &aico->olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", ok, WSAGetLastError());
@@ -622,7 +646,6 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.sendfile.file && aice->u.sendfile.size, tb_false);
 	
 	// the aico
@@ -636,6 +659,10 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// not supported?
 	if (!ptor->TransmitFile)
 	{
@@ -697,7 +724,6 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_READ, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, tb_false);
 
 	// the aico
@@ -711,6 +737,10 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done read
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
@@ -753,7 +783,6 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_WRIT, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, tb_false);
 
 	// the aico
@@ -767,6 +796,10 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done writ
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
@@ -809,7 +842,6 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_READV, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.readv.list && aice->u.readv.size, tb_false);
 
 	// the aico
@@ -823,6 +855,10 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done read
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
@@ -865,7 +901,6 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_WRITV, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	tb_assert_and_check_return_val(aice->u.writv.list && aice->u.writv.size, tb_false);
 
 	// the aico
@@ -879,6 +914,10 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// done writ
 	DWORD 		flag = 0;
 	DWORD 		real = 0;
@@ -921,7 +960,6 @@ static tb_bool_t tb_iocp_post_fsync(tb_aicp_proactor_t* proactor, tb_aice_t cons
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_FSYNC, tb_false);
-	tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, tb_false);
 	
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -933,6 +971,10 @@ static tb_bool_t tb_iocp_post_fsync(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// init aice
 	aico->olap.aice = *aice;
 
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
 	// post ok
 	aico->olap.aice.state = TB_AICE_STATE_OK;
 	if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;

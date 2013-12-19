@@ -30,6 +30,34 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * addr
+ */
+static tb_bool_t tb_aico_conn_addr_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
+	tb_assert_and_check_return_val(aice->aico && aice->aico->aicp, tb_false);
+	
+	// the aicb & port
+	tb_aicb_t aicb = (tb_aicb_t)aice->u.addr.priv[0];
+	tb_size_t port = (tb_size_t)aice->u.addr.priv[1];
+	tb_assert_and_check_return_val(aicb && port, tb_false);
+
+	// init
+	tb_aice_t 				conn = {0};
+	conn.code 				= TB_AICE_CODE_CONN;
+	conn.state 				= aice->state == TB_AICE_STATE_OK? TB_AICE_STATE_PENDING : aice->state;
+	conn.aicb 				= aicb;
+	conn.data 				= aice->data;
+	conn.aico 				= aice->aico;
+	conn.u.conn.port 		= port;
+	conn.u.conn.ipv4 		= aice->u.addr.ipv4;
+
+	// post conn
+	return tb_aicp_post(aice->aico->aicp, &conn);
+}
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_handle_t tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle)
@@ -101,9 +129,23 @@ tb_void_t tb_aico_timeout_set(tb_handle_t haico, tb_size_t type, tb_long_t timeo
 	// set the aico timeout
 	tb_atomic_set((tb_atomic_t*)(aico->timeout + type), (tb_atomic_t)timeout);
 }
-tb_bool_t tb_aico_ipv4(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+tb_bool_t tb_aico_addr(tb_handle_t haico, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
-	return tb_false;
+	// check
+	tb_aico_t const* aico = (tb_aico_t const*)haico;
+	tb_assert_and_check_return_val(aico && aico->aicp && host, tb_false);
+
+	// init
+	tb_aice_t 				aice = {0};
+	aice.code 				= TB_AICE_CODE_ADDR;
+	aice.state 				= TB_AICE_STATE_PENDING;
+	aice.aicb 				= aicb_func;
+	aice.data 				= aicb_data;
+	aice.aico 				= aico;
+	aice.u.addr.host 		= host;
+
+	// post
+	return tb_aicp_post(aico->aicp, &aice);
 }
 tb_bool_t tb_aico_acpt(tb_handle_t haico, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
@@ -136,10 +178,20 @@ tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port,
 	aice.data 				= aicb_data;
 	aice.aico 				= aico;
 	aice.u.conn.port 		= port;
-	if (!tb_ipv4_set(&aice.u.conn.ipv4, host)) 
+
+	// try to post conn
+	if (!tb_ipv4_set(&aice.u.conn.ipv4, host))
 	{
-		tb_trace("host: %s must be ipv4 address", host);
-		return tb_false;
+		// post addr and conn it
+		aice.code 			= TB_AICE_CODE_ADDR;
+		aice.aicb 			= tb_aico_conn_addr_func;
+		aice.data 			= aicb_data;
+		aice.u.addr.priv[0] = (tb_pointer_t)aicb_func;
+		aice.u.addr.priv[1] = (tb_pointer_t)port;
+		aice.u.addr.host 	= host;
+
+		// timeout: conn => addr
+		tb_aico_timeout_set(haico, TB_AICO_TIMEOUT_ADDR, tb_aico_timeout(haico, TB_AICO_TIMEOUT_CONN));
 	}
 
 	// post

@@ -96,6 +96,7 @@ tbox_C_FILES 			+= \
 						asio/aice \
 						asio/aiop \
 						asio/aicp \
+						asio/addr \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \

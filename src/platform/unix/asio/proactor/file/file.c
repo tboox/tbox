@@ -102,6 +102,9 @@ static tb_long_t tb_aicp_file_spak_read(tb_handle_t file, tb_aice_t* aice)
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
 
+	// no pending? spak it directly
+	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
+
 	// read it from the given offset
 	tb_long_t real = tb_file_pread(handle, aice->u.read.data, aice->u.read.size, aice->u.read.seek);
 
@@ -132,6 +135,9 @@ static tb_long_t tb_aicp_file_spak_writ(tb_handle_t file, tb_aice_t* aice)
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
+
+	// no pending? spak it directly
+	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// writ it from the given offset
 	tb_long_t real = tb_file_pwrit(handle, aice->u.writ.data, aice->u.read.size, aice->u.writ.seek);
@@ -164,6 +170,9 @@ static tb_long_t tb_aicp_file_spak_readv(tb_handle_t file, tb_aice_t* aice)
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
 
+	// no pending? spak it directly
+	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
+
 	// read it from the given offset
 	tb_long_t real = tb_file_preadv(handle, aice->u.readv.list, aice->u.readv.size, aice->u.readv.seek);
 
@@ -195,6 +204,9 @@ static tb_long_t tb_aicp_file_spak_writv(tb_handle_t file, tb_aice_t* aice)
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
 
+	// no pending? spak it directly
+	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
+
 	// read it from the given offset
 	tb_long_t real = tb_file_pwritv(handle, aice->u.writv.list, aice->u.writv.size, aice->u.writv.seek);
 
@@ -224,6 +236,9 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_handle_t file, tb_aice_t* aice)
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
+
+	// no pending? spak it directly
+	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// done sync
 	tb_bool_t ok = tb_file_sync(handle);
