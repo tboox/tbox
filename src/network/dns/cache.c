@@ -23,6 +23,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 		"cache"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "cache.h"
@@ -59,6 +64,9 @@ typedef struct __tb_dns_cache_t
 	// the expired
 	tb_size_t 				expired;
 
+	// using ctime?
+	tb_bool_t 				ctime;
+
 }tb_dns_cache_t;
 
 // the dns cache addr type
@@ -81,6 +89,50 @@ static tb_spinlock_t 		g_lock = TB_SPINLOCK_INIT;
 
 // the cache
 static tb_dns_cache_t 		g_cache = {0};
+
+/* ///////////////////////////////////////////////////////////////////////
+ * helper
+ */
+static __tb_inline__ tb_size_t tb_dns_cache_now()
+{
+	// using the real time?
+	return (tb_size_t)((g_cache.ctime? tb_ctime_time() : tb_mclock()) / 1000);
+}
+static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+{
+	// check
+	tb_assert_and_check_return_val(cache && bdel, tb_false);
+
+	if (item)
+	{
+		// the dns cache address
+		tb_dns_cache_addr_t const* caddr = item->data;
+		tb_assert_and_check_return_val(caddr, tb_false);
+
+		// is expired?
+		if (caddr->time < g_cache.expired)
+		{
+			// remove it
+			*bdel = tb_true;
+
+			// trace
+			tb_trace_impl("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
+																	, 	caddr->ipv4.u8[0]
+																	, 	caddr->ipv4.u8[1]
+																	, 	caddr->ipv4.u8[2]
+																	, 	caddr->ipv4.u8[3]
+																	, 	caddr->time
+																	, 	tb_hash_size(g_cache.hash));
+
+			// update times
+			tb_assert_and_check_return_val(g_cache.times >= caddr->time, tb_false);
+			g_cache.times -= caddr->time;
+		}
+	}
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -126,7 +178,7 @@ tb_void_t tb_dns_cache_exit()
 	g_cache.hash = tb_null;
 
 	// exit pool
-	if (g_cache.pool) tb_hash_exit(g_cache.pool);
+	if (g_cache.pool) tb_spool_exit(g_cache.pool);
 	g_cache.pool = tb_null;
 
 	// exit times
@@ -138,13 +190,30 @@ tb_void_t tb_dns_cache_exit()
 	// leave
 	tb_spinlock_leave(&g_lock);
 }
-tb_void_t tb_dns_cache_dump()
+tb_void_t tb_dns_cache_ctime(tb_bool_t enabled)
 {
+	// enter
+	tb_spinlock_enter(&g_lock);
+
+	// enable it?
+	g_cache.ctime = enabled;
+
+	// leave
+	tb_spinlock_leave(&g_lock);
 }
 tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 {
 	// check
 	tb_assert_and_check_return_val(name && addr, tb_false);
+
+	// trace
+	tb_trace_impl("get: %s", name);
+
+	// is ipv4?
+	tb_check_return_val(!tb_ipv4_set(addr, name), tb_true);
+
+	// clear addr
+	tb_ipv4_clr(addr);
 
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -153,6 +222,32 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 	tb_bool_t ok = tb_false;
 	do
 	{
+		// check
+		tb_assert_and_check_break(g_cache.hash);
+
+		// get the host address
+		tb_dns_cache_addr_t* caddr = tb_hash_get(g_cache.hash, name);
+		tb_check_break(caddr);
+
+		// trace
+		tb_trace_impl("get: %s => %u.%u.%u.%u, time: %u => %u, size: %u",	name
+																		, 	caddr->ipv4.u8[0]
+																		, 	caddr->ipv4.u8[1]
+																		, 	caddr->ipv4.u8[2]
+																		, 	caddr->ipv4.u8[3]
+																		, 	caddr->time
+																		, 	tb_dns_cache_now()
+																		, 	tb_hash_size(g_cache.hash));
+
+		// update time
+		tb_assert_and_check_break(g_cache.times >= caddr->time);
+		g_cache.times -= caddr->time;
+		caddr->time = tb_dns_cache_now();
+		g_cache.times += caddr->time;
+
+		// save addr
+		*addr = caddr->ipv4;
+
 		// ok
 		ok = tb_true;
 
@@ -167,7 +262,15 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
 {
 	// check
-	tb_assert_and_check_return(name && addr);
+	tb_assert_and_check_return(name && addr && addr->u32);
+
+	// trace
+	tb_trace_impl("set: %s => %u.%u.%u.%u", name, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+
+	// init addr
+	tb_dns_cache_addr_t caddr;
+	caddr.ipv4 = *addr;
+	caddr.time = tb_dns_cache_now();
 
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -175,6 +278,43 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
 	// done
 	do
 	{
+		// check
+		tb_assert_and_check_break(g_cache.hash);
+
+		// remove the expired items if full
+		if (tb_hash_size(g_cache.hash) >= TB_DNS_CACHE_MAXN)
+		{
+			// the expired time
+			g_cache.expired = ((tb_size_t)(g_cache.times / tb_hash_size(g_cache.hash)) + 1);
+
+			// check
+			tb_assert_and_check_break(g_cache.expired);
+
+			// trace
+			tb_trace_impl("expired: %lu", g_cache.expired);
+
+			// remove the expired times
+			tb_hash_walk(g_cache.hash, tb_dns_cache_cler, tb_null);
+		}
+
+		// check
+		tb_assert_and_check_break(tb_hash_size(g_cache.hash) < TB_DNS_CACHE_MAXN);
+
+		// save addr
+		tb_hash_set(g_cache.hash, name, &caddr);
+
+		// update times
+		g_cache.times += caddr.time;
+
+		// trace
+		tb_trace_impl("set: %s => %u.%u.%u.%u, time: %u, size: %u", name
+																, 	caddr.ipv4.u8[0]
+																, 	caddr.ipv4.u8[1]
+																, 	caddr.ipv4.u8[2]
+																, 	caddr.ipv4.u8[3]
+																, 	caddr.time
+																, 	tb_hash_size(g_cache.hash));
+
 	} while (0);
 
 	// leave
