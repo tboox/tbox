@@ -55,9 +55,6 @@ tb_bool_t tb_platform_init()
 tb_void_t tb_platform_exit()
 {
 	// exit dns
-	tb_dns_list_exit();
-
-	// exit dns
 	tb_dns_exit();
 
 	// exit tstore

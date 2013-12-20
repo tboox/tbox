@@ -53,8 +53,8 @@ typedef struct __tb_sstream_t
 	// the sock handle
 	tb_handle_t 		sock;
 
-	// the dns handle
-	tb_handle_t 		hdns;
+	// the dns looker
+	tb_handle_t 		looker;
 
 	// the sock type
 	tb_size_t 			type : 23;
@@ -117,10 +117,10 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		{
 			// lookup ipv4
 			tb_ipv4_t addr;
-			if (sst->hdns)
+			if (sst->looker)
 			{
 				// spank
-				tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
+				tb_long_t r = tb_dns_looker_spak(sst->looker, &addr);
 				tb_assert_and_check_goto(r >= 0, fail);
 
 				// continue?
@@ -132,18 +132,15 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 				host = tb_url_host_get(&gst->url);
 				tb_assert_and_check_return_val(host, -1);
 
-				// init dns list
-				tb_dns_list_init();
-			
 				// try get ipv4
-				if (!tb_dns_look_try4(host, &addr))
+				if (!tb_dns_cache_get(host, &addr))
 				{
 					// init dns
-					sst->hdns = tb_dns_look_init(host);
-					tb_assert_and_check_return_val(sst->hdns, -1);
+					sst->looker = tb_dns_looker_init(host);
+					tb_assert_and_check_return_val(sst->looker, -1);
 					
 					// spank
-					tb_long_t r = tb_dns_look_spak(sst->hdns, &addr);
+					tb_long_t r = tb_dns_looker_spak(sst->looker, &addr);
 					tb_assert_and_check_goto(r >= 0, fail);
 
 					// continue?
@@ -152,10 +149,10 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 			}
 
 			// exit dns if ok
-			if (sst->hdns) 
+			if (sst->looker) 
 			{
-				tb_dns_look_exit(sst->hdns);
-				sst->hdns = tb_null;
+				tb_dns_looker_exit(sst->looker);
+				sst->looker = tb_null;
 			}
 
 			// ipv4 => host
@@ -230,14 +227,14 @@ fail:
 	if (sst)
 	{
 		// dns failed?
-		if (sst->hdns)
+		if (sst->looker)
 		{
 			// save state
 			gst->state = TB_SSTREAM_STATE_DNS_FAILED;
 
 			// exit dns
-			tb_dns_look_exit(sst->hdns);
-			sst->hdns = tb_null;
+			tb_dns_looker_exit(sst->looker);
+			sst->looker = tb_null;
 		}
 		// ssl or connect failed?
 		else if (sst->type == TB_SOCKET_TYPE_TCP)
@@ -408,7 +405,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t ti
 	tb_sstream_t* sst = tb_sstream_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
 
-	if (!sst->hdns)
+	if (!sst->looker)
 	{
 		// check socket
 		tb_assert_and_check_return_val(sst->sock, -1);
@@ -420,7 +417,7 @@ static tb_long_t tb_sstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t ti
 	else
 	{
 		// wait the dns
-		sst->wait = tb_dns_look_wait(sst->hdns, timeout);
+		sst->wait = tb_dns_looker_wait(sst->looker, timeout);
 		tb_trace_impl("wait: %ld", sst->wait);
 
 		// clear tryn

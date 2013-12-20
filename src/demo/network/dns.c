@@ -7,9 +7,9 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_DNS_TEST_INVALID_HOST 		(1)
-#define TB_DNS_TEST_MORE_HOST 			(1)
-#define TB_DNS_TEST_HOST_SOME 			(1)
+#define TB_DNS_TEST_INVALID_HOST 		(0)
+#define TB_DNS_TEST_MORE_HOST 			(0)
+#define TB_DNS_TEST_HOST_SOME 			(0)
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
