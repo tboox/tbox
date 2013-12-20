@@ -39,7 +39,7 @@
  * @param name 			the thread name
  * @param func 			the thread func
  * @param data 			the thread data
- * @param stack 		the thread stack size
+ * @param stack 		the thread stack 
  *
  * @return 				the thread handle
  */
