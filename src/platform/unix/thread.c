@@ -34,22 +34,60 @@
  * implementation
  */
 
-tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_pointer_t data, tb_size_t stack_size)
+tb_handle_t tb_thread_init(tb_char_t const* name, tb_pointer_t (*func)(tb_pointer_t), tb_pointer_t data, tb_size_t stack)
 {
-	pthread_t handle;
-	if (0 != pthread_create(&handle, tb_null, func, data)) return tb_null;
-	else return ((tb_handle_t)handle);
+	// done
+	pthread_t 		handle;
+	pthread_attr_t 	attr;
+	tb_bool_t 		ok = tb_false;
+	do
+	{
+		// init attr
+		if (stack)
+		{
+			if (pthread_attr_init(&attr)) break;
+			pthread_attr_setstacksize(&attr, stack);
+		}
+
+		// init thread
+		if (pthread_create(&handle, stack? &attr : tb_null, func, data)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// exit attr
+	if (stack) pthread_attr_destroy(&attr);
+	
+	// ok?
+	return ok? ((tb_handle_t)handle) : tb_null;
 }
 tb_void_t tb_thread_exit(tb_handle_t handle)
 {
+	// check 
+	tb_long_t ok = -1;
+	if ((ok = pthread_kill(((pthread_t)handle), 0)) && ok != ESRCH)
+	{
+		// trace
+		tb_trace("thread[%p]: not exited: %ld, errno: %d", handle, ok, errno);
+	}
 }
 tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 {
+	// check
 	tb_assert_and_check_return_val(handle, -1);
 
 	// wait
-	if (0 != pthread_join(((pthread_t)handle), tb_null)) return -1;
+	tb_long_t ok = -1;
+	if (ok = pthread_join(((pthread_t)handle), tb_null))
+	{
+		// trace
+		tb_trace("thread[%p]: wait failed: %ld, errno: %d", handle, ok, errno);
+		return -1;
 	
+	}
+
 	// ok
 	return 1;
 }
