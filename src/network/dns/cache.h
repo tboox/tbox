@@ -35,6 +35,8 @@
 
 /*! init the cache list
  *
+ * not using ctime default
+ *
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_dns_cache_init(tb_noarg_t);
@@ -42,8 +44,13 @@ tb_bool_t 			tb_dns_cache_init(tb_noarg_t);
 /// exit the cache list
 tb_void_t 			tb_dns_cache_exit(tb_noarg_t);
 
-/// dump the cache list
-tb_void_t 			tb_dns_cache_dump(tb_noarg_t);
+/*! enable ctime?
+ *
+ * @param enabled	enable ctime? 
+ * 					will be lower precision and faster if be enabled
+ * 					and need spak it using tb_ctime_spak
+ */
+tb_void_t 			tb_dns_cache_ctime(tb_bool_t enabled);
 
 /*! get addr from cache 
  *
