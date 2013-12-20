@@ -28,7 +28,6 @@
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
 #include "url.h"
 #include "ipv4.h"
 #include "http.h"

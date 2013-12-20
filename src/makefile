@@ -40,7 +40,6 @@ tbox_C_FILES 			+= \
 						container/vector \
 						container/iterator \
 						network/network \
-						network/dns \
 						network/dns/cache \
 						network/dns/server \
 						network/dns/looker \
