@@ -34,6 +34,13 @@
  * interfaces
  */
 
-tb_void_t tb_dns_local_init(tb_noarg_t);
+/*! init dns 
+ *
+ * @return 	tb_true or tb_false
+ */
+tb_bool_t 	tb_dns_init(tb_noarg_t);
+
+/// exit dns
+tb_void_t 	tb_dns_exit(tb_noarg_t);
 
 #endif

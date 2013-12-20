@@ -1010,7 +1010,7 @@ tb_bool_t tb_dns_list_init()
 	if (ok) 
 	{
 		// add the hosts from local
-		tb_dns_local_init();
+		//tb_dns_local_init();
 		
 		// has local hosts?
 		tb_bool_t local = tb_false;

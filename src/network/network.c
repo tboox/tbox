@@ -17,36 +17,39 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		network.c
+ * @defgroup 	network
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
+#include "network.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
+tb_bool_t tb_network_init()
+{
+	// init dns server
+	if (!tb_dns_server_init()) return tb_false;
 
-/*! init math 
- *
- * @return 		tb_true or tb_false
- */
-tb_bool_t 		tb_math_init(tb_noarg_t);
+	// init dns cache
+	if (!tb_dns_cache_init()) return tb_false;
 
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
+	// add the default dns servers
+	tb_dns_server_add("8.8.4.4");
+	tb_dns_server_add("8.8.8.8");
 
-#endif
+	// ok
+	return tb_true;
+}
+tb_void_t tb_network_exit()
+{
+	// exit dns cache
+	tb_dns_cache_exit();
 
+	// exit dns server
+	tb_dns_server_exit();
+}

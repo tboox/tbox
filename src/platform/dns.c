@@ -17,36 +17,18 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		dns.c
+ * @ingroup 	platform
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*! init math 
- *
- * @return 		tb_true or tb_false
- */
-tb_bool_t 		tb_math_init(tb_noarg_t);
-
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
-
+#include "dns.h"
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/dns.c"
+#else
+# 	include "unix/dns.c"
 #endif
 

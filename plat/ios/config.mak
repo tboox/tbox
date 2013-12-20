@@ -6,7 +6,6 @@ TB_CONFIG_DEMO_CMD1				= @ldid -S $(1)$(BIN_SUFFIX)
 TB_CONFIG_PLAT 					= ios
 
 # api
-TB_CONFIG_API_DNS 				= unix
 TB_CONFIG_API_DLL 				= unix
 TB_CONFIG_API_FILE 				= unix
 TB_CONFIG_API_SOCK 				= unix

@@ -43,7 +43,7 @@ typedef DWORD (*tb_GetNetworkParams_t)(PFIXED_INFO pinfo, PULONG psize);
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_void_t tb_dns_local_init()
+tb_bool_t tb_dns_init()
 {
 	// done
 	FIXED_INFO* 			info = tb_null;
@@ -79,7 +79,7 @@ tb_void_t tb_dns_local_init()
 		// trace
 //		tb_trace_impl("host: %s", 	info->HostName);
 //		tb_trace_impl("domain: %s", info->DomainName);
-		tb_trace_impl("dns: %s", 	info->DnsServerList.IpAddress.String);
+		tb_trace_impl("server: %s", info->DnsServerList.IpAddress.String);
 
 		// add the first dns address
 		if (info->DnsServerList.IpAddress.String)
@@ -90,11 +90,11 @@ tb_void_t tb_dns_local_init()
         for (; addr; addr = addr->Next) 
 		{
 			// trace
-			tb_trace_impl("dns: %s", addr->IpAddress.String);
+			tb_trace_impl("server: %s", addr->IpAddress.String);
 			
 			// add the dns address
 			if (addr->IpAddress.String)
-				tb_dns_list_adds(addr->IpAddress.String);
+				tb_dns_server_add(addr->IpAddress.String);
         }
 
 	} while (0);
@@ -103,8 +103,10 @@ tb_void_t tb_dns_local_init()
 	if (info) tb_free(info);
 	info = tb_null;
 
-	// exit dll
-	if (hdll) tb_dynamic_exit(hdll);
-	hdll = tb_null;
+	// ok
+	return tb_true;
+}
+tb_void_t tb_dns_exit()
+{
 }
 

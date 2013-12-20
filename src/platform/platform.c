@@ -43,6 +43,9 @@ tb_bool_t tb_platform_init()
 	// init tstore
 	if (!tb_tstore_init()) return tb_false;
 
+	// init dns
+	if (!tb_dns_init()) return tb_false;
+
 	// spak ctime
 	tb_ctime_spak();
 
@@ -53,6 +56,9 @@ tb_void_t tb_platform_exit()
 {
 	// exit dns
 	tb_dns_list_exit();
+
+	// exit dns
+	tb_dns_exit();
 
 	// exit tstore
 	tb_tstore_exit();

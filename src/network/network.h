@@ -33,5 +33,19 @@
 #include "ipv4.h"
 #include "http.h"
 #include "cookies.h"
+#include "dns/dns.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init network 
+ *
+ * @return 		tb_true or tb_false
+ */
+tb_bool_t 		tb_network_init(tb_noarg_t);
+
+/// exit network 
+tb_void_t 		tb_network_exit(tb_noarg_t);
 
 #endif
