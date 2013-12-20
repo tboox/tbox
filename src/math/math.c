@@ -17,36 +17,29 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
+ * @file		math.c
  * @defgroup 	math
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
+#include "math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
+tb_bool_t tb_math_init()
+{
+	// init rand
+	if (!tb_rand_init()) return tb_false;
 
-/*! init math 
- *
- * @return 		tb_true or tb_false
- */
-tb_bool_t 		tb_math_init(tb_noarg_t);
-
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
-
-#endif
-
+	// ok
+	return tb_true;
+}
+tb_void_t tb_math_exit()
+{	
+	// exit rand
+	tb_rand_exit();
+}

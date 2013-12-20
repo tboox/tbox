@@ -10,6 +10,7 @@ tbox_TYPE 				= LIB
 # basic files
 tbox_C_FILES 			+= \
 						tbox \
+						math/math \
 						math/int32 \
 						math/rand \
 						math/fixed16 \
@@ -38,7 +39,11 @@ tbox_C_FILES 			+= \
 						container/dlist \
 						container/vector \
 						container/iterator \
+						network/network \
 						network/dns \
+						network/dns/cache \
+						network/dns/server \
+						network/dns/looker \
 						network/url \
 						network/ipv4 \
 						network/http \
@@ -217,6 +222,7 @@ endif
 # platform
 tbox_C_FILES 			+= \
 						platform/api \
+						platform/dns \
 						platform/path \
 						platform/ctime \
 						platform/sched \
@@ -226,7 +232,6 @@ tbox_C_FILES 			+= \
 						platform/tstore \
 						platform/platform \
 						platform/backtrace \
-						platform/$(TB_CONFIG_API_DNS)/dns \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
@@ -376,7 +381,10 @@ INC_FILES 				= \
 						network/http.h \
 						network/ipv4.h \
 						network/url.h \
-						network/dns.h \
+						network/dns/cache.h \
+						network/dns/looker.h \
+						network/dns/server.h \
+						network/dns/prefix.h \
 						network/cookies.h \
 						charset/charset.h \
 						charset/prefix.h \

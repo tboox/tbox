@@ -153,8 +153,11 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_c
 	// init platform
 	if (!tb_platform_init()) return tb_false;
 
-	// init rand
-	if (!tb_rand_init()) return tb_false;
+	// init math
+	if (!tb_math_init()) return tb_false;
+
+	// init network 
+	if (!tb_network_init()) return tb_false;
 
 	// init object
 	if (!tb_object_context_init()) return tb_false;
@@ -171,8 +174,11 @@ tb_void_t tb_exit()
 	// exit object
 	tb_object_context_exit();
 	
-	// exit rand
-	tb_rand_exit();
+	// exit network
+	tb_network_exit();
+	
+	// exit math
+	tb_math_exit();
 	
 	// exit platform
 	tb_platform_exit();

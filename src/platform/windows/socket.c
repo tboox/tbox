@@ -572,7 +572,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	// error
 	return -1;
 }
-tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(handle && ip && port && data, -1);

@@ -17,36 +17,48 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		cache.h
+ * @ingroup 	network
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_NETWORK_DNS_CACHE_H
+#define TB_NETWORK_DNS_CACHE_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init math 
+/*! init the cache list
  *
- * @return 		tb_true or tb_false
+ * @return 			tb_true or tb_false
  */
-tb_bool_t 		tb_math_init(tb_noarg_t);
+tb_bool_t 			tb_dns_cache_init(tb_noarg_t);
 
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
+/// exit the cache list
+tb_void_t 			tb_dns_cache_exit(tb_noarg_t);
+
+/// dump the cache list
+tb_void_t 			tb_dns_cache_dump(tb_noarg_t);
+
+/*! get addr from cache 
+ *
+ * @param name 		the host name 
+ * @param addr 		the host addr
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr);
+
+/*! set addr to cache 
+ *
+ * @param name 		the host name 
+ * @param addr 		the host addr
+ */
+tb_void_t 			tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr);
 
 #endif
-

@@ -207,6 +207,6 @@ tb_long_t 			tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_
  *
  * @return 			the real size or -1
  */
-tb_long_t 			tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size);
 	
 #endif

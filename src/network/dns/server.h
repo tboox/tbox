@@ -17,36 +17,49 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		math.h
- * @defgroup 	math
+ * @file		server.h
+ * @ingroup 	network
  *
  */
-#ifndef TB_MATH_H
-#define TB_MATH_H
+#ifndef TB_NETWORK_DNS_SERVER_H
+#define TB_NETWORK_DNS_SERVER_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "rand.h"
-#include "int32.h"
-#include "fixed6.h"
-#include "fixed16.h"
-#include "fixed30.h"
-#include "fixed.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init math 
+/*! init the server list
  *
- * @return 		tb_true or tb_false
+ * @return 			tb_true or tb_false
  */
-tb_bool_t 		tb_math_init(tb_noarg_t);
+tb_bool_t 			tb_dns_server_init(tb_noarg_t);
 
-/// exit math 
-tb_void_t 		tb_math_exit(tb_noarg_t);
+/// exit the server list
+tb_void_t 			tb_dns_server_exit(tb_noarg_t);
+
+/// dump the server list
+tb_void_t 			tb_dns_server_dump(tb_noarg_t);
+
+/// sort the server list by the response speed
+tb_void_t 			tb_dns_server_sort(tb_noarg_t);
+
+/*! get the server 
+ *
+ * @param addr 		the server address list, addr[0] is the fastest 
+ *
+ * @return 			the server size
+ */
+tb_size_t 			tb_dns_server_get(tb_ipv4_t addr[2]);
+
+/*! add the server 
+ *
+ * @param addr 		the server address 
+ */
+tb_void_t 			tb_dns_server_add(tb_char_t const* addr);
 
 #endif
-

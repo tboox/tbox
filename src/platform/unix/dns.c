@@ -34,14 +34,14 @@
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_void_t tb_dns_local_init()
+tb_bool_t tb_dns_init()
 {
 	// init
 	tb_long_t size = 0;
 	tb_char_t line[8192];
 
 	// check
-	if (!tb_file_info("/etc/resolv.conf", tb_null)) return ;
+	if (!tb_file_info("/etc/resolv.conf", tb_null)) return tb_true;
 
 	/* try get list from "/etc/resolv.conf"
 	 *
@@ -51,7 +51,7 @@ tb_void_t tb_dns_local_init()
 	 *
 	 */
 	tb_gstream_t* gst = tb_gstream_init_from_url("/etc/resolv.conf");
-	tb_assert_and_check_return(gst);
+	tb_assert_and_check_return_val(gst, tb_true);
 
 	// open
 	if (!tb_gstream_bopen(gst)) goto end;
@@ -61,18 +61,22 @@ tb_void_t tb_dns_local_init()
 	{
 		if (size && !tb_strnicmp(line, "nameserver", 10))
 		{
-			// seek to host
+			// seek to server
 			tb_char_t const* p = line + 10;
 			while (*p && !tb_isdigit(*p)) p++;
 			tb_check_continue(*p);
 
-			// add host
-			tb_dns_list_adds(p);
+			// add server
+			tb_dns_server_add(p);
 		}
 	}
 
 end:
 	// exit
 	if (gst) tb_gstream_exit(gst);
+	return tb_true;
+}
+tb_void_t tb_dns_exit()
+{
 }
 

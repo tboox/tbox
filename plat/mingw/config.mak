@@ -6,7 +6,6 @@ TB_CONFIG_DEMO_CMD1 			=
 TB_CONFIG_PLAT 					= mingw
 
 # api
-TB_CONFIG_API_DNS 				= windows
 TB_CONFIG_API_DLL 				= windows
 TB_CONFIG_API_FILE 				= windows
 TB_CONFIG_API_SOCK 				= windows
