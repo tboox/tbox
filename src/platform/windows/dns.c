@@ -83,7 +83,7 @@ tb_bool_t tb_dns_init()
 
 		// add the first dns address
 		if (info->DnsServerList.IpAddress.String)
-			tb_dns_list_adds(info->DnsServerList.IpAddress.String);
+			tb_dns_server_add(info->DnsServerList.IpAddress.String);
 
 		// walk dns address
         IP_ADDR_STRING* addr = info->DnsServerList.Next;

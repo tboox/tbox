@@ -127,6 +127,8 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	, 	TB_AIOE_CODE_SEND
 	, 	TB_AIOE_CODE_RECV
 	, 	TB_AIOE_CODE_SEND
+	, 	TB_AIOE_CODE_RECV
+	, 	TB_AIOE_CODE_SEND
 	, 	TB_AIOE_CODE_SEND
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
@@ -150,6 +152,8 @@ static __tb_inline__ tb_size_t tb_aiop_aice_priority(tb_aice_t const* aice)
 	, 	1 	
 	, 	0 	// acpt
 	, 	0 	// conn
+	, 	1
+	, 	1
 	, 	1
 	, 	1
 	, 	1
@@ -505,7 +509,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 
 	// the host 
 	tb_char_t 			data[16] = {0};
-	tb_char_t const* 	host = tb_ipv4_get(&aice->u.conn.ipv4, data, 16);
+	tb_char_t const* 	host = tb_ipv4_get(&aice->u.conn.addr, data, 16);
 	tb_assert_and_check_return_val(host, -1);
 
 	// try to connect it
@@ -654,6 +658,148 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 
 		// save the send size
 		aice->u.send.real = send;
+	}
+	
+	// reset wait
+	if (aico->wait) aico->wait--;
+	aico->aice.code = TB_AICE_CODE_NONE;
+
+	// ok
+	return 1;
+}
+static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+{
+	// check
+	tb_assert_and_check_return_val(ptor && aice, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_URECV, -1);
+	tb_assert_and_check_return_val(aice->u.urecv.data && aice->u.urecv.size, -1);
+	tb_assert_and_check_return_val(aice->u.urecv.addr.u32 && aice->u.urecv.port, -1);
+
+	// the aico
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+	{
+		// reset wait
+		if (aico->wait) aico->wait--;
+		aico->aice.code = TB_AICE_CODE_NONE;
+
+		// ok
+		return 1;
+	}
+
+	// the host
+	tb_char_t 			data[16] = {0};
+	tb_char_t const* 	host = tb_ipv4_get(&aice->u.urecv.addr, data, 16);
+	tb_assert_and_check_return_val(host, -1);
+
+	// check wait
+	tb_assert_and_check_return_val(aico->wait < 2, -1);
+
+	// try to recv it
+	tb_size_t recv = 0;
+	tb_long_t real = 0;
+	while (recv < aice->u.urecv.size)
+	{
+		// recv it
+		real = tb_socket_urecv(aico->base.handle, host, aice->u.urecv.port, aice->u.urecv.data + recv, aice->u.urecv.size - recv);
+
+		// save recv
+		if (real > 0) recv += real;
+		else break;
+	}
+
+	// trace
+	tb_trace_impl("urecv[%p]: %s: %lu, %lu", aico->base.handle, host, aice->u.urecv.port, recv);
+
+	// no recv? 
+	if (!recv) 
+	{
+		// wait it
+		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		// closed
+		else aice->state = TB_AICE_STATE_CLOSED;
+	}
+	else
+	{
+		// ok or closed?
+		aice->state = TB_AICE_STATE_OK;
+
+		// save the recv size
+		aice->u.urecv.real = recv;
+	}
+	
+	// reset wait
+	if (aico->wait) aico->wait--;
+	aico->aice.code = TB_AICE_CODE_NONE;
+
+	// ok
+	return 1;
+}
+static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+{
+	// check
+	tb_assert_and_check_return_val(ptor && aice, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_USEND, -1);
+	tb_assert_and_check_return_val(aice->u.usend.data && aice->u.usend.size, -1);
+	tb_assert_and_check_return_val(aice->u.usend.addr.u32 && aice->u.usend.port, -1);
+
+	// the aico
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
+
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+	{
+		// reset wait
+		if (aico->wait) aico->wait--;
+		aico->aice.code = TB_AICE_CODE_NONE;
+
+		// ok
+		return 1;
+	}
+
+	// the host
+	tb_char_t 			data[16] = {0};
+	tb_char_t const* 	host = tb_ipv4_get(&aice->u.urecv.addr, data, 16);
+	tb_assert_and_check_return_val(host, -1);
+
+	// check wait
+	tb_assert_and_check_return_val(aico->wait < 2, -1);
+ 
+	// try to send it
+	tb_size_t send = 0;
+	tb_long_t real = 0;
+	while (send < aice->u.usend.size)
+	{
+		// send it
+		real = tb_socket_usend(aico->base.handle, host, aice->u.usend.port, aice->u.usend.data + send, aice->u.usend.size - send);
+		
+		// save send
+		if (real > 0) send += real;
+		else break;
+	}
+
+	// trace
+	tb_trace_impl("usend[%p]: %s: %lu, %lu", aico->base.handle, host, aice->u.usend.port, send);
+
+	// no send? 
+	if (!send) 
+	{
+		// wait it
+		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		// closed
+		else aice->state = TB_AICE_STATE_CLOSED;
+	}
+	else
+	{
+		// ok or closed?
+		aice->state = TB_AICE_STATE_OK;
+
+		// save the send size
+		aice->u.usend.real = send;
 	}
 	
 	// reset wait
@@ -913,6 +1059,8 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 			,	tb_aiop_spak_conn
 			,	tb_aiop_spak_recv
 			,	tb_aiop_spak_send
+			,	tb_aiop_spak_urecv
+			,	tb_aiop_spak_usend
 			,	tb_aiop_spak_recvv
 			,	tb_aiop_spak_sendv
 			,	tb_aiop_spak_sendfile
