@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "api.h"
 #include "../socket.h"
 #include <windows.h>
 #include <winsock2.h>
@@ -33,63 +34,6 @@
  * libraries
  */
 #pragma comment(lib, "ws2_32.lib")
-
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-#define TB_SOCKET_WSAID_TRANSMITFILE 		{0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-typedef BOOL (WINAPI* tb_socket_func_transmitfile_t)( 	SOCKET hSocket
-													,	HANDLE hFile
-													,	DWORD nNumberOfBytesToWrite
-													,	DWORD nNumberOfBytesPerSend
-													,	LPOVERLAPPED lpOverlapped
-													,	LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
-													,	DWORD dwReserved);
-
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-static tb_socket_func_transmitfile_t tb_socket_func_transmitfile()
-{
-	// done
-	tb_long_t 								ok = -1;
-	tb_handle_t 							sock = tb_null;
-	static tb_socket_func_transmitfile_t 	transmitfile = tb_null;
-	do
-	{
-		// ok?
-		tb_check_return_val(!transmitfile, transmitfile);
-
-		// init sock
-		sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
-		tb_assert_and_check_break(sock);
-
-		// get the acceptex func address
-		DWORD 	real = 0;
-		GUID 	guid = TB_SOCKET_WSAID_TRANSMITFILE;
-		ok = WSAIoctl( 	(SOCKET)sock - 1
-					, 	SIO_GET_EXTENSION_FUNCTION_POINTER
-					, 	&guid
-					, 	sizeof(GUID)
-					, 	&transmitfile
-					, 	sizeof(tb_socket_func_transmitfile_t)
-					, 	&real
-					, 	tb_null
-					, 	tb_null);
-		tb_assert_and_check_break(!ok && transmitfile);
-
-	} while (0);
-
-	// exit sock
-	if (sock) tb_socket_close(sock);
-
-	// ok?
-	return !ok? transmitfile : tb_null;
-}
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -264,16 +208,16 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 	// ok?
 	return ok;
 }
-tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port, -1);
+	tb_assert_and_check_return_val(handle && host && port, -1);
 
 	// init
 	SOCKADDR_IN d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = inet_addr(ip);
+	d.sin_addr.S_un.S_addr = inet_addr(host);
 
 	// connect
 	tb_long_t r = connect((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, sizeof(d));
@@ -294,7 +238,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	return -1;
 }
 
-tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
 {
 	// check
 	tb_assert_and_check_return_val(handle, 0);
@@ -303,15 +247,15 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	SOCKADDR_IN d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = ip? inet_addr(ip) : htonl(INADDR_ANY); 
+	d.sin_addr.S_un.S_addr = host? inet_addr(host) : htonl(INADDR_ANY); 
 
 	// reuse addr
 #ifdef SO_REUSEADDR
-	//if (ip)
+	//if (host)
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
-			tb_trace("reuseaddr: %s failed", ip);
+			tb_trace("reuseaddr: %s failed", host);
 	}
 #endif
 
@@ -446,10 +390,10 @@ tb_long_t tb_socket_send(tb_handle_t handle, tb_byte_t const* data, tb_size_t si
 	// error
 	return -1;
 }
-tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_recvv(tb_handle_t handle, tb_iovec_t const* list, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(socket && list && size, -1);
+	tb_assert_and_check_return_val(handle && list && size, -1);
 
 	// walk read
 	tb_size_t i = 0;
@@ -462,7 +406,7 @@ tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 		tb_check_break(data && need);
 
 		// read it
-		tb_long_t real = tb_socket_recv(socket, data, need);
+		tb_long_t real = tb_socket_recv(handle, data, need);
 
 		// full? next it
 		if (real == need)
@@ -484,10 +428,10 @@ tb_long_t tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// ok?
 	return read;
 }
-tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_sendv(tb_handle_t handle, tb_iovec_t const* list, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(socket && list && size, -1);
+	tb_assert_and_check_return_val(handle && list && size, -1);
 
 	// walk writ
 	tb_size_t i = 0;
@@ -500,7 +444,7 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 		tb_check_break(data && need);
 
 		// writ it
-		tb_long_t real = tb_socket_send(socket, data, need);
+		tb_long_t real = tb_socket_send(handle, data, need);
 
 		// full? next it
 		if (real == need)
@@ -522,18 +466,18 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// ok?
 	return writ;
 }
-tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendfile(tb_handle_t handle, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
 {
 	// check
-	tb_assert_and_check_return_val(socket && file && size, -1);
+	tb_assert_and_check_return_val(handle && file && size, -1);
 
 	// the transmitfile func
-	tb_socket_func_transmitfile_t transmitfile = tb_socket_func_transmitfile();
+	tb_api_TransmitFile_t transmitfile = tb_api_TransmitFile();
 	tb_assert_and_check_return_val(transmitfile, -1);
 
 	// transmit it
 	OVERLAPPED 	olap = {0}; olap.Offset = offset;
-	tb_hong_t 	real = transmitfile((SOCKET)socket - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
+	tb_hong_t 	real = transmitfile((SOCKET)handle - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
 
 	// ok?
 	if (real >= 0) return real;
@@ -547,21 +491,21 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 	// error
 	return -1;
 }
-tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_assert_and_check_return_val(handle && host && port && data, -1);
 	tb_check_return_val(size, 0);
 
-	// init
-	SOCKADDR_IN d;
-	d.sin_family = AF_INET;
-	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = inet_addr(ip);
+	// init addr
+	SOCKADDR_IN addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.S_un.S_addr = inet_addr(host);
 
 	// recv
-	tb_int_t 	n = sizeof(d);
-	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
+	tb_int_t 	n = sizeof(addr);
+	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&addr, &n);
 
 	// ok?
 	if (r >= 0) return r;
@@ -572,20 +516,20 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	// error
 	return -1;
 }
-tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_assert_and_check_return_val(handle && host && port && data, -1);
 	tb_check_return_val(size, 0);
 
-	// init
-	SOCKADDR_IN d;
-	d.sin_family = AF_INET;
-	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = inet_addr(ip);
+	// init addr
+	SOCKADDR_IN addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.S_un.S_addr = inet_addr(host);
 
 	// send
-	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
+	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&addr, sizeof(addr));
 
 	// ok?
 	if (r >= 0) return r;
@@ -596,4 +540,92 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	// error
 	return -1;
 }
-	
+tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+
+	// init addr
+	SOCKADDR_IN addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.S_un.S_addr = inet_addr(host);
+
+	// walk read
+	tb_size_t 	i = 0;
+	tb_int_t 	n = sizeof(addr);
+	tb_size_t 	read = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_check_break(data && need);
+
+		// read it
+		tb_long_t real = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&addr, &n);
+
+		// full? next it
+		if (real == need)
+		{
+			read += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) read += real;
+
+		// end
+		break;
+	}
+
+	// ok?
+	return read;
+}
+tb_long_t tb_socket_usendv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+
+	// init addr
+	SOCKADDR_IN addr;
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.S_un.S_addr = inet_addr(host);
+
+	// walk writ
+	tb_size_t i = 0;
+	tb_size_t writ = 0;
+	for (i = 0; i < size; i++)
+	{
+		// the data & size
+		tb_byte_t* 	data = list[i].data;
+		tb_size_t 	need = list[i].size;
+		tb_check_break(data && need);
+
+		// writ it
+		tb_long_t real = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&addr, sizeof(addr));
+
+		// full? next it
+		if (real == need)
+		{
+			writ += real;
+			continue ;
+		}
+
+		// failed?
+		tb_check_return_val(real >= 0, -1);
+
+		// ok?
+		if (real > 0) writ += real;
+
+		// end
+		break;
+	}
+
+	// ok?
+	return writ;
+}

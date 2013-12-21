@@ -124,21 +124,21 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 	// ok
 	return tb_true;
 }
-tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port, -1);
+	tb_assert_and_check_return_val(handle && host && port, -1);
 
 	// init
 	struct sockaddr_in d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
 #if 1
-	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+	if (!inet_aton(host, &(d.sin_addr))) return -1;
 #else
-	if (!inet_aton(ip, &(d.sin_addr))) 
+	if (!inet_aton(host, &(d.sin_addr))) 
 	{
-		struct hostent* h = gethostbyname(ip);
+		struct hostent* h = gethostbyname(host);
 		if (h) memcpy(&d.sin_addr, h->h_addr_list[0], sizeof(struct in_addr));
 		else return -1;
 	}
@@ -157,7 +157,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* ip, tb_size_t p
 	return -1;
 }
 
-tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port)
+tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
 {
 	// check
 	tb_assert_and_check_return_val(handle, 0);
@@ -166,15 +166,15 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* ip, tb_size_t port
 	struct sockaddr_in d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	if (ip)
+	if (host)
 	{
-		if (!inet_aton(ip, &(d.sin_addr))) return 0;
+		if (!inet_aton(host, &(d.sin_addr))) return 0;
 	}
 	else d.sin_addr.s_addr = INADDR_ANY;
 
 	// reuse addr
 #ifdef SO_REUSEADDR
-	//if (ip)
+	//if (host)
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
@@ -386,17 +386,17 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 	return -1;
 #endif
 }
-tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_assert_and_check_return_val(handle && host && port && data, -1);
 	tb_check_return_val(size, 0);
 
 	// init
 	struct sockaddr_in d;
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+	if (!inet_aton(host, &(d.sin_addr))) return -1;
 
 	// recv
 	tb_int_t 	n = sizeof(d);
@@ -411,17 +411,17 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	// error
 	return -1;
 }
-tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t port, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && ip && port && data, -1);
+	tb_assert_and_check_return_val(handle && host && port && data, -1);
 	tb_check_return_val(size, 0);
 
 	// init
 	struct sockaddr_in d;
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	if (!inet_aton(ip, &(d.sin_addr))) return -1;
+	if (!inet_aton(host, &(d.sin_addr))) return -1;
 
 	// send
 	tb_long_t 	r = sendto(tb_handle2fd(handle), data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
@@ -435,4 +435,69 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* ip, tb_size_t por
 	// error
 	return -1;
 }
-	
+tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+
+	// init
+	struct sockaddr_in d;
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	if (!inet_aton(host, &(d.sin_addr))) return -1;
+
+	// init msg
+	struct msghdr msg = {0};
+	msg.msg_name 		= (tb_pointer_t)&d;
+	msg.msg_namelen 	= sizeof(d);
+	msg.msg_iov 		= (struct iovec*)list;
+	msg.msg_iovlen 		= (size_t)size;
+	msg.msg_control 	= tb_null;
+	msg.msg_controllen 	= 0;
+	msg.msg_flags 		= 0;
+
+	// recv
+	tb_long_t 	r = recvmsg(tb_handle2fd(handle), &msg, 0);
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
+tb_long_t tb_socket_usendv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+
+	// init
+	struct sockaddr_in d;
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	if (!inet_aton(host, &(d.sin_addr))) return -1;
+
+	// init msg
+	struct msghdr msg = {0};
+	msg.msg_name 		= (tb_pointer_t)&d;
+	msg.msg_namelen 	= sizeof(d);
+	msg.msg_iov 		= (struct iovec*)list;
+	msg.msg_iovlen 		= (size_t)size;
+	msg.msg_control 	= tb_null;
+	msg.msg_controllen 	= 0;
+	msg.msg_flags 		= 0;
+
+	// recv
+	tb_long_t 	r = sendmsg(tb_handle2fd(handle), &msg, 0);
+
+	// ok?
+	if (r >= 0) return r;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+}
