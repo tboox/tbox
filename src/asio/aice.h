@@ -41,24 +41,26 @@ typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 			= 0
 
-, 	TB_AICE_CODE_ADDR 			= 1 	//!< for sock
-, 	TB_AICE_CODE_ACPT 			= 2 	//!< for sock
-, 	TB_AICE_CODE_CONN 			= 3 	//!< for sock
-,	TB_AICE_CODE_RECV 			= 4		//!< for sock
-,	TB_AICE_CODE_SEND 			= 5		//!< for sock
-,	TB_AICE_CODE_RECVV 			= 6		//!< for sock
-,	TB_AICE_CODE_SENDV 			= 7		//!< for sock
-,	TB_AICE_CODE_SENDFILE 		= 8		//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+, 	TB_AICE_CODE_ADDR 			= 1 	//!< for sock, get the host address from name
+, 	TB_AICE_CODE_ACPT 			= 2 	//!< for sock, accept it
+, 	TB_AICE_CODE_CONN 			= 3 	//!< for sock, connect to the host address
+,	TB_AICE_CODE_RECV 			= 4		//!< for sock, recv data for tcp
+,	TB_AICE_CODE_SEND 			= 5		//!< for sock, send data for tcp
+,	TB_AICE_CODE_URECV 			= 6		//!< for sock, recv data for udp
+,	TB_AICE_CODE_USEND 			= 7		//!< for sock, send data for udp
+,	TB_AICE_CODE_RECVV 			= 8		//!< for sock, recv iovec data for tcp
+,	TB_AICE_CODE_SENDV 			= 9		//!< for sock, send iovec data for tcp
+,	TB_AICE_CODE_SENDFILE 		= 10	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
-,	TB_AICE_CODE_READ 			= 9		//!< for file
-,	TB_AICE_CODE_WRIT 			= 10	//!< for file
-,	TB_AICE_CODE_READV 			= 11	//!< for file
-,	TB_AICE_CODE_WRITV 			= 12	//!< for file
-,	TB_AICE_CODE_FSYNC 			= 13	//!< for file
+,	TB_AICE_CODE_READ 			= 11	//!< for file, read data
+,	TB_AICE_CODE_WRIT 			= 12	//!< for file, writ data
+,	TB_AICE_CODE_READV 			= 13	//!< for file, read iovec data
+,	TB_AICE_CODE_WRITV 			= 14	//!< for file, writ iovec data
+,	TB_AICE_CODE_FSYNC 			= 15	//!< for file, flush data to file
 
-,	TB_AICE_CODE_RUNTASK 		= 14	//!< for task
+,	TB_AICE_CODE_RUNTASK 		= 16	//!< for task, run task with the given delay
 
-, 	TB_AICE_CODE_MAXN 			= 15
+, 	TB_AICE_CODE_MAXN 			= 17
 
 }tb_aice_code_e;
 
@@ -80,11 +82,11 @@ typedef struct __tb_aice_addr_t
 	/// the host
 	tb_char_t const* 			host;
 
-	/// the ipv4
-	tb_ipv4_t 					ipv4;
+	/// the addr
+	tb_ipv4_t 					addr;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[3];
+	tb_handle_t 				priv[4];
 
 }tb_aice_addr_t;
 
@@ -95,7 +97,7 @@ typedef struct __tb_aice_acpt_t
 	tb_handle_t 				sock;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[4];
+	tb_handle_t 				priv[5];
 
 }tb_aice_acpt_t;
 
@@ -105,11 +107,11 @@ typedef struct __tb_aice_conn_t
 	/// the port
 	tb_size_t 					port;
 
-	/// the ipv4
-	tb_ipv4_t 					ipv4;
+	/// the addr
+	tb_ipv4_t 					addr;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[3];
+	tb_handle_t 				priv[4];
 
 }tb_aice_conn_t;
 
@@ -127,7 +129,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[2];
+	tb_handle_t 				priv[3];
 
 }tb_aice_recv_t;
 
@@ -144,9 +146,55 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[2];
+	tb_handle_t 				priv[3];
 
 }tb_aice_send_t;
+
+/// the urecv aice type, base: tb_iovec_t
+typedef struct __tb_aice_urecv_t
+{
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the recv data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
+}tb_aice_urecv_t;
+
+/// the usend aice type, base: tb_iovec_t
+typedef struct __tb_aice_usend_t
+{
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the send data for (tb_iovec_t*)->data
+	tb_byte_t const* 			data;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
+}tb_aice_usend_t;
 
 /// the read aice type, base: tb_iovec_t
 typedef struct __tb_aice_read_t
@@ -162,6 +210,9 @@ typedef struct __tb_aice_read_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_read_t;
 
@@ -179,6 +230,9 @@ typedef struct __tb_aice_writ_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_writ_t;
 #else
@@ -195,7 +249,7 @@ typedef struct __tb_aice_recv_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[2];
+	tb_handle_t 				priv[3];
 
 }tb_aice_recv_t;
 
@@ -212,9 +266,55 @@ typedef struct __tb_aice_send_t
 	tb_size_t 					real;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[2];
+	tb_handle_t 				priv[3];
 
 }tb_aice_send_t;
+
+/// the urecv aice type, base: tb_iovec_t
+typedef struct __tb_aice_urecv_t
+{
+	/// the recv data for (tb_iovec_t*)->data
+	tb_byte_t* 					data;
+
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
+}tb_aice_urecv_t;
+
+/// the usend aice type, base: tb_iovec_t
+typedef struct __tb_aice_usend_t
+{
+	/// the send data for (tb_iovec_t*)->data
+	tb_byte_t const* 			data;
+
+	/// the data size for (tb_iovec_t*)->size
+	tb_size_t 					size;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
+}tb_aice_usend_t;
 
 /// the read aice type, base: tb_iovec_t
 typedef struct __tb_aice_read_t
@@ -230,6 +330,9 @@ typedef struct __tb_aice_read_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_read_t;
 
@@ -247,6 +350,9 @@ typedef struct __tb_aice_writ_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_writ_t;
 #endif
@@ -266,6 +372,9 @@ typedef struct __tb_aice_recvv_t
 	/// the file seek
 	tb_hize_t 					seek;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
 }tb_aice_recvv_t;
 
 /// the sendv aice type
@@ -282,6 +391,9 @@ typedef struct __tb_aice_sendv_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_sendv_t;
 
@@ -300,6 +412,9 @@ typedef struct __tb_aice_sendfile_t
 	/// the seek
 	tb_hize_t 					seek;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
 }tb_aice_sendfile_t;
 
 /// the readv aice type
@@ -316,6 +431,9 @@ typedef struct __tb_aice_readv_t
 
 	/// the file seek
 	tb_hize_t 					seek;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
 
 }tb_aice_readv_t;
 
@@ -334,6 +452,9 @@ typedef struct __tb_aice_writv_t
 	/// the file seek
 	tb_hize_t 					seek;
 
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
 }tb_aice_writv_t;
 
 /// the runtask aice type
@@ -343,7 +464,7 @@ typedef struct __tb_aice_runtask_t
 	tb_hize_t 					when;
 
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[3];
+	tb_handle_t 				priv[4];
 
 }tb_aice_runtask_t;
 
@@ -374,6 +495,8 @@ typedef struct __tb_aice_t
 		tb_aice_conn_t 			conn;
 		tb_aice_recv_t 			recv;
 		tb_aice_send_t 			send;
+		tb_aice_urecv_t 		urecv;
+		tb_aice_usend_t 		usend;
 		tb_aice_recvv_t 		recvv;
 		tb_aice_sendv_t 		sendv;
 		tb_aice_sendfile_t 		sendfile;

@@ -269,6 +269,8 @@ static tb_long_t tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice)
 	,	tb_null
 	,	tb_null
 	,	tb_null
+	,	tb_null
+	,	tb_null
 	,	tb_aicp_file_spak_read
 	,	tb_aicp_file_spak_writ
 	,	tb_aicp_file_spak_readv
