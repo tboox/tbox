@@ -526,7 +526,7 @@ typedef struct __tb_aice_t
 	tb_pointer_t 				data;
 
 	/// the aico
-	tb_aico_t const* 			aico;
+	tb_aico_t* 					aico;
 
 	/// the uion
 	union

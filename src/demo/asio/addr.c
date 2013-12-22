@@ -50,12 +50,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// init sock
-	sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
+	sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
 	tb_assert_and_check_goto(sock, end);
 
 	// addo sock
 	aico = tb_aico_init_sock(aicp, sock);
 	tb_assert_and_check_goto(aico, end);
+
+	// sort server 
+	tb_dns_server_sort();
 
 	// init time
 	tb_hong_t time = tb_mclock();

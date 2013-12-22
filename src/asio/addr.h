@@ -28,6 +28,31 @@
  * includes
  */
 #include "aicp.h"
+#include "../network/network.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the aicp addr impl type
+typedef struct __tb_aicp_addr_impl_t
+{
+	// the itor
+	tb_size_t 				itor;
+
+	// the server maxn
+	tb_size_t 				maxn;
+
+	// the server list
+	tb_ipv4_t 				list[2];
+
+	// the data
+	tb_byte_t 				data[TB_DNS_RPKT_MAXN];
+
+	// the aice
+	tb_aice_t 				aice;
+
+}tb_aicp_addr_impl_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -40,6 +65,6 @@
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_post_addr(tb_aicp_t* aicp, tb_aice_t const* aice);
+tb_bool_t 			tb_aicp_post_addr_impl(tb_aicp_t* aicp, tb_aice_t const* aice);
 
 #endif
