@@ -88,10 +88,10 @@ static tb_long_t tb_dns_server_comp(tb_item_func_t* func, tb_cpointer_t litem, t
 	// comp
 	return (lrate > rrate? 1 : (lrate < rrate? -1 : 0));
 }
-static tb_long_t tb_dns_server_test(tb_char_t const* addr)
+static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 {
 	// check
-	tb_assert_and_check_return_val(addr, -1);
+	tb_assert_and_check_return_val(addr && addr->u32, -1);
 
 	// init sock
 	tb_handle_t sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
@@ -121,7 +121,7 @@ static tb_long_t tb_dns_server_test(tb_char_t const* addr)
 	 * tb_uint16_t z      :1;		// its z! reserved
 	 * tb_uint16_t ad     :1;	    // authenticated data
 	 * tb_uint16_t cd     :1;	    // checking disabled
-	 * tb_uint16_t rcode  :4;	    // response code
+/	 * tb_uint16_t rcode  :4;	    // response code
 	 *
 	 * this is a query 
 	 * this is a standard query 
@@ -220,7 +220,7 @@ static tb_long_t tb_dns_server_test(tb_char_t const* addr)
 	{
 		// read data
 		tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
-		//tb_trace_impl("read %d", r);
+//		tb_trace_impl("read %d", r);
 		tb_check_break(r >= 0);
 		
 		// no data?
@@ -254,7 +254,7 @@ static tb_long_t tb_dns_server_test(tb_char_t const* addr)
 	rate = (tb_long_t)(tb_mclock() - time);
 
 	// ok
-//	tb_trace_impl("[dns]: addr: %s ok, rate: %u", addr, rate);
+//	tb_trace_impl("[dns]: addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
 
 end:
 	// exit sock
@@ -276,13 +276,8 @@ static tb_bool_t tb_dns_server_rate(tb_vector_t* vector, tb_pointer_t* item, tb_
 		tb_bool_t ok = tb_false;
 		do
 		{
-			// the server addr
-			tb_char_t 			data[16] = {0};
-			tb_char_t const* 	addr = tb_ipv4_get(&server->addr, data, 16);
-			tb_assert_and_check_break(addr);
-
 			// the server rate
-			tb_long_t rate = tb_dns_server_test(addr);
+			tb_long_t rate = tb_dns_server_test(&server->addr);
 			tb_check_break(rate >= 0);
 
 			// save the server rate

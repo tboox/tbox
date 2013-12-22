@@ -50,17 +50,19 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_USEND 			= 7		//!< for sock, send data for udp
 ,	TB_AICE_CODE_RECVV 			= 8		//!< for sock, recv iovec data for tcp
 ,	TB_AICE_CODE_SENDV 			= 9		//!< for sock, send iovec data for tcp
-,	TB_AICE_CODE_SENDFILE 		= 10	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+,	TB_AICE_CODE_URECVV 		= 10	//!< for sock, recv iovec data for udp
+,	TB_AICE_CODE_USENDV 		= 11	//!< for sock, send iovec data for udp
+,	TB_AICE_CODE_SENDFILE 		= 12	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
-,	TB_AICE_CODE_READ 			= 11	//!< for file, read data
-,	TB_AICE_CODE_WRIT 			= 12	//!< for file, writ data
-,	TB_AICE_CODE_READV 			= 13	//!< for file, read iovec data
-,	TB_AICE_CODE_WRITV 			= 14	//!< for file, writ iovec data
-,	TB_AICE_CODE_FSYNC 			= 15	//!< for file, flush data to file
+,	TB_AICE_CODE_READ 			= 13	//!< for file, read data
+,	TB_AICE_CODE_WRIT 			= 14	//!< for file, writ data
+,	TB_AICE_CODE_READV 			= 15	//!< for file, read iovec data
+,	TB_AICE_CODE_WRITV 			= 16	//!< for file, writ iovec data
+,	TB_AICE_CODE_FSYNC 			= 17	//!< for file, flush data to file
 
-,	TB_AICE_CODE_RUNTASK 		= 16	//!< for task, run task with the given delay
+,	TB_AICE_CODE_RUNTASK 		= 18	//!< for task, run task with the given delay
 
-, 	TB_AICE_CODE_MAXN 			= 17
+, 	TB_AICE_CODE_MAXN 			= 19
 
 }tb_aice_code_e;
 
@@ -369,11 +371,8 @@ typedef struct __tb_aice_recvv_t
 	/// the data real
 	tb_size_t 					real;
 
-	/// the file seek
-	tb_hize_t 					seek;
-
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[1];
+	tb_handle_t 				priv[3];
 
 }tb_aice_recvv_t;
 
@@ -389,13 +388,56 @@ typedef struct __tb_aice_sendv_t
 	/// the data real
 	tb_size_t 					real;
 
-	/// the file seek
-	tb_hize_t 					seek;
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[3];
+
+}tb_aice_sendv_t;
+
+/// the urecvv aice type
+typedef struct __tb_aice_urecvv_t
+{
+	/// the recv list
+	tb_iovec_t const* 			list;
+
+	/// the list size
+	tb_size_t 					size;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
 
 	/// the private data for using the left space of the union
 	tb_handle_t 				priv[1];
 
-}tb_aice_sendv_t;
+}tb_aice_urecvv_t;
+
+/// the usendv aice type
+typedef struct __tb_aice_usendv_t
+{
+	/// the send list
+	tb_iovec_t const* 			list;
+
+	/// the list size
+	tb_size_t 					size;
+
+	/// the data real
+	tb_size_t 					real;
+
+	/// the addr
+	tb_ipv4_t 					addr;
+
+	/// the port
+	tb_size_t 					port;
+
+	/// the private data for using the left space of the union
+	tb_handle_t 				priv[1];
+
+}tb_aice_usendv_t;
 
 /// the sendfile aice type
 typedef struct __tb_aice_sendfile_t
@@ -499,6 +541,8 @@ typedef struct __tb_aice_t
 		tb_aice_usend_t 		usend;
 		tb_aice_recvv_t 		recvv;
 		tb_aice_sendv_t 		sendv;
+		tb_aice_urecvv_t 		urecvv;
+		tb_aice_usendv_t 		usendv;
 		tb_aice_sendfile_t 		sendfile;
 
 		// for file

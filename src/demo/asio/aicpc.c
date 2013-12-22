@@ -191,7 +191,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	aicp = tb_aicp_init(2);
 	tb_assert_and_check_goto(aicp, end);
 
-	// open sock
+	// init sock
 	context.sock = tb_socket_open(TB_SOCKET_TYPE_TCP);
 	tb_assert_and_check_goto(context.sock, end);
 
@@ -216,7 +216,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// post conn
 	tb_print("conn: ..");
-	if (!tb_aico_conn(context.aico[0], "127.0.0.1", 9090, tb_demo_sock_conn_func, &context)) goto end;
+	tb_ipv4_t addr; tb_ipv4_set(&addr, "127.0.0.1");
+	if (!tb_aico_conn(context.aico[0], &addr, 9090, tb_demo_sock_conn_func, &context)) goto end;
 
 	// loop aicp
 	tb_aicp_loop(aicp);

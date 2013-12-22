@@ -34,7 +34,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// done conn
 	tb_long_t conn = -1;
-	while (!(conn = tb_socket_connect(sock, "127.0.0.1", 9090)))
+	tb_ipv4_t addr = {0};
+	tb_ipv4_set(&addr, "127.0.0.1");
+	while (!(conn = tb_socket_connect(sock, &addr, 9090)))
 	{
 		// wait
 		conn = tb_aioo_wait(sock, TB_AIOE_CODE_CONN, 20000);

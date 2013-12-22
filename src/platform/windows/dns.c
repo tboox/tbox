@@ -50,6 +50,7 @@ tb_bool_t tb_dns_init()
 	ULONG 					size = 0;
 	tb_handle_t 			hdll = tb_null;
 	tb_GetNetworkParams_t 	func = tb_null;
+	tb_size_t 				count = 0;
 	do 
 	{
 		// init dynamic
@@ -83,7 +84,10 @@ tb_bool_t tb_dns_init()
 
 		// add the first dns address
 		if (info->DnsServerList.IpAddress.String)
+		{
 			tb_dns_server_add(info->DnsServerList.IpAddress.String);
+			count++;
+		}
 
 		// walk dns address
         IP_ADDR_STRING* addr = info->DnsServerList.Next;
@@ -94,7 +98,10 @@ tb_bool_t tb_dns_init()
 			
 			// add the dns address
 			if (addr->IpAddress.String)
+			{
 				tb_dns_server_add(addr->IpAddress.String);
+				count++;
+			}
         }
 
 	} while (0);
@@ -102,6 +109,13 @@ tb_bool_t tb_dns_init()
 	// exit info
 	if (info) tb_free(info);
 	info = tb_null;
+
+	// no server? add the default server
+	if (!count) 
+	{
+		tb_dns_server_add("8.8.8.8");
+		tb_dns_server_add("8.8.8.4");
+	}
 
 	// ok
 	return tb_true;

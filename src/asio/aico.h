@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../network/ipv4.h"
 #include "../platform/prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -185,14 +186,14 @@ tb_bool_t 			tb_aico_acpt(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t ai
 /*! post the conn
  *
  * @param aico 		the aico
- * @param host 		the host
+ * @param addr 		the addr
  * @param port 		the port
  * @param aicb_func the callback func
  * @param aicb_data the callback data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+tb_bool_t 			tb_aico_conn(tb_handle_t aico, tb_ipv4_t const* addr, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the recv for sock
  *
@@ -221,7 +222,7 @@ tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t siz
 /*! post the urecv for sock
  *
  * @param aico 		the aico
- * @param host 		the host
+ * @param addr 		the addr
  * @param port 		the port
  * @param data 		the data
  * @param size 		the size
@@ -230,12 +231,12 @@ tb_bool_t 			tb_aico_send(tb_handle_t aico, tb_byte_t const* data, tb_size_t siz
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_urecv(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+tb_bool_t 			tb_aico_urecv(tb_handle_t aico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the usend for sock
  *
  * @param aico 		the aico
- * @param host 		the host
+ * @param addr 		the addr
  * @param port 		the port
  * @param data 		the data
  * @param size 		the size, send the left file data if size == 0
@@ -244,7 +245,7 @@ tb_bool_t 			tb_aico_urecv(tb_handle_t aico, tb_char_t const* host, tb_size_t po
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_usend(tb_handle_t aico, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+tb_bool_t 			tb_aico_usend(tb_handle_t aico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the recvv for sock
  *
@@ -269,6 +270,34 @@ tb_bool_t 			tb_aico_recvv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t s
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aico_sendv(tb_handle_t aico, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+
+/*! post the urecvv for sock
+ *
+ * @param aico 		the aico
+ * @param addr 		the addr
+ * @param port 		the port
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_urecvv(tb_handle_t aico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
+
+/*! post the usendv for sock
+ *
+ * @param aico 		the aico
+ * @param addr 		the addr
+ * @param port 		the port
+ * @param list 		the list
+ * @param size 		the size
+ * @param aicb_func the callback func
+ * @param aicb_data the callback data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_usendv(tb_handle_t aico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data);
 
 /*! post the sendfile for sock
  *
@@ -371,6 +400,8 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 	, 	-1
 	, 	TB_AICO_TIMEOUT_ACPT
 	, 	TB_AICO_TIMEOUT_CONN
+	, 	TB_AICO_TIMEOUT_RECV
+	, 	TB_AICO_TIMEOUT_SEND
 	, 	TB_AICO_TIMEOUT_RECV
 	, 	TB_AICO_TIMEOUT_SEND
 	, 	TB_AICO_TIMEOUT_RECV

@@ -38,10 +38,6 @@ tb_bool_t tb_network_init()
 	// init dns cache
 	if (!tb_dns_cache_init()) return tb_false;
 
-	// add the default dns servers
-	tb_dns_server_add("8.8.4.4");
-	tb_dns_server_add("8.8.8.8");
-
 	// ok
 	return tb_true;
 }
