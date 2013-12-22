@@ -191,6 +191,28 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 		aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, aico);
 	}
 }
+static tb_bool_t tb_iocp_post_addr(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
+{	
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
+
+	// check aice
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
+	
+	// the aico
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
+
+	// init olap
+	tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
+
+	// init aice
+	aico->olap.aice = *aice;
+
+	// spak it directly
+	return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+}
 static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
@@ -341,7 +363,7 @@ static tb_bool_t tb_iocp_post_conn(tb_aicp_proactor_t* proactor, tb_aice_t const
 		SOCKADDR_IN addr = {0};
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(aice->u.conn.port);
-		addr.sin_addr.S_un.S_addr = htonl(aice->u.conn.addr.u32);
+		addr.sin_addr.S_un.S_addr = aice->u.conn.addr.u32;
 		ConnectEx_ok = ptor->ConnectEx( 	(SOCKET)aico->base.handle - 1
 										, 	(struct sockaddr const*)&addr
 										, 	sizeof(addr)
@@ -539,10 +561,10 @@ static tb_bool_t tb_iocp_post_urecv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
 	
 	// init addr
-	SOCKADDR_IN 				addr;
+	SOCKADDR_IN 				addr = {0};
 	addr.sin_family 			= AF_INET;
 	addr.sin_port 				= htons(aice->u.urecv.port);
-	addr.sin_addr.S_un.S_addr 	= htonl(aice->u.urecv.addr.u32);
+	addr.sin_addr.S_un.S_addr 	= aice->u.urecv.addr.u32;
 
 	// done recv
 	DWORD 		flag = 0;
@@ -610,10 +632,10 @@ static tb_bool_t tb_iocp_post_usend(tb_aicp_proactor_t* proactor, tb_aice_t cons
 		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
 		
 	// init addr
-	SOCKADDR_IN 				addr;
+	SOCKADDR_IN 				addr = {0};
 	addr.sin_family 			= AF_INET;
 	addr.sin_port 				= htons(aice->u.usend.port);
-	addr.sin_addr.S_un.S_addr 	= htonl(aice->u.usend.addr.u32);
+	addr.sin_addr.S_un.S_addr 	= aice->u.usend.addr.u32;
 
 	// done send
 	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)&aico->olap.aice.u.usend, 1, tb_null, 0, &addr, sizeof(addr), &aico->olap, tb_null);
@@ -743,6 +765,146 @@ static tb_bool_t tb_iocp_post_sendv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	// done send
 	tb_long_t ok = WSASend((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.sendv.list, (DWORD)aico->olap.aice.u.sendv.size, tb_null, 0, &aico->olap, tb_null);
 	tb_trace_impl("WSASend: %ld, error: %d", ok, WSAGetLastError());
+
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
+	if (ok == SOCKET_ERROR)
+	{
+		// done error
+		switch (WSAGetLastError())
+		{
+		// closed?
+		case WSAECONNABORTED:
+		case WSAECONNRESET:
+			aico->olap.aice.state = TB_AICE_STATE_CLOSED;
+			break;
+		// failed?
+		default:
+			aico->olap.aice.state = TB_AICE_STATE_FAILED;
+			break;
+		}
+
+		// post closed or failed
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+	}
+
+	// failed
+	return tb_false;
+}
+static tb_bool_t tb_iocp_post_urecvv(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
+{	
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
+
+	// check aice
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_URECVV, tb_false);
+	tb_assert_and_check_return_val(aice->u.urecvv.list && aice->u.urecvv.size, tb_false);
+	tb_assert_and_check_return_val(aice->u.urecvv.addr.u32 && aice->u.urecvv.port, tb_false);
+	
+	// the aico
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
+
+	// init olap
+	tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
+
+	// init aice
+	aico->olap.aice = *aice;
+
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
+	// init addr
+	SOCKADDR_IN 				addr = {0};
+	addr.sin_family 			= AF_INET;
+	addr.sin_port 				= htons(aice->u.urecvv.port);
+	addr.sin_addr.S_un.S_addr 	= aice->u.urecv.addr.u32;
+
+	// done recv
+	DWORD 		flag = 0;
+	tb_int_t 	size = sizeof(addr);
+	tb_long_t 	ok = WSARecvFrom((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.urecvv.list, (DWORD)aico->olap.aice.u.urecvv.size, tb_null, &flag, &addr, &size, &aico->olap, tb_null);
+	tb_trace_impl("WSARecvFrom: %ld, error: %d", ok, WSAGetLastError());
+
+	// ok or pending? continue it
+	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
+	{
+		// post timeout 
+		tb_iocp_post_timeout(proactor, aico);
+
+		// ok
+		return tb_true;
+	}
+
+	// error?
+	if (ok == SOCKET_ERROR)
+	{
+		// done error
+		switch (WSAGetLastError())
+		{
+		// closed?
+		case WSAECONNABORTED:
+		case WSAECONNRESET:
+			aico->olap.aice.state = TB_AICE_STATE_CLOSED;
+			break;
+		// failed?
+		default:
+			aico->olap.aice.state = TB_AICE_STATE_FAILED;
+			break;
+		}
+
+		// post closed or failed
+		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
+	}
+
+	// failed
+	return tb_false;
+}
+static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
+
+	// check aice
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_USENDV, tb_false);
+	tb_assert_and_check_return_val(aice->u.usendv.list && aice->u.usendv.size, tb_false);
+	tb_assert_and_check_return_val(aice->u.usendv.addr.u32 && aice->u.usendv.port, tb_false);
+	
+	// the aico
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
+	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
+
+	// init olap
+	tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
+
+	// init aice
+	aico->olap.aice = *aice;
+
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
+	
+	// init addr
+	SOCKADDR_IN 				addr = {0};
+	addr.sin_family 			= AF_INET;
+	addr.sin_port 				= htons(aice->u.usendv.port);
+	addr.sin_addr.S_un.S_addr 	= aice->u.urecv.addr.u32;
+
+	// done send
+	tb_long_t ok = WSASendTo((SOCKET)aico->base.handle - 1, (WSABUF*)aico->olap.aice.u.usendv.list, (DWORD)aico->olap.aice.u.usendv.size, tb_null, 0, &addr, sizeof(addr), &aico->olap, tb_null);
+	tb_trace_impl("WSASendTo: %ld, error: %d", ok, WSAGetLastError());
 
 	// ok or pending? continue it
 	if (!ok || ((ok == SOCKET_ERROR) && (WSA_IO_PENDING == WSAGetLastError())))
@@ -1241,6 +1403,14 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 		break;
 	}
 }
+static tb_long_t tb_iocp_spak_addr(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
+{
+	// check?
+	tb_assert_and_check_return_val(resp, -1);
+
+	// ok
+	return 1;
+}
 static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
 {
 	// check?
@@ -1497,9 +1667,11 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	static tb_bool_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
 	{
 		tb_null
-	,	tb_null
+	,	tb_iocp_spak_addr
 	,	tb_iocp_spak_acpt
 	,	tb_iocp_spak_conn
+	,	tb_iocp_spak_iorw
+	,	tb_iocp_spak_iorw
 	,	tb_iocp_spak_iorw
 	,	tb_iocp_spak_iorw
 	,	tb_iocp_spak_iorw
@@ -1591,7 +1763,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
 	{
 		tb_null
-	,	tb_null
+	,	tb_iocp_post_addr
 	,	tb_iocp_post_acpt
 	,	tb_iocp_post_conn
 	,	tb_iocp_post_recv
@@ -1600,6 +1772,8 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	,	tb_iocp_post_usend
 	,	tb_iocp_post_recvv
 	,	tb_iocp_post_sendv
+	,	tb_iocp_post_urecvv
+	,	tb_iocp_post_usendv
 	,	tb_iocp_post_sendfile
 	,	tb_iocp_post_read
 	,	tb_iocp_post_writ

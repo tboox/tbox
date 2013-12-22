@@ -217,11 +217,11 @@ tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
 
-	// post addr? 
-	if (aice->code == TB_AICE_CODE_ADDR) return tb_aicp_post_addr(aicp, aice);
-
 	// check post
 	tb_assert_return_val(aice->aico? !tb_atomic_fetch_and_inc(&aice->aico->post) : 0, tb_false);
+
+	// post addr? 
+	if (aice->code == TB_AICE_CODE_ADDR) return tb_aicp_post_addr(aicp, aice);
 
 	// post aice
 	return aicp->ptor->post(aicp->ptor, aice);

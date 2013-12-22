@@ -30,90 +30,6 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * addr
- */
-static tb_bool_t tb_aico_conn_addr_func(tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
-	tb_assert_and_check_return_val(aice->aico && aice->aico->aicp, tb_false);
-	
-	// the aicb & port
-	tb_aicb_t aicb = (tb_aicb_t)aice->u.addr.priv[0];
-	tb_size_t port = (tb_size_t)aice->u.addr.priv[1];
-	tb_assert_and_check_return_val(aicb && port, tb_false);
-
-	// init
-	tb_aice_t 				conn = {0};
-	conn.code 				= TB_AICE_CODE_CONN;
-	conn.state 				= aice->state == TB_AICE_STATE_OK? TB_AICE_STATE_PENDING : aice->state;
-	conn.aicb 				= aicb;
-	conn.data 				= aice->data;
-	conn.aico 				= aice->aico;
-	conn.u.conn.port 		= port;
-	conn.u.conn.addr 		= aice->u.addr.addr;
-
-	// post conn
-	return tb_aicp_post(aice->aico->aicp, &conn);
-}
-static tb_bool_t tb_aico_urecv_addr_func(tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
-	tb_assert_and_check_return_val(aice->aico && aice->aico->aicp, tb_false);
-	
-	// the aicb & port & data & size
-	tb_aicb_t 	aicb = (tb_aicb_t)aice->u.addr.priv[0];
-	tb_size_t 	port = (tb_size_t)aice->u.addr.priv[1];
-	tb_byte_t* 	data = (tb_byte_t*)aice->u.addr.priv[2];
-	tb_size_t 	size = (tb_size_t)aice->u.addr.priv[3];
-	tb_assert_and_check_return_val(aicb && port && data && size, tb_false);
-
-	// init
-	tb_aice_t 				urecv = {0};
-	urecv.code 				= TB_AICE_CODE_URECV;
-	urecv.state 			= aice->state == TB_AICE_STATE_OK? TB_AICE_STATE_PENDING : aice->state;
-	urecv.aicb 				= aicb;
-	urecv.data 				= aice->data;
-	urecv.aico 				= aice->aico;
-	urecv.u.urecv.port 		= port;
-	urecv.u.urecv.addr 		= aice->u.addr.addr;
-	urecv.u.urecv.data 		= data;
-	urecv.u.urecv.size 		= size;
-
-	// post conn
-	return tb_aicp_post(aice->aico->aicp, &urecv);
-}
-static tb_bool_t tb_aico_usend_addr_func(tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
-	tb_assert_and_check_return_val(aice->aico && aice->aico->aicp, tb_false);
-
-	// the aicb & port & data & size
-	tb_aicb_t 	aicb = (tb_aicb_t)aice->u.addr.priv[0];
-	tb_size_t 	port = (tb_size_t)aice->u.addr.priv[1];
-	tb_byte_t* 	data = (tb_byte_t*)aice->u.addr.priv[2];
-	tb_size_t 	size = (tb_size_t)aice->u.addr.priv[3];
-	tb_assert_and_check_return_val(aicb && port && data && size, tb_false);
-
-	// init
-	tb_aice_t 				usend = {0};
-	usend.code 				= TB_AICE_CODE_USEND;
-	usend.state 			= aice->state == TB_AICE_STATE_OK? TB_AICE_STATE_PENDING : aice->state;
-	usend.aicb 				= aicb;
-	usend.data 				= aice->data;
-	usend.aico 				= aice->aico;
-	usend.u.usend.port 		= port;
-	usend.u.usend.addr 		= aice->u.addr.addr;
-	usend.u.usend.data 		= data;
-	usend.u.usend.size 		= size;
-
-	// post conn
-	return tb_aicp_post(aice->aico->aicp, &usend);
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_handle_t tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle)
@@ -220,11 +136,11 @@ tb_bool_t tb_aico_acpt(tb_handle_t haico, tb_aicb_t aicb_func, tb_pointer_t aicb
 	// post
 	return tb_aicp_post(aico->aicp, &aice);
 }
-tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+tb_bool_t tb_aico_conn(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
 	// check
 	tb_aico_t const* aico = (tb_aico_t const*)haico;
-	tb_assert_and_check_return_val(aico && aico->aicp && host && port, tb_false);
+	tb_assert_and_check_return_val(aico && aico->aicp && addr && addr->u32 && port, tb_false);
 
 	// init
 	tb_aice_t 				aice = {0};
@@ -234,18 +150,7 @@ tb_bool_t tb_aico_conn(tb_handle_t haico, tb_char_t const* host, tb_size_t port,
 	aice.data 				= aicb_data;
 	aice.aico 				= aico;
 	aice.u.conn.port 		= port;
-
-	// name? get the address first
-	if (!tb_ipv4_set(&aice.u.conn.addr, host))
-	{
-		// post addr and conn it
-		aice.code 			= TB_AICE_CODE_ADDR;
-		aice.aicb 			= tb_aico_conn_addr_func;
-		aice.data 			= aicb_data;
-		aice.u.addr.priv[0] = (tb_pointer_t)aicb_func;
-		aice.u.addr.priv[1] = (tb_pointer_t)port;
-		aice.u.addr.host 	= host;
-	}
+	aice.u.conn.addr 		= *addr;
 
 	// post
 	return tb_aicp_post(aico->aicp, &aice);
@@ -288,11 +193,11 @@ tb_bool_t tb_aico_send(tb_handle_t haico, tb_byte_t const* data, tb_size_t size,
 	// post
 	return tb_aicp_post(aico->aicp, &aice);
 }
-tb_bool_t tb_aico_urecv(tb_handle_t haico, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+tb_bool_t tb_aico_urecv(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
 	// check
 	tb_aico_t const* aico = (tb_aico_t const*)haico;
-	tb_assert_and_check_return_val(aico && aico->aicp && host && port && data && size, tb_false);
+	tb_assert_and_check_return_val(aico && aico->aicp && addr && addr->u32 && port && data && size, tb_false);
 
 	// init
 	tb_aice_t 				aice = {0};
@@ -304,29 +209,16 @@ tb_bool_t tb_aico_urecv(tb_handle_t haico, tb_char_t const* host, tb_size_t port
 	aice.u.urecv.data 		= data;
 	aice.u.urecv.size 		= size;
 	aice.u.urecv.port 		= port;
-
-	// name? get the address first
-	if (!tb_ipv4_set(&aice.u.urecv.addr, host))
-	{
-		// post addr and urecv it
-		aice.code 			= TB_AICE_CODE_ADDR;
-		aice.aicb 			= tb_aico_urecv_addr_func;
-		aice.data 			= aicb_data;
-		aice.u.addr.priv[0] = (tb_pointer_t)aicb_func;
-		aice.u.addr.priv[1] = (tb_pointer_t)port;
-		aice.u.addr.priv[2] = (tb_pointer_t)data;
-		aice.u.addr.priv[3] = (tb_pointer_t)size;
-		aice.u.addr.host 	= host;
-	}
+	aice.u.urecv.addr 		= *addr;
 
 	// post
 	return tb_aicp_post(aico->aicp, &aice);
 }
-tb_bool_t tb_aico_usend(tb_handle_t haico, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+tb_bool_t tb_aico_usend(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
 {
 	// check
 	tb_aico_t const* aico = (tb_aico_t const*)haico;
-	tb_assert_and_check_return_val(aico && aico->aicp && host && port && data && size, tb_false);
+	tb_assert_and_check_return_val(aico && aico->aicp && addr && addr->u32 && port && data && size, tb_false);
 
 	// init
 	tb_aice_t 				aice = {0};
@@ -338,20 +230,7 @@ tb_bool_t tb_aico_usend(tb_handle_t haico, tb_char_t const* host, tb_size_t port
 	aice.u.usend.data 		= data;
 	aice.u.usend.size 		= size;
 	aice.u.usend.port 		= port;
-
-	// name? get the address first
-	if (!tb_ipv4_set(&aice.u.usend.addr, host))
-	{
-		// post addr and urecv it
-		aice.code 			= TB_AICE_CODE_ADDR;
-		aice.aicb 			= tb_aico_usend_addr_func;
-		aice.data 			= aicb_data;
-		aice.u.addr.priv[0] = (tb_pointer_t)aicb_func;
-		aice.u.addr.priv[1] = (tb_pointer_t)port;
-		aice.u.addr.priv[2] = (tb_pointer_t)data;
-		aice.u.addr.priv[3] = (tb_pointer_t)size;
-		aice.u.addr.host 	= host;
-	}
+	aice.u.usend.addr 		= *addr;
 
 	// post
 	return tb_aicp_post(aico->aicp, &aice);
@@ -390,6 +269,48 @@ tb_bool_t tb_aico_sendv(tb_handle_t haico, tb_iovec_t const* list, tb_size_t siz
 	aice.aico 				= aico;
 	aice.u.sendv.list 		= list;
 	aice.u.sendv.size 		= size;
+
+	// post
+	return tb_aicp_post(aico->aicp, &aice);
+}
+tb_bool_t tb_aico_urecvv(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+{
+	// check
+	tb_aico_t const* aico = (tb_aico_t const*)haico;
+	tb_assert_and_check_return_val(aico && aico->aicp && addr && addr->u32 && port && list && size, tb_false);
+
+	// init
+	tb_aice_t 				aice = {0};
+	aice.code 				= TB_AICE_CODE_URECVV;
+	aice.state 				= TB_AICE_STATE_PENDING;
+	aice.aicb 				= aicb_func;
+	aice.data 				= aicb_data;
+	aice.aico 				= aico;
+	aice.u.urecvv.list 		= list;
+	aice.u.urecvv.size 		= size;
+	aice.u.urecvv.port 		= port;
+	aice.u.urecvv.addr 		= *addr;
+
+	// post
+	return tb_aicp_post(aico->aicp, &aice);
+}
+tb_bool_t tb_aico_usendv(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size, tb_aicb_t aicb_func, tb_pointer_t aicb_data)
+{
+	// check
+	tb_aico_t const* aico = (tb_aico_t const*)haico;
+	tb_assert_and_check_return_val(aico && aico->aicp && addr && addr->u32 && port && list && size, tb_false);
+
+	// init
+	tb_aice_t 				aice = {0};
+	aice.code 				= TB_AICE_CODE_USENDV;
+	aice.state 				= TB_AICE_STATE_PENDING;
+	aice.aicb 				= aicb_func;
+	aice.data 				= aicb_data;
+	aice.aico 				= aico;
+	aice.u.usendv.list 		= list;
+	aice.u.usendv.size 		= size;
+	aice.u.usendv.port 		= port;
+	aice.u.usendv.addr 		= *addr;
 
 	// post
 	return tb_aicp_post(aico->aicp, &aice);

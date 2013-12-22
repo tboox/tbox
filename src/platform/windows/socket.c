@@ -208,16 +208,16 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 	// ok?
 	return ok;
 }
-tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
+tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {
 	// check
-	tb_assert_and_check_return_val(handle && host && port, -1);
+	tb_assert_and_check_return_val(handle && addr && addr->u32 && port, -1);
 
 	// init
 	SOCKADDR_IN d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = inet_addr(host);
+	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// connect
 	tb_long_t r = connect((SOCKET)((tb_long_t)handle - 1), (struct sockaddr *)&d, sizeof(d));
@@ -238,7 +238,7 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_char_t const* host, tb_size_t
 	return -1;
 }
 
-tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* host, tb_size_t port)
+tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {
 	// check
 	tb_assert_and_check_return_val(handle, 0);
@@ -247,15 +247,15 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_char_t const* host, tb_size_t po
 	SOCKADDR_IN d = {0};
 	d.sin_family = AF_INET;
 	d.sin_port = htons(port);
-	d.sin_addr.S_un.S_addr = host? inet_addr(host) : htonl(INADDR_ANY); 
+	d.sin_addr.S_un.S_addr = (addr && addr->u32)? addr->u32 : INADDR_ANY; 
 
 	// reuse addr
 #ifdef SO_REUSEADDR
-	//if (host)
+	//if (addr && addr->u32)
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt((tb_int_t)handle - 1, SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
-			tb_trace("reuseaddr: %s failed", host);
+			tb_trace("reuseaddr: failed");
 	}
 #endif
 
@@ -491,21 +491,21 @@ tb_hong_t tb_socket_sendfile(tb_handle_t handle, tb_handle_t file, tb_hize_t off
 	// error
 	return -1;
 }
-tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && host && port && data, -1);
+	tb_assert_and_check_return_val(handle && addr && addr->u32 && port && data, -1);
 	tb_check_return_val(size, 0);
 
 	// init addr
-	SOCKADDR_IN addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.S_un.S_addr = inet_addr(host);
+	SOCKADDR_IN d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// recv
-	tb_int_t 	n = sizeof(addr);
-	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&addr, &n);
+	tb_int_t 	n = sizeof(d);
+	tb_long_t 	r = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
 	// ok?
 	if (r >= 0) return r;
@@ -516,20 +516,20 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_char_t const* host, tb_size_t p
 	// error
 	return -1;
 }
-tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_byte_t const* data, tb_size_t size)
+tb_long_t tb_socket_usend(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && host && port && data, -1);
+	tb_assert_and_check_return_val(handle && addr && addr->u32 && port && data, -1);
 	tb_check_return_val(size, 0);
 
 	// init addr
-	SOCKADDR_IN addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.S_un.S_addr = inet_addr(host);
+	SOCKADDR_IN d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// send
-	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&addr, sizeof(addr));
+	tb_long_t r = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)size, 0, (struct sockaddr*)&d, sizeof(d));
 
 	// ok?
 	if (r >= 0) return r;
@@ -540,20 +540,20 @@ tb_long_t tb_socket_usend(tb_handle_t handle, tb_char_t const* host, tb_size_t p
 	// error
 	return -1;
 }
-tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+	tb_assert_and_check_return_val(handle && addr && addr->u32 && port && list && size, -1);
 
 	// init addr
-	SOCKADDR_IN addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.S_un.S_addr = inet_addr(host);
+	SOCKADDR_IN d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// walk read
 	tb_size_t 	i = 0;
-	tb_int_t 	n = sizeof(addr);
+	tb_int_t 	n = sizeof(d);
 	tb_size_t 	read = 0;
 	for (i = 0; i < size; i++)
 	{
@@ -563,7 +563,7 @@ tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_char_t const* host, tb_size_t 
 		tb_check_break(data && need);
 
 		// read it
-		tb_long_t real = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&addr, &n);
+		tb_long_t real = recvfrom((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&d, &n);
 
 		// full? next it
 		if (real == need)
@@ -585,16 +585,16 @@ tb_long_t tb_socket_urecvv(tb_handle_t handle, tb_char_t const* host, tb_size_t 
 	// ok?
 	return read;
 }
-tb_long_t tb_socket_usendv(tb_handle_t handle, tb_char_t const* host, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
+tb_long_t tb_socket_usendv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_iovec_t const* list, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(handle && host && port && list && size, -1);
+	tb_assert_and_check_return_val(handle && addr && addr->u32 && port && list && size, -1);
 
 	// init addr
-	SOCKADDR_IN addr;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(port);
-	addr.sin_addr.S_un.S_addr = inet_addr(host);
+	SOCKADDR_IN d = {0};
+	d.sin_family = AF_INET;
+	d.sin_port = htons(port);
+	d.sin_addr.S_un.S_addr = addr->u32;
 
 	// walk writ
 	tb_size_t i = 0;
@@ -607,7 +607,7 @@ tb_long_t tb_socket_usendv(tb_handle_t handle, tb_char_t const* host, tb_size_t 
 		tb_check_break(data && need);
 
 		// writ it
-		tb_long_t real = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&addr, sizeof(addr));
+		tb_long_t real = sendto((SOCKET)((tb_long_t)handle - 1), data, (tb_int_t)need, 0, (struct sockaddr*)&d, sizeof(d));
 
 		// full? next it
 		if (real == need)

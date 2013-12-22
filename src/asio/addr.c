@@ -32,5 +32,23 @@
  */
 tb_bool_t tb_aicp_post_addr(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
-	return tb_false;
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR && aice->u.addr.host, tb_false);
+	
+	// no pending? spak it directly 
+	if (aice->state != TB_AICE_STATE_PENDING)
+		return aicp->ptor->post(aicp->ptor, aice);
+
+	// the host is addr? ok
+	tb_aice_t addr = *aice;
+	if (tb_ipv4_set(&addr.u.addr.addr, aice->u.addr.host))
+	{
+		addr.state = TB_AICE_STATE_OK;
+		return aicp->ptor->post(aicp->ptor, &addr);
+	}
+
+	// post failed
+	addr.state = TB_AICE_STATE_FAILED;
+	return aicp->ptor->post(aicp->ptor, &addr);
 }

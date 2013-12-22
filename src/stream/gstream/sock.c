@@ -75,8 +75,8 @@ typedef struct __tb_sstream_t
 	// the ssl handle
 	tb_handle_t 		ssl;
 
-	// the ipv4 string
-	tb_char_t 			ipv4[16];
+	// the host address
+	tb_ipv4_t 			addr;
 
 }tb_sstream_t;
 
@@ -108,19 +108,18 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(port, -1);
 
 	// ipv4
-	tb_char_t const* host = tb_null;
-	if (!sst->ipv4[0])
+	if (!sst->addr.u32)
 	{
+		// try to get the ipv4 address from url
 		tb_ipv4_t const* ipv4 = tb_url_ipv4_get(&gst->url);
-		tb_assert_and_check_return_val(ipv4, -1);
-		if (!ipv4->u32)
+		if (ipv4 && ipv4->u32) sst->addr = *ipv4;
+		else
 		{
 			// lookup ipv4
-			tb_ipv4_t addr;
 			if (sst->looker)
 			{
 				// spank
-				tb_long_t r = tb_dns_looker_spak(sst->looker, &addr);
+				tb_long_t r = tb_dns_looker_spak(sst->looker, &sst->addr);
 				tb_assert_and_check_goto(r >= 0, fail);
 
 				// continue?
@@ -128,19 +127,19 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 			}
 			else
 			{
-				// host
-				host = tb_url_host_get(&gst->url);
+				// get the host from url
+				tb_char_t const* host = tb_url_host_get(&gst->url);
 				tb_assert_and_check_return_val(host, -1);
 
 				// try get ipv4
-				if (!tb_dns_cache_get(host, &addr))
+				if (!tb_dns_cache_get(host, &sst->addr))
 				{
 					// init dns
 					sst->looker = tb_dns_looker_init(host);
 					tb_assert_and_check_return_val(sst->looker, -1);
 					
 					// spank
-					tb_long_t r = tb_dns_looker_spak(sst->looker, &addr);
+					tb_long_t r = tb_dns_looker_spak(sst->looker, &sst->addr);
 					tb_assert_and_check_goto(r >= 0, fail);
 
 					// continue?
@@ -155,18 +154,8 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 				sst->looker = tb_null;
 			}
 
-			// ipv4 => host
-			host = tb_ipv4_get(&addr, sst->ipv4, 16);
-			tb_assert_and_check_goto(host, fail);
-
-			// set ipv4
-			tb_url_ipv4_set(&gst->url, &addr);
-		}
-		else 
-		{
-			// ipv4 => host
-			host = tb_ipv4_get(ipv4, sst->ipv4, 16);
-			tb_assert_and_check_goto(host, fail);
+			// save addr
+			tb_url_ipv4_set(&gst->url, &sst->addr);
 		}
 
 		// tcp or udp? for url: sock://ip:port/?udp=
@@ -174,7 +163,6 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 		if (args && !tb_strnicmp(args, "udp=", 4)) sst->type = TB_SOCKET_TYPE_UDP;
 		else if (args && !tb_strnicmp(args, "tcp=", 4)) sst->type = TB_SOCKET_TYPE_TCP;
 	}
-	else host = sst->ipv4;
 
 	// open
 	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
@@ -186,9 +174,11 @@ static tb_long_t tb_sstream_aopen(tb_gstream_t* gst)
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
-			// connect
-			tb_trace_impl("connect: try: %s[%s]:%u", tb_url_host_get(&gst->url), host, port);
-			r = tb_socket_connect(sst->sock, host, port);
+			// trace
+			tb_trace_impl("connect: try: %s[%u.%u.%u.%u]:%u", tb_url_host_get(&gst->url), sst->addr.u8[0], sst->addr.u8[1], sst->addr.u8[2], sst->addr.u8[3], port);
+
+			// connect it
+			r = tb_socket_connect(sst->sock, &sst->addr, port);
 			tb_check_return_val(r > 0, r);
 
 			// ok
@@ -268,7 +258,7 @@ static tb_long_t tb_sstream_aclose(tb_gstream_t* gst)
 	sst->tryn = 0;
 	sst->read = 0;
 	sst->writ = 0;
-	sst->ipv4[0] = '\0';
+	tb_ipv4_clr(&sst->addr);
 
 	// ok
 	return 1;
@@ -310,10 +300,10 @@ static tb_long_t tb_sstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_assert_and_check_return_val(port, -1);
 
 			// ipv4
-			tb_assert_and_check_return_val(sst->ipv4[0], -1);
+			tb_assert_and_check_return_val(sst->addr.u32, -1);
 
 			// read data
-			r = tb_socket_urecv(sst->sock, sst->ipv4, port, data, size);
+			r = tb_socket_urecv(sst->sock, &sst->addr, port, data, size);
 			tb_trace_impl("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
@@ -371,10 +361,10 @@ static tb_long_t tb_sstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 			tb_assert_and_check_return_val(port, -1);
 
 			// ipv4
-			tb_assert_and_check_return_val(sst->ipv4[0], -1);
+			tb_assert_and_check_return_val(sst->addr.u32, -1);
 
 			// writ data
-			r = tb_socket_usend(sst->sock, sst->ipv4, port, data, size);
+			r = tb_socket_usend(sst->sock, &sst->addr, port, data, size);
 			tb_trace_impl("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 

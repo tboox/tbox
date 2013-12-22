@@ -39,13 +39,6 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the host maximum size 
-#define TB_DNS_LOOKER_HOST_MAXN 			(16)
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 
@@ -62,9 +55,6 @@ typedef enum __tb_dns_looker_step_e
 // the dns looker type
 typedef struct __tb_dns_looker_t
 {
-	// the host
-	tb_sstring_t 		host;
-
 	// the name
 	tb_sstring_t 		name;
 
@@ -96,7 +86,7 @@ typedef struct __tb_dns_looker_t
 	tb_size_t 			maxn;
 
 	// the data
-	tb_byte_t 			data[TB_DNS_LOOKER_HOST_MAXN + TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
+	tb_byte_t 			data[TB_DNS_NAME_MAXN + TB_DNS_RPKT_MAXN];
 
 }tb_dns_looker_t;
 
@@ -203,33 +193,23 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 	// check
 	tb_assert_and_check_return_val(data && size && looker->size < size, -1);
 
-	// try get host from the dns list
-	if (!tb_sstring_size(&looker->host))
-	{
-		// host
-		if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
-		{
-			tb_char_t 				ipv4[16];
-			tb_char_t const* 		host = tb_ipv4_get(&looker->list[looker->itor - 1], ipv4, 16);
-			if (host) tb_sstring_cstrcpy(&looker->host, host);
-		}
-	}
-
-	// host
-	tb_char_t const* host = tb_sstring_cstr(&looker->host);
+	// try get addr from the dns list
+	tb_ipv4_t const* addr = tb_null;
+	if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
+		addr = &looker->list[looker->itor - 1];
 
 	// check
-	tb_assert_and_check_return_val(host && tb_sstring_size(&looker->host), -1);
+	tb_assert_and_check_return_val(addr && addr->u32, -1);
 
 	// need wait if no data
 	looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
 
 	// send request
-	tb_trace_impl("request: try %s", host);
+	tb_trace_impl("request: try %u.%u.%u.%u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 	while (looker->size < size)
 	{
 		// writ data
-		tb_long_t writ = tb_socket_usend(looker->sock, host, TB_DNS_HOST_PORT, data + looker->size, size - looker->size);
+		tb_long_t writ = tb_socket_usend(looker->sock, addr, TB_DNS_HOST_PORT, data + looker->size, size - looker->size);
 		//tb_trace("writ: %d", writ);
 		tb_assert_and_check_return_val(writ >= 0, -1);
 
@@ -455,24 +435,14 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 {
 	// check
 	tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_RESP), 1);
-	
-	// try get host from the dns list
-	if (!tb_sstring_size(&looker->host))
-	{
-		// host
-		if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
-		{
-			tb_char_t 				addr[16];
-			tb_char_t const* 		host = tb_ipv4_get(&looker->list[looker->itor - 1], addr, 16);
-			if (host) tb_sstring_cstrcpy(&looker->host, host);
-		}
-	}
 
-	// host
-	tb_char_t const* host = tb_sstring_cstr(&looker->host);
+	// try get addr from the dns list
+	tb_ipv4_t const* addr = tb_null;
+	if (looker->maxn && looker->itor && looker->itor <= looker->maxn)
+		addr = &looker->list[looker->itor - 1];
 
 	// check
-	tb_assert_and_check_return_val(host && tb_sstring_size(&looker->host), -1);
+	tb_assert_and_check_return_val(addr && addr->u32, -1);
 
 	// need wait if no data
 	looker->step &= ~TB_DNS_LOOKER_STEP_NEVT;
@@ -482,7 +452,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 	while (1)
 	{
 		// read data
-		tb_long_t read = tb_socket_urecv(looker->sock, host, TB_DNS_HOST_PORT, rpkt, 4096);
+		tb_long_t read = tb_socket_urecv(looker->sock, addr, TB_DNS_HOST_PORT, rpkt, 4096);
 		//tb_trace_impl("read %d", read);
 		tb_assert_and_check_return_val(read >= 0, -1);
 
@@ -544,19 +514,19 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 	tb_dns_looker_t* looker = tb_malloc0(sizeof(tb_dns_looker_t));
 	tb_assert_and_check_return_val(looker, tb_null);
 
+	// dump server
+//	tb_dns_server_dump();
+
 	// get the dns server list
 	looker->maxn = tb_dns_server_get(looker->list);
-	tb_assert_and_check_goto(looker->maxn, fail);
-
-	// init host
-	if (!tb_sstring_init(&looker->host, looker->data, TB_DNS_LOOKER_HOST_MAXN)) goto fail;
+	tb_assert_and_check_goto(looker->maxn && looker->maxn <= 2, fail);
 
 	// init name
-	if (!tb_sstring_init(&looker->name, looker->data + TB_DNS_LOOKER_HOST_MAXN, TB_DNS_NAME_MAXN)) goto fail;
+	if (!tb_sstring_init(&looker->name, looker->data, TB_DNS_NAME_MAXN)) goto fail;
 	tb_sstring_cstrcpy(&looker->name, name);
 
 	// init rpkt
-	if (!tb_sbuffer_init(&looker->rpkt, looker->data + TB_DNS_LOOKER_HOST_MAXN + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
+	if (!tb_sbuffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
 
 	// init sock
 	looker->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
@@ -600,14 +570,11 @@ fail:
 	if (looker->itor + 1 <= looker->maxn) looker->itor++;
 	else looker->itor = 0;
 
-	// try next host
+	// has next?
 	if (looker->itor)
 	{
 		// reset step, no event now, need not wait
 		looker->step = TB_DNS_LOOKER_STEP_NONE | TB_DNS_LOOKER_STEP_NEVT;
-
-		// reset host
-		tb_sstring_clear(&looker->host);
 
 		// reset rpkt
 		looker->size = 0;

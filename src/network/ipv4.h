@@ -36,7 +36,10 @@
 /// the ipv4
 typedef union __tb_ipv4_t
 {
+	// u32 for bigendian
 	tb_uint32_t u32;
+
+	// bytes
 	tb_uint8_t 	u8[4];
 
 }tb_ipv4_t;
