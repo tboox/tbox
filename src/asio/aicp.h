@@ -165,10 +165,16 @@ typedef struct __tb_aicp_t
 	tb_atomic_t 			work;
 
 	/// the aico pool
-	tb_handle_t 			pool;
+	tb_handle_t 			aico_pool;
 
-	/// the pool lock
-	tb_spinlock_t 			lock;
+	/// the aico lock
+	tb_spinlock_t 			aico_lock;
+
+	/// the addr pool
+	tb_handle_t 			addr_pool;
+
+	/// the addr lock
+	tb_spinlock_t 			addr_lock;
 
 }tb_aicp_t;
 

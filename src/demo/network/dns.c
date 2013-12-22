@@ -93,8 +93,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_dns_server_add("202.96.128.166");
 	tb_dns_server_add("202.96.209.134");
 	tb_dns_server_add("221.12.65.228");
-	tb_dns_server_sort();
 #endif
+
+	// sort
+	tb_dns_server_sort();
 
 	// dump
 #ifdef __tb_debug__

@@ -73,9 +73,6 @@ typedef struct __tb_dns_looker_t
 	// the tryn
 	tb_size_t 			tryn;
 
-	// try the next host?
-	tb_bool_t 			next;
-
 	// the socket
 	tb_handle_t 		sock;
 
@@ -519,7 +516,7 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 
 	// get the dns server list
 	looker->maxn = tb_dns_server_get(looker->list);
-	tb_assert_and_check_goto(looker->maxn && looker->maxn <= 2, fail);
+	tb_assert_and_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
 
 	// init name
 	if (!tb_sstring_init(&looker->name, looker->data, TB_DNS_NAME_MAXN)) goto fail;

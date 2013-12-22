@@ -717,7 +717,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 
 	// trace
-	tb_trace_impl("urecv[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, aice->u.urecv.addr.u8[0], aice->u.urecv.addr.u8[1], aice->u.urecv.addr.u8[2], aice->u.urecv.addr.u8[3], aice->u.urecv.port, recv);
+	tb_trace_impl("urecv[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.port, recv);
 
 	// no recv? 
 	if (!recv) 
@@ -783,7 +783,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 
 	// trace
-	tb_trace_impl("usend[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, aice->u.usend.addr.u8[0], aice->u.usend.addr.u8[1], aice->u.usend.addr.u8[2], aice->u.usend.addr.u8[3], aice->u.usend.port, send);
+	tb_trace_impl("usend[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.port, send);
 
 	// no send? 
 	if (!send) 
@@ -937,7 +937,7 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
 
 	// trace
-	tb_trace_impl("urecvv[%p]: %lu", aico->base.handle, real);
+	tb_trace_impl("urecvv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecvv.addr), aice->u.urecvv.port, real);
 
 	// ok? 
 	if (real > 0) 
@@ -987,7 +987,7 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.port, aice->u.usendv.list, aice->u.usendv.size);
 
 	// trace
-	tb_trace_impl("usendv[%p]: %lu", aico->base.handle, real);
+	tb_trace_impl("usendv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usendv.addr), aice->u.usendv.port, real);
 
 	// ok? 
 	if (real > 0) 
