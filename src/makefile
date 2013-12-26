@@ -100,6 +100,7 @@ tbox_C_FILES 			+= \
 						asio/aice \
 						asio/aiop \
 						asio/aicp \
+						asio/pool \
 						asio/addr \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
@@ -290,8 +291,13 @@ INC_FILES 				= \
 						asio/asio.h \
 						asio/prefix.h \
 						asio/aioo.h \
+						asio/aioe.h \
 						asio/aiop.h \
 						asio/aicp.h \
+						asio/aico.h \
+						asio/aice.h \
+						asio/pool.h \
+						asio/addr.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \

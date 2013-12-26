@@ -104,8 +104,8 @@ typedef struct __tb_aiop_aico_t
  */
 static tb_handle_t 	tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor);
 static tb_void_t 	tb_aicp_file_exit(tb_handle_t file);
-static tb_bool_t 	tb_aicp_file_addo(tb_handle_t file, tb_aico_t* aico);
-static tb_bool_t 	tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico);
+static tb_aico_t* 	tb_aicp_file_addo(tb_handle_t file, tb_handle_t handle);
+static tb_void_t 	tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico);
 static tb_bool_t 	tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice);
 static tb_long_t 	tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice);
 static tb_void_t 	tb_aicp_file_kill(tb_handle_t file);
@@ -1204,44 +1204,60 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+static tb_aico_t* tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->aiop && aico, tb_false);
-			
-	// the aiop aico
-	tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
-
-	// init ptor
-	aiop_aico->ptor = ptor;
-
+	tb_assert_and_check_return_val(ptor && ptor->aiop && proactor->aicp, tb_null);
+		
 	// done
-	tb_bool_t ok = tb_false;
-	switch (aico->type)
+	tb_aico_t* aico = tb_null;
+	switch (type)
 	{
 	case TB_AICO_TYPE_SOCK:
 		{
 			// check
-			tb_assert_and_check_break(aico->handle);
+			tb_assert_and_check_break(handle);
 
-			// ok
-			ok = tb_true;
+			// make aico
+			aico = (tb_aico_t*)tb_aicp_pool_malloc0(proactor->aicp, sizeof(tb_aiop_aico_t));
+			tb_assert_and_check_break(aico);
+
+			// init aico
+			aico->aicp = proactor->aicp;
+			aico->type = TB_AICO_TYPE_SOCK;
+			aico->handle = handle;
+
+			// init timeout 
+			tb_size_t i = 0;
+			tb_size_t n = tb_arrayn(aico->timeout);
+			for (i = 0; i < n; i++) aico->timeout[i] = -1;
+	
+			// init ptor
+			((tb_aiop_aico_t*)aico)->ptor = ptor;
 		}
 		break;
 	case TB_AICO_TYPE_FILE:
 		{
 			// check
-			tb_assert_and_check_break(ptor->file && aico->handle);
+			tb_assert_and_check_break(ptor->file && handle);
 
 			// file: addo
-			ok = tb_aicp_file_addo(ptor->file, aico);
+			aico = tb_aicp_file_addo(ptor->file, handle);
 		}
 		break;
 	case TB_AICO_TYPE_TASK:
 		{
-			// ok
-			ok = tb_true;
+			// make aico
+			aico = (tb_aico_t*)tb_aicp_pool_malloc0(proactor->aicp, sizeof(tb_aiop_aico_t));
+			tb_assert_and_check_break(aico);
+
+			// init aico
+			aico->aicp = proactor->aicp;
+			aico->type = TB_AICO_TYPE_TASK;	
+
+			// init ptor
+			((tb_aiop_aico_t*)aico)->ptor = ptor;
 		}
 		break;
 	default:
@@ -1249,24 +1265,23 @@ static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_aic
 	}
 
 	// ok?
-	return ok;
+	return aico;
 }
-static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+static tb_void_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->timer && aico, tb_false);
-
-	// the aiop aico
-	tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
-	aiop_aico->ptor = tb_null;
+	tb_assert_and_check_return(ptor && ptor->aiop && proactor->aicp && ptor->timer && aico);
 
 	// done
-	tb_bool_t ok = tb_false;
 	switch (aico->type)
 	{
 	case TB_AICO_TYPE_SOCK:
 		{
+			// the aiop aico
+			tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+			aiop_aico->ptor = tb_null;
+
 			// del the timeout task
 			if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
 			aiop_aico->task = tb_null;
@@ -1275,8 +1290,8 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 			if (aiop_aico->aioo) tb_aiop_delo(ptor->aiop, aiop_aico->aioo);
 			aiop_aico->aioo = tb_null;
 
-			// ok
-			ok = tb_true;
+			// exit aico
+			tb_aicp_pool_free(proactor->aicp, aico);
 		}
 		break;
 	case TB_AICO_TYPE_FILE:
@@ -1285,25 +1300,26 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 			tb_assert_and_check_break(ptor->file);
 
 			// file: delo
-			ok = tb_aicp_file_delo(ptor->file, aico);
+			tb_aicp_file_delo(ptor->file, aico);
 		}
 		break;
 	case TB_AICO_TYPE_TASK:
 		{
+			// the aiop aico
+			tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
+			aiop_aico->ptor = tb_null;
+
 			// del the timeout task
 			if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
 			aiop_aico->task = tb_null;
 
-			// ok
-			ok = tb_true;
+			// exit aico
+			tb_aicp_pool_free(proactor->aicp, aico);
 		}
 		break;
 	default:
 		break;
 	}
-	
-	// ok?
-	return ok;
 }
 static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
@@ -1555,7 +1571,6 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 
 	// init base
 	ptor->base.aicp 		= aicp;
-	ptor->base.step 		= sizeof(tb_aiop_aico_t);
 	ptor->base.kill 		= tb_aicp_proactor_aiop_kill;
 	ptor->base.exit 		= tb_aicp_proactor_aiop_exit;
 	ptor->base.addo 		= tb_aicp_proactor_aiop_addo;

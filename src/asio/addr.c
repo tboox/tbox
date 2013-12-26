@@ -33,6 +33,7 @@
 #include "addr.h"
 #include "aico.h"
 #include "aicp.h"
+#include "pool.h"
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -41,10 +42,7 @@
 static tb_aicp_addr_impl_t* tb_aicp_addr_impl_init(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->aico_pool && aice, tb_null);
-
-	// enter 
-	tb_spinlock_enter(&aicp->addr_lock);
+	tb_assert_and_check_return_val(aicp && aice, tb_null);
 
 	// done
 	tb_bool_t 				ok = tb_false;
@@ -52,7 +50,7 @@ static tb_aicp_addr_impl_t* tb_aicp_addr_impl_init(tb_aicp_t* aicp, tb_aice_t co
 	do
 	{
 		// make impl
-		impl = (tb_aicp_addr_impl_t*)tb_rpool_malloc0(aicp->addr_pool);
+		impl = (tb_aicp_addr_impl_t*)tb_aicp_pool_malloc0(aicp, sizeof(tb_aicp_addr_impl_t));
 		tb_assert_and_check_break(impl);
 	
 		// init aice
@@ -71,29 +69,20 @@ static tb_aicp_addr_impl_t* tb_aicp_addr_impl_init(tb_aicp_t* aicp, tb_aice_t co
 	// failed? exit it
 	if (!ok)
 	{
-		if (impl) tb_rpool_free(aicp->addr_pool, impl);
+		if (impl) tb_aicp_pool_free(aicp, impl);
 		impl = tb_null;
 	}
 
-	// leave 
-	tb_spinlock_leave(&aicp->addr_lock);
-	
 	// ok?
 	return impl;
 }
 static tb_void_t tb_aicp_addr_impl_exit(tb_aicp_t* aicp, tb_aicp_addr_impl_t* impl)
 {
 	// check
-	tb_assert_and_check_return(aicp && aicp->addr_pool);
-
-	// enter 
-	tb_spinlock_enter(&aicp->addr_lock);
+	tb_assert_and_check_return(aicp && aicp);
 
 	// exit it
-	if (impl) tb_rpool_free(aicp->addr_pool, impl);
-
-	// leave 
-	tb_spinlock_leave(&aicp->addr_lock);
+	if (impl) tb_aicp_pool_free(aicp, impl);
 }
 
 /* ///////////////////////////////////////////////////////////////////////

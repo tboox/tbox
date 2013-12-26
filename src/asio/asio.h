@@ -34,6 +34,7 @@
 #include "aico.h"
 #include "aice.h"
 #include "aicp.h"
+#include "pool.h"
 
 
 #endif
