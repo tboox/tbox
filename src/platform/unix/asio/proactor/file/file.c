@@ -45,13 +45,33 @@ static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 static tb_void_t tb_aicp_file_exit(tb_handle_t file)
 {
 }
-static tb_bool_t tb_aicp_file_addo(tb_handle_t file, tb_aico_t* aico)
+static tb_aico_t* tb_aicp_file_addo(tb_handle_t file, tb_handle_t handle)
 {
-	return tb_true;
+	// check
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
+	tb_assert_and_check_return_val(ptor && ptor->base.aicp && handle, tb_null);
+
+	// make aico
+	tb_aico_t* aico = (tb_aico_t*)tb_aicp_pool_malloc0(ptor->base.aicp, sizeof(tb_aico_t));
+	tb_assert_and_check_return_val(aico, tb_null);
+
+	// init aico
+	aico->aicp = ptor->base.aicp;
+	aico->type = TB_AICO_TYPE_FILE;
+	aico->handle = handle;
+
+	// ok
+	return aico;
 }
-static tb_bool_t tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico)
+static tb_void_t tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico)
 {
-	return tb_true;
+	// check
+	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
+	tb_assert_and_check_return(ptor && ptor->base.aicp);
+
+	// exit aico
+	if (aico) tb_aicp_pool_free(ptor->base.aicp, aico);
+	aico = tb_null;
 }
 static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 {

@@ -25,6 +25,7 @@
  */
 #include <sys/epoll.h>
 #include <fcntl.h>
+#include <errno.h>
 #ifndef TB_CONFIG_OS_ANDROID
 # 	include <sys/unistd.h>
 #endif
@@ -147,6 +148,11 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 	
 	// wait events
 	tb_long_t evtn = epoll_wait(rtor->epfd, rtor->evts, rtor->evtn, timeout);
+
+	// interrupted?(for gdb?) continue it
+	if (evtn < 0 && errno == EINTR) return 0;
+
+	// check error?
 	tb_assert_and_check_return_val(evtn >= 0 && evtn <= rtor->evtn, -1);
 	
 	// timeout?

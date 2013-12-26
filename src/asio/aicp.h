@@ -44,9 +44,6 @@ typedef struct __tb_aicp_proactor_t
 	/// aicp
 	struct __tb_aicp_t* 	aicp;
 
-	/// step
-	tb_size_t 				step;
-
 	/// kill
 	tb_void_t 				(*kill)(struct __tb_aicp_proactor_t* proactor);
 
@@ -54,10 +51,10 @@ typedef struct __tb_aicp_proactor_t
 	tb_void_t 				(*exit)(struct __tb_aicp_proactor_t* proactor);
 
 	/// addo
-	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
+	tb_aico_t* 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type);
 
 	/// delo
-	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
+	tb_void_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
 
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
@@ -76,22 +73,25 @@ typedef struct __tb_aicp_proactor_t
 /*! the aico pool type
  *
  * <pre>
- *
- * init:                      ...
+ *       |------------------------------------------------|
+ * aict: |  addr  | http | file | ...                     | <= the asio call transmitter
+ *       '------------------------------------------------'
+ *                             |
+ * init:                    [aicp]
  *                             |
  *       |------------------------------------------------|
  * addo: | aico0   aico1   aico2   aico3      ...         | <= sock, file, and task aico
  *       '------------------------------------------------'
  *                             | 
- *                            ...
+ *                          [aicp]
  *                             |
  * post: |------------------------------------------------| <= only post one aice for the same aico util the aice is finished
  * aice: | aice0   aice1   aice2   aice3      ...         | <---------------------------------------------------------------------------------
  *       '------------------------------------------------'                                                                                  |
  *                             |                                                                                                             |
- *                             |                                                                                                             |
+ *                          [aicp]                                                                                                             |
  *                             |         <= input aices                                                                                      |
- *                             |                                                                                                             |
+ *                             |                                                                                             |
  *                             '--------------------------------------------------------------                                               | 
  *                                                                |                          |                                               |
  *       |--------------------------------------------------------------------------------------------------|                                |
@@ -162,17 +162,11 @@ typedef struct __tb_aicp_t
 	/// the worker size
 	tb_atomic_t 			work;
 
-	/// the aico pool
-	tb_handle_t 			aico_pool;
+	/// the pool
+	tb_handle_t 			pool;
 
-	/// the aico lock
-	tb_spinlock_t 			aico_lock;
-
-	/// the addr pool
-	tb_handle_t 			addr_pool;
-
-	/// the addr lock
-	tb_spinlock_t 			addr_lock;
+	/// the pool lock
+	tb_spinlock_t 			lock;
 
 }tb_aicp_t;
 
