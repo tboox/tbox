@@ -27,6 +27,5 @@
  * includes
  */
 #include "../prefix.h"
-#include "../../../../asio/pool.h"
 
 #endif

@@ -7,22 +7,22 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_sock_addr_func(tb_aice_t const* aice)
+static tb_bool_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
+	tb_assert_and_check_return_val(haddr, tb_false);
 
 	// addr ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (addr)
 	{
 		// trace
-		tb_print("addr[%p]: host: %s, addr: %u.%u.%u.%u", aice->aico, aice->u.addr.host, aice->u.addr.addr.u8[0], aice->u.addr.addr.u8[1], aice->u.addr.addr.u8[2], aice->u.addr.addr.u8[3]);
+		tb_print("addr[%s]: %u.%u.%u.%u", tb_aicp_addr_host(haddr), addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 	}
 	// timeout or failed?
 	else
 	{
 		// trace
-		tb_print("addr[%p]: host: %s, state: %s", aice->aico, aice->u.addr.host, tb_aice_state_cstr(aice));
+		tb_print("addr[%s]: failed");
 	}
 
 	// end
@@ -42,20 +42,15 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 	// init
 	tb_handle_t 		aicp = tb_null;
-	tb_handle_t 		sock = tb_null;
-	tb_handle_t 		aico = tb_null;
+	tb_handle_t 		addr = tb_null;
 
 	// init aicp
 	aicp = tb_aicp_init(2);
 	tb_assert_and_check_goto(aicp, end);
 
-	// init sock
-	sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
-	tb_assert_and_check_goto(sock, end);
-
-	// addo sock
-	aico = tb_aico_init_sock(aicp, sock);
-	tb_assert_and_check_goto(aico, end);
+	// init addr
+	addr = tb_aicp_addr_init(aicp, argv[1], tb_demo_sock_addr_func, tb_null);
+	tb_assert_and_check_goto(addr, end);
 
 	// sort server 
 	tb_dns_server_sort();
@@ -66,8 +61,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// trace
 	tb_print("addr: %s: ..", argv[1]);
 
-	// post addr
-	if (!tb_aico_addr(aico, argv[1], tb_demo_sock_addr_func, tb_null)) goto end;
+	// done addr
+	tb_aicp_addr_done(addr);
 
 	// loop aicp
 	tb_aicp_loop(aicp);
@@ -83,11 +78,11 @@ end:
 	// trace
 	tb_print("end");
 
+	// exit addr
+	if (addr) tb_aicp_addr_exit(addr);
+
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
-
-	// exit sock
-	if (sock) tb_socket_close(sock);
 
 	// exit tbox
 	tb_exit();

@@ -27,7 +27,6 @@
  */
 #include "pool.h"
 #include "aico.h"
-#include "aicp.h"
 #include "../memory/memory.h"
 #include "../platform/platform.h"
 
@@ -35,168 +34,134 @@
  * implementation
  */
 #ifndef __tb_debug__
-tb_pointer_t tb_aicp_pool_malloc_impl(tb_aicp_t* aicp, tb_size_t size)
+tb_pointer_t tb_aico_pool_malloc_impl(tb_aico_t* aico, tb_size_t size)
 #else
-tb_pointer_t tb_aicp_pool_malloc_impl(tb_aicp_t* aicp, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_aico_pool_malloc_impl(tb_aico_t* aico, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_null);
+	tb_assert_and_check_return_val(aico, tb_null);
 
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	// init pool
+	if (!aico->pool) aico->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+	tb_assert_and_check_return_val(aico->pool, tb_null);
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_spool_malloc_impl(aicp->pool, size);
+	tb_byte_t* p = tb_spool_malloc_impl(aico->pool, size);
 #else
-	tb_byte_t* p = tb_spool_malloc_impl(aicp->pool, size, func, line, file);
+	tb_byte_t* p = tb_spool_malloc_impl(aico->pool, size, func, line, file);
 #endif
-
-	// check
-	tb_assert(p);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return p;
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_aicp_pool_malloc0_impl(tb_aicp_t* aicp, tb_size_t size)
+tb_pointer_t tb_aico_pool_malloc0_impl(tb_aico_t* aico, tb_size_t size)
 #else
-tb_pointer_t tb_aicp_pool_malloc0_impl(tb_aicp_t* aicp, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_aico_pool_malloc0_impl(tb_aico_t* aico, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_null);
+	tb_assert_and_check_return_val(aico, tb_null);
 
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	// init pool
+	if (!aico->pool) aico->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+	tb_assert_and_check_return_val(aico->pool, tb_null);
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_spool_malloc0_impl(aicp->pool, size);
+	tb_byte_t* p = tb_spool_malloc0_impl(aico->pool, size);
 #else
-	tb_byte_t* p = tb_spool_malloc0_impl(aicp->pool, size, func, line, file);
+	tb_byte_t* p = tb_spool_malloc0_impl(aico->pool, size, func, line, file);
 #endif
-
-	// check
-	tb_assert(p);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return p;
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_aicp_pool_nalloc_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_aico_pool_nalloc_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_aicp_pool_nalloc_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_aico_pool_nalloc_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_null);
+	tb_assert_and_check_return_val(aico, tb_null);
 
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	// init pool
+	if (!aico->pool) aico->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+	tb_assert_and_check_return_val(aico->pool, tb_null);
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_spool_nalloc_impl(aicp->pool, item, size);
+	tb_byte_t* p = tb_spool_nalloc_impl(aico->pool, item, size);
 #else
-	tb_byte_t* p = tb_spool_nalloc_impl(aicp->pool, item, size, func, line, file);
+	tb_byte_t* p = tb_spool_nalloc_impl(aico->pool, item, size, func, line, file);
 #endif
-
-	// check
-	tb_assert(p);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return p;
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_aicp_pool_nalloc0_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size)
+tb_pointer_t tb_aico_pool_nalloc0_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size)
 #else
-tb_pointer_t tb_aicp_pool_nalloc0_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_aico_pool_nalloc0_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_null);
+	tb_assert_and_check_return_val(aico, tb_null);
 
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	// init pool
+	if (!aico->pool) aico->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+	tb_assert_and_check_return_val(aico->pool, tb_null);
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_spool_nalloc0_impl(aicp->pool, item, size);
+	tb_byte_t* p = tb_spool_nalloc0_impl(aico->pool, item, size);
 #else
-	tb_byte_t* p = tb_spool_nalloc0_impl(aicp->pool, item, size, func, line, file);
+	tb_byte_t* p = tb_spool_nalloc0_impl(aico->pool, item, size, func, line, file);
 #endif
-
-	// check
-	tb_assert(p);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return p;
 }
 
 #ifndef __tb_debug__
-tb_pointer_t tb_aicp_pool_ralloc_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_aico_pool_ralloc_impl(tb_aico_t* aico, tb_pointer_t data, tb_size_t size)
 #else
-tb_pointer_t tb_aicp_pool_ralloc_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_pointer_t tb_aico_pool_ralloc_impl(tb_aico_t* aico, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_null);
+	tb_assert_and_check_return_val(aico, tb_null);
 
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	// init pool
+	if (!aico->pool) aico->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+	tb_assert_and_check_return_val(aico->pool, tb_null);
 
 #ifndef __tb_debug__
-	tb_byte_t* p = tb_spool_ralloc_impl(aicp->pool, data, size);
+	tb_byte_t* p = tb_spool_ralloc_impl(aico->pool, data, size);
 #else
-	tb_byte_t* p = tb_spool_ralloc_impl(aicp->pool, data, size, func, line, file);
+	tb_byte_t* p = tb_spool_ralloc_impl(aico->pool, data, size, func, line, file);
 #endif
-
-	// check
-	tb_assert(p);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return p;
 }
 
 #ifndef __tb_debug__
-tb_bool_t tb_aicp_pool_free_impl(tb_aicp_t* aicp, tb_pointer_t data)
+tb_bool_t tb_aico_pool_free_impl(tb_aico_t* aico, tb_pointer_t data)
 #else
-tb_bool_t tb_aicp_pool_free_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
+tb_bool_t tb_aico_pool_free_impl(tb_aico_t* aico, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
 #endif
 {
 	// check 
-	tb_assert_and_check_return_val(aicp && aicp->pool, tb_false);
-
-	// enter
-	tb_spinlock_enter(&aicp->lock);
+	tb_assert_and_check_return_val(aico && aico->pool, tb_false);
 
 #ifndef __tb_debug__
-	tb_bool_t r = tb_spool_free_impl(aicp->pool, data);
+	tb_bool_t r = tb_spool_free_impl(aico->pool, data);
 #else
-	tb_bool_t r = tb_spool_free_impl(aicp->pool, data, func, line, file);
+	tb_bool_t r = tb_spool_free_impl(aico->pool, data, func, line, file);
 #endif
-
-	// check
-	tb_assert(r);
-
-	// leave
-	tb_spinlock_leave(&aicp->lock);
 
 	// ok?
 	return r;

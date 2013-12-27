@@ -27,35 +27,35 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "aicp.h"
+#include "aico.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
 #ifdef __tb_debug__
-#	define tb_aicp_pool_malloc(aicp, size) 				tb_aicp_pool_malloc_impl(aicp, size, __tb_func__, __tb_line__, __tb_file__)
-#	define tb_aicp_pool_malloc0(aicp, size) 			tb_aicp_pool_malloc0_impl(aicp, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_malloc(aico, size) 				tb_aico_pool_malloc_impl(aico, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_malloc0(aico, size) 			tb_aico_pool_malloc0_impl(aico, size, __tb_func__, __tb_line__, __tb_file__)
 
-#	define tb_aicp_pool_nalloc(aicp, item, size) 		tb_aicp_pool_nalloc_impl(aicp, item, size, __tb_func__, __tb_line__, __tb_file__)
-#	define tb_aicp_pool_nalloc0(aicp, item, size) 		tb_aicp_pool_nalloc0_impl(aicp, item, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_nalloc(aico, item, size) 		tb_aico_pool_nalloc_impl(aico, item, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_nalloc0(aico, item, size) 		tb_aico_pool_nalloc0_impl(aico, item, size, __tb_func__, __tb_line__, __tb_file__)
 
-#	define tb_aicp_pool_strdup(aicp, data) 				tb_aicp_pool_strdup_impl(aicp, data, __tb_func__, __tb_line__, __tb_file__)
-#	define tb_aicp_pool_strndup(aicp, data, size) 		tb_aicp_pool_strndup_impl(aicp, data, size, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_strdup(aico, data) 				tb_aico_pool_strdup_impl(aico, data, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_strndup(aico, data, size) 		tb_aico_pool_strndup_impl(aico, data, size, __tb_func__, __tb_line__, __tb_file__)
 
-#	define tb_aicp_pool_ralloc(aicp, data, size) 		tb_aicp_pool_ralloc_impl(aicp, data, size, __tb_func__, __tb_line__, __tb_file__)
-# 	define tb_aicp_pool_free(aicp, data) 				tb_aicp_pool_free_impl(aicp, data, __tb_func__, __tb_line__, __tb_file__)
+#	define tb_aico_pool_ralloc(aico, data, size) 		tb_aico_pool_ralloc_impl(aico, data, size, __tb_func__, __tb_line__, __tb_file__)
+# 	define tb_aico_pool_free(aico, data) 				tb_aico_pool_free_impl(aico, data, __tb_func__, __tb_line__, __tb_file__)
 #else
-#	define tb_aicp_pool_malloc(aicp, size) 				tb_aicp_pool_malloc_impl(aicp, size)
-#	define tb_aicp_pool_malloc0(aicp, size) 			tb_aicp_pool_malloc0_impl(aicp, size)
+#	define tb_aico_pool_malloc(aico, size) 				tb_aico_pool_malloc_impl(aico, size)
+#	define tb_aico_pool_malloc0(aico, size) 			tb_aico_pool_malloc0_impl(aico, size)
 
-#	define tb_aicp_pool_nalloc(aicp, item, size) 		tb_aicp_pool_nalloc_impl(aicp, item, size)
-#	define tb_aicp_pool_nalloc0(aicp, item, size) 		tb_aicp_pool_nalloc0_impl(aicp, item, size)
+#	define tb_aico_pool_nalloc(aico, item, size) 		tb_aico_pool_nalloc_impl(aico, item, size)
+#	define tb_aico_pool_nalloc0(aico, item, size) 		tb_aico_pool_nalloc0_impl(aico, item, size)
 
-#	define tb_aicp_pool_strdup(aicp, data) 				tb_aicp_pool_strdup_impl(aicp, data)
-#	define tb_aicp_pool_strndup(aicp, data, size) 		tb_aicp_pool_strndup_impl(aicp, data, size)
+#	define tb_aico_pool_strdup(aico, data) 				tb_aico_pool_strdup_impl(aico, data)
+#	define tb_aico_pool_strndup(aico, data, size) 		tb_aico_pool_strndup_impl(aico, data, size)
 
-#	define tb_aicp_pool_ralloc(aicp, data, size) 		tb_aicp_pool_ralloc_impl(aicp, data, size)
-# 	define tb_aicp_pool_free(aicp, data) 				tb_aicp_pool_free_impl(aicp, data)
+#	define tb_aico_pool_ralloc(aico, data, size) 		tb_aico_pool_ralloc_impl(aico, data, size)
+# 	define tb_aico_pool_free(aico, data) 				tb_aico_pool_free_impl(aico, data)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -64,58 +64,58 @@
 
 // malloc
 #ifndef __tb_debug__
-tb_pointer_t 	tb_aicp_pool_malloc_impl(tb_aicp_t* aicp, tb_size_t size);
+tb_pointer_t 	tb_aico_pool_malloc_impl(tb_aico_t* aico, tb_size_t size);
 #else
-tb_pointer_t 	tb_aicp_pool_malloc_impl(tb_aicp_t* aicp, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_aico_pool_malloc_impl(tb_aico_t* aico, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // malloc0
 #ifndef __tb_debug__
-tb_pointer_t 	tb_aicp_pool_malloc0_impl(tb_aicp_t* aicp, tb_size_t size);
+tb_pointer_t 	tb_aico_pool_malloc0_impl(tb_aico_t* aico, tb_size_t size);
 #else
-tb_pointer_t 	tb_aicp_pool_malloc0_impl(tb_aicp_t* aicp, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_aico_pool_malloc0_impl(tb_aico_t* aico, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc
 #ifndef __tb_debug__
-tb_pointer_t  	tb_aicp_pool_nalloc_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size);
+tb_pointer_t  	tb_aico_pool_nalloc_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size);
 #else
-tb_pointer_t  	tb_aicp_pool_nalloc_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_aico_pool_nalloc_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // nalloc0
 #ifndef __tb_debug__
-tb_pointer_t  	tb_aicp_pool_nalloc0_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size);
+tb_pointer_t  	tb_aico_pool_nalloc0_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size);
 #else
-tb_pointer_t  	tb_aicp_pool_nalloc0_impl(tb_aicp_t* aicp, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_pointer_t  	tb_aico_pool_nalloc0_impl(tb_aico_t* aico, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 // ralloc
 #ifndef __tb_debug__
-tb_pointer_t 	tb_aicp_pool_ralloc_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_size_t size);
+tb_pointer_t 	tb_aico_pool_ralloc_impl(tb_aico_t* aico, tb_pointer_t data, tb_size_t size);
 #else
-tb_pointer_t 	tb_aicp_pool_ralloc_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_aico_pool_ralloc_impl(tb_aico_t* aico, tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 #endif
 
 // strdup
 #ifndef __tb_debug__
-tb_char_t* 		tb_aicp_pool_strdup_impl(tb_aicp_t* aicp, tb_char_t const* data);
+tb_char_t* 		tb_aico_pool_strdup_impl(tb_aico_t* aico, tb_char_t const* data);
 #else
-tb_char_t* 		tb_aicp_pool_strdup_impl(tb_aicp_t* aicp, tb_char_t const* data, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_char_t* 		tb_aico_pool_strdup_impl(tb_aico_t* aico, tb_char_t const* data, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 #endif
 
 // strndup
 #ifndef __tb_debug__
-tb_char_t* 		tb_aicp_pool_strndup_impl(tb_aicp_t* aicp, tb_char_t const* data, tb_size_t size);
+tb_char_t* 		tb_aico_pool_strndup_impl(tb_aico_t* aico, tb_char_t const* data, tb_size_t size);
 #else
-tb_char_t* 		tb_aicp_pool_strndup_impl(tb_aicp_t* aicp, tb_char_t const* data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_char_t* 		tb_aico_pool_strndup_impl(tb_aico_t* aico, tb_char_t const* data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
 #endif
 
 // free
 #ifndef __tb_debug__
-tb_bool_t 		tb_aicp_pool_free_impl(tb_aicp_t* aicp, tb_pointer_t data);
+tb_bool_t 		tb_aico_pool_free_impl(tb_aico_t* aico, tb_pointer_t data);
 #else
-tb_bool_t 		tb_aicp_pool_free_impl(tb_aicp_t* aicp, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
+tb_bool_t 		tb_aico_pool_free_impl(tb_aico_t* aico, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
 #endif
 
 #endif
