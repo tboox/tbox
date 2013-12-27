@@ -215,6 +215,9 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
+	// check post
+	tb_assert(aico? !tb_atomic_get(&((tb_aico_t*)aico)->post) : 0);
+
 	// delo
 	if (aicp->ptor->delo(aicp->ptor, aico))
 		tb_aicp_aico_exit(aicp, aico);

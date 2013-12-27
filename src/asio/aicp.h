@@ -232,7 +232,7 @@ tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
  */
 tb_void_t 			tb_aicp_loop(tb_aicp_t* aicp);
 
-/*! kill the spak
+/*! kill the spak 
  *
  * @param aicp 		the aicp
  */

@@ -467,6 +467,9 @@ tb_size_t tb_dns_server_get(tb_ipv4_t addr[2])
 	// leave
 	tb_spinlock_leave(&g_lock);
 
+	// trace
+	if (!ok) tb_trace("[dns]: no server!");
+
 	// ok?
 	return ok;
 }
