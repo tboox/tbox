@@ -39,6 +39,61 @@
 tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp);
 
 /* ///////////////////////////////////////////////////////////////////////
+ * aico
+ */
+static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->pool && type, tb_null);
+
+	// enter 
+	tb_spinlock_enter(&aicp->lock);
+
+	// make aico
+	tb_aico_t* aico = (tb_aico_t*)tb_rpool_malloc0(aicp->pool);
+
+	// init aico
+	if (aico)
+	{
+		aico->aicp 		= aicp;
+		aico->type 		= type;
+		aico->handle 	= handle;
+		aico->pool 		= tb_null;
+
+		// init timeout 
+		tb_size_t i = 0;
+		tb_size_t n = tb_arrayn(aico->timeout);
+		for (i = 0; i < n; i++) aico->timeout[i] = -1;
+	}
+
+	// leave 
+	tb_spinlock_leave(&aicp->lock);
+	
+	// ok?
+	return aico;
+}
+static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
+{
+	// check
+	tb_assert_and_check_return(aicp && aicp->pool);
+
+	// enter 
+	tb_spinlock_enter(&aicp->lock);
+
+	if (aico) 
+	{
+		// exit pool
+		if (aico->pool) tb_spool_exit(aico->pool);
+		aico->pool = tb_null;
+
+		// exit it
+		tb_rpool_free(aicp->pool, aico);
+	}
+
+	// leave 
+	tb_spinlock_leave(&aicp->lock);
+}
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 tb_aicp_t* tb_aicp_init(tb_size_t maxn)
@@ -78,10 +133,10 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 
 	// init proactor
 	aicp->ptor = tb_aicp_proactor_init(aicp);
-	tb_assert_and_check_goto(aicp->ptor, fail);
+	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
 
-	// init pool
-	aicp->pool = tb_spool_init(((maxn >> 2) + 16) * TB_SPOOL_GROW_MICRO, 0);
+	// init aico pool
+	aicp->pool = tb_rpool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
 	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// ok
@@ -112,7 +167,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 
 		// exit aico pool
 		tb_spinlock_enter(&aicp->lock);
-		if (aicp->pool) tb_spool_exit(aicp->pool);
+		if (aicp->pool) tb_rpool_exit(aicp->pool);
 		aicp->pool = tb_null;
 		tb_spinlock_leave(&aicp->lock);
 
@@ -128,8 +183,32 @@ tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->addo && type, tb_null);
 
-	// ado
-	return (tb_handle_t)aicp->ptor->addo(aicp->ptor, handle, type);
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_aico_t* 	aico = tb_null;
+	do
+	{
+		// init aico
+		aico = tb_aicp_aico_init(aicp, handle, type);
+		tb_assert_and_check_break(aico);
+
+		// addo aico
+		if (!aicp->ptor->addo(aicp->ptor, aico)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? remove aico
+	if (!ok && aico) 
+	{
+		tb_aicp_aico_exit(aicp, aico);
+		aico = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)aico;
 }
 tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 {
@@ -137,16 +216,13 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
 	// delo
-	aicp->ptor->delo(aicp->ptor, aico);
+	if (aicp->ptor->delo(aicp->ptor, aico))
+		tb_aicp_aico_exit(aicp, aico);
 }
 tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
-
-	// post addr? 
-	if (aice->code == TB_AICE_CODE_ADDR && aice->state == TB_AICE_STATE_PENDING)
-		return tb_aicp_post_addr_impl(aicp, aice);
 
 	// check post
 	tb_assert_return_val(aice->aico? !tb_atomic_fetch_and_inc(&aice->aico->post) : 0, tb_false);

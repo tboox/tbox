@@ -44,6 +44,9 @@ typedef struct __tb_aicp_proactor_t
 	/// aicp
 	struct __tb_aicp_t* 	aicp;
 
+	/// the aico step
+	tb_size_t 				step;
+
 	/// kill
 	tb_void_t 				(*kill)(struct __tb_aicp_proactor_t* proactor);
 
@@ -51,11 +54,11 @@ typedef struct __tb_aicp_proactor_t
 	tb_void_t 				(*exit)(struct __tb_aicp_proactor_t* proactor);
 
 	/// addo
-	tb_aico_t* 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_handle_t handle, tb_size_t type);
+	tb_bool_t 				(*addo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
 
 	/// delo
-	tb_void_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
-
+	tb_bool_t 				(*delo)(struct __tb_aicp_proactor_t* proactor, tb_aico_t* aico);
+	
 	/// post
 	tb_bool_t 				(*post)(struct __tb_aicp_proactor_t* proactor, tb_aice_t const* aice);
 
@@ -74,7 +77,7 @@ typedef struct __tb_aicp_proactor_t
  *
  * <pre>
  *       |------------------------------------------------|
- * aict: |  addr  | http | file | ...                     | <= the asio call transmitter
+ *       |  addr  | http | file | ...                     | 
  *       '------------------------------------------------'
  *                             |
  * init:                    [aicp]

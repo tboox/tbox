@@ -28,31 +28,14 @@
  * includes
  */
 #include "aicp.h"
-#include "../network/network.h"
+#include "../network/ipv4.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
-// the aicp addr impl type
-typedef struct __tb_aicp_addr_impl_t
-{
-	// the itor
-	tb_size_t 				itor;
-
-	// the server maxn
-	tb_size_t 				maxn;
-
-	// the server list
-	tb_ipv4_t 				list[2];
-
-	// the data
-	tb_byte_t 				data[TB_DNS_RPKT_MAXN];
-
-	// the aice
-	tb_aice_t 				aice;
-
-}tb_aicp_addr_impl_t;
+/// the aicp addr func type
+typedef tb_bool_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -66,5 +49,44 @@ typedef struct __tb_aicp_addr_impl_t
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_post_addr_impl(tb_aicp_t* aicp, tb_aice_t const* aice);
+
+/*! init the addr 
+ *
+ * @param aicp 		the aicp
+ * @param host 		the host
+ * @param func 		the func
+ * @param data 		the data
+ *
+ * @return 			the addr handle
+ */
+tb_handle_t 		tb_aicp_addr_init(tb_aicp_t* aicp, tb_char_t const* host, tb_aicp_addr_func_t func, tb_pointer_t data);
+
+/*! exit the addr
+ *
+ * @param haddr 	the addr handle
+ */
+tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr);
+
+/*! done the addr
+ *
+ * @param haddr 	the addr handle
+ */
+tb_void_t 			tb_aicp_addr_done(tb_handle_t haddr);
+
+/*! the addr host
+ *
+ * @param haddr 	the addr handle
+ *
+ * @return 			the host name
+ */
+tb_char_t const*	tb_aicp_addr_host(tb_handle_t haddr);
+
+/*! the addr aicp
+ *
+ * @param haddr 	the addr handle
+ *
+ * @return 			the aicp
+ */
+tb_aicp_t* 			tb_aicp_addr_aicp(tb_handle_t haddr);
 
 #endif

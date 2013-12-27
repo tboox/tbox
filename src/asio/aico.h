@@ -70,6 +70,9 @@ typedef struct __tb_aico_t
 	/// the type
 	tb_size_t 			type;
 
+	/// the pool
+	tb_handle_t 		pool;
+
 	/// the handle
 	tb_handle_t 		handle;
 
@@ -136,6 +139,14 @@ tb_handle_t 		tb_aico_aicp(tb_handle_t aico);
  * @return 			the aico type
  */
 tb_size_t 			tb_aico_type(tb_handle_t aico);
+
+/*! the aico pool
+ *
+ * @param aico 		the aico
+ *
+ * @return 			the pool handle
+ */
+tb_handle_t 		tb_aico_pool(tb_handle_t aico);
 
 /*! the aico handle
  *

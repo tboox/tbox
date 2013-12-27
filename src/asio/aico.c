@@ -74,6 +74,15 @@ tb_size_t tb_aico_type(tb_handle_t haico)
 	// the aico type
 	return aico->type;
 }
+tb_handle_t tb_aico_pool(tb_handle_t haico)
+{
+	// check
+	tb_aico_t const* aico = (tb_aico_t const*)haico;
+	tb_assert_and_check_return_val(aico, tb_null);
+
+	// the pool handle
+	return aico->pool;
+}
 tb_handle_t tb_aico_handle(tb_handle_t haico)
 {
 	// check
