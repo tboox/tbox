@@ -17,27 +17,40 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asio.h
- * @defgroup 	asio
+ * @file		file.c
+ * @ingroup 	asio
  *
  */
-#ifndef TB_ASIO_H
-#define TB_ASIO_H
+
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_IMPL_TAG 				"file"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "aioo.h"
-#include "aioe.h"
-#include "aiop.h"
-#include "aico.h"
-#include "aice.h"
-#include "aicp.h"
-#include "pool.h"
-#include "addr.h"
 #include "file.h"
-#include "http.h"
+#include "aico.h"
+#include "aicp.h"
+#include "../network/network.h"
+#include "../platform/platform.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
 
-#endif
+// the aicp file type
+typedef struct __tb_aicp_file_t
+{
+
+}tb_aicp_file_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
