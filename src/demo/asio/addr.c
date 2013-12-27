@@ -7,10 +7,14 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
+static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
 {
 	// check
-	tb_assert_and_check_return_val(haddr, tb_false);
+	tb_assert_and_check_return(haddr);
+
+	// the aicp
+	tb_aicp_t* aicp = tb_aicp_addr_aicp(haddr);
+	tb_assert_and_check_return(aicp);
 
 	// addr ok?
 	if (addr)
@@ -22,11 +26,14 @@ static tb_bool_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr
 	else
 	{
 		// trace
-		tb_print("addr[%s]: failed");
+		tb_print("addr[%s]: failed", tb_aicp_addr_host(haddr));
 	}
 
-	// end
-	return tb_false;
+	// exit addr
+	if (haddr) tb_aicp_addr_exit(haddr);
+
+	// kill aicp
+	tb_aicp_kill(aicp);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -49,7 +56,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// init addr
-	addr = tb_aicp_addr_init(aicp, argv[1], tb_demo_sock_addr_func, tb_null);
+	addr = tb_aicp_addr_init(aicp, tb_demo_sock_addr_func, tb_null);
 	tb_assert_and_check_goto(addr, end);
 
 	// sort server 
@@ -62,7 +69,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_print("addr: %s: ..", argv[1]);
 
 	// done addr
-	tb_aicp_addr_done(addr);
+	tb_aicp_addr_done(addr, argv[1]);
 
 	// loop aicp
 	tb_aicp_loop(aicp);
@@ -71,15 +78,12 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	time = tb_mclock() - time;
 
 	// trace
-	tb_print("addr: %s: ok, time: %lld ms", argv[1], time);
+	tb_print("addr: %s: time: %lld ms", argv[1], time);
 
 end:
 
 	// trace
 	tb_print("end");
-
-	// exit addr
-	if (addr) tb_aicp_addr_exit(addr);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
