@@ -295,11 +295,10 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 			}
 			else 
 			{
-				// remove it from pool directly
-				if (task->refn == 1) tb_rpool_free(timer->pool, task);
-
 				// refn--
-				if (task->refn) task->refn--;
+				if (task->refn > 1) task->refn--;
+				// remove it from pool directly
+				else tb_rpool_free(timer->pool, task);
 			}
 		}
 
@@ -453,16 +452,18 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t htask)
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
+	if (task->refn > 1)
+	{
+		// refn--
+		task->refn--;
+
+		// cancel task
+		task->func 		= tb_null;
+		task->data 		= tb_null;
+		task->repeat 	= 0;
+	}
 	// remove it from pool directly if the task have been expired 
-	if (task->refn == 1) tb_rpool_free(timer->pool, task);
-
-	// refn--
-	if (task->refn) task->refn--;
-
-	// cancel task
-	task->func 		= tb_null;
-	task->data 		= tb_null;
-	task->repeat 	= 0;
+	else tb_rpool_free(timer->pool, task);
 
 	// leave
 	tb_spinlock_leave(&timer->lock);
