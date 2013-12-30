@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "tstream.h"
+#include "filter.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -34,7 +34,7 @@
 typedef struct __tb_nstream_t
 {
 	// the stream base
-	tb_tstream_t 			base;
+	tb_gstream_filter_t 			base;
 
 }tb_nstream_t;
 
@@ -44,28 +44,28 @@ typedef struct __tb_nstream_t
 
 static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
 {
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_NONE, tb_null);
-	return (tb_nstream_t*)tst;
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_NONE, tb_null);
+	return (tb_nstream_t*)filter;
 }
 static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
 {
 	tb_nstream_t* nst = tb_nstream_cast(gst);
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(nst && tst, -1);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(nst && filter, -1);
 
 	// the input
-	tb_assert_and_check_return_val(tst->ip, -1);
-	tb_byte_t const* 	ib = tst->ip;
-	tb_byte_t const* 	ip = tst->ip;
-	tb_byte_t const* 	ie = ip + tst->in;
+	tb_assert_and_check_return_val(filter->ip, -1);
+	tb_byte_t const* 	ib = filter->ip;
+	tb_byte_t const* 	ip = filter->ip;
+	tb_byte_t const* 	ie = ip + filter->in;
 	tb_check_return_val(ip < ie, 0);
 
 	// the output
-	tb_assert_and_check_return_val(tst->op, -1);
-	tb_byte_t* 			ob = tst->op;
-	tb_byte_t* 			op = tst->op;
-	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	tb_assert_and_check_return_val(filter->op, -1);
+	tb_byte_t* 			ob = filter->op;
+	tb_byte_t* 			op = filter->op;
+	tb_byte_t const* 	oe = filter->ob + TB_GSTREAM_FLTR_CACHE_MAXN;
 	tb_check_return_val(op < oe, 0);
 
 	// spak it
@@ -79,11 +79,11 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
 	tb_assert_and_check_return_val(op >= ob && op <= oe, -1);
 
 	// update input
-	tst->in -= ip - ib;
-	tst->ip = ip;
+	filter->in -= ip - ib;
+	filter->ip = ip;
 
 	// update output
-	tst->on += op - ob;
+	filter->on += op - ob;
 
 	// ok
 	return (op - ob);
@@ -100,16 +100,16 @@ tb_gstream_t* tb_gstream_init_null()
 	if (!tb_gstream_init(gst)) goto fail;
 
 	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->aopen 	= tb_tstream_aopen;
-	gst->aread 	= tb_tstream_aread;
-	gst->aclose	= tb_tstream_aclose;
-	gst->wait	= tb_tstream_wait;
-	gst->ctrl	= tb_tstream_ctrl;
+	gst->type 	= TB_GSTREAM_TYPE_FLTR;
+	gst->aopen 	= tb_gstream_filter_aopen;
+	gst->aread 	= tb_gstream_filter_aread;
+	gst->aclose	= tb_gstream_filter_aclose;
+	gst->wait	= tb_gstream_filter_wait;
+	gst->ctrl	= tb_gstream_filter_ctrl;
 
-	// init tstream
-	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_NONE;
-	((tb_tstream_t*)gst)->spak = tb_nstream_spak;
+	// init filter
+	((tb_gstream_filter_t*)gst)->type 	= TB_GSTREAM_FLTR_TYPE_NONE;
+	((tb_gstream_filter_t*)gst)->spak = tb_nstream_spak;
 
 	// ok
 	return gst;
@@ -128,7 +128,7 @@ tb_gstream_t* tb_gstream_init_from_null(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(nst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(nst, TB_TSTREAM_CTRL_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(nst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gst)) goto fail;
 	
 	return nst;
 

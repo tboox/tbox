@@ -39,7 +39,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 	{
 		tb_http_option_t* option = tb_null;
-		tb_gstream_ctrl(ist, TB_HSTREAM_CTRL_GET_OPTION, &option);
+		tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_GET_OPTION, &option);
 		if (option) 
 		{
 			option->hfunc = tb_http_test_hfunc;
@@ -47,7 +47,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		}
 	}
 	if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE)
-		tb_gstream_ctrl(ost, TB_FSTREAM_CTRL_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+		tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
 	// open stream
 	if (!tb_gstream_bopen(ist)) goto end;

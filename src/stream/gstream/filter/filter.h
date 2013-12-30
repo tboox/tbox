@@ -17,11 +17,11 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		tstream.h
+ * @file		filter.h
  *
  */
-#ifndef TB_STREAM_TSTREAM_H
-#define TB_STREAM_TSTREAM_H
+#ifndef TB_STREAM_GSTREAM_FLTR_H
+#define TB_STREAM_GSTREAM_FLTR_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -33,15 +33,15 @@
  * types
  */
 
-// the tstream cache maxn
-#define TB_TSTREAM_CACHE_MAXN 					(TB_GSTREAM_BLOCK_MAXN)
+// the gstream filter cache maxn
+#define TB_GSTREAM_FLTR_CACHE_MAXN 					(TB_GSTREAM_BLOCK_MAXN)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
 // the transform stream type
-typedef struct __tb_tstream_t
+typedef struct __tb_gstream_filter_t
 {
 	// the stream base
 	tb_gstream_t 		base;
@@ -57,38 +57,40 @@ typedef struct __tb_tstream_t
 	tb_gstream_t* 		gst;
 
 	// the input data
-	tb_byte_t 			ib[TB_TSTREAM_CACHE_MAXN];
+	tb_byte_t 			ib[TB_GSTREAM_FLTR_CACHE_MAXN];
 	tb_byte_t const* 	ip;
 	tb_size_t 			in;
 
 	// the output data
-	tb_byte_t 			ob[TB_TSTREAM_CACHE_MAXN];
+	tb_byte_t 			ob[TB_GSTREAM_FLTR_CACHE_MAXN];
 	tb_byte_t* 			op;
 	tb_size_t 			on;
 
 	// spak
 	tb_long_t 			(*spak)(tb_gstream_t* gst, tb_long_t sync);
 
-}tb_tstream_t;
+}tb_gstream_filter_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
 // cast
-tb_tstream_t* 	tb_tstream_cast(tb_gstream_t* gst);
+tb_gstream_filter_t* 	tb_gstream_filter_cast(tb_gstream_t* gst);
 
-// open & close 
-tb_long_t 		tb_tstream_aopen(tb_gstream_t* gst);
-tb_long_t 		tb_tstream_aclose(tb_gstream_t* gst);
+// open 
+tb_long_t 				tb_gstream_filter_aopen(tb_gstream_t* gst);
+
+// close
+tb_long_t 				tb_gstream_filter_aclose(tb_gstream_t* gst);
 
 // read
-tb_long_t 		tb_tstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+tb_long_t 				tb_gstream_filter_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 // wait
-tb_long_t 		tb_tstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
+tb_long_t 				tb_gstream_filter_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
 
 // ctrl
-tb_bool_t 		tb_tstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
+tb_bool_t 				tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
 
 #endif

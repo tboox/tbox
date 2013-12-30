@@ -42,7 +42,7 @@ static tb_handle_t tb_http_demo_sfunc_init(tb_handle_t gst)
 	tb_print("[demo]: ssl: init: %p", gst);
 	tb_handle_t sock = tb_null;
 	if (gst && tb_gstream_type(gst)) 
-		tb_gstream_ctrl(gst, TB_SSTREAM_CTRL_GET_HANDLE, &sock);
+		tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_GET_HANDLE, &sock);
 	return sock;
 }
 static tb_void_t tb_http_demo_sfunc_exit(tb_handle_t ssl)

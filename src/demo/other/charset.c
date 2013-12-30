@@ -18,7 +18,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// init stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
-	if (ost) tb_gstream_ctrl(ost, TB_FSTREAM_CTRL_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+	if (ost) tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 	if (ist && ost && tb_gstream_bopen(ist) && tb_gstream_bopen(ost))
 	{
 		// init data & size

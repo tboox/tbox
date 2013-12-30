@@ -35,7 +35,7 @@
  */
 
 // the http stream type
-typedef struct __tb_hstream_t
+typedef struct __tb_gstream_http_t
 {
 	// the base
 	tb_gstream_t 		base;
@@ -43,17 +43,17 @@ typedef struct __tb_hstream_t
 	// the http 
 	tb_handle_t 		http;
 
-}tb_hstream_t;
+}tb_gstream_http_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * details
  */
-static __tb_inline__ tb_hstream_t* tb_hstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_http_t* tb_gstream_http_cast(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_HTTP, tb_null);
-	return (tb_hstream_t*)gst;
+	return (tb_gstream_http_t*)gst;
 }
-static tb_size_t tb_hstream_state(tb_hstream_t* hst)
+static tb_size_t tb_gstream_http_state(tb_gstream_http_t* hst)
 {
 	// check
 	tb_assert_and_check_return_val(hst && hst->http, -1);
@@ -63,65 +63,65 @@ static tb_size_t tb_hstream_state(tb_hstream_t* hst)
 	if (status)
 	{
 		if (status->error == TB_HTTP_ERROR_DNS_FAILED)
-			return TB_SSTREAM_STATE_DNS_FAILED;
+			return TB_GSTREAM_SOCK_STATE_DNS_FAILED;
 		else if (status->error == TB_HTTP_ERROR_SSL_FAILED)
-			return TB_SSTREAM_STATE_SSL_FAILED;
+			return TB_GSTREAM_SOCK_STATE_SSL_FAILED;
 		else if (status->error == TB_HTTP_ERROR_CONNECT_FAILED)
-			return TB_SSTREAM_STATE_CONNECT_FAILED;
+			return TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
 		else if (status->error == TB_HTTP_ERROR_REQUEST_FAILED)
-			return TB_HSTREAM_STATE_REQUEST_FAILED;
+			return TB_GSTREAM_HTTP_STATE_REQUEST_FAILED;
 		else if (status->error == TB_HTTP_ERROR_RESPONSE_204)
-			return TB_HSTREAM_STATE_RESPONSE_204;
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_204;
 		else if (status->error >= TB_HTTP_ERROR_RESPONSE_300 && status->error <= TB_HTTP_ERROR_RESPONSE_304)
-			return TB_HSTREAM_STATE_RESPONSE_300 + (status->error - TB_HTTP_ERROR_RESPONSE_300);
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_300 + (status->error - TB_HTTP_ERROR_RESPONSE_300);
 		else if (status->error >= TB_HTTP_ERROR_RESPONSE_400 && status->error <= TB_HTTP_ERROR_RESPONSE_416)
-			return TB_HSTREAM_STATE_RESPONSE_400 + (status->error - TB_HTTP_ERROR_RESPONSE_400);
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_400 + (status->error - TB_HTTP_ERROR_RESPONSE_400);
 		else if (status->error >= TB_HTTP_ERROR_RESPONSE_500 && status->error <= TB_HTTP_ERROR_RESPONSE_507)
-			return TB_HSTREAM_STATE_RESPONSE_500 + (status->error - TB_HTTP_ERROR_RESPONSE_500);
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_500 + (status->error - TB_HTTP_ERROR_RESPONSE_500);
 		else if (status->error == TB_HTTP_ERROR_RESPONSE_NUL)
-			return TB_HSTREAM_STATE_RESPONSE_NUL;
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_NUL;
 		else if (status->error == TB_HTTP_ERROR_RESPONSE_UNK)
-			return TB_HSTREAM_STATE_RESPONSE_UNK;
+			return TB_GSTREAM_HTTP_STATE_RESPONSE_UNK;
 		else if (status->error == TB_HTTP_ERROR_WAIT_FAILED)
 			return TB_GSTREAM_STATE_WAIT_FAILED;
 		else if (status->error == TB_HTTP_ERROR_UNKNOWN)
-			return TB_HSTREAM_STATE_UNKNOWN_ERROR;
+			return TB_GSTREAM_HTTP_STATE_UNKNOWN_ERROR;
 		else if (status->error == TB_HTTP_ERROR_OK)
 			return TB_GSTREAM_STATE_OK;
 	}
 	return TB_GSTREAM_STATE_OK;
 } 
-static tb_long_t tb_hstream_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_http_aopen(tb_gstream_t* gst)
 {
 	// check
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// open it
 	tb_long_t ok = tb_http_aopen(hst->http);
 
 	// save state
-	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_hstream_state(hst);
+	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hst);
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_hstream_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_http_aclose(tb_gstream_t* gst)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// close it
 	return tb_http_aclose(hst->http);
 }
-static tb_void_t tb_hstream_free(tb_gstream_t* gst)
+static tb_void_t tb_gstream_http_free(tb_gstream_t* gst)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	if (hst && hst->http) tb_http_exit(hst->http);
 }
-static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_http_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// check
@@ -132,22 +132,22 @@ static tb_long_t tb_hstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	tb_long_t ok = tb_http_aread(hst->http, data, size);
 
 	// save state
-	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_hstream_state(hst);
+	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hst);
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_hstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_http_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// writ data or afwrit data
 	return sync? tb_http_afwrit(hst->http, data, size) : tb_http_awrit(hst->http, data, size);
 }
-static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_gstream_http_size(tb_gstream_t const* gst)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, 0);
 
 	// status
@@ -157,9 +157,9 @@ static tb_hize_t tb_hstream_size(tb_gstream_t const* gst)
 	// document_size
 	return (!status->bgzip && !status->bdeflate)? status->document_size : 0;
 }
-static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
+static tb_long_t tb_gstream_http_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// status
@@ -172,23 +172,23 @@ static tb_long_t tb_hstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	// seek
 	return tb_http_aseek(hst->http, offset);
 }
-static tb_long_t tb_hstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_gstream_http_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, -1);
 
 	// wait
 	tb_long_t ok = tb_http_wait(hst->http, wait, timeout);
 
 	// save state
-	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_hstream_state(hst);
+	gst->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hst);
 
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_hstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
-	tb_hstream_t* hst = tb_hstream_cast(gst);
+	tb_gstream_http_t* hst = tb_gstream_http_cast(gst);
 	tb_assert_and_check_return_val(hst && hst->http, tb_false);
 
 	switch (ctrl)
@@ -413,14 +413,14 @@ static tb_bool_t tb_hstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
 			return tb_true;
 		}
 		break;
-	case TB_HSTREAM_CTRL_GET_OPTION:
+	case TB_GSTREAM_CTRL_HTTP_GET_OPTION:
 		{
 			tb_http_option_t** poption = (tb_http_option_t**)tb_va_arg(args, tb_http_option_t**);
 			tb_assert_and_check_return_val(poption, tb_false);
 			*poption = tb_http_option(hst->http);
 			return tb_true;
 		}
-	case TB_HSTREAM_CTRL_GET_STATUS:
+	case TB_GSTREAM_CTRL_HTTP_GET_STATUS:
 		{
 			tb_http_status_t const** pstatus = (tb_http_status_t const**)tb_va_arg(args, tb_http_status_t const**);
 			tb_assert_and_check_return_val(pstatus, tb_false);
@@ -439,24 +439,24 @@ static tb_bool_t tb_hstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
 
 tb_gstream_t* tb_gstream_init_http()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_hstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_http_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
 
 	// init stream
-	tb_hstream_t* hst = (tb_hstream_t*)gst;
+	tb_gstream_http_t* hst = (tb_gstream_http_t*)gst;
 	gst->type 	= TB_GSTREAM_TYPE_HTTP;
-	gst->aopen 	= tb_hstream_aopen;
-	gst->aclose = tb_hstream_aclose;
-	gst->aread 	= tb_hstream_aread;
-	gst->awrit 	= tb_hstream_awrit;
-	gst->aseek 	= tb_hstream_aseek;
-	gst->size 	= tb_hstream_size;
-	gst->wait 	= tb_hstream_wait;
-	gst->ctrl 	= tb_hstream_ctrl;
-	gst->free 	= tb_hstream_free;
+	gst->aopen 	= tb_gstream_http_aopen;
+	gst->aclose = tb_gstream_http_aclose;
+	gst->aread 	= tb_gstream_http_aread;
+	gst->awrit 	= tb_gstream_http_awrit;
+	gst->aseek 	= tb_gstream_http_aseek;
+	gst->size 	= tb_gstream_http_size;
+	gst->wait 	= tb_gstream_http_wait;
+	gst->ctrl 	= tb_gstream_http_ctrl;
+	gst->free 	= tb_gstream_http_free;
 	hst->http 	= tb_http_init();
 	tb_assert_and_check_goto(hst->http, fail);
 

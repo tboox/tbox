@@ -109,49 +109,49 @@ typedef struct __tb_lzsw_deflate_window_t
 
 
 // the lzsw inflate zstream type
-typedef struct __tb_lzsw_inflate_zstream_t
+typedef struct __tb_lzsw_inflate_gstream_filter_zip_t
 {
 	// the stream base
-	tb_inflate_zstream_t 		base;
+	tb_inflate_gstream_filter_zip_t 		base;
 
 	// the reference to vlc
-	tb_zstream_vlc_t* 			vlc;
+	tb_gstream_filter_zip_vlc_t* 			vlc;
 
 	// the window 
 	tb_lzsw_inflate_window_t  	window;
 
-}tb_lzsw_inflate_zstream_t;
+}tb_lzsw_inflate_gstream_filter_zip_t;
 
 // the lzsw deflate zstream type
-typedef struct __tb_lzsw_deflate_zstream_t
+typedef struct __tb_lzsw_deflate_gstream_filter_zip_t
 {
 	// the stream base
-	tb_deflate_zstream_t 		base;
+	tb_deflate_gstream_filter_zip_t 		base;
 
 	// the reference to vlc
-	tb_zstream_vlc_t* 			vlc;
+	tb_gstream_filter_zip_vlc_t* 			vlc;
 
 	// the window 
 	tb_lzsw_deflate_window_t  	window;
 
-}tb_lzsw_deflate_zstream_t;
+}tb_lzsw_deflate_gstream_filter_zip_t;
 
 
 // the lzsw zstream type
-typedef union __tb_lzsw_zstream_t
+typedef union __tb_lzsw_gstream_filter_zip_t
 {
-	tb_lzsw_inflate_zstream_t 	infst;
-	tb_lzsw_deflate_zstream_t 	defst;
+	tb_lzsw_inflate_gstream_filter_zip_t 	infst;
+	tb_lzsw_deflate_gstream_filter_zip_t 	defst;
 
-}tb_lzsw_zstream_t;
+}tb_lzsw_gstream_filter_zip_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-tb_tstream_t* 	tb_zstream_open_lzsw_inflate(tb_lzsw_inflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lzsw_deflate(tb_lzsw_deflate_zstream_t* zst);
-tb_tstream_t* 	tb_zstream_open_lzsw(tb_lzsw_zstream_t* zst, tb_size_t action);
+tb_gstream_filter_t* 	tb_gstream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_gstream_filter_zip_t* zst);
+tb_gstream_filter_t* 	tb_gstream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_gstream_filter_zip_t* zst);
+tb_gstream_filter_t* 	tb_gstream_filter_zip_open_lzsw(tb_lzsw_gstream_filter_zip_t* zst, tb_size_t action);
 
 #endif
 

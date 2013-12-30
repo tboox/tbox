@@ -17,7 +17,7 @@ static tb_handle_t tb_gstream_demo_sfunc_init(tb_handle_t gst)
 	tb_printf("ssl: init: %p\n", gst);
 	tb_handle_t sock = tb_null;
 	if (gst && tb_gstream_type(gst) == TB_GSTREAM_TYPE_SOCK) 
-		tb_gstream_ctrl(gst, TB_SSTREAM_CTRL_GET_HANDLE, &sock);
+		tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_GET_HANDLE, &sock);
 	return sock;
 }
 static tb_void_t tb_gstream_demo_sfunc_exit(tb_handle_t ssl)
@@ -91,7 +91,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 				{
 					// init hoption
 					tb_http_option_t* hoption = tb_null;
-					tb_gstream_ctrl(ist, TB_HSTREAM_CTRL_GET_OPTION, &hoption);
+					tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_GET_OPTION, &hoption);
 					if (hoption)
 					{
 						// enable gzip?
@@ -291,7 +291,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 				// ctrl ost
 				if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) 
-					tb_gstream_ctrl(ost, TB_FSTREAM_CTRL_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+					tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
 				// open ost
 				if (!tb_gstream_bopen(ost)) break;
