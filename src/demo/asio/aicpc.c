@@ -184,7 +184,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
 	// init
-	tb_handle_t 		aicp = tb_null;
+	tb_aicp_t* 			aicp = tb_null;
 	tb_demo_context_t 	context = {0};
 
 	// init aicp
