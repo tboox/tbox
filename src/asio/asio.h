@@ -36,8 +36,8 @@
 #include "aicp.h"
 #include "pool.h"
 #include "addr.h"
-#include "file.h"
 #include "http.h"
+#include "astream.h"
 
 
 #endif
