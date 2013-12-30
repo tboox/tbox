@@ -5,7 +5,8 @@ include $(PRO_DIR)/prefix.mak
 NAMES = gstream \
 		gstream/zip \
 		gstream/null \
-		gstream/charset
+		gstream/charset \
+		astream 
 
 include $(SRC_DIR)/demo/makefile
 

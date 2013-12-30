@@ -541,9 +541,9 @@ tb_gstream_filter_t* tb_gstream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_gst
 	// init 
 	tb_memset(zst, 0, sizeof(tb_lzsw_inflate_gstream_filter_zip_t));
 
-	// init tstream
-	((tb_gstream_filter_t*)zst)->transform = tb_gstream_filter_zip_inflate_lzsw_transform;
-	((tb_gstream_filter_t*)zst)->close 	= tb_gstream_filter_zip_inflate_lzsw_close;
+	// init filter
+	((tb_gstream_filter_t*)zst)->transform 	= tb_gstream_filter_zip_inflate_lzsw_transform;
+	((tb_gstream_filter_t*)zst)->close 		= tb_gstream_filter_zip_inflate_lzsw_close;
 
 	// init zstream
 	((tb_gstream_filter_zip_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZSW;
@@ -571,7 +571,7 @@ tb_gstream_filter_t* tb_gstream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_gst
 	// init 
 	tb_memset(zst, 0, sizeof(tb_lzsw_deflate_gstream_filter_zip_t));
 
-	// init tstream
+	// init filter
 	((tb_gstream_filter_t*)zst)->transform = tb_gstream_filter_zip_deflate_lzsw_transform;
 	((tb_gstream_filter_t*)zst)->close 	= tb_gstream_filter_zip_deflate_lzsw_close;
 

@@ -638,7 +638,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	if (http->status.bchunked)
 	{
 		// init kstream
-		http->stream = http->kstream = tb_gstream_init_from_chunked(http->stream);
+		http->stream = http->kstream = tb_gstream_init_filter_from_chunked(http->stream);
 		tb_assert_and_check_return_val(http->stream, -1);
 
 		// open kstream, need not async
@@ -652,7 +652,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 	{
 		// init zstream
-		http->stream = http->zstream = tb_gstream_init_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+		http->stream = http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 		tb_assert_and_check_return_val(http->stream, -1);
 
 		// open zstream, need not async

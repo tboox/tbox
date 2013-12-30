@@ -91,7 +91,7 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_init_null()
+tb_gstream_t* tb_gstream_init_filter_null()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_nstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
@@ -119,12 +119,12 @@ fail:
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_from_null(tb_gstream_t* gst)
+tb_gstream_t* tb_gstream_init_filter_from_null(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init the null stream
-	tb_gstream_t* nst = tb_gstream_init_null();
+	tb_gstream_t* nst = tb_gstream_init_filter_null();
 	tb_assert_and_check_return_val(nst, tb_null);
 
 	// set gstream

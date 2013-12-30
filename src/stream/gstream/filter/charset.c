@@ -149,7 +149,7 @@ static tb_long_t tb_gstream_filter_charset_spak(tb_gstream_t* gst, tb_long_t syn
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_init_charset()
+tb_gstream_t* tb_gstream_init_filter_charset()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_charset_t));
 	tb_assert_and_check_return_val(gst, tb_null);
@@ -177,12 +177,12 @@ fail:
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t ftype, tb_size_t ttype)
+tb_gstream_t* tb_gstream_init_filter_from_charset(tb_gstream_t* gst, tb_size_t ftype, tb_size_t ttype)
 {
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// create charset stream
-	tb_gstream_t* cst = tb_gstream_init_charset();
+	tb_gstream_t* cst = tb_gstream_init_filter_charset();
 	tb_assert_and_check_return_val(cst, tb_null);
 
 	// set gstream

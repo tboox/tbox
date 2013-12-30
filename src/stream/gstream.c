@@ -40,16 +40,6 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
- 
-// the default stream cache maxn
-#define TB_GSTREAM_MCACHE_DEFAULT 					(8192)
-
-// the default stream timeout
-#define TB_GSTREAM_TIMEOUT_DEFAULT 					(10000)
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
  
@@ -414,31 +404,6 @@ fail:
 	return tb_null;
 }
 
-tb_bool_t tb_gstream_init(tb_gstream_t* gst)
-{
-	// check
-	tb_assert_and_check_return_val(gst, tb_false);
-
-	// clear
-	tb_memset(gst, 0, sizeof(tb_gstream_t));
-
-	// init timeout
-	gst->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
-
-	// init url
-	if (!tb_url_init(&gst->url)) return tb_false;
-
-	// init cache
-	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
-	gst->bcached = 1;
-
-	// ok
-	return tb_true;
-
-fail:
-	tb_qbuffer_exit(&gst->cache);
-	return tb_false;
-}
 tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 {
 	if (gst) 

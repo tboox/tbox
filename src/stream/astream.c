@@ -18,7 +18,7 @@
  *
  * @author		ruki
  * @file		astream.c
- * @ingroup 	asio
+ * @ingroup 	stream
  *
  */
 

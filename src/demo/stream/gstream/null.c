@@ -14,7 +14,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// create stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
-	tb_gstream_t* nst = tb_gstream_init_from_null(ist);
+	tb_gstream_t* nst = tb_gstream_init_filter_from_null(ist);
 
 	if (!ist || !ost || !nst) goto end;
 
