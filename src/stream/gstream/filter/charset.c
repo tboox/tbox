@@ -24,7 +24,7 @@
  * includes
  */
 #include "prefix.h"
-#include "tstream.h"
+#include "filter.h"
 #include "../../../charset/charset.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -32,10 +32,10 @@
  */
 
 // the charset stream type
-typedef struct __tb_cstream_t
+typedef struct __tb_gstream_filter_charset_t
 {
 	// the stream base
-	tb_tstream_t 			base;
+	tb_gstream_filter_t 			base;
 
 	// the from type
 	tb_size_t 				ftype;
@@ -43,52 +43,52 @@ typedef struct __tb_cstream_t
 	// the to type
 	tb_size_t 				ttype;
 
-}tb_cstream_t;
+}tb_gstream_filter_charset_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implements
  */
 
-static __tb_inline__ tb_cstream_t* tb_cstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_filter_charset_t* tb_gstream_filter_charset_cast(tb_gstream_t* gst)
 {
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_CHARSET, tb_null);
-	return (tb_cstream_t*)tst;
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_CHARSET, tb_null);
+	return (tb_gstream_filter_charset_t*)filter;
 }
-static tb_long_t tb_cstream_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_charset_aopen(tb_gstream_t* gst)
 {
-	tb_cstream_t* cst = tb_cstream_cast(gst);
+	tb_gstream_filter_charset_t* cst = tb_gstream_filter_charset_cast(gst);
 	tb_assert_and_check_return_val(cst && cst->ftype && cst->ttype, -1);
 
-	return tb_tstream_aopen(gst);
+	return tb_gstream_filter_aopen(gst);
 }
-static tb_bool_t tb_cstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+static tb_bool_t tb_gstream_filter_charset_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
 {
-	tb_cstream_t* cst = tb_cstream_cast(gst);
+	tb_gstream_filter_charset_t* cst = tb_gstream_filter_charset_cast(gst);
 	tb_assert_and_check_return_val(cst, tb_false);
 
 	switch (cmd)
 	{
-	case TB_CSTREAM_CTRL_GET_FTYPE:
+	case TB_GSTREAM_CTRL_FLTR_CHARSET_GET_FTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe, tb_false);
 			*pe = cst->ftype;
 			return tb_true;
 		}
-	case TB_CSTREAM_CTRL_GET_TTYPE:
+	case TB_GSTREAM_CTRL_FLTR_CHARSET_GET_TTYPE:
 		{
 			tb_size_t* pe = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pe, tb_false);
 			*pe = cst->ttype;
 			return tb_true;
 		}
-	case TB_CSTREAM_CTRL_SET_FTYPE:
+	case TB_GSTREAM_CTRL_FLTR_CHARSET_SET_FTYPE:
 		{
 			cst->ftype = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_CHARSET_TYPE_OK(cst->ftype)? tb_true : tb_false;
 		}
-	case TB_CSTREAM_CTRL_SET_TTYPE:
+	case TB_GSTREAM_CTRL_FLTR_CHARSET_SET_TTYPE:
 		{
 			cst->ttype = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return TB_CHARSET_TYPE_OK(cst->ttype)? tb_true : tb_false;
@@ -97,30 +97,30 @@ static tb_bool_t tb_cstream_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 		break;
 	}
 
-	// routine to tstream 
-	return tb_tstream_ctrl(gst, cmd, args);
+	// routine to filter 
+	return tb_gstream_filter_ctrl(gst, cmd, args);
 }
-static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_long_t sync)
+static tb_long_t tb_gstream_filter_charset_spak(tb_gstream_t* gst, tb_long_t sync)
 {
-	tb_cstream_t* cst = tb_cstream_cast(gst);
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(cst && tst, -1);
+	tb_gstream_filter_charset_t* cst = tb_gstream_filter_charset_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(cst && filter, -1);
 
 	// the convecter
 	tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(cst->ftype) && TB_CHARSET_TYPE_OK(cst->ttype), -1);
 
 	// the input
-	tb_assert_and_check_return_val(tst->ip, -1);
-	tb_byte_t const* 	ib = tst->ip;
-	tb_byte_t const* 	ip = tst->ip;
-	tb_byte_t const* 	ie = ip + tst->in;
+	tb_assert_and_check_return_val(filter->ip, -1);
+	tb_byte_t const* 	ib = filter->ip;
+	tb_byte_t const* 	ip = filter->ip;
+	tb_byte_t const* 	ie = ip + filter->in;
 	tb_check_return_val(ip < ie, 0);
 
 	// the output
-	tb_assert_and_check_return_val(tst->op, -1);
-	tb_byte_t* 			ob = tst->op;
-	tb_byte_t* 			op = tst->op;
-	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	tb_assert_and_check_return_val(filter->op, -1);
+	tb_byte_t* 			ob = filter->op;
+	tb_byte_t* 			op = filter->op;
+	tb_byte_t const* 	oe = filter->ob + TB_GSTREAM_FLTR_CACHE_MAXN;
 	tb_check_return_val(op < oe, 0);
 
 	// spak it
@@ -137,11 +137,11 @@ static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_long_t sync)
 	tb_assert_and_check_return_val(op >= ob && op <= oe, -1);
 
 	// update input
-	tst->in -= ip - ib;
-	tst->ip = ip;
+	filter->in -= ip - ib;
+	filter->ip = ip;
 
 	// update output
-	tst->on += op - ob;
+	filter->on += op - ob;
 
 	// ok
 	return (op - ob);
@@ -151,23 +151,23 @@ static tb_long_t tb_cstream_spak(tb_gstream_t* gst, tb_long_t sync)
  */
 tb_gstream_t* tb_gstream_init_charset()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_cstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_charset_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
 
 	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->aopen 	= tb_cstream_aopen;
-	gst->aread 	= tb_tstream_aread;
-	gst->aclose	= tb_tstream_aclose;
-	gst->wait	= tb_tstream_wait;
-	gst->ctrl 	= tb_cstream_ctrl;
+	gst->type 	= TB_GSTREAM_TYPE_FLTR;
+	gst->aopen 	= tb_gstream_filter_charset_aopen;
+	gst->aread 	= tb_gstream_filter_aread;
+	gst->aclose	= tb_gstream_filter_aclose;
+	gst->wait	= tb_gstream_filter_wait;
+	gst->ctrl 	= tb_gstream_filter_charset_ctrl;
 
-	// init tstream
-	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_CHARSET;
-	((tb_tstream_t*)gst)->spak = tb_cstream_spak;
+	// init filter
+	((tb_gstream_filter_t*)gst)->type 	= TB_GSTREAM_FLTR_TYPE_CHARSET;
+	((tb_gstream_filter_t*)gst)->spak = tb_gstream_filter_charset_spak;
 
 	// ok
 	return gst;
@@ -186,13 +186,13 @@ tb_gstream_t* tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t ftype, t
 	tb_assert_and_check_return_val(cst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(cst, TB_TSTREAM_CTRL_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gst)) goto fail;
 		
 	// set from charset type
-	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CTRL_SET_FTYPE, ftype)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_GSTREAM_CTRL_FLTR_CHARSET_SET_FTYPE, ftype)) goto fail;
 		
 	// set to charset type
-	if (!tb_gstream_ctrl(cst, TB_CSTREAM_CTRL_SET_TTYPE, ttype)) goto fail;
+	if (!tb_gstream_ctrl(cst, TB_GSTREAM_CTRL_FLTR_CHARSET_SET_TTYPE, ttype)) goto fail;
 	
 	return cst;
 

@@ -17,40 +17,17 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		astream.c
- * @ingroup 	asio
+ * @file		prefix.h
  *
  */
-
-/* ///////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_IMPL_TAG 				"astream"
+#ifndef TB_STREAM_GSTREAM_FLTR_PREFIX_H
+#define TB_STREAM_GSTREAM_FLTR_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "astream.h"
-#include "aico.h"
-#include "aicp.h"
-#include "../network/network.h"
-#include "../platform/platform.h"
+#include "../prefix.h"
+#include "filter.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
 
-// the aicp file type
-typedef struct __tb_aicp_astream_t
-{
-
-}tb_aicp_astream_t;
-
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
+#endif

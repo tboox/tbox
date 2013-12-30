@@ -62,11 +62,12 @@ tbox_C_FILES 			+= \
 						stream/gstream/file \
 						stream/gstream/data \
 						stream/gstream/sock \
-						stream/gstream/tstream/tstream \
-						stream/gstream/tstream/charset \
-						stream/gstream/tstream/chunked \
-						stream/gstream/tstream/null \
-						stream/gstream/tstream/zip \
+						stream/gstream/filter/filter \
+						stream/gstream/filter/charset \
+						stream/gstream/filter/chunked \
+						stream/gstream/filter/null \
+						stream/gstream/filter/zip \
+						stream/astream \
 						object/object \
 						object/null \
 						object/data \
@@ -103,7 +104,6 @@ tbox_C_FILES 			+= \
 						asio/pool \
 						asio/addr \
 						asio/http \
-						asio/astream \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -301,7 +301,6 @@ INC_FILES 				= \
 						asio/pool.h \
 						asio/addr.h \
 						asio/http.h \
-						asio/astream.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
@@ -399,6 +398,7 @@ INC_FILES 				= \
 						charset/prefix.h \
 						stream/prefix.h \
 						stream/stream.h \
+						stream/astream.h \
 						stream/bstream.h \
 						stream/gstream.h \
 						object/prefix.h \

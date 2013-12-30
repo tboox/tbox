@@ -362,7 +362,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 		tb_assert_and_check_break(ist && ost);
 
 		// ctrl stream
-		tb_gstream_ctrl(ost, TB_FSTREAM_CTRL_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+		tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 
 		// open stream
 		if (!tb_gstream_bopen(ist)) break;

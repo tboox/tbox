@@ -29,17 +29,17 @@
  * includes
  */
 #include "prefix.h"
-#include "tstream.h"
+#include "filter.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
 // the chunked stream type
-typedef struct __tb_kstream_t
+typedef struct __tb_gstream_filter_chunked_t
 {
 	// the stream base
-	tb_tstream_t 			base;
+	tb_gstream_filter_t 			base;
 
 	// the chunked size
 	tb_size_t 				size;
@@ -50,23 +50,23 @@ typedef struct __tb_kstream_t
 	// the cache line
 	tb_pstring_t 			line;
 
-}tb_kstream_t;
+}tb_gstream_filter_chunked_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implements
  */
 
-static __tb_inline__ tb_kstream_t* tb_kstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_filter_chunked_t* tb_gstream_filter_chunked_cast(tb_gstream_t* gst)
 {
 	// check
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(tst && tst->type == TB_TSTREAM_TYPE_CHUNKED, tb_null);
-	return (tb_kstream_t*)tst;
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_CHUNKED, tb_null);
+	return (tb_gstream_filter_chunked_t*)filter;
 }
-static tb_long_t tb_kstream_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_aopen(tb_gstream_t* gst)
 {
 	// check
-	tb_kstream_t* kst = tb_kstream_cast(gst);
+	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
 	tb_assert_and_check_return_val(kst, -1);
 
 	// init 
@@ -74,13 +74,13 @@ static tb_long_t tb_kstream_aopen(tb_gstream_t* gst)
 	kst->read = 0;
 	if (!tb_pstring_init(&kst->line)) return -1;
 
-	// open tstream
-	return tb_tstream_aopen(gst);
+	// open filter
+	return tb_gstream_filter_aopen(gst);
 }
-static tb_long_t tb_kstream_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_aclose(tb_gstream_t* gst)
 {
 	// check
-	tb_kstream_t* kst = tb_kstream_cast(gst);
+	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
 	tb_assert_and_check_return_val(kst, -1);
 
 	// reset 
@@ -88,8 +88,8 @@ static tb_long_t tb_kstream_aclose(tb_gstream_t* gst)
 	kst->read = 0;
 	tb_pstring_exit(&kst->line);
 
-	// close tstream
-	return tb_tstream_aclose(gst);
+	// close filter
+	return tb_gstream_filter_aclose(gst);
 }
 /* chunked_data
  *
@@ -98,25 +98,25 @@ static tb_long_t tb_kstream_aclose(tb_gstream_t* gst)
  * ---------------------- ------------------------- ---------
  *        chunk0                  chunk1               end
  */
-static tb_long_t tb_kstream_spak(tb_gstream_t* gst, tb_long_t sync)
+static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t sync)
 {
 	// check
-	tb_kstream_t* kst = tb_kstream_cast(gst);
-	tb_tstream_t* tst = tb_tstream_cast(gst);
-	tb_assert_and_check_return_val(kst && tst, -1);
+	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_assert_and_check_return_val(kst && filter, -1);
 
 	// the input
-	tb_assert_and_check_return_val(tst->ip, -1);
-	tb_byte_t const* 	ib = tst->ip;
-	tb_byte_t const* 	ip = tst->ip;
-	tb_byte_t const* 	ie = ip + tst->in;
+	tb_assert_and_check_return_val(filter->ip, -1);
+	tb_byte_t const* 	ib = filter->ip;
+	tb_byte_t const* 	ip = filter->ip;
+	tb_byte_t const* 	ie = ip + filter->in;
 	tb_check_return_val(ip < ie, 0);
 
 	// the output
-	tb_assert_and_check_return_val(tst->op, -1);
-	tb_byte_t* 			ob = tst->op;
-	tb_byte_t* 			op = tst->op;
-	tb_byte_t const* 	oe = tst->ob + TB_TSTREAM_CACHE_MAXN;
+	tb_assert_and_check_return_val(filter->op, -1);
+	tb_byte_t* 			ob = filter->op;
+	tb_byte_t* 			op = filter->op;
+	tb_byte_t const* 	oe = filter->ob + TB_GSTREAM_FLTR_CACHE_MAXN;
 	tb_check_return_val(op < oe, 0);
 
 	// parse chunked head and chunked tail
@@ -208,11 +208,11 @@ end:
 	tb_assert_and_check_return_val(op >= ob && op <= oe, -1);
 
 	// update input
-	tst->in -= ip - ib;
-	tst->ip = ip;
+	filter->in -= ip - ib;
+	filter->ip = ip;
 
 	// update output
-	tst->on += op - ob;
+	filter->on += op - ob;
 
 	// ok
 	return (op - ob);
@@ -222,23 +222,23 @@ end:
  */
 tb_gstream_t* tb_gstream_init_chunked()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_kstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_chunked_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
 	if (!tb_gstream_init(gst)) goto fail;
 
 	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_TRAN;
-	gst->aopen 	= tb_kstream_aopen;
-	gst->aread 	= tb_tstream_aread;
-	gst->aclose	= tb_kstream_aclose;
-	gst->wait	= tb_tstream_wait;
-	gst->ctrl	= tb_tstream_ctrl;
+	gst->type 	= TB_GSTREAM_TYPE_FLTR;
+	gst->aopen 	= tb_gstream_filter_chunked_aopen;
+	gst->aread 	= tb_gstream_filter_aread;
+	gst->aclose	= tb_gstream_filter_chunked_aclose;
+	gst->wait	= tb_gstream_filter_wait;
+	gst->ctrl	= tb_gstream_filter_ctrl;
 
-	// init tstream
-	((tb_tstream_t*)gst)->type 	= TB_TSTREAM_TYPE_CHUNKED;
-	((tb_tstream_t*)gst)->spak = tb_kstream_spak;
+	// init filter
+	((tb_gstream_filter_t*)gst)->type 	= TB_GSTREAM_FLTR_TYPE_CHUNKED;
+	((tb_gstream_filter_t*)gst)->spak = tb_gstream_filter_chunked_spak;
 
 	// ok
 	return gst;
@@ -258,7 +258,7 @@ tb_gstream_t* tb_gstream_init_from_chunked(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(kst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(kst, TB_TSTREAM_CTRL_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(kst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gst)) goto fail;
 	
 	// ok
 	return kst;

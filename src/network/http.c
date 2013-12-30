@@ -219,13 +219,13 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	{
 		switch (tb_gstream_state(http->stream))
 		{
-		case TB_SSTREAM_STATE_DNS_FAILED:
+		case TB_GSTREAM_SOCK_STATE_DNS_FAILED:
 			http->status.error = TB_HTTP_ERROR_DNS_FAILED;
 			break;
-		case TB_SSTREAM_STATE_SSL_FAILED:
+		case TB_GSTREAM_SOCK_STATE_SSL_FAILED:
 			http->status.error = TB_HTTP_ERROR_SSL_FAILED;
 			break;
-		case TB_SSTREAM_STATE_CONNECT_FAILED:
+		case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED:
 		default:
 			http->status.error = TB_HTTP_ERROR_CONNECT_FAILED;
 			break;
@@ -893,10 +893,10 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 	{
 		switch (tb_gstream_state(http->stream))
 		{
-		case TB_SSTREAM_STATE_DNS_FAILED:
+		case TB_GSTREAM_SOCK_STATE_DNS_FAILED:
 			http->status.error = TB_HTTP_ERROR_DNS_FAILED;
 			break;
-		case TB_SSTREAM_STATE_CONNECT_FAILED:
+		case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED:
 			http->status.error = TB_HTTP_ERROR_CONNECT_FAILED;
 			break;
 		default:

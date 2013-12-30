@@ -37,7 +37,6 @@
 #include "pool.h"
 #include "addr.h"
 #include "http.h"
-#include "astream.h"
 
 
 #endif

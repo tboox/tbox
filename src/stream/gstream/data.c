@@ -33,7 +33,7 @@
  */
 
 // the data stream type
-typedef struct __tb_dstream_t
+typedef struct __tb_gstream_data_t
 {
 	// the base
 	tb_gstream_t 		base;
@@ -43,20 +43,20 @@ typedef struct __tb_dstream_t
 	tb_byte_t* 			head;
 	tb_size_t 			size;
 
-}tb_dstream_t;
+}tb_gstream_data_t;
 
 
 /* ///////////////////////////////////////////////////////////////////////
  * details
  */
-static __tb_inline__ tb_dstream_t* tb_dstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_gstream_t* gst)
 {
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_DATA, tb_null);
-	return (tb_dstream_t*)gst;
+	return (tb_gstream_data_t*)gst;
 }
-static tb_long_t tb_dstream_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_data_aopen(tb_gstream_t* gst)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->size, -1);
 
 	// attach data
@@ -65,9 +65,9 @@ static tb_long_t tb_dstream_aopen(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_dstream_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_data_aclose(tb_gstream_t* gst)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst, -1);
 	
 	// reset head
@@ -76,9 +76,9 @@ static tb_long_t tb_dstream_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_dstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_data_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->head, -1);
 
 	// check
@@ -94,9 +94,9 @@ static tb_long_t tb_dstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 	dst->head += size;
 	return (tb_long_t)(size);
 }
-static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_data_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->data && dst->head, -1);
 
 	// check
@@ -113,16 +113,16 @@ static tb_long_t tb_dstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t 
 
 	return left? (tb_long_t)(size) : -1; // force end if full
 }
-static tb_hize_t tb_dstream_size(tb_gstream_t const* gst)
+static tb_hize_t tb_gstream_data_size(tb_gstream_t const* gst)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst, 0);
 
 	return dst->size;
 }
-static tb_long_t tb_dstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
+static tb_long_t tb_gstream_data_aseek(tb_gstream_t* gst, tb_hize_t offset)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst, -1);
 
 	// seek 
@@ -131,22 +131,22 @@ static tb_long_t tb_dstream_aseek(tb_gstream_t* gst, tb_hize_t offset)
 	// ok
 	return 1;
 }
-static tb_long_t tb_dstream_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_gstream_data_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst && dst->head <= dst->data + dst->size, -1);
 
 	// wait 
 	return wait;
 }
-static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
-	tb_dstream_t* dst = tb_dstream_cast(gst);
+	tb_gstream_data_t* dst = tb_gstream_data_cast(gst);
 	tb_assert_and_check_return_val(dst, tb_false);
 
 	switch (ctrl)
 	{
-	case TB_DSTREAM_CTRL_SET_DATA:
+	case TB_GSTREAM_CTRL_DATA_SET_DATA:
 		{
 			dst->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
 			dst->size = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -164,7 +164,7 @@ static tb_bool_t tb_dstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t
  */
 tb_gstream_t* tb_gstream_init_data()
 {
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_dstream_t));
+	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_data_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init base
@@ -172,14 +172,14 @@ tb_gstream_t* tb_gstream_init_data()
 
 	// init stream
 	gst->type 	= TB_GSTREAM_TYPE_DATA;
-	gst->aopen 	= tb_dstream_aopen;
-	gst->aclose = tb_dstream_aclose;
-	gst->aread 	= tb_dstream_aread;
-	gst->awrit 	= tb_dstream_awrit;
-	gst->aseek 	= tb_dstream_aseek;
-	gst->size 	= tb_dstream_size;
-	gst->wait 	= tb_dstream_wait;
-	gst->ctrl 	= tb_dstream_ctrl;
+	gst->aopen 	= tb_gstream_data_aopen;
+	gst->aclose = tb_gstream_data_aclose;
+	gst->aread 	= tb_gstream_data_aread;
+	gst->awrit 	= tb_gstream_data_awrit;
+	gst->aseek 	= tb_gstream_data_aseek;
+	gst->size 	= tb_gstream_data_size;
+	gst->wait 	= tb_gstream_data_wait;
+	gst->ctrl 	= tb_gstream_data_ctrl;
 
 	// ok
 	return gst;
@@ -197,7 +197,7 @@ tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// set data & size
-	if (!tb_gstream_ctrl(gst, TB_DSTREAM_CTRL_SET_DATA, data, size)) goto fail;
+	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_DATA_SET_DATA, data, size)) goto fail;
 	
 	return gst;
 

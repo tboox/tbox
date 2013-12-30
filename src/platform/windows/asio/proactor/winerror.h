@@ -97,7 +97,7 @@ static __tb_inline__ tb_size_t tb_winerror_from_nsstatus(tb_size_t status)
 		return WSAECONNRESET;
 
 	case STATUS_LOCAL_DISCONNECT:
-	case STATUS_TRANSACTION_ABORTED:
+	case STATUS_FLTRSACTION_ABORTED:
 	case STATUS_CONNECTION_ABORTED:
 		return WSAECONNABORTED;
 
