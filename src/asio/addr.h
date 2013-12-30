@@ -45,7 +45,7 @@ typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_ipv4_t const* ad
  *
  * @param aicp 		the aicp
  * @param func 		the func
- * @param data 		the data
+ * @param data 		the func data
  *
  * @return 			the addr handle
  */

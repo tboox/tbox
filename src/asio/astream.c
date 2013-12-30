@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		file.c
+ * @file		astream.c
  * @ingroup 	asio
  *
  */
@@ -25,12 +25,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"file"
+#define TB_TRACE_IMPL_TAG 				"astream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "file.h"
+#include "astream.h"
 #include "aico.h"
 #include "aicp.h"
 #include "../network/network.h"
@@ -41,10 +41,10 @@
  */
 
 // the aicp file type
-typedef struct __tb_aicp_file_t
+typedef struct __tb_aicp_astream_t
 {
 
-}tb_aicp_file_t;
+}tb_aicp_astream_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
