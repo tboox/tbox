@@ -220,7 +220,7 @@ end:
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_init_chunked()
+tb_gstream_t* tb_gstream_init_filter_chunked()
 {
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_chunked_t));
 	tb_assert_and_check_return_val(gst, tb_null);
@@ -248,13 +248,13 @@ fail:
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_from_chunked(tb_gstream_t* gst)
+tb_gstream_t* tb_gstream_init_filter_from_chunked(tb_gstream_t* gst)
 {
 	// check
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// init the chunked stream
-	tb_gstream_t* kst = tb_gstream_init_chunked();
+	tb_gstream_t* kst = tb_gstream_init_filter_chunked();
 	tb_assert_and_check_return_val(kst, tb_null);
 
 	// set gstream

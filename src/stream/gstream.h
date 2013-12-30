@@ -114,7 +114,7 @@ typedef enum __tb_gstream_type_e
 
 }tb_gstream_type_e;
 
-/// the tstream enum
+/// the gstream filter enum
 typedef enum __tb_gstream_filter_type_e
 {
  	TB_GSTREAM_FLTR_TYPE_NONE 				= 0
@@ -253,20 +253,20 @@ typedef struct __tb_gstream_sfunc_t
 /// the generic stream type
 typedef struct __tb_gstream_t
 {	
-	/// the stream type
-	tb_size_t 			type 		: 8;
+	/// the type
+	tb_uint32_t 		type 		: 8;
 
 	/// is opened?
-	tb_size_t 			bopened 	: 1;
+	tb_uint32_t 		bopened 	: 1;
 
 	/// is writed?
-	tb_size_t 			bwrited 	: 1;
+	tb_uint32_t 		bwrited 	: 1;
 
 	/// is cached?
-	tb_size_t 			bcached 	: 1;
+	tb_uint32_t 		bcached 	: 1;
 
 	/// the timeout: ms
-	tb_size_t 			timeout 	: 21;
+	tb_uint32_t 		timeout 	: 21;
 
 	/// the state
 	tb_size_t 			state;
@@ -341,37 +341,29 @@ tb_gstream_t* 		tb_gstream_init_sock(tb_noarg_t);
  */
 tb_gstream_t* 		tb_gstream_init_http(tb_noarg_t);
 
-/*! init null stream 
+/*! init null filter stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_null(tb_noarg_t);
+tb_gstream_t* 		tb_gstream_init_filter_null(tb_noarg_t);
 
-/*! init zip stream 
+/*! init zip filter stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_zip(tb_noarg_t);
+tb_gstream_t* 		tb_gstream_init_filter_zip(tb_noarg_t);
 
-/*! init charset stream 
+/*! init charset filter stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_charset(tb_noarg_t);
+tb_gstream_t* 		tb_gstream_init_filter_charset(tb_noarg_t);
 
-/*! init chunked stream 
+/*! init chunked filter stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_chunked(tb_noarg_t);
-
-/*! init stream 
- *
- * @param gst 		the stream
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_gstream_init(tb_gstream_t* gst);
+tb_gstream_t* 		tb_gstream_init_filter_chunked(tb_noarg_t);
 
 /*! exit stream
  *
@@ -433,15 +425,15 @@ tb_gstream_t* 		tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port,
  */
 tb_gstream_t* 		tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
 
-/*! init stream from null
+/*! init filter stream from null
  *
  * @param gst 		the stream
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_from_null(tb_gstream_t* gst);
+tb_gstream_t* 		tb_gstream_init_filter_from_null(tb_gstream_t* gst);
 
-/*! init stream from zip
+/*! init filter stream from zip
  *
  * @param gst 		the stream
  * @param algo 		the zip algorithom
@@ -449,9 +441,9 @@ tb_gstream_t* 		tb_gstream_init_from_null(tb_gstream_t* gst);
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
+tb_gstream_t* 		tb_gstream_init_filter_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action);
 
-/*! init stream from charset
+/*! init filter stream from charset
  *
  * @param gst 		the stream
  * @param fr 		the from charset
@@ -459,15 +451,15 @@ tb_gstream_t* 		tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_s
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_from_charset(tb_gstream_t* gst, tb_size_t fr, tb_size_t to);
+tb_gstream_t* 		tb_gstream_init_filter_from_charset(tb_gstream_t* gst, tb_size_t fr, tb_size_t to);
 
-/*! init stream from chunked
+/*! init filter stream from chunked
  *
  * @param gst 		the stream
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_from_chunked(tb_gstream_t* gst);
+tb_gstream_t* 		tb_gstream_init_filter_from_chunked(tb_gstream_t* gst);
 
 /*! wait stream 
  *

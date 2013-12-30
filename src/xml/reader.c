@@ -58,7 +58,7 @@ typedef struct __tb_xml_reader_t
 	
 	// the stream
 	tb_gstream_t* 			istream;
-	tb_gstream_t* 			tstream;
+	tb_gstream_t* 			filter;
 	tb_gstream_t* 			rstream;
 
 	// the version
@@ -170,7 +170,7 @@ tb_void_t tb_xml_reader_exit(tb_handle_t reader)
 	if (xreader)
 	{
 		// exit stream
-		if (xreader->tstream) tb_gstream_exit(xreader->tstream);
+		if (xreader->filter) tb_gstream_exit(xreader->filter);
 
 		// exit version
 		tb_pstring_exit(&xreader->version);
@@ -295,9 +295,9 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					// init transform stream
 					if (charset != TB_CHARSET_TYPE_UTF8)
 					{
-						xreader->tstream = tb_gstream_init_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
-						if (xreader->tstream && tb_gstream_bopen(xreader->tstream))
-							xreader->rstream = xreader->tstream;
+						xreader->filter = tb_gstream_init_filter_from_charset(xreader->istream, charset, TB_CHARSET_TYPE_UTF8);
+						if (xreader->filter && tb_gstream_bopen(xreader->filter))
+							xreader->rstream = xreader->filter;
 						tb_pstring_cstrcpy(&xreader->charset, "utf-8");
 					}
 				}

@@ -180,7 +180,7 @@ static tb_long_t tb_gstream_filter_zip_spak(tb_gstream_t* gst, tb_long_t sync)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_t* tb_gstream_init_zip()
+tb_gstream_t* tb_gstream_init_filter_zip()
 {
 	// check
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_zip_t));
@@ -208,13 +208,13 @@ fail:
 	if (gst) tb_gstream_exit(gst);
 	return tb_null;
 }
-tb_gstream_t* tb_gstream_init_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
+tb_gstream_t* tb_gstream_init_filter_from_zip(tb_gstream_t* gst, tb_size_t algo, tb_size_t action)
 {
 	// check
 	tb_assert_and_check_return_val(gst, tb_null);
 
 	// create encoding stream
-	tb_gstream_t* zst = tb_gstream_init_zip();
+	tb_gstream_t* zst = tb_gstream_init_filter_zip();
 	tb_assert_and_check_return_val(zst, tb_null);
 
 	// set gstream
