@@ -681,15 +681,6 @@ tb_bool_t 			tb_gstream_bskip(tb_gstream_t* gst, tb_hize_t size);
  */
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gst, tb_char_t const* fmt, ...);
 
-/*! block load data
- *
- * @param gst 		the stream
- * @param ist 		the input stream
- *
- * @return 			the real size
- */
-tb_hize_t 			tb_gstream_load(tb_gstream_t* gst, tb_gstream_t* ist);
-
 /*! block save data
  *
  * @param gst 		the stream

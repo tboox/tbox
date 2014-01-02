@@ -35,84 +35,85 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the aicp file type
-typedef struct __tb_aicp_astream_t
-{
-
-}tb_aicp_astream_t;
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp, tb_astream_func_t const* func)
-{
-	return tb_null;
-}
-tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp, tb_astream_func_t const* func)
-{
-	return tb_null;
-}
-tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp, tb_astream_func_t const* func)
+tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
 	return tb_null;
 }
 tb_void_t tb_astream_exit(tb_astream_t* ast)
 {
 }
-
-tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* url)
-{
-	return tb_null;
-}
-tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* path)
-{
-	return tb_null;
-}
-tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
-{
-	return tb_null;
-}
-tb_astream_t* tb_astream_init_from_http(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
-{
-	return tb_null;
-}
 tb_void_t tb_astream_kill(tb_astream_t* ast)
 {
 }
-tb_long_t tb_astream_open(tb_astream_t* ast)
+tb_bool_t tb_astream_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
 {
-	return 0;
+	return tb_false;
 }
-tb_long_t tb_astream_read(tb_astream_t* ast)
+tb_bool_t tb_astream_read(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv)
 {
-	return 0;
+	return tb_false;
 }
-tb_long_t tb_astream_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size)
+tb_bool_t tb_astream_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
-	return 0;
+	return tb_false;
 }
-tb_long_t tb_astream_seek(tb_astream_t* ast, tb_hize_t offset)
+tb_bool_t tb_astream_save(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
 {
-	return 0;
+	return tb_false;
+}
+tb_bool_t tb_astream_seek(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+{
+	return tb_false;
+}
+tb_bool_t tb_astream_sync(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv)
+{
+	return tb_false;
+}
+tb_bool_t tb_astream_try_open(tb_astream_t* ast)
+{
+	return tb_false;
+}
+tb_bool_t tb_astream_try_seek(tb_astream_t* ast, tb_hize_t offset)
+{
+	return tb_false;
 }
 tb_aicp_t* tb_astream_aicp(tb_astream_t* ast)
 {
-	return tb_null;
+	// check
+	tb_assert_and_check_return_val(ast, tb_null);
+
+	// the aicp
+	return ast->aicp;
 }
 tb_size_t tb_astream_type(tb_astream_t const* ast)
 {
-	return 0;
+	// check
+	tb_assert_and_check_return_val(ast, TB_ASTREAM_TYPE_NONE);
+
+	// the type
+	return ast->type;
 }
 tb_hize_t tb_astream_size(tb_astream_t const* ast)
 {
 	return 0;
+}
+tb_hize_t tb_astream_left(tb_astream_t const* ast)
+{
+	return 0;
+}
+tb_hize_t tb_astream_offset(tb_astream_t const* ast)
+{
+	return 0;
+}
+tb_size_t tb_astream_timeout(tb_astream_t const* ast)
+{
+	return 0;
+}
+tb_char_t const* tb_astream_state_cstr(tb_size_t state)
+{
+	return tb_null;
 }
 tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 {

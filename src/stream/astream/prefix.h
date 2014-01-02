@@ -29,5 +29,22 @@
 #include "../prefix.h"
 #include "../astream.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * inlines
+ */
+static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* ast)
+{
+	// check
+	tb_assert_and_check_return_val(ast, tb_false);
+
+	// clear
+	tb_memset(ast, 0, sizeof(tb_astream_t));
+
+	// init url
+	if (!tb_url_init(&ast->url)) return tb_false;
+
+	// ok
+	return tb_true;
+}
 
 #endif
