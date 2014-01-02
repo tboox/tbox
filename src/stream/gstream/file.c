@@ -53,9 +53,8 @@ typedef struct __tb_gstream_file_t
 
 }tb_gstream_file_t;
 
-
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static __tb_inline__ tb_gstream_file_t* tb_gstream_file_cast(tb_gstream_t* gst)
 {
@@ -187,7 +186,6 @@ static tb_bool_t tb_gstream_file_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
 tb_gstream_t* tb_gstream_init_file()
 {
 	// make stream
@@ -224,6 +222,7 @@ fail:
 
 tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 {
+	// check
 	tb_assert_and_check_return_val(path, tb_null);
 
 	// init file stream
@@ -233,8 +232,8 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 	// set path
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_URL, path)) goto fail;
 	
+	// ok
 	return gst;
-
 fail:
 	if (gst) tb_gstream_exit(gst);
 	return tb_null;

@@ -110,76 +110,78 @@ typedef enum __tb_astream_state_e
 ,	TB_ASTREAM_SOCK_STATE_DNS_FAILED 		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 1)
 ,	TB_ASTREAM_SOCK_STATE_CONNECT_FAILED	= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 2)
 ,	TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT	= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 3)
-,	TB_ASTREAM_SOCK_STATE_SSL_FAILED		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 4)
 
 }tb_astream_state_e;
 
-/// the asio stream func type
+/// the asio stream declaration
 struct __tb_astream_t;
-typedef struct __tb_astream_func_t
-{	
-	/// the priv
-	tb_pointer_t 		priv;
 
-	/*! the astream open func type
-	 *
-	 * @param ast 		the astream
-	 * @param state 	the stream state
-	 * @param priv 		the func private data
-	 *
-	 * @return 			tb_true or tb_false, but not break aicp
-	 */
-	tb_bool_t 			(*open)(struct __tb_astream_t* ast, tb_size_t state, tb_pointer_t priv);
+/*! the astream open func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_open_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_pointer_t priv);
 
-	/*! the astream read func type
-	 *
-	 * @param ast 		the astream
-	 * @param state 	the stream state
-	 * @param offset 	the current stream offset
-	 * @param data 		the readed data
-	 * @param size 		the readed size
-	 * @param priv 		the func private data
-	 *
-	 * @return 			1: ok and break, 0: continue, -1: failed or break it, but not break aicp
-	 */
-	tb_long_t 			(*read)(struct __tb_astream_t* ast, tb_size_t state, tb_hize_t offset, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv);
+/*! the astream read func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param data 		the readed data
+ * @param size 		the readed size
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_read_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv);
 
-	/*! the astream writ func type
-	 *
-	 * @param ast 		the astream
-	 * @param state 	the stream state
-	 * @param offset 	the current stream offset
-	 * @param size 		the writed size
-	 * @param left 		the left size
-	 * @param priv 		the func private data
-	 *
-	 * @return 			1: ok and break, 0: continue, -1: failed or break it, but not break aicp
-	 */
-	tb_long_t 			(*writ)(struct __tb_astream_t* ast, tb_size_t state, tb_hize_t offset, tb_size_t size, tb_size_t left, tb_pointer_t priv);
+/*! the astream writ func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param real 		the real size
+ * @param size 		the need size
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_writ_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
-	/*! the astream seek func type
-	 *
-	 * @param ast 		the astream
-	 * @param state 	the stream state
-	 * @param offset 	the current stream offset
-	 * @param priv 		the func private data
-	 *
-	 * @return 			tb_true or tb_false, but not break aicp
-	 */
-	tb_bool_t 			(*seek)(struct __tb_astream_t* ast, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
+/*! the astream save func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param real 		the real size
+ * @param size 		the need size
+ *                  the size is (tb_hize_t)-1, if the output stream is streamed data
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_save_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_size_t real, tb_hize_t size, tb_pointer_t priv);
 
-	/*! the astream sync func type
-	 *
-	 * @param ast 		the astream
-	 * @param state 	the stream state
-	 * @param offset 	the current stream offset
-	 * @param priv 		the func private data
-	 *
-	 * @return 			tb_true or tb_false, but not break aicp
-	 */
-	tb_bool_t 			(*sync)(struct __tb_astream_t* ast, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
+/*! the astream seek func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_seek_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_pointer_t priv);
 
-}tb_astream_func_t;
+/*! the astream sync func type
+ *
+ * @param ast 		the astream
+ * @param state 	the stream state
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 	(*tb_astream_sync_func_t)(struct __tb_astream_t* ast, tb_size_t state, tb_pointer_t priv);
 
 /// the asio stream type
 typedef struct __tb_astream_t
@@ -201,9 +203,6 @@ typedef struct __tb_astream_t
 
 	/// the aicp
 	tb_aicp_t* 			aicp;
-
-	/// the func
-	tb_astream_func_t 	func;
 
 	/// the lock
 	tb_spinlock_t 		lock;
@@ -244,29 +243,26 @@ typedef struct __tb_astream_t
 /*! init file stream 
  *
  * @param aicp 		the aicp
- * @param func 		the func
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_file(tb_aicp_t* aicp, tb_astream_func_t const* func);
+tb_astream_t* 		tb_astream_init_file(tb_aicp_t* aicp);
 
 /*! init sock stream 
  *
  * @param aicp 		the aicp
- * @param func 		the func
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_sock(tb_aicp_t* aicp, tb_astream_func_t const* func);
+tb_astream_t* 		tb_astream_init_sock(tb_aicp_t* aicp);
 
 /*! init http stream 
  *
  * @param aicp 		the aicp
- * @param func 		the func
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp, tb_astream_func_t const* func);
+tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp);
 
 /*! exit stream
  *
@@ -277,7 +273,6 @@ tb_void_t 			tb_astream_exit(tb_astream_t* ast);
 /*! init stream from url
  *
  * @param aicp 		the aicp
- * @param func 		the func
  * @param url 		the url
  * <pre>
  * file://path or unix path: e.g. /root/xxxx/file
@@ -288,22 +283,20 @@ tb_void_t 			tb_astream_exit(tb_astream_t* ast);
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_from_url(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* url);
+tb_astream_t* 		tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url);
 
 /*! init stream from file
  *
  * @param aicp 		the aicp
- * @param func 		the func
  * @param path 		the file path
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_from_file(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* path);
+tb_astream_t* 		tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path);
 
 /*! init stream from sock
  *
  * @param aicp 		the aicp
- * @param func 		the func
  * @param host 		the host
  * @param port 		the port
  * @param type 		the socket type, tcp or udp
@@ -311,12 +304,11 @@ tb_astream_t* 		tb_astream_init_from_file(tb_aicp_t* aicp, tb_astream_func_t con
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_from_sock(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
+tb_astream_t* 		tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl);
 
 /*! init stream from http or https
  *
  * @param aicp 		the aicp
- * @param func 		the func
  * @param host 		the host
  * @param port 		the port
  * @param path 		the path
@@ -324,7 +316,7 @@ tb_astream_t* 		tb_astream_init_from_sock(tb_aicp_t* aicp, tb_astream_func_t con
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_from_http(tb_aicp_t* aicp, tb_astream_func_t const* func, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+tb_astream_t* 		tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
 
 /*! kill stream
  *
@@ -335,45 +327,89 @@ tb_void_t 			tb_astream_kill(tb_astream_t* ast);
 /*! open the stream 
  *
  * @param ast 		the stream
+ * @param func 		the func
+ * @param priv 		the func data
  *
- * @return 			1: ok, 0: pending and wait it, -1: failed
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_astream_open(tb_astream_t* ast);
+tb_bool_t 			tb_astream_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv);
 
 /*! read the stream 
  *
  * @param ast 		the stream
+ * @param func 		the func
+ * @param priv 		the func data
  *
- * @return 			1: ok, 0: pending and wait it, -1: failed
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_astream_read(tb_astream_t* ast);
+tb_bool_t 			tb_astream_read(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv);
 
 /*! writ the stream 
  *
  * @param ast 		the stream
  * @param data 		the data
  * @param size 		the size
+ * @param func 		the func
+ * @param priv 		the func data
  *
- * @return 			1: ok, 0: pending and wait it, -1: failed
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_astream_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size);
+tb_bool_t 			tb_astream_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
+
+/*! save the stream
+ *
+ * @param ast 		the stream
+ * @param ost 		the output stream
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_save(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv);
 
 /*! seek the stream
  *
  * @param ast 		the stream
  * @param offset 	the offset
+ * @param func 		the func
+ * @param priv 		the func data
  *
- * @return 			1: ok, 0: pending and wait it, -1: failed
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_astream_seek(tb_astream_t* ast, tb_hize_t offset);
+tb_bool_t 			tb_astream_seek(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
 
 /*! sync the stream
  *
+ * @note will be block returned if func and priv is tb_null
+ *
+ * @param ast 		the stream
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_sync(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv);
+
+/*! try to open the stream for file, ... 
+ *
+ * will be return tb_true immediately if ok
+ *
  * @param ast 		the stream
  *
- * @return 			1: ok, 0: pending and wait it, -1: failed
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_astream_sync(tb_astream_t* ast);
+tb_bool_t 			tb_astream_try_open(tb_astream_t* ast);
+
+/*! try to seek the stream for file, ...
+ *
+ * will be return tb_true immediately if ok
+ *
+ * @param ast 		the stream
+ * @param offset 	the offset
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_try_seek(tb_astream_t* ast, tb_hize_t offset);
 
 /*! the stream aicp
  *
@@ -398,6 +434,38 @@ tb_size_t 			tb_astream_type(tb_astream_t const* ast);
  * @return 			the stream size
  */
 tb_hize_t 			tb_astream_size(tb_astream_t const* ast);
+
+/*! the stream left size
+ *
+ * @param ast 		the stream
+ *
+ * @return 			the stream left size
+ */
+tb_hize_t 			tb_astream_left(tb_astream_t const* ast);
+
+/*! the stream offset
+ *
+ * @param ast 		the stream
+ *
+ * @return 			the stream offset
+ */
+tb_hize_t 			tb_astream_offset(tb_astream_t const* ast);
+
+/*! the stream timeout
+ *
+ * @param ast 		the stream
+ *
+ * @return 			the stream timeout
+ */
+tb_size_t 			tb_astream_timeout(tb_astream_t const* ast);
+
+/*! the stream state c-string
+ *
+ * @param state 	the state
+ *
+ * @return 			the stream state c-string
+ */
+tb_char_t const* 	tb_astream_state_cstr(tb_size_t state);
 
 /*! ctrl stream
  *

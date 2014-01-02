@@ -68,6 +68,9 @@ tbox_C_FILES 			+= \
 						stream/gstream/filter/null \
 						stream/gstream/filter/zip \
 						stream/astream \
+						stream/astream/http \
+						stream/astream/sock \
+						stream/astream/file \
 						object/object \
 						object/null \
 						object/data \
