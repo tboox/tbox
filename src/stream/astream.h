@@ -188,14 +188,23 @@ typedef tb_bool_t 	(*tb_astream_sync_func_t)(struct __tb_astream_t* ast, tb_size
 /// the asio stream type
 typedef struct __tb_astream_t
 {	
-	/// the type
-	tb_uint8_t 			type;
+	/// the url
+	tb_url_t 			url;
 
 	/// the aicp
 	tb_aicp_t* 			aicp;
 
-	/// the url
-	tb_url_t 			url;
+	/// the type
+	tb_uint8_t 			type;
+
+	// is opened?
+	tb_uint8_t 			opened;
+
+	// is stoped?
+	tb_atomic_t 		stoped;
+
+	// is pending?
+	tb_atomic_t 		pending;
 
 	/// open
 	tb_long_t 			(*open)(struct __tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv);

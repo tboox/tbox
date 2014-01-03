@@ -42,7 +42,7 @@ typedef struct __tb_gstream_file_t
 	// the file handle
 	tb_handle_t 		file;
 
-	// the file bref
+	// the file handle is referenced? need not exit it
 	tb_size_t 			bref;
 
 	// the file mode
@@ -86,7 +86,7 @@ static tb_long_t tb_gstream_file_close(tb_gstream_t* gst)
 
 	if (fst->file)
 	{
-		// close file
+		// exit file
 		if (!fst->bref) if (!tb_file_exit(fst->file)) return 0;
 
 		// reset

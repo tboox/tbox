@@ -22,6 +22,11 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 				"afile"
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
@@ -40,6 +45,9 @@ typedef struct __tb_astream_file_t
 	// the file handle
 	tb_handle_t 		file;
 
+	// the file handle is referenced? need not exit it
+	tb_bool_t 			bref;
+
 	// the file mode
 	tb_size_t 			mode;
 
@@ -48,6 +56,11 @@ typedef struct __tb_astream_file_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_astream_t* ast)
+{
+	tb_assert_and_check_return_val(ast && ast->type == TB_ASTREAM_TYPE_FILE, tb_null);
+	return (tb_astream_file_t*)ast;
+}
 static tb_long_t tb_astream_file_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	return -1;
@@ -73,13 +86,70 @@ static tb_long_t tb_astream_file_sync(tb_astream_t* ast, tb_astream_sync_func_t 
 	return -1;
 }
 static tb_void_t tb_astream_file_kill(tb_astream_t* ast)
-{
+{	
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return(fst);
+
+	// kill it
+	if (!fst->bref && fst->file) tb_file_exit(fst->file);
 }
 static tb_void_t tb_astream_file_exit(tb_astream_t* ast)
-{
+{	
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return(fst);
+
+	// exit it
+	if (!fst->bref && fst->file) tb_file_exit(fst->file);
+	fst->file = tb_null;
+	fst->bref = tb_false;
 }
 static tb_bool_t tb_astream_file_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_list_t args)
 {
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst, tb_false);
+
+	// ctrl
+	switch (ctrl)
+	{
+	case TB_ASTREAM_CTRL_GET_SIZE:
+	case TB_ASTREAM_CTRL_GET_OFFSET:
+		break;
+	case TB_ASTREAM_CTRL_FILE_SET_MODE:
+		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set mode
+			fst->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
+			return tb_true;
+		}
+	case TB_ASTREAM_CTRL_FILE_SET_HANDLE:
+		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set handle
+			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			fst->file = handle;
+			fst->bref = handle? tb_true : tb_false;
+			return tb_true;
+		}
+	case TB_ASTREAM_CTRL_FILE_GET_HANDLE:
+		{
+			// get handle
+			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
+			tb_assert_and_check_return_val(phandle, tb_false);
+			*phandle = fst->file;
+			return tb_true;
+		}
+	case TB_ASTREAM_CTRL_SET_TIMEOUT:
+	case TB_ASTREAM_CTRL_GET_TIMEOUT:
+	default:
+		break;
+	}
 	return tb_false;
 }
 

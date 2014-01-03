@@ -46,7 +46,7 @@ typedef struct __tb_gstream_http_t
 }tb_gstream_http_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static __tb_inline__ tb_gstream_http_t* tb_gstream_http_cast(tb_gstream_t* gst)
 {

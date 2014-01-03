@@ -80,9 +80,8 @@ typedef struct __tb_gstream_sock_t
 
 }tb_gstream_sock_t;
 
-
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gst)
 {
