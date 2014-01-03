@@ -80,12 +80,14 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_GET_PORT 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 3)
 ,	TB_ASTREAM_CTRL_GET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 4)
 ,	TB_ASTREAM_CTRL_GET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 5)
+,	TB_ASTREAM_CTRL_GET_SIZE 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 6)
+,	TB_ASTREAM_CTRL_GET_OFFSET 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 7)
 
-,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 6)
-,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 7)
-,	TB_ASTREAM_CTRL_SET_PORT 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
-,	TB_ASTREAM_CTRL_SET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 9)
-,	TB_ASTREAM_CTRL_SET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 10)
+,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
+,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 9)
+,	TB_ASTREAM_CTRL_SET_PORT 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 10)
+,	TB_ASTREAM_CTRL_SET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 11)
+,	TB_ASTREAM_CTRL_SET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 12)
 
 	// the astream for file
 ,	TB_ASTREAM_CTRL_FILE_SET_MODE 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FILE, 1)
@@ -187,49 +189,37 @@ typedef tb_bool_t 	(*tb_astream_sync_func_t)(struct __tb_astream_t* ast, tb_size
 typedef struct __tb_astream_t
 {	
 	/// the type
-	tb_uint32_t 		type 		: 8;
-
-	/// is opened?
-	tb_uint32_t 		bopened 	: 1;
-
-	/// is idled?
-	tb_uint32_t 		bidled 		: 1;
-
-	/// the url
-	tb_url_t 			url;
-
-	/// the offset
-	tb_hize_t 			offset;
+	tb_uint8_t 			type;
 
 	/// the aicp
 	tb_aicp_t* 			aicp;
 
-	/// the lock
-	tb_spinlock_t 		lock;
+	/// the url
+	tb_url_t 			url;
 
 	/// open
-	tb_bool_t 			(*open)(struct __tb_astream_t* ast);
-
-	/// close
-	tb_bool_t 			(*close)(struct __tb_astream_t* ast);
+	tb_long_t 			(*open)(struct __tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv);
 
 	/// read
-	tb_bool_t 			(*read)(struct __tb_astream_t* ast, tb_byte_t const* data, tb_size_t size);
+	tb_long_t 			(*read)(struct __tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv);
 
 	/// writ
-	tb_bool_t 			(*writ)(struct __tb_astream_t* ast, tb_byte_t const* data, tb_size_t size);
+	tb_long_t 			(*writ)(struct __tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
+
+	/// save
+	tb_long_t 			(*save)(struct __tb_astream_t* ast, struct __tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv);
 
 	/// seek
-	tb_bool_t 			(*seek)(struct __tb_astream_t* ast, tb_hize_t offset);
+	tb_long_t 			(*seek)(struct __tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
 
-	/// size
-	tb_hize_t 			(*size)(struct __tb_astream_t* ast);
+	/// sync
+	tb_long_t 			(*sync)(struct __tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv);
 
 	/// kill
 	tb_void_t 			(*kill)(struct __tb_astream_t* ast);
 
-	/// free
-	tb_void_t 			(*free)(struct __tb_astream_t* ast);
+	/// exit
+	tb_void_t 			(*exit)(struct __tb_astream_t* ast);
 
 	/// ctrl
 	tb_bool_t 			(*ctrl)(struct __tb_astream_t* ast, tb_size_t ctrl, tb_va_list_t args);

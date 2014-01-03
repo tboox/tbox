@@ -89,7 +89,7 @@ static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_SOCK, tb_null);
 	return (tb_gstream_sock_t*)gst;
 }
-static tb_long_t tb_gstream_sock_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
@@ -233,7 +233,7 @@ fail:
 
 	return -1;
 }
-static tb_long_t tb_gstream_sock_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_sock_close(tb_gstream_t* gst)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
 	tb_assert_and_check_return_val(sst, -1);
@@ -263,7 +263,7 @@ static tb_long_t tb_gstream_sock_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_gstream_sock_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
@@ -324,7 +324,7 @@ static tb_long_t tb_gstream_sock_aread(tb_gstream_t* gst, tb_byte_t* data, tb_si
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_sock_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
@@ -458,29 +458,25 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 tb_gstream_t* tb_gstream_init_sock()
 {
 	// make stream
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_sock_t));
+	tb_gstream_sock_t* gst = (tb_gstream_sock_t*)tb_malloc0(sizeof(tb_gstream_sock_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// init base
-	if (!tb_gstream_init(gst)) goto fail;
-
 	// init stream
-	tb_gstream_sock_t* sst = (tb_gstream_sock_t*)gst;
-	gst->type 	= TB_GSTREAM_TYPE_SOCK;
-	gst->aopen 	= tb_gstream_sock_aopen;
-	gst->aclose = tb_gstream_sock_aclose;
-	gst->aread 	= tb_gstream_sock_aread;
-	gst->awrit 	= tb_gstream_sock_awrit;
-	gst->ctrl 	= tb_gstream_sock_ctrl;
-	gst->wait 	= tb_gstream_sock_wait;
-	sst->sock 	= tb_null;
-	sst->type 	= TB_SOCKET_TYPE_TCP;
+	if (!tb_gstream_init((tb_gstream_t*)gst, TB_GSTREAM_TYPE_SOCK)) goto fail;
+	gst->base.open 	= tb_gstream_sock_open;
+	gst->base.close = tb_gstream_sock_close;
+	gst->base.read 	= tb_gstream_sock_read;
+	gst->base.writ 	= tb_gstream_sock_writ;
+	gst->base.ctrl 	= tb_gstream_sock_ctrl;
+	gst->base.wait 	= tb_gstream_sock_wait;
+	gst->sock 		= tb_null;
+	gst->type 		= TB_SOCKET_TYPE_TCP;
 
 	// ok
-	return gst;
+	return (tb_gstream_t*)gst;
 
 fail:
-	if (gst) tb_gstream_exit(gst);
+	if (gst) tb_gstream_exit((tb_gstream_t*)gst);
 	return tb_null;
 }
 

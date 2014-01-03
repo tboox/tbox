@@ -286,26 +286,26 @@ typedef struct __tb_gstream_t
 	/// wait 
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
 
-	/// async open
-	tb_long_t 			(*aopen)(struct __tb_gstream_t* gst);
+	/// open
+	tb_long_t 			(*open)(struct __tb_gstream_t* gst);
 
-	/// async close
-	tb_long_t 			(*aclose)(struct __tb_gstream_t* gst);
+	/// close
+	tb_long_t 			(*close)(struct __tb_gstream_t* gst);
 
-	/// async read
-	tb_long_t 			(*aread)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+	/// read
+	tb_long_t 			(*read)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
-	/// async writ
-	tb_long_t 			(*awrit)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+	/// writ
+	tb_long_t 			(*writ)(struct __tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	/// seek
-	tb_long_t 			(*aseek)(struct __tb_gstream_t* gst, tb_hize_t offset);
+	tb_long_t 			(*seek)(struct __tb_gstream_t* gst, tb_hize_t offset);
 
 	/// size
 	tb_hize_t 			(*size)(struct __tb_gstream_t* gst);
 
-	/// free
-	tb_void_t 			(*free)(struct __tb_gstream_t* gst);
+	/// exit
+	tb_void_t 			(*exit)(struct __tb_gstream_t* gst);
 
 	/// ctrl
 	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args);

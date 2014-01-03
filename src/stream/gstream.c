@@ -40,38 +40,8 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
+ * implementation
  */
- 
-// the stream table item type
-typedef struct __tb_gstream_item_t
-{
-	// the stream type
-	tb_size_t 			type;
-
-	// the stream initor
-	tb_gstream_t* 		(*init)();
-
-}tb_gstream_item_t;
-
-/* ///////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the stream table
-static tb_gstream_item_t g_gstream_table[] = 
-{
-	{TB_GSTREAM_TYPE_NONE, tb_null}
-,	{TB_GSTREAM_TYPE_FILE, tb_gstream_init_file}
-,	{TB_GSTREAM_TYPE_SOCK, tb_gstream_init_sock}
-,	{TB_GSTREAM_TYPE_HTTP, tb_gstream_init_http}
-,	{TB_GSTREAM_TYPE_DATA, tb_gstream_init_data}
-};
-
-/* ///////////////////////////////////////////////////////////////////////
- * details
- */
-
 static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 {
 	tb_long_t need = 0;
@@ -90,11 +60,11 @@ static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_
 	tb_assert_and_check_return_val(size <= push, -1);
 
 	// fill cache
-	tb_assert(gst->aread);
+	tb_assert(gst->read);
 	if (need < size)
 	{
 		// read data
-		tb_long_t real = gst->aread(gst, tail + need, push - need, tb_false);
+		tb_long_t real = gst->read(gst, tail + need, push - need, tb_false);
 		tb_check_return_val(real >= 0, -1);
 
 		// update need
@@ -139,8 +109,8 @@ static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		tb_assert_and_check_return_val(tail && push, -1);
 
 		// push data to cache from stream
-		tb_assert(gst->aread);
-		tb_long_t 	real = gst->aread(gst, tail, push, tb_false);
+		tb_assert(gst->read);
+		tb_long_t 	real = gst->read(gst, tail, push, tb_false);
 		tb_check_return_val(real >= 0, -1);
 
 		// read the left data from cache
@@ -160,7 +130,7 @@ static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gst, tb_byte_t* data, tb_s
 	else 
 	{
 		// read it directly
-		read = gst->aread(gst, data, size, tb_false);
+		read = gst->read(gst, data, size, tb_false);
 		tb_check_return_val(read >= 0, -1);
 	}
 
@@ -195,8 +165,8 @@ static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_s
 		tb_assert_and_check_return_val(head && pull, -1);
 
 		// pull data to stream from cache
-		tb_assert(gst->awrit);
-		tb_long_t 	real = gst->awrit(gst, head, pull, tb_false);
+		tb_assert(gst->writ);
+		tb_long_t 	real = gst->writ(gst, head, pull, tb_false);
 		tb_check_return_val(real >= 0, -1);
 
 		// writ the left data to cache
@@ -216,7 +186,7 @@ static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_s
 	else 
 	{
 		// writ it directly
-		writ = gst->awrit(gst, data, size, tb_false);
+		writ = gst->writ(gst, data, size, tb_false);
 		tb_check_return_val(writ >= 0, -1);
 	}
 
@@ -249,7 +219,7 @@ static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gst, tb_byte_t* data, tb_
 	}
 
 	// flush read data
-	r = gst->aread(gst, data, size, tb_true);
+	r = gst->read(gst, data, size, tb_true);
 
 	// ok?
 	return r;
@@ -268,7 +238,7 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_
 		tb_assert_and_check_return_val(head && pull, -1);
 
 		// writ data to stream
-		tb_long_t 	writ = gst->awrit(gst, head, pull, tb_false);
+		tb_long_t 	writ = gst->writ(gst, head, pull, tb_false);
 		tb_check_goto(writ >= 0, end);
 		tb_assert_and_check_return_val(writ <= pull, -1);
 
@@ -280,7 +250,7 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gst, tb_byte_t* data, tb_
 	if (tb_qbuffer_null(&gst->cache))
 	{
 		// flush writ data
-		r = gst->awrit(gst, data, size, tb_true);
+		r = gst->writ(gst, data, size, tb_true);
 	}
 	else 
 	{
@@ -328,8 +298,8 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gst, tb_hize_t offset)
 	}
 
 	// seek it
-	tb_check_return_val(gst->aseek, -1);
-	r = gst->aseek(gst, offset);
+	tb_check_return_val(gst->seek, -1);
+	r = gst->seek(gst, offset);
 
 	// support the native seek? clear cache
 	if (r >= 0) tb_qbuffer_clear(&gst->cache);
@@ -363,31 +333,37 @@ static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gst, tb_size_t wait, tb_lon
  */
 tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 {
+	// check
 	tb_assert_and_check_return_val(url, tb_null);
 
+	// the init
+	static tb_gstream_t* (*g_init[])() = 
+	{
+		tb_null
+	,	tb_gstream_init_file
+	,	tb_gstream_init_sock
+	,	tb_gstream_init_http
+	,	tb_gstream_init_data
+	};
+
 	// init
-	tb_gstream_t* 		gst = tb_null;
-	tb_size_t 			t = TB_GSTREAM_TYPE_NONE;
 	tb_char_t const* 	p = url;
-	if (!tb_strnicmp(p, "http://", 7)) 
-		t = TB_GSTREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "sock://", 7))
-		t = TB_GSTREAM_TYPE_SOCK;
-	else if (!tb_strnicmp(p, "https://", 8))
-		t = TB_GSTREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "socks://", 8))
-		t = TB_GSTREAM_TYPE_SOCK;
-	else if (!tb_strstr(p, "://")) 
-		t = TB_GSTREAM_TYPE_FILE;
+	tb_gstream_t* 		gst = tb_null;
+	tb_size_t 			type = TB_GSTREAM_TYPE_NONE;
+	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_GSTREAM_TYPE_HTTP;
+	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_GSTREAM_TYPE_SOCK;
+	else if (!tb_strnicmp(p, "https://", 8)) 	type = TB_GSTREAM_TYPE_HTTP;
+	else if (!tb_strnicmp(p, "socks://", 8)) 	type = TB_GSTREAM_TYPE_SOCK;
+	else if (!tb_strstr(p, "://")) 				type = TB_GSTREAM_TYPE_FILE;
 	else 
 	{
 		tb_trace("[gstream]: unknown prefix for url: %s", url);
 		return tb_null;
 	}
-	tb_assert_and_check_goto(t && t < tb_arrayn(g_gstream_table), fail);
+	tb_assert_and_check_goto(type && type < tb_arrayn(g_init) && g_init[type], fail);
 
 	// init stream
-	gst = g_gstream_table[t].init();
+	gst = g_init[type]();
 	tb_assert_and_check_goto(gst, fail);
 
 	// set url
@@ -400,10 +376,8 @@ fail:
 	
 	// exit stream
 	if (gst) tb_gstream_exit(gst);
-
 	return tb_null;
 }
-
 tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 {
 	if (gst) 
@@ -411,14 +385,14 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gst)
 		// close it
 		tb_gstream_bclose(gst);
 
+		// exit it
+		if (gst->exit) gst->exit(gst);
+
 		// exit cache
 		tb_qbuffer_exit(&gst->cache);
 
 		// exit url
 		tb_url_exit(&gst->url);
-
-		// free native
-		if (gst->free) gst->free(gst);
 
 		// free it
 		tb_free(gst);
@@ -485,9 +459,9 @@ tb_char_t const* tb_gstream_state_cstr(tb_gstream_t* gst)
 	// done
 	switch (state)
 	{
-	case TB_GSTREAM_STATE_OK: 				return "ok";
-	case TB_GSTREAM_STATE_UNKNOWN_ERROR: 	return "unknown error";
-	case TB_GSTREAM_STATE_WAIT_FAILED: 		return "wait failed";
+	case TB_GSTREAM_STATE_OK: 					return "ok";
+	case TB_GSTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
+	case TB_GSTREAM_STATE_WAIT_FAILED: 			return "wait failed";
 	case TB_GSTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";
 	case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED: 	return "sock: connect: failed";
 	case TB_GSTREAM_SOCK_STATE_SSL_FAILED: 		return "sock: ssl: failed";
@@ -526,7 +500,7 @@ tb_char_t const* tb_gstream_state_cstr(tb_gstream_t* gst)
 	case TB_GSTREAM_HTTP_STATE_RESPONSE_NUL: 	return "http: response: no";
 	case TB_GSTREAM_HTTP_STATE_REQUEST_FAILED: 	return "http: request: failed";
 	case TB_GSTREAM_HTTP_STATE_UNKNOWN_ERROR: 	return "http: unknown error";
-	default: 								return "http: unknown";
+	default: 									return "http: unknown";
 	}
 
 	return tb_null;
@@ -546,7 +520,7 @@ tb_bool_t tb_gstream_beof(tb_gstream_t* gst)
 tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 {
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->aopen, -1);
+	tb_assert_and_check_return_val(gst && gst->open, -1);
 
 	// already been opened?
 	tb_check_return_val(!gst->bopened, 1);
@@ -561,7 +535,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gst)
 	gst->state = TB_GSTREAM_STATE_OK;
 
 	// open it
-	tb_long_t r = gst->aopen(gst);
+	tb_long_t r = gst->open(gst);
 	
 	// ok?
 	if (r > 0) gst->bopened = 1;
@@ -607,10 +581,10 @@ tb_long_t tb_gstream_aclose(tb_gstream_t* gst)
 	}
 
 	// has close?
-	if (gst->aclose) 
+	if (gst->close) 
 	{
 		// close it
-		tb_long_t r = gst->aclose(gst);	
+		tb_long_t r = gst->close(gst);	
 
 		// continue?
 		tb_check_return_val(r, r);
@@ -653,7 +627,7 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gst, tb_byte_t** data, tb_size_t size)
 	tb_assert_and_check_return_val(data && size, -1);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(gst->bcached && tb_qbuffer_maxn(&gst->cache), -1);
@@ -703,7 +677,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->aread, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
@@ -722,7 +696,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size)
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gst && gst->bopened && gst->awrit, -1);
+	tb_assert_and_check_return_val(gst && gst->bopened && gst->writ, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gst->cache), -1);
@@ -1104,7 +1078,7 @@ tb_size_t tb_gstream_type(tb_gstream_t const* gst)
 tb_hize_t tb_gstream_size(tb_gstream_t const* gst)
 {
 	tb_assert_and_check_return_val(gst, 0);
-	return gst->size? gst->size(gst) : 0;
+	return gst->size? gst->size((tb_gstream_t*)gst) : 0;
 }
 tb_hize_t tb_gstream_offset(tb_gstream_t const* gst)
 {
@@ -1123,13 +1097,14 @@ tb_size_t tb_gstream_timeout(tb_gstream_t const* gst)
 }
 tb_bool_t tb_gstream_ctrl(tb_gstream_t* gst, tb_size_t ctrl, ...)
 {	
+	// check
 	tb_assert_and_check_return_val(gst && gst->ctrl, tb_false);
 
 	// init args
 	tb_va_list_t args;
     tb_va_start(args, ctrl);
 
-	// ctrl for gstream
+	// ctrl
 	tb_bool_t ret = tb_false;
 	switch (ctrl)
 	{

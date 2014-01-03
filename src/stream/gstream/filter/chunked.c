@@ -63,7 +63,7 @@ static __tb_inline__ tb_gstream_filter_chunked_t* tb_gstream_filter_chunked_cast
 	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_CHUNKED, tb_null);
 	return (tb_gstream_filter_chunked_t*)filter;
 }
-static tb_long_t tb_gstream_filter_chunked_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_open(tb_gstream_t* gst)
 {
 	// check
 	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
@@ -75,9 +75,9 @@ static tb_long_t tb_gstream_filter_chunked_aopen(tb_gstream_t* gst)
 	if (!tb_pstring_init(&kst->line)) return -1;
 
 	// open filter
-	return tb_gstream_filter_aopen(gst);
+	return tb_gstream_filter_open(gst);
 }
-static tb_long_t tb_gstream_filter_chunked_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gst)
 {
 	// check
 	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
@@ -89,7 +89,7 @@ static tb_long_t tb_gstream_filter_chunked_aclose(tb_gstream_t* gst)
 	tb_pstring_exit(&kst->line);
 
 	// close filter
-	return tb_gstream_filter_aclose(gst);
+	return tb_gstream_filter_close(gst);
 }
 /* chunked_data
  *
@@ -222,17 +222,17 @@ end:
  */
 tb_gstream_t* tb_gstream_init_filter_chunked()
 {
+	// make stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_chunked_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	// init stream
+	if (!tb_gstream_init(gst, TB_GSTREAM_TYPE_FLTR)) goto fail;
 
-	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_FLTR;
-	gst->aopen 	= tb_gstream_filter_chunked_aopen;
-	gst->aread 	= tb_gstream_filter_aread;
-	gst->aclose	= tb_gstream_filter_chunked_aclose;
+	// init func
+	gst->open 	= tb_gstream_filter_chunked_open;
+	gst->read 	= tb_gstream_filter_read;
+	gst->close	= tb_gstream_filter_chunked_close;
 	gst->wait	= tb_gstream_filter_wait;
 	gst->ctrl	= tb_gstream_filter_ctrl;
 

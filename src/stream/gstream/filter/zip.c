@@ -60,7 +60,7 @@ static __tb_inline__ tb_gstream_filter_zip_t* tb_gstream_filter_zip_cast(tb_gstr
 	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_ZIP, tb_null);
 	return (tb_gstream_filter_zip_t*)filter;
 }
-static tb_long_t tb_gstream_filter_zip_aopen(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_zip_open(tb_gstream_t* gst)
 {
 	// check
 	tb_gstream_filter_zip_t* zst = tb_gstream_filter_zip_cast(gst);
@@ -71,9 +71,9 @@ static tb_long_t tb_gstream_filter_zip_aopen(tb_gstream_t* gst)
 	tb_assert_and_check_return_val(zst->zip, -1);
 
 	// open filter
-	return tb_gstream_filter_aopen(gst);
+	return tb_gstream_filter_open(gst);
 }
-static tb_long_t tb_gstream_filter_zip_aclose(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_zip_close(tb_gstream_t* gst)
 {
 	// check
 	tb_gstream_filter_zip_t* zst = tb_gstream_filter_zip_cast(gst);
@@ -87,7 +87,7 @@ static tb_long_t tb_gstream_filter_zip_aclose(tb_gstream_t* gst)
 	}
 
 	// close filter
-	return tb_gstream_filter_aclose(gst);
+	return tb_gstream_filter_close(gst);
 }
 static tb_bool_t tb_gstream_filter_zip_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
 {
@@ -182,18 +182,17 @@ static tb_long_t tb_gstream_filter_zip_spak(tb_gstream_t* gst, tb_long_t sync)
  */
 tb_gstream_t* tb_gstream_init_filter_zip()
 {
-	// check
+	// make stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_zip_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	// init stream
+	if (!tb_gstream_init(gst, TB_GSTREAM_TYPE_FLTR)) goto fail;
 
-	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_FLTR;
-	gst->aopen 	= tb_gstream_filter_zip_aopen;
-	gst->aread 	= tb_gstream_filter_aread;
-	gst->aclose	= tb_gstream_filter_zip_aclose;
+	// init func
+	gst->open 	= tb_gstream_filter_zip_open;
+	gst->read 	= tb_gstream_filter_read;
+	gst->close	= tb_gstream_filter_zip_close;
 	gst->wait	= tb_gstream_filter_wait;
 	gst->ctrl 	= tb_gstream_filter_zip_ctrl;
 

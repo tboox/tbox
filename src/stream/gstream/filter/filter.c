@@ -95,7 +95,7 @@ tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	}
 	return tb_false;
 }
-tb_long_t tb_gstream_filter_aopen(tb_gstream_t* gst)
+tb_long_t tb_gstream_filter_open(tb_gstream_t* gst)
 {
 	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
 	tb_assert_and_check_return_val(filter && filter->gst, -1);
@@ -115,7 +115,7 @@ tb_long_t tb_gstream_filter_aopen(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-tb_long_t tb_gstream_filter_aclose(tb_gstream_t* gst)
+tb_long_t tb_gstream_filter_close(tb_gstream_t* gst)
 {
 	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
 	tb_assert_and_check_return_val(filter && filter->gst, -1);
@@ -135,7 +135,7 @@ tb_long_t tb_gstream_filter_aclose(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-tb_long_t tb_gstream_filter_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+tb_long_t tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
 	tb_assert_and_check_return_val(filter && filter->gst && filter->spak, -1);

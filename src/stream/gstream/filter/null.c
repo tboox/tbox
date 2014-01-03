@@ -93,17 +93,17 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
  */
 tb_gstream_t* tb_gstream_init_filter_null()
 {
+	// make stream
 	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_nstream_t));
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// init base
-	if (!tb_gstream_init(gst)) goto fail;
+	// init stream
+	if (!tb_gstream_init(gst, TB_GSTREAM_TYPE_FLTR)) goto fail;
 
-	// init gstream
-	gst->type 	= TB_GSTREAM_TYPE_FLTR;
-	gst->aopen 	= tb_gstream_filter_aopen;
-	gst->aread 	= tb_gstream_filter_aread;
-	gst->aclose	= tb_gstream_filter_aclose;
+	// init func
+	gst->open 	= tb_gstream_filter_open;
+	gst->read 	= tb_gstream_filter_read;
+	gst->close	= tb_gstream_filter_close;
 	gst->wait	= tb_gstream_filter_wait;
 	gst->ctrl	= tb_gstream_filter_ctrl;
 

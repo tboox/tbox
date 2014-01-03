@@ -17,55 +17,23 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		http.c
  *
  */
-#ifndef TB_STREAM_GSTREAM_PREFIX_H
-#define TB_STREAM_GSTREAM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../gstream.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * interfaces
  */
- 
-// the default stream cache maxn
-#define TB_GSTREAM_MCACHE_DEFAULT 					(8192)
-
-// the default stream timeout
-#define TB_GSTREAM_TIMEOUT_DEFAULT 					(10000)
-
-/* ///////////////////////////////////////////////////////////////////////
- * inlines
- */
-static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gst, tb_size_t type)
+tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 {
-	// check
-	tb_assert_and_check_return_val(gst, tb_false);
-
-	// init type
-	gst->type = type;
-
-	// init timeout
-	gst->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
-
-	// init url
-	if (!tb_url_init(&gst->url)) return tb_false;
-
-	// init cache
-	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
-	gst->bcached = 1;
-
-	// ok
-	return tb_true;
-
-fail:
-	tb_qbuffer_exit(&gst->cache);
-	return tb_false;
+	return tb_null;
 }
-
-#endif
+tb_astream_t* tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
+{
+	return tb_null;
+}
