@@ -45,9 +45,8 @@ typedef struct __tb_gstream_data_t
 
 }tb_gstream_data_t;
 
-
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * implementation
  */
 static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_gstream_t* gst)
 {

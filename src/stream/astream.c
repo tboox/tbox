@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"astream"
+//#define TB_TRACE_IMPL_TAG 				"astream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -88,11 +88,17 @@ tb_void_t tb_astream_exit(tb_astream_t* ast)
 	// check
 	tb_assert_and_check_return(ast);
 
-	// exit url
-	tb_url_exit(&ast->url);
+	// no pending?
+	tb_assert_and_check_return(!tb_atomic_get(&ast->pending));
+
+	// stop it
+	tb_atomic_set(&ast->stoped, 1);
 
 	// exit it
 	if (ast->exit) ast->exit(ast);
+
+	// exit url
+	tb_url_exit(&ast->url);
 
 	// free it
 	tb_free(ast);
@@ -101,6 +107,15 @@ tb_void_t tb_astream_kill(tb_astream_t* ast)
 {
 	// check
 	tb_assert_and_check_return(ast);
+
+	// opened?
+	tb_check_return(ast->opened);
+
+	// stop it
+	tb_atomic_set(&ast->stoped, 1);
+
+	// pending?
+	tb_check_return(tb_atomic_get(&ast->pending));
 
 	// kill it
 	if (ast->kill) ast->kill(ast);
@@ -257,12 +272,17 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	{
 	case TB_ASTREAM_CTRL_SET_URL:
 		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (url && tb_url_set(&ast->url, url)) ret = tb_true;
 		}
 		break;
 	case TB_ASTREAM_CTRL_GET_URL:
 		{
+			// get url
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (purl)
 			{
@@ -277,6 +297,10 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_SET_HOST:
 		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (host)
 			{
@@ -287,6 +311,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_GET_HOST:
 		{
+			// get host
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (phost)
 			{
@@ -301,6 +326,10 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_SET_PORT:
 		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			if (port)
 			{
@@ -311,6 +340,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_GET_PORT:
 		{
+			// get port
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			if (pport)
 			{
@@ -321,6 +351,10 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_SET_PATH:
 		{
+			// check
+			tb_assert_and_check_return_val(!ast->opened, tb_false);
+
+			// set path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (path)
 			{
@@ -331,6 +365,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 		break;
 	case TB_ASTREAM_CTRL_GET_PATH:
 		{
+			// get path
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (ppath)
 			{
