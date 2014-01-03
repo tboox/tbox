@@ -32,19 +32,15 @@
 /* ///////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* ast)
+static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* ast, tb_aicp_t* aicp, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(ast, tb_false);
+	tb_assert_and_check_return_val(ast && aicp, tb_false);
 
-	// clear
-	tb_memset(ast, 0, sizeof(tb_astream_t));
-
-	// init url
-	if (!tb_url_init(&ast->url)) return tb_false;
-
-	// ok
-	return tb_true;
+	// init
+	ast->type = type;
+	ast->aicp = aicp;
+	return tb_url_init(&ast->url);
 }
 
 #endif

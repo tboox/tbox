@@ -79,13 +79,13 @@ typedef struct __tb_gstream_filter_t
 tb_gstream_filter_t* 	tb_gstream_filter_cast(tb_gstream_t* gst);
 
 // open 
-tb_long_t 				tb_gstream_filter_aopen(tb_gstream_t* gst);
+tb_long_t 				tb_gstream_filter_open(tb_gstream_t* gst);
 
 // close
-tb_long_t 				tb_gstream_filter_aclose(tb_gstream_t* gst);
+tb_long_t 				tb_gstream_filter_close(tb_gstream_t* gst);
 
 // read
-tb_long_t 				tb_gstream_filter_aread(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+tb_long_t 				tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 // wait
 tb_long_t 				tb_gstream_filter_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
