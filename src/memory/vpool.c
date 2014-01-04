@@ -540,13 +540,13 @@ end:
 		block->magic = TB_VPOOL_MAGIC;
 
 		// set line
-		block->line = line;
+		block->line = line_;
 
 		// set file
-		block->file = file;
+		block->file = file_;
 
 		// set func
-		block->func = func;
+		block->func = func_;
 
 		// set real
 		block->real = size;

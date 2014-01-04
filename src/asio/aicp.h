@@ -34,6 +34,13 @@
 #include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+/// post
+#define tb_aicp_post(aicp, aice) 	tb_aicp_post_impl(aicp, aice __tb_debug_vals__)
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -219,7 +226,7 @@ tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice);
+tb_bool_t 			tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__);
 
 /*! loop aicp for the external thread
  *

@@ -120,50 +120,92 @@ tb_void_t tb_astream_kill(tb_astream_t* ast)
 	// kill it
 	if (ast->kill) ast->kill(ast);
 }
-tb_bool_t tb_astream_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_open_impl(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->open && func, tb_false);
 
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
+
 	// open it
 	return ast->open(ast, func, priv) >= 0? tb_true : tb_false;
 }
-tb_bool_t tb_astream_read(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_read_impl(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->read && func, tb_false);
 
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
+
 	// read it
 	return ast->read(ast, func, priv) >= 0? tb_true : tb_false;
 }
-tb_bool_t tb_astream_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_writ_impl(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->writ && data && size && func, tb_false);
 
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
+
 	// writ it
 	return ast->writ(ast, data, size, func, priv) >= 0? tb_true : tb_false;
 }
-tb_bool_t tb_astream_save(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_save_impl(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->save && ost && func, tb_false);
 
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
+
 	// save it
 	return ast->save(ast, ost, func, priv) >= 0? tb_true : tb_false;
 }
-tb_bool_t tb_astream_seek(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_seek_impl(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->seek && func, tb_false);
 
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
+
 	// seek it
 	return ast->seek(ast, offset, func, priv) >= 0? tb_true : tb_false;
 }
-tb_bool_t tb_astream_sync(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv)
+tb_bool_t tb_astream_sync_impl(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->sync && func, tb_false);
+
+	// save debug info
+#ifdef __tb_debug__
+	ast->func = func_;
+	ast->file = file_;
+	ast->line = line_;
+#endif
 
 	// sync it
 	return ast->sync(ast, func, priv) >= 0? tb_true : tb_false;
@@ -395,3 +437,29 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	// ok?
 	return ret;
 }
+#ifdef __tb_debug__
+tb_char_t const* tb_astream_func(tb_astream_t* ast)
+{
+	// check
+	tb_assert_and_check_return_val(ast, tb_null);
+
+	// the func
+	return ast->func;
+}
+tb_char_t const* tb_astream_file(tb_astream_t* ast)
+{
+	// check
+	tb_assert_and_check_return_val(ast, tb_null);
+
+	// the file
+	return ast->file;
+}
+tb_size_t tb_astream_line(tb_astream_t* ast)
+{
+	// check
+	tb_assert_and_check_return_val(ast, 0);
+
+	// the line
+	return ast->line;
+}
+#endif

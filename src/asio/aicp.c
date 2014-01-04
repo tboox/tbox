@@ -222,13 +222,23 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	if (aicp->ptor->delo(aicp->ptor, aico))
 		tb_aicp_aico_exit(aicp, aico);
 }
-tb_bool_t tb_aicp_post(tb_aicp_t* aicp, tb_aice_t const* aice)
+tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
 
 	// check post
 	tb_assert_return_val(aice->aico? !tb_atomic_fetch_and_inc(&aice->aico->post) : 0, tb_false);
+
+	// save debug info
+#ifdef __tb_debug__
+	if (aice->aico)
+	{
+		aice->aico->func = func_;
+		aice->aico->file = file_;
+		aice->aico->line = line_;
+	}
+#endif
 
 	// post aice
 	return aicp->ptor->post(aicp->ptor, aice);
@@ -278,6 +288,16 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 			tb_aicp_kill(aicp);
 			break;
 		}
+
+		// clear debug info
+#ifdef __tb_debug__
+		if (resp.aico)
+		{
+			resp.aico->func = tb_null;
+			resp.aico->file = tb_null;
+			resp.aico->line = 0;
+		}
+#endif
 	}
 
 	// exit loop

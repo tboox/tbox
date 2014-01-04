@@ -68,7 +68,7 @@ tb_pointer_t  	tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_
 tb_pointer_t  	tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__);
 
 // ralloc
-tb_pointer_t 	tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func,  tb_size_t line, tb_char_t const* file);
+tb_pointer_t 	tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__);
 
 // free
 tb_bool_t 		tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__);
