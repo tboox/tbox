@@ -173,11 +173,7 @@ tb_void_t tb_gpool_clear(tb_handle_t handle)
 	}
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size)
-#else
-tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -191,18 +187,10 @@ tb_pointer_t tb_gpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t 
 	}
 
 	// malloc it from vpool
-#ifndef __tb_debug__
-	return tb_vpool_malloc_impl(gpool->vpool, size);
-#else
-	return tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
-#endif
+	return tb_vpool_malloc_impl(gpool->vpool, size __tb_debug_args__);
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size)
-#else
-tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -216,18 +204,10 @@ tb_pointer_t tb_gpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	}
 
 	// malloc it from vpool
-#ifndef __tb_debug__
-	return tb_vpool_malloc0_impl(gpool->vpool, size);
-#else
-	return tb_vpool_malloc0_impl(gpool->vpool, size, func, line, file);
-#endif
+	return tb_vpool_malloc0_impl(gpool->vpool, size __tb_debug_args__);
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -241,18 +221,10 @@ tb_pointer_t tb_gpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t 
 	}
 
 	// malloc it from vpool
-#ifndef __tb_debug__
-	return tb_vpool_nalloc_impl(gpool->vpool, item, size);
-#else
-	return tb_vpool_nalloc_impl(gpool->vpool, item, size, func, line, file);
-#endif
+	return tb_vpool_nalloc_impl(gpool->vpool, item, size __tb_debug_args__);
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -266,18 +238,9 @@ tb_pointer_t tb_gpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	}
 
 	// malloc it from vpool
-#ifndef __tb_debug__
-	return tb_vpool_nalloc0_impl(gpool->vpool, item, size);
-#else
-	return tb_vpool_nalloc0_impl(gpool->vpool, item, size, func, line, file);
-#endif
+	return tb_vpool_nalloc0_impl(gpool->vpool, item, size __tb_debug_args__);
 }
-
-#ifndef __tb_debug__
-tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
-#else
-tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -292,11 +255,7 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 		else
 		{
 			// malloc it
-#ifndef __tb_debug__
-			pdata = tb_vpool_malloc_impl(gpool->vpool, size);
-#else
-			pdata = tb_vpool_malloc_impl(gpool->vpool, size, func, line, file);
-#endif
+			pdata = tb_vpool_malloc_impl(gpool->vpool, size __tb_debug_args__);
 			tb_check_return_val(pdata, tb_null);
 			tb_assert_and_check_return_val(pdata != data, pdata);
 
@@ -313,18 +272,10 @@ tb_pointer_t tb_gpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	}
 
 	// ralloc it from vpool
-#ifndef __tb_debug__
-	return tb_vpool_ralloc_impl(gpool->vpool, data, size);
-#else
-	return tb_vpool_ralloc_impl(gpool->vpool, data, size, func, line, file);
-#endif
+	return tb_vpool_ralloc_impl(gpool->vpool, data, size __tb_debug_args__);
 }
 
-#ifndef __tb_debug__
-tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data)
-#else
-tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
 {
 	// check 
 	tb_gpool_t* gpool = (tb_gpool_t*)handle;
@@ -335,11 +286,7 @@ tb_bool_t tb_gpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t co
 		return tb_tpool_free(gpool->tpool, data);
 
 	// free it to vpool
-#ifndef __tb_debug__
-	return tb_vpool_free_impl(gpool->vpool, data);
-#else
-	return tb_vpool_free_impl(gpool->vpool, data, func, line, file);
-#endif
+	return tb_vpool_free_impl(gpool->vpool, data __tb_debug_args__);
 }
 
 #ifdef __tb_debug__

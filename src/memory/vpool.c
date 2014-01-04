@@ -497,12 +497,7 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	// fail
 	return tb_null;
 }
-
-#ifndef __tb_debug__
-static tb_pointer_t tb_vpool_malloc_skip_frame(tb_handle_t handle, tb_size_t size)
-#else
-static tb_pointer_t tb_vpool_malloc_skip_frame(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+static tb_pointer_t tb_vpool_malloc_skip_frame(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;
@@ -813,32 +808,16 @@ tb_void_t tb_vpool_clear(tb_handle_t handle)
 #endif
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size)
-#else
-tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// malloc
-#ifndef __tb_debug__
-	return tb_vpool_malloc_skip_frame(handle, size);
-#else
-	return tb_vpool_malloc_skip_frame(handle, size, func, line, file);
-#endif
+	return tb_vpool_malloc_skip_frame(handle, size __tb_debug_args__);
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size)
-#else
-tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// malloc
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_vpool_malloc_skip_frame(handle, size);
-#else
-	tb_byte_t* p = tb_vpool_malloc_skip_frame(handle, size, func, line, file);
-#endif
+	tb_byte_t* p = tb_vpool_malloc_skip_frame(handle, size __tb_debug_args__);
 
 	// clear
 	if (p && size) tb_memset(p, 0, size);
@@ -847,38 +826,21 @@ tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size, tb_char_t
 	return p;
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef __tb_debug__
-	return tb_vpool_malloc_skip_frame(handle, item * size);
-#else
-	return tb_vpool_malloc_skip_frame(handle, item * size, func, line, file);
-#endif
+	return tb_vpool_malloc_skip_frame(handle, item * size __tb_debug_args__);
 }
-
-#ifndef __tb_debug__
-tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-#ifndef __tb_debug__
-	tb_pointer_t p = tb_vpool_malloc_skip_frame(handle, item * size);
-#else
-	tb_pointer_t p = tb_vpool_malloc_skip_frame(handle, item * size, func, line, file);
-#endif
+	tb_pointer_t p = tb_vpool_malloc_skip_frame(handle, item * size __tb_debug_args__);
 
 	// clear
 	if (p && (item * size)) tb_memset(p, 0, item * size);
@@ -887,11 +849,7 @@ tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	return p;
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size)
-#else
-tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;
@@ -900,20 +858,12 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	// free it if no size
 	if (!size)
 	{
-#ifndef __tb_debug__
-		tb_vpool_free_impl(vpool, data);
-#else
-		tb_vpool_free_impl(vpool, data, func, line, file);
-#endif
+		tb_vpool_free_impl(vpool, data __tb_debug_args__);
 		return tb_null;
 	}
 
 	// alloc it if no data?
-#ifndef __tb_debug__
-	if (!data) return tb_vpool_malloc_skip_frame(vpool, size);
-#else
-	if (!data) return tb_vpool_malloc_skip_frame(vpool, size, func, line, file);
-#endif
+	if (!data) return tb_vpool_malloc_skip_frame(vpool, size __tb_debug_args__);
 	
 	// ralloc it with fast mode if enough
 	tb_size_t 		osize = 0;
@@ -922,11 +872,7 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_assert_and_check_return_val(osize && osize < size, tb_null);
 
 	// malloc it
-#ifndef __tb_debug__
-	pdata = tb_vpool_malloc_skip_frame(vpool, size);
-#else
-	pdata = tb_vpool_malloc_skip_frame(vpool, size, func, line, file);
-#endif
+	pdata = tb_vpool_malloc_skip_frame(vpool, size __tb_debug_args__);
 	tb_check_return_val(pdata, tb_null);
 	tb_assert_and_check_return_val(pdata != data, pdata);
 
@@ -934,21 +880,12 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_memcpy(pdata, data, osize);
 	
 	// free it
-#ifndef __tb_debug__
-	tb_vpool_free_impl(vpool, data);
-#else
-	tb_vpool_free_impl(vpool, data, func, line, file);
-#endif
+	tb_vpool_free_impl(vpool, data __tb_debug_args__);
 
 	// ok
 	return pdata;
 }
-
-#ifndef __tb_debug__
-tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data)
-#else
-tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
 {
 	// check
 	tb_vpool_t* vpool = (tb_vpool_t*)handle;

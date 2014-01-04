@@ -87,11 +87,7 @@ tb_void_t tb_opool_clear()
 	// leave
 	tb_spinlock_leave(&g_lock);
 }
-#ifndef __tb_debug__
-tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type)
-#else
-tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(size && type, tb_null);
@@ -100,22 +96,14 @@ tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, t
 	tb_spinlock_enter(&g_lock);
 
 	// make object
-#ifndef __tb_debug__
-	tb_object_t* object = g_pool? tb_spool_malloc0(g_pool, size) : tb_null;
-#else
-	tb_object_t* object = g_pool? tb_spool_malloc0_impl(g_pool, size, func, line, file) : tb_null;
-#endif
+	tb_object_t* object = g_pool? tb_spool_malloc0_impl(g_pool, size __tb_debug_args__) : tb_null;
 
 	// init object
 	if (object) 
 	{
 		if (!tb_object_init(object, flag, type)) 
 		{
-#ifndef __tb_debug__
-			tb_spool_free(g_pool, object);
-#else
-			tb_spool_free_impl(g_pool, object, func, line, file);
-#endif
+			tb_spool_free_impl(g_pool, object __tb_debug_args__);
 			object = tb_null;
 		}
 	}
@@ -126,11 +114,7 @@ tb_object_t* tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, t
 	// ok?
 	return object;
 }
-#ifndef __tb_debug__
-tb_void_t tb_opool_del_impl(tb_object_t* object)
-#else
-tb_void_t tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_void_t tb_opool_del_impl(tb_object_t* object __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return(object);
@@ -139,11 +123,7 @@ tb_void_t tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_size_
 	tb_spinlock_enter(&g_lock);
 
 	// exit object
-#ifndef __tb_debug__
-	if (g_pool) tb_spool_free(g_pool, object);
-#else
-	if (g_pool) tb_spool_free_impl(g_pool, object, func, line, file);
-#endif
+	if (g_pool) tb_spool_free_impl(g_pool, object __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
