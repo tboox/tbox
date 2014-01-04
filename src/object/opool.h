@@ -32,13 +32,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#ifdef __tb_debug__
-#	define tb_opool_get(size, flag, type) 			tb_opool_get_impl(size, flag, type, __tb_func__, __tb_line__, __tb_file__)
-# 	define tb_opool_del(object) 					tb_opool_del_impl(object, __tb_func__, __tb_line__, __tb_file__)
-#else
-#	define tb_opool_get(size, flag, type) 			tb_opool_get_impl(size, flag, type)
-# 	define tb_opool_del(object) 					tb_opool_del_impl(object)
-#endif
+#define tb_opool_get(size, flag, type) 			tb_opool_get_impl(size, flag, type __tb_debug_vals__)
+#define tb_opool_del(object) 					tb_opool_del_impl(object __tb_debug_vals__)
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -64,21 +59,13 @@ tb_void_t 			tb_opool_clear(tb_noarg_t);
  *
  * @return 			the object pointer
  */
-#ifndef __tb_debug__
-tb_object_t* 		tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type);
-#else
-tb_object_t* 		tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-#endif
+tb_object_t* 		tb_opool_get_impl(tb_size_t size, tb_size_t flag, tb_size_t type __tb_debug_decl__);
 
 /*! del object from opool
  *
  * @param object 	the object pointer
  */
-#ifndef __tb_debug__
-tb_void_t 			tb_opool_del_impl(tb_object_t* object);
-#else
-tb_void_t 			tb_opool_del_impl(tb_object_t* object, tb_char_t const* func, tb_size_t line, tb_char_t const* file);
-#endif
+tb_void_t 			tb_opool_del_impl(tb_object_t* object __tb_debug_decl__);
 
 /// dump opool
 tb_void_t 			tb_opool_dump(tb_noarg_t);

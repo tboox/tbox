@@ -70,9 +70,9 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// done 
-//	tb_demo_leak();
+	tb_demo_leak();
 //	tb_demo_free2();
-	tb_demo_stack();
+//	tb_demo_stack();
 //	tb_demo_overflow();
 //	tb_demo_cstring();
 //	tb_demo_overlap();

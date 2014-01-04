@@ -118,11 +118,7 @@ tb_void_t tb_malloc_dump()
 	tb_spinlock_leave(&g_lock);
 }
 #endif
-#ifndef __tb_debug__
-tb_pointer_t tb_malloc_malloc_impl(tb_size_t size)
-#else
-tb_pointer_t tb_malloc_malloc_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_malloc_malloc_impl(tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_null);
@@ -130,25 +126,16 @@ tb_pointer_t tb_malloc_malloc_impl(tb_size_t size, tb_char_t const* func, tb_siz
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_malloc_impl(g_pool, size);
-#else
-	tb_byte_t* p = tb_gpool_malloc_impl(g_pool, size, func, line, file);
-#endif
-
-	// check
-	tb_assert(p);
+	// malloc
+	tb_byte_t* p = tb_gpool_malloc_impl(g_pool, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+
+	// ok?
 	return p;
 }
-
-#ifndef __tb_debug__
-tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size)
-#else
-tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_null);
@@ -156,25 +143,17 @@ tb_pointer_t tb_malloc_malloc0_impl(tb_size_t size, tb_char_t const* func, tb_si
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_malloc0_impl(g_pool, size);
-#else
-	tb_byte_t* p = tb_gpool_malloc0_impl(g_pool, size, func, line, file);
-#endif
-
-	// check
-	tb_assert(p);
+	// malloc0
+	tb_byte_t* p = tb_gpool_malloc0_impl(g_pool, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+	
+	// ok?
 	return p;
 }
 
-#ifndef __tb_debug__
-tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_null);
@@ -182,25 +161,16 @@ tb_pointer_t tb_malloc_nalloc_impl(tb_size_t item, tb_size_t size, tb_char_t con
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_nalloc_impl(g_pool, item, size);
-#else
-	tb_byte_t* p = tb_gpool_nalloc_impl(g_pool, item, size, func, line, file);
-#endif
-
-	// check
-	tb_assert(p);
+	// nalloc
+	tb_byte_t* p = tb_gpool_nalloc_impl(g_pool, item, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+
+	// ok?
 	return p;
 }
-
-#ifndef __tb_debug__
-tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size)
-#else
-tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_null);
@@ -208,25 +178,16 @@ tb_pointer_t tb_malloc_nalloc0_impl(tb_size_t item, tb_size_t size, tb_char_t co
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_nalloc0_impl(g_pool, item, size);
-#else
-	tb_byte_t* p = tb_gpool_nalloc0_impl(g_pool, item, size, func, line, file);
-#endif
-
-	// check
-	tb_assert(p);
+	// nalloc0
+	tb_byte_t* p = tb_gpool_nalloc0_impl(g_pool, item, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+	
+	// ok?
 	return p;
 }
-
-#ifndef __tb_debug__
-tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size)
-#else
-tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_null);
@@ -234,25 +195,16 @@ tb_pointer_t tb_malloc_ralloc_impl(tb_pointer_t data, tb_size_t size, tb_char_t 
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_byte_t* p = tb_gpool_ralloc_impl(g_pool, data, size);
-#else
-	tb_byte_t* p = tb_gpool_ralloc_impl(g_pool, data, size, func, line, file);
-#endif
-
-	// check
-	tb_assert(p);
+	// ralloc
+	tb_byte_t* p = tb_gpool_ralloc_impl(g_pool, data, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+	
+	// ok?
 	return p;
 }
-
-#ifndef __tb_debug__
-tb_bool_t tb_malloc_free_impl(tb_pointer_t data)
-#else
-tb_bool_t tb_malloc_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_t line, tb_char_t const* file)
-#endif
+tb_bool_t tb_malloc_free_impl(tb_pointer_t data __tb_debug_decl__)
 {
 	// check 
 	tb_assert_and_check_return_val(g_pool, tb_false);
@@ -260,19 +212,13 @@ tb_bool_t tb_malloc_free_impl(tb_pointer_t data, tb_char_t const* func, tb_size_
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-#ifndef __tb_debug__
-	tb_bool_t r = tb_gpool_free_impl(g_pool, data);
-#else
-	tb_bool_t r = tb_gpool_free_impl(g_pool, data, func, line, file);
-#endif
-
-	// check
-	tb_assert(r);
+	// free it
+	tb_bool_t r = tb_gpool_free_impl(g_pool, data __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
 
-	// ok
+	// ok?
 	return r;
 }
 
