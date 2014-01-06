@@ -38,8 +38,11 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* ast, tb_aicp_t* aic
 	tb_assert_and_check_return_val(ast && aicp, tb_false);
 
 	// init
-	ast->type = type;
-	ast->aicp = aicp;
+	ast->type 		= type;
+	ast->aicp 		= aicp;
+	ast->opened 	= 0;
+	ast->stoped 	= 1;
+	ast->pending 	= 0;
 	return tb_url_init(&ast->url);
 }
 

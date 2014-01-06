@@ -37,6 +37,18 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+static tb_bool_t tb_astream_save_done(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(ast && ost && func, tb_false);
+
+	// ok?
+	return tb_false;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
 tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 {
 	// check
@@ -109,7 +121,7 @@ tb_void_t tb_astream_kill(tb_astream_t* ast)
 	tb_assert_and_check_return(ast);
 
 	// opened?
-	tb_check_return(ast->opened);
+	tb_check_return(tb_atomic_get(&ast->opened));
 
 	// stop it
 	tb_atomic_set(&ast->stoped, 1);
@@ -124,6 +136,9 @@ tb_bool_t tb_astream_open_impl(tb_astream_t* ast, tb_astream_open_func_t func, t
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->open && func, tb_false);
+	
+	// check state
+	tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened) && tb_atomic_get(&ast->stoped) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -132,13 +147,31 @@ tb_bool_t tb_astream_open_impl(tb_astream_t* ast, tb_astream_open_func_t func, t
 	ast->line = line_;
 #endif
 
+	// init state
+	tb_atomic_set0(&ast->stoped);
+	tb_atomic_set(&ast->pending, 1);
+
 	// open it
-	return ast->open(ast, func, priv) >= 0? tb_true : tb_false;
+	tb_bool_t ok = ast->open(ast, func, priv);
+
+	// post failed?
+	if (!ok) 
+	{
+		tb_atomic_set(&ast->stoped, 1);
+		tb_atomic_set0(&ast->pending);
+	}
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_read_impl(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->read && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -147,13 +180,26 @@ tb_bool_t tb_astream_read_impl(tb_astream_t* ast, tb_astream_read_func_t func, t
 	ast->line = line_;
 #endif
 
+	// init state
+	tb_atomic_set(&ast->pending, 1);
+
 	// read it
-	return ast->read(ast, func, priv) >= 0? tb_true : tb_false;
+	tb_bool_t ok = ast->read(ast, func, priv);
+
+	// post failed?
+	if (!ok) tb_atomic_set0(&ast->pending);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_writ_impl(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->writ && data && size && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -162,13 +208,26 @@ tb_bool_t tb_astream_writ_impl(tb_astream_t* ast, tb_byte_t const* data, tb_size
 	ast->line = line_;
 #endif
 
+	// init state
+	tb_atomic_set(&ast->pending, 1);
+
 	// writ it
-	return ast->writ(ast, data, size, func, priv) >= 0? tb_true : tb_false;
+	tb_bool_t ok = ast->writ(ast, data, size, func, priv);
+
+	// post failed?
+	if (!ok) tb_atomic_set0(&ast->pending);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_save_impl(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->save && ost && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -177,13 +236,29 @@ tb_bool_t tb_astream_save_impl(tb_astream_t* ast, tb_astream_t* ost, tb_astream_
 	ast->line = line_;
 #endif
 
-	// save it
-	return ast->save(ast, ost, func, priv) >= 0? tb_true : tb_false;
+	// init state
+	tb_atomic_set(&ast->pending, 1);
+
+	// try to save it using the native stream
+	tb_bool_t ok = ast->save(ast, ost, func, priv);
+
+	// save it using stream if no native optimization
+	if (!ok) ok = tb_astream_save_done(ast, ost, func, priv);
+
+	// post failed?
+	if (!ok) tb_atomic_set0(&ast->pending);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_seek_impl(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->seek && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -192,13 +267,26 @@ tb_bool_t tb_astream_seek_impl(tb_astream_t* ast, tb_hize_t offset, tb_astream_s
 	ast->line = line_;
 #endif
 
+	// init state
+	tb_atomic_set(&ast->pending, 1);
+
 	// seek it
-	return ast->seek(ast, offset, func, priv) >= 0? tb_true : tb_false;
+	tb_bool_t ok = ast->seek(ast, offset, func, priv);
+
+	// post failed?
+	if (!ok) tb_atomic_set0(&ast->pending);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_sync_impl(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->sync && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -207,24 +295,49 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* ast, tb_astream_sync_func_t func, t
 	ast->line = line_;
 #endif
 
+	// init state
+	tb_atomic_set(&ast->pending, 1);
+
 	// sync it
-	return ast->sync(ast, func, priv) >= 0? tb_true : tb_false;
+	tb_bool_t ok = ast->sync(ast, func, priv);
+
+	// post failed?
+	if (!ok) tb_atomic_set0(&ast->pending);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_try_open(tb_astream_t* ast)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->open, tb_false);
+	
+	// check state
+	tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened) && tb_atomic_get(&ast->stoped) && !tb_atomic_get(&ast->pending), tb_false);
+
+	// init state
+	tb_atomic_set0(&ast->stoped);
 
 	// open it
-	return ast->open(ast, tb_null, tb_null) > 0? tb_true : tb_false;
+	tb_bool_t ok = ast->try_open(ast);
+
+	// post failed?
+	if (!ok) tb_atomic_set(&ast->stoped, 1);
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_astream_try_seek(tb_astream_t* ast, tb_hize_t offset)
 {
 	// check
 	tb_assert_and_check_return_val(ast && ast->seek, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && !tb_atomic_get(&ast->pending), tb_false);
 
 	// seek it
-	return ast->seek(ast, offset, tb_null, tb_null) > 0? tb_true : tb_false;
+	return ast->try_seek(ast, offset);
 }
 tb_aicp_t* tb_astream_aicp(tb_astream_t* ast)
 {
@@ -315,7 +428,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	case TB_ASTREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -340,7 +453,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	case TB_ASTREAM_CTRL_SET_HOST:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -369,7 +482,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	case TB_ASTREAM_CTRL_SET_PORT:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -394,7 +507,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 	case TB_ASTREAM_CTRL_SET_PATH:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -417,6 +530,28 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* ast, tb_size_t ctrl, ...)
 					*ppath = path;
 					ret = tb_true;
 				}
+			}
+		}
+		break;
+	case TB_ASTREAM_CTRL_SET_TIMEOUT:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
+
+			// set timeout
+			tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
+			ast->timeout = timeout;
+			ret = tb_true;
+		}
+		break;
+	case TB_ASTREAM_CTRL_GET_TIMEOUT:
+		{
+			// get timeout
+			tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
+			if (ptimeout)
+			{
+				*ptimeout = ast->timeout;
+				ret = tb_true;
 			}
 		}
 		break;

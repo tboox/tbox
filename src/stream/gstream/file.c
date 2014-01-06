@@ -181,7 +181,7 @@ static tb_bool_t tb_gstream_file_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 		}
 	case TB_GSTREAM_CTRL_FILE_GET_HANDLE:
 		{
-			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
+			tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = fst->file;
 			return tb_true;

@@ -216,13 +216,16 @@ typedef struct __tb_astream_t
 	tb_uint8_t 			type;
 
 	// is opened?
-	tb_uint8_t 			opened;
+	tb_atomic_t 		opened;
 
 	// is stoped?
 	tb_atomic_t 		stoped;
 
 	// is pending?
 	tb_atomic_t 		pending;
+
+	// the timeout
+	tb_long_t 			timeout;
 
 #ifdef __tb_debug__
 	/// the func
@@ -236,22 +239,28 @@ typedef struct __tb_astream_t
 #endif
 
 	/// open
-	tb_long_t 			(*open)(struct __tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*open)(struct __tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv);
 
 	/// read
-	tb_long_t 			(*read)(struct __tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*read)(struct __tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv);
 
 	/// writ
-	tb_long_t 			(*writ)(struct __tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*writ)(struct __tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
 
 	/// save
-	tb_long_t 			(*save)(struct __tb_astream_t* ast, struct __tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*save)(struct __tb_astream_t* ast, struct __tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv);
 
 	/// seek
-	tb_long_t 			(*seek)(struct __tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*seek)(struct __tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
 
 	/// sync
-	tb_long_t 			(*sync)(struct __tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv);
+	tb_bool_t 			(*sync)(struct __tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv);
+
+	/// try to open
+	tb_bool_t 			(*try_open)(struct __tb_astream_t* ast);
+
+	/// try to seek
+	tb_bool_t 			(*try_seek)(struct __tb_astream_t* ast, tb_hize_t offset);
 
 	/// kill
 	tb_void_t 			(*kill)(struct __tb_astream_t* ast);
