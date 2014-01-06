@@ -40,16 +40,34 @@
 typedef struct __tb_astream_file_t
 {
 	// the base
-	tb_astream_t 		base;
+	tb_astream_t 				base;
 
 	// the file handle
-	tb_handle_t 		file;
+	tb_handle_t 				file;
+
+	// the aico
+	tb_handle_t 				aico;
 
 	// the file handle is referenced? need not exit it
-	tb_bool_t 			bref;
+	tb_bool_t 					bref;
 
 	// the file mode
-	tb_size_t 			mode;
+	tb_size_t 					mode;
+
+	// the file data
+	tb_byte_t 					data[TB_FILE_DIRECT_CSIZE];
+
+	// the func
+	union
+	{
+		tb_astream_read_func_t 	read;
+		tb_astream_writ_func_t 	writ;
+		tb_astream_sync_func_t 	sync;
+
+	} 							func;
+
+	// the priv
+	tb_pointer_t 				priv;
 
 }tb_astream_file_t;
 
@@ -61,29 +79,264 @@ static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_astream_t* ast)
 	tb_assert_and_check_return_val(ast && ast->type == TB_ASTREAM_TYPE_FILE, tb_null);
 	return (tb_astream_file_t*)ast;
 }
-static tb_long_t tb_astream_file_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_try_open(tb_astream_t* ast)
 {
-	return -1;
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// referenced? ok?
+		if (fst->file && fst->bref)
+		{
+			ok = tb_true;
+			break;
+		}
+
+		// check
+		tb_assert_and_check_break(!fst->file && !fst->bref);
+	
+		// the url
+		tb_char_t const* url = tb_url_get(&ast->url);
+		tb_assert_and_check_break(url);
+
+		// open file
+		fst->file = tb_file_init(url, fst->mode);
+		tb_check_break(fst->file);
+
+		// addo file
+		fst->aico = tb_aico_init_file(ast->aicp, fst->file);
+		tb_assert_and_check_break(fst->aico);
+
+		// opened
+		tb_atomic_set(&ast->opened, 1);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
 }
-static tb_long_t tb_astream_file_read(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
 {
-	return -1;
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst && func, tb_false);
+
+	// open it
+	tb_size_t state = tb_astream_file_try_open(ast)? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR;
+
+	// stop pending
+	tb_atomic_set0(&ast->pending);
+
+	// done func
+	func(ast, state, priv);
+
+	// ok
+	return tb_true;
 }
-static tb_long_t tb_astream_file_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 {
-	return -1;
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_READ, tb_false);
+
+	// the stream
+	tb_astream_file_t* fst = (tb_astream_file_t*)aice->data;
+	tb_assert_and_check_return_val(fst && fst->func.read, tb_false);
+
+	// done
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	do
+	{
+		// read ok?
+		tb_check_break(aice->state == TB_AICE_STATE_OK);
+		tb_assert_and_check_break(aice->u.read.real && aice->u.read.real <= sizeof(fst->data));
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// stop pending
+	tb_atomic_set0(&fst->base.pending);
+
+	// done func
+	if (fst->func.read((tb_astream_t*)fst, state, aice->u.read.data, aice->u.read.real, fst->priv))
+	{
+		// continue?
+		if (aice->state == TB_AICE_STATE_OK)
+		{
+			// no pending now.
+			if (!tb_atomic_fetch_and_set(&fst->base.pending, 1))
+			{
+				// continue to post read
+				if (!tb_aico_read(aice->aico, tb_file_offset(fst->file), fst->data, sizeof(fst->data), tb_astream_file_read_func, (tb_astream_t*)fst))
+					tb_atomic_set0(&fst->base.pending);
+			}
+			else
+			{
+				// check
+				tb_assert(0);
+			}
+		}
+	}
+
+	// ok
+	return tb_true;
 }
-static tb_long_t tb_astream_file_save(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_read(tb_astream_t* ast, tb_astream_read_func_t func, tb_pointer_t priv)
 {
-	return -1;
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst && fst->file && fst->aico && func, tb_false);
+
+	// save func and priv
+	fst->priv 		= priv;
+	fst->func.read 	= func;
+
+	// post read
+	return tb_aico_read(fst->aico, tb_file_offset(fst->file), fst->data, sizeof(fst->data), tb_astream_file_read_func, ast);
 }
-static tb_long_t tb_astream_file_seek(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 {
-	return -1;
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_WRIT, tb_false);
+
+	// the stream
+	tb_astream_file_t* fst = (tb_astream_file_t*)aice->data;
+	tb_assert_and_check_return_val(fst && fst->func.writ, tb_false);
+
+	// done
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	do
+	{
+		// read ok?
+		tb_check_break(aice->state == TB_AICE_STATE_OK);
+		tb_assert_and_check_break(aice->u.writ.data && aice->u.writ.real && aice->u.writ.real <= aice->u.writ.size);
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// stop pending
+	tb_atomic_set0(&fst->base.pending);
+
+	// done func
+	if (fst->func.writ((tb_astream_t*)fst, state, aice->u.writ.real, aice->u.writ.size, fst->priv))
+	{
+		// continue?
+		if (aice->state == TB_AICE_STATE_OK && aice->u.writ.real < aice->u.writ.size)
+		{
+			// no pending now.
+			if (!tb_atomic_fetch_and_set(&fst->base.pending, 1))
+			{
+				// continue to post writ
+				if (!tb_aico_writ(aice->aico, tb_file_offset(fst->file), aice->u.writ.data + aice->u.writ.real, aice->u.writ.size - aice->u.writ.real, tb_astream_file_writ_func, (tb_astream_t*)fst))
+					tb_atomic_set0(&fst->base.pending);
+			}
+			else
+			{
+				// check
+				tb_assert(0);
+			}
+		}
+	}
+
+	// ok
+	return tb_true;
 }
-static tb_long_t tb_astream_file_sync(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_writ(tb_astream_t* ast, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
-	return -1;
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst && fst->file && fst->aico && data && size && func, tb_false);
+
+	// save func and priv
+	fst->priv 		= priv;
+	fst->func.writ 	= func;
+
+	// post writ
+	return tb_aico_writ(fst->aico, tb_file_offset(fst->file), data, size, tb_astream_file_writ_func, ast);
+}
+static tb_bool_t tb_astream_file_save(tb_astream_t* ast, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
+{
+	return tb_false;
+}
+static tb_bool_t tb_astream_file_try_seek(tb_astream_t* ast, tb_hize_t offset)
+{
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// check
+		tb_assert_and_check_break(fst->file);
+	
+		// seek it	
+		if (tb_file_seek(fst->file, offset, TB_FILE_SEEK_BEG) != offset) break ;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_astream_file_seek(tb_astream_t* ast, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst && func, tb_false);
+
+	// open it
+	tb_size_t state = tb_astream_file_try_seek(ast, offset)? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR;
+
+	// done func
+	func(ast, state, priv);
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_astream_file_sync_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_FSYNC, tb_false);
+
+	// the stream
+	tb_astream_file_t* fst = (tb_astream_file_t*)aice->data;
+	tb_assert_and_check_return_val(fst && fst->func.sync, tb_false);
+
+	// stop pending
+	tb_atomic_set0(&fst->base.pending);
+
+	// done func
+	fst->func.sync((tb_astream_t*)fst, aice->state == TB_AICE_STATE_OK? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR, fst->priv);
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_astream_file_sync(tb_astream_t* ast, tb_astream_sync_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_astream_file_t* fst = tb_astream_file_cast(ast);
+	tb_assert_and_check_return_val(fst && fst->file && fst->aico && func, tb_false);
+
+	// save func and priv
+	fst->priv 		= priv;
+	fst->func.sync 	= func;
+
+	// post sync
+	return tb_aico_fsync(fst->aico, tb_astream_file_sync_func, ast);
 }
 static tb_void_t tb_astream_file_kill(tb_astream_t* ast)
 {	
@@ -100,6 +353,10 @@ static tb_void_t tb_astream_file_exit(tb_astream_t* ast)
 	tb_astream_file_t* fst = tb_astream_file_cast(ast);
 	tb_assert_and_check_return(fst);
 
+	// exit aico
+	if (fst->aico) tb_aico_exit(fst->aico);
+	fst->aico = tb_null;
+
 	// exit it
 	if (!fst->bref && fst->file) tb_file_exit(fst->file);
 	fst->file = tb_null;
@@ -115,12 +372,31 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_l
 	switch (ctrl)
 	{
 	case TB_ASTREAM_CTRL_GET_SIZE:
+		{
+			// check
+			tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && fst->file, tb_false);
+
+			// get size
+			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(psize, tb_false);
+			*psize = tb_file_size(fst->file);
+			return tb_true;
+		}
 	case TB_ASTREAM_CTRL_GET_OFFSET:
-		break;
+		{
+			// check
+			tb_assert_and_check_return_val(tb_atomic_get(&ast->opened) && fst->file, tb_false);
+
+			// get offset
+			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+			*poffset = tb_file_offset(fst->file);
+			return tb_true;
+		}
 	case TB_ASTREAM_CTRL_FILE_SET_MODE:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set mode
 			fst->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -129,7 +405,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_l
 	case TB_ASTREAM_CTRL_FILE_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!ast->opened, tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
 			// set handle
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -140,13 +416,11 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_l
 	case TB_ASTREAM_CTRL_FILE_GET_HANDLE:
 		{
 			// get handle
-			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
+			tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = fst->file;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SET_TIMEOUT:
-	case TB_ASTREAM_CTRL_GET_TIMEOUT:
 	default:
 		break;
 	}
@@ -167,16 +441,18 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 
 	// init stream
 	if (!tb_astream_init((tb_astream_t*)ast, aicp, TB_ASTREAM_TYPE_FILE)) goto fail;
-	ast->base.open 	= tb_astream_file_open;
-	ast->base.read 	= tb_astream_file_read;
-	ast->base.writ 	= tb_astream_file_writ;
-	ast->base.save 	= tb_astream_file_save;
-	ast->base.seek 	= tb_astream_file_seek;
-	ast->base.sync 	= tb_astream_file_sync;
-	ast->base.kill 	= tb_astream_file_kill;
-	ast->base.exit 	= tb_astream_file_exit;
-	ast->base.ctrl 	= tb_astream_file_ctrl;
-	ast->mode 		= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+	ast->base.open 		= tb_astream_file_open;
+	ast->base.read 		= tb_astream_file_read;
+	ast->base.writ 		= tb_astream_file_writ;
+	ast->base.save 		= tb_astream_file_save;
+	ast->base.seek 		= tb_astream_file_seek;
+	ast->base.sync 		= tb_astream_file_sync;
+	ast->base.kill 		= tb_astream_file_kill;
+	ast->base.exit 		= tb_astream_file_exit;
+	ast->base.ctrl 		= tb_astream_file_ctrl;
+	ast->base.try_open 	= tb_astream_file_try_open;
+	ast->base.try_seek 	= tb_astream_file_try_seek;
+	ast->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// ok
 	return (tb_astream_t*)ast;
