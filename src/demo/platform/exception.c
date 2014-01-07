@@ -16,7 +16,7 @@ tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	
 	// trace
 	tb_print("thread[%lu]: init", self);
-
+ 
 	// try0
 //	tb_size_t i = 0; // FIXME: maybe restored after exception, will leak memory if i is handle
 	__tb_volatile__ tb_size_t i = 0;
@@ -35,7 +35,8 @@ tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 
 				// abort
 	//			tb_memset(&i, 0, 8192); // FIXME
-				*((__tb_volatile__ tb_size_t*)0) = 0;
+	//			*((__tb_volatile__ tb_size_t*)0) = 0;
+				tb_abort();
 	//			__tb_volatile__ tb_pointer_t p = tb_malloc0(10); tb_memset(p, 0, 8192);
 	
 				// trace
@@ -55,9 +56,9 @@ tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 		}
 		__tb_end
 		tb_print("thread[%lu]: try0: e: %lu", self, i);
-
+ 
 		// abort
-		*((__tb_volatile__ tb_size_t*)0) = 0;
+		tb_abort();
 
 		// end
 		tb_print("thread[%lu]: end0: e: %lu", self, i);
@@ -74,6 +75,7 @@ tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 	tb_thread_return(tb_null);
 	return tb_null;
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */

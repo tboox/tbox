@@ -152,6 +152,7 @@ static tb_void_t tb_exception_init_impl()
 	if (!tb_atomic_fetch_and_set(&s_init, 1))
 	{
 //		tb_signal(TB_SIGINT, tb_exception_func_impl);
+		tb_signal(TB_SIGILL, tb_exception_func_impl);
 		tb_signal(TB_SIGFPE, tb_exception_func_impl);
 		tb_signal(TB_SIGBUS, tb_exception_func_impl);
 		tb_signal(TB_SIGSEGV, tb_exception_func_impl);

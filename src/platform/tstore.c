@@ -96,9 +96,6 @@ tb_void_t tb_tstore_exit()
 }
 tb_void_t tb_tstore_setp(tb_tstore_data_t const* data)
 {
-	// check
-	tb_check_return(tb_atomic_get((tb_atomic_t*)&g_lock));
-
 	// enter lock
 	tb_spinlock_enter(&g_lock);
 
@@ -110,9 +107,6 @@ tb_void_t tb_tstore_setp(tb_tstore_data_t const* data)
 }
 tb_tstore_data_t* tb_tstore_getp()
 {
-	// check
-	tb_check_return_val(tb_atomic_get((tb_atomic_t*)&g_lock), tb_null);
-
 	// init data
 	tb_pointer_t data = tb_null;
 
