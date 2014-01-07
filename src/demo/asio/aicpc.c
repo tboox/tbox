@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -175,13 +174,10 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 {
 	// check
 	tb_assert_and_check_return_val(argv[1], 0);
-
-	// init tbox
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
 	// init
 	tb_aicp_t* 			aicp = tb_null;
@@ -242,7 +238,5 @@ end:
 	// exit data
 	if (context.data) tb_free(context.data);
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

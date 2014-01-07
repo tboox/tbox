@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -610,10 +609,8 @@ static tb_void_t tb_hash_test_walk_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_container_hash_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
 #if 1
 	tb_hash_test_s2i_func();
 	tb_hash_test_i2s_func();
@@ -634,6 +631,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_hash_test_walk_perf();
 #endif
 
-	tb_exit();
 	return 0;
 }

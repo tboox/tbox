@@ -515,25 +515,7 @@ INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
 
 # demos
 ifeq ($(DEMO),y)
-SUB_PROS 				= \
-					  	demo/asio \
-					  	demo/xml \
-					  	demo/flv \
-						demo/libm \
-						demo/libc \
-					  	demo/math \
-					  	demo/utils \
-					  	demo/other \
-					  	demo/object \
-					  	demo/memory \
-					  	demo/string \
-					  	demo/stream \
-					  	demo/network \
-					  	demo/platform \
-					  	demo/algorithm \
-					  	demo/container
-
-
+SUB_PROS 				= demo
 endif
 
 # suffix

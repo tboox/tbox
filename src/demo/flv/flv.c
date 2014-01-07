@@ -1,9 +1,7 @@
 /* /////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
 #include "libflv.h"
-#include <stdlib.h>
 
 /* /////////////////////////////////////////////////////////
  * types
@@ -221,11 +219,8 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 /* /////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main (tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_flv_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
-
 	// init info
 	tb_flv_info_t info = {0};
 
@@ -263,6 +258,5 @@ tb_int_t main (tb_int_t argc, tb_char_t** argv)
 end:
 	// free gstream
 	if (gst) tb_gstream_exit(gst);
-
 	return 0;
 }

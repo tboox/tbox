@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
@@ -798,10 +797,8 @@ static tb_void_t tb_float_test_atan()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_libm_float_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	tb_float_test_constant();
 	tb_float_test_round(TB_PI);
 	tb_float_test_round(-TB_PI);
@@ -821,7 +818,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_float_test_acos();
 	tb_float_test_atan();
 
-	tb_exit();
 	return 0;
 }
 

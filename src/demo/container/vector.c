@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -910,11 +909,8 @@ static tb_void_t tb_vector_test_walk_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_container_vector_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
 #if 1
 	tb_vector_int_test();
 	tb_vector_str_test();
@@ -931,7 +927,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_vector_test_walk_perf();
 #endif
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

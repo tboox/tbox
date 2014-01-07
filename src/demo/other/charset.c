@@ -1,19 +1,15 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
 {
 	// check
 	tb_assert_and_check_return_val(argc == 5, 0);
-
-	// init tbox
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
 	// init stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
@@ -44,9 +40,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_gstream_exit(ist);
 		tb_gstream_exit(ost);
 	}
-	
 
-	// exit tbox
-	tb_exit();
+	return 0;
 }
 

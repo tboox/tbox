@@ -1,6 +1,11 @@
-#include "tbox.h"
-#include <stdlib.h>
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
+#include "../demo.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * test
+ */ 
 static tb_void_t tb_rand_test_uint32(tb_uint32_t b, tb_uint32_t e)
 {
 	__tb_volatile__ tb_uint32_t rand = 0;
@@ -37,10 +42,11 @@ static tb_void_t tb_rand_test_float(tb_float_t b, tb_float_t e)
 }
 #endif
 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_math_rand_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	tb_rand_test_uint32(600, 1000);
 	tb_rand_test_uint32(100, 200);
 

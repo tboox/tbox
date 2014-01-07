@@ -1,6 +1,11 @@
-#include "tbox.h"
-#include <stdlib.h>
+/* ///////////////////////////////////////////////////////////////////////
+ * includes
+ */ 
+#include "../demo.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * globals
+ */ 
 static tb_fixed_t tb_fixed_test_angle[360] = 
 {
 	0x0
@@ -822,10 +827,12 @@ static tb_void_t tb_fixed_test_atan()
 
 	tb_printf("[fixed]: atan, %lld ms\n", t);
 }
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
-{
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_math_fixed_main(tb_int_t argc, tb_char_t** argv)
+{
 	tb_fixed_test_constant();
 	tb_fixed_test_round(TB_FIXED_PI);
 	tb_fixed_test_round(-TB_FIXED_PI);

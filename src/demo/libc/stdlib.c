@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 #include <ctype.h>
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -98,10 +97,12 @@ static tb_void_t tb_test_stof(tb_char_t const* s, tb_double_t val)
 	tb_printf("stof(%s) = %lf [?= %lf]\n", s, tb_stof(s), val);
 }
 #endif
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
-{
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */
+tb_int_t tb_demo_libc_stdlib_main(tb_int_t argc, tb_char_t** argv)
+{	
 	//tb_make_isspace_table();
 	//tb_make_isalpha_table();
 
@@ -218,8 +219,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_test_stoi32("-31415926", -31415926);
 	tb_test_stoi32("-0x1dcc666", -31415926);
 #endif
-
-
-
 	return 0;
 }
