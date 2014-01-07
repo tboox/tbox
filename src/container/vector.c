@@ -133,7 +133,7 @@ static tb_size_t tb_vector_iterator_prev(tb_iterator_t* iterator, tb_size_t itor
 	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)iterator;
 	tb_assert_and_check_return_val(vector, 0);
-	tb_assert_and_check_return_val(itor && itor < vector->size, 0);
+	tb_assert_and_check_return_val(itor && itor <= vector->size, 0);
 
 	// prev
 	return itor - 1;
