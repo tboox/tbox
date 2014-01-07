@@ -17,32 +17,19 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		transfer.h
+ * @ingroup 	stream
  *
  */
-#ifndef TB_STREAM_ASTREAM_PREFIX_H
-#define TB_STREAM_ASTREAM_PREFIX_H
+#ifndef TB_STREAM_TRANSFER_H
+#define TB_STREAM_TRANSFER_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
-#include "../astream.h"
+#include "prefix.h"
+#include "gstream.h"
+#include "astream.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * inlines
- */
-static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* ast, tb_aicp_t* aicp, tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(ast && aicp, tb_false);
-
-	// init
-	ast->type 		= type;
-	ast->aicp 		= aicp;
-	ast->opened 	= 0;
-	ast->stoped 	= 1;
-	return tb_url_init(&ast->url);
-}
 
 #endif

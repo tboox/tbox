@@ -339,10 +339,13 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 					if (left && read >= left) break;
 
 					// print verbose info
-					if (tb_mclock() - basc > 1000) 
+					if (verbose) 
 					{
-						if (verbose) tb_printf("save: %llu bytes, speed: %llu bytes / s\n", tb_gstream_offset(ist), (tb_gstream_offset(ist) * 1000) / (tb_mclock() - base));
-						basc = tb_mclock();
+						if (tb_mclock() - basc > 1000) 
+						{
+							tb_printf("save: %llu bytes, speed: %llu bytes / s\n", tb_gstream_offset(ist), (tb_gstream_offset(ist) * 1000) / (tb_mclock() - base));
+							basc = tb_mclock();
+						}
 					}
 
 				} while(1);

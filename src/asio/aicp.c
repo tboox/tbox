@@ -215,8 +215,8 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
-	// check post
-	tb_assert(aico? !tb_atomic_get(&((tb_aico_t*)aico)->post) : 0);
+	// check pending
+	tb_assert(!tb_aico_pending(aico));
 
 	// delo
 	if (aicp->ptor->delo(aicp->ptor, aico))
@@ -225,10 +225,12 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
 {
 	// check
-	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post && aice, tb_false);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
+	tb_assert_and_check_return_val(aice && aice->aico, tb_false);
 
-	// check post
-	tb_assert_return_val(aice->aico? !tb_atomic_fetch_and_inc(&aice->aico->post) : 0, tb_false);
+	// is pending?
+	tb_size_t pending = tb_atomic_fetch_and_inc(&aice->aico->pending);
+	tb_assert_and_check_return_val(!pending, tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -278,8 +280,12 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 		// timeout?
 		tb_check_continue(ok);
 
-		// check post
-		tb_assert(resp.aico? (tb_atomic_fetch_and_set0(&resp.aico->post) == 1) : 0);
+		// check aico
+		tb_assert_and_check_continue(resp.aico);
+
+		// check pending
+		tb_size_t pending = tb_atomic_fetch_and_set0(&resp.aico->pending);
+		tb_assert_and_check_continue(pending == 1);
 
 		// done aicb
 		if (resp.aicb && !resp.aicb(&resp)) 

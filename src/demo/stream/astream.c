@@ -5,35 +5,73 @@
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the context
+typedef struct __tb_demo_context_t
+{
+	// the option
+	tb_handle_t 			option;
+
+	// the base
+	tb_hong_t 				base;
+
+	// the basc
+	tb_hong_t 				basc;
+
+	// the size
+	tb_hize_t 				size;
+
+	// is debug
+	tb_bool_t 				debug;
+
+	// is verbose
+	tb_bool_t 				verbose;
+
+}tb_demo_context_t;
+
+/* ///////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_istream_save_func(tb_astream_t* ast, tb_size_t state, tb_size_t real, tb_hize_t size, tb_pointer_t priv)
+static tb_bool_t tb_demo_istream_save_func(tb_astream_t* ast, tb_astream_t* ost, tb_size_t state, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(ast, tb_false);
-	
-	// verbose
-	tb_bool_t verbose = (tb_bool_t)priv;
+	tb_demo_context_t* context = (tb_demo_context_t*)priv;
+	tb_assert_and_check_return_val(ast && context && context->option, tb_false);
 
 	// ok
 	if (state == TB_ASTREAM_STATE_OK)
 	{
+		// save size
+		context->size += size;
+
 		// print verbose info
-		if (verbose) tb_printf("save: %lu, size: %llu\n", real, size);
+		if (context->debug) tb_printf("save: %lu\n", size);
+
+		// print verbose info
+		if (context->verbose) 
+		{
+			if (tb_mclock() - context->basc > 1000) 
+			{
+				tb_printf("save: %llu bytes, speed: %llu bytes / s\n", context->size, (context->size * 1000) / (tb_mclock() - context->base));
+				context->basc = tb_mclock();
+			}
+		}
+
 	}
 	// failed
 	else
 	{
 		// print verbose info
-		if (verbose) tb_printf("save: %s\n", tb_astream_state_cstr(state));
+		if (context->verbose) tb_printf("save: %llu bytes, speed: %llu bytes / s, state: %s\n", context->size, (context->size * 1000) / (tb_mclock() - context->base), tb_astream_state_cstr(state));
 
 		// kill aicp
 		tb_aicp_kill(tb_astream_aicp(ast));
 	}
 
 	// closed or failed or finished?
-	if (state != TB_ASTREAM_STATE_OK || real == size)
-		tb_astream_exit(ast);
+	if (state != TB_ASTREAM_STATE_OK) tb_astream_exit(ost);
 
 	// ok?
 	return (state == TB_ASTREAM_STATE_OK)? tb_true : tb_false;
@@ -41,12 +79,9 @@ static tb_bool_t tb_demo_istream_save_func(tb_astream_t* ast, tb_size_t state, t
 static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, tb_pointer_t priv)
 {
 	// check
-	tb_handle_t option = (tb_handle_t)priv;
-	tb_assert_and_check_return_val(ast && option, tb_false);
+	tb_demo_context_t* context = (tb_demo_context_t*)priv;
+	tb_assert_and_check_return_val(ast && context && context->option, tb_false);
 
-	// verbose
-	tb_bool_t verbose = tb_option_find(option, "no-verbose")? tb_false : tb_true;
-	
 	// done
 	tb_bool_t 		ok = tb_false;
 	tb_astream_t* 	stream = tb_null;
@@ -56,31 +91,34 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		if (state != TB_ASTREAM_STATE_OK)
 		{
 			// print verbose info
-			if (verbose) 
+			if (context->verbose) 
 			{
 				tb_char_t const* url = tb_null;
 				tb_astream_ctrl(ast, TB_ASTREAM_CTRL_GET_URL, &url);
 				tb_printf("open: %s: %s\n", url, tb_astream_state_cstr(state));
 			}
 		}
+	
+		// trace
+		if (context->verbose) tb_printf("open: ok\n");
 
 		// init stream
-		if (tb_option_find(option, "more0"))
+		if (tb_option_find(context->option, "more0"))
 		{
 			// the path
-			tb_char_t const* path = tb_option_item_cstr(option, "more0");
+			tb_char_t const* path = tb_option_item_cstr(context->option, "more0");
 
 			// init
 			stream = tb_astream_init_from_url(tb_astream_aicp(ast), path);
 
 			// print verbose info
-			if (verbose) tb_printf("save: %s\n", path);
+			if (context->verbose) tb_printf("save: %s: ..\n", path);
 		}
 		else 
 		{
 			// the name
-			tb_char_t const* name = tb_strrchr(tb_option_item_cstr(option, "url"), '/');
-			if (!name) name = tb_strrchr(tb_option_item_cstr(option, "url"), '\\');
+			tb_char_t const* name = tb_strrchr(tb_option_item_cstr(context->option, "url"), '/');
+			if (!name) name = tb_strrchr(tb_option_item_cstr(context->option, "url"), '\\');
 			if (!name) name = "/astream.file";
 
 			// the path
@@ -94,7 +132,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 				stream = tb_astream_init_from_url(tb_astream_aicp(ast), path);
 
 				// print verbose info
-				if (verbose) tb_printf("save: %s\n", path);
+				if (context->verbose) tb_printf("save: %s: ..\n", path);
 			}
 		}
 		tb_assert_and_check_break(stream);
@@ -106,7 +144,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		// try to open stream only for file
 		if (!tb_astream_try_open(stream)) 
 		{
-			if (verbose) 
+			if (context->verbose) 
 			{	
 				tb_char_t const* url = tb_null;
 				tb_astream_ctrl(stream, TB_ASTREAM_CTRL_GET_URL, &url);
@@ -114,9 +152,12 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 			}
 			break;
 		}
-
+	
 		// save stream
-		if (!tb_astream_save(ast, stream, tb_demo_istream_save_func, (tb_pointer_t)verbose)) break;
+		context->base = tb_mclock();
+		context->basc = context->base;
+		context->size = 0;
+		if (!tb_astream_save(ast, stream, tb_demo_istream_save_func, context)) break;
 
 		// ok
 		ok = tb_true;
@@ -166,54 +207,55 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// done
 	tb_aicp_t* 			aicp = tb_null;
 	tb_astream_t* 		stream = tb_null;
-	tb_handle_t 		option = tb_null;
+	tb_demo_context_t 	context = {0};
 	do
 	{
 		// init option
-		option = tb_option_init("astream", "the astream demo", g_options);
-		tb_assert_and_check_break(option);
+		context.option = tb_option_init("astream", "the astream demo", g_options);
+		tb_assert_and_check_break(context.option);
 	
 		// done option
-		if (tb_option_done(option, argc - 1, &argv[1]))
+		if (tb_option_done(context.option, argc - 1, &argv[1]))
 		{
-			// verbose
-			tb_bool_t verbose = tb_option_find(option, "no-verbose")? tb_false : tb_true;
+			// debug and verbose
+			context.debug = tb_option_find(context.option, "debug");
+			context.verbose = tb_option_find(context.option, "no-verbose")? tb_false : tb_true;
 		
 			// done url
-			if (tb_option_find(option, "url")) 
+			if (tb_option_find(context.option, "url")) 
 			{
 				// init aicp
 				aicp = tb_aicp_init(2);
 				tb_assert_and_check_break(aicp);
 
 				// init stream
-				stream = tb_astream_init_from_url(aicp, tb_option_item_cstr(option, "url"));
+				stream = tb_astream_init_from_url(aicp, tb_option_item_cstr(context.option, "url"));
 				tb_assert_and_check_break(stream);
 
 				// set timeout
-				if (tb_option_find(option, "timeout"))
+				if (tb_option_find(context.option, "timeout"))
 				{
-					tb_size_t timeout = tb_option_item_uint32(option, "timeout");
+					tb_size_t timeout = tb_option_item_uint32(context.option, "timeout");
 					tb_astream_ctrl(stream, TB_ASTREAM_CTRL_SET_TIMEOUT, &timeout);
 				}
 
 				// print verbose info
-				if (verbose) tb_printf("open: %s: ..\n", tb_option_item_cstr(option, "url"));
+				if (context.verbose) tb_printf("open: %s: ..\n", tb_option_item_cstr(context.option, "url"));
 
 				// open stream
-				if (!tb_astream_open(stream, tb_demo_istream_open_func, option)) 
+				if (!tb_astream_open(stream, tb_demo_istream_open_func, &context)) 
 				{
 					// print verbose info
-					if (verbose) tb_printf("open: failed\n");
+					if (context.verbose) tb_printf("open: failed\n");
 					break;
 				}
 
 				// loop aicp
 				tb_aicp_loop(aicp);
 			}
-			else tb_option_help(option);
+			else tb_option_help(context.option);
 		}
-		else tb_option_help(option);
+		else tb_option_help(context.option);
 
 	} while (0);
 
@@ -226,8 +268,8 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	aicp = tb_null;
 
 	// exit option
-	if (option) tb_option_exit(option);
-	option = tb_null;
+	if (context.option) tb_option_exit(context.option);
+	context.option = tb_null;
 
 	// exit tbox
 	tb_exit();
