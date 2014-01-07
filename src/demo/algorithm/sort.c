@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -509,11 +508,8 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_algorithm_sort_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
 	// func
 	tb_sort_int_test_func_heap();
 	tb_sort_int_test_func_quick();
@@ -532,7 +528,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_sort_str_test_perf_bubble(10000);
 	tb_sort_str_test_perf_insert(10000);
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

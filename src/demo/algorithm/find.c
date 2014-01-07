@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -156,19 +155,13 @@ static tb_void_t tb_find_str_test_binary()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_algorithm_find_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
 	// test
 	tb_find_int_test();
 	tb_find_int_test_binary();
 	tb_find_str_test();
 	tb_find_str_test_binary();
 
-
-	// exit tbox
-	tb_exit();
 	return 0;
 }

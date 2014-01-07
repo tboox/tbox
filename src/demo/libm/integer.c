@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -35,11 +34,8 @@ static tb_void_t tb_integer_test_ilog2i(tb_size_t x)
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_libm_integer_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// ilog2i
 	tb_integer_test_ilog2i(0);
 	tb_integer_test_ilog2i(256);
@@ -54,7 +50,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_integer_test_isqrti(65537);
 	tb_integer_test_isqrti(1 << 30);
 
-	// exit
-	tb_exit();
 	return 0;
 }

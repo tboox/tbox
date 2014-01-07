@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -39,13 +38,10 @@ static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_asio_addr_main(tb_int_t argc, tb_char_t** argv)
 {
 	// check
 	tb_assert_and_check_return_val(argv[1], 0);
-
-	// init tbox
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
 
 	// init
 	tb_handle_t 		aicp = tb_null;
@@ -87,8 +83,5 @@ end:
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);
-
-	// exit tbox
-	tb_exit();
 	return 0;
 }

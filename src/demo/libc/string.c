@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -110,10 +109,12 @@ static tb_void_t tb_test_strncpy(tb_char_t const* s2, tb_size_t size)
 	t = tb_mclock() - t;
 	tb_printf("%lld ms, tb_test_strncpy(%s, %d) = %s\n", t, s2, size, s1);
 }
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
-{
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
 
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */
+tb_int_t tb_demo_libc_string_main(tb_int_t argc, tb_char_t** argv)
+{
 #if TB_TEST_CMP
 	tb_printf("=================================================================\n");
 	tb_test_strcmp("", "");

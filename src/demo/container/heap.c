@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -159,11 +158,8 @@ static tb_void_t tb_test_heap_max_perf()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_container_heap_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(30 * 1024 * 1024), 30 * 1024 * 1024)) return 0;
-
 	// func
 	tb_test_heap_min_func();
 	tb_test_heap_max_func();
@@ -172,7 +168,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_test_heap_min_perf();
 	tb_test_heap_max_perf();
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }
