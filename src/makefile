@@ -71,6 +71,7 @@ tbox_C_FILES 			+= \
 						stream/astream/http \
 						stream/astream/sock \
 						stream/astream/file \
+						stream/transfer \
 						object/object \
 						object/null \
 						object/data \
@@ -404,6 +405,7 @@ INC_FILES 				= \
 						stream/astream.h \
 						stream/bstream.h \
 						stream/gstream.h \
+						stream/transfer.h \
 						object/prefix.h \
 						object/object.h \
 						object/null.h \
