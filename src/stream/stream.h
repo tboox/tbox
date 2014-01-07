@@ -31,6 +31,7 @@
 #include "bstream.h"
 #include "gstream.h"
 #include "astream.h"
+#include "transfer.h"
 
 /*!architecture
  *
@@ -65,6 +66,10 @@
  *                   - filter - |- chunked 
  *                              |        
  *                               - zip    
+ *
+ *                -- gstream
+ *    transfer - |
+ *                -- astream
  *
  *                         
  * url: 
