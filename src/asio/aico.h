@@ -98,13 +98,13 @@ typedef struct __tb_aico_t
 	/// the handle
 	tb_handle_t 		handle;
 
+	/// is pending, must be zero or one
+	tb_atomic_t 		pending;
+
 	/// the timeout for aice
 	tb_atomic_t 		timeout[TB_AICO_TIMEOUT_MAXN];
 
 #ifdef __tb_debug__
-	/// the post size, must be zero or one
-	tb_atomic_t 		post;
-
 	/// the func
 	tb_char_t const* 	func;
 
@@ -186,6 +186,14 @@ tb_handle_t 		tb_aico_pool(tb_handle_t aico);
  * @return 			the aico handle
  */
 tb_handle_t 		tb_aico_handle(tb_handle_t aico);
+
+/*! the aico is pending?
+ *
+ * @param aico 		the aico
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_pending(tb_handle_t aico);
 
 #ifdef __tb_debug__
 /*! the aico func name from post for debug

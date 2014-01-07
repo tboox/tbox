@@ -121,6 +121,15 @@ tb_handle_t tb_aico_handle(tb_handle_t haico)
 	// the aico handle
 	return aico->handle;
 }
+tb_bool_t tb_aico_pending(tb_handle_t haico)
+{
+	// check
+	tb_aico_t* aico = (tb_aico_t*)haico;
+	tb_assert_and_check_return_val(aico, tb_false);
+
+	// is pending?
+	return tb_atomic_get(&aico->pending)? tb_true : tb_false;
+}
 tb_long_t tb_aico_timeout(tb_handle_t haico, tb_size_t type)
 {
 	// check
