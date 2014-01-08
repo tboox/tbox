@@ -1,9 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -46,14 +44,12 @@ static tb_cpointer_t tb_tstore_test(tb_cpointer_t data)
 	tb_thread_return(tb_null);
 	return tb_null;
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_tstore_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// done
 	tb_thread_init(tb_null, tb_tstore_test, tb_null, 0);
 	tb_thread_init(tb_null, tb_tstore_test, tb_null, 0);
@@ -63,7 +59,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// wait
 	getchar();
 
-	// exit
-	tb_exit();
 	return 0;
 }

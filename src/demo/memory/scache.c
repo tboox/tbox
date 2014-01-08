@@ -1,17 +1,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
-
 	// hello
 	tb_char_t const* hello = tb_scache_put("hello world");
 	tb_print("hello: %s", hello);
@@ -40,7 +36,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// del hello
 	tb_scache_del(hello);
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -198,12 +197,9 @@ static tb_option_item_t g_options[] =
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(5 * 1024 * 1024), 5 * 1024 * 1024)) return 0;
-
 	// done
 	tb_aicp_t* 			aicp = tb_null;
 	tb_astream_t* 		stream = tb_null;
@@ -271,7 +267,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	if (context.option) tb_option_exit(context.option);
 	context.option = tb_null;
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

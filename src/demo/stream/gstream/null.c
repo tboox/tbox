@@ -1,17 +1,14 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_stream_gstream_null_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
-	// create stream
+	// init stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
 	tb_gstream_t* nst = tb_gstream_init_filter_from_null(ist);
@@ -83,11 +80,10 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 
 end:
 
-	// destroy stream
+	// exit stream
 	tb_gstream_exit(nst);
 	tb_gstream_exit(ist);
 	tb_gstream_exit(ost);
 
-	tb_exit();
 	return 0;
 }

@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -73,12 +72,9 @@ end:
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_lock_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// init lock
 #if defined(TB_TEST_LOCK_MUTEX)
 	tb_handle_t lock = tb_mutex_init();
@@ -136,7 +132,5 @@ end:
 	// trace
 	tb_print("time: %lld ms", time);
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

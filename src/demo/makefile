@@ -26,8 +26,64 @@ demo_C_FILES 			+= \
 						asio/aicpd \
 						math/rand \
 						math/fixed \
+						utils/url \
+						utils/crc \
+						utils/md5 \
+						utils/sha \
+						utils/bits \
+						utils/dump \
+						utils/option \
+						utils/base32 \
+						utils/base64 \
 						other/test \
 						other/charset \
+						object/jsn \
+						object/xml \
+						object/bin \
+						object/dump \
+						stream/astream \
+						stream/gstream \
+						stream/gstream/zip \
+						stream/gstream/null \
+						stream/gstream/charset \
+						string/pstring \
+						string/sstring \
+						memory/check \
+						memory/fpool \
+						memory/gpool \
+						memory/vpool \
+						memory/spool \
+						memory/rpool \
+						memory/tpool \
+						memory/memops \
+						memory/scache \
+						memory/pbuffer \
+						memory/qbuffer \
+						memory/sbuffer \
+						network/dns \
+						network/url \
+						network/ipv4 \
+						network/http \
+						network/whois \
+						network/cookies \
+						platform/file \
+						platform/lock \
+						platform/path \
+						platform/ctime \
+						platform/epool \
+						platform/event \
+						platform/utils \
+						platform/timer \
+						platform/tstore \
+						platform/ltimer \
+						platform/atomic \
+						platform/process \
+						platform/barrier \
+						platform/atomic64 \
+						platform/backtrace \
+						platform/directory \
+						platform/exception \
+						platform/semaphore \
 						container/heap \
 						container/hash \
 						container/dlist \

@@ -1,16 +1,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_string_sstring_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	tb_sstring_t 	s;
 	tb_char_t 		b[4096];
 	tb_sstring_init(&s, b, 4096);

@@ -1,11 +1,10 @@
-#include "tbox.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "../demo.h"
 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_network_cookies_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// init cookies
 	tb_cookies_t* cookies = tb_cookies_init();
 	tb_assert_and_check_return_val(cookies, 0);

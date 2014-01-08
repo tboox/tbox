@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 #include <string.h>
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -56,13 +55,15 @@ static tb_bool_t check_memset_u32(tb_byte_t* dst, tb_uint32_t src, tb_size_t siz
 
 	return tb_true;
 }
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * main
+ */ 
+tb_int_t tb_demo_memory_memops_main(tb_int_t argc, tb_char_t** argv)
 {
 	__tb_volatile__ tb_size_t i = 0;
 	__tb_volatile__ tb_hong_t dt = 0;
 
-	if (!tb_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024)) return 0;
-	
 	__tb_volatile__ tb_size_t 	size = 15 * 1024 * 1024;
 	__tb_volatile__ tb_byte_t* 	data = tb_malloc(size);
 
@@ -172,8 +173,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	dt = tb_mclock() - dt;
 	tb_printf("memset_u32[1m]: %lld ms\n", dt);
 	if (!check_memset_u32(data, 0xbeefbeaf, 1024 * 1024 + 3)) tb_printf("check failed\n");
-
-
 
 
 	return 0;

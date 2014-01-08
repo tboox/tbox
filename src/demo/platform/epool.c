@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -65,12 +64,9 @@ end:
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_epool_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// init item
 	tb_test_item_t it = {0};
 
@@ -136,6 +132,5 @@ end:
 	tb_epool_exit(it.e);
 
 	tb_print("quit");
-	tb_exit();
 	return 0;
 }

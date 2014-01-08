@@ -57,9 +57,79 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(math_rand)
 ,	TB_DEMO_MAIN_ITEM(math_fixed)
 
+	// utils
+,	TB_DEMO_MAIN_ITEM(utils_url)
+,	TB_DEMO_MAIN_ITEM(utils_crc)
+,	TB_DEMO_MAIN_ITEM(utils_md5)
+,	TB_DEMO_MAIN_ITEM(utils_sha)
+,	TB_DEMO_MAIN_ITEM(utils_bits)
+,	TB_DEMO_MAIN_ITEM(utils_dump)
+,	TB_DEMO_MAIN_ITEM(utils_option)
+,	TB_DEMO_MAIN_ITEM(utils_base32)
+,	TB_DEMO_MAIN_ITEM(utils_base64)
+
 	// other
 ,	TB_DEMO_MAIN_ITEM(other_test)
 ,	TB_DEMO_MAIN_ITEM(other_charset)
+
+	// object
+,	TB_DEMO_MAIN_ITEM(object_jsn)
+,	TB_DEMO_MAIN_ITEM(object_bin)
+,	TB_DEMO_MAIN_ITEM(object_xml)
+,	TB_DEMO_MAIN_ITEM(object_dump)
+
+	// stream
+,	TB_DEMO_MAIN_ITEM(stream_astream)
+,	TB_DEMO_MAIN_ITEM(stream_gstream)
+,	TB_DEMO_MAIN_ITEM(stream_gstream_zip)
+,	TB_DEMO_MAIN_ITEM(stream_gstream_null)
+,	TB_DEMO_MAIN_ITEM(stream_gstream_charset)
+
+	// string
+,	TB_DEMO_MAIN_ITEM(string_pstring)
+,	TB_DEMO_MAIN_ITEM(string_sstring)
+
+	// memory
+,	TB_DEMO_MAIN_ITEM(memory_check)
+,	TB_DEMO_MAIN_ITEM(memory_fpool)
+,	TB_DEMO_MAIN_ITEM(memory_gpool)
+,	TB_DEMO_MAIN_ITEM(memory_spool)
+,	TB_DEMO_MAIN_ITEM(memory_tpool)
+,	TB_DEMO_MAIN_ITEM(memory_vpool)
+,	TB_DEMO_MAIN_ITEM(memory_rpool)
+,	TB_DEMO_MAIN_ITEM(memory_memops)
+,	TB_DEMO_MAIN_ITEM(memory_scache)
+,	TB_DEMO_MAIN_ITEM(memory_pbuffer)
+,	TB_DEMO_MAIN_ITEM(memory_qbuffer)
+,	TB_DEMO_MAIN_ITEM(memory_sbuffer)
+
+	// network
+,	TB_DEMO_MAIN_ITEM(network_dns)
+,	TB_DEMO_MAIN_ITEM(network_url)
+,	TB_DEMO_MAIN_ITEM(network_ipv4)
+,	TB_DEMO_MAIN_ITEM(network_http)
+,	TB_DEMO_MAIN_ITEM(network_whois)
+,	TB_DEMO_MAIN_ITEM(network_cookies)
+
+	// platform
+,	TB_DEMO_MAIN_ITEM(platform_file)
+,	TB_DEMO_MAIN_ITEM(platform_lock)
+,	TB_DEMO_MAIN_ITEM(platform_path)
+,	TB_DEMO_MAIN_ITEM(platform_ctime)
+,	TB_DEMO_MAIN_ITEM(platform_epool)
+,	TB_DEMO_MAIN_ITEM(platform_event)
+,	TB_DEMO_MAIN_ITEM(platform_utils)
+,	TB_DEMO_MAIN_ITEM(platform_timer)
+,	TB_DEMO_MAIN_ITEM(platform_tstore)
+,	TB_DEMO_MAIN_ITEM(platform_ltimer)
+,	TB_DEMO_MAIN_ITEM(platform_atomic)
+,	TB_DEMO_MAIN_ITEM(platform_process)
+,	TB_DEMO_MAIN_ITEM(platform_barrier)
+,	TB_DEMO_MAIN_ITEM(platform_atomic64)
+,	TB_DEMO_MAIN_ITEM(platform_backtrace)
+,	TB_DEMO_MAIN_ITEM(platform_directory)
+,	TB_DEMO_MAIN_ITEM(platform_exception)
+,	TB_DEMO_MAIN_ITEM(platform_semaphore)
 
 	// container
 ,	TB_DEMO_MAIN_ITEM(container_heap)

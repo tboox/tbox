@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -398,14 +397,12 @@ static tb_bool_t tb_whois_test_walk_num_6()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_network_whois_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 #if TB_WHOIS_TEST_HOST_WALK
 //	tb_whois_test_walk_2();
 //	tb_whois_test_walk_3();
@@ -424,7 +421,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_whois_test_done(argv[1]);
 #endif
 
-	// exit
-	tb_exit();
 	return 0;
 }

@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * callback
@@ -62,12 +61,9 @@ static tb_long_t tb_http_demo_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data,
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// init http
 	tb_handle_t http = tb_http_init();
 	tb_assert_and_check_goto(http, end);
@@ -185,7 +181,5 @@ end:
 	// exit http
 	if (http) tb_http_exit(http);
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }
