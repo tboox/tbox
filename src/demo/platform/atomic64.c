@@ -1,16 +1,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_platform_atomic64_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	tb_atomic64_t a;
 	tb_atomic64_set0(&a);
 	tb_print("%lld", tb_atomic64_get(&a));

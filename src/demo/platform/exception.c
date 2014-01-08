@@ -1,9 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -78,12 +76,9 @@ tb_cpointer_t tb_exception_test(tb_cpointer_t data)
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_exception_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 #if 1
 	// done
 	tb_thread_init(tb_null, tb_exception_test, tb_null, 0);
@@ -129,7 +124,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// wait
 	getchar();
 
-	// exit
-	tb_exit();
 	return 0;
 }

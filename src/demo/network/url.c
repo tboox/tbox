@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -35,13 +34,12 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 
 	tb_url_exit(&u);
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
-{
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
+ */ 
+tb_int_t tb_demo_network_url_main(tb_int_t argc, tb_char_t** argv)
+{	
 	tb_url_test_set("file:///home/ruki/file.txt");
 	tb_url_test_set("sock://localhost:8080");
 	tb_url_test_set("sock://localhost:8080/ruki/file.txt");
@@ -91,6 +89,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_url_test_set("..\\..\\ruki\\file.txt");
 	tb_url_test_set("../../ruki/../file.txt");
 
-	tb_exit();
 	return 0;
 }

@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
@@ -36,11 +35,8 @@ static tb_option_item_t g_options[] =
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// init option
 	tb_handle_t option = tb_option_init("option", "the option command test demo", g_options);
 	if (option)
@@ -102,7 +98,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_option_exit(option);
 	}
 
-	// exit tbox
-	tb_exit();
 	return 0;
 }

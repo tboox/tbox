@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -713,14 +712,12 @@ static tb_void_t tb_test_bits_fb1_u64_le(tb_uint64_t x)
 
 	tb_print("[bitops]: u64_le: fb1: %064llb => %lu, %lld ms", x, i, t);
 }
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 #if 1
 	tb_test_bits_swap_u16();
 	tb_test_bits_swap_u32();
@@ -1152,7 +1149,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb1_u64_le(0xf000000000000000);
 #endif
 
-	// exit
-	tb_exit();
 	return 0;
 }

@@ -1,17 +1,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_xml_writer_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init tbox
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
-
 	// init stream
 	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
@@ -59,8 +55,6 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_gstream_exit(gst);
 	}
 	
-	// exit tbox
-	tb_exit();
 	return 0;
 }
 

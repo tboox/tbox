@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * demo
@@ -37,11 +36,8 @@ static tb_size_t tb_base64_encode_test(tb_byte_t const* ib, tb_size_t in, tb_cha
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_utils_base64_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 #if 0
 	tb_char_t ob[4096] = {0};
 	tb_size_t on = tb_base64_encode(argv[1], tb_strlen(argv[1]), ob, 4096);
@@ -68,7 +64,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	}
 #endif
 
-	// exit
-	tb_exit();
 	return 0;
 }

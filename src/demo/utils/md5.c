@@ -1,17 +1,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */ 
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_utils_md5_main(tb_int_t argc, tb_char_t** argv)
 {
-	if (!argv[1]) return 0;
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	tb_byte_t ob[16];
 	tb_size_t on = tb_md5_encode(argv[1], tb_strlen(argv[1]), ob, 16);
 	if (on != 16) return 0;
@@ -21,7 +17,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	for (i = 0; i < 16; ++i) tb_snprintf(md5 + (i << 1), 3, "%02X", ob[i]);
 	tb_printf("%s: %lu\n", md5, on);
 
-
-	tb_exit();
 	return 0;
 }

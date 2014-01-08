@@ -66,9 +66,79 @@ TB_DEMO_MAIN_DECL(asio_aicpd);
 TB_DEMO_MAIN_DECL(math_rand);
 TB_DEMO_MAIN_DECL(math_fixed);
 
+// utils
+TB_DEMO_MAIN_DECL(utils_url);
+TB_DEMO_MAIN_DECL(utils_crc);
+TB_DEMO_MAIN_DECL(utils_md5);
+TB_DEMO_MAIN_DECL(utils_sha);
+TB_DEMO_MAIN_DECL(utils_bits);
+TB_DEMO_MAIN_DECL(utils_dump);
+TB_DEMO_MAIN_DECL(utils_option);
+TB_DEMO_MAIN_DECL(utils_base32);
+TB_DEMO_MAIN_DECL(utils_base64);
+
 // other
 TB_DEMO_MAIN_DECL(other_test);
 TB_DEMO_MAIN_DECL(other_charset);
+
+// object
+TB_DEMO_MAIN_DECL(object_jsn);
+TB_DEMO_MAIN_DECL(object_bin);
+TB_DEMO_MAIN_DECL(object_xml);
+TB_DEMO_MAIN_DECL(object_dump);
+
+// stream
+TB_DEMO_MAIN_DECL(stream_astream);
+TB_DEMO_MAIN_DECL(stream_gstream);
+TB_DEMO_MAIN_DECL(stream_gstream_zip);
+TB_DEMO_MAIN_DECL(stream_gstream_null);
+TB_DEMO_MAIN_DECL(stream_gstream_charset);
+
+// string
+TB_DEMO_MAIN_DECL(string_pstring);
+TB_DEMO_MAIN_DECL(string_sstring);
+
+// memory
+TB_DEMO_MAIN_DECL(memory_check);
+TB_DEMO_MAIN_DECL(memory_fpool);
+TB_DEMO_MAIN_DECL(memory_gpool);
+TB_DEMO_MAIN_DECL(memory_spool);
+TB_DEMO_MAIN_DECL(memory_tpool);
+TB_DEMO_MAIN_DECL(memory_vpool);
+TB_DEMO_MAIN_DECL(memory_rpool);
+TB_DEMO_MAIN_DECL(memory_memops);
+TB_DEMO_MAIN_DECL(memory_scache);
+TB_DEMO_MAIN_DECL(memory_pbuffer);
+TB_DEMO_MAIN_DECL(memory_qbuffer);
+TB_DEMO_MAIN_DECL(memory_sbuffer);
+
+// network
+TB_DEMO_MAIN_DECL(network_dns);
+TB_DEMO_MAIN_DECL(network_url);
+TB_DEMO_MAIN_DECL(network_ipv4);
+TB_DEMO_MAIN_DECL(network_http);
+TB_DEMO_MAIN_DECL(network_whois);
+TB_DEMO_MAIN_DECL(network_cookies);
+
+// platform
+TB_DEMO_MAIN_DECL(platform_file);
+TB_DEMO_MAIN_DECL(platform_lock);
+TB_DEMO_MAIN_DECL(platform_path);
+TB_DEMO_MAIN_DECL(platform_ctime);
+TB_DEMO_MAIN_DECL(platform_epool);
+TB_DEMO_MAIN_DECL(platform_event);
+TB_DEMO_MAIN_DECL(platform_utils);
+TB_DEMO_MAIN_DECL(platform_timer);
+TB_DEMO_MAIN_DECL(platform_tstore);
+TB_DEMO_MAIN_DECL(platform_ltimer);
+TB_DEMO_MAIN_DECL(platform_atomic);
+TB_DEMO_MAIN_DECL(platform_process);
+TB_DEMO_MAIN_DECL(platform_barrier);
+TB_DEMO_MAIN_DECL(platform_atomic64);
+TB_DEMO_MAIN_DECL(platform_backtrace);
+TB_DEMO_MAIN_DECL(platform_directory);
+TB_DEMO_MAIN_DECL(platform_exception);
+TB_DEMO_MAIN_DECL(platform_semaphore);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);

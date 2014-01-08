@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
  
 /* ///////////////////////////////////////////////////////////////////////
  * test
@@ -64,11 +63,8 @@ tb_void_t tb_demo_overlap()
 /* ///////////////////////////////////////////////////////////////////////
  * main
  */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_check_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 	// done 
 	tb_demo_leak();
 //	tb_demo_free2();
@@ -77,7 +73,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 //	tb_demo_cstring();
 //	tb_demo_overlap();
 
-	// exit
-	tb_exit();
 	return 0;
 }

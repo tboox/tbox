@@ -1,9 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * func
@@ -24,12 +22,9 @@ static tb_void_t tb_ltimer_task_func(tb_pointer_t data)
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(10 * 1024 * 1024), 10 * 1024 * 1024)) return 0;
-
 	// init timer
 //	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_TICK_S, tb_true);
 //	tb_handle_t timer = tb_ltimer_init(3, TB_LTIMER_TICK_S, tb_false);
@@ -61,7 +56,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_ltimer_exit(timer);
 	}
 
-	// exit
-	tb_exit();
 	return 0;
 }

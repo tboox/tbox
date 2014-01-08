@@ -1,8 +1,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "tbox.h"
-#include <stdlib.h>
+#include "../demo.h"
 
 /* /////////////////////////////////////////////////////////////////////////////////////
  * callback
@@ -29,14 +28,12 @@ static tb_void_t tb_directory_walk_func(tb_char_t const* path, tb_file_info_t co
 			, mtime.second);
 }
 
+
 /* ///////////////////////////////////////////////////////////////////////
  * main
- */
-tb_int_t main(tb_int_t argc, tb_char_t** argv)
+ */ 
+tb_int_t tb_demo_platform_directory_main(tb_int_t argc, tb_char_t** argv)
 {
-	// init
-	if (!tb_init(malloc(1024 * 1024), 1024 * 1024)) return 0;
-
 #if 1
 	// temporary
 	tb_char_t temp[4096] = {0};
@@ -55,7 +52,5 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	tb_directory_copy(argv[1], argv[2]);
 #endif
 
-	// exit
-	tb_exit();
 	return 0;
 }
