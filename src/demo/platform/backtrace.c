@@ -29,6 +29,5 @@ tb_int_t tb_demo_platform_backtrace_main(tb_int_t argc, tb_char_t** argv)
 {
 	// done 
 	tb_demo_test(argv[1]? tb_atoi(argv[1]) : 10);
-
 	return 0;
 }

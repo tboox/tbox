@@ -116,7 +116,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe);
+tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
 
 #endif
 

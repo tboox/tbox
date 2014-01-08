@@ -41,7 +41,7 @@
  *
  * @return 				the real backtrace frame count
  */
-tb_size_t 				tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip);
+tb_size_t 				tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip);
 
 /*! init backtrace frame symbols
  *
@@ -50,7 +50,7 @@ tb_size_t 				tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_si
  *
  * @return 				the backtrace frame symbols handle
  */
-tb_handle_t 			tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe);
+tb_handle_t 			tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe);
 
 /*! get backtrace frame symbol name
  *
@@ -61,7 +61,7 @@ tb_handle_t 			tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe
  *
  * @return 				the symbol name
  */
-tb_char_t const* 		tb_backtrace_symbols_name(tb_handle_t symbols, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe);
+tb_char_t const* 		tb_backtrace_symbols_name(tb_handle_t symbols, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe);
 
 /*! exit backtrace frame symbols
  *
@@ -75,6 +75,6 @@ tb_void_t 				tb_backtrace_symbols_exit(tb_handle_t symbols);
  * @param frames 		the backtrace frames, dump the current frames if null
  * @param nframe 		the backtrace frame count
  */
-tb_void_t 				tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe);
+tb_void_t 				tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe);
 
 #endif

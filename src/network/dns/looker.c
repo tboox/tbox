@@ -299,11 +299,11 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 
 		// decode resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);
-		answer.res.class 	= tb_bstream_get_u16_be(&bst);
+		answer.res.class_ 	= tb_bstream_get_u16_be(&bst);
 		answer.res.ttl 		= tb_bstream_get_u32_be(&bst);
 		answer.res.size 	= tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 
@@ -360,11 +360,11 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
-		answer.res.class = 	tb_bstream_get_u16_be(&bst);
+		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 
@@ -398,11 +398,11 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
-		answer.res.class = 	tb_bstream_get_u16_be(&bst);
+		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 

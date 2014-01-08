@@ -83,7 +83,7 @@ typedef struct __tb_dns_header_t
 typedef struct __tb_dns_question_t
 {
 	tb_uint16_t 		type;
-	tb_uint16_t 		class;
+	tb_uint16_t 		class_;
 
 }tb_dns_question_t;
 
@@ -91,7 +91,7 @@ typedef struct __tb_dns_question_t
 typedef struct __tb_dns_resource_t
 {
 	tb_uint16_t 		type;
-	tb_uint16_t 		class;
+	tb_uint16_t 		class_;
 	tb_uint32_t 		ttl;
 	tb_uint16_t 		size;
 
@@ -139,8 +139,8 @@ static __tb_inline__ tb_char_t const* tb_dns_encode_name(tb_char_t* name)
 }
 static __tb_inline__ tb_char_t const* tb_dns_decode_name_impl(tb_char_t const* sb, tb_char_t const* se, tb_char_t const* ps, tb_char_t** pd)
 {
-	tb_char_t* p = ps;
-	tb_char_t* q = *pd;
+	tb_char_t const* 	p = ps;
+	tb_char_t* 			q = *pd;
 	while (p < se)
 	{
 		tb_byte_t c = *p++;
@@ -168,12 +168,12 @@ static __tb_inline__ tb_char_t const* tb_dns_decode_name_impl(tb_char_t const* s
 static __tb_inline__ tb_char_t const* tb_dns_decode_name(tb_bstream_t* bst, tb_char_t* name)
 {
 	tb_char_t* q = name;
-	tb_char_t* p = tb_dns_decode_name_impl(tb_bstream_beg(bst), tb_bstream_end(bst), tb_bstream_pos(bst), &q);
+	tb_char_t* p = (tb_char_t*)tb_dns_decode_name_impl((tb_char_t const*)tb_bstream_beg(bst), (tb_char_t const*)tb_bstream_end(bst), (tb_char_t const*)tb_bstream_pos(bst), &q);
 	if (p)
 	{
 		tb_assert(q - name < TB_DNS_NAME_MAXN);
 		if (q > name && *(q - 1) == '.') *--q = '\0';
-		tb_bstream_goto(bst, p);
+		tb_bstream_goto(bst, (tb_byte_t*)p);
 		return name;
 	}
 	else return tb_null;

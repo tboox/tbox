@@ -27,8 +27,10 @@
  * includes
  */
 #include "prefix.h"
-#if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
+#if defined(TB_ARCH_x86)
 # 	include "x86/barrier.h"
+#elif defined(TB_ARCH_x64)
+# 	include "x64/barrier.h"
 #endif
 
 #endif
