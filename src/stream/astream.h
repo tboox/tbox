@@ -125,11 +125,14 @@ typedef enum __tb_astream_state_e
 {
 	TB_ASTREAM_STATE_OK 					= 0
 ,	TB_ASTREAM_STATE_CLOSED 				= 1
-,	TB_ASTREAM_STATE_UNKNOWN_ERROR 			= 2
+,	TB_ASTREAM_STATE_NOT_SUPPORTED 			= 2
+,	TB_ASTREAM_STATE_UNKNOWN_ERROR 			= 3
 
 ,	TB_ASTREAM_SOCK_STATE_DNS_FAILED 		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 1)
 ,	TB_ASTREAM_SOCK_STATE_CONNECT_FAILED	= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 2)
 ,	TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT	= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 3)
+,	TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 4)
+,	TB_ASTREAM_SOCK_STATE_SEND_TIMEOUT		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 5)
 
 }tb_astream_state_e;
 
@@ -492,17 +495,17 @@ tb_hize_t 			tb_astream_size(tb_astream_t const* ast);
  *
  * @param ast 		the stream
  *
- * @return 			the stream left size
+ * @return 			the stream left size, failed: -1
  */
-tb_hize_t 			tb_astream_left(tb_astream_t const* ast);
+tb_hong_t 			tb_astream_left(tb_astream_t const* ast);
 
 /*! the stream offset
  *
  * @param ast 		the stream
  *
- * @return 			the stream offset
+ * @return 			the stream offset, failed: -1
  */
-tb_hize_t 			tb_astream_offset(tb_astream_t const* ast);
+tb_hong_t 			tb_astream_offset(tb_astream_t const* ast);
 
 /*! the stream timeout
  *
