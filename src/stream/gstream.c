@@ -500,7 +500,7 @@ tb_char_t const* tb_gstream_state_cstr(tb_gstream_t* gst)
 	case TB_GSTREAM_HTTP_STATE_RESPONSE_NUL: 	return "http: response: no";
 	case TB_GSTREAM_HTTP_STATE_REQUEST_FAILED: 	return "http: request: failed";
 	case TB_GSTREAM_HTTP_STATE_UNKNOWN_ERROR: 	return "http: unknown error";
-	default: 									return "http: unknown";
+	default: 									return "unknown";
 	}
 
 	return tb_null;

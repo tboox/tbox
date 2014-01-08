@@ -484,11 +484,11 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	// check
 	tb_assert_and_check_return_val(host && port, tb_null);
 
-	// init sock stream
+	// init stream
 	tb_gstream_t* gst = tb_gstream_init_sock();
 	tb_assert_and_check_return_val(gst, tb_null);
 
-	// ioctl
+	// ctrl
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
 	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_SSL, bssl)) goto fail;

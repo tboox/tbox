@@ -329,7 +329,8 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* ast, tb_astream_sync_func_t func, t
 tb_bool_t tb_astream_try_open(tb_astream_t* ast)
 {
 	// check
-	tb_assert_and_check_return_val(ast && ast->open, tb_false);
+	tb_assert_and_check_return_val(ast, tb_false);
+	tb_check_return_val(ast->try_open, tb_false);
 	
 	// check state
 	tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened) && tb_atomic_get(&ast->stoped), tb_false);
@@ -349,7 +350,8 @@ tb_bool_t tb_astream_try_open(tb_astream_t* ast)
 tb_bool_t tb_astream_try_seek(tb_astream_t* ast, tb_hize_t offset)
 {
 	// check
-	tb_assert_and_check_return_val(ast && ast->seek, tb_false);
+	tb_assert_and_check_return_val(ast, tb_false);
+	tb_check_return_val(ast->try_seek, tb_false);
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&ast->stoped), tb_false);
@@ -383,28 +385,29 @@ tb_hize_t tb_astream_size(tb_astream_t const* ast)
 	tb_hize_t size = 0;
 	return tb_astream_ctrl((tb_astream_t*)ast, TB_ASTREAM_CTRL_GET_SIZE, &size)? size : 0;
 }
-tb_hize_t tb_astream_left(tb_astream_t const* ast)
+tb_hong_t tb_astream_left(tb_astream_t const* ast)
 {
 	// check
-	tb_assert_and_check_return_val(ast, 0);
+	tb_assert_and_check_return_val(ast, -1);
+	
+	// the offset
+	tb_hong_t offset = tb_astream_offset(ast);
+	tb_check_return_val(offset >= 0, -1);
 
 	// the size
 	tb_hize_t size = tb_astream_size(ast);
-	
-	// the offset
-	tb_hize_t offset = tb_astream_offset(ast);
 
 	// the left
 	return ((size && size >= offset)? (size - offset) : -1);
 }
-tb_hize_t tb_astream_offset(tb_astream_t const* ast)
+tb_hong_t tb_astream_offset(tb_astream_t const* ast)
 {
 	// check
-	tb_assert_and_check_return_val(ast, 0);
+	tb_assert_and_check_return_val(ast, -1);
 
 	// get the offset
 	tb_hize_t offset = 0;
-	return tb_astream_ctrl((tb_astream_t*)ast, TB_ASTREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
+	return tb_astream_ctrl((tb_astream_t*)ast, TB_ASTREAM_CTRL_GET_OFFSET, &offset)? offset : -1;
 }
 tb_size_t tb_astream_timeout(tb_astream_t const* ast)
 {
@@ -422,11 +425,14 @@ tb_char_t const* tb_astream_state_cstr(tb_size_t state)
 	{
 	case TB_ASTREAM_STATE_OK: 					return "ok";
 	case TB_ASTREAM_STATE_CLOSED: 				return "closed";
+	case TB_ASTREAM_STATE_NOT_SUPPORTED: 		return "not supported";
 	case TB_ASTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
 	case TB_ASTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";
 	case TB_ASTREAM_SOCK_STATE_CONNECT_FAILED: 	return "sock: connect: failed";
 	case TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT: return "sock: connect: timeout";
-	default: 									return "http: unknown";
+	case TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT: 	return "sock: recv: timeout";
+	case TB_ASTREAM_SOCK_STATE_SEND_TIMEOUT: 	return "sock: send: timeout";
+	default: 									return "unknown";
 	}
 
 	return tb_null;

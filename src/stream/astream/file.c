@@ -92,22 +92,17 @@ static tb_bool_t tb_astream_file_try_open(tb_astream_t* ast)
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// referenced? ok?
-		if (fst->file && fst->bref)
+		// init file
+		if (!fst->file)
 		{
-			ok = tb_true;
-			break;
+			// the url
+			tb_char_t const* url = tb_url_get(&ast->url);
+			tb_assert_and_check_break(url);
+
+			// open file
+			fst->file = tb_file_init(url, fst->mode);
+			fst->bref = tb_false;
 		}
-
-		// check
-		tb_assert_and_check_break(!fst->file && !fst->bref);
-	
-		// the url
-		tb_char_t const* url = tb_url_get(&ast->url);
-		tb_assert_and_check_break(url);
-
-		// open file
-		fst->file = tb_file_init(url, fst->mode);
 		tb_check_break(fst->file);
 
 		// addo file
@@ -152,24 +147,24 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	tb_astream_file_t* fst = (tb_astream_file_t*)aice->data;
 	tb_assert_and_check_return_val(fst && fst->func.read, tb_false);
 
-	// done
+	// done state
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
-	do
+	switch (aice->state)
 	{
-		// read ok?
-		tb_check_break(aice->state == TB_AICE_STATE_OK);
-		tb_assert_and_check_break(aice->u.read.real && aice->u.read.real <= sizeof(fst->data));
-
-		// update offset
-		tb_atomic64_fetch_and_add(&fst->offset, aice->u.read.real);
-
 		// ok
+	case TB_AICE_STATE_OK:
+		tb_assert_and_check_break(aice->u.read.real && aice->u.read.real <= sizeof(fst->data));
+		tb_atomic64_fetch_and_add(&fst->offset, aice->u.read.real);
 		state = TB_ASTREAM_STATE_OK;
-
-	} while (0);
-
-	// closed?
-	if (aice->state == TB_AICE_STATE_CLOSED) state = TB_ASTREAM_STATE_CLOSED;
+		break;
+		// closed
+	case TB_AICE_STATE_CLOSED:
+		state = TB_ASTREAM_STATE_CLOSED;
+		break;
+	default:
+		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
+		break;
+	}
 
 	// done func
 	if (fst->func.read((tb_astream_t*)fst, state, aice->u.read.data, aice->u.read.real, fst->priv))
@@ -207,24 +202,24 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	tb_astream_file_t* fst = (tb_astream_file_t*)aice->data;
 	tb_assert_and_check_return_val(fst && fst->func.writ, tb_false);
 
-	// done
+	// done state
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
-	do
+	switch (aice->state)
 	{
-		// read ok?
-		tb_check_break(aice->state == TB_AICE_STATE_OK);
-		tb_assert_and_check_break(aice->u.writ.data && aice->u.writ.real && aice->u.writ.real <= aice->u.writ.size);
-
-		// update offset
-		tb_atomic64_fetch_and_add(&fst->offset, aice->u.writ.real);
-
 		// ok
+	case TB_AICE_STATE_OK:
+		tb_assert_and_check_break(aice->u.writ.data && aice->u.writ.real && aice->u.writ.real <= aice->u.writ.size);
+		tb_atomic64_fetch_and_add(&fst->offset, aice->u.writ.real);
 		state = TB_ASTREAM_STATE_OK;
-
-	} while (0);
-
-	// closed?
-	if (aice->state == TB_AICE_STATE_CLOSED) state = TB_ASTREAM_STATE_CLOSED;
+		break;
+		// closed
+	case TB_AICE_STATE_CLOSED:
+		state = TB_ASTREAM_STATE_CLOSED;
+		break;
+	default:
+		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
+		break;
+	}
 
 	// done func
 	if (fst->func.writ((tb_astream_t*)fst, state, aice->u.writ.real, aice->u.writ.size, fst->priv))
