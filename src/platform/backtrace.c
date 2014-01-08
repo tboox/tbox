@@ -26,24 +26,22 @@
  * includes
  */
 #include "backtrace.h"
-#if defined(TB_CONFIG_LIBC_HAVE_BACKTRACE)
-# 	include "libc/backtrace.c"
-#elif defined(TB_CONFIG_OS_WINDOWS)
+#ifdef TB_CONFIG_OS_WINDOWS
 # 	include "windows/backtrace.c"
 #else
-# 	include "arch/backtrace.c"
+# 	include "libc/backtrace.c"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_cpointer_t* frames, tb_size_t nframe)
+tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_size_t nframe)
 {
 	// check
 	tb_check_return(nframe < 256);
 
 	// the frames
-	tb_cpointer_t frames_data[256] = {0};
+	tb_pointer_t frames_data[256] = {0};
 	if (!frames)
 	{
 		nframe = tb_backtrace_frames(frames_data, nframe, 2);

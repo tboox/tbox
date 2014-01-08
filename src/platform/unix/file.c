@@ -34,9 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/uio.h>
-#ifndef TB_CONFIG_OS_ANDROID
-# 	include <unistd.h>
-#endif
+#include <unistd.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation

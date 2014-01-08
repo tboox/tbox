@@ -209,11 +209,11 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 
 		// decode resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);
-		answer.res.class 	= tb_bstream_get_u16_be(&bst);
+		answer.res.class_ 	= tb_bstream_get_u16_be(&bst);
 		answer.res.ttl 		= tb_bstream_get_u32_be(&bst);
 		answer.res.size 	= tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 
@@ -270,11 +270,11 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
-		answer.res.class = 	tb_bstream_get_u16_be(&bst);
+		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 
@@ -308,11 +308,11 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
-		answer.res.class = 	tb_bstream_get_u16_be(&bst);
+		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
 		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class);
+		tb_trace_impl("response: class: %d", 	answer.res.class_);
 		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
 		tb_trace_impl("response: size: %d", 	answer.res.size);
 

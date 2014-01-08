@@ -17,25 +17,16 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		atomic.h
+ * @file		prefix.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_ATOMIC_H
-#define TB_PLATFORM_ARCH_ATOMIC_H
-
+#ifndef TB_PLATFROM_ARCH_x64_PREFIX_H
+#define TB_PLATFORM_ARCH_x64_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#if defined(TB_ARCH_x86)
-# 	include "x86/atomic.h"
-#elif defined(TB_ARCH_x64)
-# 	include "x64/atomic.h"
-#elif defined(TB_ARCH_ARM)
-# 	include "arm/atomic.h"
-#elif defined(TB_ARCH_SH4)
-# 	include "sh4/atomic.h"
-#endif
+#include "../prefix.h"
+
 
 #endif

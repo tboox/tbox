@@ -17,25 +17,42 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		atomic.h
+ * @file		frame.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_ATOMIC_H
-#define TB_PLATFORM_ARCH_ATOMIC_H
-
+#ifndef TB_PLATFORM_ARCH_x86_FRAME_H
+#define TB_PLATFORM_ARCH_x86_FRAME_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#if defined(TB_ARCH_x86)
-# 	include "x86/atomic.h"
-#elif defined(TB_ARCH_x64)
-# 	include "x64/atomic.h"
-#elif defined(TB_ARCH_ARM)
-# 	include "arm/atomic.h"
-#elif defined(TB_ARCH_SH4)
-# 	include "sh4/atomic.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the current stack frame address
+#if !defined(TB_CURRENT_STACK_FRAME) \
+	&& defined(TB_COMPILER_IS_GCC) \
+	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
+	&&	TB_COMPILER_VERSION_BE(4, 1)
+# 	define TB_CURRENT_STACK_FRAME 		__builtin_frame_address(0)
 #endif
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the frame layout type
+typedef struct __tb_frame_layout_t
+{
+	// the next
+	struct __tb_frame_layout_t* 	next;
+
+	// the frame return address
+	tb_pointer_t 					return_address;
+
+}tb_frame_layout_t;
 
 #endif

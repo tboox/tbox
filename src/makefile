@@ -347,6 +347,7 @@ INC_FILES 				= \
 						platform/path.h \
 						platform/time.h \
 						platform/ctime.h \
+						platform/sched.h \
 						platform/utils.h \
 						platform/mutex.h \
 						platform/timer.h \
@@ -371,12 +372,18 @@ INC_FILES 				= \
 						platform/compiler/gcc/barrier.h \
 						platform/compiler/gcc/atomic.h \
 						platform/compiler/gcc/atomic64.h \
+						platform/arch/frame.h \
 						platform/arch/prefix.h \
 						platform/arch/atomic.h \
 						platform/arch/barrier.h \
+						platform/arch/x86/frame.h \
 						platform/arch/x86/prefix.h \
 						platform/arch/x86/atomic.h \
 						platform/arch/x86/barrier.h \
+						platform/arch/x64/frame.h \
+						platform/arch/x64/prefix.h \
+						platform/arch/x64/atomic.h \
+						platform/arch/x64/barrier.h \
 						platform/arch/arm/prefix.h \
 						platform/arch/arm/atomic.h \
 						platform/arch/sh4/prefix.h \
@@ -393,6 +400,7 @@ INC_FILES 				= \
 						network/http.h \
 						network/ipv4.h \
 						network/url.h \
+						network/dns/dns.h \
 						network/dns/cache.h \
 						network/dns/looker.h \
 						network/dns/server.h \

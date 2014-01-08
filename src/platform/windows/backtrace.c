@@ -58,7 +58,7 @@ typedef struct __tb_symbols_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip)
+tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t nskip)
 {
 	// check
 	tb_check_return_val(frames && nframe, 0);
@@ -94,7 +94,7 @@ tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t
 	// note: cannot use assert
 	return (tb_size_t)CaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_null);
 }
-tb_handle_t tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe)
+tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
 	// check
 	tb_check_return_val(frames && nframe, tb_null);
@@ -130,7 +130,7 @@ fail:
 	tb_backtrace_symbols_exit(symbols);
 	return tb_null;
 }
-tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe)
+tb_char_t const* tb_backtrace_symbols_name(tb_handle_t handle, tb_pointer_t* frames, tb_size_t nframe, tb_size_t iframe)
 {
 	// check
 	tb_symbols_t* symbols = (tb_symbols_t*)handle;

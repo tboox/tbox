@@ -17,36 +17,15 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		backtrace.c
- * @ingroup 	platform
+ * @file		atomic.h
  *
  */
+#ifndef TB_PLATFORM_ARCH_x64_ATOMIC_H
+#define TB_PLATFORM_ARCH_x64_ATOMIC_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../x86/atomic.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-tb_size_t tb_backtrace_frames(tb_cpointer_t* frames, tb_size_t nframe, tb_size_t nskip)
-{
-	tb_trace_noimpl();
-	return 0;
-}
-tb_handle_t tb_backtrace_symbols_init(tb_cpointer_t* frames, tb_size_t nframe)
-{
-	tb_trace_noimpl();
-	return tb_null;
-}
-tb_char_t const* tb_backtrace_symbols_name(tb_handle_t symbols, tb_cpointer_t* frames, tb_size_t nframe, tb_size_t iframe)
-{
-	tb_trace_noimpl();
-	return tb_null;
-}
-tb_void_t tb_backtrace_symbols_exit(tb_handle_t symbols)
-{
-	tb_trace_noimpl();
-}
-
+#endif

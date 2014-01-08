@@ -33,9 +33,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <dirent.h>
-#ifndef TB_CONFIG_OS_ANDROID
-# 	include <unistd.h>
-#endif
+#include <unistd.h>
 
 /* ///////////////////////////////////////////////////////////////////////
  * callback
