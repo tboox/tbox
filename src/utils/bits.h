@@ -444,7 +444,7 @@
 # 	define tb_bits_fb0_u64_le(x) 		((x)? tb_bits_cl0_u64_le(~(tb_uint64_t)(x)) : 0)
 #endif
 
-// fb1, find the first bit 0
+// fb1, find the first bit 1
 #ifndef tb_bits_fb1_u32_be 
 # 	define tb_bits_fb1_u32_be(x) 		((x)? tb_bits_cl0_u32_be(x) : 32)
 #endif

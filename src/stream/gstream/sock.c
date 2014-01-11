@@ -91,7 +91,7 @@ static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gst)
 static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
-	tb_assert_and_check_return_val(sst, -1);
+	tb_assert_and_check_return_val(sst && sst->type, -1);
 
 	// clear
 	sst->wait = 0;
@@ -164,10 +164,14 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 	}
 
 	// open
-	if (!sst->sock) sst->sock = tb_socket_open(sst->type);
+	if (!sst->sock) 
+	{
+		sst->sock = tb_socket_open(sst->type);
+		sst->bref = 0;
+	}
 	tb_assert_and_check_return_val(sst->sock, -1);
 
-	// tcp
+	// done
 	tb_long_t r = -1;
 	switch (sst->type)
 	{
@@ -424,18 +428,48 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 	{
 	case TB_GSTREAM_CTRL_SOCK_SET_TYPE:
 		{
+			// check
 			tb_assert_and_check_return_val(!gst->bopened, tb_false);
+
+			// the type
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, tb_false);
+			
+			// changed? exit the old sock
+			if (sst->type != type)
+			{
+				// exit it
+				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+				sst->sock = tb_null;
+				sst->bref = 0;
+			}
+
+			// set type
 			sst->type = type;
+
+			// ok
 			return tb_true;
 		}
 	case TB_GSTREAM_CTRL_SOCK_SET_HANDLE:
 		{
+			// check
 			tb_assert_and_check_return_val(!gst->bopened, tb_false);
-			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
-			sst->sock = handle;
-			sst->bref = handle? 1 : 0;
+			
+			// the sock
+			tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+
+			// changed? exit the old sock
+			if (sst->sock != sock)
+			{
+				// exit it
+				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+			}
+
+			// set sock
+			sst->sock = sock;
+			sst->bref = sock? 1 : 0;
+
+			// ok
 			return tb_true;
 		}
 	case TB_GSTREAM_CTRL_SOCK_GET_HANDLE:

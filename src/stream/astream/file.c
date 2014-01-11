@@ -33,6 +33,13 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the file read maxn
+#define TB_ASTREAM_FILE_READ_MAXN 			TB_FILE_DIRECT_CSIZE
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -58,7 +65,7 @@ typedef struct __tb_astream_file_t
 	tb_atomic64_t 				offset;
 
 	// the file data
-	tb_byte_t 					data[TB_FILE_DIRECT_CSIZE];
+	tb_byte_t 					data[TB_ASTREAM_FILE_READ_MAXN];
 
 	// the func
 	union

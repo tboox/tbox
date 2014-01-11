@@ -33,6 +33,17 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the sock read maxn
+#ifdef __tb_small__
+# 	define 	TB_ASTREAM_SOCK_READ_MAXN 	(8192)
+#else
+# 	define 	TB_ASTREAM_SOCK_READ_MAXN 	(8192 << 1)
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -48,6 +59,9 @@ typedef struct __tb_astream_sock_t
 	// the aico
 	tb_handle_t 				aico;
 
+	// the addr
+	tb_handle_t 				addr;
+
 	// the sock type
 	tb_size_t 					type : 23;
 
@@ -55,11 +69,12 @@ typedef struct __tb_astream_sock_t
 	tb_size_t 					bref : 1;
 
 	// the sock data
-	tb_byte_t 					data[8192];
+	tb_byte_t 					data[TB_ASTREAM_SOCK_READ_MAXN];
 
 	// the func
 	union
 	{
+		tb_astream_open_func_t 	open;
 		tb_astream_read_func_t 	read;
 		tb_astream_writ_func_t 	writ;
 
@@ -78,15 +93,118 @@ static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_astream_t* ast)
 	tb_assert_and_check_return_val(ast && ast->type == TB_ASTREAM_TYPE_SOCK, tb_null);
 	return (tb_astream_sock_t*)ast;
 }
+static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
+
+	// the stream
+	tb_astream_sock_t* sst = tb_astream_sock_cast(aice->data);
+	tb_assert_and_check_return_val(sst && sst->func.open, tb_false);
+
+	// done
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	switch (aice->state)
+	{
+		// ok
+	case TB_AICE_STATE_OK:
+		{
+			// opened
+			tb_atomic_set(&sst->base.opened, 1);
+
+			// ok
+			state = TB_ASTREAM_STATE_OK;
+		}
+		break;
+		// timeout
+	case TB_AICE_STATE_TIMEOUT:
+		state = TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT;
+		break;
+		// failed
+	default:
+		state = TB_ASTREAM_SOCK_STATE_CONNECT_FAILED;
+		break;
+	}
+
+	// done func
+	sst->func.open((tb_astream_t*)sst, state, sst->priv);
+
+	// ok
+	return tb_true;
+}
+static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
+{
+	// check
+	tb_astream_sock_t* sst = tb_astream_sock_cast(data);
+	tb_assert_and_check_return(haddr && sst && sst->func.open);
+
+	// done
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	do
+	{
+		// addr ok?
+		if (addr)
+		{
+			// trace
+			tb_trace_impl("addr[%s]: %u.%u.%u.%u", tb_aicp_addr_host(haddr), tb_ipv4_u8x4(*addr));
+
+			// init sock
+			if (!sst->sock) 
+			{
+				sst->sock = tb_socket_open(sst->type);
+				sst->bref = 0;
+			}
+			tb_assert_and_check_break(sst->sock);
+
+			// init aico
+			if (!sst->aico) sst->aico = tb_aico_init_sock(sst->base.aicp, sst->sock);
+			tb_assert_and_check_break(sst->aico);
+
+			// port
+			tb_size_t port = tb_url_port_get(&sst->base.url);
+			tb_assert_and_check_break(port);
+			
+			// done conn
+			if (!tb_aico_conn(sst->aico, addr, port, tb_astream_sock_conn_func, sst)) break;
+
+			// ok
+			state = TB_ASTREAM_STATE_OK;
+		}
+		// timeout or failed?
+		else
+		{
+			// trace
+			tb_trace_impl("addr[%s]: failed", tb_aicp_addr_host(haddr));
+
+			// dns failed
+			state = TB_ASTREAM_SOCK_STATE_DNS_FAILED;
+		}
+
+	} while (0);
+
+	// done func if failed
+	if (state != TB_ASTREAM_STATE_OK) sst->func.open((tb_astream_t*)sst, state, sst->priv);
+}
 static tb_bool_t tb_astream_sock_open(tb_astream_t* ast, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sst = tb_astream_sock_cast(ast);
-	tb_assert_and_check_return_val(sst && func, tb_false);
+	tb_assert_and_check_return_val(sst && sst->type && func, tb_false);
 
+	// get the host from url
+	tb_char_t const* host = tb_url_host_get(&ast->url);
+	tb_assert_and_check_return_val(host, tb_false);
 
-	// ok
-	return tb_true;
+	// init addr
+	if (!sst->addr) sst->addr = tb_aicp_addr_init(ast->aicp, tb_astream_sock_addr_func, ast);
+	tb_assert_and_check_return_val(sst->addr, tb_false);
+
+	// save func and priv
+	sst->priv 		= priv;
+	sst->func.open 	= func;
+
+	// done addr
+	return tb_aicp_addr_done(sst->addr, host);
 }
 static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 {
@@ -255,6 +373,10 @@ static tb_void_t tb_astream_sock_exit(tb_astream_t* ast)
 	if (sst->aico) tb_aico_exit(sst->aico);
 	sst->aico = tb_null;
 
+	// exit addr
+	if (sst->addr) tb_aicp_addr_exit(sst->addr);
+	sst->addr = tb_null;
+
 	// exit it
 	if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
 	sst->sock = tb_null;
@@ -274,10 +396,27 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_l
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
-			// set type
+			// the type
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(type == TB_SOCKET_TYPE_TCP || type == TB_SOCKET_TYPE_UDP, tb_false);
+
+			// changed? exit the old sock
+			if (sst->type != type)
+			{
+				// exit aico
+				if (sst->aico) tb_aico_exit(sst->aico);
+				sst->aico = tb_null;
+
+				// exit it
+				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+				sst->sock = tb_null;
+				sst->bref = 0;
+			}
+
+			// set type
 			sst->type = type;
+
+			// ok
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_SOCK_SET_HANDLE:
@@ -285,10 +424,25 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_l
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&ast->opened), tb_false);
 
-			// set handle
-			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
-			sst->sock = handle;
-			sst->bref = handle? 1 : 0;
+			// the sock
+			tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+
+			// changed? exit the old sock
+			if (sst->sock != sock)
+			{
+				// exit aico
+				if (sst->aico) tb_aico_exit(sst->aico);
+				sst->aico = tb_null;
+
+				// exit it
+				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+			}
+
+			// set sock
+			sst->sock = sock;
+			sst->bref = sock? 1 : 0;
+
+			// ok
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_SOCK_GET_HANDLE:
@@ -328,6 +482,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	ast->base.kill 		= tb_astream_sock_kill;
 	ast->base.exit 		= tb_astream_sock_exit;
 	ast->base.ctrl 		= tb_astream_sock_ctrl;
+	ast->type 			= TB_SOCKET_TYPE_TCP;
 
 	// ok
 	return (tb_astream_t*)ast;
