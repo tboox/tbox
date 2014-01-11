@@ -17,19 +17,21 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		transfer.h
+ * @file		tstream.c
  * @ingroup 	stream
  *
  */
-#ifndef TB_STREAM_TRANSFER_H
-#define TB_STREAM_TRANSFER_H
+
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+//#define TB_TRACE_IMPL_TAG 				"tstream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "gstream.h"
-#include "astream.h"
+#include "tstream.h"
+#include "../network/network.h"
+#include "../platform/platform.h"
 
 
-#endif

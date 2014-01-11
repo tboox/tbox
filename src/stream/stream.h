@@ -31,7 +31,7 @@
 #include "bstream.h"
 #include "gstream.h"
 #include "astream.h"
-#include "transfer.h"
+#include "tstream.h"
 
 /*!architecture
  *
@@ -68,7 +68,7 @@
  *                               - zip    
  *
  *                -- gstream
- *    transfer - |
+ *    tstream - |
  *                -- astream
  *
  *                         
