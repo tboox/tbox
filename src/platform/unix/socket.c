@@ -86,6 +86,13 @@ tb_handle_t tb_socket_open(tb_size_t type)
 
 	// non-block
 	fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
+ 
+#if 0
+	int n = 0;
+	int a = sizeof(n);
+	getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char *)&n, &a);
+	tb_print("n: %d", n);
+#endif
 
 	// ok
 	return tb_fd2handle(fd);
@@ -123,6 +130,26 @@ tb_bool_t tb_socket_pair(tb_size_t type, tb_handle_t pair[2])
 
 	// ok
 	return tb_true;
+}
+tb_size_t tb_socket_recv_buffer_size(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, 0);
+
+	// get the recv buffer size
+	tb_int_t real = 0;
+	tb_int_t size = sizeof(real);
+	return !getsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_RCVBUF, (tb_char_t*)&real, &size)? real : 0;
+}
+tb_size_t tb_socket_send_buffer_size(tb_handle_t handle)
+{
+	// check
+	tb_assert_and_check_return_val(handle, 0);
+
+	// get the send buffer size
+	tb_int_t real = 0;
+	tb_int_t size = sizeof(real);
+	return !getsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&real, &size)? real : 0;
 }
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {

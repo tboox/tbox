@@ -41,6 +41,7 @@ demo_C_FILES 			+= \
 						object/xml \
 						object/bin \
 						object/dump \
+						stream/tstream \
 						stream/astream \
 						stream/gstream \
 						stream/gstream/zip \

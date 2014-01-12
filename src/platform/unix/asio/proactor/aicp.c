@@ -120,25 +120,30 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	static tb_size_t s_code[] =
 	{
 		TB_AIOE_CODE_NONE
+
+	, 	TB_AIOE_CODE_NONE 			//< addr
+	, 	TB_AIOE_CODE_ACPT 			//< acpt
+	, 	TB_AIOE_CODE_CONN 			//< conn
+	, 	TB_AIOE_CODE_RECV 			//< recv
+	, 	TB_AIOE_CODE_SEND 			//< send
+	, 	TB_AIOE_CODE_RECV 			//< urecv
+	, 	TB_AIOE_CODE_SEND 			//< usend
+	, 	TB_AIOE_CODE_RECV 			//< recvv
+	, 	TB_AIOE_CODE_SEND 			//< sendv
+	, 	TB_AIOE_CODE_RECV 			//< urecvv
+	, 	TB_AIOE_CODE_SEND 			//< usendv
+	, 	TB_AIOE_CODE_SEND 			//< sendfile
+
 	, 	TB_AIOE_CODE_NONE
-	, 	TB_AIOE_CODE_ACPT
-	, 	TB_AIOE_CODE_CONN
-	, 	TB_AIOE_CODE_RECV
-	, 	TB_AIOE_CODE_SEND
-	, 	TB_AIOE_CODE_RECV
-	, 	TB_AIOE_CODE_SEND
-	, 	TB_AIOE_CODE_RECV
-	, 	TB_AIOE_CODE_SEND
-	, 	TB_AIOE_CODE_SEND
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
-	, 	TB_AIOE_CODE_NONE
+
 	, 	TB_AIOE_CODE_NONE
 	};
 	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_code), TB_AIOE_CODE_NONE);
-	
+
 	// the aioe code
 	return s_code[aice->code];
 }

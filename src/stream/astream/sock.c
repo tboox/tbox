@@ -33,17 +33,6 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the sock read maxn
-#ifdef __tb_small__
-# 	define TB_ASTREAM_SOCK_READ_MAXN 	(8192)
-#else
-# 	define TB_ASTREAM_SOCK_READ_MAXN 	(8192 << 1)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -69,7 +58,10 @@ typedef struct __tb_astream_sock_t
 	tb_size_t 					bref : 1;
 
 	// the sock data
-	tb_byte_t 					data[TB_ASTREAM_SOCK_READ_MAXN];
+	tb_byte_t* 					data;
+
+	// the sock maxn
+	tb_size_t 					maxn;
 
 	// the func
 	union
@@ -156,6 +148,14 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* a
 			}
 			tb_assert_and_check_break(sst->sock);
 
+			// init maxn
+			if (!sst->maxn) sst->maxn = tb_socket_recv_buffer_size(sst->sock);
+			tb_assert_and_check_break(sst->maxn);
+
+			// init data
+			if (!sst->data) sst->data = tb_malloc0(sst->maxn);
+			tb_assert_and_check_break(sst->data);
+
 			// init aico
 			if (!sst->aico) sst->aico = tb_aico_init_sock(sst->base.aicp, sst->sock);
 			tb_assert_and_check_break(sst->aico);
@@ -213,7 +213,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 
 	// the stream
 	tb_astream_sock_t* sst = (tb_astream_sock_t*)aice->data;
-	tb_assert_and_check_return_val(sst && sst->func.read, tb_false);
+	tb_assert_and_check_return_val(sst && sst->maxn && sst->func.read, tb_false);
 
 	// done state
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
@@ -221,7 +221,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.recv.real && aice->u.recv.real <= sizeof(sst->data));
+		tb_assert_and_check_break(aice->u.recv.real && aice->u.recv.real <= sst->maxn);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -244,7 +244,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_recv(aice->aico, sst->data, sizeof(sst->data), tb_astream_sock_read_func, (tb_astream_t*)sst);
+			tb_aico_recv(aice->aico, sst->data, sst->maxn, tb_astream_sock_read_func, (tb_astream_t*)sst);
 		}
 	}
 
@@ -255,14 +255,14 @@ static tb_bool_t tb_astream_sock_read(tb_astream_t* ast, tb_astream_read_func_t 
 {
 	// check
 	tb_astream_sock_t* sst = tb_astream_sock_cast(ast);
-	tb_assert_and_check_return_val(sst && sst->sock && sst->aico && func, tb_false);
+	tb_assert_and_check_return_val(sst && sst->sock && sst->maxn && sst->aico && func, tb_false);
 
 	// save func and priv
 	sst->priv 		= priv;
 	sst->func.read 	= func;
 
 	// post read
-	return tb_aico_recv(sst->aico, sst->data, sizeof(sst->data), tb_astream_sock_read_func, ast);
+	return tb_aico_recv(sst->aico, sst->data, sst->maxn, tb_astream_sock_read_func, ast);
 }
 static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 {
@@ -381,6 +381,10 @@ static tb_void_t tb_astream_sock_exit(tb_astream_t* ast)
 	if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
 	sst->sock = tb_null;
 	sst->bref = 0;
+
+	// exit data
+	if (sst->data) tb_free(sst->data);
+	sst->data = tb_null;
 }
 static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* ast, tb_size_t ctrl, tb_va_list_t args)
 {

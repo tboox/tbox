@@ -30,6 +30,13 @@
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the file cache maxn
+#define TB_GSTREAM_FILE_CACHE_MAXN 			TB_FILE_DIRECT_CSIZE
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
@@ -216,7 +223,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gst->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// resize file cache
-	if (!tb_gstream_ctrl((tb_gstream_t*)gst, TB_GSTREAM_CTRL_SET_CACHE, TB_FILE_DIRECT_CSIZE)) goto fail;
+	if (!tb_gstream_ctrl((tb_gstream_t*)gst, TB_GSTREAM_CTRL_SET_CACHE, TB_GSTREAM_FILE_CACHE_MAXN)) goto fail;
 
 	// ok
 	return (tb_gstream_t*)gst;

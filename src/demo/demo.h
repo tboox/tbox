@@ -88,6 +88,7 @@ TB_DEMO_MAIN_DECL(object_xml);
 TB_DEMO_MAIN_DECL(object_dump);
 
 // stream
+TB_DEMO_MAIN_DECL(stream_tstream);
 TB_DEMO_MAIN_DECL(stream_astream);
 TB_DEMO_MAIN_DECL(stream_gstream);
 TB_DEMO_MAIN_DECL(stream_gstream_zip);
