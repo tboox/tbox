@@ -34,4 +34,77 @@
 #include "../network/network.h"
 #include "../platform/platform.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_hong_t tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	return 0;
+}
+tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	return 0;
+}
+tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(iurl && ourl, -1);
 
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	istream = tb_null;
+	tb_gstream_t* 	ostream = tb_null;
+	do
+	{
+		// init istream
+		istream = tb_gstream_init_from_url(iurl);
+		tb_assert_and_check_break(istream);
+
+		// init ostream
+		ostream = tb_gstream_init_from_url(ourl);
+		tb_assert_and_check_break(ostream);
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, rate, func, priv);
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_gstream_exit(istream);
+	istream = tb_null;
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	return tb_null;
+}
+tb_bool_t tb_tstream_start(tb_handle_t tstream)
+{
+	return tb_false;
+}
+tb_void_t tb_tstream_pause(tb_handle_t tstream)
+{
+}
+tb_void_t tb_tstream_limit(tb_handle_t tstream, tb_size_t rate)
+{
+}
+tb_void_t tb_tstream_stop(tb_handle_t tstream)
+{
+}
+tb_void_t tb_tstream_exit(tb_handle_t tstream)
+{
+}

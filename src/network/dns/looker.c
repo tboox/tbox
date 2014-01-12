@@ -630,7 +630,7 @@ tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr)
 	// check
 	tb_assert_and_check_return_val(name && addr, tb_false);
 
-	// try to looker it from cache first
+	// try to lookup it from cache first
 	if (tb_dns_cache_get(name, addr)) return tb_true;
 
 	// init looker

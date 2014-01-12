@@ -42,19 +42,19 @@ static tb_long_t tb_gstream_filter_afill(tb_gstream_filter_t* filter, tb_byte_t*
 	if (!sync) 
 	{
 		// read data
-		fill = tb_gstream_aread(filter->gst, data, size);
+		fill = tb_gstream_aread(filter->gstream, data, size);
 		tb_trace_impl("read: %ld <? %lu", fill, size);
 		tb_check_goto(fill < 0, end);
 
 		// end? sync data
-		fill = tb_gstream_afread(filter->gst, data, size);
+		fill = tb_gstream_afread(filter->gstream, data, size);
 		tb_trace_impl("sync: %ld <? %lu", fill, size);
 	}
 	// sync data
 	else 
 	{
 		// sync data
-		fill = tb_gstream_afread(filter->gst, data, size);
+		fill = tb_gstream_afread(filter->gstream, data, size);
 		tb_trace_impl("sync: %ld <? %lu", fill, size);
 	}
 
@@ -65,14 +65,14 @@ end:
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_gstream_filter_t* tb_gstream_filter_cast(tb_gstream_t* gst)
+tb_gstream_filter_t* tb_gstream_filter_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_FLTR, tb_null);
-	return (tb_gstream_filter_t*)gst;
+	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_FLTR, tb_null);
+	return (tb_gstream_filter_t*)gstream;
 }
-tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args)
+tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t cmd, tb_va_list_t args)
 {
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(filter, tb_false);
 
 	switch (cmd)
@@ -81,13 +81,13 @@ tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 		{
 			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(args, tb_gstream_t**);
 			tb_assert_and_check_return_val(pgst, tb_false);
-			*pgst = filter->gst;
+			*pgst = filter->gstream;
 			return tb_true;
 		}
 	case TB_GSTREAM_CTRL_FLTR_SET_GSTREAM:
 		{
-			filter->gst = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
-			tb_assert_and_check_return_val(filter->gst, tb_false);
+			filter->gstream = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
+			tb_assert_and_check_return_val(filter->gstream, tb_false);
 			return tb_true;
 		}
 	default:
@@ -95,10 +95,10 @@ tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t 
 	}
 	return tb_false;
 }
-tb_long_t tb_gstream_filter_open(tb_gstream_t* gst)
+tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
 {
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
-	tb_assert_and_check_return_val(filter && filter->gst, -1);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
+	tb_assert_and_check_return_val(filter && filter->gstream, -1);
 
 	// init input
 	filter->ip = filter->ib;
@@ -115,10 +115,10 @@ tb_long_t tb_gstream_filter_open(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-tb_long_t tb_gstream_filter_close(tb_gstream_t* gst)
+tb_long_t tb_gstream_filter_close(tb_gstream_t* gstream)
 {
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
-	tb_assert_and_check_return_val(filter && filter->gst, -1);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
+	tb_assert_and_check_return_val(filter && filter->gstream, -1);
 
 	// init input
 	filter->ip = filter->ib;
@@ -135,10 +135,10 @@ tb_long_t tb_gstream_filter_close(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-tb_long_t tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
-	tb_assert_and_check_return_val(filter && filter->gst && filter->spak, -1);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
+	tb_assert_and_check_return_val(filter && filter->gstream && filter->spak, -1);
 
 	// no data?
 	if (!data)
@@ -146,7 +146,7 @@ tb_long_t tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 		// flush data?
 		if (sync)
 		{
-			tb_long_t r = tb_gstream_afread(filter->gst, tb_null, 0);
+			tb_long_t r = tb_gstream_afread(filter->gstream, tb_null, 0);
 			tb_check_return_val(r < 0, r);
 		}
 
@@ -214,8 +214,8 @@ tb_long_t tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 		else if (!filter->read) 
 		{
 			// has size?
-			tb_hize_t n = tb_gstream_size(filter->gst);
-			tb_hize_t o = tb_gstream_offset(filter->gst);
+			tb_hize_t n = tb_gstream_size(filter->gstream);
+			tb_hize_t o = tb_gstream_offset(filter->gstream);
 
 			// is end?
 			if (n && o >= n) 
@@ -234,7 +234,7 @@ tb_long_t tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t s
 	{
 		// spak it
 		tb_assert_and_check_return_val(!filter->on && filter->op == filter->ob, -1);
-		if (filter->spak(gst, (tb_long_t)((filter->read < 0)? -1 : (sync? 1 : 0))) < 0) return -1;
+		if (filter->spak(gstream, (tb_long_t)((filter->read < 0)? -1 : (sync? 1 : 0))) < 0) return -1;
 		tb_trace_impl("spak: %lu, left: %lu", filter->on, filter->in);
 	}
 
@@ -270,10 +270,10 @@ end:
 	tb_trace_impl("read: %u, left: %lu", read, filter->in);
 	return read;
 }
-tb_long_t tb_gstream_filter_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
+tb_long_t tb_gstream_filter_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
 	// check
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(filter, -1);
 
 	// has read
@@ -282,7 +282,7 @@ tb_long_t tb_gstream_filter_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t ti
 	else if (!filter->read) 
 	{
 		tb_trace_impl("wait: %u, timeout: %d", wait, timeout);
-		return tb_gstream_wait(filter->gst, wait, timeout);
+		return tb_gstream_wait(filter->gstream, wait, timeout);
 	}
 	// has left input? abort it if read empty next
 	else if (filter->in) return wait;

@@ -89,14 +89,14 @@ typedef struct __tb_gstream_sock_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gst && gst->type == TB_GSTREAM_TYPE_SOCK, tb_null);
-	return (tb_gstream_sock_t*)gst;
+	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_SOCK, tb_null);
+	return (tb_gstream_sock_t*)gstream;
 }
-static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
+static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst && sst->type, -1);
 
 	// clear
@@ -109,14 +109,14 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 	tb_check_return_val(!(sst->sock && sst->bref), 1);
 
 	// port
-	tb_size_t port = tb_url_port_get(&gst->url);
+	tb_size_t port = tb_url_port_get(&gstream->url);
 	tb_assert_and_check_return_val(port, -1);
 
 	// ipv4
 	if (!sst->addr.u32)
 	{
 		// try to get the ipv4 address from url
-		tb_ipv4_t const* ipv4 = tb_url_ipv4_get(&gst->url);
+		tb_ipv4_t const* ipv4 = tb_url_ipv4_get(&gstream->url);
 		if (ipv4 && ipv4->u32) sst->addr = *ipv4;
 		else
 		{
@@ -133,7 +133,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 			else
 			{
 				// get the host from url
-				tb_char_t const* host = tb_url_host_get(&gst->url);
+				tb_char_t const* host = tb_url_host_get(&gstream->url);
 				tb_assert_and_check_return_val(host, -1);
 
 				// try get ipv4
@@ -160,11 +160,11 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 			}
 
 			// save addr
-			tb_url_ipv4_set(&gst->url, &sst->addr);
+			tb_url_ipv4_set(&gstream->url, &sst->addr);
 		}
 
 		// tcp or udp? for url: sock://ip:port/?udp=
-		tb_char_t const* args = tb_url_args_get(&gst->url);
+		tb_char_t const* args = tb_url_args_get(&gstream->url);
 		if (args && !tb_strnicmp(args, "udp=", 4)) sst->type = TB_SOCKET_TYPE_UDP;
 		else if (args && !tb_strnicmp(args, "tcp=", 4)) sst->type = TB_SOCKET_TYPE_TCP;
 	}
@@ -181,7 +181,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 	tb_size_t cache = tb_socket_recv_buffer_size(sst->sock);
 	if (cache) 
 	{
-		if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_CACHE, cache)) goto fail;
+		if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_CACHE, cache)) goto fail;
 	}
 
 	// done
@@ -191,7 +191,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// trace
-			tb_trace_impl("connect: try: %s[%u.%u.%u.%u]:%u", tb_url_host_get(&gst->url), sst->addr.u8[0], sst->addr.u8[1], sst->addr.u8[2], sst->addr.u8[3], port);
+			tb_trace_impl("connect: try: %s[%u.%u.%u.%u]:%u", tb_url_host_get(&gstream->url), sst->addr.u8[0], sst->addr.u8[1], sst->addr.u8[2], sst->addr.u8[3], port);
 
 			// connect it
 			r = tb_socket_connect(sst->sock, &sst->addr, port);
@@ -201,16 +201,16 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 			tb_trace_impl("connect: ok");
 
 			// ssl? init it
-			if (tb_url_ssl_get(&gst->url))
+			if (tb_url_ssl_get(&gstream->url))
 			{
 				// init
-				if (gst->sfunc.init) sst->ssl = gst->sfunc.init(gst);
+				if (gstream->sfunc.init) sst->ssl = gstream->sfunc.init(gstream);
 				tb_assert_and_check_goto(sst->ssl, fail);
 
 				// check sfunc
-				tb_assert_and_check_goto(gst->sfunc.read, fail);
-				tb_assert_and_check_goto(gst->sfunc.writ, fail);
-				tb_assert_and_check_goto(gst->sfunc.exit, fail);
+				tb_assert_and_check_goto(gstream->sfunc.read, fail);
+				tb_assert_and_check_goto(gstream->sfunc.writ, fail);
+				tb_assert_and_check_goto(gstream->sfunc.exit, fail);
 			}
 		}
 		break;
@@ -222,7 +222,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 	}
 
 	// save state
-	gst->state = TB_GSTREAM_STATE_OK;
+	gstream->state = TB_GSTREAM_STATE_OK;
 
 	// ok?
 	return r;
@@ -236,7 +236,7 @@ fail:
 		if (sst->looker)
 		{
 			// save state
-			gst->state = TB_GSTREAM_SOCK_STATE_DNS_FAILED;
+			gstream->state = TB_GSTREAM_SOCK_STATE_DNS_FAILED;
 
 			// exit dns
 			tb_dns_looker_exit(sst->looker);
@@ -244,21 +244,21 @@ fail:
 		}
 		// ssl or connect failed?
 		else if (sst->type == TB_SOCKET_TYPE_TCP)
-			gst->state = tb_url_ssl_get(&gst->url)? TB_GSTREAM_SOCK_STATE_SSL_FAILED : TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
+			gstream->state = tb_url_ssl_get(&gstream->url)? TB_GSTREAM_SOCK_STATE_SSL_FAILED : TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
 	}
 
 	return -1;
 }
-static tb_long_t tb_gstream_sock_close(tb_gstream_t* gst)
+static tb_long_t tb_gstream_sock_close(tb_gstream_t* gstream)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst, -1);
 
 	// has socket?
 	if (sst->sock)
 	{
 		// exit ssl
-		if (sst->ssl) gst->sfunc.exit(sst->ssl);
+		if (sst->ssl) gstream->sfunc.exit(sst->ssl);
 		sst->ssl = tb_null;
 
 		// close it
@@ -279,9 +279,9 @@ static tb_long_t tb_gstream_sock_close(tb_gstream_t* gst)
 	// ok
 	return 1;
 }
-static tb_long_t tb_gstream_sock_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
 
 	// check
@@ -298,7 +298,7 @@ static tb_long_t tb_gstream_sock_read(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// read data
-			r = (sst->ssl)? gst->sfunc.read(sst->ssl, data, size) : tb_socket_recv(sst->sock, data, size);
+			r = (sst->ssl)? gstream->sfunc.read(sst->ssl, data, size) : tb_socket_recv(sst->sock, data, size);
 			tb_trace_impl("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
@@ -312,7 +312,7 @@ static tb_long_t tb_gstream_sock_read(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	case TB_SOCKET_TYPE_UDP:
 		{
 			// port
-			tb_size_t port = tb_url_port_get(&gst->url);
+			tb_size_t port = tb_url_port_get(&gstream->url);
 			tb_assert_and_check_return_val(port, -1);
 
 			// ipv4
@@ -340,9 +340,9 @@ static tb_long_t tb_gstream_sock_read(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
 
 	// check
@@ -359,7 +359,7 @@ static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// writ data
-			r = (sst->ssl)? gst->sfunc.writ(sst->ssl, data, size) : tb_socket_send(sst->sock, data, size);
+			r = (sst->ssl)? gstream->sfunc.writ(sst->ssl, data, size) : tb_socket_send(sst->sock, data, size);
 			tb_trace_impl("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
@@ -373,7 +373,7 @@ static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	case TB_SOCKET_TYPE_UDP:
 		{
 			// port
-			tb_size_t port = tb_url_port_get(&gst->url);
+			tb_size_t port = tb_url_port_get(&gstream->url);
 			tb_assert_and_check_return_val(port, -1);
 
 			// ipv4
@@ -406,9 +406,9 @@ static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gst, tb_byte_t* data, tb_siz
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_sock_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_gstream_sock_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst, -1);
 
 	if (!sst->looker)
@@ -416,7 +416,7 @@ static tb_long_t tb_gstream_sock_wait(tb_gstream_t* gst, tb_size_t wait, tb_long
 		// check socket
 		tb_assert_and_check_return_val(sst->sock, -1);
 
-		// wait the gst
+		// wait the gstream
 		sst->wait = tb_aioo_wait(sst->sock, wait, timeout);
 		tb_trace_impl("wait: %ld", sst->wait);
 	}
@@ -432,9 +432,9 @@ static tb_long_t tb_gstream_sock_wait(tb_gstream_t* gst, tb_size_t wait, tb_long
 
 	return sst->wait;
 }
-static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
 {
-	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gst);
+	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst, tb_false);
 
 	switch (ctrl)
@@ -442,7 +442,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 	case TB_GSTREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
-			tb_assert_and_check_return_val(!gst->bopened, tb_false);
+			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
 
 			// the type
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -466,7 +466,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 	case TB_GSTREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!gst->bopened, tb_false);
+			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
 			
 			// the sock
 			tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -504,28 +504,28 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gst, tb_size_t ctrl, tb_va_l
 tb_gstream_t* tb_gstream_init_sock()
 {
 	// make stream
-	tb_gstream_sock_t* gst = (tb_gstream_sock_t*)tb_malloc0(sizeof(tb_gstream_sock_t));
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_sock_t* gstream = (tb_gstream_sock_t*)tb_malloc0(sizeof(tb_gstream_sock_t));
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init stream
-	if (!tb_gstream_init((tb_gstream_t*)gst, TB_GSTREAM_TYPE_SOCK)) goto fail;
-	gst->base.open 	= tb_gstream_sock_open;
-	gst->base.close = tb_gstream_sock_close;
-	gst->base.read 	= tb_gstream_sock_read;
-	gst->base.writ 	= tb_gstream_sock_writ;
-	gst->base.ctrl 	= tb_gstream_sock_ctrl;
-	gst->base.wait 	= tb_gstream_sock_wait;
-	gst->sock 		= tb_null;
-	gst->type 		= TB_SOCKET_TYPE_TCP;
+	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_GSTREAM_TYPE_SOCK)) goto fail;
+	gstream->base.open 	= tb_gstream_sock_open;
+	gstream->base.close = tb_gstream_sock_close;
+	gstream->base.read 	= tb_gstream_sock_read;
+	gstream->base.writ 	= tb_gstream_sock_writ;
+	gstream->base.ctrl 	= tb_gstream_sock_ctrl;
+	gstream->base.wait 	= tb_gstream_sock_wait;
+	gstream->sock 		= tb_null;
+	gstream->type 		= TB_SOCKET_TYPE_TCP;
 
 	// init sock cache
-	if (!tb_gstream_ctrl((tb_gstream_t*)gst, TB_GSTREAM_CTRL_SET_CACHE, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
+	if (!tb_gstream_ctrl((tb_gstream_t*)gstream, TB_GSTREAM_CTRL_SET_CACHE, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
 
 	// ok
-	return (tb_gstream_t*)gst;
+	return (tb_gstream_t*)gstream;
 
 fail:
-	if (gst) tb_gstream_exit((tb_gstream_t*)gst);
+	if (gstream) tb_gstream_exit((tb_gstream_t*)gstream);
 	return tb_null;
 }
 
@@ -535,19 +535,19 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(host && port, tb_null);
 
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_sock();
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* gstream = tb_gstream_init_sock();
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// ctrl
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_SSL, bssl)) goto fail;
-	if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
-	return gst;
+	return gstream;
 
 fail:
-	if (gst) tb_gstream_exit(gst);
+	if (gstream) tb_gstream_exit(gstream);
 	return tb_null;
 }
