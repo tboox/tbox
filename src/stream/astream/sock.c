@@ -38,9 +38,9 @@
 
 // the sock read maxn
 #ifdef __tb_small__
-# 	define 	TB_ASTREAM_SOCK_READ_MAXN 	(8192)
+# 	define TB_ASTREAM_SOCK_READ_MAXN 	(8192)
 #else
-# 	define 	TB_ASTREAM_SOCK_READ_MAXN 	(8192 << 1)
+# 	define TB_ASTREAM_SOCK_READ_MAXN 	(8192 << 1)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
