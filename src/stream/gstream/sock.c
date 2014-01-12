@@ -38,7 +38,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define TB_GSTREAM_SOCK_HOST_MAX 		(1024)
+
+// the sock cache maxn
+#ifdef __tb_small__
+# 	define TB_GSTREAM_SOCK_CACHE_MAXN 	(8192)
+#else
+# 	define TB_GSTREAM_SOCK_CACHE_MAXN 	(8192 << 1)
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -170,6 +176,13 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gst)
 		sst->bref = 0;
 	}
 	tb_assert_and_check_return_val(sst->sock, -1);
+
+	// init cache 
+	tb_size_t cache = tb_socket_recv_buffer_size(sst->sock);
+	if (cache) 
+	{
+		if (!tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SET_CACHE, cache)) goto fail;
+	}
 
 	// done
 	tb_long_t r = -1;
@@ -504,6 +517,9 @@ tb_gstream_t* tb_gstream_init_sock()
 	gst->base.wait 	= tb_gstream_sock_wait;
 	gst->sock 		= tb_null;
 	gst->type 		= TB_SOCKET_TYPE_TCP;
+
+	// init sock cache
+	if (!tb_gstream_ctrl((tb_gstream_t*)gst, TB_GSTREAM_CTRL_SET_CACHE, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
 
 	// ok
 	return (tb_gstream_t*)gst;

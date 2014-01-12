@@ -83,6 +83,22 @@ tb_handle_t 		tb_socket_open(tb_size_t type);
  */
 tb_bool_t 			tb_socket_pair(tb_size_t type, tb_handle_t pair[2]);
 
+/*! the socket recv buffer size
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			the recv size
+ */
+tb_size_t 			tb_socket_recv_buffer_size(tb_handle_t handle);
+
+/*! the socket send buffer size
+ *
+ * @param handle 	the socket handle
+ *
+ * @return 			the recv size
+ */
+tb_size_t 			tb_socket_send_buffer_size(tb_handle_t handle);
+
 /*! connect socket
  *
  * @param handle 	the socket handle
