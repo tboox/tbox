@@ -108,6 +108,9 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 		// check
 		tb_assert(aice->u.send.real);
 
+		// save size
+		context->size += aice->u.send.real;
+
 		// continue?
 		if (aice->u.send.real < aice->u.send.size)
 		{
@@ -144,16 +147,13 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("read[%p]: real: %lu, size: %lu", aice->aico, aice->u.read.real, aice->u.read.size);
+//		tb_print("read[%p]: real: %lu, size: %lu, seek: %llu", aice->aico, aice->u.read.real, aice->u.read.size, aice->u.read.seek);
 			
 		// check
 		tb_assert(aice->u.read.real);
 
 		// post send to client
 		if (!tb_aico_send(context->aico[0], aice->u.read.data, aice->u.read.real, tb_demo_sock_send_func, context)) return tb_false;
-
-		// save size
-		context->size += aice->u.read.real;
 	}
 	// closed or failed?
 	else
