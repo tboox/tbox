@@ -54,7 +54,7 @@ typedef struct __tb_gstream_filter_t
 	tb_long_t 			writ;
 
 	// the reference to gstream
-	tb_gstream_t* 		gst;
+	tb_gstream_t* 		gstream;
 
 	// the input data
 	tb_byte_t 			ib[TB_GSTREAM_FLTR_CACHE_MAXN];
@@ -67,7 +67,7 @@ typedef struct __tb_gstream_filter_t
 	tb_size_t 			on;
 
 	// spak
-	tb_long_t 			(*spak)(tb_gstream_t* gst, tb_long_t sync);
+	tb_long_t 			(*spak)(tb_gstream_t* gstream, tb_long_t sync);
 
 }tb_gstream_filter_t;
 
@@ -76,21 +76,21 @@ typedef struct __tb_gstream_filter_t
  */
 
 // cast
-tb_gstream_filter_t* 	tb_gstream_filter_cast(tb_gstream_t* gst);
+tb_gstream_filter_t* 	tb_gstream_filter_cast(tb_gstream_t* gstream);
 
 // open 
-tb_long_t 				tb_gstream_filter_open(tb_gstream_t* gst);
+tb_long_t 				tb_gstream_filter_open(tb_gstream_t* gstream);
 
 // close
-tb_long_t 				tb_gstream_filter_close(tb_gstream_t* gst);
+tb_long_t 				tb_gstream_filter_close(tb_gstream_t* gstream);
 
 // read
-tb_long_t 				tb_gstream_filter_read(tb_gstream_t* gst, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+tb_long_t 				tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 // wait
-tb_long_t 				tb_gstream_filter_wait(tb_gstream_t* gst, tb_size_t wait, tb_long_t timeout);
+tb_long_t 				tb_gstream_filter_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout);
 
 // ctrl
-tb_bool_t 				tb_gstream_filter_ctrl(tb_gstream_t* gst, tb_size_t cmd, tb_va_list_t args);
+tb_bool_t 				tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t cmd, tb_va_list_t args);
 
 #endif

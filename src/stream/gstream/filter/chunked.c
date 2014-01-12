@@ -56,40 +56,40 @@ typedef struct __tb_gstream_filter_chunked_t
  * implements
  */
 
-static __tb_inline__ tb_gstream_filter_chunked_t* tb_gstream_filter_chunked_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_gstream_filter_chunked_t* tb_gstream_filter_chunked_cast(tb_gstream_t* gstream)
 {
 	// check
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_CHUNKED, tb_null);
 	return (tb_gstream_filter_chunked_t*)filter;
 }
-static tb_long_t tb_gstream_filter_chunked_open(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_open(tb_gstream_t* gstream)
 {
 	// check
-	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
-	tb_assert_and_check_return_val(kst, -1);
+	tb_gstream_filter_chunked_t* kstream = tb_gstream_filter_chunked_cast(gstream);
+	tb_assert_and_check_return_val(kstream, -1);
 
 	// init 
-	kst->size = 0;
-	kst->read = 0;
-	if (!tb_pstring_init(&kst->line)) return -1;
+	kstream->size = 0;
+	kstream->read = 0;
+	if (!tb_pstring_init(&kstream->line)) return -1;
 
 	// open filter
-	return tb_gstream_filter_open(gst);
+	return tb_gstream_filter_open(gstream);
 }
-static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gst)
+static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gstream)
 {
 	// check
-	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
-	tb_assert_and_check_return_val(kst, -1);
+	tb_gstream_filter_chunked_t* kstream = tb_gstream_filter_chunked_cast(gstream);
+	tb_assert_and_check_return_val(kstream, -1);
 
 	// reset 
-	kst->size = 0;
-	kst->read = 0;
-	tb_pstring_exit(&kst->line);
+	kstream->size = 0;
+	kstream->read = 0;
+	tb_pstring_exit(&kstream->line);
 
 	// close filter
-	return tb_gstream_filter_close(gst);
+	return tb_gstream_filter_close(gstream);
 }
 /* chunked_data
  *
@@ -98,12 +98,12 @@ static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gst)
  * ---------------------- ------------------------- ---------
  *        chunk0                  chunk1               end
  */
-static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t sync)
+static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gstream, tb_long_t sync)
 {
 	// check
-	tb_gstream_filter_chunked_t* kst = tb_gstream_filter_chunked_cast(gst);
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
-	tb_assert_and_check_return_val(kst && filter, -1);
+	tb_gstream_filter_chunked_t* kstream = tb_gstream_filter_chunked_cast(gstream);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
+	tb_assert_and_check_return_val(kstream && filter, -1);
 
 	// the input
 	tb_assert_and_check_return_val(filter->ip, -1);
@@ -120,7 +120,7 @@ static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t syn
 	tb_check_return_val(op < oe, 0);
 
 	// parse chunked head and chunked tail
-	if (!kst->size || kst->read >= kst->size)
+	if (!kstream->size || kstream->read >= kstream->size)
 	{
 		// walk
 		while (ip < ie)
@@ -132,27 +132,27 @@ static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t syn
 			tb_assert_and_check_return_val(ch, -1);
 		
 			// append char to line
-			if (ch != '\n') tb_pstring_chrcat(&kst->line, ch);
+			if (ch != '\n') tb_pstring_chrcat(&kstream->line, ch);
 			// is line end?
 			else
 			{
 				// check
-				tb_char_t const* 	pb = tb_pstring_cstr(&kst->line);
-				tb_size_t 			pn = tb_pstring_size(&kst->line);
+				tb_char_t const* 	pb = tb_pstring_cstr(&kstream->line);
+				tb_size_t 			pn = tb_pstring_size(&kstream->line);
 				tb_assert_and_check_return_val(pb, -1);
 
 				// trace
-//				tb_trace_impl("line: %s", tb_pstring_cstr(&kst->line));
+//				tb_trace_impl("line: %s", tb_pstring_cstr(&kstream->line));
 
 				// strip '\r' if exists
-				if (pb[pn - 1] == '\r') tb_pstring_strip(&kst->line, pn - 1);
+				if (pb[pn - 1] == '\r') tb_pstring_strip(&kstream->line, pn - 1);
 
 				// is chunked tail? only "\r\n"
-				if (!tb_pstring_size(&kst->line)) 
+				if (!tb_pstring_size(&kstream->line)) 
 				{
 					// reset size
-					kst->read = 0;
-					kst->size = 0;
+					kstream->read = 0;
+					kstream->size = 0;
 
 					// trace
 					tb_trace_impl("tail");
@@ -164,16 +164,16 @@ static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t syn
 				else
 				{
 					// parse size
-					kst->size = tb_s16tou32(pb);
+					kstream->size = tb_s16tou32(pb);
 
 					// trace
-					tb_trace_impl("size: %lu", kst->size);
+					tb_trace_impl("size: %lu", kstream->size);
 
 					// is file end? "0\r\n\r\n"
-					tb_check_return_val(kst->size , -1);
+					tb_check_return_val(kstream->size , -1);
 
 					// clear data
-					tb_pstring_clear(&kst->line);
+					tb_pstring_clear(&kstream->line);
 
 					// ok
 					break;
@@ -183,10 +183,10 @@ static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t syn
 	}
 
 	// check
-	tb_assert_and_check_return_val(kst->read < kst->size, -1);
+	tb_assert_and_check_return_val(kstream->read < kstream->size, -1);
 
 	// read chunked data
-	tb_size_t size = tb_min3(ie - ip, oe - op, kst->size - kst->read);
+	tb_size_t size = tb_min3(ie - ip, oe - op, kstream->size - kstream->read);
 	if (size) 
 	{
 		// copy data
@@ -195,11 +195,11 @@ static tb_long_t tb_gstream_filter_chunked_spak(tb_gstream_t* gst, tb_long_t syn
 		op += size;
 
 		// update read
-		kst->read += size;
+		kstream->read += size;
 	}
 
 	// trace
-	tb_trace_impl("read: %lu", kst->read);
+	tb_trace_impl("read: %lu", kstream->read);
 
 end:
 
@@ -223,47 +223,47 @@ end:
 tb_gstream_t* tb_gstream_init_filter_chunked()
 {
 	// make stream
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_chunked_t));
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* gstream = (tb_gstream_t*)tb_malloc0(sizeof(tb_gstream_filter_chunked_t));
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init stream
-	if (!tb_gstream_init(gst, TB_GSTREAM_TYPE_FLTR)) goto fail;
+	if (!tb_gstream_init(gstream, TB_GSTREAM_TYPE_FLTR)) goto fail;
 
 	// init func
-	gst->open 	= tb_gstream_filter_chunked_open;
-	gst->read 	= tb_gstream_filter_read;
-	gst->close	= tb_gstream_filter_chunked_close;
-	gst->wait	= tb_gstream_filter_wait;
-	gst->ctrl	= tb_gstream_filter_ctrl;
+	gstream->open 	= tb_gstream_filter_chunked_open;
+	gstream->read 	= tb_gstream_filter_read;
+	gstream->close	= tb_gstream_filter_chunked_close;
+	gstream->wait	= tb_gstream_filter_wait;
+	gstream->ctrl	= tb_gstream_filter_ctrl;
 
 	// init filter
-	((tb_gstream_filter_t*)gst)->type 	= TB_GSTREAM_FLTR_TYPE_CHUNKED;
-	((tb_gstream_filter_t*)gst)->spak = tb_gstream_filter_chunked_spak;
+	((tb_gstream_filter_t*)gstream)->type 	= TB_GSTREAM_FLTR_TYPE_CHUNKED;
+	((tb_gstream_filter_t*)gstream)->spak = tb_gstream_filter_chunked_spak;
 
 	// ok
-	return gst;
+	return gstream;
 
 fail:
-	if (gst) tb_gstream_exit(gst);
+	if (gstream) tb_gstream_exit(gstream);
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_filter_from_chunked(tb_gstream_t* gst)
+tb_gstream_t* tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream)
 {
 	// check
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init the chunked stream
-	tb_gstream_t* kst = tb_gstream_init_filter_chunked();
-	tb_assert_and_check_return_val(kst, tb_null);
+	tb_gstream_t* kstream = tb_gstream_init_filter_chunked();
+	tb_assert_and_check_return_val(kstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(kst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(kstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
 	
 	// ok
-	return kst;
+	return kstream;
 
 fail:
-	if (kst) tb_gstream_exit(kst);
+	if (kstream) tb_gstream_exit(kstream);
 	return tb_null;
 }

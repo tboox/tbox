@@ -212,6 +212,13 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 	// is ipv4?
 	tb_check_return_val(!tb_ipv4_set(addr, name), tb_true);
 
+	// is localhost?
+	if (!tb_stricmp(name, "localhost"))
+	{
+		tb_ipv4_set(addr, "127.0.0.1");
+		return tb_true;
+	}
+
 	// clear addr
 	tb_ipv4_clr(addr);
 

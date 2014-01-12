@@ -96,6 +96,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 				tb_astream_ctrl(ast, TB_ASTREAM_CTRL_GET_URL, &url);
 				tb_printf("open: %s: %s\n", url, tb_astream_state_cstr(state));
 			}
+			break;
 		}
 	
 		// trace

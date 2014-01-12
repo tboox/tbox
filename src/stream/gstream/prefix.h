@@ -42,29 +42,29 @@
 /* ///////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gst, tb_size_t type)
+static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gstream, tb_size_t type)
 {
 	// check
-	tb_assert_and_check_return_val(gst, tb_false);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// init type
-	gst->type = type;
+	gstream->type = type;
 
 	// init timeout
-	gst->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
+	gstream->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
 
 	// init url
-	if (!tb_url_init(&gst->url)) return tb_false;
+	if (!tb_url_init(&gstream->url)) return tb_false;
 
 	// init cache
-	if (!tb_qbuffer_init(&gst->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
-	gst->bcached = 1;
+	if (!tb_qbuffer_init(&gstream->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;
+	gstream->bcached = 1;
 
 	// ok
 	return tb_true;
 
 fail:
-	tb_qbuffer_exit(&gst->cache);
+	tb_qbuffer_exit(&gstream->cache);
 	return tb_false;
 }
 

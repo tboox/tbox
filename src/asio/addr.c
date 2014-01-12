@@ -375,6 +375,10 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	// ok?
 	if (ipv4.u32) 
 	{
+		// save to cache
+		tb_dns_cache_set(addr->host, &ipv4);
+		
+		// done func
 		addr->func(addr, &ipv4, addr->priv);
 		return tb_true;
 	}
@@ -565,6 +569,13 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 	// only ipv4? ok
 	tb_ipv4_t ipv4 = {0};
 	if (tb_ipv4_set(&ipv4, addr->host))
+	{
+		addr->func(haddr, &ipv4, addr->priv);
+		return tb_true;
+	}
+
+	// try to lookup it from cache first
+	if (tb_dns_cache_get(addr->host, &ipv4))
 	{
 		addr->func(haddr, &ipv4, addr->priv);
 		return tb_true;

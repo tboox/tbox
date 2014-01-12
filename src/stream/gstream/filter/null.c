@@ -42,16 +42,16 @@ typedef struct __tb_nstream_t
  * implements
  */
 
-static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gst)
+static __tb_inline__ tb_nstream_t* tb_nstream_cast(tb_gstream_t* gstream)
 {
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(filter && filter->type == TB_GSTREAM_FLTR_TYPE_NONE, tb_null);
 	return (tb_nstream_t*)filter;
 }
-static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
+static tb_long_t tb_nstream_spak(tb_gstream_t* gstream, tb_long_t sync)
 {
-	tb_nstream_t* nst = tb_nstream_cast(gst);
-	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gst);
+	tb_nstream_t* nst = tb_nstream_cast(gstream);
+	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(nst && filter, -1);
 
 	// the input
@@ -94,41 +94,41 @@ static tb_long_t tb_nstream_spak(tb_gstream_t* gst, tb_long_t sync)
 tb_gstream_t* tb_gstream_init_filter_null()
 {
 	// make stream
-	tb_gstream_t* gst = (tb_gstream_t*)tb_malloc0(sizeof(tb_nstream_t));
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* gstream = (tb_gstream_t*)tb_malloc0(sizeof(tb_nstream_t));
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init stream
-	if (!tb_gstream_init(gst, TB_GSTREAM_TYPE_FLTR)) goto fail;
+	if (!tb_gstream_init(gstream, TB_GSTREAM_TYPE_FLTR)) goto fail;
 
 	// init func
-	gst->open 	= tb_gstream_filter_open;
-	gst->read 	= tb_gstream_filter_read;
-	gst->close	= tb_gstream_filter_close;
-	gst->wait	= tb_gstream_filter_wait;
-	gst->ctrl	= tb_gstream_filter_ctrl;
+	gstream->open 	= tb_gstream_filter_open;
+	gstream->read 	= tb_gstream_filter_read;
+	gstream->close	= tb_gstream_filter_close;
+	gstream->wait	= tb_gstream_filter_wait;
+	gstream->ctrl	= tb_gstream_filter_ctrl;
 
 	// init filter
-	((tb_gstream_filter_t*)gst)->type 	= TB_GSTREAM_FLTR_TYPE_NONE;
-	((tb_gstream_filter_t*)gst)->spak = tb_nstream_spak;
+	((tb_gstream_filter_t*)gstream)->type 	= TB_GSTREAM_FLTR_TYPE_NONE;
+	((tb_gstream_filter_t*)gstream)->spak = tb_nstream_spak;
 
 	// ok
-	return gst;
+	return gstream;
 
 fail:
-	if (gst) tb_gstream_exit(gst);
+	if (gstream) tb_gstream_exit(gstream);
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_filter_from_null(tb_gstream_t* gst)
+tb_gstream_t* tb_gstream_init_filter_from_null(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init the null stream
 	tb_gstream_t* nst = tb_gstream_init_filter_null();
 	tb_assert_and_check_return_val(nst, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(nst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gst)) goto fail;
+	if (!tb_gstream_ctrl(nst, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
 	
 	return nst;
 

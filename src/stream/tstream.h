@@ -51,27 +51,27 @@ typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t size, tb_size_t rate, tb_
 
 /*! save to astream from gstream, block transfer
  *
- * @param ist 		the istream, open it first if have been not opened
- * @param ost 		the ostream, open it first if have been not opened
+ * @param istream 	the istream, open it first if have been not opened
+ * @param ostream 	the ostream, open it first if have been not opened
  * @param rate 		the trasfer rate and no limit if 0, bytes/s
  * @param func 		the save func and be optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_tstream_save_ga(tb_gstream_t* ist, tb_astream_t* ost, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_hong_t 			tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! save to gstream from gstream, block transfer
  *
- * @param ist 		the istream, open it first if have been not opened
- * @param ost 		the ostream, open it first if have been not opened
+ * @param istream 	the istream, open it first if have been not opened
+ * @param ostream 	the ostream, open it first if have been not opened
  * @param rate 		the trasfer rate and no limit if 0, bytes/s
  * @param func 		the save func and be optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* ist, tb_gstream_t* ost, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! save to url from url, block transfer
  *
@@ -87,25 +87,25 @@ tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb
 
 /*! init transfer stream from astrean to astream, async transfer
  *
- * @param ist 		the istream, open it first if have been not opened
- * @param ost 		the ostream, open it first if have been not opened
+ * @param istream 	the istream, open it first if have been not opened
+ * @param ostream 	the ostream, open it first if have been not opened
  * @param func 		the save func and be not optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_aa(tb_astream_t* ist, tb_astream_t* ost, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from astrean to gstream, async transfer
  *
- * @param ist 		the istream, open it first if have been not opened
- * @param ost 		the ostream, open it first if have been not opened
+ * @param istream 	the istream, open it first if have been not opened
+ * @param ostream 	the ostream, open it first if have been not opened
  * @param func 		the save func and be not optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_ag(tb_astream_t* ist, tb_gstream_t* ost, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from url to url, async transfer
  *
@@ -120,35 +120,35 @@ tb_handle_t 		tb_tstream_init_uu(tb_char_t const* iurl, tb_char_t const* ourl, t
 
 /*! start transfer stream 
  *
- * @param tst 		the tstream
+ * @param tstream 	the tstream
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_tstream_start(tb_handle_t tst);
+tb_bool_t 			tb_tstream_start(tb_handle_t tstream);
 
 /*! pause transfer stream 
  *
- * @param tst 		the tstream
+ * @param tstream 	the tstream
  */
-tb_void_t 			tb_tstream_pause(tb_handle_t tst);
+tb_void_t 			tb_tstream_pause(tb_handle_t tstream);
 
 /*! limit transfer rate  
  *
- * @param tst 		the tstream
+ * @param tstream 	the tstream
  * @param rate 		the trasfer rate and no limit if 0, bytes/s
  */
-tb_void_t 			tb_tstream_limit(tb_handle_t tst, tb_size_t rate);
+tb_void_t 			tb_tstream_limit(tb_handle_t tstream, tb_size_t rate);
 
 /*! stop transfer stream 
  *
- * @param tst 		the tstream
+ * @param tstream 	the tstream
  */
-tb_void_t 			tb_tstream_stop(tb_handle_t tst);
+tb_void_t 			tb_tstream_stop(tb_handle_t tstream);
 
 /*! exit transfer stream 
  *
- * @param tst 		the tstream
+ * @param tstream 	the tstream
  */
-tb_void_t 			tb_tstream_exit(tb_handle_t tst);
+tb_void_t 			tb_tstream_exit(tb_handle_t tstream);
 
 #endif
