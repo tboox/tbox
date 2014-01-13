@@ -138,6 +138,7 @@ typedef enum __tb_gstream_ctrl_e
 ,	TB_GSTREAM_CTRL_GET_SFUNC 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 6)
 ,	TB_GSTREAM_CTRL_GET_CACHE 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 7)
 ,	TB_GSTREAM_CTRL_GET_TIMEOUT 			= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 8)
+,	TB_GSTREAM_CTRL_IS_OPENED 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 9)
 
 ,	TB_GSTREAM_CTRL_SET_URL 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 11)
 ,	TB_GSTREAM_CTRL_SET_HOST 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 12)
@@ -680,15 +681,6 @@ tb_bool_t 			tb_gstream_bskip(tb_gstream_t* gstream, tb_hize_t size);
  * @return 			the real size
  */
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...);
-
-/*! block save data
- *
- * @param gstream 	the stream
- * @param ost 		the output stream
- *
- * @return 			the real size
- */
-tb_hize_t 			tb_gstream_save(tb_gstream_t* gstream, tb_gstream_t* ost);
 
 /*! block read line 
  *

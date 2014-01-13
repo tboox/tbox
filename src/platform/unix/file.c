@@ -359,19 +359,14 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 		ost = tb_gstream_init_from_url(dest);
 		tb_assert_and_check_break(ist && ost);
 
-		// ctrl stream
-		tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-
-		// open stream
+		// open stream first for size
 		if (!tb_gstream_bopen(ist)) break;
-		if (!tb_gstream_bopen(ost)) break;
 
-		// copy stream
+		// the stream size
 		tb_hize_t size = tb_gstream_size(ist);
-		tb_hize_t save = tb_gstream_save(ist, ost);
 
 		// ok?
-		ok = save == size? tb_true : tb_false;
+		ok = tb_tstream_save_gg(ist, ost, 0, tb_null, tb_null) == size? tb_true : tb_false;
 
 	} while (0);
 
