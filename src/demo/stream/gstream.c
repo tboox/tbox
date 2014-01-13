@@ -4,14 +4,33 @@
 #include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * callback
+ * types
  */
-static tb_bool_t tb_gstream_demo_hfunc(tb_handle_t http, tb_char_t const* line)
+typedef struct __tb_demo_context_t
+{
+	// debug?
+	tb_bool_t 			debug;
+
+	// verbose 
+	tb_bool_t 			verbose;
+
+	// the base
+	tb_hong_t 			base;
+
+	// rate
+	tb_size_t 			rate;
+
+}tb_demo_context_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * func
+ */
+static tb_bool_t tb_demo_gstream_hfunc(tb_handle_t http, tb_char_t const* line)
 {
 	tb_printf("response: %s\n", line);
 	return tb_true;
 }
-static tb_handle_t tb_gstream_demo_sfunc_init(tb_handle_t gst)
+static tb_handle_t tb_demo_gstream_sfunc_init(tb_handle_t gst)
 {
 	tb_printf("ssl: init: %p\n", gst);
 	tb_handle_t sock = tb_null;
@@ -19,19 +38,44 @@ static tb_handle_t tb_gstream_demo_sfunc_init(tb_handle_t gst)
 		tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_GET_HANDLE, &sock);
 	return sock;
 }
-static tb_void_t tb_gstream_demo_sfunc_exit(tb_handle_t ssl)
+static tb_void_t tb_demo_gstream_sfunc_exit(tb_handle_t ssl)
 {
 	tb_printf("ssl: exit\n");
 }
-static tb_long_t tb_gstream_demo_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_demo_gstream_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
 {
 	tb_printf("ssl: read: %lu\n", size);
 	return ssl? tb_socket_recv(ssl, data, size) : -1;
 }
-static tb_long_t tb_gstream_demo_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
+static tb_long_t tb_demo_gstream_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
 {
 	tb_printf("ssl: writ: %lu\n", size);
 	return ssl? tb_socket_send(ssl, data, size) : -1;
+}
+static tb_bool_t tb_demo_gstream_save_func(tb_long_t size, tb_size_t rate, tb_pointer_t priv)
+{
+	// check
+	tb_demo_context_t* context = (tb_demo_context_t*)priv;
+	tb_assert_and_check_return_val(context, tb_false);
+	
+	// print debug info
+	if (context->debug) tb_printf("size: %ld, rate: %lu bytes / s\n", size, rate);
+
+	// print verbose info
+	if (context->verbose) 
+	{
+		if (tb_mclock() - context->base > 1000) 
+		{
+			if (size >= 0) tb_printf("size: %ld bytes, rate: %lu bytes / s\n", size, rate);
+			context->base = tb_mclock();
+		}
+	}
+
+	// save rate
+	context->rate = rate;
+
+	// ok
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -101,7 +145,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						}
 
 						// enable debug?
-						if (debug) hoption->hfunc = tb_gstream_demo_hfunc;
+						if (debug) hoption->hfunc = tb_demo_gstream_hfunc;
 
 						// custem header?
 						if (tb_option_find(option, "header"))
@@ -200,10 +244,10 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				// init ssl
 				static tb_gstream_sfunc_t sfunc = 
 				{
-					tb_gstream_demo_sfunc_init
-				,	tb_gstream_demo_sfunc_exit
-				,	tb_gstream_demo_sfunc_read
-				,	tb_gstream_demo_sfunc_writ
+					tb_demo_gstream_sfunc_init
+				,	tb_demo_gstream_sfunc_exit
+				,	tb_demo_gstream_sfunc_read
+				,	tb_demo_gstream_sfunc_writ
 				};
 				tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_SET_SFUNC, &sfunc);
 
@@ -244,12 +288,8 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 					pst = tb_gstream_init_from_url(tb_option_item_cstr(option, "post-file"));
 					tb_assert_and_check_break(pst);
 
-					// open pst
-					if (!tb_gstream_bopen(pst)) break;
-
 					// writ ist
-					if (!tb_gstream_save(pst, ist)) break;
-					if (!tb_gstream_bfwrit(ist, tb_null, 0)) break;
+					if (tb_tstream_save_gg(pst, ist, 0, tb_null, tb_null) < 0) break;
 				}
 
 				// init ost
@@ -285,69 +325,16 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				}
 				tb_assert_and_check_break(ost);
 
-				// ctrl ost
-				if (tb_gstream_type(ost) == TB_GSTREAM_TYPE_FILE) 
-					tb_gstream_ctrl(ost, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-
-				// open ost
-				if (!tb_gstream_bopen(ost)) break;
-
-				// read data
-				tb_byte_t 		data[TB_GSTREAM_BLOCK_MAXN];
-				tb_hize_t 		read = 0;
-				tb_hize_t 		left = tb_gstream_left(ist);
-				tb_hong_t 		base = tb_mclock();
-				tb_hong_t 		basc = tb_mclock();
-				do
-				{
-					// read data
-					tb_long_t real = tb_gstream_aread(ist, data, TB_GSTREAM_BLOCK_MAXN);
-					
-					// print debug info
-					if (debug) tb_printf("read: %ld\n", real);
-
-					// has data?
-					if (real > 0)
-					{
-						// writ data
-						if (!tb_gstream_bwrit(ost, data, real)) break;
-
-						// update read
-						read += real;
-					}
-					// no data?
-					else if (!real) 
-					{
-						// wait
-						tb_long_t e = tb_gstream_wait(ist, TB_GSTREAM_WAIT_READ, tb_gstream_timeout(ist));
-						tb_assert_and_check_break(e >= 0);
-
-						// timeout?
-						tb_assert_and_check_break(e);
-
-						// has read?
-						tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
-					}
-					// end
-					else break;
-
-					// is end?
-					if (left && read >= left) break;
-
-					// print verbose info
-					if (verbose) 
-					{
-						if (tb_mclock() - basc > 1000) 
-						{
-							tb_printf("save: %llu bytes, speed: %llu bytes / s\n", tb_gstream_offset(ist), (tb_gstream_offset(ist) * 1000) / (tb_mclock() - base));
-							basc = tb_mclock();
-						}
-					}
-
-				} while(1);
+				// save it
+				tb_hong_t 			save = 0;
+				tb_hong_t 			base = tb_mclock();
+				tb_demo_context_t 	context = {0}; 
+				context.debug 		= debug; 
+				context.verbose 	= verbose;
+				if ((save = tb_tstream_save_gg(ist, ost, 0, tb_demo_gstream_save_func, &context)) < 0) break;
 
 				// print verbose info
-				if (verbose) tb_printf("save: %llu bytes, size: %llu bytes, time: %llu ms, state: %s\n", read, tb_gstream_size(ist), tb_mclock() - base, tb_gstream_state_cstr(ist));
+				if (verbose) tb_printf("save: %lld bytes, size: %llu bytes, time: %llu ms, rate: %lu bytes/ s, state: %s\n", save, tb_gstream_size(ist), tb_mclock() - base, context.rate, tb_gstream_state_cstr(ist));
 			}
 			else tb_option_help(option);
 		}

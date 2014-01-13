@@ -1269,6 +1269,16 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
+	case TB_GSTREAM_CTRL_IS_OPENED:
+		{
+			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			if (popened)
+			{
+				*popened = gstream->bopened? tb_true : tb_false;
+				ret = tb_true;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -1506,48 +1516,5 @@ tb_bool_t tb_gstream_bwrit_s64_be(tb_gstream_t* gstream, tb_sint64_t val)
 	tb_byte_t b[8];
 	tb_bits_set_s64_be(b, val);
 	return tb_gstream_bwrit(gstream, b, 8);
-}
-tb_hize_t tb_gstream_save(tb_gstream_t* gstream, tb_gstream_t* ost)
-{
-	// check
-	tb_assert_and_check_return_val(ost && gstream, 0);	
-
-	// writ data
-	tb_byte_t 	data[TB_GSTREAM_BLOCK_MAXN];
-	tb_hize_t 	writ = 0;
-	tb_hize_t 	left = tb_gstream_left(gstream);
-	do
-	{
-		// read data
-		tb_long_t real = tb_gstream_aread(gstream, data, TB_GSTREAM_BLOCK_MAXN);
-		if (real > 0)
-		{
-			// writ data
-			if (!tb_gstream_bwrit(ost, data, real)) break;
-
-			// update writ
-			writ += real;
-		}
-		else if (!real) 
-		{
-			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, gstream->timeout);
-			tb_assert_and_check_break(e >= 0);
-
-			// timeout?
-			tb_check_break(e);
-
-			// has writ?
-			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
-		}
-		else break;
-
-		// is end?
-		if (left && writ >= left) break;
-
-	} while(1);
-
-	// ok?
-	return writ;
 }
 
