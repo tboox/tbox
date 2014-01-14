@@ -38,11 +38,11 @@
  */
 
 /// the stream command
-#define TB_ASTREAM_CTRL(type, ctrl) 					(((type) << 16) | (ctrl))
-#define TB_ASTREAM_CTRL_FLTR(type, ctrl) 				TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, (((type) << 8) | (ctrl)))
+#define TB_ASTREAM_CTRL(type, ctrl) 						(((type) << 16) | (ctrl))
+#define TB_ASTREAM_CTRL_FLTR(type, ctrl) 					TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, (((type) << 8) | (ctrl)))
 
 /// the stream state
-#define TB_ASTREAM_STATE(type, state) 					(((type) << 16) | (state))
+#define TB_ASTREAM_STATE(type, state) 						(((type) << 16) | (state))
 
 /// open
 #define tb_astream_open(astream, func, priv) 				tb_astream_open_impl(astream, func, priv __tb_debug_vals__)
@@ -100,12 +100,13 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_GET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 5)
 ,	TB_ASTREAM_CTRL_GET_SIZE 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 6)
 ,	TB_ASTREAM_CTRL_GET_OFFSET 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 7)
+,	TB_ASTREAM_CTRL_IS_OPENED 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
 
-,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
-,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 9)
-,	TB_ASTREAM_CTRL_SET_PORT 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 10)
-,	TB_ASTREAM_CTRL_SET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 11)
-,	TB_ASTREAM_CTRL_SET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 12)
+,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 11)
+,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 12)
+,	TB_ASTREAM_CTRL_SET_PORT 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 13)
+,	TB_ASTREAM_CTRL_SET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 14)
+,	TB_ASTREAM_CTRL_SET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 15)
 
 	// the astream for file
 ,	TB_ASTREAM_CTRL_FILE_SET_MODE 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FILE, 1)
@@ -141,7 +142,7 @@ struct __tb_astream_t;
 
 /*! the astream open func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param state 			the stream state
  * @param priv 				the func private data
  *
@@ -151,7 +152,7 @@ typedef tb_bool_t 			(*tb_astream_open_func_t)(struct __tb_astream_t* astream, t
 
 /*! the astream read func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param state 			the stream state
  * @param data 				the readed data
  * @param size 				the readed size
@@ -163,7 +164,7 @@ typedef tb_bool_t 			(*tb_astream_read_func_t)(struct __tb_astream_t* astream, t
 
 /*! the astream writ func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param state 			the stream state
  * @param real 				the real size
  * @param size 				the need size
@@ -175,7 +176,7 @@ typedef tb_bool_t 			(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, t
 
 /*! the astream save func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param ost 				the ostream
  * @param state 			the stream state
  * @param size 				the saved size currently
@@ -187,7 +188,7 @@ typedef tb_bool_t 			(*tb_astream_save_func_t)(struct __tb_astream_t* astream, s
 
 /*! the astream seek func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param state 			the stream state
  * @param priv 				the func private data
  *
@@ -197,7 +198,7 @@ typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, t
 
 /*! the astream sync func type
  *
- * @param astream 				the astream
+ * @param astream 			the astream
  * @param state 			the stream state
  * @param priv 				the func private data
  *
