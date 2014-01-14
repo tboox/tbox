@@ -90,6 +90,7 @@ static tb_option_item_t g_options[] =
 ,	{'-', 	"post-data", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post data" 		}
 ,	{'-', 	"post-file", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post file" 		}
 ,	{'-', 	"timeout", 		TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_INTEGER, 	"set the timeout" 			}
+,	{'-', 	"limitrate", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_INTEGER, 	"set the limitrate" 		}
 ,	{'h', 	"help", 		TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"display this help and exit"}
 ,	{'-', 	"url", 			TB_OPTION_MODE_VAL, 		TB_OPTION_TYPE_CSTR, 		"the url" 					}
 ,	{'-', 	tb_null, 		TB_OPTION_MODE_MORE, 		TB_OPTION_TYPE_NONE, 		tb_null 					}
@@ -325,13 +326,18 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				}
 				tb_assert_and_check_break(ost);
 
+				// the limit rate
+				tb_size_t limitrate = 0;
+				if (tb_option_find(option, "limitrate"))
+					limitrate = tb_option_item_uint32(option, "limitrate");
+
 				// save it
 				tb_hong_t 			save = 0;
 				tb_hong_t 			base = tb_mclock();
 				tb_demo_context_t 	context = {0}; 
 				context.debug 		= debug; 
 				context.verbose 	= verbose;
-				if ((save = tb_tstream_save_gg(ist, ost, 0, tb_demo_gstream_save_func, &context)) < 0) break;
+				if ((save = tb_tstream_save_gg(ist, ost, limitrate, tb_demo_gstream_save_func, &context)) < 0) break;
 
 				// print verbose info
 				if (verbose) tb_printf("save: %lld bytes, size: %llu bytes, time: %llu ms, rate: %lu bytes/ s, state: %s\n", save, tb_gstream_size(ist), tb_mclock() - base, context.rate, tb_gstream_state_cstr(ist));
