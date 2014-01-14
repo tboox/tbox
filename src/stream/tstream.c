@@ -35,7 +35,81 @@
 #include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the tstream type enum
+typedef enum __tb_tstream_type_e
+{
+	TB_TSTREAM_TYPE_AA 		= 0
+,	TB_TSTREAM_TYPE_AG 		= 1
+
+}tb_tstream_type_e;
+
+// the tstream type
+typedef struct __tb_tstream_t
+{
+	// the type
+	tb_size_t 				type;
+
+	// the istream
+	tb_astream_t* 			istream;
+
+	// the istream is owner?
+	tb_bool_t 				iowner;
+
+	// the func
+	tb_tstream_save_func_t 	func;
+
+	// the priv
+	tb_pointer_t 			priv;
+
+	// the limit rate
+	tb_atomic_t 			rate;
+
+	// is paused?
+	tb_atomic_t 			paused;
+
+	// is stoped?
+	tb_atomic_t 			stoped;
+
+}tb_tstream_t;
+
+// the tstream aa type
+typedef struct __tb_tstream_aa_t
+{
+	// the base
+	tb_tstream_t 			base;
+
+	// the ostream
+	tb_astream_t* 			ostream;
+
+	// the ostream is owner?
+	tb_bool_t 				oowner;
+
+}tb_tstream_aa_t;
+
+// the tstream ag type
+typedef struct __tb_tstream_ag_t
+{
+	// the base
+	tb_tstream_t 			base;
+
+	// the ostream
+	tb_gstream_t* 			ostream;
+
+}tb_tstream_ag_t;
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
+ */
+static tb_bool_t tb_tstream_istream_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+{
+	return tb_false;
+}
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
  */
 tb_hong_t tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
@@ -206,29 +280,179 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 }
 tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
-	return tb_null;
+	// done
+	tb_tstream_aa_t* tstream = tb_null;
+	do
+	{
+		// check
+		tb_assert_and_check_break(istream && ostream);	
+
+		// make tstream
+		tstream = tb_malloc0(sizeof(tb_tstream_aa_t));
+		tb_assert_and_check_break(tstream);
+
+		// init tstream
+		tstream->base.type 		= TB_TSTREAM_TYPE_AA;
+		tstream->base.istream 	= istream;
+		tstream->base.iowner 	= tb_false;
+		tstream->base.func 		= func;
+		tstream->base.priv 		= priv;
+		tstream->ostream 		= ostream;
+		tstream->oowner 		= tb_false;
+
+	} while (0);
+
+	// ok?
+	return (tb_handle_t)tstream;
 }
 tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
-	return tb_null;
+	// done
+	tb_tstream_ag_t* tstream = tb_null;
+	do
+	{
+		// check
+		tb_assert_and_check_break(istream && ostream);	
+
+		// make tstream
+		tstream = tb_malloc0(sizeof(tb_tstream_ag_t));
+		tb_assert_and_check_break(tstream);
+
+		// init tstream
+		tstream->base.type 		= TB_TSTREAM_TYPE_AA;
+		tstream->base.istream 	= istream;
+		tstream->base.iowner 	= tb_false;
+		tstream->base.func 		= func;
+		tstream->base.priv 		= priv;
+		tstream->ostream 		= ostream;
+
+	} while (0);
+
+	// ok?
+	return (tb_handle_t)tstream;
 }
-tb_handle_t tb_tstream_init_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv)
+tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
-	return tb_null;
+	// done
+	tb_astream_t* 		istream = tb_null;
+	tb_astream_t* 		ostream = tb_null;
+	tb_tstream_aa_t* 	tstream = tb_null;
+	do
+	{
+		// check
+		tb_assert_and_check_break(aicp && iurl && ourl);
+
+		// init istream
+		istream = tb_astream_init_from_url(aicp, iurl);
+		tb_assert_and_check_break(istream);
+
+		// init ostream
+		ostream = tb_astream_init_from_url(aicp, ourl);
+		tb_assert_and_check_break(ostream);
+
+		// make tstream
+		tstream = tb_malloc0(sizeof(tb_tstream_aa_t));
+		tb_assert_and_check_break(tstream);
+
+		// init tstream
+		tstream->base.type 		= TB_TSTREAM_TYPE_AA;
+		tstream->base.istream 	= istream;
+		tstream->base.iowner 	= tb_true;
+		tstream->base.func 		= func;
+		tstream->base.priv 		= priv;
+		tstream->ostream 		= ostream;
+		tstream->oowner 		= tb_true;
+		
+		// ok
+		istream = tb_null;
+		ostream = tb_null;
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_astream_exit(istream);
+	istream = tb_null;
+
+	// exit ostream
+	if (ostream) tb_astream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return (tb_handle_t)tstream;
 }
-tb_bool_t tb_tstream_start(tb_handle_t tstream)
+tb_bool_t tb_tstream_start(tb_handle_t handle)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return_val(tstream, tb_false);
+
 	return tb_false;
 }
-tb_void_t tb_tstream_pause(tb_handle_t tstream)
+tb_void_t tb_tstream_pause(tb_handle_t handle)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return(tstream);
+
+	// pause it
+	tb_atomic_set(&tstream->paused, 1);
 }
-tb_void_t tb_tstream_limit(tb_handle_t tstream, tb_size_t rate)
+tb_void_t tb_tstream_limit(tb_handle_t handle, tb_size_t rate)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return(tstream);
+
+	// set the limit rate
+	tb_atomic_set(&tstream->rate, rate);
 }
-tb_void_t tb_tstream_stop(tb_handle_t tstream)
+tb_void_t tb_tstream_stop(tb_handle_t handle)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return(tstream);
+
+	// stop it
+	if (tb_atomic_fetch_and_set(&tstream->stoped, 1))
+	{
+		// kill istream
+		if (tstream->istream) tb_astream_kill(tstream->istream);
+
+		// kill ostream
+		if (tstream->type == TB_TSTREAM_TYPE_AA) 
+		{
+			if (((tb_tstream_aa_t*)tstream)->ostream) 
+				tb_astream_kill(((tb_tstream_aa_t*)tstream)->ostream);
+		}
+	}
 }
-tb_void_t tb_tstream_exit(tb_handle_t tstream)
+tb_void_t tb_tstream_exit(tb_handle_t handle)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return(tstream);
+
+	// stop it first if not stoped
+	if (!tb_atomic_get(&tstream->stoped)) 
+	{
+		// stop it
+		tb_tstream_stop(handle);
+
+		// wait some time
+		tb_msleep(200);
+	}
+
+	// exit istream
+	if (tstream->istream && tstream->iowner) tb_astream_exit(tstream->istream);
+	tstream->istream = tb_null;
+
+	// exit ostream
+	if (tstream->type == TB_TSTREAM_TYPE_AA) 
+	{
+		if (((tb_tstream_aa_t*)tstream)->ostream && ((tb_tstream_aa_t*)tstream)->oowner) 
+			tb_astream_exit(((tb_tstream_aa_t*)tstream)->ostream);
+		((tb_tstream_aa_t*)tstream)->ostream = tb_null;
+	}
+	else if (tstream->type == TB_TSTREAM_TYPE_AG)
+		((tb_tstream_ag_t*)tstream)->ostream = tb_null;
 }

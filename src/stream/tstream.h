@@ -109,6 +109,7 @@ tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, t
 
 /*! init transfer stream from url to url, async transfer
  *
+ * @param aicp 		the aicp
  * @param iurl 		the input url
  * @param ourl 		the output url
  * @param func 		the save func and be not optional
@@ -116,7 +117,7 @@ tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, t
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! start transfer stream 
  *

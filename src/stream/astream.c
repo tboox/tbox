@@ -172,8 +172,15 @@ tb_void_t tb_astream_exit(tb_astream_t* astream)
 	// check
 	tb_assert_and_check_return(astream);
 
-	// stop it
-	tb_atomic_set(&astream->stoped, 1);
+	// stop it first if not stoped
+	if (!tb_atomic_get(&astream->stoped)) 
+	{
+		// kill it
+		tb_astream_kill(astream);
+
+		// wait some time
+		tb_msleep(200);
+	}
 
 	// exit it
 	if (astream->exit) astream->exit(astream);
@@ -576,6 +583,16 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			if (ptimeout)
 			{
 				*ptimeout = astream->timeout;
+				ret = tb_true;
+			}
+		}
+		break;
+	case TB_ASTREAM_CTRL_IS_OPENED:
+		{
+			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			if (popened)
+			{
+				*popened = tb_atomic_get(&astream->opened)? tb_true : tb_false;
 				ret = tb_true;
 			}
 		}
