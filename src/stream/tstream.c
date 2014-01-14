@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"tstream"
+#define TB_TRACE_IMPL_TAG 				"tstream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -75,10 +75,14 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	tb_hong_t 	time = 0;
 	tb_hize_t 	size = 0;
 	tb_size_t 	crate = 0;
+	tb_long_t 	delay = 0;
 	do
 	{
+		// the need
+		tb_size_t need = rate? tb_min(rate, TB_GSTREAM_BLOCK_MAXN) : TB_GSTREAM_BLOCK_MAXN;
+
 		// read data
-		tb_long_t real = tb_gstream_aread(istream, data, TB_GSTREAM_BLOCK_MAXN);
+		tb_long_t real = tb_gstream_aread(istream, data, need);
 		if (real > 0)
 		{
 			// writ data
@@ -87,36 +91,44 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 			// save writ
 			writ += real;
 
-			// has func?
-			if (func) 
+			// has func or limit rate?
+			if (func || rate) 
 			{
 				// the time
 				time = tb_mclock();
 
-				// compute the current rate
+				// < 1s?
 				if (time < basc + 1000)
 				{
+					// save size
 					size += real;
-					if (time > basc + 100) crate = (tb_size_t)((size * 1000) / (time - basc));
+				
+					// save current rate if < 1s from base
+					if (time < base + 1000) crate = size;
+				
+					// compute the delay for limit rate
+					if (rate) delay = size >= rate? basc + 1000 - time : 0;
 				}
 				else
 				{
-					crate = (tb_size_t)((size * 1000) / (time - basc));
-					size = 0;
+					// save current rate
+					crate = size;
+
+					// update basc
 					basc = time;
+
+					// reset size
+					size = 0;
+
+					// reset delay
+					delay = 0;
 				}
 
 				// done func
-				func(real, crate, priv);
+				if (func) func(real, crate, priv);
 
-#if 0
-				// limit rate
-				if (rate && crate > rate)
-				{
-					tb_size_t delay = crate - rate;
-
-				}
-#endif
+				// wait some time for limit rate
+				if (delay) tb_msleep(delay);
 			}
 		}
 		else if (!real) 
