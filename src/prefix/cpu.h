@@ -35,10 +35,12 @@
 // check 64-bits
 #if defined (__LP64__) \
 	|| defined (__64BIT__) \
-		|| defined (_LP64) \
-			|| defined (__tb_arch_x64__) \
-				|| (__WORDSIZE == 64) \
-					|| defined(__tb_arch_x64__)
+	|| defined (_LP64) \
+	|| defined (__x86_64) \
+	|| defined (__x86_64__) \
+	|| defined (__amd64) \
+	|| defined (__amd64__) \
+	|| (__WORDSIZE == 64)
 # 	define TB_CPU_BITSIZE 		(64)
 # 	define TB_CPU_BITBYTE 		(8)
 # 	define TB_CPU_BITALIGN 		(7)

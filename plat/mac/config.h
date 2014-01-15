@@ -6,10 +6,6 @@
 #define TB_CONFIG_OS_MAC_VERSION_MAJOR 	(10)
 #define TB_CONFIG_OS_MAC_VERSION_MINOR 	(7)
 
-// cpu
-//#define TB_CONFIG_CPU_BIGENDIAN
-//#define TB_CONFIG_CPU_HAS_CONDITIONAL_INSTR
-
 // compiler
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE_ASM
@@ -30,9 +26,6 @@
 
 // type
 #define TB_CONFIG_TYPE_FLOAT
-
-// optimization
-#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // memory
 #ifdef __tb_debug__

@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+#ifdef TB_ARCH_SSE2
 # 	include <emmintrin.h>
 #endif
 
@@ -34,7 +34,7 @@
  */
 
 #if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) || \
-		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		defined(TB_ARCH_SSE2)
 # 	define TB_LIBC_STRING_OPT_MEMSET_U8
 # 	define TB_LIBC_STRING_OPT_MEMSET_U16
 # 	define TB_LIBC_STRING_OPT_MEMSET_U32
@@ -71,7 +71,7 @@ static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v1(tb_byte_t* s, tb_byte_t 
 }
 #endif
 
-#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+#ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_impl_u8_opt_v2(tb_byte_t* s, tb_byte_t c, tb_size_t n)
 {
     if (n >= 64) 
@@ -108,7 +108,7 @@ static tb_pointer_t tb_memset_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 
 # 	if defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
 	tb_memset_impl_u8_opt_v1(s, (tb_byte_t)c, n);
-# 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+# 	elif defined(TB_ARCH_SSE2)
 	tb_memset_impl_u8_opt_v2(s, (tb_byte_t)c, n);
 # 	else
 # 		error
@@ -139,7 +139,7 @@ static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v1(tb_uint16_t* s, tb_uint
 }
 #endif
 
-#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+#ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_u16_impl_opt_v2(tb_uint16_t* s, tb_uint16_t c, tb_size_t n)
 {
     if (n >= 32) 
@@ -178,12 +178,12 @@ static tb_pointer_t tb_memset_u16_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
-		defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+		defined(TB_ARCH_SSE2)
 	if (n < 2049) tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
 	else tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
 	tb_memset_u16_impl_opt_v1(s, (tb_uint16_t)c, n);
-# 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+# 	elif defined(TB_ARCH_SSE2)
 	tb_memset_u16_impl_opt_v2(s, (tb_uint16_t)c, n);
 # 	else
 # 		error
@@ -206,7 +206,7 @@ static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v1(tb_uint32_t* s, tb_uint
 }
 #endif
 
-#ifdef TB_CONFIG_OPTI_SSE2_ENABLE
+#ifdef TB_ARCH_SSE2
 static __tb_inline__ tb_void_t tb_memset_u32_impl_opt_v2(tb_uint32_t* s, tb_uint32_t c, tb_size_t n)
 {
     if (n >= 16) 
@@ -245,12 +245,12 @@ static tb_pointer_t tb_memset_u32_impl(tb_pointer_t s, tb_size_t c, tb_size_t n)
 	if (!n) return s;
 
 # 	if (defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32) && \
-	defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+	defined(TB_ARCH_SSE2)
 	if (n < 2049) tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
 	else tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
 # 	elif defined(TB_CONFIG_ASSEMBLER_GAS) && TB_CPU_BIT32
 	tb_memset_u32_impl_opt_v1(s, (tb_uint32_t)c, n);
-# 	elif defined(TB_CONFIG_OPTI_SSE2_ENABLE)
+# 	elif defined(TB_ARCH_SSE2)
 	tb_memset_u32_impl_opt_v2(s, (tb_uint32_t)c, n);
 # 	else
 # 		error

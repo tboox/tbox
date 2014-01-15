@@ -39,7 +39,7 @@ endif
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
-CXFLAGS 			= -c -Wall $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__
+CXFLAGS 			= -c -Wall $(ARCH_CXFLAGS) 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 

@@ -30,6 +30,8 @@
 #ifndef TB_CONFIG_LIBC_HAVE_MEMSET
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/memset.c"
+# 	elif defined(TB_ARCH_x64)
+# 		include "opt/x86/memset.c"
 # 	elif defined(TB_ARCH_ARM)
 # 		include "opt/arm/memset.c"
 # 	elif defined(TB_ARCH_SH4)

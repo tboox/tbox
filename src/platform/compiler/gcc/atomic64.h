@@ -56,7 +56,7 @@
 #define tb_atomic64_and_and_fetch(a, v) 		tb_atomic64_and_and_fetch_sync(a, v)
 
 // FIXME: ios armv6: no defined refernece?
-#if !(defined(TB_CONFIG_OS_IOS) && TB_CONFIG_ARM_VERSION < 7)
+#if !(defined(TB_CONFIG_OS_IOS) && TB_ARCH_ARM_VERSION < 7)
 # 	define tb_atomic64_fetch_and_xor(a, v) 		tb_atomic64_fetch_and_xor_sync(a, v)
 # 	define tb_atomic64_xor_and_fetch(a, v) 		tb_atomic64_xor_and_fetch_sync(a, v)
 #endif
@@ -124,7 +124,7 @@ static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_sub_sync(tb_atomic64_t* a, 
 	return __sync_fetch_and_sub(a, v);
 }
 
-#if !(defined(TB_CONFIG_OS_IOS) && (TB_CONFIG_ARM_VERSION < 7))
+#if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
 static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_xor_sync(tb_atomic64_t* a, tb_hize_t v)
 {
 	tb_assert(a);
@@ -166,7 +166,7 @@ static __tb_inline__ tb_hong_t tb_atomic64_sub_and_fetch_sync(tb_atomic64_t* a, 
 	return __sync_sub_and_fetch_8(a, v);
 }
 
-#if !(defined(TB_CONFIG_OS_IOS) && (TB_CONFIG_ARM_VERSION < 7))
+#if !(defined(TB_CONFIG_OS_IOS) && (TB_ARCH_ARM_VERSION < 7))
 static __tb_inline__ tb_hize_t tb_atomic64_xor_and_fetch_sync(tb_atomic64_t* a, tb_hize_t v)
 {
 	tb_assert(a);
