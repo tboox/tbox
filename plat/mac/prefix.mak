@@ -60,7 +60,7 @@ PWD 				= pwd
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__ 
-CXFLAGS 			= -m$(BITS) -c -Wall -D__tb_arch_$(ARCH)__ -mssse3
+CXFLAGS 			= -m$(BITS) -c -Wall -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -110,7 +110,7 @@ CCFLAGS 			= \
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g -D__tb_debug__ 
-MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) -D__tb_arch_$(ARCH)__ \
+MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \

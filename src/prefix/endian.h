@@ -32,11 +32,21 @@
  * macros
  */
 
-#ifdef TB_CONFIG_CPU_BIGENDIAN
-# 	define TB_WORDS_BIGENDIAN
-# 	define TB_FLOAT_BIGENDIAN
+// words endian
+#ifdef __BYTE_ORDER__
+# 	if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+# 		define TB_WORDS_BIGENDIAN
+# 		error check it
+# 	endif
 #endif
 
+// float endian
+#ifdef __FLOAT_WORD_ORDER__
+# 	if __FLOAT_WORD_ORDER__ != __ORDER_LITTLE_ENDIAN__
+# 	define TB_FLOAT_BIGENDIAN
+# 		error check it
+# 	endif
+#endif
 
 #endif
 

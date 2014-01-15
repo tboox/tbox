@@ -127,6 +127,11 @@
 #		error Unknown GNU C/C++ Compiler Version
 #	endif
 
+	// clang
+# 	if defined(__clang__)
+# 		define TB_COMPILER_IS_CLANG
+# 	endif
+
 // watcom c/c++ 
 #elif defined(__WATCOMC__)
 #	define TB_COMPILER_IS_WATCOM

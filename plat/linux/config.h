@@ -6,10 +6,6 @@
 #define TB_CONFIG_OS_LINUX_VERSION_MAJOR 	(2)
 #define TB_CONFIG_OS_LINUX_VERSION_MINOR 	(6)
 
-// cpu
-//#define TB_CONFIG_CPU_BIGENDIAN
-//#define TB_CONFIG_CPU_HAS_CONDITIONAL_INSTR
-
 // compiler
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE_ASM
@@ -30,11 +26,6 @@
 
 // type
 #define TB_CONFIG_TYPE_FLOAT
-
-// optimization
-#if defined(__tb_arch_x86__) || defined(__tb_arch_x64__)
-# 	define TB_CONFIG_OPTI_SSE2_ENABLE
-#endif
 
 // memory
 #ifdef __tb_debug__
@@ -59,9 +50,7 @@
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
-#ifdef __tb_arch_x64__
-# 	define TB_CONFIG_LIBC_HAVE_MEMSET
-#endif
+//#define TB_CONFIG_LIBC_HAVE_MEMSET
 #define TB_CONFIG_LIBC_HAVE_MEMMOV
 #define TB_CONFIG_LIBC_HAVE_MEMCMP
 #define TB_CONFIG_LIBC_HAVE_STRCAT

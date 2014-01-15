@@ -1,30 +1,10 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
-// arm
-#if defined(__tb_arch_armv5te__)
-# 	define TB_CONFIG_ARM_VERSION 			(5)
-#elif defined(__tb_arch_armv6__)
-# 	define TB_CONFIG_ARM_VERSION 			(6)
-#elif defined(__tb_arch_armv7__)
-# 	define TB_CONFIG_ARM_VERSION 			(7)
-#endif
-#ifdef __thumb__
-# 	define TB_CONFIG_ARM_THUMB
-#endif
-//#define TB_CONFIG_ARM_JAZELLE
-//#define TB_CONFIG_ARM_VFP
-//#define TB_CONFIG_ARM_MMU 
-//#define TB_CONFIG_ARM_MPU 
-
 // os
 #define TB_CONFIG_OS_ANDROID
 #define TB_CONFIG_OS_ANDROID_VERSION_MAJOR 	(1)
 #define TB_CONFIG_OS_ANDROID_VERSION_MINOR 	(5)
-
-// cpu
-//#define TB_CONFIG_CPU_BIGENDIAN
-//#define TB_CONFIG_CPU_HAS_CONDITIONAL_INSTR
 
 // compiler
 //#define TB_CONFIG_COMPILER_NOT_SUPPORT_INLINE
@@ -46,9 +26,6 @@
 
 // type
 #define TB_CONFIG_TYPE_FLOAT
-
-// optimization
-//#define TB_CONFIG_OPTI_SSE2_ENABLE
 
 // memory
 #ifdef __tb_debug__

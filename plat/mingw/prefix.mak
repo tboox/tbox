@@ -42,7 +42,7 @@ PWD 				= pwd
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden 
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
-CXFLAGS 			= -m$(BITS) -c -Wall -D__tb_arch_$(ARCH)__ -mssse3 
+CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 

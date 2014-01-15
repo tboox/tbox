@@ -48,7 +48,7 @@ endif
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
-CXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__ -c -Wall  \
+CXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
@@ -79,7 +79,7 @@ CCFLAGS 			=
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g -D__tb_debug__
-MXFLAGS 			= -arch $(ARCH) -D__tb_arch_$(ARCH)__  -c -Wall  \
+MXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0  -Wreturn-type -Wunused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
