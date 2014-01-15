@@ -322,10 +322,6 @@ static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_byte_t const* da
 	// post writ
 	return tb_aico_send(sstream->aico, data, size, tb_astream_sock_writ_func, astream);
 }
-static tb_bool_t tb_astream_sock_save(tb_astream_t* astream, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
-{
-	return tb_false;
-}
 static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -333,7 +329,7 @@ static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, t
 	tb_assert_and_check_return_val(sstream && func, tb_false);
 
 	// done func
-	func(astream, TB_ASTREAM_STATE_NOT_SUPPORTED, priv);
+	func(astream, TB_ASTREAM_STATE_NOT_SUPPORTED, 0, priv);
 
 	// ok
 	return tb_true;
@@ -480,7 +476,6 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	astream->base.open 		= tb_astream_sock_open;
 	astream->base.read 		= tb_astream_sock_read;
 	astream->base.writ 		= tb_astream_sock_writ;
-	astream->base.save 		= tb_astream_sock_save;
 	astream->base.seek 		= tb_astream_sock_seek;
 	astream->base.sync 		= tb_astream_sock_sync;
 	astream->base.kill 		= tb_astream_sock_kill;

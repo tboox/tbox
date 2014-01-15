@@ -89,14 +89,14 @@ static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_astream_t* astre
 	tb_assert_and_check_return_val(astream && astream->type == TB_ASTREAM_TYPE_FILE, tb_null);
 	return (tb_astream_file_t*)astream;
 }
-static tb_bool_t tb_astream_file_try_open(tb_astream_t* astream)
+static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream, tb_false);
+	tb_assert_and_check_return_val(fstream && func, tb_false);
 
 	// done
-	tb_bool_t ok = tb_false;
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
 	do
 	{
 		// init file
@@ -123,21 +123,9 @@ static tb_bool_t tb_astream_file_try_open(tb_astream_t* astream)
 		tb_atomic_set(&astream->opened, 1);
 
 		// ok
-		ok = tb_true;
+		state = TB_ASTREAM_STATE_OK;
 
 	} while (0);
-
-	// ok?
-	return ok;
-}
-static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream && func, tb_false);
-
-	// open it
-	tb_size_t state = tb_astream_file_try_open(astream)? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR;
 
 	// done func
 	func(astream, state, priv);
@@ -255,18 +243,14 @@ static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_byte_t const* da
 	// post writ
 	return tb_aico_writ(fstream->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_astream_file_writ_func, astream);
 }
-static tb_bool_t tb_astream_file_save(tb_astream_t* astream, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
-{
-	return tb_false;
-}
-static tb_bool_t tb_astream_file_try_seek(tb_astream_t* astream, tb_hize_t offset)
+static tb_bool_t tb_astream_file_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream, tb_false);
+	tb_assert_and_check_return_val(fstream && func, tb_false);
 
 	// done
-	tb_bool_t ok = tb_false;
+	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
 	do
 	{
 		// check
@@ -276,24 +260,12 @@ static tb_bool_t tb_astream_file_try_seek(tb_astream_t* astream, tb_hize_t offse
 		tb_atomic64_set(&fstream->offset, offset);
 
 		// ok
-		ok = tb_true;
+		state = TB_ASTREAM_STATE_OK;
 
 	} while (0);
 
-	// ok?
-	return ok;
-}
-static tb_bool_t tb_astream_file_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream && func, tb_false);
-
-	// open it
-	tb_size_t state = tb_astream_file_try_seek(astream, offset)? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR;
-
 	// done func
-	func(astream, state, priv);
+	func(astream, state, offset, priv);
 
 	// ok
 	return tb_true;
@@ -439,14 +411,11 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	astream->base.open 		= tb_astream_file_open;
 	astream->base.read 		= tb_astream_file_read;
 	astream->base.writ 		= tb_astream_file_writ;
-	astream->base.save 		= tb_astream_file_save;
 	astream->base.seek 		= tb_astream_file_seek;
 	astream->base.sync 		= tb_astream_file_sync;
 	astream->base.kill 		= tb_astream_file_kill;
 	astream->base.exit 		= tb_astream_file_exit;
 	astream->base.ctrl 		= tb_astream_file_ctrl;
-	astream->base.try_open 	= tb_astream_file_try_open;
-	astream->base.try_seek 	= tb_astream_file_try_seek;
 	astream->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// ok

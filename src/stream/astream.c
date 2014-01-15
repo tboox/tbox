@@ -37,85 +37,116 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_astream_save_read(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv);
-static tb_bool_t tb_astream_save_writ(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
 	// check
-	tb_astream_storage_t* storage = (tb_astream_storage_t*)priv;
-	tb_assert_and_check_return_val(astream && size && storage && storage->istream && storage->func, tb_false);
-	tb_assert_and_check_return_val(((tb_astream_t*)storage->istream)->read, tb_false);
+	tb_astream_oread_t* oread = (tb_astream_oread_t*)priv;
+	tb_assert_and_check_return_val(astream && astream->read && oread && oread->func, tb_false);
 
-	// trace
-	tb_trace_impl("storage: writ: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
-
-	// ok?
-	if (state == TB_ASTREAM_STATE_OK)
+	// done
+	do
 	{
-		// check
-		tb_assert_and_check_return_val(real, tb_false);
+		// ok? 
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
 
-		// done func
-		if (storage->func(storage->istream, storage->ostream, state, real, storage->priv))
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		
+		// stoped?
+		if (tb_atomic_get(&astream->stoped))
 		{
-			// not finished? continue to writ
-			tb_check_return_val(real == size, tb_true);
-
-			// finished? post read
-			((tb_astream_t*)storage->istream)->read(storage->istream, tb_astream_save_read, storage);
+			state = TB_ASTREAM_STATE_KILLED;
+			break;
 		}
-	}
-	// closed or failed?
-	else 
-	{
-		// done func
-		storage->func(storage->istream, storage->ostream, state, 0, storage->priv);
-	}
 
-	// break
-	return tb_false;
+		// read it
+		if (!astream->read(astream, oread->func, oread->priv)) break;
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) oread->func(astream, state, tb_null, 0, oread->priv);
+
+	// ok
+	return tb_true;
 }
-static tb_bool_t tb_astream_save_read(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
 	// check
-	tb_astream_storage_t* storage = (tb_astream_storage_t*)priv;
-	tb_assert_and_check_return_val(astream && data && storage && storage->ostream && storage->func, tb_false);
-	tb_assert_and_check_return_val(((tb_astream_t*)storage->ostream)->writ, tb_false);
+	tb_astream_owrit_t* owrit = (tb_astream_owrit_t*)priv;
+	tb_assert_and_check_return_val(astream && astream->writ && owrit && owrit->func, tb_false);
 
-	// trace
-	tb_trace_impl("storage: read: size: %lu, state: %s", size, tb_astream_state_cstr(state));
-
-	// ok?
-	if (state == TB_ASTREAM_STATE_OK)
+	// done
+	do
 	{
+		// ok? 
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
+
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		
+		// stoped?
+		if (tb_atomic_get(&astream->stoped))
+		{
+			state = TB_ASTREAM_STATE_KILLED;
+			break;
+		}
+
 		// check
-		tb_assert_and_check_return_val(size, tb_false);
+		tb_assert_and_check_break(owrit->data && owrit->size);
 
-		// post writ
-		((tb_astream_t*)storage->ostream)->writ(storage->ostream, data, size, tb_astream_save_writ, storage);
-	}
-	// closed or failed?
-	else 
-	{
-		// done func
-		storage->func(astream, storage->ostream, state, 0, storage->priv);
-	}
+		// writ it
+		if (!astream->writ(astream, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
 
-	// break
-	return tb_false;
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) owrit->func(astream, state, 0, owrit->size, owrit->priv);
+
+	// ok
+	return tb_true;
 }
-static tb_bool_t tb_astream_save_done(tb_astream_t* astream, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(astream && astream->read && ost && ost->writ && func, tb_false);
+	tb_astream_oseek_t* oseek = (tb_astream_oseek_t*)priv;
+	tb_assert_and_check_return_val(astream && astream->seek && oseek && oseek->func, tb_false);
 
-	// init storage 
-	astream->storage.func = func;
-	astream->storage.priv = priv;
-	astream->storage.istream = astream;
-	astream->storage.ostream = ost;
+	// done
+	do
+	{
+		// ok? 
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
 
-	// post read
-	return astream->read(astream, tb_astream_save_read, &astream->storage);
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		
+		// stoped?
+		if (tb_atomic_get(&astream->stoped))
+		{
+			state = TB_ASTREAM_STATE_KILLED;
+			break;
+		}
+
+		// seek it
+		if (!astream->seek(astream, oseek->offset, oseek->func, oseek->priv)) break;
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) oseek->func(astream, state, 0, oseek->priv);
+
+	// ok
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -270,31 +301,6 @@ tb_bool_t tb_astream_writ_impl(tb_astream_t* astream, tb_byte_t const* data, tb_
 	// writ it
 	return astream->writ(astream, data, size, func, priv);
 }
-tb_bool_t tb_astream_save_impl(tb_astream_t* astream, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv __tb_debug_decl__)
-{
-	// check
-	tb_assert_and_check_return_val(astream && astream->save && ost && func, tb_false);
-	
-	// check state
-	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
-
-	// save debug info
-#ifdef __tb_debug__
-	astream->func = func_;
-	astream->file = file_;
-	astream->line = line_;
-#endif
-
-	// try to save it using the native stream
-	tb_bool_t ok = astream->save(astream, ost, func, priv);
-
-	// save it using stream if no native optimization
-	if (!ok) ok = tb_astream_save_done(astream, ost, func, priv);
-
-	// ok?
-	return ok;
-}
 tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
@@ -333,39 +339,59 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t fun
 	// sync it
 	return astream->sync(astream, func, priv);
 }
-tb_bool_t tb_astream_try_open(tb_astream_t* astream)
+tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
-	tb_assert_and_check_return_val(astream, tb_false);
-	tb_check_return_val(astream->try_open, tb_false);
-	
-	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened) && tb_atomic_get(&astream->stoped), tb_false);
+	tb_assert_and_check_return_val(astream && astream->open && astream->read && func, tb_false);
 
-	// init state
-	tb_atomic_set0(&astream->stoped);
+	// no opened? open it first
+	if (!tb_atomic_get(&astream->opened))
+	{
+		// init open and read
+		astream->open_and.read.func = func;
+		astream->open_and.read.priv = priv;
+		return tb_astream_open_impl(astream, tb_astream_oread_func, &astream->open_and.read __tb_debug_args__);
+	}
 
-	// open it
-	tb_bool_t ok = astream->try_open(astream);
-
-	// post failed?
-	if (!ok) tb_atomic_set(&astream->stoped, 1);
-
-	// ok?
-	return ok;
+	// read it
+	return tb_astream_read_impl(astream, func, priv __tb_debug_args__);
 }
-tb_bool_t tb_astream_try_seek(tb_astream_t* astream, tb_hize_t offset)
+tb_bool_t tb_astream_owrit_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
-	tb_assert_and_check_return_val(astream, tb_false);
-	tb_check_return_val(astream->try_seek, tb_false);
-	
-	// check state
-	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(astream && astream->open && astream->writ && data && size && func, tb_false);
+
+	// no opened? open it first
+	if (!tb_atomic_get(&astream->opened))
+	{
+		// init open and writ
+		astream->open_and.writ.func = func;
+		astream->open_and.writ.priv = priv;
+		astream->open_and.writ.data = data;
+		astream->open_and.writ.size = size;
+		return tb_astream_open_impl(astream, tb_astream_owrit_func, &astream->open_and.writ __tb_debug_args__);
+	}
+
+	// writ it
+	return tb_astream_writ_impl(astream, data, size, func, priv __tb_debug_args__);
+}
+tb_bool_t tb_astream_oseek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(astream && astream->open && astream->seek && func, tb_false);
+
+	// no opened? open it first
+	if (!tb_atomic_get(&astream->opened))
+	{
+		// init open and seek
+		astream->open_and.seek.func = func;
+		astream->open_and.seek.priv = priv;
+		astream->open_and.seek.offset = offset;
+		return tb_astream_open_impl(astream, tb_astream_oseek_func, &astream->open_and.seek __tb_debug_args__);
+	}
 
 	// seek it
-	return astream->try_seek(astream, offset);
+	return tb_astream_seek_impl(astream, offset, func, priv __tb_debug_args__);
 }
 tb_aicp_t* tb_astream_aicp(tb_astream_t* astream)
 {
@@ -432,6 +458,7 @@ tb_char_t const* tb_astream_state_cstr(tb_size_t state)
 	{
 	case TB_ASTREAM_STATE_OK: 					return "ok";
 	case TB_ASTREAM_STATE_CLOSED: 				return "closed";
+	case TB_ASTREAM_STATE_KILLED: 				return "killed";
 	case TB_ASTREAM_STATE_NOT_SUPPORTED: 		return "not supported";
 	case TB_ASTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
 	case TB_ASTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";
