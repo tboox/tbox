@@ -137,6 +137,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		}
 		tb_assert_and_check_break(stream);
 
+#if 0
 		// ctrl stream
 		if (tb_astream_type(stream) == TB_ASTREAM_TYPE_FILE) 
 			tb_astream_ctrl(stream, TB_ASTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
@@ -157,7 +158,8 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		context->base = tb_mclock();
 		context->basc = context->base;
 		context->size = 0;
-		if (!tb_astream_save(ast, stream, tb_demo_istream_save_func, context)) break;
+//		if (!tb_astream_save(ast, stream, tb_demo_istream_save_func, context)) break;
+#endif
 
 		// ok
 		ok = tb_true;

@@ -38,29 +38,35 @@
  */
 
 /// the stream command
-#define TB_ASTREAM_CTRL(type, ctrl) 						(((type) << 16) | (ctrl))
-#define TB_ASTREAM_CTRL_FLTR(type, ctrl) 					TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, (((type) << 8) | (ctrl)))
+#define TB_ASTREAM_CTRL(type, ctrl) 								(((type) << 16) | (ctrl))
+#define TB_ASTREAM_CTRL_FLTR(type, ctrl) 							TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, (((type) << 8) | (ctrl)))
 
 /// the stream state
-#define TB_ASTREAM_STATE(type, state) 						(((type) << 16) | (state))
+#define TB_ASTREAM_STATE(type, state) 								(((type) << 16) | (state))
 
 /// open
-#define tb_astream_open(astream, func, priv) 				tb_astream_open_impl(astream, func, priv __tb_debug_vals__)
+#define tb_astream_open(astream, func, priv) 						tb_astream_open_impl(astream, func, priv __tb_debug_vals__)
 
 /// read
-#define tb_astream_read(astream, func, priv) 				tb_astream_read_impl(astream, func, priv __tb_debug_vals__)
+#define tb_astream_read(astream, func, priv) 						tb_astream_read_impl(astream, func, priv __tb_debug_vals__)
 
 /// writ
-#define tb_astream_writ(astream, data, size, func, priv) 	tb_astream_writ_impl(astream, data, size, func, priv __tb_debug_vals__)
-
-/// save
-#define tb_astream_save(astream, ost, func, priv) 			tb_astream_save_impl(astream, ost, func, priv __tb_debug_vals__)
+#define tb_astream_writ(astream, data, size, func, priv) 			tb_astream_writ_impl(astream, data, size, func, priv __tb_debug_vals__)
 
 /// seek
-#define tb_astream_seek(astream, offset, func, priv) 		tb_astream_seek_impl(astream, offset, func, priv __tb_debug_vals__)
+#define tb_astream_seek(astream, offset, func, priv) 				tb_astream_seek_impl(astream, offset, func, priv __tb_debug_vals__)
 
 /// sync
-#define tb_astream_sync(astream, func, priv) 				tb_astream_sync_impl(astream, func, priv __tb_debug_vals__)
+#define tb_astream_sync(astream, func, priv) 						tb_astream_sync_impl(astream, func, priv __tb_debug_vals__)
+
+/// open and read
+#define tb_astream_oread(astream, func, priv) 						tb_astream_oread_impl(astream, func, priv __tb_debug_vals__)
+
+/// open and writ
+#define tb_astream_owrit(astream, data, size, func, priv) 			tb_astream_owrit_impl(astream, data, size, func, priv __tb_debug_vals__)
+
+/// open and seek
+#define tb_astream_oseek(astream, offset, func, priv) 				tb_astream_oseek_impl(astream, offset, func, priv __tb_debug_vals__)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -126,8 +132,9 @@ typedef enum __tb_astream_state_e
 {
 	TB_ASTREAM_STATE_OK 					= 0
 ,	TB_ASTREAM_STATE_CLOSED 				= 1
-,	TB_ASTREAM_STATE_NOT_SUPPORTED 			= 2
-,	TB_ASTREAM_STATE_UNKNOWN_ERROR 			= 3
+,	TB_ASTREAM_STATE_KILLED 				= 2
+,	TB_ASTREAM_STATE_NOT_SUPPORTED 			= 3
+,	TB_ASTREAM_STATE_UNKNOWN_ERROR 			= 4
 
 ,	TB_ASTREAM_SOCK_STATE_DNS_FAILED 		= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 1)
 ,	TB_ASTREAM_SOCK_STATE_CONNECT_FAILED	= TB_ASTREAM_STATE(TB_ASTREAM_TYPE_SOCK, 2)
@@ -174,27 +181,16 @@ typedef tb_bool_t 			(*tb_astream_read_func_t)(struct __tb_astream_t* astream, t
  */
 typedef tb_bool_t 			(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
-/*! the astream save func type
- *
- * @param astream 			the astream
- * @param ost 				the ostream
- * @param state 			the stream state
- * @param size 				the saved size currently
- * @param priv 				the func private data
- *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
- */
-typedef tb_bool_t 			(*tb_astream_save_func_t)(struct __tb_astream_t* astream, struct __tb_astream_t* ost, tb_size_t state, tb_size_t size, tb_pointer_t priv);
-
 /*! the astream seek func type
  *
  * @param astream 			the astream
  * @param state 			the stream state
+ * @param offset 			the real offset
  * @param priv 				the func private data
  *
  * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
 
 /*! the astream sync func type
  *
@@ -206,22 +202,47 @@ typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, t
  */
 typedef tb_bool_t 			(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
 
-/// the asio stream storage type
-typedef struct __tb_astream_storage_t
+/// the astream open and read type
+typedef struct __tb_astream_oread_t
 {
-	/// the save func
-	tb_astream_save_func_t 	func;
+	// the func
+	tb_astream_read_func_t 	func;
 
-	/// the save func private data
+	// the priv
 	tb_pointer_t 			priv;
 
-	/// the input stream 
-	tb_pointer_t 			istream;
+}tb_astream_oread_t;
 
-	/// the output stream 
-	tb_pointer_t 			ostream;
+/// the astream open and writ type
+typedef struct __tb_astream_owrit_t
+{
+	// the func
+	tb_astream_writ_func_t 	func;
 
-}tb_astream_storage_t;
+	// the priv
+	tb_pointer_t 			priv;
+
+	// the data
+	tb_byte_t const* 		data;
+
+	// the size
+	tb_size_t 				size;
+
+}tb_astream_owrit_t;
+
+/// the astream open and seek type
+typedef struct __tb_astream_oseek_t
+{
+	// the func
+	tb_astream_seek_func_t 	func;
+
+	// the priv
+	tb_pointer_t 			priv;
+
+	// the offset
+	tb_hize_t 				offset;
+
+}tb_astream_oseek_t;
 
 /// the asio stream type
 typedef struct __tb_astream_t
@@ -255,8 +276,14 @@ typedef struct __tb_astream_t
 	tb_size_t 				line;
 #endif
 
-	/// the storage
-	tb_astream_storage_t 	storage;
+	/// the open and read, writ, seek, ...
+	union
+	{
+		tb_astream_oread_t 	read;
+		tb_astream_owrit_t 	writ;
+		tb_astream_oseek_t 	seek;
+
+	} 						open_and;
 
 	/// open
 	tb_bool_t 				(*open)(struct __tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv);
@@ -267,20 +294,11 @@ typedef struct __tb_astream_t
 	/// writ
 	tb_bool_t 				(*writ)(struct __tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
 
-	/// save
-	tb_bool_t 				(*save)(struct __tb_astream_t* astream, struct __tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv);
-
 	/// seek
 	tb_bool_t 				(*seek)(struct __tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
 
 	/// sync
 	tb_bool_t 				(*sync)(struct __tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv);
-
-	/// try to open
-	tb_bool_t 				(*try_open)(struct __tb_astream_t* astream);
-
-	/// try to seek
-	tb_bool_t 				(*try_seek)(struct __tb_astream_t* astream, tb_hize_t offset);
 
 	/// kill
 	tb_void_t 				(*kill)(struct __tb_astream_t* astream);
@@ -413,17 +431,6 @@ tb_bool_t 			tb_astream_read_impl(tb_astream_t* astream, tb_astream_read_func_t 
  */
 tb_bool_t 			tb_astream_writ_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! save the stream
- *
- * @param astream 	the stream
- * @param ost 		the output stream
- * @param func 		the func
- * @param priv 		the func data
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_astream_save_impl(tb_astream_t* astream, tb_astream_t* ost, tb_astream_save_func_t func, tb_pointer_t priv __tb_debug_decl__);
-
 /*! seek the stream
  *
  * @param astream 	the stream
@@ -447,26 +454,38 @@ tb_bool_t 			tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_as
  */
 tb_bool_t 			tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! try to open the stream for file, ... 
- *
- * will be return tb_true immediately if ok
+/*! open and read the stream 
  *
  * @param astream 	the stream
+ * @param func 		the func
+ * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_astream_try_open(tb_astream_t* astream);
+tb_bool_t 			tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! try to seek the stream for file, ...
+/*! open and writ the stream 
  *
- * will be return tb_true immediately if ok
+ * @param astream 	the stream
+ * @param data 		the data
+ * @param size 		the size
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_owrit_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+
+/*! open and seek the stream
  *
  * @param astream 	the stream
  * @param offset 	the offset
+ * @param func 		the func
+ * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_astream_try_seek(tb_astream_t* astream, tb_hize_t offset);
+tb_bool_t 			tb_astream_oseek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
 /*! the stream aicp
  *
