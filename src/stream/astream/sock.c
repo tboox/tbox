@@ -160,6 +160,11 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* a
 			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock);
 			tb_assert_and_check_break(sstream->aico);
 
+			// init timeout
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_CONN, sstream->base.timeout);
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_RECV, sstream->base.timeout);
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_SEND, sstream->base.timeout);
+
 			// port
 			tb_size_t port = tb_url_port_get(&sstream->base.url);
 			tb_assert_and_check_break(port);
