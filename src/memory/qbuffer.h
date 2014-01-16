@@ -175,7 +175,7 @@ tb_long_t 			tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t si
  *
  * @return 			the real size
  */
-tb_long_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t const* data, tb_size_t size);
 
 /*! init pull buffer for reading
  *

@@ -189,7 +189,7 @@ tb_long_t tb_qbuffer_read(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
 	// ok
 	return read;
 }
-tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_qbuffer_writ(tb_qbuffer_t* buffer, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return_val(buffer && data && buffer->maxn, -1);

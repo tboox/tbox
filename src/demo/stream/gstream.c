@@ -52,27 +52,31 @@ static tb_long_t tb_demo_gstream_sfunc_writ(tb_handle_t ssl, tb_byte_t const* da
 	tb_printf("ssl: writ: %lu\n", size);
 	return ssl? tb_socket_send(ssl, data, size) : -1;
 }
-static tb_bool_t tb_demo_gstream_save_func(tb_long_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
 	tb_assert_and_check_return_val(context, tb_false);
-	
-	// print debug info
-	if (context->debug) tb_printf("size: %ld, rate: %lu bytes / s\n", size, rate);
 
-	// print verbose info
-	if (context->verbose) 
+	if (state == TB_GSTREAM_STATE_OK)
 	{
-		if (tb_mclock() - context->base > 1000) 
-		{
-			if (size >= 0) tb_printf("size: %ld bytes, rate: %lu bytes / s\n", size, rate);
-			context->base = tb_mclock();
-		}
-	}
+		// print debug info
+		if (context->debug) tb_printf("size: %ld, rate: %lu bytes / s\n", size, rate);
 
-	// save rate
-	context->rate = rate;
+		// print verbose info
+		if (context->verbose) 
+		{
+			if (tb_mclock() - context->base > 1000) 
+			{
+				if (size >= 0) tb_printf("size: %ld bytes, rate: %lu bytes / s\n", size, rate);
+				context->base = tb_mclock();
+			}
+		}
+
+		// save rate
+		context->rate = rate;
+	}
+	else if (context->verbose) tb_printf("state: %s\n", tb_gstream_state_cstr(state));
 
 	// ok
 	return tb_true;
@@ -266,7 +270,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				if (!tb_gstream_bopen(ist)) 
 				{
 					// print verbose info
-					if (verbose) tb_printf("open: %s\n", tb_gstream_state_cstr(ist));
+					if (verbose) tb_printf("open: %s\n", tb_gstream_state_cstr(tb_gstream_state(ist)));
 					break;
 				}
 
@@ -340,7 +344,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				if ((save = tb_tstream_save_gg(ist, ost, limitrate, tb_demo_gstream_save_func, &context)) < 0) break;
 
 				// print verbose info
-				if (verbose) tb_printf("save: %lld bytes, size: %llu bytes, time: %llu ms, rate: %lu bytes/ s, state: %s\n", save, tb_gstream_size(ist), tb_mclock() - base, context.rate, tb_gstream_state_cstr(ist));
+				if (verbose) tb_printf("save: %lld bytes, size: %llu bytes, time: %llu ms, rate: %lu bytes/ s, state: %s\n", save, tb_gstream_size(ist), tb_mclock() - base, context.rate, tb_gstream_state_cstr(tb_gstream_state(ist)));
 			}
 			else tb_option_help(option);
 		}

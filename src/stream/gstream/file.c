@@ -117,7 +117,7 @@ static tb_long_t tb_gstream_file_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	// read 
 	return tb_file_read(fstream->file, data, size);
 }
-static tb_long_t tb_gstream_file_writ(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_file_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);

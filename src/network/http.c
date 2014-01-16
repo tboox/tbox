@@ -1108,7 +1108,7 @@ tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 	// ok?
 	return r > 0? tb_true : tb_false;
 }
-tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_awrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;
@@ -1153,7 +1153,7 @@ tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// read
 	return tb_gstream_aread(http->stream, data, size);
 }
-tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_http_bwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, tb_false);
@@ -1219,7 +1219,7 @@ tb_bool_t tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// ok?
 	return read == size? tb_true : tb_false;
 }
-tb_long_t tb_http_afwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_http_afwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;
@@ -1251,7 +1251,7 @@ tb_long_t tb_http_afwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// ok?
 	return ok;
 }
-tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_http_bfwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;

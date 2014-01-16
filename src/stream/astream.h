@@ -454,7 +454,7 @@ tb_bool_t 			tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_as
  */
 tb_bool_t 			tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! open and read the stream 
+/*! open and read the stream, open it first if not opened 
  *
  * @param astream 	the stream
  * @param func 		the func
@@ -464,7 +464,7 @@ tb_bool_t 			tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t 
  */
 tb_bool_t 			tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! open and writ the stream 
+/*! open and writ the stream, open it first if not opened 
  *
  * @param astream 	the stream
  * @param data 		the data
@@ -476,7 +476,7 @@ tb_bool_t 			tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t
  */
 tb_bool_t 			tb_astream_owrit_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! open and seek the stream
+/*! open and seek the stream, open it first if not opened 
  *
  * @param astream 	the stream
  * @param offset 	the offset

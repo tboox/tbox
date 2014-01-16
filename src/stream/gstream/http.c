@@ -137,7 +137,7 @@ static tb_long_t tb_gstream_http_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	// ok?
 	return ok;
 }
-static tb_long_t tb_gstream_http_writ(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_http_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
