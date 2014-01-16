@@ -73,6 +73,9 @@ typedef struct __tb_tstream_t
 	// is stoped?
 	tb_atomic_t 			stoped;
 
+	// the seek offset
+	tb_hong_t 				offset;
+
 }tb_tstream_t;
 
 // the tstream aa type
@@ -103,9 +106,193 @@ typedef struct __tb_tstream_ag_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_tstream_istream_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv);
+static tb_bool_t tb_tstream_istream_writ_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
-	return tb_false;
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)priv;
+	tb_assert_and_check_return_val(astream && tstream && tstream->func, tb_false);
+
+	// trace
+	tb_trace_impl("writ: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
+
+	// done
+	tb_bool_t bwrit = tb_false;
+	do
+	{
+		// ok?
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
+
+		// done func, TODO: rate
+		if (!tstream->func(state, real, 0, tstream->priv)) break;
+
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+			
+		// not finished? continue to writ
+		if (real < size) bwrit = tb_true;
+		else
+		{
+			// continue to read it
+			if (!tb_astream_read(tstream->istream, tb_tstream_istream_read_func, tstream)) break;
+		}
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) tstream->func(state, 0, 0, tstream->priv);
+
+	// continue to writ or break it
+	return bwrit;
+}
+static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t size, tb_pointer_t priv)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)priv;
+	tb_assert_and_check_return_val(astream && tstream && tstream->func, tb_false);
+
+	// trace
+	tb_trace_impl("read: size: %lu, state: %s", size, tb_astream_state_cstr(state));
+
+	// done
+	tb_bool_t bread = tb_false;
+	do
+	{
+		// ok?
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
+
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+
+		// check
+		tb_assert_and_check_break(data && size);
+
+		// for astream
+		if (tstream->type == TB_TSTREAM_TYPE_AA)
+		{
+			// check
+			tb_assert_and_check_break(((tb_tstream_aa_t*)tstream)->ostream);
+
+			// writ it
+			if (!tb_astream_writ(((tb_tstream_aa_t*)tstream)->ostream, data, size, tb_tstream_istream_writ_func, tstream)) break;
+		}
+		// for gstream
+		else if (tstream->type == TB_TSTREAM_TYPE_AG)
+		{
+			// check
+			tb_assert_and_check_break(((tb_tstream_ag_t*)tstream)->ostream);
+ 
+			// writ it
+			if (!tb_gstream_bwrit(((tb_tstream_ag_t*)tstream)->ostream, data, size)) break;
+
+			// done func, TODO: rate
+			if (!tstream->func(TB_ASTREAM_STATE_OK, size, 0, tstream->priv)) break;
+
+			// continue to read it
+			bread = tb_true;
+		}
+		else 
+		{
+			tb_assert_and_check_break(0);
+		}
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// closed or failed?
+	if (state != TB_ASTREAM_STATE_OK) 
+	{
+		// flush it
+		if (tstream->type == TB_TSTREAM_TYPE_AG && ((tb_tstream_ag_t*)tstream)->ostream)
+			tb_gstream_bfwrit(((tb_tstream_ag_t*)tstream)->ostream, tb_null, 0);
+
+		// done func
+		tstream->func(state, 0, 0, tstream->priv);
+	}
+
+	// continue to read or break it
+	return bread;
+}
+static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)priv;
+	tb_assert_and_check_return_val(astream && tstream && tstream->func, tb_false);
+
+	// trace
+	tb_trace_impl("seek: offset: %llu, state: %s", offset, tb_astream_state_cstr(state));
+
+	// done
+	do
+	{
+		// ok?
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
+
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+			
+		// read it
+		if (!tb_astream_read(tstream->istream, tb_tstream_istream_read_func, tstream)) break;
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) tstream->func(state, 0, 0, tstream->priv);
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)priv;
+	tb_assert_and_check_return_val(astream && tstream && tstream->func, tb_false);
+
+	// trace
+	tb_trace_impl("open: state: %s", tb_astream_state_cstr(state));
+
+	// done
+	do
+	{
+		// ok?
+		tb_check_break(state == TB_ASTREAM_STATE_OK);
+
+		// reset state
+		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+
+		// check
+		tb_assert_and_check_break(tstream->istream);
+			
+		// need seek?
+		if (tstream->offset >= 0)
+		{
+			// open and seek it
+			if (!tb_astream_oseek(tstream->istream, tstream->offset, tb_tstream_istream_seek_func, tstream)) break;
+		}
+		else
+		{
+			// open and read it
+			if (!tb_astream_oread(tstream->istream, tb_tstream_istream_read_func, tstream)) break;
+		}
+
+		// ok
+		state = TB_ASTREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? done func
+	if (state != TB_ASTREAM_STATE_OK) tstream->func(state, 0, 0, tstream->priv);
+
+	// ok
+	return tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -199,7 +386,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 				}
 
 				// done func
-				if (func) func(real, crate, priv);
+				if (func) func(TB_GSTREAM_STATE_OK, real, crate, priv);
 
 				// wait some time for limit rate
 				if (delay) tb_msleep(delay);
@@ -237,7 +424,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : 0;
 	
 		// done func
-		func(-1, trate, priv);
+		func(TB_GSTREAM_STATE_CLOSED, 0, trate, priv);
 	}
 
 	// ok?
@@ -380,13 +567,91 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_bool_t tb_tstream_start(tb_handle_t handle)
+tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
 	tb_assert_and_check_return_val(tstream, tb_false);
 
-	return tb_false;
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// check
+		tb_assert_and_check_break(tstream->istream);
+
+		// save offset
+		tstream->offset = offset;
+
+		// open it first if has been opened
+		tb_bool_t opened = tb_false;
+		if (tstream->type == TB_TSTREAM_TYPE_AA)
+		{
+			// the ostream
+			tb_astream_t* ostream = ((tb_tstream_aa_t*)tstream)->ostream;
+			tb_assert_and_check_break(ostream);
+
+			// open it first if ostream have been not opened
+			if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) break;
+			if (!opened)
+			{
+				// ctrl file
+				if (tb_astream_type(ostream) == TB_ASTREAM_TYPE_FILE) 
+				{
+					if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) return -1;
+				}
+
+				// open it
+				if (!tb_astream_open(ostream, tb_tstream_ostream_open_func, tstream)) break;
+			}
+		}
+		else if (tstream->type == TB_TSTREAM_TYPE_AG)
+		{
+			// the ostream
+			tb_gstream_t* ostream = ((tb_tstream_ag_t*)tstream)->ostream;
+			tb_assert_and_check_break(ostream);
+
+			// open it first if ostream have been not opened
+			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_IS_OPENED, &opened)) break;
+			if (!opened)
+			{
+				// ctrl file
+				if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
+				{
+					if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) return -1;
+				}
+
+				// open it
+				if (!tb_gstream_bopen(ostream)) break;
+
+				// open ok
+				opened = tb_true;
+			}
+		}
+
+		// opened? seek or read it now
+		if (opened)
+		{
+			// need seek?
+			if (offset >= 0)
+			{
+				// open and seek it
+				if (!tb_astream_oseek(tstream->istream, offset, tb_tstream_istream_seek_func, tstream)) break;
+			}
+			else
+			{
+				// open and read it
+				if (!tb_astream_oread(tstream->istream, tb_tstream_istream_read_func, tstream)) break;
+			}
+		}
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
 }
 tb_void_t tb_tstream_pause(tb_handle_t handle)
 {

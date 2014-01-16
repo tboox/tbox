@@ -191,6 +191,7 @@ typedef enum __tb_gstream_state_e
 	TB_GSTREAM_STATE_OK 					= 0
 ,	TB_GSTREAM_STATE_UNKNOWN_ERROR 			= 1
 ,	TB_GSTREAM_STATE_WAIT_FAILED 			= 2
+,	TB_GSTREAM_STATE_CLOSED 				= 3
 
 ,	TB_GSTREAM_SOCK_STATE_DNS_FAILED 		= TB_GSTREAM_STATE(TB_GSTREAM_TYPE_SOCK, 1)
 ,	TB_GSTREAM_SOCK_STATE_CONNECT_FAILED	= TB_GSTREAM_STATE(TB_GSTREAM_TYPE_SOCK, 2)
@@ -297,7 +298,7 @@ typedef struct __tb_gstream_t
 	tb_long_t 			(*read)(struct __tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	/// writ
-	tb_long_t 			(*writ)(struct __tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+	tb_long_t 			(*writ)(struct __tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync);
 
 	/// seek
 	tb_long_t 			(*seek)(struct __tb_gstream_t* gstream, tb_hize_t offset);
@@ -485,11 +486,11 @@ tb_size_t 			tb_gstream_state(tb_gstream_t* gstream);
 
 /*! the stream state string
  *
- * @param gstream 	the stream
+ * @param state 	the stream state
  *
  * @return 			the stream state string
  */
-tb_char_t const* 	tb_gstream_state_cstr(tb_gstream_t* gstream);
+tb_char_t const* 	tb_gstream_state_cstr(tb_size_t state);
 
 /*! the stream is end?
  *
@@ -555,7 +556,7 @@ tb_long_t 			tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t 
  *
  * @return 			ok: 1, continue: 0, failed: -1
  */
-tb_long_t 			tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
 
 /*! block read
  *
@@ -575,7 +576,7 @@ tb_bool_t 			tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
 
 /*! async flush read
  *
@@ -595,7 +596,7 @@ tb_long_t 			tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t
  *
  * @return 			ok: 1, continue: 0, failed: -1
  */
-tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
+tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
 
 /*! block flush read
  *
@@ -615,7 +616,7 @@ tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
 
 /*! async need
  *

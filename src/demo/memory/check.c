@@ -66,9 +66,9 @@ tb_void_t tb_demo_overlap()
 tb_int_t tb_demo_memory_check_main(tb_int_t argc, tb_char_t** argv)
 {
 	// done 
-	tb_demo_leak();
+//	tb_demo_leak();
 //	tb_demo_free2();
-//	tb_demo_stack();
+	tb_demo_stack();
 //	tb_demo_overflow();
 //	tb_demo_cstring();
 //	tb_demo_overlap();

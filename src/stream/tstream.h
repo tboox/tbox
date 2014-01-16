@@ -37,13 +37,14 @@
 
 /*! the tstream save func type
  *
+ * @param state 	the gstream/astream state
  * @param size 		the saved size currently, finished if size == -1
  * @param rate 		the current rate, bytes/s and will be total rate if size == -1
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_long_t size, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -122,10 +123,11 @@ tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char
 /*! start transfer stream 
  *
  * @param tstream 	the tstream
+ * @param offset 	the offset, seek the given offset if offset >= 0
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_tstream_start(tb_handle_t tstream);
+tb_bool_t 			tb_tstream_start(tb_handle_t tstream, tb_hong_t offset);
 
 /*! pause transfer stream 
  *

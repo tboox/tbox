@@ -93,7 +93,7 @@ static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	dstream->head += size;
 	return (tb_long_t)(size);
 }
-static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream && dstream->data && dstream->head, -1);

@@ -144,7 +144,7 @@ end:
 //	tb_trace_impl("read: %d", read);
 	return read;
 }
-static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	tb_long_t writ = 0;
 	if (gstream->bcached)
@@ -224,7 +224,7 @@ static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gstream, tb_byte_t* data,
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// init 
 	tb_long_t r = -1;
@@ -451,17 +451,15 @@ tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 	// the stream state
 	return gstream->state;
 }
-tb_char_t const* tb_gstream_state_cstr(tb_gstream_t* gstream)
+tb_char_t const* tb_gstream_state_cstr(tb_size_t state)
 {
-	// the state
-	tb_size_t state = tb_gstream_state(gstream);
-	
 	// done
 	switch (state)
 	{
 	case TB_GSTREAM_STATE_OK: 					return "ok";
 	case TB_GSTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
 	case TB_GSTREAM_STATE_WAIT_FAILED: 			return "wait failed";
+	case TB_GSTREAM_STATE_CLOSED: 				return "closed";
 	case TB_GSTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";
 	case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED: 	return "sock: connect: failed";
 	case TB_GSTREAM_SOCK_STATE_SSL_FAILED: 		return "sock: ssl: failed";
@@ -689,7 +687,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	return tb_gstream_cache_aread(gstream, data, size);
 }
 
-tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check data
 	tb_assert_and_check_return_val(data, -1);
@@ -743,7 +741,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	return (read == size? tb_true : tb_false);
 }
 
-tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check data
 	tb_assert_and_check_abort(gstream && data);
@@ -790,7 +788,7 @@ tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 	// flush it
 	return tb_gstream_cache_afread(gstream, data, size);
 }
-tb_long_t tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+tb_long_t tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check stream
 	tb_assert_and_check_return_val(gstream && gstream->bopened, -1);
@@ -858,7 +856,7 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 	// ok
 	return tb_true;
 }
-tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check data
 	tb_assert_and_check_return_val(gstream, tb_false);
