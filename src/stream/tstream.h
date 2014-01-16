@@ -50,18 +50,6 @@ typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_size_t size, tb
  * interfaces
  */
 
-/*! save to astream from gstream, block transfer
- *
- * @param istream 	the istream, open it first if have been not opened
- * @param ostream 	the ostream, open it first if have been not opened
- * @param lrate 	the limit rate and no limit if 0, bytes/s
- * @param func 		the save func and be optional
- * @param priv 		the func private data
- *
- * @return 			the saved size, failed: -1
- */
-tb_hong_t 			tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
-
 /*! save to gstream from gstream, block transfer
  *
  * @param istream 	the istream, open it first if have been not opened
