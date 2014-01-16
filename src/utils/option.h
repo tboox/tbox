@@ -112,7 +112,7 @@ tb_bool_t 				tb_option_find(tb_handle_t option, tb_char_t const* name);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_option_done(tb_handle_t option, tb_size_t argc, tb_char_t const** argv);
+tb_bool_t 				tb_option_done(tb_handle_t option, tb_size_t argc, tb_char_t** argv);
 
 /*! dump option
  *

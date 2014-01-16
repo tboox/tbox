@@ -324,4 +324,7 @@ tb_void_t tb_aicp_kill(tb_aicp_t* aicp)
 		if (aicp->ptor && aicp->ptor->kill) aicp->ptor->kill(aicp->ptor);
 	}
 }
-
+tb_hong_t tb_aicp_time(tb_aicp_t* aicp)
+{
+	return tb_ctime_time();
+}

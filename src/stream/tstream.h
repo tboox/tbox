@@ -38,8 +38,8 @@
 /*! the tstream save func type
  *
  * @param state 	the gstream/astream state
- * @param size 		the saved size currently, finished if size == -1
- * @param rate 		the current rate, bytes/s and will be total rate if size == -1
+ * @param size 		the saved size currently
+ * @param rate 		the current rate, bytes/s
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it
@@ -54,37 +54,37 @@ typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_size_t size, tb
  *
  * @param istream 	the istream, open it first if have been not opened
  * @param ostream 	the ostream, open it first if have been not opened
- * @param rate 		the trasfer rate and no limit if 0, bytes/s
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
  * @param func 		the save func and be optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_hong_t 			tb_tstream_save_ga(tb_gstream_t* istream, tb_astream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! save to gstream from gstream, block transfer
  *
  * @param istream 	the istream, open it first if have been not opened
  * @param ostream 	the ostream, open it first if have been not opened
- * @param rate 		the trasfer rate and no limit if 0, bytes/s
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
  * @param func 		the save func and be optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! save to url from url, block transfer
  *
  * @param iurl 		the input url
  * @param ourl 		the output url
- * @param rate 		the trasfer rate and no limit if 0, bytes/s
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
  * @param func 		the save func and be optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t rate, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from astrean to astream, async transfer
  *

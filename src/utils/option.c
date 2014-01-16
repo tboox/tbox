@@ -231,7 +231,7 @@ tb_bool_t tb_option_find(tb_handle_t handle, tb_char_t const* name)
 	// find it
 	return tb_dictionary_val(option->list, name)? tb_true : tb_false;
 }
-tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** argv)
+tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 {
 	// check
 	tb_option_t* option = (tb_option_t*)handle;
@@ -245,8 +245,8 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** a
 	for (i = 0; i < argc; i++)
 	{
 		// the argument
-		tb_char_t const* p = argv[i];
-		tb_char_t const* e = p + tb_strlen(p);
+		tb_char_t* p = argv[i];
+		tb_char_t* e = p + tb_strlen(p);
 		tb_assert_and_check_return_val(p && p < e, tb_false);
 
 		// is long key?
@@ -261,7 +261,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t const** a
 			}
 
 			// the val
-			tb_char_t const* val = (*p == '=')? (p + 1) : tb_null;
+			tb_char_t* val = (*p == '=')? (p + 1) : tb_null;
 
 			// trace
 			tb_trace_impl("[lname]: %s => %s", key, val);

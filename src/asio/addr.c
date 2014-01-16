@@ -61,6 +61,9 @@ typedef struct __tb_aicp_addr_t
 	// the server list
 	tb_ipv4_t 				list[3];
 
+	// the server size
+	tb_size_t 				size;
+
 	// the data
 	tb_byte_t 				data[TB_DNS_RPKT_MAXN];
 
@@ -500,9 +503,6 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_poin
 		sock = tb_null;
 		aico = tb_null;
 
-		// init list
-		if (!tb_dns_server_get(addr->list)) break;
-
 		// ok
 		ok = tb_true;
 
@@ -581,7 +581,11 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 		return tb_true;
 	}
 
-	// the server 
+	// init server list
+	if (!addr->size) addr->size = tb_dns_server_get(addr->list);
+	tb_check_return_val(addr->size, tb_false);
+
+	// get the server 
 	tb_ipv4_t const* server = &addr->list[addr->indx = 0];
 	tb_assert_and_check_return_val(server->u32, tb_false);
 
