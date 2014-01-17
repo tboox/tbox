@@ -421,14 +421,14 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 
 		// the diff
 		tb_size_t diff = (tb_size_t)((now - timer->btime) / timer->tick);
-		tb_assert_and_check_break(diff < TB_LTIMER_WHEEL_MAXN);
 
 		// trace
 		tb_trace_impl("spak: btime: %lld, wbase: %lu, now: %lld, diff: %lu", timer->btime, timer->wbase, now, diff);
 
 		// walk the expired lists
 		tb_size_t i = 0;
-		for (i = 0; i <= diff; i++)
+		tb_size_t n = tb_min(diff, TB_LTIMER_WHEEL_MAXN - 1);
+		for (i = 0; i <= n; i++)
 		{
 			// the wheel index
 			tb_size_t indx = (timer->wbase + i) & (TB_LTIMER_WHEEL_MAXN - 1);

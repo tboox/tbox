@@ -34,6 +34,8 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 	// done
 	tb_aicp_t* 		aicp = tb_null;
 	tb_handle_t 	tstream = tb_null;
+	tb_astream_t* 	istream = tb_null;
+	tb_gstream_t* 	ostream = tb_null;
 	do
 	{
 		// init aicp
@@ -41,8 +43,13 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(aicp);
 
 		// init tstream
-//		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], tb_demo_tstream_save_func, tb_null);
-		tstream = tb_tstream_init_ag(tb_astream_init_from_url(aicp, argv[1]), tb_gstream_init_from_url(argv[2]), tb_demo_tstream_save_func, tb_null);
+#if 0
+		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], tb_demo_tstream_save_func, tb_null);
+#else
+		istream = tb_astream_init_from_url(aicp, argv[1]);
+		ostream = tb_gstream_init_from_url(argv[2]);
+		tstream = tb_tstream_init_ag(istream, ostream, tb_demo_tstream_save_func, tb_null);
+#endif
 		tb_assert_and_check_break(tstream);
 
 		// init loop
@@ -71,6 +78,14 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 	// exit tstream
 	if (tstream) tb_tstream_exit(tstream);
 	tstream = tb_null;
+
+	// exit istream
+	if (istream) tb_astream_exit(istream);
+	istream = tb_null;
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

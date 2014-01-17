@@ -255,11 +255,15 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			// the time
 			tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
 
+			// save size 
+			tstream->size += size;
+
+			// save size for 1s
+			tstream->size1s += size;
+
 			// < 1s?
 			if (time < tstream->basc + 1000)
 			{
-				// save size
-				tstream->size1s += size;
 			
 				// save current rate if < 1s from base
 				if (time < tstream->base + 1000) tstream->crate = tstream->size1s;
