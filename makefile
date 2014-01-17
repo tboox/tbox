@@ -126,7 +126,7 @@ prefix :
 	make f
 	make p
 
-lipo : 		help
+lipo : help
 clean :
 	make f
 	make c
@@ -187,6 +187,9 @@ DEMO := $(if $(DEMO),$(DEMO),y)
 # profile
 PROF := $(if $(PROF),$(PROF),n)
 
+# zlib
+ZLIB := $(if $(ZLIB),$(ZLIB),n)
+
 # project
 PRO_DIR 	:= ${shell pwd}
 PRO_NAME 	:= ${shell basename ${shell pwd}}
@@ -214,6 +217,7 @@ config : .null
 	@echo "config: arch:     " 							$(ARCH)
 	@echo "config: demo:     " 							$(DEMO)
 	@echo "config: prof:     " 							$(PROF)
+	@echo "config: zlib:     " 							$(ZLIB)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
 	@echo "config: prefix:   " 							$(PREFIX)
@@ -224,42 +228,45 @@ config : .null
 	@echo "config: ==================================================================="
 
 	@echo "# config"                      				> .config.mak
-	@echo "IS_CONFIG = y" 								>> .config.mak
+	@echo "IS_CONFIG =y" 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# project"              						>> .config.mak
-	@echo "PRO_DIR =" $(PRO_DIR) 						>> .config.mak
-	@echo "PRO_NAME =" $(PRO_NAME) 						>> .config.mak
+	@echo "PRO_DIR ="$(PRO_DIR) 						>> .config.mak
+	@echo "PRO_NAME ="$(PRO_NAME) 						>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# profile"              						>> .config.mak
-	@echo "PROF =" $(PROF) 								>> .config.mak
+	@echo "PROF ="$(PROF) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# debug"              						>> .config.mak
-	@echo "DEBUG =" $(DEBUG) 							>> .config.mak
-	@echo "DTYPE =" $(DTYPE) 							>> .config.mak
+	@echo "DEBUG ="$(DEBUG) 							>> .config.mak
+	@echo "DTYPE ="$(DTYPE) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# small"              						>> .config.mak
-	@echo "SMALL =" $(SMALL) 							>> .config.mak
+	@echo "SMALL ="$(SMALL) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# prefix"              						>> .config.mak
-	@echo "PREFIX =" $(PREFIX) 							>> .config.mak
+	@echo "PREFIX ="$(PREFIX) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# platform"      	          				>> .config.mak
-	@echo "PLAT =" $(PLAT) 								>> .config.mak
+	@echo "PLAT ="$(PLAT) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# architecture"                				>> .config.mak
-	@echo "ARCH =" $(ARCH) 								>> .config.mak
+	@echo "ARCH ="$(ARCH) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# demo" 			               				>> .config.mak
-	@echo "DEMO =" $(DEMO) 								>> .config.mak
+	@echo "DEMO ="$(DEMO) 								>> .config.mak
+	@echo ""                              				>> .config.mak
+	@echo "# zlib" 			               				>> .config.mak
+	@echo "ZLIB ="$(ZLIB) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# toolchain"            						>> .config.mak
-	@echo "SDK =" $(SDK) 								>> .config.mak
-	@echo "NDK =" $(NDK) 								>> .config.mak
-	@echo "BIN =" $(BIN) 								>> .config.mak
-	@echo "PRE =" $(PRE) 								>> .config.mak
-	@echo "HOST =" $(HOST) 								>> .config.mak
-	@echo "CCACHE =" $(CCACHE) 							>> .config.mak
-	@echo "DISTCC =" $(DISTCC) 							>> .config.mak
+	@echo "SDK ="$(SDK) 								>> .config.mak
+	@echo "NDK ="$(NDK) 								>> .config.mak
+	@echo "BIN ="$(BIN) 								>> .config.mak
+	@echo "PRE ="$(PRE) 								>> .config.mak
+	@echo "HOST ="$(HOST) 								>> .config.mak
+	@echo "CCACHE ="$(CCACHE) 							>> .config.mak
+	@echo "DISTCC ="$(DISTCC) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# export"									>> .config.mak
 	@echo "export PRO_DIR" 		 						>> .config.mak
@@ -271,6 +278,7 @@ config : .null
 	@echo "export ARCH"					 				>> .config.mak
 	@echo "export PROF"					 				>> .config.mak
 	@echo "export DEMO"					 				>> .config.mak
+	@echo "export ZLIB"					 				>> .config.mak
 	@echo "export SDK" 				 					>> .config.mak
 	@echo "export NDK" 				 					>> .config.mak
 	@echo "export BIN" 				 					>> .config.mak

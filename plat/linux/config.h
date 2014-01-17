@@ -45,9 +45,6 @@
 //#define TB_CONFIG_ASIO_HAVE_KQUEUE
 //#define TB_CONFIG_ASIO_HAVE_NAIO
 
-// third party
-#define TB_CONFIG_THIRD_ZLIB
-
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
 //#define TB_CONFIG_LIBC_HAVE_MEMSET

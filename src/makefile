@@ -180,10 +180,10 @@ tbox_C_FILES 			+= \
 						libm/ilog2i \
 						libm/isqrti \
 
-tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB) += \
+tbox_C_FILES-$(ZLIB) 	+= \
 						zip/zlib \
 						zip/gzip \
-						zip/zlibraw \
+						zip/zlibraw 
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isin \
@@ -258,6 +258,7 @@ tbox_C_FILES 			+= \
 # flags
 tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" 
 tbox_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
+tbox_CXFLAGS-$(ZLIB) 	+= -DTB_CONFIG_ZLIB
 
 # header files
 INC_FILES 				= \
@@ -484,42 +485,7 @@ INC_FILES 				= \
 						libm/fabs.h \
 						libm/round.h \
 						libm/ceil.h \
-						libm/floor.h \
-						third/prefix.h \
-						third/third.h
-
-
-# zlib files
-zlib_C_FILES 			= \
-						adler32 \
-						crc32 \
-						infback \
-						inffast \
-						inflate \
-						inftrees \
-						uncompr \
-						deflate \
-						compress \
-						trees \
-						zutil
-
-zlib_INC_FILES 			= \
-						crc32.h \
-						deflate.h \
-						inffast.h \
-						inffixed.h \
-						inflate.h \
-						inftrees.h \
-						trees.h \
-						zconf.h \
-						zlib.h \
-						zutil.h
-
-zlib_C_FILES 						:= $(addprefix third/zlib/,$(zlib_C_FILES))
-tbox_C_FILES-$(TB_CONFIG_THIRD_ZLIB)+= $(zlib_C_FILES)
-
-zlib_INC_FILES 						:= $(addprefix third/zlib/,$(zlib_INC_FILES))
-INC_FILES-$(TB_CONFIG_THIRD_ZLIB) 	+= $(zlib_INC_FILES)
+						libm/floor.h
 
 # demos
 ifeq ($(DEMO),y)

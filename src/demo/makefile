@@ -97,6 +97,7 @@ demo_C_FILES 			+= \
 
 # libs
 demo_LIBS 				+= tbox $(TB_CONFIG_DEMO_LIBS)
+demo_LIBS-$(ZLIB) 		+= z
 
 # path
 demo_LIB_DIR 			+= ..

@@ -42,7 +42,6 @@ extern "C" {
 #include "string/string.h"
 #include "object/object.h"
 #include "utils/utils.h"
-#include "third/third.h"
 #include "math/math.h"
 #include "libc/libc.h"
 #include "libm/libm.h"
