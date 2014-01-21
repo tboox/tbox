@@ -58,10 +58,10 @@ typedef struct __tb_tstream_t
 	// the istream is owner?
 	tb_bool_t 				iowner;
 
-	// the func
+	// the save func
 	tb_tstream_save_func_t 	func;
 
-	// the priv
+	// the save func priv
 	tb_pointer_t 			priv;
 
 	// is paused?
@@ -573,7 +573,7 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 	// ok?
 	return size;
 }
-tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
+tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv )
 {
 	// done
 	tb_tstream_aa_t* tstream = tb_null;
@@ -600,7 +600,7 @@ tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv)
+tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv )
 {
 	// done
 	tb_tstream_ag_t* tstream = tb_null;
@@ -626,7 +626,7 @@ tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv)
+tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv )
 {
 	// done
 	tb_astream_t* 		istream = tb_null;
@@ -818,30 +818,61 @@ tb_void_t tb_tstream_exit(tb_handle_t handle)
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
 	tb_assert_and_check_return(tstream);
 
+	// trace
+	tb_trace_impl("exit: ..");
+
 	// stop it first if not stoped
 	if (!tb_atomic_get(&tstream->stoped)) 
 	{
 		// stop it
 		tb_tstream_stop(handle);
 
-		// wait some time
-		tb_msleep(200);
 	}
 
 	// exit istream
-	if (tstream->istream && tstream->iowner) tb_astream_exit(tstream->istream);
-	tstream->istream = tb_null;
+	if (tstream->istream)
+	{
+		// wait it
+		tb_size_t tryn = 10;
+		while (tb_astream_pending(tstream->istream) && tryn--) tb_msleep(200);
+		if (tb_astream_pending(tstream->istream))
+		{
+			// trace
+			tb_trace("[tstream]: the istream is pending for func: %s, line: %lu, file: %s", tstream->istream->func, tstream->istream->line, tstream->istream->file);
+		}
+
+		// exit it
+		if (tstream->iowner) tb_astream_exit(tstream->istream);
+		tstream->istream = tb_null;
+	}
 
 	// exit ostream
 	if (tstream->type == TB_TSTREAM_TYPE_AA) 
 	{
-		if (((tb_tstream_aa_t*)tstream)->ostream && ((tb_tstream_aa_t*)tstream)->oowner) 
-			tb_astream_exit(((tb_tstream_aa_t*)tstream)->ostream);
-		((tb_tstream_aa_t*)tstream)->ostream = tb_null;
+		tb_astream_t* ostream = ((tb_tstream_aa_t*)tstream)->ostream;
+		if (ostream)
+		{
+			// wait it
+			tb_size_t tryn = 10;
+			while (tb_astream_pending(ostream) && tryn--) tb_msleep(200);
+			if (tb_astream_pending(ostream))
+			{
+				// trace
+				tb_trace("[tstream]: the ostream is pending for func: %s, line: %lu, file: %s", ostream->func, ostream->line, ostream->file);
+			}
+
+			// exit it
+			if (((tb_tstream_aa_t*)tstream)->oowner) tb_astream_exit(ostream);
+			((tb_tstream_aa_t*)tstream)->ostream = tb_null;
+		}
 	}
 	else if (tstream->type == TB_TSTREAM_TYPE_AG)
 		((tb_tstream_ag_t*)tstream)->ostream = tb_null;
 
 	// exit tstream
 	tb_free(tstream);
+
+	// trace
+	tb_trace_impl("exit: ok");
+
 }

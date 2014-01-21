@@ -83,7 +83,7 @@ tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv );
 
 /*! init transfer stream from astrean to gstream, async transfer
  *
@@ -94,7 +94,7 @@ tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, t
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv );
 
 /*! init transfer stream from url to url, async transfer
  *
@@ -106,7 +106,7 @@ tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, t
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv);
+tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv );
 
 /*! start transfer stream 
  *

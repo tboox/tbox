@@ -101,6 +101,9 @@ typedef struct __tb_aico_t
 	/// is pending, must be zero or one
 	tb_atomic_t 		pending;
 
+	/// is calling
+	tb_atomic_t 		calling;
+
 	/// the timeout for aice
 	tb_atomic_t 		timeout[TB_AICO_TIMEOUT_MAXN];
 
@@ -148,9 +151,14 @@ tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
  */
 tb_handle_t 		tb_aico_init_task(tb_handle_t aicp);
 
+/*! kill the aico
+ *
+ * @param aico 		the aico
+ */
+tb_void_t 			tb_aico_kill(tb_handle_t aico);
+
 /*! exit the aico
  *
- * @param aicp 		the aicp
  * @param aico 		the aico
  */
 tb_void_t 			tb_aico_exit(tb_handle_t aico);

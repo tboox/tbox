@@ -47,6 +47,15 @@ tb_handle_t tb_aico_init_task(tb_handle_t aicp)
 	// addo
 	return tb_aicp_addo(aicp, tb_null, TB_AICO_TYPE_TASK);
 }
+tb_void_t tb_aico_kill(tb_handle_t haico)
+{
+	// check
+	tb_aico_t* aico = (tb_aico_t*)haico;
+	tb_assert_and_check_return(aico && aico->aicp);
+
+	// kilo
+	tb_aicp_kilo(aico->aicp, haico);
+}
 tb_void_t tb_aico_exit(tb_handle_t haico)
 {
 	// check
@@ -127,8 +136,8 @@ tb_bool_t tb_aico_pending(tb_handle_t haico)
 	tb_aico_t* aico = (tb_aico_t*)haico;
 	tb_assert_and_check_return_val(aico, tb_false);
 
-	// is pending?
-	return tb_atomic_get(&aico->pending)? tb_true : tb_false;
+	// calling or pending?
+	return (tb_atomic_get(&aico->calling) || tb_atomic_get(&aico->pending))? tb_true : tb_false;
 }
 tb_long_t tb_aico_timeout(tb_handle_t haico, tb_size_t type)
 {

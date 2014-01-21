@@ -43,7 +43,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(aicp);
 
 		// init tstream
-#if 0
+#if 1
 		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], tb_demo_tstream_save_func, tb_null);
 #else
 		istream = tb_astream_init_from_url(aicp, argv[1]);
