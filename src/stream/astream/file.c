@@ -304,12 +304,8 @@ static tb_void_t tb_astream_file_kill(tb_astream_t* astream)
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
 	tb_assert_and_check_return(fstream);
 
-	// is pending?
-	if (fstream->aico && tb_aico_pending(fstream->aico))
-	{
-		// kill it
-		if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
-	}
+	// kill it
+	if (fstream->aico) tb_aico_kill(fstream->aico);
 }
 static tb_void_t tb_astream_file_exit(tb_astream_t* astream)
 {	
@@ -358,6 +354,14 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
 			*poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
+			return tb_true;
+		}
+	case TB_ASTREAM_CTRL_IS_PENDING:
+		{
+			// is pending?
+			tb_bool_t* ppending = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			tb_assert_and_check_return_val(ppending, tb_false);
+			*ppending = fstream->aico? tb_aico_pending(fstream->aico) : tb_false;
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_FILE_SET_MODE:

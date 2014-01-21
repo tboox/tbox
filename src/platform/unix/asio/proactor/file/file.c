@@ -53,6 +53,10 @@ static tb_bool_t tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico)
 {
 	return tb_true;
 }
+static tb_void_t tb_aicp_file_kilo(tb_handle_t file, tb_aico_t* aico)
+{
+	if (aico && aico->handle) tb_file_exit(aico->handle);
+}
 static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 {
 	// check

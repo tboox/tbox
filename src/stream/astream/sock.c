@@ -357,12 +357,8 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
-	// is pending?
-	if (sstream->aico && tb_aico_pending(sstream->aico))
-	{
-		// kill it
-		if (!sstream->bref && sstream->sock) tb_socket_kill(sstream->sock, TB_SOCKET_KILL_RW);
-	}
+	// kill it
+	if (sstream->aico) tb_aico_kill(sstream->aico);
 }
 static tb_void_t tb_astream_sock_exit(tb_astream_t* astream)
 {	
@@ -396,6 +392,14 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
+	case TB_ASTREAM_CTRL_IS_PENDING:
+		{
+			// is pending?
+			tb_bool_t* ppending = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			tb_assert_and_check_return_val(ppending, tb_false);
+			*ppending = sstream->aico? tb_aico_pending(sstream->aico) : tb_false;
+			return tb_true;
+		}
 	case TB_ASTREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check

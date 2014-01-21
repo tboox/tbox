@@ -215,12 +215,25 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
-	// check pending
-	tb_assert(!tb_aico_pending(aico));
+	// wait pending 
+	tb_size_t tryn = 10;
+	while (tb_aico_pending(aico) && tryn--) tb_msleep(200);
+	if (tb_aico_pending(aico))
+	{
+		// trace
+		tb_trace("[aicp]: the aico is pending for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
+	}
 
 	// delo
-	if (aicp->ptor->delo(aicp->ptor, aico))
-		tb_aicp_aico_exit(aicp, aico);
+	if (aicp->ptor->delo(aicp->ptor, aico)) tb_aicp_aico_exit(aicp, aico);
+}
+tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
+{
+	// check
+	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->kilo && aico);
+
+	// kilo
+	if (tb_atomic_get(&((tb_aico_t*)aico)->pending)) aicp->ptor->kilo(aicp->ptor, aico);
 }
 tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
 {
@@ -287,23 +300,22 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 		tb_size_t pending = tb_atomic_fetch_and_set0(&resp.aico->pending);
 		tb_assert_and_check_continue(pending == 1);
 
+		// calling++
+		tb_atomic_fetch_and_inc(&resp.aico->calling);
+
 		// done aicb
 		if (resp.aicb && !resp.aicb(&resp)) 
 		{
+			// calling--
+			tb_atomic_fetch_and_dec(&resp.aico->calling);
+
 			// exit all loops
 			tb_aicp_kill(aicp);
 			break;
 		}
 
-		// clear debug info
-#ifdef __tb_debug__
-		if (resp.aico)
-		{
-			resp.aico->func = tb_null;
-			resp.aico->file = tb_null;
-			resp.aico->line = 0;
-		}
-#endif
+		// calling--
+		tb_atomic_fetch_and_dec(&resp.aico->calling);
 	}
 
 	// exit loop

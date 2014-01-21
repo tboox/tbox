@@ -107,6 +107,7 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_GET_SIZE 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 6)
 ,	TB_ASTREAM_CTRL_GET_OFFSET 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 7)
 ,	TB_ASTREAM_CTRL_IS_OPENED 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
+,	TB_ASTREAM_CTRL_IS_PENDING 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 9)
 
 ,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 11)
 ,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 12)
@@ -339,11 +340,25 @@ tb_astream_t* 		tb_astream_init_sock(tb_aicp_t* aicp);
  */
 tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp);
 
+/*! kill stream
+ *
+ * @param astream 	the stream
+ */
+tb_void_t 			tb_astream_kill(tb_astream_t* astream);
+
 /*! exit stream
  *
  * @param astream 	the stream
  */
 tb_void_t 			tb_astream_exit(tb_astream_t* astream);
+
+/*! the stream is pending?
+ *
+ * @param astream 	the stream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_pending(tb_astream_t* astream);
 
 /*! init stream from url
  *
@@ -392,12 +407,6 @@ tb_astream_t* 		tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host
  * @return 			the stream
  */
 tb_astream_t* 		tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
-
-/*! kill stream
- *
- * @param astream 	the stream
- */
-tb_void_t 			tb_astream_kill(tb_astream_t* astream);
 
 /*! open the stream 
  *

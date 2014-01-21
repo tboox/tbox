@@ -1713,6 +1713,35 @@ static tb_bool_t tb_aicp_proactor_iocp_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// ok
 	return tb_true;
 }
+static tb_void_t tb_aicp_proactor_iocp_kilo(tb_aicp_proactor_t* proactor, tb_aico_t* aico)
+{
+	// check
+	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
+	tb_assert_and_check_return(ptor && aico);
+		
+	// kill
+	switch (aico->type)
+	{
+	case TB_AICO_TYPE_SOCK:
+		{
+			// sock: kill
+			if (aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
+		}
+		break;
+	case TB_AICO_TYPE_FILE:
+		{
+			// file: kill
+			if (aico->handle) tb_file_exit(aico->handle);
+		}
+		break;
+	case TB_AICO_TYPE_TASK:
+		{
+		}
+		break;
+	default:
+		break;
+	}
+}
 static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
@@ -2027,6 +2056,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->base.exit 		= tb_aicp_proactor_iocp_exit;
 	ptor->base.addo 		= tb_aicp_proactor_iocp_addo;
 	ptor->base.delo 		= tb_aicp_proactor_iocp_delo;
+	ptor->base.kilo 		= tb_aicp_proactor_iocp_kilo;
 	ptor->base.post 		= tb_aicp_proactor_iocp_post;
 	ptor->base.loop_init 	= tb_aicp_proactor_iocp_loop_init;
 	ptor->base.loop_exit 	= tb_aicp_proactor_iocp_loop_exit;
