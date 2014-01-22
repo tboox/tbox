@@ -157,24 +157,6 @@ tb_void_t tb_aico_timeout_set(tb_handle_t haico, tb_size_t type, tb_long_t timeo
 	// set the aico timeout
 	tb_atomic_set((tb_atomic_t*)(aico->timeout + type), (tb_atomic_t)timeout);
 }
-tb_bool_t tb_aico_addr_impl(tb_handle_t haico, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__)
-{
-	// check
-	tb_aico_t* aico = (tb_aico_t*)haico;
-	tb_assert_and_check_return_val(aico && aico->aicp && host, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_ADDR;
-	aice.state 				= TB_AICE_STATE_PENDING;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.addr.host 		= host;
-
-	// post
-	return tb_aicp_post_impl(aico->aicp, &aice __tb_debug_args__);
-} 
 tb_bool_t tb_aico_acpt_impl(tb_handle_t haico, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__)
 {
 	// check
@@ -488,24 +470,6 @@ tb_bool_t tb_aico_fsync_impl(tb_handle_t haico, tb_aicb_t aicb_func, tb_pointer_
 	// post
 	return tb_aicp_post_impl(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_addr_after_impl(tb_handle_t haico, tb_size_t delay, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__)
-{
-	// check
-	tb_aico_t* aico = (tb_aico_t*)haico;
-	tb_assert_and_check_return_val(aico && aico->aicp && host, tb_false);
-
-	// init
-	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_ADDR;
-	aice.state 				= TB_AICE_STATE_PENDING;
-	aice.aicb 				= aicb_func;
-	aice.data 				= aicb_data;
-	aice.aico 				= aico;
-	aice.u.addr.host 		= host;
-
-	// post
-	return tb_aicp_post_after_impl(aico->aicp, delay, &aice __tb_debug_args__);
-} 
 tb_bool_t tb_aico_acpt_after_impl(tb_handle_t haico, tb_size_t delay, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__)
 {
 	// check

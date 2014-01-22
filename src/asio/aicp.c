@@ -118,18 +118,23 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 		if (!tb_aicp_post_impl(aicp, posted_aice))
 #endif
 		{
+			// not posted
 			posted = tb_false;
+
+			// failed
 			posted_aice->state = TB_AICE_STATE_FAILED;
 		}
 	}
 	// failed?
 	else 
 	{
+		// not posted
 		posted = tb_false;
 
-		// save state
-		if (tb_atomic_get(&aicp->kill))
+		// killed?
+		if (tb_atomic_get(&aicp->kill) || tb_atomic_get(&aice->aico->killed))
 			posted_aice->state = TB_AICE_STATE_KILLED;
+		// other error state
 		else posted_aice->state = aice->state;
 	}
 
@@ -292,8 +297,15 @@ tb_void_t tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->kilo && aico);
 
-	// kilo
-	if (tb_atomic_get(&((tb_aico_t*)aico)->pending)) aicp->ptor->kilo(aicp->ptor, aico);
+	// pending and not killed? kill it
+	if (tb_atomic_get(&((tb_aico_t*)aico)->pending) && !tb_atomic_get(&((tb_aico_t*)aico)->killed)) 
+	{
+		// killed
+		tb_atomic_set(&((tb_aico_t*)aico)->killed, 1);
+
+		// kill it
+		aicp->ptor->kilo(aicp->ptor, aico);
+	}
 }
 tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__)
 {

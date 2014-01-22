@@ -122,7 +122,6 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	{
 		TB_AIOE_CODE_NONE
 
-	, 	TB_AIOE_CODE_NONE 			//< addr
 	, 	TB_AIOE_CODE_ACPT 			//< acpt
 	, 	TB_AIOE_CODE_CONN 			//< conn
 	, 	TB_AIOE_CODE_RECV 			//< recv
@@ -428,19 +427,6 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 
 	// ok?
 	return ok;
-}
-static tb_long_t tb_aiop_spak_addr(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
-{
-	// check
-	tb_assert_and_check_return_val(ptor && aice, -1);
-	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_ADDR, -1);
-
-	// the aico
-	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
-	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// ok
-	return 1;
 }
 static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
@@ -1190,7 +1176,6 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 			{
 				tb_null
 
-			,	tb_aiop_spak_addr
 			,	tb_aiop_spak_acpt
 			,	tb_aiop_spak_conn
 			,	tb_aiop_spak_recv
