@@ -40,6 +40,7 @@ tb_char_t const* tb_aice_state_cstr(tb_aice_t const* aice)
 	{
 	 	"ok"
 	, 	"failed"
+	, 	"killed"
 	, 	"closed"
 	, 	"pending"
 	, 	"timeout"

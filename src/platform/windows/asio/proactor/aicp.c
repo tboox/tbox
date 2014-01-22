@@ -1895,13 +1895,13 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 
 	// is the timer loop? 
 	tb_bool_t btimer = (!self || (self == loop->self))? tb_true : tb_false;
+		
+	// spak ctime
+	tb_ctime_spak();
 
 	// is the timer loop? spak timer
 	if (btimer)
 	{
-		// spak ctime
-		tb_ctime_spak();
-
 		// spak timer
 		if (!tb_ltimer_spak(ptor->timer)) return -1;
 

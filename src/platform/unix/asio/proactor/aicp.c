@@ -195,69 +195,6 @@ static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 	// post wait
 	if (value >= 0 && value < work) tb_semaphore_post(ptor->wait, work - value);
 }
-static tb_void_t tb_aiop_spak_timeout(tb_pointer_t data)
-{
-	// the aico
-	tb_aiop_aico_t* aico = data;
-	tb_assert_and_check_return(aico && aico->wait);
-
-	// the ptor
-	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
-	tb_assert_and_check_return(ptor && ptor->aiop);
-
-	// for sock
-	if (aico->base.type == TB_AICO_TYPE_SOCK)
-	{
-		// check
-		tb_assert_and_check_return(aico->aioo);
-
-		// delo aioo
-		tb_aiop_delo(ptor->aiop, aico->aioo);
-		aico->aioo = tb_null;
-	}
-
-	// the priority
-	tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
-	tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
-
-	// enter 
-	tb_spinlock_enter(&ptor->lock);
-
-	// trace
-	tb_trace_impl("timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
-
-	// spak aice
-	tb_bool_t ok = tb_false;
-	if (!tb_queue_full(ptor->spak[priority])) 
-	{
-		// save state
-		switch (aico->base.type)
-		{
-		case TB_AICO_TYPE_SOCK:
-			aico->aice.state = TB_AICE_STATE_TIMEOUT;
-			break;
-		case TB_AICO_TYPE_TASK:
-			aico->aice.state = TB_AICE_STATE_OK;
-			break;
-		default:
-			tb_assert(0);
-			break;
-		}
-
-		// put it
-		tb_queue_put(ptor->spak[priority], &aico->aice);
-
-		// ok
-		ok = tb_true;
-	}
-	else tb_assert(0);
-
-	// leave 
-	tb_spinlock_leave(&ptor->lock);
-
-	// work it
-	if (ok) tb_aiop_spak_work(ptor);
-}
 static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 {
 	// check
@@ -373,6 +310,58 @@ end:
 	tb_thread_return(tb_null);
 	return tb_null;
 }
+static tb_void_t tb_aiop_spak_wait_timeout(tb_pointer_t data)
+{
+	// the aico
+	tb_aiop_aico_t* aico = data;
+	tb_assert_and_check_return(aico && aico->wait);
+
+	// the ptor
+	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
+	tb_assert_and_check_return(ptor && ptor->aiop);
+
+	// for sock
+	if (aico->base.type == TB_AICO_TYPE_SOCK)
+	{
+		// check
+		tb_assert_and_check_return(aico->aioo);
+
+		// delo aioo
+		tb_aiop_delo(ptor->aiop, aico->aioo);
+		aico->aioo = tb_null;
+	}
+
+	// the priority
+	tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
+	tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
+
+	// enter 
+	tb_spinlock_enter(&ptor->lock);
+
+	// trace
+	tb_trace_impl("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+
+	// spak aice
+	tb_bool_t ok = tb_false;
+	if (!tb_queue_full(ptor->spak[priority])) 
+	{
+		// save state
+		aico->aice.state = TB_AICE_STATE_TIMEOUT;
+
+		// put it
+		tb_queue_put(ptor->spak[priority], &aico->aice);
+
+		// ok
+		ok = tb_true;
+	}
+	else tb_assert(0);
+
+	// leave 
+	tb_spinlock_leave(&ptor->lock);
+
+	// work it
+	if (ok) tb_aiop_spak_work(ptor);
+}
 static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
@@ -418,7 +407,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		if (timeout >= 0)
 		{
 			if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-			aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_aiop_spak_timeout, aico);
+			aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
 		}
 
 		// ok
@@ -1081,6 +1070,47 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	// ok
 	return 1;
 }
+static tb_void_t tb_aiop_spak_runtask_timeout(tb_pointer_t data)
+{
+	// the aico
+	tb_aiop_aico_t* aico = data;
+	tb_assert_and_check_return(aico && aico->wait);
+
+	// the ptor
+	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
+	tb_assert_and_check_return(ptor && ptor->aiop);
+
+	// the priority
+	tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
+	tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
+
+	// enter 
+	tb_spinlock_enter(&ptor->lock);
+
+	// trace
+	tb_trace_impl("runtask: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+
+	// spak aice
+	tb_bool_t ok = tb_false;
+	if (!tb_queue_full(ptor->spak[priority])) 
+	{
+		// save state
+		aico->aice.state = TB_AICE_STATE_OK;
+
+		// put it
+		tb_queue_put(ptor->spak[priority], &aico->aice);
+
+		// ok
+		ok = tb_true;
+	}
+	else tb_assert(0);
+
+	// leave 
+	tb_spinlock_leave(&ptor->lock);
+
+	// work it
+	if (ok) tb_aiop_spak_work(ptor);
+}
 static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
@@ -1130,7 +1160,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 
 		// add timeout task
 		if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-		aico->task = tb_ltimer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_timeout, aico);
+		aico->task = tb_ltimer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
 
 		// wait
 		ok = 0;
@@ -1266,6 +1296,10 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 	// the aiop aico
 	tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
 	aiop_aico->ptor = tb_null;
+			
+	// exit the timeout task
+	if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
+	aiop_aico->task = tb_null;
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -1273,10 +1307,6 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 	{
 	case TB_AICO_TYPE_SOCK:
 		{
-			// del the timeout task
-			if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
-			aiop_aico->task = tb_null;
-
 			// delo
 			if (aiop_aico->aioo) tb_aiop_delo(ptor->aiop, aiop_aico->aioo);
 			aiop_aico->aioo = tb_null;
@@ -1296,10 +1326,6 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 		break;
 	case TB_AICO_TYPE_TASK:
 		{
-			// del the timeout task
-			if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
-			aiop_aico->task = tb_null;
-
 			// ok
 			ok = tb_true;
 		}
@@ -1496,6 +1522,9 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->spak[0] && ptor->spak[1] && resp, -1);
+
+	// spak ctime
+	tb_ctime_spak();
 
 	// enter 
 	tb_spinlock_enter(&ptor->lock);
