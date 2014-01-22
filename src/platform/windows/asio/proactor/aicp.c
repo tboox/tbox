@@ -127,6 +127,7 @@ typedef struct __tb_iocp_loop_t
  * declaration
  */
 static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data);
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * post
@@ -150,28 +151,6 @@ static tb_void_t tb_iocp_post_timeout(tb_aicp_proactor_t* proactor, tb_iocp_aico
 		// add the new task
 		aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_iocp_spak_timeout, aico);
 	}
-}
-static tb_bool_t tb_iocp_post_addr(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
-{	
-	// check
-	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
-
-	// check aice
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ADDR, tb_false);
-	
-	// the aico
-	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
-	tb_assert_and_check_return_val(aico && aico->base.handle, tb_false);
-
-	// init olap
-	tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-
-	// init aice
-	aico->olap.aice = *aice;
-
-	// spak it directly
-	return PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)? tb_true : tb_false;  
 }
 static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
@@ -1285,7 +1264,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 
 		// add timeout task
 		if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-		aico->task = tb_ltimer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_iocp_spak_timeout, aico);
+		aico->task = tb_ltimer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_iocp_spak_runtask_timeout, aico);
 
 		// pending
 		return tb_true;
@@ -1320,7 +1299,7 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 			tb_assert_and_check_break(aico->base.handle);
 
 			// trace
-			tb_trace_impl("timeout[%p]: code: %lu", aico->base.handle, aico->olap.aice.code);
+			tb_trace_impl("spak: timeout[%p]: code: %lu", aico->base.handle, aico->olap.aice.code);
 
 			// save state: timeout
 			aico->olap.aice.state = TB_AICE_STATE_TIMEOUT;
@@ -1344,24 +1323,27 @@ static tb_void_t tb_iocp_spak_timeout(tb_pointer_t data)
 			}
 		}
 		break;
-	case TB_AICO_TYPE_TASK:
-		{
-			// trace
-			tb_trace_impl("task: when: %llu: ok", aico->olap.aice.u.runtask.when);
-
-			// post ok
-			aico->olap.aice.state = TB_AICE_STATE_OK;
-			if (!PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap))
-			{
-				// failed
-				tb_assert_and_check_break(0);
-			}
-		}
-		break;
 	default:
 		tb_assert(0);
 		break;
 	}
+}
+static tb_void_t tb_iocp_spak_runtask_timeout(tb_pointer_t data)
+{
+	// the aico
+	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)data;
+	tb_assert_and_check_return(aico);
+
+	// the ptor
+	tb_aicp_proactor_iocp_t* ptor = aico->ptor;
+	tb_assert_and_check_return(ptor);
+
+	// trace
+	tb_trace_impl("runtask: timeout: when: %llu", aico->olap.aice.u.runtask.when);
+
+	// post ok
+	aico->olap.aice.state = TB_AICE_STATE_OK;
+	PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap);
 }
 static tb_long_t tb_iocp_spak_addr(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
 {
@@ -1627,7 +1609,6 @@ static tb_long_t tb_iocp_spak_resp(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	static tb_bool_t (*s_spak[])(tb_aicp_proactor_iocp_t* , tb_aice_t* , tb_size_t , tb_size_t ) = 
 	{
 		tb_null
-	,	tb_iocp_spak_addr
 	,	tb_iocp_spak_acpt
 	,	tb_iocp_spak_conn
 	,	tb_iocp_spak_iorw
@@ -1752,7 +1733,6 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	static tb_bool_t (*s_post[])(tb_aicp_proactor_t* , tb_aice_t const*) = 
 	{
 		tb_null
-	,	tb_iocp_post_addr
 	,	tb_iocp_post_acpt
 	,	tb_iocp_post_conn
 	,	tb_iocp_post_recv

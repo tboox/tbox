@@ -34,7 +34,6 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define tb_aico_addr(aico, host, aicb_func, aicb_data) 										tb_aico_addr_impl(aico, host, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_acpt(aico, aicb_func, aicb_data) 											tb_aico_acpt_impl(aico, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_conn(aico, addr, port, aicb_func, aicb_data) 								tb_aico_conn_impl(aico, addr, port, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_recv(aico, data, size, aicb_func, aicb_data) 								tb_aico_recv_impl(aico, data, size, aicb_func, aicb_data __tb_debug_vals__)
@@ -52,7 +51,6 @@
 #define tb_aico_writv(aico, seek, list, size, aicb_func, aicb_data) 						tb_aico_writv_impl(aico, seek, list, size, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_fsync(aico, aicb_func, aicb_data) 											tb_aico_fsync_impl(aico, aicb_func, aicb_data __tb_debug_vals__)
 
-#define tb_aico_addr_after(aico, delay, host, aicb_func, aicb_data) 						tb_aico_addr_after_impl(aico, delay, host, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_acpt_after(aico, delay, aicb_func, aicb_data) 								tb_aico_acpt_after_impl(aico, delay, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_conn_after(aico, delay, addr, port, aicb_func, aicb_data) 					tb_aico_conn_after_impl(aico, delay, addr, port, aicb_func, aicb_data __tb_debug_vals__)
 #define tb_aico_recv_after(aico, delay, data, size, aicb_func, aicb_data) 					tb_aico_recv_after_impl(aico, delay, data, size, aicb_func, aicb_data __tb_debug_vals__)
@@ -118,10 +116,13 @@ typedef struct __tb_aico_t
 	/// the handle
 	tb_handle_t 		handle;
 
-	/// is pending, must be zero or one
+	/// is killed?
+	tb_atomic_t 		killed;
+
+	/// is pending? must be zero or one
 	tb_atomic_t 		pending;
 
-	/// is calling
+	/// is calling?
 	tb_atomic_t 		calling;
 
 	/// the timeout for aice
@@ -265,17 +266,6 @@ tb_long_t 			tb_aico_timeout(tb_handle_t aico, tb_size_t type);
  * @param timeout 	the timeout
  */
 tb_void_t 			tb_aico_timeout_set(tb_handle_t aico, tb_size_t type, tb_long_t timeout);
-
-/*! post the addr
- *
- * @param aico 		the aico
- * @param host 		the host
- * @param aicb_func the callback func
- * @param aicb_data the callback data
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aico_addr_impl(tb_handle_t aico, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__);
 
 /*! post the acpt
  *
@@ -477,18 +467,6 @@ tb_bool_t 			tb_aico_writv_impl(tb_handle_t aico, tb_hize_t seek, tb_iovec_t con
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aico_fsync_impl(tb_handle_t aico, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__);
-
-/*! post the addr after the delay time
- *
- * @param aico 		the aico
- * @param delay		the delay time, ms
- * @param host 		the host
- * @param aicb_func the callback func
- * @param aicb_data the callback data
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aico_addr_after_impl(tb_handle_t aico, tb_size_t delay, tb_char_t const* host, tb_aicb_t aicb_func, tb_pointer_t aicb_data __tb_debug_decl__);
 
 /*! post the acpt after the delay time
  *
@@ -730,7 +708,6 @@ static __tb_inline__ tb_long_t tb_aico_timeout_from_code(tb_handle_t aico, tb_si
 	{
 		-1
 
-	, 	-1
 	, 	TB_AICO_TIMEOUT_ACPT
 	, 	TB_AICO_TIMEOUT_CONN
 	, 	TB_AICO_TIMEOUT_RECV

@@ -41,28 +41,27 @@ typedef enum __tb_aice_code_e
 {
  	TB_AICE_CODE_NONE 			= 0
 
-, 	TB_AICE_CODE_ADDR 			= 1 	//!< for sock, get the host address from name
-, 	TB_AICE_CODE_ACPT 			= 2 	//!< for sock, accept it
-, 	TB_AICE_CODE_CONN 			= 3 	//!< for sock, connect to the host address
-,	TB_AICE_CODE_RECV 			= 4		//!< for sock, recv data for tcp
-,	TB_AICE_CODE_SEND 			= 5		//!< for sock, send data for tcp
-,	TB_AICE_CODE_URECV 			= 6		//!< for sock, recv data for udp
-,	TB_AICE_CODE_USEND 			= 7		//!< for sock, send data for udp
-,	TB_AICE_CODE_RECVV 			= 8		//!< for sock, recv iovec data for tcp
-,	TB_AICE_CODE_SENDV 			= 9		//!< for sock, send iovec data for tcp
-,	TB_AICE_CODE_URECVV 		= 10	//!< for sock, recv iovec data for udp
-,	TB_AICE_CODE_USENDV 		= 11	//!< for sock, send iovec data for udp
-,	TB_AICE_CODE_SENDFILE 		= 12	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+, 	TB_AICE_CODE_ACPT 			= 1 	//!< for sock, accept it
+, 	TB_AICE_CODE_CONN 			= 2 	//!< for sock, connect to the host address
+,	TB_AICE_CODE_RECV 			= 3		//!< for sock, recv data for tcp
+,	TB_AICE_CODE_SEND 			= 4		//!< for sock, send data for tcp
+,	TB_AICE_CODE_URECV 			= 5		//!< for sock, recv data for udp
+,	TB_AICE_CODE_USEND 			= 6		//!< for sock, send data for udp
+,	TB_AICE_CODE_RECVV 			= 7		//!< for sock, recv iovec data for tcp
+,	TB_AICE_CODE_SENDV 			= 8		//!< for sock, send iovec data for tcp
+,	TB_AICE_CODE_URECVV 		= 9		//!< for sock, recv iovec data for udp
+,	TB_AICE_CODE_USENDV 		= 10	//!< for sock, send iovec data for udp
+,	TB_AICE_CODE_SENDFILE 		= 11	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
-,	TB_AICE_CODE_READ 			= 13	//!< for file, read data
-,	TB_AICE_CODE_WRIT 			= 14	//!< for file, writ data
-,	TB_AICE_CODE_READV 			= 15	//!< for file, read iovec data
-,	TB_AICE_CODE_WRITV 			= 16	//!< for file, writ iovec data
-,	TB_AICE_CODE_FSYNC 			= 17	//!< for file, flush data to file
+,	TB_AICE_CODE_READ 			= 12	//!< for file, read data
+,	TB_AICE_CODE_WRIT 			= 13	//!< for file, writ data
+,	TB_AICE_CODE_READV 			= 14	//!< for file, read iovec data
+,	TB_AICE_CODE_WRITV 			= 15	//!< for file, writ iovec data
+,	TB_AICE_CODE_FSYNC 			= 16	//!< for file, flush data to file
 
-,	TB_AICE_CODE_RUNTASK 		= 18	//!< for task or sock or file, run task with the given delay
+,	TB_AICE_CODE_RUNTASK 		= 17	//!< for task or sock or file, run task with the given delay
 
-, 	TB_AICE_CODE_MAXN 			= 19
+, 	TB_AICE_CODE_MAXN 			= 18
 
 }tb_aice_code_e;
 
