@@ -38,7 +38,8 @@
  */
 
 /// post
-#define tb_aicp_post(aicp, aice) 	tb_aicp_post_impl(aicp, aice __tb_debug_vals__)
+#define tb_aicp_post(aicp, aice) 				tb_aicp_post_impl(aicp, aice __tb_debug_vals__)
+#define tb_aicp_post_after(aicp, delay, aice) 	tb_aicp_post_after_impl(aicp, delay, aice __tb_debug_vals__)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -237,6 +238,16 @@ tb_void_t 			tb_aicp_kilo(tb_aicp_t* aicp, tb_handle_t aico);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_decl__);
+
+/*! post the aice 
+ *
+ * @param aicp 		the aicp
+ * @param delay 	the delay time, ms
+ * @param aice 		the aice 
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__);
 
 /*! loop aicp for the external thread
  *

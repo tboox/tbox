@@ -60,7 +60,7 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_WRITV 			= 16	//!< for file, writ iovec data
 ,	TB_AICE_CODE_FSYNC 			= 17	//!< for file, flush data to file
 
-,	TB_AICE_CODE_RUNTASK 		= 18	//!< for task, run task with the given delay
+,	TB_AICE_CODE_RUNTASK 		= 18	//!< for task or sock or file, run task with the given delay
 
 , 	TB_AICE_CODE_MAXN 			= 19
 
@@ -71,10 +71,11 @@ typedef enum __tb_aice_state_e
 {
  	TB_AICE_STATE_OK 			= 0
 , 	TB_AICE_STATE_FAILED 		= 1
-,	TB_AICE_STATE_CLOSED 		= 2
-, 	TB_AICE_STATE_PENDING 		= 3
-,	TB_AICE_STATE_TIMEOUT 		= 4
-,	TB_AICE_STATE_NOTSUPPORTED 	= 5
+, 	TB_AICE_STATE_KILLED 		= 2
+,	TB_AICE_STATE_CLOSED 		= 3
+, 	TB_AICE_STATE_PENDING 		= 4
+,	TB_AICE_STATE_TIMEOUT 		= 5
+,	TB_AICE_STATE_NOTSUPPORTED 	= 6
 
 }tb_aice_state_e;
 

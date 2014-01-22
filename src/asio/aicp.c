@@ -93,6 +93,66 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
 	// leave 
 	tb_spinlock_leave(&aicp->lock);
 }
+static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
+	// the posted aice
+	tb_aice_t* posted_aice = (tb_aice_t*)aice->data;
+	tb_assert_and_check_return_val(posted_aice, tb_false);
+
+	// the aicp
+	tb_aicp_t* aicp = (tb_aicp_t*)tb_aico_aicp(aice->aico);
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
+
+	// ok?
+	tb_bool_t ok = tb_true;
+	tb_bool_t posted = tb_true;
+	if (aice->state == TB_AICE_STATE_OK)
+	{
+		// post it	
+#ifdef __tb_debug__
+		if (!tb_aicp_post_impl(aicp, posted_aice, aice->aico->func, aice->aico->line, aice->aico->file))
+#else
+		if (!tb_aicp_post_impl(aicp, posted_aice))
+#endif
+		{
+			posted = tb_false;
+			posted_aice->state = TB_AICE_STATE_FAILED;
+		}
+	}
+	// failed?
+	else 
+	{
+		posted = tb_false;
+
+		// save state
+		if (tb_atomic_get(&aicp->kill))
+			posted_aice->state = TB_AICE_STATE_KILLED;
+		else posted_aice->state = aice->state;
+	}
+
+	// not posted? done aicb now
+	if (!posted)
+	{
+		// calling++
+		tb_atomic_fetch_and_inc(&aice->aico->calling);
+
+		// done aicb
+		if (posted_aice->aicb && !posted_aice->aicb(posted_aice)) ok = tb_false;
+
+		// calling--
+		tb_atomic_fetch_and_dec(&aice->aico->calling);
+	}
+
+	// exit the posted aice
+	tb_aico_pool_free(aice->aico, posted_aice);
+
+	// ok?
+	return ok;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -221,7 +281,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	if (tb_aico_pending(aico))
 	{
 		// trace
-		tb_trace("[aicp]: the aico is pending for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
+		tb_trace("[aicp]: delo failed, the aico is pending for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
 	}
 
 	// delo
@@ -243,7 +303,12 @@ tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_de
 
 	// is pending?
 	tb_size_t pending = tb_atomic_fetch_and_inc(&aice->aico->pending);
-	tb_assert_and_check_return_val(!pending, tb_false);
+	if (pending)
+	{
+		// trace
+		tb_trace("[aicp]: post aice[%lu] failed, the aico is pending for func: %s, line: %lu, file: %s", aice->code, func_, line_, file_);
+		return tb_false;
+	}
 
 	// save debug info
 #ifdef __tb_debug__
@@ -257,6 +322,25 @@ tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_de
 
 	// post aice
 	return aicp->ptor->post(aicp->ptor, aice);
+}
+tb_bool_t tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t const* aice __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(aicp && aicp->ptor && aicp->ptor->post, tb_false);
+	tb_assert_and_check_return_val(aice && aice->aico, tb_false);
+
+	// no delay?
+	if (!delay) return tb_aicp_post_impl(aicp, aice __tb_debug_args__);
+
+	// make the posted aice
+	tb_aice_t* posted_aice = (tb_aice_t*)tb_aico_pool_malloc0(aice->aico, sizeof(tb_aice_t));
+	tb_assert_and_check_return_val(posted_aice, tb_false);
+
+	// init the posted aice
+	*posted_aice = *aice;
+
+	// run the delay task
+	return tb_aico_task_run_impl(aice->aico, delay, tb_aicp_post_after_func, posted_aice __tb_debug_args__);
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
