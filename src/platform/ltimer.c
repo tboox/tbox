@@ -700,15 +700,15 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 	// trace
 	tb_trace_impl("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
-	// the now
-	tb_hong_t now = tb_ltimer_now(timer);
-
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
 	// done
 	do
 	{
+		// expired or removed?
+		tb_check_break(task->refn == 2);
+
 		// del the task first
 		if (!tb_ltimer_del_task(timer, task))
 		{
@@ -724,7 +724,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		task->repeat = 0;
 				
 		// modify when => now
-		task->when = now;
+		task->when = tb_ltimer_now(timer);
 
 		// re-add task
 		if (!tb_ltimer_add_task(timer, task))
