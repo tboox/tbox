@@ -172,6 +172,14 @@ tb_void_t tb_aiop_kill(tb_aiop_t* aiop)
 	// kill it
 	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"k", 1);
 }
+tb_void_t tb_aiop_spak(tb_aiop_t* aiop)
+{
+	// check
+	tb_assert_and_check_return(aiop);
+
+	// spak it
+	if (aiop->spak[0]) tb_socket_send(aiop->spak[0], (tb_byte_t const*)"p", 1);
+}
 tb_handle_t tb_aiop_addo(tb_aiop_t* aiop, tb_handle_t handle, tb_size_t code, tb_pointer_t data)
 {
 	// check

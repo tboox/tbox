@@ -56,10 +56,10 @@ tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 		tb_ltimer_task_run(timer, 1 * delay, tb_true, tb_demo_ltimer_task_func, "every");
 	
 		// add task: one
-		tb_ltimer_task_run(timer, 10 * delay, tb_false, tb_demo_ltimer_task_func, "one");
+		tb_handle_t one = tb_ltimer_task_add(timer, 10 * delay, tb_false, tb_demo_ltimer_task_func, "one");
 		
 		// add task: after
-		tb_handle_t task = tb_ltimer_task_add_after(timer, 10 * delay, 5 * delay, tb_true, tb_demo_ltimer_task_func, "after");
+		tb_handle_t after = tb_ltimer_task_add_after(timer, 10 * delay, 5 * delay, tb_true, tb_demo_ltimer_task_func, "after");
 
 		// init loop
 		tb_thread_init(tb_null, tb_demo_ltimer_loop, timer, 0);
@@ -68,13 +68,15 @@ tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 		getchar();
 
 		// kil the task
-		if (task) tb_ltimer_task_kil(timer, task);
+		if (one) tb_ltimer_task_kil(timer, one);
+		if (after) tb_ltimer_task_kil(timer, after);
 
 		// wait some time
 		getchar();
 
 		// del the task
-		if (task) tb_ltimer_task_del(timer, task);
+		if (one) tb_ltimer_task_del(timer, one);
+		if (after) tb_ltimer_task_del(timer, after);
 
 		// exit timer
 		tb_ltimer_exit(timer);

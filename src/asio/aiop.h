@@ -123,6 +123,12 @@ tb_void_t 			tb_aiop_cler(tb_aiop_t* aiop);
  */
 tb_void_t 			tb_aiop_kill(tb_aiop_t* aiop);
 
+/*! spak the aiop, break the wait
+ *
+ * @param aiop 		the aiop
+ */
+tb_void_t 			tb_aiop_spak(tb_aiop_t* aiop);
+
 /*! addo the aioo
  *
  * @param aiop 		the aiop

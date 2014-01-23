@@ -489,15 +489,15 @@ tb_void_t tb_timer_task_kil(tb_handle_t handle, tb_handle_t htask)
 	// trace
 	tb_trace_impl("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
-	// the now
-	tb_hong_t now = tb_timer_now(timer);
-
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
 	// done
 	do
 	{
+		// expired or removed?
+		tb_check_break(task->refn == 2);
+
 		// find it
 		tb_size_t itor = tb_find_all(timer->heap, task, tb_timer_comp_by_task);
 		tb_assert_and_check_break(itor != tb_iterator_tail(timer->heap));
@@ -512,7 +512,7 @@ tb_void_t tb_timer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		task->repeat = 0;
 				
 		// modify when => now
-		task->when = now;
+		task->when = tb_timer_now(timer);
 
 		// re-add task
 		tb_heap_put(timer->heap, task);
