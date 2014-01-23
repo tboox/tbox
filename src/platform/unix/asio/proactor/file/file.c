@@ -38,29 +38,28 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
-{
-	return ptor;
-}
-static tb_void_t tb_aicp_file_exit(tb_handle_t file)
-{
-}
-static tb_bool_t tb_aicp_file_addo(tb_handle_t file, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 {
 	return tb_true;
 }
-static tb_bool_t tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico)
+static tb_void_t tb_aicp_file_exit(tb_aicp_proactor_aiop_t* ptor)
+{
+}
+static tb_bool_t tb_aicp_file_addo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
 {
 	return tb_true;
 }
-static tb_void_t tb_aicp_file_kilo(tb_handle_t file, tb_aico_t* aico)
+static tb_bool_t tb_aicp_file_delo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
+{
+	return tb_true;
+}
+static tb_void_t tb_aicp_file_kilo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico)
 {
 	if (aico && aico->handle) tb_file_exit(aico->handle);
 }
-static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
+static tb_bool_t tb_aicp_file_post(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice, tb_false);
 		
 	// the priority
@@ -95,19 +94,15 @@ static tb_bool_t tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice)
 	// ok?
 	return ok;
 }
-static tb_long_t tb_aicp_file_spak_read(tb_handle_t file, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READ, -1);
 	tb_assert_and_check_return_val(aice->u.read.data && aice->u.read.size, -1);
 
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
-
-	// no pending? spak it directly
-	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// read it from the given offset
 	tb_long_t real = tb_file_pread(handle, aice->u.read.data, aice->u.read.size, aice->u.read.seek);
@@ -129,19 +124,15 @@ static tb_long_t tb_aicp_file_spak_read(tb_handle_t file, tb_aice_t* aice)
 	// ok?
 	return 1;
 }
-static tb_long_t tb_aicp_file_spak_writ(tb_handle_t file, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRIT, -1);
 	tb_assert_and_check_return_val(aice->u.writ.data && aice->u.writ.size, -1);
 
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
-
-	// no pending? spak it directly
-	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// writ it from the given offset
 	tb_long_t real = tb_file_pwrit(handle, aice->u.writ.data, aice->u.read.size, aice->u.writ.seek);
@@ -163,19 +154,15 @@ static tb_long_t tb_aicp_file_spak_writ(tb_handle_t file, tb_aice_t* aice)
 	// ok?
 	return 1;
 }
-static tb_long_t tb_aicp_file_spak_readv(tb_handle_t file, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_READV, -1);
 	tb_assert_and_check_return_val(aice->u.readv.list && aice->u.readv.size, -1);
 
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
-
-	// no pending? spak it directly
-	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// read it from the given offset
 	tb_long_t real = tb_file_preadv(handle, aice->u.readv.list, aice->u.readv.size, aice->u.readv.seek);
@@ -197,19 +184,15 @@ static tb_long_t tb_aicp_file_spak_readv(tb_handle_t file, tb_aice_t* aice)
 	// ok?
 	return 1;
 }
-static tb_long_t tb_aicp_file_spak_writv(tb_handle_t file, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_WRITV, -1);
 	tb_assert_and_check_return_val(aice->u.writv.list && aice->u.writv.size, -1);
 
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
-
-	// no pending? spak it directly
-	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// read it from the given offset
 	tb_long_t real = tb_file_pwritv(handle, aice->u.writv.list, aice->u.writv.size, aice->u.writv.seek);
@@ -231,18 +214,14 @@ static tb_long_t tb_aicp_file_spak_writv(tb_handle_t file, tb_aice_t* aice)
 	// ok?
 	return 1;
 }
-static tb_long_t tb_aicp_file_spak_fsync(tb_handle_t file, tb_aice_t* aice)
+static tb_long_t tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)file;
 	tb_assert_and_check_return_val(ptor && aice && aice->code == TB_AICE_CODE_FSYNC, -1);
 
 	// the handle 
 	tb_handle_t handle = aice->aico? aice->aico->handle : tb_null;
 	tb_assert_and_check_return_val(handle, -1);
-
-	// no pending? spak it directly
-	tb_check_return_val(aice->state == TB_AICE_STATE_PENDING, 1);
 
 	// done sync
 	tb_bool_t ok = tb_file_sync(handle);
@@ -256,41 +235,10 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_handle_t file, tb_aice_t* aice)
 	// ok?
 	return 1;
 }
-static tb_long_t tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice)
-{
-	// check
-	tb_assert_and_check_return_val(file && aice, -1);
-
-	// init spak
-	static tb_bool_t (*s_spak[])(tb_handle_t , tb_aice_t*) = 
-	{
-		tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_null
-	,	tb_aicp_file_spak_read
-	,	tb_aicp_file_spak_writ
-	,	tb_aicp_file_spak_readv
-	,	tb_aicp_file_spak_writv
-	,	tb_aicp_file_spak_fsync
-	};
-	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_spak) && s_spak[aice->code], -1);
-
-	// done spak 
-	return s_spak[aice->code](file, aice);
-}
-static tb_void_t tb_aicp_file_kill(tb_handle_t file)
+static tb_void_t tb_aicp_file_kill(tb_aicp_proactor_aiop_t* ptor)
 {
 }
-static tb_void_t tb_aicp_file_poll(tb_handle_t file)
+static tb_void_t tb_aicp_file_poll(tb_aicp_proactor_aiop_t* ptor)
 {
 }
 

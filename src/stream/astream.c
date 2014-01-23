@@ -58,7 +58,7 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 			state = TB_ASTREAM_STATE_KILLED;
 			break;
 		}
-
+		
 		// read it
 		if (!astream->read(astream, oread->func, oread->priv)) break;
 
@@ -67,8 +67,15 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 
 	} while (0);
 
-	// failed? done func
-	if (state != TB_ASTREAM_STATE_OK) oread->func(astream, state, tb_null, 0, oread->priv);
+	// failed?
+	if (state != TB_ASTREAM_STATE_OK) 
+	{
+		// stoped
+		tb_atomic_set(&astream->stoped, 1);
+
+		// done func
+		oread->func(astream, state, tb_null, 0, oread->priv);
+	}
 
 	// ok
 	return tb_true;
@@ -87,7 +94,7 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 
 		// reset state
 		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
-		
+			
 		// stoped?
 		if (tb_atomic_get(&astream->stoped))
 		{
@@ -106,8 +113,15 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 
 	} while (0);
 
-	// failed? done func
-	if (state != TB_ASTREAM_STATE_OK) owrit->func(astream, state, 0, owrit->size, owrit->priv);
+	// failed? 
+	if (state != TB_ASTREAM_STATE_OK)
+	{	
+		// stoped
+		tb_atomic_set(&astream->stoped, 1);
+
+		// done func
+		owrit->func(astream, state, 0, owrit->size, owrit->priv);
+	}
 
 	// ok
 	return tb_true;
@@ -142,8 +156,15 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 
 	} while (0);
 
-	// failed? done func
-	if (state != TB_ASTREAM_STATE_OK) oseek->func(astream, state, 0, oseek->priv);
+	// failed? 
+	if (state != TB_ASTREAM_STATE_OK) 
+	{	
+		// stoped
+		tb_atomic_set(&astream->stoped, 1);
+
+		// done func
+		oseek->func(astream, state, 0, oseek->priv);
+	}
 
 	// ok
 	return tb_true;

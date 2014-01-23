@@ -112,6 +112,10 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	case TB_AICE_STATE_TIMEOUT:
 		state = TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT;
 		break;
+		// killed
+	case TB_AICE_STATE_KILLED:
+		state = TB_ASTREAM_STATE_KILLED;
+		break;
 		// failed
 	default:
 		state = TB_ASTREAM_SOCK_STATE_CONNECT_FAILED;
@@ -233,6 +237,10 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	case TB_AICE_STATE_CLOSED:
 		state = TB_ASTREAM_STATE_CLOSED;
 		break;
+		// killed
+	case TB_AICE_STATE_KILLED:
+		state = TB_ASTREAM_STATE_KILLED;
+		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:
 		state = TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT;
@@ -290,6 +298,10 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 		// closed
 	case TB_AICE_STATE_CLOSED:
 		state = TB_ASTREAM_STATE_CLOSED;
+		break;
+		// killed
+	case TB_AICE_STATE_KILLED:
+		state = TB_ASTREAM_STATE_KILLED;
 		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:

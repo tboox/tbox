@@ -43,9 +43,6 @@ typedef struct __tb_aicp_proactor_aiop_t
 	// the proactor base
 	tb_aicp_proactor_t 			base;
 
-	// the file impl
-	tb_handle_t 				file;
-
 	// the wait aiop
 	tb_aiop_t* 					aiop;
 
@@ -73,6 +70,9 @@ typedef struct __tb_aicp_proactor_aiop_t
 
 	// the spak timer
 	tb_handle_t					timer;
+
+	// the private data for file
+	tb_handle_t 				fpriv;
 
 }tb_aicp_proactor_aiop_t;
 
@@ -102,15 +102,19 @@ typedef struct __tb_aiop_aico_t
 /* ///////////////////////////////////////////////////////////////////////
  * file declaration
  */
-static tb_handle_t 	tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor);
-static tb_void_t 	tb_aicp_file_exit(tb_handle_t file);
-static tb_bool_t 	tb_aicp_file_addo(tb_handle_t file, tb_aico_t* aico);
-static tb_bool_t 	tb_aicp_file_delo(tb_handle_t file, tb_aico_t* aico);
-static tb_void_t 	tb_aicp_file_kilo(tb_handle_t file, tb_aico_t* aico);
-static tb_bool_t 	tb_aicp_file_post(tb_handle_t file, tb_aice_t const* aice);
-static tb_long_t 	tb_aicp_file_spak(tb_handle_t file, tb_aice_t* aice);
-static tb_void_t 	tb_aicp_file_kill(tb_handle_t file);
-static tb_void_t 	tb_aicp_file_poll(tb_handle_t file);
+static tb_bool_t 	tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor);
+static tb_void_t 	tb_aicp_file_exit(tb_aicp_proactor_aiop_t* ptor);
+static tb_bool_t 	tb_aicp_file_addo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico);
+static tb_bool_t 	tb_aicp_file_delo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico);
+static tb_void_t 	tb_aicp_file_kilo(tb_aicp_proactor_aiop_t* ptor, tb_aico_t* aico);
+static tb_bool_t 	tb_aicp_file_post(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice);
+static tb_void_t 	tb_aicp_file_kill(tb_aicp_proactor_aiop_t* ptor);
+static tb_void_t 	tb_aicp_file_poll(tb_aicp_proactor_aiop_t* ptor);
+static tb_long_t 	tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice);
+static tb_long_t 	tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice);
+static tb_long_t 	tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice);
+static tb_long_t 	tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice);
+static tb_long_t 	tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice);
  
 /* ///////////////////////////////////////////////////////////////////////
  * spak
@@ -282,11 +286,8 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			}
 			else if (aico->base.type == TB_AICO_TYPE_FILE)
 			{
-				// check
-				tb_assert(ptor->file);
-
 				// poll file
-				if (ptor->file) tb_aicp_file_poll(ptor->file);
+				tb_aicp_file_poll(ptor);
 			}
 			else tb_assert(0);
 		}
@@ -438,17 +439,6 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -489,17 +479,6 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -538,17 +517,6 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -603,17 +571,6 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -670,17 +627,6 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -736,17 +682,6 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
  
@@ -801,17 +736,6 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -849,17 +773,6 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -900,17 +813,6 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -950,17 +852,6 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
@@ -998,17 +889,6 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
 
 	// check wait
 	tb_assert_and_check_return_val(aico->wait < 2, -1);
@@ -1108,17 +988,6 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico, -1);
 
-	// no pending? spak it directly
-	if (aice->state != TB_AICE_STATE_PENDING)
-	{
-		// reset wait
-		if (aico->wait) aico->wait--;
-		aico->aice.code = TB_AICE_CODE_NONE;
-
-		// ok
-		return 1;
-	}
-
 	// now
 	tb_hong_t now = tb_ctime_time();
 
@@ -1161,65 +1030,67 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_assert_and_check_return_val(ptor && aice, -1);
 
 	// the aico
-	tb_aico_t const* aico = aice->aico;
+	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico, -1);
 
-	// done
-	tb_long_t ok = -1;
-	switch (aico->type)
+	// init spak
+	static tb_long_t (*s_spak[])(tb_aicp_proactor_aiop_t* , tb_aice_t*) = 
 	{
-	case TB_AICO_TYPE_SOCK:
-	case TB_AICO_TYPE_TASK:
-		{
-			// init spak
-			static tb_long_t (*s_spak[])(tb_aicp_proactor_aiop_t* , tb_aice_t*) = 
-			{
-				tb_null
+		tb_null
 
-			,	tb_aiop_spak_acpt
-			,	tb_aiop_spak_conn
-			,	tb_aiop_spak_recv
-			,	tb_aiop_spak_send
-			,	tb_aiop_spak_urecv
-			,	tb_aiop_spak_usend
-			,	tb_aiop_spak_recvv
-			,	tb_aiop_spak_sendv
-			,	tb_aiop_spak_urecvv
-			,	tb_aiop_spak_usendv
-			,	tb_aiop_spak_sendfile
+	,	tb_aiop_spak_acpt
+	,	tb_aiop_spak_conn
+	,	tb_aiop_spak_recv
+	,	tb_aiop_spak_send
+	,	tb_aiop_spak_urecv
+	,	tb_aiop_spak_usend
+	,	tb_aiop_spak_recvv
+	,	tb_aiop_spak_sendv
+	,	tb_aiop_spak_urecvv
+	,	tb_aiop_spak_usendv
+	,	tb_aiop_spak_sendfile
 
-			,	tb_null
-			,	tb_null
-			,	tb_null
-			,	tb_null
-			,	tb_null
+	,	tb_aicp_file_spak_read
+	,	tb_aicp_file_spak_writ
+	,	tb_aicp_file_spak_readv
+	,	tb_aicp_file_spak_writv
+	,	tb_aicp_file_spak_fsync
 
-			,	tb_aiop_spak_runtask
-			};
-			tb_assert_and_check_break(aice->code && aice->code < tb_arrayn(s_spak) && s_spak[aice->code]);
+	,	tb_aiop_spak_runtask
+	};
+	tb_assert_and_check_return_val(aice->code && aice->code < tb_arrayn(s_spak) && s_spak[aice->code], -1);
 
-			// done spak 
-			ok = s_spak[aice->code](ptor, aice);
-		}
-		break;
-	case TB_AICO_TYPE_FILE:
-		{
-			// check
-			tb_assert_and_check_break(ptor->file);
+	// no pending? spak it directly
+	if (aice->state != TB_AICE_STATE_PENDING)
+	{
+		// reset wait
+		if (aico->wait) aico->wait--;
 
-			// pending
-			tb_assert_and_check_return_val(aice->state == TB_AICE_STATE_PENDING, -1);
+		// reset code
+		aico->aice.code = TB_AICE_CODE_NONE;
 
-			// done spak
-			ok = tb_aicp_file_spak(ptor->file, aice);
-		}
-		break;
-	default:
-		break;
+		// ok
+		return 1;
 	}
 
-	// ok?
-	return ok;
+	// killed?
+	if (tb_atomic_get(&aico->base.killed))
+	{
+		// reset wait
+		if (aico->wait) aico->wait--;
+
+		// reset code
+		aico->aice.code = TB_AICE_CODE_NONE;
+
+		// save state
+		aice->state = TB_AICE_STATE_KILLED;
+
+		// ok
+		return 1;
+	}
+
+	// done spak 
+	return s_spak[aice->code](ptor, aice);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -1253,10 +1124,10 @@ static tb_bool_t tb_aicp_proactor_aiop_addo(tb_aicp_proactor_t* proactor, tb_aic
 	case TB_AICO_TYPE_FILE:
 		{
 			// check
-			tb_assert_and_check_break(ptor->file && aico->handle);
+			tb_assert_and_check_break(aico->handle);
 
 			// file: addo
-			ok = tb_aicp_file_addo(ptor->file, aico);
+			ok = tb_aicp_file_addo(ptor, aico);
 		}
 		break;
 	case TB_AICO_TYPE_TASK:
@@ -1302,11 +1173,8 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 		break;
 	case TB_AICO_TYPE_FILE:
 		{
-			// check
-			tb_assert_and_check_break(ptor->file);
-
 			// file: delo
-			ok = tb_aicp_file_delo(ptor->file, aico);
+			ok = tb_aicp_file_delo(ptor, aico);
 		}
 		break;
 	case TB_AICO_TYPE_TASK:
@@ -1328,19 +1196,20 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return(ptor && ptor->aiop && aico);
 
+	// trace
+	tb_trace_impl("kilo: %p", aico);
+
 	// kill
 	switch (aico->type)
 	{
 	case TB_AICO_TYPE_SOCK:
 		{
-			// sock: kill
 			if (aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
 		}
 		break;
 	case TB_AICO_TYPE_FILE:
 		{
-			// file: kill
-			tb_aicp_file_kilo(ptor->file, aico);
+			tb_aicp_file_kilo(ptor, aico);
 		}
 		break;
 	case TB_AICO_TYPE_TASK:
@@ -1355,7 +1224,7 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->file && aice && aice->aico, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor && aice && aice->aico, tb_false);
 	
 	// the priority
 	tb_size_t priority = tb_aiop_aice_priority(aice);
@@ -1397,7 +1266,7 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 	case TB_AICO_TYPE_FILE:
 		{
 			// post file
-			ok = tb_aicp_file_post(ptor->file, aice);
+			ok = tb_aicp_file_post(ptor, aice);
 		}
 		break;
 	default:
@@ -1415,7 +1284,7 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->timer && ptor->aiop && ptor->file);
+	tb_assert_and_check_return(ptor && ptor->timer && ptor->aiop);
 
 	// the worker size
 	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
@@ -1430,7 +1299,7 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 	tb_aiop_kill(ptor->aiop);
 
 	// kill file
-	tb_aicp_file_kill(ptor->file); 
+	tb_aicp_file_kill(ptor); 
 
 	// post wait
 	if (work) tb_semaphore_post(ptor->wait, work);
@@ -1444,8 +1313,7 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 		tb_trace_impl("exit");
 
 		// exit file
-		if (ptor->file) tb_aicp_file_exit(ptor->file);
-		ptor->file = tb_null;
+		tb_aicp_file_exit(ptor);
 
 		// exit loop
 		if (ptor->loop)
@@ -1632,8 +1500,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->spak[0] && ptor->spak[1], fail);
 
 	// init file
-	ptor->file = tb_aicp_file_init(ptor);
-	tb_assert_and_check_goto(ptor->file, fail);
+	if (!tb_aicp_file_init(ptor)) goto fail;
 
 	// init list
 	ptor->maxn = tb_align8((aicp->maxn >> 3) + 1);

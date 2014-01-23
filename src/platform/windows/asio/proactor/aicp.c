@@ -1345,14 +1345,6 @@ static tb_void_t tb_iocp_spak_runtask_timeout(tb_pointer_t data)
 	aico->olap.aice.state = TB_AICE_STATE_OK;
 	PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap);
 }
-static tb_long_t tb_iocp_spak_addr(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
-{
-	// check?
-	tb_assert_and_check_return_val(resp, -1);
-
-	// ok
-	return 1;
-}
 static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* resp, tb_size_t real, tb_size_t error)
 {
 	// check?

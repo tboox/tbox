@@ -23,7 +23,7 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_sort_all(&iterator);
+	tb_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -52,7 +52,7 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_bubble_sort_all(&iterator);
+	tb_bubble_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -89,7 +89,7 @@ static tb_void_t tb_sort_int_test_func_bubble()
 	}
 
 	// sort
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
 	tb_print("");
@@ -117,7 +117,7 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_insert_sort_all(&iterator);
+	tb_insert_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -154,7 +154,7 @@ static tb_void_t tb_sort_int_test_func_insert()
 	}
 
 	// sort
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
 	tb_print("");
@@ -182,7 +182,7 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
 	
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_quick_sort_all(&iterator);
+	tb_quick_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -219,7 +219,7 @@ static tb_void_t tb_sort_int_test_func_quick()
 	}
 
 	// sort
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
 	tb_print("");
@@ -247,7 +247,7 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
 	
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -284,7 +284,7 @@ static tb_void_t tb_sort_int_test_func_heap()
 	}
 
 	// sort
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
 	tb_print("");
@@ -322,7 +322,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_sort_all(&iterator);
+	tb_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -364,7 +364,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_bubble_sort_all(&iterator);
+	tb_bubble_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -406,7 +406,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_insert_sort_all(&iterator);
+	tb_insert_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -448,7 +448,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_quick_sort_all(&iterator);
+	tb_quick_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
@@ -490,7 +490,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 
 	// sort
 	tb_hong_t time = tb_mclock();
-	tb_heap_sort_all(&iterator);
+	tb_heap_sort_all(&iterator, tb_null);
 	time = tb_mclock() - time;
 
 	// time
