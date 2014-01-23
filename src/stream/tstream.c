@@ -177,7 +177,7 @@ static tb_bool_t tb_tstream_istream_writ_func(tb_astream_t* astream, tb_size_t s
 			state = TB_ASTREAM_STATE_KILLED;
 			break;
 		}
-		
+
 		// not finished? continue to writ
 		if (real < size) bwrit = tb_true;
 		// not paused?
@@ -230,7 +230,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			state = TB_ASTREAM_STATE_KILLED;
 			break;
 		}
-		
+
 		// check
 		tb_assert_and_check_break(data && size);
 
@@ -340,7 +340,7 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 			state = TB_ASTREAM_STATE_KILLED;
 			break;
 		}
-		
+
 		// read it
 		if (!tb_astream_read(tstream->istream, tb_tstream_istream_read_func, tstream)) break;
 
@@ -382,7 +382,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 			state = TB_ASTREAM_STATE_KILLED;
 			break;
 		}
-			
+
 		// need seek?
 		if (tstream->offset >= 0)
 		{

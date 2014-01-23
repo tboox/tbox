@@ -63,13 +63,19 @@ typedef struct __tb_ltimer_task_t
 	tb_hong_t 					when;
 
 	// the period
-	tb_uint32_t 				period 	: 29;
+	tb_uint32_t 				period 	: 28;
 
 	// is repeat?
 	tb_uint32_t 				repeat 	: 1;
 
+	// is killed?
+	tb_uint32_t 				killed 	: 1;
+
 	// the refn, <= 2
 	tb_uint32_t 				refn 	: 2;
+
+	// the wheel index
+	tb_uint32_t 				windx;
 
 }tb_ltimer_task_t;
 
@@ -143,7 +149,7 @@ static __tb_inline__ tb_hong_t tb_ltimer_now(tb_ltimer_t* timer)
 	// using cached time
 	return tb_ctime_time();
 }
-static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t const* task)
+static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 {
 	// check
 	tb_assert_and_check_return_val(timer && timer->pool && timer->tick, tb_false);
@@ -183,8 +189,49 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t const* 
 		if (!wlist) wlist = timer->wheel[windx] = tb_vector_init((timer->maxn / TB_LTIMER_WHEEL_MAXN) + 8, tb_item_func_ptr(tb_null, tb_null));
 		tb_assert_and_check_break(wlist);
 
+		// save the wheel index
+		task->windx = windx;
+
 		// add task to the wheel list
 		tb_vector_insert_tail(wlist, task);
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
+{
+	// check
+	tb_assert_and_check_return_val(timer && timer->pool && timer->tick, tb_false);
+	tb_assert_and_check_return_val(task && task->func && task->refn && task->when, tb_false);
+
+	// trace
+	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// check
+		tb_assert_and_check_break(task->windx != -1 && task->windx < tb_arrayn(timer->wheel));
+
+		// the wheel list
+		tb_vector_t* wlist = timer->wheel[task->windx];
+		tb_assert_and_check_break(wlist);
+
+		// find the task from the wheel list
+		tb_size_t itor = tb_find_all(wlist, task, tb_null);
+		tb_assert_and_check_break(itor != tb_iterator_tail(wlist));
+
+		// del the task from the wheel list
+		tb_vector_remove(wlist, itor);
+
+		// clear the wheel index
+		task->windx = -1;
 
 		// ok
 		ok = tb_true;
@@ -223,7 +270,7 @@ static tb_bool_t tb_ltimer_expired_done(tb_vector_t* vector, tb_pointer_t* item,
 	tb_ltimer_task_t const* task = item? *((tb_ltimer_task_t const**)item) : tb_null;
 	
 	// done func
-	if (task && task->func) task->func(task->data);
+	if (task && task->func) task->func(task->killed? tb_true : tb_false, task->data);
 
 	// ok
 	return tb_true;
@@ -246,7 +293,11 @@ static tb_bool_t tb_ltimer_expired_exit(tb_vector_t* vector, tb_pointer_t* item,
 			task->when = *now + task->period;
 
 			// continue the task
-			tb_ltimer_add_task(timer, task);
+			if (!tb_ltimer_add_task(timer, task))
+			{
+				// trace
+				tb_trace("[ltimer]: continue to add task failed");
+			}
 		}
 		else
 		{
@@ -395,7 +446,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 	tb_assert_and_check_return_val(timer && timer->pool && timer->tick && timer->expired, tb_false);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_false);
+	tb_check_return_val(!tb_atomic_get(&timer->stop), tb_false);
 
 	// the now time
 	tb_hong_t now = tb_ltimer_now(timer);
@@ -535,6 +586,8 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 		task->when 		= when;
 		task->period 	= period;
 		task->repeat 	= repeat? 1 : 0;
+		task->killed 	= 0;
+		task->windx 	= -1;
 
 		// add task
 		if (!tb_ltimer_add_task(timer, task))
@@ -588,6 +641,8 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 		task->when 		= when;
 		task->period 	= period;
 		task->repeat 	= repeat? 1 : 0;
+		task->killed 	= 0;
+		task->windx 	= -1;
 
 		// add task
 		if (!tb_ltimer_add_task(timer, task))
@@ -631,6 +686,55 @@ tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 	}
 	// remove it from pool directly if the task have been expired 
 	else tb_rpool_free(timer->pool, task);
+
+	// leave
+	tb_spinlock_leave(&timer->lock);
+}
+tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
+{
+	// check
+	tb_ltimer_t* 		timer = (tb_ltimer_t*)handle;
+	tb_ltimer_task_t* 	task = (tb_ltimer_task_t*)htask;
+	tb_assert_and_check_return(timer && timer->pool && task);
+
+	// trace
+	tb_trace_impl("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+
+	// the now
+	tb_hong_t now = tb_ltimer_now(timer);
+
+	// enter
+	tb_spinlock_enter(&timer->lock);
+
+	// done
+	do
+	{
+		// del the task first
+		if (!tb_ltimer_del_task(timer, task))
+		{
+			// trace
+			tb_trace("[ltimer]: del task failed");
+			break;
+		}
+
+		// killed
+		task->killed = 1;
+
+		// no repeat
+		task->repeat = 0;
+				
+		// modify when => now
+		task->when = now;
+
+		// re-add task
+		if (!tb_ltimer_add_task(timer, task))
+		{
+			// trace
+			tb_trace("[ltimer]: re-add task failed");
+			break;
+		}
+
+	} while (0);
 
 	// leave
 	tb_spinlock_leave(&timer->lock);

@@ -31,7 +31,7 @@
  * implementation
  */
 
-tb_size_t tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data)
+tb_size_t tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_FORWARD && pprev, tail);
@@ -43,27 +43,30 @@ tb_size_t tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb
 		return tail;
 	}
 
+	// the comparer
+	if (!comp) comp = tb_iterator_comp;
+
 	// find
 	tb_size_t prev = tail;
 	tb_size_t itor = head;
-	tb_long_t comp = -1;
+	tb_long_t find = -1;
 	for (; itor != tail; prev = itor, itor = tb_iterator_next(iterator, itor)) 
 	{
-		comp = tb_iterator_comp(iterator, tb_iterator_item(iterator, itor), data);
-		if (comp >= 0) break;
+		find = comp(iterator, tb_iterator_item(iterator, itor), data);
+		if (find >= 0) break;
 	}
 
 	// save prev
-	if (pprev) *pprev = comp? prev : tail;
+	if (pprev) *pprev = find? prev : tail;
 
 	// ok?
-	return !comp? itor : tail;
+	return !find? itor : tail;
 }
-tb_size_t tb_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data)
+tb_size_t tb_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data, tb_iterator_comp_t comp)
 {
-	return tb_pfind(iterator, pprev, tb_iterator_head(iterator), tb_iterator_tail(iterator), data);
+	return tb_pfind(iterator, pprev, tb_iterator_head(iterator), tb_iterator_tail(iterator), data, comp);
 }
-tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data)
+tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp)
 {
 	// check
 	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_RACCESS && pprev, tail);
@@ -75,6 +78,9 @@ tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t h
 		return tail;
 	}
 
+	// the comparer
+	if (!comp) comp = tb_iterator_comp;
+
 	// find
 	tb_size_t l = head;
 	tb_size_t r = tail;
@@ -82,7 +88,7 @@ tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t h
 	tb_long_t c = -1;
 	while (l < r)
 	{
-		c = tb_iterator_comp(iterator, tb_iterator_item(iterator, m), data);
+		c = comp(iterator, tb_iterator_item(iterator, m), data);
 		if (c > 0) r = m;
 		else if (c < 0) l = m + 1;
 		else break;
@@ -97,7 +103,7 @@ tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t h
 		{
 			// find the subrange for prev
 			tb_size_t p = r;
-			tb_pfind(iterator, &p, l, r, data);
+			tb_pfind(iterator, &p, l, r, data, comp);
 
 			// save prev
 			*pprev = (p != r)? p : ((c < 0)? tail - 1 : tail);
@@ -109,7 +115,7 @@ tb_size_t tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t h
 	// ok?
 	return !c? m : tail;
 }
-tb_size_t tb_binary_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data)
+tb_size_t tb_binary_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data, tb_iterator_comp_t comp)
 {
-	return tb_binary_pfind(iterator, pprev, tb_iterator_head(iterator), tb_iterator_tail(iterator), data);
+	return tb_binary_pfind(iterator, pprev, tb_iterator_head(iterator), tb_iterator_tail(iterator), data, comp);
 }

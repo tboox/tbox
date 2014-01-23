@@ -417,7 +417,7 @@ tb_void_t tb_dns_server_sort()
 	tb_vector_walk(list, tb_dns_server_rate, tb_null);
 
 	// sort list
-	tb_sort_all(list);
+	tb_sort_all(list, tb_null);
 	
 	// enter
 	tb_spinlock_enter(&g_lock);

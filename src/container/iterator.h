@@ -87,6 +87,9 @@ typedef struct __tb_iterator_t
 
 }tb_iterator_t;
 
+/// the iterator comp func type
+typedef tb_long_t 			(*tb_iterator_comp_t)(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem);
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */

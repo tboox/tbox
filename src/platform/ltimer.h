@@ -198,11 +198,18 @@ tb_handle_t 		tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_
  */
 tb_handle_t 		tb_ltimer_task_add_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data);
 
-/*! del timer task
+/*! del timer task, the task will be not called if have been not called
  *
  * @param handle	the timer handle
  * @param task		the timer task
  */
 tb_void_t 			tb_ltimer_task_del(tb_handle_t handle, tb_handle_t task);
+
+/*! kil timer task, the task will be called immediately if have been not called
+ *
+ * @param handle	the timer handle
+ * @param task		the timer task
+ */
+tb_void_t 			tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t task);
 
 #endif

@@ -44,10 +44,11 @@
  * @param head 		the iterator head
  * @param tail 		the iterator tail
  * @param data 		the finded data
+ * @param comp 		the comparer
  *
  * @return 			the iterator itor
  */
-tb_size_t 			tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
+tb_size_t 			tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp);
 
 /*! the finder for all with prev 
  *
@@ -58,10 +59,11 @@ tb_size_t 			tb_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head,
  * @param iterator 	the iterator
  * @param pprev 	the iterator prev pointer
  * @param data 		the finded data
+ * @param comp 		the comparer
  *
  * @return 			the iterator itor
  */
-tb_size_t 			tb_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data);
+tb_size_t 			tb_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data, tb_iterator_comp_t comp);
 
 /*! the binary finder for ascending with prev 
  *
@@ -74,10 +76,11 @@ tb_size_t 			tb_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer
  * @param head 		the iterator head
  * @param tail 		the iterator tail
  * @param data 		the finded data
+ * @param comp 		the comparer
  *
  * @return 			the iterator itor
  */
-tb_size_t 			tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data);
+tb_size_t 			tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp);
 
 /*! the binary finder for all with prev 
  *
@@ -88,10 +91,11 @@ tb_size_t 			tb_binary_pfind(tb_iterator_t* iterator, tb_size_t* pprev, tb_size_
  * @param iterator 	the iterator
  * @param pprev 	the iterator prev pointer
  * @param data 		the finded data
+ * @param comp 		the comparer
  *
  * @return 			the iterator itor
  */
-tb_size_t 			tb_binary_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data);
+tb_size_t 			tb_binary_pfind_all(tb_iterator_t* iterator, tb_size_t* pprev, tb_cpointer_t data, tb_iterator_comp_t comp);
 
 
 #endif

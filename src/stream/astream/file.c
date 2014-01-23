@@ -156,6 +156,10 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	case TB_AICE_STATE_CLOSED:
 		state = TB_ASTREAM_STATE_CLOSED;
 		break;
+		// killed
+	case TB_AICE_STATE_KILLED:
+		state = TB_ASTREAM_STATE_KILLED;
+		break;
 	default:
 		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
@@ -210,6 +214,10 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 		// closed
 	case TB_AICE_STATE_CLOSED:
 		state = TB_ASTREAM_STATE_CLOSED;
+		break;
+		// killed
+	case TB_AICE_STATE_KILLED:
+		state = TB_ASTREAM_STATE_KILLED;
 		break;
 	default:
 		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
