@@ -60,7 +60,7 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 		}
 		
 		// read it
-		if (!astream->read(astream, oread->func, oread->priv)) break;
+		if (!astream->read(astream, 0, oread->maxn, oread->func, oread->priv)) break;
 
 		// ok
 		state = TB_ASTREAM_STATE_OK;
@@ -72,7 +72,7 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 	{
 		// stoped
 		tb_atomic_set(&astream->stoped, 1);
-
+ 
 		// done func
 		oread->func(astream, state, tb_null, 0, oread->priv);
 	}
@@ -106,7 +106,7 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 		tb_assert_and_check_break(owrit->data && owrit->size);
 
 		// writ it
-		if (!astream->writ(astream, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
+		if (!astream->writ(astream, 0, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
 
 		// ok
 		state = TB_ASTREAM_STATE_OK;
@@ -287,7 +287,7 @@ tb_bool_t tb_astream_open_impl(tb_astream_t* astream, tb_astream_open_func_t fun
 	// ok?
 	return ok;
 }
-tb_bool_t tb_astream_read_impl(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_astream_read_impl(tb_astream_t* astream, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->read && func, tb_false);
@@ -304,7 +304,7 @@ tb_bool_t tb_astream_read_impl(tb_astream_t* astream, tb_astream_read_func_t fun
 #endif
 
 	// read it
-	return astream->read(astream, func, priv);
+	return astream->read(astream, 0, maxn, func, priv);
 }
 tb_bool_t tb_astream_writ_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
@@ -323,7 +323,7 @@ tb_bool_t tb_astream_writ_impl(tb_astream_t* astream, tb_byte_t const* data, tb_
 #endif
 
 	// writ it
-	return astream->writ(astream, data, size, func, priv);
+	return astream->writ(astream, 0, data, size, func, priv);
 }
 tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
@@ -363,7 +363,7 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t fun
 	// sync it
 	return astream->sync(astream, func, priv);
 }
-tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->open && astream->read && func, tb_false);
@@ -374,11 +374,12 @@ tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_astream_read_func_t fu
 		// init open and read
 		astream->open_and.read.func = func;
 		astream->open_and.read.priv = priv;
+		astream->open_and.read.maxn = maxn;
 		return tb_astream_open_impl(astream, tb_astream_oread_func, &astream->open_and.read __tb_debug_args__);
 	}
 
 	// read it
-	return tb_astream_read_impl(astream, func, priv __tb_debug_args__);
+	return tb_astream_read_impl(astream, maxn, func, priv __tb_debug_args__);
 }
 tb_bool_t tb_astream_owrit_impl(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
@@ -416,6 +417,44 @@ tb_bool_t tb_astream_oseek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astr
 
 	// seek it
 	return tb_astream_seek_impl(astream, offset, func, priv __tb_debug_args__);
+}
+tb_bool_t tb_astream_read_after_impl(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(astream && astream->read && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+
+	// save debug info
+#ifdef __tb_debug__
+	astream->func = func_;
+	astream->file = file_;
+	astream->line = line_;
+#endif
+
+	// read it
+	return astream->read(astream, delay, maxn, func, priv);
+}
+tb_bool_t tb_astream_writ_after_impl(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(astream && astream->writ && data && size && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+
+	// save debug info
+#ifdef __tb_debug__
+	astream->func = func_;
+	astream->file = file_;
+	astream->line = line_;
+#endif
+
+	// writ it
+	return astream->writ(astream, delay, data, size, func, priv);
 }
 tb_aicp_t* tb_astream_aicp(tb_astream_t* astream)
 {

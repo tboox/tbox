@@ -257,14 +257,14 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_recv(aice->aico, sstream->data, sstream->maxn, tb_astream_sock_read_func, (tb_astream_t*)sstream);
+			tb_aico_recv(aice->aico, sstream->data, aice->u.recv.size, tb_astream_sock_read_func, (tb_astream_t*)sstream);
 		}
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -273,9 +273,10 @@ static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_astream_read_fun
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.read 	= func;
+	if (!maxn || maxn > sstream->maxn) maxn = sstream->maxn;
 
 	// post read
-	return tb_aico_recv(sstream->aico, sstream->data, sstream->maxn, tb_astream_sock_read_func, astream);
+	return tb_aico_recv_after(sstream->aico, delay, sstream->data, maxn, tb_astream_sock_read_func, astream);
 }
 static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 {
@@ -326,7 +327,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -337,7 +338,7 @@ static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_byte_t const* da
 	sstream->func.writ 	= func;
 
 	// post writ
-	return tb_aico_send(sstream->aico, data, size, tb_astream_sock_writ_func, astream);
+	return tb_aico_send_after(sstream->aico, delay, data, size, tb_astream_sock_writ_func, astream);
 }
 static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {

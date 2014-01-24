@@ -66,7 +66,7 @@ typedef struct __tb_astream_file_t
 
 	// the file data
 	tb_byte_t 					data[TB_ASTREAM_FILE_READ_MAXN];
-
+	
 	// the func
 	union
 	{
@@ -172,14 +172,14 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_read(aice->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, sizeof(fstream->data), tb_astream_file_read_func, (tb_astream_t*)fstream);
+			tb_aico_read(aice->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, aice->u.read.size, tb_astream_file_read_func, (tb_astream_t*)fstream);
 		}
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_read(tb_astream_t* astream, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -188,9 +188,10 @@ static tb_bool_t tb_astream_file_read(tb_astream_t* astream, tb_astream_read_fun
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.read 	= func;
+	if (!maxn || maxn > sizeof(fstream->data)) maxn = sizeof(fstream->data);
 
 	// post read
-	return tb_aico_read(fstream->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, sizeof(fstream->data), tb_astream_file_read_func, astream);
+	return tb_aico_read_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, maxn, tb_astream_file_read_func, astream);
 }
 static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 {
@@ -238,7 +239,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -249,7 +250,7 @@ static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_byte_t const* da
 	fstream->func.writ 	= func;
 
 	// post writ
-	return tb_aico_writ(fstream->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_astream_file_writ_func, astream);
+	return tb_aico_writ_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_astream_file_writ_func, astream);
 }
 static tb_bool_t tb_astream_file_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
