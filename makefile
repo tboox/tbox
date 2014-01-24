@@ -190,6 +190,27 @@ PROF := $(if $(PROF),$(PROF),n)
 # zlib
 ZLIB := $(if $(ZLIB),$(ZLIB),n)
 
+# arm
+ARM := $(if $(findstring arm,$(ARCH)),y,n)
+ARMv5 := $(if $(findstring armv5,$(ARCH)),y,n)
+ARMv6 := $(if $(findstring armv6,$(ARCH)),y,n)
+ARMv7 := $(if $(findstring armv7,$(ARCH)),y,n)
+
+# x86
+x86 := $(if $(findstring x86,$(ARCH)),y,n)
+
+# x64
+x64 := $(if $(findstring x64,$(ARCH)),y,n)
+
+# sh4
+SH4 := $(if $(findstring sh4,$(ARCH)),y,n)
+
+# mips
+MIPS := $(if $(findstring mips,$(ARCH)),y,n)
+
+# sparc
+SPARC := $(if $(findstring sparc,$(ARCH)),y,n)
+
 # project
 PRO_DIR 	:= ${shell pwd}
 PRO_NAME 	:= ${shell basename ${shell pwd}}
@@ -276,6 +297,15 @@ config : .null
 	@echo "export SMALL" 			 					>> .config.mak
 	@echo "export PLAT"					 				>> .config.mak
 	@echo "export ARCH"					 				>> .config.mak
+	@echo "export ARM"					 				>> .config.mak
+	@echo "export ARMv5"					 			>> .config.mak
+	@echo "export ARMv6"					 			>> .config.mak
+	@echo "export ARMv7"					 			>> .config.mak
+	@echo "export x86"					 				>> .config.mak
+	@echo "export x64"					 				>> .config.mak
+	@echo "export SH4"					 				>> .config.mak
+	@echo "export MIPS"					 				>> .config.mak
+	@echo "export SPARC"								>> .config.mak
 	@echo "export PROF"					 				>> .config.mak
 	@echo "export DEMO"					 				>> .config.mak
 	@echo "export ZLIB"					 				>> .config.mak

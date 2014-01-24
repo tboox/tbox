@@ -17,27 +17,22 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		crc.h
+ * @file		asm.h
  *
  */
-#ifndef TB_UTILS_OPT_ARM_CRC_H
-#define TB_UTILS_OPT_ARM_CRC_H
+#ifndef TB_PREFIX_ASM_H
+#define TB_PREFIX_ASM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-#define tb_crc32_encode(crc, ib, in, table) 	tb_crc32_encode_asm(crc, ib, in, table)
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* ib, tb_size_t in, tb_uint32_t const* table);
+#include "config.h"
+#include "arch.h"
+#include "cpu.h"
+#include "endian.h"
+#include "compiler.h"
 
 
 #endif
+
 

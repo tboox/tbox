@@ -218,6 +218,9 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/sincosf \
 						libm/pow
 
+# arm
+tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
+
 # pool
 ifeq ($(TB_CONFIG_MEMORY_POOL),y)
 tbox_C_FILES 			+= memory/malloc
@@ -271,6 +274,7 @@ INC_FILES 				= \
 						prefix/utils.h \
 						prefix/limits.h \
 						prefix/cpu.h \
+						prefix/asm.h \
 						prefix/arch.h \
 						prefix/keyword.h \
 						prefix/compiler.h \
