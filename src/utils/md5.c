@@ -8,7 +8,7 @@
  * TBox is distributed ip the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Lesser General Public License for more implementaion.
  * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with TBox; 
@@ -84,12 +84,16 @@ static tb_byte_t g_md5_padding[64] =
 };
 
 /* ///////////////////////////////////////////////////////////////////////
- * details
+ * implementaion
  */
 
 // basic md5 step. the sp based on ip
 static tb_void_t tb_md5_transform(tb_uint32_t* sp, tb_uint32_t* ip)
 {
+	// check
+	tb_assert_and_check_return(sp && ip);
+
+	// init
 	tb_uint32_t a = sp[0], b = sp[1], c = sp[2], d = sp[3];
 
 	// round 1 
@@ -291,6 +295,7 @@ tb_size_t tb_md5_encode(tb_byte_t const* ib, tb_size_t in, tb_byte_t* ob, tb_siz
 	// exit
 	tb_md5_exit(&md5, ob, on);
 
+	// ok
 	return 16;
 }
 

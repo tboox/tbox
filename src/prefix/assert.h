@@ -45,16 +45,20 @@
 #define tb_assert_backtrace_dump() 							tb_backtrace_dump(TB_ASSERT_BACKTRACE_PREFIX, tb_null, TB_ASSERT_BACKTRACE_NFRAME)
 
 // assert
-#if defined(TB_ASSERT_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#if defined(TB_ASSERT_ENABLE) 
+# 	if defined(TB_COMPILER_IS_GCC)
+#		define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
+# 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 #		define tb_assert_message_tag(tag, x, fmt, ...)		do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
 # 	else
-#		define tb_assert_message_tag(tag, x, fmt, arg...)	do { if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
+#		define tb_assert_message_tag 
 # 	endif
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_assert_message_tag(...)
 #else
-#	define tb_assert_message_tag
+# 	if defined(TB_COMPILER_IS_GCC) || (defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0))
+#		define tb_assert_message_tag(tag, x, fmt, ...)
+# 	else
+#		define tb_assert_message_tag 
+# 	endif
 #endif
 
 #ifdef TB_ASSERT_ENABLE
@@ -87,12 +91,10 @@
 # 	define tb_assert_and_check_continue_tag(tag, x)			tb_check_continue(x)
 #endif
 
-#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
-# 		define tb_assert_message(x, fmt, ...)				tb_assert_message_tag(TB_PRINT_TAG, x, fmt, __VA_ARGS__)
-# 	else
-# 		define tb_assert_message(x, fmt, arg...)			tb_assert_message_tag(TB_PRINT_TAG, x, fmt, ## arg)
-# 	endif
+#if defined(TB_COMPILER_IS_GCC)
+# 	define tb_assert_message(x, fmt, arg...)			tb_assert_message_tag(TB_PRINT_TAG, x, fmt, ## arg)
+#elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+# 	define tb_assert_message(x, fmt, ...)				tb_assert_message_tag(TB_PRINT_TAG, x, fmt, __VA_ARGS__)
 #else
 # 	define tb_assert_message
 #endif

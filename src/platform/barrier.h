@@ -29,7 +29,6 @@
  */
 #include "prefix.h"
 #if defined(TB_COMPILER_IS_GCC) \
-	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
 	&&	TB_COMPILER_VERSION_BE(4, 1)
 # 	include "compiler/gcc/barrier.h"
 #elif defined(TB_CONFIG_OS_WINDOWS)

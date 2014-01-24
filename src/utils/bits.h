@@ -29,17 +29,15 @@
  */
 #include "prefix.h"
 #include "../libm/libm.h"
-
-#ifdef TB_COMPILER_IS_GCC
-# 	include "opt/bits_gcc.h"
+#if defined(TB_COMPILER_IS_GCC) 
+# 	include "opt/gcc/bits.h"
 #endif
-
 #if defined(TB_ARCH_x86) || defined(TB_ARCH_x64)
-# 	include "opt/bits_x86.h"
+# 	include "opt/x86/bits.h"
 #elif defined(TB_ARCH_ARM)
-# 	include "opt/bits_arm.h"
+# 	include "opt/arm/bits.h"
 #elif defined(TB_ARCH_SH4)
-# 	include "opt/bits_sh4.h"
+# 	include "opt/sh4/bits.h"
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////

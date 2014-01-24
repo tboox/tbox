@@ -17,50 +17,17 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		frame.h
+ * @file		prefix.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_ARM_FRAME_H
-#define TB_PLATFORM_ARCH_ARM_FRAME_H
+#ifndef TB_UTILS_OPT_ARM_PREFIX_H
+#define TB_UTILS_OPT_ARM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-// the current stack frame address
-#if !defined(TB_CURRENT_STACK_FRAME) \
-	&& defined(TB_COMPILER_IS_GCC) \
-	&&	TB_COMPILER_VERSION_BE(4, 1)
-# 	define TB_CURRENT_STACK_FRAME 				(__builtin_frame_address(0) - 12)
-#endif
-
-// the advance stack frame address
-#ifndef TB_ADVANCE_STACK_FRAME
-# 	define TB_ADVANCE_STACK_FRAME(next) 		((tb_frame_layout_t*)(next) - 1)
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-
-// the frame layout type
-typedef struct __tb_frame_layout_t
-{
-	// the next
-	struct __tb_frame_layout_t* 	next;
-
-	// the sp
-	tb_pointer_t 					sp;
-
-	// the frame return address
-	tb_pointer_t 					return_address;
-
-}tb_frame_layout_t;
 
 
 #endif

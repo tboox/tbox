@@ -35,8 +35,7 @@
 
 
 #if defined(TB_COMPILER_IS_GCC) \
-		&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
-			&& TB_COMPILER_VERSION_BE(3, 3)
+		&& TB_COMPILER_VERSION_BE(3, 3)
 # 	define TB_NAN	(__builtin_nanf (""))
 #elif defined(TB_COMPILER_IS_GCC)
 # 	define TB_NAN 	(__extension__ ((union { unsigned __l __attribute__ ((__mode__ (__SI__))); tb_float_t __d; }) { __l: 0x7fc00000UL }).__d)

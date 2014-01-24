@@ -58,8 +58,7 @@
 
 // offsetof
 #if defined(TB_COMPILER_IS_GCC) \
-	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
-		&&	TB_COMPILER_VERSION_BE(4, 1)
+	&&	TB_COMPILER_VERSION_BE(4, 1)
 # 	define tb_offsetof(s, m) 			(tb_size_t)__builtin_offsetof(s, m)
 #else
 # 	define tb_offsetof(s, m) 			(tb_size_t)&(((s const*)0)->m)

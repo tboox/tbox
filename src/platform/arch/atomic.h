@@ -34,8 +34,6 @@
 # 	include "x64/atomic.h"
 #elif defined(TB_ARCH_ARM)
 # 	include "arm/atomic.h"
-#elif defined(TB_ARCH_SH4)
-# 	include "sh4/atomic.h"
 #endif
 
 #endif
