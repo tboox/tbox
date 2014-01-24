@@ -68,8 +68,11 @@ typedef struct __tb_aicp_proactor_aiop_t
 	// the aioe size
 	tb_size_t 					maxn;
 
-	// the spak timer
+	// the spak timer for task
 	tb_handle_t					timer;
+
+	// the spak low precision timer for timeout
+	tb_handle_t					ltimer;
 
 	// the private data for file
 	tb_handle_t 				fpriv;
@@ -91,11 +94,14 @@ typedef struct __tb_aiop_aico_t
 	// the aice
 	tb_aice_t 					aice;
 
-	// the wait
-	tb_size_t 					wait;
-
 	// the task
 	tb_handle_t 				task;
+
+	// is waiting?
+	tb_uint8_t 					waiting : 1;
+
+	// is ltimer?
+	tb_uint8_t 					bltimer : 1;
 
 }tb_aiop_aico_t;
 
@@ -203,7 +209,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	// check
 	tb_aicp_proactor_aiop_t* 	ptor = (tb_aicp_proactor_aiop_t*)data;
 	tb_aicp_t* 					aicp = ptor? ptor->base.aicp : tb_null;
-	tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && ptor->timer && aicp, end);
+	tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && ptor->timer && ptor->ltimer && aicp, end);
 
 	// trace
 	tb_trace_impl("loop: init");
@@ -212,16 +218,22 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	while (!tb_atomic_get(&aicp->kill))
 	{
 		// the delay
-		tb_size_t delay = tb_ltimer_delay(ptor->timer);
+		tb_size_t delay = tb_timer_delay(ptor->timer);
+
+		// the ldelay
+		tb_size_t ldelay = tb_ltimer_delay(ptor->ltimer);
 
 		// wait aioe
-		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, delay);
+		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, tb_min(delay, ldelay));
 
 		// spak ctime
 		tb_ctime_spak();
 
 		// spak timer
-		if (!tb_ltimer_spak(ptor->timer)) break;
+		if (!tb_timer_spak(ptor->timer)) break;
+
+		// spak ltimer
+		if (!tb_ltimer_spak(ptor->ltimer)) break;
 
 		// killed?
 		tb_check_break(real >= 0);
@@ -276,10 +288,6 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			// sock?
 			if (aico->base.type == TB_AICO_TYPE_SOCK)
 			{
-				// exit the aico task
-				if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-				aico->task = tb_null;
-
 				// spak aice
 				if (!tb_queue_full(ptor->spak[priority])) tb_queue_put(ptor->spak[priority], aice);
 				else tb_assert(0);
@@ -314,7 +322,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_pointer_t data)
 {
 	// the aico
 	tb_aiop_aico_t* aico = data;
-	tb_assert_and_check_return(aico && aico->wait);
+	tb_assert_and_check_return(aico && aico->waiting);
 
 	// the ptor
 	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
@@ -365,7 +373,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_pointer_t data)
 static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t const* aice)
 {	
 	// check
-	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->timer && aice, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->ltimer && aice, tb_false);
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
@@ -380,15 +388,12 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 
 	// done
 	tb_bool_t ok = tb_false;
-	tb_size_t wait = aico->wait;
 	tb_aice_t prev = aico->aice;
 	do
 	{
 		// wait it
 		aico->aice = *aice;
-
-		// wait++
-		aico->wait++;
+		aico->waiting = 1;
 
 		// have aioo?
 		if (!aico->aioo) 
@@ -404,7 +409,11 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 
 		// add timeout task
 		tb_long_t timeout = tb_aico_timeout_from_code(aico, aice->code);
-		if (timeout >= 0) aico->task = tb_ltimer_task_add(ptor->timer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
+		if (timeout >= 0) 
+		{
+			aico->task = tb_ltimer_task_add(ptor->ltimer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
+			aico->bltimer = 1;
+		}
 
 		// ok
 		ok = tb_true;
@@ -419,7 +428,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 
 		// restore it
 		aico->aice = prev;
-		aico->wait = wait;
+		aico->waiting = 0;
 	}
 
 	// ok?
@@ -435,9 +444,6 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// accept it
 	tb_handle_t sock = tb_socket_accept(aico->base.handle);
 
@@ -448,7 +454,7 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!sock) 
 	{
 		// wait it
-		if (!aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -458,7 +464,7 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	aice->u.acpt.sock = sock;
 
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -475,9 +481,6 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// try to connect it
 	tb_long_t ok = tb_socket_connect(aico->base.handle, &aice->u.conn.addr, aice->u.conn.port);
 
@@ -488,7 +491,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!ok) 
 	{
 		// wait it
-		if (!aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_FAILED;
 	}
@@ -497,7 +500,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	aice->state = ok > 0? TB_AICE_STATE_OK : TB_AICE_STATE_FAILED;
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -513,9 +516,6 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
 	// try to recv it
 	tb_size_t recv = 0;
@@ -537,7 +537,7 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!recv) 
 	{
 		// wait it
-		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -551,7 +551,7 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	}
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -568,9 +568,6 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
- 
 	// try to send it
 	tb_size_t send = 0;
 	tb_long_t real = 0;
@@ -591,7 +588,7 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -605,7 +602,7 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	}
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -622,9 +619,6 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
 	// try to recv it
 	tb_size_t recv = 0;
@@ -646,7 +640,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	if (!recv) 
 	{
 		// wait it
-		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -660,7 +654,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -678,9 +672,6 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
- 
 	// try to send it
 	tb_size_t send = 0;
 	tb_long_t real = 0;
@@ -701,7 +692,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -715,7 +706,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -732,9 +723,6 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// recv it
 	tb_long_t real = tb_socket_recvv(aico->base.handle, aice->u.recvv.list, aice->u.recvv.size);
 
@@ -748,12 +736,12 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no recv?
-	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -770,9 +758,6 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// send it
 	tb_long_t real = tb_socket_sendv(aico->base.handle, aice->u.sendv.list, aice->u.sendv.size);
 
@@ -786,12 +771,12 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no send?
-	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -809,9 +794,6 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// recv it
 	tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
 
@@ -825,12 +807,12 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no recv?
-	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -848,9 +830,6 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
 
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
-
 	// send it
 	tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.port, aice->u.usendv.list, aice->u.usendv.size);
 
@@ -864,12 +843,12 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no send?
-	else if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -885,9 +864,6 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico && aico->base.handle, -1);
-
-	// check wait
-	tb_assert_and_check_return_val(aico->wait < 2, -1);
 
 	// try to send it
 	tb_long_t 	real = 0;
@@ -912,7 +888,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->wait) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -926,7 +902,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	}
 	
 	// reset wait
-	if (aico->wait) aico->wait--;
+	aico->waiting = 0;
 	aico->aice.code = TB_AICE_CODE_NONE;
 
 	// ok
@@ -936,7 +912,7 @@ static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t dat
 {
 	// the aico
 	tb_aiop_aico_t* aico = data;
-	tb_assert_and_check_return(aico && aico->wait);
+	tb_assert_and_check_return(aico && aico->waiting);
 
 	// the ptor
 	tb_aicp_proactor_aiop_t* ptor = aico->ptor;
@@ -982,7 +958,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
-	tb_assert_and_check_return_val(aico, -1);
+	tb_assert_and_check_return_val(aico && !aico->task, -1);
 
 	// now
 	tb_hong_t now = tb_ctime_time();
@@ -1005,13 +981,11 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 
 		// wait it
 		aico->aice = *aice;
-
-		// wait++
-		aico->wait++;
+		aico->waiting = 1;
 
 		// add timeout task
-		if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
-		aico->task = tb_ltimer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+		aico->task = tb_timer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+		aico->bltimer = 0;
 
 		// wait
 		ok = 0;
@@ -1023,21 +997,26 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_assert_and_check_return_val(ptor && ptor->timer && aice, -1);
+	tb_assert_and_check_return_val(ptor && ptor->timer && ptor->ltimer && aice, -1);
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
 	tb_assert_and_check_return_val(aico, -1);
 
 	// remove task
-	if (aico->task) tb_ltimer_task_del(ptor->timer, aico->task);
+	if (aico->task) 
+	{
+		if (aico->bltimer) tb_ltimer_task_del(ptor->ltimer, aico->task);
+		else tb_timer_task_del(ptor->timer, aico->task);
+		aico->bltimer = 0;
+	}
 	aico->task = tb_null;
 
 	// no pending? spak it directly
 	if (aice->state != TB_AICE_STATE_PENDING)
 	{
 		// reset wait
-		if (aico->wait) aico->wait--;
+		aico->waiting = 0;
 
 		// reset code
 		aico->aice.code = TB_AICE_CODE_NONE;
@@ -1050,7 +1029,7 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (tb_atomic_get(&aico->base.killed))
 	{
 		// reset wait
-		if (aico->wait) aico->wait--;
+		aico->waiting = 0;
 
 		// reset code
 		aico->aice.code = TB_AICE_CODE_NONE;
@@ -1147,14 +1126,19 @@ static tb_bool_t tb_aicp_proactor_aiop_delo(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->timer && aico, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->aiop && ptor->timer && ptor->ltimer && aico, tb_false);
 
 	// the aiop aico
 	tb_aiop_aico_t* aiop_aico = (tb_aiop_aico_t*)aico;
 	aiop_aico->ptor = tb_null;
 			
 	// exit the timeout task
-	if (aiop_aico->task) tb_ltimer_task_del(ptor->timer, aiop_aico->task);
+	if (aiop_aico->task) 
+	{
+		if (aiop_aico->bltimer) tb_ltimer_task_del(ptor->ltimer, aiop_aico->task);
+		else tb_timer_task_del(ptor->timer, aiop_aico->task);
+		aiop_aico->bltimer = 0;
+	}
 	aiop_aico->task = tb_null;
 
 	// done
@@ -1194,13 +1178,17 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->timer && ptor->aiop && aico);
+	tb_assert_and_check_return(ptor && ptor->timer && ptor->ltimer && ptor->aiop && aico);
 
 	// trace
 	tb_trace_impl("kilo: %p", aico);
 
 	// kill the task
-	if (((tb_aiop_aico_t*)aico)->task) tb_ltimer_task_kil(ptor->timer, ((tb_aiop_aico_t*)aico)->task);
+	if (((tb_aiop_aico_t*)aico)->task) 
+	{
+		if (((tb_aiop_aico_t*)aico)->bltimer) tb_ltimer_task_kil(ptor->ltimer, ((tb_aiop_aico_t*)aico)->task);
+		else tb_timer_task_kil(ptor->timer, ((tb_aiop_aico_t*)aico)->task);
+	}
 
 	// kill sock
 	if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
@@ -1210,9 +1198,7 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 		tb_aicp_file_kilo(ptor, aico);
 
 	/* the aiop will wait long time if the lastest task wait period is too long
-	 * so spak the aiop manually for spak the timer
-	 *
-	 * TODO: need impl epoll/kqueue for spak
+	 * so spak the aiop manually for spak the ltimer
 	 */
 	tb_aiop_spak(ptor->aiop);
 }
@@ -1280,7 +1266,7 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->timer && ptor->aiop);
+	tb_assert_and_check_return(ptor && ptor->timer && ptor->ltimer && ptor->aiop);
 
 	// the worker size
 	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
@@ -1289,7 +1275,10 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 	tb_trace_impl("kill: %lu", work);
 
 	// clear timer
-	tb_ltimer_clear(ptor->timer);
+	tb_timer_clear(ptor->timer);
+
+	// clear ltimer
+	tb_ltimer_clear(ptor->ltimer);
 
 	// kill aiop
 	tb_aiop_kill(ptor->aiop);
@@ -1341,8 +1330,12 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 		ptor->wait = tb_null;
 
 		// exit timer
-		if (ptor->timer) tb_ltimer_exit(ptor->timer);
+		if (ptor->timer) tb_timer_exit(ptor->timer);
 		ptor->timer = tb_null;
+
+		// exit ltimer
+		if (ptor->ltimer) tb_ltimer_exit(ptor->ltimer);
+		ptor->ltimer = tb_null;
 
 		// exit lock
 		tb_spinlock_exit(&ptor->lock);
@@ -1364,7 +1357,6 @@ static tb_void_t tb_aicp_proactor_aiop_loop_exit(tb_aicp_proactor_t* proactor, t
 	// check
 	tb_aicp_proactor_aiop_t* ptor = (tb_aicp_proactor_aiop_t*)proactor;
 	tb_assert_and_check_return(ptor);
-
 }
 static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, tb_handle_t loop, tb_aice_t* resp, tb_long_t timeout)
 {
@@ -1504,8 +1496,12 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->list, fail);
 
 	// init timer
-	ptor->timer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+	ptor->timer = tb_timer_init(aicp->maxn, tb_true);
 	tb_assert_and_check_goto(ptor->timer, fail);
+
+	// init ltimer
+	ptor->ltimer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
+	tb_assert_and_check_goto(ptor->ltimer, fail);
 
 	// init loop
 	ptor->loop = tb_thread_init(tb_null, tb_aiop_spak_loop, ptor, 0);
