@@ -1495,11 +1495,11 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	ptor->list = tb_nalloc0(ptor->maxn, sizeof(tb_aioe_t));
 	tb_assert_and_check_goto(ptor->list, fail);
 
-	// init timer
+	// init timer and using cache time
 	ptor->timer = tb_timer_init(aicp->maxn >> 3, tb_true);
 	tb_assert_and_check_goto(ptor->timer, fail);
 
-	// init ltimer
+	// init ltimer and using cache time
 	ptor->ltimer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
 	tb_assert_and_check_goto(ptor->ltimer, fail);
 
