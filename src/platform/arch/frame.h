@@ -42,7 +42,6 @@
 // the first frame address
 #if !defined(TB_FIRST_FRAME_POINTER) \
 	&& defined(TB_COMPILER_IS_GCC) \
-	&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
 	&&	TB_COMPILER_VERSION_BE(4, 1)
 # 	define TB_FIRST_FRAME_POINTER 				__builtin_frame_address(0)
 #endif

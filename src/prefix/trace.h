@@ -39,69 +39,69 @@
 #endif
 
 // print
-#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
-#		define tb_print_tag(tag, fmt, ...)					do { tb_printf("["tag"]: " fmt "\n" , __VA_ARGS__); } while (0)
-# 		define tb_print(fmt, ...)							tb_print_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 	else
-#		define tb_print_tag(tag, fmt, arg ...)				do { tb_printf("["tag"]: " fmt "\n" , ## arg); } while (0)
-# 		define tb_print(fmt, arg ...)						tb_print_tag(TB_PRINT_TAG, fmt, ## arg)
-# 	endif
+#if defined(TB_COMPILER_IS_GCC)
+#	define tb_print_tag(tag, fmt, arg ...)				do { tb_printf("["tag"]: " fmt "\n" , ## arg); } while (0)
+# 	define tb_print(fmt, arg ...)						tb_print_tag(TB_PRINT_TAG, fmt, ## arg)
+#elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+#	define tb_print_tag(tag, fmt, ...)					do { tb_printf("["tag"]: " fmt "\n" , __VA_ARGS__); } while (0)
+# 	define tb_print(fmt, ...)							tb_print_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 #else
 #	define tb_print_tag
 #	define tb_print
 #endif
 
 // wprint
-#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
-#		define tb_wprint_tag(tag, fmt, ...)					do { tb_wprintf(L"[" tag "]: " fmt "\n" , __VA_ARGS__); } while (0)
-# 		define tb_wprint(fmt, ...)							tb_wprint_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 	else
-#		define tb_wprint_tag(tag, fmt, arg ...)				do { tb_wprintf(L"[" tag "]: " fmt "\n" , ## arg); } while (0)
-# 		define tb_wprint(fmt, arg ...)						tb_wprint_tag(TB_PRINT_TAG, fmt, ## arg)
-# 	endif
+#if defined(TB_COMPILER_IS_GCC)
+#	define tb_wprint_tag(tag, fmt, arg ...)				do { tb_wprintf(L"[" tag "]: " fmt "\n" , ## arg); } while (0)
+# 	define tb_wprint(fmt, arg ...)						tb_wprint_tag(TB_PRINT_TAG, fmt, ## arg)
+#elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+#	define tb_wprint_tag(tag, fmt, ...)					do { tb_wprintf(L"[" tag "]: " fmt "\n" , __VA_ARGS__); } while (0)
+# 	define tb_wprint(fmt, ...)							tb_wprint_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 #else
 #	define tb_wprint_tag
 #	define tb_wprint
 #endif
 
 // trace_tag, the private macro
-#if defined(TB_TRACE_ENABLE) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#if defined(TB_TRACE_ENABLE)
+# 	if defined(TB_COMPILER_IS_GCC)
+#		define tb_trace_tag(tag, fmt, arg ...)				tb_print_tag(tag, fmt, ## arg)
+# 		define tb_trace_line_tag(tag, fmt, arg ...) 		tb_print_tag(tag, fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+# 		define tb_trace_warning_tag(tag, fmt, arg ...) 		tb_print_tag(tag, "warning: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+# 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 #		define tb_trace_tag(tag, fmt, ...)					tb_print_tag(tag, fmt, __VA_ARGS__)
 # 		define tb_trace_line_tag(tag, fmt, ...) 			tb_print_tag(tag, "func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
 # 		define tb_trace_warning_tag(tag, fmt, ...) 			tb_print_tag(tag, "warning: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
 # 	else
-#		define tb_trace_tag(tag, fmt, arg ...)				tb_print_tag(tag, fmt, ## arg)
-# 		define tb_trace_line_tag(tag, fmt, arg ...) 		tb_print_tag(tag, fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_trace_warning_tag(tag, fmt, arg ...) 		tb_print_tag(tag, "warning: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+#		define tb_trace_tag
+#		define tb_trace_line_tag
+#		define tb_trace_warning_tag
 # 	endif
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_trace_tag(...)
-# 	define tb_trace_line_tag(...)
-# 	define tb_trace_warning_tag(...)
 #else
-#	define tb_trace_tag
-# 	define tb_trace_line_tag
-# 	define tb_trace_warning_tag
+# 	if defined(TB_COMPILER_IS_GCC) || (defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0))
+#		define tb_trace_tag(tag, fmt, ...)		
+# 		define tb_trace_line_tag(tag, fmt, ...) 	
+# 		define tb_trace_warning_tag(tag, fmt, ...)
+# 	else
+#		define tb_trace_tag
+#		define tb_trace_line_tag
+#		define tb_trace_warning_tag
+# 	endif
 #endif
 
 // trace, the debug print
-#ifndef TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
-# 		define tb_trace(fmt, ...)							tb_trace_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 		define tb_trace_line(fmt, ...) 						tb_trace_line_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 		define tb_trace_warning(fmt, ...) 					tb_trace_warning_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
-# 	else
-# 		define tb_trace(fmt, arg ...)						tb_trace_tag(TB_PRINT_TAG, fmt, ## arg)
-# 		define tb_trace_line(fmt, arg ...) 					tb_trace_line_tag(TB_PRINT_TAG, fmt, ## arg)
-# 		define tb_trace_warning(fmt, arg ...) 				tb_trace_warning_tag(TB_PRINT_TAG, fmt, ## arg)
-# 	endif
+#if defined(TB_COMPILER_IS_GCC)
+# 	define tb_trace(fmt, arg ...)						tb_trace_tag(TB_PRINT_TAG, fmt, ## arg)
+# 	define tb_trace_line(fmt, arg ...) 					tb_trace_line_tag(TB_PRINT_TAG, fmt, ## arg)
+# 	define tb_trace_warning(fmt, arg ...) 				tb_trace_warning_tag(TB_PRINT_TAG, fmt, ## arg)
+#elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+# 	define tb_trace(fmt, ...)							tb_trace_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
+# 	define tb_trace_line(fmt, ...) 						tb_trace_line_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
+# 	define tb_trace_warning(fmt, ...) 					tb_trace_warning_tag(TB_PRINT_TAG, fmt, __VA_ARGS__)
 #else
 # 	define tb_trace
-# 	define tb_trace_line
-# 	define tb_trace_warning
+# 	define tb_trace_line		
+# 	define tb_trace_warning	
 #endif
 
 /* trace_impl
@@ -142,37 +142,47 @@
  * // no output
  *
  */
-#if defined(TB_TRACE_IMPL_TAG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#if defined(TB_TRACE_IMPL_TAG)
+# 	if defined(TB_COMPILER_IS_GCC)
+# 		define tb_trace_impl(fmt, arg ...)					tb_trace("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_trace_line_impl(fmt, arg ...) 			tb_trace_line("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_trace_warning_impl(fmt, arg ...) 			tb_trace_warning("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 # 		define tb_trace_impl(fmt, ...)						tb_trace("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
 # 		define tb_trace_line_impl(fmt, ...) 				tb_trace_line("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
 # 		define tb_trace_warning_impl(fmt, ...) 				tb_trace_warning("["TB_TRACE_IMPL_TAG"]: " fmt, __VA_ARGS__)
 # 	else
-# 		define tb_trace_impl(fmt, arg ...)					tb_trace("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
-# 		define tb_trace_line_impl(fmt, arg ...) 			tb_trace_line("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
-# 		define tb_trace_warning_impl(fmt, arg ...) 			tb_trace_warning("["TB_TRACE_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_trace_impl
+# 		define tb_trace_line_impl
+# 		define tb_trace_warning_impl
 # 	endif
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_trace_impl(...)
-# 	define tb_trace_line_impl(...)
-# 	define tb_trace_warning_impl(...)
 #else
-# 	define tb_trace_impl
-# 	define tb_trace_line_impl
-# 	define tb_trace_warning_impl
+# 	if defined(TB_COMPILER_IS_GCC) || (defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0))
+# 		define tb_trace_impl(fmt, ...)			
+# 		define tb_trace_line_impl(fmt, ...) 		
+# 		define tb_trace_warning_impl(fmt, ...) 	
+# 	else
+# 		define tb_trace_impl
+# 		define tb_trace_line_impl
+# 		define tb_trace_warning_impl
+# 	endif
 #endif
 
 // print_impl
-#if defined(TB_PRINT_IMPL_TAG) && !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-# 	if defined(TB_COMPILER_IS_MSVC) && (_MSC_VER >= 1300)
+#if defined(TB_PRINT_IMPL_TAG)
+# 	if defined(TB_COMPILER_IS_GCC)
+# 		define tb_print_impl(fmt, arg ...)					tb_print("["TB_PRINT_IMPL_TAG"]: " fmt, ## arg)
+# 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 # 		define tb_print_impl(fmt, ...)						tb_print("["TB_PRINT_IMPL_TAG"]: " fmt, __VA_ARGS__)
 # 	else
-# 		define tb_print_impl(fmt, arg ...)					tb_print("["TB_PRINT_IMPL_TAG"]: " fmt, ## arg)
+# 		define tb_print_impl
 # 	endif
-#elif !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_VARARG_MACRO)
-#	define tb_print_impl(...)
 #else
-# 	define tb_print_impl
+# 	if defined(TB_COMPILER_IS_GCC) || (defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0))
+# 		define tb_print_impl(fmt, ...)					
+# 	else
+# 		define tb_print_impl
+# 	endif
 #endif
 
 // noimpl

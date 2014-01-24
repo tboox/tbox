@@ -20,13 +20,14 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_PLATFROM_ARCH_SH4_PREFIX_H
-#define TB_PLATFORM_ARCH_SH4_PREFIX_H
+#ifndef TB_UTILS_OPT_x86_PREFIX_H
+#define TB_UTILS_OPT_x86_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "../prefix.h"
+
 
 
 #endif

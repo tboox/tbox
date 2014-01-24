@@ -17,17 +17,17 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		atomic.h
+ * @file		prefix.h
  *
  */
-#ifndef TB_PLATFORM_ARCH_SH4_ATOMIC_H
-#define TB_PLATFORM_ARCH_SH4_ATOMIC_H
-
+#ifndef TB_UTILS_OPT_GCC_PREFIX_H
+#define TB_UTILS_OPT_GCC_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
+#include "../prefix.h"
+
 
 
 #endif

@@ -387,8 +387,6 @@ INC_FILES 				= \
 						platform/arch/x64/barrier.h \
 						platform/arch/arm/prefix.h \
 						platform/arch/arm/atomic.h \
-						platform/arch/sh4/prefix.h \
-						platform/arch/sh4/atomic.h \
 						platform/windows/prefix.h \
 						platform/windows/atomic.h \
 						platform/windows/barrier.h \
@@ -438,10 +436,14 @@ INC_FILES 				= \
 						utils/dump.h \
 						utils/base32.h \
 						utils/base64.h \
-						utils/opt/bits_x86.h \
-						utils/opt/bits_arm.h \
-						utils/opt/bits_sh4.h \
-						utils/opt/bits_gcc.h \
+						utils/opt/x86/bits.h \
+						utils/opt/x86/prefix.h \
+						utils/opt/arm/bits.h \
+						utils/opt/arm/prefix.h \
+						utils/opt/sh4/bits.h \
+						utils/opt/sh4/prefix.h \
+						utils/opt/gcc/bits.h \
+						utils/opt/gcc/prefix.h \
 						utils/opt/prefix.h \
 						utils/base64.h \
 						xml/xml.h \

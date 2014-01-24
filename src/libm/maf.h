@@ -34,8 +34,7 @@
  */
 
 #if defined(TB_COMPILER_IS_GCC) \
-		&& !defined(TB_CONFIG_COMPILER_NOT_SUPPORT_BUILTIN_FUNCTIONS) \
-			&& TB_COMPILER_VERSION_BE(3, 3)
+		&& TB_COMPILER_VERSION_BE(3, 3)
 # 	define TB_MAF 		(__builtin_huge_val())
 #elif defined(TB_COMPILER_IS_GCC) && TB_COMPILER_VERSION_BE(2, 96)
 #	define TB_MAF 		(__extension__ 0x1.0p2047)
