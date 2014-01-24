@@ -62,19 +62,19 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		if (!tb_tstream_start(tstream, -1)) break;
 
 		// wait
-		getchar();
+//		getchar();
 
 		// pause tstream
 		tb_tstream_pause(tstream);
 
 		// wait
-		getchar();
+//		getchar();
 
 		// start tstream
 		if (!tb_tstream_start(tstream, -1)) break;
 
 		// wait
-		getchar();
+//		getchar();
 
 	} while (0);
 

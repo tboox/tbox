@@ -853,11 +853,7 @@ tb_void_t tb_tstream_exit(tb_handle_t handle)
 
 	// stop it first if not stoped
 	if (!tb_atomic_get(&tstream->stoped)) 
-	{
-		// stop it
 		tb_tstream_stop(handle);
-
-	}
 
 	// exit istream
 	if (tstream->istream)
