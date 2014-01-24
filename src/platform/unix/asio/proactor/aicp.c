@@ -1496,7 +1496,7 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	tb_assert_and_check_goto(ptor->list, fail);
 
 	// init timer
-	ptor->timer = tb_timer_init(aicp->maxn, tb_true);
+	ptor->timer = tb_timer_init(aicp->maxn >> 3, tb_true);
 	tb_assert_and_check_goto(ptor->timer, fail);
 
 	// init ltimer

@@ -55,6 +55,9 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		// init loop
 		if (!tb_thread_init(tb_null, tb_demo_tstream_loop, aicp, 0)) break;
 
+		// limit rate
+		tb_tstream_limit(tstream, argv[3]? tb_atoi(argv[3]) : 0);
+
 		// start tstream
 		if (!tb_tstream_start(tstream, -1)) break;
 
