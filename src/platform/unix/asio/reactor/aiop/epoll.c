@@ -190,8 +190,19 @@ static tb_long_t tb_aiop_reactor_epoll_wait(tb_aiop_reactor_t* reactor, tb_aioe_
 		// the events
 		tb_size_t events = rtor->evts[i].events;
 
-		// killed?
-		if (handle == aiop->spak[1] && (events & EPOLLIN)) return -1;
+		// spak?
+		if (handle == aiop->spak[1] && (events & EPOLLIN)) 
+		{
+			// read spak
+			tb_char_t spak = '\0';
+			if (1 != tb_socket_recv(aiop->spak[1], &spak, 1)) return -1;
+
+			// killed?
+			if (spak == 'k') return -1;
+
+			// continue it
+			continue ;
+		}
 
 		// skip spak
 		tb_check_continue(handle != aiop->spak[1]);

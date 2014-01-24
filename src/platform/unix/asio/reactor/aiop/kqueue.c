@@ -241,8 +241,19 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
 		// the handle 
 		tb_handle_t handle = aioo->handle;
 
-		// killed?
-		if (handle == aiop->spak[1] && e->filter == EVFILT_READ) return -1;
+		// spak?
+		if (handle == aiop->spak[1] && e->filter == EVFILT_READ) 
+		{
+			// read spak
+			tb_char_t spak = '\0';
+			if (1 != tb_socket_recv(aiop->spak[1], &spak, 1)) return -1;
+
+			// killed?
+			if (spak == 'k') return -1;
+
+			// continue it
+			continue ;
+		}
 
 		// skip spak
 		tb_check_continue(handle != aiop->spak[1]);

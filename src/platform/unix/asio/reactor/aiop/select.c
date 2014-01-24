@@ -226,8 +226,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 
 	// loop
 	tb_long_t wait = 0;
+	tb_bool_t stop = tb_false;
 	tb_hong_t time = tb_mclock();
-	while (!wait && (timeout < 0 || tb_mclock() < time + timeout))
+	while (!wait && !stop && (timeout < 0 || tb_mclock() < time + timeout))
 	{
 		// enter
 		if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
@@ -273,6 +274,9 @@ static tb_long_t tb_aiop_reactor_select_wait(tb_aiop_reactor_t* reactor, tb_aioe
 					// killed?
 					if (spak == 'k') wait = -1;
 					tb_check_break(wait >= 0);
+
+					// stop to wait
+					stop = tb_true;
 
 					// continue it
 					continue ;
