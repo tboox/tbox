@@ -280,14 +280,9 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
-	// wait pending 
-	tb_size_t tryn = 10;
-	while (tb_aico_pending(aico) && tryn--) tb_msleep(200);
-	if (tb_aico_pending(aico))
-	{
-		// trace
-		tb_trace("[aicp]: delo failed, the aico is pending for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
-	}
+//#error
+	// check, TODO: delay exit it from the aicp loop and exit if pending
+	tb_assert_and_check_return(!tb_aico_pending(aico));
 
 	// delo
 	if (aicp->ptor->delo(aicp->ptor, aico)) tb_aicp_aico_exit(aicp, aico);

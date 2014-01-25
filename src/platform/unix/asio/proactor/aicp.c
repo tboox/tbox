@@ -412,6 +412,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		if (timeout >= 0) 
 		{
 			aico->task = tb_ltimer_task_add(ptor->ltimer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
+			tb_assert_and_check_break(aico->task);
 			aico->bltimer = 1;
 		}
 
@@ -1037,6 +1038,9 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		// save state
 		aice->state = TB_AICE_STATE_KILLED;
 
+		// trace
+		tb_trace_impl("spak: code: %u: killed", aice->code);
+
 		// ok
 		return 1;
 	}
@@ -1181,7 +1185,7 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 	tb_assert_and_check_return(ptor && ptor->timer && ptor->ltimer && ptor->aiop && aico);
 
 	// trace
-	tb_trace_impl("kilo: %p", aico);
+	tb_trace_impl("kilo: type: %u", aico->type);
 
 	// kill the task
 	if (((tb_aiop_aico_t*)aico)->task) 

@@ -266,7 +266,8 @@ tb_bool_t tb_astream_open_impl(tb_astream_t* astream, tb_astream_open_func_t fun
 	tb_assert_and_check_return_val(astream && astream->open && func, tb_false);
 	
 	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened) && tb_atomic_get(&astream->stoped), tb_false);
+	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->stoped), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__

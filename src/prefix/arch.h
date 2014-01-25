@@ -60,15 +60,18 @@
 # 		else
 # 			define TB_ARCH_ARM_v5
 # 		endif
-# 	elif defined(__ARM_ARCH_7__)
-# 		define TB_ARCH_ARM_VERSION 		(7)
-# 		define TB_ARCH_ARM_v7
 # 	elif defined(__ARM_ARCH_7A__)
 # 		define TB_ARCH_ARM_VERSION 		(7)
 # 		define TB_ARCH_ARM_v7A
+# 	elif defined(__ARM_ARCH_7__)
+# 		define TB_ARCH_ARM_VERSION 		(7)
+# 		define TB_ARCH_ARM_v7
 # 	elif defined(__ARM_ARCH_6__)
 # 		define TB_ARCH_ARM_VERSION 		(6)
 # 		define TB_ARCH_ARM_v6
+# 	elif defined(__ARM_ARCH_5TE__)
+# 		define TB_ARCH_ARM_VERSION 		(5)
+# 		define TB_ARCH_ARM_v5te
 # 	elif defined(__ARM_ARCH_5__)
 # 		define TB_ARCH_ARM_VERSION 		(5)
 # 		define TB_ARCH_ARM_v5
@@ -105,6 +108,11 @@
 // vfp
 #if defined(__VFP_FP__)
 # 	define TB_ARCH_VFP
+#endif
+
+// elf
+#if defined(__ELF__)
+# 	define TB_ARCH_ELF
 #endif
 
 #endif
