@@ -721,6 +721,10 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 		// check
 		tb_assert_and_check_break(tstream->istream);
 
+		// must be not pending
+		tb_check_break(!tb_astream_pending(tstream->istream));
+		tb_check_break(tstream->type == TB_TSTREAM_TYPE_AA? !tb_astream_pending(((tb_tstream_aa_t*)tstream)->ostream) : tb_true);
+
 		// save offset
 		tstream->offset = offset;
 

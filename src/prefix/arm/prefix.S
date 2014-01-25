@@ -38,7 +38,7 @@
 # 	define T @
 #endif
 
-#if 0//def __ELF__
+#ifdef TB_ARCH_ELF
 # 	define ELF
 # 	define EXTERN_ASM
 #else
@@ -56,8 +56,10 @@
  		.arch armv7
 #elif defined(TB_ARCH_ARM_v6) 
  		.arch armv6
-#elif defined(TB_ARCH_ARM_v5) 
+#elif defined(TB_ARCH_ARM_v5te) 
  		.arch armv5te
+#elif defined(TB_ARCH_ARM_v5) 
+ 		.arch armv5
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
