@@ -23,14 +23,11 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../../../prefix/asm.S"
+#include "../../../prefix/prefix.S"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-	.text
-	.align 4
-
 	/* tb_uint32_t tb_crc32_encode_asm(tb_uint32_t crc, tb_byte_t const* data, tb_size_t size, tb_uint32_t const* table);
 	 * 
 	 * @param crc 	r0
@@ -40,8 +37,7 @@
 	 *
 	 * @return 		crc, r0
 	 */
-	.global tb_crc32_encode_asm
-tb_crc32_encode_asm:
+function tb_crc32_encode_asm, export=1
 
 	// enter
 	mov	ip, sp
@@ -258,3 +254,4 @@ end:
 	// leave
 	ldmea fp, {r4 - r9, sl, fp, sp, pc}
 
+endfunc

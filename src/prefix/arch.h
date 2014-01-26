@@ -53,18 +53,34 @@
 # 	define TB_ARCH_ARM
 # 	if defined(__ARM_ARCH)
 # 		define TB_ARCH_ARM_VERSION 		__ARM_ARCH
+# 		if __ARM_ARCH >= 7
+# 			define TB_ARCH_ARM_v7
+# 		elif __ARM_ARCH >= 6
+# 			define TB_ARCH_ARM_v6
+# 		else
+# 			define TB_ARCH_ARM_v5
+# 		endif
 # 	elif defined(__ARM_ARCH_7__)
 # 		define TB_ARCH_ARM_VERSION 		(7)
+# 		define TB_ARCH_ARM_v7
+# 	elif defined(__ARM_ARCH_7A__)
+# 		define TB_ARCH_ARM_VERSION 		(7)
+# 		define TB_ARCH_ARM_v7A
 # 	elif defined(__ARM_ARCH_6__)
 # 		define TB_ARCH_ARM_VERSION 		(6)
+# 		define TB_ARCH_ARM_v6
 # 	elif defined(__ARM_ARCH_5__)
 # 		define TB_ARCH_ARM_VERSION 		(5)
+# 		define TB_ARCH_ARM_v5
 # 	else 
 # 		error unknown arm arch version
 # 	endif
 # 	if defined(__thumb__)
 # 		define TB_ARCH_ARM_THUMB
 # 	endif
+# 	if defined(__ARM_NEON__)
+# 		define TB_ARCH_ARM_NEON
+# 	endif 
 #elif defined(mips) \
 	|| defined(_mips) \
 	|| defined(__mips__)
@@ -84,6 +100,11 @@
 # 	if defined(__SSE2__)
 # 		define TB_ARCH_SSE2
 # 	endif
+#endif
+
+// vfp
+#if defined(__VFP_FP__)
+# 	define TB_ARCH_VFP
 #endif
 
 #endif

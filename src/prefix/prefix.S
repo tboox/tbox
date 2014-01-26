@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asm.S
+ * @file		prefix.S
  *
  */
 
@@ -25,8 +25,7 @@
  * includes
  */
 #include "asm.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * macros
- */
+#if defined(TB_ARCH_ARM)
+# 	include "arm/prefix.S"
+#endif
 
