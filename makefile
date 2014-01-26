@@ -155,76 +155,73 @@ endif
 # #
 
 # platform
-PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
-PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
-PLAT := $(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
-PLAT := $(if $(PLAT),$(PLAT),linux)
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
+PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i cygwin},mingw,))
+PLAT :=$(if $(PLAT),$(PLAT),linux)
 
 # architecture
 ifeq ($(ARCH),)
 
-ARCH := $(if $(findstring mingw,$(PLAT)),x86,$(ARCH))
-ARCH := $(if $(findstring mac,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
-ARCH := $(if $(findstring linux,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
-ARCH := $(if $(findstring x32,$(ARCH)),x86,$(ARCH))
-ARCH := $(if $(findstring ios,$(PLAT)),armv7,$(ARCH))
-ARCH := $(if $(findstring android,$(PLAT)),armv7,$(ARCH))
+ARCH :=$(if $(findstring mingw,$(PLAT)),x86,$(ARCH))
+ARCH :=$(if $(findstring mac,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
+ARCH :=$(if $(findstring linux,$(PLAT)),x$(shell getconf LONG_BIT),$(ARCH))
+ARCH :=$(if $(findstring x32,$(ARCH)),x86,$(ARCH))
+ARCH :=$(if $(findstring ios,$(PLAT)),armv7,$(ARCH))
+ARCH :=$(if $(findstring android,$(PLAT)),armv7,$(ARCH))
 
 endif
 
 # debug
-DEBUG := $(if $(DEBUG),$(DEBUG),y)
+DEBUG :=$(if $(DEBUG),$(DEBUG),y)
 
 # debug type
-DTYPE := $(if $(findstring y,$(DEBUG)),d,r)
+DTYPE :=$(if $(findstring y,$(DEBUG)),d,r)
 
 # small
-SMALL := $(if $(SMALL),$(SMALL),y)
+SMALL :=$(if $(SMALL),$(SMALL),y)
 
 # demo
-DEMO := $(if $(DEMO),$(DEMO),y)
+DEMO :=$(if $(DEMO),$(DEMO),y)
 
 # profile
-PROF := $(if $(PROF),$(PROF),n)
+PROF :=$(if $(PROF),$(PROF),n)
 
 # zlib
-ZLIB := $(if $(ZLIB),$(ZLIB),n)
+ZLIB :=$(if $(ZLIB),$(ZLIB),n)
 
 # arm
-ARM := $(if $(findstring arm,$(ARCH)),y,n)
-ARMv5 := $(if $(findstring armv5,$(ARCH)),y,n)
-ARMv6 := $(if $(findstring armv6,$(ARCH)),y,n)
-ARMv7 := $(if $(findstring armv7,$(ARCH)),y,n)
+ARM :=$(if $(findstring arm,$(ARCH)),y,n)
 
 # x86
-x86 := $(if $(findstring x86,$(ARCH)),y,n)
+x86 :=$(if $(findstring x86,$(ARCH)),y,n)
 
 # x64
-x64 := $(if $(findstring x64,$(ARCH)),y,n)
+x64 :=$(if $(findstring x64,$(ARCH)),y,n)
 
 # sh4
-SH4 := $(if $(findstring sh4,$(ARCH)),y,n)
+SH4 :=$(if $(findstring sh4,$(ARCH)),y,n)
 
 # mips
-MIPS := $(if $(findstring mips,$(ARCH)),y,n)
+MIPS :=$(if $(findstring mips,$(ARCH)),y,n)
 
 # sparc
-SPARC := $(if $(findstring sparc,$(ARCH)),y,n)
+SPARC :=$(if $(findstring sparc,$(ARCH)),y,n)
 
 # project
-PRO_DIR 	:= ${shell pwd}
-PRO_NAME 	:= ${shell basename ${shell pwd}}
+PRO_DIR 	:=${shell pwd}
+PRO_NAME 	:=${shell basename ${shell pwd}}
 
 # ccache
 ifeq ($(CCACHE),n)
 CCACHE 		:= 
 else
-CCACHE 		:= ${shell if [ -f "/usr/bin/ccache" ]; then echo "ccache"; elif [ -f "/usr/local/bin/ccache" ]; then echo "ccache"; else echo ""; fi }
+CCACHE 		:=${shell if [ -f "/usr/bin/ccache" ]; then echo "ccache"; elif [ -f "/usr/local/bin/ccache" ]; then echo "ccache"; else echo ""; fi }
 endif
 
 # distcc
 ifeq ($(DISTCC),y)
-DISTCC 		:= ${shell if [ -f "/usr/bin/distcc" ]; then echo "distcc"; elif [ -f "/usr/local/bin/distcc" ]; then echo "distcc"; else echo ""; fi }
+DISTCC 		:=${shell if [ -f "/usr/bin/distcc" ]; then echo "distcc"; elif [ -f "/usr/local/bin/distcc" ]; then echo "distcc"; else echo ""; fi }
 else
 DISTCC 		:= 
 endif
@@ -273,6 +270,12 @@ config : .null
 	@echo ""                              				>> .config.mak
 	@echo "# architecture"                				>> .config.mak
 	@echo "ARCH ="$(ARCH) 								>> .config.mak
+	@echo "ARM ="$(ARM) 								>> .config.mak
+	@echo "x86 ="$(x86) 								>> .config.mak
+	@echo "x64 ="$(x64) 								>> .config.mak
+	@echo "SH4 ="$(SH4) 								>> .config.mak
+	@echo "MIPS ="$(MIPS) 								>> .config.mak
+	@echo "SPARC ="$(SPARC) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# demo" 			               				>> .config.mak
 	@echo "DEMO ="$(DEMO) 								>> .config.mak
@@ -298,9 +301,6 @@ config : .null
 	@echo "export PLAT"					 				>> .config.mak
 	@echo "export ARCH"					 				>> .config.mak
 	@echo "export ARM"					 				>> .config.mak
-	@echo "export ARMv5"					 			>> .config.mak
-	@echo "export ARMv6"					 			>> .config.mak
-	@echo "export ARMv7"					 			>> .config.mak
 	@echo "export x86"					 				>> .config.mak
 	@echo "export x64"					 				>> .config.mak
 	@echo "export SH4"					 				>> .config.mak
