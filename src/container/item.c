@@ -906,7 +906,7 @@ tb_item_func_t tb_item_func_ptr(tb_item_func_free_t free, tb_pointer_t priv)
 	func.ncopy = tb_item_func_ptr_ncopy;
 
 	func.size = sizeof(tb_pointer_t);
-	func.priv = tb_null;
+	func.priv = priv;
 
 	return func;
 }

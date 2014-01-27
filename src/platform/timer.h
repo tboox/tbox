@@ -71,7 +71,7 @@ tb_void_t 			tb_timer_clear(tb_handle_t handle);
  *
  * @param handle	the timer handle
  *
- * @return 			the timer delay
+ * @return 			the timer delay, (tb_size_t)-1: error or no task
  */
 tb_size_t 			tb_timer_delay(tb_handle_t handle);
 

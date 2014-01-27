@@ -213,16 +213,16 @@ tb_size_t tb_timer_delay(tb_handle_t handle)
 {
 	// check
 	tb_timer_t* timer = (tb_timer_t*)handle;
-	tb_assert_and_check_return_val(timer && timer->heap, 0);
+	tb_assert_and_check_return_val(timer && timer->heap, -1);
 
 	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), 0);
+	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), -1);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
 	// done
-	tb_size_t delay = 0; 
+	tb_size_t delay = -1; 
 	if (tb_heap_size(timer->heap))
 	{
 		// the task
@@ -338,6 +338,9 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 	{
 		// the delay
 		tb_size_t delay = tb_timer_delay(handle);
+		
+		// TODO: for delay == (tb_size_t)-1;
+		// ...
 			
 		// wait some time
 		if (delay) tb_msleep(delay);

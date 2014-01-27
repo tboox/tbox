@@ -76,7 +76,7 @@
  */
 
 struct __tb_aice_t;
-/// the callback type
+/// the aico callback type
 typedef tb_bool_t (*tb_aicb_t)(struct __tb_aice_t const* aice);
 
 /// the aico type enum
@@ -128,6 +128,12 @@ typedef struct __tb_aico_t
 	/// the timeout for aice
 	tb_atomic_t 		timeout[TB_AICO_TIMEOUT_MAXN];
 
+	/// the exit func
+	tb_void_t 			(*exit)(tb_pointer_t priv);
+
+	/// the private data for the exit func
+	tb_pointer_t 		priv;
+
 #ifdef __tb_debug__
 	/// the func
 	tb_char_t const* 	func;
@@ -149,28 +155,34 @@ typedef struct __tb_aico_t
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
+ * @param exit 		the exit func
+ * @param priv 		the private data for exit func
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle);
+tb_handle_t 		tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv);
 
 /*! init the file aico
  *
  * @param aicp 		the aicp
  * @param handle 	the handle
+ * @param exit 		the exit func
+ * @param priv 		the private data for exit func
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle);
+tb_handle_t 		tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle, tb_void_t (*exit)(tb_pointer_t ), tb_pointer_t priv);
 
 /*! init the task aico
  *
  * @param aicp 		the aicp
- * @param handle 	the handle
+ * @param bltimer 	is the lower precision timer
+ * @param exit 		the exit func
+ * @param priv 		the private data for exit func
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aico_init_task(tb_handle_t aicp);
+tb_handle_t 		tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer, tb_void_t (*exit)(tb_pointer_t ), tb_pointer_t priv);
 
 /*! kill the aico
  *

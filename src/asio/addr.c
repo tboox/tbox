@@ -488,7 +488,7 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_poin
 		tb_assert_and_check_break(sock);
 
 		// init aico
-		aico = tb_aico_init_sock(aicp, sock);
+		aico = tb_aico_init_sock(aicp, sock, tb_null, tb_null);
 		tb_assert_and_check_break(aico);
 
 		// make addr

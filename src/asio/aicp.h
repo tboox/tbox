@@ -84,6 +84,17 @@ typedef struct __tb_aicp_proactor_t
 
 }tb_aicp_proactor_t;
 
+/// the aicp lock type
+typedef struct __tb_aicp_lock_t
+{
+	/// the pool lock
+	tb_spinlock_t 			pool;
+
+	/// the list lock
+	tb_spinlock_t 			list;
+
+}tb_aicp_lock_t;
+
 /*! the aico pool type
  *
  * <pre>
@@ -105,9 +116,9 @@ typedef struct __tb_aicp_proactor_t
  * aice: | aice0   aice1   aice2   aice3      ...         | <---------------------------------------------------------------------------------
  *       '------------------------------------------------'                                                                                  |
  *                             |                                                                                                             |
- *                          [aicp]                                                                                                             |
+ *                          [aicp]                                                                                                           |
  *                             |         <= input aices                                                                                      |
- *                             |                                                                                             |
+ *                             |                                                                                                             |
  *                             '--------------------------------------------------------------                                               | 
  *                                                                |                          |                                               |
  *       |--------------------------------------------------------------------------------------------------|                                |
@@ -178,11 +189,17 @@ typedef struct __tb_aicp_t
 	/// the worker size
 	tb_atomic_t 			work;
 
-	/// the pool
+	/// the aico pool
 	tb_handle_t 			pool;
 
-	/// the pool lock
-	tb_spinlock_t 			lock;
+	/// the list list for delay exiting
+	tb_slist_t* 			list;
+
+	/// the lock
+	tb_aicp_lock_t 			lock;
+
+	/// the task
+	tb_handle_t 			task;
 
 }tb_aicp_t;
 
@@ -211,10 +228,12 @@ tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
  * @param aicp 		the aicp
  * @param handle 	the handle
  * @param type 		the aico type
+ * @param exit 		the exit func
+ * @param priv 		the private data for exit func
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
+tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv);
 
 /*! del the aico
  *

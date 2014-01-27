@@ -434,7 +434,7 @@ tb_size_t tb_ltimer_delay(tb_handle_t handle)
 {
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
-	tb_assert_and_check_return_val(timer, 0);
+	tb_assert_and_check_return_val(timer, -1);
 
 	// ok?
 	return timer->tick;
@@ -543,6 +543,9 @@ tb_void_t tb_ltimer_loop(tb_handle_t handle)
 	{
 		// the delay
 		tb_size_t delay = tb_ltimer_delay(handle);
+
+		// TODO: for delay == (tb_size_t)-1;
+		// ...
 			
 		// wait some time
 		if (delay) tb_msleep(delay);
