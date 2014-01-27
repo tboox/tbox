@@ -113,7 +113,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_check_break(fstream->file);
 
 		// addo file
-		fstream->aico = tb_aico_init_file(astream->aicp, fstream->file);
+		fstream->aico = tb_aico_init_file(astream->aicp, fstream->file, tb_null, tb_null);
 		tb_assert_and_check_break(fstream->aico);
 
 		// init offset

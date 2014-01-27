@@ -223,7 +223,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 		// the ldelay
 		tb_size_t ldelay = tb_ltimer_delay(ptor->ltimer);
 
-		// wait aioe
+		// wait aioe, TODO: need spak it if delay == (tb_size_t)-1
 		tb_long_t real = tb_aiop_wait(ptor->aiop, ptor->list, ptor->maxn, tb_min(delay, ldelay));
 
 		// spak ctime
@@ -953,7 +953,7 @@ static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t dat
 static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
-	tb_assert_and_check_return_val(ptor && ptor->timer && aice, -1);
+	tb_assert_and_check_return_val(ptor && ptor->ltimer && ptor->timer && aice, -1);
 	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_RUNTASK, -1);
 	tb_assert_and_check_return_val(aice->u.runtask.when, -1);
 
@@ -984,9 +984,17 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 		aico->aice = *aice;
 		aico->waiting = 1;
 
-		// add timeout task
-		aico->task = tb_timer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
-		aico->bltimer = 0;
+		// add timeout task, is the higher precision timer?
+		if (aico->base.handle)
+		{
+			aico->task = tb_timer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+			aico->bltimer = 0;
+		}
+		else
+		{
+			aico->task = tb_ltimer_task_add_at(ptor->ltimer, aice->u.runtask.when, 0, tb_false, tb_aiop_spak_runtask_timeout, aico);
+			aico->bltimer = 1;
+		}
 
 		// wait
 		ok = 0;

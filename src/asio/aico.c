@@ -32,20 +32,20 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle)
+tb_handle_t tb_aico_init_sock(tb_handle_t aicp, tb_handle_t handle, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv)
 {
 	// addo
-	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_SOCK);
+	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_SOCK, exit, priv);
 }
-tb_handle_t tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle)
+tb_handle_t tb_aico_init_file(tb_handle_t aicp, tb_handle_t handle, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv)
 {
 	// addo
-	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_FILE);
+	return tb_aicp_addo(aicp, handle, TB_AICO_TYPE_FILE, exit, priv);
 }
-tb_handle_t tb_aico_init_task(tb_handle_t aicp)
+tb_handle_t tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv)
 {
-	// addo
-	return tb_aicp_addo(aicp, tb_null, TB_AICO_TYPE_TASK);
+	// addo, hack: handle != null? using higher precision timer for being compatible with sock/file aico task
+	return tb_aicp_addo(aicp, (tb_handle_t)!bltimer, TB_AICO_TYPE_TASK, exit, priv);
 }
 tb_void_t tb_aico_kill(tb_handle_t haico)
 {
