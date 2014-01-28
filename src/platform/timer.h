@@ -75,6 +75,14 @@ tb_void_t 			tb_timer_clear(tb_handle_t handle);
  */
 tb_size_t 			tb_timer_delay(tb_handle_t handle);
 
+/*! the timer top when
+ *
+ * @param handle	the timer handle
+ *
+ * @return 			the top when, -1: no task
+ */
+tb_hize_t 			tb_timer_top(tb_handle_t handle);
+
 /*! spak timer for the external loop at the single thread
  *
  * @code

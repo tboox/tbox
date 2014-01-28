@@ -543,10 +543,8 @@ tb_void_t tb_ltimer_loop(tb_handle_t handle)
 	{
 		// the delay
 		tb_size_t delay = tb_ltimer_delay(handle);
+		tb_assert_and_check_break(delay != -1);
 
-		// TODO: for delay == (tb_size_t)-1;
-		// ...
-			
 		// wait some time
 		if (delay) tb_msleep(delay);
 
@@ -574,6 +572,9 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
 	tb_assert_and_check_return_val(timer && timer->pool && func, tb_null);
+
+	// stoped?
+	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_null);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
@@ -629,6 +630,9 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	// check
 	tb_ltimer_t* timer = (tb_ltimer_t*)handle;
 	tb_assert_and_check_return(timer && timer->pool && func);
+
+	// stoped?
+	tb_assert_and_check_return(!tb_atomic_get(&timer->stop));
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
