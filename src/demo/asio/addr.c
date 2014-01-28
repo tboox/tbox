@@ -29,7 +29,7 @@ static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr
 	}
 
 	// exit addr
-	if (haddr) tb_aicp_addr_exit(haddr);
+	if (haddr) tb_aicp_addr_exit(haddr, tb_true);
 
 	// kill aicp
 	tb_aicp_kill(aicp);
@@ -52,7 +52,7 @@ tb_int_t tb_demo_asio_addr_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// init addr
-	addr = tb_aicp_addr_init(aicp, tb_demo_sock_addr_func, tb_null);
+	addr = tb_aicp_addr_init(aicp, -1, tb_demo_sock_addr_func, tb_null);
 	tb_assert_and_check_goto(addr, end);
 
 	// sort server 

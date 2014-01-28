@@ -113,7 +113,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_check_break(fstream->file);
 
 		// addo file
-		fstream->aico = tb_aico_init_file(astream->aicp, fstream->file, tb_null, tb_null);
+		fstream->aico = tb_aico_init_file(astream->aicp, fstream->file);
 		tb_assert_and_check_break(fstream->aico);
 
 		// init offset
@@ -316,14 +316,14 @@ static tb_void_t tb_astream_file_kill(tb_astream_t* astream)
 	// kill it
 	if (fstream->aico) tb_aico_kill(fstream->aico);
 }
-static tb_void_t tb_astream_file_exit(tb_astream_t* astream)
+static tb_void_t tb_astream_file_exit(tb_astream_t* astream, tb_bool_t bself)
 {	
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
 	tb_assert_and_check_return(fstream);
 
 	// exit aico
-	if (fstream->aico) tb_aico_exit(fstream->aico);
+	if (fstream->aico) tb_aico_exit(fstream->aico, bself);
 	fstream->aico = tb_null;
 
 	// exit offset
@@ -435,7 +435,7 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	return (tb_astream_t*)astream;
 
 fail:
-	if (astream) tb_astream_exit((tb_astream_t*)astream);
+	if (astream) tb_astream_exit((tb_astream_t*)astream, tb_false);
 	return tb_null;
 }
 tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
@@ -453,6 +453,6 @@ tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
 	// ok
 	return astream;
 fail:
-	if (astream) tb_astream_exit(astream);
+	if (astream) tb_astream_exit(astream, tb_false);
 	return tb_null;
 }

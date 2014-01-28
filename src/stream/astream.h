@@ -314,7 +314,7 @@ typedef struct __tb_astream_t
 	tb_void_t 				(*kill)(struct __tb_astream_t* astream);
 
 	/// exit
-	tb_void_t 				(*exit)(struct __tb_astream_t* astream);
+	tb_void_t 				(*exit)(struct __tb_astream_t* astream, tb_bool_t bself);
 
 	/// ctrl
 	tb_bool_t 				(*ctrl)(struct __tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args);
@@ -358,8 +358,9 @@ tb_void_t 			tb_astream_kill(tb_astream_t* astream);
 /*! exit stream
  *
  * @param astream 	the stream
+ * @param bself 	exit it at the self callback?
  */
-tb_void_t 			tb_astream_exit(tb_astream_t* astream);
+tb_void_t 			tb_astream_exit(tb_astream_t* astream, tb_bool_t bself);
 
 /*! the stream is pending?
  *

@@ -161,7 +161,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* a
 			tb_assert_and_check_break(sstream->data);
 
 			// init aico
-			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock, tb_null, tb_null);
+			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock);
 			tb_assert_and_check_break(sstream->aico);
 
 			// init timeout
@@ -205,7 +205,7 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	tb_assert_and_check_return_val(host, tb_false);
 
 	// init addr
-	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(astream->aicp, tb_astream_sock_addr_func, astream);
+	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(astream->aicp, sstream->base.timeout, tb_astream_sock_addr_func, astream);
 	tb_assert_and_check_return_val(sstream->addr, tb_false);
 
 	// save func and priv
@@ -373,18 +373,18 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 	// kill it
 	if (sstream->aico) tb_aico_kill(sstream->aico);
 }
-static tb_void_t tb_astream_sock_exit(tb_astream_t* astream)
+static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bself)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
 	// exit aico
-	if (sstream->aico) tb_aico_exit(sstream->aico);
+	if (sstream->aico) tb_aico_exit(sstream->aico, bself);
 	sstream->aico = tb_null;
 
 	// exit addr
-	if (sstream->addr) tb_aicp_addr_exit(sstream->addr);
+	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bself);
 	sstream->addr = tb_null;
 
 	// exit it
@@ -426,7 +426,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			if (sstream->type != type)
 			{
 				// exit aico
-				if (sstream->aico) tb_aico_exit(sstream->aico);
+				if (sstream->aico) tb_aico_exit(sstream->aico, tb_false);
 				sstream->aico = tb_null;
 
 				// exit it
@@ -453,7 +453,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			if (sstream->sock != sock)
 			{
 				// exit aico
-				if (sstream->aico) tb_aico_exit(sstream->aico);
+				if (sstream->aico) tb_aico_exit(sstream->aico, tb_false);
 				sstream->aico = tb_null;
 
 				// exit it
@@ -509,7 +509,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	return (tb_astream_t*)astream;
 
 fail:
-	if (astream) tb_astream_exit((tb_astream_t*)astream);
+	if (astream) tb_astream_exit((tb_astream_t*)astream, tb_false);
 	return tb_null;
 }
 tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
@@ -532,6 +532,6 @@ tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, 
 	// ok
 	return astream;
 fail:
-	if (astream) tb_astream_exit(astream);
+	if (astream) tb_astream_exit(astream, tb_false);
 	return tb_null;
 }

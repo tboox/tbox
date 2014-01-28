@@ -54,7 +54,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->sock = tb_null;
 
 		// exit aico
-		if (context->aico[0]) tb_aico_exit(context->aico[0]);
+		if (context->aico[0]) tb_aico_exit(context->aico[0], tb_true);
 		context->aico[0] = tb_null;
 
 		// exit
@@ -75,10 +75,10 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->sock = tb_null;
 
 		// exit aico
-		if (context->aico[0]) tb_aico_exit(context->aico[0]);
+		if (context->aico[0]) tb_aico_exit(context->aico[0], tb_true);
 		context->aico[0] = tb_null;
 
-		if (context->aico[1]) tb_aico_exit(context->aico[1]);
+		if (context->aico[1]) tb_aico_exit(context->aico[1], tb_true);
 		context->aico[1] = tb_null;
 		
 		// exit data
@@ -251,7 +251,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file);
 
 			// addo sock
-			context->aico[0] = tb_aico_init_sock(aicp, context->sock, tb_null, tb_null);
+			context->aico[0] = tb_aico_init_sock(aicp, context->sock);
 			tb_assert_and_check_break(context->aico[0]);
 
 			// post sendfile from file
@@ -264,11 +264,11 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			tb_assert_and_check_break(context->file && context->data);
 
 			// addo sock
-			context->aico[0] = tb_aico_init_sock(aicp, context->sock, tb_null, tb_null);
+			context->aico[0] = tb_aico_init_sock(aicp, context->sock);
 			tb_assert_and_check_break(context->aico[0]);
 
 			// addo file
-			context->aico[1] = tb_aico_init_file(aicp, context->file, tb_null, tb_null);
+			context->aico[1] = tb_aico_init_file(aicp, context->file);
 			tb_assert_and_check_break(context->aico[1]);
 
 			// post read from file
@@ -388,15 +388,15 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(aicp, end);
 
 	// addo sock
-	aico = tb_aico_init_sock(aicp, sock, tb_null, tb_null);
+	aico = tb_aico_init_sock(aicp, sock);
 	tb_assert_and_check_goto(aico, end);
 
 	// addo task
-	task = tb_aico_init_task(aicp, tb_false, tb_null, tb_null);
+	task = tb_aico_init_task(aicp, tb_false);
 	tb_assert_and_check_goto(task, end);
 
 	// run task
-//	if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
+	if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
 //	if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) goto end;
 
 	// init acpt timeout
@@ -436,10 +436,10 @@ end:
 	}
 
 	// exit aico
-	if (aico) tb_aico_exit(aico);
+	if (aico) tb_aico_exit(aico, tb_false);
 
 	// exit task
-	if (task) tb_aico_exit(task);
+	if (task) tb_aico_exit(task, tb_false);
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

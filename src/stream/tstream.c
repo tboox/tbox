@@ -695,11 +695,11 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 	} while (0);
 
 	// exit istream
-	if (istream) tb_astream_exit(istream);
+	if (istream) tb_astream_exit(istream, tb_false);
 	istream = tb_null;
 
 	// exit ostream
-	if (ostream) tb_astream_exit(ostream);
+	if (ostream) tb_astream_exit(ostream, tb_false);
 	ostream = tb_null;
 
 	// ok?
@@ -846,7 +846,7 @@ tb_void_t tb_tstream_stop(tb_handle_t handle)
 		}
 	}
 }
-tb_void_t tb_tstream_exit(tb_handle_t handle)
+tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bself)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
@@ -862,17 +862,8 @@ tb_void_t tb_tstream_exit(tb_handle_t handle)
 	// exit istream
 	if (tstream->istream)
 	{
-		// wait it
-		tb_size_t tryn = 10;
-		while (tb_astream_pending(tstream->istream) && tryn--) tb_msleep(200);
-		if (tb_astream_pending(tstream->istream))
-		{
-			// trace
-			tb_trace("[tstream]: the istream is pending for func: %s, line: %lu, file: %s", tstream->istream->func, tstream->istream->line, tstream->istream->file);
-		}
-
 		// exit it
-		if (tstream->iowner) tb_astream_exit(tstream->istream);
+		if (tstream->iowner) tb_astream_exit(tstream->istream, bself);
 		tstream->istream = tb_null;
 	}
 
@@ -882,17 +873,8 @@ tb_void_t tb_tstream_exit(tb_handle_t handle)
 		tb_astream_t* ostream = ((tb_tstream_aa_t*)tstream)->ostream;
 		if (ostream)
 		{
-			// wait it
-			tb_size_t tryn = 10;
-			while (tb_astream_pending(ostream) && tryn--) tb_msleep(200);
-			if (tb_astream_pending(ostream))
-			{
-				// trace
-				tb_trace("[tstream]: the ostream is pending for func: %s, line: %lu, file: %s", ostream->func, ostream->line, ostream->file);
-			}
-
 			// exit it
-			if (((tb_tstream_aa_t*)tstream)->oowner) tb_astream_exit(ostream);
+			if (((tb_tstream_aa_t*)tstream)->oowner) tb_astream_exit(ostream, bself);
 			((tb_tstream_aa_t*)tstream)->ostream = tb_null;
 		}
 	}
