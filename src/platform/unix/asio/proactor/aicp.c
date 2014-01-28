@@ -1286,12 +1286,6 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 	// trace
 	tb_trace_impl("kill: %lu", work);
 
-	// clear timer
-	tb_timer_clear(ptor->timer);
-
-	// clear ltimer
-	tb_ltimer_clear(ptor->ltimer);
-
 	// kill aiop
 	tb_aiop_kill(ptor->aiop);
 

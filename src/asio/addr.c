@@ -471,7 +471,7 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_pointer_t data)
+tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && func, tb_null);
@@ -488,8 +488,12 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_poin
 		tb_assert_and_check_break(sock);
 
 		// init aico
-		aico = tb_aico_init_sock(aicp, sock, tb_null, tb_null);
+		aico = tb_aico_init_sock(aicp, sock);
 		tb_assert_and_check_break(aico);
+
+		// init timeout
+		tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_SEND, timeout);
+		tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_RECV, timeout);
 
 		// make addr
 		addr = (tb_aicp_addr_t*)tb_aico_pool_malloc0(aico, sizeof(tb_aicp_addr_t));
@@ -512,11 +516,11 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_poin
 	if (!ok)
 	{
 		// exit it
-		if (addr) tb_aicp_addr_exit(addr);
+		if (addr) tb_aicp_addr_exit(addr, tb_false);
 		addr = tb_null;
 
 		// exit aico
-		if (aico) tb_aico_exit(aico);
+		if (aico) tb_aico_exit(aico, tb_false);
 		aico = tb_null;
 
 		// exit sock
@@ -536,7 +540,7 @@ tb_void_t tb_aicp_addr_kill(tb_handle_t haddr)
 	// kill sock
 	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
 }
-tb_void_t tb_aicp_addr_exit(tb_handle_t haddr)
+tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bself)
 {
 	// check
 	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
@@ -552,7 +556,7 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t haddr)
 	if (aico) tb_aico_pool_free(aico, addr);
 
 	// exit aico
-	if (aico) tb_aico_exit(aico);
+	if (aico) tb_aico_exit(aico, bself);
 
 	// exit sock
 	if (sock) tb_socket_close(sock);

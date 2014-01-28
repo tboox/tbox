@@ -84,17 +84,6 @@ typedef struct __tb_aicp_proactor_t
 
 }tb_aicp_proactor_t;
 
-/// the aicp lock type
-typedef struct __tb_aicp_lock_t
-{
-	/// the pool lock
-	tb_spinlock_t 			pool;
-
-	/// the list lock
-	tb_spinlock_t 			list;
-
-}tb_aicp_lock_t;
-
 /*! the aico pool type
  *
  * <pre>
@@ -189,17 +178,11 @@ typedef struct __tb_aicp_t
 	/// the worker size
 	tb_atomic_t 			work;
 
-	/// the aico pool
+	/// the pool
 	tb_handle_t 			pool;
 
-	/// the list list for delay exiting
-	tb_slist_t* 			list;
-
-	/// the lock
-	tb_aicp_lock_t 			lock;
-
-	/// the task
-	tb_handle_t 			task;
+	/// the pool lock
+	tb_spinlock_t 			lock;
 
 }tb_aicp_t;
 
@@ -233,14 +216,15 @@ tb_void_t 			tb_aicp_exit(tb_aicp_t* aicp);
  *
  * @return 			the aico
  */
-tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type, tb_void_t (*exit)(tb_pointer_t), tb_pointer_t priv);
+tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
 
 /*! del the aico
  *
  * @param aicp 		the aicp
  * @param aico 		the aico
+ * @param bself 	delo it at the self callback?
  */
-tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico);
+tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself);
 
 /*! kil the aico
  *

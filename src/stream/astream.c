@@ -216,10 +216,10 @@ tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 fail:
 	
 	// exit stream
-	if (astream) tb_astream_exit(astream);
+	if (astream) tb_astream_exit(astream, tb_false);
 	return tb_null;
 }
-tb_void_t tb_astream_exit(tb_astream_t* astream)
+tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bself)
 {
 	// check
 	tb_assert_and_check_return(astream);
@@ -229,7 +229,7 @@ tb_void_t tb_astream_exit(tb_astream_t* astream)
 		tb_astream_kill(astream);
 
 	// exit it
-	if (astream->exit) astream->exit(astream);
+	if (astream->exit) astream->exit(astream, bself);
 
 	// exit url
 	tb_url_exit(&astream->url);

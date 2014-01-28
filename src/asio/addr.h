@@ -44,12 +44,13 @@ typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_ipv4_t const* ad
 /*! init the addr 
  *
  * @param aicp 		the aicp
+ * @param timeout 	the timeout, ms
  * @param func 		the func
  * @param data 		the func data
  *
  * @return 			the addr handle
  */
-tb_handle_t 		tb_aicp_addr_init(tb_aicp_t* aicp, tb_aicp_addr_func_t func, tb_pointer_t data);
+tb_handle_t 		tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_func_t func, tb_pointer_t data);
 
 /*! kill the addr
  *
@@ -60,8 +61,9 @@ tb_void_t 			tb_aicp_addr_kill(tb_handle_t haddr);
 /*! exit the addr
  *
  * @param haddr 	the addr handle
+ * @param bself 	exit it at the self callback?
  */
-tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr);
+tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bself);
 
 /*! done the addr
  *

@@ -79,11 +79,11 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 	} while (0);
 
 	// exit tstream
-	if (tstream) tb_tstream_exit(tstream);
+	if (tstream) tb_tstream_exit(tstream, tb_false);
 	tstream = tb_null;
 
 	// exit istream
-	if (istream) tb_astream_exit(istream);
+	if (istream) tb_astream_exit(istream, tb_false);
 	istream = tb_null;
 
 	// exit ostream

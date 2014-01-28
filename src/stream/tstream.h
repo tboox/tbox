@@ -139,7 +139,8 @@ tb_void_t 			tb_tstream_stop(tb_handle_t tstream);
 /*! exit transfer stream 
  *
  * @param tstream 	the tstream
+ * @param bself 	exit it at the self callback?
  */
-tb_void_t 			tb_tstream_exit(tb_handle_t tstream);
+tb_void_t 			tb_tstream_exit(tb_handle_t tstream, tb_bool_t bself);
 
 #endif

@@ -239,15 +239,15 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 	} while (0);
 
 	// exit tstream
-	if (context.tstream) tb_tstream_exit(context.tstream);
+	if (context.tstream) tb_tstream_exit(context.tstream, tb_false);
 	context.tstream = tb_null;
 
 	// exit istream
-	if (context.istream) tb_astream_exit(context.istream);
+	if (context.istream) tb_astream_exit(context.istream, tb_false);
 	context.istream = tb_null;
 
 	// exit ostream
-	if (context.ostream) tb_astream_exit(context.ostream);
+	if (context.ostream) tb_astream_exit(context.ostream, tb_false);
 	context.ostream = tb_null;
 
 	// exit option

@@ -200,11 +200,11 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(context.data, end);
 
 	// addo sock
-	context.aico[0] = tb_aico_init_sock(aicp, context.sock, tb_null, tb_null);
+	context.aico[0] = tb_aico_init_sock(aicp, context.sock);
 	tb_assert_and_check_goto(context.aico[0], end);
 
 	// addo file
-	context.aico[1] = tb_aico_init_file(aicp, context.file, tb_null, tb_null);
+	context.aico[1] = tb_aico_init_file(aicp, context.file);
 	tb_assert_and_check_goto(context.aico[1], end);
 
 	// init conn timeout
