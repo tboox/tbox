@@ -89,6 +89,9 @@ typedef struct __tb_timer_t
 	// the heap
 	tb_heap_t* 					heap;
 
+	// the event
+	tb_handle_t 				event;
+
 }tb_timer_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -170,6 +173,12 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		// warning
 		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[timer]: the loop has been not exited now!");
 
+		// post event
+		tb_spinlock_enter(&timer->lock);
+		tb_handle_t event = timer->event;
+		tb_spinlock_leave(&timer->lock);
+		if (event) tb_event_post(event);
+
 		// enter
 		tb_spinlock_enter(&timer->lock);
 
@@ -180,6 +189,10 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		// exit pool
 		if (timer->pool) tb_rpool_exit(timer->pool);
 		timer->pool = tb_null;
+
+		// exit event
+		if (timer->event) tb_event_exit(timer->event);
+		timer->event = tb_null;
 
 		// leave
 		tb_spinlock_leave(&timer->lock);
@@ -208,6 +221,33 @@ tb_void_t tb_timer_clear(tb_handle_t handle)
 		// leave
 		tb_spinlock_leave(&timer->lock);
 	}
+}
+tb_hize_t tb_timer_top(tb_handle_t handle)
+{
+	// check
+	tb_timer_t* timer = (tb_timer_t*)handle;
+	tb_assert_and_check_return_val(timer && timer->heap, -1);
+
+	// stoped?
+	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), -1);
+
+	// enter
+	tb_spinlock_enter(&timer->lock);
+
+	// done
+	tb_hize_t when = -1; 
+	if (tb_heap_size(timer->heap))
+	{
+		// the task
+		tb_timer_task_t const* task = tb_heap_top(timer->heap);
+		if (task) when = task->when;
+	}
+
+	// leave
+	tb_spinlock_leave(&timer->lock);
+
+	// ok?
+	return when;
 }
 tb_size_t tb_timer_delay(tb_handle_t handle)
 {
@@ -333,17 +373,27 @@ tb_void_t tb_timer_loop(tb_handle_t handle)
 	// work++
 	tb_atomic_fetch_and_inc(&timer->work);
 
+	// init event 
+	tb_spinlock_enter(&timer->lock);
+	if (!timer->event) timer->event = tb_event_init();
+	tb_spinlock_leave(&timer->lock);
+
 	// loop
 	while (!tb_atomic_get(&timer->stop))
 	{
 		// the delay
 		tb_size_t delay = tb_timer_delay(handle);
-		
-		// TODO: for delay == (tb_size_t)-1;
-		// ...
-			
-		// wait some time
-		if (delay) tb_msleep(delay);
+		if (delay)
+		{
+			// the event
+			tb_spinlock_enter(&timer->lock);
+			tb_handle_t event = timer->event;
+			tb_spinlock_leave(&timer->lock);
+			tb_check_break(event);
+
+			// wait some time
+			if (tb_event_wait(event, delay) < 0) break;
+		}
 
 		// spak ctime
 		if (timer->ctime) tb_ctime_spak();
@@ -370,13 +420,25 @@ tb_handle_t tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return_val(timer && timer->pool && timer->heap && func, tb_null);
 
+	// stoped?
+	tb_assert_and_check_return_val(!tb_atomic_get(&timer->stop), tb_null);
+
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
 	// make task
-	tb_timer_task_t* task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_handle_t 		event = tb_null;
+	tb_hize_t 			when_top = -1;
+	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
 	if (task)
 	{
+		// the top when 
+		if (tb_heap_size(timer->heap))
+		{
+			tb_timer_task_t* task = tb_heap_top(timer->heap);
+			if (task) when_top = task->when;
+		}
+
 		// init task
 		task->refn 		= 2;
 		task->func 		= func;
@@ -387,10 +449,17 @@ tb_handle_t tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 
 		// add task
 		tb_heap_put(timer->heap, task);
+
+		// the event
+		event = timer->event;
 	}
 
 	// leave
 	tb_spinlock_leave(&timer->lock);
+
+	// post event if the top task is changed
+	if (event && task && when < when_top)
+		tb_event_post(event);
 
 	// ok?
 	return task;
@@ -419,13 +488,25 @@ tb_void_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t per
 	tb_timer_t* timer = (tb_timer_t*)handle;
 	tb_assert_and_check_return(timer && timer->pool && timer->heap && func);
 
+	// stoped?
+	tb_assert_and_check_return(!tb_atomic_get(&timer->stop));
+
 	// enter
 	tb_spinlock_enter(&timer->lock);
 
 	// make task
-	tb_timer_task_t* task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_handle_t 		event = tb_null;
+	tb_hize_t 			when_top = -1;
+	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
 	if (task)
 	{
+		// the top when 
+		if (tb_heap_size(timer->heap))
+		{
+			tb_timer_task_t* task = tb_heap_top(timer->heap);
+			if (task) when_top = task->when;
+		}
+
 		// init task
 		task->refn 		= 1;
 		task->func 		= func;
@@ -436,10 +517,17 @@ tb_void_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t per
 
 		// add task
 		tb_heap_put(timer->heap, task);
+
+		// the event
+		event = timer->event;
 	}
 
 	// leave
 	tb_spinlock_leave(&timer->lock);
+
+	// post event if the top task is changed
+	if (event && task && when < when_top)
+		tb_event_post(event);
 }
 tb_void_t tb_timer_task_run_after(tb_handle_t handle, tb_hize_t after, tb_size_t period, tb_bool_t repeat, tb_timer_task_func_t func, tb_pointer_t data)
 {
