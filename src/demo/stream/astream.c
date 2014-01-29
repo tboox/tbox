@@ -62,7 +62,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_size_t size, tb_s
 		{
 			if (tb_mclock() - context->basc > 1000) 
 			{
-				tb_printf("save: %llu bytes, rate: %llu bytes/s\n", context->size, rate);
+				tb_printf("save: %llu bytes, rate: %lu bytes/s\n", context->size, rate);
 				context->basc = tb_mclock();
 			}
 		}
@@ -72,7 +72,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_size_t size, tb_s
 	else
 	{
 		// print verbose info
-		if (context->verbose) tb_printf("save: %llu bytes, rate: %llu bytes / s, state: %s\n", context->size, rate, tb_astream_state_cstr(state));
+		if (context->verbose) tb_printf("save: %llu bytes, rate: %lu bytes / s, state: %s\n", context->size, rate, tb_astream_state_cstr(state));
 
 		// kill aicp
 		tb_aicp_kill(tb_astream_aicp(context->istream));

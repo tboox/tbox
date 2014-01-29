@@ -107,7 +107,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 			tb_assert_and_check_break(url);
 
 			// open file
-			fstream->file = tb_file_init(url, fstream->mode);
+			fstream->file = tb_file_init(url, fstream->mode | TB_FILE_MODE_AICP);
 			fstream->bref = tb_false;
 		}
 		tb_check_break(fstream->file);

@@ -1213,9 +1213,8 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 
 	// kill sock
 	if (aico->type == TB_AICO_TYPE_SOCK && aico->handle) tb_socket_kill(aico->handle, TB_SOCKET_KILL_RW);
-	
 	// kill file
-	if (aico->type == TB_AICO_TYPE_FILE)
+	else if (aico->type == TB_AICO_TYPE_FILE)
 		tb_aicp_file_kilo(ptor, aico);
 
 	/* the aiop will wait long time if the lastest task wait period is too long

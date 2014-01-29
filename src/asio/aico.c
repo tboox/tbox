@@ -148,7 +148,6 @@ tb_bool_t tb_aico_pending(tb_handle_t haico)
 
 	// calling?
 	if (tb_atomic_get(&aico->calling)) return tb_true;
-
 	
 	// no pending
 	return tb_false;
