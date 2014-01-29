@@ -64,8 +64,11 @@ typedef struct __tb_aicp_proactor_iocp_t
 	// the spak low precision timer for timeout
 	tb_handle_t								ltimer;
 
-	// the self for the timer loop
-	tb_atomic_t 							tself;
+	// the timer loop
+	tb_handle_t 							loop;
+
+	// the timer event
+	tb_handle_t 							event;
 
 	// the AcceptEx func
 	tb_api_AcceptEx_t 						AcceptEx;
@@ -134,6 +137,60 @@ typedef struct __tb_iocp_loop_t
  */
 static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data);
 static tb_void_t tb_iocp_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t data);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * timer 
+ */
+static tb_pointer_t tb_iocp_timer_loop(tb_pointer_t data)
+{
+	// check
+	tb_aicp_proactor_iocp_t* 	ptor = (tb_aicp_proactor_iocp_t*)data;
+	tb_aicp_t* 					aicp = ptor? ptor->base.aicp : tb_null;
+	tb_assert_and_check_return_val(ptor && ptor->timer && ptor->ltimer && ptor->event && aicp, tb_null);
+
+	// trace
+	tb_trace_impl("loop: init");
+
+	// loop 
+	while (!tb_atomic_get(&aicp->kill))
+	{
+		// the delay
+		tb_size_t delay = tb_timer_delay(ptor->timer);
+
+		// the ldelay
+		tb_size_t ldelay = tb_ltimer_delay(ptor->ltimer);
+		tb_assert_and_check_break(ldelay != -1);
+
+		// using the min delay
+		if (ldelay < delay) delay = ldelay;
+
+		// wait some time
+		if (delay)
+		{
+			if (tb_event_wait(ptor->event, delay) < 0) break;
+		}
+
+		// spak ctime
+		tb_ctime_spak();
+
+		// spak timer
+		if (!tb_timer_spak(ptor->timer)) break;
+
+		// spak ltimer
+		if (!tb_ltimer_spak(ptor->ltimer)) break;
+	}
+
+end:
+	// trace
+	tb_trace_impl("loop: exit");
+
+	// kill
+	tb_atomic_set(&aicp->kill, 1);
+
+	// exit
+	tb_thread_return(tb_null);
+	return tb_null;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * post
@@ -1161,7 +1218,7 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return_val(ptor && ptor->port && ptor->timer && ptor->ltimer && proactor->aicp, tb_false);
+	tb_assert_and_check_return_val(ptor && ptor->port && ptor->timer && ptor->ltimer && ptor->event && proactor->aicp, tb_false);
 
 	// check aice
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
@@ -1206,12 +1263,9 @@ static tb_bool_t tb_iocp_post_runtask(tb_aicp_proactor_t* proactor, tb_aice_t co
 			aico->task = tb_timer_task_add_at(ptor->timer, aice->u.runtask.when, 0, tb_false, tb_iocp_spak_runtask_timeout, aico);
 			aico->bltimer = 0;
 
-			// the top task is changed? spak aiop
+			// the top task is changed? spak the timer
 			if (aico->task && aice->u.runtask.when < top)
-			{
-				// TODO
-				// ...
-			}
+				tb_event_post(ptor->event);
 		}
 		else
 		{
@@ -1254,12 +1308,12 @@ static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data)
 			// trace
 			tb_trace_impl("spak: timeout[%p]: code: %lu", aico->base.handle, aico->olap.aice.code);
 
-			// save state: timeout
-			aico->olap.aice.state = killed? TB_AICE_STATE_KILLED : TB_AICE_STATE_TIMEOUT;
-
 			// exists CancelIoEx?
 			if (ptor->CancelIoEx)
 			{
+				// save state: timeout
+				aico->olap.aice.state = killed? TB_AICE_STATE_KILLED : TB_AICE_STATE_TIMEOUT;
+
 				// the handle
 				HANDLE handle = aico->base.type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->base.handle - 1) : aico->base.handle;
 
@@ -1682,7 +1736,7 @@ static tb_void_t tb_aicp_proactor_iocp_kilo(tb_aicp_proactor_t* proactor, tb_aic
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return(ptor && aico);
+	tb_assert_and_check_return(ptor && ptor->event && aico);
 		
 	// trace
 	tb_trace_impl("kilo: type: %u", aico->type);
@@ -1700,10 +1754,9 @@ static tb_void_t tb_aicp_proactor_iocp_kilo(tb_aicp_proactor_t* proactor, tb_aic
 	else if (aico->type == TB_AICO_TYPE_FILE && aico->handle) tb_file_exit(aico->handle);
 
 	/* the iocp will wait long time if the lastest task wait period is too long
-	 * so spak the iocp manually for spak the ltimer
-	 *
-	 * TODO
+	 * so spak the iocp manually for spak the timer
 	 */
+	tb_event_post(ptor->event);
 }
 static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
@@ -1762,13 +1815,16 @@ static tb_void_t tb_aicp_proactor_iocp_kill(tb_aicp_proactor_t* proactor)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
-	tb_assert_and_check_return(ptor && ptor->port && ptor->timer && proactor->aicp);
+	tb_assert_and_check_return(ptor && ptor->port && ptor->event && proactor->aicp);
 
 	// the workers
 	tb_size_t work = tb_atomic_get(&proactor->aicp->work);
 	
 	// trace
 	tb_trace_impl("kill: %lu", work);
+
+	// post the timer event
+	tb_event_post(ptor->event);
 
 	// using GetQueuedCompletionStatusEx?
 	if (ptor->GetQueuedCompletionStatusEx)
@@ -1797,6 +1853,18 @@ static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 		// trace
 		tb_trace_impl("exit");
 
+		// post the timer event
+		if (ptor->event) tb_event_post(ptor->event);
+
+		// exit loop
+		if (ptor->loop)
+		{
+			if (!tb_thread_wait(ptor->loop, 5000))
+				tb_thread_kill(ptor->loop);
+			tb_thread_exit(ptor->loop);
+			ptor->loop = tb_null;
+		}
+
 		// exit port
 		if (ptor->port) CloseHandle(ptor->port);
 		ptor->port = tb_null;
@@ -1808,6 +1876,10 @@ static tb_void_t tb_aicp_proactor_iocp_exit(tb_aicp_proactor_t* proactor)
 		// exit ltimer
 		if (ptor->ltimer) tb_ltimer_exit(ptor->ltimer);
 		ptor->ltimer = tb_null;
+
+		// exit event
+		if (ptor->event) tb_event_exit(ptor->event);
+		ptor->event = tb_null;
 
 		// free it
 		tb_free(ptor);
@@ -1873,34 +1945,8 @@ static tb_long_t tb_aicp_proactor_iocp_loop_spak(tb_aicp_proactor_t* proactor, t
 	// trace
 	tb_trace_impl("spak[%lu]: ..", loop->self);
 
-	// save the first loop for timer
-	tb_handle_t self = (tb_handle_t)tb_atomic_fetch_and_pset(&ptor->tself, tb_null, loop->self);
-
-	// is the timer loop? 
-	tb_bool_t btimer = (!self || (self == loop->self))? tb_true : tb_false;
-		
 	// spak ctime
 	tb_ctime_spak();
-
-	// is the timer loop? spak timer
-	if (btimer)
-	{
-		// spak timer
-		if (!tb_timer_spak(ptor->timer)) return -1;
-
-		// spak ltimer
-		if (!tb_ltimer_spak(ptor->ltimer)) return -1;
-
-		// the delay
-		tb_size_t delay = tb_timer_delay(ptor->timer);
-
-		// the ldelay
-		tb_size_t ldelay = tb_ltimer_delay(ptor->ltimer);
-		tb_assert_and_check_return_val(ldelay != -1, -1);
-
-		// update the timeout for the timer loop
-		timeout = tb_min(delay, ldelay);
-	}
 
 	// exists GetQueuedCompletionStatusEx? using it
 	if (ptor->GetQueuedCompletionStatusEx)
@@ -2096,6 +2142,14 @@ tb_aicp_proactor_t* tb_aicp_proactor_init(tb_aicp_t* aicp)
 	// init ltimer and using cache time
 	ptor->ltimer = tb_ltimer_init(aicp->maxn, TB_LTIMER_TICK_S, tb_true);
 	tb_assert_and_check_goto(ptor->ltimer, fail);
+
+	// init the timer event
+	ptor->event = tb_event_init();
+	tb_assert_and_check_goto(ptor->event, fail);
+
+	// init the timer loop
+	ptor->loop = tb_thread_init(tb_null, tb_iocp_timer_loop, ptor, 0);
+	tb_assert_and_check_goto(ptor->loop, fail);
 
 	// ok
 	return (tb_aicp_proactor_t*)ptor;
