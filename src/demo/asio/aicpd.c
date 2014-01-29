@@ -396,7 +396,7 @@ tb_int_t tb_demo_asio_aicpd_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(task, end);
 
 	// run task
-	if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
+//	if (!tb_aico_task_run(task, 0, tb_demo_task_func, tb_null)) goto end;
 //	if (!tb_aico_task_run(aico, 0, tb_demo_task_func, tb_null)) goto end;
 
 	// init acpt timeout

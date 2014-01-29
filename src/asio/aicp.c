@@ -296,7 +296,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself)
 			tb_trace_impl("delo: aico: %p, type: %lu: wait pending", aico, tb_aico_type(aico));
 
 			// wait it
-			tb_msleep(200);
+			tb_msleep(500);
 		}
 		if (tb_atomic_get(&((tb_aico_t*)aico)->pending))
 		{
@@ -315,7 +315,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself)
 				tb_trace_impl("delo: aico: %p, type: %lu: wait calling", aico, tb_aico_type(aico));
 
 				// wait it
-				tb_msleep(200);
+				tb_msleep(500);
 			}
 			if (tb_atomic_get(&((tb_aico_t*)aico)->calling))
 			{
