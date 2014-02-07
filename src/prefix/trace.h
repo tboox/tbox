@@ -34,7 +34,7 @@
  */
 
 // tag
-#if defined(TB_TRACE_ENABLE) && !defined(TB_PRINT_TAG)
+#ifndef TB_PRINT_TAG
 # 	define TB_PRINT_TAG 									"tbox"
 #endif
 
