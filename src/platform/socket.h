@@ -149,7 +149,7 @@ tb_bool_t 			tb_socket_kill(tb_handle_t handle, tb_size_t mode);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_socket_close(tb_handle_t handle);
+tb_bool_t 			tb_socket_clos(tb_handle_t handle);
 
 /*! recv the socket data for tcp
  *

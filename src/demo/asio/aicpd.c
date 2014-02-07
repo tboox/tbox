@@ -50,7 +50,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->file = tb_null;
 
 		// exit sock
-		if (context->sock) tb_socket_close(context->sock);
+		if (context->sock) tb_socket_clos(context->sock);
 		context->sock = tb_null;
 
 		// exit aico
@@ -71,7 +71,7 @@ static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 		context->file = tb_null;
 
 		// exit sock
-		if (context->sock) tb_socket_close(context->sock);
+		if (context->sock) tb_socket_clos(context->sock);
 		context->sock = tb_null;
 
 		// exit aico
@@ -445,7 +445,7 @@ end:
 	if (aicp) tb_aicp_exit(aicp);
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	return 0;
 }

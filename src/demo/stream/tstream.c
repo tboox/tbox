@@ -59,7 +59,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		tb_tstream_limit(tstream, argv[3]? tb_atoi(argv[3]) : 0);
 
 		// start tstream
-		if (!tb_tstream_start(tstream, -1)) break;
+		if (!tb_tstream_start(tstream, -1, tb_false)) break;
 
 		// wait
 		getchar();
@@ -71,7 +71,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		getchar();
 
 		// start tstream
-		if (!tb_tstream_start(tstream, -1)) break;
+		if (!tb_tstream_resume(tstream)) break;
 
 		// wait
 		getchar();

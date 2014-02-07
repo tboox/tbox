@@ -219,7 +219,7 @@ fail:
 	if (astream) tb_astream_exit(astream, tb_false);
 	return tb_null;
 }
-tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bself)
+tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 {
 	// check
 	tb_assert_and_check_return(astream);
@@ -228,8 +228,29 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bself)
 	if (!tb_atomic_get(&astream->stoped))
 		tb_astream_kill(astream);
 
+	// clos it
+	if (astream->clos) astream->clos(astream, bcalling);
+
+	// not opened
+	tb_atomic_set0(&astream->opened);
+
+	// clear debug info
+#ifdef __tb_debug__
+	astream->file = tb_null;
+	astream->func = tb_null;
+	astream->line = 0;
+#endif
+}
+tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
+{
+	// check
+	tb_assert_and_check_return(astream);
+
+	// close it first
+	tb_astream_clos(astream, bcalling);
+
 	// exit it
-	if (astream->exit) astream->exit(astream, bself);
+	if (astream->exit) astream->exit(astream, bcalling);
 
 	// exit url
 	tb_url_exit(&astream->url);
@@ -250,15 +271,6 @@ tb_void_t tb_astream_kill(tb_astream_t* astream)
 
 	// kill it
 	if (astream->kill) astream->kill(astream);
-}
-tb_bool_t tb_astream_pending(tb_astream_t* astream)
-{
-	// check
-	tb_assert_and_check_return_val(astream, tb_false);
-
-	// pending?
-	tb_bool_t pending = tb_false;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_IS_PENDING, &pending)? pending : tb_false;
 }
 tb_bool_t tb_astream_open_impl(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {

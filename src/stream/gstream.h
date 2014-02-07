@@ -291,8 +291,8 @@ typedef struct __tb_gstream_t
 	/// open
 	tb_long_t 			(*open)(struct __tb_gstream_t* gstream);
 
-	/// close
-	tb_long_t 			(*close)(struct __tb_gstream_t* gstream);
+	/// clos
+	tb_long_t 			(*clos)(struct __tb_gstream_t* gstream);
 
 	/// read
 	tb_long_t 			(*read)(struct __tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
@@ -528,7 +528,7 @@ tb_bool_t 			tb_gstream_bopen(tb_gstream_t* gstream);
  *
  * @return 			ok: 1, continue: 0, failed: -1
  */
-tb_long_t 			tb_gstream_aclose(tb_gstream_t* gstream);
+tb_long_t 			tb_gstream_aclos(tb_gstream_t* gstream);
 
 /*! block close, allow multiple called
  *
@@ -536,7 +536,7 @@ tb_long_t 			tb_gstream_aclose(tb_gstream_t* gstream);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bclose(tb_gstream_t* gstream);
+tb_bool_t 			tb_gstream_bclos(tb_gstream_t* gstream);
 
 /*! async read
  *

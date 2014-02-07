@@ -249,7 +249,7 @@ fail:
 
 	return -1;
 }
-static tb_long_t tb_gstream_sock_close(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_sock_clos(tb_gstream_t* gstream)
 {
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst, -1);
@@ -262,7 +262,7 @@ static tb_long_t tb_gstream_sock_close(tb_gstream_t* gstream)
 		sst->ssl = tb_null;
 
 		// close it
-		if (!sst->bref) if (!tb_socket_close(sst->sock)) return 0;
+		if (!sst->bref) if (!tb_socket_clos(sst->sock)) return 0;
 
 		// reset
 		sst->sock = tb_null;
@@ -452,7 +452,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			if (sst->type != type)
 			{
 				// exit it
-				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+				if (!sst->bref && sst->sock) tb_socket_clos(sst->sock);
 				sst->sock = tb_null;
 				sst->bref = 0;
 			}
@@ -475,7 +475,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			if (sst->sock != sock)
 			{
 				// exit it
-				if (!sst->bref && sst->sock) tb_socket_close(sst->sock);
+				if (!sst->bref && sst->sock) tb_socket_clos(sst->sock);
 			}
 
 			// set sock
@@ -510,7 +510,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	// init stream
 	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_GSTREAM_TYPE_SOCK)) goto fail;
 	gstream->base.open 	= tb_gstream_sock_open;
-	gstream->base.close = tb_gstream_sock_close;
+	gstream->base.clos 	= tb_gstream_sock_clos;
 	gstream->base.read 	= tb_gstream_sock_read;
 	gstream->base.writ 	= tb_gstream_sock_writ;
 	gstream->base.ctrl 	= tb_gstream_sock_ctrl;

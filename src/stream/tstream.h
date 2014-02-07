@@ -112,16 +112,25 @@ tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char
  *
  * @param tstream 	the tstream
  * @param offset 	the offset, seek the given offset if offset >= 0
+ * @param bappend 	open and append it if the ostream be not opened? 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_tstream_start(tb_handle_t tstream, tb_hong_t offset);
+tb_bool_t 			tb_tstream_start(tb_handle_t tstream, tb_hong_t offset, tb_bool_t bappend);
 
 /*! pause transfer stream 
  *
  * @param tstream 	the tstream
  */
 tb_void_t 			tb_tstream_pause(tb_handle_t tstream);
+
+/*! resume transfer stream 
+ *
+ * @param tstream 	the tstream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_tstream_resume(tb_handle_t tstream);
 
 /*! limit transfer rate  
  *
@@ -139,8 +148,8 @@ tb_void_t 			tb_tstream_stop(tb_handle_t tstream);
 /*! exit transfer stream 
  *
  * @param tstream 	the tstream
- * @param bself 	exit it at the self callback?
+ * @param bcalling 	exit it at the self callback?
  */
-tb_void_t 			tb_tstream_exit(tb_handle_t tstream, tb_bool_t bself);
+tb_void_t 			tb_tstream_exit(tb_handle_t tstream, tb_bool_t bcalling);
 
 #endif

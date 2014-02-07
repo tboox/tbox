@@ -300,7 +300,7 @@ static tb_bool_t tb_iocp_post_acpt(tb_aicp_proactor_t* proactor, tb_aice_t const
 		aico->olap.aice.u.acpt.priv[0] = tb_null;
 
 		// exit sock
-		if (aico->olap.aice.u.acpt.sock) tb_socket_close(aico->olap.aice.u.acpt.sock);
+		if (aico->olap.aice.u.acpt.sock) tb_socket_clos(aico->olap.aice.u.acpt.sock);
 		aico->olap.aice.u.acpt.sock = tb_null;
 	}
 
@@ -1397,7 +1397,7 @@ static tb_long_t tb_iocp_spak_acpt(tb_aicp_proactor_iocp_t* ptor, tb_aice_t* res
 	// failed? exit sock
 	if (resp->state != TB_AICE_STATE_OK)
 	{
-		if (resp->u.acpt.sock) tb_socket_close(resp->u.acpt.sock);
+		if (resp->u.acpt.sock) tb_socket_clos(resp->u.acpt.sock);
 		resp->u.acpt.sock = tb_null;
 	}
 

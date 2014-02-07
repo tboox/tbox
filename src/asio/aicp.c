@@ -280,7 +280,7 @@ tb_handle_t tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type)
 	// ok?
 	return (tb_handle_t)aico;
 }
-tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself)
+tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bcalling)
 {
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
@@ -306,7 +306,7 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself)
 		}
 
 		// wait calling if be not at the self callback
-		if (!bself)
+		if (!bcalling)
 		{
 			tryn = 10;
 			while (tb_atomic_get(&((tb_aico_t*)aico)->calling) && tryn--) 

@@ -161,7 +161,7 @@ tb_gstream_t* tb_gstream_init_filter_charset()
 	// init func
 	gstream->open 	= tb_gstream_filter_charset_open;
 	gstream->read 	= tb_gstream_filter_read;
-	gstream->close	= tb_gstream_filter_close;
+	gstream->clos	= tb_gstream_filter_clos;
 	gstream->wait	= tb_gstream_filter_wait;
 	gstream->ctrl 	= tb_gstream_filter_charset_ctrl;
 

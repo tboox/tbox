@@ -524,7 +524,7 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_f
 		aico = tb_null;
 
 		// exit sock
-		if (sock) tb_socket_close(sock);
+		if (sock) tb_socket_clos(sock);
 		sock = tb_null;
 	}
 
@@ -540,7 +540,7 @@ tb_void_t tb_aicp_addr_kill(tb_handle_t haddr)
 	// kill sock
 	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
 }
-tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bself)
+tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling)
 {
 	// check
 	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
@@ -556,10 +556,10 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bself)
 	if (aico) tb_aico_pool_free(aico, addr);
 
 	// exit aico
-	if (aico) tb_aico_exit(aico, bself);
+	if (aico) tb_aico_exit(aico, bcalling);
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 }
 tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 {

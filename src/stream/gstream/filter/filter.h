@@ -82,7 +82,7 @@ tb_gstream_filter_t* 	tb_gstream_filter_cast(tb_gstream_t* gstream);
 tb_long_t 				tb_gstream_filter_open(tb_gstream_t* gstream);
 
 // close
-tb_long_t 				tb_gstream_filter_close(tb_gstream_t* gstream);
+tb_long_t 				tb_gstream_filter_clos(tb_gstream_t* gstream);
 
 // read
 tb_long_t 				tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);

@@ -115,7 +115,7 @@ tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
 	// ok
 	return 1;
 }
-tb_long_t tb_gstream_filter_close(tb_gstream_t* gstream)
+tb_long_t tb_gstream_filter_clos(tb_gstream_t* gstream)
 {
 	tb_gstream_filter_t* filter = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(filter && filter->gstream, -1);

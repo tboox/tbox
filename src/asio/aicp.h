@@ -222,9 +222,9 @@ tb_handle_t 		tb_aicp_addo(tb_aicp_t* aicp, tb_handle_t handle, tb_size_t type);
  *
  * @param aicp 		the aicp
  * @param aico 		the aico
- * @param bself 	delo it at the self callback?
+ * @param bcalling 	delo it at the self callback?
  */
-tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bself);
+tb_void_t 			tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bcalling);
 
 /*! kil the aico
  *

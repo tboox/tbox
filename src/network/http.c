@@ -695,7 +695,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		if (!http->status.balive) 
 		{
 			// close stream
-			tb_long_t r = tb_gstream_aclose(http->stream);
+			tb_long_t r = tb_gstream_aclos(http->stream);
 			tb_assert_and_check_return_val(r >= 0, -1);
 
 			// continue ?
@@ -770,7 +770,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 	if (!http->status.balive) 
 	{
 		// close stream
-		tb_long_t r = tb_gstream_aclose(http->stream);
+		tb_long_t r = tb_gstream_aclos(http->stream);
 		tb_assert_and_check_return_val(r >= 0, -1);
 
 		// continue ?
@@ -840,7 +840,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 		tb_http_t* http = (tb_http_t*)handle;
 
 		// close it
-		tb_http_bclose(handle);
+		tb_http_bclos(handle);
 		
 		// exit status
 		tb_http_status_exit(http);
@@ -976,12 +976,12 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 #endif
 
 	// close it if fail
-	if (r <= 0) tb_http_bclose(handle);
+	if (r <= 0) tb_http_bclos(handle);
 
 	// ok?
 	return r > 0? tb_true : tb_false;
 }
-tb_long_t tb_http_aclose(tb_handle_t handle)
+tb_long_t tb_http_aclos(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
@@ -1013,7 +1013,7 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 			if (!http->status.balive)
 			{
 				// close stream
-				tb_long_t r = tb_gstream_aclose(http->stream);
+				tb_long_t r = tb_gstream_aclos(http->stream);
 				tb_assert_and_check_return_val(r >= 0, -1);
 
 				// continue ?
@@ -1041,7 +1041,7 @@ tb_long_t tb_http_aclose(tb_handle_t handle)
 	// ok
 	return 1;
 }
-tb_bool_t tb_http_bclose(tb_handle_t handle)
+tb_bool_t tb_http_bclos(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, tb_false);
@@ -1049,7 +1049,7 @@ tb_bool_t tb_http_bclose(tb_handle_t handle)
 	// try opening it
 	tb_long_t 	r = 0;
 	tb_hong_t 	t = tb_mclock();
-	while (!(r = tb_http_aclose(handle)))
+	while (!(r = tb_http_aclos(handle)))
 	{
 		// timeout?
 		if (tb_mclock() - t > http->option.timeout) break;

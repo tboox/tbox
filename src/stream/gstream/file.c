@@ -85,7 +85,7 @@ static tb_long_t tb_gstream_file_open(tb_gstream_t* gstream)
 	// ok
 	return 1;
 }
-static tb_long_t tb_gstream_file_close(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_file_clos(tb_gstream_t* gstream)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
@@ -212,7 +212,7 @@ tb_gstream_t* tb_gstream_init_file()
 
 	// init stream
 	gstream->base.open		= tb_gstream_file_open;
-	gstream->base.close 	= tb_gstream_file_close;
+	gstream->base.clos 		= tb_gstream_file_clos;
 	gstream->base.read 		= tb_gstream_file_read;
 	gstream->base.writ 		= tb_gstream_file_writ;
 	gstream->base.seek 		= tb_gstream_file_seek;

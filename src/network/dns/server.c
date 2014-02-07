@@ -258,7 +258,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 
 end:
 	// exit sock
-	tb_socket_close(sock);
+	tb_socket_clos(sock);
 
 	// ok
 	return rate;

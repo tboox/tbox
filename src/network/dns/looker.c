@@ -618,7 +618,7 @@ tb_void_t tb_dns_looker_exit(tb_handle_t handle)
 	if (looker)
 	{
 		// exit sock
-		if (looker->sock) tb_socket_close(looker->sock);
+		if (looker->sock) tb_socket_clos(looker->sock);
 		looker->sock = tb_null;
 
 		// exit it

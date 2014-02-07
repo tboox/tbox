@@ -138,7 +138,7 @@ end:
 	tb_print("end");
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	// exit file
 	if (file) tb_file_exit(file);

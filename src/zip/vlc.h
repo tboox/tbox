@@ -43,8 +43,8 @@
 // the callback type
 struct __tb_zip_vlc_t;
 typedef tb_void_t 		(*tb_zip_vlc_set_t)(struct __tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst);
-typedef tb_uint32_t (*tb_zip_vlc_get_t)(struct __tb_zip_vlc_t* vlc, tb_bstream_t const* bst);
-typedef tb_void_t 		(*tb_zip_vlc_close_t)(struct __tb_zip_vlc_t* vlc);
+typedef tb_uint32_t 	(*tb_zip_vlc_get_t)(struct __tb_zip_vlc_t* vlc, tb_bstream_t const* bst);
+typedef tb_void_t 		(*tb_zip_vlc_clos_t)(struct __tb_zip_vlc_t* vlc);
 
 // the vlc type
 typedef enum __tb_zip_vlc_type_t
@@ -68,7 +68,7 @@ typedef struct __tb_zip_vlc_t
 	tb_zip_vlc_get_t 	get;
 
 	// close it
-	tb_zip_vlc_close_t 	close;
+	tb_zip_vlc_clos_t 	clos;
 
 }tb_zip_vlc_t;
 
