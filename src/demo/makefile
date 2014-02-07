@@ -42,6 +42,7 @@ demo_C_FILES 			+= \
 						object/bin \
 						object/dump \
 						stream/tstream \
+						stream/mstream \
 						stream/astream \
 						stream/gstream \
 						stream/gstream/zip \

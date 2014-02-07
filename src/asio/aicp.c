@@ -402,6 +402,10 @@ tb_bool_t tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t co
 }
 tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 {
+	tb_aicp_loop_util(aicp, tb_null, tb_null);	
+}
+tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv), tb_pointer_t priv)
+{	
 	// check
 	tb_assert_and_check_return(aicp);
 
@@ -458,6 +462,9 @@ tb_void_t tb_aicp_loop(tb_aicp_t* aicp)
 
 		// calling--
 		tb_atomic_fetch_and_dec(&resp.aico->calling);
+
+		// stop it?
+		if (stop && stop(priv)) break;
 	}
 
 	// exit loop

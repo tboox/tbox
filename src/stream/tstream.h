@@ -78,45 +78,49 @@ tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb
  *
  * @param istream 	the istream, open it first if have been not opened
  * @param ostream 	the ostream, open it first if have been not opened
+ * @param offset 	the offset, seek the given offset if offset >= 0
+ * @param bappend 	open and append it if the ostream be not opened? 
  * @param func 		the save func and be not optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv );
+tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from astrean to gstream, async transfer
  *
  * @param istream 	the istream, open it first if have been not opened
  * @param ostream 	the ostream, open it first if have been not opened
+ * @param offset 	the offset, seek the given offset if offset >= 0
+ * @param bappend 	open and append it if the ostream be not opened? 
  * @param func 		the save func and be not optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv );
+tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from url to url, async transfer
  *
  * @param aicp 		the aicp
  * @param iurl 		the input url
  * @param ourl 		the output url
+ * @param offset 	the offset, seek the given offset if offset >= 0
+ * @param bappend 	open and append it if the ostream be not opened? 
  * @param func 		the save func and be not optional
  * @param priv 		the func private data
  *
  * @return 			the saved size, failed: -1
  */
-tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv );
+tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! start transfer stream 
  *
  * @param tstream 	the tstream
- * @param offset 	the offset, seek the given offset if offset >= 0
- * @param bappend 	open and append it if the ostream be not opened? 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_tstream_start(tb_handle_t tstream, tb_hong_t offset, tb_bool_t bappend);
+tb_bool_t 			tb_tstream_start(tb_handle_t tstream);
 
 /*! pause transfer stream 
  *
