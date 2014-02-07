@@ -36,7 +36,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_size_t size, tb_s
 # 	if TB_DEMO_TRACE_ENABLE
 	tb_print("save: %lu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_astream_state_cstr(state), priv);
 # 	endif
-
+ 
 	// size--
 	if (state != TB_ASTREAM_STATE_OK) tb_atomic_fetch_and_dec(&g_size);
 
