@@ -91,6 +91,8 @@ static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	// read data
 	tb_memcpy(data, dstream->head, size);
 	dstream->head += size;
+
+	// ok?
 	return (tb_long_t)(size);
 }
 static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
@@ -136,7 +138,15 @@ static tb_long_t tb_gstream_data_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 	tb_assert_and_check_return_val(dstream && dstream->head <= dstream->data + dstream->size, -1);
 
 	// wait 
-	return wait;
+	tb_long_t aioe = 0;
+	if (tb_gstream_left(gstream))
+	{
+		if (wait & TB_GSTREAM_WAIT_READ) aioe |= TB_GSTREAM_WAIT_READ;
+		if (wait & TB_GSTREAM_WAIT_WRIT) aioe |= TB_GSTREAM_WAIT_WRIT;
+	}
+
+	// ok?
+	return aioe;
 }
 static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
 {

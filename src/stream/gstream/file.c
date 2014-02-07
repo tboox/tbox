@@ -91,6 +91,7 @@ static tb_long_t tb_gstream_file_clos(tb_gstream_t* gstream)
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
 	tb_assert_and_check_return_val(fstream, -1);
 
+	// has file?
 	if (fstream->file)
 	{
 		// exit file
@@ -164,8 +165,16 @@ static tb_long_t tb_gstream_file_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->file, -1);
 
+	// wait 
+	tb_long_t aioe = 0;
+	if (tb_gstream_left(gstream))
+	{
+		if (wait & TB_GSTREAM_WAIT_READ) aioe |= TB_GSTREAM_WAIT_READ;
+		if (wait & TB_GSTREAM_WAIT_WRIT) aioe |= TB_GSTREAM_WAIT_WRIT;
+	}
+
 	// ok?
-	return wait;
+	return aioe;
 }
 static tb_bool_t tb_gstream_file_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
 {
