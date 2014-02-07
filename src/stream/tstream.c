@@ -626,7 +626,7 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 	// ok?
 	return size;
 }
-tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv )
+tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
 	// done
 	tb_tstream_aa_t* tstream = tb_null;
@@ -634,6 +634,19 @@ tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_
 	{
 		// check
 		tb_assert_and_check_break(istream && ostream);	
+
+		// ctrl the file mode if the file stream have been not opened
+		tb_bool_t opened = tb_false;
+		if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) break;
+		if (!opened && tb_astream_type(ostream) == TB_ASTREAM_TYPE_FILE) 
+		{
+			// init mode
+			tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
+			mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
+
+			// ctrl mode
+			if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, mode)) break;
+		}
 
 		// make tstream
 		tstream = tb_malloc0(sizeof(tb_tstream_aa_t));
@@ -653,7 +666,7 @@ tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_tstream_save_func_t func, tb_pointer_t priv )
+tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
 	// done
 	tb_tstream_ag_t* tstream = tb_null;
@@ -661,6 +674,19 @@ tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_
 	{
 		// check
 		tb_assert_and_check_break(istream && ostream);	
+
+		// ctrl the file mode if the file stream have been not opened
+		tb_bool_t opened = tb_false;
+		if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_IS_OPENED, &opened)) break;
+		if (!opened && tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
+		{
+			// init mode
+			tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
+			mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
+
+			// ctrl mode
+			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, mode)) break;
+		}
 
 		// make tstream
 		tstream = tb_malloc0(sizeof(tb_tstream_ag_t));
@@ -672,6 +698,7 @@ tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_
 		tstream->base.iowner 	= tb_false;
 		tstream->base.func 		= func;
 		tstream->base.priv 		= priv;
+		tstream->base.offset 	= offset;
 		tstream->ostream 		= ostream;
 
 	} while (0);
@@ -679,7 +706,7 @@ tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_tstream_save_func_t func, tb_pointer_t priv )
+tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_hong_t offset, tb_bool_t bappend, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
 	// done
 	tb_astream_t* 		istream = tb_null;
@@ -698,6 +725,17 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 		ostream = tb_astream_init_from_url(aicp, ourl);
 		tb_assert_and_check_break(ostream);
 
+		// ctrl file
+		if (tb_astream_type(ostream) == TB_ASTREAM_TYPE_FILE) 
+		{
+			// init mode
+			tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
+			mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
+
+			// ctrl mode
+			if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, mode)) break;
+		}
+
 		// make tstream
 		tstream = tb_malloc0(sizeof(tb_tstream_aa_t));
 		tb_assert_and_check_break(tstream);
@@ -708,6 +746,7 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 		tstream->base.iowner 	= tb_true;
 		tstream->base.func 		= func;
 		tstream->base.priv 		= priv;
+		tstream->base.offset 	= offset;
 		tstream->ostream 		= ostream;
 		tstream->oowner 		= tb_true;
 		
@@ -728,7 +767,7 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappend)
+tb_bool_t tb_tstream_start(tb_handle_t handle)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
@@ -746,9 +785,6 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappe
 
 		// must be not pending
 		tb_check_break(!tb_atomic_fetch_and_set(&tstream->pending, 1));
-
-		// save offset
-		tstream->offset = offset;
 
 		// resume it
 		tb_atomic_set0(&tstream->paused);
@@ -772,17 +808,6 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappe
 			if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) break;
 			if (!opened)
 			{
-				// ctrl file
-				if (tb_astream_type(ostream) == TB_ASTREAM_TYPE_FILE) 
-				{
-					// init mode
-					tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
-					mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
-
-					// ctrl mode
-					if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, mode)) return -1;
-				}
-
 				// open it
 				if (!tb_astream_open(ostream, tb_tstream_ostream_open_func, tstream)) break;
 			}
@@ -797,17 +822,6 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappe
 			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_IS_OPENED, &opened)) break;
 			if (!opened)
 			{
-				// ctrl file
-				if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
-				{
-					// init mode
-					tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
-					mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
-
-					// ctrl mode
-					if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, mode)) return -1;
-				}
-
 				// open it
 				if (!tb_gstream_bopen(ostream)) break;
 
@@ -820,10 +834,10 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappe
 		if (opened)
 		{
 			// need seek?
-			if (offset >= 0)
+			if (tstream->offset >= 0)
 			{
 				// open and seek it
-				if (!tb_astream_oseek(tstream->istream, offset, tb_tstream_istream_seek_func, tstream)) break;
+				if (!tb_astream_oseek(tstream->istream, tstream->offset, tb_tstream_istream_seek_func, tstream)) break;
 			}
 			else
 			{
@@ -865,11 +879,16 @@ tb_bool_t tb_tstream_resume(tb_handle_t handle)
 		// stoped?
 		tb_assert_and_check_break(!tb_atomic_get(&tstream->stoped));
 
+		// must be not pending
+		tb_check_break(!tb_atomic_fetch_and_set(&tstream->pending, 1));
+
 		// check
 		tb_assert_and_check_break(tstream->istream);
 
-		// must be not pending
-		tb_check_break(!tb_atomic_fetch_and_set(&tstream->pending, 1));
+		// check opened
+		tb_bool_t opened = tb_false;
+		if (!tb_astream_ctrl(tstream->istream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) break;
+		tb_assert_and_check_break(opened);
 
 		// resume it
 		tb_atomic_set0(&tstream->paused);

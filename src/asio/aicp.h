@@ -265,6 +265,24 @@ tb_bool_t 			tb_aicp_post_after_impl(tb_aicp_t* aicp, tb_size_t delay, tb_aice_t
  */
 tb_void_t 			tb_aicp_loop(tb_aicp_t* aicp);
 
+/*! loop aicp util ... for the external thread
+ *
+ * @code
+ * tb_bool_t tb_aicp_stop_func(tb_pointer_t)
+ * {
+ *     if (...) return tb_true;
+ *     return tb_false;
+ * }
+ * tb_pointer_t tb_aicp_worker_thread(tb_pointer_t)
+ * {
+ * 		tb_aicp_loop_util(aicp, stop_func, tb_null);
+ * }
+ * @endcode
+ *
+ * @param aicp 		the aicp
+ */
+tb_void_t 			tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv), tb_pointer_t priv);
+
 /*! kill the spak 
  *
  * @param aicp 		the aicp

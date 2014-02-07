@@ -143,11 +143,11 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		tb_assert_and_check_break(context->ostream);
 
 		// init tstream
-		context->tstream = tb_tstream_init_aa(ast, context->ostream, tb_demo_tstream_save_func, context);
+		context->tstream = tb_tstream_init_aa(ast, context->ostream, -1, tb_false, tb_demo_tstream_save_func, context);
 		tb_assert_and_check_break(context->tstream);
 
 		// start tstream
-		if (!tb_tstream_start(context->tstream, -1, tb_false)) break;
+		if (!tb_tstream_start(context->tstream)) break;
 
 		// ok
 		ok = tb_true;
