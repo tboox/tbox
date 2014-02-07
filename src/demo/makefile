@@ -12,6 +12,9 @@ demo_C_FILES 			+= \
 						demo \
 						flv/flv \
 						flv/libflv \
+						xml/reader \
+						xml/writer \
+						xml/document \
 						libc/time \
 						libc/wchar \
 						libc/string \

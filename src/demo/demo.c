@@ -35,6 +35,11 @@ static tb_demo_t g_demo[] =
 	// flv
 	TB_DEMO_MAIN_ITEM(flv)
 
+	// xml
+,	TB_DEMO_MAIN_ITEM(xml_reader)
+,	TB_DEMO_MAIN_ITEM(xml_writer)
+,	TB_DEMO_MAIN_ITEM(xml_document)
+
 	// libc
 ,	TB_DEMO_MAIN_ITEM(libc_time)
 ,	TB_DEMO_MAIN_ITEM(libc_wchar)

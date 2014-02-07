@@ -44,6 +44,11 @@
 // flv
 TB_DEMO_MAIN_DECL(flv);
 
+// xml
+TB_DEMO_MAIN_DECL(xml_reader);
+TB_DEMO_MAIN_DECL(xml_writer);
+TB_DEMO_MAIN_DECL(xml_document);
+
 // libc
 TB_DEMO_MAIN_DECL(libc_time);
 TB_DEMO_MAIN_DECL(libc_wchar);
