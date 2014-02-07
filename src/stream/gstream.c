@@ -383,7 +383,7 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gstream)
 	if (gstream) 
 	{
 		// close it
-		tb_gstream_bclose(gstream);
+		tb_gstream_bclos(gstream);
 
 		// exit it
 		if (gstream->exit) gstream->exit(gstream);
@@ -557,7 +557,7 @@ tb_bool_t tb_gstream_bopen(tb_gstream_t* gstream)
 	// ok?
 	return r > 0? tb_true : tb_false;
 }
-tb_long_t tb_gstream_aclose(tb_gstream_t* gstream)
+tb_long_t tb_gstream_aclos(tb_gstream_t* gstream)
 {
 	// check stream
 	tb_assert_and_check_return_val(gstream, -1);
@@ -579,10 +579,10 @@ tb_long_t tb_gstream_aclose(tb_gstream_t* gstream)
 	}
 
 	// has close?
-	if (gstream->close) 
+	if (gstream->clos) 
 	{
 		// close it
-		tb_long_t r = gstream->close(gstream);	
+		tb_long_t r = gstream->clos(gstream);	
 
 		// continue?
 		tb_check_return_val(r, r);
@@ -600,14 +600,14 @@ tb_long_t tb_gstream_aclose(tb_gstream_t* gstream)
 	// ok
 	return 1;
 }
-tb_bool_t tb_gstream_bclose(tb_gstream_t* gstream)
+tb_bool_t tb_gstream_bclos(tb_gstream_t* gstream)
 {
 	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// try opening it
 	tb_long_t 	r = 0;
 	tb_hong_t 	t = tb_mclock();
-	while (!(r = tb_gstream_aclose(gstream)))
+	while (!(r = tb_gstream_aclos(gstream)))
 	{
 		// timeout?
 		if (tb_mclock() - t > gstream->timeout) break;

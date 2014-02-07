@@ -272,7 +272,7 @@ tb_bool_t tb_socket_kill(tb_handle_t handle, tb_size_t mode)
 	// kill it
 	return !shutdown(tb_handle2fd(handle), how)? tb_true : tb_false;
 }
-tb_bool_t tb_socket_close(tb_handle_t handle)
+tb_bool_t tb_socket_clos(tb_handle_t handle)
 {
 	// check
 	tb_assert_and_check_return_val(handle, tb_false);

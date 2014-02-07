@@ -48,7 +48,7 @@ static tb_void_t tb_demo_context_exit(tb_aiop_t* aiop, tb_demo_context_t* contex
 		context->aioo = tb_null;
 
 		// exit sock
-		if (context->sock) tb_socket_close(context->sock);
+		if (context->sock) tb_socket_clos(context->sock);
 		context->sock = tb_null;
 
 		// exit file
@@ -287,7 +287,7 @@ end:
 	tb_print("end");
 
 	// exit socket
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	// exit aiop
 	if (aiop) tb_aiop_exit(aiop);

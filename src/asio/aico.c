@@ -56,14 +56,14 @@ tb_void_t tb_aico_kill(tb_handle_t haico)
 	// kilo
 	tb_aicp_kilo(aico->aicp, haico);
 }
-tb_void_t tb_aico_exit(tb_handle_t haico, tb_bool_t bself)
+tb_void_t tb_aico_exit(tb_handle_t haico, tb_bool_t bcalling)
 {
 	// check
 	tb_aico_t* aico = (tb_aico_t*)haico;
 	tb_assert_and_check_return(aico && aico->aicp);
 
 	// delo
-	tb_aicp_delo(aico->aicp, haico, bself);
+	tb_aicp_delo(aico->aicp, haico, bcalling);
 }
 tb_handle_t tb_aico_aicp(tb_handle_t haico)
 {
@@ -129,28 +129,6 @@ tb_handle_t tb_aico_handle(tb_handle_t haico)
 
 	// the aico handle
 	return aico->handle;
-}
-tb_bool_t tb_aico_pending(tb_handle_t haico)
-{
-	// check
-	tb_aico_t* aico = (tb_aico_t*)haico;
-	tb_assert_and_check_return_val(aico, tb_false);
-
-	// the aicp
-	tb_aicp_t* aicp = (tb_aicp_t*)aico->aicp;
-	tb_assert_and_check_return_val(aicp, tb_false);
-
-	// the aicp is killed and not worked?
-	tb_check_return_val(!tb_atomic_get(&aicp->kill) || tb_atomic_get(&aicp->work), tb_false);
-
-	// pending?
-	if (tb_atomic_get(&aico->pending)) return tb_true;
-
-	// calling?
-	if (tb_atomic_get(&aico->calling)) return tb_true;
-	
-	// no pending
-	return tb_false;
 }
 tb_long_t tb_aico_timeout(tb_handle_t haico, tb_size_t type)
 {

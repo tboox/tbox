@@ -289,7 +289,7 @@ tb_bool_t 				tb_http_bopen(tb_handle_t handle);
  *
  * @return 				ok: 1, continue: 0, fail: -1
  */
-tb_long_t 				tb_http_aclose(tb_handle_t handle);
+tb_long_t 				tb_http_aclos(tb_handle_t handle);
 
 /*! block close, allow multiple called
  *
@@ -297,7 +297,7 @@ tb_long_t 				tb_http_aclose(tb_handle_t handle);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_http_bclose(tb_handle_t handle);
+tb_bool_t 				tb_http_bclos(tb_handle_t handle);
 
 /*! async seek
  *

@@ -283,6 +283,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			tb_size_t priority = tb_aiop_aice_priority(aice);
 			tb_assert_and_check_goto(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], end);
 
+			// this aico is killed? post to higher priority queue
+			if (tb_atomic_get(&aico->base.killed)) priority = 0;
+
 			// trace
 			tb_trace_impl("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 

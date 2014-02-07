@@ -69,7 +69,7 @@ tb_api_AcceptEx_t tb_api_AcceptEx()
 	} while (0);
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	// ok?
 	return !ok? AcceptEx_func : tb_null;
@@ -103,7 +103,7 @@ tb_api_ConnectEx_t tb_api_ConnectEx()
 	} while (0);
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	// ok?
 	return !ok? ConnectEx_func : tb_null;
@@ -137,7 +137,7 @@ tb_api_TransmitFile_t tb_api_TransmitFile()
 	} while (0);
 
 	// exit sock
-	if (sock) tb_socket_close(sock);
+	if (sock) tb_socket_clos(sock);
 
 	// ok?
 	return !ok? TransmitFile_func : tb_null;

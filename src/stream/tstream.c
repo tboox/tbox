@@ -91,6 +91,9 @@ typedef struct __tb_tstream_t
 	// the current rate
 	tb_size_t 				crate;
 
+	// is pending?
+	tb_atomic_t 			pending;
+
 }tb_tstream_t;
 
 // the tstream aa type
@@ -122,7 +125,7 @@ typedef struct __tb_tstream_ag_t
  * implementation
  */
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv);
-static tb_bool_t tb_tstream_istream_writ_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;
@@ -211,6 +214,9 @@ static tb_bool_t tb_tstream_istream_writ_func(tb_astream_t* astream, tb_size_t s
 
 		// done func
 		tstream->func(state, 0, trate, tstream->priv);
+
+		// clear pending
+		tb_atomic_set0(&tstream->pending);
 	}
 
 	// continue to writ or break it
@@ -252,7 +258,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			tb_assert_and_check_break(((tb_tstream_aa_t*)tstream)->ostream);
 
 			// writ it
-			if (!tb_astream_writ(((tb_tstream_aa_t*)tstream)->ostream, data, real, tb_tstream_istream_writ_func, tstream)) break;
+			if (!tb_astream_writ(((tb_tstream_aa_t*)tstream)->ostream, data, real, tb_tstream_ostream_writ_func, tstream)) break;
 		}
 		// for gstream
 		else if (tstream->type == TB_TSTREAM_TYPE_AG)
@@ -343,6 +349,9 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 		tstream->func(state, 0, trate, tstream->priv);
 	}
 
+	// clear pending
+	tb_atomic_set0(&tstream->pending);
+
 	// continue to read or break it
 	return bread;
 }
@@ -379,8 +388,15 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 
 	} while (0);
 
-	// failed? done func
-	if (state != TB_ASTREAM_STATE_OK) tstream->func(state, 0, 0, tstream->priv);
+	// failed?
+	if (state != TB_ASTREAM_STATE_OK) 
+	{
+		// done func
+		tstream->func(state, 0, 0, tstream->priv);
+
+		// clear pending
+		tb_atomic_set0(&tstream->pending);
+	}
 
 	// ok
 	return tb_true;
@@ -430,8 +446,15 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 
 	} while (0);
 
-	// failed? done func
-	if (state != TB_ASTREAM_STATE_OK) tstream->func(state, 0, 0, tstream->priv);
+	// failed?
+	if (state != TB_ASTREAM_STATE_OK) 
+	{
+		// done func
+		tstream->func(state, 0, 0, tstream->priv);
+
+		// clear pending
+		tb_atomic_set0(&tstream->pending);
+	}
 
 	// ok
 	return tb_true;
@@ -705,7 +728,7 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 	// ok?
 	return (tb_handle_t)tstream;
 }
-tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
+tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset, tb_bool_t bappend)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
@@ -721,10 +744,8 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 		// check
 		tb_assert_and_check_break(tstream->istream);
 
-		// FIXME
 		// must be not pending
-//		tb_check_break(!tb_astream_pending(tstream->istream));
-//		tb_check_break(tstream->type == TB_TSTREAM_TYPE_AA? !tb_astream_pending(((tb_tstream_aa_t*)tstream)->ostream) : tb_true);
+		tb_check_break(!tb_atomic_fetch_and_set(&tstream->pending, 1));
 
 		// save offset
 		tstream->offset = offset;
@@ -754,8 +775,12 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 				// ctrl file
 				if (tb_astream_type(ostream) == TB_ASTREAM_TYPE_FILE) 
 				{
-					// FIXME: for append
-					if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) return -1;
+					// init mode
+					tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
+					mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
+
+					// ctrl mode
+					if (!tb_astream_ctrl(ostream, TB_ASTREAM_CTRL_FILE_SET_MODE, mode)) return -1;
 				}
 
 				// open it
@@ -775,7 +800,12 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 				// ctrl file
 				if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
 				{
-					if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC)) return -1;
+					// init mode
+					tb_size_t mode = TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY;
+					mode |= bappend? TB_FILE_MODE_APPEND : TB_FILE_MODE_TRUNC;
+
+					// ctrl mode
+					if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, mode)) return -1;
 				}
 
 				// open it
@@ -807,6 +837,9 @@ tb_bool_t tb_tstream_start(tb_handle_t handle, tb_hong_t offset)
 
 	} while (0);
 
+	// failed? clear pending
+	if (!ok) tb_atomic_set0(&tstream->pending);
+
 	// ok?
 	return ok;
 }
@@ -818,6 +851,49 @@ tb_void_t tb_tstream_pause(tb_handle_t handle)
 
 	// pause it
 	tb_atomic_set(&tstream->paused, 1);
+}
+tb_bool_t tb_tstream_resume(tb_handle_t handle)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return_val(tstream, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// stoped?
+		tb_assert_and_check_break(!tb_atomic_get(&tstream->stoped));
+
+		// check
+		tb_assert_and_check_break(tstream->istream);
+
+		// must be not pending
+		tb_check_break(!tb_atomic_fetch_and_set(&tstream->pending, 1));
+
+		// resume it
+		tb_atomic_set0(&tstream->paused);
+
+		// init some rate info
+		tstream->base 	= tb_aicp_time(tb_astream_aicp(tstream->istream));
+		tstream->basc 	= tstream->base;
+		tstream->size 	= 0;
+		tstream->size1s = 0;
+		tstream->crate 	= 0;
+
+		// read it
+		if (!tb_astream_read(tstream->istream, (tb_size_t)tb_atomic_get(&tstream->lrate), tb_tstream_istream_read_func, tstream)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? clear pending
+	if (!ok) tb_atomic_set0(&tstream->pending);
+
+	// ok?
+	return ok;
 }
 tb_void_t tb_tstream_limit(tb_handle_t handle, tb_size_t rate)
 {
@@ -848,7 +924,7 @@ tb_void_t tb_tstream_stop(tb_handle_t handle)
 		}
 	}
 }
-tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bself)
+tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
@@ -865,7 +941,7 @@ tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bself)
 	if (tstream->istream)
 	{
 		// exit it
-		if (tstream->iowner) tb_astream_exit(tstream->istream, bself);
+		if (tstream->iowner) tb_astream_exit(tstream->istream, bcalling);
 		tstream->istream = tb_null;
 	}
 
@@ -876,7 +952,7 @@ tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bself)
 		if (ostream)
 		{
 			// exit it
-			if (((tb_tstream_aa_t*)tstream)->oowner) tb_astream_exit(ostream, bself);
+			if (((tb_tstream_aa_t*)tstream)->oowner) tb_astream_exit(ostream, bcalling);
 			((tb_tstream_aa_t*)tstream)->ostream = tb_null;
 		}
 	}

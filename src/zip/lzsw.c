@@ -393,13 +393,13 @@ static tb_bstream_t* tb_gstream_filter_zip_inflate_lzsw_transform(tb_gstream_fil
 	st->dst.p = dp;
 	return tb_gstream_filter_dst(st);
 }
-static tb_void_t tb_gstream_filter_zip_inflate_lzsw_close(tb_gstream_filter_t* st)
+static tb_void_t tb_gstream_filter_zip_inflate_lzsw_clos(tb_gstream_filter_t* st)
 {
 	tb_lzsw_inflate_gstream_filter_zip_t* zst = (tb_lzsw_inflate_gstream_filter_zip_t*)st;
 	if (zst) 
 	{
 		// close vlc
-		if (zst->vlc && zst->vlc->close) zst->vlc->close(zst->vlc); 
+		if (zst->vlc && zst->vlc->clos) zst->vlc->clos(zst->vlc); 
 
 		// reset it
 		tb_memset(zst, 0, sizeof(tb_lzsw_inflate_gstream_filter_zip_t));
@@ -511,13 +511,13 @@ static tb_bstream_t* tb_gstream_filter_zip_deflate_lzsw_transform(tb_gstream_fil
 	st->src.p = sp;
 	return dst;
 }
-static tb_void_t tb_gstream_filter_zip_deflate_lzsw_close(tb_gstream_filter_t* st)
+static tb_void_t tb_gstream_filter_zip_deflate_lzsw_clos(tb_gstream_filter_t* st)
 {
 	tb_lzsw_deflate_gstream_filter_zip_t* zst = (tb_lzsw_deflate_gstream_filter_zip_t*)st;
 	if (zst) 
 	{
 		// close vlc
-		if (zst->vlc && zst->vlc->close) zst->vlc->close(zst->vlc); 
+		if (zst->vlc && zst->vlc->clos) zst->vlc->clos(zst->vlc); 
 
 		// free pool
 #if TB_LZSW_WINDOW_HASH_FIND
@@ -543,7 +543,7 @@ tb_gstream_filter_t* tb_gstream_filter_zip_open_lzsw_inflate(tb_lzsw_inflate_gst
 
 	// init filter
 	((tb_gstream_filter_t*)zst)->transform 	= tb_gstream_filter_zip_inflate_lzsw_transform;
-	((tb_gstream_filter_t*)zst)->close 		= tb_gstream_filter_zip_inflate_lzsw_close;
+	((tb_gstream_filter_t*)zst)->clos 		= tb_gstream_filter_zip_inflate_lzsw_clos;
 
 	// init zstream
 	((tb_gstream_filter_zip_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZSW;
@@ -573,7 +573,7 @@ tb_gstream_filter_t* tb_gstream_filter_zip_open_lzsw_deflate(tb_lzsw_deflate_gst
 
 	// init filter
 	((tb_gstream_filter_t*)zst)->transform = tb_gstream_filter_zip_deflate_lzsw_transform;
-	((tb_gstream_filter_t*)zst)->close 	= tb_gstream_filter_zip_deflate_lzsw_close;
+	((tb_gstream_filter_t*)zst)->clos 	= tb_gstream_filter_zip_deflate_lzsw_clos;
 
 	// init zstream
 	((tb_gstream_filter_zip_t*)zst)->algo 		= TB_ZSTREAM_ALGO_LZSW;

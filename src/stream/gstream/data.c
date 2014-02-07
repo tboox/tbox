@@ -64,7 +64,7 @@ static tb_long_t tb_gstream_data_open(tb_gstream_t* gstream)
 	// ok
 	return 1;
 }
-static tb_long_t tb_gstream_data_close(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_data_clos(tb_gstream_t* gstream)
 {
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream, -1);
@@ -172,7 +172,7 @@ tb_gstream_t* tb_gstream_init_data()
 
 	// init func
 	gstream->open 	= tb_gstream_data_open;
-	gstream->close 	= tb_gstream_data_close;
+	gstream->clos 	= tb_gstream_data_clos;
 	gstream->read 	= tb_gstream_data_read;
 	gstream->writ 	= tb_gstream_data_writ;
 	gstream->seek 	= tb_gstream_data_seek;

@@ -182,9 +182,9 @@ tb_void_t 			tb_aico_kill(tb_handle_t aico);
 /*! exit the aico
  *
  * @param aico 		the aico
- * @param bself 	exit it at the self callback?
+ * @param bcalling 	exit it at the self callback?
  */
-tb_void_t 			tb_aico_exit(tb_handle_t aico, tb_bool_t bself);
+tb_void_t 			tb_aico_exit(tb_handle_t aico, tb_bool_t bcalling);
 
 /*! the aico aicp
  *
@@ -217,14 +217,6 @@ tb_handle_t 		tb_aico_pool(tb_handle_t aico);
  * @return 			the aico handle
  */
 tb_handle_t 		tb_aico_handle(tb_handle_t aico);
-
-/*! the aico is pending?
- *
- * @param aico 		the aico
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aico_pending(tb_handle_t aico);
 
 #ifdef __tb_debug__
 /*! the aico func name from post for debug

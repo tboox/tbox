@@ -230,7 +230,7 @@ end:
 	if (aicp) tb_aicp_exit(aicp);
 
 	// exit sock
-	if (context.sock) tb_socket_close(context.sock);
+	if (context.sock) tb_socket_clos(context.sock);
 
 	// exit file
 	if (context.file) tb_file_exit(context.file);

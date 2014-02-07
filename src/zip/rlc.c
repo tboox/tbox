@@ -223,7 +223,7 @@ tb_void_t tb_zip_rlc_exit(tb_zip_t* zip)
 	if (rlc) 
 	{
 		// close vlc
-		if (rlc->vlc && rlc->vlc->close) rlc->vlc->close(rlc->vlc); 
+		if (rlc->vlc && rlc->vlc->clos) rlc->vlc->clos(rlc->vlc); 
 
 		// free it
 		tb_free(rlc);

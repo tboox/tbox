@@ -106,13 +106,13 @@ static tb_long_t tb_gstream_http_open(tb_gstream_t* gstream)
 	// ok?
 	return ok;
 }
-static tb_long_t tb_gstream_http_close(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_http_clos(tb_gstream_t* gstream)
 {
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
 	// close it
-	return tb_http_aclose(hstream->http);
+	return tb_http_aclos(hstream->http);
 }
 static tb_void_t tb_gstream_http_exit(tb_gstream_t* gstream)
 {
@@ -446,7 +446,7 @@ tb_gstream_t* tb_gstream_init_http()
 	// init stream
 	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_GSTREAM_TYPE_HTTP)) goto fail;
 	gstream->base.open 	= tb_gstream_http_open;
-	gstream->base.close = tb_gstream_http_close;
+	gstream->base.clos 	= tb_gstream_http_clos;
 	gstream->base.read 	= tb_gstream_http_read;
 	gstream->base.writ 	= tb_gstream_http_writ;
 	gstream->base.seek 	= tb_gstream_http_seek;

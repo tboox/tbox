@@ -373,24 +373,30 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 	// kill it
 	if (sstream->aico) tb_aico_kill(sstream->aico);
 }
-static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bself)
+static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
 	// exit aico
-	if (sstream->aico) tb_aico_exit(sstream->aico, bself);
+	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
 	sstream->aico = tb_null;
 
 	// exit addr
-	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bself);
+	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bcalling);
 	sstream->addr = tb_null;
 
 	// exit it
-	if (!sstream->bref && sstream->sock) tb_socket_close(sstream->sock);
+	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
 	sstream->sock = tb_null;
 	sstream->bref = 0;
+}
+static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bcalling)
+{	
+	// check
+	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
+	tb_assert_and_check_return(sstream);
 
 	// exit data
 	if (sstream->data) tb_free(sstream->data);
@@ -405,14 +411,6 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
-	case TB_ASTREAM_CTRL_IS_PENDING:
-		{
-			// is pending?
-			tb_bool_t* ppending = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
-			tb_assert_and_check_return_val(ppending, tb_false);
-			*ppending = sstream->aico? tb_aico_pending(sstream->aico) : tb_false;
-			return tb_true;
-		}
 	case TB_ASTREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
@@ -430,7 +428,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 				sstream->aico = tb_null;
 
 				// exit it
-				if (!sstream->bref && sstream->sock) tb_socket_close(sstream->sock);
+				if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
 				sstream->sock = tb_null;
 				sstream->bref = 0;
 			}
@@ -457,7 +455,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 				sstream->aico = tb_null;
 
 				// exit it
-				if (!sstream->bref && sstream->sock) tb_socket_close(sstream->sock);
+				if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
 			}
 
 			// set sock
@@ -501,6 +499,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	astream->base.seek 		= tb_astream_sock_seek;
 	astream->base.sync 		= tb_astream_sock_sync;
 	astream->base.kill 		= tb_astream_sock_kill;
+	astream->base.clos 		= tb_astream_sock_clos;
 	astream->base.exit 		= tb_astream_sock_exit;
 	astream->base.ctrl 		= tb_astream_sock_ctrl;
 	astream->type 			= TB_SOCKET_TYPE_TCP;

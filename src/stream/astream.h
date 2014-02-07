@@ -113,7 +113,6 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_GET_SIZE 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 6)
 ,	TB_ASTREAM_CTRL_GET_OFFSET 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 7)
 ,	TB_ASTREAM_CTRL_IS_OPENED 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 8)
-,	TB_ASTREAM_CTRL_IS_PENDING 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 9)
 
 ,	TB_ASTREAM_CTRL_SET_URL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 11)
 ,	TB_ASTREAM_CTRL_SET_HOST 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 12)
@@ -313,8 +312,11 @@ typedef struct __tb_astream_t
 	/// kill
 	tb_void_t 				(*kill)(struct __tb_astream_t* astream);
 
+	/// clos
+	tb_void_t 				(*clos)(struct __tb_astream_t* astream, tb_bool_t bcalling);
+
 	/// exit
-	tb_void_t 				(*exit)(struct __tb_astream_t* astream, tb_bool_t bself);
+	tb_void_t 				(*exit)(struct __tb_astream_t* astream, tb_bool_t bcalling);
 
 	/// ctrl
 	tb_bool_t 				(*ctrl)(struct __tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args);
@@ -355,20 +357,19 @@ tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp);
  */
 tb_void_t 			tb_astream_kill(tb_astream_t* astream);
 
-/*! exit stream
+/*! close stream, will block it if be pending
  *
  * @param astream 	the stream
- * @param bself 	exit it at the self callback?
+ * @param bcalling 	exit it from the calling callback?
  */
-tb_void_t 			tb_astream_exit(tb_astream_t* astream, tb_bool_t bself);
+tb_void_t 			tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling);
 
-/*! the stream is pending?
+/*! exit stream, will block it if be pending
  *
  * @param astream 	the stream
- *
- * @return 			tb_true or tb_false
+ * @param bcalling 	exit it from the calling callback?
  */
-tb_bool_t 			tb_astream_pending(tb_astream_t* astream);
+tb_void_t 			tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling);
 
 /*! init stream from url
  *

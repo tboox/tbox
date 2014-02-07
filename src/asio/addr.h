@@ -61,9 +61,9 @@ tb_void_t 			tb_aicp_addr_kill(tb_handle_t haddr);
 /*! exit the addr
  *
  * @param haddr 	the addr handle
- * @param bself 	exit it at the self callback?
+ * @param bcalling 	exit it at the self callback?
  */
-tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bself);
+tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling);
 
 /*! done the addr
  *

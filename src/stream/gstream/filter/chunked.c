@@ -77,7 +77,7 @@ static tb_long_t tb_gstream_filter_chunked_open(tb_gstream_t* gstream)
 	// open filter
 	return tb_gstream_filter_open(gstream);
 }
-static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_filter_chunked_clos(tb_gstream_t* gstream)
 {
 	// check
 	tb_gstream_filter_chunked_t* kstream = tb_gstream_filter_chunked_cast(gstream);
@@ -89,7 +89,7 @@ static tb_long_t tb_gstream_filter_chunked_close(tb_gstream_t* gstream)
 	tb_pstring_exit(&kstream->line);
 
 	// close filter
-	return tb_gstream_filter_close(gstream);
+	return tb_gstream_filter_clos(gstream);
 }
 /* chunked_data
  *
@@ -232,7 +232,7 @@ tb_gstream_t* tb_gstream_init_filter_chunked()
 	// init func
 	gstream->open 	= tb_gstream_filter_chunked_open;
 	gstream->read 	= tb_gstream_filter_read;
-	gstream->close	= tb_gstream_filter_chunked_close;
+	gstream->clos	= tb_gstream_filter_chunked_clos;
 	gstream->wait	= tb_gstream_filter_wait;
 	gstream->ctrl	= tb_gstream_filter_ctrl;
 
