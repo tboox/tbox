@@ -488,27 +488,27 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(aicp, tb_null);
 
 	// make stream
-	tb_astream_sock_t* astream = (tb_astream_sock_t*)tb_malloc0(sizeof(tb_astream_sock_t));
-	tb_assert_and_check_return_val(astream, tb_null);
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)tb_malloc0(sizeof(tb_astream_sock_t));
+	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)astream, aicp, TB_ASTREAM_TYPE_SOCK)) goto fail;
-	astream->base.open 		= tb_astream_sock_open;
-	astream->base.read 		= tb_astream_sock_read;
-	astream->base.writ 		= tb_astream_sock_writ;
-	astream->base.seek 		= tb_astream_sock_seek;
-	astream->base.sync 		= tb_astream_sock_sync;
-	astream->base.kill 		= tb_astream_sock_kill;
-	astream->base.clos 		= tb_astream_sock_clos;
-	astream->base.exit 		= tb_astream_sock_exit;
-	astream->base.ctrl 		= tb_astream_sock_ctrl;
-	astream->type 			= TB_SOCKET_TYPE_TCP;
+	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_ASTREAM_TYPE_SOCK)) goto fail;
+	sstream->base.open 		= tb_astream_sock_open;
+	sstream->base.read 		= tb_astream_sock_read;
+	sstream->base.writ 		= tb_astream_sock_writ;
+	sstream->base.seek 		= tb_astream_sock_seek;
+	sstream->base.sync 		= tb_astream_sock_sync;
+	sstream->base.kill 		= tb_astream_sock_kill;
+	sstream->base.clos 		= tb_astream_sock_clos;
+	sstream->base.exit 		= tb_astream_sock_exit;
+	sstream->base.ctrl 		= tb_astream_sock_ctrl;
+	sstream->type 			= TB_SOCKET_TYPE_TCP;
 
 	// ok
-	return (tb_astream_t*)astream;
+	return (tb_astream_t*)sstream;
 
 fail:
-	if (astream) tb_astream_exit((tb_astream_t*)astream, tb_false);
+	if (sstream) tb_astream_exit((tb_astream_t*)sstream, tb_false);
 	return tb_null;
 }
 tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_size_t type, tb_bool_t bssl)
@@ -520,17 +520,17 @@ tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, 
 	tb_assert_and_check_return_val(!bssl, tb_null);
 
 	// init stream
-	tb_astream_t* astream = tb_astream_init_sock(aicp);
-	tb_assert_and_check_return_val(astream, tb_null);
+	tb_astream_t* sstream = tb_astream_init_sock(aicp);
+	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// ctrl
-	if (!tb_astream_ctrl(astream, TB_ASTREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_astream_ctrl(astream, TB_ASTREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_astream_ctrl(astream, TB_ASTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
-	return astream;
+	return sstream;
 fail:
-	if (astream) tb_astream_exit(astream, tb_false);
+	if (sstream) tb_astream_exit(sstream, tb_false);
 	return tb_null;
 }

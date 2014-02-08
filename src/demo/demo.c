@@ -91,6 +91,9 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(stream_gstream_zip)
 ,	TB_DEMO_MAIN_ITEM(stream_gstream_null)
 ,	TB_DEMO_MAIN_ITEM(stream_gstream_charset)
+,	TB_DEMO_MAIN_ITEM(stream_astream_zip)
+,	TB_DEMO_MAIN_ITEM(stream_astream_null)
+,	TB_DEMO_MAIN_ITEM(stream_astream_charset)
 
 	// string
 ,	TB_DEMO_MAIN_ITEM(string_pstring)

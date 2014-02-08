@@ -658,6 +658,7 @@ tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_
 		tstream->base.iowner 	= tb_false;
 		tstream->base.func 		= func;
 		tstream->base.priv 		= priv;
+		tstream->base.offset 	= offset;
 		tstream->ostream 		= ostream;
 		tstream->oowner 		= tb_false;
 

@@ -42,10 +42,10 @@
  *        |                                          - data
  *    (url, ...)                                    |
  *     gstream ------------- gstream ---------------- file
- *     [aioo]        |              \               |
- *                   |               ----- http ----- sock
- *                   |
- *                   |
+ *     [aioo]        |                              |
+ *                   |                              - sock 
+ *                   |                              |
+ *                   |                              - http
  *                   |           - charset
  *                   |          |
  *                   - filter - |- chunked 
@@ -54,11 +54,11 @@
  *
  *
  *
- *                                                   - data
- *    (url, ...)                                    |
- *     astream ------------- astream ---------------- file
- *      [aicp]       |              \               |
- *                   |               ----- http ----- sock
+ *                                                    - http
+ *    (url, ...)                                     |
+ *     astream ------------- astream ----------------- file
+ *      [aicp]       |                               |
+ *                   |                               - sock
  *                   |
  *                   |
  *                   |           - charset
