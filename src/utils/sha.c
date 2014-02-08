@@ -57,7 +57,7 @@
 #define blk(i)  				(block[i] = block[i - 16] + sigma0_256(block[i - 15]) + sigma1_256(block[i - 2]) + block[i - 7])
 
 #define ROUND256(a,b,c,d,e,f,g,h) \
-	T1 += (h) + Sigma1_256(e) + Ch((e), (f), (g)) + K256[i]; \
+	T1 += (h) + Sigma1_256(e) + Ch((e), (f), (g)) + g_sha_k256[i]; \
 	(d) += T1; \
 	(h) = T1 + Sigma0_256(a) + Maj((a), (b), (c)); \
 	i++
@@ -74,7 +74,7 @@
  * globals
  */
 
-static tb_uint32_t const K256[64] = 
+static tb_uint32_t const g_sha_k256[64] = 
 {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -100,7 +100,7 @@ static tb_uint32_t const K256[64] =
 
 static tb_void_t tb_sha_transform_sha1(tb_uint32_t state[5], tb_uint8_t const buffer[64])
 {
-	tb_uint32_t block[80];
+	tb_uint32_t 	block[80];
 	tb_uint32_t 	i, a, b, c, d, e;
 
 	a = state[0];
@@ -207,7 +207,7 @@ static tb_void_t tb_sha_transform_sha2(tb_uint32_t *state, tb_uint8_t const buff
 		if (i < 16) T1 = blk0(i);
 		else T1 = blk(i);
 
-		T1 += h + Sigma1_256(e) + Ch(e, f, g) + K256[i];
+		T1 += h + Sigma1_256(e) + Ch(e, f, g) + g_sha_k256[i];
 		T2 = Sigma0_256(a) + Maj(a, b, c);
 
 		h = g;
