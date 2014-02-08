@@ -89,16 +89,6 @@ typedef enum __tb_astream_type_e
 
 }tb_astream_type_e;
 
-/// the astream filter enum
-typedef enum __tb_astream_filter_type_e
-{
- 	TB_ASTREAM_FLTR_TYPE_NONE 				= 0
-, 	TB_ASTREAM_FLTR_TYPE_CHARSET 			= 1
-, 	TB_ASTREAM_FLTR_TYPE_ZIP 				= 2
-, 	TB_ASTREAM_FLTR_TYPE_CHUNKED 			= 3
-
-}tb_astream_filter_type_e;
-
 /// the astream ctrl enum
 typedef enum __tb_astream_ctrl_e
 {
@@ -130,6 +120,11 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_SOCK_SET_HANDLE 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 2)
 ,	TB_ASTREAM_CTRL_SOCK_GET_HANDLE 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 3)
 
+	// the astream for filter
+,	TB_ASTREAM_CTRL_FLTR_GET_ASTREAM 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, 1)
+,	TB_ASTREAM_CTRL_FLTR_GET_FILTER 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, 2)
+,	TB_ASTREAM_CTRL_FLTR_SET_ASTREAM 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, 3)
+,	TB_ASTREAM_CTRL_FLTR_SET_FILTER 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FLTR, 4)
 
 }tb_astream_ctrl_e;
 
@@ -351,6 +346,14 @@ tb_astream_t* 		tb_astream_init_sock(tb_aicp_t* aicp);
  */
 tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp);
 
+/*! init filter stream 
+ *
+ * @param aicp 		the aicp
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter(tb_aicp_t* aicp);
+
 /*! kill stream
  *
  * @param astream 	the stream
@@ -418,6 +421,43 @@ tb_astream_t* 		tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host
  * @return 			the stream
  */
 tb_astream_t* 		tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl);
+
+/*! init filter stream from null
+ *
+ * @param astream 	the stream
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter_from_null(tb_astream_t* astream);
+
+/*! init filter stream from zip
+ *
+ * @param astream 	the stream
+ * @param algo 		the zip algorithom
+ * @param action 	the zip action
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter_from_zip(tb_astream_t* astream, tb_size_t algo, tb_size_t action);
+
+/*! init filter stream from charset
+ *
+ * @param astream 	the stream
+ * @param fr 		the from charset
+ * @param to 		the to charset
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_size_t fr, tb_size_t to);
+
+/*! init filter stream from chunked
+ *
+ * @param astream 	the stream
+ * @param dechunked decode the chunked data?
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter_from_chunked(tb_astream_t* astream, tb_bool_t dechunked);
 
 /*! open the stream 
  *

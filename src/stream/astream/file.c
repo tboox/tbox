@@ -379,6 +379,9 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
 
+			// exit file first if exists
+			if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
+
 			// set handle
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
 			fstream->file = handle;
@@ -408,26 +411,26 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(aicp, tb_null);
 
 	// make stream
-	tb_astream_file_t* astream = (tb_astream_file_t*)tb_malloc0(sizeof(tb_astream_file_t));
-	tb_assert_and_check_return_val(astream, tb_null);
+	tb_astream_file_t* fstream = (tb_astream_file_t*)tb_malloc0(sizeof(tb_astream_file_t));
+	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)astream, aicp, TB_ASTREAM_TYPE_FILE)) goto fail;
-	astream->base.open 		= tb_astream_file_open;
-	astream->base.read 		= tb_astream_file_read;
-	astream->base.writ 		= tb_astream_file_writ;
-	astream->base.seek 		= tb_astream_file_seek;
-	astream->base.sync 		= tb_astream_file_sync;
-	astream->base.kill 		= tb_astream_file_kill;
-	astream->base.clos 		= tb_astream_file_clos;
-	astream->base.ctrl 		= tb_astream_file_ctrl;
-	astream->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
+	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_ASTREAM_TYPE_FILE)) goto fail;
+	fstream->base.open 		= tb_astream_file_open;
+	fstream->base.read 		= tb_astream_file_read;
+	fstream->base.writ 		= tb_astream_file_writ;
+	fstream->base.seek 		= tb_astream_file_seek;
+	fstream->base.sync 		= tb_astream_file_sync;
+	fstream->base.kill 		= tb_astream_file_kill;
+	fstream->base.clos 		= tb_astream_file_clos;
+	fstream->base.ctrl 		= tb_astream_file_ctrl;
+	fstream->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// ok
-	return (tb_astream_t*)astream;
+	return (tb_astream_t*)fstream;
 
 fail:
-	if (astream) tb_astream_exit((tb_astream_t*)astream, tb_false);
+	if (fstream) tb_astream_exit((tb_astream_t*)fstream, tb_false);
 	return tb_null;
 }
 tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
@@ -436,15 +439,15 @@ tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
 	tb_assert_and_check_return_val(aicp && path, tb_null);
 
 	// init file stream
-	tb_astream_t* astream = tb_astream_init_file(aicp);
-	tb_assert_and_check_return_val(astream, tb_null);
+	tb_astream_t* fstream = tb_astream_init_file(aicp);
+	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set path
-	if (!tb_astream_ctrl(astream, TB_ASTREAM_CTRL_SET_URL, path)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_SET_URL, path)) goto fail;
 	
 	// ok
-	return astream;
+	return fstream;
 fail:
-	if (astream) tb_astream_exit(astream, tb_false);
+	if (fstream) tb_astream_exit(fstream, tb_false);
 	return tb_null;
 }
