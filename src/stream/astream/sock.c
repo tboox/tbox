@@ -352,7 +352,7 @@ static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, t
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_sync(tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_sync(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);

@@ -357,7 +357,7 @@ tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astre
 	// seek it
 	return astream->seek(astream, offset, func, priv);
 }
-tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(astream && astream->sync && func, tb_false);
@@ -372,9 +372,9 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_astream_sync_func_t fun
 	astream->file = file_;
 	astream->line = line_;
 #endif
-
+ 
 	// sync it
-	return astream->sync(astream, func, priv);
+	return astream->sync(astream, bclosing, func, priv);
 }
 tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
