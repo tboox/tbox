@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../filter/filter.h"
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -111,8 +112,18 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
 
+	// done filter
+	tb_bool_t ok = tb_false;
+	if (fstream->filter)
+	{
+		// spak the filter
+//		tb_long_t size = tb_filter_spak(fstream->filter, data, real, &data, 0);
+	}
 	// done func
-	return fstream->func.read((tb_astream_t*)fstream, state, data, real, fstream->priv);
+	else ok = fstream->func.read((tb_astream_t*)fstream, state, data, real, fstream->priv);
+
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_astream_filter_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
@@ -192,7 +203,8 @@ static tb_void_t tb_astream_filter_clos(tb_astream_t* astream, tb_bool_t bcallin
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return(fstream);
 
-	// TODO: clear filter
+	// clear the filter
+	if (fstream->filter) tb_filter_cler(fstream->filter);
 }
 static tb_void_t tb_astream_filter_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {	
@@ -201,7 +213,7 @@ static tb_void_t tb_astream_filter_exit(tb_astream_t* astream, tb_bool_t bcallin
 	tb_assert_and_check_return(fstream);
 
 	// exit it
-//	if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
+	if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
 	fstream->filter = tb_null;
 	fstream->bref = tb_false;
 }
@@ -331,6 +343,8 @@ tb_astream_t* tb_astream_init_filter_from_zip(tb_astream_t* astream, tb_size_t a
 
 	// set filter
 	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_zip(algo, action);
+	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
 	
 	// ok
 	return fstream;
@@ -340,9 +354,55 @@ fail:
 }
 tb_astream_t* tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_size_t fr, tb_size_t to)
 {
+	// check
+	tb_assert_and_check_return_val(astream, tb_null);
+
+	// the aicp
+	tb_aicp_t* aicp = tb_astream_aicp(astream);
+	tb_assert_and_check_return_val(aicp, tb_null);
+
+	// init filter stream
+	tb_astream_t* fstream = tb_astream_init_filter(aicp);
+	tb_assert_and_check_return_val(fstream, tb_null);
+
+	// set astream
+	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+
+	// set filter
+	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_charset(fr, to);
+	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
+	
+	// ok
+	return fstream;
+fail:
+	if (fstream) tb_astream_exit(fstream, tb_false);
 	return tb_null;
 }
 tb_astream_t* tb_astream_init_filter_from_chunked(tb_astream_t* astream, tb_bool_t dechunked)
 {
+	// check
+	tb_assert_and_check_return_val(astream, tb_null);
+
+	// the aicp
+	tb_aicp_t* aicp = tb_astream_aicp(astream);
+	tb_assert_and_check_return_val(aicp, tb_null);
+
+	// init filter stream
+	tb_astream_t* fstream = tb_astream_init_filter(aicp);
+	tb_assert_and_check_return_val(fstream, tb_null);
+
+	// set astream
+	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+
+	// set filter
+	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_chunked(dechunked);
+	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
+	
+	// ok
+	return fstream;
+fail:
+	if (fstream) tb_astream_exit(fstream, tb_false);
 	return tb_null;
 }
