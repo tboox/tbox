@@ -31,4 +31,27 @@
  * implementation
  */
 
+tb_handle_t tb_filter_init_from_zip(tb_size_t algo, tb_size_t action)
+{
+	return tb_null;
+}
+tb_handle_t tb_filter_init_from_charset(tb_size_t fr, tb_size_t to)
+{
+	return tb_null;
+}
+tb_handle_t tb_filter_init_from_chunked(tb_bool_t dechunked)
+{
+	return tb_null;
+}
+tb_void_t tb_filter_cler(tb_handle_t filter)
+{
+}
+tb_void_t tb_filter_exit(tb_handle_t filter)
+{
+}
+tb_long_t tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_long_t sync)
+{
+	return -1;
+}
+
 

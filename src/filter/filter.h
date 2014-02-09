@@ -29,5 +29,59 @@
  */
 #include "prefix.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! init filter from zip
+ *
+ * @param algo 		the zip algorithom
+ * @param action 	the zip action
+ *
+ * @return 			the filter
+ */
+tb_handle_t 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
+
+/*! init filter from charset
+ *
+ * @param fr 		the from charset
+ * @param to 		the to charset
+ *
+ * @return 			the filter
+ */
+tb_handle_t 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
+
+/*! init filter from chunked
+ *
+ * @param dechunked decode the chunked data?
+ *
+ * @return 			the filter
+ */
+tb_handle_t 		tb_filter_init_from_chunked(tb_bool_t dechunked);
+
+/*! exit filter
+ *
+ * @param filter 	the filter
+ */
+tb_void_t 			tb_filter_exit(tb_handle_t filter);
+
+/*! clear filter
+ *
+ * @param filter 	the filter
+ */
+tb_void_t 			tb_filter_cler(tb_handle_t filter);
+
+/*! spak filter
+ *
+ * @param filter 	the filter
+ * @param data 		the input data, maybe null
+ * @param size 		the input size, maybe zero
+ * @param pdata 	the output data
+ * @param sync 		sync? 1: sync, 0: no sync, -1: end
+ *
+ * @return 			> 0: the output size, 0: continue, -1: end
+ */
+tb_long_t 			tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_long_t sync);
+
 
 #endif
