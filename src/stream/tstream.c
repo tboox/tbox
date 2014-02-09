@@ -222,6 +222,27 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 	// continue to writ or break it
 	return bwrit;
 }
+static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)priv;
+	tb_assert_and_check_return_val(astream && tstream && tstream->func, tb_false);
+
+	// trace
+	tb_trace_impl("sync: state: %s", tb_astream_state_cstr(state));
+
+	// the time
+	tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
+
+	// compute the total rate
+	tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
+
+	// done func
+	tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, 0, trate, tstream->priv);
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv)
 {
 	// check
@@ -335,6 +356,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 	// closed or failed?
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
+#if 0
 		// flush it
 		if (tstream->type == TB_TSTREAM_TYPE_AG && ((tb_tstream_ag_t*)tstream)->ostream)
 			tb_gstream_bfwrit(((tb_tstream_ag_t*)tstream)->ostream, tb_null, 0);
@@ -347,6 +369,31 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 
 		// done func
 		tstream->func(state, 0, trate, tstream->priv);
+#else
+
+		// sync it if closed
+		tb_bool_t bend = tb_true;
+		if (state == TB_ASTREAM_STATE_CLOSED)
+		{
+			if (tstream->type == TB_TSTREAM_TYPE_AG && ((tb_tstream_ag_t*)tstream)->ostream)
+				tb_gstream_bfwrit(((tb_tstream_ag_t*)tstream)->ostream, tb_null, 0);
+			else if (tstream->type == TB_TSTREAM_TYPE_AA && ((tb_tstream_aa_t*)tstream)->ostream)
+				bend = tb_astream_sync(((tb_tstream_aa_t*)tstream)->ostream, tb_true, tb_tstream_ostream_sync_func, tstream)? tb_false : tb_true;
+		}
+
+		// end? 
+		if (bend)
+		{
+			// the time
+			tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
+
+			// compute the total rate
+			tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
+
+			// done func
+			tstream->func(state, 0, trate, tstream->priv);
+		}
+#endif
 	}
 
 	// clear pending

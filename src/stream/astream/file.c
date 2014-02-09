@@ -294,7 +294,7 @@ static tb_bool_t tb_astream_file_sync_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_sync(tb_astream_t* astream, tb_astream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_sync(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
