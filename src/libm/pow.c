@@ -29,7 +29,7 @@
 #include <math.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_double_t tb_pow(tb_double_t x, tb_double_t y)
 {

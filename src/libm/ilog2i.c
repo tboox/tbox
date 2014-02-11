@@ -29,7 +29,7 @@
 #include "../utils/bits.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 
 tb_uint32_t tb_ilog2i(tb_uint32_t x)

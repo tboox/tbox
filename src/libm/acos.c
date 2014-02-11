@@ -29,7 +29,7 @@
 #include <math.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_double_t tb_acos(tb_double_t x)
 {

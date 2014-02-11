@@ -27,6 +27,65 @@
  * includes
  */
 #include "../prefix.h"
+#include "../stream/bstream.h"
+#include "../memory/memory.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the filter type enum
+typedef enum __tb_filter_type_e
+{
+	TB_FILTER_TYPE_NONE 	= 0
+,	TB_FILTER_TYPE_ZIP 		= 1
+,	TB_FILTER_TYPE_CHARSET 	= 2
+,	TB_FILTER_TYPE_CHUNKED 	= 3
+
+}tb_filter_type_e;
+
+/// the filter type
+typedef struct __tb_filter_t
+{
+	/// the type
+	tb_size_t 		type;
+
+	/// the input data
+	tb_pbuffer_t 	idata;
+
+	/// the output data 
+	tb_pbuffer_t 	odata;
+
+	/// the spak
+	tb_long_t 		(*spak)(struct __tb_filter_t* filter, tb_bstream_t* istream, tb_bstream_t* ostream, tb_long_t sync);
+
+	/// the cler
+	tb_void_t 		(*cler)(struct __tb_filter_t* filter);
+
+	/// the exit
+	tb_void_t 		(*exit)(struct __tb_filter_t* filter);
+
+}tb_filter_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+static __tb_inline__ tb_bool_t tb_filter_init(tb_filter_t* filter, tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(filter, tb_false);
+	
+	// init type
+	filter->type = type;
+
+	// init idata
+	if (!tb_pbuffer_init(&filter->idata)) return tb_false;
+
+	// init odata
+	if (!tb_pbuffer_init(&filter->odata)) return tb_false;
+
+	// ok
+	return tb_true;
+}
 
 #endif

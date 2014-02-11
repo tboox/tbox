@@ -30,27 +30,43 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+tb_void_t tb_filter_cler(tb_filter_t* filter)
+{
+	// check
+	tb_assert_and_check_return(filter);
+	
+	// clear it
+	if (filter->cler) filter->cler(filter);
 
-tb_handle_t tb_filter_init_from_zip(tb_size_t algo, tb_size_t action)
-{
-	return tb_null;
+	// exit idata
+	tb_pbuffer_clear(&filter->idata);
+
+	// exit odata
+	tb_pbuffer_clear(&filter->odata);
 }
-tb_handle_t tb_filter_init_from_charset(tb_size_t fr, tb_size_t to)
+tb_void_t tb_filter_exit(tb_filter_t* filter)
 {
-	return tb_null;
+	// check
+	tb_assert_and_check_return(filter);
+	
+	// exit it
+	if (filter->exit) filter->exit(filter);
+
+	// exit idata
+	tb_pbuffer_exit(&filter->idata);
+
+	// exit odata
+	tb_pbuffer_exit(&filter->odata);
+
+	// free it
+	tb_free(filter);
 }
-tb_handle_t tb_filter_init_from_chunked(tb_bool_t dechunked)
+tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
 {
-	return tb_null;
-}
-tb_void_t tb_filter_cler(tb_handle_t filter)
-{
-}
-tb_void_t tb_filter_exit(tb_handle_t filter)
-{
-}
-tb_long_t tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
-{
+	// check
+	tb_assert_and_check_return_val(filter && filter->spak && pdata, -1);
+
+	// ok?
 	return -1;
 }
 

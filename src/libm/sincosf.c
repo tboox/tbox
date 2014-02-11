@@ -29,7 +29,7 @@
 #include <math.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_void_t tb_sincosf(tb_float_t x, tb_float_t* s, tb_float_t* c)
 {

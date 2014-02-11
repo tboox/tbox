@@ -40,7 +40,7 @@
  *
  * @return 			the filter
  */
-tb_handle_t 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
+tb_filter_t* 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
 
 /*! init filter from charset
  *
@@ -49,7 +49,7 @@ tb_handle_t 		tb_filter_init_from_zip(tb_size_t algo, tb_size_t action);
  *
  * @return 			the filter
  */
-tb_handle_t 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
+tb_filter_t* 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
 
 /*! init filter from chunked
  *
@@ -57,19 +57,19 @@ tb_handle_t 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
  *
  * @return 			the filter
  */
-tb_handle_t 		tb_filter_init_from_chunked(tb_bool_t dechunked);
+tb_filter_t* 		tb_filter_init_from_chunked(tb_bool_t dechunked);
 
 /*! exit filter
  *
  * @param filter 	the filter
  */
-tb_void_t 			tb_filter_exit(tb_handle_t filter);
+tb_void_t 			tb_filter_exit(tb_filter_t* filter);
 
 /*! clear filter
  *
  * @param filter 	the filter
  */
-tb_void_t 			tb_filter_cler(tb_handle_t filter);
+tb_void_t 			tb_filter_cler(tb_filter_t* filter);
 
 /*! spak filter
  *
@@ -82,7 +82,7 @@ tb_void_t 			tb_filter_cler(tb_handle_t filter);
  *
  * @return 			> 0: the output size, 0: continue, -1: end
  */
-tb_long_t 			tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
+tb_long_t 			tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
 
 
 #endif
