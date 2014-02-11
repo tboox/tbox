@@ -44,7 +44,7 @@ typedef struct __tb_astream_filter_t
 	tb_astream_t 				base;
 
 	// the filter handle
-	tb_handle_t 				filter;
+	tb_filter_t* 				filter;
 
 	// the filter handle is referenced? need not exit it
 	tb_bool_t 					bref;
@@ -328,7 +328,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 //			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
 
 			// set filter
-			tb_handle_t filter = (tb_handle_t)tb_va_arg(args, tb_handle_t);
+			tb_filter_t* filter = (tb_filter_t*)tb_va_arg(args, tb_filter_t*);
 			fstream->filter = filter;
 			fstream->bref = filter? tb_true : tb_false;
 			return tb_true;
@@ -336,7 +336,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	case TB_ASTREAM_CTRL_FLTR_GET_FILTER:
 		{
 			// get filter
-			tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
+			tb_filter_t** phandle = (tb_filter_t**)tb_va_arg(args, tb_filter_t**);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = fstream->filter;
 			return tb_true;

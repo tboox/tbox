@@ -28,7 +28,7 @@
 #include "math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_float_t tb_exp1f(tb_float_t x)
 {

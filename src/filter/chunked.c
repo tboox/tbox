@@ -17,21 +17,20 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		sqrtf.c
- * @ingroup 	libm
+ * @file		chunked.c
+ * @ingroup 	filter
  *
  */
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "math.h"
-#include <math.h>
+#include "filter.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_float_t tb_sqrtf(tb_float_t x)
+tb_filter_t* tb_filter_init_from_chunked(tb_bool_t dechunked)
 {
-	return sqrtf(x);
+	return tb_null;
 }

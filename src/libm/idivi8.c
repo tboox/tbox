@@ -28,7 +28,7 @@
 #include "math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_uint32_t tb_idivi8(tb_uint32_t x, tb_uint8_t y)
 {

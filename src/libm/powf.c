@@ -28,7 +28,7 @@
 #include "math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_float_t tb_powf(tb_float_t x, tb_float_t y)
 {

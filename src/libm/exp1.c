@@ -28,7 +28,7 @@
 #include "math.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_double_t tb_exp1(tb_double_t x)
 {

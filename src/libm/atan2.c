@@ -29,7 +29,7 @@
 #include <math.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * implemention
+ * implementation
  */
 tb_double_t tb_atan2(tb_double_t y, tb_double_t x)
 {
