@@ -16,15 +16,6 @@ typedef struct __tb_demo_context_t
 	// the base
 	tb_hong_t 				base;
 
-	// the basc
-	tb_hong_t 				basc;
-
-	// the size
-	tb_hize_t 				size;
-
-	// is debug
-	tb_bool_t 				debug;
-
 	// is verbose
 	tb_bool_t 				verbose;
 
@@ -42,41 +33,18 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
 	tb_assert_and_check_return_val(context && context->option, tb_false);
+ 
+	// print verbose info
+	if (context->verbose) tb_printf("save: %llu bytes, rate: %lu bytes/s, state: %s\n", size, rate, tb_astream_state_cstr(state));
 
-	// ok
-	if (state == TB_ASTREAM_STATE_OK)
-	{
-		// save size
-		context->size += size;
-
-		// print verbose info
-		if (context->debug) tb_printf("save: %lu\n", size);
-
-		// print verbose info
-		if (context->verbose) 
-		{
-			if (tb_mclock() - context->basc > 1000) 
-			{
-				tb_printf("save: %llu bytes, rate: %lu bytes/s\n", context->size, rate);
-				context->basc = tb_mclock();
-			}
-		}
-
-	}
-	// failed
-	else
-	{
-		// print verbose info
-		if (context->verbose) tb_printf("save: %llu bytes, rate: %lu bytes / s, state: %s\n", context->size, rate, tb_astream_state_cstr(state));
-
-		// kill aicp
+	// failed? kill aicp
+	if (state != TB_ASTREAM_STATE_OK)
 		tb_aicp_kill(tb_astream_aicp(context->istream));
-	}
 
 	// ok?
 	return (state == TB_ASTREAM_STATE_OK)? tb_true : tb_false;
@@ -197,7 +165,6 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 		if (tb_option_done(context.option, argc - 1, &argv[1]))
 		{
 			// debug and verbose
-			context.debug = tb_option_find(context.option, "debug");
 			context.verbose = tb_option_find(context.option, "no-verbose")? tb_false : tb_true;
 		
 			// done url

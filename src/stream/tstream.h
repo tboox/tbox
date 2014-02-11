@@ -38,13 +38,13 @@
 /*! the tstream save func type
  *
  * @param state 	the gstream/astream state
- * @param size 		the saved size currently
+ * @param size 		the saved size 
  * @param rate 		the current rate, bytes/s
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

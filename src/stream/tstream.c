@@ -26,7 +26,7 @@
  * trace
  */
 #define TB_TRACE_IMPL_TAG 				"tstream"
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -120,12 +120,12 @@ typedef struct __tb_tstream_ag_t
 	tb_gstream_t* 			ostream;
 
 }tb_tstream_ag_t;
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv);
-static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;
@@ -174,10 +174,10 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 
 			// reset delay
 			delay = 0;
-		}
 
-		// done func
-		if (!tstream->func(state, real, tstream->crate, tstream->priv)) break;
+			// done func
+			if (!tstream->func(state, tstream->size, tstream->crate, tstream->priv)) break;
+		}
 
 		// reset state
 		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
@@ -198,7 +198,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			tb_trace_impl("delay: %lu ms", delay);
 
 			// continue to read it
-			if (!tb_astream_read_after(tstream->istream, delay, lrate, tb_tstream_istream_read_func, tstream)) break;
+			if (!tb_astream_read_after(tstream->istream, delay, lrate, tb_tstream_istream_read_func, (tb_pointer_t)tstream)) break;
 		}
 
 		// ok
@@ -213,7 +213,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 		// done func
-		tstream->func(state, 0, trate, tstream->priv);
+		tstream->func(state, tstream->size, trate, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -238,12 +238,12 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 	// done func
-	tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, 0, trate, tstream->priv);
+	tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tstream->size, trate, tstream->priv);
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv)
+static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;
@@ -326,7 +326,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			}
 
 			// done func
-			if (!tstream->func(TB_ASTREAM_STATE_OK, real, tstream->crate, tstream->priv)) break;
+			if (!tstream->func(TB_ASTREAM_STATE_OK, tstream->size, tstream->crate, tstream->priv)) break;
 
 			// not paused?
 			if (!tb_atomic_get(&tstream->paused)) 
@@ -368,7 +368,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 		tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 		// done func
-		tstream->func(state, 0, trate, tstream->priv);
+		tstream->func(state, tstream->size, trate, tstream->priv);
 #else
 
 		// sync it if closed
@@ -391,7 +391,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 			// done func
-			tstream->func(state, 0, trate, tstream->priv);
+			tstream->func(state, tstream->size, trate, tstream->priv);
 		}
 #endif
 	}
@@ -439,7 +439,7 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		tstream->func(state, 0, 0, tstream->priv);
+		tstream->func(state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -497,7 +497,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		tstream->func(state, 0, 0, tstream->priv);
+		tstream->func(state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -591,10 +591,10 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 
 					// reset delay
 					delay = 0;
-				}
 
-				// done func
-				if (func) func(TB_GSTREAM_STATE_OK, real, crate, priv);
+					// done func
+					if (func) func(TB_GSTREAM_STATE_OK, writ, crate, priv);
+				}
 
 				// wait some time for limit rate
 				if (delay) tb_msleep(delay);
@@ -632,7 +632,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
 	
 		// done func
-		func(TB_GSTREAM_STATE_CLOSED, 0, trate, priv);
+		func(TB_GSTREAM_STATE_CLOSED, writ, trate, priv);
 	}
 
 	// ok?

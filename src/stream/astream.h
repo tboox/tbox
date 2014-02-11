@@ -164,23 +164,25 @@ typedef tb_bool_t 			(*tb_astream_open_func_t)(struct __tb_astream_t* astream, t
  * @param state 			the stream state
  * @param data 				the readed data
  * @param real 				the real size
+ * @param size 				the need size
  * @param priv 				the func private data
  *
  * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_astream_read_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv);
+typedef tb_bool_t 			(*tb_astream_read_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the astream writ func type
  *
  * @param astream 			the astream
  * @param state 			the stream state
+ * @param data 				the writed data
  * @param real 				the real size
  * @param size 				the need size
  * @param priv 				the func private data
  *
  * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 			(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the astream seek func type
  *

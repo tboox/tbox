@@ -223,7 +223,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	// the stream
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
-
+ 
 	// done state
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
@@ -251,7 +251,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	}
 
 	// done func
-	if (sstream->func.read((tb_astream_t*)sstream, state, aice->u.recv.data, aice->u.recv.real, sstream->priv))
+	if (sstream->func.read((tb_astream_t*)sstream, state, aice->u.recv.data, aice->u.recv.real, aice->u.recv.size, sstream->priv))
 	{
 		// continue?
 		if (aice->state == TB_AICE_STATE_OK)
@@ -312,9 +312,9 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
-
+ 
 	// done func
-	if (sstream->func.writ((tb_astream_t*)sstream, state, aice->u.send.real, aice->u.send.size, sstream->priv))
+	if (sstream->func.writ((tb_astream_t*)sstream, state, aice->u.send.data, aice->u.send.real, aice->u.send.size, sstream->priv))
 	{
 		// continue?
 		if (aice->state == TB_AICE_STATE_OK && aice->u.send.real < aice->u.send.size)
