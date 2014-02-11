@@ -6,10 +6,10 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("save: %lu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
 
 	// ok
 	return tb_true;

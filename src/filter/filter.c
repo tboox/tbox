@@ -49,7 +49,7 @@ tb_void_t tb_filter_cler(tb_handle_t filter)
 tb_void_t tb_filter_exit(tb_handle_t filter)
 {
 }
-tb_long_t tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_long_t sync)
+tb_long_t tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync)
 {
 	return -1;
 }

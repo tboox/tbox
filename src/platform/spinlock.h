@@ -60,7 +60,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_init(tb_spinlock_t* lock)
 	return tb_true;
 }
 
-/* exit spinlock
+/*! exit spinlock
  *
  * @param lock 		the lock
  */
@@ -73,7 +73,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_exit(tb_spinlock_t* lock)
 	*lock = 0;
 }
 
-/* enter spinlock
+/*! enter spinlock
  *
  * @param lock 		the lock
  */
@@ -100,7 +100,7 @@ static __tb_inline_force__ tb_void_t tb_spinlock_enter(tb_spinlock_t* lock)
 	}
 }
 
-/* try to enter spinlock
+/*! try to enter spinlock
  *
  * @param lock 		the lock
  *
@@ -115,7 +115,7 @@ static __tb_inline_force__ tb_bool_t tb_spinlock_enter_try(tb_spinlock_t* lock)
 	return tb_atomic_fetch_and_pset((tb_atomic_t*)lock, 0, 1)? tb_false : tb_true;
 }
 
-/* leave spinlock
+/*! leave spinlock
  *
  * @param lock 		the lock
  */

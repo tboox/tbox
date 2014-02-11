@@ -8,14 +8,8 @@
  */
 typedef struct __tb_demo_context_t
 {
-	// debug?
-	tb_bool_t 			debug;
-
 	// verbose 
 	tb_bool_t 			verbose;
-
-	// the base
-	tb_hong_t 			base;
 
 	// rate
 	tb_size_t 			rate;
@@ -52,31 +46,17 @@ static tb_long_t tb_demo_gstream_sfunc_writ(tb_handle_t ssl, tb_byte_t const* da
 	tb_printf("ssl: writ: %lu\n", size);
 	return ssl? tb_socket_send(ssl, data, size) : -1;
 }
-static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
-	if (state == TB_GSTREAM_STATE_OK)
-	{
-		// print debug info
-		if (context->debug) tb_printf("size: %ld, rate: %lu bytes / s\n", size, rate);
+	// print verbose info
+	if (context->verbose) tb_printf("size: %llu bytes, rate: %lu bytes/s, state: %s\n", size, rate, tb_gstream_state_cstr(state));
 
-		// print verbose info
-		if (context->verbose) 
-		{
-			if (tb_mclock() - context->base > 1000) 
-			{
-				if (size >= 0) tb_printf("size: %ld bytes, rate: %lu bytes / s\n", size, rate);
-				context->base = tb_mclock();
-			}
-		}
-
-		// save rate
-		context->rate = rate;
-	}
-	else if (context->verbose) tb_printf("state: %s\n", tb_gstream_state_cstr(state));
+	// save rate
+	if (state == TB_GSTREAM_STATE_OK) context->rate = rate;
 
 	// ok
 	return tb_true;
@@ -339,7 +319,6 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				tb_hong_t 			save = 0;
 				tb_hong_t 			base = tb_mclock();
 				tb_demo_context_t 	context = {0}; 
-				context.debug 		= debug; 
 				context.verbose 	= verbose;
 				if ((save = tb_tstream_save_gg(ist, ost, limitrate, tb_demo_gstream_save_func, &context)) < 0) break;
 

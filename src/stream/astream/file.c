@@ -164,9 +164,9 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
-
+ 
 	// done func
-	if (fstream->func.read((tb_astream_t*)fstream, state, aice->u.read.data, aice->u.read.real, fstream->priv))
+	if (fstream->func.read((tb_astream_t*)fstream, state, aice->u.read.data, aice->u.read.real, aice->u.read.size, fstream->priv))
 	{
 		// continue?
 		if (aice->state == TB_AICE_STATE_OK)
@@ -197,7 +197,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 {
 	// check
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_WRIT, tb_false);
-
+ 
 	// the stream
 	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
 	tb_assert_and_check_return_val(fstream && fstream->func.writ, tb_false);
@@ -226,7 +226,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	}
 
 	// done func
-	if (fstream->func.writ((tb_astream_t*)fstream, state, aice->u.writ.real, aice->u.writ.size, fstream->priv))
+	if (fstream->func.writ((tb_astream_t*)fstream, state, aice->u.writ.data, aice->u.writ.real, aice->u.writ.size, fstream->priv))
 	{
 		// continue?
 		if (aice->state == TB_AICE_STATE_OK && aice->u.writ.real < aice->u.writ.size)

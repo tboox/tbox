@@ -66,7 +66,7 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 		state = TB_ASTREAM_STATE_OK;
 
 	} while (0);
-
+ 
 	// failed?
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
@@ -74,9 +74,9 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 		tb_atomic_set(&astream->stoped, 1);
  
 		// done func
-		oread->func(astream, state, tb_null, 0, oread->priv);
+		oread->func(astream, state, tb_null, 0, oread->maxn, oread->priv);
 	}
-
+ 
 	// ok
 	return tb_true;
 }
@@ -120,7 +120,7 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 		tb_atomic_set(&astream->stoped, 1);
 
 		// done func
-		owrit->func(astream, state, 0, owrit->size, owrit->priv);
+		owrit->func(astream, state, owrit->data, 0, owrit->size, owrit->priv);
 	}
 
 	// ok

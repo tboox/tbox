@@ -77,11 +77,12 @@ tb_void_t 			tb_filter_cler(tb_handle_t filter);
  * @param data 		the input data, maybe null
  * @param size 		the input size, maybe zero
  * @param pdata 	the output data
+ * @param need 		the need output size, using the default size if zero
  * @param sync 		sync? 1: sync, 0: no sync, -1: end
  *
  * @return 			> 0: the output size, 0: continue, -1: end
  */
-tb_long_t 			tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_long_t sync);
+tb_long_t 			tb_filter_spak(tb_handle_t filter, tb_byte_t const* data, tb_size_t size, tb_byte_t const** pdata, tb_size_t need, tb_long_t sync);
 
 
 #endif

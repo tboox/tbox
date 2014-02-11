@@ -103,7 +103,7 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 	// post open
 	return tb_astream_open(fstream->astream, tb_astream_filter_open_func, astream);
 }
-static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_pointer_t priv)
+static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(astream && data, tb_false);
@@ -117,39 +117,39 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 	if (fstream->filter)
 	{
 		// spak the filter
-		tb_long_t size = tb_filter_spak(fstream->filter, data, real, &data, state == TB_ASTREAM_STATE_CLOSED? -1 : 0);
+		tb_long_t spak = tb_filter_spak(fstream->filter, data, real, &data, size, state == TB_ASTREAM_STATE_CLOSED? -1 : 0);
 		
 		// has data?
-		if (size > 0 && data)
+		if (spak > 0 && data)
 		{
 			// done data
-			ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, size, fstream->priv);
+			ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, size, fstream->priv);
 
 			// continue and done it if closed or failed
 			if (ok && state != TB_ASTREAM_STATE_OK)
 			{
 				// done closed or failed
-				fstream->func.read((tb_astream_t*)fstream, state, tb_null, 0, fstream->priv);
+				fstream->func.read((tb_astream_t*)fstream, state, tb_null, 0, size, fstream->priv);
 
 				// break it
 				// ok = tb_false;
 			}
 		}
 		// no data? continue it
-		else if (!size) ok = tb_true;
+		else if (!spak) ok = tb_true;
 		// end or error?
 		else
 		{
 			// done closed or failed
-			fstream->func.read((tb_astream_t*)fstream, state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tb_null, 0, fstream->priv);
+			fstream->func.read((tb_astream_t*)fstream, state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tb_null, 0, size, fstream->priv);
 
 			// break it
 			// ok = tb_false;
 		}
 	}
 	// done func
-	else ok = fstream->func.read((tb_astream_t*)fstream, state, data, real, fstream->priv);
-
+	else ok = fstream->func.read((tb_astream_t*)fstream, state, data, real, size, fstream->priv);
+ 
 	// ok?
 	return ok;
 }
@@ -166,17 +166,17 @@ static tb_bool_t tb_astream_filter_read(tb_astream_t* astream, tb_size_t delay, 
 	// post read
 	return tb_astream_read_after(fstream->astream, delay, maxn, tb_astream_filter_read_func, astream);
 }
-static tb_bool_t tb_astream_filter_writ_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_astream_filter_writ_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(astream && size, tb_false);
+	tb_assert_and_check_return_val(astream && data && size, tb_false);
 
 	// the stream
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.writ, tb_false);
 
 	// done func
-	return fstream->func.writ((tb_astream_t*)fstream, state, real, size, fstream->priv);
+	return fstream->func.writ((tb_astream_t*)fstream, state, data, real, size, fstream->priv);
 }
 static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
@@ -193,7 +193,7 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 	if (fstream->filter)
 	{
 		// spak the filter
-		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, 0);
+		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, 0, 0);
 		
 		// has data? post writ
 		if (real > 0 && data)
@@ -217,10 +217,10 @@ static tb_bool_t tb_astream_filter_sync_func(tb_astream_t* astream, tb_size_t st
 	// done func
 	return fstream->func.sync((tb_astream_t*)fstream, state, fstream->priv);
 }
-static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size_t state, tb_size_t real, tb_size_t size, tb_pointer_t priv)
+static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(astream && size, tb_false);
+	tb_assert_and_check_return_val(astream && data && size, tb_false);
 
 	// the stream
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
@@ -251,7 +251,7 @@ static tb_bool_t tb_astream_filter_sync(tb_astream_t* astream, tb_bool_t bclosin
 	{
 		// spak the filter
 		tb_byte_t const* 	data = tb_null;
-		tb_long_t 			real = tb_filter_spak(fstream->filter, tb_null, 0, &data, bclosing? -1 : 1);
+		tb_long_t 			real = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1);
 		
 		// has data? post writ and sync
 		if (real > 0 && data)
