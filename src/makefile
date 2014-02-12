@@ -62,11 +62,7 @@ tbox_C_FILES 			+= \
 						stream/gstream/file \
 						stream/gstream/data \
 						stream/gstream/sock \
-						stream/gstream/filter/filter \
-						stream/gstream/filter/charset \
-						stream/gstream/filter/chunked \
-						stream/gstream/filter/null \
-						stream/gstream/filter/zip \
+						stream/gstream/filter \
 						stream/astream \
 						stream/astream/http \
 						stream/astream/sock \

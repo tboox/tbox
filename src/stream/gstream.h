@@ -114,16 +114,6 @@ typedef enum __tb_gstream_type_e
 
 }tb_gstream_type_e;
 
-/// the gstream filter enum
-typedef enum __tb_gstream_filter_type_e
-{
- 	TB_GSTREAM_FLTR_TYPE_NONE 				= 0
-, 	TB_GSTREAM_FLTR_TYPE_CHARSET 			= 1
-, 	TB_GSTREAM_FLTR_TYPE_ZIP 				= 2
-, 	TB_GSTREAM_FLTR_TYPE_CHUNKED 			= 3
-
-}tb_gstream_filter_type_e;
-
 /// the gstream ctrl enum
 typedef enum __tb_gstream_ctrl_e
 {
@@ -167,21 +157,10 @@ typedef enum __tb_gstream_ctrl_e
 ,	TB_GSTREAM_CTRL_HTTP_GET_STATUS 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_HTTP, 2)
 
 	// the gstream for filter
-,	TB_GSTREAM_CTRL_FLTR_GET_GSTREAM 		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_NONE, 1)
-,	TB_GSTREAM_CTRL_FLTR_SET_GSTREAM 		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_NONE, 2)
-
-	// the gstream for charset filter
-,	TB_GSTREAM_CTRL_FLTR_CHARSET_GET_FTYPE 	= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_CHARSET, 1)
-,	TB_GSTREAM_CTRL_FLTR_CHARSET_GET_TTYPE 	= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_CHARSET, 2)
-
-,	TB_GSTREAM_CTRL_FLTR_CHARSET_SET_FTYPE 	= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_CHARSET, 3)
-,	TB_GSTREAM_CTRL_FLTR_CHARSET_SET_TTYPE 	= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_CHARSET, 4)
-
-	// the gstream for zip filter
-,	TB_GSTREAM_CTRL_FLTR_ZIP_GET_ALGO		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_ZIP, 1)
-,	TB_GSTREAM_CTRL_FLTR_ZIP_GET_ACTION		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_ZIP, 2)
-,	TB_GSTREAM_CTRL_FLTR_ZIP_SET_ALGO		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_ZIP, 3)
-,	TB_GSTREAM_CTRL_FLTR_ZIP_SET_ACTION		= TB_GSTREAM_CTRL_FLTR(TB_GSTREAM_FLTR_TYPE_ZIP, 4)
+,	TB_GSTREAM_CTRL_FLTR_GET_GSTREAM 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_FLTR, 1)
+,	TB_GSTREAM_CTRL_FLTR_GET_FILTER 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_FLTR, 2)
+,	TB_GSTREAM_CTRL_FLTR_SET_GSTREAM 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_FLTR, 3)
+,	TB_GSTREAM_CTRL_FLTR_SET_FILTER 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_FLTR, 4)
 
 }tb_gstream_ctrl_e;
 
@@ -343,29 +322,11 @@ tb_gstream_t* 		tb_gstream_init_sock(tb_noarg_t);
  */
 tb_gstream_t* 		tb_gstream_init_http(tb_noarg_t);
 
-/*! init null filter stream 
+/*! init filter stream 
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_filter_null(tb_noarg_t);
-
-/*! init zip filter stream 
- *
- * @return 			the stream
- */
-tb_gstream_t* 		tb_gstream_init_filter_zip(tb_noarg_t);
-
-/*! init charset filter stream 
- *
- * @return 			the stream
- */
-tb_gstream_t* 		tb_gstream_init_filter_charset(tb_noarg_t);
-
-/*! init chunked filter stream 
- *
- * @return 			the stream
- */
-tb_gstream_t* 		tb_gstream_init_filter_chunked(tb_noarg_t);
+tb_gstream_t* 		tb_gstream_init_filter(tb_noarg_t);
 
 /*! exit stream
  *
@@ -459,10 +420,11 @@ tb_gstream_t* 		tb_gstream_init_filter_from_charset(tb_gstream_t* gstream, tb_si
 /*! init filter stream from chunked
  *
  * @param gstream 	the stream
+ * @param dechunked decode the chunked data?
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream);
+tb_gstream_t* 		tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream, tb_bool_t dechunked);
 
 /*! wait stream 
  *
