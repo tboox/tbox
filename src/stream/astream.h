@@ -59,6 +59,9 @@
 /// sync
 #define tb_astream_sync(astream, bclosing, func, priv) 							tb_astream_sync_impl(astream, bclosing, func, priv __tb_debug_vals__)
 
+/// task
+#define tb_astream_task(astream, delay, func, priv) 							tb_astream_task_impl(astream, delay, func, priv __tb_debug_vals__)
+
 /// open and read
 #define tb_astream_oread(astream, maxn, func, priv) 							tb_astream_oread_impl(astream, maxn, func, priv __tb_debug_vals__)
 
@@ -205,6 +208,16 @@ typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, t
  */
 typedef tb_bool_t 			(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
 
+/*! the astream task func type
+ *
+ * @param astream 			the astream
+ * @param state 			the stream state
+ * @param priv 				the func private data
+ *
+ * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ */
+typedef tb_bool_t 			(*tb_astream_task_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
+
 /// the astream open and read type
 typedef struct __tb_astream_oread_t
 {
@@ -305,6 +318,9 @@ typedef struct __tb_astream_t
 
 	/// sync
 	tb_bool_t 				(*sync)(struct __tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv);
+
+	/// task
+	tb_bool_t 				(*task)(struct __tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv);
 
 	/// kill
 	tb_void_t 				(*kill)(struct __tb_astream_t* astream);
@@ -517,6 +533,19 @@ tb_bool_t 			tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_as
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_astream_sync_impl(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
+
+/*! sync the stream
+ *
+ * @note will be block returned if func and priv is tb_null
+ *
+ * @param astream 	the stream
+ * @param delay 	the delay time, ms
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_task_impl(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
 /*! open and read the stream, open it first if not opened 
  *

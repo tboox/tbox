@@ -44,10 +44,9 @@ static tb_long_t tb_zip_gzip_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	tb_zip_gzip_t* gzip = tb_zip_gzip_cast(zip);
 	tb_assert_and_check_return_val(gzip && ist && ost, -1);
 
-	// the input stream
+	// the input stream, @note maybe null for flush the end data
 	tb_byte_t* ip = ist->p;
 	tb_byte_t* ie = ist->e;
-	tb_check_return_val(ip && ip < ie, 0);
 
 	// the output stream
 	tb_byte_t* op = ost->p;

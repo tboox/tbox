@@ -73,6 +73,7 @@ typedef struct __tb_astream_file_t
 		tb_astream_read_func_t 	read;
 		tb_astream_writ_func_t 	writ;
 		tb_astream_sync_func_t 	sync;
+		tb_astream_task_func_t 	task;
 
 	} 							func;
 
@@ -307,6 +308,41 @@ static tb_bool_t tb_astream_file_sync(tb_astream_t* astream, tb_bool_t bclosing,
 	// post sync
 	return tb_aico_fsync(fstream->aico, tb_astream_file_sync_func, astream);
 }
+static tb_bool_t tb_astream_file_task_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
+	// the stream
+	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
+	tb_assert_and_check_return_val(fstream && fstream->func.task, tb_false);
+
+	// done func
+	tb_bool_t ok = fstream->func.task((tb_astream_t*)fstream, aice->state == TB_AICE_STATE_OK? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR, fstream->priv);
+
+	// ok and continue?
+	if (ok && aice->state == TB_AICE_STATE_OK)
+	{
+		// post task
+		tb_aico_task_run(aice->aico, aice->u.runtask.delay, tb_astream_file_task_func, fstream);
+	}
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_astream_file_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
+	tb_assert_and_check_return_val(fstream && fstream->file && fstream->aico && func, tb_false);
+
+	// save func and priv
+	fstream->priv 		= priv;
+	fstream->func.task 	= func;
+
+	// post task
+	return tb_aico_task_run(fstream->aico, delay, tb_astream_file_task_func, astream);
+}
 static tb_void_t tb_astream_file_kill(tb_astream_t* astream)
 {	
 	// check
@@ -421,6 +457,7 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	fstream->base.writ 		= tb_astream_file_writ;
 	fstream->base.seek 		= tb_astream_file_seek;
 	fstream->base.sync 		= tb_astream_file_sync;
+	fstream->base.task 		= tb_astream_file_task;
 	fstream->base.kill 		= tb_astream_file_kill;
 	fstream->base.clos 		= tb_astream_file_clos;
 	fstream->base.ctrl 		= tb_astream_file_ctrl;

@@ -505,8 +505,11 @@ typedef struct __tb_aice_runtask_t
 	/// the when
 	tb_hize_t 					when;
 
+	/// the delay
+	tb_size_t 					delay;
+
 	/// the private data for using the left space of the union
-	tb_handle_t 				priv[4];
+	tb_handle_t 				priv[3];
 
 }tb_aice_runtask_t;
 
