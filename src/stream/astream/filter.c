@@ -43,10 +43,10 @@ typedef struct __tb_astream_filter_t
 	// the base
 	tb_astream_t 				base;
 
-	// the filter handle
+	// the filter 
 	tb_filter_t* 				filter;
 
-	// the filter handle is referenced? need not exit it
+	// the filter is referenced? need not exit it
 	tb_bool_t 					bref;
 
 	// the astream
