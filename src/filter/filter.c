@@ -42,7 +42,7 @@ tb_void_t tb_filter_cler(tb_filter_t* filter)
 	tb_pbuffer_clear(&filter->idata);
 
 	// exit odata
-	tb_pbuffer_clear(&filter->odata);
+	tb_qbuffer_clear(&filter->odata);
 }
 tb_void_t tb_filter_exit(tb_filter_t* filter)
 {
@@ -56,7 +56,7 @@ tb_void_t tb_filter_exit(tb_filter_t* filter)
 	tb_pbuffer_exit(&filter->idata);
 
 	// exit odata
-	tb_pbuffer_exit(&filter->odata);
+	tb_qbuffer_exit(&filter->odata);
 
 	// free it
 	tb_free(filter);
@@ -95,17 +95,32 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	}
 
 	// the need
-	if (!need) need = tb_max3(size, tb_pbuffer_maxn(&filter->odata), 8192);
+	if (!need) need = tb_max(size, tb_qbuffer_maxn(&filter->odata));
 	tb_assert_and_check_return_val(need, -1);
 
+	// init pull
+	tb_size_t 			omaxn = 0;
+	tb_byte_t* 			odata = tb_qbuffer_pull_init(&filter->odata, &omaxn);
+	tb_long_t 			osize = omaxn >= need? need : 0;
+
+	// exit pull
+	tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
+	omaxn = 0;
+
+	// enough? return it directly 
+	if (osize > 0)
+	{
+		*pdata = odata;
+		return osize;
+	}
+
 	// grow odata maxn if not enough
-	if (need > tb_pbuffer_maxn(&filter->odata))
-		tb_pbuffer_resize(&filter->odata, need);
+	if (need > tb_qbuffer_maxn(&filter->odata))
+		tb_qbuffer_resize(&filter->odata, need);
 
 	// the odata
-	tb_byte_t* 			odata = tb_pbuffer_data(&filter->odata);
-	tb_size_t 			omaxn = tb_pbuffer_maxn(&filter->odata);
-	tb_assert_and_check_return_val(odata && omaxn && need <= omaxn, -1);
+	odata = tb_qbuffer_push_init(&filter->odata, &omaxn);
+	tb_assert_and_check_return_val(odata && omaxn, -1);
 
 	// init stream
 	tb_bstream_t istream = {0};
@@ -115,10 +130,15 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 		// @note istream maybe null for sync the end data
 		if (!tb_bstream_init(&istream, (tb_byte_t*)idata, isize)) return -1;
 	}
-	if (!tb_bstream_init(&ostream, (tb_byte_t*)odata, need)) return -1;
+	if (!tb_bstream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
 
 	// spak data
-	tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
+	osize = filter->spak(filter, &istream, &ostream, sync);
+
+	// exit odata
+	tb_qbuffer_push_exit(&filter->odata, osize > 0? osize : 0);
+	odata = tb_null;
+	omaxn = 0;
 
 	// have the left idata? 
 	tb_size_t left = tb_bstream_left(&istream);
@@ -132,10 +152,18 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// clear the cache
 	else tb_pbuffer_clear(&filter->idata);
 
+	// init pull
+	odata = tb_qbuffer_pull_init(&filter->odata, &omaxn);
+
 	// no sync? cache the output data
-	if (!sync)
-	{
-	}
+	if (!sync) osize = omaxn >= need? need : 0;
+	// sync and has data? return it directly 
+	else if (omaxn) osize = tb_min(omaxn, need);
+	// sync, no data or end?
+//	else osize = osize;
+
+	// exit pull
+	tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
 
 	// return it if have the odata
 	if (osize > 0) *pdata = odata;
