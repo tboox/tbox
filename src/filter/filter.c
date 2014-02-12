@@ -99,19 +99,22 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	tb_assert_and_check_return_val(need, -1);
 
 	// init pull
-	tb_size_t 			omaxn = 0;
-	tb_byte_t* 			odata = tb_qbuffer_pull_init(&filter->odata, &omaxn);
-	tb_long_t 			osize = omaxn >= need? need : 0;
-
-	// exit pull
-	tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
-	omaxn = 0;
-
-	// enough? return it directly 
-	if (osize > 0)
+	tb_size_t 	omaxn = 0;
+	tb_byte_t* 	odata = tb_qbuffer_pull_init(&filter->odata, &omaxn);
+	if (odata)
 	{
-		*pdata = odata;
-		return osize;
+		// the osize
+		tb_long_t osize = omaxn >= need? need : 0;
+
+		// exit pull
+		if (odata) tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
+
+		// enough? return it directly 
+		if (osize > 0)
+		{
+			*pdata = odata;
+			return osize;
+		}
 	}
 
 	// grow odata maxn if not enough
@@ -119,6 +122,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 		tb_qbuffer_resize(&filter->odata, need);
 
 	// the odata
+	omaxn = 0;
 	odata = tb_qbuffer_push_init(&filter->odata, &omaxn);
 	tb_assert_and_check_return_val(odata && omaxn, -1);
 
@@ -133,12 +137,10 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	if (!tb_bstream_init(&ostream, (tb_byte_t*)odata, omaxn)) return -1;
 
 	// spak data
-	osize = filter->spak(filter, &istream, &ostream, sync);
+	tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
 
 	// exit odata
 	tb_qbuffer_push_exit(&filter->odata, osize > 0? osize : 0);
-	odata = tb_null;
-	omaxn = 0;
 
 	// have the left idata? 
 	tb_size_t left = tb_bstream_left(&istream);
@@ -153,6 +155,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	else tb_pbuffer_clear(&filter->idata);
 
 	// init pull
+	omaxn = 0;
 	odata = tb_qbuffer_pull_init(&filter->odata, &omaxn);
 
 	// no sync? cache the output data
@@ -163,7 +166,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 //	else osize = osize;
 
 	// exit pull
-	tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
+	if (odata) tb_qbuffer_pull_exit(&filter->odata, osize > 0? osize : 0);
 
 	// return it if have the odata
 	if (osize > 0) *pdata = odata;
