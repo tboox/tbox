@@ -231,7 +231,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.recv.real && aice->u.recv.real <= sstream->maxn);
+		tb_assert_and_check_break(aice->u.recv.real <= sstream->maxn);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -294,7 +294,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.send.data && aice->u.send.real && aice->u.send.real <= aice->u.send.size);
+		tb_assert_and_check_break(aice->u.send.data && aice->u.send.real <= aice->u.send.size);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed

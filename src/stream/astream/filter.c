@@ -237,7 +237,7 @@ static tb_bool_t tb_astream_filter_read(tb_astream_t* astream, tb_size_t delay, 
 static tb_bool_t tb_astream_filter_writ_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(astream && data && size, tb_false);
+	tb_assert_and_check_return_val(astream, tb_false);
 
 	// the stream
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
@@ -261,7 +261,7 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 	if (fstream->filter)
 	{
 		// spak the filter
-		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, 0, 0);
+		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, size, 0);
 		
 		// has data? 
 		if (real > 0 && data)
@@ -269,13 +269,12 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 			// post writ
 			ok = tb_astream_writ_after(fstream->astream, delay, data, real, tb_astream_filter_writ_func, astream);
 		}
-		// no data? continue to writ
-		else if (!real)
+		// no data or end? continue to writ or sync
+		else
 		{
-			// FIXME
-//			func((tb_astream_t*)fstream, state, data, real, size, fstream->priv);
+			// done func, no data and finished
+			func((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
 		}
-		else ok = tb_false;
 	}
 	// post writ
 	else ok = tb_astream_writ_after(fstream->astream, delay, data, size, tb_astream_filter_writ_func, astream);
@@ -304,8 +303,11 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
 
+	// not finished? continue it
+	if (state == TB_ASTREAM_STATE_OK && real < size) return tb_true;
+
 	// post sync
-	tb_bool_t ok = tb_astream_sync(fstream->astream, tb_true, tb_astream_filter_sync_func, astream);
+	tb_bool_t ok = tb_astream_sync(fstream->astream, tb_true, tb_astream_filter_sync_func, fstream);
 
 	// failed? done func
 	if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_ASTREAM_STATE_UNKNOWN_ERROR, fstream->priv);
