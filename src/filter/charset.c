@@ -80,7 +80,7 @@ tb_filter_t* tb_filter_init_from_charset(tb_size_t fr, tb_size_t to)
 		tb_assert_and_check_break(filter);
 
 		// init filter 
-		if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_ZIP)) break;
+		if (!tb_filter_init((tb_filter_t*)filter, TB_FILTER_TYPE_CHARSET)) break;
 		filter->base.spak = tb_filter_charset_spak;
 
 		// init the from and to charset

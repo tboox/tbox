@@ -164,6 +164,9 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fs
 	tb_charset_t const* to = tb_charset_find_by_type(ttype);
 	tb_assert_and_check_return_val(fr && to && fr->get && fr->set, -1);
 
+	// no data? end
+	tb_check_return_val(tb_bstream_left(fst), -1);
+
 	// big endian?
 	tb_bool_t fbe = !(ftype & TB_CHARSET_TYPE_LE)? tb_true : tb_false;
 	tb_bool_t tbe = !(ttype & TB_CHARSET_TYPE_LE)? tb_true : tb_false;

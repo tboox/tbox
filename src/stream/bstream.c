@@ -80,8 +80,8 @@ tb_void_t tb_bstream_sync(tb_bstream_t* bst)
  */
 tb_byte_t const* tb_bstream_beg(tb_bstream_t* bst)
 {
-	tb_assert_and_check_return_val(bst && bst->e, tb_null);
-	return (bst->e - bst->n);
+	tb_assert_and_check_return_val(bst, tb_null);
+	return bst->e? (bst->e - bst->n) : tb_null;
 }
 tb_byte_t const* tb_bstream_pos(tb_bstream_t* bst)
 {
@@ -121,7 +121,8 @@ tb_size_t tb_bstream_left_bits(tb_bstream_t* bst)
 }
 tb_bool_t tb_bstream_valid(tb_bstream_t* bst)
 {
-	if (!bst || !bst->p || !bst->e || !bst->n || bst->p > bst->e) return tb_false;
+	if (!bst) return tb_false;
+	if (bst->p && bst->p > bst->e) return tb_false;
 	return tb_true;
 }
 /* ///////////////////////////////////////////////////////////////////////
