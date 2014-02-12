@@ -411,10 +411,11 @@ tb_astream_t* 		tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url);
  *
  * @param aicp 		the aicp
  * @param path 		the file path
+ * @param mode 		the file mode, using the default ro mode if zero
  *
  * @return 			the stream
  */
-tb_astream_t* 		tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path);
+tb_astream_t* 		tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, tb_size_t mode);
 
 /*! init stream from sock
  *

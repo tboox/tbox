@@ -270,7 +270,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				else if (tb_option_find(option, "post-file"))
 				{
 					// init pst
-					pst = tb_gstream_init_from_url(tb_option_item_cstr(option, "post-file"));
+					pst = tb_gstream_init_from_file(tb_option_item_cstr(option, "post-file"), TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 					tb_assert_and_check_break(pst);
 
 					// writ ist
@@ -303,7 +303,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 					else break;
 
 					// init file
-					ost = tb_gstream_init_from_url(path);
+					ost = tb_gstream_init_from_file(path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
 					// print verbose info
 					if (verbose) tb_printf("save: %s\n", path);

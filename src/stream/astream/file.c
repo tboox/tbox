@@ -470,7 +470,7 @@ fail:
 	if (fstream) tb_astream_exit((tb_astream_t*)fstream, tb_false);
 	return tb_null;
 }
-tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
+tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, tb_size_t mode)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && path, tb_null);
@@ -481,6 +481,9 @@ tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path)
 
 	// set path
 	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_SET_URL, path)) goto fail;
+	
+	// set mode
+	if (mode) if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FILE_SET_MODE, mode)) goto fail;
 	
 	// ok
 	return fstream;

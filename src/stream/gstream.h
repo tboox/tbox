@@ -400,10 +400,11 @@ tb_gstream_t* 		tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 /*! init stream from file
  *
  * @param path 		the file path
+ * @param mode 		the file mode, using the default ro mode if zero
  *
  * @return 			the stream
  */
-tb_gstream_t* 		tb_gstream_init_from_file(tb_char_t const* path);
+tb_gstream_t* 		tb_gstream_init_from_file(tb_char_t const* path, tb_size_t mode);
 
 /*! init stream from sock
  *

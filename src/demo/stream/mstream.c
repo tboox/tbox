@@ -80,7 +80,7 @@ tb_int_t tb_demo_stream_mstream_main(tb_int_t argc, tb_char_t** argv)
 		for (; p && *p; p++)
 		{
 			// init tstream
-			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, -1, tb_false, tb_demo_tstream_save_func, *p);
+			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, -1, tb_demo_tstream_save_func, *p);
 			tb_assert_and_check_break(tstream);
 
 			// add tstream

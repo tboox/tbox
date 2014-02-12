@@ -44,11 +44,11 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 
 		// init tstream
 #if 1
-		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], -1, tb_false, tb_demo_tstream_save_func, tb_null);
+		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], -1, tb_demo_tstream_save_func, tb_null);
 #else
 		istream = tb_astream_init_from_url(aicp, argv[1]);
-		ostream = tb_gstream_init_from_url(argv[2]);
-		tstream = tb_tstream_init_ag(istream, ostream, -1, tb_false, tb_demo_tstream_save_func, tb_null);
+		ostream = tb_gstream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+		tstream = tb_tstream_init_ag(istream, ostream, -1, tb_demo_tstream_save_func, tb_null);
 #endif
 		tb_assert_and_check_break(tstream);
 

@@ -82,7 +82,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 			tb_char_t const* path = tb_option_item_cstr(context->option, "more0");
 
 			// init
-			context->ostream = tb_astream_init_from_url(tb_astream_aicp(ast), path);
+			context->ostream = tb_astream_init_from_file(tb_astream_aicp(ast), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
 			// print verbose info
 			if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -102,7 +102,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 				tb_strcat(path, name);
 
 				// init file
-				context->ostream = tb_astream_init_from_url(tb_astream_aicp(ast), path);
+				context->ostream = tb_astream_init_from_file(tb_astream_aicp(ast), path, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 
 				// print verbose info
 				if (context->verbose) tb_printf("save: %s: ..\n", path);
@@ -111,7 +111,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		tb_assert_and_check_break(context->ostream);
 
 		// init tstream
-		context->tstream = tb_tstream_init_aa(ast, context->ostream, -1, tb_false, tb_demo_tstream_save_func, context);
+		context->tstream = tb_tstream_init_aa(ast, context->ostream, -1, tb_demo_tstream_save_func, context);
 		tb_assert_and_check_break(context->tstream);
 
 		// start tstream

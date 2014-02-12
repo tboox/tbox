@@ -10,7 +10,7 @@ tb_int_t tb_demo_stream_gstream_null_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init stream
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
-	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
+	tb_gstream_t* ost = tb_gstream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 	tb_gstream_t* nst = tb_gstream_init_filter_from_null(ist);
 	if (ist && ost && nst) 
 	{

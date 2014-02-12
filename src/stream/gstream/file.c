@@ -242,7 +242,7 @@ fail:
 	return tb_null;
 }
 
-tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
+tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path, tb_size_t mode)
 {
 	// check
 	tb_assert_and_check_return_val(path, tb_null);
@@ -253,6 +253,9 @@ tb_gstream_t* tb_gstream_init_from_file(tb_char_t const* path)
 
 	// set path
 	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_URL, path)) goto fail;
+	
+	// set mode
+	if (mode) if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_FILE_SET_MODE, mode)) goto fail;
 	
 	// ok
 	return gstream;
