@@ -40,7 +40,7 @@ tb_int_t tb_demo_stream_astream_zip_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(istream);
 
 		// init ostream
-		ostream = tb_astream_init_from_url(aicp, argv[2]);
+		ostream = tb_astream_init_from_file(aicp, argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 		tb_assert_and_check_break(ostream);
 
 		// filter istream or ostream?
@@ -58,8 +58,8 @@ tb_int_t tb_demo_stream_astream_zip_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(fstream);
 
 		// init tstream
-		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1, tb_false, tb_demo_astream_zip_save_func, aicp);
-		else tstream = tb_tstream_init_aa(istream, fstream, -1, tb_false, tb_demo_astream_zip_save_func, aicp);
+		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1, tb_demo_astream_zip_save_func, aicp);
+		else tstream = tb_tstream_init_aa(istream, fstream, -1, tb_demo_astream_zip_save_func, aicp);
 		tb_assert_and_check_break(tstream);
 
 		// limit rate

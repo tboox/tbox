@@ -102,13 +102,13 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 
 	// have been opened?
 	tb_bool_t opened = tb_false;
-	if (tb_astream_ctrl(fstream->astream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) 
+	if (tb_astream_ctrl(fstream->astream, TB_ASTREAM_CTRL_IS_OPENED, &opened) && opened) 
 	{
 		// opened
 		tb_atomic_set(&fstream->base.opened, 1);
 
 		// done func
-		fstream->func.open(astream, TB_ASTREAM_STATE_OK, fstream->priv);
+		func(astream, TB_ASTREAM_STATE_OK, fstream->priv);
 
 		// ok
 		return tb_true;
@@ -263,9 +263,19 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 		// spak the filter
 		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, 0, 0);
 		
-		// has data? post writ
+		// has data? 
 		if (real > 0 && data)
+		{
+			// post writ
 			ok = tb_astream_writ_after(fstream->astream, delay, data, real, tb_astream_filter_writ_func, astream);
+		}
+		// no data? continue to writ
+		else if (!real)
+		{
+			// FIXME
+//			func((tb_astream_t*)fstream, state, data, real, size, fstream->priv);
+		}
+		else ok = tb_false;
 	}
 	// post writ
 	else ok = tb_astream_writ_after(fstream->astream, delay, data, size, tb_astream_filter_writ_func, astream);
