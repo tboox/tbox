@@ -44,8 +44,8 @@ tb_int_t tb_demo_stream_astream_zip_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(ostream);
 
 		// filter istream or ostream?
-//		tb_astream_t* iostream = istream;
-		tb_astream_t* iostream = ostream;
+		tb_astream_t* iostream = istream;
+//		tb_astream_t* iostream = ostream;
 
 		// init fstream
 //		fstream = tb_astream_init_filter_from_zip(iostream, TB_ZIP_ALGO_RLC, TB_ZIP_ACTION_INFLATE);

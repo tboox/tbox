@@ -54,7 +54,7 @@ typedef struct __tb_filter_t
 	tb_pbuffer_t 	idata;
 
 	/// the output data 
-	tb_pbuffer_t 	odata;
+	tb_qbuffer_t 	odata;
 
 	/// the spak
 	tb_long_t 		(*spak)(struct __tb_filter_t* filter, tb_bstream_t* istream, tb_bstream_t* ostream, tb_long_t sync);
@@ -82,7 +82,7 @@ static __tb_inline__ tb_bool_t tb_filter_init(tb_filter_t* filter, tb_size_t typ
 	if (!tb_pbuffer_init(&filter->idata)) return tb_false;
 
 	// init odata
-	if (!tb_pbuffer_init(&filter->odata)) return tb_false;
+	if (!tb_qbuffer_init(&filter->odata, 8192)) return tb_false;
 
 	// ok
 	return tb_true;
