@@ -376,6 +376,25 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_bool_t bclosing, tb_ast
 	// sync it
 	return astream->sync(astream, bclosing, func, priv);
 }
+tb_bool_t tb_astream_task_impl(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv __tb_debug_decl__)
+{
+	// check
+	tb_assert_and_check_return_val(astream && astream->task && func, tb_false);
+	
+	// check state
+	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+
+	// save debug info
+#ifdef __tb_debug__
+	astream->func = func_;
+	astream->file = file_;
+	astream->line = line_;
+#endif
+ 
+	// task it
+	return astream->task(astream, delay, func, priv);
+}
 tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check

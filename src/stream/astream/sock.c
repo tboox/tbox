@@ -69,6 +69,7 @@ typedef struct __tb_astream_sock_t
 		tb_astream_open_func_t 	open;
 		tb_astream_read_func_t 	read;
 		tb_astream_writ_func_t 	writ;
+		tb_astream_task_func_t 	task;
 
 	} 							func;
 
@@ -364,6 +365,41 @@ static tb_bool_t tb_astream_sock_sync(tb_astream_t* astream, tb_bool_t bclosing,
 	// ok
 	return tb_true;
 }
+static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
+	// the stream
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_assert_and_check_return_val(sstream && sstream->func.task, tb_false);
+
+	// done func
+	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, aice->state == TB_AICE_STATE_OK? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR, sstream->priv);
+
+	// ok and continue?
+	if (ok && aice->state == TB_AICE_STATE_OK)
+	{
+		// post task
+		tb_aico_task_run(aice->aico, aice->u.runtask.delay, tb_astream_sock_task_func, sstream);
+	}
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_astream_sock_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
+	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && func, tb_false);
+
+	// save func and priv
+	sstream->priv 		= priv;
+	sstream->func.task 	= func;
+
+	// post task
+	return tb_aico_task_run(sstream->aico, delay, tb_astream_sock_task_func, astream);
+}
 static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 {	
 	// check
@@ -498,6 +534,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	sstream->base.writ 		= tb_astream_sock_writ;
 	sstream->base.seek 		= tb_astream_sock_seek;
 	sstream->base.sync 		= tb_astream_sock_sync;
+	sstream->base.task 		= tb_astream_sock_task;
 	sstream->base.kill 		= tb_astream_sock_kill;
 	sstream->base.clos 		= tb_astream_sock_clos;
 	sstream->base.exit 		= tb_astream_sock_exit;

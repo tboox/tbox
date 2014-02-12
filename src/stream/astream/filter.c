@@ -52,6 +52,9 @@ typedef struct __tb_astream_filter_t
 	// the astream
 	tb_astream_t* 				astream;
 
+	// the read maxn
+	tb_size_t 					maxn;
+
 	// the func
 	union
 	{
@@ -59,6 +62,7 @@ typedef struct __tb_astream_filter_t
 		tb_astream_read_func_t 	read;
 		tb_astream_writ_func_t 	writ;
 		tb_astream_sync_func_t 	sync;
+		tb_astream_task_func_t 	task;
 
 	} 							func;
 
@@ -96,12 +100,59 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return_val(fstream && fstream->astream && func, tb_false);
 
+	// have been opened?
+	tb_bool_t opened = tb_false;
+	if (tb_astream_ctrl(fstream->astream, TB_ASTREAM_CTRL_IS_OPENED, &opened)) 
+	{
+		// opened
+		tb_atomic_set(&fstream->base.opened, 1);
+
+		// done func
+		fstream->func.open(astream, TB_ASTREAM_STATE_OK, fstream->priv);
+
+		// ok
+		return tb_true;
+	}
+
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.open 	= func;
 
 	// post open
 	return tb_astream_open(fstream->astream, tb_astream_filter_open_func, astream);
+}
+static tb_bool_t tb_astream_filter_sync_read_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(astream, tb_false);
+
+	// the stream
+	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
+	tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
+
+	// spak the filter
+	tb_byte_t const* 	data = tb_null;
+	tb_long_t 			spak = tb_filter_spak(fstream->filter, tb_null, 0, &data, fstream->maxn, -1);
+	
+	// has output data?
+	tb_bool_t ok = tb_false;
+	if (spak > 0 && data)
+	{
+		// done data
+		ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, fstream->maxn, fstream->priv);
+	}
+	// closed?
+	else
+	{
+		// done closed
+		fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_CLOSED, tb_null, 0, fstream->maxn, fstream->priv);
+
+		// break it
+		// ok = tb_false;
+	}
+
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -116,17 +167,43 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 	tb_bool_t ok = tb_false;
 	if (fstream->filter)
 	{
-		// spak the filter
-		tb_long_t spak = tb_filter_spak(fstream->filter, data, real, &data, size, state == TB_ASTREAM_STATE_CLOSED? -1 : 0);
-		
-		// has data?
-		if (spak > 0 && data)
+		// done filter
+		switch (state)
 		{
-			// done data
-			ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, size, fstream->priv);
+		case TB_ASTREAM_STATE_OK:
+			{
+				// spak the filter
+				tb_long_t spak = tb_filter_spak(fstream->filter, data, real, &data, size, 0);
+				
+				// has output data?
+				if (spak > 0 && data)
+				{
+					// done data
+					ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, size, fstream->priv);
+				}
+				// no data? continue it
+				else if (!spak) ok = tb_true;
+				// closed?
+				else
+				{
+					// done closed
+					fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_CLOSED, tb_null, 0, size, fstream->priv);
 
-			// continue and done it if closed or failed
-			if (ok && state != TB_ASTREAM_STATE_OK)
+					// break it
+					// ok = tb_false;
+				}
+			}
+			break;
+		case TB_ASTREAM_STATE_CLOSED:
+			{
+				// done sync for reading
+				ok = tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
+				
+				// error? done error
+				if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+			}
+			break;
+		default:
 			{
 				// done closed or failed
 				fstream->func.read((tb_astream_t*)fstream, state, tb_null, 0, size, fstream->priv);
@@ -134,17 +211,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 				// break it
 				// ok = tb_false;
 			}
-		}
-		// no data? continue it
-		else if (!spak) ok = tb_true;
-		// end or error?
-		else
-		{
-			// done closed or failed
-			fstream->func.read((tb_astream_t*)fstream, state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tb_null, 0, size, fstream->priv);
-
-			// break it
-			// ok = tb_false;
+			break;
 		}
 	}
 	// done func
@@ -162,6 +229,7 @@ static tb_bool_t tb_astream_filter_read(tb_astream_t* astream, tb_size_t delay, 
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.read 	= func;
+	fstream->maxn 		= maxn;
 
 	// post read
 	return tb_astream_read_after(fstream->astream, delay, maxn, tb_astream_filter_read_func, astream);
@@ -263,6 +331,31 @@ static tb_bool_t tb_astream_filter_sync(tb_astream_t* astream, tb_bool_t bclosin
 	// ok?
 	return ok;
 }
+static tb_bool_t tb_astream_filter_task_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(astream, tb_false);
+
+	// the stream
+	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
+	tb_assert_and_check_return_val(fstream && fstream->func.task, tb_false);
+
+	// done func
+	return fstream->func.task((tb_astream_t*)fstream, state, fstream->priv);
+}
+static tb_bool_t tb_astream_filter_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
+	tb_assert_and_check_return_val(fstream && fstream->astream && func, tb_false);
+
+	// save func and priv
+	fstream->priv 		= priv;
+	fstream->func.task 	= func;
+
+	// post task
+	return tb_astream_task(fstream->astream, delay, tb_astream_filter_task_func, astream);
+}
 static tb_void_t tb_astream_filter_kill(tb_astream_t* astream)
 {	
 	// check
@@ -324,8 +417,8 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
 
-			// TODO: exit filter first if exists
-//			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
+			//  exit filter first if exists
+			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
 
 			// set filter
 			tb_filter_t* filter = (tb_filter_t*)tb_va_arg(args, tb_filter_t*);
@@ -365,6 +458,7 @@ tb_astream_t* tb_astream_init_filter(tb_aicp_t* aicp)
 	fstream->base.read 		= tb_astream_filter_read;
 	fstream->base.writ 		= tb_astream_filter_writ;
 	fstream->base.sync 		= tb_astream_filter_sync;
+	fstream->base.task 		= tb_astream_filter_task;
 	fstream->base.kill 		= tb_astream_filter_kill;
 	fstream->base.clos 		= tb_astream_filter_clos;
 	fstream->base.exit 		= tb_astream_filter_exit;

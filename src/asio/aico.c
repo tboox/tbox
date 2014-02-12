@@ -789,6 +789,7 @@ tb_bool_t tb_aico_task_run_impl(tb_handle_t haico, tb_size_t delay, tb_aicb_t ai
 	aice.data 				= aicb_data;
 	aice.aico 				= aico;
 	aice.u.runtask.when 	= tb_ctime_time() + delay;
+	aice.u.runtask.delay 	= delay;
 
 	// post
 	return tb_aicp_post_impl(aico->aicp, &aice __tb_debug_args__);
