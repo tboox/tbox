@@ -166,7 +166,7 @@ typedef tb_bool_t 			(*tb_astream_open_func_t)(struct __tb_astream_t* astream, t
  * @param astream 			the astream
  * @param state 			the stream state
  * @param data 				the readed data
- * @param real 				the real size
+ * @param real 				the real size, maybe zero
  * @param size 				the need size
  * @param priv 				the func private data
  *
@@ -179,7 +179,7 @@ typedef tb_bool_t 			(*tb_astream_read_func_t)(struct __tb_astream_t* astream, t
  * @param astream 			the astream
  * @param state 			the stream state
  * @param data 				the writed data
- * @param real 				the real size
+ * @param real 				the real size, maybe zero
  * @param size 				the need size
  * @param priv 				the func private data
  *

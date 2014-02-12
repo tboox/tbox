@@ -105,9 +105,6 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 		// trace
 //		tb_print("send[%p]: real: %lu, size: %lu", aice->aico, aice->u.send.real, aice->u.send.size);
 
-		// check
-		tb_assert(aice->u.send.real);
-
 		// save size
 		context->size += aice->u.send.real;
 
@@ -149,9 +146,6 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 		// trace
 //		tb_print("read[%p]: real: %lu, size: %lu, seek: %llu", aice->aico, aice->u.read.real, aice->u.read.size, aice->u.read.seek);
 			
-		// check
-		tb_assert(aice->u.read.real);
-
 		// post send to client
 		if (!tb_aico_send(context->aico[0], aice->u.read.data, aice->u.read.real, tb_demo_sock_send_func, context)) return tb_false;
 	}
@@ -182,9 +176,6 @@ static tb_bool_t tb_demo_sock_sendfile_func(tb_aice_t const* aice)
 	{
 		// trace
 //		tb_print("sendfile[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendfile.real, aice->u.sendfile.size);
-
-		// check
-		tb_assert(aice->u.sendfile.real);
 
 		// save size
 		context->size += aice->u.sendfile.real;

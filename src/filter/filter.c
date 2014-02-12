@@ -132,6 +132,11 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// clear the cache
 	else tb_pbuffer_clear(&filter->idata);
 
+	// no sync? cache the output data
+	if (!sync)
+	{
+	}
+
 	// return it if have the odata
 	if (osize > 0) *pdata = odata;
 

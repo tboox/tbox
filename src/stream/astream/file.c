@@ -149,7 +149,7 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.read.real && aice->u.read.real <= sizeof(fstream->data));
+		tb_assert_and_check_break(aice->u.read.real <= sizeof(fstream->data));
 		tb_atomic64_fetch_and_add(&fstream->offset, aice->u.read.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
@@ -209,7 +209,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.writ.data && aice->u.writ.real && aice->u.writ.real <= aice->u.writ.size);
+		tb_assert_and_check_break(aice->u.writ.data && aice->u.writ.real <= aice->u.writ.size);
 		tb_atomic64_fetch_and_add(&fstream->offset, aice->u.writ.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
