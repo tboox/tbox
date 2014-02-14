@@ -176,6 +176,9 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// return it if have the odata
 	if (osize > 0) *pdata = odata;
 
+	// trace
+	tb_trace_impl("spak: %ld, ileft: %lu, oleft: %lu", osize, tb_pbuffer_size(&filter->idata), tb_qbuffer_size(&filter->odata));
+
 	// ok?
 	return osize;
 }

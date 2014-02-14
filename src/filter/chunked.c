@@ -48,6 +48,9 @@ typedef struct __tb_filter_chunked_t
 	// the chunked read
 	tb_size_t 				read;
 
+	// is eof
+	tb_bool_t 				beof;
+
 	// the cache line
 	tb_pstring_t 			line;
 
@@ -76,12 +79,12 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	tb_assert_and_check_return_val(cfilter && istream && ostream, -1);
 	tb_assert_and_check_return_val(tb_bstream_valid(istream) && tb_bstream_valid(ostream), -1);
 
-	// no data? continue or end
-	if (!tb_bstream_left(istream)) return sync < 0? -1 : 0;
-
 	// the idata
 	tb_byte_t const* 	ip = tb_bstream_pos(istream);
 	tb_byte_t const* 	ie = tb_bstream_end(istream);
+
+	// trace
+	tb_trace_impl("isize: %lu", tb_bstream_size(istream));
 
 	// the odata
 	tb_byte_t* 			ob = (tb_byte_t*)tb_bstream_beg(ostream);
@@ -96,6 +99,9 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 		{
 			// the charactor
 			tb_char_t ch = *ip++;
+
+			// trace
+			tb_trace_impl("character: %x", ch);
 
 			// check
 			tb_assert_and_check_return_val(ch, -1);
@@ -126,8 +132,8 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					// trace
 					tb_trace_impl("tail");
 
-					// end
-					goto end;
+					// continue
+					continue ;
 				}
 				// is chunked head? parse size
 				else
@@ -138,11 +144,21 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					// trace
 					tb_trace_impl("size: %lu", cfilter->size);
 
-					// is file end? "0\r\n\r\n"
-					tb_check_return_val(cfilter->size , -1);
-
 					// clear data
 					tb_pstring_clear(&cfilter->line);
+
+					// is file end? "0\r\n\r\n"
+					if (!cfilter->size)
+					{
+						// trace
+						tb_trace_impl("end");
+
+						// is eof
+						cfilter->beof = tb_true;
+
+						// continue to spak the end data 
+						continue ;
+					}
 
 					// ok
 					break;
@@ -152,7 +168,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	}
 
 	// check
-	tb_assert_and_check_return_val(cfilter->read < cfilter->size, -1);
+	tb_assert_and_check_return_val(cfilter->read <= cfilter->size, -1);
 
 	// read chunked data
 	tb_size_t size = tb_min3(ie - ip, oe - op, cfilter->size - cfilter->read);
@@ -167,14 +183,17 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 		cfilter->read += size;
 	}
 
-	// trace
-	tb_trace_impl("read: %lu", cfilter->read);
-
 end:
 
 	// update stream
 	tb_bstream_goto(istream, (tb_byte_t*)ip);
 	tb_bstream_goto(ostream, (tb_byte_t*)op);
+
+	// trace
+	tb_trace_impl("read: %lu, beof: %u, ileft: %lu", cfilter->read, cfilter->beof, tb_bstream_left(istream));
+
+	// no data and sync end? end
+	if (sync < 0 && op == ob && !tb_bstream_left(istream) && cfilter->beof) return -1;
 
 	// ok
 	return (op - ob);
@@ -190,6 +209,9 @@ static tb_void_t tb_filter_chunked_cler(tb_filter_t* filter)
 
 	// clear read
 	cfilter->read = 0;
+
+	// clear eof
+	cfilter->beof = tb_false;
 
 	// clear line
 	tb_pstring_clear(&cfilter->line);

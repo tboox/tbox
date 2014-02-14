@@ -57,7 +57,7 @@ tb_bool_t tb_bstream_init(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
 tb_void_t tb_bstream_goto(tb_bstream_t* bst, tb_byte_t* data)
 {
 	// check
-	tb_assert_and_check_return(bst && data && data <= bst->e);
+	tb_assert_and_check_return(bst && data <= bst->e);
 
 	// goto
 	bst->b = 0;
@@ -91,7 +91,7 @@ tb_byte_t const* tb_bstream_pos(tb_bstream_t* bst)
 }
 tb_byte_t const* tb_bstream_end(tb_bstream_t* bst)
 {
-	tb_assert_and_check_return_val(bst && bst->e, tb_null);
+	tb_assert_and_check_return_val(bst, tb_null);
 	return bst->e;
 }
 

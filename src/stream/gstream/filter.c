@@ -172,9 +172,10 @@ static tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, 
 
 		// eof?
 		if (!real && (fstream->beof || fstream->wait)) real = -1;
-
+		// no data and no wait? wait it first
+		else if (!real && !fstream->wait) return 0;
 		// clear wait
-		if (real > 0) fstream->wait = tb_false;
+		else if (real > 0) fstream->wait = tb_false;
 
 		// spak data
 		tb_byte_t const* odata = tb_null;
