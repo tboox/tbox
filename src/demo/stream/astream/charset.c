@@ -6,10 +6,10 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_astream_zip_save_func(tb_size_t state, tb_size_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_astream_charset_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("save: %lu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
 
 	// kill aicp
 	if (state != TB_ASTREAM_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);
@@ -52,8 +52,8 @@ tb_int_t tb_demo_stream_astream_charset_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(fstream);
 
 		// init tstream
-		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1, tb_demo_astream_zip_save_func, aicp);
-		else tstream = tb_tstream_init_aa(istream, fstream, -1, tb_demo_astream_zip_save_func, aicp);
+		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1, tb_demo_astream_charset_save_func, aicp);
+		else tstream = tb_tstream_init_aa(istream, fstream, -1, tb_demo_astream_charset_save_func, aicp);
 		tb_assert_and_check_break(tstream);
 
 		// limit rate

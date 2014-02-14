@@ -28,12 +28,11 @@
  * includes
  */
 #include "prefix.h"
-
-#if defined(TB_COMPILER_IS_GCC) \
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/atomic.h"
+#elif defined(TB_COMPILER_IS_GCC) \
 	&& TB_COMPILER_VERSION_BE(4, 1)
 # 	include "compiler/gcc/atomic.h"
-#elif defined(TB_CONFIG_OS_WINDOWS)
-# 	include "windows/atomic.h"
 #endif
 
 #include "arch/atomic.h"
