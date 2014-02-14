@@ -1,7 +1,7 @@
 1. configure
-make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
-make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
-make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [PREFIX=..] [BIN=] [PRE=] [NDK=..] [SDK=..]
+make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
+make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
+make config|f [PLAT=android] [ARCH=armv5te|armv6] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [NDK=..] [SDK=..]
 
 2. build
 make [all]
