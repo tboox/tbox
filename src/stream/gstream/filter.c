@@ -47,6 +47,15 @@ typedef struct __tb_gstream_filter_t
 	// is eof?
 	tb_bool_t 			beof;
 
+	// is wait?
+	tb_bool_t 			wait;
+
+	// the last
+	tb_long_t 			last;
+
+	// the mode, none: 0, read: 1, writ: -1
+	tb_long_t 			mode;
+
 	// the gstream
 	tb_gstream_t* 		gstream;
 
@@ -66,7 +75,16 @@ static tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
 
+	// clear mode
+	fstream->mode = 0;
+
+	// clear last
+	fstream->last = 0;
+
 	// clear wait
+	fstream->wait = tb_false;
+
+	// clear eof
 	fstream->beof = tb_false;
 
 	// ok
@@ -77,6 +95,23 @@ static tb_long_t tb_gstream_filter_clos(tb_gstream_t* gstream)
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
+	
+	// sync the end filter data
+	if (fstream->filter && fstream->mode == -1)
+	{
+		// spak data
+		tb_byte_t const* 	data = tb_null;
+		tb_long_t 			size = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, -1);
+		if (size > 0 && data)
+		{
+			// writ data, will have some block
+			if (tb_gstream_bwrit(fstream->gstream, data, size))
+			{
+				// continue to spak it
+				return 0;
+			}
+		}
+	}
 
 	// done
 	tb_long_t ok = tb_gstream_aclos(fstream->gstream);
@@ -84,7 +119,16 @@ static tb_long_t tb_gstream_filter_clos(tb_gstream_t* gstream)
 	// failed or ok?
 	if (ok) 
 	{
+		// clear mode
+		fstream->mode = 0;
+
+		// clear last
+		fstream->last = 0;
+
 		// clear wait
+		fstream->wait = tb_false;
+
+		// clear eof
 		fstream->beof = tb_false;
 
 		// clear the filter
@@ -117,8 +161,20 @@ static tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, 
 	// done filter
 	if (fstream->filter)
 	{
+		// save last
+		fstream->last = real;
+
+		// save mode: read
+		if (!fstream->mode) fstream->mode = 1;
+
+		// check mode
+		tb_assert_and_check_return_val(fstream->mode == 1, -1);
+
 		// eof?
-		if (!real && fstream->beof) real = -1;
+		if (!real && (fstream->beof || fstream->wait)) real = -1;
+
+		// clear wait
+		if (real > 0) fstream->wait = tb_false;
 
 		// spak data
 		tb_byte_t const* odata = tb_null;
@@ -128,6 +184,9 @@ static tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, 
 
 		// has data? save it
 		if (real > 0 && odata) tb_memcpy(data, odata, real);
+
+		// end?
+		if (fstream->last < 0 && !real) real = -1;
 	}
 
 	// ok? 
@@ -138,6 +197,26 @@ static tb_long_t tb_gstream_filter_writ(tb_gstream_t* gstream, tb_byte_t const* 
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
+
+	// done filter
+	if (fstream->filter && data && size)
+	{
+		// save mode: writ
+		if (!fstream->mode) fstream->mode = -1;
+
+		// check mode
+		tb_assert_and_check_return_val(fstream->mode == -1, -1);
+
+		// spak data
+		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, size, sync? 1 : 0);
+		tb_assert_and_check_return_val(real >= 0, -1);
+
+		// no data?
+		tb_check_return_val(real, 0);
+
+		// save size
+		size = real;
+	}
 
 	// writ 
 	return sync? tb_gstream_afwrit(fstream->gstream, data, size) : tb_gstream_awrit(fstream->gstream, data, size);
@@ -163,6 +242,8 @@ static tb_long_t tb_gstream_filter_wait(tb_gstream_t* gstream, tb_size_t wait, t
 			// set eof
 			fstream->beof = tb_true;
 		}
+		// wait ok if no data
+		else if (!fstream->last) fstream->wait = tb_true;
 	}
 
 	// ok?
