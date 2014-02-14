@@ -62,7 +62,13 @@ static tb_long_t tb_filter_charset_spak(tb_filter_t* filter, tb_bstream_t* istre
 	tb_assert_and_check_return_val(cfilter && TB_CHARSET_TYPE_OK(cfilter->ftype) && TB_CHARSET_TYPE_OK(cfilter->ttype) && istream && ostream, -1);
 
 	// spak it
-	return tb_charset_conv_bst(cfilter->ftype, cfilter->ttype, istream, ostream);
+	tb_long_t real = tb_charset_conv_bst(cfilter->ftype, cfilter->ttype, istream, ostream);
+
+	// no data and sync end? end it
+	if (!real && sync < 0) real = -1;
+
+	// ok?
+	return real;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
