@@ -129,7 +129,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
+static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(data);
@@ -143,7 +143,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* a
 		if (addr)
 		{
 			// trace
-			tb_trace_impl("addr[%s]: %u.%u.%u.%u", tb_aicp_addr_host(haddr), tb_ipv4_u8x4(*addr));
+			tb_trace_impl("addr[%s]: %u.%u.%u.%u", host, tb_ipv4_u8x4(*addr));
 
 			// init sock
 			if (!sstream->sock) 
@@ -184,7 +184,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* a
 		else
 		{
 			// trace
-			tb_trace_impl("addr[%s]: failed", tb_aicp_addr_host(haddr));
+			tb_trace_impl("addr[%s]: failed", host);
 
 			// dns failed
 			state = TB_ASTREAM_SOCK_STATE_DNS_FAILED;

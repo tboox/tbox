@@ -4,15 +4,6 @@
 #include "../../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * callback
- */
-static tb_bool_t tb_http_test_hfunc(tb_http_option_t* option, tb_char_t const* line)
-{
-	tb_print("[demo]: response: %s", line);
-	return tb_true;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * main
  */ 
 tb_int_t tb_demo_stream_gstream_zip_main(tb_int_t argc, tb_char_t** argv)

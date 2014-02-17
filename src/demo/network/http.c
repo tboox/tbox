@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * callback
  */
-static tb_bool_t tb_http_demo_hfunc(tb_handle_t http, tb_char_t const* line)
+static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(http && line, tb_false);
@@ -15,7 +15,7 @@ static tb_bool_t tb_http_demo_hfunc(tb_handle_t http, tb_char_t const* line)
 	tb_http_option_t* 	option = tb_http_option(http);
 
 	// cookies
-	tb_cookies_t* 		cookies = option->udata;
+	tb_cookies_t* 		cookies = priv;
 
 	// trace
 	tb_print("[demo]: response: %s", line);
@@ -36,28 +36,6 @@ static tb_bool_t tb_http_demo_hfunc(tb_handle_t http, tb_char_t const* line)
 
 	return tb_true;
 }
-static tb_handle_t tb_http_demo_sfunc_init(tb_handle_t gst)
-{
-	tb_print("[demo]: ssl: init: %p", gst);
-	tb_handle_t sock = tb_null;
-	if (gst && tb_gstream_type(gst)) 
-		tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_GET_HANDLE, &sock);
-	return sock;
-}
-static tb_void_t tb_http_demo_sfunc_exit(tb_handle_t ssl)
-{
-	tb_print("[demo]: ssl: exit");
-}
-static tb_long_t tb_http_demo_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
-{
-	tb_print("[demo]: ssl: read: %lu", size);
-	return ssl? tb_socket_recv(ssl, data, size) : -1;
-}
-static tb_long_t tb_http_demo_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
-{
-	tb_print("[demo]: ssl: writ: %lu", size);
-	return ssl? tb_socket_send(ssl, data, size) : -1;
-}
 
 /* ///////////////////////////////////////////////////////////////////////
  * main
@@ -77,8 +55,8 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(status, end);
 
 	// init cookies
-	option->udata = tb_cookies_init();
-	tb_assert_and_check_goto(option->udata, end);
+	option->head_priv = tb_cookies_init();
+	tb_assert_and_check_goto(option->head_priv, end);
 	
 	// init url
 	if (!tb_url_set(&option->url, argv[1])) goto end;
@@ -92,14 +70,8 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	// redirect
 //	option->rdtm = 0;
 
-	// init ssl func
-	option->sfunc.init = tb_http_demo_sfunc_init;
-	option->sfunc.exit = tb_http_demo_sfunc_exit;
-	option->sfunc.read = tb_http_demo_sfunc_read;
-	option->sfunc.writ = tb_http_demo_sfunc_writ;
-
 	// init head func
-	option->hfunc = tb_http_demo_hfunc;
+	option->head_func = tb_http_demo_head_func;
 
 	// init method
 	option->method = TB_HTTP_METHOD_POST;
@@ -168,14 +140,14 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// exit cookies
-	if (option && option->udata) 
+	if (option && option->head_priv) 
 	{
 		// dump cookies
 #ifdef __tb_debug__
-		tb_cookies_dump(option->udata);
+		tb_cookies_dump(option->head_priv);
 #endif
 
-		tb_cookies_exit(option->udata);
+		tb_cookies_exit(option->head_priv);
 	}
 
 	// exit http
