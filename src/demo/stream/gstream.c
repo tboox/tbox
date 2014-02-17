@@ -19,32 +19,10 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_gstream_hfunc(tb_handle_t http, tb_char_t const* line)
+static tb_bool_t tb_demo_gstream_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
 {
 	tb_printf("response: %s\n", line);
 	return tb_true;
-}
-static tb_handle_t tb_demo_gstream_sfunc_init(tb_handle_t gst)
-{
-	tb_printf("ssl: init: %p\n", gst);
-	tb_handle_t sock = tb_null;
-	if (gst && tb_gstream_type(gst) == TB_GSTREAM_TYPE_SOCK) 
-		tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_SOCK_GET_HANDLE, &sock);
-	return sock;
-}
-static tb_void_t tb_demo_gstream_sfunc_exit(tb_handle_t ssl)
-{
-	tb_printf("ssl: exit\n");
-}
-static tb_long_t tb_demo_gstream_sfunc_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size)
-{
-	tb_printf("ssl: read: %lu\n", size);
-	return ssl? tb_socket_recv(ssl, data, size) : -1;
-}
-static tb_long_t tb_demo_gstream_sfunc_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
-{
-	tb_printf("ssl: writ: %lu\n", size);
-	return ssl? tb_socket_send(ssl, data, size) : -1;
 }
 static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
@@ -130,7 +108,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						}
 
 						// enable debug?
-						if (debug) hoption->hfunc = tb_demo_gstream_hfunc;
+						if (debug) hoption->head_func = tb_demo_gstream_head_func;
 
 						// custem header?
 						if (tb_option_find(option, "header"))
@@ -225,16 +203,6 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						}
 					}
 				}
-
-				// init ssl
-				static tb_gstream_sfunc_t sfunc = 
-				{
-					tb_demo_gstream_sfunc_init
-				,	tb_demo_gstream_sfunc_exit
-				,	tb_demo_gstream_sfunc_read
-				,	tb_demo_gstream_sfunc_writ
-				};
-				tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_SET_SFUNC, &sfunc);
 
 				// set timeout
 				if (tb_option_find(option, "timeout"))

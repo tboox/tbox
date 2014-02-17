@@ -381,7 +381,7 @@ tb_void_t 			tb_astream_kill(tb_astream_t* astream);
 /*! close stream, will block it if be pending
  *
  * @param astream 	the stream
- * @param bcalling 	exit it from the calling callback?
+ * @param bcalling 	close it from the calling callback?
  */
 tb_void_t 			tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling);
 
@@ -524,8 +524,6 @@ tb_bool_t 			tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_as
 
 /*! sync the stream
  *
- * @note will be block returned if func and priv is tb_null
- *
  * @param astream 	the stream
  * @param bclosing 	sync the tail data for closing
  * @param func 		the func
@@ -535,9 +533,7 @@ tb_bool_t 			tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_as
  */
 tb_bool_t 			tb_astream_sync_impl(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
-/*! sync the stream
- *
- * @note will be block returned if func and priv is tb_null
+/*! task the stream
  *
  * @param astream 	the stream
  * @param delay 	the delay time, ms

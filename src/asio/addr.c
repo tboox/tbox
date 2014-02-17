@@ -382,7 +382,7 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 		tb_dns_cache_set(addr->host, &ipv4);
 		
 		// done func
-		addr->func(addr, &ipv4, addr->priv);
+		addr->func(addr, addr->host, &ipv4, addr->priv);
 		return tb_true;
 	}
 
@@ -404,7 +404,7 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	}
 
 	// failed? done func
-	if (!ok) addr->func(addr, tb_null, addr->priv);
+	if (!ok) addr->func(addr, addr->host, tb_null, addr->priv);
 
 	// continue
 	return tb_true;
@@ -463,7 +463,7 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 	}
 
 	// failed? done func
-	if (!ok) addr->func(addr, tb_null, addr->priv);
+	if (!ok) addr->func(addr, addr->host, tb_null, addr->priv);
 
 	// continue 
 	return tb_true;
@@ -574,14 +574,14 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 	tb_ipv4_t ipv4 = {0};
 	if (tb_ipv4_set(&ipv4, addr->host))
 	{
-		addr->func(haddr, &ipv4, addr->priv);
+		addr->func(haddr, addr->host, &ipv4, addr->priv);
 		return tb_true;
 	}
 
 	// try to lookup it from cache first
 	if (tb_dns_cache_get(addr->host, &ipv4))
 	{
-		addr->func(haddr, &ipv4, addr->priv);
+		addr->func(haddr, addr->host, &ipv4, addr->priv);
 		return tb_true;
 	}
 
@@ -599,15 +599,6 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 
 	// post reqt
 	return tb_aico_usend(addr->aico, server, TB_DNS_HOST_PORT, addr->data, size, tb_aicp_addr_reqt_func, (tb_pointer_t)addr);
-}
-tb_char_t const* tb_aicp_addr_host(tb_handle_t haddr)
-{
-	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
-	tb_assert_and_check_return_val(addr, tb_null);
-	
-	// the host
-	return addr->host;
 }
 tb_aicp_t* tb_aicp_addr_aicp(tb_handle_t haddr)
 {

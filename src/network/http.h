@@ -37,8 +37,10 @@
  * macros
  */
 
-// the default port
+// the http default port
 #define TB_HTTP_PORT_DEFAULT 					(80)
+
+/// the https default port
 #define TB_HTTPS_PORT_DEFAULT 					(443)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -58,23 +60,6 @@ typedef enum __tb_http_method_e
 , 	TB_HTTP_METHOD_CONNECT 			= 7
 
 }tb_http_method_e;
-
-/// the http version enum
-typedef enum __tb_http_version_e
-{
- 	TB_HTTP_VERSION_10 				= 0
-, 	TB_HTTP_VERSION_11 				= 1
-
-}tb_http_version_e;
-
-/// the http seek enum
-typedef enum __tb_http_seek_e
-{
- 	TB_HTTP_SEEK_BEG 				= 0
-, 	TB_HTTP_SEEK_CUR 				= 1
-, 	TB_HTTP_SEEK_END 				= 2
-
-}tb_http_seek_e;
 
 /// the http error enum
 typedef enum __tb_http_error_e
@@ -159,7 +144,7 @@ typedef struct __tb_http_option_t
 	/// the max redirect
 	tb_uint16_t 		rdtm 		: 9;
 
-	/// the http version
+	/// the http version, 0: HTTP/1.0, 1: HTTP/1.1
 	tb_uint16_t 		version 	: 1;
 
 	/// is alive?
@@ -183,14 +168,14 @@ typedef struct __tb_http_option_t
 	/// range
 	tb_http_range_t 	range;
 
-	/// the user data
-	tb_pointer_t 		udata;
-
-	/// the ssl func
-	tb_http_sfunc_t 	sfunc;
+	/// the priv data
+	tb_pointer_t 		head_priv;
 
 	/// the head func
-	tb_bool_t 			(*hfunc)(tb_handle_t http, tb_char_t const* line);
+	tb_bool_t 			(*head_func)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
+
+	/// the ssl func, @note: discarded
+	tb_http_sfunc_t 	sfunc;
 
 }tb_http_option_t;
 

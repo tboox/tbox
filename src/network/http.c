@@ -130,7 +130,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	http->option.method 	= TB_HTTP_METHOD_GET;
 	http->option.rdtm 		= TB_HTTP_MRDT_DEFAULT;
 	http->option.timeout 	= TB_HTTP_TIMEOUT_DEFAULT;
-	http->option.version 	= TB_HTTP_VERSION_11;
+	http->option.version 	= 1; // HTTP/1.1
 	http->option.post 		= 0;
 	http->option.bunzip 	= 0;
 
@@ -155,7 +155,7 @@ static tb_void_t tb_http_option_exit(tb_http_t* http)
 }
 static tb_bool_t tb_http_status_init(tb_http_t* http)
 {
-	http->status.version = TB_HTTP_VERSION_11;
+	http->status.version = 1;
 	if (!tb_pstring_init(&http->status.content_type)) return tb_false;
 	if (!tb_pstring_init(&http->status.location)) return tb_false;
 	return tb_true;
@@ -179,7 +179,7 @@ static tb_void_t tb_http_status_clear(tb_http_t* http)
 
 	// persistent state
 #if 0
-	http->status.version = TB_HTTP_VERSION_11;
+	http->status.version = 1;
 	http->status.balive = 0;
 	http->status.bseeked = 0;
 	http->status.document_size = 0;
@@ -433,12 +433,12 @@ static tb_long_t tb_http_request(tb_http_t* http)
 static tb_bool_t tb_http_response_done(tb_http_t* http)
 {
 	// line && size
-	tb_char_t* 	line = tb_pstring_cstr(&http->data);
-	tb_size_t 	size = tb_pstring_size(&http->data);
+	tb_char_t const* 	line = tb_pstring_cstr(&http->data);
+	tb_size_t 			size = tb_pstring_size(&http->data);
 	tb_assert_and_check_return_val(line && size, tb_false);
 
 	// init 
-	tb_char_t* 	p = line;
+	tb_char_t const* 	p = line;
 
 	// the first line? 
 	if (!http->size)
@@ -608,9 +608,9 @@ static tb_long_t tb_http_response(tb_http_t* http)
 
 			// trace
 			tb_trace_impl("response: %s", pb);
-
+ 
 			// do callback
-			if (http->option.hfunc) if (!http->option.hfunc((tb_handle_t)http, pb)) return -1;
+			if (http->option.head_func) if (!http->option.head_func((tb_handle_t)http, pb, http->option.head_priv)) return -1;
 			
 			// end?
 			if (!tb_pstring_size(&http->data)) break;

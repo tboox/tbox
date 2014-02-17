@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data)
+static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return(haddr);
@@ -19,13 +19,13 @@ static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_ipv4_t const* addr
 	if (addr)
 	{
 		// trace
-		tb_print("addr[%s]: %u.%u.%u.%u", tb_aicp_addr_host(haddr), addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+		tb_print("addr[%s]: %u.%u.%u.%u", host, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 	}
 	// timeout or failed?
 	else
 	{
 		// trace
-		tb_print("addr[%s]: failed", tb_aicp_addr_host(haddr));
+		tb_print("addr[%s]: failed", host);
 	}
 
 	// exit addr

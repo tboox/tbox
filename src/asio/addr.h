@@ -35,7 +35,7 @@
  */
 
 /// the aicp addr func type
-typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_ipv4_t const* addr, tb_pointer_t data);
+typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -73,14 +73,6 @@ tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host);
-
-/*! the addr host
- *
- * @param haddr 	the addr handle
- *
- * @return 			the host name
- */
-tb_char_t const*	tb_aicp_addr_host(tb_handle_t haddr);
 
 /*! the addr aicp
  *
