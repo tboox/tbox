@@ -250,6 +250,112 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_PATH, ppath);
 		}
 		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_METHOD:
+		{
+			// method
+			tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
+	
+			// set method
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_METHOD, method);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_METHOD:
+		{
+			// pmethod
+			tb_size_t* pmethod = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(pmethod, tb_false);
+	
+			// get method
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_METHOD, pmethod);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_HEAD:
+		{
+			// key
+			tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(key, tb_false);
+
+ 			// val
+			tb_char_t const* val = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(val, tb_false);
+	
+			// set head
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD, key, val);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_HEAD:
+		{
+			// key
+			tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(key, tb_false);
+
+			// pval
+			tb_char_t const** pval = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			tb_assert_and_check_return_val(pval, tb_false);
+	
+			// get head
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD, key, pval);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_HEAD_FUNC:
+		{
+			// head_func
+			tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
+
+			// set head_func
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD_FUNC, head_func);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_HEAD_FUNC:
+		{
+			// phead_func
+			tb_http_head_func_t* phead_func = (tb_http_head_func_t*)tb_va_arg(args, tb_http_head_func_t*);
+			tb_assert_and_check_return_val(phead_func, tb_false);
+
+			// get head_func
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD_FUNC, phead_func);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_HEAD_PRIV:
+		{
+			// head_priv
+			tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+
+			// set head_priv
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD_PRIV, head_priv);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_HEAD_PRIV:
+		{
+			// phead_priv
+			tb_pointer_t* phead_priv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
+			tb_assert_and_check_return_val(phead_priv, tb_false);
+
+			// get head_priv
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD_PRIV, phead_priv);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_RANGE:
+		{
+			tb_hize_t bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
+			tb_hize_t eof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_RANGE, bof, eof);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_RANGE:
+		{
+			// pbof
+			tb_hize_t* pbof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(pbof, tb_false);
+
+			// peof
+			tb_hize_t* peof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(peof, tb_false);
+
+			// ok
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_RANGE, pbof, peof);
+		}
+		break;
 	case TB_GSTREAM_CTRL_SET_SSL:
 		{
 			// bssl
@@ -287,6 +393,82 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	
 			// get timeout
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_POST_SIZE:
+		{
+			// post
+			tb_hize_t post = (tb_hize_t)tb_va_arg(args, tb_hize_t);
+
+			// set post
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_SIZE, post);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_POST_SIZE:
+		{
+			// ppost
+			tb_hize_t* ppost = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(ppost, tb_false);
+
+			// get post
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_SIZE, ppost);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_AUTO_UNZIP:
+		{
+			// bunzip
+			tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+
+			// set bunzip
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_AUTO_UNZIP, bunzip);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_AUTO_UNZIP:
+		{
+			// pbunzip
+			tb_bool_t* pbunzip = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			tb_assert_and_check_return_val(pbunzip, tb_false);
+
+			// get bunzip
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_AUTO_UNZIP, pbunzip);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_REDIRECT:
+		{
+			// redirect
+			tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set redirect
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_REDIRECT, redirect);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_REDIRECT:
+		{
+			// predirect
+			tb_size_t* predirect = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(predirect, tb_false);
+
+			// get redirect
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_REDIRECT, predirect);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_SET_VERSION:
+		{
+			// version
+			tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set version
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_VERSION, version);
+		}
+		break;
+	case TB_GSTREAM_CTRL_HTTP_GET_VERSION:
+		{
+			// pversion
+			tb_size_t* pversion = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(pversion, tb_false);
+
+			// get version
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_VERSION, pversion);
 		}
 		break;
 	default:
