@@ -130,8 +130,8 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 
 			// add port
 			if ( 	(url->poto != TB_URL_PROTO_HTTP)
-				|| 	(url->bssl && url->port != TB_HTTPS_PORT_DEFAULT) 
-				|| 	(!url->bssl && url->port != TB_HTTP_PORT_DEFAULT)) 
+				|| 	(url->bssl && url->port != TB_HTTP_DEFAULT_PORT_SSL) 
+				|| 	(!url->bssl && url->port != TB_HTTP_DEFAULT_PORT)) 
 				tb_pstring_cstrfcat(&url->urls, ":%u", url->port);
 
 			// add path
@@ -255,7 +255,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 			url->port = tb_s10tou32(port);
 			tb_assert_and_check_goto(url->port, fail);
 		}
-		else if (url->poto == TB_URL_PROTO_HTTP) url->port = url->bssl? TB_HTTPS_PORT_DEFAULT : TB_HTTP_PORT_DEFAULT;
+		else if (url->poto == TB_URL_PROTO_HTTP) url->port = url->bssl? TB_HTTP_DEFAULT_PORT_SSL : TB_HTTP_DEFAULT_PORT;
 		else goto fail;
 
 		// skip '/'

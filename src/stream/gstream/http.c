@@ -53,55 +53,21 @@ static __tb_inline__ tb_gstream_http_t* tb_gstream_http_cast(tb_gstream_t* gstre
 	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_HTTP, tb_null);
 	return (tb_gstream_http_t*)gstream;
 }
-static tb_size_t tb_gstream_http_state(tb_gstream_http_t* hstream)
-{
-	// check
-	tb_assert_and_check_return_val(hstream && hstream->http, -1);
-	
-	// the http status
-	tb_http_status_t const*	status = tb_http_status(hstream->http);
-	if (status)
-	{
-		if (status->error == TB_HTTP_ERROR_DNS_FAILED)
-			return TB_GSTREAM_SOCK_STATE_DNS_FAILED;
-		else if (status->error == TB_HTTP_ERROR_SSL_FAILED)
-			return TB_GSTREAM_SOCK_STATE_SSL_FAILED;
-		else if (status->error == TB_HTTP_ERROR_CONNECT_FAILED)
-			return TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
-		else if (status->error == TB_HTTP_ERROR_REQUEST_FAILED)
-			return TB_GSTREAM_HTTP_STATE_REQUEST_FAILED;
-		else if (status->error == TB_HTTP_ERROR_RESPONSE_204)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_204;
-		else if (status->error >= TB_HTTP_ERROR_RESPONSE_300 && status->error <= TB_HTTP_ERROR_RESPONSE_304)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_300 + (status->error - TB_HTTP_ERROR_RESPONSE_300);
-		else if (status->error >= TB_HTTP_ERROR_RESPONSE_400 && status->error <= TB_HTTP_ERROR_RESPONSE_416)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_400 + (status->error - TB_HTTP_ERROR_RESPONSE_400);
-		else if (status->error >= TB_HTTP_ERROR_RESPONSE_500 && status->error <= TB_HTTP_ERROR_RESPONSE_507)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_500 + (status->error - TB_HTTP_ERROR_RESPONSE_500);
-		else if (status->error == TB_HTTP_ERROR_RESPONSE_NUL)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_NUL;
-		else if (status->error == TB_HTTP_ERROR_RESPONSE_UNK)
-			return TB_GSTREAM_HTTP_STATE_RESPONSE_UNK;
-		else if (status->error == TB_HTTP_ERROR_WAIT_FAILED)
-			return TB_GSTREAM_STATE_WAIT_FAILED;
-		else if (status->error == TB_HTTP_ERROR_UNKNOWN)
-			return TB_GSTREAM_HTTP_STATE_UNKNOWN_ERROR;
-		else if (status->error == TB_HTTP_ERROR_OK)
-			return TB_GSTREAM_STATE_OK;
-	}
-	return TB_GSTREAM_STATE_OK;
-} 
 static tb_long_t tb_gstream_http_open(tb_gstream_t* gstream)
 {
 	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
+	// the http status
+	tb_http_status_t const*	status = tb_http_status(hstream->http);
+	tb_assert_and_check_return_val(status, -1);
+
 	// open it
 	tb_long_t ok = tb_http_aopen(hstream->http);
 
 	// save state
-	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hstream);
+	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : status->state;
 
 	// ok?
 	return ok;
@@ -121,8 +87,13 @@ static tb_void_t tb_gstream_http_exit(tb_gstream_t* gstream)
 }
 static tb_long_t tb_gstream_http_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
+
+	// the http status
+	tb_http_status_t const*	status = tb_http_status(hstream->http);
+	tb_assert_and_check_return_val(status, -1);
 
 	// check
 	tb_check_return_val(data, -1);
@@ -132,7 +103,7 @@ static tb_long_t tb_gstream_http_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	tb_long_t ok = tb_http_aread(hstream->http, data, size);
 
 	// save state
-	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hstream);
+	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : status->state;
 
 	// ok?
 	return ok;
@@ -177,11 +148,15 @@ static tb_long_t tb_gstream_http_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
+	// the http status
+	tb_http_status_t const*	status = tb_http_status(hstream->http);
+	tb_assert_and_check_return_val(status, -1);
+
 	// wait
 	tb_long_t ok = tb_http_wait(hstream->http, wait, timeout);
 
 	// save state
-	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : tb_gstream_http_state(hstream);
+	gstream->state = ok >= 0? TB_GSTREAM_STATE_OK : status->state;
 
 	// ok?
 	return ok;
