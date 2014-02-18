@@ -61,14 +61,11 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	// init url
 	if (!tb_url_set(&option->url, argv[1])) goto end;
 
-	// keep-alive
-	option->balive = 0;
-
 	// timeout 
 //	option->timeout = 10000;
 
 	// redirect
-//	option->rdtm = 0;
+//	option->redirect = 0;
 
 	// init head func
 	option->head_func = tb_http_demo_head_func;
