@@ -92,114 +92,110 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				// ctrl http
 				if (tb_gstream_type(ist) == TB_GSTREAM_TYPE_HTTP) 
 				{
-					// init hoption
-					tb_http_option_t* hoption = tb_null;
-					tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_GET_OPTION, &hoption);
-					if (hoption)
+					// enable gzip?
+					if (tb_option_find(option, "gzip"))
 					{
-						// enable gzip?
-						if (tb_option_find(option, "gzip"))
+						// auto unzip
+						if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+
+						// need gzip
+						if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+					}
+
+					// enable debug?
+					if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_gstream_head_func : tb_null)) break;
+
+					// custem header?
+					if (tb_option_find(option, "header"))
+					{
+						// init
+						tb_pstring_t key;
+						tb_pstring_t val;
+						tb_pstring_init(&key);
+						tb_pstring_init(&val);
+
+						// done
+						tb_bool_t 			k = tb_true;
+						tb_char_t const* 	p = tb_option_item_cstr(option, "header");
+						while (*p)
 						{
-							// auto unzip
-							hoption->bunzip = 1;
-
-							// need gzip
-							tb_hash_set(hoption->head, "Accept-Encoding", "gzip,deflate");
-						}
-
-						// enable debug?
-						if (debug) hoption->head_func = tb_demo_gstream_head_func;
-
-						// custem header?
-						if (tb_option_find(option, "header"))
-						{
-							// init
-							tb_pstring_t key;
-							tb_pstring_t val;
-							tb_pstring_init(&key);
-							tb_pstring_init(&val);
-
-							// done
-							tb_bool_t 			k = tb_true;
-							tb_char_t const* 	p = tb_option_item_cstr(option, "header");
-							while (*p)
+							// is key?
+							if (k)
 							{
-								// is key?
-								if (k)
+								if (*p != ':' && !tb_isspace(*p)) tb_pstring_chrcat(&key, *p++);
+								else if (*p == ':') 
 								{
-									if (*p != ':' && !tb_isspace(*p)) tb_pstring_chrcat(&key, *p++);
-									else if (*p == ':') 
-									{
-										// skip ':'
-										p++;
+									// skip ':'
+									p++;
 
-										// skip space
-										while (*p && tb_isspace(*p)) p++;
+									// skip space
+									while (*p && tb_isspace(*p)) p++;
 
-										// is val now
-										k = tb_false;
-									}
-									else p++;
+									// is val now
+									k = tb_false;
 								}
-								// is val?
+								else p++;
+							}
+							// is val?
+							else
+							{
+								if (*p != ';') tb_pstring_chrcat(&val, *p++);
 								else
 								{
-									if (*p != ';') tb_pstring_chrcat(&val, *p++);
-									else
+									// skip ';'
+									p++;
+
+									// skip space
+									while (*p && tb_isspace(*p)) p++;
+
+									// set header
+									if (tb_pstring_size(&key) && tb_pstring_size(&val))
 									{
-										// skip ';'
-										p++;
-
-										// skip space
-										while (*p && tb_isspace(*p)) p++;
-
-										// set header
-										if (tb_pstring_size(&key) && tb_pstring_size(&val))
-										{
-											if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-											tb_hash_set(hoption->head, tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-										}
-
-										// is key now
-										k = tb_true;
-
-										// clear key & val
-										tb_pstring_clear(&key);
-										tb_pstring_clear(&val);
+										if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
+										if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 									}
+
+									// is key now
+									k = tb_true;
+
+									// clear key & val
+									tb_pstring_clear(&key);
+									tb_pstring_clear(&val);
 								}
 							}
-
-							// set header
-							if (tb_pstring_size(&key) && tb_pstring_size(&val))
-							{
-								if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-								tb_hash_set(hoption->head, tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-							}
-
-							// exit 
-							tb_pstring_exit(&key);
-							tb_pstring_exit(&val);
 						}
 
-						// post-data?
-						if (tb_option_find(option, "post-data"))
+						// set header
+						if (tb_pstring_size(&key) && tb_pstring_size(&val))
 						{
-							hoption->method = TB_HTTP_METHOD_POST;
-							hoption->post 	= tb_strlen(tb_option_item_cstr(option, "post-data"));
-							if (debug) tb_printf("post: %lu\n", hoption->post);
+							if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
+							if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 						}
-						// post-file?
-						else if (tb_option_find(option, "post-file"))
+
+						// exit 
+						tb_pstring_exit(&key);
+						tb_pstring_exit(&val);
+					}
+
+					// post-data?
+					if (tb_option_find(option, "post-data"))
+					{
+						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(option, "post-data"));
+						if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+						if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+						if (debug) tb_printf("post: %llu\n", post_size);
+					}
+					// post-file?
+					else if (tb_option_find(option, "post-file"))
+					{
+						// exist?
+						tb_file_info_t info = {0};
+						if (tb_file_info(tb_option_item_cstr(option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
 						{
-							// exist?
-							tb_file_info_t info = {0};
-							if (tb_file_info(tb_option_item_cstr(option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
-							{
-								hoption->method = TB_HTTP_METHOD_POST;
-								hoption->post 	= info.size;
-								if (debug) tb_printf("post: %lu\n", hoption->post);
-							}
+							tb_hize_t post_size = info.size;
+							if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+							if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+							if (debug) tb_printf("post: %llu\n", post_size);
 						}
 					}
 				}
@@ -208,7 +204,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				if (tb_option_find(option, "timeout"))
 				{
 					tb_size_t timeout = tb_option_item_uint32(option, "timeout");
-					tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_SET_TIMEOUT, &timeout);
+					if (!tb_gstream_ctrl(ist, TB_GSTREAM_CTRL_SET_TIMEOUT, timeout)) break;
 				}
 
 				// print verbose info

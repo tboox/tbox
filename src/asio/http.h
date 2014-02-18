@@ -298,11 +298,20 @@ tb_bool_t 			tb_aicp_http_writ_after_impl(tb_handle_t handle, tb_size_t delay, t
 
 /*! the http aicp
  *
- * @param handle 		the http handle
+ * @param handle 	the http handle
  *
  * @return 			the aicp
  */
 tb_aicp_t* 			tb_aicp_http_aicp(tb_handle_t handle);
+
+/*! the http option
+ *
+ * @param handle 	the http handle
+ * @param option 	the http option
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...);
 
 
 #endif
