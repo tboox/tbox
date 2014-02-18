@@ -56,16 +56,55 @@
 /// the http method enum
 typedef enum __tb_http_method_e
 {
- 	TB_HTTP_METHOD_GET 				= 0
-, 	TB_HTTP_METHOD_POST 			= 1
-, 	TB_HTTP_METHOD_HEAD 			= 2
-, 	TB_HTTP_METHOD_PUT 				= 3
-,	TB_HTTP_METHOD_OPTIONS 			= 4
-, 	TB_HTTP_METHOD_DELETE 			= 5
-, 	TB_HTTP_METHOD_TRACE 			= 6
-, 	TB_HTTP_METHOD_CONNECT 			= 7
+ 	TB_HTTP_METHOD_GET 						= 0
+, 	TB_HTTP_METHOD_POST 					= 1
+, 	TB_HTTP_METHOD_HEAD 					= 2
+, 	TB_HTTP_METHOD_PUT 						= 3
+,	TB_HTTP_METHOD_OPTIONS 					= 4
+, 	TB_HTTP_METHOD_DELETE 					= 5
+, 	TB_HTTP_METHOD_TRACE 					= 6
+, 	TB_HTTP_METHOD_CONNECT 					= 7
 
 }tb_http_method_e;
+
+/// the http option enum
+typedef enum __tb_http_option_e
+{
+	TB_HTTP_OPTION_NONE 				= 0
+
+,	TB_HTTP_OPTION_GET_SSL 				= 1
+,	TB_HTTP_OPTION_GET_URL 				= 2
+,	TB_HTTP_OPTION_GET_HOST 			= 3
+,	TB_HTTP_OPTION_GET_PORT 			= 4
+,	TB_HTTP_OPTION_GET_PATH 			= 5
+,	TB_HTTP_OPTION_GET_HEAD 			= 6
+,	TB_HTTP_OPTION_GET_RANGE 			= 7 
+,	TB_HTTP_OPTION_GET_METHOD 			= 8
+,	TB_HTTP_OPTION_GET_VERSION			= 9 
+,	TB_HTTP_OPTION_GET_TIMEOUT			= 10
+,	TB_HTTP_OPTION_GET_REDIRECT			= 11 
+,	TB_HTTP_OPTION_GET_HEAD_FUNC		= 12
+,	TB_HTTP_OPTION_GET_HEAD_PRIV		= 13
+,	TB_HTTP_OPTION_GET_POST_SIZE 		= 14
+,	TB_HTTP_OPTION_GET_AUTO_UNZIP		= 15
+
+,	TB_HTTP_OPTION_SET_SSL 				= 16
+,	TB_HTTP_OPTION_SET_URL 				= 17
+,	TB_HTTP_OPTION_SET_HOST 			= 18
+,	TB_HTTP_OPTION_SET_PORT 			= 19
+,	TB_HTTP_OPTION_SET_PATH 			= 20
+,	TB_HTTP_OPTION_SET_HEAD 			= 21
+,	TB_HTTP_OPTION_SET_RANGE 			= 22
+,	TB_HTTP_OPTION_SET_METHOD 			= 23
+,	TB_HTTP_OPTION_SET_VERSION			= 24
+,	TB_HTTP_OPTION_SET_TIMEOUT			= 25
+,	TB_HTTP_OPTION_SET_REDIRECT			= 26
+,	TB_HTTP_OPTION_SET_HEAD_FUNC		= 27
+,	TB_HTTP_OPTION_SET_HEAD_PRIV		= 28
+,	TB_HTTP_OPTION_SET_POST_SIZE 		= 29
+,	TB_HTTP_OPTION_SET_AUTO_UNZIP		= 30
+
+}tb_http_option_e;
 
 /// the http range type
 typedef struct __tb_http_range_t
@@ -77,6 +116,9 @@ typedef struct __tb_http_range_t
 	tb_hize_t 			eof;
 
 }tb_http_range_t;
+
+/// the http head func type
+typedef tb_bool_t (*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t
@@ -112,7 +154,7 @@ typedef struct __tb_http_option_t
 	tb_pointer_t 		head_priv;
 
 	/// the head func
-	tb_bool_t 			(*head_func)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
+	tb_http_head_func_t head_func;
 
 }tb_http_option_t;
 
@@ -299,16 +341,11 @@ tb_bool_t 				tb_http_bfwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_
 /*! the http option
  *
  * @param handle 		the http handle
+ * @param option 		the option
  *
- * @return 				the http option
+ * @return 				tb_true or tb_false
  */
-tb_http_option_t* 		tb_http_option(tb_handle_t handle);
-
-/*! dump the http option
- *
- * @param handle 		the http handle
- */
-tb_void_t 				tb_http_option_dump(tb_handle_t handle);
+tb_bool_t 				tb_http_option(tb_handle_t handle, tb_size_t option, ...);
 
 /*! the http status
  *
@@ -317,12 +354,6 @@ tb_void_t 				tb_http_option_dump(tb_handle_t handle);
  * @return 				the http status
  */
 tb_http_status_t const*	tb_http_status(tb_handle_t handle);
-
-/*! dump the http status
- *
- * @param handle 		the http handle
- */
-tb_void_t 				tb_http_status_dump(tb_handle_t handle);
 
 #endif
 

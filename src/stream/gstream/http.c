@@ -163,9 +163,11 @@ static tb_long_t tb_gstream_http_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 }
 static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
+	// done
 	switch (ctrl)
 	{
 	case TB_GSTREAM_CTRL_SET_URL:
@@ -173,13 +175,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(url, tb_false);
-			
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+		
 			// set url
-			if (tb_url_set(&option->url, url)) return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_URL, url);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_URL:
@@ -187,18 +185,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// purl
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			tb_assert_and_check_return_val(purl, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// get url
-			tb_char_t const* url = tb_url_get(&option->url);
-			tb_assert_and_check_return_val(url, tb_false);
-
-			// ok
-			*purl = url;
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_URL, purl);
 		}
 		break;
 	case TB_GSTREAM_CTRL_SET_HOST:
@@ -206,14 +195,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(host, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// set host
-			tb_url_host_set(&option->url, host);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_HOST, host);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_HOST:
@@ -222,17 +206,8 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			tb_assert_and_check_return_val(phost, tb_false); 
 
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
 			// get host
-			tb_char_t const* host = tb_url_host_get(&option->url);
-			tb_assert_and_check_return_val(host, tb_false);
-
-			// ok
-			*phost = host;
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_HOST, phost);
 		}
 		break;
 	case TB_GSTREAM_CTRL_SET_PORT:
@@ -240,14 +215,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(port, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// set port
-			tb_url_port_set(&option->url, port);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_PORT, port);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_PORT:
@@ -255,14 +225,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// pport
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pport, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// get port
-			*pport = tb_url_port_get(&option->url);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_PORT, pport);
 		}
 		break;
 	case TB_GSTREAM_CTRL_SET_PATH:
@@ -270,14 +235,9 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(path, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// set path
-			tb_url_path_set(&option->url, path);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_PATH, path);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_PATH:
@@ -285,32 +245,18 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// ppath
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			tb_assert_and_check_return_val(ppath, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// get path
-			tb_char_t const* path = tb_url_path_get(&option->url);
-			tb_assert_and_check_return_val(path, tb_false);
-
-			// ok
-			*ppath = path;
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_PATH, ppath);
 		}
 		break;
 	case TB_GSTREAM_CTRL_SET_SSL:
 		{
 			// bssl
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// set ssl
-			tb_url_ssl_set(&option->url, bssl);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_SSL, bssl);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_SSL:
@@ -318,25 +264,19 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// pssl
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			tb_assert_and_check_return_val(pssl, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// get ssl
-			*pssl = tb_url_ssl_get(&option->url);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_SSL, pssl);
 		}
 		break;
 	case TB_GSTREAM_CTRL_SET_TIMEOUT:
 		{
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+			// timeout
+			tb_size_t timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
+			tb_assert_and_check_return_val(timeout, tb_false);
+	
 			// set timeout
-			option->timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_TIMEOUT, timeout);
 		}
 		break;
 	case TB_GSTREAM_CTRL_GET_TIMEOUT:
@@ -344,23 +284,11 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// ptimeout
 			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(ptimeout, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
+	
 			// get timeout
-			*ptimeout = option->timeout;
-			return tb_true;
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
 		}
 		break;
-	case TB_GSTREAM_CTRL_HTTP_GET_OPTION:
-		{
-			tb_http_option_t** poption = (tb_http_option_t**)tb_va_arg(args, tb_http_option_t**);
-			tb_assert_and_check_return_val(poption, tb_false);
-			*poption = tb_http_option(hstream->http);
-			return tb_true;
-		}
 	default:
 		break;
 	}

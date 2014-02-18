@@ -11,9 +11,6 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 	// check
 	tb_assert_and_check_return_val(http && line, tb_false);
 
-	// option 
-	tb_http_option_t* 	option = tb_http_option(http);
-
 	// cookies
 	tb_cookies_t* 		cookies = priv;
 
@@ -29,9 +26,11 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 		tb_assert_and_check_return_val(*p, tb_false);
 		p++; while (tb_isspace(*p)) p++;
 		tb_assert_and_check_return_val(*p, tb_false);
-
-		tb_char_t const* url = tb_url_get(&option->url);
-		if (url) tb_cookies_set_from_url(cookies, url, p);
+	
+		// the url
+		tb_char_t const* url = tb_null;
+		if (tb_http_option(http, TB_HTTP_OPTION_GET_URL, &url) && url)
+			tb_cookies_set_from_url(cookies, url, p);
 	}
 
 	return tb_true;
@@ -46,35 +45,30 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_handle_t http = tb_http_init();
 	tb_assert_and_check_goto(http, end);
 
-	// option
-	tb_http_option_t* option = tb_http_option(http);
-	tb_assert_and_check_goto(option, end);
-
-	// status
-	tb_http_status_t const* status = tb_http_status(http);
-	tb_assert_and_check_goto(status, end);
-
 	// init cookies
-	option->head_priv = tb_cookies_init();
-	tb_assert_and_check_goto(option->head_priv, end);
+	tb_cookies_t* cookies = tb_cookies_init();
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_PRIV, cookies)) goto end;
+	
+	// init head func
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_http_demo_head_func)) goto end;
 	
 	// init url
-	if (!tb_url_set(&option->url, argv[1])) goto end;
-
-	// timeout 
-//	option->timeout = 10000;
-
-	// redirect
-//	option->redirect = 0;
-
-	// init head func
-	option->head_func = tb_http_demo_head_func;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) goto end;
+	
+	// init post size
+	tb_hize_t post_size = argv[2]? tb_strlen(argv[2]) : 0;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_POST_SIZE, post_size)) goto end;
 
 	// init method
-	option->method = TB_HTTP_METHOD_POST;
+	if (!tb_http_option(http, TB_HTTP_OPTION_SET_METHOD, post_size? TB_HTTP_METHOD_POST : TB_HTTP_METHOD_GET)) goto end;
+	
+	// init timeout 
+	tb_size_t timeout = 0;
+//	if (!tb_http_option(http, TB_HTTP_OPTION_SET_TIMEOUT, 10000)) goto end;
+	if (!tb_http_option(http, TB_HTTP_OPTION_GET_TIMEOUT, &timeout)) goto end;
 
-	// init post
-	option->post = tb_strlen(argv[2]);
+	// init redirect maxn
+//	if (!tb_http_option(http, TB_HTTP_OPTION_SET_REDIRECT, 0)) goto end;
 
 	// open http
 	tb_hong_t t = tb_mclock();
@@ -83,13 +77,16 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_print("[demo]: open: %llu ms", t);
 
 	// writ post
-	tb_http_bwrit(http, argv[2], option->post);
-	tb_http_bfwrit(http, tb_null, 0);
+	if (post_size)
+	{
+		tb_http_bwrit(http, argv[2], post_size);
+		tb_http_bfwrit(http, tb_null, 0);
+	}
 
 	// read data
 	tb_byte_t 		data[8192];
 	tb_size_t 		read = 0;
-	tb_hize_t 		size = status->content_size;
+	tb_hize_t 		size = tb_http_status(http)->content_size;
 	do
 	{
 		// read data
@@ -118,7 +115,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 		{
 			// wait
 			tb_print("[demo]: wait");
-			tb_long_t e = tb_http_wait(http, TB_AIOE_CODE_RECV, option->timeout);
+			tb_long_t e = tb_http_wait(http, TB_AIOE_CODE_RECV, timeout);
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -137,18 +134,17 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// exit cookies
-	if (option && option->head_priv) 
+	if (cookies) 
 	{
 		// dump cookies
 #ifdef __tb_debug__
-		tb_cookies_dump(option->head_priv);
+		tb_cookies_dump(cookies);
 #endif
 
-		tb_cookies_exit(option->head_priv);
+		tb_cookies_exit(cookies);
 	}
 
 	// exit http
 	if (http) tb_http_exit(http);
-
 	return 0;
 }
