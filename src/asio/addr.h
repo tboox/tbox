@@ -35,7 +35,7 @@
  */
 
 /// the aicp addr func type
-typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data);
+typedef tb_void_t 	(*tb_aicp_addr_func_t)(tb_handle_t handle, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -54,32 +54,32 @@ tb_handle_t 		tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr
 
 /*! kill the addr
  *
- * @param haddr 	the addr handle
+ * @param handle 	the addr handle
  */
-tb_void_t 			tb_aicp_addr_kill(tb_handle_t haddr);
+tb_void_t 			tb_aicp_addr_kill(tb_handle_t handle);
 
 /*! exit the addr
  *
- * @param haddr 	the addr handle
+ * @param handle 	the addr handle
  * @param bcalling 	exit it at the self callback?
  */
-tb_void_t 			tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling);
+tb_void_t 			tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling);
 
 /*! done the addr
  *
- * @param haddr 	the addr handle
+ * @param handle 	the addr handle
  * @param host 		the host
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host);
+tb_bool_t 			tb_aicp_addr_done(tb_handle_t handle, tb_char_t const* host);
 
 /*! the addr aicp
  *
- * @param haddr 	the addr handle
+ * @param handle 	the addr handle
  *
  * @return 			the aicp
  */
-tb_aicp_t* 			tb_aicp_addr_aicp(tb_handle_t haddr);
+tb_aicp_t* 			tb_aicp_addr_aicp(tb_handle_t handle);
 
 #endif

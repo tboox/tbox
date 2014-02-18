@@ -531,19 +531,19 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_f
 	// ok?
 	return addr;
 }
-tb_void_t tb_aicp_addr_kill(tb_handle_t haddr)
+tb_void_t tb_aicp_addr_kill(tb_handle_t handle)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
+	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return(addr);
 
 	// kill sock
 	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
 }
-tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling)
+tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
+	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return(addr);
 
 	// the aico
@@ -561,10 +561,10 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t haddr, tb_bool_t bcalling)
 	// exit sock
 	if (sock) tb_socket_clos(sock);
 }
-tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
+tb_bool_t tb_aicp_addr_done(tb_handle_t handle, tb_char_t const* host)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
+	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return_val(addr && addr->aico && addr->func && host && host[0], tb_false);
 	
 	// save host
@@ -574,14 +574,14 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 	tb_ipv4_t ipv4 = {0};
 	if (tb_ipv4_set(&ipv4, addr->host))
 	{
-		addr->func(haddr, addr->host, &ipv4, addr->priv);
+		addr->func(handle, addr->host, &ipv4, addr->priv);
 		return tb_true;
 	}
 
 	// try to lookup it from cache first
 	if (tb_dns_cache_get(addr->host, &ipv4))
 	{
-		addr->func(haddr, addr->host, &ipv4, addr->priv);
+		addr->func(handle, addr->host, &ipv4, addr->priv);
 		return tb_true;
 	}
 
@@ -600,10 +600,10 @@ tb_bool_t tb_aicp_addr_done(tb_handle_t haddr, tb_char_t const* host)
 	// post reqt
 	return tb_aico_usend(addr->aico, server, TB_DNS_HOST_PORT, addr->data, size, tb_aicp_addr_reqt_func, (tb_pointer_t)addr);
 }
-tb_aicp_t* tb_aicp_addr_aicp(tb_handle_t haddr)
+tb_aicp_t* tb_aicp_addr_aicp(tb_handle_t handle)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)haddr;
+	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return_val(addr && addr->aico, tb_null);
 	
 	// the aicp
