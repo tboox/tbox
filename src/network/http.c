@@ -206,7 +206,6 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url));
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url));
 		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_SFUNC, &http->option.sfunc);
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -1358,6 +1357,9 @@ tb_void_t tb_http_option_dump(tb_handle_t handle)
 		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
 		if (item) tb_print("[http]: option: head: %s: %s", item->name, item->data);
 	}
+
+	// dump end
+	tb_print("");
 }
 tb_void_t tb_http_status_dump(tb_handle_t handle)
 {
@@ -1374,11 +1376,14 @@ tb_void_t tb_http_status_dump(tb_handle_t handle)
 	tb_print("[http]: status: content:size: %llu", http->status.content_size);
 	tb_print("[http]: status: document:size: %llu", http->status.document_size);
 	tb_print("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
-	tb_print("[http]: option: bgzip: %s", http->status.bgzip? "true" : "false");
-	tb_print("[http]: option: bdeflate: %s", http->status.bdeflate? "true" : "false");
+	tb_print("[http]: status: bgzip: %s", http->status.bgzip? "true" : "false");
+	tb_print("[http]: status: bdeflate: %s", http->status.bdeflate? "true" : "false");
 	tb_print("[http]: status: balived: %s", http->status.balived? "true" : "false");
 	tb_print("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
 	tb_print("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
+
+	// dump end
+	tb_print("");
 }
 #endif
 

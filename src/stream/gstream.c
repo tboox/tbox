@@ -1210,24 +1210,6 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_GSTREAM_CTRL_SET_SFUNC:
-		{
-			tb_gstream_sfunc_t const* sfunc = (tb_gstream_sfunc_t const*)tb_va_arg(args, tb_gstream_sfunc_t*);
-			if (sfunc) gstream->sfunc = *sfunc;
-			else tb_memset(&gstream->sfunc, 0, sizeof(tb_gstream_sfunc_t));
-			ret = tb_true;
-		}
-		break;
-	case TB_GSTREAM_CTRL_GET_SFUNC:
-		{
-			tb_gstream_sfunc_t* sfunc = (tb_gstream_sfunc_t*)tb_va_arg(args, tb_gstream_sfunc_t*);
-			if (sfunc)
-			{
-				*sfunc = gstream->sfunc;
-				ret = tb_true;
-			}
-		}
-		break;
 	case TB_GSTREAM_CTRL_SET_CACHE:
 		{
 			tb_size_t cache = (tb_size_t)tb_va_arg(args, tb_size_t);

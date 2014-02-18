@@ -75,11 +75,12 @@
  *
  * @param http 				the http handle
  * @param state 			the astream state
+ * @param status 			the http status
  * @param priv 				the func private data
  *
  * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_open_func_t)(tb_handle_t http, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 			(*tb_aicp_http_open_func_t)(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv);
 
 /*! the aicp http read func type
  *
