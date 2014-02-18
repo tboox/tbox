@@ -328,40 +328,6 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			return tb_true;
 		}
 		break;
-	case TB_GSTREAM_CTRL_SET_SFUNC:
-		{
-			// sfunc
-			tb_http_sfunc_t const* sfunc = (tb_http_sfunc_t const*)tb_va_arg(args, tb_http_sfunc_t*);
-			tb_assert_static(sizeof(tb_http_sfunc_t) == sizeof(tb_gstream_sfunc_t));
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
-			// set sfunc
-			if (sfunc) option->sfunc = *sfunc;
-			else tb_memset(&option->sfunc, 0, sizeof(tb_http_sfunc_t));
-
-			// ok
-			return tb_true;
-		}
-		break;
-	case TB_GSTREAM_CTRL_GET_SFUNC:
-		{
-			// sfunc
-			tb_http_sfunc_t* sfunc = (tb_http_sfunc_t*)tb_va_arg(args, tb_http_sfunc_t*);
-			tb_assert_static(sizeof(tb_http_sfunc_t) == sizeof(tb_gstream_sfunc_t));
-			tb_assert_and_check_return_val(sfunc, tb_false);
-
-			// option
-			tb_http_option_t* option = tb_http_option(hstream->http);
-			tb_assert_and_check_return_val(option, tb_false);
-
-			// get sfunc
-			*sfunc = option->sfunc;
-			return tb_true;
-		}
-		break;
 	case TB_GSTREAM_CTRL_SET_TIMEOUT:
 		{
 			// option
@@ -393,13 +359,6 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			tb_http_option_t** poption = (tb_http_option_t**)tb_va_arg(args, tb_http_option_t**);
 			tb_assert_and_check_return_val(poption, tb_false);
 			*poption = tb_http_option(hstream->http);
-			return tb_true;
-		}
-	case TB_GSTREAM_CTRL_HTTP_GET_STATUS:
-		{
-			tb_http_status_t const** pstatus = (tb_http_status_t const**)tb_va_arg(args, tb_http_status_t const**);
-			tb_assert_and_check_return_val(pstatus, tb_false);
-			*pstatus = tb_http_status(hstream->http);
 			return tb_true;
 		}
 	default:

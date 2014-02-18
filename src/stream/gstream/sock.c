@@ -200,6 +200,8 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
 			// ok
 			tb_trace_impl("connect: ok");
 
+			// TODO
+#if 0 
 			// ssl? init it
 			if (tb_url_ssl_get(&gstream->url))
 			{
@@ -212,6 +214,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
 				tb_assert_and_check_goto(gstream->sfunc.writ, fail);
 				tb_assert_and_check_goto(gstream->sfunc.exit, fail);
 			}
+#endif
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -257,9 +260,9 @@ static tb_long_t tb_gstream_sock_clos(tb_gstream_t* gstream)
 	// has socket?
 	if (sst->sock)
 	{
-		// exit ssl
-		if (sst->ssl) gstream->sfunc.exit(sst->ssl);
-		sst->ssl = tb_null;
+		// exit ssl, TODO
+//		if (sst->ssl) gstream->sfunc.exit(sst->ssl);
+//		sst->ssl = tb_null;
 
 		// close it
 		if (!sst->bref) if (!tb_socket_clos(sst->sock)) return 0;
@@ -281,6 +284,7 @@ static tb_long_t tb_gstream_sock_clos(tb_gstream_t* gstream)
 }
 static tb_long_t tb_gstream_sock_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
+	// check
 	tb_gstream_sock_t* sst = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sst && sst->sock, -1);
 
@@ -298,7 +302,7 @@ static tb_long_t tb_gstream_sock_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// read data
-			r = (sst->ssl)? gstream->sfunc.read(sst->ssl, data, size) : tb_socket_recv(sst->sock, data, size);
+			r = /*(sst->ssl)? gstream->sfunc.read(sst->ssl, data, size) : */tb_socket_recv(sst->sock, data, size);
 			tb_trace_impl("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
@@ -359,7 +363,7 @@ static tb_long_t tb_gstream_sock_writ(tb_gstream_t* gstream, tb_byte_t const* da
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// writ data
-			r = (sst->ssl)? gstream->sfunc.writ(sst->ssl, data, size) : tb_socket_send(sst->sock, data, size);
+			r = /*(sst->ssl)? gstream->sfunc.writ(sst->ssl, data, size) : */tb_socket_send(sst->sock, data, size);
 			tb_trace_impl("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 

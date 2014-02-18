@@ -125,7 +125,6 @@ typedef enum __tb_gstream_ctrl_e
 ,	TB_GSTREAM_CTRL_GET_PORT 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 3)
 ,	TB_GSTREAM_CTRL_GET_PATH 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 4)
 ,	TB_GSTREAM_CTRL_GET_SSL 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 5)
-,	TB_GSTREAM_CTRL_GET_SFUNC 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 6)
 ,	TB_GSTREAM_CTRL_GET_CACHE 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 7)
 ,	TB_GSTREAM_CTRL_GET_TIMEOUT 			= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 8)
 ,	TB_GSTREAM_CTRL_IS_OPENED 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 9)
@@ -135,7 +134,6 @@ typedef enum __tb_gstream_ctrl_e
 ,	TB_GSTREAM_CTRL_SET_PORT 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 13)
 ,	TB_GSTREAM_CTRL_SET_PATH 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 14)
 ,	TB_GSTREAM_CTRL_SET_SSL 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 15)
-,	TB_GSTREAM_CTRL_SET_SFUNC 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 16)
 ,	TB_GSTREAM_CTRL_SET_CACHE 				= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 17)
 ,	TB_GSTREAM_CTRL_SET_TIMEOUT 			= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_NONE, 18)
 
@@ -154,7 +152,6 @@ typedef enum __tb_gstream_ctrl_e
 
 	// the gstream for http
 ,	TB_GSTREAM_CTRL_HTTP_GET_OPTION 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_HTTP, 1)
-,	TB_GSTREAM_CTRL_HTTP_GET_STATUS 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_HTTP, 2)
 
 	// the gstream for filter
 ,	TB_GSTREAM_CTRL_FLTR_GET_GSTREAM 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_FLTR, 1)
@@ -213,23 +210,6 @@ typedef enum __tb_gstream_state_e
 
 }tb_gstream_state_e;
 
-/// the gstream ssl func type
-typedef struct __tb_gstream_sfunc_t
-{
-	/// the init func
-	tb_handle_t 		(*init)(tb_handle_t gstream);
-
-	/// the exit func
-	tb_void_t 			(*exit)(tb_handle_t ssl);
-
-	/// the read func
-	tb_long_t 			(*read)(tb_handle_t ssl, tb_byte_t* data, tb_size_t size);
-
-	/// the writ func
-	tb_long_t 			(*writ)(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size);
-
-}tb_gstream_sfunc_t;
-
 /// the generic stream type
 typedef struct __tb_gstream_t
 {	
@@ -259,9 +239,6 @@ typedef struct __tb_gstream_t
 
 	/// the offset
 	tb_hize_t 			offset;
-
-	/// the ssl func
-	tb_gstream_sfunc_t 	sfunc;
 
 	/// wait 
 	tb_long_t 			(*wait)(struct __tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout);
