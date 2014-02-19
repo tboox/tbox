@@ -118,7 +118,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_assert_and_check_break(fstream->aico);
 
 		// init offset
-		fstream->offset = 0;
+		tb_atomic64_set0(&fstream->offset);
 
 		// opened
 		tb_atomic_set(&astream->opened, 1);
@@ -398,7 +398,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			// get offset
 			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
-			*poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
+			*poffset = (tb_hong_t)tb_atomic64_get(&fstream->offset);
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_FILE_SET_MODE:

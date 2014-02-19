@@ -150,15 +150,6 @@ static tb_long_t tb_gstream_file_seek(tb_gstream_t* gstream, tb_hize_t offset)
 	// seek
 	return (tb_file_seek(fstream->file, offset, TB_FILE_SEEK_BEG) == offset)? 1 : -1;
 }
-static tb_hize_t tb_gstream_file_size(tb_gstream_t* gstream)
-{	
-	// check
-	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
-	tb_assert_and_check_return_val(fstream && fstream->file, 0);
-
-	// the file size
-	return tb_file_size(fstream->file);
-}
 static tb_long_t tb_gstream_file_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
 	// check
@@ -185,9 +176,18 @@ static tb_bool_t tb_gstream_file_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
+	case TB_GSTREAM_CTRL_GET_SIZE:
+		{
+			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(psize, tb_false);
+			*psize = fstream->file? tb_file_size(fstream->file) : 0;
+			return tb_true;
+		}
 	case TB_GSTREAM_CTRL_FILE_SET_MODE:
-		fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
-		return tb_true;
+		{
+			fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
+			return tb_true;
+		}
 	case TB_GSTREAM_CTRL_FILE_SET_HANDLE:
 		{
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -225,7 +225,6 @@ tb_gstream_t* tb_gstream_init_file()
 	gstream->base.read 		= tb_gstream_file_read;
 	gstream->base.writ 		= tb_gstream_file_writ;
 	gstream->base.seek 		= tb_gstream_file_seek;
-	gstream->base.size 		= tb_gstream_file_size;
 	gstream->base.wait 		= tb_gstream_file_wait;
 	gstream->base.ctrl 		= tb_gstream_file_ctrl;
 	gstream->file 			= tb_null;

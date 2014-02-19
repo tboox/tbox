@@ -1074,8 +1074,12 @@ tb_size_t tb_gstream_type(tb_gstream_t const* gstream)
 }
 tb_hize_t tb_gstream_size(tb_gstream_t const* gstream)
 {
+	// check
 	tb_assert_and_check_return_val(gstream, 0);
-	return gstream->size? gstream->size((tb_gstream_t*)gstream) : 0;
+
+	// get the size
+	tb_hize_t size = 0;
+	return tb_gstream_ctrl((tb_gstream_t*)gstream, TB_GSTREAM_CTRL_GET_SIZE, &size)? size : 0;
 }
 tb_hize_t tb_gstream_offset(tb_gstream_t const* gstream)
 {

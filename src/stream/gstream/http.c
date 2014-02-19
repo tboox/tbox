@@ -74,6 +74,7 @@ static tb_long_t tb_gstream_http_open(tb_gstream_t* gstream)
 }
 static tb_long_t tb_gstream_http_clos(tb_gstream_t* gstream)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
@@ -110,41 +111,25 @@ static tb_long_t tb_gstream_http_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 }
 static tb_long_t tb_gstream_http_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
 	// writ data or afwrit data
 	return sync? tb_http_afwrit(hstream->http, data, size) : tb_http_awrit(hstream->http, data, size);
 }
-static tb_hize_t tb_gstream_http_size(tb_gstream_t* gstream)
-{
-	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
-	tb_assert_and_check_return_val(hstream && hstream->http, 0);
-
-	// status
-	tb_http_status_t const* status = tb_http_status(hstream->http);
-	tb_assert_and_check_return_val(status, 0);
-
-	// document_size
-	return (!status->bgzip && !status->bdeflate)? status->document_size : 0;
-}
 static tb_long_t tb_gstream_http_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
-
-	// status
-	tb_http_status_t const* status = tb_http_status(hstream->http);
-	tb_assert_and_check_return_val(status, -1);
-
-	// be able to seek?
-	tb_check_return_val(status->bseeked, -1);
 
 	// seek
 	return tb_http_aseek(hstream->http, offset);
 }
 static tb_long_t tb_gstream_http_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
+	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	tb_assert_and_check_return_val(hstream && hstream->http, -1);
 
@@ -170,6 +155,20 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	// done
 	switch (ctrl)
 	{
+	case TB_GSTREAM_CTRL_GET_SIZE:
+		{
+			// psize
+			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(psize, tb_false);
+
+			// status
+			tb_http_status_t const* status = tb_http_status(hstream->http);
+			tb_assert_and_check_return_val(status, 0);
+
+			// get size
+			*psize = (!status->bgzip && !status->bdeflate)? status->document_size : 0;
+			return tb_true;
+		}
 	case TB_GSTREAM_CTRL_SET_URL:
 		{
 			// url
@@ -494,7 +493,6 @@ tb_gstream_t* tb_gstream_init_http()
 	gstream->base.read 	= tb_gstream_http_read;
 	gstream->base.writ 	= tb_gstream_http_writ;
 	gstream->base.seek 	= tb_gstream_http_seek;
-	gstream->base.size 	= tb_gstream_http_size;
 	gstream->base.wait 	= tb_gstream_http_wait;
 	gstream->base.ctrl 	= tb_gstream_http_ctrl;
 	gstream->base.exit 	= tb_gstream_http_exit;
@@ -511,13 +509,14 @@ fail:
 
 tb_gstream_t* tb_gstream_init_from_http(tb_char_t const* host, tb_size_t port, tb_char_t const* path, tb_bool_t bssl)
 {
+	// check
 	tb_assert_and_check_return_val(host && port && path, tb_null);
 
 	// init http stream
 	tb_gstream_t* gstream = tb_gstream_init_http();
 	tb_assert_and_check_return_val(gstream, tb_null);
 
-	// ioctl
+	// ctrl
 	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
 	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
 	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_PATH, path)) goto fail;
