@@ -536,8 +536,11 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
-	// kill it
+	// kill aico
 	if (sstream->aico) tb_aico_kill(sstream->aico);
+
+	// kill addr
+	if (sstream->addr) tb_aicp_addr_kill(sstream->addr);
 }
 static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
 {	

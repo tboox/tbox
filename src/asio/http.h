@@ -73,71 +73,71 @@
 
 /*! the aicp http open func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param status 			the http status
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param status 	the http status
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_open_func_t)(tb_handle_t handle, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t handle, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv);
 
 /*! the aicp http read func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param data 				the readed data
- * @param real 				the real size, maybe zero
- * @param size 				the need size
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param data 		the readed data
+ * @param real 		the real size, maybe zero
+ * @param size 		the need size
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_read_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the aicp http writ func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param data 				the writed data
- * @param real 				the real size, maybe zero
- * @param size 				the need size
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param data 		the writed data
+ * @param real 		the real size, maybe zero
+ * @param size 		the need size
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_writ_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_writ_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the aicp http seek func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param offset 			the real offset
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param offset 	the real offset
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_seek_func_t)(tb_handle_t handle, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_seek_func_t)(tb_handle_t handle, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
 
 /*! the aicp http sync func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_sync_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_sync_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
 
 /*! the aicp http task func type
  *
- * @param handle 			the http handle
- * @param state 			the astream state
- * @param priv 				the func private data
+ * @param handle 	the http handle
+ * @param state 	the astream state
+ * @param priv 		the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 			(*tb_aicp_http_task_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_task_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

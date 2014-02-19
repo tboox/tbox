@@ -69,17 +69,17 @@ typedef struct __tb_http_t
 	// the stream
 	tb_gstream_t* 		stream;
 
-	// the sstream
+	// the sstream for sock
 	tb_gstream_t* 		sstream;
 
-	// the kstream
-	tb_gstream_t* 		kstream;
+	// the cstream for chunked
+	tb_gstream_t* 		cstream;
 
-	// the zstream
+	// the zstream for gzip/deflate
 	tb_gstream_t* 		zstream;
 
-	// the spool
-	tb_handle_t			spool;
+	// the pool for string
+	tb_handle_t			pool;
 
 	// the step
 	tb_size_t 			step;
@@ -102,7 +102,7 @@ typedef struct __tb_http_t
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-static tb_char_t const* tb_http_methods[] = 
+static tb_char_t const* g_http_methods[] = 
 {
 	"GET"
 , 	"POST"
@@ -131,7 +131,7 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	if (!tb_url_init(&http->option.url)) return tb_false;
 
 	// init head
-	http->option.head = tb_hash_init(8, tb_item_func_str(tb_false, http->spool), tb_item_func_str(tb_false, http->spool));
+	http->option.head = tb_hash_init(8, tb_item_func_str(tb_false, http->pool), tb_item_func_str(tb_false, http->pool));
 	tb_assert_and_check_return_val(http->option.head, tb_false);
 
 	// ok
@@ -157,7 +157,7 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	tb_print("[http]: option: ");
 	tb_print("[http]: option: url: %s", tb_url_get(&http->option.url));
 	tb_print("[http]: option: version: HTTP/1.%1u", http->option.version);
-	tb_print("[http]: option: method: %s", http->option.method < tb_arrayn(tb_http_methods)? tb_http_methods[http->option.method] : "none");
+	tb_print("[http]: option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
 	tb_print("[http]: option: redirect: %d", http->option.redirect);
 	tb_print("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
 	tb_print("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
@@ -325,8 +325,8 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		if (!tb_sstring_init(&s, b, 64)) return -1;
 
 		// init method
-		tb_assert_and_check_return_val(http->option.method < tb_arrayn(tb_http_methods), -1);
-		tb_char_t const* method = tb_http_methods[http->option.method];
+		tb_assert_and_check_return_val(http->option.method < tb_arrayn(g_http_methods), -1);
+		tb_char_t const* method = g_http_methods[http->option.method];
 		tb_assert_and_check_return_val(method, -1);
 
 		// init path
@@ -703,15 +703,15 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	http->size = 0;
 	tb_pstring_clear(&http->data);
 
-	// switch to kstream if chunked
+	// switch to cstream if chunked
 	if (http->status.bchunked)
 	{
-		// init kstream
-		http->stream = http->kstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
+		// init cstream
+		http->stream = http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
 		tb_assert_and_check_return_val(http->stream, -1);
 
-		// open kstream, need not async
-		if (!tb_gstream_bopen(http->kstream)) return -1;
+		// open cstream, need not async
+		if (!tb_gstream_bopen(http->cstream)) return -1;
 
 		// disable seek
 		http->status.bseeked = 0;
@@ -758,11 +758,11 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 			http->zstream = tb_null;
 		}
 
-		// exit kstream
-		if (http->kstream)
+		// exit cstream
+		if (http->cstream)
 		{
-			tb_gstream_exit(http->kstream);
-			http->kstream = tb_null;
+			tb_gstream_exit(http->cstream);
+			http->cstream = tb_null;
 		}
 
 		// switch to sstream
@@ -830,11 +830,11 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 		http->zstream = tb_null;
 	}
 
-	// exit kstream
-	if (http->kstream)
+	// exit cstream
+	if (http->cstream)
 	{
-		tb_gstream_exit(http->kstream);
-		http->kstream = tb_null;
+		tb_gstream_exit(http->cstream);
+		http->cstream = tb_null;
 	}
 
 	// switch to sstream
@@ -876,70 +876,86 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 
 tb_handle_t tb_http_init()
 {
-	// init http
-	tb_http_t* http = tb_malloc0(sizeof(tb_http_t));
-	tb_assert_and_check_return_val(http, tb_null);
+	// done
+	tb_bool_t 	ok = tb_false;
+	tb_http_t* 	http = tb_null;
+	do
+	{
+		// make http
+		http = tb_malloc0(sizeof(tb_http_t));
+		tb_assert_and_check_break(http);
 
-	// init stream
-	http->stream = http->sstream = tb_gstream_init_sock();
-	tb_assert_and_check_goto(http->stream, fail);
+		// init stream
+		http->stream = http->sstream = tb_gstream_init_sock();
+		tb_assert_and_check_break(http->stream);
 
-	// init spool
-	http->spool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
-	tb_assert_and_check_goto(http->spool, fail);
+		// init pool
+		http->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+		tb_assert_and_check_break(http->pool);
 
-	// init data
-	if (!tb_pstring_init(&http->data)) goto fail;
+		// init data
+		if (!tb_pstring_init(&http->data)) break;
 
-	// init option
-	if (!tb_http_option_init(http)) goto fail;
+		// init option
+		if (!tb_http_option_init(http)) break;
 
-	// init status
-	if (!tb_http_status_init(http)) goto fail;
+		// init status
+		if (!tb_http_status_init(http)) break;
 
-	// ok
-	return (tb_handle_t)http;
+		// ok
+		ok = tb_true;
 
-fail:
-	if (http) tb_http_exit((tb_handle_t)http);
-	return tb_null;
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		if (http) tb_http_exit(http);
+		http = tb_null;
+	}
+
+	// ok?
+	return http;
 }
 tb_void_t tb_http_exit(tb_handle_t handle)
 {
-	if (handle)
-	{
-		tb_http_t* http = (tb_http_t*)handle;
+	// check
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return(http);
 
-		// close it
-		tb_http_bclos(handle);
-		
-		// exit status
-		tb_http_status_exit(http);
+	// close it
+	tb_http_bclos(handle);
 
-		// exit option
-		tb_http_option_exit(http);
+	// exit zstream
+	if (http->zstream) tb_gstream_exit(http->zstream);
+	http->zstream = tb_null;
 
-		// exit data
-		tb_pstring_exit(&http->data);
+	// exit cstream
+	if (http->cstream) tb_gstream_exit(http->cstream);
+	http->cstream = tb_null;
 
-		// exit spool
-		if (http->spool) tb_spool_exit(http->spool);
-		http->spool = tb_null;
+	// exit sstream
+	if (http->sstream) tb_gstream_exit(http->sstream);
+	http->sstream = tb_null;
 
-		// exit zstream
-		if (http->zstream) tb_gstream_exit(http->zstream);
-		http->zstream = tb_null;
+	// exit stream
+	http->stream = tb_null;
+	
+	// exit status
+	tb_http_status_exit(http);
 
-		// exit sstream
-		if (http->sstream) tb_gstream_exit(http->sstream);
-		http->sstream = tb_null;
+	// exit option
+	tb_http_option_exit(http);
 
-		// exit stream
-		http->stream = tb_null;
+	// exit data
+	tb_pstring_exit(&http->data);
 
-		// free it
-		tb_free(http);
-	}
+	// exit pool
+	if (http->pool) tb_spool_exit(http->pool);
+	http->pool = tb_null;
+
+	// free it
+	tb_free(http);
 }
 tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 {
@@ -992,6 +1008,7 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 }
 tb_long_t tb_http_aopen(tb_handle_t handle)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
@@ -1058,31 +1075,31 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 			http->zstream = tb_null;
 		}
 
-		// exit kstream
-		if (http->kstream)
+		// exit cstream
+		if (http->cstream)
 		{
-			tb_gstream_exit(http->kstream);
-			http->kstream = tb_null;
+			tb_gstream_exit(http->cstream);
+			http->cstream = tb_null;
 		}
 
 		// switch to sstream
 		http->stream = http->sstream;
 
 		// connected?
-		if (http->step & TB_HTTP_STEP_CONN) 
+		if ((http->step & TB_HTTP_STEP_CONN) && http->sstream) 
 		{
 			// not keep-alive?
 			if (!http->status.balived)
 			{
 				// close stream
-				tb_long_t r = tb_gstream_aclos(http->stream);
+				tb_long_t r = tb_gstream_aclos(http->sstream);
 				tb_assert_and_check_return_val(r >= 0, -1);
 
 				// continue ?
 				tb_check_return_val(r, 0);
 			}
 			// clear stream
-			else tb_gstream_clear(http->stream);
+			else tb_gstream_clear(http->sstream);
 		}
 
 		// clear status
