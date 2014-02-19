@@ -114,13 +114,6 @@ static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t const* da
 
 	return left? (tb_long_t)(size) : -1; // force end if full
 }
-static tb_hize_t tb_gstream_data_size(tb_gstream_t* gstream)
-{
-	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream, 0);
-
-	return dstream->size;
-}
 static tb_long_t tb_gstream_data_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
@@ -150,11 +143,19 @@ static tb_long_t tb_gstream_data_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 }
 static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
 {
+	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream, tb_false);
 
 	switch (ctrl)
 	{
+	case TB_GSTREAM_CTRL_GET_SIZE:
+		{
+			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(psize, tb_false);
+			*psize = dstream->size;
+			return tb_true;
+		}
 	case TB_GSTREAM_CTRL_DATA_SET_DATA:
 		{
 			dstream->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
@@ -186,7 +187,6 @@ tb_gstream_t* tb_gstream_init_data()
 	gstream->read 	= tb_gstream_data_read;
 	gstream->writ 	= tb_gstream_data_writ;
 	gstream->seek 	= tb_gstream_data_seek;
-	gstream->size 	= tb_gstream_data_size;
 	gstream->wait 	= tb_gstream_data_wait;
 	gstream->ctrl 	= tb_gstream_data_ctrl;
 

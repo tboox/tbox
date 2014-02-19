@@ -344,7 +344,7 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// free it
 	tb_free(http);
 }
-tb_bool_t tb_aicp_open_impl(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aicp_http_open_impl(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;

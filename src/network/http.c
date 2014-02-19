@@ -1148,7 +1148,9 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
-	tb_assert_and_check_return_val(http->status.bseeked, -1);
+
+	// be able to seek?
+	tb_check_return_val(http->status.bseeked, -1);
 
 	// check stream
 	tb_long_t r = -1;
@@ -1167,8 +1169,12 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 }
 tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, tb_false);
+
+	// be able to seek?
+	tb_check_return_val(http->status.bseeked, tb_false);
 
 	// init step
 	http->step &= ~TB_HTTP_STEP_SEEK;

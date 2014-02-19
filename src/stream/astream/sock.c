@@ -699,6 +699,7 @@ tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, 
 	// ctrl
 	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_HOST, host)) goto fail;
 	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_SSL, bssl)) goto fail;
 	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
