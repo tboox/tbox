@@ -61,7 +61,7 @@ tb_void_t tb_url_exit(tb_url_t* url)
 		tb_pstring_exit(&url->urls);
 	}
 }
-tb_void_t tb_url_clear(tb_url_t* url)
+tb_void_t tb_url_cler(tb_url_t* url)
 {
 	tb_assert_and_check_return(url);
 
@@ -155,10 +155,11 @@ tb_char_t const* tb_url_get(tb_url_t* url)
 }
 tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 {
+	// check
 	tb_assert_and_check_return_val(url && u, tb_false);
 	
 	// init
-	tb_url_clear(url);
+	tb_url_cler(url);
 
 	// parse proto
 	tb_char_t const* 	p = u;
@@ -274,7 +275,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	return tb_true;
 
 fail:
-	tb_url_clear(url);
+	tb_url_cler(url);
 	return tb_false;
 }
 tb_void_t tb_url_cpy(tb_url_t* url, tb_url_t const* u)
