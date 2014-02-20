@@ -150,6 +150,7 @@ typedef enum __tb_gstream_ctrl_e
 ,	TB_GSTREAM_CTRL_SOCK_SET_TYPE 			= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_SOCK, 1)
 ,	TB_GSTREAM_CTRL_SOCK_SET_HANDLE 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_SOCK, 2)
 ,	TB_GSTREAM_CTRL_SOCK_GET_HANDLE 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_SOCK, 3)
+,	TB_GSTREAM_CTRL_SOCK_KEEP_ALIVE 		= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_SOCK, 4)
 
 	// the gstream for http
 ,	TB_GSTREAM_CTRL_HTTP_GET_HEAD 			= TB_GSTREAM_CTRL(TB_GSTREAM_TYPE_HTTP, 1)
@@ -454,12 +455,6 @@ tb_char_t const* 	tb_gstream_state_cstr(tb_size_t state);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_gstream_beof(tb_gstream_t* gstream);
-
-/*! clear stream cache and reset status, but not close it
- *
- * @param gstream 	the stream
- */
-tb_void_t 			tb_gstream_clear(tb_gstream_t* gstream);
 
 /*! async open, allow multiple called before closing 
  *

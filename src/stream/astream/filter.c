@@ -108,10 +108,7 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 		tb_atomic_set(&fstream->base.opened, 1);
 
 		// done func
-		func(astream, TB_ASTREAM_STATE_OK, fstream->priv);
-
-		// ok
-		return tb_true;
+		return func(astream, TB_ASTREAM_STATE_OK, fstream->priv);
 	}
 
 	// save func and priv
@@ -273,7 +270,7 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 		else
 		{
 			// done func, no data and finished
-			func((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
+			ok = func((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
 		}
 	}
 	// post writ

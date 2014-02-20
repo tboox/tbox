@@ -426,23 +426,6 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeo
 	// ok?
 	return ok;
 }
-tb_void_t tb_gstream_clear(tb_gstream_t* gstream)
-{
-	// check stream
-	tb_assert_and_check_return(gstream);
-
-	// check cache
-	tb_assert_and_check_return(tb_qbuffer_maxn(&gstream->cache));
-
-	// reset offset
-	gstream->offset = 0;
-
-	// reset to readed-mode
-	gstream->bwrited = 0;
-
-	// clear cache
-	tb_qbuffer_clear(&gstream->cache);
-}
 tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 {
 	// check

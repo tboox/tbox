@@ -4,7 +4,7 @@
 #include "../demo.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * callback
+ * implementation
  */
 static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
 {
@@ -12,10 +12,10 @@ static tb_bool_t tb_http_demo_head_func(tb_handle_t http, tb_char_t const* line,
 	tb_assert_and_check_return_val(http && line, tb_false);
 
 	// cookies
-	tb_cookies_t* 		cookies = priv;
+	tb_cookies_t* cookies = priv;
 
 	// trace
-	tb_print("[demo]: response: %s", line);
+	tb_print("head: %s", line);
 
 	// cookie
 	if (cookies && !tb_strnicmp(line, "Set-Cookie", 10))
@@ -74,7 +74,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	tb_hong_t t = tb_mclock();
 	if (!tb_http_bopen(http)) goto end;
 	t = tb_mclock() - t;
-	tb_print("[demo]: open: %llu ms", t);
+	tb_print("open: %llu ms", t);
 
 	// writ post
 	if (post_size)
@@ -91,7 +91,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	{
 		// read data
 		tb_long_t real = tb_http_aread(http, data, 8192);
-		tb_print("[demo]: read: %d", real);
+		tb_print("read: %d", real);
 		if (real > 0)
 		{
 			// dump data
@@ -114,7 +114,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 		else if (!real) 
 		{
 			// wait
-			tb_print("[demo]: wait");
+			tb_print("wait");
 			tb_long_t e = tb_http_wait(http, TB_AIOE_CODE_RECV, timeout);
 			tb_assert_and_check_break(e >= 0);
 

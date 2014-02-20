@@ -122,7 +122,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 
 	} while (0);
 
-	// failed? // kill aicp
+	// failed? kill aicp
 	if (!ok) tb_aicp_kill(tb_astream_aicp(ast));
 
 	// ok?

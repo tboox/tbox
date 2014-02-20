@@ -124,6 +124,7 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_SOCK_SET_TYPE 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 1)
 ,	TB_ASTREAM_CTRL_SOCK_SET_HANDLE 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 2)
 ,	TB_ASTREAM_CTRL_SOCK_GET_HANDLE 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 3)
+,	TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE 		= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_SOCK, 4)
 
 	// the astream for http
 ,	TB_ASTREAM_CTRL_HTTP_GET_HEAD 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_HTTP, 1)
@@ -215,7 +216,7 @@ struct __tb_astream_t;
  * @param state 			the stream state
  * @param priv 				the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 					tb_true: ok, tb_false: error, but not break aicp
  */
 typedef tb_bool_t 			(*tb_astream_open_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
 
@@ -252,7 +253,7 @@ typedef tb_bool_t 			(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, t
  * @param offset 			the real offset
  * @param priv 				the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 					tb_true: ok, tb_false: error, but not break aicp
  */
 typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
 
@@ -262,7 +263,7 @@ typedef tb_bool_t 			(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, t
  * @param state 			the stream state
  * @param priv 				the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 					tb_true: ok, tb_false: error, but not break aicp
  */
 typedef tb_bool_t 			(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
 
@@ -272,7 +273,7 @@ typedef tb_bool_t 			(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, t
  * @param state 			the stream state
  * @param priv 				the func private data
  *
- * @return 					tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 					tb_true: ok, tb_false: error, but not break aicp
  */
 typedef tb_bool_t 			(*tb_astream_task_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
 

@@ -53,6 +53,7 @@ static tb_demo_t g_demo[] =
 
 	// asio
 ,	TB_DEMO_MAIN_ITEM(asio_addr)
+,	TB_DEMO_MAIN_ITEM(asio_http)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopc)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopd)
 ,	TB_DEMO_MAIN_ITEM(asio_aicpc)

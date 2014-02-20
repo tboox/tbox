@@ -90,8 +90,10 @@ typedef struct __tb_http_t
 	// the redirect count
 	tb_size_t 			rdtn;
 
-	// the data && size for request and response
+	// the data for request and response
 	tb_pstring_t 		data;
+
+	// the size for request and response
 	tb_size_t 			size;
 
 	/// the real post size
@@ -319,10 +321,10 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// check size
 		tb_assert_and_check_return_val(!http->size, -1);
 
-		// init string
-		tb_char_t  		b[64];
-		tb_sstring_t 	s;
-		if (!tb_sstring_init(&s, b, 64)) return -1;
+		// init the head value
+		tb_char_t  		data[64];
+		tb_sstring_t 	value;
+		if (!tb_sstring_init(&value, data, 64)) return -1;
 
 		// init method
 		tb_assert_and_check_return_val(http->option.method < tb_arrayn(g_http_methods), -1);
@@ -350,23 +352,22 @@ static tb_long_t tb_http_request(tb_http_t* http)
 			tb_hash_set(http->option.head, "Connection", "close");
 
 		// init range
-		tb_sstring_clear(&s);
 		if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
-			tb_sstring_cstrfcpy(&s, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
+			tb_sstring_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
 		else if (http->option.range.bof && !http->option.range.eof)
-			tb_sstring_cstrfcpy(&s, "bytes=%llu-", http->option.range.bof);
+			tb_sstring_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
 		else if (!http->option.range.bof && http->option.range.eof)
-			tb_sstring_cstrfcpy(&s, "bytes=0-%llu", http->option.range.eof);
+			tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
 
-		if (tb_sstring_size(&s)) 
-			tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&s));
+		if (tb_sstring_size(&value)) 
+			tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&value));
 
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// append post size
-			tb_sstring_cstrfcpy(&s, "%llu", http->option.post);
-			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&s));
+			tb_sstring_cstrfcpy(&value, "%llu", http->option.post);
+			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&value));
 		}
 
 		// check head
@@ -407,8 +408,8 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// append end
 		tb_pstring_cstrcat(&http->data, "\r\n");
 
-		// exit string
-		tb_sstring_exit(&s);
+		// exit the head value
+		tb_sstring_exit(&value);
 
 		// check request
 		tb_assert_and_check_return_val(tb_pstring_size(&http->data) && tb_pstring_cstr(&http->data), -1);
@@ -417,7 +418,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		tb_trace_impl("request:\n%s", tb_pstring_cstr(&http->data));
 	}
 
-	// the head data && size
+	// the head data and size
 	tb_char_t const* 	head_data = tb_pstring_cstr(&http->data);
 	tb_size_t 			head_size = tb_pstring_size(&http->data);
 	tb_assert_and_check_return_val(head_data && head_size, -1);
@@ -498,7 +499,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 static tb_bool_t tb_http_response_done(tb_http_t* http)
 {
 	// check
-	tb_assert_and_check_return_val(http, tb_false);
+	tb_assert_and_check_return_val(http && http->sstream, tb_false);
 
 	// line && size
 	tb_char_t const* 	line = tb_pstring_cstr(&http->data);
@@ -625,7 +626,11 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 		// parse connection
 		else if (!tb_strnicmp(line, "Connection", 10))
 		{
+			// keep alive?
 			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
+
+			// ctrl stream for sock
+			if (!tb_gstream_ctrl(http->sstream, TB_GSTREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
 	}
 
@@ -707,11 +712,18 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	if (http->status.bchunked)
 	{
 		// init cstream
-		http->stream = http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
-		tb_assert_and_check_return_val(http->stream, -1);
+		if (http->cstream)
+		{
+			if (!tb_gstream_ctrl(http->cstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, http->stream)) return -1;
+		}
+		else http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
+		tb_assert_and_check_return_val(http->cstream, -1);
 
 		// open cstream, need not async
 		if (!tb_gstream_bopen(http->cstream)) return -1;
+
+		// using cstream
+		http->stream = http->cstream;
 
 		// disable seek
 		http->status.bseeked = 0;
@@ -721,11 +733,18 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
 	{
 		// init zstream
-		http->stream = http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
-		tb_assert_and_check_return_val(http->stream, -1);
+		if (http->zstream)
+		{
+			if (!tb_gstream_ctrl(http->zstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, http->stream)) return -1;
+		}
+		else http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+		tb_assert_and_check_return_val(http->zstream, -1);
 
 		// open zstream, need not async
 		if (!tb_gstream_bopen(http->zstream)) return -1;
+
+		// using zstream
+		http->stream = http->zstream;
 
 		// disable seek
 		http->status.bseeked = 0;
@@ -1068,39 +1087,15 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 	// have step? clear it
 	if (http->step)
 	{	
-		// exit zstream
-		if (http->zstream)
-		{
-			tb_gstream_exit(http->zstream);
-			http->zstream = tb_null;
-		}
+		// close stream
+		tb_long_t r = tb_gstream_aclos(http->stream);
+		tb_assert_and_check_return_val(r >= 0, -1);
 
-		// exit cstream
-		if (http->cstream)
-		{
-			tb_gstream_exit(http->cstream);
-			http->cstream = tb_null;
-		}
+		// continue ?
+		tb_check_return_val(r, 0);
 
 		// switch to sstream
 		http->stream = http->sstream;
-
-		// connected?
-		if ((http->step & TB_HTTP_STEP_CONN) && http->sstream) 
-		{
-			// not keep-alive?
-			if (!http->status.balived)
-			{
-				// close stream
-				tb_long_t r = tb_gstream_aclos(http->sstream);
-				tb_assert_and_check_return_val(r >= 0, -1);
-
-				// continue ?
-				tb_check_return_val(r, 0);
-			}
-			// clear stream
-			else tb_gstream_clear(http->sstream);
-		}
 
 		// clear status
 		tb_http_status_cler(http);

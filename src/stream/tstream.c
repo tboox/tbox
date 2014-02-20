@@ -217,6 +217,9 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
+
+		// break;
+		bwrit = tb_false;
 	}
 
 	// continue to writ or break it
@@ -238,10 +241,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 	// done func
-	tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tstream->size, trate, tstream->priv);
-
-	// ok
-	return tb_true;
+	return tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tstream->size, trate, tstream->priv);
 }
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -356,21 +356,6 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 	// closed or failed?
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
-#if 0
-		// flush it
-		if (tstream->type == TB_TSTREAM_TYPE_AG && ((tb_tstream_ag_t*)tstream)->ostream)
-			tb_gstream_bfwrit(((tb_tstream_ag_t*)tstream)->ostream, tb_null, 0);
-
-		// the time
-		tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
-
-		// compute the total rate
-		tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
-
-		// done func
-		tstream->func(state, tstream->size, trate, tstream->priv);
-#else
-
 		// sync it if closed
 		tb_bool_t bend = tb_true;
 		if (state == TB_ASTREAM_STATE_CLOSED)
@@ -393,7 +378,9 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			// done func
 			tstream->func(state, tstream->size, trate, tstream->priv);
 		}
-#endif
+
+		// break
+		bread = tb_false;
 	}
 
 	// clear pending
@@ -412,6 +399,7 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 	tb_trace_impl("seek: offset: %llu, state: %s", offset, tb_astream_state_cstr(state));
 
 	// done
+	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok?
@@ -439,14 +427,14 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		tstream->func(state, tstream->size, 0, tstream->priv);
+		ok = tstream->func(state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
 	}
 
-	// ok
-	return tb_true;
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
@@ -458,6 +446,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	tb_trace_impl("open: state: %s", tb_astream_state_cstr(state));
 
 	// done
+	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok?
@@ -497,14 +486,14 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		tstream->func(state, tstream->size, 0, tstream->priv);
+		ok = tstream->func(state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
 	}
 
 	// ok
-	return tb_true;
+	return ok;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
