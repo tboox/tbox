@@ -55,10 +55,13 @@ typedef struct __tb_astream_sock_t
 	tb_ipv4_t 					ipv4;
 
 	// the sock type
-	tb_size_t 					type : 23;
+	tb_uint32_t 				type 	: 30;
 
 	// the sock bref
-	tb_size_t 					bref : 1;
+	tb_uint32_t 				bref 	: 1;
+
+	// keep alive after being closed?
+	tb_uint32_t 				balived : 1;
 
 	// the sock data
 	tb_byte_t* 					data;
@@ -225,6 +228,19 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return_val(sstream && sstream->type && func, tb_false);
+
+	// keep alive and have been opened? reopen it directly
+	if (sstream->balived && sstream->addr && sstream->aico)
+	{
+		// opened
+		tb_atomic_set(&sstream->base.opened, 1);
+
+		// done func
+		sstream->func.open((tb_astream_t*)sstream, TB_ASTREAM_STATE_OK, sstream->priv);
+
+		// ok
+		return tb_true;
+	}
 
 	// get the host from url
 	tb_char_t const* host = tb_url_host_get(&astream->url);
@@ -538,15 +554,17 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 
 	// kill aico
 	if (sstream->aico) tb_aico_kill(sstream->aico);
-
 	// kill addr
-	if (sstream->addr) tb_aicp_addr_kill(sstream->addr);
+	else if (sstream->addr) tb_aicp_addr_kill(sstream->addr);
 }
 static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
+
+	// keep alive? not close it
+	tb_check_return(!sstream->balived);
 
 	// exit aico
 	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
@@ -569,6 +587,22 @@ static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
+
+	// exit aico
+	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
+	sstream->aico = tb_null;
+
+	// exit addr
+	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bcalling);
+	sstream->addr = tb_null;
+
+	// exit it
+	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
+	sstream->sock = tb_null;
+	sstream->bref = 0;
+
+	// exit ipv4
+	tb_ipv4_clr(&sstream->ipv4);
 
 	// exit data
 	if (sstream->data) tb_free(sstream->data);
@@ -643,6 +677,13 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = sstream->sock;
+			return tb_true;
+		}
+	case TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE:
+		{
+			// keep alive?
+			tb_bool_t balived = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+			sstream->balived = balived? 1 : 0;
 			return tb_true;
 		}
 	default:

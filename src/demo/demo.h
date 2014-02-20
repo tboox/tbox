@@ -62,6 +62,7 @@ TB_DEMO_MAIN_DECL(libm_integer);
 
 // asio
 TB_DEMO_MAIN_DECL(asio_addr);
+TB_DEMO_MAIN_DECL(asio_http);
 TB_DEMO_MAIN_DECL(asio_aiopc);
 TB_DEMO_MAIN_DECL(asio_aiopd);
 TB_DEMO_MAIN_DECL(asio_aicpc);

@@ -31,60 +31,23 @@
 #include "../network/http.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
- */
-
-/// open
-#define tb_aicp_http_open(handle, func, priv) 								tb_aicp_http_open_impl(handle, func, priv __tb_debug_vals__)
-
-/// read
-#define tb_aicp_http_read(handle, maxn, func, priv) 						tb_aicp_http_read_impl(handle, maxn, func, priv __tb_debug_vals__)
-
-/// writ
-#define tb_aicp_http_writ(handle, data, size, func, priv) 					tb_aicp_http_writ_impl(handle, data, size, func, priv __tb_debug_vals__)
-
-/// seek
-#define tb_aicp_http_seek(handle, offset, func, priv) 						tb_aicp_http_seek_impl(handle, offset, func, priv __tb_debug_vals__)
-
-/// sync
-#define tb_aicp_http_sync(handle, bclosing, func, priv) 					tb_aicp_http_sync_impl(handle, bclosing, func, priv __tb_debug_vals__)
-
-/// task
-#define tb_aicp_http_task(handle, delay, func, priv) 						tb_aicp_http_task_impl(handle, delay, func, priv __tb_debug_vals__)
-
-/// open and read
-#define tb_aicp_http_oread(handle, maxn, func, priv) 						tb_aicp_http_oread_impl(handle, maxn, func, priv __tb_debug_vals__)
-
-/// open and writ
-#define tb_aicp_http_owrit(handle, data, size, func, priv) 					tb_aicp_http_owrit_impl(handle, data, size, func, priv __tb_debug_vals__)
-
-/// open and seek
-#define tb_aicp_http_oseek(handle, offset, func, priv) 						tb_aicp_http_oseek_impl(handle, offset, func, priv __tb_debug_vals__)
-
-/// read after delay
-#define tb_aicp_http_read_after(handle, delay, maxn, func, priv) 			tb_aicp_http_read_after_impl(handle, delay, maxn, func, priv __tb_debug_vals__)
-
-/// writ after delay
-#define tb_aicp_http_writ_after(handle, delay, data, size, func, priv) 		tb_aicp_http_writ_after_impl(handle, delay, data, size, func, priv __tb_debug_vals__)
-
-/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
 /*! the aicp http open func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param status 	the http status
  * @param priv 		the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t handle, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv);
 
 /*! the aicp http read func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param data 		the readed data
  * @param real 		the real size, maybe zero
@@ -93,11 +56,11 @@ typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t handle, tb_size_t sta
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the aicp http writ func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param data 		the writed data
  * @param real 		the real size, maybe zero
@@ -106,38 +69,38 @@ typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t handle, tb_size_t sta
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_writ_func_t)(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_writ_func_t)(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the aicp http seek func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param offset 	the real offset
  * @param priv 		the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_seek_func_t)(tb_handle_t handle, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_seek_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
 
 /*! the aicp http sync func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param priv 		the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_sync_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_sync_func_t)(tb_handle_t http, tb_size_t state, tb_pointer_t priv);
 
 /*! the aicp http task func type
  *
- * @param handle 	the http handle
+ * @param http 	the http handle
  * @param state 	the astream state
  * @param priv 		the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
+ * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_http_task_func_t)(tb_handle_t handle, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_http_task_func_t)(tb_handle_t http, tb_size_t state, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -179,7 +142,7 @@ tb_void_t 			tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_open_impl(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t privhttp);
 
 /*! read the http 
  *
@@ -190,7 +153,7 @@ tb_bool_t 			tb_aicp_http_open_impl(tb_handle_t handle, tb_aicp_http_open_func_t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_read_impl(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t privhttp);
 
 /*! writ the http 
  *
@@ -202,7 +165,7 @@ tb_bool_t 			tb_aicp_http_read_impl(tb_handle_t handle, tb_size_t maxn, tb_aicp_
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_writ_impl(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t privhttp);
 
 /*! seek the http
  *
@@ -213,7 +176,7 @@ tb_bool_t 			tb_aicp_http_writ_impl(tb_handle_t handle, tb_byte_t const* data, t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_seek_impl(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t privhttp);
 
 /*! sync the http
  *
@@ -224,7 +187,7 @@ tb_bool_t 			tb_aicp_http_seek_impl(tb_handle_t handle, tb_hize_t offset, tb_aic
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_sync_impl(tb_handle_t handle, tb_bool_t bclosing, tb_aicp_http_sync_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_sync(tb_handle_t handle, tb_bool_t bclosing, tb_aicp_http_sync_func_t func, tb_pointer_t privhttp);
 
 /*! task the http
  *
@@ -235,7 +198,7 @@ tb_bool_t 			tb_aicp_http_sync_impl(tb_handle_t handle, tb_bool_t bclosing, tb_a
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_task_impl(tb_handle_t handle, tb_size_t delay, tb_aicp_http_task_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_task_func_t func, tb_pointer_t privhttp);
 
 /*! open and read the http, open it first if not opened 
  *
@@ -246,7 +209,7 @@ tb_bool_t 			tb_aicp_http_task_impl(tb_handle_t handle, tb_size_t delay, tb_aicp
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_oread_impl(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t privhttp);
 
 /*! open and writ the http, open it first if not opened 
  *
@@ -258,7 +221,7 @@ tb_bool_t 			tb_aicp_http_oread_impl(tb_handle_t handle, tb_size_t maxn, tb_aicp
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_owrit_impl(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t privhttp);
 
 /*! open and seek the http, open it first if not opened 
  *
@@ -269,7 +232,7 @@ tb_bool_t 			tb_aicp_http_owrit_impl(tb_handle_t handle, tb_byte_t const* data, 
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_oseek_impl(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t privhttp);
 
 /*! read the http after the delay time
  *
@@ -281,7 +244,7 @@ tb_bool_t 			tb_aicp_http_oseek_impl(tb_handle_t handle, tb_hize_t offset, tb_ai
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_read_after_impl(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t privhttp);
 
 /*! writ the http after the delay time
  *
@@ -294,7 +257,7 @@ tb_bool_t 			tb_aicp_http_read_after_impl(tb_handle_t handle, tb_size_t delay, t
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_writ_after_impl(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aicp_http_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t privhttp);
 
 /*! the http aicp
  *

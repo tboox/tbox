@@ -23,6 +23,7 @@ demo_C_FILES 			+= \
 						libm/double \
 						libm/integer \
 						asio/addr \
+						asio/http \
 						asio/aiopc \
 						asio/aiopd \
 						asio/aicpc \
