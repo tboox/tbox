@@ -71,8 +71,9 @@ tbox_C_FILES 			+= \
 						stream/tstream \
 						filter/filter \
 						filter/zip \
-						filter/chunked \
+						filter/cache \
 						filter/charset \
+						filter/chunked \
 						object/object \
 						object/null \
 						object/data \

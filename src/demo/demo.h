@@ -100,9 +100,11 @@ TB_DEMO_MAIN_DECL(stream_astream);
 TB_DEMO_MAIN_DECL(stream_gstream);
 TB_DEMO_MAIN_DECL(stream_gstream_zip);
 TB_DEMO_MAIN_DECL(stream_gstream_null);
+TB_DEMO_MAIN_DECL(stream_gstream_cache);
 TB_DEMO_MAIN_DECL(stream_gstream_charset);
 TB_DEMO_MAIN_DECL(stream_astream_zip);
 TB_DEMO_MAIN_DECL(stream_astream_null);
+TB_DEMO_MAIN_DECL(stream_astream_cache);
 TB_DEMO_MAIN_DECL(stream_astream_charset);
 
 // string

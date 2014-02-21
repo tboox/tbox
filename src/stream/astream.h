@@ -518,6 +518,15 @@ tb_astream_t* 		tb_astream_init_filter_from_null(tb_astream_t* astream);
  */
 tb_astream_t* 		tb_astream_init_filter_from_zip(tb_astream_t* astream, tb_size_t algo, tb_size_t action);
 
+/*! init filter stream from cache
+ *
+ * @param astream 	the stream
+ * @param size 		the initial cache size, using the default size if be zero
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_filter_from_cache(tb_astream_t* astream, tb_size_t size);
+
 /*! init filter stream from charset
  *
  * @param astream 	the stream

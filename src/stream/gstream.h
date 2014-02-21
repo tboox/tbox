@@ -400,6 +400,15 @@ tb_gstream_t* 		tb_gstream_init_filter_from_null(tb_gstream_t* gstream);
  */
 tb_gstream_t* 		tb_gstream_init_filter_from_zip(tb_gstream_t* gstream, tb_size_t algo, tb_size_t action);
 
+/*! init filter stream from cache
+ *
+ * @param gstream 	the stream
+ * @param size 		the initial cache size, using the default size if be zero
+ *
+ * @return 			the stream
+ */
+tb_gstream_t* 		tb_gstream_init_filter_from_cache(tb_gstream_t* gstream, tb_size_t size);
+
 /*! init filter stream from charset
  *
  * @param gstream 	the stream
