@@ -87,9 +87,9 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	tb_trace_impl("isize: %lu", tb_bstream_size(istream));
 
 	// the odata
-	tb_byte_t* 			ob = (tb_byte_t*)tb_bstream_beg(ostream);
 	tb_byte_t* 			op = (tb_byte_t*)tb_bstream_pos(ostream);
 	tb_byte_t* 			oe = (tb_byte_t*)tb_bstream_end(ostream);
+	tb_byte_t* 			ob = op;
 
 	// parse chunked head and chunked tail
 	if (!cfilter->size || cfilter->read >= cfilter->size)

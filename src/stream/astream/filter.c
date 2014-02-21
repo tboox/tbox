@@ -533,6 +533,33 @@ fail:
 	if (fstream) tb_astream_exit(fstream, tb_false);
 	return tb_null;
 }
+tb_astream_t* tb_astream_init_filter_from_cache(tb_astream_t* astream, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(astream, tb_null);
+
+	// the aicp
+	tb_aicp_t* aicp = tb_astream_aicp(astream);
+	tb_assert_and_check_return_val(aicp, tb_null);
+
+	// init filter stream
+	tb_astream_t* fstream = tb_astream_init_filter(aicp);
+	tb_assert_and_check_return_val(fstream, tb_null);
+
+	// set astream
+	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+
+	// set filter
+	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_cache(size);
+	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
+	
+	// ok
+	return fstream;
+fail:
+	if (fstream) tb_astream_exit(fstream, tb_false);
+	return tb_null;
+}
 tb_astream_t* tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_size_t fr, tb_size_t to)
 {
 	// check

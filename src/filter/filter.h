@@ -59,6 +59,14 @@ tb_filter_t* 		tb_filter_init_from_charset(tb_size_t fr, tb_size_t to);
  */
 tb_filter_t* 		tb_filter_init_from_chunked(tb_bool_t dechunked);
 
+/*! init filter from cache
+ *
+ * @param size 		the initial cache size, using the default size if be zero
+ *
+ * @return 			the filter
+ */
+tb_filter_t* 		tb_filter_init_from_cache(tb_size_t size);
+
 /*! exit filter
  *
  * @param filter 	the filter

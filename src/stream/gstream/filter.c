@@ -350,7 +350,6 @@ fail:
 	if (fstream) tb_gstream_exit(fstream);
 	return tb_null;
 }
-
 tb_gstream_t* tb_gstream_init_filter_from_zip(tb_gstream_t* gstream, tb_size_t algo, tb_size_t action)
 {
 	// check
@@ -366,6 +365,29 @@ tb_gstream_t* tb_gstream_init_filter_from_zip(tb_gstream_t* gstream, tb_size_t a
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
 	((tb_gstream_filter_t*)fstream)->filter = tb_filter_init_from_zip(algo, action);
+	tb_assert_and_check_goto(((tb_gstream_filter_t*)fstream)->filter, fail);
+	
+	// ok
+	return fstream;
+fail:
+	if (fstream) tb_gstream_exit(fstream);
+	return tb_null;
+}
+tb_gstream_t* tb_gstream_init_filter_from_cache(tb_gstream_t* gstream, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(gstream, tb_null);
+
+	// init filter stream
+	tb_gstream_t* fstream = tb_gstream_init_filter();
+	tb_assert_and_check_return_val(fstream, tb_null);
+
+	// set gstream
+	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+
+	// set filter
+	((tb_gstream_filter_t*)fstream)->bref = tb_false;
+	((tb_gstream_filter_t*)fstream)->filter = tb_filter_init_from_cache(size);
 	tb_assert_and_check_goto(((tb_gstream_filter_t*)fstream)->filter, fail);
 	
 	// ok

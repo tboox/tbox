@@ -80,18 +80,29 @@ tb_void_t tb_bstream_sync(tb_bstream_t* bst)
  */
 tb_byte_t const* tb_bstream_beg(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst, tb_null);
+
+	// the head
 	return bst->e? (bst->e - bst->n) : tb_null;
 }
 tb_byte_t const* tb_bstream_pos(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst && bst->p <= bst->e, tb_null);
+
+	// sync
 	tb_bstream_sync(bst);
+
+	// the position 
 	return bst->p;
 }
 tb_byte_t const* tb_bstream_end(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst, tb_null);
+
+	// the end
 	return bst->e;
 }
 
@@ -100,23 +111,40 @@ tb_byte_t const* tb_bstream_end(tb_bstream_t* bst)
  */
 tb_size_t tb_bstream_size(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst, 0);
+
+	// the size
 	return bst->n;
 }
 tb_size_t tb_bstream_offset(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst, 0);
+
+	// sync
+	tb_bstream_sync(bst);
+
+	// the offset
 	return (((bst->p + bst->n) > bst->e)? (bst->p + bst->n - bst->e) : 0);
 }
 tb_size_t tb_bstream_left(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst && bst->p <= bst->e, 0);
+
+	// sync
 	tb_bstream_sync(bst);
+
+	// the left
 	return (bst->e - bst->p);
 }
 tb_size_t tb_bstream_left_bits(tb_bstream_t* bst)
 {
+	// check
 	tb_assert_and_check_return_val(bst, 0);
+
+	// the left bits
 	return ((bst->p < bst->e)? (((bst->e - bst->p) << 3) - bst->b) : 0);
 }
 tb_bool_t tb_bstream_valid(tb_bstream_t* bst)
@@ -130,13 +158,20 @@ tb_bool_t tb_bstream_valid(tb_bstream_t* bst)
  */
 tb_void_t tb_bstream_skip(tb_bstream_t* bst, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return(bst && bst->p <= bst->e);
+
+	// sync
 	tb_bstream_sync(bst);
+
+	// skip
 	bst->p += size;
 }
 tb_void_t tb_bstream_skip_bits(tb_bstream_t* bst, tb_size_t nbits)
 {
+	// check
 	tb_assert_and_check_return(bst && bst->p <= bst->e);
+
 	bst->p += (bst->b + nbits) >> 3;
 	bst->b = (bst->b + nbits) & 0x07;
 }
@@ -404,7 +439,10 @@ tb_sint32_t tb_bstream_get_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 }
 tb_char_t const* tb_bstream_get_string(tb_bstream_t* bst)
 {
-	tb_assert(bst && bst->p <= bst->e);
+	// check
+	tb_assert_and_check_return_val(bst && bst->p <= bst->e, tb_null);
+
+	// sync
 	tb_bstream_sync(bst);
 
 	// find '\0'
@@ -421,17 +459,25 @@ tb_char_t const* tb_bstream_get_string(tb_bstream_t* bst)
 }
 tb_size_t tb_bstream_get_data(tb_bstream_t* bst, tb_byte_t* data, tb_size_t size)
 {
-	tb_assert(bst->e >= bst->p);
+	// check
+	tb_assert_and_check_return_val(bst->e >= bst->p, 0);
+
+	// sync
 	tb_bstream_sync(bst);
 	
-	tb_size_t get_n = size;
-	if (bst->e - bst->p < get_n) get_n = bst->e - bst->p;
-	if (get_n)
+	// the need
+	tb_size_t need = size;
+	if (bst->e - bst->p < need) need = bst->e - bst->p;
+
+	// copy data
+	if (need)
 	{
-		tb_memcpy(data, bst->p, get_n);
-		bst->p += get_n;
+		tb_memcpy(data, bst->p, need);
+		bst->p += need;
 	}
-	return (get_n > 0? get_n : 0);
+
+	// ok?
+	return need;
 }
 /* ///////////////////////////////////////////////////////////////////////
  * set
@@ -674,12 +720,14 @@ tb_char_t* tb_bstream_set_string(tb_bstream_t* bst, tb_char_t const* s)
 	tb_bstream_sync(bst);
 
 	// set string
-	tb_char_t* b = bst->p;
-	tb_char_t* p = bst->p;
-	tb_char_t* e = bst->e - 1;
+	tb_char_t* 			b = bst->p;
+	tb_char_t* 			p = bst->p;
+	tb_char_t const* 	e = bst->e - 1;
 	while (*s && p < e) *p++ = *s++;
 	*p++ = '\0';
 	bst->p = p;
+
+	// ok?
 	return b;
 }
 /* ///////////////////////////////////////////////////////////////////////
@@ -694,8 +742,8 @@ tb_uint32_t tb_bstream_peek_ubits32(tb_bstream_t* bst, tb_size_t nbits)
 	tb_check_return_val(nbits, 0);
 
 	// save status
-	tb_byte_t const* p = bst->p;
-	tb_size_t b = bst->b;
+	tb_byte_t* 	p = bst->p;
+	tb_size_t 	b = bst->b;
 
 	// peek value
 	tb_uint32_t val = tb_bstream_get_ubits32(bst, nbits);
@@ -704,6 +752,7 @@ tb_uint32_t tb_bstream_peek_ubits32(tb_bstream_t* bst, tb_size_t nbits)
 	bst->p = p;
 	bst->b = b;
 
+	// ok?
 	return val;
 }
 tb_sint32_t tb_bstream_peek_sbits32(tb_bstream_t* bst, tb_size_t nbits)
@@ -715,8 +764,8 @@ tb_sint32_t tb_bstream_peek_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 	tb_check_return_val(nbits, 0);
 
 	// save status
-	tb_byte_t const* p = bst->p;
-	tb_size_t b = bst->b;
+	tb_byte_t* 	p = bst->p;
+	tb_size_t 	b = bst->b;
 
 	// peek value
 	tb_sint32_t val = tb_bstream_get_sbits32(bst, nbits);
@@ -725,6 +774,7 @@ tb_sint32_t tb_bstream_peek_sbits32(tb_bstream_t* bst, tb_size_t nbits)
 	bst->p = p;
 	bst->b = b;
 
+	// ok?
 	return val;
 }
 

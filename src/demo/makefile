@@ -51,9 +51,11 @@ demo_C_FILES 			+= \
 						stream/gstream \
 						stream/gstream/zip \
 						stream/gstream/null \
+						stream/gstream/cache \
 						stream/gstream/charset \
 						stream/astream/zip \
 						stream/astream/null \
+						stream/astream/cache \
 						stream/astream/charset \
 						string/pstring \
 						string/sstring \

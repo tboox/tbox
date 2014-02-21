@@ -39,8 +39,9 @@ typedef enum __tb_filter_type_e
 {
 	TB_FILTER_TYPE_NONE 	= 0
 ,	TB_FILTER_TYPE_ZIP 		= 1
-,	TB_FILTER_TYPE_CHARSET 	= 2
-,	TB_FILTER_TYPE_CHUNKED 	= 3
+,	TB_FILTER_TYPE_CACHE 	= 2
+,	TB_FILTER_TYPE_CHARSET 	= 3
+,	TB_FILTER_TYPE_CHUNKED 	= 4
 
 }tb_filter_type_e;
 
