@@ -16,7 +16,10 @@ typedef struct __tb_demo_context_t
 	// the base
 	tb_hong_t 				base;
 
-	// is verbose
+	// is debug?
+	tb_bool_t 				debug;
+
+	// is verbose?
 	tb_bool_t 				verbose;
 
 	// the istream
@@ -128,6 +131,17 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 	// ok?
 	return ok;
 }
+static tb_bool_t tb_demo_istream_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(http && line, tb_false);
+
+	// trace
+	tb_print("head: %s", line);
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
@@ -165,6 +179,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 		if (tb_option_done(context.option, argc - 1, &argv[1]))
 		{
 			// debug and verbose
+			context.debug 	= tb_option_find(context.option, "debug")? tb_false : tb_true;
 			context.verbose = tb_option_find(context.option, "no-verbose")? tb_false : tb_true;
 		
 			// done url
@@ -177,6 +192,117 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 				// init istream
 				context.istream = tb_astream_init_from_url(aicp, tb_option_item_cstr(context.option, "url"));
 				tb_assert_and_check_break(context.istream);
+	
+				// ctrl http
+				if (tb_astream_type(context.istream) == TB_ASTREAM_TYPE_HTTP) 
+				{
+					// enable gzip?
+					if (tb_option_find(context.option, "gzip"))
+					{
+						// auto unzip
+						if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+
+						// need gzip
+						if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+					}
+
+					// enable debug?
+					if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_HEAD_FUNC, context.debug? tb_demo_istream_head_func : tb_null)) break;
+
+					// custem header?
+					if (tb_option_find(context.option, "header"))
+					{
+						// init
+						tb_pstring_t key;
+						tb_pstring_t val;
+						tb_pstring_init(&key);
+						tb_pstring_init(&val);
+
+						// done
+						tb_bool_t 			k = tb_true;
+						tb_char_t const* 	p = tb_option_item_cstr(context.option, "header");
+						while (*p)
+						{
+							// is key?
+							if (k)
+							{
+								if (*p != ':' && !tb_isspace(*p)) tb_pstring_chrcat(&key, *p++);
+								else if (*p == ':') 
+								{
+									// skip ':'
+									p++;
+
+									// skip space
+									while (*p && tb_isspace(*p)) p++;
+
+									// is val now
+									k = tb_false;
+								}
+								else p++;
+							}
+							// is val?
+							else
+							{
+								if (*p != ';') tb_pstring_chrcat(&val, *p++);
+								else
+								{
+									// skip ';'
+									p++;
+
+									// skip space
+									while (*p && tb_isspace(*p)) p++;
+
+									// set header
+									if (tb_pstring_size(&key) && tb_pstring_size(&val))
+									{
+										if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
+										if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+									}
+
+									// is key now
+									k = tb_true;
+
+									// clear key & val
+									tb_pstring_clear(&key);
+									tb_pstring_clear(&val);
+								}
+							}
+						}
+
+						// set header
+						if (tb_pstring_size(&key) && tb_pstring_size(&val))
+						{
+							if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
+							if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+						}
+
+						// exit 
+						tb_pstring_exit(&key);
+						tb_pstring_exit(&val);
+					}
+
+					// post-data?
+					if (tb_option_find(context.option, "post-data"))
+					{
+						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(context.option, "post-data"));
+						if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+						if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+						if (context.debug) tb_printf("post: %llu\n", post_size);
+					}
+					// post-file?
+					else if (tb_option_find(context.option, "post-file"))
+					{
+						// exist?
+						tb_file_info_t info = {0};
+						if (tb_file_info(tb_option_item_cstr(context.option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
+						{
+							tb_hize_t post_size = info.size;
+							if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+							if (!tb_astream_ctrl(context.istream, TB_ASTREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+							if (context.debug) tb_printf("post: %llu\n", post_size);
+						}
+					}
+				}
 
 				// set timeout
 				if (tb_option_find(context.option, "timeout"))

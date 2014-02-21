@@ -34,6 +34,7 @@
 #include "aico.h"
 #include "aicp.h"
 #include "../zip/zip.h"
+#include "../filter/filter.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 
@@ -110,11 +111,14 @@ typedef struct __tb_aicp_http_t
 	// the pool for string
 	tb_handle_t						pool;
 
-	// the data for request and response
-	tb_pstring_t 					data;
+	// the line data
+	tb_pstring_t 					line_data;
 
-	// the size for request and response
-	tb_size_t 						size;
+	// the line size
+	tb_size_t 						line_size;
+
+	// the cache data
+	tb_pbuffer_t 					cache_data;
 
 	// the open and read, writ, seek, ...
 	union
@@ -407,15 +411,15 @@ static tb_bool_t tb_aicp_http_hresp_done(tb_aicp_http_t* http)
 	tb_assert_and_check_return_val(http && http->sstream, tb_false);
 
 	// line && size
-	tb_char_t const* 	line = tb_pstring_cstr(&http->data);
-	tb_size_t 			size = tb_pstring_size(&http->data);
+	tb_char_t const* 	line = tb_pstring_cstr(&http->line_data);
+	tb_size_t 			size = tb_pstring_size(&http->line_data);
 	tb_assert_and_check_return_val(line && size, tb_false);
 
 	// init 
 	tb_char_t const* 	p = line;
 
 	// the first line? 
-	if (!http->size)
+	if (!http->line_size)
 	{
 		// seek to the http version
 		while (*p && *p != '.') p++; 
@@ -579,13 +583,13 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 			}
 
 			// append char to line
-			if (ch != '\n') tb_pstring_chrcat(&http->data, ch);
+			if (ch != '\n') tb_pstring_chrcat(&http->line_data, ch);
 			// is line end?
 			else
 			{
 				// strip '\r' if exists
-				tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
-				tb_size_t 			pn = tb_pstring_size(&http->data);
+				tb_char_t const* 	pb = tb_pstring_cstr(&http->line_data);
+				tb_size_t 			pn = tb_pstring_size(&http->line_data);
 				if (!pb || !pn)
 				{
 					ok = -1;
@@ -594,7 +598,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				}
 
 				if (pb[pn - 1] == '\r')
-					tb_pstring_strip(&http->data, pn - 1);
+					tb_pstring_strip(&http->line_data, pn - 1);
 
 				// trace
 				tb_trace_impl("response: %s", pb);
@@ -608,7 +612,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				}
 				
 				// end?
-				if (!tb_pstring_size(&http->data)) 
+				if (!tb_pstring_size(&http->line_data)) 
 				{
 					// ok
 					ok = 1;
@@ -626,11 +630,11 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 					break;
 				}
 
-				// clear data
-				tb_pstring_clear(&http->data);
+				// clear line data
+				tb_pstring_clear(&http->line_data);
 
 				// line++
-				http->size++;
+				http->line_size++;
 			}
 		}
 
@@ -656,6 +660,19 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				else http->cstream = tb_astream_init_filter_from_chunked(http->stream, tb_true);
 				tb_assert_and_check_break(http->cstream);
 
+				// push the left data to filter
+				if (p < e)
+				{
+					// the filter
+					tb_filter_t* filter = tb_null;
+					if (!tb_astream_ctrl(http->cstream, TB_ASTREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					tb_assert_and_check_break(filter);
+
+					// push data
+					if (!tb_filter_push(filter, p, e - p)) break;
+					p = e;
+				}
+
 				// try to open cstream directly, because the stream have been opened 
 				if (!tb_astream_open_try(http->cstream)) break;
 
@@ -677,6 +694,19 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				else http->zstream = tb_astream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 				tb_assert_and_check_break(http->zstream);
 
+				// push the left data to filter
+				if (p < e)
+				{
+					// the filter
+					tb_filter_t* filter = tb_null;
+					if (!tb_astream_ctrl(http->zstream, TB_ASTREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					tb_assert_and_check_break(filter);
+
+					// push data
+					if (!tb_filter_push(filter, p, e - p)) break;
+					p = e;
+				}
+
 				// try to open zstream directly, because the stream have been opened 
 				if (!tb_astream_open_try(http->zstream)) break;
 
@@ -686,6 +716,10 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				// disable seek
 				http->status.bseeked = 0;
 			}
+
+			// cache the left data
+			if (p < e) tb_pbuffer_memncat(&http->cache_data, p, e - p);
+			p = e;
 
 			// ok
 			state = TB_ASTREAM_STATE_OK;
@@ -705,10 +739,10 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 	} while (0);
 
 	// clear line
-	http->size = 0;
+	http->line_size = 0;
 
 	// clear data
-	tb_pstring_clear(&http->data);
+	tb_pstring_clear(&http->line_data);
 
 	// sync state
 	http->status.state = state;
@@ -747,11 +781,14 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 		}
 		else
 		{
-			// clear line
-			http->size = 0;
+			// clear line size
+			http->line_size = 0;
 
-			// clear data
-			tb_pstring_clear(&http->data);
+			// clear line data
+			tb_pstring_clear(&http->line_data);
+
+			// clear cache data
+			tb_pbuffer_clear(&http->cache_data);
 
 			// post read 
 			if (!tb_astream_read(http->stream, 0, tb_aicp_http_hread_func, http)) break;
@@ -858,8 +895,11 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
 		http->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
 		tb_assert_and_check_break(http->pool);
 
-		// init data
-		if (!tb_pstring_init(&http->data)) break;
+		// init line data
+		if (!tb_pstring_init(&http->line_data)) break;
+
+		// init cache data
+		if (!tb_pbuffer_init(&http->cache_data)) break;
 
 		// init option
 		if (!tb_aicp_http_option_init(http)) break;
@@ -904,8 +944,14 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	// clear status
 	tb_aicp_http_status_cler(http);
 
-	// clear data
-	tb_pstring_clear(&http->data);
+	// clear line size
+	http->line_size = 0;
+
+	// clear line data
+	tb_pstring_clear(&http->line_data);
+
+	// clear cache data
+	tb_pbuffer_clear(&http->cache_data);
 }
 tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
@@ -937,8 +983,11 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// exit option
 	tb_aicp_http_option_exit(http);
 
-	// exit data
-	tb_pstring_exit(&http->data);
+	// exit line data
+	tb_pstring_exit(&http->line_data);
+
+	// exit cache data
+	tb_pbuffer_exit(&http->cache_data);
 
 	// exit pool
 	if (http->pool) tb_spool_exit(http->pool);
@@ -975,8 +1024,8 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_aicp_http_option_dump(http);
 #endif
 
-		// init the head data
-		tb_pstring_clear(&http->data);
+		// clear line data
+		tb_pstring_clear(&http->line_data);
 
 		// init the head value
 		tb_char_t  		data[64];
@@ -1031,26 +1080,26 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_assert_and_check_break(tb_hash_size(http->option.head));
 
 		// append method
-		tb_pstring_cstrcat(&http->data, method);
+		tb_pstring_cstrcat(&http->line_data, method);
 	
 		// append ' '
-		tb_pstring_chrcat(&http->data, ' ');
+		tb_pstring_chrcat(&http->line_data, ' ');
 
 		// append path
-		tb_pstring_cstrcat(&http->data, path);
+		tb_pstring_cstrcat(&http->line_data, path);
 
 		// append args if exists
 		if (args) 
 		{
-			tb_pstring_chrcat(&http->data, '?');
-			tb_pstring_cstrcat(&http->data, args);
+			tb_pstring_chrcat(&http->line_data, '?');
+			tb_pstring_cstrcat(&http->line_data, args);
 		}
 	
 		// append ' '
-		tb_pstring_chrcat(&http->data, ' ');
+		tb_pstring_chrcat(&http->line_data, ' ');
 
 		// append version, HTTP/1.1
-		tb_pstring_cstrfcat(&http->data, "HTTP/1.%1u\r\n", http->option.version);
+		tb_pstring_cstrfcat(&http->line_data, "HTTP/1.%1u\r\n", http->option.version);
 
 		// append key: value
 		tb_size_t itor = tb_iterator_head(http->option.head);
@@ -1059,18 +1108,18 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		{
 			tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
 			if (item && item->name && item->data) 
-				tb_pstring_cstrfcat(&http->data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
+				tb_pstring_cstrfcat(&http->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
 		}
 	
 		// append end
-		tb_pstring_cstrcat(&http->data, "\r\n");
+		tb_pstring_cstrcat(&http->line_data, "\r\n");
 
 		// exit the head value
 		tb_sstring_exit(&value);
 
 		// the head data and size
-		tb_char_t const* 	head_data = tb_pstring_cstr(&http->data);
-		tb_size_t 			head_size = tb_pstring_size(&http->data);
+		tb_char_t const* 	head_data = tb_pstring_cstr(&http->line_data);
+		tb_size_t 			head_size = tb_pstring_size(&http->line_data);
 		tb_assert_and_check_break(head_data && head_size);
 		
 		// trace
@@ -1177,6 +1226,21 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+
+	// read the cache data first
+	tb_byte_t const* 	cache_data = tb_pbuffer_data(&http->cache_data);
+	tb_size_t 			cache_size = tb_pbuffer_size(&http->cache_data);
+	if (cache_data && cache_size)
+	{
+		// done func
+		tb_bool_t ok = func(http, TB_ASTREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
+
+		// clear cache data
+		tb_pbuffer_clear(&http->cache_data);
+
+		// break?
+		tb_check_return_val(ok, tb_true);
+	}
 
 	// init read
 	http->func.read = func;

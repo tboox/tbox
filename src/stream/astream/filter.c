@@ -157,7 +157,7 @@ static tb_bool_t tb_astream_filter_sync_read_func(tb_astream_t* astream, tb_size
 static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(astream && data, tb_false);
+	tb_assert_and_check_return_val(astream, tb_false);
 
 	// the stream
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
