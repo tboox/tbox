@@ -156,9 +156,15 @@ static tb_long_t tb_gstream_file_wait(tb_gstream_t* gstream, tb_size_t wait, tb_
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->file, -1);
 
+	// the size
+	tb_hize_t size = tb_gstream_size(gstream);
+
+	// the offset
+	tb_hize_t offset = tb_gstream_offset(gstream);
+
 	// wait 
 	tb_long_t aioe = 0;
-	if (tb_gstream_left(gstream))
+	if (size && offset < size)
 	{
 		if (wait & TB_GSTREAM_WAIT_READ) aioe |= TB_GSTREAM_WAIT_READ;
 		if (wait & TB_GSTREAM_WAIT_WRIT) aioe |= TB_GSTREAM_WAIT_WRIT;

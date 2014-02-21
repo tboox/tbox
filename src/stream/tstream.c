@@ -636,6 +636,13 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 		ostream = tb_gstream_init_from_url(ourl);
 		tb_assert_and_check_break(ostream);
 
+		// ctrl file
+		if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
+		{
+			// ctrl mode
+			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+		}
+
 		// save stream
 		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
 
