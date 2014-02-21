@@ -98,7 +98,7 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 {
 	// check
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
-	tb_assert_and_check_return_val(fstream && fstream->astream && func, tb_false);
+	tb_assert_and_check_return_val(fstream && fstream->astream, tb_false);
 
 	// have been opened?
 	tb_bool_t opened = tb_false;
@@ -108,8 +108,11 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 		tb_atomic_set(&fstream->base.opened, 1);
 
 		// done func
-		return func(astream, TB_ASTREAM_STATE_OK, fstream->priv);
+		return func? func(astream, TB_ASTREAM_STATE_OK, fstream->priv) : tb_true;
 	}
+
+	// check
+	tb_assert_and_check_return_val(func, tb_false);
 
 	// save func and priv
 	fstream->priv 		= priv;

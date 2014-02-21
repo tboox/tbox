@@ -119,7 +119,7 @@ static tb_bool_t tb_astream_http_open(tb_astream_t* astream, tb_astream_open_fun
 static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(http && data, tb_false);
+	tb_assert_and_check_return_val(http, tb_false);
 
 	// the stream
 	tb_astream_http_t* hstream = (tb_astream_http_t*)priv;
@@ -658,6 +658,10 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	hstream->base.clos 		= tb_astream_http_clos;
 	hstream->base.exit 		= tb_astream_http_exit;
 	hstream->base.ctrl 		= tb_astream_http_ctrl;
+
+	// init http
+	hstream->http = tb_aicp_http_init(aicp);
+	tb_assert_and_check_goto(hstream->http, fail);
 
 	// ok
 	return (tb_astream_t*)hstream;

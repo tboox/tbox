@@ -94,7 +94,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream && func, tb_false);
+	tb_assert_and_check_return_val(fstream, tb_false);
 
 	// done
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
@@ -129,10 +129,10 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 	} while (0);
 
 	// done func
-	func(astream, state, priv);
+	if (func) func(astream, state, priv);
 
-	// ok
-	return tb_true;
+	// ok?
+	return func? tb_true : ((state == TB_ASTREAM_STATE_OK)? tb_true : tb_false);
 }
 static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 {

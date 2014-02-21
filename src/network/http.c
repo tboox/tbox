@@ -675,7 +675,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 			// strip '\r' if exists
 			tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
 			tb_size_t 			pn = tb_pstring_size(&http->data);
-			tb_assert_and_check_return_val(pb, -1);
+			tb_assert_and_check_return_val(pb && pn, -1);
 
 			if (pb[pn - 1] == '\r')
 				tb_pstring_strip(&http->data, pn - 1);
@@ -684,7 +684,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 			tb_trace_impl("response: %s", pb);
  
 			// do callback
-			if (http->option.head_func) if (!http->option.head_func((tb_handle_t)http, pb, http->option.head_priv)) return -1;
+			if (http->option.head_func && !http->option.head_func((tb_handle_t)http, pb, http->option.head_priv)) return -1;
 			
 			// end?
 			if (!tb_pstring_size(&http->data)) break;
@@ -704,8 +704,10 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	http->step |= TB_HTTP_STEP_RESP;
 	http->tryn = 0;
 
-	// reset data
+	// clear line
 	http->size = 0;
+
+	// clear data
 	tb_pstring_clear(&http->data);
 
 	// switch to cstream if chunked

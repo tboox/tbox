@@ -275,6 +275,27 @@ tb_void_t tb_astream_kill(tb_astream_t* astream)
 	// kill it
 	if (astream->kill) astream->kill(astream);
 }
+tb_bool_t tb_astream_open_try(tb_astream_t* astream)
+{
+	// check
+	tb_assert_and_check_return_val(astream && astream->open, tb_false);
+		
+	// check state
+	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_true);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->stoped), tb_false);
+
+	// init state
+	tb_atomic_set0(&astream->stoped);
+
+	// try to open it
+	tb_bool_t ok = astream->open(astream, tb_null, tb_null);
+
+	// open failed?
+	if (!ok) tb_atomic_set(&astream->stoped, 1);
+
+	// ok?
+	return ok;
+}
 tb_bool_t tb_astream_open_impl(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
