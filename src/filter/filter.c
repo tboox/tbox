@@ -182,5 +182,12 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// ok?
 	return osize;
 }
+tb_bool_t tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_t size)
+{
+	// check
+	tb_assert_and_check_return_val(filter && data && size, tb_false);
 
+	// push data
+	return tb_pbuffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
+}
 
