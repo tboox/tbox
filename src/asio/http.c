@@ -33,6 +33,7 @@
 #include "http.h"
 #include "aico.h"
 #include "aicp.h"
+#include "../zip/zip.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 
@@ -245,7 +246,7 @@ static tb_void_t tb_aicp_http_status_cler(tb_aicp_http_t* http)
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
-	http->status.state = TB_GSTREAM_STATE_OK;
+	http->status.state = TB_ASTREAM_STATE_OK;
 
 	// clear content type
 	tb_pstring_clear(&http->status.content_type);
@@ -388,6 +389,159 @@ static tb_bool_t tb_aicp_http_oseek_func(tb_handle_t http, tb_size_t state, tb_h
 	// ok?
 	return ok;
 }
+/*
+ * HTTP/1.1 206 Partial Content
+ * Date: Fri, 23 Apr 2010 05:25:45 GMT
+ * Server: Apache/2.2.9 (Ubuntu) PHP/5.2.6-2ubuntu4.5 with Suhosin-Patch
+ * Last-Modified: Mon, 08 Mar 2010 09:58:09 GMT
+ * ETag: "6cc014-8f47f-481471a322e40"
+ * Accept-Ranges: bytes
+ * Content-Length: 586879
+ * Content-Range: bytes 0-586878/586879
+ * Connection: close
+ * Content-Type: application/x-shockwave-flash
+ */
+static tb_bool_t tb_aicp_http_hresp_done(tb_aicp_http_t* http)
+{
+	// check
+	tb_assert_and_check_return_val(http && http->sstream, tb_false);
+
+	// line && size
+	tb_char_t const* 	line = tb_pstring_cstr(&http->data);
+	tb_size_t 			size = tb_pstring_size(&http->data);
+	tb_assert_and_check_return_val(line && size, tb_false);
+
+	// init 
+	tb_char_t const* 	p = line;
+
+	// the first line? 
+	if (!http->size)
+	{
+		// seek to the http version
+		while (*p && *p != '.') p++; 
+		tb_assert_and_check_return_val(*p, tb_false);
+		p++;
+
+		// parse version
+		tb_assert_and_check_return_val((*p - '0') < 2, tb_false);
+		http->status.version = *p - '0';
+	
+		// seek to the http code
+		p++; while (tb_isspace(*p)) p++;
+
+		// parse code
+		tb_assert_and_check_return_val(*p && tb_isdigit(*p), tb_false);
+		http->status.code = tb_stou32(p);
+
+		// save state
+		if (http->status.code == 200 || http->status.code == 206)
+			http->status.state = TB_ASTREAM_STATE_OK;
+		else if (http->status.code == 204)
+			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_204;
+		else if (http->status.code >= 300 && http->status.code <= 304)
+			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
+		else if (http->status.code >= 400 && http->status.code <= 416)
+			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
+		else if (http->status.code >= 500 && http->status.code <= 507)
+			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
+		else http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_UNK;
+
+		// check state code: 4xx & 5xx
+		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
+	}
+	// key: value?
+	else
+	{
+		// seek to value
+		while (*p && *p != ':') p++;
+		tb_assert_and_check_return_val(*p, tb_false);
+		p++; while (*p && tb_isspace(*p)) p++;
+
+		// no value
+		tb_check_return_val(*p, tb_true);
+
+		// parse content size
+		if (!tb_strnicmp(line, "Content-Length", 14))
+		{
+			http->status.content_size = tb_stou64(p);
+			if (!http->status.document_size) 
+				http->status.document_size = http->status.content_size;
+		}
+		// parse content range: "bytes $from-$to/$document_size"
+		else if (!tb_strnicmp(line, "Content-Range", 13))
+		{
+			tb_hize_t from = 0;
+			tb_hize_t to = 0;
+			tb_hize_t document_size = 0;
+			if (!tb_strncmp(p, "bytes ", 6)) 
+			{
+				p += 6;
+				from = tb_stou64(p);
+				while (*p && *p != '-') p++;
+				if (*p && *p++ == '-') to = tb_stou64(p);
+				while (*p && *p != '/') p++;
+				if (*p && *p++ == '/') document_size = tb_stou64(p);
+			}
+			// no stream, be able to seek
+			http->status.bseeked = 1;
+			http->status.document_size = document_size;
+			if (!http->status.content_size) 
+			{
+				if (from && to > from) http->status.content_size = to - from;
+				else if (!from && to) http->status.content_size = to;
+				else if (from && !to && document_size > from) http->status.content_size = document_size - from;
+				else http->status.content_size = document_size;
+			}
+		}
+		// parse accept-ranges: "bytes "
+		else if (!tb_strnicmp(line, "Accept-Ranges", 13))
+		{
+			// no stream, be able to seek
+			http->status.bseeked = 1;
+		}
+		// parse content type
+		else if (!tb_strnicmp(line, "Content-Type", 12)) 
+		{
+			tb_pstring_cstrcpy(&http->status.content_type, p);
+			tb_assert_and_check_return_val(tb_pstring_size(&http->status.content_type), tb_false);
+		}
+		// parse transfer encoding
+		else if (!tb_strnicmp(line, "Transfer-Encoding", 17))
+		{
+			if (!tb_stricmp(p, "chunked")) http->status.bchunked = 1;
+		}
+		// parse content encoding
+		else if (!tb_strnicmp(line, "Content-Encoding", 16))
+		{
+			if (!tb_stricmp(p, "gzip")) http->status.bgzip = 1;
+			else if (!tb_stricmp(p, "deflate")) http->status.bdeflate = 1;
+		}
+		// parse location
+		else if (!tb_strnicmp(line, "Location", 8)) 
+		{
+			// redirect? check code: 301 - 303
+			tb_assert_and_check_return_val(http->status.code > 300 && http->status.code < 304, tb_false);
+
+			// init redirect
+//			http->rdtn = 0;
+
+			// save location
+			tb_pstring_cstrcpy(&http->status.location, p);
+		}
+		// parse connection
+		else if (!tb_strnicmp(line, "Connection", 10))
+		{
+			// keep alive?
+			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
+
+			// ctrl stream for sock
+			if (!tb_astream_ctrl(http->sstream, TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+		}
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
@@ -398,7 +552,6 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 	tb_trace_impl("head: read: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
 
 	// done
-	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok? 
@@ -407,21 +560,164 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 		// reset state
 		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
 
+		// walk	
+		tb_long_t 			ok = 0;
+		tb_char_t 			ch = '\0';
+		tb_char_t const* 	p = (tb_char_t const*)data;
+		tb_char_t const* 	e = p + real;
+		while (p < e)
+		{
+			// the char
+			ch = *p++;
 
-		// ok
-		state = TB_ASTREAM_STATE_OK;
+			// error end?
+			if (!ch)
+			{
+				ok = -1;
+				tb_assert(0);
+				break;
+			}
+
+			// append char to line
+			if (ch != '\n') tb_pstring_chrcat(&http->data, ch);
+			// is line end?
+			else
+			{
+				// strip '\r' if exists
+				tb_char_t const* 	pb = tb_pstring_cstr(&http->data);
+				tb_size_t 			pn = tb_pstring_size(&http->data);
+				if (!pb || !pn)
+				{
+					ok = -1;
+					tb_assert(0);
+					break;
+				}
+
+				if (pb[pn - 1] == '\r')
+					tb_pstring_strip(&http->data, pn - 1);
+
+				// trace
+				tb_trace_impl("response: %s", pb);
+	 
+				// do callback
+				if (http->option.head_func && !http->option.head_func((tb_handle_t)http, pb, http->option.head_priv)) 
+				{
+					ok = -1;
+					tb_assert(0);
+					break;
+				}
+				
+				// end?
+				if (!tb_pstring_size(&http->data)) 
+				{
+					// ok
+					ok = 1;
+					break;
+				}
+
+				// done the head response
+				if (!tb_aicp_http_hresp_done(http)) 
+				{	
+					// save the error state
+					if (http->status.state != TB_ASTREAM_STATE_OK) state = http->status.state;
+
+					// error
+					ok = -1;
+					break;
+				}
+
+				// clear data
+				tb_pstring_clear(&http->data);
+
+				// line++
+				http->size++;
+			}
+		}
+
+		// continue ?
+		if (!ok) return tb_true;
+		// end?
+		else if (ok > 0) 
+		{
+			// trace
+			tb_trace_impl("head: read: end, left: %lu", e - p);
+ 
+			// trace
+			tb_trace_impl("response: ok");
+
+			// switch to cstream if chunked
+			if (http->status.bchunked)
+			{
+				// init cstream
+				if (http->cstream)
+				{
+					if (!tb_astream_ctrl(http->cstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, http->stream)) break;
+				}
+				else http->cstream = tb_astream_init_filter_from_chunked(http->stream, tb_true);
+				tb_assert_and_check_break(http->cstream);
+
+				// try to open cstream directly, because the stream have been opened 
+				if (!tb_astream_open_try(http->cstream)) break;
+
+				// using cstream
+				http->stream = http->cstream;
+
+				// disable seek
+				http->status.bseeked = 0;
+			}
+
+			// switch to zstream if gzip or deflate
+			if (http->option.bunzip && (http->status.bgzip || http->status.bdeflate))
+			{
+				// init zstream
+				if (http->zstream)
+				{
+					if (!tb_astream_ctrl(http->zstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, http->stream)) break;
+				}
+				else http->zstream = tb_astream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
+				tb_assert_and_check_break(http->zstream);
+
+				// try to open zstream directly, because the stream have been opened 
+				if (!tb_astream_open_try(http->zstream)) break;
+
+				// using zstream
+				http->stream = http->zstream;
+
+				// disable seek
+				http->status.bseeked = 0;
+			}
+
+			// ok
+			state = TB_ASTREAM_STATE_OK;
+
+			// dump status
+#if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
+			tb_aicp_http_status_dump(http);
+#endif
+		}
+		// error?
+		else 
+		{
+			// trace
+			tb_trace_impl("head: read: error, state: %s", tb_astream_state_cstr(state));
+		}
 
 	} while (0);
- 
-	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
-	{
-		// done func
-		ok = http->func.open(http, state, &http->status, http->priv);
-	}
- 
-	// ok?
-	return ok;
+
+	// clear line
+	http->size = 0;
+
+	// clear data
+	tb_pstring_clear(&http->data);
+
+	// sync state
+	http->status.state = state;
+
+	// done func
+	http->func.open(http, state, &http->status, http->priv);
+
+	// break 
+	return tb_false;
 }
 static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -433,7 +729,7 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 	tb_trace_impl("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
 
 	// done
-	tb_bool_t ok = tb_true;
+	tb_bool_t bwrit = tb_false;
 	do
 	{
 		// ok? 
@@ -442,13 +738,21 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 		// reset state
 		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
 
-		// clear data
-		tb_pstring_clear(&http->data);
-
 		// TODO: done post
 		// finished? read head
-		if (real >= size)
+		if (real < size)
 		{
+			// continue to writ
+			bwrit = tb_true;
+		}
+		else
+		{
+			// clear line
+			http->size = 0;
+
+			// clear data
+			tb_pstring_clear(&http->data);
+
 			// post read 
 			if (!tb_astream_read(http->stream, 0, tb_aicp_http_hread_func, http)) break;
 		}
@@ -462,11 +766,11 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		ok = http->func.open(http, state, &http->status, http->priv);
+		http->func.open(http, state, &http->status, http->priv);
 	}
  
 	// ok?
-	return ok;
+	return bwrit;
 }
 static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -664,6 +968,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
 		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
 		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
+		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)

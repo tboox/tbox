@@ -537,6 +537,14 @@ tb_astream_t* 		tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_si
  */
 tb_astream_t* 		tb_astream_init_filter_from_chunked(tb_astream_t* astream, tb_bool_t dechunked);
 
+/*! try to open the stream for stream: file, filter, ... 
+ *
+ * @param astream 	the stream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_astream_open_try(tb_astream_t* astream);
+
 /*! open the stream 
  *
  * @param astream 	the stream

@@ -197,7 +197,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 		// writ data
 		tb_long_t r = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
 //		tb_trace_impl("writ %d", r);
-		tb_assert_and_check_goto(r >= 0, end);
+		tb_check_goto(r >= 0, end);
 		
 		// no data?
 		if (!r)
