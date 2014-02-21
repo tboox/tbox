@@ -27,6 +27,7 @@
 #include "prefix.h"
 #include "../sched.h"
 #include "../atomic.h"
+#include "../spinlock.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
