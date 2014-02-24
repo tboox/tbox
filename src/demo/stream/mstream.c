@@ -30,7 +30,7 @@ static tb_void_t tb_demo_tstream_free(tb_item_func_t* func, tb_pointer_t item)
 	if (tstream) tb_tstream_exit(tstream, tb_false);
 }
 #if TB_DEMO_TEST_AICP
-static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
@@ -44,7 +44,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_s
 	return tb_true;
 }
 #else
-static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
