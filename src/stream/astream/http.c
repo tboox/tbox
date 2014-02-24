@@ -57,7 +57,6 @@ typedef struct __tb_astream_http_t
 	{
 		tb_astream_open_func_t 	open;
 		tb_astream_read_func_t 	read;
-		tb_astream_writ_func_t 	writ;
 		tb_astream_seek_func_t 	seek;
 		tb_astream_sync_func_t 	sync;
 		tb_astream_task_func_t 	task;
@@ -150,41 +149,6 @@ static tb_bool_t tb_astream_http_read(tb_astream_t* astream, tb_size_t delay, tb
 
 	// post read
 	return tb_aicp_http_read_after(hstream->http, delay, maxn, tb_astream_http_read_func, astream);
-}
-static tb_bool_t tb_astream_http_writ_func(tb_handle_t http, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
-{
-	// check
-	tb_assert_and_check_return_val(http, tb_false);
-
-	// the stream
-	tb_astream_http_t* hstream = (tb_astream_http_t*)priv;
-	tb_assert_and_check_return_val(hstream && hstream->func.writ, tb_false);
-
-	// save offset
-	if (state == TB_ASTREAM_STATE_OK) 
-	{
-		// try offset += real
-		tb_hong_t offset = tb_atomic64_fetch_and_add(&hstream->offset, real);
-		
-		// not seeked? reset offset
-		if (offset < 0) tb_atomic64_set(&hstream->offset, -1);
-	}
-
-	// done func
-	return hstream->func.writ((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
-}
-static tb_bool_t tb_astream_http_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
-	tb_assert_and_check_return_val(hstream && hstream->http && data && size && func, tb_false);
-
-	// save func and priv
-	hstream->priv 		= priv;
-	hstream->func.writ 	= func;
-
-	// post writ
-	return tb_aicp_http_writ_after(hstream->http, delay, data, size, tb_astream_http_writ_func, astream);
 }
 static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
 {
@@ -650,7 +614,6 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_ASTREAM_TYPE_HTTP)) goto fail;
 	hstream->base.open 		= tb_astream_http_open;
 	hstream->base.read 		= tb_astream_http_read;
-	hstream->base.writ 		= tb_astream_http_writ;
 	hstream->base.seek 		= tb_astream_http_seek;
 	hstream->base.sync 		= tb_astream_http_sync;
 	hstream->base.task 		= tb_astream_http_task;
