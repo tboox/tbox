@@ -352,6 +352,8 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_size_t 			type = TB_GSTREAM_TYPE_NONE;
 	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_GSTREAM_TYPE_HTTP;
 	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_GSTREAM_TYPE_SOCK;
+	else if (!tb_strnicmp(p, "file://", 7)) 	type = TB_GSTREAM_TYPE_FILE;
+	else if (!tb_strnicmp(p, "data://", 7)) 	type = TB_GSTREAM_TYPE_DATA;
 	else if (!tb_strnicmp(p, "https://", 8)) 	type = TB_GSTREAM_TYPE_HTTP;
 	else if (!tb_strnicmp(p, "socks://", 8)) 	type = TB_GSTREAM_TYPE_SOCK;
 	else if (!tb_strstr(p, "://")) 				type = TB_GSTREAM_TYPE_FILE;

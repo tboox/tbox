@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../../asio/asio.h"
+#include "../../utils/utils.h"
 #include "../../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -46,6 +47,9 @@ typedef struct __tb_gstream_data_t
 
 	// the size
 	tb_size_t 			size;
+
+	// the data is referenced?
+	tb_bool_t 			bref;
 
 }tb_gstream_data_t;
 
@@ -77,6 +81,23 @@ static tb_long_t tb_gstream_data_clos(tb_gstream_t* gstream)
 	
 	// clear head
 	dstream->head = tb_null;
+
+	// ok
+	return 1;
+}
+static tb_long_t tb_gstream_data_exit(tb_gstream_t* gstream)
+{
+	// check
+	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
+	tb_assert_and_check_return_val(dstream, -1);
+	
+	// clear head
+	dstream->head = tb_null;
+
+	// exit data
+	if (dstream->data && !dstream->bref) tb_free(dstream->data);
+	dstream->data = tb_null;
+	dstream->size = 0;
 
 	// ok
 	return 1;
@@ -177,19 +198,68 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	{
 	case TB_GSTREAM_CTRL_GET_SIZE:
 		{
+			// the psize
 			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
+
+			// get size
 			*psize = dstream->size;
 			return tb_true;
 		}
 	case TB_GSTREAM_CTRL_DATA_SET_DATA:
 		{
+			// exit data first if exists
+			if (dstream->data && !dstream->bref) tb_free(dstream->data);
+
+			// save data
 			dstream->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
 			dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
 			dstream->head = tb_null;
+			dstream->bref = tb_true;
+
+			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
 			return tb_true;
 		}
+	case TB_GSTREAM_CTRL_SET_URL:
+		{
+			// check
+			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
+
+			// set url
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(url, tb_false); 
+			
+			// the url size
+			tb_size_t url_size = tb_strlen(url);
+			tb_assert_and_check_return_val(url_size > 7, tb_false);
+
+			// the base64 data and size
+			tb_char_t const* 	base64_data = url + 7;
+			tb_size_t 			base64_size = url_size - 7;
+
+			// make data
+			tb_size_t 	maxn = base64_size;
+			tb_byte_t* 	data = tb_malloc(maxn); 
+			tb_assert_and_check_return_val(data, tb_false);
+
+			// decode base64 data
+			tb_size_t 	size = tb_base64_decode(base64_data, base64_size, data, maxn);
+			tb_assert_and_check_return_val(size, tb_false);
+
+			// exit data first if exists
+			if (dstream->data && !dstream->bref) tb_free(dstream->data);
+
+			// save data
+			dstream->data = data;
+			dstream->size = size;
+			dstream->bref = tb_false;
+			dstream->head = tb_null;
+
+			// ok
+			return tb_true;
+		}
+		break;
 	default:
 		break;
 	}
@@ -210,6 +280,7 @@ tb_gstream_t* tb_gstream_init_data()
 	// init func
 	gstream->open 	= tb_gstream_data_open;
 	gstream->clos 	= tb_gstream_data_clos;
+	gstream->exit 	= tb_gstream_data_exit;
 	gstream->read 	= tb_gstream_data_read;
 	gstream->writ 	= tb_gstream_data_writ;
 	gstream->seek 	= tb_gstream_data_seek;

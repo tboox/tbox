@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../../utils/utils.h"
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -95,6 +96,9 @@ typedef struct __tb_astream_data_t
 
 	// the size
 	tb_size_t 					size;
+
+	// the data is referenced?
+	tb_bool_t 					bref;
 
 	// the func
 	union
@@ -401,6 +405,24 @@ static tb_void_t tb_astream_data_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	// clear head
 	dstream->head = tb_null;
 }
+static tb_void_t tb_astream_data_exit(tb_astream_t* astream, tb_bool_t bcalling)
+{	
+	// check
+	tb_astream_data_t* dstream = tb_astream_data_cast(astream);
+	tb_assert_and_check_return(dstream);
+
+	// exit aico
+	if (dstream->aico) tb_aico_exit(dstream->aico, bcalling);
+	dstream->aico = tb_null;
+
+	// clear head
+	dstream->head = tb_null;
+
+	// exit data
+	if (dstream->data && !dstream->bref) tb_free(dstream->data);
+	dstream->data = tb_null;
+	dstream->size = 0;
+}
 static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
@@ -436,19 +458,58 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 		}
 	case TB_ASTREAM_CTRL_DATA_SET_DATA:
 		{
-			// set data
+			// exit data first if exists
+			if (dstream->data && !dstream->bref) tb_free(dstream->data);
+
+			// save data
 			dstream->data = (tb_byte_t*)tb_va_arg(args, tb_byte_t*);
-
-			// set size
 			dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
-
-			// init head
 			dstream->head = tb_null;
+			dstream->bref = tb_true;
 
 			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
 			return tb_true;
 		}
+	case TB_ASTREAM_CTRL_SET_URL:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+
+			// set url
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(url, tb_false); 
+			
+			// the url size
+			tb_size_t url_size = tb_strlen(url);
+			tb_assert_and_check_return_val(url_size > 7, tb_false);
+
+			// the base64 data and size
+			tb_char_t const* 	base64_data = url + 7;
+			tb_size_t 			base64_size = url_size - 7;
+
+			// make data
+			tb_size_t 	maxn = base64_size;
+			tb_byte_t* 	data = tb_malloc(maxn); 
+			tb_assert_and_check_return_val(data, tb_false);
+
+			// decode base64 data
+			tb_size_t 	size = tb_base64_decode(base64_data, base64_size, data, maxn);
+			tb_assert_and_check_return_val(size, tb_false);
+
+			// exit data first if exists
+			if (dstream->data && !dstream->bref) tb_free(dstream->data);
+
+			// save data
+			dstream->data = data;
+			dstream->size = size;
+			dstream->bref = tb_false;
+			dstream->head = tb_null;
+
+			// ok
+			return tb_true;
+		}
+		break;
 	default:
 		break;
 	}
@@ -476,6 +537,7 @@ tb_astream_t* tb_astream_init_data(tb_aicp_t* aicp)
 	dstream->base.task 		= tb_astream_data_task;
 	dstream->base.kill 		= tb_astream_data_kill;
 	dstream->base.clos 		= tb_astream_data_clos;
+	dstream->base.exit 		= tb_astream_data_exit;
 	dstream->base.ctrl 		= tb_astream_data_ctrl;
 
 	// ok
