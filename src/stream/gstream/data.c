@@ -38,9 +38,13 @@ typedef struct __tb_gstream_data_t
 	// the base
 	tb_gstream_t 		base;
 
-	// the data & size
+	// the data
 	tb_byte_t* 			data;
+
+	// the head
 	tb_byte_t* 			head;
+
+	// the size
 	tb_size_t 			size;
 
 }tb_gstream_data_t;
@@ -55,10 +59,11 @@ static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_gstream_t* gstre
 }
 static tb_long_t tb_gstream_data_open(tb_gstream_t* gstream)
 {
+	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream && dstream->data && dstream->size, -1);
 
-	// attach data
+	// init head
 	dstream->head = dstream->data;
 
 	// ok
@@ -66,10 +71,11 @@ static tb_long_t tb_gstream_data_open(tb_gstream_t* gstream)
 }
 static tb_long_t tb_gstream_data_clos(tb_gstream_t* gstream)
 {
+	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream, -1);
 	
-	// reset head
+	// clear head
 	dstream->head = tb_null;
 
 	// ok
@@ -77,6 +83,7 @@ static tb_long_t tb_gstream_data_clos(tb_gstream_t* gstream)
 }
 static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
+	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream && dstream->data && dstream->head, -1);
 
@@ -84,12 +91,16 @@ static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
-	// adjust size
+	// the left
 	tb_size_t left = dstream->data + dstream->size - dstream->head;
+
+	// the need
 	if (size > left) size = left;
 
 	// read data
-	tb_memcpy(data, dstream->head, size);
+	if (size) tb_memcpy(data, dstream->head, size);
+
+	// save head
 	dstream->head += size;
 
 	// ok?
@@ -97,6 +108,7 @@ static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb
 }
 static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
+	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
 	tb_assert_and_check_return_val(dstream && dstream->data && dstream->head, -1);
 
@@ -104,21 +116,26 @@ static tb_long_t tb_gstream_data_writ(tb_gstream_t* gstream, tb_byte_t const* da
 	tb_check_return_val(data, -1);
 	tb_check_return_val(size, 0);
 
-	// adjust size
+	// the left
 	tb_size_t left = dstream->data + dstream->size - dstream->head;
+
+	// the need
 	if (size > left) size = left;
 
 	// writ data
-	tb_memcpy(dstream->head, data, size);
+	if (size) tb_memcpy(dstream->head, data, size);
+
+	// save head
 	dstream->head += size;
 
+	// ok?
 	return left? (tb_long_t)(size) : -1; // force end if full
 }
 static tb_long_t tb_gstream_data_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream, -1);
+	tb_assert_and_check_return_val(dstream && offset <= dstream->size, -1);
 
 	// seek 
 	dstream->head = dstream->data + offset;
@@ -171,8 +188,8 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
 			dstream->head = tb_null;
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
+			return tb_true;
 		}
-		return tb_true;
 	default:
 		break;
 	}
@@ -208,6 +225,7 @@ fail:
 }
 tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 {
+	// check
 	tb_assert_and_check_return_val(data && size, tb_null);
 
 	// init data stream
@@ -217,6 +235,7 @@ tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 	// set data & size
 	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_DATA_SET_DATA, data, size)) goto fail;
 	
+	// ok
 	return gstream;
 
 fail:

@@ -65,8 +65,9 @@ tbox_C_FILES 			+= \
 						stream/gstream/filter \
 						stream/astream \
 						stream/astream/http \
-						stream/astream/sock \
 						stream/astream/file \
+						stream/astream/data \
+						stream/astream/sock \
 						stream/astream/filter \
 						stream/tstream \
 						filter/filter \

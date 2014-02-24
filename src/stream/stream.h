@@ -50,21 +50,25 @@
  *                   |          |
  *                   - filter - |- chunked 
  *                              |        
+ *                              |- cache
+ *                              |
  *                               - zip
  *
  *
  *
- *                                                    - http
+ *                                                    - data
  *    (url, ...)                                     |
  *     astream ------------- astream ----------------- file
  *      [aicp]       |                               |
  *                   |                               - sock
- *                   |
- *                   |
+ *                   |                               |
+ *                   |                               - http
  *                   |           - charset
  *                   |          |
  *                   - filter - |- chunked 
  *                              |        
+ *                              |- cache
+ *                              |
  *                               - zip    
  *
  *                -- gstream
