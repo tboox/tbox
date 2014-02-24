@@ -143,14 +143,14 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 		else posted_aice->state = aice->state;
 	}
 
-	// not posted? done aicb now
+	// not posted? done func now
 	if (!posted)
 	{
 		// calling++
 		tb_atomic_fetch_and_inc(&aice->aico->calling);
 
-		// done aicb
-		if (posted_aice->aicb && !posted_aice->aicb(posted_aice)) ok = tb_false;
+		// done func
+		if (posted_aice->func && !posted_aice->func(posted_aice)) ok = tb_false;
 
 		// calling--
 		tb_atomic_fetch_and_dec(&aice->aico->calling);
@@ -449,8 +449,8 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv
 		// calling++
 		tb_atomic_fetch_and_inc(&resp.aico->calling);
 
-		// done aicb
-		if (resp.aicb && !resp.aicb(&resp)) 
+		// done func
+		if (resp.func && !resp.func(&resp)) 
 		{
 			// calling--
 			tb_atomic_fetch_and_dec(&resp.aico->calling);

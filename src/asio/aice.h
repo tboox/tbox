@@ -522,10 +522,10 @@ typedef struct __tb_aice_t
 	/// the state
 	tb_uint32_t 				state 	: 8;
 
-	/// the aico callback func
-	tb_aicb_t 					aicb;
+	/// the aico func
+	tb_aico_func_t 				func;
 
-	/// the aico callback private data
+	/// the aico private data
 	tb_pointer_t 				priv;
 
 	/// the aico
