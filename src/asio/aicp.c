@@ -104,7 +104,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
 
 	// the posted aice
-	tb_aice_t* posted_aice = (tb_aice_t*)aice->data;
+	tb_aice_t* posted_aice = (tb_aice_t*)aice->priv;
 	tb_assert_and_check_return_val(posted_aice, tb_false);
 
 	// the aicp

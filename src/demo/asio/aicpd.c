@@ -96,7 +96,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SEND, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
@@ -137,7 +137,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_READ, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
@@ -168,7 +168,7 @@ static tb_bool_t tb_demo_sock_sendfile_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
@@ -210,7 +210,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_ACPT, tb_false);
 
 	// the file path
-	tb_char_t const* path = (tb_char_t const*)aice->data;
+	tb_char_t const* path = (tb_char_t const*)aice->priv;
 	tb_assert_and_check_return_val(path, tb_false);
 
 	// the aicp
@@ -317,7 +317,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 		tb_print("task[%p]: now: %lld", aice->aico, tb_ctime_time());
 
 		// run task
-		if (!tb_aico_task_run(aice->aico, 1001, tb_demo_task_func, aice->data)) return tb_false;
+		if (!tb_aico_task_run(aice->aico, 1001, tb_demo_task_func, aice->priv)) return tb_false;
 	}
 	// failed?
 	else

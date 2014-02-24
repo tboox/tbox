@@ -140,7 +140,7 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_READ, tb_false);
 
 	// the stream
-	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
+	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.read, tb_false);
 
 	// done state
@@ -200,7 +200,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_WRIT, tb_false);
  
 	// the stream
-	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
+	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.writ, tb_false);
 
 	// done state
@@ -286,7 +286,7 @@ static tb_bool_t tb_astream_file_sync_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_FSYNC, tb_false);
 
 	// the stream
-	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
+	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
 
 	// done func
@@ -314,7 +314,7 @@ static tb_bool_t tb_astream_file_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
 
 	// the stream
-	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->data;
+	tb_astream_file_t* fstream = (tb_astream_file_t*)aice->priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.task, tb_false);
 
 	// done func

@@ -98,7 +98,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = tb_astream_sock_cast(aice->data);
+	tb_astream_sock_t* sstream = tb_astream_sock_cast(aice->priv);
 	tb_assert_and_check_return_val(sstream && sstream->func.open, tb_false);
 
 	// done
@@ -266,7 +266,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RECV, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// done state
@@ -315,7 +315,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_URECV, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// done state
@@ -380,7 +380,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_SEND, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// done state
@@ -429,7 +429,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_USEND, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// done state
@@ -517,7 +517,7 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
 
 	// the stream
-	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->data;
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->func.task, tb_false);
 
 	// done func

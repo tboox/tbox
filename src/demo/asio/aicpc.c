@@ -54,7 +54,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_WRIT, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
@@ -92,7 +92,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RECV, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
@@ -141,7 +141,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_CONN, tb_false);
 
 	// the context
-	tb_demo_context_t* context = (tb_demo_context_t*)aice->data;
+	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// connection ok?
