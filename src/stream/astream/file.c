@@ -94,7 +94,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream, tb_false);
+	tb_assert_and_check_return_val(fstream && astream->aicp, tb_false);
 
 	// done
 	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;

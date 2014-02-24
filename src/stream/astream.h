@@ -88,7 +88,8 @@ typedef enum __tb_astream_type_e
 , 	TB_ASTREAM_TYPE_FILE 					= 1
 , 	TB_ASTREAM_TYPE_SOCK 					= 2
 , 	TB_ASTREAM_TYPE_HTTP 					= 3
-, 	TB_ASTREAM_TYPE_FLTR 					= 4
+, 	TB_ASTREAM_TYPE_DATA 					= 4
+, 	TB_ASTREAM_TYPE_FLTR 					= 5
 
 }tb_astream_type_e;
 
@@ -114,6 +115,9 @@ typedef enum __tb_astream_ctrl_e
 ,	TB_ASTREAM_CTRL_SET_PATH 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 14)
 ,	TB_ASTREAM_CTRL_SET_SSL 				= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 15)
 ,	TB_ASTREAM_CTRL_SET_TIMEOUT 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_NONE, 16)
+
+	// the astream for data
+,	TB_ASTREAM_CTRL_DATA_SET_DATA 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_DATA, 1)
 
 	// the astream for file
 ,	TB_ASTREAM_CTRL_FILE_SET_MODE 			= TB_ASTREAM_CTRL(TB_ASTREAM_TYPE_FILE, 1)
@@ -399,6 +403,14 @@ typedef struct __tb_astream_t
  * interfaces
  */
 
+/*! init data stream 
+ *
+ * @param aicp 		the aicp
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_data(tb_aicp_t* aicp);
+
 /*! init file stream 
  *
  * @param aicp 		the aicp
@@ -465,6 +477,16 @@ tb_void_t 			tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling);
  * @return 			the stream
  */
 tb_astream_t* 		tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url);
+
+/*! init stream from data
+ *
+ * @param aicp 		the aicp
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the stream
+ */
+tb_astream_t* 		tb_astream_init_from_data(tb_aicp_t* aicp, tb_byte_t const* data, tb_size_t size);
 
 /*! init stream from file
  *
