@@ -69,16 +69,6 @@ typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t http, tb_size_t state
  */
 typedef tb_bool_t 	(*tb_aicp_http_seek_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv);
 
-/*! the aicp http sync func type
- *
- * @param http 	the http handle
- * @param state 	the astream state
- * @param priv 		the func private data
- *
- * @return 			tb_true: ok, tb_false: error, but not break aicp
- */
-typedef tb_bool_t 	(*tb_aicp_http_sync_func_t)(tb_handle_t http, tb_size_t state, tb_pointer_t priv);
-
 /*! the aicp http task func type
  *
  * @param http 	the http handle
@@ -152,17 +142,6 @@ tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t privhttp);
-
-/*! sync the http
- *
- * @param handle 	the http handle
- * @param bclosing 	sync the tail data for closing
- * @param func 		the func
- * @param priv 		the func data
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_aicp_http_sync(tb_handle_t handle, tb_bool_t bclosing, tb_aicp_http_sync_func_t func, tb_pointer_t privhttp);
 
 /*! task the http
  *

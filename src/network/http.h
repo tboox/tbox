@@ -85,12 +85,12 @@ typedef enum __tb_http_option_e
 ,	TB_HTTP_OPTION_GET_REDIRECT			= 11 
 ,	TB_HTTP_OPTION_GET_HEAD_FUNC		= 12
 ,	TB_HTTP_OPTION_GET_HEAD_PRIV		= 13
-,	TB_HTTP_OPTION_GET_POST_SIZE 		= 14
-,	TB_HTTP_OPTION_GET_AUTO_UNZIP		= 15
-,	TB_HTTP_OPTION_GET_POST_FUNC		= 16
-,	TB_HTTP_OPTION_GET_POST_PRIV		= 17
-,	TB_HTTP_OPTION_GET_POST_LRATE		= 18
-,	TB_HTTP_OPTION_GET_POST_STREAM		= 19
+,	TB_HTTP_OPTION_GET_AUTO_UNZIP		= 14
+,	TB_HTTP_OPTION_GET_POST_URL			= 15
+,	TB_HTTP_OPTION_GET_POST_DATA		= 16
+,	TB_HTTP_OPTION_GET_POST_FUNC		= 17
+,	TB_HTTP_OPTION_GET_POST_PRIV		= 18
+,	TB_HTTP_OPTION_GET_POST_LRATE		= 19
 
 ,	TB_HTTP_OPTION_SET_SSL 				= 51
 ,	TB_HTTP_OPTION_SET_URL 				= 52
@@ -105,12 +105,12 @@ typedef enum __tb_http_option_e
 ,	TB_HTTP_OPTION_SET_REDIRECT			= 61
 ,	TB_HTTP_OPTION_SET_HEAD_FUNC		= 62
 ,	TB_HTTP_OPTION_SET_HEAD_PRIV		= 63
-,	TB_HTTP_OPTION_SET_POST_SIZE 		= 64
-,	TB_HTTP_OPTION_SET_AUTO_UNZIP		= 65
-,	TB_HTTP_OPTION_SET_POST_FUNC		= 66
-,	TB_HTTP_OPTION_SET_POST_PRIV		= 67
-,	TB_HTTP_OPTION_SET_POST_LRATE		= 68
-,	TB_HTTP_OPTION_SET_POST_STREAM		= 69
+,	TB_HTTP_OPTION_SET_AUTO_UNZIP		= 64
+,	TB_HTTP_OPTION_SET_POST_URL			= 65
+,	TB_HTTP_OPTION_SET_POST_DATA		= 66
+,	TB_HTTP_OPTION_SET_POST_FUNC		= 67
+,	TB_HTTP_OPTION_SET_POST_PRIV		= 68
+,	TB_HTTP_OPTION_SET_POST_LRATE		= 69
 
 }tb_http_option_e;
 
@@ -138,7 +138,6 @@ typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* li
 /*! the http post func type
  *
  * @param http 			the http handle
- * @param stream 		the post astream/gstream
  * @param state 		the post astream/gstream state
  * @param size 			the posted size 
  * @param rate 			the current rate, bytes/s
@@ -146,7 +145,7 @@ typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* li
  *
  * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_handle_t stream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t
@@ -184,6 +183,15 @@ typedef struct __tb_http_option_t
 	/// the head func
 	tb_http_head_func_t head_func;
 
+	/// the post url
+	tb_url_t 			post_url;
+
+	/// the post data
+	tb_byte_t const* 	post_data;
+
+	/// the post size
+	tb_size_t 			post_size;
+
 	/// the post func
 	tb_http_post_func_t post_func;
 
@@ -192,9 +200,6 @@ typedef struct __tb_http_option_t
 
 	/// the post limit rate
 	tb_size_t 			post_lrate;
-
-	/// the post astream or gstream
-	tb_handle_t 		post_stream;
 
 }tb_http_option_t;
 
