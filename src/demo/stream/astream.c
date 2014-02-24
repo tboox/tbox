@@ -36,7 +36,7 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -282,6 +282,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 					}
 
 					// post-data?
+#if 0
 					if (tb_option_find(context.option, "post-data"))
 					{
 						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(context.option, "post-data"));
@@ -302,6 +303,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 							if (context.debug) tb_printf("post: %llu\n", post_size);
 						}
 					}
+#endif
 				}
 
 				// set timeout

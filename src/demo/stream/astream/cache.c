@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_astream_cache_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_astream_cache_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));

@@ -178,31 +178,6 @@ static tb_bool_t tb_astream_http_seek(tb_astream_t* astream, tb_hize_t offset, t
 	// post seek
 	return tb_aicp_http_seek(hstream->http, offset, tb_astream_http_seek_func, astream);
 }
-static tb_bool_t tb_astream_http_sync_func(tb_handle_t http, tb_size_t state, tb_pointer_t priv)
-{
-	// check
-	tb_assert_and_check_return_val(http, tb_false);
-
-	// the stream
-	tb_astream_http_t* hstream = (tb_astream_http_t*)priv;
-	tb_assert_and_check_return_val(hstream && hstream->func.sync, tb_false);
-
-	// done func
-	return hstream->func.sync((tb_astream_t*)hstream, state, hstream->priv);
-}
-static tb_bool_t tb_astream_http_sync(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
-	tb_assert_and_check_return_val(hstream && hstream->http && func, tb_false);
-
-	// save func and priv
-	hstream->priv 		= priv;
-	hstream->func.sync 	= func;
-
-	// post sync
-	return tb_aicp_http_sync(hstream->http, bclosing, tb_astream_http_sync_func, astream);
-}
 static tb_bool_t tb_astream_http_task_func(tb_handle_t http, tb_size_t state, tb_pointer_t priv)
 {
 	// check
@@ -516,23 +491,104 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_SIZE:
+	case TB_ASTREAM_CTRL_HTTP_SET_POST_URL:
 		{
-			// post
-			tb_hize_t post = (tb_hize_t)tb_va_arg(args, tb_hize_t);
-
-			// set post
-			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_SIZE, post);
+			// url
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(url, tb_false);
+			
+			// set url
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_URL, url);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_SIZE:
+	case TB_ASTREAM_CTRL_HTTP_GET_POST_URL:
 		{
-			// ppost
-			tb_hize_t* ppost = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
-			tb_assert_and_check_return_val(ppost, tb_false);
+			// purl
+			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			tb_assert_and_check_return_val(purl, tb_false);
 
-			// get post
-			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_SIZE, ppost);
+			// get url
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_URL, purl);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_SET_POST_DATA:
+		{
+			// post data
+			tb_byte_t const* 	data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
+
+			// post size
+			tb_size_t 			size = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set post data
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_DATA, data, size);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_GET_POST_DATA:
+		{
+			// pdata and psize
+			tb_byte_t const** 	pdata = (tb_byte_t const**)tb_va_arg(args, tb_byte_t const**);
+			tb_size_t* 			psize = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(pdata && psize, tb_false);
+
+			// get post data and size
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_DATA, pdata, psize);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_SET_POST_FUNC:
+		{
+			// func
+			tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
+
+			// set post func
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_FUNC, func);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_GET_POST_FUNC:
+		{
+			// pfunc
+			tb_http_post_func_t* pfunc = (tb_http_post_func_t*)tb_va_arg(args, tb_http_post_func_t*);
+			tb_assert_and_check_return_val(pfunc, tb_false);
+
+			// get post func
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_FUNC, pfunc);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_SET_POST_PRIV:
+		{
+			// post priv
+			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+
+			// set post priv
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_GET_POST_PRIV:
+		{
+			// ppost priv
+			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
+			tb_assert_and_check_return_val(ppriv, tb_false);
+
+			// get post priv
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_PRIV, ppriv);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_SET_POST_LRATE:
+		{
+			// post lrate
+			tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set post lrate
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_LRATE, lrate);
+		}
+		break;
+	case TB_ASTREAM_CTRL_HTTP_GET_POST_LRATE:
+		{
+			// ppost lrate
+			tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(plrate, tb_false);
+
+			// get post lrate
+			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_LRATE, plrate);
 		}
 		break;
 	case TB_ASTREAM_CTRL_HTTP_SET_AUTO_UNZIP:
@@ -615,7 +671,6 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	hstream->base.open 		= tb_astream_http_open;
 	hstream->base.read 		= tb_astream_http_read;
 	hstream->base.seek 		= tb_astream_http_seek;
-	hstream->base.sync 		= tb_astream_http_sync;
 	hstream->base.task 		= tb_astream_http_task;
 	hstream->base.kill 		= tb_astream_http_kill;
 	hstream->base.clos 		= tb_astream_http_clos;

@@ -1675,6 +1675,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 			return tb_true;
 		}
 		break;
+#if 0
 	case TB_HTTP_OPTION_SET_POST_SIZE:
 		{
 			// post
@@ -1696,6 +1697,7 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 			return tb_true;
 		}
 		break;
+#endif
 	case TB_HTTP_OPTION_SET_AUTO_UNZIP:
 		{
 			// bunzip

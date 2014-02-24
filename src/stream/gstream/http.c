@@ -394,6 +394,7 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
 		}
 		break;
+#if 0
 	case TB_GSTREAM_CTRL_HTTP_SET_POST_SIZE:
 		{
 			// post
@@ -413,6 +414,7 @@ static tb_bool_t tb_gstream_http_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_SIZE, ppost);
 		}
 		break;
+#endif
 	case TB_GSTREAM_CTRL_HTTP_SET_AUTO_UNZIP:
 		{
 			// bunzip
