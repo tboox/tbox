@@ -87,22 +87,30 @@ typedef enum __tb_http_option_e
 ,	TB_HTTP_OPTION_GET_HEAD_PRIV		= 13
 ,	TB_HTTP_OPTION_GET_POST_SIZE 		= 14
 ,	TB_HTTP_OPTION_GET_AUTO_UNZIP		= 15
+,	TB_HTTP_OPTION_GET_POST_FUNC		= 16
+,	TB_HTTP_OPTION_GET_POST_PRIV		= 17
+,	TB_HTTP_OPTION_GET_POST_LRATE		= 18
+,	TB_HTTP_OPTION_GET_POST_STREAM		= 19
 
-,	TB_HTTP_OPTION_SET_SSL 				= 16
-,	TB_HTTP_OPTION_SET_URL 				= 17
-,	TB_HTTP_OPTION_SET_HOST 			= 18
-,	TB_HTTP_OPTION_SET_PORT 			= 19
-,	TB_HTTP_OPTION_SET_PATH 			= 20
-,	TB_HTTP_OPTION_SET_HEAD 			= 21
-,	TB_HTTP_OPTION_SET_RANGE 			= 22
-,	TB_HTTP_OPTION_SET_METHOD 			= 23
-,	TB_HTTP_OPTION_SET_VERSION			= 24
-,	TB_HTTP_OPTION_SET_TIMEOUT			= 25
-,	TB_HTTP_OPTION_SET_REDIRECT			= 26
-,	TB_HTTP_OPTION_SET_HEAD_FUNC		= 27
-,	TB_HTTP_OPTION_SET_HEAD_PRIV		= 28
-,	TB_HTTP_OPTION_SET_POST_SIZE 		= 29
-,	TB_HTTP_OPTION_SET_AUTO_UNZIP		= 30
+,	TB_HTTP_OPTION_SET_SSL 				= 51
+,	TB_HTTP_OPTION_SET_URL 				= 52
+,	TB_HTTP_OPTION_SET_HOST 			= 53
+,	TB_HTTP_OPTION_SET_PORT 			= 54
+,	TB_HTTP_OPTION_SET_PATH 			= 55
+,	TB_HTTP_OPTION_SET_HEAD 			= 56
+,	TB_HTTP_OPTION_SET_RANGE 			= 57
+,	TB_HTTP_OPTION_SET_METHOD 			= 58
+,	TB_HTTP_OPTION_SET_VERSION			= 59
+,	TB_HTTP_OPTION_SET_TIMEOUT			= 60
+,	TB_HTTP_OPTION_SET_REDIRECT			= 61
+,	TB_HTTP_OPTION_SET_HEAD_FUNC		= 62
+,	TB_HTTP_OPTION_SET_HEAD_PRIV		= 63
+,	TB_HTTP_OPTION_SET_POST_SIZE 		= 64
+,	TB_HTTP_OPTION_SET_AUTO_UNZIP		= 65
+,	TB_HTTP_OPTION_SET_POST_FUNC		= 66
+,	TB_HTTP_OPTION_SET_POST_PRIV		= 67
+,	TB_HTTP_OPTION_SET_POST_LRATE		= 68
+,	TB_HTTP_OPTION_SET_POST_STREAM		= 69
 
 }tb_http_option_e;
 
@@ -119,26 +127,26 @@ typedef struct __tb_http_range_t
 
 /*! the http head func type
  *
- * @param http 		the http handle
- * @param line 		the http head line
- * @param priv 		the func private data
+ * @param http 			the http handle
+ * @param line 			the http head line
+ * @param priv 			the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it
+ * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t (*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
 
 /*! the http post func type
  *
- * @param http 		the http handle
- * @param stream 	the post astream/gstream
- * @param state 	the post astream/gstream state
- * @param size 		the posted size 
- * @param rate 		the current rate, bytes/s
- * @param priv 		the func private data
+ * @param http 			the http handle
+ * @param stream 		the post astream/gstream
+ * @param state 		the post astream/gstream state
+ * @param size 			the posted size 
+ * @param rate 			the current rate, bytes/s
+ * @param priv 			the func private data
  *
- * @return 			tb_true: ok and continue it if need, tb_false: break it
+ * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_http_post_func_t)(tb_handle_t http, tb_handle_t stream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_handle_t stream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t

@@ -176,7 +176,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			delay = 0;
 
 			// done func
-			if (!tstream->func(state, tstream->size, tstream->crate, tstream->priv)) break;
+			if (!tstream->func(tstream->istream, ((tb_tstream_aa_t*)tstream)->ostream, state, tstream->size, tstream->crate, tstream->priv)) break;
 		}
 
 		// reset state
@@ -213,7 +213,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 		// done func
-		tstream->func(state, tstream->size, trate, tstream->priv);
+		tstream->func(tstream->istream, ((tb_tstream_aa_t*)tstream)->ostream, state, tstream->size, trate, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -241,7 +241,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 	// done func
-	return tstream->func(state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tstream->size, trate, tstream->priv);
+	return tstream->func(tstream->istream, ((tb_tstream_aa_t*)tstream)->ostream, state == TB_ASTREAM_STATE_OK? TB_ASTREAM_STATE_CLOSED : state, tstream->size, trate, tstream->priv);
 }
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -326,7 +326,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			}
 
 			// done func
-			if (!tstream->func(TB_ASTREAM_STATE_OK, tstream->size, tstream->crate, tstream->priv)) break;
+			if (!tstream->func(tstream->istream, ((tb_tstream_ag_t*)tstream)->ostream, TB_ASTREAM_STATE_OK, tstream->size, tstream->crate, tstream->priv)) break;
 
 			// not paused?
 			if (!tb_atomic_get(&tstream->paused)) 
@@ -376,7 +376,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			tb_size_t trate = (tstream->size && (time > tstream->base))? (tb_size_t)((tstream->size * 1000) / (time - tstream->base)) : (tb_size_t)tstream->size;
 
 			// done func
-			tstream->func(state, tstream->size, trate, tstream->priv);
+			tstream->func(tstream->istream, ((tstream->type == TB_TSTREAM_TYPE_AA)? (tb_handle_t)((tb_tstream_aa_t*)tstream)->ostream : (tb_handle_t)((tb_tstream_ag_t*)tstream)->ostream), state, tstream->size, trate, tstream->priv);
 		}
 
 		// break
@@ -427,7 +427,7 @@ static tb_bool_t tb_tstream_istream_seek_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		ok = tstream->func(state, tstream->size, 0, tstream->priv);
+		ok = tstream->func(tstream->istream, ((tb_tstream_aa_t*)tstream)->ostream, state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -486,7 +486,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	if (state != TB_ASTREAM_STATE_OK) 
 	{
 		// done func
-		ok = tstream->func(state, tstream->size, 0, tstream->priv);
+		ok = tstream->func(tstream->istream, ((tb_tstream_aa_t*)tstream)->ostream, state, tstream->size, 0, tstream->priv);
 
 		// clear pending
 		tb_atomic_set0(&tstream->pending);
@@ -572,7 +572,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 					delay = 0;
 
 					// done func
-					if (func) func(TB_GSTREAM_STATE_OK, writ, crate, priv);
+					if (func) func(istream, ostream, TB_GSTREAM_STATE_OK, writ, crate, priv);
 				}
 
 				// wait some time for limit rate
@@ -611,7 +611,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
 	
 		// done func
-		func(TB_GSTREAM_STATE_CLOSED, writ, trate, priv);
+		func(istream, ostream, TB_GSTREAM_STATE_CLOSED, writ, trate, priv);
 	}
 
 	// ok?
