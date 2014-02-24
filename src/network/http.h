@@ -117,8 +117,28 @@ typedef struct __tb_http_range_t
 
 }tb_http_range_t;
 
-/// the http head func type
+/*! the http head func type
+ *
+ * @param http 		the http handle
+ * @param line 		the http head line
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it
+ */
 typedef tb_bool_t (*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv);
+
+/*! the http post func type
+ *
+ * @param http 		the http handle
+ * @param stream 	the post astream/gstream
+ * @param state 	the post astream/gstream state
+ * @param size 		the posted size 
+ * @param rate 		the current rate, bytes/s
+ * @param priv 		the func private data
+ *
+ * @return 			tb_true: ok and continue it if need, tb_false: break it
+ */
+typedef tb_bool_t 	(*tb_http_post_func_t)(tb_handle_t http, tb_handle_t stream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t
@@ -138,7 +158,7 @@ typedef struct __tb_http_option_t
 	/// the url
 	tb_url_t 			url;
 
-	/// the post size
+	/// the post size, TODO: discard
 	tb_hize_t 			post;
 
 	/// the request head 
@@ -155,6 +175,18 @@ typedef struct __tb_http_option_t
 
 	/// the head func
 	tb_http_head_func_t head_func;
+
+	/// the post func
+	tb_http_post_func_t post_func;
+
+	/// the post data
+	tb_pointer_t 		post_priv;
+
+	/// the post limit rate
+	tb_size_t 			post_lrate;
+
+	/// the post astream or gstream
+	tb_handle_t 		post_stream;
 
 }tb_http_option_t;
 

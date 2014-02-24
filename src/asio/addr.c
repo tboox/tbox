@@ -352,7 +352,7 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aicp, tb_false);
 	
 	// the addr
-	tb_aicp_addr_t* addr = aice->data; 
+	tb_aicp_addr_t* addr = aice->priv; 
 	tb_assert_and_check_return_val(addr, tb_false);
 
 	// done
@@ -419,7 +419,7 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aicp, tb_false);
 	
 	// the addr
-	tb_aicp_addr_t* addr = aice->data; 
+	tb_aicp_addr_t* addr = aice->priv; 
 	tb_assert_and_check_return_val(addr && addr->func, tb_false);
 
 	// done
