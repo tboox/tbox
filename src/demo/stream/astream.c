@@ -192,7 +192,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 				// init istream
 				context.istream = tb_astream_init_from_url(aicp, tb_option_item_cstr(context.option, "url"));
 				tb_assert_and_check_break(context.istream);
-	
+
 				// ctrl http
 				if (tb_astream_type(context.istream) == TB_ASTREAM_TYPE_HTTP) 
 				{

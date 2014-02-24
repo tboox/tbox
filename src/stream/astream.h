@@ -468,10 +468,13 @@ tb_void_t 			tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling);
  * @param aicp 		the aicp
  * @param url 		the url
  * <pre>
+ * data://base64
  * file://path or unix path: e.g. /root/xxxx/file
  * sock://host:port?tcp=
  * sock://host:port?udp=
+ * socks://host:port
  * http://host:port/path?arg0=&arg1=...
+ * https://host:port/path?arg0=&arg1=...
  * </pre>
  *
  * @return 			the stream

@@ -331,9 +331,11 @@ tb_void_t 			tb_gstream_exit(tb_gstream_t* gstream);
  *
  * @param url 		the url
  * <pre>
+ * data://base64
  * file://path or unix path: e.g. /root/xxxx/file
  * sock://host:port?tcp=
- * socks://host:port?udp=
+ * sock://host:port?udp=
+ * socks://host:port
  * http://host:port/path?arg0=&arg1=...
  * https://host:port/path?arg0=&arg1=...
  * </pre>
