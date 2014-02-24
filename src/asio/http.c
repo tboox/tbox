@@ -56,23 +56,6 @@ typedef struct __tb_aicp_http_oread_t
 
 }tb_aicp_http_oread_t;
 
-// the aicp http open and writ type
-typedef struct __tb_aicp_http_owrit_t
-{
-	// the func
-	tb_aicp_http_writ_func_t 		func;
-
-	// the priv
-	tb_pointer_t 					priv;
-
-	// the data
-	tb_byte_t const* 				data;
-
-	// the size
-	tb_size_t 						size;
-
-}tb_aicp_http_owrit_t;
-
 // the aicp http open and seek type
 typedef struct __tb_aicp_http_oseek_t
 {
@@ -124,7 +107,6 @@ typedef struct __tb_aicp_http_t
 	union
 	{
 		tb_aicp_http_oread_t 		read;
-		tb_aicp_http_owrit_t 		writ;
 		tb_aicp_http_oseek_t 		seek;
 
 	} 								open_and;
@@ -134,7 +116,6 @@ typedef struct __tb_aicp_http_t
 	{
 		tb_aicp_http_open_func_t 	open;
 		tb_aicp_http_read_func_t 	read;
-		tb_aicp_http_writ_func_t 	writ;
 		tb_aicp_http_seek_func_t 	seek;
 		tb_aicp_http_sync_func_t 	sync;
 		tb_aicp_http_task_func_t 	task;
@@ -320,40 +301,6 @@ static tb_bool_t tb_aicp_http_oread_func(tb_handle_t http, tb_size_t state, tb_h
 	{
 		// done func
 		ok = oread->func(http, state, tb_null, 0, oread->maxn, oread->priv);
-	}
- 
-	// ok?
-	return ok;
-}
-static tb_bool_t tb_aicp_http_owrit_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_owrit_t* owrit = (tb_aicp_http_owrit_t*)priv;
-	tb_assert_and_check_return_val(http && status && owrit && owrit->func, tb_false);
-
-	// done
-	tb_bool_t ok = tb_true;
-	do
-	{
-		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
-
-		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
-	
-		// writ it
-		if (!tb_aicp_http_writ(http, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
-
-		// ok
-		state = TB_ASTREAM_STATE_OK;
-
-	} while (0);
- 
-	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
-	{
-		// done func
-		ok = owrit->func(http, state, owrit->data, 0, owrit->size, owrit->priv);
 	}
  
 	// ok?
@@ -821,18 +768,6 @@ static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, 
 	// done func
 	return http->func.read(http, state, data, real, size, http->priv);
 }
-static tb_bool_t tb_aicp_http_writ_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
-	tb_assert_and_check_return_val(http && http->stream && http->func.writ, tb_false);
-
-	// trace
-	tb_trace_impl("writ: real: %lu, state: %s", real, tb_astream_state_cstr(state));
-
-	// done func
-	return http->func.writ(http, state, data, real, size, http->priv);
-}
 static tb_bool_t tb_aicp_http_seek_func(tb_astream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
 {
 	// check
@@ -1141,10 +1076,6 @@ tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_rea
 {
 	return tb_aicp_http_read_after(handle, 0, maxn, func, priv);
 }
-tb_bool_t tb_aicp_http_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv)
-{
-	return tb_aicp_http_writ_after(handle, 0, data, size, func, priv);
-}
 tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -1196,19 +1127,6 @@ tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_re
 	http->open_and.read.maxn = maxn;
 	return tb_aicp_http_open(http, tb_aicp_http_oread_func, &http->open_and.read);
 }
-tb_bool_t tb_aicp_http_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
-	tb_assert_and_check_return_val(http && func, tb_false);
-
-	// init open and writ
-	http->open_and.writ.func = func;
-	http->open_and.writ.priv = priv;
-	http->open_and.writ.data = data;
-	http->open_and.writ.size = size;
-	return tb_aicp_http_open(http, tb_aicp_http_owrit_func, &http->open_and.writ);
-}
 tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -1248,19 +1166,6 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
 
 	// post task
 	return tb_astream_read_after(http->stream, delay, maxn, tb_aicp_http_read_func, http);
-}
-tb_bool_t tb_aicp_http_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_http_writ_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream && data && size && func, tb_false);
-
-	// init writ
-	http->func.writ = func;
-	http->priv 		= priv;
-
-	// post task
-	return tb_astream_writ_after(http->stream, delay, data, size, tb_aicp_http_writ_func, http);
 }
 tb_aicp_t* tb_aicp_http_aicp(tb_handle_t handle)
 {
