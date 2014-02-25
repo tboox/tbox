@@ -30,7 +30,7 @@ static tb_void_t tb_demo_tstream_free(tb_item_func_t* func, tb_pointer_t item)
 	if (tstream) tb_tstream_exit(tstream, tb_false);
 }
 #if TB_DEMO_TEST_AICP
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
@@ -44,7 +44,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostr
 	return tb_true;
 }
 #else
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
@@ -80,7 +80,7 @@ tb_int_t tb_demo_stream_mstream_main(tb_int_t argc, tb_char_t** argv)
 		for (; p && *p; p++)
 		{
 			// init tstream
-			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, -1, tb_null, tb_demo_tstream_save_func, *p);
+			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, -1);
 			tb_assert_and_check_break(tstream);
 
 			// add tstream
@@ -89,8 +89,8 @@ tb_int_t tb_demo_stream_mstream_main(tb_int_t argc, tb_char_t** argv)
 			// size++
 			tb_atomic_fetch_and_inc(&g_size);
 
-			// start tstream
-			if (!tb_tstream_start(tstream)) break;
+			// open and save tstream
+			if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, *p)) break;
 		}
 		tb_assert_and_check_break(tb_vector_size(list));
 
