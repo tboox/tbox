@@ -92,6 +92,14 @@
  * interfaces
  */
 
+/*! the stream mode
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream mode
+ */
+tb_size_t 			tb_stream_mode(tb_stream_t const* stream);
+
 /*! the stream type
  *
  * @param stream 	the stream
@@ -142,6 +150,15 @@ tb_size_t 			tb_stream_timeout(tb_stream_t const* stream);
  * @return 			the stream state c-string
  */
 tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
+
+/*! ctrl stream
+ *
+ * @param stream 	the stream
+ * @param ctrl 		the ctrl command
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_stream_ctrl(tb_stream_t* stream, tb_size_t ctrl, ...);
 
 #endif
 

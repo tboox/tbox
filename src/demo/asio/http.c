@@ -20,10 +20,10 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
 static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// trace
-	tb_print("read: %lu, state: %s", real, tb_astream_state_cstr(state));
+	tb_print("read: %lu, state: %s", real, tb_stream_state_cstr(state));
 
 	// failed or closed? kill aicp
-	if (state != TB_ASTREAM_STATE_OK) tb_aicp_kill(priv);
+	if (state != TB_STREAM_STATE_OK) tb_aicp_kill(priv);
 
 	// ok
 	return tb_true;
@@ -31,7 +31,7 @@ static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state
 static tb_bool_t tb_demo_aicp_http_post_func(tb_handle_t http, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("post: %llu, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
+	tb_print("post: %llu, rate: %lu bytes/s, state: %s", size, rate, tb_stream_state_cstr(state));
 
 	// ok
 	return tb_true;

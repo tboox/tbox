@@ -58,7 +58,7 @@ typedef struct __tb_gstream_data_t
  */
 static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_DATA, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_DATA, tb_null);
 	return (tb_gstream_data_t*)gstream;
 }
 static tb_long_t tb_gstream_data_open(tb_gstream_t* gstream)
@@ -196,7 +196,7 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
-	case TB_GSTREAM_CTRL_GET_SIZE:
+	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// the psize
 			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -206,7 +206,7 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			*psize = dstream->size;
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_DATA_SET_DATA:
+	case TB_STREAM_CTRL_DATA_SET_DATA:
 		{
 			// exit data first if exists
 			if (dstream->data && !dstream->bref) tb_free(dstream->data);
@@ -221,7 +221,7 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_SET_URL:
+	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
 			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
@@ -275,7 +275,7 @@ tb_gstream_t* tb_gstream_init_data()
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init stream
-	if (!tb_gstream_init(gstream, TB_GSTREAM_TYPE_DATA)) goto fail;
+	if (!tb_gstream_init(gstream, TB_STREAM_TYPE_DATA)) goto fail;
 
 	// init func
 	gstream->open 	= tb_gstream_data_open;
@@ -304,7 +304,7 @@ tb_gstream_t* tb_gstream_init_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// set data & size
-	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_DATA_SET_DATA, data, size)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_DATA_SET_DATA, data, size)) goto fail;
 	
 	// ok
 	return gstream;

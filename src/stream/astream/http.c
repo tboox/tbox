@@ -73,7 +73,7 @@ typedef struct __tb_astream_http_t
  */
 static __tb_inline__ tb_astream_http_t* tb_astream_http_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_ASTREAM_TYPE_HTTP, tb_null);
+	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_astream_http_t*)astream;
 }
 static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
@@ -122,7 +122,7 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	tb_assert_and_check_return_val(hstream && hstream->func.read, tb_false);
 
 	// save offset
-	if (state == TB_ASTREAM_STATE_OK) tb_atomic64_fetch_and_add(&hstream->offset, real);
+	if (state == TB_STREAM_STATE_OK) tb_atomic64_fetch_and_add(&hstream->offset, real);
 
 	// done func
 	return hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
@@ -150,7 +150,7 @@ static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb
 	tb_assert_and_check_return_val(hstream && hstream->func.seek, tb_false);
 
 	// save offset
-	if (state == TB_ASTREAM_STATE_OK) tb_atomic64_set(&hstream->offset, offset);
+	if (state == TB_STREAM_STATE_OK) tb_atomic64_set(&hstream->offset, offset);
 
 	// done func
 	return hstream->func.seek((tb_astream_t*)hstream, state, offset, hstream->priv);
@@ -234,7 +234,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	// done
 	switch (ctrl)
 	{
-	case TB_ASTREAM_CTRL_GET_SIZE:
+	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
@@ -245,7 +245,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			*psize = (tb_hong_t)tb_atomic64_get(&hstream->size);
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_GET_OFFSET:
+	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
@@ -256,7 +256,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			*poffset = (tb_hize_t)tb_atomic64_get(&hstream->offset);
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SET_URL:
+	case TB_STREAM_CTRL_SET_URL:
 		{
 			// url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -266,7 +266,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_URL, url);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_URL:
+	case TB_STREAM_CTRL_GET_URL:
 		{
 			// purl
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -276,7 +276,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_URL, purl);
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_HOST:
+	case TB_STREAM_CTRL_SET_HOST:
 		{
 			// host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -286,7 +286,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_HOST, host);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_HOST:
+	case TB_STREAM_CTRL_GET_HOST:
 		{
 			// phost
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -296,7 +296,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_HOST, phost);
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_PORT:
+	case TB_STREAM_CTRL_SET_PORT:
 		{
 			// port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -306,7 +306,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_PORT, port);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_PORT:
+	case TB_STREAM_CTRL_GET_PORT:
 		{
 			// pport
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -316,7 +316,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_PORT, pport);
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_PATH:
+	case TB_STREAM_CTRL_SET_PATH:
 		{
 			// path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -326,7 +326,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_PATH, path);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_PATH:
+	case TB_STREAM_CTRL_GET_PATH:
 		{
 			// ppath
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -336,7 +336,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_PATH, ppath);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_METHOD:
+	case TB_STREAM_CTRL_HTTP_SET_METHOD:
 		{
 			// method
 			tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -345,7 +345,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_METHOD, method);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_METHOD:
+	case TB_STREAM_CTRL_HTTP_GET_METHOD:
 		{
 			// pmethod
 			tb_size_t* pmethod = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -355,7 +355,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_METHOD, pmethod);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_HEAD:
+	case TB_STREAM_CTRL_HTTP_SET_HEAD:
 		{
 			// key
 			tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -369,7 +369,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD, key, val);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_HEAD:
+	case TB_STREAM_CTRL_HTTP_GET_HEAD:
 		{
 			// key
 			tb_char_t const* key = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -383,7 +383,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD, key, pval);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_HEAD_FUNC:
+	case TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC:
 		{
 			// head_func
 			tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
@@ -392,7 +392,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD_FUNC, head_func);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_HEAD_FUNC:
+	case TB_STREAM_CTRL_HTTP_GET_HEAD_FUNC:
 		{
 			// phead_func
 			tb_http_head_func_t* phead_func = (tb_http_head_func_t*)tb_va_arg(args, tb_http_head_func_t*);
@@ -402,7 +402,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD_FUNC, phead_func);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_HEAD_PRIV:
+	case TB_STREAM_CTRL_HTTP_SET_HEAD_PRIV:
 		{
 			// head_priv
 			tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
@@ -411,7 +411,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_HEAD_PRIV, head_priv);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_HEAD_PRIV:
+	case TB_STREAM_CTRL_HTTP_GET_HEAD_PRIV:
 		{
 			// phead_priv
 			tb_pointer_t* phead_priv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
@@ -421,14 +421,14 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_HEAD_PRIV, phead_priv);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_RANGE:
+	case TB_STREAM_CTRL_HTTP_SET_RANGE:
 		{
 			tb_hize_t bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
 			tb_hize_t eof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_RANGE, bof, eof);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_RANGE:
+	case TB_STREAM_CTRL_HTTP_GET_RANGE:
 		{
 			// pbof
 			tb_hize_t* pbof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -442,7 +442,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_RANGE, pbof, peof);
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_SSL:
+	case TB_STREAM_CTRL_SET_SSL:
 		{
 			// bssl
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -451,7 +451,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_SSL, bssl);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_SSL:
+	case TB_STREAM_CTRL_GET_SSL:
 		{
 			// pssl
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
@@ -461,7 +461,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_SSL, pssl);
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_TIMEOUT:
+	case TB_STREAM_CTRL_SET_TIMEOUT:
 		{
 			// timeout
 			tb_size_t timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -471,7 +471,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_TIMEOUT, timeout);
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_TIMEOUT:
+	case TB_STREAM_CTRL_GET_TIMEOUT:
 		{
 			// ptimeout
 			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -481,7 +481,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_URL:
+	case TB_STREAM_CTRL_HTTP_SET_POST_URL:
 		{
 			// url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
@@ -491,7 +491,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_URL, url);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_URL:
+	case TB_STREAM_CTRL_HTTP_GET_POST_URL:
 		{
 			// purl
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -501,7 +501,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_URL, purl);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_DATA:
+	case TB_STREAM_CTRL_HTTP_SET_POST_DATA:
 		{
 			// post data
 			tb_byte_t const* 	data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
@@ -513,7 +513,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_DATA, data, size);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_DATA:
+	case TB_STREAM_CTRL_HTTP_GET_POST_DATA:
 		{
 			// pdata and psize
 			tb_byte_t const** 	pdata = (tb_byte_t const**)tb_va_arg(args, tb_byte_t const**);
@@ -524,7 +524,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_DATA, pdata, psize);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_FUNC:
+	case TB_STREAM_CTRL_HTTP_SET_POST_FUNC:
 		{
 			// func
 			tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
@@ -533,7 +533,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_FUNC, func);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_FUNC:
+	case TB_STREAM_CTRL_HTTP_GET_POST_FUNC:
 		{
 			// pfunc
 			tb_http_post_func_t* pfunc = (tb_http_post_func_t*)tb_va_arg(args, tb_http_post_func_t*);
@@ -543,7 +543,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_FUNC, pfunc);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_PRIV:
+	case TB_STREAM_CTRL_HTTP_SET_POST_PRIV:
 		{
 			// post priv
 			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
@@ -552,7 +552,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_PRIV:
+	case TB_STREAM_CTRL_HTTP_GET_POST_PRIV:
 		{
 			// ppost priv
 			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
@@ -562,7 +562,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_PRIV, ppriv);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_POST_LRATE:
+	case TB_STREAM_CTRL_HTTP_SET_POST_LRATE:
 		{
 			// post lrate
 			tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -571,7 +571,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_LRATE, lrate);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_POST_LRATE:
+	case TB_STREAM_CTRL_HTTP_GET_POST_LRATE:
 		{
 			// ppost lrate
 			tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -581,7 +581,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_LRATE, plrate);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_AUTO_UNZIP:
+	case TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP:
 		{
 			// bunzip
 			tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -590,7 +590,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_AUTO_UNZIP, bunzip);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_AUTO_UNZIP:
+	case TB_STREAM_CTRL_HTTP_GET_AUTO_UNZIP:
 		{
 			// pbunzip
 			tb_bool_t* pbunzip = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
@@ -600,7 +600,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_AUTO_UNZIP, pbunzip);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_REDIRECT:
+	case TB_STREAM_CTRL_HTTP_SET_REDIRECT:
 		{
 			// redirect
 			tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -609,7 +609,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_REDIRECT, redirect);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_REDIRECT:
+	case TB_STREAM_CTRL_HTTP_GET_REDIRECT:
 		{
 			// predirect
 			tb_size_t* predirect = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -619,7 +619,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_GET_REDIRECT, predirect);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_SET_VERSION:
+	case TB_STREAM_CTRL_HTTP_SET_VERSION:
 		{
 			// version
 			tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -628,7 +628,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			return tb_aicp_http_option(hstream->http, TB_HTTP_OPTION_SET_VERSION, version);
 		}
 		break;
-	case TB_ASTREAM_CTRL_HTTP_GET_VERSION:
+	case TB_STREAM_CTRL_HTTP_GET_VERSION:
 		{
 			// pversion
 			tb_size_t* pversion = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -657,7 +657,7 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(hstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_ASTREAM_TYPE_HTTP)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP)) goto fail;
 	hstream->base.open 		= tb_astream_http_open;
 	hstream->base.read 		= tb_astream_http_read;
 	hstream->base.seek 		= tb_astream_http_seek;
@@ -688,10 +688,10 @@ tb_astream_t* tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, 
 	tb_assert_and_check_return_val(hstream, tb_null);
 
 	// ctrl
-	if (!tb_astream_ctrl(hstream, TB_ASTREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_ASTREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_ASTREAM_CTRL_SET_PATH, path)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_ASTREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
+	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return hstream;

@@ -95,7 +95,7 @@ typedef struct __tb_astream_sock_t
  */
 static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_ASTREAM_TYPE_SOCK, tb_null);
+	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_astream_sock_t*)astream;
 }
 static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
@@ -108,7 +108,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.open, tb_false);
 
 	// done
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
 	{
 		// ok
@@ -118,20 +118,20 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 			tb_atomic_set(&sstream->base.opened, 1);
 
 			// ok
-			state = TB_ASTREAM_STATE_OK;
+			state = TB_STREAM_STATE_OK;
 		}
 		break;
 		// timeout
 	case TB_AICE_STATE_TIMEOUT:
-		state = TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT;
+		state = TB_STREAM_SOCK_STATE_CONNECT_TIMEOUT;
 		break;
 		// killed
 	case TB_AICE_STATE_KILLED:
-		state = TB_ASTREAM_STATE_KILLED;
+		state = TB_STREAM_STATE_KILLED;
 		break;
 		// failed
 	default:
-		state = TB_ASTREAM_SOCK_STATE_CONNECT_FAILED;
+		state = TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 		break;
 	}
 
@@ -148,7 +148,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 	tb_assert_and_check_return(haddr && sstream && sstream->func.open);
 
 	// done
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	do
 	{
 		// addr ok?
@@ -208,11 +208,11 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 				tb_atomic_set(&sstream->base.opened, 1);
 
 				// done func
-				sstream->func.open((tb_astream_t*)sstream, TB_ASTREAM_STATE_OK, sstream->priv);
+				sstream->func.open((tb_astream_t*)sstream, TB_STREAM_STATE_OK, sstream->priv);
 			}
 
 			// ok
-			state = TB_ASTREAM_STATE_OK;
+			state = TB_STREAM_STATE_OK;
 		}
 		// timeout or failed?
 		else
@@ -221,13 +221,13 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 			tb_trace_impl("addr[%s]: failed", host);
 
 			// dns failed
-			state = TB_ASTREAM_SOCK_STATE_DNS_FAILED;
+			state = TB_STREAM_SOCK_STATE_DNS_FAILED;
 		}
 
 	} while (0);
 
 	// done func if failed
-	if (state != TB_ASTREAM_STATE_OK) sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
+	if (state != TB_STREAM_STATE_OK) sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
 }
 static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
 {
@@ -248,7 +248,7 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_atomic_set(&sstream->base.opened, 1);
 
 		// done func
-		sstream->func.open((tb_astream_t*)sstream, TB_ASTREAM_STATE_OK, sstream->priv);
+		sstream->func.open((tb_astream_t*)sstream, TB_STREAM_STATE_OK, sstream->priv);
 
 		// ok
 		return tb_true;
@@ -282,26 +282,26 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// done state
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.recv.real <= sstream->maxn);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.recv.real);
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 		break;
 		// closed
 	case TB_AICE_STATE_CLOSED:
-		state = TB_ASTREAM_STATE_CLOSED;
+		state = TB_STREAM_STATE_CLOSED;
 		break;
 		// killed
 	case TB_AICE_STATE_KILLED:
-		state = TB_ASTREAM_STATE_KILLED;
+		state = TB_STREAM_STATE_KILLED;
 		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:
-		state = TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT;
+		state = TB_STREAM_SOCK_STATE_RECV_TIMEOUT;
 		break;
 	default:
 		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
@@ -332,26 +332,26 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// done state
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.urecv.real <= sstream->maxn);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.urecv.real);
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 		break;
 		// closed
 	case TB_AICE_STATE_CLOSED:
-		state = TB_ASTREAM_STATE_CLOSED;
+		state = TB_STREAM_STATE_CLOSED;
 		break;
 		// killed
 	case TB_AICE_STATE_KILLED:
-		state = TB_ASTREAM_STATE_KILLED;
+		state = TB_STREAM_STATE_KILLED;
 		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:
-		state = TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT;
+		state = TB_STREAM_SOCK_STATE_RECV_TIMEOUT;
 		break;
 	default:
 		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
@@ -404,26 +404,26 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// done state
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.send.data && aice->u.send.real <= aice->u.send.size);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.send.real);
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 		break;
 		// closed
 	case TB_AICE_STATE_CLOSED:
-		state = TB_ASTREAM_STATE_CLOSED;
+		state = TB_STREAM_STATE_CLOSED;
 		break;
 		// killed
 	case TB_AICE_STATE_KILLED:
-		state = TB_ASTREAM_STATE_KILLED;
+		state = TB_STREAM_STATE_KILLED;
 		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:
-		state = TB_ASTREAM_SOCK_STATE_SEND_TIMEOUT;
+		state = TB_STREAM_SOCK_STATE_SEND_TIMEOUT;
 		break;
 	default:
 		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
@@ -454,26 +454,26 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// done state
-	tb_size_t state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.usend.data && aice->u.usend.real <= aice->u.usend.size);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.usend.real);
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 		break;
 		// closed
 	case TB_AICE_STATE_CLOSED:
-		state = TB_ASTREAM_STATE_CLOSED;
+		state = TB_STREAM_STATE_CLOSED;
 		break;
 		// killed
 	case TB_AICE_STATE_KILLED:
-		state = TB_ASTREAM_STATE_KILLED;
+		state = TB_STREAM_STATE_KILLED;
 		break;
 		// timeout?
 	case TB_AICE_STATE_TIMEOUT:
-		state = TB_ASTREAM_SOCK_STATE_SEND_TIMEOUT;
+		state = TB_STREAM_SOCK_STATE_SEND_TIMEOUT;
 		break;
 	default:
 		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
@@ -522,7 +522,7 @@ static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, t
 	tb_assert_and_check_return_val(sstream && func, tb_false);
 
 	// done func
-	func(astream, TB_ASTREAM_STATE_NOT_SUPPORTED, 0, priv);
+	func(astream, TB_STREAM_STATE_NOT_SUPPORTED, 0, priv);
 
 	// ok
 	return tb_true;
@@ -534,7 +534,7 @@ static tb_bool_t tb_astream_sock_sync(tb_astream_t* astream, tb_bool_t bclosing,
 	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && func, tb_false);
 
 	// done func
-	func(astream, TB_ASTREAM_STATE_OK, priv);
+	func(astream, TB_STREAM_STATE_OK, priv);
 
 	// ok
 	return tb_true;
@@ -549,7 +549,7 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.task, tb_false);
 
 	// done func
-	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, aice->state == TB_AICE_STATE_OK? TB_ASTREAM_STATE_OK : TB_ASTREAM_STATE_UNKNOWN_ERROR, sstream->priv);
+	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, aice->state == TB_AICE_STATE_OK? TB_STREAM_STATE_OK : TB_STREAM_STATE_UNKNOWN_ERROR, sstream->priv);
 
 	// ok and continue?
 	if (ok && aice->state == TB_AICE_STATE_OK)
@@ -651,7 +651,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
-	case TB_ASTREAM_CTRL_GET_OFFSET:
+	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
@@ -662,7 +662,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			*poffset = (tb_hize_t)tb_atomic64_get(&sstream->offset);
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SOCK_SET_TYPE:
+	case TB_STREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -690,7 +690,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			// ok
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SOCK_SET_HANDLE:
+	case TB_STREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -716,7 +716,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			// ok
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SOCK_GET_HANDLE:
+	case TB_STREAM_CTRL_SOCK_GET_HANDLE:
 		{
 			// get handle
 			tb_handle_t* phandle = (tb_handle_t*)tb_va_arg(args, tb_handle_t*);
@@ -724,7 +724,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			*phandle = sstream->sock;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE:
+	case TB_STREAM_CTRL_SOCK_KEEP_ALIVE:
 		{
 			// keep alive?
 			tb_bool_t balived = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -750,7 +750,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_ASTREAM_TYPE_SOCK)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK)) goto fail;
 	sstream->base.open 		= tb_astream_sock_open;
 	sstream->base.read 		= tb_astream_sock_read;
 	sstream->base.writ 		= tb_astream_sock_writ;
@@ -783,10 +783,10 @@ tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, 
 	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// ctrl
-	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SET_SSL, bssl)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_ASTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
 	return sstream;

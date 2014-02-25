@@ -48,15 +48,15 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->stoped))
 		{
-			state = TB_ASTREAM_STATE_KILLED;
+			state = TB_STREAM_STATE_KILLED;
 			break;
 		}
 		
@@ -64,12 +64,12 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 		if (!astream->read(astream, 0, oread->maxn, oread->func, oread->priv)) break;
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
+	if (state != TB_STREAM_STATE_OK) 
 	{
 		// stoped
 		tb_atomic_set(&astream->stoped, 1);
@@ -92,15 +92,15 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 			
 		// stoped?
 		if (tb_atomic_get(&astream->stoped))
 		{
-			state = TB_ASTREAM_STATE_KILLED;
+			state = TB_STREAM_STATE_KILLED;
 			break;
 		}
 
@@ -111,12 +111,12 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 		if (!astream->writ(astream, 0, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_ASTREAM_STATE_OK)
+	if (state != TB_STREAM_STATE_OK)
 	{	
 		// stoped
 		tb_atomic_set(&astream->stoped, 1);
@@ -139,15 +139,15 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->stoped))
 		{
-			state = TB_ASTREAM_STATE_KILLED;
+			state = TB_STREAM_STATE_KILLED;
 			break;
 		}
 
@@ -155,12 +155,12 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 		if (!astream->seek(astream, oseek->offset, oseek->func, oseek->priv)) break;
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_ASTREAM_STATE_OK) 
+	if (state != TB_STREAM_STATE_OK) 
 	{	
 		// stoped
 		tb_atomic_set(&astream->stoped, 1);
@@ -194,14 +194,14 @@ tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 	// init
 	tb_char_t const* 	p = url;
 	tb_astream_t* 		astream = tb_null;
-	tb_size_t 			type = TB_ASTREAM_TYPE_NONE;
-	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_ASTREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_ASTREAM_TYPE_SOCK;
-	else if (!tb_strnicmp(p, "file://", 7)) 	type = TB_ASTREAM_TYPE_FILE;
-	else if (!tb_strnicmp(p, "data://", 7)) 	type = TB_ASTREAM_TYPE_DATA;
-	else if (!tb_strnicmp(p, "https://", 8)) 	type = TB_ASTREAM_TYPE_HTTP;
-	else if (!tb_strnicmp(p, "socks://", 8)) 	type = TB_ASTREAM_TYPE_SOCK;
-	else if (!tb_strstr(p, "://")) 				type = TB_ASTREAM_TYPE_FILE;
+	tb_size_t 			type = TB_STREAM_TYPE_NONE;
+	if (!tb_strnicmp(p, "http://", 7)) 			type = TB_STREAM_TYPE_HTTP;
+	else if (!tb_strnicmp(p, "sock://", 7)) 	type = TB_STREAM_TYPE_SOCK;
+	else if (!tb_strnicmp(p, "file://", 7)) 	type = TB_STREAM_TYPE_FILE;
+	else if (!tb_strnicmp(p, "data://", 7)) 	type = TB_STREAM_TYPE_DATA;
+	else if (!tb_strnicmp(p, "https://", 8)) 	type = TB_STREAM_TYPE_HTTP;
+	else if (!tb_strnicmp(p, "socks://", 8)) 	type = TB_STREAM_TYPE_SOCK;
+	else if (!tb_strstr(p, "://")) 				type = TB_STREAM_TYPE_FILE;
 	else 
 	{
 		tb_trace("[astream]: unknown prefix for url: %s", url);
@@ -214,7 +214,7 @@ tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 	tb_assert_and_check_goto(astream, fail);
 
 	// set url
-	if (!tb_astream_ctrl(astream, TB_ASTREAM_CTRL_SET_URL, url)) goto fail;
+	if (!tb_astream_ctrl(astream, TB_STREAM_CTRL_SET_URL, url)) goto fail;
 
 	// ok
 	return astream;
@@ -495,14 +495,6 @@ tb_aicp_t* tb_astream_aicp(tb_astream_t* astream)
 	// the aicp
 	return astream->aicp;
 }
-tb_size_t tb_astream_type(tb_astream_t const* astream)
-{
-	// check
-	tb_assert_and_check_return_val(astream, TB_ASTREAM_TYPE_NONE);
-
-	// the type
-	return astream->type;
-}
 tb_hong_t tb_astream_size(tb_astream_t const* astream)
 {
 	// check
@@ -510,7 +502,7 @@ tb_hong_t tb_astream_size(tb_astream_t const* astream)
 
 	// get the size
 	tb_hong_t size = -1;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_SIZE, &size)? size : -1;
+	return tb_astream_ctrl((tb_astream_t*)astream, TB_STREAM_CTRL_GET_SIZE, &size)? size : -1;
 }
 tb_hong_t tb_astream_left(tb_astream_t const* astream)
 {
@@ -535,7 +527,7 @@ tb_hize_t tb_astream_offset(tb_astream_t const* astream)
 
 	// get the offset
 	tb_hize_t offset = 0;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
+	return tb_astream_ctrl((tb_astream_t*)astream, TB_STREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
 }
 tb_size_t tb_astream_timeout(tb_astream_t const* astream)
 {
@@ -544,62 +536,7 @@ tb_size_t tb_astream_timeout(tb_astream_t const* astream)
 
 	// get the timeout
 	tb_size_t timeout = 0;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : 0;
-}
-tb_char_t const* tb_astream_state_cstr(tb_size_t state)
-{
-	// done
-	switch (state)
-	{
-	case TB_ASTREAM_STATE_OK: 					return "ok";
-	case TB_ASTREAM_STATE_CLOSED: 				return "closed";
-	case TB_ASTREAM_STATE_KILLED: 				return "killed";
-	case TB_ASTREAM_STATE_PAUSED: 				return "paused";
-	case TB_ASTREAM_STATE_NOT_SUPPORTED: 		return "not supported";
-	case TB_ASTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
-	case TB_ASTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";
-	case TB_ASTREAM_SOCK_STATE_CONNECT_FAILED: 	return "sock: connect: failed";
-	case TB_ASTREAM_SOCK_STATE_CONNECT_TIMEOUT: return "sock: connect: timeout";
-	case TB_ASTREAM_SOCK_STATE_RECV_TIMEOUT: 	return "sock: recv: timeout";
-	case TB_ASTREAM_SOCK_STATE_SEND_TIMEOUT: 	return "sock: send: timeout";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_204: 	return "http: response: 204";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_300: 	return "http: response: 300";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_301: 	return "http: response: 301";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_302: 	return "http: response: 302";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_303: 	return "http: response: 303";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_304: 	return "http: http: response: 304";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_400: 	return "http: response: 400";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_401: 	return "http: response: 401";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_402: 	return "http: response: 402";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_403: 	return "http: response: 403";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_404: 	return "http: response: 404";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_405: 	return "http: response: 405";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_406: 	return "http: response: 406";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_407: 	return "http: response: 407";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_408: 	return "http: response: 408";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_409: 	return "http: response: 409";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_410: 	return "http: response: 410";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_411: 	return "http: response: 411";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_412: 	return "http: response: 412";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_413: 	return "http: response: 413";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_414: 	return "http: response: 414";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_415: 	return "http: response: 415";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_416: 	return "http: response: 416";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_500: 	return "http: response: 500";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_501: 	return "http: response: 501";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_502: 	return "http: response: 502";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_503: 	return "http: response: 503";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_504: 	return "http: response: 504";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_505: 	return "http: response: 505";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_506: 	return "http: response: 506";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_507: 	return "http: response: 507";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_UNK: 	return "http: response: unknown code";
-	case TB_ASTREAM_HTTP_STATE_RESPONSE_NUL: 	return "http: response: no";
-	case TB_ASTREAM_HTTP_STATE_REQUEST_FAILED: 	return "http: request: failed";
-	default: 									return "unknown";
-	}
-
-	return tb_null;
+	return tb_astream_ctrl((tb_astream_t*)astream, TB_STREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : 0;
 }
 tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 {
@@ -614,7 +551,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	tb_bool_t ok = tb_false;
 	switch (ctrl)
 	{
-	case TB_ASTREAM_CTRL_SET_URL:
+	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -624,7 +561,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			if (url && tb_url_set(&astream->url, url)) ok = tb_true;
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_URL:
+	case TB_STREAM_CTRL_GET_URL:
 		{
 			// get url
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -639,7 +576,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_HOST:
+	case TB_STREAM_CTRL_SET_HOST:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -653,7 +590,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_HOST:
+	case TB_STREAM_CTRL_GET_HOST:
 		{
 			// get host
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -668,7 +605,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_PORT:
+	case TB_STREAM_CTRL_SET_PORT:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -682,7 +619,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_PORT:
+	case TB_STREAM_CTRL_GET_PORT:
 		{
 			// get port
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -693,7 +630,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_PATH:
+	case TB_STREAM_CTRL_SET_PATH:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -707,7 +644,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_PATH:
+	case TB_STREAM_CTRL_GET_PATH:
 		{
 			// get path
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
@@ -722,7 +659,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_SSL:
+	case TB_STREAM_CTRL_SET_SSL:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -733,7 +670,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			ok = tb_true;
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_SSL:
+	case TB_STREAM_CTRL_GET_SSL:
 		{
 			// get ssl
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
@@ -744,7 +681,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_SET_TIMEOUT:
+	case TB_STREAM_CTRL_SET_TIMEOUT:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -755,7 +692,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			ok = tb_true;
 		}
 		break;
-	case TB_ASTREAM_CTRL_GET_TIMEOUT:
+	case TB_STREAM_CTRL_GET_TIMEOUT:
 		{
 			// get timeout
 			tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
@@ -766,7 +703,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_ASTREAM_CTRL_IS_OPENED:
+	case TB_STREAM_CTRL_IS_OPENED:
 		{
 			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			if (popened)

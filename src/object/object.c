@@ -732,8 +732,8 @@ tb_bool_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_si
 	tb_gstream_t* gst = tb_gstream_init_from_url(url);
 	if (gst)
 	{
-		if (tb_gstream_type(gst) == TB_GSTREAM_TYPE_FILE)
-			tb_gstream_ctrl(gst, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+		if (tb_stream_type(gst) == TB_STREAM_TYPE_FILE)
+			tb_gstream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 		if (tb_gstream_bopen(gst))
 		{
 			if (tb_object_writ(object, gst, format)) ok = tb_true;

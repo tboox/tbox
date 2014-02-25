@@ -107,8 +107,8 @@ tb_bool_t tb_printf_reset(tb_size_t mode, tb_char_t const* path)
 			if (g_printf.file)
 			{
 				// ctrl
-				if (tb_gstream_type(g_printf.file) == TB_GSTREAM_TYPE_FILE) 
-					tb_gstream_ctrl(g_printf.file, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+				if (tb_stream_type(g_printf.file) == TB_STREAM_TYPE_FILE) 
+					tb_gstream_ctrl(g_printf.file, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 			
 				// open 
 				if (!tb_gstream_bopen(g_printf.file))

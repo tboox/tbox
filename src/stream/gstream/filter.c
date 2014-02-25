@@ -66,7 +66,7 @@ typedef struct __tb_gstream_filter_t
  */
 static __tb_inline__ tb_gstream_filter_t* tb_gstream_filter_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_FLTR, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_gstream_filter_t*)gstream;
 }
 static tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
@@ -259,7 +259,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 	// ctrl
 	switch (ctrl)
 	{
-	case TB_GSTREAM_CTRL_FLTR_SET_GSTREAM:
+	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
 			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
@@ -269,7 +269,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 			fstream->gstream = gstream;
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_FLTR_GET_GSTREAM:
+	case TB_STREAM_CTRL_FLTR_GET_STREAM:
 		{
 			// get gstream
 			tb_gstream_t** pgstream = (tb_gstream_t**)tb_va_arg(args, tb_gstream_t**);
@@ -277,7 +277,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 			*pgstream = fstream->gstream;
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_FLTR_SET_FILTER:
+	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
 			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
@@ -291,7 +291,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 			fstream->bref = filter? tb_true : tb_false;
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_FLTR_GET_FILTER:
+	case TB_STREAM_CTRL_FLTR_GET_FILTER:
 		{
 			// get filter
 			tb_filter_t** phandle = (tb_filter_t**)tb_va_arg(args, tb_filter_t**);
@@ -314,7 +314,7 @@ tb_gstream_t* tb_gstream_init_filter()
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init base
-	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_GSTREAM_TYPE_FLTR)) goto fail;
+	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_STREAM_TYPE_FLTR)) goto fail;
 
 	// init stream
 	gstream->base.open		= tb_gstream_filter_open;
@@ -342,7 +342,7 @@ tb_gstream_t* tb_gstream_init_filter_from_null(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// ok
 	return fstream;
@@ -360,7 +360,7 @@ tb_gstream_t* tb_gstream_init_filter_from_zip(tb_gstream_t* gstream, tb_size_t a
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -383,7 +383,7 @@ tb_gstream_t* tb_gstream_init_filter_from_cache(tb_gstream_t* gstream, tb_size_t
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -406,7 +406,7 @@ tb_gstream_t* tb_gstream_init_filter_from_charset(tb_gstream_t* gstream, tb_size
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -429,7 +429,7 @@ tb_gstream_t* tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream, tb_bool
 	tb_assert_and_check_return_val(fstream, tb_null);
  
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, gstream)) goto fail;
+	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;

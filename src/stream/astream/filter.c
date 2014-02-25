@@ -82,7 +82,7 @@ typedef struct __tb_astream_filter_t
  */
 static __tb_inline__ tb_astream_filter_t* tb_astream_filter_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_ASTREAM_TYPE_FLTR, tb_null);
+	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_astream_filter_t*)astream;
 }
 static tb_bool_t tb_astream_filter_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
@@ -114,13 +114,13 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 
 	// have been opened?
 	tb_bool_t opened = tb_false;
-	if (tb_astream_ctrl(fstream->astream, TB_ASTREAM_CTRL_IS_OPENED, &opened) && opened) 
+	if (tb_astream_ctrl(fstream->astream, TB_STREAM_CTRL_IS_OPENED, &opened) && opened) 
 	{
 		// opened
 		tb_atomic_set(&fstream->base.opened, 1);
 
 		// done func
-		return func? func(astream, TB_ASTREAM_STATE_OK, fstream->priv) : tb_true;
+		return func? func(astream, TB_STREAM_STATE_OK, fstream->priv) : tb_true;
 	}
 
 	// check
@@ -154,13 +154,13 @@ static tb_bool_t tb_astream_filter_sync_read_func(tb_astream_t* astream, tb_size
 		tb_atomic64_fetch_and_add(&fstream->offset, spak);
 
 		// done data
-		ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, fstream->maxn, fstream->priv);
+		ok = fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_OK, data, spak, fstream->maxn, fstream->priv);
 	}
 	// closed?
 	else
 	{
 		// done closed
-		fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_CLOSED, tb_null, 0, fstream->maxn, fstream->priv);
+		fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_CLOSED, tb_null, 0, fstream->maxn, fstream->priv);
 
 		// break it
 		// ok = tb_false;
@@ -185,7 +185,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 		// done filter
 		switch (state)
 		{
-		case TB_ASTREAM_STATE_OK:
+		case TB_STREAM_STATE_OK:
 			{
 				// spak the filter
 				tb_long_t spak = tb_filter_spak(fstream->filter, data, real, &data, size, 0);
@@ -197,7 +197,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 					tb_atomic64_fetch_and_add(&fstream->offset, spak);
 
 					// done data
-					ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, size, fstream->priv);
+					ok = fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_OK, data, spak, size, fstream->priv);
 				}
 				// no data? continue it
 				else if (!spak) ok = tb_true;
@@ -205,20 +205,20 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 				else
 				{
 					// done closed
-					fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_CLOSED, tb_null, 0, size, fstream->priv);
+					fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_CLOSED, tb_null, 0, size, fstream->priv);
 
 					// break it
 					// ok = tb_false;
 				}
 			}
 			break;
-		case TB_ASTREAM_STATE_CLOSED:
+		case TB_STREAM_STATE_CLOSED:
 			{
 				// done sync for reading
 				ok = tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
 				
 				// error? done error
-				if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+				if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
 			}
 			break;
 		default:
@@ -306,7 +306,7 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 		else
 		{
 			// done func, no data and finished
-			ok = func((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
+			ok = func((tb_astream_t*)fstream, TB_STREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
 		}
 	}
 	// post writ
@@ -337,7 +337,7 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 	tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
 
 	// not finished? continue it
-	if (state == TB_ASTREAM_STATE_OK && real < size) return tb_true;
+	if (state == TB_STREAM_STATE_OK && real < size) return tb_true;
 
 	// save offset
 	if (real) tb_atomic64_fetch_and_add(&fstream->offset, real);
@@ -346,7 +346,7 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 	tb_bool_t ok = tb_astream_sync(fstream->astream, tb_true, tb_astream_filter_sync_func, fstream);
 
 	// failed? done func
-	if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_ASTREAM_STATE_UNKNOWN_ERROR, fstream->priv);
+	if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, fstream->priv);
 
 	// ok?
 	return ok;
@@ -454,7 +454,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	// ctrl
 	switch (ctrl)
 	{
-	case TB_ASTREAM_CTRL_GET_OFFSET:
+	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
@@ -465,7 +465,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			*poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_FLTR_SET_ASTREAM:
+	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -475,7 +475,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			fstream->astream = astream;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_FLTR_GET_ASTREAM:
+	case TB_STREAM_CTRL_FLTR_GET_STREAM:
 		{
 			// get astream
 			tb_astream_t** pastream = (tb_astream_t**)tb_va_arg(args, tb_astream_t**);
@@ -483,7 +483,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			*pastream = fstream->astream;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_FLTR_SET_FILTER:
+	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
 			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
@@ -497,7 +497,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			fstream->bref = filter? 1 : 0;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_FLTR_GET_FILTER:
+	case TB_STREAM_CTRL_FLTR_GET_FILTER:
 		{
 			// get filter
 			tb_filter_t** phandle = (tb_filter_t**)tb_va_arg(args, tb_filter_t**);
@@ -524,7 +524,7 @@ tb_astream_t* tb_astream_init_filter(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_ASTREAM_TYPE_FLTR)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FLTR)) goto fail;
 	fstream->base.open 		= tb_astream_filter_open;
 	fstream->base.read 		= tb_astream_filter_read;
 	fstream->base.writ 		= tb_astream_filter_writ;
@@ -556,7 +556,7 @@ tb_astream_t* tb_astream_init_filter_from_null(tb_astream_t* astream)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set astream
-	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, astream)) goto fail;
 
 	// ok
 	return fstream;
@@ -579,7 +579,7 @@ tb_astream_t* tb_astream_init_filter_from_zip(tb_astream_t* astream, tb_size_t a
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set astream
-	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, astream)) goto fail;
 
 	// set filter
 	((tb_astream_filter_t*)fstream)->bref = 0;
@@ -606,7 +606,7 @@ tb_astream_t* tb_astream_init_filter_from_cache(tb_astream_t* astream, tb_size_t
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set astream
-	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, astream)) goto fail;
 
 	// set filter
 	((tb_astream_filter_t*)fstream)->bref = 0;
@@ -633,7 +633,7 @@ tb_astream_t* tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_size
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set astream
-	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, astream)) goto fail;
 
 	// set filter
 	((tb_astream_filter_t*)fstream)->bref = 0;
@@ -660,7 +660,7 @@ tb_astream_t* tb_astream_init_filter_from_chunked(tb_astream_t* astream, tb_bool
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set astream
-	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
+	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, astream)) goto fail;
 
 	// set filter
 	((tb_astream_filter_t*)fstream)->bref = 0;

@@ -205,7 +205,7 @@ static tb_void_t tb_http_status_cler(tb_http_t* http)
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
-	http->status.state = TB_GSTREAM_STATE_OK;
+	http->status.state = TB_STREAM_STATE_OK;
 
 	// clear content type
 	tb_pstring_clear(&http->status.content_type);
@@ -258,10 +258,10 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 		tb_http_status_cler(http);
 
 		// ctrl stream
-		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_GSTREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url));
+		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url));
+		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url));
+		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url));
+		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url));
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -284,15 +284,15 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	{
 		switch (tb_gstream_state(http->stream))
 		{
-		case TB_GSTREAM_SOCK_STATE_DNS_FAILED:
-			http->status.state = TB_GSTREAM_SOCK_STATE_DNS_FAILED;
+		case TB_STREAM_SOCK_STATE_DNS_FAILED:
+			http->status.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
 			break;
-		case TB_GSTREAM_SOCK_STATE_SSL_FAILED:
-			http->status.state = TB_GSTREAM_SOCK_STATE_SSL_FAILED;
+		case TB_STREAM_SOCK_STATE_SSL_FAILED:
+			http->status.state = TB_STREAM_SOCK_STATE_SSL_FAILED;
 			break;
-		case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED:
+		case TB_STREAM_SOCK_STATE_CONNECT_FAILED:
 		default:
-			http->status.state = TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
+			http->status.state = TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 			break;
 		}
 	}
@@ -303,7 +303,7 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	// ok
 	http->step |= TB_HTTP_STEP_CONN;
 	http->tryn = 0;
-	http->status.state = TB_GSTREAM_STATE_OK;
+	http->status.state = TB_STREAM_STATE_OK;
 	tb_trace_impl("connect: ok");
 	return r;
 }
@@ -436,7 +436,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 			tb_long_t real = tb_gstream_awrit(http->stream, head_data + http->line_size, head_size - http->line_size);
 
 			// save state if failed
-			if (real < 0) http->status.state = TB_GSTREAM_HTTP_STATE_REQUEST_FAILED;
+			if (real < 0) http->status.state = TB_STREAM_HTTP_STATE_REQUEST_FAILED;
 
 			// check failed
 			tb_assert_and_check_return_val(real >= 0, -1);
@@ -467,7 +467,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	// finish it
 	http->step |= TB_HTTP_STEP_REQT;
 	http->tryn = 0;
-	http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_NUL;
+	http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_NUL;
 
 	// reset data
 	http->line_size = 0;
@@ -530,16 +530,16 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 
 		// save state
 		if (http->status.code == 200 || http->status.code == 206)
-			http->status.state = TB_GSTREAM_STATE_OK;
+			http->status.state = TB_STREAM_STATE_OK;
 		else if (http->status.code == 204)
-			http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_204;
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_204;
 		else if (http->status.code >= 300 && http->status.code <= 304)
-			http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
 		else if (http->status.code >= 400 && http->status.code <= 416)
-			http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
 		else if (http->status.code >= 500 && http->status.code <= 507)
-			http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
-		else http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_UNK;
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
+		else http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_UNK;
 
 		// check state code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
@@ -630,7 +630,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
 			// ctrl stream for sock
-			if (!tb_gstream_ctrl(http->sstream, TB_GSTREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+			if (!tb_gstream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
 	}
 
@@ -716,7 +716,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		// init cstream
 		if (http->cstream)
 		{
-			if (!tb_gstream_ctrl(http->cstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, http->stream)) return -1;
+			if (!tb_gstream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
 		}
 		else http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
 		tb_assert_and_check_return_val(http->cstream, -1);
@@ -737,7 +737,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		// init zstream
 		if (http->zstream)
 		{
-			if (!tb_gstream_ctrl(http->zstream, TB_GSTREAM_CTRL_FLTR_SET_GSTREAM, http->stream)) return -1;
+			if (!tb_gstream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
 		}
 		else http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 		tb_assert_and_check_return_val(http->zstream, -1);
@@ -830,7 +830,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		http->status.bchunked = 0;
 		http->status.content_size = 0;
 		http->status.document_size = 0;
-		http->status.state = TB_GSTREAM_STATE_OK;
+		http->status.state = TB_STREAM_STATE_OK;
 
 		// continue 
 		return 0;
@@ -1002,26 +1002,26 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 	{
 		switch (tb_gstream_state(http->stream))
 		{
-		case TB_GSTREAM_SOCK_STATE_DNS_FAILED:
-			http->status.state = TB_GSTREAM_SOCK_STATE_DNS_FAILED;
+		case TB_STREAM_SOCK_STATE_DNS_FAILED:
+			http->status.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
 			break;
-		case TB_GSTREAM_SOCK_STATE_CONNECT_FAILED:
-			http->status.state = TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
+		case TB_STREAM_SOCK_STATE_CONNECT_FAILED:
+			http->status.state = TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 			break;
 		default:
 			{
 				if (!(http->step & TB_HTTP_STEP_NEVT))
 				{
-					if (!(http->step & TB_HTTP_STEP_CONN)) http->status.state = TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
-					else if (!(http->step & TB_HTTP_STEP_REQT)) http->status.state = TB_GSTREAM_HTTP_STATE_REQUEST_FAILED;
-					else if (!(http->step & TB_HTTP_STEP_RESP)) http->status.state = TB_GSTREAM_HTTP_STATE_RESPONSE_NUL;
+					if (!(http->step & TB_HTTP_STEP_CONN)) http->status.state = TB_STREAM_SOCK_STATE_CONNECT_FAILED;
+					else if (!(http->step & TB_HTTP_STEP_REQT)) http->status.state = TB_STREAM_HTTP_STATE_REQUEST_FAILED;
+					else if (!(http->step & TB_HTTP_STEP_RESP)) http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_NUL;
 				}
 			}
 			break;
 		}
 
 		// unknown wait failed
-		if (!http->status.state) http->status.state = TB_GSTREAM_STATE_WAIT_FAILED;
+		if (!http->status.state) http->status.state = TB_STREAM_STATE_WAIT_FAILED;
 	}
 
 	// ok?

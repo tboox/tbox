@@ -94,7 +94,7 @@ typedef struct __tb_gstream_sock_t
  */
 static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_GSTREAM_TYPE_SOCK, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_gstream_sock_t*)gstream;
 }
 static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
@@ -185,7 +185,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
 	tb_size_t cache = tb_socket_recv_buffer_size(sstream->sock);
 	if (cache) 
 	{
-		if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_CACHE, cache)) goto fail;
+		if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SET_CACHE, cache)) goto fail;
 	}
 
 	// done
@@ -229,7 +229,7 @@ static tb_long_t tb_gstream_sock_open(tb_gstream_t* gstream)
 	}
 
 	// save state
-	gstream->state = TB_GSTREAM_STATE_OK;
+	gstream->state = TB_STREAM_STATE_OK;
 
 	// ok?
 	return r;
@@ -243,7 +243,7 @@ fail:
 		if (sstream->looker)
 		{
 			// save state
-			gstream->state = TB_GSTREAM_SOCK_STATE_DNS_FAILED;
+			gstream->state = TB_STREAM_SOCK_STATE_DNS_FAILED;
 
 			// exit dns
 			tb_dns_looker_exit(sstream->looker);
@@ -251,7 +251,7 @@ fail:
 		}
 		// ssl or connect failed?
 		else if (sstream->type == TB_SOCKET_TYPE_TCP)
-			gstream->state = tb_url_ssl_get(&gstream->url)? TB_GSTREAM_SOCK_STATE_SSL_FAILED : TB_GSTREAM_SOCK_STATE_CONNECT_FAILED;
+			gstream->state = tb_url_ssl_get(&gstream->url)? TB_STREAM_SOCK_STATE_SSL_FAILED : TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 	}
 
 	return -1;
@@ -479,7 +479,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 
 	switch (ctrl)
 	{
-	case TB_GSTREAM_CTRL_SOCK_SET_TYPE:
+	case TB_STREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
 			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
@@ -503,7 +503,7 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// ok
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_SOCK_SET_HANDLE:
+	case TB_STREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check
 			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
@@ -525,14 +525,14 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 			// ok
 			return tb_true;
 		}
-	case TB_GSTREAM_CTRL_SOCK_GET_HANDLE:
+	case TB_STREAM_CTRL_SOCK_GET_HANDLE:
 		{
 			tb_handle_t* phandle = (tb_handle_t)tb_va_arg(args, tb_handle_t*);
 			tb_assert_and_check_return_val(phandle, tb_false);
 			*phandle = sstream->sock;
 			return tb_true;
 		}
-	case TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE:
+	case TB_STREAM_CTRL_SOCK_KEEP_ALIVE:
 		{
 			// keep alive?
 			tb_bool_t balived = (tb_bool_t)tb_va_arg(args, tb_bool_t);
@@ -555,7 +555,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init stream
-	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_GSTREAM_TYPE_SOCK)) goto fail;
+	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_STREAM_TYPE_SOCK)) goto fail;
 	gstream->base.open 	= tb_gstream_sock_open;
 	gstream->base.clos 	= tb_gstream_sock_clos;
 	gstream->base.exit 	= tb_gstream_sock_exit;
@@ -567,7 +567,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	gstream->type 		= TB_SOCKET_TYPE_TCP;
 
 	// init sock cache
-	if (!tb_gstream_ctrl((tb_gstream_t*)gstream, TB_GSTREAM_CTRL_SET_CACHE, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
+	if (!tb_gstream_ctrl((tb_gstream_t*)gstream, TB_STREAM_CTRL_SET_CACHE, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
 
 	// ok
 	return (tb_gstream_t*)gstream;
@@ -587,10 +587,10 @@ tb_gstream_t* tb_gstream_init_from_sock(tb_char_t const* host, tb_size_t port, t
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// ctrl
-	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SET_SSL, bssl)) goto fail;
-	if (!tb_gstream_ctrl(gstream, TB_GSTREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
 	return gstream;

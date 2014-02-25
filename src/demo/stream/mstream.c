@@ -34,11 +34,11 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state,
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_astream_state_cstr(state), priv);
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_stream_state_cstr(state), priv);
 # 	endif
  
 	// size--
-	if (state != TB_ASTREAM_STATE_OK) tb_atomic_fetch_and_dec(&g_size);
+	if (state != TB_STREAM_STATE_OK) tb_atomic_fetch_and_dec(&g_size);
 
 	// ok
 	return tb_true;
@@ -48,7 +48,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state,
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_gstream_state_cstr(state), priv);
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_stream_state_cstr(state), priv);
 # 	endif
 
 	// ok
