@@ -435,7 +435,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_ASTREAM_CTRL_GET_SIZE:
 		{
 			// the psize
-			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
 
 			// get size
@@ -449,7 +449,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && dstream->head, tb_false);
 
 			// the poffset
-			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
 
 			// get offset

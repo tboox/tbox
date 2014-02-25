@@ -503,38 +503,39 @@ tb_size_t tb_astream_type(tb_astream_t const* astream)
 	// the type
 	return astream->type;
 }
-tb_hize_t tb_astream_size(tb_astream_t const* astream)
+tb_hong_t tb_astream_size(tb_astream_t const* astream)
 {
 	// check
 	tb_assert_and_check_return_val(astream, 0);
 
 	// get the size
-	tb_hize_t size = 0;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_SIZE, &size)? size : 0;
+	tb_hong_t size = -1;
+	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_SIZE, &size)? size : -1;
 }
 tb_hong_t tb_astream_left(tb_astream_t const* astream)
 {
 	// check
-	tb_assert_and_check_return_val(astream, -1);
+	tb_assert_and_check_return_val(astream, 0);
 	
-	// the offset
-	tb_hong_t offset = tb_astream_offset(astream);
-	tb_check_return_val(offset >= 0, -1);
-
 	// the size
-	tb_hize_t size = tb_astream_size(astream);
+	tb_hong_t size = tb_astream_size(astream);
+	tb_assert_and_check_return_val(size >= 0, -1);
+
+	// the offset
+	tb_hize_t offset = tb_astream_offset(astream);
+	tb_assert_and_check_return_val(offset <= size, 0);
 
 	// the left
-	return ((size && size >= offset)? (size - offset) : -1);
+	return size - offset;
 }
-tb_hong_t tb_astream_offset(tb_astream_t const* astream)
+tb_hize_t tb_astream_offset(tb_astream_t const* astream)
 {
 	// check
-	tb_assert_and_check_return_val(astream, -1);
+	tb_assert_and_check_return_val(astream, 0);
 
 	// get the offset
-	tb_hong_t offset = -1;
-	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_OFFSET, &offset)? offset : -1;
+	tb_hize_t offset = 0;
+	return tb_astream_ctrl((tb_astream_t*)astream, TB_ASTREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
 }
 tb_size_t tb_astream_timeout(tb_astream_t const* astream)
 {

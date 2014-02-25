@@ -50,7 +50,7 @@ typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_hize_t size, tb
  * interfaces
  */
 
-/*! save to gstream from gstream, block transfer
+/*! save gstream to gstream, block transfer
  *
  * @param istream 	the istream
  * @param ostream 	the ostream
@@ -62,7 +62,32 @@ typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_hize_t size, tb
  */
 tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
-/*! save to url from url, block transfer
+/*! save gstream to url, block transfer
+ *
+ * @param istream 	the istream
+ * @param ourl 		the output url
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_gu(tb_gstream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save gstream to data, block transfer
+ *
+ * @param istream 	the istream
+ * @param odata 	the output data
+ * @param osize 	the output size
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_gd(tb_gstream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save url to url, block transfer
  *
  * @param iurl 		the input url
  * @param ourl 		the output url
@@ -73,6 +98,57 @@ tb_hong_t 			tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb
  * @return 			the saved size, failed: -1
  */
 tb_hong_t 			tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save url to gstream, block transfer
+ *
+ * @param iurl 		the input url
+ * @param ostream 	the ostream
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_ug(tb_char_t const* iurl, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save url to data, block transfer
+ *
+ * @param iurl 		the input url
+ * @param odata 	the output data
+ * @param osize 	the output size
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save data to url, block transfer
+ *
+ * @param idata 	the input data
+ * @param isize 	the input size
+ * @param ourl 		the output url
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
+/*! save data to gstream, block transfer
+ *
+ * @param idata 	the input data
+ * @param isize 	the input size
+ * @param ostream 	the ostream
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 /*! init transfer stream from astrean to astream, async transfer
  *

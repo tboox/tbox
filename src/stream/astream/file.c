@@ -362,8 +362,8 @@ static tb_void_t tb_astream_file_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	if (fstream->aico) tb_aico_exit(fstream->aico, bcalling);
 	fstream->aico = tb_null;
 
-	// exit offset
-	fstream->offset = 0;
+	// clear the offset
+	tb_atomic64_set0(&fstream->offset);
 
 	// exit it
 	if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
@@ -385,7 +385,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && fstream->file, tb_false);
 
 			// get size
-			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
 			*psize = tb_file_size(fstream->file);
 			return tb_true;
@@ -396,9 +396,9 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && fstream->file, tb_false);
 
 			// get offset
-			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
-			*poffset = (tb_hong_t)tb_atomic64_get(&fstream->offset);
+			*poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_FILE_SET_MODE:

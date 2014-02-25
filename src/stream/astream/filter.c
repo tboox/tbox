@@ -47,13 +47,19 @@ typedef struct __tb_astream_filter_t
 	tb_filter_t* 				filter;
 
 	// the filter is referenced? need not exit it
-	tb_bool_t 					bref;
+	tb_uint32_t 				bref 	: 1;
+
+	// is reading now?
+	tb_uint32_t 				bread 	: 1;
 
 	// the astream
 	tb_astream_t* 				astream;
 
 	// the read maxn
 	tb_size_t 					maxn;
+
+	// the offset
+	tb_atomic64_t 				offset;
 
 	// the func
 	union
@@ -100,6 +106,12 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return_val(fstream && fstream->astream, tb_false);
 
+	// clear the mode
+	fstream->bread = 0;
+
+	// clear the offset
+	tb_atomic64_set0(&fstream->offset);
+
 	// have been opened?
 	tb_bool_t opened = tb_false;
 	if (tb_astream_ctrl(fstream->astream, TB_ASTREAM_CTRL_IS_OPENED, &opened) && opened) 
@@ -137,7 +149,10 @@ static tb_bool_t tb_astream_filter_sync_read_func(tb_astream_t* astream, tb_size
 	// has output data?
 	tb_bool_t ok = tb_false;
 	if (spak > 0 && data)
-	{
+	{	
+		// save offset
+		tb_atomic64_fetch_and_add(&fstream->offset, spak);
+
 		// done data
 		ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, fstream->maxn, fstream->priv);
 	}
@@ -178,6 +193,9 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 				// has output data?
 				if (spak > 0 && data)
 				{
+					// save offset
+					tb_atomic64_fetch_and_add(&fstream->offset, spak);
+
 					// done data
 					ok = fstream->func.read((tb_astream_t*)fstream, TB_ASTREAM_STATE_OK, data, spak, size, fstream->priv);
 				}
@@ -226,6 +244,12 @@ static tb_bool_t tb_astream_filter_read(tb_astream_t* astream, tb_size_t delay, 
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return_val(fstream && fstream->astream && func, tb_false);
 
+	// clear the offset if be writ mode now
+	if (!fstream->bread) tb_atomic64_set0(&fstream->offset);
+
+	// set read mode
+	fstream->bread = 1;
+
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.read 	= func;
@@ -243,6 +267,9 @@ static tb_bool_t tb_astream_filter_writ_func(tb_astream_t* astream, tb_size_t st
 	tb_astream_filter_t* fstream = (tb_astream_filter_t*)priv;
 	tb_assert_and_check_return_val(fstream && fstream->func.writ, tb_false);
 
+	// save offset
+	if (real) tb_atomic64_fetch_and_add(&fstream->offset, real);
+
 	// done func
 	return fstream->func.writ((tb_astream_t*)fstream, state, data, real, size, fstream->priv);
 }
@@ -251,6 +278,12 @@ static tb_bool_t tb_astream_filter_writ(tb_astream_t* astream, tb_size_t delay, 
 	// check
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return_val(fstream && fstream->astream && data && size && func, tb_false);
+
+	// clear the offset if be read mode now
+	if (fstream->bread) tb_atomic64_set0(&fstream->offset);
+
+	// set writ mode
+	fstream->bread = 0;
 
 	// save func and priv
 	fstream->priv 		= priv;
@@ -306,6 +339,9 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 	// not finished? continue it
 	if (state == TB_ASTREAM_STATE_OK && real < size) return tb_true;
 
+	// save offset
+	if (real) tb_atomic64_fetch_and_add(&fstream->offset, real);
+
 	// post sync
 	tb_bool_t ok = tb_astream_sync(fstream->astream, tb_true, tb_astream_filter_sync_func, fstream);
 
@@ -320,6 +356,12 @@ static tb_bool_t tb_astream_filter_sync(tb_astream_t* astream, tb_bool_t bclosin
 	// check
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return_val(fstream && fstream->astream && func, tb_false);
+
+	// clear the offset if be read mode now
+	if (fstream->bread) tb_atomic64_set0(&fstream->offset);
+
+	// set writ mode
+	fstream->bread = 0;
 
 	// save func and priv
 	fstream->priv 		= priv;
@@ -385,6 +427,12 @@ static tb_void_t tb_astream_filter_clos(tb_astream_t* astream, tb_bool_t bcallin
 
 	// clear the filter
 	if (fstream->filter) tb_filter_cler(fstream->filter);
+
+	// clear the mode
+	fstream->bread = 0;
+
+	// clear the offset
+	tb_atomic64_set0(&fstream->offset);
 }
 static tb_void_t tb_astream_filter_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {	
@@ -395,7 +443,7 @@ static tb_void_t tb_astream_filter_exit(tb_astream_t* astream, tb_bool_t bcallin
 	// exit it
 	if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
 	fstream->filter = tb_null;
-	fstream->bref = tb_false;
+	fstream->bref = 0;
 }
 static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args)
 {
@@ -406,6 +454,17 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	// ctrl
 	switch (ctrl)
 	{
+	case TB_ASTREAM_CTRL_GET_OFFSET:
+		{
+			// check
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+
+			// get offset
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+			*poffset = (tb_hize_t)tb_atomic64_get(&fstream->offset);
+			return tb_true;
+		}
 	case TB_ASTREAM_CTRL_FLTR_SET_ASTREAM:
 		{
 			// check
@@ -435,7 +494,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 			// set filter
 			tb_filter_t* filter = (tb_filter_t*)tb_va_arg(args, tb_filter_t*);
 			fstream->filter = filter;
-			fstream->bref = filter? tb_true : tb_false;
+			fstream->bref = filter? 1 : 0;
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_FLTR_GET_FILTER:
@@ -523,7 +582,7 @@ tb_astream_t* tb_astream_init_filter_from_zip(tb_astream_t* astream, tb_size_t a
 	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
 
 	// set filter
-	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->bref = 0;
 	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_zip(algo, action);
 	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
 	
@@ -550,7 +609,7 @@ tb_astream_t* tb_astream_init_filter_from_cache(tb_astream_t* astream, tb_size_t
 	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
 
 	// set filter
-	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->bref = 0;
 	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_cache(size);
 	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
 	
@@ -577,7 +636,7 @@ tb_astream_t* tb_astream_init_filter_from_charset(tb_astream_t* astream, tb_size
 	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
 
 	// set filter
-	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->bref = 0;
 	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_charset(fr, to);
 	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
 	
@@ -604,7 +663,7 @@ tb_astream_t* tb_astream_init_filter_from_chunked(tb_astream_t* astream, tb_bool
 	if (!tb_astream_ctrl(fstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, astream)) goto fail;
 
 	// set filter
-	((tb_astream_filter_t*)fstream)->bref = tb_false;
+	((tb_astream_filter_t*)fstream)->bref = 0;
 	((tb_astream_filter_t*)fstream)->filter = tb_filter_init_from_chunked(dechunked);
 	tb_assert_and_check_goto(((tb_astream_filter_t*)fstream)->filter, fail);
 	
