@@ -88,5 +88,60 @@
  *
  */
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! the stream type
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream type
+ */
+tb_size_t 			tb_stream_type(tb_stream_t const* stream);
+
+/*! the stream size and not seeking it
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream size, no size: -1, empty or error: 0
+ */
+tb_hong_t 			tb_stream_size(tb_stream_t const* stream);
+
+/*! the stream left size and not seeking it 
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream left size, no size: -1, empty or error: 0
+ */
+tb_hong_t 			tb_stream_left(tb_stream_t const* stream);
+
+/*! the stream offset
+ *
+ * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
+ * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream offset
+ */
+tb_hize_t 			tb_stream_offset(tb_stream_t const* stream);
+
+/*! the stream timeout
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the stream timeout
+ */
+tb_size_t 			tb_stream_timeout(tb_stream_t const* stream);
+
+/*! the stream state c-string
+ *
+ * @param state 	the state
+ *
+ * @return 			the stream state c-string
+ */
+tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
+
 #endif
 

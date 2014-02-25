@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_astream_zip_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_astream_zip_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
@@ -59,15 +59,15 @@ tb_int_t tb_demo_stream_astream_zip_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(fstream);
 
 		// init tstream
-		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1, tb_null, tb_demo_astream_zip_save_func, aicp);
-		else tstream = tb_tstream_init_aa(istream, fstream, -1, tb_null, tb_demo_astream_zip_save_func, aicp);
+		if (iostream == istream) tstream = tb_tstream_init_aa(fstream, ostream, -1);
+		else tstream = tb_tstream_init_aa(istream, fstream, -1);
 		tb_assert_and_check_break(tstream);
 
 		// limit rate
 //		tb_tstream_limit(tstream, 4096);
 
-		// start tstream
-		if (!tb_tstream_start(tstream)) break;
+		// open and save tstream
+		if (!tb_tstream_osave(tstream, tb_demo_astream_zip_save_func, aicp)) break;
 
 		// done loop
 		tb_aicp_loop(aicp);

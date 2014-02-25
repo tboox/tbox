@@ -554,6 +554,7 @@ tb_char_t const* tb_astream_state_cstr(tb_size_t state)
 	case TB_ASTREAM_STATE_OK: 					return "ok";
 	case TB_ASTREAM_STATE_CLOSED: 				return "closed";
 	case TB_ASTREAM_STATE_KILLED: 				return "killed";
+	case TB_ASTREAM_STATE_PAUSED: 				return "paused";
 	case TB_ASTREAM_STATE_NOT_SUPPORTED: 		return "not supported";
 	case TB_ASTREAM_STATE_UNKNOWN_ERROR: 		return "unknown error";
 	case TB_ASTREAM_SOCK_STATE_DNS_FAILED: 		return "sock: dns: failed";

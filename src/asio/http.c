@@ -866,7 +866,7 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
 	if (http->stream) tb_astream_kill(http->stream);
 
 	// kill tstream
-	if (http->tstream) tb_tstream_stop(http->tstream);
+//	if (http->tstream) tb_tstream_stop(http->tstream);
 }
 tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 {

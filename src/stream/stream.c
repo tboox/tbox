@@ -17,36 +17,16 @@
  * Copyright (C) 2009 - 2012, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		stream.c
+ * @defgroup 	stream
  *
  */
-#ifndef TB_STREAM_PREFIX_H
-#define TB_STREAM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "stream.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
+ * implementation
  */
-
-/// the stream type enum
-typedef enum __tb_stream_type_e
-{
-	TB_STREAM_TYPE_NONE 	= 0
-,	TB_STREAM_TYPE_GSTREAM 	= 1
-,	TB_STREAM_TYPE_ASTREAM 	= 2
-
-}tb_stream_type_e;
-
-/// the stream type 
-typedef struct __tb_stream_t
-{
-	/// the stream type
-	tb_size_t 		type;
-
-}tb_stream_t;
-
-#endif

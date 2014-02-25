@@ -56,6 +56,7 @@ tbox_C_FILES 			+= \
 						charset/ucs4 \
 						charset/gb2312 \
 						charset/iso8859 \
+						stream/stream \
 						stream/bstream \
 						stream/gstream \
 						stream/gstream/http \
