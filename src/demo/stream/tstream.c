@@ -6,10 +6,31 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_open_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_pointer_t priv)
 {
 	// trace
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_astream_state_cstr(state));
+	tb_print("open: offset: %llu, size: %lld, state: %s", tb_astream_offset(istream), tb_astream_size(istream), tb_astream_state_cstr(state));
+
+	// ok
+	return tb_true;
+}
+static tb_bool_t tb_demo_tstream_save_func(tb_handle_t istream, tb_handle_t ostream, tb_size_t state, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+{
+	// the percent
+	tb_size_t percent = 0;
+	tb_bool_t bopened = tb_false;
+	if (tb_astream_ctrl(istream, TB_ASTREAM_CTRL_IS_OPENED, &bopened) && bopened)
+	{
+		tb_hong_t size = tb_astream_size(istream);
+		if (size >= 0)
+		{
+			tb_size_t offset = tb_astream_offset(istream);
+			percent = offset < size? offset * 100 / size : 100;
+		}
+	}
+
+	// trace
+	tb_print("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_astream_state_cstr(state));
 
 	// ok
 	return tb_true;
@@ -44,11 +65,11 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 
 		// init tstream
 #if 1
-		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], -1, tb_demo_tstream_save_func, tb_null);
+		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], -1, tb_demo_tstream_open_func, tb_demo_tstream_save_func, tb_null);
 #else
 		istream = tb_astream_init_from_url(aicp, argv[1]);
 		ostream = tb_gstream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
-		tstream = tb_tstream_init_ag(istream, ostream, -1, tb_demo_tstream_save_func, tb_null);
+		tstream = tb_tstream_init_ag(istream, ostream, -1, tb_demo_tstream_open_func, tb_demo_tstream_save_func, tb_null);
 #endif
 		tb_assert_and_check_break(tstream);
 

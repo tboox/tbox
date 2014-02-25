@@ -100,6 +100,9 @@ typedef struct __tb_astream_data_t
 	// the data is referenced?
 	tb_bool_t 					bref;
 
+	// the offset
+	tb_atomic64_t 				offset;
+
 	// the func
 	union
 	{
@@ -138,6 +141,9 @@ static tb_bool_t tb_astream_data_open(tb_astream_t* astream, tb_astream_open_fun
 
 		// init head
 		dstream->head = dstream->data;
+
+		// init offset
+		tb_atomic64_set0(&dstream->offset);
 
 		// opened
 		tb_atomic_set(&astream->opened, 1);
@@ -191,6 +197,9 @@ static tb_bool_t tb_astream_data_read_func(tb_aice_t const* aice)
 
 			// save head
 			dstream->head += real;
+
+			// save offset
+			tb_atomic64_set(&dstream->offset, dstream->head - dstream->data);
 
 			// ok
 			state = TB_ASTREAM_STATE_OK;
@@ -272,6 +281,9 @@ static tb_bool_t tb_astream_data_writ_func(tb_aice_t const* aice)
 			// save head
 			dstream->head += real;
 
+			// save offset
+			tb_atomic64_set(&dstream->offset, dstream->head - dstream->data);
+
 			// ok
 			state = TB_ASTREAM_STATE_OK;
 
@@ -336,6 +348,9 @@ static tb_bool_t tb_astream_data_seek(tb_astream_t* astream, tb_hize_t offset, t
 
 		// seek 
 		dstream->head = dstream->data + offset;
+
+		// save offset
+		tb_atomic64_set(&dstream->offset, offset);
 
 		// ok
 		state = TB_ASTREAM_STATE_OK;
@@ -404,6 +419,9 @@ static tb_void_t tb_astream_data_clos(tb_astream_t* astream, tb_bool_t bcalling)
 
 	// clear head
 	dstream->head = tb_null;
+
+	// clear offset
+	tb_atomic64_set0(&dstream->offset);
 }
 static tb_void_t tb_astream_data_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {	
@@ -417,6 +435,9 @@ static tb_void_t tb_astream_data_exit(tb_astream_t* astream, tb_bool_t bcalling)
 
 	// clear head
 	dstream->head = tb_null;
+
+	// clear offset
+	tb_atomic64_set0(&dstream->offset);
 
 	// exit data
 	if (dstream->data && !dstream->bref) tb_free(dstream->data);
@@ -446,14 +467,14 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 		{
 			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && dstream->head, tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
 
 			// the poffset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
 
 			// get offset
-			*poffset = dstream->head - dstream->data;
+			*poffset = tb_atomic64_get(&dstream->offset);
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_DATA_SET_DATA:
@@ -466,6 +487,9 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			dstream->size = (tb_size_t)tb_va_arg(args, tb_size_t);
 			dstream->head = tb_null;
 			dstream->bref = tb_true;
+
+			// clear offset
+			tb_atomic64_set0(&dstream->offset);
 
 			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
@@ -505,6 +529,9 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			dstream->size = size;
 			dstream->bref = tb_false;
 			dstream->head = tb_null;
+
+			// clear offset
+			tb_atomic64_set0(&dstream->offset);
 
 			// ok
 			return tb_true;
