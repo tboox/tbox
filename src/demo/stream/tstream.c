@@ -12,7 +12,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state,
 	tb_size_t percent = 0;
 #if 0
 	tb_bool_t bopened = tb_false;
-	if (tb_astream_ctrl(istream, TB_ASTREAM_CTRL_IS_OPENED, &bopened) && bopened)
+	if (tb_astream_ctrl(istream, TB_STREAM_CTRL_IS_OPENED, &bopened) && bopened)
 	{
 		tb_hong_t size = tb_astream_size(istream);
 		if (size >= 0)
@@ -24,7 +24,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state,
 #endif
 
 	// trace
-	tb_print("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_astream_state_cstr(state));
+	tb_print("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
 
 	// ok
 	return tb_true;

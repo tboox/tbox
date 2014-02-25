@@ -297,7 +297,7 @@ tb_void_t 			tb_tstream_exit(tb_handle_t tstream, tb_bool_t bcalling);
 
 /*! pause tstream 
  *
- * the save func state will return TB_ASTREAM_STATE_PAUSED 
+ * the save func state will return TB_STREAM_STATE_PAUSED 
  *
  * @param tstream 	the tstream
  */

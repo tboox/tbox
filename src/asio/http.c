@@ -238,7 +238,7 @@ static tb_void_t tb_aicp_http_status_cler(tb_aicp_http_t* http)
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
-	http->status.state = TB_ASTREAM_STATE_OK;
+	http->status.state = TB_STREAM_STATE_OK;
 
 	// clear content type
 	tb_pstring_clear(&http->status.content_type);
@@ -290,21 +290,21 @@ static tb_bool_t tb_aicp_http_oread_func(tb_handle_t http, tb_size_t state, tb_h
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	
 		// read it
 		if (!tb_aicp_http_read(http, oread->maxn, oread->func, oread->priv)) break;
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
+	if (state != TB_STREAM_STATE_OK) 
 	{
 		// done func
 		ok = oread->func(http, state, tb_null, 0, oread->maxn, oread->priv);
@@ -324,21 +324,21 @@ static tb_bool_t tb_aicp_http_oseek_func(tb_handle_t http, tb_size_t state, tb_h
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	
 		// seek it
 		if (!tb_aicp_http_seek(http, oseek->offset, oseek->func, oseek->priv)) break;
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
+	if (state != TB_STREAM_STATE_OK) 
 	{
 		// done func
 		ok = oseek->func(http, state, 0, oseek->priv);
@@ -393,16 +393,16 @@ static tb_bool_t tb_aicp_http_hresp_done(tb_aicp_http_t* http)
 
 		// save state
 		if (http->status.code == 200 || http->status.code == 206)
-			http->status.state = TB_ASTREAM_STATE_OK;
+			http->status.state = TB_STREAM_STATE_OK;
 		else if (http->status.code == 204)
-			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_204;
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_204;
 		else if (http->status.code >= 300 && http->status.code <= 304)
-			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
 		else if (http->status.code >= 400 && http->status.code <= 416)
-			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
 		else if (http->status.code >= 500 && http->status.code <= 507)
-			http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
-		else http->status.state = TB_ASTREAM_HTTP_STATE_RESPONSE_UNK;
+			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
+		else http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_UNK;
 
 		// check state code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
@@ -493,7 +493,7 @@ static tb_bool_t tb_aicp_http_hresp_done(tb_aicp_http_t* http)
 			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
 			// ctrl stream for sock
-			if (!tb_astream_ctrl(http->sstream, TB_ASTREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+			if (!tb_astream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
 	}
 
@@ -507,16 +507,16 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_impl("head: read: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
+	tb_trace_impl("head: read: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
 
 	// done
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 
 		// walk	
 		tb_long_t 			ok = 0;
@@ -577,7 +577,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				if (!tb_aicp_http_hresp_done(http)) 
 				{	
 					// save the error state
-					if (http->status.state != TB_ASTREAM_STATE_OK) state = http->status.state;
+					if (http->status.state != TB_STREAM_STATE_OK) state = http->status.state;
 
 					// error
 					ok = -1;
@@ -609,7 +609,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				// init cstream
 				if (http->cstream)
 				{
-					if (!tb_astream_ctrl(http->cstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, http->stream)) break;
+					if (!tb_astream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 				}
 				else http->cstream = tb_astream_init_filter_from_chunked(http->stream, tb_true);
 				tb_assert_and_check_break(http->cstream);
@@ -619,7 +619,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				{
 					// the filter
 					tb_filter_t* filter = tb_null;
-					if (!tb_astream_ctrl(http->cstream, TB_ASTREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					if (!tb_astream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// push data
@@ -643,7 +643,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				// init zstream
 				if (http->zstream)
 				{
-					if (!tb_astream_ctrl(http->zstream, TB_ASTREAM_CTRL_FLTR_SET_ASTREAM, http->stream)) break;
+					if (!tb_astream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 				}
 				else http->zstream = tb_astream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 				tb_assert_and_check_break(http->zstream);
@@ -653,7 +653,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				{
 					// the filter
 					tb_filter_t* filter = tb_null;
-					if (!tb_astream_ctrl(http->zstream, TB_ASTREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					if (!tb_astream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// push data
@@ -676,7 +676,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 			p = e;
 
 			// ok
-			state = TB_ASTREAM_STATE_OK;
+			state = TB_STREAM_STATE_OK;
 
 			// dump status
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -687,7 +687,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 		else 
 		{
 			// trace
-			tb_trace_impl("head: read: error, state: %s", tb_astream_state_cstr(state));
+			tb_trace_impl("head: read: error, state: %s", tb_stream_state_cstr(state));
 		}
 
 	} while (0);
@@ -714,17 +714,17 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_impl("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_astream_state_cstr(state));
+	tb_trace_impl("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
 
 	// done
 	tb_bool_t bwrit = tb_false;
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_ASTREAM_STATE_OK);
+		tb_check_break(state == TB_STREAM_STATE_OK);
 
 		// reset state
-		state = TB_ASTREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 
 		// not finished? continue it
 		if (real < size)
@@ -753,12 +753,12 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 		}
 
 		// ok
-		state = TB_ASTREAM_STATE_OK;
+		state = TB_STREAM_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_ASTREAM_STATE_OK) 
+	if (state != TB_STREAM_STATE_OK) 
 	{
 		// done func
 		http->func.open(http, state, &http->status, http->priv);
@@ -774,7 +774,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.read, tb_false);
 
 	// trace
-	tb_trace_impl("read: real: %lu, state: %s", real, tb_astream_state_cstr(state));
+	tb_trace_impl("read: real: %lu, state: %s", real, tb_stream_state_cstr(state));
 
 	// done func
 	return http->func.read(http, state, data, real, size, http->priv);
@@ -786,7 +786,7 @@ static tb_bool_t tb_aicp_http_seek_func(tb_astream_t* astream, tb_size_t state, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.seek, tb_false);
 
 	// trace
-	tb_trace_impl("seek: offset: %llu, state: %s", offset, tb_astream_state_cstr(state));
+	tb_trace_impl("seek: offset: %llu, state: %s", offset, tb_stream_state_cstr(state));
 
 	// done func
 	return http->func.seek(http, state, offset, http->priv);
@@ -798,7 +798,7 @@ static tb_bool_t tb_aicp_http_task_func(tb_astream_t* astream, tb_size_t state, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.task, tb_false);
 
 	// trace
-	tb_trace_impl("task: state: %s", tb_astream_state_cstr(state));
+	tb_trace_impl("task: state: %s", tb_stream_state_cstr(state));
 
 	// done func
 	return http->func.task(http, state, http->priv);
@@ -958,11 +958,11 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_aicp_http_status_cler(http);
 
 		// ctrl stream
-		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_ASTREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
+		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url))) break;
+		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
+		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
+		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
+		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -1025,7 +1025,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 			if (http->option.post_stream)
 			{
 				tb_bool_t bopened = tb_false;
-				if (!tb_astream_ctrl(http->option.post_stream, TB_ASTREAM_CTRL_IS_OPENED, &bopened) || !bopened)
+				if (!tb_astream_ctrl(http->option.post_stream, TB_STREAM_CTRL_IS_OPENED, &bopened) || !bopened)
 					tb_assert_and_check_break(0);
 			}
 
@@ -1162,7 +1162,7 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
 	if (cache_data && cache_size)
 	{
 		// done func
-		tb_bool_t ok = func(http, TB_ASTREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
+		tb_bool_t ok = func(http, TB_STREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
 
 		// clear cache data
 		tb_pbuffer_clear(&http->cache_data);
@@ -1195,7 +1195,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 
 	// check opened?
 	tb_bool_t bopened = tb_false;
-	if (!tb_astream_ctrl(http->sstream, TB_ASTREAM_CTRL_IS_OPENED, &bopened)) return tb_false;
+	if (!tb_astream_ctrl(http->sstream, TB_STREAM_CTRL_IS_OPENED, &bopened)) return tb_false;
 	tb_assert_and_check_return_val(!bopened, tb_false);
 
 	// init args
