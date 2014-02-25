@@ -89,11 +89,8 @@ static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb
 	tb_atomic_set(&hstream->base.opened, 1);
 
 	// save size
-	tb_hize_t size = (!status->bgzip && !status->bdeflate)? status->document_size : 0;
-	tb_atomic64_set(&hstream->size, size);
-
-	// save offset
-	if (size) tb_atomic64_set0(&hstream->offset);
+	tb_hong_t size = (!status->bgzip && !status->bdeflate)? status->document_size : -1;
+	if (size >= 0) tb_atomic64_set(&hstream->size, size);
 
 	// done func
 	return hstream->func.open((tb_astream_t*)hstream, state, hstream->priv);
@@ -109,8 +106,8 @@ static tb_bool_t tb_astream_http_open(tb_astream_t* astream, tb_astream_open_fun
 	hstream->func.open 	= func;
 
 	// init size and offset
-	tb_atomic64_set0(&hstream->size);
-	tb_atomic64_set(&hstream->offset, -1);
+	tb_atomic64_set(&hstream->size, -1);
+	tb_atomic64_set0(&hstream->offset);
  
 	// post open
 	return tb_aicp_http_open(hstream->http, tb_astream_http_open_func, astream);
@@ -125,14 +122,7 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	tb_assert_and_check_return_val(hstream && hstream->func.read, tb_false);
 
 	// save offset
-	if (state == TB_ASTREAM_STATE_OK) 
-	{
-		// try offset += real
-		tb_hong_t offset = tb_atomic64_fetch_and_add(&hstream->offset, real);
-		
-		// not seeked? reset offset
-		if (offset < 0) tb_atomic64_set(&hstream->offset, -1);
-	}
+	if (state == TB_ASTREAM_STATE_OK) tb_atomic64_fetch_and_add(&hstream->offset, real);
 
 	// done func
 	return hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
@@ -222,8 +212,8 @@ static tb_void_t tb_astream_http_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	if (hstream->http) tb_aicp_http_clos(hstream->http, bcalling);
 
 	// clear size and offset
-	tb_atomic64_set0(&hstream->size);
-	tb_atomic64_set(&hstream->offset, -1);
+	tb_atomic64_set(&hstream->size, -1);
+	tb_atomic64_set0(&hstream->offset);
 }
 static tb_void_t tb_astream_http_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {	
@@ -250,9 +240,9 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
 
 			// get size
-			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
-			*psize = (tb_hize_t)tb_atomic64_get(&hstream->size);
+			*psize = (tb_hong_t)tb_atomic64_get(&hstream->size);
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_GET_OFFSET:
@@ -261,9 +251,9 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
 
 			// get offset
-			tb_hong_t* poffset = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(poffset, tb_false);
-			*poffset = (tb_hong_t)tb_atomic64_get(&hstream->offset);
+			*poffset = (tb_hize_t)tb_atomic64_get(&hstream->offset);
 			return tb_true;
 		}
 	case TB_ASTREAM_CTRL_SET_URL:

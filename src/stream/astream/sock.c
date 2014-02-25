@@ -63,6 +63,12 @@ typedef struct __tb_astream_sock_t
 	// keep alive after being closed?
 	tb_uint32_t 				balived : 1;
 
+	// is reading now?
+	tb_uint32_t 				bread 	: 1;
+
+	// the offset
+	tb_atomic64_t 				offset;
+
 	// the sock data
 	tb_byte_t* 					data;
 
@@ -229,6 +235,12 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return_val(sstream && sstream->type && func, tb_false);
 
+	// clear the mode
+	sstream->bread = 0;
+
+	// clear the offset
+	tb_atomic64_set0(&sstream->offset);
+
 	// keep alive and have been opened? reopen it directly
 	if (sstream->balived && sstream->addr && sstream->aico)
 	{
@@ -276,6 +288,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.recv.real <= sstream->maxn);
+		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.recv.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -325,6 +338,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.urecv.real <= sstream->maxn);
+		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.urecv.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -364,6 +378,12 @@ static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_size_t delay, tb
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->maxn && sstream->aico && func, tb_false);
 
+	// clear the offset if be writ mode now
+	if (!sstream->bread) tb_atomic64_set0(&sstream->offset);
+
+	// set read mode
+	sstream->bread = 1;
+
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.read 	= func;
@@ -390,6 +410,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.send.data && aice->u.send.real <= aice->u.send.size);
+		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.send.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -439,6 +460,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 		// ok
 	case TB_AICE_STATE_OK:
 		tb_assert_and_check_break(aice->u.usend.data && aice->u.usend.real <= aice->u.usend.size);
+		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.usend.real);
 		state = TB_ASTREAM_STATE_OK;
 		break;
 		// closed
@@ -477,6 +499,12 @@ static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_size_t delay, tb
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && data && size && func, tb_false);
+
+	// clear the offset if be read mode now
+	if (sstream->bread) tb_atomic64_set0(&sstream->offset);
+
+	// set writ mode
+	sstream->bread = 0;
 
 	// save func and priv
 	sstream->priv 		= priv;
@@ -563,6 +591,12 @@ static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
 	tb_assert_and_check_return(sstream);
 
+	// clear the mode
+	sstream->bread = 0;
+
+	// clear the offset
+	tb_atomic64_set0(&sstream->offset);
+
 	// keep alive? not close it
 	tb_check_return(!sstream->balived);
 
@@ -617,6 +651,17 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
+	case TB_ASTREAM_CTRL_GET_OFFSET:
+		{
+			// check
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+
+			// get offset
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+			*poffset = (tb_hize_t)tb_atomic64_get(&sstream->offset);
+			return tb_true;
+		}
 	case TB_ASTREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check

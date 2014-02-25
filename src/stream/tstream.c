@@ -617,6 +617,65 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	// ok?
 	return writ;
 }
+tb_hong_t tb_tstream_save_gu(tb_gstream_t* istream, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(istream && ourl, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	ostream = tb_null;
+	do
+	{
+		// init ostream
+		ostream = tb_gstream_init_from_url(ourl);
+		tb_assert_and_check_break(ostream);
+
+		// ctrl file
+		if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
+		{
+			// ctrl mode
+			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+		}
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_hong_t tb_tstream_save_gd(tb_gstream_t* istream, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(istream && odata && osize, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	ostream = tb_null;
+	do
+	{
+		// init ostream
+		ostream = tb_gstream_init_from_data(odata, osize);
+		tb_assert_and_check_break(ostream);
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return size;
+}
 tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -655,6 +714,135 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 	// exit ostream
 	if (ostream) tb_gstream_exit(ostream);
 	ostream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_hong_t tb_tstream_save_ug(tb_char_t const* iurl, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(iurl && ostream, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	istream = tb_null;
+	do
+	{
+		// init istream
+		istream = tb_gstream_init_from_url(iurl);
+		tb_assert_and_check_break(istream);
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_gstream_exit(istream);
+	istream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_hong_t tb_tstream_save_ud(tb_char_t const* iurl, tb_byte_t* odata, tb_size_t osize, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(iurl && odata && osize, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	istream = tb_null;
+	tb_gstream_t* 	ostream = tb_null;
+	do
+	{
+		// init istream
+		istream = tb_gstream_init_from_url(iurl);
+		tb_assert_and_check_break(istream);
+
+		// init ostream
+		ostream = tb_gstream_init_from_data(odata, osize);
+		tb_assert_and_check_break(ostream);
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_gstream_exit(istream);
+	istream = tb_null;
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_hong_t tb_tstream_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(idata && isize && ourl, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	istream = tb_null;
+	tb_gstream_t* 	ostream = tb_null;
+	do
+	{
+		// init istream
+		istream = tb_gstream_init_from_data(idata, isize);
+		tb_assert_and_check_break(istream);
+
+		// init ostream
+		ostream = tb_gstream_init_from_url(ourl);
+		tb_assert_and_check_break(ostream);
+
+		// ctrl file
+		if (tb_gstream_type(ostream) == TB_GSTREAM_TYPE_FILE) 
+		{
+			// ctrl mode
+			if (!tb_gstream_ctrl(ostream, TB_GSTREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+		}
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_gstream_exit(istream);
+	istream = tb_null;
+
+	// exit ostream
+	if (ostream) tb_gstream_exit(ostream);
+	ostream = tb_null;
+
+	// ok?
+	return size;
+}
+tb_hong_t tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(idata && isize && ostream, -1);
+
+	// done
+	tb_hong_t 		size = -1;
+	tb_gstream_t* 	istream = tb_null;
+	do
+	{
+		// init istream
+		istream = tb_gstream_init_from_data(idata, isize);
+		tb_assert_and_check_break(istream);
+
+		// save stream
+		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+
+	} while (0);
+
+	// exit istream
+	if (istream) tb_gstream_exit(istream);
+	istream = tb_null;
 
 	// ok?
 	return size;

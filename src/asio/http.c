@@ -1016,7 +1016,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
-			// TODO: using tstream
+			// TODO: using tstream, left < 0
 #if 0
 			// the post size
 			tb_hize_t post_size = http->option.post_stream? tb_astream_left(http->option.post_stream) : 0;

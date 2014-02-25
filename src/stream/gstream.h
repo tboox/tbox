@@ -978,7 +978,7 @@ tb_bool_t 			tb_gstream_bwrit_s64_be(tb_gstream_t* gstream, tb_sint64_t val);
  */
 tb_size_t 			tb_gstream_type(tb_gstream_t const* gstream);
 
-/*! the stream size
+/*! the stream size, TODO: return tb_hong_t
  *
  * @param gstream 	the stream
  *

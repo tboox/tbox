@@ -728,29 +728,32 @@ tb_aicp_t* 			tb_astream_aicp(tb_astream_t* astream);
  */
 tb_size_t 			tb_astream_type(tb_astream_t const* astream);
 
-/*! the stream size
+/*! the stream size and not seeking it
  *
  * @param astream 	the stream
  *
- * @return 			the stream size
+ * @return 			the stream size, no size: -1, empty or error: 0
  */
-tb_hize_t 			tb_astream_size(tb_astream_t const* astream);
+tb_hong_t 			tb_astream_size(tb_astream_t const* astream);
 
-/*! the stream left size
+/*! the stream left size and not seeking it 
  *
  * @param astream 	the stream
  *
- * @return 			the stream left size, failed: -1
+ * @return 			the stream left size, no size: -1, empty or error: 0
  */
 tb_hong_t 			tb_astream_left(tb_astream_t const* astream);
 
 /*! the stream offset
  *
+ * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
+ * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
+ *
  * @param astream 	the stream
  *
- * @return 			the stream offset, failed: -1
+ * @return 			the stream offset
  */
-tb_hong_t 			tb_astream_offset(tb_astream_t const* astream);
+tb_hize_t 			tb_astream_offset(tb_astream_t const* astream);
 
 /*! the stream timeout
  *
