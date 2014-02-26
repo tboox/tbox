@@ -222,34 +222,31 @@ typedef struct __tb_astream_t
 	} 						open_and;
 
 	/// open
-	tb_bool_t 				(*open)(struct __tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*open)(tb_handle_t astream, tb_astream_open_func_t func, tb_pointer_t priv);
 
 	/// read
-	tb_bool_t 				(*read)(struct __tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*read)(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv);
 
 	/// writ
-	tb_bool_t 				(*writ)(struct __tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*writ)(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv);
 
 	/// seek
-	tb_bool_t 				(*seek)(struct __tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*seek)(tb_handle_t astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv);
 
 	/// sync
-	tb_bool_t 				(*sync)(struct __tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*sync)(tb_handle_t astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv);
 
 	/// task
-	tb_bool_t 				(*task)(struct __tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv);
+	tb_bool_t 				(*task)(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv);
 
 	/// kill
-	tb_void_t 				(*kill)(struct __tb_astream_t* astream);
+	tb_void_t 				(*kill)(tb_handle_t astream);
 
 	/// clos
-	tb_void_t 				(*clos)(struct __tb_astream_t* astream, tb_bool_t bcalling);
+	tb_void_t 				(*clos)(tb_handle_t astream, tb_bool_t bcalling);
 
 	/// exit
-	tb_void_t 				(*exit)(struct __tb_astream_t* astream, tb_bool_t bcalling);
-
-	/// ctrl 
-	tb_bool_t 				(*ctrl)(struct __tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args);
+	tb_void_t 				(*exit)(tb_handle_t astream, tb_bool_t bcalling);
 
 }tb_astream_t;
 
@@ -565,58 +562,6 @@ tb_bool_t 			tb_astream_writ_after_impl(tb_astream_t* astream, tb_size_t delay, 
  * @return 			the stream aicp
  */
 tb_aicp_t* 			tb_astream_aicp(tb_astream_t* astream);
-
-/*! the stream size and not seeking it
- *
- * @param astream 	the stream
- *
- * @return 			the stream size, no size: -1, empty or error: 0
- */
-tb_hong_t 			tb_astream_size(tb_astream_t const* astream);
-
-/*! the stream left size and not seeking it 
- *
- * @param astream 	the stream
- *
- * @return 			the stream left size, no size: -1, empty or error: 0
- */
-tb_hong_t 			tb_astream_left(tb_astream_t const* astream);
-
-/*! the stream offset
- *
- * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
- * the offset is calculated from the last read/writ and not seeking it if size == -1, .e.g: sock, filter, ..
- *
- * @param astream 	the stream
- *
- * @return 			the stream offset
- */
-tb_hize_t 			tb_astream_offset(tb_astream_t const* astream);
-
-/*! the stream timeout
- *
- * @param astream 	the stream
- *
- * @return 			the stream timeout
- */
-tb_size_t 			tb_astream_timeout(tb_astream_t const* astream);
-
-/*! the stream state c-string
- *
- * @param state 	the state
- *
- * @return 			the stream state c-string
- */
-tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
-
-/*! ctrl stream
- *
- * @param astream 	the stream
- * @param ctrl 		the ctrl command
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...);
 
 #ifdef __tb_debug__
 /*! the stream func name from post for debug

@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream.h"
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -93,8 +94,9 @@ typedef struct __tb_astream_sock_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_astream_t* astream)
+static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_handle_t stream)
 {
+	tb_astream_t* astream = (tb_astream_t*)stream;
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_astream_sock_t*)astream;
 }
@@ -229,7 +231,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 	// done func if failed
 	if (state != TB_STREAM_STATE_OK) sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
 }
-static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -255,14 +257,14 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	}
 
 	// get the host from url
-	tb_char_t const* host = tb_url_host_get(&astream->base.url);
+	tb_char_t const* host = tb_url_host_get(&sstream->base.base.url);
 	tb_assert_and_check_return_val(host, tb_false);
 
 	// clear ipv4
 	tb_ipv4_clr(&sstream->ipv4);
 
 	// init addr
-	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(astream->aicp, sstream->base.base.timeout, tb_astream_sock_addr_func, astream);
+	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(sstream->base.aicp, tb_stream_timeout(astream), tb_astream_sock_addr_func, astream);
 	tb_assert_and_check_return_val(sstream->addr, tb_false);
 
 	// save func and priv
@@ -372,7 +374,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -494,7 +496,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -515,7 +517,7 @@ static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_size_t delay, tb
 		? tb_aico_send_after(sstream->aico, delay, data, size, tb_astream_sock_writ_func, astream)
 		: tb_aico_usend_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), data, size, tb_astream_sock_uwrit_func, astream);
 }
-static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_seek(tb_handle_t astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -527,7 +529,7 @@ static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, t
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_sync(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_sync(tb_handle_t astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -561,7 +563,7 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_task(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -574,7 +576,7 @@ static tb_bool_t tb_astream_sock_task(tb_astream_t* astream, tb_size_t delay, tb
 	// post task
 	return tb_aico_task_run(sstream->aico, delay, tb_astream_sock_task_func, astream);
 }
-static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
+static tb_void_t tb_astream_sock_kill(tb_handle_t astream)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -585,7 +587,7 @@ static tb_void_t tb_astream_sock_kill(tb_astream_t* astream)
 	// kill addr
 	else if (sstream->addr) tb_aicp_addr_kill(sstream->addr);
 }
-static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
+static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -616,7 +618,7 @@ static tb_void_t tb_astream_sock_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	// exit ipv4
 	tb_ipv4_clr(&sstream->ipv4);
 }
-static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bcalling)
+static tb_void_t tb_astream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -642,7 +644,7 @@ static tb_void_t tb_astream_sock_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	if (sstream->data) tb_free(sstream->data);
 	sstream->data = tb_null;
 }
-static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_astream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
@@ -654,7 +656,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
+			tb_assert_and_check_return_val(tb_stream_bopened(astream), tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -665,7 +667,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
 
 			// the type
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -693,7 +695,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
 
 			// the sock
 			tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);
@@ -760,7 +762,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	sstream->base.kill 		= tb_astream_sock_kill;
 	sstream->base.clos 		= tb_astream_sock_clos;
 	sstream->base.exit 		= tb_astream_sock_exit;
-	sstream->base.ctrl 		= tb_astream_sock_ctrl;
+	sstream->base.base.ctrl = tb_astream_sock_ctrl;
 	sstream->type 			= TB_SOCKET_TYPE_TCP;
 
 	// ok
@@ -783,10 +785,10 @@ tb_astream_t* tb_astream_init_from_sock(tb_aicp_t* aicp, tb_char_t const* host, 
 	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// ctrl
-	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
-	if (!tb_astream_ctrl(sstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
+	if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_stream_ctrl(sstream, TB_STREAM_CTRL_SOCK_SET_TYPE, type)) goto fail;
 	
 	// ok
 	return sstream;

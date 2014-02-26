@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream.h"
 #include "../../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -85,16 +86,17 @@ typedef struct __tb_astream_file_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_astream_t* astream)
+static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_handle_t stream)
 {
+	tb_astream_t* astream = (tb_astream_t*)stream;
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
 	return (tb_astream_file_t*)astream;
 }
-static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_open(tb_handle_t astream, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream && astream->aicp, tb_false);
+	tb_assert_and_check_return_val(fstream && fstream->base.aicp, tb_false);
 
 	// done
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -104,7 +106,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		if (!fstream->file)
 		{
 			// the url
-			tb_char_t const* url = tb_url_get(&astream->base.url);
+			tb_char_t const* url = tb_url_get(&fstream->base.base.url);
 			tb_assert_and_check_break(url);
 
 			// open file
@@ -114,14 +116,14 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_check_break(fstream->file);
 
 		// addo file
-		fstream->aico = tb_aico_init_file(astream->aicp, fstream->file);
+		fstream->aico = tb_aico_init_file(fstream->base.aicp, fstream->file);
 		tb_assert_and_check_break(fstream->aico);
 
 		// init offset
 		tb_atomic64_set0(&fstream->offset);
 
 		// opened
-		tb_atomic_set(&astream->base.bopened, 1);
+		tb_atomic_set(&fstream->base.base.bopened, 1);
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -180,7 +182,7 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -240,7 +242,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -253,7 +255,7 @@ static tb_bool_t tb_astream_file_writ(tb_astream_t* astream, tb_size_t delay, tb
 	// post writ
 	return tb_aico_writ_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_astream_file_writ_func, astream);
 }
-static tb_bool_t tb_astream_file_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_seek(tb_handle_t astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -295,7 +297,7 @@ static tb_bool_t tb_astream_file_sync_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_sync(tb_astream_t* astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_sync(tb_handle_t astream, tb_bool_t bclosing, tb_astream_sync_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -330,7 +332,7 @@ static tb_bool_t tb_astream_file_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_task(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -343,7 +345,7 @@ static tb_bool_t tb_astream_file_task(tb_astream_t* astream, tb_size_t delay, tb
 	// post task
 	return tb_aico_task_run(fstream->aico, delay, tb_astream_file_task_func, astream);
 }
-static tb_void_t tb_astream_file_kill(tb_astream_t* astream)
+static tb_void_t tb_astream_file_kill(tb_handle_t astream)
 {	
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -352,7 +354,7 @@ static tb_void_t tb_astream_file_kill(tb_astream_t* astream)
 	// kill it
 	if (fstream->aico) tb_aico_kill(fstream->aico);
 }
-static tb_void_t tb_astream_file_clos(tb_astream_t* astream, tb_bool_t bcalling)
+static tb_void_t tb_astream_file_clos(tb_handle_t astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -370,7 +372,7 @@ static tb_void_t tb_astream_file_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	fstream->file = tb_null;
 	fstream->bref = tb_false;
 }
-static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_astream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
@@ -382,7 +384,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_stream_bopened(astream) && fstream->file, tb_false);
 
 			// get size
 			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
@@ -393,7 +395,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_stream_bopened(astream) && fstream->file, tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -404,7 +406,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FILE_SET_MODE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
 
 			// set mode
 			fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -413,7 +415,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FILE_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
 
 			// exit file first if exists
 			if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);
@@ -460,7 +462,7 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	fstream->base.task 		= tb_astream_file_task;
 	fstream->base.kill 		= tb_astream_file_kill;
 	fstream->base.clos 		= tb_astream_file_clos;
-	fstream->base.ctrl 		= tb_astream_file_ctrl;
+	fstream->base.base.ctrl = tb_astream_file_ctrl;
 	fstream->mode 			= TB_FILE_MODE_RO | TB_FILE_MODE_BINARY;
 
 	// ok
@@ -480,10 +482,10 @@ tb_astream_t* tb_astream_init_from_file(tb_aicp_t* aicp, tb_char_t const* path, 
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set path
-	if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_SET_URL, path)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_SET_URL, path)) goto fail;
 	
 	// set mode
-	if (mode) if (!tb_astream_ctrl(fstream, TB_STREAM_CTRL_FILE_SET_MODE, mode)) goto fail;
+	if (mode) if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FILE_SET_MODE, mode)) goto fail;
 	
 	// ok
 	return fstream;
