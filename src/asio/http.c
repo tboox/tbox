@@ -1194,9 +1194,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 	tb_assert_and_check_return_val(http && http->sstream && option, tb_false);
 
 	// check opened?
-	tb_bool_t bopened = tb_false;
-	if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_IS_OPENED, &bopened)) return tb_false;
-	tb_assert_and_check_return_val(!bopened, tb_false);
+	tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
 
 	// init args
 	tb_va_list_t args;

@@ -514,14 +514,10 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	tb_assert_and_check_return_val(ostream && istream, -1);	
 
 	// open it first if istream have been not opened
-	tb_bool_t opened = tb_false;
-	if (!tb_gstream_ctrl(istream, TB_STREAM_CTRL_IS_OPENED, &opened)) return -1;
-	if (!opened && !tb_gstream_bopen(istream)) return -1;
+	if (!tb_stream_is_opened(istream) && !tb_gstream_bopen(istream)) return -1;
 	
 	// open it first if ostream have been not opened
-	opened = tb_false;
-	if (!tb_gstream_ctrl(ostream, TB_STREAM_CTRL_IS_OPENED, &opened)) return -1;
-	if (!opened && !tb_gstream_bopen(ostream)) return -1;
+	if (!tb_stream_is_opened(ostream) && !tb_gstream_bopen(ostream)) return -1;
 
 	// init tstream
 	tb_tstream_gg_t tstream;

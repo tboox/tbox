@@ -1182,16 +1182,6 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_STREAM_CTRL_IS_OPENED:
-		{
-			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
-			if (popened)
-			{
-				*popened = gstream->base.bopened? tb_true : tb_false;
-				ok = tb_true;
-			}
-		}
-		break;
 	default:
 		break;
 	}
