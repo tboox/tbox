@@ -38,7 +38,7 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t*
 	tb_assert_and_check_return_val(astream && aicp, tb_false);
 
 	// init
-	astream->base.mode 		= TB_STREAM_MODE_ASIO;
+	astream->base.mode 		= TB_STREAM_MODE_AICO;
 	astream->base.type 		= type;
 	astream->base.timeout 	= -1;
 	astream->base.bopened 	= 0;

@@ -37,44 +37,47 @@
  *
  *
  * <pre>   
- *     bstream
- *        |         
- *        |                                          - data
- *    (url, ...)                                    |
- *     gstream ------------- gstream ---------------- file
- *     [aioo]        |                              |
- *                   |                              - sock 
- *                   |                              |
- *                   |                              - http
- *                   |           - charset
- *                   |          |
- *                   - filter - |- chunked 
- *                              |        
- *                              |- cache
- *                              |
- *                               - zip
- *
- *
- *
- *                                                    - data
- *    (url, ...)                                     |
- *     astream ------------- astream ----------------- file
- *      [aicp]       |                               |
- *                   |                               - sock
- *                   |                               |
- *                   |                               - http
- *                   |           - charset
- *                   |          |
- *                   - filter - |- chunked 
- *                              |        
- *                              |- cache
- *                              |
- *                               - zip    
- *
- *                -- gstream
- *    tstream - |
- *                -- astream
- *
+ *                                                  wait - poll
+ *                                                    | 
+ *                                                    |                                          - data
+ *                                                  [aioo]                                       |
+ *                                            ----- gstream ------------- gstream ---------------- file
+ *                                            |                   |                              |
+ *                                            |                   |                              - sock 
+ *                                            |                   |                              |
+ *                                            |                   |                              - http
+ *                                            |                   |           - charset
+ *                 data -                     |                   |          |
+ *                      |  [istream]          |                   - filter - |- chunked 
+ *                 url  |-- stream ---------  |                              |        
+ *                      |      |              |                              |- cache
+ *                 ... -       |              |                              |
+ *                             |              |                               - zip
+ *                             |              |
+ *                             |              |
+ *                             |              |
+ *                             |              |
+ *                             |              |
+ *                             |              |      aicp - loop
+ *                             |              |       |
+ *                             |              |       |                                            - data
+ *                             |              |     [aico]                                        |
+ *                             |              ----- astream ------------- astream ----------------- file
+ *                             |                                  |                               |
+ *                             |                                  |                               - sock
+ *             ----------------                                   |                               |
+ *  [transfer] |                                                  |                               - http
+ *   tstream - |                                                  |           - charset
+ *             |           [ostream]                              |          |
+ *             ------------ stream                                - filter - |- chunked 
+ *                                                                     |     |        
+ *                                                                     |     |- cache
+ *                                                                     |     |
+ *                                                                     |      - zip    
+ *                                                                     |
+ *                                                                     |
+ *                                                                  bstream - [data, size]
+ *                                                                   [bits]
  *                         
  * url: 
  * data://base64
