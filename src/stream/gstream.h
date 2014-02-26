@@ -102,10 +102,10 @@ typedef struct __tb_gstream_t
 	tb_stream_t 		base;
 
 	/// is writed?
-	tb_uint32_t 		bwrited 	: 1;
+	tb_uint8_t 			bwrited 	: 1;
 
 	/// is cached?
-	tb_uint32_t 		bcached 	: 1;
+	tb_uint8_t 			bcached 	: 1;
 
 	/// the state
 	tb_size_t 			state;
@@ -117,28 +117,25 @@ typedef struct __tb_gstream_t
 	tb_hize_t 			offset;
 
 	/// wait 
-	tb_long_t 			(*wait)(struct __tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout);
+	tb_long_t 			(*wait)(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout);
 
 	/// open
-	tb_long_t 			(*open)(struct __tb_gstream_t* gstream);
+	tb_long_t 			(*open)(tb_handle_t gstream);
 
 	/// clos
-	tb_long_t 			(*clos)(struct __tb_gstream_t* gstream);
+	tb_long_t 			(*clos)(tb_handle_t gstream);
 
 	/// read
-	tb_long_t 			(*read)(struct __tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+	tb_long_t 			(*read)(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
 
 	/// writ
-	tb_long_t 			(*writ)(struct __tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync);
+	tb_long_t 			(*writ)(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync);
 
 	/// seek
-	tb_long_t 			(*seek)(struct __tb_gstream_t* gstream, tb_hize_t offset);
+	tb_long_t 			(*seek)(tb_handle_t gstream, tb_hize_t offset);
 
 	/// exit
-	tb_void_t 			(*exit)(struct __tb_gstream_t* gstream);
-
-	/// ctrl
-	tb_bool_t 			(*ctrl)(struct __tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args);
+	tb_void_t 			(*exit)(tb_handle_t gstream);
 
 }tb_gstream_t;
 
@@ -306,14 +303,6 @@ tb_long_t 			tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t ti
  * @return 			the stream state
  */
 tb_size_t 			tb_gstream_state(tb_gstream_t* gstream);
-
-/*! the stream state string
- *
- * @param state 	the stream state
- *
- * @return 			the stream state string
- */
-tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
 
 /*! the stream is end?
  *
@@ -849,23 +838,6 @@ tb_hize_t 			tb_gstream_left(tb_gstream_t const* gstream);
  * @return 			the stream offset
  */
 tb_hize_t 			tb_gstream_offset(tb_gstream_t const* gstream);
-
-/*! the stream timeout
- *
- * @param gstream 	the stream
- *
- * @return 			the stream timeout
- */
-tb_size_t 			tb_gstream_timeout(tb_gstream_t const* gstream);
-
-/*! ctrl stream
- *
- * @param gstream 	the stream
- * @param ctrl 		the ctrl command
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...);
 
 #endif
 

@@ -258,10 +258,10 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 		tb_http_status_cler(http);
 
 		// ctrl stream
-		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url));
-		tb_gstream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url));
+		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url));
+		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url));
+		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url));
+		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url));
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -630,7 +630,7 @@ static tb_bool_t tb_http_response_done(tb_http_t* http)
 			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
 			// ctrl stream for sock
-			if (!tb_gstream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+			if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
 	}
 
@@ -716,7 +716,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		// init cstream
 		if (http->cstream)
 		{
-			if (!tb_gstream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
+			if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
 		}
 		else http->cstream = tb_gstream_init_filter_from_chunked(http->stream, tb_true);
 		tb_assert_and_check_return_val(http->cstream, -1);
@@ -737,7 +737,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		// init zstream
 		if (http->zstream)
 		{
-			if (!tb_gstream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
+			if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) return -1;
 		}
 		else http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 		tb_assert_and_check_return_val(http->zstream, -1);

@@ -24,7 +24,7 @@ static tb_bool_t tb_demo_gstream_head_func(tb_handle_t http, tb_char_t const* li
 	tb_printf("response: %s\n", line);
 	return tb_true;
 }
-static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_gstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
@@ -96,14 +96,14 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 					if (tb_option_find(option, "gzip"))
 					{
 						// auto unzip
-						if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+						if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
 
 						// need gzip
-						if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+						if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
 					}
 
 					// enable debug?
-					if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_gstream_head_func : tb_null)) break;
+					if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, debug? tb_demo_gstream_head_func : tb_null)) break;
 
 					// custem header?
 					if (tb_option_find(option, "header"))
@@ -152,7 +152,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 									if (tb_pstring_size(&key) && tb_pstring_size(&val))
 									{
 										if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-										if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+										if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 									}
 
 									// is key now
@@ -169,7 +169,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						if (tb_pstring_size(&key) && tb_pstring_size(&val))
 						{
 							if (debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-							if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+							if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 						}
 
 						// exit 
@@ -177,12 +177,13 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						tb_pstring_exit(&val);
 					}
 
+#if 0
 					// post-data?
 					if (tb_option_find(option, "post-data"))
 					{
 						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(option, "post-data"));
-						if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-						if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+						if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+						if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
 						if (debug) tb_printf("post: %llu\n", post_size);
 					}
 					// post-file?
@@ -193,18 +194,19 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						if (tb_file_info(tb_option_item_cstr(option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
 						{
 							tb_hize_t post_size = info.size;
-							if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-							if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+							if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+							if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
 							if (debug) tb_printf("post: %llu\n", post_size);
 						}
 					}
+#endif
 				}
 
 				// set timeout
 				if (tb_option_find(option, "timeout"))
 				{
 					tb_size_t timeout = tb_option_item_uint32(option, "timeout");
-					if (!tb_gstream_ctrl(ist, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
+					if (!tb_stream_ctrl(ist, TB_STREAM_CTRL_SET_TIMEOUT, timeout)) break;
 				}
 
 				// print verbose info

@@ -369,7 +369,7 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_goto(gstream, fail);
 
 	// set url
-	if (!tb_gstream_ctrl(gstream, TB_STREAM_CTRL_SET_URL, url)) goto fail;
+	if (!tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_URL, url)) goto fail;
 
 	// ok
 	return gstream;
@@ -1009,7 +1009,7 @@ tb_hize_t tb_gstream_size(tb_gstream_t const* gstream)
  
 	// get the size
 	tb_hize_t size = 0;
-	return tb_gstream_ctrl((tb_gstream_t*)gstream, TB_STREAM_CTRL_GET_SIZE, &size)? size : 0;
+	return tb_stream_ctrl((tb_gstream_t*)gstream, TB_STREAM_CTRL_GET_SIZE, &size)? size : 0;
 }
 tb_hize_t tb_gstream_offset(tb_gstream_t const* gstream)
 {
@@ -1020,184 +1020,6 @@ tb_hize_t tb_gstream_left(tb_gstream_t const* gstream)
 {
 	tb_hize_t size = tb_gstream_size(gstream);
 	return ((size && size >= gstream->offset)? (size - gstream->offset) : -1);
-}
-tb_size_t tb_gstream_timeout(tb_gstream_t const* gstream)
-{	
-	tb_assert_and_check_return_val(gstream, 0);
-	return gstream->base.timeout;
-}
-tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
-{	
-	// check
-	tb_assert_and_check_return_val(gstream && gstream->ctrl, tb_false);
-
-	// init args
-	tb_va_list_t args;
-    tb_va_start(args, ctrl);
-
-	// ctrl
-	tb_bool_t ok = tb_false;
-	switch (ctrl)
-	{
-	case TB_STREAM_CTRL_SET_URL:
-		{
-			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-			if (url && tb_url_set(&gstream->base.url, url)) ok = tb_true;
-		}
-		break;
-	case TB_STREAM_CTRL_GET_URL:
-		{
-			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-			if (purl)
-			{
-				tb_char_t const* url = tb_url_get(&gstream->base.url);
-				if (url)
-				{
-					*purl = url;
-					ok = tb_true;
-				}
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_HOST:
-		{
-			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-			if (host)
-			{
-				tb_url_host_set(&gstream->base.url, host);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_GET_HOST:
-		{
-			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-			if (phost)
-			{
-				tb_char_t const* host = tb_url_host_get(&gstream->base.url);
-				if (host)
-				{
-					*phost = host;
-					ok = tb_true;
-				}
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_PORT:
-		{
-			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
-			if (port)
-			{
-				tb_url_port_set(&gstream->base.url, port);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_GET_PORT:
-		{
-			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			if (pport)
-			{
-				*pport = tb_url_port_get(&gstream->base.url);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_PATH:
-		{
-			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-			if (path)
-			{
-				tb_url_path_set(&gstream->base.url, path);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_GET_PATH:
-		{
-			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
-			if (ppath)
-			{
-				tb_char_t const* path = tb_url_path_get(&gstream->base.url);
-				if (path)
-				{
-					*ppath = path;
-					ok = tb_true;
-				}
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_SSL:
-		{
-			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-			tb_url_ssl_set(&gstream->base.url, bssl);
-			ok = tb_true;
-		}
-		break;
-	case TB_STREAM_CTRL_GET_SSL:
-		{
-			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
-			if (pssl)
-			{
-				*pssl = tb_url_ssl_get(&gstream->base.url);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_CACHE:
-		{
-			tb_size_t cache = (tb_size_t)tb_va_arg(args, tb_size_t);
-			if (cache)
-			{
-				tb_qbuffer_resize(&gstream->cache, cache);
-				if (tb_qbuffer_maxn(&gstream->cache)) ok = tb_true;
-				gstream->bcached = 1;
-			}
-			else gstream->bcached = 0;
-		}
-		break;
-	case TB_STREAM_CTRL_GET_CACHE:
-		{
-			tb_size_t* pcache = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			if (pcache)
-			{
-				*pcache = tb_qbuffer_maxn(&gstream->cache);
-				ok = tb_true;
-			}
-		}
-		break;
-	case TB_STREAM_CTRL_SET_TIMEOUT:
-		{
-			gstream->base.timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
-			ok = tb_true;
-		}
-		break;
-	case TB_STREAM_CTRL_GET_TIMEOUT:
-		{
-			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			if (ptimeout)
-			{
-				*ptimeout = gstream->base.timeout;
-				ok = tb_true;
-			}
-		}
-		break;
-	default:
-		break;
-	}
-
-	// reset args
-	tb_va_end(args);
-    tb_va_start(args, ctrl);
-
-	// ctrl for native stream
-	ok = (gstream->ctrl(gstream, ctrl, args) || ok)? tb_true : tb_false;
-
-	// exit args
-	tb_va_end(args);
-
-	// ok?
-	return ok;
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gstream)
 {
