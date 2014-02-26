@@ -468,7 +468,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 		{
 			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
-			tb_assert_and_check_return_val(tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_opened(astream), tb_false);
 
 			// the poffset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -499,7 +499,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);

@@ -384,7 +384,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_stream_bopened(astream) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_opened(astream) && fstream->file, tb_false);
 
 			// get size
 			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
@@ -395,7 +395,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_stream_bopened(astream) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_opened(astream) && fstream->file, tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -406,7 +406,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_FILE_SET_MODE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
 
 			// set mode
 			fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -415,7 +415,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_FILE_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
 
 			// exit file first if exists
 			if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);

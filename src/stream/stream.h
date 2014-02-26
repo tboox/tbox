@@ -141,7 +141,7 @@ tb_hize_t 			tb_stream_offset(tb_handle_t stream);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_stream_bopened(tb_handle_t stream);
+tb_bool_t 			tb_stream_is_opened(tb_handle_t stream);
 
 /*! the stream timeout
  *

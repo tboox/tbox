@@ -114,8 +114,7 @@ static tb_bool_t tb_astream_filter_open(tb_handle_t astream, tb_astream_open_fun
 	tb_atomic64_set0(&fstream->offset);
 
 	// have been opened?
-	tb_bool_t opened = tb_false;
-	if (tb_stream_ctrl(fstream->astream, TB_STREAM_CTRL_IS_OPENED, &opened) && opened) 
+	if (tb_stream_is_opened(fstream->astream)) 
 	{
 		// opened
 		tb_atomic_set(&fstream->base.base.bopened, 1);
@@ -458,7 +457,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(tb_stream_is_opened(astream), tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -469,7 +468,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
 
 			// set astream
 			tb_handle_t astream = (tb_astream_t*)tb_va_arg(args, tb_astream_t*);
@@ -487,7 +486,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_stream_bopened(astream), tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(astream), tb_false);
 
 			//  exit filter first if exists
 			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
