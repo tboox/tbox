@@ -375,7 +375,7 @@ static tb_object_t* tb_array_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t 
 	// walk
 	tb_char_t ch;
 	tb_bool_t ok = tb_false;
-	while (tb_gstream_left(reader->stream)) 
+	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
 		ch = tb_gstream_bread_s8(reader->stream);

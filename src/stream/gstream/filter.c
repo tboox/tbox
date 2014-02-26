@@ -261,6 +261,16 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_
 	// ctrl
 	switch (ctrl)
 	{
+	case TB_STREAM_CTRL_GET_OFFSET:
+		{
+			// the poffset
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+
+			// get offset
+			*poffset = fstream->base.offset;
+			return tb_true;
+		}
 	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check

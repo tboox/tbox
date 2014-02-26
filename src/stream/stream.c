@@ -59,7 +59,7 @@ tb_hong_t tb_stream_size(tb_handle_t handle)
 	tb_hong_t size = -1;
 	return tb_stream_ctrl((tb_stream_t*)stream, TB_STREAM_CTRL_GET_SIZE, &size)? size : -1;
 }
-tb_hong_t tb_stream_left(tb_handle_t handle)
+tb_hize_t tb_stream_left(tb_handle_t handle)
 {
 	// check
 	tb_stream_t* stream = (tb_stream_t*)handle;

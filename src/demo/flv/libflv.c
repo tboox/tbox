@@ -573,10 +573,10 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 	}
 
 	// is end?
-	if (tb_gstream_left(gst) < 16) goto end;
+	if (tb_stream_left(gst) < 16) goto end;
 	
 	// read packets
-	while (tb_gstream_left(gst) >= 15)
+	while (tb_stream_left(gst) >= 15)
 	{
 		// read flv tag
 		if (!tb_gstream_bread(gst, tag, 15)) goto end;
@@ -597,7 +597,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						|| 	tag_type == TB_FLV_TAG_TYPE_SDATA, end);
 
 		// is end?
-		if (tb_gstream_left(gst) < data_size) break;
+		if (tb_stream_left(gst) < data_size) break;
 
 		// read flv data
 		switch (tag_type)

@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream.h"
 #include "../../asio/asio.h"
 #include "../../string/string.h"
 #include "../../platform/platform.h"
@@ -157,15 +158,9 @@ static tb_long_t tb_gstream_file_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->file, -1);
 
-	// the size
-	tb_hize_t size = tb_gstream_size(gstream);
-
-	// the offset
-	tb_hize_t offset = tb_gstream_offset(gstream);
-
 	// wait 
 	tb_long_t aioe = 0;
-	if (size && offset < size)
+	if (!tb_gstream_beof(gstream))
 	{
 		if (wait & TB_GSTREAM_WAIT_READ) aioe |= TB_GSTREAM_WAIT_READ;
 		if (wait & TB_GSTREAM_WAIT_WRIT) aioe |= TB_GSTREAM_WAIT_WRIT;
@@ -185,9 +180,19 @@ static tb_bool_t tb_gstream_file_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 	{
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
-			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
 			*psize = fstream->file? tb_file_size(fstream->file) : 0;
+			return tb_true;
+		}
+	case TB_STREAM_CTRL_GET_OFFSET:
+		{
+			// the poffset
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+
+			// get offset
+			*poffset = fstream->base.offset;
 			return tb_true;
 		}
 	case TB_STREAM_CTRL_FILE_SET_MODE:

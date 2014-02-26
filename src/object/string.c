@@ -270,7 +270,7 @@ static tb_object_t* tb_string_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 
 	// walk
 	tb_char_t ch;
-	while (tb_gstream_left(reader->stream)) 
+	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
 		ch = tb_gstream_bread_s8(reader->stream);

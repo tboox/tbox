@@ -348,34 +348,8 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
-	// copy file
-	tb_bool_t 	ok = tb_false;
-	tb_handle_t ist = tb_null;
-	tb_handle_t ost = tb_null;
-	do
-	{
-		// init stream
-		ist = tb_gstream_init_from_url(path);
-		ost = tb_gstream_init_from_url(dest);
-		tb_assert_and_check_break(ist && ost);
-
-		// open stream first for size
-		if (!tb_gstream_bopen(ist)) break;
-
-		// the stream size
-		tb_hize_t size = tb_gstream_size(ist);
-
-		// ok?
-		ok = tb_tstream_save_gg(ist, ost, 0, tb_null, tb_null) == size? tb_true : tb_false;
-
-	} while (0);
-
-	// exit stream
-	if (ist) tb_gstream_exit(ist);
-	if (ost) tb_gstream_exit(ost);
-
-	// ok?
-	return ok;
+	// save it
+	return tb_tstream_save_uu(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)
 {

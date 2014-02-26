@@ -434,7 +434,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 	// walk
 	tb_bool_t ok = tb_false;
 	tb_size_t e = TB_XML_READER_EVENT_NONE;
-	tb_hong_t save = tb_gstream_offset(xreader->rstream);
+	tb_hize_t save = tb_stream_offset(xreader->rstream);
 	while (!ok && (e = tb_xml_reader_next(reader)))
 	{
 		switch (e)
@@ -498,7 +498,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 		}
 
 		// save
-		save = tb_gstream_offset(xreader->rstream);
+		save = tb_stream_offset(xreader->rstream);
 	}
 
 end:
