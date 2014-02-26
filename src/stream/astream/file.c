@@ -87,7 +87,7 @@ typedef struct __tb_astream_file_t
  */
 static __tb_inline__ tb_astream_file_t* tb_astream_file_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_FILE, tb_null);
+	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FILE, tb_null);
 	return (tb_astream_file_t*)astream;
 }
 static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
@@ -104,7 +104,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		if (!fstream->file)
 		{
 			// the url
-			tb_char_t const* url = tb_url_get(&astream->url);
+			tb_char_t const* url = tb_url_get(&astream->base.url);
 			tb_assert_and_check_break(url);
 
 			// open file
@@ -121,7 +121,7 @@ static tb_bool_t tb_astream_file_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_atomic64_set0(&fstream->offset);
 
 		// opened
-		tb_atomic_set(&astream->opened, 1);
+		tb_atomic_set(&astream->base.bopened, 1);
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -382,7 +382,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && fstream->file, tb_false);
 
 			// get size
 			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
@@ -393,7 +393,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && fstream->file, tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && fstream->file, tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -404,7 +404,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FILE_SET_MODE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set mode
 			fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -413,7 +413,7 @@ static tb_bool_t tb_astream_file_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_FILE_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// exit file first if exists
 			if (!fstream->bref && fstream->file) tb_file_exit(fstream->file);

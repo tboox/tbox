@@ -101,26 +101,14 @@ typedef struct __tb_gstream_t
 	/// the base
 	tb_stream_t 		base;
 
-	/// the type
-	tb_uint32_t 		type 		: 8;
-
-	/// is opened?
-	tb_uint32_t 		bopened 	: 1;
-
 	/// is writed?
 	tb_uint32_t 		bwrited 	: 1;
 
 	/// is cached?
 	tb_uint32_t 		bcached 	: 1;
 
-	/// the timeout: ms
-	tb_uint32_t 		timeout 	: 21;
-
 	/// the state
 	tb_size_t 			state;
-
-	/// the url
-	tb_url_t 			url;
 
 	/// the cache
 	tb_qbuffer_t 		cache;

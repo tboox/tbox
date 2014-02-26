@@ -95,7 +95,7 @@ typedef struct __tb_astream_sock_t
  */
 static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_SOCK, tb_null);
+	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_astream_sock_t*)astream;
 }
 static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
@@ -115,7 +115,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	case TB_AICE_STATE_OK:
 		{
 			// opened
-			tb_atomic_set(&sstream->base.opened, 1);
+			tb_atomic_set(&sstream->base.base.bopened, 1);
 
 			// ok
 			state = TB_STREAM_STATE_OK;
@@ -178,16 +178,16 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 			tb_assert_and_check_break(sstream->aico);
 
 			// init timeout
-			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_CONN, sstream->base.timeout);
-			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_RECV, sstream->base.timeout);
-			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_SEND, sstream->base.timeout);
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_CONN, sstream->base.base.timeout);
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_RECV, sstream->base.base.timeout);
+			tb_aico_timeout_set(sstream->aico, TB_AICO_TIMEOUT_SEND, sstream->base.base.timeout);
 
 			// port
-			tb_size_t port = tb_url_port_get(&sstream->base.url);
+			tb_size_t port = tb_url_port_get(&sstream->base.base.url);
 			tb_assert_and_check_break(port);
 			
 			// the sock type: tcp or udp? for url: sock://ip:port/?udp=
-			tb_char_t const* args = tb_url_args_get(&sstream->base.url);
+			tb_char_t const* args = tb_url_args_get(&sstream->base.base.url);
 			if (args && !tb_strnicmp(args, "udp=", 4)) sstream->type = TB_SOCKET_TYPE_UDP;
 			else if (args && !tb_strnicmp(args, "tcp=", 4)) sstream->type = TB_SOCKET_TYPE_TCP;
 			tb_assert_and_check_break(sstream->type == TB_SOCKET_TYPE_TCP || sstream->type == TB_SOCKET_TYPE_UDP);
@@ -205,7 +205,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 				sstream->ipv4 = *addr;
 
 				// opened
-				tb_atomic_set(&sstream->base.opened, 1);
+				tb_atomic_set(&sstream->base.base.bopened, 1);
 
 				// done func
 				sstream->func.open((tb_astream_t*)sstream, TB_STREAM_STATE_OK, sstream->priv);
@@ -245,7 +245,7 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	if (sstream->balived && sstream->addr && sstream->aico)
 	{
 		// opened
-		tb_atomic_set(&sstream->base.opened, 1);
+		tb_atomic_set(&sstream->base.base.bopened, 1);
 
 		// done func
 		sstream->func.open((tb_astream_t*)sstream, TB_STREAM_STATE_OK, sstream->priv);
@@ -255,14 +255,14 @@ static tb_bool_t tb_astream_sock_open(tb_astream_t* astream, tb_astream_open_fun
 	}
 
 	// get the host from url
-	tb_char_t const* host = tb_url_host_get(&astream->url);
+	tb_char_t const* host = tb_url_host_get(&astream->base.url);
 	tb_assert_and_check_return_val(host, tb_false);
 
 	// clear ipv4
 	tb_ipv4_clr(&sstream->ipv4);
 
 	// init addr
-	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(astream->aicp, sstream->base.timeout, tb_astream_sock_addr_func, astream);
+	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(astream->aicp, sstream->base.base.timeout, tb_astream_sock_addr_func, astream);
 	tb_assert_and_check_return_val(sstream->addr, tb_false);
 
 	// save func and priv
@@ -392,7 +392,7 @@ static tb_bool_t tb_astream_sock_read(tb_astream_t* astream, tb_size_t delay, tb
 	// post read
 	return (sstream->type == TB_SOCKET_TYPE_TCP)
 		? tb_aico_recv_after(sstream->aico, delay, sstream->data, maxn, tb_astream_sock_read_func, astream)
-		: tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.url), sstream->data, maxn, tb_astream_sock_uread_func, astream);
+		: tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), sstream->data, maxn, tb_astream_sock_uread_func, astream);
 }
 static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 {
@@ -513,7 +513,7 @@ static tb_bool_t tb_astream_sock_writ(tb_astream_t* astream, tb_size_t delay, tb
 	// post writ
 	return (sstream->type == TB_SOCKET_TYPE_TCP)
 		? tb_aico_send_after(sstream->aico, delay, data, size, tb_astream_sock_writ_func, astream)
-		: tb_aico_usend_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.url), data, size, tb_astream_sock_uwrit_func, astream);
+		: tb_aico_usend_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), data, size, tb_astream_sock_uwrit_func, astream);
 }
 static tb_bool_t tb_astream_sock_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
@@ -654,7 +654,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -665,7 +665,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SOCK_SET_TYPE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// the type
 			tb_size_t type = (tb_size_t)tb_va_arg(args, tb_size_t);
@@ -693,7 +693,7 @@ static tb_bool_t tb_astream_sock_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// the sock
 			tb_handle_t sock = (tb_handle_t)tb_va_arg(args, tb_handle_t);

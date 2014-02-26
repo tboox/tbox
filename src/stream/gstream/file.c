@@ -62,7 +62,7 @@ typedef struct __tb_gstream_file_t
  */
 static __tb_inline__ tb_gstream_file_t* tb_gstream_file_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_FILE, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_FILE, tb_null);
 	return (tb_gstream_file_t*)gstream;
 }
 static tb_long_t tb_gstream_file_open(tb_gstream_t* gstream)
@@ -75,7 +75,7 @@ static tb_long_t tb_gstream_file_open(tb_gstream_t* gstream)
 	tb_check_return_val(!(fstream->file && fstream->bref), 1);
 
 	// url
-	tb_char_t const* url = tb_url_get(&gstream->url);
+	tb_char_t const* url = tb_url_get(&gstream->base.url);
 	tb_assert_and_check_return_val(url, -1);
 
 	// open file

@@ -26,25 +26,41 @@
  * includes
  */
 #include "stream.h"
+#include "../platform/platform.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_size_t tb_stream_mode(tb_stream_t const* stream)
+tb_size_t tb_stream_mode(tb_handle_t handle)
 {
 	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
 	tb_assert_and_check_return_val(stream, TB_STREAM_MODE_NONE);
 
 	// the mode
 	return stream->mode;
 }
-tb_size_t tb_stream_type(tb_stream_t const* stream)
+tb_size_t tb_stream_type(tb_handle_t handle)
 {
 	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
 	tb_assert_and_check_return_val(stream, TB_STREAM_TYPE_NONE);
 
 	// the type
 	return stream->type;
+}
+tb_bool_t tb_stream_bopened(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, tb_false);
+
+	// is opened?
+	return tb_atomic_get(&stream->bopened)? tb_true : tb_false;
+}
+tb_long_t tb_stream_timeout(tb_handle_t handle)
+{
+	return -1;
 }
 tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 {
@@ -102,4 +118,13 @@ tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 	}
 
 	return tb_null;
+}
+tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, tb_false);
+
+
+	return tb_false;
 }

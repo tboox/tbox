@@ -82,7 +82,7 @@ typedef struct __tb_astream_filter_t
  */
 static __tb_inline__ tb_astream_filter_t* tb_astream_filter_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_FLTR, tb_null);
+	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_astream_filter_t*)astream;
 }
 static tb_bool_t tb_astream_filter_open_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
@@ -95,7 +95,7 @@ static tb_bool_t tb_astream_filter_open_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(fstream && fstream->func.open, tb_false);
 
 	// opened
-	tb_atomic_set(&fstream->base.opened, 1);
+	tb_atomic_set(&fstream->base.base.bopened, 1);
 
 	// done func
 	return fstream->func.open((tb_astream_t*)fstream, state, fstream->priv);
@@ -117,7 +117,7 @@ static tb_bool_t tb_astream_filter_open(tb_astream_t* astream, tb_astream_open_f
 	if (tb_astream_ctrl(fstream->astream, TB_STREAM_CTRL_IS_OPENED, &opened) && opened) 
 	{
 		// opened
-		tb_atomic_set(&fstream->base.opened, 1);
+		tb_atomic_set(&fstream->base.base.bopened, 1);
 
 		// done func
 		return func? func(astream, TB_STREAM_STATE_OK, fstream->priv) : tb_true;
@@ -457,7 +457,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -468,7 +468,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set astream
 			tb_astream_t* astream = (tb_astream_t*)tb_va_arg(args, tb_astream_t*);
@@ -486,7 +486,7 @@ static tb_bool_t tb_astream_filter_ctrl(tb_astream_t* astream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			//  exit filter first if exists
 			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);

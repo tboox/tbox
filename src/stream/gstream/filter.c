@@ -66,7 +66,7 @@ typedef struct __tb_gstream_filter_t
  */
 static __tb_inline__ tb_gstream_filter_t* tb_gstream_filter_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_FLTR, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_gstream_filter_t*)gstream;
 }
 static tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
@@ -262,7 +262,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
-			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
+			tb_assert_and_check_return_val(!gstream->base.bopened, tb_false);
 
 			// set gstream
 			tb_gstream_t* gstream = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
@@ -280,7 +280,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
-			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
+			tb_assert_and_check_return_val(!gstream->base.bopened, tb_false);
 
 			//  exit filter first if exists
 			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);

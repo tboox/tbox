@@ -195,24 +195,11 @@ typedef struct __tb_astream_t
 	/// the base
 	tb_stream_t 			base;
 
-	/// the url
-	tb_url_t 				url;
-
 	/// the aicp
 	tb_aicp_t* 				aicp;
 
-#error
-	/// the type
-	tb_uint8_t 				type;
-
-	// is opened?
-	tb_atomic_t 			opened;
-
 	// is stoped?
 	tb_atomic_t 			stoped;
-
-	// the timeout
-	tb_long_t 				timeout;
 
 #ifdef __tb_debug__
 	/// the func
@@ -261,7 +248,7 @@ typedef struct __tb_astream_t
 	/// exit
 	tb_void_t 				(*exit)(struct __tb_astream_t* astream, tb_bool_t bcalling);
 
-	/// ctrl
+	/// ctrl 
 	tb_bool_t 				(*ctrl)(struct __tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args);
 
 }tb_astream_t;
