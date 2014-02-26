@@ -528,7 +528,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	// writ data
 	tb_byte_t 	data[TB_GSTREAM_BLOCK_MAXN];
 	tb_hize_t 	writ = 0;
-	tb_hize_t 	left = tb_gstream_left(istream);
+	tb_hize_t 	left = tb_stream_left(istream);
 	tb_hong_t 	base = tb_mclock();
 	tb_hong_t 	base1s = base;
 	tb_hong_t 	time = 0;
@@ -1393,12 +1393,22 @@ tb_size_t tb_tstream_type(tb_handle_t tstream)
 {
 	return 0;
 }
-tb_handle_t tb_tstream_istream(tb_handle_t tstream)
+tb_handle_t tb_tstream_istream(tb_handle_t handle)
 {
-	return tb_null;
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return_val(tstream, tb_null);
+
+	// the istream
+	return tstream->istream;
 }
-tb_handle_t tb_tstream_ostream(tb_handle_t tstream)
+tb_handle_t tb_tstream_ostream(tb_handle_t handle)
 {
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return_val(tstream, tb_null);
+
+	// the ostream
 	return tb_null;
 }
 

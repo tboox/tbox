@@ -93,7 +93,7 @@ static tb_object_t* tb_null_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t t
 	tb_sstring_chrcat(&data, type);
 
 	// walk
-	while (tb_gstream_left(reader->stream)) 
+	while (tb_stream_left(reader->stream)) 
 	{
 		// need one character
 		tb_byte_t* p = tb_null;

@@ -285,7 +285,7 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
 	else if (gstream->bcached)
 	{
 		tb_size_t 	size = 0;
-		tb_hize_t 	curt = tb_gstream_offset(gstream);
+		tb_hize_t 	curt = tb_stream_offset(gstream);
 		tb_byte_t* 	data = tb_qbuffer_pull_init(&gstream->cache, &size);
 		if (data && size && offset >= curt && offset <= curt + size)
 		{
@@ -439,14 +439,14 @@ tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 tb_bool_t tb_gstream_beof(tb_gstream_t* gstream)
 {
 	// already been opened?
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened, tb_true);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), tb_true);
 
 	// size
-	tb_hong_t size = tb_gstream_size(gstream);
-	tb_hong_t offt = tb_gstream_offset(gstream);
+	tb_hong_t size = tb_stream_size(gstream);
+	tb_hize_t offt = tb_stream_offset(gstream);
 
 	// eof?
-	return size && offt >= size? tb_true : tb_false;
+	return (size > 0 && offt >= size)? tb_true : tb_false;
 }
 tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 {
@@ -454,7 +454,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(gstream && gstream->open, -1);
 
 	// already been opened?
-	tb_check_return_val(!gstream->base.bopened, 1);
+	tb_check_return_val(!tb_stream_is_opened(gstream), 1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -496,7 +496,7 @@ tb_long_t tb_gstream_aclos(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(gstream, -1);
 
 	// already been closed?
-	tb_check_return_val(gstream->base.bopened, 1);
+	tb_check_return_val(tb_stream_is_opened(gstream), 1);
 
 	// flush writed data first
 	if (gstream->bwrited) 
@@ -559,7 +559,7 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t si
 	tb_assert_and_check_return_val(data && size, -1);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->read, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(gstream->bcached && tb_qbuffer_maxn(&gstream->cache), -1);
@@ -609,7 +609,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->read, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -628,7 +628,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->writ, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->writ, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -646,7 +646,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	tb_check_return_val(size, tb_true);
 
 	// check the left
-	tb_hize_t left = tb_gstream_left(gstream);
+	tb_hize_t left = tb_stream_left(gstream);
 	tb_check_return_val(size <= left, tb_false);
 
 	// read data from cache
@@ -711,7 +711,7 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -725,7 +725,7 @@ tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 tb_long_t tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -932,13 +932,13 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...)
 tb_long_t tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
 
 	// need seek?
-	tb_hize_t curt = tb_gstream_offset(gstream);
+	tb_hize_t curt = tb_stream_offset(gstream);
 	tb_check_return_val(offset != curt, 1);
 
 	// try seek to cache
@@ -953,8 +953,8 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset)
 		tb_assert_and_check_return_val(!gstream->bwrited, -1);
 
 		// limit offset
-		tb_hize_t size = tb_gstream_size(gstream);
-		if (size && offset > size) offset = size;
+		tb_hong_t size = tb_stream_size(gstream);
+		if (size >= 0 && offset > size) offset = size;
 
 		// forward it?
 		tb_assert_and_check_return_val(offset > curt, -1);
@@ -968,12 +968,12 @@ tb_long_t tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset)
 		tb_check_return_val(r, 0);
 
 		// no finished? continue it
-		if (r > 0 && tb_gstream_offset(gstream) < offset) return 0;
+		if (r > 0 && tb_stream_offset(gstream) < offset) return 0;
 	}
 
 end:
 	// ok?
-	return tb_gstream_offset(gstream) == offset? 1 : -1;
+	return tb_stream_offset(gstream) == offset? 1 : -1;
 }
 tb_bool_t tb_gstream_bseek(tb_gstream_t* gstream, tb_hize_t offset)
 {
@@ -996,30 +996,11 @@ tb_bool_t tb_gstream_bseek(tb_gstream_t* gstream, tb_hize_t offset)
 tb_long_t tb_gstream_askip(tb_gstream_t* gstream, tb_hize_t size)
 {
 	tb_assert_and_check_return_val(gstream, -1);
-	return tb_gstream_aseek(gstream, tb_gstream_offset(gstream) + size);
+	return tb_gstream_aseek(gstream, tb_stream_offset(gstream) + size);
 }
 tb_bool_t tb_gstream_bskip(tb_gstream_t* gstream, tb_hize_t size)
 {
-	return tb_gstream_bseek(gstream, tb_gstream_offset(gstream) + size);
-}
-tb_hize_t tb_gstream_size(tb_gstream_t const* gstream)
-{
-	// check
-	tb_assert_and_check_return_val(gstream, 0);
- 
-	// get the size
-	tb_hize_t size = 0;
-	return tb_stream_ctrl((tb_gstream_t*)gstream, TB_STREAM_CTRL_GET_SIZE, &size)? size : 0;
-}
-tb_hize_t tb_gstream_offset(tb_gstream_t const* gstream)
-{
-	tb_assert_and_check_return_val(gstream, 0);
-	return gstream->offset;
-}
-tb_hize_t tb_gstream_left(tb_gstream_t const* gstream)
-{
-	tb_hize_t size = tb_gstream_size(gstream);
-	return ((size && size >= gstream->offset)? (size - gstream->offset) : -1);
+	return tb_gstream_bseek(gstream, tb_stream_offset(gstream) + size);
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gstream)
 {

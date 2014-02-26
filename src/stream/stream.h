@@ -120,9 +120,9 @@ tb_hong_t 			tb_stream_size(tb_handle_t stream);
  *
  * @param stream 	the stream
  *
- * @return 			the stream left size, no size: -1, empty or error: 0
+ * @return 			the stream left size, no size: infinity, empty or end: 0
  */
-tb_hong_t 			tb_stream_left(tb_handle_t stream);
+tb_hize_t 			tb_stream_left(tb_handle_t stream);
 
 /*! the stream offset
  *

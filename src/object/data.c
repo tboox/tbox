@@ -69,7 +69,7 @@ static tb_void_t tb_data_exit(tb_object_t* object)
 	if (data) 
 	{
 		tb_pbuffer_exit(&data->buff);
-		tb_opool_del(data);
+		tb_opool_del((tb_object_t*)data);
 	}
 }
 static tb_void_t tb_data_cler(tb_object_t* object)
@@ -80,7 +80,7 @@ static tb_void_t tb_data_cler(tb_object_t* object)
 static tb_data_t* tb_data_init_base()
 {
 	// make
-	tb_data_t* data = tb_opool_get(sizeof(tb_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
+	tb_data_t* data = (tb_data_t*)tb_opool_get(sizeof(tb_data_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATA);
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// init base
@@ -291,11 +291,11 @@ static tb_bool_t tb_data_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* o
 	tb_memcpy(writer->data, data, size);
 
 	// encode data
-	tb_byte_t* 	pb = data;
-	tb_byte_t* 	pe = data + size;
-	tb_byte_t* 	qb = writer->data;
-	tb_byte_t* 	qe = writer->data + writer->maxn;
-	tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
+	tb_byte_t const* 	pb = data;
+	tb_byte_t const* 	pe = data + size;
+	tb_byte_t* 			qb = writer->data;
+	tb_byte_t* 			qe = writer->data + writer->maxn;
+	tb_byte_t 			xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
 	for (; pb < pe && qb < qe; pb++, qb++, xb++) *qb = *pb ^ xb;
 
 	// writ it
@@ -322,29 +322,32 @@ tb_object_t* tb_data_init_from_url(tb_char_t const* url)
 	tb_assert_and_check_return_val(url, tb_null);
 
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(url);
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* stream = tb_gstream_init_from_url(url);
+	tb_assert_and_check_return_val(stream, tb_null);
 
 	// make stream
 	tb_object_t* object = tb_null;
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_bopen(stream))
 	{
 		// size
-		tb_size_t size = (tb_size_t)tb_gstream_size(gst);
-		if (size)
+		tb_hong_t size = tb_stream_size(stream);
+		if (size > 0)
 		{
 			tb_byte_t* data = tb_malloc0(size);
 			if (data) 
 			{
-				if (tb_gstream_bread(gst, data, size))
+				if (tb_gstream_bread(stream, data, size))
 					object = tb_data_init_from_data(data, size);
 				tb_free(data);
 			}
 		}
 		else object = tb_data_init_from_data(tb_null, 0);
 
+		// check, TODO: read stream if no size
+		tb_assert(size >= 0);
+
 		// exit stream
-		tb_gstream_exit(gst);
+		tb_gstream_exit(stream);
 	}
 
 	// ok?
@@ -363,11 +366,11 @@ tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 	if (addr && size) tb_pbuffer_memncpy(&data->buff, addr, size);
 
 	// ok
-	return data;
+	return (tb_object_t*)data;
 
 	// no
 fail:
-	tb_data_exit(data);
+	tb_data_exit((tb_object_t*)data);
 	return tb_null;
 }
 tb_object_t* tb_data_init_from_pbuf(tb_pbuffer_t* pbuf)
@@ -383,11 +386,11 @@ tb_object_t* tb_data_init_from_pbuf(tb_pbuffer_t* pbuf)
 	if (pbuf) tb_pbuffer_memcpy(&data->buff, pbuf);
 
 	// ok
-	return data;
+	return (tb_object_t*)data;
 
 	// no
 fail:
-	tb_data_exit(data);
+	tb_data_exit((tb_object_t*)data);
 	return tb_null;
 }
 tb_pointer_t tb_data_getp(tb_object_t* object)
@@ -433,26 +436,26 @@ tb_bool_t tb_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
 {
 	// check
 	tb_data_t* data = tb_data_cast(object);
-	tb_assert_and_check_return_val(data && tb_data_getp(data) && url, tb_false);
+	tb_assert_and_check_return_val(data && tb_data_getp((tb_object_t*)data) && url, tb_false);
 
 	// make stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(url);
-	tb_assert_and_check_return_val(gst, tb_false);
+	tb_gstream_t* stream = tb_gstream_init_from_url(url);
+	tb_assert_and_check_return_val(stream, tb_false);
 
 	// ctrl
-	if (tb_stream_type(gst) == TB_STREAM_TYPE_FILE)
-		tb_stream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+	if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
+		tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 	
 	// open stream
 	tb_bool_t ok = tb_false;
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_bopen(stream))
 	{
 		// writ stream
-		if (tb_gstream_bwrit(gst, tb_data_getp(data), tb_data_size(data))) ok = tb_true;
+		if (tb_gstream_bwrit(stream, tb_data_getp((tb_object_t*)data), tb_data_size((tb_object_t*)data))) ok = tb_true;
 	}
 
 	// exit stream
-	tb_gstream_exit(gst);
+	tb_gstream_exit(stream);
 
 	// ok?
 	return ok;

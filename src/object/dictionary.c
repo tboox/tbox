@@ -507,7 +507,7 @@ static tb_object_t* tb_dictionary_read_jsn(tb_object_jsn_reader_t* reader, tb_ch
 	tb_bool_t ok = tb_false;
 	tb_bool_t bkey = tb_false;
 	tb_size_t bstr = 0;
-	while (tb_gstream_left(reader->stream)) 
+	while (tb_stream_left(reader->stream)) 
 	{
 		// read one character
 		ch = tb_gstream_bread_s8(reader->stream);

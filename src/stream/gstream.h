@@ -815,29 +815,5 @@ tb_bool_t 			tb_gstream_bwrit_u64_be(tb_gstream_t* gstream, tb_uint64_t val);
  */
 tb_bool_t 			tb_gstream_bwrit_s64_be(tb_gstream_t* gstream, tb_sint64_t val);
 
-/*! the stream size, TODO: return tb_hong_t
- *
- * @param gstream 	the stream
- *
- * @return 			the stream size
- */
-tb_hize_t 			tb_gstream_size(tb_gstream_t const* gstream);
-
-/*! the stream left size
- *
- * @param gstream 	the stream
- *
- * @return 			the stream left size
- */
-tb_hize_t 			tb_gstream_left(tb_gstream_t const* gstream);
-
-/*! the stream offset
- *
- * @param gstream 	the stream
- *
- * @return 			the stream offset
- */
-tb_hize_t 			tb_gstream_offset(tb_gstream_t const* gstream);
-
 #endif
 

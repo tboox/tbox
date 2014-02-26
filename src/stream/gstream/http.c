@@ -159,7 +159,7 @@ static tb_bool_t tb_gstream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// psize
-			tb_hize_t* psize = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
 			tb_assert_and_check_return_val(psize, tb_false);
 
 			// status
@@ -167,7 +167,17 @@ static tb_bool_t tb_gstream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 			tb_assert_and_check_return_val(status, 0);
 
 			// get size
-			*psize = (!status->bgzip && !status->bdeflate)? status->document_size : 0;
+			*psize = (!status->bgzip && !status->bdeflate)? status->document_size : -1;
+			return tb_true;
+		}
+	case TB_STREAM_CTRL_GET_OFFSET:
+		{
+			// the poffset
+			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
+			tb_assert_and_check_return_val(poffset, tb_false);
+
+			// get offset
+			*poffset = hstream->base.offset;
 			return tb_true;
 		}
 	case TB_STREAM_CTRL_SET_URL:

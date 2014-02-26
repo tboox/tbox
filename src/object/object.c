@@ -57,11 +57,11 @@ static tb_handle_t 				g_object_jsn_writer = tb_null;
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_object_t* tb_object_read_xml(tb_gstream_t* gst)
+static tb_object_t* tb_object_read_xml(tb_gstream_t* stream)
 {
 	// init reader 
 	tb_object_xml_reader_t reader = {0};
-	reader.reader = tb_xml_reader_init(gst);
+	reader.reader = tb_xml_reader_init(stream);
 	tb_assert_and_check_return_val(reader.reader, tb_null);
 
 	// init object
@@ -101,11 +101,11 @@ end:
 	// ok?
 	return object;
 }
-static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
+static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
 {
 	// init writer 
 	tb_object_xml_writer_t writer = {0};
-	writer.stream 	= gst;
+	writer.stream 	= stream;
 	writer.deflate 	= deflate;
 
 	// func
@@ -113,23 +113,23 @@ static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* gst, tb_b
 	tb_assert_and_check_return_val(func, tb_false);
 
 	// writ xml header
-	tb_gstream_printf(gst, "<?xml version=\"2.0\" encoding=\"utf-8\"?>");
-	tb_object_writ_newline(gst, deflate);
+	tb_gstream_printf(stream, "<?xml version=\"2.0\" encoding=\"utf-8\"?>");
+	tb_object_writ_newline(stream, deflate);
 
 	// writ
 	tb_bool_t ok = func(&writer, object, 0);
 
 	// flush
-	tb_gstream_bfwrit(gst, tb_null, 0);
+	tb_gstream_bfwrit(stream, tb_null, 0);
 
 	// ok
 	return ok;
 }
-static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
+static tb_object_t* tb_object_read_bin(tb_gstream_t* stream)
 {
 	// read bin header
 	tb_byte_t data[32] = {0};
-	if (!tb_gstream_bread(gst, data, 5)) return tb_null;
+	if (!tb_gstream_bread(stream, data, 5)) return tb_null;
 
 	// check 
 	if (tb_strnicmp(data, "tbo00", 5)) return tb_null;
@@ -139,14 +139,14 @@ static tb_object_t* tb_object_read_bin(tb_gstream_t* gst)
 	tb_object_bin_reader_t 	reader = {0};
 
 	// init reader
-	reader.stream 			= gst;
+	reader.stream 			= stream;
 	reader.list 			= tb_vector_init(256, tb_item_func_obj());
 	tb_assert_and_check_return_val(reader.list, tb_null);
 
 	// the type & size
 	tb_size_t 				type = 0;
 	tb_uint64_t 			size = 0;
-	tb_object_read_bin_type_size(gst, &type, &size);
+	tb_object_read_bin_type_size(stream, &type, &size);
 
 	// trace
 	tb_trace_impl("root: type: %lu, size: %llu", type, size);
@@ -166,24 +166,24 @@ end:
 	// ok?
 	return object;
 }
-static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
+static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
 {
 	// check
-	tb_assert_and_check_return_val(object && gst, tb_false);
+	tb_assert_and_check_return_val(object && stream, tb_false);
 
 	// the func
 	tb_object_bin_writer_func_t func = tb_object_get_bin_writer(object->type);
 	tb_assert_and_check_return_val(func, tb_false);
 
 	// writ bin header
-	if (!tb_gstream_bwrit(gst, "tbo00", 5)) return tb_false;
+	if (!tb_gstream_bwrit(stream, "tbo00", 5)) return tb_false;
 
 	// init
 	tb_bool_t 				ok = tb_false;
 	tb_object_bin_writer_t 	writer = {0};
 
 	// init writer
-	writer.stream 			= gst;
+	writer.stream 			= stream;
 	writer.ohash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
 	writer.shash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_uint32());
 	tb_assert_and_check_return_val(writer.shash && writer.ohash, tb_false);
@@ -192,7 +192,7 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* gst, tb_b
 	if (!func(&writer, object)) goto end;
 
 	// flush
-	if (!tb_gstream_bfwrit(gst, tb_null, 0)) goto end;
+	if (!tb_gstream_bfwrit(stream, tb_null, 0)) goto end;
 
 	// ok
 	ok = tb_true;
@@ -209,25 +209,25 @@ end:
 	// ok?
 	return ok;
 }
-static tb_object_t* tb_object_read_jsn(tb_gstream_t* gst)
+static tb_object_t* tb_object_read_jsn(tb_gstream_t* stream)
 {
 	// check
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_assert_and_check_return_val(stream, tb_null);
 
 	// init reader
 	tb_object_jsn_reader_t reader = {0};
-	reader.stream = gst;
+	reader.stream = stream;
 
 	// skip spaces
 	tb_char_t type;
-	while (tb_gstream_left(gst)) 
+	while (tb_stream_left(stream)) 
 	{
-		type = tb_gstream_bread_s8(gst);
+		type = tb_gstream_bread_s8(stream);
 		if (!tb_isspace(type)) break;
 	}
 
 	// empty?
-	tb_check_return_val(tb_gstream_left(gst), tb_null);
+	tb_check_return_val(tb_stream_left(stream), tb_null);
 
 	// the func
 	tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(type);
@@ -236,11 +236,11 @@ static tb_object_t* tb_object_read_jsn(tb_gstream_t* gst)
 	// read it
 	return func(&reader, type);
 }
-static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_bool_t deflate)
+static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
 {
 	// init writer 
 	tb_object_jsn_writer_t writer = {0};
-	writer.stream 	= gst;
+	writer.stream 	= stream;
 	writer.deflate 	= deflate;
 
 	// func
@@ -251,7 +251,7 @@ static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* gst, tb_b
 	tb_bool_t ok = func(&writer, object, 0);
 
 	// flush
-	tb_gstream_bfwrit(gst, tb_null, 0);
+	tb_gstream_bfwrit(stream, tb_null, 0);
 
 	// ok
 	return ok;
@@ -444,17 +444,17 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 		tb_assert_and_check_break(data);
 
 		// init stream
-		tb_gstream_t* gst = tb_gstream_init_from_data(data, maxn);
-		tb_assert_and_check_break(gst);
+		tb_gstream_t* stream = tb_gstream_init_from_data(data, maxn);
+		tb_assert_and_check_break(stream);
 
 		// open stream
-		if (tb_gstream_bopen(gst))
+		if (tb_gstream_bopen(stream))
 		{
 			// writ object
-			if (tb_object_writ(object, gst, format))
+			if (tb_object_writ(object, stream, format))
 			{
 				// size
-				tb_size_t size = (tb_size_t)tb_gstream_offset(gst);
+				tb_size_t size = (tb_size_t)tb_stream_offset(stream);
 
 				// the data object
 				if (size < maxn) odata = tb_data_init_from_data(data, size);
@@ -463,12 +463,12 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 			else maxn <<= 1;
 		
 			// exit stream
-			tb_gstream_exit(gst);
+			tb_gstream_exit(stream);
 		}
 		else
 		{
 			// exit stream
-			tb_gstream_exit(gst);
+			tb_gstream_exit(stream);
 
 			// break
 			break;
@@ -638,24 +638,24 @@ tb_void_t tb_object_dec(tb_object_t* object)
 	// exit it?
 	if (!object->refn && object->exit) object->exit(object);
 }
-tb_object_t* tb_object_read(tb_gstream_t* gst)
+tb_object_t* tb_object_read(tb_gstream_t* stream)
 {
 	// check
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_assert_and_check_return_val(stream, tb_null);
 
 	// need
 	tb_byte_t* p = tb_null;
-	if (!tb_gstream_bneed(gst, &p, 5)) return tb_null;
+	if (!tb_gstream_bneed(stream, &p, 5)) return tb_null;
 	tb_assert_and_check_return_val(p, tb_null);
 
 	// is tbox data?
-	if (!tb_strnicmp(p, "tbo", 3)) return tb_object_read_bin(gst);
+	if (!tb_strnicmp(p, "tbo", 3)) return tb_object_read_bin(stream);
 
 	// is xml data?
-	if (!tb_strnicmp(p, "<?xml", 5)) return tb_object_read_xml(gst);
+	if (!tb_strnicmp(p, "<?xml", 5)) return tb_object_read_xml(stream);
 
 	// try to read the jsn data
-	return tb_object_read_jsn(gst);
+	return tb_object_read_jsn(stream);
 }
 tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 {
@@ -666,14 +666,14 @@ tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_object_t* object = tb_null;
 
 	// make stream
-	tb_gstream_t* gst = tb_gstream_init_from_data(data, size);
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* stream = tb_gstream_init_from_data(data, size);
+	tb_assert_and_check_return_val(stream, tb_null);
 
 	// read object
-	if (tb_gstream_bopen(gst)) object = tb_object_read(gst);
+	if (tb_gstream_bopen(stream)) object = tb_object_read(stream);
 
 	// exit stream
-	tb_gstream_exit(gst);
+	tb_gstream_exit(stream);
 
 	// ok?
 	return object;
@@ -687,32 +687,32 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 	tb_object_t* object = tb_null;
 
 	// make stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(url);
-	tb_assert_and_check_return_val(gst, tb_null);
+	tb_gstream_t* stream = tb_gstream_init_from_url(url);
+	tb_assert_and_check_return_val(stream, tb_null);
 
 	// read object
-	if (tb_gstream_bopen(gst)) object = tb_object_read(gst);
+	if (tb_gstream_bopen(stream)) object = tb_object_read(stream);
 
 	// exit stream
-	tb_gstream_exit(gst);
+	tb_gstream_exit(stream);
 
 	// ok?
 	return object;
 }
-tb_bool_t tb_object_writ(tb_object_t* object, tb_gstream_t* gst, tb_size_t format)
+tb_bool_t tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t format)
 {
 	// check
-	tb_assert_and_check_return_val(object && gst, tb_false);
+	tb_assert_and_check_return_val(object && stream, tb_false);
 
 	// writ
 	switch (format & 0x00ff)
 	{
 	case TB_OBJECT_FORMAT_XML:
-		return tb_object_writ_xml(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+		return tb_object_writ_xml(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	case TB_OBJECT_FORMAT_BIN:
-		return tb_object_writ_bin(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+		return tb_object_writ_bin(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	case TB_OBJECT_FORMAT_JSN:
-		return tb_object_writ_jsn(object, gst, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+		return tb_object_writ_jsn(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	default:
 		tb_assert(0);
 		break;
@@ -729,16 +729,16 @@ tb_bool_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_si
 	tb_bool_t ok = tb_false;
 
 	// make stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(url);
-	if (gst)
+	tb_gstream_t* stream = tb_gstream_init_from_url(url);
+	if (stream)
 	{
-		if (tb_stream_type(gst) == TB_STREAM_TYPE_FILE)
-			tb_stream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-		if (tb_gstream_bopen(gst))
+		if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
+			tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+		if (tb_gstream_bopen(stream))
 		{
-			if (tb_object_writ(object, gst, format)) ok = tb_true;
+			if (tb_object_writ(object, stream, format)) ok = tb_true;
 		}
-		tb_gstream_exit(gst);
+		tb_gstream_exit(stream);
 	}
 
 	// ok?
@@ -851,7 +851,7 @@ tb_bool_t tb_object_set_jsn_reader(tb_char_t type, tb_object_jsn_reader_func_t f
 	tb_assert_and_check_return_val(g_object_jsn_reader, tb_false);
 
 	// set
-	tb_hash_set(g_object_jsn_reader, (tb_cpointer_t)type, func);
+	tb_hash_set(g_object_jsn_reader, (tb_pointer_t)(tb_size_t)type, func);
 
 	// ok
 	return tb_true;
@@ -862,7 +862,7 @@ tb_pointer_t tb_object_get_jsn_reader(tb_char_t type)
 	tb_assert_and_check_return_val(g_object_jsn_reader, tb_null);
 
 	// get
-	return tb_hash_get(g_object_jsn_reader, (tb_cpointer_t)type);
+	return tb_hash_get(g_object_jsn_reader, (tb_pointer_t)(tb_size_t)type);
 }
 tb_bool_t tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t func)
 {

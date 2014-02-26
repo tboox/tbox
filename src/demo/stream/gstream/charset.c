@@ -30,7 +30,7 @@ tb_int_t tb_demo_stream_gstream_charset_main(tb_int_t argc, tb_char_t** argv)
 		else save = tb_tstream_save_gg(istream, fstream, 0, tb_null, tb_null);
 
 		// trace
-		tb_print("save: %lld bytes, size: %llu bytes", save, tb_gstream_size(istream));
+		tb_print("save: %lld bytes, size: %lld bytes", save, tb_stream_size(istream));
 	}
 
 	// exit fstream
