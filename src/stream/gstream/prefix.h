@@ -38,7 +38,7 @@ static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gstream, tb_size_t 
 	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// init mode
-	gstream->base.mode = TB_STREAM_MODE_POLL;
+	gstream->base.mode = TB_STREAM_MODE_AIOO;
 
 	// init type
 	gstream->base.type = type;
