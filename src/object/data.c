@@ -441,7 +441,7 @@ tb_bool_t tb_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
 
 	// ctrl
 	if (tb_stream_type(gst) == TB_STREAM_TYPE_FILE)
-		tb_gstream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+		tb_stream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 	
 	// open stream
 	tb_bool_t ok = tb_false;

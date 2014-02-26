@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream.h"
 #include "../../filter/filter.h"
 #include "../../platform/platform.h"
 
@@ -64,12 +65,13 @@ typedef struct __tb_gstream_filter_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_gstream_filter_t* tb_gstream_filter_cast(tb_gstream_t* gstream)
+static __tb_inline__ tb_gstream_filter_t* tb_gstream_filter_cast(tb_handle_t stream)
 {
+	tb_gstream_t* gstream = (tb_gstream_t*)stream;
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_gstream_filter_t*)gstream;
 }
-static tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_filter_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -90,7 +92,7 @@ static tb_long_t tb_gstream_filter_open(tb_gstream_t* gstream)
 	// ok
 	return tb_gstream_aopen(fstream->gstream);
 }
-static tb_long_t tb_gstream_filter_clos(tb_gstream_t* gstream)
+static tb_long_t tb_gstream_filter_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -138,7 +140,7 @@ static tb_long_t tb_gstream_filter_clos(tb_gstream_t* gstream)
 	// ok?
 	return ok;
 }
-static tb_void_t tb_gstream_filter_exit(tb_gstream_t* gstream)
+static tb_void_t tb_gstream_filter_exit(tb_handle_t gstream)
 {	
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -149,7 +151,7 @@ static tb_void_t tb_gstream_filter_exit(tb_gstream_t* gstream)
 	fstream->filter = tb_null;
 	fstream->bref = tb_false;
 }
-static tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -193,7 +195,7 @@ static tb_long_t tb_gstream_filter_read(tb_gstream_t* gstream, tb_byte_t* data, 
 	// ok? 
 	return real;
 }
-static tb_long_t tb_gstream_filter_writ(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_filter_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -222,7 +224,7 @@ static tb_long_t tb_gstream_filter_writ(tb_gstream_t* gstream, tb_byte_t const* 
 	// writ 
 	return sync? tb_gstream_afwrit(fstream->gstream, data, size) : tb_gstream_awrit(fstream->gstream, data, size);
 }
-static tb_long_t tb_gstream_filter_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
+static tb_long_t tb_gstream_filter_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -250,7 +252,7 @@ static tb_long_t tb_gstream_filter_wait(tb_gstream_t* gstream, tb_size_t wait, t
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_gstream_filter_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -262,7 +264,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_STREAM:
 		{
 			// check
-			tb_assert_and_check_return_val(!gstream->base.bopened, tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(gstream), tb_false);
 
 			// set gstream
 			tb_gstream_t* gstream = (tb_gstream_t*)tb_va_arg(args, tb_gstream_t*);
@@ -280,7 +282,7 @@ static tb_bool_t tb_gstream_filter_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, t
 	case TB_STREAM_CTRL_FLTR_SET_FILTER:
 		{
 			// check
-			tb_assert_and_check_return_val(!gstream->base.bopened, tb_false);
+			tb_assert_and_check_return_val(!tb_stream_is_opened(gstream), tb_false);
 
 			//  exit filter first if exists
 			if (!fstream->bref && fstream->filter) tb_filter_exit(fstream->filter);
@@ -314,7 +316,7 @@ tb_gstream_t* tb_gstream_init_filter()
 	tb_assert_and_check_return_val(gstream, tb_null);
 
 	// init base
-	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_STREAM_TYPE_FLTR)) goto fail;
+	if (!tb_gstream_init((tb_gstream_t*)gstream, TB_STREAM_TYPE_FLTR, 0)) goto fail;
 
 	// init stream
 	gstream->base.open		= tb_gstream_filter_open;
@@ -323,7 +325,7 @@ tb_gstream_t* tb_gstream_init_filter()
 	gstream->base.read 		= tb_gstream_filter_read;
 	gstream->base.writ 		= tb_gstream_filter_writ;
 	gstream->base.wait 		= tb_gstream_filter_wait;
-	gstream->base.ctrl 		= tb_gstream_filter_ctrl;
+	gstream->base.base.ctrl = tb_gstream_filter_ctrl;
 
 	// ok
 	return (tb_gstream_t*)gstream;
@@ -342,7 +344,7 @@ tb_gstream_t* tb_gstream_init_filter_from_null(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// ok
 	return fstream;
@@ -360,7 +362,7 @@ tb_gstream_t* tb_gstream_init_filter_from_zip(tb_gstream_t* gstream, tb_size_t a
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -383,7 +385,7 @@ tb_gstream_t* tb_gstream_init_filter_from_cache(tb_gstream_t* gstream, tb_size_t
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -406,7 +408,7 @@ tb_gstream_t* tb_gstream_init_filter_from_charset(tb_gstream_t* gstream, tb_size
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;
@@ -429,7 +431,7 @@ tb_gstream_t* tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream, tb_bool
 	tb_assert_and_check_return_val(fstream, tb_null);
  
 	// set gstream
-	if (!tb_gstream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
+	if (!tb_stream_ctrl(fstream, TB_STREAM_CTRL_FLTR_SET_STREAM, gstream)) goto fail;
 
 	// set filter
 	((tb_gstream_filter_t*)fstream)->bref = tb_false;

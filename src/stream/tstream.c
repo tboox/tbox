@@ -646,7 +646,7 @@ tb_hong_t tb_tstream_save_gu(tb_gstream_t* istream, tb_char_t const* ourl, tb_si
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_gstream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// save stream
@@ -710,7 +710,7 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_gstream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// save stream
@@ -813,7 +813,7 @@ tb_hong_t tb_tstream_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char_t 
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_gstream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// save stream
@@ -1193,7 +1193,7 @@ tb_bool_t tb_tstream_start(tb_handle_t handle)
 			tb_assert_and_check_break(ostream);
 
 			// open it first if ostream have been not opened
-			if (!tb_gstream_ctrl(ostream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
 			if (!opened)
 			{
 				// open it
