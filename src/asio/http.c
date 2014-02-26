@@ -493,7 +493,7 @@ static tb_bool_t tb_aicp_http_hresp_done(tb_aicp_http_t* http)
 			http->status.balived = !tb_stricmp(p, "close")? 0 : 1;
 
 			// ctrl stream for sock
-			if (!tb_astream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
+			if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_KEEP_ALIVE, http->status.balived? tb_true : tb_false)) return tb_false;
 		}
 	}
 
@@ -609,7 +609,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				// init cstream
 				if (http->cstream)
 				{
-					if (!tb_astream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+					if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 				}
 				else http->cstream = tb_astream_init_filter_from_chunked(http->stream, tb_true);
 				tb_assert_and_check_break(http->cstream);
@@ -619,7 +619,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				{
 					// the filter
 					tb_filter_t* filter = tb_null;
-					if (!tb_astream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// push data
@@ -643,7 +643,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				// init zstream
 				if (http->zstream)
 				{
-					if (!tb_astream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
+					if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_STREAM, http->stream)) break;
 				}
 				else http->zstream = tb_astream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 				tb_assert_and_check_break(http->zstream);
@@ -653,7 +653,7 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				{
 					// the filter
 					tb_filter_t* filter = tb_null;
-					if (!tb_astream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
 					// push data
@@ -958,11 +958,11 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_aicp_http_status_cler(http);
 
 		// ctrl stream
-		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
-		if (!tb_astream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url))) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
 #if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
@@ -1019,13 +1019,13 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 			// TODO: using tstream, left < 0
 #if 0
 			// the post size
-			tb_hize_t post_size = http->option.post_stream? tb_astream_left(http->option.post_stream) : 0;
+			tb_hize_t post_size = http->option.post_stream? tb_stream_left(http->option.post_stream) : 0;
 
 			// the post stream is opened?
 			if (http->option.post_stream)
 			{
 				tb_bool_t bopened = tb_false;
-				if (!tb_astream_ctrl(http->option.post_stream, TB_STREAM_CTRL_IS_OPENED, &bopened) || !bopened)
+				if (!tb_stream_ctrl(http->option.post_stream, TB_STREAM_CTRL_IS_OPENED, &bopened) || !bopened)
 					tb_assert_and_check_break(0);
 			}
 
@@ -1195,7 +1195,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 
 	// check opened?
 	tb_bool_t bopened = tb_false;
-	if (!tb_astream_ctrl(http->sstream, TB_STREAM_CTRL_IS_OPENED, &bopened)) return tb_false;
+	if (!tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_IS_OPENED, &bopened)) return tb_false;
 	tb_assert_and_check_return_val(!bopened, tb_false);
 
 	// init args

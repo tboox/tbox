@@ -218,7 +218,7 @@ typedef struct __tb_stream_t
 	tb_long_t 		timeout;
 
 	/// ctrl stream
-	tb_bool_t 		(*ctrl)(struct __tb_stream_t* stream, tb_size_t ctrl, tb_va_list_t args);
+	tb_bool_t 		(*ctrl)(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args);
 
 }tb_stream_t;
 

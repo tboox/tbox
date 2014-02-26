@@ -931,7 +931,7 @@ tb_handle_t tb_tstream_init_au(tb_astream_t* istream, tb_char_t const* ourl, tb_
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_astream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// make tstream
@@ -981,7 +981,7 @@ tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_astream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// make tstream
@@ -1074,7 +1074,7 @@ tb_handle_t tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_size_
 		if (tb_stream_type(ostream) == TB_STREAM_TYPE_FILE) 
 		{
 			// ctrl mode
-			if (!tb_astream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
 		// make tstream
@@ -1183,7 +1183,7 @@ tb_bool_t tb_tstream_start(tb_handle_t handle)
 			tb_assert_and_check_break(ostream);
 
 			// open it first if ostream have been not opened
-			if (!tb_astream_ctrl(ostream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
 			if (!opened)
 			{
 				// open it
@@ -1265,7 +1265,7 @@ tb_bool_t tb_tstream_resume(tb_handle_t handle)
 
 		// check opened
 		tb_bool_t opened = tb_false;
-		if (!tb_astream_ctrl(tstream->istream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
+		if (!tb_stream_ctrl(tstream->istream, TB_STREAM_CTRL_IS_OPENED, &opened)) break;
 		tb_assert_and_check_break(opened);
 
 		// resume it

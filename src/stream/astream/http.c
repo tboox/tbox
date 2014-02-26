@@ -30,6 +30,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../stream.h"
 #include "../../asio/asio.h"
 #include "../../platform/platform.h"
 
@@ -71,8 +72,9 @@ typedef struct __tb_astream_http_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_astream_http_t* tb_astream_http_cast(tb_astream_t* astream)
+static __tb_inline__ tb_astream_http_t* tb_astream_http_cast(tb_handle_t stream)
 {
+	tb_astream_t* astream = (tb_astream_t*)stream;
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_astream_http_t*)astream;
 }
@@ -95,7 +97,7 @@ static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb
 	// done func
 	return hstream->func.open((tb_astream_t*)hstream, state, hstream->priv);
 }
-static tb_bool_t tb_astream_http_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_http_open(tb_handle_t astream, tb_astream_open_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -127,7 +129,7 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	// done func
 	return hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
 }
-static tb_bool_t tb_astream_http_read(tb_astream_t* astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -155,7 +157,7 @@ static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb
 	// done func
 	return hstream->func.seek((tb_astream_t*)hstream, state, offset, hstream->priv);
 }
-static tb_bool_t tb_astream_http_seek(tb_astream_t* astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_http_seek(tb_handle_t astream, tb_hize_t offset, tb_astream_seek_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -180,7 +182,7 @@ static tb_bool_t tb_astream_http_task_func(tb_handle_t http, tb_size_t state, tb
 	// done func
 	return hstream->func.task((tb_astream_t*)hstream, state, hstream->priv);
 }
-static tb_bool_t tb_astream_http_task(tb_astream_t* astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_http_task(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -193,7 +195,7 @@ static tb_bool_t tb_astream_http_task(tb_astream_t* astream, tb_size_t delay, tb
 	// post task
 	return tb_aicp_http_task(hstream->http, delay, tb_astream_http_task_func, astream);
 }
-static tb_void_t tb_astream_http_kill(tb_astream_t* astream)
+static tb_void_t tb_astream_http_kill(tb_handle_t astream)
 {	
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -202,7 +204,7 @@ static tb_void_t tb_astream_http_kill(tb_astream_t* astream)
 	// kill it
 	if (hstream->http) tb_aicp_http_kill(hstream->http);
 }
-static tb_void_t tb_astream_http_clos(tb_astream_t* astream, tb_bool_t bcalling)
+static tb_void_t tb_astream_http_clos(tb_handle_t astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -215,7 +217,7 @@ static tb_void_t tb_astream_http_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	tb_atomic64_set(&hstream->size, -1);
 	tb_atomic64_set0(&hstream->offset);
 }
-static tb_void_t tb_astream_http_exit(tb_astream_t* astream, tb_bool_t bcalling)
+static tb_void_t tb_astream_http_exit(tb_handle_t astream, tb_bool_t bcalling)
 {	
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -225,7 +227,7 @@ static tb_void_t tb_astream_http_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	if (hstream->http) tb_aicp_http_exit(hstream->http, bcalling);
 	hstream->http = tb_null;
 }
-static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_va_list_t args)
+static tb_bool_t tb_astream_http_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
@@ -237,7 +239,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && hstream->http, tb_false);
+			tb_assert_and_check_return_val(tb_stream_bopened(astream) && hstream->http, tb_false);
 
 			// get size
 			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
@@ -248,7 +250,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && hstream->http, tb_false);
+			tb_assert_and_check_return_val(tb_stream_bopened(astream) && hstream->http, tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -665,7 +667,7 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	hstream->base.kill 		= tb_astream_http_kill;
 	hstream->base.clos 		= tb_astream_http_clos;
 	hstream->base.exit 		= tb_astream_http_exit;
-	hstream->base.ctrl 		= tb_astream_http_ctrl;
+	hstream->base.base.ctrl = tb_astream_http_ctrl;
 
 	// init http
 	hstream->http = tb_aicp_http_init(aicp);
@@ -688,10 +690,10 @@ tb_astream_t* tb_astream_init_from_http(tb_aicp_t* aicp, tb_char_t const* host, 
 	tb_assert_and_check_return_val(hstream, tb_null);
 
 	// ctrl
-	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
-	if (!tb_astream_ctrl(hstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
+	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_HOST, host)) goto fail;
+	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PORT, port)) goto fail;
+	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_PATH, path)) goto fail;
+	if (!tb_stream_ctrl(hstream, TB_STREAM_CTRL_SET_SSL, bssl)) goto fail;
 	
 	// ok
 	return hstream;

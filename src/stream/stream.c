@@ -49,6 +49,43 @@ tb_size_t tb_stream_type(tb_handle_t handle)
 	// the type
 	return stream->type;
 }
+tb_hong_t tb_stream_size(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, 0);
+
+	// get the size
+	tb_hong_t size = -1;
+	return tb_stream_ctrl((tb_stream_t*)stream, TB_STREAM_CTRL_GET_SIZE, &size)? size : -1;
+}
+tb_hong_t tb_stream_left(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, 0);
+	
+	// the size
+	tb_hong_t size = tb_stream_size(stream);
+	tb_assert_and_check_return_val(size >= 0, -1);
+
+	// the offset
+	tb_hize_t offset = tb_stream_offset(stream);
+	tb_assert_and_check_return_val(offset <= size, 0);
+
+	// the left
+	return size - offset;
+}
+tb_hize_t tb_stream_offset(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, 0);
+
+	// get the offset
+	tb_hize_t offset = 0;
+	return tb_stream_ctrl((tb_stream_t*)stream, TB_STREAM_CTRL_GET_OFFSET, &offset)? offset : 0;
+}
 tb_bool_t tb_stream_bopened(tb_handle_t handle)
 {
 	// check
@@ -60,7 +97,13 @@ tb_bool_t tb_stream_bopened(tb_handle_t handle)
 }
 tb_long_t tb_stream_timeout(tb_handle_t handle)
 {
-	return -1;
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, -1);
+
+	// get the timeout
+	tb_long_t timeout = -1;
+	return tb_stream_ctrl(stream, TB_STREAM_CTRL_GET_TIMEOUT, &timeout)? timeout : -1;
 }
 tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 {
@@ -123,8 +166,192 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 {
 	// check
 	tb_stream_t* stream = (tb_stream_t*)handle;
-	tb_assert_and_check_return_val(stream, tb_false);
+	tb_assert_and_check_return_val(stream && stream->ctrl, tb_false);
 
+	// init args
+	tb_va_list_t args;
+    tb_va_start(args, ctrl);
 
-	return tb_false;
+	// ctrl
+	tb_bool_t ok = tb_false;
+	switch (ctrl)
+	{
+	case TB_STREAM_CTRL_SET_URL:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set url
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (url && tb_url_set(&stream->url, url)) ok = tb_true;
+		}
+		break;
+	case TB_STREAM_CTRL_GET_URL:
+		{
+			// get url
+			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (purl)
+			{
+				tb_char_t const* url = tb_url_get(&stream->url);
+				if (url)
+				{
+					*purl = url;
+					ok = tb_true;
+				}
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_HOST:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set host
+			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (host)
+			{
+				tb_url_host_set(&stream->url, host);
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_GET_HOST:
+		{
+			// get host
+			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (phost)
+			{
+				tb_char_t const* host = tb_url_host_get(&stream->url);
+				if (host)
+				{
+					*phost = host;
+					ok = tb_true;
+				}
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_PORT:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set port
+			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
+			if (port)
+			{
+				tb_url_port_set(&stream->url, port);
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_GET_PORT:
+		{
+			// get port
+			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			if (pport)
+			{
+				*pport = tb_url_port_get(&stream->url);
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_PATH:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set path
+			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			if (path)
+			{
+				tb_url_path_set(&stream->url, path);
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_GET_PATH:
+		{
+			// get path
+			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			if (ppath)
+			{
+				tb_char_t const* path = tb_url_path_get(&stream->url);
+				if (path)
+				{
+					*ppath = path;
+					ok = tb_true;
+				}
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_SSL:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set ssl
+			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
+			tb_url_ssl_set(&stream->url, bssl);
+			ok = tb_true;
+		}
+		break;
+	case TB_STREAM_CTRL_GET_SSL:
+		{
+			// get ssl
+			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			if (pssl)
+			{
+				*pssl = tb_url_ssl_get(&stream->url);
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_TIMEOUT:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_bopened(stream), tb_false);
+
+			// set timeout
+			tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
+			stream->timeout = timeout;
+			ok = tb_true;
+		}
+		break;
+	case TB_STREAM_CTRL_GET_TIMEOUT:
+		{
+			// get timeout
+			tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
+			if (ptimeout)
+			{
+				*ptimeout = stream->timeout;
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_IS_OPENED:
+		{
+			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
+			if (popened)
+			{
+				*popened = tb_stream_bopened(stream)? tb_true : tb_false;
+				ok = tb_true;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	// reset args
+	tb_va_end(args);
+    tb_va_start(args, ctrl);
+
+	// ctrl stream
+	ok = (stream->ctrl(stream, ctrl, args) || ok)? tb_true : tb_false;
+
+	// exit args
+	tb_va_end(args);
+
+	// ok?
+	return ok;
 }

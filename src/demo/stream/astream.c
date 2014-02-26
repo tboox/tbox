@@ -69,7 +69,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 			if (context->verbose) 
 			{
 				tb_char_t const* url = tb_null;
-				tb_astream_ctrl(ast, TB_STREAM_CTRL_GET_URL, &url);
+				tb_stream_ctrl(ast, TB_STREAM_CTRL_GET_URL, &url);
 				tb_printf("open: %s: %s\n", url, tb_stream_state_cstr(state));
 			}
 			break;
@@ -200,14 +200,14 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 					if (tb_option_find(context.option, "gzip"))
 					{
 						// auto unzip
-						if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP, 1)) break;
 
 						// need gzip
-						if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Accept-Encoding", "gzip,deflate")) break;
 					}
 
 					// enable debug?
-					if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, context.debug? tb_demo_istream_head_func : tb_null)) break;
+					if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD_FUNC, context.debug? tb_demo_istream_head_func : tb_null)) break;
 
 					// custem header?
 					if (tb_option_find(context.option, "header"))
@@ -256,7 +256,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 									if (tb_pstring_size(&key) && tb_pstring_size(&val))
 									{
 										if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-										if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+										if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 									}
 
 									// is key now
@@ -273,7 +273,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 						if (tb_pstring_size(&key) && tb_pstring_size(&val))
 						{
 							if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-							if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+							if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
 						}
 
 						// exit 
@@ -286,8 +286,8 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 					if (tb_option_find(context.option, "post-data"))
 					{
 						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(context.option, "post-data"));
-						if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-						if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
 						if (context.debug) tb_printf("post: %llu\n", post_size);
 					}
 					// post-file?
@@ -298,8 +298,8 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 						if (tb_file_info(tb_option_item_cstr(context.option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
 						{
 							tb_hize_t post_size = info.size;
-							if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-							if (!tb_astream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+							if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+							if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
 							if (context.debug) tb_printf("post: %llu\n", post_size);
 						}
 					}
@@ -310,7 +310,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 				if (tb_option_find(context.option, "timeout"))
 				{
 					tb_size_t timeout = tb_option_item_uint32(context.option, "timeout");
-					tb_astream_ctrl(context.istream, TB_STREAM_CTRL_SET_TIMEOUT, &timeout);
+					tb_stream_ctrl(context.istream, TB_STREAM_CTRL_SET_TIMEOUT, &timeout);
 				}
 
 				// print verbose info
