@@ -50,7 +50,7 @@ typedef struct __tb_gstream_http_t
  */
 static __tb_inline__ tb_gstream_http_t* tb_gstream_http_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_HTTP, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_gstream_http_t*)gstream;
 }
 static tb_long_t tb_gstream_http_open(tb_gstream_t* gstream)

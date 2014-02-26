@@ -119,7 +119,7 @@ typedef struct __tb_astream_data_t
  */
 static __tb_inline__ tb_astream_data_t* tb_astream_data_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_DATA, tb_null);
+	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_DATA, tb_null);
 	return (tb_astream_data_t*)astream;
 }
 static tb_bool_t tb_astream_data_open(tb_astream_t* astream, tb_astream_open_func_t func, tb_pointer_t priv)
@@ -146,7 +146,7 @@ static tb_bool_t tb_astream_data_open(tb_astream_t* astream, tb_astream_open_fun
 		tb_atomic64_set0(&dstream->offset);
 
 		// opened
-		tb_atomic_set(&astream->opened, 1);
+		tb_atomic_set(&astream->base.bopened, 1);
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -467,7 +467,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 		{
 			// check
 			tb_assert_and_check_return_val(dstream->data && dstream->size, tb_false);
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// the poffset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
@@ -498,7 +498,7 @@ static tb_bool_t tb_astream_data_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);

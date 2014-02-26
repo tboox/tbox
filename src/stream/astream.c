@@ -30,7 +30,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "astream.h"
+#include "stream.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
 
@@ -238,7 +238,7 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	if (astream->clos) astream->clos(astream, bcalling);
 
 	// not opened
-	tb_atomic_set0(&astream->opened);
+	tb_atomic_set0(&astream->base.bopened);
 
 	// clear debug info
 #ifdef __tb_debug__
@@ -259,7 +259,7 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	if (astream->exit) astream->exit(astream, bcalling);
 
 	// exit url
-	tb_url_exit(&astream->url);
+	tb_url_exit(&astream->base.url);
 
 	// free it
 	tb_free(astream);
@@ -270,7 +270,7 @@ tb_void_t tb_astream_kill(tb_astream_t* astream)
 	tb_assert_and_check_return(astream);
 
 	// opened?
-	tb_check_return(tb_atomic_get(&astream->opened));
+	tb_check_return(tb_atomic_get(&astream->base.bopened));
 
 	// stop it
 	tb_check_return(!tb_atomic_fetch_and_set(&astream->stoped, 1));
@@ -284,7 +284,7 @@ tb_bool_t tb_astream_open_try(tb_astream_t* astream)
 	tb_assert_and_check_return_val(astream && astream->open, tb_false);
 		
 	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_true);
+	tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_true);
 	tb_assert_and_check_return_val(tb_atomic_get(&astream->stoped), tb_false);
 
 	// init state
@@ -305,7 +305,7 @@ tb_bool_t tb_astream_open_impl(tb_astream_t* astream, tb_astream_open_func_t fun
 	tb_assert_and_check_return_val(astream && astream->open && func, tb_false);
 	
 	// check state
-	tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 	tb_assert_and_check_return_val(tb_atomic_get(&astream->stoped), tb_false);
 
 	// save debug info
@@ -344,7 +344,7 @@ tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astre
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -363,7 +363,7 @@ tb_bool_t tb_astream_sync_impl(tb_astream_t* astream, tb_bool_t bclosing, tb_ast
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -382,7 +382,7 @@ tb_bool_t tb_astream_task_impl(tb_astream_t* astream, tb_size_t delay, tb_astrea
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -400,7 +400,7 @@ tb_bool_t tb_astream_oread_impl(tb_astream_t* astream, tb_size_t maxn, tb_astrea
 	tb_assert_and_check_return_val(astream && astream->open && astream->read && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&astream->opened))
+	if (!tb_atomic_get(&astream->base.bopened))
 	{
 		// init open and read
 		astream->open_and.read.func = func;
@@ -418,7 +418,7 @@ tb_bool_t tb_astream_owrit_impl(tb_astream_t* astream, tb_byte_t const* data, tb
 	tb_assert_and_check_return_val(astream && astream->open && astream->writ && data && size && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&astream->opened))
+	if (!tb_atomic_get(&astream->base.bopened))
 	{
 		// init open and writ
 		astream->open_and.writ.func = func;
@@ -437,7 +437,7 @@ tb_bool_t tb_astream_oseek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astr
 	tb_assert_and_check_return_val(astream && astream->open && astream->seek && func, tb_false);
 
 	// no opened? open it first
-	if (!tb_atomic_get(&astream->opened))
+	if (!tb_atomic_get(&astream->base.bopened))
 	{
 		// init open and seek
 		astream->open_and.seek.func = func;
@@ -456,7 +456,7 @@ tb_bool_t tb_astream_read_after_impl(tb_astream_t* astream, tb_size_t delay, tb_
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -475,7 +475,7 @@ tb_bool_t tb_astream_writ_after_impl(tb_astream_t* astream, tb_size_t delay, tb_
 	
 	// check state
 	tb_check_return_val(!tb_atomic_get(&astream->stoped), tb_false);
-	tb_assert_and_check_return_val(tb_atomic_get(&astream->opened), tb_false);
+	tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened), tb_false);
 
 	// save debug info
 #ifdef __tb_debug__
@@ -554,11 +554,11 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-			if (url && tb_url_set(&astream->url, url)) ok = tb_true;
+			if (url && tb_url_set(&astream->base.url, url)) ok = tb_true;
 		}
 		break;
 	case TB_STREAM_CTRL_GET_URL:
@@ -567,7 +567,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (purl)
 			{
-				tb_char_t const* url = tb_url_get(&astream->url);
+				tb_char_t const* url = tb_url_get(&astream->base.url);
 				if (url)
 				{
 					*purl = url;
@@ -579,13 +579,13 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_HOST:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (host)
 			{
-				tb_url_host_set(&astream->url, host);
+				tb_url_host_set(&astream->base.url, host);
 				ok = tb_true;
 			}
 		}
@@ -596,7 +596,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (phost)
 			{
-				tb_char_t const* host = tb_url_host_get(&astream->url);
+				tb_char_t const* host = tb_url_host_get(&astream->base.url);
 				if (host)
 				{
 					*phost = host;
@@ -608,13 +608,13 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_PORT:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			if (port)
 			{
-				tb_url_port_set(&astream->url, port);
+				tb_url_port_set(&astream->base.url, port);
 				ok = tb_true;
 			}
 		}
@@ -625,7 +625,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			if (pport)
 			{
-				*pport = tb_url_port_get(&astream->url);
+				*pport = tb_url_port_get(&astream->base.url);
 				ok = tb_true;
 			}
 		}
@@ -633,13 +633,13 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_PATH:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (path)
 			{
-				tb_url_path_set(&astream->url, path);
+				tb_url_path_set(&astream->base.url, path);
 				ok = tb_true;
 			}
 		}
@@ -650,7 +650,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (ppath)
 			{
-				tb_char_t const* path = tb_url_path_get(&astream->url);
+				tb_char_t const* path = tb_url_path_get(&astream->base.url);
 				if (path)
 				{
 					*ppath = path;
@@ -662,11 +662,11 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_SSL:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set ssl
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-			tb_url_ssl_set(&astream->url, bssl);
+			tb_url_ssl_set(&astream->base.url, bssl);
 			ok = tb_true;
 		}
 		break;
@@ -676,7 +676,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			if (pssl)
 			{
-				*pssl = tb_url_ssl_get(&astream->url);
+				*pssl = tb_url_ssl_get(&astream->base.url);
 				ok = tb_true;
 			}
 		}
@@ -684,11 +684,11 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_TIMEOUT:
 		{
 			// check
-			tb_assert_and_check_return_val(!tb_atomic_get(&astream->opened), tb_false);
+			tb_assert_and_check_return_val(!tb_atomic_get(&astream->base.bopened), tb_false);
 
 			// set timeout
 			tb_long_t timeout = (tb_long_t)tb_va_arg(args, tb_long_t);
-			astream->timeout = timeout;
+			astream->base.timeout = timeout;
 			ok = tb_true;
 		}
 		break;
@@ -698,7 +698,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_long_t* ptimeout = (tb_long_t*)tb_va_arg(args, tb_long_t*);
 			if (ptimeout)
 			{
-				*ptimeout = astream->timeout;
+				*ptimeout = astream->base.timeout;
 				ok = tb_true;
 			}
 		}
@@ -708,7 +708,7 @@ tb_bool_t tb_astream_ctrl(tb_astream_t* astream, tb_size_t ctrl, ...)
 			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			if (popened)
 			{
-				*popened = tb_atomic_get(&astream->opened)? tb_true : tb_false;
+				*popened = tb_atomic_get(&astream->base.bopened)? tb_true : tb_false;
 				ok = tb_true;
 			}
 		}

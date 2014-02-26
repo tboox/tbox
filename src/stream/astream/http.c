@@ -73,7 +73,7 @@ typedef struct __tb_astream_http_t
  */
 static __tb_inline__ tb_astream_http_t* tb_astream_http_cast(tb_astream_t* astream)
 {
-	tb_assert_and_check_return_val(astream && astream->type == TB_STREAM_TYPE_HTTP, tb_null);
+	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_astream_http_t*)astream;
 }
 static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
@@ -86,7 +86,7 @@ static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb
 	tb_assert_and_check_return_val(hstream && hstream->func.open, tb_false);
 
 	// opened
-	tb_atomic_set(&hstream->base.opened, 1);
+	tb_atomic_set(&hstream->base.base.bopened, 1);
 
 	// save size
 	tb_hong_t size = (!status->bgzip && !status->bdeflate)? status->document_size : -1;
@@ -237,7 +237,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_SIZE:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && hstream->http, tb_false);
 
 			// get size
 			tb_hong_t* psize = (tb_hong_t*)tb_va_arg(args, tb_hong_t*);
@@ -248,7 +248,7 @@ static tb_bool_t tb_astream_http_ctrl(tb_astream_t* astream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_GET_OFFSET:
 		{
 			// check
-			tb_assert_and_check_return_val(tb_atomic_get(&astream->opened) && hstream->http, tb_false);
+			tb_assert_and_check_return_val(tb_atomic_get(&astream->base.bopened) && hstream->http, tb_false);
 
 			// get offset
 			tb_hize_t* poffset = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);

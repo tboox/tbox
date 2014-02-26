@@ -597,7 +597,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		else if (!real) 
 		{
 			// wait
-			tb_long_t wait = tb_gstream_wait(istream, TB_GSTREAM_WAIT_READ, istream->timeout);
+			tb_long_t wait = tb_gstream_wait(istream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(istream));
 			tb_assert_and_check_break(wait >= 0);
 
 			// timeout?

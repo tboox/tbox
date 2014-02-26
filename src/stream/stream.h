@@ -98,7 +98,7 @@
  *
  * @return 			the stream mode
  */
-tb_size_t 			tb_stream_mode(tb_stream_t const* stream);
+tb_size_t 			tb_stream_mode(tb_handle_t stream);
 
 /*! the stream type
  *
@@ -106,7 +106,7 @@ tb_size_t 			tb_stream_mode(tb_stream_t const* stream);
  *
  * @return 			the stream type
  */
-tb_size_t 			tb_stream_type(tb_stream_t const* stream);
+tb_size_t 			tb_stream_type(tb_handle_t stream);
 
 /*! the stream size and not seeking it
  *
@@ -114,7 +114,7 @@ tb_size_t 			tb_stream_type(tb_stream_t const* stream);
  *
  * @return 			the stream size, no size: -1, empty or error: 0
  */
-tb_hong_t 			tb_stream_size(tb_stream_t const* stream);
+tb_hong_t 			tb_stream_size(tb_handle_t stream);
 
 /*! the stream left size and not seeking it 
  *
@@ -122,7 +122,7 @@ tb_hong_t 			tb_stream_size(tb_stream_t const* stream);
  *
  * @return 			the stream left size, no size: -1, empty or error: 0
  */
-tb_hong_t 			tb_stream_left(tb_stream_t const* stream);
+tb_hong_t 			tb_stream_left(tb_handle_t stream);
 
 /*! the stream offset
  *
@@ -133,7 +133,15 @@ tb_hong_t 			tb_stream_left(tb_stream_t const* stream);
  *
  * @return 			the stream offset
  */
-tb_hize_t 			tb_stream_offset(tb_stream_t const* stream);
+tb_hize_t 			tb_stream_offset(tb_handle_t stream);
+
+/*! is opened?
+ *
+ * @param stream 	the stream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_stream_bopened(tb_handle_t stream);
 
 /*! the stream timeout
  *
@@ -141,7 +149,7 @@ tb_hize_t 			tb_stream_offset(tb_stream_t const* stream);
  *
  * @return 			the stream timeout
  */
-tb_size_t 			tb_stream_timeout(tb_stream_t const* stream);
+tb_long_t 			tb_stream_timeout(tb_handle_t stream);
 
 /*! the stream state c-string
  *
@@ -158,7 +166,7 @@ tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_stream_ctrl(tb_stream_t* stream, tb_size_t ctrl, ...);
+tb_bool_t 			tb_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, ...);
 
 #endif
 

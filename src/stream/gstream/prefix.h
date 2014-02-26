@@ -47,14 +47,17 @@ static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gstream, tb_size_t 
 	// check
 	tb_assert_and_check_return_val(gstream, tb_false);
 
+	// init mode
+	gstream->base.mode = TB_STREAM_MODE_POLL;
+
 	// init type
-	gstream->type = type;
+	gstream->base.type = type;
 
 	// init timeout
-	gstream->timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
+	gstream->base.timeout = TB_GSTREAM_TIMEOUT_DEFAULT;
 
 	// init url
-	if (!tb_url_init(&gstream->url)) return tb_false;
+	if (!tb_url_init(&gstream->base.url)) return tb_false;
 
 	// init cache
 	if (!tb_qbuffer_init(&gstream->cache, TB_GSTREAM_MCACHE_DEFAULT)) goto fail;

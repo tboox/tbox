@@ -30,7 +30,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "gstream.h"
+#include "stream.h"
 #include "../asio/asio.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
@@ -394,7 +394,7 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gstream)
 		tb_qbuffer_exit(&gstream->cache);
 
 		// exit url
-		tb_url_exit(&gstream->url);
+		tb_url_exit(&gstream->base.url);
 
 		// free it
 		tb_free(gstream);
@@ -439,7 +439,7 @@ tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 tb_bool_t tb_gstream_beof(tb_gstream_t* gstream)
 {
 	// already been opened?
-	tb_assert_and_check_return_val(gstream && gstream->bopened, tb_true);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened, tb_true);
 
 	// size
 	tb_hong_t size = tb_gstream_size(gstream);
@@ -454,7 +454,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(gstream && gstream->open, -1);
 
 	// already been opened?
-	tb_check_return_val(!gstream->bopened, 1);
+	tb_check_return_val(!gstream->base.bopened, 1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -469,7 +469,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 	tb_long_t r = gstream->open(gstream);
 	
 	// ok?
-	if (r > 0) gstream->bopened = 1;
+	if (r > 0) gstream->base.bopened = 1;
 	return r;
 }
 tb_bool_t tb_gstream_bopen(tb_gstream_t* gstream)
@@ -481,7 +481,7 @@ tb_bool_t tb_gstream_bopen(tb_gstream_t* gstream)
 	while (!(r = tb_gstream_aopen(gstream)))
 	{
 		// wait
-		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, gstream->timeout);
+		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, tb_stream_timeout(gstream));
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -496,7 +496,7 @@ tb_long_t tb_gstream_aclos(tb_gstream_t* gstream)
 	tb_assert_and_check_return_val(gstream, -1);
 
 	// already been closed?
-	tb_check_return_val(gstream->bopened, 1);
+	tb_check_return_val(gstream->base.bopened, 1);
 
 	// flush writed data first
 	if (gstream->bwrited) 
@@ -528,7 +528,7 @@ tb_long_t tb_gstream_aclos(tb_gstream_t* gstream)
 	tb_qbuffer_clear(&gstream->cache);
 
 	// update status
-	gstream->bopened = 0;
+	gstream->base.bopened = 0;
 
 	// ok
 	return 1;
@@ -540,10 +540,11 @@ tb_bool_t tb_gstream_bclos(tb_gstream_t* gstream)
 	// try opening it
 	tb_long_t 	r = 0;
 	tb_hong_t 	t = tb_mclock();
+	tb_long_t 	timeout = tb_stream_timeout(gstream);
 	while (!(r = tb_gstream_aclos(gstream)))
 	{
 		// timeout?
-		if (tb_mclock() - t > gstream->timeout) break;
+		if (timeout >= 0 && tb_mclock() - t > timeout) break;
 
 		// sleep some time
 		tb_usleep(100);
@@ -558,7 +559,7 @@ tb_long_t tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t si
 	tb_assert_and_check_return_val(data && size, -1);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened && gstream->read, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(gstream->bcached && tb_qbuffer_maxn(&gstream->cache), -1);
@@ -586,7 +587,7 @@ tb_bool_t tb_gstream_bneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t si
 		if (!(need - prev))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, gstream->timeout);
+			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -608,7 +609,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened && gstream->read, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->read, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -627,7 +628,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 	tb_check_return_val(size, 0);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened && gstream->writ, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened && gstream->writ, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -658,7 +659,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 		else if (!real)
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, gstream->timeout);
+			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -691,7 +692,7 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 		else if (!real)
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, gstream->timeout);
+			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, tb_stream_timeout(gstream));
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -710,7 +711,7 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -724,7 +725,7 @@ tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 tb_long_t tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -754,7 +755,7 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, gstream->timeout);
+				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
@@ -775,7 +776,7 @@ tb_bool_t tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t si
 		while (!tb_gstream_afread(gstream, tb_null, 0))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, gstream->timeout);
+			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -810,7 +811,7 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_siz
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, gstream->timeout);
+				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, tb_stream_timeout(gstream));
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?
@@ -831,7 +832,7 @@ tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_siz
 		while (!tb_gstream_afwrit(gstream, tb_null, 0))
 		{
 			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, gstream->timeout);
+			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, tb_stream_timeout(gstream));
 			tb_assert_and_check_break(e >= 0);
 
 			// timeout?
@@ -931,7 +932,7 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...)
 tb_long_t tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->bopened, -1);
+	tb_assert_and_check_return_val(gstream && gstream->base.bopened, -1);
 
 	// check cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
@@ -983,7 +984,7 @@ tb_bool_t tb_gstream_bseek(tb_gstream_t* gstream, tb_hize_t offset)
 	while (!(r = tb_gstream_aseek(gstream, offset)))
 	{
 		// wait
-		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, gstream->timeout);
+		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, tb_stream_timeout(gstream));
 
 		// fail or timeout?
 		tb_check_break(r > 0);
@@ -1023,7 +1024,7 @@ tb_hize_t tb_gstream_left(tb_gstream_t const* gstream)
 tb_size_t tb_gstream_timeout(tb_gstream_t const* gstream)
 {	
 	tb_assert_and_check_return_val(gstream, 0);
-	return gstream->timeout;
+	return gstream->base.timeout;
 }
 tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 {	
@@ -1041,7 +1042,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
-			if (url && tb_url_set(&gstream->url, url)) ok = tb_true;
+			if (url && tb_url_set(&gstream->base.url, url)) ok = tb_true;
 		}
 		break;
 	case TB_STREAM_CTRL_GET_URL:
@@ -1049,7 +1050,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (purl)
 			{
-				tb_char_t const* url = tb_url_get(&gstream->url);
+				tb_char_t const* url = tb_url_get(&gstream->base.url);
 				if (url)
 				{
 					*purl = url;
@@ -1063,7 +1064,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (host)
 			{
-				tb_url_host_set(&gstream->url, host);
+				tb_url_host_set(&gstream->base.url, host);
 				ok = tb_true;
 			}
 		}
@@ -1073,7 +1074,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (phost)
 			{
-				tb_char_t const* host = tb_url_host_get(&gstream->url);
+				tb_char_t const* host = tb_url_host_get(&gstream->base.url);
 				if (host)
 				{
 					*phost = host;
@@ -1087,7 +1088,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			if (port)
 			{
-				tb_url_port_set(&gstream->url, port);
+				tb_url_port_set(&gstream->base.url, port);
 				ok = tb_true;
 			}
 		}
@@ -1097,7 +1098,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_size_t* pport = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			if (pport)
 			{
-				*pport = tb_url_port_get(&gstream->url);
+				*pport = tb_url_port_get(&gstream->base.url);
 				ok = tb_true;
 			}
 		}
@@ -1107,7 +1108,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			if (path)
 			{
-				tb_url_path_set(&gstream->url, path);
+				tb_url_path_set(&gstream->base.url, path);
 				ok = tb_true;
 			}
 		}
@@ -1117,7 +1118,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_char_t const** ppath = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			if (ppath)
 			{
-				tb_char_t const* path = tb_url_path_get(&gstream->url);
+				tb_char_t const* path = tb_url_path_get(&gstream->base.url);
 				if (path)
 				{
 					*ppath = path;
@@ -1129,7 +1130,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 	case TB_STREAM_CTRL_SET_SSL:
 		{
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
-			tb_url_ssl_set(&gstream->url, bssl);
+			tb_url_ssl_set(&gstream->base.url, bssl);
 			ok = tb_true;
 		}
 		break;
@@ -1138,7 +1139,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			if (pssl)
 			{
-				*pssl = tb_url_ssl_get(&gstream->url);
+				*pssl = tb_url_ssl_get(&gstream->base.url);
 				ok = tb_true;
 			}
 		}
@@ -1167,7 +1168,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 		break;
 	case TB_STREAM_CTRL_SET_TIMEOUT:
 		{
-			gstream->timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
+			gstream->base.timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
 			ok = tb_true;
 		}
 		break;
@@ -1176,7 +1177,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			if (ptimeout)
 			{
-				*ptimeout = gstream->timeout;
+				*ptimeout = gstream->base.timeout;
 				ok = tb_true;
 			}
 		}
@@ -1186,7 +1187,7 @@ tb_bool_t tb_gstream_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, ...)
 			tb_bool_t* popened = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			if (popened)
 			{
-				*popened = gstream->bopened? tb_true : tb_false;
+				*popened = gstream->base.bopened? tb_true : tb_false;
 				ok = tb_true;
 			}
 		}

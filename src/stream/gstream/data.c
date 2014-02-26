@@ -58,7 +58,7 @@ typedef struct __tb_gstream_data_t
  */
 static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_gstream_t* gstream)
 {
-	tb_assert_and_check_return_val(gstream && gstream->type == TB_STREAM_TYPE_DATA, tb_null);
+	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_DATA, tb_null);
 	return (tb_gstream_data_t*)gstream;
 }
 static tb_long_t tb_gstream_data_open(tb_gstream_t* gstream)
@@ -85,11 +85,11 @@ static tb_long_t tb_gstream_data_clos(tb_gstream_t* gstream)
 	// ok
 	return 1;
 }
-static tb_long_t tb_gstream_data_exit(tb_gstream_t* gstream)
+static tb_void_t tb_gstream_data_exit(tb_gstream_t* gstream)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream, -1);
+	tb_assert_and_check_return(dstream);
 	
 	// clear head
 	dstream->head = tb_null;
@@ -98,9 +98,6 @@ static tb_long_t tb_gstream_data_exit(tb_gstream_t* gstream)
 	if (dstream->data && !dstream->bref) tb_free(dstream->data);
 	dstream->data = tb_null;
 	dstream->size = 0;
-
-	// ok
-	return 1;
 }
 static tb_long_t tb_gstream_data_read(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
@@ -224,7 +221,7 @@ static tb_bool_t tb_gstream_data_ctrl(tb_gstream_t* gstream, tb_size_t ctrl, tb_
 	case TB_STREAM_CTRL_SET_URL:
 		{
 			// check
-			tb_assert_and_check_return_val(!gstream->bopened, tb_false);
+			tb_assert_and_check_return_val(!gstream->base.bopened, tb_false);
 
 			// set url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
