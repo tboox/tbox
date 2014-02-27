@@ -1332,20 +1332,16 @@ tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
 	// kill it first 
 	tb_tstream_kill(tstream);
 
-	// clos it
-	if (tb_atomic_fetch_and_set0(&tstream->opened))
-	{
-		// close istream
-		if (tstream->istream) tb_astream_clos(tstream->istream, bcalling);
+	// close istream
+	if (tstream->istream) tb_astream_clos(tstream->istream, bcalling);
 
-		// close ostream
-		if (tstream->ostream)
-		{
-			if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO) 
-				tb_astream_clos(tstream->ostream, bcalling);
-			else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
-				tb_gstream_bclos(tstream->ostream);
-		}
+	// close ostream
+	if (tstream->ostream)
+	{
+		if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO) 
+			tb_astream_clos(tstream->ostream, bcalling);
+		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
+			tb_gstream_bclos(tstream->ostream);
 	}
 
 	// trace
