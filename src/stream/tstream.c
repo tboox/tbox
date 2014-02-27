@@ -38,6 +38,7 @@
  * types
  */
 
+#if 0
 // the tstream type
 typedef struct __tb_tstream_t
 {
@@ -129,10 +130,90 @@ typedef struct __tb_tstream_gg_t
 	tb_gstream_t* 			ostream;
 
 }tb_tstream_gg_t;
+#else
+
+// the tstream open type
+typedef struct __tb_tstream_open_t
+{
+	// the func
+	tb_tstream_open_func_t 	func;
+
+	// the priv
+	tb_pointer_t 			priv;
+
+}tb_tstream_open_t;
+
+// the tstream save type
+typedef struct __tb_tstream_save_t
+{
+	// the func
+	tb_tstream_save_func_t 	func;
+
+	// the priv
+	tb_pointer_t 			priv;
+
+}tb_tstream_save_t;
+
+// the tstream type
+typedef struct __tb_tstream_t
+{
+	// the istream
+	tb_handle_t 			istream;
+
+	// the ostream
+	tb_handle_t 			ostream;
+
+	// the istream is owner?
+	tb_uint8_t 				iowner : 1;
+
+	// the ostream is owner?
+	tb_uint8_t 				oowner : 1;
+
+	// is paused?
+	tb_atomic_t 			paused;
+
+	// is stoped?
+	tb_atomic_t 			stoped;
+
+	// the base time
+	tb_hong_t 				base;
+
+	// the base time for 1s
+	tb_hong_t 				base1s;
+
+	// the seek offset, no seek: -1
+	tb_hong_t 				seek;
+
+	// the saved size
+	tb_hize_t 				save;
+
+	// the saved size for 1s
+	tb_size_t 				save1s;
+ 
+	// the limit rate
+	tb_atomic_t 			lrate;
+
+	// the current rate
+	tb_size_t 				crate;
+
+	// is pending?
+	tb_atomic_t 			pending;
+
+	// the func
+	union
+	{
+		tb_tstream_open_t 	open;
+		tb_tstream_save_t 	save;
+
+	} func;
+
+}tb_tstream_t;
+#endif
  
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
+#if 0
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -504,6 +585,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	// ok
 	return ok;
 }
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -518,12 +600,9 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	
 	// open it first if ostream have been not opened
 	if (!tb_stream_is_opened(ostream) && !tb_gstream_bopen(ostream)) return -1;
-
-	// init tstream
-	tb_tstream_gg_t tstream;
-	tstream.type = TB_TSTREAM_TYPE_GG;
-	tstream.istream = istream;
-	tstream.ostream = ostream;
+				
+	// done func
+	if (func) func(TB_STREAM_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
 
 	// writ data
 	tb_byte_t 	data[TB_GSTREAM_BLOCK_MAXN];
@@ -583,7 +662,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 					delay = 0;
 
 					// done func
-					if (func) func(&tstream, TB_STREAM_STATE_OK, writ, crate, priv);
+					if (func) func(TB_STREAM_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), writ, crate, priv);
 				}
 
 				// wait some time for limit rate
@@ -622,7 +701,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
 	
 		// done func
-		func(&tstream, TB_STREAM_STATE_CLOSED, writ, trate, priv);
+		func(TB_STREAM_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);
 	}
 
 	// ok?
@@ -858,6 +937,7 @@ tb_hong_t tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstream
 	// ok?
 	return size;
 }
+#if 0
 tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hong_t seek)
 {
 	// done
@@ -1140,6 +1220,37 @@ tb_handle_t tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_astre
 	// ok?
 	return (tb_handle_t)tstream;
 }
+#else
+tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_au(tb_astream_t* istream, tb_char_t const* ourl, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_ua(tb_char_t const* iurl, tb_astream_t* ostream, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_hong_t seek)
+{
+	return tb_null;
+}
+tb_handle_t tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_astream_t* ostream, tb_hong_t seek)
+{
+	return tb_null;
+}
+#endif
+
 #if 0
 tb_bool_t tb_tstream_start(tb_handle_t handle)
 {
