@@ -140,7 +140,7 @@ static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_s
 	hstream->func.read 	= func;
 
 	// post read
-	return tb_aicp_http_read_after(hstream->http, delay, maxn, tb_astream_http_read_func, astream);
+	return tb_aicp_http_read(hstream->http, delay, maxn, tb_astream_http_read_func, astream);
 }
 static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
 {

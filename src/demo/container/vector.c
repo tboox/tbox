@@ -233,6 +233,8 @@ static tb_size_t tb_vector_remove_head_test()
 
 	// exit
 	tb_vector_exit(vector);
+
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_vector_remove_last_test()
 {

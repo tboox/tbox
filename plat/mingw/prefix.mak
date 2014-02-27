@@ -75,7 +75,7 @@ CFLAGS 				= \
 					-Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wwrite-strings \
 					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
-					-Werror=implicit-function-declaration -Werror=missing-prototypes 
+					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type -Werror=unused-variable
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	=

@@ -143,7 +143,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;
-	tb_assert_and_check_return_val(astream && tstream && tstream->ostream && tstream->func.save.func, tb_false);
+	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
 	tb_trace_impl("writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
@@ -158,6 +158,9 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		// ok?
 		tb_check_break(state == TB_STREAM_STATE_OK);
 			
+		// done func at first once
+		if (!tstream->save && !tstream->func.save.func(state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
+
 		// save size
 		tstream->save += real;
 
@@ -190,7 +193,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			delay = 0;
 
 			// done func
-			if (!tstream->func.save.func(state, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
 		}
 
 		// reset state
@@ -215,7 +218,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			tb_atomic_set0(&tstream->pausing);
 	
 			// done func
-			if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, 0, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, 0, tstream->func.save.priv)) break;
 		}
 		// continue?
 		else
@@ -239,7 +242,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
 
 		// done func
-		tstream->func.save.func(state, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, trate, tstream->func.save.priv);
+		tstream->func.save.func(state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, trate, tstream->func.save.priv);
 
 		// break;
 		bwrit = tb_false;
@@ -252,7 +255,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;
-	tb_assert_and_check_return_val(astream && tstream && tstream->ostream && tstream->func.save.func, tb_false);
+	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
 	tb_trace_impl("sync: state: %s", tb_stream_state_cstr(state));
@@ -264,7 +267,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
 
 	// done func
-	return tstream->func.save.func(state == TB_STREAM_STATE_OK? TB_STREAM_STATE_CLOSED : state, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, trate, tstream->func.save.priv);
+	return tstream->func.save.func(state == TB_STREAM_STATE_OK? TB_STREAM_STATE_CLOSED : state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, trate, tstream->func.save.priv);
 }
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -355,7 +358,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 				tb_atomic_set0(&tstream->pausing);
 		
 				// done func
-				if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, 0, tstream->func.save.priv)) break;
+				if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, 0, tstream->func.save.priv)) break;
 			}
 			// continue?
 			else

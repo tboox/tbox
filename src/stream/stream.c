@@ -157,6 +157,7 @@ tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 	case TB_STREAM_HTTP_STATE_RESPONSE_UNK: 	return "http: response: unknown code";
 	case TB_STREAM_HTTP_STATE_RESPONSE_NUL: 	return "http: response: no";
 	case TB_STREAM_HTTP_STATE_REQUEST_FAILED: 	return "http: request: failed";
+	case TB_STREAM_HTTP_STATE_POST_NO_SIZE: 	return "http: post: no size";
 	default: 									return "unknown";
 	}
 

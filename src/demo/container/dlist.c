@@ -212,6 +212,7 @@ static tb_size_t tb_dlist_remove_test()
 	// exit
 	tb_dlist_exit(dlist);
 
+	// ok?
 	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_dlist_remove_head_test()
@@ -235,6 +236,9 @@ static tb_size_t tb_dlist_remove_head_test()
 
 	// exit
 	tb_dlist_exit(dlist);
+
+	// ok?
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_dlist_remove_last_test()
 {

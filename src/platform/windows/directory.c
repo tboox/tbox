@@ -212,7 +212,7 @@ tb_size_t tb_directory_temp(tb_char_t* path, tb_size_t maxn)
 
 	// the temporary directory
 	tb_wchar_t 	temp[TB_PATH_MAXN] = {0};
-	tb_size_t 	size = (tb_size_t)GetTempPathW(TB_PATH_MAXN, temp);
+	GetTempPathW(TB_PATH_MAXN, temp);
 
 	// wtoa
 	return tb_wtoa(path, temp, maxn);
@@ -224,7 +224,7 @@ tb_size_t tb_directory_curt(tb_char_t* path, tb_size_t maxn)
 
 	// the current directory
 	tb_wchar_t 	curt[TB_PATH_MAXN] = {0};
-	tb_size_t 	size = (tb_size_t)GetCurrentDirectoryW(TB_PATH_MAXN, curt);
+	GetCurrentDirectoryW(TB_PATH_MAXN, curt);
 
 	// wtoa
 	return tb_wtoa(path, curt, maxn);

@@ -71,6 +71,7 @@ tbox_C_FILES 			+= \
 						stream/astream/sock \
 						stream/astream/filter \
 						stream/tstream \
+						stream/mstream \
 						filter/filter \
 						filter/zip \
 						filter/cache \

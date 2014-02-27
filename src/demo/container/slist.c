@@ -235,6 +235,8 @@ static tb_size_t tb_slist_remove_head_test()
 
 	// exit
 	tb_slist_exit(slist);
+
+	return n / ((tb_uint32_t)(t) + 1);
 }
 static tb_size_t tb_slist_remove_last_test()
 {
