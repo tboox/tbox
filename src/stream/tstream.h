@@ -35,36 +35,29 @@
  * types
  */
 
-// the tstream type enum
-typedef enum __tb_tstream_type_e
-{
-	TB_TSTREAM_TYPE_AA 		= 0
-,	TB_TSTREAM_TYPE_AG 		= 1
-,	TB_TSTREAM_TYPE_GG 		= 2
-
-}tb_tstream_type_e;
-
 /*! the tstream open func type
  *
- * @param tstream 	the tstream 
- * @param state 	the gstream/astream state for istream type
+ * @param state 	the stream state 
+ * @param offset 	the istream offset
+ * @param size 		the istream size, no size: -1
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_tstream_open_func_t)(tb_handle_t tstream, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_tstream_open_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv);
 
 /*! the tstream save func type
  *
- * @param tstream 	the tstream 
- * @param state 	the gstream/astream state for istream type
+ * @param state 	the stream state 
+ * @param offset 	the istream offset
+ * @param size 		the istream size, no size: -1
  * @param save 		the saved size
  * @param rate 		the current rate, bytes/s
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_handle_t tstream, tb_size_t state, tb_hize_t save, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_tstream_save_func_t)(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

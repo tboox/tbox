@@ -11,9 +11,6 @@ typedef struct __tb_demo_context_t
 	// verbose 
 	tb_bool_t 			verbose;
 
-	// rate
-	tb_size_t 			rate;
-
 }tb_demo_context_t;
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -24,17 +21,23 @@ static tb_bool_t tb_demo_gstream_head_func(tb_handle_t http, tb_char_t const* li
 	tb_printf("response: %s\n", line);
 	return tb_true;
 }
-static tb_bool_t tb_demo_gstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// print verbose info
-	if (context->verbose) tb_printf("size: %llu bytes, rate: %lu bytes/s, state: %s\n", size, rate, tb_stream_state_cstr(state));
+	if (context->verbose) 
+	{
+		// percent
+		tb_size_t percent = 0;
+		if (size > 0) percent = (offset * 100) / size;
+		else if (state == TB_STREAM_STATE_OK) percent = 100;
 
-	// save rate
-	if (state == TB_STREAM_STATE_OK) context->rate = rate;
+		// trace
+		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
+	}
 
 	// ok
 	return tb_true;
@@ -283,13 +286,9 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 
 				// save it
 				tb_hong_t 			save = 0;
-				tb_hong_t 			base = tb_mclock();
 				tb_demo_context_t 	context = {0}; 
 				context.verbose 	= verbose;
 				if ((save = tb_tstream_save_gg(istream, ostream, limitrate, tb_demo_gstream_save_func, &context)) < 0) break;
-
-				// print verbose info
-				if (verbose) tb_printf("save: %lld bytes, size: %lld bytes, time: %llu ms, rate: %lu bytes/ s, state: %s\n", save, tb_stream_size(istream), tb_mclock() - base, context.rate, tb_stream_state_cstr(tb_gstream_state(istream)));
 			}
 			else tb_option_help(option);
 		}
