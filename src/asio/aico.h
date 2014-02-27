@@ -179,7 +179,16 @@ tb_handle_t 		tb_aico_init_task(tb_handle_t aicp, tb_bool_t bltimer);
  */
 tb_void_t 			tb_aico_kill(tb_handle_t aico);
 
-/*! exit the aico
+/*! wait pending for the aico, block mode 
+ *
+ * @param aico 		the aico
+ * @param bcalling 	wait it at the self callback?
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aico_wait(tb_handle_t aico, tb_bool_t bcalling);
+
+/*! exit the aico, block mode
  *
  * @param aico 		the aico
  * @param bcalling 	exit it at the self callback?

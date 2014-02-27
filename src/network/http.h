@@ -138,14 +138,15 @@ typedef tb_bool_t 		(*tb_http_head_func_t)(tb_handle_t http, tb_char_t const* li
 /*! the http post func type
  *
  * @param http 			the http handle
- * @param state 		the post astream/gstream state
- * @param size 			the posted size 
+ * @param offset 		the istream offset
+ * @param size 			the istream size, no size: -1
+ * @param save 			the saved size
  * @param rate 			the current rate, bytes/s
  * @param priv 			the func private data
  *
  * @return 				tb_true: ok and continue it if need, tb_false: break it
  */
-typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv);
+typedef tb_bool_t 		(*tb_http_post_func_t)(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv);
 
 /// the http option type
 typedef struct __tb_http_option_t

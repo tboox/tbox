@@ -89,7 +89,7 @@ static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
 	tb_gstream_exit(gst);
 	return tb_false;
 }
-static tb_bool_t tb_whois_test_walk_2()
+static tb_void_t tb_whois_test_walk_2()
 {
 	// table
 	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
@@ -108,7 +108,7 @@ static tb_bool_t tb_whois_test_walk_2()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_3()
+static tb_void_t tb_whois_test_walk_3()
 {
 	// table
 	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
@@ -128,7 +128,7 @@ static tb_bool_t tb_whois_test_walk_3()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_4()
+static tb_void_t tb_whois_test_walk_4()
 {
 	// table
 	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
@@ -149,7 +149,7 @@ static tb_bool_t tb_whois_test_walk_4()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_5()
+static tb_void_t tb_whois_test_walk_5()
 {
 	// table
 	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
@@ -172,7 +172,7 @@ static tb_bool_t tb_whois_test_walk_5()
 	}
 }
 
-static tb_bool_t tb_whois_test_walk_6()
+static tb_void_t tb_whois_test_walk_6()
 {
 	// table
 	tb_char_t const* t = "abcdefghijklmnopqrstuvwxyz";
@@ -232,6 +232,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 	
 	// exit ping
 	tb_free(ping);
+	return tb_true;
 }
 static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 {
@@ -273,8 +274,9 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 	
 	// exit ping
 	tb_free(ping);
+	return tb_true;
 }
-static tb_bool_t tb_whois_test_walk_num_1()
+static tb_void_t tb_whois_test_walk_num_1()
 {
 	// table
 	tb_char_t const* t = "0123456789";
@@ -292,7 +294,7 @@ static tb_bool_t tb_whois_test_walk_num_1()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_num_2()
+static tb_void_t tb_whois_test_walk_num_2()
 {
 	// table
 	tb_char_t const* t = "0123456789";
@@ -311,7 +313,7 @@ static tb_bool_t tb_whois_test_walk_num_2()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_num_3()
+static tb_void_t tb_whois_test_walk_num_3()
 {
 	// table
 	tb_char_t const* t = "0123456789";
@@ -331,7 +333,7 @@ static tb_bool_t tb_whois_test_walk_num_3()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_num_4()
+static tb_void_t tb_whois_test_walk_num_4()
 {
 	// table
 	tb_char_t const* t = "0123456789";
@@ -352,7 +354,7 @@ static tb_bool_t tb_whois_test_walk_num_4()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_num_5()
+static tb_void_t tb_whois_test_walk_num_5()
 {
 	// table
 	tb_char_t const* t = "0123456789";
@@ -374,7 +376,7 @@ static tb_bool_t tb_whois_test_walk_num_5()
 		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
-static tb_bool_t tb_whois_test_walk_num_6()
+static tb_void_t tb_whois_test_walk_num_6()
 {
 	// table
 	tb_char_t const* t = "0123456789";

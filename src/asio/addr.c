@@ -549,11 +549,17 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return(addr);
 
+	// trace
+	tb_trace_impl("exit: ..");
+
 	// the aico
 	tb_handle_t aico = addr->aico;
 
 	// the sock
 	tb_handle_t sock = addr->sock;
+
+	// wait pending before freeing addr
+	if (aico) tb_aico_wait(aico, bcalling);
 
 	// exit it
 	if (aico) tb_aico_pool_free(aico, addr);
@@ -563,6 +569,9 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 
 	// exit sock
 	if (sock) tb_socket_clos(sock);
+
+	// trace
+	tb_trace_impl("exit: ok");
 }
 tb_bool_t tb_aicp_addr_done(tb_handle_t handle, tb_char_t const* host)
 {

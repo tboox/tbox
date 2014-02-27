@@ -990,7 +990,6 @@ static tb_bool_t tb_iocp_post_read(tb_aicp_proactor_t* proactor, tb_aice_t const
 	aico->olap.aice = *aice;
 
 	// done read
-	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.read.data, (DWORD)aice->u.read.size, &real, &aico->olap);
 	tb_trace_impl("ReadFile: real: %u, size: %lu, error: %d", real, aice->u.read.size, GetLastError());
@@ -1045,7 +1044,6 @@ static tb_bool_t tb_iocp_post_writ(tb_aicp_proactor_t* proactor, tb_aice_t const
 	aico->olap.aice = *aice;
 
 	// done writ
-	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writ.data, (DWORD)aice->u.writ.size, &real, &aico->olap);
 	tb_trace_impl("WriteFile: real: %u, size: %lu, error: %d", real, aice->u.writ.size, GetLastError());
@@ -1100,7 +1098,6 @@ static tb_bool_t tb_iocp_post_readv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	aico->olap.aice = *aice;
 
 	// done read
-	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = ReadFile((HANDLE)aico->base.handle, aice->u.readv.list[0].data, (DWORD)aice->u.readv.list[0].size, &real, &aico->olap);
 	tb_trace_impl("ReadFile: %u, error: %d", real, GetLastError());
@@ -1155,7 +1152,6 @@ static tb_bool_t tb_iocp_post_writv(tb_aicp_proactor_t* proactor, tb_aice_t cons
 	aico->olap.aice = *aice;
 
 	// done writ
-	DWORD 		flag = 0;
 	DWORD 		real = 0;
 	BOOL 		ok = WriteFile((HANDLE)aico->base.handle, aice->u.writv.list[0].data, (DWORD)aice->u.writv.list[0].size, &real, &aico->olap);
 	tb_trace_impl("WriteFile: %u, error: %d", real, GetLastError());
@@ -1318,7 +1314,7 @@ static tb_void_t tb_iocp_spak_timeout(tb_bool_t killed, tb_pointer_t data)
 				HANDLE handle = aico->base.type == TB_AICO_TYPE_SOCK? (HANDLE)((SOCKET)aico->base.handle - 1) : aico->base.handle;
 
 				// CancelIoEx it
-				if (!ptor->CancelIoEx((SOCKET)aico->base.handle - 1, &aico->olap))
+				if (!ptor->CancelIoEx(handle, &aico->olap))
 				{
 					tb_trace_impl("cancel: failed: %u", GetLastError());
 				}

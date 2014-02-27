@@ -56,6 +56,60 @@ tb_void_t tb_aico_kill(tb_handle_t haico)
 	// kilo
 	tb_aicp_kilo(aico->aicp, haico);
 }
+tb_bool_t tb_aico_wait(tb_handle_t haico, tb_bool_t bcalling)
+{
+	// check
+	tb_aico_t* aico = (tb_aico_t*)haico;
+	tb_assert_and_check_return_val(aico, tb_false);
+
+	// the aicp
+	tb_aicp_t* aicp = aico->aicp;
+	tb_assert_and_check_return_val(aicp, tb_false);
+
+	// the aicp have been actived?
+	if (!tb_atomic_get(&aicp->kill) || tb_atomic_get(&aicp->work))
+	{
+		// wait pending 
+		tb_size_t tryn = 10;
+		while (tb_atomic_get(&aico->pending) && tryn--) 
+		{
+			// trace
+			tb_trace_impl("wait: aico: %p, type: %lu: wait pending", aico, tb_aico_type(aico));
+
+			// wait it
+			tb_msleep(500);
+		}
+		if (tb_atomic_get(&aico->pending))
+		{
+			// trace
+			tb_trace("[aico]: wait: failed, the aico is pending for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
+			return tb_false;
+		}
+
+		// wait calling if be not at the self callback
+		if (!bcalling)
+		{
+			tryn = 10;
+			while (tb_atomic_get(&aico->calling) && tryn--) 
+			{
+				// trace
+				tb_trace_impl("wait: aico: %p, type: %lu: wait calling", aico, tb_aico_type(aico));
+
+				// wait it
+				tb_msleep(500);
+			}
+			if (tb_atomic_get(&aico->calling))
+			{
+				// trace
+				tb_trace("[aico]: wait failed, the aico is calling for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
+				return tb_false;
+			}
+		}
+	}
+
+	// ok
+	return tb_true;
+}
 tb_void_t tb_aico_exit(tb_handle_t haico, tb_bool_t bcalling)
 {
 	// check

@@ -279,6 +279,110 @@ static tb_void_t tb_aicp_http_status_dump(tb_aicp_http_t* http)
 	tb_print("");
 }
 #endif
+static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t post_size, tb_size_t* head_size)
+{
+	// check
+	tb_assert_and_check_return_val(http && head_size, tb_null);
+
+	// clear line data
+	tb_pstring_clear(&http->line_data);
+
+	// init the head value
+	tb_char_t  		data[64];
+	tb_sstring_t 	value;
+	if (!tb_sstring_init(&value, data, 64)) return tb_null;
+
+	// init method
+	tb_assert_and_check_return_val(http->option.method < tb_arrayn(g_http_methods), tb_null);
+	tb_char_t const* method = g_http_methods[http->option.method];
+	tb_assert_and_check_return_val(method, tb_null);
+
+	// init path
+	tb_char_t const* path = tb_url_path_get(&http->option.url);
+	tb_assert_and_check_return_val(path, tb_null);
+
+	// init args
+	tb_char_t const* args = tb_url_args_get(&http->option.url);
+
+	// init host
+	tb_char_t const* host = tb_url_host_get(&http->option.url);
+	tb_assert_and_check_return_val(host, tb_null);
+	tb_hash_set(http->option.head, "Host", host);
+
+	// init accept
+	if (!tb_hash_get(http->option.head, "Accept")) 
+		tb_hash_set(http->option.head, "Accept", "*/*");
+
+	// init connection
+	if (!tb_hash_get(http->option.head, "Connection")) 
+		tb_hash_set(http->option.head, "Connection", "close");
+
+	// init range
+	if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
+		tb_sstring_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
+	else if (http->option.range.bof && !http->option.range.eof)
+		tb_sstring_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
+	else if (!http->option.range.bof && http->option.range.eof)
+		tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
+
+	if (tb_sstring_size(&value)) 
+		tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&value));
+
+	// init post
+	if (http->option.method == TB_HTTP_METHOD_POST)
+	{
+		// append post size
+		tb_sstring_cstrfcpy(&value, "%llu", post_size);
+		tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&value));
+	}
+
+	// check head
+	tb_assert_and_check_return_val(tb_hash_size(http->option.head), tb_null);
+
+	// append method
+	tb_pstring_cstrcat(&http->line_data, method);
+
+	// append ' '
+	tb_pstring_chrcat(&http->line_data, ' ');
+
+	// append path
+	tb_pstring_cstrcat(&http->line_data, path);
+
+	// append args if exists
+	if (args) 
+	{
+		tb_pstring_chrcat(&http->line_data, '?');
+		tb_pstring_cstrcat(&http->line_data, args);
+	}
+
+	// append ' '
+	tb_pstring_chrcat(&http->line_data, ' ');
+
+	// append version, HTTP/1.1
+	tb_pstring_cstrfcat(&http->line_data, "HTTP/1.%1u\r\n", http->option.version);
+
+	// append key: value
+	tb_size_t itor = tb_iterator_head(http->option.head);
+	tb_size_t tail = tb_iterator_tail(http->option.head);
+	for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
+	{
+		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
+		if (item && item->name && item->data) 
+			tb_pstring_cstrfcat(&http->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
+	}
+
+	// append end
+	tb_pstring_cstrcat(&http->line_data, "\r\n");
+
+	// exit the head value
+	tb_sstring_exit(&value);
+
+	// save the head size
+	*head_size = tb_pstring_size(&http->line_data);
+	
+	// ok
+	return tb_pstring_cstr(&http->line_data);
+}
 static tb_bool_t tb_aicp_http_oread_func(tb_handle_t http, tb_size_t state, tb_http_status_t const* status, tb_pointer_t priv)
 {
 	// check
@@ -296,7 +400,7 @@ static tb_bool_t tb_aicp_http_oread_func(tb_handle_t http, tb_size_t state, tb_h
 		state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	
 		// read it
-		if (!tb_aicp_http_read(http, oread->maxn, oread->func, oread->priv)) break;
+		if (!tb_aicp_http_read(http, 0, oread->maxn, oread->func, oread->priv)) break;
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -707,6 +811,65 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 	// break 
 	return tb_false;
 }
+static tb_bool_t tb_aicp_http_hpost_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+{
+	// check
+	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
+	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
+
+	// trace
+	tb_trace_impl("head: post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_stream_state_cstr(state));
+
+	// done
+	tb_bool_t bpost = tb_false;
+	do
+	{
+		// done func
+		if (http->option.post_func && !http->option.post_func(http, state, offset, size, save, rate, http->option.post_priv)) 
+		{
+			state = TB_STREAM_STATE_UNKNOWN_ERROR;
+			break;
+		}
+			
+		// ok? continue to post
+		if (state == TB_STREAM_STATE_OK) bpost = tb_true;
+		// closed? read head
+		else if (state == TB_STREAM_STATE_CLOSED)
+		{
+			// reset state
+			state = TB_STREAM_STATE_UNKNOWN_ERROR;
+
+			// clear line size
+			http->line_size = 0;
+
+			// clear line data
+			tb_pstring_clear(&http->line_data);
+
+			// clear cache data
+			tb_pbuffer_clear(&http->cache_data);
+
+			// post read 
+			if (!tb_astream_read(http->stream, 0, tb_aicp_http_hread_func, http)) break;
+		}
+		// failed?
+		else break;
+
+		// ok
+		state = TB_STREAM_STATE_OK;
+
+	} while (0);
+
+	// failed?
+	if (state != TB_STREAM_STATE_OK)
+	{
+		// done func
+		http->status.state = state;
+		http->func.open(http, state, &http->status, http->priv);
+	}
+ 
+	// ok?
+	return bpost;
+}
 static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
@@ -733,8 +896,13 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 			bwrit = tb_true;
 		}
 		// finished? post data
-		else if (http->option.method == TB_HTTP_METHOD_POST && http->option.post_data)
+		else if (http->option.method == TB_HTTP_METHOD_POST)
 		{
+			// check
+			tb_assert_and_check_break(http->tstream);
+
+			// post data
+			if (!tb_tstream_save(http->tstream, tb_aicp_http_hpost_func, http)) break;
 		}
 		// finished? read data
 		else
@@ -761,11 +929,65 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 	if (state != TB_STREAM_STATE_OK) 
 	{
 		// done func
+		http->status.state = state;
 		http->func.open(http, state, &http->status, http->priv);
 	}
  
 	// ok?
 	return bwrit;
+}
+static tb_bool_t tb_aicp_http_hopen_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
+{
+	// check
+	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
+	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
+
+	// trace
+	tb_trace_impl("head: open: offset: %lu, size: %lu, state: %s", offset, size, tb_stream_state_cstr(state));
+
+	// done
+	tb_bool_t ok = tb_true;
+	do
+	{
+		// ok? 
+		tb_check_break(state == TB_STREAM_STATE_OK);
+
+		// reset state
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+
+		// no post size?
+		if (size < 0)
+		{
+			state = TB_STREAM_HTTP_STATE_POST_NO_SIZE;
+			break;
+		}
+
+		// the head data and size
+		tb_size_t 			head_size = 0;
+		tb_char_t const* 	head_data = tb_aicp_http_head_format(http, size, &head_size);
+		tb_assert_and_check_break(head_data && head_size);
+		
+		// trace
+		tb_trace_impl("request:\n%s", head_data);
+
+		// post writ head
+		if (!tb_astream_writ(http->stream, head_data, head_size, tb_aicp_http_hwrit_func, http)) break;
+
+		// ok
+		state = TB_STREAM_STATE_OK;
+
+	} while (0);
+ 
+	// failed?
+	if (state != TB_STREAM_STATE_OK) 
+	{
+		// done func
+		http->status.state = state;
+		ok = http->func.open(http, state, &http->status, http->priv);
+	}
+ 
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -984,136 +1206,74 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_aicp_http_option_dump(http);
 #endif
 
-		// clear line data
-		tb_pstring_clear(&http->line_data);
-
-		// init the head value
-		tb_char_t  		data[64];
-		tb_sstring_t 	value;
-		if (!tb_sstring_init(&value, data, 64)) break;
-
-		// init method
-		tb_assert_and_check_break(http->option.method < tb_arrayn(g_http_methods));
-		tb_char_t const* method = g_http_methods[http->option.method];
-		tb_assert_and_check_break(method);
-
-		// init path
-		tb_char_t const* path = tb_url_path_get(&http->option.url);
-		tb_assert_and_check_break(path);
-
-		// init args
-		tb_char_t const* args = tb_url_args_get(&http->option.url);
-
-		// init host
-		tb_char_t const* host = tb_url_host_get(&http->option.url);
-		tb_assert_and_check_break(host);
-		tb_hash_set(http->option.head, "Host", host);
-
-		// init accept
-		if (!tb_hash_get(http->option.head, "Accept")) 
-			tb_hash_set(http->option.head, "Accept", "*/*");
-
-		// init connection
-		if (!tb_hash_get(http->option.head, "Connection")) 
-			tb_hash_set(http->option.head, "Connection", "close");
-
-		// init range
-		if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
-			tb_sstring_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
-		else if (http->option.range.bof && !http->option.range.eof)
-			tb_sstring_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
-		else if (!http->option.range.bof && http->option.range.eof)
-			tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
-
-		if (tb_sstring_size(&value)) 
-			tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&value));
-
-		// init post
-		if (http->option.method == TB_HTTP_METHOD_POST)
-		{
-			// TODO: using tstream, left < 0
-#if 0
-			// the post size
-			tb_hize_t post_size = http->option.post_stream? tb_stream_left(http->option.post_stream) : 0;
-
-			// the post stream is opened?
-			if (http->option.post_stream)
-			{
-				tb_bool_t bopened = tb_false;
-				if (!tb_stream_ctrl(http->option.post_stream, TB_STREAM_CTRL_IS_OPENED, &bopened) || !bopened)
-					tb_assert_and_check_break(0);
-			}
-
-			// append post size
-			tb_sstring_cstrfcpy(&value, "%llu", post_size);
-			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&value));
-#endif
-		}
-
-		// check head
-		tb_assert_and_check_break(tb_hash_size(http->option.head));
-
-		// append method
-		tb_pstring_cstrcat(&http->line_data, method);
-	
-		// append ' '
-		tb_pstring_chrcat(&http->line_data, ' ');
-
-		// append path
-		tb_pstring_cstrcat(&http->line_data, path);
-
-		// append args if exists
-		if (args) 
-		{
-			tb_pstring_chrcat(&http->line_data, '?');
-			tb_pstring_cstrcat(&http->line_data, args);
-		}
-	
-		// append ' '
-		tb_pstring_chrcat(&http->line_data, ' ');
-
-		// append version, HTTP/1.1
-		tb_pstring_cstrfcat(&http->line_data, "HTTP/1.%1u\r\n", http->option.version);
-
-		// append key: value
-		tb_size_t itor = tb_iterator_head(http->option.head);
-		tb_size_t tail = tb_iterator_tail(http->option.head);
-		for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
-		{
-			tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
-			if (item && item->name && item->data) 
-				tb_pstring_cstrfcat(&http->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
-		}
-	
-		// append end
-		tb_pstring_cstrcat(&http->line_data, "\r\n");
-
-		// exit the head value
-		tb_sstring_exit(&value);
-
-		// the head data and size
-		tb_char_t const* 	head_data = tb_pstring_cstr(&http->line_data);
-		tb_size_t 			head_size = tb_pstring_size(&http->line_data);
-		tb_assert_and_check_break(head_data && head_size);
-		
-		// trace
-		tb_trace_impl("request:\n%s", head_data);
-
 		// init open
 		http->func.open = func;
 		http->priv 		= priv;
 
-		// post writ
-		ok = tb_astream_owrit(http->stream, head_data, head_size, tb_aicp_http_hwrit_func, http);
+		// get?
+		if (http->option.method == TB_HTTP_METHOD_GET)
+		{
+			// the head data and size
+			tb_size_t 			head_size = 0;
+			tb_char_t const* 	head_data = tb_aicp_http_head_format(http, 0, &head_size);
+			tb_assert_and_check_break(head_data && head_size);
+			
+			// trace
+			tb_trace_impl("request:\n%s", head_data);
+
+			// post writ head
+			ok = tb_astream_owrit(http->stream, head_data, head_size, tb_aicp_http_hwrit_func, http);
+		}
+		// post?
+		else if (http->option.method == TB_HTTP_METHOD_POST)
+		{
+			// check
+			tb_assert_and_check_break(!http->tstream);
+
+			// init tstream
+			tb_char_t const* url = tb_url_get(&http->option.post_url);
+			if (http->option.post_data && http->option.post_size)
+				http->tstream = tb_tstream_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
+			else if (url) http->tstream = tb_tstream_init_ua(url, http->stream, 0);
+			else tb_assert_and_check_break(0);
+
+			// open tstream
+			ok = tb_tstream_open(http->tstream, tb_aicp_http_hopen_func, http);
+		}
+		else tb_assert_and_check_break(0);
 
 	} while (0);
 
 	// ok?
 	return ok;
 }
-tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv)
 {
-	return tb_aicp_http_read_after(handle, 0, maxn, func, priv);
+	// check
+	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+
+	// read the cache data first
+	tb_byte_t const* 	cache_data = tb_pbuffer_data(&http->cache_data);
+	tb_size_t 			cache_size = tb_pbuffer_size(&http->cache_data);
+	if (cache_data && cache_size)
+	{
+		// done func
+		tb_bool_t ok = func(http, TB_STREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
+
+		// clear cache data
+		tb_pbuffer_clear(&http->cache_data);
+
+		// break?
+		tb_check_return_val(ok, tb_true);
+	}
+
+	// init read
+	http->func.read = func;
+	http->priv 		= priv;
+
+	// post task
+	return tb_astream_read_after(http->stream, delay, maxn, tb_aicp_http_read_func, http);
 }
 tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
 {
@@ -1165,34 +1325,6 @@ tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_
 	http->open_and.seek.offset = offset;
 	return tb_aicp_http_open(http, tb_aicp_http_oseek_func, &http->open_and.seek);
 }
-tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
-	tb_assert_and_check_return_val(http && http->stream && func, tb_false);
-
-	// read the cache data first
-	tb_byte_t const* 	cache_data = tb_pbuffer_data(&http->cache_data);
-	tb_size_t 			cache_size = tb_pbuffer_size(&http->cache_data);
-	if (cache_data && cache_size)
-	{
-		// done func
-		tb_bool_t ok = func(http, TB_STREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
-
-		// clear cache data
-		tb_pbuffer_clear(&http->cache_data);
-
-		// break?
-		tb_check_return_val(ok, tb_true);
-	}
-
-	// init read
-	http->func.read = func;
-	http->priv 		= priv;
-
-	// post task
-	return tb_astream_read_after(http->stream, delay, maxn, tb_aicp_http_read_func, http);
-}
 tb_aicp_t* tb_aicp_http_aicp(tb_handle_t handle)
 {
 	// check
@@ -1208,9 +1340,6 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->sstream && option, tb_false);
 
-	// check opened?
-	tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
-
 	// init args
 	tb_va_list_t args;
     tb_va_start(args, option);
@@ -1220,6 +1349,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 	{
 	case TB_HTTP_OPTION_SET_URL:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(url, tb_false);
@@ -1245,6 +1377,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_HOST:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(host, tb_false);
@@ -1271,6 +1406,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_PORT:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(port, tb_false);
@@ -1293,6 +1431,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_PATH:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(path, tb_false);
@@ -1319,6 +1460,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_METHOD:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// method
 			tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
 
@@ -1340,6 +1484,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_HEAD:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// check
 			tb_assert_and_check_return_val(http->option.head, tb_false);
 
@@ -1358,6 +1505,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_HEAD:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// check
 			tb_assert_and_check_return_val(http->option.head, tb_false);
 
@@ -1390,6 +1540,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_HEAD_FUNC:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// phead_func
 			tb_http_head_func_t* phead_func = (tb_http_head_func_t*)tb_va_arg(args, tb_http_head_func_t*);
 			tb_assert_and_check_return_val(phead_func, tb_false);
@@ -1411,6 +1564,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_HEAD_PRIV:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// phead priv
 			tb_pointer_t* phead_priv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
 			tb_assert_and_check_return_val(phead_priv, tb_false);
@@ -1429,6 +1585,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_RANGE:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pbof
 			tb_hize_t* pbof = (tb_hize_t*)tb_va_arg(args, tb_hize_t*);
 			tb_assert_and_check_return_val(pbof, tb_false);
@@ -1455,6 +1614,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_SSL:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pssl
 			tb_bool_t* pssl = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			tb_assert_and_check_return_val(pssl, tb_false);
@@ -1473,6 +1635,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_TIMEOUT:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// ptimeout
 			tb_size_t* ptimeout = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(ptimeout, tb_false);
@@ -1498,6 +1663,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_POST_URL:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// purl
 			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			tb_assert_and_check_return_val(purl, tb_false);
@@ -1530,6 +1698,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_POST_DATA:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pdata and psize
 			tb_byte_t const** 	pdata = (tb_byte_t const**)tb_va_arg(args, tb_byte_t const**);
 			tb_size_t* 			psize = (tb_size_t*)tb_va_arg(args, tb_size_t*);
@@ -1553,6 +1724,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_POST_FUNC:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pfunc
 			tb_http_post_func_t* pfunc = (tb_http_post_func_t*)tb_va_arg(args, tb_http_post_func_t*);
 			tb_assert_and_check_return_val(pfunc, tb_false);
@@ -1574,6 +1748,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_POST_PRIV:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// ppost priv
 			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
 			tb_assert_and_check_return_val(ppriv, tb_false);
@@ -1595,6 +1772,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_POST_LRATE:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// ppost lrate
 			tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(plrate, tb_false);
@@ -1616,6 +1796,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_AUTO_UNZIP:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pbunzip
 			tb_bool_t* pbunzip = (tb_bool_t*)tb_va_arg(args, tb_bool_t*);
 			tb_assert_and_check_return_val(pbunzip, tb_false);
@@ -1637,6 +1820,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_REDIRECT:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// predirect
 			tb_size_t* predirect = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(predirect, tb_false);
@@ -1658,6 +1844,9 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_VERSION:
 		{
+			// check opened?
+			tb_assert_and_check_return_val(!tb_stream_is_opened(http->sstream), tb_false);
+
 			// pversion
 			tb_size_t* pversion = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(pversion, tb_false);

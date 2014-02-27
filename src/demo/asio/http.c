@@ -28,10 +28,10 @@ static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_demo_aicp_http_post_func(tb_handle_t http, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_aicp_http_post_func(tb_handle_t http, tb_size_t state, tb_hong_t offset, tb_hize_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("post: %llu, rate: %lu bytes/s, state: %s", size, rate, tb_stream_state_cstr(state));
+	tb_print("post: %llu, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
 
 	// ok
 	return tb_true;

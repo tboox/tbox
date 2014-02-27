@@ -50,7 +50,7 @@ CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -f
 CXFLAGS_DEBUG 		= -g -D__tb_debug__
 CXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
-					-fmessage-length=0  -Wreturn-type -Wunused-variable \
+					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					--sysroot=/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(SDK).sdk
 CXFLAGS-I 			= -I
@@ -81,7 +81,7 @@ MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -f
 MXFLAGS_DEBUG 		= -g -D__tb_debug__
 MXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
-					-fmessage-length=0  -Wreturn-type -Wunused-variable \
+					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
 					"-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \

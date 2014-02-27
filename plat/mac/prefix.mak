@@ -97,7 +97,7 @@ CFLAGS 				= \
 					-Wpointer-arith -Wwrite-strings \
 					-Wundef -Wmissing-prototypes  \
 					-fno-tree-vectorize \
-					-Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
+					-Werror=return-type -Werror=unused-variable -Wno-pointer-sign -Wno-pointer-to-int-cast \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes 
 
 # ccflags: .cc/.cpp files

@@ -285,46 +285,8 @@ tb_void_t tb_aicp_delo(tb_aicp_t* aicp, tb_handle_t aico, tb_bool_t bcalling)
 	// check
 	tb_assert_and_check_return(aicp && aicp->ptor && aicp->ptor->delo && aico);
 
-	// the aicp have been actived?
-	if (!tb_atomic_get(&aicp->kill) || tb_atomic_get(&aicp->work))
-	{
-		// wait pending 
-		tb_size_t tryn = 10;
-		while (tb_atomic_get(&((tb_aico_t*)aico)->pending) && tryn--) 
-		{
-			// trace
-			tb_trace_impl("delo: aico: %p, type: %lu: wait pending", aico, tb_aico_type(aico));
-
-			// wait it
-			tb_msleep(500);
-		}
-		if (tb_atomic_get(&((tb_aico_t*)aico)->pending))
-		{
-			// trace
-			tb_trace("[aicp]: delo failed, the aico is pending for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
-			return ;
-		}
-
-		// wait calling if be not at the self callback
-		if (!bcalling)
-		{
-			tryn = 10;
-			while (tb_atomic_get(&((tb_aico_t*)aico)->calling) && tryn--) 
-			{
-				// trace
-				tb_trace_impl("delo: aico: %p, type: %lu: wait calling", aico, tb_aico_type(aico));
-
-				// wait it
-				tb_msleep(500);
-			}
-			if (tb_atomic_get(&((tb_aico_t*)aico)->calling))
-			{
-				// trace
-				tb_trace("[aicp]: delo failed, the aico is calling for func: %s, line: %lu, file: %s", ((tb_aico_t*)aico)->func, ((tb_aico_t*)aico)->line, ((tb_aico_t*)aico)->file);
-				return ;
-			}
-		}
-	}
+	// wait pending
+	tb_aico_wait(aico, bcalling);
 
 	// delo
 	if (aicp->ptor->delo(aicp->ptor, aico)) tb_aicp_aico_exit(aicp, aico);
