@@ -33,4 +33,18 @@
  * interfaces
  */
 
+/*! init mstream, multi-stream for the tstream 
+ *
+ *
+ * @return 			the mstream handle
+ */
+tb_handle_t 		tb_mstream_init();
+
+/*! exit mstream
+ *
+ * @param mstream 	the mstream handle
+ */
+tb_void_t 			tb_mstream_exit(tb_handle_t mstream);
+
+
 #endif

@@ -1001,18 +1001,6 @@ static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, 
 	// done func
 	return http->func.read(http, state, data, real, size, http->priv);
 }
-static tb_bool_t tb_aicp_http_seek_func(tb_astream_t* astream, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
-{
-	// check
-	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
-	tb_assert_and_check_return_val(http && http->stream && http->func.seek, tb_false);
-
-	// trace
-	tb_trace_impl("seek: offset: %llu, state: %s", offset, tb_stream_state_cstr(state));
-
-	// done func
-	return http->func.seek(http, state, offset, http->priv);
-}
 static tb_bool_t tb_aicp_http_task_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
 {
 	// check
@@ -1235,7 +1223,10 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 			if (http->option.post_data && http->option.post_size)
 				http->tstream = tb_tstream_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
 			else if (url) http->tstream = tb_tstream_init_ua(url, http->stream, 0);
-			else tb_assert_and_check_break(0);
+			tb_assert_and_check_break(http->tstream);
+
+			// limit rate
+			if (http->option.post_lrate) tb_tstream_limit(http->tstream, http->option.post_lrate);
 
 			// open tstream
 			ok = tb_tstream_open(http->tstream, tb_aicp_http_hopen_func, http);
@@ -1285,8 +1276,11 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 	http->func.seek = func;
 	http->priv 		= priv;
 
-	// post sync
-	return tb_astream_seek(http->stream, offset, tb_aicp_http_seek_func, http);
+	// noimpl
+	tb_trace_noimpl();
+
+	// post seek
+	return tb_false;
 }
 tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_task_func_t func, tb_pointer_t priv)
 {
