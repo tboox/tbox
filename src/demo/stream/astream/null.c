@@ -6,10 +6,10 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_astream_null_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_astream_null_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", size, rate, tb_stream_state_cstr(state));
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
 
 	// kill aicp
 	if (state != TB_STREAM_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);
@@ -48,7 +48,7 @@ tb_int_t tb_demo_stream_astream_null_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(fstream);
 
 		// init tstream
-		tstream = tb_tstream_init_aa(fstream, ostream, -1);
+		tstream = tb_tstream_init_aa(fstream, ostream, 0);
 		tb_assert_and_check_break(tstream);
 
 		// open and save tstream

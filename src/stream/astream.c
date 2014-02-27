@@ -151,8 +151,17 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 			break;
 		}
 
-		// seek it
-		if (!astream->seek(astream, oseek->offset, oseek->func, oseek->priv)) break;
+		// offset be not modified?
+		if (tb_stream_offset(astream) == oseek->offset)
+		{
+			// done func
+			ok = oseek->func(astream, TB_STREAM_STATE_OK, oseek->offset, oseek->priv);
+		}
+		else
+		{
+			// seek it
+			if (!astream->seek(astream, oseek->offset, oseek->func, oseek->priv)) break;
+		}
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -230,9 +239,8 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	// check
 	tb_assert_and_check_return(astream);
 
-	// stop it first if not stoped
-	if (!tb_atomic_get(&astream->stoped))
-		tb_astream_kill(astream);
+	// kill it first 
+	tb_astream_kill(astream);
 
 	// clos it
 	if (astream->clos) astream->clos(astream, bcalling);
@@ -268,9 +276,6 @@ tb_void_t tb_astream_kill(tb_astream_t* astream)
 {
 	// check
 	tb_assert_and_check_return(astream);
-
-	// opened?
-	tb_check_return(tb_atomic_get(&astream->base.bopened));
 
 	// stop it
 	tb_check_return(!tb_atomic_fetch_and_set(&astream->stoped, 1));
@@ -352,6 +357,13 @@ tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astre
 	astream->file = file_;
 	astream->line = line_;
 #endif
+
+	// offset be not modified?
+	if (tb_stream_offset(astream) == offset)
+	{
+		func(astream, TB_STREAM_STATE_OK, offset, priv);
+		return tb_true;
+	}
 
 	// seek it
 	return astream->seek(astream, offset, func, priv);

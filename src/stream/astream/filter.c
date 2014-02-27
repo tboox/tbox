@@ -416,7 +416,7 @@ static tb_void_t tb_astream_filter_kill(tb_handle_t astream)
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return(fstream);
 
-	// kill it
+	// kill stream
 	if (fstream->astream) tb_astream_kill(fstream->astream);
 }
 static tb_void_t tb_astream_filter_clos(tb_handle_t astream, tb_bool_t bcalling)
@@ -424,6 +424,9 @@ static tb_void_t tb_astream_filter_clos(tb_handle_t astream, tb_bool_t bcalling)
 	// check
 	tb_astream_filter_t* fstream = tb_astream_filter_cast(astream);
 	tb_assert_and_check_return(fstream);
+
+	// close stream
+	if (fstream->astream) tb_astream_clos(fstream->astream, bcalling);
 
 	// clear the filter
 	if (fstream->filter) tb_filter_cler(fstream->filter);
