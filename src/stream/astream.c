@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"astream"
+#define TB_TRACE_IMPL_TAG 				"astream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -239,6 +239,9 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	// check
 	tb_assert_and_check_return(astream);
 
+	// trace
+	tb_trace_impl("clos: ..");
+
 	// kill it first 
 	tb_astream_kill(astream);
 
@@ -254,11 +257,17 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	astream->func = tb_null;
 	astream->line = 0;
 #endif
+
+	// trace
+	tb_trace_impl("clos: ok");
 }
 tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {
 	// check
 	tb_assert_and_check_return(astream);
+
+	// trace
+	tb_trace_impl("exit: ..");
 
 	// close it first
 	tb_astream_clos(astream, bcalling);
@@ -271,6 +280,10 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 
 	// free it
 	tb_free(astream);
+
+	// trace
+	tb_trace_impl("exit: ok");
+
 }
 tb_void_t tb_astream_kill(tb_astream_t* astream)
 {
@@ -279,6 +292,9 @@ tb_void_t tb_astream_kill(tb_astream_t* astream)
 
 	// stop it
 	tb_check_return(!tb_atomic_fetch_and_set(&astream->stoped, 1));
+
+	// trace
+	tb_trace_impl("kill: ..");
 
 	// kill it
 	if (astream->kill) astream->kill(astream);

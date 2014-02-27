@@ -537,6 +537,9 @@ tb_void_t tb_aicp_addr_kill(tb_handle_t handle)
 	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
 	tb_assert_and_check_return(addr);
 
+	// trace
+	tb_trace_impl("kill: ..");
+
 	// kill sock
 	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
 }

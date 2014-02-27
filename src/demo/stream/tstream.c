@@ -70,7 +70,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, tb_null)) break;
 
 		// wait
-		getchar();
+//		getchar();
 
 		// trace
 		tb_print("pause: ..");
@@ -103,7 +103,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		tb_print("save: ..");
 
 		// open and save tstream
-		if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, tb_null)) break;
+//		if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, tb_null)) break;
 
 		// wait
 //		getchar();
