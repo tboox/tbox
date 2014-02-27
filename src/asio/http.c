@@ -862,6 +862,9 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return(http);
 
+	// trace
+	tb_trace_impl("kill: ..");
+
 	// kill stream
 	if (http->stream) tb_astream_kill(http->stream);
 
@@ -873,6 +876,9 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return(http);
+
+	// trace
+	tb_trace_impl("clos: ..");
 
 	// close stream
 	if (http->stream) tb_astream_clos(http->stream, bcalling);
@@ -893,12 +899,18 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 
 	// clear cache data
 	tb_pbuffer_clear(&http->cache_data);
+
+	// trace
+	tb_trace_impl("clos: ok");
 }
 tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return(http);
+
+	// trace
+	tb_trace_impl("exit: ..");
 
 	// close it
 	tb_aicp_http_clos(handle, bcalling);
@@ -940,6 +952,9 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 
 	// free it
 	tb_free(http);
+
+	// trace
+	tb_trace_impl("exit: ok");
 }
 tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv)
 {

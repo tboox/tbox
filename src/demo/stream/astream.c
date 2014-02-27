@@ -36,14 +36,23 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * func
  */
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// check
 	tb_demo_context_t* context = (tb_demo_context_t*)priv;
 	tb_assert_and_check_return_val(context && context->option, tb_false);
  
 	// print verbose info
-	if (context->verbose) tb_printf("save: %llu bytes, rate: %lu bytes/s, state: %s\n", size, rate, tb_stream_state_cstr(state));
+	if (context->verbose) 
+	{	
+		// percent
+		tb_size_t percent = 0;
+		if (size > 0) percent = (offset * 100) / size;
+		else if (state == TB_STREAM_STATE_OK) percent = 100;
+
+		// trace
+		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %llu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
+	}
 
 	// failed? kill aicp
 	if (state != TB_STREAM_STATE_OK)
@@ -114,7 +123,7 @@ static tb_bool_t tb_demo_istream_open_func(tb_astream_t* ast, tb_size_t state, t
 		tb_assert_and_check_break(context->ostream);
 
 		// init tstream
-		context->tstream = tb_tstream_init_aa(ast, context->ostream, -1);
+		context->tstream = tb_tstream_init_aa(ast, context->ostream, 0);
 		tb_assert_and_check_break(context->tstream);
 
 		// open and save tstream

@@ -6,22 +6,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */ 
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
-	// the percent
+	// percent
 	tb_size_t percent = 0;
-#if 0
-	tb_bool_t bopened = tb_false;
-	if (tb_stream_ctrl(istream, TB_STREAM_CTRL_IS_OPENED, &bopened) && bopened)
-	{
-		tb_hong_t size = tb_stream_size(istream);
-		if (size >= 0)
-		{
-			tb_size_t offset = tb_stream_offset(istream);
-			percent = offset < size? offset * 100 / size : 100;
-		}
-	}
-#endif
+	if (size > 0) percent = (offset * 100) / size;
+	else if (state == TB_STREAM_STATE_OK) percent = 100;
 
 	// trace
 	tb_print("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
@@ -59,7 +49,7 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 
 		// init tstream
 #if 1
-		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], -1);
+		tstream = tb_tstream_init_uu(aicp, argv[1], argv[2], 0);
 #else
 		istream = tb_astream_init_from_url(aicp, argv[1]);
 		ostream = tb_gstream_init_from_file(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
@@ -73,25 +63,55 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		// limit rate
 		tb_tstream_limit(tstream, argv[3]? tb_atoi(argv[3]) : 0);
 
+		// trace
+		tb_print("save: ..");
+
 		// open and save tstream
 		if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, tb_null)) break;
 
 		// wait
 		getchar();
 
+		// trace
+		tb_print("pause: ..");
+
 		// pause tstream
-		tb_tstream_pause(tstream);
+//		tb_tstream_pause(tstream);
 
 		// wait
-		getchar();
+//		getchar();
+
+		// trace
+		tb_print("resume: ..");
 
 		// start tstream
-		if (!tb_tstream_resume(tstream)) break;
+//		if (!tb_tstream_resume(tstream)) break;
 
 		// wait
-		getchar();
+//		getchar();
+
+		// trace
+		tb_print("close: ..");
+
+		// clos tstream
+		tb_tstream_clos(tstream, tb_false);
+
+		// wait
+//		getchar();
+
+		// trace
+		tb_print("save: ..");
+
+		// open and save tstream
+		if (!tb_tstream_osave(tstream, tb_demo_tstream_save_func, tb_null)) break;
+
+		// wait
+//		getchar();
 
 	} while (0);
+
+	// trace
+	tb_print("exit: ..");
 
 	// exit tstream
 	if (tstream) tb_tstream_exit(tstream, tb_false);
