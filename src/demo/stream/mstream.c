@@ -6,7 +6,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */ 
-#define TB_DEMO_TEST_AICP 			(1)
+#define TB_DEMO_TEST_AICP 			(0)
 #define TB_DEMO_TRACE_ENABLE 		(1)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -30,11 +30,11 @@ static tb_void_t tb_demo_tstream_free(tb_item_func_t* func, tb_pointer_t item)
 	if (tstream) tb_tstream_exit(tstream, tb_false);
 }
 #if TB_DEMO_TEST_AICP
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_stream_state_cstr(state), priv);
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
 # 	endif
  
 	// size--
@@ -44,11 +44,11 @@ static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state,
 	return tb_true;
 }
 #else
-static tb_bool_t tb_demo_tstream_save_func(tb_handle_t tstream, tb_size_t state, tb_hize_t size, tb_size_t rate, tb_pointer_t priv)
+static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", size, rate, tb_stream_state_cstr(state), priv);
+	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
 # 	endif
 
 	// ok
@@ -80,7 +80,7 @@ tb_int_t tb_demo_stream_mstream_main(tb_int_t argc, tb_char_t** argv)
 		for (; p && *p; p++)
 		{
 			// init tstream
-			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, -1);
+			tb_handle_t tstream = tb_tstream_init_uu(aicp, argv[1], *p, 0);
 			tb_assert_and_check_break(tstream);
 
 			// add tstream

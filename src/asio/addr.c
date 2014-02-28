@@ -142,7 +142,7 @@ static tb_size_t tb_aicp_addr_reqt_init(tb_aicp_addr_t* addr)
 	// set questions, see as tb_dns_question_t
 	// name + question1 + question2 + ...
 	tb_bstream_set_u8(&bst, '.');
-	tb_byte_t* p = tb_bstream_set_string(&bst, addr->host);
+	tb_char_t* p = tb_bstream_set_string(&bst, addr->host);
 
 	// only one question now.
 	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
@@ -250,7 +250,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 		else
 		{
 			// decode rdata
-			answer.rdata = tb_dns_decode_name(&bst, answer.name);
+			answer.rdata = (tb_byte_t const*)tb_dns_decode_name(&bst, answer.name);
 			tb_trace_impl("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
 		tb_trace_impl("response: ");

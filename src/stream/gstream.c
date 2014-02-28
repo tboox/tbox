@@ -54,7 +54,7 @@ static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gstream, tb_byte_t** data,
 	}
 
 	// enter cache for push
-	tb_long_t 	push = 0;
+	tb_size_t 	push = 0;
 	tb_byte_t* 	tail = tb_qbuffer_push_init(&gstream->cache, &push);
 	tb_assert_and_check_return_val(tail && push > 0, -1);
 	tb_assert_and_check_return_val(size <= push, -1);
@@ -457,7 +457,7 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 	tb_check_return_val(!tb_stream_is_opened(gstream), 1);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(!gstream->bcached || tb_qbuffer_maxn(&gstream->cache), -1);
 
 	// init offset
 	gstream->offset = 0;
@@ -612,7 +612,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->read, -1);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(!gstream->bcached || tb_qbuffer_maxn(&gstream->cache), -1);
 
 	// the cache is writed-cache now, need call afwrit or bfwrit first.
 	tb_assert_and_check_return_val(!gstream->bwrited || tb_qbuffer_null(&gstream->cache), -1); 
@@ -631,7 +631,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->writ, -1);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(!gstream->bcached || tb_qbuffer_maxn(&gstream->cache), -1);
 
 	// the cache is readed-cache now, need call afread or bfread first.
 	tb_assert_and_check_return_val(gstream->bwrited || tb_qbuffer_null(&gstream->cache), -1); 
@@ -674,11 +674,9 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	// ok?
 	return (read == size? tb_true : tb_false);
 }
-
 tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_abort(gstream && data);
 	tb_assert_and_check_return_val(gstream && data, tb_false);
 	tb_check_return_val(size, tb_true);
 

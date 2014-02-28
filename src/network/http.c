@@ -433,7 +433,7 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		while (http->line_size < head_size)
 		{
 			// writ data
-			tb_long_t real = tb_gstream_awrit(http->stream, head_data + http->line_size, head_size - http->line_size);
+			tb_long_t real = tb_gstream_awrit(http->stream, (tb_byte_t const*)head_data + http->line_size, head_size - http->line_size);
 
 			// save state if failed
 			if (real < 0) http->status.state = TB_STREAM_HTTP_STATE_REQUEST_FAILED;
@@ -656,7 +656,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 	while (1)
 	{
 		// read char
-		cn = tb_gstream_aread(http->stream, ch, 1);
+		cn = tb_gstream_aread(http->stream, (tb_byte_t*)ch, 1);
 
 		// abort?
 		tb_check_return_val(cn >= 0, -1);
@@ -1401,9 +1401,6 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && option, tb_false);
 
-	// check connected?
-	tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
-
 	// init args
 	tb_va_list_t args;
     tb_va_start(args, option);
@@ -1413,6 +1410,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 	{
 	case TB_HTTP_OPTION_SET_URL:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// url
 			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(url, tb_false);
@@ -1438,6 +1438,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_HOST:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// host
 			tb_char_t const* host = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(host, tb_false);
@@ -1449,6 +1452,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_GET_HOST:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// phost
 			tb_char_t const** phost = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
 			tb_assert_and_check_return_val(phost, tb_false); 
@@ -1463,7 +1469,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_PORT:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// port
 			tb_size_t port = (tb_size_t)tb_va_arg(args, tb_size_t);
 			tb_assert_and_check_return_val(port, tb_false);
@@ -1485,7 +1494,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_PATH:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// path
 			tb_char_t const* path = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
 			tb_assert_and_check_return_val(path, tb_false);
@@ -1511,7 +1523,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_METHOD:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// method
 			tb_size_t method = (tb_size_t)tb_va_arg(args, tb_size_t);
 
@@ -1532,7 +1547,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_HEAD:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// check
 			tb_assert_and_check_return_val(http->option.head, tb_false);
 
@@ -1573,6 +1591,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_HEAD_FUNC:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// head_func
 			tb_http_head_func_t head_func = (tb_http_head_func_t)tb_va_arg(args, tb_http_head_func_t);
 
@@ -1594,6 +1615,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_HEAD_PRIV:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// head_priv
 			tb_pointer_t head_priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
 
@@ -1615,6 +1639,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_RANGE:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
+			// set range
 			http->option.range.bof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
 			http->option.range.eof = (tb_hize_t)tb_va_arg(args, tb_hize_t);
 			return tb_true;
@@ -1637,7 +1665,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_SSL:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// bssl
 			tb_bool_t bssl = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
@@ -1658,7 +1689,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		}
 		break;
 	case TB_HTTP_OPTION_SET_TIMEOUT:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// set timeout
 			http->option.timeout = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return tb_true;
@@ -1699,7 +1733,10 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 #endif
 	case TB_HTTP_OPTION_SET_AUTO_UNZIP:
-		{
+		{	
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// bunzip
 			tb_bool_t bunzip = (tb_bool_t)tb_va_arg(args, tb_bool_t);
 
@@ -1721,6 +1758,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_REDIRECT:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// redirect
 			tb_size_t redirect = (tb_size_t)tb_va_arg(args, tb_size_t);
 
@@ -1742,6 +1782,9 @@ tb_bool_t tb_http_option(tb_handle_t handle, tb_size_t option, ...)
 		break;
 	case TB_HTTP_OPTION_SET_VERSION:
 		{
+			// check connected?
+			tb_assert_and_check_return_val(!(http->step & TB_HTTP_STEP_CONN), tb_false);
+
 			// version
 			tb_size_t version = (tb_size_t)tb_va_arg(args, tb_size_t);
 
