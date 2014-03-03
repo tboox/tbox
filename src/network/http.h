@@ -324,26 +324,6 @@ tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_hize_t offset);
  */
 tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_hize_t offset);
 
-/*! async writ
- *
- * @param handle 		the http handle
- * @param data 			the data
- * @param size 			the size
- *
- * @return 				ok: real size, continue: 0, fail: -1
- */
-tb_long_t 				tb_http_awrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-
-/*! block writ
- *
- * @param handle 		the http handle
- * @param data 			the data
- * @param size 			the size
- *
- * @return 				tb_true or tb_false
- */
-tb_bool_t 				tb_http_bwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-
 /*! async read
  *
  * @param handle 		the http handle
@@ -363,26 +343,6 @@ tb_long_t 				tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
  * @return 				tb_true or tb_false
  */
 tb_bool_t 				tb_http_bread(tb_handle_t handle, tb_byte_t* data, tb_size_t size);
-
-/*! async flush writ
- *
- * @param handle 		the http handle
- * @param data 			the data
- * @param size 			the size
- *
- * @return 				ok: 1, continue: 0, failed: -1
- */
-tb_long_t 				tb_http_afwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
-
-/*! block flush writ
- *
- * @param handle 		the http handle
- * @param data 			the data
- * @param size 			the size
- *
- * @return 				tb_true or tb_false
- */
-tb_bool_t 				tb_http_bfwrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size);
 
 /*! the http option
  *

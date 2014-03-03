@@ -16,6 +16,19 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * func
  */
+static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
+{
+	// percent
+	tb_size_t percent = 0;
+	if (size > 0) percent = (offset * 100) / size;
+	else if (state == TB_STREAM_STATE_OK) percent = 100;
+
+	// trace
+	tb_print("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_demo_gstream_head_func(tb_handle_t http, tb_char_t const* line, tb_pointer_t priv)
 {
 	tb_printf("response: %s\n", line);
@@ -180,29 +193,25 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 						tb_pstring_exit(&val);
 					}
 
-#if 0
 					// post-data?
 					if (tb_option_find(option, "post-data"))
 					{
-						tb_hize_t post_size = tb_strlen(tb_option_item_cstr(option, "post-data"));
+						tb_char_t const* 	post_data = tb_option_item_cstr(option, "post-data");
+						tb_hize_t 			post_size = tb_strlen(post_data);
 						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
+						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_DATA, post_data, post_size)) break;
+						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
 						if (debug) tb_printf("post: %llu\n", post_size);
 					}
 					// post-file?
 					else if (tb_option_find(option, "post-file"))
 					{
-						// exist?
-						tb_file_info_t info = {0};
-						if (tb_file_info(tb_option_item_cstr(option, "post-file"), &info) && info.type == TB_FILE_TYPE_FILE)
-						{
-							tb_hize_t post_size = info.size;
-							if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
-							if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_SIZE, post_size)) break;
-							if (debug) tb_printf("post: %llu\n", post_size);
-						}
+						tb_char_t const* url = tb_option_item_cstr(option, "post-file");
+						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_METHOD, TB_HTTP_METHOD_POST)) break;
+						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
+						if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
+						if (debug) tb_printf("post: %s\n", url);
 					}
-#endif
 				}
 
 				// set timeout

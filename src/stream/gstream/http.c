@@ -110,15 +110,6 @@ static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	// ok?
 	return ok;
 }
-static tb_long_t tb_gstream_http_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
-{
-	// check
-	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
-	tb_assert_and_check_return_val(hstream && hstream->http, -1);
-
-	// writ data or afwrit data
-	return sync? tb_http_afwrit(hstream->http, data, size) : tb_http_awrit(hstream->http, data, size);
-}
 static tb_long_t tb_gstream_http_seek(tb_handle_t gstream, tb_hize_t offset)
 {
 	// check
@@ -405,6 +396,106 @@ static tb_bool_t tb_gstream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_TIMEOUT, ptimeout);
 		}
 		break;
+	case TB_STREAM_CTRL_HTTP_SET_POST_URL:
+		{
+			// url
+			tb_char_t const* url = (tb_char_t const*)tb_va_arg(args, tb_char_t const*);
+			tb_assert_and_check_return_val(url, tb_false);
+			
+			// set url
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_URL, url);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_POST_URL:
+		{
+			// purl
+			tb_char_t const** purl = (tb_char_t const**)tb_va_arg(args, tb_char_t const**);
+			tb_assert_and_check_return_val(purl, tb_false);
+
+			// get url
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_URL, purl);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_SET_POST_DATA:
+		{
+			// post data
+			tb_byte_t const* 	data = (tb_byte_t const*)tb_va_arg(args, tb_byte_t const*);
+
+			// post size
+			tb_size_t 			size = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set data and size
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_DATA, data, size);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_POST_DATA:
+		{
+			// pdata and psize
+			tb_byte_t const** 	pdata = (tb_byte_t const**)tb_va_arg(args, tb_byte_t const**);
+			tb_size_t* 			psize = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(pdata && psize, tb_false);
+
+			// get post data and size
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_DATA, pdata, psize);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_SET_POST_FUNC:
+		{
+			// func
+			tb_http_post_func_t func = (tb_http_post_func_t)tb_va_arg(args, tb_http_post_func_t);
+
+			// set post func
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_FUNC, func);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_POST_FUNC:
+		{
+			// pfunc
+			tb_http_post_func_t* pfunc = (tb_http_post_func_t*)tb_va_arg(args, tb_http_post_func_t*);
+			tb_assert_and_check_return_val(pfunc, tb_false);
+
+			// get post func
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_FUNC, pfunc);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_SET_POST_PRIV:
+		{
+			// post priv
+			tb_pointer_t priv = (tb_pointer_t)tb_va_arg(args, tb_pointer_t);
+
+			// set post priv
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_PRIV, priv);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_POST_PRIV:
+		{
+			// ppost priv
+			tb_pointer_t* ppriv = (tb_pointer_t*)tb_va_arg(args, tb_pointer_t*);
+			tb_assert_and_check_return_val(ppriv, tb_false);
+
+			// get post priv
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_PRIV, ppriv);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_SET_POST_LRATE:
+		{
+			// post lrate
+			tb_size_t lrate = (tb_size_t)tb_va_arg(args, tb_size_t);
+
+			// set post lrate
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_SET_POST_LRATE, lrate);
+		}
+		break;
+	case TB_STREAM_CTRL_HTTP_GET_POST_LRATE:
+		{
+			// ppost lrate
+			tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(plrate, tb_false);
+
+			// get post lrate
+			return tb_http_option(hstream->http, TB_HTTP_OPTION_GET_POST_LRATE, plrate);
+		}
+		break;
 	case TB_STREAM_CTRL_HTTP_SET_AUTO_UNZIP:
 		{
 			// bunzip
@@ -482,7 +573,6 @@ tb_gstream_t* tb_gstream_init_http()
 	gstream->base.open 		= tb_gstream_http_open;
 	gstream->base.clos 		= tb_gstream_http_clos;
 	gstream->base.read 		= tb_gstream_http_read;
-	gstream->base.writ 		= tb_gstream_http_writ;
 	gstream->base.seek 		= tb_gstream_http_seek;
 	gstream->base.wait 		= tb_gstream_http_wait;
 	gstream->base.exit 		= tb_gstream_http_exit;
