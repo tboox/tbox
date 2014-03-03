@@ -596,7 +596,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	tb_hong_t 	time = 0;
 	tb_size_t 	crate = 0;
 	tb_long_t 	delay = 0;
-	tb_hize_t 	size1s = 0;
+	tb_hize_t 	writ1s = 0;
 	do
 	{
 		// the need
@@ -621,25 +621,25 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 				// < 1s?
 				if (time < base1s + 1000)
 				{
-					// save size1s
-					size1s += real;
+					// save writ1s
+					writ1s += real;
 
 					// save current rate if < 1s from base
-					if (time < base + 1000) crate = size1s;
+					if (time < base + 1000) crate = writ1s;
 				
 					// compute the delay for limit rate
-					if (lrate) delay = size1s >= lrate? base1s + 1000 - time : 0;
+					if (lrate) delay = writ1s >= lrate? base1s + 1000 - time : 0;
 				}
 				else
 				{
 					// save current rate
-					crate = size1s;
+					crate = writ1s;
 
 					// update base1s
 					base1s = time;
 
-					// reset size1s
-					size1s = 0;
+					// reset writ1s
+					writ1s = 0;
 
 					// reset delay
 					delay = 0;

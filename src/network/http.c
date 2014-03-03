@@ -78,6 +78,9 @@ typedef struct __tb_http_t
 	// the zstream for gzip/deflate
 	tb_gstream_t* 		zstream;
 
+	// the pstream for post
+	tb_gstream_t* 		pstream;
+
 	// the pool for string
 	tb_handle_t			pool;
 
@@ -96,8 +99,23 @@ typedef struct __tb_http_t
 	// the line size
 	tb_size_t 			line_size;
 
-	/// the real post size
-	tb_hize_t 			post_size;
+	// the post base time
+	tb_hong_t 			post_base;
+
+	// the post base time for 1s
+	tb_hong_t 			post_base1s;
+
+	// the post writ size
+	tb_hize_t 			post_writ;
+
+	// the post writ size for 1s
+	tb_hize_t 			post_writ1s;
+
+	// the post current rate
+	tb_size_t 			post_crate;
+
+	// the post delay for limit rate
+	tb_long_t 			post_delay;
 
 }tb_http_t;
 
@@ -126,7 +144,6 @@ static tb_bool_t tb_http_option_init(tb_http_t* http)
 	http->option.redirect 	= TB_HTTP_DEFAULT_REDIRECT;
 	http->option.timeout 	= TB_HTTP_DEFAULT_TIMEOUT;
 	http->option.version 	= 1; // HTTP/1.1
-	http->option.post 		= 0;
 	http->option.bunzip 	= 0;
 
 	// init url
@@ -300,6 +317,41 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 	// failed or continue?
 	tb_check_return_val(r > 0, r);
 
+	// post
+	if (http->option.method == TB_HTTP_METHOD_POST)
+	{
+		// init pstream
+		tb_char_t const* url = tb_url_get(&http->option.url);
+		if (http->option.post_data && http->option.post_size)
+			http->pstream = tb_gstream_init_from_data(http->option.post_data, http->option.post_size);
+		else if (url) http->pstream = tb_gstream_init_from_url(url);
+		tb_assert_and_check_return_val(http->pstream, -1);
+
+		// open pstream
+		r = tb_gstream_aopen(http->pstream);
+	
+		// failed?
+		if (r < 0) http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+
+		// failed or continue?
+		tb_check_return_val(r > 0, r);
+
+		// no size?
+		if (tb_stream_size(http->pstream) < 0) 
+		{
+			http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+			return -1;
+		}
+
+		// init post info
+		http->post_crate = 0;
+		http->post_delay = 0;
+		http->post_writ = 0;
+		http->post_writ1s = 0;
+		http->post_base = tb_mclock();
+		http->post_base1s = http->post_base;
+	}
+
 	// ok
 	http->step |= TB_HTTP_STEP_CONN;
 	http->tryn = 0;
@@ -365,8 +417,15 @@ static tb_long_t tb_http_request(tb_http_t* http)
 		// init post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
+			// check
+			tb_assert_and_check_return_val(http->pstream, -1);
+
+			// no size?
+			tb_hong_t post_size = tb_stream_size(http->pstream);
+			tb_assert_and_check_return_val(post_size >= 0, -1);
+
 			// append post size
-			tb_sstring_cstrfcpy(&value, "%llu", http->option.post);
+			tb_sstring_cstrfcpy(&value, "%llu", post_size);
 			tb_hash_set(http->option.head, "Content-Length", tb_sstring_cstr(&value));
 		}
 
@@ -453,6 +512,40 @@ static tb_long_t tb_http_request(tb_http_t* http)
 
 		// check
 		tb_assert_and_check_return_val(http->line_size == head_size, -1);
+	}
+
+	// send post
+	if (http->option.method == TB_HTTP_METHOD_POST)
+	{
+		// check
+		tb_assert_and_check_return_val(http->pstream, -1);
+
+		// no end?
+		if (!tb_gstream_beof(http->pstream))
+		{
+			// the post data
+			tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
+
+			// the need
+			tb_size_t need = http->option.post_lrate? tb_min(http->option.post_lrate, TB_GSTREAM_BLOCK_MAXN) : TB_GSTREAM_BLOCK_MAXN;
+
+			// read data
+			tb_long_t real = tb_gstream_aread(http->pstream, data, need);
+
+			// ok?
+			if (real > 0)
+			{
+				// writ data
+//				if (!tb_gstream_awrit(ostream, data, real)) break;
+
+			}
+			else if (!real)
+			{
+			}
+			else
+			{
+			}
+		}
 	}
 
 	// need wait if no data
@@ -952,6 +1045,10 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	if (http->sstream) tb_gstream_exit(http->sstream);
 	http->sstream = tb_null;
 
+	// exit pstream
+	if (http->pstream) tb_gstream_exit(http->pstream);
+	http->pstream = tb_null;
+
 	// exit stream
 	http->stream = tb_null;
 	
@@ -1072,6 +1169,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 }
 tb_long_t tb_http_aclos(tb_handle_t handle)
 {
+	// check
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream, -1);
 
@@ -1084,6 +1182,17 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 
 		// continue ?
 		tb_check_return_val(r, 0);
+
+		// post?
+		if (http->pstream)
+		{
+			// close pstream
+			r = tb_gstream_aclos(http->pstream);
+			tb_assert_and_check_return_val(r >= 0, -1);
+
+			// continue ?
+			tb_check_return_val(r, 0);
+		}
 
 		// switch to sstream
 		http->stream = http->sstream;
@@ -1104,8 +1213,13 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 		// clear redirect
 		http->redirect = 0;
 
-		// clear post
-		http->post_size = 0;
+		// clear post info
+		http->post_crate = 0;
+		http->post_delay = 0;
+		http->post_writ = 0;
+		http->post_writ1s = 0;
+		http->post_base = 0;
+		http->post_base1s = 0;
 	}
 
 	// ok
