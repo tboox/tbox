@@ -166,9 +166,6 @@ typedef struct __tb_http_option_t
 	/// the url
 	tb_url_t 			url;
 
-	/// the post size, TODO: discard
-	tb_hize_t 			post;
-
 	/// the request head 
 	tb_hash_t* 			head;
 

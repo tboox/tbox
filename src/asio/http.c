@@ -958,7 +958,7 @@ static tb_bool_t tb_aicp_http_hopen_func(tb_size_t state, tb_hize_t offset, tb_h
 		// no post size?
 		if (size < 0)
 		{
-			state = TB_STREAM_HTTP_STATE_POST_NO_SIZE;
+			state = TB_STREAM_HTTP_STATE_POST_FAILED;
 			break;
 		}
 
@@ -1770,7 +1770,7 @@ tb_bool_t tb_aicp_http_option(tb_handle_t handle, tb_size_t option, ...)
 			// ppost lrate
 			tb_size_t* plrate = (tb_size_t*)tb_va_arg(args, tb_size_t*);
 			tb_assert_and_check_return_val(plrate, tb_false);
-
+ 
 			// get post lrate
 			*plrate = http->option.post_lrate;
 			return tb_true;
