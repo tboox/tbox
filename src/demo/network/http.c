@@ -55,14 +55,15 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	// init url
 	if (!tb_http_option(http, TB_HTTP_OPTION_SET_URL, argv[1])) goto end;
 	
-#if 0
-	// init post size
-	tb_hize_t post_size = argv[2]? tb_strlen(argv[2]) : 0;
-	if (!tb_http_option(http, TB_HTTP_OPTION_SET_POST_SIZE, post_size)) goto end;
+	// init post 
+	if (argv[2])
+	{
+		// init post url
+		if (!tb_http_option(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) goto end;
 
-	// init method
-	if (!tb_http_option(http, TB_HTTP_OPTION_SET_METHOD, post_size? TB_HTTP_METHOD_POST : TB_HTTP_METHOD_GET)) goto end;
-#endif
+		// init method
+		if (!tb_http_option(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) goto end;
+	}
 
 	// init timeout 
 	tb_size_t timeout = 0;
@@ -77,15 +78,6 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 	if (!tb_http_bopen(http)) goto end;
 	t = tb_mclock() - t;
 	tb_print("open: %llu ms", t);
-
-#if 0
-	// writ post
-	if (post_size)
-	{
-		tb_http_bwrit(http, argv[2], post_size);
-		tb_http_bfwrit(http, tb_null, 0);
-	}
-#endif
 
 	// read data
 	tb_byte_t 		data[8192];
