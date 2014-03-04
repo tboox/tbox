@@ -265,24 +265,13 @@ end:
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
+static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
-	// init
-	tb_long_t r = -1;
-
 	// flush writed data first
-	if (gstream->bwrited) 
-	{
-		// flush it
-		r = tb_gstream_cache_afwrit(gstream, tb_null, 0);
+	if (gstream->bwrited && !tb_gstream_bfwrit(gstream, tb_null, 0)) return tb_false;
 
-		// continue it if has data
-		tb_check_return_val(r < 0, 0);
-
-		// bwrited will be clear
-		tb_assert_and_check_return_val(!gstream->bwrited, -1);
-	}
-	else if (gstream->bcached)
+	// cached?
+	if (gstream->bcached)
 	{
 		tb_size_t 	size = 0;
 		tb_hize_t 	curt = tb_stream_offset(gstream);
@@ -292,24 +281,28 @@ static tb_long_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
 			// seek it at the cache
 			tb_qbuffer_pull_exit(&gstream->cache, (tb_size_t)(offset - curt));
 
+			// save offset
+			gstream->offset = offset;
+
 			// ok
-			goto ok;
+			return tb_true;
 		}
 	}
 
 	// seek it
-	tb_check_return_val(gstream->seek, -1);
-	r = gstream->seek(gstream, offset);
+	tb_check_return_val(gstream->seek, tb_false);
+	tb_bool_t ok = gstream->seek(gstream, offset);
 
-	// support the native seek? clear cache
-	if (r >= 0) tb_qbuffer_clear(&gstream->cache);
+	// ok? 
+	if (ok)
+	{
+		// clear cache
+		tb_qbuffer_clear(&gstream->cache);
 
-	// ok?
-	tb_check_return_val(r > 0, r);
-
-ok:
-	gstream->offset = offset;
-	return 1;
+		// save offset
+		gstream->offset = offset;
+	}
+	return ok;
 }
 static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
@@ -385,7 +378,7 @@ tb_void_t tb_gstream_exit(tb_gstream_t* gstream)
 	if (gstream) 
 	{
 		// close it
-		tb_gstream_bclos(gstream);
+		tb_gstream_clos(gstream);
 
 		// exit it
 		if (gstream->exit) gstream->exit(gstream);
@@ -448,16 +441,16 @@ tb_bool_t tb_gstream_beof(tb_gstream_t* gstream)
 	// eof?
 	return (size > 0 && offt >= size)? tb_true : tb_false;
 }
-tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
+tb_bool_t tb_gstream_open(tb_gstream_t* gstream)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && gstream->open, -1);
+	tb_assert_and_check_return_val(gstream && gstream->open, tb_false);
 
 	// already been opened?
-	tb_check_return_val(!tb_stream_is_opened(gstream), 1);
+	tb_check_return_val(!tb_stream_is_opened(gstream), tb_true);
 
 	// check cache
-	tb_assert_and_check_return_val(!gstream->bcached || tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(!gstream->bcached || tb_qbuffer_maxn(&gstream->cache), tb_false);
 
 	// init offset
 	gstream->offset = 0;
@@ -466,92 +459,39 @@ tb_long_t tb_gstream_aopen(tb_gstream_t* gstream)
 	gstream->state = TB_STREAM_STATE_OK;
 
 	// open it
-	tb_long_t r = gstream->open(gstream);
-	
-	// ok?
-	if (r > 0) gstream->base.bopened = 1;
-	return r;
-}
-tb_bool_t tb_gstream_bopen(tb_gstream_t* gstream)
-{
-	tb_assert_and_check_return_val(gstream, tb_false);
+	tb_bool_t ok = gstream->open(gstream);
 
-	// try opening it
-	tb_long_t 	r = 0;
-	while (!(r = tb_gstream_aopen(gstream)))
-	{
-		// wait
-		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, tb_stream_timeout(gstream));
-
-		// fail or timeout?
-		tb_check_break(r > 0);
-	}
+	// opened
+	if (ok) gstream->base.bopened = 1;
 
 	// ok?
-	return r > 0? tb_true : tb_false;
+	return ok;
 }
-tb_long_t tb_gstream_aclos(tb_gstream_t* gstream)
+tb_bool_t tb_gstream_clos(tb_gstream_t* gstream)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream, -1);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// already been closed?
-	tb_check_return_val(tb_stream_is_opened(gstream), 1);
+	tb_check_return_val(tb_stream_is_opened(gstream), tb_true);
 
 	// flush writed data first
-	if (gstream->bwrited) 
-	{
-		// flush it
-		tb_long_t r = tb_gstream_cache_afwrit(gstream, tb_null, 0);
-
-		// continue it if has data
-		tb_check_return_val(r < 0, 0);
-
-		// bwrited will be clear
-		tb_assert_and_check_return_val(!gstream->bwrited, -1);
-	}
+	if (gstream->bwrited && !tb_gstream_bfwrit(gstream, tb_null, 0)) return tb_false;
 
 	// has close?
-	if (gstream->clos) 
-	{
-		// close it
-		tb_long_t r = gstream->clos(gstream);	
+	if (gstream->clos && !gstream->clos(gstream)) return tb_false;
 
-		// continue?
-		tb_check_return_val(r, r);
-	}
-
-	// reset offset
+	// clear state
 	gstream->offset = 0;
+	gstream->bwrited = 0;
+	gstream->base.bopened = 0;
+	gstream->state = TB_STREAM_STATE_OK;
 
 	// clear cache
 	tb_qbuffer_clear(&gstream->cache);
 
-	// update status
-	gstream->base.bopened = 0;
-
 	// ok
-	return 1;
-}
-tb_bool_t tb_gstream_bclos(tb_gstream_t* gstream)
-{
-	tb_assert_and_check_return_val(gstream, tb_false);
-
-	// try opening it
-	tb_long_t 	r = 0;
-	tb_hong_t 	t = tb_mclock();
-	tb_long_t 	timeout = tb_stream_timeout(gstream);
-	while (!(r = tb_gstream_aclos(gstream)))
-	{
-		// timeout?
-		if (timeout >= 0 && tb_mclock() - t > timeout) break;
-
-		// sleep some time
-		tb_usleep(100);
-	}
-
-	// ok?
-	return r > 0? tb_true : tb_false;
+	return tb_true;
 }
 tb_long_t tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
 {
@@ -927,78 +867,46 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...)
 	// writ data
 	return tb_gstream_bwrit(gstream, data, size)? size : -1;
 }
-tb_long_t tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset)
+tb_bool_t tb_gstream_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), tb_false);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), tb_false);
 
 	// need seek?
 	tb_hize_t curt = tb_stream_offset(gstream);
-	tb_check_return_val(offset != curt, 1);
+	tb_check_return_val(offset != curt, tb_true);
 
 	// try seek to cache
-	tb_long_t r = tb_gstream_cache_seek(gstream, offset);
-	// ok?
-	if (r > 0) goto end;
-	// continue?
-	else if (!r) return 0;
-	else
+	tb_bool_t ok = tb_gstream_cache_seek(gstream, offset);
+
+	// failed? try to read and seek
+	if (!ok)
 	{
 		// must be read mode
-		tb_assert_and_check_return_val(!gstream->bwrited, -1);
+		tb_assert_and_check_return_val(!gstream->bwrited, tb_false);
 
 		// limit offset
 		tb_hong_t size = tb_stream_size(gstream);
 		if (size >= 0 && offset > size) offset = size;
 
 		// forward it?
-		tb_assert_and_check_return_val(offset > curt, -1);
+		tb_assert_and_check_return_val(offset > curt, tb_false);
 
 		// read some data for updating offset
 		tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
 		tb_size_t need = tb_min(offset - curt, TB_GSTREAM_BLOCK_MAXN);
-		r = tb_gstream_aread(gstream, data, need);
-
-		// no data? continue it
-		tb_check_return_val(r, 0);
-
-		// no finished? continue it
-		if (r > 0 && tb_stream_offset(gstream) < offset) return 0;
-	}
-
-end:
-	// ok?
-	return tb_stream_offset(gstream) == offset? 1 : -1;
-}
-tb_bool_t tb_gstream_bseek(tb_gstream_t* gstream, tb_hize_t offset)
-{
-	tb_assert_and_check_return_val(gstream, tb_false);
-
-	// try opening it
-	tb_long_t r = 0;
-	while (!(r = tb_gstream_aseek(gstream, offset)))
-	{
-		// wait
-		r = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_EALL, tb_stream_timeout(gstream));
-
-		// fail or timeout?
-		tb_check_break(r > 0);
+		if (!tb_gstream_bread(gstream, data, need)) return tb_false;
 	}
 
 	// ok?
-	return r > 0? tb_true : tb_false;
+	return tb_stream_offset(gstream) == offset? tb_true : tb_false;
 }
-tb_long_t tb_gstream_askip(tb_gstream_t* gstream, tb_hize_t size)
+tb_bool_t tb_gstream_skip(tb_gstream_t* gstream, tb_hize_t size)
 {
-	tb_assert_and_check_return_val(gstream, -1);
-	return tb_gstream_aseek(gstream, tb_stream_offset(gstream) + size);
-}
-tb_bool_t tb_gstream_bskip(tb_gstream_t* gstream, tb_hize_t size)
-{
-	return tb_gstream_bseek(gstream, tb_stream_offset(gstream) + size);
+	return tb_gstream_seek(gstream, tb_stream_offset(gstream) + size);
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gstream)
 {

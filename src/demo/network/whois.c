@@ -26,7 +26,7 @@ static tb_void_t tb_whois_test_done(tb_char_t const* name)
 	tb_char_t data[251] = {0};
 
 	// open
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_open(gst))
 	{
 		tb_gstream_printf(gst, "%s \r\n", name);
 		tb_gstream_bfwrit(gst, tb_null, 0);
@@ -51,7 +51,7 @@ static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 	tb_char_t data[251] = {0};
 
 	// open
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_open(gst))
 	{
 		tb_gstream_printf(gst, "%s \r\n", name);
 		tb_gstream_bfwrit(gst, tb_null, 0);
@@ -77,7 +77,7 @@ static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
 	tb_char_t data[21] = {0};
 
 	// open
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_open(gst))
 	{
 		tb_gstream_printf(gst, "%s \r\n", name);
 		tb_gstream_bfwrit(gst, tb_null, 0);
@@ -208,7 +208,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 
 	// open
 	tb_size_t n = 0;
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_open(gst))
 	{
 		while (tb_gstream_bread_line(gst, &ping[n * 16], 15) > 0)
 			n++;
@@ -246,7 +246,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 
 	// open
 	tb_size_t n = 0;
-	if (tb_gstream_bopen(gst))
+	if (tb_gstream_open(gst))
 	{
 		while (tb_gstream_bread_line(gst, &ping[n * 16], 15) > 0)
 			n++;

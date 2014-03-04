@@ -294,7 +294,7 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 
 	// open stream
 	tb_trace_impl("connect: try");
-	tb_long_t r = tb_gstream_aopen(http->stream);
+	tb_long_t r = tb_gstream_open(http->stream);
 
 	// save state if failed?
 	if (r < 0) 
@@ -328,7 +328,7 @@ static tb_long_t tb_http_connect(tb_http_t* http)
 		tb_assert_and_check_return_val(http->pstream, -1);
 
 		// open pstream
-		r = tb_gstream_aopen(http->pstream);
+		r = tb_gstream_open(http->pstream);
 	
 		// failed?
 		if (r < 0) http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
@@ -808,7 +808,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		tb_assert_and_check_return_val(http->cstream, -1);
 
 		// open cstream, need not async
-		if (!tb_gstream_bopen(http->cstream)) return -1;
+		if (!tb_gstream_open(http->cstream)) return -1;
 
 		// using cstream
 		http->stream = http->cstream;
@@ -829,7 +829,7 @@ static tb_long_t tb_http_response(tb_http_t* http)
 		tb_assert_and_check_return_val(http->zstream, -1);
 
 		// open zstream, need not async
-		if (!tb_gstream_bopen(http->zstream)) return -1;
+		if (!tb_gstream_open(http->zstream)) return -1;
 
 		// using zstream
 		http->stream = http->zstream;
@@ -879,7 +879,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		if (!http->status.balived) 
 		{
 			// close stream
-			tb_long_t r = tb_gstream_aclos(http->stream);
+			tb_long_t r = tb_gstream_clos(http->stream);
 			tb_assert_and_check_return_val(r >= 0, -1);
 
 			// continue ?
@@ -925,7 +925,7 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 	// ok
 	return 1;
 }
-static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
+static tb_long_t tb_http_seek_impl(tb_http_t* http, tb_hize_t offset)
 {
 	// check
 	tb_check_return_val(!(http->step & TB_HTTP_STEP_SEEK), 1);
@@ -951,7 +951,7 @@ static tb_long_t tb_http_seek(tb_http_t* http, tb_hize_t offset)
 	if (!http->status.balived) 
 	{
 		// close stream
-		tb_long_t r = tb_gstream_aclos(http->stream);
+		tb_long_t r = tb_gstream_clos(http->stream);
 		tb_assert_and_check_return_val(r >= 0, -1);
 
 		// continue ?
@@ -1031,7 +1031,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	tb_assert_and_check_return(http);
 
 	// close it
-	tb_http_bclos(handle);
+	tb_http_clos(handle);
 
 	// exit zstream
 	if (http->zstream) tb_gstream_exit(http->zstream);
@@ -1145,7 +1145,7 @@ tb_long_t tb_http_aopen(tb_handle_t handle)
 	// ok
 	return r;
 }
-tb_bool_t tb_http_bopen(tb_handle_t handle)
+tb_bool_t tb_http_open(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, tb_false);
@@ -1162,7 +1162,7 @@ tb_bool_t tb_http_bopen(tb_handle_t handle)
 	}
 
 	// close it if fail
-	if (r <= 0) tb_http_bclos(handle);
+	if (r <= 0) tb_http_clos(handle);
 
 	// ok?
 	return r > 0? tb_true : tb_false;
@@ -1177,7 +1177,7 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 	if (http->step)
 	{	
 		// close stream
-		tb_long_t r = tb_gstream_aclos(http->stream);
+		tb_long_t r = tb_gstream_clos(http->stream);
 		tb_assert_and_check_return_val(r >= 0, -1);
 
 		// continue ?
@@ -1187,7 +1187,7 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 		if (http->pstream)
 		{
 			// close pstream
-			r = tb_gstream_aclos(http->pstream);
+			r = tb_gstream_clos(http->pstream);
 			tb_assert_and_check_return_val(r >= 0, -1);
 
 			// continue ?
@@ -1225,7 +1225,7 @@ tb_long_t tb_http_aclos(tb_handle_t handle)
 	// ok
 	return 1;
 }
-tb_bool_t tb_http_bclos(tb_handle_t handle)
+tb_bool_t tb_http_clos(tb_handle_t handle)
 {
 	tb_http_t* http = (tb_http_t*)handle;
 	tb_assert_and_check_return_val(handle, tb_false);
@@ -1258,7 +1258,7 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 	tb_long_t r = -1;
 
 	// seek
-	r = tb_http_seek(http, offset);
+	r = tb_http_seek_impl(http, offset);
 	tb_check_return_val(r > 0, r);
 
 	// open
@@ -1269,7 +1269,7 @@ tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 	http->step &= ~TB_HTTP_STEP_SEEK;
 	return r;
 }
-tb_bool_t tb_http_bseek(tb_handle_t handle, tb_hize_t offset)
+tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 {
 	// check
 	tb_http_t* http = (tb_http_t*)handle;

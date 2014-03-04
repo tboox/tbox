@@ -10,7 +10,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init stream
 	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
-	if (gst && tb_gstream_bopen(gst))
+	if (gst && tb_gstream_open(gst))
 	{
 		// init reader
 		tb_handle_t reader = tb_xml_reader_init(gst);

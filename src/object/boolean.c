@@ -147,7 +147,7 @@ static tb_object_t* tb_boolean_read_jsn(tb_object_jsn_reader_t* reader, tb_char_
 		else break;
 
 		// skip it
-		tb_gstream_bskip(reader->stream, 1);
+		tb_gstream_skip(reader->stream, 1);
 	}
 
 	// check

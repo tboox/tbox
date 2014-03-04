@@ -71,11 +71,11 @@ static __tb_inline__ tb_gstream_filter_t* tb_gstream_filter_cast(tb_handle_t str
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_FLTR, tb_null);
 	return (tb_gstream_filter_t*)gstream;
 }
-static tb_long_t tb_gstream_filter_open(tb_handle_t gstream)
+static tb_bool_t tb_gstream_filter_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
-	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
+	tb_assert_and_check_return_val(fstream && fstream->gstream, tb_false);
 
 	// clear mode
 	fstream->mode = 0;
@@ -90,13 +90,13 @@ static tb_long_t tb_gstream_filter_open(tb_handle_t gstream)
 	fstream->beof = tb_false;
 
 	// ok
-	return tb_gstream_aopen(fstream->gstream);
+	return tb_gstream_open(fstream->gstream);
 }
-static tb_long_t tb_gstream_filter_clos(tb_handle_t gstream)
+static tb_bool_t tb_gstream_filter_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
-	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
+	tb_assert_and_check_return_val(fstream && fstream->gstream, tb_false);
 	
 	// sync the end filter data
 	if (fstream->filter && fstream->mode == -1)
@@ -106,19 +106,15 @@ static tb_long_t tb_gstream_filter_clos(tb_handle_t gstream)
 		tb_long_t 			size = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, -1);
 		if (size > 0 && data)
 		{
-			// writ data, will have some block
-			if (tb_gstream_bwrit(fstream->gstream, data, size))
-			{
-				// continue to spak it
-				return 0;
-			}
+			// writ data
+			if (!tb_gstream_bwrit(fstream->gstream, data, size)) return tb_false;
 		}
 	}
 
 	// done
-	tb_long_t ok = tb_gstream_aclos(fstream->gstream);
+	tb_bool_t ok = tb_gstream_clos(fstream->gstream);
 
-	// failed or ok?
+	// ok?
 	if (ok) 
 	{
 		// clear mode

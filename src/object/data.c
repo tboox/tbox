@@ -327,7 +327,7 @@ tb_object_t* tb_data_init_from_url(tb_char_t const* url)
 
 	// make stream
 	tb_object_t* object = tb_null;
-	if (tb_gstream_bopen(stream))
+	if (tb_gstream_open(stream))
 	{
 		// size
 		tb_hong_t size = tb_stream_size(stream);
@@ -448,7 +448,7 @@ tb_bool_t tb_data_writ_to_url(tb_object_t* object, tb_char_t const* url)
 	
 	// open stream
 	tb_bool_t ok = tb_false;
-	if (tb_gstream_bopen(stream))
+	if (tb_gstream_open(stream))
 	{
 		// writ stream
 		if (tb_gstream_bwrit(stream, tb_data_getp((tb_object_t*)data), tb_data_size((tb_object_t*)data))) ok = tb_true;

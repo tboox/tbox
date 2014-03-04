@@ -225,7 +225,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				if (verbose) tb_printf("open: %s: ..\n", tb_option_item_cstr(option, "url"));
 
 				// open istream
-				if (!tb_gstream_bopen(istream)) 
+				if (!tb_gstream_open(istream)) 
 				{
 					// print verbose info
 					if (verbose) tb_printf("open: %s\n", tb_stream_state_cstr(tb_gstream_state(istream)));

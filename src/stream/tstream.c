@@ -579,10 +579,10 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	tb_assert_and_check_return_val(ostream && istream, -1);	
 
 	// open it first if istream have been not opened
-	if (!tb_stream_is_opened(istream) && !tb_gstream_bopen(istream)) return -1;
+	if (!tb_stream_is_opened(istream) && !tb_gstream_open(istream)) return -1;
 	
 	// open it first if ostream have been not opened
-	if (!tb_stream_is_opened(ostream) && !tb_gstream_bopen(ostream)) return -1;
+	if (!tb_stream_is_opened(ostream) && !tb_gstream_open(ostream)) return -1;
 				
 	// done func
 	if (func) func(TB_STREAM_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
@@ -1248,7 +1248,7 @@ tb_bool_t tb_tstream_open(tb_handle_t handle, tb_tstream_open_func_t func, tb_po
 		}
 		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
 		{
-			if (!tb_stream_is_opened(tstream->ostream) && !tb_gstream_bopen(tstream->ostream)) break;
+			if (!tb_stream_is_opened(tstream->ostream) && !tb_gstream_open(tstream->ostream)) break;
 			bopened = tb_true;
 		}
 		else tb_assert_and_check_break(0);
@@ -1344,7 +1344,7 @@ tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
 		if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO) 
 			tb_astream_clos(tstream->ostream, bcalling);
 		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
-			tb_gstream_bclos(tstream->ostream);
+			tb_gstream_clos(tstream->ostream);
 	}
 
 	// trace

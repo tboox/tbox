@@ -54,33 +54,33 @@ static __tb_inline__ tb_gstream_http_t* tb_gstream_http_cast(tb_handle_t stream)
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_HTTP, tb_null);
 	return (tb_gstream_http_t*)gstream;
 }
-static tb_long_t tb_gstream_http_open(tb_handle_t gstream)
+static tb_bool_t tb_gstream_http_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
-	tb_assert_and_check_return_val(hstream && hstream->http, -1);
+	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// the http status
 	tb_http_status_t const*	status = tb_http_status(hstream->http);
-	tb_assert_and_check_return_val(status, -1);
+	tb_assert_and_check_return_val(status, tb_false);
 
 	// open it
-	tb_long_t ok = tb_http_aopen(hstream->http);
+	tb_bool_t ok = tb_http_open(hstream->http);
 
 	// save state
-	hstream->base.state = ok >= 0? TB_STREAM_STATE_OK : status->state;
+	hstream->base.state = ok? TB_STREAM_STATE_OK : status->state;
 
 	// ok?
 	return ok;
 }
-static tb_long_t tb_gstream_http_clos(tb_handle_t gstream)
+static tb_bool_t tb_gstream_http_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
-	tb_assert_and_check_return_val(hstream && hstream->http, -1);
+	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// close it
-	return tb_http_aclos(hstream->http);
+	return tb_http_clos(hstream->http);
 }
 static tb_void_t tb_gstream_http_exit(tb_handle_t gstream)
 {
@@ -110,14 +110,14 @@ static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	// ok?
 	return ok;
 }
-static tb_long_t tb_gstream_http_seek(tb_handle_t gstream, tb_hize_t offset)
+static tb_bool_t tb_gstream_http_seek(tb_handle_t gstream, tb_hize_t offset)
 {
 	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
-	tb_assert_and_check_return_val(hstream && hstream->http, -1);
+	tb_assert_and_check_return_val(hstream && hstream->http, tb_false);
 
 	// seek
-	return tb_http_aseek(hstream->http, offset);
+	return tb_http_seek(hstream->http, offset);
 }
 static tb_long_t tb_gstream_http_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {

@@ -62,29 +62,29 @@ static __tb_inline__ tb_gstream_data_t* tb_gstream_data_cast(tb_handle_t stream)
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_DATA, tb_null);
 	return (tb_gstream_data_t*)gstream;
 }
-static tb_long_t tb_gstream_data_open(tb_handle_t gstream)
+static tb_bool_t tb_gstream_data_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream && dstream->data && dstream->size, -1);
+	tb_assert_and_check_return_val(dstream && dstream->data && dstream->size, tb_false);
 
 	// init head
 	dstream->head = dstream->data;
 
 	// ok
-	return 1;
+	return tb_true;
 }
-static tb_long_t tb_gstream_data_clos(tb_handle_t gstream)
+static tb_bool_t tb_gstream_data_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream, -1);
+	tb_assert_and_check_return_val(dstream, tb_false);
 	
 	// clear head
 	dstream->head = tb_null;
 
 	// ok
-	return 1;
+	return tb_true;
 }
 static tb_void_t tb_gstream_data_exit(tb_handle_t gstream)
 {
@@ -150,17 +150,17 @@ static tb_long_t tb_gstream_data_writ(tb_handle_t gstream, tb_byte_t const* data
 	// ok?
 	return left? (tb_long_t)(size) : -1; // force end if full
 }
-static tb_long_t tb_gstream_data_seek(tb_handle_t gstream, tb_hize_t offset)
+static tb_bool_t tb_gstream_data_seek(tb_handle_t gstream, tb_hize_t offset)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
-	tb_assert_and_check_return_val(dstream && offset <= dstream->size, -1);
+	tb_assert_and_check_return_val(dstream && offset <= dstream->size, tb_false);
 
 	// seek 
 	dstream->head = dstream->data + offset;
 
 	// ok
-	return 1;
+	return tb_true;
 }
 static tb_long_t tb_gstream_data_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {

@@ -279,13 +279,13 @@ tb_long_t 				tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout
  */
 tb_long_t 				tb_http_aopen(tb_handle_t handle);
 
-/*! block open, allow multiple called before closing 
+/*! open the http
  *
  * @param handle 		the http handle
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_http_bopen(tb_handle_t handle);
+tb_bool_t 				tb_http_open(tb_handle_t handle);
 
 /*! async close, allow multiple called
  *
@@ -301,7 +301,7 @@ tb_long_t 				tb_http_aclos(tb_handle_t handle);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_http_bclos(tb_handle_t handle);
+tb_bool_t 				tb_http_clos(tb_handle_t handle);
 
 /*! async seek
  *
@@ -319,7 +319,7 @@ tb_long_t 				tb_http_aseek(tb_handle_t handle, tb_hize_t offset);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_http_bseek(tb_handle_t handle, tb_hize_t offset);
+tb_bool_t 				tb_http_seek(tb_handle_t handle, tb_hize_t offset);
 
 /*! async read
  *

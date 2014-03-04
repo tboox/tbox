@@ -59,9 +59,6 @@ typedef struct __tb_gstream_sock_t
 	// the sock handle
 	tb_handle_t 		sock;
 
-	// the dns looker
-	tb_handle_t 		looker;
-
 	// the sock type
 	tb_uint32_t 		type 	: 22;
 
@@ -81,9 +78,6 @@ typedef struct __tb_gstream_sock_t
 	tb_size_t 			read;
 	tb_size_t 			writ;
 	
-	// the ssl handle
-	tb_handle_t 		ssl;
-
 	// the host address
 	tb_ipv4_t 			addr;
 
@@ -98,11 +92,11 @@ static __tb_inline__ tb_gstream_sock_t* tb_gstream_sock_cast(tb_handle_t stream)
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_gstream_sock_t*)gstream;
 }
-static tb_long_t tb_gstream_sock_open(tb_handle_t gstream)
+static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
-	tb_assert_and_check_return_val(sstream && sstream->type, -1);
+	tb_assert_and_check_return_val(sstream && sstream->type, tb_false);
 
 	// clear
 	sstream->wait = 0;
@@ -110,12 +104,12 @@ static tb_long_t tb_gstream_sock_open(tb_handle_t gstream)
 	sstream->read = 0;
 	sstream->writ = 0;
 
-	// no reference?
-	tb_check_return_val(!(sstream->sock && sstream->bref), 1);
+	// opened?
+	tb_check_return_val(!sstream->sock, tb_true);
 
 	// port
 	tb_size_t port = tb_url_port_get(&sstream->base.base.url);
-	tb_assert_and_check_return_val(port, -1);
+	tb_assert_and_check_return_val(port, tb_false);
 
 	// ipv4
 	if (!sstream->addr.u32)
@@ -125,43 +119,11 @@ static tb_long_t tb_gstream_sock_open(tb_handle_t gstream)
 		if (ipv4 && ipv4->u32) sstream->addr = *ipv4;
 		else
 		{
-			// lookup ipv4
-			if (sstream->looker)
+			// look addr
+			if (!tb_dns_looker_done(tb_url_get(&sstream->base.base.url), &sstream->addr)) 
 			{
-				// spank
-				tb_long_t r = tb_dns_looker_spak(sstream->looker, &sstream->addr);
-				tb_assert_and_check_goto(r >= 0, fail);
-
-				// continue?
-				tb_check_return_val(r, 0);
-			}
-			else
-			{
-				// get the host from url
-				tb_char_t const* host = tb_url_host_get(&sstream->base.base.url);
-				tb_assert_and_check_return_val(host, -1);
-
-				// try get ipv4
-				if (!tb_dns_cache_get(host, &sstream->addr))
-				{
-					// init dns
-					sstream->looker = tb_dns_looker_init(host);
-					tb_assert_and_check_return_val(sstream->looker, -1);
-					
-					// spank
-					tb_long_t r = tb_dns_looker_spak(sstream->looker, &sstream->addr);
-					tb_assert_and_check_goto(r >= 0, fail);
-
-					// continue?
-					tb_check_return_val(r, 0);
-				}
-			}
-
-			// exit dns if ok
-			if (sstream->looker) 
-			{
-				tb_dns_looker_exit(sstream->looker);
-				sstream->looker = tb_null;
+				sstream->base.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
+				return tb_false;
 			}
 
 			// save addr
@@ -174,104 +136,65 @@ static tb_long_t tb_gstream_sock_open(tb_handle_t gstream)
 		else if (args && !tb_strnicmp(args, "tcp=", 4)) sstream->type = TB_SOCKET_TYPE_TCP;
 	}
 
-	// open
-	if (!sstream->sock) 
-	{
-		sstream->sock = tb_socket_open(sstream->type);
-		sstream->bref = 0;
-	}
-	tb_assert_and_check_return_val(sstream->sock, -1);
+	// make sock
+	sstream->sock = tb_socket_open(sstream->type);
+	sstream->bref = 0;
+	tb_assert_and_check_return_val(sstream->sock, tb_false);
 
 	// done
-	tb_long_t r = -1;
+	tb_bool_t ok = tb_false;
 	switch (sstream->type)
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// trace
-			tb_trace_impl("connect: try: %s[%u.%u.%u.%u]:%u", tb_url_host_get(&sstream->base.base.url), sstream->addr.u8[0], sstream->addr.u8[1], sstream->addr.u8[2], sstream->addr.u8[3], port);
+			tb_trace_impl("connect: %s[%u.%u.%u.%u]:%u: ..", tb_url_host_get(&sstream->base.base.url), tb_ipv4_u8x4(sstream->addr), port);
 
 			// connect it
-			r = tb_socket_connect(sstream->sock, &sstream->addr, port);
-			tb_check_return_val(r > 0, r);
+			tb_long_t r = -1;
+			while (!(r = tb_socket_connect(sstream->sock, &sstream->addr, port)))
+			{
+				r = tb_aioo_wait(sstream->sock, TB_AIOE_CODE_CONN, tb_stream_timeout(gstream));
+				tb_check_break(r > 0);
+			}
+
+			// ok?
+			if (r > 0)
+			{
+				ok = tb_true;
+				sstream->base.state = TB_STREAM_STATE_OK;
+			}
+			else sstream->base.state = !r? TB_STREAM_SOCK_STATE_CONNECT_TIMEOUT : TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 
 			// ok
-			tb_trace_impl("connect: ok");
-
-			// TODO
-#if 0 
-			// ssl? init it
-			if (tb_url_ssl_get(&sstream->base.base.url))
-			{
-				// init
-				if (gstream->sfunc.init) sstream->ssl = gstream->sfunc.init(gstream);
-				tb_assert_and_check_goto(sstream->ssl, fail);
-
-				// check sfunc
-				tb_assert_and_check_goto(gstream->sfunc.read, fail);
-				tb_assert_and_check_goto(gstream->sfunc.writ, fail);
-				tb_assert_and_check_goto(gstream->sfunc.exit, fail);
-			}
-#endif
+			tb_trace_impl("connect: %s", ok? "ok" : "no");
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
-		r = 1;
+		ok = tb_true;
+		sstream->base.state = TB_STREAM_STATE_OK;
 		break;
 	default:
 		break;
 	}
 
-	// save state
-	sstream->base.state = TB_STREAM_STATE_OK;
-
 	// ok?
-	return r;
-
-fail:
-
-	// failed?
-	if (sstream)
-	{
-		// dns failed?
-		if (sstream->looker)
-		{
-			// save state
-			sstream->base.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
-
-			// exit dns
-			tb_dns_looker_exit(sstream->looker);
-			sstream->looker = tb_null;
-		}
-		// ssl or connect failed?
-		else if (sstream->type == TB_SOCKET_TYPE_TCP)
-			sstream->base.state = tb_url_ssl_get(&sstream->base.base.url)? TB_STREAM_SOCK_STATE_SSL_FAILED : TB_STREAM_SOCK_STATE_CONNECT_FAILED;
-	}
-
-	return -1;
+	return ok;
 }
-static tb_long_t tb_gstream_sock_clos(tb_handle_t gstream)
+static tb_bool_t tb_gstream_sock_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
-	tb_assert_and_check_return_val(sstream, -1);
+	tb_assert_and_check_return_val(sstream, tb_false);
 
 	// keep alive? not close it
-	tb_check_return_val(!sstream->balived, 1);
+	tb_check_return_val(!sstream->balived, tb_true);
 
-	// has socket?
-	if (sstream->sock)
+	// close it
+	if (!sstream->bref) 
 	{
-		// exit ssl, TODO
-//		if (sstream->ssl) gstream->sfunc.exit(sstream->ssl);
-//		sstream->ssl = tb_null;
-
-		// close it
-		if (!sstream->bref) if (!tb_socket_clos(sstream->sock)) return 0;
-
-		// reset
+		if (sstream->sock && !tb_socket_clos(sstream->sock)) return tb_false;
 		sstream->sock = tb_null;
-		sstream->bref = 0;
 	}
 
 	// clear 
@@ -282,7 +205,7 @@ static tb_long_t tb_gstream_sock_clos(tb_handle_t gstream)
 	tb_ipv4_clr(&sstream->addr);
 
 	// ok
-	return 1;
+	return tb_true;
 }
 static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 {
@@ -290,19 +213,15 @@ static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return(sstream);
 
-	// has socket?
-	if (sstream->sock)
+	// close it
+	if (!sstream->bref) 
 	{
-		// exit ssl, TODO
-//		if (sstream->ssl) gstream->sfunc.exit(sstream->ssl);
-//		sstream->ssl = tb_null;
-
-		// close it
-		if (!sstream->bref) if (!tb_socket_clos(sstream->sock)) return ;
-
-		// reset
+		if (sstream->sock && !tb_socket_clos(sstream->sock))
+		{
+			// trace
+			tb_trace("[sock]: exit failed");
+		}
 		sstream->sock = tb_null;
-		sstream->bref = 0;
 	}
 
 	// clear 
@@ -442,28 +361,15 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 }
 static tb_long_t tb_gstream_sock_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {
+	// check
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
-	tb_assert_and_check_return_val(sstream, -1);
+	tb_assert_and_check_return_val(sstream && sstream->sock, -1);
 
-	if (!sstream->looker)
-	{
-		// check socket
-		tb_assert_and_check_return_val(sstream->sock, -1);
+	// wait 
+	sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);
+	tb_trace_impl("wait: %ld", sstream->wait);
 
-		// wait the gstream
-		sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);
-		tb_trace_impl("wait: %ld", sstream->wait);
-	}
-	else
-	{
-		// wait the dns
-		sstream->wait = tb_dns_looker_wait(sstream->looker, timeout);
-		tb_trace_impl("wait: %ld", sstream->wait);
-
-		// clear tryn
-		if (sstream->wait) sstream->tryn = 0;
-	}
-
+	// ok?
 	return sstream->wait;
 }
 static tb_bool_t tb_gstream_sock_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va_list_t args)
