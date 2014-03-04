@@ -231,7 +231,7 @@ static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 	sstream->writ = 0;
 	tb_ipv4_clr(&sstream->addr);
 }
-static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
@@ -293,7 +293,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	// ok?
 	return r;
 }
-static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size)
 {
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sstream && sstream->sock, -1);

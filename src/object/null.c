@@ -97,7 +97,7 @@ static tb_object_t* tb_null_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t t
 	{
 		// need one character
 		tb_byte_t* p = tb_null;
-		if (!tb_gstream_bneed(reader->stream, &p, 1) && p) goto end;
+		if (!tb_gstream_need(reader->stream, &p, 1) && p) goto end;
 
 		// the character
 		tb_char_t ch = *p;

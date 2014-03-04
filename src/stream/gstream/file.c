@@ -103,7 +103,7 @@ static tb_bool_t tb_gstream_file_clos(tb_handle_t gstream)
 	// ok
 	return tb_true;
 }
-static tb_long_t tb_gstream_file_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_file_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
@@ -116,28 +116,26 @@ static tb_long_t tb_gstream_file_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	// read 
 	return tb_file_read(fstream->file, data, size);
 }
-static tb_long_t tb_gstream_file_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_file_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
-	tb_assert_and_check_return_val(fstream && fstream->file, -1);
+	tb_assert_and_check_return_val(fstream && fstream->file && data, -1);
 
-	// has data
-	if (data)
-	{
-		// check
-		tb_check_return_val(size, 0);
+	// check
+	tb_check_return_val(size, 0);
 
-		// writ
-		return tb_file_writ(fstream->file, data, size);
-	}
-	
-end:
-	// sync data
-	if (sync) if (!tb_file_sync(fstream->file)) return -1;
+	// writ
+	return tb_file_writ(fstream->file, data, size);
+}
+static tb_bool_t tb_gstream_file_sync(tb_handle_t gstream, tb_bool_t bclosing)
+{
+	// check
+	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
+	tb_assert_and_check_return_val(fstream && fstream->file, tb_false);
 
-	// end?
-	return -1;
+	// sync
+	return tb_file_sync(fstream->file);
 }
 static tb_bool_t tb_gstream_file_seek(tb_handle_t gstream, tb_hize_t offset)
 {
@@ -232,6 +230,7 @@ tb_gstream_t* tb_gstream_init_file()
 	gstream->base.clos 		= tb_gstream_file_clos;
 	gstream->base.read 		= tb_gstream_file_read;
 	gstream->base.writ 		= tb_gstream_file_writ;
+	gstream->base.sync 		= tb_gstream_file_sync;
 	gstream->base.seek 		= tb_gstream_file_seek;
 	gstream->base.wait 		= tb_gstream_file_wait;
 	gstream->base.base.ctrl = tb_gstream_file_ctrl;

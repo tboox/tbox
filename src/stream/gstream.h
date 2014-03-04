@@ -126,13 +126,16 @@ typedef struct __tb_gstream_t
 	tb_bool_t 			(*clos)(tb_handle_t gstream);
 
 	/// read
-	tb_long_t 			(*read)(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
+	tb_long_t 			(*read)(tb_handle_t gstream, tb_byte_t* data, tb_size_t size);
 
 	/// writ
-	tb_long_t 			(*writ)(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync);
+	tb_long_t 			(*writ)(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size);
 
 	/// seek
 	tb_bool_t 			(*seek)(tb_handle_t gstream, tb_hize_t offset);
+
+	/// sync
+	tb_bool_t 			(*sync)(tb_handle_t gstream, tb_bool_t bclosing);
 
 	/// exit
 	tb_void_t 			(*exit)(tb_handle_t gstream);
@@ -320,6 +323,12 @@ tb_bool_t 			tb_gstream_beof(tb_gstream_t* gstream);
  */
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gstream);
 
+/*! kill stream
+ *
+ * @param gstream 	the stream
+ */
+tb_void_t 			tb_gstream_kill(tb_gstream_t* gstream);
+
 /*! close stream
  *
  * @param gstream 	the stream
@@ -368,27 +377,16 @@ tb_bool_t 			tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t 
  */
 tb_bool_t 			tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
 
-/*! async flush read
+/*! sync stream
  *
  * @param gstream 	the stream
- * @param data 		the data
- * @param size 		the size
+ * @param bclosing 	is closing?
  *
- * @return 			ok: 1, continue: 0, failed: -1
+ * @return 			tb_true or tb_false
  */
-tb_long_t 			tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
+tb_bool_t 			tb_gstream_sync(tb_gstream_t* gstream, tb_bool_t bclosing);
 
-/*! async flush writ
- *
- * @param gstream 	the stream
- * @param data 		the data
- * @param size 		the size
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
-
-/*! block flush read
+/*! need stream
  *
  * @param gstream 	the stream
  * @param data 		the data
@@ -396,37 +394,7 @@ tb_long_t 			tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
-
-/*! block flush writ
- *
- * @param gstream 	the stream
- * @param data 		the data
- * @param size 		the size
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
-
-/*! async need
- *
- * @param gstream 	the stream
- * @param data 		the data
- * @param size 		the size
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size);
-
-/*! block need
- *
- * @param gstream 	the stream
- * @param data 		the data
- * @param size 		the size
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_gstream_bneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size);
+tb_bool_t 			tb_gstream_need(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size);
 
 /*! seek stream
  *

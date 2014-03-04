@@ -235,26 +235,6 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				// print verbose info
 				if (verbose) tb_printf("open: ok\n");
 
-				// post-data?
-				if (tb_option_find(option, "post-data"))
-				{
-					// the post data
-					tb_char_t const* data = tb_option_item_cstr(option, "post-data");
-
-					// flush writing the post data
-					if (!tb_gstream_bfwrit(istream, data, tb_strlen(data))) break;
-				}
-				// post-file?
-				else if (tb_option_find(option, "post-file"))
-				{
-					// init pst
-					pst = tb_gstream_init_from_file(tb_option_item_cstr(option, "post-file"), TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
-					tb_assert_and_check_break(pst);
-
-					// writ istream
-					if (tb_tstream_save_gg(pst, istream, 0, tb_null, tb_null) < 0) break;
-				}
-
 				// init ostream
 				if (tb_option_find(option, "more0"))
 				{

@@ -14,79 +14,79 @@
 static tb_void_t tb_whois_test_done(tb_char_t const* name)
 {
 	// init
-//	tb_handle_t gst = tb_gstream_init_from_url("sock://whois.internic.net:43");
-	tb_handle_t gst = tb_gstream_init_from_url("sock://199.7.51.74:43");
-//	tb_handle_t gst = tb_gstream_init_from_url("sock://whois.cnnic.net.cn:43");
-	tb_assert_and_check_return(gst);
+//	tb_handle_t gstream = tb_gstream_init_from_url("sock://whois.internic.net:43");
+	tb_handle_t gstream = tb_gstream_init_from_url("sock://199.7.51.74:43");
+//	tb_handle_t gstream = tb_gstream_init_from_url("sock://whois.cnnic.net.cn:43");
+	tb_assert_and_check_return(gstream);
 
 	// timeout
-	tb_stream_ctrl(gst, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+	tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
 	// data
 	tb_char_t data[251] = {0};
 
 	// open
-	if (tb_gstream_open(gst))
+	if (tb_gstream_open(gstream))
 	{
-		tb_gstream_printf(gst, "%s \r\n", name);
-		tb_gstream_bfwrit(gst, tb_null, 0);
-		tb_gstream_bread(gst, data, 250);
+		tb_gstream_printf(gstream, "%s \r\n", name);
+		tb_gstream_sync(gstream, tb_true);
+		tb_gstream_bread(gstream, data, 250);
 		tb_print("%s", data);
 	}
 
 	// exit
-	tb_gstream_exit(gst);
+	tb_gstream_exit(gstream);
 }
 static tb_bool_t tb_whois_test_no_match_com(tb_char_t const* name)
 {
 	// init
-//	tb_handle_t gst = tb_gstream_init_from_url("sock://whois.internic.net:43");
-	tb_handle_t gst = tb_gstream_init_from_url("sock://199.7.51.74:43");
-	tb_assert_and_check_return_val(gst, tb_false);
+//	tb_handle_t gstream = tb_gstream_init_from_url("sock://whois.internic.net:43");
+	tb_handle_t gstream = tb_gstream_init_from_url("sock://199.7.51.74:43");
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// timeout
-	tb_stream_ctrl(gst, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+	tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
 	// data
 	tb_char_t data[251] = {0};
 
 	// open
-	if (tb_gstream_open(gst))
+	if (tb_gstream_open(gstream))
 	{
-		tb_gstream_printf(gst, "%s \r\n", name);
-		tb_gstream_bfwrit(gst, tb_null, 0);
-		tb_gstream_bread(gst, data, 250);
+		tb_gstream_printf(gstream, "%s \r\n", name);
+		tb_gstream_sync(gstream, tb_true);
+		tb_gstream_bread(gstream, data, 250);
 		if (tb_strstr(data + 150, "No match")) return tb_true;
 	}
 
 	// exit
-	tb_gstream_exit(gst);
+	tb_gstream_exit(gstream);
 	return tb_false;
 }
 static tb_bool_t tb_whois_test_no_match_cn(tb_char_t const* name)
 {
 	// init
-//	tb_handle_t gst = tb_gstream_init_from_url("sock://whois.cnnic.net.cn:43");
-	tb_handle_t gst = tb_gstream_init_from_url("sock://218.241.97.14:43");
-	tb_assert_and_check_return_val(gst, tb_false);
+//	tb_handle_t gstream = tb_gstream_init_from_url("sock://whois.cnnic.net.cn:43");
+	tb_handle_t gstream = tb_gstream_init_from_url("sock://218.241.97.14:43");
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// timeout
-	tb_stream_ctrl(gst, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
+	tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_TIMEOUT, 1000);
 
 	// data
 	tb_char_t data[21] = {0};
 
 	// open
-	if (tb_gstream_open(gst))
+	if (tb_gstream_open(gstream))
 	{
-		tb_gstream_printf(gst, "%s \r\n", name);
-		tb_gstream_bfwrit(gst, tb_null, 0);
-		tb_gstream_bread(gst, data, 20);
+		tb_gstream_printf(gstream, "%s \r\n", name);
+		tb_gstream_sync(gstream, tb_true);
+		tb_gstream_bread(gstream, data, 20);
 		if (tb_strstr(data, "no matching")) return tb_true;
 	}
 
 	// exit
-	tb_gstream_exit(gst);
+	tb_gstream_exit(gstream);
 	return tb_false;
 }
 static tb_void_t tb_whois_test_walk_2()
@@ -199,23 +199,23 @@ static tb_void_t tb_whois_test_walk_6()
 static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 {
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(file);
-	tb_assert_and_check_return_val(gst, tb_false);
+	tb_gstream_t* gstream = tb_gstream_init_from_url(file);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// init ping
 	tb_char_t const* ping = tb_malloc0(1000 * 16);
-	tb_assert_and_check_return_val(gst, ping);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// open
 	tb_size_t n = 0;
-	if (tb_gstream_open(gst))
+	if (tb_gstream_open(gstream))
 	{
-		while (tb_gstream_bread_line(gst, &ping[n * 16], 15) > 0)
+		while (tb_gstream_bread_line(gstream, &ping[n * 16], 15) > 0)
 			n++;
 	}
 
 	// exit stream
-	tb_gstream_exit(gst);
+	tb_gstream_exit(gstream);
 
 	// walk
 	tb_size_t i = 0;
@@ -237,23 +237,23 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 {
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(file);
-	tb_assert_and_check_return_val(gst, tb_false);
+	tb_gstream_t* gstream = tb_gstream_init_from_url(file);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// init ping
 	tb_char_t const* ping = tb_malloc0(1000 * 16);
-	tb_assert_and_check_return_val(gst, ping);
+	tb_assert_and_check_return_val(gstream, tb_false);
 
 	// open
 	tb_size_t n = 0;
-	if (tb_gstream_open(gst))
+	if (tb_gstream_open(gstream))
 	{
-		while (tb_gstream_bread_line(gst, &ping[n * 16], 15) > 0)
+		while (tb_gstream_bread_line(gstream, &ping[n * 16], 15) > 0)
 			n++;
 	}
 
 	// exit stream
-	tb_gstream_exit(gst);
+	tb_gstream_exit(gstream);
 
 	// walk
 	tb_size_t i = 0;

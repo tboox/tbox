@@ -119,8 +119,8 @@ static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* stream, t
 	// writ
 	tb_bool_t ok = func(&writer, object, 0);
 
-	// flush
-	tb_gstream_bfwrit(stream, tb_null, 0);
+	// sync
+	if (ok) ok = tb_gstream_sync(stream, tb_true);
 
 	// ok
 	return ok;
@@ -191,8 +191,8 @@ static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* stream, t
 	// writ
 	if (!func(&writer, object)) goto end;
 
-	// flush
-	if (!tb_gstream_bfwrit(stream, tb_null, 0)) goto end;
+	// sync
+	if (!tb_gstream_sync(stream, tb_true)) goto end;
 
 	// ok
 	ok = tb_true;
@@ -250,8 +250,8 @@ static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* stream, t
 	// writ
 	tb_bool_t ok = func(&writer, object, 0);
 
-	// flush
-	tb_gstream_bfwrit(stream, tb_null, 0);
+	// sync
+	if (ok) ok = tb_gstream_sync(stream, tb_true);
 
 	// ok
 	return ok;
@@ -645,7 +645,7 @@ tb_object_t* tb_object_read(tb_gstream_t* stream)
 
 	// need
 	tb_byte_t* p = tb_null;
-	if (!tb_gstream_bneed(stream, &p, 5)) return tb_null;
+	if (!tb_gstream_need(stream, &p, 5)) return tb_null;
 	tb_assert_and_check_return_val(p, tb_null);
 
 	// is tbox data?
