@@ -393,7 +393,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 		if (state == TB_STREAM_STATE_CLOSED)
 		{
 			if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
-				tb_gstream_bfwrit(tstream->ostream, tb_null, 0);
+				tb_gstream_sync(tstream->ostream, tb_true);
 			else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO)
 				bend = tb_astream_sync(tstream->ostream, tb_true, tb_tstream_ostream_sync_func, tstream)? tb_false : tb_true;
 		}
@@ -671,8 +671,8 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 
 	} while(1);
 
-	// flush the ostream
-	if (!tb_gstream_bfwrit(ostream, tb_null, 0)) return -1;
+	// sync the ostream
+	if (!tb_gstream_sync(ostream, tb_true)) return -1;
 
 	// has func?
 	if (func) 

@@ -147,14 +147,14 @@ static tb_void_t tb_gstream_filter_exit(tb_handle_t gstream)
 	fstream->filter = tb_null;
 	fstream->bref = tb_false;
 }
-static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
 	tb_assert_and_check_return_val(fstream && fstream->gstream, -1);
 
 	// read 
-	tb_long_t real = sync? tb_gstream_afread(fstream->gstream, data, size) : tb_gstream_aread(fstream->gstream, data, size);
+	tb_long_t real = tb_gstream_aread(fstream->gstream, data, size);
 
 	// done filter
 	if (fstream->filter)
@@ -177,7 +177,7 @@ static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb
 
 		// spak data
 		tb_byte_t const* odata = tb_null;
-		if (real) real = tb_filter_spak(fstream->filter, data, real < 0? 0 : real, &odata, size, (real < 0)? -1 : (sync? 1 : 0));
+		if (real) real = tb_filter_spak(fstream->filter, data, real < 0? 0 : real, &odata, size, (real < 0)? -1 : 0);
 		// no data? try to sync it
 		else real = tb_filter_spak(fstream->filter, tb_null, 0, &odata, size, 1);
 
@@ -191,7 +191,7 @@ static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb
 	// ok? 
 	return real;
 }
-static tb_long_t tb_gstream_filter_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_filter_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
@@ -207,7 +207,7 @@ static tb_long_t tb_gstream_filter_writ(tb_handle_t gstream, tb_byte_t const* da
 		tb_assert_and_check_return_val(fstream->mode == -1, -1);
 
 		// spak data
-		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, size, sync? 1 : 0);
+		tb_long_t real = tb_filter_spak(fstream->filter, data, size, &data, size, 0);
 		tb_assert_and_check_return_val(real >= 0, -1);
 
 		// no data?
@@ -218,7 +218,34 @@ static tb_long_t tb_gstream_filter_writ(tb_handle_t gstream, tb_byte_t const* da
 	}
 
 	// writ 
-	return sync? tb_gstream_afwrit(fstream->gstream, data, size) : tb_gstream_awrit(fstream->gstream, data, size);
+	return tb_gstream_awrit(fstream->gstream, data, size);
+}
+static tb_bool_t tb_gstream_filter_sync(tb_handle_t gstream, tb_bool_t bclosing)
+{
+	// check
+	tb_gstream_filter_t* fstream = tb_gstream_filter_cast(gstream);
+	tb_assert_and_check_return_val(fstream && fstream->gstream, tb_false);
+
+	// done filter
+	if (fstream->filter)
+	{
+		// save mode: writ
+		if (!fstream->mode) fstream->mode = -1;
+
+		// check mode
+		tb_assert_and_check_return_val(fstream->mode == -1, tb_false);
+
+		// spak data
+		tb_byte_t const* 	data = tb_null;
+		tb_long_t 			real = -1;
+		while ((real = tb_filter_spak(fstream->filter, tb_null, 0, &data, 0, bclosing? -1 : 1)) > 0 && data)
+		{
+			if (!tb_gstream_bwrit(fstream->gstream, data, real)) return tb_false;
+		}
+	}
+
+	// writ 
+	return tb_gstream_sync(fstream->gstream, bclosing);
 }
 static tb_long_t tb_gstream_filter_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {
@@ -330,6 +357,7 @@ tb_gstream_t* tb_gstream_init_filter()
 	gstream->base.exit 		= tb_gstream_filter_exit;
 	gstream->base.read 		= tb_gstream_filter_read;
 	gstream->base.writ 		= tb_gstream_filter_writ;
+	gstream->base.sync 		= tb_gstream_filter_sync;
 	gstream->base.wait 		= tb_gstream_filter_wait;
 	gstream->base.base.ctrl = tb_gstream_filter_ctrl;
 

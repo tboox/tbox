@@ -87,7 +87,7 @@ static tb_void_t tb_gstream_http_exit(tb_handle_t gstream)
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	if (hstream && hstream->http) tb_http_exit(hstream->http);
 }
-static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);

@@ -551,8 +551,8 @@ static tb_long_t tb_http_request(tb_http_t* http)
 	// need wait if no data
 	http->step &= ~TB_HTTP_STEP_NEVT;
 
-	// flush writed data
-	tb_long_t r = tb_gstream_afwrit(http->stream, tb_null, 0);
+	// flush writed data, TODO
+	tb_long_t r = 0;//tb_gstream_afwrit(http->stream, tb_null, 0);
 
 	// continue it if has data
 	tb_check_return_val(r < 0, 0);
@@ -887,8 +887,8 @@ static tb_long_t tb_http_redirect(tb_http_t* http)
 		}
 		else
 		{
-			// flush readed data
-			tb_long_t r = tb_gstream_afread(http->stream, tb_null, 0);
+			// flush readed data, TODO
+			tb_long_t r = 0;//tb_gstream_afread(http->stream, tb_null, 0);
 
 			// continue it if has data
 			tb_check_return_val(r < 0, 0);
@@ -1117,6 +1117,7 @@ tb_long_t tb_http_wait(tb_handle_t handle, tb_size_t aioe, tb_long_t timeout)
 	// ok?
 	return ok;
 }
+tb_long_t tb_http_aopen(tb_handle_t handle);
 tb_long_t tb_http_aopen(tb_handle_t handle)
 {
 	// check
@@ -1167,6 +1168,7 @@ tb_bool_t tb_http_open(tb_handle_t handle)
 	// ok?
 	return r > 0? tb_true : tb_false;
 }
+tb_long_t tb_http_aclos(tb_handle_t handle);
 tb_long_t tb_http_aclos(tb_handle_t handle)
 {
 	// check
@@ -1245,6 +1247,7 @@ tb_bool_t tb_http_clos(tb_handle_t handle)
 	// ok?
 	return r > 0? tb_true : tb_false;
 }
+tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset);
 tb_long_t tb_http_aseek(tb_handle_t handle, tb_hize_t offset)
 {
 	// check

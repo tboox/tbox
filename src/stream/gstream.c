@@ -42,99 +42,57 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_long_t tb_gstream_cache_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
-{
-	tb_long_t need = 0;
-
-	// enough?
-	if (size <= tb_qbuffer_size(&gstream->cache)) 
-	{
-		need = size;
-		goto end;
-	}
-
-	// enter cache for push
-	tb_size_t 	push = 0;
-	tb_byte_t* 	tail = tb_qbuffer_push_init(&gstream->cache, &push);
-	tb_assert_and_check_return_val(tail && push > 0, -1);
-	tb_assert_and_check_return_val(size <= push, -1);
-
-	// fill cache
-	tb_assert(gstream->read);
-	if (need < size)
-	{
-		// read data
-		tb_long_t real = gstream->read(gstream, tail + need, push - need, tb_false);
-		tb_check_return_val(real >= 0, -1);
-
-		// update need
-		need += real;
-	}
-	
-	// leave cache for push
-	tb_qbuffer_push_exit(&gstream->cache, need);
-
-end:
-
-	// update status
-	gstream->bwrited = 0;
-
-	// too much?
-	if (need > size) need = size;
-
-	// ok
-	if (need > 0) *data = tb_qbuffer_head(&gstream->cache);
-
-//	tb_trace_impl("need: %u size: %u", need, size);
-	return need;
-}
 static tb_long_t tb_gstream_cache_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
 {
+	// done
 	tb_long_t read = 0;
-	if (gstream->bcached)
+	do
 	{
-		// read data from cache first
-		read = tb_qbuffer_read(&gstream->cache, data, size);
-		tb_check_return_val(read >= 0, -1);
-
-		// empty? full it from stream
-		tb_check_goto(!read, end);
-
-		// cache is null now.
-		tb_assert_and_check_return_val(tb_qbuffer_null(&gstream->cache), -1);
-
-		// enter cache for push
-		tb_size_t 	push = 0;
-		tb_byte_t* 	tail = tb_qbuffer_push_init(&gstream->cache, &push);
-		tb_assert_and_check_return_val(tail && push, -1);
-
-		// push data to cache from stream
-		tb_assert(gstream->read);
-		tb_long_t 	real = gstream->read(gstream, tail, push, tb_false);
-		tb_check_return_val(real >= 0, -1);
-
-		// read the left data from cache
-		if (real > 0) 
+		if (gstream->bcached)
 		{
-			// leave cache for push
-			tb_qbuffer_push_exit(&gstream->cache, real);
+			// read data from cache first
+			read = tb_qbuffer_read(&gstream->cache, data, size);
+			tb_check_return_val(read >= 0, -1);
 
-			// read cache
-			real = tb_qbuffer_read(&gstream->cache, data + read, tb_min(real, size - read));
+			// empty? full it from stream
+			tb_check_break(!read);
+
+			// cache is null now.
+			tb_assert_and_check_return_val(tb_qbuffer_null(&gstream->cache), -1);
+
+			// enter cache for push
+			tb_size_t 	push = 0;
+			tb_byte_t* 	tail = tb_qbuffer_push_init(&gstream->cache, &push);
+			tb_assert_and_check_return_val(tail && push, -1);
+
+			// push data to cache from stream
+			tb_assert(gstream->read);
+			tb_long_t 	real = gstream->read(gstream, tail, push);
 			tb_check_return_val(real >= 0, -1);
 
-			// update read 
-			read += real;
+			// read the left data from cache
+			if (real > 0) 
+			{
+				// leave cache for push
+				tb_qbuffer_push_exit(&gstream->cache, real);
+
+				// read cache
+				real = tb_qbuffer_read(&gstream->cache, data + read, tb_min(real, size - read));
+				tb_check_return_val(real >= 0, -1);
+
+				// update read 
+				read += real;
+			}
+		}
+		else 
+		{
+			// read it directly
+			read = gstream->read(gstream, data, size);
+			tb_check_return_val(read >= 0, -1);
 		}
 	}
-	else 
-	{
-		// read it directly
-		read = gstream->read(gstream, data, size, tb_false);
-		tb_check_return_val(read >= 0, -1);
-	}
+	while (0);
 
-end:
 	// update offset
 	gstream->offset += read;
 
@@ -146,51 +104,55 @@ end:
 }
 static tb_long_t tb_gstream_cache_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
 {
+	// done
 	tb_long_t writ = 0;
-	if (gstream->bcached)
+	do
 	{
-		// writ data to cache first
-		writ = tb_qbuffer_writ(&gstream->cache, data, size);
-		tb_check_return_val(writ >= 0, -1);
-		
-		// full? writ data to stream from cache
-		tb_check_goto(!writ, end);
-
-		// cache is full now.
-		tb_assert_and_check_return_val(tb_qbuffer_full(&gstream->cache), -1);
-
-		// enter cache for pull
-		tb_size_t 	pull = 0;
-		tb_byte_t* 	head = tb_qbuffer_pull_init(&gstream->cache, &pull);
-		tb_assert_and_check_return_val(head && pull, -1);
-
-		// pull data to stream from cache
-		tb_assert(gstream->writ);
-		tb_long_t 	real = gstream->writ(gstream, head, pull, tb_false);
-		tb_check_return_val(real >= 0, -1);
-
-		// writ the left data to cache
-		if (real > 0)
+		if (gstream->bcached)
 		{
-			// leave cache for pull
-			tb_qbuffer_pull_exit(&gstream->cache, real);
+			// writ data to cache first
+			writ = tb_qbuffer_writ(&gstream->cache, data, size);
+			tb_check_return_val(writ >= 0, -1);
+			
+			// full? writ data to stream from cache
+			tb_check_break(!writ);
 
-			// writ cache
-			real = tb_qbuffer_writ(&gstream->cache, data + writ, tb_min(real, size - writ));
+			// cache is full now.
+			tb_assert_and_check_return_val(tb_qbuffer_full(&gstream->cache), -1);
+
+			// enter cache for pull
+			tb_size_t 	pull = 0;
+			tb_byte_t* 	head = tb_qbuffer_pull_init(&gstream->cache, &pull);
+			tb_assert_and_check_return_val(head && pull, -1);
+
+			// pull data to stream from cache
+			tb_assert(gstream->writ);
+			tb_long_t 	real = gstream->writ(gstream, head, pull);
 			tb_check_return_val(real >= 0, -1);
 
-			// update writ 
-			writ += real;
-		}
-	}
-	else 
-	{
-		// writ it directly
-		writ = gstream->writ(gstream, data, size, tb_false);
-		tb_check_return_val(writ >= 0, -1);
-	}
+			// writ the left data to cache
+			if (real > 0)
+			{
+				// leave cache for pull
+				tb_qbuffer_pull_exit(&gstream->cache, real);
 
-end:
+				// writ cache
+				real = tb_qbuffer_writ(&gstream->cache, data + writ, tb_min(real, size - writ));
+				tb_check_return_val(real >= 0, -1);
+
+				// update writ 
+				writ += real;
+			}
+		}
+		else 
+		{
+			// writ it directly
+			writ = gstream->writ(gstream, data, size);
+			tb_check_return_val(writ >= 0, -1);
+		}
+
+	} while (0);
+
 	// update offset
 	gstream->offset += writ;
 
@@ -200,32 +162,11 @@ end:
 //	tb_trace_impl("writ: %d", writ);
 	return writ;
 }
-static tb_long_t tb_gstream_cache_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+static tb_bool_t tb_gstream_cache_sync(tb_gstream_t* gstream, tb_bool_t bclosing)
 {
-	// init
-	tb_long_t r = 1;
-
-	// has data?
-	if (data && size)
-	{
-		// read data from cache first
-		r = tb_gstream_cache_aread(gstream, data, size);
-		tb_check_return_val(r <= 0, r);
-	}
-	else
-	{
-		// clear cache
-		tb_qbuffer_clear(&gstream->cache);
-	}
-
-	// flush read data
-	r = gstream->read(gstream, data, size, tb_true);
-
-	// ok?
-	return r;
-}
-static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
-{
+	// TODO: gstream->bcached
+	return tb_false;
+#if 0
 	// init 
 	tb_long_t r = -1;
 
@@ -238,7 +179,7 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gstream, tb_byte_t const*
 		tb_assert_and_check_return_val(head && pull, -1);
 
 		// writ data to stream
-		tb_long_t 	writ = gstream->writ(gstream, head, pull, tb_false);
+		tb_long_t 	writ = gstream->writ(gstream, head, pull);
 		tb_check_goto(writ >= 0, end);
 		tb_assert_and_check_return_val(writ <= pull, -1);
 
@@ -250,7 +191,7 @@ static tb_long_t tb_gstream_cache_afwrit(tb_gstream_t* gstream, tb_byte_t const*
 	if (tb_qbuffer_null(&gstream->cache))
 	{
 		// flush writ data
-		r = gstream->writ(gstream, data, size, tb_true);
+		r = gstream->writ(gstream, data, size);
 	}
 	else 
 	{
@@ -264,11 +205,12 @@ end:
 
 	// ok?
 	return r;
+#endif
 }
 static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
 {
 	// flush writed data first
-	if (gstream->bwrited && !tb_gstream_bfwrit(gstream, tb_null, 0)) return tb_false;
+	if (gstream->bwrited && !tb_gstream_sync(gstream, tb_false)) return tb_false;
 
 	// cached?
 	if (gstream->bcached)
@@ -303,6 +245,57 @@ static tb_bool_t tb_gstream_cache_seek(tb_gstream_t* gstream, tb_hize_t offset)
 		gstream->offset = offset;
 	}
 	return ok;
+}
+static tb_bool_t tb_gstream_cache_need(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
+{
+	// TODO: gstream->bcached
+	return tb_false;
+#if 0
+	// enough?
+	if (size <= tb_qbuffer_size(&gstream->cache)) 
+	{
+		// update status
+		gstream->bwrited = 0;
+
+		// save data
+		*data = tb_qbuffer_head(&gstream->cache);
+
+		// ok
+		return size;
+	}
+
+	// enter cache for push
+	tb_size_t 	push = 0;
+	tb_byte_t* 	tail = tb_qbuffer_push_init(&gstream->cache, &push);
+	tb_assert_and_check_return_val(tail && push && size <= push, tb_false); // size <= push?
+
+	// fill cache
+	if (need < size)
+	{
+		// read data
+		tb_long_t real = gstream->read(gstream, tail + need, push - need, tb_false);
+		tb_check_return_val(real >= 0, -1);
+
+		// update need
+		need += real;
+	}
+	
+	// leave cache for push
+	tb_qbuffer_push_exit(&gstream->cache, need);
+
+	// update status
+	gstream->bwrited = 0;
+
+	// too much?
+	if (need > size) need = size;
+
+	// save data
+	if (need > 0) *data = tb_qbuffer_head(&gstream->cache);
+
+	// ok?
+//	tb_trace_impl("need: %u size: %u", need, size);
+	return need;
+#endif
 }
 static tb_long_t tb_gstream_cache_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout)
 {
@@ -467,6 +460,11 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gstream)
 	// ok?
 	return ok;
 }
+tb_void_t tb_gstream_kill(tb_gstream_t* gstream)
+{
+	// TODO
+	tb_trace_noimpl();
+}
 tb_bool_t tb_gstream_clos(tb_gstream_t* gstream)
 {
 	// check stream
@@ -476,7 +474,7 @@ tb_bool_t tb_gstream_clos(tb_gstream_t* gstream)
 	tb_check_return_val(tb_stream_is_opened(gstream), tb_true);
 
 	// flush writed data first
-	if (gstream->bwrited && !tb_gstream_bfwrit(gstream, tb_null, 0)) return tb_false;
+	if (gstream->bwrited && !tb_gstream_sync(gstream, tb_true)) return tb_false;
 
 	// has close?
 	if (gstream->clos && !gstream->clos(gstream)) return tb_false;
@@ -493,54 +491,22 @@ tb_bool_t tb_gstream_clos(tb_gstream_t* gstream)
 	// ok
 	return tb_true;
 }
-tb_long_t tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
+tb_bool_t tb_gstream_need(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
 {
 	// check data
-	tb_assert_and_check_return_val(data && size, -1);
+	tb_assert_and_check_return_val(data && size, tb_false);
 
 	// check stream
-	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->read, -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream) && gstream->read, tb_false);
 
 	// check cache
-	tb_assert_and_check_return_val(gstream->bcached && tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(gstream->bcached && tb_qbuffer_maxn(&gstream->cache), tb_false);
 
 	// the cache is writed-cache now, need call afwrit or bfwrit first.
-	tb_assert_and_check_return_val(!gstream->bwrited || tb_qbuffer_null(&gstream->cache), -1); 
+	tb_assert_and_check_return_val(!gstream->bwrited || tb_qbuffer_null(&gstream->cache), tb_false); 
 
 	// need data from cache
-	return tb_gstream_cache_aneed(gstream, data, size);
-}
-tb_bool_t tb_gstream_bneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size)
-{
-	// check data
-	tb_assert_and_check_return_val(gstream && data, tb_false);
-
-	// need data from cache
-	tb_long_t prev = 0;
-	tb_long_t need = 0;
-	while ((need = tb_gstream_aneed(gstream, data, size)) < size)
-	{
-		// error?
-		tb_check_break(need >= 0 && need >= prev);
-		
-		// no data?
-		if (!(need - prev))
-		{
-			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
-			tb_assert_and_check_break(e >= 0);
-
-			// timeout?
-			tb_check_break(e);
-
-			// has read?
-			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
-		}
-		else prev = need;
-	}
-
-	// ok?
-	return (need == size? tb_true : tb_false);
+	return tb_gstream_cache_need(gstream, data, size);
 }
 tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
 {
@@ -645,146 +611,20 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 	// ok?
 	return (writ == size? tb_true : tb_false);
 }
-
-tb_long_t tb_gstream_afread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
+tb_bool_t tb_gstream_sync(tb_gstream_t* gstream, tb_bool_t bclosing)
 {
 	// check stream
-	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
+	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), tb_false);
 
 	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
-
-	// the cache is writed-cache now, need call afwrit or bfwrit first.
-	tb_assert_and_check_return_val(!gstream->bwrited || tb_qbuffer_null(&gstream->cache), -1); 
-
-	// flush it
-	return tb_gstream_cache_afread(gstream, data, size);
-}
-tb_long_t tb_gstream_afwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
-{
-	// check stream
-	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), -1);
-
-	// check cache
-	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), -1);
+	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->cache), tb_false);
 
 	// the cache is readed-cache now, need call afread or bfread first.
-	tb_assert_and_check_return_val(gstream->bwrited || tb_qbuffer_null(&gstream->cache), -1); 
+	tb_assert_and_check_return_val(gstream->bwrited || tb_qbuffer_null(&gstream->cache), tb_false); 
 
-	// flush it
-	return tb_gstream_cache_afwrit(gstream, data, size);
+	// sync it
+	return tb_gstream_cache_sync(gstream, bclosing);
 }
-tb_bool_t tb_gstream_bfread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
-{
-	// check data
-	tb_assert_and_check_return_val(gstream, tb_false);
-
-	// has data
-	if (data && size)
-	{
-		tb_long_t read = 0;
-		while (read < size)
-		{
-			// read data
-			tb_long_t real = tb_gstream_afread(gstream, data + read, size - read);	
-			// has data?
-			if (real > 0) read += real;
-			// no data?
-			else if (!real)
-			{
-				// wait
-				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
-				tb_assert_and_check_break(e >= 0);
-
-				// timeout?
-				tb_check_break(e);
-
-				// has read?
-				tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
-			}
-			else break;
-		}
-
-		// ok?
-		return (read == size? tb_true : tb_false);
-	}
-	// only flush the cache data
-	else
-	{
-		while (!tb_gstream_afread(gstream, tb_null, 0))
-		{
-			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_READ, tb_stream_timeout(gstream));
-			tb_assert_and_check_break(e >= 0);
-
-			// timeout?
-			tb_check_break(e);
-
-			// has read?
-			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_READ);
-		}
-	}
-
-	// ok
-	return tb_true;
-}
-tb_bool_t tb_gstream_bfwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
-{
-	// check data
-	tb_assert_and_check_return_val(gstream, tb_false);
-
-	// has data
-	if (data && size)
-	{
-		// writ data to cache
-		tb_long_t writ = 0;
-		while (writ < size)
-		{
-			// writ data
-			tb_long_t real = tb_gstream_afwrit(gstream, data + writ, size - writ);	
-
-			// has data?
-			if (real > 0) writ += real;
-			// no data?
-			else if (!real)
-			{
-				// wait
-				tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, tb_stream_timeout(gstream));
-				tb_assert_and_check_break(e >= 0);
-
-				// timeout?
-				tb_check_break(e);
-
-				// has writ?
-				tb_assert_and_check_break(e & TB_GSTREAM_WAIT_WRIT);
-			}
-			else break;
-		}
-
-		// ok?
-		return (writ == size? tb_true : tb_false);
-	}
-	// only flush the cache data
-	else
-	{
-		while (!tb_gstream_afwrit(gstream, tb_null, 0))
-		{
-			// wait
-			tb_long_t e = tb_gstream_wait(gstream, TB_GSTREAM_WAIT_WRIT, tb_stream_timeout(gstream));
-			tb_assert_and_check_break(e >= 0);
-
-			// timeout?
-			tb_check_break(e);
-
-			// has writ?
-			tb_assert_and_check_break(e & TB_GSTREAM_WAIT_WRIT);
-		}
-	}
-
-	// ok
-	return tb_true;
-}
-
 tb_long_t tb_gstream_bread_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_t size)
 {
 	tb_char_t 	ch = 0;

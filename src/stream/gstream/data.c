@@ -100,7 +100,7 @@ static tb_void_t tb_gstream_data_exit(tb_handle_t gstream)
 	dstream->data = tb_null;
 	dstream->size = 0;
 }
-static tb_long_t tb_gstream_data_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_data_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
@@ -125,7 +125,7 @@ static tb_long_t tb_gstream_data_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	// ok?
 	return (tb_long_t)(size);
 }
-static tb_long_t tb_gstream_data_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync)
+static tb_long_t tb_gstream_data_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_gstream_data_t* dstream = tb_gstream_data_cast(gstream);
