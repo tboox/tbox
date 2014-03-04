@@ -11,7 +11,7 @@ tb_int_t tb_demo_xml_writer_main(tb_int_t argc, tb_char_t** argv)
 	// init stream
 	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
 	tb_stream_ctrl(gst, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-	if (gst && tb_gstream_bopen(gst))
+	if (gst && tb_gstream_open(gst))
 	{
 		tb_handle_t writer = tb_xml_writer_init(gst, tb_true);
 		if (writer)

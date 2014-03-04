@@ -75,7 +75,7 @@ tb_int_t tb_demo_network_http_main(tb_int_t argc, tb_char_t** argv)
 
 	// open http
 	tb_hong_t t = tb_mclock();
-	if (!tb_http_bopen(http)) goto end;
+	if (!tb_http_open(http)) goto end;
 	t = tb_mclock() - t;
 	tb_print("open: %llu ms", t);
 

@@ -111,7 +111,7 @@ tb_bool_t tb_printf_reset(tb_size_t mode, tb_char_t const* path)
 					tb_stream_ctrl(g_printf.file, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
 			
 				// open 
-				if (!tb_gstream_bopen(g_printf.file))
+				if (!tb_gstream_open(g_printf.file))
 				{
 					tb_gstream_exit(g_printf.file);
 					g_printf.file = tb_null;

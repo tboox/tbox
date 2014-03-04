@@ -43,7 +43,7 @@ tb_void_t tb_dump_data(tb_byte_t const* data, tb_size_t size)
 	if (gst)
 	{
 		// open stream
-		if (tb_gstream_bopen(gst))
+		if (tb_gstream_open(gst))
 		{
 			// dump stream
 			tb_dump_data_from_stream(gst);
@@ -63,7 +63,7 @@ tb_void_t tb_dump_data_from_url(tb_char_t const* url)
 	if (gst)
 	{
 		// open stream
-		if (tb_gstream_bopen(gst))
+		if (tb_gstream_open(gst))
 		{
 			// dump stream
 			tb_dump_data_from_stream(gst);

@@ -51,7 +51,7 @@ tb_bool_t tb_dns_init()
 		if (gst)
 		{
 			// open
-			if (tb_gstream_bopen(gst)) 
+			if (tb_gstream_open(gst)) 
 			{
 				// read
 				tb_long_t size = 0;

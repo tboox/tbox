@@ -67,45 +67,41 @@ static __tb_inline__ tb_gstream_file_t* tb_gstream_file_cast(tb_handle_t stream)
 	tb_assert_and_check_return_val(gstream && gstream->base.type == TB_STREAM_TYPE_FILE, tb_null);
 	return (tb_gstream_file_t*)gstream;
 }
-static tb_long_t tb_gstream_file_open(tb_handle_t gstream)
+static tb_bool_t tb_gstream_file_open(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
-	tb_assert_and_check_return_val(fstream && !fstream->file, -1);
+	tb_assert_and_check_return_val(fstream && !fstream->file, tb_false);
 
-	// no reference?
-	tb_check_return_val(!(fstream->file && fstream->bref), 1);
+	// opened?
+	tb_check_return_val(!fstream->file, tb_true);
 
 	// url
 	tb_char_t const* url = tb_url_get(&fstream->base.base.url);
-	tb_assert_and_check_return_val(url, -1);
+	tb_assert_and_check_return_val(url, tb_false);
 
 	// open file
 	fstream->file = tb_file_init(url, fstream->mode);
-	tb_assert_and_check_return_val(fstream->file, -1);
+	tb_assert_and_check_return_val(fstream->file, tb_false);
 
 	// ok
-	return 1;
+	return tb_true;
 }
-static tb_long_t tb_gstream_file_clos(tb_handle_t gstream)
+static tb_bool_t tb_gstream_file_clos(tb_handle_t gstream)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
-	tb_assert_and_check_return_val(fstream, -1);
+	tb_assert_and_check_return_val(fstream, tb_false);
 
-	// has file?
-	if (fstream->file)
+	// exit file
+	if (!fstream->bref)
 	{
-		// exit file
-		if (!fstream->bref) if (!tb_file_exit(fstream->file)) return 0;
-
-		// reset
+		if (fstream->file && !tb_file_exit(fstream->file)) return tb_false;
 		fstream->file = tb_null;
-		fstream->bref = 0;
 	}
 
 	// ok
-	return 1;
+	return tb_true;
 }
 static tb_long_t tb_gstream_file_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync)
 {
@@ -143,14 +139,14 @@ end:
 	// end?
 	return -1;
 }
-static tb_long_t tb_gstream_file_seek(tb_handle_t gstream, tb_hize_t offset)
+static tb_bool_t tb_gstream_file_seek(tb_handle_t gstream, tb_hize_t offset)
 {
 	// check
 	tb_gstream_file_t* fstream = tb_gstream_file_cast(gstream);
-	tb_assert_and_check_return_val(fstream && fstream->file, -1);
+	tb_assert_and_check_return_val(fstream && fstream->file, tb_false);
 
 	// seek
-	return (tb_file_seek(fstream->file, offset, TB_FILE_SEEK_BEG) == offset)? 1 : -1;
+	return (tb_file_seek(fstream->file, offset, TB_FILE_SEEK_BEG) == offset)? tb_true : tb_false;
 }
 static tb_long_t tb_gstream_file_wait(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout)
 {

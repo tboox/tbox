@@ -14,7 +14,7 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
 	// init stream
 	tb_gstream_t* istream = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ostream = tb_gstream_init_from_file(argv[2], TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-	if (istream && ostream && tb_gstream_bopen(istream) && tb_gstream_bopen(ostream))
+	if (istream && ostream && tb_gstream_open(istream) && tb_gstream_open(ostream))
 	{
 		// init data & size
 		tb_hong_t isize = tb_stream_size(istream);

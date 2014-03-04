@@ -651,7 +651,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_bskip(gst, data_size)) goto end;
+					if (!tb_gstream_skip(gst, data_size)) goto end;
 				}
 			}
 			break; 
@@ -671,7 +671,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						tb_trace_impl("skip this audio tag");
 						if (data_size > 2)
 						{
-							if (!tb_gstream_bskip(gst, data_size - 2)) goto end;
+							if (!tb_gstream_skip(gst, data_size - 2)) goto end;
 						}
 						break;
 					}
@@ -744,7 +744,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						// skip this tag	
 						if (data_size > 2)
 						{
-							if (!tb_gstream_bskip(gst, data_size - 2)) goto end;
+							if (!tb_gstream_skip(gst, data_size - 2)) goto end;
 						}
 						break;
 					}
@@ -752,7 +752,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_bskip(gst, data_size)) goto end;
+					if (!tb_gstream_skip(gst, data_size)) goto end;
 				}
 			}
 			break;
@@ -772,7 +772,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						tb_trace_impl("skip this video tag");
 						if (data_size > 5)
 						{
-							if (!tb_gstream_bskip(gst, data_size - 5)) goto end;
+							if (!tb_gstream_skip(gst, data_size - 5)) goto end;
 						}
 						break;
 					}
@@ -848,7 +848,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						// skip this tag
 						if (data_size > 5)
 						{
-							if (!tb_gstream_bskip(gst, data_size - 5)) goto end;
+							if (!tb_gstream_skip(gst, data_size - 5)) goto end;
 						}
 						break;
 					}
@@ -856,14 +856,14 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_bskip(gst, data_size)) goto end;
+					if (!tb_gstream_skip(gst, data_size)) goto end;
 				}
 			}
 			break;
 		default:
 			{
 				// skip it
-				if (!tb_gstream_bskip(gst, data_size)) goto end;
+				if (!tb_gstream_skip(gst, data_size)) goto end;
 				break;
 			}
 		}

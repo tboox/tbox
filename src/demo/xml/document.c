@@ -12,7 +12,7 @@ tb_int_t tb_demo_xml_document_main(tb_int_t argc, tb_char_t** argv)
 	tb_gstream_t* ist = tb_gstream_init_from_url(argv[1]);
 	tb_gstream_t* ost = tb_gstream_init_from_url(argv[2]);
 	if (ost) tb_stream_ctrl(ost, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-	if (ist && ost && tb_gstream_bopen(ist) && tb_gstream_bopen(ost))
+	if (ist && ost && tb_gstream_open(ist) && tb_gstream_open(ost))
 	{
 		// init reader & writer
 		tb_handle_t reader = tb_xml_reader_init(ist);

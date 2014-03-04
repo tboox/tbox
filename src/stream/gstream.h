@@ -120,10 +120,10 @@ typedef struct __tb_gstream_t
 	tb_long_t 			(*wait)(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout);
 
 	/// open
-	tb_long_t 			(*open)(tb_handle_t gstream);
+	tb_bool_t 			(*open)(tb_handle_t gstream);
 
 	/// clos
-	tb_long_t 			(*clos)(tb_handle_t gstream);
+	tb_bool_t 			(*clos)(tb_handle_t gstream);
 
 	/// read
 	tb_long_t 			(*read)(tb_handle_t gstream, tb_byte_t* data, tb_size_t size, tb_bool_t sync);
@@ -132,7 +132,7 @@ typedef struct __tb_gstream_t
 	tb_long_t 			(*writ)(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size, tb_bool_t sync);
 
 	/// seek
-	tb_long_t 			(*seek)(tb_handle_t gstream, tb_hize_t offset);
+	tb_bool_t 			(*seek)(tb_handle_t gstream, tb_hize_t offset);
 
 	/// exit
 	tb_void_t 			(*exit)(tb_handle_t gstream);
@@ -312,37 +312,21 @@ tb_size_t 			tb_gstream_state(tb_gstream_t* gstream);
  */
 tb_bool_t 			tb_gstream_beof(tb_gstream_t* gstream);
 
-/*! async open, allow multiple called before closing 
- *
- * @param gstream 	the stream
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_aopen(tb_gstream_t* gstream);
-
-/*! block open, allow multiple called before closing 
+/*! open stream
  *
  * @param gstream 	the stream
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bopen(tb_gstream_t* gstream);
+tb_bool_t 			tb_gstream_open(tb_gstream_t* gstream);
 
-/*! async close, allow multiple called
- *
- * @param gstream 	the stream
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_aclos(tb_gstream_t* gstream);
-
-/*! block close, allow multiple called
+/*! close stream
  *
  * @param gstream 	the stream
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bclos(tb_gstream_t* gstream);
+tb_bool_t 			tb_gstream_clos(tb_gstream_t* gstream);
 
 /*! async read
  *
@@ -444,41 +428,23 @@ tb_long_t 			tb_gstream_aneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t
  */
 tb_bool_t 			tb_gstream_bneed(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t size);
 
-/*! async seek
- *
- * @param gstream 	the stream
- * @param offset 	the offset
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_aseek(tb_gstream_t* gstream, tb_hize_t offset);
-
-/*! block seek
+/*! seek stream
  *
  * @param gstream 	the stream
  * @param offset 	the offset
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bseek(tb_gstream_t* gstream, tb_hize_t offset);
+tb_bool_t 			tb_gstream_seek(tb_gstream_t* gstream, tb_hize_t offset);
 
-/*! async skip
- *
- * @param gstream 	the stream
- * @param size 		the size
- *
- * @return 			ok: 1, continue: 0, failed: -1
- */
-tb_long_t 			tb_gstream_askip(tb_gstream_t* gstream, tb_hize_t size);
-
-/*! block skip
+/*! skip stream
  *
  * @param gstream 	the stream
  * @param size 		the size
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_gstream_bskip(tb_gstream_t* gstream, tb_hize_t size);
+tb_bool_t 			tb_gstream_skip(tb_gstream_t* gstream, tb_hize_t size);
 
 /*! block writ format data
  *

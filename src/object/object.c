@@ -448,7 +448,7 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 		tb_assert_and_check_break(stream);
 
 		// open stream
-		if (tb_gstream_bopen(stream))
+		if (tb_gstream_open(stream))
 		{
 			// writ object
 			if (tb_object_writ(object, stream, format))
@@ -670,7 +670,7 @@ tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return_val(stream, tb_null);
 
 	// read object
-	if (tb_gstream_bopen(stream)) object = tb_object_read(stream);
+	if (tb_gstream_open(stream)) object = tb_object_read(stream);
 
 	// exit stream
 	tb_gstream_exit(stream);
@@ -691,7 +691,7 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 	tb_assert_and_check_return_val(stream, tb_null);
 
 	// read object
-	if (tb_gstream_bopen(stream)) object = tb_object_read(stream);
+	if (tb_gstream_open(stream)) object = tb_object_read(stream);
 
 	// exit stream
 	tb_gstream_exit(stream);
@@ -734,7 +734,7 @@ tb_bool_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_si
 	{
 		if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
 			tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-		if (tb_gstream_bopen(stream))
+		if (tb_gstream_open(stream))
 		{
 			if (tb_object_writ(object, stream, format)) ok = tb_true;
 		}

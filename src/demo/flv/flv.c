@@ -229,7 +229,7 @@ tb_int_t tb_demo_flv_main(tb_int_t argc, tb_char_t** argv)
 	tb_assert_and_check_goto(gst, end);
 	
 	// open stream
-	if (!tb_gstream_bopen(gst)) goto end;
+	if (!tb_gstream_open(gst)) goto end;
 	
 	// init decoder
 	tb_handle_t hflv = tb_flv_init(gst);
