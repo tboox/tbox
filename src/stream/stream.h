@@ -38,7 +38,7 @@
  *
  *
  * <pre>   
- *                                                                 wait - poll
+ *                                                                  wait - loop
  *                                                                   | 
  *                                                                   |                                          - data
  *                                                                 [aioo]                                       |
@@ -57,11 +57,11 @@
  *                                            |              |
  *                                            |              |
  *                                            |              |
- *                                            |              |
- *                                            |              |
- *                                            |              |      aicp - loop
- *                                            |              |       |
- *                                            |              |       |                                           - data
+ *                                            |              |            - loop
+ *                                            |              |     [asio] |
+ *                                            |              |      aicp -| loop
+ *                                            |              |       |    |
+ *                                            |              |       |    - ...                                  - data
  *                                            |              |     [aico]                                        |
  *                                            |              ----- astream ------------- astream ----------------- file
  *                                            |                                  |                               |
