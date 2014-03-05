@@ -41,7 +41,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
 	// percent
 	tb_size_t percent = 0;
 	if (size > 0) percent = (offset * 100) / size;
-	else if (state == TB_STREAM_STATE_OK) percent = 100;
+	else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
 
 	// trace
 	tb_print("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
@@ -61,7 +61,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb
 		// percent
 		tb_size_t percent = 0;
 		if (size > 0) percent = (offset * 100) / size;
-		else if (state == TB_STREAM_STATE_OK) percent = 100;
+		else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
 
 		// trace
 		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %llu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
@@ -173,6 +173,7 @@ static tb_option_item_t g_options[] =
 	{'-', 	"gzip", 		TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"enable gzip" 				}
 ,	{'-', 	"no-verbose", 	TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"disable verbose info" 	 	}
 ,	{'d', 	"debug", 		TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"enable debug info" 	 	}
+,	{'k', 	"keep-alive", 	TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"keep alive" 				}
 ,	{'h', 	"header", 		TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"the custem http header" 	}
 ,	{'-', 	"post-data", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post data" 		}
 ,	{'-', 	"post-file", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post file" 		}
@@ -301,6 +302,12 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 						// exit 
 						tb_pstring_exit(&key);
 						tb_pstring_exit(&val);
+					}
+
+					// keep alive?
+					if (tb_option_find(context.option, "keep-alive"))
+					{
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, "Connection", "keep-alive")) break;
 					}
 
 					// post-data?
