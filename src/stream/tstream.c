@@ -1316,11 +1316,11 @@ tb_void_t tb_tstream_kill(tb_handle_t handle)
 
 		// kill istream
 		if (tstream->istream && tb_stream_mode(tstream->istream) == TB_STREAM_MODE_AICO) 
-			tb_astream_kill(tstream->istream);
+			tb_stream_kill(tstream->istream);
 
 		// kill ostream
 		if (tstream->ostream && tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO) 
-			tb_astream_kill(tstream->ostream);
+			tb_stream_kill(tstream->ostream);
 	}
 }
 tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)

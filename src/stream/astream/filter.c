@@ -417,7 +417,7 @@ static tb_void_t tb_astream_filter_kill(tb_handle_t astream)
 	tb_assert_and_check_return(fstream);
 
 	// kill stream
-	if (fstream->astream) tb_astream_kill(fstream->astream);
+	if (fstream->astream) tb_stream_kill(fstream->astream);
 }
 static tb_void_t tb_astream_filter_clos(tb_handle_t astream, tb_bool_t bcalling)
 {	

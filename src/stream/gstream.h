@@ -323,12 +323,6 @@ tb_bool_t 			tb_gstream_beof(tb_gstream_t* gstream);
  */
 tb_bool_t 			tb_gstream_open(tb_gstream_t* gstream);
 
-/*! kill stream
- *
- * @param gstream 	the stream
- */
-tb_void_t 			tb_gstream_kill(tb_gstream_t* gstream);
-
 /*! close stream
  *
  * @param gstream 	the stream

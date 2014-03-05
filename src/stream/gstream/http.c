@@ -87,6 +87,11 @@ static tb_void_t tb_gstream_http_exit(tb_handle_t gstream)
 	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
 	if (hstream && hstream->http) tb_http_exit(hstream->http);
 }
+static tb_void_t tb_gstream_http_kill(tb_handle_t gstream)
+{
+	tb_gstream_http_t* hstream = tb_gstream_http_cast(gstream);
+	if (hstream && hstream->http) tb_http_kill(hstream->http);
+}
 static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check
@@ -577,6 +582,7 @@ tb_gstream_t* tb_gstream_init_http()
 	gstream->base.wait 		= tb_gstream_http_wait;
 	gstream->base.exit 		= tb_gstream_http_exit;
 	gstream->base.base.ctrl = tb_gstream_http_ctrl;
+	gstream->base.base.kill = tb_gstream_http_kill;
 	gstream->http 			= tb_http_init();
 	tb_assert_and_check_goto(gstream->http, fail);
 

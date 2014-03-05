@@ -152,7 +152,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 
 			// connect it
 			tb_long_t r = -1;
-			while (!(r = tb_socket_connect(sstream->sock, &sstream->addr, port)))
+			while (!(r = tb_socket_connect(sstream->sock, &sstream->addr, port)) && !tb_atomic_get(&sstream->base.base.bstoped))
 			{
 				r = tb_aioo_wait(sstream->sock, TB_AIOE_CODE_CONN, tb_stream_timeout(gstream));
 				tb_check_break(r > 0);
@@ -230,6 +230,15 @@ static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 	sstream->read = 0;
 	sstream->writ = 0;
 	tb_ipv4_clr(&sstream->addr);
+}
+static tb_void_t tb_gstream_sock_kill(tb_handle_t gstream)
+{
+	// check
+	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
+	tb_assert_and_check_return(sstream);
+
+	// kill it
+	if (sstream->sock) tb_socket_kill(sstream->sock, TB_SOCKET_KILL_RW);
 }
 static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_size_t size)
 {
@@ -473,6 +482,7 @@ tb_gstream_t* tb_gstream_init_sock()
 	gstream->base.writ 		= tb_gstream_sock_writ;
 	gstream->base.wait 		= tb_gstream_sock_wait;
 	gstream->base.base.ctrl = tb_gstream_sock_ctrl;
+	gstream->base.base.kill	= tb_gstream_sock_kill;
 	gstream->sock 			= tb_null;
 	gstream->type 			= TB_SOCKET_TYPE_TCP;
 

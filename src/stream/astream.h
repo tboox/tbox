@@ -198,9 +198,6 @@ typedef struct __tb_astream_t
 	/// the aicp
 	tb_aicp_t* 				aicp;
 
-	// is stoped?
-	tb_atomic_t 			stoped;
-
 #ifdef __tb_debug__
 	/// the func
 	tb_char_t const* 		func;
@@ -293,12 +290,6 @@ tb_astream_t* 		tb_astream_init_http(tb_aicp_t* aicp);
  * @return 			the stream
  */
 tb_astream_t* 		tb_astream_init_filter(tb_aicp_t* aicp);
-
-/*! kill stream
- *
- * @param astream 	the stream
- */
-tb_void_t 			tb_astream_kill(tb_astream_t* astream);
 
 /*! close stream, will block it if be pending
  *

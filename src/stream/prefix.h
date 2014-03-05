@@ -210,11 +210,17 @@ typedef struct __tb_stream_t
 	// is opened?
 	tb_atomic_t 	bopened;
 
+	// is stoped?
+	tb_atomic_t 	bstoped;
+
 	// the timeout
 	tb_long_t 		timeout;
 
 	/// ctrl stream
 	tb_bool_t 		(*ctrl)(tb_handle_t stream, tb_size_t ctrl, tb_va_list_t args);
+
+	/// kill
+	tb_void_t 		(*kill)(tb_handle_t astream);
 
 }tb_stream_t;
 
