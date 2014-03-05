@@ -177,7 +177,7 @@ static tb_void_t tb_http_status_exit(tb_http_t* http)
 	// exit location
 	tb_pstring_exit(&http->status.location);
 }
-static tb_void_t tb_http_status_cler(tb_http_t* http)
+static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 {
 	// clear status
 	http->status.code = 0;
@@ -193,13 +193,14 @@ static tb_void_t tb_http_status_cler(tb_http_t* http)
 	// clear location
 	tb_pstring_clear(&http->status.location);
 
-	// persistent state
-#if 0
-	http->status.version = 1;
-	http->status.balived = 0;
-	http->status.bseeked = 0;
-	http->status.document_size = 0;
-#endif
+	// host is changed? clear the alived state
+	if (host_changed)
+	{
+		http->status.version = 1;
+		http->status.balived = 0;
+		http->status.bseeked = 0;
+		http->status.document_size = 0;
+	}
 }
 #ifdef __tb_debug__
 static tb_void_t tb_http_status_dump(tb_http_t* http)
@@ -235,8 +236,15 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// clear status
-		tb_http_status_cler(http);
+		// the host is changed?
+		tb_bool_t 			host_changed = tb_true;
+		tb_char_t const* 	host_old = tb_null;
+		tb_char_t const* 	host_new = tb_url_host_get(&http->option.url);
+		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
+		if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
+
+		// trace
+		tb_trace_impl("connect: host: %s", host_changed? "changed" : "keep");
 
 		// ctrl stream
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
@@ -249,6 +257,9 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 		
 		// trace
 		tb_trace_impl("connect: ..");
+
+		// clear status
+		tb_http_status_cler(http, host_changed);
 
 		// open stream
 		if (!tb_gstream_open(http->stream)) break;
@@ -327,6 +338,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		// init connection
 		if (!tb_hash_get(http->option.head, "Connection")) 
 			tb_hash_set(http->option.head, "Connection", "close");
+		else if (http->status.balived) tb_hash_set(http->option.head, "Connection", "keep-alive");
 
 		// init range
 		if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
@@ -400,7 +412,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		tb_pstring_chrcat(&http->request, ' ');
 
 		// append version, HTTP/1.1
-		tb_pstring_cstrfcat(&http->request, "HTTP/1.%1u\r\n", http->option.version);
+		tb_pstring_cstrfcat(&http->request, "HTTP/1.%1u\r\n", http->status.balived? http->status.version : http->option.version);
 
 		// append key: value
 		tb_size_t itor = tb_iterator_head(http->option.head);
@@ -688,6 +700,62 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 	// ok?
 	return ok;
 }
+static tb_bool_t tb_http_redirect(tb_http_t* http)
+{
+	// check
+	tb_assert_and_check_return_val(http && http->stream, tb_false);
+
+	// done
+	tb_size_t i = 0;
+	for (i = 0; i < http->option.redirect && tb_pstring_size(&http->status.location); i++)
+	{
+		// read the redirect content
+		if (http->status.content_size)
+		{
+			tb_byte_t data[TB_GSTREAM_BLOCK_MAXN];
+			tb_hize_t read = 0;
+			tb_hize_t size = http->status.content_size;
+			while (read < size)	
+			{
+				// the need
+				tb_size_t need = tb_min(size - read, TB_GSTREAM_BLOCK_MAXN);
+
+				// read it
+				if (!tb_gstream_bread(http->stream, data, need)) break;
+
+				// save size
+				read += need;
+			}
+
+			// check
+			tb_assert_and_check_break(read == size);
+		}
+
+		// close stream
+		if (http->stream && !tb_gstream_clos(http->stream)) break;
+
+		// switch to sstream
+		http->stream = http->sstream;
+
+		// trace
+		tb_trace_impl("redirect: %s", tb_pstring_cstr(&http->status.location));
+
+		// set url
+		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) break;
+
+		// connect it
+		if (!tb_http_connect(http)) break;
+
+		// request it
+		if (!tb_http_request(http)) break;
+
+		// response it
+		if (!tb_http_response(http)) break;
+	}
+
+	// ok?
+	return tb_pstring_size(&http->status.location)? tb_false : tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -821,6 +889,9 @@ tb_bool_t tb_http_open(tb_handle_t handle)
 	// response it
 	if (!tb_http_response(http)) return tb_false;
 
+	// redirect it
+	if (!tb_http_redirect(http)) return tb_false;
+
 	// opened
 	http->bopened = tb_true;
 
@@ -841,12 +912,6 @@ tb_bool_t tb_http_clos(tb_handle_t handle)
 
 	// switch to sstream
 	http->stream = http->sstream;
-
-	// clear status
-	tb_http_status_cler(http);
-
-	// clear line data
-	tb_pstring_clear(&http->request);
 
 	// clear opened
 	http->bopened = tb_false;
