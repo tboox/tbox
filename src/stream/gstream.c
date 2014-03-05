@@ -121,7 +121,6 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeo
 
 	// wait it
 	tb_long_t ok = gstream->wait(gstream, wait, timeout);
-	tb_assert_and_check_return_val(ok >= 0, -1);
 	
 	// wait failed? save state
 	if (ok < 0 && !gstream->state) gstream->state = TB_STREAM_STATE_WAIT_FAILED;
@@ -693,9 +692,10 @@ tb_bool_t tb_gstream_skip(tb_gstream_t* gstream, tb_hize_t size)
 }
 tb_long_t tb_gstream_bread_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_t size)
 {
+	// done
 	tb_char_t 	ch = 0;
 	tb_char_t* 	p = data;
-	while (1)
+	while (!tb_atomic_get(&gstream->base.bstoped))
 	{
 		// read char
 		ch = tb_gstream_bread_s8(gstream);
@@ -721,6 +721,9 @@ tb_long_t tb_gstream_bread_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_
 			if (!ch) break;
 		}
 	}
+
+	// killed?
+	if (tb_atomic_get(&gstream->base.bstoped)) return -1;
 
 	// end?
 	return tb_gstream_beof(gstream)? -1 : 0;

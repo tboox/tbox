@@ -120,7 +120,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 		else
 		{
 			// look addr
-			if (!tb_dns_looker_done(tb_url_get(&sstream->base.base.url), &sstream->addr)) 
+			if (!tb_dns_looker_done(tb_url_host_get(&sstream->base.base.url), &sstream->addr)) 
 			{
 				sstream->base.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
 				return tb_false;

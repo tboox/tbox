@@ -1183,10 +1183,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 		tb_aicp_http_status_cler(http);
 
 		// ctrl stream
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_SSL, tb_url_ssl_get(&http->option.url))) break;
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_HOST, tb_url_host_get(&http->option.url))) break;
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PORT, tb_url_port_get(&http->option.url))) break;
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_PATH, tb_url_path_get(&http->option.url))) break;
+		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
