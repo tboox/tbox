@@ -1076,7 +1076,7 @@ tb_void_t tb_aicp_http_kill(tb_handle_t handle)
 	tb_trace_impl("kill: ..");
 
 	// kill stream
-	if (http->stream) tb_astream_kill(http->stream);
+	if (http->stream) tb_stream_kill(http->stream);
 
 	// kill tstream
 //	if (http->tstream) tb_tstream_stop(http->tstream);

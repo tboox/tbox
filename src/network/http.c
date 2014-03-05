@@ -1024,6 +1024,15 @@ tb_handle_t tb_http_init()
 	// ok?
 	return http;
 }
+tb_void_t tb_http_kill(tb_handle_t handle)
+{
+	// check
+	tb_http_t* http = (tb_http_t*)handle;
+	tb_assert_and_check_return(http);
+
+	// TODO
+	tb_trace_noimpl();
+}
 tb_void_t tb_http_exit(tb_handle_t handle)
 {
 	// check

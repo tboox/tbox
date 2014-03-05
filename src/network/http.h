@@ -258,6 +258,12 @@ tb_handle_t 			tb_http_init(tb_noarg_t);
  */
 tb_void_t 				tb_http_exit(tb_handle_t handle);
 
+/*! kill http
+ *
+ * @param handle 		the http handle
+ */
+tb_void_t 				tb_http_kill(tb_handle_t handle);
+
 /*! wait the http 
  *
  * blocking wait the single event object, so need not aiop 

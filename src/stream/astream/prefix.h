@@ -42,8 +42,8 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t*
 	astream->base.type 		= type;
 	astream->base.timeout 	= -1;
 	astream->base.bopened 	= 0;
+	astream->base.bstoped 	= 1;
 	astream->aicp 			= aicp;
-	astream->stoped 		= 1;
 	return tb_url_init(&astream->base.url);
 }
 

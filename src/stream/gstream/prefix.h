@@ -46,6 +46,9 @@ static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gstream, tb_size_t 
 	// init timeout, 10s
 	gstream->base.timeout = 10000;
 
+	// init stoped?
+	gstream->base.bstoped = 1;
+
 	// init url
 	if (!tb_url_init(&gstream->base.url)) return tb_false;
 

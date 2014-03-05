@@ -172,5 +172,11 @@ tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
  */
 tb_bool_t 			tb_stream_ctrl(tb_handle_t stream, tb_size_t ctrl, ...);
 
+/*! kill stream
+ *
+ * @param stream 	the stream
+ */
+tb_void_t 			tb_stream_kill(tb_handle_t stream);
+
 #endif
 

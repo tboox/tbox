@@ -67,7 +67,7 @@ tb_hize_t tb_stream_left(tb_handle_t handle)
 	
 	// the size
 	tb_hong_t size = tb_stream_size(stream);
-	tb_assert_and_check_return_val(size >= 0, -1);
+	tb_check_return_val(size >= 0, -1);
 
 	// the offset
 	tb_hize_t offset = tb_stream_offset(stream);
@@ -345,4 +345,19 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 
 	// ok?
 	return ok;
+}
+tb_void_t tb_stream_kill(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return(stream);
+
+	// stop it
+	tb_check_return(!tb_atomic_fetch_and_set(&stream->bstoped, 1));
+
+	// trace
+	tb_trace_impl("kill: ..");
+
+	// kill it
+	if (stream->kill) stream->kill(stream);
 }
