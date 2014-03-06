@@ -76,6 +76,19 @@ tb_hize_t tb_stream_left(tb_handle_t handle)
 	// the left
 	return size - offset;
 }
+tb_bool_t tb_stream_beof(tb_handle_t handle)
+{
+	// check
+	tb_stream_t* stream = (tb_stream_t*)handle;
+	tb_assert_and_check_return_val(stream, tb_true);
+
+	// size
+	tb_hong_t size = tb_stream_size(stream);
+	tb_hize_t offt = tb_stream_offset(stream);
+
+	// eof?
+	return (size > 0 && offt >= size)? tb_true : tb_false;
+}
 tb_hize_t tb_stream_offset(tb_handle_t handle)
 {
 	// check
@@ -157,6 +170,7 @@ tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 	case TB_STREAM_HTTP_STATE_RESPONSE_UNK: 	return "http: response: unknown code";
 	case TB_STREAM_HTTP_STATE_RESPONSE_NUL: 	return "http: response: no";
 	case TB_STREAM_HTTP_STATE_REQUEST_FAILED: 	return "http: request: failed";
+	case TB_STREAM_HTTP_STATE_REDIRECT_FAILED: 	return "http: redirect: failed";
 	case TB_STREAM_HTTP_STATE_POST_FAILED: 		return "http: post: failed";
 	case TB_STREAM_HTTP_STATE_RANGE_INVALID: 	return "http: range: invalid";
 	default: 									return "unknown";

@@ -185,6 +185,7 @@ static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 	http->status.bdeflate = 0;
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
+	http->status.document_size = 0;
 	http->status.state = TB_STREAM_STATE_OK;
 
 	// clear content type
@@ -199,7 +200,6 @@ static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 		http->status.version = 1;
 		http->status.balived = 0;
 		http->status.bseeked = 0;
-		http->status.document_size = 0;
 	}
 }
 #ifdef __tb_debug__
@@ -762,7 +762,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 	}
 
 	// ok?
-	return tb_pstring_size(&http->status.location)? tb_false : tb_true;
+	return (i < http->option.redirect && tb_pstring_size(&http->status.location))? tb_false : tb_true;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

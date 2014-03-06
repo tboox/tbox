@@ -150,21 +150,6 @@ tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 	// the stream state
 	return gstream->state;
 }
-tb_bool_t tb_gstream_beof(tb_gstream_t* gstream)
-{
-	// already been opened?
-	tb_assert_and_check_return_val(gstream && tb_stream_is_opened(gstream), tb_true);
-
-	// stoped?
-	tb_assert_and_check_return_val(!tb_atomic_get(&gstream->base.bstoped), tb_true);
-
-	// size
-	tb_hong_t size = tb_stream_size(gstream);
-	tb_hize_t offt = tb_stream_offset(gstream);
-
-	// eof?
-	return (size > 0 && offt >= size)? tb_true : tb_false;
-}
 tb_bool_t tb_gstream_open(tb_gstream_t* gstream)
 {
 	// check stream
@@ -726,7 +711,7 @@ tb_long_t tb_gstream_bread_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_
 	if (tb_atomic_get(&gstream->base.bstoped)) return -1;
 
 	// end?
-	return tb_gstream_beof(gstream)? -1 : 0;
+	return tb_stream_beof(gstream)? -1 : 0;
 }
 tb_long_t tb_gstream_bwrit_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_t size)
 {

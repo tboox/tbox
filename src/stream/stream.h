@@ -128,6 +128,14 @@ tb_hong_t 			tb_stream_size(tb_handle_t stream);
  */
 tb_hize_t 			tb_stream_left(tb_handle_t stream);
 
+/*! the stream is end?
+ *
+ * @param stream 	the stream
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_stream_beof(tb_handle_t stream);
+
 /*! the stream offset
  *
  * the offset is read + writ and using seek for modifying it if size != -1, .e.g: data, file, .. 
