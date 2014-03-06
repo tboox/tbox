@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"chunked"
+#define TB_TRACE_IMPL_TAG 			"chunked"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -193,7 +193,7 @@ end:
 	tb_trace_impl("read: %lu, beof: %u, ileft: %lu", cfilter->read, cfilter->beof, tb_bstream_left(istream));
 
 	// no data and sync end? end
-	if (sync < 0 && op == ob && !tb_bstream_left(istream) && cfilter->beof) return -1;
+	if (op == ob && !tb_bstream_left(istream) && cfilter->beof) return -1;
 
 	// ok
 	return (op - ob);
