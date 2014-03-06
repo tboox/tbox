@@ -307,14 +307,6 @@ tb_long_t 			tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t ti
  */
 tb_size_t 			tb_gstream_state(tb_gstream_t* gstream);
 
-/*! the stream is end?
- *
- * @param gstream 	the stream
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_gstream_beof(tb_gstream_t* gstream);
-
 /*! open stream
  *
  * @param gstream 	the stream

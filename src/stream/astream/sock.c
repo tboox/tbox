@@ -250,7 +250,7 @@ static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_
 		tb_atomic_set(&sstream->base.base.bopened, 1);
 
 		// done func
-		sstream->func.open((tb_astream_t*)sstream, TB_STREAM_STATE_OK, sstream->priv);
+		func((tb_astream_t*)sstream, TB_STREAM_STATE_OK, priv);
 
 		// ok
 		return tb_true;

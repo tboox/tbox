@@ -123,17 +123,44 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	tb_astream_http_t* hstream = (tb_astream_http_t*)priv;
 	tb_assert_and_check_return_val(hstream && hstream->func.read, tb_false);
 
-	// save offset
-	if (state == TB_STREAM_STATE_OK) tb_atomic64_fetch_and_add(&hstream->offset, real);
+	// ok?
+	tb_bool_t bend = tb_false;
+	if (state == TB_STREAM_STATE_OK) 
+	{
+		// save offset
+		tb_hize_t offset = tb_atomic64_add_and_fetch(&hstream->offset, real);
+
+		// end? 
+		tb_hong_t size = tb_atomic64_get(&hstream->size);
+		if (size >= 0 && offset == size) bend = tb_true;
+	}
 
 	// done func
-	return hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
+	tb_bool_t ok = hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
+
+	// end? closed 
+	if (ok && bend) ok = hstream->func.read((tb_astream_t*)hstream, TB_STREAM_STATE_CLOSED, data, 0, size, hstream->priv);
+
+	// ok?
+	return ok;
 }
 static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
 	tb_assert_and_check_return_val(hstream && hstream->http && func, tb_false);
+
+	// end? closed
+	tb_hong_t size = tb_atomic64_get(&hstream->size);
+	if (size >= 0) 
+	{
+		tb_hize_t offset = tb_atomic64_get(&hstream->offset);
+		if (offset == size)
+		{
+			hstream->func.read(astream, TB_STREAM_STATE_CLOSED, tb_null, 0, maxn, priv);
+			return tb_true;
+		}
+	}
 
 	// save func and priv
 	hstream->priv 		= priv;

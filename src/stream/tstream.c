@@ -221,7 +221,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, 0, tstream->func.save.priv)) break;
 		}
 		// continue?
-		else
+		else 
 		{
 			// trace
 			tb_trace_impl("delay: %lu ms", delay);

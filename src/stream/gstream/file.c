@@ -154,7 +154,7 @@ static tb_long_t tb_gstream_file_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 
 	// wait 
 	tb_long_t aioe = 0;
-	if (!tb_gstream_beof(gstream))
+	if (!tb_stream_beof(gstream))
 	{
 		if (wait & TB_GSTREAM_WAIT_READ) aioe |= TB_GSTREAM_WAIT_READ;
 		if (wait & TB_GSTREAM_WAIT_WRIT) aioe |= TB_GSTREAM_WAIT_WRIT;

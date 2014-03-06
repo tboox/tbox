@@ -88,7 +88,7 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 	tb_printf("\n");
 
 	// walk
-	while (!tb_gstream_beof(gst))
+	while (!tb_stream_beof(gst))
 	{
 		// read line
 		tb_long_t read = 0;
