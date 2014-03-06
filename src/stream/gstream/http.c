@@ -163,7 +163,7 @@ static tb_bool_t tb_gstream_http_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 			tb_assert_and_check_return_val(status, 0);
 
 			// get size
-			*psize = (!status->bgzip && !status->bdeflate)? status->document_size : -1;
+			*psize = (!status->bgzip && !status->bdeflate && !status->bchunked)? status->document_size : -1;
 			return tb_true;
 		}
 	case TB_STREAM_CTRL_GET_OFFSET:

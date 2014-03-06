@@ -91,7 +91,7 @@ static tb_bool_t tb_astream_http_open_func(tb_handle_t http, tb_size_t state, tb
 	tb_atomic_set(&hstream->base.base.bopened, 1);
 
 	// save size
-	tb_hong_t size = (!status->bgzip && !status->bdeflate)? status->document_size : -1;
+	tb_hong_t size = (!status->bgzip && !status->bdeflate && !status->bchunked)? status->document_size : -1;
 	if (size >= 0) tb_atomic64_set(&hstream->size, size);
 
 	// done func
