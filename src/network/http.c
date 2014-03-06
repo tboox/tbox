@@ -341,12 +341,17 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		else if (http->status.balived) tb_hash_set(http->option.head, "Connection", "keep-alive");
 
 		// init range
-		if (http->option.range.bof && http->option.range.eof > http->option.range.bof)
+		if (http->option.range.bof && http->option.range.eof >= http->option.range.bof)
 			tb_sstring_cstrfcpy(&value, "bytes=%llu-%llu", http->option.range.bof, http->option.range.eof);
 		else if (http->option.range.bof && !http->option.range.eof)
 			tb_sstring_cstrfcpy(&value, "bytes=%llu-", http->option.range.bof);
 		else if (!http->option.range.bof && http->option.range.eof)
 			tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
+		else if (http->option.range.bof > http->option.range.eof)
+		{
+			http->status.state = TB_STREAM_HTTP_STATE_RANGE_INVALID;
+			break;
+		}
 
 		if (tb_sstring_size(&value)) 
 			tb_hash_set(http->option.head, "Range", tb_sstring_cstr(&value));
@@ -931,9 +936,42 @@ tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 	// opened?
 	tb_assert_and_check_return_val(http->bopened, tb_false);
 
-	// TODO: noimpl
-	tb_trace_noimpl();
-	return tb_false;
+	// seeked?
+	tb_check_return_val(http->status.bseeked, tb_false);
+
+	// done
+	tb_bool_t ok = tb_false;
+	do
+	{
+		// close stream
+		if (http->stream && !tb_gstream_clos(http->stream)) break;
+
+		// switch to sstream
+		http->stream = http->sstream;
+
+		// trace
+		tb_trace_impl("seek: %llu", offset);
+
+		// set range
+		http->option.range.bof = offset;
+		http->option.range.eof = http->status.document_size? http->status.document_size - 1 : 0;
+
+		// connect it
+		if (!tb_http_connect(http)) break;
+
+		// request it
+		if (!tb_http_request(http)) break;
+
+		// response it
+		if (!tb_http_response(http)) break;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_http_aread(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {

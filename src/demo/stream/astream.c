@@ -177,6 +177,7 @@ static tb_option_item_t g_options[] =
 ,	{'h', 	"header", 		TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"the custem http header" 	}
 ,	{'-', 	"post-data", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post data" 		}
 ,	{'-', 	"post-file", 	TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the post file" 		}
+,	{'-', 	"range", 		TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_CSTR, 		"set the range" 			}
 ,	{'-', 	"timeout", 		TB_OPTION_MODE_KEY_VAL, 	TB_OPTION_TYPE_INTEGER, 	"set the timeout" 			}
 ,	{'h', 	"help", 		TB_OPTION_MODE_KEY, 		TB_OPTION_TYPE_BOOL, 		"display this help and exit"}
 ,	{'-', 	"url", 			TB_OPTION_MODE_VAL, 		TB_OPTION_TYPE_CSTR, 		"the url" 					}
@@ -328,6 +329,25 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_URL, url)) break;
 						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_POST_FUNC, tb_demo_http_post_func)) break;
 						if (context.debug) tb_printf("post: %s\n", url);
+					}
+				}
+
+				// set range
+				if (tb_option_find(context.option, "range"))
+				{
+					tb_char_t const* p = tb_option_item_cstr(context.option, "range");
+					if (p)
+					{
+						// the bof
+						tb_hize_t eof = 0;
+						tb_hize_t bof = tb_atoll(p);
+						while (*p && tb_isdigit(*p)) p++;
+						if (*p == '-')
+						{
+							p++;
+							eof = tb_atoll(p);
+						}
+						if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_RANGE, bof, eof)) break;
 					}
 				}
 
