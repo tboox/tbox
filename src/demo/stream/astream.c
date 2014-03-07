@@ -64,7 +64,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb
 		else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
 
 		// trace
-		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %llu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
+		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
 	}
 
 	// failed? kill aicp
