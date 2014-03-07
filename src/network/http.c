@@ -36,6 +36,7 @@
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
+#include "../filter/filter.h"
 #include "../stream/stream.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
@@ -673,8 +674,16 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 					else http->zstream = tb_gstream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 					tb_assert_and_check_break(http->zstream);
 
-					// init zstream read size
-					if (http->status.content_size && !tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_READ_SIZE, http->status.content_size)) break;
+					// the filter
+					tb_filter_t* filter = tb_null;
+					if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+					tb_assert_and_check_break(filter);
+
+					// clear filter
+					tb_filter_cler(filter);
+
+					// limit the filter input size
+					if (http->status.content_size) tb_filter_limit(filter, http->status.content_size);
 
 					// open zstream, need not async
 					if (!tb_gstream_open(http->zstream)) break;

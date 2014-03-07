@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"filter"
+#define TB_TRACE_IMPL_TAG 			"filter"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -39,6 +39,15 @@ tb_void_t tb_filter_cler(tb_filter_t* filter)
 {
 	// check
 	tb_assert_and_check_return(filter);
+
+	// clear eof
+	filter->beof = tb_false;
+	
+	// clear limit
+	filter->limit = -1;
+	
+	// clear offset
+	filter->offset = 0;
 	
 	// clear it
 	if (filter->cler) filter->cler(filter);
@@ -74,6 +83,9 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// init odata
 	*pdata = tb_null;
 
+	// save the input offset
+	filter->offset += size;
+
 	// the idata
 	tb_byte_t const* 	idata = tb_pbuffer_data(&filter->idata);
 	tb_size_t 			isize = tb_pbuffer_size(&filter->idata);
@@ -82,6 +94,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 		// append data to cache if have the cache data
 		if (idata && isize) 
 		{
+			// append data
 			idata = tb_pbuffer_memncat(&filter->idata, data, size);
 			isize = tb_pbuffer_size(&filter->idata);
 		}
@@ -144,6 +157,13 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// spak data
 	tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
 
+	// eof?
+	if (osize < 0 || (filter->limit >= 0 && filter->offset == filter->limit)) 
+		filter->beof = tb_true;
+
+	// no data and eof?
+	if (!osize && !tb_bstream_left(&istream) && filter->beof) osize = -1;
+
 	// exit odata
 	tb_qbuffer_push_exit(&filter->odata, osize > 0? osize : 0);
 
@@ -177,7 +197,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	if (osize > 0) *pdata = odata;
 
 	// trace
-	tb_trace_impl("spak: %ld, ileft: %lu, oleft: %lu", osize, tb_pbuffer_size(&filter->idata), tb_qbuffer_size(&filter->odata));
+	tb_trace_impl("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_pbuffer_size(&filter->idata), tb_qbuffer_size(&filter->odata), filter->offset, filter->limit);
 
 	// ok?
 	return osize;
@@ -188,6 +208,27 @@ tb_bool_t tb_filter_push(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	tb_assert_and_check_return_val(filter && data && size, tb_false);
 
 	// push data
-	return tb_pbuffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
-}
+	tb_bool_t ok = tb_pbuffer_memncat(&filter->idata, data, size)? tb_true : tb_false;
 
+	// save the input offset
+	if (ok) filter->offset += size;
+
+	// ok?
+	return ok;
+}
+tb_bool_t tb_filter_beof(tb_filter_t* filter)
+{
+	// check
+	tb_assert_and_check_return_val(filter, tb_false);
+
+	// is eof?
+	return filter->beof;
+}
+tb_void_t tb_filter_limit(tb_filter_t* filter, tb_hong_t limit)
+{
+	// check
+	tb_assert_and_check_return(filter);
+
+	// limit the input size
+	filter->limit = limit;
+}
