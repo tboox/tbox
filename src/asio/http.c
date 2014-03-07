@@ -1377,7 +1377,7 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 	tb_bool_t ok = tb_false;
 	do
 	{
-		// FIXME: close stream
+		// close stream
 		if (http->stream) tb_astream_clos(http->stream, tb_true);
 		http->stream = http->sstream;
 
@@ -1389,15 +1389,20 @@ tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_s
 		tb_trace_impl("seek: %llu", offset);
 
 		// init open
-//		http->func.open = func;
-//		http->priv 		= priv;
+		http->func.open = tb_aicp_http_oseek_func;
+		http->priv 		= &http->open_and.seek;
 
-		// FIXME: init seek
-		http->func.seek = func;
-		http->priv 		= priv;
+		// init open and seek
+		http->open_and.seek.func = func;
+		http->open_and.seek.priv = priv;
+		http->open_and.seek.offset = offset;
 
 		// clear redirect
 		http->redirect_tryn = 0;
+
+		// set range
+		http->option.range.bof = offset;
+		http->option.range.eof = http->status.document_size? http->status.document_size - 1 : 0;
 
 		// done open
 		if (!tb_aicp_http_open_done(http)) break;
@@ -1441,11 +1446,8 @@ tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return_val(http && func, tb_false);
 
-	// init open and seek
-	http->open_and.seek.func = func;
-	http->open_and.seek.priv = priv;
-	http->open_and.seek.offset = offset;
-	return tb_aicp_http_open(http, tb_aicp_http_oseek_func, &http->open_and.seek);
+	// open and seek
+	return tb_aicp_http_seek(http, offset, func, priv);
 }
 tb_aicp_t* tb_aicp_http_aicp(tb_handle_t handle)
 {
