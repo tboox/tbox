@@ -178,7 +178,7 @@ static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb
 		fstream->last = real;
 
 		// eof?
-		if (real < 0 || (!real && fstream->wait))
+		if (real < 0 || (!real && fstream->wait) || tb_filter_beof(fstream->filter))
 			fstream->beof = tb_true;
 		// clear wait
 		else if (real > 0) fstream->wait = tb_false;
@@ -187,7 +187,7 @@ static tb_long_t tb_gstream_filter_read(tb_handle_t gstream, tb_byte_t* data, tb
 		tb_byte_t const* odata = tb_null;
 		if (real) real = tb_filter_spak(fstream->filter, data, real < 0? 0 : real, &odata, size, fstream->beof? -1 : 0);
 		// no data? try to sync it
-		if (!real) real = tb_filter_spak(fstream->filter, tb_null, 0, &odata, size, 1);
+		if (!real) real = tb_filter_spak(fstream->filter, tb_null, 0, &odata, size, fstream->beof? -1 : 1);
 
 		// has data? save it
 		if (real > 0 && odata) tb_memcpy(data, odata, real);
@@ -270,7 +270,7 @@ static tb_long_t tb_gstream_filter_wait(tb_handle_t gstream, tb_size_t wait, tb_
 		// wait ok
 		if (fstream->last > 0) ok = wait;
 		// need wait
-		else if (!fstream->last && !fstream->beof)
+		else if (!fstream->last && !fstream->beof && !tb_filter_beof(fstream->filter))
 		{
 			// wait
 			ok = tb_gstream_wait(fstream->gstream, wait, timeout);
