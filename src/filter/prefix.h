@@ -51,6 +51,15 @@ typedef struct __tb_filter_t
 	/// the type
 	tb_size_t 		type;
 
+	/// the input is eof?
+	tb_bool_t 		beof;
+
+	/// the input limit size 
+	tb_hong_t 		limit;
+
+	/// the input offset 
+	tb_hize_t 		offset;
+
 	/// the input data
 	tb_pbuffer_t 	idata;
 
@@ -78,6 +87,15 @@ static __tb_inline__ tb_bool_t tb_filter_init(tb_filter_t* filter, tb_size_t typ
 	
 	// init type
 	filter->type = type;
+
+	// init the input eof
+	filter->beof = tb_false;
+
+	// init input limit size
+	filter->limit = -1;
+
+	// init the input offset
+	filter->offset = 0;
 
 	// init idata
 	if (!tb_pbuffer_init(&filter->idata)) return tb_false;

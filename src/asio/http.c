@@ -817,6 +817,9 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 					if (!tb_stream_ctrl(http->cstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
 					tb_assert_and_check_break(filter);
 
+					// clear filter
+					tb_filter_cler(filter);
+
 					// push data
 					if (!tb_filter_push(filter, p, e - p)) break;
 					p = e;
@@ -843,17 +846,20 @@ static tb_bool_t tb_aicp_http_hread_func(tb_astream_t* astream, tb_size_t state,
 				else http->zstream = tb_astream_init_filter_from_zip(http->stream, http->status.bgzip? TB_ZIP_ALGO_GZIP : TB_ZIP_ALGO_ZLIB, TB_ZIP_ACTION_INFLATE);
 				tb_assert_and_check_break(http->zstream);
 
-				// TODO: init zstream read size
-//				if (http->status.content_size && !tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_SET_READ_SIZE, http->status.content_size)) break;
+				// the filter
+				tb_filter_t* filter = tb_null;
+				if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
+				tb_assert_and_check_break(filter);
+
+				// clear filter
+				tb_filter_cler(filter);
+
+				// limit the filter input size
+				if (http->status.content_size) tb_filter_limit(filter, http->status.content_size);
 
 				// push the left data to filter
 				if (p < e)
 				{
-					// the filter
-					tb_filter_t* filter = tb_null;
-					if (!tb_stream_ctrl(http->zstream, TB_STREAM_CTRL_FLTR_GET_FILTER, &filter)) break;
-					tb_assert_and_check_break(filter);
-
 					// push data
 					if (!tb_filter_push(filter, p, e - p)) break;
 					p = e;

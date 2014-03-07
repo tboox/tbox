@@ -48,9 +48,6 @@ typedef struct __tb_filter_chunked_t
 	// the chunked read
 	tb_size_t 				read;
 
-	// is eof
-	tb_bool_t 				beof;
-
 	// the cache line
 	tb_pstring_t 			line;
 
@@ -83,8 +80,23 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	tb_byte_t const* 	ip = tb_bstream_pos(istream);
 	tb_byte_t const* 	ie = tb_bstream_end(istream);
 
+	// find the eof: '\r\n 0\r\n\r\n'
+	if ( 	!filter->beof
+		&& 	ip + 6 < ie
+		&& 	ie[-7] == '\r'
+		&& 	ie[-6] == '\n'
+		&& 	ie[-5] == '0'
+		&& 	ie[-4] == '\r'
+		&& 	ie[-3] == '\n'
+		&& 	ie[-2] == '\r'
+		&& 	ie[-1] == '\n')
+	{
+		// is eof
+		filter->beof = tb_true;
+	}
+
 	// trace
-	tb_trace_impl("isize: %lu", tb_bstream_size(istream));
+	tb_trace_impl("isize: %lu, beof: %d", tb_bstream_size(istream), filter->beof);
 
 	// the odata
 	tb_byte_t* 			op = (tb_byte_t*)tb_bstream_pos(ostream);
@@ -147,14 +159,14 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					// clear data
 					tb_pstring_clear(&cfilter->line);
 
-					// is file end? "0\r\n\r\n"
+					// is eof? "0\r\n\r\n"
 					if (!cfilter->size)
 					{
 						// trace
-						tb_trace_impl("end");
+						tb_trace_impl("eof");
 
 						// is eof
-						cfilter->beof = tb_true;
+						filter->beof = tb_true;
 
 						// continue to spak the end data 
 						continue ;
@@ -190,10 +202,7 @@ end:
 	tb_bstream_goto(ostream, (tb_byte_t*)op);
 
 	// trace
-	tb_trace_impl("read: %lu, beof: %u, ileft: %lu", cfilter->read, cfilter->beof, tb_bstream_left(istream));
-
-	// no data and sync end? end
-	if (op == ob && !tb_bstream_left(istream) && cfilter->beof) return -1;
+	tb_trace_impl("read: %lu, beof: %u, ileft: %lu", cfilter->read, filter->beof, tb_bstream_left(istream));
 
 	// ok
 	return (op - ob);
@@ -209,9 +218,6 @@ static tb_void_t tb_filter_chunked_cler(tb_filter_t* filter)
 
 	// clear read
 	cfilter->read = 0;
-
-	// clear eof
-	cfilter->beof = tb_false;
 
 	// clear line
 	tb_pstring_clear(&cfilter->line);

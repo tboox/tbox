@@ -210,6 +210,19 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 					// break it
 					// ok = tb_false;
 				}
+
+				// eof and continue?
+				if (tb_filter_beof(fstream->filter) && ok)
+				{
+					// done sync for reading
+					ok = tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
+					
+					// error? done error
+					if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+
+					// need not read data, break it
+					ok = tb_false;
+				}
 			}
 			break;
 		case TB_STREAM_STATE_CLOSED:
@@ -254,6 +267,10 @@ static tb_bool_t tb_astream_filter_read(tb_handle_t astream, tb_size_t delay, tb
 	fstream->priv 		= priv;
 	fstream->func.read 	= func;
 	fstream->maxn 		= maxn;
+
+	// filter eof? flush the left data
+	if (fstream->filter && tb_filter_beof(fstream->filter))
+		return tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
 
 	// post read
 	return tb_astream_read_after(fstream->astream, delay, maxn, tb_astream_filter_read_func, astream);

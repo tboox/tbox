@@ -79,6 +79,21 @@ tb_void_t 			tb_filter_exit(tb_filter_t* filter);
  */
 tb_void_t 			tb_filter_cler(tb_filter_t* filter);
 
+/*! is eof for the filter input data, but the output maybe exists the left data and need flush it
+ *
+ * @param filter 	the filter
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_filter_beof(tb_filter_t* filter);
+
+/*! limit the input size for filter
+ *
+ * @param filter 	the filter
+ * @param limit 	the input limit size
+ */
+tb_void_t 			tb_filter_limit(tb_filter_t* filter, tb_hong_t limit);
+
 /*! push data to the filter input data
  *
  * @param filter 	the filter
