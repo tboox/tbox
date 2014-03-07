@@ -86,6 +86,13 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	// save the input offset
 	filter->offset += size;
 
+	// eof?
+	if (filter->limit >= 0 && filter->offset == filter->limit)
+		filter->beof = tb_true;
+
+	// eof? sync it
+	if (filter->beof) sync = -1;
+
 	// the idata
 	tb_byte_t const* 	idata = tb_pbuffer_data(&filter->idata);
 	tb_size_t 			isize = tb_pbuffer_size(&filter->idata);
@@ -158,11 +165,13 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	tb_long_t osize = filter->spak(filter, &istream, &ostream, sync);
 
 	// eof?
-	if (osize < 0 || (filter->limit >= 0 && filter->offset == filter->limit)) 
-		filter->beof = tb_true;
+	if (osize < 0) filter->beof = tb_true;
 
 	// no data and eof?
 	if (!osize && !tb_bstream_left(&istream) && filter->beof) osize = -1;
+
+	// eof? sync it
+	if (filter->beof) sync = -1;
 
 	// exit odata
 	tb_qbuffer_push_exit(&filter->odata, osize > 0? osize : 0);
