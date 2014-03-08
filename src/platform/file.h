@@ -186,22 +186,12 @@ tb_long_t 				tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t 
  * 
  * @param file 			the file
  * @param ifile 		the input file
- * @param size 			the size
+ * @param offset 		the input file offset, the file offset will not be changed
+ * @param size 			the writed size
  *
  * @return 				the real size or -1
  */
-tb_hong_t 				tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_size_t size);
-
-/*! pwritf the file data
- * 
- * @param file 			the file
- * @param ifile 		the input file
- * @param size 			the size
- * @param offset 		the offset, the file offset will not be changed
- *
- * @return 				the real size or -1
- */
-tb_hong_t 				tb_file_pwritf(tb_handle_t file, tb_handle_t ifile, tb_size_t size, tb_hize_t offset);
+tb_hong_t 				tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size);
 
 /*! preadv the file data 
  * 

@@ -191,46 +191,7 @@ tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
 	// writ it
 	return writev(tb_handle2fd(file), (struct iovec const*)list, size);
 }
-tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_size_t size)
-{	
-	// check
-	tb_assert_and_check_return_val(file && ifile && size, -1);
-
-#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
-
-	// writ it
-	tb_hong_t 	real = sendfile(tb_handle2fd(file), tb_handle2fd(ifile), tb_null, (size_t)size);
-
-	// ok?
-	if (real >= 0) return real;
-
-	// continue?
-	if (errno == EINTR || errno == EAGAIN) return 0;
-
-	// error
-	return -1;
-
-#elif 0//defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-
-	// writ it
-	off_t real = (off_t)size;
-	if (!sendfile(tb_handle2fd(ifile), tb_handle2fd(file), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
-
-	// continue?
-	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
-
-	// error
-	return -1;
-#else
-
-	// no impl
-	tb_trace_noimpl();
-	
-	// error
-	return -1;
-#endif
-}
-tb_hong_t tb_file_pwritf(tb_handle_t file, tb_handle_t ifile, tb_size_t size, tb_hize_t offset)
+tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, tb_hize_t size)
 {
 	// check
 	tb_assert_and_check_return_val(file && ifile && size, -1);
@@ -250,24 +211,15 @@ tb_hong_t tb_file_pwritf(tb_handle_t file, tb_handle_t ifile, tb_size_t size, tb
 	// error
 	return -1;
 
-#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
-
-	// writ it
-	off_t real = (off_t)size;
-	if (!sendfile(tb_handle2fd(ifile), tb_handle2fd(file), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
-
-	// continue?
-	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
-
-	// error
-	return -1;
 #else
 
-	// no impl
-	tb_trace_noimpl();
-	
-	// error
-	return -1;
+	// read data
+	tb_byte_t data[8192];
+	tb_long_t real = tb_file_pread(ifile, data, sizeof(data), offset);
+	tb_check_return_val(real > 0, real);
+
+	// writ data
+	return tb_file_writ(file, data, real);
 #endif
 }
 tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
@@ -431,7 +383,7 @@ tb_bool_t tb_file_copy(tb_char_t const* path, tb_char_t const* dest)
 	dest = tb_path_full(dest, full1, TB_PATH_MAXN);
 	tb_assert_and_check_return_val(dest, tb_false);
 
-	// save it
+	// copy it
 	return tb_tstream_save_uu(path, dest, 0, tb_null, tb_null) >= 0? tb_true : tb_false;
 }
 tb_bool_t tb_file_create(tb_char_t const* path)

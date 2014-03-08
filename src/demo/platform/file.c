@@ -189,7 +189,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		tb_hize_t size = tb_file_size(ifile);
 		while (writ < size)
 		{
-			tb_long_t real = tb_file_writf(ofile, ifile, TB_FILE_DIRECT_CSIZE);
+			tb_long_t real = tb_file_writf(ofile, ifile, writ, size - writ);
 			if (real > 0) writ += real;
 			else break;
 		}
