@@ -8,9 +8,6 @@
  */ 
 tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 {
-	// copy
-//	tb_file_copy(argv[1], argv[2]);
-
 #if 0
 	// init file
 //	tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
@@ -120,7 +117,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		// exit file
 		tb_file_exit(file);
 	}
-#else
+#elif 0
 	// init file
 	tb_handle_t file = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 	if (file)
@@ -183,6 +180,28 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		// exit file
 		tb_file_exit(file);
 	}
+#elif 1
+	tb_handle_t ifile = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
+	tb_handle_t ofile = tb_file_init(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
+	if (ifile && ofile)
+	{
+		tb_hize_t writ = 0;
+		tb_hize_t size = tb_file_size(ifile);
+		while (writ < size)
+		{
+			tb_long_t real = tb_file_writf(ofile, ifile, TB_FILE_DIRECT_CSIZE);
+			if (real > 0) writ += real;
+			else break;
+		}
+	}
+		
+	// exit file
+	if (ifile) tb_file_exit(ifile);
+	if (ofile) tb_file_exit(ofile);
+
+#else
+	// copy
+	tb_file_copy(argv[1], argv[2]);
 #endif
 
 	return 0;
