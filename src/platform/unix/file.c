@@ -35,6 +35,10 @@
 #include <stdlib.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <errno.h>
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+# 	include <sys/sendfile.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -186,6 +190,85 @@ tb_long_t tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size
 
 	// writ it
 	return writev(tb_handle2fd(file), (struct iovec const*)list, size);
+}
+tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_size_t size)
+{	
+	// check
+	tb_assert_and_check_return_val(file && ifile && size, -1);
+
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+
+	// writ it
+	tb_hong_t 	real = sendfile(tb_handle2fd(file), tb_handle2fd(ifile), tb_null, (size_t)size);
+
+	// ok?
+	if (real >= 0) return real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+
+#elif 0//defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+
+	// writ it
+	off_t real = (off_t)size;
+	if (!sendfile(tb_handle2fd(ifile), tb_handle2fd(file), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
+
+	// error
+	return -1;
+#else
+
+	// no impl
+	tb_trace_noimpl();
+	
+	// error
+	return -1;
+#endif
+}
+tb_hong_t tb_file_pwritf(tb_handle_t file, tb_handle_t ifile, tb_size_t size, tb_hize_t offset)
+{
+	// check
+	tb_assert_and_check_return_val(file && ifile && size, -1);
+
+#if defined(TB_CONFIG_OS_LINUX) || defined(TB_CONFIG_OS_ANDROID)
+
+	// writ it
+	off_t 		seek = offset;
+	tb_hong_t 	real = sendfile(tb_handle2fd(file), tb_handle2fd(ifile), &seek, (size_t)size);
+
+	// ok?
+	if (real >= 0) return real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return 0;
+
+	// error
+	return -1;
+
+#elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
+
+	// writ it
+	off_t real = (off_t)size;
+	if (!sendfile(tb_handle2fd(ifile), tb_handle2fd(file), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
+
+	// continue?
+	if (errno == EINTR || errno == EAGAIN) return (tb_hong_t)real;
+
+	// error
+	return -1;
+#else
+
+	// no impl
+	tb_trace_noimpl();
+	
+	// error
+	return -1;
+#endif
 }
 tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {

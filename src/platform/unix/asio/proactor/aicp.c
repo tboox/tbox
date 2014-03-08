@@ -879,7 +879,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	while (send < size)
 	{
 		// send it
-		real = tb_socket_sendfile(aico->base.handle, file, seek + send, size - send);
+		real = tb_socket_sendf(aico->base.handle, file, seek + send, size - send);
 		
 		// save send
 		if (real > 0) send += real;

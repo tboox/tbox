@@ -191,16 +191,16 @@ tb_long_t 			tb_socket_recvv(tb_handle_t socket, tb_iovec_t const* list, tb_size
  */
 tb_long_t 			tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t size);
 
-/*! sendfile the socket data
+/*! sendf the socket data
  * 
  * @param socket	the socket handle
  * @param file 		the file
- * @param offset 	the offset
+ * @param offset 	the offset, using the current file offset and the file offset will be changed if offset == -1
  * @param size 		the size, send the left data if size == 0
  *
  * @return 			the real size or -1
  */
-tb_hong_t 			tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size);
+tb_hong_t 			tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset, tb_hize_t size);
 
 /*! recv the socket data for udp
  *

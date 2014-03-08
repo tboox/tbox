@@ -360,7 +360,7 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// error
 	return -1;
 }
-tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset, tb_hize_t size)
 {
 	// check
 	tb_assert_and_check_return_val(socket && file && size, -1);
@@ -369,7 +369,7 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 
 	// send it
 	off_t 		seek = offset;
-	tb_hong_t 	real = sendfile(tb_handle2fd(socket), tb_handle2fd(file), &seek, (size_t)size);
+	tb_hong_t 	real = sendfile(tb_handle2fd(socket), tb_handle2fd(file), offset >= 0? &seek : tb_null, (size_t)size);
 
 	// ok?
 	if (real >= 0) return real;
@@ -382,7 +382,7 @@ tb_hong_t tb_socket_sendfile(tb_handle_t socket, tb_handle_t file, tb_hize_t off
 
 #elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
 
-	// send it
+	// send it, FIXME: for offset < 0
 	off_t real = (off_t)size;
 	if (!sendfile(tb_handle2fd(file), tb_handle2fd(socket), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
 

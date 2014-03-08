@@ -145,6 +145,7 @@ tb_long_t 				tb_file_writ(tb_handle_t file, tb_byte_t const* data, tb_size_t si
  * @param file 			the file handle
  * @param data 			the data
  * @param size 			the size
+ * @param offset 		the offset, the file offset will not be changed
  *
  * @return 				the real size or -1
  */
@@ -155,6 +156,7 @@ tb_long_t 				tb_file_pread(tb_handle_t file, tb_byte_t* data, tb_size_t size, t
  * @param file 			the file handle
  * @param data 			the data
  * @param size 			the size
+ * @param offset 		the offset, the file offset will not be changed
  *
  * @return 				the real size or -1
  */
@@ -180,11 +182,33 @@ tb_long_t 				tb_file_readv(tb_handle_t file, tb_iovec_t const* list, tb_size_t 
  */
 tb_long_t 				tb_file_writv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size);
 
+/*! writf the file data
+ * 
+ * @param file 			the file
+ * @param ifile 		the input file
+ * @param size 			the size
+ *
+ * @return 				the real size or -1
+ */
+tb_hong_t 				tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_size_t size);
+
+/*! pwritf the file data
+ * 
+ * @param file 			the file
+ * @param ifile 		the input file
+ * @param size 			the size
+ * @param offset 		the offset, the file offset will not be changed
+ *
+ * @return 				the real size or -1
+ */
+tb_hong_t 				tb_file_pwritf(tb_handle_t file, tb_handle_t ifile, tb_size_t size, tb_hize_t offset);
+
 /*! preadv the file data 
  * 
  * @param file 			the file handle
  * @param list 			the iovec list
  * @param size 			the iovec size
+ * @param offset 		the offset, the file offset will not be changed
  *
  * @return 				the real size or -1
  */
@@ -195,6 +219,7 @@ tb_long_t 				tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t
  * @param file 			the file handle
  * @param list 			the iovec list
  * @param size 			the iovec size
+ * @param offset 		the offset, the file offset will not be changed
  *
  * @return 				the real size or -1
  */
