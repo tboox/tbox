@@ -25,6 +25,7 @@
  * includes
  */
 #include "prefix.h"
+#include "../file.h"
 #include "../socket.h"
 #include <unistd.h>
 #include <fcntl.h>
@@ -360,7 +361,7 @@ tb_long_t tb_socket_sendv(tb_handle_t socket, tb_iovec_t const* list, tb_size_t 
 	// error
 	return -1;
 }
-tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
 {
 	// check
 	tb_assert_and_check_return_val(socket && file && size, -1);
@@ -369,7 +370,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset
 
 	// send it
 	off_t 		seek = offset;
-	tb_hong_t 	real = sendfile(tb_handle2fd(socket), tb_handle2fd(file), offset >= 0? &seek : tb_null, (size_t)size);
+	tb_hong_t 	real = sendfile(tb_handle2fd(socket), tb_handle2fd(file), &seek, (size_t)size);
 
 	// ok?
 	if (real >= 0) return real;
@@ -382,7 +383,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset
 
 #elif defined(TB_CONFIG_OS_MAC) || defined(TB_CONFIG_OS_IOS)
 
-	// send it, FIXME: for offset < 0
+	// send it
 	off_t real = (off_t)size;
 	if (!sendfile(tb_handle2fd(file), tb_handle2fd(socket), (off_t)offset, &real, tb_null, 0)) return (tb_hong_t)real;
 
@@ -392,12 +393,13 @@ tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hong_t offset
 	// error
 	return -1;
 #else
+	// read data
+	tb_byte_t data[8192];
+	tb_long_t real = tb_file_pread(file, data, sizeof(data), offset);
+	tb_check_return_val(real > 0, real);
 
-	// no impl
-	tb_trace_noimpl();
-	
-	// error
-	return -1;
+	// sned data
+	return tb_socket_send(socket, data, real);
 #endif
 }
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size)

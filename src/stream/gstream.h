@@ -329,7 +329,7 @@ tb_bool_t 			tb_gstream_clos(tb_gstream_t* gstream);
  * @param data 		the data
  * @param size 		the size
  *
- * @return 			ok: 1, continue: 0, failed: -1
+ * @return 			the real size or -1
  */
 tb_long_t 			tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size);
 
@@ -339,9 +339,19 @@ tb_long_t 			tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t 
  * @param data 		the data
  * @param size 		the size
  *
- * @return 			ok: 1, continue: 0, failed: -1
+ * @return 			the real size or -1
  */
 tb_long_t 			tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size);
+
+/*! async writf
+ *
+ * @param gstream 	the stream
+ * @param data 		the data
+ * @param size 		the size
+ *
+ * @return 			the real size or -1
+ */
+tb_hong_t 			tb_gstream_awritf(tb_gstream_t* gstream, tb_handle_t file, tb_hize_t offset, tb_hize_t size);
 
 /*! block read
  *

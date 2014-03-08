@@ -443,6 +443,10 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 //	tb_trace_impl("writ: %d", writ);
 	return writ;
 }
+tb_hong_t tb_gstream_awritf(tb_gstream_t* gstream, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
+{
+	return -1;
+}
 tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)
 {
 	// check data

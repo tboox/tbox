@@ -241,16 +241,16 @@ tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
 
 	// save offset
 	tb_hong_t current = tb_file_offset(file);
-	tb_assert_and_check_return_val(current, -1);
+	tb_assert_and_check_return_val(current >= 0, -1);
 
 	// seek it
-	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+	if (current != offset && tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
 	// read it
 	tb_long_t real = tb_file_readv(file, list, size);
 
 	// restore offset
-	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+	if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
 
 	// ok
 	return real;
@@ -275,16 +275,16 @@ tb_long_t tb_file_pwritv(tb_handle_t file, tb_iovec_t const* list, tb_size_t siz
 
 	// save offset
 	tb_hong_t current = tb_file_offset(file);
-	tb_assert_and_check_return_val(current, -1);
+	tb_assert_and_check_return_val(current >= 0, -1);
 
 	// seek it
-	if (tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
+	if (current != offset && tb_file_seek(file, offset, TB_FILE_SEEK_BEG) != offset) return -1;
 
 	// writ it
 	tb_long_t real = tb_file_writv(file, list, size);
 
 	// restore offset
-	if (tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
+	if (current != offset && tb_file_seek(file, current, TB_FILE_SEEK_BEG) != current) return -1;
 
 	// ok
 	return real;

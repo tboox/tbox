@@ -27,13 +27,7 @@
 #include "prefix.h"
 #include "api.h"
 #include "../socket.h"
-#include <windows.h>
 #include <winsock2.h>
-
-/* ///////////////////////////////////////////////////////////////////////
- * libraries
- */
-#pragma comment(lib, "ws2_32.lib")
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -486,7 +480,7 @@ tb_long_t tb_socket_sendv(tb_handle_t handle, tb_iovec_t const* list, tb_size_t 
 	// ok?
 	return writ;
 }
-tb_hong_t tb_socket_sendf(tb_handle_t handle, tb_handle_t file, tb_hong_t offset, tb_hize_t size)
+tb_hong_t tb_socket_sendf(tb_handle_t handle, tb_handle_t file, tb_hize_t offset, tb_hize_t size)
 {
 	// check
 	tb_assert_and_check_return_val(handle && file && size, -1);
@@ -495,7 +489,7 @@ tb_hong_t tb_socket_sendf(tb_handle_t handle, tb_handle_t file, tb_hong_t offset
 	tb_api_TransmitFile_t transmitfile = tb_api_TransmitFile();
 	tb_assert_and_check_return_val(transmitfile, -1);
 
-	// transmit it, FIXME: for offset < 0
+	// transmit it
 	OVERLAPPED 	olap = {0}; olap.Offset = offset;
 	tb_hong_t 	real = transmitfile((SOCKET)handle - 1, (HANDLE)file, (DWORD)size, (1 << 16), &olap, tb_null, 0);
 
