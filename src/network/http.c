@@ -450,10 +450,46 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		// writ post
 		if (http->option.method == TB_HTTP_METHOD_POST)
 		{
-			if (tb_tstream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
+			// file => sock? optimizate it
+			tb_handle_t sock = tb_null;
+			tb_handle_t file = tb_null;
+			if (tb_stream_type(pstream) == TB_STREAM_TYPE_FILE && http->stream == http->sstream)
 			{
-				http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
-				break;
+				// is ssl?
+				tb_bool_t bssl = tb_false;
+				if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_SSL, &bssl)) break;
+
+				// save file => sock
+				if (!bssl)
+				{
+					// the sock handle
+					if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SOCK_GET_HANDLE, &sock)) break;
+
+					// the file handle
+					if (!tb_stream_ctrl(pstream, TB_STREAM_CTRL_FILE_GET_HANDLE, &file)) break;
+				}
+			}
+	
+			/* optimization, sock => file
+			 *
+			 * the pstream state need be not changed because it will be exited after saving it
+			 * the sstream state need be not changed because socket have not offset
+			 */
+			if (sock && file)
+			{
+				if (tb_tstream_save_fs(file, sock, tb_stream_timeout(http->stream), http->option.post_lrate, tb_http_request_post, http) != post_size)
+				{
+					http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+					break;
+				}
+			}
+			else
+			{
+				if (tb_tstream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
+				{
+					http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+					break;
+				}
 			}
 		}
 

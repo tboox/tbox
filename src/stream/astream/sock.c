@@ -692,6 +692,13 @@ static tb_bool_t tb_astream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va
 			// ok
 			return tb_true;
 		}
+	case TB_STREAM_CTRL_SOCK_GET_TYPE:
+		{
+			tb_size_t* ptype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(ptype, tb_false);
+			*ptype = sstream->type;
+			return tb_true;
+		}
 	case TB_STREAM_CTRL_SOCK_SET_HANDLE:
 		{
 			// check

@@ -11,7 +11,7 @@
 #define TB_DEMO_FILE_READ_MAXN 			(1 << 16)
 
 // mode
-//#define TB_DEMO_MODE_SENDFILE
+//#define TB_DEMO_MODE_SENDF
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -30,7 +30,7 @@ typedef struct __tb_demo_context_t
 	// the size
 	tb_hize_t 			size;
 
-#ifndef TB_DEMO_MODE_SENDFILE
+#ifndef TB_DEMO_MODE_SENDF
 	// the data
 	tb_byte_t* 			data;
 #endif
@@ -40,7 +40,7 @@ typedef struct __tb_demo_context_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#ifdef TB_DEMO_MODE_SENDFILE
+#ifdef TB_DEMO_MODE_SENDF
 static tb_void_t tb_demo_context_exit(tb_demo_context_t* context)
 {
 	if (context)
@@ -161,11 +161,11 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 }
 #endif
 
-#ifdef TB_DEMO_MODE_SENDFILE
-static tb_bool_t tb_demo_sock_sendfile_func(tb_aice_t const* aice)
+#ifdef TB_DEMO_MODE_SENDF
+static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
 {
 	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDF, tb_false);
 
 	// the context
 	tb_demo_context_t* context = (tb_demo_context_t*)aice->priv;
@@ -175,27 +175,27 @@ static tb_bool_t tb_demo_sock_sendfile_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("sendfile[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendfile.real, aice->u.sendfile.size);
+//		tb_print("sendf[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendf.real, aice->u.sendf.size);
 
 		// save size
-		context->size += aice->u.sendfile.real;
+		context->size += aice->u.sendf.real;
 
 		// continue to send it?
-		if (aice->u.sendfile.real < aice->u.sendfile.size)
+		if (aice->u.sendf.real < aice->u.sendf.size)
 		{
-			// post sendfile from file
-			if (!tb_aico_sendfile(aice->aico, context->file, context->size, aice->u.sendfile.size - aice->u.sendfile.real, tb_demo_sock_sendfile_func, context)) return tb_false;
+			// post sendf from file
+			if (!tb_aico_sendf(aice->aico, context->file, context->size, aice->u.sendf.size - aice->u.sendf.real, tb_demo_sock_sendf_func, context)) return tb_false;
 		}
 		else 
 		{
-			tb_print("sendfile[%p]: finished", aice->aico);
+			tb_print("sendf[%p]: finished", aice->aico);
 			tb_demo_context_exit(context);
 		}
 	}
 	// closed or failed?
 	else
 	{
-		tb_print("sendfile[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_print("sendf[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		tb_demo_context_exit(context);
 	}
 
@@ -235,7 +235,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			context = tb_malloc0(sizeof(tb_demo_context_t));
 			tb_assert_and_check_break(context);
 
-#ifdef TB_DEMO_MODE_SENDFILE
+#ifdef TB_DEMO_MODE_SENDF
 			// init context
 			context->sock = aice->u.acpt.sock;
 			context->file = tb_file_init(path, TB_FILE_MODE_RO | TB_FILE_MODE_AICP);
@@ -245,8 +245,8 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			context->aico[0] = tb_aico_init_sock(aicp, context->sock);
 			tb_assert_and_check_break(context->aico[0]);
 
-			// post sendfile from file
-			if (!tb_aico_sendfile(context->aico[0], context->file, 0ULL, tb_file_size(context->file), tb_demo_sock_sendfile_func, context)) break;
+			// post sendf from file
+			if (!tb_aico_sendf(context->aico[0], context->file, 0ULL, tb_file_size(context->file), tb_demo_sock_sendf_func, context)) break;
 #else
 			// init context
 			context->sock = aice->u.acpt.sock;
@@ -282,7 +282,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 		else
 		{
 			// continue it
-			if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, path)) return tb_false;
+			if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, (tb_pointer_t)path)) return tb_false;
 		}
 	}
 	// timeout?
@@ -292,7 +292,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 		tb_print("acpt[%p]: timeout", aice->aico);
 	
 		// continue it
-		if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, path)) return tb_false;
+		if (!tb_aico_acpt(aice->aico, tb_demo_sock_acpt_func, (tb_pointer_t)path)) return tb_false;
 	}
 	// failed?
 	else

@@ -267,11 +267,20 @@ tb_hong_t tb_file_writf(tb_handle_t file, tb_handle_t ifile, tb_hize_t offset, t
 
 	// read data
 	tb_byte_t data[8192];
-	tb_long_t real = tb_file_pread(ifile, data, sizeof(data), offset);
-	tb_check_return_val(real > 0, real);
+	tb_long_t read = tb_file_pread(ifile, data, sizeof(data), offset);
+	tb_check_return_val(read > 0, read);
 
 	// writ data
-	return tb_file_writ(file, data, real);
+	tb_size_t writ = 0;
+	while (writ < read)
+	{
+		tb_long_t real = tb_file_writ(file, data + writ, read - writ);
+		if (real > 0) writ += real;
+		else break;
+	}
+
+	// ok?
+	return writ == read? writ : -1;
 }
 tb_long_t tb_file_preadv(tb_handle_t file, tb_iovec_t const* list, tb_size_t size, tb_hize_t offset)
 {

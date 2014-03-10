@@ -44,7 +44,7 @@
 #define tb_aico_sendv(aico, list, size, func, priv) 							tb_aico_sendv_impl(aico, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_urecvv(aico, addr, port, list, size, func, priv) 				tb_aico_urecvv_impl(aico, addr, port, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_usendv(aico, addr, port, list, size, func, priv) 				tb_aico_usendv_impl(aico, addr, port, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_sendfile(aico, file, seek, size, func, priv) 					tb_aico_sendfile_impl(aico, file, seek, size, func, priv __tb_debug_vals__)
+#define tb_aico_sendf(aico, file, seek, size, func, priv) 						tb_aico_sendf_impl(aico, file, seek, size, func, priv __tb_debug_vals__)
 #define tb_aico_read(aico, seek, data, size, func, priv) 						tb_aico_read_impl(aico, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_writ(aico, seek, data, size, func, priv) 						tb_aico_writ_impl(aico, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_readv(aico, seek, list, size, func, priv) 						tb_aico_readv_impl(aico, seek, list, size, func, priv __tb_debug_vals__)
@@ -61,7 +61,7 @@
 #define tb_aico_sendv_after(aico, delay, list, size, func, priv) 				tb_aico_sendv_after_impl(aico, delay, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_urecvv_after(aico, delay, addr, port, list, size, func, priv) 	tb_aico_urecvv_after_impl(aico, delay, addr, port, list, size, func, priv __tb_debug_vals__)
 #define tb_aico_usendv_after(aico, delay, addr, port, list, size, func, priv) 	tb_aico_usendv_after_impl(aico, delay, addr, port, list, size, func, priv __tb_debug_vals__)
-#define tb_aico_sendfile_after(aico, delay, file, seek, size, func, priv) 		tb_aico_sendfile_after_impl(aico, delay, file, seek, size, func, priv __tb_debug_vals__)
+#define tb_aico_sendf_after(aico, delay, file, seek, size, func, priv) 			tb_aico_sendf_after_impl(aico, delay, file, seek, size, func, priv __tb_debug_vals__)
 #define tb_aico_read_after(aico, delay, seek, data, size, func, priv) 			tb_aico_read_after_impl(aico, delay, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_writ_after(aico, delay, seek, data, size, func, priv) 			tb_aico_writ_after_impl(aico, delay, seek, data, size, func, priv __tb_debug_vals__)
 #define tb_aico_readv_after(aico, delay, seek, list, size, func, priv) 			tb_aico_readv_after_impl(aico, delay, seek, list, size, func, priv __tb_debug_vals__)
@@ -407,7 +407,7 @@ tb_bool_t 			tb_aico_usendv_impl(tb_handle_t aico, tb_ipv4_t const* addr, tb_siz
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_sendfile_impl(tb_handle_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aico_sendf_impl(tb_handle_t aico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
 /*! post the read for file
  *
@@ -619,7 +619,7 @@ tb_bool_t 			tb_aico_usendv_after_impl(tb_handle_t aico, tb_size_t delay, tb_ipv
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aico_sendfile_after_impl(tb_handle_t aico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__);
+tb_bool_t 			tb_aico_sendf_after_impl(tb_handle_t aico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__);
 
 /*! post the read for file after the delay time
  *

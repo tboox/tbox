@@ -194,6 +194,13 @@ static tb_bool_t tb_gstream_file_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 			fstream->mode = (tb_size_t)tb_va_arg(args, tb_size_t);
 			return tb_true;
 		}
+	case TB_STREAM_CTRL_FILE_GET_MODE:
+		{
+			tb_size_t* pmode = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(pmode, tb_false);
+			*pmode = fstream->mode;
+			return tb_true;
+		}
 	case TB_STREAM_CTRL_FILE_SET_HANDLE:
 		{
 			tb_handle_t handle = (tb_handle_t)tb_va_arg(args, tb_handle_t);

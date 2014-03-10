@@ -894,15 +894,15 @@ static tb_bool_t tb_iocp_post_usendv(tb_aicp_proactor_t* proactor, tb_aice_t con
 	// failed
 	return tb_false;
 }
-static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
+static tb_bool_t tb_iocp_post_sendf(tb_aicp_proactor_t* proactor, tb_aice_t const* aice)
 {
 	// check
 	tb_aicp_proactor_iocp_t* ptor = (tb_aicp_proactor_iocp_t*)proactor;
 	tb_assert_and_check_return_val(ptor && ptor->port && proactor->aicp, tb_false);
 
 	// check aice
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDFILE, tb_false);
-	tb_assert_and_check_return_val(aice->u.sendfile.file && aice->u.sendfile.size, tb_false);
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SENDF, tb_false);
+	tb_assert_and_check_return_val(aice->u.sendf.file && aice->u.sendf.size, tb_false);
 	
 	// the aico
 	tb_iocp_aico_t* aico = (tb_iocp_aico_t*)aice->aico;
@@ -910,7 +910,7 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 
 	// init olap
 	tb_memset(&aico->olap, 0, sizeof(tb_iocp_olap_t));
-	aico->olap.base.Offset 	= aice->u.sendfile.seek;
+	aico->olap.base.Offset 	= aice->u.sendf.seek;
 
 	// init aice
 	aico->olap.aice = *aice;
@@ -924,8 +924,8 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 	}
 
 	// done send
-	tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendfile.file, (DWORD)aice->u.sendfile.size, (1 << 16), &aico->olap, tb_null, 0);
-	tb_trace_impl("sendfile: %ld, error: %d", real, WSAGetLastError());
+	tb_long_t real = ptor->TransmitFile((SOCKET)aico->base.handle - 1, (HANDLE)aice->u.sendf.file, (DWORD)aice->u.sendf.size, (1 << 16), &aico->olap, tb_null, 0);
+	tb_trace_impl("sendf: %ld, error: %d", real, WSAGetLastError());
 
 	// pending? continue it
 	if (!real || WSA_IO_PENDING == WSAGetLastError()) 
@@ -942,7 +942,7 @@ static tb_bool_t tb_iocp_post_sendfile(tb_aicp_proactor_t* proactor, tb_aice_t c
 	{
 		// post ok
 		aico->olap.aice.state = TB_AICE_STATE_OK;
-		aico->olap.aice.u.sendfile.real = real;
+		aico->olap.aice.u.sendf.real = real;
 		if (PostQueuedCompletionStatus(ptor->port, 0, (ULONG*)aico, &aico->olap)) return tb_true;
 	}
 	else
@@ -1794,7 +1794,7 @@ static tb_bool_t tb_aicp_proactor_iocp_post(tb_aicp_proactor_t* proactor, tb_aic
 	,	tb_iocp_post_sendv
 	,	tb_iocp_post_urecvv
 	,	tb_iocp_post_usendv
-	,	tb_iocp_post_sendfile
+	,	tb_iocp_post_sendf
 	,	tb_iocp_post_read
 	,	tb_iocp_post_writ
 	,	tb_iocp_post_readv

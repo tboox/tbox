@@ -393,13 +393,23 @@ tb_hong_t tb_socket_sendf(tb_handle_t socket, tb_handle_t file, tb_hize_t offset
 	// error
 	return -1;
 #else
+
 	// read data
 	tb_byte_t data[8192];
-	tb_long_t real = tb_file_pread(file, data, sizeof(data), offset);
-	tb_check_return_val(real > 0, real);
+	tb_long_t read = tb_file_pread(file, data, sizeof(data), offset);
+	tb_check_return_val(read > 0, read);
 
-	// sned data
-	return tb_socket_send(socket, data, real);
+	// send data
+	tb_size_t writ = 0;
+	while (writ < read)
+	{
+		tb_long_t real = tb_socket_send(socket, data + writ, read - writ);
+		if (real > 0) writ += real;
+		else break;
+	}
+
+	// ok?
+	return writ == read? writ : -1;
 #endif
 }
 tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port, tb_byte_t* data, tb_size_t size)

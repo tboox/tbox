@@ -142,7 +142,7 @@ static __tb_inline__ tb_size_t tb_aiop_aioe_code(tb_aice_t const* aice)
 	, 	TB_AIOE_CODE_SEND 			//< sendv
 	, 	TB_AIOE_CODE_RECV 			//< urecvv
 	, 	TB_AIOE_CODE_SEND 			//< usendv
-	, 	TB_AIOE_CODE_SEND 			//< sendfile
+	, 	TB_AIOE_CODE_SEND 			//< sendf
 
 	, 	TB_AIOE_CODE_NONE
 	, 	TB_AIOE_CODE_NONE
@@ -859,12 +859,12 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	// ok
 	return 1;
 }
-static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
+static tb_long_t tb_aiop_spak_sendf(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aice)
 {
 	// check
 	tb_assert_and_check_return_val(ptor && aice, -1);
-	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_SENDFILE, -1);
-	tb_assert_and_check_return_val(aice->u.sendfile.file && aice->u.sendfile.size, -1);
+	tb_assert_and_check_return_val(aice->code == TB_AICE_CODE_SENDF, -1);
+	tb_assert_and_check_return_val(aice->u.sendf.file && aice->u.sendf.size, -1);
 
 	// the aico
 	tb_aiop_aico_t* aico = (tb_aiop_aico_t*)aice->aico;
@@ -873,9 +873,9 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	// try to send it
 	tb_long_t 	real = 0;
 	tb_hize_t 	send = 0;
-	tb_hize_t 	seek = aice->u.sendfile.seek;
-	tb_hize_t 	size = aice->u.sendfile.size;
-	tb_handle_t file = aice->u.sendfile.file;
+	tb_hize_t 	seek = aice->u.sendf.seek;
+	tb_hize_t 	size = aice->u.sendf.size;
+	tb_handle_t file = aice->u.sendf.file;
 	while (send < size)
 	{
 		// send it
@@ -887,7 +887,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 	}
 
 	// trace
-	tb_trace_impl("sendfile[%p]: %llu", aico->base.handle, send);
+	tb_trace_impl("sendf[%p]: %llu", aico->base.handle, send);
 
 	// no send? 
 	if (!send) 
@@ -903,7 +903,7 @@ static tb_long_t tb_aiop_spak_sendfile(tb_aicp_proactor_aiop_t* ptor, tb_aice_t*
 		aice->state = TB_AICE_STATE_OK;
 
 		// save the send size
-		aice->u.sendfile.real = send;
+		aice->u.sendf.real = send;
 	}
 	
 	// reset wait
@@ -1080,7 +1080,7 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	,	tb_aiop_spak_sendv
 	,	tb_aiop_spak_urecvv
 	,	tb_aiop_spak_usendv
-	,	tb_aiop_spak_sendfile
+	,	tb_aiop_spak_sendf
 
 	,	tb_aicp_file_spak_read
 	,	tb_aicp_file_spak_writ
