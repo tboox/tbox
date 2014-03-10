@@ -304,6 +304,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 }
 static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data, tb_size_t size)
 {
+	// check
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sstream && sstream->sock, -1);
 
@@ -420,6 +421,13 @@ static tb_bool_t tb_gstream_sock_ctrl(tb_handle_t gstream, tb_size_t ctrl, tb_va
 			sstream->type = type;
 
 			// ok
+			return tb_true;
+		}
+	case TB_STREAM_CTRL_SOCK_GET_TYPE:
+		{
+			tb_size_t* ptype = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			tb_assert_and_check_return_val(ptype, tb_false);
+			*ptype = sstream->type;
 			return tb_true;
 		}
 	case TB_STREAM_CTRL_SOCK_SET_HANDLE:

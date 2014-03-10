@@ -122,6 +122,12 @@ typedef struct __tb_tstream_t
 	// the current rate
 	tb_size_t 				crate;
 
+	// the sock aico
+	tb_handle_t 			aico;
+
+	// the file handle
+	tb_handle_t 			file;
+
 	// the func
 	union
 	{
@@ -158,8 +164,11 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		// ok?
 		tb_check_break(state == TB_STREAM_STATE_OK);
 			
+		// reset state
+		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+			
 		// done func at first once
-		if (!tstream->save && !tstream->func.save.func(state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
+		if (!tstream->save && !tstream->func.save.func(TB_STREAM_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
 
 		// save size
 		tstream->save += real;
@@ -193,12 +202,9 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			delay = 0;
 
 			// done func
-			if (!tstream->func.save.func(state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(TB_STREAM_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
 		}
 
-		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
-			
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
@@ -518,6 +524,129 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	// ok
 	return ok;
 }
+static tb_bool_t tb_tstream_send_file_func(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_SENDF, tb_false);
+
+	// the tstream
+	tb_tstream_t* tstream = (tb_tstream_t*)aice->priv;
+	tb_assert_and_check_return_val(tstream && tstream->file && tstream->func.save.func, tb_false);
+
+	// trace
+	tb_trace_impl("send: file: real: %llu, size: %llu, state: %s", aice->u.sendf.real, aice->u.sendf.size, tb_aice_state_cstr(aice->state));
+
+	// the time
+	tb_hong_t time = tb_aicp_time(tb_aico_aicp(aice->aico));
+
+	// done
+	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
+	tb_hize_t filesize = tb_file_size(tstream->file);
+	do
+	{
+		// ok?
+		tb_check_break(aice->state == TB_AICE_STATE_OK);
+			
+		// done func at first once
+		if (!tstream->save && !tstream->func.save.func(TB_STREAM_STATE_OK, aice->u.sendf.seek, filesize, 0, 0, tstream->func.save.priv)) break;
+
+		// save size
+		tstream->save += aice->u.sendf.real;
+
+		// < 1s?
+		tb_size_t delay = 0;
+		tb_size_t lrate = tb_atomic_get(&tstream->lrate);
+		if (time < tstream->base1s + 1000)
+		{
+			// save size for 1s
+			tstream->save1s += aice->u.sendf.real;
+
+			// save current rate if < 1s from base
+			if (time < tstream->base + 1000) tstream->crate = tstream->save1s;
+					
+			// compute the delay for limit rate
+			if (lrate) delay = tstream->save1s >= lrate? tstream->base1s + 1000 - time : 0;
+		}
+		else
+		{
+			// save current rate
+			tstream->crate = tstream->save1s;
+
+			// update base1s
+			tstream->base1s = time;
+
+			// reset size
+			tstream->save1s = 0;
+
+			// reset delay
+			delay = 0;
+
+			// done func
+			if (!tstream->func.save.func(TB_STREAM_STATE_OK, aice->u.sendf.seek, filesize, tstream->save, tstream->crate, tstream->func.save.priv)) break;
+		}
+
+		// stoped?
+		if (tb_atomic_get(&tstream->stoped))
+		{
+			state = TB_STREAM_STATE_KILLED;
+			break;
+		}
+
+		// not finished? continue to writ
+		if (aice->u.sendf.real < aice->u.sendf.size) 
+		{
+			// pausing or paused?
+			if (tb_atomic_get(&tstream->pausing) || tb_atomic_get(&tstream->paused))
+			{
+				// paused
+				tb_atomic_set(&tstream->paused, 1);
+				
+				// clear pausing
+				tb_atomic_set0(&tstream->pausing);
+		
+				// done func
+				if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, aice->u.sendf.seek, filesize, tstream->save, 0, tstream->func.save.priv)) break;
+			}
+			// continue?
+			else 
+			{
+				// trace
+				tb_trace_impl("delay: %lu ms", delay);
+
+				// the offset
+				tb_hize_t offset = aice->u.sendf.seek + aice->u.sendf.real;
+				tb_assert_and_check_break(offset <= filesize);
+
+				// the lrate
+				tb_hize_t lrate = tb_atomic_get(&tstream->lrate);
+
+				// the need
+				tb_hize_t need = filesize - offset;
+				if (lrate && lrate < need) need = lrate;
+
+				// send file
+				if (!tb_aico_sendf_after(aice->aico, delay, tstream->file, offset, need, tb_tstream_send_file_func, tstream)) break;
+			}
+		}
+
+		// ok
+		state = TB_STREAM_STATE_OK;
+
+	} while (0);
+
+	// failed? 
+	if (state != TB_STREAM_STATE_OK) 
+	{
+		// compute the total rate
+		tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
+
+		// done func
+		tstream->func.save.func(state, aice->u.sendf.seek, filesize, tstream->save, trate, tstream->func.save.priv);
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_tstream_open_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
 {
 	// check
@@ -775,8 +904,39 @@ tb_hong_t tb_tstream_save_uu(tb_char_t const* iurl, tb_char_t const* ourl, tb_si
 			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC)) break;
 		}
 
+		// open istream
+		if (!tb_gstream_open(istream)) break;
+		
+		// open ostream
+		if (!tb_gstream_open(ostream)) break;
+
+		// file => sock? optimizate it
+		tb_handle_t sock = tb_null;
+		tb_handle_t file = tb_null;
+		if ( 	tb_stream_type(istream) == TB_STREAM_TYPE_FILE
+			&& 	tb_stream_type(ostream) == TB_STREAM_TYPE_SOCK)
+		{
+			// is ssl?
+			tb_bool_t bssl = tb_false;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_GET_SSL, &bssl)) break;
+
+			// the sock type
+			tb_size_t type = TB_SOCKET_TYPE_NUL;
+			if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_SOCK_GET_TYPE, &type)) break;
+
+			// is tcp socket? save file => sock
+			if (!bssl && type == TB_SOCKET_TYPE_TCP)
+			{
+				// the sock handle
+				if (!tb_stream_ctrl(ostream, TB_STREAM_CTRL_SOCK_GET_HANDLE, &sock)) break;
+
+				// the file handle
+				if (!tb_stream_ctrl(istream, TB_STREAM_CTRL_FILE_GET_HANDLE, &file)) break;
+			}
+		}
+	
 		// save stream
-		size = tb_tstream_save_gg(istream, ostream, lrate, func, priv);
+		size = (file && sock)? tb_tstream_save_fs(file, sock, tb_stream_timeout(ostream), lrate, func, priv) : tb_tstream_save_gg(istream, ostream, lrate, func, priv);
 
 	} while (0);
 
@@ -919,6 +1079,119 @@ tb_hong_t tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstream
 
 	// ok?
 	return size;
+}
+tb_hong_t tb_tstream_save_fs(tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(file && sock, -1);	
+
+	// the size
+	tb_hize_t size = tb_file_size(file);
+
+	// the offset
+	tb_hong_t offset = tb_file_offset(file);
+	tb_assert_and_check_return_val(offset >= 0 && offset <= size, -1);
+
+	// done func
+	if (func) func(TB_STREAM_STATE_OK, offset, size, 0, 0, priv);
+
+	// writ data
+	tb_hize_t 	writ = 0;
+	tb_hong_t 	base = tb_mclock();
+	tb_hong_t 	base1s = base;
+	tb_hong_t 	time = 0;
+	tb_size_t 	crate = 0;
+	tb_long_t 	delay = 0;
+	tb_hize_t 	writ1s = 0;
+	tb_bool_t 	wait = tb_false;
+	while (offset < size)
+	{
+		// the need
+		tb_hize_t need = lrate? tb_min(lrate, size - offset) : size - offset;
+
+		// read data
+		tb_hong_t real = tb_socket_sendf(sock, file, offset, need);
+		if (real > 0)
+		{
+			// save writ
+			writ += real;
+
+			// save offset
+			offset += real;
+
+			// clear wait
+			wait = tb_false;
+
+			// has func or limit rate?
+			if (func || lrate) 
+			{
+				// the time
+				time = tb_mclock();
+
+				// < 1s?
+				if (time < base1s + 1000)
+				{
+					// save writ1s
+					writ1s += real;
+
+					// save current rate if < 1s from base
+					if (time < base + 1000) crate = writ1s;
+				
+					// compute the delay for limit rate
+					if (lrate) delay = writ1s >= lrate? base1s + 1000 - time : 0;
+				}
+				else
+				{
+					// save current rate
+					crate = writ1s;
+
+					// update base1s
+					base1s = time;
+
+					// reset writ1s
+					writ1s = 0;
+
+					// reset delay
+					delay = 0;
+
+					// done func
+					if (func) func(TB_STREAM_STATE_OK, offset, size, writ, crate, priv);
+				}
+
+				// wait some time for limit rate
+				if (delay) tb_msleep(delay);
+			}
+		}
+		else if (!real && !wait) 
+		{
+			// wait
+			tb_long_t real = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, timeout);
+			tb_check_break(real > 0);
+
+			// has send?
+			tb_assert_and_check_break(real & TB_AIOE_CODE_SEND);
+
+			// wait ok
+			wait = tb_true;
+		}
+		else break;
+	} 
+
+	// has func?
+	if (func) 
+	{
+		// the time
+		time = tb_mclock();
+
+		// compute the total rate
+		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
+	
+		// done func
+		func(TB_STREAM_STATE_CLOSED, offset, size, writ, trate, priv);
+	}
+
+	// ok?
+	return writ;
 }
 tb_handle_t tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hize_t offset)
 {
@@ -1203,6 +1476,46 @@ tb_handle_t tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_astre
 	// ok?
 	return (tb_handle_t)tstream;
 }
+tb_handle_t tb_tstream_init_fs(tb_aicp_t* aicp, tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_hize_t offset)
+{
+	// done
+	tb_handle_t 	aico = tb_null;
+	tb_tstream_t* 	tstream = tb_null;
+	do
+	{
+		// check
+		tb_assert_and_check_break(aicp && file && sock);
+
+		// init sock aico
+		aico = tb_aico_init_sock(aicp, sock);
+		tb_assert_and_check_break(aico);
+
+		// init sock timeout 
+		tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_SEND, timeout);
+
+		// make tstream
+		tstream = tb_malloc0(sizeof(tb_tstream_t));
+		tb_assert_and_check_break(tstream);
+
+		// init tstream
+		tstream->file 		= file;
+		tstream->aico 		= aico;
+		tstream->iowner 	= 0;
+		tstream->oowner 	= 0;
+		tstream->stoped 	= 1;
+		tstream->offset 	= offset;
+
+		// ok
+		aico = tb_null;
+			
+	} while (0);
+
+	// exit aico
+	if (aico) tb_aico_exit(aico, tb_false);
+
+	// ok?
+	return (tb_handle_t)tstream;
+}
 tb_bool_t tb_tstream_open(tb_handle_t handle, tb_tstream_open_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -1217,44 +1530,60 @@ tb_bool_t tb_tstream_open(tb_handle_t handle, tb_tstream_open_func_t func, tb_po
 		tb_assert_and_check_break(tb_atomic_get(&tstream->stoped));
 		tb_assert_and_check_break(!tb_atomic_get(&tstream->opened));
 
-		// check
-		tb_assert_and_check_break(tstream->istream && tb_stream_mode(tstream->istream) == TB_STREAM_MODE_AICO);
-		tb_assert_and_check_break(tstream->ostream);
-
 		// clear state
 		tb_atomic_set0(&tstream->stoped);
 		tb_atomic_set0(&tstream->paused);
 
-		// init some rate info
-		tstream->base 	= tb_aicp_time(tb_astream_aicp(tstream->istream));
-		tstream->base1s = tstream->base;
-		tstream->save 	= 0;
-		tstream->save1s = 0;
-		tstream->crate 	= 0;
-
 		// init func
- 		tstream->func.open.func = func;
+		tstream->func.open.func = func;
 		tstream->func.open.priv = priv;
 
-		// open ostream
-		tb_bool_t bopened = tb_false;
-		if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO)
+		// file => sock
+		if (tstream->file && tstream->aico)
 		{
-			if (!tb_stream_is_opened(tstream->ostream))
-			{
-				if (!tb_astream_open(tstream->ostream, tb_tstream_ostream_open_func, tstream)) break;
-			}
-			else bopened = tb_true;
-		}
-		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
-		{
-			if (!tb_stream_is_opened(tstream->ostream) && !tb_gstream_open(tstream->ostream)) break;
-			bopened = tb_true;
-		}
-		else tb_assert_and_check_break(0);
+			// init some rate info
+			tstream->base 	= tb_aicp_time(tb_aico_aicp(tstream->aico));
+			tstream->base1s = tstream->base;
+			tstream->save 	= 0;
+			tstream->save1s = 0;
+			tstream->crate 	= 0;
 
-		// open and seek istream
-		if (bopened && !tb_astream_oseek(tstream->istream, tstream->offset, tb_tstream_istream_open_func, tstream)) break;
+			// done func
+			func(TB_STREAM_STATE_OK, tb_file_offset(tstream->file), tb_file_size(tstream->file), priv);
+		}
+		else
+		{
+			// check
+			tb_assert_and_check_break(tstream->istream && tb_stream_mode(tstream->istream) == TB_STREAM_MODE_AICO);
+			tb_assert_and_check_break(tstream->ostream);
+
+			// init some rate info
+			tstream->base 	= tb_aicp_time(tb_astream_aicp(tstream->istream));
+			tstream->base1s = tstream->base;
+			tstream->save 	= 0;
+			tstream->save1s = 0;
+			tstream->crate 	= 0;
+
+			// open ostream
+			tb_bool_t bopened = tb_false;
+			if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO)
+			{
+				if (!tb_stream_is_opened(tstream->ostream))
+				{
+					if (!tb_astream_open(tstream->ostream, tb_tstream_ostream_open_func, tstream)) break;
+				}
+				else bopened = tb_true;
+			}
+			else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
+			{
+				if (!tb_stream_is_opened(tstream->ostream) && !tb_gstream_open(tstream->ostream)) break;
+				bopened = tb_true;
+			}
+			else tb_assert_and_check_break(0);
+
+			// open and seek istream
+			if (bopened && !tb_astream_oseek(tstream->istream, tstream->offset, tb_tstream_istream_open_func, tstream)) break;
+		}
 
 		// ok
 		ok = tb_true;
@@ -1281,8 +1610,37 @@ tb_bool_t tb_tstream_save(tb_handle_t handle, tb_tstream_save_func_t func, tb_po
 	tstream->func.save.func = func;
 	tstream->func.save.priv = priv;
 
-	// read it
-	return tb_astream_read(tstream->istream, (tb_size_t)tb_atomic_get(&tstream->lrate), tb_tstream_istream_read_func, tstream);
+	// done
+	tb_bool_t ok = tb_false;
+	if (tstream->file && tstream->aico)
+	{
+		// the filesize
+		tb_hize_t filesize = tb_file_size(tstream->file);
+
+		// check
+		tb_assert_and_check_return_val(tstream->offset <= filesize, tb_false);
+
+		// the lrate
+		tb_hize_t lrate = tb_atomic_get(&tstream->lrate);
+
+		// the need
+		tb_hize_t need = filesize - tstream->offset;
+		if (lrate && lrate < need) need = lrate;
+
+		// send file
+		ok = tb_aico_sendf(tstream->aico, tstream->file, tstream->offset, need, tb_tstream_send_file_func, tstream);
+	}
+	else
+	{
+		// check
+		tb_assert_and_check_return_val(tstream->istream && tstream->ostream, tb_false);
+
+		// read it
+		ok = tb_astream_read(tstream->istream, (tb_size_t)tb_atomic_get(&tstream->lrate), tb_tstream_istream_read_func, tstream);
+	}
+
+	// ok?
+	return ok;
 }
 tb_bool_t tb_tstream_osave(tb_handle_t handle, tb_tstream_save_func_t func, tb_pointer_t priv)
 {
@@ -1321,6 +1679,9 @@ tb_void_t tb_tstream_kill(tb_handle_t handle)
 		// kill ostream
 		if (tstream->ostream && tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO) 
 			tb_stream_kill(tstream->ostream);
+
+		// kill aico
+		if (tstream->aico) tb_aico_kill(tstream->aico);
 	}
 }
 tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
@@ -1346,6 +1707,13 @@ tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
 		else if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
 			tb_gstream_clos(tstream->ostream);
 	}
+
+	// exit file
+	tstream->file = tb_null;
+
+	// exit aico
+	if (tstream->aico) tb_aico_exit(tstream->aico, bcalling);
+	tstream->aico = tb_null;
 
 	// trace
 	tb_trace_impl("clos: ok");
@@ -1375,6 +1743,13 @@ tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bcalling)
 			tb_gstream_exit(tstream->ostream);
 	}
 	tstream->ostream = tb_null;
+
+	// exit file
+	tstream->file = tb_null;
+
+	// exit aico
+	if (tstream->aico) tb_aico_exit(tstream->aico, bcalling);
+	tstream->aico = tb_null;
 
 	// exit tstream
 	tb_free(tstream);

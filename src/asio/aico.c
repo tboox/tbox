@@ -398,7 +398,7 @@ tb_bool_t tb_aico_usendv_impl(tb_handle_t haico, tb_ipv4_t const* addr, tb_size_
 	// post
 	return tb_aicp_post_impl(aico->aicp, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendfile_impl(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendf_impl(tb_handle_t haico, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_aico_t* aico = (tb_aico_t*)haico;
@@ -406,14 +406,14 @@ tb_bool_t tb_aico_sendfile_impl(tb_handle_t haico, tb_handle_t file, tb_hize_t s
 
 	// init
 	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_SENDFILE;
+	aice.code 				= TB_AICE_CODE_SENDF;
 	aice.state 				= TB_AICE_STATE_PENDING;
 	aice.func 				= func;
 	aice.priv 				= priv;
 	aice.aico 				= aico;
-	aice.u.sendfile.file 	= file;
-	aice.u.sendfile.seek 	= seek;
-	aice.u.sendfile.size 	= size;
+	aice.u.sendf.file 		= file;
+	aice.u.sendf.seek 		= seek;
+	aice.u.sendf.size 		= size;
 
 	// post
 	return tb_aicp_post_impl(aico->aicp, &aice __tb_debug_args__);
@@ -711,7 +711,7 @@ tb_bool_t tb_aico_usendv_after_impl(tb_handle_t haico, tb_size_t delay, tb_ipv4_
 	// post
 	return tb_aicp_post_after_impl(aico->aicp, delay, &aice __tb_debug_args__);
 }
-tb_bool_t tb_aico_sendfile_after_impl(tb_handle_t haico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
+tb_bool_t tb_aico_sendf_after_impl(tb_handle_t haico, tb_size_t delay, tb_handle_t file, tb_hize_t seek, tb_hize_t size, tb_aico_func_t func, tb_pointer_t priv __tb_debug_decl__)
 {
 	// check
 	tb_aico_t* aico = (tb_aico_t*)haico;
@@ -719,14 +719,14 @@ tb_bool_t tb_aico_sendfile_after_impl(tb_handle_t haico, tb_size_t delay, tb_han
 
 	// init
 	tb_aice_t 				aice = {0};
-	aice.code 				= TB_AICE_CODE_SENDFILE;
+	aice.code 				= TB_AICE_CODE_SENDF;
 	aice.state 				= TB_AICE_STATE_PENDING;
 	aice.func 				= func;
 	aice.priv 				= priv;
 	aice.aico 				= aico;
-	aice.u.sendfile.file 	= file;
-	aice.u.sendfile.seek 	= seek;
-	aice.u.sendfile.size 	= size;
+	aice.u.sendf.file 		= file;
+	aice.u.sendf.seek 		= seek;
+	aice.u.sendf.size 		= size;
 
 	// post
 	return tb_aicp_post_after_impl(aico->aicp, delay, &aice __tb_debug_args__);

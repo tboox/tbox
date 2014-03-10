@@ -51,7 +51,7 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_SENDV 			= 8		//!< for sock, send iovec data for tcp
 ,	TB_AICE_CODE_URECVV 		= 9		//!< for sock, recv iovec data for udp
 ,	TB_AICE_CODE_USENDV 		= 10	//!< for sock, send iovec data for udp
-,	TB_AICE_CODE_SENDFILE 		= 11	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+,	TB_AICE_CODE_SENDF 			= 11	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
 
 ,	TB_AICE_CODE_READ 			= 12	//!< for file, read data
 ,	TB_AICE_CODE_WRIT 			= 13	//!< for file, writ data
@@ -439,8 +439,8 @@ typedef struct __tb_aice_usendv_t
 
 }tb_aice_usendv_t;
 
-/// the sendfile aice type
-typedef struct __tb_aice_sendfile_t
+/// the sendf aice type
+typedef struct __tb_aice_sendf_t
 {
 	/// the file
 	tb_handle_t 				file;
@@ -457,7 +457,7 @@ typedef struct __tb_aice_sendfile_t
 	/// the private data for using the left space of the union
 	tb_handle_t 				priv[1];
 
-}tb_aice_sendfile_t;
+}tb_aice_sendf_t;
 
 /// the readv aice type
 typedef struct __tb_aice_readv_t
@@ -546,7 +546,7 @@ typedef struct __tb_aice_t
 		tb_aice_sendv_t 		sendv;
 		tb_aice_urecvv_t 		urecvv;
 		tb_aice_usendv_t 		usendv;
-		tb_aice_sendfile_t 		sendfile;
+		tb_aice_sendf_t 		sendf;
 
 		// for file
 		tb_aice_read_t 			read;

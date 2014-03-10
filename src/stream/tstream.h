@@ -163,6 +163,19 @@ tb_hong_t 			tb_tstream_save_du(tb_byte_t const* idata, tb_size_t isize, tb_char
  */
 tb_hong_t 			tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstream_t* ostream, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
+/*! save file to sock, block transfer
+ *
+ * @param file 		the input file
+ * @param sock 		the output socket
+ * @param timeout 	the timeout
+ * @param lrate 	the limit rate and no limit if 0, bytes/s
+ * @param func 		the save func and be optional
+ * @param priv 		the func private data
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_hong_t 			tb_tstream_save_fs(tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
+
 /*! init tstream from astrean to astream, async transfer
  *
  * @param istream 	the istream
@@ -228,7 +241,6 @@ tb_handle_t 		tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_siz
 
 /*! init tstream from data to astream, async transfer
  *
- * @param aicp 		the aicp
  * @param idata 	the input data
  * @param isize 	the input size
  * @param ostream 	the ostream
@@ -237,6 +249,18 @@ tb_handle_t 		tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_siz
  * @return 			the saved size, failed: -1
  */
 tb_handle_t 		tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_astream_t* ostream, tb_hize_t offset);
+
+/*! init tstream from file to sock, async transfer
+ *
+ * @param aicp 		the aicp
+ * @param file 		the input file
+ * @param sock 		the output socket
+ * @param timeout 	the timeout
+ * @param offset 	the offset
+ *
+ * @return 			the saved size, failed: -1
+ */
+tb_handle_t 		tb_tstream_init_fs(tb_aicp_t* aicp, tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_hize_t offset);
 
 /*! open tstream
  *

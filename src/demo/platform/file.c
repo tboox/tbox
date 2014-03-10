@@ -180,7 +180,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		// exit file
 		tb_file_exit(file);
 	}
-#elif 1
+#elif 0
 	tb_handle_t ifile = tb_file_init(argv[1], TB_FILE_MODE_RW | TB_FILE_MODE_BINARY);
 	tb_handle_t ofile = tb_file_init(argv[2], TB_FILE_MODE_RW | TB_FILE_MODE_CREAT | TB_FILE_MODE_BINARY | TB_FILE_MODE_TRUNC);
 	if (ifile && ofile)

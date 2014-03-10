@@ -97,6 +97,9 @@ typedef struct __tb_aicp_http_t
 	// the pool for string
 	tb_handle_t						pool;
 
+	// the post file
+	tb_handle_t 					post_file;
+
 	// the line data
 	tb_pstring_t 					line_data;
 
@@ -1032,7 +1035,6 @@ static tb_bool_t tb_aicp_http_hwrit_func(tb_astream_t* astream, tb_size_t state,
 }
 static tb_bool_t tb_aicp_http_hopen_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_pointer_t priv)
 {
-			tb_print("tb_aicp_http_hopen_func");
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)priv;
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
@@ -1160,12 +1162,25 @@ static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 		else if (http->option.method == TB_HTTP_METHOD_POST)
 		{
 			// check
-			tb_assert_and_check_break(!http->tstream);
+			tb_assert_and_check_break(!http->tstream && !http->post_file);
 
 			// init tstream
-			tb_char_t const* url = tb_url_get(&http->option.post_url);
+			tb_bool_t 			bssl = tb_false;
+			tb_handle_t 		sock = tb_null;
+			tb_char_t const* 	url = tb_url_get(&http->option.post_url);
 			if (http->option.post_data && http->option.post_size)
 				http->tstream = tb_tstream_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
+#if 0 // FIXME: need open ostream first
+			else if ( 	url 
+					&& 	http->stream == http->sstream
+					&& 	tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_GET_SSL, &bssl) && !bssl
+					&& 	tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_GET_HANDLE, &sock) && sock
+					&& 	(http->post_file = tb_file_init(url, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY)))
+			{
+				// optimization: file => sock
+				http->tstream = tb_tstream_init_fs(tb_astream_aicp(http->stream), http->post_file, sock, tb_stream_timeout(http->stream), 0);
+			}
+#endif
 			else if (url) http->tstream = tb_tstream_init_ua(url, http->stream, 0);
 			tb_assert_and_check_break(http->tstream);
 
@@ -1267,6 +1282,10 @@ tb_void_t tb_aicp_http_clos(tb_handle_t handle, tb_bool_t bcalling)
 	if (http->tstream) tb_tstream_exit(http->tstream, bcalling);
 	http->tstream = tb_null;
 
+	// exit the post file
+	if (http->post_file) tb_file_exit(http->post_file);
+	http->post_file = tb_null;
+
 	// trace
 	tb_trace_impl("clos: ok");
 }
@@ -1300,6 +1319,10 @@ tb_void_t tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// exit tstream
 	if (http->tstream) tb_tstream_exit(http->tstream, bcalling);
 	http->tstream = tb_null;
+
+	// exit the post file
+	if (http->post_file) tb_file_exit(http->post_file);
+	http->post_file = tb_null;
 
 	// exit status
 	tb_aicp_http_status_exit(http);
