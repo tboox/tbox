@@ -206,10 +206,13 @@ typedef enum __tb_stream_state_e
 typedef struct __tb_stream_t
 {
 	/// the stream mode
-	tb_uint8_t 		mode : 2;
+	tb_uint16_t 	mode 		: 2;
 
 	/// the stream type
-	tb_uint8_t 		type : 6;
+	tb_uint16_t 	type 		: 6;
+
+	/// is writed?
+	tb_uint16_t 	bwrited 	: 1;
 
 	/// the url
 	tb_url_t 		url;
