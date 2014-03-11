@@ -557,7 +557,7 @@ tb_astream_t* tb_astream_init_data(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(dstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)dstream, aicp, TB_STREAM_TYPE_DATA)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)dstream, aicp, TB_STREAM_TYPE_DATA, 0)) goto fail;
 	dstream->base.open 		= tb_astream_data_open;
 	dstream->base.read 		= tb_astream_data_read;
 	dstream->base.writ 		= tb_astream_data_writ;

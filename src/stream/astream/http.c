@@ -686,7 +686,7 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(hstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP, 0)) goto fail;
 	hstream->base.open 		= tb_astream_http_open;
 	hstream->base.read 		= tb_astream_http_read;
 	hstream->base.seek 		= tb_astream_http_seek;

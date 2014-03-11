@@ -251,6 +251,9 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	// not opened
 	tb_atomic_set0(&astream->base.bopened);
 
+	// clear cache
+	tb_qbuffer_clear(&astream->base.cache);
+
 	// clear debug info
 #ifdef __tb_debug__
 	astream->file = tb_null;
@@ -277,6 +280,9 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 
 	// exit url
 	tb_url_exit(&astream->base.url);
+
+	// exit cache
+	tb_qbuffer_exit(&astream->base.cache);
 
 	// free it
 	tb_free(astream);

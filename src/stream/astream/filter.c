@@ -544,7 +544,7 @@ tb_astream_t* tb_astream_init_filter(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FLTR)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FLTR, 0)) goto fail;
 	fstream->base.open 		= tb_astream_filter_open;
 	fstream->base.read 		= tb_astream_filter_read;
 	fstream->base.writ 		= tb_astream_filter_writ;

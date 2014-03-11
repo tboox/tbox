@@ -40,6 +40,9 @@
 // the file read maxn
 #define TB_ASTREAM_FILE_READ_MAXN 			TB_FILE_DIRECT_CSIZE
 
+// the file cache maxn
+#define TB_ASTREAM_FILE_CACHE_MAXN 			TB_FILE_DIRECT_CSIZE
+
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
@@ -460,7 +463,7 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FILE)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FILE, TB_ASTREAM_FILE_CACHE_MAXN)) goto fail;
 	fstream->base.open 		= tb_astream_file_open;
 	fstream->base.read 		= tb_astream_file_read;
 	fstream->base.writ 		= tb_astream_file_writ;
