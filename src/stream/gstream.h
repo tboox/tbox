@@ -104,14 +104,8 @@ typedef struct __tb_gstream_t
 	/// is writed?
 	tb_uint8_t 			bwrited 	: 1;
 
-	/// is cached?
-	tb_uint8_t 			bcached 	: 1;
-
 	/// the state
 	tb_size_t 			state;
-
-	/// the cache
-	tb_qbuffer_t 		cache;
 
 	/// the offset
 	tb_hize_t 			offset;

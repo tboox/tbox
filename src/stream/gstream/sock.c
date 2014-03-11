@@ -140,6 +140,11 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 	sstream->sock = tb_socket_open(sstream->type);
 	sstream->bref = 0;
 	tb_assert_and_check_return_val(sstream->sock, tb_false);
+	
+	// resize cache 
+	tb_size_t recv_cache = tb_socket_recv_buffer_size(sstream->sock);
+	tb_size_t send_cache = tb_socket_send_buffer_size(sstream->sock);
+	if (recv_cache || send_cache) tb_stream_ctrl(gstream, TB_STREAM_CTRL_SET_CACHE, tb_max(recv_cache, send_cache));
 
 	// done
 	tb_bool_t ok = tb_false;

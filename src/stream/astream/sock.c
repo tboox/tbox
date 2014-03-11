@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"asock"
+#define TB_TRACE_IMPL_TAG 				"asock"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -32,6 +32,13 @@
 #include "prefix.h"
 #include "../stream.h"
 #include "../../platform/platform.h"
+
+// the sock cache maxn
+#ifdef __tb_small__
+# 	define TB_GSTREAM_SOCK_CACHE_MAXN 	(8192)
+#else
+# 	define TB_GSTREAM_SOCK_CACHE_MAXN 	(8192 << 1)
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -166,6 +173,10 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 				sstream->bref = 0;
 			}
 			tb_assert_and_check_break(sstream->sock);
+	
+			// resize send cache 
+			tb_size_t cache = tb_socket_send_buffer_size(sstream->sock);
+			if (cache) tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_CACHE, cache);
 
 			// init maxn
 			if (!sstream->maxn) sstream->maxn = tb_socket_recv_buffer_size(sstream->sock);
@@ -283,6 +294,9 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
+	// trace
+	tb_trace_impl("recv: real: %lu, size: %lu, state: %s", aice->u.recv.real, aice->u.recv.size, tb_aice_state_cstr(aice));
+
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
@@ -333,6 +347,9 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
+	// trace
+	tb_trace_impl("urecv: real: %lu, size: %lu, state: %s", aice->u.urecv.real, aice->u.urecv.size, tb_aice_state_cstr(aice));
+
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
@@ -405,6 +422,9 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
+	// trace
+	tb_trace_impl("send: real: %lu, size: %lu, state: %s", aice->u.send.real, aice->u.send.size, tb_aice_state_cstr(aice));
+
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
 	switch (aice->state)
@@ -454,6 +474,9 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	// the stream
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
+
+	// trace
+	tb_trace_impl("usend: real: %lu, size: %lu, state: %s", aice->u.usend.real, aice->u.usend.size, tb_aice_state_cstr(aice));
 
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -759,7 +782,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
 	sstream->base.open 		= tb_astream_sock_open;
 	sstream->base.read 		= tb_astream_sock_read;
 	sstream->base.writ 		= tb_astream_sock_writ;

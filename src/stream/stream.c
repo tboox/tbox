@@ -136,6 +136,7 @@ tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 	case TB_STREAM_SOCK_STATE_SSL_FAILED: 		return "sock: ssl: failed";
 	case TB_STREAM_SOCK_STATE_RECV_TIMEOUT: 	return "sock: recv: timeout";
 	case TB_STREAM_SOCK_STATE_SEND_TIMEOUT: 	return "sock: send: timeout";
+	case TB_STREAM_SOCK_STATE_SEND_FAILED: 		return "sock: send: failed";
 	case TB_STREAM_HTTP_STATE_RESPONSE_204: 	return "http: response: 204";
 	case TB_STREAM_HTTP_STATE_RESPONSE_300: 	return "http: response: 300";
 	case TB_STREAM_HTTP_STATE_RESPONSE_301: 	return "http: response: 301";
@@ -340,6 +341,28 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 			if (ptimeout)
 			{
 				*ptimeout = stream->timeout;
+				ok = tb_true;
+			}
+		}
+		break;
+	case TB_STREAM_CTRL_SET_CACHE:
+		{
+			// check
+			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
+
+			// set cache
+			tb_size_t cache = (tb_size_t)tb_va_arg(args, tb_size_t);
+			tb_qbuffer_resize(&stream->cache, cache);
+			ok = tb_true;
+		}
+		break;
+	case TB_STREAM_CTRL_GET_CACHE:
+		{
+			// get cache
+			tb_size_t* pcache = (tb_size_t*)tb_va_arg(args, tb_size_t*);
+			if (pcache)
+			{
+				*pcache = tb_qbuffer_maxn(&stream->cache);
 				ok = tb_true;
 			}
 		}

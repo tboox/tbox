@@ -92,7 +92,10 @@ ASFLAGS-o 			= -o
 ARFLAGS 			= -cr
 
 # share ldflags
-SHFLAGS 			= 
+SHFLAGS 			= -march=$(ARCH) -shared -Wl,-soname -nostdlib \
+					-L$(NDK)/platforms/android-8/arch-arm/usr/lib/ \
+					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtbegin_dynamic.o \
+					$(NDK)/platforms/android-8/arch-arm/usr/lib/crtend_android.o
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak

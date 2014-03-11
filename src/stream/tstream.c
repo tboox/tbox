@@ -534,7 +534,7 @@ static tb_bool_t tb_tstream_send_file_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(tstream && tstream->file && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_impl("send: file: real: %llu, size: %llu, state: %s", aice->u.sendf.real, aice->u.sendf.size, tb_aice_state_cstr(aice->state));
+	tb_trace_impl("send: file: real: %llu, size: %llu, state: %s", aice->u.sendf.real, aice->u.sendf.size, tb_aice_state_cstr(aice));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_aico_aicp(aice->aico));
@@ -637,6 +637,17 @@ static tb_bool_t tb_tstream_send_file_func(tb_aice_t const* aice)
 	// failed? 
 	if (state != TB_STREAM_STATE_OK) 
 	{
+		// aice state => stream state
+		switch (aice->state)
+		{
+		case TB_AICE_STATE_KILLED: state = TB_STREAM_STATE_KILLED; break;
+		case TB_AICE_STATE_CLOSED: state = TB_STREAM_STATE_CLOSED; break;
+		case TB_AICE_STATE_FAILED: state = TB_STREAM_SOCK_STATE_SEND_FAILED; break;
+		case TB_AICE_STATE_TIMEOUT: state = TB_STREAM_SOCK_STATE_SEND_TIMEOUT; break;
+		case TB_AICE_STATE_NOTSUPPORTED: state = TB_STREAM_STATE_NOT_SUPPORTED; break;
+		default: state = TB_STREAM_STATE_UNKNOWN_ERROR; break;
+		}
+
 		// compute the total rate
 		tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
 
@@ -1548,6 +1559,9 @@ tb_bool_t tb_tstream_open(tb_handle_t handle, tb_tstream_open_func_t func, tb_po
 			tstream->save1s = 0;
 			tstream->crate 	= 0;
 
+			// opened
+			tb_atomic_set(&tstream->opened, 1);
+
 			// done func
 			func(TB_STREAM_STATE_OK, tb_file_offset(tstream->file), tb_file_size(tstream->file), priv);
 		}
@@ -1600,7 +1614,7 @@ tb_bool_t tb_tstream_save(tb_handle_t handle, tb_tstream_save_func_t func, tb_po
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
-	tb_assert_and_check_return_val(tstream && tstream->istream && tstream->ostream && func, tb_false);
+	tb_assert_and_check_return_val(tstream && func, tb_false);
 
 	// check state
 	tb_assert_and_check_return_val(!tb_atomic_get(&tstream->stoped), tb_false);

@@ -134,7 +134,7 @@ ASFLAGS-o 			= -o
 ARFLAGS 			= -cr
 
 # share ldflags
-SHFLAGS 			= -shared -Wl,-soname
+SHFLAGS 			= -m$(BITS) -shared -Wl,-soname
 
 # include sub-config
 include 			$(PLAT_DIR)/config.mak

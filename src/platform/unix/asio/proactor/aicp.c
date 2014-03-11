@@ -459,7 +459,13 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!sock) 
 	{
 		// wait it
-		if (!aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!aico->waiting)
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -496,7 +502,13 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!ok) 
 	{
 		// wait it
-		if (!aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!aico->waiting)
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_FAILED;
 	}
@@ -542,7 +554,13 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!recv) 
 	{
 		// wait it
-		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting)
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -593,7 +611,13 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) 
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -645,7 +669,13 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	if (!recv) 
 	{
 		// wait it
-		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting)
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -697,7 +727,13 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting)
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}
@@ -741,7 +777,13 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no recv?
-	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting)
+	{
+		// wait ok?
+		if (tb_aiop_spak_wait(ptor, aice)) return 0;
+		// wait failed
+		else aice->state = TB_AICE_STATE_FAILED;
+	}
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
@@ -776,7 +818,13 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no send?
-	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) 
+	{
+		// wait ok?
+		if (tb_aiop_spak_wait(ptor, aice)) return 0;
+		// wait failed
+		else aice->state = TB_AICE_STATE_FAILED;
+	}
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
@@ -812,7 +860,13 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no recv?
-	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting)
+	{
+		// wait ok?
+		if (tb_aiop_spak_wait(ptor, aice)) return 0;
+		// wait failed
+		else aice->state = TB_AICE_STATE_FAILED;
+	}
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
@@ -848,7 +902,13 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 		aice->state = TB_AICE_STATE_OK;
 	}
 	// no send?
-	else if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+	else if (!real && !aico->waiting) 
+	{
+		// wait ok?
+		if (tb_aiop_spak_wait(ptor, aice)) return 0;
+		// wait failed
+		else aice->state = TB_AICE_STATE_FAILED;
+	}
 	// closed?
 	else aice->state = TB_AICE_STATE_CLOSED;
 	
@@ -893,7 +953,13 @@ static tb_long_t tb_aiop_spak_sendf(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	if (!send) 
 	{
 		// wait it
-		if (!real && !aico->waiting) return tb_aiop_spak_wait(ptor, aice)? 0 : -1;
+		if (!real && !aico->waiting) 
+		{
+			// wait ok?
+			if (tb_aiop_spak_wait(ptor, aice)) return 0;
+			// wait failed
+			else aice->state = TB_AICE_STATE_FAILED;
+		}
 		// closed
 		else aice->state = TB_AICE_STATE_CLOSED;
 	}

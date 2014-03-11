@@ -32,7 +32,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t* aicp, tb_size_t type)
+static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t* aicp, tb_size_t type, tb_size_t cache)
 {
 	// check
 	tb_assert_and_check_return_val(astream && aicp, tb_false);
@@ -44,7 +44,19 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t*
 	astream->base.bopened 	= 0;
 	astream->base.bstoped 	= 1;
 	astream->aicp 			= aicp;
-	return tb_url_init(&astream->base.url);
+
+	// init url
+	if (!tb_url_init(&astream->base.url)) return tb_false;
+
+	// init cache
+	if (!tb_qbuffer_init(&astream->base.cache, cache)) goto fail;
+
+	// ok
+	return tb_true;
+
+fail:
+	tb_qbuffer_exit(&astream->base.cache);
+	return tb_false;
 }
 
 #endif
