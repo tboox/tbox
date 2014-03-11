@@ -101,9 +101,6 @@ typedef struct __tb_gstream_t
 	/// the base
 	tb_stream_t 		base;
 
-	/// is writed?
-	tb_uint8_t 			bwrited 	: 1;
-
 	/// the state
 	tb_size_t 			state;
 
