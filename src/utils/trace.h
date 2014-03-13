@@ -38,7 +38,7 @@ typedef enum __tb_trace_mode_e
 {
 	TB_TRACE_MODE_NONE 		= 0
 ,	TB_TRACE_MODE_FILE 		= 1
-,	TB_TRACE_MODE_PRINTF 	= 2
+,	TB_TRACE_MODE_PRINT 	= 2
 
 }tb_trace_mode_e;
 
@@ -93,37 +93,13 @@ tb_bool_t 			tb_trace_file_set(tb_handle_t file);
  */
 tb_bool_t 			tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend);
 
-/*! trace debug for debug
+/*! done trace
  *
  * @param prefix 	the trace prefix
  * @param module 	the trace module
  * @param format 	the trace format
  */
-tb_void_t 			tb_trace_debug(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
-
-/*! trace info for debug and release
- *
- * @param prefix 	the trace prefix
- * @param module 	the trace module
- * @param format 	the trace format
- */
-tb_void_t 			tb_trace_info(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
-
-/*! trace error for debug and release
- *
- * @param prefix 	the trace prefix
- * @param module 	the trace module
- * @param format 	the trace format
- */
-tb_void_t 			tb_trace_error(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
-
-/*! trace warning for debug and release
- *
- * @param prefix 	the trace prefix
- * @param module 	the trace module
- * @param format 	the trace format
- */
-//tb_void_t 			tb_trace_warning(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
+tb_void_t 			tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
 
 #endif
 

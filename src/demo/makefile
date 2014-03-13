@@ -113,7 +113,7 @@ demo_LIBS-$(ZLIB) 		+= z
 demo_LIB_DIR 			+= ..
 
 # flags
-demo_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" 
+demo_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" -DTB_TRACE_PREFIX=\"demo\"
 demo_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE 
 
 # command
