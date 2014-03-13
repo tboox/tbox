@@ -1071,7 +1071,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 			}
 
 			// leak
-			ok = tb_false;			
+			ok = tb_false;
 		}
 
 		// next

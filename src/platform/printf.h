@@ -50,29 +50,35 @@ typedef enum __tb_printf_mode_e
 
 /*! init printf
  *
- * @param mode 	the printf mode
- * @param path 	the printf path
+ * @param mode 		the printf mode
+ * @param path 		the printf path
  *
- * @return 		tb_true or tb_false
+ * @return 			tb_true or tb_false
  */
-tb_bool_t 		tb_printf_init(tb_size_t mode, tb_char_t const* path);
+tb_bool_t 			tb_printf_init(tb_size_t mode, tb_char_t const* path);
 
 /// exit the printf
-tb_void_t 		tb_printf_exit(tb_noarg_t);
+tb_void_t 			tb_printf_exit(tb_noarg_t);
 
 /*! reset printf
  *
- * @param mode 	the printf mode
- * @param path 	the printf path
+ * @param mode 		the printf mode
+ * @param path 		the printf path
  *
- * @return 		tb_true or tb_false
+ * @return 			tb_true or tb_false
  */
-tb_bool_t 		tb_printf_reset(tb_size_t mode, tb_char_t const* path);
+tb_bool_t 			tb_printf_reset(tb_size_t mode, tb_char_t const* path);
 
-/// printf
-tb_void_t 		tb_printf(tb_char_t const* format, ...);
+/*! printf
+ *
+ * @param format 	the printf format
+ */
+tb_void_t 			tb_printf(tb_char_t const* format, ...);
 
-/// wprintf
-tb_void_t 		tb_wprintf(tb_wchar_t const* format, ...);
+/*! wprintf
+ *
+ * @param format 	the wprintf format
+ */
+tb_void_t 			tb_wprintf(tb_wchar_t const* format, ...);
 
 #endif
