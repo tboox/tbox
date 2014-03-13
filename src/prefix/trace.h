@@ -197,9 +197,12 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
-
-tb_void_t 		tb_printf(tb_char_t const* fmt, ...);
-tb_void_t 		tb_wprintf(tb_wchar_t const* fmt, ...);
+tb_void_t 		tb_printf(tb_char_t const* format, ...);
+tb_void_t 		tb_wprintf(tb_wchar_t const* format, ...);
+tb_void_t 		tb_trace_debug(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
+tb_void_t 		tb_trace_info(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
+tb_void_t 		tb_trace_error(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
+//tb_void_t 	tb_trace_warning(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
 
 #endif
 

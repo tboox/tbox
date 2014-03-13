@@ -94,12 +94,13 @@ tbox_C_FILES 			+= \
 						zip/rlc \
 						utils/bits \
 						utils/md5 \
-						utils/option \
 						utils/sha \
 						utils/crc \
 						utils/url \
 						utils/dump \
 						utils/used \
+						utils/trace \
+						utils/option \
 						utils/base32 \
 						utils/base64 \
 						xml/node \
@@ -440,11 +441,12 @@ INC_FILES 				= \
 						utils/bits.h \
 						utils/sha.h \
 						utils/md5.h \
-						utils/option.h \
 						utils/crc.h \
 						utils/url.h \
 						utils/used.h \
 						utils/dump.h \
+						utils/trace.h \
+						utils/option.h \
 						utils/base32.h \
 						utils/base64.h \
 						utils/opt/x86/bits.h \

@@ -36,6 +36,7 @@
 #include "url.h"
 #include "dump.h"
 #include "used.h"
+#include "trace.h"
 #include "base32.h"
 #include "base64.h"
 #include "option.h"
