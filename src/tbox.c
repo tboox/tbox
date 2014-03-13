@@ -124,6 +124,9 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 
 tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_char_t const* build)
 {
+	// init trace
+	if (!tb_trace_init()) return tb_false;
+
 	// trace
 	tb_trace("init: %p %lu", data, size);
 
@@ -165,8 +168,10 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_c
 	// check version
 	tb_version_check(build);
 
-	// ok
+	// trace
 	tb_trace("init: ok");
+
+	// ok
 	return tb_true;
 }
 tb_void_t tb_exit()
@@ -186,8 +191,11 @@ tb_void_t tb_exit()
 	// exit memory
 	tb_memory_exit();
 
-	// ok
+	// trace
 	tb_trace("exit: ok");
+
+	// exit trace
+	tb_trace_exit();
 }
 
 tb_version_t const* tb_version()

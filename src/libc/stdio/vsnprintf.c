@@ -1002,6 +1002,7 @@ get_qualifier:
  */
 tb_long_t tb_vsnprintf(tb_char_t* s, tb_size_t n, tb_char_t const* fmt, tb_va_list_t args)
 {
+	// check
 	if (!n || !s || !fmt) return 0;
 
 	tb_char_t* pb = s;
