@@ -750,8 +750,8 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	tb_assert_and_check_return(cookies && cookies->cpool && cookies->spool && cookies->hmutex);
 	tb_mutex_enter(cookies->hmutex);
 
-	tb_trace_d("[cookies]: ==================================================");
-	tb_trace_d("[cookies]: cookies:");
+	tb_trace_i("==================================================");
+	tb_trace_i("cookies:");
 	
 	tb_vector_t* cpool = cookies->cpool;
 	tb_slist_t* spool = cookies->spool;
@@ -759,7 +759,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	// dump items
 	tb_size_t i = 0;
 	tb_size_t n = tb_vector_size(cpool);
-	tb_trace_d("[cookies]: [cpool]: size: %d, maxn: %d", n, tb_vector_maxn(cpool));
+	tb_trace_i("[cpool]: size: %d, maxn: %d", n, tb_vector_maxn(cpool));
 	for (i = 0; i < n; i++)
 	{
 		tb_cookie_t const* cookie = (tb_cookie_t const*)tb_iterator_item(cpool, i);
@@ -770,7 +770,7 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 			tb_cookie_string_t const* sname = cookie->name? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->name) : tb_null;
 			tb_cookie_string_t const* svalue = cookie->value? (tb_cookie_string_t const*)tb_iterator_item(spool, cookie->value) : tb_null;
 
-			tb_trace_d("[cookies]: [cookie]: url = %s%s%s, %s = %s"
+			tb_trace_i("[cookie]: url = %s%s%s, %s = %s"
 				, cookie->secure? "https://" : "http://"
 				, sdomain && sdomain->data? sdomain->data : ""
 				, spath && spath->data? spath->data : ""
@@ -783,13 +783,13 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	// dump strings
 	tb_size_t itor = tb_iterator_head(spool);
 	tb_size_t tail = tb_iterator_tail(spool);
-	tb_trace_d("[cookies]: [spool]: size: %d, maxn: %d", n, tb_slist_maxn(spool));
+	tb_trace_i("[spool]: size: %d, maxn: %d", n, tb_slist_maxn(spool));
 	for (; itor != tail; itor = tb_iterator_next(spool, itor))
 	{
 		tb_cookie_string_t const* s = (tb_cookie_string_t const*)tb_iterator_item(spool, itor);
 		if (s)
 		{
-			tb_trace_d("[cookies]: [string]: [%d]: %s ", s->refn, s->data? s->data : "");
+			tb_trace_i("[string]: [%d]: %s ", s->refn, s->data? s->data : "");
 		}
 	}
 	tb_mutex_leave(cookies->hmutex);

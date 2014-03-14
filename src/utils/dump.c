@@ -82,10 +82,11 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 	tb_size_t offset = 0;
 
 	// dump head
+	tb_tracef_i("");
 	tb_size_t i = 0;
 	tb_size_t n = 147;
-	for (i = 0; i < n; i++) tb_printf("=");
-	tb_printf("\n");
+	for (i = 0; i < n; i++) tb_tracet_i("=");
+	tb_tracet_i(__tb_newline__);
 
 	// walk
 	while (!tb_stream_beof(gst))
@@ -119,26 +120,27 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 		if (read == 0x20)
 		{
 			// dump offset
-			tb_printf("%08X ", offset);
+			tb_tracef_i("");
+			tb_tracet_i("%08X ", offset);
 
 			// dump data
 			for (i = 0; i < 0x20; i++)
 			{
-				if (!(i & 3)) tb_printf(" ");
-				tb_printf(" %02X", line[i]);
+				if (!(i & 3)) tb_tracet_i(" ");
+				tb_tracet_i(" %02X", line[i]);
 			}
 
 			// dump spaces
-			tb_printf("  ");
+			tb_tracet_i("  ");
 
 			// dump characters
 			for (i = 0; i < 0x20; i++)
 			{
-				tb_printf("%c", tb_isgraph(line[i])? line[i] : '.');
+				tb_tracet_i("%c", tb_isgraph(line[i])? line[i] : '.');
 			}
 
 			// dump new line
-			tb_printf("\n");
+			tb_tracet_i(__tb_newline__);
 
 			// update offset
 			offset += 0x20;
@@ -150,7 +152,8 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 			tb_size_t padding = n - 0x20;
 
 			// dump offset
-			tb_printf("%08X ", offset); 
+			tb_tracef_i("");
+			tb_tracet_i("%08X ", offset); 
 			if (padding >= 9) padding -= 9;
 
 			// dump data
@@ -158,25 +161,25 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 			{
 				if (!(i & 3)) 
 				{
-					tb_printf(" ");
+					tb_tracet_i(" ");
 					if (padding) padding--;
 				}
 
-				tb_printf(" %02X", line[i]);
+				tb_tracet_i(" %02X", line[i]);
 				if (padding >= 3) padding -= 3;
 			}
 
 			// dump spaces
-			while (padding--) tb_printf(" ");
+			while (padding--) tb_tracet_i(" ");
 				
 			// dump characters
 			for (i = 0; i < read; i++)
 			{
-				tb_printf("%c", tb_isgraph(line[i])? line[i] : '.');
+				tb_tracet_i("%c", tb_isgraph(line[i])? line[i] : '.');
 			}
 
 			// dump new line
-			tb_printf("\n");
+			tb_tracet_i(__tb_newline__);
 
 			// update offset
 			offset += read;

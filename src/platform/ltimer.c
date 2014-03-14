@@ -297,7 +297,7 @@ static tb_bool_t tb_ltimer_expired_exit(tb_vector_t* vector, tb_pointer_t* item,
 			if (!tb_ltimer_add_task(timer, task))
 			{
 				// trace
-				tb_trace_d("[ltimer]: continue to add task failed");
+				tb_trace_e("continue to add task failed");
 			}
 		}
 		else
@@ -721,7 +721,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		if (!tb_ltimer_del_task(timer, task))
 		{
 			// trace
-			tb_trace_d("[ltimer]: del task failed");
+			tb_trace_e("del task failed");
 			break;
 		}
 
@@ -738,7 +738,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		if (!tb_ltimer_add_task(timer, task))
 		{
 			// trace
-			tb_trace_d("[ltimer]: re-add task failed");
+			tb_trace_e("re-add task failed");
 			break;
 		}
 

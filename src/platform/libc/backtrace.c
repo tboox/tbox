@@ -23,6 +23,12 @@
  */
 
 /* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 			"backtrace"
+#define TB_TRACE_MODULE_DEBUG 			(0)
+
+/* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
@@ -84,15 +90,15 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 	tb_pointer_t __libc_stack_end = __plibc_stack_end? *__plibc_stack_end : tb_null;
 
 	// trace
-//	tb_trace_d("[backtrace]: __libc_stack_end: %p", __libc_stack_end);
+//	tb_trace_d("__libc_stack_end: %p", __libc_stack_end);
 
 	// the top frame and stack address
 	tb_pointer_t top_frame = TB_FIRST_FRAME_POINTER;
 	tb_pointer_t top_stack = TB_CURRENT_STACK_FRAME;
 
 	// trace
-//	tb_trace_d("[backtrace]: top_frame: %p", top_frame);
-//	tb_trace_d("[backtrace]: top_stack: %p", top_stack);
+//	tb_trace_d("top_frame: %p", top_frame);
+//	tb_trace_d("top_stack: %p", top_stack);
 
 	// the current frame
 	tb_frame_layout_t* current = ((tb_frame_layout_t*)top_frame);
@@ -106,7 +112,7 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 	while (n < nframe && m--)
 	{
 		// trace
-//		tb_trace_d("[backtrace]: current: %p", current);
+//		tb_trace_d("current: %p", current);
 
 		// out of range?
 		if ( 	(tb_pointer_t)current TB_STACK_INNER_THAN top_stack

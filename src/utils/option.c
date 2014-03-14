@@ -328,7 +328,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 				else if (val)
 				{
 					// print
-					tb_printf("%s: unrecognized option value '--%s=%s'\n", option->name, key, val);
+					tb_trace_e("%s: unrecognized option value '--%s=%s'", option->name, key, val);
 
 					// next
 					continue ;
@@ -336,7 +336,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 				else
 				{
 					// print
-					tb_printf("%s: no option value '--%s='\n", option->name, key);
+					tb_trace_e("%s: no option value '--%s='", option->name, key);
 
 					// next
 					continue ;
@@ -345,7 +345,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 			else
 			{
 				// print
-				tb_printf("%s: unrecognized option '--%s'\n", option->name, key);
+				tb_trace_e("%s: unrecognized option '--%s'", option->name, key);
 
 				// next
 				continue ;
@@ -372,7 +372,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 			if (tb_strlen(key) != 1)
 			{
 				// print
-				tb_printf("%s: unrecognized option '-%s'\n", option->name, key);
+				tb_trace_e("%s: unrecognized option '-%s'", option->name, key);
 
 				// next
 				continue ;
@@ -437,7 +437,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 				else if (val)
 				{
 					// print
-					tb_printf("%s: unrecognized option value '--%s=%s'\n", option->name, key, val);
+					tb_trace_e("%s: unrecognized option value '--%s=%s'", option->name, key, val);
 
 					// next
 					continue ;
@@ -445,7 +445,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 				else
 				{
 					// print
-					tb_printf("%s: no option value '--%s='\n", option->name, key);
+					tb_trace_e("%s: no option value '--%s='", option->name, key);
 
 					// next
 					continue ;
@@ -454,7 +454,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 			else
 			{
 				// print
-				tb_printf("%s: unrecognized option '-%s'\n", option->name, key);
+				tb_trace_e("%s: unrecognized option '-%s'", option->name, key);
 
 				// next
 				continue ;
