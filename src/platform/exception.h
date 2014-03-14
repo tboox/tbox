@@ -64,11 +64,11 @@
 #define tb_check_leave(x) 								{ if (!(x)) __tb_leave ; }
 
 // assert
-#ifdef TB_ASSERT_ENABLE
+#ifdef __tb_debug__
 # 	define tb_assert_leave(x)							{ if (!(x)) {tb_trace_a("expr: %s", #x); __tb_leave ; } }
 # 	define tb_assert_and_check_leave(x)					tb_assert_leave(x)
 #else
-# 	define tb_assert_leave(x)
+# 	define tb_assert_leave(x)						
 # 	define tb_assert_and_check_leave(x)					tb_check_leave(x)
 #endif
 
