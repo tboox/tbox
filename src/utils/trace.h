@@ -101,5 +101,9 @@ tb_bool_t 			tb_trace_file_set_path(tb_char_t const* path, tb_bool_t bappend);
  */
 tb_void_t 			tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
 
+/*! sync trace
+ */
+tb_void_t 			tb_trace_sync(tb_noarg_t);
+
 #endif
 

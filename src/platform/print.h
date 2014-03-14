@@ -46,4 +46,8 @@ tb_void_t 			tb_print(tb_char_t const* string);
  */
 tb_void_t 			tb_printl(tb_char_t const* string);
 
+/*! sync print
+ */
+tb_void_t 			tb_print_sync(tb_noarg_t);
+
 #endif

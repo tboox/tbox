@@ -69,6 +69,9 @@ tb_bool_t tb_trace_init()
 }
 tb_void_t tb_trace_exit()
 {
+	// sync trace
+	tb_trace_sync();
+
 	// enter
 	tb_spinlock_enter(&g_lock);
 
@@ -184,6 +187,9 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 	// done
 	do
 	{
+		// check
+		tb_check_break(g_mode);
+
 		// init
 		tb_va_list_t 	l;
 		tb_char_t* 		p = g_line;
@@ -211,12 +217,43 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		if (p < e) *p = '\0'; e[-1] = '\0';
 
 		// print it
-		tb_print(g_line);
+		if (g_mode & TB_TRACE_MODE_PRINT) tb_print(g_line);
+
+		// print it to file
+		if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+		{
+			// done
+			tb_size_t size = p - g_line;
+			tb_size_t writ = 0;
+			while (writ < size)
+			{
+				// writ it
+				tb_long_t real = tb_file_writ(g_file, g_line + writ, size - writ);
+				tb_check_break(real > 0);
+
+				// save size
+				writ += real;
+			}
+		}
 
 		// exit
 		tb_va_end(l);
 
 	} while (0);
+
+	// leave
+	tb_spinlock_leave(&g_lock);
+}
+tb_void_t tb_trace_sync()
+{
+	// enter
+	tb_spinlock_enter(&g_lock);
+
+	// sync it
+	if (g_mode & TB_TRACE_MODE_PRINT) tb_print_sync();
+
+	// sync it to file
+	if ((g_mode & TB_TRACE_MODE_FILE) && g_file) tb_file_sync(g_file);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
