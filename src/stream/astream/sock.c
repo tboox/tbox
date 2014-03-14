@@ -24,7 +24,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"asock"
+#define TB_TRACE_MODULE_NAME 				"astream_sock"
+#define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -164,7 +165,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 		if (addr)
 		{
 			// trace
-			tb_trace_impl("addr[%s]: %u.%u.%u.%u", host, tb_ipv4_u8x4(*addr));
+			tb_trace_d("addr[%s]: %u.%u.%u.%u", host, tb_ipv4_u8x4(*addr));
 
 			// init sock
 			if (!sstream->sock) 
@@ -231,7 +232,7 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 		else
 		{
 			// trace
-			tb_trace_impl("addr[%s]: failed", host);
+			tb_trace_d("addr[%s]: failed", host);
 
 			// dns failed
 			state = TB_STREAM_SOCK_STATE_DNS_FAILED;
@@ -295,7 +296,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// trace
-	tb_trace_impl("recv: real: %lu, size: %lu, state: %s", aice->u.recv.real, aice->u.recv.size, tb_aice_state_cstr(aice));
+	tb_trace_d("recv: real: %lu, size: %lu, state: %s", aice->u.recv.real, aice->u.recv.size, tb_aice_state_cstr(aice));
 
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -320,7 +321,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 		state = TB_STREAM_SOCK_STATE_RECV_TIMEOUT;
 		break;
 	default:
-		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("read: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
 
@@ -348,7 +349,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
  
 	// trace
-	tb_trace_impl("urecv: real: %lu, size: %lu, state: %s", aice->u.urecv.real, aice->u.urecv.size, tb_aice_state_cstr(aice));
+	tb_trace_d("urecv: real: %lu, size: %lu, state: %s", aice->u.urecv.real, aice->u.urecv.size, tb_aice_state_cstr(aice));
 
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -373,7 +374,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 		state = TB_STREAM_SOCK_STATE_RECV_TIMEOUT;
 		break;
 	default:
-		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("read: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
 
@@ -423,7 +424,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// trace
-	tb_trace_impl("send: real: %lu, size: %lu, state: %s", aice->u.send.real, aice->u.send.size, tb_aice_state_cstr(aice));
+	tb_trace_d("send: real: %lu, size: %lu, state: %s", aice->u.send.real, aice->u.send.size, tb_aice_state_cstr(aice));
 
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -448,7 +449,7 @@ static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 		state = TB_STREAM_SOCK_STATE_SEND_TIMEOUT;
 		break;
 	default:
-		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("writ: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
  
@@ -476,7 +477,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.writ, tb_false);
 
 	// trace
-	tb_trace_impl("usend: real: %lu, size: %lu, state: %s", aice->u.usend.real, aice->u.usend.size, tb_aice_state_cstr(aice));
+	tb_trace_d("usend: real: %lu, size: %lu, state: %s", aice->u.usend.real, aice->u.usend.size, tb_aice_state_cstr(aice));
 
 	// done state
 	tb_size_t state = TB_STREAM_STATE_UNKNOWN_ERROR;
@@ -501,7 +502,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 		state = TB_STREAM_SOCK_STATE_SEND_TIMEOUT;
 		break;
 	default:
-		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("writ: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
  

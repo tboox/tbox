@@ -35,12 +35,17 @@
 
 // the trace prefix
 #ifndef TB_TRACE_PREFIX 
-# 	define TB_TRACE_PREFIX									"tbox"
+# 	define TB_TRACE_PREFIX									tb_null
 #endif
 
 // the trace module name
 #ifndef TB_TRACE_MODULE_NAME
 # 	define TB_TRACE_MODULE_NAME 							tb_null
+#endif
+
+// the trace module debug
+#ifndef TB_TRACE_MODULE_DEBUG
+# 	define TB_TRACE_MODULE_DEBUG 							(1)
 #endif
 
 // trace prefix
@@ -126,14 +131,17 @@
 #if defined(TB_COMPILER_IS_GCC)
 #	define tb_trace_i(fmt, arg ...)					tb_trace_p(TB_TRACE_PREFIX, fmt, ## arg)
 #	define tb_trace_e(fmt, arg ...)					tb_trace_error_p(TB_TRACE_PREFIX, fmt, ## arg)
+#	define tb_trace_a(fmt, arg ...)					tb_trace_assert_p(TB_TRACE_PREFIX, fmt, ## arg)
 #	define tb_trace_w(fmt, arg ...)					tb_trace_warning_p(TB_TRACE_PREFIX, fmt, ## arg)
 #elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
 # 	define tb_trace_i(fmt, ...)						tb_trace_p(TB_TRACE_PREFIX, fmt, __VA_ARGS__)
 # 	define tb_trace_e(fmt, ...)						tb_trace_error_p(TB_TRACE_PREFIX, fmt, __VA_ARGS__)
+# 	define tb_trace_a(fmt, ...)						tb_trace_assert_p(TB_TRACE_PREFIX, fmt, __VA_ARGS__)
 # 	define tb_trace_w(fmt, ...)						tb_trace_warning_p(TB_TRACE_PREFIX, fmt, __VA_ARGS__)
 #else
 # 	define tb_trace_i
 # 	define tb_trace_e
+# 	define tb_trace_a
 # 	define tb_trace_w
 #endif
 
