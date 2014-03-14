@@ -44,15 +44,7 @@ tb_long_t tb_wputs(tb_wchar_t const* string)
 	if (size >= 0 && size < 8192) line[size] = '\0';
 
 	// print it
-	tb_print(line);
-
-#ifdef TB_CONFIG_OS_WINDOWS
-	// print "\r\n"
-	tb_print("\r\n");
-#else
-	// print "\n"
-	tb_print("\n");
-#endif
+	tb_printl(line);
 
 	// ok?
 	return tb_wcslen(string);

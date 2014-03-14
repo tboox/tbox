@@ -27,7 +27,7 @@
 #include "prefix.h"
 #include "../file.h"
 #include "../path.h"
-#include "../printf.h"
+#include "../print.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation

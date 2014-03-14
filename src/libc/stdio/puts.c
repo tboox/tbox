@@ -39,15 +39,7 @@ tb_long_t tb_puts(tb_char_t const* string)
 	tb_check_return_val(string, 0);
 
 	// print it
-	tb_print(string);
-
-#ifdef TB_CONFIG_OS_WINDOWS
-	// print "\r\n"
-	tb_print("\r\n");
-#else
-	// print "\n"
-	tb_print("\n");
-#endif
+	tb_printl(string);
 
 	// ok?
 	return tb_strlen(string);

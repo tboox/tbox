@@ -26,6 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 		"object"
+#define TB_TRACE_MODULE_DEBUG 		(0)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes

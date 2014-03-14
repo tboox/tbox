@@ -25,6 +25,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 			"aicp_iocp"
+#define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes

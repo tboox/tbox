@@ -25,7 +25,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_MODULE_NAME 		"xml"
+#define TB_TRACE_MODULE_NAME 					"xml"
+#define TB_TRACE_MODULE_DEBUG 					(0)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -112,7 +113,7 @@ static tb_char_t const* tb_xml_reader_text_parse(tb_xml_reader_t* reader)
 
 	// parse text
 	tb_char_t* pc = tb_null;
-	while (tb_gstream_need(reader->rstream, &pc, 1) && pc)
+	while (tb_gstream_need(reader->rstream, (tb_byte_t**)&pc, 1) && pc)
 	{
 		// is end? </ ..>
 		if (pc[0] == '<') return tb_pstring_cstr(&reader->text);
@@ -256,7 +257,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 	{
 		// peek character
 		tb_char_t* pc = tb_null;
-		if (!tb_gstream_need(xreader->rstream, &pc, 1) || !pc) break;
+		if (!tb_gstream_need(xreader->rstream, (tb_byte_t**)&pc, 1) || !pc) break;
 
 		// is element?
 		if (*pc == '<') 
@@ -276,7 +277,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				tb_pstring_cstrncpy(&xreader->element, element + 4, size - 4);
 
 				// update version & charset
-				tb_xml_node_t const* attr = tb_xml_reader_attributes(reader);	
+				tb_xml_node_t* attr = (tb_xml_node_t*)tb_xml_reader_attributes(reader);	
 				for (; attr; attr = attr->next)
 				{
 					if (!tb_pstring_cstricmp(&attr->name, "version")) tb_pstring_strcpy(&xreader->version, &attr->data);

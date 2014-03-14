@@ -109,10 +109,10 @@
  * "[prefix]: [module]: [error]: trace error" at func: xxx, line: xxx, file: xxx
  * "[prefix]: [module]: [warning]: trace warning" at func: xxx, line: xxx, file: xxx
  *
- * note: [module]: will be not output if not define TB_TRACE_MODULE_NAME
+ * note: [module]: will be not output if TB_TRACE_MODULE_NAME is not defined
  *
  */
-#if defined(TB_TRACE_MODULE_DEBUG) && defined(__tb_debug__)
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
 # 	if defined(TB_COMPILER_IS_GCC)
 # 		define tb_trace_d(fmt, arg ...)					tb_trace_p(TB_TRACE_PREFIX, fmt, ## arg)
 # 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
