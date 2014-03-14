@@ -31,7 +31,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 			while (writ < size)
 			{
 				tb_long_t real = tb_file_writ(file, buff, tb_min(maxn, size - writ));
-//				tb_print("real: %ld, size: %lu", real, tb_min(maxn, size - writ));
+//				tb_trace_i("real: %ld, size: %lu", real, tb_min(maxn, size - writ));
 				if (real > 0) writ += real;
 				else if (!real) ;
 				else break;
@@ -49,7 +49,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		{
 			// trace
 			time = tb_mclock() - time;
-			tb_print("writ: %lld s", time / 1000);
+			tb_trace_i("writ: %lld s", time / 1000);
 			time = tb_mclock();
 		}
 
@@ -110,7 +110,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		{
 			// trace
 			time = tb_mclock() - time;
-			tb_print("writ: %lld s", time / 1000);
+			tb_trace_i("writ: %lld s", time / 1000);
 			time = tb_mclock();
 		}
 
@@ -173,7 +173,7 @@ tb_int_t tb_demo_platform_file_main(tb_int_t argc, tb_char_t** argv)
 		{
 			// trace
 			time = tb_mclock() - time;
-			tb_print("writ: %lld s", time / 1000);
+			tb_trace_i("writ: %lld s", time / 1000);
 			time = tb_mclock();
 		}
 

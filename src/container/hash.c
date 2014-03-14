@@ -689,7 +689,7 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 							// the items number
 							tb_size_t m = e - b;
 							tb_assert(l >= m);
-//							tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
+//							tb_trace_d("del: b: %u, e: %u, d: %u", b, e, bdel);
 
 							// remove items
 							if (e < l) tb_memmov(((tb_byte_t*)&list[1]) + b * step, ((tb_byte_t*)&list[1]) + e * step, (l - e) * step);
@@ -751,9 +751,9 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 	tb_assert_and_check_return(step);
 
 	// trace
-	tb_print("=========================================================");
-	tb_print("hash_list: hash_size: %d, item_size: %u, item_maxn: %u", hash->hash_size, hash->item_size, hash->item_maxn);
-	tb_print("=========================================================");
+	tb_trace_i("=========================================================");
+	tb_trace_i("hash_list: hash_size: %d, item_size: %u, item_maxn: %u", hash->hash_size, hash->item_size, hash->item_maxn);
+	tb_trace_i("=========================================================");
 
 	// dump
 	tb_size_t i = 0;
@@ -772,31 +772,31 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 				tb_pointer_t item_data = hash->data_func.data(&hash->data_func, item + hash->name_func.size);
 
 				if (hash->name_func.cstr && hash->data_func.cstr) 
-					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i, j
+					tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %s", i, j
 						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
 						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
 				else if (hash->name_func.cstr) 
-					tb_print("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i, j
+					tb_trace_i("bucket[%d:%d] => [%d]:\t%s\t\t=> %x", i, j
 						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, hash->name_func.cstr(&hash->name_func, item_name, name, 4096)
 						, item_data);
 				else if (hash->data_func.cstr) 
-					tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
+					tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
 						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, item_name
 						, hash->data_func.cstr(&hash->data_func, item_data, data, 4096));
-				else tb_print("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
+				else tb_trace_i("bucket[%d:%d] => [%d]:\t%x\t\t=> %x", i, j
 						, hash->name_func.hash(&hash->name_func, item_name, hash->hash_size)
 						, item_name
 						, item_data);
 			}
 
-			tb_print("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
+			tb_trace_i("bucket[%u]: size: %u, maxn: %u", i, list->size, list->maxn);
 		}
 	}
 
-	tb_print("");
+	tb_trace_i("");
 	tb_size_t itor = tb_iterator_head((tb_iterator_t*)hash);
 	tb_size_t tail = tb_iterator_tail((tb_iterator_t*)hash);
 	for (; itor != tail; itor = tb_iterator_next((tb_iterator_t*)hash, itor))
@@ -805,21 +805,21 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 		if (item)
 		{
 			if (hash->name_func.cstr && hash->data_func.cstr) 
-				tb_print("item[%d] => [%d]:\t%s\t\t=> %s", itor
+				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %s", itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 			else if (hash->name_func.cstr) 
-				tb_print("item[%d] => [%d]:\t%s\t\t=> %x", itor
+				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %x", itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, item->data);
 			else if (hash->data_func.cstr) 
-				tb_print("item[%d] => [%d]:\t%x\t\t=> %x", itor
+				tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, item->name
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
-			else tb_print("item[%d] => [%d]:\t%x\t\t=> %x", itor
+			else tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, item->name
 					, item->data);

@@ -27,14 +27,14 @@ static tb_void_t tb_test_heap_min_func()
 		tb_uint32_t val = tb_rand_uint32(0, TB_MAXU32);
 
 		// trace
-//		tb_print("heap_min: put: %u", val);
+//		tb_trace_i("heap_min: put: %u", val);
 
 		// put it
 		tb_heap_put(heap, val);
 	}
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// walk
 	for (i = 0; i < 100; i++) 
@@ -43,7 +43,7 @@ static tb_void_t tb_test_heap_min_func()
 		tb_uint32_t val = (tb_uint32_t)tb_heap_top(heap);
 
 		// trace
-		tb_print("heap_min: pop: %u", val);
+		tb_trace_i("heap_min: pop: %u", val);
 
 		// pop it
 		tb_heap_pop(heap);
@@ -74,7 +74,7 @@ static tb_void_t tb_test_heap_min_perf()
 	time = tb_mclock() - time;
 
 	// trace
-	tb_print("heap_min: %lld ms", time);
+	tb_trace_i("heap_min: %lld ms", time);
 
 	// exit heap
 	tb_heap_exit(heap);
@@ -99,14 +99,14 @@ static tb_void_t tb_test_heap_max_func()
 		tb_uint32_t val = tb_rand_uint32(0, TB_MAXU32);
 
 		// trace
-//		tb_print("heap_max: put: %u", val);
+//		tb_trace_i("heap_max: put: %u", val);
 
 		// put it
 		tb_heap_put(heap, val);
 	}
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// walk
 	for (i = 0; i < 100; i++) 
@@ -115,7 +115,7 @@ static tb_void_t tb_test_heap_max_func()
 		tb_uint32_t val = (tb_uint32_t)tb_heap_top(heap);
 
 		// trace
-		tb_print("heap_max: pop: %u", val);
+		tb_trace_i("heap_max: pop: %u", val);
 
 		// pop it
 		tb_heap_pop(heap);
@@ -149,7 +149,7 @@ static tb_void_t tb_test_heap_max_perf()
 	time = tb_mclock() - time;
 
 	// trace
-	tb_print("heap_max: %lld ms", time);
+	tb_trace_i("heap_max: %lld ms", time);
 
 	// exit heap
 	tb_heap_exit(heap);

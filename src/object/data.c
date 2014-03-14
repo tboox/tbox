@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"object"
+#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -127,7 +127,7 @@ static tb_object_t* tb_data_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 				// text
 				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
-				tb_trace_impl("data: %s", text);
+				tb_trace_d("data: %s", text);
 
 				// base64
 				base64 = tb_strdup(text);
@@ -145,7 +145,7 @@ static tb_object_t* tb_data_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 					tb_byte_t* 			ob = tb_malloc0(on);
 					tb_assert_and_check_goto(ob && on, end);
 					on = tb_base64_decode(ib, in, ob, on);
-					tb_trace_impl("base64: %u => %u", in, on);
+					tb_trace_d("base64: %u => %u", in, on);
 
 					// init data
 					data = tb_data_init_from_data(ob, on); tb_free(ob);
@@ -186,7 +186,7 @@ static tb_bool_t tb_data_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* o
 		tb_char_t* 			ob = tb_malloc0(on);
 		tb_assert_and_check_return_val(ob && on, tb_false);
 		on = tb_base64_encode(ib, in, ob, on);
-		tb_trace_impl("base64: %u => %u", in, on);
+		tb_trace_d("base64: %u => %u", in, on);
 
 		// writ data
 		tb_char_t const* 	p = ob;

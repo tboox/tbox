@@ -15,7 +15,7 @@ tb_int_t tb_demo_string_sstring_main(tb_int_t argc, tb_char_t** argv)
 	tb_sstring_cstrcpy(&s, "hello");
 	tb_sstring_chrcat(&s, ' ');
 	tb_sstring_cstrfcat(&s, "%s", "world");
-	tb_print("%s", tb_sstring_cstr(&s));
+	tb_trace_i("%s", tb_sstring_cstr(&s));
 
 	tb_sstring_exit(&s);
 

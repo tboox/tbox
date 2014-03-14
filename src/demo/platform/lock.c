@@ -28,7 +28,7 @@ static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
 	// check
 	tb_uint32_t self = (tb_uint32_t)tb_thread_self();
 	tb_handle_t lock = (tb_handle_t)data; tb_used(lock);
-	tb_print("[loop: %x]: init", self);
+	tb_trace_i("[loop: %x]: init", self);
 
 	// loop
 	__tb_volatile__ tb_size_t n = 1000000;
@@ -65,7 +65,7 @@ static tb_pointer_t tb_test_mutx_loop(tb_pointer_t data)
 	}
 
 end:
-	tb_print("[loop: %x]: exit", self);
+	tb_trace_i("[loop: %x]: exit", self);
 	tb_thread_return(tb_null);
 	return tb_null;
 }
@@ -130,7 +130,7 @@ end:
 	time = tb_mclock() - time;
 
 	// trace
-	tb_print("time: %lld ms", time);
+	tb_trace_i("time: %lld ms", time);
 
 	return 0;
 }

@@ -365,7 +365,7 @@ tb_void_t tb_vector_insert_prev(tb_vector_t* handle, tb_size_t itor, tb_cpointer
 	// grow a item
 	if (!tb_vector_resize(vector, osize + 1)) 
 	{
-		tb_trace("vector resize: %u => %u failed", osize, osize + 1);
+		tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
 		return ;
 	}
 
@@ -399,7 +399,7 @@ tb_void_t tb_vector_ninsert_prev(tb_vector_t* handle, tb_size_t itor, tb_cpointe
 	// grow size
 	if (!tb_vector_resize(vector, osize + size)) 
 	{
-		tb_trace("vector resize: %u => %u failed", osize, osize + 1);
+		tb_trace_d("vector resize: %u => %u failed", osize, osize + 1);
 		return ;
 	}
 
@@ -622,7 +622,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 					// the items number
 					tb_size_t m = e - b;
 					tb_assert(n >= m);
-//					tb_trace("del: b: %u, e: %u, d: %u", b, e, bdel);
+//					tb_trace_d("del: b: %u, e: %u, d: %u", b, e, bdel);
 
 					// remove items
 					if (e < n) tb_memmov(d + b * step, d + e * step, (n - e) * step);

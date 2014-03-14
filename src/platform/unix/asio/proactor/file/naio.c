@@ -24,8 +24,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#undef TB_TRACE_IMPL_TAG
-#define TB_TRACE_IMPL_TAG 				"aicp_naio"
+#undef TB_TRACE_MODULE_NAME
+#define TB_TRACE_MODULE_NAME 				"aicp_naio"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -251,7 +251,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 	tb_long_t real = res;
 	
 	// trace		
-	tb_trace_impl("spak: code: %x, real: %ld", iocb->base.aio_lio_opcode, real);
+	tb_trace_d("spak: code: %x, real: %ld", iocb->base.aio_lio_opcode, real);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -260,7 +260,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 	case IOCB_CMD_PREAD:
 		{
 			// trace
-			tb_trace_impl("spak: read: %ld, size: %lu", real, iocb->aice.u.read.size);
+			tb_trace_d("spak: read: %ld, size: %lu", real, iocb->aice.u.read.size);
 
 			// ok?
 			if (real > 0) 
@@ -284,7 +284,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 			else 
 			{
 				// trace
-				tb_trace_impl("spak: error: %s", strerror(-real));
+				tb_trace_d("spak: error: %s", strerror(-real));
 
 				// save state
 				iocb->aice.state = TB_AICE_STATE_FAILED;
@@ -297,7 +297,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 	case IOCB_CMD_PWRITE:
 		{
 			// trace
-			tb_trace_impl("spak: writ: %ld, size: %lu", real, iocb->aice.u.writ.size);
+			tb_trace_d("spak: writ: %ld, size: %lu", real, iocb->aice.u.writ.size);
 
 			// ok?
 			if (real > 0) 
@@ -311,7 +311,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 			else 
 			{
 				// trace
-				tb_trace_impl("spak: error: %s", strerror(-real));
+				tb_trace_d("spak: error: %s", strerror(-real));
 
 				// save state
 				iocb->aice.state = TB_AICE_STATE_FAILED;
@@ -483,7 +483,7 @@ static tb_void_t tb_aicp_file_poll(tb_handle_t handle)
 	// read the finished ioce count
 	tb_uint64_t finished = 0;
 	if (read((tb_int_t)naio->spak - 1, &finished, sizeof(finished)) != sizeof(finished)) return ;
-	tb_trace_impl("poll: finished: %llu", finished);
+	tb_trace_d("poll: finished: %llu", finished);
 
 	// walk ioces
 	struct timespec timeout = {0};
@@ -492,7 +492,7 @@ static tb_void_t tb_aicp_file_poll(tb_handle_t handle)
 	{
 		// get aices
 		tb_long_t real = tb_naio_getevents(naio->ictx, 1, tb_arrayn(ioces), ioces, &timeout);
-		tb_trace_impl("poll: real: %llu", real);
+		tb_trace_d("poll: real: %llu", real);
 		if (real > 0 && real <= finished)
 		{
 			tb_size_t i = 0;

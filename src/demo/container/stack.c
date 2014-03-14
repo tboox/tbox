@@ -35,7 +35,7 @@ static tb_size_t tb_stack_put_and_pop_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_stack_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_trace_i("tb_stack_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// check
 	tb_assert(tb_stack_size(stack) == 10);
@@ -72,7 +72,7 @@ static tb_size_t tb_stack_iterator_next_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_stack_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_trace_i("tb_stack_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// exit
 	tb_stack_exit(stack);
@@ -102,7 +102,7 @@ static tb_size_t tb_stack_iterator_prev_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_stack_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_trace_i("tb_stack_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_stack_size(stack), tb_stack_maxn(stack));
 
 	// exit
 	tb_stack_exit(stack);
@@ -112,19 +112,19 @@ static tb_size_t tb_stack_iterator_prev_test()
 
 static tb_void_t tb_stack_efm_dump(tb_stack_t const* stack)
 {
-	tb_print("efm size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
+	tb_trace_i("efm size: %d, maxn: %d", tb_stack_size(stack), tb_stack_maxn(stack));
 	tb_size_t itor = tb_iterator_head(stack);
 	tb_size_t tail = tb_iterator_tail(stack);
 	for (; itor != tail; itor = tb_iterator_next(stack, itor))
-		tb_print("efm at[%d]: %s", itor, tb_iterator_item(stack, itor));
+		tb_trace_i("efm at[%d]: %s", itor, tb_iterator_item(stack, itor));
 }
 static tb_void_t tb_stack_efm_test()
 {	
 	tb_stack_t* stack = tb_stack_init(10, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(stack);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_stack_put(stack, "0000000000");
 	tb_stack_put(stack, "1111111111");
 	tb_stack_put(stack, "2222222222");
@@ -137,8 +137,8 @@ static tb_void_t tb_stack_efm_test()
 	tb_stack_put(stack, "9999999999");
 	tb_stack_efm_dump(stack);
 
-	tb_print("=============================================================");
-	tb_print("pop:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("pop:");
 	tb_stack_pop(stack);
 	tb_stack_pop(stack);
 	tb_stack_pop(stack);
@@ -146,8 +146,8 @@ static tb_void_t tb_stack_efm_test()
 	tb_stack_pop(stack);
 	tb_stack_efm_dump(stack);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_stack_put(stack, "0000000000");
 	tb_stack_put(stack, "1111111111");
 	tb_stack_put(stack, "2222222222");
@@ -155,8 +155,8 @@ static tb_void_t tb_stack_efm_test()
 	tb_stack_put(stack, "4444444444");
 	tb_stack_efm_dump(stack);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_stack_clear(stack);
 	tb_stack_efm_dump(stack);
 
@@ -166,17 +166,17 @@ static tb_void_t tb_stack_efm_test()
 static tb_void_t tb_stack_perf_test()
 {
 	tb_size_t score = 0;
-	tb_print("=============================================================");
-	tb_print("put & pop performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put & pop performance:");
 	score += tb_stack_put_and_pop_test();
 
-	tb_print("=============================================================");
-	tb_print("iterator performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("iterator performance:");
 	score += tb_stack_iterator_next_test();
 	score += tb_stack_iterator_prev_test();
 
-	tb_print("=============================================================");
-	tb_print("score: %lu", score / 100);
+	tb_trace_i("=============================================================");
+	tb_trace_i("score: %lu", score / 100);
 
 }
 /* ///////////////////////////////////////////////////////////////////////

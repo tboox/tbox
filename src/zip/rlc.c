@@ -90,7 +90,7 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 					// set value
 					tb_bstream_set_ubits32(ost, last, 8);
 
-					//tb_trace("repeat(0x%02x): %d", last, repeat);
+					//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 				}
 				else
 				{
@@ -165,7 +165,7 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 			// get value
 			last = tb_bstream_get_ubits32(ist, 8);
 
-			//tb_trace("repeat(0x%02x): %d", last, repeat);
+			//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 
 			// fill bytes
 			while (repeat-- > 0 && op < oe) *op++ = last;

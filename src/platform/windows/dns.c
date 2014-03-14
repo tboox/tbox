@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"dns"
+//#define TB_TRACE_MODULE_NAME 		"dns"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -78,9 +78,9 @@ tb_bool_t tb_dns_init()
 		if (func(info, &size) != NO_ERROR) break;
 
 		// trace
-//		tb_trace_impl("host: %s", 	info->HostName);
-//		tb_trace_impl("domain: %s", info->DomainName);
-		tb_trace_impl("server: %s", info->DnsServerList.IpAddress.String);
+//		tb_trace_d("host: %s", 	info->HostName);
+//		tb_trace_d("domain: %s", info->DomainName);
+		tb_trace_d("server: %s", info->DnsServerList.IpAddress.String);
 
 		// add the first dns address
 		if (info->DnsServerList.IpAddress.String)
@@ -94,7 +94,7 @@ tb_bool_t tb_dns_init()
         for (; addr; addr = addr->Next) 
 		{
 			// trace
-			tb_trace_impl("server: %s", addr->IpAddress.String);
+			tb_trace_d("server: %s", addr->IpAddress.String);
 			
 			// add the dns address
 			if (addr->IpAddress.String)

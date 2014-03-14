@@ -189,7 +189,7 @@ tb_pointer_t tb_memset(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_malloc_data_size(s);
 		if (size && n > size)
 		{
-			tb_print("[memset]: [overflow]: [%#lx x %lu] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset]: [overflow]: [%#lx x %lu] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset]: [overflow]: ", tb_null, 10);
 			tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -209,7 +209,7 @@ tb_pointer_t tb_memset_u16(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_malloc_data_size(s);
 		if (size && (n << 1) > size)
 		{
-			tb_print("[memset_u16]: [overflow]: [%#lx x %lu x 2] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u16]: [overflow]: [%#lx x %lu x 2] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset_u16]: [overflow]: ", tb_null, 10);
 			tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -229,7 +229,7 @@ tb_pointer_t tb_memset_u24(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_malloc_data_size(s);
 		if (size && (n * 3) > size)
 		{
-			tb_print("[memset_u24]: [overflow]: [%#lx x %lu x 3] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u24]: [overflow]: [%#lx x %lu x 3] => [%p, %lu]", c, n, s, size);
 			tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
 		}
@@ -248,7 +248,7 @@ tb_pointer_t tb_memset_u32(tb_pointer_t s, tb_size_t c, tb_size_t n)
 		tb_size_t size = tb_malloc_data_size(s);
 		if (size && (n << 2) > size)
 		{
-			tb_print("[memset_u32]: [overflow]: [%#lx x %lu x 4] => [%p, %lu]", c, n, s, size);
+			tb_trace_i("[memset_u32]: [overflow]: [%#lx x %lu x 4] => [%p, %lu]", c, n, s, size);
 			tb_backtrace_dump("[memset_u32]: [overflow]: ", tb_null, 10);
 			tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();

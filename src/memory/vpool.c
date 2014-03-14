@@ -290,7 +290,7 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 			if (prev->free)
 			{
 				// dump
-				tb_print("vpool: overflow: magic: data: %p size: %lu free: %lu"
+				tb_trace_i("vpool: overflow: magic: data: %p size: %lu free: %lu"
 						, (tb_byte_t const*)prev + vpool->nhead
 						, prev->real
 						, prev->free
@@ -303,7 +303,7 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 			else
 			{
 				// dump
-				tb_print("vpool: overflow: magic: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+				tb_trace_i("vpool: overflow: magic: data: %p size: %lu free: %lu at %s(): %d, file: %s"
 						, (tb_byte_t const*)prev + vpool->nhead
 						, prev->real
 						, prev->free
@@ -320,7 +320,7 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 				tb_vpool_dump_data((tb_byte_t const*)prev + vpool->nhead + prev->size, vpool->nhead);
 			}
 		}
-		else tb_print("vpool: overflow");
+		else tb_trace_i("vpool: overflow");
 
 		// abort
 		return tb_false;
@@ -338,7 +338,7 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 		if (p < e)
 		{
 			// dump
-			tb_print("vpool: overflow: fill: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+			tb_trace_i("vpool: overflow: fill: data: %p size: %lu free: %lu at %s(): %d, file: %s"
 					, (tb_byte_t const*)block + vpool->nhead
 					, block->real
 					, block->free
@@ -918,7 +918,7 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_de
 	if (block->free)
 	{
 		// trace
-		tb_trace("vpool: double free: at %s(): %d, file: %s", block->func, block->line, block->file);
+		tb_trace_d("vpool: double free: at %s(): %d, file: %s", block->func, block->line, block->file);
 
 #ifdef __tb_debug__
 		// dump backtrace
@@ -1001,7 +1001,7 @@ tb_void_t tb_vpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t c
 	tb_check_return(block->magic == TB_VPOOL_MAGIC && !block->free);
 
 	// dump
-	tb_print("%s: data: %p size: %lu at %s(): %d, file: %s"
+	tb_trace_i("%s: data: %p size: %lu at %s(): %d, file: %s"
 			, prefix
 			, data
 			, block->real
@@ -1028,7 +1028,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	if (!prefix) prefix = "vpool";
 
 	// dump
-	tb_print("======================================================================");
+	tb_trace_i("======================================================================");
 
 	// walk
 	tb_size_t 			i = 0;
@@ -1051,7 +1051,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 		if (!block->free)
 		{
 			// dump leak
-			tb_print("%s: leak: data: %p size: %lu at %s(): %d, file: %s"
+			tb_trace_i("%s: leak: data: %p size: %lu at %s(): %d, file: %s"
 					, prefix
 					, pb + nhead
 					, block->real
@@ -1082,19 +1082,19 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	}
 
 	// dump 
-	if (!ok) tb_print("");
-//	tb_print("%s: magic: %#lx",		prefix, vpool->magic);
-//	tb_print("%s: nhead: %lu", 		prefix, vpool->nhead);
-	tb_print("%s: align: %lu", 		prefix, vpool->align);
-//	tb_print("%s: head: %lu", 		prefix, vpool->data - (tb_byte_t*)vpool);
-//	tb_print("%s: data: %p", 		prefix, vpool->data);
-	tb_print("%s: size: %lu", 		prefix, vpool->size);
-	tb_print("%s: full: %s", 		prefix, vpool->full? "true" : "false");
-	tb_print("%s: used: %lu", 		prefix, vpool->info.used);
-	tb_print("%s: peak: %lu", 		prefix, vpool->info.peak);
-	tb_print("%s: wast: %lu%%", 	prefix, (vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
-	tb_print("%s: fail: %lu", 		prefix, vpool->info.fail);
-	tb_print("%s: pred: %lu%%", 	prefix, vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
-	tb_print("%s: frag: %lu", 		prefix, frag);
+	if (!ok) tb_trace_i("");
+//	tb_trace_i("%s: magic: %#lx",		prefix, vpool->magic);
+//	tb_trace_i("%s: nhead: %lu", 		prefix, vpool->nhead);
+	tb_trace_i("%s: align: %lu", 		prefix, vpool->align);
+//	tb_trace_i("%s: head: %lu", 		prefix, vpool->data - (tb_byte_t*)vpool);
+//	tb_trace_i("%s: data: %p", 		prefix, vpool->data);
+	tb_trace_i("%s: size: %lu", 		prefix, vpool->size);
+	tb_trace_i("%s: full: %s", 		prefix, vpool->full? "true" : "false");
+	tb_trace_i("%s: used: %lu", 		prefix, vpool->info.used);
+	tb_trace_i("%s: peak: %lu", 		prefix, vpool->info.peak);
+	tb_trace_i("%s: wast: %lu%%", 	prefix, (vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
+	tb_trace_i("%s: fail: %lu", 		prefix, vpool->info.fail);
+	tb_trace_i("%s: pred: %lu%%", 	prefix, vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
+	tb_trace_i("%s: frag: %lu", 		prefix, frag);
 }
 #endif

@@ -31,7 +31,7 @@ static tb_void_t tb_whois_test_done(tb_char_t const* name)
 		tb_gstream_printf(gstream, "%s \r\n", name);
 		tb_gstream_sync(gstream, tb_true);
 		tb_gstream_bread(gstream, data, 250);
-		tb_print("%s", data);
+		tb_trace_i("%s", data);
 	}
 
 	// exit
@@ -105,7 +105,7 @@ static tb_void_t tb_whois_test_walk_2()
 		b = j % 26; j /= 26; p[5] = t[b];
 		b = j % 26; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_3()
@@ -125,7 +125,7 @@ static tb_void_t tb_whois_test_walk_3()
 		b = j % 26; j /= 26; p[5] = t[b];
 		b = j % 26; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_4()
@@ -146,7 +146,7 @@ static tb_void_t tb_whois_test_walk_4()
 		b = j % 26; j /= 26; p[5] = t[b];
 		b = j % 26; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_5()
@@ -168,7 +168,7 @@ static tb_void_t tb_whois_test_walk_5()
 		b = j % 26; j /= 26; p[5] = t[b];
 		b = j % 26; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 
@@ -192,7 +192,7 @@ static tb_void_t tb_whois_test_walk_6()
 		b = j % 26; j /= 26; p[5] = t[b];
 		b = j % 26; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 
@@ -226,7 +226,7 @@ static tb_bool_t tb_whois_test_walk_ping_2(tb_char_t const* file)
 		{
 			tb_char_t p[41] = {0};
 			tb_snprintf(p, 40, "%s%s.cn", &ping[i * 16], &ping[j * 16]);
-			tb_print("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
+			tb_trace_i("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
 		}
 	}
 	
@@ -267,7 +267,7 @@ static tb_bool_t tb_whois_test_walk_ping_3(tb_char_t const* file)
 			{
 				tb_char_t p[61] = {0};
 				tb_snprintf(p, 60, "%s%s%s.cn", &ping[i * 16], &ping[j * 16], &ping[k * 16]);
-				tb_print("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
+				tb_trace_i("%s: %s", p, tb_whois_test_no_match_cn(p)? "ok" : "no");
 			}
 		}
 	}
@@ -291,7 +291,7 @@ static tb_void_t tb_whois_test_walk_num_1()
 		j = i;
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_num_2()
@@ -310,7 +310,7 @@ static tb_void_t tb_whois_test_walk_num_2()
 		b = j % 10; j /= 10; p[5] = t[b];
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_num_3()
@@ -330,7 +330,7 @@ static tb_void_t tb_whois_test_walk_num_3()
 		b = j % 10; j /= 10; p[5] = t[b];
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_num_4()
@@ -351,7 +351,7 @@ static tb_void_t tb_whois_test_walk_num_4()
 		b = j % 10; j /= 10; p[5] = t[b];
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_num_5()
@@ -373,7 +373,7 @@ static tb_void_t tb_whois_test_walk_num_5()
 		b = j % 10; j /= 10; p[5] = t[b];
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 static tb_void_t tb_whois_test_walk_num_6()
@@ -396,7 +396,7 @@ static tb_void_t tb_whois_test_walk_num_6()
 		b = j % 10; j /= 10; p[5] = t[b];
 		b = j % 10; p[4] = t[b];
 
-		tb_print("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
+		tb_trace_i("%s: %s", p, tb_whois_test_no_match_com(&p[4])? "ok" : "no");
 	}
 }
 

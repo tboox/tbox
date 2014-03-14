@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -159,7 +159,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_object_xml_reader_t* reader, tb_si
 				// name
 				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
-				tb_trace_impl("%s", name);
+				tb_trace_d("%s", name);
 
 				// is key
 				if (!tb_stricmp(name, "key")) key = tb_true;
@@ -171,7 +171,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_object_xml_reader_t* reader, tb_si
 
 					// read
 					tb_object_t* object = func(reader, event);
-					tb_trace_impl("%s => %p", tb_sstring_cstr(&kname), object);
+					tb_trace_d("%s => %p", tb_sstring_cstr(&kname), object);
 					tb_assert_and_check_goto(object, end);
 
 					// set key & value
@@ -309,7 +309,7 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 			tb_object_read_bin_type_size(reader->stream, &type, &size);
 
 			// trace
-			tb_trace_impl("key: type: %lu, size: %llu", type, size);
+			tb_trace_d("key: type: %lu, size: %llu", type, size);
 
 			// is index?
 			if (!type)
@@ -359,7 +359,7 @@ static tb_object_t* tb_dictionary_read_bin(tb_object_bin_reader_t* reader, tb_si
 			tb_object_read_bin_type_size(reader->stream, &type, &size);
 
 			// trace
-			tb_trace_impl("val: type: %lu, size: %llu", type, size);
+			tb_trace_d("val: type: %lu, size: %llu", type, size);
 
 			// is index?
 			if (!type)
@@ -531,7 +531,7 @@ static tb_object_t* tb_dictionary_read_jsn(tb_object_jsn_reader_t* reader, tb_ch
 			else
 			{
 				// trace
-				tb_trace_impl("key: %s", tb_sstring_cstr(&kname));
+				tb_trace_d("key: %s", tb_sstring_cstr(&kname));
 
 				// the func
 				tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(ch);

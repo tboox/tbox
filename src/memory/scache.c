@@ -186,8 +186,8 @@ tb_void_t tb_scache_dump()
 	if (g_hash && tb_hash_size(g_hash))
 	{
 		// trace
-		tb_print("======================================================================");
-		tb_print("scache: size: %lu", tb_hash_size(g_hash));
+		tb_trace_i("======================================================================");
+		tb_trace_i("scache: size: %lu", tb_hash_size(g_hash));
 
 		// walk
 		tb_size_t itor = tb_iterator_head(g_hash);
@@ -195,7 +195,7 @@ tb_void_t tb_scache_dump()
 		for (; itor != tail; itor = tb_iterator_next(g_hash, itor))
 		{
 			tb_hash_item_t const* item = tb_iterator_item(g_hash, itor);
-			if (item) tb_print("scache: item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
+			if (item) tb_trace_i("scache: item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
 		}
 	}
 

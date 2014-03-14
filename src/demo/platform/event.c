@@ -32,13 +32,13 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 {
 	tb_test_item_t* it = (tb_test_item_t*)cb_data;
 	tb_assert_and_check_goto(it, end);
-	tb_print("[thread: %u]: init", it->i);
+	tb_trace_i("[thread: %u]: init", it->i);
 
 	// loop
 	while (1)
 	{
 		// wait
-		tb_print("[event: %u]: wait", it->i);
+		tb_trace_i("[event: %u]: wait", it->i);
 		tb_long_t r = tb_event_wait(it->e, -1);
 		tb_assert_and_check_goto(r >= 0, end);
 
@@ -49,11 +49,11 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		tb_check_continue(r);
 
 		// signal
-		tb_print("[event: %u]: signal", it->i);
+		tb_trace_i("[event: %u]: signal", it->i);
 	}
 
 end:
-	tb_print("[thread: %u]: exit", it? it->i : 0);
+	tb_trace_i("[thread: %u]: exit", it? it->i : 0);
 	tb_thread_return(tb_null);
 	return tb_null;
 }
@@ -128,7 +128,7 @@ end:
 		if (it[i].e) tb_event_exit(it[i].e);
 	}
 
-	tb_print("quit");
+	tb_trace_i("quit");
 
 	return 0;
 }

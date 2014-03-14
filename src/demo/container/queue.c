@@ -34,7 +34,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_queue_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// check
 	tb_assert(tb_queue_size(queue) == 10);
@@ -70,7 +70,7 @@ static tb_size_t tb_queue_iterator_next_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_queue_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// exit
 	tb_queue_exit(queue);
@@ -99,7 +99,7 @@ static tb_size_t tb_queue_iterator_prev_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_queue_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// exit
 	tb_queue_exit(queue);
@@ -108,19 +108,19 @@ static tb_size_t tb_queue_iterator_prev_test()
 }
 static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 {
-	tb_print("tb_int_t size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_int_t size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_iterator_head(queue);
 	tb_size_t tail = tb_iterator_tail(queue);
 	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_print("tb_int_t at[%d]: %u", itor, tb_iterator_item(queue, itor));
+		tb_trace_i("tb_int_t at[%d]: %u", itor, tb_iterator_item(queue, itor));
 }
 static tb_void_t tb_queue_int_test()
 {
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_long());
 	tb_assert_and_check_return(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, 0);
 	tb_queue_put(queue, 1);
 	tb_queue_put(queue, 2);
@@ -133,8 +133,8 @@ static tb_void_t tb_queue_int_test()
 	tb_queue_put(queue, 9);
 	tb_queue_int_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("pop:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("pop:");
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
@@ -142,8 +142,8 @@ static tb_void_t tb_queue_int_test()
 	tb_queue_pop(queue);
 	tb_queue_int_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, 0);
 	tb_queue_put(queue, 1);
 	tb_queue_put(queue, 2);
@@ -151,27 +151,27 @@ static tb_void_t tb_queue_int_test()
 	tb_queue_put(queue, 4);
 	tb_queue_int_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_queue_clear(queue);
 	tb_queue_int_dump(queue);
 	tb_queue_exit(queue);
 }
 static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 {
-	tb_print("str size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("str size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_iterator_head(queue);
 	tb_size_t tail = tb_iterator_tail(queue);
 	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_print("str at[%d]: %s", itor, tb_iterator_item(queue, itor));
+		tb_trace_i("str at[%d]: %s", itor, tb_iterator_item(queue, itor));
 }
 static tb_void_t tb_queue_str_test()
 {
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -184,8 +184,8 @@ static tb_void_t tb_queue_str_test()
 	tb_queue_put(queue, "9999999999");
 	tb_queue_str_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("pop:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("pop:");
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
@@ -193,8 +193,8 @@ static tb_void_t tb_queue_str_test()
 	tb_queue_pop(queue);
 	tb_queue_str_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -202,27 +202,27 @@ static tb_void_t tb_queue_str_test()
 	tb_queue_put(queue, "4444444444");
 	tb_queue_str_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_queue_clear(queue);
 	tb_queue_str_dump(queue);
 	tb_queue_exit(queue);
 }
 static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
 {
-	tb_print("efm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("efm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_iterator_head(queue);
 	tb_size_t tail = tb_iterator_tail(queue);
 	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_print("efm at[%d]: %s", itor, tb_iterator_item(queue, itor));
+		tb_trace_i("efm at[%d]: %s", itor, tb_iterator_item(queue, itor));
 }
 static tb_void_t tb_queue_efm_test()
 {
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -235,8 +235,8 @@ static tb_void_t tb_queue_efm_test()
 	tb_queue_put(queue, "9999999999");
 	tb_queue_efm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("pop:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("pop:");
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
@@ -244,8 +244,8 @@ static tb_void_t tb_queue_efm_test()
 	tb_queue_pop(queue);
 	tb_queue_efm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -253,8 +253,8 @@ static tb_void_t tb_queue_efm_test()
 	tb_queue_put(queue, "4444444444");
 	tb_queue_efm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_queue_clear(queue);
 	tb_queue_efm_dump(queue);
 	tb_queue_exit(queue);
@@ -262,23 +262,23 @@ static tb_void_t tb_queue_efm_test()
 
 static tb_void_t tb_queue_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_print("ifm free: %s, priv: %s", item, func->priv);
+	tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
 }
 static tb_void_t tb_queue_ifm_dump(tb_queue_t const* queue)
 {
-	tb_print("ifm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("ifm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
 	tb_size_t itor = tb_iterator_head(queue);
 	tb_size_t tail = tb_iterator_tail(queue);
 	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_print("ifm at[%d]: %s", itor, tb_iterator_item(queue, itor));
+		tb_trace_i("ifm at[%d]: %s", itor, tb_iterator_item(queue, itor));
 }
 static tb_void_t tb_queue_ifm_test()
 {
 	tb_queue_t* queue = tb_queue_init(10, tb_item_func_ifm(11, tb_queue_ifm_free, "ifm"));
 	tb_assert_and_check_return(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -291,8 +291,8 @@ static tb_void_t tb_queue_ifm_test()
 	tb_queue_put(queue, "9999999999");
 	tb_queue_ifm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("pop:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("pop:");
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
 	tb_queue_pop(queue);
@@ -300,8 +300,8 @@ static tb_void_t tb_queue_ifm_test()
 	tb_queue_pop(queue);
 	tb_queue_ifm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("put:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put:");
 	tb_queue_put(queue, "0000000000");
 	tb_queue_put(queue, "1111111111");
 	tb_queue_put(queue, "2222222222");
@@ -309,8 +309,8 @@ static tb_void_t tb_queue_ifm_test()
 	tb_queue_put(queue, "4444444444");
 	tb_queue_ifm_dump(queue);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_queue_clear(queue);
 	tb_queue_ifm_dump(queue);
 	tb_queue_exit(queue);
@@ -319,17 +319,17 @@ static tb_void_t tb_queue_ifm_test()
 static tb_void_t tb_queue_perf_test()
 {
 	tb_size_t score = 0;
-	tb_print("=============================================================");
-	tb_print("put & pop performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("put & pop performance:");
 	score += tb_queue_put_and_pop_test();
 
-	tb_print("=============================================================");
-	tb_print("iterator performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("iterator performance:");
 	score += tb_queue_iterator_next_test();
 	score += tb_queue_iterator_prev_test();
 
-	tb_print("=============================================================");
-	tb_print("score: %d", score / 100);
+	tb_trace_i("=============================================================");
+	tb_trace_i("score: %d", score / 100);
 
 }
 static tb_void_t tb_queue_test_itor_perf()
@@ -371,7 +371,7 @@ static tb_void_t tb_queue_test_itor_perf()
 		itor = tb_iterator_next(queue, itor);
 	}
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_queue_size(queue), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_queue_size(queue), t);
 
 	tb_queue_exit(queue);
 }
@@ -409,7 +409,7 @@ static tb_void_t tb_queue_test_walk_perf()
 	__tb_volatile__ tb_hize_t test[2] = {0};
 	tb_queue_walk(queue, tb_queue_test_walk_item, test);
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_queue_size(queue), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_queue_size(queue), t);
 
 	tb_queue_exit(queue);
 }

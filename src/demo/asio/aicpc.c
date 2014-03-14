@@ -61,7 +61,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
+//		tb_trace_i("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
 
 		// continue?
 		if (aice->u.writ.real < aice->u.writ.size)
@@ -79,7 +79,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_print("writ[%p]: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("writ[%p]: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
@@ -99,7 +99,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-//		tb_print("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
+//		tb_trace_i("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
 
 		// post writ to file
 		if (!tb_aico_writ(context->aico[1], context->size, aice->u.recv.data, aice->u.recv.real, tb_demo_file_writ_func, context)) return tb_false;
@@ -122,13 +122,13 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 			context->time = tb_mclock();
 
 			// trace
-			tb_print("recv[%p]: size: %llu, sped: %lu KB/s", aice->aico, context->size, context->sped / 1000);
+			tb_trace_i("recv[%p]: size: %llu, sped: %lu KB/s", aice->aico, context->size, context->sped / 1000);
 		}
 	}
 	// closed or failed?
 	else
 	{
-		tb_print("recv[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("recv[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
@@ -148,7 +148,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_print("conn[%p]: ok", aice->aico);
+		tb_trace_i("conn[%p]: ok", aice->aico);
 
 		// post recv from server
 		if (!tb_aico_recv(aice->aico, context->data, TB_DEMO_SOCK_RECV_MAXN, tb_demo_sock_recv_func, context)) return tb_false;
@@ -157,7 +157,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	else
 	{
 		// exit loop
-		tb_print("conn[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("conn[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
 		return tb_false;
 	}
 
@@ -205,7 +205,7 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 	tb_aico_timeout_set(context.aico[0], TB_AICO_TIMEOUT_CONN, 10000);
 
 	// post conn
-	tb_print("conn: ..");
+	tb_trace_i("conn: ..");
 	tb_ipv4_t addr; tb_ipv4_set(&addr, "127.0.0.1");
 	if (!tb_aico_conn(context.aico[0], &addr, 9090, tb_demo_sock_conn_func, &context)) goto end;
 
@@ -213,12 +213,12 @@ tb_int_t tb_demo_asio_aicpc_main(tb_int_t argc, tb_char_t** argv)
 	tb_aicp_loop(aicp);
 		
 	// trace
-	tb_print("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
+	tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", context.sock, context.size, context.size / (tb_mclock() - context.base));
 
 end:
 
 	// trace
-	tb_print("end");
+	tb_trace_i("end");
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

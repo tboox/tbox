@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -76,7 +76,7 @@ static tb_object_t* tb_boolean_read_xml(tb_object_xml_reader_t* reader, tb_size_
 	// name
 	tb_char_t const* name = tb_xml_reader_element(reader->reader);
 	tb_assert_and_check_return_val(name, tb_null);
-	tb_trace_impl("boolean: %s", name);
+	tb_trace_d("boolean: %s", name);
 
 	// the boolean value
 	tb_bool_t val = tb_false;
@@ -154,7 +154,7 @@ static tb_object_t* tb_boolean_read_jsn(tb_object_jsn_reader_t* reader, tb_char_
 	tb_assert_and_check_goto(tb_sstring_size(&data), end);
 
 	// trace
-	tb_trace_impl("boolean: %s", tb_sstring_cstr(&data));
+	tb_trace_d("boolean: %s", tb_sstring_cstr(&data));
 
 	// true?
 	if (!tb_stricmp(tb_sstring_cstr(&data), "true")) boolean = tb_boolean_init(tb_true);

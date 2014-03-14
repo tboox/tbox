@@ -9,7 +9,7 @@
 static tb_bool_t tb_demo_astream_charset_save_func(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
+	tb_trace_i("save: %llu bytes, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
 
 	// kill aicp
 	if (state != TB_STREAM_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);

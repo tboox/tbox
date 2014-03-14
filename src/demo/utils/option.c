@@ -54,31 +54,31 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
 			else if (tb_option_find(option, "version"))
 			{
 				tb_version_t const* version = tb_version();
-				if (version) tb_print("version: tbox-v%u.%u.%u.%llu", version->major, version->minor, version->alter, version->build);
+				if (version) tb_trace_i("version: tbox-v%u.%u.%u.%llu", version->major, version->minor, version->alter, version->build);
 			}
 			else
 			{
 				// done integer
 				if (tb_option_find(option, "i"))
-					tb_print("integer: %lld", tb_option_item_sint64(option, "i"));
+					tb_trace_i("integer: %lld", tb_option_item_sint64(option, "i"));
 				// done string
 				if (tb_option_find(option, "s"))
-					tb_print("string: %s", tb_option_item_cstr(option, "s"));
+					tb_trace_i("string: %s", tb_option_item_cstr(option, "s"));
 				// done float
 				if (tb_option_find(option, "f"))
-					tb_print("float: %f", tb_option_item_float(option, "f"));
+					tb_trace_i("float: %f", tb_option_item_float(option, "f"));
 				// done boolean
 				if (tb_option_find(option, "b"))
-					tb_print("boolean: %s", tb_option_item_bool(option, "b")? "y" : "n");
+					tb_trace_i("boolean: %s", tb_option_item_bool(option, "b")? "y" : "n");
 				// done demo
 				if (tb_option_find(option, "demo"))
-					tb_print("demo: %s", tb_option_item_cstr(option, "demo"));
+					tb_trace_i("demo: %s", tb_option_item_cstr(option, "demo"));
 				// done file0
 				if (tb_option_find(option, "file0"))
-					tb_print("file0: %s", tb_option_item_cstr(option, "file0"));
+					tb_trace_i("file0: %s", tb_option_item_cstr(option, "file0"));
 				// done file1
 				if (tb_option_find(option, "file1"))
-					tb_print("file1: %s", tb_option_item_cstr(option, "file1"));
+					tb_trace_i("file1: %s", tb_option_item_cstr(option, "file1"));
 
 				// done more
 				tb_size_t more = 0;
@@ -87,7 +87,7 @@ tb_int_t tb_demo_utils_option_main(tb_int_t argc, tb_char_t** argv)
 					tb_char_t name[64] = {0};
 					tb_snprintf(name, 63, "more%lu", more++);
 					if (tb_option_find(option, name))
-						tb_print("%s: %s", name, tb_option_item_cstr(option, name));
+						tb_trace_i("%s: %s", name, tb_option_item_cstr(option, name));
 					else break;
 				}
 			}

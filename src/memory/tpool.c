@@ -696,42 +696,42 @@ tb_void_t tb_tpool_dump(tb_handle_t handle)
 	tb_tpool_t* tpool = (tb_tpool_t*)handle;
 	tb_assert_and_check_return(tpool);
 
-	tb_print("======================================================================");
-	tb_print("tpool: magic: %#lx",	tpool->magic);
-	tb_print("tpool: align: %lu", 	tpool->align);
-	tb_print("tpool: limit: %lu", 	tb_tpool_limit(tpool));
-	tb_print("tpool: step: %lu", 	tpool->step);
-	tb_print("tpool: head: %lu", 	tpool->data - (tb_byte_t*)tpool);
-	tb_print("tpool: data: %p", 	tpool->data);
-	tb_print("tpool: size: %lu", 	tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN);
-	tb_print("tpool: full: %lu", 	tpool->full);
-	tb_print("tpool: used: %lu", 	tpool->info.used);
-	tb_print("tpool: peak: %lu", 	tpool->info.peak);
-	tb_print("tpool: wast: %lu%%", 	(tpool->info.real + (tpool->data - (tb_byte_t*)tpool) - tpool->info.need) * 100 / (tpool->info.real + (tpool->data - (tb_byte_t*)tpool)));
-	tb_print("tpool: fail: %lu", 	tpool->info.fail);
-	tb_print("tpool: pred: %lu%%", 	tpool->info.aloc? ((tpool->info.pred * 100) / tpool->info.aloc) : 0);
+	tb_trace_i("======================================================================");
+	tb_trace_i("tpool: magic: %#lx",	tpool->magic);
+	tb_trace_i("tpool: align: %lu", 	tpool->align);
+	tb_trace_i("tpool: limit: %lu", 	tb_tpool_limit(tpool));
+	tb_trace_i("tpool: step: %lu", 	tpool->step);
+	tb_trace_i("tpool: head: %lu", 	tpool->data - (tb_byte_t*)tpool);
+	tb_trace_i("tpool: data: %p", 	tpool->data);
+	tb_trace_i("tpool: size: %lu", 	tpool->maxn * tpool->step * TB_TPOOL_BLOCK_MAXN);
+	tb_trace_i("tpool: full: %lu", 	tpool->full);
+	tb_trace_i("tpool: used: %lu", 	tpool->info.used);
+	tb_trace_i("tpool: peak: %lu", 	tpool->info.peak);
+	tb_trace_i("tpool: wast: %lu%%", 	(tpool->info.real + (tpool->data - (tb_byte_t*)tpool) - tpool->info.need) * 100 / (tpool->info.real + (tpool->data - (tb_byte_t*)tpool)));
+	tb_trace_i("tpool: fail: %lu", 	tpool->info.fail);
+	tb_trace_i("tpool: pred: %lu%%", 	tpool->info.aloc? ((tpool->info.pred * 100) / tpool->info.aloc) : 0);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_size_t 	i = 0;
 	tb_size_t 	m = TB_TPOOL_BLOCK_MAXN;
 	for (i = 0; i < m; i++)
 	{
 		tb_size_t pred = tpool->pred[i];
 #if TB_CPU_BIT64
-		tb_print("tpool: [%lu]: pred: %lu, body: %064lb, last: %064lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
+		tb_trace_i("tpool: [%lu]: pred: %lu, body: %064lb, last: %064lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
 #elif TB_CPU_BIT32
-		tb_print("tpool: [%lu]: pred: %lu, body: %032lb, last: %032lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
+		tb_trace_i("tpool: [%lu]: pred: %lu, body: %032lb, last: %032lb", i, pred, pred? tpool->body[pred - 1] : 0, pred? tpool->last[pred - 1] : 0);
 #endif
 	}
 
-	tb_print("");
+	tb_trace_i("");
 	m = tpool->maxn;
 	for (i = 0; i < m; i++)
 	{
 #if TB_CPU_BIT64
-		if (tpool->body[i]) tb_print("tpool: [%lu]: body: %064lb, last: %064lb", i, tpool->body[i], tpool->last[i]);
+		if (tpool->body[i]) tb_trace_i("tpool: [%lu]: body: %064lb, last: %064lb", i, tpool->body[i], tpool->last[i]);
 #elif TB_CPU_BIT32
-		if (tpool->body[i]) tb_print("tpool: [%lu]: body: %032lb, last: %032lb", i, tpool->body[i], tpool->last[i]);
+		if (tpool->body[i]) tb_trace_i("tpool: [%lu]: body: %032lb, last: %032lb", i, tpool->body[i], tpool->last[i]);
 #endif
 	}
 

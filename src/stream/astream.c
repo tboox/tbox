@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"astream"
+#define TB_TRACE_MODULE_NAME 				"astream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -213,7 +213,7 @@ tb_astream_t* tb_astream_init_from_url(tb_aicp_t* aicp, tb_char_t const* url)
 	else if (!tb_strstr(p, "://")) 				type = TB_STREAM_TYPE_FILE;
 	else 
 	{
-		tb_trace("[astream]: unknown prefix for url: %s", url);
+		tb_trace_d("[astream]: unknown prefix for url: %s", url);
 		return tb_null;
 	}
 	tb_assert_and_check_goto(type && type < tb_arrayn(g_init) && g_init[type], fail);
@@ -240,7 +240,7 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 	tb_assert_and_check_return(astream);
 
 	// trace
-	tb_trace_impl("clos: ..");
+	tb_trace_d("clos: ..");
 
 	// kill it first 
 	tb_stream_kill(astream);
@@ -262,7 +262,7 @@ tb_void_t tb_astream_clos(tb_astream_t* astream, tb_bool_t bcalling)
 #endif
 
 	// trace
-	tb_trace_impl("clos: ok");
+	tb_trace_d("clos: ok");
 }
 tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 {
@@ -270,7 +270,7 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	tb_assert_and_check_return(astream);
 
 	// trace
-	tb_trace_impl("exit: ..");
+	tb_trace_d("exit: ..");
 
 	// close it first
 	tb_astream_clos(astream, bcalling);
@@ -288,7 +288,7 @@ tb_void_t tb_astream_exit(tb_astream_t* astream, tb_bool_t bcalling)
 	tb_free(astream);
 
 	// trace
-	tb_trace_impl("exit: ok");
+	tb_trace_d("exit: ok");
 
 }
 tb_bool_t tb_astream_open_try(tb_astream_t* astream)

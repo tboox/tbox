@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"path"
+//#define TB_TRACE_MODULE_NAME 			"path"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -41,7 +41,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 {
 	// check
 	tb_assert_and_check_return_val(path && full && maxn, tb_null);
-	tb_trace_impl("path: %s", path);
+	tb_trace_d("path: %s", path);
 
 	// unix path?
 	if (path[0] == '/' || !tb_strnicmp(path, "file://", 7)) 
@@ -54,7 +54,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 		{
 			tb_strlcpy(full, path, maxn - 1);
 			full[maxn - 1] = '\0';
-			tb_trace_impl("full: %s", full);
+			tb_trace_d("full: %s", full);
 			return full;
 		}
 	}
@@ -63,14 +63,14 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 	{
 		tb_strlcpy(full, path, maxn - 1);
 		full[maxn - 1] = '\0';
-		tb_trace_impl("full: %s", full);
+		tb_trace_d("full: %s", full);
 		return full;
 	}
 	
 	// the current directory
 	tb_size_t size = 0;
 	if (!(size = tb_directory_curt(full, maxn))) return tb_null;
-	tb_trace_impl("curt: %s", full);
+	tb_trace_d("curt: %s", full);
 
 	// is windows path?
 	tb_size_t 	w = tb_false;
@@ -128,7 +128,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 			// too small?
 			else 
 			{
-				tb_trace("[path]: the full path is too small for %s", path);
+				tb_trace_d("[path]: the full path is too small for %s", path);
 				return tb_null;
 			}
 
@@ -153,7 +153,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 	}
 
 	// trace	
-	tb_trace_impl("full: %s", full);
+	tb_trace_d("full: %s", full);
 	
 	// ok?
 	return full;

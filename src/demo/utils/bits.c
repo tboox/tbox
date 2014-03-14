@@ -15,7 +15,7 @@ static tb_void_t tb_test_bits_swap_u16()
 	while (n--) x = tb_bits_swap_u16(x);
 
 	dt = tb_mclock() - dt;
-	tb_print("[bitops]: swap_u16: %x => %x, %llu ms", 0x1234, x, dt);
+	tb_trace_i("[bitops]: swap_u16: %x => %x, %llu ms", 0x1234, x, dt);
 }
 static tb_void_t tb_test_bits_swap_u32()
 {
@@ -26,7 +26,7 @@ static tb_void_t tb_test_bits_swap_u32()
 	while (n--) x = tb_bits_swap_u32(x);
 
 	dt = tb_mclock() - dt;
-	tb_print("[bitops]: swap_u32: %x => %x, %llu ms", 0x12345678, x, dt);
+	tb_trace_i("[bitops]: swap_u32: %x => %x, %llu ms", 0x12345678, x, dt);
 }
 static tb_void_t tb_test_bits_swap_u64()
 {
@@ -37,7 +37,7 @@ static tb_void_t tb_test_bits_swap_u64()
 	while (n--) x = tb_bits_swap_u64(x);
 
 	dt = tb_mclock() - dt;
-	tb_print("[bitops]: swap_u64: %x => %llx, %llu ms", 0x12345678, x, dt);
+	tb_trace_i("[bitops]: swap_u64: %x => %llx, %llu ms", 0x12345678, x, dt);
 }
 static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 {
@@ -47,7 +47,7 @@ static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 	__tb_volatile__ tb_hong_t 	tg = 0;
 	for (b = 0; b < 8; ++b)
 	{
-		tb_print("[bitops]: ubits32 b: %d x: %x", b, x);
+		tb_trace_i("[bitops]: ubits32 b: %d x: %x", b, x);
 		for (n = 0; n <= 32; ++n)
 		{
 			__tb_volatile__ tb_byte_t 	p[256] = {0};
@@ -69,12 +69,12 @@ static tb_void_t tb_test_bits_ubits32(tb_uint32_t x)
 
 			if (xx != y)
 			{
-				tb_print("[bitops]: ubits32 set: b: %x, n: %x, x: %x, %llu ms", b, n, xx, t1);
-				tb_print("[bitops]: ubits32 get: b: %x, n: %x, y: %x, %llu ms", b, n, y, t2);
+				tb_trace_i("[bitops]: ubits32 set: b: %x, n: %x, x: %x, %llu ms", b, n, xx, t1);
+				tb_trace_i("[bitops]: ubits32 get: b: %x, n: %x, y: %x, %llu ms", b, n, y, t2);
 			}
 		}
 	}
-	tb_print("[bitops]: ubits32 set: %llu ms, get: %llu ms", ts, tg);
+	tb_trace_i("[bitops]: ubits32 set: %llu ms, get: %llu ms", ts, tg);
 }
 static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 {
@@ -84,7 +84,7 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 	__tb_volatile__ tb_hong_t 	tg = 0;
 	for (b = 0; b < 8; ++b)
 	{
-		tb_print("[bitops]: sbits32 b: %d x: %d", b, x);
+		tb_trace_i("[bitops]: sbits32 b: %d x: %d", b, x);
 		for (n = 2; n <= 32; ++n)
 		{
 			__tb_volatile__ tb_byte_t 	p[256] = {0};
@@ -106,12 +106,12 @@ static tb_void_t tb_test_bits_sbits32(tb_sint32_t x)
 
 			if (xx != y)
 			{
-				tb_print("[bitops]: sbits32 set: b: %d, n: %u, x: %d, %llu ms", b, n, xx, t1);
-				tb_print("[bitops]: sbits32 get: b: %u, n: %u, y: %d, %llu ms", b, n, y, t2);
+				tb_trace_i("[bitops]: sbits32 set: b: %d, n: %u, x: %d, %llu ms", b, n, xx, t1);
+				tb_trace_i("[bitops]: sbits32 get: b: %u, n: %u, y: %d, %llu ms", b, n, y, t2);
 			}
 		}
 	}
-	tb_print("[bitops]: sbits32 set: %llu ms, get: %llu ms", ts, tg);
+	tb_trace_i("[bitops]: sbits32 set: %llu ms, get: %llu ms", ts, tg);
 }
 static tb_void_t tb_test_bits_u32_be(tb_uint32_t x)
 {
@@ -133,7 +133,7 @@ static tb_void_t tb_test_bits_u32_be(tb_uint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u32_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u32_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_u32_le(tb_uint32_t x)
 {
@@ -155,7 +155,7 @@ static tb_void_t tb_test_bits_u32_le(tb_uint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u32_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u32_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_u24_be(tb_uint32_t x)
 {
@@ -177,7 +177,7 @@ static tb_void_t tb_test_bits_u24_be(tb_uint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u24_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u24_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 {
@@ -199,7 +199,7 @@ static tb_void_t tb_test_bits_u24_le(tb_uint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u24_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u24_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 {
@@ -221,7 +221,7 @@ static tb_void_t tb_test_bits_u16_be(tb_uint16_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u16_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u16_be set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 {
@@ -243,7 +243,7 @@ static tb_void_t tb_test_bits_u16_le(tb_uint16_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: u16_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: u16_le set: x: %x, %llu ms, get: y: %x, %llu ms", x, ts, y, tg);
 }
 
 static tb_void_t tb_test_bits_s32_be(tb_sint32_t x)
@@ -266,7 +266,7 @@ static tb_void_t tb_test_bits_s32_be(tb_sint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s32_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s32_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_s32_le(tb_sint32_t x)
 {
@@ -288,7 +288,7 @@ static tb_void_t tb_test_bits_s32_le(tb_sint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s32_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s32_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_s24_be(tb_sint32_t x)
 {
@@ -310,7 +310,7 @@ static tb_void_t tb_test_bits_s24_be(tb_sint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s24_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s24_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 {
@@ -332,7 +332,7 @@ static tb_void_t tb_test_bits_s24_le(tb_sint32_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s24_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s24_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 {
@@ -354,7 +354,7 @@ static tb_void_t tb_test_bits_s16_be(tb_sint16_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s16_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s16_be set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 {
@@ -376,7 +376,7 @@ static tb_void_t tb_test_bits_s16_le(tb_sint16_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: s16_le set: x: %d, %llu ms, get: y: %d, %llu ms", x, ts, y, tg);
 }
 #ifdef TB_CONFIG_TYPE_FLOAT
 static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
@@ -399,7 +399,7 @@ static tb_void_t tb_test_bits_double_bbe(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_bbe set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: double_bbe set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_double_ble(tb_double_t x)
 {
@@ -421,7 +421,7 @@ static tb_void_t tb_test_bits_double_ble(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_ble set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: double_ble set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_double_lbe(tb_double_t x)
 {
@@ -443,7 +443,7 @@ static tb_void_t tb_test_bits_double_lbe(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_lbe set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: double_lbe set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_double_lle(tb_double_t x)
 {
@@ -465,7 +465,7 @@ static tb_void_t tb_test_bits_double_lle(tb_double_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: double_lle set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: double_lle set: x: %lf, %llu ms, get: y: %lf, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_float_be(tb_float_t x)
 {
@@ -487,7 +487,7 @@ static tb_void_t tb_test_bits_float_be(tb_float_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: float_be set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: float_be set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
 }
 static tb_void_t tb_test_bits_float_le(tb_float_t x)
 {
@@ -509,7 +509,7 @@ static tb_void_t tb_test_bits_float_le(tb_float_t x)
 	t2 = tb_mclock() - t2;
 	tg += t1;
 
-	tb_print("[bitops]: float_le set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
+	tb_trace_i("[bitops]: float_le set: x: %f, %llu ms, get: y: %f, %llu ms", x, ts, y, tg);
 }
 #endif
 static tb_void_t tb_test_bits_cl0_u32_be(tb_uint32_t x)
@@ -520,7 +520,7 @@ static tb_void_t tb_test_bits_cl0_u32_be(tb_uint32_t x)
 	while (n--) i = tb_bits_cl0_u32_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_be: cl0: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_be: cl0: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl0_u32_le(tb_uint32_t x)
 {
@@ -530,7 +530,7 @@ static tb_void_t tb_test_bits_cl0_u32_le(tb_uint32_t x)
 	while (n--) i = tb_bits_cl0_u32_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_le: cl0: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_le: cl0: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl0_u64_be(tb_uint64_t x)
 {
@@ -540,7 +540,7 @@ static tb_void_t tb_test_bits_cl0_u64_be(tb_uint64_t x)
 	while (n--) i = tb_bits_cl0_u64_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_be: cl0: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_be: cl0: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl0_u64_le(tb_uint64_t x)
 {
@@ -550,7 +550,7 @@ static tb_void_t tb_test_bits_cl0_u64_le(tb_uint64_t x)
 	while (n--) i = tb_bits_cl0_u64_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_le: cl0: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_le: cl0: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl1_u32_be(tb_uint32_t x)
 {
@@ -560,7 +560,7 @@ static tb_void_t tb_test_bits_cl1_u32_be(tb_uint32_t x)
 	while (n--) i = tb_bits_cl1_u32_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_be: cl1: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_be: cl1: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl1_u32_le(tb_uint32_t x)
 {
@@ -570,7 +570,7 @@ static tb_void_t tb_test_bits_cl1_u32_le(tb_uint32_t x)
 	while (n--) i = tb_bits_cl1_u32_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_le: cl1: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_le: cl1: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl1_u64_be(tb_uint64_t x)
 {
@@ -580,7 +580,7 @@ static tb_void_t tb_test_bits_cl1_u64_be(tb_uint64_t x)
 	while (n--) i = tb_bits_cl1_u64_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_be: cl1: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_be: cl1: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cl1_u64_le(tb_uint64_t x)
 {
@@ -590,7 +590,7 @@ static tb_void_t tb_test_bits_cl1_u64_le(tb_uint64_t x)
 	while (n--) i = tb_bits_cl1_u64_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_le: cl1: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_le: cl1: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cb0_u32(tb_uint32_t x)
 {
@@ -600,7 +600,7 @@ static tb_void_t tb_test_bits_cb0_u32(tb_uint32_t x)
 	while (n--) i = tb_bits_cb0_u32(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32: cb0: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32: cb0: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cb0_u64(tb_uint64_t x)
 {
@@ -610,7 +610,7 @@ static tb_void_t tb_test_bits_cb0_u64(tb_uint64_t x)
 	while (n--) i = tb_bits_cb0_u64(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64: cb0: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64: cb0: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cb1_u32(tb_uint32_t x)
 {
@@ -620,7 +620,7 @@ static tb_void_t tb_test_bits_cb1_u32(tb_uint32_t x)
 	while (n--) i = tb_bits_cb1_u32(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32: cb1: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32: cb1: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_cb1_u64(tb_uint64_t x)
 {
@@ -630,7 +630,7 @@ static tb_void_t tb_test_bits_cb1_u64(tb_uint64_t x)
 	while (n--) i = tb_bits_cb1_u64(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64: cb1: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64: cb1: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb0_u32_be(tb_uint32_t x)
 {
@@ -640,7 +640,7 @@ static tb_void_t tb_test_bits_fb0_u32_be(tb_uint32_t x)
 	while (n--) i = tb_bits_fb0_u32_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_be: fb0: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_be: fb0: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb0_u32_le(tb_uint32_t x)
 {
@@ -650,7 +650,7 @@ static tb_void_t tb_test_bits_fb0_u32_le(tb_uint32_t x)
 	while (n--) i = tb_bits_fb0_u32_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_le: fb0: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_le: fb0: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb0_u64_be(tb_uint64_t x)
 {
@@ -660,7 +660,7 @@ static tb_void_t tb_test_bits_fb0_u64_be(tb_uint64_t x)
 	while (n--) i = tb_bits_fb0_u64_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_be: fb0: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_be: fb0: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb0_u64_le(tb_uint64_t x)
 {
@@ -670,7 +670,7 @@ static tb_void_t tb_test_bits_fb0_u64_le(tb_uint64_t x)
 	while (n--) i = tb_bits_fb0_u64_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_le: fb0: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_le: fb0: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb1_u32_be(tb_uint32_t x)
 {
@@ -680,7 +680,7 @@ static tb_void_t tb_test_bits_fb1_u32_be(tb_uint32_t x)
 	while (n--) i = tb_bits_fb1_u32_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_be: fb1: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_be: fb1: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb1_u32_le(tb_uint32_t x)
 {
@@ -690,7 +690,7 @@ static tb_void_t tb_test_bits_fb1_u32_le(tb_uint32_t x)
 	while (n--) i = tb_bits_fb1_u32_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u32_le: fb1: %032lb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u32_le: fb1: %032lb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb1_u64_be(tb_uint64_t x)
 {
@@ -700,7 +700,7 @@ static tb_void_t tb_test_bits_fb1_u64_be(tb_uint64_t x)
 	while (n--) i = tb_bits_fb1_u64_be(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_be: fb1: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_be: fb1: %064llb => %lu, %lld ms", x, i, t);
 }
 static tb_void_t tb_test_bits_fb1_u64_le(tb_uint64_t x)
 {
@@ -710,7 +710,7 @@ static tb_void_t tb_test_bits_fb1_u64_le(tb_uint64_t x)
 	while (n--) i = tb_bits_fb1_u64_le(x);
 	t = tb_mclock() - t;
 
-	tb_print("[bitops]: u64_le: fb1: %064llb => %lu, %lld ms", x, i, t);
+	tb_trace_i("[bitops]: u64_le: fb1: %064llb => %lu, %lld ms", x, i, t);
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -725,54 +725,54 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 0
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_ubits32(0x87654321);
 	tb_test_bits_ubits32(0x12345678);
 	
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_sbits32(0x87654321);
 	tb_test_bits_sbits32(0x12345678);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_sbits32(-300);
 	tb_test_bits_sbits32(300);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_u32_be(0x87654321);
 	tb_test_bits_u32_be(0x12345678);
 
 	tb_test_bits_u32_le(0x87654321);
 	tb_test_bits_u32_le(0x12345678);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_u24_be(0x654321);
 	tb_test_bits_u24_be(0x345678);
 
 	tb_test_bits_u24_le(0x654321);
 	tb_test_bits_u24_le(0x345678);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_u16_be(0x4321);
 	tb_test_bits_u16_be(0x5678);
 
 	tb_test_bits_u16_le(0x4321);
 	tb_test_bits_u16_le(0x5678);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_s32_be(0x8765F321);
 	tb_test_bits_s32_be(0x1234F678);
 
 	tb_test_bits_s32_le(0x8765F321);
 	tb_test_bits_s32_le(0x1234F678);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_s24_be(123456);
 	tb_test_bits_s24_be(-123456);
 
 	tb_test_bits_s24_le(123456);
 	tb_test_bits_s24_le(-123456);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_s16_be(4321);
 	tb_test_bits_s16_be(-4321);
 
@@ -780,14 +780,14 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_s16_le(-4321);
 
 #ifdef TB_CONFIG_TYPE_FLOAT
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_double_bbe(3.1415926);
 	tb_test_bits_double_ble(3.1415926);
 
 	tb_test_bits_double_lbe(3.1415926);
 	tb_test_bits_double_lle(3.1415926);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_double_be(3.1415926);
 	tb_test_bits_double_le(3.1415926);
 
@@ -797,7 +797,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl0_u32_be(0);
 	tb_test_bits_cl0_u32_be(1);
 	tb_test_bits_cl0_u32_be(2);
@@ -814,7 +814,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl0_u32_be(0x0000000f);
 	tb_test_bits_cl0_u32_be(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl0_u32_le(0);
 	tb_test_bits_cl0_u32_le(1);
 	tb_test_bits_cl0_u32_le(2);
@@ -831,7 +831,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl0_u32_le(0x0000000f);
 	tb_test_bits_cl0_u32_le(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl0_u64_be(0);
 	tb_test_bits_cl0_u64_be(1);
 	tb_test_bits_cl0_u64_be(2);
@@ -848,7 +848,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl0_u64_be(0x000000000000000f);
 	tb_test_bits_cl0_u64_be(0xf000000000000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl0_u64_le(0);
 	tb_test_bits_cl0_u64_le(1);
 	tb_test_bits_cl0_u64_le(2);
@@ -867,7 +867,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl1_u32_be(0);
 	tb_test_bits_cl1_u32_be(1);
 	tb_test_bits_cl1_u32_be(2);
@@ -884,7 +884,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl1_u32_be(0x0000000f);
 	tb_test_bits_cl1_u32_be(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl1_u32_le(0);
 	tb_test_bits_cl1_u32_le(1);
 	tb_test_bits_cl1_u32_le(2);
@@ -901,7 +901,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl1_u32_le(0x0000000f);
 	tb_test_bits_cl1_u32_le(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl1_u64_be(0);
 	tb_test_bits_cl1_u64_be(1);
 	tb_test_bits_cl1_u64_be(2);
@@ -918,7 +918,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cl1_u64_be(0x000000000000000f);
 	tb_test_bits_cl1_u64_be(0xf000000000000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cl1_u64_le(0);
 	tb_test_bits_cl1_u64_le(1);
 	tb_test_bits_cl1_u64_le(2);
@@ -937,7 +937,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cb0_u32(0);
 	tb_test_bits_cb0_u32(1);
 	tb_test_bits_cb0_u32(2);
@@ -954,7 +954,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cb0_u32(0x0000000f);
 	tb_test_bits_cb0_u32(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cb0_u64(0);
 	tb_test_bits_cb0_u64(1);
 	tb_test_bits_cb0_u64(2);
@@ -973,7 +973,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cb1_u32(0);
 	tb_test_bits_cb1_u32(1);
 	tb_test_bits_cb1_u32(2);
@@ -990,7 +990,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_cb1_u32(0x0000000f);
 	tb_test_bits_cb1_u32(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_cb1_u64(0);
 	tb_test_bits_cb1_u64(1);
 	tb_test_bits_cb1_u64(2);
@@ -1010,7 +1010,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb0_u32_be(0);
 	tb_test_bits_fb0_u32_be(1);
 	tb_test_bits_fb0_u32_be(2);
@@ -1027,7 +1027,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb0_u32_be(0x0000000f);
 	tb_test_bits_fb0_u32_be(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb0_u32_le(0);
 	tb_test_bits_fb0_u32_le(1);
 	tb_test_bits_fb0_u32_le(2);
@@ -1044,7 +1044,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb0_u32_le(0x0000000f);
 	tb_test_bits_fb0_u32_le(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb0_u64_be(0);
 	tb_test_bits_fb0_u64_be(1);
 	tb_test_bits_fb0_u64_be(2);
@@ -1061,7 +1061,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb0_u64_be(0x000000000000000f);
 	tb_test_bits_fb0_u64_be(0xf000000000000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb0_u64_le(0);
 	tb_test_bits_fb0_u64_le(1);
 	tb_test_bits_fb0_u64_le(2);
@@ -1080,7 +1080,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 #if 1
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb1_u32_be(0);
 	tb_test_bits_fb1_u32_be(1);
 	tb_test_bits_fb1_u32_be(2);
@@ -1097,7 +1097,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb1_u32_be(0x0000000f);
 	tb_test_bits_fb1_u32_be(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb1_u32_le(0);
 	tb_test_bits_fb1_u32_le(1);
 	tb_test_bits_fb1_u32_le(2);
@@ -1114,7 +1114,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb1_u32_le(0x0000000f);
 	tb_test_bits_fb1_u32_le(0xf0000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb1_u64_be(0);
 	tb_test_bits_fb1_u64_be(1);
 	tb_test_bits_fb1_u64_be(2);
@@ -1131,7 +1131,7 @@ tb_int_t tb_demo_utils_bits_main(tb_int_t argc, tb_char_t** argv)
 	tb_test_bits_fb1_u64_be(0x000000000000000f);
 	tb_test_bits_fb1_u64_be(0xf000000000000000);
 
-	tb_print("");
+	tb_trace_i("");
 	tb_test_bits_fb1_u64_le(0);
 	tb_test_bits_fb1_u64_le(1);
 	tb_test_bits_fb1_u64_le(2);

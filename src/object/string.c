@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -146,7 +146,7 @@ static tb_object_t* tb_string_read_xml(tb_object_xml_reader_t* reader, tb_size_t
 				// text
 				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
-				tb_trace_impl("string: %s", text);
+				tb_trace_d("string: %s", text);
 				
 				// string
 				string = tb_string_init_from_cstr(text);
@@ -285,7 +285,7 @@ static tb_object_t* tb_string_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 	tb_object_t* string = tb_string_init_from_cstr(tb_pstring_cstr(&data));
 
 	// trace
-	tb_trace_impl("string: %s", tb_pstring_cstr(&data));
+	tb_trace_d("string: %s", tb_pstring_cstr(&data));
 
 	// exit data
 	tb_pstring_exit(&data);

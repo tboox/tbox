@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"chunked"
+#define TB_TRACE_MODULE_NAME 			"chunked"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -96,7 +96,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 	}
 
 	// trace
-	tb_trace_impl("isize: %lu, beof: %d", tb_bstream_size(istream), filter->beof);
+	tb_trace_d("isize: %lu, beof: %d", tb_bstream_size(istream), filter->beof);
 
 	// the odata
 	tb_byte_t* 			op = (tb_byte_t*)tb_bstream_pos(ostream);
@@ -113,7 +113,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 			tb_char_t ch = *ip++;
 
 			// trace
-			tb_trace_impl("character: %x", ch);
+			tb_trace_d("character: %x", ch);
 
 			// check
 			tb_assert_and_check_return_val(ch, -1);
@@ -129,7 +129,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 				tb_assert_and_check_return_val(pb, -1);
 
 				// trace
-				tb_trace_impl("line: %s", tb_pstring_cstr(&cfilter->line));
+				tb_trace_d("line: %s", tb_pstring_cstr(&cfilter->line));
 
 				// strip '\r' if exists
 				if (pb[pn - 1] == '\r') tb_pstring_strip(&cfilter->line, pn - 1);
@@ -142,7 +142,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					cfilter->size = 0;
 
 					// trace
-					tb_trace_impl("tail");
+					tb_trace_d("tail");
 
 					// continue
 					continue ;
@@ -154,7 +154,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					cfilter->size = tb_s16tou32(pb);
 
 					// trace
-					tb_trace_impl("size: %lu", cfilter->size);
+					tb_trace_d("size: %lu", cfilter->size);
 
 					// clear data
 					tb_pstring_clear(&cfilter->line);
@@ -163,7 +163,7 @@ static tb_long_t tb_filter_chunked_spak(tb_filter_t* filter, tb_bstream_t* istre
 					if (!cfilter->size)
 					{
 						// trace
-						tb_trace_impl("eof");
+						tb_trace_d("eof");
 
 						// is eof
 						filter->beof = tb_true;
@@ -202,7 +202,7 @@ end:
 	tb_bstream_goto(ostream, (tb_byte_t*)op);
 
 	// trace
-	tb_trace_impl("read: %lu, beof: %u, ileft: %lu", cfilter->read, filter->beof, tb_bstream_left(istream));
+	tb_trace_d("read: %lu, beof: %u, ileft: %lu", cfilter->read, filter->beof, tb_bstream_left(istream));
 
 	// ok
 	return (op - ob);

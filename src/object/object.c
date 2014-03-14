@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -149,7 +149,7 @@ static tb_object_t* tb_object_read_bin(tb_gstream_t* stream)
 	tb_object_read_bin_type_size(stream, &type, &size);
 
 	// trace
-	tb_trace_impl("root: type: %lu, size: %llu", type, size);
+	tb_trace_d("root: type: %lu, size: %llu", type, size);
 
 	// the func
 	tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
@@ -518,7 +518,7 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
 				}
 
 				// trace
-				tb_trace_impl("key: %s", key);
+				tb_trace_d("key: %s", key);
 			
 				// the value
 				object = tb_dictionary_val(object, key);
@@ -539,7 +539,7 @@ tb_object_t* tb_object_seek(tb_object_t* object, tb_char_t const* path, tb_size_
 				for (; p < e && ib < ie && *p && tb_isdigit10(*p); p++, ib++) *ib = *p;
 
 				// trace
-				tb_trace_impl("index: %s", index);
+				tb_trace_d("index: %s", index);
 
 				// check
 				tb_size_t i = tb_atoi(index);

@@ -265,7 +265,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_ASIO)/asio/proactor/aicp
 
 # flags
-tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_PRINT_TAG=\"tbox\" -DTB_TRACE_PREFIX=\"tbox\"
+tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_TRACE_PREFIX=\"tbox\"
 tbox_CXFLAGS-$(DEBUG) 	+= -DTB_TRACE_ENABLE -DTB_ASSERT_ENABLE
 tbox_CXFLAGS-$(ZLIB) 	+= -DTB_CONFIG_ZLIB
 

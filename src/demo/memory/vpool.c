@@ -45,7 +45,7 @@ end:
 #endif
 
 	// trace
-	tb_print("vpool: %lld ms", time);
+	tb_trace_i("vpool: %lld ms", time);
 	
 	// exit
 	tb_vpool_exit(vpool);

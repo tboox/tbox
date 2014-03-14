@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -122,7 +122,7 @@ static tb_object_t* tb_date_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 				// text
 				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
-				tb_trace_impl("date: %s", text);
+				tb_trace_d("date: %s", text);
 
 				// done date: %04ld-%02ld-%02ld %02ld:%02ld:%02ld
 				tb_tm_t tm = {0};

@@ -34,7 +34,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
+	tb_trace_i("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
 # 	endif
  
 	// size--
@@ -48,7 +48,7 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb
 {
 	// trace
 # 	if TB_DEMO_TRACE_ENABLE
-	tb_print("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
+	tb_trace_i("save: %llu bytes, rate: %lu bytes/s, state: %s, to: %s", save, rate, tb_stream_state_cstr(state), priv);
 # 	endif
 
 	// ok

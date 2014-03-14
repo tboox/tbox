@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"option"
+#define TB_TRACE_MODULE_NAME 		"option"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -264,7 +264,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 			tb_char_t* val = (*p == '=')? (p + 1) : tb_null;
 
 			// trace
-			tb_trace_impl("[lname]: %s => %s", key, val);
+			tb_trace_d("[lname]: %s => %s", key, val);
 
 			// find the item
 			tb_option_item_t const* find = tb_option_item_find(option->opts, key, '\0');
@@ -365,7 +365,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 			tb_char_t const* val = (*p == '=')? (p + 1) : tb_null;
 
 			// trace
-			tb_trace_impl("[sname]: %s => %s", key, val);
+			tb_trace_d("[sname]: %s => %s", key, val);
 
 			// is short name?
 			if (tb_strlen(key) != 1)
@@ -463,7 +463,7 @@ tb_bool_t tb_option_done(tb_handle_t handle, tb_size_t argc, tb_char_t** argv)
 		else
 		{
 			// trace
-			tb_trace_impl("[val]: %s", p);
+			tb_trace_d("[val]: %s", p);
 
 			// find the value item 
 			while (item && item->mode != TB_OPTION_MODE_VAL && item->mode != TB_OPTION_MODE_END && item->mode != TB_OPTION_MODE_MORE)

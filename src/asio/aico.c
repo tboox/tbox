@@ -74,7 +74,7 @@ tb_bool_t tb_aico_wait(tb_handle_t haico, tb_bool_t bcalling)
 		while (tb_atomic_get(&aico->pending) && tryn--) 
 		{
 			// trace
-			tb_trace_impl("wait: aico: %p, type: %lu: wait pending", aico, tb_aico_type(aico));
+			tb_trace_d("wait: aico: %p, type: %lu: wait pending", aico, tb_aico_type(aico));
 
 			// wait it
 			tb_msleep(500);
@@ -82,7 +82,7 @@ tb_bool_t tb_aico_wait(tb_handle_t haico, tb_bool_t bcalling)
 		if (tb_atomic_get(&aico->pending))
 		{
 			// trace
-			tb_trace("[aico]: wait: failed, the aico is pending for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
+			tb_trace_d("[aico]: wait: failed, the aico is pending for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
 			return tb_false;
 		}
 
@@ -93,7 +93,7 @@ tb_bool_t tb_aico_wait(tb_handle_t haico, tb_bool_t bcalling)
 			while (tb_atomic_get(&aico->calling) && tryn--) 
 			{
 				// trace
-				tb_trace_impl("wait: aico: %p, type: %lu: wait calling", aico, tb_aico_type(aico));
+				tb_trace_d("wait: aico: %p, type: %lu: wait calling", aico, tb_aico_type(aico));
 
 				// wait it
 				tb_msleep(500);
@@ -101,7 +101,7 @@ tb_bool_t tb_aico_wait(tb_handle_t haico, tb_bool_t bcalling)
 			if (tb_atomic_get(&aico->calling))
 			{
 				// trace
-				tb_trace("[aico]: wait failed, the aico is calling for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
+				tb_trace_d("[aico]: wait failed, the aico is calling for func: %s, line: %lu, file: %s", aico->func, aico->line, aico->file);
 				return tb_false;
 			}
 		}

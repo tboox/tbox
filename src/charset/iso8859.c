@@ -39,7 +39,7 @@ tb_long_t tb_charset_iso8859_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* c
 	else
 	{
 		// @note: need lookup characters table
-		tb_trace("iso8859: unknown character: %x", b);
+		tb_trace_d("iso8859: unknown character: %x", b);
 		*ch = 0;
 	}
 	return 1;
@@ -52,7 +52,7 @@ tb_long_t tb_charset_iso8859_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch
 	else 
 	{
 		// @note: need lookup characters table
-		tb_trace("iso8859: unknown character: %x", ch);
+		tb_trace_d("iso8859: unknown character: %x", ch);
 	}
 	return 1;
 }

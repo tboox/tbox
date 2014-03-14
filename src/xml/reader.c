@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"xml"
+//#define TB_TRACE_MODULE_NAME 		"xml"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -290,7 +290,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 					tb_size_t charset = TB_CHARSET_TYPE_UTF8;
 					if (!tb_pstring_cstricmp(&xreader->charset, "gb2312") || !tb_pstring_cstricmp(&xreader->charset, "gbk")) 
 						charset = TB_CHARSET_TYPE_GB2312;
-					else tb_trace_impl("the charset: %s is not supported", tb_pstring_cstr(&xreader->charset));
+					else tb_trace_d("the charset: %s is not supported", tb_pstring_cstr(&xreader->charset));
 
 					// init transform stream
 					if (charset != TB_CHARSET_TYPE_UTF8)
@@ -398,7 +398,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 			}
 
 			// trace
-//			tb_trace_impl("<%s>", element);
+//			tb_trace_d("<%s>", element);
 		}
 		// is text: <> text </>
 		else if (*pc)
@@ -409,7 +409,7 @@ tb_size_t tb_xml_reader_next(tb_handle_t reader)
 				xreader->event = TB_XML_READER_EVENT_TEXT;
 
 			// trace
-//			tb_trace_impl("%s", text);
+//			tb_trace_d("%s", text);
 		}
 	}
 
@@ -420,7 +420,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 {
 	tb_xml_reader_t* xreader = (tb_xml_reader_t*)reader;
 	tb_assert_and_check_return_val(xreader && xreader->rstream && path, tb_false);
-	tb_trace_impl("goto: %s", path);
+	tb_trace_d("goto: %s", path);
 
 	// reset
 	xreader->level = 0;
@@ -452,7 +452,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 
 				// ok?
 				if (!tb_sstring_cstricmp(&s, path)) ok = tb_true;
-				tb_trace_impl("path: %s", tb_sstring_cstr(&s));
+				tb_trace_d("path: %s", tb_sstring_cstr(&s));
 
 				// remove 
 				tb_sstring_strip(&s, n);
@@ -473,7 +473,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 
 				// ok?
 				if (!tb_sstring_cstricmp(&s, path)) ok = tb_true;
-				tb_trace_impl("path: %s", tb_sstring_cstr(&s));
+				tb_trace_d("path: %s", tb_sstring_cstr(&s));
 
 				// restore
 				if (ok) if (!(ok = tb_gstream_seek(xreader->rstream, save))) goto end;
@@ -487,7 +487,7 @@ tb_bool_t tb_xml_reader_goto(tb_handle_t reader, tb_char_t const* path)
 
 				// ok?
 				if (!tb_sstring_cstricmp(&s, path)) ok = tb_true;
-				tb_trace_impl("path: %s", tb_sstring_cstr(&s));
+				tb_trace_d("path: %s", tb_sstring_cstr(&s));
 
 				// restore
 				if (ok) if (!(ok = tb_gstream_seek(xreader->rstream, save))) goto end;

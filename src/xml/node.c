@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 		"xml"
+#define TB_TRACE_MODULE_NAME 		"xml"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -399,7 +399,7 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute
 tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
 {
 	tb_assert_and_check_return_val(node && path, tb_null);
-	tb_trace_impl("root: %s goto: %s", tb_pstring_cstr(&node->name), path);
+	tb_trace_d("root: %s goto: %s", tb_pstring_cstr(&node->name), path);
 
 	// skip '/'
 	tb_char_t const* p = path; while (*p && *p == '/') p++;
@@ -420,7 +420,7 @@ tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
 			tb_size_t m = tb_pstring_size(&node->name);
 
 			// trace
-			tb_trace_impl("%s", tb_pstring_cstr(&node->name));
+			tb_trace_d("%s", tb_pstring_cstr(&node->name));
 
 			// has it?
 			if (!tb_pstring_cstrncmp(&node->name, p, m))

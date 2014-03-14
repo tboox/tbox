@@ -69,13 +69,13 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 #ifdef __tb_debug__
 	if (!(mode & TB_MODE_DEBUG))
 	{
-		tb_print("[tbox]: [warning]: libtbox.a has __tb_debug__ but tbox/tbox.h not");
+		tb_trace_i("[tbox]: [warning]: libtbox.a has __tb_debug__ but tbox/tbox.h not");
 		return tb_false;
 	}
 #else
 	if (mode & TB_MODE_DEBUG)
 	{
-		tb_print("[tbox]: [warning]: tbox/tbox.h has __tb_debug__ but libtbox.a not");
+		tb_trace_i("[tbox]: [warning]: tbox/tbox.h has __tb_debug__ but libtbox.a not");
 		return tb_false;
 	}
 #endif
@@ -83,13 +83,13 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 #ifdef __tb_small__
 	if (!(mode & TB_MODE_SMALL))
 	{
-		tb_print("[tbox]: [warning]: libtbox.a has __tb_small__ but tbox/tbox.h not");
+		tb_trace_i("[tbox]: [warning]: libtbox.a has __tb_small__ but tbox/tbox.h not");
 		return tb_false;
 	}
 #else
 	if (mode & TB_MODE_SMALL)
 	{
-		tb_print("[tbox]: [warning]: tbox/tbox.h has __tb_small__ but libtbox.a not");
+		tb_trace_i("[tbox]: [warning]: tbox/tbox.h has __tb_small__ but libtbox.a not");
 		return tb_false;
 	}
 #endif
@@ -105,12 +105,12 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 		// ok
 		if ((tb_hize_t)tb_atoll(build) == version->build)
 		{
-			tb_trace("version: tbox-%lub-v%u.%u.%u.%llu", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build);
+			tb_trace_d("version: tbox-%lub-v%u.%u.%u.%llu", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build);
 			return tb_true;
 		}
 		else
 		{
-			tb_trace("version: tbox-%lub-v%u.%u.%u.%llu != %s", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
+			tb_trace_d("version: tbox-%lub-v%u.%u.%u.%llu != %s", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
 		}
 	}
 
@@ -128,7 +128,7 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_c
 	if (!tb_trace_init()) return tb_false;
 
 	// trace
-	tb_trace("init: %p %lu", data, size);
+	tb_trace_d("init: %p %lu", data, size);
 
 	// check mode
 	if (!tb_check_mode(mode)) return tb_false;
@@ -169,7 +169,7 @@ tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_c
 	tb_version_check(build);
 
 	// trace
-	tb_trace("init: ok");
+	tb_trace_d("init: ok");
 
 	// ok
 	return tb_true;
@@ -192,7 +192,7 @@ tb_void_t tb_exit()
 	tb_memory_exit();
 
 	// trace
-	tb_trace("exit: ok");
+	tb_trace_d("exit: ok");
 
 	// exit trace
 	tb_trace_exit();

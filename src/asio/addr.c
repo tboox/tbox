@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"addr"
+#define TB_TRACE_MODULE_NAME 				"addr"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -172,13 +172,13 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	header.answer 		= tb_bstream_get_u16_be(&bst);
 	header.authority 	= tb_bstream_get_u16_be(&bst);
 	header.resource 	= tb_bstream_get_u16_be(&bst);
-	tb_trace_impl("response: size: %u", 		size);
-	tb_trace_impl("response: id: 0x%04x", 		header.id);
-	tb_trace_impl("response: question: %d", 	header.question);
-	tb_trace_impl("response: answer: %d", 		header.answer);
-	tb_trace_impl("response: authority: %d", 	header.authority);
-	tb_trace_impl("response: resource: %d", 	header.resource);
-	tb_trace_impl("");
+	tb_trace_d("response: size: %u", 		size);
+	tb_trace_d("response: id: 0x%04x", 		header.id);
+	tb_trace_d("response: question: %d", 	header.question);
+	tb_trace_d("response: answer: %d", 		header.answer);
+	tb_trace_d("response: authority: %d", 	header.authority);
+	tb_trace_d("response: resource: %d", 	header.resource);
+	tb_trace_d("");
 
 	// check header
 	tb_assert_and_check_return_val(header.id == TB_DNS_HEADER_MAGIC, tb_false);
@@ -194,7 +194,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	//name = tb_dns_decode_name(name);
 	tb_assert_and_check_return_val(name, tb_false);
 	tb_bstream_skip(&bst, 4);
-	tb_trace_impl("response: name: %s", name);
+	tb_trace_d("response: name: %s", name);
 #endif
 
 	// decode answers
@@ -204,21 +204,21 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	{
 		// decode answer
 		tb_dns_answer_t answer;
-		tb_trace_impl("response: answer: %d", i);
+		tb_trace_d("response: answer: %d", i);
 
 		// decode dns name
 		tb_char_t const* name = tb_dns_decode_name(&bst, answer.name); tb_used(name);
-		tb_trace_impl("response: name: %s", name);
+		tb_trace_d("response: name: %s", name);
 
 		// decode resource
 		answer.res.type 	= tb_bstream_get_u16_be(&bst);
 		answer.res.class_ 	= tb_bstream_get_u16_be(&bst);
 		answer.res.ttl 		= tb_bstream_get_u32_be(&bst);
 		answer.res.size 	= tb_bstream_get_u16_be(&bst);
-		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class_);
-		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
-		tb_trace_impl("response: size: %d", 	answer.res.size);
+		tb_trace_d("response: type: %d", 	answer.res.type);
+		tb_trace_d("response: class: %d", 	answer.res.class_);
+		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -227,7 +227,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 
 			// save the first ip
 			if (!found) 
@@ -243,7 +243,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 
 				// found it
 				found = 1;
-				tb_trace_impl("response: ");
+				tb_trace_d("response: ");
 				break;
 			}
 		}
@@ -251,9 +251,9 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 		{
 			// decode rdata
 			answer.rdata = (tb_byte_t const*)tb_dns_decode_name(&bst, answer.name);
-			tb_trace_impl("response: alias: %s", answer.rdata? answer.rdata : "");
+			tb_trace_d("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace_impl("response: ");
+		tb_trace_d("response: ");
 	}
 
 	// found it?
@@ -265,21 +265,21 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	{
 		// decode answer
 		tb_dns_answer_t answer;
-		tb_trace_impl("response: authority: %d", i);
+		tb_trace_d("response: authority: %d", i);
 
 		// decode dns name
 		tb_char_t* name = tb_dns_decode_name(&bst, answer.name);
-		tb_trace_impl("response: name: %s", name? name : "");
+		tb_trace_d("response: name: %s", name? name : "");
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
 		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
-		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class_);
-		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
-		tb_trace_impl("response: size: %d", 	answer.res.size);
+		tb_trace_d("response: type: %d", 	answer.res.type);
+		tb_trace_d("response: class: %d", 	answer.res.class_);
+		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -288,36 +288,36 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else
 		{
 			// decode data
 			answer.rdata = tb_dns_decode_name(&bst, answer.name);
-			tb_trace_impl("response: server: %s", answer.rdata? answer.rdata : "");
+			tb_trace_d("response: server: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace_impl("response: ");
+		tb_trace_d("response: ");
 	}
 
 	for (i = 0; i < header.resource; i++)
 	{
 		// decode answer
 		tb_dns_answer_t answer;
-		tb_trace_impl("response: resource: %d", i);
+		tb_trace_d("response: resource: %d", i);
 
 		// decode dns name
 		tb_char_t* name = tb_dns_decode_name(&bst, answer.name);
-		tb_trace_impl("response: name: %s", name? name : "");
+		tb_trace_d("response: name: %s", name? name : "");
 
 		// decode resource
 		answer.res.type = 	tb_bstream_get_u16_be(&bst);
 		answer.res.class_ = 	tb_bstream_get_u16_be(&bst);
 		answer.res.ttl = 	tb_bstream_get_u32_be(&bst);
 		answer.res.size = 	tb_bstream_get_u16_be(&bst);
-		tb_trace_impl("response: type: %d", 	answer.res.type);
-		tb_trace_impl("response: class: %d", 	answer.res.class_);
-		tb_trace_impl("response: ttl: %d", 		answer.res.ttl);
-		tb_trace_impl("response: size: %d", 	answer.res.size);
+		tb_trace_d("response: type: %d", 	answer.res.type);
+		tb_trace_d("response: class: %d", 	answer.res.class_);
+		tb_trace_d("response: ttl: %d", 		answer.res.ttl);
+		tb_trace_d("response: size: %d", 	answer.res.size);
 
 		// is ipv4?
 		if (answer.res.type == 1)
@@ -326,15 +326,15 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 			tb_byte_t b2 = tb_bstream_get_u8(&bst);
 			tb_byte_t b3 = tb_bstream_get_u8(&bst);
 			tb_byte_t b4 = tb_bstream_get_u8(&bst);
-			tb_trace_impl("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
+			tb_trace_d("response: ipv4: %u.%u.%u.%u", b1, b2, b3, b4);
 		}
 		else
 		{
 			// decode data
 			answer.rdata = tb_dns_decode_name(&bst, answer.name);
-			tb_trace_impl("response: alias: %s", answer.rdata? answer.rdata : "");
+			tb_trace_d("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
-		tb_trace_impl("response: ");
+		tb_trace_d("response: ");
 	}
 #endif
 
@@ -360,7 +360,7 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_trace_impl("resp[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
+		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
 
 		// check
 		tb_assert_and_check_return_val(aice->u.urecv.real, tb_false);
@@ -372,7 +372,7 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	else
 	{
 		// trace
-		tb_trace_impl("resp[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
 	}
 
 	// ok?
@@ -427,7 +427,7 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_trace_impl("reqt[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
+		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
 
 		// check
 		tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
@@ -443,7 +443,7 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 	else
 	{
 		// trace
-		tb_trace_impl("reqt[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_aice_state_cstr(aice));
 			
 		// the next server 
 		tb_ipv4_t const* server = &addr->list[addr->indx + 1];
@@ -538,7 +538,7 @@ tb_void_t tb_aicp_addr_kill(tb_handle_t handle)
 	tb_assert_and_check_return(addr);
 
 	// trace
-	tb_trace_impl("kill: ..");
+	tb_trace_d("kill: ..");
 
 	// kill sock
 	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
@@ -550,7 +550,7 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 	tb_assert_and_check_return(addr);
 
 	// trace
-	tb_trace_impl("exit: ..");
+	tb_trace_d("exit: ..");
 
 	// the aico
 	tb_handle_t aico = addr->aico;
@@ -571,7 +571,7 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 	if (sock) tb_socket_clos(sock);
 
 	// trace
-	tb_trace_impl("exit: ok");
+	tb_trace_d("exit: ok");
 }
 tb_bool_t tb_aicp_addr_done(tb_handle_t handle, tb_char_t const* host)
 {

@@ -26,7 +26,7 @@ static tb_size_t tb_vector_insert_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -55,7 +55,7 @@ static tb_size_t tb_vector_insert_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_insert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_insert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -84,7 +84,7 @@ static tb_size_t tb_vector_insert_tail_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_insert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_insert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -115,7 +115,7 @@ static tb_size_t tb_vector_ninsert_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n + 1);
@@ -143,7 +143,7 @@ static tb_size_t tb_vector_ninsert_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_ninsert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_ninsert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -171,7 +171,7 @@ static tb_size_t tb_vector_ninsert_tail_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_ninsert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_ninsert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -202,7 +202,7 @@ static tb_size_t tb_vector_remove_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_remove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_remove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -226,7 +226,7 @@ static tb_size_t tb_vector_remove_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_remove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_remove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -250,7 +250,7 @@ static tb_size_t tb_vector_remove_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_remove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_remove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -273,7 +273,7 @@ static tb_size_t tb_vector_nremove_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nremove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nremove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -296,7 +296,7 @@ static tb_size_t tb_vector_nremove_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nremove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nremove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -319,7 +319,7 @@ static tb_size_t tb_vector_nremove_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nremove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nremove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(!tb_vector_size(vector));
@@ -344,7 +344,7 @@ static tb_size_t tb_vector_replace_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_replace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_replace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -370,7 +370,7 @@ static tb_size_t tb_vector_replace_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_replace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_replace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -395,7 +395,7 @@ static tb_size_t tb_vector_replace_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_replace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_replace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -420,7 +420,7 @@ static tb_size_t tb_vector_nreplace_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nreplace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nreplace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -445,7 +445,7 @@ static tb_size_t tb_vector_nreplace_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nreplace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nreplace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -470,7 +470,7 @@ static tb_size_t tb_vector_nreplace_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_nreplace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_nreplace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// check
 	tb_assert(tb_vector_size(vector) == n);
@@ -503,7 +503,7 @@ static tb_size_t tb_vector_iterator_next_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// exit
 	tb_vector_exit(vector);
@@ -532,7 +532,7 @@ static tb_size_t tb_vector_iterator_prev_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_vector_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_vector_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_vector_size(vector), tb_vector_maxn(vector));
 
 	// exit
 	tb_vector_exit(vector);
@@ -541,19 +541,19 @@ static tb_size_t tb_vector_iterator_prev_test()
 }
 static tb_void_t tb_vector_int_dump(tb_vector_t const* vector)
 {
-	tb_print("tb_int_t size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("tb_int_t size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
 	tb_size_t itor = tb_iterator_head(vector);
 	tb_size_t tail = tb_iterator_tail(vector);
 	for (; itor != tail; itor = tb_iterator_next(vector, itor))
-		tb_print("tb_int_t at[%d]: %x", itor, tb_iterator_item(vector, itor));
+		tb_trace_i("tb_int_t at[%d]: %x", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_int_test()
 {
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_long());
 	tb_assert_and_check_return(vector);
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_vector_ninsert_head(vector, 0xa, 10); 
 	tb_vector_ninsert_tail(vector, 0xf, 10);
 	tb_vector_insert_prev(vector, 10, 0);
@@ -578,22 +578,22 @@ static tb_void_t tb_vector_int_test()
 	tb_vector_insert_tail(vector, 9);
 	tb_vector_int_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_vector_nremove_head(vector, 5);
 	tb_vector_nremove_last(vector, 5);
 	tb_vector_int_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_vector_nreplace_head(vector, 0xf, 10);
 	tb_vector_nreplace_last(vector, 0xa, 10);
 	tb_vector_replace_head(vector, 0);
 	tb_vector_replace_last(vector, 0);
 	tb_vector_int_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_vector_clear(vector);
 	tb_vector_int_dump(vector);
 
@@ -601,19 +601,19 @@ static tb_void_t tb_vector_int_test()
 }
 static tb_void_t tb_vector_str_dump(tb_vector_t const* vector)
 {
-	tb_print("str size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("str size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
 	tb_size_t itor = tb_iterator_head(vector);
 	tb_size_t tail = tb_iterator_tail(vector);
 	for (; itor != tail; itor = tb_iterator_next(vector, itor))
-		tb_print("str at[%d]: %s", itor, tb_iterator_item(vector, itor));
+		tb_trace_i("str at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_str_test()
 {
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_str(tb_true, tb_spool_init(TB_SPOOL_GROW_SMALL, 0)));
 	tb_assert_and_check_return(vector);
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
 	tb_vector_insert_prev(vector, 10, "0000000000");
@@ -638,22 +638,22 @@ static tb_void_t tb_vector_str_test()
 	tb_vector_insert_tail(vector, "9999999999");
 	tb_vector_str_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_vector_nremove_head(vector, 5);
 	tb_vector_nremove_last(vector, 5);
 	tb_vector_str_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_vector_nreplace_head(vector, "TTTTTTTTTT", 10);
 	tb_vector_nreplace_last(vector, "HHHHHHHHHH", 10);
 	tb_vector_replace_head(vector, "OOOOOOOOOO");
 	tb_vector_replace_last(vector, "OOOOOOOOOO");
 	tb_vector_str_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_vector_clear(vector);
 	tb_vector_str_dump(vector);
 
@@ -661,19 +661,19 @@ static tb_void_t tb_vector_str_test()
 }
 static tb_void_t tb_vector_efm_dump(tb_vector_t const* vector)
 {
-	tb_print("efm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("efm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
 	tb_size_t itor = tb_iterator_head(vector);
 	tb_size_t tail = tb_iterator_tail(vector);
 	for (; itor != tail; itor = tb_iterator_next(vector, itor))
-		tb_print("efm at[%d]: %s", itor, tb_iterator_item(vector, itor));
+		tb_trace_i("efm at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_efm_test()
 {
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_efm(11, tb_rpool_init(256, 11, 0)));
 	tb_assert_and_check_return(vector);
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
 	tb_vector_insert_prev(vector, 10, "0000000000");
@@ -698,22 +698,22 @@ static tb_void_t tb_vector_efm_test()
 	tb_vector_insert_tail(vector, "9999999999");
 	tb_vector_efm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_vector_nremove_head(vector, 5);
 	tb_vector_nremove_last(vector, 5);
 	tb_vector_efm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_vector_nreplace_head(vector, "TTTTTTTTTT", 10);
 	tb_vector_nreplace_last(vector, "HHHHHHHHHH", 10);
 	tb_vector_replace_head(vector, "OOOOOOOOOO");
 	tb_vector_replace_last(vector, "OOOOOOOOOO");
 	tb_vector_efm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_vector_clear(vector);
 	tb_vector_efm_dump(vector);
 
@@ -721,23 +721,23 @@ static tb_void_t tb_vector_efm_test()
 }
 static tb_void_t tb_vector_ifm_dump(tb_vector_t const* vector)
 {
-	tb_print("ifm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
+	tb_trace_i("ifm size: %d, maxn: %d", tb_vector_size(vector), tb_vector_maxn(vector));
 	tb_size_t itor = tb_iterator_head(vector);
 	tb_size_t tail = tb_iterator_tail(vector);
 	for (; itor != tail; itor = tb_iterator_next(vector, itor))
-		tb_print("ifm at[%d]: %s", itor, tb_iterator_item(vector, itor));
+		tb_trace_i("ifm at[%d]: %s", itor, tb_iterator_item(vector, itor));
 }
 static tb_void_t tb_vector_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_print("ifm free: %s, priv: %s", item, func->priv);
+	tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
 }
 static tb_void_t tb_vector_ifm_test()
 {
 	tb_vector_t* vector = tb_vector_init(TB_VECTOR_GROW_SIZE, tb_item_func_ifm(11, tb_vector_ifm_free, "ifm"));
 	tb_assert_and_check_return(vector);
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_vector_ninsert_head(vector, "HHHHHHHHHH", 10); 
 	tb_vector_ninsert_tail(vector, "TTTTTTTTTT", 10);
 	tb_vector_insert_prev(vector, 10, "0000000000");
@@ -762,22 +762,22 @@ static tb_void_t tb_vector_ifm_test()
 	tb_vector_insert_tail(vector, "9999999999");
 	tb_vector_ifm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_vector_nremove_head(vector, 5);
 	tb_vector_nremove_last(vector, 5);
 	tb_vector_ifm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_vector_nreplace_head(vector, "TTTTTTTTTT", 10);
 	tb_vector_nreplace_last(vector, "HHHHHHHHHH", 10);
 	tb_vector_replace_head(vector, "OOOOOOOOOO");
 	tb_vector_replace_last(vector, "OOOOOOOOOO");
 	tb_vector_ifm_dump(vector);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_vector_clear(vector);
 	tb_vector_ifm_dump(vector);
 
@@ -786,8 +786,8 @@ static tb_void_t tb_vector_ifm_test()
 static tb_void_t tb_vector_perf_test()
 {
 	tb_size_t score = 0;
-	tb_print("=============================================================");
-	tb_print("insert performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert performance:");
 	score += tb_vector_insert_test();
 	score += tb_vector_insert_head_test();
 	score += tb_vector_insert_tail_test();
@@ -795,8 +795,8 @@ static tb_void_t tb_vector_perf_test()
 	score += tb_vector_ninsert_head_test();
 	score += tb_vector_ninsert_tail_test();
 
-	tb_print("=============================================================");
-	tb_print("remove performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove performance:");
 	score += tb_vector_remove_test();
 	score += tb_vector_remove_head_test();
 	score += tb_vector_remove_last_test();
@@ -804,8 +804,8 @@ static tb_void_t tb_vector_perf_test()
 	score += tb_vector_nremove_head_test();
 	score += tb_vector_nremove_last_test();
 
-	tb_print("=============================================================");
-	tb_print("replace performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace performance:");
 	score += tb_vector_replace_test();
 	score += tb_vector_replace_head_test();
 	score += tb_vector_replace_last_test();
@@ -813,13 +813,13 @@ static tb_void_t tb_vector_perf_test()
 	score += tb_vector_nreplace_head_test();
 	score += tb_vector_nreplace_last_test();
 
-	tb_print("=============================================================");
-	tb_print("iterator performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("iterator performance:");
 	score += tb_vector_iterator_next_test();
 	score += tb_vector_iterator_prev_test();
 
-	tb_print("=============================================================");
-	tb_print("score: %d", score / 100);
+	tb_trace_i("=============================================================");
+	tb_trace_i("score: %d", score / 100);
 
 }
 static tb_void_t tb_vector_test_itor_perf()
@@ -859,7 +859,7 @@ static tb_void_t tb_vector_test_itor_perf()
 		itor = tb_iterator_next(vector, itor);
 	}
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
 	tb_vector_exit(vector);
 }
@@ -904,7 +904,7 @@ static tb_void_t tb_vector_test_walk_perf()
 	__tb_volatile__ tb_hize_t test[2] = {0};
 	tb_vector_walk(vector, tb_vector_test_walk_item, test);
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_vector_size(vector), t);
 
 	tb_vector_exit(vector);
 }

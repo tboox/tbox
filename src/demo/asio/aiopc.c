@@ -40,11 +40,11 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 	}
 
 	// ok?
-	if (conn > 0) tb_print("conn[%p]: ok", sock);
+	if (conn > 0) tb_trace_i("conn[%p]: ok", sock);
 	// timeout?
-	else if (!conn) tb_print("conn[%p]: timeout", sock);
+	else if (!conn) tb_trace_i("conn[%p]: timeout", sock);
 	// failed?
-	else tb_print("conn[%p]: failed", sock);
+	else tb_trace_i("conn[%p]: failed", sock);
 	tb_check_goto(conn > 0, end);
 
 	// done sock
@@ -64,7 +64,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 			size += real;
 
 			// trace
-//			tb_print("recv[%p]: real: %ld", sock, real);
+//			tb_trace_i("recv[%p]: real: %ld", sock, real);
 
 			// compute speed
 			peak += real;
@@ -80,7 +80,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 				time = tb_mclock();
 	
 				// trace
-				tb_print("recv[%p]: size: %llu, sped: %lu KB/s", sock, size, sped / 1000);
+				tb_trace_i("recv[%p]: size: %llu, sped: %lu KB/s", sock, size, sped / 1000);
 			}
 
 			// init wait
@@ -96,7 +96,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 				if (real > 0)
 				{
 					// trace
-//					tb_print("writ[%p]: real: %ld", file, real);
+//					tb_trace_i("writ[%p]: real: %ld", file, real);
 
 					// save writ
 					writ += real;
@@ -105,7 +105,7 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 				else if (!real && !wait) wait = tb_true;
 				else
 				{
-					tb_print("writ[%p]: failed", file);
+					tb_trace_i("writ[%p]: failed", file);
 				}
 			}
 
@@ -117,25 +117,25 @@ tb_int_t tb_demo_asio_aiopc_main(tb_int_t argc, tb_char_t** argv)
 			// wait
 			if (tb_aioo_wait(sock, TB_AIOE_CODE_RECV, -1) <= 0) 
 			{
-				tb_print("recv[%p]: wait: failed", sock);
+				tb_trace_i("recv[%p]: wait: failed", sock);
 				break;
 			}
 			wait = tb_true;
 		}
 		else
 		{
-			tb_print("recv[%p]: closed", sock);
+			tb_trace_i("recv[%p]: closed", sock);
 			break;
 		}
 	}
 	
 	// trace
-	if (sock) tb_print("recv[%p]: size: %llu, sped: %llu KB/s", sock, size, size / (tb_mclock() - base));
+	if (sock) tb_trace_i("recv[%p]: size: %llu, sped: %llu KB/s", sock, size, size / (tb_mclock() - base));
 
 end:
 
 	// trace
-	tb_print("end");
+	tb_trace_i("end");
 
 	// exit sock
 	if (sock) tb_socket_clos(sock);

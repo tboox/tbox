@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"filter"
+#define TB_TRACE_MODULE_NAME 			"filter"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -206,7 +206,7 @@ tb_long_t tb_filter_spak(tb_filter_t* filter, tb_byte_t const* data, tb_size_t s
 	if (osize > 0) *pdata = odata;
 
 	// trace
-	tb_trace_impl("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_pbuffer_size(&filter->idata), tb_qbuffer_size(&filter->odata), filter->offset, filter->limit);
+	tb_trace_d("spak: %ld, ileft: %lu, oleft: %lu, offset: %llu, limit: %lld", osize, tb_pbuffer_size(&filter->idata), tb_qbuffer_size(&filter->odata), filter->offset, filter->limit);
 
 	// ok?
 	return osize;

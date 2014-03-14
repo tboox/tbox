@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 	"gzip"
+#define TB_TRACE_MODULE_NAME 	"gzip"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -63,7 +63,7 @@ static tb_long_t tb_zip_gzip_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	// deflate 
 	tb_int_t r = deflate(&gzip->zst, sync > 0? Z_SYNC_FLUSH : (sync < 0? Z_FINISH : Z_NO_FLUSH));
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	tb_trace_impl("deflate: %u => %u, sync: %ld", (tb_size_t)(ie - ip), (tb_size_t)((tb_byte_t*)gzip->zst.next_out - op), sync);
+	tb_trace_d("deflate: %u => %u, sync: %ld", (tb_size_t)(ie - ip), (tb_size_t)((tb_byte_t*)gzip->zst.next_out - op), sync);
 
 	// update 
 	ist->p = (tb_byte_t*)gzip->zst.next_in;
@@ -100,7 +100,7 @@ static tb_long_t tb_zip_gzip_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_b
 	// inflate 
 	tb_int_t r = inflate(&gzip->zst, !sync? Z_NO_FLUSH : Z_SYNC_FLUSH);
 	tb_assert_and_check_return_val(r == Z_OK || r == Z_STREAM_END, -1);
-	tb_trace_impl("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)gzip->zst.next_out - op, sync);
+	tb_trace_d("inflate: %u => %u, sync: %ld", ie - ip, (tb_byte_t*)gzip->zst.next_out - op, sync);
 
 	// update 
 	ist->p = (tb_byte_t*)gzip->zst.next_in;

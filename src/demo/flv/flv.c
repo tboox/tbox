@@ -22,38 +22,38 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 	switch (value->type)
 	{
 	case TB_FLV_SDATA_TYPE_NUMBER:
-		tb_print("[demo]: %s = %lf", spath, value->u.number);
+		tb_trace_i("[demo]: %s = %lf", spath, value->u.number);
 		break;
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
-		tb_print("[demo]: %s = %s", spath, value->u.boolean? "true" : "false");
+		tb_trace_i("[demo]: %s = %s", spath, value->u.boolean? "true" : "false");
 		break;
 	case TB_FLV_SDATA_TYPE_STRING:
 	case TB_FLV_SDATA_TYPE_LONGSTRING:
-		tb_print("[demo]: %s = %s", spath, value->u.string.data);
+		tb_trace_i("[demo]: %s = %s", spath, value->u.string.data);
 		break;
 	case TB_FLV_SDATA_TYPE_MOVIECLIP:
-		tb_print("[demo]: %s = movieclip", spath);
+		tb_trace_i("[demo]: %s = movieclip", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_NONE:
-		tb_print("[demo]: %s = null", spath);
+		tb_trace_i("[demo]: %s = null", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_UNDEFINED:
-		tb_print("[demo]: %s = undefined", spath);
+		tb_trace_i("[demo]: %s = undefined", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_REFERENCE:
-		tb_print("[demo]: %s = reference", spath);
+		tb_trace_i("[demo]: %s = reference", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_DATE:	
-		tb_print("[demo]: %s = date", spath);
+		tb_trace_i("[demo]: %s = date", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_OBJECT:
-		tb_print("[demo]: %s = object", spath);
+		tb_trace_i("[demo]: %s = object", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_ECMAARRAY:
-		tb_print("[demo]: %s = ecmaarray", spath);
+		tb_trace_i("[demo]: %s = ecmaarray", spath);
 		break;
 	case TB_FLV_SDATA_TYPE_STRICTARRAY:
-		tb_print("[demo]: %s = strictarray", spath);
+		tb_trace_i("[demo]: %s = strictarray", spath);
 		break;
 	default:
 		break;
@@ -62,18 +62,18 @@ static tb_void_t tb_flv_sdata_cb_func(tb_char_t const* spath, tb_flv_sdata_value
 
 static tb_void_t tb_flv_sdata_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
 {
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: sdata_data: %d %d", head_size, body_size);
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: sdata_data: %d %d", head_size, body_size);
 }
 static tb_void_t tb_flv_hdata_cb_func(tb_byte_t const* data, tb_size_t size, tb_pointer_t cb_data)
 {
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: head_size: %d", size);
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: head_size: %d", size);
 }
 static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
 {
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: audio_config_size: %d %d", head_size, body_size);
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: audio_config_size: %d %d", head_size, body_size);
 
 	tb_uint8_t flags = head_data[11];
 	static tb_uint32_t samplerate_table[] =
@@ -106,12 +106,12 @@ static tb_void_t tb_flv_audio_config_cb_func(tb_byte_t const* head_data, tb_size
 	tb_byte_t channels_idex = tb_bstream_get_ubits32(&bst, 4);
 	tb_size_t channels = channels_idex < 8? channels_table[channels_idex] : 2;
 	if (!channels) channels = (flags & TB_FLV_AUDIO_CHANNEL_MASK) == TB_FLV_AUDIO_CHANNEL_STEREO ? 2 : 1;
-	tb_print("[demo]: samplerate: %u Hz, channels: %u, object_type: %u", samplerate, channels, object_type);
+	tb_trace_i("[demo]: samplerate: %u Hz, channels: %u, object_type: %u", samplerate, channels, object_type);
 }
 static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_pointer_t cb_data)
 {
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: video_config_size: %d %d", head_size, body_size);
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: video_config_size: %d %d", head_size, body_size);
 	tb_bstream_t 	bst;
 	tb_bstream_init(&bst, body_data, body_size);
 
@@ -119,19 +119,19 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 	tb_uint8_t avc_profile_indication 	= tb_bstream_get_u8(&bst);
 	tb_uint8_t profile_compatibility 	= tb_bstream_get_u8(&bst);
 	tb_uint8_t avc_level_indication 	= tb_bstream_get_u8(&bst);
-	tb_print("[demo]: version: %x profile: %x compatibility: %x, level: %x", configure_version, avc_profile_indication, profile_compatibility, avc_level_indication);
+	tb_trace_i("[demo]: version: %x profile: %x compatibility: %x, level: %x", configure_version, avc_profile_indication, profile_compatibility, avc_level_indication);
 
 	tb_uint8_t length_size_minusone 	= tb_bstream_get_u8(&bst) & 0x03;
-	tb_print("[demo]: length_size_minusone: %u", length_size_minusone);
+	tb_trace_i("[demo]: length_size_minusone: %u", length_size_minusone);
 
 	tb_uint8_t sps_n = tb_bstream_get_u8(&bst) & 0x1f;
-	tb_print("[demo]: sps_n: %u", sps_n);
+	tb_trace_i("[demo]: sps_n: %u", sps_n);
 
 	tb_size_t i = 0;
 	for (i = 0; i < sps_n; ++i)
 	{
 		tb_uint16_t size = tb_bstream_get_u16_be(&bst);
-		tb_print("[demo]: sps_size: %u", size);
+		tb_trace_i("[demo]: sps_size: %u", size);
 
 		// analyze framerate
 		if (size)
@@ -146,7 +146,7 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 
 			// analyze framerate
 			tb_double_t framerate = tb_flv_video_h264_sps_analyze_framerate(data, size);
-			tb_print("[demo]: sps_framerate: %lf", framerate);
+			tb_trace_i("[demo]: sps_framerate: %lf", framerate);
 
 			// free data
 			tb_free(data);
@@ -154,20 +154,20 @@ static tb_void_t tb_flv_video_config_cb_func(tb_byte_t const* head_data, tb_size
 	}
 
 	tb_uint8_t pps_n = tb_bstream_get_u8(&bst) & 0x1f;
-	tb_print("[demo]: pps_n: %u", pps_n);
+	tb_trace_i("[demo]: pps_n: %u", pps_n);
 
 	for (i = 0; i < pps_n; ++i)
 	{
 		tb_uint16_t size = tb_bstream_get_u16_be(&bst);
-		tb_print("[demo]: pps_size: %u", size);
+		tb_trace_i("[demo]: pps_size: %u", size);
 		tb_bstream_skip(&bst, size);
 	}
 }
 static tb_bool_t tb_flv_audio_data_cb_func(tb_byte_t const* head_data, tb_size_t head_size, tb_byte_t const* body_data, tb_size_t body_size, tb_size_t dts, tb_pointer_t cb_data)
 {	
 	tb_flv_info_t* info = cb_data;
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: audio_data_size: %u %u, dts: %u, dt: %u", head_size, body_size, dts, dts - info->audio_dts_last);
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: audio_data_size: %u %u, dts: %u, dt: %u", head_size, body_size, dts, dts - info->audio_dts_last);
 	info->audio_dts_last = dts;
 
 	return tb_true;
@@ -178,8 +178,8 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 	tb_uint8_t 	flags = head_data[11];
 	tb_bool_t 	bkeyframe = (flags & TB_FLV_VIDEO_FRAMETYPE_MASK) == TB_FLV_FRAME_TYPE_KEY? tb_true : tb_false;
 
-	tb_print("[demo]: =================================================================================");
-	tb_print("[demo]: video_data_size: %u %u, dts: %u, cts: %d, pts: %u, dt: %u, %s", head_size, body_size, dts, cts, dts + (cts > 0? cts : 0), dts - info->video_dts_last, bkeyframe? "iframe" : "xframe");
+	tb_trace_i("[demo]: =================================================================================");
+	tb_trace_i("[demo]: video_data_size: %u %u, dts: %u, cts: %d, pts: %u, dt: %u, %s", head_size, body_size, dts, cts, dts + (cts > 0? cts : 0), dts - info->video_dts_last, bkeyframe? "iframe" : "xframe");
 	info->video_dts_last = dts;
 
 	// set unit data
@@ -194,7 +194,7 @@ static tb_bool_t tb_flv_video_data_cb_func(tb_byte_t const* head_data, tb_size_t
 		{
 			// skip sei unit
 			tb_byte_t unit_type = tb_bstream_get_u8(&bst) & 0x1f;
-			tb_print("[demo]: unit_type: %u, unit_size: %u", unit_type, unit_size);
+			tb_trace_i("[demo]: unit_type: %u, unit_size: %u", unit_type, unit_size);
 
 			// skip unit
 			tb_bstream_skip(&bst, unit_size - 1);

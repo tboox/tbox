@@ -27,7 +27,7 @@ static tb_void_t tb_sort_int_test_perf(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_sort_int_all: %lld ms", time);
+	tb_trace_i("tb_sort_int_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
@@ -56,7 +56,7 @@ static tb_void_t tb_sort_int_test_perf_bubble(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_bubble_sort_int_all: %lld ms", time);
+	tb_trace_i("tb_bubble_sort_int_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
@@ -78,24 +78,24 @@ static tb_void_t tb_sort_int_test_func_bubble()
 	tb_iterator_t iterator = tb_iterator_int(data, n);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// put
 	tb_rand_clear();
 	for (i = 0; i < n; i++) 
 	{
 		data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
-		tb_print("bubble_put: %ld", data[i]);
+		tb_trace_i("bubble_put: %ld", data[i]);
 	}
 
 	// sort
 	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// pop
-	for (i = 0; i < n; i++) tb_print("bubble_pop: %ld", data[i]);
+	for (i = 0; i < n; i++) tb_trace_i("bubble_pop: %ld", data[i]);
 
 	// free
 	tb_free(data);
@@ -121,7 +121,7 @@ static tb_void_t tb_sort_int_test_perf_insert(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_insert_sort_int_all: %lld ms", time);
+	tb_trace_i("tb_insert_sort_int_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
@@ -143,24 +143,24 @@ static tb_void_t tb_sort_int_test_func_insert()
 	tb_iterator_t iterator = tb_iterator_int(data, n);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// put
 	tb_rand_clear();
 	for (i = 0; i < n; i++) 
 	{
 		data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
-		tb_print("insert_put: %ld", data[i]);
+		tb_trace_i("insert_put: %ld", data[i]);
 	}
 
 	// sort
 	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// pop
-	for (i = 0; i < n; i++) tb_print("insert_pop: %ld", data[i]);
+	for (i = 0; i < n; i++) tb_trace_i("insert_pop: %ld", data[i]);
 
 	// free
 	tb_free(data);
@@ -186,7 +186,7 @@ static tb_void_t tb_sort_int_test_perf_quick(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_quick_sort_int_all: %lld ms", time);
+	tb_trace_i("tb_quick_sort_int_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
@@ -208,24 +208,24 @@ static tb_void_t tb_sort_int_test_func_quick()
 	tb_iterator_t iterator = tb_iterator_int(data, n);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// put
 	tb_rand_clear();
 	for (i = 0; i < n; i++) 
 	{
 		data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
-		tb_print("quick_put: %ld", data[i]);
+		tb_trace_i("quick_put: %ld", data[i]);
 	}
 
 	// sort
 	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// pop
-	for (i = 0; i < n; i++) tb_print("quick_pop: %ld", data[i]);
+	for (i = 0; i < n; i++) tb_trace_i("quick_pop: %ld", data[i]);
 
 	// free
 	tb_free(data);
@@ -251,7 +251,7 @@ static tb_void_t tb_sort_int_test_perf_heap(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_heap_sort_int_all: %lld ms", time);
+	tb_trace_i("tb_heap_sort_int_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(data[i - 1] <= data[i]);
@@ -273,24 +273,24 @@ static tb_void_t tb_sort_int_test_func_heap()
 	tb_iterator_t iterator = tb_iterator_int(data, n);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// put
 	tb_rand_clear();
 	for (i = 0; i < n; i++) 
 	{
 		data[i] = tb_rand_sint32(TB_MINS16, TB_MAXS16);
-		tb_print("heap_put: %ld", data[i]);
+		tb_trace_i("heap_put: %ld", data[i]);
 	}
 
 	// sort
 	tb_heap_sort_all(&iterator, tb_null);
 
 	// trace
-	tb_print("");
+	tb_trace_i("");
 
 	// pop
-	for (i = 0; i < n; i++) tb_print("heap_pop: %ld", data[i]);
+	for (i = 0; i < n; i++) tb_trace_i("heap_pop: %ld", data[i]);
 
 	// free
 	tb_free(data);
@@ -326,7 +326,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_sort_str_all: %lld ms", time);
+	tb_trace_i("tb_sort_str_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
@@ -368,7 +368,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_bubble_sort_str_all: %lld ms", time);
+	tb_trace_i("tb_bubble_sort_str_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
@@ -410,7 +410,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_insert_sort_str_all: %lld ms", time);
+	tb_trace_i("tb_insert_sort_str_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
@@ -452,7 +452,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_quick_sort_str_all: %lld ms", time);
+	tb_trace_i("tb_quick_sort_str_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
@@ -494,7 +494,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 	time = tb_mclock() - time;
 
 	// time
-	tb_print("tb_heap_sort_str_all: %lld ms", time);
+	tb_trace_i("tb_heap_sort_str_all: %lld ms", time);
 
 	// check
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);

@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"ltimer"
+//#define TB_TRACE_MODULE_NAME 				"ltimer"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -156,7 +156,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 	tb_assert_and_check_return_val(task && task->func && task->refn && task->when, tb_false);
 
 	// trace
-	tb_trace_impl("add: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("add: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -168,21 +168,21 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 			timer->btime = tb_ltimer_now(timer);
 			timer->wbase = 0;
 		}
-		tb_trace_impl("add: btime: %lld, wbase: %lu", timer->btime, timer->wbase);
+		tb_trace_d("add: btime: %lld, wbase: %lu", timer->btime, timer->wbase);
 
 		// the timer difference
 		tb_hong_t tdiff = task->when - timer->btime;
 		tb_assert_and_check_break(tdiff >= 0);
-		tb_trace_impl("add: tdiff: %lld", tdiff);
+		tb_trace_d("add: tdiff: %lld", tdiff);
 
 		// the wheel difference
 		tb_size_t wdiff = (tb_size_t)(tdiff / timer->tick);
 		tb_assert_and_check_break(wdiff < TB_LTIMER_WHEEL_MAXN);
-		tb_trace_impl("add: wdiff: %lu", wdiff);
+		tb_trace_d("add: wdiff: %lu", wdiff);
 
 		// the wheel index
 		tb_size_t windx = (timer->wbase + wdiff) & (TB_LTIMER_WHEEL_MAXN - 1);
-		tb_trace_impl("add: windx: %lu", windx);
+		tb_trace_d("add: windx: %lu", windx);
 
 		// the wheel list
 		tb_vector_t* wlist = timer->wheel[windx];
@@ -210,7 +210,7 @@ static tb_bool_t tb_ltimer_del_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 	tb_assert_and_check_return_val(task && task->func && task->refn && task->when, tb_false);
 
 	// trace
-	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -252,7 +252,7 @@ static tb_bool_t tb_ltimer_expired_init(tb_vector_t* vector, tb_pointer_t* item,
 	if (task)
 	{
 		// trace
-		tb_trace_impl("spak: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+		tb_trace_d("spak: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 		// check refn
 		tb_assert(task->refn);
@@ -296,7 +296,7 @@ static tb_bool_t tb_ltimer_expired_exit(tb_vector_t* vector, tb_pointer_t* item,
 			if (!tb_ltimer_add_task(timer, task))
 			{
 				// trace
-				tb_trace("[ltimer]: continue to add task failed");
+				tb_trace_d("[ltimer]: continue to add task failed");
 			}
 		}
 		else
@@ -360,7 +360,7 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		while (tb_atomic_get(&timer->work) && tryn--) tb_msleep(500);
 
 		// warning
-		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[ltimer]: the loop has been not exited now!");
+		if (!tryn && tb_atomic_get(&timer->work)) tb_trace_w("[ltimer]: the loop has been not exited now!");
 
 		// enter
 		tb_spinlock_enter(&timer->lock);
@@ -474,7 +474,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 		tb_size_t diff = (tb_size_t)((now - timer->btime) / timer->tick);
 
 		// trace
-		tb_trace_impl("spak: btime: %lld, wbase: %lu, now: %lld, diff: %lu", timer->btime, timer->wbase, now, diff);
+		tb_trace_d("spak: btime: %lld, wbase: %lu, now: %lld, diff: %lu", timer->btime, timer->wbase, now, diff);
 
 		// walk the expired lists
 		tb_size_t i = 0;
@@ -676,7 +676,7 @@ tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 	tb_assert_and_check_return(timer && timer->pool && task);
 
 	// trace
-	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
@@ -705,7 +705,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 	tb_assert_and_check_return(timer && timer->pool && task);
 
 	// trace
-	tb_trace_impl("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
@@ -720,7 +720,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		if (!tb_ltimer_del_task(timer, task))
 		{
 			// trace
-			tb_trace("[ltimer]: del task failed");
+			tb_trace_d("[ltimer]: del task failed");
 			break;
 		}
 
@@ -737,7 +737,7 @@ tb_void_t tb_ltimer_task_kil(tb_handle_t handle, tb_handle_t htask)
 		if (!tb_ltimer_add_task(timer, task))
 		{
 			// trace
-			tb_trace("[ltimer]: re-add task failed");
+			tb_trace_d("[ltimer]: re-add task failed");
 			break;
 		}
 

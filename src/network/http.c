@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 			"http"
+#define TB_TRACE_MODULE_NAME 			"http"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -136,14 +136,14 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	tb_assert_and_check_return(http);
 
 	// dump option
-	tb_print("[http]: ======================================================================");
-	tb_print("[http]: option: ");
-	tb_print("[http]: option: url: %s", tb_url_get(&http->option.url));
-	tb_print("[http]: option: version: HTTP/1.%1u", http->option.version);
-	tb_print("[http]: option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
-	tb_print("[http]: option: redirect: %d", http->option.redirect);
-	tb_print("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
-	tb_print("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
+	tb_trace_i("[http]: ======================================================================");
+	tb_trace_i("[http]: option: ");
+	tb_trace_i("[http]: option: url: %s", tb_url_get(&http->option.url));
+	tb_trace_i("[http]: option: version: HTTP/1.%1u", http->option.version);
+	tb_trace_i("[http]: option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
+	tb_trace_i("[http]: option: redirect: %d", http->option.redirect);
+	tb_trace_i("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
+	tb_trace_i("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
 
 	// dump head 
 	tb_size_t itor = tb_iterator_head(http->option.head);
@@ -151,11 +151,11 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
 	{
 		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
-		if (item) tb_print("[http]: option: head: %s: %s", item->name, item->data);
+		if (item) tb_trace_i("[http]: option: head: %s: %s", item->name, item->data);
 	}
 
 	// dump end
-	tb_print("");
+	tb_trace_i("");
 }
 #endif
 static tb_bool_t tb_http_status_init(tb_http_t* http)
@@ -210,22 +210,22 @@ static tb_void_t tb_http_status_dump(tb_http_t* http)
 	tb_assert_and_check_return(http);
 
 	// dump status
-	tb_print("[http]: ======================================================================");
-	tb_print("[http]: status: ");
-	tb_print("[http]: status: code: %d", http->status.code);
-	tb_print("[http]: status: version: HTTP/1.%1u", http->status.version);
-	tb_print("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
-	tb_print("[http]: status: content:size: %llu", http->status.content_size);
-	tb_print("[http]: status: document:size: %llu", http->status.document_size);
-	tb_print("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
-	tb_print("[http]: status: bgzip: %s", http->status.bgzip? "true" : "false");
-	tb_print("[http]: status: bdeflate: %s", http->status.bdeflate? "true" : "false");
-	tb_print("[http]: status: balived: %s", http->status.balived? "true" : "false");
-	tb_print("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
-	tb_print("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
+	tb_trace_i("[http]: ======================================================================");
+	tb_trace_i("[http]: status: ");
+	tb_trace_i("[http]: status: code: %d", http->status.code);
+	tb_trace_i("[http]: status: version: HTTP/1.%1u", http->status.version);
+	tb_trace_i("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
+	tb_trace_i("[http]: status: content:size: %llu", http->status.content_size);
+	tb_trace_i("[http]: status: document:size: %llu", http->status.document_size);
+	tb_trace_i("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
+	tb_trace_i("[http]: status: bgzip: %s", http->status.bgzip? "true" : "false");
+	tb_trace_i("[http]: status: bdeflate: %s", http->status.bdeflate? "true" : "false");
+	tb_trace_i("[http]: status: balived: %s", http->status.balived? "true" : "false");
+	tb_trace_i("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
+	tb_trace_i("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
 
 	// dump end
-	tb_print("");
+	tb_trace_i("");
 }
 #endif
 static tb_bool_t tb_http_connect(tb_http_t* http)
@@ -245,19 +245,19 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 		if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
 
 		// trace
-		tb_trace_impl("connect: host: %s", host_changed? "changed" : "keep");
+		tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
 
 		// ctrl stream
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
-#if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
+#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
 		tb_http_option_dump(http);
 #endif
 		
 		// trace
-		tb_trace_impl("connect: ..");
+		tb_trace_d("connect: ..");
 
 		// clear status
 		tb_http_status_cler(http, host_changed);
@@ -266,7 +266,7 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 		if (!tb_gstream_open(http->stream)) break;
 
 		// trace
-		tb_trace_impl("connect: ok");
+		tb_trace_d("connect: ok");
 
 		// ok
 		ok = tb_true;
@@ -287,7 +287,7 @@ static tb_bool_t tb_http_request_post(tb_size_t state, tb_hize_t offset, tb_hong
 	tb_assert_and_check_return_val(http && http->stream, tb_false);
 
 	// trace
-	tb_trace_impl("post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_stream_state_cstr(state));
+	tb_trace_d("post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_stream_state_cstr(state));
 
 	// done func
 	if (http->option.post_func && !http->option.post_func(http, state, offset, size, save, rate, http->option.post_priv)) 
@@ -442,7 +442,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 		tb_assert_and_check_break(head_data && head_size);
 		
 		// trace
-		tb_trace_impl("request[%lu]:\n%s", head_size, head_data);
+		tb_trace_d("request[%lu]:\n%s", head_size, head_data);
 
 		// writ request
 		if (!tb_gstream_bwrit(http->stream, (tb_byte_t const*)head_data, head_size)) break;
@@ -635,7 +635,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 		while ((real = tb_gstream_bread_line(http->stream, line, sizeof(line) - 1)) >= 0)
 		{
 			// trace
-			tb_trace_impl("response: %s", line);
+			tb_trace_d("response: %s", line);
  
 			// do callback
 			if (http->option.head_func && !http->option.head_func((tb_handle_t)http, line, http->option.head_priv)) break;
@@ -697,10 +697,10 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 				}
 
 				// trace
-				tb_trace_impl("response: ok");
+				tb_trace_d("response: ok");
 
 				// dump status
-#if defined(__tb_debug__) && defined(TB_TRACE_IMPL_TAG)
+#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
 				tb_http_status_dump(http);
 #endif
 
@@ -756,7 +756,7 @@ static tb_bool_t tb_http_redirect(tb_http_t* http)
 		http->stream = http->sstream;
 
 		// trace
-		tb_trace_impl("redirect: %s", tb_pstring_cstr(&http->status.location));
+		tb_trace_d("redirect: %s", tb_pstring_cstr(&http->status.location));
 
 		// set url
 		if (!tb_url_set(&http->option.url, tb_pstring_cstr(&http->status.location))) break;
@@ -960,7 +960,7 @@ tb_bool_t tb_http_seek(tb_handle_t handle, tb_hize_t offset)
 		http->stream = http->sstream;
 
 		// trace
-		tb_trace_impl("seek: %llu", offset);
+		tb_trace_d("seek: %llu", offset);
 
 		// set range
 		http->option.range.bof = offset;

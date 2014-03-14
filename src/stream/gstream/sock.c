@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"sock"
+//#define TB_TRACE_MODULE_NAME 			"sock"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -153,7 +153,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 	case TB_SOCKET_TYPE_TCP:
 		{
 			// trace
-			tb_trace_impl("connect: %s[%u.%u.%u.%u]:%u: ..", tb_url_host_get(&sstream->base.base.url), tb_ipv4_u8x4(sstream->addr), port);
+			tb_trace_d("connect: %s[%u.%u.%u.%u]:%u: ..", tb_url_host_get(&sstream->base.base.url), tb_ipv4_u8x4(sstream->addr), port);
 
 			// connect it
 			tb_long_t r = -1;
@@ -172,7 +172,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 			else sstream->base.state = !r? TB_STREAM_SOCK_STATE_CONNECT_TIMEOUT : TB_STREAM_SOCK_STATE_CONNECT_FAILED;
 
 			// ok
-			tb_trace_impl("connect: %s", ok? "ok" : "no");
+			tb_trace_d("connect: %s", ok? "ok" : "no");
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -224,7 +224,7 @@ static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 		if (sstream->sock && !tb_socket_clos(sstream->sock))
 		{
 			// trace
-			tb_trace("[sock]: exit failed");
+			tb_trace_d("[sock]: exit failed");
 		}
 		sstream->sock = tb_null;
 	}
@@ -266,7 +266,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 		{
 			// read data
 			r = /*(sstream->ssl)? gstream->sfunc.read(sstream->ssl, data, size) : */tb_socket_recv(sstream->sock, data, size);
-			tb_trace_impl("read: %ld <? %lu", r, size);
+			tb_trace_d("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -287,7 +287,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 
 			// read data
 			r = tb_socket_urecv(sstream->sock, &sstream->addr, port, data, size);
-			tb_trace_impl("read: %ld <? %lu", r, size);
+			tb_trace_d("read: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -328,7 +328,7 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 		{
 			// writ data
 			r = /*(sstream->ssl)? gstream->sfunc.writ(sstream->ssl, data, size) : */tb_socket_send(sstream->sock, data, size);
-			tb_trace_impl("writ: %ld <? %lu", r, size);
+			tb_trace_d("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// abort?
@@ -349,7 +349,7 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 
 			// writ data
 			r = tb_socket_usend(sstream->sock, &sstream->addr, port, data, size);
-			tb_trace_impl("writ: %ld <? %lu", r, size);
+			tb_trace_d("writ: %ld <? %lu", r, size);
 			tb_check_return_val(r >= 0, -1);
 
 			// no data?
@@ -382,7 +382,7 @@ static tb_long_t tb_gstream_sock_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 
 	// wait 
 	sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);
-	tb_trace_impl("wait: %ld", sstream->wait);
+	tb_trace_d("wait: %ld", sstream->wait);
 
 	// ok?
 	return sstream->wait;

@@ -242,7 +242,7 @@ tb_bool_t tb_url_set(tb_url_t* url, tb_char_t const* u)
 	}
 	else
 	{
-		tb_trace("[url]: unknown prefix for url: %s", p);
+		tb_trace_d("[url]: unknown prefix for url: %s", p);
 		goto fail;
 	}
 

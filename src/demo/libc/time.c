@@ -15,7 +15,7 @@ tb_int_t tb_demo_libc_time_main(tb_int_t argc, tb_char_t** argv)
 	tb_tm_t lt = {0};
 	if (tb_localtime(now, &lt))
 	{
-		tb_print("LMT: %04ld-%02ld-%02ld %02ld:%02ld:%02ld, week: %d, time: %lld ?= %lld"
+		tb_trace_i("LMT: %04ld-%02ld-%02ld %02ld:%02ld:%02ld, week: %d, time: %lld ?= %lld"
 			, lt.year
 			, lt.month
 			, lt.mday
@@ -31,7 +31,7 @@ tb_int_t tb_demo_libc_time_main(tb_int_t argc, tb_char_t** argv)
 	tb_tm_t gt = {0};
 	if (tb_gmtime(now, &gt))
 	{
-		tb_print("GMT: %04ld-%02ld-%02ld %02ld:%02ld:%02ld, week: %d, time: %lld ?= %lld"
+		tb_trace_i("GMT: %04ld-%02ld-%02ld %02ld:%02ld:%02ld, week: %d, time: %lld ?= %lld"
 			, gt.year
 			, gt.month
 			, gt.mday
