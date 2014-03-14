@@ -35,9 +35,9 @@
 
 // the trace line maxn
 #ifdef __tb_small__
-# 	define TB_TRACE_LINE_MAXN 		(4096)
-#else
 # 	define TB_TRACE_LINE_MAXN 		(8192)
+#else
+# 	define TB_TRACE_LINE_MAXN 		(8192 << 1)
 #endif
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -196,7 +196,20 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		tb_char_t* 		e = g_line + sizeof(g_line);
 		tb_va_start(l, format);
 
+		// print prefix to file
+		if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+		{
+			// print time to file
+			tb_tm_t lt = {0};
+			if (p < e && tb_localtime(tb_time(), &lt))
+				p += tb_snprintf(p, e - p, "[%04ld-%02ld-%02ld %02ld:%02ld:%02ld]: ", lt.year, lt.month, lt.mday, lt.hour, lt.minute, lt.second);
+
+			// print self to file
+			if (p < e) p += tb_snprintf(p, e - p, "[%lx]: ", tb_thread_self());
+		}
+
 		// append prefix
+		tb_char_t* 		b = p;
 		if (prefix && p < e) p += tb_snprintf(p, e - p, "[%s]: ", prefix);
 
 		// append module
@@ -217,7 +230,7 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		if (p < e) *p = '\0'; e[-1] = '\0';
 
 		// print it
-		if (g_mode & TB_TRACE_MODE_PRINT) tb_print(g_line);
+		if (g_mode & TB_TRACE_MODE_PRINT) tb_print(b);
 
 		// print it to file
 		if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
