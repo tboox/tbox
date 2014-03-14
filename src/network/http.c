@@ -137,14 +137,14 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	tb_assert_and_check_return(http);
 
 	// dump option
-	tb_trace_i("[http]: ======================================================================");
-	tb_trace_i("[http]: option: ");
-	tb_trace_i("[http]: option: url: %s", tb_url_get(&http->option.url));
-	tb_trace_i("[http]: option: version: HTTP/1.%1u", http->option.version);
-	tb_trace_i("[http]: option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
-	tb_trace_i("[http]: option: redirect: %d", http->option.redirect);
-	tb_trace_i("[http]: option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
-	tb_trace_i("[http]: option: bunzip: %s", http->option.bunzip? "true" : "false");
+	tb_trace_i("======================================================================");
+	tb_trace_i("option: ");
+	tb_trace_i("option: url: %s", tb_url_get(&http->option.url));
+	tb_trace_i("option: version: HTTP/1.%1u", http->option.version);
+	tb_trace_i("option: method: %s", http->option.method < tb_arrayn(g_http_methods)? g_http_methods[http->option.method] : "none");
+	tb_trace_i("option: redirect: %d", http->option.redirect);
+	tb_trace_i("option: range: %llu-%llu", http->option.range.bof, http->option.range.eof);
+	tb_trace_i("option: bunzip: %s", http->option.bunzip? "true" : "false");
 
 	// dump head 
 	tb_size_t itor = tb_iterator_head(http->option.head);
@@ -152,7 +152,7 @@ static tb_void_t tb_http_option_dump(tb_http_t* http)
 	for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
 	{
 		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
-		if (item) tb_trace_i("[http]: option: head: %s: %s", item->name, item->data);
+		if (item) tb_trace_i("option: head: %s: %s", item->name, item->data);
 	}
 
 	// dump end
@@ -211,19 +211,19 @@ static tb_void_t tb_http_status_dump(tb_http_t* http)
 	tb_assert_and_check_return(http);
 
 	// dump status
-	tb_trace_i("[http]: ======================================================================");
-	tb_trace_i("[http]: status: ");
-	tb_trace_i("[http]: status: code: %d", http->status.code);
-	tb_trace_i("[http]: status: version: HTTP/1.%1u", http->status.version);
-	tb_trace_i("[http]: status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
-	tb_trace_i("[http]: status: content:size: %llu", http->status.content_size);
-	tb_trace_i("[http]: status: document:size: %llu", http->status.document_size);
-	tb_trace_i("[http]: status: location: %s", tb_pstring_cstr(&http->status.location));
-	tb_trace_i("[http]: status: bgzip: %s", http->status.bgzip? "true" : "false");
-	tb_trace_i("[http]: status: bdeflate: %s", http->status.bdeflate? "true" : "false");
-	tb_trace_i("[http]: status: balived: %s", http->status.balived? "true" : "false");
-	tb_trace_i("[http]: status: bseeked: %s", http->status.bseeked? "true" : "false");
-	tb_trace_i("[http]: status: bchunked: %s", http->status.bchunked? "true" : "false");
+	tb_trace_i("======================================================================");
+	tb_trace_i("status: ");
+	tb_trace_i("status: code: %d", http->status.code);
+	tb_trace_i("status: version: HTTP/1.%1u", http->status.version);
+	tb_trace_i("status: content:type: %s", tb_pstring_cstr(&http->status.content_type));
+	tb_trace_i("status: content:size: %llu", http->status.content_size);
+	tb_trace_i("status: document:size: %llu", http->status.document_size);
+	tb_trace_i("status: location: %s", tb_pstring_cstr(&http->status.location));
+	tb_trace_i("status: bgzip: %s", http->status.bgzip? "true" : "false");
+	tb_trace_i("status: bdeflate: %s", http->status.bdeflate? "true" : "false");
+	tb_trace_i("status: balived: %s", http->status.balived? "true" : "false");
+	tb_trace_i("status: bseeked: %s", http->status.bseeked? "true" : "false");
+	tb_trace_i("status: bchunked: %s", http->status.bchunked? "true" : "false");
 
 	// dump end
 	tb_trace_i("");

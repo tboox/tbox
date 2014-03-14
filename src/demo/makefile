@@ -113,7 +113,7 @@ demo_LIBS-$(ZLIB) 		+= z
 demo_LIB_DIR 			+= ..
 
 # flags
-demo_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_TRACE_ENABLE -DTB_TRACE_PREFIX=\"demo\"
+demo_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_TRACE_PREFIX=\"demo\"
 
 # command
 demo_SUFFIX_CMD1 		+= $(TB_CONFIG_DEMO_CMD1)

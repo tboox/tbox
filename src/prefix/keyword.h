@@ -79,6 +79,7 @@
 
 #endif
 
+// like
 #if defined(TB_COMPILER_IS_GCC) && __GNUC__ > 2
 # 	define __tb_likely__(x) 		__builtin_expect((x), 1)
 # 	define __tb_unlikely__(x) 		__builtin_expect((x), 0)
@@ -87,6 +88,7 @@
 # 	define __tb_unlikely__(x) 		(x)
 #endif
 
+// debug
 #ifdef __tb_debug__
 # 	define __tb_debug_decl__ 		, tb_char_t const* func_, tb_size_t line_, tb_char_t const* file_
 # 	define __tb_debug_vals__ 		, __tb_func__, __tb_line__, __tb_file__
@@ -95,6 +97,13 @@
 # 	define __tb_debug_decl__ 
 # 	define __tb_debug_vals__ 
 # 	define __tb_debug_args__ 
+#endif
+
+// newline
+#ifdef TB_CONFIG_OS_WINDOWS
+# 	define __tb_newline__ 			"\r\n"
+#else
+# 	define __tb_newline__ 			"\n"
 #endif
 
 

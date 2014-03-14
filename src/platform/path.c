@@ -129,7 +129,7 @@ tb_char_t const* tb_path_full(tb_char_t const* path, tb_char_t* full, tb_size_t 
 			// too small?
 			else 
 			{
-				tb_trace_d("[path]: the full path is too small for %s", path);
+				tb_trace_e("the full path is too small for %s", path);
 				return tb_null;
 			}
 

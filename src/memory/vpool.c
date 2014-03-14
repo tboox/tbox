@@ -164,10 +164,11 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return(data && size);
 
 	// dump head
+	tb_tracef_i("");
 	tb_size_t i = 0;
 	tb_size_t n = 147;
-	for (i = 0; i < n; i++) tb_printf("=");
-	tb_printf("\n");
+	for (i = 0; i < n; i++) tb_tracet_i("=");
+	tb_tracet_i(__tb_newline__);
 
 	// walk
 	tb_byte_t const* p = data;
@@ -178,26 +179,27 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 		if (p + 0x20 <= e)
 		{
 			// dump offset
-			tb_printf("%08X ", p - data);
+			tb_tracef_i("");
+			tb_tracet_i("%08X ", p - data);
 
 			// dump data
 			for (i = 0; i < 0x20; i++)
 			{
-				if (!(i & 3)) tb_printf(" ");
-				tb_printf(" %02X", p[i]);
+				if (!(i & 3)) tb_tracet_i(" ");
+				tb_tracet_i(" %02X", p[i]);
 			}
 
 			// dump spaces
-			tb_printf("  ");
+			tb_tracet_i("  ");
 
 			// dump characters
 			for (i = 0; i < 0x20; i++)
 			{
-				tb_printf("%c", tb_isgraph(p[i])? p[i] : '.');
+				tb_tracet_i("%c", tb_isgraph(p[i])? p[i] : '.');
 			}
 
 			// dump new line
-			tb_printf("\n");
+			tb_tracet_i(__tb_newline__);
 
 			// update p
 			p += 0x20;
@@ -209,7 +211,8 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 			tb_size_t padding = n - 0x20;
 
 			// dump offset
-			tb_printf("%08X ", p - data); 
+			tb_tracef_i("");
+			tb_tracet_i("%08X ", p - data); 
 			if (padding >= 9) padding -= 9;
 
 			// dump data
@@ -218,25 +221,25 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 			{
 				if (!(i & 3)) 
 				{
-					tb_printf(" ");
+					tb_tracet_i(" ");
 					if (padding) padding--;
 				}
 
-				tb_printf(" %02X", p[i]);
+				tb_tracet_i(" %02X", p[i]);
 				if (padding >= 3) padding -= 3;
 			}
 
 			// dump spaces
-			while (padding--) tb_printf(" ");
+			while (padding--) tb_tracet_i(" ");
 				
 			// dump characters
 			for (i = 0; i < left; i++)
 			{
-				tb_printf("%c", tb_isgraph(p[i])? p[i] : '.');
+				tb_tracet_i("%c", tb_isgraph(p[i])? p[i] : '.');
 			}
 
 			// dump new line
-			tb_printf("\n");
+			tb_tracet_i(__tb_newline__);
 
 			// update p
 			p += left;
@@ -652,7 +655,7 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 			block->size = asize;
 
 			// predict the next free block
-			vpool->pred = next;
+			vpool->pred = (tb_byte_t*)next;
 		}
 		// reset the predicted block
 		else if (vpool->pred == (tb_byte_t*)block || vpool->pred == (tb_byte_t*)next || vpool->pred == pe)
@@ -715,7 +718,7 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	tb_memset(data, 0, size);
 
 	// init vpool
-	tb_vpool_t* vpool = data;
+	tb_vpool_t* vpool = (tb_vpool_t*)data;
 
 	// init magic
 	vpool->magic = TB_VPOOL_MAGIC;

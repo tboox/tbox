@@ -218,19 +218,65 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		// append format
 		if (p < e) p += tb_vsnprintf(p, e - p, format, l);
 
-		// append '\r'
-#ifdef TB_CONFIG_OS_WINDOWS
-		if (p < e) *p++ = '\r';
-#endif
-
-		// append '\n'
-		if (p < e) *p++ = '\n';
-
 		// append end
 		if (p < e) *p = '\0'; e[-1] = '\0';
 
 		// print it
 		if (g_mode & TB_TRACE_MODE_PRINT) tb_print(b);
+
+		// print it to file
+		if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
+		{
+			// done
+			tb_size_t size = p - g_line;
+			tb_size_t writ = 0;
+			while (writ < size)
+			{
+				// writ it
+				tb_long_t real = tb_file_writ(g_file, g_line + writ, size - writ);
+				tb_check_break(real > 0);
+
+				// save size
+				writ += real;
+			}
+		}
+
+		// exit
+		tb_va_end(l);
+
+	} while (0);
+
+	// leave
+	tb_spinlock_leave(&g_lock);
+}
+tb_void_t tb_trace_tail(tb_char_t const* format, ...)
+{
+	// check
+	tb_check_return(format);
+
+	// enter
+	tb_spinlock_enter(&g_lock);
+
+	// done
+	do
+	{
+		// check
+		tb_check_break(g_mode);
+
+		// init
+		tb_va_list_t 	l;
+		tb_char_t* 		p = g_line;
+		tb_char_t* 		e = g_line + sizeof(g_line);
+		tb_va_start(l, format);
+
+		// append format
+		if (p < e) p += tb_vsnprintf(p, e - p, format, l);
+
+		// append end
+		if (p < e) *p = '\0'; e[-1] = '\0';
+
+		// print it
+		if (g_mode & TB_TRACE_MODE_PRINT) tb_print(g_line);
 
 		// print it to file
 		if ((g_mode & TB_TRACE_MODE_FILE) && g_file) 
