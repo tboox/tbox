@@ -52,9 +52,6 @@ tb_void_t tb_print(tb_char_t const* string)
 
 	// print to the stdout
 	fputs(string, stdout);
-
-	// flush the stdout
-	fflush(stdout);
 }
 tb_void_t tb_printl(tb_char_t const* string)
 {
@@ -74,7 +71,9 @@ tb_void_t tb_printl(tb_char_t const* string)
 
 	// print newline to the stdout
 	fputs("\n", stdout);
-
+}
+tb_void_t tb_print_sync()
+{
 	// flush the stdout
 	fflush(stdout);
 }

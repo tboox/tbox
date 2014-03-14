@@ -51,15 +51,15 @@
 // trace prefix
 #if defined(TB_TRACE_ENABLE)
 # 	if defined(TB_COMPILER_IS_GCC)
-#		define tb_trace_p(prefix, fmt, arg ...)				tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, ## arg)
-# 		define tb_trace_error_p(prefix, fmt, arg ...) 		tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_trace_assert_p(prefix, fmt, arg ...) 		tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
-# 		define tb_trace_warning_p(prefix, fmt, arg ...) 	tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__)
+#		define tb_trace_p(prefix, fmt, arg ...)				do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, ## arg); } while (0)
+# 		define tb_trace_error_p(prefix, fmt, arg ...) 		do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
+# 		define tb_trace_assert_p(prefix, fmt, arg ...) 		do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
+# 		define tb_trace_warning_p(prefix, fmt, arg ...) 	do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: " fmt " at func: %s, line: %d, file: %s", ##arg, __tb_func__, __tb_line__, __tb_file__); tb_trace_sync(); } while (0)
 # 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#		define tb_trace_p(prefix, fmt, ...)					tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, __VA_ARGS__)
-# 		define tb_trace_error_p(prefix, fmt, ...) 			tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
-# 		define tb_trace_assert_p(prefix, fmt, ...) 			tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
-# 		define tb_trace_warning_p(prefix, fmt, ...) 		tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__)
+#		define tb_trace_p(prefix, fmt, ...)					do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, fmt, __VA_ARGS__)
+# 		define tb_trace_error_p(prefix, fmt, ...) 			do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[error]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
+# 		define tb_trace_assert_p(prefix, fmt, ...) 			do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[assert]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
+# 		define tb_trace_warning_p(prefix, fmt, ...) 		do { tb_trace_done(prefix, TB_TRACE_MODULE_NAME, "[warning]: func: %s, line: %d, file: %s:\n" fmt, __tb_func__, __tb_line__, __tb_file__, __VA_ARGS__); tb_trace_sync(); } while (0)
 # 	else
 #		define tb_trace_p
 # 		define tb_trace_error_p
@@ -154,6 +154,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * declaration
  */
+tb_void_t 		tb_trace_sync(tb_noarg_t);
 tb_void_t 		tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_char_t const* format, ...);
 
 #endif
