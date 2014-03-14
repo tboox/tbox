@@ -80,7 +80,7 @@ tb_int_t tb_demo_memory_tpool_main(tb_int_t argc, tb_char_t** argv)
 #endif
 
 	// trace
-	tb_print("tpool: %lld ms", time);
+	tb_trace_i("tpool: %lld ms", time);
 	
 	// exit
 	tb_tpool_exit(tpool);

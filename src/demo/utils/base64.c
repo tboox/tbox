@@ -57,7 +57,7 @@ tb_int_t tb_demo_utils_base64_main(tb_int_t argc, tb_char_t** argv)
 			tb_base64_encode_test("<?xml version=", 14, ob, 64, table);
 			if (!tb_strncmp(ob, "zfgPAH1dqbbo3RKRmIIc", 18))
 			{
-				tb_print("%s", table);
+				tb_trace_i("%s", table);
 				break;
 			}
 		}

@@ -110,7 +110,7 @@ tb_long_t tb_charset_utf8_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch)
 	else
 	{
 		// invalid character
-		tb_trace("invalid utf8 character: %x", *p);
+		tb_trace_d("invalid utf8 character: %x", *p);
 
 		// skip it
 		tb_bstream_skip(bst, 1);

@@ -65,6 +65,14 @@ do \
  * interfaces
  */
 
+/*! printf
+ *
+ * @param fmt 		the format string
+ * 
+ * @return 			the real size
+ */
+tb_void_t 			tb_printf(tb_char_t const* fmt, ...);
+
 /*! sprintf
  *
  * @param s 		the string data

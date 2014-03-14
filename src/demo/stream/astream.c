@@ -44,7 +44,7 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
 	else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
 
 	// trace
-	tb_print("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
+	tb_trace_i("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
 
 	// ok
 	return tb_true;
@@ -159,7 +159,7 @@ static tb_bool_t tb_demo_istream_head_func(tb_handle_t http, tb_char_t const* li
 	tb_assert_and_check_return_val(http && line, tb_false);
 
 	// trace
-	tb_print("head: %s", line);
+	tb_trace_i("head: %s", line);
 
 	// ok
 	return tb_true;

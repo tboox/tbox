@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"cache"
+//#define TB_TRACE_MODULE_NAME 		"cache"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -116,7 +116,7 @@ static tb_bool_t tb_dns_cache_cler(tb_handle_t cache, tb_hash_item_t* item, tb_b
 			*bdel = tb_true;
 
 			// trace
-			tb_trace_impl("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
+			tb_trace_d("del: %s => %u.%u.%u.%u, time: %u, size: %u", (tb_char_t const*)item->name
 																	, 	caddr->ipv4.u8[0]
 																	, 	caddr->ipv4.u8[1]
 																	, 	caddr->ipv4.u8[2]
@@ -207,7 +207,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 	tb_assert_and_check_return_val(name && addr, tb_false);
 
 	// trace
-	tb_trace_impl("get: %s", name);
+	tb_trace_d("get: %s", name);
 
 	// is ipv4?
 	tb_check_return_val(!tb_ipv4_set(addr, name), tb_true);
@@ -237,7 +237,7 @@ tb_bool_t tb_dns_cache_get(tb_char_t const* name, tb_ipv4_t* addr)
 		tb_check_break(caddr);
 
 		// trace
-		tb_trace_impl("get: %s => %u.%u.%u.%u, time: %u => %u, size: %u",	name
+		tb_trace_d("get: %s => %u.%u.%u.%u, time: %u => %u, size: %u",	name
 																		, 	caddr->ipv4.u8[0]
 																		, 	caddr->ipv4.u8[1]
 																		, 	caddr->ipv4.u8[2]
@@ -272,7 +272,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
 	tb_assert_and_check_return(name && addr && addr->u32);
 
 	// trace
-	tb_trace_impl("set: %s => %u.%u.%u.%u", name, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+	tb_trace_d("set: %s => %u.%u.%u.%u", name, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 
 	// init addr
 	tb_dns_cache_addr_t caddr;
@@ -298,7 +298,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
 			tb_assert_and_check_break(g_cache.expired);
 
 			// trace
-			tb_trace_impl("expired: %lu", g_cache.expired);
+			tb_trace_d("expired: %lu", g_cache.expired);
 
 			// remove the expired times
 			tb_hash_walk(g_cache.hash, tb_dns_cache_cler, tb_null);
@@ -314,7 +314,7 @@ tb_void_t tb_dns_cache_set(tb_char_t const* name, tb_ipv4_t const* addr)
 		g_cache.times += caddr.time;
 
 		// trace
-		tb_trace_impl("set: %s => %u.%u.%u.%u, time: %u, size: %u", name
+		tb_trace_d("set: %s => %u.%u.%u.%u, time: %u, size: %u", name
 																, 	caddr.ipv4.u8[0]
 																, 	caddr.ipv4.u8[1]
 																, 	caddr.ipv4.u8[2]

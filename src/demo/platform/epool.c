@@ -31,14 +31,14 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 {
 	tb_test_item_t* it = (tb_test_item_t*)cb_data;
 	tb_assert_and_check_goto(it, end);
-	tb_print("[thread]: init");
+	tb_trace_i("[thread]: init");
 
 	// loop
 	tb_eobject_t o[TB_TEST_ITEM_MAX];
 	while (1)
 	{
 		// wait
-		tb_print("[event]: wait");
+		tb_trace_i("[event]: wait");
 		tb_long_t r = tb_epool_wait(it->e, o, TB_TEST_ITEM_MAX, -1);
 		tb_assert_and_check_goto(r >= 0, end);
 
@@ -51,13 +51,13 @@ static tb_pointer_t tb_test_thread(tb_pointer_t cb_data)
 		// signal
 		tb_size_t i = 0;
 		for (i = 0; i < r; i++) 
-			tb_print("[event: %u]: signal", o[i].data);
+			tb_trace_i("[event: %u]: signal", o[i].data);
 	}
 
 end:
 
 	// exit thread
-	tb_print("[thread]: exit");
+	tb_trace_i("[thread]: exit");
 	tb_thread_return(tb_null);
 	return tb_null;
 }
@@ -131,6 +131,6 @@ end:
 	// exit event
 	tb_epool_exit(it.e);
 
-	tb_print("quit");
+	tb_trace_i("quit");
 	return 0;
 }

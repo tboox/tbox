@@ -24,7 +24,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"aicp_aiop"
+#define TB_TRACE_MODULE_NAME 				"aicp_aiop"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -212,7 +212,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 	tb_assert_and_check_goto(ptor && ptor->aiop && ptor->list && ptor->timer && ptor->ltimer && aicp, end);
 
 	// trace
-	tb_trace_impl("loop: init");
+	tb_trace_d("loop: init");
 
 	// loop 
 	while (!tb_atomic_get(&aicp->kill))
@@ -287,7 +287,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			if (tb_atomic_get(&aico->base.killed)) priority = 0;
 
 			// trace
-			tb_trace_impl("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
+			tb_trace_d("wait: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 
 			// sock?
 			if (aico->base.type == TB_AICO_TYPE_SOCK)
@@ -313,7 +313,7 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 
 end:
 	// trace
-	tb_trace_impl("loop: exit");
+	tb_trace_d("loop: exit");
 
 	// kill
 	tb_atomic_set(&aicp->kill, 1);
@@ -351,7 +351,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_pointer_t data)
 	tb_spinlock_enter(&ptor->lock);
 
 	// trace
-	tb_trace_impl("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+	tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
 
 	// spak aice
 	tb_bool_t ok = tb_false;
@@ -388,7 +388,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	tb_assert_and_check_return_val(code != TB_AIOE_CODE_NONE, tb_false);
 				
 	// trace
-	tb_trace_impl("wait: code: %lu: ..", aice->code);
+	tb_trace_d("wait: code: %lu: ..", aice->code);
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -429,7 +429,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	if (!ok) 
 	{
 		// trace
-		tb_trace_impl("wait: code: %lu: failed", aice->code);
+		tb_trace_d("wait: code: %lu: failed", aice->code);
 
 		// restore it
 		aico->aice = prev;
@@ -453,7 +453,7 @@ static tb_long_t tb_aiop_spak_acpt(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_handle_t sock = tb_socket_accept(aico->base.handle);
 
 	// trace
-	tb_trace_impl("acpt[%p]: %p", aico->base.handle, sock);
+	tb_trace_d("acpt[%p]: %p", aico->base.handle, sock);
 
 	// no accepted? wait it
 	if (!sock) 
@@ -496,7 +496,7 @@ static tb_long_t tb_aiop_spak_conn(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	tb_long_t ok = tb_socket_connect(aico->base.handle, &aice->u.conn.addr, aice->u.conn.port);
 
 	// trace
-	tb_trace_impl("conn[%p]: %u.%u.%u.%u: %lu: %ld", aico->base.handle, aice->u.conn.addr.u8[0], aice->u.conn.addr.u8[1], aice->u.conn.addr.u8[2], aice->u.conn.addr.u8[3], aice->u.conn.port, ok);
+	tb_trace_d("conn[%p]: %u.%u.%u.%u: %lu: %ld", aico->base.handle, aice->u.conn.addr.u8[0], aice->u.conn.addr.u8[1], aice->u.conn.addr.u8[2], aice->u.conn.addr.u8[3], aice->u.conn.port, ok);
 
 	// no connected? wait it
 	if (!ok) 
@@ -548,7 +548,7 @@ static tb_long_t tb_aiop_spak_recv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	}
 
 	// trace
-	tb_trace_impl("recv[%p]: %lu", aico->base.handle, recv);
+	tb_trace_d("recv[%p]: %lu", aico->base.handle, recv);
 
 	// no recv? 
 	if (!recv) 
@@ -605,7 +605,7 @@ static tb_long_t tb_aiop_spak_send(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 	}
 
 	// trace
-	tb_trace_impl("send[%p]: %lu", aico->base.handle, send);
+	tb_trace_d("send[%p]: %lu", aico->base.handle, send);
 
 	// no send? 
 	if (!send) 
@@ -663,7 +663,7 @@ static tb_long_t tb_aiop_spak_urecv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 
 	// trace
-	tb_trace_impl("urecv[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.port, recv);
+	tb_trace_d("urecv[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.port, recv);
 
 	// no recv? 
 	if (!recv) 
@@ -721,7 +721,7 @@ static tb_long_t tb_aiop_spak_usend(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 
 	// trace
-	tb_trace_impl("usend[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.port, send);
+	tb_trace_d("usend[%p]: %u.%u.%u.%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.port, send);
 
 	// no send? 
 	if (!send) 
@@ -768,7 +768,7 @@ static tb_long_t tb_aiop_spak_recvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_long_t real = tb_socket_recvv(aico->base.handle, aice->u.recvv.list, aice->u.recvv.size);
 
 	// trace
-	tb_trace_impl("recvv[%p]: %lu", aico->base.handle, real);
+	tb_trace_d("recvv[%p]: %lu", aico->base.handle, real);
 
 	// ok? 
 	if (real > 0) 
@@ -809,7 +809,7 @@ static tb_long_t tb_aiop_spak_sendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	tb_long_t real = tb_socket_sendv(aico->base.handle, aice->u.sendv.list, aice->u.sendv.size);
 
 	// trace
-	tb_trace_impl("sendv[%p]: %lu", aico->base.handle, real);
+	tb_trace_d("sendv[%p]: %lu", aico->base.handle, real);
 
 	// ok? 
 	if (real > 0) 
@@ -851,7 +851,7 @@ static tb_long_t tb_aiop_spak_urecvv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_long_t real = tb_socket_urecvv(aico->base.handle, &aice->u.urecvv.addr, aice->u.urecvv.port, aice->u.urecvv.list, aice->u.urecvv.size);
 
 	// trace
-	tb_trace_impl("urecvv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecvv.addr), aice->u.urecvv.port, real);
+	tb_trace_d("urecvv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.urecvv.addr), aice->u.urecvv.port, real);
 
 	// ok? 
 	if (real > 0) 
@@ -893,7 +893,7 @@ static tb_long_t tb_aiop_spak_usendv(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* a
 	tb_long_t real = tb_socket_usendv(aico->base.handle, &aice->u.usendv.addr, aice->u.usendv.port, aice->u.usendv.list, aice->u.usendv.size);
 
 	// trace
-	tb_trace_impl("usendv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usendv.addr), aice->u.usendv.port, real);
+	tb_trace_d("usendv[%p]: %u.%u.%u%u: %lu, %lu", aico->base.handle, tb_ipv4_u8x4(aice->u.usendv.addr), aice->u.usendv.port, real);
 
 	// ok? 
 	if (real > 0) 
@@ -947,7 +947,7 @@ static tb_long_t tb_aiop_spak_sendf(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* ai
 	}
 
 	// trace
-	tb_trace_impl("sendf[%p]: %llu", aico->base.handle, send);
+	tb_trace_d("sendf[%p]: %llu", aico->base.handle, send);
 
 	// no send? 
 	if (!send) 
@@ -997,7 +997,7 @@ static tb_void_t tb_aiop_spak_runtask_timeout(tb_bool_t killed, tb_pointer_t dat
 	tb_spinlock_enter(&ptor->lock);
 
 	// trace
-	tb_trace_impl("runtask: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+	tb_trace_d("runtask: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
 
 	// spak aice
 	tb_bool_t ok = tb_false;
@@ -1039,7 +1039,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 	if (aice->u.runtask.when <= now)
 	{
 		// trace
-		tb_trace_impl("runtask: when: %llu, now: %lld: ok", aice->u.runtask.when, now);
+		tb_trace_d("runtask: when: %llu, now: %lld: ok", aice->u.runtask.when, now);
 	
 		// ok
 		aice->state = TB_AICE_STATE_OK;
@@ -1048,7 +1048,7 @@ static tb_long_t tb_aiop_spak_runtask(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* 
 	else
 	{
 		// trace
-		tb_trace_impl("runtask: when: %llu, now: %lld: ..", aice->u.runtask.when, now);
+		tb_trace_d("runtask: when: %llu, now: %lld: ..", aice->u.runtask.when, now);
 
 		// wait it
 		aico->aice = *aice;
@@ -1125,7 +1125,7 @@ static tb_long_t tb_aiop_spak_done(tb_aicp_proactor_aiop_t* ptor, tb_aice_t* aic
 		aice->state = TB_AICE_STATE_KILLED;
 
 		// trace
-		tb_trace_impl("spak: code: %u: killed", aice->code);
+		tb_trace_d("spak: code: %u: killed", aice->code);
 
 		// ok
 		return 1;
@@ -1271,7 +1271,7 @@ static tb_void_t tb_aicp_proactor_aiop_kilo(tb_aicp_proactor_t* proactor, tb_aic
 	tb_assert_and_check_return(ptor && ptor->timer && ptor->ltimer && ptor->aiop && aico);
 
 	// trace
-	tb_trace_impl("kilo: type: %u", aico->type);
+	tb_trace_d("kilo: type: %u", aico->type);
 
 	// kill the task
 	if (((tb_aiop_aico_t*)aico)->task) 
@@ -1319,7 +1319,7 @@ static tb_bool_t tb_aicp_proactor_aiop_post(tb_aicp_proactor_t* proactor, tb_aic
 				tb_queue_put(ptor->spak[priority], aice);
 
 				// trace
-				tb_trace_impl("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
+				tb_trace_d("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 			}
 			else
 			{
@@ -1361,7 +1361,7 @@ static tb_void_t tb_aicp_proactor_aiop_kill(tb_aicp_proactor_t* proactor)
 	tb_size_t work = tb_atomic_get(&ptor->base.aicp->work);
 
 	// trace
-	tb_trace_impl("kill: %lu", work);
+	tb_trace_d("kill: %lu", work);
 
 	// kill aiop
 	tb_aiop_kill(ptor->aiop);
@@ -1378,7 +1378,7 @@ static tb_void_t tb_aicp_proactor_aiop_exit(tb_aicp_proactor_t* proactor)
 	if (ptor)
 	{
 		// trace
-		tb_trace_impl("exit");
+		tb_trace_d("exit");
 
 		// exit file
 		tb_aicp_file_exit(ptor);
@@ -1466,7 +1466,7 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 			*resp = *aice;
 
 			// trace
-			tb_trace_impl("spak[%u]: code: %lu, priority: 0, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[0]));
+			tb_trace_d("spak[%u]: code: %lu, priority: 0, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[0]));
 
 			// pop it
 			tb_queue_pop(ptor->spak[0]);
@@ -1489,7 +1489,7 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 				*resp = *aice;
 
 				// trace
-				tb_trace_impl("spak[%u]: code: %lu, priority: 1, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[1]));
+				tb_trace_d("spak[%u]: code: %lu, priority: 1, size: %lu", (tb_uint16_t)tb_thread_self(), aice->code, tb_queue_size(ptor->spak[1]));
 
 				// pop it
 				tb_queue_pop(ptor->spak[1]);
@@ -1510,7 +1510,7 @@ static tb_long_t tb_aicp_proactor_aiop_loop_spak(tb_aicp_proactor_t* proactor, t
 	tb_check_return_val(!ok && null, ok);
 
 	// trace
-	tb_trace_impl("wait[%u]: ..", (tb_uint16_t)tb_thread_self());
+	tb_trace_d("wait[%u]: ..", (tb_uint16_t)tb_thread_self());
 
 	// wait some time
 	if (tb_semaphore_wait(ptor->wait, timeout) < 0) return -1;

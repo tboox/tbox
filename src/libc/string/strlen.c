@@ -87,7 +87,7 @@ tb_size_t tb_strlen(tb_char_t const* s)
 			tb_size_t real = tb_strnlen(s, size);
 			if (s[real])
 			{
-				tb_print("[strlen]: [overflow]: [%p, %lu]", s, size);
+				tb_trace_i("[strlen]: [overflow]: [%p, %lu]", s, size);
 				tb_backtrace_dump("[strlen]: [overflow]: ", tb_null, 10);
 				tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
 				tb_abort();

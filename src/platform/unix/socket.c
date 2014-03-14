@@ -92,7 +92,7 @@ tb_handle_t tb_socket_open(tb_size_t type)
 	int n = 0;
 	int a = sizeof(n);
 	getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char *)&n, &a);
-	tb_print("n: %d", n);
+	tb_trace_i("n: %d", n);
 #endif
 
 	// ok
@@ -193,7 +193,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
 	{
 		tb_int_t reuseaddr = 1;
 		if (setsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_REUSEADDR, (tb_int_t *)&reuseaddr, sizeof(reuseaddr)) < 0) 
-			tb_trace("reuseaddr: failed");
+			tb_trace_d("reuseaddr: failed");
 	}
 #endif
 
@@ -203,7 +203,7 @@ tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t po
 	{
 		tb_int_t reuseport = 1;
 		if (setsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_REUSEPORT, (tb_int_t *)&reuseport, sizeof(reuseport)) < 0) 
-			tb_trace("reuseport: %lu failed", port);
+			tb_trace_d("reuseport: %lu failed", port);
 	}
 #endif
 

@@ -12,7 +12,7 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
 	tb_assert_and_check_return_val(http && line, tb_false);
 
 	// trace
-	tb_print("head: %s", line);
+	tb_trace_i("head: %s", line);
 
 	// ok
 	return tb_true;
@@ -20,7 +20,7 @@ static tb_bool_t tb_demo_aicp_http_head_func(tb_handle_t http, tb_char_t const* 
 static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// trace
-	tb_print("read: %lu, state: %s", real, tb_stream_state_cstr(state));
+	tb_trace_i("read: %lu, state: %s", real, tb_stream_state_cstr(state));
 
 	// failed or closed? kill aicp
 	if (state != TB_STREAM_STATE_OK) tb_aicp_kill(priv);
@@ -31,7 +31,7 @@ static tb_bool_t tb_demo_aicp_http_read_func(tb_handle_t handle, tb_size_t state
 static tb_bool_t tb_demo_aicp_http_post_func(tb_handle_t http, tb_size_t state, tb_hong_t offset, tb_hize_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
 	// trace
-	tb_print("post: %llu, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
+	tb_trace_i("post: %llu, rate: %lu bytes/s, state: %s", save, rate, tb_stream_state_cstr(state));
 
 	// ok
 	return tb_true;
@@ -85,7 +85,7 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// trace
-	tb_print("end");
+	tb_trace_i("end");
 
 	// exit http
 	if (http) tb_aicp_http_exit(http, tb_false);

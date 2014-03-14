@@ -65,14 +65,12 @@
 
 // assert
 #ifdef TB_ASSERT_ENABLE
-# 	define tb_assert_leave_tag(tag, x)					{ if (!(x)) {tb_trace_line_tag(tag, "[assert]: expr: %s", #x); __tb_leave ; } }
-# 	define tb_assert_and_check_leave_tag(tag, x)		tb_assert_leave_tag(tag, x)
+# 	define tb_assert_leave(x)							{ if (!(x)) {tb_trace_a("expr: %s", #x); __tb_leave ; } }
+# 	define tb_assert_and_check_leave(x)					tb_assert_leave(x)
 #else
-# 	define tb_assert_leave_tag(tag, x)
-# 	define tb_assert_and_check_leave_tag(tag, x)		tb_check_leave(x)
+# 	define tb_assert_leave(x)
+# 	define tb_assert_and_check_leave(x)					tb_check_leave(x)
 #endif
-#define tb_assert_leave(x)								tb_assert_leave_tag(TB_PRINT_TAG, x)
-#define tb_assert_and_check_leave(x)					tb_assert_and_check_leave_tag(TB_PRINT_TAG, x)
 
 #endif
 

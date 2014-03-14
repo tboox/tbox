@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -225,7 +225,7 @@ static tb_object_t* tb_number_read_xml(tb_object_xml_reader_t* reader, tb_size_t
 				// text
 				tb_char_t const* text = tb_xml_reader_text(reader->reader);
 				tb_assert_and_check_goto(text, end);
-				tb_trace_impl("number: %s", text);
+				tb_trace_d("number: %s", text);
 
 				// has sign? is float?
 				tb_size_t s = 0;
@@ -493,7 +493,7 @@ static tb_object_t* tb_number_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t
 	tb_assert_and_check_goto(tb_sstring_size(&data), end);
 
 	// trace
-	tb_trace_impl("number: %s", tb_sstring_cstr(&data));
+	tb_trace_d("number: %s", tb_sstring_cstr(&data));
 
 	// init number 
 #ifdef TB_CONFIG_TYPE_FLOAT

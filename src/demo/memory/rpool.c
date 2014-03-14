@@ -30,7 +30,7 @@ end:
 #endif
 
 	// trace
-	tb_print("rpool: %lld ms", time);
+	tb_trace_i("rpool: %lld ms", time);
 	
 	// exit rpool
 	tb_rpool_exit(rpool);

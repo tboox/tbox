@@ -24,8 +24,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#undef TB_TRACE_IMPL_TAG
-#define TB_TRACE_IMPL_TAG 				"aicp_file"
+#undef TB_TRACE_MODULE_NAME
+#define TB_TRACE_MODULE_NAME 				"aicp_file"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -77,7 +77,7 @@ static tb_bool_t tb_aicp_file_post(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		tb_queue_put(ptor->spak[priority], aice);
 
 		// trace
-		tb_trace_impl("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
+		tb_trace_d("post: code: %lu, priority: %lu, size: %lu", aice->code, priority, tb_queue_size(ptor->spak[priority]));
 	}
 	else
 	{
@@ -108,7 +108,7 @@ static tb_long_t tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
 	tb_long_t real = tb_file_pread(handle, aice->u.read.data, aice->u.read.size, aice->u.read.seek);
 
 	// trace
-	tb_trace_impl("read[%p]: %ld", handle, real);
+	tb_trace_d("read[%p]: %ld", handle, real);
 
 	// ok?
 	if (real > 0) 
@@ -138,7 +138,7 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
 	tb_long_t real = tb_file_pwrit(handle, aice->u.writ.data, aice->u.read.size, aice->u.writ.seek);
 
 	// trace
-	tb_trace_impl("writ[%p]: %ld", handle, real);
+	tb_trace_d("writ[%p]: %ld", handle, real);
 
 	// ok?
 	if (real > 0) 
@@ -168,7 +168,7 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	tb_long_t real = tb_file_preadv(handle, aice->u.readv.list, aice->u.readv.size, aice->u.readv.seek);
 
 	// trace
-	tb_trace_impl("readv[%p]: %ld", handle, real);
+	tb_trace_d("readv[%p]: %ld", handle, real);
 
 	// ok?
 	if (real > 0) 
@@ -198,7 +198,7 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	tb_long_t real = tb_file_pwritv(handle, aice->u.writv.list, aice->u.writv.size, aice->u.writv.seek);
 
 	// trace
-	tb_trace_impl("writv[%p]: %ld", handle, real);
+	tb_trace_d("writv[%p]: %ld", handle, real);
 
 	// ok?
 	if (real > 0) 
@@ -227,7 +227,7 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	tb_bool_t ok = tb_file_sync(handle);
 
 	// trace
-	tb_trace_impl("fsync[%p]: %s", handle, ok? "ok" : "no");
+	tb_trace_d("fsync[%p]: %s", handle, ok? "ok" : "no");
 
 	// ok?
 	aice->state = ok? TB_AICE_STATE_OK : TB_AICE_STATE_FAILED;

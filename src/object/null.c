@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -114,7 +114,7 @@ static tb_object_t* tb_null_read_jsn(tb_object_jsn_reader_t* reader, tb_char_t t
 	tb_assert_and_check_goto(tb_sstring_size(&data), end);
 
 	// trace
-	tb_trace_impl("null: %s", tb_sstring_cstr(&data));
+	tb_trace_d("null: %s", tb_sstring_cstr(&data));
 
 	// null?
 	if (!tb_stricmp(tb_sstring_cstr(&data), "null")) null = tb_null_init();

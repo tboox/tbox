@@ -60,9 +60,9 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_si
 			for (i = 0; i < nframe; i++)
 			{
 #if TB_CPU_BIT64
-				tb_print("%s[%016p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+				tb_trace_i("%s[%016p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
 #else
-				tb_print("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
+				tb_trace_i("%s[%08p]: %s", prefix? prefix : "", frames[i], tb_backtrace_symbols_name(symbols, frames, nframe, i));
 #endif
 			}
 		
@@ -76,9 +76,9 @@ tb_void_t tb_backtrace_dump(tb_char_t const* prefix, tb_pointer_t* frames, tb_si
 			for (i = 0; i < nframe; i++)
 			{
 #if TB_CPU_BIT64
-				tb_print("%s[%016p]", prefix? prefix : "", frames[i]);
+				tb_trace_i("%s[%016p]", prefix? prefix : "", frames[i]);
 #else
-				tb_print("%s[%08p]", prefix? prefix : "", frames[i]);
+				tb_trace_i("%s[%08p]", prefix? prefix : "", frames[i]);
 #endif				
 			}
 		}

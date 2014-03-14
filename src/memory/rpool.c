@@ -487,13 +487,13 @@ tb_void_t tb_rpool_dump(tb_handle_t handle)
 	tb_rpool_t* rpool = (tb_rpool_t*)handle;
 	tb_assert_and_check_return(rpool && rpool->pools);
 
-	tb_print("======================================================================");
-	tb_print("rpool: align: %lu", 	rpool->align);
-	tb_print("rpool: pooln: %lu", 	rpool->pooln);
-	tb_print("rpool: poolm: %lu", 	rpool->poolm);
-	tb_print("rpool: size: %lu", 	rpool->size);
-	tb_print("rpool: grow: %lu", 	rpool->grow);
-	tb_print("rpool: pred: %lu%%", 	rpool->info.aloc? ((rpool->info.pred * 100) / rpool->info.aloc) : 0);
+	tb_trace_i("======================================================================");
+	tb_trace_i("rpool: align: %lu", 	rpool->align);
+	tb_trace_i("rpool: pooln: %lu", 	rpool->pooln);
+	tb_trace_i("rpool: poolm: %lu", 	rpool->poolm);
+	tb_trace_i("rpool: size: %lu", 	rpool->size);
+	tb_trace_i("rpool: grow: %lu", 	rpool->grow);
+	tb_trace_i("rpool: pred: %lu%%", 	rpool->info.aloc? ((rpool->info.pred * 100) / rpool->info.aloc) : 0);
 
 	tb_size_t i = 0;
 	tb_size_t n = rpool->pooln;

@@ -19,13 +19,13 @@ static tb_void_t tb_demo_sock_addr_func(tb_handle_t haddr, tb_char_t const* host
 	if (addr)
 	{
 		// trace
-		tb_print("addr[%s]: %u.%u.%u.%u", host, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
+		tb_trace_i("addr[%s]: %u.%u.%u.%u", host, addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3]);
 	}
 	// timeout or failed?
 	else
 	{
 		// trace
-		tb_print("addr[%s]: failed", host);
+		tb_trace_i("addr[%s]: failed", host);
 	}
 
 	// exit addr
@@ -62,7 +62,7 @@ tb_int_t tb_demo_asio_addr_main(tb_int_t argc, tb_char_t** argv)
 	tb_hong_t time = tb_mclock();
 
 	// trace
-	tb_print("addr: %s: ..", argv[1]);
+	tb_trace_i("addr: %s: ..", argv[1]);
 
 	// done addr
 	tb_aicp_addr_done(addr, argv[1]);
@@ -74,12 +74,12 @@ tb_int_t tb_demo_asio_addr_main(tb_int_t argc, tb_char_t** argv)
 	time = tb_mclock() - time;
 
 	// trace
-	tb_print("addr: %s: time: %lld ms", argv[1], time);
+	tb_trace_i("addr: %s: time: %lld ms", argv[1], time);
 
 end:
 
 	// trace
-	tb_print("end");
+	tb_trace_i("end");
 
 	// exit aicp
 	if (aicp) tb_aicp_exit(aicp);

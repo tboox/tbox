@@ -524,25 +524,25 @@ tb_void_t tb_fpool_dump(tb_handle_t handle)
 	tb_fpool_t* fpool = (tb_fpool_t*)handle;
 	tb_assert_and_check_return(fpool);
 
-	tb_print("======================================================================");
-	tb_print("fpool: magic: %#lx",	fpool->magic);
-	tb_print("fpool: align: %lu", 	fpool->align);
-	tb_print("fpool: head: %lu", 	fpool->data - (tb_byte_t*)fpool);
-	tb_print("fpool: data: %p", 	fpool->data);
-	tb_print("fpool: size: %lu", 	fpool->size);
-	tb_print("fpool: step: %lu", 	fpool->step);
-	tb_print("fpool: maxn: %lu", 	fpool->maxn);
-	tb_print("fpool: peak: %lu", 	fpool->info.peak);
-	tb_print("fpool: wast: %lu%%", 	(fpool->data - (tb_byte_t*)fpool) * 100 / (fpool->maxn * fpool->step));
-	tb_print("fpool: fail: %lu", 	fpool->info.fail);
-	tb_print("fpool: pred: %lu%%", 	fpool->info.aloc? ((fpool->info.pred * 100) / fpool->info.aloc) : 0);
+	tb_trace_i("======================================================================");
+	tb_trace_i("fpool: magic: %#lx",	fpool->magic);
+	tb_trace_i("fpool: align: %lu", 	fpool->align);
+	tb_trace_i("fpool: head: %lu", 	fpool->data - (tb_byte_t*)fpool);
+	tb_trace_i("fpool: data: %p", 	fpool->data);
+	tb_trace_i("fpool: size: %lu", 	fpool->size);
+	tb_trace_i("fpool: step: %lu", 	fpool->step);
+	tb_trace_i("fpool: maxn: %lu", 	fpool->maxn);
+	tb_trace_i("fpool: peak: %lu", 	fpool->info.peak);
+	tb_trace_i("fpool: wast: %lu%%", 	(fpool->data - (tb_byte_t*)fpool) * 100 / (fpool->maxn * fpool->step));
+	tb_trace_i("fpool: fail: %lu", 	fpool->info.fail);
+	tb_trace_i("fpool: pred: %lu%%", 	fpool->info.aloc? ((fpool->info.pred * 100) / fpool->info.aloc) : 0);
 
 	tb_size_t 	i = 0;
 	tb_size_t 	m = fpool->maxn;
 	for (i = 0; i < m; ++i)
 	{
 		if (!(i & 0x7) && fpool->used[i >> 3]) 
-			tb_print("\tfpool: block[%lu]: %08b", i >> 3, fpool->used[i >> 3]);
+			tb_trace_i("\tfpool: block[%lu]: %08b", i >> 3, fpool->used[i >> 3]);
 	}
 }
 #endif

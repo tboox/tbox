@@ -527,12 +527,12 @@ tb_void_t tb_spool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	if (!prefix) prefix = "spool";
 
 #if 0
-	tb_print("======================================================================");
-	tb_print("%s: align: %lu", 		prefix, spool->align);
-	tb_print("%s: pooln: %lu", 		prefix, spool->pooln);
-	tb_print("%s: poolm: %lu", 		prefix, spool->poolm);
-	tb_print("%s: grow: %lu", 		prefix, spool->grow);
-	tb_print("%s: pred: %lu%%", 	prefix, spool->info.aloc? ((spool->info.pred * 100) / spool->info.aloc) : 0);
+	tb_trace_i("======================================================================");
+	tb_trace_i("%s: align: %lu", 		prefix, spool->align);
+	tb_trace_i("%s: pooln: %lu", 		prefix, spool->pooln);
+	tb_trace_i("%s: poolm: %lu", 		prefix, spool->poolm);
+	tb_trace_i("%s: grow: %lu", 		prefix, spool->grow);
+	tb_trace_i("%s: pred: %lu%%", 	prefix, spool->info.aloc? ((spool->info.pred * 100) / spool->info.aloc) : 0);
 #endif
 
 	tb_size_t i = 0;

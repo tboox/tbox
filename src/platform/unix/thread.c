@@ -70,7 +70,7 @@ tb_void_t tb_thread_exit(tb_handle_t handle)
 	if ((ok = pthread_kill(((pthread_t)handle), 0)) && ok != ESRCH)
 	{
 		// trace
-		tb_trace("thread[%p]: not exited: %ld, errno: %d", handle, ok, errno);
+		tb_trace_d("thread[%p]: not exited: %ld, errno: %d", handle, ok, errno);
 	}
 }
 tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
@@ -83,7 +83,7 @@ tb_long_t tb_thread_wait(tb_handle_t handle, tb_long_t timeout)
 	if (ok = pthread_join(((pthread_t)handle), tb_null))
 	{
 		// trace
-		tb_trace("thread[%p]: wait failed: %ld, errno: %d", handle, ok, errno);
+		tb_trace_d("thread[%p]: wait failed: %ld, errno: %d", handle, ok, errno);
 		return -1;
 	
 	}

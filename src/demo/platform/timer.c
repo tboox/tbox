@@ -16,7 +16,7 @@ static tb_void_t tb_demo_timer_task_func(tb_bool_t killed, tb_pointer_t data)
 		tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
 		// trace
-		tb_print("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
+		tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
 	}
 }
 static tb_pointer_t tb_demo_timer_loop(tb_pointer_t data)

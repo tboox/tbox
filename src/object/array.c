@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"object"
+//#define TB_TRACE_MODULE_NAME 		"object"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -160,7 +160,7 @@ static tb_object_t* tb_array_read_xml(tb_object_xml_reader_t* reader, tb_size_t 
 				// name
 				tb_char_t const* name = tb_xml_reader_element(reader->reader);
 				tb_assert_and_check_goto(name, end);
-				tb_trace_impl("item: %s", name);
+				tb_trace_d("item: %s", name);
 
 				// func
 				tb_object_xml_reader_func_t func = tb_object_get_xml_reader(name);
@@ -273,7 +273,7 @@ static tb_object_t* tb_array_read_bin(tb_object_bin_reader_t* reader, tb_size_t 
 		tb_object_read_bin_type_size(reader->stream, &type, &size);
 
 		// trace
-		tb_trace_impl("item: type: %lu, size: %llu", type, size);
+		tb_trace_d("item: type: %lu, size: %llu", type, size);
 
 		// is index?
 		tb_object_t* item = tb_null;

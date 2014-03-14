@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"timer"
+//#define TB_TRACE_MODULE_NAME 				"timer"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -171,7 +171,7 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		while (tb_atomic_get(&timer->work) && tryn--) tb_msleep(500);
 
 		// warning
-		if (!tryn && tb_atomic_get(&timer->work)) tb_warning("[timer]: the loop has been not exited now!");
+		if (!tryn && tb_atomic_get(&timer->work)) tb_trace_w("[timer]: the loop has been not exited now!");
 
 		// post event
 		tb_spinlock_enter(&timer->lock);
@@ -546,7 +546,7 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t htask)
 	tb_assert_and_check_return(timer && timer->pool && task);
 
 	// trace
-	tb_trace_impl("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("del: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);
@@ -575,7 +575,7 @@ tb_void_t tb_timer_task_kil(tb_handle_t handle, tb_handle_t htask)
 	tb_assert_and_check_return(timer && timer->pool && task);
 
 	// trace
-	tb_trace_impl("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
+	tb_trace_d("kil: when: %lld, period: %u, refn: %u", task->when, task->period, task->refn);
 
 	// enter
 	tb_spinlock_enter(&timer->lock);

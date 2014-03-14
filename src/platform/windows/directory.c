@@ -68,7 +68,7 @@ static tb_void_t tb_directory_walk_copy(tb_char_t const* path, tb_file_info_t co
 	// the dest file path
 	tb_char_t dpath[8192] = {0};
 	tb_snprintf(dpath, 8192, "%s\\%s", dest, name[0] == '\\'? name + 1 : name);
-//	tb_print("%s => %s", path, dpath);
+//	tb_trace_i("%s => %s", path, dpath);
 
 	// remove the dest file first
 	tb_file_info_t dinfo = {0};

@@ -25,9 +25,9 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 	if (tb_dns_looker_done(name, &ipv4))
 	{
 		time = tb_mclock() - time;
-		tb_print("[demo]: %s => %s, %lld ms", name, tb_ipv4_get(&ipv4, data, 16), time);
+		tb_trace_i("[demo]: %s => %s, %lld ms", name, tb_ipv4_get(&ipv4, data, 16), time);
 	}
-	else tb_print("[demo]: %s failed", name);
+	else tb_trace_i("[demo]: %s failed", name);
 }
 #else
 #include <netdb.h>
@@ -47,9 +47,9 @@ static tb_void_t tb_dns_test_done(tb_char_t const* name)
 	if (h)
 	{
 		time = tb_mclock() - time;
-		tb_print("[demo]: %s => %s, %lld ms", name, inet_ntoa(*((struct in_addr*)(h->h_addr))), time);
+		tb_trace_i("[demo]: %s => %s, %lld ms", name, inet_ntoa(*((struct in_addr*)(h->h_addr))), time);
 	}
-	else tb_print("[demo]: %s failed", name);
+	else tb_trace_i("[demo]: %s failed", name);
 }
 #endif
 
@@ -271,7 +271,7 @@ tb_int_t tb_demo_network_dns_main(tb_int_t argc, tb_char_t** argv)
 	tb_dns_test_done("www.ted.com");
 	tb_dns_test_done("www.ted.com");
 	time = tb_mclock() - time;
-	tb_print("[demo]: done %lld ms", time);
+	tb_trace_i("[demo]: done %lld ms", time);
 #else
 	tb_dns_test_done(argv[1]);
 #endif

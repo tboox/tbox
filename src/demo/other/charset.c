@@ -27,7 +27,7 @@ tb_int_t tb_demo_other_charset_main(tb_int_t argc, tb_char_t** argv)
 			{
 				// conv
 				osize = tb_charset_conv_data(tb_charset_type(argv[3]), tb_charset_type(argv[4]), idata, isize, odata, osize);
-				tb_print("conv: %ld bytes", osize);
+				tb_trace_i("conv: %ld bytes", osize);
 				
 				// save
 				if (osize > 0) tb_gstream_bwrit(ostream, odata, osize);

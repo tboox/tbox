@@ -17,6 +17,6 @@ tb_int_t tb_demo_other_test_main(tb_int_t argc, tb_char_t** argv)
 		if (i) n++;
 	}
 	t = tb_uclock() - t;
-	tb_print("%lld", t);
+	tb_trace_i("%lld", t);
 	return 0;
 }

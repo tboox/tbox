@@ -29,7 +29,7 @@ static tb_size_t tb_slist_insert_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_insert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n + 1);
@@ -58,7 +58,7 @@ static tb_size_t tb_slist_insert_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_insert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_insert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -87,7 +87,7 @@ static tb_size_t tb_slist_insert_tail_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_insert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_insert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -118,7 +118,7 @@ static tb_size_t tb_slist_ninsert_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_ninsert_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n + 1);
@@ -146,7 +146,7 @@ static tb_size_t tb_slist_ninsert_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_ninsert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_ninsert_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -174,7 +174,7 @@ static tb_size_t tb_slist_ninsert_tail_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_ninsert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_ninsert_tail(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -204,7 +204,7 @@ static tb_size_t tb_slist_remove_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_remove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_remove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -228,7 +228,7 @@ static tb_size_t tb_slist_remove_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_remove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_remove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -252,7 +252,7 @@ static tb_size_t tb_slist_remove_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_remove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_remove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -275,7 +275,7 @@ static tb_size_t tb_slist_nremove_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nremove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nremove(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -298,7 +298,7 @@ static tb_size_t tb_slist_nremove_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nremove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nremove_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -321,7 +321,7 @@ static tb_size_t tb_slist_nremove_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nremove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nremove_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(!tb_slist_size(slist));
@@ -346,7 +346,7 @@ static tb_size_t tb_slist_replace_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_replace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_replace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -372,7 +372,7 @@ static tb_size_t tb_slist_replace_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_replace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_replace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -397,7 +397,7 @@ static tb_size_t tb_slist_replace_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_replace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_replace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -422,7 +422,7 @@ static tb_size_t tb_slist_nreplace_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nreplace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nreplace(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -447,7 +447,7 @@ static tb_size_t tb_slist_nreplace_head_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nreplace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nreplace_head(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -472,7 +472,7 @@ static tb_size_t tb_slist_nreplace_last_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_nreplace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_nreplace_last(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// check
 	tb_assert(tb_slist_size(slist) == n);
@@ -505,7 +505,7 @@ static tb_size_t tb_slist_iterator_next_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_iterator_next(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// exit
 	tb_slist_exit(slist);
@@ -534,7 +534,7 @@ static tb_size_t tb_slist_iterator_prev_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_print("tb_slist_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_slist_iterator_prev(%d): %lld ms, size: %d, maxn: %d", n, t, tb_slist_size(slist), tb_slist_maxn(slist));
 
 	// exit
 	tb_slist_exit(slist);
@@ -543,13 +543,13 @@ static tb_size_t tb_slist_iterator_prev_test()
 }
 static tb_void_t tb_slist_int_dump(tb_slist_t const* slist)
 {
-	tb_print("tb_int_t size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("tb_int_t size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
 	tb_size_t itor = tb_iterator_head(slist);
 	tb_size_t tail = tb_iterator_tail(slist);
 	for (; itor != tail; itor = tb_iterator_next(slist, itor))
 	{
 		tb_char_t const* item = tb_iterator_item(slist, itor);
-		tb_print("tb_int_t at[%lx]: %x", itor, item);
+		tb_trace_i("tb_int_t at[%lx]: %x", itor, item);
 	}
 }
 static tb_void_t tb_slist_int_test()
@@ -560,8 +560,8 @@ static tb_void_t tb_slist_int_test()
 	tb_size_t 			i = 0;
 	tb_size_t 			j = 0;
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_slist_ninsert_head(slist, 0xa, 10);
 	i = tb_slist_ninsert_tail(slist, 0xf, 10);
 	j = tb_slist_insert_prev(slist, i, 0);
@@ -586,8 +586,8 @@ static tb_void_t tb_slist_int_test()
 	tb_slist_insert_tail(slist, 9);
 	tb_slist_int_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_slist_nremove_head(slist, 5);
 	tb_slist_nremove_last(slist, 5);
 	j = tb_slist_remove(slist, j);
@@ -602,22 +602,22 @@ static tb_void_t tb_slist_int_test()
 	j = tb_slist_remove(slist, j);	
 	tb_slist_int_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_slist_nreplace_head(slist, 0xf, 10);
 	tb_slist_nreplace_last(slist, 0xa, 10);
 	tb_slist_replace_head(slist, 0);
 	tb_slist_replace_last(slist, 1);
 	tb_slist_int_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("moveto:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("moveto:");
 	tb_slist_moveto_head(slist, tb_iterator_last(slist));
 	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_int_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_slist_clear(slist);
 	tb_slist_int_dump(slist);
 
@@ -625,13 +625,13 @@ static tb_void_t tb_slist_int_test()
 }
 static tb_void_t tb_slist_str_dump(tb_slist_t const* slist)
 {
-	tb_print("str size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("str size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
 	tb_size_t itor = tb_iterator_head(slist);
 	tb_size_t tail = tb_iterator_tail(slist);
 	for (; itor != tail; itor = tb_iterator_next(slist, itor))
 	{
 		tb_char_t const* item = tb_iterator_item(slist, itor);
-		tb_print("str at[%lx]: %s", itor, item);
+		tb_trace_i("str at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_str_test()
@@ -643,8 +643,8 @@ static tb_void_t tb_slist_str_test()
 	tb_size_t 			i = 0;
 	tb_size_t 			j = 0;
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
 	j = tb_slist_insert_prev(slist, i, "0000000000");
@@ -669,8 +669,8 @@ static tb_void_t tb_slist_str_test()
 	tb_slist_insert_tail(slist, "9999999999");
 	tb_slist_str_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_slist_nremove_head(slist, 5);
 	tb_slist_nremove_last(slist, 5);
 	j = tb_slist_remove(slist, j);
@@ -685,22 +685,22 @@ static tb_void_t tb_slist_str_test()
 	j = tb_slist_remove(slist, j);	
 	tb_slist_str_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
 	tb_slist_replace_last(slist, "IIIIIIIIII");
 	tb_slist_str_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("moveto:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("moveto:");
 	tb_slist_moveto_head(slist, tb_iterator_last(slist));
 	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_str_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_slist_clear(slist);
 	tb_slist_str_dump(slist);
 
@@ -709,13 +709,13 @@ static tb_void_t tb_slist_str_test()
 }
 static tb_void_t tb_slist_efm_dump(tb_slist_t const* slist)
 {
-	tb_print("efm size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("efm size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
 	tb_size_t itor = tb_iterator_head(slist);
 	tb_size_t tail = tb_iterator_tail(slist);
 	for (; itor != tail; itor = tb_iterator_next(slist, itor))
 	{
 		tb_char_t const* item = tb_iterator_item(slist, itor);
-		tb_print("efm at[%lx]: %s", itor, item);
+		tb_trace_i("efm at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_efm_test()
@@ -727,8 +727,8 @@ static tb_void_t tb_slist_efm_test()
 	tb_size_t 			i = 0;
 	tb_size_t 			j = 0;
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
 	j = tb_slist_insert_prev(slist, i, "0000000000");
@@ -753,8 +753,8 @@ static tb_void_t tb_slist_efm_test()
 	tb_slist_insert_tail(slist, "9999999999");
 	tb_slist_efm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_slist_nremove_head(slist, 5);
 	tb_slist_nremove_last(slist, 5);
 	j = tb_slist_remove(slist, j);
@@ -769,22 +769,22 @@ static tb_void_t tb_slist_efm_test()
 	j = tb_slist_remove(slist, j);	
 	tb_slist_efm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
 	tb_slist_replace_last(slist, "IIIIIIIIII");
 	tb_slist_efm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("moveto:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("moveto:");
 	tb_slist_moveto_head(slist, tb_iterator_last(slist));
 	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_efm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_slist_clear(slist);
 	tb_slist_efm_dump(slist);
 
@@ -793,17 +793,17 @@ static tb_void_t tb_slist_efm_test()
 }
 static tb_void_t tb_slist_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 {
-	tb_print("ifm free: %s, priv: %s", item, func->priv);
+	tb_trace_i("ifm free: %s, priv: %s", item, func->priv);
 }
 static tb_void_t tb_slist_ifm_dump(tb_slist_t const* slist)
 {
-	tb_print("ifm size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
+	tb_trace_i("ifm size: %d, maxn: %d", tb_slist_size(slist), tb_slist_maxn(slist));
 	tb_size_t itor = tb_iterator_head(slist);
 	tb_size_t tail = tb_iterator_tail(slist);
 	for (; itor != tail; itor = tb_iterator_next(slist, itor))
 	{
 		tb_char_t const* item = tb_iterator_item(slist, itor);
-		tb_print("ifm at[%lx]: %s", itor, item);
+		tb_trace_i("ifm at[%lx]: %s", itor, item);
 	}
 }
 static tb_void_t tb_slist_ifm_test()
@@ -814,8 +814,8 @@ static tb_void_t tb_slist_ifm_test()
 	tb_size_t 			i = 0;
 	tb_size_t 			j = 0;
 
-	tb_print("=============================================================");
-	tb_print("insert:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert:");
 	tb_slist_ninsert_head(slist, "HHHHHHHHHH", 10);
 	i = tb_slist_ninsert_tail(slist, "TTTTTTTTTT", 10);
 	j = tb_slist_insert_prev(slist, i, "0000000000");
@@ -840,8 +840,8 @@ static tb_void_t tb_slist_ifm_test()
 	tb_slist_insert_tail(slist, "9999999999");
 	tb_slist_ifm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("remove:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove:");
 	tb_slist_nremove_head(slist, 5);
 	tb_slist_nremove_last(slist, 5);
 	j = tb_slist_remove(slist, j);
@@ -856,22 +856,22 @@ static tb_void_t tb_slist_ifm_test()
 	j = tb_slist_remove(slist, j);	
 	tb_slist_ifm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("replace:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace:");
 	tb_slist_nreplace_head(slist, "TTTTTTTTTT", 10);
 	tb_slist_nreplace_last(slist, "HHHHHHHHHH", 10);
 	tb_slist_replace_head(slist, "OOOOOOOOOO");
 	tb_slist_replace_last(slist, "IIIIIIIIII");
 	tb_slist_ifm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("moveto:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("moveto:");
 	tb_slist_moveto_head(slist, tb_iterator_last(slist));
 	tb_slist_moveto_tail(slist, tb_iterator_next(slist, tb_iterator_head(slist)));
 	tb_slist_ifm_dump(slist);
 
-	tb_print("=============================================================");
-	tb_print("clear:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("clear:");
 	tb_slist_clear(slist);
 	tb_slist_ifm_dump(slist);
 
@@ -880,8 +880,8 @@ static tb_void_t tb_slist_ifm_test()
 static tb_void_t tb_slist_perf_test()
 {
 	tb_size_t score = 0;
-	tb_print("=============================================================");
-	tb_print("insert performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("insert performance:");
 	score += tb_slist_insert_test();
 	score += tb_slist_insert_head_test();
 	score += tb_slist_insert_tail_test();
@@ -889,8 +889,8 @@ static tb_void_t tb_slist_perf_test()
 	score += tb_slist_ninsert_head_test();
 	score += tb_slist_ninsert_tail_test();
 
-	tb_print("=============================================================");
-	tb_print("remove performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("remove performance:");
 	score += tb_slist_remove_test();
 	score += tb_slist_remove_head_test();
 	score += tb_slist_remove_last_test();
@@ -898,8 +898,8 @@ static tb_void_t tb_slist_perf_test()
 	score += tb_slist_nremove_head_test();
 	score += tb_slist_nremove_last_test();
 
-	tb_print("=============================================================");
-	tb_print("replace performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("replace performance:");
 	score += tb_slist_replace_test();
 	score += tb_slist_replace_head_test();
 	score += tb_slist_replace_last_test();
@@ -907,13 +907,13 @@ static tb_void_t tb_slist_perf_test()
 	score += tb_slist_nreplace_head_test();
 	score += tb_slist_nreplace_last_test();
 
-	tb_print("=============================================================");
-	tb_print("iterator performance:");
+	tb_trace_i("=============================================================");
+	tb_trace_i("iterator performance:");
 	score += tb_slist_iterator_next_test();
 	score += tb_slist_iterator_prev_test();
 
-	tb_print("=============================================================");
-	tb_print("score: %d", score / 100);
+	tb_trace_i("=============================================================");
+	tb_trace_i("score: %d", score / 100);
 
 }
 static tb_void_t tb_slist_test_itor_perf()
@@ -963,7 +963,7 @@ static tb_void_t tb_slist_test_itor_perf()
 		itor = tb_iterator_next(slist, itor);
 	}
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
 
 	tb_slist_exit(slist);
 }
@@ -1009,7 +1009,7 @@ static tb_void_t tb_slist_test_walk_perf()
 	tb_slist_walk(slist, tb_slist_test_walk_item, test);
 //	tb_slist_walk(slist, tb_slist_test_walk_item, test);
 	t = tb_mclock() - t;
-	tb_print("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
+	tb_trace_i("item: %llx, size: %llu ?= %u, time: %lld", test[0], test[1], tb_slist_size(slist), t);
 
 	tb_slist_exit(slist);
 }

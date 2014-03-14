@@ -13,7 +13,7 @@ tb_int_t tb_demo_memory_pbuffer_main(tb_int_t argc, tb_char_t** argv)
 
 	tb_pbuffer_memncpy(&b, "hello ", 6);
 	tb_pbuffer_memncat(&b, "world", 6);
-	tb_print("%s", tb_pbuffer_data(&b));
+	tb_trace_i("%s", tb_pbuffer_data(&b));
 
 	tb_pbuffer_exit(&b);
 

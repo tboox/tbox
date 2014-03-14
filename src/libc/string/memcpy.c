@@ -94,7 +94,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 		tb_size_t n1 = tb_malloc_data_size(s1);
 		if (n1 && n > n1)
 		{
-			tb_print("[memcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_trace_i("[memcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
 			tb_backtrace_dump("[memcpy]: [overflow]: [dst]: ", tb_null, 10);
 			tb_malloc_data_dump(s1, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -104,7 +104,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 		tb_size_t n2 = tb_malloc_data_size(s2);
 		if (n2 && n > n2)
 		{
-			tb_print("[memcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_trace_i("[memcpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
 			tb_backtrace_dump("[memcpy]: [overflow]: [src] ", tb_null, 10);
 			tb_malloc_data_dump(s2, "\t[malloc]: [from]: ");
 			tb_abort();
@@ -113,7 +113,7 @@ tb_pointer_t tb_memcpy(tb_pointer_t s1, tb_cpointer_t s2, tb_size_t n)
 		// overlap?
 		if ((s2 >= s1 && s2 < s1 + n) || (s1 >= s2 && s1 < s2 + n))
 		{
-			tb_print("[memcpy]: [overlap]: [%p, %lu] => [%p, %lu]", s2, n, s1, n);
+			tb_trace_i("[memcpy]: [overlap]: [%p, %lu] => [%p, %lu]", s2, n, s1, n);
 			tb_backtrace_dump("[memcpy]: [overlap]: ", tb_null, 10);
 			tb_malloc_data_dump(s1, "\t[malloc]: [from]: ");
 			tb_abort();

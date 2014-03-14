@@ -136,7 +136,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 					tb_assert_and_check_break(context->aioo);
 
 					// trace
-					tb_print("acpt[%p]: ok", context->sock);
+					tb_trace_i("acpt[%p]: ok", context->sock);
 
 					// init left
 					context->left = tb_file_size(context->file);
@@ -149,7 +149,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 					context->left -= real;
 
 					// trace
-//					tb_print("read[%p]: real: %ld", context->file, real);
+//					tb_trace_i("read[%p]: real: %ld", context->file, real);
 
 					// done send
 					context->send = real;
@@ -160,12 +160,12 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 						context->real += real;
 
 						// trace
-//						tb_print("send[%p]: real: %ld", context->sock, real);
+//						tb_trace_i("send[%p]: real: %ld", context->sock, real);
 					}
 					else
 					{
 						// trace
-						tb_print("send[%p]: closed", context->sock);
+						tb_trace_i("send[%p]: closed", context->sock);
 						break;
 					}
 
@@ -200,12 +200,12 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 						context->real += real;
 
 						// trace
-//						tb_print("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
+//						tb_trace_i("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
 					}
 					else
 					{
 						// trace
-						tb_print("send[%p]: closed", tb_aioo_handle(aioo));
+						tb_trace_i("send[%p]: closed", tb_aioo_handle(aioo));
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -229,7 +229,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 						context->left -= real;
 
 						// trace
-//						tb_print("read[%p]: real: %ld", context->file, real);
+//						tb_trace_i("read[%p]: real: %ld", context->file, real);
 
 						// done send
 						context->send = real;
@@ -240,12 +240,12 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 							context->real += real;
 
 							// trace
-//							tb_print("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
+//							tb_trace_i("send[%p]: real: %ld", tb_aioo_handle(aioo), real);
 						}
 						else
 						{
 							// trace
-							tb_print("send[%p]: closed", tb_aioo_handle(aioo));
+							tb_trace_i("send[%p]: closed", tb_aioo_handle(aioo));
 
 							// exit context
 							tb_demo_context_exit(aiop, context);
@@ -255,7 +255,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 					else
 					{
 						// trace
-						tb_print("read[%p]: closed", tb_aioo_handle(aioo));
+						tb_trace_i("read[%p]: closed", tb_aioo_handle(aioo));
 
 						// exit context
 						tb_demo_context_exit(aiop, context);
@@ -265,7 +265,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 				else 
 				{
 					// trace
-					tb_print("read[%p]: closed", tb_aioo_handle(aioo));
+					tb_trace_i("read[%p]: closed", tb_aioo_handle(aioo));
 
 					// exit context
 					tb_demo_context_exit(aiop, context);
@@ -275,7 +275,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 			// error?
 			else 
 			{
-				tb_print("aioe[%p]: unknown code: %lu", tb_aioo_handle(aioo), list[i].code);
+				tb_trace_i("aioe[%p]: unknown code: %lu", tb_aioo_handle(aioo), list[i].code);
 				break;
 			}
 		}
@@ -284,7 +284,7 @@ tb_int_t tb_demo_asio_aiopd_main(tb_int_t argc, tb_char_t** argv)
 end:
 
 	// trace
-	tb_print("end");
+	tb_trace_i("end");
 
 	// exit socket
 	if (sock) tb_socket_clos(sock);

@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 			"gstream"
+//#define TB_TRACE_MODULE_NAME 			"gstream"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -70,7 +70,7 @@ tb_gstream_t* tb_gstream_init_from_url(tb_char_t const* url)
 	else if (!tb_strstr(p, "://")) 				type = TB_STREAM_TYPE_FILE;
 	else 
 	{
-		tb_trace("[gstream]: unknown prefix for url: %s", url);
+		tb_trace_d("[gstream]: unknown prefix for url: %s", url);
 		return tb_null;
 	}
 	tb_assert_and_check_goto(type && type < tb_arrayn(g_init) && g_init[type], fail);
@@ -362,7 +362,7 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	// update offset
 	gstream->offset += read;
 
-//	tb_trace_impl("read: %d", read);
+//	tb_trace_d("read: %d", read);
 	return read;
 }
 tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size_t size)
@@ -437,7 +437,7 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 	// update offset
 	gstream->offset += writ;
 
-//	tb_trace_impl("writ: %d", writ);
+//	tb_trace_d("writ: %d", writ);
 	return writ;
 }
 tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t size)

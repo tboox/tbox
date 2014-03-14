@@ -32,16 +32,16 @@ static tb_pointer_t tb_test_thread(tb_pointer_t data)
 {
 	tb_test_item_t* it = (tb_test_item_t*)data;
 	tb_assert_and_check_goto(it, end);
-	tb_print("[thread: %u]: init", it->i);
+	tb_trace_i("[thread: %u]: init", it->i);
 
 	// loop
 	while (1)
 	{
 		// value
-		tb_print("[semaphore: %u]: %ld", it->i, tb_semaphore_value(it->s));
+		tb_trace_i("[semaphore: %u]: %ld", it->i, tb_semaphore_value(it->s));
 
 		// wait
-		tb_print("[semaphore: %u]: wait", it->i);
+		tb_trace_i("[semaphore: %u]: wait", it->i);
 		tb_long_t r = tb_semaphore_wait(it->s, -1);
 		tb_assert_and_check_goto(r >= 0, end);
 
@@ -52,11 +52,11 @@ static tb_pointer_t tb_test_thread(tb_pointer_t data)
 		tb_check_continue(r);
 
 		// signal
-		tb_print("[semaphore: %u]: signal", it->i);
+		tb_trace_i("[semaphore: %u]: signal", it->i);
 	}
 
 end:
-	tb_print("[thread: %u]: exit", it? it->i : 0);
+	tb_trace_i("[thread: %u]: exit", it? it->i : 0);
 	tb_thread_return(tb_null);
 	return tb_null;
 }
@@ -131,6 +131,6 @@ end:
 		if (it[i].s) tb_semaphore_exit(it[i].s);
 	}
 
-	tb_print("quit");
+	tb_trace_i("quit");
 	return 0;
 }

@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 		"server"
+//#define TB_TRACE_MODULE_NAME 		"server"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -196,7 +196,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	{
 		// writ data
 		tb_long_t r = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
-//		tb_trace_impl("writ %d", r);
+//		tb_trace_d("writ %d", r);
 		tb_check_goto(r >= 0, end);
 		
 		// no data?
@@ -220,7 +220,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	{
 		// read data
 		tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
-//		tb_trace_impl("read %d", r);
+//		tb_trace_d("read %d", r);
 		tb_check_break(r >= 0);
 		
 		// no data?
@@ -231,7 +231,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 
 			// wait
 			r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_TIMEOUT);
-//			tb_trace_impl("wait %d", r);
+//			tb_trace_d("wait %d", r);
 
 			// fail or timeout?
 			tb_check_break(r > 0);
@@ -254,7 +254,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	rate = (tb_long_t)(tb_mclock() - time);
 
 	// ok
-//	tb_trace_impl("[dns]: addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
+//	tb_trace_d("[dns]: addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
 
 end:
 	// exit sock
@@ -355,8 +355,8 @@ tb_void_t tb_dns_server_dump()
 	if (g_list.list) 
 	{
 		// trace
-		tb_print("============================================================");
-		tb_print("[dns]: list: %u servers", tb_vector_size(g_list.list));
+		tb_trace_i("============================================================");
+		tb_trace_i("[dns]: list: %u servers", tb_vector_size(g_list.list));
 
 		// walk
 		tb_size_t i = 0;
@@ -367,7 +367,7 @@ tb_void_t tb_dns_server_dump()
 			if (server)
 			{
 				// trace
-				tb_print("[dns]: server: %u.%u.%u.%u, rate: %u", 	server->addr.u8[0]
+				tb_trace_i("[dns]: server: %u.%u.%u.%u, rate: %u", 	server->addr.u8[0]
 																, 	server->addr.u8[1]
 																, 	server->addr.u8[2]
 																, 	server->addr.u8[3]
@@ -468,7 +468,7 @@ tb_size_t tb_dns_server_get(tb_ipv4_t addr[2])
 	tb_spinlock_leave(&g_lock);
 
 	// trace
-	if (!ok) tb_trace("[dns]: no server!");
+	if (!ok) tb_trace_d("[dns]: no server!");
 
 	// ok?
 	return ok;

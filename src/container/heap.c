@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"heap"
+//#define TB_TRACE_MODULE_NAME 				"heap"
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -131,7 +131,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 		// check?
 		if (heap->func.comp(&heap->func, heap->func.data(&heap->func, data + lchild * step), parent_data) < 0) 
 		{
-			tb_trace_impl("lchild[%lu]: invalid, parent: %lu", lchild, parent);
+			tb_trace_d("lchild[%lu]: invalid, parent: %lu", lchild, parent);
 			break;
 		}
 
@@ -142,7 +142,7 @@ static tb_void_t tb_heap_check(tb_heap_impl_t* heap)
 		// check?
 		if (heap->func.comp(&heap->func, heap->func.data(&heap->func, data + rchild * step), parent_data) < 0) 
 		{
-			tb_trace_impl("rchild[%lu]: invalid, parent: %lu", rchild, parent);
+			tb_trace_d("rchild[%lu]: invalid, parent: %lu", rchild, parent);
 			break;
 		}
 	}

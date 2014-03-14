@@ -23,16 +23,16 @@ static tb_void_t tb_url_test_set(tb_char_t const* url)
 		, 	"rtsp"
 		};
 
-		tb_print("=================================================");
-		tb_print("irl: %s", url);
-		tb_print("orl: %s", tb_url_get(&u));
-		tb_print("poto: %s", poto[tb_url_poto_get(&u)]);
-		tb_print("port: %u", tb_url_port_get(&u));
-		tb_print("host: %s", tb_url_host_get(&u));
-		tb_print("path: %s", tb_url_path_get(&u));
-		tb_print("args: %s", tb_url_args_get(&u));
+		tb_trace_i("=================================================");
+		tb_trace_i("irl: %s", url);
+		tb_trace_i("orl: %s", tb_url_get(&u));
+		tb_trace_i("poto: %s", poto[tb_url_poto_get(&u)]);
+		tb_trace_i("port: %u", tb_url_port_get(&u));
+		tb_trace_i("host: %s", tb_url_host_get(&u));
+		tb_trace_i("path: %s", tb_url_path_get(&u));
+		tb_trace_i("args: %s", tb_url_args_get(&u));
 	}
-	else tb_print("invalid url: %s", url);
+	else tb_trace_i("invalid url: %s", url);
 
 	tb_url_exit(&u);
 }

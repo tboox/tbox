@@ -16,7 +16,7 @@ static tb_cpointer_t tb_tstore_test(tb_cpointer_t data)
 	tb_size_t self = tb_thread_self();
 	
 	// trace
-	tb_print("thread[%lu]: init", self);
+	tb_trace_i("thread[%lu]: init", self);
 
 	// done
 	tb_tstore_data_t* item = tb_null;
@@ -34,13 +34,13 @@ static tb_cpointer_t tb_tstore_test(tb_cpointer_t data)
 		}
 		else 
 		{
-			tb_print("getp: %lu", item->type);
+			tb_trace_i("getp: %lu", item->type);
 		}
 		tb_sleep(1);
 	}
 
 	// trace
-	tb_print("thread[%lu]: exit", self);
+	tb_trace_i("thread[%lu]: exit", self);
 	tb_thread_return(tb_null);
 	return tb_null;
 }

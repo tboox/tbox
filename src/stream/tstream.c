@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_IMPL_TAG 				"tstream"
+#define TB_TRACE_MODULE_NAME 				"tstream"
  
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -152,7 +152,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_impl("writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
+	tb_trace_d("writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
@@ -230,7 +230,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		else 
 		{
 			// trace
-			tb_trace_impl("delay: %lu ms", delay);
+			tb_trace_d("delay: %lu ms", delay);
 
 			// continue to read it
 			if (!tb_astream_read_after(tstream->istream, delay, lrate, tb_tstream_istream_read_func, (tb_pointer_t)tstream)) break;
@@ -264,7 +264,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_impl("sync: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("sync: state: %s", tb_stream_state_cstr(state));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
@@ -282,7 +282,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->ostream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_impl("read: size: %lu, state: %s", real, tb_stream_state_cstr(state));
+	tb_trace_d("read: size: %lu, state: %s", real, tb_stream_state_cstr(state));
 
 	// done
 	tb_bool_t bread = tb_false;
@@ -374,7 +374,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 				else 
 				{
 					// trace
-					tb_trace_impl("delay: %lu ms", delay);
+					tb_trace_d("delay: %lu ms", delay);
 
 					// continue to read it after the delay time
 					if (!tb_astream_read_after(tstream->istream, delay, lrate, tb_tstream_istream_read_func, tstream)) break;
@@ -431,7 +431,7 @@ static tb_bool_t tb_tstream_istream_open_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->func.open.func, tb_false);
 
 	// trace
-	tb_trace_impl("open: istream: offset: %llu, state: %s", offset, tb_stream_state_cstr(state));
+	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_stream_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -481,7 +481,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->func.open.func, tb_false);
 
 	// trace
-	tb_trace_impl("open: ostream: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("open: ostream: state: %s", tb_stream_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -534,7 +534,7 @@ static tb_bool_t tb_tstream_send_file_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(tstream && tstream->file && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_impl("send: file: real: %llu, size: %llu, state: %s", aice->u.sendf.real, aice->u.sendf.size, tb_aice_state_cstr(aice));
+	tb_trace_d("send: file: real: %llu, size: %llu, state: %s", aice->u.sendf.real, aice->u.sendf.size, tb_aice_state_cstr(aice));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_aico_aicp(aice->aico));
@@ -611,7 +611,7 @@ static tb_bool_t tb_tstream_send_file_func(tb_aice_t const* aice)
 			else 
 			{
 				// trace
-				tb_trace_impl("delay: %lu ms", delay);
+				tb_trace_d("delay: %lu ms", delay);
 
 				// the offset
 				tb_hize_t offset = aice->u.sendf.seek + aice->u.sendf.real;
@@ -669,7 +669,7 @@ static tb_bool_t tb_tstream_open_func(tb_size_t state, tb_hize_t offset, tb_hong
 	tb_assert_and_check_return_val(tstream, tb_false);
 
 	// trace
-	tb_trace_impl("open: offset: %llu, size: %lld, state: %s", offset, size, tb_stream_state_cstr(state));
+	tb_trace_d("open: offset: %llu, size: %lld, state: %s", offset, size, tb_stream_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
@@ -1684,7 +1684,7 @@ tb_void_t tb_tstream_kill(tb_handle_t handle)
 	if (!tb_atomic_fetch_and_set(&tstream->stoped, 1))
 	{
 		// trace
-		tb_trace_impl("kill: ..");
+		tb_trace_d("kill: ..");
 
 		// kill istream
 		if (tstream->istream && tb_stream_mode(tstream->istream) == TB_STREAM_MODE_AICO) 
@@ -1705,7 +1705,7 @@ tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
 	tb_assert_and_check_return(tstream);
 
 	// trace
-	tb_trace_impl("clos: ..");
+	tb_trace_d("clos: ..");
 
 	// kill it first 
 	tb_tstream_kill(tstream);
@@ -1730,7 +1730,7 @@ tb_void_t tb_tstream_clos(tb_handle_t handle, tb_bool_t bcalling)
 	tstream->aico = tb_null;
 
 	// trace
-	tb_trace_impl("clos: ok");
+	tb_trace_d("clos: ok");
 }
 tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
@@ -1739,7 +1739,7 @@ tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bcalling)
 	tb_assert_and_check_return(tstream);
 
 	// trace
-	tb_trace_impl("exit: ..");
+	tb_trace_d("exit: ..");
 
 	// close it first 
 	tb_tstream_clos(tstream, bcalling);
@@ -1769,7 +1769,7 @@ tb_void_t tb_tstream_exit(tb_handle_t handle, tb_bool_t bcalling)
 	tb_free(tstream);
 
 	// trace
-	tb_trace_impl("exit: ok");
+	tb_trace_d("exit: ok");
 }
 tb_void_t tb_tstream_pause(tb_handle_t handle)
 {

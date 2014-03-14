@@ -394,7 +394,7 @@ tb_void_t tb_stream_kill(tb_handle_t handle)
 	tb_check_return(!tb_atomic_fetch_and_set(&stream->bstoped, 1));
 
 	// trace
-	tb_trace_impl("kill: ..");
+	tb_trace_d("kill: ..");
 
 	// kill it
 	if (stream->kill) stream->kill(stream);

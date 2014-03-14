@@ -45,7 +45,7 @@ end:
 #endif
 
 	// trace
-	tb_print("gpool: %lld ms", time);
+	tb_trace_i("gpool: %lld ms", time);
 	
 	// exit
 	tb_gpool_exit(gpool);

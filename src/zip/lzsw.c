@@ -342,7 +342,7 @@ static tb_bstream_t* tb_gstream_filter_zip_inflate_lzsw_transform(tb_gstream_fil
 			// get size
 			tb_size_t n = vlc_get(vlc, src) + 2;
 
-			//tb_trace("%d %d", p, n);
+			//tb_trace_d("%d %d", p, n);
 #if 0 
 			// fill data
 			// @note: address maybe overlap
@@ -454,7 +454,7 @@ static tb_bstream_t* tb_gstream_filter_zip_deflate_lzsw_transform(tb_gstream_fil
 			// update sp
 			sp += n;
 
-			//tb_trace("%d %d", p, n);
+			//tb_trace_d("%d %d", p, n);
 		}
 		else
 		{
@@ -489,7 +489,7 @@ static tb_bstream_t* tb_gstream_filter_zip_deflate_lzsw_transform(tb_gstream_fil
 		window->wn = wn;
 		window->wb = (wn == TB_LZSW_WINDOW_SIZE_MAX)? window->mb : TB_MATH_ICLOG2I(wn);
 		window->base = (window->base + TB_LZSW_WINDOW_SIZE_MAX - ln) % TB_LZSW_WINDOW_SIZE_MAX;
-		//tb_trace("[window]: at: %d, base: %d, ln: %d, rn: %d, coff0: %d", wb - sb, window->base, ln, rn, tb_lzsw_window_coff(window->base, 0));
+		//tb_trace_d("[window]: at: %d, base: %d, ln: %d, rn: %d, coff0: %d", wb - sb, window->base, ln, rn, tb_lzsw_window_coff(window->base, 0));
 
 
 		// insert the new nodes

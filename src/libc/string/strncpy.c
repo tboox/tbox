@@ -92,7 +92,7 @@ tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 		tb_size_t n1 = tb_malloc_data_size(s1);
 		if (n1 && n + 1 > n1)
 		{
-			tb_print("[strncpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
+			tb_trace_i("[strncpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
 			tb_backtrace_dump("[strncpy]: [overflow]: ", tb_null, 10);
 			tb_malloc_data_dump(s2, "\t[malloc]: [from]: ");
 			tb_abort();

@@ -10,7 +10,7 @@ tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
 {
 	// hello
 	tb_char_t const* hello = tb_scache_put("hello world");
-	tb_print("hello: %s", hello);
+	tb_trace_i("hello: %s", hello);
 
 	// clear rand
 	tb_rand_clear();
@@ -31,7 +31,7 @@ tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
 #endif
 	}
 	t = tb_mclock() - t;
-	tb_print("time: %lld", t);
+	tb_trace_i("time: %lld", t);
 
 	// del hello
 	tb_scache_del(hello);

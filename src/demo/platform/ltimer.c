@@ -16,7 +16,7 @@ static tb_void_t tb_demo_ltimer_task_func(tb_bool_t killed, tb_pointer_t data)
 		tb_hong_t val = ((tb_hong_t)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
 		// trace
-		tb_print("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
+		tb_trace_i("task[%s]: %lld ms, killed: %d", (tb_char_t const*)data, val, killed);
 	}
 }
 static tb_pointer_t tb_demo_ltimer_loop(tb_pointer_t data)
@@ -50,7 +50,7 @@ tb_int_t tb_demo_platform_ltimer_main(tb_int_t argc, tb_char_t** argv)
 		tb_size_t delay 		= tb_ltimer_delay(timer);
 
 		// trace
-		tb_print("limit: %lu, delay: %lu", limit, delay);
+		tb_trace_i("limit: %lu, delay: %lu", limit, delay);
 
 		// add task: every
 		tb_ltimer_task_run(timer, 1 * delay, tb_true, tb_demo_ltimer_task_func, "every");
