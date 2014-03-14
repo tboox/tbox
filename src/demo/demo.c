@@ -226,23 +226,23 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 	// no this demo? help it
 	if (!name)
 	{
-		tb_print("======================================================================");
-		tb_print("help: echo \"name\" > ./.demo");
-		tb_print("help:     ./demo.b args ...");
-		tb_print("help: or");
-		tb_print("help: ./demo.b name args ...");
-		tb_print("help: ");
-		tb_print("help: example: echo \"stream_gstream\" > ./.demo");
-		tb_print("help: example:     ./demo.b --help");
-		tb_print("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
-		tb_print("help: example: or");
-		tb_print("help: example: ./demo.b stream_gstream http://www.xxxxx.com /tmp/a");
-		tb_print("help: ");
+		tb_trace_i("======================================================================");
+		tb_trace_i("help: echo \"name\" > ./.demo");
+		tb_trace_i("help:     ./demo.b args ...");
+		tb_trace_i("help: or");
+		tb_trace_i("help: ./demo.b name args ...");
+		tb_trace_i("help: ");
+		tb_trace_i("help: example: echo \"stream_gstream\" > ./.demo");
+		tb_trace_i("help: example:     ./demo.b --help");
+		tb_trace_i("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
+		tb_trace_i("help: example: or");
+		tb_trace_i("help: example: ./demo.b stream_gstream http://www.xxxxx.com /tmp/a");
+		tb_trace_i("help: ");
 
 		// walk name
 		tb_size_t i = 0;
 		tb_size_t n = tb_arrayn(g_demo);
-		for (i = 0; i < n; i++) tb_print("help: name: %s", g_demo[i].name);
+		for (i = 0; i < n; i++) tb_trace_i("help: name: %s", g_demo[i].name);
 	}
 
 	// exit tbox

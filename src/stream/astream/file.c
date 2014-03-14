@@ -24,7 +24,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_IMPL_TAG 				"afile"
+#define TB_TRACE_MODULE_NAME 				"astream_file"
+#define TB_TRACE_MODULE_DEBUG 				(0)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -167,7 +168,7 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 		state = TB_STREAM_STATE_KILLED;
 		break;
 	default:
-		tb_trace_impl("read: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("read: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
  
@@ -227,7 +228,7 @@ static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 		state = TB_STREAM_STATE_KILLED;
 		break;
 	default:
-		tb_trace_impl("writ: unknown state: %s", tb_aice_state_cstr(aice));
+		tb_trace_d("writ: unknown state: %s", tb_aice_state_cstr(aice));
 		break;
 	}
 

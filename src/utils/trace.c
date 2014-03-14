@@ -199,6 +199,14 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		// append format
 		if (p < e) p += tb_vsnprintf(p, e - p, format, l);
 
+		// append '\r'
+#ifdef TB_CONFIG_OS_WINDOWS
+		if (p < e) *p++ = '\r';
+#endif
+
+		// append '\n'
+		if (p < e) *p++ = '\n';
+
 		// append end
 		if (p < e) *p = '\0'; e[-1] = '\0';
 
