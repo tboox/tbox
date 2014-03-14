@@ -26,6 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 				"aicp_http"
+#define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -886,7 +887,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 			state = TB_STREAM_STATE_OK;
 
 			// dump status
-#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
+#if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
 			tb_aicp_http_status_dump(http);
 #endif
 		}
@@ -1180,7 +1181,6 @@ static tb_bool_t tb_aicp_http_task_func(tb_astream_t* astream, tb_size_t state, 
 	// done func
 	return http->func.task(http, state, http->priv);
 }
-#if 0
 static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 {
 	// check
@@ -1208,95 +1208,7 @@ static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
-#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
-		tb_aicp_http_option_dump(http);
-#endif
-
-		// clear status
-		tb_aicp_http_status_cler(http, host_changed);
-
-		// get?
-		if (http->option.method == TB_HTTP_METHOD_GET)
-		{
-			// the head data and size
-			tb_size_t 			head_size = 0;
-			tb_char_t const* 	head_data = tb_aicp_http_head_format(http, 0, &head_size, tb_null);
-			tb_check_break(head_data && head_size);
-			
-			// trace
-			tb_trace_d("request:\n%s", head_data);
-
-			// post writ head
-			ok = tb_astream_owrit(http->stream, head_data, head_size, tb_aicp_http_head_writ_func, http);
-		}
-		// post?
-		else if (http->option.method == TB_HTTP_METHOD_POST)
-		{
-			// check
-			tb_assert_and_check_break(!http->tstream && !http->post_file);
-
-			// init tstream
-//			tb_bool_t 			bssl = tb_false;
-//			tb_handle_t 		sock = tb_null;
-			tb_char_t const* 	url = tb_url_get(&http->option.post_url);
-			if (http->option.post_data && http->option.post_size)
-				http->tstream = tb_tstream_init_da(http->option.post_data, http->option.post_size, http->stream, 0);
-#if 0 // FIXME: need open ostream first
-			else if ( 	url 
-					&& 	http->stream == http->sstream
-					&& 	tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_GET_SSL, &bssl) && !bssl
-					&& 	tb_stream_ctrl(http->sstream, TB_STREAM_CTRL_SOCK_GET_HANDLE, &sock) && sock
-					&& 	(http->post_file = tb_file_init(url, TB_FILE_MODE_RO | TB_FILE_MODE_BINARY)))
-			{
-				// optimization: file => sock
-				http->tstream = tb_tstream_init_fs(tb_astream_aicp(http->stream), http->post_file, sock, tb_stream_timeout(http->stream), 0);
-			}
-#endif
-			else if (url) http->tstream = tb_tstream_init_ua(url, http->stream, 0);
-			tb_assert_and_check_break(http->tstream);
-
-			// limit rate
-			if (http->option.post_lrate) tb_tstream_limit(http->tstream, http->option.post_lrate);
-
-			// open tstream
-			ok = tb_tstream_open(http->tstream, tb_aicp_http_post_open_func, http);
-		}
-		else tb_assert_and_check_break(0);
-
-	} while (0);
-
-	// ok?
-	return ok;
-}
-#else
-static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
-{
-	// check
-	tb_assert_and_check_return_val(http && http->func.open, tb_false);
-
-	// done
-	tb_bool_t ok = tb_false;
-	do
-	{
-		// check stream
-		tb_assert_and_check_break(http->stream && http->stream == http->sstream);
-
-		// the host is changed?
-		tb_bool_t 			host_changed = tb_true;
-		tb_char_t const* 	host_old = tb_null;
-		tb_char_t const* 	host_new = tb_url_host_get(&http->option.url);
-		tb_stream_ctrl(http->stream, TB_STREAM_CTRL_GET_HOST, &host_old);
-		if (host_old && host_new && !tb_stricmp(host_old, host_new)) host_changed = tb_false;
-
-		// trace
-		tb_trace_d("connect: host: %s", host_changed? "changed" : "keep");
-
-		// ctrl stream
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_URL, tb_url_get(&http->option.url))) break;
-		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
-
-		// dump option
-#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
+#if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
 		tb_aicp_http_option_dump(http);
 #endif
 
@@ -1311,7 +1223,6 @@ static tb_bool_t tb_aicp_http_open_done(tb_aicp_http_t* http)
 	// ok?
 	return ok;
 }
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

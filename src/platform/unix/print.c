@@ -56,4 +56,25 @@ tb_void_t tb_print(tb_char_t const* string)
 	// flush the stdout
 	fflush(stdout);
 }
+tb_void_t tb_printl(tb_char_t const* string)
+{
+	// check
+	tb_check_return(string);
 
+#if defined(TB_CONFIG_OS_ANDROID)
+	// print to the android device log
+	__android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s\n", string);
+#elif defined(TB_CONFIG_OS_IOS)
+	// print to the ios device log
+	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, "%s\n", string);
+#endif
+
+	// print string to the stdout
+	fputs(string, stdout);
+
+	// print newline to the stdout
+	fputs("\n", stdout);
+
+	// flush the stdout
+	fflush(stdout);
+}

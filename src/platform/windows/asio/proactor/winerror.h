@@ -163,7 +163,7 @@ static __tb_inline__ tb_size_t tb_winerror_from_nsstatus(tb_size_t status)
 		}
 		else
 		{
-			tb_trace("ntstatus: unknown: %lx", status);
+			tb_trace_e("ntstatus: unknown: %lx", status);
 			return WSAEINVAL;
 		}
 	}

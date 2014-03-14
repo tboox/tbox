@@ -25,7 +25,9 @@
  * trace
  */
 #undef TB_TRACE_MODULE_NAME
-#define TB_TRACE_MODULE_NAME 				"aicp_file"
+#undef TB_TRACE_MODULE_DEBUG
+#define TB_TRACE_MODULE_NAME 			"aicp_file"
+#define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes

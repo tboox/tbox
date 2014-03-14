@@ -17,33 +17,44 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		print.h
- * @ingroup 	platform
+ * @file		print.c
  *
  */
-#ifndef TB_PLATFORM_PRINT_H
-#define TB_PLATFORM_PRINT_H
-
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
+#include "../print.h"
+#include <windows.h>
+#include <stdio.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * implementation
  */
+tb_void_t tb_print(tb_char_t const* string)
+{
+	// check
+	tb_check_return(string);
 
-/*! print string and without newline
- *
- * @param string 	the print string
- */
-tb_void_t 			tb_print(tb_char_t const* string);
+	// print to the stdout
+	fputs(string, stdout);
 
-/*! print string and newline
- *
- * @param string 	the print string
- */
-tb_void_t 			tb_printl(tb_char_t const* string);
+	// flush the stdout
+	fflush(stdout);
+}
+tb_void_t tb_printl(tb_char_t const* string)
+{
+	// check
+	tb_check_return(string);
 
-#endif
+	// print string to the stdout
+	fputs(string, stdout);
+
+	// print newline to the stdout
+	fputs("\r\n", stdout);
+
+	// flush the stdout
+	fflush(stdout);
+}
+

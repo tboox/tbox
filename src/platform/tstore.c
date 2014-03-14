@@ -25,7 +25,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-//#define TB_TRACE_MODULE_NAME 			"tstore"
+#define TB_TRACE_MODULE_NAME 			"tstore"
+#define TB_TRACE_MODULE_DEBUG 			(0)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -73,7 +74,7 @@ tb_bool_t tb_tstore_init()
 	if (!g_store) 
 	{
 		// init store
-		g_store = tb_hash_init(8, tb_item_func_ptr(tb_null, tb_null), tb_item_func_ptr(tb_tstore_free, tb_null));
+		g_store = tb_hash_init(8, tb_item_func_size(), tb_item_func_ptr(tb_tstore_free, tb_null));
 	}
 
 	// leave lock
@@ -100,7 +101,7 @@ tb_void_t tb_tstore_setp(tb_tstore_data_t const* data)
 	tb_spinlock_enter(&g_lock);
 
 	// get data
-	if (g_store) tb_hash_set(g_store, tb_thread_self(), data);
+	if (g_store) tb_hash_set(g_store, (tb_pointer_t)tb_thread_self(), data);
 
 	// leave lock
 	tb_spinlock_leave(&g_lock);
@@ -114,7 +115,7 @@ tb_tstore_data_t* tb_tstore_getp()
 	tb_spinlock_enter(&g_lock);
 
 	// get data
-	if (g_store) data = tb_hash_get(g_store, tb_thread_self());
+	if (g_store) data = tb_hash_get(g_store, (tb_pointer_t)tb_thread_self());
 
 	// leave lock
 	tb_spinlock_leave(&g_lock);

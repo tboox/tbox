@@ -26,6 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 			"http"
+#define TB_TRACE_MODULE_DEBUG 			(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -252,7 +253,7 @@ static tb_bool_t tb_http_connect(tb_http_t* http)
 		if (!tb_stream_ctrl(http->stream, TB_STREAM_CTRL_SET_TIMEOUT, http->option.timeout)) break;
 
 		// dump option
-#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
+#if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
 		tb_http_option_dump(http);
 #endif
 		
@@ -700,7 +701,7 @@ static tb_bool_t tb_http_response(tb_http_t* http)
 				tb_trace_d("response: ok");
 
 				// dump status
-#if defined(__tb_debug__) && defined(TB_TRACE_MODULE_NAME)
+#if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
 				tb_http_status_dump(http);
 #endif
 

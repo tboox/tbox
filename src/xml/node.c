@@ -26,6 +26,7 @@
  * trace
  */
 #define TB_TRACE_MODULE_NAME 		"xml"
+#define TB_TRACE_MODULE_DEBUG 		(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -83,7 +84,7 @@ tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
 	if (cdata) tb_pstring_cstrcpy(&node->data, cdata);
 
 	// ok
-	return cdata;
+	return node;
 }
 tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
 {
