@@ -119,6 +119,10 @@ tbox_C_FILES 			+= \
 						libc/misc/time/gmmktime \
 						libc/misc/time/gmtime \
 						libc/misc/time/localtime \
+						libc/stdio/puts \
+						libc/stdio/wputs \
+						libc/stdio/printf \
+						libc/stdio/wprintf \
 						libc/stdio/sprintf \
 						libc/stdio/snprintf \
 						libc/stdio/swprintf \
@@ -243,7 +247,6 @@ tbox_C_FILES 			+= \
 						platform/sched \
 						platform/timer \
 						platform/ltimer \
-						platform/printf \
 						platform/tstore \
 						platform/platform \
 						platform/backtrace \
@@ -257,7 +260,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_EVENT)/epool \
 						platform/$(TB_CONFIG_API_SEMAPHORE)/semaphore \
 						platform/$(TB_CONFIG_API_TIME)/time \
-						platform/$(TB_CONFIG_API_PRINTF)/printf \
+						platform/$(TB_CONFIG_API_PRINT)/print \
 						platform/$(TB_CONFIG_API_FILE)/directory \
 						platform/$(TB_CONFIG_API_PROCESS)/process \
 						platform/$(TB_CONFIG_API_ASIO)/asio/reactor/aioo \
@@ -368,7 +371,7 @@ INC_FILES 				= \
 						platform/socket.h \
 						platform/event.h \
 						platform/epool.h \
-						platform/printf.h \
+						platform/print.h \
 						platform/atomic.h \
 						platform/barrier.h \
 						platform/dynamic.h \

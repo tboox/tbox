@@ -16,7 +16,7 @@ TB_CONFIG_API_ASIO 				= windows
 TB_CONFIG_API_TIME				= windows
 TB_CONFIG_API_EVENT 			= windows
 TB_CONFIG_API_SEMAPHORE 		= windows
-TB_CONFIG_API_PRINTF 			= windows
+TB_CONFIG_API_PRINT 			= windows
 TB_CONFIG_API_PROCESS 			= windows
 TB_CONFIG_API_MEMORY 			= windows
 
