@@ -210,8 +210,8 @@ tb_void_t tb_trace_done(tb_char_t const* prefix, tb_char_t const* module, tb_cha
 		// append end
 		if (p < e) *p = '\0'; e[-1] = '\0';
 
-		// trace it, TODO: ...
-		tb_printf("%s", g_line);
+		// print it
+		tb_print(g_line);
 
 		// exit
 		tb_va_end(l);

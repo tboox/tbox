@@ -17,33 +17,43 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		printf.c
- *
+ * @file		print.c
+ * @ingroup 	platform
  */
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "printf.h"
-#include "../libc/libc.h"
+#include "prefix.h"
+#include "../print.h"
+#include <unistd.h>
+#include <stdio.h>
+#if defined(TB_CONFIG_OS_ANDROID)
+# 	include <android/log.h>     
+#elif defined(TB_CONFIG_OS_IOS)
+# 	include <asl.h>
+#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_void_t tb_wprintf(tb_wchar_t const* format, ...)
+tb_void_t tb_print(tb_char_t const* string)
 {
-	// format info
-	tb_long_t 	size = 0;
-	tb_wchar_t 	info[8192] = {0};
-	tb_vswprintf_format(info, 8191, format, &size);
-	if (size >= 0 && size < 8192) info[size] = L'\0';
+	// check
+	tb_check_return(string);
 
-	// wtoa
-	tb_char_t text[8192] = {0};
-	size = tb_wtoa(text, info, 8191);
-	if (size >= 0 && size < 8192) text[size] = '\0';
+#if defined(TB_CONFIG_OS_ANDROID)
+	// print to the android device log
+	__android_log_print(ANDROID_LOG_DEBUG, TB_TRACE_PREFIX? TB_TRACE_PREFIX : "tbox", "%s", string);
+#elif defined(TB_CONFIG_OS_IOS)
+	// print to the ios device log
+	asl_log(tb_null, tb_null, ASL_LEVEL_WARNING, string);
+#endif
 
-	// printf
-	tb_printf("%s", text);
+	// print to the stdout
+	fputs(string, stdout);
+
+	// flush the stdout
+	fflush(stdout);
 }
 
