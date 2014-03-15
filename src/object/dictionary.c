@@ -21,7 +21,7 @@
  * @ingroup 	object
  *
  */
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -72,11 +72,11 @@ static tb_object_t* tb_dictionary_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// init copy
-	tb_dictionary_t* copy = tb_dictionary_init(dictionary->size, dictionary->incr);
+	tb_dictionary_t* copy = (tb_dictionary_t*)tb_dictionary_init(dictionary->size, dictionary->incr);
 	tb_assert_and_check_return_val(copy, tb_null);
 
 	// walk copy
-	tb_iterator_t* 	iterator 	= tb_dictionary_itor(dictionary);
+	tb_iterator_t* 	iterator 	= tb_dictionary_itor((tb_object_t*)dictionary);
 	tb_size_t 		itor 		= tb_iterator_head(iterator);
 	tb_size_t 		tail 		= tb_iterator_tail(iterator);
 	for (; itor != tail; itor = tb_iterator_next(iterator, itor))
@@ -88,15 +88,16 @@ static tb_object_t* tb_dictionary_copy(tb_object_t* object)
 			if (item->val) tb_object_inc(item->val);
 
 			// copy
-			tb_dictionary_set(copy, item->key, item->val);
+			tb_dictionary_set((tb_object_t*)copy, item->key, item->val);
 		}
 	}
 
 	// ok
-	return copy;
+	return (tb_object_t*)copy;
 }
 static tb_void_t tb_dictionary_exit(tb_object_t* object)
 {
+	// check
 	tb_dictionary_t* dictionary = tb_dictionary_cast(object);
 	tb_assert_and_check_return(dictionary);
 
@@ -105,7 +106,7 @@ static tb_void_t tb_dictionary_exit(tb_object_t* object)
 	dictionary->hash = tb_null;
 
 	// exit it
-	tb_opool_del(dictionary);
+	tb_opool_del((tb_object_t*)dictionary);
 }
 static tb_void_t tb_dictionary_cler(tb_object_t* object)
 {
@@ -118,7 +119,7 @@ static tb_void_t tb_dictionary_cler(tb_object_t* object)
 static tb_dictionary_t* tb_dictionary_init_base()
 {
 	// make
-	tb_dictionary_t* dictionary = tb_opool_get(sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
+	tb_dictionary_t* dictionary = (tb_dictionary_t*)tb_opool_get(sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// init base
@@ -200,7 +201,7 @@ static tb_object_t* tb_dictionary_read_xml(tb_object_xml_reader_t* reader, tb_si
 				if (key)
 				{
 					// text
-					tb_char_t* text = tb_xml_reader_text(reader->reader);
+					tb_char_t const* text = tb_xml_reader_text(reader->reader);
 					tb_assert_and_check_goto(text, end);
 
 					// writ key name
@@ -637,6 +638,160 @@ static tb_bool_t tb_dictionary_writ_jsn(tb_object_jsn_writer_t* writer, tb_objec
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_dictionary_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO, tb_false);
+
+	// init key name
+	tb_sstring_t 	kname;
+	tb_char_t 		kdata[8192];
+	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
+
+	// init dictionary
+	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_false);
+	tb_assert_and_check_return_val(dictionary, tb_null);
+
+	// walk
+	tb_bool_t 	ok = tb_false;
+	tb_bool_t 	key = tb_false;
+	while (!ok && (event = tb_xml_reader_next(reader->reader)))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				tb_trace_d("%s", name);
+
+				// is key
+				if (!tb_stricmp(name, "key")) key = tb_true;
+				else if (!key)
+				{
+					// func
+					tb_object_xplist_reader_func_t func = tb_object_get_xplist_reader(name);
+					tb_assert_and_check_goto(func, end);
+
+					// read
+					tb_object_t* object = func(reader, event);
+					tb_trace_d("%s => %p", tb_sstring_cstr(&kname), object);
+					tb_assert_and_check_goto(object, end);
+
+					// set key & value
+					if (tb_sstring_size(&kname) && dictionary) 
+						tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), object);
+
+					// clear key name
+					tb_sstring_clear(&kname);
+				}
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "dict")) ok = tb_true;
+				else if (!tb_stricmp(name, "key")) key = tb_false;
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				if (key)
+				{
+					// text
+					tb_char_t const* text = tb_xml_reader_text(reader->reader);
+					tb_assert_and_check_goto(text, end);
+
+					// writ key name
+					tb_sstring_cstrcpy(&kname, text);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// fail
+	if (!ok) 
+	{
+		tb_object_exit(dictionary);
+		dictionary = tb_null;
+	}
+
+	// exit key name
+	tb_sstring_exit(&kname);
+
+	// ok?
+	return dictionary;
+}
+static tb_bool_t tb_dictionary_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	if (tb_dictionary_size(object))
+	{
+		// writ beg
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<dict>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// walk
+		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
+			if (item && item->key && item->val)
+			{
+				// func
+				tb_object_xplist_writer_func_t func = tb_object_get_xplist_writer(item->val->type);
+				tb_assert_and_check_continue(func);
+
+				// writ key
+				tb_object_writ_tab(writer->stream, writer->deflate, level + 1);
+				tb_gstream_printf(writer->stream, "<key>%s</key>", item->key);
+				tb_object_writ_newline(writer->stream, writer->deflate);
+
+				// writ val
+				if (!func(writer, item->val, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "</dict>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<dict/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -645,6 +800,7 @@ tb_bool_t tb_dictionary_init_reader()
 	if (!tb_object_set_xml_reader("dict", tb_dictionary_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_read_bin)) return tb_false;
 	if (!tb_object_set_jsn_reader('{', tb_dictionary_read_jsn)) return tb_false;
+	if (!tb_object_set_xplist_reader("dict", tb_dictionary_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_dictionary_init_writer()
@@ -652,6 +808,7 @@ tb_bool_t tb_dictionary_init_writer()
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_bin)) return tb_false;
 	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_jsn)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_DICTIONARY, tb_dictionary_writ_xplist)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
@@ -669,11 +826,11 @@ tb_object_t* tb_dictionary_init(tb_size_t size, tb_size_t incr)
 	tb_assert_and_check_goto(dictionary->hash, fail);
 
 	// ok
-	return dictionary;
+	return (tb_object_t*)dictionary;
 
 fail:
 	// no
-	tb_dictionary_exit(dictionary);
+	tb_dictionary_exit((tb_object_t*)dictionary);
 	return tb_null;
 }
 

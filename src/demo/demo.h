@@ -91,6 +91,8 @@ TB_DEMO_MAIN_DECL(other_charset);
 TB_DEMO_MAIN_DECL(object_jsn);
 TB_DEMO_MAIN_DECL(object_bin);
 TB_DEMO_MAIN_DECL(object_xml);
+TB_DEMO_MAIN_DECL(object_xplist);
+TB_DEMO_MAIN_DECL(object_bplist);
 TB_DEMO_MAIN_DECL(object_dump);
 
 // stream

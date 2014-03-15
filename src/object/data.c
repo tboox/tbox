@@ -21,7 +21,7 @@
  * @ingroup 	object
  *
  */
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -178,7 +178,8 @@ static tb_bool_t tb_data_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* o
 	{
 		// writ beg
 		tb_object_writ_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<data>\n");
+		tb_gstream_printf(writer->stream, "<data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 
 		// decode base64 data
 		tb_byte_t const* 	ib = tb_data_getp(object);
@@ -197,25 +198,27 @@ static tb_bool_t tb_data_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* o
 		{
 			if (!(n & 63))
 			{
-				if (n) tb_gstream_printf(writer->stream, "\n");
+				if (n) tb_object_writ_newline(writer->stream, writer->deflate);
 				tb_object_writ_tab(writer->stream, writer->deflate, level);
 			}
 			tb_gstream_printf(writer->stream, "%c", *p);
 		}
-		tb_gstream_printf(writer->stream, "\n");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 
 		// free it
 		tb_free(ob);
 					
 		// writ end
 		tb_object_writ_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "</data>\n");
+		tb_gstream_printf(writer->stream, "</data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 	else 
 	{
 		// writ
 		tb_object_writ_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<data/>\n");
+		tb_gstream_printf(writer->stream, "<data/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
 	}
 
 	// ok
@@ -302,6 +305,143 @@ static tb_bool_t tb_data_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* o
 	// writ it
 	return tb_gstream_bwrit(writer->stream, writer->data, size);
 }
+static tb_object_t* tb_data_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_data_init_from_data(tb_null, 0);
+
+	// walk
+	tb_char_t* 		base64 	= tb_null;
+	tb_object_t* 	data 	= tb_null;
+	while (event = tb_xml_reader_next(reader->reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "data"))
+				{
+					// empty?
+					if (!data) data = tb_data_init_from_data(tb_null, 0);
+					goto end;
+				}
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_d("data: %s", text);
+
+				// base64
+				base64 = tb_strdup(text);
+				tb_char_t* p = base64;
+				tb_char_t* q = p;
+				for (; *p; p++) if (!tb_isspace(*p)) *q++ = *p;
+				*q = '\0';
+
+				// decode base64 data
+				tb_char_t const* 	ib = base64;
+				tb_size_t 			in = tb_strlen(base64); 
+				if (in)
+				{
+					tb_size_t 			on = in;
+					tb_byte_t* 			ob = tb_malloc0(on);
+					tb_assert_and_check_goto(ob && on, end);
+					on = tb_base64_decode(ib, in, ob, on);
+					tb_trace_d("base64: %u => %u", in, on);
+
+					// init data
+					data = tb_data_init_from_data(ob, on); tb_free(ob);
+				}
+				else data = tb_data_init_from_data(tb_null, 0);
+				tb_assert_and_check_goto(data, end);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// free
+	if (base64) tb_free(base64);
+
+	// ok?
+	return data;
+}
+static tb_bool_t tb_data_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// no empty?
+	if (tb_data_size(object))
+	{
+		// writ beg
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// decode base64 data
+		tb_byte_t const* 	ib = tb_data_getp(object);
+		tb_size_t 			in = tb_data_size(object); 
+		tb_size_t 			on = in << 1;
+		tb_char_t* 			ob = tb_malloc0(on);
+		tb_assert_and_check_return_val(ob && on, tb_false);
+		on = tb_base64_encode(ib, in, ob, on);
+		tb_trace_d("base64: %u => %u", in, on);
+
+		// writ data
+		tb_char_t const* 	p = ob;
+		tb_char_t const* 	e = ob + on;
+		tb_size_t 			n = 0;
+		for (; p < e && *p; p++, n++)
+		{
+			if (!(n % 68))
+			{
+				if (n) tb_object_writ_newline(writer->stream, writer->deflate);
+				tb_object_writ_tab(writer->stream, writer->deflate, level);
+			}
+			tb_gstream_printf(writer->stream, "%c", *p);
+		}
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// free it
+		tb_free(ob);
+					
+		// writ end
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "</data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		// writ
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "</data>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -309,12 +449,14 @@ tb_bool_t tb_data_init_reader()
 {
 	if (!tb_object_set_xml_reader("data", tb_data_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DATA, tb_data_read_bin)) return tb_false;
+	if (!tb_object_set_xplist_reader("data", tb_data_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_data_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_DATA, tb_data_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DATA, tb_data_writ_bin)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_DATA, tb_data_writ_xplist)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_data_init_from_url(tb_char_t const* url)

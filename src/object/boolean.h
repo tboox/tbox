@@ -51,19 +51,19 @@ tb_bool_t 			tb_boolean_init_writer(tb_noarg_t);
  *
  * @return 			the boolean object
  */
-tb_object_t const* 	tb_boolean_init(tb_bool_t value);
+tb_object_t* 		tb_boolean_init(tb_bool_t value);
 
 /*! the boolean value: true
  *
  * @return 			the boolean object
  */
-tb_object_t const* 	tb_boolean_true(tb_noarg_t);
+tb_object_t* 		tb_boolean_true(tb_noarg_t);
 
 /*! the boolean value: false
  *
  * @return 			the boolean object
  */
-tb_object_t const* 	tb_boolean_false(tb_noarg_t);
+tb_object_t* 		tb_boolean_false(tb_noarg_t);
 
 /*! the boolean value
  *

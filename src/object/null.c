@@ -21,7 +21,7 @@
  * @ingroup 	object
  *
  */
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -46,7 +46,7 @@ static tb_object_t* tb_null_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
 
 	// ok
-	return tb_null_init();
+	return (tb_object_t*)tb_null_init();
 }
 static tb_bool_t tb_null_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
@@ -67,7 +67,7 @@ static tb_object_t* tb_null_read_bin(tb_object_bin_reader_t* reader, tb_size_t t
 	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
 	// ok
-	return tb_null_init();
+	return (tb_object_t*)tb_null_init();
 }
 static tb_bool_t tb_null_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
@@ -175,8 +175,8 @@ tb_bool_t tb_null_init_writer()
 	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_NULL, tb_null_writ_jsn)) return tb_false;
 	return tb_true;
 }
-tb_object_t const* tb_null_init()
+tb_object_t* tb_null_init()
 {
-	return &g_null;
+	return (tb_object_t*)&g_null;
 }
 

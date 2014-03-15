@@ -21,7 +21,7 @@
  * @ingroup 	object
  *
  */
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -54,6 +54,18 @@ static tb_handle_t 				g_object_jsn_reader = tb_null;
 
 // the object jsn writer
 static tb_handle_t 				g_object_jsn_writer = tb_null;
+
+// the object xplist reader
+static tb_handle_t 				g_object_xplist_reader = tb_null;
+
+// the object xplist writer
+static tb_handle_t 				g_object_xplist_writer = tb_null;
+
+// the object bplist reader
+static tb_handle_t 				g_object_bplist_reader = tb_null;
+
+// the object bplist writer
+static tb_handle_t 				g_object_bplist_writer = tb_null;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -257,6 +269,95 @@ static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* stream, t
 	// ok
 	return ok;
 }
+static tb_object_t* tb_object_read_xplist(tb_gstream_t* stream)
+{
+	// init reader 
+	tb_object_xplist_reader_t reader = {0};
+	reader.reader = tb_xml_reader_init(stream);
+	tb_assert_and_check_return_val(reader.reader, tb_null);
+
+	// init object
+	tb_object_t* object = tb_null;
+
+	// walk
+	tb_size_t event = TB_XML_READER_EVENT_NONE;
+	while (!object && (event = tb_xml_reader_next(reader.reader)))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader.reader);
+				tb_assert_and_check_goto(name, end);
+
+				// <plist/> ?
+				if (tb_stricmp(name, "plist"))
+				{
+					// func
+					tb_object_xplist_reader_func_t func = tb_object_get_xplist_reader(name);
+					tb_assert_and_check_goto(func, end);
+
+					// read
+					object = func(&reader, event);
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// exit reader
+	tb_xml_reader_exit(reader.reader);
+
+	// ok?
+	return object;
+}
+static tb_bool_t tb_object_writ_xplist(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
+{
+	// init writer 
+	tb_object_xplist_writer_t writer = {0};
+	writer.stream 	= stream;
+	writer.deflate 	= deflate;
+
+	// func
+	tb_object_xplist_writer_func_t func = tb_object_get_xplist_writer(object->type);
+	tb_assert_and_check_return_val(func, tb_false);
+
+	// writ xml header
+	tb_gstream_printf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	tb_object_writ_newline(stream, deflate);
+	tb_gstream_printf(stream, "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+	tb_object_writ_newline(stream, deflate);
+	tb_gstream_printf(stream, "<plist version=\"1.0\">");
+	tb_object_writ_newline(stream, deflate);
+
+	// writ
+	tb_bool_t ok = func(&writer, object, 0);
+
+	// sync
+	if (ok) 
+	{
+		tb_gstream_printf(stream, "</plist>");
+		tb_object_writ_newline(stream, deflate);
+		ok = tb_gstream_sync(stream, tb_true);
+	}
+
+	// ok
+	return ok;
+}
+static tb_object_t* tb_object_read_bplist(tb_gstream_t* stream)
+{
+	return tb_null;
+}
+static tb_bool_t tb_object_writ_bplist(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
+{
+	return tb_false;
+}
 static tb_bool_t tb_object_init_reader()
 {
 	// init null
@@ -299,6 +400,14 @@ static tb_void_t tb_object_exit_reader()
 	// exit the object jsn reader
 	if (g_object_jsn_reader) tb_hash_exit(g_object_jsn_reader);
 	g_object_jsn_reader = tb_null;
+	
+	// exit the object xplist reader
+	if (g_object_xplist_reader) tb_hash_exit(g_object_xplist_reader);
+	g_object_xplist_reader = tb_null;
+		
+	// exit the object bplist reader
+	if (g_object_bplist_reader) tb_hash_exit(g_object_bplist_reader);
+	g_object_bplist_reader = tb_null;
 }
 static tb_bool_t tb_object_init_writer()
 {
@@ -342,6 +451,14 @@ static tb_void_t tb_object_exit_writer()
 	// exit the object jsn writer
 	if (g_object_jsn_writer) tb_hash_exit(g_object_jsn_writer);
 	g_object_jsn_writer = tb_null;
+	
+	// exit the object xplist writer
+	if (g_object_xplist_writer) tb_hash_exit(g_object_xplist_writer);
+	g_object_xplist_writer = tb_null;
+
+	// exit the object bplist writer
+	if (g_object_bplist_writer) tb_hash_exit(g_object_bplist_writer);
+	g_object_bplist_writer = tb_null;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -646,14 +763,25 @@ tb_object_t* tb_object_read(tb_gstream_t* stream)
 
 	// need
 	tb_byte_t* p = tb_null;
-	if (!tb_gstream_need(stream, &p, 5)) return tb_null;
+	if (!tb_gstream_need(stream, &p, 6)) return tb_null;
 	tb_assert_and_check_return_val(p, tb_null);
 
-	// is tbox data?
+	// is tbox binary data?
 	if (!tb_strnicmp(p, "tbo", 3)) return tb_object_read_bin(stream);
 
+	// is bplist data?
+	if (!tb_strnicmp(p, "bplist", 6)) return tb_object_read_bplist(stream);
+
 	// is xml data?
-	if (!tb_strnicmp(p, "<?xml", 5)) return tb_object_read_xml(stream);
+	if (!tb_strnicmp(p, "<?xml", 5)) 
+	{
+		// need more data
+		if (!tb_gstream_need(stream, &p, 256)) return tb_null;
+		tb_assert_and_check_return_val(p, tb_null);
+
+		// is xplist?
+		return tb_stristr(p, "DOCTYPE plist")? tb_object_read_xplist(stream) : tb_object_read_xml(stream);
+	}
 
 	// try to read the jsn data
 	return tb_object_read_jsn(stream);
@@ -714,6 +842,10 @@ tb_bool_t tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t fo
 		return tb_object_writ_bin(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	case TB_OBJECT_FORMAT_JSN:
 		return tb_object_writ_jsn(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+	case TB_OBJECT_FORMAT_BPLIST:
+		return tb_object_writ_bplist(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
+	case TB_OBJECT_FORMAT_XPLIST:
+		return tb_object_writ_xplist(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
 	default:
 		tb_assert(0);
 		break;
@@ -888,4 +1020,100 @@ tb_pointer_t tb_object_get_jsn_writer(tb_size_t type)
 
 	// get
 	return tb_hash_get(g_object_jsn_writer, (tb_pointer_t)type);
+}
+tb_bool_t tb_object_set_xplist_reader(tb_char_t const* type, tb_object_xplist_reader_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init reader
+	if (!g_object_xplist_reader)
+		g_object_xplist_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr(tb_null, tb_null));
+	tb_assert_and_check_return_val(g_object_xplist_reader, tb_false);
+
+	// set
+	tb_hash_set(g_object_xplist_reader, type, func);
+
+	// ok
+	return tb_true;
+}
+tb_pointer_t tb_object_get_xplist_reader(tb_char_t const* type)
+{ 
+	// check
+	tb_assert_and_check_return_val(g_object_xplist_reader, tb_null);
+
+	// get
+	return tb_hash_get(g_object_xplist_reader, type);
+}
+tb_bool_t tb_object_set_xplist_writer(tb_size_t type, tb_object_xplist_writer_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init writer
+	if (!g_object_xplist_writer)
+		g_object_xplist_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+	tb_assert_and_check_return_val(g_object_xplist_writer, tb_false);
+
+	// set
+	tb_hash_set(g_object_xplist_writer, (tb_pointer_t)type, func);
+
+	// ok
+	return tb_true;
+}
+tb_pointer_t tb_object_get_xplist_writer(tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(g_object_xplist_writer, tb_null);
+
+	// get
+	return tb_hash_get(g_object_xplist_writer, (tb_pointer_t)type);
+}
+tb_bool_t tb_object_set_bplist_reader(tb_size_t type, tb_object_bplist_reader_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init reader
+	if (!g_object_bplist_reader)
+		g_object_bplist_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+	tb_assert_and_check_return_val(g_object_bplist_reader, tb_false);
+
+	// set
+	tb_hash_set(g_object_bplist_reader, (tb_pointer_t)type, func);
+
+	// ok
+	return tb_true;
+} 
+tb_pointer_t tb_object_get_bplist_reader(tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(g_object_bplist_reader, tb_null);
+
+	// get
+	return tb_hash_get(g_object_bplist_reader, (tb_pointer_t)type);
+}
+tb_bool_t tb_object_set_bplist_writer(tb_size_t type, tb_object_bplist_writer_func_t func)
+{
+	// check
+	tb_assert_and_check_return_val(type && func, tb_false);
+
+	// init writer
+	if (!g_object_bplist_writer)
+		g_object_bplist_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
+	tb_assert_and_check_return_val(g_object_bplist_writer, tb_false);
+
+	// set
+	tb_hash_set(g_object_bplist_writer, (tb_pointer_t)type, func);
+
+	// ok
+	return tb_true;
+}
+tb_pointer_t tb_object_get_bplist_writer(tb_size_t type)
+{
+	// check
+	tb_assert_and_check_return_val(g_object_bplist_writer, tb_null);
+
+	// get
+	return tb_hash_get(g_object_bplist_writer, (tb_pointer_t)type);
 }

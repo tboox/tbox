@@ -21,7 +21,7 @@
  * @ingroup 	object
  *
  */
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
@@ -84,7 +84,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	{
 		if (string->cdata) tb_scache_del(string->cdata);
 		tb_pstring_exit(&string->pstr);
-		tb_opool_del(string);
+		tb_opool_del(object);
 	}
 }
 static tb_void_t tb_string_cler(tb_object_t* object)
@@ -101,7 +101,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 static tb_string_t* tb_string_init_base()
 {
 	// make
-	tb_string_t* string = tb_opool_get(sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
+	tb_string_t* string = (tb_string_t*)tb_opool_get(sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// init base
@@ -250,11 +250,11 @@ static tb_bool_t tb_string_writ_bin(tb_object_bin_writer_t* writer, tb_object_t*
 	tb_memcpy(writer->data, data, size);
 
 	// encode data
-	tb_byte_t* 	pb = data;
-	tb_byte_t* 	pe = data + size;
-	tb_byte_t* 	qb = writer->data;
-	tb_byte_t* 	qe = writer->data + writer->maxn;
-	tb_byte_t 	xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
+	tb_byte_t const* 	pb = data;
+	tb_byte_t const* 	pe = data + size;
+	tb_byte_t* 			qb = writer->data;
+	tb_byte_t* 			qe = writer->data + writer->maxn;
+	tb_byte_t 			xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
 	for (; pb < pe && qb < qe && *pb; pb++, qb++, xb++) *qb = *pb ^ xb;
 
 	// writ it
@@ -308,6 +308,73 @@ static tb_bool_t tb_string_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t*
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_string_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_string_init_from_cstr(tb_null);
+
+	// walk
+	tb_object_t* string = tb_null;
+	while (event = tb_xml_reader_next(reader->reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "string"))
+				{
+					// empty?
+					if (!string) string = tb_string_init_from_cstr(tb_null);
+					goto end;
+				}
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_d("string: %s", text);
+				
+				// string
+				string = tb_string_init_from_cstr(text);
+				tb_assert_and_check_goto(string, end);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// ok?
+	return string;
+}
+static tb_bool_t tb_string_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	tb_object_writ_tab(writer->stream, writer->deflate, level);
+	if (tb_string_size(object))
+		tb_gstream_printf(writer->stream, "<string>%s</string>", tb_string_cstr(object));
+	else tb_gstream_printf(writer->stream, "<string/>");
+	tb_object_writ_newline(writer->stream, writer->deflate);
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -318,6 +385,7 @@ tb_bool_t tb_string_init_reader()
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_STRING, tb_string_read_bin)) return tb_false;
 	if (!tb_object_set_jsn_reader('\"', tb_string_read_jsn)) return tb_false;
 	if (!tb_object_set_jsn_reader('\'', tb_string_read_jsn)) return tb_false;
+	if (!tb_object_set_xplist_reader("string", tb_string_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_string_init_writer()
@@ -325,6 +393,7 @@ tb_bool_t tb_string_init_writer()
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_bin)) return tb_false;
 	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_jsn)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_STRING, tb_string_writ_xplist)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
@@ -356,11 +425,11 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 	}
 
 	// ok
-	return string;
+	return (tb_object_t*)string;
 
 	// no
 fail:
-	tb_string_exit(string);
+	tb_string_exit((tb_object_t*)string);
 	return tb_null;
 }
 tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
@@ -389,11 +458,11 @@ tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
 	}
 
 	// ok
-	return string;
+	return (tb_object_t*)string;
 
 	// no
 fail:
-	tb_string_exit(string);
+	tb_string_exit((tb_object_t*)string);
 	return tb_null;
 }
 tb_char_t const* tb_string_cstr(tb_object_t* object)

@@ -37,7 +37,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
-
+ 
 // the date type
 typedef struct __tb_date_t
 {
@@ -66,8 +66,7 @@ static tb_object_t* tb_date_copy(tb_object_t* object)
 }
 static tb_void_t tb_date_exit(tb_object_t* object)
 {
-	tb_date_t* date = tb_date_cast(object);
-	if (date) tb_opool_del(date);
+	if (object) tb_opool_del(object);
 }
 static tb_void_t tb_date_cler(tb_object_t* object)
 {
@@ -77,7 +76,7 @@ static tb_void_t tb_date_cler(tb_object_t* object)
 static tb_date_t* tb_date_init_base()
 {
 	// make
-	tb_date_t* date = tb_opool_get(sizeof(tb_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
+	tb_date_t* date = (tb_date_t*)tb_opool_get(sizeof(tb_date_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DATE);
 	tb_assert_and_check_return_val(date, tb_null);
 
 	// init base
@@ -98,7 +97,7 @@ static tb_object_t* tb_date_read_xml(tb_object_xml_reader_t* reader, tb_size_t e
 		return tb_date_init_from_time(0);
 
 	// walk
-	tb_object_t* 	date 	= tb_null;
+	tb_object_t* date = tb_null;
 	while (event = tb_xml_reader_next(reader->reader))
 	{
 		switch (event)
@@ -240,6 +239,143 @@ static tb_bool_t tb_date_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* o
 	// writ type & time
 	return tb_object_writ_bin_type_size(writer->stream, object->type, (tb_uint64_t)tb_date_time(object));
 }
+static tb_object_t* tb_date_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_date_init_from_time(0);
+
+	// walk
+	tb_object_t* date = tb_null;
+	while (event = tb_xml_reader_next(reader->reader))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "date"))
+				{
+					// empty?
+					if (!date) date = tb_date_init_from_time(0);
+					goto end;
+				}
+			}
+			break;
+		case TB_XML_READER_EVENT_TEXT: 
+			{
+				// text
+				tb_char_t const* text = tb_xml_reader_text(reader->reader);
+				tb_assert_and_check_goto(text, end);
+				tb_trace_d("date: %s", text);
+
+				// done date: %04ld-%02ld-%02ld %02ld:%02ld:%02ld
+				tb_tm_t tm = {0};
+				tb_char_t const* p = text;
+				tb_char_t const* e = text + tb_strlen(text);
+
+				// init year
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.year = tb_atoi(p);
+
+				// init month
+				while (p < e && *p && tb_isdigit(*p)) p++;
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.month = tb_atoi(p);
+				
+				// init day
+				while (p < e && *p && tb_isdigit(*p)) p++;
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.mday = tb_atoi(p);
+				
+				// init hour
+				while (p < e && *p && tb_isdigit(*p)) p++;
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.hour = tb_atoi(p);
+						
+				// init minute
+				while (p < e && *p && tb_isdigit(*p)) p++;
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.minute = tb_atoi(p);
+				
+				// init second
+				while (p < e && *p && tb_isdigit(*p)) p++;
+				while (p < e && *p && !tb_isdigit(*p)) p++;
+				tb_assert_and_check_goto(p < e, end);
+				tm.second = tb_atoi(p);
+			
+				// time
+				tb_time_t time = tb_mktime(&tm);
+				tb_assert_and_check_goto(time >= 0, end);
+
+				// date
+				date = tb_date_init_from_time(time);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+end:
+
+	// ok?
+	return date;
+}
+static tb_bool_t tb_date_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// no empty?
+	tb_time_t time = tb_date_time(object);
+	if (time > 0)
+	{
+		// writ beg
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<date>");
+
+		// writ date
+		tb_tm_t date = {0};
+		if (tb_localtime(time, &date))
+		{
+			tb_gstream_printf(writer->stream, 	"%04ld-%02ld-%02ldT%02ld:%02ld:%02ldZ"
+								, 	date.year
+								, 	date.month
+								, 	date.mday
+								, 	date.hour
+								, 	date.minute
+								, 	date.second);
+		}
+					
+		// writ end
+		tb_gstream_printf(writer->stream, "</date>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		// writ
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<date/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
+
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
@@ -247,12 +383,14 @@ tb_bool_t tb_date_init_reader()
 {
 	if (!tb_object_set_xml_reader("date", tb_date_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_DATE, tb_date_read_bin)) return tb_false;
+	if (!tb_object_set_xplist_reader("date", tb_date_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_date_init_writer()
 {
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_DATE, tb_date_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_DATE, tb_date_writ_bin)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_DATE, tb_date_writ_xplist)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_date_init_from_now()
@@ -265,7 +403,7 @@ tb_object_t* tb_date_init_from_now()
 	date->time = tb_time();
 
 	// ok
-	return date;
+	return (tb_object_t*)date;
 }
 tb_object_t* tb_date_init_from_time(tb_time_t time)
 {
@@ -277,7 +415,7 @@ tb_object_t* tb_date_init_from_time(tb_time_t time)
 	if (time > 0) date->time = time;
 
 	// ok
-	return date;
+	return (tb_object_t*)date;
 }
 tb_time_t tb_date_time(tb_object_t* object)
 {
