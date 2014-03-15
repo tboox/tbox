@@ -17,52 +17,59 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		null.c
+ * @file		xml.h
  * @ingroup 	object
  *
  */
- 
-/* ///////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME 		"object_null"
-#define TB_TRACE_MODULE_DEBUG 		(0)
+#ifndef TB_OBJECT_READER_XML_H
+#define TB_OBJECT_READER_XML_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "object.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-static tb_object_t* tb_null_copy(tb_object_t* object)
-{
-	return object;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * globals
+ * types
  */
 
-// null
-static tb_object_t const g_null = 
+/// the xml reader type
+typedef struct __tb_object_xml_reader_t
 {
-	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-,	TB_OBJECT_TYPE_NULL
-, 	1
-, 	tb_null
-, 	tb_null_copy
-, 	tb_null
-, 	tb_null
+	/// the xml reader
+	tb_handle_t 				reader;
 
-};
+}tb_object_xml_reader_t;
+
+/// the xml reader func type
+typedef tb_object_t* 			(*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_null_init()
-{
-	return (tb_object_t*)&g_null;
-}
+
+/*! the xml object reader
+ *
+ * @return 						the xml object reader
+ */
+tb_object_reader_t* 			tb_object_xml_reader(tb_noarg_t);
+
+/*! hook the xml reader
+ *
+ * @param type 					the object type name
+ * @param func 					the reader func
+ *
+ * @return 						tb_true or tb_false
+ */
+tb_bool_t 						tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_func_t func);
+
+/*! the xml reader func
+ *
+ * @param type 					the object type name
+ *
+ * @return 						the object reader func
+ */
+tb_object_xml_reader_func_t 	tb_object_xml_reader_func(tb_char_t const* type);
+
+#endif
 

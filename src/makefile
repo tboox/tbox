@@ -87,6 +87,8 @@ tbox_C_FILES 			+= \
 						object/number \
 						object/boolean \
 						object/dictionary \
+						object/reader/xml \
+						object/writer/xml \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \
@@ -438,6 +440,12 @@ INC_FILES 				= \
 						object/string.h \
 						object/boolean.h \
 						object/dictionary.h \
+						object/reader/prefix.h \
+						object/reader/reader.h \
+						object/reader/xml.h \
+						object/writer/prefix.h \
+						object/writer/writer.h \
+						object/writer/xml.h \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \

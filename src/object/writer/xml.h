@@ -17,52 +17,62 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		null.c
+ * @file		xml.h
  * @ingroup 	object
  *
  */
- 
-/* ///////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME 		"object_null"
-#define TB_TRACE_MODULE_DEBUG 		(0)
+#ifndef TB_OBJECT_WRITER_XML_H
+#define TB_OBJECT_WRITER_XML_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "object.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-static tb_object_t* tb_null_copy(tb_object_t* object)
-{
-	return object;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * globals
+ * types
  */
 
-// null
-static tb_object_t const g_null = 
+/// the object xml writer type
+typedef struct __tb_object_xml_writer_t
 {
-	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-,	TB_OBJECT_TYPE_NULL
-, 	1
-, 	tb_null
-, 	tb_null_copy
-, 	tb_null
-, 	tb_null
+	/// the stream
+	tb_gstream_t* 				stream;
 
-};
+	/// is deflate?
+	tb_bool_t 					deflate;
+
+}tb_object_xml_writer_t;
+
+/// the xml writer func type
+typedef tb_bool_t 				(*tb_object_xml_writer_func_t)(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_object_t* tb_null_init()
-{
-	return (tb_object_t*)&g_null;
-}
+
+/*! the xml object writer
+ *
+ * @return 						the xml object writer
+ */
+tb_object_writer_t* 			tb_object_xml_writer(tb_noarg_t);
+
+/*! hook the xml writer
+ *
+ * @param type 					the object type 
+ * @param func 					the writer func
+ *
+ * @return 						tb_true or tb_false
+ */
+tb_bool_t 						tb_object_xml_writer_hook(tb_size_t type, tb_object_xml_writer_func_t func);
+
+/*! the xml writer func
+ *
+ * @param type 					the object type 
+ *
+ * @return 						the object writer func
+ */
+tb_object_xml_writer_func_t 	tb_object_xml_writer_func(tb_size_t type);
+
+#endif
 

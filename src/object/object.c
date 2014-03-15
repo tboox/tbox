@@ -37,453 +37,121 @@
  * globals
  */
 
-// the object xml reader
-static tb_handle_t 				g_object_xml_reader = tb_null;
+// the object reader
+static tb_object_reader_t* 	g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
-// the object xml writer
-static tb_handle_t 				g_object_xml_writer = tb_null;
-
-// the object bin reader
-static tb_handle_t 				g_object_bin_reader = tb_null;
-
-// the object bin writer
-static tb_handle_t 				g_object_bin_writer = tb_null;
-
-// the object jsn reader
-static tb_handle_t 				g_object_jsn_reader = tb_null;
-
-// the object jsn writer
-static tb_handle_t 				g_object_jsn_writer = tb_null;
-
-// the object xplist reader
-static tb_handle_t 				g_object_xplist_reader = tb_null;
-
-// the object xplist writer
-static tb_handle_t 				g_object_xplist_writer = tb_null;
-
-// the object bplist reader
-static tb_handle_t 				g_object_bplist_reader = tb_null;
-
-// the object bplist writer
-static tb_handle_t 				g_object_bplist_writer = tb_null;
+// the object writer
+static tb_object_writer_t* 	g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_null};
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
- */
-static tb_object_t* tb_object_read_xml(tb_gstream_t* stream)
-{
-	// init reader 
-	tb_object_xml_reader_t reader = {0};
-	reader.reader = tb_xml_reader_init(stream);
-	tb_assert_and_check_return_val(reader.reader, tb_null);
-
-	// init object
-	tb_object_t* object = tb_null;
-
-	// walk
-	tb_size_t event = TB_XML_READER_EVENT_NONE;
-	while (!object && (event = tb_xml_reader_next(reader.reader)))
-	{
-		switch (event)
-		{
-		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
-		case TB_XML_READER_EVENT_ELEMENT_BEG: 
-			{
-				// name
-				tb_char_t const* name = tb_xml_reader_element(reader.reader);
-				tb_assert_and_check_goto(name, end);
-
-				// func
-				tb_object_xml_reader_func_t func = tb_object_get_xml_reader(name);
-				tb_assert_and_check_goto(func, end);
-
-				// read
-				object = func(&reader, event);
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-end:
-
-	// exit reader
-	tb_xml_reader_exit(reader.reader);
-
-	// ok?
-	return object;
-}
-static tb_bool_t tb_object_writ_xml(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
-{
-	// init writer 
-	tb_object_xml_writer_t writer = {0};
-	writer.stream 	= stream;
-	writer.deflate 	= deflate;
-
-	// func
-	tb_object_xml_writer_func_t func = tb_object_get_xml_writer(object->type);
-	tb_assert_and_check_return_val(func, tb_false);
-
-	// writ xml header
-	tb_gstream_printf(stream, "<?xml version=\"2.0\" encoding=\"utf-8\"?>");
-	tb_object_writ_newline(stream, deflate);
-
-	// writ
-	tb_bool_t ok = func(&writer, object, 0);
-
-	// sync
-	if (ok) ok = tb_gstream_sync(stream, tb_true);
-
-	// ok
-	return ok;
-}
-static tb_object_t* tb_object_read_bin(tb_gstream_t* stream)
-{
-	// read bin header
-	tb_byte_t data[32] = {0};
-	if (!tb_gstream_bread(stream, data, 5)) return tb_null;
-
-	// check 
-	if (tb_strnicmp(data, "tbo00", 5)) return tb_null;
-
-	// init
-	tb_object_t* 			object = tb_null;
-	tb_object_bin_reader_t 	reader = {0};
-
-	// init reader
-	reader.stream 			= stream;
-	reader.list 			= tb_vector_init(256, tb_item_func_obj());
-	tb_assert_and_check_return_val(reader.list, tb_null);
-
-	// the type & size
-	tb_size_t 				type = 0;
-	tb_uint64_t 			size = 0;
-	tb_object_read_bin_type_size(stream, &type, &size);
-
-	// trace
-	tb_trace_d("root: type: %lu, size: %llu", type, size);
-
-	// the func
-	tb_object_bin_reader_func_t func = tb_object_get_bin_reader(type);
-	tb_assert_and_check_goto(func, end);
-
-	// read it
-	object = func(&reader, type, size);
-
-end:
-
-	// exit the list
-	if (reader.list) tb_vector_exit(reader.list);
-
-	// ok?
-	return object;
-}
-static tb_bool_t tb_object_writ_bin(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
-{
-	// check
-	tb_assert_and_check_return_val(object && stream, tb_false);
-
-	// the func
-	tb_object_bin_writer_func_t func = tb_object_get_bin_writer(object->type);
-	tb_assert_and_check_return_val(func, tb_false);
-
-	// writ bin header
-	if (!tb_gstream_bwrit(stream, "tbo00", 5)) return tb_false;
-
-	// init
-	tb_bool_t 				ok = tb_false;
-	tb_object_bin_writer_t 	writer = {0};
-
-	// init writer
-	writer.stream 			= stream;
-	writer.ohash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_ptr(tb_null, tb_null), tb_item_func_uint32());
-	writer.shash 			= tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_true, tb_null), tb_item_func_uint32());
-	tb_assert_and_check_return_val(writer.shash && writer.ohash, tb_false);
-
-	// writ
-	if (!func(&writer, object)) goto end;
-
-	// sync
-	if (!tb_gstream_sync(stream, tb_true)) goto end;
-
-	// ok
-	ok = tb_true;
-
-end:
-
-	// exit the hash
-	if (writer.ohash) tb_hash_exit(writer.ohash);
-	if (writer.shash) tb_hash_exit(writer.shash);
-
-	// exit the data
-	if (writer.data) tb_free(writer.data);
-
-	// ok?
-	return ok;
-}
-static tb_object_t* tb_object_read_jsn(tb_gstream_t* stream)
-{
-	// check
-	tb_assert_and_check_return_val(stream, tb_null);
-
-	// init reader
-	tb_object_jsn_reader_t reader = {0};
-	reader.stream = stream;
-
-	// skip spaces
-	tb_char_t type;
-	while (tb_stream_left(stream)) 
-	{
-		type = tb_gstream_bread_s8(stream);
-		if (!tb_isspace(type)) break;
-	}
-
-	// empty?
-	tb_check_return_val(tb_stream_left(stream), tb_null);
-
-	// the func
-	tb_object_jsn_reader_func_t func = tb_object_get_jsn_reader(type);
-	tb_assert_and_check_return_val(func, tb_null);
-
-	// read it
-	return func(&reader, type);
-}
-static tb_bool_t tb_object_writ_jsn(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
-{
-	// init writer 
-	tb_object_jsn_writer_t writer = {0};
-	writer.stream 	= stream;
-	writer.deflate 	= deflate;
-
-	// func
-	tb_object_jsn_writer_func_t func = tb_object_get_jsn_writer(object->type);
-	tb_assert_and_check_return_val(func, tb_false);
-
-	// writ
-	tb_bool_t ok = func(&writer, object, 0);
-
-	// sync
-	if (ok) ok = tb_gstream_sync(stream, tb_true);
-
-	// ok
-	return ok;
-}
-static tb_object_t* tb_object_read_xplist(tb_gstream_t* stream)
-{
-	// init reader 
-	tb_object_xplist_reader_t reader = {0};
-	reader.reader = tb_xml_reader_init(stream);
-	tb_assert_and_check_return_val(reader.reader, tb_null);
-
-	// init object
-	tb_object_t* object = tb_null;
-
-	// walk
-	tb_size_t event = TB_XML_READER_EVENT_NONE;
-	while (!object && (event = tb_xml_reader_next(reader.reader)))
-	{
-		switch (event)
-		{
-		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
-		case TB_XML_READER_EVENT_ELEMENT_BEG: 
-			{
-				// name
-				tb_char_t const* name = tb_xml_reader_element(reader.reader);
-				tb_assert_and_check_goto(name, end);
-
-				// <plist/> ?
-				if (tb_stricmp(name, "plist"))
-				{
-					// func
-					tb_object_xplist_reader_func_t func = tb_object_get_xplist_reader(name);
-					tb_assert_and_check_goto(func, end);
-
-					// read
-					object = func(&reader, event);
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-end:
-
-	// exit reader
-	tb_xml_reader_exit(reader.reader);
-
-	// ok?
-	return object;
-}
-static tb_bool_t tb_object_writ_xplist(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
-{
-	// init writer 
-	tb_object_xplist_writer_t writer = {0};
-	writer.stream 	= stream;
-	writer.deflate 	= deflate;
-
-	// func
-	tb_object_xplist_writer_func_t func = tb_object_get_xplist_writer(object->type);
-	tb_assert_and_check_return_val(func, tb_false);
-
-	// writ xml header
-	tb_gstream_printf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-	tb_object_writ_newline(stream, deflate);
-	tb_gstream_printf(stream, "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
-	tb_object_writ_newline(stream, deflate);
-	tb_gstream_printf(stream, "<plist version=\"1.0\">");
-	tb_object_writ_newline(stream, deflate);
-
-	// writ
-	tb_bool_t ok = func(&writer, object, 0);
-
-	// sync
-	if (ok) 
-	{
-		tb_gstream_printf(stream, "</plist>");
-		tb_object_writ_newline(stream, deflate);
-		ok = tb_gstream_sync(stream, tb_true);
-	}
-
-	// ok
-	return ok;
-}
-static tb_object_t* tb_object_read_bplist(tb_gstream_t* stream)
-{
-	return tb_null;
-}
-static tb_bool_t tb_object_writ_bplist(tb_object_t* object, tb_gstream_t* stream, tb_bool_t deflate)
-{
-	return tb_false;
-}
-static tb_bool_t tb_object_init_reader()
-{
-	// init null
-	if (!tb_null_init_reader()) return tb_false;
-
-	// init data
-	if (!tb_data_init_reader()) return tb_false;
-
-	// init date
-	if (!tb_date_init_reader()) return tb_false;
-
-	// init array
-	if (!tb_array_init_reader()) return tb_false;
-
-	// init number
-	if (!tb_number_init_reader()) return tb_false;
-
-	// init string
-	if (!tb_string_init_reader()) return tb_false;
-
-	// init boolean
-	if (!tb_boolean_init_reader()) return tb_false;
-
-	// init dictionary
-	if (!tb_dictionary_init_reader()) return tb_false;
-
-	// ok
-	return tb_true;
-}
-static tb_void_t tb_object_exit_reader()
-{
-	// exit the object xml reader
-	if (g_object_xml_reader) tb_hash_exit(g_object_xml_reader);
-	g_object_xml_reader = tb_null;
-		
-	// exit the object bin reader
-	if (g_object_bin_reader) tb_hash_exit(g_object_bin_reader);
-	g_object_bin_reader = tb_null;
-	
-	// exit the object jsn reader
-	if (g_object_jsn_reader) tb_hash_exit(g_object_jsn_reader);
-	g_object_jsn_reader = tb_null;
-	
-	// exit the object xplist reader
-	if (g_object_xplist_reader) tb_hash_exit(g_object_xplist_reader);
-	g_object_xplist_reader = tb_null;
-		
-	// exit the object bplist reader
-	if (g_object_bplist_reader) tb_hash_exit(g_object_bplist_reader);
-	g_object_bplist_reader = tb_null;
-}
-static tb_bool_t tb_object_init_writer()
-{
-	// init null
-	if (!tb_null_init_writer()) return tb_false;
-
-	// init data
-	if (!tb_data_init_writer()) return tb_false;
-
-	// init date
-	if (!tb_date_init_writer()) return tb_false;
-
-	// init array
-	if (!tb_array_init_writer()) return tb_false;
-
-	// init number
-	if (!tb_number_init_writer()) return tb_false;
-
-	// init string
-	if (!tb_string_init_writer()) return tb_false;
-
-	// init boolean
-	if (!tb_boolean_init_writer()) return tb_false;
-
-	// init dictionary
-	if (!tb_dictionary_init_writer()) return tb_false;
-
-	// ok
-	return tb_true;
-}
-static tb_void_t tb_object_exit_writer()
-{
-	// exit the object xml writer
-	if (g_object_xml_writer) tb_hash_exit(g_object_xml_writer);
-	g_object_xml_writer = tb_null;
-
-	// exit the object bin writer
-	if (g_object_bin_writer) tb_hash_exit(g_object_bin_writer);
-	g_object_bin_writer = tb_null;
-
-	// exit the object jsn writer
-	if (g_object_jsn_writer) tb_hash_exit(g_object_jsn_writer);
-	g_object_jsn_writer = tb_null;
-	
-	// exit the object xplist writer
-	if (g_object_xplist_writer) tb_hash_exit(g_object_xplist_writer);
-	g_object_xplist_writer = tb_null;
-
-	// exit the object bplist writer
-	if (g_object_bplist_writer) tb_hash_exit(g_object_bplist_writer);
-	g_object_bplist_writer = tb_null;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
  */
 tb_bool_t tb_object_context_init()
 {
 	// init opool
 	if (!tb_opool_init()) return tb_false;
 
-	// init object
-	if (!tb_object_init_reader()) return tb_false;
-	if (!tb_object_init_writer()) return tb_false;
+	// set reader
+	if (!tb_object_set_reader(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
+ 
+	// set writer
+	if (!tb_object_set_writer(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
 
 	// ok
 	return tb_true;
 }
 tb_void_t tb_object_context_exit()
 {
-	// exit object
-	tb_object_exit_reader();
-	tb_object_exit_writer();
+	// exit reader
+	tb_object_del_reader(TB_OBJECT_FORMAT_XML);
+
+	// exit writer
+	tb_object_del_writer(TB_OBJECT_FORMAT_XML);
 
 	// exit opool
 	tb_opool_exit();
+}
+tb_bool_t tb_object_set_reader(tb_size_t format, tb_object_reader_t* reader)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
+
+	// exit the older reader if exists
+	tb_object_del_reader(format);
+
+	// set
+	g_reader[format] = reader;
+
+	// ok
+	return tb_true;
+}
+tb_void_t tb_object_del_reader(tb_size_t format)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return((format < tb_arrayn(g_reader)));
+
+	// exit it
+	if (g_reader[format])
+	{
+		// exit hooker
+		if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
+		g_reader[format]->hooker = tb_null;
+		
+		// clear it
+		g_reader[format] = tb_null;
+	}
+}
+tb_object_reader_t* tb_object_get_reader(tb_size_t format)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return_val((format < tb_arrayn(g_reader)), tb_null);
+
+	// ok
+	return g_reader[format];
+}
+tb_bool_t tb_object_set_writer(tb_size_t format, tb_object_writer_t* writer)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return_val(writer && (format < tb_arrayn(g_writer)), tb_false);
+
+	// exit the older writer if exists
+	tb_object_del_writer(format);
+
+	// set
+	g_writer[format] = writer;
+
+	// ok
+	return tb_true;
+}
+tb_void_t tb_object_del_writer(tb_size_t format)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return((format < tb_arrayn(g_writer)));
+
+	// exit it
+	if (g_writer[format])
+	{
+		// exit hooker
+		if (g_writer[format]->hooker) tb_hash_exit(g_writer[format]->hooker);
+		g_writer[format]->hooker = tb_null;
+		
+		// clear it
+		g_writer[format] = tb_null;
+	}
+}
+tb_object_writer_t* tb_object_get_writer(tb_size_t format)
+{
+	// check
+	format &= 0x00ff;
+	tb_assert_and_check_return_val((format < tb_arrayn(g_writer)), tb_null);
+
+	// ok
+	return g_writer[format];
 }
 tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 {
@@ -561,36 +229,13 @@ tb_object_t* tb_object_data(tb_object_t* object, tb_size_t format)
 		data = data? tb_ralloc(data, maxn) : tb_malloc(maxn);
 		tb_assert_and_check_break(data);
 
-		// init stream
-		tb_gstream_t* stream = tb_gstream_init_from_data(data, maxn);
-		tb_assert_and_check_break(stream);
-
-		// open stream
-		if (tb_gstream_open(stream))
-		{
-			// writ object
-			if (tb_object_writ(object, stream, format))
-			{
-				// size
-				tb_size_t size = (tb_size_t)tb_stream_offset(stream);
-
-				// the data object
-				if (size < maxn) odata = tb_data_init_from_data(data, size);
-				else maxn <<= 1;
-			}
-			else maxn <<= 1;
-		
-			// exit stream
-			tb_gstream_exit(stream);
-		}
-		else
-		{
-			// exit stream
-			tb_gstream_exit(stream);
-
-			// break
-			break;
-		}
+		// writ object to data
+		tb_long_t size = tb_object_writ_to_data(object, data, maxn, format);
+	
+		// ok? make the data object
+		if (size >= 0) odata = tb_data_init_from_data(data, size);
+		// failed? grow it
+		else maxn <<= 1;
 
 	} while (!odata);
 
@@ -761,51 +406,29 @@ tb_object_t* tb_object_read(tb_gstream_t* stream)
 	// check
 	tb_assert_and_check_return_val(stream, tb_null);
 
-	// need
-	tb_byte_t* p = tb_null;
-	if (!tb_gstream_need(stream, &p, 6)) return tb_null;
-	tb_assert_and_check_return_val(p, tb_null);
-
-	// is tbox binary data?
-	if (!tb_strnicmp(p, "tbo", 3)) return tb_object_read_bin(stream);
-
-	// is bplist data?
-	if (!tb_strnicmp(p, "bplist", 6)) return tb_object_read_bplist(stream);
-
-	// is xml data?
-	if (!tb_strnicmp(p, "<?xml", 5)) 
+	// probe it
+	tb_size_t i = 0;
+	tb_size_t n = tb_arrayn(g_reader);
+	tb_size_t m = 0;
+	tb_size_t f = 0;
+	for (i = 0; i < n && m < 100; i++)
 	{
-		// need more data
-		if (!tb_gstream_need(stream, &p, 256)) return tb_null;
-		tb_assert_and_check_return_val(p, tb_null);
-
-		// is xplist?
-		return tb_stristr(p, "DOCTYPE plist")? tb_object_read_xplist(stream) : tb_object_read_xml(stream);
+		// the reader
+		tb_object_reader_t* reader = g_reader[i];
+		if (reader && reader->probe)
+		{
+			// the probe score
+			tb_size_t score = reader->probe(stream);
+			if (score > m) 
+			{
+				m = score;
+				f = i;
+			}
+		}
 	}
 
-	// try to read the jsn data
-	return tb_object_read_jsn(stream);
-}
-tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
-{
-	// check
-	tb_assert_and_check_return_val(data && size, tb_null);
-
-	// init
-	tb_object_t* object = tb_null;
-
-	// make stream
-	tb_gstream_t* stream = tb_gstream_init_from_data(data, size);
-	tb_assert_and_check_return_val(stream, tb_null);
-
-	// read object
-	if (tb_gstream_open(stream)) object = tb_object_read(stream);
-
-	// exit stream
-	tb_gstream_exit(stream);
-
-	// ok?
-	return object;
+	// ok? read it
+	return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_null;
 }
 tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 {
@@ -828,292 +451,81 @@ tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 	// ok?
 	return object;
 }
-tb_bool_t tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t format)
+tb_object_t* tb_object_read_from_data(tb_byte_t const* data, tb_size_t size)
 {
 	// check
-	tb_assert_and_check_return_val(object && stream, tb_false);
-
-	// writ
-	switch (format & 0x00ff)
-	{
-	case TB_OBJECT_FORMAT_XML:
-		return tb_object_writ_xml(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
-	case TB_OBJECT_FORMAT_BIN:
-		return tb_object_writ_bin(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
-	case TB_OBJECT_FORMAT_JSN:
-		return tb_object_writ_jsn(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
-	case TB_OBJECT_FORMAT_BPLIST:
-		return tb_object_writ_bplist(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
-	case TB_OBJECT_FORMAT_XPLIST:
-		return tb_object_writ_xplist(object, stream, format & TB_OBJECT_FORMAT_DEFLATE? tb_true : tb_false);
-	default:
-		tb_assert(0);
-		break;
-	}
-
-	return tb_false;
-}
-tb_bool_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format)
-{
-	// check
-	tb_assert_and_check_return_val(object && url, tb_false);
+	tb_assert_and_check_return_val(data && size, tb_null);
 
 	// init
-	tb_bool_t ok = tb_false;
+	tb_object_t* object = tb_null;
 
 	// make stream
-	tb_gstream_t* stream = tb_gstream_init_from_url(url);
+	tb_gstream_t* stream = tb_gstream_init_from_data(data, size);
+	tb_assert_and_check_return_val(stream, tb_null);
+
+	// read object
+	if (tb_gstream_open(stream)) object = tb_object_read(stream);
+
+	// exit stream
+	tb_gstream_exit(stream);
+
+	// ok?
+	return object;
+}
+tb_long_t tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t format)
+{
+	// check
+	tb_assert_and_check_return_val(object && stream, -1);
+
+	// the writer
+	tb_object_writer_t* writer = tb_object_get_writer(format);
+	tb_assert_and_check_return_val(writer && writer->writ, -1);
+
+	// writ it
+	return writer->writ(stream, object, (format & TB_OBJECT_FORMAT_DEFLATE)? tb_true : tb_false);
+}
+tb_long_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format)
+{
+	// check
+	tb_assert_and_check_return_val(object && url, -1);
+
+	// make stream
+	tb_long_t 		writ = -1;
+	tb_gstream_t* 	stream = tb_gstream_init_from_url(url);
 	if (stream)
 	{
+		// ctrl stream
 		if (tb_stream_type(stream) == TB_STREAM_TYPE_FILE)
-			tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
-		if (tb_gstream_open(stream))
-		{
-			if (tb_object_writ(object, stream, format)) ok = tb_true;
-		}
+			tb_stream_ctrl(stream, TB_STREAM_CTRL_FILE_SET_MODE, TB_FILE_MODE_RW | TB_FILE_MODE_BINARY | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+
+		// open and writ stream
+		if (tb_gstream_open(stream)) writ = tb_object_writ(object, stream, format);
+
+		// exit stream
 		tb_gstream_exit(stream);
 	}
 
 	// ok?
-	return ok;
+	return writ;
 }
-tb_bool_t tb_object_set_xml_reader(tb_char_t const* type, tb_object_xml_reader_func_t func)
+tb_long_t tb_object_writ_to_data(tb_object_t* object, tb_byte_t* data, tb_size_t size, tb_size_t format)
 {
 	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
+	tb_assert_and_check_return_val(object && data && size, -1);
 
-	// init reader
-	if (!g_object_xml_reader)
-		g_object_xml_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_xml_reader, tb_false);
+	// make stream
+	tb_long_t 		writ = -1;
+	tb_gstream_t* 	stream = tb_gstream_init_from_data(data, size);
+	if (stream)
+	{
+		// open and writ stream
+		if (tb_gstream_open(stream)) writ = tb_object_writ(object, stream, format);
 
-	// set
-	tb_hash_set(g_object_xml_reader, type, func);
+		// exit stream
+		tb_gstream_exit(stream);
+	}
 
-	// ok
-	return tb_true;
+	// ok?
+	return writ;
 }
-tb_pointer_t tb_object_get_xml_reader(tb_char_t const* type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_xml_reader, tb_null);
 
-	// get
-	return tb_hash_get(g_object_xml_reader, type);
-}
-tb_bool_t tb_object_set_xml_writer(tb_size_t type, tb_object_xml_writer_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init writer
-	if (!g_object_xml_writer)
-		g_object_xml_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_xml_writer, tb_false);
-
-	// set
-	tb_hash_set(g_object_xml_writer, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_xml_writer(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_xml_writer, tb_null);
-
-	// get
-	return tb_hash_get(g_object_xml_writer, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_bin_reader(tb_size_t type, tb_object_bin_reader_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init reader
-	if (!g_object_bin_reader)
-		g_object_bin_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_bin_reader, tb_false);
-
-	// set
-	tb_hash_set(g_object_bin_reader, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_bin_reader(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_bin_reader, tb_null);
-
-	// get
-	return tb_hash_get(g_object_bin_reader, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_bin_writer(tb_size_t type, tb_object_bin_writer_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init writer
-	if (!g_object_bin_writer)
-		g_object_bin_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_bin_writer, tb_false);
-
-	// set
-	tb_hash_set(g_object_bin_writer, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_bin_writer(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_bin_writer, tb_null);
-
-	// get
-	return tb_hash_get(g_object_bin_writer, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_jsn_reader(tb_char_t type, tb_object_jsn_reader_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init reader
-	if (!g_object_jsn_reader)
-		g_object_jsn_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint8(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_jsn_reader, tb_false);
-
-	// set
-	tb_hash_set(g_object_jsn_reader, (tb_pointer_t)(tb_size_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_jsn_reader(tb_char_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_jsn_reader, tb_null);
-
-	// get
-	return tb_hash_get(g_object_jsn_reader, (tb_pointer_t)(tb_size_t)type);
-}
-tb_bool_t tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init writer
-	if (!g_object_jsn_writer)
-		g_object_jsn_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_jsn_writer, tb_false);
-
-	// set
-	tb_hash_set(g_object_jsn_writer, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_jsn_writer(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_jsn_writer, tb_null);
-
-	// get
-	return tb_hash_get(g_object_jsn_writer, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_xplist_reader(tb_char_t const* type, tb_object_xplist_reader_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init reader
-	if (!g_object_xplist_reader)
-		g_object_xplist_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_str(tb_false, tb_null), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_xplist_reader, tb_false);
-
-	// set
-	tb_hash_set(g_object_xplist_reader, type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_xplist_reader(tb_char_t const* type)
-{ 
-	// check
-	tb_assert_and_check_return_val(g_object_xplist_reader, tb_null);
-
-	// get
-	return tb_hash_get(g_object_xplist_reader, type);
-}
-tb_bool_t tb_object_set_xplist_writer(tb_size_t type, tb_object_xplist_writer_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init writer
-	if (!g_object_xplist_writer)
-		g_object_xplist_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_xplist_writer, tb_false);
-
-	// set
-	tb_hash_set(g_object_xplist_writer, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_xplist_writer(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_xplist_writer, tb_null);
-
-	// get
-	return tb_hash_get(g_object_xplist_writer, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_bplist_reader(tb_size_t type, tb_object_bplist_reader_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init reader
-	if (!g_object_bplist_reader)
-		g_object_bplist_reader = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_bplist_reader, tb_false);
-
-	// set
-	tb_hash_set(g_object_bplist_reader, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-} 
-tb_pointer_t tb_object_get_bplist_reader(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_bplist_reader, tb_null);
-
-	// get
-	return tb_hash_get(g_object_bplist_reader, (tb_pointer_t)type);
-}
-tb_bool_t tb_object_set_bplist_writer(tb_size_t type, tb_object_bplist_writer_func_t func)
-{
-	// check
-	tb_assert_and_check_return_val(type && func, tb_false);
-
-	// init writer
-	if (!g_object_bplist_writer)
-		g_object_bplist_writer = tb_hash_init(TB_HASH_SIZE_MICRO, tb_item_func_uint32(), tb_item_func_ptr(tb_null, tb_null));
-	tb_assert_and_check_return_val(g_object_bplist_writer, tb_false);
-
-	// set
-	tb_hash_set(g_object_bplist_writer, (tb_pointer_t)type, func);
-
-	// ok
-	return tb_true;
-}
-tb_pointer_t tb_object_get_bplist_writer(tb_size_t type)
-{
-	// check
-	tb_assert_and_check_return_val(g_object_bplist_writer, tb_null);
-
-	// get
-	return tb_hash_get(g_object_bplist_writer, (tb_pointer_t)type);
-}
