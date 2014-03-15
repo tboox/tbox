@@ -53,52 +53,6 @@ tb_bool_t 			tb_object_context_init(tb_noarg_t);
 /// exit object context
 tb_void_t 			tb_object_context_exit(tb_noarg_t);
 
-/*! set object reader
- *
- * @param format 	the reader format
- * @param reader 	the reader
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_object_set_reader(tb_size_t format, tb_object_reader_t* reader);
-
-/*! del object reader
- *
- * @param format 	the reader format
- */
-tb_void_t 			tb_object_del_reader(tb_size_t format);
-
-/*! get object reader
- *
- * @param format 	the reader format
- *
- * @return 			the object reader
- */
-tb_object_reader_t* tb_object_get_reader(tb_size_t format);
-
-/*! set object writer
- *
- * @param format 	the writer format
- * @param writer 	the writer
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_object_set_writer(tb_size_t format, tb_object_writer_t* writer);
-
-/*! del object writer
- *
- * @param format 	the writer format
- */
-tb_void_t 			tb_object_del_writer(tb_size_t format);
-
-/*! get object writer
- *
- * @param format 	the writer format
- *
- * @return 			the object writer
- */
-tb_object_writer_t* tb_object_get_writer(tb_size_t format);
-
 /*! init object
  *
  * @param object 	the object
@@ -141,11 +95,11 @@ tb_cpointer_t 		tb_object_getp(tb_object_t* object);
 
 /*! read object
  *
- * @param gst 		the stream
+ * @param stream 	the stream
  *
  * @return 			the object
  */
-tb_object_t* 		tb_object_read(tb_gstream_t* gst);
+tb_object_t* 		tb_object_read(tb_gstream_t* stream);
 
 /*! read object from url
  *
@@ -167,12 +121,12 @@ tb_object_t* 		tb_object_read_from_data(tb_byte_t const* data, tb_size_t size);
 /*! writ object
  *
  * @param object 	the object
- * @param gst 		the stream
+ * @param stream 	the stream
  * @param format 	the object format
  *
  * @return 			the writed size, failed: -1
  */
-tb_long_t 			tb_object_writ(tb_object_t* object, tb_gstream_t* gst, tb_size_t format);
+tb_long_t 			tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t format);
 
 /*! writ object to url
  *

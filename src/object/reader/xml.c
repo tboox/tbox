@@ -625,7 +625,7 @@ tb_bool_t tb_object_xml_reader_hook(tb_char_t const* type, tb_object_xml_reader_
 	tb_assert_and_check_return_val(type && func, tb_false);
 
 	// the reader
-	tb_object_reader_t* reader = tb_object_get_reader(TB_OBJECT_FORMAT_XML);
+	tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_XML);
 	tb_assert_and_check_return_val(reader && reader->hooker, tb_false);
 
 	// hook it
@@ -640,7 +640,7 @@ tb_object_xml_reader_func_t tb_object_xml_reader_func(tb_char_t const* type)
 	tb_assert_and_check_return_val(type, tb_null);
 
 	// the reader
-	tb_object_reader_t* reader = tb_object_get_reader(TB_OBJECT_FORMAT_XML);
+	tb_object_reader_t* reader = tb_object_reader_get(TB_OBJECT_FORMAT_XML);
 	tb_assert_and_check_return_val(reader && reader->hooker, tb_null);
 
 	// the func

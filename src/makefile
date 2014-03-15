@@ -88,7 +88,9 @@ tbox_C_FILES 			+= \
 						object/boolean \
 						object/dictionary \
 						object/reader/xml \
+						object/reader/reader \
 						object/writer/xml \
+						object/writer/writer \
 						zip/zip \
 						zip/vlc/fixed \
 						zip/vlc/golomb \

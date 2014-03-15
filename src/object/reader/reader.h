@@ -29,5 +29,40 @@
  */
 #include "xml.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! set object reader
+ *
+ * @param format 	the reader format
+ * @param reader 	the reader
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader);
+
+/*! del object reader
+ *
+ * @param format 	the reader format
+ */
+tb_void_t 			tb_object_reader_del(tb_size_t format);
+
+/*! get object reader
+ *
+ * @param format 	the reader format
+ *
+ * @return 			the object reader
+ */
+tb_object_reader_t* tb_object_reader_get(tb_size_t format);
+
+/*! done reader
+ *
+ * @param stream 	the stream
+ *
+ * @return 			the object
+ */
+tb_object_t* 		tb_object_reader_done(tb_gstream_t* stream);
+
 
 #endif
