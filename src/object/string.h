@@ -33,18 +33,6 @@
  * interfaces
  */
 
-/*! init string reader
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_string_init_reader(tb_noarg_t);
-
-/*! init string writer
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_string_init_writer(tb_noarg_t);
-
 /*! init string from c-string
  *
  * @param cstr 		the c-string

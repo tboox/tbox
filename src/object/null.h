@@ -33,18 +33,6 @@
  * interfaces
  */
 
-/*! init null reader
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_null_init_reader(tb_noarg_t);
-
-/*! init null writer
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_null_init_writer(tb_noarg_t);
-
 /*! init null
  *
  * @return 			the null object

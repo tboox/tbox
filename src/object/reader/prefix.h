@@ -17,52 +17,17 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		null.c
+ * @file		prefix.h
  * @ingroup 	object
  *
  */
- 
-/* ///////////////////////////////////////////////////////////////////////
- * trace
- */
-#define TB_TRACE_MODULE_NAME 		"object_null"
-#define TB_TRACE_MODULE_DEBUG 		(0)
+#ifndef TB_OBJECT_READER_PREFIX_H
+#define TB_OBJECT_READER_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "object.h"
+#include "../prefix.h"
 
-/* ///////////////////////////////////////////////////////////////////////
- * implementation
- */
-static tb_object_t* tb_null_copy(tb_object_t* object)
-{
-	return object;
-}
 
-/* ///////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// null
-static tb_object_t const g_null = 
-{
-	TB_OBJECT_FLAG_READONLY | TB_OBJECT_FLAG_SINGLETON
-,	TB_OBJECT_TYPE_NULL
-, 	1
-, 	tb_null
-, 	tb_null_copy
-, 	tb_null
-, 	tb_null
-
-};
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-tb_object_t* tb_null_init()
-{
-	return (tb_object_t*)&g_null;
-}
-
+#endif
