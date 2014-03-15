@@ -34,16 +34,6 @@
 #include "object.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * globals
- */
-
-// the object reader
-static tb_object_reader_t* 	g_reader[TB_OBJECT_FORMAT_MAXN] = {tb_null};
-
-// the object writer
-static tb_object_writer_t* 	g_writer[TB_OBJECT_FORMAT_MAXN] = {tb_null};
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_bool_t tb_object_context_init()
@@ -52,10 +42,10 @@ tb_bool_t tb_object_context_init()
 	if (!tb_opool_init()) return tb_false;
 
 	// set reader
-	if (!tb_object_set_reader(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
+	if (!tb_object_reader_set(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
  
 	// set writer
-	if (!tb_object_set_writer(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
+	if (!tb_object_writer_set(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
 
 	// ok
 	return tb_true;
@@ -63,95 +53,13 @@ tb_bool_t tb_object_context_init()
 tb_void_t tb_object_context_exit()
 {
 	// exit reader
-	tb_object_del_reader(TB_OBJECT_FORMAT_XML);
+	tb_object_reader_del(TB_OBJECT_FORMAT_XML);
 
 	// exit writer
-	tb_object_del_writer(TB_OBJECT_FORMAT_XML);
+	tb_object_writer_del(TB_OBJECT_FORMAT_XML);
 
 	// exit opool
 	tb_opool_exit();
-}
-tb_bool_t tb_object_set_reader(tb_size_t format, tb_object_reader_t* reader)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val(reader && (format < tb_arrayn(g_reader)), tb_false);
-
-	// exit the older reader if exists
-	tb_object_del_reader(format);
-
-	// set
-	g_reader[format] = reader;
-
-	// ok
-	return tb_true;
-}
-tb_void_t tb_object_del_reader(tb_size_t format)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return((format < tb_arrayn(g_reader)));
-
-	// exit it
-	if (g_reader[format])
-	{
-		// exit hooker
-		if (g_reader[format]->hooker) tb_hash_exit(g_reader[format]->hooker);
-		g_reader[format]->hooker = tb_null;
-		
-		// clear it
-		g_reader[format] = tb_null;
-	}
-}
-tb_object_reader_t* tb_object_get_reader(tb_size_t format)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val((format < tb_arrayn(g_reader)), tb_null);
-
-	// ok
-	return g_reader[format];
-}
-tb_bool_t tb_object_set_writer(tb_size_t format, tb_object_writer_t* writer)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val(writer && (format < tb_arrayn(g_writer)), tb_false);
-
-	// exit the older writer if exists
-	tb_object_del_writer(format);
-
-	// set
-	g_writer[format] = writer;
-
-	// ok
-	return tb_true;
-}
-tb_void_t tb_object_del_writer(tb_size_t format)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return((format < tb_arrayn(g_writer)));
-
-	// exit it
-	if (g_writer[format])
-	{
-		// exit hooker
-		if (g_writer[format]->hooker) tb_hash_exit(g_writer[format]->hooker);
-		g_writer[format]->hooker = tb_null;
-		
-		// clear it
-		g_writer[format] = tb_null;
-	}
-}
-tb_object_writer_t* tb_object_get_writer(tb_size_t format)
-{
-	// check
-	format &= 0x00ff;
-	tb_assert_and_check_return_val((format < tb_arrayn(g_writer)), tb_null);
-
-	// ok
-	return g_writer[format];
 }
 tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 {
@@ -406,29 +314,8 @@ tb_object_t* tb_object_read(tb_gstream_t* stream)
 	// check
 	tb_assert_and_check_return_val(stream, tb_null);
 
-	// probe it
-	tb_size_t i = 0;
-	tb_size_t n = tb_arrayn(g_reader);
-	tb_size_t m = 0;
-	tb_size_t f = 0;
-	for (i = 0; i < n && m < 100; i++)
-	{
-		// the reader
-		tb_object_reader_t* reader = g_reader[i];
-		if (reader && reader->probe)
-		{
-			// the probe score
-			tb_size_t score = reader->probe(stream);
-			if (score > m) 
-			{
-				m = score;
-				f = i;
-			}
-		}
-	}
-
-	// ok? read it
-	return (m && g_reader[f] && g_reader[f]->read)? g_reader[f]->read(stream) : tb_null;
+	// done reader
+	return tb_object_reader_done(stream);
 }
 tb_object_t* tb_object_read_from_url(tb_char_t const* url)
 {
@@ -477,12 +364,8 @@ tb_long_t tb_object_writ(tb_object_t* object, tb_gstream_t* stream, tb_size_t fo
 	// check
 	tb_assert_and_check_return_val(object && stream, -1);
 
-	// the writer
-	tb_object_writer_t* writer = tb_object_get_writer(format);
-	tb_assert_and_check_return_val(writer && writer->writ, -1);
-
 	// writ it
-	return writer->writ(stream, object, (format & TB_OBJECT_FORMAT_DEFLATE)? tb_true : tb_false);
+	return tb_object_writer_done(object, stream, format);
 }
 tb_long_t tb_object_writ_to_url(tb_object_t* object, tb_char_t const* url, tb_size_t format)
 {

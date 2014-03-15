@@ -424,7 +424,7 @@ tb_bool_t tb_object_xml_writer_hook(tb_size_t type, tb_object_xml_writer_func_t 
 	tb_assert_and_check_return_val(func, tb_false);
  
 	// the writer
-	tb_object_writer_t* writer = tb_object_get_writer(TB_OBJECT_FORMAT_XML);
+	tb_object_writer_t* writer = tb_object_writer_get(TB_OBJECT_FORMAT_XML);
 	tb_assert_and_check_return_val(writer && writer->hooker, tb_false);
 
 	// hook it
@@ -436,7 +436,7 @@ tb_bool_t tb_object_xml_writer_hook(tb_size_t type, tb_object_xml_writer_func_t 
 tb_object_xml_writer_func_t tb_object_xml_writer_func(tb_size_t type)
 {
 	// the writer
-	tb_object_writer_t* writer = tb_object_get_writer(TB_OBJECT_FORMAT_XML);
+	tb_object_writer_t* writer = tb_object_writer_get(TB_OBJECT_FORMAT_XML);
 	tb_assert_and_check_return_val(writer && writer->hooker, tb_null);
 
 	// the func
