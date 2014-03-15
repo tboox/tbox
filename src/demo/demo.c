@@ -82,6 +82,8 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(object_jsn)
 ,	TB_DEMO_MAIN_ITEM(object_bin)
 ,	TB_DEMO_MAIN_ITEM(object_xml)
+,	TB_DEMO_MAIN_ITEM(object_bplist)
+,	TB_DEMO_MAIN_ITEM(object_xplist)
 ,	TB_DEMO_MAIN_ITEM(object_dump)
 
 	// stream

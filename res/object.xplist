@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>appleId</key>
+	<string>steve@rim.jobs</string>
+	<key>artistId</key>
+	<integer>284417353</integer>
+	<key>artistName</key>
+	<string>Apple</string>
+	<key>bundleShortVersionString</key>
+	<string>1.3</string>
+	<key>bundleVersion</key>
+	<string>699</string>
+	<key>copyright</key>
+	<string>2012 Apple Inc.</string>
+	<key>drmVersionNumber</key>
+	<integer>0</integer>
+	<key>fileExtension</key>
+	<string>.app</string>
+	<key>New item - 2</key>
+	<true/>
+	<key>genre</key>
+	<string>教育</string>
+	<key>genreId</key>
+	<integer>6017</integer>
+	<key>itemId</key>
+	<integer>490217893</integer>
+	<key>itemName</key>
+	<string>iTunes U</string>
+	<key>kind</key>
+	<string>software</string>
+	<key>playlistArtistName</key>
+	<string>Apple</string>
+	<key>playlistName</key>
+	<string>iTunes U</string>
+	<key>product-type</key>
+	<string>ios-app</string>
+	<key>purchaseDate</key>
+	<date>2009-08-26T19:12:18Z</date>
+	<key>rating</key>
+	<dict>
+		<key>content</key>
+		<string></string>
+		<key>label</key>
+		<string>4+</string>
+		<key>rank</key>
+		<integer>100</integer>
+		<key>system</key>
+		<string>itunes-games</string>
+	</dict>
+	<key>releaseDate</key>
+	<string>2012-01-19T16:30:33Z</string>
+	<key>s</key>
+	<integer>143465</integer>
+	<key>softwareIcon57x57URL</key>
+	<string>http://a355.phobos.apple.com/us/r1000/101/Purple/v4/29/21/24/2921245f-0a5c-2445-02c4-6e0e538f3df1/Icon.png</string>
+	<key>softwareIconNeedsShine</key>
+	<false/>
+	<key>softwareSupportedDeviceIds</key>
+	<array>
+		<integer>1</integer>
+	</array>
+	<key>softwareVersionBundleId</key>
+	<string>com.apple.itunesu</string>
+	<key>softwareVersionExternalIdentifier</key>
+	<integer>10647872</integer>
+	<key>softwareVersionExternalIdentifiers</key>
+	<array>
+		<integer>5559188</integer>
+		<integer>6806965</integer>
+		<integer>7393738</integer>
+		<integer>9476432</integer>
+		<integer>10647872</integer>
+	</array>
+	<key>vendorId</key>
+	<real>3.1415926</real>
+	<key>New item</key>
+	<data></data>
+	<key>versionRestrictions</key>
+	<integer>16843008</integer>
+</dict>
+</plist>

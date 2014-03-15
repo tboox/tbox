@@ -27,7 +27,7 @@
  */
 #define TB_TRACE_MODULE_NAME 		"object"
 #define TB_TRACE_MODULE_DEBUG 		(0)
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -51,13 +51,13 @@ typedef struct __tb_boolean_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static __tb_inline__ tb_boolean_t const* tb_boolean_cast(tb_object_t const* object)
+static __tb_inline__ tb_boolean_t* tb_boolean_cast(tb_object_t const* object)
 {
 	// check
 	tb_assert_and_check_return_val(object && object->type == TB_OBJECT_TYPE_BOOLEAN, tb_null);
 
 	// cast
-	return (tb_boolean_t const*)object;
+	return (tb_boolean_t*)object;
 }
 
 static tb_object_t* tb_boolean_copy(tb_object_t* object)
@@ -86,7 +86,7 @@ static tb_object_t* tb_boolean_read_xml(tb_object_xml_reader_t* reader, tb_size_
 	else return tb_null;
 
 	// ok?
-	return tb_boolean_init(val);
+	return (tb_object_t*)tb_boolean_init(val);
 }
 static tb_bool_t tb_boolean_writ_xml(tb_object_xml_writer_t* writer, tb_object_t* object, tb_size_t level)
 {
@@ -107,7 +107,7 @@ static tb_object_t* tb_boolean_read_bin(tb_object_bin_reader_t* reader, tb_size_
 	tb_assert_and_check_return_val(reader && reader->stream && reader->list, tb_null);
 
 	// ok?
-	return tb_boolean_init(size? tb_true : tb_false);
+	return (tb_object_t*)tb_boolean_init(size? tb_true : tb_false);
 }
 static tb_bool_t tb_boolean_writ_bin(tb_object_bin_writer_t* writer, tb_object_t* object)
 {
@@ -182,11 +182,43 @@ static tb_bool_t tb_boolean_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_boolean_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// name
+	tb_char_t const* name = tb_xml_reader_element(reader->reader);
+	tb_assert_and_check_return_val(name, tb_null);
+	tb_trace_d("boolean: %s", name);
+
+	// the boolean value
+	tb_bool_t val = tb_false;
+	if (!tb_stricmp(name, "true")) val = tb_true;
+	else if (!tb_stricmp(name, "false")) val = tb_false;
+	else return tb_null;
+
+	// ok?
+	return (tb_object_t*)tb_boolean_init(val);
+}
+static tb_bool_t tb_boolean_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	tb_object_writ_tab(writer->stream, writer->deflate, level);
+	tb_gstream_printf(writer->stream, "<%s/>", tb_boolean_bool(object)? "true" : "false");
+	tb_object_writ_newline(writer->stream, writer->deflate);
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
-
+ 
 // true
 static tb_boolean_t const g_boolean_true = 
 {
@@ -227,6 +259,8 @@ tb_bool_t tb_boolean_init_reader()
 	if (!tb_object_set_jsn_reader('T', tb_boolean_read_jsn)) return tb_false;
 	if (!tb_object_set_jsn_reader('f', tb_boolean_read_jsn)) return tb_false;
 	if (!tb_object_set_jsn_reader('F', tb_boolean_read_jsn)) return tb_false;
+	if (!tb_object_set_xplist_reader("true", tb_boolean_read_xplist)) return tb_false;
+	if (!tb_object_set_xplist_reader("false", tb_boolean_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_boolean_init_writer()
@@ -234,23 +268,24 @@ tb_bool_t tb_boolean_init_writer()
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_BOOLEAN, tb_boolean_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_BOOLEAN, tb_boolean_writ_bin)) return tb_false;
 	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_BOOLEAN, tb_boolean_writ_jsn)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_BOOLEAN, tb_boolean_writ_xplist)) return tb_false;
 	return tb_true;
 }
-tb_object_t const* tb_boolean_init(tb_bool_t value)
+tb_object_t* tb_boolean_init(tb_bool_t value)
 {
 	return value? tb_boolean_true() : tb_boolean_false();
 }
-tb_object_t const* tb_boolean_true()
+tb_object_t* tb_boolean_true()
 {
-	return (tb_object_t const*)&g_boolean_true;
+	return (tb_object_t*)&g_boolean_true;
 }
-tb_object_t const* tb_boolean_false()
+tb_object_t* tb_boolean_false()
 {
-	return (tb_object_t const*)&g_boolean_false;
+	return (tb_object_t*)&g_boolean_false;
 }
 tb_bool_t tb_boolean_bool(tb_object_t const* object)
 {
-	tb_boolean_t const* boolean = tb_boolean_cast(object);
+	tb_boolean_t* boolean = tb_boolean_cast(object);
 	tb_assert_and_check_return_val(boolean, tb_false);
 
 	return boolean->value;

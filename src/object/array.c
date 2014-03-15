@@ -27,7 +27,7 @@
  */
 #define TB_TRACE_MODULE_NAME 		"object"
 #define TB_TRACE_MODULE_DEBUG 		(0)
-
+ 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
@@ -90,7 +90,7 @@ static tb_object_t* tb_array_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(array && array->vector, tb_null);
 
 	// init copy
-	tb_array_t* copy = tb_array_init(tb_vector_grow(array->vector), array->incr);
+	tb_array_t* copy = (tb_array_t*)tb_array_init(tb_vector_grow(array->vector), array->incr);
 	tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
 	// refn++
@@ -100,10 +100,11 @@ static tb_object_t* tb_array_copy(tb_object_t* object)
 	tb_vector_copy(copy->vector, array->vector);
 
 	// ok
-	return copy;
+	return (tb_object_t*)copy;
 }
 static tb_void_t tb_array_exit(tb_object_t* object)
 {
+	// check
 	tb_array_t* array = tb_array_cast(object);
 	tb_assert_and_check_return(array);
 
@@ -112,7 +113,7 @@ static tb_void_t tb_array_exit(tb_object_t* object)
 	array->vector = tb_null;
 
 	// exit it
-	tb_opool_del(array);
+	tb_opool_del(object);
 }
 static tb_void_t tb_array_cler(tb_object_t* object)
 {
@@ -125,7 +126,7 @@ static tb_void_t tb_array_cler(tb_object_t* object)
 static tb_array_t* tb_array_init_base()
 {
 	// make
-	tb_array_t* array = tb_opool_get(sizeof(tb_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
+	tb_array_t* array = (tb_array_t*)tb_opool_get(sizeof(tb_array_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_ARRAY);
 	tb_assert_and_check_return_val(array, tb_null);
 
 	// init base
@@ -469,6 +470,121 @@ static tb_bool_t tb_array_writ_jsn(tb_object_jsn_writer_t* writer, tb_object_t* 
 	// ok
 	return tb_true;
 }
+static tb_object_t* tb_array_read_xplist(tb_object_xplist_reader_t* reader, tb_size_t event)
+{
+	// check
+	tb_assert_and_check_return_val(reader && reader->reader && event, tb_null);
+
+	// empty?
+	if (event == TB_XML_READER_EVENT_ELEMENT_EMPTY) 
+		return tb_array_init(TB_ARRAY_GROW, tb_false);
+
+	// init array
+	tb_object_t* array = tb_array_init(TB_ARRAY_GROW, tb_false);
+	tb_assert_and_check_return_val(array, tb_null);
+
+	// walk
+	tb_bool_t ok = tb_false;
+	while (!ok && (event = tb_xml_reader_next(reader->reader)))
+	{
+		switch (event)
+		{
+		case TB_XML_READER_EVENT_ELEMENT_BEG: 
+		case TB_XML_READER_EVENT_ELEMENT_EMPTY: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				tb_trace_d("item: %s", name);
+
+				// func
+				tb_object_xplist_reader_func_t func = tb_object_get_xplist_reader(name);
+				tb_assert_and_check_goto(func, end);
+
+				// read
+				tb_object_t* object = func(reader, event);
+
+				// append object
+				if (object) tb_array_append(array, object);
+			}
+			break;
+		case TB_XML_READER_EVENT_ELEMENT_END: 
+			{
+				// name
+				tb_char_t const* name = tb_xml_reader_element(reader->reader);
+				tb_assert_and_check_goto(name, end);
+				
+				// is end?
+				if (!tb_stricmp(name, "array")) ok = tb_true;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ok
+	ok = tb_true;
+
+end:
+
+	// fail
+	if (!ok)
+	{
+		if (array) tb_object_exit(array);
+		array = tb_null;
+	}
+
+	// ok?
+	return array;
+}
+static tb_bool_t tb_array_writ_xplist(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level)
+{
+	// check
+	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
+
+	// writ
+	if (tb_array_size(object))
+	{
+		// writ beg
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<array>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+
+		// walk
+		tb_iterator_t* 	iterator = tb_array_itor(object);
+		tb_size_t 		itor = tb_iterator_head(iterator);
+		tb_size_t 		tail = tb_iterator_tail(iterator);
+		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		{
+			// item
+			tb_object_t* item = tb_iterator_item(iterator, itor);
+			if (item)
+			{
+				// func
+				tb_object_xplist_writer_func_t func = tb_object_get_xplist_writer(item->type);
+				tb_assert_and_check_continue(func);
+
+				// writ
+				if (!func(writer, item, level + 1)) return tb_false;
+			}
+		}
+
+		// writ end
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "</array>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+	else 
+	{
+		tb_object_writ_tab(writer->stream, writer->deflate, level);
+		tb_gstream_printf(writer->stream, "<array/>");
+		tb_object_writ_newline(writer->stream, writer->deflate);
+	}
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -478,6 +594,7 @@ tb_bool_t tb_array_init_reader()
 	if (!tb_object_set_xml_reader("array", tb_array_read_xml)) return tb_false;
 	if (!tb_object_set_bin_reader(TB_OBJECT_TYPE_ARRAY, tb_array_read_bin)) return tb_false;
 	if (!tb_object_set_jsn_reader('[', tb_array_read_jsn)) return tb_false;
+	if (!tb_object_set_xplist_reader("array", tb_array_read_xplist)) return tb_false;
 	return tb_true;
 }
 tb_bool_t tb_array_init_writer()
@@ -485,6 +602,7 @@ tb_bool_t tb_array_init_writer()
 	if (!tb_object_set_xml_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_xml)) return tb_false;
 	if (!tb_object_set_bin_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_bin)) return tb_false;
 	if (!tb_object_set_jsn_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_jsn)) return tb_false;
+	if (!tb_object_set_xplist_writer(TB_OBJECT_TYPE_ARRAY, tb_array_writ_xplist)) return tb_false;
 	return tb_true;
 }
 tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)
@@ -504,11 +622,11 @@ tb_object_t* tb_array_init(tb_size_t grow, tb_bool_t incr)
 	array->incr = incr;
 
 	// ok
-	return array;
+	return (tb_object_t*)array;
 
 fail:
 	// no
-	tb_array_exit(array);
+	tb_array_exit((tb_object_t*)array);
 	return tb_null;
 }
 tb_size_t tb_array_size(tb_object_t* object)

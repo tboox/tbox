@@ -348,5 +348,73 @@ tb_bool_t 			tb_object_set_jsn_writer(tb_size_t type, tb_object_jsn_writer_func_
  */
 tb_pointer_t 		tb_object_get_jsn_writer(tb_size_t type);
 
+/*! set xplist object reader
+ *
+ * @param type 		the object type name
+ * @param func 		the reader func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_xplist_reader(tb_char_t const* type, tb_object_xplist_reader_func_t func);
+
+/*! get xplist object reader
+ *
+ * @param type 		the object type name
+ *
+ * @return 			the reader func
+ */
+tb_pointer_t 		tb_object_get_xplist_reader(tb_char_t const* type);
+
+/*! set xplist object writer
+ *
+ * @param type 		the object type
+ * @param func 		the writer func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_xplist_writer(tb_size_t type, tb_object_xplist_writer_func_t func);
+
+/*! get xplist object writer
+ *
+ * @param type 		the object type
+ *
+ * @return 			the writer func
+ */
+tb_pointer_t 		tb_object_get_xplist_writer(tb_size_t type);
+
+/*! set bplist object reader
+ *
+ * @param type 		the object type
+ * @param func 		the reader func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_bplist_reader(tb_size_t type, tb_object_bplist_reader_func_t func);
+
+/*! get bplist object reader
+ *
+ * @param type 		the object type
+ *
+ * @return 			the reader func
+ */
+tb_pointer_t 		tb_object_get_bplist_reader(tb_size_t type);
+
+/*! set bplist object writer
+ *
+ * @param type 		the object type
+ * @param func 		the writer func
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_object_set_bplist_writer(tb_size_t type, tb_object_bplist_writer_func_t func);
+
+/*! get bplist object writer
+ *
+ * @param type 		the object type
+ *
+ * @return 			the writer func
+ */
+tb_pointer_t 		tb_object_get_bplist_writer(tb_size_t type);
+
 #endif
 

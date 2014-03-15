@@ -44,6 +44,8 @@ demo_C_FILES 			+= \
 						object/jsn \
 						object/xml \
 						object/bin \
+						object/xplist \
+						object/bplist \
 						object/dump \
 						stream/tstream \
 						stream/mstream \

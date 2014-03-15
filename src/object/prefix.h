@@ -39,8 +39,8 @@
 // writ tab
 #define tb_object_writ_tab(gst, deflate, tab) 	if (!(deflate)) { tb_size_t t = (tab); while (t--) tb_gstream_printf((gst), "\t"); } 
 
-// writ '\n'
-#define tb_object_writ_newline(gst, deflate) 	if (!(deflate)) tb_gstream_printf((gst), "\n"); 
+// writ newline
+#define tb_object_writ_newline(gst, deflate) 	if (!(deflate)) tb_gstream_printf((gst), __tb_newline__); 
 
 // bytes
 #define tb_object_need_bytes(x) 				\
@@ -83,8 +83,10 @@ typedef enum __tb_object_format_e
 {
 	TB_OBJECT_FORMAT_NONE 		= 0x0000 	//!< none
 ,	TB_OBJECT_FORMAT_XML 		= 0x0001 	//!< the xml format
-,	TB_OBJECT_FORMAT_BIN 		= 0x0002 	//!< the tbox format
+,	TB_OBJECT_FORMAT_BIN 		= 0x0002 	//!< the tbox binary format
 ,	TB_OBJECT_FORMAT_JSN 		= 0x0003 	//!< the json format
+,	TB_OBJECT_FORMAT_XPLIST 	= 0x0004 	//!< the xplist format for apple
+,	TB_OBJECT_FORMAT_BPLIST 	= 0x0005 	//!< the bplist format for apple
 ,	TB_OBJECT_FORMAT_DEFLATE 	= 0x0100 	//!< deflate?
 
 }tb_object_format_e;
@@ -93,10 +95,10 @@ typedef enum __tb_object_format_e
 typedef struct __tb_object_t
 {
 	/// the object flag
-	tb_size_t 				flag 	: 1;
+	tb_uint8_t 				flag;
 
 	/// the object type
-	tb_size_t 				type 	: 31;
+	tb_uint16_t 			type;
 
 	/// the object reference count
 	tb_size_t 				refn;
@@ -187,6 +189,44 @@ typedef struct __tb_object_jsn_writer_t
 
 }tb_object_jsn_writer_t;
 
+/// the object xplist reader type
+typedef struct __tb_object_xplist_reader_t
+{
+	// the xml reader
+	tb_handle_t 			reader;
+
+}tb_object_xplist_reader_t;
+
+/// the object xplist writer type
+typedef struct __tb_object_xplist_writer_t
+{
+	// the stream
+	tb_gstream_t* 			stream;
+
+	// is deflate?
+	tb_bool_t 				deflate;
+
+}tb_object_xplist_writer_t;
+
+/// the object bplist reader type
+typedef struct __tb_object_bplist_reader_t
+{
+	// the stream
+	tb_gstream_t* 			stream;
+
+}tb_object_bplist_reader_t;
+
+/// the object bplist writer type
+typedef struct __tb_object_bplist_writer_t
+{
+	// the stream
+	tb_gstream_t* 			stream;
+
+	// is deflate?
+	tb_bool_t 				deflate;
+
+}tb_object_bplist_writer_t;
+
 /// the xml reader func type
 typedef tb_object_t* 		(*tb_object_xml_reader_func_t)(tb_object_xml_reader_t* reader, tb_size_t event);
 
@@ -204,6 +244,18 @@ typedef tb_object_t* 		(*tb_object_jsn_reader_func_t)(tb_object_jsn_reader_t* re
 
 /// the jsn writer func type
 typedef tb_bool_t 			(*tb_object_jsn_writer_func_t)(tb_object_jsn_writer_t* writer, tb_object_t* object, tb_size_t level);
+
+/// the xplist reader func type
+typedef tb_object_t* 		(*tb_object_xplist_reader_func_t)(tb_object_xplist_reader_t* reader, tb_size_t event);
+
+/// the xplist writer func type
+typedef tb_bool_t 			(*tb_object_xplist_writer_func_t)(tb_object_xplist_writer_t* writer, tb_object_t* object, tb_size_t level);
+
+/// the bplist reader func type
+typedef tb_object_t* 		(*tb_object_bplist_reader_func_t)(tb_object_bplist_reader_t* reader, tb_size_t type, tb_uint64_t size);
+
+/// the bplist writer func type
+typedef tb_bool_t 			(*tb_object_bplist_writer_func_t)(tb_object_bplist_writer_t* writer, tb_object_t* object);
 
 /* ///////////////////////////////////////////////////////////////////////
  * inlines

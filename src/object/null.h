@@ -49,7 +49,7 @@ tb_bool_t 			tb_null_init_writer(tb_noarg_t);
  *
  * @return 			the null object
  */
-tb_object_t const* 	tb_null_init(tb_noarg_t);
+tb_object_t* 		tb_null_init(tb_noarg_t);
 
 
 #endif
