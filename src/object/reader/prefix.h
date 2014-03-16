@@ -29,5 +29,16 @@
  */
 #include "../prefix.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// bytes
+#define tb_object_reader_need_bytes(x) 				\
+													(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
+													(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
+													(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
+													(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
+
 
 #endif

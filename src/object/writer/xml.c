@@ -43,9 +43,9 @@ static tb_bool_t tb_object_xml_writer_func_null(tb_object_xml_writer_t* writer, 
 	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
 	// writ
-	tb_object_writer_tab(writer->stream, writer->deflate, level);
-	tb_gstream_printf(writer->stream, "<null/>");
-	tb_object_writer_newline(writer->stream, writer->deflate);
+	if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+	if (tb_gstream_printf(writer->stream, "<null/>") < 0) return tb_false;
+	if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 	// ok
 	return tb_true;
@@ -60,32 +60,32 @@ static tb_bool_t tb_object_xml_writer_func_date(tb_object_xml_writer_t* writer, 
 	if (time > 0)
 	{
 		// writ beg
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<date>");
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<date>") < 0) return tb_false;
 
 		// writ date
 		tb_tm_t date = {0};
 		if (tb_localtime(time, &date))
 		{
-			tb_gstream_printf(writer->stream, 	"%04ld-%02ld-%02ld %02ld:%02ld:%02ld"
+			if (tb_gstream_printf(writer->stream, 	"%04ld-%02ld-%02ld %02ld:%02ld:%02ld"
 								, 	date.year
 								, 	date.month
 								, 	date.mday
 								, 	date.hour
 								, 	date.minute
-								, 	date.second);
+								, 	date.second) < 0) return tb_false;
 		}
 					
 		// writ end
-		tb_gstream_printf(writer->stream, "</date>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (tb_gstream_printf(writer->stream, "</date>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 	else 
 	{
 		// writ
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<date/>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<date/>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 
 	// ok
@@ -100,9 +100,9 @@ static tb_bool_t tb_object_xml_writer_func_data(tb_object_xml_writer_t* writer, 
 	if (tb_data_size(object))
 	{
 		// writ beg
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<data>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<data>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// decode base64 data
 		tb_byte_t const* 	ib = tb_data_getp(object);
@@ -121,27 +121,27 @@ static tb_bool_t tb_object_xml_writer_func_data(tb_object_xml_writer_t* writer, 
 		{
 			if (!(n & 63))
 			{
-				if (n) tb_object_writer_newline(writer->stream, writer->deflate);
-				tb_object_writer_tab(writer->stream, writer->deflate, level);
+				if (n) if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
+				if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
 			}
-			tb_gstream_printf(writer->stream, "%c", *p);
+			if (tb_gstream_printf(writer->stream, "%c", *p) < 0) return tb_false;
 		}
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// free it
 		tb_free(ob);
 					
 		// writ end
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "</data>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "</data>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 	else 
 	{
 		// writ
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<data/>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<data/>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 
 	// ok
@@ -156,9 +156,9 @@ static tb_bool_t tb_object_xml_writer_func_array(tb_object_xml_writer_t* writer,
 	if (tb_array_size(object))
 	{
 		// writ beg
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<array>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<array>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// walk
 		tb_iterator_t* 	iterator = tb_array_itor(object);
@@ -180,15 +180,15 @@ static tb_bool_t tb_object_xml_writer_func_array(tb_object_xml_writer_t* writer,
 		}
 
 		// writ end
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "</array>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "</array>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 	else 
 	{
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<array/>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<array/>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 
 	// ok
@@ -200,11 +200,13 @@ static tb_bool_t tb_object_xml_writer_func_string(tb_object_xml_writer_t* writer
 	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
 	// writ
-	tb_object_writer_tab(writer->stream, writer->deflate, level);
+	if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
 	if (tb_string_size(object))
-		tb_gstream_printf(writer->stream, "<string>%s</string>", tb_string_cstr(object));
-	else tb_gstream_printf(writer->stream, "<string/>");
-	tb_object_writer_newline(writer->stream, writer->deflate);
+	{
+		if (tb_gstream_printf(writer->stream, "<string>%s</string>", tb_string_cstr(object)) < 0) return tb_false;
+	}
+	else if (tb_gstream_printf(writer->stream, "<string/>") < 0) return tb_false;
+	if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 	// ok
 	return tb_true;
@@ -218,55 +220,55 @@ static tb_bool_t tb_object_xml_writer_func_number(tb_object_xml_writer_t* writer
 	switch (tb_number_type(object))
 	{
 	case TB_NUMBER_TYPE_UINT64:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%llu</number>", tb_number_uint64(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%llu</number>", tb_number_uint64(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_SINT64:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%lld</number>", tb_number_sint64(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%lld</number>", tb_number_sint64(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_UINT32:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint32(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint32(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_SINT32:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint32(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint32(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_UINT16:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint16(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint16(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_SINT16:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint16(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint16(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_UINT8:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint8(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%u</number>", tb_number_uint8(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_SINT8:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint8(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%d</number>", tb_number_sint8(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 #ifdef TB_CONFIG_TYPE_FLOAT
 	case TB_NUMBER_TYPE_FLOAT:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%f</number>", tb_number_float(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%f</number>", tb_number_float(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 	case TB_NUMBER_TYPE_DOUBLE:
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<number>%lf</number>", tb_number_double(object));
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<number>%lf</number>", tb_number_double(object)) < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 		break;
 #endif
 	default:
@@ -282,9 +284,9 @@ static tb_bool_t tb_object_xml_writer_func_boolean(tb_object_xml_writer_t* write
 	tb_assert_and_check_return_val(writer && writer->stream, tb_false);
 
 	// writ
-	tb_object_writer_tab(writer->stream, writer->deflate, level);
-	tb_gstream_printf(writer->stream, "<%s/>", tb_boolean_bool(object)? "true" : "false");
-	tb_object_writer_newline(writer->stream, writer->deflate);
+	if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+	if (tb_gstream_printf(writer->stream, "<%s/>", tb_boolean_bool(object)? "true" : "false") < 0) return tb_false;
+	if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 	// ok
 	return tb_true;
@@ -298,9 +300,9 @@ static tb_bool_t tb_object_xml_writer_func_dictionary(tb_object_xml_writer_t* wr
 	if (tb_dictionary_size(object))
 	{
 		// writ beg
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<dict>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<dict>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// walk
 		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
@@ -317,9 +319,9 @@ static tb_bool_t tb_object_xml_writer_func_dictionary(tb_object_xml_writer_t* wr
 				tb_assert_and_check_continue(func);
 
 				// writ key
-				tb_object_writer_tab(writer->stream, writer->deflate, level + 1);
-				tb_gstream_printf(writer->stream, "<key>%s</key>", item->key);
-				tb_object_writer_newline(writer->stream, writer->deflate);
+				if (!tb_object_writer_tab(writer->stream, writer->deflate, level + 1)) return tb_false;
+				if (tb_gstream_printf(writer->stream, "<key>%s</key>", item->key) < 0) return tb_false;
+				if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 				// writ val
 				if (!func(writer, item->val, level + 1)) return tb_false;
@@ -327,15 +329,15 @@ static tb_bool_t tb_object_xml_writer_func_dictionary(tb_object_xml_writer_t* wr
 		}
 
 		// writ end
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "</dict>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "</dict>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 	else 
 	{
-		tb_object_writer_tab(writer->stream, writer->deflate, level);
-		tb_gstream_printf(writer->stream, "<dict/>");
-		tb_object_writer_newline(writer->stream, writer->deflate);
+		if (!tb_object_writer_tab(writer->stream, writer->deflate, level)) return tb_false;
+		if (tb_gstream_printf(writer->stream, "<dict/>") < 0) return tb_false;
+		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 	}
 
 	// ok
@@ -359,35 +361,20 @@ static tb_long_t tb_object_xml_writer_done(tb_gstream_t* stream, tb_object_t* ob
 	tb_hize_t bof = tb_stream_offset(stream);
 
 	// writ xml header
-	tb_gstream_printf(stream, "<?xml version=\"2.0\" encoding=\"utf-8\"?>");
-	tb_object_writer_newline(stream, deflate);
+	if (tb_gstream_printf(stream, "<?xml version=\"2.0\" encoding=\"utf-8\"?>") < 0) return -1;
+	if (!tb_object_writer_newline(stream, deflate)) return -1;
 
 	// writ
-	tb_bool_t ok = func(&writer, object, 0);
-	tb_check_return_val(ok, -1);
+	if (!func(&writer, object, 0)) return -1;
 
 	// sync
-	ok = tb_gstream_sync(stream, tb_true);
-	tb_check_return_val(ok, -1);
+	if (!tb_gstream_sync(stream, tb_true)) return -1;
 
 	// the end offset
 	tb_hize_t eof = tb_stream_offset(stream);
 
 	// ok?
 	return eof >= bof? (tb_long_t)(eof - bof) : -1;
-}
-static tb_size_t tb_object_xml_writer_probe(tb_gstream_t* stream)
-{
-	// check
-	tb_assert_and_check_return_val(stream, 0);
-
-	// need it
-	tb_byte_t* p = tb_null;
-	if (!tb_gstream_need(stream, &p, 5)) return 0;
-	tb_assert_and_check_return_val(p, 0);
-
-	// ok?
-	return !tb_strnicmp(p, "<?xml", 5)? 50 : 0;
 }
 
 /* ///////////////////////////////////////////////////////////////////////

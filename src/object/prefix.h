@@ -69,7 +69,7 @@ typedef enum __tb_object_format_e
 ,	TB_OBJECT_FORMAT_BPLIST 	= 0x0002 	//!< the bplist format for apple
 ,	TB_OBJECT_FORMAT_XPLIST 	= 0x0003 	//!< the xplist format for apple
 ,	TB_OBJECT_FORMAT_XML 		= 0x0004 	//!< the xml format
-,	TB_OBJECT_FORMAT_JSN 		= 0x0005 	//!< the json format
+,	TB_OBJECT_FORMAT_JSON 		= 0x0005 	//!< the json format
 ,	TB_OBJECT_FORMAT_MAXN 		= 0x000f 	//!< the format maxn
 ,	TB_OBJECT_FORMAT_DEFLATE 	= 0x0100 	//!< deflate?
 

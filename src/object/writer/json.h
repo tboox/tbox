@@ -17,51 +17,62 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		prefix.h
+ * @file		json.h
  * @ingroup 	object
  *
  */
-#ifndef TB_OBJECT_WRITER_PREFIX_H
-#define TB_OBJECT_WRITER_PREFIX_H
+#ifndef TB_OBJECT_WRITER_JSON_H
+#define TB_OBJECT_WRITER_JSON_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "../prefix.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * types
  */
 
-// bytes
-#define tb_object_writer_need_bytes(x) 				\
-													(((tb_uint64_t)(x)) < (1ull << 8) ? 1 : \
-													(((tb_uint64_t)(x)) < (1ull << 16) ? 2 : \
-													(((tb_uint64_t)(x)) < (1ull << 24) ? 3 : \
-													(((tb_uint64_t)(x)) < (1ull << 32) ? 4 : 8))))
+/// the object json writer type
+typedef struct __tb_object_json_writer_t
+{
+	/// the stream
+	tb_gstream_t* 				stream;
+
+	/// is deflate?
+	tb_bool_t 					deflate;
+
+}tb_object_json_writer_t;
+
+/// the json writer func type
+typedef tb_bool_t 				(*tb_object_json_writer_func_t)(tb_object_json_writer_t* writer, tb_object_t* object, tb_size_t level);
 
 /* ///////////////////////////////////////////////////////////////////////
- * inlines
+ * interfaces
  */
 
-static __tb_inline__ tb_bool_t tb_object_writer_tab(tb_gstream_t* stream, tb_bool_t deflate, tb_size_t tab)
-{
-	// writ tab
-	if (!deflate) 
-	{
-		while (tab--) if (tb_gstream_printf(stream, "\t") < 0) return tb_false;
-	}
+/*! the json object writer
+ *
+ * @return 						the json object writer
+ */
+tb_object_writer_t* 			tb_object_json_writer(tb_noarg_t);
 
-	// ok
-	return tb_true;
-}
-static __tb_inline__ tb_bool_t tb_object_writer_newline(tb_gstream_t* stream, tb_bool_t deflate)
-{
-	// writ newline
-	if (!deflate && tb_gstream_printf(stream, __tb_newline__) < 0) return tb_false;
+/*! hook the json writer
+ *
+ * @param type 					the object type 
+ * @param func 					the writer func
+ *
+ * @return 						tb_true or tb_false
+ */
+tb_bool_t 						tb_object_json_writer_hook(tb_size_t type, tb_object_json_writer_func_t func);
 
-	// ok
-	return tb_true;
-}
+/*! the json writer func
+ *
+ * @param type 					the object type 
+ *
+ * @return 						the object writer func
+ */
+tb_object_json_writer_func_t 	tb_object_json_writer_func(tb_size_t type);
 
 #endif
+
