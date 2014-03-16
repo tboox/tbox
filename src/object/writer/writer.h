@@ -30,6 +30,7 @@
 #include "xml.h"
 #include "bin.h"
 #include "json.h"
+#include "xplist.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
