@@ -45,11 +45,13 @@ tb_bool_t tb_object_context_init()
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_reader())) return tb_false;
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_JSON, tb_object_json_reader())) return tb_false;
+	if (!tb_object_reader_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_reader())) return tb_false;
  
 	// set writer
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_writer())) return tb_false;
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_JSON, tb_object_json_writer())) return tb_false;
+	if (!tb_object_writer_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_writer())) return tb_false;
 
 	// ok
 	return tb_true;
@@ -60,11 +62,13 @@ tb_void_t tb_object_context_exit()
 	tb_object_reader_del(TB_OBJECT_FORMAT_XML);
 	tb_object_reader_del(TB_OBJECT_FORMAT_BIN);
 	tb_object_reader_del(TB_OBJECT_FORMAT_JSON);
+	tb_object_reader_del(TB_OBJECT_FORMAT_XPLIST);
 
 	// exit writer
 	tb_object_writer_del(TB_OBJECT_FORMAT_XML);
 	tb_object_writer_del(TB_OBJECT_FORMAT_BIN);
 	tb_object_writer_del(TB_OBJECT_FORMAT_JSON);
+	tb_object_writer_del(TB_OBJECT_FORMAT_XPLIST);
 
 	// exit opool
 	tb_opool_exit();
