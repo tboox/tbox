@@ -17,53 +17,59 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		reader.h
+ * @file		json.h
  * @ingroup 	object
  *
  */
-#ifndef TB_OBJECT_READER_H
-#define TB_OBJECT_READER_H
+#ifndef TB_OBJECT_READER_JSON_H
+#define TB_OBJECT_READER_JSON_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "xml.h"
-#include "json.h"
+#include "prefix.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the json reader type
+typedef struct __tb_object_json_reader_t
+{
+	/// the stream
+	tb_gstream_t* 				stream;
+
+}tb_object_json_reader_t;
+
+/// the json reader func type
+typedef tb_object_t* 			(*tb_object_json_reader_func_t)(tb_object_json_reader_t* reader, tb_char_t type);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! set object reader
+/*! the json object reader
  *
- * @param format 	the reader format
- * @param reader 	the reader
- *
- * @return 			tb_true or tb_false
+ * @return 						the json object reader
  */
-tb_bool_t 			tb_object_reader_set(tb_size_t format, tb_object_reader_t* reader);
+tb_object_reader_t* 			tb_object_json_reader(tb_noarg_t);
 
-/*! del object reader
+/*! hook the json reader
  *
- * @param format 	the reader format
+ * @param type 					the object type name
+ * @param func 					the reader func
+ *
+ * @return 						tb_true or tb_false
  */
-tb_void_t 			tb_object_reader_del(tb_size_t format);
+tb_bool_t 						tb_object_json_reader_hook(tb_char_t type, tb_object_json_reader_func_t func);
 
-/*! get object reader
+/*! the json reader func
  *
- * @param format 	the reader format
+ * @param type 					the object type name
  *
- * @return 			the object reader
+ * @return 						the object reader func
  */
-tb_object_reader_t* tb_object_reader_get(tb_size_t format);
-
-/*! done reader
- *
- * @param stream 	the stream
- *
- * @return 			the object
- */
-tb_object_t* 		tb_object_reader_done(tb_gstream_t* stream);
-
+tb_object_json_reader_func_t 	tb_object_json_reader_func(tb_char_t type);
 
 #endif
+

@@ -396,7 +396,7 @@ tb_bool_t 			tb_gstream_skip(tb_gstream_t* gstream, tb_hize_t size);
  * @param gstream 	the stream
  * @param fmt 		the format
  *
- * @return 			the real size
+ * @return 			the real size, failed: -1
  */
 tb_long_t 			tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...);
 

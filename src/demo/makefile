@@ -41,7 +41,7 @@ demo_C_FILES 			+= \
 						utils/base64 \
 						other/test \
 						other/charset \
-						object/jsn \
+						object/json \
 						object/xml \
 						object/bin \
 						object/xplist \
