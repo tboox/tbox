@@ -201,6 +201,8 @@ static tb_object_t* tb_object_bplist_reader_func_array(tb_object_bplist_reader_t
 			if (tb_gstream_bread(reader->stream, data + sizeof(tb_uint32_t), size * item_size))
 			{
 				tb_bits_set_u32_ne(data, (tb_uint32_t)size);
+
+				// FIXME: not using the user private data
 				tb_object_setp(object, data);
 			}
 			else tb_free(data);

@@ -126,7 +126,7 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
 			{
 				// the func
 				tb_object_bin_writer_func_t func = tb_object_bin_writer_func(item->type);
-				tb_assert_and_check_return_val(func, tb_false);
+				tb_assert_and_check_continue(func);
 
 				// writ it
 				if (!func(writer, item)) return tb_false;

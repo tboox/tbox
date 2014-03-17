@@ -473,7 +473,10 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 				index_tables = tb_object_getp(object);
 				if (!index_tables)
 				{
+					// make it
 					index_tables = tb_malloc0(size * item_size);
+
+					// FIXME: not using the user private data
 					tb_object_setp(object, index_tables);
 				}
 			}
@@ -512,7 +515,10 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 				index_tables = tb_object_getp(object);
 				if (!index_tables)
 				{
+					// make it
 					index_tables = tb_malloc0((size << 1) * item_size);
+
+					// FIXME: not using the user private data
 					tb_object_setp(object, index_tables);
 				}
 			}
@@ -685,12 +691,12 @@ static tb_long_t tb_object_bplist_writer_done(tb_gstream_t* stream, tb_object_t*
 				// check
 				tb_assert_and_check_goto(i < object_count, end);
 
-				// the func
-				tb_object_bplist_writer_func_t func = tb_object_bplist_writer_func(tb_object_type(item));
-				tb_assert_and_check_goto(func, end);
-
 				// save offset
 				offsets[i++] = tb_stream_offset(stream);
+
+				// the func
+				tb_object_bplist_writer_func_t func = tb_object_bplist_writer_func(tb_object_type(item));
+				tb_assert_and_check_continue(func);
 
 				// writ object
 				if (!func(&writer, item, item_size)) goto end;
