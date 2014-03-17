@@ -46,12 +46,14 @@ tb_bool_t tb_object_context_init()
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_reader())) return tb_false;
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_JSON, tb_object_json_reader())) return tb_false;
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_reader())) return tb_false;
+	if (!tb_object_reader_set(TB_OBJECT_FORMAT_BPLIST, tb_object_bplist_reader())) return tb_false;
  
 	// set writer
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_XML, tb_object_xml_writer())) return tb_false;
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_writer())) return tb_false;
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_JSON, tb_object_json_writer())) return tb_false;
 	if (!tb_object_writer_set(TB_OBJECT_FORMAT_XPLIST, tb_object_xplist_writer())) return tb_false;
+	if (!tb_object_writer_set(TB_OBJECT_FORMAT_BPLIST, tb_object_bplist_writer())) return tb_false;
 
 	// ok
 	return tb_true;
@@ -63,12 +65,14 @@ tb_void_t tb_object_context_exit()
 	tb_object_reader_del(TB_OBJECT_FORMAT_BIN);
 	tb_object_reader_del(TB_OBJECT_FORMAT_JSON);
 	tb_object_reader_del(TB_OBJECT_FORMAT_XPLIST);
+	tb_object_reader_del(TB_OBJECT_FORMAT_BPLIST);
 
 	// exit writer
 	tb_object_writer_del(TB_OBJECT_FORMAT_XML);
 	tb_object_writer_del(TB_OBJECT_FORMAT_BIN);
 	tb_object_writer_del(TB_OBJECT_FORMAT_JSON);
 	tb_object_writer_del(TB_OBJECT_FORMAT_XPLIST);
+	tb_object_writer_del(TB_OBJECT_FORMAT_BPLIST);
 
 	// exit opool
 	tb_opool_exit();
@@ -109,13 +113,13 @@ tb_void_t tb_object_cler(tb_object_t* object)
 	// clear
 	if (object->cler) object->cler(object);
 }
-tb_void_t tb_object_setp(tb_object_t* object, tb_cpointer_t priv)
+tb_void_t tb_object_setp(tb_object_t* object, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return(object);
 	object->priv = priv;
 }
-tb_cpointer_t tb_object_getp(tb_object_t* object)
+tb_pointer_t tb_object_getp(tb_object_t* object)
 {
 	// check
 	tb_assert_and_check_return_val(object, tb_null);

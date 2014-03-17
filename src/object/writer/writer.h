@@ -31,6 +31,7 @@
 #include "bin.h"
 #include "json.h"
 #include "xplist.h"
+#include "bplist.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

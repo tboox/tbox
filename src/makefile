@@ -91,11 +91,13 @@ tbox_C_FILES 			+= \
 						object/reader/bin \
 						object/reader/json \
 						object/reader/xplist \
+						object/reader/bplist \
 						object/reader/reader \
 						object/writer/xml \
 						object/writer/bin \
 						object/writer/json \
 						object/writer/xplist \
+						object/writer/bplist \
 						object/writer/writer \
 						zip/zip \
 						zip/vlc/fixed \
@@ -454,12 +456,14 @@ INC_FILES 				= \
 						object/reader/bin.h \
 						object/reader/json.h \
 						object/reader/xplist.h \
+						object/reader/bplist.h \
 						object/writer/prefix.h \
 						object/writer/writer.h \
 						object/writer/xml.h \
 						object/writer/bin.h \
 						object/writer/json.h \
 						object/writer/xplist.h \
+						object/writer/bplist.h \
 						utils/prefix.h \
 						utils/utils.h \
 						utils/bits.h \
