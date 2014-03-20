@@ -345,28 +345,6 @@ tb_bool_t tb_stream_ctrl(tb_handle_t handle, tb_size_t ctrl, ...)
 			}
 		}
 		break;
-	case TB_STREAM_CTRL_SET_CACHE:
-		{
-			// check
-			tb_assert_and_check_return_val(!tb_stream_is_opened(stream), tb_false);
-
-			// set cache
-			tb_size_t cache = (tb_size_t)tb_va_arg(args, tb_size_t);
-			tb_qbuffer_resize(&stream->cache, cache);
-			ok = tb_true;
-		}
-		break;
-	case TB_STREAM_CTRL_GET_CACHE:
-		{
-			// get cache
-			tb_size_t* pcache = (tb_size_t*)tb_va_arg(args, tb_size_t*);
-			if (pcache)
-			{
-				*pcache = tb_qbuffer_maxn(&stream->cache);
-				ok = tb_true;
-			}
-		}
-		break;
 	default:
 		break;
 	}
