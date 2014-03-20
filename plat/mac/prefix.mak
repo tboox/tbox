@@ -15,39 +15,19 @@ DLL_SUFFIX 			= .dylib
 
 ASM_SUFFIX 			= .S
 
-# prefix
-PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),)
-
-# cc
-CC_ 				:= ${shell if [ -f "/usr/bin/clang" ]; then echo "clang"; elif [ -f "/usr/local/bin/clang" ]; then echo "clang"; else echo "gcc"; fi }
-CC_ 				:= $(if $(findstring y,$(PROF)),gcc,$(CC_))
-CC 					= $(PRE_)$(CC_)
-ifeq ($(CXFLAGS_CHECK),)
-CC_CHECK 			= ${shell if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-CXFLAGS_CHECK 		:= $(call CC_CHECK,-ftrapv,) $(call CC_CHECK,-fsanitize=address,) #-fsanitize=thread
-export CXFLAGS_CHECK
-endif
-
-# ld
-LD_ 				:= ${shell if [ -f "/usr/bin/clang++" ]; then echo "clang++"; elif [ -f "/usr/local/bin/clang++" ]; then echo "clang++"; else echo "g++"; fi }
-LD_ 				:= $(if $(findstring y,$(PROF)),g++,$(LD_))
-LD 					= $(PRE_)$(LD_)
-ifeq ($(LDFLAGS_CHECK),)
-LD_CHECK 			= ${shell if $(LD) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi }
-LDFLAGS_CHECK 		:= $(call LD_CHECK,-ftrapv,) $(call LD_CHECK,-fsanitize=address,) #-fsanitize=thread
-export LDFLAGS_CHECK
-endif
-
 # cpu bits
 BITS 				:= $(if $(findstring x64,$(ARCH)),64,)
 BITS 				:= $(if $(findstring x86,$(ARCH)),32,)
 BITS 				:= $(if $(BITS),$(BITS),$(shell getconf LONG_BIT))
 
 # tool
-MM 					= $(PRE_)$(CC_)
-AR 					= $(PRE_)ar
-STRIP 				= $(PRE_)strip
-RANLIB 				= $(PRE_)ranlib
+PRE 				= xcrun -sdk macosx 
+CC 					= $(PRE)clang
+MM 					= $(PRE)clang
+LD 					= $(PRE)clang
+AR 					= $(PRE)ar
+STRIP 				= $(PRE)strip
+RANLIB 				= $(PRE)ranlib
 AS					= yasm
 RM 					= rm -f
 RMDIR 				= rm -rf
@@ -58,7 +38,7 @@ MAKE 				= make
 PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
-CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+CXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
 CXFLAGS_DEBUG 		= -g -D__tb_debug__ 
 CXFLAGS 			= -m$(BITS) -c -Wall -mssse3
 CXFLAGS-I 			= -I
@@ -74,12 +54,9 @@ endif
 # prof
 ifeq ($(PROF),y)
 CXFLAGS 			+= -g -fno-omit-frame-pointer 
-ifeq ($(ARCH),x64)
-CXFLAGS 			+= -pg
-endif
 else
 CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
-CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(CXFLAGS_CHECK)
+CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
 endif
 
 # small
@@ -108,10 +85,10 @@ CCFLAGS 			= \
 					-D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
 
 # mxflags: .m/.mm files
-MXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
+MXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
 MXFLAGS_DEBUG 		= -g -D__tb_debug__ 
 MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) \
-					-fmessage-length=0  -Wreturn-type -Wunused-variable \
+					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
 					"-DIBOutlet=__attribute__((iboutlet))" \
 					"-DIBOutletCollection(ClassName)=__attribute__((iboutletcollection(ClassName)))" \
@@ -129,12 +106,9 @@ endif
 # prof
 ifeq ($(PROF),y)
 MXFLAGS 			+= -g -fno-omit-frame-pointer 
-ifeq ($(ARCH),x64)
-MXFLAGS 			+= -pg
-endif
 else
 MXFLAGS_RELEASE 	+= -fomit-frame-pointer 
-MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer $(CXFLAGS_CHECK)
+MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
 endif
 
 # small
@@ -160,12 +134,9 @@ LDFLAGS-o 			= -o
 
 # prof
 ifeq ($(PROF),y)
-ifeq ($(ARCH),x64)
-LDFLAGS 			+= -pg
-endif
 else
 LDFLAGS_RELEASE 	+= -s
-LDFLAGS_DEBUG 		+= $(LDFLAGS_CHECK)
+LDFLAGS_DEBUG 		+= -ftrapv
 endif
 
 # asflags
