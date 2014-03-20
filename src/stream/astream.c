@@ -62,13 +62,13 @@ static tb_bool_t tb_astream_csync_func(tb_astream_t* astream, tb_size_t state, t
 		ok = astream->sync(astream, astream->wcache_and.sync.bclosing, astream->wcache_and.sync.func, priv);
 
 		// failed? done func
-		if (!ok) ok = astream->wcache_and.sync.func(astream, TB_STREAM_STATE_UNKNOWN_ERROR, priv);
+		if (!ok) ok = astream->wcache_and.sync.func(astream, TB_STREAM_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
 	}
 	// failed?
 	else
 	{
 		// failed? done func
-		ok = astream->wcache_and.sync.func(astream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, priv);
+		ok = astream->wcache_and.sync.func(astream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
 	}
 
 	// ok?
@@ -293,7 +293,7 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_astream_sread_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_astream_sread_func(tb_astream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sread_t* sread = (tb_astream_sread_t*)priv;
@@ -334,7 +334,7 @@ static tb_bool_t tb_astream_sread_func(tb_astream_t* astream, tb_size_t state, t
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_astream_sseek_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_astream_sseek_func(tb_astream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sseek_t* sseek = (tb_astream_sseek_t*)priv;

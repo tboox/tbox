@@ -336,7 +336,7 @@ static tb_bool_t tb_astream_filter_writ(tb_handle_t astream, tb_size_t delay, tb
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_astream_filter_sync_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_astream_filter_sync_func(tb_astream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv)
 {
 	// check
 	tb_assert_and_check_return_val(astream, tb_false);
@@ -346,7 +346,7 @@ static tb_bool_t tb_astream_filter_sync_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
 
 	// done func
-	return fstream->func.sync((tb_astream_t*)fstream, state, fstream->priv);
+	return fstream->func.sync((tb_astream_t*)fstream, state, bclosing, fstream->priv);
 }
 static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -370,13 +370,13 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 		ok = tb_astream_sync(fstream->astream, fstream->bclosing, tb_astream_filter_sync_func, fstream);
 
 		// failed? done func
-		if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, fstream->priv);
+		if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
 	}
 	// failed?
 	else
 	{
 		// failed? done func
-		ok = fstream->func.sync((tb_astream_t*)fstream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, fstream->priv);
+		ok = fstream->func.sync((tb_astream_t*)fstream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
 	}
 
 	// ok?
@@ -390,7 +390,7 @@ static tb_bool_t tb_astream_filter_sync(tb_handle_t astream, tb_bool_t bclosing,
 
 	// clear the offset if be read mode now
 	if (fstream->bread) tb_atomic64_set0(&fstream->offset);
-
+ 
 	// set writ mode
 	fstream->bread = 0;
 

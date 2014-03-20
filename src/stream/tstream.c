@@ -258,7 +258,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 	// continue to writ or break it
 	return bwrit;
 }
-static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t state, tb_pointer_t priv)
+static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)priv;

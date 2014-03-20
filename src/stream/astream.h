@@ -128,11 +128,12 @@ typedef tb_bool_t 				(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, 
  *
  * @param astream 				the astream
  * @param state 				the stream state
+ * @param bclosing 				is closing?
  * @param priv 					the func private data
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 				(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 				(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, tb_size_t state, tb_bool_t bclosing, tb_pointer_t priv);
 
 /*! the astream task func type
  *

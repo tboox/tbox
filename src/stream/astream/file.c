@@ -66,6 +66,9 @@ typedef struct __tb_astream_file_t
 	// the file offset
 	tb_atomic64_t 				offset;
 
+	// is closing
+	tb_bool_t 					bclosing;
+
 	// the func
 	union
 	{
@@ -288,7 +291,7 @@ static tb_bool_t tb_astream_file_sync_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(fstream && fstream->func.sync, tb_false);
 
 	// done func
-	fstream->func.sync((tb_astream_t*)fstream, aice->state == TB_AICE_STATE_OK? TB_STREAM_STATE_OK : TB_STREAM_STATE_UNKNOWN_ERROR, fstream->priv);
+	fstream->func.sync((tb_astream_t*)fstream, aice->state == TB_AICE_STATE_OK? TB_STREAM_STATE_OK : TB_STREAM_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
 
 	// ok
 	return tb_true;
@@ -302,6 +305,7 @@ static tb_bool_t tb_astream_file_sync(tb_handle_t astream, tb_bool_t bclosing, t
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.sync 	= func;
+	fstream->bclosing	= bclosing;
 
 	// post sync
 	return tb_aico_fsync(fstream->aico, tb_astream_file_sync_func, astream);
