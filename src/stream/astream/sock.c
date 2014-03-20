@@ -545,7 +545,7 @@ static tb_bool_t tb_astream_sock_sync(tb_handle_t astream, tb_bool_t bclosing, t
 	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && func, tb_false);
 
 	// done func
-	func(astream, TB_STREAM_STATE_OK, priv);
+	func(astream, TB_STREAM_STATE_OK, bclosing, priv);
 
 	// ok
 	return tb_true;

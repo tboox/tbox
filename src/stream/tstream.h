@@ -176,13 +176,13 @@ tb_hong_t 			tb_tstream_save_dg(tb_byte_t const* idata, tb_size_t isize, tb_gstr
  */
 tb_hong_t 			tb_tstream_save_fs(tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_size_t lrate, tb_tstream_save_func_t func, tb_pointer_t priv);
 
-/*! init tstream from astrean to astream, async transfer
+/*! init tstream from astream to astream, async transfer
  *
  * @param istream 	the istream
  * @param ostream 	the ostream
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, tb_hize_t offset);
 
@@ -192,7 +192,7 @@ tb_handle_t 		tb_tstream_init_aa(tb_astream_t* istream, tb_astream_t* ostream, t
  * @param ostream 	the ostream
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, tb_hize_t offset);
 
@@ -202,7 +202,7 @@ tb_handle_t 		tb_tstream_init_ag(tb_astream_t* istream, tb_gstream_t* ostream, t
  * @param ourl 		the output url
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_au(tb_astream_t* istream, tb_char_t const* ourl, tb_hize_t offset);
 
@@ -213,7 +213,7 @@ tb_handle_t 		tb_tstream_init_au(tb_astream_t* istream, tb_char_t const* ourl, t
  * @param ourl 		the output url
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset);
 
@@ -223,7 +223,7 @@ tb_handle_t 		tb_tstream_init_uu(tb_aicp_t* aicp, tb_char_t const* iurl, tb_char
  * @param ostream 	the ostream
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_ua(tb_char_t const* iurl, tb_astream_t* ostream, tb_hize_t offset);
 
@@ -235,7 +235,7 @@ tb_handle_t 		tb_tstream_init_ua(tb_char_t const* iurl, tb_astream_t* ostream, t
  * @param ourl 		the output url
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_size_t isize, tb_char_t const* ourl, tb_hize_t offset);
 
@@ -246,7 +246,7 @@ tb_handle_t 		tb_tstream_init_du(tb_aicp_t* aicp, tb_byte_t const* idata, tb_siz
  * @param ostream 	the ostream
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_astream_t* ostream, tb_hize_t offset);
 
@@ -258,7 +258,7 @@ tb_handle_t 		tb_tstream_init_da(tb_byte_t const* idata, tb_size_t isize, tb_ast
  * @param timeout 	the timeout
  * @param offset 	the offset
  *
- * @return 			the saved size, failed: -1
+ * @return 			the tstream 
  */
 tb_handle_t 		tb_tstream_init_fs(tb_aicp_t* aicp, tb_handle_t file, tb_handle_t sock, tb_long_t timeout, tb_hize_t offset);
 

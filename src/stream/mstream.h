@@ -28,23 +28,45 @@
  * includes
  */
 #include "prefix.h"
+#include "../asio/asio.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*! init mstream, multi-stream for the tstream 
+/*! init mstream
  *
+ * the multi-stream for the stream transfer
  *
- * @return 			the mstream handle
+ * @param conc 			the concurrent transfer count, no limit if be zeor
+ *
+ * @return 				the mstream 
  */
-tb_handle_t 		tb_mstream_init();
+tb_handle_t 			tb_mstream_init(tb_aicp_t* aicp, tb_size_t conc);
 
 /*! exit mstream
  *
- * @param mstream 	the mstream handle
+ * @param mstream 		the mstream 
  */
-tb_void_t 			tb_mstream_exit(tb_handle_t mstream);
+tb_void_t 				tb_mstream_exit(tb_handle_t mstream);
 
+/*! kill mstream
+ *
+ * @param mstream 		the mstream 
+ */
+tb_void_t 				tb_mstream_kill(tb_handle_t mstream);
+
+/*! done transfer from iurl to ourl
+ *
+ * @param mstream 		the mstream 
+ * @param iurl 			the input url
+ * @param ourl 			the output url
+ * @param offset 		the offset
+ * @param func 			the save func 
+ * @param priv 			the func private data
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_mstream_done(tb_handle_t mstream, tb_char_t const* iurl, tb_char_t const* ourl, tb_hize_t offset, tb_tstream_save_func_t func, tb_pointer_t priv);
 
 #endif

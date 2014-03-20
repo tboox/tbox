@@ -825,7 +825,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 					tb_filter_cler(filter);
 
 					// push data
-					if (!tb_filter_push(filter, p, e - p)) break;
+					if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
 					p = e;
 				}
 
@@ -865,7 +865,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 				if (p < e)
 				{
 					// push data
-					if (!tb_filter_push(filter, p, e - p)) break;
+					if (!tb_filter_push(filter, (tb_byte_t const*)p, e - p)) break;
 					p = e;
 				}
 
@@ -880,7 +880,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 			}
 
 			// cache the left data
-			if (p < e) tb_pbuffer_memncat(&http->cache_data, p, e - p);
+			if (p < e) tb_pbuffer_memncat(&http->cache_data, (tb_byte_t const*)p, e - p);
 			p = e;
 
 			// ok
@@ -998,7 +998,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_astream_t* astream, tb_size_t st
 		{
 			// check
 			tb_assert_and_check_break(http->tstream);
-
+ 
 			// post data
 			if (!tb_tstream_save(http->tstream, tb_aicp_http_head_post_func, http)) break;
 		}
@@ -1069,7 +1069,7 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
 		tb_trace_d("request[%lu]:\n%s", head_size, head_data);
 
 		// post writ head
-		if (!tb_astream_writ(http->stream, head_data, head_size, tb_aicp_http_head_writ_func, http)) break;
+		if (!tb_astream_writ(http->stream, (tb_byte_t const*)head_data, head_size, tb_aicp_http_head_writ_func, http)) break;
 
 		// ok
 		state = TB_STREAM_STATE_OK;
@@ -1118,7 +1118,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_astream_t* astream, tb_size_t st
 			tb_trace_d("request:\n%s", head_data);
 
 			// post writ head
-			ok = tb_astream_owrit(http->stream, head_data, head_size, tb_aicp_http_head_writ_func, http);
+			ok = tb_astream_owrit(http->stream, (tb_byte_t const*)head_data, head_size, tb_aicp_http_head_writ_func, http);
 		}
 		// post?
 		else if (http->option.method == TB_HTTP_METHOD_POST)
