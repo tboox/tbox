@@ -132,8 +132,8 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 		tb_hize_t offset = tb_atomic64_add_and_fetch(&hstream->offset, real);
 
 		// end? 
-		tb_hong_t size = tb_atomic64_get(&hstream->size);
-		if (size >= 0 && offset == size) bend = tb_true;
+		tb_hong_t hsize = tb_atomic64_get(&hstream->size);
+		if (hsize >= 0 && offset == hsize) bend = tb_true;
 	}
 
 	// done func
@@ -145,20 +145,20 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_http_t* hstream = tb_astream_http_cast(astream);
 	tb_assert_and_check_return_val(hstream && hstream->http && func, tb_false);
 
 	// end? closed
-	tb_hong_t size = tb_atomic64_get(&hstream->size);
-	if (size >= 0) 
+	tb_hong_t hsize = tb_atomic64_get(&hstream->size);
+	if (hsize >= 0) 
 	{
 		tb_hize_t offset = tb_atomic64_get(&hstream->offset);
-		if (offset == size)
+		if (offset == hsize)
 		{
-			hstream->func.read(astream, TB_STREAM_STATE_CLOSED, tb_null, 0, maxn, priv);
+			hstream->func.read(astream, TB_STREAM_STATE_CLOSED, tb_null, 0, size, priv);
 			return tb_true;
 		}
 	}
@@ -168,7 +168,7 @@ static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_s
 	hstream->func.read 	= func;
 
 	// post read
-	return tb_aicp_http_read(hstream->http, delay, maxn, tb_astream_http_read_func, astream);
+	return tb_aicp_http_read(hstream->http, delay, size, tb_astream_http_read_func, astream);
 }
 static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb_hize_t offset, tb_pointer_t priv)
 {
@@ -687,7 +687,7 @@ tb_astream_t* tb_astream_init_http(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(hstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP, 0)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)hstream, aicp, TB_STREAM_TYPE_HTTP, 0, 0)) goto fail;
 	hstream->base.open 		= tb_astream_http_open;
 	hstream->base.read 		= tb_astream_http_read;
 	hstream->base.seek 		= tb_astream_http_seek;

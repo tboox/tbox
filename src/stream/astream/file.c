@@ -38,9 +38,6 @@
  * macros
  */
 
-// the file read maxn
-#define TB_ASTREAM_FILE_READ_MAXN 			TB_FILE_DIRECT_CSIZE
-
 // the file cache maxn
 #define TB_ASTREAM_FILE_CACHE_MAXN 			TB_FILE_DIRECT_CSIZE
 
@@ -69,9 +66,6 @@ typedef struct __tb_astream_file_t
 	// the file offset
 	tb_atomic64_t 				offset;
 
-	// the file data
-	tb_byte_t 					data[TB_ASTREAM_FILE_READ_MAXN];
-	
 	// the func
 	union
 	{
@@ -155,7 +149,6 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.read.real <= sizeof(fstream->data));
 		tb_atomic64_fetch_and_add(&fstream->offset, aice->u.read.real);
 		state = TB_STREAM_STATE_OK;
 		break;
@@ -179,26 +172,25 @@ static tb_bool_t tb_astream_file_read_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_read(aice->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, aice->u.read.size, tb_astream_file_read_func, (tb_astream_t*)fstream);
+			tb_aico_read(aice->aico, (tb_hize_t)tb_atomic64_get(&fstream->offset), aice->u.read.data, aice->u.read.size, tb_astream_file_read_func, (tb_astream_t*)fstream);
 		}
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_file_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_file_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_file_t* fstream = tb_astream_file_cast(astream);
-	tb_assert_and_check_return_val(fstream && fstream->file && fstream->aico && func, tb_false);
+	tb_assert_and_check_return_val(fstream && fstream->file && fstream->aico && data && size && func, tb_false);
 
 	// save func and priv
 	fstream->priv 		= priv;
 	fstream->func.read 	= func;
-	if (!maxn || maxn > sizeof(fstream->data)) maxn = sizeof(fstream->data);
 
 	// post read
-	return tb_aico_read_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), fstream->data, maxn, tb_astream_file_read_func, astream);
+	return tb_aico_read_after(fstream->aico, delay, (tb_hize_t)tb_atomic64_get(&fstream->offset), data, size, tb_astream_file_read_func, astream);
 }
 static tb_bool_t tb_astream_file_writ_func(tb_aice_t const* aice)
 {
@@ -464,7 +456,7 @@ tb_astream_t* tb_astream_init_file(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(fstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FILE, TB_ASTREAM_FILE_CACHE_MAXN)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)fstream, aicp, TB_STREAM_TYPE_FILE, TB_ASTREAM_FILE_CACHE_MAXN, TB_ASTREAM_FILE_CACHE_MAXN)) goto fail;
 	fstream->base.open 		= tb_astream_file_open;
 	fstream->base.read 		= tb_astream_file_read;
 	fstream->base.writ 		= tb_astream_file_writ;

@@ -32,31 +32,55 @@
 /* ///////////////////////////////////////////////////////////////////////
  * inlines
  */
-static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t* aicp, tb_size_t type, tb_size_t cache)
+static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t* aicp, tb_size_t type, tb_size_t rcache, tb_size_t wcache)
 {
 	// check
 	tb_assert_and_check_return_val(astream && aicp, tb_false);
 
-	// init
-	astream->base.mode 		= TB_STREAM_MODE_AICO;
-	astream->base.type 		= type;
-	astream->base.timeout 	= -1;
-	astream->base.bopened 	= 0;
-	astream->base.bstoped 	= 1;
-	astream->aicp 			= aicp;
+	// done
+	tb_bool_t ok = tb_false;
+	tb_bool_t ok_url = tb_false;
+	tb_bool_t ok_rcache = tb_false;
+	do
+	{
+		// init
+		astream->base.mode 		= TB_STREAM_MODE_AICO;
+		astream->base.type 		= type;
+		astream->base.timeout 	= -1;
+		astream->base.bopened 	= 0;
+		astream->base.bstoped 	= 1;
+		astream->aicp 			= aicp;
 
-	// init url
-	if (!tb_url_init(&astream->base.url)) return tb_false;
+		// init url
+		if (!tb_url_init(&astream->base.url)) break;
+		ok_url = tb_true;
 
-	// init cache
-	if (!tb_qbuffer_init(&astream->base.cache, cache)) goto fail;
+		// init rcache
+		if (!tb_pbuffer_init(&astream->rcache_data)) break;
+		astream->rcache_maxn = rcache;
+		ok_rcache = tb_true;
 
-	// ok
-	return tb_true;
+		// init wcache
+		if (!tb_pbuffer_init(&astream->wcache_data)) break;
+		astream->wcache_maxn = wcache;
 
-fail:
-	tb_qbuffer_exit(&astream->base.cache);
-	return tb_false;
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed? 
+	if (!ok)
+	{
+		// exit rcache
+		if (ok_rcache) tb_pbuffer_exit(&astream->rcache_data);
+
+		// exit url
+		if (ok_url) tb_url_exit(&astream->base.url);
+	}
+
+	// ok?
+	return ok;
 }
 
 #endif

@@ -223,6 +223,9 @@ tb_bool_t tb_gstream_need(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t siz
 	// must enable cache
 	tb_assert_and_check_return_val(tb_qbuffer_maxn(&gstream->base.cache) && size <= tb_qbuffer_maxn(&gstream->base.cache), tb_false);
 
+	// have writed cache? sync first
+	if (gstream->base.bwrited && !tb_qbuffer_null(&gstream->base.cache) && !tb_gstream_sync(gstream, tb_false)) return tb_false;
+
 	// switch to the read cache mode
 	if (gstream->base.bwrited && tb_qbuffer_null(&gstream->base.cache)) gstream->base.bwrited = 0;
 
@@ -350,9 +353,6 @@ tb_long_t tb_gstream_aread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 		}
 		else 
 		{
-			// switch to the read cache mode
-			gstream->base.bwrited = 0;
-
 			// read it directly
 			read = gstream->read(gstream, data, size);
 			tb_check_return_val(read >= 0, -1);
@@ -405,7 +405,6 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 			tb_assert_and_check_return_val(head && pull, -1);
 
 			// pull data to stream from cache
-			tb_assert(gstream->writ);
 			tb_long_t 	real = gstream->writ(gstream, head, pull);
 			tb_check_return_val(real >= 0, -1);
 
@@ -425,9 +424,6 @@ tb_long_t tb_gstream_awrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 		}
 		else 
 		{
-			// switch to the writ cache mode
-			gstream->base.bwrited = 1;
-
 			// writ it directly
 			writ = gstream->writ(gstream, data, size);
 			tb_check_return_val(writ >= 0, -1);
@@ -446,6 +442,10 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 	// check data
 	tb_assert_and_check_return_val(gstream && data, tb_false);
 	tb_check_return_val(size, tb_true);
+
+	// have writed cache? sync first
+	if (gstream->base.bwrited && !tb_qbuffer_null(&gstream->base.cache) && !tb_gstream_sync(gstream, tb_false))
+		return tb_false;
 
 	// check the left
 	tb_hize_t left = tb_stream_left(gstream);
@@ -711,14 +711,14 @@ tb_long_t tb_gstream_bwrit_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_
 	tb_long_t writ = 0;
 	if (size) 
 	{
-		if (!tb_gstream_bwrit(gstream, data, size)) return -1;
+		if (!tb_gstream_bwrit(gstream, (tb_byte_t*)data, size)) return -1;
 	}
 	else
 	{
 		tb_char_t* p = data;
 		while (*p)
 		{
-			if (!tb_gstream_bwrit(gstream, p, 1)) return -1;
+			if (!tb_gstream_bwrit(gstream, (tb_byte_t*)p, 1)) return -1;
 			p++;
 		}
 	
@@ -733,7 +733,7 @@ tb_long_t tb_gstream_bwrit_line(tb_gstream_t* gstream, tb_char_t* data, tb_size_
 	tb_char_t le[] = "\n";
 	tb_size_t ln = 1;
 #endif
-	if (!tb_gstream_bwrit(gstream, le, ln)) return -1;
+	if (!tb_gstream_bwrit(gstream, (tb_byte_t*)le, ln)) return -1;
 	writ += ln;
 
 	// ok
@@ -750,7 +750,7 @@ tb_long_t tb_gstream_printf(tb_gstream_t* gstream, tb_char_t const* fmt, ...)
 	tb_check_return_val(size, 0);
 
 	// writ data
-	return tb_gstream_bwrit(gstream, data, size)? size : -1;
+	return tb_gstream_bwrit(gstream, (tb_byte_t*)data, size)? size : -1;
 }
 tb_uint8_t tb_gstream_bread_u8(tb_gstream_t* gstream)
 {
