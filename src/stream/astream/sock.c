@@ -78,12 +78,6 @@ typedef struct __tb_astream_sock_t
 	// the offset
 	tb_atomic64_t 				offset;
 
-	// the sock data
-	tb_byte_t* 					data;
-
-	// the sock maxn
-	tb_size_t 					maxn;
-
 	// the func
 	union
 	{
@@ -175,17 +169,11 @@ static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* h
 			}
 			tb_assert_and_check_break(sstream->sock);
 	
-			// resize send cache 
-			tb_size_t cache = tb_socket_send_buffer_size(sstream->sock);
-			if (cache) tb_stream_ctrl(sstream, TB_STREAM_CTRL_SET_CACHE, cache);
-
-			// init maxn
-			if (!sstream->maxn) sstream->maxn = tb_socket_recv_buffer_size(sstream->sock);
-			tb_assert_and_check_break(sstream->maxn);
-
-			// init data
-			if (!sstream->data) sstream->data = tb_malloc0(sstream->maxn);
-			tb_assert_and_check_break(sstream->data);
+			// resize cache
+			tb_size_t rcache = tb_socket_recv_buffer_size(sstream->sock);
+			tb_size_t wcache = tb_socket_send_buffer_size(sstream->sock);
+			if (rcache) sstream->base.rcache_maxn = rcache;
+			if (wcache) sstream->base.wcache_maxn = wcache;
 
 			// init aico
 			if (!sstream->aico) sstream->aico = tb_aico_init_sock(sstream->base.aicp, sstream->sock);
@@ -293,7 +281,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 
 	// the stream
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
-	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
+	tb_assert_and_check_return_val(sstream && sstream->func.read, tb_false);
  
 	// trace
 	tb_trace_d("recv: real: %lu, size: %lu, state: %s", aice->u.recv.real, aice->u.recv.size, tb_aice_state_cstr(aice));
@@ -304,7 +292,6 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.recv.real <= sstream->maxn);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.recv.real);
 		state = TB_STREAM_STATE_OK;
 		break;
@@ -332,7 +319,7 @@ static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_recv(aice->aico, sstream->data, aice->u.recv.size, tb_astream_sock_read_func, (tb_astream_t*)sstream);
+			tb_aico_recv(aice->aico, aice->u.recv.data, aice->u.recv.size, tb_astream_sock_read_func, (tb_astream_t*)sstream);
 		}
 	}
 
@@ -346,7 +333,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 
 	// the stream
 	tb_astream_sock_t* sstream = (tb_astream_sock_t*)aice->priv;
-	tb_assert_and_check_return_val(sstream && sstream->maxn && sstream->func.read, tb_false);
+	tb_assert_and_check_return_val(sstream && sstream->func.read, tb_false);
  
 	// trace
 	tb_trace_d("urecv: real: %lu, size: %lu, state: %s", aice->u.urecv.real, aice->u.urecv.size, tb_aice_state_cstr(aice));
@@ -357,7 +344,6 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	{
 		// ok
 	case TB_AICE_STATE_OK:
-		tb_assert_and_check_break(aice->u.urecv.real <= sstream->maxn);
 		tb_atomic64_fetch_and_add(&sstream->offset, aice->u.urecv.real);
 		state = TB_STREAM_STATE_OK;
 		break;
@@ -385,18 +371,18 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 		if (aice->state == TB_AICE_STATE_OK)
 		{
 			// continue to post read
-			tb_aico_urecv(aice->aico, &aice->u.urecv.addr, aice->u.urecv.port, sstream->data, aice->u.urecv.size, tb_astream_sock_uread_func, (tb_astream_t*)sstream);
+			tb_aico_urecv(aice->aico, &aice->u.urecv.addr, aice->u.urecv.port, aice->u.urecv.data, aice->u.urecv.size, tb_astream_sock_uread_func, (tb_astream_t*)sstream);
 		}
 	}
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
-	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->maxn && sstream->aico && func, tb_false);
+	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && data && size && func, tb_false);
 
 	// clear the offset if be writ mode now
 	if (!sstream->bread) tb_atomic64_set0(&sstream->offset);
@@ -407,12 +393,11 @@ static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_s
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.read 	= func;
-	if (!maxn || maxn > sstream->maxn) maxn = sstream->maxn;
 
 	// post read
 	return (sstream->type == TB_SOCKET_TYPE_TCP)
-		? tb_aico_recv_after(sstream->aico, delay, sstream->data, maxn, tb_astream_sock_read_func, astream)
-		: tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), sstream->data, maxn, tb_astream_sock_uread_func, astream);
+		? tb_aico_recv_after(sstream->aico, delay, data, size, tb_astream_sock_read_func, astream)
+		: tb_aico_urecv_after(sstream->aico, delay, &sstream->ipv4, tb_url_port_get(&sstream->base.base.url), data, size, tb_astream_sock_uread_func, astream);
 }
 static tb_bool_t tb_astream_sock_writ_func(tb_aice_t const* aice)
 {
@@ -663,10 +648,6 @@ static tb_void_t tb_astream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 
 	// exit ipv4
 	tb_ipv4_clr(&sstream->ipv4);
-
-	// exit data
-	if (sstream->data) tb_free(sstream->data);
-	sstream->data = tb_null;
 }
 static tb_bool_t tb_astream_sock_ctrl(tb_handle_t astream, tb_size_t ctrl, tb_va_list_t args)
 {
@@ -783,7 +764,7 @@ tb_astream_t* tb_astream_init_sock(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(sstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)sstream, aicp, TB_STREAM_TYPE_SOCK, TB_GSTREAM_SOCK_CACHE_MAXN, TB_GSTREAM_SOCK_CACHE_MAXN)) goto fail;
 	sstream->base.open 		= tb_astream_sock_open;
 	sstream->base.read 		= tb_astream_sock_read;
 	sstream->base.writ 		= tb_astream_sock_writ;

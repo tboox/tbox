@@ -44,8 +44,8 @@ typedef struct __tb_astream_data_read_t
 	// the func
 	tb_astream_read_func_t 		func;
 
-	// the maxn
-	tb_size_t 					maxn;
+	// the size
+	tb_size_t 					size;
 
 	// the priv
 	tb_pointer_t 				priv;
@@ -184,7 +184,7 @@ static tb_bool_t tb_astream_data_read_func(tb_aice_t const* aice)
 			tb_size_t left = dstream->data + dstream->size - dstream->head;
 
 			// the real
-			tb_size_t real = dstream->func.read.maxn;
+			tb_size_t real = dstream->func.read.size;
 			if (!real || real > left) real = left;
 
 			// no data? closed
@@ -207,7 +207,7 @@ static tb_bool_t tb_astream_data_read_func(tb_aice_t const* aice)
 			state = TB_STREAM_STATE_OK;
 
 			// done func
-			if (dstream->func.read.func((tb_astream_t*)dstream, state, data, real, dstream->func.read.maxn, dstream->func.read.priv))
+			if (dstream->func.read.func((tb_astream_t*)dstream, state, data, real, dstream->func.read.size, dstream->func.read.priv))
 			{
 				// continue to post read
 				tb_aico_task_run(aice->aico, 0, tb_astream_data_read_func, (tb_astream_t*)dstream);
@@ -224,12 +224,12 @@ static tb_bool_t tb_astream_data_read_func(tb_aice_t const* aice)
 	}
  
 	// done func
-	if (state != TB_STREAM_STATE_OK) dstream->func.read.func((tb_astream_t*)dstream, state, tb_null, 0, dstream->func.read.maxn, dstream->func.read.priv);
+	if (state != TB_STREAM_STATE_OK) dstream->func.read.func((tb_astream_t*)dstream, state, tb_null, 0, dstream->func.read.size, dstream->func.read.priv);
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_astream_data_read(tb_handle_t astream, tb_size_t delay, tb_size_t maxn, tb_astream_read_func_t func, tb_pointer_t priv)
+static tb_bool_t tb_astream_data_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_data_t* dstream = tb_astream_data_cast(astream);
@@ -238,7 +238,7 @@ static tb_bool_t tb_astream_data_read(tb_handle_t astream, tb_size_t delay, tb_s
 	// save func and priv
 	dstream->func.read.priv 	= priv;
 	dstream->func.read.func 	= func;
-	dstream->func.read.maxn 	= maxn;
+	dstream->func.read.size 	= size;
 
 	// post read
 	return tb_aico_task_run(dstream->aico, delay, tb_astream_data_read_func, astream);
@@ -558,7 +558,7 @@ tb_astream_t* tb_astream_init_data(tb_aicp_t* aicp)
 	tb_assert_and_check_return_val(dstream, tb_null);
 
 	// init stream
-	if (!tb_astream_init((tb_astream_t*)dstream, aicp, TB_STREAM_TYPE_DATA, 0)) goto fail;
+	if (!tb_astream_init((tb_astream_t*)dstream, aicp, TB_STREAM_TYPE_DATA, 0, 0)) goto fail;
 	dstream->base.open 		= tb_astream_data_open;
 	dstream->base.read 		= tb_astream_data_read;
 	dstream->base.writ 		= tb_astream_data_writ;
