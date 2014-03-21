@@ -28,6 +28,7 @@
  * includes
  */
 #include "prefix.h"
+#include "tstream.h"
 #include "../asio/asio.h"
 
 /* ///////////////////////////////////////////////////////////////////////
