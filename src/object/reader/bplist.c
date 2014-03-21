@@ -106,7 +106,7 @@ static tb_object_t* tb_object_bplist_reader_func_object(tb_object_bplist_reader_
 	// read the object type & size
 	tb_uint8_t type = tb_gstream_bread_u8(reader->stream);
 	tb_uint8_t size = type & 0x0f; type &= 0xf0;
-//	tb_trace_d("type: %x, size: %x", type, size);
+	tb_trace_d("type: %x, size: %x", type, size);
 
 	// the func
 	tb_object_bplist_reader_func_t func = tb_object_bplist_reader_func(type);
@@ -244,7 +244,7 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
 				tb_assert_and_check_break(utf8);
 
 				// read utf8
-				if (!tb_gstream_bread(reader->stream, utf8, size)) break;
+				if (!tb_gstream_bread(reader->stream, (tb_byte_t*)utf8, size)) break;
 				utf8[size] = '\0';
 			}
 
@@ -272,10 +272,10 @@ static tb_object_t* tb_object_bplist_reader_func_string(tb_object_bplist_reader_
 				tb_assert_and_check_break(utf8 && utf16);
 
 				// read utf16
-				if (!tb_gstream_bread(reader->stream, utf16, size << 1)) break;
+				if (!tb_gstream_bread(reader->stream, (tb_byte_t*)utf16, size << 1)) break;
 				
 				// utf16 to utf8
-				tb_long_t osize = tb_charset_conv_data(TB_CHARSET_TYPE_UTF16, TB_CHARSET_TYPE_UTF8, utf16, size << 1, utf8, (size + 1) << 2);
+				tb_long_t osize = tb_charset_conv_data(TB_CHARSET_TYPE_UTF16, TB_CHARSET_TYPE_UTF8, (tb_byte_t*)utf16, size << 1, (tb_byte_t*)utf8, (size + 1) << 2);
 				tb_assert_and_check_break(osize > 0 && osize < ((size + 1) << 2));
 				utf8[osize] = '\0';
 
@@ -476,7 +476,7 @@ static tb_object_t* tb_object_bplist_reader_done(tb_gstream_t* stream)
 	if (!tb_gstream_bread(stream, data, 8)) return tb_null;
 
 	// check magic & version
-	if (tb_strncmp(data, "bplist00", 8)) return tb_null;
+	if (tb_strncmp((tb_char_t const*)data, "bplist00", 8)) return tb_null;
 
 	// seek to tail
 	if (!tb_gstream_seek(stream, size - 26)) return tb_null;
@@ -680,7 +680,7 @@ static tb_size_t tb_object_bplist_reader_probe(tb_gstream_t* stream)
 	tb_assert_and_check_return_val(p, 0);
 
 	// ok?
-	return !tb_strnicmp(p, "bplist", 6)? 80 : 0;
+	return !tb_strnicmp((tb_char_t const*)p, "bplist", 6)? 80 : 0;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
