@@ -73,7 +73,7 @@ tb_int_t tb_demo_stream_mstream_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(g_event);
 
 		// init mstream
-		mstream = tb_mstream_init(tb_null, 3, 10);
+		mstream = tb_mstream_init(tb_null, 3, 0);
 		tb_assert_and_check_break(mstream);
 
 		// init tasks

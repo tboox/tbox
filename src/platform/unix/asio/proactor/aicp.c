@@ -368,7 +368,7 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_pointer_t data)
 		tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
 
 		// trace
-		tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
+		tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu, time: %lld", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]), tb_ctime_time());
 
 		// spak aice
 		if (!tb_queue_full(ptor->spak[priority])) 
@@ -406,7 +406,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 	tb_assert_and_check_return_val(code != TB_AIOE_CODE_NONE, tb_false);
 				
 	// trace
-	tb_trace_d("wait: code: %lu: ..", aice->code);
+	tb_trace_d("wait: code: %lu: time: %lld: ..", aice->code, tb_ctime_time());
 
 	// done
 	tb_bool_t ok = tb_false;
@@ -434,6 +434,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		tb_long_t timeout = tb_aico_timeout_from_code(aico, aice->code);
 		if (timeout >= 0) 
 		{
+			// add it
 			aico->task = tb_ltimer_task_add(ptor->ltimer, timeout, tb_false, tb_aiop_spak_wait_timeout, aico);
 			tb_assert_and_check_break(aico->task);
 			aico->bltimer = 1;

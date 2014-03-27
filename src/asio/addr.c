@@ -376,11 +376,12 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
 	}
 
-	// ok?
-	if (ipv4.u32) 
+	// ok or try to get ok from cache again if failed or timeout? 
+	tb_bool_t from_cache = tb_false;
+	if (ipv4.u32 || (from_cache = tb_dns_cache_get(addr->host, &ipv4))) 
 	{
-		// save to cache
-		tb_dns_cache_set(addr->host, &ipv4);
+		// save to cache 
+		if (!from_cache) tb_dns_cache_set(addr->host, &ipv4);
 		
 		// done func
 		addr->func(addr, addr->host, &ipv4, addr->priv);
