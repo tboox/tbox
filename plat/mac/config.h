@@ -1,6 +1,18 @@
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
 
+// build version
+#define TB_CONFIG_VERSION_BUILD 		[build]
+
+// debug
+#define TB_CONFIG_DEBUG					[debug]
+
+// small
+#define TB_CONFIG_SMALL					[small]
+
+// zlib
+#define TB_CONFIG_ZLIB					[zlib]
+
 // os
 #define TB_CONFIG_OS_MAC
 #define TB_CONFIG_OS_MAC_VERSION_MAJOR 	(10)
@@ -16,10 +28,13 @@
 #define TB_CONFIG_TYPE_FLOAT
 
 // memory
-#ifdef __tb_debug__
+#if TB_CONFIG_DEBUG
 # 	define TB_CONFIG_MEMORY_POOL
 #endif
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
+
+// exception
+#define TB_CONFIG_EXCEPTION_ENABLE
 
 // semaphore
 //#define TB_CONFIG_SEMAPHORE_HAVE_POSIX
@@ -81,8 +96,5 @@
 //#define TB_CONFIG_LIBM_HAVE_SINCOSF
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
-
-// the build version
-#define TB_CONFIG_VERSION_BUILD 		[build]
 
 #endif

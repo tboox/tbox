@@ -38,7 +38,7 @@ endif
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS_DEBUG 		= -g 
 CXFLAGS 			= -c -Wall $(ARCH_CXFLAGS) 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -49,9 +49,6 @@ CXFLAGS_RELEASE 	+= -Os
 else
 CXFLAGS_RELEASE 	+= -O3
 endif
-
-# small
-CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 

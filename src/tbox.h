@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 // init tbox
-#define tb_init(data, size) 	tb_init_for_mode(data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_CONFIG_VERSION_BUILD)
+#define tb_init(data, size) 	tb_init_for_mode(data, size, (tb_size_t)(__tb_mode_debug__ | __tb_mode_small__), TB_VERSION_BUILD_STRING)
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

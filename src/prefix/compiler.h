@@ -40,21 +40,21 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__INTEL_COMPILER == ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(__INTEL_COMPILER < ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(__INTEL_COMPILER <= ((major) * 100 + (minor)))
-#	define TB_COMPILER_STRING 						"Intel C/C++"
+#	define TB_COMPILER_STRING 						"intel c/c++"
 #	if (__INTEL_COMPILER == 600)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 6.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 6.0"
 #	elif (__INTEL_COMPILER == 700)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 7.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 7.0"
 #	elif (__INTEL_COMPILER == 800)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 8.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 8.0"
 #	elif (__INTEL_COMPILER == 900)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 9.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 9.0"
 #	elif (__INTEL_COMPILER == 1000)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 10.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 10.0"
 #	elif (__INTEL_COMPILER == 1100)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 11.0"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 11.0"
 #	elif (__INTEL_COMPILER == 1110)
-#		define TB_COMPILER_VERSION_STRING			"Intel C/C++ 11.1"
+#		define TB_COMPILER_VERSION_STRING			"intel c/c++ 11.1"
 #	else
 #		error Unknown Intel C++ Compiler Version
 #	endif
@@ -67,21 +67,21 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__BORLANDC__ == ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(__BORLANDC__ < ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(__BORLANDC__ <= ((major) * 100 + (minor)))
-#	define TB_COMPILER_STRING						"Borland C/C++"
+#	define TB_COMPILER_STRING						"borland c/c++"
 #	if 0
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 4.52"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 4.52"
 #	elif 0
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 5.5"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 5.5"
 #	elif (__BORLANDC__ == 0x0551)
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 5.51"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 5.51"
 #	elif (__BORLANDC__ == 0x0560)
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 5.6"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 5.6"
 # elif (__BORLANDC__ == 0x0564)
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 5.6.4 (C++ BuilderX)"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 5.6.4 (c++ builderx)"
 #	elif (__BORLANDC__ == 0x0582)
-#		define TB_COMPILER_VERSION_STRING			"Borland C++ 5.82 (Turbo C++)"
+#		define TB_COMPILER_VERSION_STRING			"borland c++ 5.82 (turbo c++)"
 #	else
-#		error Unknown Borland C++ Compiler Version
+#		error Unknown borland c++ Compiler Version
 #	endif
 
 // gnu c/c++ 
@@ -92,44 +92,53 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) == ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) < ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	((__GNUC__ * 100 + __GNUC_MINOR__) <= ((major) * 100 + (minor)))
-#	define TB_COMPILER_STRING						"GNU C/C++"
+#	define TB_COMPILER_STRING						"gnu c/c++"
 #	if  __GNUC__ == 2
 #		if __GNUC_MINOR__ < 95
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ <2.95"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ <2.95"
 #		elif __GNUC_MINOR__ == 95
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 2.95"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 2.95"
 #		elif __GNUC_MINOR__ == 96
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 2.96"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 2.96"
 #		else
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ > 2.9 6&& < 3.0"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ > 2.96 && < 3.0"
 #		endif
 #	elif __GNUC__ == 3
 #		if __GNUC_MINOR__ == 2
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 3.2"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 3.2"
 #		elif __GNUC_MINOR__ == 3
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 3.3"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 3.3"
 #		elif __GNUC_MINOR__ == 4
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 3.4"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 3.4"
 #		else
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ > 3.4 && < 4.0"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ > 3.4 && < 4.0"
 #		endif
 #	elif __GNUC__ == 4
 #		if __GNUC_MINOR__ == 1
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 4.1"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.1"
 #		elif __GNUC_MINOR__ == 2
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 4.2"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.2"
 #		elif __GNUC_MINOR__ == 3
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 4.3"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.3"
 #		elif __GNUC_MINOR__ == 4
-#			define TB_COMPILER_VERSION_STRING		"GNU C/C++ 4.4"
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.4"
 #		endif
 #	else
-#		error Unknown GNU C/C++ Compiler Version
+#		error Unknown gnu c/c++ Compiler Version
 #	endif
 
 	// clang
 # 	if defined(__clang__)
 # 		define TB_COMPILER_IS_CLANG
+# 		undef TB_COMPILER_STRING
+#		define TB_COMPILER_STRING					"clang c/c++"
+# 		if defined(__VERSION__)
+# 			undef TB_COMPILER_VERSION_STRING
+# 			define TB_COMPILER_VERSION_STRING 		__VERSION__
+# 		elif defined(__clang_version__)
+# 			undef TB_COMPILER_VERSION_STRING
+# 			define TB_COMPILER_VERSION_STRING 		__clang_version__
+# 		endif
 # 	endif
 
 // watcom c/c++ 
@@ -140,27 +149,27 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__WATCOMC__ == ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(__WATCOMC__ < ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(__WATCOMC__ <= ((major) * 100 + (minor)))
-#	define TB_COMPILER_STRING 						"Watcom C/C++"
+#	define TB_COMPILER_STRING 						"watcom c/c++"
 #	if (__WATCOMC__ == 1100)
-#		define TB_COMPILER_VERSION_STRING 			"Watcom C/C++ 11.0"
+#		define TB_COMPILER_VERSION_STRING 			"watcom c/c++ 11.0"
 #	elif (__WATCOMC__ == 1200)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.0 (Watcom 12.0)"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.0 (watcom 12.0)"
 #	elif (__WATCOMC__ == 1210)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.1 (Watcom 12.1)"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.1 (watcom 12.1)"
 #	elif (__WATCOMC__ == 1220)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.2 (Watcom 12.2)"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.2 (watcom 12.2)"
 #	elif (__WATCOMC__ == 1230)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.3 (Watcom 12.3)"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.3 (watcom 12.3)"
 #	elif (__WATCOMC__ == 1240)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.4 (Watcom 12.4)"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.4 (watcom 12.4)"
 #	elif (__WATCOMC__ == 1250)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.5"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.5"
 #	elif (__WATCOMC__ == 1260)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.6"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.6"
 #	elif (__WATCOMC__ == 1270)
-#		define TB_COMPILER_VERSION_STRING 			"Open Watcom C/C++ 1.7"
+#		define TB_COMPILER_VERSION_STRING 			"open watcom c/c++ 1.7"
 #	else
-#		error Unknown Watcom C/C++ Compiler Version
+#		error Unknown watcom c/c++ Compiler Version
 #	endif
 
 // digital mars c/c++
@@ -171,30 +180,30 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__DMC__ == ((major) * 256 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(__DMC__ < ((major) * 256 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(__DMC__ <= ((major) * 256 + (minor)))
-#	define TB_COMPILER_STRING 						"Digital Mars C/C++"
+#	define TB_COMPILER_STRING 						"digital mars c/c++"
 #	if (__DMC__ < 0x0826)
-#		error Only versions 8.26 and later of the Digital Mars C/C++ compilers are supported by the EXTL libraries
+#		error Only versions 8.26 and later of the digital mars c/c++ compilers are supported by the EXTL libraries
 #	else
 #		if __DMC__ >= 0x0832
 #			define TB_COMPILER_VERSION_STRING 		__DMC_VERSION_STRING__
 #		elif (__DMC__ == 0x0826)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.26"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.26"
 #		elif (__DMC__ == 0x0827)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.27"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.27"
 #		elif (__DMC__ == 0x0828)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.28"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.28"
 #		elif (__DMC__ == 0x0829)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.29"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.29"
 #		elif (__DMC__ == 0x0830)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.30"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.30"
 #		elif (__DMC__ == 0x0831)
-#			define TB_COMPILER_VERSION_STRING 		"Digital Mars C/C++ 8.31"
+#			define TB_COMPILER_VERSION_STRING 		"digital mars c/c++ 8.31"
 #		else
-#			error Unknown Digital Mars C/C++ Compiler Version
+#			error Unknown digital mars c/c++ Compiler Version
 #		endif
 #	endif
 
-// codeplay vectorc c/c++
+// codeplay vector c/c++
 #elif defined(__VECTORC)
 #	define TB_COMPILER_IS_VECTORC
 # 	define TB_COMPILER_VERSION_BT(major, minor) 	(__VECTORC > (major))
@@ -202,9 +211,9 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(__VECTORC == (major))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(__VECTORC < (major))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(__VECTORC <= (major))
-#	define TB_COMPILER_VERSION_STRING 				"CodePlay VectorC C/C++"
+#	define TB_COMPILER_VERSION_STRING 				"codeplay vector c/c++"
 #	if (__VECTORC == 1)
-#		define TB_COMPILER_VERSION_STRING 			"CodePlay VectorC C/C++"
+#		define TB_COMPILER_VERSION_STRING 			"codeplay vector c/c++"
 #	else
 #		error Unknown CodePlay VectorC C++ Compiler Version
 #	endif
@@ -217,28 +226,28 @@
 # 	define TB_COMPILER_VERSION_EQ(major, minor) 	(_MSC_VER == ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LT(major, minor) 	(_MSC_VER < ((major) * 100 + (minor)))
 # 	define TB_COMPILER_VERSION_LE(major, minor) 	(_MSC_VER <= ((major) * 100 + (minor)))
-#		define TB_COMPILER_STRING					"Visual C++"
+#		define TB_COMPILER_STRING					"visual c++"
 #	if defined(TB_FORCE_MSVC_4_2) && (_MSC_VER == 1020)
-#		define TB_COMPILER_VERSION_STRING			"Visual C++ 4.2"
+#		define TB_COMPILER_VERSION_STRING			"visual c++ 4.2"
 #	elif (_MSC_VER == 1100)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ 5.0"
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ 5.0"
 #	elif (_MSC_VER == 1200)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ 6.0"
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ 6.0"
 #	elif (_MSC_VER == 1300)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ .NET (7.0)"
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ .net (7.0)"
 #	elif (_MSC_VER == 1310)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ .NET (7.1)"	/* .NET 2003 */
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ .net (7.1)"	/* .net 2003 */
 #	elif (_MSC_VER == 1400)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ .NET (8.0)"	/* .NET 2005 */
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ .net (8.0)"	/* .net 2005 */
 #	elif (_MSC_VER == 1500)
-#		define TB_COMPILER_VERSION_STRING 			"Visual C++ .NET (9.0)"	/* .NET 2008 */
+#		define TB_COMPILER_VERSION_STRING 			"visual c++ .net (9.0)"	/* .net 2008 */
 #	else
-#		error Unknown Visual C++ Compiler Version
+#		error Unknown visual c++ Compiler Version
 #	endif
 
 #else
-#	define TB_COMPILER_STRING 						"Unknown Compiler"
-#	define TB_COMPILER_VERSION_STRING 				"Unknown Compiler Version"
+#	define TB_COMPILER_STRING 						"unknown compiler"
+#	define TB_COMPILER_VERSION_STRING 				"unknown compiler version"
 #	define TB_COMPILER_IS_UNKNOWN
 #endif
 

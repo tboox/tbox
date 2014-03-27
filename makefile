@@ -228,7 +228,10 @@ endif
 
 config : .null
 	-@cp ./plat/$(PLAT)/config.h ./src/config.h
-	-@perl -pi -e "s/\[build\]/\"`date +%Y%m%d%H%M`\"/g" ./src/config.h
+	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/config.h
+	-@perl -pi -e "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
+	-@perl -pi -e "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
+	-@perl -pi -e "s/\[zlib\]/\($(if $(findstring y,$(ZLIB)),1,0)\)/g" ./src/config.h
 	@echo "config: ==================================================================="
 	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)

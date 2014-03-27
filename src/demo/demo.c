@@ -87,6 +87,7 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(object_dump)
 
 	// stream
+,	TB_DEMO_MAIN_ITEM(stream_spider)
 ,	TB_DEMO_MAIN_ITEM(stream_tstream)
 ,	TB_DEMO_MAIN_ITEM(stream_mstream)
 ,	TB_DEMO_MAIN_ITEM(stream_astream)

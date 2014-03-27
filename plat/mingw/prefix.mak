@@ -41,7 +41,7 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden 
-CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS_DEBUG 		= -g 
 CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -60,9 +60,6 @@ else
 CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
 CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer 
 endif
-
-# small
-CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 

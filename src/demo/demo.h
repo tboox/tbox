@@ -96,6 +96,7 @@ TB_DEMO_MAIN_DECL(object_bplist);
 TB_DEMO_MAIN_DECL(object_dump);
 
 // stream
+TB_DEMO_MAIN_DECL(stream_spider);
 TB_DEMO_MAIN_DECL(stream_tstream);
 TB_DEMO_MAIN_DECL(stream_mstream);
 TB_DEMO_MAIN_DECL(stream_astream);

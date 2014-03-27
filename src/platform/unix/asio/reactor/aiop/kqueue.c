@@ -189,7 +189,7 @@ static tb_long_t tb_aiop_reactor_kqueue_wait(tb_aiop_reactor_t* reactor, tb_aioe
 	if (timeout > 0)
 	{
 		t.tv_sec = timeout / 1000;
-		t.tv_nsec+= (timeout % 1000) * 1000000;
+		t.tv_nsec = (timeout % 1000) * 1000000;
 	}
 
 	// init grow

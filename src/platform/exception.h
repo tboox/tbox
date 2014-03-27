@@ -27,7 +27,7 @@
  * includes
  */
 #include "prefix.h"
-#ifdef TB_EXCEPTION_ENABLE
+#ifdef TB_CONFIG_EXCEPTION_ENABLE
 # 	include "../libc/misc/signal.h"
 # 	if defined(TB_CONFIG_OS_WINDOWS)
 # 		include "windows/exception.h"

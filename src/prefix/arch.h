@@ -45,36 +45,57 @@
 	|| defined(__i386__) \
 	|| defined(__i686__)
 # 	define TB_ARCH_x86
+# 	define TB_ARCH_STRING 					"x86"
+# 	if defined(__i386) || defined(__i386__)
+# 		define TB_ARCH_VERSION_STRING 		"i386"
+# 	elif defined(__i686) || defined(__i686__)
+# 		define TB_ARCH_VERSION_STRING 		"i686"
+# 	endif
 #elif defined(__x86_64) \
 	|| defined(__amd64__) \
 	|| defined(__amd64)
 # 	define TB_ARCH_x64
+# 	define TB_ARCH_STRING 					"x64"
+# 	if defined(__x86_64)
+# 		define TB_ARCH_VERSION_STRING 		"x86_64"
+# 	elif defined(__amd64__) || defined(__amd64)
+# 		define TB_ARCH_VERSION_STRING 		"amd64"
+# 	endif
 #elif defined(__arm__)
 # 	define TB_ARCH_ARM
+# 	define TB_ARCH_STRING 					"arm"
 # 	if defined(__ARM_ARCH)
-# 		define TB_ARCH_ARM_VERSION 		__ARM_ARCH
+# 		define TB_ARCH_ARM_VERSION 			__ARM_ARCH
 # 		if __ARM_ARCH >= 7
 # 			define TB_ARCH_ARM_v7
+# 			define TB_ARCH_VERSION_STRING 	"armv7"
 # 		elif __ARM_ARCH >= 6
 # 			define TB_ARCH_ARM_v6
+# 			define TB_ARCH_VERSION_STRING 	"armv6"
 # 		else
 # 			define TB_ARCH_ARM_v5
+# 			define TB_ARCH_VERSION_STRING 	"armv5"
 # 		endif
 # 	elif defined(__ARM_ARCH_7A__)
-# 		define TB_ARCH_ARM_VERSION 		(7)
+# 		define TB_ARCH_ARM_VERSION 			(7)
 # 		define TB_ARCH_ARM_v7A
+# 		define TB_ARCH_VERSION_STRING 		"armv7a"
 # 	elif defined(__ARM_ARCH_7__)
-# 		define TB_ARCH_ARM_VERSION 		(7)
+# 		define TB_ARCH_ARM_VERSION 			(7)
 # 		define TB_ARCH_ARM_v7
+# 		define TB_ARCH_VERSION_STRING 		"armv7"
 # 	elif defined(__ARM_ARCH_6__)
-# 		define TB_ARCH_ARM_VERSION 		(6)
+# 		define TB_ARCH_ARM_VERSION 			(6)
 # 		define TB_ARCH_ARM_v6
+# 		define TB_ARCH_VERSION_STRING 		"armv6"
 # 	elif defined(__ARM_ARCH_5TE__)
-# 		define TB_ARCH_ARM_VERSION 		(5)
+# 		define TB_ARCH_ARM_VERSION 			(5)
 # 		define TB_ARCH_ARM_v5te
+# 		define TB_ARCH_VERSION_STRING 		"armv5te"
 # 	elif defined(__ARM_ARCH_5__)
-# 		define TB_ARCH_ARM_VERSION 		(5)
+# 		define TB_ARCH_ARM_VERSION 			(5)
 # 		define TB_ARCH_ARM_v5
+# 		define TB_ARCH_VERSION_STRING 		"armv5"
 # 	else 
 # 		error unknown arm arch version
 # 	endif
@@ -88,11 +109,13 @@
 	|| defined(_mips) \
 	|| defined(__mips__)
 # 	define TB_ARCH_MIPS
+# 	define TB_ARCH_STRING 					"mips"
 #else
 //# 	define TB_ARCH_SPARC
 //# 	define TB_ARCH_PPC
 //# 	define TB_ARCH_SH4
 # 	error unknown arch
+# 	define TB_ARCH_STRING 					"unknown_arch"
 #endif
 
 // sse
@@ -113,6 +136,11 @@
 // elf
 #if defined(__ELF__)
 # 	define TB_ARCH_ELF
+#endif
+
+// version string
+#ifndef TB_ARCH_VERSION_STRING
+#	define TB_ARCH_VERSION_STRING 			TB_ARCH_STRING
 #endif
 
 #endif

@@ -47,7 +47,7 @@ endif
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g -D__tb_debug__
+CXFLAGS_DEBUG 		= -g 
 CXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
@@ -63,9 +63,6 @@ else
 CXFLAGS_RELEASE 	+= -O3
 endif
 
-# small
-CXFLAGS-$(SMALL) 	+= -D__tb_small__
-
 # cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
@@ -78,7 +75,7 @@ CCFLAGS 			=
 
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fomit-frame-pointer -freg-struct-return -fno-bounds-check -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g -D__tb_debug__
+MXFLAGS_DEBUG 		= -g 
 MXFLAGS 			= -arch $(ARCH) -c -Wall  \
 					-mthumb $(CPU_CXFLAGS) -miphoneos-version-min=$(SDK) \
 					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
@@ -98,7 +95,7 @@ MXFLAGS_RELEASE 	+= -O3
 endif
 
 # small
-MXFLAGS-$(SMALL) 	+= -D__tb_small__
+MXFLAGS-$(SMALL) 	+= 
 
 # mflags: .m files
 MFLAGS_RELEASE 		= 

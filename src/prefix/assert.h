@@ -47,9 +47,9 @@
 // assert
 #ifdef __tb_debug__
 # 	if defined(TB_COMPILER_IS_GCC)
-#		define tb_assert_message(x, fmt, arg...)				do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
+#		define tb_assert_message(x, fmt, arg...)			do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, ##arg); tb_assert_backtrace_dump(); } } while(0)
 # 	elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
-#		define tb_assert_message(x, fmt, ...)					do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
+#		define tb_assert_message(x, fmt, ...)				do { if (!(x)) {tb_trace_a("expr: %s, msg: " fmt, #x, __VA_ARGS__); tb_assert_backtrace_dump(); } } while(0)
 # 	else
 #		define tb_assert_message 
 # 	endif
