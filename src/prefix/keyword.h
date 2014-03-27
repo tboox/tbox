@@ -32,43 +32,43 @@
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
-#define __tb_register__ 			register
-#define __tb_volatile__ 			volatile
-#define __tb_asm__ 					__asm__
-#define __tb_func__ 				__FUNCTION__
-#define __tb_file__ 				__FILE__
-#define __tb_line__ 				__LINE__
+#define __tb_register__ 						register
+#define __tb_volatile__ 						volatile
+#define __tb_asm__ 								__asm__
+#define __tb_func__ 							__FUNCTION__
+#define __tb_file__ 							__FILE__
+#define __tb_line__ 							__LINE__
 
 #if defined(TB_COMPILER_IS_MSVC)
 
-# 	define __tb_inline__ 			__inline
-# 	define __tb_inline_force__ 		__forceinline
-# 	define __tb_cdecl__ 			__cdecl
-# 	define __tb_stdcall__ 			__stdcall
-# 	define __tb_fastcall__ 			__fastcall
-# 	define __tb_thiscall__ 			__thiscall
+# 	define __tb_inline__ 						__inline
+# 	define __tb_inline_force__ 					__forceinline
+# 	define __tb_cdecl__ 						__cdecl
+# 	define __tb_stdcall__ 						__stdcall
+# 	define __tb_fastcall__ 						__fastcall
+# 	define __tb_thiscall__ 						__thiscall
 # 	define __tb_packed__ 
 # 	define __tb_aligned__(a) 
 
 #elif defined(TB_COMPILER_IS_GCC)
 
-# 	define __tb_inline__ 			__inline__
-# 	define __tb_inline_force__ 		__inline__ __attribute__((always_inline))
-# 	define __tb_cdecl__ 			__attribute__((__cdecl__))
-# 	define __tb_stdcall__ 			__attribute__((__stdcall__))
-# 	define __tb_fastcall__ 			__attribute__((__fastcall__))
-# 	define __tb_thiscall__ 			__attribute__((__thiscall__))
-# 	define __tb_packed__ 			__attribute__((packed, aligned(1)))
-# 	define __tb_aligned__(a) 		__attribute__((packed, aligned(a)))
+# 	define __tb_inline__ 						__inline__
+# 	define __tb_inline_force__ 					__inline__ __attribute__((always_inline))
+# 	define __tb_cdecl__ 						__attribute__((__cdecl__))
+# 	define __tb_stdcall__ 						__attribute__((__stdcall__))
+# 	define __tb_fastcall__ 						__attribute__((__fastcall__))
+# 	define __tb_thiscall__ 						__attribute__((__thiscall__))
+# 	define __tb_packed__ 						__attribute__((packed, aligned(1)))
+# 	define __tb_aligned__(a) 					__attribute__((packed, aligned(a)))
 
 #else
 
-# 	define __tb_inline__ 			inline
-# 	define __tb_inline_force__ 		inline
+# 	define __tb_inline__ 						inline
+# 	define __tb_inline_force__ 					inline
 # 	define __tb_asm__ 				
-# 	define __tb_func__ 				
-# 	define __tb_file__ 				""
-# 	define __tb_line__ 				(0)
+# 	define __tb_func__ 					
+# 	define __tb_file__ 							""
+# 	define __tb_line__ 							(0)
 
 # 	define __tb_cdecl__		
 # 	define __tb_stdcall__		
@@ -81,30 +81,42 @@
 
 // like
 #if defined(TB_COMPILER_IS_GCC) && __GNUC__ > 2
-# 	define __tb_likely__(x) 		__builtin_expect((x), 1)
-# 	define __tb_unlikely__(x) 		__builtin_expect((x), 0)
+# 	define __tb_likely__(x) 					__builtin_expect((x), 1)
+# 	define __tb_unlikely__(x) 					__builtin_expect((x), 0)
 #else
-# 	define __tb_likely__(x) 		(x)
-# 	define __tb_unlikely__(x) 		(x)
+# 	define __tb_likely__(x) 					(x)
+# 	define __tb_unlikely__(x) 					(x)
 #endif
 
 // debug
-#ifdef __tb_debug__
-# 	define __tb_debug_decl__ 		, tb_char_t const* func_, tb_size_t line_, tb_char_t const* file_
-# 	define __tb_debug_vals__ 		, __tb_func__, __tb_line__, __tb_file__
-# 	define __tb_debug_args__ 		, func_, line_, file_
+#undef __tb_debug__
+#if TB_CONFIG_DEBUG
+# 	define __tb_debug__
+# 	define __tb_debug_decl__ 					, tb_char_t const* func_, tb_size_t line_, tb_char_t const* file_
+# 	define __tb_debug_vals__ 					, __tb_func__, __tb_line__, __tb_file__
+# 	define __tb_debug_args__ 					, func_, line_, file_
 #else 
 # 	define __tb_debug_decl__ 
 # 	define __tb_debug_vals__ 
 # 	define __tb_debug_args__ 
 #endif
 
+// small
+#undef __tb_small__
+#if TB_CONFIG_SMALL
+# 	define __tb_small__
+#endif
+
 // newline
 #ifdef TB_CONFIG_OS_WINDOWS
-# 	define __tb_newline__ 			"\r\n"
+# 	define __tb_newline__ 						"\r\n"
 #else
-# 	define __tb_newline__ 			"\n"
+# 	define __tb_newline__ 						"\n"
 #endif
+
+// macros
+#define __tb_macro_string__(x) 					#x
+#define __tb_macro_expand_and_string__(x) 		__tb_macro_string__(x)
 
 
 #endif

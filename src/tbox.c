@@ -27,7 +27,31 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * helper
+ * macros
+ */
+
+// vtag: debug
+#ifdef __tb_debug__
+# 	define TB_VTAG_DEBUG 							debug
+#else
+# 	define TB_VTAG_DEBUG 							release
+#endif
+
+// vtag: small
+#ifdef __tb_small__
+# 	define TB_VTAG_SMALL 							small
+#else
+# 	define TB_VTAG_SMALL 							large
+#endif
+
+// vtag: version
+#define TB_VTAG_VERSION_STRING(version) 			#version
+#define TB_VTAG_VERSION_MAKE(debug, small, major, minor, alter, build) 	\
+													TB_VTAG_VERSION_STRING(debug-small-major.minor.alter.build)
+#define TB_VTAG_VERSION 							TB_VTAG_VERSION_MAKE(TB_VTAG_DEBUG, TB_VTAG_SMALL, TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER, TB_CONFIG_VERSION_BUILD)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
  */
 static __tb_inline__ tb_bool_t tb_check_order_word()
 {
@@ -105,12 +129,12 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 		// ok
 		if ((tb_hize_t)tb_atoll(build) == version->build)
 		{
-			tb_trace_d("version: tbox-%lub-v%u.%u.%u.%llu", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build);
+			tb_trace_d("version: tbox-%s-v%u.%u.%u.%llu", TB_ARCH_VERSION_STRING, version->major, version->minor, version->alter, version->build);
 			return tb_true;
 		}
 		else
 		{
-			tb_trace_d("version: tbox-%lub-v%u.%u.%u.%llu != %s", (tb_size_t)(sizeof(tb_pointer_t) << 3), version->major, version->minor, version->alter, version->build, TB_CONFIG_VERSION_BUILD);
+			tb_trace_w("version: tbox-%s-v%u.%u.%u.%llu != %s", version->major, version->minor, version->alter, version->build, TB_VERSION_BUILD_STRING);
 		}
 	}
 
@@ -119,7 +143,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
 }
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
 
 tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_char_t const* build)
@@ -201,7 +225,7 @@ tb_void_t tb_exit()
 tb_version_t const* tb_version()
 {
 	// init version tag for binary search
-	static __tb_volatile__ tb_char_t const* s_vtag = "[tbox]: [vtag]: " TB_CONFIG_VERSION_BUILD; tb_used(s_vtag);
+	static __tb_volatile__ tb_char_t const* s_vtag = "[tbox]: [vtag]: [" TB_COMPILER_VERSION_STRING "]: tbox-" TB_ARCH_VERSION_STRING "-" TB_VTAG_VERSION; tb_used(s_vtag);
 
 	// init version
 	static tb_version_t s_version = {0};
@@ -210,7 +234,7 @@ tb_version_t const* tb_version()
 		s_version.major = TB_VERSION_MAJOR;
 		s_version.minor = TB_VERSION_MINOR;
 		s_version.alter = TB_VERSION_ALTER;
-		s_version.build = (tb_hize_t)tb_atoll(TB_CONFIG_VERSION_BUILD);
+		s_version.build = (tb_hize_t)tb_atoll(TB_VERSION_BUILD_STRING);
 	}
 
 	return &s_version;

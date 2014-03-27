@@ -27,15 +27,27 @@
  * includes
  */
 #include "config.h"
+#include "keyword.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
  */
 
 // version: v1.4.7
-#define TB_VERSION_MAJOR 			(1)
-#define TB_VERSION_MINOR 			(4)
-#define TB_VERSION_ALTER 			(7)
+#define TB_VERSION_MAJOR 			1
+#define TB_VERSION_MINOR 			4
+#define TB_VERSION_ALTER 			7
+#define TB_VERSION_BUILD 			TB_CONFIG_VERSION_BUILD
+#define TB_VERSION_BUILD_STRING 	__tb_macro_expand_and_string__(TB_CONFIG_VERSION_BUILD)
+
+#if 0
+#define TB_VERSION_STRING 			__tb_macro_expand_and_string__(TB_CONFIG_VERSION_BUILD)
+
+#define TB_VTAG_VERSION_STRING(version) 			#version
+#define TB_VTAG_VERSION_MAKE(debug, small, major, minor, alter, build) 	\
+													TB_VTAG_VERSION_STRING(debug-small-major.minor.alter.build)
+#define TB_VTAG_VERSION 							TB_VTAG_VERSION_MAKE(TB_VTAG_DEBUG, TB_VTAG_SMALL, TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER, TB_CONFIG_VERSION_BUILD)
+#endif
 
 #endif
 

@@ -280,8 +280,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_ASIO)/asio/proactor/aicp
 
 # flags
-tbox_CXFLAGS 			+= -DTB_EXCEPTION_ENABLE -DTB_TRACE_PREFIX=\"tbox\"
-tbox_CXFLAGS-$(ZLIB) 	+= -DTB_CONFIG_ZLIB
+tbox_CXFLAGS 			+= -DTB_TRACE_PREFIX=\"tbox\"
 
 # header files
 INC_FILES 				= \

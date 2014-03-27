@@ -39,7 +39,7 @@ PWD 				= pwd
 
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
-CXFLAGS_DEBUG 		= -g -D__tb_debug__ 
+CXFLAGS_DEBUG 		= -g  
 CXFLAGS 			= -m$(BITS) -c -Wall -mssse3
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
@@ -58,9 +58,6 @@ else
 CXFLAGS_RELEASE 	+= -fomit-frame-pointer 
 CXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
 endif
-
-# small
-CXFLAGS-$(SMALL) 	+= -D__tb_small__
 
 # cflags: .c files
 CFLAGS_RELEASE 		= 
@@ -86,7 +83,7 @@ CCFLAGS 			= \
 
 # mxflags: .m/.mm files
 MXFLAGS_RELEASE 	= -fno-bounds-check -fvisibility=hidden
-MXFLAGS_DEBUG 		= -g -D__tb_debug__ 
+MXFLAGS_DEBUG 		= -g  
 MXFLAGS 			= -m$(BITS) -c -Wall -mssse3 $(ARCH_CXFLAGS) \
 					-fmessage-length=0 -Werror=return-type -Werror=unused-variable \
 					-pipe -Wno-trigraphs -fpascal-strings \
@@ -112,7 +109,7 @@ MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
 endif
 
 # small
-MXFLAGS-$(SMALL) 	+= -D__tb_small__
+MXFLAGS-$(SMALL) 	+= 
 
 # mflags: .m files
 MFLAGS_RELEASE 		= 
