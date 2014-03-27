@@ -507,6 +507,9 @@ tb_bool_t tb_mstream_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t c
 		transfer->priv 		= priv;
 		tb_assert_and_check_break(transfer->tstream);
 
+		// init timeout
+		if (mstream->timeout) tb_tstream_timeout_set(transfer->tstream, mstream->timeout);
+
 		// working now?
 		bworking = (mstream->conc && tb_dlist_size(mstream->working) >= mstream->conc)? tb_false : tb_true;
 		if (bworking)

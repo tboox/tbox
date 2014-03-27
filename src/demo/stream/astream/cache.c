@@ -57,7 +57,7 @@ tb_int_t tb_demo_stream_astream_cache_main(tb_int_t argc, tb_char_t** argv)
 		tb_assert_and_check_break(tstream);
 
 		// limit rate
-//		tb_tstream_limit(tstream, 4096);
+//		tb_tstream_limitrate(tstream, 4096);
 
 		// open and save tstream
 		if (!tb_tstream_osave(tstream, tb_demo_astream_cache_save_func, aicp)) break;

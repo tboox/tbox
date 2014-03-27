@@ -1134,7 +1134,7 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_astream_t* astream, tb_size_t st
 			tb_assert_and_check_break(http->tstream);
 
 			// limit rate
-			if (http->option.post_lrate) tb_tstream_limit(http->tstream, http->option.post_lrate);
+			if (http->option.post_lrate) tb_tstream_limitrate(http->tstream, http->option.post_lrate);
 
 			// open tstream
 			ok = tb_tstream_open(http->tstream, tb_aicp_http_post_open_func, http);

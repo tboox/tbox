@@ -98,6 +98,11 @@ typedef struct __tb_aiop_aico_t
 	// the task
 	tb_handle_t 				task;
 
+	/* wait ok? avoid spak double aice when wait killed/timeout and ok at same time
+	 * need lock it using ptor->lock
+	 */
+	tb_uint8_t 					wait_ok : 1;
+
 	// is waiting?
 	tb_uint8_t 					waiting : 1;
 
@@ -280,6 +285,9 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			// have wait?
 			tb_check_continue(aice->code);
 
+			// have been waited ok for the timer timeout/killed func? need not spak it repeatly
+			tb_check_continue(!aico->wait_ok);
+
 			// the priority
 			tb_size_t priority = tb_aiop_aice_priority(aice);
 			tb_assert_and_check_goto(priority < tb_arrayn(ptor->spak) && ptor->spak[priority], end);
@@ -294,7 +302,11 @@ static tb_pointer_t tb_aiop_spak_loop(tb_pointer_t data)
 			if (aico->base.type == TB_AICO_TYPE_SOCK)
 			{
 				// spak aice
-				if (!tb_queue_full(ptor->spak[priority])) tb_queue_put(ptor->spak[priority], aice);
+				if (!tb_queue_full(ptor->spak[priority])) 
+				{
+					tb_queue_put(ptor->spak[priority], aice);
+					aico->wait_ok = 1;
+				}
 				else tb_assert(0);
 			}
 			else if (aico->base.type == TB_AICO_TYPE_FILE)
@@ -344,30 +356,35 @@ static tb_void_t tb_aiop_spak_wait_timeout(tb_bool_t killed, tb_pointer_t data)
 		aico->aioo = tb_null;
 	}
 
-	// the priority
-	tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
-	tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
-
 	// enter 
 	tb_spinlock_enter(&ptor->lock);
 
-	// trace
-	tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
-
-	// spak aice
+	// have been waited ok for the spak loop? need not spak it repeatly
 	tb_bool_t ok = tb_false;
-	if (!tb_queue_full(ptor->spak[priority])) 
+	if (!aico->wait_ok)
 	{
-		// save state
-		aico->aice.state = killed? TB_AICE_STATE_KILLED : TB_AICE_STATE_TIMEOUT;
+		// the priority
+		tb_size_t priority = tb_aiop_aice_priority(&aico->aice);
+		tb_assert_and_check_return(priority < tb_arrayn(ptor->spak) && ptor->spak[priority]);
 
-		// put it
-		tb_queue_put(ptor->spak[priority], &aico->aice);
+		// trace
+		tb_trace_d("wait: timeout: code: %lu, priority: %lu, size: %lu", aico->aice.code, priority, tb_queue_size(ptor->spak[priority]));
 
-		// ok
-		ok = tb_true;
+		// spak aice
+		if (!tb_queue_full(ptor->spak[priority])) 
+		{
+			// save state
+			aico->aice.state = killed? TB_AICE_STATE_KILLED : TB_AICE_STATE_TIMEOUT;
+
+			// put it
+			tb_queue_put(ptor->spak[priority], &aico->aice);
+
+			// ok
+			ok = tb_true;
+			aico->wait_ok = 1;
+		}
+		else tb_assert(0);
 	}
-	else tb_assert(0);
 
 	// leave 
 	tb_spinlock_leave(&ptor->lock);
@@ -399,6 +416,7 @@ static tb_bool_t tb_aiop_spak_wait(tb_aicp_proactor_aiop_t* ptor, tb_aice_t cons
 		// wait it
 		aico->aice = *aice;
 		aico->waiting = 1;
+		aico->wait_ok = 0;
 
 		// have aioo?
 		if (!aico->aioo) 

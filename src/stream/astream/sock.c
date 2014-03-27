@@ -272,7 +272,14 @@ static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_
 	sstream->func.open 	= func;
 
 	// done addr
-	return tb_aicp_addr_done(sstream->addr, host);
+	if (!tb_aicp_addr_done(sstream->addr, host))
+	{
+		// done func
+		func((tb_astream_t*)sstream, TB_STREAM_SOCK_STATE_DNS_FAILED, priv);
+	}
+
+	// ok
+	return tb_true;
 }
 static tb_bool_t tb_astream_sock_read_func(tb_aice_t const* aice)
 {

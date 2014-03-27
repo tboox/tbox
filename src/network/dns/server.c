@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 		"server"
+#define TB_TRACE_MODULE_NAME 		"dns_server"
 #define TB_TRACE_MODULE_DEBUG 		(0)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -37,6 +37,13 @@
 #include "../../platform/platform.h"
 #include "../../container/container.h"
 #include "../../algorithm/algorithm.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the dns server test timeout
+#define TB_DNS_SERVER_TEST_TIMEOUT 	(500)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -122,7 +129,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	 * tb_uint16_t z      :1;		// its z! reserved
 	 * tb_uint16_t ad     :1;	    // authenticated data
 	 * tb_uint16_t cd     :1;	    // checking disabled
-/	 * tb_uint16_t rcode  :4;	    // response code
+	 * tb_uint16_t rcode  :4;	    // response code
 	 *
 	 * this is a query 
 	 * this is a standard query 
@@ -197,7 +204,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	{
 		// writ data
 		tb_long_t r = tb_socket_usend(sock, addr, TB_DNS_HOST_PORT, rpkt + writ, size - writ);
-//		tb_trace_d("writ %d", r);
+		tb_trace_d("writ %d", r);
 		tb_check_goto(r >= 0, end);
 		
 		// no data?
@@ -207,7 +214,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 			tb_check_goto(!writ, end);
  
 			// wait
-			r = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_TIMEOUT);
+			r = tb_aioo_wait(sock, TB_AIOE_CODE_SEND, TB_DNS_SERVER_TEST_TIMEOUT);
 
 			// fail or timeout?
 			tb_check_goto(r > 0, end);
@@ -221,7 +228,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	{
 		// read data
 		tb_long_t r = tb_socket_urecv(sock, addr, TB_DNS_HOST_PORT, rpkt + read, TB_DNS_RPKT_MAXN - read);
-//		tb_trace_d("read %d", r);
+		tb_trace_d("read %d", r);
 		tb_check_break(r >= 0);
 		
 		// no data?
@@ -231,8 +238,8 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 			tb_check_break(!read);
 
 			// wait
-			r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_TIMEOUT);
-//			tb_trace_d("wait %d", r);
+			r = tb_aioo_wait(sock, TB_AIOE_CODE_RECV, TB_DNS_SERVER_TEST_TIMEOUT);
+			tb_trace_d("wait %d", r);
 
 			// fail or timeout?
 			tb_check_break(r > 0);
@@ -255,7 +262,7 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	rate = (tb_long_t)(tb_mclock() - time);
 
 	// ok
-//	tb_trace_d("[dns]: addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
+	tb_trace_d("addr: %u.%u.%u.%u ok, rate: %u", addr->u8[0], addr->u8[1], addr->u8[2], addr->u8[3], rate);
 
 end:
 	// exit sock
@@ -357,7 +364,7 @@ tb_void_t tb_dns_server_dump()
 	{
 		// trace
 		tb_trace_i("============================================================");
-		tb_trace_i("[dns]: list: %u servers", tb_vector_size(g_list.list));
+		tb_trace_i("list: %u servers", tb_vector_size(g_list.list));
 
 		// walk
 		tb_size_t i = 0;
@@ -368,11 +375,11 @@ tb_void_t tb_dns_server_dump()
 			if (server)
 			{
 				// trace
-				tb_trace_i("[dns]: server: %u.%u.%u.%u, rate: %u", 	server->addr.u8[0]
-																, 	server->addr.u8[1]
-																, 	server->addr.u8[2]
-																, 	server->addr.u8[3]
-																, 	server->rate);
+				tb_trace_i("server: %u.%u.%u.%u, rate: %u", 	server->addr.u8[0]
+															, 	server->addr.u8[1]
+															, 	server->addr.u8[2]
+															, 	server->addr.u8[3]
+															, 	server->rate);
 			}
 		}
 	}
@@ -414,7 +421,7 @@ tb_void_t tb_dns_server_sort()
 	// need sort?
 	tb_check_return(list);
 
-	// rate list
+	// rate list and remove no-rate servers
 	tb_vector_walk(list, tb_dns_server_rate, tb_null);
 
 	// sort list
@@ -424,7 +431,12 @@ tb_void_t tb_dns_server_sort()
 	tb_spinlock_enter(&g_lock);
 
 	// save list
-	tb_vector_copy(g_list.list, list);
+	if (tb_vector_size(list)) tb_vector_copy(g_list.list, list);
+	else
+	{
+		// no faster server? using the previous server list
+		tb_trace_w("no faster server");
+	}
 
 	// sort ok
 	g_list.sort = tb_true;
@@ -469,7 +481,7 @@ tb_size_t tb_dns_server_get(tb_ipv4_t addr[2])
 	tb_spinlock_leave(&g_lock);
 
 	// trace
-	if (!ok) tb_trace_d("[dns]: no server!");
+	if (!ok) tb_trace_e("no server!");
 
 	// ok?
 	return ok;
