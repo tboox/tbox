@@ -41,7 +41,7 @@
  *
  * @param aicp 			the aicp, will make it if be null
  * @param conc 			the concurrent transfer count, no limit if be zero
- * @param timeout 		the timeout, using the default timeout if be zero
+ * @param timeout 		the timeout, using the default timeout if be zero 
  *
  * @return 				the mstream 
  */

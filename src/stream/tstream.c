@@ -1421,7 +1421,7 @@ tb_bool_t tb_tstream_resume(tb_handle_t handle)
 	// ok?
 	return ok;
 }
-tb_void_t tb_tstream_limit(tb_handle_t handle, tb_size_t rate)
+tb_void_t tb_tstream_limitrate(tb_handle_t handle, tb_size_t rate)
 {
 	// check
 	tb_tstream_t* tstream = (tb_tstream_t*)handle;
@@ -1430,5 +1430,22 @@ tb_void_t tb_tstream_limit(tb_handle_t handle, tb_size_t rate)
 	// set the limit rate
 	tb_atomic_set(&tstream->lrate, rate);
 }
+tb_void_t tb_tstream_timeout_set(tb_handle_t handle, tb_long_t timeout)
+{
+	// check
+	tb_tstream_t* tstream = (tb_tstream_t*)handle;
+	tb_assert_and_check_return(tstream && tstream->istream && tstream->ostream);
 
+	// set timeout
+	if (timeout)
+	{
+		// check
+		tb_assert_and_check_return(tb_atomic_get(&tstream->stoped));
+		tb_assert_and_check_return(!tb_atomic_get(&tstream->opened));
+
+		// ctrl it
+		tb_stream_ctrl(tstream->istream, TB_STREAM_CTRL_SET_TIMEOUT, timeout);
+		tb_stream_ctrl(tstream->ostream, TB_STREAM_CTRL_SET_TIMEOUT, timeout);
+	}
+}
 

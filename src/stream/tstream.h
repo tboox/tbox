@@ -296,11 +296,18 @@ tb_void_t 			tb_tstream_pause(tb_handle_t tstream);
  */
 tb_bool_t 			tb_tstream_resume(tb_handle_t tstream);
 
-/*! limit transfer rate  
+/*! limit tstream rate  
  *
  * @param tstream 	the tstream
  * @param rate 		the trasfer rate and no limit if 0, bytes/s
  */
-tb_void_t 			tb_tstream_limit(tb_handle_t tstream, tb_size_t rate);
+tb_void_t 			tb_tstream_limitrate(tb_handle_t tstream, tb_size_t rate);
+
+/*! set tstream timeout 
+ *
+ * @param tstream 	the tstream
+ * @param timeout 	the timeout, using the default timeout if be zero 
+ */
+tb_void_t 			tb_tstream_timeout_set(tb_handle_t tstream, tb_long_t timeout);
 
 #endif

@@ -25,7 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 		"looker"
+#define TB_TRACE_MODULE_NAME 		"dns_looker"
 #define TB_TRACE_MODULE_DEBUG 		(0)
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -38,6 +38,13 @@
 #include "../../string/string.h"
 #include "../../memory/memory.h"
 #include "../../platform/platform.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the dns looker timeout
+#define TB_DNS_LOOKER_TIMEOUT 	(5000)
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -167,14 +174,14 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		// set questions, see as tb_dns_question_t
 		// name + question1 + question2 + ...
 		tb_bstream_set_u8(&bst, '.');
-		p = tb_bstream_set_string(&bst, tb_sstring_cstr(&looker->name));
+		p = (tb_byte_t*)tb_bstream_set_string(&bst, tb_sstring_cstr(&looker->name));
 
 		// only one question now.
 		tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
 		tb_bstream_set_u16_be(&bst, 1); 		// it's internet (lol)
 
 		// encode dns name
-		if (!p || !tb_dns_encode_name(p - 1)) return -1;
+		if (!p || !tb_dns_encode_name((tb_char_t*)p - 1)) return -1;
 
 		// size
 		size = tb_bstream_offset(&bst);
@@ -338,7 +345,7 @@ static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv
 		else
 		{
 			// decode rdata
-			answer.rdata = tb_dns_decode_name(&bst, answer.name);
+			answer.rdata = (tb_byte_t*)tb_dns_decode_name(&bst, answer.name);
 			tb_trace_d("response: alias: %s", answer.rdata? answer.rdata : "");
 		}
 		tb_trace_d("response: ");
@@ -517,10 +524,10 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 
 	// get the dns server list
 	looker->maxn = tb_dns_server_get(looker->list);
-	tb_assert_and_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
+	tb_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
 
 	// init name
-	if (!tb_sstring_init(&looker->name, looker->data, TB_DNS_NAME_MAXN)) goto fail;
+	if (!tb_sstring_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;
 	tb_sstring_cstrcpy(&looker->name, name);
 
 	// init rpkt
@@ -636,14 +643,14 @@ tb_bool_t tb_dns_looker_done(tb_char_t const* name, tb_ipv4_t* addr)
 
 	// init looker
 	tb_handle_t looker = tb_dns_looker_init(name);
-	tb_assert_and_check_return_val(looker, tb_false);
+	tb_check_return_val(looker, tb_false);
 
 	// spak
 	tb_long_t r = -1;
 	while (!(r = tb_dns_looker_spak(looker, addr)))
 	{
 		// wait
-		r = tb_dns_looker_wait(looker, TB_DNS_TIMEOUT);
+		r = tb_dns_looker_wait(looker, TB_DNS_LOOKER_TIMEOUT);
 		tb_assert_and_check_goto(r >= 0, end);
 	}
 

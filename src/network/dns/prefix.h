@@ -48,9 +48,6 @@
 // the rpkt maximum size 
 #define TB_DNS_RPKT_MAXN 			(TB_DNS_HEADER_SIZE + TB_DNS_NAME_MAXN + 256)
 
-// the default timeout
-#define TB_DNS_TIMEOUT 				(1000)
-
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
