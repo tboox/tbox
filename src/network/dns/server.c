@@ -415,6 +415,11 @@ tb_void_t tb_dns_server_sort()
 
 	} while (0);
 
+	/* sort ok, only done once sort
+	 * using the unsorted server list at the other thread if the sort have been not finished
+	 */
+	g_list.sort = tb_true;
+
 	// leave
 	tb_spinlock_leave(&g_lock);
 
@@ -430,16 +435,13 @@ tb_void_t tb_dns_server_sort()
 	// enter
 	tb_spinlock_enter(&g_lock);
 
-	// save list
+	// save the sorted server list
 	if (tb_vector_size(list)) tb_vector_copy(g_list.list, list);
 	else
 	{
 		// no faster server? using the previous server list
 		tb_trace_w("no faster server");
 	}
-
-	// sort ok
-	g_list.sort = tb_true;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
