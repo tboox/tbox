@@ -39,11 +39,13 @@
  *
  * the multi-stream for the stream transfer
  *
- * @param conc 			the concurrent transfer count, no limit if be zeor
+ * @param aicp 			the aicp, will make it if be null
+ * @param conc 			the concurrent transfer count, no limit if be zero
+ * @param timeout 		the timeout, using the default timeout if be zero
  *
  * @return 				the mstream 
  */
-tb_handle_t 			tb_mstream_init(tb_aicp_t* aicp, tb_size_t conc);
+tb_handle_t 			tb_mstream_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout);
 
 /*! exit mstream
  *
@@ -56,6 +58,12 @@ tb_void_t 				tb_mstream_exit(tb_handle_t mstream);
  * @param mstream 		the mstream 
  */
 tb_void_t 				tb_mstream_kill(tb_handle_t mstream);
+
+/*! the mstream size
+ *
+ * @param mstream 		the mstream 
+ */
+tb_size_t 				tb_mstream_size(tb_handle_t mstream);
 
 /*! done transfer from iurl to ourl
  *

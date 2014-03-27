@@ -91,15 +91,6 @@ tb_int_t tb_demo_stream_tstream_main(tb_int_t argc, tb_char_t** argv)
 		getchar();
 
 		// trace
-		tb_trace_i("close: ..");
-
-		// clos tstream
-		tb_tstream_clos(tstream, tb_false);
-
-		// wait
-		getchar();
-
-		// trace
 		tb_trace_i("save: ..");
 
 		// open and save tstream
