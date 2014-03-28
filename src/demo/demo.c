@@ -86,8 +86,11 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(object_xplist)
 ,	TB_DEMO_MAIN_ITEM(object_dump)
 
+	// spider
+,	TB_DEMO_MAIN_ITEM(spider)
+,	TB_DEMO_MAIN_ITEM(spider_queue)
+
 	// stream
-,	TB_DEMO_MAIN_ITEM(stream_spider)
 ,	TB_DEMO_MAIN_ITEM(stream_tstream)
 ,	TB_DEMO_MAIN_ITEM(stream_mstream)
 ,	TB_DEMO_MAIN_ITEM(stream_astream)
@@ -182,7 +185,7 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		{
 			// read line
 			tb_char_t line[8192] = {0};
-			if (tb_file_read(file, line, sizeof(line) - 1))
+			if (tb_file_read(file, (tb_byte_t*)line, sizeof(line) - 1))
 			{
 				tb_size_t i = 0;
 				tb_size_t n = tb_arrayn(g_demo);

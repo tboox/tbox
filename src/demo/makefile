@@ -47,7 +47,8 @@ demo_C_FILES 			+= \
 						object/xplist \
 						object/bplist \
 						object/dump \
-						stream/spider \
+						spider/spider \
+						spider/queue \
 						stream/tstream \
 						stream/mstream \
 						stream/astream \
