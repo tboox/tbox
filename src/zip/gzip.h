@@ -28,7 +28,7 @@
  * includes
  */
 #include "prefix.h"
-#if TB_CONFIG_ZLIB
+#ifdef TB_CONFIG_HAVE_ZLIB
 # 	include <zlib.h>
 #endif
 
@@ -42,7 +42,7 @@ typedef struct __tb_zip_gzip_t
 	// the zip base
 	tb_zip_t 		base;
 
-#if TB_CONFIG_ZLIB
+#ifdef TB_CONFIG_HAVE_ZLIB
 	z_stream 		zst;
 #endif
 

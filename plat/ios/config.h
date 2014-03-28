@@ -10,9 +10,6 @@
 // small
 #define TB_CONFIG_SMALL					[small]
 
-// zlib
-#define TB_CONFIG_ZLIB					[zlib]
-
 // os
 #define TB_CONFIG_OS_IOS
 #define TB_CONFIG_OS_IOS_VERSION_MAJOR 	(5)
@@ -46,9 +43,6 @@
 #define TB_CONFIG_ASIO_HAVE_POLL
 //#define TB_CONFIG_ASIO_HAVE_PORT
 //#define TB_CONFIG_ASIO_HAVE_KQUEUE
-
-// third party
-#define TB_CONFIG_THIRD_ZLIB
 
 // libc
 #define TB_CONFIG_LIBC_HAVE_MEMCPY
@@ -96,5 +90,14 @@
 //#define TB_CONFIG_LIBM_HAVE_SINCOSF
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
+
+// zlib
+#define TB_CONFIG_HAVE_ZLIB					
+
+// openssl
+//#define TB_CONFIG_HAVE_OPENSSL	
+
+// polarssl
+//#define TB_CONFIG_HAVE_POLARSSL	
 
 #endif

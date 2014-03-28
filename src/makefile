@@ -202,10 +202,16 @@ tbox_C_FILES 			+= \
 						libm/ilog2i \
 						libm/isqrti \
 
-tbox_C_FILES-$(ZLIB) 	+= \
+tbox_C_FILES-$(TB_CONFIG_HAVE_ZLIB) += \
 						zip/zlib \
 						zip/gzip \
 						zip/zlibraw 
+
+tbox_C_FILES-$(TB_CONFIG_HAVE_OPENSSL) += \
+						network/ssl/openssl 
+
+tbox_C_FILES-$(TB_CONFIG_HAVE_POLARSSL) += \
+						network/ssl/polarssl 
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 						libm/isin \
@@ -422,6 +428,7 @@ INC_FILES 				= \
 						network/http.h \
 						network/ipv4.h \
 						network/url.h \
+						network/ssl.h \
 						network/dns/dns.h \
 						network/dns/cache.h \
 						network/dns/looker.h \

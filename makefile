@@ -187,9 +187,6 @@ DEMO :=$(if $(DEMO),$(DEMO),y)
 # profile
 PROF :=$(if $(PROF),$(PROF),n)
 
-# zlib
-ZLIB :=$(if $(ZLIB),$(ZLIB),n)
-
 # arm
 ARM :=$(if $(findstring arm,$(ARCH)),y,n)
 
@@ -231,14 +228,12 @@ config : .null
 	-@perl -pi -e "s/\[build\]/`date +%Y%m%d%H%M`/g" ./src/config.h
 	-@perl -pi -e "s/\[debug\]/\($(if $(findstring y,$(DEBUG)),1,0)\)/g" ./src/config.h
 	-@perl -pi -e "s/\[small\]/\($(if $(findstring y,$(SMALL)),1,0)\)/g" ./src/config.h
-	-@perl -pi -e "s/\[zlib\]/\($(if $(findstring y,$(ZLIB)),1,0)\)/g" ./src/config.h
 	@echo "config: ==================================================================="
 	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
 	@echo "config: demo:     " 							$(DEMO)
 	@echo "config: prof:     " 							$(PROF)
-	@echo "config: zlib:     " 							$(ZLIB)
 	@echo "config: debug:    " 							$(DEBUG)
 	@echo "config: small:    " 							$(SMALL)
 	@echo "config: prefix:   " 							$(PREFIX)
@@ -278,13 +273,10 @@ config : .null
 	@echo "x64 ="$(x64) 								>> .config.mak
 	@echo "SH4 ="$(SH4) 								>> .config.mak
 	@echo "MIPS ="$(MIPS) 								>> .config.mak
-	@echo "SPARC ="$(SPARC) 								>> .config.mak
+	@echo "SPARC ="$(SPARC) 							>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# demo" 			               				>> .config.mak
 	@echo "DEMO ="$(DEMO) 								>> .config.mak
-	@echo ""                              				>> .config.mak
-	@echo "# zlib" 			               				>> .config.mak
-	@echo "ZLIB ="$(ZLIB) 								>> .config.mak
 	@echo ""                              				>> .config.mak
 	@echo "# toolchain"            						>> .config.mak
 	@echo "SDK ="$(SDK) 								>> .config.mak
@@ -311,7 +303,6 @@ config : .null
 	@echo "export SPARC"								>> .config.mak
 	@echo "export PROF"					 				>> .config.mak
 	@echo "export DEMO"					 				>> .config.mak
-	@echo "export ZLIB"					 				>> .config.mak
 	@echo "export SDK" 				 					>> .config.mak
 	@echo "export NDK" 				 					>> .config.mak
 	@echo "export BIN" 				 					>> .config.mak
