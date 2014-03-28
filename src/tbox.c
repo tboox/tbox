@@ -44,12 +44,13 @@
 # 	define TB_VTAG_SMALL 							large
 #endif
 
+#if 0
 // vtag: version
 #define TB_VTAG_VERSION_STRING(version) 			#version
 #define TB_VTAG_VERSION_MAKE(debug, small, major, minor, alter, build) 	\
 													TB_VTAG_VERSION_STRING(debug-small-major.minor.alter.build)
 #define TB_VTAG_VERSION 							TB_VTAG_VERSION_MAKE(TB_VTAG_DEBUG, TB_VTAG_SMALL, TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER, TB_CONFIG_VERSION_BUILD)
-
+#endif
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -121,21 +122,17 @@ static __tb_inline__ tb_bool_t tb_check_mode(tb_size_t mode)
 	// ok
 	return tb_true;
 }
-static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
+static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 {
-	tb_version_t const* version = tb_version();
-	if (version) 
+	// ok
+	if (build == TB_VERSION_BUILD)
 	{
-		// ok
-		if ((tb_hize_t)tb_atoll(build) == version->build)
-		{
-			tb_trace_d("version: tbox-%s-v%u.%u.%u.%llu", TB_ARCH_VERSION_STRING, version->major, version->minor, version->alter, version->build);
-			return tb_true;
-		}
-		else
-		{
-			tb_trace_w("version: tbox-%s-v%u.%u.%u.%llu != %s", version->major, version->minor, version->alter, version->build, TB_VERSION_BUILD_STRING);
-		}
+		tb_trace_d("version: %s", TB_VERSION_STRING);
+		return tb_true;
+	}
+	else
+	{
+		tb_trace_w("version: %s != %s", TB_VERSION_STRING, TB_VERSION_BUILD_STRING);
 	}
 
 	// no
@@ -146,7 +143,7 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_char_t const* build)
  * interfaces
  */
 
-tb_bool_t tb_init_for_mode(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_char_t const* build)
+tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
 {
 	// init trace
 	if (!tb_trace_init()) return tb_false;
@@ -225,7 +222,7 @@ tb_void_t tb_exit()
 tb_version_t const* tb_version()
 {
 	// init version tag for binary search
-	static __tb_volatile__ tb_char_t const* s_vtag = "[tbox]: [vtag]: [" TB_COMPILER_VERSION_STRING "]: tbox-" TB_ARCH_VERSION_STRING "-" TB_VTAG_VERSION; tb_used(s_vtag);
+	static __tb_volatile__ tb_char_t const* s_vtag = "[tbox]: [vtag]: " TB_VERSION_STRING; tb_used(s_vtag);
 
 	// init version
 	static tb_version_t s_version = {0};
