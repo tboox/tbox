@@ -20,12 +20,18 @@ TB_CONFIG_API_PRINT 			= unix
 TB_CONFIG_API_PROCESS 			= unix
 TB_CONFIG_API_MEMORY 			= libc
 
-# third party
-TB_CONFIG_THIRD_ZLIB 			= y
-
 # memory
 TB_CONFIG_MEMORY_POOL 			= $(DEBUG)
 
 # float
 TB_CONFIG_TYPE_FLOAT 			= y
+
+# zlib
+TB_CONFIG_HAVE_ZLIB 			= y
+
+# openssl
+TB_CONFIG_HAVE_OPENSSL 			= n
+
+# polarssl
+TB_CONFIG_HAVE_POLARSSL 		= n
 

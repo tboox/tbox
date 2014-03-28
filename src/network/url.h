@@ -96,9 +96,8 @@ typedef struct __tb_url_t
 
 }tb_url_t;
 
-
 /* ///////////////////////////////////////////////////////////////////////
- * the interfaces
+ * interfaces
  */
 
 /*! init url

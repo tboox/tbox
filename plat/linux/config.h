@@ -10,9 +10,6 @@
 // small
 #define TB_CONFIG_SMALL					[small]
 
-// zlib
-#define TB_CONFIG_ZLIB					[zlib]
-
 // os
 #define TB_CONFIG_OS_LINUX
 #define TB_CONFIG_OS_LINUX_VERSION_MAJOR 	(2)
@@ -94,5 +91,14 @@
 #define TB_CONFIG_LIBM_HAVE_SINCOSF
 #define TB_CONFIG_LIBM_HAVE_LOG2
 #define TB_CONFIG_LIBM_HAVE_LOG2F
+
+// zlib
+#define TB_CONFIG_HAVE_ZLIB					
+
+// openssl
+//#define TB_CONFIG_HAVE_OPENSSL	
+
+// polarssl
+//#define TB_CONFIG_HAVE_POLARSSL	
 
 #endif

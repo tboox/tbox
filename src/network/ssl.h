@@ -17,35 +17,20 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		network.h
- * @defgroup 	network
+ * @file		ssl.h
+ * @ingroup 	network
  *
  */
-#ifndef TB_NETWORK_H
-#define TB_NETWORK_H
+#ifndef TB_NETWORK_SSL_H
+#define TB_NETWORK_SSL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "ssl.h"
-#include "url.h"
-#include "ipv4.h"
-#include "http.h"
-#include "cookies.h"
-#include "dns/dns.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-
-/*! init network 
- *
- * @return 		tb_true or tb_false
- */
-tb_bool_t 		tb_network_init(tb_noarg_t);
-
-/// exit network 
-tb_void_t 		tb_network_exit(tb_noarg_t);
 
 #endif
