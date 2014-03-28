@@ -115,8 +115,41 @@
 #endif
 
 // macros
-#define __tb_macro_string__(x) 					#x
-#define __tb_macro_expand_and_string__(x) 		__tb_macro_string__(x)
+#define __tb_mstring__(x) 									#x
+#define __tb_mstring_ex__(x) 								__tb_mstring__(x)
+
+#define __tb_mconcat__(a, b) 								a##b
+#define __tb_mconcat_ex__(a, b) 							__tb_mconcat__(a, b)
+
+#define __tb_mconcat3__(a, b, c) 							a##b##c
+#define __tb_mconcat3_ex__(a, b, c) 						__tb_mconcat3__(a, b, c)
+
+#define __tb_mconcat4__(a, b, c, d) 						a##b##c##d
+#define __tb_mconcat4_ex__(a, b, c, d) 						__tb_mconcat4__(a, b, c, d)
+
+#define __tb_mconcat5__(a, b, c, d, e) 						a##b##c##d##e
+#define __tb_mconcat5_ex__(a, b, c, d, e) 					__tb_mconcat5__(a, b, c, d, e)
+
+#define __tb_mconcat6__(a, b, c, d, e, f) 					a##b##c##d##e##f
+#define __tb_mconcat6_ex__(a, b, c, d, e, f) 				__tb_mconcat6__(a, b, c, d, e, f)
+
+#define __tb_mconcat7__(a, b, c, d, e, f, g) 				a##b##c##d##e##f##g
+#define __tb_mconcat7_ex__(a, b, c, d, e, f, g) 			__tb_mconcat7__(a, b, c, d, e, f, g)
+
+#define __tb_mconcat8__(a, b, c, d, e, f, g, h) 			a##b##c##d##e##f##g##h
+#define __tb_mconcat8_ex__(a, b, c, d, e, f, g, h) 			__tb_mconcat8__(a, b, c, d, e, f, g, h)
+
+#define __tb_mconcat9__(a, b, c, d, e, f, g, h, i) 			a##b##c##d##e##f##g##h##i
+#define __tb_mconcat9_ex__(a, b, c, d, e, f, g, h, i) 		__tb_mconcat9__(a, b, c, d, e, f, g, h, i)
+
+#define __tb_mstrcat__(a, b) 								a b
+#define __tb_mstrcat3__(a, b, c) 							a b c
+#define __tb_mstrcat4__(a, b, c, d) 						a b c d
+#define __tb_mstrcat5__(a, b, c, d, e) 						a b c d e
+#define __tb_mstrcat6__(a, b, c, d, e, f) 					a b c d e f
+#define __tb_mstrcat7__(a, b, c, d, e, f, g) 				a b c d e f g
+#define __tb_mstrcat8__(a, b, c, d, e, f, g, h) 			a b c d e f g h
+#define __tb_mstrcat9__(a, b, c, d, e, f, g, h, i) 			a b c d e f g h i
 
 
 #endif
