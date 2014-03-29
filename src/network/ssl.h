@@ -117,6 +117,19 @@ tb_bool_t 			tb_ssl_open(tb_handle_t ssl);
 
 /*! try opening ssl using non-blocking mode
  *
+ * @code
+ *
+	// open it
+	tb_long_t ok = -1;
+	while (!(ok = tb_ssl_open_try(handle)))
+	{
+		// wait it
+		ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, timeout);
+		tb_check_break(ok > 0);
+	}
+
+ * @endcode
+ *
  * @param ssl 		the ssl handle
  *
  * @return 			ok: 1, continue: 0, failed: -1
