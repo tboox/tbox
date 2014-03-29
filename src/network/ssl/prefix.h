@@ -20,8 +20,8 @@
  * @file		prefix.h
  *
  */
-#ifndef TB_NETWORK_PREFIX_H
-#define TB_NETWORK_PREFIX_H
+#ifndef TB_NETWORK_SSL_PREFIX_H
+#define TB_NETWORK_SSL_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes

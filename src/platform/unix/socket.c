@@ -138,8 +138,8 @@ tb_size_t tb_socket_recv_buffer_size(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, 0);
 
 	// get the recv buffer size
-	tb_int_t real = 0;
-	tb_int_t size = sizeof(real);
+	tb_int_t 	real = 0;
+	socklen_t 	size = sizeof(real);
 	return !getsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_RCVBUF, (tb_char_t*)&real, &size)? real : 0;
 }
 tb_size_t tb_socket_send_buffer_size(tb_handle_t handle)
@@ -148,9 +148,18 @@ tb_size_t tb_socket_send_buffer_size(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, 0);
 
 	// get the send buffer size
-	tb_int_t real = 0;
-	tb_int_t size = sizeof(real);
+	tb_int_t 	real = 0;
+	socklen_t 	size = sizeof(real);
 	return !getsockopt(tb_handle2fd(handle), SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&real, &size)? real : 0;
+}
+tb_void_t tb_socket_block(tb_handle_t handle, tb_bool_t block)
+{
+	// check
+	tb_assert_and_check_return(handle);
+
+	// block it?
+	if (block) fcntl(tb_handle2fd(handle), F_SETFL, fcntl(tb_handle2fd(handle), F_GETFL) & ~O_NONBLOCK);
+	else fcntl(tb_handle2fd(handle), F_SETFL, fcntl(tb_handle2fd(handle), F_GETFL) | O_NONBLOCK);
 }
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {
@@ -175,7 +184,6 @@ tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t
 	// error
 	return -1;
 }
-
 tb_size_t tb_socket_bind(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {
 	// check
@@ -235,8 +243,8 @@ tb_handle_t tb_socket_accept(tb_handle_t handle)
 	tb_assert_and_check_return_val(handle, tb_null);
 
 	// accept  
-	struct sockaddr_in d;
-	tb_int_t 	n = sizeof(struct sockaddr_in);
+	struct sockaddr_in d = {0};
+	socklen_t 	n = sizeof(struct sockaddr_in);
 	tb_long_t 	fd = accept(tb_handle2fd(handle), (struct sockaddr *)&d, &n);
 
 	// no client?
@@ -425,7 +433,7 @@ tb_long_t tb_socket_urecv(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t p
 	d.sin_addr.s_addr = addr->u32;
 
 	// recv
-	tb_int_t 	n = sizeof(d);
+	socklen_t 	n = sizeof(d);
 	tb_long_t 	r = recvfrom(tb_handle2fd(handle), data, (tb_int_t)size, 0, (struct sockaddr*)&d, &n);
 
 	// ok?
