@@ -84,7 +84,7 @@ tb_void_t 			tb_ssl_exit(tb_handle_t ssl);
 /*! set ssl bio sock
  *
  * @param ssl 		the ssl handle
- * @param sock 		the sock handle
+ * @param sock 		the sock handle, @note need block this socket
  */
 tb_void_t 			tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
 
