@@ -99,6 +99,14 @@ tb_size_t 			tb_socket_recv_buffer_size(tb_handle_t handle);
  */
 tb_size_t 			tb_socket_send_buffer_size(tb_handle_t handle);
 
+/*! set the socket block mode
+ *
+ * @param handle 	the socket handle
+ * @param block 	block it?
+ *
+ */
+tb_void_t 			tb_socket_block(tb_handle_t handle, tb_bool_t block);
+
 /*! connect socket
  *
  * @param handle 	the socket handle

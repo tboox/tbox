@@ -222,6 +222,15 @@ tb_size_t tb_socket_send_buffer_size(tb_handle_t handle)
 	tb_int_t size = sizeof(real);
 	return !getsockopt((SOCKET)((tb_long_t)handle - 1), SOL_SOCKET, SO_SNDBUF, (tb_char_t*)&real, &size)? real : 0;
 }
+tb_void_t tb_socket_block(tb_handle_t handle, tb_bool_t block)
+{
+	// check
+	tb_assert_and_check_return(handle);
+
+	// block it?
+	tb_ulong_t nb = block? 0 : 1;
+	ioctlsocket((SOCKET)((tb_long_t)handle - 1), FIONBIO, &nb);
+}
 tb_long_t tb_socket_connect(tb_handle_t handle, tb_ipv4_t const* addr, tb_size_t port)
 {
 	// check

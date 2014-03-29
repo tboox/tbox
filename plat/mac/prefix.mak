@@ -108,9 +108,6 @@ MXFLAGS_RELEASE 	+= -fomit-frame-pointer
 MXFLAGS_DEBUG 		+= -fno-omit-frame-pointer -ftrapv
 endif
 
-# small
-MXFLAGS-$(SMALL) 	+= 
-
 # mflags: .m files
 MFLAGS_RELEASE 		= 
 MFLAGS_DEBUG 		= 
@@ -148,6 +145,10 @@ ARFLAGS 			= -cr
 
 # share ldflags
 SHFLAGS 			= $(ARCH_LDFLAGS) -dynamiclib
+
+# pathes
+INC_DIR 			+= /usr/local/include
+LIB_DIR 			+= /usr/local/lib
 
 # config
 include 			$(PLAT_DIR)/config.mak
