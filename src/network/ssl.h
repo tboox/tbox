@@ -84,7 +84,7 @@ tb_void_t 			tb_ssl_exit(tb_handle_t ssl);
 /*! set ssl bio sock
  *
  * @param ssl 		the ssl handle
- * @param sock 		the sock handle, @note need block this socket
+ * @param sock 		the sock handle, non-blocking 
  */
 tb_void_t 			tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
 
@@ -93,12 +93,21 @@ tb_void_t 			tb_ssl_set_bio_sock(tb_handle_t ssl, tb_handle_t sock);
  * @param ssl 		the ssl handle
  * @param read 		the read func
  * @param writ 		the writ func
- * #param wait 		the wait func, optional
+ * #param wait 		the wait func only for tb_ssl_open and tb_ssl_wait
  * @param priv 		the priv data
  */
 tb_void_t 			tb_ssl_set_bio_func(tb_handle_t ssl, tb_ssl_func_read_t read, tb_ssl_func_writ_t writ, tb_ssl_func_wait_t wait, tb_pointer_t priv);
 
-/*! open ssl
+/*! set ssl timeout for opening
+ *
+ * @param ssl 		the ssl handle
+ * @param timeout 	the timeout
+ */
+tb_void_t 			tb_ssl_set_timeout(tb_handle_t ssl, tb_long_t timeout);
+
+/*! open ssl using blocking mode
+ *
+ * @note need wait func
  *
  * @param ssl 		the ssl handle
  *
@@ -106,7 +115,15 @@ tb_void_t 			tb_ssl_set_bio_func(tb_handle_t ssl, tb_ssl_func_read_t read, tb_ss
  */
 tb_bool_t 			tb_ssl_open(tb_handle_t ssl);
 
-/*! clos ssl
+/*! try opening ssl using non-blocking mode
+ *
+ * @param ssl 		the ssl handle
+ *
+ * @return 			ok: 1, continue: 0, failed: -1
+ */
+tb_long_t 			tb_ssl_open_try(tb_handle_t ssl);
+
+/*! clos ssl 
  *
  * @param ssl 		the ssl handle
  */
@@ -131,6 +148,73 @@ tb_long_t 			tb_ssl_read(tb_handle_t ssl, tb_byte_t* data, tb_size_t size);
  * @return 			the real size, no data: 0 and see state for waiting, failed: -1
  */
 tb_long_t 			tb_ssl_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size);
+
+/*! wait ssl data
+ *
+ * @param ssl 		the ssl handle
+ * @param code 		the aioe code
+ * @param timeout 	the timeout
+ *
+ * @return 			the real code, no event: 0, failed or closed: -1
+ */
+tb_long_t 			tb_ssl_wait(tb_handle_t ssl, tb_size_t code, tb_long_t timeout);
+
+/*! the wait code
+ *
+ * @param ssl 		the ssl handle
+ * @param code 		the aioe code
+ *
+ * @return 			the need code, failed: -1
+ */
+tb_long_t 			tb_ssl_wait_code(tb_handle_t ssl, tb_size_t code);
+
+/*! spak ssl waited result for the external wait mode
+ *
+ * for detecting peer closed and tb_ssl_read or tb_ssl_writ or tb_ssl_open_try will return -1
+ * for implementing multi-sockets wait using poll mode
+ *
+ * @code
+ *
+ 	// init code
+	tb_long_t code = 0;
+
+  	// try opening
+//	tb_long_t real = tb_ssl_open_try(ssl);
+
+  	// read data
+	tb_long_t real = tb_ssl_read(ssl, data, size); code = TB_AIOE_CODE_RECV;
+
+  	// writ data
+//	tb_long_t real = tb_ssl_writ(ssl, data, size); code = TB_AIOE_CODE_SEND;
+
+	// ok
+	if (real > 0) ;
+	// need wait?
+	else if (!real)
+	{
+#if 1
+		// the need wait code
+		code = tb_ssl_wait_code(ssl, code);
+
+		// wait it
+		tb_long_t wait = code > 0? wait_func(code) : code;
+
+		// spak the waited result
+		tb_ssl_wait_spak(ssl, wait);
+#else
+		// or using ssl_wait directly
+		tb_long_t wait = tb_ssl_wait(ssl, code, timeout);
+#endif
+	}
+	// closed or failed?
+	else ;
+ *
+ * @endcode
+ *
+ * @param ssl 		the ssl handle
+ * @param wait 		the waited aioe code
+ */
+tb_void_t 			tb_ssl_wait_spak(tb_handle_t ssl, tb_long_t wait);
 
 /*! the ssl state see the stream ssl state
  *

@@ -60,6 +60,12 @@ typedef struct __tb_ssl_t
 	// the state
 	tb_size_t 			state;
 
+	// the last wait
+	tb_long_t 			lwait;
+
+	// the timeout
+	tb_long_t 			timeout;
+
 	// the read func
 	tb_ssl_func_read_t 	read;
 
@@ -114,7 +120,22 @@ static tb_int_t tb_ssl_func_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t s
 	tb_assert_static(sizeof(tb_size_t) == sizeof(size_t));
 
 	// recv it
-	return (tb_int_t)ssl->read(ssl->priv, data, size);
+	tb_long_t real = ssl->read(ssl->priv, data, size);
+
+	// trace 
+	tb_trace_d("read: %ld", real);
+
+	// ok? clear wait
+	if (real > 0) ssl->lwait = 0;
+	// peer closed?
+	else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_RECV)) real = POLARSSL_ERR_NET_CONN_RESET;
+	// no data? continue to read it
+	else if (!real) real = POLARSSL_ERR_NET_WANT_READ;
+	// failed?
+	else real = POLARSSL_ERR_NET_RECV_FAILED;
+
+	// ok?
+	return (tb_int_t)real;
 }
 static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, tb_size_t size)
 {
@@ -124,7 +145,22 @@ static tb_int_t tb_ssl_func_writ(tb_pointer_t priv, tb_byte_t const* data, tb_si
 	tb_assert_static(sizeof(tb_size_t) == sizeof(size_t));
 
 	// send it
-	return (tb_int_t)ssl->writ(ssl->priv, data, size);
+	tb_long_t real = ssl->writ(ssl->priv, data, size);
+
+	// trace 
+	tb_trace_d("writ: %ld", real);
+
+	// ok? clear wait
+	if (real > 0) ssl->lwait = 0;
+	// peer closed?
+	else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_SEND)) real = POLARSSL_ERR_NET_CONN_RESET;
+	// no data? continue to writ
+	else if (!real) real = POLARSSL_ERR_NET_WANT_WRITE;
+	// failed?
+	else real = POLARSSL_ERR_NET_SEND_FAILED;
+
+	// ok?
+	return (tb_int_t)real;
 }
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -140,6 +176,9 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
 		// make ssl
 		ssl = tb_malloc0(sizeof(tb_ssl_t));
 		tb_assert_and_check_break(ssl);
+
+		// init timeout, 30s
+		ssl->timeout = 30000;
 
 		// init ssl x509_crt
 		x509_crt_init(&ssl->x509_crt);
@@ -250,57 +289,107 @@ tb_void_t tb_ssl_set_bio_func(tb_handle_t handle, tb_ssl_func_read_t read, tb_ss
 	// set bio: func
 	ssl_set_bio(&ssl->ssl, tb_ssl_func_read, ssl, tb_ssl_func_writ, ssl);
 }
+tb_void_t tb_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return(ssl);
+
+	// save timeout
+	ssl->timeout = timeout;
+}
 tb_bool_t tb_ssl_open(tb_handle_t handle)
 {
 	// the ssl
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return_val(ssl, tb_false);
+	tb_assert_and_check_return_val(ssl && ssl->wait, tb_false);
+
+	// open it
+	tb_long_t ok = -1;
+	while (!(ok = tb_ssl_open_try(handle)))
+	{
+		// wait it
+		ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, ssl->timeout);
+		tb_check_break(ok > 0);
+	}
+
+	// ok?
+	return ok > 0? tb_true : tb_false;
+}
+tb_long_t tb_ssl_open_try(tb_handle_t handle)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl, -1);
 
 	// done
+	tb_long_t ok = -1;
 	do
 	{
 		// init state
 		ssl->state = TB_STREAM_STATE_OK;
 
-		// check
-		tb_assert_and_check_break(!ssl->bopened);
-
-		// done handshake
-		tb_long_t r = 0;
-		while ((r = ssl_handshake(&ssl->ssl)))
+		// have been opened already?
+		if (ssl->bopened)
 		{
-			// failed?
-			if (r != POLARSSL_ERR_NET_WANT_READ && r != POLARSSL_ERR_NET_WANT_WRITE)
-			{
-				// trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-# 	ifdef POLARSSL_ERROR_C
-				tb_char_t error[256] = {0};
-				polarssl_strerror(r, error, sizeof(error));
-				tb_trace_d("handshake: failed: %ld, %s", r, error);
-# 	else
-				tb_trace_d("handshake: failed: %ld", r);
-# 	endif
-#endif
-				break;
-			}
-			// wait it?
-			else if (ssl->wait)
-			{
-				// trace
-				tb_trace_d("handshake: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
-
-				// wait 
-				r = ssl->wait(ssl->priv, r == POLARSSL_ERR_NET_WANT_READ? TB_AIOE_CODE_RECV : TB_AIOE_CODE_SEND, -1);
-				tb_check_break(r > 0);
-			}
+			ok = 1;
+			break;
 		}
 
-		// failed? break it
-		tb_check_break(!r);
+		// done handshake
+		tb_long_t r = ssl_handshake(&ssl->ssl);
+		
+		// trace
+		tb_trace_d("handshake: %ld", r);
 
+		// ok?
+		if (!r) ok = 1;
+		// peer closed
+		else if (r == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || r == POLARSSL_ERR_NET_CONN_RESET)
+		{
+			tb_trace_d("handshake: closed: %ld", r);
+			ssl->state = TB_STREAM_STATE_CLOSED;
+			break;
+		}
+		// continue to wait it?
+		else if (r == POLARSSL_ERR_NET_WANT_READ || r == POLARSSL_ERR_NET_WANT_WRITE)
+		{
+			// trace
+			tb_trace_d("handshake: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
+
+			// continue it
+			ok = 0;
+
+			// save state
+			ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STREAM_SOCK_STATE_SSL_WANT_READ : TB_STREAM_SOCK_STATE_SSL_WANT_WRIT;
+			break;
+		}
+		// failed?
+		else
+		{
+			// trace
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+# 	ifdef POLARSSL_ERROR_C
+			tb_char_t error[256] = {0};
+			polarssl_strerror(r, error, sizeof(error));
+			tb_trace_d("handshake: failed: %ld, %s", r, error);
+# 	else
+			tb_trace_d("handshake: failed: %ld", r);
+# 	endif
+#endif
+			// save state
+			ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
+			break;
+		}
+
+	} while (0);
+
+	// ok?
+	if (ok > 0)
+	{
 		// done ssl verify
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+		tb_long_t r = 0;
 		if ((r = ssl_get_verify_result(&ssl->ssl)))
 		{
 			if ((r & BADCERT_EXPIRED)) tb_trace_d("server certificate has expired");
@@ -311,13 +400,11 @@ tb_bool_t tb_ssl_open(tb_handle_t handle)
 		}
 #endif
 
-		// ok
+		// opened
 		ssl->bopened = tb_true;
-
-	} while (0);
-
+	}
 	// failed?
-	if (!ssl->bopened)
+	else if (ok < 0)
 	{
 		// save state
 		if (ssl->state == TB_STREAM_STATE_OK)
@@ -325,10 +412,10 @@ tb_bool_t tb_ssl_open(tb_handle_t handle)
 	}
 
 	// trace
-	tb_trace_d("handshake: %s", ssl->bopened? "ok" : "no");
+	tb_trace_d("handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
 
 	// ok?
-	return ssl->bopened;
+	return ok;
 }
 tb_void_t tb_ssl_clos(tb_handle_t handle)
 {
@@ -359,7 +446,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_long_t real = ssl_read(&ssl->ssl, data, size);
 
 	// want read? continue it
-	if (real == POLARSSL_ERR_NET_WANT_READ)
+	if (real == POLARSSL_ERR_NET_WANT_READ || !real)
 	{
 		// trace
 		tb_trace_d("read: want read");
@@ -379,7 +466,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		return 0;
 	}
 	// peer closed?
-	else if (real == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY)
+	else if (real == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || real == POLARSSL_ERR_NET_CONN_RESET)
 	{
 		// trace
 		tb_trace_d("read: peer closed");
@@ -404,16 +491,6 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 		// save state
 		ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
-		return -1;
-	}
-	// end?
-	else if (!real)
-	{
-		// trace
-		tb_trace_d("read: end");
-
-		// save state
-		ssl->state = TB_STREAM_STATE_CLOSED;
 		return -1;
 	}
 
@@ -443,7 +520,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 		return 0;
 	}
 	// want writ? continue it
-	else if (real == POLARSSL_ERR_NET_WANT_WRITE)
+	else if (real == POLARSSL_ERR_NET_WANT_WRITE || !real)
 	{
 		// trace
 		tb_trace_d("writ: want writ");
@@ -452,8 +529,18 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 		ssl->state = TB_STREAM_SOCK_STATE_SSL_WANT_WRIT;
 		return 0;
 	}
+	// peer closed?
+	else if (real == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || real == POLARSSL_ERR_NET_CONN_RESET)
+	{
+		// trace
+		tb_trace_d("writ: peer closed");
+
+		// save state
+		ssl->state = TB_STREAM_STATE_CLOSED;
+		return -1;
+	}
 	// failed?
-	else if (real <= 0)
+	else if (real < 0)
 	{
 		// trace
 #if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
@@ -476,6 +563,73 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 
 	// ok
 	return real;
+}
+tb_long_t tb_ssl_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl && ssl->wait, -1);
+	
+	// the wait code
+	tb_long_t wait = tb_ssl_wait_code(handle, code);
+
+	// wait it
+	wait = ssl->wait(ssl->priv, wait, timeout);
+
+	// spak wait
+	tb_ssl_wait_spak(handle, wait);
+
+	// ok?
+	return wait;
+}
+tb_long_t tb_ssl_wait_code(tb_handle_t handle, tb_size_t code)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl, code);
+	
+	// the ssl state
+	tb_long_t wait = -1;
+	switch (ssl->state)
+	{
+		// wait read
+	case TB_STREAM_SOCK_STATE_SSL_WANT_READ:
+		wait = TB_AIOE_CODE_RECV;
+		break;
+		// wait writ
+	case TB_STREAM_SOCK_STATE_SSL_WANT_WRIT:
+		wait = TB_AIOE_CODE_SEND;
+		break;
+		// ok, wait it
+	case TB_STREAM_STATE_OK:
+		wait = code;
+		break;
+		// failed or closed?
+	default:
+		break;
+	}
+
+	// trace
+	tb_trace_d("wait: %ld => %ld: ..", code, wait);
+
+	// ok?
+	return wait;
+}
+tb_void_t tb_ssl_wait_spak(tb_handle_t handle, tb_long_t wait)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return(ssl);
+	
+	// wait ok
+	ssl->lwait = wait;
+
+	// timeout or failed? save state
+	if (ssl->lwait < 0) ssl->state = TB_STREAM_SOCK_STATE_SSL_WAIT_FAILED;
+	else if (!ssl->lwait) ssl->state = TB_STREAM_SOCK_STATE_SSL_TIMEOUT;
+
+	// trace
+	tb_trace_d("wait: %ld", ssl->lwait);
 }
 tb_size_t tb_ssl_state(tb_handle_t handle)
 {

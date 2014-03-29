@@ -143,8 +143,10 @@ tb_char_t const* tb_stream_state_cstr(tb_size_t state)
 	case TB_STREAM_SOCK_STATE_SEND_TIMEOUT: 	return "sock: send: timeout";
 	case TB_STREAM_SOCK_STATE_SEND_FAILED: 		return "sock: send: failed";
 	case TB_STREAM_SOCK_STATE_SSL_FAILED: 		return "sock: ssl: failed";
+	case TB_STREAM_SOCK_STATE_SSL_TIMEOUT: 		return "sock: ssl: timeout";
 	case TB_STREAM_SOCK_STATE_SSL_WANT_READ: 	return "sock: ssl: want read";
 	case TB_STREAM_SOCK_STATE_SSL_WANT_WRIT: 	return "sock: ssl: want writ";
+	case TB_STREAM_SOCK_STATE_SSL_WAIT_FAILED: 	return "sock: ssl: wait failed";
 	case TB_STREAM_HTTP_STATE_RESPONSE_204: 	return "http: response: 204";
 	case TB_STREAM_HTTP_STATE_RESPONSE_300: 	return "http: response: 300";
 	case TB_STREAM_HTTP_STATE_RESPONSE_301: 	return "http: response: 301";
