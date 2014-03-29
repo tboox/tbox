@@ -192,11 +192,11 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 						if (!sstream->hssl) sstream->hssl = tb_ssl_init(tb_false);
 						tb_assert_and_check_break(sstream->hssl);
 
-						// block it
-						tb_socket_block(sstream->sock, tb_true);
-
 						// init bio
 						tb_ssl_set_bio_sock(sstream->hssl, sstream->sock);
+
+						// init timeout
+						tb_ssl_set_timeout(sstream->hssl, tb_stream_timeout(gstream));
 
 						// open ssl
 						if (!tb_ssl_open(sstream->hssl)) break;
@@ -209,15 +209,8 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 					// trace
 					tb_trace_d("ssl: %s", ok? "ok" : "no");
 			
-					// failed?
-					if (!ok) 
-					{
-						// save state
-						sstream->base.state = sstream->hssl? tb_ssl_state(sstream->hssl) : TB_STREAM_SOCK_STATE_SSL_FAILED;
-
-						// unblock it
-						tb_socket_block(sstream->sock, tb_false);
-					}
+					// failed? save state
+					if (!ok) sstream->base.state = sstream->hssl? tb_ssl_state(sstream->hssl) : TB_STREAM_SOCK_STATE_SSL_FAILED;
 				}
 			}
 		}
@@ -252,13 +245,7 @@ static tb_bool_t tb_gstream_sock_clos(tb_handle_t gstream)
 
 	// close ssl
 	if (tb_url_ssl_get(&sstream->base.base.url) && sstream->hssl)
-	{
-		// close ssl
 		tb_ssl_clos(sstream->hssl);
-
-		// unblock socket
-		if (sstream->sock) tb_socket_block(sstream->sock, tb_false);
-	}
 
 	// keep alive? not close it
 	tb_check_return_val(!sstream->balived, tb_true);
@@ -344,24 +331,30 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	
 				// read data
 				real = tb_ssl_read(sstream->hssl, data, size);
+
+				// trace
+				tb_trace_d("read: %ld <? %lu", real, size);
+
+				// failed or closed?
+				tb_check_return_val(real >= 0, -1);
 			}
 			else
 			{
 				// read data
 				real = tb_socket_recv(sstream->sock, data, size);
+
+				// trace
+				tb_trace_d("read: %ld <? %lu", real, size);
+
+				// failed or closed?
+				tb_check_return_val(real >= 0, -1);
+
+				// peer closed?
+				if (!real && sstream->wait > 0 && (sstream->wait & TB_AIOE_CODE_RECV)) return -1;
+
+				// clear wait
+				if (real > 0) sstream->wait = 0;
 			}
-
-			// trace
-			tb_trace_d("read: %ld <? %lu", real, size);
-
-			// failed or closed?
-			tb_check_return_val(real >= 0, -1);
-
-			// peer closed?
-			if (!real && sstream->wait > 0 && (sstream->wait & TB_AIOE_CODE_RECV)) return -1;
-
-			// clear wait
-			if (real > 0) sstream->wait = 0;
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -430,21 +423,26 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 				// trace
 				tb_trace_d("writ: %ld <? %lu", real, size);
 
+				// failed or closed?
+				tb_check_return_val(real >= 0, -1);
 			}
 			else
 			{
 				// writ data
 				real = tb_socket_send(sstream->sock, data, size);
+
+				// trace
+				tb_trace_d("writ: %ld <? %lu", real, size);
+
+				// failed or closed?
+				tb_check_return_val(real >= 0, -1);
+
+				// peer closed?
+				if (!real && sstream->wait > 0 && (sstream->wait & TB_AIOE_CODE_SEND)) return -1;
+
+				// clear wait
+				if (real > 0) sstream->wait = 0;
 			}
-
-			// failed or closed?
-			tb_check_return_val(real >= 0, -1);
-
-			// peer closed?
-			if (!real && sstream->wait > 0 && (sstream->wait & TB_AIOE_CODE_SEND)) return -1;
-
-			// clear wait
-			if (real > 0) sstream->wait = 0;
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -499,30 +497,17 @@ static tb_long_t tb_gstream_sock_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 		// check
 		tb_assert_and_check_return_val(sstream->hssl, -1);
 
-		// the ssl state
-		tb_size_t state = tb_ssl_state(sstream->hssl);
-		switch (state)
-		{
-			// wait read
-		case TB_STREAM_SOCK_STATE_SSL_WANT_READ:
-			wait = TB_AIOE_CODE_RECV;
-			break;
-			// wait writ
-		case TB_STREAM_SOCK_STATE_SSL_WANT_WRIT:
-			wait = TB_AIOE_CODE_SEND;
-			break;
-			// ok, wait it
-		case TB_STREAM_STATE_OK:
-			break;
-			// failed or closed?
-		default:
-			sstream->base.state = state;
-			return -1;
-		}
-	}
+		// wait 
+		sstream->wait = tb_ssl_wait(sstream->hssl, wait, timeout);
 
-	// wait 
-	sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);
+		// timeout or failed? save state
+		if (sstream->wait <= 0) sstream->base.state = tb_ssl_state(sstream->hssl);
+	}
+	else
+	{
+		// wait 
+		sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);
+	}
 
 	// trace
 	tb_trace_d("wait: %ld", sstream->wait);
