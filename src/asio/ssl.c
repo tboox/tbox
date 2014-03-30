@@ -17,27 +17,37 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asio.h
- * @defgroup 	asio
+ * @file		ssl.c
+ * @ingroup 	asio
  *
  */
-#ifndef TB_ASIO_H
-#define TB_ASIO_H
+
+/* ///////////////////////////////////////////////////////////////////////
+ * trace
+ */
+#define TB_TRACE_MODULE_NAME 				"aicp_ssl"
+#define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "aioo.h"
-#include "aioe.h"
-#include "aiop.h"
-#include "aico.h"
-#include "aice.h"
-#include "aicp.h"
-#include "pool.h"
-#include "http.h"
-#include "dns.h"
 #include "ssl.h"
+#include "aico.h"
+#include "aicp.h"
+#include "../network/network.h"
+#include "../platform/platform.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
 
-#endif
+// the aicp ssl type
+typedef struct __tb_aicp_ssl_t
+{
+
+}tb_aicp_ssl_t;
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+

@@ -126,6 +126,7 @@ tbox_C_FILES 			+= \
 						asio/pool \
 						asio/http \
 						asio/dns \
+						asio/ssl \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -335,6 +336,7 @@ INC_FILES 				= \
 						asio/pool.h \
 						asio/http.h \
 						asio/dns.h \
+						asio/ssl.h \
 						math/prefix.h \
 						math/math.h \
 						math/rand.h \
