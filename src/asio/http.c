@@ -254,7 +254,7 @@ static tb_void_t tb_aicp_http_status_cler(tb_aicp_http_t* http, tb_bool_t host_c
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
 	http->status.document_size = 0;
-	http->status.state = TB_STREAM_STATE_OK;
+	http->status.state = TB_STATE_OK;
 
 	// clear content type
 	tb_pstring_clear(&http->status.content_type);
@@ -344,7 +344,7 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
 	else if (http->option.range.bof > http->option.range.eof)
 	{
 		// save state
-		if (state) *state = TB_STREAM_HTTP_STATE_RANGE_INVALID;
+		if (state) *state = TB_STATE_HTTP_RANGE_INVALID;
 		return tb_null;
 	}
 
@@ -417,21 +417,21 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 	
 		// read it
 		if (!tb_aicp_http_read(http, 0, oread->maxn, oread->func, oread->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		ok = oread->func(http, state, tb_null, 0, oread->maxn, oread->priv);
@@ -451,21 +451,21 @@ static tb_bool_t tb_aicp_http_open_seek_func(tb_handle_t http, tb_size_t state, 
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 	
 		// seek it
 		if (!tb_aicp_http_seek(http, oseek->offset, oseek->func, oseek->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		ok = oseek->func(http, state, 0, oseek->priv);
@@ -520,16 +520,16 @@ static tb_bool_t tb_aicp_http_head_resp_done(tb_aicp_http_t* http)
 
 		// save state
 		if (http->status.code == 200 || http->status.code == 206)
-			http->status.state = TB_STREAM_STATE_OK;
+			http->status.state = TB_STATE_OK;
 		else if (http->status.code == 204)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_204;
+			http->status.state = TB_STATE_HTTP_RESPONSE_204;
 		else if (http->status.code >= 300 && http->status.code <= 304)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
+			http->status.state = TB_STATE_HTTP_RESPONSE_300 + (http->status.code - 300);
 		else if (http->status.code >= 400 && http->status.code <= 416)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
+			http->status.state = TB_STATE_HTTP_RESPONSE_400 + (http->status.code - 400);
 		else if (http->status.code >= 500 && http->status.code <= 507)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
-		else http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_UNK;
+			http->status.state = TB_STATE_HTTP_RESPONSE_500 + (http->status.code - 500);
+		else http->status.state = TB_STATE_HTTP_RESPONSE_UNK;
 
 		// check state code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return tb_false;
@@ -631,13 +631,13 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("head: redt: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
+	tb_trace_d("head: redt: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
 
 	// done
 	do
 	{
 		// ok? 
-		if (state == TB_STREAM_STATE_OK)
+		if (state == TB_STATE_OK)
 		{
 			// save read
 			http->redirect_read += real;
@@ -647,10 +647,10 @@ static tb_bool_t tb_aicp_http_head_redt_func(tb_astream_t* astream, tb_size_t st
 		}
 
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK || state == TB_STREAM_STATE_CLOSED);
+		tb_check_break(state == TB_STATE_OK || state == TB_STATE_CLOSED);
 
 		// redirect failed
-		state = TB_STREAM_HTTP_STATE_REDIRECT_FAILED;
+		state = TB_STATE_HTTP_REDIRECT_FAILED;
 
 		// close stream
 		if (http->stream) tb_astream_clos(http->stream, tb_true);
@@ -690,16 +690,16 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("head: read: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
+	tb_trace_d("head: read: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
 
 	// done
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// walk	
 		tb_long_t 			ok = 0;
@@ -760,7 +760,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 				if (!tb_aicp_http_head_resp_done(http)) 
 				{	
 					// save the error state
-					if (http->status.state != TB_STREAM_STATE_OK) state = http->status.state;
+					if (http->status.state != TB_STATE_OK) state = http->status.state;
 
 					// error
 					ok = -1;
@@ -798,7 +798,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 					if (!tb_astream_read(http->stream, 0, tb_aicp_http_head_redt_func, http)) break;
 				}
 				// no left data, redirect it directly
-				else tb_aicp_http_head_redt_func(http->stream, TB_STREAM_STATE_OK, tb_null, 0, 0, http);
+				else tb_aicp_http_head_redt_func(http->stream, TB_STATE_OK, tb_null, 0, 0, http);
 				return tb_false;
 			}
 
@@ -884,7 +884,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 			p = e;
 
 			// ok
-			state = TB_STREAM_STATE_OK;
+			state = TB_STATE_OK;
 
 			// dump status
 #if defined(__tb_debug__) && TB_TRACE_MODULE_DEBUG
@@ -895,7 +895,7 @@ static tb_bool_t tb_aicp_http_head_read_func(tb_astream_t* astream, tb_size_t st
 		else 
 		{
 			// trace
-			tb_trace_d("head: read: error, state: %s", tb_stream_state_cstr(state));
+			tb_trace_d("head: read: error, state: %s", tb_state_cstr(state));
 		}
 
 	} while (0);
@@ -916,7 +916,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("head: post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_stream_state_cstr(state));
+	tb_trace_d("head: post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_state_cstr(state));
 
 	// done
 	tb_bool_t bpost = tb_false;
@@ -925,17 +925,17 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
 		// done func
 		if (http->option.post_func && !http->option.post_func(http, state, offset, size, save, rate, http->option.post_priv)) 
 		{
-			state = TB_STREAM_STATE_UNKNOWN_ERROR;
+			state = TB_STATE_UNKNOWN_ERROR;
 			break;
 		}
 			
 		// ok? continue to post
-		if (state == TB_STREAM_STATE_OK) bpost = tb_true;
+		if (state == TB_STATE_OK) bpost = tb_true;
 		// closed? read head
-		else if (state == TB_STREAM_STATE_CLOSED)
+		else if (state == TB_STATE_CLOSED)
 		{
 			// reset state
-			state = TB_STREAM_STATE_UNKNOWN_ERROR;
+			state = TB_STATE_UNKNOWN_ERROR;
 
 			// clear line size
 			http->line_size = 0;
@@ -953,12 +953,12 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
 		else break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed?
-	if (state != TB_STREAM_STATE_OK)
+	if (state != TB_STATE_OK)
 	{
 		// done func
 		http->status.state = state;
@@ -975,17 +975,17 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
+	tb_trace_d("head: writ: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
 
 	// done
 	tb_bool_t bwrit = tb_false;
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// not finished? continue it
 		if (real < size)
@@ -1019,12 +1019,12 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_astream_t* astream, tb_size_t st
 		}
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		http->status.state = state;
@@ -1041,22 +1041,22 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("post: open: offset: %lu, size: %lu, state: %s", offset, size, tb_stream_state_cstr(state));
+	tb_trace_d("post: open: offset: %lu, size: %lu, state: %s", offset, size, tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// no post size?
 		if (size < 0)
 		{
-			state = TB_STREAM_HTTP_STATE_POST_FAILED;
+			state = TB_STATE_HTTP_POST_FAILED;
 			break;
 		}
 
@@ -1072,12 +1072,12 @@ static tb_bool_t tb_aicp_http_post_open_func(tb_size_t state, tb_hize_t offset, 
 		if (!tb_astream_writ(http->stream, (tb_byte_t const*)head_data, head_size, tb_aicp_http_head_writ_func, http)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		http->status.state = state;
@@ -1094,17 +1094,17 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_astream_t* astream, tb_size_t st
 	tb_assert_and_check_return_val(http && http->stream && http->func.open, tb_false);
 
 	// trace
-	tb_trace_d("sock: open: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("sock: open: state: %s", tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// get?
 		if (http->option.method == TB_HTTP_METHOD_GET)
@@ -1142,12 +1142,12 @@ static tb_bool_t tb_aicp_http_sock_open_func(tb_astream_t* astream, tb_size_t st
 		else tb_assert_and_check_break(0);
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		http->status.state = state;
@@ -1164,7 +1164,7 @@ static tb_bool_t tb_aicp_http_read_func(tb_astream_t* astream, tb_size_t state, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.read, tb_false);
 
 	// trace
-	tb_trace_d("read: real: %lu, state: %s", real, tb_stream_state_cstr(state));
+	tb_trace_d("read: real: %lu, state: %s", real, tb_state_cstr(state));
 
 	// done func
 	return http->func.read(http, state, data, real, size, http->priv);
@@ -1176,7 +1176,7 @@ static tb_bool_t tb_aicp_http_task_func(tb_astream_t* astream, tb_size_t state, 
 	tb_assert_and_check_return_val(http && http->stream && http->func.task, tb_false);
 
 	// trace
-	tb_trace_d("task: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("task: state: %s", tb_state_cstr(state));
 
 	// done func
 	return http->func.task(http, state, http->priv);
@@ -1400,7 +1400,7 @@ tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn,
 	if (cache_data && cache_size)
 	{
 		// done func
-		tb_bool_t ok = func(http, TB_STREAM_STATE_OK, cache_data, cache_size, cache_size, priv);
+		tb_bool_t ok = func(http, TB_STATE_OK, cache_data, cache_size, cache_size, priv);
 
 		// clear cache data
 		tb_pbuffer_clear(&http->cache_data);

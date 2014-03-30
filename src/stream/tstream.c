@@ -147,7 +147,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_d("writ: real: %lu, size: %lu, state: %s", real, size, tb_stream_state_cstr(state));
+	tb_trace_d("writ: real: %lu, size: %lu, state: %s", real, size, tb_state_cstr(state));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
@@ -157,13 +157,13 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 	do
 	{
 		// ok?
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 			
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 			
 		// done func at first once
-		if (!tstream->save && !tstream->func.save.func(TB_STREAM_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
+		if (!tstream->save && !tstream->func.save.func(TB_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
 
 		// save size
 		tstream->save += real;
@@ -197,13 +197,13 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			delay = 0;
 
 			// done func
-			if (!tstream->func.save.func(TB_STREAM_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(TB_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
 		}
 
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -219,7 +219,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			tb_atomic_set0(&tstream->pausing);
 	
 			// done func
-			if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, 0, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(TB_STATE_PAUSED, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, 0, tstream->func.save.priv)) break;
 		}
 		// continue?
 		else 
@@ -232,12 +232,12 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 		}
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// compute the total rate
 		tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
@@ -259,7 +259,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->istream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_d("sync: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("sync: state: %s", tb_state_cstr(state));
 
 	// the time
 	tb_hong_t time = tb_aicp_time(tb_astream_aicp(astream));
@@ -268,7 +268,7 @@ static tb_bool_t tb_tstream_ostream_sync_func(tb_astream_t* astream, tb_size_t s
 	tb_size_t trate = (tstream->save && (time > tstream->base))? (tb_size_t)((tstream->save * 1000) / (time - tstream->base)) : (tb_size_t)tstream->save;
 
 	// done func
-	return tstream->func.save.func(state == TB_STREAM_STATE_OK? TB_STREAM_STATE_CLOSED : state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, trate, tstream->func.save.priv);
+	return tstream->func.save.func(state == TB_STATE_OK? TB_STATE_CLOSED : state, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), tstream->save, trate, tstream->func.save.priv);
 }
 static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
@@ -277,22 +277,22 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->ostream && tstream->func.save.func, tb_false);
 
 	// trace
-	tb_trace_d("read: size: %lu, state: %s", real, tb_stream_state_cstr(state));
+	tb_trace_d("read: size: %lu, state: %s", real, tb_state_cstr(state));
 
 	// done
 	tb_bool_t bread = tb_false;
 	do
 	{
 		// ok?
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -347,7 +347,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 			}
 
 			// done func
-			if (!tstream->func.save.func(TB_STREAM_STATE_OK, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
+			if (!tstream->func.save.func(TB_STATE_OK, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, tstream->crate, tstream->func.save.priv)) break;
 
 			// pausing or paused?
 			if (tb_atomic_get(&tstream->pausing) || tb_atomic_get(&tstream->paused))
@@ -359,7 +359,7 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 				tb_atomic_set0(&tstream->pausing);
 		
 				// done func
-				if (!tstream->func.save.func(TB_STREAM_STATE_PAUSED, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, 0, tstream->func.save.priv)) break;
+				if (!tstream->func.save.func(TB_STATE_PAUSED, tb_stream_offset(astream), tb_stream_size(astream), tstream->save, 0, tstream->func.save.priv)) break;
 			}
 			// continue?
 			else
@@ -382,16 +382,16 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 		}
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// closed or failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// sync it if closed
 		tb_bool_t bend = tb_true;
-		if (state == TB_STREAM_STATE_CLOSED)
+		if (state == TB_STATE_CLOSED)
 		{
 			if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AIOO)
 				tb_gstream_sync(tstream->ostream, tb_true);
@@ -426,22 +426,22 @@ static tb_bool_t tb_tstream_istream_open_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->func.open.func, tb_false);
 
 	// trace
-	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_stream_state_cstr(state));
+	tb_trace_d("open: istream: offset: %llu, state: %s", offset, tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok?
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 			
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -449,15 +449,15 @@ static tb_bool_t tb_tstream_istream_open_func(tb_astream_t* astream, tb_size_t s
 		tb_atomic_set(&tstream->opened, 1);
 
 		// done func
-		ok = tstream->func.open.func(TB_STREAM_STATE_OK, tb_stream_offset(astream), tb_stream_size(astream), tstream->func.open.priv);
+		ok = tstream->func.open.func(TB_STATE_OK, tb_stream_offset(astream), tb_stream_size(astream), tstream->func.open.priv);
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		ok = tstream->func.open.func(state, 0, 0, tstream->func.open.priv);
@@ -476,17 +476,17 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 	tb_assert_and_check_return_val(astream && tstream && tstream->func.open.func, tb_false);
 
 	// trace
-	tb_trace_d("open: ostream: state: %s", tb_stream_state_cstr(state));
+	tb_trace_d("open: ostream: state: %s", tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok?
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 
 		// check
 		tb_assert_and_check_break(tstream->istream);
@@ -494,7 +494,7 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -502,12 +502,12 @@ static tb_bool_t tb_tstream_ostream_open_func(tb_astream_t* astream, tb_size_t s
 		if (!tb_astream_oseek(tstream->istream, tstream->offset, tb_tstream_istream_open_func, tstream)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		ok = tstream->func.open.func(state, 0, 0, tstream->func.open.priv);
@@ -530,22 +530,22 @@ static tb_bool_t tb_tstream_open_func(tb_size_t state, tb_hize_t offset, tb_hong
 	tb_assert_and_check_return_val(tstream, tb_false);
 
 	// trace
-	tb_trace_d("open: offset: %llu, size: %lld, state: %s", offset, size, tb_stream_state_cstr(state));
+	tb_trace_d("open: offset: %llu, size: %lld, state: %s", offset, size, tb_state_cstr(state));
 
 	// done
 	tb_bool_t ok = tb_true;
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&tstream->stoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -553,12 +553,12 @@ static tb_bool_t tb_tstream_open_func(tb_size_t state, tb_hize_t offset, tb_hong
 		if (!tb_tstream_save(tstream, osave->func, osave->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{	
 		// stoped
 		tb_atomic_set(&tstream->stoped, 1);
@@ -586,7 +586,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 	if (!tb_stream_is_opened(ostream) && !tb_gstream_open(ostream)) return -1;
 				
 	// done func
-	if (func) func(TB_STREAM_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
+	if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), 0, 0, priv);
 
 	// writ data
 	tb_byte_t 	data[TB_GSTREAM_BLOCK_MAXN];
@@ -646,7 +646,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 					delay = 0;
 
 					// done func
-					if (func) func(TB_STREAM_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), writ, crate, priv);
+					if (func) func(TB_STATE_OK, tb_stream_offset(istream), tb_stream_size(istream), writ, crate, priv);
 				}
 
 				// wait some time for limit rate
@@ -685,7 +685,7 @@ tb_hong_t tb_tstream_save_gg(tb_gstream_t* istream, tb_gstream_t* ostream, tb_si
 		tb_size_t trate = (writ && (time > base))? (tb_size_t)((writ * 1000) / (time - base)) : writ;
 	
 		// done func
-		func(TB_STREAM_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);
+		func(TB_STATE_CLOSED, tb_stream_offset(istream), tb_stream_size(istream), writ, trate, priv);
 	}
 
 	// ok?

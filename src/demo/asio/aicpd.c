@@ -100,7 +100,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 //		tb_trace_i("send[%p]: real: %lu, size: %lu", aice->aico, aice->u.send.real, aice->u.send.size);
@@ -124,7 +124,7 @@ static tb_bool_t tb_demo_sock_send_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_trace_i("send[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("send[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		tb_demo_context_exit(context);
 	}
 
@@ -141,7 +141,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 //		tb_trace_i("read[%p]: real: %lu, size: %lu, seek: %llu", aice->aico, aice->u.read.real, aice->u.read.size, aice->u.read.seek);
@@ -152,7 +152,7 @@ static tb_bool_t tb_demo_file_read_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_trace_i("read[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("read[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		tb_demo_context_exit(context);
 	}
 
@@ -172,7 +172,7 @@ static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 //		tb_trace_i("sendf[%p]: real: %lu, size: %lu", aice->aico, aice->u.sendf.real, aice->u.sendf.size);
@@ -195,7 +195,7 @@ static tb_bool_t tb_demo_sock_sendf_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_trace_i("sendf[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("sendf[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		tb_demo_context_exit(context);
 	}
 
@@ -218,7 +218,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aicp, tb_false);
 
 	// acpt ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 		tb_trace_i("acpt[%p]: %p", aice->aico, aice->u.acpt.sock);
@@ -286,7 +286,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 		}
 	}
 	// timeout?
-	else if (aice->state == TB_AICE_STATE_TIMEOUT)
+	else if (aice->state == TB_STATE_TIMEOUT)
 	{
 		// trace
 		tb_trace_i("acpt[%p]: timeout", aice->aico);
@@ -298,7 +298,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	else
 	{
 		// exit loop
-		tb_trace_i("acpt[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("acpt[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		return tb_false;
 	}
 
@@ -311,7 +311,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 		tb_trace_i("task[%p]: now: %lld", aice->aico, tb_ctime_time());
@@ -323,7 +323,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 	else
 	{
 		// trace
-		tb_trace_i("task[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("task[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		return tb_false;
 	}
 

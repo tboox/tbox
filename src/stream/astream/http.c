@@ -126,7 +126,7 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 
 	// ok?
 	tb_bool_t bend = tb_false;
-	if (state == TB_STREAM_STATE_OK) 
+	if (state == TB_STATE_OK) 
 	{
 		// save offset
 		tb_hize_t offset = tb_atomic64_add_and_fetch(&hstream->offset, real);
@@ -140,7 +140,7 @@ static tb_bool_t tb_astream_http_read_func(tb_handle_t http, tb_size_t state, tb
 	tb_bool_t ok = hstream->func.read((tb_astream_t*)hstream, state, data, real, size, hstream->priv);
 
 	// end? closed 
-	if (ok && bend) ok = hstream->func.read((tb_astream_t*)hstream, TB_STREAM_STATE_CLOSED, data, 0, size, hstream->priv);
+	if (ok && bend) ok = hstream->func.read((tb_astream_t*)hstream, TB_STATE_CLOSED, data, 0, size, hstream->priv);
 
 	// ok?
 	return ok;
@@ -158,7 +158,7 @@ static tb_bool_t tb_astream_http_read(tb_handle_t astream, tb_size_t delay, tb_b
 		tb_hize_t offset = tb_atomic64_get(&hstream->offset);
 		if (offset == hsize)
 		{
-			hstream->func.read(astream, TB_STREAM_STATE_CLOSED, tb_null, 0, size, priv);
+			hstream->func.read(astream, TB_STATE_CLOSED, tb_null, 0, size, priv);
 			return tb_true;
 		}
 	}
@@ -180,7 +180,7 @@ static tb_bool_t tb_astream_http_seek_func(tb_handle_t http, tb_size_t state, tb
 	tb_assert_and_check_return_val(hstream && hstream->func.seek, tb_false);
 
 	// save offset
-	if (state == TB_STREAM_STATE_OK) tb_atomic64_set(&hstream->offset, offset);
+	if (state == TB_STATE_OK) tb_atomic64_set(&hstream->offset, offset);
 
 	// done func
 	return hstream->func.seek((tb_astream_t*)hstream, state, offset, hstream->priv);

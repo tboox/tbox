@@ -37,7 +37,7 @@
 /*! the aicp ssl open func type
  *
  * @param ssl 		the ssl handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp
@@ -47,7 +47,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, 
 /*! the aicp ssl read func type
  *
  * @param ssl 		the ssl handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param data 		the readed data
  * @param real 		the real size, maybe zero
  * @param size 		the need size
@@ -60,7 +60,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, 
 /*! the aicp ssl task func type
  *
  * @param ssl 		the ssl handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp

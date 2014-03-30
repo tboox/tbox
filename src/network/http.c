@@ -188,7 +188,7 @@ static tb_void_t tb_http_status_cler(tb_http_t* http, tb_bool_t host_changed)
 	http->status.bchunked = 0;
 	http->status.content_size = 0;
 	http->status.document_size = 0;
-	http->status.state = TB_STREAM_STATE_OK;
+	http->status.state = TB_STATE_OK;
 
 	// clear content type
 	tb_pstring_clear(&http->status.content_type);
@@ -288,7 +288,7 @@ static tb_bool_t tb_http_request_post(tb_size_t state, tb_hize_t offset, tb_hong
 	tb_assert_and_check_return_val(http && http->stream, tb_false);
 
 	// trace
-	tb_trace_d("post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_stream_state_cstr(state));
+	tb_trace_d("post: percent: %llu%%, size: %lu, state: %s", size > 0? (offset * 100 / size) : 0, save, tb_state_cstr(state));
 
 	// done func
 	if (http->option.post_func && !http->option.post_func(http, state, offset, size, save, rate, http->option.post_priv)) 
@@ -351,7 +351,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 			tb_sstring_cstrfcpy(&value, "bytes=0-%llu", http->option.range.eof);
 		else if (http->option.range.bof > http->option.range.eof)
 		{
-			http->status.state = TB_STREAM_HTTP_STATE_RANGE_INVALID;
+			http->status.state = TB_STATE_HTTP_RANGE_INVALID;
 			break;
 		}
 
@@ -391,7 +391,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 			// init post failed?
 			if (!post_ok) 
 			{
-				http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+				http->status.state = TB_STATE_HTTP_POST_FAILED;
 				break;
 			}
 		}
@@ -454,7 +454,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 			// post stream
 			if (tb_tstream_save_gg(pstream, http->stream, http->option.post_lrate, tb_http_request_post, http) != post_size)
 			{
-				http->status.state = TB_STREAM_HTTP_STATE_POST_FAILED;
+				http->status.state = TB_STATE_HTTP_POST_FAILED;
 				break;
 			}
 		}
@@ -468,7 +468,7 @@ static tb_bool_t tb_http_request(tb_http_t* http)
 	while (0);
 
 	// failed?
-	if (!ok && !http->status.state) http->status.state = TB_STREAM_HTTP_STATE_REQUEST_FAILED;
+	if (!ok && !http->status.state) http->status.state = TB_STATE_HTTP_REQUEST_FAILED;
 
 	// exit pstream
 	if (pstream) tb_gstream_exit(pstream);
@@ -516,16 +516,16 @@ static tb_bool_t tb_http_response_done(tb_http_t* http, tb_char_t const* line, t
 
 		// save state
 		if (http->status.code == 200 || http->status.code == 206)
-			http->status.state = TB_STREAM_STATE_OK;
+			http->status.state = TB_STATE_OK;
 		else if (http->status.code == 204)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_204;
+			http->status.state = TB_STATE_HTTP_RESPONSE_204;
 		else if (http->status.code >= 300 && http->status.code <= 304)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_300 + (http->status.code - 300);
+			http->status.state = TB_STATE_HTTP_RESPONSE_300 + (http->status.code - 300);
 		else if (http->status.code >= 400 && http->status.code <= 416)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_400 + (http->status.code - 400);
+			http->status.state = TB_STATE_HTTP_RESPONSE_400 + (http->status.code - 400);
 		else if (http->status.code >= 500 && http->status.code <= 507)
-			http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_500 + (http->status.code - 500);
-		else http->status.state = TB_STREAM_HTTP_STATE_RESPONSE_UNK;
+			http->status.state = TB_STATE_HTTP_RESPONSE_500 + (http->status.code - 500);
+		else http->status.state = TB_STATE_HTTP_RESPONSE_UNK;
 
 		// check state code: 4xx & 5xx
 		if (http->status.code >= 400 && http->status.code < 600) return tb_false;

@@ -276,10 +276,10 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 				iocb->aice.u.read.real = real;
 
 				// save state
-				iocb->aice.state = TB_AICE_STATE_OK;
+				iocb->aice.state = TB_STATE_OK;
 			}
 			// closed?
-			else if (!real) iocb->aice.state = TB_AICE_STATE_CLOSED;
+			else if (!real) iocb->aice.state = TB_STATE_CLOSED;
 			// failed?
 			else 
 			{
@@ -287,7 +287,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 				tb_trace_d("spak: error: %s", strerror(-real));
 
 				// save state
-				iocb->aice.state = TB_AICE_STATE_FAILED;
+				iocb->aice.state = TB_STATE_FAILED;
 			}
 
 			// ok
@@ -302,11 +302,11 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 			// ok?
 			if (real > 0) 
 			{
-				iocb->aice.state = TB_AICE_STATE_OK;
+				iocb->aice.state = TB_STATE_OK;
 				iocb->aice.u.writ.real = real;
 			}
 			// closed?
-			else if (!real) iocb->aice.state = TB_AICE_STATE_CLOSED;
+			else if (!real) iocb->aice.state = TB_STATE_CLOSED;
 			// failed?
 			else 
 			{
@@ -314,7 +314,7 @@ static tb_void_t tb_aicp_iocb_spak(tb_naio_t* naio, tb_naio_iocb_t* iocb, tb_lon
 				tb_trace_d("spak: error: %s", strerror(-real));
 
 				// save state
-				iocb->aice.state = TB_AICE_STATE_FAILED;
+				iocb->aice.state = TB_STATE_FAILED;
 			}
 
 			// ok

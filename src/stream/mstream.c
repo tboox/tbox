@@ -129,13 +129,13 @@ static tb_bool_t tb_mstream_transfer_save(tb_size_t state, tb_hize_t offset, tb_
 	tb_assert_and_check_return_val(mstream, tb_false);
 
 	// trace
-	tb_trace_d("transfer[%p]: save: %llu bytes, rate: %lu bytes/s, state: %s", transfer, save, rate, tb_stream_state_cstr(state));
+	tb_trace_d("transfer[%p]: save: %llu bytes, rate: %lu bytes/s, state: %s", transfer, save, rate, tb_state_cstr(state));
 
 	// done func
 	tb_bool_t ok = transfer->func(state, offset, size, save, rate, transfer->priv);	
 
 	// failed, killed or closed?
-	if (state != TB_STREAM_STATE_OK && state != TB_STREAM_STATE_PAUSED)
+	if (state != TB_STATE_OK && state != TB_STATE_PAUSED)
 	{
 		// enter
 		tb_spinlock_enter(&mstream->lock);

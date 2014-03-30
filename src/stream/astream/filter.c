@@ -124,7 +124,7 @@ static tb_bool_t tb_astream_filter_open(tb_handle_t astream, tb_astream_open_fun
 		tb_atomic_set(&fstream->base.base.bopened, 1);
 
 		// done func
-		return func? func(astream, TB_STREAM_STATE_OK, fstream->priv) : tb_true;
+		return func? func(astream, TB_STATE_OK, fstream->priv) : tb_true;
 	}
 
 	// check
@@ -158,13 +158,13 @@ static tb_bool_t tb_astream_filter_sync_read_func(tb_astream_t* astream, tb_size
 		tb_atomic64_fetch_and_add(&fstream->offset, spak);
 
 		// done data
-		ok = fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_OK, data, spak, fstream->size, fstream->priv);
+		ok = fstream->func.read((tb_astream_t*)fstream, TB_STATE_OK, data, spak, fstream->size, fstream->priv);
 	}
 	// closed?
 	else
 	{
 		// done closed
-		fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_CLOSED, tb_null, 0, fstream->size, fstream->priv);
+		fstream->func.read((tb_astream_t*)fstream, TB_STATE_CLOSED, tb_null, 0, fstream->size, fstream->priv);
 
 		// break it
 		// ok = tb_false;
@@ -189,7 +189,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 		// done filter
 		switch (state)
 		{
-		case TB_STREAM_STATE_OK:
+		case TB_STATE_OK:
 			{
 				// spak the filter
 				tb_long_t spak = tb_filter_spak(fstream->filter, data, real, &data, size, 0);
@@ -201,7 +201,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 					tb_atomic64_fetch_and_add(&fstream->offset, spak);
 
 					// done data
-					ok = fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_OK, data, spak, size, fstream->priv);
+					ok = fstream->func.read((tb_astream_t*)fstream, TB_STATE_OK, data, spak, size, fstream->priv);
 				}
 				// no data? continue it
 				else if (!spak) ok = tb_true;
@@ -209,7 +209,7 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 				else
 				{
 					// done closed
-					fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_CLOSED, tb_null, 0, size, fstream->priv);
+					fstream->func.read((tb_astream_t*)fstream, TB_STATE_CLOSED, tb_null, 0, size, fstream->priv);
 
 					// break it
 					// ok = tb_false;
@@ -222,20 +222,20 @@ static tb_bool_t tb_astream_filter_read_func(tb_astream_t* astream, tb_size_t st
 					ok = tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
 					
 					// error? done error
-					if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+					if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
 
 					// need not read data, break it
 					ok = tb_false;
 				}
 			}
 			break;
-		case TB_STREAM_STATE_CLOSED:
+		case TB_STATE_CLOSED:
 			{
 				// done sync for reading
 				ok = tb_astream_task(fstream->astream, 0, tb_astream_filter_sync_read_func, fstream);
 				
 				// error? done error
-				if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
+				if (!ok) fstream->func.read((tb_astream_t*)fstream, TB_STATE_UNKNOWN_ERROR, tb_null, 0, size, fstream->priv);
 			}
 			break;
 		default:
@@ -327,7 +327,7 @@ static tb_bool_t tb_astream_filter_writ(tb_handle_t astream, tb_size_t delay, tb
 		else
 		{
 			// done func, no data and finished
-			ok = func((tb_astream_t*)fstream, TB_STREAM_STATE_OK, tb_null, 0, 0, fstream->priv);
+			ok = func((tb_astream_t*)fstream, TB_STATE_OK, tb_null, 0, 0, fstream->priv);
 		}
 	}
 	// post writ
@@ -362,21 +362,21 @@ static tb_bool_t tb_astream_filter_writ_sync_func(tb_astream_t* astream, tb_size
 
 	// not finished? continue it
 	tb_bool_t ok = tb_false;
-	if (state == TB_STREAM_STATE_OK && real < size) ok = tb_true;
+	if (state == TB_STATE_OK && real < size) ok = tb_true;
 	// ok? sync it
-	else if (state == TB_STREAM_STATE_OK && real == size)
+	else if (state == TB_STATE_OK && real == size)
 	{
 		// post sync
 		ok = tb_astream_sync(fstream->astream, fstream->bclosing, tb_astream_filter_sync_func, fstream);
 
 		// failed? done func
-		if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_STREAM_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
+		if (!ok) ok = fstream->func.sync((tb_astream_t*)fstream, TB_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
 	}
 	// failed?
 	else
 	{
 		// failed? done func
-		ok = fstream->func.sync((tb_astream_t*)fstream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
+		ok = fstream->func.sync((tb_astream_t*)fstream, state != TB_STATE_OK? state : TB_STATE_UNKNOWN_ERROR, fstream->bclosing, fstream->priv);
 	}
 
 	// ok?

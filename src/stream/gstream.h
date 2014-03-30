@@ -296,11 +296,11 @@ tb_gstream_t* 		tb_gstream_init_filter_from_chunked(tb_gstream_t* gstream, tb_bo
  */
 tb_long_t 			tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeout);
 
-/*! the stream state
+/*! the state
  *
  * @param gstream 	the stream
  *
- * @return 			the stream state
+ * @return 			the state
  */
 tb_size_t 			tb_gstream_state(tb_gstream_t* gstream);
 

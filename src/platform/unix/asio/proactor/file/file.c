@@ -116,12 +116,12 @@ static tb_long_t tb_aicp_file_spak_read(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
 	if (real > 0) 
 	{
 		aice->u.read.real = real;
-		aice->state = TB_AICE_STATE_OK;
+		aice->state = TB_STATE_OK;
 	}
 	// closed?
-	else if (!real) aice->state = TB_AICE_STATE_CLOSED;
+	else if (!real) aice->state = TB_STATE_CLOSED;
 	// failed?
-	else aice->state = TB_AICE_STATE_FAILED;
+	else aice->state = TB_STATE_FAILED;
 
 	// ok?
 	return 1;
@@ -146,12 +146,12 @@ static tb_long_t tb_aicp_file_spak_writ(tb_aicp_proactor_aiop_t* ptor, tb_aice_t
 	if (real > 0) 
 	{
 		aice->u.writ.real = real;
-		aice->state = TB_AICE_STATE_OK;
+		aice->state = TB_STATE_OK;
 	}
 	// closed?
-	else if (!real) aice->state = TB_AICE_STATE_CLOSED;
+	else if (!real) aice->state = TB_STATE_CLOSED;
 	// failed?
-	else aice->state = TB_AICE_STATE_FAILED;
+	else aice->state = TB_STATE_FAILED;
 
 	// ok?
 	return 1;
@@ -176,12 +176,12 @@ static tb_long_t tb_aicp_file_spak_readv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	if (real > 0) 
 	{
 		aice->u.readv.real = real;
-		aice->state = TB_AICE_STATE_OK;
+		aice->state = TB_STATE_OK;
 	}
 	// closed?
-	else if (!real) aice->state = TB_AICE_STATE_CLOSED;
+	else if (!real) aice->state = TB_STATE_CLOSED;
 	// failed?
-	else aice->state = TB_AICE_STATE_FAILED;
+	else aice->state = TB_STATE_FAILED;
 
 	// ok?
 	return 1;
@@ -206,12 +206,12 @@ static tb_long_t tb_aicp_file_spak_writv(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	if (real > 0) 
 	{
 		aice->u.writv.real = real;
-		aice->state = TB_AICE_STATE_OK;
+		aice->state = TB_STATE_OK;
 	}
 	// closed?
-	else if (!real) aice->state = TB_AICE_STATE_CLOSED;
+	else if (!real) aice->state = TB_STATE_CLOSED;
 	// failed?
-	else aice->state = TB_AICE_STATE_FAILED;
+	else aice->state = TB_STATE_FAILED;
 
 	// ok?
 	return 1;
@@ -232,7 +232,7 @@ static tb_long_t tb_aicp_file_spak_fsync(tb_aicp_proactor_aiop_t* ptor, tb_aice_
 	tb_trace_d("fsync[%p]: %s", handle, ok? "ok" : "no");
 
 	// ok?
-	aice->state = ok? TB_AICE_STATE_OK : TB_AICE_STATE_FAILED;
+	aice->state = ok? TB_STATE_OK : TB_STATE_FAILED;
 
 	// ok?
 	return 1;

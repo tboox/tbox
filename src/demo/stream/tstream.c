@@ -11,10 +11,10 @@ static tb_bool_t tb_demo_tstream_save_func(tb_size_t state, tb_hize_t offset, tb
 	// percent
 	tb_size_t percent = 0;
 	if (size > 0) percent = (offset * 100) / size;
-	else if (state == TB_STREAM_STATE_OK) percent = 100;
+	else if (state == TB_STATE_OK) percent = 100;
 
 	// trace
-	tb_trace_i("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
+	tb_trace_i("save: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
 
 	// ok
 	return tb_true;

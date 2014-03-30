@@ -358,7 +358,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
 
 	// done
 	tb_ipv4_t ipv4 = {0};
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
@@ -373,7 +373,7 @@ static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
 	else
 	{
 		// trace
-		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_state_cstr(aice->state));
 	}
 
 	// ok or try to get ok from cache again if failed or timeout? 
@@ -426,7 +426,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
 
 	// done
 	tb_bool_t ok = tb_false;
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
@@ -445,7 +445,7 @@ static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
 	else
 	{
 		// trace
-		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_state_cstr(aice->state));
 			
 		// the next server 
 		tb_ipv4_t const* server = &dns->list[dns->indx + 1];

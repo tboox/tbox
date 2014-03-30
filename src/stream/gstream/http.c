@@ -68,7 +68,7 @@ static tb_bool_t tb_gstream_http_open(tb_handle_t gstream)
 	tb_bool_t ok = tb_http_open(hstream->http);
 
 	// save state
-	hstream->base.state = ok? TB_STREAM_STATE_OK : status->state;
+	hstream->base.state = ok? TB_STATE_OK : status->state;
 
 	// ok?
 	return ok;
@@ -110,7 +110,7 @@ static tb_long_t tb_gstream_http_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	tb_long_t ok = tb_http_aread(hstream->http, data, size);
 
 	// save state
-	hstream->base.state = ok >= 0? TB_STREAM_STATE_OK : status->state;
+	hstream->base.state = ok >= 0? TB_STATE_OK : status->state;
 
 	// ok?
 	return ok;
@@ -138,7 +138,7 @@ static tb_long_t tb_gstream_http_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 	tb_long_t ok = tb_http_wait(hstream->http, wait, timeout);
 
 	// save state
-	hstream->base.state = ok >= 0? TB_STREAM_STATE_OK : status->state;
+	hstream->base.state = ok >= 0? TB_STATE_OK : status->state;
 
 	// ok?
 	return ok;

@@ -37,7 +37,7 @@
 /*! the aicp http open func type
  *
  * @param http 		the http handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param status 	the http status
  * @param priv 		the func private data
  *
@@ -48,7 +48,7 @@ typedef tb_bool_t 	(*tb_aicp_http_open_func_t)(tb_handle_t http, tb_size_t state
 /*! the aicp http read func type
  *
  * @param http 		the http handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param data 		the readed data
  * @param real 		the real size, maybe zero
  * @param size 		the need size
@@ -61,7 +61,7 @@ typedef tb_bool_t 	(*tb_aicp_http_read_func_t)(tb_handle_t http, tb_size_t state
 /*! the aicp http seek func type
  *
  * @param http 		the http handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param offset 	the real offset
  * @param priv 		the func private data
  *
@@ -72,7 +72,7 @@ typedef tb_bool_t 	(*tb_aicp_http_seek_func_t)(tb_handle_t http, tb_size_t state
 /*! the aicp http task func type
  *
  * @param http 		the http handle
- * @param state 	the stream state
+ * @param state 	the state
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp

@@ -225,7 +225,7 @@ typedef struct __tb_http_status_t
 	/// is deflate?
 	tb_uint16_t 		bdeflate	: 1;
 
-	/// the astream or gstream state
+	/// the state
 	tb_size_t 			state;
 
 	/// the document size

@@ -58,7 +58,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 //		tb_trace_i("writ[%p]: real: %lu, size: %lu", aice->aico, aice->u.writ.real, aice->u.writ.size);
@@ -79,7 +79,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_trace_i("writ[%p]: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("writ[%p]: %s", aice->aico, tb_state_cstr(aice->state));
 		return tb_false;
 	}
 
@@ -96,7 +96,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 //		tb_trace_i("recv[%p]: real: %lu, size: %lu", aice->aico, aice->u.recv.real, aice->u.recv.size);
@@ -128,7 +128,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	// closed or failed?
 	else
 	{
-		tb_trace_i("recv[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("recv[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		return tb_false;
 	}
 
@@ -145,7 +145,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(context, tb_false);
 
 	// connection ok?
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// trace
 		tb_trace_i("conn[%p]: ok", aice->aico);
@@ -157,7 +157,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	else
 	{
 		// exit loop
-		tb_trace_i("conn[%p]: state: %s", aice->aico, tb_aice_state_cstr(aice));
+		tb_trace_i("conn[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
 		return tb_false;
 	}
 

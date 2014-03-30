@@ -126,7 +126,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 			// look addr
 			if (!tb_dns_looker_done(tb_url_host_get(&sstream->base.base.url), &sstream->addr)) 
 			{
-				sstream->base.state = TB_STREAM_SOCK_STATE_DNS_FAILED;
+				sstream->base.state = TB_STATE_SOCK_DNS_FAILED;
 				return tb_false;
 			}
 
@@ -171,9 +171,9 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 			if (real > 0)
 			{
 				ok = tb_true;
-				sstream->base.state = TB_STREAM_STATE_OK;
+				sstream->base.state = TB_STATE_OK;
 			}
-			else sstream->base.state = !real? TB_STREAM_SOCK_STATE_CONNECT_TIMEOUT : TB_STREAM_SOCK_STATE_CONNECT_FAILED;
+			else sstream->base.state = !real? TB_STATE_SOCK_CONNECT_TIMEOUT : TB_STATE_SOCK_CONNECT_FAILED;
 
 			// trace
 			tb_trace_d("connect: %s", ok? "ok" : "no");
@@ -210,7 +210,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 					tb_trace_d("ssl: %s", ok? "ok" : "no");
 			
 					// failed? save state
-					if (!ok) sstream->base.state = sstream->hssl? tb_ssl_state(sstream->hssl) : TB_STREAM_SOCK_STATE_SSL_FAILED;
+					if (!ok) sstream->base.state = sstream->hssl? tb_ssl_state(sstream->hssl) : TB_STATE_SOCK_SSL_FAILED;
 				}
 			}
 		}
@@ -226,7 +226,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 
 			// ok
 			ok = tb_true;
-			sstream->base.state = TB_STREAM_STATE_OK;
+			sstream->base.state = TB_STATE_OK;
 		}
 		break;
 	default:
