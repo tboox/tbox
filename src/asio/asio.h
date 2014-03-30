@@ -35,8 +35,8 @@
 #include "aice.h"
 #include "aicp.h"
 #include "pool.h"
-#include "addr.h"
 #include "http.h"
+#include "dns.h"
 
 
 #endif

@@ -52,7 +52,7 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(libm_integer)
 
 	// asio
-,	TB_DEMO_MAIN_ITEM(asio_addr)
+,	TB_DEMO_MAIN_ITEM(asio_dns)
 ,	TB_DEMO_MAIN_ITEM(asio_http)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopc)
 ,	TB_DEMO_MAIN_ITEM(asio_aiopd)

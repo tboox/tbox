@@ -22,7 +22,7 @@ demo_C_FILES 							+= \
 										libm/float \
 										libm/double \
 										libm/integer \
-										asio/addr \
+										asio/dns \
 										asio/http \
 										asio/aiopc \
 										asio/aiopd \
