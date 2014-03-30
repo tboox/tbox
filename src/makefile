@@ -121,7 +121,6 @@ tbox_C_FILES 			+= \
 						xml/writer \
 						asio/aioo \
 						asio/aico \
-						asio/aice \
 						asio/aiop \
 						asio/aicp \
 						asio/pool \

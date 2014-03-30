@@ -163,14 +163,6 @@ tb_bool_t 			tb_stream_is_opened(tb_handle_t stream);
  */
 tb_long_t 			tb_stream_timeout(tb_handle_t stream);
 
-/*! the stream state c-string
- *
- * @param state 	the state
- *
- * @return 			the stream state c-string
- */
-tb_char_t const* 	tb_stream_state_cstr(tb_size_t state);
-
 /*! ctrl stream
  *
  * @param stream 	the stream

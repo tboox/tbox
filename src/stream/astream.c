@@ -47,13 +47,13 @@ static tb_bool_t tb_astream_csync_func(tb_astream_t* astream, tb_size_t state, t
 	if (real) tb_pbuffer_memmov(&astream->wcache_data, real);
 
 	// not finished? continue it
-	if (state == TB_STREAM_STATE_OK && real < size) return tb_true;
+	if (state == TB_STATE_OK && real < size) return tb_true;
 
 	// not finished? continue it
 	tb_bool_t ok = tb_false;
-	if (state == TB_STREAM_STATE_OK && real < size) ok = tb_true;
+	if (state == TB_STATE_OK && real < size) ok = tb_true;
 	// ok? sync it
-	else if (state == TB_STREAM_STATE_OK && real == size)
+	else if (state == TB_STATE_OK && real == size)
 	{
 		// check
 		tb_assert_and_check_return_val(!tb_pbuffer_size(&astream->wcache_data), tb_false);
@@ -62,13 +62,13 @@ static tb_bool_t tb_astream_csync_func(tb_astream_t* astream, tb_size_t state, t
 		ok = astream->sync(astream, astream->wcache_and.sync.bclosing, astream->wcache_and.sync.func, priv);
 
 		// failed? done func
-		if (!ok) ok = astream->wcache_and.sync.func(astream, TB_STREAM_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
+		if (!ok) ok = astream->wcache_and.sync.func(astream, TB_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
 	}
 	// failed?
 	else
 	{
 		// failed? done func
-		ok = astream->wcache_and.sync.func(astream, state != TB_STREAM_STATE_OK? state : TB_STREAM_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
+		ok = astream->wcache_and.sync.func(astream, state != TB_STATE_OK? state : TB_STATE_UNKNOWN_ERROR, astream->wcache_and.sync.bclosing, priv);
 	}
 
 	// ok?
@@ -103,7 +103,7 @@ static tb_bool_t tb_astream_cwrit_done(tb_astream_t* astream, tb_size_t delay, t
 		if (size < astream->wcache_maxn)
 		{
 			// done func
-			func(astream, TB_STREAM_STATE_OK, data, size, size, priv);
+			func(astream, TB_STATE_OK, data, size, size, priv);
 			ok = tb_true;
 		}
 		else
@@ -160,15 +160,15 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->base.bstoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 	
@@ -176,12 +176,12 @@ static tb_bool_t tb_astream_oread_func(tb_astream_t* astream, tb_size_t state, t
 		if (!tb_astream_cread_done(astream, 0, oread->size, oread->func, oread->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// stoped
 		tb_atomic_set(&astream->base.bstoped, 1);
@@ -204,15 +204,15 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 			
 		// stoped?
 		if (tb_atomic_get(&astream->base.bstoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -223,12 +223,12 @@ static tb_bool_t tb_astream_owrit_func(tb_astream_t* astream, tb_size_t state, t
 		if (!tb_astream_cwrit_done(astream, 0, owrit->data, owrit->size, owrit->func, owrit->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_STREAM_STATE_OK)
+	if (state != TB_STATE_OK)
 	{	
 		// stoped
 		tb_atomic_set(&astream->base.bstoped, 1);
@@ -251,15 +251,15 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->base.bstoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -267,7 +267,7 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 		if (tb_stream_offset(astream) == oseek->offset)
 		{
 			// done func
-			ok = oseek->func(astream, TB_STREAM_STATE_OK, oseek->offset, oseek->priv);
+			ok = oseek->func(astream, TB_STATE_OK, oseek->offset, oseek->priv);
 		}
 		else
 		{
@@ -276,12 +276,12 @@ static tb_bool_t tb_astream_oseek_func(tb_astream_t* astream, tb_size_t state, t
 		}
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{	
 		// stoped
 		tb_atomic_set(&astream->base.bstoped, 1);
@@ -304,15 +304,15 @@ static tb_bool_t tb_astream_sread_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->base.bstoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 	
@@ -320,12 +320,12 @@ static tb_bool_t tb_astream_sread_func(tb_astream_t* astream, tb_size_t state, t
 		if (!tb_astream_cread_done(astream, 0, sread->size, sread->func, sread->priv)) break;
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
  
 	// failed?
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{
 		// done func
 		ok = sread->func(astream, state, tb_null, 0, sread->size, sread->priv);
@@ -345,15 +345,15 @@ static tb_bool_t tb_astream_sseek_func(tb_astream_t* astream, tb_size_t state, t
 	do
 	{
 		// ok? 
-		tb_check_break(state == TB_STREAM_STATE_OK);
+		tb_check_break(state == TB_STATE_OK);
 
 		// reset state
-		state = TB_STREAM_STATE_UNKNOWN_ERROR;
+		state = TB_STATE_UNKNOWN_ERROR;
 		
 		// stoped?
 		if (tb_atomic_get(&astream->base.bstoped))
 		{
-			state = TB_STREAM_STATE_KILLED;
+			state = TB_STATE_KILLED;
 			break;
 		}
 
@@ -361,7 +361,7 @@ static tb_bool_t tb_astream_sseek_func(tb_astream_t* astream, tb_size_t state, t
 		if (tb_stream_offset(astream) == sseek->offset)
 		{
 			// done func
-			ok = sseek->func(astream, TB_STREAM_STATE_OK, sseek->offset, sseek->priv);
+			ok = sseek->func(astream, TB_STATE_OK, sseek->offset, sseek->priv);
 		}
 		else
 		{
@@ -370,12 +370,12 @@ static tb_bool_t tb_astream_sseek_func(tb_astream_t* astream, tb_size_t state, t
 		}
 
 		// ok
-		state = TB_STREAM_STATE_OK;
+		state = TB_STATE_OK;
 
 	} while (0);
 
 	// failed? 
-	if (state != TB_STREAM_STATE_OK) 
+	if (state != TB_STATE_OK) 
 	{	
 		// done func
 		ok = sseek->func(astream, state, 0, sseek->priv);
@@ -584,7 +584,7 @@ tb_bool_t tb_astream_seek_impl(tb_astream_t* astream, tb_hize_t offset, tb_astre
 	// offset be not modified?
 	if (tb_stream_offset(astream) == offset)
 	{
-		func(astream, TB_STREAM_STATE_OK, offset, priv);
+		func(astream, TB_STATE_OK, offset, priv);
 		return tb_true;
 	}
 

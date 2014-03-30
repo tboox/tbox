@@ -80,7 +80,7 @@ struct __tb_astream_t;
 /*! the astream open func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param priv 					the func private data
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp
@@ -90,7 +90,7 @@ typedef tb_bool_t 				(*tb_astream_open_func_t)(struct __tb_astream_t* astream, 
 /*! the astream read func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param data 					the readed data
  * @param real 					the real size, maybe zero
  * @param size 					the need size
@@ -103,7 +103,7 @@ typedef tb_bool_t 				(*tb_astream_read_func_t)(struct __tb_astream_t* astream, 
 /*! the astream writ func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param data 					the writed data
  * @param real 					the real size, maybe zero
  * @param size 					the need size
@@ -116,7 +116,7 @@ typedef tb_bool_t 				(*tb_astream_writ_func_t)(struct __tb_astream_t* astream, 
 /*! the astream seek func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param offset 				the real offset
  * @param priv 					the func private data
  *
@@ -127,7 +127,7 @@ typedef tb_bool_t 				(*tb_astream_seek_func_t)(struct __tb_astream_t* astream, 
 /*! the astream sync func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param bclosing 				is closing?
  * @param priv 					the func private data
  *
@@ -138,7 +138,7 @@ typedef tb_bool_t 				(*tb_astream_sync_func_t)(struct __tb_astream_t* astream, 
 /*! the astream task func type
  *
  * @param astream 				the astream
- * @param state 				the stream state
+ * @param state 				the state
  * @param priv 					the func private data
  *
  * @return 						tb_true: ok, tb_false: error, but not break aicp

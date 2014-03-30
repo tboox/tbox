@@ -21,10 +21,10 @@ static tb_bool_t tb_demo_http_post_func(tb_handle_t http, tb_size_t state, tb_hi
 	// percent
 	tb_size_t percent = 0;
 	if (size > 0) percent = (offset * 100) / size;
-	else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
+	else if (state == TB_STATE_CLOSED) percent = 100;
 
 	// trace
-	tb_trace_i("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
+	tb_trace_i("post: %llu, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
 
 	// ok
 	return tb_true;
@@ -46,10 +46,10 @@ static tb_bool_t tb_demo_gstream_save_func(tb_size_t state, tb_hize_t offset, tb
 		// percent
 		tb_size_t percent = 0;
 		if (size > 0) percent = (offset * 100) / size;
-		else if (state == TB_STREAM_STATE_CLOSED) percent = 100;
+		else if (state == TB_STATE_CLOSED) percent = 100;
 
 		// trace
-		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s\n", save, rate, percent, tb_stream_state_cstr(state));
+		tb_printf("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s\n", save, rate, percent, tb_state_cstr(state));
 	}
 
 	// ok
@@ -255,7 +255,7 @@ tb_int_t tb_demo_stream_gstream_main(tb_int_t argc, tb_char_t** argv)
 				if (!tb_gstream_open(istream)) 
 				{
 					// print verbose info
-					if (verbose) tb_printf("open: %s\n", tb_stream_state_cstr(tb_gstream_state(istream)));
+					if (verbose) tb_printf("open: %s\n", tb_state_cstr(tb_gstream_state(istream)));
 					break;
 				}
 

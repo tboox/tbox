@@ -114,7 +114,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 	// ok?
 	tb_bool_t ok = tb_true;
 	tb_bool_t posted = tb_true;
-	if (aice->state == TB_AICE_STATE_OK)
+	if (aice->state == TB_STATE_OK)
 	{
 		// post it	
 #ifdef __tb_debug__
@@ -127,7 +127,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 			posted = tb_false;
 
 			// failed
-			posted_aice->state = TB_AICE_STATE_FAILED;
+			posted_aice->state = TB_STATE_FAILED;
 		}
 	}
 	// failed?
@@ -138,7 +138,7 @@ static tb_bool_t tb_aicp_post_after_func(tb_aice_t const* aice)
 
 		// killed?
 		if (tb_atomic_get(&aicp->kill) || tb_atomic_get(&aice->aico->killed))
-			posted_aice->state = TB_AICE_STATE_KILLED;
+			posted_aice->state = TB_STATE_KILLED;
 		// other error state
 		else posted_aice->state = aice->state;
 	}

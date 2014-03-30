@@ -51,7 +51,7 @@ typedef enum __tb_aice_code_e
 ,	TB_AICE_CODE_SENDV 			= 8		//!< for sock, send iovec data for tcp
 ,	TB_AICE_CODE_URECVV 		= 9		//!< for sock, recv iovec data for udp
 ,	TB_AICE_CODE_USENDV 		= 10	//!< for sock, send iovec data for udp
-,	TB_AICE_CODE_SENDF 			= 11	//!< for sock, maybe return TB_AICE_STATE_NOTSUPPORTED
+,	TB_AICE_CODE_SENDF 			= 11	//!< for sock, maybe return TB_STATE_NOT_SUPPORTED
 
 ,	TB_AICE_CODE_READ 			= 12	//!< for file, read data
 ,	TB_AICE_CODE_WRIT 			= 13	//!< for file, writ data
@@ -64,19 +64,6 @@ typedef enum __tb_aice_code_e
 , 	TB_AICE_CODE_MAXN 			= 18
 
 }tb_aice_code_e;
-
-/// the aice state code enum
-typedef enum __tb_aice_state_e
-{
- 	TB_AICE_STATE_OK 			= 0
-, 	TB_AICE_STATE_FAILED 		= 1
-, 	TB_AICE_STATE_KILLED 		= 2
-,	TB_AICE_STATE_CLOSED 		= 3
-, 	TB_AICE_STATE_PENDING 		= 4
-,	TB_AICE_STATE_TIMEOUT 		= 5
-,	TB_AICE_STATE_NOTSUPPORTED 	= 6
-
-}tb_aice_state_e;
 
 /// the addr aice type
 typedef struct __tb_aice_addr_t
@@ -569,19 +556,6 @@ typedef struct __tb_aice_t
 	} u;
 
 }tb_aice_t;
-
-/* ///////////////////////////////////////////////////////////////////////
- * interfaces
- */
-
-/*! the aice state c-string
- *
- * @param aice 		the aice
- *
- * @return 			the aice state c-string
- */
-tb_char_t const* 	tb_aice_state_cstr(tb_aice_t const* aice);
-
 
 
 #endif

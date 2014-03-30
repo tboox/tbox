@@ -11,13 +11,13 @@ static tb_bool_t tb_demo_astream_zip_save_func(tb_size_t state, tb_hize_t offset
 	// percent
 	tb_size_t percent = 0;
 	if (size > 0) percent = (offset * 100) / size;
-	else if (state == TB_STREAM_STATE_OK) percent = 100;
+	else if (state == TB_STATE_OK) percent = 100;
 
 	// trace
-	tb_trace_i("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_stream_state_cstr(state));
+	tb_trace_i("save: %llu bytes, rate: %lu bytes/s, percent: %lu%%, state: %s", save, rate, percent, tb_state_cstr(state));
 
 	// kill aicp
-	if (state != TB_STREAM_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);
+	if (state != TB_STATE_OK) tb_aicp_kill((tb_aicp_t*)priv);
 
 	// ok
 	return tb_true;

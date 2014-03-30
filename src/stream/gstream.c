@@ -124,7 +124,7 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeo
 	tb_long_t ok = gstream->wait(gstream, wait, timeout);
 	
 	// wait failed? save state
-	if (ok < 0 && !gstream->state) gstream->state = TB_STREAM_STATE_WAIT_FAILED;
+	if (ok < 0 && !gstream->state) gstream->state = TB_STATE_WAIT_FAILED;
 
 	// ok?
 	tb_check_return_val(!ok, ok);
@@ -146,7 +146,7 @@ tb_long_t tb_gstream_wait(tb_gstream_t* gstream, tb_size_t wait, tb_long_t timeo
 tb_size_t tb_gstream_state(tb_gstream_t* gstream)
 {
 	// check
-	tb_assert_and_check_return_val(gstream, TB_STREAM_STATE_UNKNOWN_ERROR);
+	tb_assert_and_check_return_val(gstream, TB_STATE_UNKNOWN_ERROR);
 
 	// the stream state
 	return gstream->state;
@@ -166,7 +166,7 @@ tb_bool_t tb_gstream_open(tb_gstream_t* gstream)
 	gstream->offset = 0;
 
 	// init state
-	gstream->state = TB_STREAM_STATE_OK;
+	gstream->state = TB_STATE_OK;
 
 	// clear stoped
 	tb_atomic_set0(&gstream->base.bstoped);
@@ -200,7 +200,7 @@ tb_bool_t tb_gstream_clos(tb_gstream_t* gstream)
 	gstream->offset = 0;
 	gstream->bwrited = 0;
 	gstream->base.bopened = 0;
-	gstream->state = TB_STREAM_STATE_OK;
+	gstream->state = TB_STATE_OK;
 	tb_atomic_set(&gstream->base.bstoped, 1);
 
 	// clear cache
@@ -282,7 +282,7 @@ tb_bool_t tb_gstream_need(tb_gstream_t* gstream, tb_byte_t** data, tb_size_t siz
 	{
 		// killed? save state
 		if (!gstream->state && tb_atomic_get(&gstream->base.bstoped))
-			gstream->state = TB_STREAM_STATE_KILLED;
+			gstream->state = TB_STATE_KILLED;
 
 		// failed
 		return tb_false;
@@ -472,7 +472,7 @@ tb_bool_t tb_gstream_bread(tb_gstream_t* gstream, tb_byte_t* data, tb_size_t siz
 
 	// killed? save state
 	if (read != size && !gstream->state && tb_atomic_get(&gstream->base.bstoped))
-		gstream->state = TB_STREAM_STATE_KILLED;
+		gstream->state = TB_STATE_KILLED;
 
 	// ok?
 	return (read == size? tb_true : tb_false);
@@ -504,7 +504,7 @@ tb_bool_t tb_gstream_bwrit(tb_gstream_t* gstream, tb_byte_t const* data, tb_size
 
 	// killed? save state
 	if (writ != size && !gstream->state && tb_atomic_get(&gstream->base.bstoped))
-		gstream->state = TB_STREAM_STATE_KILLED;
+		gstream->state = TB_STATE_KILLED;
 
 	// ok?
 	return (writ == size? tb_true : tb_false);
@@ -565,7 +565,7 @@ tb_bool_t tb_gstream_sync(tb_gstream_t* gstream, tb_bool_t bclosing)
 			{
 				// killed? save state
 				if (!gstream->state && tb_atomic_get(&gstream->base.bstoped))
-					gstream->state = TB_STREAM_STATE_KILLED;
+					gstream->state = TB_STATE_KILLED;
 
 				// failed
 				return tb_false;

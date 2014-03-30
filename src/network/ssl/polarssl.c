@@ -227,7 +227,7 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
 #endif
 
 		// init state
-		ssl->state = TB_STREAM_STATE_OK;
+		ssl->state = TB_STATE_OK;
 
 		// ok
 		ok = tb_true;
@@ -327,7 +327,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 	do
 	{
 		// init state
-		ssl->state = TB_STREAM_STATE_OK;
+		ssl->state = TB_STATE_OK;
 
 		// have been opened already?
 		if (ssl->bopened)
@@ -348,7 +348,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 		else if (r == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || r == POLARSSL_ERR_NET_CONN_RESET)
 		{
 			tb_trace_d("handshake: closed: %ld", r);
-			ssl->state = TB_STREAM_STATE_CLOSED;
+			ssl->state = TB_STATE_CLOSED;
 			break;
 		}
 		// continue to wait it?
@@ -361,7 +361,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 			ok = 0;
 
 			// save state
-			ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STREAM_SOCK_STATE_SSL_WANT_READ : TB_STREAM_SOCK_STATE_SSL_WANT_WRIT;
+			ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
 			break;
 		}
 		// failed?
@@ -378,7 +378,7 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 # 	endif
 #endif
 			// save state
-			ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
 			break;
 		}
 
@@ -407,8 +407,8 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 	else if (ok < 0)
 	{
 		// save state
-		if (ssl->state == TB_STREAM_STATE_OK)
-			ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
+		if (ssl->state == TB_STATE_OK)
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
 	}
 
 	// trace
@@ -434,7 +434,7 @@ tb_void_t tb_ssl_clos(tb_handle_t handle)
 
 	// close it
 	ssl->bopened = tb_false;
-	ssl->state = TB_STREAM_STATE_OK;
+	ssl->state = TB_STATE_OK;
 }
 tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -452,7 +452,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		tb_trace_d("read: want read");
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_WANT_READ;
+		ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
 		return 0;
 	}
 	// want writ? continue it
@@ -462,7 +462,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		tb_trace_d("read: want writ");
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_WANT_WRIT;
+		ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
 		return 0;
 	}
 	// peer closed?
@@ -472,7 +472,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		tb_trace_d("read: peer closed");
 
 		// save state
-		ssl->state = TB_STREAM_STATE_CLOSED;
+		ssl->state = TB_STATE_CLOSED;
 		return -1;
 	}
 	// failed?
@@ -490,7 +490,7 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 #endif
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
+		ssl->state = TB_STATE_SOCK_SSL_FAILED;
 		return -1;
 	}
 
@@ -516,7 +516,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 		tb_trace_d("writ: want read");
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_WANT_READ;
+		ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
 		return 0;
 	}
 	// want writ? continue it
@@ -526,7 +526,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 		tb_trace_d("writ: want writ");
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_WANT_WRIT;
+		ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
 		return 0;
 	}
 	// peer closed?
@@ -536,7 +536,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 		tb_trace_d("writ: peer closed");
 
 		// save state
-		ssl->state = TB_STREAM_STATE_CLOSED;
+		ssl->state = TB_STATE_CLOSED;
 		return -1;
 	}
 	// failed?
@@ -554,7 +554,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 #endif
 
 		// save state
-		ssl->state = TB_STREAM_SOCK_STATE_SSL_FAILED;
+		ssl->state = TB_STATE_SOCK_SSL_FAILED;
 		return -1;
 	}
 
@@ -593,15 +593,15 @@ tb_long_t tb_ssl_wait_code(tb_handle_t handle, tb_size_t code)
 	switch (ssl->state)
 	{
 		// wait read
-	case TB_STREAM_SOCK_STATE_SSL_WANT_READ:
+	case TB_STATE_SOCK_SSL_WANT_READ:
 		wait = TB_AIOE_CODE_RECV;
 		break;
 		// wait writ
-	case TB_STREAM_SOCK_STATE_SSL_WANT_WRIT:
+	case TB_STATE_SOCK_SSL_WANT_WRIT:
 		wait = TB_AIOE_CODE_SEND;
 		break;
 		// ok, wait it
-	case TB_STREAM_STATE_OK:
+	case TB_STATE_OK:
 		wait = code;
 		break;
 		// failed or closed?
@@ -625,8 +625,8 @@ tb_void_t tb_ssl_wait_spak(tb_handle_t handle, tb_long_t wait)
 	ssl->lwait = wait;
 
 	// timeout or failed? save state
-	if (ssl->lwait < 0) ssl->state = TB_STREAM_SOCK_STATE_SSL_WAIT_FAILED;
-	else if (!ssl->lwait) ssl->state = TB_STREAM_SOCK_STATE_SSL_TIMEOUT;
+	if (ssl->lwait < 0) ssl->state = TB_STATE_SOCK_SSL_WAIT_FAILED;
+	else if (!ssl->lwait) ssl->state = TB_STATE_SOCK_SSL_TIMEOUT;
 
 	// trace
 	tb_trace_d("wait: %ld", ssl->lwait);
@@ -635,7 +635,7 @@ tb_size_t tb_ssl_state(tb_handle_t handle)
 {
 	// the ssl
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return_val(ssl, TB_STREAM_STATE_UNKNOWN_ERROR);
+	tb_assert_and_check_return_val(ssl, TB_STATE_UNKNOWN_ERROR);
 
 	// the state
 	return ssl->state;
