@@ -517,10 +517,19 @@ typedef struct __tb_aice_runtask_t
 typedef struct __tb_aice_t
 {
 	/// the aice code
-	tb_uint32_t 				code 	: 8;
+	tb_uint8_t 					code;
 
-	/// the state
-	tb_uint32_t 				state 	: 8;
+	/*! the state
+	 *
+	 * TB_STATE_OK 		
+	 * TB_STATE_FAILED 	
+	 * TB_STATE_KILLED 	
+	 * TB_STATE_CLOSED 	
+	 * TB_STATE_PENDING 
+	 * TB_STATE_TIMEOUT 
+	 * TB_STATE_NOT_SUPPORTED 
+	 */
+	tb_size_t 					state;
 
 	/// the aico func
 	tb_aico_func_t 				func;
