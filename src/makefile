@@ -14,6 +14,7 @@ tbox_C_FILES 			+= \
 						math/int32 \
 						math/rand \
 						math/fixed16 \
+						prefix/state \
 						memory/vpool \
 						memory/fpool \
 						memory/tpool \
@@ -310,6 +311,7 @@ INC_FILES 				= \
 						prefix/check.h \
 						prefix/abort.h \
 						prefix/trace.h \
+						prefix/state.h \
 						prefix/packed.h \
 						prefix/config.h \
 						memory/vpool.h \
