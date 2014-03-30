@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		addr.c
+ * @file		dns.c
  * @ingroup 	asio
  *
  */
@@ -25,13 +25,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * trace
  */
-#define TB_TRACE_MODULE_NAME 				"addr"
+#define TB_TRACE_MODULE_NAME 				"aicp_dns"
 #define TB_TRACE_MODULE_DEBUG 				(1)
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "addr.h"
+#include "dns.h"
 #include "aico.h"
 #include "aicp.h"
 #include "../network/network.h"
@@ -41,11 +41,11 @@
  * types
  */
 
-// the aicp addr type
-typedef struct __tb_aicp_addr_t
+// the aicp dns type
+typedef struct __tb_aicp_dns_t
 {
 	// the func
-	tb_aicp_addr_func_t 	func;
+	tb_aicp_dns_func_t 	func;
 
 	// the func data
 	tb_pointer_t 			priv;
@@ -71,19 +71,19 @@ typedef struct __tb_aicp_addr_t
 	// the host
 	tb_char_t 				host[256];
 
-}tb_aicp_addr_t;
+}tb_aicp_dns_t;
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_size_t tb_aicp_addr_reqt_init(tb_aicp_addr_t* addr)
+static tb_size_t tb_aicp_dns_reqt_init(tb_aicp_dns_t* dns)
 {
 	// check
-	tb_assert_and_check_return_val(addr, 0);
+	tb_assert_and_check_return_val(dns, 0);
 
 	// init query data
 	tb_bstream_t bst;
-	tb_bstream_init(&bst, addr->data, TB_DNS_RPKT_MAXN);
+	tb_bstream_init(&bst, dns->data, TB_DNS_RPKT_MAXN);
 
 	// identification number
 	tb_bstream_set_u16_be(&bst, TB_DNS_HEADER_MAGIC);
@@ -143,10 +143,10 @@ static tb_size_t tb_aicp_addr_reqt_init(tb_aicp_addr_t* addr)
 	// set questions, see as tb_dns_question_t
 	// name + question1 + question2 + ...
 	tb_bstream_set_u8(&bst, '.');
-	tb_char_t* p = tb_bstream_set_string(&bst, addr->host);
+	tb_char_t* p = tb_bstream_set_string(&bst, dns->host);
 
 	// only one question now.
-	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
+	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 dnsess
 	tb_bstream_set_u16_be(&bst, 1); 		// it's internet (lol)
 
 	// encode dns name
@@ -155,10 +155,10 @@ static tb_size_t tb_aicp_addr_reqt_init(tb_aicp_addr_t* addr)
 	// ok?
 	return tb_bstream_offset(&bst);
 }
-static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb_ipv4_t* ipv4)
+static tb_bool_t tb_aicp_dns_resp_done(tb_aicp_dns_t* dns, tb_size_t size, tb_ipv4_t* ipv4)
 {
 	// check
-	tb_assert_and_check_return_val(addr && ipv4, tb_false);
+	tb_assert_and_check_return_val(dns && ipv4, tb_false);
 
 	// check
 	tb_assert_and_check_return_val(size >= TB_DNS_HEADER_SIZE, tb_false);
@@ -166,7 +166,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	// decode dns header
 	tb_bstream_t 	bst;
 	tb_dns_header_t header;
-	tb_bstream_init(&bst, addr->data, size);
+	tb_bstream_init(&bst, dns->data, size);
 	header.id = tb_bstream_get_u16_be(&bst);
 	tb_bstream_skip(&bst, 2);
 	header.question 	= tb_bstream_get_u16_be(&bst);
@@ -252,7 +252,7 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 		{
 			// decode rdata
 			answer.rdata = (tb_byte_t const*)tb_dns_decode_name(&bst, answer.name);
-			tb_trace_d("response: alias: %s", answer.rdata? answer.rdata : "");
+			tb_trace_d("response: alias: %s", answer.rdata? (tb_char_t const*)answer.rdata : "");
 		}
 		tb_trace_d("response: ");
 	}
@@ -342,8 +342,8 @@ static tb_bool_t tb_aicp_addr_resp_done(tb_aicp_addr_t* addr, tb_size_t size, tb
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice);
-static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice);
+static tb_bool_t tb_aicp_dns_resp_func(tb_aice_t const* aice)
 {
 	// check
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_URECV, tb_false);
@@ -352,66 +352,66 @@ static tb_bool_t tb_aicp_addr_resp_func(tb_aice_t const* aice)
 	tb_aicp_t* aicp = (tb_aicp_t*)tb_aico_aicp(aice->aico);
 	tb_assert_and_check_return_val(aicp, tb_false);
 	
-	// the addr
-	tb_aicp_addr_t* addr = aice->priv; 
-	tb_assert_and_check_return_val(addr, tb_false);
+	// the dns
+	tb_aicp_dns_t* dns = aice->priv; 
+	tb_assert_and_check_return_val(dns, tb_false);
 
 	// done
 	tb_ipv4_t ipv4 = {0};
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
+		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), aice->u.urecv.real);
 
 		// check
 		tb_assert_and_check_return_val(aice->u.urecv.real, tb_false);
 
 		// done resp
-		tb_aicp_addr_resp_done(addr, aice->u.urecv.real, &ipv4);
+		tb_aicp_dns_resp_done(dns, aice->u.urecv.real, &ipv4);
 	}
 	// timeout or failed?
 	else
 	{
 		// trace
-		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("resp[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.urecv.addr), tb_aice_state_cstr(aice));
 	}
 
 	// ok or try to get ok from cache again if failed or timeout? 
 	tb_bool_t from_cache = tb_false;
-	if (ipv4.u32 || (from_cache = tb_dns_cache_get(addr->host, &ipv4))) 
+	if (ipv4.u32 || (from_cache = tb_dns_cache_get(dns->host, &ipv4))) 
 	{
 		// save to cache 
-		if (!from_cache) tb_dns_cache_set(addr->host, &ipv4);
+		if (!from_cache) tb_dns_cache_set(dns->host, &ipv4);
 		
 		// done func
-		addr->func(addr, addr->host, &ipv4, addr->priv);
+		dns->func(dns, dns->host, &ipv4, dns->priv);
 		return tb_true;
 	}
 
 	// try next server?
 	tb_bool_t ok = tb_false;
-	tb_ipv4_t const* server = &addr->list[addr->indx + 1];
+	tb_ipv4_t const* server = &dns->list[dns->indx + 1];
 	if (server->u32)
 	{	
 		// indx++
-		addr->indx++;
+		dns->indx++;
 
 		// init reqt
-		tb_size_t size = tb_aicp_addr_reqt_init(addr);
+		tb_size_t size = tb_aicp_dns_reqt_init(dns);
 		if (size)
 		{
 			// post reqt
-			ok = tb_aico_usend(aice->aico, server, TB_DNS_HOST_PORT, addr->data, size, tb_aicp_addr_reqt_func, (tb_pointer_t)addr);
+			ok = tb_aico_usend(aice->aico, server, TB_DNS_HOST_PORT, dns->data, size, tb_aicp_dns_reqt_func, (tb_pointer_t)dns);
 		}
 	}
 
 	// failed? done func
-	if (!ok) addr->func(addr, addr->host, tb_null, addr->priv);
+	if (!ok) dns->func(dns, dns->host, tb_null, dns->priv);
 
 	// continue
 	return tb_true;
 }
-static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
+static tb_bool_t tb_aicp_dns_reqt_func(tb_aice_t const* aice)
 {
 	// check
 	tb_assert_and_check_return_val(aice && aice->aico && aice->code == TB_AICE_CODE_USEND, tb_false);
@@ -420,52 +420,52 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 	tb_aicp_t* aicp = (tb_aicp_t*)tb_aico_aicp(aice->aico);
 	tb_assert_and_check_return_val(aicp, tb_false);
 	
-	// the addr
-	tb_aicp_addr_t* addr = aice->priv; 
-	tb_assert_and_check_return_val(addr && addr->func, tb_false);
+	// the dns
+	tb_aicp_dns_t* dns = aice->priv; 
+	tb_assert_and_check_return_val(dns && dns->func, tb_false);
 
 	// done
 	tb_bool_t ok = tb_false;
 	if (aice->state == TB_AICE_STATE_OK)
 	{
 		// trace
-		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, real: %lu", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
+		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, real: %lu", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), aice->u.usend.real);
 
 		// check
 		tb_assert_and_check_return_val(aice->u.usend.real, tb_false);
 
 		// the server 
-		tb_ipv4_t const* server = &addr->list[addr->indx];
+		tb_ipv4_t const* server = &dns->list[dns->indx];
 		tb_assert_and_check_return_val(server->u32, tb_false);
 
 		// post resp
-		ok = tb_aico_urecv(aice->aico, server, TB_DNS_HOST_PORT, addr->data, sizeof(addr->data), tb_aicp_addr_resp_func, (tb_pointer_t)addr);
+		ok = tb_aico_urecv(aice->aico, server, TB_DNS_HOST_PORT, dns->data, sizeof(dns->data), tb_aicp_dns_resp_func, (tb_pointer_t)dns);
 	}
 	// timeout or failed?
 	else
 	{
 		// trace
-		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", addr->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_aice_state_cstr(aice));
+		tb_trace_d("reqt[%s]: server: %u.%u.%u.%u, state: %s", dns->host, tb_ipv4_u8x4(aice->u.usend.addr), tb_aice_state_cstr(aice));
 			
 		// the next server 
-		tb_ipv4_t const* server = &addr->list[addr->indx + 1];
+		tb_ipv4_t const* server = &dns->list[dns->indx + 1];
 		if (server->u32)
 		{	
 			// indx++
-			addr->indx++;
+			dns->indx++;
 
 			// init reqt
-			tb_size_t size = tb_aicp_addr_reqt_init(addr);
+			tb_size_t size = tb_aicp_dns_reqt_init(dns);
 			if (size)
 			{
 				// post reqt
-				ok = tb_aico_usend(aice->aico, server, TB_DNS_HOST_PORT, addr->data, size, tb_aicp_addr_reqt_func, (tb_pointer_t)addr);
+				ok = tb_aico_usend(aice->aico, server, TB_DNS_HOST_PORT, dns->data, size, tb_aicp_dns_reqt_func, (tb_pointer_t)dns);
 			}
 		}
 	}
 
 	// failed? done func
-	if (!ok) addr->func(addr, addr->host, tb_null, addr->priv);
+	if (!ok) dns->func(dns, dns->host, tb_null, dns->priv);
 
 	// continue 
 	return tb_true;
@@ -473,14 +473,14 @@ static tb_bool_t tb_aicp_addr_reqt_func(tb_aice_t const* aice)
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_func_t func, tb_pointer_t data)
+tb_handle_t tb_aicp_dns_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_dns_func_t func, tb_pointer_t data)
 {
 	// check
 	tb_assert_and_check_return_val(aicp && func, tb_null);
 
 	// done
 	tb_bool_t 		ok = tb_false;
-	tb_aicp_addr_t* addr = tb_null;
+	tb_aicp_dns_t* dns = tb_null;
 	tb_handle_t 	sock = tb_null;
 	tb_handle_t 	aico = tb_null;
 	do
@@ -497,15 +497,15 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_f
 		tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_SEND, timeout);
 		tb_aico_timeout_set(aico, TB_AICO_TIMEOUT_RECV, timeout);
 
-		// make addr
-		addr = (tb_aicp_addr_t*)tb_aico_pool_malloc0(aico, sizeof(tb_aicp_addr_t));
-		tb_assert_and_check_break(addr);
+		// make dns
+		dns = (tb_aicp_dns_t*)tb_aico_pool_malloc0(aico, sizeof(tb_aicp_dns_t));
+		tb_assert_and_check_break(dns);
 
-		// init addr
-		addr->sock = sock;
-		addr->aico = aico;
-		addr->func = func;
-		addr->priv = data;
+		// init dns
+		dns->sock = sock;
+		dns->aico = aico;
+		dns->func = func;
+		dns->priv = data;
 		sock = tb_null;
 		aico = tb_null;
 
@@ -518,8 +518,8 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_f
 	if (!ok)
 	{
 		// exit it
-		if (addr) tb_aicp_addr_exit(addr, tb_false);
-		addr = tb_null;
+		if (dns) tb_aicp_dns_exit(dns, tb_false);
+		dns = tb_null;
 
 		// exit aico
 		if (aico) tb_aico_exit(aico, tb_false);
@@ -531,40 +531,40 @@ tb_handle_t tb_aicp_addr_init(tb_aicp_t* aicp, tb_long_t timeout, tb_aicp_addr_f
 	}
 
 	// ok?
-	return addr;
+	return dns;
 }
-tb_void_t tb_aicp_addr_kill(tb_handle_t handle)
+tb_void_t tb_aicp_dns_kill(tb_handle_t handle)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
-	tb_assert_and_check_return(addr);
+	tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
+	tb_assert_and_check_return(dns);
 
 	// trace
 	tb_trace_d("kill: ..");
 
 	// kill sock
-	if (addr->sock) tb_socket_kill(addr->sock, TB_SOCKET_KILL_RW);
+	if (dns->sock) tb_socket_kill(dns->sock, TB_SOCKET_KILL_RW);
 }
-tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
+tb_void_t tb_aicp_dns_exit(tb_handle_t handle, tb_bool_t bcalling)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
-	tb_assert_and_check_return(addr);
+	tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
+	tb_assert_and_check_return(dns);
 
 	// trace
 	tb_trace_d("exit: ..");
 
 	// the aico
-	tb_handle_t aico = addr->aico;
+	tb_handle_t aico = dns->aico;
 
 	// the sock
-	tb_handle_t sock = addr->sock;
+	tb_handle_t sock = dns->sock;
 
-	// wait pending before freeing addr
+	// wait pending before freeing dns
 	if (aico) tb_aico_wait(aico, bcalling);
 
 	// exit it
-	if (aico) tb_aico_pool_free(aico, addr);
+	if (aico) tb_aico_pool_free(aico, dns);
 
 	// exit aico
 	if (aico) tb_aico_exit(aico, bcalling);
@@ -575,51 +575,51 @@ tb_void_t tb_aicp_addr_exit(tb_handle_t handle, tb_bool_t bcalling)
 	// trace
 	tb_trace_d("exit: ok");
 }
-tb_bool_t tb_aicp_addr_done(tb_handle_t handle, tb_char_t const* host)
+tb_bool_t tb_aicp_dns_done(tb_handle_t handle, tb_char_t const* host)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
-	tb_assert_and_check_return_val(addr && addr->aico && addr->func && host && host[0], tb_false);
+	tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
+	tb_assert_and_check_return_val(dns && dns->aico && dns->func && host && host[0], tb_false);
 	
 	// save host
-	tb_strlcpy(addr->host, host, sizeof(addr->host) - 1);
+	tb_strlcpy(dns->host, host, sizeof(dns->host) - 1);
  
 	// only ipv4? ok
 	tb_ipv4_t ipv4 = {0};
-	if (tb_ipv4_set(&ipv4, addr->host))
+	if (tb_ipv4_set(&ipv4, dns->host))
 	{
-		addr->func(handle, addr->host, &ipv4, addr->priv);
+		dns->func(handle, dns->host, &ipv4, dns->priv);
 		return tb_true;
 	}
 
 	// try to lookup it from cache first
-	if (tb_dns_cache_get(addr->host, &ipv4))
+	if (tb_dns_cache_get(dns->host, &ipv4))
 	{
-		addr->func(handle, addr->host, &ipv4, addr->priv);
+		dns->func(handle, dns->host, &ipv4, dns->priv);
 		return tb_true;
 	}
 
 	// init server list
-	if (!addr->size) addr->size = tb_dns_server_get(addr->list);
-	tb_check_return_val(addr->size, tb_false);
+	if (!dns->size) dns->size = tb_dns_server_get(dns->list);
+	tb_check_return_val(dns->size, tb_false);
 
 	// get the server 
-	tb_ipv4_t const* server = &addr->list[addr->indx = 0];
+	tb_ipv4_t const* server = &dns->list[dns->indx = 0];
 	tb_assert_and_check_return_val(server->u32, tb_false);
 
 	// init reqt
-	tb_size_t size = tb_aicp_addr_reqt_init(addr);
+	tb_size_t size = tb_aicp_dns_reqt_init(dns);
 	tb_assert_and_check_return_val(size, tb_false);
 
 	// post reqt
-	return tb_aico_usend(addr->aico, server, TB_DNS_HOST_PORT, addr->data, size, tb_aicp_addr_reqt_func, (tb_pointer_t)addr);
+	return tb_aico_usend(dns->aico, server, TB_DNS_HOST_PORT, dns->data, size, tb_aicp_dns_reqt_func, (tb_pointer_t)dns);
 }
-tb_aicp_t* tb_aicp_addr_aicp(tb_handle_t handle)
+tb_aicp_t* tb_aicp_dns_aicp(tb_handle_t handle)
 {
 	// check
-	tb_aicp_addr_t* addr = (tb_aicp_addr_t*)handle;
-	tb_assert_and_check_return_val(addr && addr->aico, tb_null);
+	tb_aicp_dns_t* dns = (tb_aicp_dns_t*)handle;
+	tb_assert_and_check_return_val(dns && dns->aico, tb_null);
 	
 	// the aicp
-	return tb_aico_aicp(addr->aico);
+	return tb_aico_aicp(dns->aico);
 }

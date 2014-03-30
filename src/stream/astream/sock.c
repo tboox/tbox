@@ -57,8 +57,8 @@ typedef struct __tb_astream_sock_t
 	// the aico
 	tb_handle_t 				aico;
 
-	// the aicp addr
-	tb_handle_t 				addr;
+	// the aicp dns
+	tb_handle_t 				hdns;
 
 	// the ipv4 addr
 	tb_ipv4_t 					ipv4;
@@ -145,7 +145,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
-static tb_void_t tb_astream_sock_addr_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data)
+static tb_void_t tb_astream_sock_dns_func(tb_handle_t haddr, tb_char_t const* host, tb_ipv4_t const* addr, tb_pointer_t data)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(data);
@@ -244,7 +244,7 @@ static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_
 	tb_atomic64_set0(&sstream->offset);
 
 	// keep alive and have been opened? reopen it directly
-	if (sstream->balived && sstream->addr && sstream->aico)
+	if (sstream->balived && sstream->hdns && sstream->aico)
 	{
 		// opened
 		tb_atomic_set(&sstream->base.base.bopened, 1);
@@ -263,16 +263,16 @@ static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_
 	// clear ipv4
 	tb_ipv4_clr(&sstream->ipv4);
 
-	// init addr
-	if (!sstream->addr) sstream->addr = tb_aicp_addr_init(sstream->base.aicp, tb_stream_timeout(astream), tb_astream_sock_addr_func, astream);
-	tb_assert_and_check_return_val(sstream->addr, tb_false);
+	// init dns
+	if (!sstream->hdns) sstream->hdns = tb_aicp_dns_init(sstream->base.aicp, tb_stream_timeout(astream), tb_astream_sock_dns_func, astream);
+	tb_assert_and_check_return_val(sstream->hdns, tb_false);
 
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.open 	= func;
 
 	// done addr
-	if (!tb_aicp_addr_done(sstream->addr, host))
+	if (!tb_aicp_dns_done(sstream->hdns, host))
 	{
 		// done func
 		func((tb_astream_t*)sstream, TB_STREAM_SOCK_STATE_DNS_FAILED, priv);
@@ -601,7 +601,7 @@ static tb_void_t tb_astream_sock_kill(tb_handle_t astream)
 	// kill aico
 	if (sstream->aico) tb_aico_kill(sstream->aico);
 	// kill addr
-	else if (sstream->addr) tb_aicp_addr_kill(sstream->addr);
+	else if (sstream->hdns) tb_aicp_dns_kill(sstream->hdns);
 }
 static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 {	
@@ -623,8 +623,8 @@ static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 	sstream->aico = tb_null;
 
 	// exit addr
-	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bcalling);
-	sstream->addr = tb_null;
+	if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, bcalling);
+	sstream->hdns = tb_null;
 
 	// exit it
 	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
@@ -645,8 +645,8 @@ static tb_void_t tb_astream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 	sstream->aico = tb_null;
 
 	// exit addr
-	if (sstream->addr) tb_aicp_addr_exit(sstream->addr, bcalling);
-	sstream->addr = tb_null;
+	if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, bcalling);
+	sstream->hdns = tb_null;
 
 	// exit it
 	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
