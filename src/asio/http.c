@@ -1413,7 +1413,7 @@ tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn,
 	http->func.read = func;
 	http->priv 		= priv;
 
-	// post task
+	// post read
 	return tb_astream_read_after(http->stream, delay, maxn, tb_aicp_http_read_func, http);
 }
 tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
