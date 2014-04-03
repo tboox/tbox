@@ -219,10 +219,10 @@ tb_object_t* 		tb_object_data(tb_object_t* object, tb_size_t format);
  *
  *
  * <code>
- * id_object_t* 	object = id_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
+ * tb_object_t* 	object = tb_object_seek(root, ".array[5].string", TB_OBJECT_TYPE_STRING);
  * if (object)
  * {
- * 		tb_print("%s", tb_string_cstr(object));
+ * 		tb_trace_d("%s", tb_string_cstr(object));
  * }
  * <endcode>
  *

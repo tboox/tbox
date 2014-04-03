@@ -60,6 +60,9 @@ typedef struct __tb_astream_sock_t
 	// the aicp dns
 	tb_handle_t 				hdns;
 
+	// the aicp ssl
+	tb_handle_t 				hssl;
+
 	// the ipv4 addr
 	tb_ipv4_t 					ipv4;
 
@@ -102,6 +105,24 @@ static __tb_inline__ tb_astream_sock_t* tb_astream_sock_cast(tb_handle_t stream)
 	tb_assert_and_check_return_val(astream && astream->base.type == TB_STREAM_TYPE_SOCK, tb_null);
 	return (tb_astream_sock_t*)astream;
 }
+static tb_bool_t tb_astream_sock_sopen_func(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_astream_sock_t* sstream = tb_astream_sock_cast(priv);
+	tb_assert_and_check_return_val(ssl && sstream->func.open, tb_false);
+
+	// trace
+	tb_trace_d("ssl: open: %s", tb_state_cstr(state));
+
+	// ok? opened
+	if (state == TB_STATE_OK) tb_atomic_set(&sstream->base.base.bopened, 1);
+
+	// done func
+	sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 {
 	// check
@@ -118,9 +139,37 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 		// ok
 	case TB_STATE_OK:
 		{
-			// opened
-			tb_atomic_set(&sstream->base.base.bopened, 1);
+			// ssl?
+			if (tb_url_ssl_get(&sstream->base.base.url))
+			{
+				// init state
+				state = TB_STATE_SOCK_SSL_FAILED;
 
+				// check
+				tb_assert_and_check_break(sstream->sock);
+
+				// init ssl
+				if (!sstream->hssl) sstream->hssl = tb_aicp_ssl_init(sstream->base.aicp, tb_false);
+				tb_assert_and_check_break(sstream->hssl);
+
+				// init ssl sock
+				tb_aicp_ssl_set_sock(sstream->hssl, sstream->sock);
+
+				// init ssl timeout
+				tb_aicp_ssl_set_timeout(sstream->hssl, sstream->base.base.timeout);
+
+				// open ssl
+				if (!tb_aicp_ssl_open(sstream->hssl, tb_astream_sock_sopen_func, sstream)) break;
+			}
+			else
+			{
+				// opened
+				tb_atomic_set(&sstream->base.base.bopened, 1);
+
+				// done func
+				sstream->func.open((tb_astream_t*)sstream, TB_STATE_OK, sstream->priv);
+			}
+			
 			// ok
 			state = TB_STATE_OK;
 		}
@@ -139,8 +188,8 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 		break;
 	}
 
-	// done func
-	sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
+	// failed? done func
+	if (state != TB_STATE_OK) sstream->func.open((tb_astream_t*)sstream, state, sstream->priv);
 
 	// ok
 	return tb_true;
@@ -203,6 +252,13 @@ static tb_void_t tb_astream_sock_dns_func(tb_handle_t haddr, tb_char_t const* ho
 			// udp?
 			else
 			{
+				// ssl? not supported
+				if (tb_url_ssl_get(&sstream->base.base.url))
+				{
+					// trace
+					tb_trace_w("udp ssl is not supported!");
+				}
+
 				// save ipv4
 				sstream->ipv4 = *addr;
 
@@ -615,6 +671,9 @@ static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 	// clear the offset
 	tb_atomic64_set0(&sstream->offset);
 
+	// close ssl
+	if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, bcalling);
+
 	// keep alive? not close it
 	tb_check_return(!sstream->balived);
 
@@ -622,7 +681,7 @@ static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
 	sstream->aico = tb_null;
 
-	// exit addr
+	// exit dns
 	if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, bcalling);
 	sstream->hdns = tb_null;
 
@@ -644,9 +703,13 @@ static tb_void_t tb_astream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 	if (sstream->aico) tb_aico_exit(sstream->aico, bcalling);
 	sstream->aico = tb_null;
 
-	// exit addr
+	// exit dns
 	if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, bcalling);
 	sstream->hdns = tb_null;
+
+	// exit ssl
+	if (sstream->hssl) tb_aicp_ssl_exit(sstream->hssl, bcalling);
+	sstream->hssl = tb_null;
 
 	// exit it
 	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);
