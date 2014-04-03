@@ -109,11 +109,26 @@ static tb_bool_t tb_aicp_ssl_open_done_read(tb_aice_t const* aice)
 		ssl->read_real = aice->u.recv.real;
 
 		// try opening it
-		if (tb_ssl_open_try(ssl->ssl))
+		tb_long_t ok = tb_ssl_open_try(ssl->ssl);
+
+		// trace
+		tb_trace_d("open: try: %ld", ok);
+	
+		// ok?
+		if (ok > 0)
 		{
-			// ok and done func
+			// done func
 			ssl->open(ssl, TB_STATE_OK, ssl->priv);
 		}
+		// failed?
+		else if (ok < 0)
+		{
+			// save state
+			state = tb_ssl_state(ssl->ssl);
+			break;
+		}
+		// continue 
+		else ;
 
 		// ok
 		state = TB_STATE_OK;
@@ -157,11 +172,26 @@ static tb_bool_t tb_aicp_ssl_open_done_writ(tb_aice_t const* aice)
 		ssl->writ_real = aice->u.send.real;
 
 		// try opening it
-		if (tb_ssl_open_try(ssl->ssl))
+		tb_long_t ok = tb_ssl_open_try(ssl->ssl);
+
+		// trace
+		tb_trace_d("open: try: %ld", ok);
+	
+		// ok?
+		if (ok > 0)
 		{
-			// ok and done func
+			// done func
 			ssl->open(ssl, TB_STATE_OK, ssl->priv);
 		}
+		// failed?
+		else if (ok < 0)
+		{
+			// save state
+			state = tb_ssl_state(ssl->ssl);
+			break;
+		}
+		// continue 
+		else ;
 
 		// ok
 		state = TB_STATE_OK;
@@ -183,6 +213,9 @@ static tb_long_t tb_aicp_ssl_open_post_read(tb_pointer_t priv, tb_byte_t* data, 
 	// check
 	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
 	tb_assert_and_check_return_val(ssl && ssl->open, -1);
+
+	// trace
+	tb_trace_d("read: try: %lu: ..", size);
 
 	// done
 	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
@@ -213,7 +246,7 @@ static tb_long_t tb_aicp_ssl_open_post_read(tb_pointer_t priv, tb_byte_t* data, 
 			tb_memcpy(data, read_data, read_real);
 
 			// trace
-			tb_trace_d("done: read: %lu: ok", read_real);
+			tb_trace_d("read: done: %lu: ok", read_real);
 
 			// read ok
 			return read_real;
@@ -229,10 +262,10 @@ static tb_long_t tb_aicp_ssl_open_post_read(tb_pointer_t priv, tb_byte_t* data, 
 		tb_assert_and_check_break(read_data && read_maxn && size <= read_maxn);
 
 		// trace
-		tb_trace_d("post: read: %lu: ..", read_maxn);
+		tb_trace_d("read: post: %lu: ..", size);
 
 		// post read
-		if (!tb_aico_recv(ssl->aico, read_data, read_maxn, tb_aicp_ssl_open_done_read, ssl)) break;
+		if (!tb_aico_recv(ssl->aico, read_data, size, tb_aicp_ssl_open_done_read, ssl)) break;
 
 		// ok
 		state = TB_STATE_OK;
@@ -255,6 +288,9 @@ static tb_long_t tb_aicp_ssl_open_post_writ(tb_pointer_t priv, tb_byte_t const* 
 	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
 	tb_assert_and_check_return_val(ssl, -1);
 
+	// trace
+	tb_trace_d("writ: try: %lu: ..", size);
+
 	// done
 	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
 	do
@@ -276,7 +312,7 @@ static tb_long_t tb_aicp_ssl_open_post_writ(tb_pointer_t priv, tb_byte_t const* 
 			tb_assert_and_check_break(writ_real <= size);
 
 			// trace
-			tb_trace_d("done: writ: %lu: ok", writ_real);
+			tb_trace_d("writ: done: %lu: ok", writ_real);
 
 			// writ ok
 			return writ_real;
@@ -291,7 +327,7 @@ static tb_long_t tb_aicp_ssl_open_post_writ(tb_pointer_t priv, tb_byte_t const* 
 		tb_assert_and_check_break(writ_data && writ_size && size == writ_size);
 
 		// trace
-		tb_trace_d("post: writ: %lu: ..", writ_size);
+		tb_trace_d("writ: post: %lu: ..", writ_size);
 
 		// post writ
 		if (!tb_aico_send(ssl->aico, writ_data, writ_size, tb_aicp_ssl_open_done_writ, ssl)) break;
@@ -413,6 +449,10 @@ tb_void_t tb_aicp_ssl_exit(tb_handle_t handle, tb_bool_t bcalling)
 	if (ssl->ssl) tb_ssl_exit(ssl->ssl);
 	ssl->ssl = tb_null;
 
+	// exit data
+	tb_pbuffer_exit(&ssl->read_data);
+	tb_pbuffer_exit(&ssl->writ_data);
+
 	// exit it
 	tb_free(ssl);
 
@@ -474,7 +514,26 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_open_post_read, tb_aicp_ssl_open_post_writ, tb_null, ssl);
 
 		// try opening it
-		tb_ssl_open_try(ssl->ssl);
+		tb_long_t r = tb_ssl_open_try(ssl->ssl);
+
+		// trace
+		tb_trace_d("open: try: %ld", r);
+		
+		// ok
+		if (r > 0)
+		{
+			// done func
+			func(ssl, TB_STATE_OK, priv);
+		}
+		// failed?
+		else if (r < 0)
+		{
+			// done func
+			func(ssl, tb_ssl_state(ssl->ssl), priv);
+			break;
+		}
+		// continue it
+		else ;
 
 		// ok
 		ok = tb_true;
