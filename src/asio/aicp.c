@@ -323,7 +323,7 @@ tb_bool_t tb_aicp_post_impl(tb_aicp_t* aicp, tb_aice_t const* aice __tb_debug_de
 	if (pending)
 	{
 		// trace
-		tb_trace_d("[aicp]: post aice[%lu] failed, the aico is pending for func: %s, line: %lu, file: %s", aice->code, func_, line_, file_);
+		tb_trace_e("post aice[%lu] failed, the aico is pending for func: %s, line: %lu, file: %s", aice->code, func_, line_, file_);
 		return tb_false;
 	}
 

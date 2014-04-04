@@ -121,6 +121,17 @@ tb_void_t 			tb_aicp_http_exit(tb_handle_t handle, tb_bool_t bcalling);
  */
 tb_bool_t 			tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, tb_pointer_t priv);
 
+/*! read the http
+ *
+ * @param handle 	the http handle
+ * @param size 		the read size, using the default size if be zero
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv);
+
 /*! read the http after the delay time
  *
  * @param handle 	the http handle
@@ -131,7 +142,7 @@ tb_bool_t 			tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv);
 
 /*! seek the http
  *
