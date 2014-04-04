@@ -417,9 +417,12 @@ tb_void_t tb_aicp_loop_util(tb_aicp_t* aicp, tb_bool_t (*stop)(tb_pointer_t priv
 			// calling--
 			tb_atomic_fetch_and_dec(&resp.aico->calling);
 
-			// exit all loops
-			tb_aicp_kill(aicp);
-			break;
+			// trace
+#ifdef __tb_debug__
+			tb_trace_e("done aice func failed at line: %lu, func: %s, file: %s!", resp.aico->line, resp.aico->func, resp.aico->file);
+#else
+			tb_trace_e("done aice func failed!");
+#endif
 		}
 
 		// calling--

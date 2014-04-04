@@ -80,7 +80,7 @@ static tb_bool_t tb_demo_file_writ_func(tb_aice_t const* aice)
 	else
 	{
 		tb_trace_i("writ[%p]: %s", aice->aico, tb_state_cstr(aice->state));
-		return tb_false;
+		tb_aicp_kill(tb_aico_aicp(aice->aico));
 	}
 
 	// ok
@@ -129,7 +129,7 @@ static tb_bool_t tb_demo_sock_recv_func(tb_aice_t const* aice)
 	else
 	{
 		tb_trace_i("recv[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-		return tb_false;
+		tb_aicp_kill(tb_aico_aicp(aice->aico));
 	}
 
 	// ok
@@ -158,7 +158,7 @@ static tb_bool_t tb_demo_sock_conn_func(tb_aice_t const* aice)
 	{
 		// exit loop
 		tb_trace_i("conn[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-		return tb_false;
+		tb_aicp_kill(tb_aico_aicp(aice->aico));
 	}
 
 	// ok

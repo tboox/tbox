@@ -125,13 +125,13 @@ tb_bool_t 			tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func
  *
  * @param handle 	the http handle
  * @param delay 	the delay time, ms
- * @param maxn 		the read maxn, using the default maxn if be zero
+ * @param size 		the read size, using the default size if be zero
  * @param func 		the func
  * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv);
 
 /*! seek the http
  *
@@ -158,13 +158,13 @@ tb_bool_t 			tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http
 /*! open and read the http, open it first if not opened 
  *
  * @param handle 	the http handle
- * @param maxn 		the read maxn, using the default maxn if be zero
+ * @param size 		the read size, using the default size if be zero
  * @param func 		the func
  * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_http_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv);
 
 /*! open and seek the http, open it first if not opened 
  *

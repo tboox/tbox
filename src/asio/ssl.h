@@ -55,7 +55,7 @@ typedef tb_bool_t 	(*tb_aicp_ssl_open_func_t)(tb_handle_t ssl, tb_size_t state, 
  *
  * @return 			tb_true: ok and continue it if need, tb_false: break it, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_read_func_t)(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_pointer_t priv);
 
 /*! the aicp ssl writ func type
  *
@@ -137,17 +137,42 @@ tb_void_t 			tb_aicp_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout);
  */
 tb_bool_t 			tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_pointer_t priv);
 
-/*! read the ssl after the delay time
+/*! read the ssl
  *
  * @param handle 	the ssl handle
- * @param delay 	the delay time, ms
- * @param maxn 		the read maxn, using the default maxn if be zero
+ * @param data 		the read data
+ * @param size 		the read size
  * @param func 		the func
  * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+
+/*! writ the ssl
+ *
+ * @param handle 	the ssl handle
+ * @param data 		the data
+ * @param size 		the size
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
+
+/*! read the ssl after the delay time
+ *
+ * @param handle 	the ssl handle
+ * @param delay 	the delay time, ms
+ * @param data 		the read data
+ * @param size 		the read size
+ * @param func 		the func
+ * @param priv 		the func data
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
 
 /*! writ the ssl after the delay time
  *
@@ -160,7 +185,7 @@ tb_bool_t 			tb_aicp_ssl_read(tb_handle_t handle, tb_size_t delay, tb_size_t max
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_writ(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv);
 
 /*! task the ssl
  *
@@ -176,13 +201,14 @@ tb_bool_t 			tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_t
 /*! open and read the ssl, open it first if not opened 
  *
  * @param handle 	the ssl handle
- * @param maxn 		the read maxn, using the default maxn if be zero
+ * @param data 		the read data
+ * @param size 		the read size
  * @param func 		the func
  * @param priv 		the func data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_aicp_ssl_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
+tb_bool_t 			tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv);
 
 /*! open and writ the ssl, open it first if not opened 
  *

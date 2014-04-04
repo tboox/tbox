@@ -277,7 +277,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 			if (context) tb_demo_context_exit(context);
 
 			// exit loop
-			return tb_false;
+			tb_aicp_kill(tb_aico_aicp(aice->aico));
 		}
 		else
 		{
@@ -299,7 +299,7 @@ static tb_bool_t tb_demo_sock_acpt_func(tb_aice_t const* aice)
 	{
 		// exit loop
 		tb_trace_i("acpt[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-		return tb_false;
+		tb_aicp_kill(tb_aico_aicp(aice->aico));
 	}
 
 	// ok
@@ -324,7 +324,7 @@ static tb_bool_t tb_demo_task_func(tb_aice_t const* aice)
 	{
 		// trace
 		tb_trace_i("task[%p]: state: %s", aice->aico, tb_state_cstr(aice->state));
-		return tb_false;
+		tb_aicp_kill(tb_aico_aicp(aice->aico));
 	}
 
 	// ok

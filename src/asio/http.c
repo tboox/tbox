@@ -52,8 +52,8 @@ typedef struct __tb_aicp_http_oread_t
 	// the priv
 	tb_pointer_t 					priv;
 
-	// the maxn
-	tb_size_t 						maxn;
+	// the size
+	tb_size_t 						size;
 
 }tb_aicp_http_oread_t;
 
@@ -423,7 +423,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 		state = TB_STATE_UNKNOWN_ERROR;
 	
 		// read it
-		if (!tb_aicp_http_read(http, 0, oread->maxn, oread->func, oread->priv)) break;
+		if (!tb_aicp_http_read(http, 0, oread->size, oread->func, oread->priv)) break;
 
 		// ok
 		state = TB_STATE_OK;
@@ -434,7 +434,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 	if (state != TB_STATE_OK) 
 	{
 		// done func
-		ok = oread->func(http, state, tb_null, 0, oread->maxn, oread->priv);
+		ok = oread->func(http, state, tb_null, 0, oread->size, oread->priv);
 	}
  
 	// ok?
@@ -1388,7 +1388,7 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 	// done open
 	return tb_aicp_http_open_done(http);
 }
-tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1414,7 +1414,7 @@ tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn,
 	http->priv 		= priv;
 
 	// post read
-	return tb_astream_read_after(http->stream, delay, maxn, tb_aicp_http_read_func, http);
+	return tb_astream_read_after(http->stream, delay, size, tb_aicp_http_read_func, http);
 }
 tb_bool_t tb_aicp_http_seek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
 {
@@ -1477,7 +1477,7 @@ tb_bool_t tb_aicp_http_task(tb_handle_t handle, tb_size_t delay, tb_aicp_http_ta
 	// post task
 	return tb_astream_task(http->stream, delay, tb_aicp_http_task_func, http);
 }
-tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
@@ -1486,7 +1486,7 @@ tb_bool_t tb_aicp_http_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_http_re
 	// init open and read
 	http->open_and.read.func = func;
 	http->open_and.read.priv = priv;
-	http->open_and.read.maxn = maxn;
+	http->open_and.read.size = size;
 	return tb_aicp_http_open(http, tb_aicp_http_open_read_func, &http->open_and.read);
 }
 tb_bool_t tb_aicp_http_oseek(tb_handle_t handle, tb_hize_t offset, tb_aicp_http_seek_func_t func, tb_pointer_t priv)
