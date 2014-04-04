@@ -237,10 +237,10 @@ static tb_long_t tb_aicp_ssl_open_post_read(tb_pointer_t priv, tb_byte_t* data, 
 			// check
 			tb_assert_and_check_break(read_real <= size);
 
-			// the data and maxn
+			// the data and size
 			tb_byte_t* 	read_data = tb_pbuffer_data(&ssl->read_data);
-			tb_size_t 	read_maxn = tb_pbuffer_maxn(&ssl->read_data);
-			tb_assert_and_check_break(read_data && read_maxn && size <= read_maxn);
+			tb_size_t 	read_size = tb_pbuffer_size(&ssl->read_data);
+			tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
 			// copy data
 			tb_memcpy(data, read_data, read_real);
@@ -253,13 +253,13 @@ static tb_long_t tb_aicp_ssl_open_post_read(tb_pointer_t priv, tb_byte_t* data, 
 		}
 
 		// resize data
-		if (tb_pbuffer_maxn(&ssl->read_data) < size)
+		if (tb_pbuffer_size(&ssl->read_data) < size)
 			tb_pbuffer_resize(&ssl->read_data, size);
 
-		// the data and maxn
+		// the data and size
 		tb_byte_t* 	read_data = tb_pbuffer_data(&ssl->read_data);
-		tb_size_t 	read_maxn = tb_pbuffer_maxn(&ssl->read_data);
-		tb_assert_and_check_break(read_data && read_maxn && size <= read_maxn);
+		tb_size_t 	read_size = tb_pbuffer_size(&ssl->read_data);
+		tb_assert_and_check_break(read_data && read_size && size <= read_size);
 
 		// trace
 		tb_trace_d("read: post: %lu: ..", size);
@@ -543,11 +543,19 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 	// ok?
 	return ok;
 }
-tb_bool_t tb_aicp_ssl_read(tb_handle_t handle, tb_size_t delay, tb_size_t maxn, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
 {
 	return tb_false;
 }
-tb_bool_t tb_aicp_ssl_writ(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv)
+{
+	return tb_false;
+}
+tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
+{
+	return tb_false;
+}
+tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv)
 {
 	return tb_false;
 }
@@ -555,7 +563,7 @@ tb_bool_t tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_task
 {
 	return tb_false;
 }
-tb_bool_t tb_aicp_ssl_oread(tb_handle_t handle, tb_size_t maxn, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
 {
 	return tb_false;
 }

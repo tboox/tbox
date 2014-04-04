@@ -51,12 +51,16 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_SOCK_CONNECT_TIMEOUT: 		return "sock: connect: timeout";
 	case TB_STATE_SOCK_RECV_TIMEOUT: 			return "sock: recv: timeout";
 	case TB_STATE_SOCK_SEND_TIMEOUT: 			return "sock: send: timeout";
+	case TB_STATE_SOCK_RECV_FAILED: 			return "sock: recv: failed";
 	case TB_STATE_SOCK_SEND_FAILED: 			return "sock: send: failed";
+	case TB_STATE_SOCK_UNKNOWN_ERROR: 			return "sock: unknown error";
 	case TB_STATE_SOCK_SSL_FAILED: 				return "sock: ssl: failed";
 	case TB_STATE_SOCK_SSL_TIMEOUT: 			return "sock: ssl: timeout";
 	case TB_STATE_SOCK_SSL_WANT_READ: 			return "sock: ssl: want read";
 	case TB_STATE_SOCK_SSL_WANT_WRIT: 			return "sock: ssl: want writ";
 	case TB_STATE_SOCK_SSL_WAIT_FAILED: 		return "sock: ssl: wait failed";
+	case TB_STATE_SOCK_SSL_READ_FAILED: 		return "sock: ssl: read: failed";
+	case TB_STATE_SOCK_SSL_WRIT_FAILED: 		return "sock: ssl: writ: failed";
 	case TB_STATE_SOCK_SSL_UNKNOWN_ERROR: 		return "sock: ssl: unknown error";
 
 	case TB_STATE_HTTP_RESPONSE_204: 			return "http: response: 204";
