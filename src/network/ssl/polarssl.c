@@ -86,7 +86,7 @@ typedef struct __tb_ssl_t
 static tb_void_t tb_ssl_trace_info(tb_pointer_t priv, tb_int_t level, tb_char_t const* info)
 {
 	// trace
-	if (level < 2) tb_printf("%s", info);
+	if (level < 1) tb_printf("%s", info);
 }
 static tb_long_t tb_ssl_sock_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t size)
 {

@@ -423,7 +423,7 @@ static tb_bool_t tb_aicp_http_open_read_func(tb_handle_t http, tb_size_t state, 
 		state = TB_STATE_UNKNOWN_ERROR;
 	
 		// read it
-		if (!tb_aicp_http_read(http, 0, oread->size, oread->func, oread->priv)) break;
+		if (!tb_aicp_http_read(http, oread->size, oread->func, oread->priv)) break;
 
 		// ok
 		state = TB_STATE_OK;
@@ -1388,7 +1388,16 @@ tb_bool_t tb_aicp_http_open(tb_handle_t handle, tb_aicp_http_open_func_t func, t
 	// done open
 	return tb_aicp_http_open_done(http);
 }
-tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+tb_bool_t tb_aicp_http_read(tb_handle_t handle, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
+{
+	// check
+	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
+	tb_assert_and_check_return_val(http && http->stream && func, tb_false);
+
+	// post read
+	return tb_aicp_http_read_after(handle, 0, size, func, priv);
+}
+tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t size, tb_aicp_http_read_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
