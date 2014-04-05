@@ -172,63 +172,6 @@ tb_long_t 			tb_ssl_writ(tb_handle_t ssl, tb_byte_t const* data, tb_size_t size)
  */
 tb_long_t 			tb_ssl_wait(tb_handle_t ssl, tb_size_t code, tb_long_t timeout);
 
-/*! the wait code
- *
- * @param ssl 		the ssl handle
- * @param code 		the aioe code
- *
- * @return 			the need code, failed: -1
- */
-tb_long_t 			tb_ssl_wait_code(tb_handle_t ssl, tb_size_t code);
-
-/*! spak ssl waited result for the external wait mode
- *
- * for detecting peer closed and tb_ssl_read or tb_ssl_writ or tb_ssl_open_try will return -1
- * for implementing multi-sockets wait using poll mode
- *
- * @code
- *
- 	// init code
-	tb_long_t code = 0;
-
-  	// try opening
-//	tb_long_t real = tb_ssl_open_try(ssl);
-
-  	// read data
-	tb_long_t real = tb_ssl_read(ssl, data, size); code = TB_AIOE_CODE_RECV;
-
-  	// writ data
-//	tb_long_t real = tb_ssl_writ(ssl, data, size); code = TB_AIOE_CODE_SEND;
-
-	// ok
-	if (real > 0) ;
-	// need wait?
-	else if (!real)
-	{
-#if 1
-		// the need wait code
-		code = tb_ssl_wait_code(ssl, code);
-
-		// wait it
-		tb_long_t wait = code > 0? wait_func(code) : code;
-
-		// spak the waited result
-		tb_ssl_wait_spak(ssl, wait);
-#else
-		// or using ssl_wait directly
-		tb_long_t wait = tb_ssl_wait(ssl, code, timeout);
-#endif
-	}
-	// closed or failed?
-	else ;
- *
- * @endcode
- *
- * @param ssl 		the ssl handle
- * @param wait 		the waited aioe code
- */
-tb_void_t 			tb_ssl_wait_spak(tb_handle_t ssl, tb_long_t wait);
-
 /*! the ssl state see the stream ssl state
  *
  * @param ssl 		the ssl handle

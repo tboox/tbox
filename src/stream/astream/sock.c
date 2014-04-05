@@ -649,7 +649,7 @@ static tb_bool_t tb_astream_sock_swrit_func(tb_handle_t ssl, tb_size_t state, tb
 	if (sstream->func.writ((tb_astream_t*)sstream, state, data, real, size, sstream->priv))
 	{
 		// ok? continue it
-		if (state == TB_STATE_OK)
+		if (state == TB_STATE_OK && real < size)
 		{
 			// continue to post writ
 			if (!tb_aicp_ssl_writ(sstream->hssl, data, size, tb_astream_sock_swrit_func, (tb_astream_t*)sstream))

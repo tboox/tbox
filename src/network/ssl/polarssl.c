@@ -427,7 +427,23 @@ tb_void_t tb_ssl_clos(tb_handle_t handle)
 	tb_check_return(ssl->bopened);
 
 	// close ssl notify
-    ssl_close_notify(&ssl->ssl);
+    tb_long_t ok = ssl_close_notify(&ssl->ssl);
+
+	// trace
+	tb_trace_d("clos: notify: %ld", ok);
+	if (ok)
+	{
+		// trace
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+# 	ifdef POLARSSL_ERROR_C
+		tb_char_t error[256] = {0};
+		polarssl_strerror(ok, error, sizeof(error));
+		tb_trace_d("clos: notify: failed: %ld, %s", ok, error);
+# 	else
+		tb_trace_d("clos: notify: failed: %ld", ok);
+# 	endif
+#endif
+	}
 
 	// clear ssl context
 	ssl_session_reset(&ssl->ssl);
@@ -570,59 +586,30 @@ tb_long_t tb_ssl_wait(tb_handle_t handle, tb_size_t code, tb_long_t timeout)
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;
 	tb_assert_and_check_return_val(ssl && ssl->wait, -1);
 	
-	// the wait code
-	tb_long_t wait = tb_ssl_wait_code(handle, code);
-
-	// wait it
-	wait = ssl->wait(ssl->priv, wait, timeout);
-
-	// spak wait
-	tb_ssl_wait_spak(handle, wait);
-
-	// ok?
-	return wait;
-}
-tb_long_t tb_ssl_wait_code(tb_handle_t handle, tb_size_t code)
-{
-	// the ssl
-	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return_val(ssl, code);
-	
 	// the ssl state
-	tb_long_t wait = -1;
 	switch (ssl->state)
 	{
 		// wait read
 	case TB_STATE_SOCK_SSL_WANT_READ:
-		wait = TB_AIOE_CODE_RECV;
+		code = TB_AIOE_CODE_RECV;
 		break;
 		// wait writ
 	case TB_STATE_SOCK_SSL_WANT_WRIT:
-		wait = TB_AIOE_CODE_SEND;
+		code = TB_AIOE_CODE_SEND;
 		break;
 		// ok, wait it
 	case TB_STATE_OK:
-		wait = code;
 		break;
 		// failed or closed?
 	default:
-		break;
+		return -1;
 	}
 
 	// trace
-	tb_trace_d("wait: %ld => %ld: ..", code, wait);
+	tb_trace_d("wait: %lu: ..", code);
 
-	// ok?
-	return wait;
-}
-tb_void_t tb_ssl_wait_spak(tb_handle_t handle, tb_long_t wait)
-{
-	// the ssl
-	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return(ssl);
-	
-	// wait ok
-	ssl->lwait = wait;
+	// wait it
+	ssl->lwait = ssl->wait(ssl->priv, code, timeout);
 
 	// timeout or failed? save state
 	if (ssl->lwait < 0) ssl->state = TB_STATE_SOCK_SSL_WAIT_FAILED;
@@ -630,6 +617,9 @@ tb_void_t tb_ssl_wait_spak(tb_handle_t handle, tb_long_t wait)
 
 	// trace
 	tb_trace_d("wait: %ld", ssl->lwait);
+
+	// ok?
+	return ssl->lwait;
 }
 tb_size_t tb_ssl_state(tb_handle_t handle)
 {
