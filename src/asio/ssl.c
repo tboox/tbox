@@ -92,6 +92,20 @@ typedef struct __tb_aicp_ssl_writ_t
 
 }tb_aicp_ssl_writ_t;
 
+// the aicp ssl task type
+typedef struct __tb_aicp_ssl_task_t
+{
+	// the func
+	tb_aicp_ssl_task_func_t func;
+
+	// the priv 
+	tb_pointer_t 			priv;
+
+	// the delay
+	tb_size_t 				delay;
+
+}tb_aicp_ssl_task_t;
+
 // the aicp ssl type
 typedef struct __tb_aicp_ssl_t
 {
@@ -113,8 +127,17 @@ typedef struct __tb_aicp_ssl_t
 		tb_aicp_ssl_open_t 	open;
 		tb_aicp_ssl_read_t 	read;
 		tb_aicp_ssl_writ_t 	writ;
+		tb_aicp_ssl_task_t 	task;
 
 	} 						func;
+
+	// the open and func
+	union
+	{
+		tb_aicp_ssl_read_t 	read;
+		tb_aicp_ssl_writ_t 	writ;
+
+	} 						open_and;
 
 	// the timeout
 	tb_long_t 				timeout;
@@ -939,6 +962,92 @@ static tb_long_t tb_aicp_ssl_writ_post_writ(tb_pointer_t priv, tb_byte_t const* 
 	// ok?
 	return state != TB_STATE_OK? -1 : 0;
 }
+static tb_bool_t tb_aicp_ssl_open_and_read(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_aicp_ssl_read_t* read = (tb_aicp_ssl_read_t*)priv;
+	tb_assert_and_check_return_val(ssl && read && read->func, tb_false);
+
+	// done
+	tb_bool_t ok = tb_true;
+	do
+	{
+		// check
+		tb_check_break(state == TB_STATE_OK);
+
+		// clear state
+		state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
+
+		// post read
+		if (!tb_aicp_ssl_read(ssl, read->data, read->size, read->func, read->priv)) break;
+
+		// ok
+		state = TB_STATE_OK;
+
+	} while (0);
+
+	// failed?
+	if (state != TB_STATE_OK)
+	{
+		// done func
+		ok = read->func(ssl, state, read->data, 0, read->size, read->priv);
+	}
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_aicp_ssl_open_and_writ(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv)
+{
+	// check
+	tb_aicp_ssl_writ_t* writ = (tb_aicp_ssl_writ_t*)priv;
+	tb_assert_and_check_return_val(ssl && writ && writ->func, tb_false);
+
+	// done
+	tb_bool_t ok = tb_true;
+	do
+	{
+		// check
+		tb_check_break(state == TB_STATE_OK);
+
+		// clear state
+		state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
+
+		// post writ
+		if (!tb_aicp_ssl_writ(ssl, writ->data, writ->size, writ->func, writ->priv)) break;
+
+		// ok
+		state = TB_STATE_OK;
+
+	} while (0);
+
+	// failed?
+	if (state != TB_STATE_OK)
+	{
+		// done func
+		ok = writ->func(ssl, state, writ->data, 0, writ->size, writ->priv);
+	}
+
+	// ok?
+	return ok;
+}
+static tb_bool_t tb_aicp_ssl_done_task(tb_aice_t const* aice)
+{
+	// check
+	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RUNTASK, tb_false);
+
+	// the ssl
+	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)aice->priv;
+	tb_assert_and_check_return_val(ssl && ssl->func.task.func, tb_false);
+
+	// trace
+	tb_trace_d("task: done: state: %s", tb_state_cstr(aice->state));
+
+	// done func
+	ssl->func.task.func(ssl, aice->state, ssl->func.task.delay, ssl->func.task.priv);
+
+	// ok
+	return tb_true;
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -1275,15 +1384,55 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
 }
 tb_bool_t tb_aicp_ssl_task(tb_handle_t handle, tb_size_t delay, tb_aicp_ssl_task_func_t func, tb_pointer_t priv)
 {
-	return tb_false;
+	// check
+	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl && ssl->aico && func, tb_false);
+
+	// save func
+	ssl->func.task.func 	= func;
+	ssl->func.task.priv 	= priv;
+	ssl->func.task.delay 	= delay;
+
+	// run task
+	return tb_aico_task_run(ssl->aico, delay, tb_aicp_ssl_done_task, ssl);
 }
 tb_bool_t tb_aicp_ssl_oread(tb_handle_t handle, tb_byte_t* data, tb_size_t size, tb_aicp_ssl_read_func_t func, tb_pointer_t priv)
 {
-	return tb_false;
+	// check
+	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
+
+	// not opened? open it first
+	if (!tb_atomic_get(&ssl->bopened))
+	{
+		ssl->open_and.read.func = func;
+		ssl->open_and.read.data = data;
+		ssl->open_and.read.size = size;
+		ssl->open_and.read.priv = priv;
+		return tb_aicp_ssl_open(handle, tb_aicp_ssl_open_and_read, &ssl->open_and.read);
+	}
+
+	// read it
+	return tb_aicp_ssl_read(handle, data, size, func, priv);
 }
 tb_bool_t tb_aicp_ssl_owrit(tb_handle_t handle, tb_byte_t const* data, tb_size_t size, tb_aicp_ssl_writ_func_t func, tb_pointer_t priv)
 {
-	return tb_false;
+	// check
+	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl && data && size && func, tb_false);
+
+	// not opened? open it first
+	if (!tb_atomic_get(&ssl->bopened))
+	{
+		ssl->open_and.writ.func = func;
+		ssl->open_and.writ.data = data;
+		ssl->open_and.writ.size = size;
+		ssl->open_and.writ.priv = priv;
+		return tb_aicp_ssl_open(handle, tb_aicp_ssl_open_and_writ, &ssl->open_and.writ);
+	}
+
+	// writ it
+	return tb_aicp_ssl_writ(handle, data, size, func, priv);
 }
 tb_aicp_t* tb_aicp_ssl_aicp(tb_handle_t handle)
 {

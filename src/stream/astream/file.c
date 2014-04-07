@@ -320,7 +320,7 @@ static tb_bool_t tb_astream_file_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(fstream && fstream->func.task, tb_false);
 
 	// done func
-	tb_bool_t ok = fstream->func.task((tb_astream_t*)fstream, aice->state == TB_STATE_OK? TB_STATE_OK : TB_STATE_UNKNOWN_ERROR, fstream->priv);
+	tb_bool_t ok = fstream->func.task((tb_astream_t*)fstream, aice->state, fstream->priv);
 
 	// ok and continue?
 	if (ok && aice->state == TB_STATE_OK)
