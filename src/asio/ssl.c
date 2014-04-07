@@ -939,122 +939,6 @@ static tb_long_t tb_aicp_ssl_writ_post_writ(tb_pointer_t priv, tb_byte_t const* 
 	// ok?
 	return state != TB_STATE_OK? -1 : 0;
 }
-static tb_bool_t tb_aicp_ssl_clos_done_read(tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_RECV, tb_false);
-
-	// the ssl
-	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)aice->priv;
-	tb_assert_and_check_return_val(ssl, tb_false);
-
-	// trace
-	tb_trace_d("clos: done: read: real: %lu, state: %s", aice->u.recv.real, tb_state_cstr(aice->state));
-
-	// ok
-	return tb_true;
-}
-static tb_bool_t tb_aicp_ssl_clos_done_writ(tb_aice_t const* aice)
-{
-	// check
-	tb_assert_and_check_return_val(aice && aice->code == TB_AICE_CODE_SEND, tb_false);
-
-	// the ssl
-	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)aice->priv;
-	tb_assert_and_check_return_val(ssl, tb_false);
-
-	// trace
-	tb_trace_d("clos: done: writ: real: %lu, state: %s", aice->u.send.real, tb_state_cstr(aice->state));
-
-	// ok
-	return tb_true;
-}
-
-static tb_long_t tb_aicp_ssl_clos_post_read(tb_pointer_t priv, tb_byte_t* data, tb_size_t size)
-{
-	// check
-	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-	tb_assert_and_check_return_val(ssl, -1);
-
-	// done
-	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
-	do
-	{
-		// try read it
-		tb_long_t real = tb_aicp_ssl_try_read(ssl, data, size);
-		tb_check_break(real >= 0);
-
-		// ok?
-		tb_check_return_val(!real, real);
-
-		// resize data
-		if (tb_pbuffer_size(&ssl->read_data) < size)
-			tb_pbuffer_resize(&ssl->read_data, size);
-
-		// the data and size
-		tb_byte_t* 	read_data = tb_pbuffer_data(&ssl->read_data);
-		tb_size_t 	read_size = tb_pbuffer_size(&ssl->read_data);
-		tb_assert_and_check_break(read_data && read_size && size <= read_size);
-
-		// trace
-		tb_trace_d("clos: post: read: %lu: ..", size);
-
-		// check
-		tb_assert_and_check_break(ssl->aico);
-
-		// post read
-		if (!tb_aico_recv(ssl->aico, read_data, size, tb_aicp_ssl_clos_done_read, ssl)) break;
-
-		// ok
-		state = TB_STATE_OK;
-
-	} while (0);
-
-	// read failed or continue?
-	return state != TB_STATE_OK? -1 : 0;
-}
-static tb_long_t tb_aicp_ssl_clos_post_writ(tb_pointer_t priv, tb_byte_t const* data, tb_size_t size)
-{
-	// check
-	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-	tb_assert_and_check_return_val(ssl, -1);
-
-	// done
-	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
-	do
-	{
-		// try writ it
-		tb_long_t real = tb_aicp_ssl_try_writ(ssl, data, size);
-		tb_check_break(real >= 0);
-
-		// ok?
-		tb_check_return_val(!real, real);
-
-		// save data
-		tb_pbuffer_memncpy(&ssl->writ_data, data, size);
-
-		// the data and size
-		tb_byte_t* 	writ_data = tb_pbuffer_data(&ssl->writ_data);
-		tb_size_t 	writ_size = tb_pbuffer_size(&ssl->writ_data);
-		tb_assert_and_check_break(writ_data && writ_size && size == writ_size);
-
-		// check
-		tb_assert_and_check_break(ssl->aico);
-
-		// trace
-		tb_trace_d("clos: post: writ: %lu: ..", writ_size);
-
-		// post writ
-		if (!tb_aico_send(ssl->aico, writ_data, writ_size, tb_aicp_ssl_clos_done_writ, ssl)) break;
-
-		// ok
-		state = TB_STATE_OK;
-
-	} while (0);
-
-	// ok?
-	return state != TB_STATE_OK? -1 : 0;
-}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -1126,10 +1010,10 @@ tb_void_t tb_aicp_ssl_clos(tb_handle_t handle, tb_bool_t bcalling)
 	// close ssl
 	if (ssl->ssl) 
 	{		
-		// init post func
-		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_clos_post_read, tb_aicp_ssl_clos_post_writ, tb_null, ssl);
+		// init bio sock, need some blocking time for closing
+		tb_ssl_set_bio_sock(ssl->ssl, ssl->sock);
 
-		// FIXME: close it
+		// close it
 		tb_ssl_clos(ssl->ssl);
 	}
 
