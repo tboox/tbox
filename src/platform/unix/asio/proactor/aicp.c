@@ -206,7 +206,7 @@ static tb_void_t tb_aiop_spak_work(tb_aicp_proactor_aiop_t* ptor)
 
 	// the semaphore value
 	tb_long_t value = tb_semaphore_value(ptor->wait);
-
+	
 	// post wait
 	if (value >= 0 && value < work) tb_semaphore_post(ptor->wait, work - value);
 }
