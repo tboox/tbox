@@ -74,11 +74,12 @@ typedef tb_bool_t 	(*tb_aicp_ssl_writ_func_t)(tb_handle_t ssl, tb_size_t state, 
  *
  * @param ssl 		the ssl handle
  * @param state 	the state
+ * @param delay 	the delay
  * @param priv 		the func private data
  *
  * @return 			tb_true: ok, tb_false: error, but not break aicp
  */
-typedef tb_bool_t 	(*tb_aicp_ssl_task_func_t)(tb_handle_t ssl, tb_size_t state, tb_pointer_t priv);
+typedef tb_bool_t 	(*tb_aicp_ssl_task_func_t)(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_pointer_t priv);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces

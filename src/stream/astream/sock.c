@@ -34,6 +34,10 @@
 #include "../stream.h"
 #include "../../platform/platform.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
 // the sock cache maxn
 #ifdef __tb_small__
 # 	define TB_GSTREAM_SOCK_CACHE_MAXN 	(8192)
@@ -743,7 +747,7 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	tb_assert_and_check_return_val(sstream && sstream->func.task, tb_false);
 
 	// done func
-	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, aice->state == TB_STATE_OK? TB_STATE_OK : TB_STATE_UNKNOWN_ERROR, sstream->priv);
+	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, aice->state, sstream->priv);
 
 	// ok and continue?
 	if (ok && aice->state == TB_STATE_OK)
@@ -755,18 +759,45 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+static tb_bool_t tb_astream_sock_stask_func(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_pointer_t priv)
+{
+	// check
+	tb_assert_and_check_return_val(ssl, tb_false);
+
+	// the stream
+	tb_astream_sock_t* sstream = (tb_astream_sock_t*)priv;
+	tb_assert_and_check_return_val(sstream && sstream->func.task, tb_false);
+
+	// done func
+	tb_bool_t ok = sstream->func.task((tb_astream_t*)sstream, state, sstream->priv);
+
+	// ok and continue?
+	if (ok && state == TB_STATE_OK)
+	{
+		// post task
+		tb_aicp_ssl_task(ssl, delay, tb_astream_sock_stask_func, sstream);
+	}
+
+	// ok
+	return tb_true;
+}
 static tb_bool_t tb_astream_sock_task(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
 {
 	// check
 	tb_astream_sock_t* sstream = tb_astream_sock_cast(astream);
-	tb_assert_and_check_return_val(sstream && sstream->sock && sstream->aico && func, tb_false);
+	tb_assert_and_check_return_val(sstream && sstream->sock && func, tb_false);
 
 	// save func and priv
 	sstream->priv 		= priv;
 	sstream->func.task 	= func;
 
 	// post task
-	return tb_aico_task_run(sstream->aico, delay, tb_astream_sock_task_func, astream);
+	if (sstream->aico) return tb_aico_task_run(sstream->aico, delay, tb_astream_sock_task_func, astream);
+	else if (sstream->hssl) return tb_aicp_ssl_task(sstream->hssl, delay, tb_astream_sock_stask_func, astream);
+
+	// failed
+	tb_trace_e("cannot run task!");
+	return tb_false;
 }
 static tb_void_t tb_astream_sock_kill(tb_handle_t astream)
 {	
