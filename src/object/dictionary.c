@@ -32,6 +32,7 @@
  * includes
  */
 #include "object.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -76,12 +77,8 @@ static tb_object_t* tb_dictionary_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(copy, tb_null);
 
 	// walk copy
-	tb_iterator_t* 	iterator 	= tb_dictionary_itor((tb_object_t*)dictionary);
-	tb_size_t 		itor 		= tb_iterator_head(iterator);
-	tb_size_t 		tail 		= tb_iterator_tail(iterator);
-	for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+	tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor((tb_object_t*)dictionary))
 	{
-		tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 		if (item && item->key) 
 		{
 			// refn++

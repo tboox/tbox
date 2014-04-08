@@ -53,14 +53,18 @@
  * @endcode
  */
 #define tb_for(type, item, head, tail, iterator) \
-			tb_assert(!iterator || (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD)); \
+			/* iterator */ \
+			tb_iterator_t* __iterator##item = (tb_iterator_t*)iterator; \
+			tb_assert(!__iterator##item || (tb_iterator_mode(__iterator##item) & TB_ITERATOR_MODE_FORWARD)); \
+			/* init */ \
 			type item; \
 			tb_size_t __itor_##item = head; \
 			tb_size_t __tail_##item = tail; \
-			if (iterator && __itor_##item != __tail_##item) \
+			/* walk */ \
+			if (__iterator##item && __itor_##item != __tail_##item) \
 				for ( 	; \
-						__itor_##item != __tail_##item && ((item = (type)tb_iterator_item((tb_iterator_t*)iterator, __itor_##item)), 1); \
-						__itor_##item = tb_iterator_next((tb_iterator_t*)iterator, __itor_##item)) 
+						__itor_##item != __tail_##item && ((item = (type)tb_iterator_item(__iterator##item, __itor_##item)), 1); \
+						__itor_##item = tb_iterator_next(__iterator##item, __itor_##item)) 
 
 /*! for all items using iterator
  *

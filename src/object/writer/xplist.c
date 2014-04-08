@@ -33,6 +33,7 @@
  */
 #include "xplist.h"
 #include "../object.h"
+#include "../../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -152,13 +153,9 @@ static tb_bool_t tb_object_xplist_writer_func_array(tb_object_xplist_writer_t* w
 		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// walk
-		tb_iterator_t* 	iterator = tb_array_itor(object);
-		tb_size_t 		itor = tb_iterator_head(iterator);
-		tb_size_t 		tail = tb_iterator_tail(iterator);
-		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		tb_for_all (tb_object_t*, item, tb_array_itor(object))
 		{
 			// item
-			tb_object_t* item = tb_iterator_item(iterator, itor);
 			if (item)
 			{
 				// func
@@ -296,13 +293,9 @@ static tb_bool_t tb_object_xplist_writer_func_dictionary(tb_object_xplist_writer
 		if (!tb_object_writer_newline(writer->stream, writer->deflate)) return tb_false;
 
 		// walk
-		tb_iterator_t* 	iterator = tb_dictionary_itor(object);
-		tb_size_t 		itor = tb_iterator_head(iterator);
-		tb_size_t 		tail = tb_iterator_tail(iterator);
-		for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+		tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
 		{
 			// item
-			tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 			if (item && item->key && item->val)
 			{
 				// func

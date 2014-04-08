@@ -92,12 +92,8 @@ tb_void_t 				tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
  * @return 				the dictionary iterator
  *
  * @code
- * tb_iterator_t* 	iterator = tb_dictionary_itor(dictionary);
- * tb_size_t 		itor = tb_iterator_head(iterator);
- * tb_size_t 		tail = tb_iterator_tail(iterator);
- * for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+ * tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(dictionary))
  * {
- * 		tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
  * 		if (item)
  * 		{
  * 			tb_char_t const* 	key = item->key;

@@ -33,6 +33,7 @@
  */
 #include "bin.h"
 #include "../object.h"
+#include "../../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
@@ -107,12 +108,8 @@ static tb_bool_t tb_object_bin_writer_func_array(tb_object_bin_writer_t* writer,
 	if (!tb_object_writer_bin_type_size(writer->stream, object->type, tb_array_size(object))) return tb_false;
 
 	// walk
-	tb_iterator_t* 	iterator = tb_array_itor(object);
-	tb_size_t 		itor = tb_iterator_head(iterator);
-	tb_size_t 		tail = tb_iterator_tail(iterator);
-	for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+	tb_for_all (tb_object_t*, item, tb_array_itor(object))
 	{
-		tb_object_t* item = tb_iterator_item(iterator, itor);
 		if (item)
 		{
 			// exists?
@@ -175,8 +172,8 @@ static tb_bool_t tb_object_bin_writer_func_string(tb_object_bin_writer_t* writer
 	tb_memcpy(writer->data, data, size);
 
 	// encode data
-	tb_byte_t const* 	pb = data;
-	tb_byte_t const* 	pe = data + size;
+	tb_byte_t const* 	pb = (tb_byte_t const*)data;
+	tb_byte_t const* 	pe = (tb_byte_t const*)data + size;
 	tb_byte_t* 			qb = writer->data;
 	tb_byte_t* 			qe = writer->data + writer->maxn;
 	tb_byte_t 			xb = (tb_byte_t)(((size >> 8) & 0xff) | (size & 0xff));
@@ -261,12 +258,8 @@ static tb_bool_t tb_object_bin_writer_func_dictionary(tb_object_bin_writer_t* wr
 	if (!tb_object_writer_bin_type_size(writer->stream, object->type, tb_dictionary_size(object))) return tb_false;
 
 	// walk
-	tb_iterator_t* 	iterator = tb_dictionary_itor(object);
-	tb_size_t 		itor = tb_iterator_head(iterator);
-	tb_size_t 		tail = tb_iterator_tail(iterator);
-	for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+	tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
 	{
-		tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 		if (item)
 		{
 			tb_char_t const* 	key = item->key;
@@ -345,7 +338,7 @@ static tb_long_t tb_object_bin_writer_done(tb_gstream_t* stream, tb_object_t* ob
 	tb_hize_t bof = tb_stream_offset(stream);
 
 	// writ bin header
-	if (!tb_gstream_bwrit(stream, "tbo00", 5)) return -1;
+	if (!tb_gstream_bwrit(stream, (tb_byte_t const*)"tbo00", 5)) return -1;
 
 	// done
 	tb_object_bin_writer_t writer = {0};
