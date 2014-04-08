@@ -30,7 +30,10 @@ tbox_C_FILES 			+= \
 						string/sstring \
 						algorithm/sort \
 						algorithm/find \
+						algorithm/rfind \
 						algorithm/pfind \
+						algorithm/walk \
+						algorithm/rwalk \
 						container/item \
 						container/hash \
 						container/heap \
@@ -359,9 +362,14 @@ INC_FILES 				= \
 						string/sstring.h \
 						algorithm/prefix.h \
 						algorithm/algorithm.h \
+						algorithm/for.h \
+						algorithm/rfor.h \
 						algorithm/sort.h \
 						algorithm/find.h \
+						algorithm/rfind.h \
 						algorithm/pfind.h \
+						algorithm/walk.h \
+						algorithm/rwalk.h \
 						container/prefix.h \
 						container/container.h \
 						container/item.h \

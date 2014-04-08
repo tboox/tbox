@@ -106,7 +106,7 @@ tb_void_t 				tb_dictionary_incr(tb_object_t* dictionary, tb_bool_t incr);
  * 			// ...
  * 		}
  * }
- * @codeend
+ * @endcode
  */
 tb_iterator_t* 			tb_dictionary_itor(tb_object_t* dictionary);
 
