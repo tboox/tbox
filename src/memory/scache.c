@@ -30,6 +30,7 @@
 #include "../libc/libc.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
@@ -116,7 +117,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 			tb_size_t refn = (tb_size_t)item->data;
 
 			// refn++
-			if (refn) tb_iterator_copy(g_hash, itor, refn + 1);
+			if (refn) tb_iterator_copy(g_hash, itor, (tb_pointer_t)(refn + 1));
 			// no refn? remove it
 			else
 			{
@@ -133,7 +134,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 		if (!item)
 		{
 			// add it
-			if (itor = tb_hash_set(g_hash, data, 1))
+			if ((itor = tb_hash_set(g_hash, data, (tb_pointer_t)1)))
 				item = tb_iterator_item(g_hash, itor);
 		}
 
@@ -167,7 +168,7 @@ tb_void_t tb_scache_del(tb_char_t const* data)
 			tb_size_t refn = (tb_size_t)item->data;
 
 			// refn--
-			if (refn > 1) tb_iterator_copy(g_hash, itor, refn - 1);
+			if (refn > 1) tb_iterator_copy(g_hash, itor, (tb_pointer_t)(refn - 1));
 			// del it
 			else tb_iterator_delt(g_hash, itor);
 		}
@@ -190,11 +191,8 @@ tb_void_t tb_scache_dump()
 		tb_trace_i("scache: size: %lu", tb_hash_size(g_hash));
 
 		// walk
-		tb_size_t itor = tb_iterator_head(g_hash);
-		tb_size_t tail = tb_iterator_tail(g_hash);
-		for (; itor != tail; itor = tb_iterator_next(g_hash, itor))
+		tb_for_all (tb_hash_item_t*, item, g_hash)
 		{
-			tb_hash_item_t const* item = tb_iterator_item(g_hash, itor);
 			if (item) tb_trace_i("scache: item: refn: %lu, cstr: %s", (tb_size_t)item->data, item->name);
 		}
 	}

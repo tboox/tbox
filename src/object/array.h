@@ -73,12 +73,8 @@ tb_void_t 			tb_array_incr(tb_object_t* array, tb_bool_t incr);
  * @return 			the array iterator
  *
  * @code
- * tb_iterator_t* 	iterator = tb_array_itor(array);
- * tb_size_t 		itor = tb_iterator_head(iterator);
- * tb_size_t 		tail = tb_iterator_tail(iterator);
- * for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+ * tb_for_all (tb_object_t*, item, tb_array_itor(array))
  * {
- * 		tb_object_t* item = tb_iterator_item(iterator, itor);
  * 		if (item)
  * 		{
  * 			// ...

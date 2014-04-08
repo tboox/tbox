@@ -33,6 +33,7 @@
  */
 #include "writer.h"
 #include "../charset/charset.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -279,11 +280,8 @@ tb_void_t tb_xml_writer_element_empty(tb_handle_t writer, tb_char_t const* name)
 	// writ attributes
 	if (tb_hash_size(xwriter->attributes))
 	{
-		tb_size_t itor = tb_iterator_head(xwriter->attributes);
-		tb_size_t tail = tb_iterator_tail(xwriter->attributes);
-		for (; itor != tail; itor = tb_iterator_next(xwriter->attributes, itor))
+		tb_for_all (tb_hash_item_t*, item, xwriter->attributes)
 		{
-			tb_hash_item_t const* item = tb_iterator_item(xwriter->attributes, itor);
 			if (item && item->name && item->data)
 				tb_gstream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
 		}
@@ -312,11 +310,8 @@ tb_void_t tb_xml_writer_element_enter(tb_handle_t writer, tb_char_t const* name)
 	// writ attributes
 	if (tb_hash_size(xwriter->attributes))
 	{
-		tb_size_t itor = tb_iterator_head(xwriter->attributes);
-		tb_size_t tail = tb_iterator_tail(xwriter->attributes);
-		for (; itor != tail; itor = tb_iterator_next(xwriter->attributes, itor))
+		tb_for_all (tb_hash_item_t*, item, xwriter->attributes)
 		{
-			tb_hash_item_t const* item = tb_iterator_item(xwriter->attributes, itor);
 			if (item && item->name && item->data)
 				tb_gstream_printf(xwriter->wstream, " %s=\"%s\"", item->name, item->data);
 		}

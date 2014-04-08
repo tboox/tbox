@@ -36,6 +36,7 @@
 #include "../utils/utils.h"
 #include "../libc/libc.h"
 #include "../platform/platform.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -131,8 +132,8 @@ static tb_bool_t tb_cookies_split_url(tb_char_t const* url, tb_char_t const* pho
 	}
 
 	// get host
-	tb_char_t* pb = phost;
-	tb_char_t* pe = phost + *nhost - 1;
+	tb_char_t* pb = (tb_char_t*)phost;
+	tb_char_t* pe = (tb_char_t*)phost + *nhost - 1;
 	while (p < e && pb < pe && *p && *p != '/' && *p != ':') *pb++ = *p++;
 	*pb = '\0';
 	*nhost = pb - phost;
@@ -306,6 +307,7 @@ static tb_bool_t tb_cookies_parse(tb_cookie_entry_t* entry, tb_char_t const* dom
 // set cookies string
 static tb_size_t tb_cookie_set_string(tb_cookies_t* cookies, tb_char_t const* s, tb_size_t n)
 {
+	// check
 	tb_assert_and_check_return_val(s && n, 0);
  
 	// reuse it if exists
@@ -505,7 +507,7 @@ static tb_void_t tb_cookies_spool_free(tb_item_func_t* func, tb_pointer_t item)
 		//tb_trace_d("[string]::dtor: %s", s->data? s->data : "");
 		if (s->data) 
 		{
-			tb_free(s->data);
+			tb_free((tb_pointer_t)s->data);
 			s->data = tb_null;
 		}
 	}
@@ -781,12 +783,9 @@ tb_void_t tb_cookies_dump(tb_cookies_t const* cookies)
 	}
 
 	// dump strings
-	tb_size_t itor = tb_iterator_head(spool);
-	tb_size_t tail = tb_iterator_tail(spool);
 	tb_trace_i("[spool]: size: %d, maxn: %d", n, tb_slist_maxn(spool));
-	for (; itor != tail; itor = tb_iterator_next(spool, itor))
+	tb_for_all (tb_cookie_string_t*, s, spool)
 	{
-		tb_cookie_string_t const* s = (tb_cookie_string_t const*)tb_iterator_item(spool, itor);
 		if (s)
 		{
 			tb_trace_i("[string]: [%d]: %s ", s->refn, s->data? s->data : "");

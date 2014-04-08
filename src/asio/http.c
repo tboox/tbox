@@ -38,6 +38,8 @@
 #include "../filter/filter.h"
 #include "../network/network.h"
 #include "../platform/platform.h"
+#include "../algorithm/algorithm.h"
+#include "../container/container.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -213,11 +215,8 @@ static tb_void_t tb_aicp_http_option_dump(tb_aicp_http_t* http)
 	tb_trace_i("option: bunzip: %s", http->option.bunzip? "true" : "false");
 
 	// dump head 
-	tb_size_t itor = tb_iterator_head(http->option.head);
-	tb_size_t tail = tb_iterator_tail(http->option.head);
-	for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
+	tb_for_all (tb_hash_item_t*, item, http->option.head)
 	{
-		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
 		if (item) tb_trace_i("option: head: %s: %s", item->name, item->data);
 	}
 
@@ -385,11 +384,8 @@ static tb_char_t const* tb_aicp_http_head_format(tb_aicp_http_t* http, tb_hize_t
 	tb_pstring_cstrfcat(&http->line_data, "HTTP/1.%1u\r\n", http->option.version);
 
 	// append key: value
-	tb_size_t itor = tb_iterator_head(http->option.head);
-	tb_size_t tail = tb_iterator_tail(http->option.head);
-	for (; itor != tail; itor = tb_iterator_next(http->option.head, itor))
+	tb_for_all (tb_hash_item_t*, item, http->option.head)
 	{
-		tb_hash_item_t const* item = tb_iterator_item(http->option.head, itor);
 		if (item && item->name && item->data) 
 			tb_pstring_cstrfcat(&http->line_data, "%s: %s\r\n", (tb_char_t const*)item->name, (tb_char_t const*)item->data);
 	}

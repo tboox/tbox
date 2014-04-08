@@ -34,6 +34,7 @@
 #include "bplist.h"
 #include "../object.h"
 #include "../../charset/charset.h"
+#include "../../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -239,7 +240,7 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
 			tb_assert_and_check_break(utf16);
 
 			// utf8 to utf16
-			osize = tb_charset_conv_data(TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16, utf8, size, utf16, (size + 1) << 2);
+			osize = tb_charset_conv_data(TB_CHARSET_TYPE_UTF8, TB_CHARSET_TYPE_UTF16, (tb_byte_t const*)utf8, size, (tb_byte_t*)utf16, (size + 1) << 2);
 			tb_assert_and_check_break(osize > 0 && osize < (size + 1) << 2);
 			tb_assert_and_check_break(!(osize & 1));
 
@@ -252,9 +253,9 @@ static tb_bool_t tb_object_bplist_writer_func_string(tb_object_bplist_writer_t* 
 		if (ok) 
 		{
 			// only ascii? writ utf8
-			if (osize == (size << 1)) ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, utf8, size, item_size);
+			if (osize == (size << 1)) ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_STRING, (tb_byte_t*)utf8, size, item_size);
 			// writ utf16
-			else ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_UNICODE, utf16, osize >> 1, item_size);
+			else ok = tb_object_bplist_writer_func_rdata(writer, TB_OBJECT_BPLIST_TYPE_UNICODE, (tb_byte_t*)utf16, osize >> 1, item_size);
 
 		}
 
@@ -396,12 +397,8 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_t* object)
 	case TB_OBJECT_TYPE_ARRAY:
 		{
 			// walk
-			tb_iterator_t* 	iterator = tb_array_itor(object);
-			tb_size_t 		itor = tb_iterator_head(iterator);
-			tb_size_t 		tail = tb_iterator_tail(iterator);
-			for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+			tb_for_all (tb_object_t*, item, tb_array_itor(object))
 			{
-				tb_object_t* item = tb_iterator_item(iterator, itor);
 				if (item) size += tb_object_bplist_writer_builder_maxn(item);
 			}
 		}
@@ -409,13 +406,9 @@ static tb_uint64_t tb_object_bplist_writer_builder_maxn(tb_object_t* object)
 	case TB_OBJECT_TYPE_DICTIONARY:
 		{
 			// walk
-			tb_iterator_t* 	iterator = tb_dictionary_itor(object);
-			tb_size_t 		itor = tb_iterator_head(iterator);
-			tb_size_t 		tail = tb_iterator_tail(iterator);
-			for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+			tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
 			{
 				// item
-				tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 				if (item && item->key && item->val)
 					size += 1 + tb_object_bplist_writer_builder_maxn(item->val);
 			}
@@ -482,14 +475,10 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 			}
 
 			// walk
-			tb_size_t 		i = 0;
-			tb_iterator_t* 	iterator = tb_array_itor(object);
-			tb_size_t 		itor = tb_iterator_head(iterator);
-			tb_size_t 		tail = tb_iterator_tail(iterator);
-			for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+			tb_size_t i = 0;
+			tb_for_all (tb_object_t*, item, tb_array_itor(object))
 			{
 				// build item
-				tb_object_t* item = tb_iterator_item(iterator, itor);
 				if (item) 
 				{
 					// add item to builder
@@ -525,14 +514,10 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 
 			// walk keys
 			{
-				tb_size_t 		i = 0;
-				tb_iterator_t* 	iterator = tb_dictionary_itor(object);
-				tb_size_t 		itor = tb_iterator_head(iterator);
-				tb_size_t 		tail = tb_iterator_tail(iterator);
-				for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+				tb_size_t i = 0;
+				tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
 				{
 					// item
-					tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 					if (item && item->key && item->val)
 					{
 						// make key object
@@ -558,13 +543,9 @@ static tb_void_t tb_object_bplist_writer_builder_init(tb_object_t* object, tb_ob
 			// walk vals
 			{
 				tb_size_t 		i = 0;
-				tb_iterator_t* 	iterator = tb_dictionary_itor(object);
-				tb_size_t 		itor = tb_iterator_head(iterator);
-				tb_size_t 		tail = tb_iterator_tail(iterator);
-				for (; itor != tail; itor = tb_iterator_next(iterator, itor))
+				tb_for_all (tb_dictionary_item_t*, item, tb_dictionary_itor(object))
 				{
 					// item
-					tb_dictionary_item_t* item = tb_iterator_item(iterator, itor);
 					if (item && item->key && item->val)
 					{
 						// add val to builder
@@ -591,12 +572,9 @@ static tb_void_t tb_object_bplist_writer_builder_exit(tb_object_t* list, tb_hash
 	if (hash)
 	{
 		// walk
-		tb_size_t 		itor = tb_iterator_head(hash);
-		tb_size_t 		tail = tb_iterator_tail(hash);
-		for (; itor != tail; itor = tb_iterator_next(hash, itor))
+		tb_for_all (tb_hash_item_t*, item, hash)
 		{
 			// exit item
-			tb_hash_item_t const* item = tb_iterator_item(hash, itor);
 			if (item && item->name)
 			{
 				tb_byte_t* priv = tb_object_getp(item->name);
@@ -674,18 +652,15 @@ static tb_long_t tb_object_bplist_writer_done(tb_gstream_t* stream, tb_object_t*
 	bof = tb_stream_offset(stream);
 
 	// writ magic & version
-	if (!tb_gstream_bwrit(stream, "bplist00", 8)) goto end;
+	if (!tb_gstream_bwrit(stream, (tb_byte_t const*)"bplist00", 8)) goto end;
 
 	// writ objects
 	if (object_count)
 	{
-		tb_iterator_t* 	iterator = tb_array_itor(list);
-		tb_size_t 		itor = tb_iterator_head(iterator);
-		tb_size_t 		tail = tb_iterator_tail(iterator);
-		for (i = 0; itor != tail; itor = tb_iterator_next(iterator, itor))
+		i = 0;
+		tb_for_all (tb_object_t*, item, tb_array_itor(list))
 		{
 			// item
-			tb_object_t* item = tb_iterator_item(iterator, itor);
 			if (item) 
 			{
 				// check
