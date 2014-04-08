@@ -17,24 +17,16 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		algorithm.h
- * @defgroup 	algorithm
+ * @file		rfind.c
+ * @ingroup 	algorithm
  *
  */
-#ifndef TB_ALGORITHM_H
-#define TB_ALGORITHM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "prefix.h"
-#include "for.h"
-#include "rfor.h"
-#include "sort.h"
-#include "find.h"
 #include "rfind.h"
-#include "pfind.h"
-#include "walk.h"
-#include "rwalk.h"
 
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */

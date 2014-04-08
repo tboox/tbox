@@ -84,7 +84,7 @@ tb_void_t 			tb_array_incr(tb_object_t* array, tb_bool_t incr);
  * 			// ...
  * 		}
  * }
- * @codeend
+ * @endcode
  */
 tb_iterator_t* 		tb_array_itor(tb_object_t* array);
 

@@ -17,24 +17,43 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		algorithm.h
- * @defgroup 	algorithm
+ * @file		rwalk.h
+ * @ingroup 	algorithm
  *
  */
-#ifndef TB_ALGORITHM_H
-#define TB_ALGORITHM_H
+#ifndef TB_ALGORITHM_RWALK_H
+#define TB_ALGORITHM_RWALK_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "for.h"
-#include "rfor.h"
-#include "sort.h"
-#include "find.h"
-#include "rfind.h"
-#include "pfind.h"
-#include "walk.h"
-#include "rwalk.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * interfaces
+ */
+
+/*! the reverse walker
+ *
+ * @param iterator 	the iterator
+ * @param head 		the iterator head
+ * @param tail 		the iterator tail
+ * @param func 		the walker func
+ * @param priv 		the func private data
+ *
+ * @return 			the item count
+ */
+tb_size_t 			tb_rwalk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_pointer_t func, tb_pointer_t priv);
+
+/*! the reverse walker for all
+ *
+ * @param iterator 	the iterator
+ * @param func 		the walker func
+ * @param priv 		the func private data
+ *
+ * @return 			the item count
+ */
+tb_size_t 			tb_rwalk_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_pointer_t func, tb_pointer_t priv);
+
 
 #endif

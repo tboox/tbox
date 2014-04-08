@@ -491,19 +491,23 @@ static tb_size_t tb_dlist_nreplace_last_test()
 static tb_size_t tb_dlist_iterator_next_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_size());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 1000000;
-	tb_dlist_ninsert_head(dlist, 0xd, n);
+	tb_dlist_ninsert_head(dlist, (tb_pointer_t)0xd, n);
+	tb_hong_t t = tb_mclock();
+#if 0
 	__tb_volatile__ tb_size_t itor = tb_iterator_head(dlist);
 	__tb_volatile__ tb_size_t tail = tb_iterator_tail(dlist);
-	tb_hong_t t = tb_mclock();
 	for (; itor != tail; itor = tb_iterator_next(dlist, itor))
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(dlist, itor);
+		tb_size_t __tb_volatile__ item = (tb_size_t __tb_volatile__)tb_iterator_item(dlist, itor);
 		tb_used(item);
 	}
+#else
+	tb_for_all(tb_size_t, item, dlist) tb_used(item);
+#endif
 	t = tb_mclock() - t;
 
 	// time
@@ -517,22 +521,26 @@ static tb_size_t tb_dlist_iterator_next_test()
 static tb_size_t tb_dlist_iterator_prev_test()
 {
 	// init
-	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_long());
+	tb_dlist_t* dlist = tb_dlist_init(TB_DLIST_GROW_SIZE, tb_item_func_size());
 	tb_assert_and_check_return_val(dlist, 0);
 
 	tb_size_t n = 10000;
-	tb_dlist_ninsert_head(dlist, 0xd, n);
+	tb_dlist_ninsert_head(dlist, (tb_pointer_t)0xd, n);
+	tb_hong_t t = tb_mclock();
+#if 0
 	__tb_volatile__ tb_size_t itor = tb_iterator_last(dlist);
 	__tb_volatile__ tb_size_t head = tb_iterator_head(dlist);
-	tb_hong_t t = tb_mclock();
 	while (1)
 	{
-		__tb_volatile__ tb_byte_t const* item = tb_iterator_item(dlist, itor);
+		tb_size_t __tb_volatile__ item = (tb_size_t __tb_volatile__)tb_iterator_item(dlist, itor);
 		tb_used(item);
 
 		if (itor == head) break;
 		itor = tb_iterator_prev(dlist, itor);
 	}
+#else
+	tb_rfor_all(tb_size_t, item, dlist) tb_used(item);
+#endif
 	t = tb_mclock() - t;
 
 	// time
