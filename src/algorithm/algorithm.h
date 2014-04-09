@@ -31,10 +31,15 @@
 #include "for.h"
 #include "rfor.h"
 #include "sort.h"
+#include "heap_sort.h"
+#include "quick_sort.h"
+#include "insert_sort.h"
+#include "bubble_sort.h"
 #include "find.h"
 #include "rfind.h"
-#include "pfind.h"
+#include "binary_find.h"
 #include "walk.h"
 #include "rwalk.h"
+#include "count.h"
 
 #endif

@@ -34,7 +34,7 @@ static tb_size_t tb_queue_put_and_pop_test()
 	t = tb_mclock() - t;
 
 	// time
-	tb_trace_i("tb_queue_put_and_pop(%d): %lld ms, size: %d, maxn: %d", n, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_put_and_pop(%lu): %lld ms, size: %lu, maxn: %lu", n, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// check
 	tb_assert(tb_queue_size(queue) == 10);
@@ -59,18 +59,12 @@ static tb_size_t tb_queue_iterator_next_test()
 	tb_assert_and_check_return_val(queue, 0);
 
 	while (n--) tb_queue_put(queue, 0xf);
-	__tb_volatile__ tb_size_t itor = tb_iterator_head(queue);
-	__tb_volatile__ tb_size_t tail = tb_iterator_tail(queue);
 	tb_hong_t t = tb_mclock();
-	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-	{
-		__tb_volatile__ tb_cpointer_t item = tb_iterator_item(queue, itor);
-		tb_used(item);
-	}
+	tb_for_all (tb_char_t*, item, queue) tb_used(item);
 	t = tb_mclock() - t;
 
 	// time
-	tb_trace_i("tb_queue_iterator_next(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_iterator_next(%lu): %lld ms, size: %lu, maxn: %lu", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// exit
 	tb_queue_exit(queue);
@@ -85,21 +79,12 @@ static tb_size_t tb_queue_iterator_prev_test()
 	tb_assert_and_check_return_val(queue, 0);
 
 	while (n--) tb_queue_put(queue, 0xf);
-	__tb_volatile__ tb_size_t itor = tb_iterator_last(queue);
-	__tb_volatile__ tb_size_t head = tb_iterator_head(queue);
 	tb_hong_t t = tb_mclock();
-	while (1)
-	{
-		__tb_volatile__ tb_cpointer_t item = tb_iterator_item(queue, itor);
-		tb_used(item);
-
-		if (itor == head) break;
-		itor = tb_iterator_prev(queue, itor);
-	}
+	tb_rfor_all (tb_char_t*, item, queue) tb_used(item);
 	t = tb_mclock() - t;
 
 	// time
-	tb_trace_i("tb_queue_iterator_prev(%d): %lld ms, size: %d, maxn: %d", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_trace_i("tb_queue_iterator_prev(%lu): %lld ms, size: %lu, maxn: %lu", 1000000, t, tb_queue_size(queue), tb_queue_maxn(queue));
 
 	// exit
 	tb_queue_exit(queue);
@@ -108,11 +93,11 @@ static tb_size_t tb_queue_iterator_prev_test()
 }
 static tb_void_t tb_queue_int_dump(tb_queue_t const* queue)
 {
-	tb_trace_i("tb_int_t size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_iterator_head(queue);
-	tb_size_t tail = tb_iterator_tail(queue);
-	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_trace_i("tb_int_t at[%d]: %u", itor, tb_iterator_item(queue, itor));
+	tb_trace_i("tb_int_t size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_for_all (tb_char_t*, item, queue)
+	{
+		tb_trace_i("tb_int_t at[%lu]: %u", item_itor, item);
+	}
 }
 static tb_void_t tb_queue_int_test()
 {
@@ -159,11 +144,11 @@ static tb_void_t tb_queue_int_test()
 }
 static tb_void_t tb_queue_str_dump(tb_queue_t const* queue)
 {
-	tb_trace_i("str size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_iterator_head(queue);
-	tb_size_t tail = tb_iterator_tail(queue);
-	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_trace_i("str at[%d]: %s", itor, tb_iterator_item(queue, itor));
+	tb_trace_i("str size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_for_all (tb_char_t*, item, queue)
+	{
+		tb_trace_i("str at[%lu]: %s", item_itor, item);
+	}
 }
 static tb_void_t tb_queue_str_test()
 {
@@ -210,11 +195,11 @@ static tb_void_t tb_queue_str_test()
 }
 static tb_void_t tb_queue_efm_dump(tb_queue_t const* queue)
 {
-	tb_trace_i("efm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_iterator_head(queue);
-	tb_size_t tail = tb_iterator_tail(queue);
-	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_trace_i("efm at[%d]: %s", itor, tb_iterator_item(queue, itor));
+	tb_trace_i("efm size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_for_all (tb_char_t*, item, queue)
+	{
+		tb_trace_i("efm at[%lu]: %s", item_itor, item);
+	}
 }
 static tb_void_t tb_queue_efm_test()
 {
@@ -266,11 +251,11 @@ static tb_void_t tb_queue_ifm_free(tb_item_func_t* func, tb_pointer_t item)
 }
 static tb_void_t tb_queue_ifm_dump(tb_queue_t const* queue)
 {
-	tb_trace_i("ifm size: %d, maxn: %d", tb_queue_size(queue), tb_queue_maxn(queue));
-	tb_size_t itor = tb_iterator_head(queue);
-	tb_size_t tail = tb_iterator_tail(queue);
-	for (; itor != tail; itor = tb_iterator_next(queue, itor))
-		tb_trace_i("ifm at[%d]: %s", itor, tb_iterator_item(queue, itor));
+	tb_trace_i("ifm size: %lu, maxn: %lu", tb_queue_size(queue), tb_queue_maxn(queue));
+	tb_for_all (tb_char_t*, item, queue)
+	{
+		tb_trace_i("ifm at[%lu]: %s", item_itor, item);
+	}
 }
 static tb_void_t tb_queue_ifm_test()
 {
@@ -329,7 +314,7 @@ static tb_void_t tb_queue_perf_test()
 	score += tb_queue_iterator_prev_test();
 
 	tb_trace_i("=============================================================");
-	tb_trace_i("score: %d", score / 100);
+	tb_trace_i("score: %lu", score / 100);
 
 }
 static tb_void_t tb_queue_test_itor_perf()

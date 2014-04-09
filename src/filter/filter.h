@@ -35,7 +35,7 @@
 
 /*! init filter from zip
  *
- * @param algo 		the zip algorithom
+ * @param algo 		the zip algorithm
  * @param action 	the zip action
  *
  * @return 			the filter

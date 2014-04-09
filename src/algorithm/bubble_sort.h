@@ -17,42 +17,38 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		find.c
+ * @file		bubble_sort.h
  * @ingroup 	algorithm
  *
  */
+#ifndef TB_ALGORITHM_BUBBLE_SORT_H
+#define TB_ALGORITHM_BUBBLE_SORT_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "find.h"
+#include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * interfaces
  */
 
-tb_size_t tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp)
-{
-	// check
-	tb_assert_and_check_return_val(iterator && iterator->mode & TB_ITERATOR_MODE_FORWARD, tail);
+/*! the bubble sorter, O(n^2)
+ *
+ * @param iterator 	the iterator
+ * @param head 		the iterator head
+ * @param tail 		the iterator tail
+ * @param comp 		the comparer
+ */
+tb_void_t 			tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp);
 
-	// null?
-	tb_check_return_val(head != tail, tail);
+/*! the bubble sorter for all
+ *
+ * @param iterator 	the iterator
+ * @param head 		the iterator head
+ * @param tail 		the iterator tail
+ * @param comp 		the comparer
+ */
+tb_void_t 			tb_bubble_sort_all(tb_iterator_t* iterator, tb_iterator_comp_t comp);
 
-	// the comparer
-	if (!comp) comp = tb_iterator_comp;
-
-	// find
-	tb_long_t find = -1;
-	tb_size_t itor = head;
-	for (; itor != tail; itor = tb_iterator_next(iterator, itor)) 
-		if (!(find = comp(iterator, tb_iterator_item(iterator, itor), data))) break;
-
-	// ok?
-	return !find? itor : tail;
-} 
-tb_size_t tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_iterator_comp_t comp)
-{
-	return tb_find(iterator, tb_iterator_head(iterator), tb_iterator_tail(iterator), data, comp);
-}
-
+#endif

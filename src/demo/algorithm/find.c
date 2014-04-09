@@ -54,14 +54,14 @@ static tb_void_t tb_find_int_test_binary()
 	// find
 	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
-	for (i = 0; i < n; i++) itor = tb_binary_find_all(&iterator, data[8000], tb_null);
+	for (i = 0; i < n; i++) itor = tb_bfind_all(&iterator, data[8000], tb_null);
 	time = tb_mclock() - time;
 
 	// item
 	tb_long_t item = itor != tb_iterator_tail(&iterator)? (tb_long_t)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
-	tb_trace_i("tb_binary_find_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
+	tb_trace_i("tb_bfind_int_all[%ld ?= %ld]: %lld ms", item, data[8000], time);
 
 	// free
 	tb_free(data);
@@ -137,14 +137,14 @@ static tb_void_t tb_find_str_test_binary()
 	// find
 	tb_size_t itor;
 	tb_hong_t time = tb_mclock();
-	for (i = 0; i < n; i++) itor = tb_binary_find_all(&iterator, data[8000], tb_null);
+	for (i = 0; i < n; i++) itor = tb_bfind_all(&iterator, data[8000], tb_null);
 	time = tb_mclock() - time;
 
 	// item
 	tb_char_t* item = itor != tb_iterator_tail(&iterator)? (tb_char_t*)tb_iterator_item(&iterator, itor) : tb_null;
 
 	// time
-	tb_trace_i("tb_binary_find_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
+	tb_trace_i("tb_bfind_str_all[%s ?= %s]: %lld ms", item, data[8000], time);
 
 	// exit pool
 	tb_spool_exit(pool);

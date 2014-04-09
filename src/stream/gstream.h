@@ -248,7 +248,7 @@ tb_gstream_t* 		tb_gstream_init_filter_from_null(tb_gstream_t* gstream);
 /*! init filter stream from zip
  *
  * @param gstream 	the stream
- * @param algo 		the zip algorithom
+ * @param algo 		the zip algorithm
  * @param action 	the zip action
  *
  * @return 			the stream
