@@ -107,7 +107,7 @@ static tb_charset_t const* tb_charset_find_by_name(tb_char_t const* name)
 	iterator.comp = tb_charset_comp_by_name;
 
 	// find it by the binary search
-	tb_size_t 		itor = tb_binary_find_all(&iterator, name, tb_null);
+	tb_size_t 		itor = tb_bfind_all(&iterator, name, tb_null);
 
 	// ok?
 	if (itor != tb_iterator_tail(&iterator))
@@ -121,7 +121,7 @@ static tb_charset_t const* tb_charset_find_by_type(tb_size_t type)
 	iterator.comp = tb_charset_comp_by_type;
 
 	// find it by the binary search
-	tb_size_t 		itor = tb_binary_find_all(&iterator, (tb_cpointer_t)TB_CHARSET_TYPE(type), tb_null);
+	tb_size_t 		itor = tb_bfind_all(&iterator, (tb_cpointer_t)TB_CHARSET_TYPE(type), tb_null);
 
 	// ok?
 	if (itor != tb_iterator_tail(&iterator))

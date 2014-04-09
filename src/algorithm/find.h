@@ -55,26 +55,4 @@ tb_size_t 			tb_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb
  */
 tb_size_t 			tb_find_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_iterator_comp_t comp);
 
-/*! the binary finder for ascending
- *
- * @param iterator 	the iterator
- * @param head 		the iterator head
- * @param tail 		the iterator tail
- * @param data 		the finded data
- * @param comp 		the comparer
- *
- * @return 			the iterator itor
- */
-tb_size_t 			tb_binary_find(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_cpointer_t data, tb_iterator_comp_t comp);
-
-/*! the binary finder for all
- *
- * @param iterator 	the iterator
- * @param data 		the finded data
- * @param comp 		the comparer
- *
- * @return 			the iterator itor
- */
-tb_size_t 			tb_binary_find_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_iterator_comp_t comp);
-
 #endif

@@ -454,7 +454,7 @@ tb_astream_t* 		tb_astream_init_filter_from_null(tb_astream_t* astream);
 /*! init filter stream from zip
  *
  * @param astream 	the stream
- * @param algo 		the zip algorithom
+ * @param algo 		the zip algorithm
  * @param action 	the zip action
  *
  * @return 			the stream
