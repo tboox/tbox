@@ -77,6 +77,34 @@ typedef struct __tb_ssl_t
 }tb_ssl_t;
 
 /* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+static tb_int_t 		tb_ssl_bio_method_init(BIO* bio);
+static tb_int_t 		tb_ssl_bio_method_exit(BIO* bio);
+static tb_int_t 		tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size);
+static tb_int_t 		tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t size);
+static tb_long_t 		tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, tb_pointer_t ptr);
+static tb_int_t 		tb_ssl_bio_method_puts(BIO* bio, tb_char_t const* data);
+static tb_int_t 		tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * globals
+ */
+static BIO_METHOD const g_ssl_bio_method =
+{
+	BIO_TYPE_SOURCE_SINK | 100
+,	"ssl_bio"
+,	tb_ssl_bio_method_writ
+,	tb_ssl_bio_method_read
+,	tb_ssl_bio_method_puts
+,	tb_ssl_bio_method_gets
+,	tb_ssl_bio_method_ctrl
+,	tb_ssl_bio_method_init
+,	tb_ssl_bio_method_exit
+,	tb_null
+};
+
+/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
 static tb_int_t tb_ssl_verify(tb_int_t ok, X509_STORE_CTX* ctx)
@@ -135,6 +163,175 @@ static tb_long_t tb_ssl_sock_wait(tb_pointer_t priv, tb_size_t code, tb_long_t t
 	// wait it
 	return tb_aioo_wait((tb_handle_t)priv, code, timeout);
 }
+static tb_int_t tb_ssl_bio_method_init(BIO* bio)
+{
+	// check
+	tb_assert_and_check_return_val(bio, 0);
+
+	// trace
+	tb_trace_d("bio: init");
+
+	// init 
+	bio->init 		= 1;
+	bio->num 		= 0;
+	bio->ptr 		= tb_null;
+	bio->flags 		= 0;
+	bio->shutdown 	= 1;
+
+	// ok
+	return 1;
+}
+static tb_int_t tb_ssl_bio_method_exit(BIO* bio)
+{
+	// check
+	tb_assert_and_check_return_val(bio, 0);
+
+	// trace
+	tb_trace_d("bio: exit");
+
+	// exit 
+	bio->init 		= 0;
+	bio->num 		= 0;
+	bio->ptr 		= tb_null;
+	bio->flags 		= 0;
+
+	// ok
+	return 1;
+}
+static tb_int_t tb_ssl_bio_method_read(BIO* bio, tb_char_t* data, tb_int_t size)
+{
+	// check
+	tb_assert_and_check_return_val(bio && data && size >= 0, -1);
+
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
+	tb_assert_and_check_return_val(ssl && ssl->read, -1);
+
+	// writ 
+	tb_long_t real = ssl->read(ssl->priv, (tb_byte_t*)data, size);
+
+	// trace
+	tb_trace_d("bio: read: real: %ld, size: %d", real, size);
+
+	// ok? clear wait
+	if (real > 0) ssl->lwait = 0;
+	// peer closed?
+	else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_RECV)) 
+	{
+		BIO_clear_retry_flags(bio);
+		real = -1;
+	}
+	// no data? continue to read it
+	else if (!real) 
+	{
+		BIO_clear_retry_flags(bio);
+		BIO_set_retry_read(bio);
+		real = -1;
+	}
+	// failed?
+	else 
+	{
+		BIO_clear_retry_flags(bio);
+		real = -1;
+	}
+
+	// ok?
+	return (tb_int_t)real;
+}
+static tb_int_t tb_ssl_bio_method_writ(BIO* bio, tb_char_t const* data, tb_int_t size)
+{
+	// check
+	tb_assert_and_check_return_val(bio && data && size >= 0, -1);
+
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
+	tb_assert_and_check_return_val(ssl && ssl->writ, -1);
+
+	// writ 
+	tb_long_t real = ssl->writ(ssl->priv, (tb_byte_t const*)data, size);
+
+	// trace
+	tb_trace_d("bio: writ: real: %ld, size: %d", real, size);
+
+	// ok? clear wait
+	if (real > 0) ssl->lwait = 0;
+	// peer closed?
+	else if (!real && ssl->lwait > 0 && (ssl->lwait & TB_AIOE_CODE_SEND)) 
+	{
+		BIO_clear_retry_flags(bio);
+		real = -1;
+	}
+	// no data? continue to writ
+	else if (!real) 
+	{
+		BIO_clear_retry_flags(bio);
+		BIO_set_retry_write(bio);
+		real = -1;
+	}
+	// failed?
+	else
+	{
+		BIO_clear_retry_flags(bio);
+		real = -1;
+	}
+
+	// ok?
+	return (tb_int_t)real;
+}
+static tb_long_t tb_ssl_bio_method_ctrl(BIO* bio, tb_int_t cmd, tb_long_t num, tb_pointer_t ptr)
+{
+	// check
+	tb_assert_and_check_return_val(bio, -1);
+
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)bio->ptr;
+	tb_assert_and_check_return_val(ssl, -1);
+
+	// done
+	tb_long_t ok = 0;
+	switch (cmd)
+	{
+	case BIO_CTRL_FLUSH:
+		{
+			// trace
+			tb_trace_d("bio: ctrl: flush");
+
+			// ok
+			ok = 1;
+		}
+		break;
+	default:
+		{
+			// trace
+			tb_trace_d("bio: ctrl: unknown: %d", cmd);
+		}
+		break;
+	}
+	// ok?
+	return ok;
+}
+static tb_int_t tb_ssl_bio_method_puts(BIO* bio, tb_char_t const* data)
+{
+	// check
+	tb_assert_and_check_return_val(bio && data, -1);
+
+	// trace
+	tb_trace_d("bio: puts: %s", data);
+
+	// writ
+	return tb_ssl_bio_method_writ(bio, data, tb_strlen(data));
+}
+static tb_int_t tb_ssl_bio_method_gets(BIO* bio, tb_char_t* data, tb_int_t size)
+{
+	// check
+	tb_assert_and_check_return_val(bio && data, -1);
+
+	// trace
+	tb_trace_d("bio: gets: %d", size);
+
+	// read it
+	return tb_ssl_bio_method_read(bio, data, size);
+}
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -170,7 +367,15 @@ tb_handle_t tb_ssl_init(tb_bool_t bserver)
 		else SSL_set_connect_state(ssl->ssl);
 
 		// init verify
-		SSL_set_verify(ssl, 0, tb_ssl_verify);
+		SSL_set_verify(ssl->ssl, 0, tb_ssl_verify);
+
+		// init bio
+		ssl->bio = BIO_new(&g_ssl_bio_method);
+		tb_assert_and_check_break(ssl->bio);
+
+		// set bio to ssl
+		ssl->bio->ptr = ssl;
+		SSL_set_bio(ssl->ssl, ssl->bio, ssl->bio);
 
 		// init state
 		ssl->state = TB_STATE_OK;
@@ -230,7 +435,6 @@ tb_void_t tb_ssl_set_bio_func(tb_handle_t handle, tb_ssl_func_read_t read, tb_ss
 	ssl->writ = writ;
 	ssl->wait = wait;
 	ssl->priv = priv;
-
 }
 tb_void_t tb_ssl_set_timeout(tb_handle_t handle, tb_long_t timeout)
 {
@@ -283,18 +487,38 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 		tb_long_t r = SSL_do_handshake(ssl->ssl);
 	
 		// trace
-		tb_trace_d("handshake: %ld", r);
+		tb_trace_d("open: handshake: %ld", r);
 
 		// ok?
 		if (r == 1) ok = 1;
+		// continue ?
+		else if (!r) ok = 0;
 		else
 		{
-			// trace
-			tb_trace_d("handshake: %s", tb_ssl_error(SSL_get_error(ssl->ssl, r)));
+			// the error
+			tb_long_t error = SSL_get_error(ssl->ssl, r);
+
+			// wait?
+			if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
+			{
+				// trace
+				tb_trace_d("open: handshake: wait: %s: ..", error == SSL_ERROR_WANT_READ? "read" : "writ");
+
+				// continue it
+				ok = 0;
+
+				// save state
+				ssl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+			}
+			// failed?
+			else
+			{
+				// trace
+				tb_trace_d("open: handshake: failed: %s", tb_ssl_error(error));
 	
-			// save state
-			ssl->state = TB_STATE_SOCK_SSL_FAILED;
-			break;
+				// save state
+				ssl->state = TB_STATE_SOCK_SSL_FAILED;
+			}
 		}
 
 	} while (0);
@@ -314,26 +538,111 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 	}
 
 	// trace
-	tb_trace_d("handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
+	tb_trace_d("open: handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
 
 	// ok?
 	return ok;
 }
-tb_void_t tb_ssl_clos(tb_handle_t handle)
+tb_bool_t tb_ssl_clos(tb_handle_t handle)
 {
 	// the ssl
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return(ssl);
+	tb_assert_and_check_return_val(ssl, tb_false);
 
-	// check
-	tb_check_return(ssl->bopened);
+	// open it
+	tb_long_t ok = -1;
+	while (!(ok = tb_ssl_clos_try(handle)))
+	{
+		// wait it
+		ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, ssl->timeout);
+		tb_check_break(ok > 0);
+	}
 
-	// close ssl
-	if (ssl->ssl) SSL_shutdown(ssl->ssl);
+	// ok?
+	return ok > 0? tb_true : tb_false;
+}
+tb_long_t tb_ssl_clos_try(tb_handle_t handle)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl, -1);
 
-	// close it
-	ssl->bopened = tb_false;
-	ssl->state = TB_STATE_OK;
+	// done
+	tb_long_t ok = -1;
+	do
+	{
+		// init state
+		ssl->state = TB_STATE_OK;
+
+		// have been closed already?
+		if (!ssl->bopened || !ssl->ssl)
+		{
+			ok = 1;
+			break;
+		}
+
+		// do shutdown
+		tb_long_t r = SSL_shutdown(ssl->ssl);
+	
+		// trace
+		tb_trace_d("clos: shutdown: %ld", r);
+
+		// ok?
+		if (r == 1) ok = 1;
+		// continue?
+		else if (!r) ok = 0;
+		else
+		{
+			// the error
+			tb_long_t error = SSL_get_error(ssl->ssl, r);
+
+			// wait?
+			if (error == SSL_ERROR_WANT_WRITE || error == SSL_ERROR_WANT_READ)
+			{
+				// trace
+				tb_trace_d("clos: shutdown: wait: %s: ..", error == SSL_ERROR_WANT_READ? "read" : "writ");
+
+				// continue it
+				ok = 0;
+
+				// save state
+				ssl->state = (error == SSL_ERROR_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+			}
+			// failed?
+			else
+			{
+				// trace
+				tb_trace_d("clos: shutdown: failed: %s", tb_ssl_error(error));
+	
+				// save state
+				ssl->state = TB_STATE_SOCK_SSL_FAILED;
+			}
+		}
+
+	} while (0);
+
+	// ok?
+	if (ok > 0)
+	{
+		// closed
+		ssl->bopened = tb_false;
+
+		// clear ssl
+		if (ssl->ssl) SSL_clear(ssl->ssl);
+	}
+	// failed?
+	else if (ok < 0)
+	{
+		// save state
+		if (ssl->state == TB_STATE_OK)
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
+	}
+
+	// trace
+	tb_trace_d("clos: shutdown: %s", ok > 0? "ok" : (!ok? ".." : "no"));
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
@@ -343,6 +652,44 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 
 	// read it
 	tb_long_t real = SSL_read(ssl->ssl, data, size);
+
+	// done
+	if (real <= 0)
+	{
+		// the error
+		tb_long_t error = SSL_get_error(ssl->ssl, real);
+
+		// want read? continue it
+		if (error == SSL_ERROR_WANT_READ || !real)
+		{
+			// trace
+			tb_trace_d("read: want read");
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
+			return 0;
+		}
+		// want writ? continue it
+		else if (error == SSL_ERROR_WANT_WRITE)
+		{
+			// trace
+			tb_trace_d("read: want writ");
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
+			return 0;
+		}
+		// failed?
+		else
+		{
+			// trace
+			tb_trace_d("read: failed: %ld, %s", real, tb_ssl_error(error));
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
+			return -1;
+		}
+	}
 
 	// trace
 	tb_trace_d("read: %ld", real);
@@ -358,6 +705,44 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 
 	// writ it
 	tb_long_t real = SSL_write(ssl->ssl, data, size);
+
+	// done
+	if (real <= 0)
+	{
+		// the error
+		tb_long_t error = SSL_get_error(ssl->ssl, real);
+
+		// want read? continue it
+		if (error == SSL_ERROR_WANT_READ)
+		{
+			// trace
+			tb_trace_d("writ: want read");
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_WANT_READ;
+			return 0;
+		}
+		// want writ? continue it
+		else if (error == SSL_ERROR_WANT_WRITE || !real)
+		{
+			// trace
+			tb_trace_d("writ: want writ");
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_WANT_WRIT;
+			return 0;
+		}
+		// failed?
+		else
+		{
+			// trace
+			tb_trace_d("writ: failed: %ld, %s", real, tb_ssl_error(error));
+
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
+			return -1;
+		}
+	}
 
 	// trace
 	tb_trace_d("writ: %ld", real);

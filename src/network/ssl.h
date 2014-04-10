@@ -139,8 +139,31 @@ tb_long_t 			tb_ssl_open_try(tb_handle_t ssl);
 /*! clos ssl 
  *
  * @param ssl 		the ssl handle
+ *
+ * @return 			tb_true or tb_false
  */
-tb_void_t 			tb_ssl_clos(tb_handle_t ssl);
+tb_bool_t 			tb_ssl_clos(tb_handle_t ssl);
+
+/*! try closing ssl  using non-blocking mode
+ *
+ * @code
+ *
+	// open it
+	tb_long_t ok = -1;
+	while (!(ok = tb_ssl_clos_try(handle)))
+	{
+		// wait it
+		ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, timeout);
+		tb_check_break(ok > 0);
+	}
+
+ * @endcode
+ *
+ * @param ssl 		the ssl handle
+ *
+ * @return 			ok: 1, continue: 0, failed: -1
+ */
+tb_long_t 			tb_ssl_clos_try(tb_handle_t ssl);
 
 /*! read ssl data
  *

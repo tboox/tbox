@@ -112,7 +112,7 @@ demo_C_FILES 							+= \
 # libs
 demo_LIBS 								+= tbox $(TB_CONFIG_DEMO_LIBS)
 demo_LIBS-$(TB_CONFIG_HAVE_ZLIB) 		+= z
-demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl
+demo_LIBS-$(TB_CONFIG_HAVE_OPENSSL) 	+= ssl crypto
 demo_LIBS-$(TB_CONFIG_HAVE_POLARSSL) 	+= polarssl
 
 # path

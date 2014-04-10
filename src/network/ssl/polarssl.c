@@ -340,29 +340,27 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 		tb_long_t r = ssl_handshake(&ssl->ssl);
 		
 		// trace
-		tb_trace_d("handshake: %ld", r);
+		tb_trace_d("open: handshake: %ld", r);
 
 		// ok?
 		if (!r) ok = 1;
 		// peer closed
 		else if (r == POLARSSL_ERR_SSL_PEER_CLOSE_NOTIFY || r == POLARSSL_ERR_NET_CONN_RESET)
 		{
-			tb_trace_d("handshake: closed: %ld", r);
+			tb_trace_d("open: handshake: closed: %ld", r);
 			ssl->state = TB_STATE_CLOSED;
-			break;
 		}
 		// continue to wait it?
 		else if (r == POLARSSL_ERR_NET_WANT_READ || r == POLARSSL_ERR_NET_WANT_WRITE)
 		{
 			// trace
-			tb_trace_d("handshake: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
+			tb_trace_d("open: handshake: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
 
 			// continue it
 			ok = 0;
 
 			// save state
 			ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
-			break;
 		}
 		// failed?
 		else
@@ -372,14 +370,13 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 # 	ifdef POLARSSL_ERROR_C
 			tb_char_t error[256] = {0};
 			polarssl_strerror(r, error, sizeof(error));
-			tb_trace_d("handshake: failed: %ld, %s", r, error);
+			tb_trace_d("open: handshake: failed: %ld, %s", r, error);
 # 	else
-			tb_trace_d("handshake: failed: %ld", r);
+			tb_trace_d("open: handshake: failed: %ld", r);
 # 	endif
 #endif
 			// save state
 			ssl->state = TB_STATE_SOCK_SSL_FAILED;
-			break;
 		}
 
 	} while (0);
@@ -412,45 +409,110 @@ tb_long_t tb_ssl_open_try(tb_handle_t handle)
 	}
 
 	// trace
-	tb_trace_d("handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
+	tb_trace_d("open: handshake: %s", ok > 0? "ok" : (!ok? ".." : "no"));
 
 	// ok?
 	return ok;
 }
-tb_void_t tb_ssl_clos(tb_handle_t handle)
+tb_bool_t tb_ssl_clos(tb_handle_t handle)
 {
 	// the ssl
 	tb_ssl_t* ssl = (tb_ssl_t*)handle;
-	tb_assert_and_check_return(ssl);
+	tb_assert_and_check_return_val(ssl, tb_false);
 
-	// check
-	tb_check_return(ssl->bopened);
-
-	// close ssl notify
-    tb_long_t ok = ssl_close_notify(&ssl->ssl);
-
-	// trace
-	tb_trace_d("clos: notify: %ld", ok);
-	if (ok)
+	// open it
+	tb_long_t ok = -1;
+	while (!(ok = tb_ssl_clos_try(handle)))
 	{
-		// trace
-#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
-# 	ifdef POLARSSL_ERROR_C
-		tb_char_t error[256] = {0};
-		polarssl_strerror(ok, error, sizeof(error));
-		tb_trace_d("clos: notify: failed: %ld, %s", ok, error);
-# 	else
-		tb_trace_d("clos: notify: failed: %ld", ok);
-# 	endif
-#endif
+		// wait it
+		ok = tb_ssl_wait(handle, TB_AIOE_CODE_RECV | TB_AIOE_CODE_SEND, ssl->timeout);
+		tb_check_break(ok > 0);
 	}
 
-	// clear ssl context
-	ssl_session_reset(&ssl->ssl);
+	// ok?
+	return ok > 0? tb_true : tb_false;
+}
+tb_long_t tb_ssl_clos_try(tb_handle_t handle)
+{
+	// the ssl
+	tb_ssl_t* ssl = (tb_ssl_t*)handle;
+	tb_assert_and_check_return_val(ssl, -1);
 
-	// close it
-	ssl->bopened = tb_false;
-	ssl->state = TB_STATE_OK;
+	// done
+	tb_long_t ok = -1;
+	do
+	{
+		// init state
+		ssl->state = TB_STATE_OK;
+
+		// have been closed already?
+		if (!ssl->bopened)
+		{
+			ok = 1;
+			break;
+		}
+
+		// done close notify
+		tb_long_t r = ssl_close_notify(&ssl->ssl);
+
+		// trace
+		tb_trace_d("clos: close_notify: %ld", r);
+
+		// ok?
+		if (!r) ok = 1;
+		// continue to wait it?
+		else if (r == POLARSSL_ERR_NET_WANT_READ || r == POLARSSL_ERR_NET_WANT_WRITE)
+		{
+			// trace
+			tb_trace_d("clos: close_notify: wait: %s: ..", r == POLARSSL_ERR_NET_WANT_READ? "read" : "writ");
+
+			// continue it
+			ok = 0;
+
+			// save state
+			ssl->state = (r == POLARSSL_ERR_NET_WANT_READ)? TB_STATE_SOCK_SSL_WANT_READ : TB_STATE_SOCK_SSL_WANT_WRIT;
+		}
+		// failed?
+		else
+		{
+			// trace
+#if TB_TRACE_MODULE_DEBUG && defined(__tb_debug__)
+# 	ifdef POLARSSL_ERROR_C
+			tb_char_t error[256] = {0};
+			polarssl_strerror(r, error, sizeof(error));
+			tb_trace_d("clos: close_notify: failed: %ld, %s", r, error);
+# 	else
+			tb_trace_d("clos: close_notify: failed: %ld", r);
+# 	endif
+#endif
+			// save state
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
+		}
+
+	} while (0);
+
+	// ok?
+	if (ok > 0)
+	{
+		// closed
+		ssl->bopened = tb_false;
+
+		// clear ssl
+		ssl_session_reset(&ssl->ssl);
+	}
+	// failed?
+	else if (ok < 0)
+	{
+		// save state
+		if (ssl->state == TB_STATE_OK)
+			ssl->state = TB_STATE_SOCK_SSL_FAILED;
+	}
+
+	// trace
+	tb_trace_d("clos: close_notify: %s", ok > 0? "ok" : (!ok? ".." : "no"));
+
+	// ok?
+	return ok;
 }
 tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 {
