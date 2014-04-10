@@ -942,26 +942,23 @@ static tb_void_t tb_slist_test_itor_perf()
 
 	tb_slist_exit(slist);
 }
-static tb_bool_t tb_slist_test_walk_item(tb_slist_t* slist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_slist_test_walk_item(tb_slist_t* slist, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(slist && bdel && data, tb_false);
+	tb_assert_and_check_return_val(slist && bdel && priv, tb_false);
 
 	// done
-	tb_hize_t* test = data;
-	if (item)
+	tb_hize_t* 	test = priv;
+	tb_size_t 	i = (tb_size_t)item;
+	if (!((i >> 25) & 0x1))
+//	if (!(i & 0x7))
+//	if (1)
+//	if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
+		*bdel = tb_true;
+	else
 	{
-		tb_size_t i = (tb_size_t)*item;
-		if (!((i >> 25) & 0x1))
-//		if (!(i & 0x7))
-//		if (1)
-//		if (!(tb_rand_uint32(0, TB_MAXU32) & 0x1))
-			*bdel = tb_true;
-		else
-		{
-			test[0] += i;
-			test[1]++;
-		}
+		test[0] += i;
+		test[1]++;
 	}
 
 	// ok

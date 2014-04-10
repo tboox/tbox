@@ -92,13 +92,6 @@ tb_pointer_t 		tb_queue_last(tb_queue_t const* queue);
  */
 tb_void_t 			tb_queue_clear(tb_queue_t* queue);
 
-/*! remove the queue item
- *
- * @param queue 	the queue
- * @param itor 		the item itor
- */
-tb_void_t 			tb_queue_remove(tb_queue_t* queue, tb_size_t itor);
-
 /*! put the queue item
  *
  * @param queue 	the queue
@@ -151,36 +144,6 @@ tb_bool_t 			tb_queue_full(tb_queue_t const* queue);
  * @return 			tb_true or tb_false
  */
 tb_bool_t 			tb_queue_null(tb_queue_t const* queue);
-
-/*! walk the queue
- *
- * be faster than the iterator mode, optimizate to remove items for walking
- *
- * @code
- * tb_bool_t tb_queue_item_func(tb_queue_t* queue, tb_pointer_t* item, tb_pointer_t data)
- * {
- * 		tb_assert_and_check_return_val(queue, tb_false);
- *
- * 		// is tail?
- * 		if (!item) ;
- *
- * 		// ok
- * 		return tb_true;
- *
- * 	fail:
- * 		// break
- * 		return tb_false;
- * }
- * @endcode
- * 
- * @param queue 	the queue
- * @param func 		the walk func
- * @param data 		the walk data
- *
- */
-tb_void_t 			tb_queue_walk(tb_queue_t* queue, tb_bool_t (*func)(tb_queue_t* queue, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data);
-
-
 
 #endif
 

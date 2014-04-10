@@ -58,15 +58,15 @@ tb_void_t tb_stack_pop(tb_stack_t* stack)
 {
 	tb_vector_remove_last(stack);
 }
-tb_pointer_t tb_stack_top(tb_stack_t const* stack)
+tb_pointer_t tb_stack_top(tb_stack_t* stack)
 {
 	return tb_vector_last(stack);
 }
-tb_pointer_t tb_stack_head(tb_stack_t const* stack)
+tb_pointer_t tb_stack_head(tb_stack_t* stack)
 {
 	return tb_vector_head(stack);
 }
-tb_pointer_t tb_stack_last(tb_stack_t const* stack)
+tb_pointer_t tb_stack_last(tb_stack_t* stack)
 {
 	return tb_vector_last(stack);
 }
@@ -78,7 +78,7 @@ tb_size_t tb_stack_maxn(tb_stack_t const* stack)
 {
 	return tb_vector_maxn(stack);
 }
-tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
 {
-	tb_vector_walk(stack, func, data);
+	tb_vector_walk(stack, func, priv);
 }

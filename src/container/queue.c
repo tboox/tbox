@@ -242,11 +242,11 @@ tb_pointer_t tb_queue_get(tb_queue_t const* handle)
 }
 tb_pointer_t tb_queue_head(tb_queue_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_head(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_head((tb_iterator_t*)handle));
 }
 tb_pointer_t tb_queue_last(tb_queue_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_last(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_last((tb_iterator_t*)handle));
 }
 tb_size_t tb_queue_size(tb_queue_t const* handle)
 {	
@@ -280,37 +280,4 @@ tb_bool_t tb_queue_null(tb_queue_t const* handle)
 
 	return ((queue->head == queue->tail)? tb_true : tb_false);
 }
-tb_void_t tb_queue_remove(tb_queue_t* handle, tb_size_t itor)
-{
-	tb_trace_noimpl();
-}
-tb_void_t tb_queue_walk(tb_queue_t* handle, tb_bool_t (*func)(tb_queue_t* handle, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data)
-{
-	// check
-	tb_queue_impl_t* queue = (tb_queue_impl_t*)handle;
-	tb_assert_and_check_return(queue && queue->data && queue->maxn && func);
 
-	// step
-	tb_size_t step = queue->func.size;
-	tb_assert_and_check_return(step);
-
-	// walk
-	tb_byte_t* 	base = queue->data;
-	tb_size_t 	itor = queue->head;
-	tb_size_t 	tail = queue->tail;
-	tb_size_t 	maxn = queue->maxn;
-	for (; itor != tail; itor = (itor + 1) & (maxn - 1))
-	{
-		// item
-		tb_pointer_t item = queue->func.data(&queue->func, base + itor * step);
-
-		// callback: item
-		if (!func(queue, &item, data)) goto end;
-	}
-
-	// callback: tail
-	if (!func(queue, tb_null, data)) goto end;
-
-end:
-	return ;
-}

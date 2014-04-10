@@ -88,7 +88,7 @@ tb_void_t 			tb_stack_exit(tb_stack_t* stack);
  *
  * @return 			the head item
  */
-tb_pointer_t 		tb_stack_head(tb_stack_t const* stack);
+tb_pointer_t 		tb_stack_head(tb_stack_t* stack);
 
 /*! the stack last item
  *
@@ -96,7 +96,7 @@ tb_pointer_t 		tb_stack_head(tb_stack_t const* stack);
  *
  * @return 			the last item
  */
-tb_pointer_t 		tb_stack_last(tb_stack_t const* stack);
+tb_pointer_t 		tb_stack_last(tb_stack_t* stack);
 
 /*! clear the stack
  *
@@ -130,7 +130,7 @@ tb_void_t 	 		tb_stack_pop(tb_stack_t* stack);
  *
  * @return 			the stack top item
  */
-tb_pointer_t 	 	tb_stack_top(tb_stack_t const* stack);
+tb_pointer_t 	 	tb_stack_top(tb_stack_t* stack);
 
 /*! the stack size
  *
@@ -153,22 +153,16 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_stack_item_func(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
  * {
+ * 		// check
  * 		tb_assert_and_check_return_val(stack && bdel, tb_false);
- *
- * 		// is tail?
- * 		if (!item) ;
  *
  * 		// delete it?
  * 		// *bdel = tb_true;
  *
- * 		// ok
+ * 		// continue or break
  * 		return tb_true;
- *
- * fail:
- * 		// break
- * 		return tb_false;
  * }
  * @endcode
  *
@@ -177,7 +171,7 @@ tb_size_t 			tb_stack_maxn(tb_stack_t const* stack);
  * @param data 		the walk data
  *
  */
-tb_void_t 			tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_stack_walk(tb_stack_t* stack, tb_bool_t (*func)(tb_stack_t* stack, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
 
 
 #endif

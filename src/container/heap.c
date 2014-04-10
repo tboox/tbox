@@ -665,33 +665,4 @@ tb_void_t tb_heap_del(tb_heap_t* handle, tb_size_t itor)
 {
 	tb_heap_iterator_delt(handle, itor);
 }
-tb_void_t tb_heap_walk(tb_heap_t* handle, tb_bool_t (*func)(tb_heap_t* handle, tb_pointer_t* item, tb_pointer_t data), tb_pointer_t data)
-{
-	// check
-	tb_heap_impl_t* heap = (tb_heap_impl_t*)handle;
-	tb_assert_and_check_return(heap && heap->data && func);
 
-	// step
-	tb_size_t step = heap->func.size;
-	tb_assert_and_check_return(step);
-
-	// walk
-	tb_size_t 	i = 0;
-	tb_size_t 	n = heap->size;
-	tb_byte_t* 	d = heap->data;
-	for (i = 0; i < n; i++)
-	{
-		// item
-		tb_pointer_t item = heap->func.data(&heap->func, d + i * step);
-
-		// callback: item
-		if (!func(heap, &item, data)) goto end;
-	}
-
-	// callback: tail
-	if (!func(heap, tb_null, data)) goto end;
-
-end:
-
-	return ;
-}
