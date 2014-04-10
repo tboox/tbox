@@ -35,7 +35,7 @@
 tb_void_t tb_bubble_sort(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_iterator_comp_t comp)
 {
 	// check
-	tb_assert_and_check_return(iterator && iterator->mode & TB_ITERATOR_MODE_FORWARD);
+	tb_assert_and_check_return(iterator && (tb_iterator_mode(iterator) & TB_ITERATOR_MODE_FORWARD));
 	tb_check_return(head != tail);
 
 	// init

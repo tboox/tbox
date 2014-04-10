@@ -30,6 +30,13 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+/// the walk func type
+typedef tb_bool_t 	(*tb_walk_func_t)(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv);
+
+/* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
@@ -43,7 +50,7 @@
  *
  * @return 			the item count
  */
-tb_size_t 			tb_walk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_pointer_t func, tb_pointer_t priv);
+tb_size_t 			tb_walk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb_walk_func_t func, tb_pointer_t priv);
 
 /*! the walker for all
  *
@@ -53,7 +60,7 @@ tb_size_t 			tb_walk(tb_iterator_t* iterator, tb_size_t head, tb_size_t tail, tb
  *
  * @return 			the item count
  */
-tb_size_t 			tb_walk_all(tb_iterator_t* iterator, tb_cpointer_t data, tb_pointer_t func, tb_pointer_t priv);
+tb_size_t 			tb_walk_all(tb_iterator_t* iterator, tb_walk_func_t func, tb_pointer_t priv);
 
 
 #endif
