@@ -24,6 +24,7 @@
  * includes
  */
 #include <sys/poll.h>
+#include "../../../../../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -89,33 +90,29 @@ static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t* item, tb_b
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_poll_walk_sete(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_poll_walk_sete(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(vector && bdel, tb_false);
+	tb_assert_and_check_return_val(iterator, tb_false);
 
 	// the aioe
-	tb_aioe_t const* aioe = (tb_size_t)data;
+	tb_aioe_t const* aioe = (tb_size_t)priv;
 	tb_assert_and_check_return_val(aioe, tb_false);
 
 	// the aioo
 	tb_aioo_t const* aioo = aioe->aioo;
 	tb_assert_and_check_return_val(aioo && aioo->handle, tb_false);
 
-	// find and remove it
-	if (item)
+	// is this?
+	struct pollfd* pfd = (struct pollfd*)item;
+	if (pfd && pfd->fd == ((tb_long_t)aioo->handle - 1)) 
 	{
-		// is this?
-		struct pollfd* pfd = (struct pollfd*)*item;
-		if (pfd && pfd->fd == ((tb_long_t)aioo->handle - 1)) 
-		{
-			pfd->events = 0;
-			if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
-			if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN) pfd->events |= POLLOUT;
+		pfd->events = 0;
+		if (aioe->code & TB_AIOE_CODE_RECV || aioe->code & TB_AIOE_CODE_ACPT) pfd->events |= POLLIN;
+		if (aioe->code & TB_AIOE_CODE_SEND || aioe->code & TB_AIOE_CODE_CONN) pfd->events |= POLLOUT;
 
-			// break
-			return tb_false;
-		}
+		// break
+		return tb_false;
 	}
 
 	// ok
@@ -208,7 +205,7 @@ static tb_bool_t tb_aiop_reactor_poll_post(tb_aiop_reactor_t* reactor, tb_aioe_t
 
 	// sete it, TODO: sete by binary search
 	if (rtor->mutx.pfds) tb_mutex_enter(rtor->mutx.pfds);
-	tb_vector_walk(rtor->pfds, tb_poll_walk_sete, aioe);
+	tb_walk_all(rtor->pfds, tb_poll_walk_sete, aioe);
 	if (rtor->mutx.pfds) tb_mutex_leave(rtor->mutx.pfds);
 
 	// spak it

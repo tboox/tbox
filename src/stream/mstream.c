@@ -36,6 +36,7 @@
 #include "../network/network.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -207,10 +208,10 @@ static tb_bool_t tb_mstream_transfer_save(tb_size_t state, tb_hize_t offset, tb_
 	// ok?
 	return ok;
 }
-static tb_bool_t tb_mstream_transfer_working_kill(tb_dlist_t* working, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_mstream_transfer_working_kill(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
 {
 	// the transfer 
-	tb_mstream_transfer_t* transfer = item? *((tb_mstream_transfer_t**)item) : tb_null;
+	tb_mstream_transfer_t* transfer = (tb_mstream_transfer_t*)item;
 	tb_check_return_val(transfer, tb_false);
 
 	// check
@@ -222,22 +223,22 @@ static tb_bool_t tb_mstream_transfer_working_kill(tb_dlist_t* working, tb_pointe
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_mstream_transfer_working_copy(tb_dlist_t* working, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_mstream_transfer_working_copy(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
 {
 	// the transfer 
-	tb_mstream_transfer_t* transfer = item? *((tb_mstream_transfer_t**)item) : tb_null;
-	tb_check_return_val(transfer && data, tb_false);
+	tb_mstream_transfer_t* transfer = (tb_mstream_transfer_t*)item;
+	tb_check_return_val(transfer && priv, tb_false);
 
 	// save it
-	tb_dlist_insert_tail((tb_dlist_t*)data, transfer);
+	tb_dlist_insert_tail((tb_dlist_t*)priv, transfer);
 
 	// ok
 	return tb_true;
 }
-static tb_bool_t tb_mstream_transfer_waiting_exit(tb_slist_t* waiting, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_mstream_transfer_waiting_exit(tb_iterator_t* iterator, tb_pointer_t item, tb_pointer_t priv)
 {
 	// the transfer 
-	tb_mstream_transfer_t* transfer = item? *((tb_mstream_transfer_t**)item) : tb_null;
+	tb_mstream_transfer_t* transfer = (tb_mstream_transfer_t*)item;
 	tb_check_return_val(transfer, tb_false);
 
 	// exit it
@@ -340,7 +341,7 @@ tb_void_t tb_mstream_kill(tb_handle_t handle)
 		working = tb_dlist_init(mstream->conc? mstream->conc : 16, tb_item_func_ptr(tb_null, tb_null));
 
 		// copy it
-		tb_dlist_walk(mstream->working, tb_mstream_transfer_working_copy, working);
+		tb_walk_all(mstream->working, tb_mstream_transfer_working_copy, working);
 	}
 
 	// leave
@@ -349,7 +350,7 @@ tb_void_t tb_mstream_kill(tb_handle_t handle)
 	// kill it
 	if (working)
 	{
-		tb_dlist_walk(working, tb_mstream_transfer_working_kill, tb_null);
+		tb_walk_all(working, tb_mstream_transfer_working_kill, tb_null);
 		tb_dlist_exit(working);
 		working = tb_null;
 	}
@@ -408,7 +409,7 @@ tb_void_t tb_mstream_exit(tb_handle_t handle)
 	if (mstream->waiting) 
 	{
 		// exit it
-		tb_slist_walk(mstream->waiting, tb_mstream_transfer_waiting_exit, tb_null);
+		tb_walk_all(mstream->waiting, tb_mstream_transfer_waiting_exit, tb_null);
 		tb_slist_exit(mstream->waiting);
 		mstream->waiting = tb_null;
 	}

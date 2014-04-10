@@ -32,6 +32,7 @@
  * includes
  */
 #include "object.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -62,18 +63,6 @@ static __tb_inline__ tb_array_t* tb_array_cast(tb_object_t* object)
 	// cast
 	return (tb_array_t*)object;
 }
-static tb_bool_t tb_array_item_walk_incf(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
-{
-	// check
-	tb_assert_and_check_return_val(vector && item, tb_false);
-
-	// refn++
-	tb_object_t* object = *((tb_object_t**)item);
-	if (object) tb_object_inc(object);
-
-	// ok
-	return tb_true;
-}
 static tb_object_t* tb_array_copy(tb_object_t* object)
 {
 	// check
@@ -85,7 +74,10 @@ static tb_object_t* tb_array_copy(tb_object_t* object)
 	tb_assert_and_check_return_val(copy && copy->vector, tb_null);
 
 	// refn++
-	tb_vector_walk(array->vector, tb_array_item_walk_incf, tb_null);
+	tb_for_all (tb_object_t*, item, array->vector)
+	{
+		if (item) tb_object_inc(item);
+	}
 
 	// copy
 	tb_vector_copy(copy->vector, array->vector);
