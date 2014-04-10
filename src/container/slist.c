@@ -170,7 +170,7 @@ static tb_void_t tb_slist_iterator_copy(tb_iterator_t* iterator, tb_size_t itor,
 	tb_assert_and_check_return(slist && itor);
 
 	// copy
-	slist->func.copy(&slist->func, &((tb_slist_item_t const*)itor)[1], item);
+	slist->func.copy(&slist->func, (tb_pointer_t)&((tb_slist_item_t const*)itor)[1], item);
 }
 static tb_long_t tb_slist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
@@ -282,20 +282,20 @@ static tb_size_t tb_slist_detach_next(tb_slist_impl_t* slist, tb_size_t itor)
 			slist->last = 0;
 		}
 		// update head
-		else slist->head = next = tb_iterator_next(slist, midd);
+		else slist->head = next = tb_iterator_next((tb_iterator_t*)slist, midd);
 	}
 	// remove body?
 	else
 	{
 		// the midd node
-		midd = tb_iterator_next(slist, prev);
+		midd = tb_iterator_next((tb_iterator_t*)slist, prev);
 
 		// get the prev data
 		tb_slist_item_t* pprev = (tb_slist_item_t*)prev;
 		tb_assert_and_check_return_val(pprev, 0);
 
 		// the next node
-		next = tb_iterator_next(slist, midd);
+		next = tb_iterator_next((tb_iterator_t*)slist, midd);
 
 		// prev => next
 		pprev->next = next;
@@ -398,11 +398,11 @@ tb_void_t tb_slist_clear(tb_slist_t* handle)
 }
 tb_pointer_t tb_slist_head(tb_slist_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_head(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_head((tb_iterator_t*)handle));
 }
 tb_pointer_t tb_slist_last(tb_slist_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_last(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_last((tb_iterator_t*)handle));
 }
 tb_size_t tb_slist_size(tb_slist_t const* handle)
 {
@@ -526,8 +526,8 @@ tb_size_t tb_slist_nreplace(tb_slist_t* handle, tb_size_t itor, tb_cpointer_t da
 	tb_assert_and_check_return_val(slist && size, itor);
 
 	tb_size_t head = itor;
-	tb_size_t tail = tb_iterator_tail(slist);
-	for (; size-- && itor != tail; itor = tb_iterator_next(slist, itor)) 
+	tb_size_t tail = tb_iterator_tail((tb_iterator_t*)slist);
+	for (; size-- && itor != tail; itor = tb_iterator_next((tb_iterator_t*)slist, itor)) 
 		tb_slist_replace(slist, itor, data);
 	return head;
 }
@@ -588,7 +588,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* handle, tb_size_t itor)
 	tb_assert_and_check_return_val(node, itor);
 
 	// next item
-	tb_size_t next = tb_iterator_next(slist, node);
+	tb_size_t next = tb_iterator_next((tb_iterator_t*)slist, node);
 
 	// free item
 	if (slist->func.free)
@@ -656,7 +656,7 @@ tb_size_t tb_slist_moveto_next(tb_slist_t* handle, tb_size_t itor, tb_size_t mov
 	tb_assert_and_check_return_val(slist && slist->pool && move, move);
 
 	// detach move
-	tb_size_t node = tb_slist_detach_next(slist, tb_iterator_prev(slist, move));
+	tb_size_t node = tb_slist_detach_next(slist, tb_iterator_prev((tb_iterator_t*)slist, move));
 	tb_assert_and_check_return_val(node && node == move, move);
 
 	// attach move to next
@@ -670,7 +670,7 @@ tb_size_t tb_slist_moveto_tail(tb_slist_t* handle, tb_size_t move)
 {
 	return tb_slist_moveto_prev(handle, tb_iterator_tail(handle), move);
 }
-tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* slist, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
 {
 	// check
 	tb_slist_impl_t* slist = (tb_slist_impl_t*)handle;
@@ -704,7 +704,7 @@ tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* handle
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(slist, &item, &bdel, data)) stop = tb_true;
+		if (!func(slist, item, &bdel, priv)) stop = tb_true;
 
 		// free it?
 		if (bdel)
@@ -754,9 +754,6 @@ tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* handle
 		prev = itor;
 		itor = next;
 	}
-
-	// callback: tail
-	if (!func(slist, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

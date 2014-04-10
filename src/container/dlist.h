@@ -349,31 +349,25 @@ tb_size_t 			tb_dlist_maxn(tb_dlist_t const* dlist);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_dlist_item_func(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_dlist_item_func(tb_dlist_t* dlist, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
  * {
+ * 		// check
  *  	tb_assert_and_check_return_val(dlist && bdel, tb_false);
- *
- * 		// is tail?
- * 		if (!item) ;
  *
  * 		// delete it?
  * 		// *bdel = tb_true;
  *
- * 		// ok
+ * 		// continue or break
  * 		return tb_true;
- *
- * fail:
- * 		// break
- * 		return tb_false;
  * }
  * @endcode
  *
  * @param dlist 	the dlist
  * @param func 		the walk func
- * @param data 		the walk data
+ * @param priv 		the walk priv
  *
  */
-tb_void_t 			tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_dlist_walk(tb_dlist_t* dlist, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
 
 
 #endif

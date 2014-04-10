@@ -150,22 +150,15 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_hash_item_func(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv)
  * {
  * 		tb_assert_and_check_return_val(hash && bdel, tb_false);
- *
- * 		// is tail?
- * 		if (!item) ;
  *
  * 		// delete it?
  * 		// *bdel = tb_true;
  *
- * 		// ok
+ * 		// continue or break
  * 		return tb_true;
- *
- * fail:
- * 		// break
- * 		return tb_false;
  * }
  * @endcode
  *
@@ -174,7 +167,7 @@ tb_void_t 				tb_hash_dump(tb_hash_t const* hash);
  * @param data 			the walk callback data
  *
  */
-tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 				tb_hash_walk(tb_hash_t* hash, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
 
 #endif
 

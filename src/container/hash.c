@@ -30,6 +30,7 @@
 #include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../platform/platform.h"
+#include "../algorithm/algorithm.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
@@ -484,7 +485,7 @@ tb_void_t tb_hash_clear(tb_hash_t* handle)
 tb_size_t tb_hash_itor(tb_hash_t const* handle, tb_cpointer_t name)
 {
 	// check
-	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
+	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
 	tb_assert_and_check_return_val(hash, 0);
 
 	// find
@@ -495,7 +496,7 @@ tb_size_t tb_hash_itor(tb_hash_t const* handle, tb_cpointer_t name)
 tb_pointer_t tb_hash_get(tb_hash_t const* handle, tb_cpointer_t name)
 {
 	// check
-	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
+	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
 	tb_assert_and_check_return_val(hash, tb_null);
 
 	// find
@@ -624,7 +625,7 @@ tb_size_t tb_hash_maxn(tb_hash_t const* handle)
 	tb_assert_and_check_return_val(hash, 0);
 	return hash->item_maxn;
 }
-tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_hash_t* hash, tb_hash_item_t* item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
 {
 	// check
 	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
@@ -663,7 +664,7 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 				bdel = tb_false;
 
 				// callback: item
-				if (!func(hash, &item, &bdel, data)) stop = tb_true;
+				if (!func(hash, &item, &bdel, priv)) stop = tb_true;
 
 				// free it?
 				if (bdel)
@@ -732,9 +733,6 @@ tb_void_t tb_hash_walk(tb_hash_t* handle, tb_bool_t (*func)(tb_handle_t hash, tb
 		}
 	}
 
-	// callback: tail
-	if (!func(hash, tb_null, &bdel, data)) goto end;
-
 end:
 
 	return ;
@@ -743,7 +741,7 @@ end:
 tb_void_t tb_hash_dump(tb_hash_t const* handle)
 {
 	// check
-	tb_hash_impl_t const* hash = (tb_hash_impl_t const*)handle;
+	tb_hash_impl_t* hash = (tb_hash_impl_t*)handle;
 	tb_assert_and_check_return(hash && hash->hash_list);
 
 	// the step
@@ -797,29 +795,26 @@ tb_void_t tb_hash_dump(tb_hash_t const* handle)
 	}
 
 	tb_trace_i("");
-	tb_size_t itor = tb_iterator_head((tb_iterator_t*)hash);
-	tb_size_t tail = tb_iterator_tail((tb_iterator_t*)hash);
-	for (; itor != tail; itor = tb_iterator_next((tb_iterator_t*)hash, itor))
+	tb_for_all (tb_hash_item_t*, item, hash)
 	{
-		tb_hash_item_t const* item = tb_iterator_item((tb_iterator_t*)hash, itor);
 		if (item)
 		{
 			if (hash->name_func.cstr && hash->data_func.cstr) 
-				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %s", itor
+				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %s", item_itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
 			else if (hash->name_func.cstr) 
-				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %x", itor
+				tb_trace_i("item[%d] => [%d]:\t%s\t\t=> %x", item_itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, hash->name_func.cstr(&hash->name_func, item->name, name, 4096)
 					, item->data);
 			else if (hash->data_func.cstr) 
-				tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", itor
+				tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, item->name
 					, hash->data_func.cstr(&hash->data_func, item->data, data, 4096));
-			else tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", itor
+			else tb_trace_i("item[%d] => [%d]:\t%x\t\t=> %x", item_itor
 					, hash->name_func.hash(&hash->name_func, item->name, hash->hash_size)
 					, item->name
 					, item->data);

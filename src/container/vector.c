@@ -571,7 +571,7 @@ tb_void_t tb_vector_nremove_last(tb_vector_t* handle, tb_size_t size)
 	// remove last
 	tb_vector_nremove(vector, vector->size - size, size);
 }
-tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
 {
 	// check
 	tb_vector_impl_t* vector = (tb_vector_impl_t*)handle;
@@ -597,7 +597,7 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(vector, &item, &bdel, data)) stop = tb_true;
+		if (!func(vector, item, &bdel, priv)) stop = tb_true;
 
 		// free it?
 		if (bdel)
@@ -653,9 +653,6 @@ tb_void_t tb_vector_walk(tb_vector_t* handle, tb_bool_t (*func)(tb_vector_t* han
 			tb_check_goto(!stop, end);
 		}
 	}
-
-	// callback: tail
-	if (!func(vector, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

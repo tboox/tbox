@@ -166,7 +166,7 @@ static tb_void_t tb_dlist_iterator_copy(tb_iterator_t* iterator, tb_size_t itor,
 	tb_assert_and_check_return(dlist && itor);
 
 	// copy
-	dlist->func.copy(&dlist->func, &((tb_dlist_item_t const*)itor)[1], item);
+	dlist->func.copy(&dlist->func, (tb_pointer_t)&((tb_dlist_item_t const*)itor)[1], item);
 }
 static tb_long_t tb_dlist_iterator_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
 {
@@ -444,11 +444,11 @@ tb_void_t tb_dlist_clear(tb_dlist_t* handle)
 }
 tb_pointer_t tb_dlist_head(tb_dlist_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_head(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_head((tb_iterator_t*)handle));
 }
 tb_pointer_t tb_dlist_last(tb_dlist_t const* handle)
 {
-	return tb_iterator_item(handle, tb_iterator_last(handle));
+	return tb_iterator_item((tb_iterator_t*)handle, tb_iterator_last((tb_iterator_t*)handle));
 }
 tb_size_t tb_dlist_size(tb_dlist_t const* handle)
 {
@@ -576,7 +576,7 @@ tb_size_t tb_dlist_remove(tb_dlist_t* handle, tb_size_t itor)
 	tb_assert_and_check_return_val(node && node == itor, itor);
 
 	// next item
-	tb_size_t next = tb_iterator_next(dlist, node);
+	tb_size_t next = tb_iterator_next((tb_iterator_t*)dlist, node);
 
 	// free item
 	if (dlist->func.free)
@@ -645,7 +645,7 @@ tb_size_t tb_dlist_moveto_tail(tb_dlist_t* handle, tb_size_t move)
 {
 	return tb_dlist_moveto_prev(handle, tb_iterator_tail(handle), move);
 }
-tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data)
+tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* dlist, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv)
 {
 	// check
 	tb_dlist_impl_t* dlist = (tb_dlist_impl_t*)handle;
@@ -679,7 +679,7 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 		bdel = tb_false;
 
 		// callback: item
-		if (!func(dlist, &item, &bdel, data)) stop = tb_true;
+		if (!func(dlist, item, &bdel, priv)) stop = tb_true;
 
 		// free it?
 		if (bdel)
@@ -742,9 +742,6 @@ tb_void_t tb_dlist_walk(tb_dlist_t* handle, tb_bool_t (*func)(tb_dlist_t* handle
 		prev = itor;
 		itor = next;
 	}
-
-	// callback: tail
-	if (!func(dlist, tb_null, &bdel, data)) goto end;
 
 end:
 	return ;

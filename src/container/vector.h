@@ -292,31 +292,24 @@ tb_size_t 			tb_vector_maxn(tb_vector_t const* vector);
  * be faster than the iterator mode, optimizate to remove items for walking
  *
  * @code
- * tb_bool_t tb_vector_item_func(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+ * tb_bool_t tb_vector_item_func(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
  * {
  * 		// check
  * 		tb_assert_and_check_return_val(vector && bdel, tb_false);
  *
- * 		// is tail?
- * 		if (!item) ;
- *
  * 		// delete it?
  * 		// *bdel = tb_true;
  *
- * 		// ok
+ * 		// continue or break
  * 		return tb_true;
- *
- * fail:
- * 		// break
- * 		return tb_false;
  * }
  * @endcode
  *
  * @param vector 	the vector
  * @param func 		the walk func
- * @param data 		the walk data
+ * @param priv 		the walk priv
  */
-tb_void_t 			tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_vector_walk(tb_vector_t* vector, tb_bool_t (*func)(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv), tb_pointer_t priv);
 
 
 

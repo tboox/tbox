@@ -64,27 +64,23 @@ typedef struct __tb_aiop_reactor_poll_t
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t* item, tb_bool_t* bdel, tb_pointer_t data)
+static tb_bool_t tb_poll_walk_delo(tb_vector_t* vector, tb_pointer_t item, tb_bool_t* bdel, tb_pointer_t priv)
 {
 	// check
-	tb_assert_and_check_return_val(vector && bdel && data, tb_false);
+	tb_assert_and_check_return_val(vector && bdel && priv, tb_false);
 
 	// the fd
-	tb_long_t fd = (tb_long_t)data;
+	tb_long_t fd = (tb_long_t)priv;
 
-	// find and remove it
-	if (item)
+	// is this?
+	struct pollfd* pfd = (struct pollfd*)item;
+	if (pfd && pfd->fd == fd) 
 	{
-		// is this?
-		struct pollfd* pfd = (struct pollfd*)*item;
-		if (pfd && pfd->fd == fd) 
-		{
-			// remove it
-			*bdel = tb_true;
+		// remove it
+		*bdel = tb_true;
 
-			// break
-			return tb_false;
-		}
+		// break
+		return tb_false;
 	}
 
 	// ok
