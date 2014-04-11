@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		malloc.h
+ * @file		memory.h
  * @defgroup 	platform
  *
  */
-#ifndef TB_PLATFORM_MALLOC_H
-#define TB_PLATFORM_MALLOC_H
+#ifndef TB_PLATFORM_MEMORY_H
+#define TB_PLATFORM_MEMORY_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
@@ -48,7 +48,7 @@ tb_void_t 				tb_native_memory_exit(tb_noarg_t);
  *
  * @return 				the data address
  */
-tb_pointer_t 			tb_native_malloc(tb_size_t size);
+tb_pointer_t 			tb_native_memory_malloc(tb_size_t size);
 
 /*! malloc the native memory and fill zero 
  *
@@ -56,7 +56,7 @@ tb_pointer_t 			tb_native_malloc(tb_size_t size);
  *
  * @return 				the data address
  */
-tb_pointer_t 			tb_native_malloc0(tb_size_t size);
+tb_pointer_t 			tb_native_memory_malloc0(tb_size_t size);
 
 /*! malloc the native memory with the item count
  *
@@ -65,7 +65,7 @@ tb_pointer_t 			tb_native_malloc0(tb_size_t size);
  *
  * @return 				the data address
  */
-tb_pointer_t  			tb_native_nalloc(tb_size_t item, tb_size_t size);
+tb_pointer_t  			tb_native_memory_nalloc(tb_size_t item, tb_size_t size);
 
 /*! malloc the native memory with the item count and fill zero
  *
@@ -74,7 +74,7 @@ tb_pointer_t  			tb_native_nalloc(tb_size_t item, tb_size_t size);
  *
  * @return 				the data address
  */
-tb_pointer_t  			tb_native_nalloc0(tb_size_t item, tb_size_t size);
+tb_pointer_t  			tb_native_memory_nalloc0(tb_size_t item, tb_size_t size);
 
 /*! realloc the native memory
  *
@@ -83,7 +83,7 @@ tb_pointer_t  			tb_native_nalloc0(tb_size_t item, tb_size_t size);
  *
  * @return 				the new data address
  */
-tb_pointer_t 			tb_native_ralloc(tb_pointer_t data, tb_size_t size);
+tb_pointer_t 			tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size);
 
 /*! free the native memory
  *
@@ -91,7 +91,7 @@ tb_pointer_t 			tb_native_ralloc(tb_pointer_t data, tb_size_t size);
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_native_free(tb_pointer_t data);
+tb_bool_t 				tb_native_memory_free(tb_pointer_t data);
 
 #endif
 
