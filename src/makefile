@@ -258,13 +258,6 @@ tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \
 # arm
 tbox_ASM_FILES-$(ARM) 	+= utils/opt/arm/crc
 
-# pool
-ifeq ($(TB_CONFIG_MEMORY_POOL),y)
-tbox_C_FILES 			+= memory/malloc
-else
-tbox_C_FILES 			+= platform/$(TB_CONFIG_API_MEMORY)/malloc 
-endif
-
 # platform
 tbox_C_FILES 			+= \
 						platform/api \
@@ -285,6 +278,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_THRD)/thread \
 						platform/$(TB_CONFIG_API_EVENT)/event \
 						platform/$(TB_CONFIG_API_EVENT)/epool \
+						platform/$(TB_CONFIG_API_MEMORY)/malloc \
 						platform/$(TB_CONFIG_API_SEMAPHORE)/semaphore \
 						platform/$(TB_CONFIG_API_TIME)/time \
 						platform/$(TB_CONFIG_API_PRINT)/print \
@@ -330,7 +324,6 @@ INC_FILES 				= \
 						memory/scache.h \
 						memory/prefix.h \
 						memory/memory.h \
-						memory/malloc.h \
 						memory/pbuffer.h \
 						memory/sbuffer.h \
 						memory/qbuffer.h \
@@ -410,6 +403,7 @@ INC_FILES 				= \
 						platform/epool.h \
 						platform/print.h \
 						platform/atomic.h \
+						platform/malloc.h \
 						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \

@@ -23,9 +23,6 @@ TB_CONFIG_API_MEMORY 			= libc
 # third party
 TB_CONFIG_THIRD_ZLIB 			= y
 
-# memory
-TB_CONFIG_MEMORY_POOL 			= $(DEBUG)
-
 # float
 TB_CONFIG_TYPE_FLOAT 			= y
 

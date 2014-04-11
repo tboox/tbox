@@ -26,6 +26,7 @@
  * includes
  */
 #include "string.h"
+#include "../../memory/memory.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRNCPY
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strncpy.c"
@@ -89,12 +90,12 @@ tb_char_t* tb_strncpy(tb_char_t* s1, tb_char_t const* s2, tb_size_t n)
 		tb_strlen(s2);
 
 		// strncpy overflow? 
-		tb_size_t n1 = tb_malloc_data_size(s1);
+		tb_size_t n1 = tb_memory_data_size(s1);
 		if (n1 && n + 1 > n1)
 		{
 			tb_trace_i("[strncpy]: [overflow]: [%p, %lu] => [%p, %lu]", s2, n, s1, n1);
 			tb_backtrace_dump("[strncpy]: [overflow]: ", tb_null, 10);
-			tb_malloc_data_dump(s2, "\t[malloc]: [from]: ");
+			tb_memory_data_dump(s2, "\t[malloc]: [from]: ");
 			tb_abort();
 		}
 	}

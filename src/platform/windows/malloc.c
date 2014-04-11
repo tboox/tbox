@@ -26,6 +26,7 @@
  */
 #include "prefix.h"
 #include "../sched.h"
+#include "../malloc.h"
 #include "../atomic.h"
 #include "../spinlock.h"
 
@@ -40,49 +41,9 @@ static tb_handle_t 		g_heap = tb_null;
 static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT; 
 
 /* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-#ifndef TB_CONFIG_MEMORY_POOL
-tb_bool_t tb_malloc_init(tb_noarg_t);
-tb_void_t tb_malloc_exit(tb_noarg_t);
-#endif
-
-/* ///////////////////////////////////////////////////////////////////////
- * locker
- */
-static __tb_inline_force__ tb_void_t tb_malloc_lock_enter(tb_noarg_t)
-{
-	// init tryn
-	__tb_volatile__ tb_size_t tryn = 5;
-
-	// lock it
-	while (tb_atomic_fetch_and_pset(&g_lock, 0, 1))
-	{
-		if (!tryn--)
-		{
-			// yield the processor
-			tb_sched_yield();
-//			tb_usleep(1);
-
-			// reset tryn
-			tryn = 5;
-		}
-	}
-}
-static __tb_inline_force__ tb_size_t tb_malloc_lock_enter_try(tb_noarg_t)
-{
-	// try lock it
-	return !tb_atomic_fetch_and_pset(&g_lock, 0, 1);
-}
-static __tb_inline_force__ tb_void_t tb_malloc_lock_leave(tb_noarg_t)
-{
-    g_lock = 0;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_malloc_init()
+tb_bool_t tb_native_memory_init()
 {	
 	// init heap
 	tb_bool_t ok = tb_false;
@@ -94,7 +55,7 @@ tb_bool_t tb_malloc_init()
 	// ok?
 	return ok;
 }
-tb_void_t tb_malloc_exit()
+tb_void_t tb_native_memory_exit()
 {	
 	// enter 
 	tb_spinlock_enter(&g_lock);
@@ -109,7 +70,7 @@ tb_void_t tb_malloc_exit()
 	// exit lock
 	g_lock = 0;
 }
-tb_pointer_t tb_malloc(tb_size_t size)
+tb_pointer_t tb_native_malloc(tb_size_t size)
 {
 	// check
 	tb_check_return_val(size, tb_null);
@@ -129,7 +90,7 @@ tb_pointer_t tb_malloc(tb_size_t size)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_malloc0(tb_size_t size)
+tb_pointer_t tb_native_malloc0(tb_size_t size)
 {
 	// check
 	tb_check_return_val(size, tb_null);
@@ -149,17 +110,17 @@ tb_pointer_t tb_malloc0(tb_size_t size)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_nalloc(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_nalloc(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);	
 	return tb_malloc(item * size);
 }
-tb_pointer_t tb_nalloc0(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_nalloc0(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);		
 	return tb_malloc0(item * size);
 }
-tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
 {
 	if (!size) 
 	{
@@ -182,15 +143,22 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 		return data;
 	}
 }
-tb_void_t tb_free(tb_pointer_t data)
+tb_bool_t tb_native_free(tb_pointer_t data)
 {
+	// check
+	tb_check_return_val(data, tb_true);
+
 	// enter 
 	tb_spinlock_enter(&g_lock);
 
 	// free data
-	if (g_heap && data) HeapFree((HANDLE)g_heap, 0, data);
+	tb_bool_t ok = tb_false;
+	if (g_heap) ok = HeapFree((HANDLE)g_heap, 0, data)? tb_true : tb_false;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
+
+	// ok?
+	return ok;
 }
 

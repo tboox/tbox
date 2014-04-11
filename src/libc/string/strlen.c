@@ -26,6 +26,7 @@
  * includes
  */
 #include "string.h"
+#include "../../memory/memory.h"
 #ifndef TB_CONFIG_LIBC_HAVE_STRLEN
 # 	if defined(TB_ARCH_x86)
 # 		include "opt/x86/strlen.c"
@@ -80,7 +81,7 @@ tb_size_t tb_strlen(tb_char_t const* s)
 #ifdef __tb_debug__
 	{
 		// overflow? 
-		tb_size_t size = tb_malloc_data_size(s);
+		tb_size_t size = tb_memory_data_size(s);
 		if (size)
 		{
 			// no '\0'?
@@ -89,7 +90,7 @@ tb_size_t tb_strlen(tb_char_t const* s)
 			{
 				tb_trace_i("[strlen]: [overflow]: [%p, %lu]", s, size);
 				tb_backtrace_dump("[strlen]: [overflow]: ", tb_null, 10);
-				tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
+				tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 				tb_abort();
 			}
 		}

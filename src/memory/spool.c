@@ -25,9 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "spool.h"
-#include "vpool.h"
-#include "malloc.h"
+#include "memory.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"

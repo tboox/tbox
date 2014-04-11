@@ -79,8 +79,8 @@ extern "C" {
 
 /*! init the tbox library
  *
- * @param data 		the memory data, uses it when TB_CONFIG_MEMORY_POOL is enabled
- * @param size 		the memory size, uses it when TB_CONFIG_MEMORY_POOL is enabled
+ * @param data 		the memory data, using the native memory if be tb_null
+ * @param size 		the memory size, using the native memory if be zero
  * @param mode 		the compile mode for check __tb_small__ and __tb_debug__
  * @param build 	the build version
  *

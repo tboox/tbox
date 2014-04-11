@@ -25,47 +25,40 @@
  * includes
  */
 #include "prefix.h"
+#include "../malloc.h"
 #include <stdlib.h>
-
-/* ///////////////////////////////////////////////////////////////////////
- * declaration
- */
-#ifndef TB_CONFIG_MEMORY_POOL
-tb_bool_t tb_malloc_init(tb_noarg_t);
-tb_void_t tb_malloc_exit(tb_noarg_t);
-#endif
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_malloc_init()
+tb_bool_t tb_native_memory_init()
 {
 	return tb_true;
 }
-tb_void_t tb_malloc_exit()
+tb_void_t tb_native_memory_exit()
 {
 }
-tb_pointer_t tb_malloc(tb_size_t size)
+tb_pointer_t tb_native_malloc(tb_size_t size)
 {
 	tb_check_return_val(size, tb_null);
 	return malloc(size);
 }
-tb_pointer_t tb_malloc0(tb_size_t size)
+tb_pointer_t tb_native_malloc0(tb_size_t size)
 {
 	tb_check_return_val(size, tb_null);	
 	return calloc(1, size);
 }
-tb_pointer_t tb_nalloc(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_nalloc(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);	
 	return malloc(item * size);
 }
-tb_pointer_t tb_nalloc0(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_nalloc0(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);		
 	return calloc(item, size);
 }
-tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
 {
 	if (!size) 
 	{
@@ -75,8 +68,9 @@ tb_pointer_t tb_ralloc(tb_pointer_t data, tb_size_t size)
 	else if (!data) return malloc(size);
 	else return realloc(data, size);
 }
-tb_void_t tb_free(tb_pointer_t data)
+tb_bool_t tb_native_free(tb_pointer_t data)
 {
 	if (data) free(data);
+	return tb_true;
 }
 

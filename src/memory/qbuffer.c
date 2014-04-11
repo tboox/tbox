@@ -25,8 +25,7 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "qbuffer.h"
-#include "malloc.h"
+#include "memory.h"
 #include "../libc/libc.h"
 #include "../utils/utils.h"
 
