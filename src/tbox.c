@@ -27,30 +27,12 @@
 #include "tbox.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * globals
  */
 
-// vtag: debug
-#ifdef __tb_debug__
-# 	define TB_VTAG_DEBUG 							debug
-#else
-# 	define TB_VTAG_DEBUG 							release
-#endif
+// the initial count
+static tb_atomic_t 	g_init = 0;
 
-// vtag: small
-#ifdef __tb_small__
-# 	define TB_VTAG_SMALL 							small
-#else
-# 	define TB_VTAG_SMALL 							large
-#endif
-
-#if 0
-// vtag: version
-#define TB_VTAG_VERSION_STRING(version) 			#version
-#define TB_VTAG_VERSION_MAKE(debug, small, major, minor, alter, build) 	\
-													TB_VTAG_VERSION_STRING(debug-small-major.minor.alter.build)
-#define TB_VTAG_VERSION 							TB_VTAG_VERSION_MAKE(TB_VTAG_DEBUG, TB_VTAG_SMALL, TB_VERSION_MAJOR, TB_VERSION_MINOR, TB_VERSION_ALTER, TB_CONFIG_VERSION_BUILD)
-#endif
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
@@ -145,6 +127,9 @@ static __tb_inline__ tb_bool_t tb_version_check(tb_hize_t build)
 
 tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_hize_t build)
 {
+	// is inited?
+	if (tb_atomic_fetch_and_inc(&g_init)) return tb_true;
+
 	// init trace
 	if (!tb_trace_init()) return tb_false;
 
@@ -197,6 +182,13 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 }
 tb_void_t tb_exit()
 {
+	// need exit?
+	tb_long_t init = 0;
+	if ((init = tb_atomic_dec_and_fetch(&g_init)) > 0) return ;
+
+	// check
+	tb_assert_and_check_return(!init);
+
 	// exit object
 	tb_object_context_exit();
 	
