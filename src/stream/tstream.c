@@ -167,7 +167,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 
 		// save size
 		tstream->save += real;
-
+	
 		// < 1s?
 		tb_size_t delay = 0;
 		tb_size_t lrate = tb_atomic_get(&tstream->lrate);

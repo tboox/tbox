@@ -79,11 +79,46 @@ static tb_bool_t tb_astream_cwrit_func(tb_astream_t* astream, tb_size_t state, t
 	// check
 	tb_assert_and_check_return_val(astream && astream->wcache_and.writ.func, tb_false);
 
-	// move cache
-	if (real) tb_pbuffer_memmov(&astream->wcache_data, real);
+	// done
+	tb_bool_t bwrit = tb_true;
+	do
+	{
+		// check
+		tb_check_break(state == TB_STATE_OK);
 
-	// done func
-	return astream->wcache_and.writ.func(astream, state, data, real, size, priv);
+		// finished?
+		if (real == size)
+		{
+			// trace
+			tb_trace_d("cache: writ: %lu: ok", astream->wcache_and.writ.size);
+
+			// clear cache
+			tb_pbuffer_clear(&astream->wcache_data);
+	
+			// done func
+			astream->wcache_and.writ.func(astream, TB_STATE_OK, astream->wcache_and.writ.data, astream->wcache_and.writ.size, astream->wcache_and.writ.size, priv);
+
+			// break
+			bwrit = tb_false;
+		}
+
+	} while (0);
+
+	// failed? 
+	if (state != TB_STATE_OK)
+	{
+		// trace
+		tb_trace_d("cache: writ: %lu: failed: %s", astream->wcache_and.writ.size, tb_state_cstr(state));
+
+		// done func
+		astream->wcache_and.writ.func(astream, state, astream->wcache_and.writ.data, 0, astream->wcache_and.writ.size, priv);
+
+		// break
+		bwrit = tb_false;
+	}
+
+	// continue writing?
+	return bwrit;
 }
 static tb_bool_t tb_astream_cwrit_done(tb_astream_t* astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
@@ -95,22 +130,32 @@ static tb_bool_t tb_astream_cwrit_done(tb_astream_t* astream, tb_size_t delay, t
 	if (astream->wcache_maxn)
 	{
 		// writ data to cache 
-		if (data && size) data = tb_pbuffer_memncat(&astream->wcache_data, data, size);
-		else data = tb_pbuffer_data(&astream->wcache_data);
-		size = tb_pbuffer_size(&astream->wcache_data);
+		if (data && size) tb_pbuffer_memncat(&astream->wcache_data, data, size);
 
+		// the writ data and size
+		tb_byte_t const* 	writ_data = tb_pbuffer_data(&astream->wcache_data);
+		tb_size_t 			writ_size = tb_pbuffer_size(&astream->wcache_data);
+	
 		// no full? writ ok
-		if (size < astream->wcache_maxn)
+		if (writ_size < astream->wcache_maxn)
 		{
+			// trace
+			tb_trace_d("cache: writ: %lu: ok", size);
+
 			// done func
 			func(astream, TB_STATE_OK, data, size, size, priv);
 			ok = tb_true;
 		}
 		else
 		{
+			// trace
+			tb_trace_d("cache: writ: %lu: ..", size);
+
 			// writ it
 			astream->wcache_and.writ.func = func;
-			ok = astream->writ(astream, delay, data, size, tb_astream_cwrit_func, priv);
+			astream->wcache_and.writ.data = data;
+			astream->wcache_and.writ.size = size;
+			ok = astream->writ(astream, delay, writ_data, writ_size, tb_astream_cwrit_func, priv);
 		}
 	}
 	// writ it

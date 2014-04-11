@@ -1233,6 +1233,9 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		// ok
 		if (r > 0)
 		{
+			// opened
+			tb_atomic_set(&ssl->bopened, 1);
+
 			// done func
 			func(ssl, TB_STATE_OK, priv);
 		}
