@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		malloc.c
+ * @file		memory.c
  *
  */
 
@@ -25,7 +25,7 @@
  * includes
  */
 #include "prefix.h"
-#include "../malloc.h"
+#include "../memory.h"
 #include <stdlib.h>
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -38,27 +38,39 @@ tb_bool_t tb_native_memory_init()
 tb_void_t tb_native_memory_exit()
 {
 }
-tb_pointer_t tb_native_malloc(tb_size_t size)
+tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
+	// check
 	tb_check_return_val(size, tb_null);
+
+	// malloc it
 	return malloc(size);
 }
-tb_pointer_t tb_native_malloc0(tb_size_t size)
+tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
+	// check
 	tb_check_return_val(size, tb_null);	
+
+	// malloc0 it
 	return calloc(1, size);
 }
-tb_pointer_t tb_native_nalloc(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
+	// check
 	tb_check_return_val(item && size, tb_null);	
+
+	// nalloc it
 	return malloc(item * size);
 }
-tb_pointer_t tb_native_nalloc0(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
-	tb_check_return_val(item && size, tb_null);		
+	// check
+	tb_check_return_val(item && size, tb_null);
+
+	// nalloc0 it
 	return calloc(item, size);
 }
-tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
 	if (!size) 
 	{
@@ -68,7 +80,7 @@ tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
 	else if (!data) return malloc(size);
 	else return realloc(data, size);
 }
-tb_bool_t tb_native_free(tb_pointer_t data)
+tb_bool_t tb_native_memory_free(tb_pointer_t data)
 {
 	if (data) free(data);
 	return tb_true;

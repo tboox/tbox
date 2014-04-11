@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		malloc.c
+ * @file		memory.c
  *
  */
 
@@ -26,7 +26,7 @@
  */
 #include "prefix.h"
 #include "../sched.h"
-#include "../malloc.h"
+#include "../memory.h"
 #include "../atomic.h"
 #include "../spinlock.h"
 
@@ -70,7 +70,7 @@ tb_void_t tb_native_memory_exit()
 	// exit lock
 	g_lock = 0;
 }
-tb_pointer_t tb_native_malloc(tb_size_t size)
+tb_pointer_t tb_native_memory_malloc(tb_size_t size)
 {
 	// check
 	tb_check_return_val(size, tb_null);
@@ -90,7 +90,7 @@ tb_pointer_t tb_native_malloc(tb_size_t size)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_native_malloc0(tb_size_t size)
+tb_pointer_t tb_native_memory_malloc0(tb_size_t size)
 {
 	// check
 	tb_check_return_val(size, tb_null);
@@ -110,17 +110,17 @@ tb_pointer_t tb_native_malloc0(tb_size_t size)
 	// ok?
 	return data;
 }
-tb_pointer_t tb_native_nalloc(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_memory_nalloc(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);	
 	return tb_malloc(item * size);
 }
-tb_pointer_t tb_native_nalloc0(tb_size_t item, tb_size_t size)
+tb_pointer_t tb_native_memory_nalloc0(tb_size_t item, tb_size_t size)
 {
 	tb_check_return_val(item && size, tb_null);		
 	return tb_malloc0(item * size);
 }
-tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
+tb_pointer_t tb_native_memory_ralloc(tb_pointer_t data, tb_size_t size)
 {
 	if (!size) 
 	{
@@ -143,7 +143,7 @@ tb_pointer_t tb_native_ralloc(tb_pointer_t data, tb_size_t size)
 		return data;
 	}
 }
-tb_bool_t tb_native_free(tb_pointer_t data)
+tb_bool_t tb_native_memory_free(tb_pointer_t data)
 {
 	// check
 	tb_check_return_val(data, tb_true);

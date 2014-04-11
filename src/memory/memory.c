@@ -133,7 +133,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__)
 	tb_spinlock_leave(&g_lock);
 
 	// malloc it from the native memory
-	if (!pool) data = tb_native_malloc(size);
+	if (!pool) data = tb_native_memory_malloc(size);
 
 	// ok?
 	return data;
@@ -153,7 +153,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__)
 	tb_spinlock_leave(&g_lock);
 
 	// malloc0 it from the native memory
-	if (!pool) data = tb_native_malloc0(size);
+	if (!pool) data = tb_native_memory_malloc0(size);
 
 	// ok?
 	return data;
@@ -173,7 +173,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_dec
 	tb_spinlock_leave(&g_lock);
 
 	// nalloc it from the native memory
-	if (!pool) data = tb_native_nalloc(item, size);
+	if (!pool) data = tb_native_memory_nalloc(item, size);
 
 	// ok?
 	return data;
@@ -193,7 +193,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_de
 	tb_spinlock_leave(&g_lock);
 	
 	// nalloc0 it from the native memory
-	if (!pool) data = tb_native_nalloc0(item, size);
+	if (!pool) data = tb_native_memory_nalloc0(item, size);
 
 	// ok?
 	return data;
@@ -207,13 +207,13 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_
 	tb_handle_t pool = g_pool;
 
 	// ralloc
-	data = pool? tb_gpool_ralloc_impl(pool, data, size __tb_debug_args__) : tb_null;
+	if (pool) data = tb_gpool_ralloc_impl(pool, data, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
 	
 	// ralloc it from the native memory
-	if (!pool) data = tb_native_ralloc(data, size);
+	if (!pool) data = tb_native_memory_ralloc(data, size);
 
 	// ok?
 	return data;
@@ -236,7 +236,7 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__)
 	tb_spinlock_leave(&g_lock);
 	
 	// free it from the native memory
-	if (!pool) ok = tb_native_free(data);
+	if (!pool) ok = tb_native_memory_free(data);
 
 	// ok?
 	return ok;

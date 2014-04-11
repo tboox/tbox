@@ -278,7 +278,7 @@ tbox_C_FILES 			+= \
 						platform/$(TB_CONFIG_API_THRD)/thread \
 						platform/$(TB_CONFIG_API_EVENT)/event \
 						platform/$(TB_CONFIG_API_EVENT)/epool \
-						platform/$(TB_CONFIG_API_MEMORY)/malloc \
+						platform/$(TB_CONFIG_API_MEMORY)/memory \
 						platform/$(TB_CONFIG_API_SEMAPHORE)/semaphore \
 						platform/$(TB_CONFIG_API_TIME)/time \
 						platform/$(TB_CONFIG_API_PRINT)/print \
@@ -403,7 +403,7 @@ INC_FILES 				= \
 						platform/epool.h \
 						platform/print.h \
 						platform/atomic.h \
-						platform/malloc.h \
+						platform/memory.h \
 						platform/barrier.h \
 						platform/dynamic.h \
 						platform/process.h \
