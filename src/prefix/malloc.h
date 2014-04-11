@@ -27,36 +27,27 @@
  * includes
  */
 #include "config.h"
-#ifdef TB_CONFIG_MEMORY_POOL
-# 	include "../memory/malloc.h"
-#endif
+#include "keyword.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * macros
  */
+#define tb_malloc(size) 			tb_memory_malloc_impl(size __tb_debug_vals__)
+#define tb_malloc0(size) 			tb_memory_malloc0_impl(size __tb_debug_vals__)
+#define tb_nalloc(item, size) 		tb_memory_nalloc_impl(item, size __tb_debug_vals__)
+#define tb_nalloc0(item, size) 		tb_memory_nalloc0_impl(item, size __tb_debug_vals__)
+#define tb_ralloc(data, size) 		tb_memory_ralloc_impl(data, size __tb_debug_vals__)
+#define tb_free(data) 				tb_memory_free_impl(data __tb_debug_vals__)
 
-// malloc & free
-#ifdef TB_CONFIG_MEMORY_POOL
-#	define tb_malloc(size) 				tb_malloc_malloc(size)
-#	define tb_malloc0(size) 			tb_malloc_malloc0(size)
-
-#	define tb_nalloc(item, size) 		tb_malloc_nalloc(item, size)
-#	define tb_nalloc0(item, size) 		tb_malloc_nalloc0(item, size)
-
-#	define tb_ralloc(data, size) 		tb_malloc_ralloc(data, size)
-# 	define tb_free(data) 				tb_malloc_free(data)
-#else
-
-tb_pointer_t 	tb_malloc(tb_size_t size);
-tb_pointer_t 	tb_malloc0(tb_size_t size);
-
-tb_pointer_t 	tb_nalloc(tb_size_t item, tb_size_t size);
-tb_pointer_t 	tb_nalloc0(tb_size_t item, tb_size_t size);
-
-tb_pointer_t 	tb_ralloc(tb_pointer_t data, tb_size_t size);
-tb_void_t 		tb_free(tb_pointer_t data);
-
-#endif
+/* ///////////////////////////////////////////////////////////////////////
+ * declaration
+ */
+tb_pointer_t 	tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t  	tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_decl__);
+tb_pointer_t 	tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_decl__);
+tb_bool_t 		tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__);
 
 
 #endif

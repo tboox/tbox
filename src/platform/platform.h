@@ -44,6 +44,7 @@
 #include "socket.h"
 #include "thread.h"
 #include "atomic.h"
+#include "malloc.h"
 #include "barrier.h"
 #include "dynamic.h"
 #include "process.h"

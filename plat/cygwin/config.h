@@ -24,9 +24,6 @@
 #define TB_CONFIG_TYPE_FLOAT
 
 // memory
-#if TB_CONFIG_DEBUG
-# 	define TB_CONFIG_MEMORY_POOL
-#endif
 //#define TB_CONFIG_MEMORY_UNALIGNED_ACCESS_ENABLE
 
 // exception

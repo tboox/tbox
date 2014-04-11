@@ -26,6 +26,7 @@
  * includes
  */
 #include "string.h"
+#include "../../memory/memory.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces 
@@ -40,12 +41,12 @@ tb_pointer_t tb_memdup(tb_cpointer_t s, tb_size_t n)
 #ifdef __tb_debug__
 	{
 		// overflow?
-		tb_size_t size = tb_malloc_data_size(s);
+		tb_size_t size = tb_memory_data_size(s);
 		if (size && n > size)
 		{
 			tb_trace_i("[memdup]: [overflow]: [%p, %lu] from [%p, %lu]", s, n, s, size);
 			tb_backtrace_dump("[memdup]: [overflow]: ", tb_null, 10);
-			tb_malloc_data_dump(s, "\t[malloc]: [from]: ");
+			tb_memory_data_dump(s, "\t[malloc]: [from]: ");
 			tb_abort();
 		}
 	}

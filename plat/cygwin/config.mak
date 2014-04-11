@@ -20,9 +20,6 @@ TB_CONFIG_API_PRINT 			= unix
 TB_CONFIG_API_PROCESS 			= unix
 TB_CONFIG_API_MEMORY 			= libc
 
-# memory
-TB_CONFIG_MEMORY_POOL 			= $(DEBUG)
-
 # float
 TB_CONFIG_TYPE_FLOAT 			= y
 
