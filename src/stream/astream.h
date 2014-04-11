@@ -196,6 +196,12 @@ typedef struct __tb_astream_cwrit_t
 	/// the func
 	tb_astream_writ_func_t 		func;
 
+	/// the data
+	tb_byte_t const* 			data;
+
+	/// the size
+	tb_size_t 					size;
+
 }tb_astream_cwrit_t;
 
 /// the astream cache and sync type

@@ -67,14 +67,18 @@ tb_int_t tb_demo_asio_http_main(tb_int_t argc, tb_char_t** argv)
 	// init head func
 	if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_HEAD_FUNC, tb_demo_aicp_http_head_func)) goto end;
 
-	// init post url
-	if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) goto end;
+	// init post
+	if (argv[2])
+	{
+		// init post url
+		if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_URL, argv[2])) goto end;
 
-	// init post func
-	if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_FUNC, tb_demo_aicp_http_post_func)) goto end;
+		// init post func
+		if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_POST_FUNC, tb_demo_aicp_http_post_func)) goto end;
 
-	// init method
-	if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_METHOD, argv[2]? TB_HTTP_METHOD_POST : TB_HTTP_METHOD_GET)) goto end;
+		// init method
+		if (!tb_aicp_http_option(http, TB_HTTP_OPTION_SET_METHOD, TB_HTTP_METHOD_POST)) goto end;
+	}
 
 	// open and read 
 	if (!tb_aicp_http_oread(http, 0, tb_demo_aicp_http_read_func, aicp)) goto end;
