@@ -653,6 +653,9 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	// read it
 	tb_long_t real = SSL_read(ssl->ssl, data, size);
 
+	// trace
+	tb_trace_d("read: %ld", real);
+
 	// done
 	if (real <= 0)
 	{
@@ -691,9 +694,6 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 		}
 	}
 
-	// trace
-	tb_trace_d("read: %ld", real);
-
 	// ok
 	return real;
 }
@@ -705,6 +705,9 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 
 	// writ it
 	tb_long_t real = SSL_write(ssl->ssl, data, size);
+
+	// trace
+	tb_trace_d("writ: %ld", real);
 
 	// done
 	if (real <= 0)
@@ -743,9 +746,6 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 			return -1;
 		}
 	}
-
-	// trace
-	tb_trace_d("writ: %ld", real);
 
 	// ok
 	return real;
