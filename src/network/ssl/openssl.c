@@ -657,13 +657,13 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 	tb_trace_d("read: %ld", real);
 
 	// done
-	if (real <= 0)
+	if (real < 0)
 	{
 		// the error
 		tb_long_t error = SSL_get_error(ssl->ssl, real);
 
 		// want read? continue it
-		if (error == SSL_ERROR_WANT_READ || !real)
+		if (error == SSL_ERROR_WANT_READ)
 		{
 			// trace
 			tb_trace_d("read: want read");
@@ -693,6 +693,16 @@ tb_long_t tb_ssl_read(tb_handle_t handle, tb_byte_t* data, tb_size_t size)
 			return -1;
 		}
 	}
+	// closed?
+	else if (!real)
+	{
+		// trace
+		tb_trace_d("read: closed");
+
+		// save state
+		ssl->state = TB_STATE_CLOSED;
+		return -1;
+	}
 
 	// ok
 	return real;
@@ -710,7 +720,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 	tb_trace_d("writ: %ld", real);
 
 	// done
-	if (real <= 0)
+	if (real < 0)
 	{
 		// the error
 		tb_long_t error = SSL_get_error(ssl->ssl, real);
@@ -726,7 +736,7 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 			return 0;
 		}
 		// want writ? continue it
-		else if (error == SSL_ERROR_WANT_WRITE || !real)
+		else if (error == SSL_ERROR_WANT_WRITE)
 		{
 			// trace
 			tb_trace_d("writ: want writ");
@@ -745,6 +755,16 @@ tb_long_t tb_ssl_writ(tb_handle_t handle, tb_byte_t const* data, tb_size_t size)
 			ssl->state = TB_STATE_SOCK_SSL_FAILED;
 			return -1;
 		}
+	}
+	// closed?
+	else if (!real)
+	{
+		// trace
+		tb_trace_d("read: closed");
+
+		// save state
+		ssl->state = TB_STATE_CLOSED;
+		return -1;
 	}
 
 	// ok

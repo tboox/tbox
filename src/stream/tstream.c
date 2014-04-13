@@ -297,7 +297,15 @@ static tb_bool_t tb_tstream_istream_read_func(tb_astream_t* astream, tb_size_t s
 		}
 
 		// check
-		tb_assert_and_check_break(data && real);
+		tb_assert_and_check_break(data);
+
+		// no data? continue it
+		if (!real)
+		{
+			bread = tb_true;
+			state = TB_STATE_OK;
+			break;
+		}
 
 		// for astream
 		if (tb_stream_mode(tstream->ostream) == TB_STREAM_MODE_AICO)
