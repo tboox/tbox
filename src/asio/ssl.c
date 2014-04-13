@@ -142,11 +142,11 @@ typedef struct __tb_aicp_ssl_t
 		// the post delay
 		tb_size_t 			delay;
 
-		// post read?
-		tb_bool_t 			read;
+		// have post?
+		tb_bool_t 			bpost;
 
-		// post writ?
-		tb_bool_t 			writ;
+		// the real size
+		tb_long_t 			real;
 
 	} 						post;
 
@@ -161,12 +161,6 @@ typedef struct __tb_aicp_ssl_t
 
 	// the writ data
 	tb_pbuffer_t 			writ_data;
-
-	// the read real size
-	tb_long_t 				read_real;
-
-	// the writ real size
-	tb_long_t 				writ_real;
 
 }tb_aicp_ssl_t;
 
@@ -184,13 +178,13 @@ static tb_long_t tb_aicp_ssl_fill_read(tb_aicp_ssl_t* ssl, tb_byte_t* data, tb_s
 	{
 		// check
 		tb_assert_and_check_break(ssl->aico);
-		tb_assert_and_check_break(data && size && ssl->read_real >= 0);
+		tb_assert_and_check_break(data && size && ssl->post.real >= 0);
 
 		// save real
-		tb_size_t read_real = ssl->read_real;
+		tb_size_t read_real = ssl->post.real;
 
 		// clear real
-		ssl->read_real = -1;
+		ssl->post.real = -1;
 
 		// check
 		tb_assert_and_check_break(read_real <= size);
@@ -225,13 +219,13 @@ static tb_long_t tb_aicp_ssl_fill_writ(tb_aicp_ssl_t* ssl, tb_byte_t const* data
 	{
 		// check
 		tb_assert_and_check_break(ssl->aico);
-		tb_assert_and_check_break(size && ssl->writ_real >= 0);
+		tb_assert_and_check_break(size && ssl->post.real >= 0);
 
 		// save real
-		tb_size_t writ_real = ssl->writ_real;
+		tb_size_t writ_real = ssl->post.real;
 
 		// clear real
-		ssl->writ_real = -1;
+		ssl->post.real = -1;
 
 		// check
 		tb_assert_and_check_break(writ_real <= size);
@@ -267,8 +261,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
 	do
 	{
 		// clear post
-		if (aice->code == TB_AICE_CODE_RECV) ssl->post.read = tb_false;
-		else ssl->post.writ = tb_false;
+		ssl->post.bpost = tb_false;
 
 		// failed or closed?
 		if (aice->state != TB_STATE_OK)
@@ -278,8 +271,11 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
 		}
 
 		// save the real size
-		ssl->read_real = real;
+		ssl->post.real = real;
 
+		// trace
+		tb_trace_d("open: done: try: ..");
+	
 		// try opening it
 		tb_long_t ok = tb_ssl_open_try(ssl->ssl);
 
@@ -303,7 +299,7 @@ static tb_bool_t tb_aicp_ssl_open_done(tb_aice_t const* aice)
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
@@ -345,8 +341,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
 	do
 	{
 		// clear post
-		if (aice->code == TB_AICE_CODE_RECV) ssl->post.read = tb_false;
-		else ssl->post.writ = tb_false;
+		ssl->post.bpost = tb_false;
 
 		// failed or closed?
 		if (aice->state != TB_STATE_OK)
@@ -356,7 +351,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
 		}
 
 		// save the real size
-		ssl->read_real = real;
+		ssl->post.real = real;
 
 		// trace
 		tb_trace_d("read: done: try: %lu: ..", ssl->func.read.size);
@@ -381,7 +376,7 @@ static tb_bool_t tb_aicp_ssl_read_done(tb_aice_t const* aice)
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
@@ -426,8 +421,7 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
 	do
 	{
 		// clear post
-		if (aice->code == TB_AICE_CODE_RECV) ssl->post.read = tb_false;
-		else ssl->post.writ = tb_false;
+		ssl->post.bpost = tb_false;
 
 		// failed or closed?
 		if (aice->state != TB_STATE_OK)
@@ -437,7 +431,7 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
 		}
 
 		// save the real size
-		ssl->read_real = real;
+		ssl->post.real = real;
 
 		// trace
 		tb_trace_d("writ: done: try: %lu: ..", ssl->func.writ.size);
@@ -462,7 +456,7 @@ static tb_bool_t tb_aicp_ssl_writ_done(tb_aice_t const* aice)
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
@@ -491,14 +485,14 @@ static tb_long_t tb_aicp_ssl_post_read(tb_pointer_t priv, tb_byte_t* data, tb_si
 {
 	// check
 	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-	tb_assert_and_check_return_val(ssl && ssl->post.func, -1);
+	tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.bpost, -1);
 
 	// done
 	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
 	do
 	{
 		// fill to read it?
-		if (ssl->read_real >= 0) return tb_aicp_ssl_fill_read(ssl, data, size);
+		if (ssl->post.real >= 0) return tb_aicp_ssl_fill_read(ssl, data, size);
 
 		// resize data
 		if (tb_pbuffer_size(&ssl->read_data) < size)
@@ -516,10 +510,10 @@ static tb_long_t tb_aicp_ssl_post_read(tb_pointer_t priv, tb_byte_t* data, tb_si
 		tb_assert_and_check_break(ssl->aico);
 
 		// post read
-		ssl->post.read = tb_true;
+		ssl->post.bpost = tb_true;
 		if (!tb_aico_recv_after(ssl->aico, ssl->post.delay, read_data, size, ssl->post.func, ssl)) 
 		{
-			ssl->post.read = tb_false;
+			ssl->post.bpost = tb_false;
 			break;
 		}
 
@@ -538,14 +532,14 @@ static tb_long_t tb_aicp_ssl_post_writ(tb_pointer_t priv, tb_byte_t const* data,
 {
 	// check
 	tb_aicp_ssl_t* ssl = (tb_aicp_ssl_t*)priv;
-	tb_assert_and_check_return_val(ssl && ssl->post.func, -1);
+	tb_assert_and_check_return_val(ssl && ssl->post.func && !ssl->post.bpost, -1);
 
 	// done
 	tb_size_t state = TB_STATE_SOCK_SSL_UNKNOWN_ERROR;
 	do
 	{
 		// fill to writ it?
-		if (ssl->writ_real >= 0) return tb_aicp_ssl_fill_writ(ssl, data, size);
+		if (ssl->post.real >= 0) return tb_aicp_ssl_fill_writ(ssl, data, size);
 
 		// save data
 		tb_pbuffer_memncpy(&ssl->writ_data, data, size);
@@ -562,10 +556,10 @@ static tb_long_t tb_aicp_ssl_post_writ(tb_pointer_t priv, tb_byte_t const* data,
 		tb_assert_and_check_break(ssl->aico);
 
 		// post writ
-		ssl->post.writ = tb_true;
+		ssl->post.bpost = tb_true;
 		if (!tb_aico_send_after(ssl->aico, ssl->post.delay, writ_data, writ_size, ssl->post.func, ssl)) 
 		{
-			ssl->post.writ = tb_false;
+			ssl->post.bpost = tb_false;
 			break;
 		}
 
@@ -753,8 +747,8 @@ tb_void_t tb_aicp_ssl_clos(tb_handle_t handle, tb_bool_t bcalling)
 	tb_pbuffer_clear(&ssl->writ_data);
 
 	// clear real
-	ssl->read_real = 0;
-	ssl->writ_real = 0;
+	ssl->post.real = 0;
+	ssl->post.real = 0;
 
 	// clear opened
 	tb_atomic_set0(&ssl->bopened);
@@ -838,15 +832,11 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 		ssl->func.open.func = func;
 		ssl->func.open.priv = priv;
 
-		// clear real
-		ssl->read_real = -1;
-		ssl->writ_real = -1;
-
 		// init post
 		ssl->post.func = tb_aicp_ssl_open_done;
-		ssl->post.read 	= tb_false;
-		ssl->post.writ 	= tb_false;
 		ssl->post.delay = 0;
+		ssl->post.bpost = tb_false;
+		ssl->post.real = -1;
 
 		// init post func
 		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
@@ -871,7 +861,7 @@ tb_bool_t tb_aicp_ssl_open(tb_handle_t handle, tb_aicp_ssl_open_func_t func, tb_
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
@@ -923,15 +913,11 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
 		ssl->func.read.data 	= data;
 		ssl->func.read.size 	= size;
 
-		// clear real
-		ssl->read_real = -1;
-		ssl->writ_real = -1;
-
 		// init post
 		ssl->post.func 	= tb_aicp_ssl_read_done;
-		ssl->post.read 	= tb_false;
-		ssl->post.writ 	= tb_false;
 		ssl->post.delay = delay;
+		ssl->post.bpost = tb_false;
+		ssl->post.real = -1;
 
 		// init post func
 		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
@@ -953,7 +939,7 @@ tb_bool_t tb_aicp_ssl_read_after(tb_handle_t handle, tb_size_t delay, tb_byte_t*
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
@@ -997,15 +983,11 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
 		ssl->func.writ.data 	= data;
 		ssl->func.writ.size 	= size;
 
-		// clear real
-		ssl->read_real = -1;
-		ssl->writ_real = -1;
-
 		// init post
-		ssl->post.func = tb_aicp_ssl_writ_done;
-		ssl->post.read 	= tb_false;
-		ssl->post.writ 	= tb_false;
+		ssl->post.func 	= tb_aicp_ssl_writ_done;
 		ssl->post.delay = delay;
+		ssl->post.bpost = tb_false;
+		ssl->post.real 	= -1;
 
 		// init post func
 		tb_ssl_set_bio_func(ssl->ssl, tb_aicp_ssl_post_read, tb_aicp_ssl_post_writ, tb_null, ssl);
@@ -1027,7 +1009,7 @@ tb_bool_t tb_aicp_ssl_writ_after(tb_handle_t handle, tb_size_t delay, tb_byte_t 
 			break;
 		}
 		// have post? continue it
-		else if (ssl->post.read || ssl->post.writ) ;
+		else if (ssl->post.bpost) ;
 		else
 		{
 			// trace
