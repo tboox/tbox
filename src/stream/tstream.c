@@ -161,7 +161,7 @@ static tb_bool_t tb_tstream_ostream_writ_func(tb_astream_t* astream, tb_size_t s
 			
 		// reset state
 		state = TB_STATE_UNKNOWN_ERROR;
-			
+
 		// done func at first once
 		if (!tstream->save && !tstream->func.save.func(TB_STATE_OK, tb_stream_offset(tstream->istream), tb_stream_size(tstream->istream), 0, 0, tstream->func.save.priv)) break;
 
