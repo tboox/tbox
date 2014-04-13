@@ -112,6 +112,9 @@ typedef struct __tb_aicp_http_t
 	// the cache data
 	tb_pbuffer_t 					cache_data;
 
+	// the cache read
+	tb_size_t 						cache_read;
+
 	// the redirect read
 	tb_hize_t 						redirect_read;
 
@@ -941,6 +944,7 @@ static tb_bool_t tb_aicp_http_head_post_func(tb_size_t state, tb_hize_t offset, 
 
 			// clear cache data
 			tb_pbuffer_clear(&http->cache_data);
+			http->cache_read = 0;
 
 			// post read 
 			if (!tb_astream_read(http->stream, 0, tb_aicp_http_head_read_func, http)) break;
@@ -1009,6 +1013,7 @@ static tb_bool_t tb_aicp_http_head_writ_func(tb_astream_t* astream, tb_size_t st
 
 			// clear cache data
 			tb_pbuffer_clear(&http->cache_data);
+			http->cache_read = 0;
 
 			// post read 
 			if (!tb_astream_read(http->stream, 0, tb_aicp_http_head_read_func, http)) break;
@@ -1250,6 +1255,7 @@ tb_handle_t tb_aicp_http_init(tb_aicp_t* aicp)
 
 		// init cache data
 		if (!tb_pbuffer_init(&http->cache_data)) break;
+		http->cache_read = 0;
 
 		// init option
 		if (!tb_aicp_http_option_init(http)) break;
@@ -1399,16 +1405,20 @@ tb_bool_t tb_aicp_http_read_after(tb_handle_t handle, tb_size_t delay, tb_size_t
 	tb_aicp_http_t* http = (tb_aicp_http_t*)handle;
 	tb_assert_and_check_return_val(http && http->stream && func, tb_false);
 
-	// read the cache data first
+	// read the cache data first, note: must be reentrant
 	tb_byte_t const* 	cache_data = tb_pbuffer_data(&http->cache_data);
 	tb_size_t 			cache_size = tb_pbuffer_size(&http->cache_data);
-	if (cache_data && cache_size)
+	if (cache_data && cache_size && http->cache_read < cache_size)
 	{
+		// read cache
+		http->cache_read = cache_size;
+
 		// done func
 		tb_bool_t ok = func(http, TB_STATE_OK, cache_data, cache_size, cache_size, priv);
 
 		// clear cache data
 		tb_pbuffer_clear(&http->cache_data);
+		http->cache_read = 0;
 
 		// break?
 		tb_check_return_val(ok, tb_true);
