@@ -159,6 +159,9 @@ tb_bool_t tb_init_and_check(tb_byte_t* data, tb_size_t size, tb_size_t mode, tb_
 	// init memory
 	if (!tb_memory_init(data, size, TB_CPU_BITBYTE)) return tb_false;
 
+	// init singleton
+	if (!tb_singleton_init()) return tb_false;
+
 	// init platform
 	if (!tb_platform_init()) return tb_false;
 
@@ -188,6 +191,9 @@ tb_void_t tb_exit()
 
 	// check
 	tb_assert_and_check_return(!init);
+	
+	// kill singleton
+	tb_singleton_kill();
 
 	// exit object
 	tb_object_context_exit();
@@ -200,6 +206,9 @@ tb_void_t tb_exit()
 	
 	// exit platform
 	tb_platform_exit();
+	
+	// exit singleton
+	tb_singleton_exit();
 
 	// exit memory
 	tb_memory_exit();
