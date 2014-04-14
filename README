@@ -1,3 +1,15 @@
+The Treasure Box Library
+
+TBOX is a mutli-platform c library for unix, windows, mac, ios, android, etc.
+
+It includes asio, stream, network, container, algorithm, object, memory, string
+charset, math, libc, libm, utils and other library modules.
+
+features:
+
+
+usage:
+
 1. configure
 make config|f [PLAT=linux|mac|mingw|cygwin] [ARCH=x86|x64] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=]
 make config|f [PLAT=ios] [ARCH=armv6|armv7|armv7s] [DEBUG=y|n] [SMALL=y|n] [DEMO=y|n] [PROF=y|n] [ZLIB=y|n] [OPENSSL=y|n] [PREFIX=..] [BIN=] [PRE=] [SDK=5.0|5.1|6.0|..]
@@ -28,4 +40,11 @@ make doc|d
 
 8. help
 make help|h
+
+contact:
+
+email:   	waruqi@gmail.com
+source:  	git@github.com:waruqi/tbox.git
+website: 	http://www.tboox.org or http://www.tboox.net
+download: 	https://github.com/waruqi/tbox/archive/master.zip
 
