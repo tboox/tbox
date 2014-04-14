@@ -35,7 +35,6 @@
 #include "utils.h"
 #include "mutex.h"
 #include "event.h"
-#include "epool.h"
 #include "ctime.h"
 #include "timer.h"
 #include "print.h"
