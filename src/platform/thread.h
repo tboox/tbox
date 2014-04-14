@@ -36,10 +36,10 @@
 
 /*! init thread
  *
- * @param name 			the thread name
+ * @param name 			the thread name, maybe null
  * @param func 			the thread func
  * @param data 			the thread data
- * @param stack 		the thread stack 
+ * @param stack 		the thread stack, using the default stack size if be zero 
  *
  * @return 				the thread handle
  */

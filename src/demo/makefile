@@ -98,6 +98,7 @@ demo_C_FILES 							+= \
 										platform/directory \
 										platform/exception \
 										platform/semaphore \
+										platform/thread_pool \
 										container/heap \
 										container/hash \
 										container/dlist \

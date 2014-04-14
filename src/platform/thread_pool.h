@@ -17,55 +17,47 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		platform.h
- * @defgroup 	platform
+ * @file		thread_pool.h
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFROM_H
-#define TB_PLATFORM_H
+#ifndef TB_PLATFORM_THREAD_POOL_H
+#define TB_PLATFORM_THREAD_POOL_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include "dns.h"
-#include "path.h"
-#include "file.h"
-#include "time.h"
-#include "utils.h"
-#include "mutex.h"
-#include "event.h"
-#include "ctime.h"
-#include "timer.h"
-#include "print.h"
-#include "ltimer.h"
-#include "tstore.h"
-#include "socket.h"
-#include "thread.h"
-#include "atomic.h"
-#include "memory.h"
-#include "barrier.h"
-#include "dynamic.h"
-#include "process.h"
-#include "spinlock.h"
-#include "atomic64.h"
-#include "semaphore.h"
-#include "backtrace.h"
-#include "directory.h"
-#include "exception.h"
-#include "thread_pool.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
 
-/*!init the platform
+/*! init thread pool
  *
- * @return tb_true or tb_false
+ * @param maxn 			the thread max count
+ * @param stack 		the thread stack, using the default stack size if be zero 
+ *
+ * @return 				the thread pool handle
  */
-tb_bool_t 	tb_platform_init(tb_noarg_t);
+tb_handle_t 			tb_thread_pool_init(tb_size_t maxn, tb_size_t stack);
 
-/// exit the platform 
-tb_void_t 	tb_platform_exit(tb_noarg_t);
+/*! exit thread pool
+ *
+ * @param pool 			the thread pool handle
+ */
+tb_void_t 				tb_thread_pool_exit(tb_handle_t pool);
+
+/*! kill thread pool
+ *
+ * @param pool 			the thread pool handle
+ */
+tb_void_t 				tb_thread_pool_kill(tb_handle_t pool);
+
+/*! the thread pool instance
+ *
+ * @param pool 			the thread pool handle
+ */
+tb_handle_t 			tb_thread_pool_instance(tb_noarg_t);
 
 #endif

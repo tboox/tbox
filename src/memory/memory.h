@@ -46,12 +46,12 @@
 /*!architecture
  *
  * <pre>
- * small  block - spool ------|
- *                            vpool --
- * global block - gpool ------|       | 
- *                            tpool --|- data: |-------------------------------|
- *                                    |
- * fixed  block - rpool ----- fpool --
+ * spool ------------------ vpool --
+ *                |        |        |
+ *             gpool ------|        | 
+ *                |         tpool --|- data: |-------------------------------|
+ *                |                 |
+ * rpool ------------------ fpool --
  * </pre>
  */
 
