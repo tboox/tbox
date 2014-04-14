@@ -85,7 +85,6 @@ demo_C_FILES 							+= \
 										platform/lock \
 										platform/path \
 										platform/ctime \
-										platform/epool \
 										platform/event \
 										platform/utils \
 										platform/timer \
