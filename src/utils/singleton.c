@@ -80,9 +80,14 @@ tb_void_t tb_singleton_kill()
 		{
 			// the instance
 			tb_handle_t instance = (tb_handle_t)tb_atomic_get(&g_singletons[i].instance);
+			if (instance && instance != (tb_handle_t)1) 
+			{	
+				// trace
+				tb_trace_d("instance: kill: %lu: ..", i);
 
-			// kill it
-			if (instance && instance != (tb_handle_t)1) g_singletons[i].kill(instance);
+				// kill it
+				g_singletons[i].kill(instance);
+			}
 		}
 	}
 }
@@ -97,17 +102,11 @@ tb_void_t tb_singleton_exit()
 			tb_handle_t instance = (tb_handle_t)tb_atomic_fetch_and_set0(&g_singletons[i].instance);
 			if (instance && instance != (tb_handle_t)1) 
 			{
+				// trace
+				tb_trace_d("instance: exit: %lu: ..", i);
+
 				// exit it
-				if (g_singletons[i].exit(instance))
-				{
-					// trace
-					tb_trace_d("instance: exit: %lu: ok", i);
-				}
-				else
-				{
-					// trace
-					tb_trace_e("instance: exit: %lu: no", i);
-				}
+				g_singletons[i].exit(instance);
 			}
 		}
 	}

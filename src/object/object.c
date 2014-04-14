@@ -38,9 +38,6 @@
  */
 tb_bool_t tb_object_context_init()
 {
-	// init opool
-	if (!tb_opool_init()) return tb_false;
-
 	// set reader
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_XML, tb_object_xml_reader())) return tb_false;
 	if (!tb_object_reader_set(TB_OBJECT_FORMAT_BIN, tb_object_bin_reader())) return tb_false;
@@ -73,9 +70,6 @@ tb_void_t tb_object_context_exit()
 	tb_object_writer_del(TB_OBJECT_FORMAT_JSON);
 	tb_object_writer_del(TB_OBJECT_FORMAT_XPLIST);
 	tb_object_writer_del(TB_OBJECT_FORMAT_BPLIST);
-
-	// exit opool
-	tb_opool_exit();
 }
 tb_bool_t tb_object_init(tb_object_t* object, tb_size_t flag, tb_size_t type)
 {

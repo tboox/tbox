@@ -58,7 +58,7 @@ typedef enum __tb_singleton_type_e
 typedef tb_handle_t (*tb_singleton_init_func_t)();
 
 /// the singleton exit func type
-typedef tb_bool_t 	(*tb_singleton_exit_func_t)(tb_handle_t instance);
+typedef tb_void_t 	(*tb_singleton_exit_func_t)(tb_handle_t instance);
 
 /// the singleton kill func type
 typedef tb_void_t 	(*tb_singleton_kill_func_t)(tb_handle_t instance);
