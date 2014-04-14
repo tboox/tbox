@@ -271,6 +271,7 @@ tbox_C_FILES 			+= \
 						platform/tstore \
 						platform/platform \
 						platform/backtrace \
+						platform/thread_pool \
 						platform/$(TB_CONFIG_API_DLL)/dynamic \
 						platform/$(TB_CONFIG_API_FILE)/file \
 						platform/$(TB_CONFIG_API_UTIL)/utils \
@@ -411,6 +412,7 @@ INC_FILES 				= \
 						platform/directory.h \
 						platform/exception.h \
 						platform/backtrace.h \
+						platform/thread_pool.h \
 						platform/compiler/prefix.h \
 						platform/compiler/gcc/prefix.h \
 						platform/compiler/gcc/barrier.h \

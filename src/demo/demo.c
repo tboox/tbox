@@ -148,6 +148,7 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(platform_directory)
 ,	TB_DEMO_MAIN_ITEM(platform_exception)
 ,	TB_DEMO_MAIN_ITEM(platform_semaphore)
+,	TB_DEMO_MAIN_ITEM(platform_thread_pool)
 
 	// container
 ,	TB_DEMO_MAIN_ITEM(container_heap)

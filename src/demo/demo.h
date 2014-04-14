@@ -157,6 +157,7 @@ TB_DEMO_MAIN_DECL(platform_backtrace);
 TB_DEMO_MAIN_DECL(platform_directory);
 TB_DEMO_MAIN_DECL(platform_exception);
 TB_DEMO_MAIN_DECL(platform_semaphore);
+TB_DEMO_MAIN_DECL(platform_thread_pool);
 
 // container
 TB_DEMO_MAIN_DECL(container_heap);

@@ -54,7 +54,7 @@ typedef struct __tb_object_pool_t
 }tb_object_pool_t;
 
 /* ///////////////////////////////////////////////////////////////////////
- * implementation
+ * instance implementation
  */
 static tb_void_t tb_object_pool_instance_exit(tb_handle_t handle)
 {
