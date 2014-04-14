@@ -124,6 +124,7 @@ tbox_C_FILES 			+= \
 						utils/option \
 						utils/base32 \
 						utils/base64 \
+						utils/singleton \
 						xml/node \
 						xml/reader \
 						xml/writer \
@@ -498,6 +499,7 @@ INC_FILES 				= \
 						utils/option.h \
 						utils/base32.h \
 						utils/base64.h \
+						utils/singleton.h \
 						utils/opt/x86/bits.h \
 						utils/opt/x86/prefix.h \
 						utils/opt/arm/bits.h \
