@@ -84,7 +84,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	{
 		if (string->cdata) tb_scache_del(string->cdata);
 		tb_pstring_exit(&string->pstr);
-		tb_opool_del(object);
+		tb_object_pool_del(tb_object_pool_instance(), object);
 	}
 }
 static tb_void_t tb_string_cler(tb_object_t* object)
@@ -101,7 +101,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 static tb_string_t* tb_string_init_base()
 {
 	// make
-	tb_string_t* string = (tb_string_t*)tb_opool_get(sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
+	tb_string_t* string = (tb_string_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_string_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_STRING);
 	tb_assert_and_check_return_val(string, tb_null);
 
 	// init base

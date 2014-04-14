@@ -103,7 +103,7 @@ static tb_void_t tb_dictionary_exit(tb_object_t* object)
 	dictionary->hash = tb_null;
 
 	// exit it
-	tb_opool_del((tb_object_t*)dictionary);
+	tb_object_pool_del(tb_object_pool_instance(), (tb_object_t*)dictionary);
 }
 static tb_void_t tb_dictionary_cler(tb_object_t* object)
 {
@@ -116,7 +116,7 @@ static tb_void_t tb_dictionary_cler(tb_object_t* object)
 static tb_dictionary_t* tb_dictionary_init_base()
 {
 	// make
-	tb_dictionary_t* dictionary = (tb_dictionary_t*)tb_opool_get(sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
+	tb_dictionary_t* dictionary = (tb_dictionary_t*)tb_object_pool_get(tb_object_pool_instance(), sizeof(tb_dictionary_t), TB_OBJECT_FLAG_NONE, TB_OBJECT_TYPE_DICTIONARY);
 	tb_assert_and_check_return_val(dictionary, tb_null);
 
 	// init base
