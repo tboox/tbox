@@ -55,7 +55,7 @@ static tb_handle_t tb_thread_pool_instance_init()
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_handle_t tb_thread_pool_init(tb_size_t maxn, tb_size_t stack)
+tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 {
 	return tb_null;
 }
@@ -65,7 +65,40 @@ tb_void_t tb_thread_pool_exit(tb_handle_t handle)
 tb_void_t tb_thread_pool_kill(tb_handle_t handle)
 {
 }
+tb_size_t tb_thread_pool_worker_size(tb_handle_t handle)
+{
+	return 0;
+}
+tb_size_t tb_thread_pool_task_size(tb_handle_t handle)
+{
+	return 0;
+}
+tb_handle_t tb_thread_pool_task_post(tb_handle_t handle, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent)
+{
+	return tb_null;
+}
+tb_bool_t tb_thread_pool_task_post_list(tb_handle_t handle, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks)
+{
+	return tb_false;
+}
+tb_void_t tb_thread_pool_task_kill(tb_handle_t handle, tb_handle_t task)
+{
+}
+tb_void_t tb_thread_pool_task_kill_list(tb_handle_t handle, tb_handle_t* tasks, tb_size_t size)
+{
+}
+tb_void_t tb_thread_pool_task_kill_all(tb_handle_t handle)
+{
+}
 tb_handle_t tb_thread_pool_instance()
 {
 	return tb_singleton_instance(TB_SINGLETON_TYPE_THREAD_POOL, tb_thread_pool_instance_init, tb_thread_pool_exit, tb_thread_pool_kill);
 }
+#ifdef __tb_debug__
+tb_void_t tb_thread_pool_worker_dump(tb_handle_t handle)
+{
+}
+tb_void_t tb_thread_pool_task_dump(tb_handle_t handle)
+{
+}
+#endif
