@@ -17,18 +17,15 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asm.h
+ * @file		prefix.S
  *
  */
-#ifndef TB_PREFIX_ASM_H
-#define TB_PREFIX_ASM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "asm/asm.h"
-
-
+#include "asm.h"
+#if defined(TB_ARCH_ARM)
+# 	include "arm/prefix.S"
 #endif
-
 

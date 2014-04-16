@@ -34,7 +34,6 @@
 	&& TB_COMPILER_VERSION_BE(4, 1)
 # 	include "compiler/gcc/atomic.h"
 #endif
-
 #include "arch/atomic.h"
 
 /* ///////////////////////////////////////////////////////////////////////

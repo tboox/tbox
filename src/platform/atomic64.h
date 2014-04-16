@@ -29,13 +29,12 @@
  */
 #include "prefix.h"
 #include "atomic.h"
-
 #if !TB_CPU_BIT64
-# 	if defined(TB_COMPILER_IS_GCC) \
+# 	if defined(TB_CONFIG_OS_WINDOWS)
+# 		include "windows/atomic64.h"
+# 	elif defined(TB_COMPILER_IS_GCC) \
 		&& TB_COMPILER_VERSION_BE(4, 1)
 # 		include "compiler/gcc/atomic64.h"
-# 	elif defined(TB_CONFIG_OS_WINDOWS)
-# 		include "windows/atomic64.h"
 # 	endif
 #endif
 
@@ -155,187 +154,32 @@
 # 	define tb_atomic64_and_and_fetch(a, v) 		tb_atomic64_and_and_fetch_generic(a, v)
 #endif
 
-
 /* ///////////////////////////////////////////////////////////////////////
- * get & set
+ * interfaces
  */
-static __tb_inline__ tb_hize_t tb_atomic64_get_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-	return *a;
-}
-static __tb_inline__ tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-	*a = v;
-}
-static __tb_inline__ tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-	*a = 0;
-}
-static __tb_inline__ tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-	if (*a == p) *a = v;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
+tb_hize_t tb_atomic64_get_generic(tb_atomic64_t* a);
+tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a);
+tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v);
 
-	tb_hize_t o = *a;
-	*a = 0;
-	return o;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
+tb_hize_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a);
+tb_hize_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hize_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v);
+tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a);
+tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a);
+tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hize_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hize_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hize_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hize_t v);
 
-	tb_hize_t o = *a;
-	*a = v;
-	return o;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hize_t o = *a;
-	if (o == p) *a = v;
-	return o;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * fetch and ...
- */
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return *pa++;
-}
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return *pa--;
-}
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t o = *((tb_hong_t*)a);
-	*((tb_hong_t*)a) += v;
-	return o;
-}
-static __tb_inline__ tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t o = *((tb_hong_t*)a);
-	*((tb_hong_t*)a) -= v;
-	return o;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hize_t o = *a;
-	*a ^= v;
-	return o;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hize_t o = *a;
-	*a &= v;
-	return o;
-}
-static __tb_inline__ tb_hize_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hize_t o = *a;
-	*a |= v;
-	return o;
-}
-
-/* ///////////////////////////////////////////////////////////////////////
- * ... and fetch
- */
-static __tb_inline__ tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return ++*pa;
-}
-static __tb_inline__ tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return --*pa;
-}
-static __tb_inline__ tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) += v;
-	return *((tb_hong_t*)a);
-}
-static __tb_inline__ tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) -= v;
-	return *((tb_hong_t*)a);
-}
-static __tb_inline__ tb_hize_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) ^= v;
-	return *((tb_hong_t*)a);
-}
-static __tb_inline__ tb_hize_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) &= v;
-	return *((tb_hong_t*)a);
-}
-static __tb_inline__ tb_hize_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) |= v;
-	return *((tb_hong_t*)a);
-}
-
+tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a);
+tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a);
+tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hize_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hize_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hize_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
 
 
 

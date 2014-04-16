@@ -24,8 +24,5 @@
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "asm.h"
-#if defined(TB_ARCH_ARM)
-# 	include "arm/prefix.S"
-#endif
+#include "asm/prefix.S"
 
