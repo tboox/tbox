@@ -135,7 +135,6 @@ tbox_C_FILES 			+= \
 						asio/pool \
 						asio/http \
 						asio/dns \
-						asio/ssl \
 						libc/misc/time/time \
 						libc/misc/time/mktime \
 						libc/misc/time/gmmktime \
@@ -218,9 +217,11 @@ tbox_C_FILES-$(TB_CONFIG_HAVE_ZLIB) += \
 						zip/zlibraw 
 
 tbox_C_FILES-$(TB_CONFIG_HAVE_OPENSSL) += \
+						asio/ssl \
 						network/ssl/openssl 
 
 tbox_C_FILES-$(TB_CONFIG_HAVE_POLARSSL) += \
+						asio/ssl \
 						network/ssl/polarssl 
 
 tbox_C_FILES-$(TB_CONFIG_TYPE_FLOAT) += \

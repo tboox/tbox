@@ -61,6 +61,7 @@ tb_char_t const* tb_state_cstr(tb_size_t state)
 	case TB_STATE_SOCK_SSL_WAIT_FAILED: 		return "sock: ssl: wait failed";
 	case TB_STATE_SOCK_SSL_READ_FAILED: 		return "sock: ssl: read: failed";
 	case TB_STATE_SOCK_SSL_WRIT_FAILED: 		return "sock: ssl: writ: failed";
+	case TB_STATE_SOCK_SSL_NOT_SUPPORTED: 		return "sock: ssl: not supported";
 	case TB_STATE_SOCK_SSL_UNKNOWN_ERROR: 		return "sock: ssl: unknown error";
 
 	case TB_STATE_HTTP_RESPONSE_204: 			return "http: response: 204";

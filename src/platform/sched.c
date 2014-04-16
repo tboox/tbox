@@ -30,10 +30,8 @@
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-#if defined(TB_CONFIG_OS_LINUX) || \
-		defined(TB_CONFIG_OS_MAC) || \
-			defined(TB_CONFIG_OS_IOS) || \
-				defined(TB_CONFIG_OS_ANDROID) \
-
+#if defined(TB_CONFIG_OS_WINDOWS)
+# 	include "windows/sched.c"
+#else
 # 	include "unix/sched.c"
 #endif

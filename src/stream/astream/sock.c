@@ -64,8 +64,10 @@ typedef struct __tb_astream_sock_t
 	// the aicp dns
 	tb_handle_t 				hdns;
 
+#ifdef TB_SSL_ENABLE
 	// the aicp ssl
 	tb_handle_t 				hssl;
+#endif
 
 	// the ipv4 addr
 	tb_ipv4_t 					ipv4;
@@ -143,6 +145,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 		// ok
 	case TB_STATE_OK:
 		{
+#ifdef TB_SSL_ENABLE
 			// ssl?
 			if (tb_url_ssl_get(&sstream->base.base.url))
 			{
@@ -166,6 +169,7 @@ static tb_bool_t tb_astream_sock_conn_func(tb_aice_t const* aice)
 				if (!tb_aicp_ssl_open(sstream->hssl, tb_astream_sock_sopen_func, sstream)) break;
 			}
 			else
+#endif
 			{
 				// opened
 				tb_atomic_set(&sstream->base.base.bopened, 1);
@@ -302,6 +306,21 @@ static tb_bool_t tb_astream_sock_open(tb_handle_t astream, tb_astream_open_func_
 
 	// clear the offset
 	tb_atomic64_set0(&sstream->offset);
+
+#ifndef TB_SSL_ENABLE
+	// ssl? not supported
+	if (tb_url_ssl_get(&sstream->base.base.url))
+	{
+		// trace
+		tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
+
+		// done func
+		func((tb_astream_t*)sstream, TB_STATE_SOCK_SSL_NOT_SUPPORTED, priv);
+
+		// ok
+		return tb_true;
+	}
+#endif
 
 	// keep alive and have been opened? reopen it directly
 	if (sstream->balived && sstream->hdns && sstream->aico)
@@ -447,6 +466,7 @@ static tb_bool_t tb_astream_sock_uread_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#ifdef TB_SSL_ENABLE
 static tb_bool_t tb_astream_sock_sread_func(tb_handle_t ssl, tb_size_t state, tb_byte_t* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
@@ -477,6 +497,7 @@ static tb_bool_t tb_astream_sock_sread_func(tb_handle_t ssl, tb_size_t state, tb
 	// ok
 	return tb_true;
 }
+#endif
 static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_byte_t* data, tb_size_t size, tb_astream_read_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -499,6 +520,7 @@ static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_b
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
+#ifdef TB_SSL_ENABLE
 			// ssl?
 			if (tb_url_ssl_get(&sstream->base.base.url))
 			{
@@ -509,7 +531,11 @@ static tb_bool_t tb_astream_sock_read(tb_handle_t astream, tb_size_t delay, tb_b
 				ok = tb_aicp_ssl_read_after(sstream->hssl, delay, data, size, tb_astream_sock_sread_func, astream);
 			}
 			// post tcp read
-			else ok = tb_aico_recv_after(sstream->aico, delay, data, size, tb_astream_sock_read_func, astream);
+			else
+#endif
+			{
+				ok = tb_aico_recv_after(sstream->aico, delay, data, size, tb_astream_sock_read_func, astream);
+			}
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -634,6 +660,7 @@ static tb_bool_t tb_astream_sock_uwrit_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#ifdef TB_SSL_ENABLE
 static tb_bool_t tb_astream_sock_swrit_func(tb_handle_t ssl, tb_size_t state, tb_byte_t const* data, tb_size_t real, tb_size_t size, tb_pointer_t priv)
 {
 	// check
@@ -664,6 +691,7 @@ static tb_bool_t tb_astream_sock_swrit_func(tb_handle_t ssl, tb_size_t state, tb
 	// ok
 	return tb_true;
 }
+#endif
 static tb_bool_t tb_astream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_byte_t const* data, tb_size_t size, tb_astream_writ_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -686,6 +714,7 @@ static tb_bool_t tb_astream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_b
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
+#ifdef TB_SSL_ENABLE
 			// ssl?
 			if (tb_url_ssl_get(&sstream->base.base.url))
 			{
@@ -696,7 +725,11 @@ static tb_bool_t tb_astream_sock_writ(tb_handle_t astream, tb_size_t delay, tb_b
 				ok = tb_aicp_ssl_writ_after(sstream->hssl, delay, data, size, tb_astream_sock_swrit_func, astream);
 			}
 			// post tcp writ
-			else ok = tb_aico_send_after(sstream->aico, delay, data, size, tb_astream_sock_writ_func, astream);
+			else 
+#endif
+			{
+				ok = tb_aico_send_after(sstream->aico, delay, data, size, tb_astream_sock_writ_func, astream);
+			}
 		}
 		break;
 	case TB_SOCKET_TYPE_UDP:
@@ -759,6 +792,7 @@ static tb_bool_t tb_astream_sock_task_func(tb_aice_t const* aice)
 	// ok
 	return tb_true;
 }
+#ifdef TB_SSL_ENABLE
 static tb_bool_t tb_astream_sock_stask_func(tb_handle_t ssl, tb_size_t state, tb_size_t delay, tb_pointer_t priv)
 {
 	// check
@@ -781,6 +815,7 @@ static tb_bool_t tb_astream_sock_stask_func(tb_handle_t ssl, tb_size_t state, tb
 	// ok
 	return tb_true;
 }
+#endif
 static tb_bool_t tb_astream_sock_task(tb_handle_t astream, tb_size_t delay, tb_astream_task_func_t func, tb_pointer_t priv)
 {
 	// check
@@ -793,7 +828,9 @@ static tb_bool_t tb_astream_sock_task(tb_handle_t astream, tb_size_t delay, tb_a
 
 	// post task
 	if (sstream->aico) return tb_aico_task_run(sstream->aico, delay, tb_astream_sock_task_func, astream);
+#ifdef TB_SSL_ENABLE
 	else if (sstream->hssl) return tb_aicp_ssl_task(sstream->hssl, delay, tb_astream_sock_stask_func, astream);
+#endif
 
 	// failed
 	tb_trace_e("cannot run task!");
@@ -822,8 +859,10 @@ static tb_void_t tb_astream_sock_clos(tb_handle_t astream, tb_bool_t bcalling)
 	// clear the offset
 	tb_atomic64_set0(&sstream->offset);
 
+#ifdef TB_SSL_ENABLE
 	// close ssl
 	if (sstream->hssl) tb_aicp_ssl_clos(sstream->hssl, bcalling);
+#endif
 
 	// keep alive? not close it
 	tb_check_return(!sstream->balived);
@@ -858,9 +897,11 @@ static tb_void_t tb_astream_sock_exit(tb_handle_t astream, tb_bool_t bcalling)
 	if (sstream->hdns) tb_aicp_dns_exit(sstream->hdns, bcalling);
 	sstream->hdns = tb_null;
 
+#ifdef TB_SSL_ENABLE
 	// exit ssl
 	if (sstream->hssl) tb_aicp_ssl_exit(sstream->hssl, bcalling);
 	sstream->hssl = tb_null;
+#endif
 
 	// exit it
 	if (!sstream->bref && sstream->sock) tb_socket_clos(sstream->sock);

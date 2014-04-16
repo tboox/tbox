@@ -27,7 +27,7 @@ TB_CONFIG_TYPE_FLOAT 			= y
 TB_CONFIG_HAVE_ZLIB 			= y
 
 # openssl
-TB_CONFIG_HAVE_OPENSSL 			= y
+TB_CONFIG_HAVE_OPENSSL 			= n
 
 # polarssl
 TB_CONFIG_HAVE_POLARSSL 		= n

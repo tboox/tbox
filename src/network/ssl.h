@@ -30,6 +30,18 @@
 #include "prefix.h"
 
 /* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// enable ssl?
+#if defined(TB_CONFIG_HAVE_OPENSSL) \
+	|| defined(TB_CONFIG_HAVE_POLARSSL)
+# 	define TB_SSL_ENABLE
+#else
+# 	undef TB_SSL_ENABLE
+#endif
+
+/* ///////////////////////////////////////////////////////////////////////
  * types
  */
 

@@ -25,6 +25,7 @@
  * includes
  */
 #include "api.h"
+#include "../atomic.h"
 #include "../socket.h"
 
 /* ///////////////////////////////////////////////////////////////////////
@@ -144,25 +145,157 @@ tb_api_TransmitFile_t tb_api_TransmitFile()
 }
 tb_api_CancelIoEx_t tb_api_CancelIoEx()
 {
-	// the kernel32 module
-	HANDLE module = GetModuleHandleA("kernel32.dll");
+	// init
+	static tb_atomic_t s_pCancelIoEx = 0;
 
-	// the CancelIoEx func
-	tb_api_CancelIoEx_t CancelIoEx_func = tb_null;
-	if (module) CancelIoEx_func = GetProcAddress(module, "CancelIoEx");
+	// try getting it
+	tb_api_CancelIoEx_t pCancelIoEx = tb_null;
+	if (!(pCancelIoEx = (tb_api_CancelIoEx_t)tb_atomic_get(&s_pCancelIoEx))) 
+	{
+		// the kernel32 module
+		HANDLE module = GetModuleHandleA("kernel32.dll");
+
+		// the CancelIoEx func
+		if (module) 
+		{
+			// get it
+			pCancelIoEx = GetProcAddress(module, "CancelIoEx");
+
+			// save it
+			tb_atomic_set(&s_pCancelIoEx, pCancelIoEx);
+		}
+	}
 
 	// ok?
-	return CancelIoEx_func;
+	return pCancelIoEx;
 }
 tb_api_GetQueuedCompletionStatusEx_t tb_api_GetQueuedCompletionStatusEx()
 {
-	// the kernel32 module
-	HANDLE module = GetModuleHandleA("kernel32.dll");
+	// init
+	static tb_atomic_t s_pGetQueuedCompletionStatusEx = 0;
 
-	// the GetQueuedCompletionStatusEx func
-	tb_api_GetQueuedCompletionStatusEx_t GetQueuedCompletionStatusEx_func = tb_null;
-	if (module) GetQueuedCompletionStatusEx_func = GetProcAddress(module, "GetQueuedCompletionStatusEx");
+	// try getting it
+	tb_api_GetQueuedCompletionStatusEx_t pGetQueuedCompletionStatusEx = tb_null;
+	if (!(pGetQueuedCompletionStatusEx = (tb_api_GetQueuedCompletionStatusEx_t)tb_atomic_get(&s_pGetQueuedCompletionStatusEx))) 
+	{
+		// the kernel32 module
+		HANDLE module = GetModuleHandleA("kernel32.dll");
+
+		// the GetQueuedCompletionStatusEx func
+		if (module) 
+		{
+			// get it
+			pGetQueuedCompletionStatusEx = GetProcAddress(module, "GetQueuedCompletionStatusEx");
+
+			// save it
+			tb_atomic_set(&s_pGetQueuedCompletionStatusEx, pGetQueuedCompletionStatusEx);
+		}
+	}
 
 	// ok?
-	return GetQueuedCompletionStatusEx_func;
+	return pGetQueuedCompletionStatusEx;
+}
+tb_api_CaptureStackBackTrace_t tb_api_CaptureStackBackTrace()
+{
+	// init
+	static tb_atomic_t s_pCaptureStackBackTrace = 0;
+
+	// try getting it
+	tb_api_CaptureStackBackTrace_t pCaptureStackBackTrace = tb_null;
+	if (!(pCaptureStackBackTrace = (tb_api_CaptureStackBackTrace_t)tb_atomic_get(&s_pCaptureStackBackTrace))) 
+	{
+		// the kernel32 module
+		HANDLE module = GetModuleHandleA("kernel32.dll");
+
+		// the CaptureStackBackTrace func
+		if (module) 
+		{
+			// get it
+			pCaptureStackBackTrace = GetProcAddress(module, "CaptureStackBackTrace");
+
+			// save it
+			tb_atomic_set(&s_pCaptureStackBackTrace, pCaptureStackBackTrace);
+		}
+	}
+
+	// ok?
+	return pCaptureStackBackTrace;
+}
+tb_api_GetFileSizeEx_t tb_api_GetFileSizeEx()
+{
+	// init
+	static tb_atomic_t s_pGetFileSizeEx = 0;
+
+	// try getting it
+	tb_api_GetFileSizeEx_t pGetFileSizeEx = tb_null;
+	if (!(pGetFileSizeEx = (tb_api_GetFileSizeEx_t)tb_atomic_get(&s_pGetFileSizeEx))) 
+	{
+		// the kernel32 module
+		HANDLE module = GetModuleHandleA("kernel32.dll");
+
+		// the GetFileSizeEx func
+		if (module) 
+		{
+			// get it
+			pGetFileSizeEx = GetProcAddress(module, "GetFileSizeEx");
+
+			// save it
+			tb_atomic_set(&s_pGetFileSizeEx, pGetFileSizeEx);
+		}
+	}
+
+	// ok?
+	return pGetFileSizeEx;
+}
+tb_api_SymInitialize_t tb_api_SymInitialize()
+{
+	// init
+	static tb_atomic_t s_pSymInitialize = 0;
+
+	// try getting it
+	tb_api_SymInitialize_t pSymInitialize = tb_null;
+	if (!(pSymInitialize = (tb_api_SymInitialize_t)tb_atomic_get(&s_pSymInitialize))) 
+	{
+		// the dbghelp module
+		HANDLE module = LoadLibraryExA("dbghelp.dll", tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
+
+		// the SymInitialize func
+		if (module) 
+		{
+			// get it
+			pSymInitialize = GetProcAddress(module, "SymInitialize");
+
+			// save it
+			tb_atomic_set(&s_pSymInitialize, pSymInitialize);
+		}
+	}
+
+	// ok?
+	return pSymInitialize;
+}
+tb_api_GetNetworkParams_t tb_api_GetNetworkParams()
+{
+	// init
+	static tb_atomic_t s_pGetNetworkParams = 0;
+
+	// try getting it
+	tb_api_GetNetworkParams_t pGetNetworkParams = tb_null;
+	if (!(pGetNetworkParams = (tb_api_GetNetworkParams_t)tb_atomic_get(&s_pGetNetworkParams))) 
+	{
+		// the iphlpapi module
+		HANDLE module = tb_dynamic_init("iphlpapi.dll");
+
+		// the GetNetworkParams func
+		if (module) 
+		{
+			// get it
+			pGetNetworkParams = GetProcAddress(module, "GetNetworkParams");
+
+			// save it
+			tb_atomic_set(&s_pGetNetworkParams, pGetNetworkParams);
+		}
+	}
+
+	// ok?
+	return pGetNetworkParams;
 }

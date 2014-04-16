@@ -31,15 +31,9 @@
  * includes
  */
 #include "prefix.h"
-#include <winsock2.h>
-#include <iphlpapi.h>
+#include "api.h"
 #include "../dynamic.h"
 #include "../../network/network.h"
-
-/* ///////////////////////////////////////////////////////////////////////
- * types
- */
-typedef DWORD (*tb_GetNetworkParams_t)(PFIXED_INFO pinfo, PULONG psize);
 
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
@@ -49,18 +43,12 @@ tb_bool_t tb_dns_init()
 	// done
 	FIXED_INFO* 			info = tb_null;
 	ULONG 					size = 0;
-	tb_handle_t 			hdll = tb_null;
-	tb_GetNetworkParams_t 	func = tb_null;
 	tb_size_t 				count = 0;
 	do 
 	{
-		// init dynamic
-		hdll = tb_dynamic_init("iphlpapi.dll");
-		tb_assert_and_check_break(hdll);
-
 		// init func
-		func = (tb_GetNetworkParams_t)tb_dynamic_func(hdll, "GetNetworkParams");
-		tb_assert_and_check_break(func);
+		tb_api_GetNetworkParams_t pGetNetworkParams = tb_api_GetNetworkParams();
+		tb_assert_and_check_break(pGetNetworkParams);
 
 		// init info
 		info = tb_malloc0(sizeof(FIXED_INFO));
@@ -68,7 +56,7 @@ tb_bool_t tb_dns_init()
 
 		// get the info size
 		size = sizeof(FIXED_INFO);
-		if (func(info, &size) == ERROR_BUFFER_OVERFLOW) 
+		if (pGetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW) 
 		{
 			// grow info
 			info = (FIXED_INFO *)tb_ralloc(info, size);
@@ -76,7 +64,7 @@ tb_bool_t tb_dns_init()
 		}
 		
 		// get the info
-		if (func(info, &size) != NO_ERROR) break;
+		if (pGetNetworkParams(info, &size) != NO_ERROR) break;
 
 		// trace
 //		tb_trace_d("host: %s", 	info->HostName);
