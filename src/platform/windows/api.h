@@ -29,9 +29,11 @@
 #include "prefix.h"
 #include <windows.h>
 #include <winsock2.h>
+#include <mswsock.h>
+#include <iphlpapi.h>
 
 /* ///////////////////////////////////////////////////////////////////////
- * types
+ * the mswsock types
  */
 
 // the OVERLAPPED_ENTRY type
@@ -44,47 +46,71 @@ typedef struct _OVERLAPPED_ENTRY
 
 }OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;
 
-// the AcceptEx func type from mswsock
+// the AcceptEx func type 
 typedef BOOL (WINAPI* tb_api_AcceptEx_t)( 	SOCKET sListenSocket
-											,	SOCKET sAcceptSocket
-											,	PVOID lpOutputBuffer
-											,	DWORD dwReceiveDataLength
-											,	DWORD dwLocalAddressLength
-											,	DWORD dwRemoteAddressLength
-											,	LPDWORD lpdwBytesReceived
-											,	LPOVERLAPPED lpOverlapped);
+										,	SOCKET sAcceptSocket
+										,	PVOID lpOutputBuffer
+										,	DWORD dwReceiveDataLength
+										,	DWORD dwLocalAddressLength
+										,	DWORD dwRemoteAddressLength
+										,	LPDWORD lpdwBytesReceived
+										,	LPOVERLAPPED lpOverlapped);
 
-// the ConnectEx func type from mswsock
-typedef BOOL (WINAPI* tb_api_ConnectEx_t)( SOCKET s
-											, 	struct sockaddr const*name
-											,	tb_int_t namelen
-											,	PVOID lpSendBuffer
-											,	DWORD dwSendDataLength
-											,	LPDWORD lpdwBytesSent
-											,	LPOVERLAPPED lpOverlapped);
+// the ConnectEx func type 
+typedef BOOL (WINAPI* tb_api_ConnectEx_t)( 	SOCKET s
+										, 	struct sockaddr const*name
+										,	tb_int_t namelen
+										,	PVOID lpSendBuffer
+										,	DWORD dwSendDataLength
+										,	LPDWORD lpdwBytesSent
+										,	LPOVERLAPPED lpOverlapped);
 
-// the TransmitFile func type from mswsock
-typedef BOOL (WINAPI* tb_api_TransmitFile_t)( SOCKET hSocket
-												,	HANDLE hFile
-												,	DWORD nNumberOfBytesToWrite
-												,	DWORD nNumberOfBytesPerSend
-												,	LPOVERLAPPED lpOverlapped
-												,	LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
-												,	DWORD dwReserved);
-
-// the GetQueuedCompletionStatusEx func type from kernel32
-typedef BOOL (WINAPI* tb_api_GetQueuedCompletionStatusEx_t)( 	HANDLE CompletionPort
-																, 	LPOVERLAPPED_ENTRY lpCompletionPortEntries
-																, 	ULONG ulCount
-																, 	PULONG ulNumEntriesRemoved
-																, 	DWORD dwMilliseconds
-																, 	BOOL fAlertable);
-
-// the CancelIoEx func type from kernel32
-typedef BOOL (WINAPI* tb_api_CancelIoEx_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);
+// the TransmitFile func type 
+typedef BOOL (WINAPI* tb_api_TransmitFile_t)( 	SOCKET hSocket
+											,	HANDLE hFile
+											,	DWORD nNumberOfBytesToWrite
+											,	DWORD nNumberOfBytesPerSend
+											,	LPOVERLAPPED lpOverlapped
+											,	LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers
+											,	DWORD dwReserved);
 
 /* ///////////////////////////////////////////////////////////////////////
- * interfaces
+ * the kernel32 types
+ */
+
+// the GetQueuedCompletionStatusEx func type 
+typedef BOOL (WINAPI* tb_api_GetQueuedCompletionStatusEx_t)( 	HANDLE CompletionPort
+															, 	LPOVERLAPPED_ENTRY lpCompletionPortEntries
+															, 	ULONG ulCount
+															, 	PULONG ulNumEntriesRemoved
+															, 	DWORD dwMilliseconds
+															, 	BOOL fAlertable);
+
+// the CancelIoEx func type
+typedef BOOL (WINAPI* tb_api_CancelIoEx_t)(HANDLE hFile, LPOVERLAPPED lpOverlapped);
+
+// the CaptureStackBackTrace func type
+typedef USHORT (WINAPI* tb_api_CaptureStackBackTrace_t)(ULONG FramesToSkip, ULONG FramesToCapture, PVOID *BackTrace, PULONG BackTraceHash);
+
+// the GetFileSizeEx func type
+typedef BOOL (WINAPI* tb_api_GetFileSizeEx_t)(HANDLE hFile, PLARGE_INTEGER lpFileSize);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the dbghelp types
+ */
+
+// the SymInitialize func type
+typedef BOOL (WINAPI* tb_api_SymInitialize_t)(HANDLE hProcess, LPCTSTR UserSearchPath, BOOL fInvadeProcess);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the iphlpapi types
+ */
+
+// the GetNetworkParams func type
+typedef DWORD (* tb_api_GetNetworkParams_t)(PFIXED_INFO pFixedInfo, PULONG pOutBufLen);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the mswsock interfaces
  */
 
 /// the AcceptEx func type 
@@ -96,11 +122,35 @@ tb_api_ConnectEx_t 							tb_api_ConnectEx(tb_noarg_t);
 /// the TransmitFile func type 
 tb_api_TransmitFile_t 						tb_api_TransmitFile(tb_noarg_t);
 
+/* ///////////////////////////////////////////////////////////////////////
+ * the kernel32 interfaces
+ */
+
 /// the GetQueuedCompletionStatusEx func type 
 tb_api_GetQueuedCompletionStatusEx_t 		tb_api_GetQueuedCompletionStatusEx(tb_noarg_t);
 
 /// the CancelIoEx func type 
 tb_api_CancelIoEx_t 						tb_api_CancelIoEx(tb_noarg_t);
+
+/// the CaptureStackBackTrace func type 
+tb_api_CaptureStackBackTrace_t 				tb_api_CaptureStackBackTrace(tb_noarg_t);
+
+/// the GetFileSizeEx func type 
+tb_api_GetFileSizeEx_t 						tb_api_GetFileSizeEx(tb_noarg_t);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the dbghelp interfaces
+ */
+
+/// the SymInitialize func type 
+tb_api_SymInitialize_t 						tb_api_SymInitialize(tb_noarg_t);
+
+/* ///////////////////////////////////////////////////////////////////////
+ * the iphlpapi interfaces
+ */
+
+/// the GetNetworkParams func type 
+tb_api_GetNetworkParams_t 					tb_api_GetNetworkParams(tb_noarg_t);
 
 
 #endif

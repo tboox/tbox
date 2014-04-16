@@ -60,8 +60,10 @@ typedef struct __tb_gstream_sock_t
 	// the sock handle
 	tb_handle_t 		sock;
 
+#ifdef TB_SSL_ENABLE
 	// the ssl handle
 	tb_handle_t 		hssl;
+#endif
 
 	// the sock type
 	tb_uint32_t 		type 	: 22;
@@ -110,6 +112,19 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 
 	// opened?
 	tb_check_return_val(!sstream->sock, tb_true);
+
+#ifndef TB_SSL_ENABLE
+	// ssl? not supported
+	if (tb_url_ssl_get(&sstream->base.base.url))
+	{
+		// trace
+		tb_trace_w("ssl is not supported now! please enable it from config if you need it.");
+
+		// save state
+		sstream->base.state = TB_STATE_SOCK_SSL_NOT_SUPPORTED;
+		return tb_false;
+	}
+#endif
 
 	// port
 	tb_size_t port = tb_url_port_get(&sstream->base.base.url);
@@ -184,6 +199,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 				// ssl? init it
 				if (tb_url_ssl_get(&sstream->base.base.url))
 				{
+#ifdef TB_SSL_ENABLE
 					// done
 					ok = tb_false;
 					do
@@ -211,6 +227,7 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 			
 					// failed? save state
 					if (!ok) sstream->base.state = sstream->hssl? tb_ssl_state(sstream->hssl) : TB_STATE_SOCK_SSL_FAILED;
+#endif
 				}
 			}
 		}
@@ -222,11 +239,16 @@ static tb_bool_t tb_gstream_sock_open(tb_handle_t gstream)
 			{
 				// trace
 				tb_trace_w("udp ssl is not supported!");
-			}
 
-			// ok
-			ok = tb_true;
-			sstream->base.state = TB_STATE_OK;
+				// save state
+				sstream->base.state = TB_STATE_SOCK_SSL_NOT_SUPPORTED;
+			}
+			else
+			{
+				// ok
+				ok = tb_true;
+				sstream->base.state = TB_STATE_OK;
+			}
 		}
 		break;
 	default:
@@ -243,9 +265,11 @@ static tb_bool_t tb_gstream_sock_clos(tb_handle_t gstream)
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sstream, tb_false);
 
+#ifdef TB_SSL_ENABLE
 	// close ssl
 	if (tb_url_ssl_get(&sstream->base.base.url) && sstream->hssl)
 		tb_ssl_clos(sstream->hssl);
+#endif
 
 	// keep alive? not close it
 	tb_check_return_val(!sstream->balived, tb_true);
@@ -273,9 +297,11 @@ static tb_void_t tb_gstream_sock_exit(tb_handle_t gstream)
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return(sstream);
 
+#ifdef TB_SSL_ENABLE
 	// exit ssl
 	if (sstream->hssl) tb_ssl_exit(sstream->hssl);
 	sstream->hssl = tb_null;
+#endif
 
 	// close sock
 	if (!sstream->bref) 
@@ -323,6 +349,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
+#ifdef TB_SSL_ENABLE
 			// ssl?
 			if (tb_url_ssl_get(&sstream->base.base.url))
 			{
@@ -339,6 +366,7 @@ static tb_long_t tb_gstream_sock_read(tb_handle_t gstream, tb_byte_t* data, tb_s
 				tb_check_return_val(real >= 0, -1);
 			}
 			else
+#endif
 			{
 				// read data
 				real = tb_socket_recv(sstream->sock, data, size);
@@ -411,6 +439,7 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 	{
 	case TB_SOCKET_TYPE_TCP:
 		{
+#ifdef TB_SSL_ENABLE
 			// ssl?
 			if (tb_url_ssl_get(&sstream->base.base.url))
 			{
@@ -427,6 +456,7 @@ static tb_long_t tb_gstream_sock_writ(tb_handle_t gstream, tb_byte_t const* data
 				tb_check_return_val(real >= 0, -1);
 			}
 			else
+#endif
 			{
 				// writ data
 				real = tb_socket_send(sstream->sock, data, size);
@@ -491,6 +521,7 @@ static tb_long_t tb_gstream_sock_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 	tb_gstream_sock_t* sstream = tb_gstream_sock_cast(gstream);
 	tb_assert_and_check_return_val(sstream && sstream->sock, -1);
 
+#ifdef TB_SSL_ENABLE
 	// ssl?
 	if (tb_url_ssl_get(&sstream->base.base.url))
 	{
@@ -504,6 +535,7 @@ static tb_long_t tb_gstream_sock_wait(tb_handle_t gstream, tb_size_t wait, tb_lo
 		if (sstream->wait <= 0) sstream->base.state = tb_ssl_state(sstream->hssl);
 	}
 	else
+#endif
 	{
 		// wait 
 		sstream->wait = tb_aioo_wait(sstream->sock, wait, timeout);

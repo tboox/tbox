@@ -17,28 +17,28 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		barrier.h
+ * @file		sched.c
+ * @ingroup 	platform
  *
  */
-#ifndef TB_PLATFORM_WINDOWS_BARRIER_H
-#define TB_PLATFORM_WINDOWS_BARRIER_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "prefix.h"
-#include <windows.h>
+#include "../sched.h"
 
 /* ///////////////////////////////////////////////////////////////////////
- * macros
+ * implementation
  */
-#if defined(MemoryBarrier)
-# 	define tb_barrier() 		MemoryBarrier()
-#elif defined(_AMD64_)
-# 	define tb_barrier() 		__faststorefence()
-#elif defined(_IA64_)
-# 	define tb_barrier() 		__mf()
+tb_bool_t tb_sched_yield()
+{
+#if defined(YieldProcessor)
+	YieldProcessor();
+	return tb_true;
+#else
+	tb_usleep(1);
+	return tb_true;
 #endif
+}
 
-
-#endif

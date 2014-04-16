@@ -32,6 +32,7 @@
  * includes
  */
 #include "platform.h"
+#include "../utils/utils.h"
 #include "../memory/memory.h"
 #include "../container/container.h"
 #include "../algorithm/algorithm.h"

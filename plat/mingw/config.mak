@@ -1,5 +1,5 @@
 # demo
-TB_CONFIG_DEMO_LIBS				= iphlpapi ws2_32
+TB_CONFIG_DEMO_LIBS				= iphlpapi ws2_32 
 TB_CONFIG_DEMO_CMD1 			=
 
 # plat
@@ -20,8 +20,15 @@ TB_CONFIG_API_PRINT 			= windows
 TB_CONFIG_API_PROCESS 			= windows
 TB_CONFIG_API_MEMORY 			= windows
 
-# third party
-TB_CONFIG_THIRD_ZLIB 			= y
-
 # float
 TB_CONFIG_TYPE_FLOAT 			= y
+
+# zlib
+TB_CONFIG_HAVE_ZLIB 			= y
+
+# openssl
+TB_CONFIG_HAVE_OPENSSL 			= n
+
+# polarssl
+TB_CONFIG_HAVE_POLARSSL 		= n
+

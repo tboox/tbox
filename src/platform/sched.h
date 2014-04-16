@@ -35,25 +35,10 @@
  * interfaces
  */
 
-#if defined(TB_CONFIG_OS_LINUX) || \
-		defined(TB_CONFIG_OS_MAC) || \
-			defined(TB_CONFIG_OS_IOS) || \
-				defined(TB_CONFIG_OS_ANDROID) \
-
 /*! yield the processor
  *
  * @return 		tb_true or tb_false
  */
 tb_bool_t 		tb_sched_yield(tb_noarg_t);
-
-#else
-
-static __tb_inline_force__ tb_bool_t tb_sched_yield()
-{
-	tb_usleep(1);
-	return tb_true;
-}
-
-#endif
 
 #endif

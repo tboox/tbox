@@ -16,7 +16,7 @@ DLL_SUFFIX 			= .so
 ASM_SUFFIX 			= .S
 
 # prefix
-PRE 				:= $(if $(findstring x86,$(ARCH)),i686-w64-mingw32-,$(PRE))
+PRE 				:= $(if $(findstring x86,$(ARCH)),$(if $(findstring mac,$(HOST)),i386-mingw32-,i686-w64-mingw32-),$(PRE))
 PRE 				:= $(if $(findstring x64,$(ARCH)),x86_64-w64-mingw32-,$(PRE))
 PRE_ 				:= $(if $(BIN),$(BIN)/$(PRE),$(PRE))
 
@@ -42,7 +42,11 @@ PWD 				= pwd
 # cxflags: .c/.cc/.cpp files
 CXFLAGS_RELEASE 	= -freg-struct-return -fno-bounds-check -fvisibility=hidden 
 CXFLAGS_DEBUG 		= -g 
+ifeq ($(HOST),mac)
+CXFLAGS 			= -m$(BITS) -c -Wall 
+else
 CXFLAGS 			= -m$(BITS) -c -Wall -mssse3 
+endif
 CXFLAGS-I 			= -I
 CXFLAGS-o 			= -o
 
@@ -64,6 +68,16 @@ endif
 # cflags: .c files
 CFLAGS_RELEASE 		= 
 CFLAGS_DEBUG 		= 
+ifeq ($(HOST),mac)
+CFLAGS 				= \
+					-std=c99 \
+					-D_GNU_SOURCE=1 -D_REENTRANT \
+					-Wno-parentheses \
+					-Wno-switch -Wno-format-zero-length -Wdisabled-optimization \
+					-Wpointer-arith -Wredundant-decls -Wwrite-strings \
+					-Wundef -Wmissing-prototypes -Wstrict-prototypes -fno-math-errno
+					
+else
 CFLAGS 				= \
 					-std=c99 \
 					-D_GNU_SOURCE=1 -D_REENTRANT \
@@ -73,6 +87,7 @@ CFLAGS 				= \
 					-Wtype-limits -Wundef -Wmissing-prototypes -Wno-pointer-to-int-cast \
 					-Wstrict-prototypes -fno-math-errno -fno-signed-zeros -fno-tree-vectorize \
 					-Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=return-type -Werror=unused-variable
+endif
 
 # ccflags: .cc/.cpp files
 CCFLAGS_RELEASE 	=

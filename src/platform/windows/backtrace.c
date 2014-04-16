@@ -26,16 +26,41 @@
  * includes
  */
 #include "prefix.h"
-#include <windows.h>
-#include <dbghelp.h>
+#include "api.h"
+
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+#define TB_MAX_SYM_NAME 			(2000)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
  */
 
+// the symbol info type
+typedef struct __tb_symbol_info_t 
+{
+	ULONG 		SizeOfStruct;
+	ULONG 		TypeIndex;
+	ULONG64 	Reserved[2];
+	ULONG 		info;
+	ULONG 		Size;
+	ULONG64 	ModBase;
+	ULONG 		Flags;
+	ULONG64 	Value;
+	ULONG64 	Address;
+	ULONG 		Register;
+	ULONG 		Scope;
+	ULONG 		Tag;
+	ULONG 		NameLen;
+	ULONG 		MaxNameLen;
+	CHAR 		Name[1];
+
+}tb_symbol_info_t;
+
 // the dynamic func
-typedef BOOL WINAPI 	(*tb_SymInitialize_t)(HANDLE hProcess, PCTSTR UserSearchPath, BOOL fInvadeProcess);
-typedef BOOL WINAPI 	(*tb_SymFromAddr_t)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, PSYMBOL_INFO Symbol);
+typedef BOOL WINAPI 	(*tb_SymInitialize_t)(HANDLE hProcess, LPCTSTR UserSearchPath, BOOL fInvadeProcess);
+typedef BOOL WINAPI 	(*tb_SymFromAddr_t)(HANDLE hProcess, DWORD64 Address, PDWORD64 Displacement, tb_symbol_info_t* Symbol);
 typedef DWORD WINAPI 	(*tb_SymSetOptions_t)(DWORD SymOptions);
 
 // the symbols type
@@ -51,7 +76,7 @@ typedef struct __tb_symbols_t
 	HANDLE 				library;
 
 	// the symbol
-	SYMBOL_INFO* 		symbol;
+	tb_symbol_info_t* 	symbol;
 
 }tb_symbols_t;
 
@@ -67,32 +92,25 @@ tb_size_t tb_backtrace_frames(tb_pointer_t* frames, tb_size_t nframe, tb_size_t 
 	static tb_bool_t init = tb_false;
 	if (!init)
 	{
-		// init library
-		HANDLE library = LoadLibraryExA("dbghelp.dll", tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
-		if (library)
+		// init SymInitialize
+		tb_SymInitialize_t pSymInitialize = tb_api_SymInitialize();
+		if (pSymInitialize)
 		{
-			// init SymInitialize
-			tb_SymInitialize_t pSymInitialize = (tb_SymInitialize_t)GetProcAddress(library, "SymInitialize");
-			if (pSymInitialize)
-			{
-#if 0
-				// init options
-				tb_SymSetOptions_t pSymSetOptions = (tb_SymSetOptions_t)GetProcAddress(library, "SymSetOptions");
-				if (pSymSetOptions) pSymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
-#endif
-
-				// init symbols
-				if (pSymInitialize(GetCurrentProcess(), tb_null, TRUE))
-					init = tb_true;
-			}
+			// init symbols
+			if (pSymInitialize(GetCurrentProcess(), tb_null, TRUE))
+				init = tb_true;
 		}
 	}
 
 	// check
 	tb_check_return_val(init, 0);
 
+	// the CaptureStackBackTrace func
+	tb_api_CaptureStackBackTrace_t pCaptureStackBackTrace = tb_api_CaptureStackBackTrace();
+	tb_check_return_val(pCaptureStackBackTrace, 0);
+
 	// note: cannot use assert
-	return (tb_size_t)CaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_null);
+	return (tb_size_t)pCaptureStackBackTrace((DWORD)nskip, (DWORD)nframe < 63? nframe : 62, frames, tb_null);
 }
 tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 {
@@ -104,12 +122,12 @@ tb_handle_t tb_backtrace_symbols_init(tb_pointer_t* frames, tb_size_t nframe)
 	tb_check_return_val(symbols, tb_null);
 
 	// make symbol
-	symbols->symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(tb_char_t), 1);
+	symbols->symbol = (tb_symbol_info_t*)calloc(sizeof(tb_symbol_info_t) + TB_MAX_SYM_NAME * sizeof(tb_char_t), 1);
 	tb_check_goto(symbols->symbol, fail);
 
 	// init symbol
-	symbols->symbol->MaxNameLen = MAX_SYM_NAME;
-	symbols->symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+	symbols->symbol->MaxNameLen = TB_MAX_SYM_NAME;
+	symbols->symbol->SizeOfStruct = sizeof(tb_symbol_info_t);
 
 	// init dynamic
 	symbols->library = LoadLibraryExA("dbghelp.dll", tb_null, LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -151,4 +169,3 @@ tb_void_t tb_backtrace_symbols_exit(tb_handle_t handle)
 		free(symbols);
 	}
 }
-

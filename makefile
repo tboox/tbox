@@ -154,6 +154,12 @@ endif
 # config
 # #
 
+# host
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i linux},linux,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i darwin},mac,))
+HOST :=$(if $(HOST),$(HOST),$(if ${shell uname | egrep -i cygwin},windows,))
+HOST :=$(if $(HOST),$(HOST),linux)
+
 # platform
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i linux},linux,))
 PLAT :=$(if $(PLAT),$(PLAT),$(if ${shell uname | egrep -i darwin},mac,))
@@ -232,6 +238,7 @@ config : .null
 	@echo "config: name:     " 							$(PRO_NAME)
 	@echo "config: plat:     " 							$(PLAT)
 	@echo "config: arch:     " 							$(ARCH)
+	@echo "config: host:     " 							$(HOST)
 	@echo "config: demo:     " 							$(DEMO)
 	@echo "config: prof:     " 							$(PROF)
 	@echo "config: debug:    " 							$(DEBUG)
@@ -263,6 +270,9 @@ config : .null
 	@echo "# prefix"              						>> .config.mak
 	@echo "PREFIX ="$(PREFIX) 							>> .config.mak
 	@echo ""                              				>> .config.mak
+	@echo "# host"      		          				>> .config.mak
+	@echo "HOST ="$(HOST) 								>> .config.mak
+	@echo ""                              				>> .config.mak
 	@echo "# platform"      	          				>> .config.mak
 	@echo "PLAT ="$(PLAT) 								>> .config.mak
 	@echo ""                              				>> .config.mak
@@ -283,7 +293,6 @@ config : .null
 	@echo "NDK ="$(NDK) 								>> .config.mak
 	@echo "BIN ="$(BIN) 								>> .config.mak
 	@echo "PRE ="$(PRE) 								>> .config.mak
-	@echo "HOST ="$(HOST) 								>> .config.mak
 	@echo "CCACHE ="$(CCACHE) 							>> .config.mak
 	@echo "DISTCC ="$(DISTCC) 							>> .config.mak
 	@echo ""                              				>> .config.mak
@@ -293,6 +302,7 @@ config : .null
 	@echo "export DEBUG" 			 					>> .config.mak
 	@echo "export DTYPE" 			 					>> .config.mak
 	@echo "export SMALL" 			 					>> .config.mak
+	@echo "export HOST"					 				>> .config.mak
 	@echo "export PLAT"					 				>> .config.mak
 	@echo "export ARCH"					 				>> .config.mak
 	@echo "export ARM"					 				>> .config.mak
@@ -307,7 +317,6 @@ config : .null
 	@echo "export NDK" 				 					>> .config.mak
 	@echo "export BIN" 				 					>> .config.mak
 	@echo "export PRE" 				 					>> .config.mak
-	@echo "export HOST" 			 					>> .config.mak
 	@echo "export CCACHE" 			 					>> .config.mak
 	@echo "export DISTCC" 			 					>> .config.mak
 
