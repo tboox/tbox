@@ -17,17 +17,25 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asm.h
+ * @file		cache.h
  *
  */
-#ifndef TB_PREFIX_ASM_H
-#define TB_PREFIX_ASM_H
+#ifndef TB_PREFIX_ASM_CACHE_H
+#define TB_PREFIX_ASM_CACHE_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "asm/asm.h"
+#include "prefix.h"
 
+/* ///////////////////////////////////////////////////////////////////////
+ * macros
+ */
+
+// the cpu L1 cache bytes, default: 32 bytes
+#ifndef TB_L1_CACHE_BYTES
+# 	define TB_L1_CACHE_BYTES 				(32)
+#endif
 
 #endif
 

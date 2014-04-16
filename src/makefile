@@ -270,6 +270,7 @@ tbox_C_FILES 			+= \
 						platform/timer \
 						platform/ltimer \
 						platform/tstore \
+						platform/atomic64 \
 						platform/platform \
 						platform/backtrace \
 						platform/thread_pool \
@@ -317,6 +318,13 @@ INC_FILES 				= \
 						prefix/state.h \
 						prefix/packed.h \
 						prefix/config.h \
+						prefix/prefix.S \
+						prefix/asm/prefix.h \
+						prefix/asm/prefix.S \
+						prefix/asm/asm.h \
+						prefix/asm/cache.h \
+						prefix/asm/arm/prefix.h \
+						prefix/asm/arm/prefix.S \
 						memory/vpool.h \
 						memory/fpool.h \
 						memory/tpool.h \

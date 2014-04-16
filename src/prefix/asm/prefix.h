@@ -17,16 +17,20 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		asm.h
+ * @file		prefix.h
  *
  */
-#ifndef TB_PREFIX_ASM_H
-#define TB_PREFIX_ASM_H
+#ifndef TB_PREFIX_ASM_PREFIX_H
+#define TB_PREFIX_ASM_PREFIX_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "asm/asm.h"
+#include "../config.h"
+#include "../arch.h"
+#include "../cpu.h"
+#include "../endian.h"
+#include "../compiler.h"
 
 
 #endif

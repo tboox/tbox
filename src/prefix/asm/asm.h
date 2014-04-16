@@ -20,13 +20,14 @@
  * @file		asm.h
  *
  */
-#ifndef TB_PREFIX_ASM_H
-#define TB_PREFIX_ASM_H
+#ifndef TB_PREFIX_ASM_ASM_H
+#define TB_PREFIX_ASM_ASM_H
 
 /* ///////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "asm/asm.h"
+#include "prefix.h"
+#include "cache.h"
 
 
 #endif
