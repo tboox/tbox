@@ -27,6 +27,7 @@
 #include "api.h"
 #include "../atomic.h"
 #include "../socket.h"
+#include "../dynamic.h"
 
 /* ///////////////////////////////////////////////////////////////////////
  * macros
