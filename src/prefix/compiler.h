@@ -122,6 +122,16 @@
 #			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.3"
 #		elif __GNUC_MINOR__ == 4
 #			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.4"
+#		elif __GNUC_MINOR__ == 5
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.5"
+#		elif __GNUC_MINOR__ == 6
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.6"
+#		elif __GNUC_MINOR__ == 7
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.7"
+#		elif __GNUC_MINOR__ == 8
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.8"
+#		elif __GNUC_MINOR__ == 9
+#			define TB_COMPILER_VERSION_STRING		"gnu c/c++ 4.9"
 #		endif
 #	else
 #		error Unknown gnu c/c++ Compiler Version
