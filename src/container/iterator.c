@@ -22,13 +22,13 @@
  *
  */
 
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
 #include "iterator.h"
 #include "../libc/libc.h"
 
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * integer
  */
 static tb_size_t tb_iterator_int_head(tb_iterator_t* iterator)
@@ -63,7 +63,7 @@ static tb_long_t tb_iterator_int_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 {
 	return (tb_long_t)ltem - (tb_long_t)rtem;
 }
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * string
  */
 static tb_long_t tb_iterator_str_comp(tb_iterator_t* iterator, tb_cpointer_t ltem, tb_cpointer_t rtem)
@@ -71,7 +71,7 @@ static tb_long_t tb_iterator_str_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 	tb_assert_return_val(ltem && rtem, 0);
 	return iterator->priv? tb_strcmp((tb_char_t const*)ltem, (tb_char_t const*)rtem) : tb_stricmp((tb_char_t const*)ltem, (tb_char_t const*)rtem);
 }
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * pointer
  */
 static tb_pointer_t tb_iterator_ptr_item(tb_iterator_t* iterator, tb_size_t itor)
@@ -88,7 +88,7 @@ static tb_long_t tb_iterator_ptr_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 {
 	return ltem - rtem;
 }
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * memory
  */
 static tb_pointer_t tb_iterator_mem_item(tb_iterator_t* iterator, tb_size_t itor)
@@ -114,7 +114,7 @@ static tb_long_t tb_iterator_mem_comp(tb_iterator_t* iterator, tb_cpointer_t lte
 	tb_assert_return_val(ltem && rtem, 0);
 	return tb_memcmp(ltem, rtem, iterator->step);
 }
-/* ///////////////////////////////////////////////////////////////////////
+/* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 tb_iterator_t tb_iterator_int(tb_long_t* data, tb_size_t size)
