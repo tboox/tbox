@@ -157,29 +157,29 @@
 /* ///////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_hize_t tb_atomic64_get_generic(tb_atomic64_t* a);
-tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a);
+tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a);
-tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v);
+tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
 
-tb_hize_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a);
-tb_hize_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hize_t v);
-tb_hize_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v);
+tb_hong_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a);
+tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hize_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hize_t v);
-tb_hize_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hize_t v);
-tb_hize_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v);
 
 tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a);
 tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
 tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
-tb_hize_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
-tb_hize_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
-tb_hize_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v);
+tb_hong_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
+tb_hong_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v);
 
 
 
