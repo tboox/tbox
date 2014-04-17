@@ -34,11 +34,7 @@
  */
 
 // the atomic64 lock mac count
-#ifdef __tb_small__
-# 	define TB_ATOMIC64_LOCK_MAXN 		(16)
-#else
-# 	define TB_ATOMIC64_LOCK_MAXN 		(32)
-#endif
+#define TB_ATOMIC64_LOCK_MAXN 		(16)
 
 /* ///////////////////////////////////////////////////////////////////////
  * types
@@ -53,184 +49,386 @@ typedef struct __tb_atomic64_lock_t
 	// the padding
 	tb_byte_t 				padding[TB_L1_CACHE_BYTES];
 
-}tb_atomic64_lock_t;
+}tb_atomic64_lock_t __tb_cacheline_aligned__;
 
 /* ///////////////////////////////////////////////////////////////////////
  * globals
  */
 
 // the locks
-static tb_atomic64_lock_t 	g_locks[TB_ATOMIC64_LOCK_MAXN] = {0};
+static tb_atomic64_lock_t 	g_locks[TB_ATOMIC64_LOCK_MAXN] = {TB_SPINLOCK_INIT};
 
 /* ///////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_hize_t tb_atomic64_get_generic(tb_atomic64_t* a)
+
+static __tb_inline_force__ tb_spinlock_t* tb_atomic64_lock(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
-	tb_assert(a);
-	return *a;
+	// trace
+	tb_trace1_w("using generic atomic64, maybe slower!");
+
+	// the addr
+	tb_hize_t addr = (tb_hong_t)a;
+
+	// compile the hash value
+	addr >>= TB_L1_CACHE_SHIFT;
+	addr ^= (addr >> 8) ^ (addr >> 16);
+
+	// the lock
+	return &g_locks[addr & (TB_ATOMIC64_LOCK_MAXN - 1)].lock;
 }
-tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hize_t v)
+
+/* ///////////////////////////////////////////////////////////////////////
+ * implementation
+ */
+tb_hong_t tb_atomic64_get_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
-	*a = v;
+
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// get value
+	tb_hong_t v = (tb_hong_t)*a;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return v;
+}
+tb_void_t tb_atomic64_set_generic(tb_atomic64_t* a, tb_hong_t v)
+{
+	// check
+	tb_assert(a);
+
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	*a = (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
 }
 tb_void_t tb_atomic64_set0_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
-	tb_assert(a);
-	*a = 0;
+	tb_atomic64_set_generic(a, 0);
 }
-tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
+tb_void_t tb_atomic64_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
-	tb_trace_nosafe();
-	tb_assert(a);
-	if (*a == p) *a = v;
-}
-tb_hize_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a)
-{
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hize_t o = *a;
-	*a = 0;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	if ((tb_hong_t)*a == p) *a = (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+}
+tb_hong_t tb_atomic64_fetch_and_set0_generic(tb_atomic64_t* a)
+{
+	return tb_atomic64_fetch_and_set_generic(a, 0);
+}
+tb_hong_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hong_t v)
+{
+	// check
+	tb_assert(a);
+
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; *a = (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
-tb_hize_t tb_atomic64_fetch_and_set_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hong_t p, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hize_t o = *a;
-	*a = v;
-	return o;
-}
-tb_hize_t tb_atomic64_fetch_and_pset_generic(tb_atomic64_t* a, tb_hize_t p, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
 
-	tb_hize_t o = *a;
-	if (o == p) *a = v;
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; if (o == p) *a = (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
 tb_hong_t tb_atomic64_fetch_and_inc_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return *pa++;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)(*a)++;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 tb_hong_t tb_atomic64_fetch_and_dec_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return *pa--;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)(*a)--;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 tb_hong_t tb_atomic64_fetch_and_add_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hong_t o = *((tb_hong_t*)a);
-	*((tb_hong_t*)a) += v;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; *a += (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
 tb_hong_t tb_atomic64_fetch_and_sub_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	return tb_atomic64_fetch_and_add_generic(a, -v);
+}
+tb_hong_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hong_t v)
+{
+	// check
 	tb_assert(a);
 
-	tb_hong_t o = *((tb_hong_t*)a);
-	*((tb_hong_t*)a) -= v;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; *a ^= (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
-tb_hize_t tb_atomic64_fetch_and_xor_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hize_t o = *a;
-	*a ^= v;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; *a &= (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
-tb_hize_t tb_atomic64_fetch_and_and_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hize_t o = *a;
-	*a &= v;
-	return o;
-}
-tb_hize_t tb_atomic64_fetch_and_or_generic(tb_atomic64_t* a, tb_hize_t v)
-{
-	tb_trace_nosafe();
-	tb_assert(a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
 
-	tb_hize_t o = *a;
-	*a |= v;
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)*a; *a |= (tb_atomic64_t)v;
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
 	return o;
 }
 tb_hong_t tb_atomic64_inc_and_fetch_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return ++*pa;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)++(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 tb_hong_t tb_atomic64_dec_and_fetch_generic(tb_atomic64_t* a)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	tb_hong_t __tb_volatile__* pa = (tb_hong_t __tb_volatile__*)a;
-	return --*pa;
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	tb_hong_t o = (tb_hong_t)--(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 tb_hong_t tb_atomic64_add_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	*((tb_hong_t*)a) += v;
-	return *((tb_hong_t*)a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	*a += (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 tb_hong_t tb_atomic64_sub_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
-	tb_assert(a);
-
-	*((tb_hong_t*)a) -= v;
-	return *((tb_hong_t*)a);
+	return tb_atomic64_add_and_fetch_generic(a, -v);
 }
-tb_hize_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_xor_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	*((tb_hong_t*)a) ^= v;
-	return *((tb_hong_t*)a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	*a ^= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
-tb_hize_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_and_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	*((tb_hong_t*)a) &= v;
-	return *((tb_hong_t*)a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	*a &= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
-tb_hize_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hize_t v)
+tb_hong_t tb_atomic64_or_and_fetch_generic(tb_atomic64_t* a, tb_hong_t v)
 {
-	tb_trace_nosafe();
+	// check
 	tb_assert(a);
 
-	*((tb_hong_t*)a) |= v;
-	return *((tb_hong_t*)a);
+	// the lock
+	tb_spinlock_t* lock = tb_atomic64_lock(a);
+
+	// enter
+	tb_spinlock_enter(lock);
+
+	// set value
+	*a |= (tb_atomic64_t)v; tb_hong_t o = (tb_hong_t)(*a);
+
+	// leave
+	tb_spinlock_leave(lock);
+
+	// ok?
+	return o;
 }
 

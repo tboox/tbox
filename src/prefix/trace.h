@@ -176,11 +176,29 @@
 # 	define tb_tracet_w
 #endif
 
+// trace once
+#if defined(TB_COMPILER_IS_GCC)
+#	define tb_trace1_d(fmt, arg ...)				do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_d(fmt, ## arg); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_i(fmt, arg ...)				do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_i(fmt, ## arg); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_e(fmt, arg ...)				do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_e(fmt, ## arg); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_a(fmt, arg ...)				do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_a(fmt, ## arg); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_w(fmt, arg ...)				do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_w(fmt, ## arg); __trace_once = tb_true; } } while (0)
+#elif defined(TB_COMPILER_IS_MSVC) && TB_COMPILER_VERSION_BE(13, 0)
+#	define tb_trace1_d(fmt, ...)					do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_d(fmt, __VA_ARGS__); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_i(fmt, ...)					do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_i(fmt, __VA_ARGS__); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_e(fmt, ...)					do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_e(fmt, __VA_ARGS__); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_a(fmt, ...)					do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_a(fmt, __VA_ARGS__); __trace_once = tb_true; } } while (0)
+#	define tb_trace1_w(fmt, ...)					do { static tb_bool_t __trace_once = tb_false; if (!__trace_once) { tb_trace_w(fmt, __VA_ARGS__); __trace_once = tb_true; } } while (0)
+#else
+# 	define tb_trace1_i
+#endif
+
+
 // noimpl
-#define tb_trace_noimpl() 							tb_trace_w("noimpl")
+#define tb_trace_noimpl() 							tb_trace1_w("noimpl")
 
 // nosafe
-#define tb_trace_nosafe() 							tb_trace_w("nosafe")
+#define tb_trace_nosafe() 							tb_trace1_w("nosafe")
 
 /* ///////////////////////////////////////////////////////////////////////
  * declaration

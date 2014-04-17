@@ -127,13 +127,13 @@
 /* ///////////////////////////////////////////////////////////////////////
  * get & set
  */
-static __tb_inline__ tb_size_t tb_atomic_get_generic(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_get_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	return *a;
 }
-static __tb_inline__ tb_void_t tb_atomic_set_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_set_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -145,36 +145,36 @@ static __tb_inline__ tb_void_t tb_atomic_set0_generic(tb_atomic_t* a)
 	tb_assert(a);
 	*a = 0;
 }
-static __tb_inline__ tb_void_t tb_atomic_pset_generic(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_void_t tb_atomic_pset_generic(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 	if (*a == p) *a = v;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_set0_generic(tb_atomic_t* a)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_set0_generic(tb_atomic_t* a)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	*a = 0;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_set_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_set_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	*a = v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_pset_generic(tb_atomic_t* a, tb_size_t p, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_pset_generic(tb_atomic_t* a, tb_long_t p, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	if (o == p) *a = v;
 	return o;
 }
@@ -216,30 +216,30 @@ static __tb_inline__ tb_long_t tb_atomic_fetch_and_sub_generic(tb_atomic_t* a, t
 	*((tb_long_t*)a) -= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_xor_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_xor_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	*a ^= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_and_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_and_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	*a &= v;
 	return o;
 }
-static __tb_inline__ tb_size_t tb_atomic_fetch_and_or_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_fetch_and_or_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
 
-	tb_size_t o = *a;
+	tb_long_t o = *a;
 	*a |= v;
 	return o;
 }
@@ -279,7 +279,7 @@ static __tb_inline__ tb_long_t tb_atomic_sub_and_fetch_generic(tb_atomic_t* a, t
 	*((tb_long_t*)a) -= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_xor_and_fetch_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -287,7 +287,7 @@ static __tb_inline__ tb_size_t tb_atomic_xor_and_fetch_generic(tb_atomic_t* a, t
 	*((tb_long_t*)a) ^= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_and_and_fetch_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);
@@ -295,7 +295,7 @@ static __tb_inline__ tb_size_t tb_atomic_and_and_fetch_generic(tb_atomic_t* a, t
 	*((tb_long_t*)a) &= v;
 	return *((tb_long_t*)a);
 }
-static __tb_inline__ tb_size_t tb_atomic_or_and_fetch_generic(tb_atomic_t* a, tb_size_t v)
+static __tb_inline__ tb_long_t tb_atomic_or_and_fetch_generic(tb_atomic_t* a, tb_long_t v)
 {
 	tb_trace_nosafe();
 	tb_assert(a);

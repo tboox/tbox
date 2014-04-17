@@ -60,7 +60,6 @@
 # 	define __tb_thiscall__ 						__attribute__((__thiscall__))
 # 	define __tb_packed__ 						__attribute__((packed, aligned(1)))
 # 	define __tb_aligned__(a) 					__attribute__((packed, aligned(a)))
-
 #else
 
 # 	define __tb_inline__ 						inline
