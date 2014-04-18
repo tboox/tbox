@@ -791,7 +791,7 @@ tb_handle_t tb_http_init()
 		tb_assert_and_check_break(http->stream);
 
 		// init pool
-		http->pool = tb_spool_init(TB_SPOOL_GROW_MICRO, 0);
+		http->pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_MICRO, 0);
 		tb_assert_and_check_break(http->pool);
 
 		// init line data
@@ -861,7 +861,7 @@ tb_void_t tb_http_exit(tb_handle_t handle)
 	tb_pstring_exit(&http->request);
 
 	// exit pool
-	if (http->pool) tb_spool_exit(http->pool);
+	if (http->pool) tb_block_pool_exit(http->pool);
 	http->pool = tb_null;
 
 	// free it

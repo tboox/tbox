@@ -105,20 +105,42 @@ tb_size_t 				tb_thread_pool_task_size(tb_handle_t pool);
  * @param priv 			the task private data
  * @param urgent 		is urgent task?
  *
- * @return 				the task handle
+ * @return 				tb_true or tb_false
  */
-tb_handle_t 			tb_thread_pool_task_post(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
+tb_bool_t 				tb_thread_pool_task_post(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
 
 /*! post task list
  *
  * @param pool 			the thread pool handle
  * @param list 			the task list
  * @param size 			the task count
- * @param tasks 		the task handle list, optional
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks);
+tb_bool_t 				tb_thread_pool_task_post_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size);
+
+/*! init one task
+ *
+ * @param pool 			the thread pool handle
+ * @param done 			the task done func
+ * @param exit 			the task exit func, optional
+ * @param priv 			the task private data
+ * @param urgent 		is urgent task?
+ *
+ * @return 				the task handle
+ */
+tb_handle_t 			tb_thread_pool_task_init(tb_handle_t pool, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent);
+
+/*! init task list
+ *
+ * @param pool 			the thread pool handle
+ * @param list 			the task list
+ * @param size 			the task count
+ * @param tasks 		the task handle list
+ *
+ * @return 				tb_true or tb_false
+ */
+tb_bool_t 				tb_thread_pool_task_init_list(tb_handle_t pool, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks);
 
 /*! kill one task
  *
@@ -140,6 +162,21 @@ tb_void_t 				tb_thread_pool_task_kill_list(tb_handle_t pool, tb_handle_t* tasks
  * @param pool 			the thread pool handle
  */
 tb_void_t 				tb_thread_pool_task_kill_all(tb_handle_t pool);
+
+/*! exit one task
+ *
+ * @param pool 			the thread pool handle
+ * @param task 			the task handle
+ */
+tb_void_t 				tb_thread_pool_task_exit(tb_handle_t pool, tb_handle_t task);
+
+/*! exit task list
+ *
+ * @param pool 			the thread pool handle
+ * @param tasks 		the task handle list
+ * @param size 			the task handle count
+ */
+tb_void_t 				tb_thread_pool_task_exit_list(tb_handle_t pool, tb_handle_t* tasks, tb_size_t size);
 
 /*! the thread pool instance
  *

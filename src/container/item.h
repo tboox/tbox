@@ -152,7 +152,7 @@ tb_item_func_t 		tb_item_func_uint64(tb_noarg_t);
 /*! the string item function
  *
  * using tb_strdup if the spool is null, 
- * using tb_spool_strdup if the spool exists
+ * using tb_block_pool_strdup if the spool exists
  *
  * @param bcase 	is case?
  * @param spool 	the string pool
@@ -183,7 +183,7 @@ tb_item_func_t 		tb_item_func_obj(tb_noarg_t);
  * storing the index value in the internal item of the container
  *
  * using tb_malloc if the rpool is null, 
- * using tb_rpool_malloc if the rpool exists
+ * using tb_fixed_pool_malloc if the rpool exists
  *
  * @param size 		the item size
  * @param rpool 	the item rpool
@@ -210,7 +210,7 @@ tb_item_func_t 		tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_p
 
  * @return 			the item func
  */
-tb_item_func_t 		tb_item_func_scache(tb_bool_t bcase); 
+tb_item_func_t 		tb_item_func_string_cache(tb_bool_t bcase); 
 
 #endif
 

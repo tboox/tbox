@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		vpool.c
+ * @file		static_block_pool.c
  * @ingroup 	memory
  *
  */
@@ -25,7 +25,7 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "vpool.h"
+#include "static_block_pool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -36,15 +36,15 @@
  */
 
 // the magic number
-#define TB_VPOOL_MAGIC 							(0xdead)
+#define TB_STATIC_BLOCK_POOL_MAGIC 							(0xdead)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
  */
 
 #ifdef __tb_debug__
-/// the vpool info type
-typedef struct __tb_vpool_info_t
+/// the pool info type
+typedef struct __tb_static_block_pool_info_t
 {
 	// the used size
 	tb_size_t 			used;
@@ -67,11 +67,11 @@ typedef struct __tb_vpool_info_t
 	// the aloc count
 	tb_size_t 			aloc;
 
-}tb_vpool_info_t;
+}tb_static_block_pool_info_t;
 #endif
 
-/// the vpool block type
-typedef struct __tb_vpool_block_t
+/// the pool block type
+typedef struct __tb_static_block_pool_block_t
 {
 #ifdef __tb_debug__
 
@@ -101,7 +101,7 @@ typedef struct __tb_vpool_block_t
 	/// is free?
 	tb_uint32_t 		free 	: 1;
 
-}tb_vpool_block_t;
+}tb_static_block_pool_block_t;
 
 /*!the variable pool type
  *
@@ -111,7 +111,7 @@ typedef struct __tb_vpool_block_t
  *                     block0 							block1 ...
  * </pre>
  */
-typedef struct __tb_vpool_t
+typedef struct __tb_static_block_pool_t
 {
 	// the magic 
 	tb_uint16_t 		magic;
@@ -136,17 +136,17 @@ typedef struct __tb_vpool_t
 	
 	// the info 
 #ifdef __tb_debug__
-	tb_vpool_info_t 	info;
+	tb_static_block_pool_info_t 	info;
 #endif
 
-}tb_vpool_t;
+}tb_static_block_pool_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 #ifdef __tb_debug__
 // dump backtrace
-static tb_void_t tb_vpool_dump_backtrace(tb_char_t const* prefix, tb_vpool_block_t* block)
+static tb_void_t tb_static_block_pool_dump_backtrace(tb_char_t const* prefix, tb_static_block_pool_block_t* block)
 {
 	if (block)
 	{
@@ -158,7 +158,7 @@ static tb_void_t tb_vpool_dump_backtrace(tb_char_t const* prefix, tb_vpool_block
 		tb_backtrace_dump(prefix, block->frames, nframe);
 	}
 }
-static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
+static tb_void_t tb_static_block_pool_dump_data(tb_byte_t const* data, tb_size_t size)
 {
 	// check
 	tb_assert_and_check_return(data && size);
@@ -248,23 +248,23 @@ static tb_void_t tb_vpool_dump_data(tb_byte_t const* data, tb_size_t size)
 		else break;
 	}
 }
-static tb_vpool_block_t* tb_vpool_overflow_find(tb_vpool_t* vpool)
+static tb_static_block_pool_block_t* tb_static_block_pool_overflow_find(tb_static_block_pool_t* pool)
 {
 	// check
-	tb_assert_and_check_return_val(vpool, tb_null);
+	tb_assert_and_check_return_val(pool, tb_null);
 
 	// walk
-	tb_byte_t* 			pb = vpool->data;
-	tb_byte_t* 			pe = pb + vpool->size;
-	tb_size_t 			nhead = vpool->nhead;
-	tb_vpool_block_t* 	prev = tb_null;
+	tb_byte_t* 			pb = pool->data;
+	tb_byte_t* 			pe = pb + pool->size;
+	tb_size_t 			nhead = pool->nhead;
+	tb_static_block_pool_block_t* 	prev = tb_null;
 	while (pb + nhead < pe)
 	{
 		// the block
-		tb_vpool_block_t* block = (tb_vpool_block_t*)pb;
+		tb_static_block_pool_block_t* block = (tb_static_block_pool_block_t*)pb;
 
 		// overflow?
-		if (block->magic != TB_VPOOL_MAGIC || !block->size || block->size >= vpool->size)
+		if (block->magic != TB_STATIC_BLOCK_POOL_MAGIC || !block->size || block->size >= pool->size)
 			return prev;	
 
 		// next
@@ -278,13 +278,13 @@ static tb_vpool_block_t* tb_vpool_overflow_find(tb_vpool_t* vpool)
 #endif
 
 #ifdef __tb_debug__
-static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* block, tb_vpool_block_t* prev)
+static tb_bool_t tb_static_block_pool_overflow_check(tb_static_block_pool_t* pool, tb_static_block_pool_block_t* block, tb_static_block_pool_block_t* prev)
 {
 	// overflow?
-	if (block->magic != TB_VPOOL_MAGIC || !block->size || block->size >= vpool->size) 
+	if (block->magic != TB_STATIC_BLOCK_POOL_MAGIC || !block->size || block->size >= pool->size) 
 	{
 		// find the previous block if null
-		if (!prev) prev = tb_vpool_overflow_find(vpool);
+		if (!prev) prev = tb_static_block_pool_overflow_find(pool);
 
 		// dump backtrace
 		if (prev)
@@ -293,21 +293,21 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 			if (prev->free)
 			{
 				// dump
-				tb_trace_i("vpool: overflow: magic: data: %p size: %lu free: %lu"
-						, (tb_byte_t const*)prev + vpool->nhead
+				tb_trace_i("pool: overflow: magic: data: %p size: %lu free: %lu"
+						, (tb_byte_t const*)prev + pool->nhead
 						, prev->real
 						, prev->free
 						);
 				
 				// dump data
-				tb_vpool_dump_data((tb_byte_t const*)prev, vpool->nhead + prev->size);
-				tb_vpool_dump_data((tb_byte_t const*)prev + vpool->nhead + prev->size, vpool->nhead);
+				tb_static_block_pool_dump_data((tb_byte_t const*)prev, pool->nhead + prev->size);
+				tb_static_block_pool_dump_data((tb_byte_t const*)prev + pool->nhead + prev->size, pool->nhead);
 			}
 			else
 			{
 				// dump
-				tb_trace_i("vpool: overflow: magic: data: %p size: %lu free: %lu at %s(): %d, file: %s"
-						, (tb_byte_t const*)prev + vpool->nhead
+				tb_trace_i("pool: overflow: magic: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+						, (tb_byte_t const*)prev + pool->nhead
 						, prev->real
 						, prev->free
 						, prev->func
@@ -316,14 +316,14 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 						);
 
 				// dump backtrace
-				tb_vpool_dump_backtrace("vpool:     ", prev);
+				tb_static_block_pool_dump_backtrace("pool:     ", prev);
 
 				// dump data
-				tb_vpool_dump_data((tb_byte_t const*)prev, vpool->nhead + prev->size);
-				tb_vpool_dump_data((tb_byte_t const*)prev + vpool->nhead + prev->size, vpool->nhead);
+				tb_static_block_pool_dump_data((tb_byte_t const*)prev, pool->nhead + prev->size);
+				tb_static_block_pool_dump_data((tb_byte_t const*)prev + pool->nhead + prev->size, pool->nhead);
 			}
 		}
-		else tb_trace_i("vpool: overflow");
+		else tb_trace_i("pool: overflow");
 
 		// abort
 		return tb_false;
@@ -333,16 +333,16 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 	if (!block->free && block->real < block->size)
 	{
 		// find 0xcc
-		tb_byte_t const* 	p = (tb_byte_t const*)block + vpool->nhead + block->real;
-		tb_byte_t const* 	e = (tb_byte_t const*)block + vpool->nhead + block->size;
+		tb_byte_t const* 	p = (tb_byte_t const*)block + pool->nhead + block->real;
+		tb_byte_t const* 	e = (tb_byte_t const*)block + pool->nhead + block->size;
 		if (p + 4 < e) e = p + 4; while (p < e && *p == 0xcc) p++;
 		
 		// no 0xcc? overflow?
 		if (p < e)
 		{
 			// dump
-			tb_trace_i("vpool: overflow: fill: data: %p size: %lu free: %lu at %s(): %d, file: %s"
-					, (tb_byte_t const*)block + vpool->nhead
+			tb_trace_i("pool: overflow: fill: data: %p size: %lu free: %lu at %s(): %d, file: %s"
+					, (tb_byte_t const*)block + pool->nhead
 					, block->real
 					, block->free
 					, block->func
@@ -351,10 +351,10 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 					);
 
 			// dump backtrace
-			tb_vpool_dump_backtrace("vpool:     ", block);
+			tb_static_block_pool_dump_backtrace("pool:     ", block);
 
 			// dump data
-			tb_vpool_dump_data((tb_byte_t const*)block, vpool->nhead + block->size);
+			tb_static_block_pool_dump_data((tb_byte_t const*)block, pool->nhead + block->size);
 
 			// abort
 			return tb_false;
@@ -364,10 +364,10 @@ static tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* bl
 	return tb_true;
 }
 #else
-static __tb_inline__ tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpool_block_t* block, tb_vpool_block_t* prev)
+static __tb_inline__ tb_bool_t tb_static_block_pool_overflow_check(tb_static_block_pool_t* pool, tb_static_block_pool_block_t* block, tb_static_block_pool_block_t* prev)
 {
 	// check
-	tb_check_return_val(block->size < vpool->size, tb_false);
+	tb_check_return_val(block->size < pool->size, tb_false);
 
 	// ok
 	return tb_true;
@@ -375,11 +375,11 @@ static __tb_inline__ tb_bool_t tb_vpool_overflow_check(tb_vpool_t* vpool, tb_vpo
 #endif
 
 // malloc from the given data address
-static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)
+static tb_pointer_t tb_static_block_pool_malloc_from(tb_static_block_pool_t* pool, tb_byte_t* data, tb_size_t size, tb_size_t tryn)
 {
 	// pb & pe
-	tb_byte_t* 	pb = vpool->data;
-	tb_byte_t* 	pe = pb + vpool->size;
+	tb_byte_t* 	pb = pool->data;
+	tb_byte_t* 	pe = pb + pool->size;
 
 	// the data
 	tb_byte_t* 	p = data;
@@ -390,12 +390,12 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	tb_bool_t 	bpred = tryn == 1? tb_true : tb_false;
 
 	// the nhead
-	tb_size_t 	nhead = vpool->nhead;
+	tb_size_t 	nhead = pool->nhead;
 
 	// is align?
-	tb_assert(!(size & (vpool->align - 1)));
-	tb_assert(!(nhead & (vpool->align - 1)));
-	tb_assert(!((tb_size_t)data & (vpool->align - 1)));
+	tb_assert(!(size & (pool->align - 1)));
+	tb_assert(!(nhead & (pool->align - 1)));
+	tb_assert(!((tb_size_t)data & (pool->align - 1)));
 
 	// find the free block
 	tb_size_t 			maxn = 1;
@@ -403,11 +403,11 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	while (p + nhead <= pe && tryn)
 	{
 		// the block
-		tb_vpool_block_t* 	block = ((tb_vpool_block_t*)p);
-		tb_size_t 			bsize = ((tb_vpool_block_t*)p)->size;
+		tb_static_block_pool_block_t* 	block = ((tb_static_block_pool_block_t*)p);
+		tb_size_t 			bsize = ((tb_static_block_pool_block_t*)p)->size;
 			
 		// overflow?
-		tb_check_abort(tb_vpool_overflow_check(vpool, block, tb_null));
+		tb_check_abort(tb_static_block_pool_overflow_check(pool, block, tb_null));
 
 		// allocate if the block is free
 		if (block->free)
@@ -429,17 +429,17 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 				if (bsize > nhead + size)
 				{
 					// split block
-					tb_vpool_block_t* next = (tb_vpool_block_t*)(p + size);
+					tb_static_block_pool_block_t* next = (tb_static_block_pool_block_t*)(p + size);
 					next->size = bsize - size - nhead;
 					next->free = 1;
 				#ifdef __tb_debug__
 					next->real = 0;
-					next->magic = TB_VPOOL_MAGIC;
+					next->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 				#endif
 					block->size = size;
 
 					// predict the next free block
-					vpool->pred = p + block->size;
+					pool->pred = p + block->size;
 				}
 				// use the whole block
 				else block->size = bsize;
@@ -448,11 +448,11 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 				block->free = 0;
 
 				// reset the predicted block
-				if (vpool->pred == (tb_byte_t*)block || vpool->pred == pe)
-					vpool->pred = tb_null;
+				if (pool->pred == (tb_byte_t*)block || pool->pred == pe)
+					pool->pred = tb_null;
 
 				// reset full
-				vpool->full = 0;
+				pool->full = 0;
 
 				// return data address
 				return p;
@@ -460,7 +460,7 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 			else // attempt to merge next free block if the free block is too small
 			{
 				// the next block
-				tb_vpool_block_t* next = (tb_vpool_block_t*)(p + nhead + bsize);
+				tb_static_block_pool_block_t* next = (tb_static_block_pool_block_t*)(p + nhead + bsize);
 			
 				// break if doesn't exist next block
 				if ((tb_size_t)next + nhead >= (tb_size_t)pe) break;
@@ -472,11 +472,11 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 					block->size += nhead + next->size;
 
 					// reset the next predicted block
-					if (vpool->pred == (tb_byte_t*)next)
-						vpool->pred = tb_null;
+					if (pool->pred == (tb_byte_t*)next)
+						pool->pred = tb_null;
 
 					// reset full
-					vpool->full = 0;
+					pool->full = 0;
 
 					// continue handle this block
 					continue ;
@@ -492,34 +492,34 @@ static tb_pointer_t tb_vpool_malloc_from(tb_vpool_t* vpool, tb_byte_t* data, tb_
 	}
 
 	// predict the max free block
-	vpool->pred = pred;
+	pool->pred = pred;
 
 	// full => pred => max free block size or 1
-	if (!bpred) vpool->full = maxn;
+	if (!bpred) pool->full = maxn;
 
 	// fail
 	return tb_null;
 }
-static tb_pointer_t tb_vpool_malloc_skip_frame(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+static tb_pointer_t tb_static_block_pool_malloc_skip_frame(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, tb_null);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_null);
 
 	// no size?
 	tb_check_return_val(size, tb_null);
 
 	// align size
-	tb_size_t asize = tb_align(size, vpool->align);
+	tb_size_t asize = tb_align(size, pool->align);
 
 	// full?
-	tb_check_return_val(!vpool->full || asize <= vpool->full, tb_null);
+	tb_check_return_val(!pool->full || asize <= pool->full, tb_null);
 
 	// one tryn
 	tb_size_t tryn = 1;
 
 	// try allocating from the predicted block
-	tb_byte_t* p = tb_vpool_malloc_from(vpool, vpool->pred, asize, tryn);
+	tb_byte_t* p = tb_static_block_pool_malloc_from(pool, pool->pred, asize, tryn);
 
 	// ok?
 	tb_check_goto(!p, end);
@@ -528,7 +528,7 @@ static tb_pointer_t tb_vpool_malloc_skip_frame(tb_handle_t handle, tb_size_t siz
 	tryn = -1;
 
 	// alloc it from the first block
-	p = tb_vpool_malloc_from(vpool, vpool->data, asize, tryn);
+	p = tb_static_block_pool_malloc_from(pool, pool->data, asize, tryn);
 
 end:
 
@@ -537,10 +537,10 @@ end:
 	if (p) 
 	{			
 		// the block
-		tb_vpool_block_t* block = (tb_vpool_block_t*)(p - vpool->nhead);
+		tb_static_block_pool_block_t* block = (tb_static_block_pool_block_t*)(p - pool->nhead);
 
 		// set magic
-		block->magic = TB_VPOOL_MAGIC;
+		block->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 
 		// set line
 		block->line = line_;
@@ -562,60 +562,60 @@ end:
 		if (nframe < tb_arrayn(block->frames)) tb_memset(block->frames + nframe, 0, (tb_arrayn(block->frames) - nframe) * sizeof(tb_cpointer_t));
 
 		// update the used size
-		vpool->info.used += block->size;
+		pool->info.used += block->size;
 
 		// update the need size
-		vpool->info.need += size;
+		pool->info.need += size;
 
 		// update the real size		
-		vpool->info.real += vpool->nhead + block->size;
+		pool->info.real += pool->nhead + block->size;
 
 		// update the peak size
-		if (vpool->info.used > vpool->info.peak) vpool->info.peak = vpool->info.used;
+		if (pool->info.used > pool->info.peak) pool->info.peak = pool->info.used;
 		
 		// pred++
-		if (tryn == 1) vpool->info.pred++;
+		if (tryn == 1) pool->info.pred++;
 	}
 	// fail++
-	else vpool->info.fail++;
+	else pool->info.fail++;
 	
 	// aloc++
-	vpool->info.aloc++;
+	pool->info.aloc++;
 
 #endif
 
 	// ok?
 	return p;
 }
-tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
-tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
+tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize);
+tb_pointer_t tb_static_block_pool_ralloc_fast(tb_static_block_pool_t* pool, tb_pointer_t data, tb_size_t size, tb_size_t* osize)
 {
 	// check
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, tb_null);
+	tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_null);
 
 	// no data?
 	tb_check_return_val(data, tb_null);
 
 	// pb & pe
-	tb_byte_t* 	pb = vpool->data;
-	tb_byte_t* 	pe = pb + vpool->size;
+	tb_byte_t* 	pb = pool->data;
+	tb_byte_t* 	pe = pb + pool->size;
 
 	// the data
 	tb_byte_t* 	p = data;
 	tb_check_return_val(p && p >= pb && p < pe, tb_null);
 
 	// the nhead
-	tb_size_t 	nhead = vpool->nhead;
+	tb_size_t 	nhead = pool->nhead;
 	
 	// the block
-	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
+	tb_static_block_pool_block_t* 	block = ((tb_static_block_pool_block_t*)(p - nhead));
 #ifdef __tb_debug__
 	tb_size_t 			bsize = block->size;
 #endif
 
 	// check block
-	tb_assert_return_val(block->magic == TB_VPOOL_MAGIC, tb_null);
-	tb_assert_and_check_return_val(block->size < vpool->size, tb_null);
+	tb_assert_return_val(block->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_null);
+	tb_assert_and_check_return_val(block->size < pool->size, tb_null);
 	tb_assert_and_check_return_val(!block->free, tb_null);
 
 	// osize
@@ -632,10 +632,10 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 	}
 
 	// align size
-	tb_size_t asize = tb_align(size, vpool->align);
+	tb_size_t asize = tb_align(size, pool->align);
 
 	// merge it if the next block is free and the space is enough
-	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
+	tb_static_block_pool_block_t* next = (tb_static_block_pool_block_t*)(p + block->size);
 	if (next->free && block->size + nhead + next->size >= asize) 
 	{
 		// merge it
@@ -645,24 +645,24 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 		if (block->size > asize + nhead)
 		{
 			// split block
-			next = (tb_vpool_block_t*)(p + asize);
+			next = (tb_static_block_pool_block_t*)(p + asize);
 			next->size = block->size - asize - nhead;
 			next->free = 1;
 #ifdef __tb_debug__
 			next->real = 0;
-			next->magic = TB_VPOOL_MAGIC;
+			next->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 #endif
 			block->size = asize;
 
 			// predict the next free block
-			vpool->pred = (tb_byte_t*)next;
+			pool->pred = (tb_byte_t*)next;
 		}
 		// reset the predicted block
-		else if (vpool->pred == (tb_byte_t*)block || vpool->pred == (tb_byte_t*)next || vpool->pred == pe)
-			vpool->pred = tb_null;
+		else if (pool->pred == (tb_byte_t*)block || pool->pred == (tb_byte_t*)next || pool->pred == pe)
+			pool->pred = tb_null;
 
 		// reset full
-		vpool->full = 0;
+		pool->full = 0;
 
 		// osize
 		if (osize) *osize = block->size;
@@ -670,16 +670,16 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 #ifdef __tb_debug__
 
 		// update the used size
-		vpool->info.used += block->size - bsize;
+		pool->info.used += block->size - bsize;
 
 		// update the need size
-		vpool->info.need += block->size - bsize;
+		pool->info.need += block->size - bsize;
 
 		// update the real size		
-		vpool->info.real += block->size - bsize;
+		pool->info.real += block->size - bsize;
 
 		// update the peak size
-		if (vpool->info.used > vpool->info.peak) vpool->info.peak = vpool->info.used;
+		if (pool->info.used > pool->info.peak) pool->info.peak = pool->info.used;
 		
 		// update the real size
 		block->real = size;
@@ -699,7 +699,7 @@ tb_pointer_t tb_vpool_ralloc_fast(tb_vpool_t* vpool, tb_pointer_t data, tb_size_
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
  */
-tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
+tb_handle_t tb_static_block_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 {
 	// check
 	tb_assert_and_check_return_val(data && size, tb_null);
@@ -717,110 +717,110 @@ tb_handle_t tb_vpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 	// init data
 	tb_memset(data, 0, size);
 
-	// init vpool
-	tb_vpool_t* vpool = (tb_vpool_t*)data;
+	// init pool
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)data;
 
 	// init magic
-	vpool->magic = TB_VPOOL_MAGIC;
+	pool->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 
 	// init align
-	vpool->align = align;
+	pool->align = align;
 
 	// init nhead
-	vpool->nhead = tb_align(sizeof(tb_vpool_block_t), vpool->align);
+	pool->nhead = tb_align(sizeof(tb_static_block_pool_block_t), pool->align);
 
 	// init data
-	vpool->data = (tb_byte_t*)tb_align((tb_hize_t)&vpool[1], (tb_hize_t)vpool->align);
-	tb_assert_and_check_return_val(data + size > vpool->data, tb_null);
+	pool->data = (tb_byte_t*)tb_align((tb_hize_t)&pool[1], (tb_hize_t)pool->align);
+	tb_assert_and_check_return_val(data + size > pool->data, tb_null);
 
 	// init size
-	vpool->size = (tb_byte_t*)data + size - vpool->data;
-	tb_assert_and_check_return_val(vpool->size > vpool->nhead, tb_null);
+	pool->size = (tb_byte_t*)data + size - pool->data;
+	tb_assert_and_check_return_val(pool->size > pool->nhead, tb_null);
 
 	// init block, only one free block now.
-	((tb_vpool_block_t*)vpool->data)->free = 1;
-	((tb_vpool_block_t*)vpool->data)->size = vpool->size - vpool->nhead;
+	((tb_static_block_pool_block_t*)pool->data)->free = 1;
+	((tb_static_block_pool_block_t*)pool->data)->size = pool->size - pool->nhead;
 #ifdef __tb_debug__
-	((tb_vpool_block_t*)vpool->data)->real = 0;
-	((tb_vpool_block_t*)vpool->data)->magic = TB_VPOOL_MAGIC;
+	((tb_static_block_pool_block_t*)pool->data)->real = 0;
+	((tb_static_block_pool_block_t*)pool->data)->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 #endif
 
 	// init pred
-	vpool->pred = vpool->data;
+	pool->pred = pool->data;
 
 	// init full
-	vpool->full = 0;
+	pool->full = 0;
 
 	// init info
 #ifdef __tb_debug__
-	vpool->info.used = 0;
-	vpool->info.peak = 0;
-	vpool->info.need = 0;
-	vpool->info.real = 0;
-	vpool->info.fail = 0;
-	vpool->info.pred = 0;
-	vpool->info.aloc = 0;
-	if (vpool->nhead < vpool->size) tb_memset(vpool->data + vpool->nhead, 0xcc, vpool->size - vpool->nhead);
+	pool->info.used = 0;
+	pool->info.peak = 0;
+	pool->info.need = 0;
+	pool->info.real = 0;
+	pool->info.fail = 0;
+	pool->info.pred = 0;
+	pool->info.aloc = 0;
+	if (pool->nhead < pool->size) tb_memset(pool->data + pool->nhead, 0xcc, pool->size - pool->nhead);
 #endif
 
 	// ok
-	return ((tb_handle_t)vpool);
+	return ((tb_handle_t)pool);
 }
-tb_void_t tb_vpool_exit(tb_handle_t handle)
+tb_void_t tb_static_block_pool_exit(tb_handle_t handle)
 {
 	// check 
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return(vpool && vpool->magic == TB_VPOOL_MAGIC);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC);
 
 	// clear body
-	tb_vpool_clear(handle);
+	tb_static_block_pool_clear(handle);
 
 	// clear head
-	tb_memset(vpool, 0, sizeof(tb_vpool_t));	
+	tb_memset(pool, 0, sizeof(tb_static_block_pool_t));	
 }
-tb_void_t tb_vpool_clear(tb_handle_t handle)
+tb_void_t tb_static_block_pool_clear(tb_handle_t handle)
 {
 	// check 
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return(vpool && vpool->magic == TB_VPOOL_MAGIC);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC);
 
 	// init block, only one free block now.
-	((tb_vpool_block_t*)vpool->data)->free = 1;
-	((tb_vpool_block_t*)vpool->data)->size = vpool->size - vpool->nhead;
+	((tb_static_block_pool_block_t*)pool->data)->free = 1;
+	((tb_static_block_pool_block_t*)pool->data)->size = pool->size - pool->nhead;
 #ifdef __tb_debug__
-	((tb_vpool_block_t*)vpool->data)->real = 0;
-	((tb_vpool_block_t*)vpool->data)->magic = TB_VPOOL_MAGIC;
+	((tb_static_block_pool_block_t*)pool->data)->real = 0;
+	((tb_static_block_pool_block_t*)pool->data)->magic = TB_STATIC_BLOCK_POOL_MAGIC;
 #endif
 
 	// reinit pred
-	vpool->pred = vpool->data;
+	pool->pred = pool->data;
 
 	// reinit full
-	vpool->full = 0;
+	pool->full = 0;
 
 	// reinit info
 #ifdef __tb_debug__
-	vpool->info.used = 0;
-	vpool->info.peak = 0;
-	vpool->info.need = 0;
-	vpool->info.real = 0;
-	vpool->info.fail = 0;
-	vpool->info.pred = 0;
-	vpool->info.aloc = 0;
-	if (vpool->nhead < vpool->size) tb_memset(vpool->data + vpool->nhead, 0xcc, vpool->size - vpool->nhead);
+	pool->info.used = 0;
+	pool->info.peak = 0;
+	pool->info.need = 0;
+	pool->info.real = 0;
+	pool->info.fail = 0;
+	pool->info.pred = 0;
+	pool->info.aloc = 0;
+	if (pool->nhead < pool->size) tb_memset(pool->data + pool->nhead, 0xcc, pool->size - pool->nhead);
 #endif
 }
 
-tb_pointer_t tb_vpool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// malloc
-	return tb_vpool_malloc_skip_frame(handle, size __tb_debug_args__);
+	return tb_static_block_pool_malloc_skip_frame(handle, size __tb_debug_args__);
 }
 
-tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_block_pool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug_decl__)
 {
 	// malloc
-	tb_byte_t* p = tb_vpool_malloc_skip_frame(handle, size __tb_debug_args__);
+	tb_byte_t* p = tb_static_block_pool_malloc_skip_frame(handle, size __tb_debug_args__);
 
 	// clear
 	if (p && size) tb_memset(p, 0, size);
@@ -829,21 +829,21 @@ tb_pointer_t tb_vpool_malloc0_impl(tb_handle_t handle, tb_size_t size __tb_debug
 	return p;
 }
 
-tb_pointer_t tb_vpool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_block_pool_nalloc_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-	return tb_vpool_malloc_skip_frame(handle, item * size __tb_debug_args__);
+	return tb_static_block_pool_malloc_skip_frame(handle, item * size __tb_debug_args__);
 }
-tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_block_pool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t size __tb_debug_decl__)
 {
 	// check
 	tb_assert_and_check_return_val(item, tb_null);
 
 	// malloc
-	tb_pointer_t p = tb_vpool_malloc_skip_frame(handle, item * size __tb_debug_args__);
+	tb_pointer_t p = tb_static_block_pool_malloc_skip_frame(handle, item * size __tb_debug_args__);
 
 	// clear
 	if (p && (item * size)) tb_memset(p, 0, item * size);
@@ -852,30 +852,30 @@ tb_pointer_t tb_vpool_nalloc0_impl(tb_handle_t handle, tb_size_t item, tb_size_t
 	return p;
 }
 
-tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
+tb_pointer_t tb_static_block_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size_t size __tb_debug_decl__)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, tb_null);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_null);
 
 	// free it if no size
 	if (!size)
 	{
-		tb_vpool_free_impl(vpool, data __tb_debug_args__);
+		tb_static_block_pool_free_impl(pool, data __tb_debug_args__);
 		return tb_null;
 	}
 
 	// alloc it if no data?
-	if (!data) return tb_vpool_malloc_skip_frame(vpool, size __tb_debug_args__);
+	if (!data) return tb_static_block_pool_malloc_skip_frame(pool, size __tb_debug_args__);
 	
 	// ralloc it with fast mode if enough
 	tb_size_t 		osize = 0;
-	tb_pointer_t 	pdata = tb_vpool_ralloc_fast(vpool, data, size, &osize);
+	tb_pointer_t 	pdata = tb_static_block_pool_ralloc_fast(pool, data, size, &osize);
 	tb_check_return_val(!pdata, pdata);
 	tb_assert_and_check_return_val(osize && osize < size, tb_null);
 
 	// malloc it
-	pdata = tb_vpool_malloc_skip_frame(vpool, size __tb_debug_args__);
+	pdata = tb_static_block_pool_malloc_skip_frame(pool, size __tb_debug_args__);
 	tb_check_return_val(pdata, tb_null);
 	tb_assert_and_check_return_val(pdata != data, pdata);
 
@@ -883,49 +883,49 @@ tb_pointer_t tb_vpool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, tb_size
 	tb_memcpy(pdata, data, osize);
 	
 	// free it
-	tb_vpool_free_impl(vpool, data __tb_debug_args__);
+	tb_static_block_pool_free_impl(pool, data __tb_debug_args__);
 
 	// ok
 	return pdata;
 }
-tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
+tb_bool_t tb_static_block_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_decl__)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool && vpool->magic == TB_VPOOL_MAGIC, tb_false);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return_val(pool && pool->magic == TB_STATIC_BLOCK_POOL_MAGIC, tb_false);
 
 	// no data?
 	tb_check_return_val(data, tb_true);
 
 	// pb & pe
-	tb_byte_t* 	pb = vpool->data;
-	tb_byte_t* 	pe = pb + vpool->size;
+	tb_byte_t* 	pb = pool->data;
+	tb_byte_t* 	pe = pb + pool->size;
 
 	// the data
 	tb_byte_t* 	p = data;
 	tb_check_return_val(p >= pb && p < pe, tb_false);
 
 	// the nhead
-	tb_size_t 	nhead = vpool->nhead;
+	tb_size_t 	nhead = pool->nhead;
 	
 	// the block
-	tb_vpool_block_t* 	block = ((tb_vpool_block_t*)(p - nhead));
+	tb_static_block_pool_block_t* 	block = ((tb_static_block_pool_block_t*)(p - nhead));
 #ifdef __tb_debug__
 	tb_size_t 			bsize = block->size;
 #endif
 
 	// check overflow
-	tb_check_abort(tb_vpool_overflow_check(vpool, block, tb_null));
+	tb_check_abort(tb_static_block_pool_overflow_check(pool, block, tb_null));
 
 	// double free?
 	if (block->free)
 	{
 		// trace
-		tb_trace_d("vpool: double free: at %s(): %d, file: %s", block->func, block->line, block->file);
+		tb_trace_d("pool: double free: at %s(): %d, file: %s", block->func, block->line, block->file);
 
 #ifdef __tb_debug__
 		// dump backtrace
-		tb_vpool_dump_backtrace("vpool:     ", block);
+		tb_static_block_pool_dump_backtrace("pool:     ", block);
 #endif
 
 		return tb_true;
@@ -933,11 +933,11 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_de
 	tb_assert_and_check_return_val(!block->free, tb_true);
 
 	// check the next block
-	tb_vpool_block_t* next = (tb_vpool_block_t*)(p + block->size);
+	tb_static_block_pool_block_t* next = (tb_static_block_pool_block_t*)(p + block->size);
 	if ((tb_byte_t const*)next + nhead < pe)
 	{
 		// check overflow
-		tb_check_abort(tb_vpool_overflow_check(vpool, next, block));
+		tb_check_abort(tb_static_block_pool_overflow_check(pool, next, block));
 
 		// merge it if the next block is free
 		if (next->free) block->size += nhead + next->size;
@@ -947,14 +947,14 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_de
 	block->free = 1;
 
 	// predict the next free block
-	vpool->pred = (tb_byte_t*)block;
+	pool->pred = (tb_byte_t*)block;
 
 	// reinit full
-	vpool->full = 0;
+	pool->full = 0;
 
 #ifdef __tb_debug__
 	// update the used
-	vpool->info.used -= bsize;
+	pool->info.used -= bsize;
 
 	// clear the real
 	block->real = 0;
@@ -968,40 +968,40 @@ tb_bool_t tb_vpool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_debug_de
 	return tb_true;
 }
 #ifdef __tb_debug__
-tb_size_t tb_vpool_data_size(tb_handle_t handle, tb_cpointer_t data)
+tb_size_t tb_static_block_pool_data_size(tb_handle_t handle, tb_cpointer_t data)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return_val(vpool, 0);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return_val(pool, 0);
 	tb_check_return_val(data, 0);
 
-	// is this vpool?
-	tb_check_return_val(data >= (tb_byte_t const*)vpool->data + vpool->nhead && data < (tb_byte_t const*)vpool->data + vpool->size, 0);
+	// is this pool?
+	tb_check_return_val((tb_byte_t const*)data >= (tb_byte_t const*)pool->data + pool->nhead && (tb_byte_t const*)data < (tb_byte_t const*)pool->data + pool->size, 0);
 
 	// the data block
-	tb_vpool_block_t const* block = ((tb_vpool_block_t const*)((tb_byte_t const*)data - vpool->nhead));
+	tb_static_block_pool_block_t const* block = ((tb_static_block_pool_block_t const*)((tb_byte_t const*)data - pool->nhead));
 
 	// check magic
-	tb_check_return_val(block->magic == TB_VPOOL_MAGIC && !block->free, 0);
+	tb_check_return_val(block->magic == TB_STATIC_BLOCK_POOL_MAGIC && !block->free, 0);
 
 	// the real size
 	return block->real;
 }
-tb_void_t tb_vpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix)
+tb_void_t tb_static_block_pool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t const* prefix)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return(vpool);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return(pool);
 	tb_check_return(data);
 
-	// is this vpool?
-	tb_check_return(data >= (tb_byte_t const*)vpool->data + vpool->nhead && data < (tb_byte_t const*)vpool->data + vpool->size);
+	// is this pool?
+	tb_check_return(data >= (tb_byte_t const*)pool->data + pool->nhead && data < (tb_byte_t const*)pool->data + pool->size);
 
 	// the data block
-	tb_vpool_block_t const* block = ((tb_vpool_block_t const*)((tb_byte_t const*)data - vpool->nhead));
+	tb_static_block_pool_block_t const* block = ((tb_static_block_pool_block_t const*)((tb_byte_t const*)data - pool->nhead));
 
 	// check magic
-	tb_check_return(block->magic == TB_VPOOL_MAGIC && !block->free);
+	tb_check_return(block->magic == TB_STATIC_BLOCK_POOL_MAGIC && !block->free);
 
 	// dump
 	tb_trace_i("%s: data: %p size: %lu at %s(): %d, file: %s"
@@ -1016,39 +1016,39 @@ tb_void_t tb_vpool_data_dump(tb_handle_t handle, tb_cpointer_t data, tb_char_t c
 	// dump backtrace
 	tb_char_t tag[1024] = {0};
 	tb_snprintf(tag, "%s:     ", prefix);
-	tb_vpool_dump_backtrace(tag, block);
+	tb_static_block_pool_dump_backtrace(tag, block);
 
 	// dump data
-	tb_vpool_dump_data(data, tb_min(block->real, 4096));
+	tb_static_block_pool_dump_data(data, tb_min(block->real, 4096));
 }
-tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
+tb_void_t tb_static_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 {
 	// check
-	tb_vpool_t* vpool = (tb_vpool_t*)handle;
-	tb_assert_and_check_return(vpool);
+	tb_static_block_pool_t* pool = (tb_static_block_pool_t*)handle;
+	tb_assert_and_check_return(pool);
 
 	// prefix
-	if (!prefix) prefix = "vpool";
+	if (!prefix) prefix = "pool";
 
 	// dump
 	tb_trace_i("======================================================================");
 
 	// walk
 	tb_size_t 			i = 0;
-	tb_byte_t* 			pb = vpool->data;
-	tb_byte_t* 			pe = pb + vpool->size;
-	tb_size_t 			nhead = vpool->nhead;
-	tb_vpool_block_t* 	prev = tb_null;
+	tb_byte_t* 			pb = pool->data;
+	tb_byte_t* 			pe = pb + pool->size;
+	tb_size_t 			nhead = pool->nhead;
+	tb_static_block_pool_block_t* 	prev = tb_null;
 	tb_size_t 			prev_i = 0;
 	tb_bool_t 			ok = tb_true;
 	tb_size_t 			frag = 0;
 	while (pb + nhead < pe)
 	{
 		// the block
-		tb_vpool_block_t* block = (tb_vpool_block_t*)pb;
+		tb_static_block_pool_block_t* block = (tb_static_block_pool_block_t*)pb;
 
 		// check overflow
-		tb_check_break((ok = tb_vpool_overflow_check(vpool, block, prev)));
+		tb_check_break((ok = tb_static_block_pool_overflow_check(pool, block, prev)));
 
 		// no free?
 		if (!block->free)
@@ -1070,7 +1070,7 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 				tb_snprintf(backtrace_prefix, 63, "%s:     ", prefix);
 
 				// dump backtrace
-				tb_vpool_dump_backtrace(backtrace_prefix, block);
+				tb_static_block_pool_dump_backtrace(backtrace_prefix, block);
 			}
 
 			// leak
@@ -1086,18 +1086,18 @@ tb_void_t tb_vpool_dump(tb_handle_t handle, tb_char_t const* prefix)
 
 	// dump 
 	if (!ok) tb_trace_i("");
-//	tb_trace_i("%s: magic: %#lx",		prefix, vpool->magic);
-//	tb_trace_i("%s: nhead: %lu", 		prefix, vpool->nhead);
-	tb_trace_i("%s: align: %lu", 		prefix, vpool->align);
-//	tb_trace_i("%s: head: %lu", 		prefix, vpool->data - (tb_byte_t*)vpool);
-//	tb_trace_i("%s: data: %p", 		prefix, vpool->data);
-	tb_trace_i("%s: size: %lu", 		prefix, vpool->size);
-	tb_trace_i("%s: full: %s", 		prefix, vpool->full? "true" : "false");
-	tb_trace_i("%s: used: %lu", 		prefix, vpool->info.used);
-	tb_trace_i("%s: peak: %lu", 		prefix, vpool->info.peak);
-	tb_trace_i("%s: wast: %lu%%", 	prefix, (vpool->info.real + (vpool->data - (tb_byte_t*)vpool) - vpool->info.need) * 100 / (vpool->info.real + (vpool->data - (tb_byte_t*)vpool)));
-	tb_trace_i("%s: fail: %lu", 		prefix, vpool->info.fail);
-	tb_trace_i("%s: pred: %lu%%", 	prefix, vpool->info.aloc? ((vpool->info.pred * 100) / vpool->info.aloc) : 0);
+//	tb_trace_i("%s: magic: %#lx",		prefix, pool->magic);
+//	tb_trace_i("%s: nhead: %lu", 		prefix, pool->nhead);
+	tb_trace_i("%s: align: %lu", 		prefix, pool->align);
+//	tb_trace_i("%s: head: %lu", 		prefix, pool->data - (tb_byte_t*)pool);
+//	tb_trace_i("%s: data: %p", 		prefix, pool->data);
+	tb_trace_i("%s: size: %lu", 		prefix, pool->size);
+	tb_trace_i("%s: full: %s", 		prefix, pool->full? "true" : "false");
+	tb_trace_i("%s: used: %lu", 		prefix, pool->info.used);
+	tb_trace_i("%s: peak: %lu", 		prefix, pool->info.peak);
+	tb_trace_i("%s: wast: %lu%%", 	prefix, (pool->info.real + (pool->data - (tb_byte_t*)pool) - pool->info.need) * 100 / (pool->info.real + (pool->data - (tb_byte_t*)pool)));
+	tb_trace_i("%s: fail: %lu", 		prefix, pool->info.fail);
+	tb_trace_i("%s: pred: %lu%%", 	prefix, pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
 	tb_trace_i("%s: frag: %lu", 		prefix, frag);
 }
 #endif

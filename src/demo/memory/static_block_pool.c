@@ -6,10 +6,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_memory_vpool_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_static_block_pool_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init
-	tb_handle_t vpool = tb_vpool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
+	tb_handle_t vpool = tb_static_block_pool_init(malloc(50 * 1024 * 1024), 50 * 1024 * 1024, 0);
 	tb_assert_and_check_return_val(vpool, 0);
 
 #if 0
@@ -18,7 +18,7 @@ tb_int_t tb_demo_memory_vpool_main(tb_int_t argc, tb_char_t** argv)
 	__tb_volatile__ tb_size_t 	maxn = 100000;
 	while (maxn--)
 	{
-		data = tb_vpool_malloc(vpool, 64);
+		data = tb_static_block_pool_malloc(vpool, 64);
 		tb_check_break(data);
 	}
 	time = tb_mclock() - time;
@@ -31,7 +31,7 @@ tb_int_t tb_demo_memory_vpool_main(tb_int_t argc, tb_char_t** argv)
 	while (maxn--)
 	{
 		size = (size * 10807 + 1) & 0xffffffff;
-		data = tb_vpool_malloc(vpool, (size & lmod)? (size & lmod) : 1);
+		data = tb_static_block_pool_malloc(vpool, (size & lmod)? (size & lmod) : 1);
 		tb_check_break(data);
 	}
 	time = tb_mclock() - time;
@@ -41,13 +41,13 @@ end:
 
 	// dump
 #ifdef __tb_debug__
-	tb_vpool_dump(vpool, tb_null);
+	tb_static_block_pool_dump(vpool, tb_null);
 #endif
 
 	// trace
 	tb_trace_i("vpool: %lld ms", time);
 	
 	// exit
-	tb_vpool_exit(vpool);
+	tb_static_block_pool_exit(vpool);
 	return 0;
 }

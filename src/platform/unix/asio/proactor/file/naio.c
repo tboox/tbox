@@ -114,7 +114,7 @@ static tb_bool_t tb_aicp_iocb_init_read(tb_naio_t* naio, tb_aice_t const* aice, 
 	iocb->aice 					= *aice;
 	iocb->base.aio_fildes 		= (tb_int_t)aico->handle - 1;
 	iocb->base.aio_lio_opcode 	= IOCB_CMD_PREAD;
-	iocb->base.aio_buf 			= aligned? aice->u.read.data : tb_spool_malloc(naio->pool_data, aice->u.read.size);
+	iocb->base.aio_buf 			= aligned? aice->u.read.data : tb_block_pool_malloc(naio->pool_data, aice->u.read.size);
 	iocb->base.aio_offset 		= aice->u.read.seek;
 	iocb->base.aio_nbytes 		= aice->u.read.size;
 	iocb->base.aio_flags 		= IOCB_FLAG_RESFD;
@@ -144,7 +144,7 @@ static tb_bool_t tb_aicp_iocb_init_writ(tb_naio_t* naio, tb_aice_t const* aice, 
 	iocb->aice 					= *aice;
 	iocb->base.aio_fildes 		= (tb_int_t)aico->handle - 1;
 	iocb->base.aio_lio_opcode 	= IOCB_CMD_PWRITE;
-	iocb->base.aio_buf 			= aligned? aice->u.writ.data : tb_spool_malloc(naio->pool_data, aice->u.writ.size);
+	iocb->base.aio_buf 			= aligned? aice->u.writ.data : tb_block_pool_malloc(naio->pool_data, aice->u.writ.size);
 	iocb->base.aio_offset 		= aice->u.writ.seek;
 	iocb->base.aio_nbytes 		= aice->u.writ.size;
 	iocb->base.aio_flags 		= IOCB_FLAG_RESFD;
@@ -170,7 +170,7 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 	if (naio->lock) tb_mutex_enter(naio->lock);
 
 	// make iocb
-	tb_naio_iocb_t* iocb = (tb_naio_iocb_t*)tb_rpool_malloc0(naio->pool_iocb);
+	tb_naio_iocb_t* iocb = (tb_naio_iocb_t*)tb_fixed_pool_malloc0(naio->pool_iocb);
 
 	// init iocb
 	if (iocb)
@@ -204,11 +204,11 @@ static tb_naio_iocb_t* tb_aicp_iocb_init(tb_naio_t* naio, tb_aice_t const* aice)
 			if (iocb) 
 			{
 				// exit data
-				if (iocb->base.aio_buf && !iocb->base.aio_data) tb_spool_free(naio->pool_data, iocb->base.aio_buf);
+				if (iocb->base.aio_buf && !iocb->base.aio_data) tb_block_pool_free(naio->pool_data, iocb->base.aio_buf);
 				iocb->base.aio_buf = tb_null;
 
 				// exit it
-				tb_rpool_free(naio->pool_iocb, iocb);
+				tb_fixed_pool_free(naio->pool_iocb, iocb);
 			}
 			iocb = tb_null;
 		}
@@ -232,11 +232,11 @@ static tb_void_t tb_aicp_iocb_exit(tb_naio_t* naio, tb_naio_iocb_t* iocb)
 	if (iocb) 
 	{
 		// exit data
-		if (iocb->base.aio_buf && !iocb->base.aio_data) tb_spool_free(naio->pool_data, iocb->base.aio_buf);
+		if (iocb->base.aio_buf && !iocb->base.aio_data) tb_block_pool_free(naio->pool_data, iocb->base.aio_buf);
 		iocb->base.aio_buf = tb_null;
 
 		// exit it
-		tb_rpool_free(naio->pool_iocb, iocb);
+		tb_fixed_pool_free(naio->pool_iocb, iocb);
 	}
 
 	// leave 
@@ -358,11 +358,11 @@ static tb_handle_t tb_aicp_file_init(tb_aicp_proactor_aiop_t* ptor)
 	tb_assert_and_check_goto(naio->lock, fail);
 
 	// init iocb pool
-	naio->pool_iocb = tb_rpool_init((ptor->base.aicp->maxn >> 4) + 16, sizeof(tb_naio_iocb_t), 0);
+	naio->pool_iocb = tb_fixed_pool_init((ptor->base.aicp->maxn >> 4) + 16, sizeof(tb_naio_iocb_t), 0);
 	tb_assert_and_check_goto(naio->pool_iocb, fail);
 
 	// init data pool, aligned by 512 bytes
-	naio->pool_data = tb_spool_init(((ptor->base.aicp->maxn >> 4) + 16) << 16, TB_FILE_DIRECT_ASIZE);
+	naio->pool_data = tb_block_pool_init(((ptor->base.aicp->maxn >> 4) + 16) << 16, TB_FILE_DIRECT_ASIZE);
 	tb_assert_and_check_goto(naio->pool_data, fail);
 
 	// init ictx
@@ -415,8 +415,8 @@ static tb_void_t tb_aicp_file_exit(tb_handle_t handle)
 	
 		// exit pool
 		if (naio->lock) tb_mutex_enter(naio->lock);
-		if (naio->pool_iocb) tb_rpool_exit(naio->pool_iocb);
-		if (naio->pool_data) tb_spool_exit(naio->pool_data);
+		if (naio->pool_iocb) tb_fixed_pool_exit(naio->pool_iocb);
+		if (naio->pool_data) tb_block_pool_exit(naio->pool_data);
 		naio->pool_iocb = tb_null;
 		naio->pool_data = tb_null;
 		if (naio->lock) tb_mutex_leave(naio->lock);

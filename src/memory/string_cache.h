@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		tpool.h
+ * @file		string_cache.h
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_TPOOL_H
-#define TB_MEMORY_TPOOL_H
+#ifndef TB_MEMORY_string_cache_H
+#define TB_MEMORY_string_cache_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -33,37 +33,37 @@
  * interfaces
  */
 
-// init
-tb_handle_t 	tb_tpool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
+/*! init string cache for small, readonly and repeat strings
+ *
+ * readonly, strip repeat strings and decrease memory fragmens
+ *
+ * @param align 	the cpu align bytes
+ *
+ * @return 			tb_true or tb_false
+ */
+tb_bool_t 			tb_string_cache_init(tb_size_t align);
 
-// exit
-tb_void_t 		tb_tpool_exit(tb_handle_t handle);
+/// exit scache
+tb_void_t 			tb_string_cache_exit(tb_noarg_t);
 
-// limit
-tb_size_t 		tb_tpool_limit(tb_handle_t handle);
+/// clear scache
+tb_void_t 			tb_string_cache_clear(tb_noarg_t);
 
-// clear
-tb_void_t 		tb_tpool_clear(tb_handle_t handle);
+/*! put string to scache
+ *
+ * @param data 		the string data
+ *
+ * @return 			the string data
+ */
+tb_char_t const*	tb_string_cache_put(tb_char_t const* data);
 
-// malloc
-tb_pointer_t 	tb_tpool_malloc(tb_handle_t handle, tb_size_t size);
+/*! del string from scache
+ *
+ * @param data 		the string data
+ */
+tb_void_t 			tb_string_cache_del(tb_char_t const* data);
 
-// malloc0
-tb_pointer_t 	tb_tpool_malloc0(tb_handle_t handle, tb_size_t size);
-
-// nalloc
-tb_pointer_t  	tb_tpool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size);
-
-// nalloc0
-tb_pointer_t  	tb_tpool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size);
-
-// ralloc
-tb_pointer_t 	tb_tpool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
-
-// free
-tb_bool_t 		tb_tpool_free(tb_handle_t handle, tb_pointer_t data);
-
-// dump
-tb_void_t 		tb_tpool_dump(tb_handle_t handle);
+/// dump scache
+tb_void_t 			tb_string_cache_dump(tb_noarg_t);
 
 #endif

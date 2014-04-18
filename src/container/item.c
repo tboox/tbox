@@ -311,7 +311,7 @@ static tb_void_t tb_item_func_str_free(tb_item_func_t* func, tb_pointer_t item)
 	tb_assert_and_check_return(func && item);
 	if (*((tb_pointer_t*)item)) 
 	{
-		if (func->pool) tb_spool_free(func->pool, *((tb_pointer_t*)item));
+		if (func->pool) tb_block_pool_free(func->pool, *((tb_pointer_t*)item));
 		else tb_free(*((tb_pointer_t*)item));
 		*((tb_pointer_t*)item) = tb_null;
 	}
@@ -320,7 +320,7 @@ static tb_void_t tb_item_func_str_dupl(tb_item_func_t* func, tb_pointer_t item, 
 {
 	tb_assert_and_check_return(func && item);
 
-	if (data) *((tb_pointer_t*)item) = func->pool? tb_spool_strdup(func->pool, data) : tb_strdup(data);
+	if (data) *((tb_pointer_t*)item) = func->pool? tb_block_pool_strdup(func->pool, data) : tb_strdup(data);
 	else *((tb_pointer_t*)item) = tb_null;
 }
 static tb_void_t tb_item_func_str_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -331,7 +331,7 @@ static tb_void_t tb_item_func_str_repl(tb_item_func_t* func, tb_pointer_t item, 
 	if (func->free) func->free(func, item);
 
 	// copy it
-	if (func->pool) *((tb_pointer_t*)item) = data? tb_spool_strdup(func->pool, data) : tb_null;
+	if (func->pool) *((tb_pointer_t*)item) = data? tb_block_pool_strdup(func->pool, data) : tb_null;
 	else *((tb_pointer_t*)item) = data? tb_strdup(data) : tb_null;
 }
 
@@ -507,7 +507,7 @@ static tb_void_t tb_item_func_efm_free(tb_item_func_t* func, tb_pointer_t item)
 	tb_assert_and_check_return(func && item);
 	if (*((tb_pointer_t*)item)) 
 	{
-		if (func->pool) tb_rpool_free(func->pool, *((tb_pointer_t*)item));
+		if (func->pool) tb_fixed_pool_free(func->pool, *((tb_pointer_t*)item));
 		else tb_free(*((tb_pointer_t*)item));
 		*((tb_pointer_t*)item) = tb_null;
 	}
@@ -521,7 +521,7 @@ static tb_void_t tb_item_func_efm_dupl(tb_item_func_t* func, tb_pointer_t item, 
 {
 	tb_assert_and_check_return(func && item);
 
-	if (func->pool) *((tb_pointer_t*)item) = data? tb_rpool_memdup(func->pool, data) : 0;
+	if (func->pool) *((tb_pointer_t*)item) = data? tb_fixed_pool_memdup(func->pool, data) : 0;
 	else if (func->priv) *((tb_pointer_t*)item) = data? tb_memdup(data, func->priv) : tb_null;
 }
 static tb_void_t tb_item_func_efm_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
@@ -676,27 +676,27 @@ static tb_void_t tb_item_func_ifm_ncopy(tb_item_func_t* func, tb_pointer_t item,
 	if (func->ndupl) func->ndupl(func, item, data, size);
 }
 // the string for scache 
-static tb_void_t tb_item_func_scache_free(tb_item_func_t* func, tb_pointer_t item)
+static tb_void_t tb_item_func_string_cache_free(tb_item_func_t* func, tb_pointer_t item)
 {
 	// check
 	tb_assert_and_check_return(func && item);
-	if (*((tb_pointer_t*)item)) tb_scache_del(*((tb_pointer_t*)item));
+	if (*((tb_pointer_t*)item)) tb_string_cache_del(*((tb_pointer_t*)item));
 }
-static tb_void_t tb_item_func_scache_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_string_cache_dupl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return(func && item);
 
-	if (data) *((tb_pointer_t*)item) = tb_scache_put(data);
+	if (data) *((tb_pointer_t*)item) = tb_string_cache_put(data);
 	else *((tb_pointer_t*)item) = tb_null;
 }
-static tb_void_t tb_item_func_scache_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
+static tb_void_t tb_item_func_string_cache_repl(tb_item_func_t* func, tb_pointer_t item, tb_cpointer_t data)
 {
 	// check
 	tb_assert_and_check_return(func && item);
 
 	// copy it, refn++
-	tb_pointer_t copy = data? tb_scache_put(data) : tb_null;
+	tb_pointer_t copy = data? tb_string_cache_put(data) : tb_null;
 
 	// free it, refn--
 	if (func->free) func->free(func, item);
@@ -988,7 +988,7 @@ tb_item_func_t tb_item_func_ifm(tb_size_t size, tb_item_func_free_t free, tb_poi
 
 	return func;
 }
-tb_item_func_t tb_item_func_scache(tb_bool_t bcase)
+tb_item_func_t tb_item_func_string_cache(tb_bool_t bcase)
 {
 	tb_item_func_t func = {0};
 	func.type = TB_ITEM_TYPE_SCACHE;
@@ -998,9 +998,9 @@ tb_item_func_t tb_item_func_scache(tb_bool_t bcase)
 	func.data = tb_item_func_ptr_data;
 	func.cstr = tb_item_func_str_cstr;
 
-	func.free = tb_item_func_scache_free;
-	func.dupl = tb_item_func_scache_dupl;
-	func.repl = tb_item_func_scache_repl;
+	func.free = tb_item_func_string_cache_free;
+	func.dupl = tb_item_func_string_cache_dupl;
+	func.repl = tb_item_func_string_cache_repl;
 	func.copy = tb_item_func_ptr_copy;
 
 	func.nfree = tb_item_func_efm_nfree;

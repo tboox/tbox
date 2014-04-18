@@ -88,7 +88,7 @@ tb_handle_t tb_object_pool_init()
 		if (!tb_spinlock_init(&pool->lock)) break;
 
 		// init pool
-		pool->pool = tb_spool_init(TB_OBJECT_POOL_GROW, 0);
+		pool->pool = tb_block_pool_init(TB_OBJECT_POOL_GROW, 0);
 		tb_assert_and_check_break(pool->pool);
 
 		// ok
@@ -117,7 +117,7 @@ tb_void_t tb_object_pool_exit(tb_handle_t handle)
 	tb_spinlock_enter(&pool->lock);
 
 	// exit pool
-	if (pool->pool) tb_spool_exit(pool->pool);
+	if (pool->pool) tb_block_pool_exit(pool->pool);
 	pool->pool = tb_null;
 
 	// leave
@@ -139,7 +139,7 @@ tb_void_t tb_object_pool_clear(tb_handle_t handle)
 	tb_spinlock_enter(&pool->lock);
 
 	// clear pool
-	if (pool->pool) tb_spool_clear(pool->pool);
+	if (pool->pool) tb_block_pool_clear(pool->pool);
 
 	// leave
 	tb_spinlock_leave(&pool->lock);
@@ -155,7 +155,7 @@ tb_void_t tb_object_pool_dump(tb_handle_t handle)
 	tb_spinlock_enter(&pool->lock);
 
 	// dump
-	if (pool->pool) tb_spool_dump(pool->pool, "object_pool");
+	if (pool->pool) tb_block_pool_dump(pool->pool, "object_pool");
 
 	// leave
 	tb_spinlock_leave(&pool->lock);
@@ -171,14 +171,14 @@ tb_object_t* tb_object_pool_get_impl(tb_handle_t handle, tb_size_t size, tb_size
 	tb_spinlock_enter(&pool->lock);
 
 	// make object
-	tb_object_t* object = pool->pool? tb_spool_malloc0_impl(pool->pool, size __tb_debug_args__) : tb_null;
+	tb_object_t* object = pool->pool? tb_block_pool_malloc0_impl(pool->pool, size __tb_debug_args__) : tb_null;
 
 	// init object
 	if (object) 
 	{
 		if (!tb_object_init(object, flag, type)) 
 		{
-			tb_spool_free_impl(pool->pool, object __tb_debug_args__);
+			tb_block_pool_free_impl(pool->pool, object __tb_debug_args__);
 			object = tb_null;
 		}
 	}
@@ -199,7 +199,7 @@ tb_void_t tb_object_pool_del_impl(tb_handle_t handle, tb_object_t* object __tb_d
 	tb_spinlock_enter(&pool->lock);
 
 	// exit object
-	if (pool->pool) tb_spool_free_impl(pool->pool, object __tb_debug_args__);
+	if (pool->pool) tb_block_pool_free_impl(pool->pool, object __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&pool->lock);

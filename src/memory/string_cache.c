@@ -17,7 +17,7 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		scache.c
+ * @file		string_cache.c
  * @ingroup 	memory
  *
  */
@@ -25,8 +25,8 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
  */
-#include "scache.h"
-#include "spool.h"
+#include "string_cache.h"
+#include "block_pool.h"
 #include "../libc/libc.h"
 #include "../platform/platform.h"
 #include "../container/container.h"
@@ -48,10 +48,10 @@ static tb_spinlock_t 	g_lock = TB_SPINLOCK_INIT;
 /* //////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
-tb_bool_t tb_scache_init(tb_size_t align)
+tb_bool_t tb_string_cache_init(tb_size_t align)
 {
 	// init pool
-	if (!g_pool) g_pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, align);
+	if (!g_pool) g_pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, align);
 	tb_assert_and_check_return_val(g_pool, tb_false);
 
 	// init hash
@@ -61,11 +61,11 @@ tb_bool_t tb_scache_init(tb_size_t align)
 	// ok
 	return tb_true;
 }
-tb_void_t tb_scache_exit()
+tb_void_t tb_string_cache_exit()
 {
 	// dump
 #ifdef __tb_debug__
-	tb_scache_dump();
+	tb_string_cache_dump();
 #endif
 
 	// enter
@@ -76,13 +76,13 @@ tb_void_t tb_scache_exit()
 	g_hash = tb_null;
 
 	// exit pool
-	if (g_pool) tb_spool_exit(g_pool);
+	if (g_pool) tb_block_pool_exit(g_pool);
 	g_pool = tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
 }
-tb_void_t tb_scache_clear()
+tb_void_t tb_string_cache_clear()
 {
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -91,12 +91,12 @@ tb_void_t tb_scache_clear()
 	if (g_hash) tb_hash_clear(g_hash);
 
 	// clear pool
-	if (g_pool) tb_spool_clear(g_pool);
+	if (g_pool) tb_block_pool_clear(g_pool);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
 }
-tb_char_t const* tb_scache_put(tb_char_t const* data)
+tb_char_t const* tb_string_cache_put(tb_char_t const* data)
 {
 	// check
 	tb_assert_and_check_return_val(data, tb_null);
@@ -148,7 +148,7 @@ tb_char_t const* tb_scache_put(tb_char_t const* data)
 	// ok?
 	return cstr;
 }
-tb_void_t tb_scache_del(tb_char_t const* data)
+tb_void_t tb_string_cache_del(tb_char_t const* data)
 {
 	// check
 	tb_assert_and_check_return(data);
@@ -178,7 +178,7 @@ tb_void_t tb_scache_del(tb_char_t const* data)
 	tb_spinlock_leave(&g_lock);
 }
 #ifdef __tb_debug__
-tb_void_t tb_scache_dump()
+tb_void_t tb_string_cache_dump()
 {
 	// enter
 	tb_spinlock_enter(&g_lock);

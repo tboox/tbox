@@ -57,7 +57,7 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 			tb_assert(!g_pool);
 
 			// init pool
-			tb_handle_t pool = g_pool = tb_gpool_init(data, size, align);
+			tb_handle_t pool = g_pool = tb_global_pool_init(data, size, align);
 
 			// leave
 			tb_spinlock_leave(&g_lock);
@@ -72,7 +72,7 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 		}
 
 		// init scache
-		if (!tb_scache_init(align)) break;
+		if (!tb_string_cache_init(align)) break;
 
 		// ok
 		ok = tb_true;
@@ -88,7 +88,7 @@ tb_bool_t tb_memory_init(tb_byte_t* data, tb_size_t size, tb_size_t align)
 tb_void_t tb_memory_exit()
 {
 	// exit scache
-	tb_scache_exit();
+	tb_string_cache_exit();
 
 	// enter
 	tb_spinlock_enter(&g_lock);
@@ -101,11 +101,11 @@ tb_void_t tb_memory_exit()
 	{
 #ifdef __tb_debug__
 		// dump it
-		tb_gpool_dump(pool);
+		tb_global_pool_dump(pool);
 #endif
 
 		// exit it
-		tb_gpool_exit(pool);
+		tb_global_pool_exit(pool);
 	}
 	g_pool = tb_null;
 
@@ -127,7 +127,7 @@ tb_pointer_t tb_memory_malloc_impl(tb_size_t size __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// malloc
-	tb_pointer_t data = pool? tb_gpool_malloc_impl(pool, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_malloc_impl(pool, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -147,7 +147,7 @@ tb_pointer_t tb_memory_malloc0_impl(tb_size_t size __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// malloc0
-	tb_pointer_t data = pool? tb_gpool_malloc0_impl(pool, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_malloc0_impl(pool, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -167,7 +167,7 @@ tb_pointer_t tb_memory_nalloc_impl(tb_size_t item, tb_size_t size __tb_debug_dec
 	tb_handle_t pool = g_pool;
 
 	// nalloc
-	tb_pointer_t data = pool? tb_gpool_nalloc_impl(pool, item, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_nalloc_impl(pool, item, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -187,7 +187,7 @@ tb_pointer_t tb_memory_nalloc0_impl(tb_size_t item, tb_size_t size __tb_debug_de
 	tb_handle_t pool = g_pool;
 
 	// nalloc0
-	tb_pointer_t data = pool? tb_gpool_nalloc0_impl(pool, item, size __tb_debug_args__) : tb_null;
+	tb_pointer_t data = pool? tb_global_pool_nalloc0_impl(pool, item, size __tb_debug_args__) : tb_null;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -207,7 +207,7 @@ tb_pointer_t tb_memory_ralloc_impl(tb_pointer_t data, tb_size_t size __tb_debug_
 	tb_handle_t pool = g_pool;
 
 	// ralloc
-	if (pool) data = tb_gpool_ralloc_impl(pool, data, size __tb_debug_args__);
+	if (pool) data = tb_global_pool_ralloc_impl(pool, data, size __tb_debug_args__);
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -230,7 +230,7 @@ tb_bool_t tb_memory_free_impl(tb_pointer_t data __tb_debug_decl__)
 	tb_handle_t pool = g_pool;
 
 	// free it
-	tb_bool_t ok = pool? tb_gpool_free_impl(pool, data __tb_debug_args__) : tb_false;
+	tb_bool_t ok = pool? tb_global_pool_free_impl(pool, data __tb_debug_args__) : tb_false;
 
 	// leave
 	tb_spinlock_leave(&g_lock);
@@ -249,7 +249,7 @@ tb_size_t tb_memory_data_size(tb_cpointer_t data)
 	if (tb_spinlock_enter_try(&g_lock))
 	{
 		// size
-		size = g_pool? tb_gpool_data_size(g_pool, data) : 0;
+		size = g_pool? tb_global_pool_data_size(g_pool, data) : 0;
 
 		// leave
 		tb_spinlock_leave(&g_lock);
@@ -264,7 +264,7 @@ tb_void_t tb_memory_data_dump(tb_cpointer_t data, tb_char_t const* prefix)
 	if (tb_spinlock_enter_try(&g_lock))
 	{
 		// dump
-		if (g_pool) tb_gpool_data_dump(g_pool, data, prefix);
+		if (g_pool) tb_global_pool_data_dump(g_pool, data, prefix);
 
 		// leave
 		tb_spinlock_leave(&g_lock);
@@ -276,7 +276,7 @@ tb_void_t tb_memory_dump()
 	tb_spinlock_enter(&g_lock);
 	
 	// dump
-	if (g_pool) tb_gpool_dump(g_pool);
+	if (g_pool) tb_global_pool_dump(g_pool);
 
 	// leave
 	tb_spinlock_leave(&g_lock);

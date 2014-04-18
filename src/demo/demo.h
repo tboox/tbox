@@ -119,14 +119,14 @@ TB_DEMO_MAIN_DECL(string_sstring);
 
 // memory
 TB_DEMO_MAIN_DECL(memory_check);
-TB_DEMO_MAIN_DECL(memory_fpool);
-TB_DEMO_MAIN_DECL(memory_gpool);
-TB_DEMO_MAIN_DECL(memory_spool);
-TB_DEMO_MAIN_DECL(memory_tpool);
-TB_DEMO_MAIN_DECL(memory_vpool);
-TB_DEMO_MAIN_DECL(memory_rpool);
+TB_DEMO_MAIN_DECL(memory_static_fixed_pool);
+TB_DEMO_MAIN_DECL(memory_global_pool);
+TB_DEMO_MAIN_DECL(memory_block_pool);
+TB_DEMO_MAIN_DECL(memory_tiny_pool);
+TB_DEMO_MAIN_DECL(memory_static_block_pool);
+TB_DEMO_MAIN_DECL(memory_fixed_pool);
 TB_DEMO_MAIN_DECL(memory_memops);
-TB_DEMO_MAIN_DECL(memory_scache);
+TB_DEMO_MAIN_DECL(memory_string_cache);
 TB_DEMO_MAIN_DECL(memory_pbuffer);
 TB_DEMO_MAIN_DECL(memory_qbuffer);
 TB_DEMO_MAIN_DECL(memory_sbuffer);

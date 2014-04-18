@@ -28,13 +28,13 @@
  * includes
  */
 #include "prefix.h"
-#include "vpool.h"
-#include "fpool.h"
-#include "tpool.h"
-#include "gpool.h"
-#include "spool.h"
-#include "rpool.h"
-#include "scache.h"
+#include "static_block_pool.h"
+#include "static_fixed_pool.h"
+#include "static_tiny_pool.h"
+#include "global_pool.h"
+#include "block_pool.h"
+#include "fixed_pool.h"
+#include "string_cache.h"
 #include "pbuffer.h"
 #include "sbuffer.h"
 #include "qbuffer.h"
@@ -46,12 +46,12 @@
 /*!architecture
  *
  * <pre>
- * spool ------------------ vpool --
- *                |        |        |
- *             gpool ------|        | 
- *                |         tpool --|- data: |-------------------------------|
- *                |                 |
- * rpool ------------------ fpool --
+ * block_pool --------------------- static_block_pool --
+ *                |                     |              |
+ *             global_pool -------------|              | 
+ *                |                 static_tiny_pool --|- data: |-------------------------------|
+ *                |                                    |
+ * fixed_pool --------------------- static_fixed_pool --
  * </pre>
  */
 
