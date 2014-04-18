@@ -38,6 +38,52 @@
 #include "../algorithm/algorithm.h"
 
 /* //////////////////////////////////////////////////////////////////////////////////////
+ * types
+ */
+
+// the thread pool job type
+typedef struct __tb_thread_pool_job_t
+{
+	// the task
+	tb_thread_pool_task_t 	task;
+
+}tb_thread_pool_job_t;
+
+// the thread pool worker type
+typedef struct __tb_thread_pool_worker_t
+{
+	// the lock
+	tb_spinlock_t 			lock;
+
+	// the job queue
+	tb_queue_t* 			jobs;
+	
+}tb_thread_pool_worker_t;
+
+// the thread pool type
+typedef struct __tb_thread_pool_t
+{
+	// the thread stack size
+	tb_size_t 				stack;
+
+	// the worker max count
+	tb_size_t 				worker_maxn;
+
+	// the lock
+	tb_spinlock_t 			lock;
+
+	// the job pool
+	tb_handle_t 			pool;
+
+	// the job queue
+	tb_slist_t* 			jobs;
+	
+	// the urgent job queue
+	tb_slist_t* 			jobs_urgent;
+
+}tb_thread_pool_t;
+
+/* //////////////////////////////////////////////////////////////////////////////////////
  * instance implementation
  */
 static tb_handle_t tb_thread_pool_instance_init()
@@ -58,10 +104,44 @@ static tb_handle_t tb_thread_pool_instance_init()
  */
 tb_handle_t tb_thread_pool_init(tb_size_t worker_maxn, tb_size_t stack)
 {
-	return tb_null;
+	// done
+	tb_thread_pool_t* 	pool = tb_null;
+	tb_bool_t 			ok = tb_false;
+	do
+	{
+		// make pool
+		pool = tb_malloc0(sizeof(tb_thread_pool_t));
+		tb_assert_and_check_break(pool);
+
+		// init pool
+		pool->stack 		= stack;
+		pool->worker_maxn 	= worker_maxn;
+
+		// ok
+		ok = tb_true;
+
+	} while (0);
+
+	// failed?
+	if (!ok)
+	{
+		// exit it
+		if (pool) tb_thread_pool_exit((tb_handle_t)pool);
+		pool = tb_null;
+	}
+
+	// ok?
+	return (tb_handle_t)pool;
 }
 tb_void_t tb_thread_pool_exit(tb_handle_t handle)
 {
+	// check
+	tb_thread_pool_t* pool = (tb_thread_pool_t*)handle;
+	tb_assert_and_check_return(pool);
+
+
+	// exit it
+	tb_free(pool);
 }
 tb_void_t tb_thread_pool_kill(tb_handle_t handle)
 {
@@ -74,11 +154,19 @@ tb_size_t tb_thread_pool_task_size(tb_handle_t handle)
 {
 	return 0;
 }
-tb_handle_t tb_thread_pool_task_post(tb_handle_t handle, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent)
+tb_bool_t tb_thread_pool_task_post(tb_handle_t handle, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent)
+{
+	return tb_false;
+}
+tb_bool_t tb_thread_pool_task_post_list(tb_handle_t handle, tb_thread_pool_task_t const* list, tb_size_t size)
+{
+	return tb_false;
+}
+tb_handle_t tb_thread_pool_task_init(tb_handle_t handle, tb_thread_pool_task_done_func_t done, tb_thread_pool_task_exit_func_t exit, tb_pointer_t priv, tb_bool_t urgent)
 {
 	return tb_null;
 }
-tb_bool_t tb_thread_pool_task_post_list(tb_handle_t handle, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks)
+tb_bool_t tb_thread_pool_task_init_list(tb_handle_t handle, tb_thread_pool_task_t const* list, tb_size_t size, tb_handle_t* tasks)
 {
 	return tb_false;
 }
@@ -89,6 +177,12 @@ tb_void_t tb_thread_pool_task_kill_list(tb_handle_t handle, tb_handle_t* tasks, 
 {
 }
 tb_void_t tb_thread_pool_task_kill_all(tb_handle_t handle)
+{
+}
+tb_void_t tb_thread_pool_task_exit(tb_handle_t handle, tb_handle_t task)
+{
+}
+tb_void_t tb_thread_pool_task_exit_list(tb_handle_t handle, tb_handle_t* tasks, tb_size_t size)
 {
 }
 tb_handle_t tb_thread_pool_instance()

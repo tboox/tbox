@@ -117,7 +117,7 @@ static tb_void_t tb_mstream_transfer_exit(tb_mstream_transfer_t* transfer, tb_bo
 	transfer->tstream = tb_null;
 
 	// free it
-	tb_rpool_free(mstream->pool, transfer);
+	tb_fixed_pool_free(mstream->pool, transfer);
 }
 static tb_bool_t tb_mstream_transfer_save(tb_size_t state, tb_hize_t offset, tb_hong_t size, tb_hize_t save, tb_size_t rate, tb_pointer_t priv)
 {
@@ -292,7 +292,7 @@ tb_handle_t tb_mstream_init(tb_aicp_t* aicp, tb_size_t conc, tb_long_t timeout)
 		tb_assert_and_check_break(mstream->aicp);
 
 		// init pool
-		mstream->pool = tb_rpool_init(conc? conc : 16, sizeof(tb_mstream_transfer_t), 0);
+		mstream->pool = tb_fixed_pool_init(conc? conc : 16, sizeof(tb_mstream_transfer_t), 0);
 		tb_assert_and_check_break(mstream->pool);
 
 		// init working list
@@ -415,7 +415,7 @@ tb_void_t tb_mstream_exit(tb_handle_t handle)
 	}
 
 	// exit pool
-	if (mstream->pool) tb_rpool_exit(mstream->pool);
+	if (mstream->pool) tb_fixed_pool_exit(mstream->pool);
 	mstream->pool = tb_null;
 
 	// leave
@@ -461,7 +461,7 @@ tb_size_t tb_mstream_size(tb_handle_t handle)
 	tb_spinlock_enter(&mstream->lock);
 
 	// the size
-	tb_size_t size = mstream->pool? tb_rpool_size(mstream->pool) : 0;
+	tb_size_t size = mstream->pool? tb_fixed_pool_size(mstream->pool) : 0;
 
 	// leave
 	tb_spinlock_leave(&mstream->lock);
@@ -498,7 +498,7 @@ tb_bool_t tb_mstream_done(tb_handle_t handle, tb_char_t const* iurl, tb_char_t c
 		}
 
 		// make transfer
-		transfer = tb_rpool_malloc0(mstream->pool);
+		transfer = tb_fixed_pool_malloc0(mstream->pool);
 		tb_assert_and_check_break(transfer);
 
 		// init transfer

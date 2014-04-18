@@ -148,7 +148,7 @@ tb_bool_t tb_dns_cache_init()
 	do
 	{
 		// init pool
-		if (!g_cache.pool) g_cache.pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+		if (!g_cache.pool) g_cache.pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 		tb_assert_and_check_break(g_cache.pool);
 
 		// init hash
@@ -179,7 +179,7 @@ tb_void_t tb_dns_cache_exit()
 	g_cache.hash = tb_null;
 
 	// exit pool
-	if (g_cache.pool) tb_spool_exit(g_cache.pool);
+	if (g_cache.pool) tb_block_pool_exit(g_cache.pool);
 	g_cache.pool = tb_null;
 
 	// exit times

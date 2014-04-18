@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		fpool.h
+ * @file		static_fixed_pool.h
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_FPOOL_H
-#define TB_MEMORY_FPOOL_H
+#ifndef TB_MEMORY_STATIC_FIXED_POOL_H
+#define TB_MEMORY_STATIC_FIXED_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -33,7 +33,7 @@
  * interfaces
  */
 
-/*! init fixed pool
+/*! init pool
  *
  * @param data 		the data
  * @param size 		the size
@@ -42,66 +42,66 @@
  *
  * @return 			the pool handle
  */
-tb_handle_t 		tb_fpool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
+tb_handle_t 		tb_static_fixed_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t step, tb_size_t align);
 
-/*! exit fixed pool
+/*! exit pool
  *
  * @param handle 	the pool handle
  */
-tb_void_t 			tb_fpool_exit(tb_handle_t handle);
+tb_void_t 			tb_static_fixed_pool_exit(tb_handle_t handle);
 
-/*! the fixed pool item count
+/*! the pool item count
  *
  * @param handle 	the pool handle
  *
  * @return 			the item count
  */
-tb_size_t 			tb_fpool_size(tb_handle_t handle);
+tb_size_t 			tb_static_fixed_pool_size(tb_handle_t handle);
 
-/*! clear fixed pool
+/*! clear pool
  *
  * @param handle 	the pool handle
  */
-tb_void_t 			tb_fpool_clear(tb_handle_t handle);
+tb_void_t 			tb_static_fixed_pool_clear(tb_handle_t handle);
 
-/*! malloc fixed pool data
+/*! malloc pool data
  *
  * @param handle 	the pool handle
  * 
  * @return 			the data pointer
  */
-tb_pointer_t 		tb_fpool_malloc(tb_handle_t handle);
+tb_pointer_t 		tb_static_fixed_pool_malloc(tb_handle_t handle);
 
-/*! malloc fixed pool data and clear it
+/*! malloc pool data and clear it
  *
  * @param handle 	the pool handle
  *
  * @return 			the data pointer
  */
-tb_pointer_t 		tb_fpool_malloc0(tb_handle_t handle);
+tb_pointer_t 		tb_static_fixed_pool_malloc0(tb_handle_t handle);
 
-/*! duplicate fixed pool data 
+/*! duplicate pool data 
  *
  * @param handle 	the pool handle
  * @param data		the data pointer
  *
  * @return 			the duplicated data pointer
  */
-tb_pointer_t 		tb_fpool_memdup(tb_handle_t handle, tb_cpointer_t data);
+tb_pointer_t 		tb_static_fixed_pool_memdup(tb_handle_t handle, tb_cpointer_t data);
 
-/*! free fixed pool data
+/*! free pool data
  *
  * @param handle 	the pool handle
  * @param data 		the pool item data
  *
  * @return 			tb_true or tb_false
  */
-tb_bool_t 			tb_fpool_free(tb_handle_t handle, tb_pointer_t data);
+tb_bool_t 			tb_static_fixed_pool_free(tb_handle_t handle, tb_pointer_t data);
 
-/*! walk fixed pool item
+/*! walk pool item
  *
  * @code
- * tb_bool_t tb_fpool_item_func(tb_pointer_t item, tb_pointer_t data)
+ * tb_bool_t tb_static_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
  * {
  * 		// is tail?
  * 		if (!item) ;
@@ -120,13 +120,13 @@ tb_bool_t 			tb_fpool_free(tb_handle_t handle, tb_pointer_t data);
  * @param data 		the walk data
  *
  */
-tb_void_t 			tb_fpool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
+tb_void_t 			tb_static_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t item, tb_pointer_t data), tb_pointer_t data);
 
-/*! dump fixed pool
+/*! dump pool
  *
  * @param handle 	the pool handle
  */
-tb_void_t 			tb_fpool_dump(tb_handle_t handle);
+tb_void_t 			tb_static_fixed_pool_dump(tb_handle_t handle);
 
 
 #endif

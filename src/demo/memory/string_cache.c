@@ -6,10 +6,10 @@
 /* //////////////////////////////////////////////////////////////////////////////////////
  * main
  */ 
-tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
+tb_int_t tb_demo_memory_string_cache_main(tb_int_t argc, tb_char_t** argv)
 {
 	// hello
-	tb_char_t const* hello = tb_scache_put("hello world");
+	tb_char_t const* hello = tb_string_cache_put("hello world");
 	tb_trace_i("hello: %s", hello);
 
 	// clear rand
@@ -24,8 +24,8 @@ tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
 		tb_int_t r = tb_snprintf(s, 256, "%u", tb_rand_uint32(0, 10000)); 
 		s[r] == '\0'; 
 #if 1
-		tb_scache_put(s); 
-		if (!(n & 15)) tb_scache_del(s);
+		tb_string_cache_put(s); 
+		if (!(n & 15)) tb_string_cache_del(s);
 #else
 		tb_free(tb_strdup(s));
 #endif
@@ -34,7 +34,7 @@ tb_int_t tb_demo_memory_scache_main(tb_int_t argc, tb_char_t** argv)
 	tb_trace_i("time: %lld", t);
 
 	// del hello
-	tb_scache_del(hello);
+	tb_string_cache_del(hello);
 
 	return 0;
 }

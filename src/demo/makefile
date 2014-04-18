@@ -64,14 +64,14 @@ demo_C_FILES 							+= \
 										string/pstring \
 										string/sstring \
 										memory/check \
-										memory/fpool \
-										memory/gpool \
-										memory/vpool \
-										memory/spool \
-										memory/rpool \
-										memory/tpool \
+										memory/static_fixed_pool \
+										memory/global_pool \
+										memory/static_block_pool \
+										memory/block_pool \
+										memory/fixed_pool \
+										memory/static_tiny_pool \
 										memory/memops \
-										memory/scache \
+										memory/string_cache \
 										memory/pbuffer \
 										memory/qbuffer \
 										memory/sbuffer \

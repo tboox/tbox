@@ -146,7 +146,7 @@ tb_handle_t tb_timer_init(tb_size_t maxn, tb_bool_t ctime)
 	if (!tb_spinlock_init(&timer->lock)) goto fail;
 
 	// init pool
-	timer->pool 		= tb_rpool_init((maxn >> 2) + 16, sizeof(tb_timer_task_t), 0);
+	timer->pool 		= tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_timer_task_t), 0);
 	tb_assert_and_check_goto(timer->pool, fail);
 	
 	// init heap
@@ -188,7 +188,7 @@ tb_void_t tb_timer_exit(tb_handle_t handle)
 		timer->heap = tb_null;
 
 		// exit pool
-		if (timer->pool) tb_rpool_exit(timer->pool);
+		if (timer->pool) tb_fixed_pool_exit(timer->pool);
 		timer->pool = tb_null;
 
 		// exit event
@@ -217,7 +217,7 @@ tb_void_t tb_timer_clear(tb_handle_t handle)
 		if (timer->heap) tb_heap_clear(timer->heap);
 
 		// clear pool
-		if (timer->pool) tb_rpool_clear(timer->pool);
+		if (timer->pool) tb_fixed_pool_clear(timer->pool);
 
 		// leave
 		tb_spinlock_leave(&timer->lock);
@@ -347,7 +347,7 @@ tb_bool_t tb_timer_spak(tb_handle_t handle)
 				// refn--
 				if (task->refn > 1) task->refn--;
 				// remove it from pool directly
-				else tb_rpool_free(timer->pool, task);
+				else tb_fixed_pool_free(timer->pool, task);
 			}
 		}
 
@@ -430,7 +430,7 @@ tb_handle_t tb_timer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t p
 	// make task
 	tb_handle_t 		event = tb_null;
 	tb_hize_t 			when_top = -1;
-	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
 	if (task)
 	{
 		// the top when 
@@ -498,7 +498,7 @@ tb_void_t tb_timer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t per
 	// make task
 	tb_handle_t 		event = tb_null;
 	tb_hize_t 			when_top = -1;
-	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_timer_task_t* 	task = (tb_timer_task_t*)tb_fixed_pool_malloc0(timer->pool);
 	if (task)
 	{
 		// the top when 
@@ -563,7 +563,7 @@ tb_void_t tb_timer_task_del(tb_handle_t handle, tb_handle_t htask)
 		task->repeat 	= 0;
 	}
 	// remove it from pool directly if the task have been expired 
-	else tb_rpool_free(timer->pool, task);
+	else tb_fixed_pool_free(timer->pool, task);
 
 	// leave
 	tb_spinlock_leave(&timer->lock);

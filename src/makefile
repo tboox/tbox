@@ -15,13 +15,13 @@ tbox_C_FILES 			+= \
 						math/rand \
 						math/fixed16 \
 						prefix/state \
-						memory/vpool \
-						memory/fpool \
-						memory/tpool \
-						memory/gpool \
-						memory/spool \
-						memory/rpool \
-						memory/scache \
+						memory/static_block_pool \
+						memory/static_fixed_pool \
+						memory/static_tiny_pool \
+						memory/global_pool \
+						memory/block_pool \
+						memory/fixed_pool \
+						memory/string_cache \
 						memory/memory \
 						memory/pbuffer \
 						memory/sbuffer \
@@ -325,13 +325,13 @@ INC_FILES 				= \
 						prefix/asm/cache.h \
 						prefix/asm/arm/prefix.h \
 						prefix/asm/arm/prefix.S \
-						memory/vpool.h \
-						memory/fpool.h \
-						memory/tpool.h \
- 						memory/gpool.h \
-						memory/spool.h \
-						memory/rpool.h \
-						memory/scache.h \
+						memory/static_block_pool.h \
+						memory/static_fixed_pool.h \
+						memory/static_tiny_pool.h \
+ 						memory/global_pool.h \
+						memory/block_pool.h \
+						memory/fixed_pool.h \
+						memory/string_cache.h \
 						memory/prefix.h \
 						memory/memory.h \
 						memory/pbuffer.h \

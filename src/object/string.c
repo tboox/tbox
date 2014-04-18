@@ -39,7 +39,7 @@
  */
 
 // the scache string size
-#define TB_STRING_SCACHE_SIZE 		(64)
+#define TB_STRING_STRING_CACHE_SIZE 		(64)
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * types
@@ -82,7 +82,7 @@ static tb_void_t tb_string_exit(tb_object_t* object)
 	tb_string_t* string = tb_string_cast(object);
 	if (string) 
 	{
-		if (string->cdata) tb_scache_del(string->cdata);
+		if (string->cdata) tb_string_cache_del(string->cdata);
 		tb_pstring_exit(&string->pstr);
 		tb_object_pool_del(tb_object_pool_instance(), object);
 	}
@@ -92,7 +92,7 @@ static tb_void_t tb_string_cler(tb_object_t* object)
 	tb_string_t* string = tb_string_cast(object);
 	if (string) 
 	{
-		if (string->cdata) tb_scache_del(string->cdata);
+		if (string->cdata) tb_string_cache_del(string->cdata);
 		string->cdata = tb_null;
 		string->csize = 0;
 		tb_pstring_clear(&string->pstr);
@@ -131,10 +131,10 @@ tb_object_t* tb_string_init_from_cstr(tb_char_t const* cstr)
 		tb_size_t size = tb_strlen(cstr);
 		if (size)
 		{
-			if (size < TB_STRING_SCACHE_SIZE) 
+			if (size < TB_STRING_STRING_CACHE_SIZE) 
 			{
 				// put string to scache
-				string->cdata = tb_scache_put(cstr);
+				string->cdata = tb_string_cache_put(cstr);
 				tb_assert_and_check_goto(string->cdata, fail);
 
 				// the string size
@@ -165,10 +165,10 @@ tb_object_t* tb_string_init_from_pstr(tb_pstring_t* pstr)
 	if (pstr) 
 	{
 		tb_size_t size = tb_pstring_size(&string->pstr);
-		if (size < TB_STRING_SCACHE_SIZE) 
+		if (size < TB_STRING_STRING_CACHE_SIZE) 
 		{
 			// put string to scache
-			string->cdata = tb_scache_put(tb_pstring_cstr(pstr));
+			string->cdata = tb_string_cache_put(tb_pstring_cstr(pstr));
 			tb_assert_and_check_goto(string->cdata, fail);
 
 			// the string size
@@ -206,14 +206,14 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 		size = tb_strlen(cstr);
 		if (size)
 		{
-			if (size < TB_STRING_SCACHE_SIZE) 
+			if (size < TB_STRING_STRING_CACHE_SIZE) 
 			{
 				// put string to scache
-				tb_char_t const* cdata = tb_scache_put(cstr);
+				tb_char_t const* cdata = tb_string_cache_put(cstr);
 				if (cdata)
 				{
 					// save string
-					if (string->cdata) tb_scache_del(string->cdata);
+					if (string->cdata) tb_string_cache_del(string->cdata);
 					string->cdata = cdata;
 					string->csize = size;
 				}
@@ -225,7 +225,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 				size = tb_pstring_size(&string->pstr);
 
 				// remove string from scache
-				if (string->cdata) tb_scache_del(string->cdata);
+				if (string->cdata) tb_string_cache_del(string->cdata);
 				string->cdata = tb_null;
 				string->csize = 0;
 			}
@@ -236,7 +236,7 @@ tb_size_t tb_string_cstr_set(tb_object_t* object, tb_char_t const* cstr)
 			tb_pstring_clear(&string->pstr);
 
 			// remove string from scache
-			if (string->cdata) tb_scache_del(string->cdata);
+			if (string->cdata) tb_string_cache_del(string->cdata);
 			string->cdata = tb_null;
 			string->csize = 0;
 		}

@@ -55,7 +55,7 @@ static tb_aico_t* tb_aicp_aico_init(tb_aicp_t* aicp, tb_handle_t handle, tb_size
 	tb_spinlock_enter(&aicp->lock);
 
 	// make aico
-	tb_aico_t* aico = (tb_aico_t*)tb_rpool_malloc0(aicp->pool);
+	tb_aico_t* aico = (tb_aico_t*)tb_fixed_pool_malloc0(aicp->pool);
 
 	// init aico
 	if (aico)
@@ -88,11 +88,11 @@ static tb_void_t tb_aicp_aico_exit(tb_aicp_t* aicp, tb_aico_t* aico)
 	if (aico) 
 	{
 		// exit pool
-		if (aico->pool) tb_spool_exit(aico->pool);
+		if (aico->pool) tb_block_pool_exit(aico->pool);
 		aico->pool = tb_null;
 
 		// exit it
-		tb_rpool_free(aicp->pool, aico);
+		tb_fixed_pool_free(aicp->pool, aico);
 	}
 
 	// leave 
@@ -206,7 +206,7 @@ tb_aicp_t* tb_aicp_init(tb_size_t maxn)
 	tb_assert_and_check_goto(aicp->ptor && aicp->ptor->step >= sizeof(tb_aico_t), fail);
 
 	// init aico pool
-	aicp->pool = tb_rpool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
+	aicp->pool = tb_fixed_pool_init((maxn >> 2) + 16, aicp->ptor->step, 0);
 	tb_assert_and_check_goto(aicp->pool, fail);
 
 	// ok
@@ -237,7 +237,7 @@ tb_void_t tb_aicp_exit(tb_aicp_t* aicp)
 
 		// exit aico pool
 		tb_spinlock_enter(&aicp->lock);
-		if (aicp->pool) tb_rpool_exit(aicp->pool);
+		if (aicp->pool) tb_fixed_pool_exit(aicp->pool);
 		aicp->pool = tb_null;
 		tb_spinlock_leave(&aicp->lock);
 

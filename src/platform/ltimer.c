@@ -164,7 +164,7 @@ static tb_bool_t tb_ltimer_add_task(tb_ltimer_t* timer, tb_ltimer_task_t* task)
 	do
 	{
 		// empty? move to the wheel head
-		if (!tb_rpool_size(timer->pool)) 
+		if (!tb_fixed_pool_size(timer->pool)) 
 		{
 			timer->btime = tb_ltimer_now(timer);
 			timer->wbase = 0;
@@ -305,7 +305,7 @@ static tb_bool_t tb_ltimer_expired_exit(tb_iterator_t* iterator, tb_pointer_t it
 			// refn--
 			if (task->refn > 1) task->refn--;
 			// remove it from pool directly
-			else tb_rpool_free(timer->pool, task);
+			else tb_fixed_pool_free(timer->pool, task);
 		}
 	}
 
@@ -335,7 +335,7 @@ tb_handle_t tb_ltimer_init(tb_size_t maxn, tb_size_t tick, tb_bool_t ctime)
 	if (!tb_spinlock_init(&timer->lock)) goto fail;
 
 	// init pool
-	timer->pool 		= tb_rpool_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_t), 0);
+	timer->pool 		= tb_fixed_pool_init((maxn >> 2) + 16, sizeof(tb_ltimer_task_t), 0);
 	tb_assert_and_check_goto(timer->pool, fail);
 
 	// init the expired tasks
@@ -377,7 +377,7 @@ tb_void_t tb_ltimer_exit(tb_handle_t handle)
 		}
 
 		// exit pool
-		if (timer->pool) tb_rpool_exit(timer->pool);
+		if (timer->pool) tb_fixed_pool_exit(timer->pool);
 		timer->pool = tb_null;
 
 		// leave
@@ -416,7 +416,7 @@ tb_void_t tb_ltimer_clear(tb_handle_t handle)
 		}
 
 		// clear pool
-		if (timer->pool) tb_rpool_clear(timer->pool);
+		if (timer->pool) tb_fixed_pool_clear(timer->pool);
 
 		// leave
 		tb_spinlock_leave(&timer->lock);
@@ -463,7 +463,7 @@ tb_bool_t tb_ltimer_spak(tb_handle_t handle)
 	do
 	{
 		// empty? move to the wheel head
-		if (!tb_rpool_size(timer->pool))
+		if (!tb_fixed_pool_size(timer->pool))
 		{
 			timer->btime = now;
 			timer->wbase = 0;
@@ -581,7 +581,7 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 	tb_spinlock_enter(&timer->lock);
 
 	// make task
-	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_fixed_pool_malloc0(timer->pool);
 	if (task)
 	{
 		// init task
@@ -597,7 +597,7 @@ tb_handle_t tb_ltimer_task_add_at(tb_handle_t handle, tb_hize_t when, tb_size_t 
 		// add task
 		if (!tb_ltimer_add_task(timer, task))
 		{
-			tb_rpool_free(timer->pool, task);
+			tb_fixed_pool_free(timer->pool, task);
 			task = tb_null;
 		}
 	}
@@ -639,7 +639,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 	tb_spinlock_enter(&timer->lock);
 
 	// make task
-	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_rpool_malloc0(timer->pool);
+	tb_ltimer_task_t* task = (tb_ltimer_task_t*)tb_fixed_pool_malloc0(timer->pool);
 	if (task)
 	{
 		// init task
@@ -654,7 +654,7 @@ tb_void_t tb_ltimer_task_run_at(tb_handle_t handle, tb_hize_t when, tb_size_t pe
 
 		// add task
 		if (!tb_ltimer_add_task(timer, task))
-			tb_rpool_free(timer->pool, task);
+			tb_fixed_pool_free(timer->pool, task);
 	}
 
 	// leave
@@ -693,7 +693,7 @@ tb_void_t tb_ltimer_task_del(tb_handle_t handle, tb_handle_t htask)
 		task->repeat 	= 0;
 	}
 	// remove it from pool directly if the task have been expired 
-	else tb_rpool_free(timer->pool, task);
+	else tb_fixed_pool_free(timer->pool, task);
 
 	// leave
 	tb_spinlock_leave(&timer->lock);

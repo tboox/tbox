@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		scache.h
+ * @file		static_tiny_pool.h
  * @ingroup 	memory
  *
  */
-#ifndef TB_MEMORY_scache_H
-#define TB_MEMORY_scache_H
+#ifndef TB_MEMORY_STATIC_TINY_POOL_H
+#define TB_MEMORY_STATIC_TINY_POOL_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -33,37 +33,37 @@
  * interfaces
  */
 
-/*! init string cache for small, readonly and repeat strings
- *
- * readonly, strip repeat strings and decrease memory fragmens
- *
- * @param align 	the cpu align bytes
- *
- * @return 			tb_true or tb_false
- */
-tb_bool_t 			tb_scache_init(tb_size_t align);
+// init
+tb_handle_t 	tb_tiny_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align);
 
-/// exit scache
-tb_void_t 			tb_scache_exit(tb_noarg_t);
+// exit
+tb_void_t 		tb_tiny_pool_exit(tb_handle_t handle);
 
-/// clear scache
-tb_void_t 			tb_scache_clear(tb_noarg_t);
+// limit
+tb_size_t 		tb_tiny_pool_limit(tb_handle_t handle);
 
-/*! put string to scache
- *
- * @param data 		the string data
- *
- * @return 			the string data
- */
-tb_char_t const*	tb_scache_put(tb_char_t const* data);
+// clear
+tb_void_t 		tb_tiny_pool_clear(tb_handle_t handle);
 
-/*! del string from scache
- *
- * @param data 		the string data
- */
-tb_void_t 			tb_scache_del(tb_char_t const* data);
+// malloc
+tb_pointer_t 	tb_tiny_pool_malloc(tb_handle_t handle, tb_size_t size);
 
-/// dump scache
-tb_void_t 			tb_scache_dump(tb_noarg_t);
+// malloc0
+tb_pointer_t 	tb_tiny_pool_malloc0(tb_handle_t handle, tb_size_t size);
+
+// nalloc
+tb_pointer_t  	tb_tiny_pool_nalloc(tb_handle_t handle, tb_size_t item, tb_size_t size);
+
+// nalloc0
+tb_pointer_t  	tb_tiny_pool_nalloc0(tb_handle_t handle, tb_size_t item, tb_size_t size);
+
+// ralloc
+tb_pointer_t 	tb_tiny_pool_ralloc(tb_handle_t handle, tb_pointer_t data, tb_size_t size);
+
+// free
+tb_bool_t 		tb_tiny_pool_free(tb_handle_t handle, tb_pointer_t data);
+
+// dump
+tb_void_t 		tb_tiny_pool_dump(tb_handle_t handle);
 
 #endif

@@ -113,7 +113,7 @@ static tb_void_t tb_hash_test_s2i_func()
 static tb_void_t tb_hash_test_s2i_perf()
 {
 	// init hash
-	tb_handle_t 	pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_handle_t 	pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
 	tb_hash_t* 		hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_str(tb_true, pool), tb_item_func_long());
 	tb_assert_and_check_return(hash);
 
@@ -135,7 +135,7 @@ static tb_void_t tb_hash_test_s2i_perf()
 	tb_trace_i("s2i: time: %lld", t);
 
 	tb_hash_exit(hash);
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 }
 static tb_void_t tb_hash_test_i2s_func()
 {
@@ -209,7 +209,7 @@ static tb_void_t tb_hash_test_i2s_func()
 static tb_void_t tb_hash_test_i2s_perf()
 {
 	// init hash
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_long(), tb_item_func_str(tb_true, pool));
 	tb_assert_and_check_return(hash);
 
@@ -229,7 +229,7 @@ static tb_void_t tb_hash_test_i2s_perf()
 	tb_trace_i("i2s: time: %lld", t);
 
 	tb_hash_exit(hash);
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 }
 static tb_void_t tb_hash_test_m2m_func()
 {
@@ -348,7 +348,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	// init hash: mem => mem
 	tb_size_t const	step = 12;
 	tb_byte_t 		item[step];
-	tb_handle_t 	pool = tb_rpool_init(256, step, 0);
+	tb_handle_t 	pool = tb_fixed_pool_init(256, step, 0);
 	//tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_efm(step, pool), tb_item_func_efm(step, pool));
 	tb_hash_t* 	hash = tb_hash_init(TB_HASH_SIZE_DEFAULT, tb_item_func_ifm(step, tb_null, tb_null), tb_item_func_ifm(step, tb_null, tb_null));
 	tb_assert_and_check_return(hash);
@@ -369,7 +369,7 @@ static tb_void_t tb_hash_test_m2m_perf()
 	tb_trace_i("m2m: time: %lld", t);
 
 	tb_hash_exit(hash);
-	tb_rpool_exit(pool);
+	tb_fixed_pool_exit(pool);
 }
 static tb_void_t tb_hash_test_i2i_func()
 {

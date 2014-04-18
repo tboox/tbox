@@ -86,7 +86,7 @@ tb_handle_t tb_xml_writer_init(tb_gstream_t* wstream, tb_bool_t bformat)
 	writer->bformat 	= bformat;
 
 	// init spool
-	writer->spool 		= tb_spool_init(TB_SPOOL_GROW_SMALL, 0);
+	writer->spool 		= tb_block_pool_init(TB_BLOCK_POOL_GROW_SMALL, 0);
 	tb_assert_and_check_goto(writer->spool, fail);
 	
 	// init elements
@@ -116,7 +116,7 @@ tb_void_t tb_xml_writer_exit(tb_handle_t writer)
 		if (xwriter->elements) tb_stack_exit(xwriter->elements);
 
 		// exit spool
-		if (xwriter->spool) tb_spool_exit(xwriter->spool);
+		if (xwriter->spool) tb_block_pool_exit(xwriter->spool);
 
 		// free it
 		tb_free(xwriter);

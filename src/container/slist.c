@@ -341,7 +341,7 @@ tb_slist_t* tb_slist_init(tb_size_t grow, tb_item_func_t func)
 	slist->itor.comp = tb_slist_iterator_comp;
 
 	// init pool, step = next + data
-	slist->pool = tb_rpool_init(grow, sizeof(tb_slist_item_t) + func.size, 0);
+	slist->pool = tb_fixed_pool_init(grow, sizeof(tb_slist_item_t) + func.size, 0);
 	tb_assert_and_check_goto(slist->pool, fail);
 
 	// ok
@@ -360,7 +360,7 @@ tb_void_t tb_slist_exit(tb_slist_t* handle)
 		tb_slist_clear(slist);
 
 		// free pool
-		if (slist->pool) tb_rpool_exit(slist->pool);
+		if (slist->pool) tb_fixed_pool_exit(slist->pool);
 
 		// free it
 		tb_free(slist);
@@ -389,7 +389,7 @@ tb_void_t tb_slist_clear(tb_slist_t* handle)
 		}
 
 		// clear pool
-		if (slist->pool) tb_rpool_clear(slist->pool);
+		if (slist->pool) tb_fixed_pool_clear(slist->pool);
 
 		// reset it
 		slist->head = 0;
@@ -408,7 +408,7 @@ tb_size_t tb_slist_size(tb_slist_t const* handle)
 {
 	tb_slist_impl_t const* slist = (tb_slist_impl_t const*)handle;
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
-	return tb_rpool_size(slist->pool);
+	return tb_fixed_pool_size(slist->pool);
 }
 tb_size_t tb_slist_maxn(tb_slist_t const* handle)
 {
@@ -451,7 +451,7 @@ tb_size_t tb_slist_insert_next(tb_slist_t* handle, tb_size_t itor, tb_cpointer_t
 	tb_assert_and_check_return_val(slist && slist->pool, 0);
 
 	// make the node data
-	tb_slist_item_t* pnode = tb_rpool_malloc(slist->pool);
+	tb_slist_item_t* pnode = tb_fixed_pool_malloc(slist->pool);
 	tb_assert_and_check_return_val(pnode, 0);
 
 	// init node, inode => 0
@@ -595,7 +595,7 @@ tb_size_t tb_slist_remove_next(tb_slist_t* handle, tb_size_t itor)
 		slist->func.free(&slist->func, &((tb_slist_item_t*)node)[1]);
 
 	// free node
-	tb_rpool_free(slist->pool, (tb_pointer_t)node);
+	tb_fixed_pool_free(slist->pool, (tb_pointer_t)node);
 
 	// return next node
 	return next;
@@ -717,7 +717,7 @@ tb_void_t tb_slist_walk(tb_slist_t* handle, tb_bool_t (*func)(tb_slist_t* slist,
 				slist->func.free(&slist->func, &((tb_slist_item_t*)itor)[1]);
 
 			// free item
-			tb_rpool_free(pool, (tb_pointer_t)itor);
+			tb_fixed_pool_free(pool, (tb_pointer_t)itor);
 		}
 		
 		// remove items?

@@ -304,7 +304,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 	tb_assert_and_check_return(data);
 
 	// init pool
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
@@ -317,7 +317,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
-		data[i] = tb_spool_strdup(pool, s);
+		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
 	// sort
@@ -332,7 +332,7 @@ static tb_void_t tb_sort_str_test_perf(tb_size_t n)
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
 	// exit pool
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 
 	// free data
 	tb_free(data);
@@ -346,7 +346,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 	tb_assert_and_check_return(data);
 
 	// init pool
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
@@ -359,7 +359,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
-		data[i] = tb_spool_strdup(pool, s);
+		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
 	// sort
@@ -374,7 +374,7 @@ static tb_void_t tb_sort_str_test_perf_bubble(tb_size_t n)
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
 	// exit pool
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 
 	// free data
 	tb_free(data);
@@ -388,7 +388,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 	tb_assert_and_check_return(data);
 
 	// init pool
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
@@ -401,7 +401,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
-		data[i] = tb_spool_strdup(pool, s);
+		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
 	// sort
@@ -416,7 +416,7 @@ static tb_void_t tb_sort_str_test_perf_insert(tb_size_t n)
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
 	// exit pool
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 
 	// free data
 	tb_free(data);
@@ -430,7 +430,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 	tb_assert_and_check_return(data);
 
 	// init pool
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
@@ -443,7 +443,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
-		data[i] = tb_spool_strdup(pool, s);
+		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
 	// sort
@@ -458,7 +458,7 @@ static tb_void_t tb_sort_str_test_perf_quick(tb_size_t n)
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
 	// exit pool
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 
 	// free data
 	tb_free(data);
@@ -472,7 +472,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 	tb_assert_and_check_return(data);
 
 	// init pool
-	tb_handle_t pool = tb_spool_init(TB_SPOOL_GROW_DEFAULT, 0);
+	tb_handle_t pool = tb_block_pool_init(TB_BLOCK_POOL_GROW_DEFAULT, 0);
 	tb_assert_and_check_return(pool);
 	
 	// init iterator
@@ -485,7 +485,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 	{
 		tb_long_t r = tb_snprintf(s, 256, "%x", tb_rand_uint32(0, TB_MAXU32)); 
 		s[r] == '\0'; 
-		data[i] = tb_spool_strdup(pool, s);
+		data[i] = tb_block_pool_strdup(pool, s);
 	}
 
 	// sort
@@ -500,7 +500,7 @@ static tb_void_t tb_sort_str_test_perf_heap(tb_size_t n)
 	for (i = 1; i < n; i++) tb_assert_and_check_break(tb_strcmp(data[i - 1], data[i]) <= 0);
 
 	// exit pool
-	tb_spool_exit(pool);
+	tb_block_pool_exit(pool);
 
 	// free data
 	tb_free(data);
