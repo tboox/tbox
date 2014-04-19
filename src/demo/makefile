@@ -61,8 +61,8 @@ demo_C_FILES 							+= \
 										stream/astream/null \
 										stream/astream/cache \
 										stream/astream/charset \
-										string/pstring \
-										string/sstring \
+										string/scoped_string \
+										string/static_string \
 										memory/check \
 										memory/static_fixed_pool \
 										memory/global_pool \
@@ -72,9 +72,9 @@ demo_C_FILES 							+= \
 										memory/static_tiny_pool \
 										memory/memops \
 										memory/string_cache \
-										memory/pbuffer \
-										memory/qbuffer \
-										memory/sbuffer \
+										memory/queue_buffer \
+										memory/scoped_buffer \
+										memory/static_buffer \
 										network/dns \
 										network/url \
 										network/ipv4 \

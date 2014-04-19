@@ -105,8 +105,8 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(stream_astream_charset)
 
 	// string
-,	TB_DEMO_MAIN_ITEM(string_pstring)
-,	TB_DEMO_MAIN_ITEM(string_sstring)
+,	TB_DEMO_MAIN_ITEM(string_scoped_string)
+,	TB_DEMO_MAIN_ITEM(string_static_string)
 
 	// memory
 ,	TB_DEMO_MAIN_ITEM(memory_check)
@@ -118,9 +118,9 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(memory_fixed_pool)
 ,	TB_DEMO_MAIN_ITEM(memory_memops)
 ,	TB_DEMO_MAIN_ITEM(memory_string_cache)
-,	TB_DEMO_MAIN_ITEM(memory_pbuffer)
-,	TB_DEMO_MAIN_ITEM(memory_qbuffer)
-,	TB_DEMO_MAIN_ITEM(memory_sbuffer)
+,	TB_DEMO_MAIN_ITEM(memory_scoped_buffer)
+,	TB_DEMO_MAIN_ITEM(memory_queue_buffer)
+,	TB_DEMO_MAIN_ITEM(memory_static_buffer)
 
 	// network
 ,	TB_DEMO_MAIN_ITEM(network_dns)

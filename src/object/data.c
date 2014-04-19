@@ -45,7 +45,7 @@ typedef struct __tb_data_t
 	tb_object_t 		base;
 
 	// the data buffer
-	tb_pbuffer_t 		buff;
+	tb_scoped_buffer_t 		buff;
 
 }tb_data_t;
 
@@ -69,14 +69,14 @@ static tb_void_t tb_data_exit(tb_object_t* object)
 	tb_data_t* data = tb_data_cast(object);
 	if (data) 
 	{
-		tb_pbuffer_exit(&data->buff);
+		tb_scoped_buffer_exit(&data->buff);
 		tb_object_pool_del(tb_object_pool_instance(), (tb_object_t*)data);
 	}
 }
 static tb_void_t tb_data_cler(tb_object_t* object)
 {
 	tb_data_t* data = tb_data_cast(object);
-	if (data) tb_pbuffer_clear(&data->buff);
+	if (data) tb_scoped_buffer_clear(&data->buff);
 }
 static tb_data_t* tb_data_init_base()
 {
@@ -140,10 +140,10 @@ tb_object_t* tb_data_init_from_data(tb_pointer_t addr, tb_size_t size)
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// init buff
-	if (!tb_pbuffer_init(&data->buff)) goto fail;
+	if (!tb_scoped_buffer_init(&data->buff)) goto fail;
 
 	// copy data
-	if (addr && size) tb_pbuffer_memncpy(&data->buff, addr, size);
+	if (addr && size) tb_scoped_buffer_memncpy(&data->buff, addr, size);
 
 	// ok
 	return (tb_object_t*)data;
@@ -153,17 +153,17 @@ fail:
 	tb_data_exit((tb_object_t*)data);
 	return tb_null;
 }
-tb_object_t* tb_data_init_from_pbuf(tb_pbuffer_t* pbuf)
+tb_object_t* tb_data_init_from_pbuf(tb_scoped_buffer_t* pbuf)
 {	
 	// make
 	tb_data_t* data = tb_data_init_base();
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// init buff
-	if (!tb_pbuffer_init(&data->buff)) goto fail;
+	if (!tb_scoped_buffer_init(&data->buff)) goto fail;
 
 	// copy data
-	if (pbuf) tb_pbuffer_memcpy(&data->buff, pbuf);
+	if (pbuf) tb_scoped_buffer_memcpy(&data->buff, pbuf);
 
 	// ok
 	return (tb_object_t*)data;
@@ -180,7 +180,7 @@ tb_pointer_t tb_data_getp(tb_object_t* object)
 	tb_assert_and_check_return_val(data, tb_null);
 
 	// data
-	return tb_pbuffer_data(&data->buff);
+	return tb_scoped_buffer_data(&data->buff);
 }
 tb_bool_t tb_data_setp(tb_object_t* object, tb_pointer_t addr, tb_size_t size)
 {
@@ -189,7 +189,7 @@ tb_bool_t tb_data_setp(tb_object_t* object, tb_pointer_t addr, tb_size_t size)
 	tb_assert_and_check_return_val(data && addr, tb_false);
 
 	// data
-	tb_pbuffer_memncpy(&data->buff, addr, size);
+	tb_scoped_buffer_memncpy(&data->buff, addr, size);
 
 	// ok
 	return tb_true;
@@ -201,9 +201,9 @@ tb_size_t tb_data_size(tb_object_t* object)
 	tb_assert_and_check_return_val(data, 0);
 
 	// data
-	return tb_pbuffer_size(&data->buff);
+	return tb_scoped_buffer_size(&data->buff);
 }
-tb_pbuffer_t* tb_data_buff(tb_object_t* object)
+tb_scoped_buffer_t* tb_data_buff(tb_object_t* object)
 {
 	// check
 	tb_data_t* data = tb_data_cast(object);

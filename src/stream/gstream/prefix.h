@@ -53,13 +53,13 @@ static __tb_inline__ tb_bool_t tb_gstream_init(tb_gstream_t* gstream, tb_size_t 
 	if (!tb_url_init(&gstream->base.url)) return tb_false;
 
 	// init cache
-	if (!tb_qbuffer_init(&gstream->cache, cache)) goto fail;
+	if (!tb_queue_buffer_init(&gstream->cache, cache)) goto fail;
 
 	// ok
 	return tb_true;
 
 fail:
-	tb_qbuffer_exit(&gstream->cache);
+	tb_queue_buffer_exit(&gstream->cache);
 	return tb_false;
 }
 

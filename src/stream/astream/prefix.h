@@ -56,12 +56,12 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t*
 		ok_url = tb_true;
 
 		// init rcache
-		if (!tb_pbuffer_init(&astream->rcache_data)) break;
+		if (!tb_scoped_buffer_init(&astream->rcache_data)) break;
 		astream->rcache_maxn = rcache;
 		ok_rcache = tb_true;
 
 		// init wcache
-		if (!tb_pbuffer_init(&astream->wcache_data)) break;
+		if (!tb_scoped_buffer_init(&astream->wcache_data)) break;
 		astream->wcache_maxn = wcache;
 
 		// ok
@@ -73,7 +73,7 @@ static __tb_inline__ tb_bool_t tb_astream_init(tb_astream_t* astream, tb_aicp_t*
 	if (!ok)
 	{
 		// exit rcache
-		if (ok_rcache) tb_pbuffer_exit(&astream->rcache_data);
+		if (ok_rcache) tb_scoped_buffer_exit(&astream->rcache_data);
 
 		// exit url
 		if (ok_url) tb_url_exit(&astream->base.url);

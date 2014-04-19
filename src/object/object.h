@@ -31,12 +31,12 @@
 #include "null.h"
 #include "data.h"
 #include "date.h"
-#include "pool.h"
 #include "array.h"
 #include "string.h"
 #include "number.h"
 #include "boolean.h"
 #include "dictionary.h"
+#include "object_pool.h"
 #include "reader/reader.h"
 #include "writer/writer.h"
 

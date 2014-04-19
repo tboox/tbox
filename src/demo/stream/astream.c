@@ -237,10 +237,10 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 					if (tb_option_find(context.option, "header"))
 					{
 						// init
-						tb_pstring_t key;
-						tb_pstring_t val;
-						tb_pstring_init(&key);
-						tb_pstring_init(&val);
+						tb_scoped_string_t key;
+						tb_scoped_string_t val;
+						tb_scoped_string_init(&key);
+						tb_scoped_string_init(&val);
 
 						// done
 						tb_bool_t 			k = tb_true;
@@ -250,7 +250,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 							// is key?
 							if (k)
 							{
-								if (*p != ':' && !tb_isspace(*p)) tb_pstring_chrcat(&key, *p++);
+								if (*p != ':' && !tb_isspace(*p)) tb_scoped_string_chrcat(&key, *p++);
 								else if (*p == ':') 
 								{
 									// skip ':'
@@ -267,7 +267,7 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 							// is val?
 							else
 							{
-								if (*p != ';') tb_pstring_chrcat(&val, *p++);
+								if (*p != ';') tb_scoped_string_chrcat(&val, *p++);
 								else
 								{
 									// skip ';'
@@ -277,32 +277,32 @@ tb_int_t tb_demo_stream_astream_main(tb_int_t argc, tb_char_t** argv)
 									while (*p && tb_isspace(*p)) p++;
 
 									// set header
-									if (tb_pstring_size(&key) && tb_pstring_size(&val))
+									if (tb_scoped_string_size(&key) && tb_scoped_string_size(&val))
 									{
-										if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-										if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+										if (context.debug) tb_printf("header: %s: %s\n", tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val));
+										if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val))) break;
 									}
 
 									// is key now
 									k = tb_true;
 
 									// clear key & val
-									tb_pstring_clear(&key);
-									tb_pstring_clear(&val);
+									tb_scoped_string_clear(&key);
+									tb_scoped_string_clear(&val);
 								}
 							}
 						}
 
 						// set header
-						if (tb_pstring_size(&key) && tb_pstring_size(&val))
+						if (tb_scoped_string_size(&key) && tb_scoped_string_size(&val))
 						{
-							if (context.debug) tb_printf("header: %s: %s\n", tb_pstring_cstr(&key), tb_pstring_cstr(&val));
-							if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_pstring_cstr(&key), tb_pstring_cstr(&val))) break;
+							if (context.debug) tb_printf("header: %s: %s\n", tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val));
+							if (!tb_stream_ctrl(context.istream, TB_STREAM_CTRL_HTTP_SET_HEAD, tb_scoped_string_cstr(&key), tb_scoped_string_cstr(&val))) break;
 						}
 
 						// exit 
-						tb_pstring_exit(&key);
-						tb_pstring_exit(&val);
+						tb_scoped_string_exit(&key);
+						tb_scoped_string_exit(&val);
 					}
 
 					// keep alive?

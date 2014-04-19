@@ -46,7 +46,7 @@ typedef struct tb_option_t
 	tb_char_t 					name[64];
 
 	// the command help
-	tb_pstring_t 				help;
+	tb_scoped_string_t 				help;
 
 	// the options
 	tb_option_item_t const* 	opts;
@@ -197,8 +197,8 @@ tb_handle_t tb_option_init(tb_char_t const* name, tb_char_t const* help, tb_opti
 	tb_strlcpy(option->name, name, sizeof(option->name) - 1);
 
 	// init help
-	if (!tb_pstring_init(&option->help)) goto fail;
-	if (help) tb_pstring_cstrcpy(&option->help, help);
+	if (!tb_scoped_string_init(&option->help)) goto fail;
+	if (help) tb_scoped_string_cstrcpy(&option->help, help);
 
 	// ok
 	return option;
@@ -213,7 +213,7 @@ tb_void_t tb_option_exit(tb_handle_t handle)
 	if (option)
 	{
 		// exit help
-		tb_pstring_exit(&option->help);
+		tb_scoped_string_exit(&option->help);
 
 		// exit list
 		if (option->list) tb_object_exit(option->list);
@@ -608,8 +608,8 @@ tb_void_t tb_option_help(tb_handle_t handle)
 	tb_printf("\n\n");
 
 	// dump help
-	if (tb_pstring_size(&option->help)) 
-		tb_printf("[help]:  %s\n\n", tb_pstring_cstr(&option->help));
+	if (tb_scoped_string_size(&option->help)) 
+		tb_printf("[help]:  %s\n\n", tb_scoped_string_cstr(&option->help));
 
 	// dump options head
 	tb_printf("[options]: \n");

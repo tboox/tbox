@@ -25,7 +25,7 @@ typedef struct __tb_flv_t
 	tb_size_t 						spank_type_ok;
 
 	// the string data
-	tb_pstring_t 					string;
+	tb_scoped_string_t 					string;
 
 	// the sdata path
 	tb_char_t 						spath[TB_FLV_SDATA_STRING_MAX];
@@ -112,43 +112,43 @@ static tb_char_t const* tb_flv_sdata_value_to_string(tb_flv_t* flv, tb_flv_sdata
 	switch (value->type)
 	{
 	case TB_FLV_SDATA_TYPE_NUMBER:
-		tb_pstring_cstrfcpy(&flv->string, "%lf", value->u.number);
+		tb_scoped_string_cstrfcpy(&flv->string, "%lf", value->u.number);
 		break;
 	case TB_FLV_SDATA_TYPE_BOOLEAN:
-		tb_pstring_cstrfcpy(&flv->string, "%s", value->u.boolean? "true" : "false");
+		tb_scoped_string_cstrfcpy(&flv->string, "%s", value->u.boolean? "true" : "false");
 		break;
 	case TB_FLV_SDATA_TYPE_STRING:
 	case TB_FLV_SDATA_TYPE_LONGSTRING:
 		return value->u.string.size? (value->u.string.size < TB_FLV_SDATA_STRING_MAX? value->u.string.data : "too long") : "";
 	case TB_FLV_SDATA_TYPE_OBJECT:
-		tb_pstring_cstrfcpy(&flv->string, "object");
+		tb_scoped_string_cstrfcpy(&flv->string, "object");
 		break;
 	case TB_FLV_SDATA_TYPE_MOVIECLIP:
-		tb_pstring_cstrfcpy(&flv->string, "movieclip");
+		tb_scoped_string_cstrfcpy(&flv->string, "movieclip");
 		break;
 	case TB_FLV_SDATA_TYPE_NONE:
-		tb_pstring_cstrfcpy(&flv->string, "null");
+		tb_scoped_string_cstrfcpy(&flv->string, "null");
 		break;
 	case TB_FLV_SDATA_TYPE_UNDEFINED:
-		tb_pstring_cstrfcpy(&flv->string, "undefined");
+		tb_scoped_string_cstrfcpy(&flv->string, "undefined");
 		break;
 	case TB_FLV_SDATA_TYPE_REFERENCE:
-		tb_pstring_cstrfcpy(&flv->string, "reference");
+		tb_scoped_string_cstrfcpy(&flv->string, "reference");
 		break;
 	case TB_FLV_SDATA_TYPE_ECMAARRAY:
-		tb_pstring_cstrfcpy(&flv->string, "ecmaarray");
+		tb_scoped_string_cstrfcpy(&flv->string, "ecmaarray");
 		break;
 	case TB_FLV_SDATA_TYPE_STRICTARRAY:
-		tb_pstring_cstrfcpy(&flv->string, "strictarray");
+		tb_scoped_string_cstrfcpy(&flv->string, "strictarray");
 		break;
 	case TB_FLV_SDATA_TYPE_DATE:
-		tb_pstring_cstrfcpy(&flv->string, "date");
+		tb_scoped_string_cstrfcpy(&flv->string, "date");
 		break;
 	default:
 		break;
 	}
 
-	return tb_pstring_cstr(&flv->string);
+	return tb_scoped_string_cstr(&flv->string);
 }
 static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_value_t const* value)
 {
@@ -497,7 +497,7 @@ tb_handle_t tb_flv_init(tb_gstream_t* gst)
 	flv->stail 	= flv->spath;
 
 	// init string
-	if (!tb_pstring_init(&flv->string)) goto fail;
+	if (!tb_scoped_string_init(&flv->string)) goto fail;
 
 	// ok
 	return (tb_handle_t)flv;
@@ -532,7 +532,7 @@ tb_void_t tb_flv_exit(tb_handle_t hflv)
 			tb_free(tb_bstream_beg(&flv->sdata_bst));
 
 		// free string
-		tb_pstring_exit(&flv->string);
+		tb_scoped_string_exit(&flv->string);
 
 		// free it
 		tb_free(flv);

@@ -111,7 +111,7 @@ typedef struct __tb_gstream_t
 	tb_uint8_t 			bwrited;
 
 	/// the cache
-	tb_qbuffer_t 		cache;
+	tb_queue_buffer_t 		cache;
 
 	/// wait 
 	tb_long_t 			(*wait)(tb_handle_t gstream, tb_size_t wait, tb_long_t timeout);

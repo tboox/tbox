@@ -23,11 +23,11 @@ tbox_C_FILES 			+= \
 						memory/fixed_pool \
 						memory/string_cache \
 						memory/memory \
-						memory/pbuffer \
-						memory/sbuffer \
-						memory/qbuffer \
-						string/pstring \
-						string/sstring \
+						memory/scoped_buffer \
+						memory/static_buffer \
+						memory/queue_buffer \
+						string/scoped_string \
+						string/static_string \
 						algorithm/sort \
 						algorithm/heap_sort \
 						algorithm/quick_sort \
@@ -90,7 +90,7 @@ tbox_C_FILES 			+= \
 						object/null \
 						object/data \
 						object/date \
-						object/pool \
+						object/object_pool \
 						object/array \
 						object/string \
 						object/number \
@@ -334,9 +334,9 @@ INC_FILES 				= \
 						memory/string_cache.h \
 						memory/prefix.h \
 						memory/memory.h \
-						memory/pbuffer.h \
-						memory/sbuffer.h \
-						memory/qbuffer.h \
+						memory/scoped_buffer.h \
+						memory/static_buffer.h \
+						memory/queue_buffer.h \
 						asio/asio.h \
 						asio/prefix.h \
 						asio/aioo.h \
@@ -366,8 +366,8 @@ INC_FILES 				= \
 						math/opt/fixed30_sh4.h \
 						string/prefix.h \
 						string/string.h \
-						string/pstring.h \
-						string/sstring.h \
+						string/scoped_string.h \
+						string/static_string.h \
 						algorithm/prefix.h \
 						algorithm/algorithm.h \
 						algorithm/for.h \
@@ -475,12 +475,12 @@ INC_FILES 				= \
 						object/null.h \
 						object/data.h \
 						object/date.h \
-						object/pool.h \
 						object/array.h \
 						object/number.h \
 						object/string.h \
 						object/boolean.h \
 						object/dictionary.h \
+						object/object_pool.h \
 						object/reader/prefix.h \
 						object/reader/reader.h \
 						object/reader/xml.h \

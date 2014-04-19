@@ -64,10 +64,10 @@ typedef enum __tb_dns_looker_step_e
 typedef struct __tb_dns_looker_t
 {
 	// the name
-	tb_sstring_t 		name;
+	tb_static_string_t 		name;
 
 	// the request & response packet
-	tb_sbuffer_t 		rpkt;
+	tb_static_buffer_t 		rpkt;
 	
 	// the size for recv & send packet
 	tb_size_t 			size;
@@ -104,7 +104,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 	tb_check_return_val(!(looker->step & TB_DNS_LOOKER_STEP_REQT), 1);
 	
 	// format it first if the request is null
-	if (!tb_sbuffer_size(&looker->rpkt))
+	if (!tb_static_buffer_size(&looker->rpkt))
 	{
 		// check size
 		tb_assert_and_check_return_val(!looker->size, -1);
@@ -174,7 +174,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		// set questions, see as tb_dns_question_t
 		// name + question1 + question2 + ...
 		tb_bstream_set_u8(&bst, '.');
-		p = (tb_byte_t*)tb_bstream_set_string(&bst, tb_sstring_cstr(&looker->name));
+		p = (tb_byte_t*)tb_bstream_set_string(&bst, tb_static_string_cstr(&looker->name));
 
 		// only one question now.
 		tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
@@ -188,12 +188,12 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 		tb_assert_and_check_return_val(size, -1);
 
 		// copy
-		tb_sbuffer_memncpy(&looker->rpkt, rpkt, size);
+		tb_static_buffer_memncpy(&looker->rpkt, rpkt, size);
 	}
 
 	// data && size
-	tb_byte_t const* 	data = tb_sbuffer_data(&looker->rpkt);
-	tb_size_t 			size = tb_sbuffer_size(&looker->rpkt);
+	tb_byte_t const* 	data = tb_static_buffer_data(&looker->rpkt);
+	tb_size_t 			size = tb_static_buffer_size(&looker->rpkt);
 
 	// check
 	tb_assert_and_check_return_val(data && size && looker->size < size, -1);
@@ -242,7 +242,7 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 
 	// reset rpkt
 	looker->size = 0;
-	tb_sbuffer_clear(&looker->rpkt);
+	tb_static_buffer_clear(&looker->rpkt);
 
 	// ok
 	tb_trace_d("request: ok");
@@ -251,8 +251,8 @@ static tb_long_t tb_dns_looker_reqt(tb_dns_looker_t* looker)
 static tb_bool_t tb_dns_looker_resp_done(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 {
 	// rpkt && size
-	tb_byte_t const* 	rpkt = tb_sbuffer_data(&looker->rpkt);
-	tb_size_t 			size = tb_sbuffer_size(&looker->rpkt);
+	tb_byte_t const* 	rpkt = tb_static_buffer_data(&looker->rpkt);
+	tb_size_t 			size = tb_static_buffer_size(&looker->rpkt);
 
 	// check
 	tb_assert_and_check_return_val(rpkt && size >= TB_DNS_HEADER_SIZE, tb_false);
@@ -465,7 +465,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 		if (!read)
 		{
 			// end? read x, read 0
-			tb_check_break(!tb_sbuffer_size(&looker->rpkt));
+			tb_check_break(!tb_static_buffer_size(&looker->rpkt));
 	
 			// abort? read 0, read 0
 			tb_check_return_val(!looker->tryn, -1);
@@ -479,17 +479,17 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 		else looker->tryn = 0;
 
 		// copy data
-		tb_sbuffer_memncat(&looker->rpkt, rpkt, read);
+		tb_static_buffer_memncat(&looker->rpkt, rpkt, read);
 	}
 
 	// done
 	if (!tb_dns_looker_resp_done(looker, ipv4)) return -1;
 
 	// check
-	tb_assert_and_check_return_val(tb_sstring_size(&looker->name) && ipv4->u32, -1);
+	tb_assert_and_check_return_val(tb_static_string_size(&looker->name) && ipv4->u32, -1);
 
 	// add to cache
-	tb_dns_cache_set(tb_sstring_cstr(&looker->name), ipv4);
+	tb_dns_cache_set(tb_static_string_cstr(&looker->name), ipv4);
 
 	// finish it
 	looker->step |= TB_DNS_LOOKER_STEP_RESP;
@@ -497,7 +497,7 @@ static tb_long_t tb_dns_looker_resp(tb_dns_looker_t* looker, tb_ipv4_t* ipv4)
 
 	// reset rpkt
 	looker->size = 0;
-	tb_sbuffer_clear(&looker->rpkt);
+	tb_static_buffer_clear(&looker->rpkt);
 
 	// ok
 	tb_trace_d("response: ok");
@@ -527,11 +527,11 @@ tb_handle_t tb_dns_looker_init(tb_char_t const* name)
 	tb_check_goto(looker->maxn && looker->maxn <= tb_arrayn(looker->list), fail);
 
 	// init name
-	if (!tb_sstring_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;
-	tb_sstring_cstrcpy(&looker->name, name);
+	if (!tb_static_string_init(&looker->name, (tb_char_t*)looker->data, TB_DNS_NAME_MAXN)) goto fail;
+	tb_static_string_cstrcpy(&looker->name, name);
 
 	// init rpkt
-	if (!tb_sbuffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
+	if (!tb_static_buffer_init(&looker->rpkt, looker->data + TB_DNS_NAME_MAXN, TB_DNS_RPKT_MAXN)) goto fail;
 
 	// init sock
 	looker->sock = tb_socket_open(TB_SOCKET_TYPE_UDP);
@@ -583,7 +583,7 @@ fail:
 
 		// reset rpkt
 		looker->size = 0;
-		tb_sbuffer_clear(&looker->rpkt);
+		tb_static_buffer_clear(&looker->rpkt);
 
 		// continue 
 		return 0;

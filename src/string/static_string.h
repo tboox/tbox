@@ -17,12 +17,12 @@
  * Copyright (C) 2009 - 2015, ruki All rights reserved.
  *
  * @author		ruki
- * @file		sstring.h
+ * @file		static_string.h
  * @ingroup 	string
  *
  */
-#ifndef TB_STRING_SSTRING_H
-#define TB_STRING_SSTRING_H
+#ifndef TB_STRING_STATIC_STRING_H
+#define TB_STRING_STATIC_STRING_H
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * includes
@@ -35,7 +35,7 @@
  */
 
 /// the static string type
-typedef tb_sbuffer_t 	tb_sstring_t;
+typedef tb_static_buffer_t 	tb_static_string_t;
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * interfaces
@@ -49,13 +49,13 @@ typedef tb_sbuffer_t 	tb_sstring_t;
  *
  * @return 				tb_true or tb_false
  */
-tb_bool_t				tb_sstring_init(tb_sstring_t* string, tb_char_t* data, tb_size_t maxn);
+tb_bool_t				tb_static_string_init(tb_static_string_t* string, tb_char_t* data, tb_size_t maxn);
 
 /*! exit string
  *
  * @param string 		the string
  */
-tb_void_t 				tb_sstring_exit(tb_sstring_t* string);
+tb_void_t 				tb_static_string_exit(tb_static_string_t* string);
 
 /*! the c-string pointer
  *
@@ -63,7 +63,7 @@ tb_void_t 				tb_sstring_exit(tb_sstring_t* string);
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstr(tb_sstring_t const* string);
+tb_char_t const* 		tb_static_string_cstr(tb_static_string_t const* string);
 
 /*! the string size
  *
@@ -71,13 +71,13 @@ tb_char_t const* 		tb_sstring_cstr(tb_sstring_t const* string);
  *
  * @return 				the string size
  */
-tb_size_t 				tb_sstring_size(tb_sstring_t const* string);
+tb_size_t 				tb_static_string_size(tb_static_string_t const* string);
 
 /*! clear the string
  *
  * @param string 		the string
  */
-tb_void_t 				tb_sstring_clear(tb_sstring_t* string);
+tb_void_t 				tb_static_string_clear(tb_static_string_t* string);
 
 /*! strip the string
  *
@@ -86,7 +86,7 @@ tb_void_t 				tb_sstring_clear(tb_sstring_t* string);
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_strip(tb_sstring_t* string, tb_size_t n);
+tb_char_t const* 		tb_static_string_strip(tb_static_string_t* string, tb_size_t n);
 
 /*! find charactor position
  *
@@ -96,7 +96,7 @@ tb_char_t const* 		tb_sstring_strip(tb_sstring_t* string, tb_size_t n);
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 				tb_static_string_strchr(tb_static_string_t const* string, tb_size_t p, tb_char_t c);
 
 /*! find charactor position and ignore case
  *
@@ -106,7 +106,7 @@ tb_long_t 				tb_sstring_strchr(tb_sstring_t const* string, tb_size_t p, tb_char
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strichr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 				tb_static_string_strichr(tb_static_string_t const* string, tb_size_t p, tb_char_t c);
 
 /*! reverse to find charactor position
  *
@@ -116,7 +116,7 @@ tb_long_t 				tb_sstring_strichr(tb_sstring_t const* string, tb_size_t p, tb_cha
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strrchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 				tb_static_string_strrchr(tb_static_string_t const* string, tb_size_t p, tb_char_t c);
 
 /*! reverse to find charactor position and ignore case
  *
@@ -126,7 +126,7 @@ tb_long_t 				tb_sstring_strrchr(tb_sstring_t const* string, tb_size_t p, tb_cha
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strirchr(tb_sstring_t const* string, tb_size_t p, tb_char_t c);
+tb_long_t 				tb_static_string_strirchr(tb_static_string_t const* string, tb_size_t p, tb_char_t c);
 
 /*! find string position 
  *
@@ -136,7 +136,7 @@ tb_long_t 				tb_sstring_strirchr(tb_sstring_t const* string, tb_size_t p, tb_ch
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_strstr(tb_static_string_t const* string, tb_size_t p, tb_static_string_t const* s);
 
 /*! find string position and ignore case
  *
@@ -146,7 +146,7 @@ tb_long_t 				tb_sstring_strstr(tb_sstring_t const* string, tb_size_t p, tb_sstr
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_stristr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_stristr(tb_static_string_t const* string, tb_size_t p, tb_static_string_t const* s);
 
 /*! find c-string position 
  *
@@ -156,7 +156,7 @@ tb_long_t 				tb_sstring_stristr(tb_sstring_t const* string, tb_size_t p, tb_sst
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_cstrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstrstr(tb_static_string_t const* string, tb_size_t p, tb_char_t const* s);
 
 /*! find c-string position and ignore case
  *
@@ -166,7 +166,7 @@ tb_long_t 				tb_sstring_cstrstr(tb_sstring_t const* string, tb_size_t p, tb_cha
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_cstristr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstristr(tb_static_string_t const* string, tb_size_t p, tb_char_t const* s);
 
 /*! reverse to find string position 
  *
@@ -176,7 +176,7 @@ tb_long_t 				tb_sstring_cstristr(tb_sstring_t const* string, tb_size_t p, tb_ch
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strrstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_strrstr(tb_static_string_t const* string, tb_size_t p, tb_static_string_t const* s);
 
 /*! reverse to find string position and ignore case
  *
@@ -186,7 +186,7 @@ tb_long_t 				tb_sstring_strrstr(tb_sstring_t const* string, tb_size_t p, tb_sst
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_strirstr(tb_sstring_t const* string, tb_size_t p, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_strirstr(tb_static_string_t const* string, tb_size_t p, tb_static_string_t const* s);
 
 /*! reverse to find c-string position 
  *
@@ -196,7 +196,7 @@ tb_long_t 				tb_sstring_strirstr(tb_sstring_t const* string, tb_size_t p, tb_ss
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_cstrrstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstrrstr(tb_static_string_t const* string, tb_size_t p, tb_char_t const* s);
 
 /*! reverse to find c-string position and ignore case
  *
@@ -206,7 +206,7 @@ tb_long_t 				tb_sstring_cstrrstr(tb_sstring_t const* string, tb_size_t p, tb_ch
  *
  * @return 				the real position, no find: -1
  */
-tb_long_t 				tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstrirstr(tb_static_string_t const* string, tb_size_t p, tb_char_t const* s);
 
 /*! copy string
  *
@@ -215,7 +215,7 @@ tb_long_t 				tb_sstring_cstrirstr(tb_sstring_t const* string, tb_size_t p, tb_c
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s);
+tb_char_t const* 		tb_static_string_strcpy(tb_static_string_t* string, tb_static_string_t const* s);
 
 /*! copy c-string
  *
@@ -224,7 +224,7 @@ tb_char_t const* 		tb_sstring_strcpy(tb_sstring_t* string, tb_sstring_t const* s
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s);
+tb_char_t const* 		tb_static_string_cstrcpy(tb_static_string_t* string, tb_char_t const* s);
 
 /*! copy c-string with the given size
  *
@@ -234,7 +234,7 @@ tb_char_t const* 		tb_sstring_cstrcpy(tb_sstring_t* string, tb_char_t const* s);
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrncpy(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_char_t const* 		tb_static_string_cstrncpy(tb_static_string_t* string, tb_char_t const* s, tb_size_t n);
 
 /*! copy format c-string
  *
@@ -243,7 +243,7 @@ tb_char_t const* 		tb_sstring_cstrncpy(tb_sstring_t* string, tb_char_t const* s,
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrfcpy(tb_sstring_t* string, tb_char_t const* fmt, ...);
+tb_char_t const* 		tb_static_string_cstrfcpy(tb_static_string_t* string, tb_char_t const* fmt, ...);
 
 /*! append charactor
  *
@@ -252,7 +252,7 @@ tb_char_t const* 		tb_sstring_cstrfcpy(tb_sstring_t* string, tb_char_t const* fm
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_chrcat(tb_sstring_t* string, tb_char_t c);
+tb_char_t const* 		tb_static_string_chrcat(tb_static_string_t* string, tb_char_t c);
 
 /*! append charactor with the given size
  *
@@ -262,7 +262,7 @@ tb_char_t const* 		tb_sstring_chrcat(tb_sstring_t* string, tb_char_t c);
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_chrncat(tb_sstring_t* string, tb_char_t c, tb_size_t n);
+tb_char_t const* 		tb_static_string_chrncat(tb_static_string_t* string, tb_char_t c, tb_size_t n);
 
 /*! append string
  *
@@ -271,7 +271,7 @@ tb_char_t const* 		tb_sstring_chrncat(tb_sstring_t* string, tb_char_t c, tb_size
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_strcat(tb_sstring_t* string, tb_sstring_t const* s);
+tb_char_t const* 		tb_static_string_strcat(tb_static_string_t* string, tb_static_string_t const* s);
 
 /*! append c-string
  *
@@ -280,7 +280,7 @@ tb_char_t const* 		tb_sstring_strcat(tb_sstring_t* string, tb_sstring_t const* s
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s);
+tb_char_t const* 		tb_static_string_cstrcat(tb_static_string_t* string, tb_char_t const* s);
 
 /*! append c-string with the given size
  *
@@ -290,7 +290,7 @@ tb_char_t const* 		tb_sstring_cstrcat(tb_sstring_t* string, tb_char_t const* s);
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrncat(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_char_t const* 		tb_static_string_cstrncat(tb_static_string_t* string, tb_char_t const* s, tb_size_t n);
 
 /*! append format c-string 
  *
@@ -299,7 +299,7 @@ tb_char_t const* 		tb_sstring_cstrncat(tb_sstring_t* string, tb_char_t const* s,
  *
  * @return 				the c-string
  */
-tb_char_t const* 		tb_sstring_cstrfcat(tb_sstring_t* string, tb_char_t const* fmt, ...);
+tb_char_t const* 		tb_static_string_cstrfcat(tb_static_string_t* string, tb_char_t const* fmt, ...);
 
 /*! compare string
  *
@@ -308,7 +308,7 @@ tb_char_t const* 		tb_sstring_cstrfcat(tb_sstring_t* string, tb_char_t const* fm
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_strcmp(tb_sstring_t* string, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_strcmp(tb_static_string_t* string, tb_static_string_t const* s);
 
 /*! compare string and ignore case
  *
@@ -317,7 +317,7 @@ tb_long_t 				tb_sstring_strcmp(tb_sstring_t* string, tb_sstring_t const* s);
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_strimp(tb_sstring_t* string, tb_sstring_t const* s);
+tb_long_t 				tb_static_string_strimp(tb_static_string_t* string, tb_static_string_t const* s);
 
 /*! compare c-string
  *
@@ -326,7 +326,7 @@ tb_long_t 				tb_sstring_strimp(tb_sstring_t* string, tb_sstring_t const* s);
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_cstrcmp(tb_sstring_t* string, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstrcmp(tb_static_string_t* string, tb_char_t const* s);
 
 /*! compare c-string and ignore case
  *
@@ -335,7 +335,7 @@ tb_long_t 				tb_sstring_cstrcmp(tb_sstring_t* string, tb_char_t const* s);
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_cstricmp(tb_sstring_t* string, tb_char_t const* s);
+tb_long_t 				tb_static_string_cstricmp(tb_static_string_t* string, tb_char_t const* s);
 
 /*! compare c-string with given size
  *
@@ -345,7 +345,7 @@ tb_long_t 				tb_sstring_cstricmp(tb_sstring_t* string, tb_char_t const* s);
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_cstrncmp(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_long_t 				tb_static_string_cstrncmp(tb_static_string_t* string, tb_char_t const* s, tb_size_t n);
 
 /*! compare c-string with given size and ignore case
  *
@@ -355,7 +355,7 @@ tb_long_t 				tb_sstring_cstrncmp(tb_sstring_t* string, tb_char_t const* s, tb_s
  *
  * @return 				equal: 0
  */
-tb_long_t 				tb_sstring_cstrnicmp(tb_sstring_t* string, tb_char_t const* s, tb_size_t n);
+tb_long_t 				tb_static_string_cstrnicmp(tb_static_string_t* string, tb_char_t const* s, tb_size_t n);
 
 #endif
 

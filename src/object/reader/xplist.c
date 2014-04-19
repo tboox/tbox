@@ -431,9 +431,9 @@ static tb_object_t* tb_object_xplist_reader_func_dictionary(tb_object_xplist_rea
 		return tb_dictionary_init(TB_DICTIONARY_SIZE_MICRO, tb_false);
 
 	// init key name
-	tb_sstring_t 	kname;
+	tb_static_string_t 	kname;
 	tb_char_t 		kdata[8192];
-	if (!tb_sstring_init(&kname, kdata, 8192)) return tb_null;
+	if (!tb_static_string_init(&kname, kdata, 8192)) return tb_null;
 
 	// init dictionary
 	tb_object_t* dictionary = tb_dictionary_init(TB_DICTIONARY_SIZE_DEFAULT, tb_false);
@@ -464,15 +464,15 @@ static tb_object_t* tb_object_xplist_reader_func_dictionary(tb_object_xplist_rea
 
 					// read
 					tb_object_t* object = func(reader, event);
-					tb_trace_d("%s => %p", tb_sstring_cstr(&kname), object);
+					tb_trace_d("%s => %p", tb_static_string_cstr(&kname), object);
 					tb_assert_and_check_goto(object, end);
 
 					// set key & value
-					if (tb_sstring_size(&kname) && dictionary) 
-						tb_dictionary_set(dictionary, tb_sstring_cstr(&kname), object);
+					if (tb_static_string_size(&kname) && dictionary) 
+						tb_dictionary_set(dictionary, tb_static_string_cstr(&kname), object);
 
 					// clear key name
-					tb_sstring_clear(&kname);
+					tb_static_string_clear(&kname);
 				}
 			}
 			break;
@@ -496,7 +496,7 @@ static tb_object_t* tb_object_xplist_reader_func_dictionary(tb_object_xplist_rea
 					tb_assert_and_check_goto(text, end);
 
 					// writ key name
-					tb_sstring_cstrcpy(&kname, text);
+					tb_static_string_cstrcpy(&kname, text);
 				}
 			}
 			break;
@@ -518,7 +518,7 @@ end:
 	}
 
 	// exit key name
-	tb_sstring_exit(&kname);
+	tb_static_string_exit(&kname);
 
 	// ok?
 	return dictionary;

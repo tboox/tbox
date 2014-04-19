@@ -47,9 +47,9 @@ tb_xml_node_t* tb_xml_node_init_element(tb_char_t const* name)
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_ELEMENT;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_cstrcpy(&node->name, name);
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_cstrcpy(&node->name, name);
 
 	// ok
 	return node;
@@ -62,10 +62,10 @@ tb_xml_node_t* tb_xml_node_init_text(tb_char_t const* data)
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_TEXT;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_cstrcpy(&node->name, "#text");
-	if (data) tb_pstring_cstrcpy(&node->data, data);
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_cstrcpy(&node->name, "#text");
+	if (data) tb_scoped_string_cstrcpy(&node->data, data);
 
 	// ok
 	return node;
@@ -78,10 +78,10 @@ tb_xml_node_t* tb_xml_node_init_cdata(tb_char_t const* cdata)
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_CDATA;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_cstrcpy(&node->name, "#cdata");
-	if (cdata) tb_pstring_cstrcpy(&node->data, cdata);
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_cstrcpy(&node->name, "#cdata");
+	if (cdata) tb_scoped_string_cstrcpy(&node->data, cdata);
 
 	// ok
 	return node;
@@ -94,10 +94,10 @@ tb_xml_node_t* tb_xml_node_init_comment(tb_char_t const* comment)
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_COMMENT;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_cstrcpy(&node->name, "#comment");
-	if (comment) tb_pstring_cstrcpy(&node->data, comment);
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_cstrcpy(&node->name, "#comment");
+	if (comment) tb_scoped_string_cstrcpy(&node->data, comment);
 
 	// ok
 	return node;
@@ -110,10 +110,10 @@ tb_xml_node_t* tb_xml_node_init_attribute(tb_char_t const* name, tb_char_t const
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_ATTRIBUTE;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	if (name) tb_pstring_cstrcpy(&node->name, name);
-	if (data) tb_pstring_cstrcpy(&node->data, data);
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	if (name) tb_scoped_string_cstrcpy(&node->name, name);
+	if (data) tb_scoped_string_cstrcpy(&node->data, data);
 
 	// ok
 	return node;
@@ -126,13 +126,13 @@ tb_xml_node_t* tb_xml_node_init_document(tb_char_t const* version, tb_char_t con
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_DOCUMENT;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_init(&((tb_xml_document_t*)node)->version);
-	tb_pstring_init(&((tb_xml_document_t*)node)->charset);
-	tb_pstring_cstrcpy(&node->name, "#document");
-	tb_pstring_cstrcpy(&((tb_xml_document_t*)node)->version, version? version : "2.0");
-	tb_pstring_cstrcpy(&((tb_xml_document_t*)node)->charset, charset? charset : "utf-8");
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_init(&((tb_xml_document_t*)node)->version);
+	tb_scoped_string_init(&((tb_xml_document_t*)node)->charset);
+	tb_scoped_string_cstrcpy(&node->name, "#document");
+	tb_scoped_string_cstrcpy(&((tb_xml_document_t*)node)->version, version? version : "2.0");
+	tb_scoped_string_cstrcpy(&((tb_xml_document_t*)node)->charset, charset? charset : "utf-8");
 
 	// ok
 	return node;
@@ -145,11 +145,11 @@ tb_xml_node_t* tb_xml_node_init_document_type(tb_char_t const* type)
 
 	// init 
 	node->type = TB_XML_NODE_TYPE_DOCUMENT_TYPE;
-	tb_pstring_init(&node->name);
-	tb_pstring_init(&node->data);
-	tb_pstring_init(&((tb_xml_document_type_t*)node)->type);
-	tb_pstring_cstrcpy(&node->name, "#doctype");
-	tb_pstring_cstrcpy(&((tb_xml_document_type_t*)node)->type, type? type : "");
+	tb_scoped_string_init(&node->name);
+	tb_scoped_string_init(&node->data);
+	tb_scoped_string_init(&((tb_xml_document_type_t*)node)->type);
+	tb_scoped_string_cstrcpy(&node->name, "#doctype");
+	tb_scoped_string_cstrcpy(&((tb_xml_document_type_t*)node)->type, type? type : "");
 
 	// ok
 	return node;
@@ -159,19 +159,19 @@ tb_void_t tb_xml_node_exit(tb_xml_node_t* node)
 	if (node)
 	{
 		// free name & data
-		tb_pstring_exit(&node->name);
-		tb_pstring_exit(&node->data);
+		tb_scoped_string_exit(&node->name);
+		tb_scoped_string_exit(&node->data);
 
 		// free version & charset for document
 		if (node->type == TB_XML_NODE_TYPE_DOCUMENT)
 		{
-			tb_pstring_exit(&((tb_xml_document_t*)node)->version);
-			tb_pstring_exit(&((tb_xml_document_t*)node)->charset);
+			tb_scoped_string_exit(&((tb_xml_document_t*)node)->version);
+			tb_scoped_string_exit(&((tb_xml_document_t*)node)->charset);
 		}
 
 		// free type
 		if (node->type == TB_XML_NODE_TYPE_DOCUMENT_TYPE)
-			tb_pstring_exit(&((tb_xml_document_type_t*)node)->type);
+			tb_scoped_string_exit(&((tb_xml_document_type_t*)node)->type);
 
 		// free childs
 		if (node->chead)
@@ -400,7 +400,7 @@ tb_void_t tb_xml_node_append_atail(tb_xml_node_t* node, tb_xml_node_t* attribute
 tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
 {
 	tb_assert_and_check_return_val(node && path, tb_null);
-	tb_trace_d("root: %s goto: %s", tb_pstring_cstr(&node->name), path);
+	tb_trace_d("root: %s goto: %s", tb_scoped_string_cstr(&node->name), path);
 
 	// skip '/'
 	tb_char_t const* p = path; while (*p && *p == '/') p++;
@@ -418,13 +418,13 @@ tb_xml_node_t* tb_xml_node_goto(tb_xml_node_t* node, tb_char_t const* path)
 		if (node->type == TB_XML_NODE_TYPE_ELEMENT)
 		{
 			// size
-			tb_size_t m = tb_pstring_size(&node->name);
+			tb_size_t m = tb_scoped_string_size(&node->name);
 
 			// trace
-			tb_trace_d("%s", tb_pstring_cstr(&node->name));
+			tb_trace_d("%s", tb_scoped_string_cstr(&node->name));
 
 			// has it?
-			if (!tb_pstring_cstrncmp(&node->name, p, m))
+			if (!tb_scoped_string_cstrncmp(&node->name, p, m))
 			{
 				// is it?
 				if (m == n) return node;
