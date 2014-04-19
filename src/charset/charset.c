@@ -32,36 +32,36 @@
  */
 
 // ascii
-tb_long_t tb_charset_ascii_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ascii_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ascii_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ascii_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // utf8
-tb_long_t tb_charset_utf8_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf8_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf8_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf8_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // utf16
-tb_long_t tb_charset_utf16_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf16_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf16_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf16_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // utf32
-tb_long_t tb_charset_utf32_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_utf32_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_utf32_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_utf32_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // ucs2
-tb_long_t tb_charset_ucs2_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ucs2_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs2_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs2_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // ucs4
-tb_long_t tb_charset_ucs4_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_ucs4_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_ucs4_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_ucs4_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // gb2312
-tb_long_t tb_charset_gb2312_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_gb2312_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_gb2312_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_gb2312_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 // iso8859
-tb_long_t tb_charset_iso8859_get(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t* ch);
-tb_long_t tb_charset_iso8859_set(tb_bstream_t* bst, tb_bool_t be, tb_uint32_t ch);
+tb_long_t tb_charset_iso8859_get(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t* ch);
+tb_long_t tb_charset_iso8859_set(tb_bits_stream_t* bst, tb_bool_t be, tb_uint32_t ch);
 
 /* //////////////////////////////////////////////////////////////////////////////////////
  * globals
@@ -153,11 +153,11 @@ tb_charset_t const* tb_charset_find(tb_size_t type)
 {
 	return tb_charset_find_by_type(type);
 }
-tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fst, tb_bstream_t* tst)
+tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bits_stream_t* fst, tb_bits_stream_t* tst)
 {
 	// check
 	tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(ftype) && TB_CHARSET_TYPE_OK(ttype) && fst && tst, -1);
-	tb_assert_and_check_return_val(tb_bstream_valid(fst) && tb_bstream_valid(tst), -1);
+	tb_assert_and_check_return_val(tb_bits_stream_valid(fst) && tb_bits_stream_valid(tst), -1);
 
 	// init the charset
 	tb_charset_t const* fr = tb_charset_find_by_type(ftype);
@@ -165,7 +165,7 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fs
 	tb_assert_and_check_return_val(fr && to && fr->get && fr->set, -1);
 
 	// no data? 
-	tb_check_return_val(tb_bstream_left(fst), 0);
+	tb_check_return_val(tb_bits_stream_left(fst), 0);
 
 	// big endian?
 	tb_bool_t fbe = !(ftype & TB_CHARSET_TYPE_LE)? tb_true : tb_false;
@@ -173,8 +173,8 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fs
 
 	// walk
 	tb_uint32_t 		ch;
-	tb_byte_t const* 	tp = tb_bstream_pos(tst);
-	while (tb_bstream_left(fst) && tb_bstream_left(tst))
+	tb_byte_t const* 	tp = tb_bits_stream_pos(tst);
+	while (tb_bits_stream_left(fst) && tb_bits_stream_left(tst))
 	{
 		// get ucs4 character
 		tb_long_t ok = 0;
@@ -187,7 +187,7 @@ tb_long_t tb_charset_conv_bst(tb_size_t ftype, tb_size_t ttype, tb_bstream_t* fs
 	}
 
 	// ok?
-	return tb_bstream_pos(tst) - tp;
+	return tb_bits_stream_pos(tst) - tp;
 }
 tb_long_t tb_charset_conv_cstr(tb_size_t ftype, tb_size_t ttype, tb_char_t const* cstr, tb_byte_t* data, tb_size_t size)
 {
@@ -203,10 +203,10 @@ tb_long_t tb_charset_conv_data(tb_size_t ftype, tb_size_t ttype, tb_byte_t const
 	tb_assert_and_check_return_val(TB_CHARSET_TYPE_OK(ftype) && TB_CHARSET_TYPE_OK(ttype) && idata && isize && odata && osize, -1);
 
 	// init bstream
-	tb_bstream_t ist;
-	tb_bstream_t ost;
-	tb_bstream_init(&ist, (tb_pointer_t)idata, isize);
-	tb_bstream_init(&ost, odata, osize);
+	tb_bits_stream_t ist;
+	tb_bits_stream_t ost;
+	tb_bits_stream_init(&ist, (tb_pointer_t)idata, isize);
+	tb_bits_stream_init(&ost, odata, osize);
 
 	// conv
 	return tb_charset_conv_bst(ftype, ttype, &ist, &ost);

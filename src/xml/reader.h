@@ -60,7 +60,7 @@ typedef enum __tb_xml_reader_event_t
  * @param gst 			the stream
  * @return 				the reader handle
  */
-tb_handle_t 			tb_xml_reader_init(tb_gstream_t* gst);
+tb_handle_t 			tb_xml_reader_init(tb_basic_stream_t* gst);
 
 /*! exit the xml reader
  *
@@ -82,8 +82,8 @@ tb_void_t 				tb_xml_reader_clear(tb_handle_t reader);
  * @code
  *
  *	// init stream
- *	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
- *	if (gst && tb_gstream_open(gst))
+ *	tb_basic_stream_t* gst = tb_basic_stream_init_from_url(argv[1]);
+ *	if (gst && tb_basic_stream_open(gst))
  *	{
  *		// init reader
  *		tb_handle_t reader = tb_xml_reader_init(gst);
@@ -164,7 +164,7 @@ tb_void_t 				tb_xml_reader_clear(tb_handle_t reader);
  *		}
  *	
  *		// exit stream
- *		tb_gstream_exit(gst);
+ *		tb_basic_stream_exit(gst);
  *	}
  * @endcode
  */
@@ -175,7 +175,7 @@ tb_size_t 				tb_xml_reader_next(tb_handle_t reader);
  * @param reader 		the xml reader
  * @return 				the xml stream
  */
-tb_gstream_t* 			tb_xml_reader_stream(tb_handle_t reader);
+tb_basic_stream_t* 			tb_xml_reader_stream(tb_handle_t reader);
 
 /*! the xml level
  *

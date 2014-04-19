@@ -531,7 +531,7 @@ end:
 	// ok?
 	return dictionary;
 }
-static tb_object_t* tb_object_xml_reader_done(tb_gstream_t* stream)
+static tb_object_t* tb_object_xml_reader_done(tb_basic_stream_t* stream)
 {
 	// init reader 
 	tb_object_xml_reader_t reader = {0};
@@ -575,14 +575,14 @@ end:
 	// ok?
 	return object;
 }
-static tb_size_t tb_object_xml_reader_probe(tb_gstream_t* stream)
+static tb_size_t tb_object_xml_reader_probe(tb_basic_stream_t* stream)
 {
 	// check
 	tb_assert_and_check_return_val(stream, 0);
 
 	// need it
 	tb_byte_t* p = tb_null;
-	if (!tb_gstream_need(stream, &p, 5)) return 0;
+	if (!tb_basic_stream_need(stream, &p, 5)) return 0;
 	tb_assert_and_check_return_val(p, 0);
 
 	// ok?

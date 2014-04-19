@@ -91,18 +91,18 @@ static tb_demo_t g_demo[] =
 ,	TB_DEMO_MAIN_ITEM(spider_queue)
 
 	// stream
-,	TB_DEMO_MAIN_ITEM(stream_tstream)
-,	TB_DEMO_MAIN_ITEM(stream_mstream)
-,	TB_DEMO_MAIN_ITEM(stream_astream)
-,	TB_DEMO_MAIN_ITEM(stream_gstream)
-,	TB_DEMO_MAIN_ITEM(stream_gstream_zip)
-,	TB_DEMO_MAIN_ITEM(stream_gstream_null)
-,	TB_DEMO_MAIN_ITEM(stream_gstream_cache)
-,	TB_DEMO_MAIN_ITEM(stream_gstream_charset)
-,	TB_DEMO_MAIN_ITEM(stream_astream_zip)
-,	TB_DEMO_MAIN_ITEM(stream_astream_null)
-,	TB_DEMO_MAIN_ITEM(stream_astream_cache)
-,	TB_DEMO_MAIN_ITEM(stream_astream_charset)
+,	TB_DEMO_MAIN_ITEM(stream_transfer_stream)
+,	TB_DEMO_MAIN_ITEM(stream_transfer)
+,	TB_DEMO_MAIN_ITEM(stream_async_stream)
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream)
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream_zip)
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream_null)
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream_cache)
+,	TB_DEMO_MAIN_ITEM(stream_basic_stream_charset)
+,	TB_DEMO_MAIN_ITEM(stream_async_stream_zip)
+,	TB_DEMO_MAIN_ITEM(stream_async_stream_null)
+,	TB_DEMO_MAIN_ITEM(stream_async_stream_cache)
+,	TB_DEMO_MAIN_ITEM(stream_async_stream_charset)
 
 	// string
 ,	TB_DEMO_MAIN_ITEM(string_scoped_string)
@@ -242,11 +242,11 @@ tb_int_t main(tb_int_t argc, tb_char_t** argv)
 		tb_trace_i("help: or");
 		tb_trace_i("help: ./demo.b name args ...");
 		tb_trace_i("help: ");
-		tb_trace_i("help: example: echo \"stream_gstream\" > ./.demo");
+		tb_trace_i("help: example: echo \"stream_basic_stream\" > ./.demo");
 		tb_trace_i("help: example:     ./demo.b --help");
 		tb_trace_i("help: example:     ./demo.b http://www.xxxxx.com /tmp/a");
 		tb_trace_i("help: example: or");
-		tb_trace_i("help: example: ./demo.b stream_gstream http://www.xxxxx.com /tmp/a");
+		tb_trace_i("help: example: ./demo.b stream_basic_stream http://www.xxxxx.com /tmp/a");
 		tb_trace_i("help: ");
 
 		// walk name

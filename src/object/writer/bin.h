@@ -37,7 +37,7 @@
 typedef struct __tb_object_bin_writer_t
 {
 	/// the stream
-	tb_gstream_t* 				stream;
+	tb_basic_stream_t* 				stream;
 
 	/// the object hash
 	tb_hash_t* 					ohash;

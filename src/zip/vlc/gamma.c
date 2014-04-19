@@ -30,7 +30,7 @@
  * details
  */
 
-static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bstream_t* bst)
+static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bits_stream_t* bst)
 {
 #if 0
 	tb_assert(vlc && val);
@@ -44,24 +44,24 @@ static tb_void_t tb_zip_vlc_gamma_set(tb_zip_vlc_t* vlc, tb_uint32_t val, tb_bst
 
 	// store
 	tb_int_t i = 0;
-	for (i = 0; i < q; i++) tb_bstream_set_u1(bst, 1);
-	tb_bstream_set_u1(bst, 0);
-	for (i = 0; i < q; i++, r >>= 1) tb_bstream_set_u1(bst, r & 0x1);
+	for (i = 0; i < q; i++) tb_bits_stream_set_u1(bst, 1);
+	tb_bits_stream_set_u1(bst, 0);
+	for (i = 0; i < q; i++, r >>= 1) tb_bits_stream_set_u1(bst, r & 0x1);
 #endif
 }
-static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_bstream_t const* bst)
+static tb_uint32_t tb_zip_vlc_gamma_get(tb_zip_vlc_t* vlc, tb_bits_stream_t const* bst)
 {
 	tb_assert(vlc);
 
 	// get q
 	tb_uint32_t q = 0;
-	while (tb_bstream_get_u1(bst)) q++;
+	while (tb_bits_stream_get_u1(bst)) q++;
 	tb_assert(q < 32);
 
 	// get r
 	tb_uint32_t i = 0;
 	tb_uint32_t r = 0;
-	for (i = 0; i < q; i++) r |= tb_bstream_get_u1(bst) << i;
+	for (i = 0; i < q; i++) r |= tb_bits_stream_get_u1(bst) << i;
 
 	//tb_trace_d("x: %d, q: %d, r: %d", r + (1 << q), q, r);
 
@@ -102,7 +102,7 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 	// make it
 	tb_int_t 		x = 0;
 	tb_int_t 		i = 0;
-	tb_bstream_t 	bst;
+	tb_bits_stream_t 	bst;
 	tb_byte_t 		d[4];
 	for (x = 1; x <= 65535; x++)
 	{
@@ -112,16 +112,16 @@ tb_zip_vlc_t* tb_zip_vlc_gamma_open(tb_zip_vlc_gamma_t* gamma)
 		// is out?
 		if ((q << 1) + 1 > 16) break;
 
-		tb_bstream_init(&bst, d, 4);
-		for (i = 0; i < q; i++) tb_bstream_set_u1(&bst, 1);
-		tb_bstream_set_u1(&bst, 0);
-		for (i = 0; i < q; i++, r >>= 1) tb_bstream_set_u1(&bst, r & 0x1);
+		tb_bits_stream_init(&bst, d, 4);
+		for (i = 0; i < q; i++) tb_bits_stream_set_u1(&bst, 1);
+		tb_bits_stream_set_u1(&bst, 0);
+		for (i = 0; i < q; i++, r >>= 1) tb_bits_stream_set_u1(&bst, r & 0x1);
 
 		tb_printf("x = 0x%04x, q = %d: ", x, q);
-		tb_bstream_init(&bst, d, 4);
-		for (q = 0; tb_bstream_get_u1(&bst); q++) tb_printf("1");
+		tb_bits_stream_init(&bst, d, 4);
+		for (q = 0; tb_bits_stream_get_u1(&bst); q++) tb_printf("1");
 		tb_printf("0 ");
-		for (i = 0; i < q; i++) tb_printf("%d", tb_bstream_get_u1(&bst));
+		for (i = 0; i < q; i++) tb_printf("%d", tb_bits_stream_get_u1(&bst));
 		tb_printf("\n");
 	}
 

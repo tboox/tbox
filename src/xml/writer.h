@@ -40,7 +40,7 @@
  * @param bformat 		is format xml?
  * @return 				the writer handle
  */
-tb_handle_t 			tb_xml_writer_init(tb_gstream_t* gst, tb_bool_t bformat);
+tb_handle_t 			tb_xml_writer_init(tb_basic_stream_t* gst, tb_bool_t bformat);
 
 /*! exit the xml writer
  *

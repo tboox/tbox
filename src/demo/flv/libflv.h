@@ -195,7 +195,7 @@ typedef tb_bool_t (*tb_flv_video_data_cb_func_t)(tb_byte_t const* head_data, tb_
  */
 
 // init & exit
-tb_handle_t tb_flv_init(tb_gstream_t* gst);
+tb_handle_t tb_flv_init(tb_basic_stream_t* gst);
 tb_void_t 	tb_flv_exit(tb_handle_t hflv);
 
 // ioctl

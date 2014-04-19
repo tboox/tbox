@@ -109,13 +109,13 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	tb_long_t rate = -1;
  
 	// format query
-	tb_bstream_t 	bst;
+	tb_bits_stream_t 	bst;
 	tb_byte_t 		rpkt[TB_DNS_RPKT_MAXN];
 	tb_size_t 		size = 0;
-	tb_bstream_init(&bst, rpkt, TB_DNS_RPKT_MAXN);
+	tb_bits_stream_init(&bst, rpkt, TB_DNS_RPKT_MAXN);
 
 	// identification number
-	tb_bstream_set_u16_be(&bst, TB_DNS_HEADER_MAGIC);
+	tb_bits_stream_set_u16_be(&bst, TB_DNS_HEADER_MAGIC);
 
 	/* 0x2104: 0 0000 001 0000 0000
 	 *
@@ -141,19 +141,19 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	 *
 	 */
 #if 1
-	tb_bstream_set_u16_be(&bst, 0x0100);
+	tb_bits_stream_set_u16_be(&bst, 0x0100);
 #else
-	tb_bstream_set_u1(&bst, 0); 			// this is a query
-	tb_bstream_set_ubits32(&bst, 0, 4); 	// this is a standard query
-	tb_bstream_set_u1(&bst, 0); 			// not authoritive answer
-	tb_bstream_set_u1(&bst, 0); 			// not truncated
-	tb_bstream_set_u1(&bst, 1); 			// recursion desired
+	tb_bits_stream_set_u1(&bst, 0); 			// this is a query
+	tb_bits_stream_set_ubits32(&bst, 0, 4); 	// this is a standard query
+	tb_bits_stream_set_u1(&bst, 0); 			// not authoritive answer
+	tb_bits_stream_set_u1(&bst, 0); 			// not truncated
+	tb_bits_stream_set_u1(&bst, 1); 			// recursion desired
 
-	tb_bstream_set_u1(&bst, 0); 			// recursion not available! hey we dont have it (lol)
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_u1(&bst, 0);
-	tb_bstream_set_ubits32(&bst, 0, 4);
+	tb_bits_stream_set_u1(&bst, 0); 			// recursion not available! hey we dont have it (lol)
+	tb_bits_stream_set_u1(&bst, 0);
+	tb_bits_stream_set_u1(&bst, 0);
+	tb_bits_stream_set_u1(&bst, 0);
+	tb_bits_stream_set_ubits32(&bst, 0, 4);
 #endif
 
 	/* we have only one question
@@ -164,35 +164,35 @@ static tb_long_t tb_dns_server_test(tb_ipv4_t const* addr)
 	 * tb_uint16_t resource;		// number of resource entries
 	 *
 	 */
-	tb_bstream_set_u16_be(&bst, 1); 
-	tb_bstream_set_u16_be(&bst, 0);
-	tb_bstream_set_u16_be(&bst, 0);
-	tb_bstream_set_u16_be(&bst, 0);
+	tb_bits_stream_set_u16_be(&bst, 1); 
+	tb_bits_stream_set_u16_be(&bst, 0);
+	tb_bits_stream_set_u16_be(&bst, 0);
+	tb_bits_stream_set_u16_be(&bst, 0);
 
 	// set questions, see as tb_dns_question_t
 	// name + question1 + question2 + ...
-	tb_bstream_set_u8(&bst, 3);
-	tb_bstream_set_u8(&bst, 'w');
-	tb_bstream_set_u8(&bst, 'w');
-	tb_bstream_set_u8(&bst, 'w');
-	tb_bstream_set_u8(&bst, 5);
-	tb_bstream_set_u8(&bst, 't');
-	tb_bstream_set_u8(&bst, 'b');
-	tb_bstream_set_u8(&bst, 'o');
-	tb_bstream_set_u8(&bst, 'o');
-	tb_bstream_set_u8(&bst, 'x');
-	tb_bstream_set_u8(&bst, 3);
-	tb_bstream_set_u8(&bst, 'c');
-	tb_bstream_set_u8(&bst, 'o');
-	tb_bstream_set_u8(&bst, 'm');
-	tb_bstream_set_u8(&bst, '\0');
+	tb_bits_stream_set_u8(&bst, 3);
+	tb_bits_stream_set_u8(&bst, 'w');
+	tb_bits_stream_set_u8(&bst, 'w');
+	tb_bits_stream_set_u8(&bst, 'w');
+	tb_bits_stream_set_u8(&bst, 5);
+	tb_bits_stream_set_u8(&bst, 't');
+	tb_bits_stream_set_u8(&bst, 'b');
+	tb_bits_stream_set_u8(&bst, 'o');
+	tb_bits_stream_set_u8(&bst, 'o');
+	tb_bits_stream_set_u8(&bst, 'x');
+	tb_bits_stream_set_u8(&bst, 3);
+	tb_bits_stream_set_u8(&bst, 'c');
+	tb_bits_stream_set_u8(&bst, 'o');
+	tb_bits_stream_set_u8(&bst, 'm');
+	tb_bits_stream_set_u8(&bst, '\0');
 
 	// only one question now.
-	tb_bstream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
-	tb_bstream_set_u16_be(&bst, 1); 		// it's internet (lol)
+	tb_bits_stream_set_u16_be(&bst, 1); 		// we are requesting the ipv4 address
+	tb_bits_stream_set_u16_be(&bst, 1); 		// it's internet (lol)
 
 	// size
-	size = tb_bstream_offset(&bst);
+	size = tb_bits_stream_offset(&bst);
 	tb_assert_and_check_goto(size, end);
 
 	// init time

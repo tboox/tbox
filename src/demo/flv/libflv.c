@@ -18,7 +18,7 @@
 typedef struct __tb_flv_t
 {
 	// the stream
-	tb_gstream_t* 					gst;
+	tb_basic_stream_t* 					gst;
 
 	// the spank type
 	tb_size_t 						spank_type;
@@ -32,7 +32,7 @@ typedef struct __tb_flv_t
 	tb_char_t* 						stail;
 
 	// the sdata bstream
-	tb_bstream_t 					sdata_bst;
+	tb_bits_stream_t 					sdata_bst;
 
 	// the hdata callback
 	tb_flv_hdata_cb_func_t 			hdata_cb_func;
@@ -181,35 +181,35 @@ static tb_double_t tb_flv_sdata_value_to_number(tb_flv_t* flv, tb_flv_sdata_valu
 
 static tb_bool_t tb_flv_sdata_number_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 8, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 8, tb_false);
 
 	value->type = TB_FLV_SDATA_TYPE_NUMBER;
-	value->u.number = tb_bstream_get_double_bbe(&flv->sdata_bst);
+	value->u.number = tb_bits_stream_get_double_bbe(&flv->sdata_bst);
 
 	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_boolean_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 1, tb_false);
 
 	value->type = TB_FLV_SDATA_TYPE_BOOLEAN;
-	value->u.boolean = tb_bstream_get_u8(&flv->sdata_bst)? tb_true : tb_false;
+	value->u.boolean = tb_bits_stream_get_u8(&flv->sdata_bst)? tb_true : tb_false;
 	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_string_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 2, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 2, tb_false);
 
 	// read size
-	tb_uint16_t size = tb_bstream_get_u16_be(&flv->sdata_bst);
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, tb_false);
+	tb_uint16_t size = tb_bits_stream_get_u16_be(&flv->sdata_bst);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= size, tb_false);
 
 	// too larger? skip it
-	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bstream_skip(&flv->sdata_bst, size);
+	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bits_stream_skip(&flv->sdata_bst, size);
 	else
 	{
 		// read data
-		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
+		if (size != tb_bits_stream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -240,10 +240,10 @@ static tb_bool_t tb_flv_sdata_reference_spank(tb_flv_t* flv, tb_flv_sdata_value_
 }
 static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 4, tb_false);
 
 	// read size
-	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
+	tb_uint32_t size = tb_bits_stream_get_u32_be(&flv->sdata_bst);
 	tb_trace_d("[ecmaarray]: size = %d", size);
 
 	// save spath
@@ -253,13 +253,13 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 	if (size)
 	{
 		// read variable
-		for (i = 0; i < size && tb_bstream_left(&flv->sdata_bst); i++)
+		for (i = 0; i < size && tb_bits_stream_left(&flv->sdata_bst); i++)
 		{
 			// is end?
-			if (tb_bstream_left(&flv->sdata_bst) >= 3 
+			if (tb_bits_stream_left(&flv->sdata_bst) >= 3 
 				&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 			{
-				tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
+				tb_size_t end = tb_bits_stream_get_u24_be(&flv->sdata_bst); tb_used(end);
 				tb_trace_d("ecmaarray end: %x", end);
 				break;
 			}
@@ -297,10 +297,10 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 	if (i == size)
 	{
 		// is end?
-		if (tb_bstream_left(&flv->sdata_bst) >= 3 
+		if (tb_bits_stream_left(&flv->sdata_bst) >= 3 
 			&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 		{
-			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
+			tb_size_t end = tb_bits_stream_get_u24_be(&flv->sdata_bst); tb_used(end);
 			tb_trace_d("ecmaarray end: %x", end);
 		}
 	}
@@ -312,10 +312,10 @@ static tb_bool_t tb_flv_sdata_ecmaarray_spank(tb_flv_t* flv, tb_flv_sdata_value_
 }
 static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 4, tb_false);
 	
 	// read size
-	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
+	tb_uint32_t size = tb_bits_stream_get_u32_be(&flv->sdata_bst);
 	tb_trace_d("[strictarray]: size = %d", size);
 
 	// callback
@@ -326,7 +326,7 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
 
 	// read variable
 	tb_uint32_t i = 0;
-	for (i = 0; i < size && tb_bstream_left(&flv->sdata_bst); i++)
+	for (i = 0; i < size && tb_bits_stream_left(&flv->sdata_bst); i++)
 	{
 		if (!tb_flv_sdata_value_spank(flv, &data)) return tb_false;
 		tb_trace_d("[strictarray: %d]: %s", i, tb_flv_sdata_value_to_string(flv, &data));
@@ -342,25 +342,25 @@ static tb_bool_t tb_flv_sdata_strictarray_spank(tb_flv_t* flv, tb_flv_sdata_valu
 }
 static tb_bool_t tb_flv_sdata_date_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 10, tb_false);
-	tb_bstream_skip(&flv->sdata_bst, 10);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 10, tb_false);
+	tb_bits_stream_skip(&flv->sdata_bst, 10);
 	value->type = TB_FLV_SDATA_TYPE_DATE;
 	return tb_true;
 }
 static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 4, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 4, tb_false);
 
 	// read size
-	tb_uint32_t size = tb_bstream_get_u32_be(&flv->sdata_bst);
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= size, tb_false);
+	tb_uint32_t size = tb_bits_stream_get_u32_be(&flv->sdata_bst);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= size, tb_false);
 
 	// too larger? skip it
-	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bstream_skip(&flv->sdata_bst, size);
+	if (size >= TB_FLV_SDATA_STRING_MAX) tb_bits_stream_skip(&flv->sdata_bst, size);
 	else
 	{
 		// read data
-		if (size != tb_bstream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
+		if (size != tb_bits_stream_get_data(&flv->sdata_bst, value->u.string.data, size)) return tb_false;
 		if (size)
 		{
 			value->u.string.data[size] = '\0';
@@ -373,9 +373,9 @@ static tb_bool_t tb_flv_sdata_longstring_spank(tb_flv_t* flv, tb_flv_sdata_value
 }
 static tb_bool_t tb_flv_sdata_value_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {	
-	tb_assert_and_check_return_val(tb_bstream_left(&flv->sdata_bst) >= 1, tb_false);
+	tb_assert_and_check_return_val(tb_bits_stream_left(&flv->sdata_bst) >= 1, tb_false);
 
-	value->type = tb_bstream_get_u8(&flv->sdata_bst);
+	value->type = tb_bits_stream_get_u8(&flv->sdata_bst);
 	//tb_trace_d("value type: %x", value->type);
 	switch (value->type)
 	{
@@ -447,13 +447,13 @@ static tb_bool_t tb_flv_sdata_object_spank(tb_flv_t* flv, tb_flv_sdata_value_t* 
 static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t* value)
 {
 	value->type = TB_FLV_SDATA_TYPE_OBJECT;
-	while (tb_bstream_left(&flv->sdata_bst))
+	while (tb_bits_stream_left(&flv->sdata_bst))
 	{
 		// is end?
-		if (tb_bstream_left(&flv->sdata_bst) >= 3 
+		if (tb_bits_stream_left(&flv->sdata_bst) >= 3 
 			&& tb_bits_get_u24_be(flv->sdata_bst.p) == 0x09) 
 		{
-			tb_size_t end = tb_bstream_get_u24_be(&flv->sdata_bst); tb_used(end);
+			tb_size_t end = tb_bits_stream_get_u24_be(&flv->sdata_bst); tb_used(end);
 			tb_trace_d("objects end: %x", end);
 			break;
 		}
@@ -466,24 +466,24 @@ static tb_bool_t tb_flv_sdata_objects_spank(tb_flv_t* flv, tb_flv_sdata_value_t*
 	// ok
 	return tb_true;
 }
-static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_bstream_t* bst)
+static tb_size_t tb_flv_video_h264_sps_analyze_get_exp_golomb(tb_bits_stream_t* bst)
 {
 	tb_size_t nbits = 0;
 	tb_size_t b = 1;
 
-	while (!tb_bstream_get_u1(bst) && tb_bstream_left_bits(bst))
+	while (!tb_bits_stream_get_u1(bst) && tb_bits_stream_left_bits(bst))
 	{
 		++nbits;
 		b <<= 1;
 	}
-	return (b - 1 + tb_bstream_get_ubits32(bst, nbits));
+	return (b - 1 + tb_bits_stream_get_ubits32(bst, nbits));
 }
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
  * implementation
  */
 
-tb_handle_t tb_flv_init(tb_gstream_t* gst)
+tb_handle_t tb_flv_init(tb_basic_stream_t* gst)
 {
 	// check 
 	tb_assert_and_check_return_val(gst, tb_null);
@@ -528,8 +528,8 @@ tb_void_t tb_flv_exit(tb_handle_t hflv)
 			tb_free(flv->video_config_data);
 
 		// free script data
-		if (tb_bstream_valid(&flv->sdata_bst) && tb_bstream_beg(&flv->sdata_bst))
-			tb_free(tb_bstream_beg(&flv->sdata_bst));
+		if (tb_bits_stream_valid(&flv->sdata_bst) && tb_bits_stream_beg(&flv->sdata_bst))
+			tb_free(tb_bits_stream_beg(&flv->sdata_bst));
 
 		// free string
 		tb_scoped_string_exit(&flv->string);
@@ -544,12 +544,12 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 	tb_assert_and_check_return_val(flv, tb_false);
 
 	// init variables
-	tb_bstream_t 	bst;
+	tb_bits_stream_t 	bst;
 	tb_byte_t 		tag[16];
 	tb_bool_t 		ret = tb_false;
 
 	// get stream
-	tb_gstream_t* gst = flv->gst;
+	tb_basic_stream_t* gst = flv->gst;
 	tb_assert_and_check_return_val(gst, tb_false);
 
 	// spank hdata?
@@ -557,7 +557,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 		&& !(flv->spank_type_ok & TB_FLV_SPANK_TYPE_HDATA)) 
 	{
 		// read flv header
-		if (!tb_gstream_bread(gst, tag, 9)) goto end;
+		if (!tb_basic_stream_bread(gst, tag, 9)) goto end;
 
 		// check 
 		if (tag[0] != 'F' || tag[1] != 'L' || tag[2] != 'V' || tag[3] > 6) goto end;
@@ -580,14 +580,14 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 	while (tb_stream_left(gst) >= 15)
 	{
 		// read flv tag
-		if (!tb_gstream_bread(gst, tag, 15)) goto end;
-		tb_bstream_init(&bst, tag, 15);
-		tb_uint32_t 	ptag_size = tb_bstream_get_u32_be(&bst); tb_used(ptag_size);
-		tb_uint8_t 		tag_type = tb_bstream_get_u8(&bst);
-		tb_uint32_t 	data_size = tb_bstream_get_u24_be(&bst);
-		tb_uint32_t 	dts = tb_bstream_get_u24_be(&bst);
-		dts |= tb_bstream_get_u8(&bst) << 24;
-		tb_bstream_skip(&bst, 3); // skip stream id
+		if (!tb_basic_stream_bread(gst, tag, 15)) goto end;
+		tb_bits_stream_init(&bst, tag, 15);
+		tb_uint32_t 	ptag_size = tb_bits_stream_get_u32_be(&bst); tb_used(ptag_size);
+		tb_uint8_t 		tag_type = tb_bits_stream_get_u8(&bst);
+		tb_uint32_t 	data_size = tb_bits_stream_get_u24_be(&bst);
+		tb_uint32_t 	dts = tb_bits_stream_get_u24_be(&bst);
+		dts |= tb_bits_stream_get_u8(&bst) << 24;
+		tb_bits_stream_skip(&bst, 3); // skip stream id
 
 		tb_trace_d("tag type: %d", tag_type);
 		tb_trace_d("tag size: %d", data_size);
@@ -614,16 +614,16 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 					tb_assert_goto(data, end);
 
 					// attach data
-					tb_bstream_init(&flv->sdata_bst, data, data_size);
+					tb_bits_stream_init(&flv->sdata_bst, data, data_size);
 
 					// read data
-					if (!tb_gstream_bread(gst, data, data_size)) goto end;
+					if (!tb_basic_stream_bread(gst, data, data_size)) goto end;
 
 					// spank meta
 					if (flv->sdata_cb_func)
 					{
 						// the first value must be string : onMetaData
-						tb_size_t type = tb_bstream_get_u8(&flv->sdata_bst);
+						tb_size_t type = tb_bits_stream_get_u8(&flv->sdata_bst);
 						tb_assert_and_check_goto(type == TB_FLV_SDATA_TYPE_STRING, end);
 						
 						// get object list
@@ -652,7 +652,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_skip(gst, data_size)) goto end;
+					if (!tb_basic_stream_skip(gst, data_size)) goto end;
 				}
 			}
 			break; 
@@ -663,7 +663,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				{
 					// read audio flag
 					tb_byte_t data[2];
-					if (!tb_gstream_bread(gst, data, 2)) goto end;
+					if (!tb_basic_stream_bread(gst, data, 2)) goto end;
 
 					// aac?
 					if ((data[0] & TB_FLV_AUDIO_CODEC_MASK) != TB_FLV_AUDIO_CODEC_AAC) 
@@ -672,7 +672,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						tb_trace_d("skip this audio tag");
 						if (data_size > 2)
 						{
-							if (!tb_gstream_skip(gst, data_size - 2)) goto end;
+							if (!tb_basic_stream_skip(gst, data_size - 2)) goto end;
 						}
 						break;
 					}
@@ -686,7 +686,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						flv->audio_config_size = data_size - 2;
 						flv->audio_config_data = tb_malloc(flv->audio_config_size);
 						tb_assert_goto(flv->audio_config_data, end);
-						if (!tb_gstream_bread(gst, flv->audio_config_data, flv->audio_config_size)) goto end;
+						if (!tb_basic_stream_bread(gst, flv->audio_config_data, flv->audio_config_size)) goto end;
 
 						// make head data
 						tb_byte_t head_data[13];
@@ -725,7 +725,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						else flv->audio_size = data_size;
 
 						tb_assert_goto(flv->audio_data, end);
-						if (!tb_gstream_bread(gst, flv->audio_data, flv->audio_size)) goto end;
+						if (!tb_basic_stream_bread(gst, flv->audio_data, flv->audio_size)) goto end;
 
 						// make head data
 						tb_byte_t head_data[13];
@@ -745,7 +745,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						// skip this tag	
 						if (data_size > 2)
 						{
-							if (!tb_gstream_skip(gst, data_size - 2)) goto end;
+							if (!tb_basic_stream_skip(gst, data_size - 2)) goto end;
 						}
 						break;
 					}
@@ -753,7 +753,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_skip(gst, data_size)) goto end;
+					if (!tb_basic_stream_skip(gst, data_size)) goto end;
 				}
 			}
 			break;
@@ -764,7 +764,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				{
 					// read video flag
 					tb_byte_t data[5];
-					if (!tb_gstream_bread(gst, data, 5)) goto end;
+					if (!tb_basic_stream_bread(gst, data, 5)) goto end;
 			
 					// h264?
 					if ((data[0] & TB_FLV_VIDEO_CODEC_MASK) != TB_FLV_VIDEO_CODEC_H264) 
@@ -773,7 +773,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						tb_trace_d("skip this video tag");
 						if (data_size > 5)
 						{
-							if (!tb_gstream_skip(gst, data_size - 5)) goto end;
+							if (!tb_basic_stream_skip(gst, data_size - 5)) goto end;
 						}
 						break;
 					}
@@ -790,7 +790,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						flv->video_config_size = data_size - 5;
 						flv->video_config_data = tb_malloc(flv->video_config_size);
 						tb_assert_goto(flv->video_config_data, end);
-						if (!tb_gstream_bread(gst, flv->video_config_data, flv->video_config_size)) goto end;
+						if (!tb_basic_stream_bread(gst, flv->video_config_data, flv->video_config_size)) goto end;
 
 						// make head data
 						tb_byte_t head_data[16];
@@ -829,7 +829,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						else flv->video_size = data_size;
 
 						tb_assert_goto(flv->video_data, end);
-						if (!tb_gstream_bread(gst, flv->video_data, flv->video_size)) goto end;
+						if (!tb_basic_stream_bread(gst, flv->video_data, flv->video_size)) goto end;
 
 						// make head data
 						tb_byte_t head_data[16];
@@ -849,7 +849,7 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 						// skip this tag
 						if (data_size > 5)
 						{
-							if (!tb_gstream_skip(gst, data_size - 5)) goto end;
+							if (!tb_basic_stream_skip(gst, data_size - 5)) goto end;
 						}
 						break;
 					}
@@ -857,14 +857,14 @@ tb_bool_t tb_flv_spank(tb_handle_t hflv)
 				else
 				{
 					// skip it
-					if (!tb_gstream_skip(gst, data_size)) goto end;
+					if (!tb_basic_stream_skip(gst, data_size)) goto end;
 				}
 			}
 			break;
 		default:
 			{
 				// skip it
-				if (!tb_gstream_skip(gst, data_size)) goto end;
+				if (!tb_basic_stream_skip(gst, data_size)) goto end;
 				break;
 			}
 		}
@@ -942,13 +942,13 @@ tb_bool_t tb_flv_ioctl(tb_handle_t hflv, tb_size_t cmd, ...)
 		break;
 	case TB_FLV_IOCTL_CMD_SET_STREAM:
 		{
-			flv->gst = (tb_gstream_t*)tb_va_arg(arg, tb_gstream_t*);
+			flv->gst = (tb_basic_stream_t*)tb_va_arg(arg, tb_basic_stream_t*);
 			ret = tb_true;
 		}
 		break;
 	case TB_FLV_IOCTL_CMD_GET_STREAM:
 		{
-			tb_gstream_t** pgst = (tb_gstream_t**)tb_va_arg(arg, tb_gstream_t**);
+			tb_basic_stream_t** pgst = (tb_basic_stream_t**)tb_va_arg(arg, tb_basic_stream_t**);
 			tb_assert_and_check_return_val(pgst, tb_false);
 			
 			*(pgst) = flv->gst;
@@ -1003,20 +1003,20 @@ tb_size_t tb_flv_video_h264_sps_analyze_remove_emulation(tb_byte_t* sps_data, tb
 tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t size)
 {
 	// attach data
-	tb_bstream_t bst;
-	tb_bstream_init(&bst, data, size);
+	tb_bits_stream_t bst;
+	tb_bits_stream_init(&bst, data, size);
 
 	// skip forbidden_zero_bit & nal_ref_idc & nal_unit_type
-	tb_bstream_skip(&bst, 1);
+	tb_bits_stream_skip(&bst, 1);
 
-	tb_size_t profile_idc = tb_bstream_get_u8(&bst);
+	tb_size_t profile_idc = tb_bits_stream_get_u8(&bst);
 	tb_trace_d("profile_idc: %x", profile_idc);
 
-	tb_size_t constraint_setn_flag = tb_bstream_get_u8(&bst);
+	tb_size_t constraint_setn_flag = tb_bits_stream_get_u8(&bst);
 	tb_used(constraint_setn_flag);
 	tb_trace_d("constraint_setn_flag: %x", constraint_setn_flag);
 
-	tb_size_t level_idc = tb_bstream_get_u8(&bst);
+	tb_size_t level_idc = tb_bits_stream_get_u8(&bst);
 	tb_used(level_idc);
 	tb_trace_d("level_idc: %x", level_idc);
 
@@ -1031,7 +1031,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 
 		if (chroma_format_idc == 3)
 		{
-			tb_size_t separate_colour_plane_flag = tb_bstream_get_u1(&bst); tb_used(separate_colour_plane_flag);
+			tb_size_t separate_colour_plane_flag = tb_bits_stream_get_u1(&bst); tb_used(separate_colour_plane_flag);
 			tb_trace_d("\t\tseparate_colour_plane_flag: %x", separate_colour_plane_flag);
 		}
 
@@ -1043,11 +1043,11 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		tb_used(bit_depth_chroma_minus8);
 		tb_trace_d("\tbit_depth_chroma_minus8: %x", bit_depth_chroma_minus8);
 	
-		tb_size_t qpprime_y_zero_transform_bypass_flag = tb_bstream_get_u1(&bst);
+		tb_size_t qpprime_y_zero_transform_bypass_flag = tb_bits_stream_get_u1(&bst);
 		tb_used(qpprime_y_zero_transform_bypass_flag);
 		tb_trace_d("\tqpprime_y_zero_transform_bypass_flag: %x", qpprime_y_zero_transform_bypass_flag);
 	
-		tb_size_t seq_scaling_matrix_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t seq_scaling_matrix_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\tseq_scaling_matrix_present_flag: %x", seq_scaling_matrix_present_flag);
 
 		if (seq_scaling_matrix_present_flag)
@@ -1055,7 +1055,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 			tb_size_t i = 0;
 			for (i = 0; i < ((chroma_format_idc != 3) ? 8 : 12); ++i) 
 			{
-				tb_size_t seq_scaling_list_present_flag = tb_bstream_get_u1(&bst);
+				tb_size_t seq_scaling_list_present_flag = tb_bits_stream_get_u1(&bst);
 				tb_trace_d("\t\tseq_scaling_list_present_flag: %x", seq_scaling_list_present_flag);
 
 				if (seq_scaling_list_present_flag) 
@@ -1094,7 +1094,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	}
 	else if (pic_order_cnt_type == 1) 
 	{
-		tb_size_t delta_pic_order_always_zero_flag = tb_bstream_get_u1(&bst);
+		tb_size_t delta_pic_order_always_zero_flag = tb_bits_stream_get_u1(&bst);
 		tb_used(delta_pic_order_always_zero_flag);
 		tb_trace_d("\tdelta_pic_order_always_zero_flag: %x", delta_pic_order_always_zero_flag);
 
@@ -1121,7 +1121,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	tb_used(max_num_ref_frames);
 	tb_trace_d("max_num_ref_frames: %x", max_num_ref_frames);
 
-	tb_size_t gaps_in_frame_num_value_allowed_flag = tb_bstream_get_u1(&bst);
+	tb_size_t gaps_in_frame_num_value_allowed_flag = tb_bits_stream_get_u1(&bst);
 	tb_used(gaps_in_frame_num_value_allowed_flag);
 	tb_trace_d("gaps_in_frame_num_value_allowed_flag: %x", gaps_in_frame_num_value_allowed_flag);
 	
@@ -1133,21 +1133,21 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 	tb_used(pic_height_in_map_units_minus1);
 	tb_trace_d("pic_height_in_map_units_minus1: %x", pic_height_in_map_units_minus1);
 
-	tb_size_t frame_mbs_only_flag = tb_bstream_get_u1(&bst);
+	tb_size_t frame_mbs_only_flag = tb_bits_stream_get_u1(&bst);
 	tb_trace_d("frame_mbs_only_flag: %x", frame_mbs_only_flag);
 	
 	if (!frame_mbs_only_flag) 
 	{
-		tb_size_t mb_adaptive_frame_field_flag = tb_bstream_get_u1(&bst);
+		tb_size_t mb_adaptive_frame_field_flag = tb_bits_stream_get_u1(&bst);
 		tb_used(mb_adaptive_frame_field_flag);
 		tb_trace_d("\tmb_adaptive_frame_field_flag: %x", mb_adaptive_frame_field_flag);
 	}
 
-	tb_size_t direct_8x8_inference_flag = tb_bstream_get_u1(&bst);
+	tb_size_t direct_8x8_inference_flag = tb_bits_stream_get_u1(&bst);
 	tb_used(direct_8x8_inference_flag);
 	tb_trace_d("direct_8x8_inference_flag: %x", direct_8x8_inference_flag);
 
-	tb_size_t frame_cropping_flag = tb_bstream_get_u1(&bst);
+	tb_size_t frame_cropping_flag = tb_bits_stream_get_u1(&bst);
 	tb_trace_d("frame_cropping_flag: %x", frame_cropping_flag);
 
 	if (frame_cropping_flag)
@@ -1169,57 +1169,57 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		tb_trace_d("\tframe_crop_bottom_offset: %x", frame_crop_bottom_offset);
 	}
 
-	tb_size_t vui_parameters_present_flag = tb_bstream_get_u1(&bst);
+	tb_size_t vui_parameters_present_flag = tb_bits_stream_get_u1(&bst);
 	tb_trace_d("vui_parameters_present_flag: %x", vui_parameters_present_flag);
 
 	if (vui_parameters_present_flag)
 	{
-		tb_size_t aspect_ratio_info_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t aspect_ratio_info_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\taspect_ratio_info_present_flag: %x", aspect_ratio_info_present_flag);
 
 		if (aspect_ratio_info_present_flag)
 		{
-			tb_size_t aspect_ratio_idc = tb_bstream_get_ubits32(&bst, 8);
+			tb_size_t aspect_ratio_idc = tb_bits_stream_get_ubits32(&bst, 8);
 			tb_trace_d("\t\taspect_ratio_idc: %x", aspect_ratio_idc);
 
 			if (aspect_ratio_idc == 255)
 			{		
-				tb_size_t sar_width = tb_bstream_get_ubits32(&bst, 16); tb_used(sar_width);
+				tb_size_t sar_width = tb_bits_stream_get_ubits32(&bst, 16); tb_used(sar_width);
 				tb_trace_d("\t\t\tsar_width: %x", sar_width);
 
-				tb_size_t sar_height = tb_bstream_get_ubits32(&bst, 16); tb_used(sar_height);
+				tb_size_t sar_height = tb_bits_stream_get_ubits32(&bst, 16); tb_used(sar_height);
 				tb_trace_d("\t\t\tsar_height: %x", sar_height);
 			}
 		}
-		tb_size_t overscan_info_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t overscan_info_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\toverscan_info_present_flag: %x", overscan_info_present_flag);
 
 		if (overscan_info_present_flag)
 		{	
-			tb_size_t overscan_appropriate_flag = tb_bstream_get_u1(&bst);
+			tb_size_t overscan_appropriate_flag = tb_bits_stream_get_u1(&bst);
 			tb_used(overscan_appropriate_flag);
 			tb_trace_d("\t\toverscan_appropriate_flag: %x", overscan_appropriate_flag);
 		}
 		
-		tb_size_t video_signal_type_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t video_signal_type_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\tvideo_signal_type_present_flag: %x", video_signal_type_present_flag);
 
 		if (video_signal_type_present_flag)
 		{
 			// skip video_format & video_full_range_flag
-			tb_bstream_skip_bits(&bst, 4);
+			tb_bits_stream_skip_bits(&bst, 4);
 	
-			tb_size_t colour_description_present_flag = tb_bstream_get_u1(&bst);
+			tb_size_t colour_description_present_flag = tb_bits_stream_get_u1(&bst);
 			tb_trace_d("\t\tcolour_description_present_flag: %x", colour_description_present_flag);
 	
 			if (colour_description_present_flag)
 			{
 				// skip colour_primaries & transfer_characteristics & matrix_coefficients	
-				tb_bstream_skip_bits(&bst, 24);
+				tb_bits_stream_skip_bits(&bst, 24);
 			}
 		}
 
-		tb_size_t chroma_loc_info_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t chroma_loc_info_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\tchroma_loc_info_present_flag: %x", chroma_loc_info_present_flag);
 
 		if (chroma_loc_info_present_flag)
@@ -1233,18 +1233,18 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 			tb_trace_d("\t\tchroma_sample_loc_type_bottom_field: %x", chroma_sample_loc_type_bottom_field);
 		}
 
-		tb_size_t timing_info_present_flag = tb_bstream_get_u1(&bst);
+		tb_size_t timing_info_present_flag = tb_bits_stream_get_u1(&bst);
 		tb_trace_d("\ttiming_info_present_flag: %x", timing_info_present_flag);
 
 		if (timing_info_present_flag)
 		{
-			tb_size_t num_units_in_tick = tb_bstream_get_ubits32(&bst, 32);
+			tb_size_t num_units_in_tick = tb_bits_stream_get_ubits32(&bst, 32);
 			tb_trace_d("\t\tnum_units_in_tick: %x", num_units_in_tick);
 	
-			tb_size_t time_scale = tb_bstream_get_ubits32(&bst, 32);
+			tb_size_t time_scale = tb_bits_stream_get_ubits32(&bst, 32);
 			tb_trace_d("\t\ttime_scale: %x", time_scale);
 	
-			tb_size_t fixed_frame_rate_flag = tb_bstream_get_u1(&bst);
+			tb_size_t fixed_frame_rate_flag = tb_bits_stream_get_u1(&bst);
 			tb_used(fixed_frame_rate_flag);
 			tb_trace_d("\t\tfixed_frame_rate_flag: %x", fixed_frame_rate_flag);
 
@@ -1259,7 +1259,7 @@ tb_double_t tb_flv_video_h264_sps_analyze_framerate(tb_byte_t* data, tb_size_t s
 		// analyze ...
 	}
 
-	tb_trace_d("left: %u bits", tb_bstream_left_bits(&bst));
+	tb_trace_d("left: %u bits", tb_bits_stream_left_bits(&bst));
 
 	return 0.;
 }

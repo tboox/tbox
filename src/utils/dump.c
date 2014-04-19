@@ -39,18 +39,18 @@ tb_void_t tb_dump_data(tb_byte_t const* data, tb_size_t size)
 	tb_assert_and_check_return(data && size);
 
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_data(data, size);
+	tb_basic_stream_t* gst = tb_basic_stream_init_from_data(data, size);
 	if (gst)
 	{
 		// open stream
-		if (tb_gstream_open(gst))
+		if (tb_basic_stream_open(gst))
 		{
 			// dump stream
 			tb_dump_data_from_stream(gst);
 		}
 	
 		// exit stream
-		tb_gstream_exit(gst);
+		tb_basic_stream_exit(gst);
 	}
 }
 tb_void_t tb_dump_data_from_url(tb_char_t const* url)
@@ -59,21 +59,21 @@ tb_void_t tb_dump_data_from_url(tb_char_t const* url)
 	tb_assert_and_check_return(url);
 
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(url);
+	tb_basic_stream_t* gst = tb_basic_stream_init_from_url(url);
 	if (gst)
 	{
 		// open stream
-		if (tb_gstream_open(gst))
+		if (tb_basic_stream_open(gst))
 		{
 			// dump stream
 			tb_dump_data_from_stream(gst);
 		}
 	
 		// exit stream
-		tb_gstream_exit(gst);
+		tb_basic_stream_exit(gst);
 	}
 }
-tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
+tb_void_t tb_dump_data_from_stream(tb_basic_stream_t* gst)
 {
 	// check
 	tb_assert_and_check_return(gst);
@@ -97,14 +97,14 @@ tb_void_t tb_dump_data_from_stream(tb_gstream_t* gst)
 		while (read < 0x20)
 		{
 			// read data
-			tb_long_t real = tb_gstream_aread(gst, line + read, 0x20 - read);
+			tb_long_t real = tb_basic_stream_aread(gst, line + read, 0x20 - read);
 			// has data?
 			if (real > 0) read += real;
 			// no data?
 			else if (!real)
 			{
 				// wait
-				tb_long_t e = tb_gstream_wait(gst, TB_AIOE_CODE_RECV, tb_stream_timeout(gst));
+				tb_long_t e = tb_basic_stream_wait(gst, TB_AIOE_CODE_RECV, tb_stream_timeout(gst));
 				tb_assert_and_check_break(e >= 0);
 
 				// timeout?

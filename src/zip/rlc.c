@@ -34,7 +34,7 @@ static __tb_inline__ tb_zip_rlc_t* tb_zip_rlc_cast(tb_zip_t* zip)
 	tb_assert_and_check_return_val(zip && zip->algo == TB_ZIP_ALGO_RLC, tb_null);
 	return (tb_zip_rlc_t*)zip;
 }
-static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_long_t sync)
+static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
 	tb_assert_and_check_return_val(rlc && ist && ost, -1);
@@ -77,18 +77,18 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 		if (*ip != last || ip == ie) 
 		{
 			// fill output, [FIXME]: vlc < 24?
-			if (tb_bstream_left_bits(ost) > 32) 
+			if (tb_bits_stream_left_bits(ost) > 32) 
 			{
 				if (repeat > 1)
 				{
 					// set flag
-					tb_bstream_set_u1(ost, 1);
+					tb_bits_stream_set_u1(ost, 1);
 
 					// set repeat
 					vlc_set(vlc, repeat, ost);
 					
 					// set value
-					tb_bstream_set_ubits32(ost, last, 8);
+					tb_bits_stream_set_ubits32(ost, last, 8);
 
 					//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 				}
@@ -97,10 +97,10 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 					tb_assert(repeat == 1);
 
 					// set flag
-					tb_bstream_set_u1(ost, 0);
+					tb_bits_stream_set_u1(ost, 0);
 
 					// set value
-					tb_bstream_set_ubits32(ost, last, 8);
+					tb_bits_stream_set_ubits32(ost, last, 8);
 				}
 			}
 
@@ -115,7 +115,7 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 	}
 
 	// sync 
-	//tb_bstream_sync(ost);
+	//tb_bits_stream_sync(ost);
 
 	// update 
 	ist->p = ip;
@@ -125,7 +125,7 @@ static tb_long_t tb_zip_rlc_spak_deflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 	// ok
 	return (ost->p - op);
 }
-static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bstream_t* ost, tb_long_t sync)
+static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bits_stream_t* ist, tb_bits_stream_t* ost, tb_long_t sync)
 {
 	tb_zip_rlc_t* rlc = tb_zip_rlc_cast(zip);
 	tb_assert_and_check_return_val(rlc && ist && ost, -1);
@@ -154,16 +154,16 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 	while (repeat-- > 0 && op < oe) *op++ = last;
 
 	// inflate, [FIXME]: vlc < 24?
-	while (tb_bstream_left_bits(ist) > 32 && op < oe)
+	while (tb_bits_stream_left_bits(ist) > 32 && op < oe)
 	{
 		// get flag
-		if (tb_bstream_get_u1(ist))
+		if (tb_bits_stream_get_u1(ist))
 		{
 			// get repeat
 			repeat = vlc_get(vlc, ist);
 
 			// get value
-			last = tb_bstream_get_ubits32(ist, 8);
+			last = tb_bits_stream_get_ubits32(ist, 8);
 
 			//tb_trace_d("repeat(0x%02x): %d", last, repeat);
 
@@ -171,7 +171,7 @@ static tb_long_t tb_zip_rlc_spak_inflate(tb_zip_t* zip, tb_bstream_t* ist, tb_bs
 			while (repeat-- > 0 && op < oe) *op++ = last;
 	
 		}
-		else if (op < oe) *op++ = tb_bstream_get_ubits32(ist, 8);
+		else if (op < oe) *op++ = tb_bits_stream_get_ubits32(ist, 8);
 	}
 
 	// update 

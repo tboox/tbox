@@ -49,18 +49,18 @@ demo_C_FILES 							+= \
 										object/dump \
 										spider/spider \
 										spider/queue \
-										stream/tstream \
-										stream/mstream \
-										stream/astream \
-										stream/gstream \
-										stream/gstream/zip \
-										stream/gstream/null \
-										stream/gstream/cache \
-										stream/gstream/charset \
-										stream/astream/zip \
-										stream/astream/null \
-										stream/astream/cache \
-										stream/astream/charset \
+										stream/transfer \
+										stream/transfer_stream \
+										stream/async_stream \
+										stream/basic_stream \
+										stream/basic_stream/zip \
+										stream/basic_stream/null \
+										stream/basic_stream/cache \
+										stream/basic_stream/charset \
+										stream/async_stream/zip \
+										stream/async_stream/null \
+										stream/async_stream/cache \
+										stream/async_stream/charset \
 										string/scoped_string \
 										string/static_string \
 										memory/check \

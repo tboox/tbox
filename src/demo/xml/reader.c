@@ -9,8 +9,8 @@
 tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 {
 	// init stream
-	tb_gstream_t* gst = tb_gstream_init_from_url(argv[1]);
-	if (gst && tb_gstream_open(gst))
+	tb_basic_stream_t* gst = tb_basic_stream_init_from_url(argv[1]);
+	if (gst && tb_basic_stream_open(gst))
 	{
 		// init reader
 		tb_handle_t reader = tb_xml_reader_init(gst);
@@ -110,7 +110,7 @@ tb_int_t tb_demo_xml_reader_main(tb_int_t argc, tb_char_t** argv)
 		}
 	
 		// exit stream
-		tb_gstream_exit(gst);
+		tb_basic_stream_exit(gst);
 	}
 	
 	return 0;

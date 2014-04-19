@@ -28,11 +28,11 @@
  * includes
  */
 #include "prefix.h"
-#include "bstream.h"
-#include "gstream.h"
-#include "astream.h"
-#include "tstream.h"
-#include "mstream.h"
+#include "bits_stream.h"
+#include "basic_stream.h"
+#include "async_stream.h"
+#include "transfer_stream.h"
+#include "transfer.h"
 
 /*!architecture
  *

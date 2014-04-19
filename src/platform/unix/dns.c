@@ -47,16 +47,16 @@ tb_bool_t tb_dns_init()
 		 * nameserver 8.8.8.8
 		 *
 		 */
-		tb_gstream_t* gst = tb_gstream_init_from_url("/etc/resolv.conf");
+		tb_basic_stream_t* gst = tb_basic_stream_init_from_url("/etc/resolv.conf");
 		if (gst)
 		{
 			// open
-			if (tb_gstream_open(gst)) 
+			if (tb_basic_stream_open(gst)) 
 			{
 				// read
 				tb_long_t size = 0;
 				tb_char_t line[8192];
-				while ((size = tb_gstream_bread_line(gst, line, 8192)) >= 0)
+				while ((size = tb_basic_stream_bread_line(gst, line, 8192)) >= 0)
 				{
 					if (size && !tb_strnicmp(line, "nameserver", 10))
 					{
@@ -75,7 +75,7 @@ tb_bool_t tb_dns_init()
 			}
 	
 			// exit
-			tb_gstream_exit(gst);
+			tb_basic_stream_exit(gst);
 		}
 	}
 

@@ -100,18 +100,18 @@ TB_DEMO_MAIN_DECL(spider);
 TB_DEMO_MAIN_DECL(spider_queue);
 
 // stream
-TB_DEMO_MAIN_DECL(stream_tstream);
-TB_DEMO_MAIN_DECL(stream_mstream);
-TB_DEMO_MAIN_DECL(stream_astream);
-TB_DEMO_MAIN_DECL(stream_gstream);
-TB_DEMO_MAIN_DECL(stream_gstream_zip);
-TB_DEMO_MAIN_DECL(stream_gstream_null);
-TB_DEMO_MAIN_DECL(stream_gstream_cache);
-TB_DEMO_MAIN_DECL(stream_gstream_charset);
-TB_DEMO_MAIN_DECL(stream_astream_zip);
-TB_DEMO_MAIN_DECL(stream_astream_null);
-TB_DEMO_MAIN_DECL(stream_astream_cache);
-TB_DEMO_MAIN_DECL(stream_astream_charset);
+TB_DEMO_MAIN_DECL(stream_transfer_stream);
+TB_DEMO_MAIN_DECL(stream_transfer);
+TB_DEMO_MAIN_DECL(stream_async_stream);
+TB_DEMO_MAIN_DECL(stream_basic_stream);
+TB_DEMO_MAIN_DECL(stream_basic_stream_zip);
+TB_DEMO_MAIN_DECL(stream_basic_stream_null);
+TB_DEMO_MAIN_DECL(stream_basic_stream_cache);
+TB_DEMO_MAIN_DECL(stream_basic_stream_charset);
+TB_DEMO_MAIN_DECL(stream_async_stream_zip);
+TB_DEMO_MAIN_DECL(stream_async_stream_null);
+TB_DEMO_MAIN_DECL(stream_async_stream_cache);
+TB_DEMO_MAIN_DECL(stream_async_stream_charset);
 
 // string
 TB_DEMO_MAIN_DECL(string_scoped_string);
