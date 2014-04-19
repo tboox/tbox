@@ -26,8 +26,8 @@
  * includes
  */
 #include "global_pool.h"
-#include "static_block_pool.h"
 #include "static_tiny_pool.h"
+#include "static_block_pool.h"
 #include "../libc/libc.h"
 #include "../math/math.h"
 #include "../utils/utils.h"
@@ -100,7 +100,7 @@ tb_handle_t tb_global_pool_init(tb_byte_t* data, tb_size_t size, tb_size_t align
 	data += byte;
 
 	// init pool
-	tb_global_pool_t* pool = data;
+	tb_global_pool_t* pool = (tb_global_pool_t*)data;
 	tb_memset(pool, 0, sizeof(tb_global_pool_t));
 
 	// init magic
@@ -247,7 +247,7 @@ tb_pointer_t tb_global_pool_ralloc_impl(tb_handle_t handle, tb_pointer_t data, t
 	tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_null);
 
 	// try ralloc it from tpool
-	if (pool->tpool && data > pool->tdata && data < pool->tdata + pool->tsize)
+	if (pool->tpool && (tb_byte_t*)data > pool->tdata && (tb_byte_t*)data < pool->tdata + pool->tsize)
 	{
 		// ralloc it
 		tb_pointer_t pdata = tb_null;
@@ -282,7 +282,7 @@ tb_bool_t tb_global_pool_free_impl(tb_handle_t handle, tb_pointer_t data __tb_de
 	tb_assert_and_check_return_val(pool && pool->magic == TB_GLOBAL_POOL_MAGIC && pool->bpool, tb_false);
 
 	// free it to tpool
-	if (pool->tpool && data > pool->tdata && data < pool->tdata + pool->tsize)
+	if (pool->tpool && (tb_byte_t*)data > pool->tdata && (tb_byte_t*)data < pool->tdata + pool->tsize)
 		return tb_tiny_pool_free(pool->tpool, data);
 
 	// free it to bpool

@@ -47,12 +47,12 @@
 /// the pool chunk type
 typedef struct __tb_fixed_pool_chunk_t
 {
-	// the fpool
-	tb_handle_t 		pool;
+	// the static fixed pool
+	tb_handle_t 			pool;
 
 	// the chunk
-	tb_byte_t* 			data;
-	tb_size_t 			size;
+	tb_byte_t* 				data;
+	tb_size_t 				size;
 
 }tb_fixed_pool_chunk_t;
 
@@ -61,10 +61,10 @@ typedef struct __tb_fixed_pool_chunk_t
 typedef struct __tb_fixed_pool_info_t
 {
 	// the pred count
-	tb_size_t 			pred;
+	tb_size_t 				pred;
 
 	// the aloc count
-	tb_size_t 			aloc;
+	tb_size_t 				aloc;
 
 }tb_fixed_pool_info_t;
 #endif
@@ -73,24 +73,28 @@ typedef struct __tb_fixed_pool_info_t
 typedef struct __tb_fixed_pool_t
 {
 	// the pools align
-	tb_size_t 			align;
+	tb_size_t 				align;
 
 	// the size
-	tb_size_t 			size;
+	tb_size_t 				size;
 
 	// the chunk pools
 	tb_fixed_pool_chunk_t* 	pools;
-	tb_size_t 			pooln;
-	tb_size_t 			poolm;
+
+	// the chunk pool count
+	tb_size_t 				pooln;
+
+	// the chunk pool maxn
+	tb_size_t 				poolm;
 
 	// the chunk step
-	tb_size_t 			step;
+	tb_size_t 				step;
 
 	// the chunk grow
-	tb_size_t 			grow;
+	tb_size_t 				grow;
 
 	// the chunk pred
-	tb_size_t 			pred;
+	tb_size_t 				pred;
 
 	// the info
 #ifdef __tb_debug__
@@ -116,10 +120,10 @@ static tb_bool_t tb_fixed_pool_item_func(tb_pointer_t item, tb_pointer_t data)
 	data = rdata[1];
 
 	// done func
-	tb_bool_t ok = (tb_pointer_t)func(item, data);
+	tb_bool_t ok = func(item, data);
 
 	// save it
-	rdata[2] = (tb_pointer_t)ok;
+	rdata[2] = (tb_pointer_t)(tb_size_t)ok;
 
 	// ok?
 	return ok;
@@ -152,7 +156,7 @@ tb_handle_t tb_fixed_pool_init(tb_size_t grow, tb_size_t step, tb_size_t align)
 	// init chunk pools
 	pool->pooln = 0;
 	pool->poolm = TB_FIXED_POOL_CHUNK_GROW;
-	pool->pools = (tb_handle_t*)tb_nalloc0(TB_FIXED_POOL_CHUNK_GROW, sizeof(tb_fixed_pool_chunk_t));
+	pool->pools = (tb_fixed_pool_chunk_t*)tb_nalloc0(TB_FIXED_POOL_CHUNK_GROW, sizeof(tb_fixed_pool_chunk_t));
 	tb_assert_and_check_goto(pool->pools, fail);
 
 	// init chunk pred
@@ -311,7 +315,7 @@ tb_pointer_t tb_fixed_pool_malloc(tb_handle_t handle)
 	{
 		// grow
 		pool->poolm += TB_FIXED_POOL_CHUNK_GROW;
-		pool->pools = (tb_handle_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_fixed_pool_chunk_t));
+		pool->pools = (tb_fixed_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_fixed_pool_chunk_t));
 		tb_assert_and_check_return_val(pool->pools, tb_null);
 	}
 	
@@ -389,7 +393,7 @@ tb_bool_t tb_fixed_pool_free(tb_handle_t handle, tb_pointer_t data)
 	if (pool->pred)
 	{
 		// check
-		tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_null);
+		tb_assert_and_check_return_val(pool->pred <= pool->pooln, tb_false);
 
 		// the predicted pool
 		tb_handle_t fpool = pool->pools[pool->pred - 1].pool;
@@ -467,9 +471,9 @@ tb_void_t tb_fixed_pool_walk(tb_handle_t handle, tb_bool_t (*func)(tb_pointer_t 
 		{
 			// done walk
 			tb_pointer_t rdata[3];
-			rdata[0] = (tb_cpointer_t)func;
+			rdata[0] = (tb_pointer_t)func;
 			rdata[1] = data;
-			rdata[2] = tb_true;
+			rdata[2] = (tb_pointer_t)tb_true;
 			tb_static_fixed_pool_walk(pool->pools[i].pool, tb_fixed_pool_item_func, rdata);
 
 			// ok?
@@ -485,14 +489,16 @@ tb_void_t tb_fixed_pool_dump(tb_handle_t handle)
 	tb_fixed_pool_t* pool = (tb_fixed_pool_t*)handle;
 	tb_assert_and_check_return(pool && pool->pools);
 
+	// trace
 	tb_trace_i("======================================================================");
 	tb_trace_i("pool: align: %lu", 	pool->align);
 	tb_trace_i("pool: pooln: %lu", 	pool->pooln);
 	tb_trace_i("pool: poolm: %lu", 	pool->poolm);
 	tb_trace_i("pool: size: %lu", 	pool->size);
 	tb_trace_i("pool: grow: %lu", 	pool->grow);
-	tb_trace_i("pool: pred: %lu%%", 	pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
+	tb_trace_i("pool: pred: %lu%%", pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
 
+	// dump
 	tb_size_t i = 0;
 	tb_size_t n = pool->pooln;
 	for (i = 0; i < n; i++)

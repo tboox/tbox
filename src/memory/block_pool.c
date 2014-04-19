@@ -47,12 +47,12 @@
 /// the pool chunk type
 typedef struct __tb_block_pool_chunk_t
 {
-	// the vpool
-	tb_handle_t 		pool;
+	// the static block pool
+	tb_handle_t 			pool;
 
 	// the chunk
-	tb_byte_t* 			data;
-	tb_size_t 			size;
+	tb_byte_t* 				data;
+	tb_size_t 				size;
 
 }tb_block_pool_chunk_t;
 
@@ -61,10 +61,10 @@ typedef struct __tb_block_pool_chunk_t
 typedef struct __tb_block_pool_info_t
 {
 	// the pred count
-	tb_size_t 			pred;
+	tb_size_t 				pred;
 
 	// the aloc count
-	tb_size_t 			aloc;
+	tb_size_t 				aloc;
 
 }tb_block_pool_info_t;
 #endif
@@ -73,18 +73,22 @@ typedef struct __tb_block_pool_info_t
 typedef struct __tb_block_pool_t
 {
 	// the pools align
-	tb_size_t 			align;
+	tb_size_t 				align;
 
 	// the chunk pools
 	tb_block_pool_chunk_t* 	pools;
-	tb_size_t 			pooln;
-	tb_size_t 			poolm;
+
+	// the chunk pool count
+	tb_size_t 				pooln;
+
+	// the chunk pool maxn
+	tb_size_t 				poolm;
 
 	// the chunk grow
-	tb_size_t 			grow;
+	tb_size_t 				grow;
 
 	// the chunk pred
-	tb_size_t 			pred;
+	tb_size_t 				pred;
 
 	// the info
 #ifdef __tb_debug__
@@ -179,7 +183,7 @@ tb_handle_t tb_block_pool_init(tb_size_t grow, tb_size_t align)
 	// init chunk pools
 	pool->pooln = 0;
 	pool->poolm = TB_BLOCK_POOL_CHUNK_GROW;
-	pool->pools = (tb_handle_t*)tb_nalloc0(TB_BLOCK_POOL_CHUNK_GROW, sizeof(tb_block_pool_chunk_t));
+	pool->pools = (tb_block_pool_chunk_t*)tb_nalloc0(TB_BLOCK_POOL_CHUNK_GROW, sizeof(tb_block_pool_chunk_t));
 	tb_assert_and_check_goto(pool->pools, fail);
 
 	// init chunk pred
@@ -323,7 +327,7 @@ tb_pointer_t tb_block_pool_malloc_impl(tb_handle_t handle, tb_size_t size __tb_d
 	{
 		// grow
 		pool->poolm += TB_BLOCK_POOL_CHUNK_GROW;
-		pool->pools = (tb_handle_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_block_pool_chunk_t));
+		pool->pools = (tb_block_pool_chunk_t*)tb_ralloc(pool->pools, pool->poolm * sizeof(tb_block_pool_chunk_t));
 		tb_assert_and_check_return_val(pool->pools, tb_null);
 	}
 	
@@ -524,15 +528,17 @@ tb_void_t tb_block_pool_dump(tb_handle_t handle, tb_char_t const* prefix)
 	// prefix
 	if (!prefix) prefix = "pool";
 
+	// trace
 #if 0
 	tb_trace_i("======================================================================");
-	tb_trace_i("%s: align: %lu", 		prefix, pool->align);
-	tb_trace_i("%s: pooln: %lu", 		prefix, pool->pooln);
-	tb_trace_i("%s: poolm: %lu", 		prefix, pool->poolm);
-	tb_trace_i("%s: grow: %lu", 		prefix, pool->grow);
+	tb_trace_i("%s: align: %lu", 	prefix, pool->align);
+	tb_trace_i("%s: pooln: %lu", 	prefix, pool->pooln);
+	tb_trace_i("%s: poolm: %lu", 	prefix, pool->poolm);
+	tb_trace_i("%s: grow: %lu", 	prefix, pool->grow);
 	tb_trace_i("%s: pred: %lu%%", 	prefix, pool->info.aloc? ((pool->info.pred * 100) / pool->info.aloc) : 0);
 #endif
 
+	// dump
 	tb_size_t i = 0;
 	tb_size_t n = pool->pooln;
 	for (i = 0; i < n; i++)
